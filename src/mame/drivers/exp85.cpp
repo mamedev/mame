@@ -30,12 +30,58 @@
 
 
 #include "emu.h"
-#include "includes/exp85.h"
 
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "machine/ram.h"
 #include "speaker.h"
+
+#include "bus/rs232/rs232.h"
+#include "cpu/i8085/i8085.h"
+#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
+
+#define I8085A_TAG      "u100"
+#define I8155_TAG       "u106"
+#define I8355_TAG       "u105"
+
+class exp85_state : public driver_device
+{
+public:
+	exp85_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, I8085A_TAG)
+		, m_rs232(*this, "rs232")
+		, m_cassette(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_rom(*this, I8085A_TAG)
+		, m_tape_control(0)
+	{ }
+
+	void exp85(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_rst75 );
+
+private:
+	required_device<i8085a_cpu_device> m_maincpu;
+	required_device<rs232_port_device> m_rs232;
+	required_device<cassette_image_device> m_cassette;
+	required_device<speaker_sound_device> m_speaker;
+	required_memory_region m_rom;
+
+	virtual void machine_start() override;
+
+	uint8_t i8355_a_r();
+	void i8355_a_w(uint8_t data);
+	DECLARE_READ_LINE_MEMBER( sid_r );
+	DECLARE_WRITE_LINE_MEMBER( sod_w );
+
+	/* cassette state */
+	bool m_tape_control;
+	void exp85_io(address_map &map);
+	void exp85_mem(address_map &map);
+};
 
 /* Memory Maps */
 
@@ -72,8 +118,8 @@ INPUT_CHANGED_MEMBER( exp85_state::trigger_rst75 )
 static INPUT_PORTS_START( exp85 )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_rst75, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_reset, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_rst75, 0)
 INPUT_PORTS_END
 
 /* 8355 Interface */
@@ -170,6 +216,8 @@ void exp85_state::machine_start()
 	membank("bank1")->configure_entry(0, m_rom->base() + 0xf000);
 	membank("bank1")->configure_entry(1, m_rom->base());
 	membank("bank1")->set_entry(0);
+
+	save_item(NAME(m_tape_control));
 }
 
 /* Machine Driver */
@@ -229,4 +277,4 @@ ROM_END
 
 /* System Drivers */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME       FLAGS
-COMP( 1979, exp85, 0,      0,      exp85,   exp85, exp85_state, empty_init, "Netronics", "Explorer/85", 0 )
+COMP( 1979, exp85, 0,      0,      exp85,   exp85, exp85_state, empty_init, "Netronics", "Explorer/85", MACHINE_SUPPORTS_SAVE )

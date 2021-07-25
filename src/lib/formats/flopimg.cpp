@@ -13,7 +13,6 @@
 
 #include "osdcore.h"
 #include "ioprocs.h"
-#include "pool.h"
 
 #include <cassert>
 #include <cctype>
@@ -31,22 +30,21 @@ using util::BIT;
 
 struct floppy_image_legacy
 {
-	struct io_generic io;
+	struct io_generic io = { 0 };
 
-	const struct FloppyFormat *floppy_option;
-	struct FloppyCallbacks format;
+	const struct FloppyFormat *floppy_option = nullptr;
+	struct FloppyCallbacks format = { 0 };
 
 	/* loaded track stuff */
-	int loaded_track_head;
-	int loaded_track_index;
-	uint32_t loaded_track_size;
-	void *loaded_track_data;
-	uint8_t loaded_track_status;
-	uint8_t flags;
+	int loaded_track_head = 0;
+	int loaded_track_index = 0;
+	uint32_t loaded_track_size = 0;
+	std::unique_ptr<uint8_t[]> loaded_track_data;
+	uint8_t loaded_track_status = 0;
+	uint8_t flags = 0;
 
 	/* tagging system */
-	object_pool *tags;
-	void *tag_data;
+	std::unique_ptr<uint8_t[]> tag_data;
 };
 
 
@@ -82,13 +80,8 @@ static floppy_image_legacy *floppy_init(void *fp, const struct io_procs *procs, 
 {
 	floppy_image_legacy *floppy;
 
-	floppy = (floppy_image_legacy *)malloc(sizeof(floppy_image_legacy));
-	if (!floppy)
-		return nullptr;
+	floppy = new floppy_image_legacy;
 
-	memset(floppy, 0, sizeof(*floppy));
-	floppy->tags = pool_alloc_lib(nullptr);
-	floppy->tag_data = nullptr;
 	floppy->io.file = fp;
 	floppy->io.procs = procs;
 	floppy->io.filler = 0xFF;
@@ -295,11 +288,8 @@ static void floppy_close_internal(floppy_image_legacy *floppy, bool close_file)
 			floppy->floppy_option->destruct(floppy, floppy->floppy_option);
 		if (close_file)
 			io_generic_close(&floppy->io);
-		if (floppy->loaded_track_data)
-			free(floppy->loaded_track_data);
-		pool_free_lib(floppy->tags);
 
-		free(floppy);
+		delete floppy;
 	}
 }
 
@@ -327,15 +317,15 @@ struct FloppyCallbacks *floppy_callbacks(floppy_image_legacy *floppy)
 void *floppy_tag(floppy_image_legacy *floppy)
 {
 	assert(floppy);
-	return floppy->tag_data;
+	return floppy->tag_data.get();
 }
 
 
 
 void *floppy_create_tag(floppy_image_legacy *floppy, size_t tagsize)
 {
-	floppy->tag_data = pool_malloc_lib(floppy->tags,tagsize);
-	return floppy->tag_data;
+	floppy->tag_data = std::make_unique<uint8_t[]>(tagsize);
+	return floppy->tag_data.get();
 }
 
 
@@ -779,7 +769,6 @@ uint8_t floppy_random_byte(floppy_image_legacy *floppy)
 floperr_t floppy_load_track(floppy_image_legacy *floppy, int head, int track, int dirtify, void **track_data, size_t *track_length)
 {
 	floperr_t err;
-	void *new_loaded_track_data;
 	uint32_t track_size;
 
 	/* have we already loaded this track? */
@@ -791,20 +780,12 @@ floperr_t floppy_load_track(floppy_image_legacy *floppy, int head, int track, in
 
 		track_size = floppy_callbacks(floppy)->get_track_size(floppy, head, track);
 
-		if (floppy->loaded_track_data) free(floppy->loaded_track_data);
-		new_loaded_track_data = malloc(track_size);
-		if (!new_loaded_track_data)
-		{
-			err = FLOPPY_ERROR_OUTOFMEMORY;
-			goto error;
-		}
-
-		floppy->loaded_track_data = new_loaded_track_data;
+		floppy->loaded_track_data = std::make_unique<uint8_t[]>(track_size);
 		floppy->loaded_track_size = track_size;
 		floppy->loaded_track_head = head;
 		floppy->loaded_track_index = track;
 
-		err = floppy_callbacks(floppy)->read_track(floppy, floppy->loaded_track_head, floppy->loaded_track_index, 0, floppy->loaded_track_data, floppy->loaded_track_size);
+		err = floppy_callbacks(floppy)->read_track(floppy, floppy->loaded_track_head, floppy->loaded_track_index, 0, floppy->loaded_track_data.get(), floppy->loaded_track_size);
 		if (err)
 			goto error;
 
@@ -814,7 +795,7 @@ floperr_t floppy_load_track(floppy_image_legacy *floppy, int head, int track, in
 		floppy->loaded_track_status |= (dirtify ? TRACK_DIRTY : 0);
 
 	if (track_data)
-		*track_data = floppy->loaded_track_data;
+		*track_data = floppy->loaded_track_data.get();
 	if (track_length)
 		*track_length = floppy->loaded_track_size;
 	return FLOPPY_ERROR_SUCCESS;
@@ -834,7 +815,7 @@ static floperr_t floppy_track_unload(floppy_image_legacy *floppy)
 	int err;
 	if (floppy->loaded_track_status & TRACK_DIRTY)
 	{
-		err = floppy_callbacks(floppy)->write_track(floppy, floppy->loaded_track_head, floppy->loaded_track_index, 0, floppy->loaded_track_data, floppy->loaded_track_size);
+		err = floppy_callbacks(floppy)->write_track(floppy, floppy->loaded_track_head, floppy->loaded_track_index, 0, floppy->loaded_track_data.get(), floppy->loaded_track_size);
 		if (err)
 			return (floperr_t)err;
 	}
@@ -995,23 +976,6 @@ bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, u
 	return false;
 }
 
-floppy_image_format_t::floppy_image_format_t()
-{
-	next = nullptr;
-}
-
-floppy_image_format_t::~floppy_image_format_t()
-{
-}
-
-void floppy_image_format_t::append(floppy_image_format_t *_next)
-{
-	if(next)
-		next->append(_next);
-	else
-		next = _next;
-}
-
 bool floppy_image_format_t::save(io_generic *, const std::vector<uint32_t> &, floppy_image *)
 {
 	return false;
@@ -1038,7 +1002,7 @@ bool floppy_image_format_t::extension_matches(const char *file_name) const
 	return false;
 }
 
-bool floppy_image_format_t::type_no_data(int type) const
+bool floppy_image_format_t::type_no_data(int type)
 {
 	return
 		type == CRC_CCITT_START ||
@@ -1055,7 +1019,7 @@ bool floppy_image_format_t::type_no_data(int type) const
 		type == END;
 }
 
-bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs) const
+bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs)
 {
 	return
 		type == MFM ||
@@ -1078,7 +1042,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 		(type == CRC && (crcs[p1].type == CRC_CCITT || crcs[p1].type == CRC_AMIGA));
 }
 
-void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs) const
+void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 {
 	memset(crcs, 0, MAX_CRC_COUNT * sizeof(*crcs));
 	for(int i=0; i != MAX_CRC_COUNT; i++)
@@ -1120,7 +1084,7 @@ void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 		}
 }
 
-int floppy_image_format_t::crc_cells_size(int type) const
+int floppy_image_format_t::crc_cells_size(int type)
 {
 	switch(type) {
 	case CRC_CCITT: return 32;

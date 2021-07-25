@@ -731,6 +731,7 @@ Mushiking The King Of Beetles 2006 Second (Japan)   840-0171C    not present  2 
 Pokasuka Ghost!                                     840-0170C    not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based)
 Radirgy Noa                                         841-0062C    not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
 Rhythm Tengoku                                      841-0177C    not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
+Driving Simulator                                   841-0178C    not present  8 (512Mb)   present  317-0502-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A", require 3 comm.bd. linked Naomi 2
 Star Horse Progress Returns (main screen left)      840-0183C    24480        4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Star Horse Progress Returns (main screen right)     840-0184C    not present  2 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Star Horse Progress Returns (live and voice)        840-0185C    not present  4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
@@ -3113,6 +3114,16 @@ void naomi_state::naomim4(machine_config &config)
 }
 
 /*
+ * Naomi M1 with 837-14438 "SH I/O BD" hopper board
+ */
+
+void naomi_state::naomim1_hop(machine_config &config)
+{
+	naomim1(config);
+	SEGA837_14438(config, "hopperbd", 0);
+}
+
+/*
  * Naomi M2 with Keyboard controllers
  */
 
@@ -3198,6 +3209,18 @@ void naomi2_state::naomi2m1(machine_config &config)
 void naomi2_state::naomi2m2(machine_config &config)
 {
 	naomim2(config);
+	naomi2_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
+
+/*
+ * Naomi 2, M4 sub-board
+ */
+
+void naomi2_state::naomi2m4(machine_config &config)
+{
+	naomim4(config);
 	naomi2_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
@@ -7741,26 +7764,6 @@ ROM_START( kick4csh )
 	ROM_REGION(0x200, "some_eeprom", 0)
 	ROM_LOAD( "25lc040.ic13s", 0, 0x200, CRC(1576366a) SHA1(3e8bf3dbc8a248a6863242b78d5c6e53a869e951) )
 
-	// 837-14438 SH I/O BD
-	// IC1    - Hitachi/Renesas SH4 SoC
-	// IC2    - Xilinx Spartan XC2S50 PQ208AMS0341 FPGA
-	// IC3    - Xilinx 17S50APC Spartan-II Family OTP Configuration PROM, stamped 6372A
-	// IC4,5  - Toshiba TC59S6432CFT-10  512K x4 banks x32bit SDRAM
-	// IC6    - Macronix MX29LV160ATTC-90 16Mbit Flash ROM
-	// IC7    - ST M68AF127BL55MC6 1Mbit (128K x8) SRAM
-	// IC9    - NS USBN9604-28M USB Node Controller
-	// OSC1   - 33.3333 MHz
-	// OSC2   - 32.0000 MHz
-	// OCS3   - 24.0000 MHz
-	// SW1,2  - pushbuttons
-	// DIPSW1 - 4x DIP switch
-	// LED1-5 - LEDs
-	// LED6,7 - 7seg LEDs
-	// BT1    - Panasonic CR2032 battery
-	ROM_REGION(0x220000, "hopper_board", 0)
-	ROM_LOAD( "fpr-24150.ic6",   0x0000000, 0x200000, CRC(3845c34c) SHA1(027b17bac64482ee152773d5fab30fcbc6e2bcb7) )    // SH4 code
-	ROM_LOAD( "6372a.ic3",       0x0200000, 0x020000, CRC(f30839ad) SHA1(ea1a32c4da1ed9745300bcdd7964a7c0964e3221) )    // FPGA config
-
 	// 840-0140    2004     317-0397-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "820857c9" )
 ROM_END
@@ -10339,6 +10342,26 @@ ROM_START( clubk2kpa )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 populated, not used
 ROM_END
 
+ROM_START( sgdrvsim )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x20000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "ic8.bin",  0x00000000, 0x4000000, CRC(3ef5e62f) SHA1(34385c21152881942be3f66cfeba6cb9d94343bc) )
+	ROM_LOAD( "ic9.bin",  0x04000000, 0x4000000, CRC(4edf67df) SHA1(bb5bca9bb0d13d47fd33790f28cdd0839e62b422) )
+	ROM_LOAD( "ic10.bin", 0x08000000, 0x4000000, CRC(a3b0f436) SHA1(4a8153bbb5c7314d33b65b6c724543afd4e6df15) )
+	ROM_LOAD( "ic11.bin", 0x0c000000, 0x4000000, CRC(200ad72c) SHA1(e3b30853f6368a0501f4b7c6fcd442cb4d7d9d24) )
+	ROM_LOAD( "ic12.bin", 0x10000000, 0x4000000, CRC(90d192a4) SHA1(43aae3d60c4b562f4f2ec50d6e9364eb2bad4ad4) )
+	ROM_LOAD( "ic13.bin", 0x14000000, 0x4000000, CRC(eed33acc) SHA1(d2bccd58efd4ef29883d90806ebaebd6ac89de3b) )
+	ROM_LOAD( "ic14.bin", 0x18000000, 0x4000000, CRC(349267e9) SHA1(333cd48238ad321023b587ffa8d5f1f926ce8780) )
+	ROM_LOAD( "ic15.bin", 0x1c000000, 0x4000000, CRC(acc0c039) SHA1(8f02dd8599adb0d6435e031b5dd146ed0db4d558) )
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0502-jpn.ic3", 0, 0x800, CRC(528ad9e7) SHA1(35795c663c4cd43142ad8196f604b4c67a0c16f4) )
+
+	ROM_PARAMETER( ":rom_board:id", "5508" )
+ROM_END
+
 
 /**********************************************
  *
@@ -11701,6 +11724,7 @@ ROM_END
 /* 0103    */ GAME( 2002, shors2k2s, naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (sound and backup, Rev A)", GAME_FLAGS )
 /* 0104    */ GAME( 2002, shors2k2l, naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (live)", GAME_FLAGS )
 /* 0112    */ GAME( 2002, shors2k2,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (sound, Export/Taiwan)", GAME_FLAGS )
+// 0117 それいけ！アンパンマン ポップコーンこうじょう2 / Soreike! Anpanman Popcorn Kojo 2
 /* 0120    */ GAME( 2003, shorsepm,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (main screens, Rev B)", GAME_FLAGS )
 /* 0121    */ GAME( 2003, shorseps,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (sound & backup, Rev A)", GAME_FLAGS )
 /* 0122    */ GAME( 2003, shorsepl,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (live, Rev A)", GAME_FLAGS )
@@ -11709,9 +11733,9 @@ ROM_END
 /* 0128    */ GAME( 2003, shootpl,   naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan, Rev A)", GAME_FLAGS )
 /* 0130    */ GAME( 2002, hopper,    naomi,    naomi,   naomi,   naomi_state, init_naomi,   ROT0, "Sega", "SWP Hopper Board", GAME_FLAGS )
 // 0132 Mushiking 2K3 2ND (Japan)
-/* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B", GAME_FLAGS ) // Build: 23 Jan 2004
+/* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1_hop, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B", GAME_FLAGS ) // Build: 23 Jan 2004
 /* 0136    */ GAME( 2004, shootplmp, shootplm, naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B (prototype)", GAME_FLAGS ) // Build: 15 Dec 2003
-/* 0140    */ GAME( 2004, kick4csh,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Kick '4' Cash (Export)", GAME_FLAGS )
+/* 0140    */ GAME( 2004, kick4csh,  naomi,    naomim1_hop, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Kick '4' Cash (Export)", GAME_FLAGS )
 /* 0150    */ GAME( 2004, mushike,   naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND Ver. 1.003-, World)", GAME_FLAGS ) // not for Japan
 /* 0150    */ GAME( 2004, mushikeo,  mushike,  naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND Ver. 1.002-, World)", GAME_FLAGS ) // not for Japan
 /* 0150-FLS*/ GAME( 2004, mushikep,  mushike,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (MUSHIUSA '04 1ST, Prototype)", GAME_FLAGS )
@@ -11765,6 +11789,7 @@ ROM_END
 /* 0139 */ GAME( 2003, clubk2k3, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, Rev A)", GAME_FLAGS )
 /* none */ GAME( 2003, clubk2kp, clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype, set 1)", GAME_FLAGS )
 /* none */ GAME( 2003, clubk2kpa,clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype, set 2)", GAME_FLAGS )
+/* 0178 */ GAME( 2007, sgdrvsim, naomi2,  naomi2m4, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Driving Simulator", GAME_FLAGS )
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */       GAME( 1999, pstone,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Power Stone", GAME_FLAGS )

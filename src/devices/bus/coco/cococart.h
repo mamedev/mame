@@ -231,5 +231,8 @@ private:
 void coco_cart_add_basic_devices(device_slot_interface &device);
 void coco_cart_add_fdcs(device_slot_interface &device);
 void coco_cart_add_multi_pak(device_slot_interface &device);
+void dragon_cart_add_basic_devices(device_slot_interface &device);
+void dragon_cart_add_fdcs(device_slot_interface &device);
+void dragon_cart_add_multi_pak(device_slot_interface &device);
 
 #endif // MAME_BUS_COCO_COCOCART_H

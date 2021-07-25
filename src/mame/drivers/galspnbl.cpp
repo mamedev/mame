@@ -43,7 +43,7 @@ Manuals for both games define the controls as 4 push buttons:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
@@ -232,8 +232,6 @@ void galspnbl_state::galspnbl(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(galspnbl_state::screen_update_galspnbl));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galspnbl);
 	PALETTE(config, m_palette, FUNC(galspnbl_state::galspnbl_palette)).set_format(palette_device::xBGR_444, 1024 + 32768);

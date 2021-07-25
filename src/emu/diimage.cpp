@@ -801,10 +801,9 @@ bool device_image_interface::load_software(software_list_device &swlist, std::st
 				if (!swinfo)
 					return false;
 
-				const u32 supported = swinfo->supported();
-				if (supported == SOFTWARE_SUPPORTED_PARTIAL)
+				if (swinfo->supported() == software_support::PARTIALLY_SUPPORTED)
 					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
-				if (supported == SOFTWARE_SUPPORTED_NO)
+				else if (swinfo->supported() == software_support::UNSUPPORTED)
 					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
 
 				u32 crc = 0;

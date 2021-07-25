@@ -275,7 +275,7 @@ void ns32202_device::interrupt(void *ptr, s32 param)
 					// check equal priority unmasked pending cascade interrupt
 					if ((m_csrc & mask) && (m_ipnd & mask) && !(m_imsk & mask))
 					{
-						LOGMASKED(LOG_STATE, "unmasked pending cascade in-service interrupt %d\n", 31 - count_leading_zeros(mask));
+						LOGMASKED(LOG_STATE, "unmasked pending cascade in-service interrupt %d\n", 31 - count_leading_zeros_32(mask));
 						accept = true;
 					}
 
@@ -285,7 +285,7 @@ void ns32202_device::interrupt(void *ptr, s32 param)
 				// check unmasked pending interrupt
 				if ((m_ipnd & mask) && !(m_imsk & mask))
 				{
-					LOGMASKED(LOG_STATE, "unmasked pending interrupt %d\n", 31 - count_leading_zeros(mask));
+					LOGMASKED(LOG_STATE, "unmasked pending interrupt %d\n", 31 - count_leading_zeros_32(mask));
 					accept = true;
 					break;
 				}
@@ -324,7 +324,7 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 			mask = (mask << 1) | (mask >> 15);
 		}
 
-		unsigned const number = 31 - count_leading_zeros(mask);
+		unsigned const number = 31 - count_leading_zeros_32(mask);
 		if (side_effects)
 		{
 			LOGMASKED(LOG_STATE, "acknowledge highest priority unmasked interrupt %d\n", number);
@@ -400,7 +400,7 @@ u8 ns32202_device::interrupt_return(bool side_effects)
 			// rotate priority mask
 			mask = (mask << 1) | (mask >> 15);
 		}
-		unsigned const number = 31 - count_leading_zeros(mask);
+		unsigned const number = 31 - count_leading_zeros_32(mask);
 
 		if (side_effects)
 		{
@@ -685,14 +685,14 @@ void ns32202_device::cctl_w(u8 data)
 			{} // TODO: decrement l-counter
 	}
 
-	m_cctl = data & ~(CCTL_CRUNH | CCTL_CRUNL);
+	m_cctl = data & ~(CCTL_CDCRH | CCTL_CDCRL);
 }
 
 void ns32202_device::cictl_w(u8 data)
 {
 	u8 const mask =
-		((data & CICTL_WENL) ? (CICTL_CERL | CICTL_CIRL | CICTL_CIEL) : 0) |
-		((data & CICTL_WENH) ? (CICTL_CERH | CICTL_CIRH | CICTL_CIEH) : 0);
+		((data & CICTL_WENL) ? (CICTL_CERL | CICTL_CIRL | CICTL_CIEL | CICTL_WENL) : 0) |
+		((data & CICTL_WENH) ? (CICTL_CERH | CICTL_CIRH | CICTL_CIEH | CICTL_WENH) : 0);
 
 	m_cictl = (m_cictl & ~mask) | (data & mask);
 }

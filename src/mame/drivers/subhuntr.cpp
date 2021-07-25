@@ -147,7 +147,7 @@ void subhuntr_state::txtram_w(offs_t offset, u8 data)
 
 u8 subhuntr_state::intack_r()
 {
-	unsigned const source = count_leading_zeros(m_intreqs) - 24;
+	unsigned const source = count_leading_zeros_32(m_intreqs) - 24;
 	u8 const vector = ((m_intreq_cnf->read() & 0x01) ? 0x91 : 0x11) | (source << 1);
 	switch (source)
 	{

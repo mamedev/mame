@@ -1088,6 +1088,7 @@ end
 				"-Wno-unknown-attributes",
 				"-Wno-unknown-warning-option",
 				"-Wno-unused-value",
+				"-Wno-unused-const-variable",
 			}
 			if (version < 70000) or ((version < 100001) and (_OPTIONS["targetos"] == 'macosx')) then
 				buildoptions { -- clang 6.0 complains that [[maybe_unused]] is ignored for static data members
@@ -1130,6 +1131,14 @@ end
 			if (version >= 100000) then
 				buildoptions {
 					"-Wno-return-local-addr", -- sqlite3.c in GCC 10
+				}
+			end
+			if (version >= 110000) then
+				buildoptions {
+					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
+					"-Wno-stringop-overread",       -- machine/bbc.cpp in GCC 11.1
+					"-Wno-misleading-indentation",  -- sqlite3.c in GCC 11.1
+					"-Wno-maybe-uninitialized"      -- expat in GCC 11.1
 				}
 			end
 		end
@@ -1373,6 +1382,7 @@ end
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
 			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
+			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4702", -- warning C4702: unreachable code
 			"/wd4706", -- warning C4706: assignment within conditional expression
 			"/wd4804", -- warning C4804: '>>': unsafe use of type 'bool' in operation
@@ -1437,6 +1447,7 @@ if _OPTIONS["vs"]=="clangcl" then
 			"-Wno-unused-local-typedef",
 			"-Wno-unused-private-field",
 			"-Wno-unused-variable",
+			"-Wno-xor-used-as-pow",
 			"-Wno-microsoft-cast",
 		}
 end

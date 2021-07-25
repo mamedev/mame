@@ -19,10 +19,12 @@ known chips:
  *A67     HD38750  1982, Romtec Pucki & Monsters (ET-803)
 
  @A04     HD38800  1980, Gakken Heiankyo Alien
+ *A16     HD38800  1981, Entex Select-A-Game cartridge: Basketball 3 -> sag.cpp
  *A20     HD38800  1981, Entex Super Space Invader 2
  @A25     HD38800  1981, Coleco Alien Attack
  @A27     HD38800  1981, Bandai Packri Monster
  @A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
+ *A36     HD38800  1981, Entex Select-A-Game cartridge: Pac-Man 2       -> "
   A37     HD38800  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
   A38     HD38800  1981, Entex Select-A-Game cartridge: Pinball         -> "
  *A41     HD38800  1982, Gakken Puck Monster
@@ -56,6 +58,7 @@ known chips:
  @A45     HD38820  1982, Coleco Donkey Kong
  @A49     HD38820  1983, Bandai Zackman
  @A61     HD38820  1983, Coleco Ms. Pac-Man
+ *A62     HD38820  1983, Coleco Zaxxon
  @A63     HD38820  1983, Bandai Pengo
  @A65     HD38820  1983, Bandai Burger Time (PT-389)
  @A69     HD38820  1983, Gakken Dig Dug
@@ -90,7 +93,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same game:
+ROM source notes when dumped from another publisher, but confident it's the same:
 - gckong: CGL Super Kong
 - ghalien: CGL Earth Invaders
 - kingman: Tandy Kingman

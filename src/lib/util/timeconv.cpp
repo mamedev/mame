@@ -37,7 +37,7 @@ arbitrary_datetime arbitrary_datetime::now()
 	time_t sec;
 	time(&sec);
 	auto t = *localtime(&sec);
-	
+
 	arbitrary_datetime dt;
 	dt.year         = t.tm_year + 1900;
 	dt.month        = t.tm_mon + 1;
@@ -46,7 +46,7 @@ arbitrary_datetime arbitrary_datetime::now()
 	dt.minute       = t.tm_min;
 	dt.second       = t.tm_sec;
 
-	return dt;	
+	return dt;
 }
 
 static std::chrono::system_clock::duration calculate_system_clock_adjustment()

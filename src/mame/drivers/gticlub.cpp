@@ -308,7 +308,7 @@ private:
 	optional_device<k001005_device> m_k001005;
 	optional_device_array<k001006_device, 2> m_k001006;
 	optional_device_array<k001604_device, 2> m_k001604;
-	optional_device_array<voodoo_device, 2> m_voodoo;
+	optional_device_array<generic_voodoo_device, 2> m_voodoo;
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
@@ -559,7 +559,7 @@ void gticlub_state::hangplt_sharc0_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r)).w(m_voodoo[0], FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r)).w(m_voodoo[0], FUNC(generic_voodoo_device::write));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_fifo_0_w));
 	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
@@ -571,7 +571,7 @@ void gticlub_state::hangplt_sharc1_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r)).w(m_voodoo[1], FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r)).w(m_voodoo[1], FUNC(generic_voodoo_device::write));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_fifo_1_w));
 	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
@@ -762,9 +762,12 @@ void gticlub_state::machine_reset()
 
 uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_k001604[0]->draw_back_layer(bitmap, cliprect);
+	m_k001604[0]->draw_back_layer(screen, bitmap, cliprect);
 
-	m_k001005->draw(bitmap, cliprect);
+	if (m_konppc[0].output_3d_enabled())
+	{
+		m_k001005->draw(bitmap, cliprect);
+	}
 
 	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);
 
@@ -829,7 +832,7 @@ uint32_t gticlub_state::screen_update_two_screens(screen_device &screen, bitmap_
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 //  m_k001604[Which]->draw_back_layer(bitmap, cliprect);
-	m_voodoo[Which]->voodoo_update(bitmap, cliprect);
+	m_voodoo[Which]->update(bitmap, cliprect);
 	m_k001604[Which]->draw_front_layer(screen, bitmap, cliprect);
 
 	return 0;
@@ -870,17 +873,13 @@ void gticlub_state::gticlub(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_size(512, 384);
-	screen.set_visarea(0, 511, 0, 383);
+	screen.set_size(1024, 1024);
+	screen.set_visarea(40, 511+40, 28, 383+28);     // needs CRTC emulation
 	screen.set_screen_update(FUNC(gticlub_state::screen_update_gticlub));
 
 	PALETTE(config, m_palette).set_entries(65536);
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_layer_size(1);
-	m_k001604[0]->set_roz_size(1);
-	m_k001604[0]->set_txt_mem_offset(0);
-	m_k001604[0]->set_roz_mem_offset(0);
 	m_k001604[0]->set_palette(m_palette);
 
 	K001005(config, m_k001005, 0, m_k001006[0]);
@@ -914,8 +913,6 @@ void gticlub_state::thunderh(machine_config &config) // Todo: K056230 from the I
 
 	m_adc1038->set_gti_club_hack(false);
 
-	m_k056230->set_thunderh_hack(true);
-
 	M68000(config, m_gn680, XTAL(32'000'000) / 2); // 16MHz
 	m_gn680->set_addrmap(AS_PROGRAM, &gticlub_state::gn680_memmap);
 }
@@ -925,10 +922,6 @@ void gticlub_state::slrasslt(machine_config &config)
 	gticlub(config);
 
 	m_adc1038->set_gti_club_hack(false);
-
-	m_k001604[0]->set_layer_size(0);
-	m_k001604[0]->set_roz_size(0);
-	m_k001604[0]->set_txt_mem_offset(16384);
 }
 
 void gticlub_state::hangplt(machine_config &config)
@@ -957,19 +950,23 @@ void gticlub_state::hangplt(machine_config &config)
 
 	K056230(config, m_k056230, "maincpu");
 
-	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[0], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
-	m_voodoo[0]->set_screen_tag("lscreen");
-	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[0]->set_screen("lscreen");
+	m_voodoo[0]->set_cpu(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[1], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
-	m_voodoo[1]->set_screen_tag("rscreen");
-	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[1]->set_screen("rscreen");
+	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	K033906(config, "k033906_1", 0, m_voodoo[0]);
 	K033906(config, "k033906_2", 0, m_voodoo[1]);
@@ -990,17 +987,9 @@ void gticlub_state::hangplt(machine_config &config)
 	rscreen.set_screen_update(FUNC(gticlub_state::screen_update_two_screens<1>));
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_layer_size(0);
-	m_k001604[0]->set_roz_size(1);
-	m_k001604[0]->set_txt_mem_offset(0);
-	m_k001604[0]->set_roz_mem_offset(16384);
 	m_k001604[0]->set_palette(m_palette);
 
 	K001604(config, m_k001604[1], 0);
-	m_k001604[1]->set_layer_size(0);
-	m_k001604[1]->set_roz_size(1);
-	m_k001604[1]->set_txt_mem_offset(0);
-	m_k001604[1]->set_roz_mem_offset(16384);
 	m_k001604[1]->set_palette(m_palette);
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
@@ -1047,7 +1036,7 @@ ROM_START( gticlub ) // Euro version EAA - Reports: GTI CLUB(TM) System ver 1.00
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(ee5c9149) SHA1(cf4fda82c7d01eab664f21b062c55a3dd0234556) )
+	ROM_LOAD16_WORD_SWAP( "93c56.24g", 0x0000, 0x0100, CRC(9564a685) SHA1(ec19f3d6e3a55eac4dab6da5ede7216f002b3186) )
 ROM_END
 
 ROM_START( gticlubu ) // USA version UAA - Reports: GTI CLUB(TM) System ver 1.02(USA)
@@ -1077,7 +1066,7 @@ ROM_START( gticlubu ) // USA version UAA - Reports: GTI CLUB(TM) System ver 1.02
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(ee5c9149) SHA1(cf4fda82c7d01eab664f21b062c55a3dd0234556) )
+	ROM_LOAD16_WORD_SWAP("93c56.24g", 0x0000, 0x0100, CRC(9564a685) SHA1(ec19f3d6e3a55eac4dab6da5ede7216f002b3186))
 ROM_END
 
 ROM_START( gticluba ) // Asia version AAA - Reports: GTI CLUB(TM) System ver 1.00(ASI)
@@ -1107,7 +1096,7 @@ ROM_START( gticluba ) // Asia version AAA - Reports: GTI CLUB(TM) System ver 1.0
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(ee5c9149) SHA1(cf4fda82c7d01eab664f21b062c55a3dd0234556) )
+	ROM_LOAD16_WORD_SWAP("93c56.24g", 0x0000, 0x0100, CRC(9564a685) SHA1(ec19f3d6e3a55eac4dab6da5ede7216f002b3186))
 ROM_END
 
 ROM_START( gticlubj ) // Japan version JAA - Reports: GTI CLUB(TM) System ver 1.00(JPN)
@@ -1137,7 +1126,7 @@ ROM_START( gticlubj ) // Japan version JAA - Reports: GTI CLUB(TM) System ver 1.
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(ee5c9149) SHA1(cf4fda82c7d01eab664f21b062c55a3dd0234556) )
+	ROM_LOAD16_WORD_SWAP("93c56.24g", 0x0000, 0x0100, CRC(9564a685) SHA1(ec19f3d6e3a55eac4dab6da5ede7216f002b3186))
 ROM_END
 
 ROM_START( thunderh ) // Euro version EAA
@@ -1168,6 +1157,9 @@ ROM_START( thunderh ) // Euro version EAA
 	ROM_LOAD64_WORD( "680a14.13d", 0x000002, 0x200000, CRC(9ae15033) SHA1(12e291114629632b81f53811a6c8666aff4e92f3) )
 	ROM_LOAD64_WORD( "680a15.9d",  0x000004, 0x200000, CRC(dc47c86f) SHA1(71af9b21f1ecc063135f501b1561869ee910c236) )
 	ROM_LOAD64_WORD( "680a16.4d",  0x000006, 0x200000, CRC(ea388143) SHA1(3de5314a009d702186d5e285c8edefdd48139eab) )
+
+	ROM_REGION16_BE(0x100, "eeprom", 0)
+	ROM_LOAD16_WORD_SWAP("93c56.24g", 0x0000, 0x0100, CRC(e6524263) SHA1(de6c614fad8049fa6cebe09722cadae656457d69))
 ROM_END
 
 ROM_START( thunderhu ) // USA version UAA
@@ -1198,6 +1190,9 @@ ROM_START( thunderhu ) // USA version UAA
 	ROM_LOAD64_WORD( "680a14.13d", 0x000002, 0x200000, CRC(9ae15033) SHA1(12e291114629632b81f53811a6c8666aff4e92f3) )
 	ROM_LOAD64_WORD( "680a15.9d",  0x000004, 0x200000, CRC(dc47c86f) SHA1(71af9b21f1ecc063135f501b1561869ee910c236) )
 	ROM_LOAD64_WORD( "680a16.4d",  0x000006, 0x200000, CRC(ea388143) SHA1(3de5314a009d702186d5e285c8edefdd48139eab) )
+
+	ROM_REGION16_BE(0x100, "eeprom", 0)
+	ROM_LOAD16_WORD_SWAP("93c56.24g", 0x0000, 0x0100, CRC(e6524263) SHA1(de6c614fad8049fa6cebe09722cadae656457d69))
 ROM_END
 
 ROM_START( slrasslt ) // USA version UAA

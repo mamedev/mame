@@ -10,13 +10,10 @@ TODO:
 - implement printer;
 - Implement 2nd cart slot
 - Keyboard works in all scenarios, but it is a guess.
-- Colours are incorrect. Need more carts to help construct a proper solution.
- -- m_pal_reg and m_pri_mask can have unemulated bits used by games, what are these bits for?
- -- the colours are verified correct for all games in the software lists, except:
-   -- chlgolf - it's almost correct, just a few minor things in the background. Perfectly playable.
-   -- cracer - this game has a lot of issues, including incorrect behaviour. It's still playable though.
 - RAM handling can't be right: PCB has 30KB shared RAM (manual also says this in the technical specs),
   but MAME allocates much more
+- Find out what port F3 does - read and write - used by many games
+- Find out what ports 23 and EF do - used by rengo
 
 Notes:
 - BS-BASIC v1.0 notes:
@@ -60,10 +57,10 @@ Summary of Monitor commands.
 ==============================================================================================================
 
 Known issues:
-- Excite baseball: Graphics issues, unplayable
-- Sekigahara: Joystick problem
-- Mobile Gundam: Bad sound at the intro screen
-- Champion Racer: Graphics and Colour.
+- Sekigahara: Possible joystick problem (need to be checked again)
+- Need more software to test with.
+BTANB:
+- ProWrestling: When player 1 jumps at player 2 and misses, he always lands behind player 2.
 
 *************************************************************************************************************/
 
@@ -89,6 +86,7 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
 		, m_palette(*this, "palette")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void init_rx78();
@@ -106,6 +104,9 @@ private:
 	void vdp_reg_w(offs_t offset, u8 data);
 	void vdp_bg_reg_w(u8 data);
 	void vdp_pri_mask_w(u8 data);
+	void portf3_w(u8 data);
+	void create_palette(palette_device &palette);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -114,17 +115,22 @@ private:
 	void rx78_io(address_map &map);
 	void rx78_mem(address_map &map);
 
-	u8 m_vram_read_bank;
-	u8 m_vram_write_bank;
+	u8 m_vram_read_bank = 0;
+	u8 m_vram_write_bank = 0;
 	u8 m_pal_reg[7];
-	u8 m_pri_mask;
-	u8 m_key_mux;
+	u8 m_pri_mask = 0;
+	u8 m_key_mux = 0;
+	u8 m_background = 0;
+	bool m_irq_en = 1;
+	u8 m_irq_slow = 0;
+	u8 m_irq_count = 0;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
+	required_ioport_array<16> m_io_keyboard;
 };
 
 
@@ -144,17 +150,13 @@ u8 rx78_state::cass_r()
 
 uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 color[2];
-	bool pen[3];
+	u8 layers;
+	u8 laycol[2];
 	const u8 borderx = 32, bordery = 20;
 
-	bitmap.fill(16, cliprect);
+	bitmap.fill(64, cliprect); // set the border
 
 	u16 count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
-
-	u8 pri_mask = m_pri_mask;
-	if (BIT(m_pri_mask, 7))
-		pri_mask &= m_pal_reg[6]; // this gives blue sky in Challenge Golf - colours to be checked on carts as they are dumped
 
 	for(u8 y=0; y<184; y++)
 	{
@@ -162,24 +164,26 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		{
 			for (u8 i = 0; i < 8; i++)
 			{
-				/* bg color */
-				pen[0] = BIT(m_pri_mask, 3) ? BIT(m_vram[count + 0x6000], i) : 0;
-				pen[1] = BIT(m_pri_mask, 4) ? BIT(m_vram[count + 0x8000], i) : 0;
-				pen[2] = BIT(m_pri_mask, 5) ? BIT(m_vram[count + 0xa000], i) : 0;
+				layers = 0;
+				for (u8 j = 0; j < 6; j++)
+					if (BIT(m_pri_mask, j))
+						layers |= (BIT(m_vram[count + j*0x2000], i))<<j;
 
-				color[1] = pen[0] | (pen[1] << 1) | (pen[2] << 2);
+				laycol[0] = 0;
+				laycol[1] = 0;
+				for (u8 j = 0; j < 6; j++)
+					if (BIT(layers, j))
+						laycol[BIT(m_pal_reg[6], j)] |= m_pal_reg[j];
 
-				/* fg color */
-				pen[0] = BIT(pri_mask, 0) ? BIT(m_vram[count + 0x0000], i) : 0;
-				pen[1] = BIT(pri_mask, 1) ? BIT(m_vram[count + 0x2000], i) : 0;
-				pen[2] = BIT(pri_mask, 2) ? BIT(m_vram[count + 0x4000], i) : 0;
+				// This fixes text in Space Enemy
+				if (m_pal_reg[6])
+					for (u8 j = 0; j < 6; j++)
+						if (BIT(layers, j))
+							if (!m_pal_reg[j])
+								laycol[0] = 0;
 
-				color[0] = pen[0] | (pen[1] << 1) | (pen[2] << 2);
-
-				if (color[1])
-					bitmap.pix(y+bordery, x+i+borderx) = color[1] | 8;
-				if (color[0])
-					bitmap.pix(y+bordery, x+i+borderx) = color[0];
+				u8 color = laycol[1] ? laycol[1] : (laycol[0] ? laycol[0] : m_background);
+				bitmap.pix(y+bordery, x+i+borderx) = color;
 			}
 			count++;
 		}
@@ -191,24 +195,35 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 u8 rx78_state::key_r()
 {
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-											"KEY4", "KEY5", "KEY6", "KEY7",
-											"KEY8", "JOY1P_0","JOY1P_1","JOY1P_2",
-											"JOY2P_0", "JOY2P_1", "JOY2P_2", "UNUSED" };
-
-	if(m_key_mux >= 1 && m_key_mux <= 15)
-		return ioport(keynames[m_key_mux - 1])->read();
+	if((m_key_mux >= 1) && (m_key_mux <= 15))
+		return m_io_keyboard[m_key_mux]->read();
 
 	u8 res = 0;
-	for(u8 i=0; i<15; i++)
-		res |= ioport(keynames[i])->read();
+	for(u8 i=1; i<10; i++)
+		res |= m_io_keyboard[i]->read();
 
 	return res;
 }
 
 void rx78_state::key_w(u8 data)
 {
-	m_key_mux = data;
+	// special codes: 10 (disable irq?) used by gundam and exbaseb; 30 (no idea) used by basic
+	m_key_mux = data & 15;
+	m_irq_en = !BIT(data, 4);
+	m_maincpu->set_input_line(0, CLEAR_LINE);    // fixes exbaseb opening screen
+}
+
+// guess
+void rx78_state::portf3_w(u8 data)
+{
+	data &= 3;
+	if (data == 3)
+		m_irq_slow = 64;    // fixes cracer traffic light
+	else
+	if (data == 2)
+		m_irq_slow = 8;     // fixes seki flash rate of sight
+	else
+		m_irq_slow = 0;
 }
 
 u8 rx78_state::vram_r(offs_t offset)
@@ -238,31 +253,10 @@ void rx78_state::vram_write_bank_w(u8 data)
 
 void rx78_state::vdp_reg_w(offs_t offset, u8 data)
 {
-	m_pal_reg[offset] = data;
-
 	if (offset < 6)
-	{
-		for(u8 i = 0; i < 16; i++)
-		{
-			data =   (BIT(i, 0) ? m_pal_reg[0 + (BIT(i, 3) ? 3 : 0)] : 0)
-					|(BIT(i, 1) ? m_pal_reg[1 + (BIT(i, 3) ? 3 : 0)] : 0)
-					|(BIT(i, 2) ? m_pal_reg[2 + (BIT(i, 3) ? 3 : 0)] : 0);
-
-			u8 r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0);
-			u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
-			u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
-
-			m_palette->set_pen_color(i, rgb_t(r,g,b));
-		}
-	}
-
-	if (m_pal_reg[6] == 3)  // seki
-		for (u8 i = 5; i <8; i++)
-			m_palette->set_pen_color(i, m_palette->pen_color(i-4));
+		m_pal_reg[offset] = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
 	else
-	if (m_pal_reg[6] == 15)  // theprowr
-		for (u8 i = 11; i <16; i+=2)
-			m_palette->set_pen_color(i, m_palette->pen_color(9));
+		m_pal_reg[offset] = data & 0x3f;
 }
 
 void rx78_state::vdp_bg_reg_w(u8 data)
@@ -270,13 +264,26 @@ void rx78_state::vdp_bg_reg_w(u8 data)
 	u8 r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0);
 	u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
 	u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
-
-	m_palette->set_pen_color(16, rgb_t(r,g,b));
+	m_palette->set_pen_color(64, rgb_t(r,g,b));   // use this as the border colour
+	m_background = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
 }
 
 void rx78_state::vdp_pri_mask_w(u8 data)
 {
 	m_pri_mask = data;
+}
+
+void rx78_state::create_palette(palette_device &palette)
+{
+	constexpr u8 level[] = { 0, 0x7f, 0, 0xff };
+	for (u8 i = 0; i < 64; i++)
+	{
+		u8 r = level[BIT(i, 0, 2)];
+		u8 g = level[BIT(i, 2, 2)];
+		u8 b = level[BIT(i, 4, 2)];
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+	vdp_bg_reg_w(0);
 }
 
 
@@ -294,12 +301,14 @@ void rx78_state::rx78_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
+//  map(0x23, 0x23).nopw(); //used by rengo
 //  map(0xe2, 0xe2).noprw(); //printer
 //  map(0xe3, 0xe3).nopw(); //printer
+//  map(0xef, 0xef).nopw(); //used by rengo
 	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
 	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
 	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));
-	map(0xf3, 0xf3).nopw();    // Basic constantly writes 0x82 and 0xC2 here
+	map(0xf3, 0xf3).w(FUNC(rx78_state::portf3_w));
 	map(0xf4, 0xf4).rw(FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
 	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
 	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
@@ -309,7 +318,10 @@ void rx78_state::rx78_io(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( rx78 )
-	PORT_START("KEY0")
+	PORT_START("X0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("X1")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
@@ -319,7 +331,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
-	PORT_START("KEY1")
+	PORT_START("X2")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
@@ -329,7 +341,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
-	PORT_START("KEY2")
+	PORT_START("X3")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('@') PORT_CHAR('`')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')
@@ -339,7 +351,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')
 
-	PORT_START("KEY3")
+	PORT_START("X4")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
@@ -349,7 +361,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o')
 
-	PORT_START("KEY4")
+	PORT_START("X5")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
@@ -359,7 +371,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')
 
-	PORT_START("KEY5")
+	PORT_START("X6")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')
@@ -369,7 +381,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up Down Arrow") PORT_CODE(KEYCODE_PGUP) PORT_CHAR('^')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right Left Arrow") PORT_CODE(KEYCODE_PGDN)
 
-	PORT_START("KEY6")
+	PORT_START("X7")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
@@ -379,7 +391,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("INST / DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 
-	PORT_START("KEY7")
+	PORT_START("X8")
 	PORT_BIT(0x07,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP") PORT_CODE(KEYCODE_END) PORT_CHAR(0xff) PORT_CHAR(3)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_UNUSED )
@@ -387,50 +399,43 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
 
-	PORT_START("KEY8")
+	PORT_START("X9")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) //kana shift?
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0xf8,IP_ACTIVE_HIGH,IPT_UNUSED )
 
-	PORT_START("JOY1P_0")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Left") PORT_PLAYER(1)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_START("X10")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Left") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START("JOY1P_1")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Left")  PORT_PLAYER(1)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Right") PORT_PLAYER(1)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("X11")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Left")  PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Right") PORT_PLAYER(1)
 
-	PORT_START("JOY1P_2")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(1)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Right") PORT_PLAYER(1)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(1)
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_START("X12")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Right") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START("JOY2P_0")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Left") PORT_PLAYER(2)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_START("X13")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Left") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START("JOY2P_1")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Left")  PORT_PLAYER(2)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Right") PORT_PLAYER(2)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("X14")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Left")  PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Right") PORT_PLAYER(2)
 
-	PORT_START("JOY2P_2")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(2)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Right") PORT_PLAYER(2)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(2)
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-
-	PORT_START("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("X15")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Right") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -456,6 +461,26 @@ void rx78_state::machine_start()
 	save_pointer(NAME(m_pal_reg), 7);
 	save_item(NAME(m_pri_mask));
 	save_item(NAME(m_key_mux));
+	save_item(NAME(m_background));
+}
+
+INTERRUPT_GEN_MEMBER(rx78_state::interrupt)
+{
+	if (m_irq_en)
+	{
+		m_irq_count++;
+		if (m_irq_count > m_irq_slow)
+		{
+			m_irq_count = 0;
+			irq0_line_hold(device);
+		}
+	}
+	else
+	// wait for a keypress
+	if (key_r())
+	{
+		irq0_line_hold(device);
+	}
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
@@ -492,14 +517,13 @@ static GFXDECODE_START( gfx_rx78 )
 	GFXDECODE_ENTRY( "roms", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
-
 void rx78_state::rx78(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/7); // unknown divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &rx78_state::rx78_mem);
 	m_maincpu->set_addrmap(AS_IO, &rx78_state::rx78_io);
-	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::irq0_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::interrupt));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -512,7 +536,7 @@ void rx78_state::rx78(machine_config &config)
 	screen.set_screen_update(FUNC(rx78_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, m_palette).set_entries(16+1); //+1 for the background color
+	PALETTE(config, m_palette, FUNC(rx78_state::create_palette), 64+1);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "rx78_cart", "bin,rom").set_device_load(FUNC(rx78_state::cart_load));

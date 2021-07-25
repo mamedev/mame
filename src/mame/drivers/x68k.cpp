@@ -936,6 +936,11 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if(m_bus_error)
 		return;
+	else if(!m_maincpu->executing())
+	{
+		m_hd63450->bec_w(0, hd63450_device::ERR_BUS);
+		return;
+	}
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
@@ -1646,7 +1651,7 @@ void x68k_state::x68000_base(machine_config &config)
 
 	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu");
 	m_hd63450->set_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
-	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
+	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(450), attotime::from_nsec(50));
 	m_hd63450->irq_callback().set(FUNC(x68k_state::dma_irq));
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
 	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));

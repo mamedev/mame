@@ -59,7 +59,9 @@ NBA Play By Play  GX778      GN715(A)   GN715(B)
 Teraburst         GX715      GN715(A)   GN715(B)      GN680(E) I/O board
 Thrill Drive      GE713UF    GN715(A)   GN715(B)      GN676-PWB(H)A LAN PCB
 Silent Scope      GQ830      GN715(A)   2x GN715(B)
+Silent Scope      GQ830      GN715(A)   2x GQ871(B)
 Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H) LAN PCB
+Silent Scope 2    GQ931      GN715(A)   2x GN715(B)   GQ931(H) LAN PCB
 
 
 PCB Layouts
@@ -361,7 +363,7 @@ Jumpers set on GFX PCB to scope monitor:
 #include "sound/k056800.h"
 #include "sound/rf5c400.h"
 #include "video/k037122.h"
-#include "video/voodoo.h"
+#include "video/voodoo_2.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -405,10 +407,13 @@ public:
 	void terabrst(machine_config &config);
 	void sscope(machine_config &config);
 	void sscope2(machine_config &config);
+	void sscope_voodoo2(machine_config& config);
+	void sscope2_voodoo1(machine_config& config);
 
 	void init_hornet();
 	void init_sscope();
 	void init_sscope2();
+	void init_gradius4();
 
 protected:
 	virtual void machine_start() override;
@@ -429,11 +434,11 @@ private:
 	required_device<adc12138_device> m_adc12138;
 	required_device<konppc_device> m_konppc;
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
-	optional_device_array<voodoo_device, 2> m_voodoo;
+	optional_device_array<generic_voodoo_device, 2> m_voodoo;
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	optional_ioport m_eepromout;
-	optional_ioport_array<2> m_analog;
+	optional_ioport_array<3> m_analog;
 	output_finder<2> m_pcb_digit;
 	optional_region_ptr<uint32_t> m_comm_board_rom;
 	optional_memory_bank m_comm_bank;
@@ -447,6 +452,8 @@ private:
 	uint16_t m_gn680_latch;
 	uint16_t m_gn680_ret0;
 	uint16_t m_gn680_ret1;
+
+	bool m_sndres;
 
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
@@ -485,7 +492,7 @@ private:
 template <uint8_t Which>
 uint32_t hornet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_voodoo[Which]->voodoo_update(bitmap, cliprect);
+	m_voodoo[Which]->update(bitmap, cliprect);
 
 	m_k037122[Which]->tile_draw(screen, bitmap, cliprect);
 
@@ -562,6 +569,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 
 		case 4: // System Register 1
+		{
 			/*
 			    0x80 = SNDRES (sound reset)
 			    0x40 = COMRES (COM reset)
@@ -577,9 +585,19 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			m_adc12138->di_w((data >> 1) & 0x1);
 			m_adc12138->sclk_w(data & 0x1);
 
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			bool sndres = (data & 0x80) ? true : false;
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, (sndres) ? CLEAR_LINE : ASSERT_LINE);
+			if (sndres != m_sndres)
+			{
+				// clear interrupts when reset line is triggered
+				m_audiocpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+			}
+
+			m_sndres = sndres;
+
 			osd_printf_debug("System register 1 = %02X\n", data);
 			break;
+		}
 
 		case 5: // Sound Control Register
 			/*
@@ -615,6 +633,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+
 			m_konppc->set_cgboard_id((data >> 4) & 3);
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
@@ -815,7 +834,7 @@ void hornet_state::sharc0_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_voodoo[0], FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).m(m_voodoo[0], FUNC(generic_voodoo_device::core_map));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
 	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
@@ -826,7 +845,7 @@ void hornet_state::sharc1_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_voodoo[1], FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).m(m_voodoo[1], FUNC(generic_voodoo_device::core_map));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
 	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
@@ -993,6 +1012,33 @@ static INPUT_PORTS_START( sscope2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( thrilld )
+	PORT_INCLUDE( hornet )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Gear Shift Left")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Gear Shift Right")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("ANALOG1")
+	PORT_BIT(0x7ff, 0x400, IPT_PADDLE) PORT_NAME("Steering Wheel") PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
+
+	PORT_START("ANALOG2")
+	PORT_BIT(0x7ff, 0x000, IPT_PEDAL) PORT_NAME("Gas Pedal") PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
+
+	PORT_START("ANALOG3")
+	PORT_BIT(0x7ff, 0x000, IPT_PEDAL2) PORT_NAME("Brake Pedal") PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
+INPUT_PORTS_END
+
 
 /* PowerPC interrupts
 
@@ -1046,14 +1092,13 @@ void hornet_state::machine_reset()
 
 double hornet_state::adc12138_input_callback(uint8_t input)
 {
-	int value = 0;
-	switch (input)
+	if (input < m_analog.size())
 	{
-		case 0: value = m_analog[0].read_safe(0); break;
-		case 1: value = m_analog[1].read_safe(0); break;
+		int value = m_analog[input].read_safe(0);
+		return (double)(value) / 2047.0;
 	}
 
-	return (double)(value) / 2047.0;
+	return 0.0;
 }
 
 void hornet_state::hornet(machine_config &config)
@@ -1079,9 +1124,11 @@ void hornet_state::hornet(machine_config &config)
 	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
-	m_voodoo[0]->set_screen_tag("screen");
-	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[0]->set_screen("screen");
+	m_voodoo[0]->set_cpu(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
 	K033906(config, "k033906_1", 0, m_voodoo[0]);
 
@@ -1153,14 +1200,16 @@ void hornet_state::sscope(machine_config &config)
 	m_k037122[1]->set_screen("rscreen");
 	m_k037122[1]->set_palette("palette");
 
-	m_voodoo[0]->set_screen_tag("lscreen");
+	m_voodoo[0]->set_screen("lscreen");
 
 	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4, 0);
-	m_voodoo[1]->set_screen_tag("rscreen");
-	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[1]->set_screen("rscreen");
+	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
@@ -1183,25 +1232,44 @@ void hornet_state::sscope(machine_config &config)
 	m_konppc->set_num_boards(2);
 }
 
+void hornet_state::sscope_voodoo2(machine_config& config)
+{
+	sscope(config);
+
+	VOODOO_2(config.replace(), m_voodoo[0], voodoo_2_device::NOMINAL_CLOCK);
+	m_voodoo[0]->set_fbmem(2);
+	m_voodoo[0]->set_tmumem(4,0);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[0]->set_screen("lscreen");
+	m_voodoo[0]->set_cpu(m_dsp[0]);
+	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
+
+	VOODOO_2(config.replace(), m_voodoo[1], voodoo_2_device::NOMINAL_CLOCK);
+	m_voodoo[1]->set_fbmem(2);
+	m_voodoo[1]->set_tmumem(4,0);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[1]->set_screen("rscreen");
+	m_voodoo[1]->set_cpu(m_dsp[1]);
+	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
+}
+
 void hornet_state::sscope2(machine_config &config)
+{
+	sscope_voodoo2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::sscope2_map);
+
+	DS2401(config, "lan_serial_id");
+	EEPROM_93C46_16BIT(config, "lan_eeprom");
+}
+
+void hornet_state::sscope2_voodoo1(machine_config& config)
 {
 	sscope(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::sscope2_map);
-
-	VOODOO_2(config.replace(), m_voodoo[0], STD_VOODOO_2_CLOCK);
-	m_voodoo[0]->set_fbmem(2);
-	m_voodoo[0]->set_tmumem(4,0);
-	m_voodoo[0]->set_screen_tag("lscreen");
-	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
-	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	VOODOO_2(config.replace(), m_voodoo[1], STD_VOODOO_2_CLOCK);
-	m_voodoo[1]->set_fbmem(2);
-	m_voodoo[1]->set_tmumem(4,0);
-	m_voodoo[1]->set_screen_tag("rscreen");
-	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
-	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
 	DS2401(config, "lan_serial_id");
 	EEPROM_93C46_16BIT(config, "lan_eeprom");
@@ -1354,6 +1422,13 @@ void hornet_state::init_hornet()
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 
+	//m_dsp[0]->enable_recompiler();
+}
+
+void hornet_state::init_gradius4()
+{
+	init_hornet();
+
 	m_dsp[0]->enable_recompiler();
 }
 
@@ -1464,36 +1539,122 @@ ROM_START(sscopea)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) )
 ROM_END
 
+ROM_START(sscoped)
+	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
+	ROM_LOAD16_WORD_SWAP("830d01.27p", 0x200000, 0x200000, CRC(de9b3dfa) SHA1(660652a5f745cb04687481c3626d8a43cd169193))
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", ROMREGION_ERASE00)   // Data roms
+
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
+	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1))
+
+	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_LOAD32_WORD("830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c))
+	ROM_LOAD32_WORD("830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7))
+
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       // PCM sample roms
+	ROM_LOAD("830a09.16p", 0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb))
+	ROM_LOAD("830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f))
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD("m48t58y-70pc1", 0x000000, 0x002000, CRC(9b451384) SHA1(b371fbf41fcf703b91650c494481835f4bffb67f))
+ROM_END
+
 ROM_START(sscope2)
 	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
-	ROM_LOAD16_WORD_SWAP("931d01.bin", 0x200000, 0x200000, CRC(4065fde6) SHA1(84f2dedc3e8f61651b22c0a21433a64993e1b9e2) )
+	ROM_LOAD16_WORD_SWAP("931d01.27p", 0x200000, 0x200000, CRC(4065fde6) SHA1(84f2dedc3e8f61651b22c0a21433a64993e1b9e2) )
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04.bin", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
-	ROM_LOAD("931a19.bin", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
-	ROM_LOAD("931a20.bin", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
+	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
+	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
 	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
-	ROM_LOAD16_WORD_SWAP("931a08.bin", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
+	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
 
 	ROM_REGION16_LE(0xc00000, "rfsnd", 0)        // PCM sample roms
-	ROM_LOAD( "931a09.bin",   0x000000, 0x400000, CRC(694c354c) SHA1(42f54254a5959e1b341f2801f1ad032c4ed6f329) )
-	ROM_LOAD( "931a10.bin",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
-	ROM_LOAD( "931a11.bin",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
+	ROM_LOAD( "931a09.16p",   0x000000, 0x400000, CRC(694c354c) SHA1(42f54254a5959e1b341f2801f1ad032c4ed6f329) )
+	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
+	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
 
 	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(d4e69d7a) SHA1(1e29eecf4886e5e098a388dedd5f3901c2bb65e5) )
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
 	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+ROM_END
+
+ROM_START(sscope2b)
+	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
+	ROM_LOAD16_WORD_SWAP("931b01.27p", 0x200000, 0x200000, CRC(deb036b7) SHA1(12280aa4e37c3492e5192d630c26e758d08744dd))
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814))
+
+	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
+	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4))
+	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d))
+
+	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
+	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c))
+
+	ROM_REGION16_LE(0xc00000, "rfsnd", 0)        // PCM sample roms
+	ROM_LOAD("931a09.16p", 0x000000, 0x400000, CRC(694c354c) SHA1(42f54254a5959e1b341f2801f1ad032c4ed6f329))
+	ROM_LOAD("931a10.14p", 0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad))
+	ROM_LOAD("931a11.12p", 0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294))
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD("m48t58y-70pc1", 0x000000, 0x002000, CRC(72f41511) SHA1(2097bcf7fe56f798182219ff46908a20aa47546a))
+
+	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
+	ROM_LOAD("ds2401.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a)) // hand built
+
+	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
+	ROM_LOAD("at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152)) // hand built
+ROM_END
+
+ROM_START(sscope2c)
+	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
+	ROM_LOAD16_WORD_SWAP("931c01.27p", 0x200000, 0x200000, CRC(653ba4d9) SHA1(29c1c1d5088e6ba7fa5cfa63b5975f47b54602ee))
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864))
+
+	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
+	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4))
+	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d))
+
+	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
+	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c))
+
+	ROM_REGION16_LE(0xc00000, "rfsnd", 0)        // PCM sample roms
+	ROM_LOAD("931a09.16p", 0x000000, 0x400000, CRC(694c354c) SHA1(42f54254a5959e1b341f2801f1ad032c4ed6f329))
+	ROM_LOAD("931a10.14p", 0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad))
+	ROM_LOAD("931a11.12p", 0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294))
+
+	ROM_REGION(0x2000, "m48t58", 0)
+	ROM_LOAD("m48t58y-70pc1", 0x000000, 0x002000, CRC(216ec340) SHA1(bbcb42a3fe54d7f5b83d45f063ecbead705c7b66))
+
+	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
+	ROM_LOAD("ds2401.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a)) // hand built
+
+	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
+	ROM_LOAD("at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152)) // hand built
 ROM_END
 
 ROM_START(gradius4)
@@ -1661,13 +1822,13 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,  0,        hornet,     gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,  0,        hornet,     gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbp,    0,        hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbpa,   nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrst,  0,        terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrsta, terabrst, terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // identifies as NWK-LC system
-GAME(  1998, thrilldbu, thrilld,  hornet_lan, hornet,   hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // heavy GFX glitches, fails wheel motor test, for now it's possible to get in game by switching "SW:2" to on
+GAME(  1998, thrilldbu, thrilld,  hornet_lan, thrilld,  hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // heavy GFX glitches, fails wheel motor test, for now it's possible to get in game by switching "SW:2" to on
 
 // The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
 // version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.
@@ -1677,6 +1838,13 @@ GAMEL( 1999, sscopec,   sscope,   sscope,  sscope,    hornet_state, init_sscope,
 GAMEL( 1999, sscopeb,   sscope,   sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 1999, sscopea,   sscope,   sscope,  sscope,    hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
+// This version of Silent Scope runs on GQ871 video boards (Voodoo 2 instead of Voodoo 1)
+GAMEL( 1999, sscoped,   sscope,   sscope_voodoo2,  sscope,  hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33, GQ871 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+
 GAMEL( 2000, sscope2,   0,        sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
 //GAMEL( 2000, sscope2e, sscope2, sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver EAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
 //GAMEL( 2000, sscope2j, sscope2  sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Innocent Sweeper (ver JAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
+
+// These versions of Silent Scope 2 run on GN715 video boards (Voodoo 1 instead of Voodoo 2)
+GAMEL( 2000, sscope2b, sscope2, sscope2_voodoo1, sscope2, hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver UAB, Ver 1.01, GN715 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2c, sscope2, sscope2_voodoo1, sscope2, hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver UAC, Ver 1.02, GN715 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )

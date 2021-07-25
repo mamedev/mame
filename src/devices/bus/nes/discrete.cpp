@@ -12,9 +12,6 @@
  * PCB with IC 74x377 [mapper 11]
  * PCB with IC 74x161x138 [mapper 38]
 
- TODO:
- - Investigating missing inputs in Crime Busters
-
  ***********************************************************************************************************/
 
 

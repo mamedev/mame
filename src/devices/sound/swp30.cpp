@@ -64,13 +64,19 @@ static int scount = 0;
   ch03       40ff at startup, 5010 always afterwards?
   ch04       fixed LPF resonance level
   ch05       unknown
-  ch06-09    envelope information, not understood yet
+  ch06       attack,  bit 14-8 = step, bit 7 = skip
+  ch07       decay,   bit 14-8 = step, bit 7-0 = target attenuation (top 8 bits)
+  ch08       release, bit 14-8 = step, bit 7-0 = target attenuation (top 8 bits)
+  ch09       base volume  bit 15 = activate release, bit 14-8 unknown, bit 7-0 = initial attenuation
+
   ch0a-0d    unknown, probably something to do with pitch eg
   ch10       unknown
-  ch11       channel replay frequency, signed 4.10 fixed point, log2 scale, positive is higher resulting frequency
-  ch12-13    number of samples before the loop point
-  ch14-15    number of samples in the loop
-  ch16-17    bit 31-30 = sample format, bits 29-25 = loop samples decimal part, 24-0 = loop start address in rom
+  ch11       bit 15 = compressed 8-bits mode, 13-0 channel replay frequency, signed 3.10 fixed point,
+             log2 scale, positive is higher resulting frequency.
+
+  ch12-13    bit 31 unknown, 30 unknown, 29-0 = number of samples before the loop point
+  ch14-15    bit 31 = play sample backwards, 30-0 = number of samples in the loop
+  ch16-17    bit 31-30 = sample format, 29-25 = loop samples decimal part, 24-0 = loop start address in rom
   ch20,22,24 first FIR coefficients
   ch26,28,2a second FIR coefficients
   ch2c-2f    unknown
@@ -82,6 +88,22 @@ static int scount = 0;
   sy10       write something to trigger a keyon according to the mask
 
 
+  The current attenuation (before panning) is on 26 bits, in 4.22
+  floating point format, of which only probably the top 8 are used for
+  actual volume computations (see the Mixer part).  The steps are in
+  4.3 floating-point format, e.g. the value converts to linear as:
+
+     step = (8 + bit 2..0) << (bit 7..4)
+
+  giving a value between 8 and 0x78000.  This value is added or
+  substracted after each sample.
+
+  For attack the actual range of steps is 8..119, giving an increment
+  of 0x10 to 0x3c000, and a full sweep from -96dB to 0 in 95s (8) to
+  6.2ms (119).
+
+  For decay and release the range is 1..120, e.g. 9 to 0x40000, or
+  169s to 5.8ms for a full sweep.
 
 
     MEG:
@@ -135,7 +157,7 @@ static int scount = 0;
   sample) and the external inputs, attenuates and sums them according
   to its mapping instructions, and pushes the results to the MEG, the
   DACs and the external outputs.  The attenuations are 8-bits values
-  is 4.4 floating point format (multiplies by (1-mant/2)*2**(-exp)).
+  in 4.4 floating point format (multiplies by (1-mant/2)*2**(-exp)).
   The routing is indicated through triplets of 16-bits values.
 
   ch33       dry (msb) and reverb (lsb) attenuation for an AWM2 channel
@@ -179,7 +201,7 @@ void swp30_device::device_start()
 	// bits.  The scale is logarithmic, with 0x400 = 1 octave (e.g. *2
 	// or /2).
 
-	for(int i=-0x20000; i<0x2000; i++)
+	for(int i=-0x2000; i<0x2000; i++)
 		m_sample_increment[i & 0x3fff] = 256 * pow(2, i/1024.0);
 
 	// Log to linear 8-bits sample decompression.  Statistics say
@@ -204,7 +226,6 @@ void swp30_device::device_start()
 	save_item(NAME(m_program));
 
 	save_item(NAME(m_keyon_mask));
-	save_item(NAME(m_active_mask));
 
 	save_item(NAME(m_pre_size));
 	save_item(NAME(m_post_size));
@@ -217,10 +238,14 @@ void swp30_device::device_start()
 	save_item(NAME(m_program_pint));
 	save_item(NAME(m_program_plfo));
 
-	save_item(NAME(m_volume));
+	save_item(NAME(m_base_volume));
+	save_item(NAME(m_current_volume));
+	save_item(NAME(m_mode));
 	save_item(NAME(m_freq));
 	save_item(NAME(m_pan));
-	save_item(NAME(m_envelope));
+	save_item(NAME(m_attack));
+	save_item(NAME(m_decay));
+	save_item(NAME(m_release));
 	save_item(NAME(m_lpf_cutoff));
 	save_item(NAME(m_lpf_cutoff_inc));
 	save_item(NAME(m_lpf_reso));
@@ -238,7 +263,6 @@ void swp30_device::device_reset()
 	memset(m_program, 0, sizeof(m_program));
 
 	m_keyon_mask = 0;
-	m_active_mask = 0;
 
 	memset(m_pre_size, 0, sizeof(m_pre_size));
 	memset(m_post_size, 0, sizeof(m_post_size));
@@ -251,10 +275,14 @@ void swp30_device::device_reset()
 	memset(m_program_pint, 0, sizeof(m_program_pint));
 	memset(m_program_plfo, 0, sizeof(m_program_plfo));
 
-	memset(m_volume, 0, sizeof(m_volume));
+	memset(m_base_volume, 0, sizeof(m_base_volume));
+	memset(m_current_volume, 0, sizeof(m_current_volume));
+	memset(m_mode, IDLE, sizeof(m_mode));
 	memset(m_freq, 0, sizeof(m_freq));
 	memset(m_pan, 0, sizeof(m_pan));
-	memset(m_envelope, 0, sizeof(m_envelope));
+	memset(m_attack, 0, sizeof(m_attack));
+	memset(m_decay, 0, sizeof(m_decay));
+	memset(m_release, 0, sizeof(m_release));
 	memset(m_lpf_cutoff, 0, sizeof(m_lpf_cutoff));
 	memset(m_lpf_cutoff_inc, 0, sizeof(m_lpf_cutoff_inc));
 	memset(m_lpf_reso, 0, sizeof(m_lpf_reso));
@@ -280,10 +308,10 @@ void swp30_device::map(address_map &map)
 	// 03 seems to always get 5010 except at startup where it's 40ff
 	rchan(map, 0x04).rw(FUNC(swp30_device::lpf_reso_r), FUNC(swp30_device::lpf_reso_w));
 	// 05 missing
-	rchan(map, 0x06).rw(FUNC(swp30_device::envelope_r<0>), FUNC(swp30_device::envelope_w<0>));
-	rchan(map, 0x07).rw(FUNC(swp30_device::envelope_r<1>), FUNC(swp30_device::envelope_w<1>));
-	rchan(map, 0x08).rw(FUNC(swp30_device::envelope_r<2>), FUNC(swp30_device::envelope_w<2>));
-	rchan(map, 0x09).rw(FUNC(swp30_device::volume_r), FUNC(swp30_device::volume_w));
+	rchan(map, 0x06).rw(FUNC(swp30_device::attack_r), FUNC(swp30_device::attack_w));
+	rchan(map, 0x07).rw(FUNC(swp30_device::decay_r), FUNC(swp30_device::decay_w));
+	rchan(map, 0x08).rw(FUNC(swp30_device::release_r), FUNC(swp30_device::release_w));
+	rchan(map, 0x09).rw(FUNC(swp30_device::base_volume_r), FUNC(swp30_device::base_volume_w));
 	// 0a-0d missing
 	// 10 missing
 	rchan(map, 0x11).rw(FUNC(swp30_device::freq_r), FUNC(swp30_device::freq_w));
@@ -366,14 +394,15 @@ u16 swp30_device::keyon_r()
 
 void swp30_device::keyon_w(u16)
 {
-	m_stream->update();
 	for(int i=0; i<64; i++) {
 		u64 mask = u64(1) << i;
-		if((m_keyon_mask & mask) && !(m_active_mask & mask) && !(m_volume[i] & 0x8000)) {
+		if(m_keyon_mask & mask) {
 			m_sample_pos[i] = -s32(m_pre_size[i] << 8);
-			if(0)
-				logerror("keyon %02x %08x %08x %08x vol %04x pan %04x\n", i, m_pre_size[i], m_post_size[i], m_address[i], m_volume[i], m_pan[i]);
-			m_active_mask |= mask;
+			m_current_volume[i] = (m_base_volume[i] & 0xff) << (26-8);
+			change_mode(i, m_base_volume[i] & 0x8000 ? RELEASE : m_attack[i] & 0x80 ? DECAY : ATTACK);
+
+			if(1)
+				logerror("[%08d] keyon %02x %08x %08x %08x vol %04x env %04x %04x %04x pan %04x disp %04x %04x\n", scount, i, m_pre_size[i], m_post_size[i], m_address[i], m_base_volume[i], m_attack[i], m_decay[i], m_release[i], m_pan[i], m_dry_rev[i], m_cho_var[i]);
 		}
 	}
 	m_keyon_mask = 0;
@@ -433,9 +462,8 @@ u16 swp30_device::lpf_cutoff_r(offs_t offset)
 
 void swp30_device::lpf_cutoff_w(offs_t offset, u16 data)
 {
-	m_stream->update();
 	u8 chan = offset >> 6;
-	if(1 || m_lpf_cutoff[chan] != data)
+	if(0 && m_lpf_cutoff[chan] != data)
 		logerror("chan %02x lpf cutoff %04x\n", chan, data);
 	m_lpf_cutoff[chan] = data;
 }
@@ -447,9 +475,8 @@ u16 swp30_device::lpf_cutoff_inc_r(offs_t offset)
 
 void swp30_device::lpf_cutoff_inc_w(offs_t offset, u16 data)
 {
-	m_stream->update();
 	u8 chan = offset >> 6;
-	if(1 || m_lpf_cutoff_inc[chan] != data)
+	if(0 && m_lpf_cutoff_inc[chan] != data)
 		logerror("chan %02x lpf cutoff increment %04x\n", chan, data);
 	m_lpf_cutoff_inc[chan] = data;
 }
@@ -461,9 +488,8 @@ u16 swp30_device::hpf_cutoff_r(offs_t offset)
 
 void swp30_device::hpf_cutoff_w(offs_t offset, u16 data)
 {
-	m_stream->update();
 	u8 chan = offset >> 6;
-	if(1 || m_hpf_cutoff[chan] != data)
+	if(0 && m_hpf_cutoff[chan] != data)
 		logerror("chan %02x hpf cutoff %04x\n", chan, data);
 	m_hpf_cutoff[chan] = data;
 }
@@ -475,9 +501,8 @@ u16 swp30_device::lpf_reso_r(offs_t offset)
 
 void swp30_device::lpf_reso_w(offs_t offset, u16 data)
 {
-	m_stream->update();
 	u8 chan = offset >> 6;
-	if(1 || m_lpf_reso[chan] != data)
+	if(0 && m_lpf_reso[chan] != data)
 		logerror("chan %02x lpf resonance %04x\n", chan, data);
 	m_lpf_reso[chan] = data;
 }
@@ -489,7 +514,6 @@ template<int coef> u16 swp30_device::eq_filter_r(offs_t offset)
 
 template<int coef> void swp30_device::eq_filter_w(offs_t offset, u16 data)
 {
-	m_stream->update();
 	m_eq_filter[offset >> 6][coef] = data;
 }
 
@@ -500,29 +524,22 @@ template<int sel> u16 swp30_device::routing_r(offs_t offset)
 
 template<int sel> void swp30_device::routing_w(offs_t offset, u16 data)
 {
-	m_stream->update();
 	m_routing[offset >> 6][sel] = data;
 }
 
-u16 swp30_device::volume_r(offs_t offset)
+u16 swp30_device::base_volume_r(offs_t offset)
 {
-	int chan = offset >> 6;
-	return m_volume[chan];
+	return m_base_volume[offset >> 6];
 }
 
-void swp30_device::volume_w(offs_t offset, u16 data)
+void swp30_device::base_volume_w(offs_t offset, u16 data)
 {
-	m_stream->update();
 	u8 chan = offset >> 6;
-	if(0 && m_volume[chan] != data)
+	if(1 && m_base_volume[chan] != data)
 		logerror("snd chan %02x volume %02x %02x\n", chan, data >> 8, data & 0xff);
-	m_volume[chan] = data;
-	if(data & 0x8000) {
-		if(m_active_mask & (u64(1) << chan)) {
-			if(m_post_size[chan])
-				m_active_mask &= ~(u64(1) << chan);
-		}
-	}
+	m_base_volume[chan] = data;
+	if((data & 0x8000) && m_mode[chan] != IDLE && m_mode[chan] != RELEASE)
+		change_mode(chan, RELEASE);
 }
 
 
@@ -580,18 +597,34 @@ void swp30_device::freq_w(offs_t offset, u16 data)
 	m_freq[chan] = data;
 }
 
-template<int sel> u16 swp30_device::envelope_r(offs_t offset)
+u16 swp30_device::attack_r(offs_t offset)
 {
-	return m_envelope[offset >> 6][sel];
+	return m_attack[offset >> 6];
 }
 
-template<int sel> void swp30_device::envelope_w(offs_t offset, u16 data)
+void swp30_device::attack_w(offs_t offset, u16 data)
 {
-	u8 chan = offset >> 6;
-	bool ch = m_envelope[chan][sel] != data;
-	m_envelope[chan][sel] = data;
-	if(1 && ch)
-		logerror("snd chan %02x envelopes %04x %04x %04x\n", chan, m_envelope[chan][0], m_envelope[chan][1], m_envelope[chan][2]);
+	m_attack[offset >> 6] = data;
+}
+
+u16 swp30_device::decay_r(offs_t offset)
+{
+	return m_decay[offset >> 6];
+}
+
+void swp30_device::decay_w(offs_t offset, u16 data)
+{
+	m_decay[offset >> 6] = data;
+}
+
+u16 swp30_device::release_r(offs_t offset)
+{
+	return m_release[offset >> 6];
+}
+
+void swp30_device::release_w(offs_t offset, u16 data)
+{
+	m_release[offset >> 6] = data;
 }
 
 u16 swp30_device::pre_size_h_r(offs_t offset)
@@ -682,23 +715,13 @@ u16 swp30_device::internal_r()
 	u8 chan = m_internal_adr & 0x3f;
 	switch(m_internal_adr >> 8) {
 	case 0:
-		// used at d312
-		// r0 = [b15, b14, 0,0,0,0,0,0, !b13, !b12, !b11, !b10, !b9, !b8, 1, 1]
-		// voice[45] = (voice[4b] * r0l) >> 7 (unsigned)
-		// if(r0h == 0) voice[43] = 0xff
-		// else         voice[43] = voice[51] - r0l; // 51 = inverse velocity
-		// if(r0l >= 0x80) ???
-		logerror("read %02x.0\n", chan);
-
-		// 3f -> active stays 2 until release where 1
-		// 7f, bf, ff -> active = 0 immediatly
-		return 0x0000 | 0x0000;
+		return m_mode[chan] == IDLE ? 0xffff : m_current_volume[chan] >> (26-14);
 
 	case 4:
 		// used at 44c4
 		// tests & 0x4000 only
-		logerror("read %02x.4\n", chan);
-		return 0x0000;
+		//      logerror("read %02x.4\n", chan);
+		return 0xffff;
 
 	case 6:
 		// used at 3e7c
@@ -814,6 +837,39 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 
 // Synthesis
 
+void swp30_device::change_mode(int channel, u8 mode)
+{
+	if(1)
+		logerror("[%08d] channel %02x mode %s\n", scount, channel,
+				 mode == IDLE ? "idle" :
+				 mode == ATTACK ? "attack" :
+				 mode == DECAY ? "decay" :
+				 mode == SUSTAIN ? "sustain" :
+				 mode == RELEASE ? "release" :
+				 "?");
+
+	m_mode[channel] = mode;
+	if(mode == IDLE || mode == SUSTAIN) {
+		m_step_volume[channel] = 0;
+		return;
+	}
+
+	u16 reg = mode == ATTACK ? m_attack[channel] & 0xff00 : mode == DECAY ? m_decay[channel] : m_release[channel];
+	u32 target = (reg & 0xff) << (26-8);
+	s32 step = (8 + ((reg >> 8) & 7)) << ((reg >> 11) & 15);
+	if(mode != ATTACK)
+		step *= 8;
+	if(target < m_current_volume[channel])
+		step = -step;
+	m_target_volume[channel] = target;
+	m_step_volume[channel] = step;
+
+	if(1) {
+		double delay = (double(target) - double(m_current_volume[channel])) / (44100*step);
+		logerror("    -> time until hit %f seconds\n", delay);
+	}
+}
+
 void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if(outputs[0].samples() != 1)
@@ -822,11 +878,11 @@ void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	scount++;
 
 	// Accumulate on 64 bits, shift/clamp at the end
-	s64 acc_left = 0, acc_right = 0;
+	s64 dry_left = 0, dry_right = 0;
 
 	// Loop on channels
 	for(int channel = 0; channel < 64; channel++)
-		if(m_active_mask & (u64(1) << channel)) {
+		if(m_mode[channel] != IDLE) {
 			// First, read the sample
 
 			// - Find the base sample index and base address
@@ -888,7 +944,7 @@ void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				// We reached the loop point, stop if loop size is zero,
 				// otherwise loop
 				if(!loop_size)
-					m_active_mask &= ~((u64(1) << channel));
+					change_mode(channel, IDLE);
 				else
 					do
 						m_sample_pos[channel] -= loop_size;
@@ -908,15 +964,57 @@ void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			m_sample_history[channel][1][1] = m_sample_history[channel][1][0];
 			m_sample_history[channel][1][0] = samp1;
 
-			// - anything else?
+			// Fourth, establish the 8 volumes (only 2 for now, need the MEG) and update the envelope
+			u32 raw_vol = m_current_volume[channel];
+			u32 vol = raw_vol >> (26-8);
 
-			// Fourth, volume (disabled) and pan, clamp the attenuation at -96dB
-			s32 sampl = samp2 * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] >> 8))];
-			s32 sampr = samp2 * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] & 0xff))];
+			u32 base_l = vol + (m_pan[channel] >> 8);
+			u32 base_r = vol + (m_pan[channel] & 0xff);
 
-			// Fifth, add to the accumulators
-			acc_left  += sampl;
-			acc_right += sampr;
+			u32 dry_l = base_l + (m_dry_rev[channel] >> 8);
+			u32 dry_r = base_r + (m_dry_rev[channel] >> 8);
+
+			s32 step = m_step_volume[channel];
+			u32 target = m_target_volume[channel];
+
+			if(0) {
+				u8 mode = m_mode[channel];
+				logerror("[%08d] channel %02x state %s vol=%07x step=%c%07x target=%07x\n",
+						 scount,
+						 channel,
+						 mode == IDLE ? "idle" :
+						 mode == ATTACK ? "attack" :
+						 mode == DECAY ? "decay" :
+						 mode == SUSTAIN ? "sustain" :
+						 mode == RELEASE ? "release" :
+						 "?",
+						 raw_vol,
+						 step < 0 ? '-' : '+',
+						 step < 0 ? -step : step,
+						 target);
+			}
+			if(step) {
+				raw_vol += step;
+				if((step < 0 && (raw_vol <= target || raw_vol & 0x80000000)) ||
+				   (step > 0 && raw_vol >= target)) {
+					raw_vol = target;
+					m_current_volume[channel] = raw_vol;
+
+					// IDLE and SUSTAIN have zero step.
+					// current volume must be updated before calling change_mode
+
+					switch(m_mode[channel]) {
+					case ATTACK:  change_mode(channel, DECAY);   break;
+					case DECAY:   change_mode(channel, SUSTAIN); break;
+					case RELEASE: change_mode(channel, IDLE);    break;
+					}
+				} else
+					m_current_volume[channel] = raw_vol;
+			}
+
+			// Fifth, add to the (dry) accumulators
+			dry_left  += samp2 * m_linear_attenuation[std::min(0xffu, dry_l)];
+			dry_right += samp2 * m_linear_attenuation[std::min(0xffu, dry_r)];
 
 			// Missing: reverb, chorus, effects in general
 		}
@@ -924,9 +1022,9 @@ void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	// Samples are 16 bits, there are up to 64 of them, and the accumulators are fixed-point signed 48.16
 	// Global EQ is missing (it's done in the MEG)
 
-	acc_left >>= (16+6);
-	outputs[0].put_int_clamp(0, acc_left, 32768);
+	dry_left >>= 14;
+	outputs[0].put_int_clamp(0, dry_left, 32768);
 
-	acc_right >>= (16+6);
-	outputs[1].put_int_clamp(0, acc_right, 32768);
+	dry_right >>= 14;
+	outputs[1].put_int_clamp(0, dry_right, 32768);
 }

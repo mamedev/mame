@@ -122,11 +122,11 @@ static int decrypt(int const param1, int const param2, int const enc_prev_word, 
 
 
 
-uint16_t gaelco_decrypt(address_space &space, int offset, int data, int param1, int param2)
+uint16_t gaelco_decrypt(cpu_device &cpu, int offset, int data, int param1, int param2)
 {
 	static int lastpc, lastoffset, lastencword, lastdecword;
 
-	int thispc = space.device().state().pc();
+	int thispc = cpu.pc();
 //  int savedata = data;
 
 	/* check if 2nd half of 32 bit */

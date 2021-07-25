@@ -19,7 +19,7 @@
 #include "machine/pit8253.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80scc.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 
@@ -75,7 +75,7 @@ private:
 	required_device<hd44780_device> m_lcdc;
 	required_device<wd1772_device> m_fdc;
 	required_device<floppy_image_device> m_fdd;
-	required_device<ncr5380n_device> m_hdc;
+	required_device<ncr5380_device> m_hdc;
 	required_device<pit8254_device> m_pit;
 	required_device<z80scc_device> m_scc;
 	optional_device<acia6850_device> m_ddt;
@@ -144,8 +144,8 @@ void emu3_state::emu3_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("bootprom", 0);
 	map(0x008000, 0x027fff).ram();
-	map(0x2c0000, 0x2c0000).rw(m_hdc, FUNC(ncr5380n_device::dma_r), FUNC(ncr5380n_device::dma_w));
-	map(0x300000, 0x30000f).rw(m_hdc, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
+	map(0x2c0000, 0x2c0000).rw(m_hdc, FUNC(ncr5380_device::dma_r), FUNC(ncr5380_device::dma_w));
+	map(0x300000, 0x30000f).rw(m_hdc, FUNC(ncr5380_device::read), FUNC(ncr5380_device::write)).umask16(0x00ff);
 	map(0x390000, 0x390007).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0x400000, 0xbfffff).ram();
 
@@ -230,10 +230,10 @@ void emu3_state::emu3(machine_config &config)
 	NSCSI_BUS(config, "scsi");
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("ncr5380", NCR5380N).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:0").option_set("ncr5380", NCR5380).machine_config(
 		[this](device_t *device)
 		{
-			ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
+			ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
 
 			adapter.irq_handler().set(*this, FUNC(emu3_state::irq_w<HDINT>));
 		});

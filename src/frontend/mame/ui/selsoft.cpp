@@ -250,19 +250,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 		icon.second.texture.reset();
 
 	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
-	m_has_empty_start = true;
 	int old_software = -1;
-
-	// FIXME: why does it do this relatively expensive operation every time?
-	machine_config config(m_driver, machine().options());
-	for (device_image_interface &image : image_interface_enumerator(config.root_device()))
-	{
-		if (!image.filename() && image.must_be_loaded())
-		{
-			m_has_empty_start = false;
-			break;
-		}
-	}
 
 	// start with an empty list
 	m_displaylist.clear();
@@ -340,6 +328,17 @@ void menu_select_software::build_software_list()
 	m_swinfo.emplace_back(m_driver);
 
 	machine_config config(m_driver, machine().options());
+
+	// see if any media devices require an image to be loaded
+	m_has_empty_start = true;
+	for (device_image_interface &image : image_interface_enumerator(config.root_device()))
+	{
+		if (!image.filename() && image.must_be_loaded())
+		{
+			m_has_empty_start = false;
+			break;
+		}
+	}
 
 	// iterate through all software lists
 	std::vector<std::size_t> orphans;
@@ -425,7 +424,7 @@ void menu_select_software::build_software_list()
 	}
 
 	std::string searchstr, curpath;
-	for (auto & elem : m_filter_data.list_names())
+	for (auto &elem : m_filter_data.list_names())
 	{
 		path_iterator path(machine().options().media_path());
 		while (path.next(curpath))

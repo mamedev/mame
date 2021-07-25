@@ -24,7 +24,7 @@ bool fs_refcounted_inner::unref()
 	if(m_ref == 0) {
 		if(m_weak_ref)
 			drop_weak_references();
-		else 
+		else
 			delete this;
 		return true;
 	}
@@ -369,19 +369,59 @@ uint32_t filesystem_t::r32l(const uint8_t *p)
 	return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
+std::string filesystem_t::trim_end_spaces(const std::string &str)
+{
+	auto i = str.end();
+	while(i != str.begin() && i[-1] == ' ')
+		i--;
+	return std::string(str.begin(), i);
+}
+
+filesystem_t::file_t filesystem_t::idir_t::file_create(const fs_meta_data &info)
+{
+	fatalerror("file_create called on a filesystem not supporting write\n");
+}
+
+void filesystem_t::idir_t::file_delete(uint64_t key)
+{
+	fatalerror("file_delete called on a filesystem not supporting write\n");
+}
+
+
+void filesystem_t::ifile_t::replace(const std::vector<u8> &data)
+{
+	fatalerror("replace called on a filesystem not supporting write \n");
+}
+
+void filesystem_t::ifile_t::rsrc_replace(const std::vector<u8> &data)
+{
+	fatalerror("rsrc_replace called on a filesystem not supporting write or resource forks \n");
+}
+
+void filesystem_t::ifile_t::metadata_change(const fs_meta_data &info)
+{
+	fatalerror("metadata_change called on a filesystem not supporting write \n");
+}
+
+void filesystem_t::idir_t::metadata_change(const fs_meta_data &info)
+{
+	fatalerror("metadata_change called on a filesystem not supporting write \n");
+}
+
+void filesystem_t::metadata_change(const fs_meta_data &info)
+{
+	fatalerror("metadata_change called on a filesystem not supporting write \n");
+}
+
 std::vector<u8> filesystem_t::ifile_t::rsrc_read_all()
 {
-	fatalerror("rsrc_read_all called on filesystem without resource forks\n");
+	fatalerror("rsrc_read_all called on a filesystem without resource forks\n");
 }
 
-std::vector<u8> filesystem_t::ifile_t::rsrc_read(u64 start, u64 length)
-{
-	fatalerror("rsrc_read called on filesystem without resource forks\n");
-}
-
-const char *fs_meta_get_name(fs_meta_name name)
+const char *fs_meta_data::entry_name(fs_meta_name name)
 {
 	switch(name) {
+	case fs_meta_name::basic: return "basic";
 	case fs_meta_name::creation_date: return "creation_date";
 	case fs_meta_name::length: return "length";
 	case fs_meta_name::loading_address: return "loading_address";
@@ -397,7 +437,7 @@ const char *fs_meta_get_name(fs_meta_name name)
 	return "";
 }
 
-std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m)
+std::string fs_meta::to_string(fs_meta_type type, const fs_meta &m)
 {
 	switch(type) {
 	case fs_meta_type::string: return m.as_string();

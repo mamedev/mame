@@ -161,16 +161,21 @@ static const nes_pcb pcb_list[] =
 	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
 	{ "hes",              HES_BOARD },
 	{ "hosenkan",         HOSENKAN_BOARD },
-	{ "ks7058",           KAISER_KS7058 },
 	{ "ks202",            KAISER_KS202 },   // mapper 56
-	{ "ks7022",           KAISER_KS7022 }, // mapper 175
-	{ "ks7017",           KAISER_KS7017 },
-	{ "ks7032",           KAISER_KS7032 },  //  mapper 142
-	{ "ks7031",           KAISER_KS7031 },  //  used in Dracula II (FDS Conversion)
-	{ "ks7012",           KAISER_KS7012 },     // used in Zanac (FDS Conversion)
-	{ "ks7013b",          KAISER_KS7013B },    // used in Highway Star (FDS Conversion)
+	{ "ks7010",           KAISER_KS7010 },  // used in Akumajo Dracula (FDS Conversion)
+	{ "ks7012",           KAISER_KS7012 },  // used in Zanac (FDS Conversion)
+	{ "ks7013b",          KAISER_KS7013B }, // used in Highway Star (FDS Conversion)
 	{ "ks7016",           KAISER_KS7016 },  // used in Exciting Basketball (FDS Conversion)
-	{ "ks7037",           KAISER_KS7037 },  // Metroid FDS Chinese
+	{ "ks7016b",          KAISER_KS7016B }, // used in Meikyuu Jiin Dababa alt (FDS Conversion)
+	{ "ks7017",           KAISER_KS7017 },
+	{ "ks7021a",          KAISER_KS7021A }, // GetsuFumaDen pirate cart
+	{ "ks7022",           KAISER_KS7022 },  // mapper 175
+	{ "ks7030",           KAISER_KS7030 },  // used in Doki Doki Panic alt (FDS Conversion)
+	{ "ks7031",           KAISER_KS7031 },  // used in Dracula II (FDS Conversion)
+	{ "ks7032",           KAISER_KS7032 },  // mapper 142
+	{ "ks7037",           KAISER_KS7037 },  // Metroid (FDS Conversion)
+	{ "ks7057",           KAISER_KS7057 },  // Gyruss (FDS Conversion)
+	{ "ks7058",           KAISER_KS7058 },
 	{ "gs2015",           RCM_GS2015 },
 	{ "gs2004",           RCM_GS2004 },
 	{ "gs2013",           RCM_GS2013 },
@@ -199,17 +204,19 @@ static const nes_pcb pcb_list[] =
 	{ "asnicol",          BTL_AISENSHINICOL },
 	{ "smb3pirate",       BTL_SMB3 },
 	{ "btl_dninja",       BTL_DRAGONNINJA },
-	{ "whirl2706",        WHIRLWIND_2706 },
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
 	{ "smb2jb",           BTL_SMB2JB },
+	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
+	{ "batmanfs",         BTL_BATMANFS },
+	{ "palthena",         BTL_PALTHENA },
 	{ "tobidase",         BTL_TOBIDASE },  // mapper 120
 	{ "dbz5",             REXSOFT_DBZ5 },
 	{ "sl1632",           REXSOFT_SL1632 },
 	{ "somari",           SOMARI_SL12 },  // mapper 116
 	{ "nitra",            NITRA_TDA },
-	{ "ks7057",           UNL_KS7057 },  // mapper 196 alt (for Street Fighter VI / Fight Street VI },
+	{ "fs6",              UNL_FS6 },  // mapper 196 alt? (for Street Fighter VI / Fight Street VI },
 	{ "sbros11",          BTL_SBROS11 },
 	{ "family4646",       BMC_FAMILY_4646 },
 	{ "pikay2k",          BTL_PIKACHUY2K },  // mapper 254
@@ -237,13 +244,18 @@ static const nes_pcb pcb_list[] =
 	{ "novel2",           BMC_NOVEL2 },  // mapper 213... same as BMC-NOVELDIAMOND9999999IN1 board?
 	{ "studyngame",       UNL_STUDYNGAME },  // mapper 39
 	{ "sgun20in1",        BMC_SUPERGUN_20IN1 },
-	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 60 otherwise
-	{ "bmc_d1038",        BMC_VT5201 },  // mapper 60?
-	{ "810544c",          BMC_810544 },
+	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 59?
+	{ "bmc_d1038",        BMC_VT5201 },  // mapper 59?
+	{ "bmc_80013b",       BMC_80013B },
+	{ "bmc_810544c",      BMC_810544C },
 	{ "ntd03",            BMC_NTD_03 },
+	{ "bmc_ctc09",        BMC_CTC09 },
 	{ "bmc_gb63",         BMC_G63IN1 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
+	{ "bmc_k3046",        BMC_K3046 },
+	{ "bmc_sa005a",       BMC_SA005A },
+	{ "bmc_tj03",         BMC_TJ03 },
 	{ "bmc_ws",           BMC_WS },
 	{ "bmc_hik300",       BMC_SUPERHIK_300IN1 },
 	{ "bmc_s700",         BMC_SUPER_700IN1 },
@@ -296,11 +308,16 @@ static const nes_pcb pcb_list[] =
 	{ "unl_shero",        SACHEN_SHERO },
 	{ "mmalee2",          UNL_MMALEE },
 	{ "unl_2708",         UNL_2708 },
+	{ "unl_dh08",         UNL_DH08 },
+	{ "unl_le05",         UNL_LE05 },
+	{ "unl_lg25",         UNL_LG25 },
 	{ "unl_lh10",         UNL_LH10 },
+	{ "unl_lh28_lh54",    UNL_LH28_LH54 },
+	{ "unl_lh31",         UNL_LH31 },
 	{ "unl_lh32",         UNL_LH32 },
+	{ "unl_lh51",         UNL_LH51 },
 	{ "unl_lh53",         UNL_LH53 },
 	{ "unl_ac08",         UNL_AC08 },
-	{ "unl_bb",           UNL_BB },
 	{ "unl_malisb",       UNL_MALISB },
 	{ "sgpipe",           BTL_SHUIGUAN },
 	{ "rt01",             UNL_RT01 },   // Russian Test Cart
@@ -308,14 +325,17 @@ static const nes_pcb pcb_list[] =
 	{ "unl_43272",        UNL_43272 },
 	{ "tf1201",           UNL_TF1201 },
 	{ "unl_cfight",       UNL_CITYFIGHT },
+	{ "ninjaryu",         UNL_NINJARYU },
+	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II
 	{ "nocash_nochr",     NOCASH_NOCHR },
-	{ "nes_action53",     BTL_ACTION53 },
-	{ "nes_2a03pur",      BTL_2A03_PURITANS },
+	{ "action53",         UNL_ACTION53 },
+	{ "cufrom",           UNL_CUFROM },
+	{ "unrom512",         UNL_UNROM512 },
+	{ "2a03pur",          UNL_2A03PURITANS },
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
 	{ "8237a",            UNSUPPORTED_BOARD },
-	{ "ninjaryu",         UNSUPPORTED_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
@@ -326,7 +346,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_f15",          UNSUPPORTED_BOARD },  // 150-in-1 Unchained Melody
 	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
 	{ "bmc_8in1",         UNSUPPORTED_BOARD },  // Super 8-in-1 (Incl. Rockin' Kats)
-	{ "unl_eh8813a",      UNSUPPORTED_BOARD },  // Dr. Mario II
 	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
@@ -605,7 +624,7 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		logerror("-- PCB: %s", get_feature("pcb"));
 		if (m_pcb_id == UNSUPPORTED_BOARD)
-			logerror(" (currently not supported by MESS)");
+			logerror(" (currently not supported by MAME)");
 		logerror("\n");
 	}
 	logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);

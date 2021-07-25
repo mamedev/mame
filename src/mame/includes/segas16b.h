@@ -21,8 +21,8 @@
 #include "machine/upd4701.h"
 #include "sound/dac.h"
 #include "sound/upd7759.h"
-#include "sound/ym2151.h"
-#include "sound/ym2413.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 #include "screen.h"
@@ -302,7 +302,7 @@ public:
 
 protected:
 	void sound_control_w(uint8_t data);
-	void dac_data_w(uint8_t data);
+	void dac_data_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER( soundirq_cb );
 	bool m_nmi_enable;
 	uint16_t m_dac_data;

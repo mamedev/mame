@@ -32,13 +32,7 @@
     3. At the Basic prompt, type in EDASM press enter. At the memory size
        prompt press enter. Now, make sure the keyboard works properly.
 
-    Old keyboard ToDo:
-    - Occasional characters dropped while typing
-    - Lots of characters dropped when pasting
-    - On mbee128p, Simply Write doesn't accept any input
-
-    New keyboard ToDo:
-    - On mbeett, various problems caused by phantom characters.
+    See drivers\mbee.cpp for any issues.
 
 ****************************************************************************/
 
@@ -350,10 +344,9 @@ void mbee_state::standard_palette(palette_device &palette) const
 {
 	constexpr u8 bglevel[] = { 0, 0x54, 0xa0, 0xff };
 	constexpr u8 fglevel[] = { 0, 0xa0, 0xff, 0xff };
-	u8 i;
 
 	// set up background colours (00-63)
-	i = 0;
+	u8 i = 0;
 	for (u8 b : bglevel)
 	{
 		for (u8 g : bglevel)

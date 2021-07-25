@@ -13,8 +13,10 @@
 
 #include <variant>
 #include <unordered_map>
+#include <functional>
 
 enum class fs_meta_name {
+	basic,
 	creation_date,
 	length,
 	loading_address,
@@ -43,6 +45,9 @@ enum class fs_dir_entry_type {
 
 class fs_meta {
 public:
+	static std::string to_string(fs_meta_type type, const fs_meta &m);
+	static fs_meta from_string(fs_meta_type type, std::string value);
+
 	fs_meta() { value = false; }
 	fs_meta(std::string str) { value = str; }
 	fs_meta(bool b) { value = b; }
@@ -61,11 +66,31 @@ private:
 	std::variant<std::string, uint64_t, bool, util::arbitrary_datetime> value;
 };
 
-using fs_meta_data = std::unordered_map<fs_meta_name, fs_meta>;
+class fs_meta_data {
+public:
+	std::unordered_map<fs_meta_name, fs_meta> meta;
 
-const char *fs_meta_get_name(fs_meta_name name);
-std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m);
-fs_meta fs_meta_from_string(fs_meta_type type, std::string value);
+	static const char *entry_name(fs_meta_name name);
+
+	bool has(fs_meta_name name) const { return meta.find(name) != meta.end(); }
+	bool empty() const { return meta.empty(); }
+
+	void set(fs_meta_name name, const fs_meta &val) { meta[name] = val; }
+	void set(fs_meta_name name, std::string str) { set(name, fs_meta(str)); }
+	void set(fs_meta_name name, bool b) { set(name, fs_meta(b)); }
+	void set(fs_meta_name name, int32_t num) { set(name, fs_meta(num)); }
+	void set(fs_meta_name name, uint32_t num) { set(name, fs_meta(num)); }
+	void set(fs_meta_name name, int64_t num) { set(name, fs_meta(num)); }
+	void set(fs_meta_name name, uint64_t num) { set(name, fs_meta(num)); }
+	void set(fs_meta_name name, util::arbitrary_datetime dt) { set(name, fs_meta(dt)); }
+	void set_now(fs_meta_name name) { set(name, fs_meta(util::arbitrary_datetime::now())); }
+
+	fs_meta get(fs_meta_name name) const { auto i = meta.find(name);  if(i == meta.end()) fatalerror("Entry %s not found\n", entry_name(name)); else return i->second; }
+	util::arbitrary_datetime get_date(fs_meta_name name, util::arbitrary_datetime def = util::arbitrary_datetime::now()) const { auto i = meta.find(name);  if(i == meta.end()) return def; else return i->second.as_date(); }
+	bool get_flag(fs_meta_name name, bool def = false) const { auto i = meta.find(name);  if(i == meta.end()) return def; else return i->second.as_flag(); }
+	uint64_t get_number(fs_meta_name name, uint64_t def = 0) const { auto i = meta.find(name);  if(i == meta.end()) return def; else return i->second.as_number(); }
+	std::string get_string(fs_meta_name name, std::string def = "") const { auto i = meta.find(name);  if(i == meta.end()) return def; else return i->second.as_string(); }
+};
 
 template<typename T> class fs_refcounted_outer {
 public:
@@ -116,7 +141,7 @@ public:
 		} else if(m_is_weak_ref != cref.m_is_weak_ref) {
 			ref();
 			cref.unref();
-			m_object = cref.m_object; // In case the object got deleted	(when going from strong ref to weak on the last strong)		
+			m_object = cref.m_object; // In case the object got deleted (when going from strong ref to weak on the last strong)
 		}
 		cref.m_object = nullptr;
 		return *this;
@@ -137,7 +162,7 @@ private:
 				m_object->ref();
 		}
 	}
-	
+
 	void unref() {
 		if(m_object) {
 			bool del = m_is_weak_ref ? m_object->unref_weak() : m_object->unref();
@@ -245,7 +270,7 @@ public:
 
 	fsblk_t() : m_block_size(0) {}
 	virtual ~fsblk_t() = default;
-	
+
 	virtual void set_block_size(uint32_t block_size);
 	virtual uint32_t block_count() const = 0;
 	virtual block_t get(uint32_t id) = 0;
@@ -268,9 +293,12 @@ protected:
 		virtual ~idir_t() = default;
 
 		virtual fs_meta_data metadata() = 0;
+		virtual void metadata_change(const fs_meta_data &info);
 		virtual std::vector<fs_dir_entry> contents() = 0;
 		virtual file_t file_get(uint64_t key) = 0;
 		virtual dir_t dir_get(uint64_t key) = 0;
+		virtual file_t file_create(const fs_meta_data &info);
+		virtual void file_delete(uint64_t key);
 	};
 
 	class ifile_t : public fs_refcounted_inner {
@@ -279,10 +307,11 @@ protected:
 		virtual ~ifile_t() = default;
 
 		virtual fs_meta_data metadata() = 0;
+		virtual void metadata_change(const fs_meta_data &info);
 		virtual std::vector<u8> read_all() = 0;
-		virtual std::vector<u8> read(u64 start, u64 length) = 0;
+		virtual void replace(const std::vector<u8> &data);
 		virtual std::vector<u8> rsrc_read_all();
-		virtual std::vector<u8> rsrc_read(u64 start, u64 length);
+		virtual void rsrc_replace(const std::vector<u8> &data);
 	};
 
 public:
@@ -296,9 +325,12 @@ public:
 		dir_t weak() { return dir_t(m_object, true); }
 
 		fs_meta_data metadata() { return m_object->metadata(); }
+		void metadata_change(const fs_meta_data &info) { m_object->metadata_change(info); }
 		std::vector<fs_dir_entry> contents() { return m_object->contents(); }
 		file_t file_get(uint64_t key) { return m_object->file_get(key); }
 		dir_t dir_get(uint64_t key)  { return m_object->dir_get(key); }
+		file_t file_create(const fs_meta_data &info) { return m_object->file_create(info); }
+		void file_delete(uint64_t key) { m_object->file_delete(key); }
 	};
 
 	class file_t : public fs_refcounted_outer<ifile_t> {
@@ -311,11 +343,11 @@ public:
 		file_t weak() { return file_t(m_object, true); }
 
 		fs_meta_data metadata() { return m_object->metadata(); }
-
+		void metadata_change(const fs_meta_data &info) { m_object->metadata_change(info); }
 		std::vector<u8> read_all() { return m_object->read_all(); }
-		std::vector<u8> read(u32 start, u32 length) { return m_object->read(start, length); }
+		void replace(const std::vector<u8> &data) { m_object->replace(data); }
 		std::vector<u8> rsrc_read_all() { return m_object->rsrc_read_all(); }
-		std::vector<u8> rsrc_read(u32 start, u32 length) { return m_object->rsrc_read(start, length); }
+		void rsrc_replace(const std::vector<u8> &data) { m_object->rsrc_replace(data); }
 	};
 
 	filesystem_t(fsblk_t &blockdev, u32 size) : m_blockdev(blockdev) {
@@ -324,9 +356,10 @@ public:
 
 	virtual ~filesystem_t() = default;
 
+	virtual dir_t root();
 	virtual void format(const fs_meta_data &meta);
 	virtual fs_meta_data metadata();
-	virtual dir_t root();
+	virtual void  metadata_change(const fs_meta_data &info);
 
 	static void copy(uint8_t *p, const uint8_t *src, uint32_t size);
 	static void fill(uint8_t *p, uint8_t data, uint32_t size);
@@ -348,18 +381,20 @@ public:
 	static uint32_t r24l(const uint8_t *p);
 	static uint32_t r32l(const uint8_t *p);
 
+	static std::string trim_end_spaces(const std::string &str);
+
 protected:
 	fsblk_t &m_blockdev;
 };
 
 class unformatted_floppy_creator;
-	
+
 class filesystem_manager_t {
 public:
 	struct floppy_enumerator {
 		virtual ~floppy_enumerator() = default;
 
-		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, uint32_t image_size, const char *name, const char *description) = 0;
+		virtual void add(floppy_format_type type, uint32_t image_size, const char *name, const char *description) = 0;
 		virtual void add_raw(const char *name, uint32_t key, const char *description) = 0;
 	};
 
@@ -377,6 +412,9 @@ public:
 
 
 	virtual ~filesystem_manager_t() = default;
+
+	virtual const char *name() const = 0;
+	virtual const char *description() const = 0;
 
 	virtual void enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
 	virtual void enumerate_h(hd_enumerator &he) const;
@@ -403,15 +441,5 @@ protected:
 	static bool has(uint32_t form_factor, const std::vector<uint32_t> &variants, uint32_t ff, uint32_t variant);
 	static bool has_variant(const std::vector<uint32_t> &variants, uint32_t variant);
 };
-
-
-typedef filesystem_manager_t *(*filesystem_manager_type)();
-
-// this template function creates a stub which constructs a filesystem manager
-template<class _FormatClass>
-filesystem_manager_t *filesystem_manager_creator()
-{
-	return new _FormatClass();
-}
 
 #endif

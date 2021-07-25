@@ -6395,5 +6395,16 @@ HP Osho
 		</part>
 	</software>
 
+	<software name="dezalis">
+		<description>Dezalis</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x050000">
+				<rom name="dezalis.2d" size="0x050000" crc="d9ba6eb6" sha1="6a6a564b2eabc35dbc1591abb8efcf6a9e98bd10"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
 

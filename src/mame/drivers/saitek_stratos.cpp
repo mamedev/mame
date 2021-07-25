@@ -72,9 +72,9 @@ class stratos_state : public saitek_stratos_state
 public:
 	stratos_state(const machine_config &mconfig, device_type type, const char *tag) :
 		saitek_stratos_state(mconfig, type, tag),
-		m_nvram(*this, "nvram.u7"),
-		m_rombank(*this, "rombank"),
+		m_banked_nvram(*this, "nvram.u7", 0x2000, ENDIANNESS_LITTLE),
 		m_nvrambank(*this, "nvrambank"),
+		m_rombank(*this, "rombank"),
 		m_extrom(*this, "extrom"),
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
@@ -94,9 +94,9 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<nvram_device> m_nvram;
-	required_memory_bank m_rombank;
+	memory_share_creator<u8> m_banked_nvram;
 	required_memory_bank m_nvrambank;
+	required_memory_bank m_rombank;
 	required_device<generic_slot_device> m_extrom;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
@@ -115,11 +115,9 @@ private:
 	u8 lcd_data_r();
 	u8 extrom_r(offs_t offset);
 
-	std::unique_ptr<u8[]> m_nvram_data;
-
-	u8 m_select;
-	u8 m_control;
-	u8 m_led_data;
+	u8 m_select = 0;
+	u8 m_control = 0;
+	u8 m_led_data = 0;
 };
 
 // saitek_stratos_state
@@ -129,12 +127,6 @@ void saitek_stratos_state::machine_start()
 	// resolve handlers
 	m_out_digit.resolve();
 	m_out_lcd.resolve();
-
-	// zerofill
-	m_power = false;
-	m_lcd_ready = false;
-	m_lcd_count = 0;
-	m_lcd_command = 0;
 
 	// register for savestates
 	save_item(NAME(m_power));
@@ -158,8 +150,8 @@ void saitek_stratos_state::set_cpu_freq()
 {
 	// known officially* released CPU speeds: 5MHz, 5.626MHz, 5.67MHz
 	// *not including reseller overclocks, user mods, or the "Turbo Kit"
-	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 5.67_MHz_XTAL : ((inp & 1) ? 5.626_MHz_XTAL : 5_MHz_XTAL));
+	static const XTAL xtal[3] = { 5.626_MHz_XTAL, 5.67_MHz_XTAL, 5_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
 }
 
 // stratos_state
@@ -170,16 +162,7 @@ void stratos_state::machine_start()
 
 	// init banks
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base(), 0x8000);
-
-	m_nvram_data = make_unique_clear<u8[]>(0x2000);
-	save_pointer(NAME(m_nvram_data), 0x2000);
-	m_nvram->set_base(m_nvram_data.get(), 0x2000);
-	m_nvrambank->configure_entries(0, 2, m_nvram_data.get(), 0x1000);
-
-	// zerofill
-	m_select = 0;
-	m_control = 0;
-	m_led_data = 0;
+	m_nvrambank->configure_entries(0, 2, m_banked_nvram, 0x1000);
 
 	// register for savestates
 	save_item(NAME(m_select));
@@ -342,7 +325,7 @@ void stratos_state::control_w(u8 data)
 
 	// d0: main rom bank
 	// d1: ext rom bank
-	// d1: nvram bank?
+	// d1: nvram bank
 	m_rombank->set_entry(data & 1);
 	m_nvrambank->set_entry(data >> 1 & 1);
 
@@ -493,7 +476,7 @@ void stratos_state::stratos(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_egr");
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_egr");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }
 
@@ -559,6 +542,6 @@ ROM_END
 CONS( 1987, stratos,  0,       0, stratos, stratos, stratos_state, empty_init, "SciSys", "Kasparov Stratos (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, stratosa, stratos, 0, stratos, stratos, stratos_state, empty_init, "SciSys", "Kasparov Stratos (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, tking,    0,       0, tking2,  tking2,  stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
-CONS( 1988, tkinga,   tking,   0, tking,   stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, tkingb,   tking,   0, tking,   stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, tking,    stratos, 0, tking2,  tking2,  stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
+CONS( 1988, tkinga,   stratos, 0, tking,   stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, tkingb,   stratos, 0, tking,   stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

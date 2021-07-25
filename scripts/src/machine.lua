@@ -1199,6 +1199,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds6417.h,MACHINES["DS6417"] = true
+---------------------------------------------------
+
+if (MACHINES["DS6417"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds6417.cpp",
+		MAME_DIR .. "src/devices/machine/ds6417.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds75160a.h,MACHINES["DS75160A"] = true
 ---------------------------------------------------
 
@@ -3270,6 +3282,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tmc0999.h,MACHINES["TMC0999"] = true
+---------------------------------------------------
+
+if (MACHINES["TMC0999"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tmc0999.cpp",
+		MAME_DIR .. "src/devices/machine/tmc0999.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/tmc208k.h,MACHINES["TMC208K"] = true
 ---------------------------------------------------
 
@@ -3802,13 +3826,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr5380n.h,MACHINES["NCR5380N"] = true
+--@src/devices/machine/ncr5380.h,MACHINES["NCR5380"] = true
 ---------------------------------------------------
 
-if (MACHINES["NCR5380N"]~=null) then
+if (MACHINES["NCR5380"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/ncr5380n.cpp",
-		MAME_DIR .. "src/devices/machine/ncr5380n.h",
+		MAME_DIR .. "src/devices/machine/ncr5380.cpp",
+		MAME_DIR .. "src/devices/machine/ncr5380.h",
 	}
 end
 
@@ -4744,5 +4768,16 @@ if (MACHINES["NS32202"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ns32202.cpp",
 		MAME_DIR .. "src/devices/machine/ns32202.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ns32082.h,MACHINES["NS32082"] = true
+---------------------------------------------------
+if (MACHINES["NS32082"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ns32082.cpp",
+		MAME_DIR .. "src/devices/machine/ns32082.h",
 	}
 end

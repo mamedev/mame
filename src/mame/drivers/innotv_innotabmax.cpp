@@ -152,7 +152,7 @@ void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &conf
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(vtech_innotv_innotabmax_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("vtech_innotv_innotabmax_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("vtech_innotv_cart");
 }
 
 ROM_START( innotv )

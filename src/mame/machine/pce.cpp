@@ -79,7 +79,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 
 
 
-void pce_state::init_mess_pce()
+void pce_state::init_pce()
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
@@ -87,11 +87,6 @@ void pce_state::init_mess_pce()
 void pce_state::init_tg16()
 {
 	m_io_port_options = TG_16_JOY_SIG | CONST_SIG;
-}
-
-void pce_state::init_sgx()
-{
-	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
 void pce_state::machine_start()
@@ -103,16 +98,10 @@ void pce_state::machine_start()
 	// OTOH CD states are saved but not correctly restored!
 	save_item(NAME(m_io_port_options));
 	save_item(NAME(m_acard));
-	save_item(NAME(m_joystick_port_select));
-	save_item(NAME(m_joystick_data_select));
-	save_item(NAME(m_joy_6b_packet));
 }
 
 void pce_state::machine_reset()
 {
-	for (auto & elem : m_joy_6b_packet)
-		elem = 0;
-
 	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
 	   We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
 	m_acard = m_a_card->read() & 1;
@@ -120,88 +109,35 @@ void pce_state::machine_reset()
 	if (m_cartslot->get_type() == PCE_CDSYS3J)
 	{
 		m_sys3_card = 1;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8sm_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8sm_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8sm_delegate(*this, FUNC(pce_state::acard_wram_r)), write8sm_delegate(*this, FUNC(pce_state::acard_wram_w)));
 	}
 
 	if (m_cartslot->get_type() == PCE_CDSYS3U)
 	{
 		m_sys3_card = 3;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8sm_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8sm_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8sm_delegate(*this, FUNC(pce_state::acard_wram_r)), write8sm_delegate(*this, FUNC(pce_state::acard_wram_w)));
 	}
 }
 
 /* todo: how many input ports does the PCE have? */
-void pce_state::mess_pce_joystick_w(uint8_t data)
+void pce_state::controller_w(u8 data)
 {
-	int joy_i;
-	uint8_t joy_type = m_joy_type->read();
-
-	/* bump counter on a low-to-high transition of bit 1 */
-	if ((!m_joystick_data_select) && (data & JOY_CLOCK))
-	{
-		m_joystick_port_select = (m_joystick_port_select + 1) & 0x07;
-	}
-
-	/* do we want buttons or direction? */
-	m_joystick_data_select = data & JOY_CLOCK;
-
-	/* clear counter if bit 2 is set */
-	if (data & JOY_RESET)
-	{
-		m_joystick_port_select = 0;
-
-		for (joy_i = 0; joy_i < 5; joy_i++)
-		{
-			if (((joy_type >> (joy_i*2)) & 3) == 2)
-				m_joy_6b_packet[joy_i] ^= 1;
-		}
-	}
+	m_port_ctrl->sel_w(BIT(data, 0));
+	m_port_ctrl->clr_w(BIT(data, 1));
 }
 
-uint8_t pce_state::mess_pce_joystick_r()
+u8 pce_state::controller_r()
 {
-	uint8_t joy_type = m_joy_type->read();
-	uint8_t ret, data;
-
-	if (m_joystick_port_select <= 4)
-	{
-		switch ((joy_type >> (m_joystick_port_select*2)) & 3)
-		{
-			case 0: //2-buttons pad
-				data = m_joy[m_joystick_port_select]->read();
-				break;
-			case 2: //6-buttons pad
-				/*
-				Two packets:
-				1st packet: directions + I, II, Run, Select
-				2nd packet: 6 buttons "header" (high 4 bits active low) + III, IV, V, VI
-				Note that six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this
-				on real HW.
-				*/
-				data = m_joy6b[m_joystick_port_select]->read() >> (m_joy_6b_packet[m_joystick_port_select]*8);
-				break;
-			default:
-				data = 0xff;
-				break;
-		}
-	}
-	else
-		data = 0xff;
-
-
-	if (m_joystick_data_select)
-		data >>= 4;
-
-	ret = (data & 0x0f) | m_io_port_options;
+	u8 ret = (m_port_ctrl->port_r() & 0x0f) | m_io_port_options;
 #ifdef UNIFIED_PCE
 	ret &= ~0x40;
 #endif
 
-	return (ret);
+	return ret;
 }
 
 
-void pce_state::pce_cd_intf_w(offs_t offset, uint8_t data)
+void pce_state::cd_intf_w(offs_t offset, u8 data)
 {
 	m_cd->update();
 
@@ -213,7 +149,7 @@ void pce_state::pce_cd_intf_w(offs_t offset, uint8_t data)
 	m_cd->update();
 }
 
-uint8_t pce_state::pce_cd_intf_r(offs_t offset)
+u8 pce_state::cd_intf_r(offs_t offset)
 {
 	m_cd->update();
 
@@ -237,12 +173,12 @@ uint8_t pce_state::pce_cd_intf_r(offs_t offset)
 }
 
 
-uint8_t pce_state::pce_cd_acard_wram_r(offs_t offset)
+u8 pce_state::acard_wram_r(offs_t offset)
 {
-	return pce_cd_intf_r(0x200 | (offset & 0x6000) >> 9);
+	return cd_intf_r(0x200 | (offset & 0x6000) >> 9);
 }
 
-void pce_state::pce_cd_acard_wram_w(offs_t offset, uint8_t data)
+void pce_state::acard_wram_w(offs_t offset, u8 data)
 {
-	pce_cd_intf_w(0x200 | (offset & 0x6000) >> 9, data);
+	cd_intf_w(0x200 | (offset & 0x6000) >> 9, data);
 }

@@ -714,4 +714,4 @@ GAME( 1993, twins,    0,     twins,    twins, twins_state,    init_twins,      R
 GAME( 1994, twinsed1, twins, twinsed1, twins, twinsed1_state, empty_init,      ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, twinsed2, twins, twins,    twins, twins_state,    init_twinsed2,   ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, spider,   0,     spider,   twins, spider_state,   empty_init, ROT0, "Buena Vision",                          "Spider",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spider,   0,     spider,   twins, spider_state,   empty_init,      ROT0, "Buena Vision",                          "Spider (Buena Vision)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

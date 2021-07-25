@@ -1826,6 +1826,8 @@ void pdp1_state::pdp1(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pdp1);
 	PALETTE(config, m_palette, FUNC(pdp1_state::pdp1_palette), total_colors_needed + std::size(pdp1_pens), total_colors_needed);
+
+	SOFTWARE_LIST(config, "ptp_list").set_original("pdp1_ptp");
 }
 
 /*

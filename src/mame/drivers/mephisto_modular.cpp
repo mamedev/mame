@@ -44,8 +44,8 @@ Undocumented buttons:
 
 TODO:
 - match I/S= diag speed test with real hardware (good test for proper waitstates)
-- gen32 waitstates emulation is preliminary (without it, sound pitch is too high
-  and lcd write speed too fast)
+- gen32 waitstates emulation is preliminary (without it, sound pitch is way too high
+  and lcd write speed too fast). Real gen32 sound is a bit lower pitched than MAME.
 
 ===============================================================================
 

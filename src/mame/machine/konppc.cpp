@@ -106,6 +106,14 @@ void konppc_device::set_cgboard_texture_bank(int board, const char *bank, uint8_
 	machine().root_device().membank(bank)->configure_entries(0, 2, rom, 0x800000);
 }
 
+bool konppc_device::output_3d_enabled()
+{
+	if (cgboard_id < MAX_CG_BOARDS)
+		return enable_3d[cgboard_id];
+	else
+		return false;
+}
+
 /*****************************************************************************/
 
 /* CG Board DSP interface for PowerPC */
@@ -153,6 +161,11 @@ void konppc_device::cgboard_dsp_comm_w_ppc(offs_t offset, uint32_t data, uint32_
 
 				if (data & 0x04000000)
 					dsp.set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+			}
+
+			if (ACCESSING_BITS_16_23)
+			{
+				enable_3d[cgboard_id] = (data & 0x400000) ? true : false;
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -213,7 +226,10 @@ void konppc_device::dsp_comm_sharc_w(int board, int offset, uint32_t data)
 			if (offset == 1)
 			{
 				if (data & 0x03)
+				{
 					m_dsp[0]->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+					m_dsp[0]->abort_timeslice();
+				}
 			}
 			break;
 		}
@@ -420,7 +436,7 @@ void konppc_device::nwk_fifo_0_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	}
 	else
 	{
-		m_voodoo[0]->voodoo_w(offset ^ 0x80000, data, mem_mask);
+		m_voodoo[0]->write(offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -437,7 +453,7 @@ void konppc_device::nwk_fifo_1_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	}
 	else
 	{
-		m_voodoo[1]->voodoo_w(offset ^ 0x80000, data, mem_mask);
+		m_voodoo[1]->write(offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -449,7 +465,7 @@ uint32_t konppc_device::nwk_voodoo_0_r(offs_t offset)
 	}
 	else
 	{
-		return m_voodoo[0]->voodoo_r(offset);
+		return m_voodoo[0]->read(offset);
 	}
 }
 
@@ -461,7 +477,7 @@ uint32_t konppc_device::nwk_voodoo_1_r(offs_t offset)
 	}
 	else
 	{
-		return m_voodoo[1]->voodoo_r(offset);
+		return m_voodoo[1]->read(offset);
 	}
 }
 
@@ -478,7 +494,7 @@ void konppc_device::nwk_voodoo_0_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	}
 	else
 	{
-		m_voodoo[0]->voodoo_w(offset, data, mem_mask);
+		m_voodoo[0]->write(offset, data, mem_mask);
 	}
 }
 
@@ -495,6 +511,6 @@ void konppc_device::nwk_voodoo_1_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	}
 	else
 	{
-		m_voodoo[1]->voodoo_w(offset, data, mem_mask);
+		m_voodoo[1]->write(offset, data, mem_mask);
 	}
 }

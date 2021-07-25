@@ -328,6 +328,7 @@
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 #define GFXFIFO_IN_VERBOSE          0
@@ -355,11 +356,13 @@ struct cobra_polydata
 	uint32_t tex_address;
 };
 
-class cobra_renderer : public poly_manager<float, cobra_polydata, 8, 10000>
+class cobra_renderer : public poly_manager<float, cobra_polydata, 8>
 {
 public:
 	cobra_renderer(screen_device &screen)
-		: poly_manager<float, cobra_polydata, 8, 10000>(screen)
+		: poly_manager<float, cobra_polydata, 8>(screen.machine())
+		, m_screen(screen)
+		, m_framebuffer_size(0, 511, 0, 399)
 	{
 		m_texture_ram = std::make_unique<uint32_t[]>(0x100000);
 
@@ -386,6 +389,7 @@ public:
 		}
 	}
 
+	screen_device &screen() const { return m_screen; }
 	void render_texture_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
 	void render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
 	void draw_point(const rectangle &visarea, vertex_t &v, uint32_t color);
@@ -403,6 +407,7 @@ public:
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 	inline rgb_t texture_fetch(uint32_t *texture, int u, int v, int width, int format);
 private:
+	screen_device &m_screen;
 	std::unique_ptr<bitmap_rgb32> m_framebuffer;
 	std::unique_ptr<bitmap_rgb32> m_backbuffer;
 	std::unique_ptr<bitmap_rgb32> m_overlay;
@@ -418,6 +423,8 @@ private:
 	std::unique_ptr<uint64_t[]> m_gfx_register;
 
 	uint32_t m_texram_ptr;
+
+	rectangle m_framebuffer_size;
 
 	enum
 	{
@@ -777,10 +784,10 @@ public:
 
 	std::unique_ptr<cobra_renderer> m_renderer;
 
-	cobra_fifo *m_gfxfifo_in;
-	cobra_fifo *m_gfxfifo_out;
-	cobra_fifo *m_m2sfifo;
-	cobra_fifo *m_s2mfifo;
+	std::unique_ptr<cobra_fifo> m_gfxfifo_in;
+	std::unique_ptr<cobra_fifo> m_gfxfifo_out;
+	std::unique_ptr<cobra_fifo> m_m2sfifo;
+	std::unique_ptr<cobra_fifo> m_s2mfifo;
 
 	void gfxfifo_in_event_callback(cobra_fifo::EventType event);
 	void gfxfifo_out_event_callback(cobra_fifo::EventType event);
@@ -851,6 +858,8 @@ public:
 	void cobra_gfx_map(address_map &map);
 	void cobra_main_map(address_map &map);
 	void cobra_sub_map(address_map &map);
+
+	void rf5c400_map(address_map& map);
 
 	uint32_t mpc106_pci_r(int function, int reg, uint32_t mem_mask);
 	void mpc106_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
@@ -1131,12 +1140,12 @@ void cobra_state::video_start()
 uint32_t cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_has_psac)
-	{
-		m_k001604->draw_back_layer(bitmap, cliprect);
-		m_k001604->draw_front_layer(screen, bitmap, cliprect);
-	}
+		m_k001604->draw_back_layer(screen, bitmap, cliprect);
 
 	m_renderer->display(&bitmap, cliprect);
+
+	if (m_has_psac)
+		m_k001604->draw_front_layer(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -2085,25 +2094,23 @@ void cobra_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
 {
 	if (m_gfx_register[0] & 0x4)
 	{
-		copybitmap_trans(*bitmap, *m_framebuffer, 0, 0, 0, 0, cliprect, 0);
+		copybitmap_trans(*bitmap, *m_framebuffer, 0, 0, cliprect.min_x, cliprect.min_y, cliprect, 0);
 	}
 	else
 	{
-		copybitmap_trans(*bitmap, *m_backbuffer, 0, 0, 0, 0, cliprect, 0);
+		copybitmap_trans(*bitmap, *m_backbuffer, 0, 0, cliprect.min_x, cliprect.min_y, cliprect, 0);
 	}
 }
 
 void cobra_renderer::gfx_init()
 {
-	const rectangle& visarea = screen().visible_area();
-
 	m_gfx_gram = std::make_unique<uint32_t[]>(0x40000);
 
 	m_gfx_register = std::make_unique<uint64_t[]>(0x3000);
 	m_gfx_register_select = 0;
 
 	float zvalue = 10000000.0f;
-	m_zbuffer->fill(*(int*)&zvalue, visarea);
+	m_zbuffer->fill(*(int*)&zvalue, m_framebuffer_size);
 }
 
 void cobra_renderer::gfx_exit()
@@ -2124,7 +2131,7 @@ void cobra_renderer::gfx_exit()
 
 void cobra_renderer::gfx_reset()
 {
-	cobra_state *cobra = machine().driver_data<cobra_state>();
+	cobra_state *cobra = screen().machine().driver_data<cobra_state>();
 
 	cobra->m_gfx_re_status = RE_STATUS_IDLE;
 }
@@ -2210,13 +2217,11 @@ void cobra_renderer::gfx_write_reg(uint64_t data)
 	{
 		case 0x0000:
 		{
-			const rectangle& visarea = screen().visible_area();
-
-			copybitmap_trans(*m_framebuffer, *m_backbuffer, 0, 0, 0, 0, visarea, 0);
-			m_backbuffer->fill(0xff000000, visarea);
+			copybitmap_trans(*m_framebuffer, *m_backbuffer, 0, 0, 0, 0, m_framebuffer_size, 0);
+			m_backbuffer->fill(0xff000000, m_framebuffer_size);
 
 			float zvalue = 10000000.0f;
-			m_zbuffer->fill(*(int*)&zvalue, visarea);
+			m_zbuffer->fill(*(int*)&zvalue, m_framebuffer_size);
 			break;
 		}
 	}
@@ -2226,16 +2231,15 @@ void cobra_renderer::gfx_write_reg(uint64_t data)
 
 void cobra_renderer::gfx_fifo_exec()
 {
-	cobra_state *cobra = machine().driver_data<cobra_state>();
+	cobra_state *cobra = screen().machine().driver_data<cobra_state>();
 
 	if (cobra->m_gfx_fifo_loopback != 0)
 		return;
 
-	const rectangle& visarea = screen().visible_area();
 	vertex_t vert[32];
 
-	cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
-	cobra_fifo *fifo_out = cobra->m_gfxfifo_out;
+	cobra_fifo *fifo_in = cobra->m_gfxfifo_in.get();
+	cobra_fifo *fifo_out = cobra->m_gfxfifo_out.get();
 
 	while (fifo_in->current_num() >= 2)
 	{
@@ -2533,7 +2537,7 @@ void cobra_renderer::gfx_fifo_exec()
 							render_delegate rd = render_delegate(&cobra_renderer::render_texture_scan, this);
 							for (int i=2; i < units; i++)
 							{
-								render_triangle(visarea, rd, 8, vert[i-2], vert[i-1], vert[i]);
+								render_triangle<8>(m_framebuffer_size, rd, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
 						else
@@ -2541,7 +2545,7 @@ void cobra_renderer::gfx_fifo_exec()
 							render_delegate rd = render_delegate(&cobra_renderer::render_color_scan, this);
 							for (int i=2; i < units; i++)
 							{
-								render_triangle(visarea, rd, 5, vert[i-2], vert[i-1], vert[i]);
+								render_triangle<5>(m_framebuffer_size, rd, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
 						break;
@@ -2551,7 +2555,7 @@ void cobra_renderer::gfx_fifo_exec()
 					{
 						for (int i=0; i < units; i++)
 						{
-							draw_point(visarea, vert[i], 0xffffffff);
+							draw_point(m_framebuffer_size, vert[i], 0xffffffff);
 						}
 						break;
 					}
@@ -2562,7 +2566,7 @@ void cobra_renderer::gfx_fifo_exec()
 						{
 							for (i=0; i < units; i+=2)
 							{
-								draw_line(visarea, vert[i], vert[i+1]);
+								draw_line(m_framebuffer_size, vert[i], vert[i+1]);
 							}
 						}
 						else                        // line strip
@@ -3080,7 +3084,7 @@ void cobra_state::gfx_cpu_dc_store(offs_t offset, uint32_t data)
 	if (addr == 0x10 || addr == 0x18 || addr == 0x1e)
 	{
 		uint64_t i = (uint64_t)(m_gfx_fifo_cache_addr) << 32;
-		cobra_fifo *fifo_in = m_gfxfifo_in;
+		cobra_fifo *fifo_in = m_gfxfifo_in.get();
 
 		uint32_t a = (offset / 8) & 0xff;
 
@@ -3283,7 +3287,7 @@ void cobra_state::cobra(machine_config &config)
 	m_gfxcpu->set_bus_frequency(XTAL(66'666'700));   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_gfxcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_gfx_map);
 
-	config.set_maximum_quantum(attotime::from_hz(15005));
+	config.set_maximum_quantum(attotime::from_hz(55005));
 
 	PCI_BUS_LEGACY(config, m_legacy_pci, 0, 0);
 	m_legacy_pci->set_device(0, FUNC(cobra_state::mpc106_pci_r), FUNC(cobra_state::mpc106_pci_w));
@@ -3295,8 +3299,8 @@ void cobra_state::cobra(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(512, 400);
-	m_screen->set_visarea_full();
+	m_screen->set_size(1024, 1024);
+	m_screen->set_visarea(40, 511+40, 31, 399+31);
 	m_screen->set_screen_update(FUNC(cobra_state::screen_update_cobra));
 	PALETTE(config, m_palette).set_entries(65536);
 
@@ -3304,6 +3308,7 @@ void cobra_state::cobra(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));
+	rfsnd.set_addrmap(0, &cobra_state::rf5c400_map);
 	rfsnd.add_route(0, "lspeaker", 1.0);
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
@@ -3314,10 +3319,6 @@ void cobra_state::cobra(machine_config &config)
 	M48T58(config, "m48t58", 0);
 
 	K001604(config, m_k001604, 0);     // on the LAN board in Racing Jam DX
-	m_k001604->set_layer_size(0);
-	m_k001604->set_roz_size(1);
-	m_k001604->set_txt_mem_offset(0);  // correct?
-	m_k001604->set_roz_mem_offset(0);  // correct?
 	m_k001604->set_palette(m_palette);
 
 	COBRA_JVS_HOST(config, m_jvs_host, 4000000);
@@ -3326,42 +3327,43 @@ void cobra_state::cobra(machine_config &config)
 	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
 }
 
+void cobra_state::rf5c400_map(address_map& map)
+{
+	map(0x000000, 0xffffff).ram().share("rf5c400_ram");
+}
+
 /*****************************************************************************/
 
 /*****************************************************************************/
 
 void cobra_state::init_cobra()
 {
-	m_gfxfifo_in  = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_gfxfifo_in  = std::make_unique<cobra_fifo>(machine(),
 								8192,
 								"GFXFIFO_IN",
 								GFXFIFO_IN_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::gfxfifo_in_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::gfxfifo_in_event_callback, this)
 								);
 
-	m_gfxfifo_out = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_gfxfifo_out = std::make_unique<cobra_fifo>(machine(),
 								8192,
 								"GFXFIFO_OUT",
 								GFXFIFO_OUT_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::gfxfifo_out_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::gfxfifo_out_event_callback, this)
 								);
 
-	m_m2sfifo     = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_m2sfifo     = std::make_unique<cobra_fifo>(machine(),
 								2048,
 								"M2SFIFO",
 								M2SFIFO_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::m2sfifo_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::m2sfifo_event_callback, this)
 								);
 
-	m_s2mfifo     = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_s2mfifo     = std::make_unique<cobra_fifo>(machine(),
 								2048,
 								"S2MFIFO",
 								S2MFIFO_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this)
 								);
 
 	m_maincpu->ppc_set_dcstore_callback(write32sm_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));
@@ -3573,8 +3575,6 @@ ROM_START(bujutsu)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
 
-	ROM_REGION16_LE(0x1000000, "rfsnd", ROMREGION_ERASE00)
-
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "645c04", 0, SHA1(c0aabe69f6eb4e4cf748d606ae50674297af6a04) )
 ROM_END
@@ -3591,8 +3591,6 @@ ROM_START(racjamdx)
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", ROMREGION_ERASE00)
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )

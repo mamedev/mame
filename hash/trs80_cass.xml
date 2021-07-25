@@ -11,7 +11,7 @@ Compatibility flags:
 3 = trs80m3
 4 = trs80m4
 H = HT series
-M = meritum
+
 
 If no flag is specified, it's assumed it works on all of them.
 
@@ -25,39 +25,13 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 -->
 <softwarelist name="trs80_cass" description="Radio Shack TRS-80 cassettes">
 
-	<software name="android">
-		<description>Android Nim</description>
-		<year>1978</year>
-		<publisher>80-NW Publishing Co</publisher>
-		<info name="author" value="Leo Christopherson" />
-		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt) CLOAD then RUN" />
-		<sharedfeat name="compatibility" value="1,3,4,H" />
-		<part name="cass1" interface="trs80_cass">
-			<dataarea name="cass" size="0x3785">
-				<rom name="android1.cas" size="0x3785" crc="4f72e456" sha1="d53a619c8f3d734f08db6ade979cdb267097e2cf"/>
-			</dataarea>
-		</part>
-	</software>
-	<software name="meteor2">
-		<description>Meteor Mission 2</description>
-		<year>1982</year>
-		<publisher>Big Five Software</publisher>
-		<info name="author" value="Bill Hogue and Jeff Konyu" />
-		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt) SYSTEM then METEOR then /" />
-		<sharedfeat name="compatibility" value="1,3,4,H" /><!-- Graphics are better on 3,4 -->
-		<part name="cass1" interface="trs80_cass">
-			<dataarea name="cass" size="0x2ff8">
-				<rom name="meteor2.cas" size="0x2ff8" crc="144417c0" sha1="26b441bd494ddbce478239c1727087e64a95e447"/>
-			</dataarea>
-		</part>
-	</software>
 	<software name="chess0">
 		<description>MicroChess 1.5 (L1)</description>
 		<year>1978</year>
 		<publisher>Micro-ware Limited</publisher>
-		<info name="usage" value="CLOAD then RUN" />
+		<info name="usage" value="Enter, CLOAD then RUN" />
 		<sharedfeat name="compatibility" value="0" />
-		<part name="cass1" interface="trs80_cass">
+		<part name="cass" interface="trs80_cass">
 			<dataarea name="cass" size="0x148b">
 				<rom name="chess0.cas" size="0x148b" crc="b8a1a3ae" sha1="937c25f5295edd00a90bfe828615ba5e2470b9dd"/>
 			</dataarea>
@@ -67,9 +41,9 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		<description>Haunted House (L1)</description>
 		<year>1980</year>
 		<publisher>Tandy Corporation</publisher>
-		<info name="usage" value="CLOAD then when it says HAUNTED HOUSE hit Enter" />
+		<info name="usage" value="Enter, CLOAD then when it says HAUNTED HOUSE hit Enter" />
 		<sharedfeat name="compatibility" value="0" />
-		<part name="cass1" interface="trs80_cass">
+		<part name="cass" interface="trs80_cass">
 			<dataarea name="cass" size="0x1ae3">
 				<rom name="haunt0.cas" size="0x1ae3" crc="40554978" sha1="d8d6c8a2f482bc1f7c6e6c49a510979f9f9139d9"/>
 			</dataarea>
@@ -79,9 +53,9 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		<description>Invasion Force (L1)</description>
 		<year>1979</year>
 		<publisher>Tandy Corporation</publisher>
-		<info name="usage" value="CLOAD" />
+		<info name="usage" value="Enter, CLOAD" />
 		<sharedfeat name="compatibility" value="0" />
-		<part name="cass1" interface="trs80_cass">
+		<part name="cass" interface="trs80_cass">
 			<dataarea name="cass" size="0x2287">
 				<rom name="invasion0.cas" size="0x2287" crc="d40c1134" sha1="aea9a587d9040cff153c8be219ed4591a794524c"/>
 			</dataarea>
@@ -91,9 +65,9 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		<description>TRS-80 Marquee (L1)</description>
 		<year>1979</year>
 		<publisher>Tandy Corporation</publisher>
-		<info name="usage" value="CLOAD" />
+		<info name="usage" value="Enter, CLOAD" />
 		<sharedfeat name="compatibility" value="0" />
-		<part name="cass1" interface="trs80_cass">
+		<part name="cass" interface="trs80_cass">
 			<dataarea name="cass" size="0x069f">
 				<rom name="marquee0.cas" size="0x069f" crc="46c8ba18" sha1="a1edef26cfb996d8f150e0ca9e5212a8de6c4aef"/>
 			</dataarea>
@@ -103,9 +77,9 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		<description>Quick Watson (L1)</description>
 		<year>1978</year>
 		<publisher>Radio Shack</publisher>
-		<info name="usage" value="CLOAD then RUN" />
+		<info name="usage" value="Enter, CLOAD then RUN" />
 		<sharedfeat name="compatibility" value="0" />
-		<part name="cass1" interface="trs80_cass">
+		<part name="cass" interface="trs80_cass">
 			<dataarea name="cass" size="0x0c5b">
 				<rom name="qwatson0.cas" size="0x0c5b" crc="196e5e75" sha1="a65fb3144b71d377632240548cdeb875e6537d8d"/>
 			</dataarea>
@@ -116,11 +90,665 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		<year>1979</year>
 		<publisher>Radio Shack</publisher>
 		<info name="author" value="Robert Arnstein" />
-		<info name="usage" value="CLOAD then RUN" />
+		<info name="usage" value="Enter, CLOAD then RUN" />
 		<sharedfeat name="compatibility" value="0" />
-		<part name="cass1" interface="trs80_cass">
-			<dataarea name="cass" size="0e8b">
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0e8b">
 				<rom name="saucer0.cas" size="0x0e8b" crc="257f8f52" sha1="5c46fc89edab7f5a55706ab18c9315aa7b2f3d28"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="android">
+		<description>Android Nim</description>
+		<year>1978</year>
+		<publisher>80-NW Publishing Co</publisher>
+		<info name="author" value="Leo Christopherson" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3785">
+				<rom name="android1.cas" size="0x3785" crc="4f72e456" sha1="d53a619c8f3d734f08db6ade979cdb267097e2cf"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="colliss">
+		<description>Collission</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="David Bohlke" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0ac3">
+				<rom name="autozas.cas" size="0x0ac3" crc="2ce1c3ca" sha1="5172fd0540e1a0c21530682f87ef21abdd73f169"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="baccarat">
+		<description>Baccarat</description>
+		<year>1979</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x2b53">
+				<rom name="baccarat.cas" size="0x2b53" crc="f7c12e3a" sha1="022e9df94542ae9012e5903c5eceeaba554600b4"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="backgamm">
+		<description>Backgammon</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0c6d">
+				<rom name="backgamm.cas" size="0x0c6d" crc="f191518b" sha1="771ce3df3cb48bf7ebea79a3f3ec2beb104a12af"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="blakjack">
+		<description>Blackjack</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0ba2">
+				<rom name="blackjack.cas" size="0x0ba2" crc="c16621c1" sha1="e75e527fcbfa1131e1c0eb618686bd13facd787d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="craps">
+		<description>Reno Casino Craps</description>
+		<year>1979</year>
+		<publisher>Tandy Corp</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x2278">
+				<rom name="craps.cas" size="0x2278" crc="9e7ac665" sha1="4f26aa561b1c90c3074963a9c1fc526224ca9702"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dslogo">
+		<description>System-80 Demo</description>
+		<year>19??</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="usage" value="Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0d65">
+				<rom name="dslogo.cas" size="0x0d65" crc="77cbbbf3" sha1="e901be378d78ac286fd9f4e37bdb912f795432c7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dtrap">
+		<description>Death Trap</description>
+		<year>19??</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="author" value="Michael Fackerell" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), 32640, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x12e9">
+				<rom name="dtrap.cas" size="0x12e9" crc="a5f283e2" sha1="ac4406c8469bf6fe54560a4273d678275fc7dd4e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="keno">
+		<description>Reno Keno</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x1427">
+				<rom name="keno.cas" size="0x1427" crc="0db78e54" sha1="fed04ea2f4a63ceb651fb6fbc5ba19584583f85f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="meteor2">
+		<description>Meteor Mission 2</description>
+		<year>1982</year>
+		<publisher>Big Five Software</publisher>
+		<info name="author" value="Bill Hogue and Jeff Konyu" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then METEOR then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" /><!-- Graphics are better on 3,4 -->
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x2ff8">
+				<rom name="meteor2.cas" size="0x2ff8" crc="144417c0" sha1="26b441bd494ddbce478239c1727087e64a95e447"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="microply">
+		<description>Micro-opoly</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Douglas Perrin" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x32f1">
+				<rom name="microply.cas" size="0x32f1" crc="c9da3313" sha1="cfb8f1312de710f297c09f5e188a3ea6bf78895b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="qwatson">
+		<description>Quick Watson</description>
+		<year>1978</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0bb4">
+				<rom name="qwatson.cas" size="0x0bb4" crc="f185d97a" sha1="332dec055c615cf5aea92f093bf3fb0767cf8ec5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="roulette">
+		<description>Reno Casino Roulette</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x2353">
+				<rom name="roulette.cas" size="0x2353" crc="87efc863" sha1="8eb3b5fffe3169591848aba58b01e2a6591ce6fa"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="pinball">
+		<description>Micro-80 Pinball Machine</description>
+		<year>1980</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="G.R.Jensen" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x21e5">
+				<rom name="pinball.cas" size="0x21e5" crc="86a16262" sha1="e2f84cc05a675a82a360091cf5c53f53c9f0accf"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="slot">
+		<description>Reno Casino Slot Machine</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x15fe">
+				<rom name="slot.cas" size="0x15fe" crc="1b0d4944" sha1="abf542b2bb8690c1878b9a4a27fc35145d72efa0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="startrek">
+		<description>Star Trek (The Computer Game)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x360f">
+				<rom name="startrek.cas" size="0x360f" crc="6e3f370f" sha1="61ce2862e66d5be93d8ad4416f14ef74d65a1c70"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="starwar">
+		<description>Star War</description>
+		<year>19??</year>
+		<publisher>EACA International</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x20fa">
+				<rom name="starwar.cas" size="0x20fa" crc="0f5d20f3" sha1="343a5551b297d8959f4a4b7a34c717a576a46dc5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="taipan">
+		<description>Taipan</description>
+		<year>1979</year>
+		<publisher>Cybernautics</publisher>
+		<info name="author" value="Art Canfil" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3566">
+				<rom name="taipan.cas" size="0x3566" crc="08ab89f7" sha1="e427a18099ab2362df186403539d3a4ad8dc45df"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="trollcru">
+		<description>Troll Crusher</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Simon Goodwin" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x396a">
+				<rom name="trollcrusher.cas" size="0x396a" crc="40409fdd" sha1="1dcf4e8d69c930aac9e49241bc915b019cef9464"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="vglogo">
+		<description>Video Genie Demo</description>
+		<year>1979</year>
+		<publisher>EACA International</publisher>
+		<info name="usage" value="Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x05cd">
+				<rom name="vglogo.cas" size="0x05cd" crc="0176a408" sha1="3a258cfaad530b18fba079744985c44e7eef5cc4"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="wheel">
+		<description>Wheel of Fortune</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x1616">
+				<rom name="wheel.cas" size="0x1616" crc="f259ef4d" sha1="5291a7ef54a2718ffac0db2ad989821541d657b2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="cosmic">
+		<description>Cosmic</description><!-- Game has no title, used name of file -->
+		<year>1980</year>
+		<publisher>Instant Software</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then COSMIC then / then G. Arrows to alter viewpoint, Space to fire." />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x1f20">
+				<rom name="cosmic.cas" size="0x1f20" crc="8a0844bc" sha1="a402b0b110d57817debe54d6c5b581cb8279d217"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="defense">
+		<description>Defense Command</description>
+		<year>1982</year>
+		<publisher>Big Five Software</publisher>
+		<info name="author" value="Bill Hogue and Jeff Konyu" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then DEFENS then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x395c">
+				<rom name="defense.cas" size="0x395c" crc="cd25580c" sha1="d067676b33ed6d84642a77bba89bd91a8963ec5b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="eliza">
+		<description>Eliza</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then ELIZA then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x292c">
+				<rom name="eliza.cas" size="0x292c" crc="5cf60e78" sha1="550ccd97d33219203d877e9ea70c0e4d81080101"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="env">
+		<description>Les Invasiou des Extras-terrestres</description>
+		<year>19??</year>
+		<publisher>Sivea</publisher>
+		<info name="author" value="Xavier Ackaouy" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then ENV then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x1015">
+				<rom name="env.cas" size="0x1015" crc="5f84b9c5" sha1="966d9c849cd6314529e60a004b21f9b052a08aab"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="escape">
+		<description>Escape</description>
+		<year>1984</year>
+		<publisher>Bernzeszoft</publisher>
+		<info name="author" value="Janos Torok" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then ESCAPE" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x1711">
+				<rom name="escape.cas" size="0x1711" crc="8c792839" sha1="b6017f5fd4f8bf65881868975bebb807885a7883"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="headon">
+		<description>Head On</description>
+		<year>1980</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Marc Ferguson" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then HEADON then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0a37">
+				<rom name="headon.cas" size="0x0a37" crc="9c28c415" sha1="1b7557c0b0b1c1726edfbceb2a15d4730c19e8c0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="heliko">
+		<description>Heliko</description><!-- Game has no title, used name of file -->
+		<year>19??</year>
+		<publisher>Punk and Kalap System</publisher>
+		<info name="author" value="Kalap" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then HELIKO then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0ac0">
+				<rom name="heliko.cas" size="0x0ac0" crc="0ac4660e" sha1="ebae39380c96d6fc7f75b94dfd88f142badc9c4c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="spaceinv">
+		<description>Space Invaders</description>
+		<year>19??</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then INVADE then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x50bd36">
+				<rom name="invade2.wav" size="0x50bd36" crc="8551c2ac" sha1="318cb4950a9571d46575cf84667b05ea494888f5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="invaders">
+		<description>Invaders</description>
+		<year>1979</year>
+		<publisher>Level IV Products</publisher>
+		<info name="author" value="Kim Watt" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then INVADE then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x2ce1">
+				<rom name="invade3.cas" size="0x2ce1" crc="698755ca" sha1="3b13cff55b660fa0e417d02220b1cfa1266af657"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="invasion">
+		<description>Invasion Force</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then INVADE then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x22b5">
+				<rom name="invade4.cas" size="0x22b5" crc="f1b110fc" sha1="6985382a82be496e6a8126ee44bf6bc6b4a3d3dc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="adv03">
+		<description>Mission Impossible</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Scott Adams" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then MISSIO then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3f3c">
+				<rom name="adv03.cas" size="0x3f3c" crc="750bda34" sha1="4d1bd8ac8486cf87073a2220fcaab1865eb0ebe9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="penetr">
+		<description>Penetrator</description><!-- [3,4]:most sounds are missing -->
+		<year>19??</year>
+		<publisher>Beam Software</publisher>
+		<info name="author" value="Philip Mitchell" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then PENETR then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3f7a">
+				<rom name="penetr.cas" size="0x3f7a" crc="a6fe072b" sha1="78830a291784eb8afbba32f590e57407b69adb64"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="pyrmd">
+		<description>Pyramid</description><!-- Game has no title, used name of file -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then PYRMD then / then Enter then N" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3f3c">
+				<rom name="pyrmd.cas" size="0x3f3c" crc="3791b59e" sha1="51408870ded6365d41a5c031e89db18ccd0fc9e8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="galaxy1">
+		<description>Galaxy Invasion (set 1)</description>
+		<year>1980</year>
+		<publisher>Big Five Software</publisher>
+		<info name="author" value="Bill Hogue and Jeff Konyu" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then GALAXY then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x26c4">
+				<rom name="galaxy1.cas" size="0x26c4" crc="2952db6e" sha1="aee00dffcf82dcd47168ac502a36f83e7de65365"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="galaxy2">
+		<description>Galaxy Invasion (set 2)</description>
+		<year>1980</year>
+		<publisher>Big Five Software</publisher>
+		<info name="author" value="Bill Hogue and Jeff Konyu" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then GALAXY then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x2be3">
+				<rom name="galaxy2.cas" size="0x2be3" crc="e08fc94a" sha1="1246e5a02279f0b7b609480f75e28d3dd3ac1441"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="kinghill">
+		<description>King of the Hill</description>
+		<year>1983</year>
+		<publisher>Smith and Jones Software</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then R then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x39f4">
+				<rom name="kinghill.cas" size="0x39f4" crc="51425422" sha1="c96e6dacc90bca79d68bb6ffed511abe6b688a08"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="robot">
+		<description>Robot Attack</description>
+		<year>19??</year>
+		<publisher>Big Five Software</publisher>
+		<info name="author" value="Bill Hogue and Jeff Konyu" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then ROBOT then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3a23">
+				<rom name="robot.cas" size="0x3a23" crc="e01c4e4f" sha1="962020685329ac19ead4a8fd4025becadb5f8b31"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="chess">
+		<description>Sargon Chess</description>
+		<year>1978</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="author" value="Dan and Kathe Spracklen" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SARGON then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x23be">
+				<rom name="chess.cas" size="0x23be" crc="9a5db0de" sha1="08100dade68d1a8cee5f096b9396d286aefc27b9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="scarfman">
+		<description>Scarfman</description>
+		<year>1981</year>
+		<publisher>Cornsoft Group</publisher>
+		<info name="author" value="Philip Oliver" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SCARFM then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x1c64">
+				<rom name="scarfman.cas" size="0x1c64" crc="2f5f3150" sha1="7375a5ff6445d48c05b82f87129991529a8c93f9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="scripsit">
+		<description>Scripsit v1.0</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SCRIPS then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x2994">
+				<rom name="scripsit.cas" size="0x2994" crc="147cf7cf" sha1="5ec2f41c5fbfb618bae66e1d1c70f30e29749809"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="seadragon">
+		<description>Seadragon</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Wayne Westmoreland and Terry Gilman" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SEADRA then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x389f">
+				<rom name="seadragon.cas" size="0x389f" crc="eedf4761" sha1="256065a3435ca3a354c9993539ef296ab4330114"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="spcinv">
+		<description>Space Invaders (alt)</description>
+		<year>1981</year>
+		<publisher>Sivea</publisher>
+		<info name="author" value="Xavier Ackaouy" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SPCINV then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0ff7">
+				<rom name="spcinv.cas" size="0x0ff7" crc="5a9f1a45" sha1="e1ec949864145459f988fb865187161cbcd7380c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="adv10">
+		<description>Savage Island (Pt 1)</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Scott Adams" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SAVAGE then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3f3c">
+				<rom name="adv10.cas" size="0x3f3c" crc="11aec391" sha1="f263cdad1aad42c719c592b524932bc6ac2b8050"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="spcwarp">
+		<description>Space Warp</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Joshua Lavinsky" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SPWAR" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x11c2">
+				<rom name="spwar.cas" size="0x11c2" crc="dee2a9d4" sha1="1f7947eecc6b1f3c161fa9c2a105cd761f931a77"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="starfi">
+		<description>Starfighter</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="author" value="Sparky Starks" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then STARFI then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3fa5">
+				<rom name="starfi.cas" size="0x3fa5" crc="22cda8d5" sha1="8966a056c377bddc1d854ea53c57699485dddc3e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="starsm">
+		<description>Starfighter Trainer</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="author" value="Sparky Starks" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then STARSM then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x3f7e">
+				<rom name="starsm.cas" size="0x3f7e" crc="24fa1636" sha1="e51c6085afb5efe26242cc81ff31bde19cc30922"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="swamp">
+		<description>Swamp War</description>
+		<year>1981</year>
+		<publisher>Instant Software Inc</publisher>
+		<info name="author" value="Eric Quintana" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SWAMP then /. Shift to fire." />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x1555">
+				<rom name="swamp.cas" size="0x1555" crc="12cacd93" sha1="ab04613a1525b66b829d3f41968cb24b04defdfa"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="taxi">
+		<description>Alien Taxi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="John Olsen" />
+		<info name="usage" value="Enter, SYSTEM then TAXI then /" />
+		<sharedfeat name="compatibility" value="1,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x4260">
+				<rom name="taxi.cas" size="0x4260" crc="6c6b5e8b" sha1="8098eff4133aacb6a4ab9994e75eb3f022b0f9ba"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="ulcbas">
+		<description>Lowercase conversion</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter, SYSTEM then ULCBAS then /" />
+		<sharedfeat name="compatibility" value="1,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x0523">
+				<rom name="ulcbas.cas" size="0x0523" crc="d4225dfa" sha1="0c6e45bb23e1e4e85e46ffc56b64ec4b6f8398f9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="zchess">
+		<description>Z-Chess</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then ZCHESS then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x2be9">
+				<rom name="zchess.cas" size="0x2be9" crc="d9d17cb3" sha1="14faf525494124a8dff3d711b231c97a6c4d04f1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dddd">
+		<description>Doubled Dancing Demon Demo</description>
+		<year>2009</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="George Phillips" />
+		<info name="usage" value="Enter, Enter, SYSTEM then DANDEM then /" />
+		<sharedfeat name="compatibility" value="3,4" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x4fa9">
+				<rom name="dandem.cas" size="0x4fa9" crc="1c4253a6" sha1="2f2eef2524333bcc5609621602c7687cca3b49de"/>
 			</dataarea>
 		</part>
 	</software>

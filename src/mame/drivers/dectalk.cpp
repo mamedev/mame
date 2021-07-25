@@ -296,7 +296,6 @@ private:
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 	uint8_t duart_input();
 	void duart_output(uint8_t data);
@@ -332,11 +331,6 @@ private:
 
 
 /* 2681 DUART */
-WRITE_LINE_MEMBER(dectalk_state::duart_irq_handler)
-{
-	m_maincpu->set_input_line(M68K_IRQ_6, state);
-}
-
 uint8_t dectalk_state::duart_input()
 {
 	uint8_t data = 0;
@@ -880,7 +874,7 @@ void dectalk_state::dectalk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
-	m_duart->irq_cb().set(FUNC(dectalk_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_duart->a_tx_cb().set(FUNC(dectalk_state::duart_txa));
 	m_duart->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_duart->inport_cb().set(FUNC(dectalk_state::duart_input));

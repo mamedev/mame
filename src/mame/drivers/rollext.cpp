@@ -74,6 +74,7 @@
 #include "emu.h"
 #include "cpu/tms32082/tms32082.h"
 #include "video/poly.h"
+#include "screen.h"
 
 struct rollext_polydata
 {
@@ -82,11 +83,11 @@ struct rollext_polydata
 	uint32_t pal;
 };
 
-class rollext_renderer : public poly_manager<float, rollext_polydata, 4, 10000>
+class rollext_renderer : public poly_manager<float, rollext_polydata, 4>
 {
 public:
 	rollext_renderer(screen_device &screen)
-		: poly_manager<float, rollext_polydata, 4, 10000>(screen)
+		: poly_manager<float, rollext_polydata, 4>(screen.machine())
 	{
 		m_fb = std::make_unique<bitmap_rgb32>(1024, 1024);
 	}
@@ -95,7 +96,7 @@ public:
 
 	void set_texture_ram(uint8_t* texture_ram);
 	void set_palette_ram(uint16_t* palette_ram);
-	void process_display_list(uint32_t* dispram);
+	void process_display_list(screen_device &screen, uint32_t* dispram);
 
 	void clear_fb();
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
@@ -149,9 +150,9 @@ void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &ext
 	}
 }
 
-void rollext_renderer::process_display_list(uint32_t* disp_ram)
+void rollext_renderer::process_display_list(screen_device &screen, uint32_t* disp_ram)
 {
-	const rectangle& visarea = screen().visible_area();
+	const rectangle& visarea = screen.visible_area();
 
 	render_delegate rd = render_delegate(&rollext_renderer::render_texture_scan, this);
 
@@ -247,8 +248,8 @@ void rollext_renderer::process_display_list(uint32_t* disp_ram)
 		}
 #endif
 
-		render_triangle(visarea, rd, 4, vert[0], vert[1], vert[2]);
-		render_triangle(visarea, rd, 4, vert[0], vert[2], vert[3]);
+		render_triangle<4>(visarea, rd, vert[0], vert[1], vert[2]);
+		render_triangle<4>(visarea, rd, vert[0], vert[2], vert[3]);
 
 	}
 
@@ -490,7 +491,7 @@ void rollext_state::cmd_callback(address_space &space, uint32_t data)
 			}
 			space.write_dword(0x600ffffc, oldnum+consume_num);
 
-			m_renderer->process_display_list(m_disp_ram);
+			m_renderer->process_display_list(*m_screen, m_disp_ram);
 
 			space.write_dword(0x600ffffc, 0);
 

@@ -47,6 +47,8 @@ protected:
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
+
+	std::unique_ptr<u8[]> m_blended_data;
 };
 
 

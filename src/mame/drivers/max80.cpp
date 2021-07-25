@@ -98,7 +98,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_floppy2(*this, "fdc:2")
 		, m_floppy3(*this, "fdc:3")
-		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_io_keyboard(*this, "LINE%u", 0U)
 //      , m_mainram(*this, RAM_TAG)
 	{ }
 
@@ -332,7 +332,7 @@ u8 max80_state::keyboard_r(offs_t offset)
 
 u8 max80_state::fdc_status_r(offs_t offset)
 {
-	u8 data = 0xfc | m_fdc_drq | (m_fdc_int << 1);
+	u8 data = 0xfc | int(m_fdc_drq) | (m_fdc_int << 1);
 	return data;
 }
 

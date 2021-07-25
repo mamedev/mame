@@ -1030,6 +1030,7 @@ void macquadra_state::macqd700(machine_config &config)
 	m_ram->set_extra_options("8M,16M,32M,64M,68M,72M,80M,96M,128M");
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 }
 
 ROM_START( macqd700 )

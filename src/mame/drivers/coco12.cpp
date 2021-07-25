@@ -433,6 +433,7 @@ void coco_state::coco_sound(machine_config &config)
 void coco_state::coco_floating_map(address_map &map)
 {
 	map(0x0000, 0xFFFF).r(FUNC(coco_state::floating_bus_r));
+	map(0x0000, 0xFFFF).nopw(); /* suppress log warnings */
 }
 
 

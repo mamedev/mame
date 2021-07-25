@@ -29,7 +29,7 @@
 #include "machine/upd765.h"
 #include "machine/dmac_0266.h"
 #include "machine/news_hid.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 
 // video
 #include "screen.h"

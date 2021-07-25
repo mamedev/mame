@@ -41,7 +41,7 @@ protected:
 private:
 	uint8_t shareram_r(offs_t offset);
 	void shareram_w(offs_t offset, uint8_t data);
-	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void okim6295_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);

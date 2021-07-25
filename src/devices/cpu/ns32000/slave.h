@@ -33,6 +33,12 @@ public:
 	virtual u16 read_op() = 0;
 
 protected:
+	ns32000_slave_interface(machine_config const &mconfig, device_t &device, char const *type)
+		: device_interface(device, type)
+		, m_out_scb(*this)
+	{
+	}
+
 	// device_interface overrides
 	virtual void interface_post_start() override
 	{
@@ -40,6 +46,18 @@ protected:
 	}
 
 	devcb_write_line m_out_scb;
+};
+
+class ns32000_mmu_interface : public ns32000_slave_interface
+{
+public:
+	ns32000_mmu_interface(machine_config const &mconfig, device_t &device)
+		: ns32000_slave_interface(mconfig, device, "ns32000_mmu")
+	{
+	}
+
+	enum translate_result : unsigned { COMPLETE, CANCEL, ABORT };
+	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool debug = false) = 0;
 };
 
 #endif // MAME_CPU_NS32000_SLAVE_H

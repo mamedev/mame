@@ -12,6 +12,7 @@
 #include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
 #include "emupal.h"
+#include "softlist_dev.h"
 
 /* defines for each bit and mask in input port "CSW" */
 enum
@@ -177,6 +178,7 @@ class pdp1_readtape_image_device :  public device_t,
 public:
 	// construction/destruction
 	pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	virtual const char *image_interface() const noexcept override { return "pdp1_ptp"; }
 
 	auto st_ptr() { return m_st_ptr.bind(); }
 
@@ -201,6 +203,7 @@ protected:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 public:
 	TIMER_CALLBACK_MEMBER(reader_callback);

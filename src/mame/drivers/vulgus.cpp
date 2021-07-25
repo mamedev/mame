@@ -229,10 +229,7 @@ void vulgus_state::vulgus(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(XTAL(12'000'000)/2, 384, 128, 0, 262, 22, 246);  // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(vulgus_state::screen_update));
 	screen.set_palette(m_palette);
 

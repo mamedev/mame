@@ -5179,6 +5179,103 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="freedos13rc4_720">
+		<description>FreeDOS 1.3 Release Candidate 4 (Floppy-Only Edition, 3.5" 720k)</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC4"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installer"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86BOOT.img" size="737280" crc="df953515" sha1="db173ff17348e087720c555719cccfa95652e8d2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK01.img" size="737280" crc="1b5b4567" sha1="45a6a49b548add014a2ee5c204fa50ab82de2190"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK02.img" size="737280" crc="0adaba9e" sha1="d3e8eab279fe72b167350e243b40bae253061179"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK03.img" size="737280" crc="be2d6531" sha1="e80ddbce302abdf3249ba1a4da8ae324c6a3384f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK04.img" size="737280" crc="a5b92aa8" sha1="e9112a8a177e2d9f51fe832a18843d747308e24c"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK05.img" size="737280" crc="1141fac0" sha1="2c15676136caf511b581016c602fe5dd5ec8fd6e"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK06.img" size="737280" crc="f6f130e8" sha1="d68e1f8af53c17c734e8056f72bc4678dbf0a811"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK07.img" size="737280" crc="a885a22c" sha1="5e727cf94dd3bc61fb4a3cf89868c6a5a3f75849"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK08.img" size="737280" crc="3e4f6e12" sha1="cfa2ceb634f5a77a3a7c1c15097c01d2c3e16b79"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK09.img" size="737280" crc="1a68ad9f" sha1="640cd88f43906e3d02991ebabb5e37dc59f66e12"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 10"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK10.img" size="737280" crc="10f07cdc" sha1="f230af2eee75d20e45546610c6e1b93f1b11d239"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 11"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK11.img" size="737280" crc="cd6de434" sha1="7e43d17d5d535ab1c61e5e0969ae9877bbb1e323"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 12"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK12.img" size="737280" crc="1e35a8bc" sha1="53981c43b262e0b1a7934dc2cd9e23caa3fdb3ba"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 13"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK13.img" size="737280" crc="e83b59ff" sha1="0ee454e24b0a892fc9ce42347ce11faff6b36703"/>
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 14"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK14.img" size="737280" crc="82db7923" sha1="0d4989a635f0a316fc8a6d0303be829671e4b046"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="k16auto">
 		<description>Kaypro 16 Autoload</description>
 		<year>1984</year>
@@ -7498,6 +7595,50 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="dkkrynn">
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (5.25", v1.00)</description>
+		<year>1991</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Death Knights of Krynn [SSI] [1991] [5.25DD] [Disk 1 of 2].img" size="368640" crc="c5d6230b" sha1="dfc457652f605f179685bc661d3c7b4c356feeed"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Death Knights of Krynn [SSI] [1991] [5.25DD] [Disk 2 of 2].img" size="368640" crc="48e723c8" sha1="4b3b94e32015746dc3a763cbd47615dd181de306"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkkrynn35" cloneof="dkkrynn">
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (3.5", v1.00)</description>
+		<year>1991</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Death Knights of Krynn [SSI] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="27fd9b4e" sha1="43431e5ede6a402e4756ff6a447a324171c09b14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkkrynn35a" cloneof="dkkrynn">
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (3.5", v1.10)</description>
+		<year>1992</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.10" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Death Knights of Krynn [SSI] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="17d70b72" sha1="05f3442254e1c750549d23fb191fbe48142efb08"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkmoon">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II: The Legend of Darkmoon</description>
@@ -7602,6 +7743,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Secret of the Silver Blades (USA).img" size="737280" crc="64b5ce63" sha1="66f92af0f871081d3c1ff7554ab8b6b1c3402344"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warlance">
+		<description>Advanced Dungeons &amp; Dragons - War of the Lance</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="War of the Lance [SSI] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="afec175a" sha1="0f9b04ef50127328c053d0cacb53625b3cb22db0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="War of the Lance [SSI] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="53c950fa" sha1="e25796b64dc77bb4af361292fd05573d3f57db3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7912,6 +8071,34 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="asterog">
+		<description>Astérix: Operation Getafix (UK)</description>
+		<year>1990</year>
+		<publisher>Coktel Vision</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="distributor" value="System 4" />
+		<!--Bad dump - floppy disk with saved game file [ASTERIX.INF] -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Asterix Operation Getafix (UK) [Coktel Vision] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="c946effa" sha1="4498732a6b5077b791ad7f4cdb998a938fda3e67" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroges" cloneof="asterog">
+		<description>Astérix: El Golpe del Menhir (Astérix y Operacion Menhir) (Spain, System 4 release)</description>
+		<year>1990</year>
+		<publisher>Coktel Vision</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="distributor" value="System 4" />
+		<!--Bad dump - floppy disk with saved game file [ASTERIX.INF] -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Asterix El Golpe del Menhir (Spain) [Coktel Vision] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9ababc1e" sha1="e202017f9ad9bd6e38e1c2c312fd926dcd94ae2c" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bat">
 		<description>B.A.T. (VGA Version)</description>
 		<year>1990</year>
@@ -8209,6 +8396,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Battle Chess (EGA version - 2nd release) [Interplay] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="040ff059" sha1="b21954c1c0ae2e44e78f8d4d5cb955ba6f4967a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchesses" cloneof="btlchess">
+		<description>Battle Chess (3.5", EGA version, Spain, Dro Soft release)</description>
+		<year>1988</year>
+		<publisher>Electronic Arts / Interplay</publisher>
+		<info name="distributor" value="Dro Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (EGA version) (Spain) [Electronic Arts] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="b3602eff" sha1="7c689014dd939a0b2666cc0b8963cd56befbb819"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8983,7 +9182,103 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="crimewav">
-		<description>Crime Wave</description>
+		<description>Crime Wave (5.25", v2.0)</description>
+		<year>1990</year>
+		<publisher>Access Software</publisher>
+		<info name="version" value="2.0" />
+		<info name="developer" value="Access Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 1 of 8].img" size="368640" crc="61b7dbfb" sha1="85a854ec95b91eead12fb88ff5eec7025471e5f1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 2 of 8].img" size="368640" crc="19e13796" sha1="ba8693473e30b40a994d8a32e4f4258db381e4dd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 3 of 8].img" size="368640" crc="c7a21ba5" sha1="efd3319b7dade6264f49c3eb0a37bf8ab5b7fe9c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 4 of 8].img" size="368640" crc="503eb292" sha1="c73d048f09c1db132ee6b6f9830be02b88f19524"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 5 of 8].img" size="368640" crc="2d415d98" sha1="c8070809d79dc85a6af09b6780f1efa6e799f4f4"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 6 of 8].img" size="368640" crc="e635a53b" sha1="e047077581b633c7d254ef66fc238075d6d47591"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 7 of 8].img" size="368640" crc="1db54168" sha1="0815d6b4e578f5efee8d96a4b8c000ed8b30a975"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 8 of 8].img" size="368640" crc="30d917e1" sha1="b3bbeb142e57df36535569c09ccdbcc92c7391b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimewava" cloneof="crimewav">
+		<description>Crime Wave (5.25", v1.1)</description>
+		<year>1990</year>
+		<publisher>Access Software</publisher>
+		<info name="version" value="1.1" />
+		<info name="developer" value="Access Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 1 of 8].img" size="368640" crc="225ee0a6" sha1="5b2534dd68b44e71fb8081643553f2170868ad28"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 2 of 8].img" size="368640" crc="9d8c7b7b" sha1="2c3ad851295913fd819f0c3946c86106c1dc2190"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 3 of 8].img" size="368640" crc="10eee8ef" sha1="cb3e0fb149727620187c4a1e5874173c85a1be0d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 4 of 8].img" size="368640" crc="503eb292" sha1="c73d048f09c1db132ee6b6f9830be02b88f19524"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 5 of 8].img" size="368640" crc="2d415d98" sha1="c8070809d79dc85a6af09b6780f1efa6e799f4f4"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 6 of 8].img" size="368640" crc="e635a53b" sha1="e047077581b633c7d254ef66fc238075d6d47591"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 7 of 8].img" size="368640" crc="1db54168" sha1="0815d6b4e578f5efee8d96a4b8c000ed8b30a975"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 8 of 8].img" size="368640" crc="30d917e1" sha1="b3bbeb142e57df36535569c09ccdbcc92c7391b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimewav35" cloneof="crimewav">
+		<description>Crime Wave (v2.0, 3.5")</description>
 		<year>1990</year>
 		<publisher>Access Software</publisher>
 		<info name="version" value="2.0" />
@@ -9080,6 +9375,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="d-generation disk 2.img" size="737280" crc="9edd6f84" sha1="9ad37d011d01d050fe6aa1acebf380f209b6c75d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathtrk">
+		<description>DeathTrack</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Dynamix" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DeathTrack [Activision] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="370950be" sha1="52834383e9ae7de19613170af6d27ada3894c7d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DeathTrack [Activision] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="fb1cba9f" sha1="0640f77598a5fe3ddb8506817a19de1b27e9dcfb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10390,6 +10702,33 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="International Soccer Challenge [Elite] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="1853c17a" sha1="5f4e2c7fad1a1c25441b8d820992347385ba0590"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ishar">
+		<description>Ishar: Legend of the Fortress</description>
+		<year>1992</year>
+		<publisher>Silmarils</publisher>
+		<info name="developer" value="Silmarils" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 1 of 4] [Disk A].img" size="368640" crc="c3d9dd94" sha1="6cbd07973e1b63597a8571858ed3835de651ffe3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 2 of 4] [Disk B].img" size="368640" crc="b104a509" sha1="37094cd30b41da66e4f7de4b5daae88cb66d1c64"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 3 of 4] [Disk C].img" size="368640" crc="6b756b72" sha1="ec4993e83247148f7b33ae9b5a92f42d1e939c16"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 4 of 4] [Disk D].img" size="368640" crc="e5b4da48" sha1="d53fd8662d25cef392a2650732de8ab25c11d7c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13488,12 +13827,12 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Binary Systems" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Starflight [Electronic Arts] [1986] [5.25''DD] [Disk 1 of 2].img" size="368640" crc="9e50175b" sha1="496bea78bb92544882f4f3df2404482929f14d0d"/>
+				<rom name="Starflight [Electronic Arts] [1986] [5.25DD] [Disk 1 of 2].img" size="368640" crc="cea623ec" sha1="87acb730fd73e01d7f8ef3df4d6c041531d0dd75"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Starflight [Electronic Arts] [1986] [5.25''DD] [Disk 2 of 2].img" size="368640" crc="a0d1c41d" sha1="7a2c8628736d376543c3ac12959050f3ae03c791"/>
+				<rom name="Starflight [Electronic Arts] [1986] [5.25DD] [Disk 2 of 2].img" size="368640" crc="5da2fc6a" sha1="36a678d5c6040e4d8d2e1e6bb5459056bcdf4580"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13518,7 +13857,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="starflg2a" cloneof="starflg2">
-		<description>Starflight 2: Trade Routes of the Cloud Nebula (5.25", Alt)</description>
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (5.25", alt)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Binary Systems" />
@@ -13534,6 +13873,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- this could be the USA release -->
 	<software name="starflg2_35" cloneof="starflg2">
 		<description>Starflight 2: Trade Routes of the Cloud Nebula (3.5")</description>
 		<year>1989</year>
@@ -13542,6 +13882,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Starflight 2 - Trade Routes of the Cloud Nebula [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="ca96256f" sha1="a56171d525026459734fdaa77a246a6b7b0da52d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflg2a_35" cloneof="starflg2">
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (3.5", alt)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Binary Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Starflight 2 (alt) [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="14a815e7" sha1="03e343efbced4c31454e348f1364dc6e68307629"/>
 			</dataarea>
 		</part>
 	</software>

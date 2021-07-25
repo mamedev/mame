@@ -6156,8 +6156,11 @@ license:CC0
 	<software name="caalgebb">
 		<description>Computer Assisted Problem Solving for Beginning Algebra (cleanly cracked)</description>
 		<year>1984</year>
-		<publisher>UNKNOWN</publisher>
+		<publisher>Unknown</publisher>
+		<info name="programmer" value="Chris W. Avery and Charles B. Barker"/>
 		<info name="release" value="2017-09-06"/>
+		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
+		Barker. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -6176,8 +6179,11 @@ license:CC0
 	<software name="caalgebi">
 		<description>Computer Assisted Problem Solving for Intermediate Algebra (cleanly cracked)</description>
 		<year>1984</year>
-		<publisher>UNKNOWN</publisher>
+		<publisher>Unknown</publisher>
+		<info name="programmer" value="Chris W. Avery and Charles B. Barker"/>
 		<info name="release" value="2017-09-06"/>
+		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
+		Barker. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -6196,8 +6202,11 @@ license:CC0
 	<software name="caalgebpa">
 		<description>Computer Assisted Problem Solving for Pre-Algebra (cleanly cracked)</description>
 		<year>1984</year>
-		<publisher>UNKNOWN</publisher>
+		<publisher>Unknown</publisher>
+		<info name="programmer" value="Chris W. Avery and Charles B. Barker"/>
 		<info name="release" value="2017-09-05"/>
+		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
+		Barker. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -10094,7 +10103,7 @@ license:CC0
 	</software>
 
 	<software name="graphmkr">
-		<description>Graph Maker (cleanly cracked)</description>
+		<description>Graph Maker: Introduction to Graphs and Charts (cleanly cracked)</description>
 		<year>1993</year>
 		<publisher>Troll Associates</publisher>
 		<info name="release" value="2015-12-18"/>
@@ -13196,7 +13205,7 @@ license:CC0
 	</software>
 
 	<software name="lgtmapsk">
-		<description>Let's Go There - Beginning Map and Geography Skills (cleanly cracked)</description>
+		<description>Let's Go There: Beginning Map and Geography Skills (cleanly cracked)</description>
 		<year>1993</year>
 		<publisher>Troll Associates</publisher>
 		<info name="release" value="2017-06-30"/>
@@ -23644,10 +23653,18 @@ license:CC0
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="2015-08-27"/>
+		<!-- Updated on June 30th, 2021 to fix missing side B -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
-				<rom name="aliens (4am crack).dsk" size="143360" crc="a5cde005" sha1="20ab58e08cc16cf2c52c3d7cb6460cc42f3cd59e" />
+				<rom name="aliens (4am crack) side a.dsk" size="143360" crc="f73e332e" sha1="80bf2611d515eb4c8812f46c2bcca4e95087c34e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="aliens (4am crack) side b.dsk" size="143360" crc="001325b2" sha1="077d7e3d9fb920b6f7cfc69381eb447f44ce0713" />
 			</dataarea>
 		</part>
 	</software>
@@ -26378,7 +26395,7 @@ license:CC0
 	</software>
 
 	<software name="tgamedmo">
-		<description>The Game (self-running demo) (cleanly cracked)</description>
+		<description>The Game (Self-Running Demo) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Random House</publisher>
 		<info name="release" value="2016-09-05"/>
@@ -33292,7 +33309,7 @@ license:CC0
 	</software>
 
 	<software name="trlspmth">
-		<description>Troll Sports Math (cleanly cracked)</description>
+		<description>Troll Sports Math (800K 3.5") (cleanly cracked)</description>
 		<year>1991</year>
 		<publisher>Troll Associates</publisher>
 		<info name="release" value="2019-05-27"/>
@@ -36195,8 +36212,8 @@ license:CC0
 	<software name="capalgr2">
 		<description>Computer Assisted Problem Solving for Intermediate Algebra (Revision 2) (cleanly cracked)</description>
 		<year>1984</year>
-		<publisher>UNKNOWN</publisher>
-		<info name="author" value="Chris W. Avery, Charles B. Barker" />
+		<publisher>Unknown</publisher>
+		<info name="programmer" value="Chris W. Avery and Charles B. Barker"/>
 		<info name="release" value="2020-07-16"/>
 		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
 		Barker. -->
@@ -41967,6 +41984,1110 @@ license:CC0
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the school tool (4am crack) disk 3.dsk" size="143360" crc="8b1b0641" sha1="65b78d70baab3cd4b04089eab8e8f9f21fdc86fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algmix85">
+		<description>Alligator Mix (1985 Re-release) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2021-04-26"/>
+		<info name="programmer" value="Jerry Chaffin, Bill Maxwell, Barbara Thompson, and Allen Colebank"/>
+		<!--"Alligator Mix" is a 1982 educational program developed by Jerry Chaffin, Bill Maxwell, and Barbara Thompson. This 1985 re-release is developed by Allen Colebank. It is distributed by Developmental Learning Materials. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alligator mix 1985 (4am crack).dsk" size="143360" crc="e6c484d4" sha1="583208338064143d656d4140f9f4f46db7750b77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdyply89">
+		<description>Teddy's Playground (1989 Re-release) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-26"/>
+		<info name="programmer" value="Donna Stanger and Lon Koenig"/>
+		<!--"Teddy's Playground" is a 1985 educational program developed by Donna Stanger and Lon Koenig, and distributed by Sunburst Communications. This is the 1989 re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="teddy's playground 1989 (4am crack).dsk" size="143360" crc="80deccb7" sha1="bfa611ba323010c24b7c84c0311baf0bb95d6218"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcircr0">
+		<description>Alphabet Circus (Revision 0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2021-04-28"/>
+		<!--"Alphabet Circus" is a 1984 educational program developed by Neosoft and distributed by Developmental Learning Materials. This appears to be an earlier release than other known copies. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alphabet circus rev. 0 (4am crack).dsk" size="143360" crc="0be03a63" sha1="9f6e121a85f7f39b7c60ac53c5afafbda93de463"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kidwrtr0">
+		<description>Kidwriter (Revision 0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Jim and Jack Pejsa"/>
+		<!--"Kidwriter" is a 1983 educational program developed by Jim and Jack Pejsa, and distributed by Spinnaker Software. This appears to be an earlier release than other known copies. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kidwriter rev. 0 (4am crack).dsk" size="143360" crc="da97fb1c" sha1="3ae516b768b82d6e65e737fb9749f8733ad57e73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="martgm12">
+		<description>Mastery Arithmetic Games (Version 1.2) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Mastery Development</publisher>
+		<info name="release" value="2021-04-28"/>
+		<!--"Mastery Arithmetic Games" is a 1986 educational program developed and distributed by Mastery Development. This is version 1.2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastery arithmetic games v1.2 (4am crack) side a.dsk" size="143360" crc="0ecd0a97" sha1="2fc35c78ab6bee6e57be26ecce9d2c74a07a0e30"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastery arithmetic games v1.2 (4am crack) side b.dsk" size="143360" crc="827c0c00" sha1="1fd7dc613bb0274ab727a3daa508f2c57995742f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtpropt">
+		<description>Ratios and Proportions (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="usage" value="Due to programming bugs, it will only work on an Apple ][+" />
+		<!--"Ratios and Proportions" is a 1983 educational program developed and distributed by Milton Bradley. Due to programming bugs unrelated to copy protection, it will only work on an Apple ][+. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ratios and proportions (4am crack).dsk" size="143360" crc="e0222fb9" sha1="38d541db226104517918e14a6f512fc70bc63860"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smanalgy">
+		<description>SocMate Analogies Games (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>American Guidance Service</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="B. Maxwell, B. Thompson, J. Chaffin, D. D. Smith, and J. O. Smith"/>
+		<!--"SocMate Analogies Games" is a 1985 educational program developed by B. Maxwell, B. Thompson, J. Chaffin, D. D. Smith, and J. O. Smith, and distributed by American Guidance Service. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="socmate analogies games (4am crack).dsk" size="143360" crc="0470999a" sha1="99e351816e7c5391f09b24f17d15efd2e3d27428"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strsrcdm">
+		<description>Star Search (Self-Running Demo) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Earthware Computer Services</publisher>
+		<info name="release" value="2021-04-29"/>
+		<info name="programmer" value="Mark Goles"/>
+		<!--"Star Search" is a 1981 self-running demo developed by Mark Goles and distributed by Earthware Computer Services. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star search self-running demo (4am crack) side a.dsk" size="143360" crc="e6482d15" sha1="461b1cf88bc373b455ab03788be903bbedbc9386"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star search self-running demo (4am crack) side b.dsk" size="143360" crc="fe50796b" sha1="509b98da10af36a1acb1f7c78489c091e5a9e670"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoomastr">
+		<description>Zoo Master (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Earthware Computer Services</publisher>
+		<info name="release" value="2021-04-29"/>
+		<info name="programmer" value="Kevin Ryan"/>
+		<!--"Zoo Master" is a 1983 action game developed by Kevin Ryan and distributed by Earthware Computer Services.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoo master (4am crack).dsk" size="143360" crc="58e50374" sha1="a2420b04b5422c703b35fa6851f6cb18809d314c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blkbelt">
+		<description>Black Belt (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Earthware Computer Services</publisher>
+		<info name="release" value="2021-04-29"/>
+		<info name="programmer" value="Kevin Ryan"/>
+		<!--"Black Belt" is a 1984 sports game developed by Kevin Ryan and distributed by Earthware Computer Services.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="black belt (4am crack).dsk" size="143360" crc="6ba73711" sha1="f9f1bab379e6802c488e9c704870561018a162c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccscbd">
+		<description>Uncle Clyde's Consonant Slides: Consonant Blends and Digraphs (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Uncle Clyde's Consonant Slides: Consonant Blends and Digraphs" is a 1993 educational program developed and distributed by Micrograms. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - consonant blends and digraphs (4am crack).dsk" size="143360" crc="dec1edfc" sha1="93088790186e6c08bd762196f80d1d5f57837da1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsec">
+		<description>Uncle Clyde's Consonant Slides: Ending Consonants (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Uncle Clyde's Consonant Slides: Ending Consonants" is a 1993 educational program developed and distributed by Micrograms. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - ending consonants (4am crack).dsk" size="143360" crc="67153156" sha1="211cd07bb41d1dc7b98c2e30dfceb5550676f78f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chschkbk">
+		<description>Chess, Checkers, and Backgammon (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Box Office</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Chess, Checkers, and Backgammon" is a 1987 compilation of board games developed and distributed by Box Office. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="chess, checkers, and backgammon (4am crack).dsk" size="143360" crc="ab1dc1bb" sha1="f19b9a05cc8b2bd6d56c0b4007c381387fe69262"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divsklls">
+		<description>Division Skills (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Division Skills" is a 1982 educational program developed and distributed by Milton Bradley. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="division skills (4am crack).dsk" size="143360" crc="9e728c36" sha1="59a4e0758dcfd2d110de99e81594f9dda1b4da1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vocsklls">
+		<description>Vocabulary Skills (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Vocabulary Skills" is a 1982 educational program developed and distributed by Milton Bradley. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="vocabulary skills (4am crack).dsk" size="143360" crc="ee2bf37f" sha1="b3ad2f51f97062628092af27cc661f35d46eff6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lechocdm">
+		<description>Le Choc des Multinationales (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sogiciel</publisher>
+		<info name="release" value="2021-05-17"/>
+		<!--"Le Choc des Multinationales" is a 1982 French simulation game developed and distributed by Sogiciel.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="le choc des multinationales (4am crack).dsk" size="143360" crc="883a6653" sha1="69aeda4f7e221f42392a7c6cc35ff08bb1267c18"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lalmonop">
+		<description>L. A. Land Monopoly (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Continental Software</publisher>
+		<info name="release" value="2021-05-17"/>
+		<!--"L. A. Land Monopoly" is a 1980 board game developed by Jeff Stanton and distributed by Continental Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="l. a. land monopoly (4am and san inc crack).dsk" size="143360" crc="1343945f" sha1="12cc537abbe9da06fa6d9802d47096aa9523c0c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anltut87">
+		<description>Analogies Tutorial (Version 12.15.87) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-05-17"/>
+		<!--"Analogies Tutorial" is a 1983 educational program developed and distributed by Hartley Courseware. This updated version, dated December 15, 1987, is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="analogies tutorial v12.15.87 (4am crack) side a.dsk" size="143360" crc="fa2036cd" sha1="f1927b777d150dbc1343e78023cf7148fb314547"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="analogies tutorial v12.15.87 (4am crack) side b.dsk" size="143360" crc="283b3b33" sha1="3cebf89919243d5f4ff4cd64f7f935e504f8ede3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decpcdpp">
+		<description>Decimals and Percent: Decimals Practice Problems (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2021-05-18"/>
+		<!--"Decimals and Percent: Decimals Practice Problems" is a 1981 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="decimals and percent 2nd edition (4am and san inc crack).dsk" size="143360" crc="3d16ad56" sha1="ff765a012546b808c12aec30f5334777d86214e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhbasic">
+		<description>Hand Holding BASIC (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-05-18"/>
+		<!--"Hand Holding BASIC" is a 1980 educational program developed by Neil Bennett and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="hand holding basic (4am and san inc crack).dsk" size="143360" crc="b320ae13" sha1="3fe03672338a15b84784db9fd8af04cdd736762c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgngame">
+		<description>Dragon Games (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>American Educational Computer</publisher>
+		<info name="release" value="2021-05-18"/>
+		<!--"Dragon Games" is a 1982 educational program developed and distributed by American Educational Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dragon games (4am crack).dsk" size="143360" crc="8ad2ff45" sha1="18732199591bc2ddeec617f2cd20413ae07e42c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblgm13">
+		<description>Bumble Games (Version 1.3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-03"/>
+		<!--"Bumble Games" is a 1982 educational program developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.3. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble games v1.3 (4am and san inc crack).dsk" size="143360" crc="6636a469" sha1="59badccd350a2c82d6a0140b628a042997b8c88e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrbit10">
+		<description>Reader Rabbit (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-03"/>
+		<!--"Reader Rabbit" is a 1984 educational program developed by Leslie Grimm, illustrated by Corinne and Cindy Grimm, and distributed by The Learning Company. This is version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="reader rabbit v1.0 (4am and san inc crack).dsk" size="143360" crc="9033d75d" sha1="fd19516c3a995ed96026e0463030ce6028c07d47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="projcirc">
+		<description>Projectile and Circular Motion (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Materials and Equipment</publisher>
+		<info name="release" value="2021-06-05"/>
+		<!--"Projectile and Circular Motion" is a 1984 educational program developed and distributed by Educational Materials and Equipment Corporation. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="projectile and circular motion (4am crack).dsk" size="143360" crc="4074b3dd" sha1="95e35ca175c0f02221a9f2a9d413bbcc40e11c42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bumblp11">
+		<description>Bumble Plot (Version 1.1) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-06"/>
+		<!--"Bumble Plot" is a 1982 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.1. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble plot v1.1 (4am and san inc crack).dsk" size="143360" crc="1a360981" sha1="7675056caea06ca067bb576d835207e1885d68fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertrudep82">
+		<description>Gertrude's Puzzles (1982 Version) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-06"/>
+		<!--"Gertrude's Puzzles" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's puzzles 1982 (4am and san inc crack).dsk" size="143360" crc="4584488c" sha1="3bb9f19e91b62935cf95c559fd683e08033dc532"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertrudesec82">
+		<description>Gertrude's Secrets 1982 (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-06"/>
+		<!--"Gertrude's Secrets" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's secrets 1982 (4am and san inc crack).dsk" size="143360" crc="0d53b68c" sha1="1ae15f7b76b4324f979c533b67aa63ab9169b631"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taldiscv">
+		<description>Tales of Discovery (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2021-06-06"/>
+		<!--"Tales of Discovery" is a 1984 pair of adventure games developed by Dan Klassen, David G. Olmon, Amy McKinley, Deborah Kovacs, Loretta Jones, Maryellen Kohn, Jeffrey Siegel, Andrew Ragan, and Susan Edwards, and distributed by Scholastic. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tales of discovery (4am and san inc crack) side a.dsk" size="143360" crc="a3feb079" sha1="e670a5ea6584e98cad5a56563aecb0f5d8fbe3e3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tales of discovery (4am and san inc crack) side b.dsk" size="143360" crc="22a0b7c9" sha1="e840ad24ab23df0723ba2f409ec57b3bcf3cbae9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advelec">
+		<description>Advanced Electricity (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Materials and Equipment</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"Advanced Electricity" is a 1984 educational program developed and distributed by Educational Materials and Equipment Corporation. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="advanced electricity (4am crack).dsk" size="143360" crc="dd8cc60f" sha1="e290354b903160b8aa8425f9aa95ec744043eb9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compcirc">
+		<description>Complex Circuits (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Materials and Equipment</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"Complex Circuits" is a 1984 educational program developed and distributed by Educational Materials and Equipment Corporation. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="complex circuits (4am crack).dsk" size="143360" crc="d39c85c2" sha1="9befb85556807a4734031b4854b4271d73beb79d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pforth30">
+		<description>PAI Forth (Version 3.0, 12-21-1985) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Prentice Associates Incorporated</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"PAI Forth" is a 1985 development program. This is version 3.0. It is preserved here for the first time.-->
+		<!-- It is uncertain as of now whether this was used internally or released. More research is required. - FH -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pai forth v3.0 (4am crack).dsk" size="143360" crc="5f1f43e9" sha1="7a10dd0964da0ba404b1ed0dcce8e7f806a8d6e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots82">
+		<description>Rocky's Boots (Unknown 1982 version) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"Rocky's Boots" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rocky's boots 1982 (4am and san inc crack).dsk" size="143360" crc="887947a7" sha1="4e3bdda73af0c1069a768a64f32754556c40d223"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prsnr110s">
+		<description>The Prisoner (Version 1.10) (SoftSmith) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"The Prisoner" is a 1980 adventure game developed by Edu-Ware. This is version 1.10, re-released by SoftSmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the prisoner v1.10 (softsmith) (4am and san inc crack).dsk" size="143360" crc="cfb731df" sha1="16e9ff900df3bab5ab9c516325d2cd5729636698"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssastatk">
+		<description>Astro Attack (SoftSmith) (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"Astro Attack" is an action game published by SoftSmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="astro attack (softsmith) (4am and san inc crack).dsk" size="143360" crc="1b3ca0e0" sha1="9b4ff6b17ef8494dfe8ed242ec08c90873e50ea4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sssplmst">
+		<description>Spell Master (Version 1.3.1) (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"Spell Master" is a 1982 educational program developed by Edu-Ware Services. This is the SoftSmith re-release, based on version 1.3.1. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spell master (softsmith) (4am and san inc crack) - disk 1 - program.dsk" size="143360" crc="dc8ab97e" sha1="5fc44198d1e93dd4a20df7fd28f562cc527ff0db"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data disk level 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spell master (softsmith) (4am and san inc crack) - disk 2 - data disk level 4.dsk" size="143360" crc="73681f8a" sha1="e5ee724e7ed29e33ac7791294811cd2dd057cb57"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Data disk level 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spell master (softsmith) (4am and san inc crack) - disk 3 - data disk level 5.dsk" size="143360" crc="9cb50d28" sha1="c9bfeb39d43164666a5830877db5e1dcb3c5970b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Data disk level 6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spell master (softsmith) (4am and san inc crack) - disk 4 - data disk level 6.dsk" size="143360" crc="263ef5b1" sha1="16ff889149fe9787ecbe8ae6f999f0b3d6d76741"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Data disk level 7"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spell master (softsmith) (4am and san inc crack) - disk 5 - data disk level 7.dsk" size="143360" crc="c2ed9fd0" sha1="a13509e10dcb848aa7547df9f0c8fefe1dee6743"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Data disk level 8"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spell master (softsmith) (4am and san inc crack) - disk 6 - data disk level 8.dsk" size="143360" crc="6e8030a5" sha1="360995dcbe12632071c9e434e5cb258e22899993"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssdnrdsk">
+		<description>Dinner on a Disk (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"Dinner on a Disk" is a 1981 educational program developed by Henny Hall. This is the SoftSmith re-release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dinner on a disk (softsmith) (4am and san inc crack).dsk" size="143360" crc="ec222a42" sha1="b1ea957c94a7b6b6b0c14e75b98f80f56e2d6b10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssbarmte">
+		<description>Micro Barmate (Version 1.0) (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"Micro Barmate" is a 1982 educational program developed by Virtual Combinatorics. This is the SoftSmith re-release, based on version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="micro barmate (softsmith) (4am and san inc crack) disk 1 - program disk.dsk" size="143360" crc="ae3ffc60" sha1="9a8d27eef761ddee2539afb00df31123fd76daf2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Recipe disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="micro barmate (softsmith) (4am and san inc crack) disk 2 - recipe disk.dsk" size="143360" crc="fda44cc2" sha1="545380d53bad9a38197992c07b31a5697c3bf066"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssmthskl">
+		<description>Math Skills (Version 1.3) (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"Math Skills" is a 1981 educational program developed by Edu-Ware Services. This is the SoftSmith re-release, based on version 1.3. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math skills (softsmith) (4am and san inc crack).dsk" size="143360" crc="8374635f" sha1="1812b3e98eb8a975071cf0db6159c76ff3defe63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssfractn">
+		<description>Fractions (Version 3.0) (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"Fractions" is a 1982 educational program developed by Edu-Ware Services. This is the SoftSmith re-release, based on version 3.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions v3.0 (softsmith) (4am and san inc crack).dsk" size="143360" crc="51735c4b" sha1="17caba0bc5916623bcc319615a5afca8f8e35255"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sspercpt">
+		<description>Perception (Version 3.1) (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"Perception" is a 1981 educational program developed by Edu-Ware Services. This is the SoftSmith re-release, based on version 3.1. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="perception (softsmith) (4am and san inc crack).dsk" size="143360" crc="998cddae" sha1="e4dafe7365675af37675c1019114639d848afda7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sslogomn">
+		<description>LogoMotion (Version 1.2) (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"LogoMotion" is a 1982 programming environment developed by Terrapin, Inc. This is the SoftSmith re-release, based on version 1.2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="logomotion v1.2 (softsmith) (4am and san inc crack) disk 1 - program.dsk" size="143360" crc="ef0e3ee0" sha1="8793abcd56b6d5aa8077ed00f7018ef09ea5943a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Utilities disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="logomotion v1.2 (softsmith) (4am and san inc crack) disk 2 - utilities.dsk" size="143360" crc="760ebcd7" sha1="11d517e95eb7ead1ad09f3fcd7a1ebc6b5c3d3b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssccrlye">
+		<description>Cross Country Rallye (Softsmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Cross Country Rallye" is a 1982 action game developed by Bob Carter. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cross country rallye (softsmith) (4am and san inc crack).dsk" size="143360" crc="eaefd387" sha1="129ce296dc6b6d4c57518d71f538a36f7a4837aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssalg113">
+		<description>Algebra I (Version 1.3) (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Algebra I" is a 1981 educational program developed by Edu-Ware. This is the SoftSmith re-release of version 1.3. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra i v1.3 (softsmith) (4am and san inc crack).dsk" size="143360" crc="c750d7ec" sha1="e55fd8e1fd849dbf2b7ee118221956961975a617"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssbugbytr">
+		<description>Bugbyter (Version 1.11) (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Bugbyter" is a 1982 development program developed by Ted Cohn and Pete Rowe. This is the SoftSmith re-release of version 1.11. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bugbyter (softsmith) (4am and san inc crack).dsk" size="143360" crc="24dc0c8f" sha1="2e28ec886bc4b11ed2d252aa5eb6c1e0485b3d4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssmdnmld">
+		<description>Midnight Malady (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Midnight Malady" is a 1981 adventure game developed by Steven Sacks. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="midnight malady (4am and san inc crack).dsk" size="143360" crc="343ab816" sha1="8dc6500ddea01ba83bd0294dad301c12459478e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssmummyc">
+		<description>Mummy's Curse (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-28"/>
+		<!--"Mummy's Curse" is a 1981 adventure game developed by Highlands Computers. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mummy's curse (softsmith) (4am and san inc crack).dsk" size="143360" crc="57d3132c" sha1="69fb5a48a9a592d11795ed596fe77db7f5b24c08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sslzmaze">
+		<description>Lazer Maze (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Lazer Maze" is a 1982 board game developed by James D. Spain. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="lazer maze (softsmith) (4am and san inc crack).dsk" size="143360" crc="2e02590f" sha1="973de2770cbe37f8ac6449e3da2d364dbb40a0e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sszenith">
+		<description>Zenith (SoftSmith) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Zenith" is a 1983 action game developed by Nasir Gebelli. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zenith (softsmith) (4am and san inc crack).dsk" size="143360" crc="5aca8e2b" sha1="1e3086c531f8ca29ff79d4551682e8f5799b485e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sssuprmp">
+		<description>Supermap (SoftSmith) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Supermap" is a 1983 educational game developed by Sonoma Softworks. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="supermap (softsmith) (4am and san inc crack).dsk" size="143360" crc="d1b8f173" sha1="a3ce2a132cfc51075d2d9a7aad587ff33f190514"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssguardn">
+		<description>Guardian (SoftSmith) (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Guardian" is an action game published by SoftSmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="guardian (softsmith) (4am and san inc crack).dsk" size="143360" crc="4efd71e5" sha1="e81562c6b8866d5a5d3c0235b4c800d0d4754811"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssgameus">
+		<description>Game of the U.S. (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Game of the U.S." is a 1982 educational game developed by Cecil Andrews. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="game of the u.s. (softsmith) (4am and san inc crack).dsk" size="143360" crc="5f7b8fd6" sha1="25d1e5d3d3debbf95ed820654f20690a8d48b35a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sslalmon">
+		<description>L.A. Land Monopoly (SoftSmith) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"L.A. Land Monopoly" is a 1980 board game developed by Jeff Stanton. This is the SoftSmith re-release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="l.a. land monopoly (softsmith) (4am and san inc crack).dsk" size="143360" crc="3647c18b" sha1="7bfbfea61609d8eaa0172293909cfb0766875f29"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sscsmcbt">
+		<description>Cosmic Combat (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Cosmic Combat" is a 1982 action game developed by Highland Computer Services. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cosmic combat (softsmith) (4am and san inc crack).dsk" size="143360" crc="977ec4f7" sha1="a20fa81d6d5948bbc72a6956414216257f065b79"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssgmshow">
+		<description>The Game Show (SoftSmith) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"The Game Show" is a 1983 educational game developed by Computer Advanced Ideas. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the game show (softsmith) (4am and san inc crack).dsk" size="143360" crc="bbea58df" sha1="b52821a588af9ab9642389e9d7bcc36e5ab1295b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sscrtvnt">
+		<description>Creature Venture (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Creature Venture" is a 1981 adventure game developed by Highland Computer Services. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="creature venture (softsmith) (4am and san inc crack).dsk" size="143360" crc="7fd8e180" sha1="135dba416a0d32ed1ecd3f790c78843e268db11d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sslzsilk">
+		<description>Lazer Silk (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-26"/>
+		<!--"Lazer Silk" is a 1982 action game developed by Eric Knopp. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="lazer silk (softsmith) (4am and san inc crack).dsk" size="143360" crc="395f1f6f" sha1="2cb4a546dbe72238b7f973ddc068bdda26c3aa82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dskdrctr">
+		<description>Disk Director (SoftSmith) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-03"/>
+		<!--"Disk Director" is a 1983 set of disk utilities developed by Sensible Software. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="disk director (softsmith) (4am and san inc crack).dsk" size="143360" crc="a8722aba" sha1="cad9258dd20090f3d463aaa0f2dfd5fdad6c180c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfootpps">
+		<description>Pro Football Pointspread Prediction System (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Systems Design Lab</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Pro Football Pointspread Prediction System" is a 1982 sports program developed by Ken Perry and distributed by Systems Design Lab. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - System disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pro football pointspread prediction system (4am crack) disk 1 - system.dsk" size="143360" crc="3fbca853" sha1="9adca99f6bf04c45400631768cf71ac02b67abae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pro football pointspread prediction system (4am crack) disk 2 - data.dsk" size="143360" crc="8867facf" sha1="26be3337f12c70ec6407b6b0c6062fd843b246ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbdrawng">
+		<description>Stickybear Drawing (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Stickybear Drawing" is a 1986 graphics program developed by Richard Hefter and David Cunningham, and distributed by Optimum Resource. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="stickybear drawing (4am and san inc crack).dsk" size="143360" crc="c084f302" sha1="75217f3a5a60d729cd114a9646b5cbabce07e400"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblgm14">
+		<description>Bumble Games (Version 1.4) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Bumble Games" is a 1982 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.4. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble games v1.4 (4am and san inc crack).dsk" size="143360" crc="ea34ac74" sha1="253236c6da94ed7939afe551685d96d3747738ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beachlnd">
+		<description>Beach Landing (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Beach Landing" is a 1984 action game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="beach landing (4am and san inc crack).dsk" size="143360" crc="5b2034a4" sha1="dbd3bbcb0a2f014b6fbafd27c64b1242d47ddafe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapshai4">
+		<description>Temple of Apshai rev. 4 (cleanly cracked)</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Temple of Apshai" is a 1979 roleplaying game designed by Jon Freeman and Jeff Johnson, ported to the Apple II by Michael Farren, and distributed by Automated Simulations. This is the fourth revision.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="temple of apshai rev. 4 (4am and san inc crack).dsk" size="143360" crc="b79ef05c" sha1="37055324e27e563a8e783d31b73f182265ed8aa6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advdbl2">
+		<description>Adventure Double Feature Volume II (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Adventure Double Feature Volume II" is a 1984 pair of adventure games developed by Dan Klassen, David G. Olmon, Pat Relf, Loretta Jones, Deborah Kovacs, Maryellen Kohn, Jeffrey Siegel, Andrew Ragan, Susan Edwards, and Amy McKinley, and distributed by Scholastic.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="adventure double feature volume ii (4am and san inc crack) side a.dsk" size="143360" crc="a23d19ed" sha1="30aa8f1fd09356aeb1e716efc24e83f61085aeb5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="adventure double feature volume ii (4am and san inc crack) side b.dsk" size="143360" crc="1d155dc9" sha1="a1924e1b6440c222e312b512273788e961a4832b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moptp81">
+		<description>Moptown Parade (1981 Version) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Moptown Parade" is a 1981 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is the 1981 release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="moptown parade 1981 (4am and san inc crack).dsk" size="143360" crc="aa354a32" sha1="8830f3f7b9b19c0d7e188878f7b7e6c7b89d45ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crush681">
+		<description>Crush, Crumble and Chomp! (1981-06-22 Version) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Crush, Crumble and Chomp!" is a 1981 simulation game designed by Jon Freeman and Jim Connelley, and distributed by Automated Simulations. This version is dated June 22, 1981.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="crush, crumble and chomp 1981-06-22 (4am and san inc crack).dsk" size="143360" crc="d39ad177" sha1="21b9d99e8bbbe459ba5b60ecbb7baad65bb84591"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conput83">
+		<description>Con-Putation (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Softsmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Con-Putation" is a 1980 educational game developed by T.H.E.S.I.S.. This is the 1983 Softsmith re-release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="con-putation (4am and san inc crack).dsk" size="143360" crc="d6ae1de7" sha1="7cb2780b8d5a26d9909924896345d115b69f6f61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dnkondsk">
+		<description>Drinks on a Disk (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Drinks on a Disk" is a 1982 educational program developed by Henny Hall and published by SoftSmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="drinks on a disk (softsmith) (4am and san inc crack).dsk" size="143360" crc="91cc7c59" sha1="afdaf2649db01f07782a88be64b7f81c9134a136"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frndolvr">
+		<description>Friends or Lovers (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Friends or Lovers" is a 1982 educational program developed by Alpine Software and published by SoftSmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="friends or lovers (softsmith) (4am and san inc crack).dsk" size="143360" crc="8fad094b" sha1="edde096830d1434c90710ae9011525336b1a399d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltlsplr">
+		<description>Little Speller (Version 2.0) (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Little Speller" is a 1981 educational program developed by John R. Conrad. This is the SoftSmith re-release, based on version 2.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="little speller (softsmith) (4am and san inc crack).dsk" size="143360" crc="5b3c1772" sha1="1f5b7b8c1a88b64876dfd5fb032879550bcb3beb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fnlfrntr">
+		<description>The Final Frontier (Version 1.0) (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"The Final Frontier" is a 1982 simulation game developed by Wes Huntress. This is the SoftSmith re-release, based on version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the final frontier (softsmith) (4am and san inc crack).dsk" size="143360" crc="641a9d1c" sha1="4daec6541b8e65880b2d822eb4c9e797111a6040"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmledgp">
+		<description>Farm Ledger Pro (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Harvest Computer Systems</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Farm Ledger Pro" is a 1983 productivity program developed by Gary Randolph, Rich Conrad, Sandra Rybolt, and Kenneth Vint, and distributed by Harvest Computer Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="farm ledger pro (4am crack).dsk" size="143360" crc="b4ddbab7" sha1="60b1c7b53f00353cc2870b90d5d5195e427259cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pyobingo">
+		<description>Print Your Own BINGO Plus (Version 01.23.88) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Print Your Own BINGO Plus" is a 1988 productivity program developed by Phil Mansour and distributed by Hartley Courseware. This version is dated 01.23.88. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="print your own bingo plus (4am crack).dsk" size="143360" crc="09c2e5af" sha1="7cc963fe89ef2683ef3b62a469e153a944ef97f6"/>
 			</dataarea>
 		</part>
 	</software>

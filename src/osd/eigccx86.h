@@ -433,13 +433,13 @@ _mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    count_leading_zeros - return the number of
+    count_leading_zeros_32 - return the number of
     leading zero bits in a 32-bit value
 -------------------------------------------------*/
 
-#define count_leading_zeros _count_leading_zeros
+#define count_leading_zeros_32 _count_leading_zeros_32
 inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_zeros(uint32_t value)
+_count_leading_zeros_32(uint32_t value)
 {
 	uint32_t result;
 	__asm__ (
@@ -450,18 +450,18 @@ _count_leading_zeros(uint32_t value)
 		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
 		: "cc"                          // clobbers condition codes
 	);
-	return 31U - result;
+	return uint8_t(31U - result);
 }
 
 
 /*-------------------------------------------------
-    count_leading_ones - return the number of
+    count_leading_ones_32 - return the number of
     leading one bits in a 32-bit value
 -------------------------------------------------*/
 
-#define count_leading_ones _count_leading_ones
+#define count_leading_ones_32 _count_leading_ones_32
 inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_ones(uint32_t value)
+_count_leading_ones_32(uint32_t value)
 {
 	uint32_t result;
 	__asm__ (
@@ -472,7 +472,55 @@ _count_leading_ones(uint32_t value)
 		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
 		: "cc"                          // clobbers condition codes
 	);
-	return 31U - result;
+	return uint8_t(31U - result);
 }
+
+
+/*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifdef __x86_64__
+#define count_leading_zeros_64 _count_leading_zeros_64
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_zeros_64(uint64_t value)
+{
+	uint64_t result;
+	__asm__ (
+		" bsrq    %[value], %[result] ;"
+		" cmovzq  %[bias], %[result]  ;"
+		: [result] "=&r" (result)       // result can be in any register
+		: [value]  "rm"  (value)        // 'value' can be register or memory
+		, [bias]   "rm"  (~uint64_t(0)) // 'bias' can be register or memory
+		: "cc"                          // clobbers condition codes
+	);
+	return uint8_t(63U - result);
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_64 - return the number of
+    leading one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifdef __x86_64__
+#define count_leading_ones_64 _count_leading_ones_64
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_ones_64(uint64_t value)
+{
+	uint64_t result;
+	__asm__ (
+		" bsrq    %[value], %[result] ;"
+		" cmovzq  %[bias], %[result]  ;"
+		: [result] "=&r" (result)       // result can be in any register
+		: [value]  "rm"  (~value)       // 'value' can be register or memory
+		, [bias]   "rm"  (~uint64_t(0)) // 'bias' can be register or memory
+		: "cc"                          // clobbers condition codes
+	);
+	return uint8_t(63U - result);
+}
+#endif
 
 #endif // MAME_OSD_EIGCCX86_H

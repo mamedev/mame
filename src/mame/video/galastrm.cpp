@@ -8,7 +8,7 @@
 
 
 galastrm_renderer::galastrm_renderer(galastrm_state& state)
-	: poly_manager<float, gs_poly_data, 2, 10000>(state.machine())
+	: poly_manager<float, gs_poly_data, 2>(state.machine())
 	, m_state(state)
 	, m_screenbits(state.m_screen->width(), state.m_screen->height())
 {
@@ -406,7 +406,7 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	gs_poly_data& extra = object_data_alloc();
 	extra.texbase = &srcbitmap;
 
-	render_polygon<4>(clip, render_delegate(&galastrm_renderer::tc0610_draw_scanline, this), 2, vert);
+	render_polygon<4, 2>(clip, render_delegate(&galastrm_renderer::tc0610_draw_scanline, this), vert);
 	wait();
 }
 

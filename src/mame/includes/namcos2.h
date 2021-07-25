@@ -39,6 +39,7 @@ public:
 	namcos2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_gametype(0),
+		m_update_to_line_before_posirq(false),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
 		m_audiocpu(*this, "audiocpu"),
@@ -80,6 +81,7 @@ public:
 	void sgunner2(machine_config &config);
 	void base2(machine_config &config);
 	void finallap_noio(machine_config &config);
+	void base_fl(machine_config &config);
 	void finallap(machine_config &config);
 	void finallap_c68(machine_config &config);
 	void finalap2(machine_config &config);
@@ -113,6 +115,7 @@ public:
 	void init_valkyrie();
 	void init_fourtrax();
 	void init_finalap3();
+	void init_finalap3bl();
 	void init_luckywld();
 	void init_assaultj();
 	void init_dsaberj();
@@ -172,6 +175,8 @@ enum
 	};
 
 	int m_gametype;
+	bool m_update_to_line_before_posirq;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_audiocpu;
@@ -240,7 +245,9 @@ enum
 
 	uint16_t namcos2_68k_key_r(offs_t offset);
 	void namcos2_68k_key_w(offs_t offset, uint16_t data);
-	uint16_t namcos2_finallap_prot_r(offs_t offset);
+	uint16_t namcos2_finallap_prot_r(offs_t offset); // finalap2, finalap3
+	uint16_t finalap3bl_prot_r(); // finalap3bl
+
 	void GollyGhostUpdateLED_c4(int data);
 	void GollyGhostUpdateLED_c6(int data);
 	void GollyGhostUpdateLED_c8(int data);

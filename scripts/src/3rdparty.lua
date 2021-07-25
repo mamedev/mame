@@ -197,6 +197,7 @@ end
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
+		MAME_DIR .. "3rdparty/softfloat/fpatan.c",
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 	}
 
@@ -2251,6 +2252,44 @@ project "wdlfft"
 	files {
 		MAME_DIR .. "3rdparty/wdlfft/fft.c",
 		MAME_DIR .. "3rdparty/wdlfft/fft.h"
+	}
+
+
+--------------------------------------------------
+-- ymfm library objects
+--------------------------------------------------
+
+project "ymfm"
+	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
+	kind "StaticLib"
+
+	configuration { }
+		defines {
+			"YMFM_MAME",
+		}
+
+	files {
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_adpcm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_adpcm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_fm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_fm.ipp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_misc.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_misc.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opl.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opl.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opn.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opn.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opq.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opq.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opz.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opz.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_pcm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_pcm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_ssg.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_ssg.h",
 	}
 
 

@@ -2,13 +2,14 @@ Advanced configuration
 ----------------------
 
 .. toctree::
-	:titlesonly:
+    :titlesonly:
 
-	multiconfig
-	paths
-	shiftertoggle
-	bgfx
-	hlsl
-	glsl
-	devicemap
-	linux-lightguns
+    multiconfig
+    paths
+    shiftertoggle
+    bgfx
+    hlsl
+    glsl
+    ctrlr_config
+    devicemap
+    linux-lightguns

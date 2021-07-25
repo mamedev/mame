@@ -241,6 +241,53 @@ inline void m68000_base_device::store_pack_float80(u32 ea, int k, floatx80 fpr)
 	m68ki_write_32(ea+8, dw3);
 }
 
+inline floatx80 propagateFloatx80NaNOneArg(floatx80 a)
+{
+	if (floatx80_is_signaling_nan(a))
+		float_raise(float_flag_invalid);
+
+	a.low |= 0xC000000000000000U;
+
+	return a;
+}
+
+static void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr, uint64_t *zSigPtr)
+{
+	int shiftCount = countLeadingZeros64(aSig);
+	*zSigPtr = aSig << shiftCount;
+	*zExpPtr = 1 - shiftCount;
+}
+
+inline floatx80 getman(floatx80 src)
+{
+	const flag sign = (src.high >> 15);
+	int32_t exp = (src.high & 0x7fff);
+	uint64_t signific = src.low;
+
+	if (exp == 0x7fff)
+	{
+		if ((uint64_t)(signific << 1))
+		{
+			return propagateFloatx80NaNOneArg(src);
+		}
+		else
+		{
+			return packFloatx80(0, 0xffff, 0xffffffffffffffffU);
+		}
+	}
+
+	if (exp == 0)
+	{
+		if (signific == 0)
+		{
+			return packFloatx80(sign, 0, 0);
+		}
+		normalizeFloatx80Subnormal(signific, &exp, &signific);
+	}
+
+	return packFloatx80(sign, 0x3fff, signific);
+}
+
 inline void m68000_base_device::SET_CONDITION_CODES(floatx80 reg)
 {
 //  u64 *regi;
@@ -347,6 +394,10 @@ u8 m68000_base_device::READ_EA_8(int ea)
 		{
 			return REG_D()[reg];
 		}
+		case 1: // An
+		{
+			return REG_A()[reg];
+		}
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
@@ -422,6 +473,10 @@ u16 m68000_base_device::READ_EA_16(int ea)
 		case 0:     // Dn
 		{
 			return (u16)(REG_D()[reg]);
+		}
+		case 1:     // An
+		{
+			return (u16)REG_A()[reg];
 		}
 		case 2:     // (An)
 		{
@@ -499,6 +554,10 @@ u32 m68000_base_device::READ_EA_32(int ea)
 		case 0:     // Dn
 		{
 			return REG_D()[reg];
+		}
+		case 1:     // An
+		{
+			return REG_A()[reg];
 		}
 		case 2:     // (An)
 		{
@@ -650,12 +709,9 @@ u64 m68000_base_device::READ_EA_64(int ea)
 	return 0;
 }
 
-
-floatx80 m68000_base_device::READ_EA_FPE(int ea)
+floatx80 m68000_base_device::READ_EA_FPE(int mode, int reg, uint32 di_mode_ea)
 {
 	floatx80 fpr;
-	int mode = (ea >> 3) & 0x7;
-	int reg = (ea & 0x7);
 
 	switch (mode)
 	{
@@ -682,16 +738,12 @@ floatx80 m68000_base_device::READ_EA_FPE(int ea)
 		}
 		case 5:     // (d16, An)
 		{
-			// FIXME: will fail for fmovem
-			u32 ea = EA_AY_DI_32();
-			fpr = load_extended_float80(ea);
+			fpr = load_extended_float80(di_mode_ea);
 			break;
 		}
 		case 6:     // (An) + (Xn) + d8
 		{
-			// FIXME: will fail for fmovem
-			u32 ea = EA_AY_IX_32();
-			fpr = load_extended_float80(ea);
+			fpr = load_extended_float80(di_mode_ea);
 			break;
 		}
 
@@ -720,6 +772,11 @@ floatx80 m68000_base_device::READ_EA_FPE(int ea)
 						u32 ea = EA_PCIX_32();
 						fpr = load_extended_float80(ea);
 					}
+					break;
+
+				case 4:     // #<data>
+					fpr = load_extended_float80(m_pc);
+					m_pc += 12;
 					break;
 
 				default:
@@ -1070,11 +1127,8 @@ void m68000_base_device::WRITE_EA_64(int ea, u64 data)
 	}
 }
 
-void m68000_base_device::WRITE_EA_FPE(int ea, floatx80 fpr)
+void m68000_base_device::WRITE_EA_FPE(int mode, int reg, floatx80 fpr, uint32 di_mode_ea)
 {
-	int mode = (ea >> 3) & 0x7;
-	int reg = (ea & 0x7);
-
 	switch (mode)
 	{
 		case 2:     // (An)
@@ -1105,7 +1159,15 @@ void m68000_base_device::WRITE_EA_FPE(int ea, floatx80 fpr)
 
 		case 5:     // (d16,An)
 		{
-			u32 ea = EA_AY_DI_32();
+			// EA_AY_DI_32() should not be done here because fmovem would increase
+			// PC each time, reading incorrect displacement & advancing PC too much.
+			store_extended_float80(di_mode_ea, fpr);
+			break;
+		}
+
+		case 6: // (An) + (Xn) + d8
+		{
+			u32 ea = EA_AY_IX_32();
 			store_extended_float80(ea, fpr);
 			break;
 		}
@@ -1167,11 +1229,11 @@ void m68000_base_device::WRITE_EA_PACK(int ea, int k, floatx80 fpr)
 
 void m68000_base_device::fpgen_rm_reg(u16 w2)
 {
-	int ea = m_ir & 0x3f;
-	int rm = (w2 >> 14) & 0x1;
-	int src = (w2 >> 10) & 0x7;
-	int dst = (w2 >>  7) & 0x7;
-	int opmode = w2 & 0x7f;
+	const int ea = m_ir & 0x3f;
+	const int rm = (w2 >> 14) & 0x1;
+	const int src = (w2 >> 10) & 0x7;
+	const int dst = (w2 >>  7) & 0x7;
+	const int opmode = w2 & 0x7f;
 	floatx80 source;
 
 	// fmovecr #$f, fp0 f200 5c0f
@@ -1194,7 +1256,10 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			}
 			case 2:     // Extended-precision Real
 			{
-				source = READ_EA_FPE(ea);
+				int imode = (ea >> 3) & 0x7;
+				int reg = (ea & 0x7);
+				uint32 di_mode_ea = imode == 5 ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+				source = READ_EA_FPE(imode, reg, di_mode_ea);
 				break;
 			}
 			case 3:     // Packed-decimal Real
@@ -1336,6 +1401,7 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 
 				// handle it right here, the usual opmode bits aren't valid in the FMOVECR case
 				m_fpr[dst] = source;
+				SET_CONDITION_CODES(m_fpr[dst]);
 				m_icount -= 4;
 				return;
 			}
@@ -1363,6 +1429,7 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			s32 temp;
 			temp = floatx80_to_int32(source);
 			m_fpr[dst] = int32_to_floatx80(temp);
+			SET_CONDITION_CODES(m_fpr[dst]);
 			break;
 		}
 		case 0x03:      // FINTRZ
@@ -1370,6 +1437,7 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			s32 temp;
 			temp = floatx80_to_int32_round_to_zero(source);
 			m_fpr[dst] = int32_to_floatx80(temp);
+			SET_CONDITION_CODES(m_fpr[dst]);
 			break;
 		}
 		case 0x04:      // FSQRT
@@ -1381,9 +1449,16 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x06:      // FLOGNP1
 		{
-			m_fpr[dst] = floatx80_flognp1 (source);
+			m_fpr[dst] = floatx80_flognp1(source);
 			SET_CONDITION_CODES(m_fpr[dst]);
 			m_icount -= 594; // for MC68881
+			break;
+		}
+		case 0x0a:      // FATAN
+		{
+			m_fpr[dst] = floatx80_fatan (source);
+			SET_CONDITION_CODES(m_fpr[dst]);
+			m_icount -= 426; // for MC68881
 			break;
 		}
 		case 0x0e:      // FSIN
@@ -1458,9 +1533,18 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 6;
 			break;
 		}
+		case 0x1f:      // FGETMAN
+		{
+			m_fpr[dst] = getman(source);
+			SET_CONDITION_CODES(m_fpr[dst]);
+			m_icount -= 31;
+			break;
+		}
+		case 0x60:      // FSDIVS
 		case 0x20:      // FDIV
 		{
 			m_fpr[dst] = floatx80_div(m_fpr[dst], source);
+			SET_CONDITION_CODES(m_fpr[dst]);
 			m_icount -= 43;
 			break;
 		}
@@ -1481,6 +1565,7 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 9;
 			break;
 		}
+		case 0x63:      // FSMULS (JFF)
 		case 0x23:      // FMUL
 		{
 			m_fpr[dst] = floatx80_mul(m_fpr[dst], source);
@@ -1529,6 +1614,24 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 9;
 			break;
 		}
+		case 0x30:      // FSINCOS
+		case 0x31:
+		case 0x32:
+		case 0x33:
+		case 0x34:
+		case 0x35:
+		case 0x36:
+		case 0x37:
+		{
+			m_fpr[dst] = source;
+			floatx80_fsin(m_fpr[dst]);
+			SET_CONDITION_CODES(m_fpr[dst]);    // condition codes are set for the sine result
+
+			m_fpr[(w2 & 0x7)] = source;
+			floatx80_fcos(m_fpr[(w2 & 0x7)]);
+			m_icount -= 451;
+			break;
+		}
 		case 0x38:      // FCMP
 		{
 			floatx80 res;
@@ -1573,7 +1676,11 @@ void m68000_base_device::fmove_reg_mem(u16 w2)
 		}
 		case 2:     // Extended-precision Real
 		{
-			WRITE_EA_FPE(ea, m_fpr[src]);
+			int mode = (ea >> 3) & 0x7;
+			int reg = (ea & 0x7);
+			uint32 di_mode_ea = mode == 5 ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+
+			WRITE_EA_FPE(mode, reg, m_fpr[src], di_mode_ea);
 			break;
 		}
 		case 3:     // Packed-decimal Real with Static K-factor
@@ -1665,7 +1772,11 @@ void m68000_base_device::fmove_fpcr(u16 w2)
 		}
 		else        // From <ea> to system control reg
 		{
-			if (regsel & 4) m_fpcr = READ_EA_32(ea);
+			if (regsel & 4)
+			{
+				m_fpcr = READ_EA_32(ea);
+				// should update softfloat rounding mode here
+			}
 			if (regsel & 2) m_fpsr = READ_EA_32(ea);
 			if (regsel & 1) m_fpiar = READ_EA_32(ea);
 		}
@@ -1730,17 +1841,6 @@ void m68000_base_device::fmovem(u16 w2)
 	int mode = (w2 >> 11) & 0x3;
 	int reglist = w2 & 0xff;
 
-	u32 mem_addr = 0;
-	switch (ea >> 3)
-	{
-		case 5:     // (d16, An)
-			mem_addr= EA_AY_DI_32();
-			break;
-		case 6:     // (An) + (Xn) + d8
-			mem_addr= EA_AY_IX_32();
-			break;
-	}
-
 	if (dir)    // From FP regs to mem
 	{
 		switch (mode)
@@ -1751,20 +1851,23 @@ void m68000_base_device::fmovem(u16 w2)
 				[[fallthrough]];
 			case 0:     // Static register list, predecrement or control addressing mode
 			{
+				// the "di_mode_ea" parameter kludge is required here else WRITE_EA_FPE would have
+				// to call EA_AY_DI_32() (that advances PC & reads displacement) each time
+				// when the proper behaviour is 1) read once, 2) increment ea for each matching register
+				// this forces to pre-read the mode (named "imode") so we can decide to read displacement, only once
+				int imode = (ea >> 3) & 0x7;
+				int reg = (ea & 0x7);
+				int di_mode = imode == 5;
+				uint32 di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						switch (ea >> 3)
+						WRITE_EA_FPE(imode, reg, m_fpr[i], di_mode_ea);
+						if (di_mode)
 						{
-							case 5:     // (d16, An)
-							case 6:     // (An) + (Xn) + d8
-								store_extended_float80(mem_addr, m_fpr[i]);
-								mem_addr += 12;
-								break;
-							default:
-								WRITE_EA_FPE(ea, m_fpr[i]);
-								break;
+							di_mode_ea += 12;
 						}
 
 						m_icount -= 2;
@@ -1779,20 +1882,19 @@ void m68000_base_device::fmovem(u16 w2)
 				[[fallthrough]];
 			case 2:     // Static register list, postdecrement or control addressing mode
 			{
+				int imode = (ea >> 3) & 0x7;
+				int reg = (ea & 0x7);
+				int di_mode = (imode == 5);
+				uint32 di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						switch (ea >> 3)
+						WRITE_EA_FPE(imode, reg, m_fpr[7 - i], di_mode_ea);
+						if (di_mode)
 						{
-							case 5:     // (d16, An)
-							case 6:     // (An) + (Xn) + d8
-								store_extended_float80(mem_addr, m_fpr[7-i]);
-								mem_addr += 12;
-								break;
-							default:
-								WRITE_EA_FPE(ea, m_fpr[7-i]);
-								break;
+							di_mode_ea += 12;
 						}
 
 						m_icount -= 2;
@@ -1814,20 +1916,19 @@ void m68000_base_device::fmovem(u16 w2)
 				[[fallthrough]];
 			case 2:     // Static register list, postincrement or control addressing mode
 			{
+				int imode = (ea >> 3) & 0x7;
+				int reg = (ea & 0x7);
+				int di_mode = (imode == 5);
+				uint32 di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						switch (ea >> 3)
+						m_fpr[7 - i] = READ_EA_FPE(imode, reg, di_mode_ea);
+						if (di_mode)
 						{
-							case 5:     // (d16, An)
-							case 6:     // (An) + (Xn) + d8
-								m_fpr[7-i] = load_extended_float80(mem_addr);
-								mem_addr += 12;
-								break;
-							default:
-								m_fpr[7-i] = READ_EA_FPE(ea);
-								break;
+							di_mode_ea += 12;
 						}
 						m_icount -= 2;
 					}
@@ -1842,10 +1943,24 @@ void m68000_base_device::fmovem(u16 w2)
 
 void m68000_base_device::fscc()
 {
-	int ea = m_ir & 0x3f;
-	int condition = (s16)(OPER_I_16());
+	const int mode = (m_ir & 0x38) >> 3;
+	const int condition = OPER_I_16() & 0x3f;
+	const int v = (TEST_CONDITION(condition) ? 0xff : 0x00);
 
-	WRITE_EA_8(ea, TEST_CONDITION(condition) ? 0xff : 0);
+	switch (mode)
+	{
+		case 0: // Dx (handled specially because it only changes the low byte of Dx)
+			{
+				const int reg = m_ir & 7;
+				REG_D()[reg] = (REG_D()[reg] & 0xffffff00) | v;
+			}
+			break;
+
+		default:
+			WRITE_EA_8(m_ir & 0x3f, v);
+			break;
+	}
+
 	m_icount -= 7; // ???
 }
 

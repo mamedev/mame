@@ -281,7 +281,7 @@ uint8_t nb1412m2_device::rom_decrypt_r()
 // Mighty Guy specifics
 uint8_t nb1412m2_device::timer_r()
 {
-	return m_timer_reg == true;
+	return (m_timer_reg) ? 1 : 0;
 }
 
 void nb1412m2_device::timer_w(uint8_t data)
@@ -319,7 +319,7 @@ void nb1412m2_device::dac_control_w(uint8_t data)
 {
 	if (data == 0)
 	{
-		// Mighty Guy is uses this to stop psycho gun sound.
+		// Mighty Guy uses this to stop psycho gun sound.
 		m_dac_playback = false;
 	}
 }

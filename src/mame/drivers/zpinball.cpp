@@ -14,6 +14,9 @@
 #include "sound/saa1099.h"
 #include "speaker.h"
 
+
+namespace {
+
 class zpinball_state : public driver_device
 {
 public:
@@ -30,6 +33,7 @@ public:
 	}
 
 	void zpinball(machine_config &config);
+	void eballchps(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -102,7 +106,7 @@ void zpinball_state::machine_reset()
 
 u8 zpinball_state::pal_r()
 {
-	// TODO: at least simulate this
+	// TODO: at least simulate this, according to PinMAME returning 0x9b is enough to circumvent the protection
 	return m_pal_input;
 }
 
@@ -266,7 +270,13 @@ void zpinball_state::zpinball(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SAA1099(config, "saa", 8_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	EFO_ZSU1(config, m_zsu, 0);
+	EFO_ZSU1(config, m_zsu);
+}
+
+void zpinball_state::eballchps(machine_config &config)
+{
+	zpinball(config);
+	EFO_ZSU(config.replace(), m_zsu);
 }
 
 
@@ -297,7 +307,7 @@ ROM_END
 // Come Back (Nondum)
 ROM_START(comeback)
 	ROM_REGION(0x8000, "zpurom", 0)
-	ROM_LOAD("jeb_5a0.u18", 0x0000, 0x8000, CRC(87615a7d) SHA1(b27ca2d863040a2641f88f9bd3143467a83f181b))
+	ROM_LOAD("jco_6a0.u18", 0x0000, 0x8000, CRC(31268ca1) SHA1(d6132d021e808d107dd29c7da0fbb4bc887339a7))
 
 	ROM_REGION(0x28000, "zsu:soundcpu", 0)
 	ROM_LOAD("cbs_3a0.u3", 0x00000, 0x8000, CRC(d0f55dc9) SHA1(91186e2cbe248323380418911240a9a5887063fb))
@@ -305,7 +315,9 @@ ROM_START(comeback)
 	ROM_LOAD("cbs_1c0.u5", 0x10000, 0x8000, CRC(794ae588) SHA1(adaa5e69232523369a6a2da865ac05102cc04ec8))
 ROM_END
 
+} // Anonymous namespace
 
-GAME(1986, eballchps, eballchp, zpinball, zpinball, zpinball_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, cobrapb,   0,        zpinball, zpinball, zpinball_state, empty_init, ROT0, "Playbar", "Cobra (Playbar)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, comeback,  0,        zpinball, zpinball, zpinball_state, empty_init, ROT0, "Nondum / CIFA", "Come Back", MACHINE_IS_SKELETON_MECHANICAL)
+
+GAME(1986, eballchps, eballchp, eballchps, zpinball, zpinball_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, cobrapb,   0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Playbar", "Cobra (Playbar)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?, comeback,  0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Nondum / CIFA", "Come Back", MACHINE_IS_SKELETON_MECHANICAL)

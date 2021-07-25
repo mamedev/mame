@@ -576,13 +576,13 @@ void menu_image_info::image_info(device_image_interface *image)
 			// display supported information, if available
 			switch (swinfo.supported())
 			{
-			case SOFTWARE_SUPPORTED_NO:
+			case software_support::UNSUPPORTED:
 				item_append(_("Not supported"), FLAG_DISABLE, nullptr);
 				break;
-			case SOFTWARE_SUPPORTED_PARTIAL:
+			case software_support::PARTIALLY_SUPPORTED:
 				item_append(_("Partially supported"), FLAG_DISABLE, nullptr);
 				break;
-			default:
+			case software_support::SUPPORTED:
 				break;
 			}
 		}

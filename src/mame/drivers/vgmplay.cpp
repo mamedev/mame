@@ -38,18 +38,10 @@
 #include "sound/upd7759.h"
 #include "sound/vgm_visualizer.h"
 #include "sound/x1_010.h"
-#include "sound/y8950.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
-#include "sound/ym2413.h"
-#include "sound/ym2608.h"
-#include "sound/ym2610.h"
-#include "sound/ym2612.h"
-#include "sound/ym3526.h"
-#include "sound/ym3812.h"
 #include "sound/ymf271.h"
-#include "sound/ymf262.h"
-#include "sound/ymf278b.h"
+#include "sound/ymopl.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "sound/ymz280b.h"
 #include "audio/vboy.h"
 #include "audio/wswan.h"
@@ -2946,10 +2938,6 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		m_ay8910[1]->set_psg_type(vgm_ay8910_type(version >= 0x151 && header_size >= 0x7c ? r8(0x78) : 0));
 		m_ay8910[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7a ? r8(0x79) : 0));
 		m_ay8910[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7a ? r8(0x79) : 0));
-		m_ym2203[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7b ? r8(0x7a) : 0));
-		m_ym2203[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7b ? r8(0x7a) : 0));
-		m_ym2608[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7c ? r8(0x7b) : 0));
-		m_ym2608[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7c ? r8(0x7b) : 0));
 
 		setup_device(*m_dmg[0], 0, CT_GAMEBOY, 0x80, 0x161);
 		setup_device(*m_dmg[1], 1, CT_GAMEBOY, 0x80, 0x161);

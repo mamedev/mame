@@ -3,9 +3,8 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-Fidelity Sensory 12 Chess Challenger (SC12-B, 6086)
-4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
----------------------------------
+Fidelity Sensory 12 Chess Challenger (SC12, 6086)
+------------------------------------
 RE information from netlist by Berger
 
 8*(8+1) buttons, 8+8+2 red LEDs
@@ -180,7 +179,7 @@ void sc12_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( sc12_sidepanel )
+static INPUT_PORTS_START( sc12_base )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("DM / Knight")
@@ -194,12 +193,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12 )
 	PORT_INCLUDE( fidel_clockdiv_2 )
-	PORT_INCLUDE( sc12_sidepanel )
+	PORT_INCLUDE( sc12_base )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12b )
 	PORT_INCLUDE( fidel_clockdiv_4 )
-	PORT_INCLUDE( sc12_sidepanel )
+	PORT_INCLUDE( sc12_base )
 INPUT_PORTS_END
 
 
@@ -273,5 +272,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1984, fscc12,  0,       0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, fscc12b, fscc12,  0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12,  0,       0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\" (model SC12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12b, fscc12,  0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\" (model 6086)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

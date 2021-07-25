@@ -98,7 +98,8 @@ void betacam_state::betacam(machine_config &config)
 	m_systemcpu->set_addrmap(AS_PROGRAM, &betacam_state::system_mem_map);
 	m_systemcpu->p2_in_cb().set_ioport("DSW1");
 
-	HD6475348(config, m_servocpu, 20_MHz_XTAL); //Actual chip is marked "H8/534 6435348F 10"
+	HD6435348(config, m_servocpu, 20_MHz_XTAL); //Actual chip is marked "H8/534 6435348F 10"
+	m_servocpu->set_mode(3);
 	m_servocpu->set_addrmap(AS_PROGRAM, &betacam_state::servo_mem_map);
 
 	//CXD1095(config, "cxdio0");

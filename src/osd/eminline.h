@@ -33,8 +33,10 @@
 
 #elif defined(_MSC_VER)
 
-#if (defined(_M_IX86) || defined(_M_X64))
+#if defined(_M_IX86) || defined(_M_X64)
 #include "eivcx86.h"
+#elif defined(_M_ARM) || defined(_M_ARM64)
+#include "eivcarm.h"
 #endif
 
 #include "eivc.h"
@@ -352,12 +354,12 @@ inline bool addu_64x64_co(uint64_t a, uint64_t b, uint64_t &sum)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    count_leading_zeros - return the number of
+    count_leading_zeros_32 - return the number of
     leading zero bits in a 32-bit value
 -------------------------------------------------*/
 
-#ifndef count_leading_zeros
-inline uint8_t count_leading_zeros(uint32_t val)
+#ifndef count_leading_zeros_32
+inline uint8_t count_leading_zeros_32(uint32_t val)
 {
 	if (!val) return 32U;
 	uint8_t count;
@@ -368,15 +370,46 @@ inline uint8_t count_leading_zeros(uint32_t val)
 
 
 /*-------------------------------------------------
-    count_leading_ones - return the number of
+    count_leading_ones_32 - return the number of
     leading one bits in a 32-bit value
 -------------------------------------------------*/
 
-#ifndef count_leading_ones
-inline uint8_t count_leading_ones(uint32_t val)
+#ifndef count_leading_ones_32
+inline uint8_t count_leading_ones_32(uint32_t val)
 {
 	uint8_t count;
 	for (count = 0; int32_t(val) < 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros_64
+inline uint8_t count_leading_zeros_64(uint64_t val)
+{
+	if (!val) return 64U;
+	uint8_t count;
+	for (count = 0; int64_t(val) >= 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_64 - return the number of
+    leading one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones_64
+inline uint8_t count_leading_ones_64(uint64_t val)
+{
+	uint8_t count;
+	for (count = 0; int64_t(val) < 0; count++) val <<= 1;
 	return count;
 }
 #endif

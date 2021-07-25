@@ -25,9 +25,10 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "video/n64.h"
+#include "includes/n64.h"
 #include "video/rdpblend.h"
 #include "video/rdptpipe.h"
+#include "screen.h"
 
 #include <algorithm>
 
@@ -91,14 +92,14 @@ int32_t n64_rdp::get_alpha_cvg(int32_t comb_alpha, rdp_span_aux* userdata, const
 
 void n64_state::video_start()
 {
-	m_rdp = auto_alloc(machine(), n64_rdp(*this, m_rdram, m_rsp_dmem));
+	m_rdp = std::make_unique<n64_rdp>(*this, m_rdram, m_rsp_dmem);
 
 	m_rdp->set_machine(machine());
 	m_rdp->init_internal_state();
 	m_rdp->set_n64_periphs(m_rcp_periphs);
 
 	m_rdp->m_blender.set_machine(machine());
-	m_rdp->m_blender.set_processor(m_rdp);
+	m_rdp->m_blender.set_processor(m_rdp.get());
 
 	m_rdp->m_tex_pipe.set_machine(machine());
 
@@ -3140,7 +3141,7 @@ void n64_rdp::process_command_list()
 
 /*****************************************************************************/
 
-n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manager<uint32_t, rdp_poly_state, 8, 32000>(state.machine())
+n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manager<uint32_t, rdp_poly_state, 8>(state.machine())
 {
 	ignore = false;
 	dolog = false;

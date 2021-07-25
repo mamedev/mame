@@ -1236,7 +1236,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	case WM_SIZING:
 		{
 			RECT *rect = (RECT *)lparam;
-			if (window->keepaspect() && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
+			if (window->keepaspect() && (window->target()->scale_mode() == SCALE_FRACTIONAL) && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
 			{
 				osd_rect r = window->constrain_to_aspect_ratio(RECT_to_osd_rect(*rect), wparam);
 				rect->top = r.top();
@@ -1422,10 +1422,6 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	if (monitor == nullptr)
 		return rect;
 
-	// do not constrain aspect ratio for integer scaled views
-	if (target()->scale_mode() != SCALE_FRACTIONAL)
-		return rect;
-
 	// get the pixel aspect ratio for the target monitor
 	pixel_aspect = monitor->pixel_aspect();
 
@@ -1551,7 +1547,7 @@ osd_dim win_window_info::get_min_bounds(int constrain)
 	minheight += wnd_extra_height();
 
 	// if we want it constrained, figure out which one is larger
-	if (constrain && target()->scale_mode() == SCALE_FRACTIONAL)
+	if (constrain)
 	{
 		// first constrain with no height limit
 		osd_rect test1(0,0,minwidth,10000);
@@ -1611,7 +1607,7 @@ osd_dim win_window_info::get_max_bounds(int constrain)
 	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
-	if (constrain && target()->scale_mode() == SCALE_FRACTIONAL)
+	if (constrain)
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
 
 	return maximum.dim();

@@ -51,7 +51,7 @@ between them.
 	</software>
 
 	<software name="adv04a">
-		<description>Voodoo Castle (1)</description>
+		<description>Voodoo Castle (set 1)</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,MN" />
@@ -63,7 +63,7 @@ between them.
 	</software>
 
 	<software name="adv04b">
-		<description>Voodoo Castle (2)</description>
+		<description>Voodoo Castle (set 2)</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,MN" />
@@ -99,7 +99,7 @@ between them.
 	</software>
 
 	<software name="atc1">
-		<description>Air Traffic Control (1)</description>
+		<description>Air Traffic Control (Model I?)</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M1,M2,MN" />
@@ -111,7 +111,7 @@ between them.
 	</software>
 
 	<software name="atc3">
-		<description>Air Traffic Control (3)</description>
+		<description>Air Traffic Control (Model III?)</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -123,7 +123,7 @@ between them.
 	</software>
 
 	<software name="backgam1">
-		<description>Backgammon (1)</description>
+		<description>Backgammon (set 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -135,7 +135,7 @@ between them.
 	</software>
 
 	<software name="backgam2">
-		<description>Backgammon (2)</description>
+		<description>Backgammon (set 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -147,7 +147,7 @@ between them.
 	</software>
 
 	<software name="backgam3">
-		<description>Backgammon (3)</description>
+		<description>Backgammon (set 3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -159,7 +159,7 @@ between them.
 	</software>
 
 	<software name="backgam4">
-		<description>Backgammon (4)</description>
+		<description>Backgammon (set 4)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -171,7 +171,7 @@ between them.
 	</software>
 
 	<software name="bedlam1">
-		<description>Bedlam (1)</description>
+		<description>Bedlam (set 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,H,M2,MN" />
@@ -183,7 +183,7 @@ between them.
 	</software>
 
 	<software name="bedlam2">
-		<description>Bedlam (2)</description>
+		<description>Bedlam (set 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,H,M2,MN" />
@@ -195,7 +195,7 @@ between them.
 	</software>
 
 	<software name="bedlam3">
-		<description>Bedlam (3)</description>
+		<description>Bedlam (set 3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,H,M2,MN" />
@@ -256,7 +256,7 @@ between them.
 	</software>
 
 	<software name="caterplr1"><!-- needs [3] for correct graphics -->
-		<description>Caterpillar (1)</description>
+		<description>Caterpillar (Model I?)</description>
 		<year>1982</year>
 		<publisher>Soft Sector Marketing Inc</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M1,MN" />
@@ -268,7 +268,7 @@ between them.
 	</software>
 
 	<software name="caterplr3"><!-- needs [3] for correct graphics -->
-		<description>Caterpillar (3)</description>
+		<description>Caterpillar (Model III?)</description>
 		<year>1982</year>
 		<publisher>Soft Sector Marketing Inc</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M1,MN" />
@@ -340,7 +340,7 @@ between them.
 	</software>
 
 	<software name="fstroid1">
-		<description>Fasteroids (1)</description>
+		<description>Fasteroids (set 1)</description>
 		<year>1981</year>
 		<publisher>Adventureworld</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -352,7 +352,7 @@ between them.
 	</software>
 
 	<software name="fstroid2">
-		<description>Fasteroids (2)</description>
+		<description>Fasteroids (set 2)</description>
 		<year>1981</year>
 		<publisher>Adventureworld</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -364,7 +364,7 @@ between them.
 	</software>
 
 	<software name="fstroid3">
-		<description>Fasteroids (3)</description>
+		<description>Fasteroids (set 3)</description>
 		<year>1981</year>
 		<publisher>Adventureworld</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -376,7 +376,7 @@ between them.
 	</software>
 
 	<software name="flysauc1">
-		<description>Flying Saucers (1)</description>
+		<description>Flying Saucers (set 1)</description>
 		<year>19??</year>
 		<publisher>Radio Shack</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -387,7 +387,7 @@ between them.
 	</software>
 
 	<software name="flysauc2">
-		<description>Flying Saucers (2)</description>
+		<description>Flying Saucers (set 2)</description>
 		<year>19??</year>
 		<publisher>Radio Shack</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -398,7 +398,7 @@ between them.
 	</software>
 
 	<software name="flysauc3">
-		<description>Flying Saucers (3)</description>
+		<description>Flying Saucers (set 3)</description>
 		<year>19??</year>
 		<publisher>Radio Shack</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -409,7 +409,7 @@ between them.
 	</software>
 
 	<software name="flysauc4">
-		<description>Flying Saucers (4)</description>
+		<description>Flying Saucers (set 4)</description>
 		<year>19??</year>
 		<publisher>Radio Shack</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -420,7 +420,7 @@ between them.
 	</software>
 
 	<software name="flysauc5">
-		<description>Flying Saucers (5)</description>
+		<description>Flying Saucers (set 5)</description>
 		<year>19??</year>
 		<publisher>Radio Shack</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -443,11 +443,11 @@ between them.
 	</software>
 
 	<software name="frogger1">
-		<description>Frogger (1)</description>
+		<description>Frogger (set 1)</description>
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3256">
 				<rom name="frogger1.cmd" size="0x3256" crc="64f592b7" sha1="41ec2e8bf8e0ea37d4620026183092c38d6f8f76"/>
@@ -456,11 +456,11 @@ between them.
 	</software>
 
 	<software name="frogger2">
-		<description>Frogger (2)</description>
+		<description>Frogger (set 2)</description>
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger2.cmd" size="0x3000" crc="eec61bf9" sha1="2e1df95218ca421099e5ca5ac0fdb1e1199372f6"/>
@@ -469,11 +469,11 @@ between them.
 	</software>
 
 	<software name="frogger3">
-		<description>Frogger (3)</description>
+		<description>Frogger (set 3)</description>
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x33f4">
 				<rom name="frogger3.cmd" size="0x33f4" crc="3e6d36a7" sha1="693fcf5798b1b5f9db7de2cc1ae558fefaace1a6"/>
@@ -482,11 +482,11 @@ between them.
 	</software>
 
 	<software name="frogger4">
-		<description>Frogger (4)</description>
+		<description>Frogger (set 4)</description>
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger4.cmd" size="0x3000" crc="24c63f58" sha1="94397d54bd9a6aad7f59db2f0f854fa2dc3e1973"/>
@@ -495,11 +495,11 @@ between them.
 	</software>
 
 	<software name="frogger5">
-		<description>Frogger (5)</description>
+		<description>Frogger (set 5)</description>
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger5.cmd" size="0x3000" crc="03573bc4" sha1="496b922b1932dbb5bed6870a0e6428897f2afff4"/>
@@ -508,11 +508,11 @@ between them.
 	</software>
 
 	<software name="frogger6">
-		<description>Frogger (6)</description>
+		<description>Frogger (set 6)</description>
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger6.cmd" size="0x3000" crc="4ab1a2c5" sha1="f533224621a75a850f7e7bd158655ef7cd74c6f6"/>
@@ -521,11 +521,11 @@ between them.
 	</software>
 
 	<software name="frogger7">
-		<description>Frogger (7)</description>
+		<description>Frogger (set 7)</description>
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x35e1">
 				<rom name="frogger7.cmd" size="0x35e1" crc="2c0aa48d" sha1="cf7e3c9c8d4d7966a8dbc43c53a87efdd7174c8f"/>
@@ -534,11 +534,11 @@ between them.
 	</software>
 
 	<software name="frogger8">
-		<description>Frogger (8)</description>
+		<description>Frogger (set 8)</description>
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger8.cmd" size="0x3000" crc="550b42af" sha1="4056b075238e45742712f47f6da88f764ff2615a"/>
@@ -547,7 +547,7 @@ between them.
 	</software>
 
 	<software name="fs1a">
-		<description>Flight Simulator (1)</description>
+		<description>Flight Simulator (set 1)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -559,7 +559,7 @@ between them.
 	</software>
 
 	<software name="fs1b">
-		<description>Flight Simulator (2)</description>
+		<description>Flight Simulator (set 2)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -571,7 +571,7 @@ between them.
 	</software>
 
 	<software name="fs1c">
-		<description>Flight Simulator (3)</description>
+		<description>Flight Simulator (set 3)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -583,7 +583,7 @@ between them.
 	</software>
 
 	<software name="fs1d">
-		<description>Flight Simulator (4)</description>
+		<description>Flight Simulator (set 4)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -595,7 +595,7 @@ between them.
 	</software>
 
 	<software name="fs1e">
-		<description>Flight Simulator (5)</description>
+		<description>Flight Simulator (set 5)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -607,7 +607,7 @@ between them.
 	</software>
 
 	<software name="fs1f">
-		<description>Flight Simulator (6)</description>
+		<description>Flight Simulator (set 6)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -619,7 +619,7 @@ between them.
 	</software>
 
 	<software name="fs1g">
-		<description>Flight Simulator (7)</description>
+		<description>Flight Simulator (set 7)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -631,7 +631,7 @@ between them.
 	</software>
 
 	<software name="fs1h">
-		<description>Flight Simulator (8)</description>
+		<description>Flight Simulator (set 8)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -643,7 +643,7 @@ between them.
 	</software>
 
 	<software name="fs1i">
-		<description>Flight Simulator (9)</description>
+		<description>Flight Simulator (set 9)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -655,7 +655,7 @@ between them.
 	</software>
 
 	<software name="fs1j">
-		<description>Flight Simulator (10)</description>
+		<description>Flight Simulator (set 10)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -667,7 +667,7 @@ between them.
 	</software>
 
 	<software name="fs1k">
-		<description>Flight Simulator (11)</description>
+		<description>Flight Simulator (set 11)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -679,7 +679,7 @@ between them.
 	</software>
 
 	<software name="fs1l">
-		<description>Flight Simulator (12)</description>
+		<description>Flight Simulator (set 12)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -691,7 +691,7 @@ between them.
 	</software>
 
 	<software name="fs1m">
-		<description>Flight Simulator (13)</description>
+		<description>Flight Simulator (set 13)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -703,7 +703,7 @@ between them.
 	</software>
 
 	<software name="fs1p">
-		<description>Flight Simulator (14)</description>
+		<description>Flight Simulator (set 14)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -715,7 +715,7 @@ between them.
 	</software>
 
 	<software name="gobbler1">
-		<description>Gobbling Box (1)</description>
+		<description>Gobbling Box (set 1)</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H" />
@@ -727,7 +727,7 @@ between them.
 	</software>
 
 	<software name="gobbler2">
-		<description>Gobbling Box (2)</description>
+		<description>Gobbling Box (set 2)</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H" />
@@ -739,7 +739,7 @@ between them.
 	</software>
 
 	<software name="gunfght1">
-		<description>Gunfighter (1)</description>
+		<description>Gunfighter (set 1)</description>
 		<year>1981</year>
 		<publisher>Tandy Corp</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -750,7 +750,7 @@ between them.
 	</software>
 
 	<software name="gunfght2">
-		<description>Gunfighter (2)</description>
+		<description>Gunfighter (set 2)</description>
 		<year>1981</year>
 		<publisher>Tandy Corp</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -761,7 +761,7 @@ between them.
 	</software>
 
 	<software name="gunfght3">
-		<description>Gunfighter (3)</description>
+		<description>Gunfighter (set 3)</description>
 		<year>1981</year>
 		<publisher>Tandy Corp</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -820,7 +820,7 @@ between them.
 	</software>
 
 	<software name="mutinv1">
-		<description>Mutant Invasion (1)</description>
+		<description>Mutant Invasion (set 1)</description>
 		<year>1982</year>
 		<publisher>Micro-Systems Software</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -832,7 +832,7 @@ between them.
 	</software>
 
 	<software name="mutinv2">
-		<description>Mutant Invasion (2)</description>
+		<description>Mutant Invasion (set 2)</description>
 		<year>1982</year>
 		<publisher>Micro-Systems Software</publisher>
 		<sharedfeat name="compatibility" value="1,3,H" />
@@ -856,7 +856,7 @@ between them.
 	</software>
 
 	<software name="raakatu1">
-		<description>Raaka-tu (1)</description>
+		<description>Raaka-tu (set 1)</description>
 		<year>1981</year>
 		<publisher>Radio Shack</publisher>
 		<sharedfeat name="compatibility" value="1,H,M2,MN" />
@@ -868,7 +868,7 @@ between them.
 	</software>
 
 	<software name="raakatu2">
-		<description>Raaka-tu (2)</description>
+		<description>Raaka-tu (set 2)</description>
 		<year>1981</year>
 		<publisher>Radio Shack</publisher>
 		<sharedfeat name="compatibility" value="1,H,M2,MN" />
@@ -880,7 +880,7 @@ between them.
 	</software>
 
 	<software name="raakatu3">
-		<description>Raaka-tu (3)</description>
+		<description>Raaka-tu (set 3)</description>
 		<year>1981</year>
 		<publisher>Radio Shack</publisher>
 		<sharedfeat name="compatibility" value="1,H,M2,MN" />
@@ -892,7 +892,7 @@ between them.
 	</software>
 
 	<software name="rrivet1">
-		<description>Revenge of Rivet Race (1)</description>
+		<description>Revenge of Rivet Race (set 1)</description>
 		<year>1983</year>
 		<publisher>Quality Software and Consulting Inc</publisher>
 		<sharedfeat name="compatibility" value="1,3,H" />
@@ -904,7 +904,7 @@ between them.
 	</software>
 
 	<software name="rrivet2">
-		<description>Revenge of Rivet Race (2)</description>
+		<description>Revenge of Rivet Race (set 2)</description>
 		<year>1983</year>
 		<publisher>Quality Software and Consulting Inc</publisher>
 		<sharedfeat name="compatibility" value="1,3,H" />
@@ -916,7 +916,7 @@ between them.
 	</software>
 
 	<software name="rrivet3">
-		<description>Revenge of Rivet Race (3)</description>
+		<description>Revenge of Rivet Race (set 3)</description>
 		<year>1983</year>
 		<publisher>Quality Software and Consulting Inc</publisher>
 		<sharedfeat name="compatibility" value="1,3,H" />
@@ -928,7 +928,7 @@ between them.
 	</software>
 
 	<software name="eqsf1">
-		<description>Earthquake San Francisco 1906 (1)</description>
+		<description>Earthquake San Francisco 1906 (set 1)</description>
 		<year>1981</year>
 		<publisher>Adventure International</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,MN" />
@@ -940,7 +940,7 @@ between them.
 	</software>
 
 	<software name="eqsf2">
-		<description>Earthquake San Francisco 1906 (2)</description>
+		<description>Earthquake San Francisco 1906 (set 2)</description>
 		<year>1981</year>
 		<publisher>Adventure International</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,M2,MN" />
@@ -1037,7 +1037,7 @@ between them.
 	</software>
 
 	<software name="tron1">
-		<description>Tron (1)</description>
+		<description>Tron (set 1)</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -1048,7 +1048,7 @@ between them.
 	</software>
 
 	<software name="tron2">
-		<description>Tron (2)</description>
+		<description>Tron (set 2)</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -1059,7 +1059,7 @@ between them.
 	</software>
 
 	<software name="tron3">
-		<description>Tron (3)</description>
+		<description>Tron (set 3)</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="1,3,H,MN" />
@@ -1071,7 +1071,7 @@ between them.
 	</software>
 
 	<software name="tron4">
-		<description>Tron (4)</description>
+		<description>Tron (set 4)</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="trs80_quik">
@@ -1129,7 +1129,7 @@ between them.
 	</software>
 
 	<software name="trap2">
-		<description>Trap v2.0 (1)</description>
+		<description>Trap v2.0 (set 1)</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="3" />
@@ -1141,7 +1141,7 @@ between them.
 	</software>
 
 	<software name="trap2a">
-		<description>Trap v2.0 (2)</description>
+		<description>Trap v2.0 (set 2)</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="3" />

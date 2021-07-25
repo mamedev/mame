@@ -100,6 +100,7 @@ bagman.cpp
 bailey.cpp
 balsente.cpp
 bankp.cpp
+banprestoms.cpp
 baraduke.cpp
 barata.cpp
 barni.cpp
@@ -296,6 +297,7 @@ d9final.cpp
 dacholer.cpp
 dai3wksi.cpp
 dambustr.cpp
+dangbar.cpp
 darius.cpp
 darkmist.cpp
 darkseal.cpp
@@ -439,6 +441,7 @@ funworld.cpp
 funybubl.cpp
 fuukifg2.cpp
 fuukifg3.cpp
+fwheel.cpp
 g627.cpp
 gaelco.cpp
 gaelco2.cpp
@@ -452,6 +455,7 @@ galastrm.cpp
 galaxi.cpp
 galaxia.cpp
 galaxian.cpp
+galaxian_rockclim.cpp
 galaxold.cpp
 galgame.cpp
 galgames.cpp
@@ -975,6 +979,7 @@ play_1.cpp
 play_2.cpp
 play_3.cpp
 playcenter.cpp
+plsonic4.cpp
 pluto5.cpp
 plygonet.cpp
 pntnpuzl.cpp
@@ -1092,6 +1097,7 @@ sbmjb.cpp
 sbowling.cpp
 sbrkout.cpp
 sbugger.cpp
+schexx4gen.cpp
 schick.cpp
 scm_500.cpp
 scobra.cpp
@@ -1119,6 +1125,7 @@ segaorun.cpp
 segas16a.cpp
 segas16b.cpp
 segas18.cpp
+segas18_astormbl.cpp
 segas24.cpp
 segas32.cpp
 segasp.cpp
@@ -1423,6 +1430,7 @@ voyager.cpp
 vp101.cpp
 vpoker.cpp
 vroulet.cpp
+vsmjtria.cpp
 vsnes.cpp
 vulgus.cpp
 wacky_gator.cpp

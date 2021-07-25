@@ -117,6 +117,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_CTRL_EDGE_CONNECTOR, neogeo_ctrl_edge_port_device)
 
 void neogeo_controls(device_slot_interface &device);
 void neogeo_arc_edge(device_slot_interface &device);
+void neogeo_arc_edge_irrmaze(device_slot_interface &device);
 void neogeo_arc_edge_fixed(device_slot_interface &device);
 void neogeo_arc_pin15(device_slot_interface &device);
 

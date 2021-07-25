@@ -271,6 +271,9 @@ public:
 	inline void min(const s32 value)
 	{
 		__m128i val = _mm_set1_epi32(value);
+#ifdef __SSE4_1__
+		m_value = _mm_min_epi32(m_value, val);
+#else
 		__m128i is_greater_than = _mm_cmpgt_epi32(m_value, val);
 
 		__m128i val_to_set = _mm_and_si128(val, is_greater_than);
@@ -278,11 +281,15 @@ public:
 
 		m_value = _mm_and_si128(m_value, keep_mask);
 		m_value = _mm_or_si128(val_to_set, m_value);
+#endif
 	}
 
 	inline void max(const s32 value)
 	{
 		__m128i val = _mm_set1_epi32(value);
+#ifdef __SSE4_1__
+		m_value = _mm_max_epi32(m_value, val);
+#else
 		__m128i is_less_than = _mm_cmplt_epi32(m_value, val);
 
 		__m128i val_to_set = _mm_and_si128(val, is_less_than);
@@ -290,6 +297,7 @@ public:
 
 		m_value = _mm_and_si128(m_value, keep_mask);
 		m_value = _mm_or_si128(val_to_set, m_value);
+#endif
 	}
 
 	void blend(const rgbaint_t& other, u8 factor);
@@ -324,48 +332,38 @@ public:
 		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
 	}
 
-	// This function needs absolute value of color and scale to be 11 bits or less
+	// This function needs absolute value of color and scale to be 15 bits or less
 	inline void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{
-		// Pack scale into mult a 16 bits
-		__m128i tmp1 = _mm_packs_epi32(scale.m_value, _mm_setzero_si128());
-		// Shift up by 4
-		tmp1 = _mm_slli_epi16(tmp1, 4);
-		// Pack color into mult b 16 bit inputs
-		m_value = _mm_packs_epi32(m_value, _mm_setzero_si128());
-		// Shift up by 4
-		m_value = _mm_slli_epi16(m_value, 4);
-		// Do the 16 bit multiply, bottom 64 bits will contain 16 bit truncated results
-		m_value = _mm_mulhi_epi16(m_value, tmp1);
-		// Unpack up to s32, putting the 16 bit value at the top so the sign bit is set by the 16 bit result
-		m_value = _mm_unpacklo_epi16(_mm_setzero_si128(), m_value);
-		// Arithmetic shift down the 16 bit value to the lower 16 bits
-		sra_imm(16);
+#ifdef __SSE4_1__
+		m_value = _mm_mullo_epi32(m_value, scale.m_value);
+#else
+		// Mask off the top 16 bits of each 32-bit value
+		m_value = _mm_and_si128(m_value, _mm_set1_epi32(0x0000ffff));
+		// Do 16x16 multiplies and sum into 32-bit pairs; the AND above ensures upper pair is always 0
+		m_value = _mm_madd_epi16(m_value, scale.m_value);
+#endif
+		// Arithmetic shift down the result by 8 bits
+		sra_imm(8);
 		add(other);
 		clamp_to_uint8();
 	}
 
-	// This function needs absolute value of color and scale to be 11 bits or less
+	// This function needs absolute value of color and scale to be 15 bits or less
 	inline void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
 	{
-		// Pack both scale values into mult a 16 bits
-		__m128i tmp1 = _mm_packs_epi32(scale.m_value, scale2.m_value);
-		// Shift up by 4
-		tmp1 = _mm_slli_epi16(tmp1, 4);
-		// Pack both color values into mult b 16 bit inputs
-		m_value = _mm_packs_epi32(m_value, other.m_value);
-		// Shift up by 4
-		m_value = _mm_slli_epi16(m_value, 4);
-		// Do the 16 bit multiply, top and bottom 64 bits will contain 16 bit truncated results
-		tmp1 = _mm_mulhi_epi16(m_value, tmp1);
-		// Unpack up to s32, putting the 16 bit value at the top so the sign bit is set by the 16 bit result
-		m_value = _mm_unpacklo_epi16(_mm_setzero_si128(), tmp1);
-		tmp1 = _mm_unpackhi_epi16(_mm_setzero_si128(), tmp1);
-		// Arithmetic shift down the 16 bit value to the lower 16 bits
-		sra_imm(16);
-		tmp1 = _mm_srai_epi32(tmp1, 16);
-		// Add the results
-		m_value = _mm_add_epi32(m_value, tmp1);
+		// Pack 32-bit values to 16-bit values in low half, and scales in top half
+		__m128i tmp1 = _mm_packs_epi32(m_value, scale.m_value);
+		// Same for other and scale2
+		__m128i tmp2 = _mm_packs_epi32(other.m_value, scale2.m_value);
+		// Interleave the low halves (m_value, other)
+		__m128i tmp3 = _mm_unpacklo_epi16(tmp1, tmp2);
+		// Interleave the top halves (scale, scale2)
+		__m128i tmp4 = _mm_unpackhi_epi16(tmp1, tmp2);
+		// Multiply values by scales and add adjacent pairs
+		m_value = _mm_madd_epi16(tmp3, tmp4);
+		// Final shift by 8
+		sra_imm(8);
 		clamp_to_uint8();
 	}
 

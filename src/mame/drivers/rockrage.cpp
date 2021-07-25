@@ -56,7 +56,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -32,6 +32,7 @@ centronics_device::centronics_device(const machine_config &mconfig, const char *
 	m_autofd_handler(*this),
 	m_fault_handler(*this),
 	m_init_handler(*this),
+	m_sense_handler(*this),
 	m_select_in_handler(*this),
 	m_dev(nullptr)
 {
@@ -40,6 +41,12 @@ centronics_device::centronics_device(const machine_config &mconfig, const char *
 void centronics_device::device_config_complete()
 {
 	m_dev = dynamic_cast<device_centronics_peripheral_interface *>(get_card_device());
+}
+
+void centronics_device::device_reset()
+{
+	if (m_dev && m_dev->supports_pin35_5v())
+		m_sense_handler(1);
 }
 
 void centronics_device::device_start()
@@ -60,7 +67,10 @@ void centronics_device::device_start()
 	m_autofd_handler.resolve_safe();
 	m_fault_handler.resolve_safe();
 	m_init_handler.resolve_safe();
+	m_sense_handler.resolve_safe();
 	m_select_in_handler.resolve_safe();
+
+	m_sense_handler(0);
 
 	// pull up
 	m_strobe_handler(1);

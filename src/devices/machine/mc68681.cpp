@@ -1269,7 +1269,7 @@ void duart_channel::tra_complete()
 {
 	//printf("%s ch %d Tx complete\n", tag(), m_ch);
 	tx_ready = 1;
-	SR |= STATUS_TRANSMITTER_READY;
+	SR |= STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY;
 
 	if (m_ch == 0)
 		m_uart->set_ISR_bits(INT_TXRDYA);
@@ -1319,24 +1319,13 @@ void duart_channel::update_interrupts()
 	switch (MR2 & 0xc0) // what mode are we in?
 	{
 	case 0x00: // normal mode
-		if (tx_enabled)
-			SR |= STATUS_TRANSMITTER_EMPTY;
-		else
-			SR &= ~STATUS_TRANSMITTER_EMPTY;
 		break;
 	case 0x40: // automatic echo mode
-		SR &= ~STATUS_TRANSMITTER_EMPTY;
 		SR &= ~STATUS_TRANSMITTER_READY;
 		break;
 	case 0x80: // local loopback mode
-		if (tx_enabled)
-			SR |= STATUS_TRANSMITTER_EMPTY;
-		else
-			SR &= ~STATUS_TRANSMITTER_EMPTY;
 		break;
 	case 0xc0: // remote loopback mode
-		// write me, what the txrdy/txemt regs do for remote loopback mode is undocumented afaik, for now just clear both
-		SR &= ~STATUS_TRANSMITTER_EMPTY;
 		SR &= ~STATUS_TRANSMITTER_READY;
 		break;
 	}
@@ -1571,7 +1560,8 @@ void duart_channel::write_CR(uint8_t data)
 		break;
 	case 3: /* Reset channel transmitter */
 		tx_enabled = 0;
-		SR &= ~STATUS_TRANSMITTER_READY;
+		tx_ready = 0;
+		SR &= ~(STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY);
 		if (m_ch == 0)
 			m_uart->clear_ISR_bits(INT_TXRDYA);
 		else
@@ -1636,7 +1626,7 @@ void duart_channel::write_CR(uint8_t data)
 	{
 		tx_enabled = 1;
 		tx_ready = 1;
-		SR |= STATUS_TRANSMITTER_READY;
+		SR |= STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY;
 		if (m_ch == 0)
 			m_uart->set_ISR_bits(INT_TXRDYA);
 		else
@@ -1646,7 +1636,7 @@ void duart_channel::write_CR(uint8_t data)
 	{
 		tx_enabled = 0;
 		tx_ready = 0;
-		SR &= ~STATUS_TRANSMITTER_READY;
+		SR &= ~(STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY);
 		if (m_ch == 0)
 			m_uart->clear_ISR_bits(INT_TXRDYA);
 		else
@@ -1668,7 +1658,7 @@ void duart_channel::write_TX(uint8_t data)
 	//printf("%s ch %d Tx %c [%02x]\n", tag(), m_ch, isprint(data) ? data : ' ', data);
 
 	tx_ready = 0;
-	SR &= ~STATUS_TRANSMITTER_READY;
+	SR &= ~(STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY);
 
 	if (m_ch == 0)
 		m_uart->clear_ISR_bits(INT_TXRDYA);

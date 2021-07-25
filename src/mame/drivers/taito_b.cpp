@@ -90,7 +90,7 @@ List of known B-System games:
 
     Violence Fight                  (YM2203 sound, 1xMSM6295 )
     Hit The Ice                     (YM2203 sound, 1xMSM6295 )
-    Master of Weapons               (YM2203 sound)
+    Master of Weapon                (YM2203 sound)
 
     Quiz Sekai wa SHOW by shobai    (YM2610-B sound, MB87078 - electronic volume control)
     Puzzle Bobble                   (YM2610-B sound, MB87078 - electronic volume control)
@@ -188,8 +188,7 @@ TODO!
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ym2203.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -585,7 +584,7 @@ void taitob_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
 	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xe400, 0xe403).nopw(); /* pan */
@@ -1588,8 +1587,8 @@ static INPUT_PORTS_START( sbm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)//LADY ????
 
 	PORT_START("START")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )//select; ok (1P in object test)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )//start ; ok (2P in object test)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Select")//select; ok (1P in object test)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start")//start ; ok (2P in object test)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3277,7 +3276,7 @@ ROM_START( masterwj )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
 
-ROM_START( yukiwo ) /* Prototype of Master of Weapons */
+ROM_START( yukiwo ) /* Prototype of Master of Weapon */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "ic33-rom0e.bin", 0x00000, 0x20000, CRC(a0dd51d9) SHA1(a4740bf08e26e1e576344c95d945df5d970738f2) )
 	ROM_LOAD16_BYTE( "ic24-e882.bin",  0x00001, 0x20000, CRC(d66f29d4) SHA1(0854f1a0943a20693e6cd02825666e39b4fe28ca) )

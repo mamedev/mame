@@ -334,7 +334,7 @@ private:
 	required_device_array<k001604_device, 2> m_k001604;
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
-	required_device_array<voodoo_device, 2> m_voodoo;
+	required_device_array<generic_voodoo_device, 2> m_voodoo;
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	required_ioport_array<5> m_analog;
@@ -352,9 +352,11 @@ private:
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
 
+	bool m_exrgb;
+
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
-	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void ppc_map(address_map &map);
 	void sharc0_map(address_map &map);
@@ -369,13 +371,14 @@ void nwktr_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-template <uint8_t Which>
 uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	m_voodoo[Which]->voodoo_update(bitmap, cliprect);
-	m_k001604[Which]->draw_front_layer(screen, bitmap, cliprect);
+	int board = m_exrgb ? 1 : 0;
+
+	m_voodoo[board]->update(bitmap, cliprect);
+	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);   // K001604 on slave board doesn't seem to output anything. Bug or intended?
 
 	return 0;
 }
@@ -435,12 +438,25 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 		}
 
 		case 7:
+			/*
+			    0x80 = EXRES1
+			    0x40 = EXRES0
+			    0x20 = EXID1
+			    0x10 = EXID0
+			    0x01 = EXRGB
+			*/
 			if (data & 0x80) // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40) // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-			m_konppc->set_cgboard_id((data >> 4) & 3);
+			m_konppc->set_cgboard_id((data >> 4) & 0x3);
+
+			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
+			// This could mean broadcast to both CG boards?
+
+			m_exrgb = data & 0x1;       // Select which CG Board outputs signal
+
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
 
@@ -548,7 +564,7 @@ void nwktr_state::sharc1_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
+	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r), FUNC(konppc_device::nwk_voodoo_1_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
 	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
@@ -672,41 +688,32 @@ void nwktr_state::nwktr(machine_config &config)
 	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
-	m_voodoo[0]->set_screen_tag("lscreen");
-	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[0]->set_screen("screen");
+	m_voodoo[0]->set_cpu(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
 	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
-	m_voodoo[1]->set_screen_tag("rscreen");
-	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[1]->set_screen("screen");
+	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// default 24KHz parameter in both 001604 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
-	lscreen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
-	lscreen.set_screen_update(FUNC(nwktr_state::screen_update<0>));
-
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // for unused/debug screen from slave CG board
-	// resolution currently unknown, input clock correct? (60~Hz Vsync, 50MHz/3 or 64MHz/4?)
-	rscreen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
-	rscreen.set_screen_update(FUNC(nwktr_state::screen_update<1>));
+	screen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
+	screen.set_screen_update(FUNC(nwktr_state::screen_update));
 
 	PALETTE(config, m_palette).set_entries(65536);
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_layer_size(0);
-	m_k001604[0]->set_roz_size(1);
-	m_k001604[0]->set_txt_mem_offset(0);  // correct?
-	m_k001604[0]->set_roz_mem_offset(0);  // correct?
 	m_k001604[0]->set_palette(m_palette);
 
 	K001604(config, m_k001604[1], 0);
-	m_k001604[1]->set_layer_size(0);
-	m_k001604[1]->set_roz_size(1);
-	m_k001604[1]->set_txt_mem_offset(0);  // correct?
-	m_k001604[1]->set_roz_mem_offset(0);  // correct?
 	m_k001604[1]->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -729,10 +736,6 @@ void nwktr_state::nwktr(machine_config &config)
 void nwktr_state::thrilld(machine_config &config)
 {
 	nwktr(config);
-
-	m_k001604[0]->set_layer_size(1);
-
-	m_k001604[1]->set_layer_size(1);
 }
 
 /*****************************************************************************/

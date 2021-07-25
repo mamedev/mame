@@ -50,6 +50,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/cqm_dsk.h",
 		MAME_DIR .. "src/lib/formats/dsk_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/dsk_dsk.h",
+		MAME_DIR .. "src/lib/formats/ipf_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/ipf_dsk.h",
 		MAME_DIR .. "src/lib/formats/td0_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/td0_dsk.h",
 		MAME_DIR .. "src/lib/formats/hxchfe_dsk.cpp",
@@ -1497,18 +1499,6 @@ end
 
 --------------------------------------------------
 --
---@src/lib/formats/ipf_dsk.h,FORMATS["IPF_DSK"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "IPF_DSK") then
-	files {
-		MAME_DIR.. "src/lib/formats/ipf_dsk.cpp",
-		MAME_DIR.. "src/lib/formats/ipf_dsk.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/lib/formats/phc25_cas.h,FORMATS["PHC25_CAS"] = true
 --------------------------------------------------
 
@@ -1996,6 +1986,30 @@ if opt_tool(FORMATS, "VT_CAS") then
 	files {
 		MAME_DIR.. "src/lib/formats/vt_cas.cpp",
 		MAME_DIR.. "src/lib/formats/vt_cas.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/vt_dsk.h,FORMATS["VT_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "VT_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/vt_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/vt_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_vtech.h,FORMATS["FS_VTECH"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_VTECH") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_vtech.cpp",
+		MAME_DIR.. "src/lib/formats/fs_vtech.h",
 	}
 end
 

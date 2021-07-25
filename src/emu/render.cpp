@@ -1193,37 +1193,55 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 
 			// get target aspect
 			float target_aspect = (float)target_width / (float)target_height * target_pixel_aspect;
-			bool target_is_portrait = (target_aspect < 1.0f);
 
 			// apply automatic axial stretching if required
 			int scale_mode = m_scale_mode;
 			if (m_scale_mode == SCALE_FRACTIONAL_AUTO)
 			{
 				bool is_rotated = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY);
-				scale_mode = is_rotated ^ target_is_portrait ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
+				scale_mode = is_rotated ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
 			}
-
-			// determine the scale mode for each axis
-			bool x_is_integer = !((!target_is_portrait && scale_mode == SCALE_FRACTIONAL_X) || (target_is_portrait && scale_mode == SCALE_FRACTIONAL_Y));
-			bool y_is_integer = !((target_is_portrait && scale_mode == SCALE_FRACTIONAL_X) || (!target_is_portrait && scale_mode == SCALE_FRACTIONAL_Y));
 
 			// first compute scale factors to fit the screen
 			float xscale = (float)target_width / src_width;
 			float yscale = (float)target_height / src_height;
-			float maxxscale = std::max(1.0f, float(m_int_overscan ? render_round_nearest(xscale) : floor(xscale)));
-			float maxyscale = std::max(1.0f, float(m_int_overscan ? render_round_nearest(yscale) : floor(yscale)));
 
-			// now apply desired scale mode and aspect correction
-			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
-			if (m_keepaspect && target_aspect < src_aspect) yscale *= target_aspect / src_aspect * (maxxscale / xscale);
-			if (x_is_integer) xscale = std::clamp(render_round_nearest(xscale), 1.0f, maxxscale);
-			if (y_is_integer) yscale = std::clamp(render_round_nearest(yscale), 1.0f, maxyscale);
+			// apply aspect correction
+			if (m_keepaspect)
+			{
+				if (target_aspect > src_aspect)
+					xscale *= src_aspect / target_aspect;
+				else
+					yscale *= target_aspect / src_aspect;
+			}
+
+			bool x_fits = render_round_nearest(xscale) * src_width <= target_width;
+			bool y_fits = render_round_nearest(yscale) * src_height <= target_height;
+
+			// compute integer scale factors
+			float integer_x = std::max(1.0f, float(m_int_overscan || x_fits ? render_round_nearest(xscale) : floor(xscale)));
+			float integer_y = std::max(1.0f, float(m_int_overscan || y_fits ? render_round_nearest(yscale) : floor(yscale)));
 
 			// check if we have user defined scale factors, if so use them instead
-			int user_scale_x = target_is_portrait? m_int_scale_y : m_int_scale_x;
-			int user_scale_y = target_is_portrait? m_int_scale_x : m_int_scale_y;
-			xscale = user_scale_x > 0 ? user_scale_x : xscale;
-			yscale = user_scale_y > 0 ? user_scale_y : yscale;
+			integer_x = m_int_scale_x > 0 ? m_int_scale_x : integer_x;
+			integer_y = m_int_scale_y > 0 ? m_int_scale_y : integer_y;
+
+			// now apply desired scale mode
+			if (scale_mode == SCALE_FRACTIONAL_X)
+			{
+				if (m_keepaspect) xscale *= integer_y / yscale;
+				yscale = integer_y;
+			}
+			else if (scale_mode == SCALE_FRACTIONAL_Y)
+			{
+				if (m_keepaspect) yscale *= integer_x / xscale;
+				xscale = integer_x;
+			}
+			else
+			{
+				xscale = integer_x;
+				yscale = integer_y;
+			}
 
 			// set the final width/height
 			visible_width = render_round_nearest(src_width * xscale);
@@ -3039,7 +3057,10 @@ render_manager::render_manager(running_machine &machine)
 	, m_ui_container(new render_container(*this))
 {
 	// register callbacks
-	machine.configuration().config_register("video", config_load_delegate(&render_manager::config_load, this), config_save_delegate(&render_manager::config_save, this));
+	machine.configuration().config_register(
+			"video",
+			configuration_manager::load_delegate(&render_manager::config_load, this),
+			configuration_manager::save_delegate(&render_manager::config_save, this));
 
 	// create one container per screen
 	for (screen_device &screen : screen_device_enumerator(machine.root_device()))
@@ -3294,10 +3315,10 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void render_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// we only care about game files with matching nodes
-	if ((cfg_type != config_type::GAME) || !parentnode)
+	// we only care about system-specific configuration with matching nodes
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
 	// check the UI target
@@ -3350,8 +3371,8 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 
 void render_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
+	// we only save system-specific configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	// write out the interface target

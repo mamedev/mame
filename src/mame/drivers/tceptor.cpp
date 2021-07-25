@@ -17,7 +17,7 @@
 #include "machine/adc0808.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "tceptor2.lh"
@@ -345,6 +345,7 @@ void tceptor_state::tceptor(machine_config &config)
 
 	NAMCO_C45_ROAD(config, m_c45_road);
 	m_c45_road->set_palette(m_palette);
+	m_c45_road->set_xoffset(-64);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.606060);

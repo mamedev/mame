@@ -6,14 +6,14 @@
 
     Implementation of the BOOTI card
 
-	The BOOTI is an Apple II interface to the CH376 USB module.
-	The CH376 is intended for use with small microcontrollers (or,
-	you know, the 6502) to give them access to FAT-formatted
-	flash drives.  See ch376.cpp for details.
+    The BOOTI is an Apple II interface to the CH376 USB module.
+    The CH376 is intended for use with small microcontrollers (or,
+    you know, the 6502) to give them access to FAT-formatted
+    flash drives.  See ch376.cpp for details.
 
-	C0n0: read/write data to CH376
-	C0n1: read status/write command to CH376
-	C0n4: $C800 ROM bank (0-3)
+    C0n0: read/write data to CH376
+    C0n1: read status/write command to CH376
+    C0n4: $C800 ROM bank (0-3)
 
 *********************************************************************/
 

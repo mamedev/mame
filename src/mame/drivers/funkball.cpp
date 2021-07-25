@@ -80,7 +80,9 @@ Notes:
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
 #include "video/voodoo.h"
+#include "sound/ks0164.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class funkball_state : public pcat_base_state
@@ -89,6 +91,7 @@ public:
 	funkball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 		, m_voodoo(*this, "voodoo_0")
+		, m_sound(*this, "ks0164")
 		, m_unk_ram(*this, "unk_ram")
 		, m_flashbank(*this, "flashbank")
 		, m_inputs(*this, "IN.%u", 0)
@@ -105,17 +108,20 @@ private:
 	uint32_t m_biu_ctrl_reg[256/4];
 
 	uint32_t flashbank_addr;
+	uint16_t m_latched_timer;
 
 	// devices
 	required_device<voodoo_1_device> m_voodoo;
+	required_device<ks0164_device> m_sound;
 
 	required_shared_ptr<uint32_t> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
-	required_ioport_array<16> m_inputs;
+	required_ioport_array<14> m_inputs;
 
 	void flash_w (offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 //  void bios_ram_w(offs_t offset, uint8_t data);
 	uint8_t in_r(offs_t offset);
+	uint8_t timer_r(offs_t offset);
 
 	uint8_t funkball_config_reg_r();
 	void funkball_config_reg_w(uint8_t data);
@@ -148,13 +154,28 @@ private:
 	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
+uint8_t funkball_state::timer_r(offs_t offset)
+{
+	if (offset == 0)
+	{
+		// exact frequency unknown, but the code checks against 32539 for a timeout
+		// so guessing that could be it
+		m_latched_timer = machine().time().as_ticks(32539);
+		return m_latched_timer >> 8;
+	}
+
+	// the game polls this timer frequently; eat cycles as a cheap speedup
+	m_maincpu->eat_cycles(500);
+	return m_latched_timer;
+}
+
 void funkball_state::video_start()
 {
 }
 
 uint32_t funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 uint32_t funkball_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask)
@@ -195,7 +216,7 @@ void funkball_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32
 			break;
 		case 0x40:
 			m_voodoo_pci_regs.init_enable = data;
-			m_voodoo->voodoo_set_init_enable(data);
+			m_voodoo->set_init_enable(data);
 			break;
 	}
 }
@@ -330,7 +351,7 @@ void funkball_state::funkball_map(address_map &map)
 //  map(0x08000000, 0x0fffffff).noprw();
 	map(0x40008000, 0x400080ff).rw(FUNC(funkball_state::biu_ctrl_r), FUNC(funkball_state::biu_ctrl_w));
 	map(0x40010e00, 0x40010eff).ram().share("unk_ram");
-	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(generic_voodoo_device::read), FUNC(generic_voodoo_device::write));
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
@@ -354,10 +375,14 @@ void funkball_state::funkball_io(address_map &map)
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
+	map(0x0320, 0x0323).rw(m_sound, FUNC(ks0164_device::mpu401_data_r), FUNC(ks0164_device::mpu401_data_w)).umask32(0x000000ff);
+	map(0x0320, 0x0323).rw(m_sound, FUNC(ks0164_device::mpu401_status_r), FUNC(ks0164_device::mpu401_ctrl_w)).umask32(0x0000ff00);
+
 	map(0x0360, 0x0363).w(FUNC(funkball_state::flash_w));
 
 //  map(0x0320, 0x0323).r(FUNC(funkball_state::test_r));
-	map(0x0360, 0x036f).r(FUNC(funkball_state::in_r)); // inputs
+	map(0x0360, 0x036d).r(FUNC(funkball_state::in_r)); // inputs
+	map(0x036e, 0x036f).r(FUNC(funkball_state::timer_r)); // inputs
 }
 
 static INPUT_PORTS_START( funkball )
@@ -679,56 +704,6 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN.14")
-	PORT_DIPNAME( 0x01, 0x01, "14" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN.15")
-	PORT_DIPNAME( 0x01, 0x01, "15" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void funkball_state::machine_start()
@@ -781,11 +756,12 @@ void funkball_state::funkball(machine_config &config)
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&funkball_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* video hardware */
-	VOODOO_1(config, m_voodoo, STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo, voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
-	m_voodoo->set_screen_tag("screen");
-	m_voodoo->set_cpu_tag(m_maincpu);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo->set_screen("screen");
+	m_voodoo->set_cpu(m_maincpu);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -809,13 +785,20 @@ void funkball_state::funkball(machine_config &config)
 	INTEL_28F320J5(config, "u29");
 	INTEL_28F320J5(config, "u30");
 	INTEL_28F320J5(config, "u3");
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	KS0164(config, m_sound, 16.9344_MHz_XTAL);
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( funkball )
 	ROM_REGION32_LE(0x20000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "512k-epr.u62", 0x010000, 0x010000, CRC(cced894a) SHA1(298c81716e375da4b7215f3e588a45ca3ea7e35c) )
 
-	ROM_REGION16_BE(0x400000, "u3", ROMREGION_ERASE00) // Sound Program / Samples
+	ROM_REGION(0x400000, "ks0164", ROMREGION_ERASE00) // Sound Program / Samples
 	ROM_LOAD16_WORD_SWAP( "flash.u3", 0x000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
 
 	ROM_REGION16_BE(0x400000, "u29", ROMREGION_ERASE00) // Main Program
@@ -826,4 +809,4 @@ ROM_START( funkball )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING)

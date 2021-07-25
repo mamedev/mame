@@ -197,7 +197,8 @@ protected:
 
 	soundmux_status_t soundmux_status(void);
 	void update_sound(void);
-	void poll_joystick(bool *joyin, uint8_t *buttons);
+	bool poll_joystick(void);
+	uint8_t poll_joystick_buttons(void);
 	void poll_keyboard(void);
 	void poll_hires_joystick(void);
 	void update_cassout(int cassout);
@@ -259,8 +260,8 @@ protected:
 	bool m_dclg_previous_bit;
 	uint8_t m_dclg_output_h;
 	uint8_t m_dclg_output_v;
-	uint8_t m_dclg_state;
-	uint16_t m_dclg_timer;
+	uint32_t m_dclg_state;
+	uint32_t m_dclg_timer;
 
 	// VHD selection
 	uint8_t m_vhd_select;

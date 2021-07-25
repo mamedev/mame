@@ -379,6 +379,9 @@ void sslam_state::sslam_program_map(address_map &map)
 	map(0x000000, 0xffffff).rom();   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
 
 	map(0x000400, 0x07ffff).ram();
+	// maybe video register, protection in fpga, rand?  Nothing about this is hardware correct.
+	map(0x000458, 0x00045b).lrw16([this](offs_t offset) { return offset ? m_unk_458 : m_unk_458 >> 16; }, "unk_458_r",
+			[this](offs_t offset, uint16_t data) { if(offset) m_unk_458 = (data & 0xfff) * 0xb1; }, "unk_458_w");
 	map(0x100000, 0x103fff).ram().w(FUNC(sslam_state::sslam_bg_tileram_w)).share("bg_tileram");
 	map(0x104000, 0x107fff).ram().w(FUNC(sslam_state::sslam_md_tileram_w)).share("md_tileram");
 	map(0x108000, 0x10ffff).ram().w(FUNC(sslam_state::sslam_tx_tileram_w)).share("tx_tileram");
@@ -693,11 +696,13 @@ void sslam_state::machine_start()
 	m_track = 0;
 	m_melody = 0;
 	m_bar = 0;
+	m_unk_458 = 0;
 
 	save_item(NAME(m_track));
 	save_item(NAME(m_melody));
 	save_item(NAME(m_bar));
 	save_item(NAME(m_snd_bank));
+	save_item(NAME(m_unk_458));
 
 	m_music_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sslam_state::music_playback),this));
 }

@@ -99,7 +99,7 @@
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
 #include "machine/macscsi.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
 #include "sound/asc.h"
@@ -589,6 +589,7 @@ void macportable_state::macprtb(machine_config &config)
 	m_ram->set_extra_options("1M,3M,5M,7M,9M");
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 

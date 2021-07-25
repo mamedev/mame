@@ -14,10 +14,10 @@
  * Edited and translated to English by Kenji RIKITAKE
  */
 
-#include <cstring>
-#include <cassert>
-#include "pool.h"
 #include "flopimg.h"
+
+#include <cassert>
+#include <cstring>
 
 #define BUFSZ           512     // new input buffer
 
@@ -107,10 +107,6 @@ struct floppy_image_legacy
 	void *loaded_track_data;
 	uint8_t loaded_track_status;
 	uint8_t flags;
-
-	/* tagging system */
-	object_pool *tags;
-	void *tag_data;
 };
 
 

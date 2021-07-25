@@ -218,8 +218,8 @@ void mame_ui_manager::init()
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mame_ui_manager::exit, this));
 	machine().configuration().config_register(
 			"ui_warnings",
-			config_load_delegate(&mame_ui_manager::config_load, this),
-			config_save_delegate(&mame_ui_manager::config_save, this));
+			configuration_manager::load_delegate(&mame_ui_manager::config_load, this),
+			configuration_manager::save_delegate(&mame_ui_manager::config_save, this));
 
 	// create mouse bitmap
 	uint32_t *dst = &m_mouse_bitmap.pix(0);
@@ -258,10 +258,10 @@ void mame_ui_manager::exit()
 //  config_load - load configuration data
 //-------------------------------------------------
 
-void mame_ui_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void mame_ui_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
 	// make sure it's relevant and there's data available
-	if (config_type::GAME == cfg_type)
+	if (config_type::SYSTEM == cfg_type)
 	{
 		m_unemulated_features.clear();
 		m_imperfect_features.clear();
@@ -302,7 +302,7 @@ void mame_ui_manager::config_load(config_type cfg_type, util::xml::data_node con
 void mame_ui_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// only save system-level configuration when times are valid
-	if ((config_type::GAME == cfg_type) && (std::time_t(-1) != m_last_launch_time) && (std::time_t(-1) != m_last_warning_time))
+	if ((config_type::SYSTEM == cfg_type) && (std::time_t(-1) != m_last_launch_time) && (std::time_t(-1) != m_last_warning_time))
 	{
 		parentnode->set_attribute_int("launched", static_cast<long long>(m_last_launch_time));
 		parentnode->set_attribute_int("warned", static_cast<long long>(m_last_warning_time));

@@ -1,947 +1,589 @@
 // license:BSD-3-Clause
-// copyright-holders:Nigel Barnes
-/*****************************************************************************
-*
-*   ns32000dasm.cpp
-*
-*   NS32000 CPU Disassembly
-*
-*****************************************************************************/
+// copyright-holders:Patrick Mackinlay
 
 #include "emu.h"
+
 #include "ns32000dasm.h"
 
-// instruction field extraction
-#define Format0cond(x)   ((x >> 4) & 0x0f)
+char const *const cond_code[] = { "EQ", "NE", "CS", "CC", "HI", "LS", "GT", "LE", "FS", "FC", "LO", "HS", "LT", "GE", "R", "N" };
+char const size_char[] = { 'B','W',' ','D' };
 
-#define Format1op(x)     ((x >> 4) & 0x0f)
+s32 ns32000_disassembler::displacement(offs_t pc, data_buffer const &opcodes, unsigned &bytes)
+{
+	u32 const byte0 = opcodes.r8(pc + bytes++);
 
-#define Format2i(x)      ((x >> 0) & 0x03)
-#define Format2op(x)     ((x >> 4) & 0x07)
-#define Format2short(x)  ((x >> 7) & 0x0f)
-#define Format2gen(x)    ((x >> 11) & 0x1f)
-
-#define Format3i(x)      ((x >> 0) & 0x03)
-#define Format3op(x)     ((x >> 7) & 0x0f)
-#define Format3gen(x)    ((x >> 11) & 0x1f)
-
-#define Format4i(x)      ((x >> 0) & 0x03)
-#define Format4op(x)     ((x >> 2) & 0x0f)
-#define Format4gen2(x)   ((x >> 6) & 0x1f)
-#define Format4gen1(x)   ((x >> 11) & 0x1f)
-
-#define Format5i(x)      ((x >> 8) & 0x03)
-#define Format5op(x)     ((x >> 10) & 0x07)
-#define Format5short(x)  ((x >> 15) & 0x0f)
-
-#define Format6i(x)      ((x >> 8) & 0x03)
-#define Format6op(x)     ((x >> 10) & 0x0f)
-#define Format6gen2(x)   ((x >> 14) & 0x1f)
-#define Format6gen1(x)   ((x >> 19) & 0x1f)
-
-#define Format7i(x)      ((x >> 8) & 0x03)
-#define Format7op(x)     ((x >> 10) & 0x0f)
-#define Format7gen2(x)   ((x >> 14) & 0x1f)
-#define Format7gen1(x)   ((x >> 19) & 0x1f)
-
-#define Format8i(x)      ((x >> 8) & 0x03)
-#define Format8op(x)     (((x >> 8) & 0x04) | ((x >> 6) & 0x03))
-#define Format8reg(x)    ((x >> 11) & 0x07)
-#define Format8gen2(x)   ((x >> 14) & 0x1f)
-#define Format8gen1(x)   ((x >> 19) & 0x1f)
-
-#define Format9i(x)      ((x >> 8) & 0x03)
-#define Format9f(x)      ((x >> 10) & 0x01)
-#define Format9op(x)     ((x >> 11) & 0x07)
-#define Format9gen2(x)   ((x >> 14) & 0x1f)
-#define Format9gen1(x)   ((x >> 19) & 0x1f)
-
-#define Format11f(x)     ((x >> 8) & 0x01)
-#define Format11op(x)    ((x >> 10) & 0x0f)
-#define Format11gen2(x)  ((x >> 14) & 0x1f)
-#define Format11gen1(x)  ((x >> 19) & 0x1f)
-
-#define Format14i(x)     ((x >> 8) & 0x01)
-#define Format14op(x)    ((x >> 10) & 0x0f)
-#define Format14short(x) ((x >> 15) & 0x0f)
-#define Format14gen1(x)  ((x >> 19) & 0x1f)
-
-// instructions
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format0_op[1] =
-{
-	{ "Bcond",         DISP,             0,                0,                0,     0 }
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format1_op[16] =
-{
-	{ "BSR",           DISP,             0,                0,                0,     STEP_OVER },
-	{ "RET",           DISP,             0,                0,                0,     STEP_OUT },
-	{ "CXP",           DISP,             0,                0,                0,     STEP_OVER },
-	{ "RXP",           DISP,             0,                0,                0,     STEP_OUT },
-	{ "RETT",          0,                0,                0,                0,     STEP_OUT },
-	{ "RETI",          DISP,             0,                0,                0,     STEP_OUT },
-	{ "SAVE",          IMM,              0,                0,                0,     0 },
-	{ "RESTORE",       IMM,              0,                0,                0,     0 },
-	{ "ENTER",         IMM,              DISP,             0,                0,     0 },
-	{ "EXIT",          IMM,              0,                0,                0,     0 },
-	{ "NOP",           0,                0,                0,                0,     0 },
-	{ "WAIT",          0,                0,                0,                0,     0 },
-	{ "DIA",           0,                0,                0,                0,     0 },
-	{ "FLAG",          0,                0,                0,                0,     0 },
-	{ "SVC",           0,                0,                0,                0,     0 },
-	{ "BPT",           0,                0,                0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format2_op[8] =
-{
-	{ "ADDQi",         QUICK,            GEN | RMW   | I,  0,                0,     0 },
-	{ "CMPQi",         QUICK,            GEN | READ  | I,  0,                0,     0 },
-	{ "SPRi",          SHORT,            GEN | WRITE | I,  0,                0,     0 },
-	{ "Scondi",        GEN | WRITE | I,  0,                0,                0,     0 },
-	{ "ACBi",          QUICK,            GEN | RMW   | I,  DISP,             0,     0 },
-	{ "MOVQi",         QUICK,            GEN | WRITE | I,  0,                0,     0 },
-	{ "LPRi",          SHORT,            GEN | READ  | I,  0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format3_op[16] =
-{
-	{ "CXPD",          GEN | ADDR,       0,                0,                0,     STEP_OVER },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "BICPSRi",       GEN | READ  | I,  0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "JUMP",          GEN | ADDR,       0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "BISPSRB",       GEN | READ | B,   0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "ADJSPi",        GEN | READ  | I,  0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "JSR",           GEN | ADDR,       0,                0,                0,     STEP_OVER },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "CASEi",         GEN | READ  | I,  0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format4_op[16] =
-{
-	{ "ADDi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "CMPi",          GEN | READ  | I,  GEN | READ  | I,  0,                0,     0 },
-	{ "BICi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "ADDCi",         GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "MOVi",          GEN | READ  | I,  GEN | WRITE | I,  0,                0,     0 },
-	{ "ORi",           GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "SUBi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "ADDR",          GEN | ADDR,       GEN | WRITE | D,  0,                0,     0 },
-	{ "ANDi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "SUBCi",         GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "TBITi",         GEN | READ  | I,  GEN | REGADDR,    0,                0,     0 },
-	{ "XORi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format5_op[16] =
-{
-	{ "MOVSi",         OPTIONS,          0,                0,                0,     0 },
-	{ "CMPSi",         OPTIONS,          0,                0,                0,     0 },
-	{ "SETCFG",        SHORT,            0,                0,                0,     0 },
-	{ "SKPSi",         OPTIONS,          0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format6_op[16] =
-{
-	{ "ROTi",          GEN | READ  | B,  GEN | RMW   | I,  0,                0,     0 },
-	{ "ASHi",          GEN | READ  | B,  GEN | RMW   | I,  0,                0,     0 },
-	{ "CBITi",         GEN | READ  | I,  GEN | REGADDR,    0,                0,     0 },
-	{ "CBITIi",        GEN | READ  | I,  GEN | REGADDR,    0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "LSHi",          GEN | READ  | B,  GEN | RMW   | I,  0,                0,     0 },
-	{ "SBITi",         GEN | READ  | I,  GEN | REGADDR,    0,                0,     0 },
-	{ "SBITIi",        GEN | READ  | I,  GEN | REGADDR,    0,                0,     0 },
-	{ "NEGi",          GEN | READ  | I,  GEN | WRITE | I,  0,                0,     0 },
-	{ "NOTi",          GEN | READ  | I,  GEN | WRITE | I,  0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "SUBPi",         GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "ABSi",          GEN | READ  | I,  GEN | READ  | I,  0,                0,     0 },
-	{ "COM",           GEN | READ  | I,  GEN | WRITE | I,  0,                0,     0 },
-	{ "IBITi",         GEN | READ  | I,  GEN | REGADDR,    0,                0,     0 },
-	{ "ADDPi",         GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format7_op[16] =
-{
-	{ "MOVMi",         GEN | ADDR,       GEN | ADDR,       DISP,             0,     0 },
-	{ "CMPMi",         GEN | ADDR,       GEN | ADDR,       DISP,             0,     0 },
-	{ "INSSi",         GEN | READ  | I,  GEN | REGADDR,    IMM,              0,     0 },
-	{ "EXTSi",         GEN | REGADDR,    GEN | WRITE | I,  IMM,              0,     0 },
-	{ "MOVXBW",        GEN | READ  | B,  GEN | WRITE | W,  0,                0,     0 },
-	{ "MOVZBW",        GEN | READ  | B,  GEN | WRITE | W,  0,                0,     0 },
-	{ "MOVZiD",        GEN | READ  | I,  GEN | WRITE | D,  0,                0,     0 },
-	{ "MOVXiD",        GEN | READ  | I,  GEN | WRITE | D,  0,                0,     0 },
-	{ "MULi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "MEIi",          GEN | READ  | I,  GEN | RMW   | I2, 0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "DEIi",          GEN | READ  | I,  GEN | RMW   | I2, 0,                0,     0 },
-	{ "QUOi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "REMi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "MODi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-	{ "DIVi",          GEN | READ  | I,  GEN | RMW   | I,  0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format8_op[] =
-{
-	{ "EXTi",          REG,              GEN | REGADDR,    GEN | WRITE | I,  DISP,  0 },
-	{ "CVTP",          REG,              GEN | ADDR,       GEN | WRITE | D,  0,     0 },
-	{ "INSi",          REG,              GEN | READ  | I,  GEN | REGADDR,    DISP,  0 },
-	{ "CHECKi",        REG,              GEN | ADDR,       GEN | READ  | I,  0,     0 },
-	{ "INDEXi",        REG,              GEN | READ  | I,  GEN | READ  | I,  0,     0 },
-	{ "FFSi",          GEN | READ  | I,  GEN | RMW   | B,  0,                0,     0 },
-	{ "MOVSUi",        GEN | ADDR,       GEN | ADDR,       0,                0,     0 },
-	{ "MOVUSi",        GEN | ADDR,       GEN | ADDR,       0,                0,     0 }
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format9_op[] =
-{
-	{ "MOVif",         GEN | READ  | I,  GEN | WRITE | F,  0,                0,     0 },
-	{ "LFSR",          GEN | READ  | D,  0,                0,                0,     0 },
-	{ "MOVLF",         GEN | READ  | L,  GEN | WRITE | F,  0,                0,     0 },
-	{ "MOVFL",         GEN | READ  | F,  GEN | WRITE | L,  0,                0,     0 },
-	{ "ROUNDfi",       GEN | READ  | F,  GEN | WRITE | I,  0,                0,     0 },
-	{ "TRUNCfi",       GEN | READ  | F,  GEN | WRITE | I,  0,                0,     0 },
-	{ "SFSR",          GEN | WRITE | D,  0,                0,                0,     0 },
-	{ "FLOORfi",       GEN | READ  | F,  GEN | WRITE | I,  0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format11_op[] =
-{
-	{ "ADDf",          GEN | READ  | F,  GEN | RMW   | F,  0,                0,     0 },
-	{ "MOVf",          GEN | READ  | F,  GEN | WRITE | F,  0,                0,     0 },
-	{ "CMPf",          GEN | READ  | F,  GEN | READ  | F,  0,                0,     0 }, // POLYf
-	{ "Trap (SLAVE)",  0,                0,                0,                0,     0 }, // DOTf
-	{ "SUBf",          GEN | READ  | F,  GEN | RMW   | F,  0,                0,     0 }, // SCALBf
-	{ "NEGf",          GEN | READ  | F,  GEN | WRITE | F,  0,                0,     0 }, // LOGBf
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "DIVf",          GEN | READ  | F,  GEN | RMW   | F,  0,                0,     0 },
-	{ "Trap (SLAVE)",  0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "MULf",          GEN | READ  | F,  GEN | RMW   | F,  0,                0,     0 },
-	{ "ABSf",          GEN | READ  | F,  GEN | READ  | F,  0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-};
-const ns32000_disassembler::NS32000_OPCODE ns32000_disassembler::format14_op[] =
-{
-	{ "RDVAL",         GEN | ADDR,       0,                0,                0,     0 },
-	{ "WRVAL",         GEN | ADDR,       0,                0,                0,     0 },
-	{ "LMR",           SHORT,            GEN | READ  | D,  0,                0,     0 },
-	{ "SMR",           SHORT,            GEN | WRITE | D,  0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 }, // CINV
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-	{ "Trap (UND)",    0,                0,                0,                0,     0 },
-};
-
-
-const char *const ns32000_disassembler::Format0[] =
-{
-	"Bcond"
-};
-const char *const ns32000_disassembler::Format1[] =
-{
-	"BSR", "RET", "CXP", "RXP", "RETT", "RETI", "SAVE", "RESTORE", "ENTER", "EXIT", "NOP", "WAIT", "DIA", "FLAG", "SVC", "BPT"
-};
-const char *const ns32000_disassembler::Format2[] =
-{
-	"ADDQi", "CMPQi", "SPRi", "Scondi", "ACBi", "MOVQi", "LPRi"
-};
-const char *const ns32000_disassembler::Format3[] =
-{
-	"CXPD", "Trap (UND)", "BICPSRi", "Trap (UND)", "JUMP", "Trap (UND)", "BISPSRi", "Trap (UND)", "Trap (UND)", "Trap (UND)", "ADJSPi", "Trap (UND)", "JSR", "Trap (UND)", "CASEi", "Trap (UND)"
-};
-const char *const ns32000_disassembler::Format4[] =
-{
-	"ADDi", "CMPi", "BICi", "Trap (UND)", "ADDCi", "MOVi", "ORi", "Trap (UND)", "SUBi", "ADDR", "ANDi", "Trap (UND)", "SUBCi", "TBITi", "XORi", "Trap (UND)"
-};
-const char *const ns32000_disassembler::Format5[] =
-{
-	"MOVSi", "CMPSi", "SETCFG", "SKPSi", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)"
-};
-const char *const ns32000_disassembler::Format6[] =
-{
-	"ROTi", "ASHi", "CBITi", "CBITIi", "Trap (UND)", "LSHi", "SBITi", "SBITIi", "NEGi", "NOTi", "Trap (UND)", "SUBPi", "ABSi", "COM", "IBITi", "ADDPi"
-};
-const char *const ns32000_disassembler::Format7[] =
-{
-	"MOVMi", "CMPMi", "INSSi", "EXTSi", "MOVXBW", "MOVZBW", "MOVZiD", "MOVXiD", "MULi", "MEIi", "Trap (UND)", "DEIi", "QUOi", "REMi", "MODi", "DIVi"
-};
-const char *const ns32000_disassembler::Format8[] =
-{
-	"EXTi", "CVTP", "INSi", "CHECKi", "INDEXi", "FFSi", "MOVSUi", "MOVUSi"
-};
-const char *const ns32000_disassembler::Format9[] =
-{
-	"MOVif", "LFSR", "MOVLF", "MOVFL", "ROUNDfi", "TRUNCfi", "SFSR", "FLOORfi"
-};
-const char *const ns32000_disassembler::Format11[] =
-{
-	"ADDf", "MOVf", "CMPf", "Trap (SLAVE)", "SUBf", "NEGf", "Trap (UND)", "Trap (UND)", "DIVf", "Trap (SLAVE)", "Trap (UND)", "Trap (UND)", "MULf", "ABSf", "Trap (UND)", "Trap (UND)"
-};
-const char *const ns32000_disassembler::Format14[] =
-{
-	"RDVAL", "WRVAL", "LMR", "SMR", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)", "Trap (UND)"
-};
-
-// types
-const char *const ns32000_disassembler::iType[] =
-{
-	"B", "W", " ", "D"
-};
-const char *const ns32000_disassembler::fType[] =
-{
-	"L", "F"
-};
-const char *const ns32000_disassembler::cType[] =
-{
-	"Q", "D"
-};
-
-// index byte sizes
-const char *const ns32000_disassembler::indexSize[] =
-{
-	"B", "W", "D", "Q"
-};
-
-// short codes
-const char *const ns32000_disassembler::cond[] =
-{
-	"EQ", "NE", "CS", "CC", "HI", "LS", "GT", "LE", "FS", "FC", "LO", "HS", "LT", "GE", "R", "N"
-};
-const char *const ns32000_disassembler::areg[] =
-{
-	"US", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "FP", "SP", "SB", "(reserved)", "(reserved)", "PSR", "INTBASE", "MOD"
-};
-const char *const ns32000_disassembler::mreg[] =
-{
-	"BPR0", "BPR1", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "(reserved)", "MSR", "BCNT", "PTB0", "PTB1", "(reserved)", "EIA"
-};
-
-// register names
-const char *const ns32000_disassembler::R[] =
-{
-	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7"
-};
-const char *const ns32000_disassembler::M[] =
-{
-	"FP", "SP", "SB"
-};
-const char *const ns32000_disassembler::PR[] =
-{
-	"UPSR", "DCR", "BPC", "DSR", "CAR", "", "", "", "FP", "SP", "SB", "USP", "CFG", "PSR", "INTBASE", "MOD"
-};
-const char *const ns32000_disassembler::FP[] =
-{
-	"F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7"
-};
-
-int8_t ns32000_disassembler::short2int(uint8_t val)
-{
-	return (val & 0x08) ? val | 0xf0 : val;
-}
-
-std::string ns32000_disassembler::mnemonic_index(std::string form, const std::string &itype, const std::string &ftype)
-{
-	if (itype.size() && form.find('i') != std::string::npos)
-		form.replace(form.find('i'), 1, itype);
-	if (ftype.size() && form.find('f') != std::string::npos)
-		form.replace(form.find('f'), 1, ftype);
-	return form;
-}
-
-uint8_t ns32000_disassembler::opcode_format(uint8_t byte)
-{
-	switch (byte & 0x0f)
+	if (BIT(byte0, 7))
 	{
-	case 0x0a: return 0;
-	case 0x02: return 1;
-	case 0x0c:
-	case 0x0d:
-	case 0x0f:
-		if ((byte & 0x70) != 0x70)
-			return 2;
+		if (BIT(byte0, 6))
+		{
+			// double word displacement
+			u32 const byte1 = opcodes.r8(pc + bytes++);
+			u32 const byte2 = opcodes.r8(pc + bytes++);
+			u32 const byte3 = opcodes.r8(pc + bytes++);
+
+			return (s32((byte0 << 24) | (byte1 << 16) | (byte2 << 8) | byte3) << 2) >> 2;
+		}
 		else
-			return 3;
-	case 0x06:
-		if (BIT(byte, 4))
-			return 15;
-		else
-			return 19;
+		{
+			// word displacement
+			u8 const byte1 = opcodes.r8(pc + bytes++);
+
+			return s16(((byte0 << 8) | byte1) << 2) >> 2;
+		}
+	}
+	else
+		// byte displacement
+		return s8(byte0 << 1) >> 1;
+}
+
+void ns32000_disassembler::decode(addr_mode *mode, offs_t pc, data_buffer const &opcodes, unsigned &bytes)
+{
+	char const scale_size[] = { 'B', 'W', 'D', 'Q' };
+	std::string scale[2];
+
+	// scaled mode
+	for (unsigned i = 0; i < 2; i++)
+	{
+		if (mode[i].gen > 0x1b)
+		{
+			u8 const index = opcodes.r8(pc + bytes++);
+
+			scale[i] = util::string_format("[R%d:%c]", index & 7, scale_size[mode[i].gen & 3]);
+			mode[i].gen = index >> 3;
+		}
 	}
 
-	if ((byte & 0x03) != 0x02) return 4;
-
-	switch (byte)
+	// base mode
+	for (unsigned i = 0; i < 2; i++)
 	{
-	case 0x0e: return 5;
-	case 0x4e: return 6;
-	case 0xce: return 7;
+		switch (mode[i].gen)
+		{
+		case 0x00: case 0x01: case 0x02: case 0x03:
+		case 0x04: case 0x05: case 0x06: case 0x07:
+			// register
+			mode[i].mode = util::string_format("%c%d", mode[i].fpu ? 'F' : 'R', mode[i].gen);
+			break;
+		case 0x08: case 0x09: case 0x0a: case 0x0b:
+		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+			// register relative
+			mode[i].mode = util::string_format("%d(R%d)", displacement(pc, opcodes, bytes), mode[i].gen & 7);
+			break;
+		case 0x10:
+			// frame memory relative disp2(disp1(FP))
+			{
+				s32 const disp1 = displacement(pc, opcodes, bytes);
+				s32 const disp2 = displacement(pc, opcodes, bytes);
+				mode[i].mode = util::string_format("%d(%d(FP))", disp2, disp1);
+			}
+			break;
+		case 0x11:
+			// stack memory relative disp2(disp1(SP))
+			{
+				s32 const disp1 = displacement(pc, opcodes, bytes);
+				s32 const disp2 = displacement(pc, opcodes, bytes);
+				mode[i].mode = util::string_format("%d(%d(SP))", disp2, disp1);
+			}
+			break;
+		case 0x12:
+			// static memory relative disp2(disp1(SB))
+			{
+				s32 const disp1 = displacement(pc, opcodes, bytes);
+				s32 const disp2 = displacement(pc, opcodes, bytes);
+				mode[i].mode = util::string_format("%d(%d(SB))", disp2, disp1);
+			}
+			break;
+		case 0x13:
+			// reserved
+			break;
+		case 0x14:
+			// immediate
+			switch (mode[i].size)
+			{
+			case SIZE_B: mode[i].mode = util::string_format("0x%X", opcodes.r8(pc + bytes)); bytes += 1; break;
+			case SIZE_W: mode[i].mode = util::string_format("0x%X", swapendian_int16(opcodes.r16(pc + bytes))); bytes += 2; break;
+			case SIZE_D: mode[i].mode = util::string_format("0x%X", swapendian_int32(opcodes.r32(pc + bytes))); bytes += 4; break;
+			case SIZE_Q: mode[i].mode = util::string_format("0x%X", swapendian_int64(opcodes.r64(pc + bytes))); bytes += 8; break;
+			}
+			break;
+		case 0x15:
+			// absolute @disp
+			mode[i].mode = util::string_format("@0x%X", displacement(pc, opcodes, bytes));
+			break;
+		case 0x16:
+			// external EXT(disp1) + disp2
+			{
+				s32 const disp1 = displacement(pc, opcodes, bytes);
+				s32 const disp2 = displacement(pc, opcodes, bytes);
+				if (disp2 < 0)
+					mode[i].mode = util::string_format("EXT(%d) - %d", disp1, -disp2);
+				else if (disp2 > 0)
+					mode[i].mode = util::string_format("EXT(%d) + %d", disp1, disp2);
+				else
+					mode[i].mode = util::string_format("EXT(%d)", disp1);
+			}
+			break;
+		case 0x17:
+			// top of stack TOS
+			mode[i].mode = "TOS";
+			break;
+		case 0x18:
+			// frame memory disp(FP)
+			mode[i].mode = util::string_format("%d(FP)", displacement(pc, opcodes, bytes));
+			break;
+		case 0x19:
+			// stack memory disp(SP)
+			mode[i].mode = util::string_format("%d(SP)", displacement(pc, opcodes, bytes));
+			break;
+		case 0x1a:
+			// static memory disp(SB)
+			mode[i].mode = util::string_format("%d(SB)", displacement(pc, opcodes, bytes));
+			break;
+		case 0x1b:
+			// program memory *+disp
+			mode[i].mode = util::string_format("0x%X", pc + displacement(pc, opcodes, bytes));
+			break;
+		}
+
+		if (!scale[i].empty())
+			mode[i].mode.append(scale[i]);
+	}
+}
+
+std::string ns32000_disassembler::reglist(u8 imm)
+{
+	std::string result;
+
+	for (unsigned i = 0; i < 8; i++)
+		if (BIT(imm, i))
+		{
+			if (result.empty())
+				result.append(util::string_format("R%d", i));
+			else
+				result.append(util::string_format(",R%d", i));
+		}
+
+	return result;
+}
+
+offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buffer const &opcodes, data_buffer const &params)
+{
+	uint32_t flags = SUPPORTED;
+	unsigned bytes = 0;
+
+	u8 const opbyte = opcodes.r8(pc + bytes++);
+
+	if ((opbyte & 15) == 10)
+	{
+		// format 0: cccc 1010
+		util::stream_format(stream, "B%-2s     0x%X", cond_code[BIT(opbyte, 4, 4)], pc + displacement(pc, opcodes, bytes));
+	}
+	else if ((opbyte & 15) == 2)
+	{
+		// format 1: oooo 0010
+
+		// reglist immediate for save/restore/enter/exit
+		u8 const imm = (BIT(opbyte, 4, 4) >= 6 && BIT(opbyte, 4, 4) <= 9) ?
+			opcodes.r8(pc + bytes++) : 0;
+
+		switch (BIT(opbyte, 4, 4))
+		{
+		case 0x0: util::stream_format(stream, "BSR     0x%X", pc + displacement(pc, opcodes, bytes)); flags |= STEP_OVER; break;
+		case 0x1: util::stream_format(stream, "RET     %d", displacement(pc, opcodes, bytes)); flags |= STEP_OUT; break;
+		case 0x2: util::stream_format(stream, "CXP     %d", displacement(pc, opcodes, bytes)); flags |= STEP_OVER; break;
+		case 0x3: util::stream_format(stream, "RXP     %d", displacement(pc, opcodes, bytes)); flags |= STEP_OUT; break;
+		case 0x4: util::stream_format(stream, "RETT    %d", displacement(pc, opcodes, bytes)); flags |= STEP_OUT; break;
+		case 0x5: util::stream_format(stream, "RETI"); flags |= STEP_OUT; break;
+		case 0x6: util::stream_format(stream, "SAVE    [%s]", reglist(imm)); break;
+		case 0x7: util::stream_format(stream, "RESTORE [%s]", reglist(bitswap(imm, 0, 1, 2, 3, 4, 5, 6, 7))); break;
+		case 0x8: util::stream_format(stream, "ENTER   [%s], %d", reglist(imm), displacement(pc, opcodes, bytes)); break;
+		case 0x9: util::stream_format(stream, "EXIT    [%s]", reglist(bitswap(imm, 0, 1, 2, 3, 4, 5, 6, 7))); break;
+		case 0xa: util::stream_format(stream, "NOP"); break;
+		case 0xb: util::stream_format(stream, "WAIT"); break;
+		case 0xc: util::stream_format(stream, "DIA"); break;
+		case 0xd: util::stream_format(stream, "FLAG"); break;
+		case 0xe: util::stream_format(stream, "SVC"); break;
+		case 0xf: util::stream_format(stream, "BPT"); break;
+		}
+	}
+	else if ((opbyte & 15) == 12 || (opbyte & 15) == 13 || (opbyte & 15) == 15)
+	{
+		// format 2: gggg gsss sooo 11ii
+		u16 const opword = (u16(opcodes.r8(pc + bytes++)) << 8) | opbyte;
+
+		// HACK: use reserved mode for second unused type
+		addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(0x13) };
+
+		unsigned const quick = BIT(opword, 7, 4);
+		size_code const size = size_code(opbyte & 3);
+
+		char const *const procreg[] = { "UPSR", "DCR", "BPC", "DSR", "CAR", "", "", "", "FP", "SP", "SB", "USP", "CFG", "PSR", "INTBASE", "MOD" };
+
+		mode[0].size_i(size);
+		decode(mode, pc, opcodes, bytes);
+
+		switch (BIT(opbyte, 4, 3))
+		{
+		case 0: util::stream_format(stream, "ADDQ%c   %d, %s", size_char[size], s32(quick << 28) >> 28, mode[0].mode); break;
+		case 1: util::stream_format(stream, "CMPQ%c   %d, %s", size_char[size], s32(quick << 28) >> 28, mode[0].mode); break;
+		case 2: util::stream_format(stream, "SPR%c    %s, %s", size_char[size], procreg[quick], mode[0].mode); break;
+		case 3: util::stream_format(stream, "S%s%c    %s", cond_code[quick], size_char[size], mode[0].mode); break;
+		case 4: util::stream_format(stream, "ACB%c    %d, %s, 0x%X", size_char[size], s32(quick << 28) >> 28, mode[0].mode, pc + displacement(pc, opcodes, bytes)); break;
+		case 5: util::stream_format(stream, "MOVQ%c   %d, %s", size_char[size], s32(quick << 28) >> 28, mode[0].mode); break;
+		case 6: util::stream_format(stream, "LPR%c    %s, %s", size_char[size], procreg[quick], mode[0].mode); break;
+		case 7:
+			// format 3: gggg gooo o111 11ii
+			switch (BIT(opword, 7, 4))
+			{
+			case 0x0: util::stream_format(stream, "CXPD    %s", mode[0].mode); flags |= STEP_OVER; break;
+			case 0x2: util::stream_format(stream, "BICPSR%c %s", size_char[size], mode[0].mode); break;
+			case 0x4: util::stream_format(stream, "JUMP    %s", mode[0].mode); break;
+			case 0x6: util::stream_format(stream, "BISPSR%c %s", size_char[size], mode[0].mode); break;
+			case 0xa: util::stream_format(stream, "ADJSP%c  %s", size_char[size], mode[0].mode); break;
+			case 0xc: util::stream_format(stream, "JUMP    %s", mode[0].mode); flags |= STEP_OVER; break;
+			case 0xe: util::stream_format(stream, "CASE%c   %s", size_char[size], mode[0].mode); break;
+			default: bytes = 1; break;
+			}
+			break;
+		}
+	}
+	else if ((opbyte & 3) != 2)
+	{
+		// format 4: xxxx xyyy yyoo ooii
+		u16 const opword = (u16(opcodes.r8(pc + bytes++)) << 8) | opbyte;
+
+		addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+		size_code const size = size_code(opbyte & 3);
+
+		mode[0].size_i(size);
+		mode[1].size_i(size);
+		decode(mode, pc, opcodes, bytes);
+
+		switch (BIT(opbyte, 2, 4))
+		{
+		case 0x0: util::stream_format(stream, "ADD%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0x1: util::stream_format(stream, "CMP%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0x2: util::stream_format(stream, "BIC%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0x4: util::stream_format(stream, "ADDC%c   %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0x5: util::stream_format(stream, "MOV%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0x6: util::stream_format(stream, "OR%c     %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0x8: util::stream_format(stream, "SUB%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0x9: util::stream_format(stream, "ADDR    %s, %s", mode[0].mode, mode[1].mode); break;
+		case 0xa: util::stream_format(stream, "AND%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0xc: util::stream_format(stream, "SUBC%c   %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0xd: util::stream_format(stream, "TBIT%c   %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		case 0xe: util::stream_format(stream, "XOR%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+		default: bytes = 1; break;
+		}
+	}
+	else switch (opbyte)
+	{
+	case 0x0e:
+		// format 5: 0000 0sss s0oo ooii 0000 1110
+		{
+			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
+
+			char const *const options[] = { "", "B", "W", "W,B", "", "", "U", "U,B" };
+			char const *const config[] = { "", "I", "F", "F,I", "M", "M,I", "M,F", "M,F,I", "C", "C,I", "C,F", "C,F,I", "C,M", "C,M,I", "C,M,F", "C,M,F,I" };
+
+			size_code const size = size_code(opword & 3);
+
+			switch (BIT(opword, 2, 4))
+			{
+			case 0:
+				if (BIT(opword, 7))
+					util::stream_format(stream, "MOVST%c  %s", size_char[size], options[BIT(opword, 8, 3)]);
+				else
+					util::stream_format(stream, "MOVS%c   %s", size_char[size], options[BIT(opword, 8, 3)]);
+				break;
+			case 1:
+				if (BIT(opword, 7))
+					util::stream_format(stream, "CMPST%c  %s", size_char[size], options[BIT(opword, 8, 3)]);
+				else
+					util::stream_format(stream, "CMPS%c   %s", size_char[size], options[BIT(opword, 8, 3)]);
+				break;
+			case 2: util::stream_format(stream, "SETCFG  [%s]", config[BIT(opword, 7, 4)]); break;
+			case 3:
+				if (BIT(opword, 7))
+					util::stream_format(stream, "SKPST%c  %s", size_char[size], options[BIT(opword, 8, 3)]);
+				else
+					util::stream_format(stream, "SKPS%c   %s", size_char[size], options[BIT(opword, 8, 3)]);
+				break;
+			default: bytes = 1; break;
+			}
+		}
+		break;
+	case 0x4e:
+		// format 6: xxxx xyyy yyoo ooii 0100 1110
+		{
+			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
+
+			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+			size_code const size = size_code(opword & 3);
+
+			switch (BIT(opword, 2, 4))
+			{
+			case 0: case 1: case 5:
+				mode[0].size_i(SIZE_B);
+				break;
+			default:
+				mode[0].size_i(size);
+				break;
+			}
+			mode[1].size_i(size);
+			decode(mode, pc, opcodes, bytes);
+
+			switch (BIT(opword, 2, 4))
+			{
+			case 0x0: util::stream_format(stream, "ROT%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x1: util::stream_format(stream, "ASH%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x2: util::stream_format(stream, "CBIT%c   %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x3: util::stream_format(stream, "CBITI%c  %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x5: util::stream_format(stream, "LSH%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x6: util::stream_format(stream, "SBIT%c   %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x7: util::stream_format(stream, "SBITI%c  %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x8: util::stream_format(stream, "NEG%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x9: util::stream_format(stream, "NOT%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xb: util::stream_format(stream, "SUBP%c   %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xc: util::stream_format(stream, "ABS%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xd: util::stream_format(stream, "COM%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xe: util::stream_format(stream, "IBIT%c   %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xf: util::stream_format(stream, "ADDP%c   %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			default: bytes = 1; break;
+			}
+		}
+		break;
+	case 0xce:
+		// format 7: xxxx xyyy yyoo ooii 1100 1110
+		{
+			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
+
+			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+			size_code const size = size_code(opword & 3);
+
+			mode[0].size_i(size);
+			mode[1].size_i(size);
+			decode(mode, pc, opcodes, bytes);
+
+			u8 const imm = (BIT(opword, 2, 4) == 2 || BIT(opword, 2, 4) == 3) ? opcodes.r8(pc + bytes++) : 0;
+
+			switch (BIT(opword, 2, 4))
+			{
+			case 0x0: util::stream_format(stream, "MOVM%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, displacement(pc, opcodes, bytes) / (size + 1) + 1); break;
+			case 0x1: util::stream_format(stream, "CMPM%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, displacement(pc, opcodes, bytes) / (size + 1) + 1); break;
+			case 0x2: util::stream_format(stream, "INSS%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, imm & 31); break;
+			case 0x3: util::stream_format(stream, "EXTS%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, imm & 31); break;
+			case 0x4: util::stream_format(stream, "MOVXBW  %s, %s", mode[0].mode, mode[1].mode); break;
+			case 0x5: util::stream_format(stream, "MOVZBW  %s, %s", mode[0].mode, mode[1].mode); break;
+			case 0x6: util::stream_format(stream, "MOVZ%cD  %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x7: util::stream_format(stream, "MOVX%cD  %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x8: util::stream_format(stream, "MUL%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0x9: util::stream_format(stream, "MEI%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xb: util::stream_format(stream, "DEI%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xc: util::stream_format(stream, "QUO%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xd: util::stream_format(stream, "REM%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xe: util::stream_format(stream, "MOD%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 0xf: util::stream_format(stream, "DIV%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			default: bytes = 1; break;
+			}
+		}
+		break;
 	case 0x2e:
 	case 0x6e:
 	case 0xae:
-	case 0xee: return 8;
-	case 0x3e: return 9;
-	case 0x7e: return 10;
-	case 0xbe: return 11;
-	case 0xfe: return 12;
-	case 0x9e: return 13;
-	case 0x1e: return 14;
-	case 0x5e: return 16;
-	case 0xde: return 17;
-	case 0x8e: return 18;
-	}
-
-	return 99; /* unknown format */
-}
-
-inline std::string ns32000_disassembler::get_option_list(uint8_t cfg)
-{
-	std::string option_list;
-
-	option_list.append("[");
-	if (BIT(cfg, 0)) option_list.append("I,");
-	if (BIT(cfg, 1)) option_list.append("F,");
-	if (BIT(cfg, 2)) option_list.append("M,");
-	if (BIT(cfg, 3)) option_list.append("C,");
-	if (option_list.back() == ',') option_list.pop_back();
-	option_list.append("]");
-
-	return option_list;
-}
-
-inline std::string ns32000_disassembler::get_options(uint8_t opts)
-{
-	std::string options;
-
-	if ((opts & 0x02) == 0x02) options.append("B,");
-	if ((opts & 0x0c) == 0x04) options.append("W,");
-	if ((opts & 0x0c) == 0x0c) options.append("U,");
-	if (!options.empty()) options.pop_back();
-
-	return options;
-}
-
-inline int32_t ns32000_disassembler::get_disp(offs_t &pc, const data_buffer &opcodes)
-{
-	/* displacement can be upto 3 bytes */
-	uint32_t disp = swapendian_int32(opcodes.r32(pc));
-
-	switch ((disp >> 29) & 0x07)
-	{
-	case 0: case 1: /* 7 bit positive */
-		disp = (disp >> 24);
-		pc += 1;
-		break;
-
-	case 2: case 3: /* 7 bit negative */
-		disp = (disp >> 24) | 0xffffff80;
-		pc += 1;
-		break;
-
-	case 4: /* 14 bit positive */
-		disp = (disp >> 16) & 0x3fff;
-		pc += 2;
-		break;
-
-	case 5: /* 14 bit negative */
-		disp = (disp >> 16) | 0xffffc000;
-		pc += 2;
-		break;
-
-	case 6: /* 30 bit positive */
-		disp = disp & 0x3fffffff;
-		pc += 4;
-		break;
-
-	case 7: /* 30 bit negative */
-		pc += 4;
-		break;
-	}
-
-	return disp;
-}
-
-inline std::string ns32000_disassembler::format_disp(int32_t disp)
-{
-	if (disp >= -9 && disp <= 9)
-		return string_format("%d", disp);
-	else if (disp < 0)
-		return string_format("-0x%X", -disp);
-	else
-		return string_format("0x%X", disp);
-}
-
-inline std::string ns32000_disassembler::get_reg_list(offs_t &pc, const data_buffer &opcodes, bool reverse)
-{
-	std::string reg_list;
-
-	uint8_t byte = opcodes.r8(pc++);
-
-	reg_list.append("[");
-	for (int i = 0; i < 8; i++)
-	{
-		if (BIT(byte, i)) reg_list.append(R[reverse ? (~i & 7) : (i & 7)]).append(",");
-	}
-	if (reg_list.back() == ',') reg_list.pop_back();
-	reg_list.append("]");
-
-	return reg_list;
-}
-
-void ns32000_disassembler::stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, operand_class op_class, offs_t &pc, const data_buffer &opcodes, bool fpreg)
-{
-	uint8_t index_byte;
-	int32_t disp1, disp2;
-
-	switch (gen_addr)
-	{
-	case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-		/* Register */
-		if (op_class != operand_class::ADDRESS)
-			util::stream_format(stream, "%s", fpreg ? FP[gen_addr & 0x07] : R[gen_addr & 0x07]);
-		else
-			util::stream_format(stream, "(invalid)");
-		break;
-	case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-		/* Register Relative */
-		disp1 = get_disp(pc, opcodes);
-		util::stream_format(stream, "%s(%s)", format_disp(disp1), R[gen_addr & 0x07]);
-		break;
-	case 0x10: case 0x11: case 0x12:
-		/* Memory Relative */
-		disp1 = get_disp(pc, opcodes);
-		disp2 = get_disp(pc, opcodes);
-		util::stream_format(stream, "%s(%s(%s))", format_disp(disp2), format_disp(disp1), M[gen_addr & 0x03]);
-		break;
-	case 0x13:
-		/* Reserved */
-		util::stream_format(stream, "(reserved)");
-		break;
-	case 0x14:
-		/* Immediate */
-		if (op_class == operand_class::SOURCE || op_class == operand_class::BITPOS)
+	case 0xee:
+		// format 8: xxxx xyyy yyrr roii oo10 1110
 		{
-			int64_t imm;
-			if (op_len == 0)
-				imm = int8_t(opcodes.r8(pc));
-			else if (op_len == 1)
-				imm = int16_t(swapendian_int16(opcodes.r16(pc)));
-			else if (op_len == 3)
-				imm = int32_t(swapendian_int32(opcodes.r32(pc)));
-			else
-				imm = int64_t(swapendian_int64(opcodes.r64(pc)));
-			if (op_class == operand_class::BITPOS)
-				util::stream_format(stream, "$%d", imm);
-			else if (op_len == 0)
-				util::stream_format(stream, "$0x%02X", uint8_t(imm));
-			else if (op_len == 1)
-				util::stream_format(stream, "$0x%04X", uint16_t(imm));
-			else if (op_len == 3)
-				util::stream_format(stream, "$0x%08X", uint32_t(imm));
-			else if (op_len == 7)
-				util::stream_format(stream, "$0x%016X", imm);
-			pc += op_len + 1;
-		}
-		else
-			util::stream_format(stream, "(invalid)");
-		break;
-	case 0x15:
-		/* Absolute */
-		disp1 = get_disp(pc, opcodes);
-		util::stream_format(stream, "@0x%06X", disp1 & 0xffffff);
-		break;
-	case 0x16:
-		/* External */
-		disp1 = get_disp(pc, opcodes);
-		disp2 = get_disp(pc, opcodes);
-		if (disp2)
-			util::stream_format(stream, "EXT(%d)+%d", disp1, disp2);
-		else
-			util::stream_format(stream, "EXT(%d)", disp1);
-		break;
-	case 0x17:
-		/* Top Of Stack */
-		util::stream_format(stream, "TOS");
-		break;
-	case 0x18: case 0x19: case 0x1a:
-		/* Memory Space */
-		disp1 = get_disp(pc, opcodes);
-		util::stream_format(stream, "%s(%s)", format_disp(disp1), M[gen_addr & 0x03]);
-		break;
-	case 0x1b:
-		/* Memory Space */
-		disp1 = get_disp(pc, opcodes);
-		util::stream_format(stream, "0x%06X", m_base_pc + disp1);
-		break;
-	case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-		/* Scaled Index */
-		if (op_class != operand_class::SCALED_INDEX)
-		{
-			index_byte = opcodes.r8(pc++);
-			stream_gen(stream, index_byte >> 3, op_len, operand_class::SCALED_INDEX, pc, opcodes);
-			util::stream_format(stream, "[%s:%c]", R[index_byte & 0x07], indexSize[gen_addr & 0x03]);
-		}
-		else
-			util::stream_format(stream, "(invalid)");
-		break;
-	}
-}
+			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
 
-offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
-{
-	uint32_t flags = SUPPORTED;
+			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+			unsigned const reg = BIT(opword, 3, 3);
+			size_code const size = size_code(opword & 3);
 
-	uint32_t opcode;
-	std::string mnemonic;
-	uint8_t temp8;
+			mode[0].size_i(size);
+			mode[1].size_i(size);
+			decode(mode, pc, opcodes, bytes);
 
-	/* opcode can be upto 3 bytes */
-	opcode = opcodes.r32(pc);
-	m_base_pc = pc;
-
-	switch (opcode_format(opcode))
-	{
-	case 0: /* Format 0 */
-		pc += 1;
-		util::stream_format(stream, "%-8s 0x%06X", std::string("B").append(cond[Format0cond(opcode)]), m_base_pc + get_disp(pc, opcodes));
-		break;
-
-	case 0x01: /* Format 1 */
-		pc += 1;
-		switch (Format1op(opcode))
-		{
-		case 0x00:
-			util::stream_format(stream, "%-8s 0x%06X", Format1[Format1op(opcode)], m_base_pc + get_disp(pc, opcodes));
-			flags |= STEP_OVER;
-			break;
-		case 0x01: case 0x03: case 0x04:
-			util::stream_format(stream, "%-8s %s", Format1[Format1op(opcode)], format_disp(get_disp(pc, opcodes)));
-			flags |= STEP_OUT;
-			break;
-		case 0x02:
-			util::stream_format(stream, "%-8s EXT(%d)", Format1[Format1op(opcode)], get_disp(pc, opcodes));
-			flags |= STEP_OVER;
-			break;
-		case 0x05:
-			util::stream_format(stream, "%-8s", Format1[Format1op(opcode)]);
-			flags |= STEP_OUT;
-			break;
-		case 0x06:
-			util::stream_format(stream, "%-8s %s", Format1[Format1op(opcode)], get_reg_list(pc, opcodes, false));
-			break;
-		case 0x07: case 0x09:
-			util::stream_format(stream, "%-8s %s", Format1[Format1op(opcode)], get_reg_list(pc, opcodes, true));
-			break;
-		case 0x08:
-			util::stream_format(stream, "%-8s %s, ", Format1[Format1op(opcode)], get_reg_list(pc, opcodes, false));
-			util::stream_format(stream, "%s", format_disp(get_disp(pc, opcodes)));
-			break;
-		case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			util::stream_format(stream, "%-8s", Format1[Format1op(opcode)]);
-			break;
+			switch ((opword & 4) | BIT(opbyte, 6, 2))
+			{
+			case 0: util::stream_format(stream, "EXT%c    R%d, %s, %s, %d", size_char[size], reg, mode[0].mode, mode[1].mode, displacement(pc, opcodes, bytes)); break;
+			case 1: util::stream_format(stream, "CVTP    R%d, %s, %s", reg, mode[0].mode, mode[1].mode); break;
+			case 2: util::stream_format(stream, "INS%c    R%d, %s, %s, %d", size_char[size], reg, mode[0].mode, mode[1].mode, displacement(pc, opcodes, bytes)); break;
+			case 3: util::stream_format(stream, "CHECK%c  R%d, %s, %s", size_char[size], reg, mode[0].mode, mode[1].mode); break;
+			case 4: util::stream_format(stream, "INDEX%c  R%d, %s, %s", size_char[size], reg, mode[0].mode, mode[1].mode); break;
+			case 5: util::stream_format(stream, "FFS%c    %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
+			case 6:
+				if (reg == 1)
+					util::stream_format(stream, "MOVSU%c  %s, %s", size_char[size], mode[0].mode, mode[1].mode);
+				else if (reg == 3)
+					util::stream_format(stream, "MOVUS%c  %s, %s", size_char[size], mode[0].mode, mode[1].mode);
+				else
+					bytes = 1;
+				break;
+			default: bytes = 1; break;
+			}
 		}
 		break;
-
-	case 0x02: /* Format 2 */
-		pc += 2;
-		mnemonic = mnemonic_index(Format2[Format2op(opcode)], iType[Format2i(opcode)], "");
-		switch (Format2op(opcode))
+	case 0x3e:
+		// format 9: xxxx xyyy yyoo ofii 0011 1110
 		{
-		case 0x00: case 0x01: case 0x05:
-			util::stream_format(stream, "%-8s $%d, ", mnemonic, short2int(Format2short(opcode)));
-			if (Format2op(opcode) == 0x01)
-				stream_gen(stream, Format2gen(opcode), Format2i(opcode), operand_class::SOURCE, pc, opcodes);
-			else
-				stream_gen(stream, Format2gen(opcode), Format2i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		case 0x02: case 0x06:
-			util::stream_format(stream, "%-8s %s, ", mnemonic, areg[Format2short(opcode)]);
-			if (Format2op(opcode) == 0x06)
-				stream_gen(stream, Format2gen(opcode), Format2i(opcode), operand_class::SOURCE, pc, opcodes);
-			else
-				stream_gen(stream, Format2gen(opcode), Format2i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		case 0x03:
-			util::stream_format(stream, "%-8s ", std::string("S").append(cond[Format2short(opcode)]).append(iType[Format2i(opcode)]));
-			stream_gen(stream, Format2gen(opcode), Format2i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		case 0x04:
-			util::stream_format(stream, "%-8s %d, ", mnemonic, short2int(Format2short(opcode)));
-			stream_gen(stream, Format2gen(opcode), Format2i(opcode), operand_class::DESTINATION, pc, opcodes);
-			util::stream_format(stream, ", 0x%06X", m_base_pc + get_disp(pc, opcodes));
-			break;
+			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
+
+			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+			size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
+			size_code const size = size_code(opword & 3);
+
+			switch (BIT(opword, 3, 3))
+			{
+			case 0:
+				// MOVif src,dst
+				//       gen,gen
+				//       read.i,write.f
+				mode[0].size_i(size);
+				mode[1].size_f(size_f);
+				decode(mode, pc, opcodes, bytes);
+				util::stream_format(stream, "MOV%c%c   %s, %s", size_char[size], BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode);
+				break;
+			case 1:
+				// LFSR src
+				//      gen
+				//      read.D
+				mode[0].size_i(size);
+				decode(mode, pc, opcodes, bytes);
+				util::stream_format(stream, "LFSR    %s", mode[0].mode);
+				break;
+			case 2:
+				// MOVLF src,dst
+				//       gen,gen
+				//       read.L,write.F
+				mode[0].size_f(SIZE_Q);
+				mode[1].size_f(size_f);
+				decode(mode, pc, opcodes, bytes);
+				util::stream_format(stream, "MOVLF   %s, %s", mode[0].mode, mode[1].mode);
+				break;
+			case 3:
+				// MOVFL src,dst
+				//       gen,gen
+				//       read.F,write.L
+				mode[0].size_f(SIZE_D);
+				mode[1].size_f(size_f);
+				decode(mode, pc, opcodes, bytes);
+				util::stream_format(stream, "MOVFL   %s, %s", mode[0].mode, mode[1].mode);
+				break;
+			case 4:
+				// ROUNDfi src,dst
+				//         gen,gen
+				//         read.f,write.i
+				mode[0].size_f(size_f);
+				mode[1].size_i(size);
+				decode(mode, pc, opcodes, bytes);
+				util::stream_format(stream, "ROUND%c%c %s, %s", BIT(opword, 0) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
+				break;
+			case 5:
+				// TRUNCfi src,dst
+				//         gen,gen
+				//         read.f,write.i
+				mode[0].size_f(size_f);
+				mode[1].size_i(size);
+				decode(mode, pc, opcodes, bytes);
+				util::stream_format(stream, "TRUNC%c%c %s, %s", BIT(opword, 0) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
+				break;
+			case 6:
+				// SFSR dst
+				//      gen
+				//      write.D
+				mode[0].size_i(size);
+				decode(mode, pc, opcodes, bytes);
+				util::stream_format(stream, "SFSR    %s", mode[0].mode);
+				break;
+			case 7:
+				// FLOORfi src,dst
+				//         gen,gen
+				//         read.f,write.i
+				mode[0].size_f(size_f);
+				mode[1].size_i(size);
+				decode(mode, pc, opcodes, bytes);
+				util::stream_format(stream, "FLOOR%c%c %s, %s", BIT(opword, 0) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
+				break;
+			}
 		}
 		break;
-
-	case 0x03: /* Format 3 */
-		pc += 2;
-		mnemonic = mnemonic_index(Format3[Format3op(opcode)], iType[Format3i(opcode)], "");
-		switch (Format3op(opcode))
+	case 0x7e: // format 10
+		bytes = 1;
+		break;
+	case 0xbe:
+		// format 11: xxxx xyyy yyoo oo0f 1011 1110
 		{
-		case 0x00: case 0x02: case 0x04: case 0x06: case 0x0a: case 0x0c: case 0x0e:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format3gen(opcode), Format3i(opcode), operand_class::SOURCE, pc, opcodes);
-			if (Format3op(opcode) == 0x00 || Format3op(opcode) == 0x0c)
-				flags |= STEP_OVER;
-			break;
-		default: /* Trap */
-			util::stream_format(stream, "%-8s ", mnemonic);
-			break;
+			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
+
+			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+			size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
+
+			mode[0].size_f(size_f);
+			mode[1].size_f(size_f);
+			decode(mode, pc, opcodes, bytes);
+
+			switch (BIT(opword, 2, 4))
+			{
+			case 0x0: util::stream_format(stream, "ADD%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0x1: util::stream_format(stream, "MOV%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0x2: util::stream_format(stream, "CMP%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0x4: util::stream_format(stream, "SUB%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0x5: util::stream_format(stream, "NEG%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0x8: util::stream_format(stream, "DIV%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0xc: util::stream_format(stream, "MUL%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0xd: util::stream_format(stream, "ABS%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			default: bytes = 1; break;
+			}
 		}
 		break;
-
-	case 0x04: /* Format 4 */
-		pc += 2;
-		mnemonic = mnemonic_index(Format4[Format4op(opcode)], iType[Format4i(opcode)], "");
-		util::stream_format(stream, "%-8s ", mnemonic);
-		if (Format4op(opcode) == 0x09)
-			stream_gen(stream, Format4gen1(opcode), Format4i(opcode), operand_class::ADDRESS, pc, opcodes);
-		else if (Format4op(opcode) == 0x0d)
-			stream_gen(stream, Format4gen1(opcode), Format4i(opcode), operand_class::BITPOS, pc, opcodes);
-		else
-			stream_gen(stream, Format4gen1(opcode), Format4i(opcode), operand_class::SOURCE, pc, opcodes);
-		util::stream_format(stream, ", ");
-		if (Format4op(opcode) == 0x01 || Format4op(opcode) == 0x0d)
-			stream_gen(stream, Format4gen2(opcode), Format4i(opcode), operand_class::SOURCE, pc, opcodes);
-		else
-			stream_gen(stream, Format4gen2(opcode), Format4i(opcode), operand_class::DESTINATION, pc, opcodes);
+	case 0xfe: // format 12
+	case 0x9e: // format 13
+		bytes = 1;
 		break;
-
-	case 0x05: /* Format 5 */
-		pc += 3;
-		mnemonic = mnemonic_index(Format5[Format5op(opcode)], iType[Format5i(opcode)], "");
-		switch ((opcode >> 10) & 0x0f)
+	case 0x1e:
+		// format 14: xxxx xsss s0oo ooii 0001 1110
 		{
-		case 0x00: case 0x01: case 0x03:
-			if (Format5short(opcode) & 0x01)
-				util::stream_format(stream, "%-8s %s", std::string(Format5[Format5op(opcode)]).append("T"), get_options(Format5short(opcode)));
-			else
-				util::stream_format(stream, "%-8s %s", mnemonic, get_options(Format5short(opcode)));
-			break;
-		case 0x02:
-			util::stream_format(stream, "%-8s %s", Format5[Format5op(opcode)], get_option_list(Format5short(opcode)));
-			break;
-		default: /* Trap */
-			util::stream_format(stream, "%-8s ", mnemonic);
-			break;
+			char const *const mmureg[] = { "BPR0", "BPR1", "", "", "", "", "", "", "", "", "MSR", "BCNT", "PTB0", "PTB1", "", "EIA" };
+
+			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
+
+			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(0x13) };
+
+			unsigned const quick = BIT(opword, 7, 4);
+			size_code const size = size_code(opword & 3);
+
+			mode[0].size_i(size);
+			decode(mode, pc, opcodes, bytes);
+
+			switch (BIT(opword, 2, 4))
+			{
+			case 0: util::stream_format(stream, "RDVAL   %s", mode[0].mode); break;
+			case 1: util::stream_format(stream, "WRVAL   %s", mode[0].mode); break;
+			case 2: util::stream_format(stream, "LMR     %s, %s", mmureg[quick], mode[0].mode); break;
+			case 3: util::stream_format(stream, "SMR     %s, %s", mmureg[quick], mode[0].mode); break;
+			default: bytes = 1; break;
+			}
 		}
 		break;
-
-	case 0x06: /* Format 6 */
-		pc += 3;
-		mnemonic = mnemonic_index(Format6[Format6op(opcode)], iType[Format6i(opcode)], "");
-		switch ((opcode >> 10) & 0x0f)
-		{
-		case 0x00: case 0x01: case 0x05:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format6gen1(opcode), B, operand_class::BITPOS, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format6gen2(opcode), Format6i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		case 0x02: case 0x03: case 0x06: case 0x07: case 0x0e:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format6gen1(opcode), Format6i(opcode), operand_class::BITPOS, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format6gen2(opcode), Format6i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		case 0x08: case 0x09: case 0x0b: case 0x0c: case 0x0d: case 0x0f:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format6gen1(opcode), Format6i(opcode), operand_class::SOURCE, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format6gen2(opcode), Format6i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		default: /* Trap */
-			util::stream_format(stream, "%-8s ", mnemonic);
-			break;
-		}
-		break;
-
-	case 0x07: /* Format 7 */
-		pc += 3;
-		mnemonic = mnemonic_index(Format7[Format7op(opcode)], iType[Format7i(opcode)], "");
-		switch (Format7op(opcode))
-		{
-		case 0x00: case 0x01:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format7gen1(opcode), Format7i(opcode), operand_class::SOURCE, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format7gen2(opcode), Format7i(opcode), operand_class::DESTINATION, pc, opcodes);
-			util::stream_format(stream, ", %d", get_disp(pc, opcodes) / (Format7i(opcode) + 1) + 1);
-			break;
-		case 0x02: case 0x03:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format7gen1(opcode), Format7i(opcode), operand_class::SOURCE, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format7gen2(opcode), Format7i(opcode), operand_class::DESTINATION, pc, opcodes);
-			temp8 = opcodes.r8(pc++);
-			util::stream_format(stream, ", %d, %d", temp8 >> 5, temp8 + 1);
-			break;
-		case 0x04: case 0x05: case 0x06: case 0x07: case 0x08: case 0x09: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format7gen1(opcode), Format7i(opcode), operand_class::SOURCE, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format7gen2(opcode), Format7i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		default: /* Trap */
-			util::stream_format(stream, "%-8s ", mnemonic);
-			break;
-		}
-		break;
-
-	case 0x08: /* Format 8 */
-		pc += 3;
-		mnemonic = mnemonic_index(Format8[Format8op(opcode)], iType[Format8i(opcode)], "");
-		switch (Format8op(opcode))
-		{
-		case 0x00: case 0x02:
-			util::stream_format(stream, "%-8s %s, ", mnemonic, R[Format8reg(opcode)]);
-			stream_gen(stream, Format8gen2(opcode), Format8i(opcode), operand_class::SOURCE, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format8gen1(opcode), Format8i(opcode), operand_class::DESTINATION, pc, opcodes);
-			util::stream_format(stream, ", %d", get_disp(pc, opcodes));
-			break;
-		case 0x01: case 0x03: case 0x04:
-			util::stream_format(stream, "%-8s %s, ", mnemonic, R[Format8reg(opcode)]);
-			stream_gen(stream, Format8gen2(opcode), Format8i(opcode), operand_class::SOURCE, pc, opcodes);
-			util::stream_format(stream, ", ");
-			if (Format8op(opcode) == 0x01)
-				stream_gen(stream, Format8gen1(opcode), D, operand_class::ADDRESS, pc, opcodes);
-			else
-				stream_gen(stream, Format8gen1(opcode), Format8i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		case 0x05:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format8gen2(opcode), Format8i(opcode), operand_class::SOURCE, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format8gen1(opcode), B, operand_class::DESTINATION, pc, opcodes);
-			break;
-		case 0x06:
-			if (Format8reg(opcode) == 0x01)
-				util::stream_format(stream, "%-8s ", std::string(Format8[Format8op(opcode)]).append(iType[Format8i(opcode)]));
-			else
-				util::stream_format(stream, "%-8s ", std::string(Format8[Format8op(opcode) + 1]).append(iType[Format8i(opcode)]));
-			stream_gen(stream, Format8gen2(opcode), Format8i(opcode), operand_class::ADDRESS, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format8gen1(opcode), Format8i(opcode), operand_class::ADDRESS, pc, opcodes);
-			break;
-		default:
-			util::stream_format(stream, "unknown instruction");
-			break;
-		}
-		break;
-
-	case 0x09: /* Format 9 */
-		pc += 3;
-		mnemonic = mnemonic_index(Format9[Format9op(opcode)], iType[Format9i(opcode)], fType[Format9f(opcode)]);
-		switch (Format9op(opcode))
-		{
-		case 0x00:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format9gen1(opcode), Format9i(opcode), operand_class::SOURCE, pc, opcodes);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format9gen2(opcode), Format9i(opcode), operand_class::DESTINATION, pc, opcodes, true);
-			break;
-		case 0x02: case 0x03:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format9gen1(opcode), Format9f(opcode) ? 7 : 3, operand_class::SOURCE, pc, opcodes, true);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format9gen2(opcode), Format9f(opcode) ? 3 : 7, operand_class::DESTINATION, pc, opcodes, true);
-			break;
-		case 0x04: case 0x05: case 0x07:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format9gen1(opcode), Format9f(opcode) ? 3 : 7, operand_class::SOURCE, pc, opcodes, true);
-			util::stream_format(stream, ", ");
-			stream_gen(stream, Format9gen2(opcode), Format9i(opcode), operand_class::DESTINATION, pc, opcodes);
-			break;
-		case 0x01: case 0x06:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			if (Format9op(opcode) == 0x06)
-				stream_gen(stream, Format9gen1(opcode), D, operand_class::DESTINATION, pc, opcodes);
-			else
-				stream_gen(stream, Format9gen1(opcode), D, operand_class::SOURCE, pc, opcodes);
-			break;
-		}
-		break;
-
-	case 0x0b: /* Format 11 */
-		pc += 3;
-		mnemonic = mnemonic_index(Format11[Format11op(opcode)], "", fType[Format11f(opcode)]);
-		switch (Format11op(opcode))
-		{
-		case 0x00: case 0x01: case 0x02: case 0x04: case 0x05 : case 0x08: case 0x0c : case 0x0d:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format11gen1(opcode), Format11f(opcode) ? 3 : 7, operand_class::SOURCE, pc, opcodes, true);
-			util::stream_format(stream, ",");
-			stream_gen(stream, Format11gen2(opcode), Format11f(opcode) ? 3 : 7, operand_class::DESTINATION, pc, opcodes, true);
-			break;
-		default: /* Trap */
-			util::stream_format(stream, "%-8s ", mnemonic);
-			break;
-		}
-		break;
-
-	case 0x0a: /* Format 10 */
-	case 0x0c: /* Format 12 */
-	case 0x0d: /* Format 13 */
-	case 0x10: /* Format 16 */
-	case 0x11: /* Format 17 */
-	case 0x12: /* Format 18 */
-	case 0x13: /* Format 19 */
-		pc += 1;
-		util::stream_format(stream, "Trap (UND)");
-		break;
-
-	case 0x0e: /* Format 14 */
-		pc += 3;
-		mnemonic = mnemonic_index(Format14[Format14op(opcode)], iType[Format14i(opcode)], "");
-		switch (Format14op(opcode))
-		{
-		case 0x00: case 0x01:
-			util::stream_format(stream, "%-8s ", mnemonic);
-			stream_gen(stream, Format14gen1(opcode), Format14i(opcode), operand_class::ADDRESS, pc, opcodes);
-			break;
-		case 0x02: case 0x03:
-			util::stream_format(stream, "%-8s %s, ", mnemonic, mreg[Format14short(opcode)]);
-			if (Format14op(opcode) == 0x03)
-				stream_gen(stream, Format14gen1(opcode), D, operand_class::DESTINATION, pc, opcodes);
-			else
-				stream_gen(stream, Format14gen1(opcode), D, operand_class::SOURCE, pc, opcodes);
-			break;
-		default: /* Trap */
-			util::stream_format(stream, "%-8s ", mnemonic);
-			break;
-		}
-		break;
-
+	case 0x16: // format 15.0
+	case 0x36: // format 15.1
+	case 0xb6: // format 15.5
+	case 0x5e: // format 16
+	case 0xde: // format 17
+	case 0x8e: // format 18
+	case 0x06:
+	case 0x26:
+	case 0x46:
+	case 0x66:
+	case 0x86:
+	case 0xa6:
+	case 0xc6:
+	case 0xe6:
+		// format 19
 	default:
-		pc += 1;
-		util::stream_format(stream, "unknown instruction format");
+		bytes = 1;
 		break;
 	}
 
-	return (pc - m_base_pc) | flags;
+	return bytes | flags;
 }

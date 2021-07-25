@@ -887,7 +887,8 @@ void cps3_state::init_crypt(u32 key1, u32 key2, int altEncryption)
 	}
 	else
 	{
-		m_user4 = auto_alloc_array(machine(), u8, USER4REGION_LENGTH);
+		m_user4_allocated = std::make_unique<u8[]>(USER4REGION_LENGTH);
+		m_user4 = m_user4_allocated.get();
 	}
 
 	if (m_user5_region)
@@ -896,7 +897,8 @@ void cps3_state::init_crypt(u32 key1, u32 key2, int altEncryption)
 	}
 	else
 	{
-		m_user5 = auto_alloc_array(machine(), u8, USER5REGION_LENGTH);
+		m_user5_allocated = std::make_unique<u8[]>(USER5REGION_LENGTH);
+		m_user5 = m_user5_allocated.get();
 	}
 
 	m_cps3sound->set_base((s8*)m_user5);

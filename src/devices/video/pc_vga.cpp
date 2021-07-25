@@ -36,11 +36,11 @@
     ROM declarations:
 
     (oti 037 chip)
-    ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, 0x318c5f43)
+    ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43) SHA1(2aeb6cf737fd87dfd08c9f5b5bc421fcdbab4ce9) )
     (tseng labs famous et4000 isa vga card (oem))
-    ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, 0xa903540d)
+    ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, CRC(a903540d) SHA1(unknown) )
     (tseng labs famous et4000 isa vga card)
-    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, 0xf01e4be0)
+    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5) )
 
 ***************************************************************************/
 

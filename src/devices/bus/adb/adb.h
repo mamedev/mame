@@ -62,8 +62,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
 	devcb_write_line m_adb_cb;
+
+private:
 	devcb_write_line m_poweron_cb;
 	bool m_adb_istate, m_adb_ostate;
 };

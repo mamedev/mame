@@ -1723,7 +1723,7 @@ static INPUT_PORTS_START( sf2049 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Music")
 	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, keypad_r)
 	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, gearshift_r)
-	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xf080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("GEAR")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear")
@@ -1924,7 +1924,8 @@ void vegas_state::vegascore(machine_config &config)
 	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 4);
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	M48T37(config, m_timekeeper);
 	m_timekeeper->reset_cb().set(FUNC(vegas_state::watchdog_reset));
@@ -1968,7 +1969,8 @@ void vegas_state::vegasban(machine_config &config)
 	vegas32m(config);
 	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 }
 
 
@@ -1982,7 +1984,8 @@ void vegas_state::vegasv3(machine_config &config)
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 }
 
 
@@ -1999,7 +2002,8 @@ void vegas_state::denver(machine_config &config)
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	// TL16C552 UART
 	NS16550(config, m_uart1, XTAL(1'843'200));
@@ -2158,7 +2162,7 @@ void vegas_state::nbagold(machine_config &config)
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	//m_ioasic->set_auto_ack(1)
-	 m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
+	m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
 }
 
 void vegas_state::sf2049(machine_config &config)
@@ -2232,7 +2236,7 @@ void vegas_state::cartfury(machine_config &config)
  *
  *************************************/
 
-	// there is a socket next to the main bios roms for updates, this is what the update region is.
+// there is a socket next to the main bios roms for updates, this is what the update region is.
 
 
 ROM_START( gauntleg )
@@ -2266,7 +2270,6 @@ ROM_START( gauntleg12 )
 	ROMX_LOAD("12to16.2.bin", 0x000000, 0x100000, CRC(15b1fe78) SHA1(532c4937b55befcc3a8cb25b0282d63e206fba47), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.2 to 1.6 Step 3 of 3" )
 	ROMX_LOAD("12to16.3.bin", 0x000000, 0x100000, CRC(1027e54f) SHA1(a841f5cc5b022ddfaf70c97a64d1582f0a2ca70e), ROM_BIOS(3))
-
 
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 1.4 10/22/1998 Main 10/23/1998

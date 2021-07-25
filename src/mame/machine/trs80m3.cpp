@@ -411,13 +411,25 @@ void trs80m3_state::port_ff_w(uint8_t data)
 /* Cassette port
     d1, d0 Cassette output */
 
-	if (!BIT(m_model4, 2))     // Model 4P has no cassette hardware
+	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+
+	// Model 4P has no cassette hardware, and only one bit for sound
+	if (BIT(m_model4, 2))
 	{
-		static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+		if (!(BIT(m_port_ec, 1)))
+			m_speaker->level_w(BIT(data, 0));
+	}
+	else
+	// Others have the same old unofficial sound via the cassette port
+	{
 		m_cassette->output(levels[data & 3]);
 		m_cassette_data &= ~0x80;
+		if (!(BIT(m_port_ec, 1)))
+		{
+			m_speaker->set_levels(4, levels);
+			m_speaker->level_w(data & 3);
+		}
 	}
-	m_speaker->level_w(!(BIT(data, 0)));
 }
 
 

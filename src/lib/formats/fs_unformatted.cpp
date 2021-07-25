@@ -6,6 +6,18 @@
 #include "emu.h"
 #include "fs_unformatted.h"
 
+const fs_unformatted FS_UNFORMATTED;
+
+const char *fs_unformatted::name() const
+{
+	return "unformatted";
+}
+
+const char *fs_unformatted::description() const
+{
+	return "Unformatted floppy image";
+}
+
 void fs_unformatted::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	bool all = form_factor == floppy_image::FF_UNKNOWN;
@@ -120,5 +132,3 @@ bool fs_unformatted::has_rsrc() const
 {
 	return false;
 }
-
-const filesystem_manager_type FS_UNFORMATTED = &filesystem_manager_creator<fs_unformatted>;

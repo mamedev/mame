@@ -189,11 +189,11 @@ public:
 		m_maincpu->space(0).install_write_tap(0x20cb10, 0x20cb10 + 0x122*0x22 - 1, "chan debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
 												   chan_write_tap(offset, data, mem_mask);
 											   });
-		if(1)
+		if(0)
 		m_maincpu->space(0).install_write_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
 												  voice_write_tap(offset, data, mem_mask);
 											   });
-		if(1)
+		if(0)
 		m_maincpu->space(0).install_read_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
 												  voice_read_tap(offset, data, mem_mask);
 											   });

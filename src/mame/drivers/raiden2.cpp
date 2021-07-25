@@ -175,8 +175,8 @@ Protection Notes:
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym3812.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "machine/r2crypt.h"
 
 #include "debugger.h"
@@ -3130,7 +3130,7 @@ GAME( 1993, raiden2i,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden
 
 // code rev with first ROM having checksum 2abc848c
 GAME( 1993, raiden2e,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easier, Korea)", MACHINE_SUPPORTS_SAVE ) // (Region 0x04) - Korea, if regions are the same as RDX, no license or region message tho
-GAME( 1993, raiden2eub,	raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easier, US set 3)", MACHINE_SUPPORTS_SAVE ) // (Region 0x01) - PRG0 is same as raiden2e, but PRG1 has region byte different than raiden2e, other ROMs match raiden2u
+GAME( 1993, raiden2eub, raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easier, US set 3)", MACHINE_SUPPORTS_SAVE ) // (Region 0x01) - PRG0 is same as raiden2e, but PRG1 has region byte different than raiden2e, other ROMs match raiden2u
 // code rev with first ROM having checksum ed1514e3 (using 4x program ROM configuration, not 2) would have crc 2abc848c in 2 ROM config, so same rev as above
 GAME( 1993, raiden2eua, raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easier, US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, raiden2eg,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (easier, Germany)", MACHINE_SUPPORTS_SAVE )

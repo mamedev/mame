@@ -555,6 +555,8 @@ end
 
 if CPUS["PDP8"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/pdp8/hd6120.cpp",
+		MAME_DIR .. "src/devices/cpu/pdp8/hd6120.h",
 		MAME_DIR .. "src/devices/cpu/pdp8/pdp8.cpp",
 		MAME_DIR .. "src/devices/cpu/pdp8/pdp8.h",
 	}
@@ -3216,8 +3218,8 @@ if CPUS["F2MC16"] then
 end
 
 if opt_tool(CPUS, "F2MC16") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16d.h")
 end
 
 --------------------------------------------------
@@ -3520,4 +3522,14 @@ end
 if opt_tool(CPUS, "MK1") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mk1/mk1dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mk1/mk1dasm.h")
+end
+
+--------------------------------------------------
+-- Motorola M68HC16 (CPU16) - Disassembler only
+--@src/devices/cpu/m68hc16/m68hc16.h,CPUS["M68HC16"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "M68HC16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.h")
 end

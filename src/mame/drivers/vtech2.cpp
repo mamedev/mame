@@ -92,6 +92,8 @@ void vtech2_state::mem_map(address_map &map)
 void vtech2_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0xff).noprw();
 	map(0x10, 0x1f).rw(FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
 	map(0x40, 0x40).lw8(NAME([this] (u8 data) { m_banka->set_bank(data & 15); }));
 	map(0x41, 0x41).lw8(NAME([this] (u8 data) { m_bankb->set_bank(data & 15); }));
@@ -493,8 +495,12 @@ void vtech2_state::laser350(machine_config &config)
 	m_cassette->set_formats(vtech2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("vtech2_cass");
 
-	VTECH_IOEXP_SLOT(config, "io").set_io_space(m_maincpu, AS_IO);
+	SOFTWARE_LIST(config, "cass_list").set_original("vtech2_cass");
+
+	VTECH_IOEXP_SLOT(config, m_ioexp);
+	m_ioexp->set_iospace(m_maincpu, AS_IO);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "vtech_cart", "rom,bin").set_device_load(FUNC(vtech2_state::cart_load));

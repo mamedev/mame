@@ -74,9 +74,9 @@ private:
 	void validate_rgb();
 	void validate_driver(device_t &root);
 	void validate_roms(device_t &root);
-	void validate_analog_input_field(ioport_field &field);
-	void validate_dip_settings(ioport_field &field);
-	void validate_condition(ioport_condition &condition, device_t &device);
+	void validate_analog_input_field(const ioport_field &field);
+	void validate_dip_settings(const ioport_field &field);
+	void validate_condition(const ioport_condition &condition, device_t &device);
 	void validate_inputs(device_t &root);
 	void validate_devices(machine_config &config);
 	void validate_device_types();
