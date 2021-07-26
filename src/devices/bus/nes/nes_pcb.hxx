@@ -237,6 +237,7 @@ static const nes_pcb pcb_list[] =
 	{ "caltron6in1",      CALTRON_6IN1 },
 	{ "rumblestation",    RUMBLESTATION_BOARD },     // mapper 46
 	{ "svision16",        SVISION16_BOARD },
+	{ "kn42",             UNL_KN42 },
 	{ "n625092",          UNL_N625092 },
 	{ "a65as",            BMC_A65AS },
 	{ "t262",             BMC_T262 },

@@ -352,6 +352,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("maxi15",           NES_MAXI15);        //  mapper 234
 	device.option_add_internal("rumblestation",    NES_RUMBLESTATION);    // mapper 46
 	device.option_add_internal("svision16",        NES_SVISION16);  // mapper 53
+	device.option_add_internal("kn42",             NES_KN42);
 	device.option_add_internal("n625092",          NES_N625092);
 	device.option_add_internal("a65as",            NES_A65AS);
 	device.option_add_internal("t262",             NES_T262);
