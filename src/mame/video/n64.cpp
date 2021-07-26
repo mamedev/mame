@@ -699,18 +699,18 @@ void n64_rdp::set_blender_input(int32_t cycle, int32_t which, color_t** input_rg
 
 uint8_t const n64_rdp::s_bayer_matrix[16] =
 { /* Bayer matrix */
-		0,  4,  1, 5,
-		6,  2,  7, 3,
-		1,   5,  0, 4,
-		7,  3,  6, 2
+	0, 4, 1, 5,
+	6, 2, 7, 3,
+	1, 5, 0, 4,
+	7, 3, 6, 2
 };
 
 uint8_t const n64_rdp::s_magic_matrix[16] =
 { /* Magic square matrix */
-		0,  6,  1, 7,
-		4,  2,  5, 3,
-		3,   5,  2, 4,
-		7,  1,  6, 0
+	0, 4, 3, 7,
+	6, 2, 5, 1,
+	1, 5, 2, 6,
+	7, 3, 4, 0
 };
 
 z_decompress_entry_t const n64_rdp::m_z_dec_table[8] =
