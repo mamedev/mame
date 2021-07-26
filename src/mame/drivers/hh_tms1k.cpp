@@ -7,7 +7,7 @@ This driver is a collection of simple dedicated handheld and tabletop
 toys based around the TMS1000 MCU series. Anything more complex or clearly
 part of a series is (or will be) in its own driver, see:
 - eva: Chrysler EVA-11 (and EVA-24)
-- microvsn: Milton Bradley MicroVision
+- microvsn: Milton Bradley Microvision
 - sag: Entex Select-A-Game Machine
 
 (contd.) hh_tms1k child drivers:
@@ -92,28 +92,28 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3435   TMS1100   1979, Coleco Zodiac
  @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
-  MP3450A  TMS1100   1979, MicroVision cartridge: Block Buster
-  MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike
-  MP3455   TMS1100   1980, MicroVision cartridge: Pinball
-  MP3457   TMS1100   1979, MicroVision cartridge: Mindbuster
+  MP3450A  TMS1100   1979, Microvision cartridge: Block Buster
+  MP3454   TMS1100   1979, Microvision cartridge: Star Trek Phaser Strike
+  MP3455   TMS1100   1980, Microvision cartridge: Pinball
+  MP3457   TMS1100   1979, Microvision cartridge: Mindbuster
  @MP3460   TMS1100   1979, Coleco Head to Head: Electronic Football
-  MP3474   TMS1100   1979, MicroVision cartridge: Vegas Slots
-  MP3475   TMS1100   1979, MicroVision cartridge: Bowling
+  MP3474   TMS1100   1979, Microvision cartridge: Vegas Slots
+  MP3475   TMS1100   1979, Microvision cartridge: Bowling
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
-  MP3479   TMS1100   1980, MicroVision cartridge: Baseball
-  MP3481   TMS1100   1979, MicroVision cartridge: Connect Four
+  MP3479   TMS1100   1980, Microvision cartridge: Baseball
+  MP3481   TMS1100   1979, Microvision cartridge: Connect Four
  *MP3489   TMS1100   1980, Kenner Live Action Football
  @MP3491   TMS1100   1979, Mattel Thoroughbred Horse Race Analyzer
  *MP3493   TMS1100   1980, Milton Bradley OMNI Entertainment System (1/2)
  *MP3494   TMS1100   1980, Milton Bradley OMNI Entertainment System (2/2)
-  MP3496   TMS1100   1980, MicroVision cartridge: Sea Duel
-  M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
+  MP3496   TMS1100   1980, Microvision cartridge: Sea Duel
+  M34009   TMS1100   1981, Microvision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
-  M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
+  M34017   TMS1100   1981, Microvision cartridge: Cosmic Hunter
  @M34018   TMS1100   1981, Coleco Head to Head: Electronic Boxing
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
-  M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
+  M34047   TMS1100   1982, Microvision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
  *M34137   TMS1100?  1985, Technasonic Weight Talker
  @MP4486A  TMS1000C  1983, Vulcan XL 25
