@@ -24,11 +24,13 @@ public:
 	auto centronics_perror() { return m_write_centronics_perror.bind(); }
 	auto centronics_fault() { return m_write_centronics_fault.bind(); }
 	auto centronics_select() { return m_write_centronics_select.bind(); }
+	auto cpu_reset() { return m_write_cpu_reset.bind(); }
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
 
 	/* Centronics stuff */
+	DECLARE_WRITE_LINE_MEMBER( centronics_input_init );
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_strobe );
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_data0 ) { if (state) m_centronics_data |= 0x01; else m_centronics_data &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_data1 ) { if (state) m_centronics_data |= 0x02; else m_centronics_data &= ~0x02; }
@@ -57,6 +59,7 @@ private:
 	devcb_write_line m_write_centronics_perror;
 	devcb_write_line m_write_centronics_fault;
 	devcb_write_line m_write_centronics_select;
+	devcb_write_line m_write_cpu_reset;
 
 	void update_printhead(int pos, uint8_t data);
 	void update_pf_stepper(uint8_t data);
@@ -73,10 +76,12 @@ private:
 	uint8_t m_centronics_data;
 	int m_centronics_busy;
 	int m_centronics_nack;
+	uint8_t m_centronics_init;
 	uint8_t m_centronics_strobe;
 	uint8_t m_centronics_data_latch;
 	uint8_t m_centronics_data_latched;
 	uint32_t m_c000_shift_register;
+
 };
 
 DECLARE_DEVICE_TYPE(E05A30, e05a30_device)

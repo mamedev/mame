@@ -29,9 +29,10 @@ e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, dev
 	m_write_centronics_perror(*this),
 	m_write_centronics_fault(*this),
 	m_write_centronics_select(*this),
+	m_write_cpu_reset(*this),
 	m_printhead(0),
 	m_pf_stepper(0),
-	m_cr_stepper(0), m_centronics_data(0), m_centronics_busy(0), m_centronics_nack(0), m_centronics_strobe(0), m_centronics_data_latch(0), m_centronics_data_latched(0)
+	m_cr_stepper(0), m_centronics_data(0), m_centronics_busy(0), m_centronics_nack(0), m_centronics_init(1), m_centronics_strobe(0), m_centronics_data_latch(0), m_centronics_data_latched(0)
 {
 }
 
@@ -51,6 +52,7 @@ void e05a30_device::device_start()
 	m_write_centronics_perror.resolve_safe();
 	m_write_centronics_fault.resolve_safe();
 	m_write_centronics_select.resolve_safe();
+	m_write_cpu_reset.resolve_safe();
 
 	/* register for state saving */
 	save_item(NAME(m_printhead));
@@ -156,6 +158,18 @@ WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 	}
 
 	m_centronics_strobe = state;
+}
+
+
+WRITE_LINE_MEMBER( e05a30_device::centronics_input_init )
+{
+	if (m_centronics_init == 1 && state == 0) // when init goes low, do a reset cycle
+	{
+		m_write_cpu_reset(0);
+		m_write_cpu_reset(1);
+		device_reset(); // this will trigger an NMI after 0.9 seconds
+	}
+	m_centronics_init = state;
 }
 
 
