@@ -322,7 +322,7 @@ private:
 	inline void doCMP_8(u8 lhs, u8 rhs)
 	{
 		u16 tmp16 = lhs - rhs;
-		setNZ_16(tmp16 & 0xff);
+		setNZ_8(tmp16 & 0xff);
 		m_ps &= ~(F_C|F_V);
 		if (tmp16 & 0x100)
 		{
@@ -365,7 +365,7 @@ private:
 	inline u8 doSUB_8(u8 lhs, u8 rhs)
 	{
 		u16 tmp16 = lhs - rhs;
-		setNZ_16(tmp16 & 0xff);
+		setNZ_8(tmp16 & 0xff);
 		m_ps &= ~(F_C|F_V);
 		if (tmp16 & 0x100)
 		{
@@ -376,7 +376,7 @@ private:
 			m_ps |= F_V;
 		}
 
-		return m_tmp16 & 0xff;
+		return tmp16 & 0xff;
 	}
 	inline u16 doSUB_16(u16 lhs, u16 rhs)
 	{
