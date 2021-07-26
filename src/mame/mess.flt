@@ -88,6 +88,7 @@ argox.cpp
 asst128.cpp
 astrohome.cpp
 at.cpp
+at386sx.cpp
 at386.cpp
 at486.cpp
 atari400.cpp

@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, Miodrag Milanovic
 /***************************************************************************
 
-IBM AT compatibles using a 386 class CPU
+IBM AT compatibles using a 386DX class CPU
 split from at.cpp
 
 ***************************************************************************/
@@ -87,11 +87,10 @@ void at386_state::at386l_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
 }
 
+
 /**********************************************************
- *
- * Init functions
- *
- **********************************************************/
+ Init functions
+**********************************************************/
 
 void at386_state::init_at386_common(int xmsbase)
 {
@@ -112,11 +111,10 @@ void at386_state::init_at386()
 	init_at386_common(0xa0000);
 }
 
+
 /**********************************************************
- *
- * Machine configurations
- *
- **********************************************************/
+ Machine configurations
+**********************************************************/
 
 void at386_state::at386(machine_config &config)
 {
@@ -210,7 +208,7 @@ void at386_state::pg750(machine_config &config)
 	rtc.set_century_index(0x32);
 
 	// on-board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true); // .set_option_machine_config("fdc", cfg_dual_1440K); // FIXME: deteremine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true); // FIXME: deteremine ISA bus clock
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
 	// ISA cards

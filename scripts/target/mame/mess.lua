@@ -1874,6 +1874,7 @@ files {
 createMESSProjects(_target, _subtarget, "at")
 files {
 	MAME_DIR .. "src/mame/drivers/at.cpp",
+	MAME_DIR .. "src/mame/drivers/at386sx.cpp",
 	MAME_DIR .. "src/mame/drivers/at386.cpp",
 	MAME_DIR .. "src/mame/drivers/at486.cpp",
 	MAME_DIR .. "src/mame/drivers/atpci.cpp",

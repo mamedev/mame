@@ -2634,6 +2634,8 @@ td70a                           // TD70A and TD70AN motherboards (386sx)
 td70n                           // TD70N motherboard (386sx)
 tower386sx                      // Schneider 386SX System 40 (386sx, VGA)
 walk386sx                       // 1992 Triumph-Adler Walkstation 386 SX
+
+@source: at386sx.cpp
 zeos386sx                       // ZEOS 386 SX-16
 
 @source:at386.cpp

@@ -106,11 +106,10 @@ void at486_state::at486l_map(address_map &map)
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0x20000);
 }
 
+
 /**********************************************************
- *
- * Init functions
- *
- **********************************************************/
+ Init functions
+**********************************************************/
 
 void at486_state::init_at486_common(int xmsbase)
 {
@@ -141,11 +140,10 @@ static void pci_devices(device_slot_interface &device)
 	device.option_add_internal("vt82c505", VT82C505);
 }
 
+
 /**********************************************************
- *
- * Machine configurations
- *
- **********************************************************/
+ Machine configurations
+**********************************************************/
 
 void at486_state::at486(machine_config &config)
 {
