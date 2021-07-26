@@ -12558,6 +12558,9 @@ dpb7000                         //
 @source:dps1.cpp
 dps1                            //
 
+@source:dpsv55.cpp
+dpsv55                          //
+
 @source:dragon.cpp
 d64plus                         // Dragon 64 + Compusense Plus addon
 dgnalpha                        // Dragon Alpha
