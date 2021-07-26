@@ -998,14 +998,14 @@ void n64_periphs::vi_recalculate_resolution()
 	int x_end = vi_hstart & 0x000003ff;
 	int y_start = ((vi_vstart & 0x03ff0000) >> 16) >> 1;
 	int y_end = (vi_vstart & 0x000003ff) >> 1;
-	int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
-	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
+	int width = x_end - x_start;
+	int height = y_end - y_start;
 
 	rectangle visarea = screen().visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
 	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
 
-	if (width == 0 || height == 0 || (vi_control & 3) == 0)
+	if (width <= 0 || height <= 0 || (vi_control & 3) == 0)
 	{
 		vi_blank = 1;
 		/*
@@ -1115,12 +1115,15 @@ void n64_periphs::vi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 
 		case 0x08/4:        // VI_WIDTH_REG
-			if (vi_width != data && data > 0)
 			{
-				vi_recalculate_resolution();
+				uint32_t old_width = vi_width;
+				vi_width = data;
+				if (old_width != data && data > 0)
+				{
+					vi_recalculate_resolution();
+				}
+				break;
 			}
-			vi_width = data;
-			break;
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
