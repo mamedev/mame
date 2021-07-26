@@ -5,6 +5,7 @@
     C-bus slot interface for PC-98xx family
 
     a.k.a. NEC version of the ISA bus.
+	C-bus -> Card Bus
 
     TODO:
     - stub interface, checkout what actually belongs here.

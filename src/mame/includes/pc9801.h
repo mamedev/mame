@@ -81,8 +81,8 @@
 class pc98_base_state : public driver_device
 {
 public:
-	pc98_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	pc98_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
@@ -117,8 +117,8 @@ protected:
 class pc9801_state : public pc98_base_state
 {
 public:
-	pc9801_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc98_base_state(mconfig, type, tag)
+	pc9801_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dmac(*this, "i8237")
 		, m_pit(*this, "pit")
@@ -156,10 +156,15 @@ public:
 	void pc9821(machine_config &config);
 	void pc9821as(machine_config &config);
 	void pc9821ap2(machine_config &config);
+	void pc9821cx3(machine_config &config);
 	void pc9821xa16(machine_config &config);
 	void pc9821ra20(machine_config &config);
+	void pc9821ra266(machine_config &config);
 	void pc9821ra333(machine_config &config);
 	void pc9821v20(machine_config &config);
+	
+	void pc9821nr15(machine_config &config);
+	void pc9821nr166(machine_config &config);
 
 	void pc386m(machine_config &config);
 	void pc486mu(machine_config &config);
@@ -468,8 +473,8 @@ private:
 class pc98lt_state : public pc98_base_state
 {
 public:
-	pc98lt_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc98_base_state(mconfig, type, tag)
+	pc98lt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_fdc(*this, "upd765")
 		, m_gvram(*this, "gvram")
@@ -521,8 +526,8 @@ private:
 class pc98ha_state : public pc98lt_state
 {
 public:
-	pc98ha_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc98lt_state(mconfig, type, tag)
+	pc98ha_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc98lt_state(mconfig, type, tag)
 		, m_ems_banks(*this, "ems_bank%u", 1U)
 		, m_ext_view(*this, "ext_io")
 		, m_ramdrv_bank(*this, "ramdrv_bank")

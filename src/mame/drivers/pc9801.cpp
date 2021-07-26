@@ -54,8 +54,13 @@
     TODO: (PC-9821AP)
     - No way to exit the initial loop. Code looks broken, bad dump?
 
-    TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra333)
-    - "MICON ERROR" at POST (generic HW fault, PCI?);
+    TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333)
+    - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
+	  involved bankswitch);
+
+	TODO: (PC-9821Nr166)
+	- Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
+	- Eventually dies with a "MEMORY ERROR" (never reads extended memory);
 
 ===================================================================================================
 
@@ -2547,6 +2552,16 @@ void pc9801_state::pc9821ap2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9821ap2)
 }
 
+void pc9801_state::pc9821cx3(machine_config &config)
+{
+	pc9821(config);
+	const double xtal = 100000000;
+	PENTIUM(config.replace(), m_maincpu, xtal);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+}
+
 void pc9801_state::pc9821v20(machine_config &config)
 {
 	pc9821(config);
@@ -2574,6 +2589,22 @@ void pc9801_state::pc9821ra20(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
 
+void pc9801_state::pc9821ra266(machine_config &config)
+{
+	pc9821(config);
+	const double xtal = 266000000;
+	PENTIUM2(config.replace(), m_maincpu, xtal);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	
+	// 512KB CPU cache RAM
+	// Trident TGUI9682XGi + integrated 98 gfx card
+	// 3x cbus + 2x PCI slots
+	// 3GB HDD
+	// built-in ethernet 100BASE-TX/10BASE-T
+}
+
 void pc9801_state::pc9821ra333(machine_config &config)
 {
 	pc9821(config);
@@ -2588,7 +2619,46 @@ void pc9801_state::pc9821ra333(machine_config &config)
 	// 3x cbus + 2x PCI slots
 	// 6GB HDD
 	// built-in ethernet 100BASE-TX/10BASE-T
+}
 
+// 9821 NOTE machine configs
+
+void pc9801_state::pc9821nr15(machine_config &config)
+{
+	pc9821(config);
+	const double xtal = 150000000;
+	PENTIUM_PRO(config.replace(), m_maincpu, xtal); // unsure if normal or pro, clock and cache size suggests latter
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	
+	// 256KB CPU cache RAM
+	// TFT 12.1 screen with 800x600 max resolution
+	// Trident Cyber9385 Flat Panel Controller (SVGA, PCI?)
+	// -86 board
+	// PCI TypeII x 2 (Type III x 1)
+	// C-Bus x 1 or ZV port (?)
+	// 1GB or 1.4GB HDD
+	// 8x/11x CD-ROM
+	// Optional FAX
+}
+
+void pc9801_state::pc9821nr166(machine_config &config)
+{
+	pc9821(config);
+	const double xtal = 166000000;
+	PENTIUM_MMX(config.replace(), m_maincpu, xtal);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	
+	// 256KB CPU cache RAM
+	// TFT 13.3 screen with 1024x768 resolution
+	// Trident Cyber9385 Flat Panel Controller (SVGA, PCI?)
+	// PCI TypeII x 2 (Type III x 1)
+	// C-Bus x 1 or ZV port (?)
+	// 3GB HDD
+	// Has FAX or ethernet 100BASE-TX/10BASE-T (depending on submodel type)
 }
 
 // Epson clones
@@ -2993,7 +3063,7 @@ ROM_START( pc9821xa16 )
 ROM_END
 
 /*
-pc-9821Ra20 (98MATE R)
+PC-9821Ra20 (98MATE R)
 
 Pentium Pro @ 200
 32MB
@@ -3018,14 +3088,43 @@ ROM_START( pc9821ra20 )
 ROM_END
 
 /*
-pc-9821Ra333 (98MATE R)
+PC-9821Ra266
+
+Pentium II @ 266 MHz
+Trident TGUI9682XGi
+32MB, max 256 MB (ECC EDO RAM)
+3.5x1, 16xCD-ROM
+CBus: 3 slots, PCI: 2 slots
+PCI Intel 440FX (Natoma), PCI Rev. 2.1
+
+PC-9821Ra266/M30R has been re-released in 1998,
+unknown differences other than having Win98 pre
+*/
+
+ROM_START( pc9821ra266 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+    ROM_LOAD( "g8ykkw.bin", 0x000000, 0x040000, CRC(d73a2795) SHA1(65d4e1e438e91c1646bcc06a9868aa474faf0ccf) ) // SOP44
+	
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+PC-9821Ra333 (98MATE R)
 
 Celeron @ 333
 32MB, max 256 MB (ECC EDO RAM)
 3.5x1, 24xCD-ROM
 CBus: 3 slots, PCI: 2 slots
 */
-
 
 ROM_START( pc9821ra333 )
 	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
@@ -3071,6 +3170,120 @@ ROM_START( pc9821v20 )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_v20.rom", 0x00000, 0x046800, BAD_DUMP CRC(6244c4c0) SHA1(9513cac321e89b4edb067b30e9ecb1adae7e7be7) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+PC-9821CX3
+
+Pentium @ 100 MHz
+16MB, max 128 MB
+3.5x1, 4xCD-ROM
+CL GD5440
+PCI VLSI Supercore594 (Wildcat), PCI Rev. 2.0
+*/
+
+ROM_START( pc9821cx3 )
+	ROM_REGION16_LE( 0x80000, "biosrom", ROMREGION_ERASEFF )
+    ROM_LOAD( "pc-9821cx3.bin", 0x000000, 0x080000, CRC(0360ed78) SHA1(2e4fe059d001d980add1656816bda97cd11ef331) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 512k space seems valid
+	ROM_COPY( "biosrom", 0x68000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
+
+	// "microcode" memory dump, probably identical to above but shuffled
+	// left for consultation
+	ROM_REGION16_LE( 0x80000, "memory", ROMREGION_ERASEFF )
+	ROM_LOAD( "bank0.bin",    0x000000, 0x008000, CRC(bccc5233) SHA1(1246203bebf9f04e3bac2df7fc64719304f9f1bd) )
+	ROM_LOAD( "bank1.bin",    0x008000, 0x008000, CRC(190b448b) SHA1(01d555cb1044ea280759c5fb724b24ca38ba67f7) )
+	ROM_LOAD( "bank2.bin",    0x010000, 0x008000, CRC(2a73461c) SHA1(745d48a33766b7f4dab84faa87014fd6f4c8ce34) )
+	ROM_LOAD( "bank3.bin",    0x018000, 0x008000, CRC(13ffa799) SHA1(dba02689de02d4c2d6bbf10efe86a37653f3aa86) )
+	ROM_LOAD( "bank4.bin",    0x020000, 0x008000, CRC(b5fa9408) SHA1(fd94a0da767b5de2c10da154ae336c14a1d70e4f) )
+	ROM_LOAD( "bank5.bin",    0x028000, 0x008000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
+	ROM_LOAD( "bank6.bin",    0x030000, 0x008000, CRC(1021ccca) SHA1(2154b03c8650e66700a9ea83f1eb2bb32a2bad46) )
+	ROM_LOAD( "bank7.bin",    0x038000, 0x008000, CRC(d339d36f) SHA1(fdb5e2d8bfcc723a86d4706c7c00e3adb1bc421b) )
+	ROM_LOAD( "bank8.bin",    0x040000, 0x008000, CRC(41263c3a) SHA1(fa415639882b266e663f36b22a8f6336258b7f93) )
+	ROM_LOAD( "bank9.bin",    0x048000, 0x008000, CRC(28ccca78) SHA1(44b10f0cfae71b34221306db5d93d5d5aaec3cd3) )
+	ROM_LOAD( "banka.bin",    0x050000, 0x008000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )
+	ROM_LOAD( "bankb.bin",    0x058000, 0x008000, CRC(2ec7b657) SHA1(34b9ba199b13c71d4facc4215931574d59afd928) )
+	ROM_LOAD( "bankc.bin",    0x060000, 0x008000, CRC(b3559c78) SHA1(d8f177b75e96ad22393933534b0432bc0018eae5) )
+	ROM_LOAD( "bankd.bin",    0x068000, 0x008000, CRC(9bc44372) SHA1(baa917086edd578d88b730ab1dca1899beb0525d) )
+	ROM_LOAD( "banke.bin",    0x070000, 0x008000, CRC(911003f4) SHA1(a35b72130b2c3c3822a1648d1f470a6973262c73) )
+	ROM_LOAD( "bankf.bin",    0x078000, 0x008000, CRC(77f6a5c7) SHA1(b8fbf104dd8a8e00855be18f0c3b71da79b6a841) )
+	
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+PC-9821Nr15
+
+Pentium [Pro?] @ 150 MHz
+16MB, max 128 MB
+3.5x1, 8xCD-ROM
+Trident Cyber9385
+TFT 12.1 inches @ 800x600
+
+Nr15/S14F has:
+11xCD-ROM
+FAX
+*/
+
+ROM_START( pc9821nr15 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+    ROM_LOAD( "g8xwa_xwa00_ab28f200bx-t.bin", 0x000000, 0x040000, CRC(17b91850) SHA1(755eb8767c08980d0f1b6e32638e9fdd616a1b26) ) // SOP44
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+/*
+PC-9821Nr166
+
+Pentium MMX @ 166 MHz
+32MB, max 128 MB
+3.5x1, 11xCD-ROM
+Trident Cyber9385
+TFT 13.3 inches, 1024x768
+Optional FAX or LAN (depending on model sub-type)
+*/
+
+ROM_START( pc9821nr166 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+    ROM_LOAD( "pc-9821nr166.bin", 0x000000, 0x040000, CRC(6a137f51) SHA1(1b8264ff525cfda5b367bf85570ff53a6ad42cd4) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+
+	// "microcode" memory dump, probably identical to above but shuffled
+	// left for consultation
+	ROM_REGION16_LE( 0x40000, "memory", ROMREGION_ERASEFF )
+	ROM_LOAD( "bank0.bin",    0x000000, 0x008000, CRC(c08b4f76) SHA1(bc352826e33566b0e9f5e54c391d7690b6d8fff0) )
+	ROM_LOAD( "bank1.bin",    0x008000, 0x008000, CRC(62dfab8b) SHA1(e95cd8e6f385a8074fc311dcfc982b42ce1f1a7c) )
+	ROM_LOAD( "bank2.bin",    0x010000, 0x008000, CRC(1df9ebcb) SHA1(91db85ac60ab7c9100aa95c945f50564f4933776) )
+	ROM_LOAD( "bank3.bin",    0x018000, 0x008000, CRC(e2b44219) SHA1(f02449f37a2b3d7a22551c3c4fd018d426059829) )
+	ROM_LOAD( "bank4.bin",    0x020000, 0x008000, CRC(507d66df) SHA1(f29434ce472ea49b87a17f195fef7d31b7f9ba67) )
+	ROM_LOAD( "bank5.bin",    0x028000, 0x008000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
+	ROM_LOAD( "bank6.bin",    0x030000, 0x008000, CRC(c0f0495b) SHA1(5fd9db08f61faadc8d5b004e41005f113c480ee5) )
+	ROM_LOAD( "bank7.bin",    0x038000, 0x008000, CRC(cf92cf6b) SHA1(880350ce71fcf5a039155062d6065566f0c8fa46) )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -3293,16 +3506,17 @@ void pc9801_state::init_pc9801vm_kanji()
 // specifically happening for a family group. This will be hopefully put into stone with driver splits at some point in future.
 
 // "vanilla" class (i86, E/F/M)
-COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
+COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
 
-// N5200 (started as a vanilla PC-98 business line derivative, eventually diverged into its own thing and incorporated various Hyper 98 features. Runs proprietary PTOS)
+// N5200 (started as a vanilla PC-98 business line derivative, eventually diverged into its own thing and incorporated various Hyper 98 features.
+//    Runs proprietary PTOS)
 // APC III (US version of either vanilla PC9801 or N5200, aimed at business market. Runs MS-DOS 2.11/3.xx or PC-UX)
 // ...
 
 // VM class (V30 and/or i286)
-COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
-COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
+COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // VX class (first model using an EGC)
 // ...
@@ -3315,38 +3529,53 @@ COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9
 // SV-H98 (Later Hyper 98 revision, up to Pentium CPU)
 // ...
 
+// CV class (V30, compact version with monitor built-in like a Macintosh)
+// ...
+
 // RS class (i386SX)
-COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // FA class (i486SX)
-COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86), superimposition)
 // ...
 
 // Epson class
-COMP( 1990, pc386m,     0,        0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1990, pc386m,     0,        0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// PC9821 class
+// PC9821 [desktop] class
 // TODO: unknown real model of parent, given the BIOS rom size wrt the others it may be better suited as a "98Multi" or even a FA class?
 // investigate by making genuine BIOS dumps to boot
-COMP( 1994, pc9821,      0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1993, pc9821as,    pc9821,   0, pc9821as,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE A)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1993, pc9821ap2,   pc9821,   0, pc9821ap2,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821AP2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821xs,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE Xs)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821ce2,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi Ce2)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821ne,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1996, pc9821xa16,  pc9821,   0, pc9821xa16,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1996, pc9821ra20,  pc9821,   0, pc9821ra20,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1998, pc9821ra333, pc9821,   0, pc9821ra333, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1998, pc9821v13,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 13)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1998, pc9821v20,   pc9821,   0, pc9821v20,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc9821,      0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821as,    pc9821,   0, pc9821as,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE A)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821ap2,   pc9821,   0, pc9821ap2,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821AP2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821xs,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE Xs)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821ce2,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi Ce2)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1995, pc9821cx3,   pc9821,   0, pc9821cx3,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821xa16,  pc9821,   0, pc9821xa16,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821ra20,  pc9821,   0, pc9821ra20,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, pc9821ra266, pc9821,   0, pc9821ra266, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1998, pc9821ra333, pc9821,   0, pc9821ra333, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1998, pc9821v13,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 13)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1998, pc9821v20,   pc9821,   0, pc9821v20,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// PC9821 NOTE[book] class
+COMP( 1994, pc9821ne,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821nr15,  pc9821,   0, pc9821nr15,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, pc9821nr166, pc9821,   0, pc9821nr166, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 
-// PC-98LT (laptop b&w LCD version V50, no upd7220, just one single bitmap layer)
-// PC-98HA aka HANDY98 (portable b&w LCD version, V50, apparently compatible with LT)
+// PC-9801T (i386SX, extremely expensive TFT or LCD laptop with C-Bus slots, de-facto a "portable" desktop machine)
+// PC-9801LX (i286, belongs to pc98ha.cpp?)
+// PC-9801LS (i386SX, Plasma laptop)
 // RC-9801 (portable (color?) LCD, i386SX, wireless 9600bps modem)
 // PC-9801P (LCD with light pen)
+
+// FC-9801 (FC stands for "Factory Computer". Aimed at industrial automation, has similarly named models from 9801 to 9821 and H98.
+//     Uses a FC-9801-06 RAS "Reliability, Availability and Serviceability" specific expansion)
+// FC98-NX (Evolution of FC-9821Ka, first model FC20C released in 1998, branch is still running to date.
+//     It's unknown if it's just a naming brand or there's actually a real 98 evolution)

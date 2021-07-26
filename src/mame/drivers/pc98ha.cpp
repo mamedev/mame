@@ -77,12 +77,13 @@ void pc98lt_state::power_control_w(offs_t offset, u8 data)
 	// pc98lt: go to prompt (type "command" in main menu) and execute "poweroff.com"
 	if (BIT(data, 0))
 		logerror("%s: power_control_w power off signal ON\n", machine().describe_context());
+
 	// pc98ha bit 1: flips between 0->1 on system boot failure, in tandem with standby mode held
 	if (data & ~0x07)
 		logerror("%s: power_control_w unknown signal sent %02x\n", machine().describe_context(), data);
 }
 
-// TODO: intentionally repeated from base pc98, until I understand what's going on here.
+// TODO: intentionally repeated from base pc98 until I understand what's going on here.
 // (supposedly should be same from base pc98 minus the V50 integrations and whatever the "docking station" really adds up)
 u8 pc98lt_state::floppy_mode_r(offs_t offset)
 {
