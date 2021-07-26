@@ -357,7 +357,7 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 			{
 				uint32_t *const d = &bitmap.pix(j);
 
-				float u0 = (float)0.0f;
+				float u0 = 0.0f;
 
 				int iv0 = (int)v0;
 				int pix_v0_line = iv0 * vi_width;
