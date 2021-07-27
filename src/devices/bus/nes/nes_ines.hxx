@@ -268,7 +268,7 @@ static const nes_mmc mmc_list[] =
 	{ 232, CAMERICA_BF9096 },
 	{ 233, BMC_42IN1RESET },
 	{ 234, AVE_MAXI15 },
-	{ 235, BMC_GOLD150 },   // 235 Golden Game x-in-1 - Unsupported
+	{ 235, BMC_GOLD260 },   // 235 Golden Game x-in-1 games
 	{ 236, BMC_70IN1 },
 	{ 237, BMC_TELETUBBIES },
 	{ 238, UNL_603_5052 },

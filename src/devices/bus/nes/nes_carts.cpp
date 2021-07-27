@@ -441,8 +441,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_500in1",       NES_BMC_500IN1);
 	device.option_add_internal("bmc_800in1",       NES_BMC_800IN1);     // mapper 236
 	device.option_add_internal("bmc_1200in1",      NES_BMC_1200IN1);
-	device.option_add_internal("bmc_gold150",      NES_BMC_GOLD150);    // mapper 235 with 2M PRG
-	device.option_add_internal("bmc_gold260",      NES_BMC_GOLD260);    // mapper 235 with 4M PRG
+	device.option_add_internal("bmc_gold260",      NES_BMC_GOLD260);    // mapper 235
 	device.option_add_internal("bmc_th22913",      NES_BMC_TH22913);    // mapper 63
 	device.option_add_internal("bmc_reset4",       NES_BMC_4IN1RESET);  // mapper 60 with 64k prg and 32k chr
 	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 233
