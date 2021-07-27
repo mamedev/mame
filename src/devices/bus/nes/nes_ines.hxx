@@ -391,10 +391,10 @@ static const nes_mmc mmc_list[] =
 	// 354 250-in-1 multicart with FDS Bubble Bobble
 	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
 	// 356 7-in-1 Rockman (JY-208)
-	// 357 Bit Corp 4-in-1 (ID 4602)
+	{ 357, BITCORP_4602 },
 	// 358 JY multicarts, variant of mapper 282
 	// 359 BMC-SB-5013 multicarts
-	// 360 Bit Corp 31-in-1 (ID 3150) (has five accessible DIP switches!)
+	{ 360, BITCORP_3150 },
 	// 361 JY multicarts
 	// 362 JY-005 multicart
 	// 363 variant of mapper 358?

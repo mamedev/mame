@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAEM_BUS_NES_EVENT_H
-#define MAEM_BUS_NES_EVENT_H
+#ifndef MAME_BUS_NES_EVENT_H
+#define MAME_BUS_NES_EVENT_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_EVENT, nes_event_device)
 
-#endif // MAEM_BUS_NES_EVENT_H
+#endif // MAME_BUS_NES_EVENT_H

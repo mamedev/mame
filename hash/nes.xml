@@ -78555,6 +78555,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_31mry">
+		<description>31 in 1 (Super Mary)</description>
+		<year>19??</year>
+		<publisher>Bit Corp</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bitcorp_3150" />
+			<dataarea name="prg" size="524288">
+				<rom name="icromn3040" size="524288" crc="2b18c680" sha1="f077b2884785be82825b26448f165edda85cbf33" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="icromn3120" size="262144" crc="eaf19d6a" sha1="bafddd8e6122660e8ec78aaa71d2a5be3772b28b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_320">
 		<description>320 in 1</description>
 		<year>19??</year>
@@ -79057,7 +79072,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4mary" supported="no">
+	<software name="mc_4mary">
 		<description>4 in 1 (Mr. Mary 2)</description>
 		<year>19??</year>
 		<publisher>Bit Corp</publisher>

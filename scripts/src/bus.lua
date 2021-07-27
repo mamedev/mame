@@ -2769,6 +2769,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/bandai.h",
 		MAME_DIR .. "src/devices/bus/nes/benshieng.cpp",
 		MAME_DIR .. "src/devices/bus/nes/benshieng.h",
+		MAME_DIR .. "src/devices/bus/nes/bitcorp.cpp",
+		MAME_DIR .. "src/devices/bus/nes/bitcorp.h",
 		MAME_DIR .. "src/devices/bus/nes/bootleg.cpp",
 		MAME_DIR .. "src/devices/bus/nes/bootleg.h",
 		MAME_DIR .. "src/devices/bus/nes/camerica.cpp",

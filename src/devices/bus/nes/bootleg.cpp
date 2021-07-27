@@ -686,7 +686,7 @@ void nes_yung08_device::pcb_reset()
 {
 	prg8_89(1);
 	prg8_ab(0);
-	prg8_cd(0);    // switchable bank
+	prg8_cd(4);    // switchable bank
 	prg8_ef(8);
 	chr8(0, CHRROM);
 
