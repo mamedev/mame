@@ -19,7 +19,7 @@ known chips:
  *A67     HD38750  1982, Romtec Pucki & Monsters (ET-803)
 
  @A04     HD38800  1980, Gakken Heiankyo Alien
- *A16     HD38800  1981, Entex Select-A-Game cartridge: Basketball 3 -> sag.cpp
+  A16     HD38800  1981, Entex Select-A-Game cartridge: Basketball 3 -> sag.cpp
  *A20     HD38800  1981, Entex Super Space Invader 2
  @A25     HD38800  1981, Coleco Alien Attack
  @A27     HD38800  1981, Bandai Packri Monster
