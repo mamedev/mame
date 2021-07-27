@@ -157,6 +157,8 @@ void rsp_disassembler::disasm_cop2(std::ostream &stream, uint32_t op)
 				case 0x2b:  util::stream_format(stream, "vnor   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
 				case 0x2c:  util::stream_format(stream, "vxor   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
 				case 0x2d:  util::stream_format(stream, "vnxor  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x2e:  util::stream_format(stream, "v056   %s, %s[%c]", vreg[dest], vreg[s2], element2[el][s1 & 7]); break;
+				case 0x2f:  util::stream_format(stream, "v057   %s, %s[%c]", vreg[dest], vreg[s2], element2[el][s1 & 7]); break;
 				case 0x30:  util::stream_format(stream, "vrcp   %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
 				case 0x31:  util::stream_format(stream, "vrcpl  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
 				case 0x32:  util::stream_format(stream, "vrcph  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
@@ -165,6 +167,8 @@ void rsp_disassembler::disasm_cop2(std::ostream &stream, uint32_t op)
 				case 0x35:  util::stream_format(stream, "vrsql  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
 				case 0x36:  util::stream_format(stream, "vrsqh  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
 				case 0x37:  util::stream_format(stream, "vnop"); break;
+				case 0x3b:  util::stream_format(stream, "v073   %s, %s[%c]", vreg[dest], vreg[s2], element2[el][s1 & 7]); break;
+				case 0x3f:  util::stream_format(stream, "vnull"); break;
 				default:    util::stream_format(stream, "??? (VECTOR OP)"); break;
 			}
 			break;

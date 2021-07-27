@@ -1125,20 +1125,25 @@ void rsp_device::cop2::handle_lwc2(uint32_t op)
 			// | 110010 | BBBBB | TTTTT | 01010 | IIII | Offset |
 			// --------------------------------------------------
 			//
+			// Intended instruction behavior:
 			// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
+			//
+			// Actual instruction behavior:
+			// Loads the full 128-bit vector starting from vector byte index 0.
+			//
+			// Hardware testing has proven that the vector index is ignored when executing LWV.
+			// By contrast, SWV will function as intended when provided an index.
 
-			//printf("LWV ");
 #if USE_SIMD
 #else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
-			end = (16 - index) + 16;
-
-			for (i=(16 - index); i < end; i++)
+			for (i=0; i < 16; i++)
 			{
-				VREG_B(dest, i & 0xf) = m_rsp.READ8(ea);
-				ea += 4;
+				uint8_t data = m_rsp.READ8(ea);
+				VREG_B(dest, i) = data;
+				ea++;
 			}
 #endif
 			//
@@ -3308,6 +3313,7 @@ void rsp_device::cop2::handle_vector_ops(uint32_t op)
 			//
 			break;
 		}
+
 		case 0x2d:      /* VNXOR */
 		{
 			// 31       25  24     20      15      10      5        0
@@ -3336,6 +3342,33 @@ void rsp_device::cop2::handle_vector_ops(uint32_t op)
 			WRITEBACK_RESULT();
 #endif
 			//
+			break;
+		}
+
+		case 0x2e:      /* V056 (Reserved) */
+		case 0x2f:      /* V057 (Reserved) */
+		{
+			// 31       25  24     20      15      10      5        0
+			// ------------------------------------------------------
+			// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101101 |
+			// ------------------------------------------------------
+			//
+			// Reserved Opcode
+			// Appears to simply store the unsigned 16-bit sum of vector elements into low accumulator slice.
+			// Zeroes destination vector.
+
+#if USE_SIMD
+#else
+			for (i=0; i < 8; i++)
+			{
+				m_vres[i] = 0;
+				uint16_t e1 = (uint16_t)VREG_S(VS1REG, i);
+				uint16_t e2 = (uint16_t)VREG_S(VS2REG, VEC_EL_2(EL, i));
+				uint16_t r = e1 + e2;
+				SET_ACCUM_L(r, i);
+			}
+			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -3538,18 +3571,16 @@ void rsp_device::cop2::handle_vector_ops(uint32_t op)
 			//
 			// Moves element from vector to destination vector
 
-			//printf("MOV ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 			m_v[VDREG].v = vec_vmov(VS2REG, EL, VDREG, VS1REG);
 #else
-			VREG_S(VDREG, VS1REG & 7) = VREG_S(VS2REG, EL & 7);
+			VREG_S(VDREG, VS1REG & 7) = VREG_S(VS2REG, VEC_EL_2(EL, VS1REG & 7));
 			for (i = 0; i < 8; i++)
 			{
-				SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
+				SET_ACCUM_L(VREG_S(VS2REG, i), i);
 			}
 #endif
-			//
 			break;
 		}
 
@@ -3756,6 +3787,55 @@ void rsp_device::cop2::handle_vector_ops(uint32_t op)
 			// Vector null instruction
 
 			//printf("NOP ");
+			break;
+		}
+
+		case 0x3b:      /* V073 (Reserved) */
+		{
+			// 31       25  24     20      15      10      5        0
+			// ------------------------------------------------------
+			// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101101 |
+			// ------------------------------------------------------
+			//
+			// Reserved Opcode
+			// Appears to simply store the unsigned 16-bit sum of vector elements into low accumulator slice.
+			// Zeroes destination vector.
+
+#if USE_SIMD
+#else
+			for (i=0; i < 8; i++)
+			{
+				m_vres[i] = 0;
+				uint16_t e1 = (uint16_t)VREG_S(VS1REG, i);
+				uint16_t e2 = (uint16_t)VREG_S(VS2REG, VEC_EL_2(EL, i));
+				uint16_t r = e1 + e2;
+				SET_ACCUM_L(r, i);
+			}
+			WRITEBACK_RESULT();
+#endif
+			break;
+		}
+
+		case 0x3f:      /* VNULL (Reserved) */
+		{
+			// 31       25  24     20      15      10      5        0
+			// ------------------------------------------------------
+			// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101101 |
+			// ------------------------------------------------------
+			//
+			// Reserved Opcode
+			// Appears to simply store the unsigned 16-bit sum of vector elements into low accumulator slice.
+			// Zeroes destination vector.
+
+#if USE_SIMD
+#else
+			for (i=0; i < 8; i++)
+			{
+				m_vres[i] = (uint16_t)VREG_S(VS1REG, i);
+				SET_ACCUM_L(0, i);
+			}
+			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
