@@ -77,6 +77,8 @@
 
     ARKANOID: Abuses TIMER = 0 for ball ricochet sounds
 
+    POP*STAR PILOT: Timer is synchronized with scanlines.
+
 **********************************************************************/
 
 
@@ -480,12 +482,12 @@ void gime_device::reset_timer(void)
 		if (timer_type() == GIME_TIMER_63USEC)
 		{
 			// master clock divided by 8, divided by 228, divided by 2
-			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 3648 * m_timer_value);
+			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 3648 * m_timer_value / 2);
 		}
 		else
 		{
 			// master clock divided by 8, divided by 2
-			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 16 * m_timer_value);
+			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 16 * m_timer_value / 2);
 		}
 	}
 	else
