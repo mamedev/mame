@@ -1676,6 +1676,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/apricot.cpp",
 	MAME_DIR .. "src/mame/drivers/apricotf.cpp",
 	MAME_DIR .. "src/mame/drivers/apricotp.cpp",
+	MAME_DIR .. "src/mame/drivers/apxen.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",

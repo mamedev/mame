@@ -1484,6 +1484,9 @@ f2                              //
 @source:apricotp.cpp
 fp                              //
 
+@source:apxen.cpp
+apxen                           // 1985 ACT
+
 @source:aquarium.cpp
 aquarium                        // (c) 1996 Excellent System
 aquariumj                       // (c) 1996 Excellent System
