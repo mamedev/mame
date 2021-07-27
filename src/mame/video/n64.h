@@ -323,18 +323,40 @@ private:
 	void    compute_cvg_noflip(extent_t* spans, int32_t* majorx, int32_t* minorx, int32_t* majorxint, int32_t* minorxint, int32_t scanline, int32_t yh, int32_t yl, int32_t base);
 	void    compute_cvg_flip(extent_t* spans, int32_t* majorx, int32_t* minorx, int32_t* majorxint, int32_t* minorxint, int32_t scanline, int32_t yh, int32_t yl, int32_t base);
 
-	void    write_pixel(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
-	void    read_pixel(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
-	void    copy_pixel(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
-	void    fill_pixel(uint32_t curpixel, const rdp_poly_state &object);
+	void    write_pixel4(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    write_pixel8(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    write_pixel16(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    write_pixel32(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel4(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel8(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel16(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel32(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    copy_pixel4(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	void    copy_pixel8(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	void    copy_pixel16(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	void    copy_pixel32(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	void    fill_pixel4(uint32_t curpixel, const rdp_poly_state &object);
+	void    fill_pixel8(uint32_t curpixel, const rdp_poly_state &object);
+	void    fill_pixel16(uint32_t curpixel, const rdp_poly_state &object);
+	void    fill_pixel32(uint32_t curpixel, const rdp_poly_state &object);
 
 	void    precalc_cvmask_derivatives(void);
 	void    z_build_com_table(void);
 
 	typedef void (n64_rdp::*compute_cvg_t) (extent_t* spans, int32_t* majorx, int32_t* minorx, int32_t* majorxint, int32_t* minorxint, int32_t scanline, int32_t yh, int32_t yl, int32_t base);
-	compute_cvg_t   m_compute_cvg[2];
+	compute_cvg_t     m_compute_cvg[2];
 
-	running_machine* m_machine;
+	typedef void (n64_rdp::*write_pixel_t) (uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	typedef void (n64_rdp::*read_pixel_t) (uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	typedef void (n64_rdp::*copy_pixel_t) (uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	typedef void (n64_rdp::*fill_pixel_t) (uint32_t curpixel, const rdp_poly_state &object);
+
+	write_pixel_t     m_write_pixel[4];
+	read_pixel_t      m_read_pixel[4];
+	copy_pixel_t      m_copy_pixel[4];
+	fill_pixel_t      m_fill_pixel[4];
+
+	running_machine*  m_machine;
 	uint32_t*         m_rdram;
 	uint32_t*         m_dmem;
 	n64_periphs* m_n64_periphs;

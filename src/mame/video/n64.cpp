@@ -171,7 +171,7 @@ WRITE_LINE_MEMBER(n64_state::screen_vblank_n64)
 void n64_periphs::video_update(bitmap_rgb32 &bitmap)
 {
 
-	if(vi_control & 0x40) /* Interlace */
+	if (vi_control & 0x40) /* Interlace */
 	{
 		field ^= 1;
 	}
@@ -180,7 +180,7 @@ void n64_periphs::video_update(bitmap_rgb32 &bitmap)
 		field = 0;
 	}
 
-	switch(vi_control & 0x3)
+	switch (vi_control & 0x3)
 	{
 		case PIXEL_SIZE_16BIT:
 			video_update16(bitmap);
@@ -210,58 +210,126 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 	//uint32_t hb = ((n64->vi_origin & 0xffffff) >> 2) >> 1;
 	//uint8_t* hidden_buffer = &m_hidden_bits[hb];
 
-	int32_t hdiff = (vi_hstart & 0x3ff) - ((vi_hstart >> 16) & 0x3ff);
+	int32_t hend = vi_hstart & 0x3ff;
+	int32_t hstart = (vi_hstart >> 16) & 0x3ff;
+	int32_t hdiff = hend - hstart;
 	float hcoeff = ((float)(vi_xscale & 0xfff) / (1 << 10));
 	uint32_t hres = ((float)hdiff * hcoeff);
-	int32_t invisiblewidth = vi_width - hres;
 
-	int32_t vdiff = ((vi_vstart & 0x3ff) - ((vi_vstart >> 16) & 0x3ff)) >> 1;
+	int32_t vend = (vi_vstart & 0x3ff) >> 1;
+	int32_t vstart = ((vi_vstart >> 16) & 0x3ff) >> 1;
+	int32_t vdiff = vend - vstart;
 	float vcoeff = ((float)(vi_yscale & 0xfff) / (1 << 10));
 	uint32_t vres = ((float)vdiff * vcoeff);
+
+	fflush(stdout);
 
 	if (vdiff <= 0 || hdiff <= 0)
 	{
 		return;
 	}
 
-	//if (hres > 640) // Needed by Top Gear Overdrive (E)
-	//{
-	//  invisiblewidth += (hres - 640);
-	//  hres = 640;
-	//}
-
 	if (vres > bitmap.height()) // makes Perfect Dark boot w/o crashing
 	{
 		vres = bitmap.height();
 	}
 
-	uint32_t pixels = 0;
-
 	if (frame_buffer)
 	{
-		for(int32_t j = 0; j < vres; j++)
+		const uint32_t aa_control = (vi_control >> 8) & 3;
+		float v0 = 0.0f;
+		if (aa_control < 3) // Resample pixels
 		{
-			uint32_t *const d = &bitmap.pix(j);
-
-			for(int32_t i = 0; i < hres; i++)
+			for (int32_t j = 0; j < vdiff; j++, v0 += vcoeff)
 			{
-				uint16_t pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
+				uint32_t *const d = &bitmap.pix(j);
 
-				const uint8_t r = ((pix >> 8) & 0xf8) | (pix >> 13);
-				const uint8_t g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
-				const uint8_t b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
-				d[i] = (r << 16) | (g << 8) | b;
-				pixels++;
+				float u0 = (float)0.0f;
+
+				int iv0 = (int)v0;
+				int pix_v0_line = iv0 * vi_width;
+
+				int iv1 = (iv0 >= (vres - 1) ? iv0 : (iv0 + 1));
+				int pix_v1_line = iv1 * vi_width;
+
+				for (int32_t i = 0; i < hdiff; i++)
+				{
+					int iu0 = (int)u0;
+					int iu1 = (iu0 >= (hres - 1) ? iu0 : (iu0 + 1));
+					uint16_t pix00 = frame_buffer[(pix_v0_line + iu0) ^ WORD_ADDR_XOR];
+					uint16_t pix10 = frame_buffer[(pix_v0_line + iu1) ^ WORD_ADDR_XOR];
+					uint16_t pix01 = frame_buffer[(pix_v1_line + iu0) ^ WORD_ADDR_XOR];
+					uint16_t pix11 = frame_buffer[(pix_v1_line + iu1) ^ WORD_ADDR_XOR];
+
+					const uint8_t r00 = ((pix00 >> 8) & 0xf8) | (pix00 >> 13);
+					const uint8_t g00 = ((pix00 >> 3) & 0xf8) | ((pix00 >>  8) & 0x07);
+					const uint8_t b00 = ((pix00 << 2) & 0xf8) | ((pix00 >>  3) & 0x07);
+
+					const uint8_t r10 = ((pix10 >> 8) & 0xf8) | (pix10 >> 13);
+					const uint8_t g10 = ((pix10 >> 3) & 0xf8) | ((pix10 >>  8) & 0x07);
+					const uint8_t b10 = ((pix10 << 2) & 0xf8) | ((pix10 >>  3) & 0x07);
+
+					const uint8_t r01 = ((pix01 >> 8) & 0xf8) | (pix01 >> 13);
+					const uint8_t g01 = ((pix01 >> 3) & 0xf8) | ((pix01 >>  8) & 0x07);
+					const uint8_t b01 = ((pix01 << 2) & 0xf8) | ((pix01 >>  3) & 0x07);
+
+					const uint8_t r11 = ((pix11 >> 8) & 0xf8) | (pix11 >> 13);
+					const uint8_t g11 = ((pix11 >> 3) & 0xf8) | ((pix11 >>  8) & 0x07);
+					const uint8_t b11 = ((pix11 << 2) & 0xf8) | ((pix11 >>  3) & 0x07);
+
+					const float ut = u0 - (int)u0;
+					const float vt = v0 - (int)v0;
+
+					float ur0 = (1.0f - ut) * r00 + ut * r10;
+					float ug0 = (1.0f - ut) * g00 + ut * g10;
+					float ub0 = (1.0f - ut) * b00 + ut * b10;
+
+					float ur1 = (1.0f - ut) * r01 + ut * r11;
+					float ug1 = (1.0f - ut) * g01 + ut * g11;
+					float ub1 = (1.0f - ut) * b01 + ut * b11;
+
+					float r = (1.0f - vt) * ur0 + vt * ur1;
+					float g = (1.0f - vt) * ug0 + vt * ug1;
+					float b = (1.0f - vt) * ub0 + vt * ub1;
+
+					uint8_t r8 = std::clamp((uint8_t)r, (uint8_t)0, (uint8_t)255);
+					uint8_t g8 = std::clamp((uint8_t)g, (uint8_t)0, (uint8_t)255);
+					uint8_t b8 = std::clamp((uint8_t)b, (uint8_t)0, (uint8_t)255);
+
+					d[i] = (r8 << 16) | (g8 << 8) | b8;
+
+					u0 += hcoeff;
+				}
 			}
-			pixels += invisiblewidth;
+		}
+		else // Replicate pixels
+		{
+			for (int32_t j = 0; j < vdiff; j++, v0 += vcoeff)
+			{
+				uint32_t *const d = &bitmap.pix(j);
+
+				int iv0 = (int)v0;
+				int pix_v0_line = iv0 * vi_width;
+
+				for (int32_t i = 0; i < hdiff; i++)
+				{
+					int u0 = (int)(i * hcoeff);
+					uint16_t pix = frame_buffer[(pix_v0_line + u0) ^ WORD_ADDR_XOR];
+
+					const uint8_t r = ((pix >> 8) & 0xf8) | (pix >> 13);
+					const uint8_t g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
+					const uint8_t b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
+					d[i] = (r << 16) | (g << 8) | b;
+				}
+			}
 		}
 	}
 }
 
 void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 {
-	int32_t gamma = (vi_control >> 3) & 1;
-	int32_t gamma_dither = (vi_control >> 2) & 1;
+	//int32_t gamma = (vi_control >> 3) & 1;
+	//int32_t gamma_dither = (vi_control >> 2) & 1;
 	//int32_t vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
 	uint32_t* frame_buffer32 = (uint32_t*)&m_rdram[(vi_origin & 0xffffff) >> 2];
@@ -269,7 +337,6 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 	const int32_t hdiff = (vi_hstart & 0x3ff) - ((vi_hstart >> 16) & 0x3ff);
 	const float hcoeff = ((float)(vi_xscale & 0xfff) / (1 << 10));
 	uint32_t hres = ((float)hdiff * hcoeff);
-	int32_t invisiblewidth = vi_width - hres;
 
 	const int32_t vdiff = ((vi_vstart & 0x3ff) - ((vi_vstart >> 16) & 0x3ff)) >> 1;
 	const float vcoeff = ((float)(vi_yscale & 0xfff) / (1 << 10));
@@ -280,60 +347,89 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 		return;
 	}
 
-	//if (hres > 640) // Needed by Top Gear Overdrive (E)
-	//{
-	//  invisiblewidth += (hres - 640);
-	//  hres = 640;
-	//}
-
 	if (frame_buffer32)
 	{
-		for (int32_t j = 0; j < vres; j++)
+		const uint32_t aa_control = (vi_control >> 8) & 3;
+		float v0 = 0.0f;
+		if (aa_control < 3) // Resample pixels
 		{
-			uint32_t *const d = &bitmap.pix(j);
-			for (int32_t i = 0; i < hres; i++)
+			for (int32_t j = 0; j < vdiff; j++, v0 += vcoeff)
 			{
-				uint32_t pix = *frame_buffer32++;
-				if (gamma || gamma_dither)
-				{
-					int32_t r = (pix >> 24) & 0xff;
-					int32_t g = (pix >> 16) & 0xff;
-					int32_t b = (pix >> 8) & 0xff;
-					int32_t dith = 0;
-					if (gamma_dither)
-					{
-						dith = get_random() & 0x3f;
-					}
-					if (gamma)
-					{
-						if (gamma_dither)
-						{
-							r = m_gamma_dither_table[(r << 6)| dith];
-							g = m_gamma_dither_table[(g << 6)| dith];
-							b = m_gamma_dither_table[(b << 6)| dith];
-						}
-						else
-						{
-							r = m_gamma_table[r];
-							g = m_gamma_table[g];
-							b = m_gamma_table[b];
-						}
-					}
-					else if (gamma_dither)
-					{
-						if (r < 255)
-							r += (dith & 1);
-						if (g < 255)
-							g += (dith & 1);
-						if (b < 255)
-							b += (dith & 1);
-					}
-					pix = (r << 24) | (g << 16) | (b << 8);
-				}
+				uint32_t *const d = &bitmap.pix(j);
 
-				d[i] = (pix >> 8);
+				float u0 = 0.0f;
+
+				int iv0 = (int)v0;
+				int pix_v0_line = iv0 * vi_width;
+
+				int iv1 = (iv0 >= (vres - 1) ? iv0 : (iv0 + 1));
+				int pix_v1_line = iv1 * vi_width;
+
+				for (int32_t i = 0; i < hdiff; i++)
+				{
+					int iu0 = (int)u0;
+					int iu1 = (iu0 >= (hres - 1) ? iu0 : (iu0 + 1));
+					uint32_t pix00 = frame_buffer32[pix_v0_line + iu0];
+					uint32_t pix10 = frame_buffer32[pix_v0_line + iu1];
+					uint32_t pix01 = frame_buffer32[pix_v1_line + iu0];
+					uint32_t pix11 = frame_buffer32[pix_v1_line + iu1];
+
+					const uint8_t r00 = (uint8_t)(pix00 >> 16);
+					const uint8_t g00 = (uint8_t)(pix00 >> 8);
+					const uint8_t b00 = (uint8_t)pix00;
+
+					const uint8_t r10 = (uint8_t)(pix01 >> 16);
+					const uint8_t g10 = (uint8_t)(pix01 >> 8);
+					const uint8_t b10 = (uint8_t)pix01;
+
+					const uint8_t r01 = (uint8_t)(pix10 >> 16);
+					const uint8_t g01 = (uint8_t)(pix10 >> 8);
+					const uint8_t b01 = (uint8_t)pix10;
+
+					const uint8_t r11 = (uint8_t)(pix11 >> 16);
+					const uint8_t g11 = (uint8_t)(pix11 >> 8);
+					const uint8_t b11 = (uint8_t)pix11;
+
+					const float ut = u0 - (int)u0;
+					const float vt = v0 - (int)v0;
+
+					float ur0 = (1.0f - ut) * r00 + ut * r10;
+					float ug0 = (1.0f - ut) * g00 + ut * g10;
+					float ub0 = (1.0f - ut) * b00 + ut * b10;
+
+					float ur1 = (1.0f - ut) * r01 + ut * r11;
+					float ug1 = (1.0f - ut) * g01 + ut * g11;
+					float ub1 = (1.0f - ut) * b01 + ut * b11;
+
+					float r = (1.0f - vt) * ur0 + vt * ur1;
+					float g = (1.0f - vt) * ug0 + vt * ug1;
+					float b = (1.0f - vt) * ub0 + vt * ub1;
+
+					uint8_t r8 = std::clamp((uint8_t)r, (uint8_t)0, (uint8_t)255);
+					uint8_t g8 = std::clamp((uint8_t)g, (uint8_t)0, (uint8_t)255);
+					uint8_t b8 = std::clamp((uint8_t)b, (uint8_t)0, (uint8_t)255);
+
+					d[i] = (r8 << 16) | (g8 << 8) | b8;
+
+					u0 += hcoeff;
+				}
 			}
-			frame_buffer32 += invisiblewidth;
+		}
+		else // Replicate pixels
+		{
+			for (int32_t j = 0; j < vdiff; j++, v0 += vcoeff)
+			{
+				uint32_t *const d = &bitmap.pix(j);
+
+				int iv0 = (int)v0;
+				int pix_v0_line = iv0 * vi_width;
+
+				for (int32_t i = 0; i < hdiff; i++)
+				{
+					int u0 = (int)(i * hcoeff);
+					d[i] = (frame_buffer32[pix_v0_line + u0] >> 8);
+				}
+			}
 		}
 	}
 }
@@ -603,18 +699,18 @@ void n64_rdp::set_blender_input(int32_t cycle, int32_t which, color_t** input_rg
 
 uint8_t const n64_rdp::s_bayer_matrix[16] =
 { /* Bayer matrix */
-		0,  4,  1, 5,
-		6,  2,  7, 3,
-		1,   5,  0, 4,
-		7,  3,  6, 2
+	0, 4, 1, 5,
+	6, 2, 7, 3,
+	1, 5, 0, 4,
+	7, 3, 6, 2
 };
 
 uint8_t const n64_rdp::s_magic_matrix[16] =
 { /* Magic square matrix */
-		0,  6,  1, 7,
-		4,  2,  5, 3,
-		3,   5,  2, 4,
-		7,  1,  6, 0
+	0, 4, 3, 7,
+	6, 2, 5, 1,
+	1, 5, 2, 6,
+	7, 3, 4, 0
 };
 
 z_decompress_entry_t const n64_rdp::m_z_dec_table[8] =
@@ -3008,11 +3104,6 @@ void n64_rdp::cmd_set_color_image(uint64_t w1)
 	m_misc_state.m_fb_size    = uint32_t(w1 >> 51) & 0x3;
 	m_misc_state.m_fb_width   = (uint32_t(w1 >> 32) & 0x3ff) + 1;
 	m_misc_state.m_fb_address = uint32_t(w1) & 0x01ffffff;
-
-	if (m_misc_state.m_fb_format < 2 || m_misc_state.m_fb_format > 32) // Jet Force Gemini sets the format to 4, Intensity.  Protection?
-	{
-		m_misc_state.m_fb_format = 2;
-	}
 }
 
 /*****************************************************************************/
@@ -3216,6 +3307,26 @@ n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manag
 
 	m_compute_cvg[0] = &n64_rdp::compute_cvg_noflip;
 	m_compute_cvg[1] = &n64_rdp::compute_cvg_flip;
+
+	m_write_pixel[0] = &n64_rdp::write_pixel4;
+	m_write_pixel[1] = &n64_rdp::write_pixel8;
+	m_write_pixel[2] = &n64_rdp::write_pixel16;
+	m_write_pixel[3] = &n64_rdp::write_pixel32;
+
+	m_read_pixel[0] = &n64_rdp::read_pixel4;
+	m_read_pixel[1] = &n64_rdp::read_pixel8;
+	m_read_pixel[2] = &n64_rdp::read_pixel16;
+	m_read_pixel[3] = &n64_rdp::read_pixel32;
+
+	m_copy_pixel[0] = &n64_rdp::copy_pixel4;
+	m_copy_pixel[1] = &n64_rdp::copy_pixel8;
+	m_copy_pixel[2] = &n64_rdp::copy_pixel16;
+	m_copy_pixel[3] = &n64_rdp::copy_pixel32;
+
+	m_fill_pixel[0] = &n64_rdp::fill_pixel4;
+	m_fill_pixel[1] = &n64_rdp::fill_pixel8;
+	m_fill_pixel[2] = &n64_rdp::fill_pixel16;
+	m_fill_pixel[3] = &n64_rdp::fill_pixel32;
 }
 
 void n64_rdp::render_spans(int32_t start, int32_t end, int32_t tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object)
@@ -3333,185 +3444,234 @@ void n64_rdp::rgbaz_correct_triangle(int32_t offx, int32_t offy, int32_t* r, int
 	}
 }
 
-inline void n64_rdp::write_pixel(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object)
+void n64_rdp::write_pixel4(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
-	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
+	// Not yet implemented
+}
+
+void n64_rdp::write_pixel8(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object)
+{
+	const uint8_t c = (color.get_r() & 0xf8) | ((color.get_g() & 0xf8) >> 5);
+	if (c != 0)
+		RWRITEADDR8(object.m_misc_state.m_fb_address + curpixel, c);
+}
+
+void n64_rdp::write_pixel16(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object)
+{
+	const uint32_t fb = (object.m_misc_state.m_fb_address >> 1) + curpixel;
+
+	uint16_t finalcolor;
+	if (object.m_other_modes.color_on_cvg && !userdata->m_pre_wrap)
 	{
-		const uint32_t fb = (object.m_misc_state.m_fb_address >> 1) + curpixel;
+		finalcolor = RREADIDX16(fb) & 0xfffe;
+	}
+	else
+	{
+		color.shr_imm(3);
+		finalcolor = (color.get_r() << 11) | (color.get_g() << 6) | (color.get_b() << 1);
+	}
 
-		uint16_t finalcolor;
-		if (object.m_other_modes.color_on_cvg && !userdata->m_pre_wrap)
-		{
-			finalcolor = RREADIDX16(fb) & 0xfffe;
-		}
-		else
-		{
-			color.shr_imm(3);
-			finalcolor = (color.get_r() << 11) | (color.get_g() << 6) | (color.get_b() << 1);
-		}
-
-		switch (object.m_other_modes.cvg_dest)
-		{
-			case 0:
-				if (userdata->m_blend_enable)
-				{
-					uint32_t finalcvg = userdata->m_current_pix_cvg + userdata->m_current_mem_cvg;
-					if (finalcvg & 8)
-					{
-						finalcvg = 7;
-					}
-					RWRITEIDX16(fb, finalcolor | (finalcvg >> 2));
-					HWRITEADDR8(fb, finalcvg & 3);
-				}
-				else
-				{
-					const uint32_t finalcvg = (userdata->m_current_pix_cvg - 1) & 7;
-					RWRITEIDX16(fb, finalcolor | (finalcvg >> 2));
-					HWRITEADDR8(fb, finalcvg & 3);
-				}
-				break;
-			case 1:
+	switch (object.m_other_modes.cvg_dest)
+	{
+		case 0:
+			if (userdata->m_blend_enable)
 			{
-				const uint32_t finalcvg = (userdata->m_current_pix_cvg + userdata->m_current_mem_cvg) & 7;
+				uint32_t finalcvg = userdata->m_current_pix_cvg + userdata->m_current_mem_cvg;
+				if (finalcvg & 8)
+				{
+					finalcvg = 7;
+				}
 				RWRITEIDX16(fb, finalcolor | (finalcvg >> 2));
 				HWRITEADDR8(fb, finalcvg & 3);
-				break;
 			}
-			case 2:
-				RWRITEIDX16(fb, finalcolor | 1);
-				HWRITEADDR8(fb, 3);
-				break;
-			case 3:
-				RWRITEIDX16(fb, finalcolor | (userdata->m_current_mem_cvg >> 2));
-				HWRITEADDR8(fb, userdata->m_current_mem_cvg & 3);
-				break;
-		}
-	}
-	else // 32-bit framebuffer
-	{
-		const uint32_t fb = (object.m_misc_state.m_fb_address >> 2) + curpixel;
-
-		uint32_t finalcolor;
-		if (object.m_other_modes.color_on_cvg && !userdata->m_pre_wrap)
+			else
+			{
+				const uint32_t finalcvg = (userdata->m_current_pix_cvg - 1) & 7;
+				RWRITEIDX16(fb, finalcolor | (finalcvg >> 2));
+				HWRITEADDR8(fb, finalcvg & 3);
+			}
+			break;
+		case 1:
 		{
-			finalcolor = RREADIDX32(fb) & 0xffffff00;
+			const uint32_t finalcvg = (userdata->m_current_pix_cvg + userdata->m_current_mem_cvg) & 7;
+			RWRITEIDX16(fb, finalcolor | (finalcvg >> 2));
+			HWRITEADDR8(fb, finalcvg & 3);
+			break;
 		}
-		else
-		{
-			finalcolor = (color.get_r() << 24) | (color.get_g() << 16) | (color.get_b() << 8);
-		}
-
-		switch (object.m_other_modes.cvg_dest)
-		{
-			case 0:
-				if (userdata->m_blend_enable)
-				{
-					uint32_t finalcvg = userdata->m_current_pix_cvg + userdata->m_current_mem_cvg;
-					if (finalcvg & 8)
-					{
-						finalcvg = 7;
-					}
-
-					RWRITEIDX32(fb, finalcolor | (finalcvg << 5));
-				}
-				else
-				{
-					RWRITEIDX32(fb, finalcolor | (((userdata->m_current_pix_cvg - 1) & 7) << 5));
-				}
-				break;
-			case 1:
-				RWRITEIDX32(fb, finalcolor | (((userdata->m_current_pix_cvg + userdata->m_current_mem_cvg) & 7) << 5));
-				break;
-			case 2:
-				RWRITEIDX32(fb, finalcolor | 0xE0);
-				break;
-			case 3:
-				RWRITEIDX32(fb, finalcolor | (userdata->m_current_mem_cvg << 5));
-				break;
-		}
+		case 2:
+			RWRITEIDX16(fb, finalcolor | 1);
+			HWRITEADDR8(fb, 3);
+			break;
+		case 3:
+			RWRITEIDX16(fb, finalcolor | (userdata->m_current_mem_cvg >> 2));
+			HWRITEADDR8(fb, userdata->m_current_mem_cvg & 3);
+			break;
 	}
 }
 
-inline void n64_rdp::read_pixel(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object)
+void n64_rdp::write_pixel32(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
-	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
-	{
-		const uint16_t fword = RREADIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel);
+	const uint32_t fb = (object.m_misc_state.m_fb_address >> 2) + curpixel;
 
-		userdata->m_memory_color.set(0, GETHICOL(fword), GETMEDCOL(fword), GETLOWCOL(fword));
-		if (object.m_other_modes.image_read_en)
-		{
-			uint8_t hbyte = HREADADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel);
-			userdata->m_memory_color.set_a(userdata->m_current_mem_cvg << 5);
-			userdata->m_current_mem_cvg = ((fword & 1) << 2) | (hbyte & 3);
-		}
-		else
-		{
-			userdata->m_memory_color.set_a(0xff);
-			userdata->m_current_mem_cvg = 7;
-		}
-	}
-	else // 32-bit framebuffer
+	uint32_t finalcolor;
+	if (object.m_other_modes.color_on_cvg && !userdata->m_pre_wrap)
 	{
-		const uint32_t mem = RREADIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel);
-		userdata->m_memory_color.set(0, (mem >> 24) & 0xff, (mem >> 16) & 0xff, (mem >> 8) & 0xff);
-		if (object.m_other_modes.image_read_en)
-		{
-			userdata->m_memory_color.set_a(mem & 0xff);
-			userdata->m_current_mem_cvg = (mem >> 5) & 7;
-		}
-		else
-		{
-			userdata->m_memory_color.set_a(0xff);
-			userdata->m_current_mem_cvg = 7;
-		}
+		finalcolor = RREADIDX32(fb) & 0xffffff00;
+	}
+	else
+	{
+		finalcolor = (color.get_r() << 24) | (color.get_g() << 16) | (color.get_b() << 8);
+	}
+
+	switch (object.m_other_modes.cvg_dest)
+	{
+		case 0:
+			if (userdata->m_blend_enable)
+			{
+				uint32_t finalcvg = userdata->m_current_pix_cvg + userdata->m_current_mem_cvg;
+				if (finalcvg & 8)
+				{
+					finalcvg = 7;
+				}
+
+				RWRITEIDX32(fb, finalcolor | (finalcvg << 5));
+			}
+			else
+			{
+				RWRITEIDX32(fb, finalcolor | (((userdata->m_current_pix_cvg - 1) & 7) << 5));
+			}
+			break;
+		case 1:
+			RWRITEIDX32(fb, finalcolor | (((userdata->m_current_pix_cvg + userdata->m_current_mem_cvg) & 7) << 5));
+			break;
+		case 2:
+			RWRITEIDX32(fb, finalcolor | 0xE0);
+			break;
+		case 3:
+			RWRITEIDX32(fb, finalcolor | (userdata->m_current_mem_cvg << 5));
+			break;
 	}
 }
 
-inline void n64_rdp::copy_pixel(uint32_t curpixel, color_t& color, const rdp_poly_state &object)
+void n64_rdp::read_pixel4(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object)
+{
+	userdata->m_memory_color.set(0, 0, 0, 0);
+	userdata->m_current_mem_cvg = 7;
+}
+
+void n64_rdp::read_pixel8(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object)
+{
+	const uint8_t fbyte = RREADADDR8(object.m_misc_state.m_fb_address + curpixel);
+	const uint8_t r8 = (fbyte & 0xf8) | (fbyte >> 5);
+	uint8_t g8 = (fbyte & 0x07);
+	g8 |= g8 << 3;
+	g8 |= g8 << 6;
+	userdata->m_memory_color.set(0, r8, g8, 0);
+	userdata->m_memory_color.set_a(0xff);
+	userdata->m_current_mem_cvg = 7;
+}
+
+void n64_rdp::read_pixel16(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object)
+{
+	const uint16_t fword = RREADIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel);
+
+	userdata->m_memory_color.set(0, GETHICOL(fword), GETMEDCOL(fword), GETLOWCOL(fword));
+	if (object.m_other_modes.image_read_en)
+	{
+		uint8_t hbyte = HREADADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel);
+		userdata->m_memory_color.set_a(userdata->m_current_mem_cvg << 5);
+		userdata->m_current_mem_cvg = ((fword & 1) << 2) | (hbyte & 3);
+	}
+	else
+	{
+		userdata->m_memory_color.set_a(0xff);
+		userdata->m_current_mem_cvg = 7;
+	}
+}
+
+void n64_rdp::read_pixel32(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object)
+{
+	const uint32_t mem = RREADIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel);
+	userdata->m_memory_color.set(0, (mem >> 24) & 0xff, (mem >> 16) & 0xff, (mem >> 8) & 0xff);
+	if (object.m_other_modes.image_read_en)
+	{
+		userdata->m_memory_color.set_a(mem & 0xff);
+		userdata->m_current_mem_cvg = (mem >> 5) & 7;
+	}
+	else
+	{
+		userdata->m_memory_color.set_a(0xff);
+		userdata->m_current_mem_cvg = 7;
+	}
+}
+
+void n64_rdp::copy_pixel4(uint32_t curpixel, color_t& color, const rdp_poly_state &object)
+{
+	// Not yet implemented
+}
+
+void n64_rdp::copy_pixel8(uint32_t curpixel, color_t& color, const rdp_poly_state &object)
+{
+	const uint8_t c = (color.get_r() & 0xf8) | ((color.get_g() & 0xf8) >> 5);
+	if (c != 0)
+		RWRITEADDR8(object.m_misc_state.m_fb_address + curpixel, c);
+}
+
+void n64_rdp::copy_pixel16(uint32_t curpixel, color_t& color, const rdp_poly_state &object)
 {
 	const uint32_t current_pix_cvg = color.get_a() ? 7 : 0;
 	const uint8_t r = color.get_r(); // Vectorize me
 	const uint8_t g = color.get_g();
 	const uint8_t b = color.get_b();
-	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
-	{
-		RWRITEIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel, ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | ((current_pix_cvg >> 2) & 1));
-		HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel, current_pix_cvg & 3);
-	}
-	else // 32-bit framebuffer
-	{
-		RWRITEIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel, (r << 24) | (g << 16) | (b << 8) | (current_pix_cvg << 5));
-	}
+	RWRITEIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel, ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | ((current_pix_cvg >> 2) & 1));
+	HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel, current_pix_cvg & 3);
 }
 
-inline void n64_rdp::fill_pixel(uint32_t curpixel, const rdp_poly_state &object)
+void n64_rdp::copy_pixel32(uint32_t curpixel, color_t& color, const rdp_poly_state &object)
 {
-	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
+	const uint32_t current_pix_cvg = color.get_a() ? 7 : 0;
+	const uint8_t r = color.get_r(); // Vectorize me
+	const uint8_t g = color.get_g();
+	const uint8_t b = color.get_b();
+	RWRITEIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel, (r << 24) | (g << 16) | (b << 8) | (current_pix_cvg << 5));
+}
+
+void n64_rdp::fill_pixel4(uint32_t curpixel, const rdp_poly_state &object)
+{
+	// Not yet implemented
+}
+
+void n64_rdp::fill_pixel8(uint32_t curpixel, const rdp_poly_state &object)
+{
+	const uint8_t byte_shift = ((curpixel & 3) ^ BYTE_ADDR_XOR) << 3;
+	RWRITEADDR8(object.m_misc_state.m_fb_address + curpixel, (uint8_t)(object.m_fill_color >> byte_shift));
+}
+
+void n64_rdp::fill_pixel16(uint32_t curpixel, const rdp_poly_state &object)
+{
+	uint16_t val;
+	if (curpixel & 1)
 	{
-		uint16_t val;
-		if (curpixel & 1)
-		{
-			val = object.m_fill_color & 0xffff;
-		}
-		else
-		{
-			val = (object.m_fill_color >> 16) & 0xffff;
-		}
-		RWRITEIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel, val);
-		HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel, ((val & 1) << 1) | (val & 1));
+		val = object.m_fill_color & 0xffff;
 	}
-	else // 32-bit framebuffer
+	else
 	{
-		RWRITEIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel, object.m_fill_color);
-		HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + (curpixel << 1), (object.m_fill_color & 0x10000) ? 3 : 0);
-		HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + (curpixel << 1) + 1, (object.m_fill_color & 0x1) ? 3 : 0);
+		val = (object.m_fill_color >> 16) & 0xffff;
 	}
+	RWRITEIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel, val);
+	HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel, ((val & 1) << 1) | (val & 1));
+}
+
+void n64_rdp::fill_pixel32(uint32_t curpixel, const rdp_poly_state &object)
+{
+	RWRITEIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel, object.m_fill_color);
+	HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + (curpixel << 1), (object.m_fill_color & 0x10000) ? 3 : 0);
+	HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + (curpixel << 1) + 1, (object.m_fill_color & 0x1) ? 3 : 0);
 }
 
 void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const rdp_poly_state &object, int32_t threadid)
 {
-	assert(object.m_misc_state.m_fb_size >= 2 && object.m_misc_state.m_fb_size < 4);
+	assert(object.m_misc_state.m_fb_size < 4);
 
 	const int32_t clipx1 = object.m_scissor.m_xh;
 	const int32_t clipx2 = object.m_scissor.m_xl;
@@ -3593,7 +3753,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 		dzpix = object.m_span_base.m_span_dzpix;
 	}
 
-	if (object.m_misc_state.m_fb_size < 2 || object.m_misc_state.m_fb_size > 4)
+	if (object.m_misc_state.m_fb_size > 4)
 		fatalerror("unsupported m_fb_size %d\n", object.m_misc_state.m_fb_size);
 
 	const int32_t blend_index = (object.m_other_modes.alpha_cvg_select ? 2 : 0) | ((object.m_other_modes.rgb_dither_sel < 3) ? 1 : 0);
@@ -3669,7 +3829,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 			const uint32_t zbcur = zb + curpixel;
 			const uint32_t zhbcur = zhb + curpixel;
 
-			read_pixel(curpixel, userdata, object);
+			((this)->*(m_read_pixel[object.m_misc_state.m_fb_size]))(curpixel, userdata, object);
 
 			if(z_compare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
@@ -3682,7 +3842,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 
 				if (rendered)
 				{
-					write_pixel(curpixel, blended_pixel, userdata, object);
+					((this)->*(m_write_pixel[object.m_misc_state.m_fb_size]))(curpixel, blended_pixel, userdata, object);
 					if (object.m_other_modes.z_update_en)
 					{
 						z_store(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
@@ -3709,7 +3869,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 
 void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const rdp_poly_state &object, int32_t threadid)
 {
-	assert(object.m_misc_state.m_fb_size >= 2 && object.m_misc_state.m_fb_size < 4);
+	assert(object.m_misc_state.m_fb_size < 4);
 
 	const int32_t clipx1 = object.m_scissor.m_xh;
 	const int32_t clipx2 = object.m_scissor.m_xl;
@@ -3803,7 +3963,7 @@ void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const r
 		dzpix = object.m_span_base.m_span_dzpix;
 	}
 
-	if (object.m_misc_state.m_fb_size < 2 || object.m_misc_state.m_fb_size > 4)
+	if (object.m_misc_state.m_fb_size > 4)
 		fatalerror("unsupported m_fb_size %d\n", object.m_misc_state.m_fb_size);
 
 	const int32_t blend_index = (object.m_other_modes.alpha_cvg_select ? 2 : 0) | ((object.m_other_modes.rgb_dither_sel < 3) ? 1 : 0);
@@ -3928,7 +4088,7 @@ void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const r
 			const uint32_t zbcur = zb + curpixel;
 			const uint32_t zhbcur = zhb + curpixel;
 
-			read_pixel(curpixel, userdata, object);
+			((this)->*(m_read_pixel[object.m_misc_state.m_fb_size]))(curpixel, userdata, object);
 
 			if(z_compare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
@@ -3939,7 +4099,7 @@ void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const r
 
 				if (rendered)
 				{
-					write_pixel(curpixel, blended_pixel, userdata, object);
+					((this)->*(m_write_pixel[object.m_misc_state.m_fb_size]))(curpixel, blended_pixel, userdata, object);
 					if (object.m_other_modes.z_update_en)
 					{
 						z_store(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
@@ -4000,9 +4160,9 @@ void n64_rdp::span_draw_copy(int32_t scanline, const extent_t &extent, const rdp
 			m_tex_pipe.copy(&userdata->m_texel0_color, sss, sst, tilenum, object, userdata);
 
 			uint32_t curpixel = fb_index + x;
-			if ((userdata->m_texel0_color.get_a() != 0) || (!object.m_other_modes.alpha_compare_en))
+			if (userdata->m_texel0_color.get_a() != 0 || !object.m_other_modes.alpha_compare_en || object.m_misc_state.m_fb_size == 1)
 			{
-				copy_pixel(curpixel, userdata->m_texel0_color, object);
+				((this)->*(m_copy_pixel[object.m_misc_state.m_fb_size]))(curpixel, userdata->m_texel0_color, object);
 			}
 		}
 
@@ -4014,7 +4174,7 @@ void n64_rdp::span_draw_copy(int32_t scanline, const extent_t &extent, const rdp
 
 void n64_rdp::span_draw_fill(int32_t scanline, const extent_t &extent, const rdp_poly_state &object, int32_t threadid)
 {
-	assert(object.m_misc_state.m_fb_size >= 2 && object.m_misc_state.m_fb_size < 4);
+	assert(object.m_misc_state.m_fb_size < 4);
 
 	const bool flip = object.flip;
 
@@ -4036,7 +4196,7 @@ void n64_rdp::span_draw_fill(int32_t scanline, const extent_t &extent, const rdp
 	{
 		if (x >= clipx1 && x < clipx2)
 		{
-			fill_pixel(fb_index + x, object);
+			((this)->*(m_fill_pixel[object.m_misc_state.m_fb_size]))(fb_index + x, object);
 		}
 
 		x += xinc;
