@@ -114,7 +114,6 @@ TODO:
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
 - improve/redo SVGs of: bzaxxon, bpengo, bbtime, gscobra
-- gscobra doesn't work, assume bad romdump
 
 ***************************************************************************/
 
@@ -3521,7 +3520,7 @@ void gscobra_state::gscobra(machine_config &config)
 
 ROM_START( gscobra )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "hd38820a32", 0x0000, 0x1000, BAD_DUMP CRC(d286858d) SHA1(d37f79f2b9e52528bbe95c37ec9f5963c4bd7fa5) )
+	ROM_LOAD( "hd38820a32", 0x0000, 0x1000, CRC(7bbd130f) SHA1(91dd280e4108fad7ba99191355364bd3217b9d17) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 100000, "screen", 0)
