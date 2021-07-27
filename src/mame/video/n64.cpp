@@ -374,21 +374,21 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 					uint32_t pix01 = frame_buffer32[pix_v1_line + iu0];
 					uint32_t pix11 = frame_buffer32[pix_v1_line + iu1];
 
-					const uint8_t r00 = (uint8_t)(pix00 >> 16);
-					const uint8_t g00 = (uint8_t)(pix00 >> 8);
-					const uint8_t b00 = (uint8_t)pix00;
+					const uint8_t r00 = (uint8_t)(pix00 >> 24);
+					const uint8_t g00 = (uint8_t)(pix00 >> 16);
+					const uint8_t b00 = (uint8_t)(pix00 >> 8);
 
-					const uint8_t r10 = (uint8_t)(pix01 >> 16);
-					const uint8_t g10 = (uint8_t)(pix01 >> 8);
-					const uint8_t b10 = (uint8_t)pix01;
+					const uint8_t r10 = (uint8_t)(pix01 >> 24);
+					const uint8_t g10 = (uint8_t)(pix01 >> 16);
+					const uint8_t b10 = (uint8_t)(pix01 >> 8);
 
-					const uint8_t r01 = (uint8_t)(pix10 >> 16);
-					const uint8_t g01 = (uint8_t)(pix10 >> 8);
-					const uint8_t b01 = (uint8_t)pix10;
+					const uint8_t r01 = (uint8_t)(pix10 >> 24);
+					const uint8_t g01 = (uint8_t)(pix10 >> 16);
+					const uint8_t b01 = (uint8_t)(pix10 >> 8);
 
-					const uint8_t r11 = (uint8_t)(pix11 >> 16);
-					const uint8_t g11 = (uint8_t)(pix11 >> 8);
-					const uint8_t b11 = (uint8_t)pix11;
+					const uint8_t r11 = (uint8_t)(pix11 >> 24);
+					const uint8_t g11 = (uint8_t)(pix11 >> 16);
+					const uint8_t b11 = (uint8_t)(pix11 >> 8);
 
 					const float ut = u0 - (int)u0;
 					const float vt = v0 - (int)v0;
@@ -3831,7 +3831,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 
 			((this)->*(m_read_pixel[object.m_misc_state.m_fb_size]))(curpixel, userdata, object);
 
-			if(z_compare(zbcur, zhbcur, sz, dzpix, userdata, object))
+			if (z_compare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
 				int32_t cdith = 0;
 				int32_t adith = 0;
