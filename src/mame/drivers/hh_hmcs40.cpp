@@ -51,7 +51,7 @@ known chips:
  @A23     HD38820  1981, Entex Pac Man 2
  @A28     HD38820  1981, Coleco Pac-Man (ver 1)
  @A29     HD38820  1981, Coleco Pac-Man (ver 2)
- *A32     HD38820  198?, Gakken Super Cobra
+ @A32     HD38820  1982, Gakken Super Cobra
  *A38     HD38820  1982, Entex Crazy Climber
  @A42     HD38820  1982, Entex Stargate
  @A43     HD38820  1982, Entex Turtles
@@ -113,7 +113,8 @@ TODO:
   games may manipulate VFD plate brightness by strobing it longer/shorter,
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
-- improve/redo SVGs of: bzaxxon, bpengo, bbtime
+- improve/redo SVGs of: bzaxxon, bpengo, bbtime, gscobra
+- gscobra doesn't work, assume bad romdump
 
 ***************************************************************************/
 
@@ -139,7 +140,7 @@ TODO:
 #include "msthawk.lh"
 #include "packmon.lh"
 
-//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -3406,6 +3407,133 @@ ROM_END
 
 /***************************************************************************
 
+  Gakken Super Cobra
+  * PCB label SUPER COBRA 3000N
+  * Hitachi QFP HD38820A32 MCU
+  * cyan/red/green VFD display
+
+  There are 2 versions, a green one and a white one. They are assumed to have
+  the same MCU, the VFD has color differences though.
+
+***************************************************************************/
+
+class gscobra_state : public hh_hmcs40_state
+{
+public:
+	gscobra_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+
+	void update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+	void gscobra(machine_config &config);
+};
+
+// handlers
+
+void gscobra_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R6x(,D1-D3): vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	m_display->matrix(m_grid, m_plate);
+}
+
+void gscobra_state::grid_w(u16 data)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D10-D15: input mux
+	u8 inp_mux = data >> 10 & 0x3f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D4-D15: vfd grid
+	m_grid = data >> 4 & 0xfff;
+
+	// D1-D3: more plates (update display there)
+	plate_w(7, data >> 1 & 7);
+}
+
+void gscobra_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(6));
+}
+
+// config
+
+static INPUT_PORTS_START( gscobra )
+	PORT_START("IN.0") // D10 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.1") // D11 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.2") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.3") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.4") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.5") // D15 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+INPUT_PORTS_END
+
+void gscobra_state::gscobra(machine_config &config)
+{
+	/* basic machine hardware */
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_d().set(FUNC(gscobra_state::grid_w));
+
+	/* video hardware */
+	//screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	//screen.set_refresh_hz(60);
+	config.set_default_layout(layout_hh_hmcs40_test);
+
+	PWM_DISPLAY(config, m_display).set_size(12, 31);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gscobra )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a32", 0x0000, 0x1000, BAD_DUMP CRC(d286858d) SHA1(d37f79f2b9e52528bbe95c37ec9f5963c4bd7fa5) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "gscobra.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Gakken Dig Dug (manufactured in Japan)
   * PCB label Gakken DIG-DAG KS-004283(A/B)
   * Hitachi QFP HD38820A69 MCU
@@ -4338,6 +4466,7 @@ CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_in
 
 CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
