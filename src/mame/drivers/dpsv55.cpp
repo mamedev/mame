@@ -12,6 +12,9 @@
 #include "emu.h"
 #include "cpu/f2mc16/mb9061x.h"
 #include "machine/nvram.h"
+#include "video/hd44780.h"
+#include "emupal.h"
+#include "screen.h"
 
 namespace {
 
@@ -21,20 +24,60 @@ public:
 	dpsv55_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "lcdc")
+		, m_p5(0)
 	{
 	}
 
 	void dpsv55(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	HD44780_PIXEL_UPDATE(pixel_update);
+	u8 p5_r();
+	void p5_w(u8 data);
+
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<hd44780_device> m_lcdc;
+
+	u8 m_p5;
 };
+
+void dpsv55_state::machine_start()
+{
+	save_item(NAME(m_p5));
+}
+
+HD44780_PIXEL_UPDATE(dpsv55_state::pixel_update)
+{
+	if (x < 5 && y < 8 && line < 2 && pos >= 4 && pos < 20)
+		bitmap.pix(line * 8 + y, (pos - 4) * 6 + x) = state;
+}
+
+u8 dpsv55_state::p5_r()
+{
+	return m_p5;
+}
+
+void dpsv55_state::p5_w(u8 data)
+{
+	m_lcdc->e_w(BIT(data, 3));
+	m_lcdc->rw_w(BIT(data, 2));
+	m_lcdc->rs_w(BIT(data, 1));
+
+	m_p5 = data;
+}
 
 
 void dpsv55_state::mem_map(address_map &map)
 {
+	map(0x000001, 0x000001).rw(m_lcdc, FUNC(hd44780_device::db_r), FUNC(hd44780_device::db_w));
+	map(0x000005, 0x000005).rw(FUNC(dpsv55_state::p5_r), FUNC(dpsv55_state::p5_w));
+	map(0x000023, 0x000023).nopr();
 	map(0xfc0000, 0xfc7fff).mirror(0x18000).ram().share("nvram"); // CS1
 	map(0xfe0000, 0xffffff).rom().region("eprom", 0); // CS0
 }
@@ -50,7 +93,20 @@ void dpsv55_state::dpsv55(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CY62256LL-70SNC-T2 + 3V lithium battery + M62021FP-600C reset generator + M5239L voltage detector
 
-	// TODO: LCD unit (LC0801)
+	// LCD unit (LC0801)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 8*2);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 20);
+	m_lcdc->set_pixel_update_cb(FUNC(dpsv55_state::pixel_update));
 
 	//CXD2707(config, "dsp", 49.152_MHz_XTAL);
 }
