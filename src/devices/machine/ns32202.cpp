@@ -714,19 +714,19 @@ void ns32202_device::cictl_w(u8 data)
 
 template <unsigned N> void ns32202_device::ccvl_w(u8 data)
 {
-	if ((N == 0 && !(m_cctl & CCTL_CRUNL)) || (N == 1) && !(m_cctl & CCTL_CRUNH))
+	if ((N == 0 && !(m_cctl & CCTL_CRUNL)) || ((N == 1) && !(m_cctl & CCTL_CRUNH)))
 		m_ccv[N] = (m_ccv[N] & 0xff00) | data;
 }
 
 template <unsigned N> void ns32202_device::ccvh_w(u8 data)
 {
-	if ((N == 0 && !(m_cctl & CCTL_CRUNL)) || (N == 1) && !(m_cctl & CCTL_CRUNH))
+	if ((N == 0 && !(m_cctl & CCTL_CRUNL)) || ((N == 1) && !(m_cctl & CCTL_CRUNH)))
 		m_ccv[N] = (u16(data) << 8) | u8(m_ccv[N]);
 }
 
 void ns32202_device::mctl_w(u8 data)
 {
-	if (!(m_mctl & MCTL_CFRZ) && (data && MCTL_CFRZ))
+	if (!(m_mctl & MCTL_CFRZ) && (data & MCTL_CFRZ))
 		update_ccv();
 
 	m_mctl = data;
