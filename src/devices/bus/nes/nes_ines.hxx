@@ -402,7 +402,7 @@ static const nes_mmc mmc_list[] =
 	// 365 is this asderp95 in nes.xml?
 	// 366 K-3131GS and K-3131SS 4-in-1 carts
 	// 367 7-in-1 cart that is a close variant of mapper 205
-	// { 368, BTL_YUNG08 }            // SMB2 FDS conversion
+	{ 368, BTL_YUNG08 },            // SMB2 FDS conversion
 	// 369 Super Mario Bros Party multicart
 	// 370 Golden Mario Party II multicart
 	// 371 Spanish PEC-586 computer main cart

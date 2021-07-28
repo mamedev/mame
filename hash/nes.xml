@@ -67263,14 +67263,15 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="smb2fdsy" cloneof="smb2fds" supported="no">
+	<software name="smb2fdsy" cloneof="smb2fds">
 		<description>Super Mario Bros. 2 (YUNG-08)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="yung08" /> <!-- mapper 368 -->
 			<feature name="pcb" value="YUNG-08" />
-			<dataarea name="prg" size="73728">
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="81920">
 				<rom name="mali4dai.prg0" size="32768" crc="473b9553" sha1="5b3a5752229cfadb41b2ae8a1fe3eff2b7132a17" offset="0x00000" status="baddump" /> <!-- original label: 瑪琍4代 -->
 				<rom name="mali4dai.prg1" size="32768" crc="8d188ef2" sha1="44b76a77c3d2ffd582a510516a9da6e58aaecc92" offset="0x08000" status="baddump" /> <!-- original label: 瑪琍4代 -->
 				<rom name="mali4dai.prg2" size="2048" crc="9f098abf" sha1="d295e4e882c21dcbda6b4923e54d1e924b557fa4" offset="0x10000" status="baddump" /> <!-- no label -->
@@ -67285,14 +67286,15 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 <!-- Two boards turned up with the same silkscreen YUNG-08, and this one for whatever reason had different ROMs with the protection check patched out but with the hardware to support it still intact. -->
-	<software name="smb2fdsy1" cloneof="smb2fds" supported="no">
+	<software name="smb2fdsy1" cloneof="smb2fds">
 		<description>Super Mario Bros. 2 (YUNG-08, no protection)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="yung08" /> <!-- mapper 368 -->
 			<feature name="pcb" value="YUNG-08" />
-			<dataarea name="prg" size="73728">
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="81920">
 				<rom name="mali4dai (alt).prg0" size="32768" crc="473b9553" sha1="5b3a5752229cfadb41b2ae8a1fe3eff2b7132a17" offset="0x00000" status="baddump" />
 				<rom name="mali4dai (alt).prg1" size="32768" crc="8d188ef2" sha1="44b76a77c3d2ffd582a510516a9da6e58aaecc92" offset="0x08000" status="baddump" />
 				<rom name="mali4dai (alt).prg2" size="2048" crc="c9fbd397" sha1="21c72e06ff861bda4b8bf81541c1eb665e88d27e" offset="0x10000" status="baddump" />
