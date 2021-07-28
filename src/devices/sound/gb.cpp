@@ -44,6 +44,7 @@
 TODO:
 - Implement different behavior of CGB-02.
 - Implement different behavior of CGB-05.
+- Implement different behavior of AGB-*.
 - Perform more tests on real hardware to figure out when the frequency counters are
   reloaded.
 - Perform more tests on real hardware to understand when changes to the noise divisor
@@ -75,6 +76,7 @@ DEFINE_DEVICE_TYPE(DMG_APU, dmg_apu_device, "dmg_apu", "LR35902 APU")
 //DEFINE_DEVICE_TYPE(CGB02_APU, cgb02_apu_device, "cgb02_apu", fullname)
 DEFINE_DEVICE_TYPE(CGB04_APU, cgb04_apu_device, "cgb04_apu", "CGB04 APU")
 //DEFINE_DEVICE_TYPE(CGB05_APU, cgb05_apu_device, "cgb05_apu", fullname)
+DEFINE_DEVICE_TYPE(AGB_APU, agb_apu_device, "agb_apu", "AGB APU")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -97,8 +99,20 @@ dmg_apu_device::dmg_apu_device(const machine_config &mconfig, const char *tag, d
 }
 
 
+cgb04_apu_device::cgb04_apu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gameboy_sound_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
 cgb04_apu_device::cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gameboy_sound_device(mconfig, CGB04_APU, tag, owner, clock)
+	: cgb04_apu_device(mconfig, CGB04_APU, tag, owner, clock)
+{
+}
+
+
+agb_apu_device::agb_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cgb04_apu_device(mconfig, AGB_APU, tag, owner, clock)
 {
 }
 
@@ -131,6 +145,8 @@ cgb04_apu_device::cgb04_apu_device(const machine_config &mconfig, const char *ta
 	save_item(NAME(snd.sweep_direction)); \
 	save_item(NAME(snd.sweep_time)); \
 	save_item(NAME(snd.sweep_count)); \
+	save_item(NAME(snd.size)); \
+	save_item(NAME(snd.bank)); \
 	save_item(NAME(snd.level)); \
 	save_item(NAME(snd.offset)); \
 	save_item(NAME(snd.duty_count)); \
@@ -148,6 +164,7 @@ void gameboy_sound_device::device_start()
 
 	save_item(NAME(m_last_updated));
 	save_item(NAME(m_snd_regs));
+	save_item(NAME(m_wave_ram));
 	// sound control
 	save_item(NAME(m_snd_control.on));
 	save_item(NAME(m_snd_control.vol_left));
@@ -191,31 +208,31 @@ void gameboy_sound_device::device_reset()
 	memset(&m_snd_4, 0, sizeof(m_snd_4));
 
 	m_snd_1.channel = 1;
-	m_snd_1.length_mask = 0x3F;
+	m_snd_1.length_mask = 0x3f;
 	m_snd_2.channel = 2;
-	m_snd_2.length_mask = 0x3F;
+	m_snd_2.length_mask = 0x3f;
 	m_snd_3.channel = 3;
-	m_snd_3.length_mask = 0xFF;
+	m_snd_3.length_mask = 0xff;
 	m_snd_4.channel = 4;
-	m_snd_4.length_mask = 0x3F;
+	m_snd_4.length_mask = 0x3f;
 
 	sound_w_internal(NR52, 0x00);
-	m_snd_regs[AUD3W0] = 0xac;
-	m_snd_regs[AUD3W1] = 0xdd;
-	m_snd_regs[AUD3W2] = 0xda;
-	m_snd_regs[AUD3W3] = 0x48;
-	m_snd_regs[AUD3W4] = 0x36;
-	m_snd_regs[AUD3W5] = 0x02;
-	m_snd_regs[AUD3W6] = 0xcf;
-	m_snd_regs[AUD3W7] = 0x16;
-	m_snd_regs[AUD3W8] = 0x2c;
-	m_snd_regs[AUD3W9] = 0x04;
-	m_snd_regs[AUD3WA] = 0xe5;
-	m_snd_regs[AUD3WB] = 0x2c;
-	m_snd_regs[AUD3WC] = 0xac;
-	m_snd_regs[AUD3WD] = 0xdd;
-	m_snd_regs[AUD3WE] = 0xda;
-	m_snd_regs[AUD3WF] = 0x48;
+	m_wave_ram[0][0x0] = 0xac;
+	m_wave_ram[0][0x1] = 0xdd;
+	m_wave_ram[0][0x2] = 0xda;
+	m_wave_ram[0][0x3] = 0x48;
+	m_wave_ram[0][0x4] = 0x36;
+	m_wave_ram[0][0x5] = 0x02;
+	m_wave_ram[0][0x6] = 0xcf;
+	m_wave_ram[0][0x7] = 0x16;
+	m_wave_ram[0][0x8] = 0x2c;
+	m_wave_ram[0][0x9] = 0x04;
+	m_wave_ram[0][0xa] = 0xe5;
+	m_wave_ram[0][0xb] = 0x2c;
+	m_wave_ram[0][0xc] = 0xac;
+	m_wave_ram[0][0xd] = 0xdd;
+	m_wave_ram[0][0xe] = 0xda;
+	m_wave_ram[0][0xf] = 0x48;
 }
 
 
@@ -223,22 +240,63 @@ void cgb04_apu_device::device_reset()
 {
 	gameboy_sound_device::device_reset();
 
-	m_snd_regs[AUD3W0] = 0x00;
-	m_snd_regs[AUD3W1] = 0xFF;
-	m_snd_regs[AUD3W2] = 0x00;
-	m_snd_regs[AUD3W3] = 0xFF;
-	m_snd_regs[AUD3W4] = 0x00;
-	m_snd_regs[AUD3W5] = 0xFF;
-	m_snd_regs[AUD3W6] = 0x00;
-	m_snd_regs[AUD3W7] = 0xFF;
-	m_snd_regs[AUD3W8] = 0x00;
-	m_snd_regs[AUD3W9] = 0xFF;
-	m_snd_regs[AUD3WA] = 0x00;
-	m_snd_regs[AUD3WB] = 0xFF;
-	m_snd_regs[AUD3WC] = 0x00;
-	m_snd_regs[AUD3WD] = 0xFF;
-	m_snd_regs[AUD3WE] = 0x00;
-	m_snd_regs[AUD3WF] = 0xFF;
+	m_wave_ram[0][0x0] = 0x00;
+	m_wave_ram[0][0x1] = 0xff;
+	m_wave_ram[0][0x2] = 0x00;
+	m_wave_ram[0][0x3] = 0xff;
+	m_wave_ram[0][0x4] = 0x00;
+	m_wave_ram[0][0x5] = 0xff;
+	m_wave_ram[0][0x6] = 0x00;
+	m_wave_ram[0][0x7] = 0xff;
+	m_wave_ram[0][0x8] = 0x00;
+	m_wave_ram[0][0x9] = 0xff;
+	m_wave_ram[0][0xa] = 0x00;
+	m_wave_ram[0][0xb] = 0xff;
+	m_wave_ram[0][0xc] = 0x00;
+	m_wave_ram[0][0xd] = 0xff;
+	m_wave_ram[0][0xe] = 0x00;
+	m_wave_ram[0][0xf] = 0xff;
+}
+
+
+void agb_apu_device::device_reset()
+{
+	gameboy_sound_device::device_reset();
+
+	// TODO: needs verification
+	m_wave_ram[0][0x0] = 0x00;
+	m_wave_ram[0][0x1] = 0xff;
+	m_wave_ram[0][0x2] = 0x00;
+	m_wave_ram[0][0x3] = 0xff;
+	m_wave_ram[0][0x4] = 0x00;
+	m_wave_ram[0][0x5] = 0xff;
+	m_wave_ram[0][0x6] = 0x00;
+	m_wave_ram[0][0x7] = 0xff;
+	m_wave_ram[0][0x8] = 0x00;
+	m_wave_ram[0][0x9] = 0xff;
+	m_wave_ram[0][0xa] = 0x00;
+	m_wave_ram[0][0xb] = 0xff;
+	m_wave_ram[0][0xc] = 0x00;
+	m_wave_ram[0][0xd] = 0xff;
+	m_wave_ram[0][0xe] = 0x00;
+	m_wave_ram[0][0xf] = 0xff;
+
+	m_wave_ram[1][0x0] = 0x00;
+	m_wave_ram[1][0x1] = 0xff;
+	m_wave_ram[1][0x2] = 0x00;
+	m_wave_ram[1][0x3] = 0xff;
+	m_wave_ram[1][0x4] = 0x00;
+	m_wave_ram[1][0x5] = 0xff;
+	m_wave_ram[1][0x6] = 0x00;
+	m_wave_ram[1][0x7] = 0xff;
+	m_wave_ram[1][0x8] = 0x00;
+	m_wave_ram[1][0x9] = 0xff;
+	m_wave_ram[1][0xa] = 0x00;
+	m_wave_ram[1][0xb] = 0xff;
+	m_wave_ram[1][0xc] = 0x00;
+	m_wave_ram[1][0xd] = 0xff;
+	m_wave_ram[1][0xe] = 0x00;
+	m_wave_ram[1][0xf] = 0xff;
 }
 
 
@@ -272,7 +330,7 @@ int32_t gameboy_sound_device::calculate_next_sweep(struct SOUND &snd)
 	snd.sweep_neg_mode_used = (snd.sweep_direction < 0);
 	int32_t new_frequency = snd.frequency + snd.sweep_direction * (snd.frequency >> snd.sweep_shift);
 
-	if (new_frequency > 0x7FF)
+	if (new_frequency > 0x7ff)
 	{
 		snd.on = false;
 	}
@@ -288,7 +346,7 @@ void gameboy_sound_device::apply_next_sweep(struct SOUND &snd)
 	if (snd.on && snd.sweep_shift > 0)
 	{
 		snd.frequency = new_frequency;
-		snd.reg[3] = snd.frequency & 0xFF;
+		snd.reg[3] = snd.frequency & 0xff;
 	}
 }
 
@@ -339,7 +397,7 @@ void gameboy_sound_device::tick_envelope(struct SOUND &snd)
 
 bool gameboy_sound_device::dac_enabled(struct SOUND &snd)
 {
-	return (snd.channel != 3) ? snd.reg[2] & 0xF8 : snd.reg[0] & 0x80;
+	return (snd.channel != 3) ? snd.reg[2] & 0xf8 : snd.reg[0] & 0x80;
 }
 
 
@@ -410,6 +468,7 @@ void dmg_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 			}
 		}
 
+		const uint8_t level = snd.level & 3;
 		while (cycles > 0)
 		{
 			// Emit current sample
@@ -425,24 +484,24 @@ void dmg_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 				cycles -= 2;
 
 				// Calculate next state
-				snd.frequency_counter = (snd.frequency_counter + 1) & 0x7FF;
+				snd.frequency_counter = (snd.frequency_counter + 1) & 0x7ff;
 				snd.sample_reading = false;
 				if (snd.frequency_counter == 0x7ff)
 				{
-					snd.offset = (snd.offset + 1) & 0x1F;
+					snd.offset = (snd.offset + 1) & 0x1f;
 				}
 				if (snd.frequency_counter == 0)
 				{
 					// Read next sample
 					snd.sample_reading = true;
-					snd.current_sample = m_snd_regs[AUD3W0 + (snd.offset/2)];
+					snd.current_sample = m_wave_ram[0][(snd.offset/2)];
 					if (!(snd.offset & 0x01))
 					{
 						snd.current_sample >>= 4;
 					}
-					snd.current_sample = (snd.current_sample & 0x0F) - 8;
+					snd.current_sample = (snd.current_sample & 0x0f) - 8;
 
-					snd.signal = snd.level ? snd.current_sample / (1 << (snd.level - 1)) : 0;
+					snd.signal = level ? snd.current_sample / (1 << (level - 1)) : 0;
 
 					// Reload frequency counter
 					snd.frequency_counter = snd.frequency;
@@ -480,7 +539,8 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 			snd.cycles_left = 1;
 		}
 		cycles >>= 1;
-		uint16_t    distance = 0x800 - snd.frequency_counter;
+		uint16_t      distance = 0x800 - snd.frequency_counter;
+		const uint8_t level = snd.level & 3;
 		if (cycles >= distance)
 		{
 			cycles -= distance;
@@ -488,14 +548,74 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 			// How many times the condition snd.frequency_counter == 0 is true
 			uint64_t    counter = 1 + cycles / distance;
 
-			snd.offset = (snd.offset + counter) & 0x1F;
-			snd.current_sample = m_snd_regs[AUD3W0 + snd.offset / 2];
+			snd.offset = (snd.offset + counter) & 0x1f;
+			snd.current_sample = m_wave_ram[0][snd.offset / 2];
 			if (!(snd.offset & 1))
 			{
 				snd.current_sample >>= 4;
 			}
-			snd.current_sample = (snd.current_sample & 0x0F) - 8;
-			snd.signal = snd.level ? snd.current_sample / (1 << (snd.level - 1)) : 0;
+			snd.current_sample = (snd.current_sample & 0x0f) - 8;
+			snd.signal = level ? snd.current_sample / (1 << (level - 1)) : 0;
+
+			cycles %= distance;
+			snd.sample_reading = cycles ? false : true;
+
+			snd.frequency_counter = snd.frequency + cycles;
+		}
+		else
+		{
+			snd.frequency_counter += cycles;
+		}
+	}
+}
+
+
+void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
+{
+	if (snd.on)
+	{
+		const uint8_t level_table[8] = { 0, 4, 2, 1, 3, 3, 3, 3 };
+		// compensate for left over cycles
+		if (snd.cycles_left > 0)
+		{
+			if (cycles <= snd.cycles_left)
+			{
+				// Emit samples
+				snd.cycles_left -= cycles;
+				cycles = 0;
+			}
+			else
+			{
+				// Emit samples
+
+				cycles -= snd.cycles_left;
+				snd.cycles_left = 0;
+			}
+		}
+
+		if (cycles & 1)
+		{
+			snd.cycles_left = 1;
+		}
+		cycles >>= 1;
+		uint16_t      distance = 0x800 - snd.frequency_counter;
+		const uint8_t level = level_table[snd.level];
+		if (cycles >= distance)
+		{
+			cycles -= distance;
+			distance = 0x800 - snd.frequency;
+			// How many times the condition snd.frequency_counter == 0 is true
+			uint64_t    counter = 1 + cycles / distance;
+
+			snd.offset = (snd.offset + counter) & 0x3f;
+			uint8_t bank = snd.size ? BIT(snd.offset, 5) : snd.bank;
+			snd.current_sample = m_wave_ram[bank][snd.offset / 2];
+			if (!(snd.offset & 1))
+			{
+				snd.current_sample >>= 4;
+			}
+			snd.current_sample = (snd.current_sample & 0x0f) - 8;
+			snd.signal = level ? (snd.current_sample * level) / 4 : 0;
 
 			cycles %= distance;
 			snd.sample_reading = cycles ? false : true;
@@ -642,10 +762,10 @@ u8 dmg_apu_device::wave_r(offs_t offset)
 
 	if (m_snd_3.on)
 	{
-		return m_snd_3.sample_reading ? m_snd_regs[AUD3W0 + (m_snd_3.offset/2)] : 0xFF;
+		return m_snd_3.sample_reading ? m_wave_ram[0][(m_snd_3.offset/2)] : 0xff;
 	}
 
-	return m_snd_regs[AUD3W0 + offset];
+	return m_wave_ram[0][offset];
 }
 
 
@@ -656,19 +776,36 @@ u8 cgb04_apu_device::wave_r(offs_t offset)
 
 	if (m_snd_3.on)
 	{
-		return m_snd_regs[AUD3W0 + (m_snd_3.offset/2)];
+		return m_wave_ram[0][(m_snd_3.offset/2)];
 	}
 
-	return m_snd_regs[AUD3W0 + offset];
+	return m_wave_ram[0][offset];
+}
+
+
+u8 agb_apu_device::wave_r(offs_t offset)
+{
+	m_channel->update();
+	update_state();
+
+	if (m_snd_3.on)
+	{
+		return m_wave_ram[m_snd_3.bank ^ 1][(m_snd_3.offset/2)];
+	}
+
+	return m_wave_ram[m_snd_3.bank ^ 1][offset];
 }
 
 
 u8 gameboy_sound_device::sound_r(offs_t offset)
 {
+	if ((offset >= AUD3W0) && (offset <= AUD3WF))
+		return wave_r(offset - AUD3W0);
+
 	static const uint8_t read_mask[0x40] =
 	{
-		0x80,0x3F,0x00,0xFF,0xBF,0xFF,0x3F,0x00,0xFF,0xBF,0x7F,0xFF,0x9F,0xFF,0xBF,0xFF,
-		0xFF,0x00,0x00,0xBF,0x00,0x00,0x70,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+		0x80,0x3f,0x00,0xff,0xbf,0xff,0x3f,0x00,0xff,0xbf,0x7f,0xff,0x9f,0xff,0xbf,0xff,
+		0xff,0x00,0x00,0xbf,0x00,0x00,0x70,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 	};
@@ -683,11 +820,43 @@ u8 gameboy_sound_device::sound_r(offs_t offset)
 		{
 			return (m_snd_regs[NR52]&0xf0) | (m_snd_1.on ? 1 : 0) | (m_snd_2.on ? 2 : 0) | (m_snd_3.on ? 4 : 0) | (m_snd_4.on ? 8 : 0) | 0x70;
 		}
-		return m_snd_regs[offset] | read_mask[offset & 0x3F];
+		return m_snd_regs[offset] | read_mask[offset & 0x3f];
 	}
 	else
 	{
-		return read_mask[offset & 0x3F];
+		return read_mask[offset & 0x3f];
+	}
+}
+
+
+u8 agb_apu_device::sound_r(offs_t offset)
+{
+	if ((offset >= AUD3W0) && (offset <= AUD3WF))
+		return wave_r(offset - AUD3W0);
+
+	static const uint8_t read_mask[0x40] =
+	{
+		0x80,0x3f,0x00,0xff,0xbf,0xff,0x3f,0x00,0xff,0xbf,0x1f,0xff,0x1f,0xff,0xbf,0xff,
+		0xff,0x00,0x00,0xbf,0x00,0x00,0x70,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+	};
+
+	// Make sure we are up to date.
+	m_channel->update();
+	update_state();
+
+	if (m_snd_control.on)
+	{
+		if (offset == NR52)
+		{
+			return (m_snd_regs[NR52] & 0xf0) | (m_snd_1.on ? 1 : 0) | (m_snd_2.on ? 2 : 0) | (m_snd_3.on ? 4 : 0) | (m_snd_4.on ? 8 : 0) | 0x70;
+		}
+		return m_snd_regs[offset] | read_mask[offset & 0x3f];
+	}
+	else
+	{
+		return read_mask[offset & 0x3f];
 	}
 }
 
@@ -701,12 +870,12 @@ void dmg_apu_device::wave_w(offs_t offset, u8 data)
 	{
 		if (m_snd_3.sample_reading)
 		{
-			m_snd_regs[AUD3W0 + (m_snd_3.offset/2)] = data;
+			m_wave_ram[0][(m_snd_3.offset/2)] = data;
 		}
 	}
 	else
 	{
-		m_snd_regs[AUD3W0 + offset] = data;
+		m_wave_ram[0][offset] = data;
 	}
 }
 
@@ -718,11 +887,27 @@ void cgb04_apu_device::wave_w(offs_t offset, u8 data)
 
 	if (m_snd_3.on)
 	{
-		m_snd_regs[AUD3W0 + (m_snd_3.offset/2)] = data;
+		m_wave_ram[0][(m_snd_3.offset/2)] = data;
 	}
 	else
 	{
-		m_snd_regs[AUD3W0 + offset] = data;
+		m_wave_ram[0][offset] = data;
+	}
+}
+
+
+void agb_apu_device::wave_w(offs_t offset, u8 data)
+{
+	m_channel->update();
+	update_state();
+
+	if (m_snd_3.on)
+	{
+		m_wave_ram[m_snd_3.bank ^ 1][(m_snd_3.offset/2)] = data;
+	}
+	else
+	{
+		m_wave_ram[m_snd_3.bank ^ 1][offset] = data;
 	}
 }
 
@@ -759,13 +944,13 @@ void dmg_apu_device::corrupt_wave_ram()
 {
 	if (m_snd_3.offset < 8)
 	{
-		m_snd_regs[AUD3W0] = m_snd_regs[AUD3W0 + (m_snd_3.offset/2)];
+		m_wave_ram[0][0x0] = m_wave_ram[0][(m_snd_3.offset/2)];
 	}
 	else
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			m_snd_regs[AUD3W0 + i] = m_snd_regs[AUD3W0 + ((m_snd_3.offset / 2) & ~0x03) + i];
+			m_wave_ram[0][i] = m_wave_ram[0][((m_snd_3.offset / 2) & ~0x03) + i];
 		}
 	}
 }
@@ -950,6 +1135,8 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 	/*MODE 3 */
 	case NR30: /* Sound On/Off (R/W) */
 		m_snd_3.reg[0] = data;
+		m_snd_3.size = BIT(data, 5);
+		m_snd_3.bank = BIT(data, 6);
 		if (!dac_enabled(m_snd_3))
 		{
 			m_snd_3.on = false;
@@ -962,7 +1149,7 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 		break;
 	case NR32: /* Select Output Level */
 		m_snd_3.reg[2] = data;
-		m_snd_3.level = (data & 0x60) >> 5;
+		m_snd_3.level = (data & 0xe0) >> 5;
 		break;
 	case NR33: /* Frequency lo (W) */
 		m_snd_3.reg[3] = data;
@@ -1114,6 +1301,24 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 		}
 		m_snd_control.on = (data & 0x80) ? true : false;
 		m_snd_regs[NR52] = data & 0x80;
+		break;
+	case AUD3W0: // Wavetable (R/W)
+	case AUD3W1:
+	case AUD3W2:
+	case AUD3W3:
+	case AUD3W4:
+	case AUD3W5:
+	case AUD3W6:
+	case AUD3W7:
+	case AUD3W8:
+	case AUD3W9:
+	case AUD3WA:
+	case AUD3WB:
+	case AUD3WC:
+	case AUD3WD:
+	case AUD3WE:
+	case AUD3WF:
+		wave_w(offset - AUD3W0, data);
 		break;
 	}
 }
