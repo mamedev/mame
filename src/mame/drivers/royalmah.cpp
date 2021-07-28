@@ -162,6 +162,7 @@ public:
 	void janyoup2(machine_config &config);
 	void chalgirl(machine_config &config);
 	void mjsiyoub(machine_config &config);
+	void rkjanoh2(machine_config &config);
 
 	void init_tahjong();
 	void init_dynax();
@@ -309,6 +310,7 @@ private:
 	void mjtensin_map(address_map &map);
 	void mjvegasa_map(address_map &map);
 	void mjyarou_iomap(address_map &map);
+	void rkjanoh2_iomap(address_map &map);
 	void royalmah_iomap(address_map &map);
 	void royalmah_map(address_map &map);
 	void seljan_iomap(address_map &map);
@@ -820,15 +822,20 @@ void royalmah_state::jongshin_iomap(address_map &map)
 	map(0xc0, 0xc0).w(FUNC(royalmah_state::jongshin_bank_w));
 }
 
-void royalmah_state::mjyarou_iomap(address_map &map)
+void royalmah_state::rkjanoh2_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
 	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::mjderngr_coin_w));
 	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
-	map(0x12, 0x12).portr("DSW2");
 	map(0x50, 0x55).w(FUNC(royalmah_state::mjyarou_bank_w));
+}
+
+void royalmah_state::mjyarou_iomap(address_map &map)
+{
+	rkjanoh2_iomap(map);
+	map(0x12, 0x12).portr("DSW2");
 }
 
 void royalmah_state::mjsiyoub_iomap(address_map &map)
@@ -3738,6 +3745,12 @@ void royalmah_state::chalgirl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &royalmah_state::chalgirl_iomap);
 }
 
+void royalmah_state::rkjanoh2(machine_config &config)
+{
+	chalgirl(config);
+	m_maincpu->set_addrmap(AS_IO, &royalmah_state::rkjanoh2_iomap);
+}
+
 void royalmah_state::mjyarou(machine_config &config)
 {
 	chalgirl(config);
@@ -5377,9 +5390,7 @@ ROM_START( rkjanoh2 )
 	ROM_LOAD( "pf_5",         0x004000, 0x001000, CRC(8a858464) SHA1(55c71ce1c30e908dfc8c21237256dfbb75c55363) )
 	ROM_LOAD( "pf_6",         0x005000, 0x001000, CRC(5b649918) SHA1(191a221a515c261d90d7432443a7fbc8da71e7ac) )
 	ROM_LOAD( "pf_7",         0x006000, 0x001000, CRC(c4fdd2ac) SHA1(76c5645534b87dde87acfb4140d0f3ba18c95cd2) )
-
-	ROM_REGION( 0x002000, "gfx", 0 )
-	ROM_LOAD( "pf_8",         0x000000, 0x002000, CRC(c789e2b3) SHA1(33b5c8f22a1e337816a61fd2c91bc175a412d10e) )
+	ROM_LOAD( "pf_8",         0x008000, 0x002000, CRC(c789e2b3) SHA1(33b5c8f22a1e337816a61fd2c91bc175a412d10e) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
@@ -5541,7 +5552,7 @@ GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state, empty_init,
 GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state, empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
-GAME( 1984,  rkjanoh2, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_NOT_WORKING )
+GAME( 1984,  rkjanoh2, 0,        rkjanoh2, royalmah, royalmah_state, init_chalgirl, ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
 GAME( 1984,  janoh,    0,        janoh,    royalmah, royalmah_state, empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoha,   royalmah, royalmah_state, empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   royalmah_state, init_jansou,   ROT0,   "Dyna Computer",              "Jansou (set 1)",                        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
