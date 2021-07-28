@@ -2073,7 +2073,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						//       gen,gen
 						//       read.i,regaddr
 					case 0x7:
-						// SBITI offset,base
+						// SBITIi offset,base
 						//       gen,gen
 						//       read.i,regaddr
 						{
@@ -3250,7 +3250,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							mode[0].write_i(size);
 							decode(mode, bytes);
 
-							if (slave(m_mmu, mode[0], mode[1]))
+							if (slave(m_mmu, mode[1], mode[0]))
 								interrupt(SLV, m_pc);
 
 							tex = mode[0].tea + top(size);
