@@ -122,7 +122,7 @@ private:
 	uint16_t get_pitch();
 	uint16_t get_pattern(uint8_t cycle);
 	void next_pixel(int direction);
-	void draw_pixel(int x, int y, int xi, uint16_t tile_data);
+	void draw_pixel();
 	void draw_line();
 	void draw_rectangle();
 	void draw_arc();

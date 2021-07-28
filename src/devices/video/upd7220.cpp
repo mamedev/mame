@@ -797,28 +797,16 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  draw_pixel -
 //-------------------------------------------------
 
-void upd7220_device::draw_pixel(int x, int y, int xi, uint16_t tile_data)
+void upd7220_device::draw_pixel()
 {
-	uint32_t addr = (((y * (m_pitch >> m_figs.m_gd)) + (x >> 4))) & 0x3ffff;
-	uint16_t data = readword(addr);
-	uint16_t new_pixel = (tile_data & (1 << (xi & 0xf))) ? (1 << (x & 0xf)) : 0;
+	LOG("uPD7220 dot check: %08x %04x %02x %02x %d\n", m_ead, m_mask, m_bitmap_mod, m_figs.m_dir, m_figs.m_dc);
 
-	switch(m_bitmap_mod)
+	for(int i = 0; i <= m_figs.m_dc; ++i)
 	{
-		case 0: //replace
-			data = (data & ~(1 << (x & 0xf))) | new_pixel;
-			break;
-		case 1: //complement
-			data = data ^ new_pixel;
-			break;
-		case 2: //reset
-			data = data & ~new_pixel;
-			break;
-		case 3: //set
-			data = data | new_pixel;
-			break;
+		const uint16_t pattern = get_pattern(i & 0xf);
+		write_vram(0, m_bitmap_mod, pattern, m_mask);
+		next_pixel(m_figs.m_dir);
 	}
-	writeword(addr, data);
 }
 
 
@@ -1121,7 +1109,6 @@ void upd7220_device::process_fifo()
 {
 	uint8_t data;
 	int flag;
-	uint16_t eff_pitch = m_pitch >> m_figs.m_gd;
 	int cr;
 
 	dequeue(&data, &flag);
@@ -1399,7 +1386,7 @@ void upd7220_device::process_fifo()
 	case COMMAND_FIGD: /* figure draw start */
 		m_pattern = (m_ra[8]) | (m_ra[9]<<8);
 		if(m_figs.m_figure_type == 0)
-			draw_pixel(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch),m_dad,(m_ra[8]) | (m_ra[9]<<8));
+			draw_pixel();
 		else if(m_figs.m_figure_type == 1)
 			draw_line();
 		else if(m_figs.m_figure_type == 4)
