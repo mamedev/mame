@@ -1,0 +1,38 @@
+VS_VERSION_INFO VERSIONINFO
+	FILEVERSION @CMAKE_PROJECT_VERSION_MAJOR@,@CMAKE_PROJECT_VERSION_MINOR@,0,0
+	PRODUCTVERSION @CMAKE_PROJECT_VERSION_MAJOR@,@CMAKE_PROJECT_VERSION_MINOR@,0,0
+	FILEFLAGSMASK 0x3fL
+	FILEFLAGS VS_FF_PRERELEASE
+	FILEOS VOS_NT_WINDOWS32
+	FILETYPE VFT_APP
+	FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+#ifdef UNICODE
+		BLOCK "040904b0"
+#else
+		BLOCK "040904E4"
+#endif
+		BEGIN
+			VALUE "Author", "@resource_author@\0"
+			VALUE "Comments", "@resource_comments@\0"
+			VALUE "CompanyName", "@resource_company_name@\0"
+			VALUE "FileDescription", "@resource_file_description@\0"
+			VALUE "FileVersion", "@CMAKE_PROJECT_VERSION_MAJOR@, @CMAKE_PROJECT_VERSION_MINOR@, 0, 0\0"
+			VALUE "InternalName", "@resource_internal_name@\0"
+			VALUE "LegalCopyright", "Copyright Nicola Salmoria and the MAME team\0"
+			VALUE "OriginalFilename", "@resource_original_filename@\0"
+			VALUE "ProductName", "@resource_product_name@\0"
+			VALUE "ProductVersion", "@CMAKE_PROJECT_VERSION_MAJOR@.@CMAKE_PROJECT_VERSION_MINOR@\0"
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+#ifdef UNICODE
+		VALUE "Translation", 0x409, 1200
+#else
+		VALUE "Translation", 0x409, 1252
+#endif
+	END
+END

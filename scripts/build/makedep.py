@@ -237,7 +237,7 @@ class CppParser(ParserBase):
         self.line_buffer = ''
 
 
-class LuaParser(ParserBase):
+class CMakeParser(ParserBase):
     class Handler(object):
         def short_comment(self, text):
             pass
@@ -259,7 +259,7 @@ class LuaParser(ParserBase):
         LONG_STRING_CONSTANT = 4
 
     def __init__(self, handler, **kwargs):
-        super(LuaParser, self).__init__(**kwargs)
+        super(CMakeParser, self).__init__(**kwargs)
         self.handler = handler
         self.processors = {
                 self.ParseState.DEFAULT: self.process_default,
@@ -294,7 +294,7 @@ class LuaParser(ParserBase):
                 self.long_bracket_level = None
                 self.escape = False
                 return pos + 1;
-            elif (ch == '-') and self.escape:
+            elif (ch == '#') and self.escape:
                 self.parse_state = self.ParseState.SHORT_COMMENT
                 self.long_bracket_level = None
                 self.escape = False
@@ -313,7 +313,7 @@ class LuaParser(ParserBase):
                     self.long_bracket_level = None
             elif ch == '[':
                 self.long_bracket_level = 0
-            self.escape = ch == '-'
+            self.escape = ch == '#'
             pos += 1
         self.escape = False
 
@@ -582,11 +582,11 @@ def collect_lua_directives(options):
 
     base = os.path.join(options.root, 'scripts', 'src')
     result = { }
-    handler = LuaParser.Handler()
+    handler = CMakeParser.Handler()
     handler.short_comment = short_comment_hook
-    parser = LuaParser(handler)
-    for name in ('bus', 'cpu', 'machine', 'sound', 'video', 'formats'):
-        path = os.path.join(base, name + '.lua')
+    parser = CMakeParser(handler)
+    for name in ('bus', 'cpu', 'machine', 'sound', 'video', 'lib/formats'):
+        path = os.path.join(base, name + '.cmake')
         try:
             f = io.open(path, 'r', encoding='utf-8')
         except IOError:
@@ -702,42 +702,39 @@ def write_project(options, f, mappings, sources):
             for line in action:
                 f.write(line + '\n')
         if source.startswith('src/mame/'):
-            targetsrc += '        MAME_DIR .. "%s",\n' % (source, )
+            targetsrc += '        ${MAME_DIR}/%s\n' % (source, )
     f.write(
             '\n' \
-            'function createProjects_mame_%s(_target, _subtarget)\n' \
-            '    project ("mame_%s")\n' \
-            '    targetsubdir(_target .."_" .. _subtarget)\n' \
-            '    kind (LIBTYPE)\n' \
-            '    uuid (os.uuid("drv-mame-%s"))\n' \
-            '    addprojectflags()\n' \
-            '    \n' \
-            '    includedirs {\n' \
-            '        MAME_DIR .. "src/osd",\n' \
-            '        MAME_DIR .. "src/emu",\n' \
-            '        MAME_DIR .. "src/devices",\n' \
-            '        MAME_DIR .. "src/mame",\n' \
-            '        MAME_DIR .. "src/lib",\n' \
-            '        MAME_DIR .. "src/lib/util",\n' \
-            '        MAME_DIR .. "src/lib/netlist",\n' \
-            '        MAME_DIR .. "3rdparty",\n' \
-            '        GEN_DIR  .. "mame/layout",\n' \
-            '        ext_includedir("flac"),\n' \
-            '        ext_includedir("glm"),\n' \
-            '        ext_includedir("jpeg"),\n' \
-            '        ext_includedir("rapidjson"),\n' \
-            '        ext_includedir("zlib"),\n' \
-            '    }\n' \
+            'macro(createProjects_mame_%s _target  _subtarget)\n' \
+	        '    set(CUSTOM_BUILD_SRCS \n'
+            '%s' \
+            '    )\n' \
+        	'    add_library(mame_%s ${LIBTYPE} ${CUSTOM_BUILD_SRCS})\n' \
+	        '    addprojectflags(mame_%s)\n' \
+	        '    precompiledheaders_novs(mame_%s)\n' \
+	        '    add_dependencies(mame_%s layouts)\n' \
+	        '    add_project_to_group(drivers mame_%s)\n' \
+            '    target_include_directories(mame_%s PRIVATE\n' \
+	        '        ${MAME_DIR}/src/osd\n' \
+	        '        ${MAME_DIR}/src/emu\n' \
+	        '        ${MAME_DIR}/src/devices\n' \
+	        '        ${MAME_DIR}/src/mame\n' \
+	        '        ${MAME_DIR}/src/lib\n' \
+	        '        ${MAME_DIR}/src/lib/util\n' \
+            '        ${MAME_DIR}/src/lib/netlist\n' \
+	        '        ${MAME_DIR}/3rdparty\n' \
+            '        ${EXT_INCLUDEDIR_FLAC}\n' \
+            '        ${EXT_INCLUDEDIR_GLM}\n' \
+            '        ${EXT_INCLUDEDIR_JPEG}\n' \
+            '        ${EXT_INCLUDEDIR_RAPIDJSON}\n' \
+            '        ${EXT_INCLUDEDIR_ZLIB}\n' \
+	        '        ${GEN_DIR}/mame/layout\n' \
+	        ')\n' \
+            'endmacro()\n' \
             '\n' \
-            '    files{\n%s' \
-            '    }\n' \
-            'end\n' \
-            '\n' \
-            'function linkProjects_mame_%s(_target, _subtarget)\n' \
-            '    links {\n' \
-            '        "mame_%s",\n' \
-            '    }\n' \
-            'end\n' % (options.target, options.target, options.target, targetsrc, options.target, options.target))
+            'macro(linkProjects_mame_%s _target _subtarget _projectname)\n' \
+            '    target_link_libraries(${_projectname} PRIVATE mame_%s)\n' \
+            'endmacro()\n' % (options.target, targetsrc, options.target, options.target, options.target, options.target, options.target, options.target, options.target, options.target))
 
 
 def write_filter(options, f):
