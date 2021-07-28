@@ -3526,7 +3526,8 @@ COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9
 
 // PC-H98 (Hyper 98, '90-'93 high end line with High-reso, proprietary NESA bus, E²GC)
 // PC-H98T (LCD Hyper 98)
-// SV-H98 (Later Hyper 98 revision, up to Pentium CPU)
+// SV-H98 "98SERVER" (Later Hyper 98 revision, up to Pentium CPU)
+// OP-98 ("Office Processor", released around '91. Reports claims to be H98-like, with extra connectivity with NEC 7200 workstation)
 // ...
 
 // CV class (V30, compact version with monitor built-in like a Macintosh)
@@ -3536,7 +3537,9 @@ COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9
 COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // FA class (i486SX)
-COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// ...
+// BX class (official nickname "98 FELLOW", last releases prior to 9821 line)
+COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86), superimposition)
 // ...
@@ -3547,25 +3550,61 @@ COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9
 COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // PC9821 [desktop] class
-// TODO: unknown real model of parent, given the BIOS rom size wrt the others it may be better suited as a "98Multi" or even a FA class?
-// investigate by making genuine BIOS dumps to boot
-COMP( 1994, pc9821,      0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc9821as,    pc9821,   0, pc9821as,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE A)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc9821ap2,   pc9821,   0, pc9821ap2,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821AP2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1994, pc9821xs,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE Xs)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1994, pc9821ce2,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi Ce2)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// NB: several of these sub-models don't have the final letter in the original flyers but present in later docs as an afterthought.
+// To mark this we intentionally add square brackets here as optional omission notation.
+// TODO: unknown real model of parent, it is unconfirmed if it's really a 98MULTi or "just" a FA/BX class
+// 98MULTi (i386, desktop)
+COMP( 1994, pc9821,      0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
+COMP( 1993, pc9821as,    pc9821,   0, pc9821as,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821ap2,   pc9821,   0, pc9821ap2,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98MATE [B] (i486, desktop, has GD5428 and no sound)
+// ...
+
+// 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
+COMP( 1994, pc9821ce2,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1995, pc9821cx3,   pc9821,   0, pc9821cx3,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98MULTi CanBe Jam (Pentium Pro equipped, laptop, Multimedia PC as above + JEIDA 4.2/PCMCIA 2.1)
+// ...
+
+// 98MATE X (i486sx/Pentium/Pentium Pro, has PCI, comes with various SVGA cards)
+COMP( 1994, pc9821xs,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1996, pc9821xa16,  pc9821,   0, pc9821xa16,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
+COMP( 1998, pc9821v13,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1998, pc9821v20,   pc9821,   0, pc9821v20,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821V20 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98MATE R (Pentium Pro, otherwise same as 98MATE X)
 COMP( 1996, pc9821ra20,  pc9821,   0, pc9821ra20,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1997, pc9821ra266, pc9821,   0, pc9821ra266, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1998, pc9821ra333, pc9821,   0, pc9821ra333, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1998, pc9821v13,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 13)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1998, pc9821v20,   pc9821,   0, pc9821v20,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// PC9821 NOTE[book] class
+// 98MATE SERVER (Server variant of 98MATE R. Inherits concepts from 98SERVER above)
+// ...
+
+// CEREB (Pentium MMX based. Multimedia PC with a Sony DDU100E DVD-ROM drive as most notable addition. Form factor is way more akin of a DVD player)
+// ...
+
+// PC-9821 NOTE[book] class
+// 98NOTE
 COMP( 1994, pc9821ne,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98NOTE Lavie
 COMP( 1996, pc9821nr15,  pc9821,   0, pc9821nr15,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1997, pc9821nr166, pc9821,   0, pc9821nr166, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98NOTE Light
+// ...
+
+// 98NOTE Aile
+// ...
+
+// 98FiNE
+// ...
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 
@@ -3578,4 +3617,4 @@ COMP( 1997, pc9821nr166, pc9821,   0, pc9821nr166, pc9821,   pc9801_state, init_
 // FC-9801 (FC stands for "Factory Computer". Aimed at industrial automation, has similarly named models from 9801 to 9821 and H98.
 //     Uses a FC-9801-06 RAS "Reliability, Availability and Serviceability" specific expansion)
 // FC98-NX (Evolution of FC-9821Ka, first model FC20C released in 1998, branch is still running to date.
-//     It's unknown if it's just a naming brand or there's actually a real 98 evolution)
+//     Most likely just DOS/V compatible and not going to fit here except for RAS capabilities)
