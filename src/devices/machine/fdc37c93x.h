@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_rtc_w);
 	// keyboard
 	DECLARE_WRITE_LINE_MEMBER(irq_keyboard_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mouse_w);
 	DECLARE_WRITE_LINE_MEMBER(kbdp21_gp25_gatea20_w);
 	DECLARE_WRITE_LINE_MEMBER(kbdp20_gp20_reset_w);
 
