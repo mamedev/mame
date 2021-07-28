@@ -930,54 +930,25 @@ void upd7220_device::draw_arc(int x, int y)
 //  draw_rectangle -
 //-------------------------------------------------
 
-void upd7220_device::draw_rectangle(int x, int y)
+void upd7220_device::draw_rectangle()
 {
-	const int rect_x_dir[8] = { 0, 1, 0,-1, 1, 1,-1,-1 };
-	const int rect_y_dir[8] = { 1, 0,-1, 0, 1,-1,-1, 1 };
-	uint8_t rect_type,rect_dir;
-	uint16_t pattern = (m_ra[8]) | (m_ra[9]<<8);
+	assert(m_figs.m_dc == 3);
 
-	LOG("uPD7220 rectangle check: %d %d %02x %08x\n",x,y,m_figs.m_dir,m_ead);
+	LOG("uPD7220 rectangle check: %08x %04x %02x %02x %d %d %d\n",m_ead, m_mask, m_bitmap_mod, m_figs.m_dir, m_figs.m_dc, m_figs.m_d, m_figs.m_d2);
 
-	rect_type = (m_figs.m_dir & 1) << 2;
-	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 0) & 3);
-
-	for(int i = 0; i < m_figs.m_d; i++)
+	for (int i = 0; i <= m_figs.m_dc; ++i)
 	{
-		draw_pixel(x,y,i,pattern);
-		x+=rect_x_dir[rect_dir];
-		y+=rect_y_dir[rect_dir];
+		const uint16_t dist = (i & 1 ? m_figs.m_d2 : m_figs.m_d);
+		for (int j = 0; j < dist; ++j)
+		{
+			const uint16_t pattern = get_pattern(j & 0xf);
+			write_vram(0, m_bitmap_mod, pattern, m_mask);
+			if (i > 0 && j == 0)
+				m_figs.m_dir = (m_figs.m_dir + 2) & 7;
+			next_pixel(m_figs.m_dir);
+		}
+
 	}
-
-	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 1) & 3);
-
-	for(int i = 0; i < m_figs.m_d2; i++)
-	{
-		draw_pixel(x,y,i,pattern);
-		x+=rect_x_dir[rect_dir];
-		y+=rect_y_dir[rect_dir];
-	}
-
-	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 2) & 3);
-
-	for(int i = 0; i < m_figs.m_d; i++)
-	{
-		draw_pixel(x,y,i,pattern);
-		x+=rect_x_dir[rect_dir];
-		y+=rect_y_dir[rect_dir];
-	}
-
-	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 3) & 3);
-
-	for(int i = 0; i < m_figs.m_d2; i++)
-	{
-		draw_pixel(x,y,i,pattern);
-		x+=rect_x_dir[rect_dir];
-		y+=rect_y_dir[rect_dir];
-	}
-
-	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
-	m_dad = x & 0x0f;
 }
 
 
@@ -1466,6 +1437,7 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
+		m_pattern = (m_ra[8]) | (m_ra[9]<<8);
 		if(m_figs.m_figure_type == 0)
 			draw_pixel(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch),m_dad,(m_ra[8]) | (m_ra[9]<<8));
 		else if(m_figs.m_figure_type == 1)
@@ -1473,7 +1445,7 @@ void upd7220_device::process_fifo()
 		else if(m_figs.m_figure_type == 4)
 			draw_arc(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
 		else if(m_figs.m_figure_type == 8)
-			draw_rectangle(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
+			draw_rectangle();
 		else
 			logerror("uPD7220 Unimplemented command FIGD %02x\n", m_figs.m_figure_type);
 
