@@ -543,7 +543,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 	case 0x1e:
 		// format 14: xxxx xsss s0oo ooii 0001 1110
 		{
-			char const *const mmureg[] = { "BPR0", "BPR1", "", "", "", "", "", "", "", "", "MSR", "BCNT", "PTB0", "PTB1", "", "EIA" };
+			char const *const mmureg[] = { "BPR0", "BPR1", "", "", "PF0", "PF1", "", "", "SC", "", "MSR", "BCNT", "PTB0", "PTB1", "", "EIA" };
 
 			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
 
