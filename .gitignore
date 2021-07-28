@@ -36,7 +36,6 @@
 !/.gitattributes
 !/.gitignore
 !/.travis.yml
-!/makefile
 !/mame.doxygen
 !/*.md
 !/*.bdf
@@ -47,5 +46,5 @@ docs/build
 docs/source/_build
 regtests/chdman/temp
 regtests/jedutil/output
-/CMakeLists.txt
+!/CMakeLists.txt
 /samples
