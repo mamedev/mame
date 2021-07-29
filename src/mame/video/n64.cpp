@@ -296,7 +296,7 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 					uint8_t g8 = std::clamp((uint8_t)g, (uint8_t)0, (uint8_t)255);
 					uint8_t b8 = std::clamp((uint8_t)b, (uint8_t)0, (uint8_t)255);
 
-					d[i] = (r8 << 16) | (g8 << 8) | b8;
+					d[iu0] = (r8 << 16) | (g8 << 8) | b8;
 
 					u0 += hcoeff;
 				}
@@ -319,7 +319,7 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 					const uint8_t r = ((pix >> 8) & 0xf8) | (pix >> 13);
 					const uint8_t g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
 					const uint8_t b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
-					d[i] = (r << 16) | (g << 8) | b;
+					d[u0] = (r << 16) | (g << 8) | b;
 				}
 			}
 		}
@@ -334,11 +334,15 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 
 	uint32_t* frame_buffer32 = (uint32_t*)&m_rdram[(vi_origin & 0xffffff) >> 2];
 
-	const int32_t hdiff = (vi_hstart & 0x3ff) - ((vi_hstart >> 16) & 0x3ff);
+	int32_t hend = vi_hstart & 0x3ff;
+	int32_t hstart = (vi_hstart >> 16) & 0x3ff;
+	int32_t hdiff = hend - hstart;
 	const float hcoeff = ((float)(vi_xscale & 0xfff) / (1 << 10));
 	uint32_t hres = ((float)hdiff * hcoeff);
 
-	const int32_t vdiff = ((vi_vstart & 0x3ff) - ((vi_vstart >> 16) & 0x3ff)) >> 1;
+	int32_t vend = (vi_vstart & 0x3ff) >> 1;
+	int32_t vstart = ((vi_vstart >> 16) & 0x3ff) >> 1;
+	int32_t vdiff = vend - vstart;
 	const float vcoeff = ((float)(vi_yscale & 0xfff) / (1 << 10));
 	const uint32_t vres = ((float)vdiff * vcoeff);
 
@@ -347,13 +351,15 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 		return;
 	}
 
+	//printf("hd,vd: %d,%d hc,vc: %f,%f hs,he: %d,%d vs,ve: %d,%d hr,vr: %d, %d viw: %d\n", hdiff, vdiff, hcoeff, vcoeff, hstart, hend, vstart, vend, hres, vres, vi_width);
+
 	if (frame_buffer32)
 	{
 		const uint32_t aa_control = (vi_control >> 8) & 3;
 		float v0 = 0.0f;
 		if (aa_control < 3) // Resample pixels
 		{
-			for (int32_t j = 0; j < vdiff; j++, v0 += vcoeff)
+			for (int32_t j = 0; j < vres; j++, v0 += 1.0f)
 			{
 				uint32_t *const d = &bitmap.pix(j);
 
@@ -409,7 +415,7 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 					uint8_t g8 = std::clamp((uint8_t)g, (uint8_t)0, (uint8_t)255);
 					uint8_t b8 = std::clamp((uint8_t)b, (uint8_t)0, (uint8_t)255);
 
-					d[i] = (r8 << 16) | (g8 << 8) | b8;
+					d[iu0] = (r8 << 16) | (g8 << 8) | b8;
 
 					u0 += hcoeff;
 				}
@@ -427,7 +433,7 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 				for (int32_t i = 0; i < hdiff; i++)
 				{
 					int u0 = (int)(i * hcoeff);
-					d[i] = (frame_buffer32[pix_v0_line + u0] >> 8);
+					d[u0] = (frame_buffer32[pix_v0_line + u0] >> 8);
 				}
 			}
 		}
