@@ -1061,6 +1061,16 @@ ROM_START( mag_day )
 	ROM_LOAD( "adayinspace 31_3_87.img", 0x00000, 0xf0000, CRC(bc65302d) SHA1(6ace68a0b5f7a07a8f5c318c5359011074e7f2ec) )
 ROM_END
 
+// track 79 side 1 (file offset 0x0ee800) would not read, but it appears to be outside of the used data
+// this also has many scores stored on the disk at offset 0x01cc00, invalidating these does reset the
+// score table to 'EFO 100000' scores, but then it never writes new scores?
+ROM_START( mag_pdak )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "paris.dsk 31_3_87.img", 0x00000, 0xf0000, CRC(2c4ee9e1) SHA1(22c2b75c16aca95ecf2199451c1bd12dd3a3844c) )
+ROM_END
+
 /*
     protection? (Time Scanner note)
 
@@ -1129,3 +1139,6 @@ GAME( 1987, mag_wara, mag_war,cedar_magnet, cedar_magnet, cedar_magnet_state, em
 GAME( 1987, mag_burn, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "The Burning Cavern (31/03/87)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // date on label
 
 GAME( 1987, mag_day,  cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "A Day In Space (31/03/87)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // date on label
+
+// has unemulated 'handlebar' option that can be enabled in service mode
+GAME( 1987, mag_pdak, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Paris Dakar (31/03/87, Spanish)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // date on label

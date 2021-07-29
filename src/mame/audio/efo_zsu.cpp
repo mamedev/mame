@@ -295,6 +295,8 @@ void cedar_magnet_sound_device::device_add_mconfig(machine_config &config)
 	subdevice<z80_device>("soundcpu")->set_addrmap(AS_PROGRAM, &cedar_magnet_sound_device::cedar_magnet_sound_map);
 
 	subdevice<ay8910_device>("aysnd0")->port_a_write_callback().set(FUNC(cedar_magnet_sound_device::ay0_porta_w));
+
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void efo_zsu_device::device_start()
