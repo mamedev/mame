@@ -1072,6 +1072,36 @@ ROM_START( mag_pdak )
 ROM_END
 
 /*
+The following tracks/sides failed to read (bad disk)
+
+track:68:0 (file offset:0x0cc000 - 0x0cd7ff)
+track:69:0 (file offset:0x0cf000 - 0x0d07ff)
+track:70:0 (file offset:0x0d2000 - 0x0d37ff)
+track:71:0 (file offset:0x0d5000 - 0x0d67ff)
+track:72:0 (file offset:0x0d8000 - 0x0d97ff)
+track:73:0 (file offset:0x0db000 - 0x0dc7ff)
+track:74:0 (file offset:0x0de000 - 0x0df7ff)
+track:75:0 (file offset:0x0e1000 - 0x0e27ff)
+track:76:0 (file offset:0x0e4000 - 0x0e57ff)
+
+these areas aren't read by the code that currently loads, but other areas also didn't read consistently
+
+the 3 dumps in the set below contain different reads of tracks 0-67
+
+*/
+
+ROM_START( mag_drac )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "drac.dsk", 0x00000, 0xf0000, CRC(2b5ca6f8) SHA1(063ea3b55bf95d05c866c0fcdb41c307c484a4f8) )
+	ROM_LOAD( "drac2.dsk", 0x00000, 0xf0000, CRC(cf6c1dd2) SHA1(7adb5146b050172090556927bf6d30ba8265107a) )
+	ROM_LOAD( "drac3.dsk", 0x00000, 0xf0000, CRC(7060e4a2) SHA1(b8e5437afff11d57a40c092d005d6b075819537a))
+ROM_END
+
+
+
+/*
     protection? (Time Scanner note)
 
     one part of the code is a weird loop checking values from port 0x7c while doing other nonsensical stuff, a flag gets set to 0xff if it fails
@@ -1142,3 +1172,5 @@ GAME( 1987, mag_day,  cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, em
 
 // has unemulated 'handlebar' option that can be enabled in service mode
 GAME( 1987, mag_pdak, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Paris Dakar (31/03/87, Spanish)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // date on label
+
+GAME( 1987, mag_drac, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Dracula's Castle (Magnet System)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
