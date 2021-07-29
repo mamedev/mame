@@ -258,7 +258,7 @@ nes_bmc_21in1_device::nes_bmc_21in1_device(const machine_config &mconfig, const 
 {
 }
 
-nes_bmc_31in1_device::nes_bmc_31in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bmc_31in1_device::nes_bmc_31in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_31IN1, tag, owner, clock)
 {
 }
@@ -821,19 +821,6 @@ void nes_bmc_21in1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_bmc_31in1_device::device_start()
-{
-	common_start();
-}
-
-void nes_bmc_31in1_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(1);
 	chr8(0, m_chr_source);
 }
 
@@ -2220,23 +2207,21 @@ void nes_bmc_21in1_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_bmc_31in1_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_31in1_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_31in1 write_h, offset: %04x, data: %02x\n", offset, data));
+	set_nt_mirroring(BIT(offset, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	chr8(offset, CHRROM);
-
-	if ((offset & 0x1e) == 0)
+	offset &= 0x1f;
+	if (offset & 0x1e)
 	{
-		prg16_89ab(0);
-		prg16_89ab(1);
+		prg16_89ab(offset);
+		prg16_cdef(offset);
 	}
 	else
-	{
-		prg16_89ab(offset & 0x1f);
-		prg16_89ab(offset & 0x1f);
-	}
+		prg32(0);
+
+	chr8(offset, CHRROM);
 }
 
 /*-------------------------------------------------
