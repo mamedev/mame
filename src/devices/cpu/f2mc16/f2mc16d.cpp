@@ -1450,7 +1450,10 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 
 	case 0x49: case 0x59:
 		util::stream_format(stream, "%-8s", "MOVW");
-		format_dir(stream, segm, opcodes.r8(pc + bytes++));
+		if (BIT(op, 4))
+			format_io(stream, opcodes.r8(pc + bytes++));
+		else
+			format_dir(stream, segm, opcodes.r8(pc + bytes++));
 		stream << ", A";
 		break;
 
