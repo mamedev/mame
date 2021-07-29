@@ -350,9 +350,6 @@ DECLARE_ENUM_INCDEC_OPERATORS(input_item_id)
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// controller alias table typedef
-typedef std::map<std::string, std::string> devicemap_table_type;
-
 // ======================> input_code
 
 // a combined code that describes a particular input on a particular device
@@ -493,6 +490,9 @@ private:
 class input_manager
 {
 public:
+	// controller alias table typedef
+	using devicemap_table = std::map<std::string, std::string>;
+
 	// construction/destruction
 	input_manager(running_machine &machine);
 	~input_manager();
@@ -526,7 +526,7 @@ public:
 	void seq_from_tokens(input_seq &seq, std::string_view _token);
 
 	// misc
-	bool map_device_to_controller(const devicemap_table_type &devicemap_table);
+	bool map_device_to_controller(const devicemap_table &table);
 
 private:
 	// internal helpers
