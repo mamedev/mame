@@ -141,6 +141,8 @@ void n64_periphs::device_reset()
 
 	sp_mem_addr = 0;
 	sp_dram_addr = 0;
+	sp_mem_addr_start = 0;
+	sp_dram_addr_start = 0;
 	sp_dma_length = 0;
 	sp_dma_count = 0;
 	sp_dma_skip = 0;
@@ -546,6 +548,9 @@ void n64_periphs::rdram_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void n64_periphs::sp_dma(int direction)
 {
+	sp_mem_addr = sp_mem_addr_start;
+	sp_dram_addr = sp_dram_addr_start;
+
 	uint32_t length = sp_dma_length + 1;
 
 	if ((length & 7) != 0)
@@ -571,17 +576,19 @@ void n64_periphs::sp_dma(int direction)
 
 	int sp_mem_page = (sp_mem_addr >> 12) & 1;
 
-	if(sp_mem_page == 1)
-		m_rsp->rspdrc_flush_drc_cache();
+	//if (sp_mem_page == 1)
+		//m_rsp->rspdrc_flush_drc_cache();
 
-	if(direction == 0)// RDRAM -> I/DMEM
+	//printf("DMA %s RSP: mem %08x, dram %08x, sp_dma_length: %03x, length: %04x, count: %02x, skip: %03x\n", direction ? "from" : "to", sp_mem_addr, sp_dram_addr, sp_dma_length, length, sp_dma_count, sp_dma_skip);
+
+	if (direction == 0)// RDRAM -> I/DMEM
 	{
-		for(int c = 0; c <= sp_dma_count; c++)
+		for (int c = 0; c <= sp_dma_count; c++)
 		{
-			uint32_t src = (sp_dram_addr & 0x007fffff) >> 2;
+			uint32_t src = sp_dram_addr >> 2;
 			uint32_t dst = (sp_mem_addr & 0xfff) >> 2;
 
-			for(int i = 0; i < length / 4; i++)
+			for (int i = 0; i < length / 4; i++)
 			{
 				sp_mem[sp_mem_page][(dst + i) & 0x3ff] = m_rdram[src + i];
 			}
@@ -589,17 +596,18 @@ void n64_periphs::sp_dma(int direction)
 			sp_mem_addr += length;
 			sp_dram_addr += length;
 
-			sp_dram_addr += sp_dma_skip;
+			if (c != sp_dma_count)
+				sp_dram_addr += sp_dma_skip;
 		}
 	}
 	else                    // I/DMEM -> RDRAM
 	{
-		for(int c = 0; c <= sp_dma_count; c++)
+		for (int c = 0; c <= sp_dma_count; c++)
 		{
 			uint32_t src = (sp_mem_addr & 0xfff) >> 2;
-			uint32_t dst = (sp_dram_addr & 0x007fffff) >> 2;
+			uint32_t dst = sp_dram_addr >> 2;
 
-			for(int i = 0; i < length / 4; i++)
+			for (int i = 0; i < length / 4; i++)
 			{
 				m_rdram[dst + i] = sp_mem[sp_mem_page][(src + i) & 0x3ff];
 			}
@@ -607,9 +615,13 @@ void n64_periphs::sp_dma(int direction)
 			sp_mem_addr += length;
 			sp_dram_addr += length;
 
-			sp_dram_addr += sp_dma_skip;
+			if (c != sp_dma_count)
+				sp_dram_addr += sp_dma_skip;
 		}
 	}
+
+	sp_dma_count = 0;
+	sp_dma_length = 0xff8;
 }
 
 void n64_periphs::sp_set_status(uint32_t data)
@@ -642,6 +654,7 @@ uint32_t n64_periphs::sp_reg_r(offs_t offset)
 			return sp_dram_addr;
 
 		case 0x08/4:        // SP_RD_LEN_REG
+		case 0x0c/4:        // SP_WR_LEN_REG
 			return (sp_dma_skip << 20) | (sp_dma_count << 12) | sp_dma_length;
 
 		case 0x10/4:        // SP_STATUS_REG
@@ -710,24 +723,24 @@ void n64_periphs::sp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		switch (offset & 0xffff)
 		{
 			case 0x00/4:        // SP_MEM_ADDR_REG
-				sp_mem_addr = data;
+				sp_mem_addr_start = data & 0x00001fff;
 				break;
 
 			case 0x04/4:        // SP_DRAM_ADDR_REG
-				sp_dram_addr = data & 0xffffff;
+				sp_dram_addr_start = data & 0x007fffff;
 				break;
 
 			case 0x08/4:        // SP_RD_LEN_REG
 				sp_dma_length = data & 0xfff;
 				sp_dma_count = (data >> 12) & 0xff;
-				sp_dma_skip = (data >> 20) & 0xfff;
+				sp_dma_skip = (data >> 20) & 0xff8;
 				sp_dma(0);
 				break;
 
 			case 0x0c/4:        // SP_WR_LEN_REG
 				sp_dma_length = data & 0xfff;
 				sp_dma_count = (data >> 12) & 0xff;
-				sp_dma_skip = (data >> 20) & 0xfff;
+				sp_dma_skip = (data >> 20) & 0xff8;
 				sp_dma(1);
 				break;
 
@@ -998,8 +1011,10 @@ void n64_periphs::vi_recalculate_resolution()
 	int x_end = vi_hstart & 0x000003ff;
 	int y_start = ((vi_vstart & 0x03ff0000) >> 16) >> 1;
 	int y_end = (vi_vstart & 0x000003ff) >> 1;
-	int width = x_end - x_start;
-	int height = y_end - y_start;
+	const float hcoeff = ((float)(vi_xscale & 0xfff) / (1 << 10));
+	const float vcoeff = ((float)(vi_yscale & 0xfff) / (1 << 10));
+	int width = (x_end - x_start) * hcoeff;
+	int height = (y_end - y_start) * vcoeff;
 
 	rectangle visarea = screen().visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame

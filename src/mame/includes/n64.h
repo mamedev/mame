@@ -228,6 +228,8 @@ private:
 
 	uint32_t sp_mem_addr;
 	uint32_t sp_dram_addr;
+	uint32_t sp_mem_addr_start;
+	uint32_t sp_dram_addr_start;
 	int sp_dma_length;
 	int sp_dma_count;
 	int sp_dma_skip;
