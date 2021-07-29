@@ -78539,7 +78539,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_31" supported="no">
+	<software name="mc_31">
 		<description>31 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
