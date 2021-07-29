@@ -35801,6 +35801,9 @@ rabbita                         // (c) 1996 Electronic Arts
 rabbitj                         // (c) 1997 Electronic Arts
 rabbitjt                        // (c) 1996 Electronic Arts
 
+@source:radikaldarts.cpp
+radikaldrt                      // (c) 2011? Gaelco Darts
+
 @source:radio86.cpp
 impuls03                        //
 kr03                            //
