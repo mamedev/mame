@@ -77577,7 +77577,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="mc_11bal">
-		<description>11 in 1 Ball Games</description>
+		<description>11 in 1 Ball Series</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
