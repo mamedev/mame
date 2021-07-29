@@ -72,7 +72,7 @@ u8 cedar_magnet_flop_device::port63_r()
 			if (m_secoffs == 0)
 			{
 				// this is weird data, protection??
-			//	if(read_offset_base==0xea400)
+				if(read_offset_base==0xea400)
 					printf("reading sector %d offset %d (from disk image at %04x) (cur track %02x cur side %02x cur sector %02x)\n", m_flopsec, m_secoffs, read_offset, m_curtrack, side, m_flopsec);
 			}
 
@@ -169,8 +169,6 @@ void cedar_magnet_flop_device::port63_w(u8 data)
 
 	if ((m_flopcmd & 0xf0) == 0xb0) // writing data
 	{
-		printf("write command %02x\n", m_flopcmd);
-
 		int side = (m_flopcmd & 0x02)>>1;
 		int read_offset_base = (m_flopsec * 0x400) + (m_curtrack * 0x3000) + (side * 0x1800);
 
@@ -199,10 +197,6 @@ void cedar_magnet_flop_device::port63_w(u8 data)
 				m_flopsec++;
 			}
 		}
-	}
-	else
-	{
-		printf("command %02x\n", m_flopcmd);
 	}
 
 }
