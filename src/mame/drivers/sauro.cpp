@@ -674,7 +674,7 @@ ROM_END
 ROM_START( seawolft )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",           0x00000, 0x8000, BAD_DUMP CRC(33f05999) SHA1(961243b60b3f75368394404d02eaefa06692c199) ) // Fails on ROM test
-	ROM_LOAD( "2.bin",           0x08000, 0x8000, BAD_DUMP CRC(870b05ef) SHA1(c841f80a7e014a90fc81b00fa8c99405de9f660f) ) // Untrusted dump
+	ROM_LOAD( "2.bin",           0x08000, 0x8000, CRC(870b05ef) SHA1(c841f80a7e014a90fc81b00fa8c99405de9f660f) ) // Passes the ROM test OK
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, BAD_DUMP CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) ) // Not dumped on this PCB
