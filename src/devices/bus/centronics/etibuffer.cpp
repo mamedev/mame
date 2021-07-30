@@ -49,7 +49,6 @@ etiprintbuffer_device::etiprintbuffer_device(const machine_config &mconfig, devi
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_centronics_peripheral_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
-	, m_screen(*this, "screen")
 	, m_ctx(*this, ETI_CENTRONICS_TAG)
 	, m_ctx_data_out(*this, "ctx_data_out")
 	, m_printerready_led(*this, "printerready_led")

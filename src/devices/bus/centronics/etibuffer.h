@@ -54,7 +54,6 @@
 #pragma once
 
 #include "ctronics.h"
-#include "screen.h"
 #include "cpu/z80/z80.h"
 
 //**************************************************************************
@@ -103,7 +102,6 @@ protected:
 	void    eti_write_3000(offs_t offset, uint8_t data);
 
 	required_device<z80_device> m_maincpu;
-	optional_device<screen_device> m_screen;
 	required_device<centronics_device> m_ctx;
 	required_device<output_latch_device> m_ctx_data_out;
 
