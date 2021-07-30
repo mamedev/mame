@@ -1007,6 +1007,7 @@ private:
 	int m_latch;
 };
 
+
 // ======================> nes_bmc_42in1reset_device
 
 class nes_bmc_42in1reset_device : public nes_nrom_device
@@ -1026,6 +1027,18 @@ protected:
 private:
 	int m_latch;
 	uint8_t m_reg[2];
+};
+
+
+// ======================> nes_bmc_lc160_device
+
+class nes_bmc_lc160_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_lc160_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -1083,5 +1096,6 @@ DECLARE_DEVICE_TYPE(NES_BMC_CH001,      nes_bmc_ch001_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SUPER22,    nes_bmc_super22_device)
 DECLARE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device)
 DECLARE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device)
+DECLARE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device)
 
 #endif // MAME_BUS_NES_MULTIGAME_H

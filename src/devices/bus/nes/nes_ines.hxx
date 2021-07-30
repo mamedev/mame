@@ -52,6 +52,7 @@ static const nes_mmc mmc_list[] =
 	{ 17, FFE8_BOARD },
 	{ 18, JALECO_SS88006 },
 	{ 19, NAMCOT_163 },
+	// 20 Reserved for emulator use for FDS emulation.
 	{ 21, KONAMI_VRC4 },
 	{ 22, KONAMI_VRC2 },
 	{ 23, KONAMI_VRC2 },
@@ -156,7 +157,7 @@ static const nes_mmc mmc_list[] =
 	{ 121, KAY_BOARD },
 	// 122 Unused
 	{ 123, UNL_H2288 },
-	// 124 Super Game Mega Type III pirate arcade board?
+	// 124 Super Game Mega Type III bootleg arcade board. Emulated in MAME as supergm3.
 	{ 125, UNL_LH32 },  // Monty no Doki Doki Daidassou - FDS Conversion
 	{ 126, BMC_PJOY84 },
 	// 127 Double Dragon II Japan pirate. Dump available?
@@ -500,7 +501,7 @@ static const nes_mmc mmc_list[] =
 	// { 538, BTL_60106416L }, Exciting Soccer bootleg, not in nes.xml (available baddump needs banks rearranged?)
 	{ 539, BTL_PALTHENA },         // Hikari Shinwa (Kid Icarus) FDS conversion
 	// 540 for mstrfgt6 in nes.xml or a variant of it not in nes.xml?
-	// 541 LittleCom 160 in 1 multicart, not in nes.xml?
+	{ 541, BMC_LITTLECOM160 },
 	// 542 Chairman Mao's 100th anniversary cart? You've got to be kidding me.
 	// 543 5 in 1 (CH-501) multicart, not in nes.xml?
 	// 544 another alt of sango2ht/sanguo2a?
