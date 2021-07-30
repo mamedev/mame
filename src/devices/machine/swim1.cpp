@@ -142,7 +142,19 @@ u8 swim1_device::read(offs_t offset)
 	if(m_ism_mode & 0x40)
 		return ism_read(offset);
 	else
-		return iwm_control(offset, 0x00);
+	{
+		if(!machine().side_effects_disabled())
+			iwm_control(offset, 0x00);
+
+		switch(m_iwm_control & 0xc0) {
+		case 0x00: return m_iwm_active ? m_iwm_data : 0xff;
+		case 0x40: return (m_iwm_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
+		case 0x80: return m_iwm_whd;
+		case 0xc0: return 0xff;
+		}
+
+		abort();
+	}
 }
 
 void swim1_device::write(offs_t offset, u8 data)
@@ -409,7 +421,7 @@ void swim1_device::flush_write(u64 when)
 		m_flux_write_count = 0;
 }
 
-u8 swim1_device::iwm_control(int offset, u8 data)
+void swim1_device::iwm_control(int offset, u8 data)
 {
 	iwm_sync();
 
@@ -549,14 +561,13 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 	else
 		logerror("iwm counter = %d\n", m_iwm_to_ism_counter);
 
-	switch(m_iwm_control & 0xc0) {
-	case 0x00: return m_iwm_active ? m_iwm_data : 0xff;
-	case 0x40: return (m_iwm_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
-	case 0x80: return m_iwm_whd;
-	case 0xc0: if(offset & 1) { if(m_iwm_active) iwm_data_w(data); else iwm_mode_w(data); } return 0xff;
+	if((m_iwm_control & 0xc0) == 0xc0 && (offset & 1))
+	{
+		if(m_iwm_active)
+			iwm_data_w(data);
+		else
+			iwm_mode_w(data);
 	}
-
-	abort();
 }
 
 void swim1_device::ism_crc_clear()
