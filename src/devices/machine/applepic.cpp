@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "applepic.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 // device type definition
 DEFINE_DEVICE_TYPE(APPLEPIC, applepic_device, "applepic", "Apple 343S1021 PIC")
 
@@ -22,10 +25,12 @@ applepic_device::applepic_device(const machine_config &mconfig, const char *tag,
 	, m_prd_callback(*this)
 	, m_pwr_callback(*this)
 	, m_hint_callback(*this)
+	, m_gpin_callback(*this)
 	, m_gpout_callback(*this)
+	, m_timer1(nullptr)
+	, m_timer_last_expired(attotime::zero)
 	, m_ram_address(0)
 	, m_status_reg(0x80)
-	, m_timer_counter(0)
 	, m_timer_latch(0)
 	, m_scc_control(0)
 	, m_io_control(0)
@@ -69,15 +74,19 @@ void applepic_device::device_resolve_objects()
 	m_prd_callback.resolve_safe(0);
 	m_pwr_callback.resolve_safe();
 	m_hint_callback.resolve_safe();
+	m_gpin_callback.resolve_safe(0);
 	m_gpout_callback.resolve_all_safe();
 }
 
 void applepic_device::device_start()
 {
+	// Initialize timer
+	m_timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(applepic_device::timer1_callback), this));
+
 	// Save internal state
+	save_item(NAME(m_timer_last_expired));
 	save_item(NAME(m_ram_address));
 	save_item(NAME(m_status_reg));
-	save_item(NAME(m_timer_counter));
 	save_item(NAME(m_timer_latch));
 	save_item(STRUCT_MEMBER(m_dma_channel, control));
 	save_item(STRUCT_MEMBER(m_dma_channel, map));
@@ -151,7 +160,7 @@ void applepic_device::host_w(offs_t offset, u8 data)
 	{
 		if (BIT(m_status_reg, 2) != BIT(data, 2))
 		{
-			logerror("%s: /RSTPIC %dactive\n", machine().describe_context(), BIT(data, 2) ? "in" : "");
+			LOG("%s: /RSTPIC %dactive\n", machine().describe_context(), BIT(data, 2) ? "in" : "");
 			m_iopcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 		}
 		if (BIT(data, 3))
@@ -161,7 +170,7 @@ void applepic_device::host_w(offs_t offset, u8 data)
 			m_status_reg &= ~(data & 0x30);
 			if ((m_status_reg & 0x30) == 0)
 			{
-				logerror("%s: Host interrupts acknowledged\n", machine().describe_context());
+				LOG("%s: Host interrupts acknowledged\n", machine().describe_context());
 				m_hint_callback(CLEAR_LINE);
 			}
 		}
@@ -191,15 +200,23 @@ WRITE_LINE_MEMBER(applepic_device::pint_w)
 
 WRITE_LINE_MEMBER(applepic_device::reqa_w)
 {
+	if (state == ASSERT_LINE)
+		m_dma_channel[0].control |= 0x02;
+	else
+		m_dma_channel[0].control &= 0xfd;
 }
 
 WRITE_LINE_MEMBER(applepic_device::reqb_w)
 {
+	if (state == ASSERT_LINE)
+		m_dma_channel[1].control |= 0x02;
+	else
+		m_dma_channel[1].control &= 0xfd;
 }
 
 u8 applepic_device::timer_r(offs_t offset)
 {
-	u16 reg = BIT(offset, 1) ? m_timer_latch : m_timer_counter;
+	u16 reg = BIT(offset, 1) ? m_timer_latch : get_timer_count();
 	if (BIT(offset, 0))
 		return (reg & 0xff00) >> 8;
 	else
@@ -214,12 +231,32 @@ void applepic_device::timer_w(offs_t offset, u8 data)
 {
 	if (BIT(offset, 0))
 	{
-		m_timer_latch = u16(data) << 8 | (m_timer_latch & 0xff00);
+		m_timer_latch = u16(data) << 8 | (m_timer_latch & 0x00ff);
 		if (offset == 1)
+		{
 			reset_interrupt(5);
+			m_timer1->adjust(clocks_to_attotime(m_timer_latch * 8 + 12));
+		}
 	}
 	else
 		m_timer_latch = (m_timer_latch & 0xff00) | data;
+}
+
+u16 applepic_device::get_timer_count() const
+{
+	if (m_timer1->enabled())
+		return u16((attotime_to_clocks(m_timer1->remaining()) - 4) / 8);
+	else
+		return 0xffff - u16((attotime_to_clocks(machine().time() - m_timer_last_expired) + 4) / 8);
+}
+
+TIMER_CALLBACK_MEMBER(applepic_device::timer1_callback)
+{
+	set_interrupt(5);
+	if (BIT(m_timer_dpll_control, 0))
+		m_timer1->adjust(clocks_to_attotime((m_timer_latch + 2) * 8));
+	else
+		m_timer_last_expired = machine().time();
 }
 
 u8 applepic_device::dma_channel_r(offs_t offset)
@@ -257,7 +294,7 @@ void applepic_device::dma_channel_w(offs_t offset, u8 data)
 	switch (offset & 7)
 	{
 	case 0:
-		channel.control = data;
+		channel.control = (data & 0xfd) | (channel.control & 0x02);
 		break;
 
 	case 1:
@@ -309,12 +346,13 @@ void applepic_device::io_control_w(u8 data)
 
 u8 applepic_device::timer_dpll_control_r()
 {
-	return m_timer_dpll_control;
+	return m_timer_dpll_control | (m_gpin_callback() & 3) << 2;
 }
 
 void applepic_device::timer_dpll_control_w(u8 data)
 {
-	m_timer_dpll_control = data;
+	m_timer_dpll_control = (m_timer_dpll_control & 0xa0) | (data & 0x53);
+	m_gpout_callback[0](BIT(data, 1));
 }
 
 u8 applepic_device::int_mask_r()
@@ -326,7 +364,7 @@ void applepic_device::int_mask_w(u8 data)
 {
 	for (int which = 1; which <= 5; which++)
 		if (BIT(m_int_mask, which) != BIT(data, which))
-			logerror("%s: %sabling %s interrupt\n", machine().describe_context(), BIT(data, which) ? "En" : "Dis", s_interrupt_names[which]);
+			LOG("%s: %sabling %s interrupt\n", machine().describe_context(), BIT(data, which) ? "En" : "Dis", s_interrupt_names[which]);
 
 	m_int_mask = data & 0x3e;
 	m_iopcpu->set_input_line(r65c02_device::IRQ_LINE, (m_int_mask & m_int_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
@@ -344,7 +382,7 @@ void applepic_device::int_reg_w(u8 data)
 		m_int_reg &= ~data;
 		if ((m_int_mask & m_int_reg) == 0)
 		{
-			logerror("%s: 6502 interrupts acknowledged\n", machine().describe_context());
+			LOG("%s: 6502 interrupts acknowledged\n", machine().describe_context());
 			m_iopcpu->set_input_line(r65c02_device::IRQ_LINE, CLEAR_LINE);
 		}
 	}
@@ -354,7 +392,7 @@ void applepic_device::set_interrupt(int which)
 {
 	if (!BIT(m_int_reg, which))
 	{
-		logerror("%s: Setting %s interrupt\n", machine().describe_context(), s_interrupt_names[which]);
+		LOG("%s: Setting %s interrupt\n", machine().describe_context(), s_interrupt_names[which]);
 		m_int_reg |= (1 << which);
 		if ((m_int_reg & m_int_mask) == (1 << which))
 			m_iopcpu->set_input_line(r65c02_device::IRQ_LINE, ASSERT_LINE);
@@ -365,7 +403,7 @@ void applepic_device::reset_interrupt(int which)
 {
 	if (BIT(m_int_reg, which))
 	{
-		logerror("%s: Resetting %s interrupt\n", machine().describe_context(), s_interrupt_names[which]);
+		LOG("%s: Resetting %s interrupt\n", machine().describe_context(), s_interrupt_names[which]);
 		if ((m_int_reg & m_int_mask) == (1 << which))
 			m_iopcpu->set_input_line(r65c02_device::IRQ_LINE, CLEAR_LINE);
 		m_int_reg &= ~(1 << which);
@@ -379,7 +417,7 @@ u8 applepic_device::host_reg_r()
 
 void applepic_device::host_reg_w(u8 data)
 {
-	logerror("%s: INTHST0 %srequested, INTHST1 %srequested\n", machine().describe_context(), BIT(data, 2) ? "" : "not ", BIT(data, 3) ? "" : "not ");
+	LOG("%s: INTHST0 %srequested, INTHST1 %srequested\n", machine().describe_context(), BIT(data, 2) ? "" : "not ", BIT(data, 3) ? "" : "not ");
 	m_status_reg |= (data & 0x0c) << 2;
 	if ((data & 0x0c) != 0)
 		m_hint_callback(ASSERT_LINE);

@@ -24,6 +24,7 @@ public:
 	auto prd_callback() { return m_prd_callback.bind(); }
 	auto pwr_callback() { return m_pwr_callback.bind(); }
 	auto hint_callback() { return m_hint_callback.bind(); }
+	auto gpin_callback() { return m_gpin_callback.bind(); }
 	auto gpout0_callback() { return m_gpout_callback[0].bind(); }
 	auto gpout1_callback() { return m_gpout_callback[1].bind(); }
 
@@ -55,7 +56,8 @@ private:
 
 	u8 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u8 data);
-	void reset_timer_interrupt();
+	u16 get_timer_count() const;
+	TIMER_CALLBACK_MEMBER(timer1_callback);
 	u8 dma_channel_r(offs_t offset);
 	void dma_channel_w(offs_t offset, u8 data);
 	u8 scc_control_r();
@@ -84,12 +86,14 @@ private:
 	devcb_read8 m_prd_callback;
 	devcb_write8 m_pwr_callback;
 	devcb_write_line m_hint_callback;
+	devcb_read8 m_gpin_callback;
 	devcb_write_line::array<2> m_gpout_callback;
 
 	// internal state
+	emu_timer *m_timer1;
+	attotime m_timer_last_expired;
 	u16 m_ram_address;
 	u8 m_status_reg;
-	u16 m_timer_counter;
 	u16 m_timer_latch;
 	dma_channel m_dma_channel[2];
 	u8 m_scc_control;

@@ -463,7 +463,12 @@ uint32_t mac_state::buserror_r()
 	return 0;
 }
 
-uint8_t mac_state::maciifx_unknown_r()
+uint8_t mac_state::maciifx_8010_r()
+{
+	return 0x40;
+}
+
+uint8_t mac_state::maciifx_8040_r()
 {
 	return 0;
 }
@@ -569,7 +574,8 @@ void mac_state::maciifx_map(address_map &map)
 	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
 	map(0x50004000, 0x50005fff).rw("sccpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0xff00ff00);
 	map(0x50004000, 0x50005fff).rw("sccpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0x00ff00ff);
-	map(0x50008040, 0x50008040).r(FUNC(mac_state::maciifx_unknown_r)).mirror(0x00f00000);
+	map(0x50008010, 0x50008010).r(FUNC(mac_state::maciifx_8010_r)).mirror(0x00f00000);
+	map(0x50008040, 0x50008040).r(FUNC(mac_state::maciifx_8040_r)).mirror(0x00f00000);
 	map(0x5000a000, 0x5000bfff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
 	map(0x5000c060, 0x5000c063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
 	map(0x5000d000, 0x5000d003).w(FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
