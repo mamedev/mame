@@ -193,7 +193,7 @@ file:set_resolve_tags_callback(
 			bufferhead = file.device:subdevice("maincpu").state["BC"].value
 			buffertail = file.device:subdevice("maincpu").state["DE"].value
 			buffersize = file.device:subdevice("maincpu").state["HL"].value
-			local minsize = 512
+			local minsize = 512  -- choose a minimum size so that we can see the bar
 			if bufferhead >= buffertail then
 				bufferhead = max(buffertail + minsize, bufferhead)   -- minimum size or you can't see it
 				bufferfull = nil
@@ -202,6 +202,12 @@ file:set_resolve_tags_callback(
 				buffertail = max(buffertail, bufferhead + minsize)  -- minimum size
 			end
 		end
+
+		-- The idea is to draw two bars, one that is the full bar (normally black), and a second bar
+		--   in the middle to represent the buffer tail and head (normally white).
+		-- When the buffer tail <= buffer head the buffer extends directly from the tail to the head.
+		-- When the buffer head < buffer tail the buffer wraps around, so we switch the colors of the
+		--   full and the middle bars, and draw the middle bar from the head to the tail.
 
 		bufheadx = scalevalue(bufferhead,0x4000,0xffff,boundx0,boundx1)
 		buftailx = scalevalue(buffertail,0x4000,0xffff,boundx0,boundx1)
