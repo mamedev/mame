@@ -816,7 +816,7 @@ GAME( 1987, sauroa,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, R
 GAME( 1987, saurop,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1987, saurorr,  sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, saurob,   sauro,    saurob,   saurob,    sauro_state, init_tecfri, ROT0, "bootleg",                               "Sauro (bootleg)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1987, seawolft, sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sea Wolf (Tecfri)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, seawolft, sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sea Wolf (Tecfri)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // MNW Because of the bad dumps
 
 GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )
