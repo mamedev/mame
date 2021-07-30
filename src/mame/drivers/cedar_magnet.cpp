@@ -51,14 +51,14 @@
 
  The following were advertised
   Original Games
-  - A Day in Space **
+  - A Day in Space ** *
   - Crazy Driver
   - Jungle Trophy
   - Quadrum
   - War Mission ** *
-  - The Burning Cave
+  - The Burning Cave *
   - Scorpio
-  - Paris Dakar **
+  - Paris Dakar ** *
   - Sailing Race
   - Formula
 
@@ -1068,7 +1068,7 @@ ROM_START( mag_pdak )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "paris.dsk 31_3_87.img", 0x00000, 0xf0000, CRC(2c4ee9e1) SHA1(22c2b75c16aca95ecf2199451c1bd12dd3a3844c) )
+	ROM_LOAD( "paris.dsk 31_3_87.img", 0x00000, 0xf0000, BAD_DUMP CRC(2c4ee9e1) SHA1(22c2b75c16aca95ecf2199451c1bd12dd3a3844c) )
 ROM_END
 
 /*
@@ -1094,9 +1094,9 @@ ROM_START( mag_drac )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "drac.dsk", 0x00000, 0xf0000, CRC(2b5ca6f8) SHA1(063ea3b55bf95d05c866c0fcdb41c307c484a4f8) )
-	ROM_LOAD( "drac2.dsk", 0x00000, 0xf0000, CRC(cf6c1dd2) SHA1(7adb5146b050172090556927bf6d30ba8265107a) )
-	ROM_LOAD( "drac3.dsk", 0x00000, 0xf0000, CRC(7060e4a2) SHA1(b8e5437afff11d57a40c092d005d6b075819537a))
+	ROM_LOAD( "drac.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(2b5ca6f8) SHA1(063ea3b55bf95d05c866c0fcdb41c307c484a4f8) )
+	ROM_LOAD( "drac2.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(cf6c1dd2) SHA1(7adb5146b050172090556927bf6d30ba8265107a) )
+	ROM_LOAD( "drac3.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(7060e4a2) SHA1(b8e5437afff11d57a40c092d005d6b075819537a))
 ROM_END
 
 
