@@ -158,11 +158,6 @@ function scalevalue(xval1, x1, x2, y1, y2)
 	return yval1
 end
 
-function scale2value(xval1, xval2, x1, x2, y1, y2)
-	return scalevalue(xval1, x1, x2, y1, y2),
-		   scalevalue(xval2, x1, x2, y1, y2)
-end
-
 function iif(a,b,c) if a then return b else return c end end
 
 file:set_resolve_tags_callback(
@@ -242,15 +237,18 @@ file:set_resolve_tags_callback(
 
 	-- buffer head amd tail bars
 
-	file.views["Control Panel"].items["bufheadtaildisplay0"]:set_color_callback(
+	file.views["Control Panel"]:set_prepare_items_callback( -- called every frame
 		function ()
 			updatebufferdetails()
+		end)
+
+	file.views["Control Panel"].items["bufheadtaildisplay0"]:set_color_callback(
+		function ()
 			return rgbtorender_color(fullcolor)
 		end)
 
 	file.views["Control Panel"].items["bufheadtaildisplay0"]:set_bounds_callback(
 		function ()
-			updatebufferdetails()
 			local b = emu.render_bounds()
 			b:set_xy(boundx0,boundy0,boundx1,boundy1)
 			return b
@@ -258,13 +256,11 @@ file:set_resolve_tags_callback(
 
 	file.views["Control Panel"].items["bufheadtaildisplay1"]:set_color_callback(
 		function ()
-			updatebufferdetails()
 			return rgbtorender_color(middlecolor)
 		end)
 
 	file.views["Control Panel"].items["bufheadtaildisplay1"]:set_bounds_callback(
 		function ()
-			updatebufferdetails()
 			local b = emu.render_bounds()
 			b:set_xy(middleboundx0,boundy0,middleboundx1,boundy1)
 			return b
