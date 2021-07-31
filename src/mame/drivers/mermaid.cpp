@@ -14,6 +14,7 @@
     Known issues:
         * stars playfield colors and scrolling are wrong in Rougien;
         * Dunno where the "alien whistle" sample is supposed to play in Rougien;
+        * Incomplete GFX emulation in Mermaid (see MT07985 and MT08000);
         * Mermaid has a ROM for sample playback, identify and hook it up (see MT07987);
 
 Yachtsman
@@ -426,7 +427,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 void mermaid_state::mermaid(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);    // ???
+	Z80(config, m_maincpu, 24.576_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mermaid_state::mermaid_map);
 
 	LS259(config, m_latch[0]);
@@ -599,6 +600,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid,  0,        mermaid,  mermaid, mermaid_state, empty_init, ROT0, "Sanritsu / Rock-Ola", "Mermaid",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, mermaid_state, empty_init, ROT0, "Sanritsu / Esco",     "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid, mermaid_state, empty_init, ROT0, "Sanritsu / Rock-Ola", "Mermaid",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, mermaid_state, empty_init, ROT0, "Sanritsu / Esco",     "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1982, rougien,  0,        rougien,  rougien, mermaid_state, empty_init, ROT0, "Sanritsu",            "Rougien",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
