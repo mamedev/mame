@@ -334,7 +334,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-<!-- Device I/O error -->
 	<software name="cball" supported="no">
 		<description>Crash Ball</description>
 		<year>1984</year>
@@ -718,7 +717,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-<!-- Game freezes before drawing road elements and car -->
 	<software name="fmracer" supported="no">
 		<description>FM Racer</description>
 		<year>19??</year>
