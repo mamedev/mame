@@ -803,11 +803,19 @@ static const command_description s_commands[] =
 // hard disk templates
 static const hd_template s_hd_templates[] =
 {
-	{ "Conner", "CFA170A", 332, 16, 63, 512 }, // 163 MB
-	{ "Rodime", "R0201",   321,  2, 16, 512 }, //   5 MB
-	{ "Rodime", "R0202",   321,  4, 16, 512 }, //  10 MB
-	{ "Rodime", "R0203",   321,  6, 16, 512 }, //  15 MB
-	{ "Rodime", "R0204",   321,  8, 16, 512 }, //  20 MB
+	{ "Conner",     "CFA170A",    332, 16, 63, 512 }, //  163 MB
+	{ "Rodime",     "R0201",      321,  2, 16, 512 }, //    5 MB
+	{ "Rodime",     "R0202",      321,  4, 16, 512 }, //   10 MB
+	{ "Rodime",     "R0203",      321,  6, 16, 512 }, //   15 MB
+	{ "Rodime",     "R0204",      321,  8, 16, 512 }, //   20 MB
+	{ "Seagate",    "ST-213",     615,  2, 17, 512 }, //   10 MB
+	{ "Seagate",    "ST-225",     615,  4, 17, 512 }, //   20 MB
+	{ "Seagate",    "ST-251",     820,  6, 17, 512 }, //   40 MB
+	{ "Seagate",    "ST-3600N",  1877,  7, 76, 512 }, //  525 MB
+	{ "Maxtor",     "LXT-213S",  1314,  7, 53, 512 }, //  200 MB
+	{ "Maxtor",     "LXT-340S",  1574,  7, 70, 512 }, //  340 MB
+	{ "Maxtor",     "MXT-540SL", 2466,  7, 87, 512 }, //  540 MB
+	{ "Micropolis", "1528",      2094, 15, 83, 512 }, // 1342 MB
 };
 
 
