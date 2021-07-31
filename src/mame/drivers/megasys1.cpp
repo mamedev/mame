@@ -78,19 +78,19 @@ Input Ports R   080000-080009   0e0000-0e0001** 0d8000-d80001** 100000-100001**
 
 
 
-Sound CPU       RW      MS1-A           MS1-B           MS1-C           MS1-D
+Sound CPU       RW          MS1-A           MS1-B           MS1-C           MS1-D
 -----------------------------------------------------------------------------------
-ROM         R       000000-01ffff       000000-01ffff       000000-01ffff       No Sound CPU
-Latch #1        R       040000-040001       <           060000-060001
-Latch #2         W      060000-060001       <           <
-2151 reg         W      080000-080001       <           <
-2151 data        W      080002-080003       <           <
-2151 status     R       080002-080003       <           <
-6295 #1 data         W      0a0000-0a0003       <           <
-6295 #1 status      R       0a0000-0a0001       <           <
-6295 #2 data         W      0c0000-0c0003       <           <
-6295 #2 status      R       0c0000-0c0001       <           <
-RAM         RW      0f0000-0f3fff       0e0000-0effff*      <
+ROM             R       000000-01ffff   000000-01ffff   000000-01ffff   No Sound CPU
+Latch #1        R       040000-040001         <         060000-060001
+Latch #2         W      060000-060001         <               <
+2151 reg         W      080000-080001         <               <
+2151 data        W      080002-080003         <               <
+2151 status     R       080002-080003         <               <
+6295 #1 data     W      0a0000-0a0003         <               <
+6295 #1 status  R       0a0000-0a0001         <               <
+6295 #2 data     W      0c0000-0c0003         <               <
+6295 #2 status  R       0c0000-0c0001         <               <
+RAM             RW      0e0000-0effff*        <               <
 -----------------------------------------------------------------------------------
 *Mirror at 0xf0000 (verified on hardware)
 
@@ -2940,7 +2940,8 @@ ROM_START( edfbl )
 	ROM_LOAD16_BYTE( "01.bin",  0x000001, 0x020000, CRC(fc893ad0) SHA1(6d7be560e2343f3943f52ccdae7bd255b7720b6e) )
 	ROM_CONTINUE (                  0x080001, 0x020000 )
 
-	/* no 2nd 68k on this bootleg, is there a PIC? */
+	ROM_REGION( 0x2000, "mcu", 0 ) // PIC, 28 pin, part number scratched off
+	ROM_LOAD( "pic", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "07.bin",  0x000000, 0x040000, CRC(4495c228) SHA1(2193561e193e696c66f27fa186f27ffbbdcb1826) )
@@ -3636,6 +3637,38 @@ ROM_START( p47 )
 ROM_END
 
 
+/*
+The Japanese version of P-47 can be found in 2 different ROM board configurations:
+'Normal' rev - full split EPROMs
+Type B rev - 4x 2mb HN62312 and 1x HN62321 mask ROMs
+
+Type B on the left, normal on the right
+
+p-47_1_rom1.bin = p47j_1.bin          | Main CPU
+p-47_3_rom2.bin = p47j_3.bin          /
+
+p-47_9_rom8.bin = p47j_9.bin          | Audio CPU
+p-47_19_rom7.bin = p47j_19.bin        /
+
+rom4.bin = p47j_5.bin + p47j_6.bin    | Scroll0
+p-47_7_rom3.bin = p47j_7.bin**        /
+
+rom5.bin = p47j_23.bin                | Scroll1
+rom6.bin = p47j_12.bin                /
+
+p-47_16_rom12.bin = p47j_16.bin       | Scroll2
+
+rom11.bin = p47j_27.bin + p47j_18.bin | Sprites
+p-47_26_rom13.bin = p47j_26.bin       /
+
+rom9.bin = p47j_20.bin + p47j_21.bin  | OKI1
+
+rom10.bin = p47j_10.bin + p47j_11.bin | OKI2
+
+p-47.14m = p-47.14m                   | PROMS
+
+**p-47_7_rom3.bin is a 27512 compatible mask rom. The existing P47j set is 1mb. The 2nd half of the data is not present on the type B boardset.
+*/
 ROM_START( p47j )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "p47j_3.bin", 0x000000, 0x020000, CRC(11c655e5) SHA1(a2bfd6538ac81a5f20fa77460ba045584313413a) )

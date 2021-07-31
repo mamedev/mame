@@ -956,6 +956,7 @@ void debug_imgui::mount_image()
 			case file_entry_type::FILE:
 				m_dialog_image->load(m_selected_file->fullpath);
 				ImGui::CloseCurrentPopup();
+				m_mount_open = false;
 				break;
 		}
 	}
@@ -1107,8 +1108,8 @@ void debug_imgui::draw_mount_dialog(const char* label)
 		if(ImGui::InputText("##mountpath",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
 			m_filelist_refresh = true;
 		ImGui::Separator();
+		if(ImGui::ListBoxHeader("##filelist",m_filelist.size(),15))
 		{
-			ImGui::ListBoxHeader("##filelist",m_filelist.size(),15);
 			for(auto f = m_filelist.begin();f != m_filelist.end();++f)
 			{
 				std::string txt_name;
@@ -1132,14 +1133,19 @@ void debug_imgui::draw_mount_dialog(const char* label)
 				{
 					m_selected_file = &(*f);
 					if(ImGui::IsMouseDoubleClicked(0))
+					{
 						mount_image();
+					}
 				}
 			}
 			ImGui::ListBoxFooter();
 		}
 		ImGui::Separator();
 		if(ImGui::Button("Cancel##mount"))
+		{
 			ImGui::CloseCurrentPopup();
+			m_mount_open = false;
+		}
 		ImGui::SameLine();
 		if(ImGui::Button("OK##mount"))
 			mount_image();
@@ -1199,7 +1205,10 @@ void debug_imgui::draw_create_dialog(const char* label)
 		{
 			ImGui::Separator();
 			if(ImGui::Button("Cancel##mount"))
+			{
 				ImGui::CloseCurrentPopup();
+				m_create_open = false;
+			}
 			ImGui::SameLine();
 			if(ImGui::Button("OK##mount"))
 			{
@@ -1210,6 +1219,7 @@ void debug_imgui::draw_create_dialog(const char* label)
 				if(file_type == osd::directory::entry::entry_type::FILE)
 					m_create_confirm_wait = true;
 				// cannot overwrite a directory, so nothing will be none in that case.
+				m_create_open = false;
 			}
 		}
 		ImGui::EndPopup();
@@ -1328,15 +1338,13 @@ void debug_imgui::draw_console()
 		if(m_mount_open)
 		{
 			ImGui::OpenPopup("Mount Image");
-			m_mount_open = false;
+			draw_mount_dialog("Mount Image");  // draw mount image dialog if open
 		}
 		if(m_create_open)
 		{
 			ImGui::OpenPopup("Create Image");
-			m_create_open = false;
+			draw_create_dialog("Create Image");  // draw create image dialog if open
 		}
-		draw_mount_dialog("Mount Image");  // draw mount image dialog if open
-		draw_create_dialog("Create Image");  // draw create image dialog if open
 		ImGui::PopItemWidth();
 		ImGui::EndChild();
 		ImGui::End();

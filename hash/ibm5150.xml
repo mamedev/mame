@@ -9182,7 +9182,103 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="crimewav">
-		<description>Crime Wave</description>
+		<description>Crime Wave (5.25", v2.0)</description>
+		<year>1990</year>
+		<publisher>Access Software</publisher>
+		<info name="version" value="2.0" />
+		<info name="developer" value="Access Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 1 of 8].img" size="368640" crc="61b7dbfb" sha1="85a854ec95b91eead12fb88ff5eec7025471e5f1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 2 of 8].img" size="368640" crc="19e13796" sha1="ba8693473e30b40a994d8a32e4f4258db381e4dd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 3 of 8].img" size="368640" crc="c7a21ba5" sha1="efd3319b7dade6264f49c3eb0a37bf8ab5b7fe9c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 4 of 8].img" size="368640" crc="503eb292" sha1="c73d048f09c1db132ee6b6f9830be02b88f19524"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 5 of 8].img" size="368640" crc="2d415d98" sha1="c8070809d79dc85a6af09b6780f1efa6e799f4f4"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 6 of 8].img" size="368640" crc="e635a53b" sha1="e047077581b633c7d254ef66fc238075d6d47591"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 7 of 8].img" size="368640" crc="1db54168" sha1="0815d6b4e578f5efee8d96a4b8c000ed8b30a975"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v2.0) [Access Software] [1990] [5.25DD] [disk 8 of 8].img" size="368640" crc="30d917e1" sha1="b3bbeb142e57df36535569c09ccdbcc92c7391b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimewava" cloneof="crimewav">
+		<description>Crime Wave (5.25", v1.1)</description>
+		<year>1990</year>
+		<publisher>Access Software</publisher>
+		<info name="version" value="1.1" />
+		<info name="developer" value="Access Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 1 of 8].img" size="368640" crc="225ee0a6" sha1="5b2534dd68b44e71fb8081643553f2170868ad28"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 2 of 8].img" size="368640" crc="9d8c7b7b" sha1="2c3ad851295913fd819f0c3946c86106c1dc2190"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 3 of 8].img" size="368640" crc="10eee8ef" sha1="cb3e0fb149727620187c4a1e5874173c85a1be0d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 4 of 8].img" size="368640" crc="503eb292" sha1="c73d048f09c1db132ee6b6f9830be02b88f19524"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 5 of 8].img" size="368640" crc="2d415d98" sha1="c8070809d79dc85a6af09b6780f1efa6e799f4f4"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 6 of 8].img" size="368640" crc="e635a53b" sha1="e047077581b633c7d254ef66fc238075d6d47591"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 7 of 8].img" size="368640" crc="1db54168" sha1="0815d6b4e578f5efee8d96a4b8c000ed8b30a975"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Crime Wave (v1.1) [Access Software] [1990] [5.25DD] [disk 8 of 8].img" size="368640" crc="30d917e1" sha1="b3bbeb142e57df36535569c09ccdbcc92c7391b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimewav35" cloneof="crimewav">
+		<description>Crime Wave (v2.0, 3.5")</description>
 		<year>1990</year>
 		<publisher>Access Software</publisher>
 		<info name="version" value="2.0" />

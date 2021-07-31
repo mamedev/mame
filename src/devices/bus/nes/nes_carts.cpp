@@ -301,6 +301,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2j",            NES_SMB2J);
 	device.option_add_internal("smb2ja",           NES_SMB2JA);
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
+	device.option_add_internal("yung08",           NES_YUNG08);
 	device.option_add_internal("btl_0353",         NES_0353);       // used by Lucky (Roger) Rabbit FDS conversion
 	device.option_add_internal("09034a",           NES_09034A);
 	device.option_add_internal("batmanfs",         NES_BATMANFS);
@@ -352,6 +353,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("maxi15",           NES_MAXI15);        //  mapper 234
 	device.option_add_internal("rumblestation",    NES_RUMBLESTATION);    // mapper 46
 	device.option_add_internal("svision16",        NES_SVISION16);  // mapper 53
+	device.option_add_internal("kn42",             NES_KN42);
 	device.option_add_internal("n625092",          NES_N625092);
 	device.option_add_internal("a65as",            NES_A65AS);
 	device.option_add_internal("t262",             NES_T262);
@@ -359,9 +361,10 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("novel2",           NES_NOVEL2); // mapper 213... same as BMC-NOVELDIAMOND9999999IN1 board?
 	device.option_add_internal("studyngame",       NES_STUDYNGAME); // mapper 39
 	device.option_add_internal("sgun20in1",        NES_SUPERGUN20IN1);
-	device.option_add_internal("bmc_vt5201",       NES_VT5201); // mapper 60 otherwise
-	device.option_add_internal("bmc_d1038",        NES_VT5201); // mapper 60?
-	device.option_add_internal("810544c",          NES_810544C);
+	device.option_add_internal("bmc_vt5201",       NES_VT5201); // mapper 59?
+	device.option_add_internal("bmc_d1038",        NES_VT5201); // mapper 59?
+	device.option_add_internal("bmc_80013b",       NES_BMC_80013B);
+	device.option_add_internal("bmc_810544c",      NES_BMC_810544C);
 	device.option_add_internal("ntd03",            NES_NTD03);
 	device.option_add_internal("bmc_ctc09",        NES_BMC_CTC09);
 	device.option_add_internal("bmc_gb63",         NES_BMC_GB63);

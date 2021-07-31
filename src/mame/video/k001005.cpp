@@ -16,7 +16,7 @@
 /*
     TODO:
         - Winding Heat (and maybe others) have slight Z-fighting problems.
-		- Player car shadow not visible in Winding Heat. Hidden by road, needs polygon priority or something similar?
+        - Player car shadow not visible in Winding Heat. Hidden by road, needs polygon priority or something similar?
 
 */
 
@@ -226,7 +226,7 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 
 					texel = rgbaint_t::bilinear_filter(tex00, tex01, tex10, tex11, ufrac * 16, vfrac * 16);
 					texel_alpha = tex00 >> 24;
-				}				
+				}
 			}
 
 			int idiff = std::clamp((int)(diff), 0, 255);
@@ -250,7 +250,7 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 					rgbaint_t color(ia, ir, ig, ib);
 
 					if (UseTexture && texel_alpha != 0)
-					{						
+					{
 						color.set(texel);
 					}
 
@@ -286,7 +286,7 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 						if (UseBilinear && texel_alpha < 0xff)
 						{
 							rgbaint_t fb_color(fb[x]);
-							texel_color.blend(fb_color, texel_alpha);								
+							texel_color.blend(fb_color, texel_alpha);
 						}
 
 						if (UseFog)
@@ -356,33 +356,33 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 
 
 /*
-	Command
-	0x00: xxxxxxxx xxxxxxxx xxxxxxx- --------    0x80000000 (exact number of bits unknown)
-	0x00: -------- -------- -------x --------    0 = per-poly color, 1 = per-vertex color
-	0x00: -------- -------- -------- x-------    ? Texture related
-	0x00: -------- -------- -------- -x------    Unused?
-	0x00: -------- -------- -------- --x-----    1 = enable smooth shading?
-	0x00: -------- -------- -------- ---x----    1 = texture mirroring
-	0x00: -------- -------- -------- ----x---    ? Texture related
-	0x00: -------- -------- -------- -----x--    1 = enable Z-buffer read
-	0x00: -------- -------- -------- ------x-    0 = blend enabled, 1 = disabled
-	0x00: -------- -------- -------- -------x    0 = per-vertex Z, 1 = per-poly Z (0x80000121 seems like an exception)
+    Command
+    0x00: xxxxxxxx xxxxxxxx xxxxxxx- --------    0x80000000 (exact number of bits unknown)
+    0x00: -------- -------- -------x --------    0 = per-poly color, 1 = per-vertex color
+    0x00: -------- -------- -------- x-------    ? Texture related
+    0x00: -------- -------- -------- -x------    Unused?
+    0x00: -------- -------- -------- --x-----    1 = enable smooth shading?
+    0x00: -------- -------- -------- ---x----    1 = texture mirroring
+    0x00: -------- -------- -------- ----x---    ? Texture related
+    0x00: -------- -------- -------- -----x--    1 = enable Z-buffer read
+    0x00: -------- -------- -------- ------x-    0 = blend enabled, 1 = disabled
+    0x00: -------- -------- -------- -------x    0 = per-vertex Z, 1 = per-poly Z (0x80000121 seems like an exception)
 
-	Texture header
-	0x01: -xxx---- -------- -------- --------    Texture palette
-	0x01: ----xx-- -------- -------- --------    Unknown flags, set by commands 0x7b...0x7e. Used mostly on polygons further away from camera. Some kind of depth-based effect?
-	0x01: ------xx x------- -------- --------    Texture width / 8 - 1
-	0x01: -------- -xxx---- -------- --------    Texture height / 8 - 1
-	0x01: -------- -------x xxxx---- --------    Texture page
-	0x01: -------- -------- ----x-x- x-x-x-x-    Texture X / 8
-	0x01: -------- -------- -----x-x -x-x-x-x    Texture Y / 8
+    Texture header
+    0x01: -xxx---- -------- -------- --------    Texture palette
+    0x01: ----xx-- -------- -------- --------    Unknown flags, set by commands 0x7b...0x7e. Used mostly on polygons further away from camera. Some kind of depth-based effect?
+    0x01: ------xx x------- -------- --------    Texture width / 8 - 1
+    0x01: -------- -xxx---- -------- --------    Texture height / 8 - 1
+    0x01: -------- -------x xxxx---- --------    Texture page
+    0x01: -------- -------- ----x-x- x-x-x-x-    Texture X / 8
+    0x01: -------- -------- -----x-x -x-x-x-x    Texture Y / 8
 */
 
 int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 {
 	render_delegate rd_scan_tex = render_delegate(&k001005_renderer::draw_scanline_generic<true, false>, this);
 	render_delegate rd_scan_vertex_color = render_delegate(&k001005_renderer::draw_scanline_generic<false, true>, this);
-	render_delegate rd_scan_vertex_color_tex = render_delegate(&k001005_renderer::draw_scanline_generic<true, true>, this);		
+	render_delegate rd_scan_vertex_color_tex = render_delegate(&k001005_renderer::draw_scanline_generic<true, true>, this);
 	render_delegate rd_scan_color = render_delegate(&k001005_renderer::draw_scanline_generic<false, false>, this);
 
 	int viewport_min_x = std::clamp(256 + m_viewport_min_x + m_viewport_center_x, m_cliprect.min_x, m_cliprect.max_x);
@@ -391,7 +391,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 	int viewport_max_y = std::clamp(200 + m_viewport_max_y - m_viewport_center_y + 1, m_cliprect.min_y, m_cliprect.max_y);
 
 	rectangle cliprect(viewport_min_x, viewport_max_x, viewport_min_y, viewport_max_y);
-	
+
 
 	int start_index = index;
 
@@ -399,7 +399,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 
 	bool has_texture = (cmd & 0x18) != 0;
 	bool has_vertex_color = (cmd & 0x100) != 0;
-	bool has_vertex_z = !(cmd & 1) || has_vertex_color;		// command 0x121 breaks the logic here, maybe vertex color enforces vertex z too?
+	bool has_vertex_z = !(cmd & 1) || has_vertex_color;     // command 0x121 breaks the logic here, maybe vertex color enforces vertex z too?
 
 	uint32_t texture_x = 0;
 	uint32_t texture_y = 0;
@@ -460,7 +460,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			// -------------------------------------------------------------------------
 			if (has_vertex_z)
 			{
-				uint32_t z = fifo[index] & 0xffffff00;		// 32-bit float with low 8-bits of mantissa masked out
+				uint32_t z = fifo[index] & 0xffffff00;      // 32-bit float with low 8-bits of mantissa masked out
 				int diffuse = fifo[index] & 0xff;
 				index++;
 
@@ -477,10 +477,10 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			// -------------------------------------------------------------------------
 			if (last_vertex && has_texture)
 			{
-				// polygon Z comes before the last UV coords for textured polygons				
+				// polygon Z comes before the last UV coords for textured polygons
 				if (!has_vertex_z)
 				{
-					uint32_t z = (fifo[index] & 0x07ffff00) | 0x48000000;	// like fog values, these seem to be missing the 4 upper bits of exponent
+					uint32_t z = (fifo[index] & 0x07ffff00) | 0x48000000;   // like fog values, these seem to be missing the 4 upper bits of exponent
 					polygon_diffuse = fifo[index] & 0xff;
 					index++;
 					polygon_z = u2f(z);
@@ -540,7 +540,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			// polygon Z
 			if (!has_vertex_z)
 			{
-				uint32_t z = (fifo[index] & 0x07ffff00) | 0x48000000;	// like fog values, these seem to be missing the 4 upper bits of exponent
+				uint32_t z = (fifo[index] & 0x07ffff00) | 0x48000000;   // like fog values, these seem to be missing the 4 upper bits of exponent
 				polygon_diffuse = fifo[index] & 0xff;
 				index++;
 
@@ -574,7 +574,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 		extra.texture_mirror = (cmd & 0x10);
 		extra.diffuse_light = rgb_t(m_light_r, m_light_g, m_light_b);
 		extra.ambient_light = rgb_t(m_ambient_r, m_ambient_g, m_ambient_b);
-		extra.fog_color = rgb_t(m_fog_r, m_fog_g, m_fog_b);		
+		extra.fog_color = rgb_t(m_fog_r, m_fog_g, m_fog_b);
 		extra.fog_enable = (m_reg_fog_start != 0xffff) && !(cmd & 1);
 		extra.cmd = cmd;
 
@@ -594,7 +594,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 		int v2 = (m_vertexb_ptr - 2) & 3;
 		int v3 = (m_vertexb_ptr - 1) & 3;
 
-		
+
 		// This fixes shading issues in the Konami logo in Solar Assault.
 		// Some triangle strips have different shading values compared to reused vertices, causing unintended smooth shading.
 		// This ensures all vertices have the same shading value.
@@ -613,7 +613,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 		if (is_quad)
 		{
 			if (has_vertex_color)
-			{				
+			{
 				render_triangle<10>(cliprect, has_texture ? rd_scan_vertex_color_tex : rd_scan_vertex_color, m_vertexb[v0], m_vertexb[v1], m_vertexb[v2]);
 				render_triangle<10>(cliprect, has_texture ? rd_scan_vertex_color_tex : rd_scan_vertex_color, m_vertexb[v2], m_vertexb[v3], m_vertexb[v0]);
 			}
@@ -629,7 +629,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			}
 		}
 		else
-		{			
+		{
 			if (has_vertex_color)
 			{
 				render_triangle<10>(cliprect, has_texture ? rd_scan_vertex_color_tex : rd_scan_vertex_color, m_vertexb[v1], m_vertexb[v2], m_vertexb[v3]);
@@ -817,7 +817,7 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 				return m_ram[0][(m_ram_ptr++) & 0x3fffff];
 			}
 
-		default:			
+		default:
 			//osd_printf_debug("%s m_r: %08X, %08X\n", machine().describe_context(), offset, mem_mask);
 			break;
 	}
@@ -875,19 +875,19 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 		case 0x100:     break;
 
 		case 0x101:     break;      // framebuffer width?
-		case 0x102:     break;		// framebuffer height?
+		case 0x102:     break;      // framebuffer height?
 
-		case 0x103:		m_renderer->m_viewport_min_x = data & 0xffff; break;
+		case 0x103:     m_renderer->m_viewport_min_x = data & 0xffff; break;
 		case 0x104:     m_renderer->m_viewport_max_x = data & 0xffff; break;
 		case 0x105:     m_renderer->m_viewport_max_y = data & 0xffff; break;
-		case 0x106:		m_renderer->m_viewport_min_y = data & 0xffff; break;
+		case 0x106:     m_renderer->m_viewport_min_y = data & 0xffff; break;
 
-		case 0x107:		m_renderer->m_viewport_center_x = data & 0xffff; break;
-		case 0x108:		m_renderer->m_viewport_center_y = data & 0xffff; break;
+		case 0x107:     m_renderer->m_viewport_center_x = data & 0xffff; break;
+		case 0x108:     m_renderer->m_viewport_center_y = data & 0xffff; break;
 
 		case 0x109:                 // far Z value
 			{
-				// the SHARC code throws away the bottom 11 bits of mantissa and the top 5 bits (to fit in a 16-bit register?)				
+				// the SHARC code throws away the bottom 11 bits of mantissa and the top 5 bits (to fit in a 16-bit register?)
 				m_renderer->m_far_z = u2f((data & 0xffff) << 11);
 				break;
 			}
@@ -904,7 +904,7 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 		case 0x111:     m_renderer->m_fog_g = data & 0xff; break;
 		case 0x112:     m_renderer->m_fog_b = data & 0xff; break;
 
-		case 0x117:					// linear fog start Z
+		case 0x117:                 // linear fog start Z
 			{
 				// 4 bits exponent + 12 bits mantissa, similar to far Z value
 				// value of 0xffff is used to effectively turn off fog
@@ -915,14 +915,14 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 				m_renderer->m_fog_start_z = u2f((0x90000 | (data & 0xffff)) << 11);
 				break;
 			}
-		case 0x118:					// linear fog end Z
+		case 0x118:                 // linear fog end Z
 			{
 				// 4 bits exponent + 12 bits mantissa, similar to far Z value
 				m_renderer->m_fog_end_z = u2f((0x90000 | (data & 0xffff)) << 11);
 				break;
 			}
 
-		case 0x119:					// 1 / (end_fog - start_fog) ?
+		case 0x119:                 // 1 / (end_fog - start_fog) ?
 			{
 				// 5 bits exponent + 11 bits mantissa
 				break;

@@ -1139,9 +1139,9 @@ void cobra_state::video_start()
 
 uint32_t cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_has_psac)	
+	if (m_has_psac)
 		m_k001604->draw_back_layer(screen, bitmap, cliprect);
-	
+
 	m_renderer->display(&bitmap, cliprect);
 
 	if (m_has_psac)

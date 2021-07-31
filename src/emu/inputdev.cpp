@@ -15,6 +15,8 @@
 #include "emuopts.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -26,7 +28,7 @@ class input_device_switch_item : public input_device_item
 {
 public:
 	// construction/destruction
-	input_device_switch_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
+	input_device_switch_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
@@ -52,7 +54,7 @@ class input_device_relative_item : public input_device_item
 {
 public:
 	// construction/destruction
-	input_device_relative_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
+	input_device_relative_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
@@ -69,7 +71,7 @@ class input_device_absolute_item : public input_device_item
 {
 public:
 	// construction/destruction
-	input_device_absolute_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
+	input_device_absolute_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
@@ -77,6 +79,8 @@ public:
 	virtual s32 read_as_absolute(input_item_modifier modifier) override;
 	virtual bool item_check_axis(input_item_modifier modifier, s32 memory) override;
 };
+
+} // anonymous namespace
 
 
 //**************************************************************************
@@ -253,7 +257,7 @@ u8 joystick_map::update(s32 xaxisval, s32 yaxisval)
 //  input_device - constructor
 //-------------------------------------------------
 
-input_device::input_device(input_manager &manager, const char *name, const char *id, void *internal)
+input_device::input_device(input_manager &manager, std::string_view name, std::string_view id, void *internal)
 	: m_manager(manager),
 		m_name(name),
 		m_id(id),
@@ -279,11 +283,10 @@ input_device::~input_device()
 //  add_item - add a new item to an input device
 //-------------------------------------------------
 
-input_item_id input_device::add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal)
+input_item_id input_device::add_item(std::string_view name, input_item_id itemid, item_get_state_func getstate, void *internal)
 {
 	if (machine().phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call input_device::add_item at init time!");
-	assert(name != nullptr);
 	assert(itemid > ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
 	assert(getstate != nullptr);
 
@@ -346,7 +349,7 @@ bool input_device::match_device_id(std::string_view deviceid) const
 //  input_device_keyboard - constructor
 //-------------------------------------------------
 
-input_device_keyboard::input_device_keyboard(input_manager &manager, const char *_name, const char *_id, void *_internal)
+input_device_keyboard::input_device_keyboard(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
 	: input_device(manager, _name, _id, _internal)
 {
 }
@@ -387,7 +390,7 @@ void input_device_keyboard::apply_steadykey() const
 //  input_device_mouse - constructor
 //-------------------------------------------------
 
-input_device_mouse::input_device_mouse(input_manager &manager, const char *_name, const char *_id, void *_internal)
+input_device_mouse::input_device_mouse(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
 	: input_device(manager, _name, _id, _internal)
 {
 }
@@ -397,7 +400,7 @@ input_device_mouse::input_device_mouse(input_manager &manager, const char *_name
 //  input_device_lightgun - constructor
 //-------------------------------------------------
 
-input_device_lightgun::input_device_lightgun(input_manager &manager, const char *_name, const char *_id, void *_internal)
+input_device_lightgun::input_device_lightgun(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
 	: input_device(manager, _name, _id, _internal)
 {
 }
@@ -407,7 +410,7 @@ input_device_lightgun::input_device_lightgun(input_manager &manager, const char 
 //  input_device_joystick - constructor
 //-------------------------------------------------
 
-input_device_joystick::input_device_joystick(input_manager &manager, const char *_name, const char *_id, void *_internal)
+input_device_joystick::input_device_joystick(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
 	: input_device(manager, _name, _id, _internal),
 		m_joystick_deadzone(s32(manager.machine().options().joystick_deadzone() * INPUT_ABSOLUTE_MAX)),
 		m_joystick_saturation(s32(manager.machine().options().joystick_saturation() * INPUT_ABSOLUTE_MAX))
@@ -494,18 +497,16 @@ input_class::~input_class()
 //  add_device - add a new input device
 //-------------------------------------------------
 
-input_device *input_class::add_device(const char *name, const char *id, void *internal)
+input_device &input_class::add_device(std::string_view name, std::string_view id, void *internal)
 {
 	if (machine().phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call input_class::add_device at init time!");
-	assert(name != nullptr);
-	assert(id != nullptr);
 
 	// allocate a new device and add it to the index
 	return add_device(make_device(name, id, internal));
 }
 
-input_device *input_class::add_device(std::unique_ptr<input_device> &&new_device)
+input_device &input_class::add_device(std::unique_ptr<input_device> &&new_device)
 {
 	assert(new_device->devclass() == m_devclass);
 
@@ -523,7 +524,7 @@ input_device *input_class::add_device(std::unique_ptr<input_device> &&new_device
 				osd_printf_verbose("Input: Adding %s #%d: %s (device id: %s)\n", m_name, devindex, new_device->name(), new_device->id());
 
 			m_device[devindex] = std::move(new_device);
-			return m_device[devindex].get();
+			return *m_device[devindex];
 		}
 
 	throw emu_fatalerror("Input: Too many %s devices\n", m_name);
@@ -666,7 +667,7 @@ bool input_class_joystick::set_global_joystick_map(const char *mapstring)
 //  input_device_item - constructor
 //-------------------------------------------------
 
-input_device_item::input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass)
+input_device_item::input_device_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass)
 	: m_device(device),
 		m_name(name),
 		m_internal(internal),
@@ -720,7 +721,7 @@ bool input_device_item::check_axis(input_item_modifier modifier, s32 memory)
 //  input_device_switch_item - constructor
 //-------------------------------------------------
 
-input_device_switch_item::input_device_switch_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate)
+input_device_switch_item::input_device_switch_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate)
 	: input_device_item(device, name, internal, itemid, getstate, ITEM_CLASS_SWITCH),
 		m_steadykey(0),
 		m_oldkey(0)
@@ -825,7 +826,7 @@ bool input_device_switch_item::steadykey_changed()
 //  input_device_relative_item - constructor
 //-------------------------------------------------
 
-input_device_relative_item::input_device_relative_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate)
+input_device_relative_item::input_device_relative_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate)
 	: input_device_item(device, name, internal, itemid, getstate, ITEM_CLASS_RELATIVE)
 {
 }
@@ -896,7 +897,7 @@ bool input_device_relative_item::item_check_axis(input_item_modifier modifier, s
 //  input_device_absolute_item - constructor
 //-------------------------------------------------
 
-input_device_absolute_item::input_device_absolute_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate)
+input_device_absolute_item::input_device_absolute_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate)
 	: input_device_item(device, name, internal, itemid, getstate, ITEM_CLASS_ABSOLUTE)
 {
 }

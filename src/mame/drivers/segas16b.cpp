@@ -1932,17 +1932,17 @@ void dfjail_state::sound_control_w(uint8_t data)
 void dfjail_state::dac_data_w(offs_t offset, uint8_t data)
 {
 	/*
-		Z80 code in the NMI handler at 0x6e:
-		Sample in A
-		Copy A to E
-		Shift A left 2 and AND by 3C
-		write A to port 0x80
-		Copy E to A
-		Shift right 4 times
-		write A to ports 0x81, 0x82, and 0x83
+	    Z80 code in the NMI handler at 0x6e:
+	    Sample in A
+	    Copy A to E
+	    Shift A left 2 and AND by 3C
+	    write A to port 0x80
+	    Copy E to A
+	    Shift right 4 times
+	    write A to ports 0x81, 0x82, and 0x83
 
-		This means port 0x80 gets the bottom 4 bits of the 8-bit sample, offset by 2 bits,
-		and ports 81/82/83 get the top 4 bits of the sample, shifted right 4 bits.
+	    This means port 0x80 gets the bottom 4 bits of the 8-bit sample, offset by 2 bits,
+	    and ports 81/82/83 get the top 4 bits of the sample, shifted right 4 bits.
 	*/
 	if (offset == 0)
 	{
@@ -10000,7 +10000,7 @@ GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_stat
 GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
 GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
-GAME( 199?, dfjail,   0,          dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_NO_COCKTAIL )
+GAME( 1991, dfjail,   0,          dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_NO_COCKTAIL ) // Regulatory approval document dated "1991. 3.28" based on submission of manual and photos
 
 // decrypted bootleg / 'suicide repair' sets
 

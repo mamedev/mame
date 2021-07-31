@@ -421,6 +421,13 @@ WRITE_LINE_MEMBER(fdc37c93x_device::irq_keyboard_w)
 	request_irq(configuration_registers[LogicalDevice::Keyboard][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER(fdc37c93x_device::irq_mouse_w)
+{
+	if (enabled_logical[LogicalDevice::Keyboard] == false)
+		return;
+	request_irq(configuration_registers[LogicalDevice::Keyboard][0x72], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 WRITE_LINE_MEMBER(fdc37c93x_device::kbdp21_gp25_gatea20_w)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)

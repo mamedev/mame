@@ -54,6 +54,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="drdos703">
+		<description>DR DOS 7.03</description>
+		<year>1999</year>
+		<publisher>Caldera</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="drdos703" sha1="5dc226a7f8df239f0085266a8e8db7bb12e5f3eb" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="drdosl703" cloneof="drdos703">
+		<description>DR DOS Lite 7.03</description>
+		<year>1999</year>
+		<publisher>Caldera</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="drdosl703" sha1="a71ab60140d2dfe4da7f3dd4da03820aab836aa2" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="msdos5">
 		<description>MS-DOS (Version 5.00)</description>
 		<year>1991</year>
@@ -151,6 +173,50 @@ license:CC0
 		<part name="hdd" interface="ide_hdd">
 			<diskarea name="harddriv">
 				<disk name="pcdos61" sha1="87feeccc64414792c16d4b1e5fefc1aa7de8d3c2" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="odos701">
+		<description>Caldera OpenDOS 7.01</description>
+		<year>1997</year>
+		<publisher>Caldera</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="odos701" sha1="b8fbb4ef751ecef8d5992f2f849f5f11f936c947" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="odosl701">
+		<description>Caldera OpenDOS Lite 7.01</description>
+		<year>1997</year>
+		<publisher>Caldera</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="odosl701" sha1="0d73b04dfbe8dc57bb9ed5f08969d4e222f17ae7" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="os2warp3b">
+		<description>OS/2 Warp with Win-OS/2</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="os2warp3b" sha1="28923439271f44700986325fb7219456a94c7831" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="os2warp3cb">
+		<description>OS/2 Warp Connect with Win-OS/2</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="os2warp3cb" sha1="f48d5fe6f2df2002877b98c19da2abdae896dd70" writeable="yes"/>
 			</diskarea>
 		</part>
 	</software>

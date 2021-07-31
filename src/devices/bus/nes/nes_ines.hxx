@@ -295,7 +295,7 @@ static const nes_mmc mmc_list[] =
 	// 258 UNIF MAPR 158B?
 	// 259 UNIF MAPR F-15?
 	// 260 HP10xx/HP20xx multicarts?
-	{ 261, BMC_810544 },
+	{ 261, BMC_810544C },
 	{ 262, SACHEN_SHERO },
 	{ 263, UNL_KOF97 },
 	{ 264, YOKO_BOARD },
@@ -308,7 +308,7 @@ static const nes_mmc mmc_list[] =
 	// 271 TXC 4 in 1 MGC-026, not in nes.xml?
 	// 272 Akumajo Special bootleg not in nes.xml
 	// 273 Gremlins 2 bootleg, related to pirate gremlin2h or unk2?
-	// 274 BMC_80013B multicarts, not in nes.xml?
+	{ 274, BMC_80013B },
 	// 275 Unused
 	// 276 Unused
 	// 277 Unused
@@ -402,7 +402,7 @@ static const nes_mmc mmc_list[] =
 	// 365 is this asderp95 in nes.xml?
 	// 366 K-3131GS and K-3131SS 4-in-1 carts
 	// 367 7-in-1 cart that is a close variant of mapper 205
-	// { 368, BTL_YUNG08 }            // SMB2 FDS conversion
+	{ 368, BTL_YUNG08 },            // SMB2 FDS conversion
 	// 369 Super Mario Bros Party multicart
 	// 370 Golden Mario Party II multicart
 	// 371 Spanish PEC-586 computer main cart
@@ -415,7 +415,7 @@ static const nes_mmc mmc_list[] =
 	// 378 8-in-1 multicart, which one?
 	// 379 35-in-1 multicart, similar to mapper 38
 	// 380 970630C multicart
-	// 381 KN-42 2-in-1 with the Big Nose games
+	{ 381, UNL_KN42 },             // 2-in-1 Big Nose games
 	// 382 830928C 5-in-1 and 9-in-1 multicarts
 	// 383 JY-014 multicart
 	// 384 4-in-1 VRC4 clone with Crisis Force

@@ -1463,22 +1463,23 @@ void debugger_commands::execute_bpset(int ref, const std::vector<std::string> &p
 	u64 address;
 	int bpnum;
 	const char *action = nullptr;
+	int p = 0;
 
-	/* CPU is implicit */
-	if (!validate_cpu_parameter(nullptr, cpu))
+	/* CPU defaults to the active cpu */
+	if (!validate_cpu_parameter((params[p][0] == '#') ? &params[p++][1] : nullptr, cpu))
 		return;
 
 	/* param 1 is the address */
-	if (!validate_number_parameter(params[0], address))
+	if (!validate_number_parameter(params[p++], address))
 		return;
 
 	/* param 2 is the condition */
 	parsed_expression condition(cpu->debug()->symtable());
-	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
+	if (params.size() > p && !debug_command_parameter_expression(params[p++], condition))
 		return;
 
 	/* param 3 is the action */
-	if (params.size() > 2 && !debug_command_parameter_command(action = params[2].c_str()))
+	if (params.size() > p && !debug_command_parameter_command(action = params[p++].c_str()))
 		return;
 
 	/* set the breakpoint */
@@ -1605,39 +1606,41 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 	u64 address, length;
 	read_or_write type;
 	int wpnum;
+	int p = 0;
 
-	/* CPU is implicit */
-	if (!validate_cpu_space_parameter(nullptr, ref, space))
+	/* CPU defaults to the active cpu */
+	if (!validate_cpu_space_parameter((params[p][0] == '#') ? &params[p++][1] : nullptr, ref, space))
 		return;
 
 	/* param 1 is the address */
-	if (!validate_number_parameter(params[0], address))
+	if (!validate_number_parameter(params[p++], address))
 		return;
 
 	/* param 2 is the length */
-	if (!validate_number_parameter(params[1], length))
+	if (!validate_number_parameter(params[p++], length))
 		return;
 
 	/* param 3 is the type */
-	if (!core_stricmp(params[2].c_str(), "r"))
+	if (!core_stricmp(params[p].c_str(), "r"))
 		type = read_or_write::READ;
-	else if (!core_stricmp(params[2].c_str(), "w"))
+	else if (!core_stricmp(params[p].c_str(), "w"))
 		type = read_or_write::WRITE;
-	else if (!core_stricmp(params[2].c_str(), "rw") || !core_stricmp(params[2].c_str(), "wr"))
+	else if (!core_stricmp(params[p].c_str(), "rw") || !core_stricmp(params[p].c_str(), "wr"))
 		type = read_or_write::READWRITE;
 	else
 	{
 		m_console.printf("Invalid watchpoint type: expected r, w, or rw\n");
 		return;
 	}
+	p++;
 
 	/* param 4 is the condition */
 	parsed_expression condition(space->device().debug()->symtable());
-	if (params.size() > 3 && !debug_command_parameter_expression(params[3], condition))
+	if (params.size() > p && !debug_command_parameter_expression(params[p++], condition))
 		return;
 
 	/* param 5 is the action */
-	if (params.size() > 4 && !debug_command_parameter_command(action = params[4].c_str()))
+	if (params.size() > p && !debug_command_parameter_command(action = params[p++].c_str()))
 		return;
 
 	/* set the watchpoint */
@@ -1768,18 +1771,19 @@ void debugger_commands::execute_rpset(int ref, const std::vector<std::string> &p
 	device_t *cpu;
 	const char *action = nullptr;
 	int bpnum;
+	int p = 0;
 
-	/* CPU is implicit */
-	if (!validate_cpu_parameter(nullptr, cpu))
+	/* CPU defaults to the active cpu */
+	if (!validate_cpu_parameter((params[p][0] == '#') ? &params[p++][1] : nullptr, cpu))
 		return;
 
 	/* param 1 is the condition */
 	parsed_expression condition(cpu->debug()->symtable());
-	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+	if (params.size() > p && !debug_command_parameter_expression(params[p], condition))
 		return;
 
 	/* param 2 is the action */
-	if (params.size() > 1 && !debug_command_parameter_command(action = params[1].c_str()))
+	if (params.size() > p && !debug_command_parameter_command(action = params[p].c_str()))
 		return;
 
 	/* set the breakpoint */
@@ -3743,13 +3747,14 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 	offs_t taddress;
 	u64 address;
 	int intention;
+	int p = 0;
 
-	/* validate parameters */
-	if (!validate_number_parameter(params[0], address))
+	/* CPU defaults to the active cpu */
+	if (!validate_cpu_space_parameter((params[p][0] == '#') ? &params[p++][1] : nullptr, ref, space))
 		return;
 
-	/* CPU is implicit */
-	if (!validate_cpu_space_parameter(nullptr, ref, space))
+	/* validate parameters */
+	if (!validate_number_parameter(params[p++], address))
 		return;
 
 	/* do the translation first */

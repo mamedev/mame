@@ -32,6 +32,7 @@ DEFINE_DEVICE_TYPE(NES_ACTION52,       nes_action52_device,       "nes_action52"
 DEFINE_DEVICE_TYPE(NES_CALTRON6IN1,    nes_caltron_device,        "nes_caltron",        "NES Cart Caltron 6 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_RUMBLESTATION,  nes_rumblestat_device,     "nes_rumblestat",     "NES Cart Rumblestation PCB")
 DEFINE_DEVICE_TYPE(NES_SVISION16,      nes_svision16_device,      "nes_svision16",      "NES Cart Supervision 16 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_KN42,           nes_kn42_device,           "nes_kn42",           "NES Cart KN-42 PCB")
 DEFINE_DEVICE_TYPE(NES_N625092,        nes_n625092_device,        "nes_n625092",        "NES Cart N625092 PCB")
 DEFINE_DEVICE_TYPE(NES_A65AS,          nes_a65as_device,          "nes_a65as",          "NES Cart A65AS PCB")
 DEFINE_DEVICE_TYPE(NES_T262,           nes_t262_device,           "nes_t262",           "NES Cart T-262 PCB")
@@ -40,7 +41,8 @@ DEFINE_DEVICE_TYPE(NES_NOVEL2,         nes_novel2_device,         "nes_novel2", 
 DEFINE_DEVICE_TYPE(NES_STUDYNGAME,     nes_studyngame_device,     "nes_studyngame",     "NES Cart Study n Game PCB")
 DEFINE_DEVICE_TYPE(NES_SUPERGUN20IN1,  nes_sgun20in1_device,      "nes_sgun20in1",      "NES Cart Supergun 20 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_VT5201,         nes_vt5201_device,         "nes_vt5201",         "NES Cart VT5201 PCB")
-DEFINE_DEVICE_TYPE(NES_810544C,        nes_810544c_device,        "nes_810544c",        "NES Cart 810544-C-A1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_80013B,     nes_bmc_80013b_device,     "nes_bmc_80013b",     "NES Cart BMC 80013-B PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device,    "nes_bmc_810544c",    "NES Cart BMC 810544-C-A1 PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63",       "NES Cart BMC Ghostbusters 63 in 1 PCB")
@@ -101,6 +103,11 @@ nes_svision16_device::nes_svision16_device(const machine_config &mconfig, const 
 {
 }
 
+nes_kn42_device::nes_kn42_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_KN42, tag, owner, clock), m_latch(0)
+{
+}
+
 nes_n625092_device::nes_n625092_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_N625092, tag, owner, clock), m_latch1(0), m_latch2(0)
 {
@@ -141,8 +148,13 @@ nes_vt5201_device::nes_vt5201_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_810544c_device::nes_810544c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_810544C, tag, owner, clock)
+nes_bmc_80013b_device::nes_bmc_80013b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_80013B, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_bmc_810544c_device::nes_bmc_810544c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_810544C, tag, owner, clock)
 {
 }
 
@@ -216,7 +228,7 @@ nes_bmc_s700_device::nes_bmc_s700_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_bmc_ball11_device::nes_bmc_ball11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bmc_ball11_device::nes_bmc_ball11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_BALL11, tag, owner, clock)
 {
 }
@@ -246,7 +258,7 @@ nes_bmc_21in1_device::nes_bmc_21in1_device(const machine_config &mconfig, const 
 {
 }
 
-nes_bmc_31in1_device::nes_bmc_31in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bmc_31in1_device::nes_bmc_31in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_31IN1, tag, owner, clock)
 {
 }
@@ -400,6 +412,20 @@ void nes_svision16_device::pcb_reset()
 	m_latch2 = 0;
 }
 
+void nes_kn42_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_kn42_device::pcb_reset()
+{
+	m_latch ^= 0x10;
+	prg16_89ab(m_latch);
+	prg16_cdef(m_latch | 0x0f);    // fixed to last bank for either game
+	chr8(0, CHRRAM);
+}
+
 void nes_n625092_device::device_start()
 {
 	common_start();
@@ -517,18 +543,32 @@ void nes_vt5201_device::pcb_reset()
 	m_dipsetting = 0;
 }
 
-void nes_810544c_device::device_start()
+void nes_bmc_80013b_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_80013b_device::pcb_reset()
+{
+	chr8(0, CHRRAM);
+
+	m_latch = 0x80;
+	m_reg[0] = m_reg[1] = 0;
+	update_prg();
+}
+
+void nes_bmc_810544c_device::device_start()
 {
 	common_start();
 }
 
-void nes_810544c_device::pcb_reset()
+void nes_bmc_810544c_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
-	chr8(0, m_chr_source);
-	set_nt_mirroring(PPU_MIRROR_VERT);
+	chr8(0, CHRROM);
 }
 
 void nes_ntd03_device::device_start()
@@ -701,13 +741,11 @@ void nes_bmc_ball11_device::device_start()
 
 void nes_bmc_ball11_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
-	chr8(0, m_chr_source);
+	chr8(0, CHRRAM);
 
-	m_reg[0] = 1;
+	m_reg[0] = 2;
 	m_reg[1] = 0;
-	set_banks();
 }
 
 void nes_bmc_22games_device::device_start()
@@ -781,19 +819,6 @@ void nes_bmc_21in1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_bmc_31in1_device::device_start()
-{
-	common_start();
-}
-
-void nes_bmc_31in1_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(1);
 	chr8(0, m_chr_source);
 }
 
@@ -1197,6 +1222,32 @@ void nes_svision16_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
+ Bootleg Board KN-42
+
+ Games: 2 in 1 - Big Nose & Big Nose Freaks Out
+
+ NES 2.0: mapper 381
+
+ In MAME: Supported.
+
+ TODO: Big Nose Freaks Out has timing issues like
+ many Camerica games. It happens with the singleton
+ dump and is unrelated to the bootleg board here.
+
+ -------------------------------------------------*/
+
+void nes_kn42_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("kn42 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	prg16_89ab(m_latch | (data & 0x07) << 1 | BIT(data, 4));
+}
+
+/*-------------------------------------------------
+
  Bootleg Board N625092
 
  Games: 400 in 1, 700 in 1, 1000 in 1
@@ -1244,7 +1295,6 @@ void nes_n625092_device::write_h(offs_t offset, uint8_t data)
 		}
 	}
 }
-
 
 /*-------------------------------------------------
 
@@ -1420,16 +1470,54 @@ uint8_t nes_vt5201_device::read_h(offs_t offset)
 
 /*-------------------------------------------------
 
+ BMC-80013-B
+
+ Games: Cartridge Story I, II, and III
+
+ NES 2.0: mapper 274
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_80013b_device::update_prg()
+{
+	prg16_89ab(m_latch | (m_reg[1] & 0x70) | m_reg[0]);
+	prg16_cdef(m_reg[1]);
+}
+
+void nes_bmc_80013b_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_80013b write_h, offset: %04x, data: %02x\n", offset, data));
+	if (offset & 0x6000)
+	{
+		m_reg[1] = data & 0x7f;
+		m_latch = !BIT(offset, 14) << 7;
+	}
+	else
+	{
+		m_reg[0] = data & 0x0f;
+		set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
+	update_prg();
+}
+
+/*-------------------------------------------------
+
  BMC-810544-C-A1
 
  Games: 200-in-1 Elfland
 
+ NES 2.0: mapper 261
+
+ In MAME: Supported.
+
  -------------------------------------------------*/
 
-void nes_810544c_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_810544c_device::write_h(offs_t offset, u8 data)
 {
-	uint8_t bank = (offset >> 7);
-	LOG_MMC(("810544 write_h, offset: %04x, data: %02x\n", offset, data));
+	u8 bank = (offset >> 7);
+	LOG_MMC(("bmc_810544c write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (!BIT(offset, 6))
 	{
@@ -1873,53 +1961,46 @@ void nes_bmc_s700_device::write_h(offs_t offset, uint8_t data)
  BMC-BALLGAMES-11IN1
 
  Known Boards: Unknown Multigame Bootleg Board
- Games: 11 in 1 Ball Games
+ Games: 11 in 1 Ball Series
 
  iNES: mapper 51
 
- In MESS: Partially Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_bmc_ball11_device::set_banks()
+u8 nes_bmc_ball11_device::read_m(offs_t offset)
 {
-	set_nt_mirroring((m_reg[0] == 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	LOG_MMC(("bmc_ball11 read_m, offset: %04x, data: %02x\n", offset));
 
-	if (m_reg[0] & 0x01)
-	{
+	u8 bank = m_reg[1] << 2 | (m_reg[0] ? 0x23 : 0x2f);
+	return m_prg[bank * 0x2000 + offset];
+}
+
+void nes_bmc_ball11_device::update_prg()
+{
+	if (m_reg[0])
 		prg32(m_reg[1]);
-	}
 	else
 	{
-		prg16_89ab((m_reg[1] << 1) | (m_reg[0] >> 1));
-		prg16_cdef((m_reg[1] << 1) | 0x07);
+		prg16_89ab(m_reg[1] << 1 | BIT(m_reg[1], 4));
+		prg16_cdef(m_reg[1] << 1 | 0x07);
 	}
 }
 
-void nes_bmc_ball11_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_ball11_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_ball11 write_m, offset: %04x, data: %02x\n", offset, data));
-
-	m_reg[0] = ((data >> 1) & 0x01) | ((data >> 3) & 0x02);
-	set_banks();
+	set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	m_reg[0] = data & 0x02;
+	update_prg();
 }
 
-void nes_bmc_ball11_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_ball11_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_ball11 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x6000)
-	{
-		case 0x4000:    // here we also update reg[0] upper bit
-			m_reg[0] = (m_reg[0] & 0x01) | ((data >> 3) & 0x02);
-			[[fallthrough]];
-		case 0x0000:
-		case 0x2000:
-		case 0x6000:
-			m_reg[1] = data & 0x0f;
-			set_banks();
-			break;
-	}
+	m_reg[1] = data & 0x1f;
+	update_prg();
 }
 
 /*-------------------------------------------------
@@ -2113,27 +2194,25 @@ void nes_bmc_21in1_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 229
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_bmc_31in1_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_31in1_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_31in1 write_h, offset: %04x, data: %02x\n", offset, data));
+	set_nt_mirroring(BIT(offset, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	chr8(offset, CHRROM);
-
-	if ((offset & 0x1e) == 0)
+	offset &= 0x1f;
+	if (offset & 0x1e)
 	{
-		prg16_89ab(0);
-		prg16_89ab(1);
+		prg16_89ab(offset);
+		prg16_cdef(offset);
 	}
 	else
-	{
-		prg16_89ab(offset & 0x1f);
-		prg16_89ab(offset & 0x1f);
-	}
+		prg32(0);
+
+	chr8(offset, CHRROM);
 }
 
 /*-------------------------------------------------

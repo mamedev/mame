@@ -316,7 +316,9 @@ tmu_state::tmu_state() :
 	m_ram(nullptr),
 	m_mask(0),
 	m_basemask(0xfffff),
-	m_baseshift(3)
+	m_baseshift(3),
+	m_regdirty(true),
+	m_texel_lookup(nullptr)
 {
 }
 
@@ -578,6 +580,7 @@ void debug_stats::add_emulation_stats(thread_stats_block const &block)
 
 void debug_stats::reset()
 {
+	m_swaps = 0;
 	m_stalls = 0;
 	m_triangles = 0;
 	m_pixels_in = 0;
@@ -1149,8 +1152,8 @@ u16 *voodoo_1_device::draw_buffer_indirect(int index)
 {
 	switch (index)
 	{
-		case 0:	m_video_changed = true; return front_buffer();
-		case 1:	return back_buffer();
+		case 0: m_video_changed = true; return front_buffer();
+		case 1: return back_buffer();
 		default: return nullptr;
 	}
 }
@@ -1166,8 +1169,8 @@ u16 *voodoo_1_device::lfb_buffer_indirect(int index)
 {
 	switch (index)
 	{
-		case 0:	m_video_changed = true; return front_buffer();
-		case 1:	return back_buffer();
+		case 0: m_video_changed = true; return front_buffer();
+		case 1: return back_buffer();
 		case 2: return aux_buffer();
 		default: return nullptr;
 	}
@@ -2837,7 +2840,7 @@ void voodoo_1_device::recompute_video_memory_common(u32 config, u32 rowpixels)
 	switch (config)
 	{
 		case 3: // reserved
-//			logerror("VOODOO.ERROR:Unexpected memory configuration in recompute_video_memory!\n");
+//          logerror("VOODOO.ERROR:Unexpected memory configuration in recompute_video_memory!\n");
 			[[fallthrough]];
 		case 0: // 2 color buffers, 1 aux buffer
 			m_rgboffs[2] = ~0;

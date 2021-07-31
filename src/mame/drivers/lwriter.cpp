@@ -102,8 +102,8 @@
 namespace {
 
 enum print_state {
-        READING_CMD,
-        WRITING_RESULT
+	READING_CMD,
+	WRITING_RESULT
 };
 
 class lwriter_state : public driver_device

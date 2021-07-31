@@ -561,11 +561,12 @@ u8 apple2_state::keyb_data_r()
 
 u8 apple2_state::keyb_strobe_r()
 {
-	// reads any key down, clears strobe
-	u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+	// reads floating bus, clears strobe
 	if (!machine().side_effects_disabled())
+	{
 		m_strobe = 0;
-	return rv;
+	}
+	return read_floatingbus();
 }
 
 void apple2_state::keyb_strobe_w(u8 data)
@@ -1558,8 +1559,9 @@ ROM_START(prav82)
 ROM_END
 
 ROM_START(prav8m)
-	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "pravetz8m.chr", 0x0000, 0x0800, BAD_DUMP CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594)) // Taken from Agat computer
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("pravetz8m_chr.bin", 0x000000, 0x002000, CRC(72244022) SHA1(4db7544e049bc7aeab4b4da2f8ef9fbeb3ceff24))
+
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "pravetz8m.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
 	ROM_LOAD ( "pravetz8m.d8", 0x1800, 0x0800, CRC(654b6f7b) SHA1(f7b1457b48fe6974c4de7e976df3a8fca6b7b661))

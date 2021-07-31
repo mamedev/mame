@@ -207,6 +207,7 @@ static const nes_pcb pcb_list[] =
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
 	{ "smb2jb",           BTL_SMB2JB },
+	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
 	{ "batmanfs",         BTL_BATMANFS },
@@ -237,6 +238,7 @@ static const nes_pcb pcb_list[] =
 	{ "caltron6in1",      CALTRON_6IN1 },
 	{ "rumblestation",    RUMBLESTATION_BOARD },     // mapper 46
 	{ "svision16",        SVISION16_BOARD },
+	{ "kn42",             UNL_KN42 },
 	{ "n625092",          UNL_N625092 },
 	{ "a65as",            BMC_A65AS },
 	{ "t262",             BMC_T262 },
@@ -244,9 +246,10 @@ static const nes_pcb pcb_list[] =
 	{ "novel2",           BMC_NOVEL2 },  // mapper 213... same as BMC-NOVELDIAMOND9999999IN1 board?
 	{ "studyngame",       UNL_STUDYNGAME },  // mapper 39
 	{ "sgun20in1",        BMC_SUPERGUN_20IN1 },
-	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 60 otherwise
-	{ "bmc_d1038",        BMC_VT5201 },  // mapper 60?
-	{ "810544c",          BMC_810544 },
+	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 59?
+	{ "bmc_d1038",        BMC_VT5201 },  // mapper 59?
+	{ "bmc_80013b",       BMC_80013B },
+	{ "bmc_810544c",      BMC_810544C },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
 	{ "bmc_gb63",         BMC_G63IN1 },

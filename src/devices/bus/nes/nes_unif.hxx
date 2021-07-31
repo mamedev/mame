@@ -119,7 +119,7 @@ static const unif unif_list[] =
 	{ "BMC-FK23CA",                 0,    0, CHRRAM_0,  BMC_FK23CA},
 	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  BMC_G63IN1 },
 	{ "BMC-BS-5",                   0,    0, CHRRAM_0,  BMC_BENSHIENG},
-	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  BMC_810544},
+	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  BMC_810544C},
 	{ "BMC-411120-C",               0,    0, CHRRAM_0,  BMC_411120C},
 	{ "BMC-8157",                   0,    0, CHRRAM_8,  BMC_8157},
 	{ "BMC-830118C",                0,    0, CHRRAM_0,  BMC_830118C},

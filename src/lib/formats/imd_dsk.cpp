@@ -661,7 +661,7 @@ bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 
 		bool fm = m_mode[i]< 3;
 
-		auto bitstream = generate_bitstream_from_track(m_track[i]*m_trackmult, head, 2000, image);
+		auto bitstream = generate_bitstream_from_track(m_track[i]*m_trackmult, head, fm ? 4000 : 2000, image);
 		std::vector<std::vector<uint8_t>> sectors;
 
 		if (fm)
