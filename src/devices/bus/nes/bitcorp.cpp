@@ -45,7 +45,6 @@ nes_bc4602_device::nes_bc4602_device(const machine_config &mconfig, const char *
 	: nes_nrom_device(mconfig, NES_BC4602, tag, owner, clock)
 	, m_dsw(*this, "DIPSW")
 	, m_dipsetting(0)
-	, m_latch(0)
 	, m_irq_count(0)
 	, m_irq_enable(0)
 	, irq_timer(nullptr)
@@ -54,170 +53,13 @@ nes_bc4602_device::nes_bc4602_device(const machine_config &mconfig, const char *
 
 
 
-// This board is fully emulated here. Dipswitches directly select NROM-128 or NROM-256 (SMB only) game.
-void nes_bc3150_device::pcb_reset()
-{
-	u8 dsw = m_dsw->read();
-
-	if (dsw > 1)
-	{
-		prg16_89ab(dsw);
-		prg16_cdef(dsw);
-	}
-	else
-		prg32(0);
-	chr8(dsw, CHRROM);
-	set_nt_mirroring(BIT(dsw, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-}
-
-void nes_bc4602_device::device_start()
-{
-	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
-
-	save_item(NAME(m_dipsetting));
-	save_item(NAME(m_latch));
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_count));
-}
-
-void nes_bc4602_device::pcb_reset()
-{
-	m_dipsetting = m_dsw->read();
-	if (m_dipsetting)    // UNROM games
-	{
-		prg16_89ab(m_dipsetting << 3);
-		prg16_cdef(m_dipsetting << 3 | 0x07);
-	}
-	else                 // Mr Mary 2
-	{
-		prg8_89(1);
-		prg8_ab(0);
-		prg8_cd(4);     // switchable bank
-		prg8_ef(10);    // switchable bank
-		m_latch = 0;
-		m_irq_enable = 0;
-		m_irq_count = 0;
-	}
-	chr8(0, CHRRAM);
-	set_nt_mirroring(m_dipsetting == 3 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-}
-
-
-/*-------------------------------------------------
- mapper specific handlers
- -------------------------------------------------*/
-
-/*-------------------------------------------------
-
- Bit Corp 4602 board
-
- Games: 4 in 1
-
- Besides having the 2 dipswitches this board is basically
- a combination of the YUNG-08 SMB2 bootleg board and UNROM
- for the other 3 games. The YUNG-08 half is a slightly
- incompatible hack of the original bootleg.
-
- NES 2.0: mapper 357
-
- In MAME: Supported.
-
- -------------------------------------------------*/
-
-void nes_bc4602_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if (id == TIMER_IRQ)
-	{
-		if (m_irq_enable)
-		{
-			m_irq_count = (m_irq_count + 1) & 0x0fff;
-			if (!m_irq_count)
-				set_irq_line(ASSERT_LINE);
-		}
-	}
-}
-
-u8 nes_bc4602_device::read_l(offs_t offset)
-{
-	LOG_MMC(("bc4602 read_l, offset: %04x, data: %02x\n", offset));
-
-	offset += 0x100;
-	if (m_dipsetting)                          // UNROM games
-		return get_open_bus();
-	else if (offset >= 0x1000)                 // Mr Mary 2, 0x5000-0x5fff
-		return m_prg[0x10000 + (offset & 0x0fff)];    // fixed 4K bank
-	else if ((offset & 0x11ff) == 0x0122)      // Mr Mary 2, 0x4122
-		return m_irq_enable;
-	else                                       // Mr Mary 2, other 0x4...
-		return get_open_bus();
-}
-
-u8 nes_bc4602_device::read_m(offs_t offset)
-{
-	LOG_MMC(("bc4602 read_m, offset: %04x, data: %02x\n", offset));
-
-	if (m_dipsetting)
-		return get_open_bus();
-	else
-		return m_prg[(!m_latch << 1) * 0x2000 + offset];
-}
-
-void nes_bc4602_device::write_45(offs_t offset, u8 data)
-{
-	switch (offset & 0x51ff)
-	{
-		case 0x4022:
-			prg8_cd(data & 1 ? 3 : 4 + ((data & 0x07) >> 1));
-			break;
-		case 0x4120:
-			m_latch = BIT(data, 0);
-			prg8_ef(8 + (!m_latch << 1));
-			break;
-		case 0x4122:
-			m_irq_enable = BIT(data, 0);
-			if (!m_irq_enable)
-			{
-				set_irq_line(CLEAR_LINE);
-				m_irq_count = 0;
-			}
-			break;
-	}
-}
-
-void nes_bc4602_device::write_ex(offs_t offset, u8 data)
-{
-	LOG_MMC(("bc4602 write_l, offset: %04x, data: %02x\n", offset, data));
-
-	if (!m_dipsetting)       // Mr Mary 2
-		write_45(offset + 0x4020, data);
-}
-
-void nes_bc4602_device::write_l(offs_t offset, u8 data)
-{
-	LOG_MMC(("bc4602 write_l, offset: %04x, data: %02x\n", offset, data));
-
-	if (!m_dipsetting)       // Mr Mary 2
-		write_45(offset + 0x4100, data);
-}
-
-void nes_bc4602_device::write_h(offs_t offset, u8 data)
-{
-	LOG_MMC(("bc4602 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if (m_dipsetting)        // UNROM games
-	     prg16_89ab(m_dipsetting << 3 | (data & 0x07));
-}
-
-
 //-------------------------------------------------
 //  Dipswitch
 //-------------------------------------------------
 
 static INPUT_PORTS_START( bc3150_dsw )
 	PORT_START("DIPSW")
-	PORT_DIPNAME( 0x1f, 0x00, "Game" ) PORT_DIPLOCATION("SW:!1,!2,!3,!4,!5")
+	PORT_DIPNAME( 0x1f, 0x00, "Game" ) PORT_DIPLOCATION("SW:!1,!2,!3,!4,!5") PORT_CHANGED_MEMBER(DEVICE_SELF, nes_bc3150_device, dsw_changed, 0)
 	PORT_DIPSETTING( 0x00, "Super Mary (Super Mario Bros.)" )
 	PORT_DIPSETTING( 0x01, "Super Mary (Super Mario Bros.)" )
 	PORT_DIPSETTING( 0x02, "Star War (Star Force)" )
@@ -252,21 +94,227 @@ static INPUT_PORTS_START( bc3150_dsw )
 	PORT_DIPSETTING( 0x1f, "Super Arabian" )
 INPUT_PORTS_END
 
-ioport_constructor nes_bc3150_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( bc3150_dsw );
-}
-
 static INPUT_PORTS_START( bc4602_dsw )
 	PORT_START("DIPSW")
-	PORT_DIPNAME( 0x03, 0x00, "Game" ) PORT_DIPLOCATION("SW:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, "Game" ) PORT_DIPLOCATION("SW:!1,!2") PORT_CHANGED_MEMBER(DEVICE_SELF, nes_bc4602_device, dsw_changed, 0)
 	PORT_DIPSETTING( 0x00, "Mr. Mary 2 (Super Mario Bros. 2 FDS)" )
 	PORT_DIPSETTING( 0x01, "Brave Soldier (Argos no Senshi)" )
 	PORT_DIPSETTING( 0x02, "Phoenix (Hi no Tori Hououhen)" )
 	PORT_DIPSETTING( 0x03, "Booby Kids" )
 INPUT_PORTS_END
 
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor nes_bc3150_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bc3150_dsw );
+}
+
 ioport_constructor nes_bc4602_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( bc4602_dsw );
+}
+
+
+
+//--------------------------------------------------
+//  DIP switch handlers
+//--------------------------------------------------
+
+INPUT_CHANGED_MEMBER( nes_bc3150_device::dsw_changed )
+{
+	update_banks();
+}
+
+INPUT_CHANGED_MEMBER( nes_bc4602_device::dsw_changed )
+{
+	m_dipsetting = newval;
+	update_banks();
+}
+
+
+
+
+void nes_bc3150_device::pcb_reset()
+{
+	update_banks();
+}
+
+void nes_bc4602_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_dipsetting));
+	save_item(NAME(m_reg));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
+}
+
+void nes_bc4602_device::pcb_reset()
+{
+	chr8(0, CHRRAM);
+
+	m_dipsetting = m_dsw->read();
+	m_reg[0] = m_reg[1] = 0;    // used by Mr Mary 2
+	m_reg[2] = 0;               // used by UNROM games
+	update_banks();
+
+	m_irq_enable = 0;
+	m_irq_count = 0;
+}
+
+
+
+/*-------------------------------------------------
+ mapper specific handlers
+ -------------------------------------------------*/
+
+/*-------------------------------------------------
+
+ Bit Corp 3150 board
+
+ Games: 31 in 1
+
+ This board contains NROM-128 and NROM-256 (SMB only)
+ games with banks directly selected by 5 DIP switches
+ that protrude through the front of the cartridge.
+
+ NES 2.0: mapper 360
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bc3150_device::update_banks()
+{
+	u8 dsw = m_dsw->read();
+
+	if (dsw > 1)
+	{
+		prg16_89ab(dsw);
+		prg16_cdef(dsw);
+	}
+	else
+		prg32(0);
+
+	chr8(dsw, CHRROM);
+	set_nt_mirroring(BIT(dsw, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ Bit Corp 4602 board
+
+ Games: 4 in 1
+
+ Besides having the 2 DIP switches this board is basically
+ a combination of the YUNG-08 SMB2 bootleg board and UNROM
+ for the other 3 games. The YUNG-08 half is a slightly
+ incompatible hack of the original bootleg.
+
+ NES 2.0: mapper 357
+
+ In MAME: Supported.
+
+ TODO: Verify how DIP switches and register latches actually
+ work in conjunction.
+
+ -------------------------------------------------*/
+
+void nes_bc4602_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (m_irq_enable)
+		{
+			m_irq_count = (m_irq_count + 1) & 0x0fff;
+			if (!m_irq_count)
+				set_irq_line(ASSERT_LINE);
+		}
+	}
+}
+
+void nes_bc4602_device::update_banks()
+{
+	if (m_dipsetting)      // UNROM games
+	{
+		prg16_89ab(m_dipsetting << 3 | m_reg[2]);
+		prg16_cdef(m_dipsetting << 3 | 0x07);
+	}
+	else                   // Mr Mary 2
+	{
+		prg8_89(1);    // fixed bank
+		prg8_ab(0);    // fixed bank
+		prg8_cd(m_reg[0] & 1 ? 3 : 4 + ((m_reg[0] & 0x06) >> 1));
+		prg8_ef(8 + (!m_reg[1] << 1));
+	}
+
+	set_nt_mirroring(m_dipsetting == 3 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+u8 nes_bc4602_device::read_l(offs_t offset)
+{
+	LOG_MMC(("bc4602 read_l, offset: %04x, data: %02x\n", offset));
+
+	offset += 0x100;
+	if (offset >= 0x1000)                      // Mr Mary 2, 0x5000-0x5fff
+		return m_prg[0x10000 + (offset & 0x0fff)];    // fixed 4K bank
+	else if ((offset & 0x11ff) == 0x0122)      // Mr Mary 2, 0x4122
+		return m_irq_enable;
+	else                                       // all other 0x4...
+		return get_open_bus();
+}
+
+u8 nes_bc4602_device::read_m(offs_t offset)
+{
+	LOG_MMC(("bc4602 read_m, offset: %04x, data: %02x\n", offset));
+	return m_prg[(!m_reg[1] << 1) * 0x2000 + offset];
+}
+
+void nes_bc4602_device::write_45(offs_t offset, u8 data)
+{
+	switch (offset & 0x51ff)
+	{
+		case 0x4022:
+			m_reg[0] = data;
+			update_banks();
+			break;
+		case 0x4120:
+			m_reg[1] = BIT(data, 0);
+			update_banks();
+			break;
+		case 0x4122:
+			m_irq_enable = BIT(data, 0);
+			if (!m_irq_enable)
+			{
+				set_irq_line(CLEAR_LINE);
+				m_irq_count = 0;
+			}
+			break;
+	}
+}
+
+void nes_bc4602_device::write_ex(offs_t offset, u8 data)
+{
+	LOG_MMC(("bc4602 write_l, offset: %04x, data: %02x\n", offset, data));
+	write_45(offset + 0x4020, data);
+}
+
+void nes_bc4602_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("bc4602 write_l, offset: %04x, data: %02x\n", offset, data));
+	write_45(offset + 0x4100, data);
+}
+
+void nes_bc4602_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bc4602 write_h, offset: %04x, data: %02x\n", offset, data));
+	m_reg[2] = data & 0x07;
+	update_banks();
 }

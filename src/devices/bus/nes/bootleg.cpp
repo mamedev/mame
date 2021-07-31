@@ -2109,7 +2109,7 @@ void nes_yung08_device::write_45(offs_t offset, u8 data)
 	switch (offset & 0x51ff)
 	{
 		case 0x4022:
-			prg8_cd(data & 1 ? 3 : 4 + ((data & 0x07) >> 1));
+			prg8_cd(data & 1 ? 3 : 4 + ((data & 0x06) >> 1));
 			break;
 		case 0x4122:
 			m_irq_latch = data & 0x35;
