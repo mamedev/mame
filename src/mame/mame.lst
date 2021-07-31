@@ -10234,13 +10234,15 @@ minijook                        //
 
 @source:cedar_magnet.cpp
 cedmag
-mag_time
-mag_exzi
-mag_xain
-mag_war
-mag_wara
 mag_burn
 mag_day
+mag_drac
+mag_exzi
+mag_pdak
+mag_time
+mag_war
+mag_wara
+mag_xain
 
 @source:centiped.cpp
 bullsdrt                        // (c) 1985 Shinkai
