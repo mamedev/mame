@@ -12,9 +12,9 @@
         * Rougien
 
     Known issues:
-        * stars playfield colors and scrolling is wrong in Rougien;
+        * stars playfield colors and scrolling are wrong in Rougien;
         * Dunno where the "alien whistle" sample is supposed to play in Rougien;
-        * Mermaid has a ROM for sample playback, identify and hook it up;
+        * Mermaid has a ROM for sample playback, identify and hook it up (see MT07987);
 
 Yachtsman
 Esco/Sanritsu, 1982
@@ -120,7 +120,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/mermaid.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/msm5205.h"
 #include "speaker.h"
 
 
@@ -369,6 +368,8 @@ void mermaid_state::machine_start()
 	save_item(NAME(m_rougien_gfxbank1));
 	save_item(NAME(m_rougien_gfxbank2));
 	save_item(NAME(m_ay8910_enable));
+	save_item(NAME(m_bg_mask));
+	save_item(NAME(m_nmi_mask));
 
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_data));
@@ -399,7 +400,7 @@ void mermaid_state::machine_reset()
 	}
 }
 
-/* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
+// Similar to Jantotsu, apparently the HW has three ports that control what kind of sample should be played. Every sample size is 0x1000 in rougien, 0x800 (?) in mermaid.
 void mermaid_state::adpcm_data_w(uint8_t data)
 {
 	m_adpcm_data = data;
@@ -431,7 +432,7 @@ void mermaid_state::mermaid(machine_config &config)
 	LS259(config, m_latch[0]);
 	m_latch[0]->q_out_cb<0>().set(FUNC(mermaid_state::ay1_enable_w));
 	m_latch[0]->q_out_cb<1>().set(FUNC(mermaid_state::ay2_enable_w));
-	m_latch[0]->q_out_cb<2>().set([this](int state){ logerror("02 = %d\n", state); }); // ???
+	m_latch[0]->q_out_cb<2>().set([this](int state){ logerror("02 = %d\n", state); }); // plays sample
 	m_latch[0]->q_out_cb<3>().set([this](int state){ logerror("03 = %d\n", state); }); // ???
 	m_latch[0]->q_out_cb<4>().set([this](int state){ logerror("04 = %d\n", state); }); // ???
 	m_latch[0]->q_out_cb<5>().set(FUNC(mermaid_state::flip_screen_x_w));
