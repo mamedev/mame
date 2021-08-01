@@ -362,7 +362,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<!-- Release binary equal with parent -->
 	<software name="aladdina" cloneof="aladdin">
-		<description>Disney's Aladdin (Euro, Alt PCB)</description>
+		<description>Disney's Aladdin (Euro, alt PCB)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-1058-50"/>
@@ -709,7 +709,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<!-- Release binary equal with parent -->
 	<software name="astergrea" cloneof="astergre">
-		<description>Astérix and the Great Rescue (Euro, Alt PCB)</description>
+		<description>Astérix and the Great Rescue (Euro, alt PCB)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-1532-50"/>
@@ -1570,7 +1570,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
     1 word at 0xcf14e removed (FC08), 1 word at 0xcf1fe (D011)
 -->
 	<software name="cliffh1" cloneof="cliffh">
-		<description>Cliffhanger (Euro, Alt)</description>
+		<description>Cliffhanger (Euro, alt)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93036-50"/>
@@ -6576,7 +6576,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only USA is confirmed -->
 	<software name="quacksht1" cloneof="quacksht">
-		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World, Alt PCB)</description>
+		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World, alt PCB)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4054 (JPN)"/>
@@ -7407,7 +7407,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 	<software name="soniccmp1" cloneof="soniccmp">
-		<description>Sonic Compilation (Euro, Earlier)</description>
+		<description>Sonic Compilation (Euro, earlier)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -8183,7 +8183,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 	<software name="stbladej1" cloneof="stblade">
-		<description>Super Thunder Blade (Jpn, Alt PCB)</description>
+		<description>Super Thunder Blade (Jpn, alt PCB)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4003"/>
@@ -8932,7 +8932,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="vf2a" cloneof="vf2">
-		<description>Virtua Fighter 2 - Genesis (Euro, USA, Alt PCB)</description>
+		<description>Virtua Fighter 2 - Genesis (Euro, USA, alt PCB)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -10019,7 +10019,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="action52a" cloneof="action52">
-		<description>Action 52 (USA, Alt)</description>
+		<description>Action 52 (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Active Enterprises</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15645,7 +15645,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="fantdizz1" cloneof="fantdizz">
-		<description>Fantastic Dizzy (Euro, USA, Alt)</description>
+		<description>Fantastic Dizzy (Euro, USA, alt)</description>
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15955,7 +15955,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="fireshrku1" cloneof="fireshrk">
-		<description>Fire Shark (USA, Alt)</description>
+		<description>Fire Shark (USA, alt)</description>
 		<year>1990</year>
 		<publisher>Dreamworks Games</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16793,7 +16793,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="gunstarjs" cloneof="gunstar">
-		<description>Gunstar Heroes (Jpn, Sample)</description>
+		<description>Gunstar Heroes (Jpn, sample)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -19113,8 +19113,8 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="megabm8">
-		<description>Mega Bomberman - 8 Player Demo</description>
-		<year>199?</year>
+		<description>Mega Bomberman - special 8-player-demo</description>
+		<year>1994</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -19163,7 +19163,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="rockman1" cloneof="megaman">
-		<description>Rockman Mega World (Jpn, Alt)</description>
+		<description>Rockman Mega World (Jpn, alt)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-12053"/>
@@ -19356,7 +19356,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="micromacb" cloneof="micromac">
-		<description>Micro Machines (Euro, USA, Alt 2)</description>
+		<description>Micro Machines (Euro, USA, alt 2)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -19390,7 +19390,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="micromc2a" cloneof="micromc2">
-		<description>Micro Machines 2 - Turbo Tournament (Euro, J-Cart, Alt)</description>
+		<description>Micro Machines 2 - Turbo Tournament (Euro, J-Cart, alt)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -19631,7 +19631,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="ditkapf1" cloneof="ditkapf">
-		<description>Mike Ditka Power Football (Euro, USA, Alt)</description>
+		<description>Mike Ditka Power Football (Euro, USA, alt)</description>
 		<year>1991</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -20538,7 +20538,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="bullvsblj1" cloneof="bullvsbl">
-		<description>NBA Playoffs - Bulls Vs Blazers (Jpn, Alt)</description>
+		<description>NBA Playoffs - Bulls Vs Blazers (Jpn, alt)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="EM20017"/>
@@ -21283,7 +21283,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="ncirc1" cloneof="ncirc">
-		<description>Nightmare Circus (Bra, Alt)</description>
+		<description>Nightmare Circus (Bra, alt)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -21461,7 +21461,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="olympgldu2" cloneof="olympgld" supported="no">
-		<description>Olympic Gold (USA, Alt)</description>
+		<description>Olympic Gold (USA, alt)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22019,7 +22019,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sampras1" cloneof="sampras">
-		<description>Pete Sampras Tennis (Euro, USA, J-Cart, Alt)</description>
+		<description>Pete Sampras Tennis (Euro, USA, J-Cart, alt)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22031,7 +22031,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sampras2" cloneof="sampras">
-		<description>Pete Sampras Tennis (Euro, USA, J-Cart, Alt 2)</description>
+		<description>Pete Sampras Tennis (Euro, USA, J-Cart, alt 2)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22560,7 +22560,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="pokemona" cloneof="pokemon">
-		<description>Pocket Monsters (Alt Protection)</description>
+		<description>Pocket Monsters (alt protection)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24579,7 +24579,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="supshin2p2" cloneof="shinobi3">
-		<description>The Super Shinobi II (Jpn, prototype, Earlier)</description>
+		<description>The Super Shinobi II (Jpn, prototype, earlier)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="ザ・スーパー忍II"/>
@@ -24679,7 +24679,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sdmilha2a" cloneof="sdmilha2">
-		<description>Show do Milhão Volume 2 (Bra, Alt)</description>
+		<description>Show do Milhão Volume 2 (Bra, alt)</description>
 		<year>2002</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25295,7 +25295,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sspinua" cloneof="sspin">
-		<description>Sonic Spinball (USA, Alt)</description>
+		<description>Sonic Spinball (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -27150,7 +27150,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="svolley1" cloneof="svolley">
-		<description>Super Volley Ball (USA, Alt)</description>
+		<description>Super Volley Ball (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Video System</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -28398,7 +28398,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="tplayglda" cloneof="tplaygld">
-		<description>Triple Play Gold (USA, Alt)</description>
+		<description>Triple Play Gold (USA, alt)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -31011,7 +31011,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="xinqig1" cloneof="beggarp">
-		<description>Xin Qi Gai Wang Zi (Chi, Alt)</description>
+		<description>Xin Qi Gai Wang Zi (Chi, alt)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
 		<info name="alt_title" value="新乞丐王子"/>
@@ -31562,7 +31562,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- Different PCB type needed? -->
 	<software name="kof99a" cloneof="kof99" supported="partial">
-		<description>The King of Fighters '99 (Alt)</description>
+		<description>The King of Fighters '99 (alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -31627,7 +31627,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="majianqra" cloneof="majianqr">
-		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi, Alt)</description>
+		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi, alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="姬麻將之 麻將情人"/>
@@ -31676,7 +31676,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="soulblada" cloneof="soulblad">
-		<description>Soul Blade (Alt)</description>
+		<description>Soul Blade (alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -31735,7 +31735,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sdkong99">
-		<description>Super Donkey Kong 99 (Protected)</description>
+		<description>Super Donkey Kong 99 (protected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -32098,7 +32098,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="lionkin3b" cloneof="lionkin3">
-		<description>Lion King 3 (Alt 2?)</description>
+		<description>Lion King 3 (alt 2?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="Shi Zi Wang 3 - The Lion King 3 (Box?)"/>
@@ -32122,7 +32122,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="mbubblea" cloneof="mbubble">
-		<description>Magic Bubble (Alt)</description>
+		<description>Magic Bubble (alt)</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
 		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
@@ -32274,7 +32274,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="chessa" cloneof="chess">
-		<description>Chess (Rus, Alt)</description>
+		<description>Chess (Rus, alt)</description>
 		<year>1998</year>
 		<publisher>BSComp</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -32632,7 +32632,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="iraqwara" cloneof="iraqwar">
 	<!-- Look the Same as iraqwar -->
-		<description>Iraq War 2003 (Alt)</description>
+		<description>Iraq War 2003 (alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -32773,7 +32773,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="mario3d" cloneof="mario3">
-		<description>Mario 3 - Vokrug Sveta (Rus, Demo?)</description>
+		<description>Mario 3 - Vokrug Sveta (Rus, demo?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Mario 3 Вокруг света"/>
@@ -32932,7 +32932,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="pokecda" cloneof="pokecd">
-		<description>Pokemon Crazy Drummer (Alt)</description>
+		<description>Pokemon Crazy Drummer (alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -33059,7 +33059,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="spykids4" cloneof="dinotale">
-		<description>Spy Kids 4 - All The Time In The World (Rus)</description>
+		<description>Spy Kids 4 - All the Time in the World (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -33301,7 +33301,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="par2a" cloneof="par2" supported="no">
-		<description>Pro Action Replay 2 (Euro, Alt)</description>
+		<description>Pro Action Replay 2 (Euro, alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -33546,7 +33546,7 @@ This dump is either a bad dump or a wrongly patched one.
 	<!-- titan-overdrivemegademo.zip -->
 	<!-- http://www.pouet.net/prod.php?which=61724 -->
 	<software name="d_titovr">
-		<description>Overdrive (Demo) (Euro)</description>
+		<description>Overdrive (demo) (Euro)</description>
 		<year>2013</year>
 		<publisher>Titan</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -33560,7 +33560,7 @@ This dump is either a bad dump or a wrongly patched one.
 	<!-- titan-overdrive2.zip -->
 	<!-- http://www.pouet.net/prod.php?which=69648 -->
 	<software name="d_titov2" supported="no">
-		<description>Overdrive 2 (Demo) (Euro)</description>
+		<description>Overdrive 2 (demo) (Euro)</description>
 		<year>2017</year>
 		<publisher>Titan</publisher>
 		<part name="cart" interface="megadriv_cart">
