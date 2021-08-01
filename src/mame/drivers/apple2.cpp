@@ -1547,7 +1547,7 @@ ROM_END
 
 ROM_START(prav82)
 	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "pravetz82.chr", 0x0000, 0x0800, BAD_DUMP CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594)) // Taken from Agat computer
+	ROM_LOAD("pravetz82_chr.bin", 0x000000, 0x000800, CRC(c5d6bbc2) SHA1(b2074675d1890b5d1f0a14ed1758665f190ea3c7))
 
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "pravetz82.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
