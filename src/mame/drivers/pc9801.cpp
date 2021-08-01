@@ -3539,7 +3539,7 @@ COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9
 // FA class (i486SX)
 // ...
 // BX class (official nickname "98 FELLOW", last releases prior to 9821 line)
-COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86), superimposition)
 // ...
@@ -3557,29 +3557,29 @@ COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9
 COMP( 1994, pc9821,      0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
-COMP( 1993, pc9821as,    pc9821,   0, pc9821as,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821as,    0,        0, pc9821as,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1993, pc9821ap2,   pc9821,   0, pc9821ap2,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE [B] (i486, desktop, has GD5428 and no sound)
 // ...
 
 // 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
-COMP( 1994, pc9821ce2,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821ce2,   0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1995, pc9821cx3,   pc9821,   0, pc9821cx3,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MULTi CanBe Jam (Pentium Pro equipped, laptop, Multimedia PC as above + JEIDA 4.2/PCMCIA 2.1)
 // ...
 
 // 98MATE X (i486sx/Pentium/Pentium Pro, has PCI, comes with various SVGA cards)
-COMP( 1994, pc9821xs,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821xs,    0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1996, pc9821xa16,  pc9821,   0, pc9821xa16,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
-COMP( 1998, pc9821v13,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1998, pc9821v13,   0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1998, pc9821v20,   pc9821,   0, pc9821v20,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821V20 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE R (Pentium Pro, otherwise same as 98MATE X)
-COMP( 1996, pc9821ra20,  pc9821,   0, pc9821ra20,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821ra20,  0,        0, pc9821ra20,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1997, pc9821ra266, pc9821,   0, pc9821ra266, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1998, pc9821ra333, pc9821,   0, pc9821ra333, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -3591,10 +3591,10 @@ COMP( 1998, pc9821ra333, pc9821,   0, pc9821ra333, pc9821,   pc9801_state, init_
 
 // PC-9821 NOTE[book] class
 // 98NOTE
-COMP( 1994, pc9821ne,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821ne,    0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Lavie
-COMP( 1996, pc9821nr15,  pc9821,   0, pc9821nr15,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821nr15,  0,        0, pc9821nr15,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1997, pc9821nr166, pc9821,   0, pc9821nr166, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Light

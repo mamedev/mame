@@ -546,5 +546,5 @@ ROM_START( pc98ha )
 	ROM_LOAD( "ramdrv.bin",   0x000000, 0x160000, BAD_DUMP CRC(f2cec994) SHA1(c986ad6d8f810ac0a9657c1af26b6fec712d56ed) )
 ROM_END
 
-COMP( 1989, pc98lt,      0,        0, lt_config,    pc98lt,   pc98lt_state, empty_init,   "NEC",   "PC-98LT",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, pc98ha,      0,        0, ha_config,    pc98ha,   pc98ha_state, empty_init,   "NEC",   "PC-98HA (Handy98)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1989, pc98lt,      0,        0, lt_config,    pc98lt,   pc98lt_state, empty_init,   "NEC",   "PC-98LT",                   MACHINE_NOT_WORKING )
+COMP( 1990, pc98ha,      0,        0, ha_config,    pc98ha,   pc98ha_state, empty_init,   "NEC",   "PC-98HA (Handy98)",         MACHINE_NOT_WORKING )
