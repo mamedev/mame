@@ -80726,6 +80726,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- This seems to have been a pack-in cartridge included with the Little Com II (only II?) Famiclone-based computer. -->
+	<software name="mc_lc160">
+		<description>Little Com 160</description>
+		<year>199?</year>
+		<publisher>Little Com</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_lc160" />
+			<dataarea name="prg" size="1048576">
+				<rom name="mc_lc160.prg" size="1048576" crc="49a5cda7" sha1="119afaafbdbeae813f8686e255d9bbdd6a2c3faa" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed
 to check why this is different -->
 	<software name="mc_mario">

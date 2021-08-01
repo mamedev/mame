@@ -81,6 +81,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_CH001,      nes_bmc_ch001_device,      "nes_bmc_ch001
 DEFINE_DEVICE_TYPE(NES_BMC_SUPER22,    nes_bmc_super22_device,    "nes_bmc_super22",    "NES Cart BMC Super 22 Games PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device,  "nes_bmc_4in1reset",  "NES Cart BMC 4 in 1 (Reset Based) PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device, "nes_bmc_42in1reset", "NES Cart BMC 42 in 1 (Reset Based) PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device,      "nes_bmc_lc160",      "NES Cart BMC Little Com 160 PCB")
 
 
 nes_action52_device::nes_action52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -345,6 +346,11 @@ nes_bmc_4in1reset_device::nes_bmc_4in1reset_device(const machine_config &mconfig
 
 nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_42IN1RESET, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_bmc_lc160_device::nes_bmc_lc160_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_LC160, tag, owner, clock)
 {
 }
 
@@ -2801,4 +2807,31 @@ void nes_bmc_42in1reset_device::write_h(offs_t offset, uint8_t data)
 
 	set_nt_mirroring(BIT(offset, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
+}
+
+/*-------------------------------------------------
+
+ BMC-LITTLECOM-160
+
+ Unknown Bootleg Multigame Board
+
+ Games: Little Com 160
+
+ NES 2.0: mapper 541
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_lc160_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_lc160 write_h, offset: %04x, data: %02x\n", offset, data));
+	if (offset >= 0x4000)
+	{
+		u8 bank = (offset >> 2) & 0x3f;
+		u8 mode = !BIT(offset, 1);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+		set_nt_mirroring(BIT(offset, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+	}
 }
