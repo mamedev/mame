@@ -535,7 +535,9 @@ void lwriter_state::lwriter(machine_config &config)
 	m_scc->out_dtrb_callback().set(FUNC(lwriter_state::write_dtr));
 	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	/* Interrupt */
-	m_scc->out_int_callback().set(m_via, FUNC(via6522_device::write_ca1));
+	// The "CA1 Latch/Interrupt Control" bit in VIA PCR gets set to "negative
+	// active edge" so we invert the SCC interrupt.
+	m_scc->out_int_callback().set(m_via, FUNC(via6522_device::write_ca1)).invert();
 	//m_scc->out_int_callback().set(FUNC(lwriter_state::scc_int));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
