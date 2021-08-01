@@ -22,6 +22,8 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	, cart_present(false)
 	, m_vr4300(*this, "^maincpu")
 	, m_rsp(*this, "^rsp")
+	, m_rsp_imem(*this, "^rsp_imem")
+	, m_rsp_dmem(*this, "^rsp_dmem")
 	, ai_dac(*this, "^dac%u", 1U)
 {
 	for (int32_t i = 0; i < 256; i++)
@@ -130,8 +132,6 @@ void n64_periphs::device_reset()
 	m_mem_map = &m_vr4300->space(AS_PROGRAM);
 
 	m_rdram = m_n64->rdram();
-	m_rsp_imem = m_n64->rsp_imem();
-	m_rsp_dmem = m_n64->rsp_dmem();
 	m_sram = m_n64->sram();
 
 	mi_version = 0x01010101;
@@ -576,9 +576,6 @@ void n64_periphs::sp_dma(int direction)
 
 	int sp_mem_page = (sp_mem_addr >> 12) & 1;
 
-	//if (sp_mem_page == 1)
-		//m_rsp->rspdrc_flush_drc_cache();
-
 	//printf("DMA %s RSP: mem %08x, dram %08x, sp_dma_length: %03x, length: %04x, count: %02x, skip: %03x\n", direction ? "from" : "to", sp_mem_addr, sp_dram_addr, sp_dma_length, length, sp_dma_count, sp_dma_skip);
 
 	if (direction == 0)// RDRAM -> I/DMEM
@@ -877,13 +874,13 @@ void n64_periphs::sp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		switch (offset & 0xffff)
 		{
 			case 0x00/4:        // SP_PC_REG
-				if( m_rsp->state_int(RSP_NEXTPC) != 0xffffffff )
+				if (m_rsp->state_int(RSP_NEXTPC) != 0xffff)
 				{
-					m_rsp->set_state_int(RSP_NEXTPC, 0x1000 | (data & 0xfff));
+					m_rsp->set_state_int(RSP_NEXTPC, data & 0xfff);
 				}
 				else
 				{
-					m_rsp->set_state_int(RSP_PC, 0x1000 | (data & 0xfff));
+					m_rsp->set_state_int(RSP_PC, data & 0xfff);
 				}
 				break;
 
@@ -1509,6 +1506,14 @@ uint32_t n64_periphs::pi_reg_r(offs_t offset, uint32_t mem_mask)
 			ret = pi_cart_addr;
 			break;
 
+		case 0x08/4:        // PI_RD_LEN_REG
+			ret = pi_rd_len;
+			break;
+
+		case 0x0c/4:        // PI_WR_LEN_REG
+			ret = pi_wr_len;
+			break;
+
 		case 0x10/4:        // PI_STATUS_REG
 			ret = pi_status;
 			break;
@@ -1558,13 +1563,10 @@ void n64_periphs::pi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	switch (offset)
 	{
 		case 0x00/4:        // PI_DRAM_ADDR_REG
-		{
 			pi_dram_addr = data;
 			break;
-		}
 
 		case 0x04/4:        // PI_CART_ADDR_REG
-		{
 			pi_cart_addr = data;
 			if(pi_cart_addr == 0x05000400 && dd_present)
 			{
@@ -1581,15 +1583,15 @@ void n64_periphs::pi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				m_vr4300->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			break;
-		}
 
 		case 0x08/4:        // PI_RD_LEN_REG
 		{
+			//printf("pi_rd_len_reg: %08x\n", data);
 			//logerror("Start PI Read\n");
 			pi_rd_len = data;
 			pi_dma_dir = 0;
 			pi_status |= 1;
-
+			//pi_dma_tick();
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			pi_dma_timer->adjust(dma_period);
 			break;
@@ -1597,11 +1599,12 @@ void n64_periphs::pi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 		case 0x0c/4:        // PI_WR_LEN_REG
 		{
+			//printf("pi_wr_len_reg: %08x\n", data);
 			//logerror("Start PI Write\n");
 			pi_wr_len = data;
 			pi_dma_dir = 1;
 			pi_status |= 1;
-
+			//pi_dma_tick();
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			pi_dma_timer->adjust(dma_period);
 			break;
@@ -1777,6 +1780,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, uint8_t *s
 				}
 				case 4:
 				{
+					//printf("Read EEPROM status, type: %02x\n", (machine().root_device().ioport("input")->read() >> 8) & 0xC0);
 					// Read EEPROM status
 					rdata[0] = 0x00;
 					rdata[1] = (machine().root_device().ioport("input")->read() >> 8) & 0xC0;
@@ -1943,6 +1947,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, uint8_t *s
 
 		case 0x04:      // Read from EEPROM
 		{
+			//printf("Read from EEPROM, channel %d: slength %d, rlength %d, sdata[1] %02x\n", channel, slength, rlength, sdata[1]);
 			if (channel != 4)
 			{
 				return 1;
@@ -2766,11 +2771,6 @@ void n64_state::machine_start()
 
 	/* configure fast RAM regions */
 	//m_vr4300->add_fastram(0x00000000, 0x007fffff, false, m_rdram);
-
-	m_rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);
-	m_rsp->rspdrc_flush_drc_cache();
-	m_rsp->rsp_add_dmem(m_rsp_dmem);
-	m_rsp->rsp_add_imem(m_rsp_imem);
 
 	/* add a hook for battery save */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&n64_state::n64_machine_stop,this));
