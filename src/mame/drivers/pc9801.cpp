@@ -2494,6 +2494,8 @@ void pc9801_state::pc9801bx2(machine_config &config)
 
 void pc9801_state::pc9821(machine_config &config)
 {
+	// TODO: specs for a MULTi doesn't match
+	// should be 386sx at 20 MHz
 	pc9801rs(config);
 	I486(config.replace(), m_maincpu, 16000000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
@@ -2524,10 +2526,13 @@ void pc9801_state::pc9821as(machine_config &config)
 void pc9801_state::pc9821ap2(machine_config &config)
 {
 	pc9821(config);
-	I486(config.replace(), m_maincpu, 66666667); // unknown clock
+	const XTAL xtal = XTAL(66'000'000);
+	I486(config.replace(), m_maincpu, xtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9821ap2)
 }
@@ -2545,7 +2550,8 @@ void pc9801_state::pc9821cx3(machine_config &config)
 void pc9801_state::pc9821v20(machine_config &config)
 {
 	pc9821(config);
-	PENTIUM(config.replace(), m_maincpu, 32000000); // unknown clock, definitely not 32 MHz
+	const double xtal = 200000000;
+	PENTIUM(config.replace(), m_maincpu, xtal); // Pentium Pro
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
