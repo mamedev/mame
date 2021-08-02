@@ -249,6 +249,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("hengg_shjy3",      NES_HENGG_SHJY3); // mapper 253
 	device.option_add_internal("hes",              NES_HES);
 	device.option_add_internal("hosenkan",         NES_HOSENKAN);
+	device.option_add_internal("ks106c",           NES_KS106C);     // mapper 352
 	device.option_add_internal("ks202",            NES_KS202);      // mapper 56
 	device.option_add_internal("ks7010",           NES_KS7010);     // used in Akumajo Dracula (FDS Conversion)
 	device.option_add_internal("ks7012",           NES_KS7012);     // used in Zanac (FDS Conversion)

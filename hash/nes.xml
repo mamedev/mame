@@ -79041,6 +79041,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_4k106">
+		<description>4 in 1 (KS-106C)</description>
+		<year>19??</year>
+		<publisher>Kaiser</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks106c" />
+			<dataarea name="prg" size="131072">
+				<rom name="mc_4k106.prg" size="131072" crc="eb2474f7" sha1="427b323bd1d7d94a2078425e0a6509a258b1c222" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="mc_4k106.chr" size="32768" crc="a77dae2d" sha1="50671c4cb8db0caee3c2ea764d3324570cebfed0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4kt34" supported="no">
 		<description>4 in 1 (KT-3445AB)</description>
 		<year>19??</year>
