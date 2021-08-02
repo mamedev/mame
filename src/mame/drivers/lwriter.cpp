@@ -130,6 +130,7 @@ public:
 	{ }
 
 	void lwriter(machine_config &config);
+	void lwriter2nt(machine_config &config);
 
 private:
 	uint16_t bankedarea_r(offs_t offset);
@@ -141,8 +142,10 @@ private:
 	void fifo_out_w(uint8_t data);
 	uint8_t via_pa_r();
 	void via_pa_w(uint8_t data);
+	void via_pa_lw_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
 	uint8_t via_pb_r();
+	uint8_t via_pb_lw2nt_r();
 	void write_dtr(int state);
 	void via_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
@@ -394,6 +397,12 @@ void lwriter_state::via_pa_w(uint8_t data)
 	logerror(" VIA: Port A written with data of 0x%02x!\n", data);
 }
 
+void lwriter_state::via_pa_lw_w(uint8_t data)
+{
+	via_pa_w(data);
+	m_cbsy = data & 1;
+}
+
 WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
 {
 	logerror(" VIA: CA2 written with %d!\n", state);
@@ -402,7 +411,14 @@ WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
 uint8_t lwriter_state::via_pb_r()
 {
 	logerror(" VIA: Port B read!\n");
-	return 0xFF;
+	return 0xFB;
+}
+
+// The 3rd bit is used for talking with the print controller
+// and is inverted on II NT
+uint8_t lwriter_state::via_pb_lw2nt_r()
+{
+	return via_pb_r() ^ 0x4;
 }
 
 void lwriter_state::via_pb_w(uint8_t data)
@@ -519,6 +535,13 @@ void lwriter_state::write_dtr(int state)
 	}
 }
 
+void lwriter_state::lwriter2nt(machine_config &config)
+{
+	lwriter(config);
+	m_via->readpb_handler().set(FUNC(lwriter_state::via_pb_lw2nt_r));
+	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_w));
+}
+
 void lwriter_state::lwriter(machine_config &config)
 {
 	M68000(config, m_maincpu, CPU_CLK);
@@ -551,7 +574,7 @@ void lwriter_state::lwriter(machine_config &config)
 	R65NC22(config, m_via, CPU_CLK/10); // 68000 E clock presumed
 	m_via->readpa_handler().set(FUNC(lwriter_state::via_pa_r));
 	m_via->readpb_handler().set(FUNC(lwriter_state::via_pb_r));
-	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_w));
+	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_lw_w));
 	m_via->writepb_handler().set(FUNC(lwriter_state::via_pb_w));
 	m_via->cb1_handler().set(FUNC(lwriter_state::via_cb1_w));
 	m_via->ca2_handler().set(FUNC(lwriter_state::via_ca2_w));
@@ -591,7 +614,7 @@ void lwriter_state::lwriter(machine_config &config)
 */
 
 
-ROM_START(lwriter)
+ROM_START(lwriter2nt)
 	ROM_REGION16_BE( 0x200000, "rom", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE("342-0545.l0", 0x000001, 0x20000, CRC (6431742d) SHA1 (040bd5b84b49b86f2b0fe9ece378bbc7a10a94ec)) // Label: "342-0545-A JAPAN // TC531000CP-F700 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L0
 	ROM_LOAD16_BYTE("342-0546.h0", 0x000000, 0x20000, CRC (c592bfb7) SHA1 (b595ae225238f7fabd1566a3133ea6154e082e2d)) // Label: "342-0546-A JAPAN // TC531000CP-F701 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H0
@@ -602,10 +625,22 @@ ROM_START(lwriter)
 	ROM_LOAD16_BYTE("342-0551.l3", 0x0c0001, 0x20000, CRC (176b3346) SHA1 (eb8dfc7e44f2bc884097e51a47e2f10ee091c9e9)) // Label: "342-0551-A JAPAN // TC531000CP-F706 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L3
 	ROM_LOAD16_BYTE("342-0552.h3", 0x0c0000, 0x20000, CRC (69b175c6) SHA1 (a84c82be1ec7e373bb097ee74b941920a3b091aa)) // Label: "342-0552-A JAPAN // TC531000CP-F707 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H3
 	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
-
+ROM_END
+ROM_START(lwriter)
+	ROM_REGION16_BE( 0x200000, "rom", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE("342-0568a.rom", 0x000001, 0x10000, CRC (83341c75) SHA1 (d7c65d09abaaf862fef00ac4df7a094ddedd24c5)) // Label: "342-0568-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0569a.rom", 0x000000, 0x10000, CRC (47d33a6b) SHA1 (0e79fa9204f9be6539abcdb619a17a4ced912b13)) // Label: "342-0569-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0570a.rom", 0x020001, 0x10000, CRC (38753dd2) SHA1 (931eb3386fe0fff1de1311b2bc1cee8ee02ed599)) // Label: "342-0570-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0571a.rom", 0x020000, 0x10000, CRC (08888acd) SHA1 (f771306d8f876e6e4ed14f3c6e5b71dff75cf49e)) // Label: "342-0571-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0572a.rom", 0x040001, 0x10000, CRC (0a64af91) SHA1 (22cd61ed7c2f64bfd4ddbd7b5cde64311a3db5e6)) // Label: "342-0572-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0573a.rom", 0x040000, 0x10000, CRC (f8e529fe) SHA1 (8a4511a4c12eb24c731e1de747886aacfa2057d5)) // Label: "342-0573-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0574a.rom", 0x060001, 0x10000, CRC (bb694699) SHA1 (2e208b30e8d05725f7e8b469974b6357008fbb1d)) // Label: "342-0574-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0575a.rom", 0x060000, 0x10000, CRC (c21c1d22) SHA1 (9fc6cd059380c11588c182fb8ec6422e5db472e1)) // Label: "342-0575-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
 ROM_END
 
 } // anonymous namespace
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY            FULLNAME                    FLAGS */
-CONS( 1988, lwriter, 0,      0,      lwriter, lwriter, lwriter_state, empty_init, "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY            FULLNAME             FLAGS */
+CONS( 1985, lwriter,    0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_IS_SKELETON)
+CONS( 1988, lwriter2nt, 0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_IS_SKELETON)
