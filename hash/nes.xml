@@ -78461,14 +78461,14 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_22rb" supported="partial">
+	<software name="mc_22rb">
 		<description>22 in 1 (Reset Based)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to use multigame menu."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_22games" />
 			<feature name="pcb" value="BMC-22GAMES" />
-			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="655360">
 				<rom name="22 in 1 (reset based).prg" size="655360" crc="03fdefad" sha1="4e84be9a20c5e385ae71c466a02613d5a74de01e" offset="00000" status="baddump" />
 			</dataarea>
