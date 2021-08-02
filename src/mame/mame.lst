@@ -2583,7 +2583,9 @@ wpc250                          // Wang PC-250/16 (286)
 wy220001                        // WYSEpc 286
 xb42639                         // 1989 Apricot XEN-S (Venus I Motherboard 286) (Bios:3.10.17i)
 xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286) (Bios:1.02.17)
-zdz248                          // Zenith Z-248 ab hier 386sx
+zdz248                          // Zenith Z-248
+
+@source: at386sx.cpp
 386sxvhcom                      // 80386SX-VH-COM
 3siud                           // 3SIUD-1.1 motherboard (386sx)
 alaleolx                        // RYC Alaris LEOPARD LX REV D (486SLC2)
@@ -2634,8 +2636,6 @@ td70a                           // TD70A and TD70AN motherboards (386sx)
 td70n                           // TD70N motherboard (386sx)
 tower386sx                      // Schneider 386SX System 40 (386sx, VGA)
 walk386sx                       // 1992 Triumph-Adler Walkstation 386 SX
-
-@source: at386sx.cpp
 zeos386sx                       // ZEOS 386 SX-16
 
 @source:at386.cpp
