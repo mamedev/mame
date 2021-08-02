@@ -301,6 +301,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2j",            NES_SMB2J);
 	device.option_add_internal("smb2ja",           NES_SMB2JA);
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
+	device.option_add_internal("yung08",           NES_YUNG08);
 	device.option_add_internal("btl_0353",         NES_0353);       // used by Lucky (Roger) Rabbit FDS conversion
 	device.option_add_internal("09034a",           NES_09034A);
 	device.option_add_internal("batmanfs",         NES_BATMANFS);
@@ -352,6 +353,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("maxi15",           NES_MAXI15);        //  mapper 234
 	device.option_add_internal("rumblestation",    NES_RUMBLESTATION);    // mapper 46
 	device.option_add_internal("svision16",        NES_SVISION16);  // mapper 53
+	device.option_add_internal("kn42",             NES_KN42);
 	device.option_add_internal("n625092",          NES_N625092);
 	device.option_add_internal("a65as",            NES_A65AS);
 	device.option_add_internal("t262",             NES_T262);
@@ -402,6 +404,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_s22games",     NES_BMC_SUPER22);    // mapper 233
 	device.option_add_internal("bmc_reset4",       NES_BMC_4IN1RESET);  // mapper 60 with 64k prg and 32k chr
 	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 226? or 233?
+	device.option_add_internal("bmc_lc160",        NES_BMC_LC160);
 // misc multigame cart MMC3 clone boards
 	device.option_add_internal("fk23c",            NES_FK23C);
 	device.option_add_internal("fk23ca",           NES_FK23CA);

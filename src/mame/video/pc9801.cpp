@@ -557,6 +557,25 @@ void pc9801_state::upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mas
  *
  ************************************************/
 
+uint16_t pc9801_state::egc_color_pat(int plane) const
+{
+	uint8_t color = 0;
+	switch((m_egc.regs[1] >> 13) & 3)
+	{
+		case 1:
+			//back color
+			color = m_egc.regs[5];
+			break;
+		case 2:
+			//fore color
+			color = m_egc.regs[3];
+			break;
+		default:
+			return m_egc.pat[plane];
+	}
+	return BIT(color, plane) ? 0xffff : 0;
+}
+
 uint16_t pc9801_state::egc_shift(int plane, uint16_t val)
 {
 	int src_off = m_egc.regs[6] & 0xf, dst_off = (m_egc.regs[6] >> 4) & 0xf;
@@ -632,6 +651,7 @@ void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 		mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (16 - dst_off)) - 1);
 		if(BIT(m_egc.regs[2], 10) && !m_egc.init)
 			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
+		m_egc.init = true;
 	}
 
 	// mask off the bits past the end of the blit
@@ -653,7 +673,7 @@ void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		if(!BIT(m_egc.regs[0], i))
 		{
-			uint16_t src = m_egc.src[i], pat = m_egc.pat[i];
+			uint16_t src = m_egc.src[i], pat = egc_color_pat(i);
 			if(BIT(m_egc.regs[2], 10))
 				src = egc_shift(i, data);
 
@@ -715,17 +735,28 @@ uint16_t pc9801_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
 		m_egc.pat[2] = m_video_ram_2[plane_off + (0x4000 * 3)];
 		m_egc.pat[3] = m_video_ram_2[plane_off];
 	}
-	if(m_egc.first && !m_egc.init)
+	//TODO: this needs another look
+	/*if(m_egc.first && !m_egc.init)
 	{
 		m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
 		if(((m_egc.regs[6] >> 4) & 0xf) >= (m_egc.regs[6] & 0xf)) // check if we have enough bits
 			m_egc.init = true;
-	}
+	}*/
+	m_egc.init = true;
 	for(int i = 0; i < 4; i++)
 		m_egc.src[i] = egc_shift(i, m_video_ram_2[plane_off + (((i + 1) & 3) * 0x4000)]);
 
 	if(BIT(m_egc.regs[2], 13))
-		return m_video_ram_2[offset];
+	{
+		uint16_t ret;
+		// docs say vram is compared to the foreground color register but 4a2 13-14 must be 2
+		// guess that the other values probably work too
+		ret =  ~(egc_color_pat(0) ^ m_video_ram_2[plane_off + 0x4000]);
+		ret &= ~(egc_color_pat(1) ^ m_video_ram_2[plane_off + (0x4000 * 2)]);
+		ret &= ~(egc_color_pat(2) ^ m_video_ram_2[plane_off + (0x4000 * 3)]);
+		ret &= ~(egc_color_pat(3) ^ m_video_ram_2[plane_off]);
+		return ret;
+	}
 	else
 		return m_egc.src[(m_egc.regs[1] >> 8) & 3];
 }

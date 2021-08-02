@@ -4201,7 +4201,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bignfo">
+	<software name="bignfo" supported="no">
 		<description>Big Nose Freaks Out (USA)</description>
 		<year>1992</year>
 		<publisher>Camerica</publisher>
@@ -61302,13 +61302,31 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- OTHER TAIWANESE ~ CHINESE ~ ASIAN PIRATES-->
 
+	<software name="2bignose" supported="partial">
+		<description>2 in 1 - Big Nose the Caveman &amp; Big Nose Freaks Out</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="serial" value="BC-019"/>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="kn42" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="2-in-1 high standard game (bc-019).prg" size="524288" crc="330623a4" sha1="ad189495ed8b6d60dddcbb970be17174b2389e63" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2dkjb" supported="no">
 		<description>2 in 1 - Donkey Kong &amp; Jungle Book</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="n625092" />
-			<feature name="pcb" value="UNL-N625092" /> <!-- Mapper 221 -->
+			<feature name="slot" value="jyc_b" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="262144">
 				<rom name="2-in-1 donkey kong + jungle book (unl).chr" size="262144" crc="52ea0000" sha1="7d437a553c7498e637c231dd1df51e73defc0905" offset="00000" status="baddump" />
 			</dataarea>
@@ -67208,8 +67226,8 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-<!-- Whirlwind Manu has at least two version: LE10 and LF36. This earlier version apparently hangs at the end of world 4-4 on real hardware. -->
-	<software name="smb2fdse" cloneof="smb2fds" supported="no">
+<!-- Whirlwind Manu has at least two versions: LE10 and LF36. This earlier version has a broken status bar that scrolls with the game. It also crashes at the end of world 4-4 on real hardware (and in MAME). -->
+	<software name="smb2fdse" cloneof="smb2fds">
 		<description>Super Mario Bros. 2 (LE10)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
@@ -67245,14 +67263,15 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="smb2fdsy" cloneof="smb2fds" supported="no">
+	<software name="smb2fdsy" cloneof="smb2fds">
 		<description>Super Mario Bros. 2 (YUNG-08)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="yung08" /> <!-- mapper 368 -->
 			<feature name="pcb" value="YUNG-08" />
-			<dataarea name="prg" size="73728">
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="81920">
 				<rom name="mali4dai.prg0" size="32768" crc="473b9553" sha1="5b3a5752229cfadb41b2ae8a1fe3eff2b7132a17" offset="0x00000" status="baddump" /> <!-- original label: 瑪琍4代 -->
 				<rom name="mali4dai.prg1" size="32768" crc="8d188ef2" sha1="44b76a77c3d2ffd582a510516a9da6e58aaecc92" offset="0x08000" status="baddump" /> <!-- original label: 瑪琍4代 -->
 				<rom name="mali4dai.prg2" size="2048" crc="9f098abf" sha1="d295e4e882c21dcbda6b4923e54d1e924b557fa4" offset="0x10000" status="baddump" /> <!-- no label -->
@@ -67267,14 +67286,15 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 <!-- Two boards turned up with the same silkscreen YUNG-08, and this one for whatever reason had different ROMs with the protection check patched out but with the hardware to support it still intact. -->
-	<software name="smb2fdsy1" cloneof="smb2fds" supported="no">
+	<software name="smb2fdsy1" cloneof="smb2fds">
 		<description>Super Mario Bros. 2 (YUNG-08, no protection)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="yung08" /> <!-- mapper 368 -->
 			<feature name="pcb" value="YUNG-08" />
-			<dataarea name="prg" size="73728">
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="81920">
 				<rom name="mali4dai (alt).prg0" size="32768" crc="473b9553" sha1="5b3a5752229cfadb41b2ae8a1fe3eff2b7132a17" offset="0x00000" status="baddump" />
 				<rom name="mali4dai (alt).prg1" size="32768" crc="8d188ef2" sha1="44b76a77c3d2ffd582a510516a9da6e58aaecc92" offset="0x08000" status="baddump" />
 				<rom name="mali4dai (alt).prg2" size="2048" crc="c9fbd397" sha1="21c72e06ff861bda4b8bf81541c1eb665e88d27e" offset="0x10000" status="baddump" />
@@ -77557,7 +77577,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="mc_11bal">
-		<description>11 in 1 Ball Games</description>
+		<description>11 in 1 Ball Series</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78519,7 +78539,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_31" supported="no">
+	<software name="mc_31">
 		<description>31 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -78732,6 +78752,7 @@ be better to redump them properly. -->
 		<description>4 in 1 (Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_reset4" />
 			<feature name="mirroring" value="vertical" />
@@ -78748,6 +78769,7 @@ be better to redump them properly. -->
 		<description>4 in 1 (Alt 3)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_reset4" />
 			<dataarea name="chr" size="32768">
@@ -80704,6 +80726,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- This seems to have been a pack-in cartridge included with the Little Com II (only II?) Famiclone-based computer. -->
+	<software name="mc_lc160">
+		<description>Little Com 160</description>
+		<year>199?</year>
+		<publisher>Little Com</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_lc160" />
+			<dataarea name="prg" size="1048576">
+				<rom name="mc_lc160.prg" size="1048576" crc="49a5cda7" sha1="119afaafbdbeae813f8686e255d9bbdd6a2c3faa" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed
 to check why this is different -->
 	<software name="mc_mario">
@@ -80849,6 +80887,7 @@ to check why this is different -->
 		<description>Reset Based 4 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_reset4" />
 			<feature name="pcb" value="BMC-RESETBASED-4IN1" />

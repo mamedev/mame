@@ -207,6 +207,7 @@ static const nes_pcb pcb_list[] =
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
 	{ "smb2jb",           BTL_SMB2JB },
+	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
 	{ "batmanfs",         BTL_BATMANFS },
@@ -237,6 +238,7 @@ static const nes_pcb pcb_list[] =
 	{ "caltron6in1",      CALTRON_6IN1 },
 	{ "rumblestation",    RUMBLESTATION_BOARD },     // mapper 46
 	{ "svision16",        SVISION16_BOARD },
+	{ "kn42",             UNL_KN42 },
 	{ "n625092",          UNL_N625092 },
 	{ "a65as",            BMC_A65AS },
 	{ "t262",             BMC_T262 },
@@ -300,6 +302,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_s22games",     BMC_SUPER22 },
 	{ "bmc_reset4",       BMC_4IN1RESET },
 	{ "bmc_reset42",      BMC_42IN1RESET },
+	{ "bmc_lc160",        BMC_LITTLECOM160 },
 	{ "jyc_a",            JYCOMPANY_A },
 	{ "jyc_b",            JYCOMPANY_B },
 	{ "jyc_c",            JYCOMPANY_C },

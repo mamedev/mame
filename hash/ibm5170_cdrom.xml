@@ -3214,7 +3214,7 @@ license:CC0
 			<!-- Missing -->
 			<feature name="part_id" value="BonusPak for OS/2 version 3"/>
 			<diskarea name="cdrom">
-				<disk name="bonuspak" status="nodump"/>
+				<disk name="bonus_pak" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>

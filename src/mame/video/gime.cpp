@@ -77,6 +77,8 @@
 
     ARKANOID: Abuses TIMER = 0 for ball ricochet sounds
 
+    POP*STAR PILOT: Timer is synchronized with scanlines.
+
 **********************************************************************/
 
 
@@ -480,12 +482,12 @@ void gime_device::reset_timer(void)
 		if (timer_type() == GIME_TIMER_63USEC)
 		{
 			// master clock divided by 8, divided by 228, divided by 2
-			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 3648 * m_timer_value);
+			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 3648 * m_timer_value / 2);
 		}
 		else
 		{
 			// master clock divided by 8, divided by 2
-			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 16 * m_timer_value);
+			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 16 * m_timer_value / 2);
 		}
 	}
 	else
@@ -529,19 +531,16 @@ void gime_device::update_memory(int bank)
 
 	// bank 8 is really $FE00-$FEFF; it is weird so adjust for it
 	offs_t offset;
-	bool force_ram;
 	bool enable_mmu = (m_gime_registers[0] & 0x40) ? true : false;
 	if (bank == 8)
 	{
 		bank = 7;
 		offset = 0x1E00;
-		force_ram = (m_gime_registers[0] & 0x08);
 		enable_mmu = enable_mmu && !(m_gime_registers[0] & 0x08);
 	}
 	else
 	{
 		offset = 0x0000;
-		force_ram = false;
 	}
 
 	// is the MMU enabled at $FF90?
@@ -566,7 +565,7 @@ void gime_device::update_memory(int bank)
 	// are we actually in ROM?
 	uint8_t *memory;
 	bool is_read_only;
-	if (((block & 0x3F) >= 0x3C) && !(m_sam_state & SAM_STATE_TY) && !force_ram)
+	if (((block & 0x3F) >= 0x3C) && !(m_sam_state & SAM_STATE_TY))
 	{
 		// we're in ROM
 		const uint8_t rom_mode = m_gime_registers[0] & 3;

@@ -8,20 +8,16 @@
 //
 //============================================================
 
-#include "input_module.h"
 #include "modules/lib/osdobj_common.h"
-
-#include <memory>
 
 // MAME headers
 #include "emu.h"
+#include "input_common.h"
 
 // winnt.h defines this
 #ifdef DELETE
 #undef DELETE
 #endif
-
-#include "input_common.h"
 
 //============================================================
 //  Keyboard translation table

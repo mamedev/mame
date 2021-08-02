@@ -4503,6 +4503,38 @@ ROM_START( svgtw )
 	ROM_LOAD( "igs_w05602b032.u7",  0xc00000, 0x400000, CRC(0685166d) SHA1(64dac49abd2a46d5fb58c678027aa5e23d672dc4) )
 ROM_END
 
+ROM_START( svghk )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "v101hk_u30.u30",      0x100000, 0x080000, CRC(8d0405e4) SHA1(b6175c9ffeaac531d28e7845cb34c673476e286a) ) // V100 03/14/05 20:04:08
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // marked H1
+	ROM_LOAD( "svgpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
+	ROM_LOAD( "svgcpb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(7a59da5d) SHA1(d67ba465db40ca716b4b901b1c8e762716fb954e) ) // this is from the Japan set, the cart this came from was Hong Kong
+
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
+	ROM_LOAD( "v101hk_u26.u26", 0x000000, 0x400000, CRC(42b0d5a9) SHA1(1dd2b6530f982dbb720e4c017fca7f90cf441f57) ) // 06/20/05 11:36:15 V100
+	ROM_LOAD( "v101hk_u36.u36", 0x400000, 0x400000, CRC(bf15a47a) SHA1(822aadb222d4f0278b2e2375cb59d8b35667f5ef) )
+
+	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "igs_t05601w016.u29", 0x180000, 0x200000, CRC(03e110dc) SHA1(41c8f286e9303b24ba6235b341371c298226fb6a) )
+
+	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "igs_a05601w064.u3",  0x0000000, 0x0800000, CRC(ea6453e4) SHA1(b5c82edafa8008ad59b5f2219511947d078d446e) )
+	ROM_LOAD( "igs_a05602w064.u4",  0x0800000, 0x0800000, CRC(6d00621b) SHA1(55a4bc357e14b975b0234a9cd49e2224f509dad9) )
+	ROM_LOAD( "igs_a05603w064.u6",  0x1000000, 0x0800000, CRC(7b71c64f) SHA1(bec7c7edf0634cf8351a54abb867c56af08ad2c3) )
+	ROM_LOAD( "igs_a05604w032.u8",  0x1800000, 0x0400000, CRC(9452a567) SHA1(01fdb8e1f131603843ef4c49ab76d7a56b2d6414) )
+
+	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "igs_b05601w064.u9",  0x0000000, 0x0800000, CRC(35c0a489) SHA1(a7d5527da01f8eaa7499fb6785b57094521bce97) )
+	ROM_LOAD( "igs_b05602w064.u11", 0x0800000, 0x0800000, CRC(8aad3f85) SHA1(da6996d901d42b3a2ba7019ad014bb938a5e328b) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "igs_w05601b064.u5",  0x400000, 0x800000, CRC(bfe61a71) SHA1(e682ca8d57ca51c4d72f64fc091161f3dbdce871) )
+	ROM_LOAD( "igs_w05602b032.u7",  0xc00000, 0x400000, CRC(0685166d) SHA1(64dac49abd2a46d5fb58c678027aa5e23d672dc4) )
+ROM_END
 
 ROM_START( svgpcb )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
@@ -5504,6 +5536,7 @@ GAME( 2003, thegladpcba,  theglad,   pgm_arm_type3_33m,      pgm,       pgm_arm_
 //圣魔世纪/Shèng mó shìjì (China)
 //聖魔世紀/Shèng mó shìjì (Taiwan, Hong Kong)
 GAME( 2005, svg,          pgm,       pgm_arm_type3_33m,      svg,       pgm_arm_type3_state,  init_svg,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation / Sheng Mo Shiji (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ARM label was 200, but it's code rev 201? // ARM time: 10:07:20
+GAME( 2005, svghk,        svg,       pgm_arm_type3_33m,      svghk,     pgm_arm_type3_state,  init_svgpcb,  ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation / Sheng Mo Shiji (M68k label V101HK) (ARM label V101HK, ROM 06/20/05 S.V.G V100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k label was 101 but it's same as v100
 GAME( 2005, svgtw,        svg,       pgm_arm_type3_33m,      svgtw,     pgm_arm_type3_state,  init_svgpcb,  ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation / Sheng Mo Shiji (M68k label V101TW) (ARM label V101TW, ROM 06/20/05 S.V.G V100)", MACHINE_NOT_WORKING ) // 68k label was 101 but it's same as v100
 GAME( 2005, svgpcb,       svg,       pgm_arm_type3_33m,      svgpcb,    pgm_arm_type3_state,  init_svgpcb,  ROT0,   "IGS / Idea Factory (AMI license)", "S.V.G. - Spectral vs Generation / Sheng Mo Shiji (M68k label V100JP) (ARM label V100JP, ROM 05/12/05 S.V.G V100) (Japan, JAMMA PCB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// ARM time: 15:31:35 // PCB version only released in Japan?
 

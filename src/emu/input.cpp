@@ -800,7 +800,7 @@ std::string input_manager::code_name(input_code code) const
 	}
 
 	// devcode part comes from the item name
-	const char *devcode = item->name();
+	std::string_view devcode = item->name();
 
 	// determine the modifier part
 	const char *modifier = (*modifier_string_table)[code.item_modifier()];
@@ -808,13 +808,13 @@ std::string input_manager::code_name(input_code code) const
 	// devcode is redundant with joystick switch left/right/up/down
 	if (device_class == DEVICE_CLASS_JOYSTICK && code.item_class() == ITEM_CLASS_SWITCH)
 		if (code.item_modifier() >= ITEM_MODIFIER_LEFT && code.item_modifier() <= ITEM_MODIFIER_DOWN)
-			devcode = "";
+			devcode = std::string_view();
 
 	// concatenate the strings
 	std::string str(devclass);
 	if (!devindex.empty())
 		str.append(" ").append(devindex);
-	if (devcode[0] != 0)
+	if (!devcode.empty())
 		str.append(" ").append(devcode);
 	if (modifier != nullptr)
 		str.append(" ").append(modifier);
@@ -830,6 +830,8 @@ std::string input_manager::code_name(input_code code) const
 
 std::string input_manager::code_to_token(input_code code) const
 {
+	using namespace std::literals;
+
 	// determine the devclass part
 	const char *devclass = (*devclass_token_table)[code.device_class()];
 	if (devclass == nullptr)
@@ -842,14 +844,14 @@ std::string input_manager::code_to_token(input_code code) const
 
 	// determine the itemid part; look up in the table if we don't have a token
 	input_device_item *item = item_from_code(code);
-	const char *devcode = (item != nullptr) ? item->token() : "UNKNOWN";
+	std::string_view devcode = item ? item->token() : "UNKNOWN"sv;
 
 	// determine the modifier part
 	const char *modifier = (*modifier_token_table)[code.item_modifier()];
 
 	// determine the itemclass part; if we match the native class, we don't include this
 	const char *itemclass = "";
-	if (item == nullptr || item->itemclass() != code.item_class())
+	if (!item || (item->itemclass() != code.item_class()))
 		itemclass = (*itemclass_token_table)[code.item_class()];
 
 	// concatenate the strings
@@ -994,14 +996,16 @@ bool input_manager::seq_pressed(const input_seq &seq)
 	bool first = true;
 	for (int codenum = 0; ; codenum++)
 	{
-		// handle NOT
 		input_code code = seq[codenum];
 		if (code == input_seq::not_code)
+		{
+			// handle NOT
 			invert = true;
-
-		// handle OR and END
+		}
 		else if (code == input_seq::or_code || code == input_seq::end_code)
 		{
+			// handle OR and END
+
 			// if we have a positive result from the previous set, we're done
 			if (result || code == input_seq::end_code)
 				break;
@@ -1011,10 +1015,10 @@ bool input_manager::seq_pressed(const input_seq &seq)
 			invert = false;
 			first = true;
 		}
-
-		// handle everything else as a series of ANDs
 		else
 		{
+			// handle everything else as a series of ANDs
+
 			// if this is the first in the sequence, result is set equal
 			if (first)
 				result = code_pressed(code) ^ invert;
@@ -1313,9 +1317,9 @@ void input_manager::seq_from_tokens(input_seq &seq, std::string_view string)
 //  controller based on device map table
 //-------------------------------------------------
 
-bool input_manager::map_device_to_controller(const devicemap_table_type &devicemap_table)
+bool input_manager::map_device_to_controller(const devicemap_table &table)
 {
-	for (const auto &it : devicemap_table)
+	for (const auto &it : table)
 	{
 		std::string_view deviceid = it.first;
 		std::string_view controllername = it.second;

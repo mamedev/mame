@@ -150,6 +150,7 @@ CPUS["UPD78K"] = true
 CPUS["KS0164"] = true
 --CPUS["COPS1"] = true
 CPUS["MEG"] = true
+CPUS["F2MC16"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -456,6 +457,7 @@ MACHINES["AM79C90"] = true
 --MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AMIGAFDC"] = true
+--MACHINES["APPLEPIC"] = true
 MACHINES["AT_KEYBC"] = true
 MACHINES["AT28C16"] = true
 --MACHINES["AT28C64B"] = true

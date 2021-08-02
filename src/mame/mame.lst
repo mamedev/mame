@@ -203,6 +203,7 @@ polarisa                        // PS  (c) 1980 Taito
 polarisb                        // PS  (c) 1980 Taito
 polarisbr                       // PS  (c) 1981 Taito do Brasil
 polariso                        // PS  (c) 1980 Taito
+resclunar                       // bootleg (Niemer)
 rollingc                        // Nichibutsu
 schaser                         // RT  Taito
 schasera                        // RT  Taito
@@ -1483,6 +1484,9 @@ f2                              //
 
 @source:apricotp.cpp
 fp                              //
+
+@source:apxen.cpp
+apxen                           // 1985 ACT
 
 @source:aquarium.cpp
 aquarium                        // (c) 1996 Excellent System
@@ -10230,13 +10234,15 @@ minijook                        //
 
 @source:cedar_magnet.cpp
 cedmag
-mag_time
-mag_exzi
-mag_xain
-mag_war
-mag_wara
 mag_burn
 mag_day
+mag_drac
+mag_exzi
+mag_pdak
+mag_time
+mag_war
+mag_wara
+mag_xain
 
 @source:centiped.cpp
 bullsdrt                        // (c) 1985 Shinkai
@@ -12557,6 +12563,9 @@ dpb7000                         //
 
 @source:dps1.cpp
 dps1                            //
+
+@source:dpsv55.cpp
+dpsv55                          //
 
 @source:dragon.cpp
 d64plus                         // Dragon 64 + Compusense Plus addon
@@ -16280,6 +16289,7 @@ eturtles                        // Entex
 gckong                          // Gakken
 gdigdug                         // Gakken
 ghalien                         // Gakken
+gscobra                         // Gakken
 kingman                         // Tomy
 machiman                        // Bandai
 msthawk                         // Mattel
@@ -34717,6 +34727,7 @@ puzzli2s                        // (c) 2001 Puzzli 2 Super
 py2k2                           // (c) 2001 Photo Y2K2 (M101XX)
 py2k2100                        // (c) 2000 Photo Y2K2 (ver. 100)
 svg                             // (c) 2003 Spectral vs Generation
+svghk                           //
 svgpcb                          //
 svgtw                           //
 theglad                         // (c) 2003 The Gladiator
@@ -39860,7 +39871,8 @@ nprincesu                       // 834-5677 (c) 1985 (S1)
 pitfall2                        // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
 pitfall2a                       // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
 pitfall2u                       // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
-raflesia                        // 834-5753 (c) 1985 Coreland / Sega (S1)
+raflesia                        // 834-5753 (c) 1986 Coreland / Sega (S1)
+raflesiau                       // 834-5191 (c) 1986 Coreland / Sega (S1)
 regulus                         // 834-5328?(c) 1983 (S1)
 reguluso                        // 834-5328?(c) 1983 (S1)
 regulusu                        // 834-5328?(c) 1983 (S1)

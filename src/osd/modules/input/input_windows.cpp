@@ -167,4 +167,4 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 		}
 }
 
-#endif
+#endif // defined(OSD_WINDOWS) || defined(OSD_UWP)

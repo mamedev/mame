@@ -487,10 +487,10 @@ void tx0_64kw_device::execute_instruction_64kw()
 				/* (0.8) CLR = Clear the right nine digital positions of the AC */
 				AC &= 0777000;
 
-			if (((MAR & 0030000) >> 12) == 1)
+			if (((MAR & 0030000) >> 12) == 2)
 				/* (0.8) IOS In-Out Stop = Stop machine so that an In-Out command
 				    (specified by digits 6 7 8 of MAR) may be executed */
-				m_ioh = 1;
+				m_ios = 0;
 
 			if (((MAR & 0007000) >> 9) != 0)
 			{
@@ -545,8 +545,6 @@ void tx0_64kw_device::execute_instruction_64kw()
 			AC = AC + MBR;
 			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 
-			if (AC == 0777777)      /* check for -0 */
-				AC = 0;
 			break;
 
 		case 2:     /* TRansfer on Negative */
@@ -579,7 +577,6 @@ void tx0_64kw_device::execute_instruction_64kw()
 			if ((MAR & 0000003) == 2)
 				/* (1.3) LMB = Store the contents of the LR in the MBR. */
 				MBR = LR;
-			break;
 
 			if (((MAR & 0000600) >> 7) == 1)
 				/* (1.3) MLR = Store the contents of the MBR (memory buffer
@@ -621,9 +618,6 @@ void tx0_64kw_device::execute_instruction_64kw()
 
 				AC = AC + MBR;
 				AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
-
-				if (AC == 0777777)      /* check for -0 */
-					AC = 0;
 			}
 
 			if (((MAR & 0030000) >> 12) == 3)
@@ -639,8 +633,6 @@ void tx0_device::indexed_address_eval()
 {
 	MAR = MAR + XR;
 	MAR = (MAR + (MAR >> 14)) & 0037777;    /* propagate carry around */
-	//if (MAR == 0037777)       /* check for -0 */
-	//  MAR = 0;
 	if (MAR & 0020000)          /* fix negative (right???) */
 		MAR = (MAR + 1) & 0017777;
 }
@@ -791,6 +783,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 					/* (5 is undefined) */
 					int index = (MAR & 0007000) >> 9;
 
+					m_ios = 0;
 					call_io_handler(index);
 					m_ioh = 1;
 				}
@@ -837,15 +830,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 			if (m_cycle)
 			{   /* cycle 1 */
 				AC = tx0_read(MAR) + 1;
-
-				#if 0
-					AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
-					if (AC == 0777777)      /* check for -0 (right???) */
-						AC = 0;
-				#else
-					if (AC >= 0777777)
-						AC = (AC + 1) & 0777777;
-				#endif
+				AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 			}
 			else
 			{   /* cycle 2 */
@@ -873,8 +858,6 @@ void tx0_8kw_device::execute_instruction_8kw()
 			AC = AC + MBR;
 			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 
-			if (AC == 0777777)      /* check for -0 */
-				AC = 0;
 			break;
 
 		case 10:    /* LoaD indeX */
@@ -888,8 +871,6 @@ void tx0_8kw_device::execute_instruction_8kw()
 			XR = XR + ((MBR & 0017777) | ((MBR >> 4) & 0020000));
 			XR = (XR + (XR >> 14)) & 0037777;   /* propagate carry around */
 
-			//if (XR == 0037777)        /* check for -0 */
-			//  XR = 0;
 			break;
 
 		case 13:    /* Load Lr indeXed */
@@ -1027,9 +1008,6 @@ void tx0_8kw_device::execute_instruction_8kw()
 
 					AC = AC + MBR;
 					AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
-
-					if (AC == 0777777)      /* check for -0 */
-						AC = 0;
 				}
 
 				if ((! (MAR & 0000004)) && (MAR & 0000001))

@@ -316,7 +316,9 @@ tmu_state::tmu_state() :
 	m_ram(nullptr),
 	m_mask(0),
 	m_basemask(0xfffff),
-	m_baseshift(3)
+	m_baseshift(3),
+	m_regdirty(true),
+	m_texel_lookup(nullptr)
 {
 }
 
@@ -578,6 +580,7 @@ void debug_stats::add_emulation_stats(thread_stats_block const &block)
 
 void debug_stats::reset()
 {
+	m_swaps = 0;
 	m_stalls = 0;
 	m_triangles = 0;
 	m_pixels_in = 0;

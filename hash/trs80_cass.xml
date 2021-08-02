@@ -752,5 +752,17 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 			</dataarea>
 		</part>
 	</software>
+	<software name="hoppy">
+		<description>Hoppy</description>
+		<year>1981</year>
+		<publisher>Dubois and McNamara</publisher>
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then HG then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" /><!-- sound only works on [3,4] -->
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x22c0">
+				<rom name="hoppy.cas" size="0x22c0" crc="1698c5f5" sha1="e1fc8e3d72571723a25b51f7495822185a1dab2d"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

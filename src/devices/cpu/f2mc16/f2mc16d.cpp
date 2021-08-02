@@ -1199,17 +1199,19 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 			format_imm_signed(stream, s32(s8(opcodes.r8(pc + bytes++))));
 		break;
 
-	case 0x18:
-		util::stream_format(stream, "%-8sA, ", "ADDL");
-		format_imm_signed(stream, s32(opcodes.r32(pc + bytes)));
+	case 0x18: case 0x19:
+	{
+		u32 operand = opcodes.r32(pc + bytes);
+		if (operand == 0x00000001)
+			util::stream_format(stream, "%-8sA", BIT(op, 0) ? "DECL" : "INCL");
+		else
+		{
+			util::stream_format(stream, "%-8sA, ", BIT(op, 0) ? "SUBL" : "ADDL");
+			format_imm_signed(stream, s32(operand));
+		}
 		bytes += 4;
 		break;
-
-	case 0x19:
-		util::stream_format(stream, "%-8sA, ", "SUBL");
-		format_imm_signed(stream, s32(opcodes.r32(pc + bytes)));
-		bytes += 4;
-		break;
+	}
 
 	case 0x1a:
 		util::stream_format(stream, "%-8sILM, ", "MOV");
@@ -1222,20 +1224,14 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 		bytes += 4;
 		break;
 
-	case 0x20: case 0x30:
+	case 0x20:
 		util::stream_format(stream, "%-8sA, ", "ADD");
-		if (BIT(op, 4))
-			format_imm_signed(stream, s32(s8(opcodes.r8(pc + bytes++))));
-		else
-			format_dir(stream, segm, opcodes.r8(pc + bytes++));
+		format_dir(stream, segm, opcodes.r8(pc + bytes++));
 		break;
 
-	case 0x21: case 0x31:
+	case 0x21:
 		util::stream_format(stream, "%-8sA, ", "SUB");
-		if (BIT(op, 4))
-			format_imm_signed(stream, s32(s8(opcodes.r8(pc + bytes++))));
-		else
-			format_dir(stream, segm, opcodes.r8(pc + bytes++));
+		format_dir(stream, segm, opcodes.r8(pc + bytes++));
 		break;
 
 	case 0x22:
@@ -1269,24 +1265,12 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 		util::stream_format(stream, "%-8sA", "MULU");
 		break;
 
-	case 0x28: case 0x38:
+	case 0x28:
 		util::stream_format(stream, "%-8sA", "ADDW");
-		if (BIT(op, 4))
-		{
-			stream << ", ";
-			format_imm_signed(stream, s32(s16(opcodes.r16(pc + bytes))));
-			bytes += 2;
-		}
 		break;
 
-	case 0x29: case 0x39:
+	case 0x29:
 		util::stream_format(stream, "%-8sA", "SUBW");
-		if (BIT(op, 4))
-		{
-			stream << ", ";
-			format_imm_signed(stream, s32(s16(opcodes.r16(pc + bytes))));
-			bytes += 2;
-		}
 		break;
 
 	case 0x2a:
@@ -1341,6 +1325,19 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 		util::stream_format(stream, "%-8sA", "MULUW");
 		break;
 
+	case 0x30: case 0x31:
+	{
+		u8 operand = opcodes.r8(pc + bytes++);
+		if (operand == 0x01)
+			util::stream_format(stream, "%-8sA", BIT(op, 0) ? "DEC" : "INC");
+		else
+		{
+			util::stream_format(stream, "%-8sA, ", BIT(op, 0) ? "SUB" : "ADD");
+			format_imm_signed(stream, s32(s8(operand)));
+		}
+		break;
+	}
+
 	case 0x32:
 		util::stream_format(stream, "%-8sA", "SUBC");
 		break;
@@ -1363,6 +1360,20 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 	case 0x37:
 		util::stream_format(stream, "%-8sA", "NOT");
 		break;
+
+	case 0x38: case 0x39:
+	{
+		u16 operand = opcodes.r16(pc + bytes);
+		if (operand == 0x0001)
+			util::stream_format(stream, "%-8sA", BIT(op, 0) ? "DECW" : "INCW");
+		else
+		{
+			util::stream_format(stream, "%-8sA, ", BIT(op, 0) ? "SUBW" : "ADDW");
+			format_imm_signed(stream, s32(s16(operand)));
+		}
+		bytes += 2;
+		break;
+	}
 
 	case 0x3a:
 		util::stream_format(stream, "%-8sA, ", "CWBNE");
@@ -1439,7 +1450,10 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 
 	case 0x49: case 0x59:
 		util::stream_format(stream, "%-8s", "MOVW");
-		format_dir(stream, segm, opcodes.r8(pc + bytes++));
+		if (BIT(op, 4))
+			format_io(stream, opcodes.r8(pc + bytes++));
+		else
+			format_dir(stream, segm, opcodes.r8(pc + bytes++));
 		stream << ", A";
 		break;
 
