@@ -53468,6 +53468,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Gluk Video</publisher>
 		<info name="alt_title" value="El Bloque Magico (on the cart label)"/>
 		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="bloque magico, el (spain) (gluk video) (unl).chr" size="32768" crc="4ed2d601" sha1="b2983c47eed95d94998a074c6fa1a6e9e91cfe54" offset="00000" status="baddump" />
 			</dataarea>
@@ -61696,6 +61698,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="aladdin 4 (unl) [p2].prg" size="262144" crc="9c2e973d" sha1="bf9a3fc1bedac091f78401bbb459affd7944fe8f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amheros">
+		<description>The Ancient Modern Heros</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fs6" />
+			<dataarea name="prg" size="131072">
+				<rom name="amheros.prg" size="131072" crc="21ac5e20" sha1="2576eeb3bb25e40be633ff457b7323fd622a6274" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="amheros.chr" size="262144" crc="b51f4284" sha1="5c95b79fb241d992f0f1a5534729667a5e03bdd2" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -73901,13 +73918,13 @@ Other
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="sbros11" />
+			<feature name="pcb" value="BTL-SUPERBROS11" />
 			<dataarea name="chr" size="131072">
 				<rom name="super bros 10 kung fu mari (jackie chan hack).chr" size="131072" crc="b0382d58" sha1="d754d208564573fe5ea66111595f3b7e76cd2f33" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="super bros 10 kung fu mari (jackie chan hack).prg" size="131072" crc="43e1ec79" sha1="cabc927a5693523ada990adcf4f82227c43c8c64" offset="00000" status="baddump" />
+				<rom name="super bros 10 kung fu mari (jackie chan hack).prg" size="131072" crc="dc37d3db" sha1="8fcff188ca9425859bc7463689604a515139b6b1" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74053,13 +74070,13 @@ Other
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="sbros11" />
+			<feature name="pcb" value="BTL-SUPERBROS11" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mario 14 (unl).chr" size="131072" crc="c54e1415" sha1="59e4262c2a67655d11c0b839e29cd46a2f41655a" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="super mario 14 (unl).prg" size="131072" crc="d838a08d" sha1="f55cd39674eacc72ffdcb5fe4ec4d1a4fac023ab" offset="00000" status="baddump" />
+				<rom name="super mario 14 (unl).prg" size="131072" crc="f17d41f2" sha1="528891aaada0ebd4e57257bd928e89d105760ea5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74124,22 +74141,6 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="super mario bros. 9 (unl).prg" size="131072" crc="32f22059" sha1="7257c3d165a09b8e21962db61730fa9d49840d81" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb11a" cloneof="advisln3">
-		<description>Super Bros. 11 (Takahashi Meijin no Boukenjima III pirate, Hacked?)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="super mario bros. 11 (unl) [hm04].chr" size="131072" crc="5c5d3aca" sha1="b4e087212b14ece5f1cf7a50e89805156e2b9058" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="super mario bros. 11 (unl) [hm04].prg" size="131072" crc="99ea0d0e" sha1="6ddcb429995518c31824018f6c0e465b75a631b5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74221,6 +74222,22 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="super mario bros. 17 (unl).prg" size="131072" crc="6071291e" sha1="b7c094f3fcd4585d31c1316e30440dc8022000df" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smarids2" cloneof="chipndl2">
+		<description>Super Mari - Mali Lugi - Mari no Daisakusen 2 (Chip 'n Dale 2 pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sbros11" />
+			<feature name="pcb" value="BTL-SUPERBROS11" />
+			<dataarea name="prg" size="131072">
+				<rom name="smarids2.prg" size="131072" crc="4e23e888" sha1="0a317ecd943a7c262841912a90e2bc3216e39921" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="smarids2.chr" size="131072" crc="f90ce953" sha1="0f8bb9c7413bf5e22d0055950a5b0e6201385e4d" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74381,8 +74398,8 @@ Other
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="sbros11" />
+			<feature name="pcb" value="BTL-SUPERBROS11" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mali hero legends (unl).chr" size="131072" crc="68a91ed3" sha1="5ca1f9894c2e12adb9f21d056ca58375a67a2b71" offset="00000" status="baddump" />
 			</dataarea>
