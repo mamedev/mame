@@ -65,8 +65,14 @@ protected:
 	int left_offset = 3;
 
 	double headtemp[7] = {0.0}; // initialize to zero - nan bugs
-	int heattime=350;   // time in usec to hit max temp  (smaller numbers mean faster)
-	int decaytime=100;  // time in usec to cool off
+//  int heattime=3500;   // time in usec to hit max temp  (smaller numbers mean faster)  5 levels
+
+// equal 4 levels
+//  int heattime=4500;   // time in usec to hit max temp  (smaller numbers mean faster)
+// int heattime=2000;   // time in usec to hit max temp  (smaller numbers mean faster)  5 levels saturated in the middle
+//      int heattime=4000;   // time in usec to hit max temp  (smaller numbers mean faster)  5 levels
+				int heattime=3000;   // time in usec to hit max temp  (smaller numbers mean faster)  5 levels  25 percent   68/255 was darkest at 4000
+	int decaytime=1000;  // time in usec to cool off
 
 //  int hstepper;
 //  int vstepper;
@@ -99,11 +105,14 @@ protected:
 //  int setbit(int& a, int bit, int value) {a=(a&~bit)|(bit*((value!=0)?1:0)); return a;}
 
 // this setbit works on a bitnumber
-int setbit(int& a, int bit, int value) {a=(a&~(1<<bit))|((1<<bit)*((value!=0)?1:0)); return a;}
+//int setbit(int& a, int bit, int value) {a=(a&~(1<<bit))|((1<<bit)*((value!=0)?1:0)); return a;}
+int setbit(int& a, int bit, int value) {a=(a&~(1<<bit))|((((value!=0)?(1<<bit):0))); return a;}
 	void write_snapshot_to_file();
+
+	void darken_pixel(double headtemp, u32& pixel);
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(A2BUS_SILENTYPE,      a2bus_silentype_device)
+DECLARE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device)
 #endif // MAME_BUS_A2BUS_A2SILENTYPE_H

@@ -125,6 +125,16 @@ covers using the Apple II Product Diagnostics Disk to perform diagnostics on the
 
 Disk named "Apple II+ Products diagnostic 652-0334.dsk"
 
+
+https://www.folklore.org/StoryView.py?project=Macintosh&story=What_Hath_Woz_Wrought
+Story about silentype development
+Author: Andy Hertzfeld
+Date:   September 1979
+
+
+https://www.folklore.org/StoryView.py?project=Macintosh&story=Apple_II_Mouse_Card.txt
+
+Mentions using the 6522 chip in Apple III to interface to the Silentype thermal printer.
 ======================================================================
 
 
@@ -165,22 +175,24 @@ Disk named "Apple II+ Products diagnostic 652-0334.dsk"
 #include "emuopts.h"
 #include "fileio.h"
 #include "png.h"
+#include <algorithm>
+#include <bitset>
 
-//#include "ex800.lh"
-//defines from OpenEmulator
-
-#define SILENTYPE_DATA                  (0)
-#define SILENTYPE_SHIFTCLOCKB           (1)  // SHIFT CLOCK (CLOCKED WITH PHI-1)
-#define SILENTYPE_STORECLOCK            (2)
-#define SILENTYPE_DATAWRITEENABLED      (3)  // OUTPUT ENABLE
-#define SILENTYPE_SHIFTCLOCKA           (4)  // LATCHED SHIFT CLOCK
-#define SILENTYPE_ROMENABLED            (5)
-#define SILENTYPE_SHIFTCLOCKDISABLED    (6)  // SHIFT CLOCK OUTPUT DISABLE
+// write bits @ c091
+#define SILENTYPE_DATA                (0)
+#define SILENTYPE_SHIFTCLOCKB         (1)  // SHIFT CLOCK (CLOCKED WITH PHI-1)
+#define SILENTYPE_STORECLOCK          (2)
+#define SILENTYPE_DATAWRITEENABLE     (3)  // OUTPUT ENABLE
+#define SILENTYPE_SHIFTCLOCKA         (4)  // LATCHED SHIFT CLOCK
+#define SILENTYPE_ROMENABLE           (5)
+#define SILENTYPE_SHIFTCLOCKDISABLE   (6)  // SHIFT CLOCK OUTPUT DISABLE
 
 // read bits @ c094
-#define SILENTYPE_STATUS                (7)
-#define SERIAL_DATA_Q15                 (7)  // shift register Q15 output
-#define SERIAL_CLOCK_STATUS             (6)  // current shift clock output, read on A01
+#define SILENTYPE_STATUS              (7)  // margin switch status
+
+// read bits @ c092
+#define SERIAL_DATA_Q15               (7)  // shift register Q15 output
+#define SERIAL_CLOCK_STATUS           (6)  // current shift clock output, read on A01
 
 
 /***************************************************************************
@@ -191,7 +203,7 @@ Disk named "Apple II+ Products diagnostic 652-0334.dsk"
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE,      a2bus_silentype_device, "a2silentype", "Silentype")
+DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, "a2silentype", "Apple Silentype Printer")
 
 #define SILENTYPE_ROM_REGION  "silentype_rom"
 
@@ -369,62 +381,120 @@ void a2bus_silentype_device::write_snapshot_to_file()
 -------------------------------------------------*/
 
 
+void a2bus_silentype_device::darken_pixel(double headtemp, u32& pixel)
+{
+
+//              u8 intensity = headtemp*7.0;  // seven gradations
+				u8 intensity = headtemp*15.0;  // seven gradations
+					//darken a pixel based on intensity
+
+	//              int pixelval = m_bitmap.pix32(ypixel,xpixel);
+					u32 pixelval = pixel;
+					int darkenval;
+					if (intensity == 0) darkenval = 0;
+//                  else darkenval = intensity * 0x222222+0x111111;
+					else darkenval = intensity * 0x111111;
+
+					pixelval &= 0xffffff;
+
+					int rp = (pixelval & 0xff0000)>>16;
+					int gp = (pixelval & 0x00ff00)>>8;
+					int bp = (pixelval & 0x0000ff)>>0;
+
+					int rd = (darkenval & 0xff0000)>>16;
+					int gd = (darkenval & 0x00ff00)>>8;
+					int bd = (darkenval & 0x0000ff)>>0;
+
+					int r = (rp >= rd) ? rp-rd : 0;    // subtract the amount to darken
+					int g = (gp >= gd) ? gp-gd : 0;
+					int b = (bp >= bd) ? bp-bd : 0;
+
+//                  u32 r = std::min(rp,rd);
+//                  u32 g = std::min(gp,gd);
+//                  u32 b = std::min(bp,bd);
+
+					pixelval = (r<<16)|(g<<8)|(b<<0);
+
+	//              m_bitmap.pix32(ypixel,xpixel) = pixelval;
+					pixel = pixelval;
+}
+
+
+
 void a2bus_silentype_device::update_printhead(uint8_t headbits)
 {
 		printf("PRINTHEAD %x\n",headbits);
 		double time_elapsed = machine().time().as_double() - last_update_time;
 		last_update_time = machine().time().as_double();
 
-		int intensity = 0;
+		printf("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",time_elapsed, time_elapsed*1e6, std::bitset<8>(headbits).to_string().c_str());
 
-		for (int i=0;i<7;i++) {
-		headtemp[i]= headtemp[i] +
-			( (lastheadbits & (1<<i)) ?
-				(time_elapsed / ((double) heattime  / 100000)) :
-			  - (time_elapsed / ((double) decaytime / 100000)) );
-		if (headtemp[i] < 0.0) headtemp[i]=0;
-		if (headtemp[i] > 1.0) headtemp[i]=1.0;
-		}
+//      int intensity = 0;
 
-		for (int j=0;j<7;j++)
-		{
-			intensity = headtemp[j]*7.0;
-			printf("intensity %x = %x  %f\n",j,intensity,headtemp[j]);
 
-			// to get the left moving  rows and right rows to align, need to do a little fudging
-			int xpixel= m_xpos + ((xdirection==1) ? right_offset : left_offset);
-			int ypixel= (m_ypos*7/4)+(6-j);
-			if ((xpixel>=0) && (xpixel <= (PAPER_WIDTH-1)))
-			{
-				//darken a pixel based on intensity
+		//if (time_elapsed < (double) decaytime(1.0e6) & headbits==0)
+		//{
 
-//              int pixelval = m_bitmap.pix32(ypixel,xpixel);
-				int pixelval = m_bitmap.pix(ypixel,xpixel);
-				int darkenval;
-				if (intensity == 0) darkenval = 0;
-				else darkenval = intensity * 0x222222+0x111111;
-
-				pixelval &= 0xffffff;
-
-				int rp = (pixelval & 0xff0000)>>16;
-				int gp = (pixelval & 0x00ff00)>>8;
-				int bp = (pixelval & 0x0000ff)>>0;
-
-				int rd = (darkenval & 0xff0000)>>16;
-				int gd = (darkenval & 0x00ff00)>>8;
-				int bd = (darkenval & 0x0000ff)>>0;
-
-				int r = (rp >= rd) ? rp-rd : 0;
-				int g = (gp >= gd) ? gp-gd : 0;
-				int b = (bp >= bd) ? bp-bd : 0;
-
-				pixelval = (r<<16)|(g<<8)|(b<<0);
-
-//              m_bitmap.pix32(ypixel,xpixel) = pixelval;
-				m_bitmap.pix(ypixel,xpixel) = pixelval;
+			for (int i=0;i<7;i++) {
+			headtemp[i]= headtemp[i] +
+				( (lastheadbits & (1<<i)) ?
+					(time_elapsed / ((double) heattime  / 1.0E6)) :
+				  - (time_elapsed / ((double) decaytime / 1.0E6)) );
+			if (headtemp[i] < 0.0) headtemp[i]=0;
+			if (headtemp[i] > 1.0) headtemp[i]=1.0;
 			}
-		}
 
+			for (int j=0;j<7;j++)
+			{
+
+				int xpixel= m_xpos + ((xdirection==1) ? right_offset : left_offset);
+				int ypixel= (m_ypos*7/4)+(6-j);
+				if ((xpixel>=0) && (xpixel <= (PAPER_WIDTH-1)))
+					darken_pixel(headtemp[j],m_bitmap.pix(ypixel,xpixel));
+	/*          intensity = headtemp[j]*7.0;
+	//          printf("intensity %x = %x  %f\n",j,intensity,headtemp[j]);
+
+	            // to get the left moving  rows and right rows to align, need to do a little fudging
+	            int xpixel= m_xpos + ((xdirection==1) ? right_offset : left_offset);
+	            int ypixel= (m_ypos*7/4)+(6-j);
+	            if ((xpixel>=0) && (xpixel <= (PAPER_WIDTH-1)))
+	            {
+	                //darken a pixel based on intensity
+
+	//              int pixelval = m_bitmap.pix32(ypixel,xpixel);
+	                int pixelval = m_bitmap.pix(ypixel,xpixel);
+	                int darkenval;
+	                if (intensity == 0) darkenval = 0;
+	                else darkenval = intensity * 0x222222+0x111111;
+
+	                pixelval &= 0xffffff;
+
+	                int rp = (pixelval & 0xff0000)>>16;
+	                int gp = (pixelval & 0x00ff00)>>8;
+	                int bp = (pixelval & 0x0000ff)>>0;
+
+	                int rd = (darkenval & 0xff0000)>>16;
+	                int gd = (darkenval & 0x00ff00)>>8;
+	                int bd = (darkenval & 0x0000ff)>>0;
+
+	                int r = (rp >= rd) ? rp-rd : 0;    // subtract the amount to darken
+	                int g = (gp >= gd) ? gp-gd : 0;
+	                int b = (bp >= bd) ? bp-bd : 0;
+
+//                  u32 r = std::min(rp,rd);
+//                  u32 g = std::min(gp,gd);
+//                  u32 b = std::min(bp,bd);
+
+	                pixelval = (r<<16)|(g<<8)|(b<<0);
+
+	//              m_bitmap.pix32(ypixel,xpixel) = pixelval;
+	                m_bitmap.pix(ypixel,xpixel) = pixelval;
+
+
+	            }
+	            */
+			}
+//      }
 		lastheadbits = headbits;
 }
 
@@ -486,18 +556,24 @@ void a2bus_silentype_device::update_cr_stepper(uint8_t hstepper)
 		const int drivetable[4]={3,9,12,6};
 		const int halfsteptable[4]={2,4,8,1};
 
-		if (hstepper!=0){
-		newpageflag=0;
+		if (hstepper != 0){
+		newpageflag = 0;
 
-		for(int i=0;i<4;i++)
-			{if (drivetable[i]==hstepperlast)
+		for(int i = 0; i < 4; i++)
+		{
+			if (drivetable[i] == hstepperlast)
+			{
+				if (drivetable[wrap(i + 1, 4)] == hstepper)
 				{
-				if (drivetable[wrap(i+1,4)]==hstepper)
-					{ m_xpos+=1;   xdirection = 1;}
-				else if (drivetable[wrap(i-1,4)]==hstepper)
-					{ m_xpos-=1;   xdirection = -1;  if (m_xpos < 0) m_xpos=0; }
+					m_xpos += 1; xdirection = 1;
+				}
+				else if (drivetable[wrap(i - 1, 4)] == hstepper)
+				{
+					m_xpos -= 1; xdirection = -1;
+					if (m_xpos < 0) m_xpos = 0;
 				}
 			}
+		}
 
 		// ignore half steps
 		halfstepflag=0;
@@ -511,14 +587,13 @@ void a2bus_silentype_device::update_cr_stepper(uint8_t hstepper)
 void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 //  printf("WRITE %x = %x\n",offset+slotno()*0x10+0xc080,data);
-	m_romenable = BIT(data,SILENTYPE_ROMENABLED) ? 1 : 0;  // should be reversed I think because it's NOT ROMENABLE
+	m_romenable = BIT(data,SILENTYPE_ROMENABLE) ? 1 : 0;
 
 	if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 0))
 	{
 //  printf("CLEAR\n");
 		m_shift_reg = 0;
 	}
-//    else if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 1))
 	else if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 1))
 	{
 //      printf("SHIFT\n");
@@ -536,9 +611,7 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 		update_pf_stepper(vstepperbits);
 		update_cr_stepper(hstepperbits);
 		update_printhead(headbits);
-
 	}
-//  else printf("NONE\n");
 }
 
 
@@ -564,9 +637,14 @@ void a2bus_silentype_device::write_cnxx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_silentype_device::read_c800(uint16_t offset)
 {
-  if ((offset>=0x700) && (!m_romenable)) return m_ram[offset-0x700];
- else   return m_rom[offset];
-
+	if ((offset>=0x700) && (!m_romenable))
+	{
+		return m_ram[offset-0x700];
+	}
+	else
+	{
+		return m_rom[offset];
+	}
 }
 
 /*-------------------------------------------------
@@ -574,6 +652,6 @@ uint8_t a2bus_silentype_device::read_c800(uint16_t offset)
 -------------------------------------------------*/
 void a2bus_silentype_device::write_c800(uint16_t offset, uint8_t data)
 {
-  if (offset >= 0x700) m_ram[(offset-0x700)] = data;
+	if (offset >= 0x700) m_ram[(offset-0x700)] = data;
 }
 
