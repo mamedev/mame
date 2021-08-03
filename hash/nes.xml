@@ -72828,26 +72828,6 @@ Other
 		</part>
 	</software>
 
-<!-- This needs more investigations: is it ripped from a multicart? was it from a standalone cart?  does it really use mapper 0
-(and if so why the invalid code)?  is it the same fancy bros of a lot of multicarts (where the game have the wrong mirroring,
-resulting in tons of glitches? -->
-	<software name="fancybro" cloneof="smb" supported="no">
-		<description>Fancy Bros. (Super Mario Bros. pirate)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-256" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="8192">
-				<rom name="fancy bros (unl).chr" size="8192" crc="33b3bebd" sha1="9e4e974db73043dc26cbd8a832c77f8767be5568" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="fancy bros (unl).prg" size="32768" crc="4f17e986" sha1="9de0d7726b751a7a74842c8cc865d8a339785272" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="felixjer" cloneof="ttoonadv">
 		<description>Felix vs Jerry (Tiny Toon Adventures pirate)</description>
 		<year>19??</year>
