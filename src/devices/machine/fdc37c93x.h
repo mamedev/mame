@@ -150,8 +150,8 @@ private:
 	devcb_write_line m_nrts2_callback;
 	required_device<smc37c78_device> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
-	required_device<ns16450_device> pc_serial1_comdev;
-	required_device<ns16450_device> pc_serial2_comdev;
+	required_device<ns16550_device> pc_serial1_comdev;
+	required_device<ns16550_device> pc_serial2_comdev;
 	required_device<ds12885_device> ds12885_rtcdev;
 	required_device<kbdc8042_device> m_kbdc;
 	int sysopt_pin;

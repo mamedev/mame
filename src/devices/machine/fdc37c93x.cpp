@@ -255,13 +255,13 @@ void fdc37c93x_device::device_add_mconfig(machine_config &config)
 	pc_lpt_lptdev->irq_handler().set(FUNC(fdc37c93x_device::irq_parallel_w));
 
 	// serial ports
-	NS16450(config, pc_serial1_comdev, XTAL(1'843'200)); // or NS16550 ?
+	NS16550(config, pc_serial1_comdev, XTAL(1'843'200));
 	pc_serial1_comdev->out_int_callback().set(FUNC(fdc37c93x_device::irq_serial1_w));
 	pc_serial1_comdev->out_tx_callback().set(FUNC(fdc37c93x_device::txd_serial1_w));
 	pc_serial1_comdev->out_dtr_callback().set(FUNC(fdc37c93x_device::dtr_serial1_w));
 	pc_serial1_comdev->out_rts_callback().set(FUNC(fdc37c93x_device::rts_serial1_w));
 
-	NS16450(config, pc_serial2_comdev, XTAL(1'843'200));
+	NS16550(config, pc_serial2_comdev, XTAL(1'843'200));
 	pc_serial2_comdev->out_int_callback().set(FUNC(fdc37c93x_device::irq_serial2_w));
 	pc_serial2_comdev->out_tx_callback().set(FUNC(fdc37c93x_device::txd_serial2_w));
 	pc_serial2_comdev->out_dtr_callback().set(FUNC(fdc37c93x_device::dtr_serial2_w));
