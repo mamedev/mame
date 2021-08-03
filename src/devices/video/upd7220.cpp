@@ -826,54 +826,32 @@ void upd7220_device::draw_pixel(int x, int y, int xi, uint16_t tile_data)
 //  draw_line -
 //-------------------------------------------------
 
-void upd7220_device::draw_line(int x, int y)
+void upd7220_device::draw_line()
 {
-	int xi, yi;
 	int d = (m_figs.m_d & 0x2000) ? (int16_t)(m_figs.m_d | 0xe000) : m_figs.m_d;
 	int d1 = (m_figs.m_d1 & 0x2000) ? (int16_t)(m_figs.m_d1 | 0xe000) : m_figs.m_d1;
 	int d2 = (m_figs.m_d2 & 0x2000) ? (int16_t)(m_figs.m_d2 | 0xe000) : m_figs.m_d2;
-	uint16_t pattern = (m_ra[8]) | (m_ra[9]<<8);
-	const int dot_dir[4] = {1, -1, -1, 1};
+	const uint8_t octant = m_figs.m_dir;
 
-	LOG("uPD7220 line check: %d %d %02x %08x %d %d %d\n",x,y,m_figs.m_dir,m_ead,d1,m_figs.m_dc,m_bitmap_mod);
+	LOG("uPD7220 line check: %08x %04x %02x %02x %d %d %d %d\n", m_ead, m_mask, m_bitmap_mod, m_figs.m_dir, m_figs.m_dc, d, d1, d2);
 
-	for(yi = xi = 0; yi <= m_figs.m_dc; yi++)
+	for(int i = 0; i <= m_figs.m_dc; ++i)
 	{
-		switch(m_figs.m_dir & 3)
+		const uint16_t pattern = get_pattern(i & 0xf);
+		write_vram(0, m_bitmap_mod, pattern, m_mask);
+		if (octant & 1)
 		{
-			case 1:
-			case 2:
-				draw_pixel(yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, xi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
-				break;
-			default:
-				draw_pixel(xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, yi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
-				break;
-		}
-		if(d > 0)
-		{
-			xi++;
-			d += d2;
+			m_figs.m_dir = (d < 0) ? (octant + 1) & 7 : octant;
 		}
 		else
-			d += d1;
+		{
+			m_figs.m_dir = (d < 0) ? octant : (octant + 1) & 7;
+		}
+		d += ((d < 0 ) ? d1 : d2);
+		next_pixel(m_figs.m_dir);
 	}
-
-	switch(m_figs.m_dir & 3)
-	{
-		case 1:
-		case 2:
-			x += yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
-			y += xi * dot_dir[m_figs.m_dir >> 1];
-			break;
-		default:
-			x += xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
-			y += yi * dot_dir[m_figs.m_dir >> 1];
-			break;
-	}
-
-	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
-	m_dad = x & 0x0f;
 }
+
 
 //-------------------------------------------------
 //  draw_arc -
@@ -1441,7 +1419,7 @@ void upd7220_device::process_fifo()
 		if(m_figs.m_figure_type == 0)
 			draw_pixel(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch),m_dad,(m_ra[8]) | (m_ra[9]<<8));
 		else if(m_figs.m_figure_type == 1)
-			draw_line(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
+			draw_line();
 		else if(m_figs.m_figure_type == 4)
 			draw_arc(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
 		else if(m_figs.m_figure_type == 8)
