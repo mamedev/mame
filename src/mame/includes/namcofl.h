@@ -74,7 +74,7 @@ private:
 	}
 
 	uint32_t unk1_r();
-	uint32_t network_r();
+	uint8_t network_r(offs_t offset);
 	uint32_t sysreg_r();
 	void sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void c116_w(offs_t offset, uint8_t data);
