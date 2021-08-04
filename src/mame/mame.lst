@@ -20102,6 +20102,7 @@ trojanr                         // 4/1986 (c) 1986 + Romstar
 
 @source:lwriter.cpp
 lwriter                         // Apple LaserWriter
+lwriter2nt                      // Apple LaserWriter II NT
 
 @source:lynx.cpp
 lynx                            // Atari Lynx Handheld
