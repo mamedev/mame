@@ -16,7 +16,8 @@ TODO:
  - 24c01 eeprom (IOLINES)
  - timing
  - unknown reads/writes
- - sound
+ - improve sound hook up
+ - does ppcar only use the VIDC internal DAC?
 
 *************************************************************************************************************
 
@@ -127,12 +128,16 @@ Notes:
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/i2cmem.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
+#include "machine/i2cmem.h"
+#include "sound/qs1000.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class ssfindo_state : public driver_device
 {
@@ -144,6 +149,7 @@ public:
 		, m_iomd(*this, "iomd")
 		, m_i2cmem(*this, "i2cmem")
 		, m_flashrom(*this, "flash")
+		, m_qs1000(*this, "qs1000")
 		{ }
 
 	void ssfindo(machine_config &config);
@@ -158,6 +164,7 @@ protected:
 	required_device<arm7500fe_iomd_device> m_iomd;
 	optional_device<i2cmem_device> m_i2cmem;
 	required_region_ptr<uint16_t> m_flashrom;
+	required_device<qs1000_device> m_qs1000;
 
 	void init_common();
 	virtual void machine_start() override;
@@ -169,6 +176,9 @@ protected:
 	uint32_t m_flashType;
 
 	bool m_i2cmem_clock;
+
+	void sound_w(uint8_t data);
+
 private:
 
 	// ssfindo and ppcar
@@ -222,7 +232,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
 	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
 	uint32_t tetfight_unk_r();
-	void tetfight_unk_w(uint32_t data);
 };
 
 //TODO: eeprom  24c01 & 24c02
@@ -359,10 +368,18 @@ uint32_t ssfindo_state::randomized_r()
 	return machine().rand();
 }
 
+void ssfindo_state::sound_w(uint8_t data)
+{
+	m_qs1000->serial_in(data);
+	m_maincpu->spin_until_time(attotime::from_usec(2000)); // give time to the QS1000 CPU to react. TODO: sync things correctly
+}
+
+
 void ssfindo_state::ssfindo_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
+	map(0x032001d8, 0x032001db).nopw(); // 1d8 always 0x10?
 	map(0x03012e60, 0x03012e67).noprw();
 	map(0x03012fe0, 0x03012fe3).w(FUNC(ssfindo_state::debug_w));
 	map(0x03012ff0, 0x03012ff3).noprw();
@@ -372,8 +389,8 @@ void ssfindo_state::ssfindo_map(address_map &map)
 	map(0x03241000, 0x03241003).portr("IN1").nopw();
 	map(0x03242000, 0x03242003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
 	map(0x03243000, 0x03243003).portr("DSW").nopw();
+	map(0x03245002, 0x03245002).w(FUNC(ssfindo_state::sound_w));
 	map(0x0324f000, 0x0324f003).r(FUNC(ssfindo_state::SIMPLEIO_r));
-	map(0x03245000, 0x03245003).nopw(); /* sound ? */
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 	map(0x10000000, 0x11ffffff).ram();
 }
@@ -400,11 +417,6 @@ uint32_t tetfight_state::tetfight_unk_r()
 	return machine().rand();
 }
 
-void tetfight_state::tetfight_unk_w(uint32_t data)
-{
-	//sound latch ?
-}
-
 void tetfight_state::tetfight_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
@@ -412,7 +424,8 @@ void tetfight_state::tetfight_map(address_map &map)
 	map(0x03240000, 0x03240003).portr("IN0");
 	map(0x03240004, 0x03240007).portr("IN1");
 	map(0x03240008, 0x0324000b).portr("DSW2");
-	map(0x03240020, 0x03240023).rw(FUNC(tetfight_state::tetfight_unk_r), FUNC(tetfight_state::tetfight_unk_w));
+	map(0x03240020, 0x03240023).r(FUNC(tetfight_state::tetfight_unk_r));
+	map(0x03240020, 0x03240020).w(FUNC(tetfight_state::sound_w));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 	map(0x10000000, 0x14ffffff).ram();
 }
@@ -554,7 +567,7 @@ INPUT_PORTS_END
 
 void ssfindo_state::ssfindo(machine_config &config)
 {
-	ARM7(config, m_maincpu, 54000000);
+	ARM7(config, m_maincpu, 54_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ssfindo_map);
 
 	I2C_24C01(config, m_i2cmem);
@@ -566,11 +579,20 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
 
-	ARM7500FE_IOMD(config, m_iomd, 54000000);
+	ARM7500FE_IOMD(config, m_iomd, 54_MHz_XTAL);
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
+	qs1000.set_external_rom(true);
+	// qs1000.p1_out().set(FUNC()); // TODO: writes something here
+	qs1000.add_route(0, "lspeaker", 1.0);
+	qs1000.add_route(1, "rspeaker", 1.0);
 }
 
 void ssfindo_state::ppcar(machine_config &config)
@@ -611,15 +633,13 @@ ROM_START( ssfindo )
 	ROM_REGION(0x80, "i2cmem", 0 ) /* eeprom */
 	ROM_LOAD( "24c01a.u36",     0x00, 0x80, CRC(b4f4849b) SHA1(f8f17dc94b2a305048693cfb78d14be57310ce56) )
 
-	ROM_REGION(0x10000, "user4", 0 ) /* qdsp code */
-	ROM_LOAD( "e.u14",      0x000000, 0x10000, CRC(49976f7b) SHA1(eba5b97b81736f3c184ae0c19f1b10c5ae250d51) )
+	ROM_REGION(0x10000, "qs1000:cpu", 0 ) /* qdsp code */
+	ROM_LOAD( "e.u14", 0x00000, 0x10000, CRC(49976f7b) SHA1(eba5b97b81736f3c184ae0c19f1b10c5ae250d51) )
 
-	ROM_REGION(0x100000, "user5", 0 ) /* HWASS 1008S-1  qdsp samples */
-	ROM_LOAD( "1008s-1.u16",    0x000000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) )
-
-	ROM_REGION(0x100000, "user6", 0 ) /* samples - same internal structure as qdsp samples  */
-	ROM_LOAD( "c.u12",      0x000000, 0x80000, CRC(d24b5e56) SHA1(d89983cf4b0a6e0e4137f3799bdbcfd72c7bebe4) )
-	ROM_LOAD( "d.u11",      0x080000, 0x80000, CRC(c0fdd82a) SHA1(a633045e0f5c144b4e24e04fb9446522fdb222f4) )
+	ROM_REGION(0x1000000, "qs1000", 0 ) /* HWASS 1008S-1  qdsp samples */
+	ROM_LOAD( "c.u12",       0x000000, 0x080000, CRC(d24b5e56) SHA1(d89983cf4b0a6e0e4137f3799bdbcfd72c7bebe4) )
+	ROM_LOAD( "d.u11",       0x080000, 0x080000, CRC(c0fdd82a) SHA1(a633045e0f5c144b4e24e04fb9446522fdb222f4) )
+	ROM_LOAD( "1008s-1.u16", 0x100000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) )
 ROM_END
 
 ROM_START( ppcar )
@@ -634,14 +654,11 @@ ROM_START( ppcar )
 	ROM_LOAD16_BYTE( "du3",     0x800000, 0x400000, CRC(73882474) SHA1(191b64e662542b5322160c99af8e00079420d473) )
 	ROM_LOAD16_BYTE( "du2",     0x800001, 0x400000, CRC(9250124a) SHA1(650f4b89c92fe4fb63fc89d4e08c4c4c611bebbc) )
 
-	ROM_REGION(0x10000, "user4", ROMREGION_ERASE00 ) /* qdsp code */
+	ROM_REGION(0x10000, "qs1000:cpu", ROMREGION_ERASE00 ) /* qdsp code */
 	/* none */
 
-	ROM_REGION(0x100000, "user5", 0 ) /* HWASS 1008S-1  qdsp samples */
+	ROM_REGION(0x100000, "qs1000", 0 ) /* HWASS 1008S-1  qdsp samples */
 	ROM_LOAD( "nasn9289.u9",    0x000000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) )
-
-	ROM_REGION(0x100000, "user6", ROMREGION_ERASE00 ) /* samples - same internal structure as qdsp samples  */
-	/* none */
 ROM_END
 
 ROM_START( tetfight )
@@ -654,16 +671,13 @@ ROM_START( tetfight )
 	ROM_REGION(0x100, "i2cmem", 0 ) /* 24c02 eeprom */
 	ROM_LOAD( "u1",     0x00, 0x100, CRC(dd207b40) SHA1(6689d9dfa980bdfbd4e4e6cef7973e22ebbfe22e) )
 
-	ROM_REGION(0x10000, "user4", 0 ) /* qdsp code */
+	ROM_REGION(0x10000, "qs1000:cpu", 0 ) /* qdsp code */
 	ROM_LOAD( "u12",        0x000000, 0x10000, CRC(49976f7b) SHA1(eba5b97b81736f3c184ae0c19f1b10c5ae250d51) ) // 27c512 = e.u14 on ssfindo
 
-	ROM_REGION(0x100000, "user5", ROMREGION_ERASE00 )/*  qdsp samples */
-	// probably the same, but wasn't dumped
-	//ROM_LOAD( "1008s-1.u16",  0x000000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) )
-
-	ROM_REGION(0x100000, "user6", 0 ) /* samples - same internal structure as qdsp samples  */
-	ROM_LOAD( "u11",        0x000000, 0x80000, CRC(073050f6) SHA1(07f362f3ba468bde2341a99e6b26931d11459a92) ) // 27c040
-	ROM_LOAD( "u15",        0x080000, 0x80000, CRC(477f8089) SHA1(8084facb254d60da7983d628d5945d27b9494e65) ) // 27c040
+	ROM_REGION(0x1000000, "qs1000", 0 ) /* samples - same internal structure as qdsp samples  */
+	ROM_LOAD( "u11",         0x000000, 0x80000, CRC(073050f6) SHA1(07f362f3ba468bde2341a99e6b26931d11459a92) ) // 27c040
+	ROM_LOAD( "u15",         0x080000, 0x80000, CRC(477f8089) SHA1(8084facb254d60da7983d628d5945d27b9494e65) ) // 27c040
+	ROM_LOAD( "1008s-1.u16", 0x100000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) ) // probably the same as the other games, but wasn't dumped for this one
 ROM_END
 
 void ssfindo_state::init_common()
@@ -696,6 +710,9 @@ void tetfight_state::init_tetfight()
 	m_flashType = 0;
 }
 
-GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo_state, init_ssfindo,  ROT0, "Icarus", "See See Find Out", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ssfindo_state, init_ppcar,    ROT0, "Icarus", "Pang Pang Car",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, tetfight,0,        tetfight, tetfight, tetfight_state, init_tetfight, ROT0, "Sego",   "Tetris Fighters",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+} // Anonymous namespace
+
+
+GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo_state,  init_ssfindo,  ROT0, "Icarus", "See See Find Out", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ssfindo_state,  init_ppcar,    ROT0, "Icarus", "Pang Pang Car",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, tetfight,0,        tetfight, tetfight, tetfight_state, init_tetfight, ROT0, "Sego",   "Tetris Fighters",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
