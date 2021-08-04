@@ -74242,13 +74242,12 @@ Other
 		</part>
 	</software>
 
-	<software name="smb4" cloneof="armadill" supported="no">
+	<software name="smb4" cloneof="armadill">
 		<description>Super Mario Bros. IV (Armadillo pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="txsrom" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mario bros iv (unl).chr" size="131072" crc="281b07cc" sha1="4a6ce2a87de0a017915aac50aac60cfe70dc9724" offset="00000" status="baddump" />
 			</dataarea>
