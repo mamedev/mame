@@ -381,7 +381,6 @@ protected:
 	void match_pattern(int port);
 	void external_port_w(int port, int bit, int state);
 
-private:
 	devcb_write_line       m_write_irq;
 
 	devcb_read8            m_read_pa;

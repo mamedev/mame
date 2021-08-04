@@ -919,6 +919,32 @@ void cio_base_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 int z8536_device::z80daisy_irq_state()
 {
+	static const int prio[] =
+	{
+		COUNTER_TIMER_3_COMMAND_AND_STATUS,
+		PORT_A_COMMAND_AND_STATUS,
+		COUNTER_TIMER_2_COMMAND_AND_STATUS,
+		PORT_B_COMMAND_AND_STATUS,
+		COUNTER_TIMER_1_COMMAND_AND_STATUS
+	};
+
+	if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_MIE)
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			if (m_register[prio[i]] & PCS_IUS)
+			{
+				// we are currently servicing an interrupt request
+				return Z80_DAISY_IEO;
+			}
+			else if ((m_register[prio[i]] & PCS_IE) && (m_register[prio[i]] & PCS_IP))
+			{
+				// indicate that we have an interrupt request waiting
+				return Z80_DAISY_INT;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -1081,19 +1107,19 @@ void z8536_device::write(offs_t offset, u8 data)
 	{
 		switch (offset & 0x03)
 		{
-		case PORT_C:
+		case 0:
 			write_register(PORT_C_DATA, data);
 			break;
 
-		case PORT_B:
+		case 1:
 			write_register(PORT_B_DATA, data);
 			break;
 
-		case PORT_A:
+		case 2:
 			write_register(PORT_A_DATA, data);
 			break;
 
-		case CONTROL:
+		case 3:
 			if (m_state0)
 			{
 				// state 0: write pointer
