@@ -446,6 +446,16 @@ private:
 	uint16_t egc_color_pat(int plane) const;
 };
 
+
+
+
+
+/******************************************
+ *
+ * pc98ha.cpp: "Handy98" 1st gen portables
+ *
+ ******************************************/
+
 class pc98lt_state : public pc98_base_state
 {
 public:

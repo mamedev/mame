@@ -407,9 +407,11 @@ void pc9801_state::fdc_2hd_ctrl_w(uint8_t data)
 
 uint8_t pc9801_state::fdc_2dd_ctrl_r()
 {
-		int ret = (!m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
-		ret |= (m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
-		return ret | 0x40; //unknown port meaning, might be 0x70
+	// TODO: not really working, it's supposed to detect if the drive has a disk in
+	// (it also clearly has a code smell atm)
+	int ret = (!m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
+	ret |= (m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
+	return ret | 0x40; //unknown port meaning, might be 0x70
 }
 
 void pc9801_state::fdc_2dd_ctrl_w(uint8_t data)
@@ -1403,7 +1405,7 @@ void pc9801_state::pc9821_io(address_map &map)
 //  map(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
 }
 
-// TODO: identify this, might be an alt way to access SDIP or 98 local bus
+// TODO: identify this, might be an alt way to access SDIP or 98[21 MATE A] local bus
 uint8_t pc9801_state::as_unkdev_data_r(offs_t offset)
 {
 	if (offset == 0)
@@ -2793,7 +2795,7 @@ ROM_START( pc9801rs )
 ROM_END
 
 /*
-BX2/U2 - 486SX - (should be 33, but "dumper" note says it's 25 MHz)
+BX2/U2 - 486SX @ 25 MHz
 
 Yet another franken-romset done with direct memory dump, shrug
 
@@ -2957,7 +2959,7 @@ ROM_END
 
 ROM_START( pc9821ne )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",     0x10000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "itf.rom",     0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios_ne.rom", 0x18000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -3113,7 +3115,7 @@ ROM_END
 
 ROM_START( pc9821v13 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",      0x10000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios_v13.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -3179,7 +3181,7 @@ ROM_START( pc9821cx3 )
 	ROM_LOAD( "bankf.bin",    0x078000, 0x008000, CRC(77f6a5c7) SHA1(b8fbf104dd8a8e00855be18f0c3b71da79b6a841) )
 	
 	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
