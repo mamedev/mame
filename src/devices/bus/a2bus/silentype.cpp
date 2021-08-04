@@ -100,17 +100,48 @@ Mentions using the 6522 chip in Apple III to interface to the Silentype thermal 
 #include "emuopts.h"
 #include "fileio.h"
 #include "png.h"
-//#include <algorithm>   // need for std::max
-#include <bitset>
+//#include <bitset>
 
 // write bits @ c091
 #define SILENTYPE_DATA                (0)
-#define SILENTYPE_SHIFTCLOCKB         (1)  // SHIFT CLOCK (CLOCKED WITH PHI-1)
-#define SILENTYPE_STORECLOCK          (2)
+#define SILENTYPE_SHIFTCLOCKB         (1)  // SHIFT CLOCK (MOMENTARILY CLOCKED OUT WITH PHI-1)
+#define SILENTYPE_STORECLOCK          (2)  // STORE CLOCK  (printer receives inverted signal, so falling edge does store)
 #define SILENTYPE_DATAWRITEENABLE     (3)  // OUTPUT ENABLE
 #define SILENTYPE_SHIFTCLOCKA         (4)  // LATCHED SHIFT CLOCK
-#define SILENTYPE_ROMENABLE           (5)
+#define SILENTYPE_ROMENABLE           (5)  // ENABLE ROM
 #define SILENTYPE_SHIFTCLOCKDISABLE   (6)  // SHIFT CLOCK OUTPUT DISABLE
+
+// shift register shifts when shift clock goes low (falling edge)
+//
+// storage register of 673 gets loaded on rising edge of store clock but this signal is inverted
+//    so it will load on falling edge of bit 2 (d2 going from 1 to 0).
+//
+// (both store clock low (d4=0) and shift clock low (d2=0) will clear the storage register)
+//   for example, writing 0 to c091 will reset the 673 parallel storage register
+//
+// Normal writing pattern to the shift register is 16 bytes of either 0x0e or 0x0f.
+//
+//    0x0e will shift in a 0
+//    0x0f will shift in a 1
+//
+//       hstepperbits = BITS(m_parallel_reg, 3,  0);  // bits 0-3 are for the horizontal stepper
+//       vstepperbits = BITS(m_parallel_reg, 7,  4);  // bits 4-7 are for the vertical stepper
+//       headbits     = BITS(m_parallel_reg, 15, 9);  // bits 9-15 are for the print head
+//
+//    Bit 8 is for R/W* input to the shift register and is normally sent as a 0.
+//
+//    It was most likely used for diagnostic purposes in order to read the contents of the shift register,
+//       since the serial data connection is bidirectional.  Once the parallel register gets loaded with bit 8 = 1,
+//       the LS673 will be put into read mode.
+//
+//  Following the 16 bytes is a sequence of 4 bytes of 0x1c, 0x18, 0x1c, 0x0c.
+//    The first 0x1c will raise d4.  d2 is already kept high from the previous 0x0e or previous 0x0f.
+//    The 0x18 will drop d2: this will load the parallel storage register on the falling edge of d2.
+//    We have to raise d2 by sending 0x1c before we drop d4 by sending 0x0c or the parallel register will be reset.
+//    Dropping d4 has the side effect of shifting in another bit.
+//  We don't care about this extra shift since we will always load 16 bits, and the extra bit will
+//    get completely shifted out.
+
 
 // read bits @ c094
 #define SILENTYPE_STATUS              (7)  // margin switch status
@@ -268,6 +299,7 @@ void a2bus_silentype_device::write_snapshot_to_file(std::string directory, std::
 {
 	emu_file file(machine().options().snapshot_directory() + std::string("/") + directory,
 		  OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		  
 	auto const filerr = file.open(name);
 
 	if (filerr == osd_file::error::NONE)
@@ -275,7 +307,8 @@ void a2bus_silentype_device::write_snapshot_to_file(std::string directory, std::
 		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
 
 		// clear paper to bottom
-		m_bitmap.plot_box(m_ypos*7/4,3,PAPER_WIDTH-1,PAPER_HEIGHT-1,rgb_t::white());
+		// something doesn't make sense with this formula...revisit this
+		m_bitmap.plot_box(m_ypos * 7 / 4, 3, PAPER_WIDTH - 1, PAPER_HEIGHT - 1, rgb_t::white());
 
 		// save the paper into a png
 		util::png_write_bitmap(file, nullptr, m_bitmap, 2, png_palette);
@@ -320,11 +353,11 @@ void a2bus_silentype_device::darken_pixel(double headtemp, u32& pixel)
 
 void a2bus_silentype_device::adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp)
 {
-			temp += ( (pin_status) ?
-						(time_elapsed / ((double) heattime  / 1.0E6)) :
-					  - (time_elapsed / ((double) decaytime / 1.0E6)) );
-			if (temp < 0.0) temp = 0;
-			if (temp > 1.0) temp = 1.0;
+	temp += ( (pin_status) ?
+				(time_elapsed / ((double) heattime  / 1.0E6)) :
+			  - (time_elapsed / ((double) decaytime / 1.0E6)) );
+	if (temp < 0.0) temp = 0;
+	if (temp > 1.0) temp = 1.0;
 }
 
 //-------------------------------------------------
@@ -334,24 +367,24 @@ void a2bus_silentype_device::adjust_headtemp(u8 pin_status, double time_elapsed,
 void a2bus_silentype_device::update_printhead(uint8_t headbits)
 {
 
-		double current_time = machine().time().as_double();
-		double time_elapsed = current_time - last_update_time;
-		last_update_time = current_time;
+	double current_time = machine().time().as_double();
+	double time_elapsed = current_time - last_update_time;
+	last_update_time = current_time;
 
 //      printf("PRINTHEAD %x\n",headbits);
 //      printf("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",time_elapsed, time_elapsed*1e6, std::bitset<8>(headbits).to_string().c_str());
 
-		for (int i=0;i<7;i++)
-		{
-			adjust_headtemp( BIT(lastheadbits,i), time_elapsed,  headtemp[i] );
+	for (int i=0;i<7;i++)
+	{
+		adjust_headtemp( BIT(lastheadbits,i), time_elapsed,  headtemp[i] );
 
-			int xpixel = m_xpos + ((xdirection == 1) ? right_offset : left_offset);
-			int ypixel = (m_ypos * 7 / 4) + (6 - i);
+		int xpixel = m_xpos + ((xdirection == 1) ? right_offset : left_offset);
+		int ypixel = (m_ypos * 7 / 4) + (6 - i);
 
-			if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
-				darken_pixel( headtemp[i], m_bitmap.pix(ypixel, xpixel) );
-		}
-		lastheadbits = headbits;
+		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
+			darken_pixel( headtemp[i], m_bitmap.pix(ypixel, xpixel) );
+	}
+	lastheadbits = headbits;
 }
 
 //-------------------------------------------------
@@ -360,18 +393,17 @@ void a2bus_silentype_device::update_printhead(uint8_t headbits)
 
 void a2bus_silentype_device::update_pf_stepper(uint8_t vstepper)
 {
-		int halfstepflag;
-		const int drivetable[4]    = {3, 9, 12, 6};
-		const int halfsteptable[4] = {2, 4, 8, 1};
+	int halfstepflag;
+	const int drivetable[4]    = {3, 9, 12, 6};
+	const int halfsteptable[4] = {2, 4, 8, 1};
 
-		if (vstepper!=0){
-
-		for(int i=0;i<4;i++)
+	if (vstepper != 0)
+	{
+		for(int i = 0; i < 4; i++)
 		{
-			if (drivetable[i] == vstepperlast)
+			if (drivetable[i] == vstepperlast) // scan table until we match index
 			{
-				if (drivetable[wrap(i+1,4)]==vstepper)
-				// we are moving down the page
+				if (drivetable[wrap(i + 1, 4)] == vstepper) // we are moving down the page
 				{
 					m_ypos += 1;
 					if (newpageflag == 1)
@@ -397,18 +429,22 @@ void a2bus_silentype_device::update_pf_stepper(uint8_t vstepper)
 						m_bitmap.plot_box(0, 3,
 										  PAPER_WIDTH, PAPER_HEIGHT - 3 - PAPER_SCREEN_HEIGHT,
 										  rgb_t::white());
+					}
+				}
+				else if (drivetable[wrap(i - 1, 4)] == vstepper) // we are moving up the page
+				{
+					m_ypos -= 1;
+					if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
 				}
 			}
-			else if (drivetable[wrap(i - 1, 4)] == vstepper) m_ypos -= 1;
-			}
-		}
+		} // end for
 
 		// ignore half steps
 		halfstepflag=0;
-		for (int i = 0; i < 4;i ++) if (halfsteptable[i] == vstepper) halfstepflag = 1;
+		for (int i = 0; i < 4; i++) if (halfsteptable[i] == vstepper) halfstepflag = 1;
 
 		if (!halfstepflag) vstepperlast = vstepper; // update the vstepperlast ignoring half steps
-		}
+	}
 }
 
 //-------------------------------------------------
@@ -417,17 +453,17 @@ void a2bus_silentype_device::update_pf_stepper(uint8_t vstepper)
 
 void a2bus_silentype_device::update_cr_stepper(uint8_t hstepper)
 {
-//      printf("CR_STEPPER %x\n",hstepper);
-		int halfstepflag;
-		const int drivetable[4]={3,9,12,6};
-		const int halfsteptable[4]={2,4,8,1};
+	int halfstepflag;
+	const int drivetable[4]    = {3, 9, 12, 6};
+	const int halfsteptable[4] = {2, 4, 8, 1};
 
-		if (hstepper != 0){
+	if (hstepper != 0)
+	{
 		newpageflag = 0;
 
 		for(int i = 0; i < 4; i++)
 		{
-			if (drivetable[i] == hstepperlast)
+			if (drivetable[i] == hstepperlast) // scan table until we match index
 			{
 				if (drivetable[wrap(i + 1, 4)] == hstepper)
 				{
@@ -439,14 +475,14 @@ void a2bus_silentype_device::update_cr_stepper(uint8_t hstepper)
 					if (m_xpos < 0) m_xpos = 0;
 				}
 			}
-		}
+		} // end for
 
 		// ignore half steps
 		halfstepflag = 0;
 		for (int i = 0; i < 4; i++) if (halfsteptable[i] == hstepper) halfstepflag = 1;
 
 		if (!halfstepflag) hstepperlast = hstepper; // update the hstepperlast ignoring half steps
-		}
+	}
 }
 
 //-------------------------------------------------
@@ -472,9 +508,9 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 	{
 		m_parallel_reg = m_shift_reg;
 
-		uint8_t hstepperbits = BITS(m_parallel_reg,3,0);
-		uint8_t vstepperbits = BITS(m_parallel_reg,7,4);
-		uint8_t headbits     = BITS(m_parallel_reg,15,9);
+		uint8_t hstepperbits = BITS(m_parallel_reg, 3,  0);
+		uint8_t vstepperbits = BITS(m_parallel_reg, 7,  4);
+		uint8_t headbits     = BITS(m_parallel_reg, 15, 9);
 
 		printf("PARALLEL REGISTER = %4x\n",m_parallel_reg);
 		update_pf_stepper(vstepperbits);
