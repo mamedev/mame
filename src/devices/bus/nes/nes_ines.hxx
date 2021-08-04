@@ -396,7 +396,7 @@ static const nes_mmc mmc_list[] =
 	// 358 JY multicarts, variant of mapper 282
 	// 359 BMC-SB-5013 multicarts
 	// 360 Bit Corp 31-in-1 (ID 3150) (has five accessible DIP switches!)
-	// 361 JY multicarts
+	{ 361, BMC_841101C },
 	// 362 JY-005 multicart
 	// 363 variant of mapper 358?
 	// 364 JY-007, is this ttoons6 in nes.xml?

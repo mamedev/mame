@@ -419,6 +419,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_gc6in1",       NES_BMC_GC6IN1);
 	device.option_add_internal("bmc_411120c",      NES_BMC_411120C);
 	device.option_add_internal("bmc_830118c",      NES_BMC_830118C);
+	device.option_add_internal("bmc_841101c",      NES_BMC_841101C);
 	device.option_add_internal("pjoy84",           NES_PJOY84);
 	device.option_add_internal("nocash_nochr",     NES_NOCHR);
 	device.option_add_internal("action53",         NES_ACTION53);

@@ -296,6 +296,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_gc6in1",       BMC_GOLDENCARD_6IN1 },
 	{ "bmc_411120c",      BMC_411120C },
 	{ "bmc_830118c",      BMC_830118C },
+	{ "bmc_841101c",      BMC_841101C },
 	{ "pjoy84",           BMC_PJOY84 },
 	{ "bmc_gold150",      BMC_GOLD150 },
 	{ "bmc_gold260",      BMC_GOLD260 },
