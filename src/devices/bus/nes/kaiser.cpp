@@ -8,6 +8,7 @@
 
  Here we emulate the following Kaiser bootleg PCBs
 
+ * Kaiser KS106C
  * Kaiser KS202
  * Kaiser KS7010
  * Kaiser KS7012
@@ -44,6 +45,7 @@
 //  constructor
 //-------------------------------------------------
 
+DEFINE_DEVICE_TYPE(NES_KS106C,  nes_ks106c_device,  "nes_ks106c",  "NES Cart Kaiser KS-106C PCB")
 DEFINE_DEVICE_TYPE(NES_KS202,   nes_ks202_device,   "nes_ks202",   "NES Cart Kaiser KS-202 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7010,  nes_ks7010_device,  "nes_ks7010",  "NES Cart Kaiser KS-7010 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7012,  nes_ks7012_device,  "nes_ks7012",  "NES Cart Kaiser KS-7012 PCB")
@@ -60,6 +62,11 @@ DEFINE_DEVICE_TYPE(NES_KS7037,  nes_ks7037_device,  "nes_ks7037",  "NES Cart Kai
 DEFINE_DEVICE_TYPE(NES_KS7057,  nes_ks7057_device,  "nes_ks7057",  "NES Cart Kaiser KS-7057 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7058,  nes_ks7058_device,  "nes_ks7058",  "NES Cart Kaiser KS-7058 PCB")
 
+
+nes_ks106c_device::nes_ks106c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_KS106C, tag, owner, clock), m_latch(0)
+{
+}
 
 nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_KS7058, tag, owner, clock)
@@ -148,6 +155,20 @@ nes_ks7057_device::nes_ks7057_device(const machine_config &mconfig, const char *
 
 
 
+
+void nes_ks106c_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_ks106c_device::pcb_reset()
+{
+	prg32(m_latch);
+	chr8(m_latch, CHRROM);
+	set_nt_mirroring(BIT(m_latch, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+	m_latch = (m_latch + 1) & 0x03;
+}
 
 void nes_ks7058_device::device_start()
 {
@@ -369,6 +390,21 @@ void nes_ks7057_device::pcb_reset()
 
 /*-------------------------------------------------
  mapper specific handlers
+ -------------------------------------------------*/
+
+/*-------------------------------------------------
+
+ Kaiser Board KS106C
+
+ Games: 4 in 1
+
+ No need to use handlers. At reset the banks change
+ and so does the game.
+
+ NES 2.0: mapper 352
+
+ In MAME: Supported.
+
  -------------------------------------------------*/
 
 /*-------------------------------------------------

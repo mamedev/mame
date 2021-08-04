@@ -387,7 +387,7 @@ static const nes_mmc mmc_list[] =
 	{ 349, BMC_G146 },
 	// { 350, BMC_891227 }, not in nes.xml
 	// 351 JY/Techline 9-in-1
-	// 352 Kaiser 4-in-1 KS106C
+	{ 352, KAISER_KS106C },        // 4-in-1
 	// 353 Super Mario Family multicart
 	// 354 250-in-1 multicart with FDS Bubble Bobble
 	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
