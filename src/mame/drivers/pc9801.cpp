@@ -3546,7 +3546,7 @@ COMP( 1994, pc9821,      0,        0, pc9821,      pc9821,   pc9801_state, init_
 COMP( 1993, pc9821as,    0,          0, pc9821as,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// 98MATE [B] (i486, desktop, has GD5428 and no sound)
+// 98MATE [B] (i486, desktop, has GD5428 and no built-in sound)
 // ...
 
 // 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
@@ -3569,10 +3569,10 @@ COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9801_state, i
 COMP( 1997, pc9821ra266, pc9821ra20,   0, pc9821ra266, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// 98MATE SERVER (Server variant of 98MATE R. Inherits concepts from 98SERVER above)
+// 98MATE SERVER, pc9821rs* (Server variant of 98MATE R. Inherits concepts from 98SERVER above)
 // ...
 
-// CEREB (Pentium MMX based. Multimedia PC with a Sony DDU100E DVD-ROM drive as most notable addition. Form factor is way more akin of a DVD player)
+// CEREB (Pentium MMX based. Multimedia PC with a Sony DDU100E DVD-ROM drive as most notable addition. Form factor is way more akin of a DVD player than a PC)
 // ...
 
 // PC-9821 NOTE[book] class

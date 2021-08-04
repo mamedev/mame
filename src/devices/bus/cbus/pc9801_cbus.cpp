@@ -124,3 +124,35 @@ template void pc9801_slot_device::install_io<read8_delegate,    write8_delegate 
 template void pc9801_slot_device::install_io<read8s_delegate,   write8s_delegate  >(offs_t start, offs_t end, read8s_delegate rhandler,   write8s_delegate whandler);
 template void pc9801_slot_device::install_io<read8sm_delegate,  write8sm_delegate >(offs_t start, offs_t end, read8sm_delegate rhandler,  write8sm_delegate whandler);
 template void pc9801_slot_device::install_io<read8smo_delegate, write8smo_delegate>(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
+
+// boilerplate code for boards that has configurable I/O with either Jumpers or Dip-Switches
+// NB: client must have a mechanism to remember what port has been used before and after calling this,
+// in order to avoid "last instantiated wins" issues with overlapping board full configs.
+void pc9801_slot_device::flush_install_io(const char *client_tag, u16 old_io, u16 new_io, u16 size, read8sm_delegate rhandler, write8sm_delegate whandler)
+{
+	// initialize if client have this unmapped (such as first boot)
+	// device_start fns cannot read input ports ...
+	if (old_io == 0)
+		old_io = new_io;
+
+	logerror("%s: %s I/O uninstall I/O at %04x-%04x\n",
+		this->tag(),
+		client_tag,
+		old_io,
+		old_io + size
+	);
+	this->io_space().unmap_readwrite(old_io, old_io + size);
+
+	logerror("%s: %s install I/O at %04x-%04x\n",
+		this->tag(),
+		client_tag,
+		new_io,
+		new_io + size
+	);
+	this->install_io(
+		new_io,
+		new_io + size,
+		rhandler,
+		whandler
+	);
+}

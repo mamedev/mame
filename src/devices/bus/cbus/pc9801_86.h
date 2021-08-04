@@ -49,6 +49,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void pc9801_86_config(machine_config &config);
+	virtual u16 read_io_base() override;
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;
