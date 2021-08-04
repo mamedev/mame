@@ -675,6 +675,20 @@ private:
 };
 
 
+// ======================> nes_bmc_841101c_device
+
+class nes_bmc_841101c_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_841101c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_pjoy84_device
 
 class nes_pjoy84_device : public nes_txrom_device
@@ -753,6 +767,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GC6IN1,    nes_bmc_gc6in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_830118C,   nes_bmc_830118c_device)
+DECLARE_DEVICE_TYPE(NES_BMC_841101C,   nes_bmc_841101c_device)
 DECLARE_DEVICE_TYPE(NES_PJOY84,        nes_pjoy84_device)
 DECLARE_DEVICE_TYPE(NES_COOLBOY,       nes_coolboy_device)
 

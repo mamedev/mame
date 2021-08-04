@@ -51669,6 +51669,69 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 
+<!-- J.Y. Company -->
+
+	<software name="mc_4jy9">
+		<description>1994 Ball 4 in 1 Series (JY-009)</description>
+		<year>1994</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_841101c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 ball 4-in-1 series (jy-009).prg" size="524288" crc="a75d2f6d" sha1="2b4250e0d0ad2225003d7f178bcc8fc353a27ea3" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 ball 4-in-1 series (jy-009).chr" size="524288" crc="560ca283" sha1="d00cfd3c0c65db543a635fcddb1b0cf86149f257" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy18">
+		<description>1996 Super HiK 4 in 1 (JY-018)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_841101c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-018).prg" size="524288" crc="b8740880" sha1="8e05438c36323e8c400c257d5d8007bfe5841d20" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-018).chr" size="524288" crc="29b559a8" sha1="e6456668069a8e2f615b8d4724dd99903a79028c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy19">
+		<description>1995 Super HiK 4 in 1 (JY-019)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_841101c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-019).prg" size="524288" crc="5bb37e97" sha1="126b4701467e9cb94c69b079563937429f3fd3bf" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-019).chr" size="524288" crc="ad775257" sha1="ec4cad29b83ba3aa8fdd50ce259b75c56fdbe639" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy20">
+		<description>1996 Super HiK 4 in 1 (JY-020)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_841101c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-020).prg" size="524288" crc="e858f260" sha1="60e0d13f27f567ed259aa8b91fe0f2b07e8a719e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-020).chr" size="524288" crc="934f22fd" sha1="ff90c43fe41912b560b865c03fefa1e897bb4352" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Sachen / Thin Chen (and clones) -->
 
 	<software name="englpyrm">
@@ -79084,13 +79147,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4o411" supported="no">
+	<software name="mc_4o411">
 		<description>4 in 1 (OK-411)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_15in1" />
-			<feature name="pcb" value="BMC-15IN1" />
+			<feature name="slot" value="bmc_841101c" />
 			<dataarea name="chr" size="524288">
 				<rom name="4-in-1 (ok-411)[p1].chr" size="524288" crc="b9300c30" sha1="90cef987aac482e7402891892779847cffaa6ef0" offset="00000" status="baddump" />
 			</dataarea>
