@@ -1123,60 +1123,38 @@ void pc9801_state::window_bank_w(offs_t offset, uint8_t data)
 		logerror("PC-9821 $f0000 window bank %02x\n",data);
 }
 
-uint8_t pc9801_state::m_sdip_read(uint16_t port, uint8_t sdip_offset)
+template<unsigned port> u8 pc9801_state::sdip_r(offs_t offset)
 {
-	if(port == 2)
+	u8 sdip_offset = port + (m_sdip_bank * 12);
+
+	if (offset == 2)
 		return m_sdip[sdip_offset];
 
-	logerror("Warning: read from unknown SDIP area %02x %04x\n",port,0x841c + port + (sdip_offset % 12)*0x100);
+	logerror("Warning: read from unknown SDIP area %02x %04x\n", offset, 0x841c + offset + (sdip_offset % 12)*0x100);
 	return 0xff;
 }
 
-void pc9801_state::m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data)
+template<unsigned port> void pc9801_state::sdip_w(offs_t offset, u8 data)
 {
-	if(port == 2)
+	u8 sdip_offset = port + (m_sdip_bank * 12);
+
+	if (offset == 2)
 	{
 		m_sdip[sdip_offset] = data;
 		return;
 	}
 
-	logerror("Warning: write from unknown SDIP area %02x %04x %02x\n",port,0x841c + port + (sdip_offset % 12)*0x100,data);
-}
-
-uint8_t pc9801_state::sdip_0_r(offs_t offset) { return m_sdip_read(offset, 0+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_1_r(offs_t offset) { return m_sdip_read(offset, 1+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_2_r(offs_t offset) { return m_sdip_read(offset, 2+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_3_r(offs_t offset) { return m_sdip_read(offset, 3+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_4_r(offs_t offset) { return m_sdip_read(offset, 4+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_5_r(offs_t offset) { return m_sdip_read(offset, 5+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_6_r(offs_t offset) { return m_sdip_read(offset, 6+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_7_r(offs_t offset) { return m_sdip_read(offset, 7+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_8_r(offs_t offset) { return m_sdip_read(offset, 8+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_9_r(offs_t offset) { return m_sdip_read(offset, 9+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_a_r(offs_t offset) { return m_sdip_read(offset, 10+m_sdip_bank*12); }
-uint8_t pc9801_state::sdip_b_r(offs_t offset) { return m_sdip_read(offset, 11+m_sdip_bank*12); }
-
-void pc9801_state::sdip_0_w(offs_t offset, uint8_t data) { m_sdip_write(offset,0+m_sdip_bank*12,data); }
-void pc9801_state::sdip_1_w(offs_t offset, uint8_t data) { m_sdip_write(offset,1+m_sdip_bank*12,data); }
-void pc9801_state::sdip_2_w(offs_t offset, uint8_t data) { m_sdip_write(offset,2+m_sdip_bank*12,data); }
-void pc9801_state::sdip_3_w(offs_t offset, uint8_t data) { m_sdip_write(offset,3+m_sdip_bank*12,data); }
-void pc9801_state::sdip_4_w(offs_t offset, uint8_t data) { m_sdip_write(offset,4+m_sdip_bank*12,data); }
-void pc9801_state::sdip_5_w(offs_t offset, uint8_t data) { m_sdip_write(offset,5+m_sdip_bank*12,data); }
-void pc9801_state::sdip_6_w(offs_t offset, uint8_t data) { m_sdip_write(offset,6+m_sdip_bank*12,data); }
-void pc9801_state::sdip_7_w(offs_t offset, uint8_t data) { m_sdip_write(offset,7+m_sdip_bank*12,data); }
-void pc9801_state::sdip_8_w(offs_t offset, uint8_t data) { m_sdip_write(offset,8+m_sdip_bank*12,data); }
-void pc9801_state::sdip_9_w(offs_t offset, uint8_t data) { m_sdip_write(offset,9+m_sdip_bank*12,data); }
-void pc9801_state::sdip_a_w(offs_t offset, uint8_t data) { m_sdip_write(offset,10+m_sdip_bank*12,data); }
-void pc9801_state::sdip_b_w(offs_t offset, uint8_t data)
-{
-	if(offset == 3)
+	if(offset == 3 && port == 0xb)
+	{
 		m_sdip_bank = (data & 0x40) >> 6;
-
-	if(offset == 2)
-		m_sdip_write(offset,11+m_sdip_bank*12,data);
-
-	if((offset & 2) == 0)
-		logerror("SDIP area B write %02x %02x\n",offset,data);
+		return;
+	}
+	
+	logerror("Warning: write from unknown SDIP area %02x %04x %02x\n",
+		port,
+		0x841c + port + (sdip_offset % 12)*0x100,
+		data
+	);
 }
 
 uint16_t pc9801_state::timestamp_r(offs_t offset)
@@ -1209,7 +1187,7 @@ uint8_t pc9801_state::ext2_video_ff_r()
 //      case 0x0b: VRAM access mode (i/o 0x6a -> 0x62)
 //      case 0x0c: unknown
 //      case 0x0d: VRAM boundary mode (i/o 0x6a -> 0x68)
-//      case 0x0e: 65536 color GFX mode (i/o 0x6a -> 0x22)
+//      case 0x0e: 65,536 color GFX mode (i/o 0x6a -> 0x22)
 //      case 0x0f: 65,536 color palette mode (i/o 0x6a -> 0x24)
 //      case 0x10: unknown (i/o 0x6a -> 0x6a)
 //      case 0x11: Reverse mode related (i/o 0x6a -> 0x26)
@@ -1393,18 +1371,18 @@ void pc9801_state::pc9821_io(address_map &map)
 	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
 	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
-	map(0x841c, 0x841f).rw(FUNC(pc9801_state::sdip_0_r), FUNC(pc9801_state::sdip_0_w));
-	map(0x851c, 0x851f).rw(FUNC(pc9801_state::sdip_1_r), FUNC(pc9801_state::sdip_1_w));
-	map(0x861c, 0x861f).rw(FUNC(pc9801_state::sdip_2_r), FUNC(pc9801_state::sdip_2_w));
-	map(0x871c, 0x871f).rw(FUNC(pc9801_state::sdip_3_r), FUNC(pc9801_state::sdip_3_w));
-	map(0x881c, 0x881f).rw(FUNC(pc9801_state::sdip_4_r), FUNC(pc9801_state::sdip_4_w));
-	map(0x891c, 0x891f).rw(FUNC(pc9801_state::sdip_5_r), FUNC(pc9801_state::sdip_5_w));
-	map(0x8a1c, 0x8a1f).rw(FUNC(pc9801_state::sdip_6_r), FUNC(pc9801_state::sdip_6_w));
-	map(0x8b1c, 0x8b1f).rw(FUNC(pc9801_state::sdip_7_r), FUNC(pc9801_state::sdip_7_w));
-	map(0x8c1c, 0x8c1f).rw(FUNC(pc9801_state::sdip_8_r), FUNC(pc9801_state::sdip_8_w));
-	map(0x8d1c, 0x8d1f).rw(FUNC(pc9801_state::sdip_9_r), FUNC(pc9801_state::sdip_9_w));
-	map(0x8e1c, 0x8e1f).rw(FUNC(pc9801_state::sdip_a_r), FUNC(pc9801_state::sdip_a_w));
-	map(0x8f1c, 0x8f1f).rw(FUNC(pc9801_state::sdip_b_r), FUNC(pc9801_state::sdip_b_w));
+	map(0x841c, 0x841f).rw(FUNC(pc9801_state::sdip_r<0x0>), FUNC(pc9801_state::sdip_w<0x0>));
+	map(0x851c, 0x851f).rw(FUNC(pc9801_state::sdip_r<0x1>), FUNC(pc9801_state::sdip_w<0x1>));
+	map(0x861c, 0x861f).rw(FUNC(pc9801_state::sdip_r<0x2>), FUNC(pc9801_state::sdip_w<0x2>));
+	map(0x871c, 0x871f).rw(FUNC(pc9801_state::sdip_r<0x3>), FUNC(pc9801_state::sdip_w<0x3>));
+	map(0x881c, 0x881f).rw(FUNC(pc9801_state::sdip_r<0x4>), FUNC(pc9801_state::sdip_w<0x4>));
+	map(0x891c, 0x891f).rw(FUNC(pc9801_state::sdip_r<0x5>), FUNC(pc9801_state::sdip_w<0x5>));
+	map(0x8a1c, 0x8a1f).rw(FUNC(pc9801_state::sdip_r<0x6>), FUNC(pc9801_state::sdip_w<0x6>));
+	map(0x8b1c, 0x8b1f).rw(FUNC(pc9801_state::sdip_r<0x7>), FUNC(pc9801_state::sdip_w<0x7>));
+	map(0x8c1c, 0x8c1f).rw(FUNC(pc9801_state::sdip_r<0x8>), FUNC(pc9801_state::sdip_w<0x8>));
+	map(0x8d1c, 0x8d1f).rw(FUNC(pc9801_state::sdip_r<0x9>), FUNC(pc9801_state::sdip_w<0x9>));
+	map(0x8e1c, 0x8e1f).rw(FUNC(pc9801_state::sdip_r<0xa>), FUNC(pc9801_state::sdip_w<0xa>));
+	map(0x8f1c, 0x8f1f).rw(FUNC(pc9801_state::sdip_r<0xb>), FUNC(pc9801_state::sdip_w<0xb>));
 //  map(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
 //  map(0xbfdb, 0xbfdb) mouse timing port
 //  map(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
@@ -1425,7 +1403,7 @@ void pc9801_state::pc9821_io(address_map &map)
 //  map(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
 }
 
-// TODO: identify this, might be an alt way to access SDIP?
+// TODO: identify this, might be an alt way to access SDIP or 98 local bus
 uint8_t pc9801_state::as_unkdev_data_r(offs_t offset)
 {
 	if (offset == 0)

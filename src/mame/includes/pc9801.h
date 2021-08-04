@@ -284,32 +284,6 @@ private:
 	uint8_t pic_r(offs_t offset);
 	void pic_w(offs_t offset, uint8_t data);
 
-	uint8_t sdip_0_r(offs_t offset);
-	uint8_t sdip_1_r(offs_t offset);
-	uint8_t sdip_2_r(offs_t offset);
-	uint8_t sdip_3_r(offs_t offset);
-	uint8_t sdip_4_r(offs_t offset);
-	uint8_t sdip_5_r(offs_t offset);
-	uint8_t sdip_6_r(offs_t offset);
-	uint8_t sdip_7_r(offs_t offset);
-	uint8_t sdip_8_r(offs_t offset);
-	uint8_t sdip_9_r(offs_t offset);
-	uint8_t sdip_a_r(offs_t offset);
-	uint8_t sdip_b_r(offs_t offset);
-
-	void sdip_0_w(offs_t offset, uint8_t data) ;
-	void sdip_1_w(offs_t offset, uint8_t data) ;
-	void sdip_2_w(offs_t offset, uint8_t data) ;
-	void sdip_3_w(offs_t offset, uint8_t data) ;
-	void sdip_4_w(offs_t offset, uint8_t data) ;
-	void sdip_5_w(offs_t offset, uint8_t data) ;
-	void sdip_6_w(offs_t offset, uint8_t data) ;
-	void sdip_7_w(offs_t offset, uint8_t data) ;
-	void sdip_8_w(offs_t offset, uint8_t data) ;
-	void sdip_9_w(offs_t offset, uint8_t data) ;
-	void sdip_a_w(offs_t offset, uint8_t data) ;
-	void sdip_b_w(offs_t offset, uint8_t data) ;
-
 	uint8_t as_unkdev_data_r(offs_t offset);
 	void as_unkdev_data_w(offs_t offset, uint8_t data);
 	void as_unkdev_addr_w(offs_t offset, uint8_t data);
@@ -464,8 +438,9 @@ private:
 
 	uint16_t m_pc9821_256vram_bank;
 
-	uint8_t m_sdip_read(uint16_t port, uint8_t sdip_offset);
-	void m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data);
+	template<unsigned port> u8 sdip_r(offs_t offset);
+	template<unsigned port> void sdip_w(offs_t offset, u8 data);
+
 	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const;
 	uint16_t egc_shift(int plane, uint16_t val);
 	uint16_t egc_color_pat(int plane) const;
