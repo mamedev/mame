@@ -260,7 +260,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="6in1cal" cloneof="6in1hes" supported="partial">
+	<software name="6in1cal" cloneof="6in1hes">
 		<description>6 in 1 (USA)</description>
 		<year>1992</year>
 		<publisher>Caltron</publisher>
@@ -53953,6 +53953,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="9in1cal">
+		<description>9 in 1 (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Caltron</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="caltron9in1" />
+			<dataarea name="prg" size="524288">
+				<rom name="0.prg" size="524288" crc="443fafc4" sha1="99457c111178cc398444324712f18be0dd081acc" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="0.chr" size="262144" crc="d75fba82" sha1="79407b0a88a3e86875c26f6c6b8911ea237a945d" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

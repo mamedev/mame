@@ -424,7 +424,7 @@ static const nes_mmc mmc_list[] =
 	// 386 JY-090 multicart
 	// 387 various JY multicarts
 	// 388 various JY multicarts
-	// { 389, CALTRON_9IN1 },
+	{ 389, CALTRON_9IN1 },
 	// 390 variant of mapper 236?
 	// 391 BS-110 MMC3 clone
 	// 392 8-in-1 variant of mc_sv16
