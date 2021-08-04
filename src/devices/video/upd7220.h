@@ -125,7 +125,7 @@ private:
 	void draw_pixel(int x, int y, int xi, uint16_t tile_data);
 	void draw_line();
 	void draw_rectangle();
-	void draw_arc(int x, int y);
+	void draw_arc();
 	void draw_char();
 	int translate_command(uint8_t data);
 	void process_fifo();
