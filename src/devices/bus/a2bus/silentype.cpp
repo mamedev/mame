@@ -300,7 +300,8 @@ uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 {
 	if (offset == 4)
 	{
-		return (m_xpos <= 0) << SILENTYPE_STATUS;
+//		return (m_xpos <= 0) << SILENTYPE_STATUS;
+		return m_silentype_printer->margin_switch_input() << SILENTYPE_STATUS;
 	}
 	else
 		return 0x00;
