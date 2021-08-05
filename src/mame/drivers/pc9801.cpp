@@ -4,14 +4,13 @@
 
     PC-9801 (c) 1981 NEC
 
-    driver by Angelo Salese
-
     TODO:
     - proper 8251 uart hook-up on keyboard;
     - SASI/SCSI support;
     - Finish DIP-Switches support;
-    - text scrolling, upd52611 (cfr. clipping in edge & arcus2, madoum* too?);
-    - AGDC emulation, upd72120;
+    - text scrolling, μPD52611 (cfr. clipping in edge & arcus2, madoum* too?);
+    - AGDC emulation, μPD72120;
+	- GP-IB emulation, μPD7210;
     - CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
     - Write a PC80S31K device for 2d type floppies
       (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
@@ -20,6 +19,8 @@
     - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
     - Remove kludge for POR bit in a20_ctrl_w fn;
     - floppy sounds never silences when drive is idle (disabled for the time being);
+	- Abnormal 90 Hz refresh rate adjust for normal display mode (15KHz).
+	  Should really be 61.xx instead.
 
     TODO (PC-9801F)
     - kanji port 0xa9 readback is broken for several games (balpower, lovelyho).
@@ -37,19 +38,6 @@
 
     TODO (PC-9821AS)
     - IPL ROM banking contradicts greatly from the other machines;
-
-    TODO (PC-386M):
-    - "ERR:BR" at boot (BIOS loader error).
-      Executes some code in text VRAM area (PC=$a006e), trying to setup a writeable RAM bank
-      (shadow RAM even?) to IPL window, I/O $c06 seems to be the control port for it;
-
-    TODO: (PC-486SE/PC-486MU):
-    - Verify ROM bankswitch;
-      On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode
-      is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads
-      the same bank.
-    - Fix POR/ROM bankswitch on soft resets.
-    - Eventually errors with a ERR:VR (GFX VRAM);
 
     TODO: (PC-9821AP)
     - No way to exit the initial loop. Code looks broken, bad dump?
@@ -1035,11 +1023,11 @@ void pc9801_state::pc9801rs_io(address_map &map)
 	map(0xe0d0, 0xe0d3).r(FUNC(pc9801_state::midi_r));
 }
 
-/*************************************
+/**************************************
  *
  * PC-9821 specific handlers
  *
- ************************************/
+ *************************************/
 
 void pc9801_state::pc9821_video_ff_w(offs_t offset, uint8_t data)
 {
@@ -1583,9 +1571,9 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_START("MOUSE_B")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 
 	PORT_START("ROM_LOAD")
 	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2hd BIOS" )
@@ -2415,7 +2403,7 @@ void pc9801_state::pc9801rs(machine_config &config)
 	// TODO: verify if it needs invert();
 	m_pit->out_handler<1>().set( m_dac, FUNC(speaker_sound_device::level_w));
 
-	ADDRESS_MAP_BANK(config, "ipl_bank").set_map(&pc9801_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
+	ADDRESS_MAP_BANK(config, m_ipl).set_map(&pc9801_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801rs)
@@ -2627,56 +2615,7 @@ void pc9801_state::pc9821nr166(machine_config &config)
 	// Has FAX or ethernet 100BASE-TX/10BASE-T (depending on submodel type)
 }
 
-// Epson clones
-// TODO: definitely runs on their own state machine
-// (verify if for instance they need EGC and what kind of FM board they needs up)
-
-void pc9801_state::pc386m(machine_config &config)
-{
-	pc9801rs(config);
-//  I386SX(config.replace(), m_maincpu, 16000000); // i386SX 16MHz, switchable to 10/6 MHz
-//  m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801rs_map);
-//  m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801rs_io);
-//  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	// RAM: 640KB + 14.6MB max
-	// 2 3.5 floppy drives
-	// ...
-}
-
-void pc9801_state::pc486se(machine_config &config)
-{
-	pc9821(config);
-	const XTAL xtal = XTAL(25'000'000);
-	I486(config.replace(), m_maincpu, xtal); // i486SX, switchable to 10/5 MHz, supports overdrive
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	pit_clock_config(config, xtal/8); // unknown, passes "ERR:TM" test
-
-	// RAM: 1.6 MB (!) + 17.6 max
-	// "dedicated internal memory slot x 1"
-	// "dedicated video board" slot
-}
-
-void pc9801_state::pc486mu(machine_config &config)
-{
-	pc9821(config);
-	const XTAL xtal = XTAL(33'000'000);
-	I486(config.replace(), m_maincpu, xtal); // i486SX, switchable to I386DX 10MHz/5MHz, Pentium ODP compatible
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	pit_clock_config(config, xtal/8); // unknown, passes "ERR:TM" test
-
-	// CL-GD5428
-	// RAM: 5.6 + 61.6MB max
-	// 2 x 3.5 floppy drives
-}
-
-
-/* took from "raw" memory dump, uncomment ROM_FILL if you want to play with it */
+/* took from "raw" memory dump */
 #define LOAD_IDE_ROM \
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) ) \
 	ROM_LOAD( "d8000.rom", 0x0000, 0x2000, BAD_DUMP CRC(5dda57cc) SHA1(d0dead41c5b763008a4d777aedddce651eb6dcbb) ) \
@@ -3255,86 +3194,6 @@ ROM_START( pc9821nr166 )
 	LOAD_IDE_ROM
 ROM_END
 
-/*
-Epson PC-386M
-
-i386SX-16 @ 16
-1MB
-3.5"2DD/2HDx2
-CBus: 3slots
-*/
-
-ROM_START( pc386m )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "cwma-a02.bin", 0x10000, 0x08000,  CRC(d2c357a4) SHA1(819c9a1fc92124a8d6a85339c74651add7efaf92) )
-	ROM_CONTINUE(             0x18000, 0x18000 )
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
-/*
-Epson PC-486SE
-
-i486SX @ 25 MHz
-1.6 MB of conventional memory (???)
-17.6 MB
-CBus: 2slots
-*/
-
-ROM_START( pc486se )
-	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "1699ma_cw99-a03.bin", 0x00000, 0x20000,   CRC(f03df711) SHA1(88614746e01c7d3cff9f3b8ce0a598830a77d1dc) )
-
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// this looks convoluted
-	ROM_COPY( "biosrom", 0x08000, 0x00000, 0x08000 ) // tests this area at PC=0xf5149
-	ROM_COPY( "biosrom", 0x00000, 0x10000, 0x08000 )
-	ROM_COPY( "biosrom", 0x10000, 0x08000, 0x08000 )
-//  ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
-	ROM_COPY( "biosrom", 0x10000, 0x20000, 0x08000 ) // PC=f5113 bankswitch into same area, correct?
-	ROM_COPY( "biosrom", 0x18000, 0x28000, 0x08000 )
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
-/*
-Epson PC-486MU
-i486SX-33 @ 33
-8MB RAM
-3.5'2DD/2HDx2, 2xCD-ROM
-CBus: 3 slots
-*/
-
-ROM_START( pc486mu )
-	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "pc-486mu_hn27c1024.bin", 0x00000, 0x20000, CRC(113268e1) SHA1(2a630abc825b2808f9f8fb65c6cb1fb7e7f6c710))
-//  ROM_LOAD( "bios_486mu.rom", 0x00000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
-
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// backported from pc486se
-	ROM_COPY( "biosrom", 0x08000, 0x00000, 0x08000 )
-	ROM_COPY( "biosrom", 0x00000, 0x10000, 0x08000 )
-	ROM_COPY( "biosrom", 0x10000, 0x08000, 0x08000 )
-//  ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
-	ROM_COPY( "biosrom", 0x10000, 0x20000, 0x08000 )
-	ROM_COPY( "biosrom", 0x18000, 0x28000, 0x08000 )
-
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
 void pc9801_state::init_pc9801_kanji()
 {
 	#define copy_kanji_strip(_dst,_src,_fill_type) \
@@ -3510,10 +3369,7 @@ COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801_state, init_pc9
 // PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86), superimposition)
 // ...
 
-// Epson class
-COMP( 1990, pc386m,     0,        0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// Epson class knockoffs -> cfr. pc9801_epson.cpp
 
 // PC9821 [desktop] class
 // NB: several of these sub-models don't have the final letter in the original flyers but present in later docs as an afterthought.
@@ -3573,7 +3429,9 @@ COMP( 1997, pc9821nr166, pc9821nr15,   0, pc9821nr166, pc9821,   pc9801_state, i
 // ...
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
+// ...
 
+// PC-98LT / PC-98HA -> cfr. pc98ha.cpp
 // PC-9801T (i386SX, extremely expensive TFT or LCD laptop with C-Bus slots, de-facto a "portable" desktop machine)
 // PC-9801LX (i286, belongs to pc98ha.cpp?)
 // PC-9801LS (i386SX, Plasma laptop)

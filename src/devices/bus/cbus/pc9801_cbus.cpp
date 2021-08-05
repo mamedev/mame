@@ -135,7 +135,7 @@ void pc9801_slot_device::flush_install_io(const char *client_tag, u16 old_io, u1
 	if (old_io == 0)
 		old_io = new_io;
 
-	logerror("%s: %s I/O uninstall I/O at %04x-%04x\n",
+	logerror("%s: %s uninstall I/O at %04x-%04x\n",
 		this->tag(),
 		client_tag,
 		old_io,

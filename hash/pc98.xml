@@ -1883,7 +1883,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="epdiag">
+	<!-- boot OK -->
+	<!-- several unsupported features, has misaligned vertical lines on GFX boxes -->
+	<!-- on VM class FM sound test runs way too fast -->
+	<software name="epdiag" supported="partial">
 		<description>EPSON Jiko Shindan Program</description>
 		<year>1991</year>
 		<publisher>EPSON</publisher>
@@ -1895,7 +1898,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- "Disk I/O Error" on boot -->
+	<!-- "Disk I/O Error" on boot (btanb, needs Epson class machine) -->
 	<software name="epinstal" supported="no">
 		<description>EPSON Software Installation Program (v3.02)</description>
 		<year>19??</year>
@@ -36644,7 +36647,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<!-- boot OK -->
-	<!-- Has DAC1BIT Note class switch option, has Epson class mixing option -->
+	<!-- Has DAC1BIT Note class switch option, has Epson class sound mixing option -->
 	<software name="puyopuyo" supported="yes">
 		<description>Puyo Puyo</description>
 		<year>1993</year>

@@ -120,6 +120,7 @@ public:
 	pc9801_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ipl(*this, "ipl_bank")
 		, m_dmac(*this, "i8237")
 		, m_pit(*this, "pit")
 		, m_pic1(*this, "pic8259_master")
@@ -140,7 +141,6 @@ public:
 		, m_ext_gvram(*this, "ext_gvram")
 		, m_dac(*this, "dac")
 		, m_ram(*this, RAM_TAG)
-		, m_ipl(*this, "ipl_bank")
 	{
 	}
 
@@ -166,10 +166,6 @@ public:
 	void pc9821nr15(machine_config &config);
 	void pc9821nr166(machine_config &config);
 
-	void pc386m(machine_config &config);
-	void pc486mu(machine_config &config);
-	void pc486se(machine_config &config);
-
 	void init_pc9801_kanji();
 	void init_pc9801vm_kanji();
 
@@ -185,10 +181,21 @@ protected:
 
 	void pit_clock_config(machine_config &config, const XTAL clock);
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<address_map_bank_device> m_ipl;
+
+	void pc9801rs_io(address_map &map);
+	void pc9801rs_map(address_map &map);
+
+	DECLARE_MACHINE_START(pc9801rs);
+	DECLARE_MACHINE_RESET(pc9801rs);
+
+	u8 m_vram_bank;
+	u8 m_gate_a20;
+
 private:
 	static void cdrom_headphones(device_t *device);
 
-	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_pic1;
@@ -210,7 +217,6 @@ private:
 //	optional_device<dac_1bit_device> m_dac;
 	optional_device<speaker_sound_device> m_dac;
 	optional_device<ram_device> m_ram;
-	optional_device<address_map_bank_device> m_ipl;
 
 	void dmapg4_w(offs_t offset, uint8_t data);
 	void dmapg8_w(offs_t offset, uint8_t data);
@@ -221,7 +227,6 @@ private:
 	void txt_scrl_w(offs_t offset, uint8_t data);
 	uint8_t grcg_r(offs_t offset);
 	void grcg_w(offs_t offset, uint8_t data);
-	void egc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t pc9801_a0_r(offs_t offset);
 	void pc9801_a0_w(offs_t offset, uint8_t data);
 	uint8_t fdc_2hd_ctrl_r();
@@ -299,13 +304,11 @@ private:
 
 	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_START(pc9801f);
-	DECLARE_MACHINE_START(pc9801rs);
 	DECLARE_MACHINE_START(pc9801bx2);
 	DECLARE_MACHINE_START(pc9821);
 	DECLARE_MACHINE_START(pc9821ap2);
 	DECLARE_MACHINE_RESET(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801f);
-	DECLARE_MACHINE_RESET(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9821);
 
 	void pc9801_palette(palette_device &palette) const;
@@ -339,8 +342,6 @@ private:
 	void pc9801_common_io(address_map &map);
 	void pc9801_io(address_map &map);
 	void pc9801_map(address_map &map);
-	void pc9801rs_io(address_map &map);
-	void pc9801rs_map(address_map &map);
 	void pc9801ux_io(address_map &map);
 	void pc9801ux_map(address_map &map);
 	void pc9821_io(address_map &map);
@@ -376,7 +377,6 @@ private:
 	uint8_t m_fdc_2dd_ctrl,m_fdc_2hd_ctrl;
 	uint8_t m_nmi_ff;
 
-	uint8_t m_vram_bank;
 	uint8_t m_vram_disp;
 
 	uint8_t m_sasi_data;
@@ -398,7 +398,6 @@ private:
 	bool m_dac_disable;
 
 	/* PC9801RS specific, move to specific state */
-	uint8_t m_gate_a20; //A20 line
 	uint8_t m_access_ctrl; // DMA related
 	uint8_t m_fdc_ctrl;
 	uint8_t m_ex_video_ff[128];
@@ -416,16 +415,12 @@ private:
 		uint8_t tile[4], tile_index;
 	}m_grcg;
 
-	void egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t egc_blit_r(uint32_t offset, uint16_t mem_mask);
-
-
-	/* PC9821 specific */
+	// SDIP, PC9801DA onward
 	uint8_t m_sdip[24], m_sdip_bank;
-	uint8_t m_unkdev0468[0x100], m_unkdev0468_addr;
-	uint8_t m_pc9821_window_bank;
-	uint8_t m_ext2_ff;
+	template<unsigned port> u8 sdip_r(offs_t offset);
+	template<unsigned port> void sdip_w(offs_t offset, u8 data);
 
+	// EGC, PC9801VX onward
 	struct {
 		uint16_t regs[8];
 		uint16_t pat[4];
@@ -436,19 +431,71 @@ private:
 		bool init;
 	} m_egc;
 
-	uint16_t m_pc9821_256vram_bank;
+	void egc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	template<unsigned port> u8 sdip_r(offs_t offset);
-	template<unsigned port> void sdip_w(offs_t offset, u8 data);
+	void egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t egc_blit_r(uint32_t offset, uint16_t mem_mask);
 
 	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const;
 	uint16_t egc_shift(int plane, uint16_t val);
 	uint16_t egc_color_pat(int plane) const;
+
+	// other PC9821 specifics
+	uint8_t m_unkdev0468[0x100], m_unkdev0468_addr;
+	uint8_t m_pc9821_window_bank;
+	uint8_t m_ext2_ff;
+
+	uint16_t m_pc9821_256vram_bank;
 };
 
 
+/******************************************
+ *
+ * pc9801_epson.cpp: Epson clones
+ *
+ ******************************************/
 
+class pc98_epson_state : public pc9801_state
+{
+public:
+	pc98_epson_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9801_state(mconfig, type, tag)
+		, m_shadow_ipl(*this, "shadow_ipl_%u", 0)
+	{
+	}
 
+	void pc386m(machine_config &config);
+	void pc486mu(machine_config &config);
+	void pc486se(machine_config &config);
+
+protected:
+	void pc386m_ipl_bank(address_map &map);
+
+	void pc386m_io(address_map &map);
+	void pc386m_map(address_map &map);
+	void pc486se_io(address_map &map);
+	void pc486se_map(address_map &map);
+
+//	virtual void machine_start() override;
+//	virtual void machine_reset() override;
+
+	DECLARE_MACHINE_START(pc98_epson);
+	DECLARE_MACHINE_RESET(pc98_epson);
+
+private:
+	void epson_ipl_bank_w(offs_t offset, u8 data);
+	void epson_itf_bank_w(offs_t offset, u8 data);
+	void epson_a20_w(offs_t offset, u8 data);
+	void epson_vram_bank_w(offs_t offset, u8 data);
+
+	required_shared_ptr_array<uint16_t, 2> m_shadow_ipl;
+
+	template <unsigned which> void shadow_ipl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	u8 m_shadow_ipl_bank;
+	bool m_itf_bank_enable;
+	u8 m_itf_bank;
+};
 
 /******************************************
  *
