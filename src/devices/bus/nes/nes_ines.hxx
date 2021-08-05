@@ -207,7 +207,7 @@ static const nes_mmc mmc_list[] =
 	{ 171, KAISER_KS7058 },
 	{ 172, TXC_DUMARACING },
 	{ 173, TXC_MJBLOCK },
-	// 174 Bisqwit's TV GAME multicart (Legend of Kage, Goonies, etc). Dump available?
+	{ 174, BMC_2751 },
 	{ 175, KAISER_KS7022},
 	{ 176, UNL_XIAOZY },
 	{ 177, HENGG_SRICH },
@@ -302,7 +302,7 @@ static const nes_mmc mmc_list[] =
 	{ 264, YOKO_BOARD },
 	{ 265, BMC_T262 },
 	{ 266, UNL_CITYFIGHT },
-	// 267 8 in 1 JY-119 multicart, not in nes.xml?
+	{ 267, BMC_FCGENJIN_8IN1 },
 	// 268 COOLBOY and MINDKIDS
 	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
 	// 270 multicarts on OneBus Famiclones

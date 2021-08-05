@@ -433,6 +433,20 @@ private:
 #endif
 
 
+// ======================> nes_fcgj8in1_device
+
+class nes_fcgj8in1_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_fcgj8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_fk23c_device
 
 class nes_fk23c_device : public nes_txrom_device
@@ -755,6 +769,7 @@ DECLARE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device)
 DECLARE_DEVICE_TYPE(NES_A9746,         nes_a9746_device)
 #endif
 
+DECLARE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device)
 DECLARE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device)
 DECLARE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device)
 DECLARE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device)
