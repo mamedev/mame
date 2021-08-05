@@ -17,7 +17,9 @@ TODO:
  - timing
  - unknown reads/writes
  - improve sound hook up
- - does ppcar only use the VIDC internal DAC?
+ - does ppcar only use the VIDC internal DAC? Could also be using just the QS1000 internal ROM and the
+   wave ROM for music and the DAC for SFX
+
 
 *************************************************************************************************************
 
@@ -379,7 +381,6 @@ void ssfindo_state::ssfindo_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x032001d8, 0x032001db).nopw(); // 1d8 always 0x10?
 	map(0x03012e60, 0x03012e67).noprw();
 	map(0x03012fe0, 0x03012fe3).w(FUNC(ssfindo_state::debug_w));
 	map(0x03012ff0, 0x03012ff3).noprw();
