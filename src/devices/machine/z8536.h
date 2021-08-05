@@ -443,6 +443,15 @@ protected:
 	virtual void z80daisy_irq_reti() override;
 
 private:
+	// direct external access to ports
+	enum
+	{
+		EXT_PORT_C = 0,
+		EXT_PORT_B,
+		EXT_PORT_A,
+		EXT_CONTROL
+	};
+
 	// control state machine
 	bool m_state0;
 	u8 m_pointer;

@@ -1041,19 +1041,19 @@ u8 z8536_device::read(offs_t offset)
 	{
 		switch (offset & 0x03)
 		{
-		case 0:
+		case EXT_PORT_C:
 			data = read_register(PORT_C_DATA);
 			break;
 
-		case 1:
+		case EXT_PORT_B:
 			data = read_register(PORT_B_DATA);
 			break;
 
-		case 2:
+		case EXT_PORT_A:
 			data = read_register(PORT_A_DATA);
 			break;
 
-		case 3:
+		case EXT_CONTROL:
 			// state 0 or state 1: read data
 			data = read_register(m_pointer);
 
@@ -1107,19 +1107,19 @@ void z8536_device::write(offs_t offset, u8 data)
 	{
 		switch (offset & 0x03)
 		{
-		case 0:
+		case EXT_PORT_C:
 			write_register(PORT_C_DATA, data);
 			break;
 
-		case 1:
+		case EXT_PORT_B:
 			write_register(PORT_B_DATA, data);
 			break;
 
-		case 2:
+		case EXT_PORT_A:
 			write_register(PORT_A_DATA, data);
 			break;
 
-		case 3:
+		case EXT_CONTROL:
 			if (m_state0)
 			{
 				// state 0: write pointer
