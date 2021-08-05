@@ -1,34 +1,44 @@
 // license:BSD-3-Clause
-// copyright-holders: Golden Child
-/*********************************************************************
+// copyright-holders:
+/*
+ *  silentype deserializer board
+ *
+ */
 
-    silentype.h
-
-    Implementation of the Apple II Silentype Printer
-
-*********************************************************************/
-
-#ifndef MAME_BUS_A2BUS_SILENTYPE_H
-#define MAME_BUS_A2BUS_SILENTYPE_H
+#ifndef MAME_MACHINE_SILENTYPE_PRINTER_H
+#define MAME_MACHINE_SILENTYPE_PRINTER_H
 
 #pragma once
 
-#include "a2bus.h"
-#include "silentype_printer.h"
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-class a2bus_silentype_device:
-	public device_t,
-	public device_a2bus_card_interface
+class silentype_printer_device : public device_t
 {
 public:
-	a2bus_silentype_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	silentype_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	silentype_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+public:
+	void update_printhead(uint8_t data);
+	void update_pf_stepper(uint8_t data);
+	void update_cr_stepper(uint8_t data);
+
+/*
+    auto silentype_pin5_machine_status_input() { return m_write_silentype_pin5_machine_status_input.bind(); }
+    auto silentype_pin9_serial_data_input() { return m_write_silentype_pin5_machine_status_input.bind(); }
+
+    void write(offs_t offset, uint8_t data);
+    uint8_t read(offs_t offset);
+
+    DECLARE_WRITE_LINE_MEMBER( silentype_pin4_serial_data_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
+    DECLARE_WRITE_LINE_MEMBER( silentype_pin9_serial_clock_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
+    DECLARE_WRITE_LINE_MEMBER( silentype_pin8_store_clock_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
+
+    // treat these as an atomic update, update when serial_clock_out gets written
+
+*/
 
 protected:
-	a2bus_silentype_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	// device-level overrides
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -36,18 +46,15 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// overrides of standard a2bus slot functions
-	virtual uint8_t read_c0nx(uint8_t offset) override;
-	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_cnxx(uint8_t offset) override;
-	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_c800(uint16_t offset) override;
-	virtual void write_c800(uint16_t offset, uint8_t data) override;
 
+private:
+	/* callbacks */
+//  devcb_write_line m_write_silentype_pin9_serial_data_input;
+//  devcb_write_line m_write_silentype_pin9_machine_status_input;
 
-	void update_printhead(uint8_t data);
-	void update_pf_stepper(uint8_t data);
-	void update_cr_stepper(uint8_t data);
+	uint8_t m_serial_data_out;
+	uint8_t m_serial_clock_out;
+	uint8_t m_store_clock_out;
 
 	uint8_t *m_rom;
 	uint8_t m_ram[256];
@@ -61,8 +68,6 @@ protected:
 	int m_romenable = 0;  // start off disabled
 
 	required_device<screen_device> m_screen;
-	required_device<silentype_printer_device> m_silentype_printer;
-
 
 	int right_offset = 0;
 	int left_offset = 3;
@@ -83,7 +88,6 @@ protected:
 
  private:
 	uint32_t screen_update_silentype(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	const int dpi=60;
 	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide at 60 dpi
@@ -98,11 +102,9 @@ protected:
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, u32& pixel);
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
+
 };
 
+DECLARE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device)
 
-// device type definition
-
-DECLARE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device)
-
-#endif // MAME_BUS_A2BUS_A2SILENTYPE_H
+#endif // MAME_MACHINE_SILENTYPE_PRINTER_H

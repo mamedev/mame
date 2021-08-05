@@ -2480,6 +2480,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/sider.h",
 		MAME_DIR .. "src/devices/bus/a2bus/silentype.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/silentype.h",
+		MAME_DIR .. "src/devices/bus/a2bus/silentype_printer.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/silentype_printer.h",
 		MAME_DIR .. "src/devices/bus/a2bus/softcard3.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/softcard3.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",
