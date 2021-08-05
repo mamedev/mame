@@ -30,8 +30,11 @@ public:
     uint8_t read(offs_t offset);
 
     DECLARE_WRITE_LINE_MEMBER( silentype_pin4_serial_data_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
-    DECLARE_WRITE_LINE_MEMBER( silentype_pin9_serial_clock_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
     DECLARE_WRITE_LINE_MEMBER( silentype_pin8_store_clock_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
+    DECLARE_WRITE_LINE_MEMBER( silentype_pin9_serial_clock_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
+
+    DECLARE_READ_LINE_MEMBER( silentype_pin4_serial_data_input ) {}
+    DECLARE_READ_LINE_MEMBER( silentype_pin5_machine_status_input ) {}
 
     // treat these as an atomic update, update when serial_clock_out gets written
 
