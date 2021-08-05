@@ -55,6 +55,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device,       "nes_bmc_tj03"
 DEFINE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device,         "nes_bmc_ws",         "NES Cart BMC WS PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device,      "nes_bmc_1160",       "NES Cart BMC-1160 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_G146,       nes_bmc_g146_device,       "nes_bmc_g146",       "NES Cart BMC-G-146 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_2751,       nes_bmc_2751_device,       "nes_bmc_2751",       "NES Cart BMC-2751 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_8157,       nes_bmc_8157_device,       "nes_bmc_8157",       "NES Cart BMC-8157 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_HIK300,     nes_bmc_hik300_device,     "nes_bmc_hik300",     "NES Cart BMC HIK 300 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_S700,       nes_bmc_s700_device,       "nes_bmc_s700",       "NES Cart BMC Super 700 in 1 PCB")
@@ -217,6 +218,11 @@ nes_bmc_11160_device::nes_bmc_11160_device(const machine_config &mconfig, const 
 
 nes_bmc_g146_device::nes_bmc_g146_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_G146, tag, owner, clock)
+{
+}
+
+nes_bmc_2751_device::nes_bmc_2751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_2751, tag, owner, clock)
 {
 }
 
@@ -722,6 +728,19 @@ void nes_bmc_g146_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
+}
+
+void nes_bmc_2751_device::pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted)
+{
+	device_nes_cart_interface::pcb_start(machine, ciram_ptr, cart_mounted);
+	prg16_89ab(0);
+	prg16_cdef(0);
+	chr8(0, CHRROM);
+}
+
+void nes_bmc_2751_device::pcb_reset()
+{
+	// this board does not reset to menu on soft reset
 }
 
 void nes_bmc_8157_device::device_start()
@@ -1937,6 +1956,29 @@ void nes_bmc_g146_device::write_h(offs_t offset, uint8_t data)
 		prg32((offset & 0x1f) >> 4);
 
 	set_nt_mirroring(!BIT(offset, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ Board BMC-2751
+
+ Games: 5 in 1
+
+ iNES: mapper 174
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_2751_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_2751 write_h, offset: %04x, data: %02x\n", offset, data));
+	u8 bank = (offset >> 4) & 0x07;
+	u8 mode = BIT(offset, 7);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
+	chr8((offset >> 1) & 0x07, CHRROM);
+	set_nt_mirroring(BIT(offset, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------

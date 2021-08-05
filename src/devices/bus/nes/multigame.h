@@ -526,6 +526,21 @@ protected:
 };
 
 
+// ======================> nes_bmc_2751_device
+
+class nes_bmc_2751_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_2751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+	virtual void pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted) override;
+};
+
+
 // ======================> nes_bmc_8157_device
 
 class nes_bmc_8157_device : public nes_nrom_device
@@ -1092,6 +1107,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device)
 DECLARE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device)
 DECLARE_DEVICE_TYPE(NES_BMC_G146,       nes_bmc_g146_device)
+DECLARE_DEVICE_TYPE(NES_BMC_2751,       nes_bmc_2751_device)
 DECLARE_DEVICE_TYPE(NES_BMC_8157,       nes_bmc_8157_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK300,     nes_bmc_hik300_device)
 DECLARE_DEVICE_TYPE(NES_BMC_S700,       nes_bmc_s700_device)
