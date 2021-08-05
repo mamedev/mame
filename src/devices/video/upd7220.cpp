@@ -424,9 +424,9 @@ inline void upd7220_device::reset_figs_param()
 {
 	m_figs.m_dc = 0x0000;
 	m_figs.m_d = 0x0008;
-	m_figs.m_d1 = 0x0008;
-	m_figs.m_d2 = 0x0000;
-	m_figs.m_dm = 0x0000;
+	m_figs.m_d1 = 0xffff;
+	m_figs.m_d2 = 0x0008;
+	m_figs.m_dm = 0xffff;
 	m_figs.m_gd = 0;
 }
 
