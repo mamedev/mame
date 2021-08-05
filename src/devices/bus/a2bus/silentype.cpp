@@ -180,16 +180,6 @@ ROM_END
 
 void a2bus_silentype_device::device_add_mconfig(machine_config &config)
 {
-   // video hardware (simulates paper)
-/*
-    screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
-    screen.set_refresh_hz(60);
-    screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-    screen.set_size(PAPER_WIDTH, PAPER_SCREEN_HEIGHT);
-    screen.set_visarea(0, PAPER_WIDTH-1, 0, PAPER_SCREEN_HEIGHT-1);
-    screen.set_screen_update(FUNC(a2bus_silentype_device::screen_update_silentype));
-*/
-
 [[maybe_unused]]    silentype_printer_device &printer(SILENTYPE_PRINTER(config, m_silentype_printer, 0));
 }
 
@@ -211,7 +201,6 @@ a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, de
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_rom(nullptr),
-	//  m_screen(*this, "screen"), // aagh missing comma makes compile freakout
 		m_silentype_printer(*this, "silentype_printer")
 {
 }
@@ -232,25 +221,7 @@ void a2bus_silentype_device::device_start()
 
 	memset(m_ram, 0, 256);
 
-//  m_bitmap.allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
-//  m_bitmap.fill(0xffffff); // Start with a white piece of paper
-
-//  save_item(NAME(m_bitmap));
 	save_item(NAME(m_ram));
-	save_item(NAME(m_xpos));
-	save_item(NAME(m_ypos));
-	save_item(NAME(right_offset));
-	save_item(NAME(left_offset));
-	save_item(NAME(heattime));
-	save_item(NAME(decaytime));
-	save_item(NAME(lastheadbits));
-	save_item(NAME(headtemp));
-	save_item(NAME(hstepperlast));
-	save_item(NAME(vstepperlast));
-	save_item(NAME(xdirection));
-	save_item(NAME(newpageflag));
-	save_item(NAME(page_count));
-	save_item(NAME(last_update_time));
 }
 
 void a2bus_silentype_device::device_reset_after_children()
@@ -260,37 +231,8 @@ void a2bus_silentype_device::device_reset_after_children()
 
 void a2bus_silentype_device::device_reset()
 {
-/*
-    update_pf_stepper(0);
-    update_cr_stepper(0);
-    update_printhead(0);
-*/
 }
 
-/*
-
-uint32_t a2bus_silentype_device::screen_update_silentype(screen_device &screen,
-                             bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-    const int distfrombottom = 50;
-    int scrolly = bitmap.height() - distfrombottom - (m_ypos * 7 / 4);
-
-    int bottomlinetoclear = std::min(PAPER_HEIGHT-PAPER_SCREEN_HEIGHT,PAPER_HEIGHT);
-
-    m_bitmap.plot_box(0, m_ypos * 7 / 4 + 10, PAPER_WIDTH, bottomlinetoclear, rgb_t::white());
-
-    copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
-
-    m_bitmap.plot_box(0, 0, 559, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
-
-    bitmap.plot_box(m_xpos - 10, bitmap.height() - distfrombottom + 10,     20, 30, 0xBDB76B);
-    bitmap.plot_box(m_xpos - 5,  bitmap.height() - distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
-
-    return 0;
-}
-
-
-*/
 
 /*-------------------------------------------------
   read_c0nx - called for reads from this card's c0nx space
@@ -300,224 +242,12 @@ uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 {
 	if (offset == 4)
 	{
-//		return (m_xpos <= 0) << SILENTYPE_STATUS;
+//      return (m_xpos <= 0) << SILENTYPE_STATUS;
 		return m_silentype_printer->margin_switch_input() << SILENTYPE_STATUS;
 	}
 	else
 		return 0x00;
 }
-
-
-/*
-
-void a2bus_silentype_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
-{
-    bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
-//  bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, rgb_t::white());
-
-}
-
-void a2bus_silentype_device::write_snapshot_to_file(std::string directory, std::string name)
-{
-    emu_file file(machine().options().snapshot_directory() + std::string("/") + directory,
-          OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
-    auto const filerr = file.open(name);
-
-    if (filerr == osd_file::error::NONE)
-    {
-        static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
-
-        // save the paper into a png
-        util::png_write_bitmap(file, nullptr, m_bitmap, 2, png_palette);
-    }
-}
-
-
-*/
-
-
-/*-------------------------------------------------
-    write_c0nx - called for writes to this card's c0nx space
--------------------------------------------------*/
-/*
-void a2bus_silentype_device::darken_pixel(double headtemp, u32& pixel)
-{
-    if (headtemp > 0.0)
-    {
-        u8 intensity = headtemp * 15.0;
-        u32 pixelval = pixel;
-        u32 darkenval = intensity * 0x111111;
-
-        pixelval &= 0xffffff;
-
-        u32 rp = BITS(pixelval, 23, 16);
-        u32 gp = BITS(pixelval, 15,  8);
-        u32 bp = BITS(pixelval,  7,  0);
-
-        u32 rd = BITS(darkenval, 23, 16);
-        u32 gd = BITS(darkenval, 15,  8);
-        u32 bd = BITS(darkenval,  7,  0);
-
-        u32 r = (rp >= rd) ? rp - rd : 0;    // subtract the amount to darken
-        u32 g = (gp >= gd) ? gp - gd : 0;
-        u32 b = (bp >= bd) ? bp - bd : 0;
-
-        pixelval = (r << 16) | (g << 8) | (b << 0);
-
-        pixel = pixelval;
-    }
-}
-
-
-
-
-//-------------------------------------------------
-//    Adjust Printhead Temperature
-//-------------------------------------------------
-
-void a2bus_silentype_device::adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp)
-{
-    temp += ( (pin_status) ?
-                (time_elapsed / ((double) heattime  / 1.0E6)) :
-              - (time_elapsed / ((double) decaytime / 1.0E6)) );
-    if (temp < 0.0) temp = 0;
-    if (temp > 1.0) temp = 1.0;
-}
-
-//-------------------------------------------------
-//    Update Printhead
-//-------------------------------------------------
-
-void a2bus_silentype_device::update_printhead(uint8_t headbits)
-{
-
-    double current_time = machine().time().as_double();
-    double time_elapsed = current_time - last_update_time;
-    last_update_time = current_time;
-
-//      printf("PRINTHEAD %x\n",headbits);
-//      printf("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",
-//      time_elapsed, time_elapsed*1e6, std::bitset<8>(headbits).to_string().c_str());
-
-    for (int i=0;i<7;i++)
-    {
-        adjust_headtemp( BIT(lastheadbits,i), time_elapsed,  headtemp[i] );
-
-        int xpixel = m_xpos + ((xdirection == 1) ? right_offset : left_offset);
-        int ypixel = (m_ypos * 7 / 4) + (6 - i);
-
-        if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
-            darken_pixel( headtemp[i], m_bitmap.pix(ypixel, xpixel) );
-    }
-    lastheadbits = headbits;
-}
-
-//-------------------------------------------------
-//    Update Paper Stepper
-//-------------------------------------------------
-
-void a2bus_silentype_device::update_pf_stepper(uint8_t vstepper)
-{
-    int halfstepflag;
-    const int drivetable[4]    = {3, 9, 12, 6};
-    const int halfsteptable[4] = {2, 4, 8, 1};
-
-    if (vstepper != 0)
-    {
-        for(int i = 0; i < 4; i++)
-        {
-            if (drivetable[i] == vstepperlast) // scan table until we match index
-            {
-                if (drivetable[wrap(i + 1, 4)] == vstepper) // we are moving down the page
-                {
-                    m_ypos += 1; // move down
-
-                    if (newpageflag == 1)
-                    {
-                        m_ypos = 10;  // lock to the top of page until we seek horizontally
-                    }
-                    if (m_ypos * 7 / 4 > m_bitmap.height() - 50)
-                        // if we are within 50 pixels of the bottom of the page we will
-                        // write the page to a file, then erase the top part of the page
-                        // so we can still see the last page printed.
-                    {
-
-                        // clear paper to bottom
-                        // something doesn't make sense with this formula...revisit this after I get some sleep
-                        //m_bitmap.plot_box(m_ypos * 7 / 4, 3, PAPER_WIDTH - 1, PAPER_HEIGHT - 1, rgb_t::white());
-                        bitmap_clear_band(m_bitmap, m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
-
-                        // save a snapshot with the slot and page as part of the filename
-                        write_snapshot_to_file(
-                                    std::string("silentype"),
-                                    std::string("silentype") +
-                                    std::string("_slot") + std::to_string(slotno()) +
-                                    "_page" + std::to_string(page_count++) + ".png");
-
-                        newpageflag = 1;
-                        m_ypos = 10;
-
-                        // clear page down to visible area
-                        bitmap_clear_band(m_bitmap, m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
-                    }
-                }
-                else if (drivetable[wrap(i - 1, 4)] == vstepper) // we are moving up the page
-                {
-                    m_ypos -= 1;
-                    if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
-                }
-            }
-        } // end for
-
-        // ignore half steps
-        halfstepflag=0;
-        for (int i = 0; i < 4; i++) if (halfsteptable[i] == vstepper) halfstepflag = 1;
-
-        if (!halfstepflag) vstepperlast = vstepper; // update the vstepperlast ignoring half steps
-    }
-}
-
-//-------------------------------------------------
-//    Update Carriage Stepper
-//-------------------------------------------------
-
-void a2bus_silentype_device::update_cr_stepper(uint8_t hstepper)
-{
-    int halfstepflag;
-    const int drivetable[4]    = {3, 9, 12, 6};
-    const int halfsteptable[4] = {2, 4, 8, 1};
-
-    if (hstepper != 0)
-    {
-        newpageflag = 0;
-
-        for(int i = 0; i < 4; i++)
-        {
-            if (drivetable[i] == hstepperlast) // scan table until we match index
-            {
-                if (drivetable[wrap(i + 1, 4)] == hstepper)
-                {
-                    m_xpos += 1; xdirection = 1;
-                }
-                else if (drivetable[wrap(i - 1, 4)] == hstepper)
-                {
-                    m_xpos -= 1; xdirection = -1;
-                    if (m_xpos < 0) m_xpos = 0;
-                }
-            }
-        } // end for
-
-        // ignore half steps
-        halfstepflag = 0;
-        for (int i = 0; i < 4; i++) if (halfsteptable[i] == hstepper) halfstepflag = 1;
-
-        if (!halfstepflag) hstepperlast = hstepper; // update the hstepperlast ignoring half steps
-    }
-}
-
-
-*/
 
 
 //-------------------------------------------------
@@ -547,10 +277,7 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 		uint8_t vstepperbits = BITS(m_parallel_reg, 7,  4);
 		uint8_t headbits     = BITS(m_parallel_reg, 15, 9);
 
-		printf("PARALLEL REGISTER = %4x\n",m_parallel_reg);
-//      update_pf_stepper(vstepperbits);
-//      update_cr_stepper(hstepperbits);
-//      update_printhead(headbits);
+//      printf("PARALLEL REGISTER = %4x\n",m_parallel_reg);
 
 		m_silentype_printer->update_pf_stepper(vstepperbits);
 		m_silentype_printer->update_cr_stepper(hstepperbits);

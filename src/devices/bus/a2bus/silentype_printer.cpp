@@ -121,24 +121,23 @@ void silentype_printer_device::device_start()
 {
 	m_bitmap.allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
 	m_bitmap.fill(0xffffff); // Start with a white piece of paper
-/*
-    save_item(NAME(m_bitmap));
-    save_item(NAME(m_ram));
-    save_item(NAME(m_xpos));
-    save_item(NAME(m_ypos));
-    save_item(NAME(right_offset));
-    save_item(NAME(left_offset));
-    save_item(NAME(heattime));
-    save_item(NAME(decaytime));
-    save_item(NAME(lastheadbits));
-    save_item(NAME(headtemp));
-    save_item(NAME(hstepperlast));
-    save_item(NAME(vstepperlast));
-    save_item(NAME(xdirection));
-    save_item(NAME(newpageflag));
-    save_item(NAME(page_count));
-    save_item(NAME(last_update_time));
-    */
+
+	save_item(NAME(m_bitmap));
+	save_item(NAME(m_xpos));
+	save_item(NAME(m_ypos));
+	save_item(NAME(right_offset));
+	save_item(NAME(left_offset));
+	save_item(NAME(heattime));
+	save_item(NAME(decaytime));
+	save_item(NAME(lastheadbits));
+	save_item(NAME(headtemp));
+	save_item(NAME(hstepperlast));
+	save_item(NAME(vstepperlast));
+	save_item(NAME(xdirection));
+	save_item(NAME(newpageflag));
+	save_item(NAME(page_count));
+	save_item(NAME(last_update_time));
+
 }
 
 void silentype_printer_device::device_reset_after_children()

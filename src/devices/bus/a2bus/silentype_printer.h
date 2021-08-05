@@ -40,7 +40,7 @@ public:
 
 */
 
-    DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_xpos <= 0); }
+	DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_xpos <= 0); }
 
 protected:
 	// device-level overrides
