@@ -504,6 +504,35 @@ ROM_START( pc486mu )
 	LOAD_IDE_ROM
 ROM_END
 
+// Epson PC98 desktop line
+
+// PC-286 (i286, first model released in Oct 1987)
+// PC-286U (same as above except running on V30)
+// PC-286C "PC Club" (same as PC-286?)
+// ...
+
+// PC-386 (i386)
 COMP( 1990, pc386m,     0,        0, pc386m,    pc386m, pc98_epson_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// PC-486 (i486SX/DX)
 COMP( 1994, pc486mu,    0,        0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji,   "Epson", "PC-486SE",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// PRO-486 (first actual version with i486dx? Supports High-reso)
+// PC-486P/Win (same as a PC-486P but with Windows 3.0a + MS-DOS 3.3 HDD pre-installed?)
+
+// PC-586 (Pentium/Pentium ODP compatibles)
+// ...
+
+// Epson PC98 L[aptop] line
+// PC-286B (80C286)
+// PC-286L* (V30 or 80C286)
+// ...
+
+// PC-386BL* (i386sx)
+// PC-386LS* (just bigger version of above?)
+// ...
+
+// Epson PC98 NOTE[book] line
+// PC-*86N* (runs on correlated CPU as above)
+// PC-486PT ("P[or]T[able]" SL enhanced i486, wallet-like dimensions, supports light pen, runs under "PenDOS")
+// ...
