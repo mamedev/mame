@@ -494,7 +494,7 @@ private:
 
 	u8 m_shadow_ipl_bank;
 	bool m_itf_bank_enable;
-	u8 m_itf_bank;
+//	u8 m_itf_bank;
 };
 
 /******************************************

@@ -232,9 +232,6 @@
 
     For more info (e.g. optional hardware), see http://www.geocities.jp/retro_zzz/machines/nec/9801/mdl98cpu.html
 
-    Epson Series
-    http://www.pc-9800.net/db_epson/desk_index.htm
-
     PC-9821 Series
 
     PC-9821 (1992) - aka 98MULTi, desktop computer, 386 based

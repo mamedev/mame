@@ -25,6 +25,9 @@
     - Eventually errors with a ERR:VR (GFX VRAM);
 
 	Notes:
+	- A detailed list of Epson PC98s can be seen from here:
+	  http://www.pc-9800.net/db_epson/index.htm
+
 	- Being these knockoffs means that there isn't 100% compatibility with all SWs.
 	  Additionally NEC introduced the so called "EPSON Protect" / "EPSON check" (エプソンチェック) 
 	  starting with MS-DOS 3.3 onward, which checks the presence of NEC / Microsoft copyright
