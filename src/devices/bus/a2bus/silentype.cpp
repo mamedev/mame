@@ -10,7 +10,7 @@
 
 Useful Resources:
 
-OpenEmulator its Apple Silentype driver by Marc S. Ressl
+OpenEmulator's Apple Silentype driver by Marc S. Ressl
 
 Apple II Documentation Project:
 Apple II Documentation Project/Interface Cards/Serial/Apple Synch Printer Interface Card (Silentype)/
@@ -52,7 +52,7 @@ https://archive.org/details/AppleServiceLevelITechnicalProcedures0720062VolIIJan
 covers using the Apple II Product Diagnostics Disk to perform diagnostics on the Silentype Printer and Interface.
 
 Diagnostics disk named "Apple II+ Products diagnostic 652-0334.dsk"
-
+Diagnostics disk named "Apple II Peripherals diskette 077-0217-A.dsk"
 
 https://www.folklore.org/StoryView.py?project=Macintosh&story=What_Hath_Woz_Wrought
 Story about Silentype development by Andy Hertzfeld from September 1979
@@ -295,20 +295,23 @@ uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 		return 0x00;
 }
 
+void a2bus_silentype_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
+{
+	bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
+//  bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, rgb_t::white());
+
+}
+
 void a2bus_silentype_device::write_snapshot_to_file(std::string directory, std::string name)
 {
 	emu_file file(machine().options().snapshot_directory() + std::string("/") + directory,
 		  OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		  
+
 	auto const filerr = file.open(name);
 
 	if (filerr == osd_file::error::NONE)
 	{
 		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
-
-		// clear paper to bottom
-		// something doesn't make sense with this formula...revisit this
-		m_bitmap.plot_box(m_ypos * 7 / 4, 3, PAPER_WIDTH - 1, PAPER_HEIGHT - 1, rgb_t::white());
 
 		// save the paper into a png
 		util::png_write_bitmap(file, nullptr, m_bitmap, 2, png_palette);
@@ -372,7 +375,8 @@ void a2bus_silentype_device::update_printhead(uint8_t headbits)
 	last_update_time = current_time;
 
 //      printf("PRINTHEAD %x\n",headbits);
-//      printf("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",time_elapsed, time_elapsed*1e6, std::bitset<8>(headbits).to_string().c_str());
+//      printf("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",
+//      time_elapsed, time_elapsed*1e6, std::bitset<8>(headbits).to_string().c_str());
 
 	for (int i=0;i<7;i++)
 	{
@@ -405,7 +409,8 @@ void a2bus_silentype_device::update_pf_stepper(uint8_t vstepper)
 			{
 				if (drivetable[wrap(i + 1, 4)] == vstepper) // we are moving down the page
 				{
-					m_ypos += 1;
+					m_ypos += 1; // move down
+
 					if (newpageflag == 1)
 					{
 						m_ypos = 10;  // lock to the top of page until we seek horizontally
@@ -415,6 +420,12 @@ void a2bus_silentype_device::update_pf_stepper(uint8_t vstepper)
 						// write the page to a file, then erase the top part of the page
 						// so we can still see the last page printed.
 					{
+
+						// clear paper to bottom
+						// something doesn't make sense with this formula...revisit this after I get some sleep
+						//m_bitmap.plot_box(m_ypos * 7 / 4, 3, PAPER_WIDTH - 1, PAPER_HEIGHT - 1, rgb_t::white());
+						bitmap_clear_band(m_bitmap, m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
+
 						// save a snapshot with the slot and page as part of the filename
 						write_snapshot_to_file(
 									std::string("silentype"),
@@ -425,10 +436,14 @@ void a2bus_silentype_device::update_pf_stepper(uint8_t vstepper)
 						newpageflag = 1;
 						m_ypos = 10;
 
-						// clear from beneath the print head to the visible area
-						m_bitmap.plot_box(0, 3,
-										  PAPER_WIDTH, PAPER_HEIGHT - 3 - PAPER_SCREEN_HEIGHT,
-										  rgb_t::white());
+/*
+                        // clear from beneath the print head to the visible area
+                        m_bitmap.plot_box(0, 3,
+                                          PAPER_WIDTH, PAPER_HEIGHT - 3 - PAPER_SCREEN_HEIGHT,
+                                          rgb_t::white());
+*/
+						// clear page down to visible area
+						bitmap_clear_band(m_bitmap, m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
 					}
 				}
 				else if (drivetable[wrap(i - 1, 4)] == vstepper) // we are moving up the page
