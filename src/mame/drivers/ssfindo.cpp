@@ -17,8 +17,7 @@ TODO:
  - timing
  - unknown reads/writes
  - improve sound hook up
- - does ppcar only use the VIDC internal DAC? Could also be using just the QS1000 internal ROM and the
-   wave ROM for music and the DAC for SFX
+ - ppcar uses the VIDC internal DAC for SFX and the QS1000 for music. It's configured to use the undumped internal ROM.
 
 
 *************************************************************************************************************
@@ -380,12 +379,12 @@ void ssfindo_state::sound_w(uint8_t data)
 void ssfindo_state::ssfindo_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
 	map(0x03012e60, 0x03012e67).noprw();
 	map(0x03012fe0, 0x03012fe3).w(FUNC(ssfindo_state::debug_w));
 	map(0x03012ff0, 0x03012ff3).noprw();
 	map(0x03012ff4, 0x03012ff7).nopw().r(FUNC(ssfindo_state::ff4_r)); //status flag ?
 	map(0x03012ff8, 0x03012fff).noprw();
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
 	map(0x03240000, 0x03240003).portr("IN0").nopw();
 	map(0x03241000, 0x03241003).portr("IN1").nopw();
 	map(0x03242000, 0x03242003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
@@ -399,10 +398,12 @@ void ssfindo_state::ssfindo_map(address_map &map)
 void ssfindo_state::ppcar_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x03012b00, 0x03012bff).r(FUNC(ssfindo_state::randomized_r)).nopw();
+	//map(0x03012be0, 0x03012be0).w(FUNC(ssfindo_state::sound_w)); // once the internal ROM is dumped
+	map(0x03012bf4, 0x03012bf7).r(FUNC(ssfindo_state::randomized_r)).nopw();
+	map(0x03012de0, 0x03012de3).portr("DSW");
 	map(0x03012e60, 0x03012e67).nopw();
 	map(0x03012ff8, 0x03012ffb).portr("IN0").nopw();
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
 	map(0x032c0000, 0x032c0003).portr("IN1").nopw();
 	map(0x03340000, 0x03340007).nopw();
 	map(0x03341000, 0x0334101f).nopw();
@@ -507,6 +508,29 @@ static INPUT_PORTS_START( ppcar )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN    ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1   )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x00, "Credits to Start" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPNAME( 0x0c, 0x00, "Missiles" )
+	PORT_DIPSETTING(    0x0c, "2" )
+	PORT_DIPSETTING(    0x08, "2" ) // same
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetfight )
@@ -602,16 +626,19 @@ void ssfindo_state::ppcar(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ppcar_map);
 
+	subdevice<qs1000_device>("qs1000")->set_external_rom(false); // ppcar has no external ROM
+	subdevice<i8052_device>("qs1000:cpu")->set_disable(); // internal ROM hasn't been dumped yet
+
 	config.device_remove("i2cmem");
 }
 
 void tetfight_state::tetfight(machine_config &config)
 {
-	ppcar(config);
+	ssfindo(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &tetfight_state::tetfight_map);
 
-	I2C_24C02(config, m_i2cmem);
+	I2C_24C02(config.replace(), m_i2cmem);
 
 	m_iomd->iocr_read_od<0>().set(FUNC(tetfight_state::iocr_od0_r));
 	m_iomd->iocr_read_od<1>().set(FUNC(tetfight_state::iocr_od1_r));
@@ -654,9 +681,6 @@ ROM_START( ppcar )
 
 	ROM_LOAD16_BYTE( "du3",     0x800000, 0x400000, CRC(73882474) SHA1(191b64e662542b5322160c99af8e00079420d473) )
 	ROM_LOAD16_BYTE( "du2",     0x800001, 0x400000, CRC(9250124a) SHA1(650f4b89c92fe4fb63fc89d4e08c4c4c611bebbc) )
-
-	ROM_REGION(0x10000, "qs1000:cpu", ROMREGION_ERASE00 ) /* qdsp code */
-	/* none */
 
 	ROM_REGION(0x100000, "qs1000", 0 ) /* HWASS 1008S-1  qdsp samples */
 	ROM_LOAD( "nasn9289.u9",    0x000000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) )
