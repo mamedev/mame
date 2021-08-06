@@ -295,6 +295,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_hik8in1",      BMC_HIK8IN1 },
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
 	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
+	{ "bmc_f15",          BMC_F15 },
 	{ "bmc_gold7in1",     BMC_GOLD_7IN1 },
 	{ "bmc_gc6in1",       BMC_GOLDENCARD_6IN1 },
 	{ "bmc_411120c",      BMC_411120C },
@@ -351,7 +352,6 @@ static const nes_pcb pcb_list[] =
 	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "bmc_f15",          UNSUPPORTED_BOARD },  // 150-in-1 Unchained Melody
 	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
 	{ "bmc_8in1",         UNSUPPORTED_BOARD },  // Super 8-in-1 (Incl. Rockin' Kats)
 	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic

@@ -598,6 +598,21 @@ private:
 };
 
 
+// ======================> nes_bmc_f15_device
+
+class nes_bmc_f15_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_f15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void prg_cb(int start, int bank) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_bmc_gold7in1_device
 
 class nes_bmc_gold7in1_device : public nes_txrom_device
@@ -778,6 +793,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device)
 DECLARE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device)
+DECLARE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GC6IN1,    nes_bmc_gc6in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device)
