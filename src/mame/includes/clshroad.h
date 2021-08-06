@@ -6,25 +6,28 @@
 #pragma once
 
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 class clshroad_state : public driver_device
 {
 public:
-	clshroad_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_spriteram(*this, "spriteram"),
-		m_vram_0(*this, "vram_0"),
-		m_vram_1(*this, "vram_1"),
-		m_vregs(*this, "vregs")
+	clshroad_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spriteram(*this, "spriteram")
+		, m_vram_0(*this, "vram_0")
+		, m_vram_1(*this, "vram_1")
+		, m_vregs(*this, "vregs")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -33,8 +36,10 @@ public:
 	required_shared_ptr<uint8_t> m_vram_1;
 	required_shared_ptr<uint8_t> m_vregs;
 
-	uint8_t m_main_irq_mask;
-	uint8_t m_sound_irq_mask;
+	u8 m_main_irq_mask;
+	u8 m_sound_irq_mask;
+	u8 m_color_bank;
+	u8 m_video_unk;
 
 	tilemap_t *m_tilemap_0a;
 	tilemap_t *m_tilemap_0b;
@@ -54,15 +59,19 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
 	void init_firebatl();
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(firebatl);
 	void firebatl_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(clshroad);
 	void clshroad_palette(palette_device &palette) const;
+	void color_bank_w(offs_t offset, u8 data);
+	void video_unk_w(offs_t offset, u8 data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 	void firebatl(machine_config &config);
 	void clshroad(machine_config &config);
