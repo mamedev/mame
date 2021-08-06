@@ -49,6 +49,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09
 DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63",       "NES Cart BMC Ghostbusters 63 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device,      "nes_bmc_k3036",      "NES Cart BMC K-3036 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device,      "nes_bmc_k3046",      "NES Cart BMC K-3046 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device,     "nes_bmc_sa005a",     "NES Cart BMC SA005-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device,       "nes_bmc_tj03",       "NES Cart BMC TJ-03 PCB")
@@ -188,6 +189,11 @@ nes_bmc_gka_device::nes_bmc_gka_device(const machine_config &mconfig, const char
 
 nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_GKB, tag, owner, clock)
+{
+}
+
+nes_bmc_k3036_device::nes_bmc_k3036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_K3036, tag, owner, clock)
 {
 }
 
@@ -675,6 +681,13 @@ void nes_bmc_gkb_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
+}
+
+void nes_bmc_k3036_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
 }
 
 void nes_bmc_k3046_device::pcb_reset()
@@ -1799,6 +1812,27 @@ void nes_bmc_gkb_device::write_h(offs_t offset, uint8_t data)
 	prg16_cdef(offset | bank);
 	chr8(offset >> 3, m_chr_source);
 	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ BMC-K-3036
+
+ Games: 35 in 1
+
+ NES 2.0: mapper 340
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_k3036_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_k3036 write_h, offset: %04x, data: %02x\n", offset, data));
+	u8 bank = offset & 0x1f;
+	prg16_89ab(bank);
+	prg16_cdef(bank | (BIT(offset, 5) ? 0 : 7));
+	set_nt_mirroring((offset & 0x25) == 0x25 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------
