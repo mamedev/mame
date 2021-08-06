@@ -36,7 +36,7 @@ to the print head, paper drive motor and the head drive motor.)
 Apple-Orchard-v1n3-1980-1-Winter.pdf
 Inside the Silentype Firmware by J.D. Eisenberg and A.J. Hertzfeld
 (The Apple Orchard Winter 1980, p.43)
-(This article shows you how to print bit graphics patterns.  It has warnings about
+(This shows you how to print bit graphics patterns.  It has warnings about
 using the Silentype and the Disk II simultaneously as it will
 damage the Apple's power supply.)
 
@@ -57,9 +57,8 @@ Diagnostics disk named "Apple II Peripherals diskette 077-0217-A.dsk"
 https://www.folklore.org/StoryView.py?project=Macintosh&story=What_Hath_Woz_Wrought
 Story about Silentype development by Andy Hertzfeld from September 1979
 
-
 https://www.folklore.org/StoryView.py?project=Macintosh&story=Apple_II_Mouse_Card.txt
-Mentions using the 6522 chip in Apple III to interface to the Silentype thermal printer.
+Mentions using the 6522 chip in the Apple III to interface to the Silentype thermal printer.
 ======================================================================
 
 
@@ -222,7 +221,9 @@ void a2bus_silentype_device::device_start()
 {
 //  m_rom = device().machine().root_device().memregion(this->subtag(SILENTYPE_ROM_REGION).c_str())->base();
 
-	memset(m_ram, 0, 256);
+	printf("Silentype ram size = %lx\n",sizeof(m_ram));
+	memset(m_ram, 0, sizeof(m_ram));
+
 
 	save_item(NAME(m_ram));
 }
@@ -234,7 +235,6 @@ void a2bus_silentype_device::device_reset_after_children()
 void a2bus_silentype_device::device_reset()
 {
 }
-
 
 /*-------------------------------------------------
   read_c0nx - called for reads from this card's c0nx space
@@ -251,35 +251,38 @@ uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 		return 0x00;
 }
 
-
 //-------------------------------------------------
-//    Write c0nx
+//    write_c0nx
 //-------------------------------------------------
 
 void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-//  printf("WRITE %x = %x\n",offset+slotno()*0x10+0xc080,data);
+	LOG("Silentype WRITE %x = %x\n",offset+slotno()*0x10+0xc080,data);
 	m_romenable = BIT(data,SILENTYPE_ROMENABLE) ? 1 : 0;
 
-	if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 0))
+//	if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 0))
+	if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 0) && BIT(data, SILENTYPE_STORECLOCK) == 0)
 	{
-//  printf("CLEAR\n");
-		m_shift_reg = 0;
+		LOG("Silentype Clear Parallel Register\n");
+		m_parallel_reg = 0;
+		m_silentype_printer->update_pf_stepper(0);
+		m_silentype_printer->update_cr_stepper(0);
+		m_silentype_printer->update_printhead(0);
 	}
 	else if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 1))
 	{
-//      printf("SHIFT\n");
+	LOG("Silentype Shift Bit = %x\n", BIT(data,SILENTYPE_DATA));
 		m_shift_reg = (m_shift_reg << 1) | BIT(data,SILENTYPE_DATA);
 	}
 	else if ((BIT(data,SILENTYPE_STORECLOCK) == 0))  // when NOT STORECLOCK, store shift register to parallel register
 	{
 		m_parallel_reg = m_shift_reg;
 
+		LOG("Silentype Store Parallel Register = %4x\n",m_parallel_reg);
+
 		uint8_t hstepperbits = BITS(m_parallel_reg, 3,  0);
 		uint8_t vstepperbits = BITS(m_parallel_reg, 7,  4);
 		uint8_t headbits     = BITS(m_parallel_reg, 15, 9);
-
-//      printf("PARALLEL REGISTER = %4x\n",m_parallel_reg);
 
 		m_silentype_printer->update_pf_stepper(vstepperbits);
 		m_silentype_printer->update_cr_stepper(hstepperbits);
@@ -310,9 +313,9 @@ void a2bus_silentype_device::write_cnxx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_silentype_device::read_c800(uint16_t offset)
 {
-	if ((offset>=0x700) && (!m_romenable))
+	if ((offset >= 0x700) && (!m_romenable))
 	{
-		return m_ram[offset-0x700];
+		return m_ram[offset - 0x700];
 	}
 	else
 	{
@@ -326,6 +329,6 @@ uint8_t a2bus_silentype_device::read_c800(uint16_t offset)
 
 void a2bus_silentype_device::write_c800(uint16_t offset, uint8_t data)
 {
-	if (offset >= 0x700) m_ram[(offset-0x700) & 0xff] = data;
+	if (offset >= 0x700) m_ram[(offset - 0x700) & 0xff] = data;
 }
 
