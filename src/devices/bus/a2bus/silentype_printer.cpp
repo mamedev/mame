@@ -2,7 +2,7 @@
 // copyright-holders: Golden Child
 /*********************************************************************
 
-    silentype.cpp
+    silentype_printer.cpp
 
     Implementation of the Apple Silentype Printer
 
@@ -77,6 +77,23 @@
 
 DEFINE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device, "silentype", "Apple Silentype Printer")
 
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+INPUT_PORTS_START(silentype_printer)
+	PORT_START("CNF")
+	PORT_CONFNAME(0x1, 0x00, "Print Darkness")
+	PORT_CONFSETTING(   0x0, "Normal")
+	PORT_CONFSETTING(   0x1, "Super Dark")
+INPUT_PORTS_END
+
+
+ioport_constructor silentype_printer_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(silentype_printer);
+}
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -199,7 +216,12 @@ void silentype_printer_device::darken_pixel(double headtemp, u32& pixel)
 {
 	if (headtemp > 0.0)
 	{
-		u8 intensity = headtemp * 15.0;
+//      u8 intensity = headtemp * 15.0;
+		u8 intensity = (
+						ioport("CNF")->read() & 0x1 ?
+							std::min(headtemp * 4, 1.0) :
+							headtemp
+						) * 15.0;
 		u32 pixelval = pixel;
 		u32 darkenval = intensity * 0x111111;
 
@@ -302,6 +324,9 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 									std::string("silentype"),
 									std::string("silentype") +
 //                                  std::string("_slot") + std::to_string(slotno()) +
+								  std::string("_slot") +
+//                                std::to_string(((a2bus_silentype_device *) (this->owner()))->get_slotno()) +
+								  std::to_string( static_cast<a2bus_silentype_device *> (this->owner()) -> get_slotno() ) +
 									"_page" + std::to_string(page_count++) + ".png");
 
 						newpageflag = 1;

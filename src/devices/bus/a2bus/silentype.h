@@ -26,7 +26,7 @@ class a2bus_silentype_device:
 {
 public:
 	a2bus_silentype_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
+	u8 get_slotno() { return slotno(); }
 protected:
 	a2bus_silentype_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

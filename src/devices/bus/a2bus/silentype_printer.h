@@ -18,9 +18,6 @@ protected:
 	silentype_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 public:
-	void update_printhead(uint8_t data);
-	void update_pf_stepper(uint8_t data);
-	void update_cr_stepper(uint8_t data);
 
 /*
     auto silentype_pin5_machine_status_input() { return m_write_silentype_pin5_machine_status_input.bind(); }
@@ -39,8 +36,12 @@ public:
     // treat these as an atomic update, update when serial_clock_out gets written
 
 */
+	void update_printhead(uint8_t data);
+	void update_pf_stepper(uint8_t data);
+	void update_cr_stepper(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_xpos <= 0); }
+
 
 protected:
 	// device-level overrides
@@ -48,7 +49,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
-
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 
