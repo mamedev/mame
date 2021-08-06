@@ -4548,12 +4548,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!--
-	    Seems to have some kind of trouble with changing disks. Starting the game from the opening sequence (オープニングから始める) doesn't work
-	    because it doesn't recognize Data Disk A afterwards, but starting from the beginning of the game itself (最初から始める) works.
-
-	    Needs further testing in order to confirm if later disk changes also fail.
-	-->
+	<!-- boot OK, has disk swap issues (needs to swap multiple times in order to actually make the game to recognize) -->
 	<software name="alvaleak" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Alvaleak Boukenki</description>
@@ -46199,7 +46194,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="vaindrem">
+	<!-- boot OK -->
+	<software name="vaindrem" supported="yes">
 		<description>Vain Dream</description>
 		<year>1991</year>
 		<publisher>グローディア (Glodia)</publisher>
