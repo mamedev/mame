@@ -99,8 +99,13 @@ Mentions using the 6522 chip in Apple III to interface to the Silentype thermal 
 #include "screen.h"
 #include "emuopts.h"
 #include "fileio.h"
-#include "png.h"
+//#include "png.h"  // don't need it here now
 //#include <bitset>
+
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
 
 // write bits @ c091
 #define SILENTYPE_DATA                (0)
@@ -161,7 +166,7 @@ Mentions using the 6522 chip in Apple III to interface to the Silentype thermal 
 
 DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, "a2silentype", "Apple Silentype Printer")
 
-#define SILENTYPE_ROM_REGION  "silentype_rom"
+#define SILENTYPE_ROM_REGION  "rom"
 
 ROM_START( silentype )
 	ROM_REGION(0x800, SILENTYPE_ROM_REGION, 0)
@@ -200,8 +205,9 @@ const tiny_rom_entry *a2bus_silentype_device::device_rom_region() const
 a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
-		m_rom(nullptr),
-		m_silentype_printer(*this, "silentype_printer")
+//      m_rom(nullptr),
+		m_silentype_printer(*this, "silentype_printer"),
+		m_rom(*this, "rom") // had to reorder
 {
 }
 
@@ -217,7 +223,7 @@ a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, co
 
 void a2bus_silentype_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(SILENTYPE_ROM_REGION).c_str())->base();
+//  m_rom = device().machine().root_device().memregion(this->subtag(SILENTYPE_ROM_REGION).c_str())->base();
 
 	memset(m_ram, 0, 256);
 
@@ -226,7 +232,7 @@ void a2bus_silentype_device::device_start()
 
 void a2bus_silentype_device::device_reset_after_children()
 {
-	m_ypos=10;
+//	m_ypos=10;
 }
 
 void a2bus_silentype_device::device_reset()
@@ -324,6 +330,6 @@ uint8_t a2bus_silentype_device::read_c800(uint16_t offset)
 
 void a2bus_silentype_device::write_c800(uint16_t offset, uint8_t data)
 {
-	if (offset >= 0x700) m_ram[(offset-0x700)] = data;
+	if (offset >= 0x700) m_ram[(offset-0x700) & 0xff] = data;
 }
 
