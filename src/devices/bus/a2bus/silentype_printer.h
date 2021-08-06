@@ -98,6 +98,7 @@ private:
 	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide at 60 dpi
 	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high at 60 dpi
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
+	const int distfrombottom = 50;  // print position from bottom of screen
 
 	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
 

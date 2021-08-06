@@ -156,7 +156,6 @@ void silentype_printer_device::device_reset()
 uint32_t silentype_printer_device::screen_update_silentype(screen_device &screen,
 							 bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const int distfrombottom = 50;
 	int scrolly = bitmap.height() - distfrombottom - (m_ypos * 7 / 4);
 
 	int bottomlinetoclear = std::min(PAPER_HEIGHT-PAPER_SCREEN_HEIGHT,PAPER_HEIGHT);
@@ -295,9 +294,7 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 						// so we can still see the last page printed.
 					{
 
-						// clear paper to bottom
-						// something doesn't make sense with this formula...revisit this after I get some sleep
-						//m_bitmap.plot_box(m_ypos * 7 / 4, 3, PAPER_WIDTH - 1, PAPER_HEIGHT - 1, rgb_t::white());
+						// clear paper to bottom from current position
 						bitmap_clear_band(m_bitmap, m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
 
 						// save a snapshot with the slot and page as part of the filename
@@ -308,17 +305,14 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 									"_page" + std::to_string(page_count++) + ".png");
 
 						newpageflag = 1;
-						m_ypos = 10;
+						// clear page down to visible area, starting from the top of page
+						bitmap_clear_band(m_bitmap, 0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
 
-/*
-                        // clear from beneath the print head to the visible area
-                        m_bitmap.plot_box(0, 3,
-                                          PAPER_WIDTH, PAPER_HEIGHT - 3 - PAPER_SCREEN_HEIGHT,
-                                          rgb_t::white());
-*/
-						// clear page down to visible area
-						bitmap_clear_band(m_bitmap, m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
+						m_ypos = 10;
 					}
+					// clear page down to visible area
+					bitmap_clear_band(m_bitmap, m_ypos * 7 / 4 + distfrombottom, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
+
 				}
 				else if (drivetable[wrap(i - 1, 4)] == vstepper) // we are moving up the page
 				{

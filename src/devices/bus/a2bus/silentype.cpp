@@ -185,7 +185,7 @@ ROM_END
 
 void a2bus_silentype_device::device_add_mconfig(machine_config &config)
 {
-[[maybe_unused]]    silentype_printer_device &printer(SILENTYPE_PRINTER(config, m_silentype_printer, 0));
+	[[maybe_unused]] silentype_printer_device &printer(SILENTYPE_PRINTER(config, m_silentype_printer, 0));
 }
 
 //-------------------------------------------------
@@ -214,7 +214,6 @@ a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, de
 a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		a2bus_silentype_device(mconfig, A2BUS_SILENTYPE, tag, owner, clock)
 {
-
 }
 
 //-------------------------------------------------
@@ -232,7 +231,6 @@ void a2bus_silentype_device::device_start()
 
 void a2bus_silentype_device::device_reset_after_children()
 {
-//	m_ypos=10;
 }
 
 void a2bus_silentype_device::device_reset()

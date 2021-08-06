@@ -51,7 +51,7 @@ protected:
 	int m_romenable = 0;  // start off disabled
 
 	required_device<silentype_printer_device> m_silentype_printer;
-	required_region_ptr<u8>                 m_rom;
+	required_region_ptr<u8> m_rom;
 
  private:
 	virtual const tiny_rom_entry *device_rom_region() const override;
