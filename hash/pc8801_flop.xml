@@ -23448,7 +23448,10 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="valis2">
+	<!-- boot OK -->
+	<!-- Omake: press F5 during opening for music test, alternatively just boot disk G from drive 1 -->
+	<!-- TODO: checkout if there are other hidden hotkeys like PC98 version -->
+	<software name="valis2" supported="yes">
 		<description>Mugen Senshi Valis II</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -36112,7 +36115,9 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<software name="vaindrea">
+	<!-- Displays Glodia transition then logo keeps scrolling left with wrong colors -->
+	<!-- Known to be related to write protect flag on System disk that must be ON (PC=0xB0A4) -->
+	<software name="vaindrea" supported="no">
 		<description>Vain Dream</description>
 		<year>1991</year>
 		<publisher>グローディア (Global Media)</publisher>
