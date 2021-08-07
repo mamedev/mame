@@ -154,7 +154,6 @@ private:
 	uint16_t m_mask;                  // mask register
 	uint8_t m_pitch;                  // number of word addresses in display memory in the horizontal direction
 	uint32_t m_ead;                   // execute word address
-	uint16_t m_dad;                   // dot address within the word
 	uint32_t m_lad;                   // light pen address
 
 	uint8_t m_ra[16];                 // parameter RAM

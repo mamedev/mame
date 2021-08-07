@@ -28,8 +28,6 @@
     - honor visible area
     - wide mode (32-bit access)
     - light pen
-    - dad and mask are the same, in figd dad is shifted every step and when msb or lsb are 1 ead is advanced in x dir
-
 */
 
 #include "emu.h"
@@ -612,7 +610,6 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_mask(0),
 	m_pitch(0),
 	m_ead(0),
-	m_dad(0),
 	m_lad(0),
 	m_ra_addr(0),
 	m_sr(UPD7220_SR_FIFO_EMPTY),
@@ -700,7 +697,6 @@ void upd7220_device::device_start()
 	save_item(NAME(m_ctop));
 	save_item(NAME(m_cbot));
 	save_item(NAME(m_ead));
-	save_item(NAME(m_dad));
 	save_item(NAME(m_lad));
 	save_item(NAME(m_disp));
 	save_item(NAME(m_gchr));
@@ -1150,7 +1146,6 @@ void upd7220_device::process_fifo()
 			m_ra[0] = m_ra[1] = m_ra[2] = 0;
 			m_ra[3] = 0x19;
 			m_ead = 0;
-			m_dad = 0;
 			m_mask = 0;
 			break;
 
@@ -1289,9 +1284,7 @@ void upd7220_device::process_fifo()
 
 			if(m_param_ptr == 4)
 			{
-				m_dad = (m_pr[3] >> 4) & 0x0f;;
-				m_mask = 1 << m_dad;
-				LOG("uPD7220 DAD: %01x\n", m_dad);
+				m_mask = 1 << ((m_pr[3] >> 4) & 0x0f);
 				LOG("uPD7220 MASK: %04x\n", m_mask);
 			}
 		}
@@ -1420,14 +1413,13 @@ void upd7220_device::process_fifo()
 
 	case COMMAND_CURD: /* cursor address read */
 	{
-		uint16_t dad = 1 << m_dad;
 		fifo_set_direction(FIFO_READ);
 
 		queue(m_ead & 0xff, 0);
 		queue((m_ead >> 8) & 0xff, 0);
 		queue(m_ead >> 16, 0);
-		queue(dad & 0xff, 0);
-		queue(dad >> 8, 0);
+		queue(m_mask & 0xff, 0);
+		queue(m_mask >> 8, 0);
 
 		m_sr |= UPD7220_SR_DATA_READY;
 		break;
