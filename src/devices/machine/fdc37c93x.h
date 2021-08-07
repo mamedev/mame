@@ -186,12 +186,12 @@ private:
 	void write_auxio_configuration_register(int index, int data);
 	uint16_t read_global_configuration_register(int index);
 	uint16_t read_logical_configuration_register(int index);
-	uint16_t read_fdd_configuration_register(int index) { return 0; }
-	uint16_t read_ide1_configuration_register(int index) { return 0; }
-	uint16_t read_ide2_configuration_register(int index) { return 0; }
-	uint16_t read_parallel_configuration_register(int index) { return 0; }
-	uint16_t read_serial1_configuration_register(int index) { return 0; }
-	uint16_t read_serial2_configuration_register(int index) { return 0; }
+	uint16_t read_fdd_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_ide1_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_ide2_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_parallel_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_serial1_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_serial2_configuration_register(int index) { return configuration_registers[logical_device][index]; }
 	uint16_t read_rtc_configuration_register(int index);
 	uint16_t read_keyboard_configuration_register(int index);
 	uint16_t read_auxio_configuration_register(int index);
