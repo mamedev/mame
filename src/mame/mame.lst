@@ -20103,6 +20103,7 @@ trojanr                         // 4/1986 (c) 1986 + Romstar
 
 @source:lwriter.cpp
 lwriter                         // Apple LaserWriter
+lwriterplus                     // Apple LaserWriter Plus
 lwriter2nt                      // Apple LaserWriter II NT
 
 @source:lynx.cpp

@@ -580,6 +580,9 @@ void lwriter_state::lwriter(machine_config &config)
 	m_via->ca2_handler().set(FUNC(lwriter_state::via_ca2_w));
 	m_via->cb2_handler().set(FUNC(lwriter_state::via_cb2_w));
 	m_via->irq_handler().set(FUNC(lwriter_state::via_int_w));
+
+	// Initialize ca1 to 1 so that we don't miss the first interrupt/transition to 0
+	m_via->write_ca1(1);
 }
 
 /* SCC init sequence
@@ -638,9 +641,30 @@ ROM_START(lwriter)
 	ROM_LOAD16_BYTE("342-0575a.rom", 0x060000, 0x10000, CRC (c21c1d22) SHA1 (9fc6cd059380c11588c182fb8ec6422e5db472e1)) // Label: "342-0575-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
 	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
 ROM_END
+ROM_START(lwriterplus)
+	ROM_REGION16_BE( 0x200000, "rom", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE("342-0089a.l0", 0x000001, 0x10000, CRC (d5dc7d6e) SHA1 (b9a1f807facf6a6de92fae5887044df961d73ab1)) // Label: "342-0089-A+L0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0090a.h0", 0x000000, 0x10000, CRC (32dc1f96) SHA1 (f3647b11c712979f6c5658a15a3e8647bd4d1a1d)) // Label: "342-0090-A+H0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0091a.l1", 0x020001, 0x10000, CRC (a24dcb05) SHA1 (9edfb94a1e6723a7580caed629418ee1d2472a84)) // Label: "342-0091-A+L1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0092a.h1", 0x020000, 0x10000, CRC (8600e85d) SHA1 (332308825f78a768e30eaa36f10f0ac1c5eacc19)) // Label: "342-0092-A+H1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0093a.l2", 0x040001, 0x10000, CRC (3c8fd0f7) SHA1 (36315be1ed691b24c49471eab0cd93a4242d6e10)) // Label: "342-0093-A+L2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0094a.h2", 0x040000, 0x10000, CRC (e1a9d862) SHA1 (ffdd96eb70f54c6bb10dfc94f49ce2d916a74ab6)) // Label: "342-0094-A+H2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0095a.l3", 0x060001, 0x10000, CRC (47f637f3) SHA1 (d04548144f906a8d89b826692812acdcbfbed144)) // Label: "342-0095-A+L3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0096a.h3", 0x060000, 0x10000, CRC (3213e057) SHA1 (94d2ac1849b48628004877521c882e0f828f97b3)) // Label: "342-0096-A+H3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0097a.l4", 0x080001, 0x10000, CRC (9ecdc5fc) SHA1 (336ecaaf29c5396c30a11aaa86533f0598cb50b3)) // Label: "342-0097-A+L4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0098a.h4", 0x080000, 0x10000, CRC (867657e3) SHA1 (0c9c29bac49fdfcd26f22a751be71508add0a25a)) // Label: "342-0098-A+H4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0099a.l5", 0x0a0001, 0x10000, CRC (820c0f63) SHA1 (0f8d45fc886f996fbcb4103961810b673e9ab7e4)) // Label: "342-0099-A+L5 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0100a.h5", 0x0a0000, 0x10000, CRC (40aeb030) SHA1 (2a34280a6b2ab54d1c82145ec1a8aaac1f57ae15)) // Label: "342-0100-A+H5 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0101a.l6", 0x0c0001, 0x10000, CRC (aed532c4) SHA1 (39d7d3ae1d35d8b4ec33fd8c88a569c607628e2a)) // Label: "342-0101-A+L6 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0102a.h6", 0x0c0000, 0x10000, CRC (653979d1) SHA1 (bf56df6a7eaee2bc8edfbc45f78d1abb19e6807a)) // Label: "342-0102-A+H6 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0103b.l7", 0x0e0001, 0x10000, CRC (dbafb1ed) SHA1 (b9f5b65b04f8f804c473b62c292dc83d14b2ab33)) // Label: "342-0103-B+L7 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0104b.h7", 0x0e0000, 0x10000, CRC (50c72f89) SHA1 (bdbc0e282121f7dc4d701aa12f94296e436b504b)) // Label: "342-0104-B+H7 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
+ROM_END
 
 } // anonymous namespace
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY            FULLNAME             FLAGS */
-CONS( 1985, lwriter,    0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_IS_SKELETON)
-CONS( 1988, lwriter2nt, 0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_IS_SKELETON)
+/*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY            FULLNAME             FLAGS */
+CONS( 1985, lwriter,     0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_IS_SKELETON)
+CONS( 1986, lwriterplus, 0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter Plus",  MACHINE_IS_SKELETON)
+CONS( 1988, lwriter2nt,  0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_IS_SKELETON)
