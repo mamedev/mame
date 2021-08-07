@@ -1400,7 +1400,10 @@ static INPUT_PORTS_START( seattle_analog )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Button")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0620, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED  )
 
 	PORT_START("AN0") PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 	PORT_START("AN1") PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
@@ -1467,6 +1470,9 @@ static INPUT_PORTS_START( mace )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Strong")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Evade")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Kick")
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED  )
 
 INPUT_PORTS_END
 
@@ -1548,9 +1554,9 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Radio")
 	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1") //road cam
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") //tailgate cam
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") //sky cam
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1") // road cam
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") // tailgate cam
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") // sky cam
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, gearshift_r)
 
@@ -1868,6 +1874,9 @@ static INPUT_PORTS_START( carnevil )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED  )
+
 	PORT_START("LIGHT0_X") //fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
@@ -2152,7 +2161,7 @@ void seattle_state::sfrushrk(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
-	m_ioasic->set_upper(331); // unknown
+	m_ioasic->set_upper(331); // others?
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
@@ -2277,7 +2286,7 @@ void seattle_state::hyprdriv(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
-	m_ioasic->set_upper(469); //unknown
+	m_ioasic->set_upper(471); // others?
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
