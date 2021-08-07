@@ -267,8 +267,8 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			for (i=0; i < 3; i++)
 			{
 				vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
-				vert[i].p[2] = (uint16_t)(polygon_fifo[ptr++]);
-				vert[i].p[1] = (uint16_t)(polygon_fifo[ptr++]);
+				vert[i].p[2] = (int16_t)(polygon_fifo[ptr++]);
+				vert[i].p[1] = (int16_t)(polygon_fifo[ptr++]);
 				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
 				vert[i].x =  (int16_t)(polygon_fifo[ptr++]);
 				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);
@@ -369,8 +369,8 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			for (i=0; i < 4; i++)
 			{
 				vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
-				vert[i].p[2] = (uint16_t)(polygon_fifo[ptr++]);
-				vert[i].p[1] = (uint16_t)(polygon_fifo[ptr++]);
+				vert[i].p[2] = (int16_t)(polygon_fifo[ptr++]);
+				vert[i].p[1] = (int16_t)(polygon_fifo[ptr++]);
 				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
 				vert[i].x =  (int16_t)(polygon_fifo[ptr++]);
 				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);

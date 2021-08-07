@@ -585,12 +585,14 @@ Marvel Vs. Capcom 2 New Age of Heroes (Export, Rev A)       841-0007C-02 23085A 
 Marvel Vs. Capcom 2 New Age of Heroes (Korea, Rev A)        841-0007C-03 23085A  14 (64Mb)*  present  317-5058-COM  *(+2x 32Mb) have factory wire-mod connecting IC13S serial EEPROM CLK pin to IC11 ROM /OE pin
 MushiKing The King of Beetles (2K3 2ND Ver. 1.003-, World)  840-0150C    24217    6 (64Mb)   present  317-0394-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 MushiKing The King of Beetles (2K3 2ND Ver. 1.002-, World)  840-0150C    24217    6 (64Mb)   present  317-0394-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
+MushiKing The King of Beetles (2K3 2ND Ver. 1.000-, Korea)  840-0155C    none     6 (64Mb)   present  317-0???-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 Quiz Ah Megamisama                                          840-0030C    23227   16 (64Mb)   present  317-0280-JPN
 Shootout Pool                                               840-0098C    23844    4 (64Mb)   present  317-0336-COM  requires regular 837-13551 and 837-13938 rotary JVS boards
 /Shootout Pool Prize (Export) /
 \Shootout Pool The Medal (Japan, Rev A)                     840-0128C    24065A   4 (64Mb)   present  317-0367-COM  requires Naomi-based hopper controller
 /Shootout Pool Prize (Export) /
 \Shootout Pool The Medal (Japan) Version B                  840-0136C    24148    4 (64Mb)   present  317-0367-COM  requires Naomi-based or 837-14438 hopper controller (selected by P1 BUTTON1 bit)
+Soreike! Anpanman Popcorn Factory 2                         840-0117C    24049B   4 (64Mb)   present  317-0359-JPN  require 838-14403 popcorn vendor control BD, Type-2 JVS I/O, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 Star Horse 2002 (sound, Export/Taiwan)                      840-0112B*   23964    6 (64Mb)   present  317-0347-COM  *no case
 SWP Hopper Board                                            840-0130C    24083   20 (64Mb)   present  317-0339-COM  reused VF4 Evo ROM board with all maskROMs still in place; there is an additional 837-14381 IO board
 Touch de Uno! 2                                             840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
@@ -720,18 +722,22 @@ Mamoru-kun wa Norowarete Shimatta                   841-0060C    not present  4 
 Manic Panic Ghost! (USA)                            840-0170C-01 not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based) - PCB s/n is 840-0170B-01
 Melty Blood Actress Again (Japan)                   841-0061C    not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
 Melty Blood Actress Again Version A (Rev A)         841-0061C    24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
+MushiKing The King of Beetles
+(2K3 2ND Ver. 1.000-, China)                        840-0157C    not present  1 (512Mb)   present  317-0???-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 /Mushiking The King Of Beetles
 \Mushiking II / III / III+ (Ver. 1.001) (World)     840-0164C    not present  2 (512Mb)   present  317-0437-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 /Mushiking The King Of Beetles
 \Mushiking II / III / III+ (Ver. 2.001) (World)     840-0164C    24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
+/Mushiking The King Of Beetles
+\Mushiking II / III / III+ (Ver. 1.000-) (Korea)    840-0168C    not present  2 (512Mb)   present  317-0???-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 /Mushiking The King Of Beetles
 \Mushiking IV / V / VI (World)                      840-0180C    not present  2 (512Mb)   present  317-0437-COM  present  IC2# is labeled "VER.1", IC4# is marked "8A", requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 Mushiking The King Of Beetles 2006 First (Japan)    840-0167C    not present  2 (512Mb)   present  317-0444-JPN  present  IC4# is marked "18", require 610-0669 barcode reader
 Mushiking The King Of Beetles 2006 Second (Japan)   840-0171C    not present  2 (512Mb)   present  317-0444-JPN  present  IC4# is marked "18", require 610-0669 barcode reader
 Pokasuka Ghost!                                     840-0170C    not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based)
 Radirgy Noa                                         841-0062C    not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
-Rhythm Tengoku                                      841-0177C    not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
-Driving Simulator                                   841-0178C    not present  8 (512Mb)   present  317-0502-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A", require 3 comm.bd. linked Naomi 2
+Rhythm Tengoku                                      840-0177C    not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
+Driving Simulator                                   840-0178C    not present  8 (512Mb)   present  317-0502-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A", require 3 comm.bd. linked Naomi 2
 Star Horse Progress Returns (main screen left)      840-0183C    24480        4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Star Horse Progress Returns (main screen right)     840-0184C    not present  2 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Star Horse Progress Returns (live and voice)        840-0185C    not present  4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
@@ -5011,7 +5017,7 @@ ROM_START( tduno2 )
 	ROM_REGION(0x200, "some_eeprom", 0)
 	ROM_LOAD( "25lc040.ic13s", 0, 0x200, CRC(6291605c) SHA1(44f757da4814b08108d1a4f431c9a39c38acecb2) )
 
-	// 840-0022    2000     317-0276-COM   Naomi
+	// 840-0022    2000     317-0276-JPN   Naomi
 	ROM_PARAMETER( ":rom_board:key", "2f6f0f8d" )
 ROM_END
 
@@ -5667,6 +5673,8 @@ ROM_START( 18wheelro )
 	// JVS I/O board 837-13844, external Z80 code for Sega 315-6146 "MIE" MCU
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
+	// earlier or prototype revision
+	ROM_LOAD( "epr-21868p.ic7",0x000000, 0x010000, CRC(5d7b75f0) SHA1(faf7f06636b70298eb15770da4b0f7c435755dcb) )
 	// later version of the same I/O board (temporary, we'll handle this properly later)
 	ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
 	// 837-14645 JVS I/O, uses same PCB as 837-13844
@@ -5711,6 +5719,8 @@ ROM_START( 18wheelr )
 	// JVS I/O board 837-13844, external Z80 code for Sega 315-6146 "MIE" MCU
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
+	// earlier or prototype revision
+	ROM_LOAD( "epr-21868p.ic7",0x000000, 0x010000, CRC(5d7b75f0) SHA1(faf7f06636b70298eb15770da4b0f7c435755dcb) )
 	// later version of the same I/O board (temporary, we'll handle this properly later)
 	ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
 	// 837-14645 JVS I/O, uses same PCB as 837-13844
@@ -5755,6 +5765,8 @@ ROM_START( 18wheelrt )
 	// JVS I/O board 837-13844, external Z80 code for Sega 315-6146 "MIE" MCU
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
+	// earlier or prototype revision
+	ROM_LOAD( "epr-21868p.ic7",0x000000, 0x010000, CRC(5d7b75f0) SHA1(faf7f06636b70298eb15770da4b0f7c435755dcb) )
 	// later version of the same I/O board (temporary, we'll handle this properly later)
 	ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
 	// 837-14645 JVS I/O, uses same PCB as 837-13844
@@ -5796,11 +5808,15 @@ ROM_START( 18wheels )
 	ROM_LOAD( "mpr-22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
 	ROM_LOAD( "mpr-22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
 
-	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
+	// JVS I/O board 837-13844, external Z80 code for Sega 315-6146 "MIE" MCU
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
+	// earlier or prototype revision
+	ROM_LOAD( "epr-21868p.ic7",0x000000, 0x010000, CRC(5d7b75f0) SHA1(faf7f06636b70298eb15770da4b0f7c435755dcb) )
 	// later version of the same I/O board (temporary, we'll handle this properly later)
 	ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
+	// 837-14645 JVS I/O, uses same PCB as 837-13844
+	ROM_LOAD( "epr-24354.ic7", 0x000000, 0x010000, CRC(0ce43505) SHA1(7700e3acfb756dfbf95f3ff14786d1bcb57e2f7d) )
 
 	// 18 Wheeler motor controller 838-13992, code is for a TMPZ84C015 which is Z80 compatible
 	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
@@ -5838,11 +5854,15 @@ ROM_START( 18wheelu )
 	ROM_LOAD( "mpr-22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
 	ROM_LOAD( "mpr-22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
 
-	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
+	// JVS I/O board 837-13844, external Z80 code for Sega 315-6146 "MIE" MCU
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
+	// earlier or prototype revision
+	ROM_LOAD( "epr-21868p.ic7",0x000000, 0x010000, CRC(5d7b75f0) SHA1(faf7f06636b70298eb15770da4b0f7c435755dcb) )
 	// later version of the same I/O board (temporary, we'll handle this properly later)
 	ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
+	// 837-14645 JVS I/O, uses same PCB as 837-13844
+	ROM_LOAD( "epr-24354.ic7", 0x000000, 0x010000, CRC(0ce43505) SHA1(7700e3acfb756dfbf95f3ff14786d1bcb57e2f7d) )
 
 	// 840-0023    2000     317-0273-COM   Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
@@ -10342,6 +10362,11 @@ ROM_START( clubk2kpa )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 populated, not used
 ROM_END
 
+// Machine setup include:
+// - x3 Naomi 2 linked using optical communicatin boards, for center/left/right screens, node ID selected using DIPSW 2 and 3
+// - Sega Type-2 JVS I/O board (837-13844 or similar), connected to main Naomi 2
+// - MIDI drive board with servo motor, connected to main Naomi 2
+// - optional RS232 link to host PC, which may control several such machines
 ROM_START( sgdrvsim )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -11740,11 +11765,14 @@ ROM_END
 /* 0150    */ GAME( 2004, mushikeo,  mushike,  naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND Ver. 1.002-, World)", GAME_FLAGS ) // not for Japan
 /* 0150-FLS*/ GAME( 2004, mushikep,  mushike,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (MUSHIUSA '04 1ST, Prototype)", GAME_FLAGS )
 /* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
+// 0155 Mushiking 2K3 2ND (Korea)
+// 0157 Mushiking 2K3 2ND (China)
 /* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2005 First (Japan)", GAME_FLAGS )
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
 /* 0167    */ GAME( 2006, mushi2k61, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 First (Japan)", GAME_FLAGS )
+// 0168 Mushiking II (Korea)
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
 /* 0171    */ GAME( 2006, mushi2k62, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 Second (Japan)", GAME_FLAGS )

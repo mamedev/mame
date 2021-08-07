@@ -16261,6 +16261,7 @@ vidchal                         // Select Merchandise
 cambrp                          // Sinclair
 mbaskb                          // Mattel
 mhockey                         // Mattel
+mhockeya                        // Mattel
 msoccer                         // Mattel
 qkracerm                        // National Semiconductor
 qkspeller                       // National Semiconductor
@@ -20102,6 +20103,7 @@ trojanr                         // 4/1986 (c) 1986 + Romstar
 
 @source:lwriter.cpp
 lwriter                         // Apple LaserWriter
+lwriter2nt                      // Apple LaserWriter II NT
 
 @source:lynx.cpp
 lynx                            // Atari Lynx Handheld
@@ -31517,6 +31519,7 @@ tekken51b                       //
 tekken5d                        //
 timecrs3                        //
 timecrs3e                       //
+timecrs3u                       //
 timecrs4                        //
 timecrs4j                       //
 vnight                          //
@@ -39998,6 +40001,7 @@ zarza1                          //
 ashura                          // C43 (c) 1990 Taito Corporation Japan (World)
 ashuraj                         // C43 (c) 1990 Taito Corporation (Japan)
 ashurau                         // C43 (c) 1990 Taito America Corporation (US)
+bublbust                        // ??? (c) 1994 Taito America Corporation (US)
 crimec                          // B99 (c) 1989 Taito Corporation Japan (World)
 crimecj                         // B99 (c) 1989 Taito Corporation (Japan)
 crimecu                         // B99 (c) 1989 Taito America Corporation (US)
@@ -40304,8 +40308,9 @@ spacegunj                       // C57 (c) 1990 Taito Corporation (Japan)
 spacegunu                       // C57 (c) 1990 Taito America Corporation (US)
 
 @source:taitoair.cpp
-ainferno                        // C45 (c) 1990 Taito America Corporation (US)
+ainferno                        // C45 (c) 1990 Taito Corporation Japan (World)
 ainfernoj                       // C45 (c) 1990 Taito Corporation (Japan)
+ainfernou                       // C45 (c) 1990 Taito America Corporation (US)
 topland                         // B62 (c) 1988 Taito Corporation Japan (World)
 toplandj                        // B62 (c) 1988 Taito Corporation (Japan)
 

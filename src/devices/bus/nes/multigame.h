@@ -26,16 +26,16 @@ protected:
 };
 
 
-// ======================> nes_caltron_device
+// ======================> nes_caltron6in1_device
 
-class nes_caltron_device : public nes_nrom_device
+class nes_caltron6in1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_caltron_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_caltron6in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -44,7 +44,29 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch;
+	void update_chr();
+	u8 m_latch, m_reg;
+};
+
+
+// ======================> nes_caltron9in1_device
+
+class nes_caltron9in1_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_caltron9in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch[3];
 };
 
 
@@ -501,6 +523,21 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+};
+
+
+// ======================> nes_bmc_2751_device
+
+class nes_bmc_2751_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_2751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+	virtual void pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted) override;
 };
 
 
@@ -1007,6 +1044,7 @@ private:
 	int m_latch;
 };
 
+
 // ======================> nes_bmc_42in1reset_device
 
 class nes_bmc_42in1reset_device : public nes_nrom_device
@@ -1029,9 +1067,22 @@ private:
 };
 
 
+// ======================> nes_bmc_lc160_device
+
+class nes_bmc_lc160_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_lc160_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(NES_ACTION52,       nes_action52_device)
-DECLARE_DEVICE_TYPE(NES_CALTRON6IN1,    nes_caltron_device)
+DECLARE_DEVICE_TYPE(NES_CALTRON6IN1,    nes_caltron6in1_device)
+DECLARE_DEVICE_TYPE(NES_CALTRON9IN1,    nes_caltron9in1_device)
 DECLARE_DEVICE_TYPE(NES_RUMBLESTATION,  nes_rumblestat_device)
 DECLARE_DEVICE_TYPE(NES_SVISION16,      nes_svision16_device)
 DECLARE_DEVICE_TYPE(NES_KN42,           nes_kn42_device)
@@ -1056,6 +1107,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device)
 DECLARE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device)
 DECLARE_DEVICE_TYPE(NES_BMC_G146,       nes_bmc_g146_device)
+DECLARE_DEVICE_TYPE(NES_BMC_2751,       nes_bmc_2751_device)
 DECLARE_DEVICE_TYPE(NES_BMC_8157,       nes_bmc_8157_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK300,     nes_bmc_hik300_device)
 DECLARE_DEVICE_TYPE(NES_BMC_S700,       nes_bmc_s700_device)
@@ -1083,5 +1135,6 @@ DECLARE_DEVICE_TYPE(NES_BMC_CH001,      nes_bmc_ch001_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SUPER22,    nes_bmc_super22_device)
 DECLARE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device)
 DECLARE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device)
+DECLARE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device)
 
 #endif // MAME_BUS_NES_MULTIGAME_H

@@ -52,6 +52,7 @@ static const nes_mmc mmc_list[] =
 	{ 17, FFE8_BOARD },
 	{ 18, JALECO_SS88006 },
 	{ 19, NAMCOT_163 },
+	// 20 Reserved for emulator use for FDS emulation.
 	{ 21, KONAMI_VRC4 },
 	{ 22, KONAMI_VRC2 },
 	{ 23, KONAMI_VRC2 },
@@ -156,7 +157,7 @@ static const nes_mmc mmc_list[] =
 	{ 121, KAY_BOARD },
 	// 122 Unused
 	{ 123, UNL_H2288 },
-	// 124 Super Game Mega Type III pirate arcade board?
+	// 124 Super Game Mega Type III bootleg arcade board. Emulated in MAME as supergm3.
 	{ 125, UNL_LH32 },  // Monty no Doki Doki Daidassou - FDS Conversion
 	{ 126, BMC_PJOY84 },
 	// 127 Double Dragon II Japan pirate. Dump available?
@@ -206,7 +207,7 @@ static const nes_mmc mmc_list[] =
 	{ 171, KAISER_KS7058 },
 	{ 172, TXC_DUMARACING },
 	{ 173, TXC_MJBLOCK },
-	// 174 Bisqwit's TV GAME multicart (Legend of Kage, Goonies, etc). Dump available?
+	{ 174, BMC_2751 },
 	{ 175, KAISER_KS7022},
 	{ 176, UNL_XIAOZY },
 	{ 177, HENGG_SRICH },
@@ -301,7 +302,7 @@ static const nes_mmc mmc_list[] =
 	{ 264, YOKO_BOARD },
 	{ 265, BMC_T262 },
 	{ 266, UNL_CITYFIGHT },
-	// 267 8 in 1 JY-119 multicart, not in nes.xml?
+	{ 267, BMC_FCGENJIN_8IN1 },
 	// 268 COOLBOY and MINDKIDS
 	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
 	// 270 multicarts on OneBus Famiclones
@@ -386,7 +387,7 @@ static const nes_mmc mmc_list[] =
 	{ 349, BMC_G146 },
 	// { 350, BMC_891227 }, not in nes.xml
 	// 351 JY/Techline 9-in-1
-	// 352 Kaiser 4-in-1 KS106C
+	{ 352, KAISER_KS106C },        // 4-in-1
 	// 353 Super Mario Family multicart
 	// 354 250-in-1 multicart with FDS Bubble Bobble
 	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
@@ -395,7 +396,7 @@ static const nes_mmc mmc_list[] =
 	// 358 JY multicarts, variant of mapper 282
 	// 359 BMC-SB-5013 multicarts
 	// 360 Bit Corp 31-in-1 (ID 3150) (has five accessible DIP switches!)
-	// 361 JY multicarts
+	{ 361, BMC_841101C },
 	// 362 JY-005 multicart
 	// 363 variant of mapper 358?
 	// 364 JY-007, is this ttoons6 in nes.xml?
@@ -423,7 +424,7 @@ static const nes_mmc mmc_list[] =
 	// 386 JY-090 multicart
 	// 387 various JY multicarts
 	// 388 various JY multicarts
-	// { 389, CALTRON_9IN1 },
+	{ 389, CALTRON_9IN1 },
 	// 390 variant of mapper 236?
 	// 391 BS-110 MMC3 clone
 	// 392 8-in-1 variant of mc_sv16
@@ -500,7 +501,7 @@ static const nes_mmc mmc_list[] =
 	// { 538, BTL_60106416L }, Exciting Soccer bootleg, not in nes.xml (available baddump needs banks rearranged?)
 	{ 539, BTL_PALTHENA },         // Hikari Shinwa (Kid Icarus) FDS conversion
 	// 540 for mstrfgt6 in nes.xml or a variant of it not in nes.xml?
-	// 541 LittleCom 160 in 1 multicart, not in nes.xml?
+	{ 541, BMC_LITTLECOM160 },
 	// 542 Chairman Mao's 100th anniversary cart? You've got to be kidding me.
 	// 543 5 in 1 (CH-501) multicart, not in nes.xml?
 	// 544 another alt of sango2ht/sanguo2a?

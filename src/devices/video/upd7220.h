@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl
+// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl, Brian Johnson
 /**********************************************************************
 
     NEC uPD7220 Graphics Display Controller emulation
@@ -100,8 +100,6 @@ private:
 		TIMER_BLANK
 	};
 
-	inline uint8_t readbyte(offs_t address);
-	inline void writebyte(offs_t address, uint8_t data);
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);
 	inline void fifo_clear();
@@ -117,15 +115,18 @@ private:
 	inline void rdat(uint8_t type, uint8_t mod);
 	inline uint16_t read_vram();
 	inline void wdat(uint8_t type, uint8_t mod);
-	inline void write_vram(uint8_t type, uint8_t mod, uint16_t data);
+	inline void write_vram(uint8_t type, uint8_t mod, uint16_t data, uint16_t mask = 0xffff);
 	inline void get_text_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 	inline void get_graphics_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 
+	uint16_t get_pitch();
+	uint16_t get_pattern(uint8_t cycle);
+	void next_pixel(int direction);
 	void draw_pixel(int x, int y, int xi, uint16_t tile_data);
 	void draw_line(int x, int y);
 	void draw_rectangle(int x, int y);
 	void draw_arc(int x, int y);
-	void draw_char(int x, int y);
+	void draw_char();
 	int translate_command(uint8_t data);
 	void process_fifo();
 	void continue_command();
@@ -142,6 +143,8 @@ private:
 	devcb_write_line   m_write_hsync;
 	devcb_write_line   m_write_vsync;
 	devcb_write_line   m_write_blank;
+
+	uint16_t m_pattern;
 
 	uint8_t m_dma_type;               // DMA transfer type
 	uint8_t m_dma_mod;                // DMA transfer mode

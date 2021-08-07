@@ -22,23 +22,25 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
 /***************************************************************************/
 
-
 void timelimt_state::machine_start()
 {
+	m_nmi_state = false;
+	m_nmi_enabled = false;
+
+	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_nmi_enabled));
 }
 
 WRITE_LINE_MEMBER(timelimt_state::nmi_enable_w)
 {
-	m_nmi_enabled = state;
-	if (!m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_nmi_enabled = bool(state);
 }
 
 WRITE_LINE_MEMBER(timelimt_state::coin_lockout_w)
@@ -214,10 +216,14 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(timelimt_state::irq)
+INTERRUPT_GEN_MEMBER(timelimt_state::main_nmi)
 {
-	if (m_nmi_enabled)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_nmi_state = !m_nmi_state;
+
+	if (m_nmi_enabled && m_nmi_state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else if (!m_nmi_state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /***************************************************************************/
@@ -228,7 +234,7 @@ void timelimt_state::timelimt(machine_config &config)
 	Z80(config, m_maincpu, 5000000);   /* 5.000 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &timelimt_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &timelimt_state::main_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(timelimt_state::irq));
+	m_maincpu->set_vblank_int("screen", FUNC(timelimt_state::main_nmi));
 
 	Z80(config, m_audiocpu, 18432000/6);    /* 3.072 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &timelimt_state::sound_map);

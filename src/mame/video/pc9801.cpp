@@ -59,7 +59,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 			int res_x = x + xi;
 			int res_y = y;
 
-			uint8_t pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x40000)];
+			uint8_t pen = ext_gvram[(address)*16+xi+(m_vram_disp*0x40000)];
 
 			bitmap.pix(res_y, res_x) = palette[pen + 0x20];
 		}
@@ -72,11 +72,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 			int res_y = y;
 
 			uint8_t pen;
-			pen = ((m_video_ram_2[((address & 0x7fff) + (0x08000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 1 : 0;
-			pen|= ((m_video_ram_2[((address & 0x7fff) + (0x10000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 2 : 0;
-			pen|= ((m_video_ram_2[((address & 0x7fff) + (0x18000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 4 : 0;
+			pen = ((m_video_ram_2[((address & 0x3fff) + (0x4000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 1 : 0;
+			pen|= ((m_video_ram_2[((address & 0x3fff) + (0x8000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 2 : 0;
+			pen|= ((m_video_ram_2[((address & 0x3fff) + (0xc000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 4 : 0;
 			if(m_ex_video_ff[ANALOG_16_MODE])
-				pen|= ((m_video_ram_2[((address & 0x7fff) + (0) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 8 : 0;
+				pen|= ((m_video_ram_2[((address & 0x3fff) + (0) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 8 : 0;
 			bitmap.pix(res_y, res_x) = palette[pen + colors16_mode];
 		}
 	}
@@ -99,6 +99,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 	uint8_t char_size = m_video_ff[FONTSEL_REG] ? 16 : 8;
 
 	uint8_t x_step;
+	uint8_t lastul = 0;
 	for(int x=0;x<pitch;x+=x_step)
 	{
 		uint32_t tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
@@ -188,7 +189,11 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					}
 
 					if(reverse) { tile_data^=0xff; }
-					if(u_line && yi == lr-1) { tile_data = 0xff; }
+					if(yi == lr-1)
+					{
+						if(u_line) tile_data = 0x0f;
+						if(lastul) tile_data |= 0xf0;
+					}
 					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
@@ -217,6 +222,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					}
 				}
 			}
+			lastul = u_line;
 		}
 	}
 }

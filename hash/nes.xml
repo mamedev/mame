@@ -260,7 +260,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="6in1cal" cloneof="6in1hes" supported="partial">
+	<software name="6in1cal" cloneof="6in1hes">
 		<description>6 in 1 (USA)</description>
 		<year>1992</year>
 		<publisher>Caltron</publisher>
@@ -51669,6 +51669,84 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 
+<!-- J.Y. Company -->
+
+	<software name="mc_4jy9">
+		<description>1994 Ball 4 in 1 Series (JY-009)</description>
+		<year>1994</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_841101c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 ball 4-in-1 series (jy-009).prg" size="524288" crc="a75d2f6d" sha1="2b4250e0d0ad2225003d7f178bcc8fc353a27ea3" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 ball 4-in-1 series (jy-009).chr" size="524288" crc="560ca283" sha1="d00cfd3c0c65db543a635fcddb1b0cf86149f257" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy18">
+		<description>1996 Super HiK 4 in 1 (JY-018)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_841101c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-018).prg" size="524288" crc="b8740880" sha1="8e05438c36323e8c400c257d5d8007bfe5841d20" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-018).chr" size="524288" crc="29b559a8" sha1="e6456668069a8e2f615b8d4724dd99903a79028c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy19">
+		<description>1995 Super HiK 4 in 1 (JY-019)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_841101c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-019).prg" size="524288" crc="5bb37e97" sha1="126b4701467e9cb94c69b079563937429f3fd3bf" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-019).chr" size="524288" crc="ad775257" sha1="ec4cad29b83ba3aa8fdd50ce259b75c56fdbe639" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy20">
+		<description>1996 Super HiK 4 in 1 (JY-020)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_841101c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-020).prg" size="524288" crc="e858f260" sha1="60e0d13f27f567ed259aa8b91fe0f2b07e8a719e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-020).chr" size="524288" crc="934f22fd" sha1="ff90c43fe41912b560b865c03fefa1e897bb4352" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j119">
+		<description>FC Genjin 8 in 1 (JY-119)</description>
+		<year>199?</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fcgj8in1" />
+			<dataarea name="prg" size="2097152">
+				<rom name="8-in-1 (jy-119).prg" size="2097152" crc="acb1f4e9" sha1="e65bf41010b4f3d4692b458698e355c233ecd729" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="8-in-1 (jy-119).chr" size="1048576" crc="f4df8173" sha1="911ff9555fa908cda9fbc6347111b104f6510d4b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Sachen / Thin Chen (and clones) -->
 
 	<software name="englpyrm">
@@ -53468,6 +53546,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Gluk Video</publisher>
 		<info name="alt_title" value="El Bloque Magico (on the cart label)"/>
 		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="bloque magico, el (spain) (gluk video) (unl).chr" size="32768" crc="4ed2d601" sha1="b2983c47eed95d94998a074c6fa1a6e9e91cfe54" offset="00000" status="baddump" />
 			</dataarea>
@@ -53888,6 +53968,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="9in1cal">
+		<description>9 in 1 (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Caltron</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="caltron9in1" />
+			<dataarea name="prg" size="524288">
+				<rom name="0.prg" size="524288" crc="443fafc4" sha1="99457c111178cc398444324712f18be0dd081acc" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="0.chr" size="262144" crc="d75fba82" sha1="79407b0a88a3e86875c26f6c6b8911ea237a945d" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -61696,6 +61791,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="aladdin 4 (unl) [p2].prg" size="262144" crc="9c2e973d" sha1="bf9a3fc1bedac091f78401bbb459affd7944fe8f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amheros">
+		<description>The Ancient Modern Heros</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fs6" />
+			<dataarea name="prg" size="131072">
+				<rom name="amheros.prg" size="131072" crc="21ac5e20" sha1="2576eeb3bb25e40be633ff457b7323fd622a6274" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="amheros.chr" size="262144" crc="b51f4284" sha1="5c95b79fb241d992f0f1a5534729667a5e03bdd2" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -72828,26 +72938,6 @@ Other
 		</part>
 	</software>
 
-<!-- This needs more investigations: is it ripped from a multicart? was it from a standalone cart?  does it really use mapper 0
-(and if so why the invalid code)?  is it the same fancy bros of a lot of multicarts (where the game have the wrong mirroring,
-resulting in tons of glitches? -->
-	<software name="fancybro" cloneof="smb" supported="no">
-		<description>Fancy Bros. (Super Mario Bros. pirate)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-256" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="8192">
-				<rom name="fancy bros (unl).chr" size="8192" crc="33b3bebd" sha1="9e4e974db73043dc26cbd8a832c77f8767be5568" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="fancy bros (unl).prg" size="32768" crc="4f17e986" sha1="9de0d7726b751a7a74842c8cc865d8a339785272" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="felixjer" cloneof="ttoonadv">
 		<description>Felix vs Jerry (Tiny Toon Adventures pirate)</description>
 		<year>19??</year>
@@ -73921,13 +74011,13 @@ resulting in tons of glitches? -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="sbros11" />
+			<feature name="pcb" value="BTL-SUPERBROS11" />
 			<dataarea name="chr" size="131072">
 				<rom name="super bros 10 kung fu mari (jackie chan hack).chr" size="131072" crc="b0382d58" sha1="d754d208564573fe5ea66111595f3b7e76cd2f33" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="super bros 10 kung fu mari (jackie chan hack).prg" size="131072" crc="43e1ec79" sha1="cabc927a5693523ada990adcf4f82227c43c8c64" offset="00000" status="baddump" />
+				<rom name="super bros 10 kung fu mari (jackie chan hack).prg" size="131072" crc="dc37d3db" sha1="8fcff188ca9425859bc7463689604a515139b6b1" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74073,13 +74163,13 @@ resulting in tons of glitches? -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="sbros11" />
+			<feature name="pcb" value="BTL-SUPERBROS11" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mario 14 (unl).chr" size="131072" crc="c54e1415" sha1="59e4262c2a67655d11c0b839e29cd46a2f41655a" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="super mario 14 (unl).prg" size="131072" crc="d838a08d" sha1="f55cd39674eacc72ffdcb5fe4ec4d1a4fac023ab" offset="00000" status="baddump" />
+				<rom name="super mario 14 (unl).prg" size="131072" crc="f17d41f2" sha1="528891aaada0ebd4e57257bd928e89d105760ea5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74144,22 +74234,6 @@ resulting in tons of glitches? -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="super mario bros. 9 (unl).prg" size="131072" crc="32f22059" sha1="7257c3d165a09b8e21962db61730fa9d49840d81" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb11a" cloneof="advisln3">
-		<description>Super Bros. 11 (Takahashi Meijin no Boukenjima III pirate, Hacked?)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="super mario bros. 11 (unl) [hm04].chr" size="131072" crc="5c5d3aca" sha1="b4e087212b14ece5f1cf7a50e89805156e2b9058" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="super mario bros. 11 (unl) [hm04].prg" size="131072" crc="99ea0d0e" sha1="6ddcb429995518c31824018f6c0e465b75a631b5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74245,13 +74319,28 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="smb4" cloneof="armadill" supported="no">
+	<software name="smarids2" cloneof="chipndl2">
+		<description>Super Mari - Mali Lugi - Mari no Daisakusen 2 (Chip 'n Dale 2 pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sbros11" />
+			<feature name="pcb" value="BTL-SUPERBROS11" />
+			<dataarea name="prg" size="131072">
+				<rom name="smarids2.prg" size="131072" crc="4e23e888" sha1="0a317ecd943a7c262841912a90e2bc3216e39921" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="smarids2.chr" size="131072" crc="f90ce953" sha1="0f8bb9c7413bf5e22d0055950a5b0e6201385e4d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smb4" cloneof="armadill">
 		<description>Super Mario Bros. IV (Armadillo pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="txsrom" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mario bros iv (unl).chr" size="131072" crc="281b07cc" sha1="4a6ce2a87de0a017915aac50aac60cfe70dc9724" offset="00000" status="baddump" />
 			</dataarea>
@@ -74401,8 +74490,8 @@ resulting in tons of glitches? -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="sbros11" />
+			<feature name="pcb" value="BTL-SUPERBROS11" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mali hero legends (unl).chr" size="131072" crc="68a91ed3" sha1="5ca1f9894c2e12adb9f21d056ca58375a67a2b71" offset="00000" status="baddump" />
 			</dataarea>
@@ -79041,6 +79130,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_4k106">
+		<description>4 in 1 (KS-106C)</description>
+		<year>19??</year>
+		<publisher>Kaiser</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks106c" />
+			<dataarea name="prg" size="131072">
+				<rom name="mc_4k106.prg" size="131072" crc="eb2474f7" sha1="427b323bd1d7d94a2078425e0a6509a258b1c222" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="mc_4k106.chr" size="32768" crc="a77dae2d" sha1="50671c4cb8db0caee3c2ea764d3324570cebfed0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4kt34" supported="no">
 		<description>4 in 1 (KT-3445AB)</description>
 		<year>19??</year>
@@ -79072,13 +79177,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4o411" supported="no">
+	<software name="mc_4o411">
 		<description>4 in 1 (OK-411)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_15in1" />
-			<feature name="pcb" value="BMC-15IN1" />
+			<feature name="slot" value="bmc_841101c" />
 			<dataarea name="chr" size="524288">
 				<rom name="4-in-1 (ok-411)[p1].chr" size="524288" crc="b9300c30" sha1="90cef987aac482e7402891892779847cffaa6ef0" offset="00000" status="baddump" />
 			</dataarea>
@@ -79536,6 +79640,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="5-in-1 (spc005)[p1].prg" size="1048576" crc="02e417c2" sha1="6a9244f56e72ebbf5feb5f48df3246ac3beb2eb6" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_5tvg">
+		<description>TV Game 5 in 1</description>
+		<year>1989</year>
+		<publisher>NTDEC</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_2751" />
+			<feature name="pcb_model" value="2751" />
+			<dataarea name="prg" size="131072">
+				<rom name="5909-p" size="131072" crc="03679817" sha1="a8787e1a1e1a350f5ca85c9f9eed0d6403bfa4e8" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="5802-c" size="65536" crc="eb6d0182" sha1="c4019ff0dd390d2b753995f0638d2a28044ad4c4" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -80722,6 +80842,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="kunio 8-in-1 [p1].prg" size="1048576" crc="58bcacf6" sha1="b80dca69c0943fea309d3cc0bf34d6bfc38e29c9" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This seems to have been a pack-in cartridge included with the Little Com II (only II?) Famiclone-based computer. -->
+	<software name="mc_lc160">
+		<description>Little Com 160</description>
+		<year>199?</year>
+		<publisher>Little Com</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_lc160" />
+			<dataarea name="prg" size="1048576">
+				<rom name="mc_lc160.prg" size="1048576" crc="49a5cda7" sha1="119afaafbdbeae813f8686e255d9bbdd6a2c3faa" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>

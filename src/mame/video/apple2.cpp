@@ -1716,8 +1716,7 @@ void a2_video_device::text_updateGS(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
 
-	uint32_t const start_address = m_80col ? 0x400 : m_page2 ? 0x800
-															 : 0x400;
+	uint32_t const start_address = m_page2 ? 0x800 : 0x400;
 
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);

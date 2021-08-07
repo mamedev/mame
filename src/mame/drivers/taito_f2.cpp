@@ -1911,7 +1911,7 @@ static INPUT_PORTS_START( hthero )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( footchmpbl  )
+static INPUT_PORTS_START( footchmpbl )
 	PORT_INCLUDE(footchmp)
 
 	PORT_MODIFY("IN1")
@@ -1947,7 +1947,7 @@ static INPUT_PORTS_START( ninjak )
 	PORT_DIPSETTING(    0x08, "TROG (4 players / 2 coin slots)" )
 	PORT_DIPSETTING(    0x04, "MTX2 (4 players / 2 cabinets combined)" )
 	PORT_DIPSETTING(    0x00, "TMNT (4 players / 4 coin slots)" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )

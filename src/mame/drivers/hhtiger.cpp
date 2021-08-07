@@ -184,9 +184,9 @@ GFXDECODE_END
 UPD7220_DISPLAY_PIXELS_MEMBER(hhtiger_state::display_pixels)
 {
 	/* 96KB video RAM (32KB green + 32KB red + 32KB blue) */
-	uint16_t const green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
-	uint16_t const red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
-	uint16_t const blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
+	uint16_t const green = m_video_ram[(0x00000 + (address & 0x3fff))];
+	uint16_t const red   = m_video_ram[(0x04000 + (address & 0x3fff))];
+	uint16_t const blue  = m_video_ram[(0x08000 + (address & 0x3fff))];
 
 	for (int xi = 0; xi<16; xi++)
 	{

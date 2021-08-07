@@ -50,8 +50,9 @@ DEFINE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device,       "nes_sa9602b",  
 DEFINE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device,  "nes_shero",         "NES Cart Street Hero PCB")
 //DEFINE_DEVICE_TYPE(NES_A9746,         nes_a9746_device,         "nes_bmc_a9746",     "NES Cart A-9746 PCB")
 
-DEFINE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device,         "nes_kf23c",         "NES Cart KF23C PCB")
-DEFINE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device,        "nes_kf23ca",        "NES Cart KF23CA PCB")
+DEFINE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device,      "nes_fcgj8in1",      "NES Cart BMC FC Genjin 8 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device,         "nes_fk23c",         "NES Cart FK23C PCB")
+DEFINE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device,        "nes_fk23ca",        "NES Cart FK23CA PCB")
 DEFINE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device,    "nes_s24in1c03",     "NES Cart Super 24 in 1 SC-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device,     "nes_bmc_15in1",     "NES Cart BMC 15 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device,     "nes_bmc_sbig7",     "NES Cart BMC Super BIG 7 in 1 PCB")
@@ -62,6 +63,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in
 DEFINE_DEVICE_TYPE(NES_BMC_GC6IN1,    nes_bmc_gc6in1_device,    "nes_bmc_gc6in1",    "NES Cart BMC Golden Card 6 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device,   "nes_bmc_411120c",   "NES Cart BMC 411120C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830118C,   nes_bmc_830118c_device,   "nes_bmc_830118c",   "NES Cart BMC 830118C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_841101C,   nes_bmc_841101c_device,   "nes_bmc_841101c",   "NES Cart BMC 841101C PCB")
 DEFINE_DEVICE_TYPE(NES_PJOY84,        nes_pjoy84_device,        "nes_pjoy84",        "NES Cart Powerjoy 84 PCB")
 DEFINE_DEVICE_TYPE(NES_COOLBOY,       nes_coolboy_device,       "nes_coolboy",       "NES Cart CoolBoy PCB")
 
@@ -171,6 +173,11 @@ nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, 
 //{
 //}
 
+nes_fcgj8in1_device::nes_fcgj8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_FCGJ8IN1, tag, owner, clock)
+{
+}
+
 nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc_cmd1(0)
 {
@@ -233,6 +240,11 @@ nes_bmc_411120c_device::nes_bmc_411120c_device(const machine_config &mconfig, co
 
 nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_BMC_830118C, tag, owner, clock), m_reg(0)
+{
+}
+
+nes_bmc_841101c_device::nes_bmc_841101c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_841101C, tag, owner, clock)
 {
 }
 
@@ -439,6 +451,12 @@ void nes_sachen_shero_device::pcb_reset()
 	mmc3_common_initialize(0xff, 0x1ff, 0);
 }
 
+void nes_fcgj8in1_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x1f, 0x7f, 0);
+}
+
 void nes_fk23c_device::device_start()
 {
 	mmc3_start();
@@ -458,7 +476,6 @@ void nes_fk23c_device::pcb_reset()
 	mmc3_common_initialize(0xff, 0xff, 0);
 	fk23c_set_prg();
 	fk23c_set_chr();
-
 }
 
 void nes_fk23ca_device::pcb_reset()
@@ -599,6 +616,12 @@ void nes_bmc_830118c_device::pcb_reset()
 
 	m_reg = 0;
 	mmc3_common_initialize(0x7f, 0x7f, 0);
+}
+
+void nes_bmc_841101c_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
 void nes_pjoy84_device::device_start()
@@ -2193,6 +2216,33 @@ void nes_bmc_mario7in1_device::write_m(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
+ BMC-FCGENJIN-8IN1
+
+ Unknown Multigame Bootleg Board
+ Games: 8 in 1 (JY-119)
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 267
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_fcgj8in1_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("fcgj8in1 write_m, offset: %04x, data: %02x\n", offset, data));
+	if (!(offset & 0x1000))    // game only banks via 0x6000, this mask is a guess
+	{
+		m_prg_base = (data & 0x20) << 2 | (data & 0x06) << 4;
+		set_prg(m_prg_base, m_prg_mask);
+		m_chr_base = m_prg_base << 2;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+/*-------------------------------------------------
+
  BMC-GOLD-7IN1
 
  Known Boards: Unknown Multigame Bootleg Board
@@ -2433,6 +2483,32 @@ void nes_bmc_830118c_device::write_m(offs_t offset, uint8_t data)
 	{
 		m_reg = data;
 		set_prg(m_prg_base, m_prg_mask);
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+/*-------------------------------------------------
+
+ BMC-841101C
+
+ Games: 4 in 1 (OK-411, JY-009, JY-018, JY-019, JY-020)
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 361
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_841101c_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_841101c write_m, offset: %04x, data: %02x\n", offset, data));
+	if (offset & 0x1000)    // games only write 0x7000, this mask is a guess
+	{
+		m_prg_base = data & 0xf0;
+		set_prg(m_prg_base, m_prg_mask);
+		m_chr_base = (data & 0xf0) << 3;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }

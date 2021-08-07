@@ -20,9 +20,9 @@ public:
 		, m_audiopcb(*this, "audiopcb")
 		, m_videoram(*this, "videoram")
 		, m_attributesram(*this, "attributesram")
-		, m_spriteram(*this, "spriteram")
-		, m_spriteram2(*this, "spriteram2")
+		, m_spriteram(*this, "spriteram%u", 1U)
 		, m_dsw_port(*this, "DSW.%u", 0)
+		, m_coins(*this, "COINS")
 	{ }
 
 	void zaccaria(machine_config &config);
@@ -44,10 +44,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	void dsw_sel_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void zaccaria_palette(palette_device &palette) const;
+	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,uint8_t *spriteram,int color,int section);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, int color, int section);
 
 	void main_map(address_map &map);
 
@@ -58,12 +58,12 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_attributesram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 
 	required_ioport_array<3> m_dsw_port;
+	required_ioport m_coins;
 
-	int m_dsw_sel;
+	uint8_t m_dsw_sel;
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_nmi_mask;
 };

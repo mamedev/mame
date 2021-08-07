@@ -258,7 +258,7 @@ private:
 	int m_rx_active;
 	int m_tx_retry_count;
 	u8 m_rx_hash;
-	u8 m_loopback_result;
+	int m_loopback_result;
 
 	void update_ethernet_irq();
 	void update_stats();

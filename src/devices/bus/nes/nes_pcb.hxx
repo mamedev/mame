@@ -161,6 +161,7 @@ static const nes_pcb pcb_list[] =
 	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
 	{ "hes",              HES_BOARD },
 	{ "hosenkan",         HOSENKAN_BOARD },
+	{ "ks106c",           KAISER_KS106C },  // mapper 352
 	{ "ks202",            KAISER_KS202 },   // mapper 56
 	{ "ks7010",           KAISER_KS7010 },  // used in Akumajo Dracula (FDS Conversion)
 	{ "ks7012",           KAISER_KS7012 },  // used in Zanac (FDS Conversion)
@@ -236,6 +237,7 @@ static const nes_pcb pcb_list[] =
 	{ "benshieng",        BMC_BENSHIENG },
 	{ "action52",         ACTENT_ACT52 },
 	{ "caltron6in1",      CALTRON_6IN1 },
+	{ "caltron9in1",      CALTRON_9IN1 },
 	{ "rumblestation",    RUMBLESTATION_BOARD },     // mapper 46
 	{ "svision16",        SVISION16_BOARD },
 	{ "kn42",             UNL_KN42 },
@@ -280,9 +282,11 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_190in1",       BMC_190IN1 },
 	{ "bmc_800in1",       BMC_800IN1 },
 	{ "bmc_1200in1",      BMC_1200IN1 },
+	{ "bmc_2751",         BMC_2751 },
 	{ "bmc_8157",         BMC_8157 },
 	{ "bmc_g146",         BMC_G146 },
 	{ "bmc_11160",        BMC_11160 },
+	{ "fcgj8in1",         BMC_FCGENJIN_8IN1 },
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
@@ -295,6 +299,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_gc6in1",       BMC_GOLDENCARD_6IN1 },
 	{ "bmc_411120c",      BMC_411120C },
 	{ "bmc_830118c",      BMC_830118C },
+	{ "bmc_841101c",      BMC_841101C },
 	{ "pjoy84",           BMC_PJOY84 },
 	{ "bmc_gold150",      BMC_GOLD150 },
 	{ "bmc_gold260",      BMC_GOLD260 },
@@ -302,6 +307,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_s22games",     BMC_SUPER22 },
 	{ "bmc_reset4",       BMC_4IN1RESET },
 	{ "bmc_reset42",      BMC_42IN1RESET },
+	{ "bmc_lc160",        BMC_LITTLECOM160 },
 	{ "jyc_a",            JYCOMPANY_A },
 	{ "jyc_b",            JYCOMPANY_B },
 	{ "jyc_c",            JYCOMPANY_C },

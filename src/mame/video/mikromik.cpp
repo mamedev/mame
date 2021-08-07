@@ -71,7 +71,7 @@ void mm1_state::mm1_upd7220_map(address_map &map)
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 {
-	uint16_t data = m_video_ram[address >> 1];
+	uint16_t data = m_video_ram[address];
 	for (int i = 0; i < 16; i++)
 	{
 		if (BIT(data, i)) bitmap.pix(y, x + i) = m_palette->pen(2);
