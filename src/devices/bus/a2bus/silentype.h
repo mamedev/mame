@@ -4,7 +4,7 @@
 
     silentype.h
 
-    Implementation of the Apple II Silentype Printer
+    Implementation of the Apple II Silentype Printer Interface Card
 
 *********************************************************************/
 
@@ -49,6 +49,7 @@ protected:
 	uint16_t m_shift_reg = 0;
 	uint16_t m_parallel_reg = 0;
 	int m_romenable = 0;  // start off disabled
+	u8 last_write_c0nx = 0;
 
 	required_device<silentype_printer_device> m_silentype_printer;
 	required_region_ptr<u8> m_rom;
@@ -58,7 +59,6 @@ protected:
 
 	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
 };
-
 
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device)

@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
- *  silentype deserializer board
+ *  silentype printer
  *
  */
+#include "screen.h"
 
 #ifndef MAME_MACHINE_SILENTYPE_PRINTER_H
 #define MAME_MACHINE_SILENTYPE_PRINTER_H
@@ -19,29 +20,11 @@ protected:
 
 public:
 
-/*
-    auto silentype_pin5_machine_status_input() { return m_write_silentype_pin5_machine_status_input.bind(); }
-    auto silentype_pin9_serial_data_input() { return m_write_silentype_pin5_machine_status_input.bind(); }
-
-    void write(offs_t offset, uint8_t data);
-    uint8_t read(offs_t offset);
-
-    DECLARE_WRITE_LINE_MEMBER( silentype_pin4_serial_data_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
-    DECLARE_WRITE_LINE_MEMBER( silentype_pin8_store_clock_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
-    DECLARE_WRITE_LINE_MEMBER( silentype_pin9_serial_clock_out ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
-
-    DECLARE_READ_LINE_MEMBER( silentype_pin4_serial_data_input ) {}
-    DECLARE_READ_LINE_MEMBER( silentype_pin5_machine_status_input ) {}
-
-    // treat these as an atomic update, update when serial_clock_out gets written
-
-*/
 	void update_printhead(uint8_t data);
 	void update_pf_stepper(uint8_t data);
 	void update_cr_stepper(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_xpos <= 0); }
-
 
 protected:
 	// device-level overrides
@@ -52,11 +35,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-
 private:
-	/* callbacks */
-//  devcb_write_line m_write_silentype_pin9_serial_data_input;
-//  devcb_write_line m_write_silentype_pin9_machine_status_input;
 
 	uint8_t m_serial_data_out;
 	uint8_t m_serial_clock_out;

@@ -15,8 +15,12 @@
 #include "emuopts.h"
 #include "fileio.h"
 #include "png.h"
-//#include <bitset>
+#include <bitset>
 #include "silentype_printer.h"
+
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
 
 // write bits @ c091
 #define SILENTYPE_DATA                (0)
@@ -84,9 +88,9 @@ DEFINE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device, "silentype", "Ap
 
 INPUT_PORTS_START(silentype_printer)
 	PORT_START("CNF")
-	PORT_CONFNAME(0x1, 0x00, "Print Darkness")
-	PORT_CONFSETTING(   0x0, "Normal")
-	PORT_CONFSETTING(   0x1, "Super Dark")
+	PORT_CONFNAME(0x1, 0x01, "Print Darkness")
+	PORT_CONFSETTING(0x0, "Normal (grey)")
+	PORT_CONFSETTING(0x1, "Dark   (b/w)")
 INPUT_PORTS_END
 
 
@@ -110,7 +114,7 @@ void silentype_printer_device::device_add_mconfig(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(PAPER_WIDTH, PAPER_SCREEN_HEIGHT);
-	screen.set_visarea(0, PAPER_WIDTH-1, 0, PAPER_SCREEN_HEIGHT-1);
+	screen.set_visarea(0, PAPER_WIDTH - 1, 0, PAPER_SCREEN_HEIGHT - 1);
 	screen.set_screen_update(FUNC(silentype_printer_device::screen_update_silentype));
 }
 
@@ -269,9 +273,9 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 	double time_elapsed = current_time - last_update_time;
 	last_update_time = current_time;
 
-//      printf("PRINTHEAD %x\n",headbits);
-//      printf("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",
-//      time_elapsed, time_elapsed*1e6, std::bitset<8>(headbits).to_string().c_str());
+	LOG("PRINTHEAD %x\n",headbits);
+	LOG("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",
+	  time_elapsed, time_elapsed*1e6, std::bitset<8>(headbits).to_string().c_str());
 
 	for (int i=0;i<7;i++)
 	{

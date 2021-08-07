@@ -4,7 +4,7 @@
 
     silentype.cpp
 
-    Implementation of the Apple Silentype Printer
+    Implementation of the Apple Silentype Printer Interface Card
 
 **********************************************************************
 
@@ -94,10 +94,10 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 
 #include "emu.h"
 #include "silentype.h"
-#include "video.h"
-#include "screen.h"
-#include "emuopts.h"
-#include "fileio.h"
+//#include "video.h"
+//#include "screen.h"
+//#include "emuopts.h"
+//#include "fileio.h"
 //#include "png.h"  // don't need it here now
 //#include <bitset>
 
@@ -258,36 +258,52 @@ uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	LOG("Silentype WRITE %x = %x\n",offset+slotno()*0x10+0xc080,data);
-	m_romenable = BIT(data,SILENTYPE_ROMENABLE) ? 1 : 0;
 
-//	if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 0))
-	if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 0) && BIT(data, SILENTYPE_STORECLOCK) == 0)
+	m_romenable = BIT(data, SILENTYPE_ROMENABLE) ? 1 : 0;
+
+	if (
+		(
+		(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
+		(BIT(data, SILENTYPE_SHIFTCLOCKB) == 1)     // transitory shift clock
+		)
+			||
+		(
+		(BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKA) == 1) &&   // latched transition from 1 to 0
+		(BIT(data,            SILENTYPE_SHIFTCLOCKA) == 0)
+		)
+		)
+	{
+		u8 databit = BIT(data, SILENTYPE_DATAWRITEENABLE) ? BIT(data, SILENTYPE_DATA) : 0;
+		LOG("Silentype Shift Bit = %x\n", databit);
+		m_shift_reg = (m_shift_reg << 1) | databit;
+	}
+
+	if (
+		(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
+		(BIT(data, SILENTYPE_SHIFTCLOCKB) == 0) &&
+		(BIT(data, SILENTYPE_STORECLOCK) == 0)
+		)
 	{
 		LOG("Silentype Clear Parallel Register\n");
 		m_parallel_reg = 0;
-		m_silentype_printer->update_pf_stepper(0);
-		m_silentype_printer->update_cr_stepper(0);
-		m_silentype_printer->update_printhead(0);
+		m_silentype_printer->update_cr_stepper(BITS(m_parallel_reg, 3,  0));
+		m_silentype_printer->update_pf_stepper(BITS(m_parallel_reg, 7,  4));
+		m_silentype_printer->update_printhead (BITS(m_parallel_reg, 15, 9));
 	}
-	else if ((BIT(data,SILENTYPE_SHIFTCLOCKA) == 0) && (BIT(data,SILENTYPE_SHIFTCLOCKB) == 1))
-	{
-	LOG("Silentype Shift Bit = %x\n", BIT(data,SILENTYPE_DATA));
-		m_shift_reg = (m_shift_reg << 1) | BIT(data,SILENTYPE_DATA);
-	}
-	else if ((BIT(data,SILENTYPE_STORECLOCK) == 0))  // when NOT STORECLOCK, store shift register to parallel register
+	else if (
+		(BIT(last_write_c0nx, SILENTYPE_STORECLOCK) == 1) &&  // transition from 1 to 0
+		(BIT(data,            SILENTYPE_STORECLOCK) == 0)
+		)  // store shift register to parallel register
 	{
 		m_parallel_reg = m_shift_reg;
 
-		LOG("Silentype Store Parallel Register = %4x\n",m_parallel_reg);
+		LOG("Silentype Store Parallel Register = %4x\n", m_parallel_reg);
 
-		uint8_t hstepperbits = BITS(m_parallel_reg, 3,  0);
-		uint8_t vstepperbits = BITS(m_parallel_reg, 7,  4);
-		uint8_t headbits     = BITS(m_parallel_reg, 15, 9);
-
-		m_silentype_printer->update_pf_stepper(vstepperbits);
-		m_silentype_printer->update_cr_stepper(hstepperbits);
-		m_silentype_printer->update_printhead(headbits);
+		m_silentype_printer->update_cr_stepper(BITS(m_parallel_reg, 3,  0));
+		m_silentype_printer->update_pf_stepper(BITS(m_parallel_reg, 7,  4));
+		m_silentype_printer->update_printhead (BITS(m_parallel_reg, 15, 9));
 	}
+	last_write_c0nx = data;
 }
 
 /*-------------------------------------------------
