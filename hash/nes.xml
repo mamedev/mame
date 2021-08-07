@@ -78099,6 +78099,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_17" supported="partial">
+		<description>17 in 1 (60311C)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_60311c" />
+			<dataarea name="prg" size="2097152">
+				<rom name="17-in-1 (60311c).prg" size="2097152" crc="2374b9ba" sha1="a145cc0d8b5db4a7bdca68c787d959cc32dd1373" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_18kd">
 		<description>18 in 1 (KD-1512)</description>
 		<year>19??</year>
@@ -79760,6 +79775,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="58-in-1 [p1].prg" size="1048576" crc="0d0ef5dd" sha1="d0b0fcc55d33aeb72625dd918636506bd07ad70d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_6a30">
+		<description>Super HiK 6 in 1 (A-030)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830425c" />
+			<dataarea name="prg" size="1048576">
+				<rom name="super hik 6-in-1 a-030.prg" size="1048576" crc="ee62ac32" sha1="6f7dbfdbdc1633e45c84d2e1b7f833d2ef7741c3" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>

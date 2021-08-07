@@ -324,7 +324,7 @@ static const nes_mmc mmc_list[] =
 	{ 286, BMC_BENSHIENG },
 	{ 287, BMC_411120C },
 	// 288 GKCX1 21 in 1 multicarts, not in nes.xml?
-	// { 289, BMC_60311C }, not in nes.xml?
+	{ 289, BMC_60311C },
 	{ 290, BMC_NTD_03 },
 	// 291 Kasheng 2-in-1 multicarts not yet in nes.xml?
 	// { 292, UNL_DRAGONFIGHTER }, in nes.xml, not emulated yet
@@ -355,7 +355,7 @@ static const nes_mmc mmc_list[] =
 	// 317 Unused
 	// 318 Unused
 	// 319 HP-898F (has different bank order than UNIF!) and KD-7/9-E boards
-	// 320 BMC-830425C-4391T, not in nes.xml?
+	{ 320, BMC_830425C },
 	// 321 duplicate of 287?
 	// 322 BMC-K-3033 35-in-1, related to mc_35?
 	// 323 Farid SLROM homebrew 8-in-1
