@@ -2566,6 +2566,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- boot OK with the given instructions -->
+	<!-- Omake: boot a MS-DOS, insert and switch prompt to system disk, issue "MUSIC TEST" (latter is case sensitive) for a sound test menu -->
 	<software name="46okunen" supported="yes">
 		<description>46 Okunen Monogatari - The Shinkaron</description>
 		<year>1990</year>
@@ -32040,26 +32041,33 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="valis2">
+	<!-- boot OK -->
+	<!-- Omake: press F1 up to F6 during opening for music test (tenkey for up/down, space to select, enter to quit) -->
+	<!-- Cheat: press F2 + F4 + F5 during gameplay for jewel refill -->
+	<!-- TODO: cannot make following two to work, F1 is the inventory menu call, may require key repeat? -->
+	<!-- Omake: press F1 + F4 during gameplay for partial MIDI support -->
+	<!-- Cheat: press F1 + F6 during gameplay for rapid fire -->
+	<software name="valis2" supported="yes">
 		<description>Mugen Senshi Valis II</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="夢幻戦士ヴァリス２" />
 		<info name="release" value="19890805" />
+
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 1 of 3)(disk a).fdi" size="1265664" crc="ceb883b9" sha1="36f06cfdf9b43184a58521c0ec57777eb890c2ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 2 of 3)(disk b).fdi" size="1265664" crc="38cbab2a" sha1="4eff9c916e7f939b68b01da673350200aff430ba" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 3 of 3)(disk c).fdi" size="1265664" crc="bf57cbfc" sha1="550606a177b52ef6e5c3480a0ee975fc4eedfddf" offset="0" />
 			</dataarea>

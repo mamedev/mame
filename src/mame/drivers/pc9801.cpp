@@ -13,7 +13,7 @@
 	- GP-IB emulation, μPD7210;
     - CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
     - Write a PC80S31K device for 2d type floppies
-      (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
+      (also used on PC-6601SR, PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
     - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
     - clean-ups & split into separate devices and driver flavours;
     - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
@@ -30,6 +30,11 @@
     - keyboard shift doesn't seem to disable properly (fixed by now?);
     - Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
     - clean-up duplicate code;
+
+	TODO (PC-9801BX2)
+	- "system shutdown" at POST, a soft reset fixes it? A non-fatal "memory
+	  error" is always thrown no matter the RAM size
+	- unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM size;
 
     TODO (PC-9821):
     - fix CPU for some clones;
@@ -2447,12 +2452,21 @@ void pc9801_state::pc9801ux(machine_config &config)
 void pc9801_state::pc9801bx2(machine_config &config)
 {
 	pc9801rs(config);
-	I486(config.replace(), m_maincpu, 25000000);
+	const XTAL xtal = XTAL(25'000'000);
+	I486(config.replace(), m_maincpu, xtal); // i486sx, ODP upgradeable
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801bx2)
+
+	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+
+	// minimum RAM: 1.8 / 3.6 MB (?)
+	// maximum RAM: 19.6 MB
+	// GDC & EGC, DAC1BIT built-in
+	// 2x 3.5 internal floppy drives + 1x mountable File Bay
+	// 3x C-Bus slots
 }
 
 // TODO: setter for DMAC clock should follow up whatever is the CPU clock
