@@ -2199,6 +2199,7 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 	ppi_mouse.in_pc_callback().set_ioport("DSW4");
 	ppi_mouse.out_pc_callback().set(FUNC(pc9801_state::ppi_mouse_portc_w));
 
+	// TODO: timing is configurable
 	TIMER(config, "mouse_timer").configure_periodic(FUNC(pc9801_state::mouse_irq_cb), attotime::from_hz(120));
 }
 
@@ -2449,6 +2450,20 @@ void pc9801_state::pc9801ux(machine_config &config)
 //  AM9157A(config, "i8237", 10000000); // unknown clock
 }
 
+void pc9801_state::pc9801vx(machine_config &config)
+{
+	pc9801ux(config);
+	// TODO: EGC initial buggy revision
+	// Reportedly has a bug with a RMW op, details TBD
+	// ...
+	
+	// minimum RAM: 640 kB
+	// maximum RAM: 8.6 MB
+	// GDC & EGC, DAC1BIT built-in
+	// Either 2x 5.25 or 2x 3.5 internal floppy drives
+	// 4x C-Bus slots
+}
+
 void pc9801_state::pc9801bx2(machine_config &config)
 {
 	pc9801rs(config);
@@ -2681,95 +2696,6 @@ ROM_START( pc9801f )
 ROM_END
 
 /*
-UX - 80286 10 + V30 8
-*/
-
-ROM_START( pc9801ux )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
-	ROM_LOAD( "bios_ux.rom", 0x18000, 0x18000, BAD_DUMP CRC(97375ca2) SHA1(bfe458f671d90692104d0640730972ca8dc0a100) )
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
-
-	LOAD_KANJI_ROMS
-//  LOAD_IDE_ROM
-ROM_END
-
-/*
-RX - 80286 12 (no V30?)
-
-The bios is from a 386 model not an RX
-*/
-
-ROM_START( pc9801rx )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_rs.rom",  0x10000, 0x08000, BAD_DUMP CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-	ROM_LOAD( "bios_rx.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
-	// fix csum
-	ROM_FILL(0x2fffe, 1, 0x0d)
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_rx.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
-/*
-RS - 386SX 16
-
-(note: might be a different model!)
-*/
-
-ROM_START( pc9801rs )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_rs.rom",  0x10000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-	ROM_LOAD( "bios_rs.rom", 0x18000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
-
-	/* following is an emulator memory dump, should be checked and eventually nuked if nothing worth is there */
-	ROM_REGION( 0x100000, "memory", 0 )
-	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
-	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
-	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
-	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
-	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )  // contains n-88 basic (86) v2.0
-	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
-	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
-/*
-BX2/U2 - 486SX @ 25 MHz
-
-Yet another franken-romset done with direct memory dump, shrug
-
-*/
-
-ROM_START( pc9801bx2 )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "pc98bank0.bin",  0x00000, 0x08000, BAD_DUMP CRC(bfd100cc) SHA1(cf8e6a5679cca7761481abef0ba4b35ead39efdb) )
-	ROM_LOAD( "pc98bank1.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
-	ROM_LOAD( "pc98bank2.bin",  0x00000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
-	ROM_LOAD( "pc98bank3.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
-	ROM_LOAD( "pc98bank4.bin",  0x10000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
-	ROM_LOAD( "pc98bank5.bin",  0x18000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
-	ROM_LOAD( "pc98bank6.bin",  0x20000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
-	ROM_LOAD( "pc98bank7.bin",  0x28000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
-/*
 VM - V30 8/10
 
 TODO: missing itf roms, if they exist
@@ -2826,7 +2752,125 @@ ROM_START( pc9801vm11 )
 //  LOAD_IDE_ROM
 ROM_END
 
+/*
+VX - 80286 10 + V30 8
 
+UVPROM label on extension board for CPU board (4 * NEC D27C256D-15):
+YLL01/YLL02/YLL03/YLL04
+00
+(C) '86 NEC
+
+Coming from a dead machine
+*/
+
+ROM_START( pc9801vx )
+ 	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll01.bin", 0x00000, 0x08000, CRC(1b235313) SHA1(d2c5e2cea3ee0a643d3c5d384d134404b58db793) )
+	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll03.bin", 0x00001, 0x08000, CRC(33605ae3) SHA1(f644ff15c54c8568e643324f38aa3b6211912af0) )
+	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll02.bin", 0x10000, 0x08000, CRC(948f8658) SHA1(674378d4e90fee715ccfdd49378cd5c2fe8d7f62) )
+	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll04.bin", 0x10001, 0x08000, CRC(2ce2101b) SHA1(2158d022d5424daf6981bf4da0ab9613bf9646f5) )
+	
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_COPY( "biosrom", 0x18000, 0x10000, 0x08000 )  //ITF ROM
+	ROM_COPY( "biosrom", 0x08000, 0x18000, 0x08000 )  //BIOS ROM
+	ROM_COPY( "biosrom", 0x00000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x28000, 0x08000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
+
+	LOAD_KANJI_ROMS
+//  LOAD_IDE_ROM
+ROM_END
+
+/*
+UX - 80286 10 + V30 8
+*/
+
+ROM_START( pc9801ux )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
+	ROM_LOAD( "bios_ux.rom", 0x18000, 0x18000, BAD_DUMP CRC(97375ca2) SHA1(bfe458f671d90692104d0640730972ca8dc0a100) )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
+
+	LOAD_KANJI_ROMS
+//  LOAD_IDE_ROM
+ROM_END
+
+/*
+RX - 80286 12 (no V30?)
+
+The bios is from a 386 model not an RX
+*/
+
+ROM_START( pc9801rx )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_rs.rom",  0x10000, 0x08000, BAD_DUMP CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+	ROM_LOAD( "bios_rx.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	// fix csum
+	ROM_FILL(0x2fffe, 1, 0x0d)
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_rx.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+RS - 386SX @ 16 MHz
+
+(note: might be a different model!)
+*/
+
+ROM_START( pc9801rs )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_rs.rom",  0x10000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+	ROM_LOAD( "bios_rs.rom", 0x18000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
+
+	/* following is an emulator memory dump, should be checked and eventually nuked if nothing worth is there */
+	ROM_REGION( 0x100000, "memory", 0 )
+	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
+	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
+	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
+	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
+	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )  // contains n-88 basic (86) v2.0
+	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
+	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+BX2/U2 - 486SX @ 25 MHz
+
+Yet another franken-romset done with direct memory dump, shrug
+
+*/
+
+ROM_START( pc9801bx2 )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "pc98bank0.bin",  0x00000, 0x08000, BAD_DUMP CRC(bfd100cc) SHA1(cf8e6a5679cca7761481abef0ba4b35ead39efdb) )
+	ROM_LOAD( "pc98bank1.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
+	ROM_LOAD( "pc98bank2.bin",  0x00000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
+	ROM_LOAD( "pc98bank3.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
+	ROM_LOAD( "pc98bank4.bin",  0x10000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
+	ROM_LOAD( "pc98bank5.bin",  0x18000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
+	ROM_LOAD( "pc98bank6.bin",  0x20000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
+	ROM_LOAD( "pc98bank7.bin",  0x28000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
 
 /*
 98MATE A - 80486SX 25
@@ -3355,7 +3399,8 @@ COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9
 COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // VX class (first model using an EGC)
-// ...
+// original VX0/VX2/VX4 released in Nov 1986, minor updates with OS pre-installed etc. in 1987
+COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // XA/XL class (1120 x 750 true color, nicknamed "High-reso")
 // ...

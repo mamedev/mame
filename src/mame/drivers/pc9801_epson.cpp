@@ -435,7 +435,7 @@ CBus: 3slots
 */
 
 ROM_START( pc386m )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// bank 0: definitely wants this ROM mapping otherwise POST throws "ERR:R0" (BIOS checksum)
 	ROM_LOAD( "cwma-a02.bin", 0x10000, 0x08000,  CRC(d2c357a4) SHA1(819c9a1fc92124a8d6a85339c74651add7efaf92) )
 	ROM_CONTINUE(             0x00000, 0x10000 )
