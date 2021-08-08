@@ -374,8 +374,8 @@ static const nes_mmc mmc_list[] =
 	{ 336, BMC_K3046 },
 	// { 337, BMC_CTC_12IN1 }, not in nes.xml
 	{ 338, BMC_SA005A },
-	// 339 BMC-K-3006 21-in-1, not in nes.xml?
-	// 340 BMC-K-3036 35-in-1, not in nes.xml?
+	{ 339, BMC_K3006 },
+	{ 340, BMC_K3036 },
 	{ 341, BMC_TJ03 },
 	// 342 COOLGIRL homebrew
 	// 343 reset-based 4-in-1 pirate?

@@ -78391,6 +78391,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_21k6">
+		<description>21 in 1 (K-3006)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_k3006" />
+			<dataarea name="prg" size="524288">
+				<rom name="21-in-1 (k-3006).prg" size="524288" crc="0efb3c8f" sha1="079e862ec83fc54d6a99b0dc63d85a15262f3e6b" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="21-in-1 (k-3006).chr" size="524288" crc="b7833591" sha1="782a8a77afdc15e16663ea5fe984d1776e2e2a2b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_22rb" supported="partial">
 		<description>22 in 1 (Reset Based)</description>
 		<year>19??</year>
@@ -78673,6 +78688,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="35-in-1 [p1].prg" size="65536" crc="72dd449d" sha1="1a7d10a3f9d09b6131226ba7310c1771fa61347b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_35k36">
+		<description>35 in 1 (K-3036)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_k3036" />
+			<dataarea name="prg" size="524288">
+				<rom name="35-in-1 (k-3036).prg" size="524288" crc="df2a71c7" sha1="ff04533c60ad0d2c0005577068b629d90053e1fc" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
