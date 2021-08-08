@@ -78028,9 +78028,9 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_150um" supported="no">
+	<software name="mc_150um">
 		<description>150 in 1 Unchained Melody (Fight 150 Ver. Love)</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_f15" />

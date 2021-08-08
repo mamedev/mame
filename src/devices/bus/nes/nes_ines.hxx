@@ -294,7 +294,7 @@ static const nes_mmc mmc_list[] =
 	// 256 OneBus Famiclones
 	// 257 UNIF MAPR PEC-586?
 	// 258 UNIF MAPR 158B?
-	// 259 UNIF MAPR F-15?
+	{ 259, BMC_F15 },
 	// 260 HP10xx/HP20xx multicarts?
 	{ 261, BMC_810544C },
 	{ 262, SACHEN_SHERO },
