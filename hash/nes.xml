@@ -80951,13 +80951,31 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_pw255" supported="no">
+	<software name="mc_pw250">
+		<description>Powerful 250 in 1</description>
+		<year>1991</year>
+		<publisher>NTDEC</publisher>
+		<info name="alt_title" value="Golden 250"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_th22913" />
+			<feature name="pcb_model" value="TH2291-3" />
+			<dataarea name="prg" size="3145728">
+				<rom name="powerful 255-in-1.prg" size="3145728" crc="4bf3227c" sha1="5407fba6bf00ff7ac3af249ba4f5607e4fb15a01" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This seems to be a bootleg of the above multi-bootleg cart. -->
+	<software name="mc_pw255" cloneof="mc_pw250">
 		<description>Powerful 255 in 1</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_power255" />
-			<feature name="pcb" value="BMC-POWERFUL-255" /> <!-- Mapper 63 -->
+			<feature name="slot" value="bmc_th22913" />
+			<feature name="pcb_model" value="CH-011" />
 			<dataarea name="prg" size="3145728">
 				<rom name="powerful 255-in-1.prg" size="3145728" crc="41a14986" sha1="afee7b75d43e322cd18f382688fe6f2d9a294988" offset="00000" status="baddump" />
 			</dataarea>

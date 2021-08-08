@@ -79,7 +79,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_800IN1,     nes_bmc_800in1_device,     "nes_bmc_800in
 DEFINE_DEVICE_TYPE(NES_BMC_1200IN1,    nes_bmc_1200in1_device,    "nes_bmc_1200in1",    "NES Cart BMC 1200 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD150,    nes_bmc_gold150_device,    "nes_bmc_gold150",    "NES Cart BMC Golden 150 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD260,    nes_bmc_gold260_device,    "nes_bmc_gold260",    "NES Cart BMC Golden 260 in 1 PCB")
-DEFINE_DEVICE_TYPE(NES_BMC_CH001,      nes_bmc_ch001_device,      "nes_bmc_ch001",      "NES Cart BMC CH-001 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_TH22913,    nes_bmc_th22913_device,    "nes_bmc_th22913",    "NES Cart BMC TH2291-3 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SUPER22,    nes_bmc_super22_device,    "nes_bmc_super22",    "NES Cart BMC Super 22 Games PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device,  "nes_bmc_4in1reset",  "NES Cart BMC 4 in 1 (Reset Based) PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device, "nes_bmc_42in1reset", "NES Cart BMC 42 in 1 (Reset Based) PCB")
@@ -341,11 +341,6 @@ nes_bmc_gold260_device::nes_bmc_gold260_device(const machine_config &mconfig, co
 {
 }
 
-nes_bmc_ch001_device::nes_bmc_ch001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_CH001, tag, owner, clock), m_latch(0)
-{
-}
-
 nes_bmc_super22_device::nes_bmc_super22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_SUPER22, tag, owner, clock)
 {
@@ -363,6 +358,16 @@ nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconf
 
 nes_bmc_lc160_device::nes_bmc_lc160_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_LC160, tag, owner, clock)
+{
+}
+
+nes_vram_protect_device::nes_vram_protect_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+     : nes_nrom_device(mconfig, type, tag, owner, clock), m_vram_protect(false)
+{
+}
+
+nes_bmc_th22913_device::nes_bmc_th22913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_vram_protect_device(mconfig, NES_BMC_TH22913, tag, owner, clock)
 {
 }
 
@@ -1050,21 +1055,6 @@ void nes_bmc_gold260_device::pcb_reset()
 	chr8(0, m_chr_source);
 }
 
-void nes_bmc_ch001_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_latch));
-}
-
-void nes_bmc_ch001_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-
-	m_latch = 0;
-}
-
 void nes_bmc_super22_device::device_start()
 {
 	common_start();
@@ -1113,6 +1103,25 @@ void nes_bmc_42in1reset_device::pcb_reset()
 
 	m_reg[0] = 0;
 	m_reg[1] = 0;
+}
+
+void nes_vram_protect_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_vram_protect));
+}
+
+void nes_vram_protect_device::pcb_reset()
+{
+	chr8(0, CHRRAM);
+	m_vram_protect = false;
+}
+
+void nes_bmc_th22913_device::pcb_reset()
+{
+	nes_vram_protect_device::pcb_reset();
+	prg16_89ab(0);
+	prg16_cdef(0);
 }
 
 
@@ -2783,59 +2792,6 @@ uint8_t nes_bmc_gold150_device::read_h(offs_t offset)
 		return hi_access_rom(offset);
 }
 
-
-/*-------------------------------------------------
-
- BMC-POWERFUL-255
-
- Unknown Bootleg Multigame Board
- Games:
-
- iNES: mapper 63
-
-
- In MESS: Preliminary Supported.
-
- -------------------------------------------------*/
-
-void nes_bmc_ch001_device::write_h(offs_t offset, uint8_t data)
-{
-	int bank = ((offset >> 1) & 0x1fc);
-	LOG_MMC(("bmc_ch001 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	m_latch = ((offset & 0x300) == 0x300);
-	set_nt_mirroring(BIT(offset, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	if (offset & 2)
-	{
-		prg8_89(bank + 0);
-		prg8_ab(bank + 1);
-		prg8_cd(bank + 2);
-		prg8_ef(bank + 3);
-	}
-	else
-	{
-		bank |= (offset & 4) >> 1;
-		prg8_89(bank + 0);
-		prg8_ab(bank + 1);
-		prg8_cd(bank + 0);
-		prg8_ef(bank + 1);
-	}
-
-	if (offset & 0x800) // in this case, the last 8KB bank is switched differently...
-		prg8_ef((offset & 0x07c ) | ((offset & 0x6) ? 0x3 : 0x1));
-}
-
-uint8_t nes_bmc_ch001_device::read_h(offs_t offset)
-{
-	LOG_MMC(("bmc_ch001 read_h, offset: %04x\n", offset));
-
-	if (m_latch && offset < 0x4000) // open bus
-		return get_open_bus();
-	else
-		return hi_access_rom(offset);
-}
-
 /*-------------------------------------------------
 
  BMC-SUPER22GAMES
@@ -2949,4 +2905,29 @@ void nes_bmc_lc160_device::write_h(offs_t offset, u8 data)
 		prg16_cdef(bank | mode);
 		set_nt_mirroring(BIT(offset, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	}
+}
+
+/*-------------------------------------------------
+
+ BMC-TH2291-3, BMC-CH-011
+
+ Games: Powerful 250 in 1, Powerful 255 in 1
+
+ iNES: mapper 63
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_th22913_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_th22913 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	u8 bank = offset >> 2;
+	u8 mode = BIT(offset, 1);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
+
+	set_nt_mirroring(BIT(offset, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	m_vram_protect = BIT(offset, 10);
 }

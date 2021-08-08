@@ -95,7 +95,7 @@ static const nes_mmc mmc_list[] =
 	{ 60, BMC_4IN1RESET },
 	{ 61, RCM_TF9IN1 },
 	{ 62, BMC_SUPER_700IN1 },
-	{ 63, BMC_CH001 },  // Powerful 255
+	{ 63, BMC_TH22913 },  // Powerful 250/255
 	{ 64, TENGEN_800032 },
 	{ 65, IREM_H3001 },
 	{ 66, STD_GXROM },
