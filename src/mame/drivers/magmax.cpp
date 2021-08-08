@@ -45,7 +45,7 @@ uint8_t magmax_state::sound_r()
 
 void magmax_state::ay8910_portB_0_w(uint8_t data)
 {
-	/*bit 0 is input to CLR line of the LS74*/
+	// bit 0 is input to CLR line of the LS74
 	m_LS74_clr = data & 1;
 	if (m_LS74_clr == 0)
 		m_LS74_q = 0;
@@ -55,8 +55,8 @@ TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
 {
 	int scanline = param;
 
-	/* bit 0 goes hi whenever line V6 from video part goes lo->hi */
-	/* that is when scanline is 64 and 192 accordingly */
+	/* bit 0 goes hi whenever line V6 from video part goes lo->hi
+	   that is when scanline is 64 and 192 accordingly */
 	if (m_LS74_clr != 0)
 		m_LS74_q = 1;
 
@@ -68,10 +68,10 @@ TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
 
 void magmax_state::machine_start()
 {
-	/* Create interrupt timer */
+	// Create interrupt timer
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(magmax_state::scanline_callback),this));
 
-	/* Set up save state */
+	// Set up save state
 	save_item(NAME(m_sound_latch));
 	save_item(NAME(m_LS74_clr));
 	save_item(NAME(m_LS74_q));
@@ -144,21 +144,21 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 
 	m_gain_control = data & 0x0f;
 
-	/*popmessage("gain_ctrl = %2x",data&0x0f);*/
+	//  popmessage("gain_ctrl = %2x",data&0x0f);
 
 	float percent = (m_gain_control & 1) ? 1.0 : 0.50;
 	m_ay[0]->set_output_gain(0, percent);
-//fixme:    set_RC_filter(0,10000,100000000,0,10000);   /* 10K, 10000pF = 0.010uF */
+//fixme:    set_RC_filter(0,10000,100000000,0,10000);   // 10K, 10000pF = 0.010uF
 
 	percent = (m_gain_control & 2) ? 0.45 : 0.23;
 	m_ay[0]->set_output_gain(1, percent);
 	m_ay[0]->set_output_gain(2, percent);
 	m_ay[1]->set_output_gain(0, percent);
 	m_ay[1]->set_output_gain(1, percent);
-//fixme:    set_RC_filter(1,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
-//fixme:    set_RC_filter(2,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
-//fixme:    set_RC_filter(3,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
-//fixme:    set_RC_filter(4,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
+//fixme:    set_RC_filter(1,4700,100000000,0,4700); //  4.7K, 4700pF = 0.0047uF
+//fixme:    set_RC_filter(2,4700,100000000,0,4700); //  4.7K, 4700pF = 0.0047uF
+//fixme:    set_RC_filter(3,4700,100000000,0,4700); //  4.7K, 4700pF = 0.0047uF
+//fixme:    set_RC_filter(4,4700,100000000,0,4700); //  4.7K, 4700pF = 0.0047uF
 
 	percent = (m_gain_control & 4) ? 0.45 : 0.23;
 	m_ay[1]->set_output_gain(2, percent);
@@ -171,14 +171,14 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 
 void magmax_state::vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* VRAM CONTROL REGISTER */
-	/* bit0 - coin counter 1    */
-	/* bit1 - coin counter 2    */
-	/* bit2 - flip screen (INV) */
-	/* bit3 - page bank to be displayed (PG) */
-	/* bit4 - sprite bank LSB (DP0) */
-	/* bit5 - sprite bank MSB (DP1) */
-	/* bit6 - BG display enable (BE)*/
+	// VRAM CONTROL REGISTER
+	// bit0 - coin counter 1
+	// bit1 - coin counter 2
+	// bit2 - flip screen (INV)
+	// bit3 - page bank to be displayed (PG)
+	// bit4 - sprite bank LSB (DP0)
+	// bit5 - sprite bank MSB (DP1)
+	// bit6 - BG display enable (BE)
 	COMBINE_DATA(m_vreg);
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( magmax )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Speed") PORT_CODE(KEYCODE_F1) PORT_TOGGLE   /* see notes */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Speed") PORT_CODE(KEYCODE_F1) PORT_TOGGLE   // see notes
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -239,7 +239,7 @@ static INPUT_PORTS_START( magmax )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* see notes */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )            // see notes
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -285,11 +285,11 @@ static INPUT_PORTS_START( magmax )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:6")     /* undocumented in the US manual */
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:6")     // undocumented in the US manual
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Debug Mode" )            PORT_DIPLOCATION("SW2:8")     /* see notes */
+	PORT_DIPNAME( 0x8000, 0x8000, "Debug Mode" )            PORT_DIPLOCATION("SW2:8")     // see notes
 	PORT_DIPSETTING(      0x8000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -297,9 +297,9 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8, 8,   /* 8*8 characters */
-	256,    /* 256 characters */
-	4,  /* 4 bits per pixel */
+	8, 8,   // 8*8 characters
+	256,    // 256 characters
+	4,  // 4 bits per pixel
 	{ 0, 1, 2, 3 },
 	{ 4, 0, 12, 8, 20, 16, 28, 24 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
@@ -308,9 +308,9 @@ static const gfx_layout charlayout =
 
 static const gfx_layout spritelayout =
 {
-	16, 16, /* 16*16 characters */
-	512,    /* 512 characters */
-	4,  /* 4 bits per pixel */
+	16, 16, // 16*16 characters
+	512,    // 512 characters
+	4,  // 4 bits per pixel
 	{ 0, 1, 2, 3 },
 	{ 4, 0, 4+512*64*8, 0+512*64*8, 12, 8, 12+512*64*8, 8+512*64*8,
 		20, 16, 20+512*64*8, 16+512*64*8, 28, 24, 28+512*64*8, 24+512*64*8 },
@@ -320,26 +320,26 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_magmax )
-	GFXDECODE_ENTRY( "chars", 0, charlayout,           0,  1 ) /*no color codes*/
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,      1*16, 16 ) /*16 color codes*/
+	GFXDECODE_ENTRY( "chars", 0, charlayout,           0,  1 ) // no color codes
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,      1*16, 16 ) // 16 color codes
 GFXDECODE_END
 
 
 void magmax_state::magmax(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(16'000'000)/2);   /* verified on pcb */
+	// basic machine hardware
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &magmax_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(magmax_state::irq1_line_assert));
 
-	Z80(config, m_audiocpu, XTAL(20'000'000)/8); /* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(20'000'000)/8); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &magmax_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &magmax_state::sound_io_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
@@ -348,19 +348,19 @@ void magmax_state::magmax(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magmax);
-	PALETTE(config, m_palette, FUNC(magmax_state::magmax_palette), 1*16 + 16*16 + 256, 256);
+	PALETTE(config, m_palette, FUNC(magmax_state::palette), 1*16 + 16*16 + 256, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay[0], XTAL(20'000'000)/16); /* verified on pcb */
+	AY8910(config, m_ay[0], XTAL(20'000'000)/16); // verified on PCB
 	m_ay[0]->port_a_write_callback().set(FUNC(magmax_state::ay8910_portA_0_w));
 	m_ay[0]->port_b_write_callback().set(FUNC(magmax_state::ay8910_portB_0_w));
 	m_ay[0]->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	AY8910(config, m_ay[1], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); /* verified on pcb */
+	AY8910(config, m_ay[1], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); // verified on PCB
 
-	AY8910(config, m_ay[2], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); /* verified on pcb */
+	AY8910(config, m_ay[2], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); // verified on PCB
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
@@ -392,29 +392,79 @@ ROM_START( magmax )
 	ROM_LOAD( "21.5g",  0x0a000, 0x2000, CRC(dd52eda4) SHA1(773e92c918f5b076ce3cae55a33a27c38d958edf) )
 	ROM_LOAD( "22.6g",  0x0c000, 0x2000, CRC(4afc98ff) SHA1(a34d63befdb3c749460d1cfb62e15ced52859b9b) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) /* surface scroll control */
+	ROM_REGION( 0x10000, "user1", 0 ) // surface scroll control
 	ROM_LOAD16_BYTE( "4.18b",  0x00000, 0x2000, CRC(1550942e) SHA1(436424d63ca576d13b0f4a3713f009a38e33f2f3) )
 	ROM_LOAD16_BYTE( "5.20b",  0x00001, 0x2000, CRC(3b93017f) SHA1(b1b67c2050c8033c29bb74ab909075c39e4f7c6a) )
-	/* BG control data */
-	ROM_LOAD( "9.18d",  0x04000, 0x2000, CRC(9ecc9ab8) SHA1(ea5fbd9e9ce09e25f532dc74623e0f7e8464b7f3) ) /* surface */
-	ROM_LOAD( "10.20d", 0x06000, 0x2000, CRC(e2ff7293) SHA1(d93c30f7edac53747efcf840325a8ce5f5e47b32) ) /* underground */
-	/* background tiles */
-	ROM_LOAD( "11.15f", 0x08000, 0x2000, CRC(91f3edb6) SHA1(64e8008cad0e9c42c2ee972c2ee867c7c51cae27) ) /* surface */
-	ROM_LOAD( "12.17f", 0x0a000, 0x2000, CRC(99771eff) SHA1(5a1e2316b4055a1332d9d1f02edee5bc6aae90ac) ) /* underground */
-	ROM_LOAD( "13.18f", 0x0c000, 0x2000, CRC(75f30159) SHA1(d188ccf926e7a842e90ebc1aad3dc20c37d84b98) ) /* surface of mechanical level */
-	ROM_LOAD( "14.20f", 0x0e000, 0x2000, CRC(96babcba) SHA1(fec58ccc1e5cc2cec56658a412b94fe7b989541d) ) /* underground of mechanical level */
+	// BG control data
+	ROM_LOAD( "9.18d",  0x04000, 0x2000, CRC(9ecc9ab8) SHA1(ea5fbd9e9ce09e25f532dc74623e0f7e8464b7f3) ) // surface
+	ROM_LOAD( "10.20d", 0x06000, 0x2000, CRC(e2ff7293) SHA1(d93c30f7edac53747efcf840325a8ce5f5e47b32) ) // underground
+	// background tiles
+	ROM_LOAD( "11.15f", 0x08000, 0x2000, CRC(91f3edb6) SHA1(64e8008cad0e9c42c2ee972c2ee867c7c51cae27) ) // surface
+	ROM_LOAD( "12.17f", 0x0a000, 0x2000, CRC(99771eff) SHA1(5a1e2316b4055a1332d9d1f02edee5bc6aae90ac) ) // underground
+	ROM_LOAD( "13.18f", 0x0c000, 0x2000, CRC(75f30159) SHA1(d188ccf926e7a842e90ebc1aad3dc20c37d84b98) ) // surface of mechanical level
+	ROM_LOAD( "14.20f", 0x0e000, 0x2000, CRC(96babcba) SHA1(fec58ccc1e5cc2cec56658a412b94fe7b989541d) ) // underground of mechanical level
 
-	ROM_REGION( 0x0200, "user2", 0 ) /* BG control data */
-	ROM_LOAD( "mag_b.14d",  0x0000, 0x0100, CRC(a0fb7297) SHA1(e6461050e7e586475343156aae1066b944ceab66) ) /* background control PROM */
-	ROM_LOAD( "mag_c.15d",  0x0100, 0x0100, CRC(d84a6f78) SHA1(f2ce329b1adf39bde6df2eb79be6d144adea65d0) ) /* background control PROM */
+	ROM_REGION( 0x0200, "user2", 0 ) // BG control data
+	ROM_LOAD( "mag_b.14d",  0x0000, 0x0100, CRC(a0fb7297) SHA1(e6461050e7e586475343156aae1066b944ceab66) ) // background control PROM
+	ROM_LOAD( "mag_c.15d",  0x0100, 0x0100, CRC(d84a6f78) SHA1(f2ce329b1adf39bde6df2eb79be6d144adea65d0) ) // background control PROM
 
-	ROM_REGION( 0x0500, "proms", 0 ) /* color PROMs */
-	ROM_LOAD( "mag_e.10f",  0x0000, 0x0100, CRC(75e4f06a) SHA1(cdaccc3e56df4ac9ace04b93b3bab9a62f1ea6f5) ) /* red */
-	ROM_LOAD( "mag_d.10e",  0x0100, 0x0100, CRC(34b6a6e3) SHA1(af254ccf0d38e1f4644375cd357d468ad4efe450) ) /* green */
-	ROM_LOAD( "mag_a.10d",  0x0200, 0x0100, CRC(a7ea7718) SHA1(4789586d6795644517a18f179b4ae5f23737b21d) ) /* blue */
-	ROM_LOAD( "mag_g.2e",   0x0300, 0x0100, CRC(830be358) SHA1(f412587718040a783c4e6453619930c90daf385e) ) /* sprites color lookup table */
-	ROM_LOAD( "mag_f.13b",  0x0400, 0x0100, CRC(4a6f9a6d) SHA1(65f1e0bfacd1f354ece1b18598a551044c27c4d1) ) /* state machine data used for video signals generation (not used in emulation)*/
+	ROM_REGION( 0x0500, "proms", 0 ) // color PROMs
+	ROM_LOAD( "mag_e.10f",  0x0000, 0x0100, CRC(75e4f06a) SHA1(cdaccc3e56df4ac9ace04b93b3bab9a62f1ea6f5) ) // red
+	ROM_LOAD( "mag_d.10e",  0x0100, 0x0100, CRC(34b6a6e3) SHA1(af254ccf0d38e1f4644375cd357d468ad4efe450) ) // green
+	ROM_LOAD( "mag_a.10d",  0x0200, 0x0100, CRC(a7ea7718) SHA1(4789586d6795644517a18f179b4ae5f23737b21d) ) // blue
+	ROM_LOAD( "mag_g.2e",   0x0300, 0x0100, CRC(830be358) SHA1(f412587718040a783c4e6453619930c90daf385e) ) // sprites color lookup table
+	ROM_LOAD( "mag_f.13b",  0x0400, 0x0100, CRC(4a6f9a6d) SHA1(65f1e0bfacd1f354ece1b18598a551044c27c4d1) ) // state machine data used for video signals generation (not used in emulation)
+ROM_END
+
+ROM_START( magmaxa )
+	ROM_REGION( 0x14000, "maincpu", 0 ) // all differ from the parent
+	ROM_LOAD16_BYTE( "1.3b", 0x00001, 0x4000, CRC(f112b450) SHA1(ab10d4015b8736c5fc5aaa2f266fb026afeb2658) ) // sldh
+	ROM_LOAD16_BYTE( "6.3d", 0x00000, 0x4000, CRC(89a6d9e3) SHA1(99c00fae13201d2204034c079f49f6c6c1260280) ) // sldh
+	ROM_LOAD16_BYTE( "2.5b", 0x08001, 0x4000, CRC(53560842) SHA1(b5e918d902e0149282558ca750fa874cac76e43e) ) // sldh
+	ROM_LOAD16_BYTE( "7.5d", 0x08000, 0x4000, CRC(e20c2c05) SHA1(9660e29eb73a2b8fae5addbd300023cd8c881ca0) ) // sldh
+	ROM_LOAD16_BYTE( "3.6b", 0x10001, 0x2000, CRC(a1276b61) SHA1(ae9a024c817c60b847a1552bbc5af4c9d6aa612c) ) // sldh
+	ROM_LOAD16_BYTE( "8.6d", 0x10000, 0x2000, CRC(da172797) SHA1(a713c32218cc9f3ca2fa20e3647b4e4fa9a74609) ) // sldh
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "15.17b", 0x00000, 0x2000, CRC(5f2016b7) SHA1(473be0a67e29f8fa614c026d621a2906143e1939) ) // sldh, only other different ROM
+	ROM_LOAD( "16.18b", 0x02000, 0x2000, CRC(055e3126) SHA1(8c9b03eb7588512ef17f8c1b731a2fd7cf372bf8) )
+
+	ROM_REGION( 0x02000, "chars", 0 )
+	ROM_LOAD( "23.15g", 0x00000, 0x2000, CRC(a7471da2) SHA1(ec2815a5801bc55955e612173a845399fd493eb7) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "17.3e",  0x00000, 0x2000, CRC(8e305b2e) SHA1(74c318089f6bebafbee31c22302e93a09d3ffa32) )
+	ROM_LOAD( "18.5e",  0x02000, 0x2000, CRC(14c55a60) SHA1(fd2a1b434bb65502f0f791995caf1cd869ccd254) )
+	ROM_LOAD( "19.6e",  0x04000, 0x2000, CRC(fa4141d8) SHA1(a5279d1ada5a13df14a8bbc18ceeea79f82a4c23) )
+	ROM_LOAD( "20.3g",  0x08000, 0x2000, CRC(6fa3918b) SHA1(658bdbdc581732922c986b07746a9601d86ec5a2) )
+	ROM_LOAD( "21.5g",  0x0a000, 0x2000, CRC(dd52eda4) SHA1(773e92c918f5b076ce3cae55a33a27c38d958edf) )
+	ROM_LOAD( "22.6g",  0x0c000, 0x2000, CRC(4afc98ff) SHA1(a34d63befdb3c749460d1cfb62e15ced52859b9b) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) // surface scroll control
+	ROM_LOAD16_BYTE( "4.18b",  0x00000, 0x2000, CRC(1550942e) SHA1(436424d63ca576d13b0f4a3713f009a38e33f2f3) )
+	ROM_LOAD16_BYTE( "5.20b",  0x00001, 0x2000, CRC(3b93017f) SHA1(b1b67c2050c8033c29bb74ab909075c39e4f7c6a) )
+	// BG control data
+	ROM_LOAD( "9.18d",  0x04000, 0x2000, CRC(9ecc9ab8) SHA1(ea5fbd9e9ce09e25f532dc74623e0f7e8464b7f3) ) // surface
+	ROM_LOAD( "10.20d", 0x06000, 0x2000, CRC(e2ff7293) SHA1(d93c30f7edac53747efcf840325a8ce5f5e47b32) ) // underground
+	// background tiles
+	ROM_LOAD( "11.15f", 0x08000, 0x2000, CRC(91f3edb6) SHA1(64e8008cad0e9c42c2ee972c2ee867c7c51cae27) ) // surface
+	ROM_LOAD( "12.17f", 0x0a000, 0x2000, CRC(99771eff) SHA1(5a1e2316b4055a1332d9d1f02edee5bc6aae90ac) ) // underground
+	ROM_LOAD( "13.18f", 0x0c000, 0x2000, CRC(75f30159) SHA1(d188ccf926e7a842e90ebc1aad3dc20c37d84b98) ) // surface of mechanical level
+	ROM_LOAD( "14.20f", 0x0e000, 0x2000, CRC(96babcba) SHA1(fec58ccc1e5cc2cec56658a412b94fe7b989541d) ) // underground of mechanical level
+
+	// the PROMs weren't dumped for this set
+	ROM_REGION( 0x0200, "user2", 0 ) // BG control data
+	ROM_LOAD( "mag_b.14d",  0x0000, 0x0100, CRC(a0fb7297) SHA1(e6461050e7e586475343156aae1066b944ceab66) ) // background control PROM
+	ROM_LOAD( "mag_c.15d",  0x0100, 0x0100, CRC(d84a6f78) SHA1(f2ce329b1adf39bde6df2eb79be6d144adea65d0) ) // background control PROM
+
+	ROM_REGION( 0x0500, "proms", 0 ) // color PROMs
+	ROM_LOAD( "mag_e.10f",  0x0000, 0x0100, CRC(75e4f06a) SHA1(cdaccc3e56df4ac9ace04b93b3bab9a62f1ea6f5) ) // red
+	ROM_LOAD( "mag_d.10e",  0x0100, 0x0100, CRC(34b6a6e3) SHA1(af254ccf0d38e1f4644375cd357d468ad4efe450) ) // green
+	ROM_LOAD( "mag_a.10d",  0x0200, 0x0100, CRC(a7ea7718) SHA1(4789586d6795644517a18f179b4ae5f23737b21d) ) // blue
+	ROM_LOAD( "mag_g.2e",   0x0300, 0x0100, CRC(830be358) SHA1(f412587718040a783c4e6453619930c90daf385e) ) // sprites color lookup table
+	ROM_LOAD( "mag_f.13b",  0x0400, 0x0100, CRC(4a6f9a6d) SHA1(65f1e0bfacd1f354ece1b18598a551044c27c4d1) ) // state machine data used for video signals generation (not used in emulation)
 ROM_END
 
 
-GAME( 1985, magmax, 0, magmax, magmax, magmax_state, empty_init, ROT0, "Nichibutsu", "Mag Max", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, magmax,  0,      magmax, magmax, magmax_state, empty_init, ROT0, "Nichibutsu", "Mag Max (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, magmaxa, magmax, magmax, magmax, magmax_state, empty_init, ROT0, "Nichibutsu", "Mag Max (set 2)", MACHINE_SUPPORTS_SAVE )

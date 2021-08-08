@@ -26,7 +26,7 @@ Additional tweaking by Jarek Burczynski
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-void magmax_state::magmax_palette(palette_device &palette) const
+void magmax_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -47,7 +47,7 @@ void magmax_state::magmax_palette(palette_device &palette) const
 	for (int i = 0; i < 0x10; i++)
 		palette.set_pen_indirect(i, i);
 
-	// sprites use colors 0x10-0x1f, color 0x1f being transparen
+	// sprites use colors 0x10-0x1f, color 0x1f being transparent
 	for (int i = 0; i < 0x100; i++)
 	{
 		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x10;
@@ -64,14 +64,14 @@ void magmax_state::video_start()
 {
 	uint8_t * prom14D = memregion("user2")->base();
 
-	/* Set up save state */
+	// Set up save state
 	save_item(NAME(m_flipscreen));
 
 	m_prom_tab = std::make_unique<uint32_t[]>(256);
 
 	m_screen->register_screen_bitmap(m_bitmap);
 
-	/* Allocate temporary bitmap */
+	// Allocate temporary bitmap
 	for (int i = 0; i < 256; i++)
 	{
 		int v = (prom14D[i] << 4) + prom14D[i + 0x100];
@@ -83,21 +83,21 @@ void magmax_state::video_start()
 
 uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* bit 2 flip screen */
+	// bit 2 flip screen
 	m_flipscreen = *m_vreg & 0x04;
 
-	/* copy the background graphics */
-	if (*m_vreg & 0x40)     /* background disable */
+	// copy the background graphics
+	if (*m_vreg & 0x40)     // background disable
 		bitmap.fill(0, cliprect);
 	else
 	{
 		uint32_t scroll_h = (*m_scroll_x) & 0x3fff;
 		uint32_t scroll_v = (*m_scroll_y) & 0xff;
 
-		/*clear background-over-sprites bitmap*/
+		// clear background-over-sprites bitmap
 		m_bitmap.fill(0);
 
-		for (int v = 2*8; v < 30*8; v++) /*only for visible area*/
+		for (int v = 2*8; v < 30*8; v++) // only for visible area
 		{
 			uint16_t line_data[256];
 
@@ -110,12 +110,7 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 			for (int h = 0; h < 0x100; h++)
 			{
-				uint32_t graph_data;
-				uint32_t graph_color;
-				uint32_t LS283;
-				uint32_t prom_data;
-
-				LS283 = scroll_h + h;
+				uint32_t LS283 = scroll_h + h;
 
 				if (!map_v_scr_100)
 				{
@@ -125,7 +120,7 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 						LS283 = LS283 + m_rom18B[ map_v_scr_1fe_6 + h ] + 0xff01;
 				}
 
-				prom_data = m_prom_tab[ (LS283 >> 6) & 0xff ];
+				uint32_t prom_data = m_prom_tab[ (LS283 >> 6) & 0xff ];
 
 				rom18D_addr &= 0x20f8;
 				rom18D_addr += (prom_data & 0x1f00) + ((LS283 & 0x38) >>3);
@@ -134,16 +129,16 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				rom15F_addr += (m_rom18B[0x4000 + rom18D_addr ]<<5) + ((LS283 & 0x6)>>1);
 				rom15F_addr += (prom_data & 0x4000);
 
-				graph_color = (prom_data & 0x0070);
+				uint32_t graph_color = (prom_data & 0x0070);
 
-				graph_data = m_rom18B[0x8000 + rom15F_addr];
+				uint32_t graph_data = m_rom18B[0x8000 + rom15F_addr];
 				if ((LS283 & 1))
 					graph_data >>= 4;
 				graph_data &= 0x0f;
 
 				line_data[h] = pen_base + graph_color + graph_data;
 
-				/*priority: background over sprites*/
+				// priority: background over sprites
 				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
 					m_bitmap.pix(v, h) = line_data[h];
 			}
@@ -160,7 +155,7 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 
-	/* draw the sprites */
+	// draw the sprites
 	for (int offs = 0; offs < m_spriteram.bytes()/2; offs += 4)
 	{
 		int sy = m_spriteram[offs] & 0xff;
@@ -184,10 +179,10 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				flipy = !flipy;
 			}
 
-			if (code & 0x80)    /* sprite bankswitch */
+			if (code & 0x80)    // sprite bankswitch
 				code += (*m_vreg & 0x30) * 0x8;
 
-			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
 					code,
 					color,
 					flipx, flipy,
@@ -196,10 +191,10 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 
-	if (!(*m_vreg & 0x40))      /* background disable */
-		copybitmap_trans(bitmap, m_bitmap, m_flipscreen,m_flipscreen,0,0, cliprect, 0);
+	if (!(*m_vreg & 0x40))      // background disable
+		copybitmap_trans(bitmap, m_bitmap, m_flipscreen, m_flipscreen, 0, 0, cliprect, 0);
 
-	/* draw the foreground characters */
+	// draw the foreground characters
 	for (int offs = 32*32-1; offs >= 0; offs -= 1)
 	{
 		//int page = (*m_vreg>>3) & 0x1;
@@ -216,7 +211,7 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				sy = 31 - sy;
 			}
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 					code,
 					0,
 					m_flipscreen, m_flipscreen,

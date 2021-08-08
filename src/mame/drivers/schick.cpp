@@ -788,4 +788,4 @@ ROM_START( schick )
 ROM_END
 
 
-GAME( 1988, schick, 0, schick, schick, schick_state, init_schick, ROT90, "Microhard", "Super Chick", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, schick, 0, schick, schick, schick_state, init_schick, ROT90, "Microhard", "Super Chick", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

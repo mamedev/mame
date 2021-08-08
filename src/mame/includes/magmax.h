@@ -57,7 +57,7 @@ private:
 	uint8_t m_LS74_q;
 	uint8_t m_gain_control;
 	emu_timer *m_interrupt_timer;
-	int m_flipscreen;
+	uint8_t m_flipscreen;
 	std::unique_ptr<uint32_t[]> m_prom_tab;
 	bitmap_ind16 m_bitmap;
 
@@ -67,7 +67,7 @@ private:
 	void ay8910_portB_0_w(uint8_t data);
 	void ay8910_portA_0_w(uint8_t data);
 
-	void magmax_palette(palette_device &palette) const;
+	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
