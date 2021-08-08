@@ -13,8 +13,10 @@ Toshiba TLCS-900/H disassembly
 
 class tlcs900_disassembler : public util::disasm_interface
 {
+protected:
+	tlcs900_disassembler(uint16_t num_SFRs, const char *const SFR_names[]);
+
 public:
-	tlcs900_disassembler() = default;
 	virtual ~tlcs900_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
@@ -105,7 +107,48 @@ private:
 	static const char *const s_allreg16[256];
 	static const char *const s_allreg32[256];
 	static const char *const s_cond[16];
+	const uint16_t m_num_SFRs;
+	const char *const *m_SFR_names;
+};
 
+
+class tmp94c241_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp94c241_disassembler();
+
+private:
+	static const char *const s_SFR_names[];
+};
+
+
+class tmp95c061_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp95c061_disassembler();
+
+private:
+	static const char *const s_SFR_names[];
+};
+
+
+class tmp95c063_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp95c063_disassembler();
+
+private:
+	static const char *const s_SFR_names[];
+};
+
+
+class tmp96c141_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp96c141_disassembler();
+
+private:
+	static const char *const s_SFR_names[];
 };
 
 #endif

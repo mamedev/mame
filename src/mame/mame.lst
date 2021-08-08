@@ -44268,6 +44268,12 @@ musicbal                        // (c) 1987
 speedbal                        // (c) 1987
 speedbala                       // (c) 1987
 
+@source:technics/kn1500.cpp
+kn1500                          // (c) 199? Technics SX KN-1500 PCM Keyboard
+
+@source:technics/kn5000.cpp
+kn5000                          // (c) 199? Technics SX KN-5000 PCM Keyboard
+
 @source:technos/battlane.cpp
 battlane                        // -0215, -0216 (Data East part number) (c) 1986 + Taito license
 battlane2                       // -0215, -0216 (Data East part number) (c) 1986 + Taito license

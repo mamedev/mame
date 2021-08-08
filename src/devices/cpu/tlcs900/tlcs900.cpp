@@ -12,7 +12,6 @@ TODO:
 
 #include "emu.h"
 #include "tlcs900.h"
-#include "dasm900.h"
 
 
 tlcs900_device::tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
@@ -61,12 +60,6 @@ device_memory_interface::space_config_vector tlcs900_device::memory_space_config
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
-}
-
-
-std::unique_ptr<util::disasm_interface> tlcs900_device::create_disassembler()
-{
-	return std::make_unique<tlcs900_disassembler>();
 }
 
 

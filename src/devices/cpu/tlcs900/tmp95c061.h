@@ -50,6 +50,9 @@ protected:
 	int tlcs900_process_hdma( int channel );
 	void update_porta();
 
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
 private:
 	uint8_t p1_r();
 	void p1_w(uint8_t data);

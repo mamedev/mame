@@ -8,6 +8,7 @@ Toshiba TMP95C061 emulation
 
 #include "emu.h"
 #include "tmp95c061.h"
+#include "dasm900.h"
 
 DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "Toshiba TMP95C061")
 
@@ -1479,4 +1480,9 @@ uint8_t tmp95c061_device::dmemcr_r()
 void tmp95c061_device::dmemcr_w(uint8_t data)
 {
 	m_dram_access = data;
+}
+
+std::unique_ptr<util::disasm_interface> tmp95c061_device::create_disassembler()
+{
+	return std::make_unique<tmp95c061_disassembler>();
 }

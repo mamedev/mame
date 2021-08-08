@@ -9,6 +9,11 @@ Toshiba TLCS-900/H disassembly
 #include "emu.h"
 #include "dasm900.h"
 
+tlcs900_disassembler::tlcs900_disassembler(uint16_t num_SFRs, const char *const SFR_names[])
+	: m_num_SFRs(num_SFRs), m_SFR_names(SFR_names)
+{
+}
+
 const char *const tlcs900_disassembler::s_mnemonic[] =
 {
 	"adc", "add", "and", "andcf", "bit", "bs1b",
@@ -1369,6 +1374,145 @@ const char *const tlcs900_disassembler::s_cond[16] =
 	"F","LT","LE","ULE","PE/OV","M/MI","Z","C","T","GE","GT","UGT","PO/NOV","P/PL","NZ","NC"
 };
 
+tmp94c241_disassembler::tmp94c241_disassembler()
+	: tlcs900_disassembler(0x170, s_SFR_names)
+{
+}
+
+const char *const tmp94c241_disassembler::s_SFR_names[0x170] = {
+	/* TLCS-900/H2 type 8 bit I/O: */
+	/* 00:*/ "P0",      "0x01",    "P0CR",    "P0FC",    "P1",      "0x05",    "P1CR",    "P1FC",
+	/* 08:*/ "P2",      "0x09",    "P2CR",    "P2FC",    "P3",      "0x0d",    "P3CR",    "P3FC",
+	/* 10:*/ "P4",      "0x11",    "P4CR",    "P4FC",    "P5",      "0x15",    "P5CR",    "P5FC",
+	/* 18:*/ "P6",      "0x19",    "P6CR",    "P6FC",    "P7",      "0x1d",    "P7CR",    "P7FC",
+	/* 20:*/ "P8",      "0x21",    "P8CR",    "P8FC",    "0x24",    "0x25",    "0x26",    "0x27",
+	/* 28:*/ "PA",      "0x29",    "0x2a",    "PAFC",    "PB",      "0x2d",    "0x2e",    "PBFC",
+	/* 30:*/ "PC",      "0x31",    "PCCR",    "PCFC",    "PD",      "0x35",    "PDCR",    "PDFC",
+	/* 38:*/ "PE",      "0x39",    "PECR",    "PEFC",    "PF",      "0x3d",    "PFCR",    "PFFC",
+	/* 40:*/ "PG",      "0x41",    "0x42",    "0x43",    "PH",      "0x45",    "PHCR",    "PHFC",
+	/* 48:*/ "0x48",    "0x49",    "0x4a",    "0x4b",    "0x4c",    "0x4d",    "0x4e",    "0x4f",
+	/* 50:*/ "0x50",    "0x51",    "0x52",    "0x53",    "0x54",    "0x55",    "0x56",    "0x57",
+	/* 58:*/ "0x58",    "0x59",    "0x5a",    "0x5b",    "0x5c",    "0x5d",    "0x5e",    "0x5f",
+	/* 60:*/ "0x60",    "0x61",    "0x62",    "0x63",    "0x64",    "0x65",    "0x66",    "0x67",
+	/* 68:*/ "PZ",      "0x69",    "PZCR",    "0x6b",    "0x6c",    "0x6d",    "0x6e",    "0x6f",
+	/* 70:*/ "0x70",    "0x71",    "0x72",    "0x73",    "0x74",    "0x75",    "0x76",    "0x77",
+	/* 78:*/ "0x78",    "0x79",    "0x7a",    "0x7b",    "0x7c",    "0x7d",    "0x7e",    "0x7f",
+
+    /* TLCS-90 type I/O: */
+	/* 80:*/ "T8RUN",   "TRDC",    "T02FFCR", "0x83",    "T01MOD",  "T23MOD",  "0x86",    "0x87",
+	/* 88:*/ "TREG0",   "TREG1",   "TREG2",   "TREG3",   "0x8c",    "0x8d",    "0x8e",    "0x8f",
+	/* 90:*/ "TREG4L",  "TREG4H",  "TREG5L",  "TREG5H",  "CAP4L",   "CAP4H",   "CAP5L",   "CAP5H",
+	/* 98:*/ "T4MOD",   "T4FFCR",  "0x9a",    "0x9b",    "0x9c",    "0x9d",    "T16RUN",  "T16CR",
+	/* a0:*/ "TREG6L",  "TREG6H",  "TREG7L",  "TREG7H",  "CAP6L",   "CAP6H",   "CAP7L",   "CAP7H",
+	/* a8:*/ "T6MOD",   "T6FFCR",  "0xaa",    "0xab",    "0xac",    "0xad",    "0xae",    "0xaf",
+	/* b0:*/ "TREG8L",  "TREG8H",  "TREG9L",  "TREG9H",  "CAP8L",   "CAP8H",   "CAP9L",   "CAP9H",
+	/* b8:*/ "T8MOD",   "T8FFCR",  "0xba",    "0xbb",    "0xbc",    "0xbd",    "0xbe",    "0xbf",
+	/* c0:*/ "TREGAL",  "TREGAH",  "TREGBL",  "TREGBH",  "CAPAL",   "CAPAH",   "CAPBL",   "CAPBH",
+	/* c8:*/ "TAMOD",   "TAFFCR",  "0xca",    "0xcb",    "0xcc",    "0xcd",    "0xce",    "0xcf",
+	/* d0:*/ "SC0BUF",  "SC0CR",   "SC0MOD",  "BR0CR",   "SC1BUF",  "SC1CR",   "SC1MOD",  "BR1CR",
+	/* d8:*/ "0xd8",    "0xd9",    "0xda",    "0xdb",    "0xdc",    "0xdd",    "0xde",    "0xdf",
+
+    /* TLCS-900/H2 type 8 bit I/O: */
+	/* e0:*/ "INTE45",  "INTE67",  "INTE89",  "INTEAB",  "INTET01", "INTET23", "INTET45", "INTET67",
+	/* e8:*/ "INTET89", "INTETAB", "INTES0",  "INTES1",  "INTETC01","INTETC23","INTETC45","INTETC67",
+	/* f0:*/ "INTE0AD", "0xf1",    "0xf2",    "0xf3",    "0xf4",    "0xf5",    "IIMC",    "INTNMWDT",
+	/* f8:*/ "INTCLR",  "0xf9",    "0xfa",    "0xfb",    "0xfc",    "0xfd",    "0xfe",    "0xff",
+	/*100:*/ "DMA0V",   "DMA1V",   "DMA2V" ,  "DMA3V",   "DMA4V",   "DMA5V",   "DMA6V",   "DMA7V",
+	/*108:*/ "DMAB",    "DMAR",    "CLKMOD" , "0x10b",   "0x10c",   "0x10d",   "0x10e",   "0x10f",
+
+    /* TLCS-90 type I/O: */
+	/*110:*/ "WDMOD",   "WDCR",    "0x112" ,  "0x113",   "0x114",   "0x115",   "0x116",   "0x117",
+	/*118:*/ "0x118",   "0x119",   "0x11a",   "0x11b",   "0x11c",   "0x11d",   "0x11e",   "0x11f",
+	/*120:*/ "ADREG04L","ADREG04H","ADREG15L","ADREG15H","ADREG26L","ADREG26H","ADREG37L","ADREG37H",
+	/*128:*/ "ADMOD1",  "ADMOD2",  "0x12a",   "0x12b",   "0x12c",   "0x12d",   "0x12e",   "0x12f",
+	/*130:*/ "DAREG0",  "DAREG1",  "DADRV",   "0x133",   "0x134",   "0x135",   "0x136",   "0x137",
+	/*138:*/ "0x138",   "0x139",   "0x13a",   "0x13b",   "0x13c",   "0x13d",   "0x13e",   "0x13f",
+
+    /* TLCS-900/H2 type 8 bit I/O: */
+	/*140:*/ "B0CSL",   "B0CSH",   "MAMR0",   "MSAR0",   "B1CSL",   "B1CSH",   "MAMR1",   "MSAR1",
+	/*148:*/ "B2CSL",   "B2CSH",   "MAMR2",   "MSAR2",   "B3CSL",   "B3CSH",   "MAMR3",   "MSAR3",
+	/*150:*/ "B4CSL",   "B4CSH",   "MAMR4",   "MSAR4",   "B5CSL",   "B5CSH",   "MAMR5",   "MSAR5",
+	/*158:*/ "0x158",   "0x159",   "0x15a",   "0x15b",   "0x15c",   "0x15d",   "0x15e",   "0x15f",
+	/*160:*/ "DRAM0CRL","DRAM0CRH","DRAM1CRL","DRAM1CRH","DRAM0REF","DRAM1REF","PMEMCR",  "0x167",
+	/*168:*/ "0x168",   "0x169",   "0x16a",   "0x16b",   "0x16c",   "0x16d",   "0x16e",   "0x16f",
+};
+
+tmp95c061_disassembler::tmp95c061_disassembler()
+	: tlcs900_disassembler(0x80, s_SFR_names)
+{
+}
+
+const char *const tmp95c061_disassembler::s_SFR_names[0x80] = {
+	/*00:*/ "0x00",    "P1",      "0x02",    "0x03",    "P1CR",    "0x05",    "P2",      "0x07",
+	/*08:*/ "0x08",    "P2FC",    "0x0a",    "0x0b",    "0x0c",    "P5",      "0x0e",    "0x0f",
+	/*10:*/ "P5CR",    "P5FC",    "P6",      "P7",      "0x14",    "P6FC",    "P7CR",    "P7FC",
+	/*18:*/ "P8",      "P9",      "P8CR",    "P8FC",    "0x1c",    "0x1d",    "PA",      "PB",
+	/*20:*/ "TRUN",    "0x21",    "TREG0",   "TREG1",   "T01MOD",  "TFFCR",   "TREG2",   "TREG3",
+	/*28:*/ "T23MOD",  "TRDC",    "0x2a",    "0x2b",    "PACR",    "PAFC",    "PBCR",    "PBFC",
+	/*30:*/ "TREG4L",  "TREG4H",  "TREG5L",  "TREG5H",  "CAP1L",   "CAP1H",   "CAP2L",   "CAP2H",
+	/*38:*/ "T4MOD",   "T4FFCR",  "T45CR",   "0x3b",    "MSAR0",   "MAMR0",   "MSAR1",   "MAMR1",
+	/*40:*/ "TREG6L",  "TREG6H",  "TREG7L",  "TREG7H",  "CAP3L",   "CAP3H",   "CAP4L",   "CAP4H",
+	/*48:*/ "T5MOD",   "T5FFCR",  "0x4a",    "0x4b",    "PG0REG",  "PG1REG",  "PG01CR",  "0x4f",
+	/*50:*/ "SC0BUF",  "SC0CR",   "SC0MOD",  "BR0CR",   "SC1BUF",  "SC1CR",   "SC1MOD",  "BR1CR",
+	/*58:*/ "ODE",     "0x59",    "DREFCR",  "DMEMCR",  "MSAR2",   "MAMR2",   "MSAR3",   "MAMR3",
+	/*60:*/ "ADREG0L", "ADREG0H", "ADREG1L", "ADREG1H", "ADREG2L", "ADREG2H", "ADREG3L", "ADREG3H",
+	/*68:*/ "B0CS",    "B1CS",    "B2CS",    "B3CS",    "BEXCS",   "ADMOD",   "WDMOD",   "WDCR",
+	/*70:*/ "INTE0AD", "INTE45",  "INTE67",  "INTET10", "INTET32", "INTET54", "INTET76", "INTES0",
+	/*78:*/ "INTES1",  "INTETC01","INTETC23","IIMC",    "DMA0V",   "DMA1V",   "DMA2V",   "DMA3V"
+};
+
+tmp95c063_disassembler::tmp95c063_disassembler()
+	: tlcs900_disassembler(0xA0, s_SFR_names)
+{
+}
+
+const char *const tmp95c063_disassembler::s_SFR_names[0xA0] = {
+	/*00:*/ "0x00",    "P1",      "0x02",    "0x03",    "P1CR",    "0x05",    "P2",      "0x07",
+	/*08:*/ "0x08",    "P2FC",    "0x0a",    "0x0b",    "0x0c",    "P5",      "0x0e",    "0x0f",
+	/*10:*/ "P5CR",    "P5FC",    "P6",      "P7",      "0x14",    "P6FC",    "P7CR",    "P7FC",
+	/*18:*/ "P8",      "P9",      "P8CR",    "P8FC",    "P9CR",    "P9FC",    "PA",      "PB",
+	/*20:*/ "T8RUN",   "TRDC",    "TREG0",   "TREG1",   "T01MOD",  "T02FFCR", "TREG2",   "TREG3",
+	/*28:*/ "T23MOD",  "TREG4",   "TREG5",   "T45MOD",  "TA46FFCR","TREG6",   "TREG7",   "T67MOD",
+	/*30:*/ "TREG8L",  "TREG8H",  "TREG9L",  "TREG9H",  "CAP1L",   "CAP1H",   "CAP2L",   "CAP2H",
+	/*38:*/ "T8MOD",   "T8FFCR",  "T89CR",   "T16RUN",  "0x3c",    "0x3d",    "0x3e",    "0x3f",
+	/*40:*/ "TREGAL",  "TREGAH",  "TREGBL",  "TREGBH",  "CAP3L",   "CAP3H",   "CAP4L",   "CAP4H",
+	/*48:*/ "T9MOD",   "T9FFCR",  "DAREG0",  "DAREG1",  "PG0REG",  "PG1REG",  "PG01CR",  "DADRV",
+	/*50:*/ "SC0BUF",  "SC0CR",   "SC0MOD",  "BR0CR",   "SC1BUF",  "SC1CR",   "SC1MOD",  "BR1CR",
+	/*58:*/ "ODE",     "0x59",    "DMA0V",   "DMA1V",   "DMA2V",   "DMA3V",   "ADMOD1",  "ADMOD2",
+	/*60:*/ "ADREG04L","ADREG04H","ADREG15L","ADREG15H","ADREG26L","ADREG26H","ADREG37L","ADREG37H",
+	/*68:*/ "0x68",    "0x69",    "SDMACR0", "SDMACR1", "SDMACR2", "SDMACR3", "WDMOD",   "WDCR",
+	/*70:*/ "INTE_0AD","INTE12",  "INTE34",  "INTE56",  "INT78",   "INTET01", "INTET32", "INTET45",
+	/*78:*/ "INTET67", "INTET89", "INTETAB", "INTES0",  "INTES1",  "INTETC01","INTETC23","IIMC"
+	/*80:*/ "PACR",    "PAFC",    "PBCR",    "PBFC",    "PC",      "PD",      "0x86",    "0x87",
+	/*88:*/ "PDCR",    "0x89",    "PE",      "0x8B",    "PECR",    "0x8D",    "0x8E",    "BEXCS",
+	/*90:*/ "B0CS",    "B1CS",    "B2CS",    "B3CS",    "MSAR0",   "MAMR0",   "MSAR1",   "MAMR1",
+	/*98:*/ "MSAR2",   "MAMR2",   "MSAR3",   "MAMR3",   "DREFCR1", "DMEMCR1", "DREFCR3", "DMEMCR3"
+};
+
+tmp96c141_disassembler::tmp96c141_disassembler()
+	: tlcs900_disassembler(0x80, s_SFR_names)
+{
+}
+
+const char *const tmp96c141_disassembler::s_SFR_names[0x80] = {
+	/*00:*/ "P0",      "P1",      "P0CR",    "0x03",    "P1CR",    "P1FC",    "P2",      "P3",
+	/*08:*/ "P2CR",    "P2FC",    "P3CR",    "P3FC",    "P4",      "P5",      "P4CR",    "0x0f",
+	/*10:*/ "P4FC",    "0x11",    "P6",      "P7",      "P6CR",    "P7CR",    "P6FC",    "P7FC",
+	/*18:*/ "P8",      "P9",      "P8CR",    "P9CR",    "P8FC",    "P9FC",    "0x1e",    "0x1f",
+	/*20:*/ "TRUN",    "0x21",    "TREG0",   "TREG1",   "TMOD",    "TFFCR",   "TREG2",   "TREG3",
+	/*28:*/ "P0MOD",   "P1MOD",   "PFFCR",   "0x2b",    "0x2c",    "0x2d",    "0x2e",    "0x2f",
+	/*30:*/ "TREG4L",  "TREG4H",  "TREG5L",  "TREG5H",  "CAP1L",   "CAP1H",   "CAP2L",   "CAP2H",
+	/*38:*/ "T4MOD",   "T4FFCR",  "T45CR",   "0x3b",    "0x3c",    "0x3d",    "0x3e",    "0x3f",
+	/*40:*/ "TREG6L",  "TREG6H",  "TREG7L",  "TREG7H",  "CAP3L",   "CAP3H",   "CAP4L",   "CAP4H",
+	/*48:*/ "T5MOD",   "T5FFCR",  "0x4a",    "0x4b",    "PG0REG",  "PG1REG",  "PG01CR",  "0x4f",
+	/*50:*/ "SC0BUF",  "SC0CR",   "SC0MOD",  "BR0CR",   "SC1BUF",  "SC1CR",   "SC1MOD",  "BR1CR",
+	/*58:*/ "ODE",     "0x59",    "0x5a",    "0x5b",    "WDMOD",   "WDCR",    "ADMOD",   "0x5f",
+	/*60:*/ "ADREG0L", "ADREG0H", "ADREG1L", "ADREG1H", "ADREG2L", "ADREG2H", "ADREG3L", "ADREG3H",
+	/*68:*/ "B0CS",    "B1CS",    "B2CS",    "0x6b",    "0x6c",    "0x6d",    "0x6e",    "0x6f",
+	/*70:*/ "INTE0AD", "INTE45",  "INTE67",  "INTET10", "INTEPW10","INTET54", "INTET76", "INTES0",
+	/*78:*/ "INTES1",  "0x79",    "0x7a",    "IIMC",    "DMA0V",   "DMA1V",   "DMA2V",   "DMA3V"
+};
+
 
 u32 tlcs900_disassembler::opcode_alignment() const
 {
@@ -1451,20 +1595,32 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		{
 		case 0x00:  /* 0xC0 */
 			imm = opcodes.r8( pos++ );
-			buf = string_format("0x%02x", imm);
+			if (imm < m_num_SFRs){
+				buf = string_format("%s", m_SFR_names[imm]);
+			} else {
+				buf = string_format("0x%02x", imm);
+			}
 			break;
 
 		case 0x01:  /* 0xC1 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
-			buf = string_format("0x%04x", imm);
+			if (imm < m_num_SFRs){
+				buf = string_format("%s", m_SFR_names[imm]);
+			} else {
+				buf = string_format("0x%04x", imm);
+			}
 			break;
 
 		case 0x02:  /* 0xC2 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			imm = imm | (opcodes.r8( pos++ ) << 16);
-			buf = string_format("0x%06x", imm);
+			if (imm < m_num_SFRs){
+				buf = string_format("%s", m_SFR_names[imm]);
+			} else {
+				buf = string_format("0x%06x", imm);
+			}
 			break;
 
 		case 0x03:  /* 0xC3 */
@@ -1731,20 +1887,32 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		{
 		case 0x00:  /* 0xF0 */
 			imm = opcodes.r8( pos++ );
-			buf = string_format("0x%02x", imm);
+			if (imm < m_num_SFRs){
+				buf = string_format("%s", m_SFR_names[imm]);
+			} else {
+				buf = string_format("0x%02x", imm);
+			}
 			break;
 
 		case 0x01:  /* 0xF1 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
-			buf = string_format("0x%04x", imm);
+			if (imm < m_num_SFRs){
+				buf = string_format("%s", m_SFR_names[imm]);
+			} else {
+				buf = string_format("0x%04x", imm);
+			}
 			break;
 
 		case 0x02:  /* 0xF2 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			imm = imm | (opcodes.r8( pos++ ) << 16);
-			buf = string_format("0x%06x", imm);
+			if (imm < m_num_SFRs){
+				buf = string_format("%s", m_SFR_names[imm]);
+			} else {
+				buf = string_format("0x%06x", imm);
+			}
 			break;
 
 		case 0x03:  /* 0xF3 */
@@ -1860,78 +2028,42 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CR8:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
+		switch (imm & 0xe3)
 		{
-		case 0x22:
-			util::stream_format(stream, " DMAM0");
-			break;
-		case 0x26:
-			util::stream_format(stream, " DMAM1");
-			break;
-		case 0x2a:
-			util::stream_format(stream, " DMAM2");
-			break;
-		case 0x2e:
-			util::stream_format(stream, " DMAM3");
+		case 0x42:
+			util::stream_format(stream, " DMAM%d", (imm >> 2) & 7);
 			break;
 		default:
-			util::stream_format(stream, " unknown");
+			util::stream_format(stream, " <Unknown 8-bit ControlReg 0x%02X>", imm);
 			break;
 		}
 		break;
 
 	case O_CR16:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
+		switch (imm & 0xe3)
 		{
-		case 0x20:
-			util::stream_format(stream, " DMAC0");
-			break;
-		case 0x24:
-			util::stream_format(stream, " DMAC1");
-			break;
-		case 0x28:
-			util::stream_format(stream, " DMAC2");
-			break;
-		case 0x2c:
-			util::stream_format(stream, " DMAC3");
+		case 0x40:
+			util::stream_format(stream, " DMAC%d", (imm >> 2) & 7);
 			break;
 		default:
-			util::stream_format(stream, " unknown");
+			util::stream_format(stream, " <Unknown 16-bit ControlReg 0x%02X>", imm);
 			break;
 		}
 		break;
 
 	case O_CR32:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
+		switch (imm & 0xe3)
 		{
 		case 0x00:
-			util::stream_format(stream, " DMAS0");
+			util::stream_format(stream, " DMAS%d", (imm >> 2) & 7);
 			break;
-		case 0x04:
-			util::stream_format(stream, " DMAS1");
-			break;
-		case 0x08:
-			util::stream_format(stream, " DMAS2");
-			break;
-		case 0x0c:
-			util::stream_format(stream, " DMAS3");
-			break;
-		case 0x10:
-			util::stream_format(stream, " DMAD0");
-			break;
-		case 0x14:
-			util::stream_format(stream, " DMAD1");
-			break;
-		case 0x18:
-			util::stream_format(stream, " DMAD2");
-			break;
-		case 0x1c:
-			util::stream_format(stream, " DMAD3");
+		case 0x20:
+			util::stream_format(stream, " DMAD%d", (imm >> 2) & 7);
 			break;
 		default:
-			util::stream_format(stream, " unknown");
+			util::stream_format(stream, " <Unknown 32-bit ControlReg 0x%02X>", imm);
 			break;
 		}
 		break;
@@ -1997,13 +2129,21 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_M8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, " (0x%02x)", imm);
+		if (imm <= m_num_SFRs){
+			util::stream_format(stream, " (%s)", m_SFR_names[imm]);
+		} else {
+			util::stream_format(stream, " (0x%02x)", imm);
+		}
 		break;
 
 	case O_M16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, " (0x%04x)", imm);
+		if (imm <= m_num_SFRs){
+			util::stream_format(stream, " (%s)", m_SFR_names[imm]);
+		} else {
+			util::stream_format(stream, " (0x%04x)", imm);
+		}
 		break;
 
 	case O_R:
@@ -2048,78 +2188,42 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CR8:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
+		switch (imm & 0xe3)
 		{
-		case 0x22:
-			util::stream_format(stream, ",DMAM0");
-			break;
-		case 0x26:
-			util::stream_format(stream, ",DMAM1");
-			break;
-		case 0x2a:
-			util::stream_format(stream, ",DMAM2");
-			break;
-		case 0x2e:
-			util::stream_format(stream, ",DMAM3");
+		case 0x42:
+			util::stream_format(stream, ", DMAM%d", (imm >> 2) & 7);
 			break;
 		default:
-			util::stream_format(stream, ",unknown");
+			util::stream_format(stream, ", <Unknown 8-bit ControlReg 0x%02X>", imm);
 			break;
 		}
 		break;
 
 	case O_CR16:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
+		switch (imm & 0xe3)
 		{
-		case 0x20:
-			util::stream_format(stream, ",DMAC0");
-			break;
-		case 0x24:
-			util::stream_format(stream, ",DMAC1");
-			break;
-		case 0x28:
-			util::stream_format(stream, ",DMAC2");
-			break;
-		case 0x2c:
-			util::stream_format(stream, ",DMAC3");
+		case 0x40:
+			util::stream_format(stream, ", DMAC%d", (imm >> 2) & 7);
 			break;
 		default:
-			util::stream_format(stream, ",unknown");
+			util::stream_format(stream, ", <Unknown 16-bit ControlReg 0x%02X>", imm);
 			break;
 		}
 		break;
 
 	case O_CR32:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
+		switch (imm & 0xe3)
 		{
 		case 0x00:
-			util::stream_format(stream, ",DMAS0");
+			util::stream_format(stream, ", DMAS%d", (imm >> 2) & 7);
 			break;
-		case 0x04:
-			util::stream_format(stream, ",DMAS1");
-			break;
-		case 0x08:
-			util::stream_format(stream, ",DMAS2");
-			break;
-		case 0x0c:
-			util::stream_format(stream, ",DMAS3");
-			break;
-		case 0x10:
-			util::stream_format(stream, ",DMAD0");
-			break;
-		case 0x14:
-			util::stream_format(stream, ",DMAD1");
-			break;
-		case 0x18:
-			util::stream_format(stream, ",DMAD2");
-			break;
-		case 0x1c:
-			util::stream_format(stream, ",DMAD3");
+		case 0x20:
+			util::stream_format(stream, ", DMAD%d", (imm >> 2) & 7);
 			break;
 		default:
-			util::stream_format(stream, ",unknown");
+			util::stream_format(stream, ", <Unknown 32-bit ControlReg 0x%02X>", imm);
 			break;
 		}
 		break;
@@ -2185,13 +2289,20 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_M8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, ",(0x%02x)", imm);
-		break;
+		if (imm <= m_num_SFRs){
+			util::stream_format(stream, " (%s)", m_SFR_names[imm]);
+		} else {
+			util::stream_format(stream, " (0x%02x)", imm);
+		}break;
 
 	case O_M16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, ",(0x%04x)", imm);
+		if (imm <= m_num_SFRs){
+			util::stream_format(stream, " (%s)", m_SFR_names[imm]);
+		} else {
+			util::stream_format(stream, " (0x%04x)", imm);
+		}
 		break;
 
 	case O_R:

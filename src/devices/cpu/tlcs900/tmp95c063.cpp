@@ -8,6 +8,7 @@ Toshiba TMP95C063 emulation
 
 #include "emu.h"
 #include "tmp95c063.h"
+#include "dasm900.h"
 
 DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063")
 
@@ -1600,4 +1601,9 @@ void tmp95c063_device::execute_set_input(int input, int level)
 		break;
 	}
 	m_check_irqs = 1;
+}
+
+std::unique_ptr<util::disasm_interface> tmp95c063_device::create_disassembler()
+{
+	return std::make_unique<tmp95c063_disassembler>();
 }
