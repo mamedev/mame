@@ -250,7 +250,7 @@ static const nes_mmc mmc_list[] =
 	{ 214, BMC_SUPERGUN_20IN1 },
 	{ 215, SUPERGAME_BOOGERMAN },
 	{ 216, RCM_GS2015 },
-	{ 217, BMC_GOLDENCARD_6IN1 },
+	{ 217, BMC_500IN1 },
 	{ 218, NOCASH_NOCHR },
 	// 219 UNL-A9746 (according to Cah4e3's code, no dump available (yet)
 	// 220 Unused - reserved for emulator debugging
