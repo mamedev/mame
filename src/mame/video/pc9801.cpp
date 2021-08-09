@@ -30,7 +30,8 @@ uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* graphics */
-	m_hgdc2->screen_update(screen, bitmap, cliprect);
+	if(m_video_ff[DISPLAY_REG] != 0)
+		m_hgdc2->screen_update(screen, bitmap, cliprect);
 	m_hgdc1->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
@@ -46,10 +47,26 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
-		return;
-
 	uint8_t colors16_mode = (m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
+
+	for(int xi=0;xi<16;xi++)
+	{
+		int res_x = x + xi;
+		int res_y = y;
+
+		uint8_t pen;
+		pen = ((m_video_ram_2[((address & 0x7fff) + (0x08000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 1 : 0;
+		pen|= ((m_video_ram_2[((address & 0x7fff) + (0x10000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 2 : 0;
+		pen|= ((m_video_ram_2[((address & 0x7fff) + (0x18000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 4 : 0;
+		if(m_ex_video_ff[ANALOG_16_MODE])
+			pen|= ((m_video_ram_2[((address & 0x7fff) + (0) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 8 : 0;
+		bitmap.pix(res_y, res_x) = palette[pen + colors16_mode];
+	}
+}
+
+UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pc9821_hgdc_display_pixels )
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
@@ -65,21 +82,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 		}
 	}
 	else
-	{
-		for(int xi=0;xi<16;xi++)
-		{
-			int res_x = x + xi;
-			int res_y = y;
-
-			uint8_t pen;
-			pen = ((m_video_ram_2[((address & 0x7fff) + (0x08000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 1 : 0;
-			pen|= ((m_video_ram_2[((address & 0x7fff) + (0x10000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 2 : 0;
-			pen|= ((m_video_ram_2[((address & 0x7fff) + (0x18000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 4 : 0;
-			if(m_ex_video_ff[ANALOG_16_MODE])
-				pen|= ((m_video_ram_2[((address & 0x7fff) + (0) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 8 : 0;
-			bitmap.pix(res_y, res_x) = palette[pen + colors16_mode];
-		}
-	}
+		pc9801_state::hgdc_display_pixels(bitmap, y, x, address);
 }
 
 /*************************************************

@@ -10988,7 +10988,9 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="emeraldd">
+	<!-- Displays Glodia transition then logo keeps scrolling left -->
+	<!-- Same as Vain Dream? -->
+	<software name="emeraldd" supported="no">
 		<description>Emerald Dragon</description>
 		<year>1989</year>
 		<publisher>バショウハウス (Bashou House)</publisher>

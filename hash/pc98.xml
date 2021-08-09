@@ -2566,7 +2566,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- boot OK with the given instructions -->
-	<!-- Omake: boot a MS-DOS, insert and switch prompt to system disk, issue "MUSIC TEST" (latter is case sensitive) for a sound test menu -->
+	<!-- Omake: boot DOS, insert and switch prompt to system disk, issue "MUSIC TEST" (latter is case sensitive) for a sound test menu -->
 	<software name="46okunen" supported="yes">
 		<description>46 Okunen Monogatari - The Shinkaron</description>
 		<year>1990</year>
@@ -12263,7 +12263,13 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dark">
+	<!-- boot OK, cannot disk swap -->
+	<!-- Cheat: in a dungeon hold SHIFT and CTRL then press any of the listed f-keys for desired effect: -->
+	<!--        F1: Auto game over -->
+	<!--        F2: Full restore HP/MP -->
+	<!--        F3: Level up -->
+	<!--        F5: Calls a user interactable (fake?) prompt, then asks to insert disk B in drive 2 (boss key? temp save?) -->
+	<software name="dark" supported="no">
 		<description>D'ark</description>
 		<year>1992</year>
 		<publisher>姫屋ソフト (Himeya Soft)</publisher>
@@ -12862,6 +12868,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<!-- Omake: boot Umi disk in drive 1 and System in drive 2 for music test -->
+	<!-- Omake: boot DOS, insert System disk, execute "fmdrv.com, mouse.com, cls, end" for ending sequence -->
 	<software name="daikokai">
 		<description>Daikoukai Jidai</description>
 		<year>1990</year>
@@ -13477,7 +13485,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dwraith">
+	<!-- Reportedly has copy protection checks: -->
+	<!-- Level ups do not give stat boosts -->
+	<!-- By testing: MC has LV 0 and zero gold, leveling up takes an absurd number of fights and stats gain is negligible -->
+	<!-- Is it really game like intended? FDC investigation required -->
+	<software name="dwraith" supported="no">
 		<description>Dark Wraith</description>
 		<year>1989</year>
 		<publisher>アーテック (Artec)</publisher>
@@ -18357,7 +18369,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="emeraldd">
+	<!-- boot OK -->
+	<!-- Sometimes keyboard stuck pressed keys and becomes unresponsive (on RS class at very least) -->
+	<!-- Omake: boot up an MS-DOS, insert Opening Disk, execute "CKMUS %1" for music test -->
+	<!--        Parameter is a file with .s extension also inside disk contents (also cfr. readme.doc) -->
+	<software name="emeraldd" supported="no">
 		<description>Emerald Dragon</description>
 		<year>1989</year>
 		<publisher>グローディア (Glodia)</publisher>
@@ -18375,10 +18391,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 				<rom name="emerald dragon disk2 opening disk.fdi" size="1261568" crc="d5f8ba83" sha1="2d8cee17aa2cb1eae24e0837708bd3d12984970f" offset="0" />
 			</dataarea>
 		</part>
+		<!-- baddump: contains non-factory saves -->
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="1261568">
-				<rom name="emerald dragon disk3 data disk.fdi" size="1261568" crc="f850549e" sha1="a2aefac04d1649507da699710f000d1d19259c2e" offset="0" />
+				<rom name="emerald dragon disk3 data disk.fdi" size="1261568" crc="f850549e" sha1="a2aefac04d1649507da699710f000d1d19259c2e" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -27604,28 +27621,35 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="lastarmg">
+	<!-- boot OK -->
+	<!-- no sound on RS class (btanb?) -->
+	<!-- TODO: source claims that booting with disks C and D in gives a more extensive monster book -->
+	<!-- what's "disk D" tho? Game package contains three disks only, and alienzuk loaded in drive 2 doesn't seem to work -->
+	<software name="lastarmg" supported="partial">
 		<description>Last Armageddon</description>
 		<year>1988</year>
 		<publisher>ブレイングレイ (Brain Grey)</publisher>
 		<info name="alt_title" value="ラストハルマゲドン" />
 		<info name="release" value="198808xx" />
+		<info name="usage" value="Boot disk A for opening, disks C and B for actual game." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="lastarma.fdi" size="1265664" crc="377a8ee9" sha1="20c923d3130be3496d380e57c2b0908120f46194" offset="0" />
 			</dataarea>
 		</part>
+		<!-- baddump: contains non-factory save -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="lastarmb.fdi" size="1265664" crc="391d8c0f" sha1="5c2f6b8459f81c0b5ff71c27c5a9b1cba7f9e18e" offset="0" />
+				<rom name="lastarmb.fdi" size="1265664" crc="391d8c0f" sha1="5c2f6b8459f81c0b5ff71c27c5a9b1cba7f9e18e" offset="0" status="baddump" />
 			</dataarea>
 		</part>
+		<!-- baddump: contains partially filled compendium (item 3) -->
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="lastarmc.fdi" size="1265664" crc="c4647efa" sha1="6ad35f7cf5f917c25327d2613d21c425ab1d8b92" offset="0" />
+				<rom name="lastarmc.fdi" size="1265664" crc="c4647efa" sha1="6ad35f7cf5f917c25327d2613d21c425ab1d8b92" offset="0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32054,16 +32078,17 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="alt_title" value="夢幻戦士ヴァリス２" />
 		<info name="release" value="19890805" />
 
+		<!-- baddump: contains non-factory save (confirm which disk contains user data) -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 1 of 3)(disk a).fdi" size="1265664" crc="ceb883b9" sha1="36f06cfdf9b43184a58521c0ec57777eb890c2ab" offset="0" />
+				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 1 of 3)(disk a).fdi" size="1265664" crc="ceb883b9" sha1="36f06cfdf9b43184a58521c0ec57777eb890c2ab" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 2 of 3)(disk b).fdi" size="1265664" crc="38cbab2a" sha1="4eff9c916e7f939b68b01da673350200aff430ba" offset="0" />
+				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 2 of 3)(disk b).fdi" size="1265664" crc="38cbab2a" sha1="4eff9c916e7f939b68b01da673350200aff430ba" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
@@ -46203,6 +46228,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<!-- boot OK -->
+	<!-- TODO: it reportedly has copy protection check near the ending, -->
+	<!--       where character(s) scolds the player and refuses to continue. -->
 	<software name="vaindrem" supported="yes">
 		<description>Vain Dream</description>
 		<year>1991</year>
@@ -57175,6 +57202,8 @@ SPACE EMPIRE
 		</part>
 	</software>
 
+	<!-- TODO: verify support status -->
+	<!-- Omake: boot DOS, insert Disk 2, run omake.com for hidden developer message -->
 	<software name="macross3" supported="no">
 		<description>Choujikuu Yousai Macross - Love Stories</description>
 		<year>1994</year>
