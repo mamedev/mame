@@ -1050,7 +1050,10 @@ template<unsigned port> u8 pc9801bx_state::sdip_r(offs_t offset)
 	if (offset == 2)
 		return m_sdip[sdip_offset];
 
-	logerror("Warning: read from unknown SDIP area %02x %04x\n", offset, 0x841c + offset + (sdip_offset % 12)*0x100);
+	logerror("Warning: read from unknown SDIP area %02x %04x\n", 
+		offset,
+		0x841c + offset + (sdip_offset % 12) * 0x100
+	);
 	return 0xff;
 }
 
@@ -1072,7 +1075,7 @@ template<unsigned port> void pc9801bx_state::sdip_w(offs_t offset, u8 data)
 	
 	logerror("Warning: write from unknown SDIP area %02x %04x %02x\n",
 		port,
-		0x841c + port + (sdip_offset % 12)*0x100,
+		0x841c + port + (sdip_offset % 12) * 0x100,
 		data
 	);
 }
@@ -2544,8 +2547,9 @@ void pc9801_state::init_pc9801vm_kanji()
 // "vanilla" class (i86, E/F/M)
 COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
 
-// N5200 (started as a vanilla PC-98 business line derivative, eventually diverged into its own thing and incorporated various Hyper 98 features.
-//    Runs proprietary PTOS)
+// N5200 (started as a vanilla PC-98 business line derivative, 
+//        eventually diverged into its own thing and incorporated various Hyper 98 features.
+//        Runs proprietary PTOS)
 // APC III (US version of either vanilla PC9801 or N5200, aimed at business market. Runs MS-DOS 2.11/3.xx or PC-UX)
 // ...
 
@@ -2612,8 +2616,8 @@ COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_p
 // DtermPC (V30/V40/V50 LCD terminal telephone aimed at digital PBX exchanges)
 
 // FC-9801 (FC stands for "Factory Computer". Aimed at industrial automation, has similarly named models from 9801 to 9821 and H98.
-//     Uses a FC-9801-06 RAS "Reliability, Availability and Serviceability" specific expansion)
+//          Uses a FC-9801-06 RAS "Reliability, Availability and Serviceability" specific expansion)
 // FC98-NX (Evolution of FC-9821Ka, first model FC20C released in 1998, branch is still running to date.
-//     Most likely just DOS/V compatible and not going to fit here except for RAS capabilities)
+//          Most likely just DOS/V compatible and not going to fit here except for RAS capabilities)
 
 // TWINPOS ("Point Of Sale" from NEC, originally based off PC-98 arch, eventually switched to DOS/V too?)

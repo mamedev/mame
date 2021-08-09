@@ -457,27 +457,13 @@ public:
 	}
 
 	void pc9821(machine_config &config);
-	void pc9821as(machine_config &config);
-	void pc9821ap2(machine_config &config);
-	void pc9821ce2(machine_config &config);
-	void pc9821cx3(machine_config &config);
-	void pc9821xa16(machine_config &config);
-	void pc9821xs(machine_config &config);
-	void pc9821ra20(machine_config &config);
-	void pc9821ra266(machine_config &config);
-	void pc9821ra333(machine_config &config);
-	void pc9821v20(machine_config &config);
-
-	// 9821NOTE, move me
-	void pc9821ne(machine_config &config);
-	void pc9821nr15(machine_config &config);
-	void pc9821nr166(machine_config &config);
 
 protected:
 	void pc9821_io(address_map &map);
 	void pc9821_map(address_map &map);
-	void pc9821as_io(address_map &map);
 
+	DECLARE_MACHINE_START(pc9821);
+	DECLARE_MACHINE_RESET(pc9821);
 private:
 	required_shared_ptr<uint32_t> m_ext_gvram;
 
@@ -492,14 +478,7 @@ private:
 	void window_bank_w(offs_t offset, uint8_t data);
 	uint8_t ext2_video_ff_r();
 	void ext2_video_ff_w(uint8_t data);
-	u8 as_unkdev_data_r(offs_t offset);
-	void as_unkdev_data_w(offs_t offset, u8 data);
-	void as_unkdev_addr_w(offs_t offset, u8 data);
 
-	DECLARE_MACHINE_START(pc9821);
-	DECLARE_MACHINE_START(pc9821ap2);
-	DECLARE_MACHINE_RESET(pc9821);
-	uint8_t m_unkdev0468[0x100], m_unkdev0468_addr;
 	uint8_t m_pc9821_window_bank;
 	uint8_t m_ext2_ff;
 
@@ -514,6 +493,120 @@ private:
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_hgdc_display_pixels );
+};
+
+// MATE A
+
+class pc9821_mate_a_state : public pc9821_state
+{
+public:
+	pc9821_mate_a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9821_state(mconfig, type, tag)
+	{
+	}
+
+	void pc9821as(machine_config &config);
+	void pc9821ap2(machine_config &config);
+
+protected:
+	void pc9821as_io(address_map &map);
+
+private:
+	DECLARE_MACHINE_START(pc9821ap2);
+
+	// Ap, As, Ae only
+	u8 ext_sdip_data_r(offs_t offset);
+	void ext_sdip_data_w(offs_t offset, u8 data);
+	void ext_sdip_address_w(offs_t offset, u8 data);
+	void ext_sdip_access_w(offs_t offset, u8 data);
+
+	uint8_t m_ext_sdip[0x100], m_ext_sdip_addr;
+};
+
+// CanBe
+
+class pc9821_canbe_state : public pc9821_state
+{
+public:
+	pc9821_canbe_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9821_state(mconfig, type, tag)
+	{
+	}
+
+	void pc9821ce2(machine_config &config);
+	void pc9821cx3(machine_config &config);
+};
+
+// class pc9821_cereb_state : public pc9821_canbe_state
+
+// Mate B
+
+// class pc9821_mate_b_state : public pc9821_state
+
+// Mate X (NB: should be subclass of Mate B)
+
+class pc9821_mate_x_state : public pc9821_state
+{
+public:
+	pc9821_mate_x_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9821_state(mconfig, type, tag)
+	{
+	}
+
+	void pc9821xa16(machine_config &config);
+	void pc9821xs(machine_config &config);
+};
+
+// Mate R
+
+class pc9821_mate_r_state : public pc9821_mate_x_state
+{
+public:
+	pc9821_mate_r_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9821_mate_x_state(mconfig, type, tag)
+	{
+	}
+
+	void pc9821ra20(machine_config &config);
+	void pc9821ra266(machine_config &config);
+	void pc9821ra333(machine_config &config);
+};
+
+class pc9821_valuestar_state : public pc9821_mate_x_state
+{
+public:
+	pc9821_valuestar_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9821_mate_x_state(mconfig, type, tag)
+	{
+	}
+
+	void pc9821v13(machine_config &config);
+	void pc9821v20(machine_config &config);
+};
+
+// 9821NOTE
+
+class pc9821_note_state : public pc9821_state
+{
+public:
+	pc9821_note_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9821_state(mconfig, type, tag)
+	{
+	}
+
+	void pc9821ne(machine_config &config);
+};
+
+class pc9821_note_lavie_state : public pc9821_note_state
+{
+public:
+	pc9821_note_lavie_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9821_note_state(mconfig, type, tag)
+	{
+	}
+
+	void pc9821nr15(machine_config &config);
+	void pc9821nr166(machine_config &config);
 };
 
 /******************************************

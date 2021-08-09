@@ -11,19 +11,20 @@
     - undumped IDE ROM, kludged to work;
 	- further state machine breakdowns;
 
-    TODO (PC-9821AS)
-    - IPL ROM banking contradicts greatly from the other machines;
+    TODO (PC-9821As)
+	- unimplemented SDIP specific access;
+	- "SYSTEM SHUTDOWN" while accessing above;
 
-    TODO: (PC-9821AP)
+    TODO: (PC-9821Ap2)
     - No way to exit the initial loop. Code looks broken, bad dump?
 
     TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333/PC-9821Cx3)
     - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
-	  involved bankswitch);
+	  involved bankswitch with Pentium based machines);
 
-	TODO: (PC-9821Nr166)
+	TODO: (PC-9821Nr15/PC-9821Nr166)
 	- Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
-	- Eventually dies with a "MEMORY ERROR" (never reads extended memory);
+	- Skipping that will eventually die with a "MEMORY ERROR" (never reads extended memory);
 
 **************************************************************************************************/
 
@@ -338,34 +339,36 @@ void pc9821_state::pc9821_io(address_map &map)
 /*
  * 98MATE A overrides
  */
-// TODO: identify this, might be an alt way to access SDIP or 98[21 MATE A] local bus
-u8 pc9821_state::as_unkdev_data_r(offs_t offset)
+// TODO: SDIP extended access for 9821Ap, As, Ae
+// (it never r/w the conventional ports, at least on POST)
+u8 pc9821_mate_a_state::ext_sdip_data_r(offs_t offset)
 {
-	if (offset == 0)
-		return m_unkdev0468[m_unkdev0468_addr];
-
-	return 0xff;
+	logerror("%s: %02x %02x\n", machine().describe_context(), m_ext_sdip_addr, m_ext_sdip[m_ext_sdip_addr]);
+	return m_ext_sdip[m_ext_sdip_addr];
 }
 
-void pc9821_state::as_unkdev_data_w(offs_t offset, u8 data)
+void pc9821_mate_a_state::ext_sdip_data_w(offs_t offset, u8 data)
 {
-	if (offset == 0)
-		m_unkdev0468[m_unkdev0468_addr] = data;
-
-	// offset == 0: access bit?
+	m_ext_sdip[m_ext_sdip_addr] = data;
 }
 
-void pc9821_state::as_unkdev_addr_w(offs_t offset, uint8_t data)
+void pc9821_mate_a_state::ext_sdip_access_w(offs_t offset, u8 data)
 {
-	if (offset == 0)
-		m_unkdev0468_addr = data;
+	// access enable?
 }
 
-void pc9821_state::pc9821as_io(address_map &map)
+void pc9821_mate_a_state::ext_sdip_address_w(offs_t offset, uint8_t data)
+{
+	m_ext_sdip_addr = data;
+}
+
+void pc9821_mate_a_state::pc9821as_io(address_map &map)
 {
 	pc9821_io(map);
-	map(0x0468, 0x046b).rw(FUNC(pc9821_state::as_unkdev_data_r), FUNC(pc9821_state::as_unkdev_data_w)).umask32(0x00ff00ff);
-	map(0x046c, 0x046f).w(FUNC(pc9821_state::as_unkdev_addr_w)).umask32(0x00ff00ff);
+	map(0x0468, 0x0468).rw(FUNC(pc9821_mate_a_state::ext_sdip_data_r), FUNC(pc9821_mate_a_state::ext_sdip_data_w));
+	map(0x046a, 0x046a).w(FUNC(pc9821_mate_a_state::ext_sdip_access_w));
+	map(0x046c, 0x046c).w(FUNC(pc9821_mate_a_state::ext_sdip_address_w));
+	// TODO: specific MATE A local bus (location?)
 }
 
 static INPUT_PORTS_START( pc9821 )
@@ -395,7 +398,8 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "S-Dip SW Init" ) // with On will keep testing the SDIP
+	PORT_DIPNAME( 0x01, 0x01, "Initialize sdip SW" ) // With off it keeps trying to check sdip contents without actual init
+	// TODO: meaning is flipped on some models
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "DSW2" )
@@ -521,7 +525,7 @@ MACHINE_START_MEMBER(pc9821_state,pc9821)
 	// ...
 }
 
-MACHINE_START_MEMBER(pc9821_state,pc9821ap2)
+MACHINE_START_MEMBER(pc9821_mate_a_state,pc9821ap2)
 {
 	MACHINE_START_CALL_MEMBER(pc9821);
 
@@ -558,97 +562,120 @@ void pc9821_state::pc9821(machine_config &config)
 	m_hgdc2->set_display_pixels(FUNC(pc9821_state::pc9821_hgdc_display_pixels));
 }
 
-void pc9821_state::pc9821as(machine_config &config)
+void pc9821_mate_a_state::pc9821as(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(33'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486dx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821as_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_a_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_a_state::pc9821as_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
 
-void pc9821_state::pc9821ap2(machine_config &config)
+void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(66'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486dx2
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821as_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_a_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_a_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
-	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821ap2)
+	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
 
-void pc9821_state::pc9821ce2(machine_config &config)
+void pc9821_canbe_state::pc9821ce2(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(25'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486sx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 }
 
-void pc9821_state::pc9821cx3(machine_config &config)
+void pc9821_canbe_state::pc9821cx3(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(100'000'000);
 	PENTIUM(config.replace(), m_maincpu, xtal);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
 
-void pc9821_state::pc9821v20(machine_config &config)
-{
-	pc9821(config);
-	const double xtal = 200000000;
-	PENTIUM(config.replace(), m_maincpu, xtal); // Pentium Pro
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-}
-
-void pc9821_state::pc9821xs(machine_config &config)
+void pc9821_mate_x_state::pc9821xs(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(66'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486dx2
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821as_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
 
-void pc9821_state::pc9821xa16(machine_config &config)
+void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 {
 	pc9821(config);
 	PENTIUM(config.replace(), m_maincpu, 166000000); // Pentium P54C
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
 
-void pc9821_state::pc9821ra20(machine_config &config)
+void pc9821_valuestar_state::pc9821v13(machine_config &config)
+{
+	pc9821(config);
+	const double xtal = 133000000;
+	PENTIUM(config.replace(), m_maincpu, xtal); // Pentium Pro, 256kB cache RAM
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_valuestar_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_valuestar_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// VLSI Supercore594 (Wildcat) / Intel 430FX (Triton) PCI 2.0
+	// PCI slot x 1
+	// GD5440
+	// built-in 3.5 floppy x 1
+	// file bay with built-in CD-Rom (4x, 6x, 8x depending on sub-model type)
+	// HDD with pre-installed software (850MB, 1.2GB, 1.6GB)
+	// minimum RAM: 16MB
+	// maximum RAM: 128MB
+	// C-Bus x 2
+	// PC-9801-120 pre-installed (fax/modem 28'000 bps) or PC-9801-121 (ISDN)
+}
+
+void pc9821_valuestar_state::pc9821v20(machine_config &config)
+{
+	pc9821(config);
+	const double xtal = 200000000;
+	PENTIUM(config.replace(), m_maincpu, xtal); // Pentium Pro
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_valuestar_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_valuestar_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+}
+
+void pc9821_mate_r_state::pc9821ra20(machine_config &config)
 {
 	pc9821(config);
 	PENTIUM_PRO(config.replace(), m_maincpu, XTAL(200'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_r_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
 
-void pc9821_state::pc9821ra266(machine_config &config)
+void pc9821_mate_r_state::pc9821ra266(machine_config &config)
 {
 	pc9821(config);
 	const double xtal = 266000000;
 	PENTIUM2(config.replace(), m_maincpu, xtal);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_r_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	
 	// 512KB CPU cache RAM
@@ -658,13 +685,13 @@ void pc9821_state::pc9821ra266(machine_config &config)
 	// built-in ethernet 100BASE-TX/10BASE-T
 }
 
-void pc9821_state::pc9821ra333(machine_config &config)
+void pc9821_mate_r_state::pc9821ra333(machine_config &config)
 {
 	pc9821(config);
 	const double xtal = 333000000;
 	PENTIUM2(config.replace(), m_maincpu, xtal); // actually a Celeron
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_r_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	// 128KB CPU cache RAM
@@ -676,13 +703,13 @@ void pc9821_state::pc9821ra333(machine_config &config)
 
 // 9821 NOTE machine configs
 
-void pc9821_state::pc9821ne(machine_config &config)
+void pc9821_note_state::pc9821ne(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(33'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486sx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_note_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
@@ -696,14 +723,14 @@ void pc9821_state::pc9821ne(machine_config &config)
 	// maximum RAM: 14.6MB
 }
 
-void pc9821_state::pc9821nr15(machine_config &config)
+void pc9821_note_lavie_state::pc9821nr15(machine_config &config)
 {
 	pc9821(config);
 //	const XTAL xtal = XTAL(150'000'000);
 	const double xtal = 150000000;
 	PENTIUM_PRO(config.replace(), m_maincpu, xtal); // unsure if normal or pro, clock and cache size suggests latter
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	
 	// 256KB CPU cache RAM
@@ -717,13 +744,13 @@ void pc9821_state::pc9821nr15(machine_config &config)
 	// Optional FAX
 }
 
-void pc9821_state::pc9821nr166(machine_config &config)
+void pc9821_note_lavie_state::pc9821nr166(machine_config &config)
 {
 	pc9821(config);
 	const double xtal = 166000000;
 	PENTIUM_MMX(config.replace(), m_maincpu, xtal);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	
 	// 256KB CPU cache RAM
@@ -790,9 +817,9 @@ ROM_START( pc9821as )
 	ROM_LOAD( "mvs0100-1.bin", 0x00000, 0x80000, CRC(ca37b631) SHA1(8c481dd0608d6c27235bc88bd77e345628dc28a1) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// TODO: not quite right yet, needs actual itf rom loaded
-	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )
-	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
+	// backported from pc9821ap2
+	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 ) // ITF
+	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x18000 ) // BIOS
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
@@ -820,9 +847,19 @@ ROM_START( pc9821ap2 )
 	ROMX_LOAD( "phd0102.rom",     0x000000, 0x80000, CRC(3036774c) SHA1(59856a348f156adf5eca06326f967aca54ff871c), ROM_BIOS(1) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// TODO: identify ROM banks
-	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )
-	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
+	// 0x00000-0x04ff0 <unknown>
+	// 0x0c000-0x0ffff internal sound BIOS?
+	// 0x10000-0x13fff ^ mirror of above?
+	// 0x14000-0x14ff0 <unknown>
+	// 0x16000-0x19fff contains refs to 765 and HDDs "Conner Peripherals", IDE BIOS?
+	// 0x1c000-0x1ffff contains refs to SDIP setup
+	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 ) // ITF
+	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x18000 ) // BIOS
+	// 0x40000-0x4ffff empty
+	// 0x50000-0x57fff extended BIOS check?
+	// 0x58000-0x65fff empty
+	// 0x66000-0x77fff mirrors of IDE or sound BIOS (left-overs?)
+	// 0x78000-0x7ffff Has a (c) 1986, more left-over?
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
@@ -1041,14 +1078,18 @@ ROM_END
 
 ROM_START( pc9821v13 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// "ROM SUM ERROR"
 	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//	ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, BAD_DUMP CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
 	ROM_LOAD( "bios_v13.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_a.rom",   0x00000, 0x46800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
+	ROM_LOAD( "font_v13.rom",   0x00000, 0x46800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
+
+	// TODO: factory HDDs
 ROM_END
 
 /*
@@ -1057,7 +1098,9 @@ ROM_END
 
 ROM_START( pc9821v20 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
+	// Doesn't boot, not an ITF ROM!
+	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//	ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
 	ROM_LOAD( "bios_v20.rom", 0x18000, 0x18000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -1065,6 +1108,8 @@ ROM_START( pc9821v20 )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
+
+	// TODO: factory HDDs
 ROM_END
 
 /*
@@ -1140,48 +1185,49 @@ ROM_END
 // To mark this we intentionally add square brackets here as optional omission notation.
 
 // 98MULTi (i386, desktop)
-COMP( 1994, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
-COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE [B] (i486, desktop, has GD5428 and no built-in sound)
 // ...
 
 // 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
-COMP( 1994, pc9821ce2,   0,           0, pc9821ce2,    pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1995, pc9821cx3,   pc9821ce2,   0, pc9821cx3,    pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821ce2,   0,           0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1995, pc9821cx3,   pc9821ce2,   0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MULTi CanBe Jam (Pentium Pro equipped, laptop, Multimedia PC as above + JEIDA 4.2/PCMCIA 2.1)
 // ...
 
-// 98MATE X (i486sx/Pentium/Pentium Pro, has PCI, comes with various SVGA cards)
-COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1996, pc9821xa16,  pc9821xs,    0, pc9821xa16,   pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
-// 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
-COMP( 1998, pc9821v13,   0,           0, pc9821,       pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1998, pc9821v20,   pc9821v13,   0, pc9821v20,    pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821V20 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
-// 98MATE R (Pentium Pro, otherwise same as 98MATE X)
-COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, pc9821ra266, pc9821ra20,   0, pc9821ra266, pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
-// 98MATE SERVER, pc9821rs* (Server variant of 98MATE R. Inherits concepts from 98SERVER above)
+// CEREB (Pentium MMX based CanBe follow-up. Multimedia PC with a Sony DDU100E DVD-ROM drive as most notable addition.
+//        Form factor is way more akin of a DVD player than a PC)
 // ...
 
-// CEREB (Pentium MMX based. Multimedia PC with a Sony DDU100E DVD-ROM drive as most notable addition. Form factor is way more akin of a DVD player than a PC)
+// 98MATE X (i486sx/Pentium/Pentium Pro, has PCI, comes with various SVGA cards)
+COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821xa16,  pc9821xs,    0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
+COMP( 1998, pc9821v13,   0,           0, pc9821v13,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1998, pc9821v20,   pc9821v13,   0, pc9821v20,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V20 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98MATE R (Pentium Pro, otherwise same as 98MATE X?)
+COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, pc9821ra266, pc9821ra20,   0, pc9821ra266, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 98MATE SERVER, pc9821rs* (Server variant of 98MATE R. Inherits concepts from SV-H98 98SERVER)
 // ...
 
 // PC-9821 NOTE[book] class
 // 98NOTE
-COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_note_state,       init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Lavie
-COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, pc9821nr166, pc9821nr15,   0, pc9821nr166, pc9821,   pc9821_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, pc9821nr166, pc9821nr15,   0, pc9821nr166, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Light
 // ...
