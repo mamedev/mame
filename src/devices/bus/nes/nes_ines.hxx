@@ -368,7 +368,7 @@ static const nes_mmc mmc_list[] =
 	// 330 Sangokushi II - Haou no Tairiku hack - N163 bootleg
 	{ 331, BMC_12IN1 },
 	{ 332, BMC_WS },
-	// 333 BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
+	{ 333, BMC_8IN1 },
 	// 334 5/20-in-1 1993 Copyright multicart, not in nes.xml?
 	{ 335, BMC_CTC09 },
 	{ 336, BMC_K3046 },
