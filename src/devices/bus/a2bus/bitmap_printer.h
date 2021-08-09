@@ -132,7 +132,8 @@ unsigned int& pix(int y, int x)    // reversed y x
     	setprintername(sessiontime()+std::string(" ")+simplename());  
     }
 
-	std::string padzeroes( std::string s, int len) { return std::string(len -s.length(), '0').append(s); }
+//	std::string padzeroes( std::string s, int len) { return std::string(len -s.length(), '0').append(s); }
+	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
 
 //    void initluaprinter(bitmap_rgb32 &mybitmap);
 //  void setsnapshotdir(std::string dir){ m_lp_snapshotdir = dir; };

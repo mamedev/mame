@@ -127,7 +127,6 @@ void silentype_printer_device::device_add_mconfig(machine_config &config)
 
 silentype_printer_device::silentype_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, type, tag, owner, clock),
-//		m_screen(*this, "screen"),
 		m_bitmap_printer(*this, "bitmap_printer")
 {
 }
@@ -178,47 +177,6 @@ void silentype_printer_device::device_reset()
 	update_printhead(0);
 }
 
-
-uint32_t silentype_printer_device::screen_update_silentype(screen_device &screen,
-							 bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int scrolly = bitmap.height() - distfrombottom - (m_ypos * 7 / 4);
-
-	int bottomlinetoclear = std::min(PAPER_HEIGHT - PAPER_SCREEN_HEIGHT, PAPER_HEIGHT);
-
-	m_bitmap.plot_box(0, m_ypos * 7 / 4 + 10, PAPER_WIDTH, bottomlinetoclear, rgb_t::white());
-
-	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
-
-	m_bitmap.plot_box(0, 0, PAPER_WIDTH, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
-
-	bitmap.plot_box(m_xpos - 10, bitmap.height() - distfrombottom + 10,     20, 30, 0xBDB76B);
-	bitmap.plot_box(m_xpos - 5,  bitmap.height() - distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
-
-	return 0;
-}
-
-void silentype_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
-{
-	bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
-
-}
-
-void silentype_printer_device::write_snapshot_to_file(std::string directory, std::string name)
-{
-	emu_file file(machine().options().snapshot_directory() + std::string("/") + directory,
-		  OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
-	auto const filerr = file.open(name);
-
-	if (filerr == osd_file::error::NONE)
-	{
-		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
-
-		// save the paper into a png
-		util::png_write_bitmap(file, nullptr, m_bitmap, 2, png_palette);
-	}
-}
 
 void silentype_printer_device::darken_pixel(double headtemp, unsigned int& pixel)
 {
@@ -290,7 +248,6 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
-	//		darken_pixel( headtemp[i], m_bitmap.pix(ypixel, xpixel) );
 			darken_pixel( headtemp[i], m_bitmap_printer->pix(ypixel, xpixel) );
 		}
 	}
@@ -330,7 +287,6 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 					{
 
 						// clear paper to bottom from current position
-//						m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
 						m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
 
 //	printf("Silentype Device Tag = %s\n",this->device().tag());
@@ -357,13 +313,11 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 
 						newpageflag = 1;
 						// clear page down to visible area, starting from the top of page
-//						m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), 0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
 						m_bitmap_printer->bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
 
 						m_ypos = 10;
 					}
 					// clear page down to visible area
-//					m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), m_ypos * 7 / 4 + distfrombottom, std::min(m_ypos * 7 / 4 + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
 					m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4 + distfrombottom, std::min(m_ypos * 7 / 4 + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
 
 				}
@@ -423,68 +377,3 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 	m_bitmap_printer->setheadpos(m_xpos,m_ypos);
 }
 
-
-
-/*
-
-std::string silentype_printer_device::fixchar(std::string in, char from, char to)
-{
-        std::string final;
-        for(std::string::const_iterator it = in.begin(); it != in.end(); ++it)
-        {
-                if((*it) != from)
-                {
-                        final += *it;
-                }
-                else final += to;
-        }
-        return final;
-}
-
-std::string silentype_printer_device::fixcolons(std::string in)
-{
-        return fixchar(in, ':', '-');
-}
-
-std::string silentype_printer_device::sessiontime()
-{
-        struct tm *info;
-        char buffer[80];
-        info = localtime( &m_lp_session_time );
-        strftime(buffer,120,"%Y-%m-%d %H-%M-%S", info);
-        return std::string(buffer);
-}
-
-std::string silentype_printer_device::tagname()
-{
-   return fixcolons(std::string(getrootdev()->shortname())+std::string(tag()));
-//   return fixcolons(std::string(getrootdev()->shortname())+std::string(device().tag()));
-}
-
-std::string silentype_printer_device::simplename()
-{
-        device_t * dev;
-//        dev = &device();
-		dev = this;
-        std::string s(dev->owner()->shortname());
-        while (dev){
-                s=std::string(dev->shortname())+std::string(" ")+s;
-                dev=dev->owner();
-        }
-        return s;
-}
-
-device_t* silentype_printer_device::getrootdev()
-{
-        device_t* dev;
-        device_t* lastdev = NULL;
-//        dev = &device();
-		dev = this;
-        while (dev){
-                lastdev = dev;
-                dev=dev->owner();
-        }
-        return lastdev;
-}
-
-*/
