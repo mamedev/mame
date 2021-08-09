@@ -81554,11 +81554,12 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_s8rk" supported="no">
+	<software name="mc_s8rk">
 		<description>Super 8 in 1 (Including Rockin' Kats)</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_8in1" />
 			<dataarea name="chr" size="524288">
 				<rom name="super 8-in-1 (with rockin' kats)(unl)[u].chr" size="524288" crc="841de576" sha1="78194012d82c851b93efa7eb74757bea309ba792" offset="00000" status="baddump" />
 			</dataarea>

@@ -415,6 +415,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("fk23c",            NES_FK23C);
 	device.option_add_internal("fk23ca",           NES_FK23CA);
 	device.option_add_internal("s24in1c03",        NES_S24IN1SC03);
+	device.option_add_internal("bmc_8in1",         NES_BMC_8IN1);
 	device.option_add_internal("bmc_15in1",        NES_BMC_15IN1);
 	device.option_add_internal("bmc_sbig7in1",     NES_BMC_SBIG7);
 	device.option_add_internal("bmc_hik8in1",      NES_BMC_HIK8);
@@ -438,7 +439,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("pec586",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("coolboy",          NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("bmc_hp898f",       NES_NROM);    // UNSUPPORTED
-	device.option_add_internal("bmc_8in1",         NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_158b",         NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_drgnfgt",      NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?

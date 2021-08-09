@@ -54,6 +54,7 @@ DEFINE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device,      "nes_fcgj8in1", 
 DEFINE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device,         "nes_fk23c",         "NES Cart FK23C PCB")
 DEFINE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device,        "nes_fk23ca",        "NES Cart FK23CA PCB")
 DEFINE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device,    "nes_s24in1c03",     "NES Cart Super 24 in 1 SC-03 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device,      "nes_bmc_8in1",      "NES Cart BMC GRM070 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device,     "nes_bmc_15in1",     "NES Cart BMC 15 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device,     "nes_bmc_sbig7",     "NES Cart BMC Super BIG 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device,      "nes_bmc_hik8",      "NES Cart BMC HIK 8 in 1 PCB")
@@ -197,6 +198,11 @@ nes_fk23ca_device::nes_fk23ca_device(const machine_config &mconfig, const char *
 
 nes_s24in1sc03_device::nes_s24in1sc03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_S24IN1SC03, tag, owner, clock)
+{
+}
+
+nes_bmc_8in1_device::nes_bmc_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_8IN1, tag, owner, clock)
 {
 }
 
@@ -518,6 +524,13 @@ void nes_s24in1sc03_device::pcb_reset()
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
 
+void nes_bmc_8in1_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x0f, 0x7f, 0);
+	prg32(0);
+}
+
 void nes_bmc_15in1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -616,7 +629,6 @@ void nes_bmc_k3006_device::pcb_reset()
 	mmc3_common_initialize(0x0f, 0x7f, 0);
 	prg16_89ab(0);
 	prg16_cdef(0);
-	chr8(0, m_chr_source);
 }
 
 void nes_bmc_411120c_device::device_start()
@@ -2049,6 +2061,39 @@ void nes_s24in1sc03_device::write_l(offs_t offset, uint8_t data)
 		m_reg[2] = data;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
+}
+
+/*-------------------------------------------------
+
+ BMC-NEWSTAR-GRM070-8IN1
+
+ Unknown Bootleg Multigame Board
+ Games: New Star Super 8 in 1
+
+ NES 2.0: mapper 333
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_8in1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_8in1 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 12))
+	{
+		if (BIT(data, 4))
+		{
+			m_prg_base = (data & 0x0c) << 2;
+			set_prg(m_prg_base, m_prg_mask);
+			m_chr_base = m_prg_base << 3;
+			set_chr(m_chr_source, m_chr_base, m_chr_mask);
+		}
+		else
+			prg32(data & 0x0f);
+	}
+	else
+		txrom_write(offset, data);
 }
 
 /*-------------------------------------------------

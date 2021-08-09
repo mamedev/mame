@@ -292,6 +292,7 @@ static const nes_pcb pcb_list[] =
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
 	{ "bmc_hik8in1",      BMC_HIK8IN1 },
@@ -355,7 +356,6 @@ static const nes_pcb pcb_list[] =
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
-	{ "bmc_8in1",         UNSUPPORTED_BOARD },  // Super 8-in-1 (Incl. Rockin' Kats)
 	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
