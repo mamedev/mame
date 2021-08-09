@@ -4,8 +4,8 @@
  *  silentype printer
  *
  */
-#include "screen.h"
 #include "bitmap_printer.h"
+
 #ifndef MAME_MACHINE_SILENTYPE_PRINTER_H
 #define MAME_MACHINE_SILENTYPE_PRINTER_H
 
@@ -20,11 +20,11 @@ protected:
 
 public:
 
+	DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_xpos <= 0); }
+
 	void update_printhead(uint8_t data);
 	void update_pf_stepper(uint8_t data);
 	void update_cr_stepper(uint8_t data);
-
-	DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_xpos <= 0); }
 
 protected:
 	// device-level overrides
@@ -37,14 +37,13 @@ protected:
 
 private:
 
+/*
 	uint8_t m_serial_data_out;
 	uint8_t m_serial_clock_out;
 	uint8_t m_store_clock_out;
-
+*/
 	uint8_t *m_rom;
 	uint8_t m_ram[256];
-
-	bitmap_rgb32 m_bitmap;
 
 	int m_xpos = 250;
 	int m_ypos = 0;
@@ -72,22 +71,19 @@ private:
 	double last_update_time = 0.0;  // strange behavior if we don't initialize
 
  private:
-	uint32_t screen_update_silentype(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	const int dpi=60;
 	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide at 60 dpi
 	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high at 60 dpi
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
-	const int distfrombottom = 50;  // print position from bottom of screen
+	const int distfrombottom = 50;
 
 	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
 
 	int wrap(int x, int mod) {if (x<0) return (x + ((-1 * (x / mod)) + 1) * mod) % mod; else return x % mod;}
-	void write_snapshot_to_file(std::string directory, std::string name);
 
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, unsigned int& pixel);
-	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
 
 };
 

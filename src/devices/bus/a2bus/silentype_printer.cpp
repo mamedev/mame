@@ -10,8 +10,8 @@
 
 #include "emu.h"
 #include "silentype.h"
-#include "video.h"
-#include "screen.h"
+//#include "video.h"
+//#include "screen.h"
 #include "emuopts.h"
 #include "fileio.h"
 #include "png.h"
@@ -147,7 +147,7 @@ void silentype_printer_device::device_start()
 	m_bitmap.allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
 	m_bitmap.fill(0xffffff); // Start with a white piece of paper
 */
-	save_item(NAME(m_bitmap));
+//	save_item(NAME(m_bitmap));
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));
 	save_item(NAME(right_offset));
