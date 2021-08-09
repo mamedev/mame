@@ -33832,6 +33832,13 @@ pc9801ux                        // 1987
 pc9801vm                        // 1985
 pc9801vm11                      //
 pc9801vx						//
+
+@source:pc9801_epson.cpp
+pc386m                          //
+pc486se                         // 1993
+pc486mu                         //
+
+@source:pc9821.cpp
 pc9821                          //
 pc9821ap2                       //
 pc9821as                        //
@@ -33847,11 +33854,6 @@ pc9821v13                       //
 pc9821v20                       //
 pc9821xa16                      //
 pc9821xs                        //
-
-@source:pc9801_epson.cpp
-pc386m                          //
-pc486se                         // 1993
-pc486mu                         //
 
 @source:pcat_dyn.cpp
 toursol                         // (c) 1995 Dynamo
