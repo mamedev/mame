@@ -5,7 +5,7 @@
  *
  */
 #include "screen.h"
-
+#include "bitmap_printer.h"
 #ifndef MAME_MACHINE_SILENTYPE_PRINTER_H
 #define MAME_MACHINE_SILENTYPE_PRINTER_H
 
@@ -53,6 +53,8 @@ private:
 	int m_romenable = 0;  // start off disabled
 
 	required_device<screen_device> m_screen;
+	required_device<bitmap_printer_device> m_bitmap_printer;
+//	required_device<bitmap_printer_device> m_bitmap_printer;
 
 	int right_offset = 0;
 	int left_offset = 3;
@@ -86,8 +88,27 @@ private:
 	void write_snapshot_to_file(std::string directory, std::string name);
 
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
-	void darken_pixel(double headtemp, u32& pixel);
+	void darken_pixel(double headtemp, unsigned int& pixel);
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
+
+public:
+    device_t* getrootdev();
+    std::string fixchar(std::string in, char from, char to);
+    std::string fixcolons(std::string in);
+    std::string sessiontime();
+    std::string tagname();
+    std::string simplename();
+    void setprintername(std::string name){ m_lp_luaprintername = name; }
+    std::string getprintername(){ return m_lp_luaprintername; }
+    void initprintername(){ setprintername(sessiontime()+std::string(" ")+tagname()); }
+
+//    void initluaprinter(bitmap_rgb32 &mybitmap);
+//  void setsnapshotdir(std::string dir){ m_lp_snapshotdir = dir; };
+//   std::string getsnapshotdir(std::string dir){ return m_lp_snapshotdir; };
+
+    std::string m_lp_luaprintername;
+    std::string m_lp_snapshotdir;
+    time_t m_lp_session_time;
 
 };
 

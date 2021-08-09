@@ -164,6 +164,7 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, "a2silentype", "Apple Silentype Printer")
+//DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, <<shortname>>, <<name>>)   tag comes from including device constructor
 
 #define SILENTYPE_ROM_REGION  "rom"
 
@@ -221,7 +222,24 @@ void a2bus_silentype_device::device_start()
 {
 //  m_rom = device().machine().root_device().memregion(this->subtag(SILENTYPE_ROM_REGION).c_str())->base();
 
-	printf("Silentype ram size = %lx\n",sizeof(m_ram));
+	printf("Silentype Device Tag = %s\n",device().tag());
+	printf("Silentype Owner Tag = %s\n",device().owner()->tag());
+
+	
+//	printf("Silentype Owner Tag = %s\n",device()->owner()->tag());  this doesn't work
+//	printf("Silentype ram size = %lx\n",sizeof(m_ram));
+
+/*	
+Silentype Device Tag = :sl1:silentype
+Silentype Owner Tag = :sl1
+Silentype ram size = 100
+Silentype Device Tag = :sl2:silentype
+Silentype Owner Tag = :sl2
+Silentype ram size = 100
+*/
+	
+	
+	
 	memset(m_ram, 0, sizeof(m_ram));
 
 

@@ -16,7 +16,7 @@
 #include "fileio.h"
 #include "png.h"
 #include <bitset>
-#include "silentype_printer.h"
+//#include "silentype_printer.h"
 
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -116,6 +116,8 @@ void silentype_printer_device::device_add_mconfig(machine_config &config)
 	screen.set_size(PAPER_WIDTH, PAPER_SCREEN_HEIGHT);
 	screen.set_visarea(0, PAPER_WIDTH - 1, 0, PAPER_SCREEN_HEIGHT - 1);
 	screen.set_screen_update(FUNC(silentype_printer_device::screen_update_silentype));
+	
+	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, 0));
 }
 
 //**************************************************************************
@@ -124,7 +126,8 @@ void silentype_printer_device::device_add_mconfig(machine_config &config)
 
 silentype_printer_device::silentype_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, type, tag, owner, clock),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_bitmap_printer(*this, "bitmap_printer")
 {
 }
 
@@ -179,13 +182,13 @@ uint32_t silentype_printer_device::screen_update_silentype(screen_device &screen
 {
 	int scrolly = bitmap.height() - distfrombottom - (m_ypos * 7 / 4);
 
-	int bottomlinetoclear = std::min(PAPER_HEIGHT-PAPER_SCREEN_HEIGHT,PAPER_HEIGHT);
+	int bottomlinetoclear = std::min(PAPER_HEIGHT - PAPER_SCREEN_HEIGHT, PAPER_HEIGHT);
 
 	m_bitmap.plot_box(0, m_ypos * 7 / 4 + 10, PAPER_WIDTH, bottomlinetoclear, rgb_t::white());
 
 	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
-	m_bitmap.plot_box(0, 0, 559, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
+	m_bitmap.plot_box(0, 0, PAPER_WIDTH, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
 	bitmap.plot_box(m_xpos - 10, bitmap.height() - distfrombottom + 10,     20, 30, 0xBDB76B);
 	bitmap.plot_box(m_xpos - 5,  bitmap.height() - distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
@@ -195,7 +198,6 @@ uint32_t silentype_printer_device::screen_update_silentype(screen_device &screen
 
 void silentype_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
 {
-//  bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, rgb_t::white());
 	bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
 
 }
@@ -216,7 +218,7 @@ void silentype_printer_device::write_snapshot_to_file(std::string directory, std
 	}
 }
 
-void silentype_printer_device::darken_pixel(double headtemp, u32& pixel)
+void silentype_printer_device::darken_pixel(double headtemp, unsigned int& pixel)
 {
 	if (headtemp > 0.0)
 	{
@@ -285,7 +287,10 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 		int ypixel = (m_ypos * 7 / 4) + (6 - i);
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
+		{
 			darken_pixel( headtemp[i], m_bitmap.pix(ypixel, xpixel) );
+			darken_pixel( headtemp[i], m_bitmap_printer->pix(ypixel, xpixel) );
+		}
 	}
 	lastheadbits = headbits;
 }
@@ -323,15 +328,26 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 						// clear paper to bottom from current position
 						bitmap_clear_band(m_bitmap, m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
 
+//	printf("Silentype Device Tag = %s\n",this->device().tag());
+
+	printf("Silentype Device Tag = %s\n",tag());
+//	printf("Silentype Device Tag = %s\n",device().tag());
+//	printf("Silentype Owner Tag = %s\n",device().owner()->tag());
+
+
 						// save a snapshot with the slot and page as part of the filename
 						write_snapshot_to_file(
 									std::string("silentype"),
-									std::string("silentype") +
+									std::string("silentype_") +
 //                                  std::string("_slot") + std::to_string(slotno()) +
-								  std::string("_slot") +
+//								  std::string("_slot") +
 //                                std::to_string(((a2bus_silentype_device *) (this->owner()))->get_slotno()) +
-								  std::to_string( static_cast<a2bus_silentype_device *> (this->owner()) -> get_slotno() ) +
-									"_page" + std::to_string(page_count++) + ".png");
+//								  std::to_string( static_cast<a2bus_silentype_device *> (this->owner()) -> get_slotno() ) +
+									m_bitmap_printer->getprintername() + 
+									" page_" + 
+									m_bitmap_printer->padzeroes(std::to_string(page_count++),3) + 
+//									std::to_string(page_count++) + 
+									".png");
 
 						newpageflag = 1;
 						// clear page down to visible area, starting from the top of page
@@ -395,6 +411,70 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 
 		if (!halfstepflag) hstepperlast = hstepper; // update the hstepperlast ignoring half steps
 	}
+}
+
+
+
+
+
+std::string silentype_printer_device::fixchar(std::string in, char from, char to)
+{
+        std::string final;
+        for(std::string::const_iterator it = in.begin(); it != in.end(); ++it)
+        {
+                if((*it) != from)
+                {
+                        final += *it;
+                }
+                else final += to;
+        }
+        return final;
+}
+
+std::string silentype_printer_device::fixcolons(std::string in)
+{
+        return fixchar(in, ':', '-');
+}
+
+std::string silentype_printer_device::sessiontime()
+{
+        struct tm *info;
+        char buffer[80];
+        info = localtime( &m_lp_session_time );
+        strftime(buffer,120,"%Y-%m-%d %H-%M-%S", info);
+        return std::string(buffer);
+}
+
+std::string silentype_printer_device::tagname()
+{
+   return fixcolons(std::string(getrootdev()->shortname())+std::string(tag()));
+//   return fixcolons(std::string(getrootdev()->shortname())+std::string(device().tag()));
+}
+
+std::string silentype_printer_device::simplename()
+{
+        device_t * dev;
+//        dev = &device();
+		dev = this;
+        std::string s(dev->owner()->shortname());
+        while (dev){
+                s=std::string(dev->shortname())+std::string(" ")+s;
+                dev=dev->owner();
+        }
+        return s;
+}
+
+device_t* silentype_printer_device::getrootdev()
+{
+        device_t* dev;
+        device_t* lastdev = NULL;
+//        dev = &device();
+		dev = this;
+        while (dev){
+                lastdev = dev;
+                dev=dev->owner();
+        }
+        return lastdev;
 }
 
 

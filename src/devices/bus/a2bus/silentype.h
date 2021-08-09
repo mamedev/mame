@@ -16,6 +16,7 @@
 #include "a2bus.h"
 #include "silentype_printer.h"
 
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -26,7 +27,7 @@ class a2bus_silentype_device:
 {
 public:
 	a2bus_silentype_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	u8 get_slotno() { return slotno(); }
+//	u8 get_slotno() { return slotno(); }
 protected:
 	a2bus_silentype_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -53,6 +54,7 @@ protected:
 
 	required_device<silentype_printer_device> m_silentype_printer;
 	required_region_ptr<u8> m_rom;
+
 
  private:
 	virtual const tiny_rom_entry *device_rom_region() const override;
