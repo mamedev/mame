@@ -196,6 +196,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("nanjing",          NES_NANJING);     // mapper 163
 	device.option_add_internal("ntdec_asder",      NES_NTDEC_ASDER); // mapper 112
 	device.option_add_internal("ntdec_fh",         NES_NTDEC_FH);    // mapper 193
+	device.option_add_internal("ntdec_n715021",    NES_NTDEC_N715021);    // mapper 81
 	device.option_add_internal("jyc_a",            NES_JY_TYPEA);    // mapper 90
 	device.option_add_internal("jyc_b",            NES_JY_TYPEB);    // mapper 211
 	device.option_add_internal("jyc_c",            NES_JY_TYPEC);    // mapper 209
