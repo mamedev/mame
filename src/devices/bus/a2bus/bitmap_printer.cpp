@@ -93,8 +93,8 @@ void bitmap_printer_device::device_start()
 	time(&m_lp_session_time);  // initialize session time
 	initprintername();
 	
-	m_bitmap.allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
-	m_bitmap.fill(0xffffff); // Start with a white piece of paper
+//	m_bitmap.allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
+//	m_bitmap.fill(0xffffff); // Start with a white piece of paper
 
 
 	m_lp_bitmap->allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
@@ -136,6 +136,7 @@ void bitmap_printer_device::device_reset()
 uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 							 bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+//	int scrolly = bitmap.height() - distfrombottom - (m_ypos * 7 / 4);
 	int scrolly = bitmap.height() - distfrombottom - (m_ypos * 7 / 4);
 
 /*
@@ -146,10 +147,10 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 */
 
-	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
+//	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 	copyscrollbitmap(bitmap, *m_lp_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
-	m_bitmap.plot_box(0, 0, PAPER_WIDTH, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
+	bitmap.plot_box(0, bitmap.height() - distfrombottom - (m_ypos * 7/4), PAPER_WIDTH, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
 	bitmap.plot_box(m_xpos - 10, bitmap.height() - distfrombottom + 10,     20, 30, 0xBDB76B);
 	bitmap.plot_box(m_xpos - 5,  bitmap.height() - distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
@@ -160,6 +161,7 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
 {
+//	printf("clear band (%d,%d)\n",from_line,to_line);
 	bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
 
 }
@@ -167,6 +169,7 @@ void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_lin
 
 void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
 {
+	printf("write snapshot\n");
 	emu_file file(machine().options().snapshot_directory() + std::string("/") + directory,
 		  OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
@@ -177,7 +180,7 @@ void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::s
 		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
 
 		// save the paper into a png
-		util::png_write_bitmap(file, nullptr, m_bitmap, 2, png_palette);
+		util::png_write_bitmap(file, nullptr, *m_lp_bitmap, 2, png_palette);
 	}
 }
 

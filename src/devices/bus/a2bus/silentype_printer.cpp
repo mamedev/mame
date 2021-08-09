@@ -109,14 +109,15 @@ ioport_constructor silentype_printer_device::device_input_ports() const
 
 void silentype_printer_device::device_add_mconfig(machine_config &config)
 {
-   /* video hardware (simulates paper) */
+/*
+   // video hardware (simulates paper) 
 	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(PAPER_WIDTH, PAPER_SCREEN_HEIGHT);
 	screen.set_visarea(0, PAPER_WIDTH - 1, 0, PAPER_SCREEN_HEIGHT - 1);
 	screen.set_screen_update(FUNC(silentype_printer_device::screen_update_silentype));
-	
+*/	
 	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, 0));
 }
 
@@ -126,7 +127,7 @@ void silentype_printer_device::device_add_mconfig(machine_config &config)
 
 silentype_printer_device::silentype_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, type, tag, owner, clock),
-		m_screen(*this, "screen"),
+//		m_screen(*this, "screen"),
 		m_bitmap_printer(*this, "bitmap_printer")
 {
 }
@@ -143,9 +144,10 @@ silentype_printer_device::silentype_printer_device(const machine_config &mconfig
 
 void silentype_printer_device::device_start()
 {
+/*
 	m_bitmap.allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
 	m_bitmap.fill(0xffffff); // Start with a white piece of paper
-
+*/
 	save_item(NAME(m_bitmap));
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));
@@ -288,7 +290,7 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
-			darken_pixel( headtemp[i], m_bitmap.pix(ypixel, xpixel) );
+	//		darken_pixel( headtemp[i], m_bitmap.pix(ypixel, xpixel) );
 			darken_pixel( headtemp[i], m_bitmap_printer->pix(ypixel, xpixel) );
 		}
 	}
@@ -313,20 +315,22 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 			{
 				if (drivetable[wrap(i + 1, 4)] == vstepper) // we are moving down the page
 				{
+//					printf("moving down\n");
 					m_ypos += 1; // move down
 
 					if (newpageflag == 1)
 					{
 						m_ypos = 10;  // lock to the top of page until we seek horizontally
 					}
-					if (m_ypos * 7 / 4 > m_bitmap.height() - 50)
+//					if (m_ypos * 7 / 4 > m_bitmap.height() - 50)  // i see why it's failing
+					if (m_ypos * 7 / 4 > m_bitmap_printer->get_m_lp_bitmap().height() - 50)  // i see why it's failing
 						// if we are within 50 pixels of the bottom of the page we will
 						// write the page to a file, then erase the top part of the page
 						// so we can still see the last page printed.
 					{
 
 						// clear paper to bottom from current position
-						bitmap_clear_band(m_bitmap, m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
+						m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
 
 //	printf("Silentype Device Tag = %s\n",this->device().tag());
 
@@ -336,7 +340,8 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 
 
 						// save a snapshot with the slot and page as part of the filename
-						write_snapshot_to_file(
+						m_bitmap_printer->write_snapshot_to_file(
+//						write_snapshot_to_file(
 									std::string("silentype"),
 									std::string("silentype_") +
 //                                  std::string("_slot") + std::to_string(slotno()) +
@@ -351,12 +356,12 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 
 						newpageflag = 1;
 						// clear page down to visible area, starting from the top of page
-						bitmap_clear_band(m_bitmap, 0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
+						m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), 0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
 
 						m_ypos = 10;
 					}
 					// clear page down to visible area
-					bitmap_clear_band(m_bitmap, m_ypos * 7 / 4 + distfrombottom, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
+					m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), m_ypos * 7 / 4 + distfrombottom, std::min(m_ypos * 7 / 4 + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
 
 				}
 				else if (drivetable[wrap(i - 1, 4)] == vstepper) // we are moving up the page
@@ -373,6 +378,7 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 
 		if (!halfstepflag) vstepperlast = vstepper; // update the vstepperlast ignoring half steps
 	}
+	m_bitmap_printer->setheadpos(m_xpos,m_ypos);
 }
 
 //-------------------------------------------------
@@ -411,6 +417,7 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 
 		if (!halfstepflag) hstepperlast = hstepper; // update the hstepperlast ignoring half steps
 	}
+	m_bitmap_printer->setheadpos(m_xpos,m_ypos);
 }
 
 

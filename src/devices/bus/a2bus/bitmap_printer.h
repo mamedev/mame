@@ -34,7 +34,7 @@ private:
 	uint8_t *m_rom;
 	uint8_t m_ram[256];
 
-	bitmap_rgb32 m_bitmap;
+//	bitmap_rgb32 m_bitmap;
 
 	int m_xpos = 250;
 	int m_ypos = 0;
@@ -43,9 +43,9 @@ private:
 	
 	bitmap_rgb32 m_lp_internal_bitmap;  // pointer to bitmap
 	bitmap_rgb32 *m_lp_bitmap = &m_lp_internal_bitmap;  // pointer to bitmap  use internal bitmap by default
-
+public:
 	bitmap_rgb32& get_m_lp_bitmap(){ return *m_lp_bitmap; }
-
+private:
       	
 	std::string m_lp_luaprintername;
     std::string m_lp_snapshotdir;
@@ -77,6 +77,7 @@ private:
 	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
 
 	int wrap(int x, int mod) {if (x<0) return (x + ((-1 * (x / mod)) + 1) * mod) % mod; else return x % mod;}
+public:
 	void write_snapshot_to_file(std::string directory, std::string name);
 
 public:
@@ -112,6 +113,8 @@ unsigned int& pix(int y, int x)    // reversed y x
 	return m_lp_bitmap->pix(y,x);
 };
 
+
+	void setheadpos(int x, int y){m_xpos = x; m_ypos=y;}
 
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
 
