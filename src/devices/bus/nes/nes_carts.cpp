@@ -298,6 +298,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("mariobaby",        NES_MARIOBABY);
 	device.option_add_internal("asnicol",          NES_ASN);
 	device.option_add_internal("smb3pirate",       NES_SMB3PIRATE);
+	device.option_add_internal("btl_contraj",      NES_BTL_CONTRAJ);
 	device.option_add_internal("btl_dninja",       NES_BTL_DNINJA);
 	device.option_add_internal("smb2j",            NES_SMB2J);
 	device.option_add_internal("smb2ja",           NES_SMB2JA);

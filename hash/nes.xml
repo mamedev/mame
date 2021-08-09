@@ -62078,6 +62078,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Game will freeze during the intro story if it is not skipped. Otherwise this is fully playable. -->
+	<software name="contrah" cloneof="probot" supported="partial">
+		<description>Contra (pirate)</description>
+		<year>198?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="コントラ 魂斗羅"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="btl_contraj" />
+			<dataarea name="prg" size="131072">
+				<rom name="n-7569.ic6" size="131072" crc="bcb787de" sha1="6c3f6f84676f79bff344c3c8439bffce17bc97db" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="n-7570.ic7" size="131072" crc="c6172032" sha1="aca9049b53dd73055f5a0aa6a8d85cf72b50bb69" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="contrafg">
 		<description>Contra Fighter (Asia)</description>
 		<year>19??</year>
