@@ -2613,7 +2613,7 @@ void nes_bmc_150in1_device::write_h(offs_t offset, uint8_t data)
 	prg16_cdef(bank + (((bank & 0x06) == 0x06) ? 1 : 0));
 	chr8(bank, CHRROM);
 
-	set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(offset, 0) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 
