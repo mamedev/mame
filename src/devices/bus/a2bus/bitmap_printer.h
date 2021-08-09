@@ -117,6 +117,7 @@ unsigned int& pix(int y, int x)    // reversed y x
 	void setheadpos(int x, int y){m_xpos = x; m_ypos=y;}
 
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
+	void bitmap_clear_band(int from_line, int to_line, u32 color);
 
     device_t* getrootdev();
     std::string fixchar(std::string in, char from, char to);

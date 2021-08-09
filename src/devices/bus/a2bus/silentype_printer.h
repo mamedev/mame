@@ -92,6 +92,7 @@ private:
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
 
 public:
+/*
     device_t* getrootdev();
     std::string fixchar(std::string in, char from, char to);
     std::string fixcolons(std::string in);
@@ -109,7 +110,7 @@ public:
     std::string m_lp_luaprintername;
     std::string m_lp_snapshotdir;
     time_t m_lp_session_time;
-
+*/
 };
 
 DECLARE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device)

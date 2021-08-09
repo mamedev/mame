@@ -330,7 +330,8 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 					{
 
 						// clear paper to bottom from current position
-						m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
+//						m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
+						m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
 
 //	printf("Silentype Device Tag = %s\n",this->device().tag());
 
@@ -356,12 +357,14 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 
 						newpageflag = 1;
 						// clear page down to visible area, starting from the top of page
-						m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), 0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
+//						m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), 0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
+						m_bitmap_printer->bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
 
 						m_ypos = 10;
 					}
 					// clear page down to visible area
-					m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), m_ypos * 7 / 4 + distfrombottom, std::min(m_ypos * 7 / 4 + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
+//					m_bitmap_printer->bitmap_clear_band(m_bitmap_printer->get_m_lp_bitmap(), m_ypos * 7 / 4 + distfrombottom, std::min(m_ypos * 7 / 4 + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
+					m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4 + distfrombottom, std::min(m_ypos * 7 / 4 + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
 
 				}
 				else if (drivetable[wrap(i - 1, 4)] == vstepper) // we are moving up the page
@@ -422,7 +425,7 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 
 
 
-
+/*
 
 std::string silentype_printer_device::fixchar(std::string in, char from, char to)
 {
@@ -484,4 +487,4 @@ device_t* silentype_printer_device::getrootdev()
         return lastdev;
 }
 
-
+*/

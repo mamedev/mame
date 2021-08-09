@@ -159,12 +159,19 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 }
 
 
+void bitmap_printer_device::bitmap_clear_band(int from_line, int to_line, u32 color)
+{
+//	printf("clear band (%d,%d)\n",from_line,to_line);
+	m_lp_bitmap->plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
+}
+
 void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
 {
 //	printf("clear band (%d,%d)\n",from_line,to_line);
 	bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
 
 }
+
 
 
 void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
