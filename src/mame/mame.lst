@@ -35676,6 +35676,9 @@ pv9234                          //
 @source:pve500.cpp
 pve500                          // SONY PVE-500
 
+@source:pwp14.cpp
+pwp14                           // Smith Corona PWP System 14
+
 @source:pwrview.cpp
 pwrview                         // Compugraphic MCS PowerView 10
 
