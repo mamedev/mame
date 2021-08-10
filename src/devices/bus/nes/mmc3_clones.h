@@ -692,11 +692,10 @@ class nes_bmc_411120c_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
 	virtual void prg_cb(int start, int bank) override;
-	virtual void chr_cb(int start, int bank, int source) override;
 
 	virtual void pcb_reset() override;
 
@@ -705,7 +704,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_reg;
+	u8 m_reg;
 };
 
 
