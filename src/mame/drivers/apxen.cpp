@@ -32,6 +32,7 @@
 #include "cpu/i86/i286.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
+#include "machine/input_merger.h"
 #include "machine/mm58274c.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -43,6 +44,7 @@
 #include "sound/sn76496.h"
 #include "imagedev/floppy.h"
 #include "formats/apridisk.h"
+#include "bus/apricot/keyboard/keyboard.h"
 #include "bus/apricot/video/video.h"
 #include "speaker.h"
 
@@ -503,17 +505,21 @@ void apxen_state::apxen(machine_config &config)
 	m_pit->set_clk<2>(2000000);
 	m_pit->out_handler<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 
+	INPUT_MERGER_ANY_HIGH(config, "z80int").output_handler().set(m_pic[0], FUNC(pic8259_device::ir1_w));
+
 	Z8536(config, m_cio, 4000000);
-	m_cio->irq_wr_cb().set(m_pic[0], FUNC(pic8259_device::ir1_w));
+	m_cio->irq_wr_cb().set("z80int", FUNC(input_merger_device::in_w<0>));
 	m_cio->pa_rd_cb().set(FUNC(apxen_state::cio_porta_r));
 	m_cio->pa_wr_cb().set(FUNC(apxen_state::cio_porta_w));
 	m_cio->pb_wr_cb().set(FUNC(apxen_state::cio_portb_w));
 	m_cio->pc_wr_cb().set(FUNC(apxen_state::cio_portc_w));
 
 	Z80SIO(config, m_sio, 4000000);
+	m_sio->out_int_callback().set("z80int", FUNC(input_merger_device::in_w<1>));
+	// channel a: rs232
+	m_sio->out_txdb_callback().set("kbd", FUNC(apricot_keyboard_bus_device::out_w));
 	m_sio->out_dtrb_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write));
 	m_sio->out_rtsb_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
-	// channel a rs232, b keyboard
 
 	MM58274C(config, "rtc", 32.768_kHz_XTAL);
 
@@ -531,6 +537,9 @@ void apxen_state::apxen(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SN76489(config, "sn", 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	// keyboard
+	APRICOT_KEYBOARD_INTERFACE(config, "kbd", apricot_keyboard_devices, "hle").in_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 }
 
 
