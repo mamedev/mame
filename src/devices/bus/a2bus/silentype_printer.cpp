@@ -386,8 +386,6 @@ int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uin
 {
 	int lastpos = stepper->get_absolute_position();	
 
-//	stepper->update(bitswap(pattern, 3, 0));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
-
 	stepper->update(bitswap(pattern, 1, 2));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
 
 	int delta = stepper->get_absolute_position() - lastpos;
@@ -401,15 +399,6 @@ int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uin
 
 void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 {
-/*
-	int lastpos = m_pf_stepper->get_absolute_position();
-
-	m_pf_stepper->update(bitswap(vstepper,3,0));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
-	
-	int delta = m_pf_stepper->get_absolute_position() - lastpos;
-	delta *= -1;  //other direction
-*/
-
 	int delta = update_stepper_delta(m_pf_stepper, vstepper);
 		
 	if (delta > 0)
@@ -425,7 +414,6 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 			// write the page to a file, then erase the top part of the page
 			// so we can still see the last page printed.
 		{
-
 			// clear paper to bottom from current position
 			m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
 
@@ -503,14 +491,6 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 
 void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 {
-/*
-	int lastpos = m_cr_stepper->get_absolute_position();
-
-	m_cr_stepper->update(bitswap(hstepper,3,0));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
-	
-	int delta = m_cr_stepper->get_absolute_position() - lastpos;
-	delta *= -1; 
-*/	
 	int delta = update_stepper_delta(m_cr_stepper, hstepper);
 	
 //	printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
@@ -530,7 +510,6 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 		}
 	}
 
-//	m_bitmap_printer->setheadpos(m_xpos/4,m_ypos/4);
 	m_bitmap_printer->setheadpos(m_xpos/2, m_ypos/(7.0/4));
 }
 
