@@ -184,6 +184,7 @@ ROM_END
 void a2bus_silentype_device::device_add_mconfig(machine_config &config)
 {
 	[[maybe_unused]] silentype_printer_device &printer(SILENTYPE_PRINTER(config, m_silentype_printer, 0));
+	
 }
 
 //-------------------------------------------------
@@ -238,11 +239,7 @@ Silentype Owner Tag = :sl2
 Silentype ram size = 100
 */
 	
-	
-	
 	memset(m_ram, 0, sizeof(m_ram));
-
-
 	save_item(NAME(m_ram));
 }
 

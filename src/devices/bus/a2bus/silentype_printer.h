@@ -5,6 +5,7 @@
  *
  */
 #include "bitmap_printer.h"
+#include "machine/steppers.h"
 
 #ifndef MAME_MACHINE_SILENTYPE_PRINTER_H
 #define MAME_MACHINE_SILENTYPE_PRINTER_H
@@ -52,6 +53,9 @@ private:
 	int m_romenable = 0;  // start off disabled
 
 	required_device<bitmap_printer_device> m_bitmap_printer;
+	required_device<stepper_device> m_pf_stepper;
+	required_device<stepper_device> m_cr_stepper;
+
 
 	int right_offset = 0;
 	int left_offset = 3;
@@ -81,10 +85,10 @@ private:
 	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
 
 	int wrap(int x, int mod) {if (x<0) return (x + ((-1 * (x / mod)) + 1) * mod) % mod; else return x % mod;}
-
+	u8 bitswap(u16 val, u8 a, u8 b);
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, unsigned int& pixel);
-
+int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern);
 };
 
 DECLARE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device)
