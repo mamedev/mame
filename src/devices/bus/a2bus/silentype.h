@@ -27,7 +27,7 @@ class a2bus_silentype_device:
 {
 public:
 	a2bus_silentype_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//	u8 get_slotno() { return slotno(); }
+
 protected:
 	a2bus_silentype_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -45,16 +45,15 @@ protected:
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
 
-//  uint8_t *m_rom;
 	uint8_t m_ram[256];
 	uint16_t m_shift_reg = 0;
 	uint16_t m_parallel_reg = 0;
+
 	int m_romenable = 0;  // start off disabled
 	u8 last_write_c0nx = 0;
 
 	required_device<silentype_printer_device> m_silentype_printer;
 	required_region_ptr<u8> m_rom;
-
 
  private:
 	virtual const tiny_rom_entry *device_rom_region() const override;

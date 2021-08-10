@@ -5,18 +5,17 @@
     silentype_printer.cpp
 
     Implementation of the Apple Silentype Printer
+    
+    (Implements physical printhead and stepper motors)
 
 **********************************************************************/
 
 #include "emu.h"
 #include "silentype.h"
-//#include "video.h"
-//#include "screen.h"
 #include "emuopts.h"
 #include "fileio.h"
 #include "png.h"
 #include <bitset>
-//#include "silentype_printer.h"
 
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -109,20 +108,10 @@ ioport_constructor silentype_printer_device::device_input_ports() const
 
 void silentype_printer_device::device_add_mconfig(machine_config &config)
 {
-/*
-   // video hardware (simulates paper) 
-	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(PAPER_WIDTH, PAPER_SCREEN_HEIGHT);
-	screen.set_visarea(0, PAPER_WIDTH - 1, 0, PAPER_SCREEN_HEIGHT - 1);
-	screen.set_screen_update(FUNC(silentype_printer_device::screen_update_silentype));
-*/	
 	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, 0));
 	
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
-
 }
 
 //**************************************************************************
@@ -149,11 +138,6 @@ silentype_printer_device::silentype_printer_device(const machine_config &mconfig
 
 void silentype_printer_device::device_start()
 {
-/*
-	m_bitmap.allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
-	m_bitmap.fill(0xffffff); // Start with a white piece of paper
-*/
-//	save_item(NAME(m_bitmap));
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));
 	save_item(NAME(right_offset));
@@ -168,7 +152,6 @@ void silentype_printer_device::device_start()
 	save_item(NAME(newpageflag));
 	save_item(NAME(page_count));
 	save_item(NAME(last_update_time));
-
 }
 
 void silentype_printer_device::device_reset_after_children()
@@ -288,16 +271,6 @@ u8 silentype_printer_device::bitpattern(u16 val, u8 a, u8 b, u8 c, u8 d)
 
 /*
 //Standard drive table in steppers.cpp is 2,6,4,5,1,9,8,a
-
-abcd
-0010      c
-0110     bc
-0100     b
-0101     b d
-0001       d
-1001    a  d
-1000    a
-1010    a c
 
 SILENTYPE STEPPER WINDING TABLE: 3,2,6,4,c,8,9,1
 

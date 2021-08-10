@@ -5,6 +5,8 @@
     silentype.cpp
 
     Implementation of the Apple Silentype Printer Interface Card
+    
+    (implements Silentype Synch Interface and Printer Deserializer Board)
 
 **********************************************************************
 
@@ -94,11 +96,6 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 
 #include "emu.h"
 #include "silentype.h"
-//#include "video.h"
-//#include "screen.h"
-//#include "emuopts.h"
-//#include "fileio.h"
-//#include "png.h"  // don't need it here now
 //#include <bitset>
 
 //#define VERBOSE 1
@@ -226,19 +223,6 @@ void a2bus_silentype_device::device_start()
 	printf("Silentype Device Tag = %s\n",device().tag());
 	printf("Silentype Owner Tag = %s\n",device().owner()->tag());
 
-	
-//	printf("Silentype Owner Tag = %s\n",device()->owner()->tag());  this doesn't work
-//	printf("Silentype ram size = %lx\n",sizeof(m_ram));
-
-/*	
-Silentype Device Tag = :sl1:silentype
-Silentype Owner Tag = :sl1
-Silentype ram size = 100
-Silentype Device Tag = :sl2:silentype
-Silentype Owner Tag = :sl2
-Silentype ram size = 100
-*/
-	
 	memset(m_ram, 0, sizeof(m_ram));
 	save_item(NAME(m_ram));
 }

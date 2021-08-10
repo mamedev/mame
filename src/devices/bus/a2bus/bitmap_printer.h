@@ -75,9 +75,6 @@ private:
 public:
 	void write_snapshot_to_file(std::string directory, std::string name);
 
-public:
-
-
 	void drawpixel(int x, int y, int pixelval)
 	{
 		y += m_paperheight;
@@ -115,7 +112,7 @@ public:
     std::string simplename();
     void setprintername(std::string name){ m_printername = name; }
     std::string getprintername(){ return m_printername; }
-    void initprintername(){ setprintername(sessiontime()+std::string(" ")+simplename()); }
+    void initprintername(){ setprintername(sessiontime() + std::string(" ") + simplename()); }
 
 	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }    
 };
