@@ -251,7 +251,7 @@ nes_bmc_k3006_device::nes_bmc_k3006_device(const machine_config &mconfig, const 
 {
 }
 
-nes_bmc_411120c_device::nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bmc_411120c_device::nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_411120C, tag, owner, clock), m_reg(0)
 {
 }
@@ -642,7 +642,7 @@ void nes_bmc_411120c_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
 	m_reg = 0;
-	mmc3_common_initialize(0x7f, 0x7f, 0);
+	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
 void nes_bmc_830118c_device::device_start()
@@ -2550,36 +2550,41 @@ void nes_bmc_k3006_device::write_m(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-411120C
+ BMC-411120C, BMC-810849-C
 
+ Games: 4 in 1, 19 in 1
 
- MMC3 clone
+ MMC3 clone with banking for multigame menu.
 
+ NES 2.0: mapper 287
 
- In MESS: Very Preliminary Support
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_bmc_411120c_device::prg_cb(int start, int bank)
 {
-	if (m_reg & 8)  // & 0xc when DSW change (diff menu?)
-		prg32(((m_reg >> 4) & 3) | 0x0c);
-	else
-		prg8_x(start, (bank & 0x0f) | ((m_reg & 0x03) << 4));
+	if (!BIT(m_reg, 3))    // all games use MMC3 PRG banking except Master Fighter II
+		nes_txrom_device::prg_cb(start, bank);
 }
 
-void nes_bmc_411120c_device::chr_cb(int start, int bank, int source)
-{
-	chr1_x(start, bank | ((m_reg & 3) << 7), source);
-}
-
-void nes_bmc_411120c_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_411120c_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_411120c write_m, offset: %04x, data: %02x\n", offset, data));
 
-	m_reg = data;
-	set_prg(m_prg_base, m_prg_mask);
-	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	if (BIT(m_wram_protect, 7))
+	{
+		m_reg = offset;
+		if (BIT(m_reg, 3))
+			prg32((m_reg & 0x07) << 2 | (m_reg & 0x30) >> 4);
+		else
+		{
+			m_prg_base = (m_reg & 0x07) << 4;
+			set_prg(m_prg_base, m_prg_mask);
+		}
+		m_chr_base = (m_reg & 0x07) << 7;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
 }
 
 /*-------------------------------------------------
