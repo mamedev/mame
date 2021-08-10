@@ -1,4 +1,6 @@
-// Copyright (c) 2015-2016 The Khronos Group Inc.
+// Copyright (c) 2015-2020 The Khronos Group Inc.
+// Modifications Copyright (C) 2020 Advanced Micro Devices, Inc. All rights
+// reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +21,10 @@
 
 #include <algorithm>
 
+#include "DebugInfo.h"
+#include "OpenCLDebugInfo100.h"
 #include "source/macro.h"
+#include "source/opcode.h"
 #include "source/spirv_constant.h"
 #include "source/spirv_target_env.h"
 
@@ -29,6 +34,7 @@
 // per-item basis. https://github.com/KhronosGroup/SPIRV-Tools/issues/1195
 
 #include "operand.kinds-unified1.inc"
+#include "spirv-tools/libspirv.h"
 
 static const spv_operand_table_t kOperandTable = {
     ARRAY_SIZE(pygen_variable_OperandInfoTable),
@@ -203,6 +209,8 @@ const char* spvOperandTypeStr(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_MEMORY_ACCESS:
     case SPV_OPERAND_TYPE_OPTIONAL_MEMORY_ACCESS:
       return "memory access";
+    case SPV_OPERAND_TYPE_FRAGMENT_SHADING_RATE:
+      return "shading rate";
     case SPV_OPERAND_TYPE_SCOPE_ID:
       return "scope ID";
     case SPV_OPERAND_TYPE_GROUP_OPERATION:
@@ -213,6 +221,17 @@ const char* spvOperandTypeStr(spv_operand_type_t type) {
       return "kernel profiling info";
     case SPV_OPERAND_TYPE_CAPABILITY:
       return "capability";
+    case SPV_OPERAND_TYPE_RAY_FLAGS:
+      return "ray flags";
+    case SPV_OPERAND_TYPE_RAY_QUERY_INTERSECTION:
+      return "ray query intersection";
+    case SPV_OPERAND_TYPE_RAY_QUERY_COMMITTED_INTERSECTION_TYPE:
+      return "ray query committed intersection type";
+    case SPV_OPERAND_TYPE_RAY_QUERY_CANDIDATE_INTERSECTION_TYPE:
+      return "ray query candidate intersection type";
+    case SPV_OPERAND_TYPE_PACKED_VECTOR_FORMAT:
+    case SPV_OPERAND_TYPE_OPTIONAL_PACKED_VECTOR_FORMAT:
+      return "packed vector format";
     case SPV_OPERAND_TYPE_IMAGE:
     case SPV_OPERAND_TYPE_OPTIONAL_IMAGE:
       return "image";
@@ -228,6 +247,18 @@ const char* spvOperandTypeStr(spv_operand_type_t type) {
       return "debug type qualifier";
     case SPV_OPERAND_TYPE_DEBUG_OPERATION:
       return "debug operation";
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_INFO_FLAGS:
+      return "OpenCL.DebugInfo.100 debug info flags";
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_BASE_TYPE_ATTRIBUTE_ENCODING:
+      return "OpenCL.DebugInfo.100 debug base type encoding";
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_COMPOSITE_TYPE:
+      return "OpenCL.DebugInfo.100 debug composite type";
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_TYPE_QUALIFIER:
+      return "OpenCL.DebugInfo.100 debug type qualifier";
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_OPERATION:
+      return "OpenCL.DebugInfo.100 debug operation";
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_IMPORTED_ENTITY:
+      return "OpenCL.DebugInfo.100 debug imported entity";
 
     // The next values are for values returned from an instruction, not actually
     // an operand.  So the specific strings don't matter.  But let's add them
@@ -237,10 +268,18 @@ const char* spvOperandTypeStr(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_IMAGE_CHANNEL_DATA_TYPE:
       return "image channel data type";
 
+    case SPV_OPERAND_TYPE_FPDENORM_MODE:
+      return "FP denorm mode";
+    case SPV_OPERAND_TYPE_FPOPERATION_MODE:
+      return "FP operation mode";
+    case SPV_OPERAND_TYPE_QUANTIZATION_MODES:
+      return "quantization mode";
+    case SPV_OPERAND_TYPE_OVERFLOW_MODES:
+      return "overflow mode";
+
     case SPV_OPERAND_TYPE_NONE:
       return "NONE";
     default:
-      assert(0 && "Unhandled operand type!");
       break;
   }
   return "unknown";
@@ -308,10 +347,24 @@ bool spvOperandIsConcrete(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_KERNEL_ENQ_FLAGS:
     case SPV_OPERAND_TYPE_KERNEL_PROFILING_INFO:
     case SPV_OPERAND_TYPE_CAPABILITY:
+    case SPV_OPERAND_TYPE_RAY_FLAGS:
+    case SPV_OPERAND_TYPE_RAY_QUERY_INTERSECTION:
+    case SPV_OPERAND_TYPE_RAY_QUERY_COMMITTED_INTERSECTION_TYPE:
+    case SPV_OPERAND_TYPE_RAY_QUERY_CANDIDATE_INTERSECTION_TYPE:
     case SPV_OPERAND_TYPE_DEBUG_BASE_TYPE_ATTRIBUTE_ENCODING:
     case SPV_OPERAND_TYPE_DEBUG_COMPOSITE_TYPE:
     case SPV_OPERAND_TYPE_DEBUG_TYPE_QUALIFIER:
     case SPV_OPERAND_TYPE_DEBUG_OPERATION:
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_BASE_TYPE_ATTRIBUTE_ENCODING:
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_COMPOSITE_TYPE:
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_TYPE_QUALIFIER:
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_OPERATION:
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_IMPORTED_ENTITY:
+    case SPV_OPERAND_TYPE_FPDENORM_MODE:
+    case SPV_OPERAND_TYPE_FPOPERATION_MODE:
+    case SPV_OPERAND_TYPE_QUANTIZATION_MODES:
+    case SPV_OPERAND_TYPE_OVERFLOW_MODES:
+    case SPV_OPERAND_TYPE_PACKED_VECTOR_FORMAT:
       return true;
     default:
       break;
@@ -327,7 +380,9 @@ bool spvOperandIsConcreteMask(spv_operand_type_t type) {
     case SPV_OPERAND_TYPE_LOOP_CONTROL:
     case SPV_OPERAND_TYPE_FUNCTION_CONTROL:
     case SPV_OPERAND_TYPE_MEMORY_ACCESS:
+    case SPV_OPERAND_TYPE_FRAGMENT_SHADING_RATE:
     case SPV_OPERAND_TYPE_DEBUG_INFO_FLAGS:
+    case SPV_OPERAND_TYPE_CLDEBUG100_DEBUG_INFO_FLAGS:
       return true;
     default:
       break;
@@ -336,13 +391,36 @@ bool spvOperandIsConcreteMask(spv_operand_type_t type) {
 }
 
 bool spvOperandIsOptional(spv_operand_type_t type) {
-  return SPV_OPERAND_TYPE_FIRST_OPTIONAL_TYPE <= type &&
-         type <= SPV_OPERAND_TYPE_LAST_OPTIONAL_TYPE;
+  switch (type) {
+    case SPV_OPERAND_TYPE_OPTIONAL_ID:
+    case SPV_OPERAND_TYPE_OPTIONAL_IMAGE:
+    case SPV_OPERAND_TYPE_OPTIONAL_MEMORY_ACCESS:
+    case SPV_OPERAND_TYPE_OPTIONAL_LITERAL_INTEGER:
+    case SPV_OPERAND_TYPE_OPTIONAL_LITERAL_NUMBER:
+    case SPV_OPERAND_TYPE_OPTIONAL_TYPED_LITERAL_INTEGER:
+    case SPV_OPERAND_TYPE_OPTIONAL_LITERAL_STRING:
+    case SPV_OPERAND_TYPE_OPTIONAL_ACCESS_QUALIFIER:
+    case SPV_OPERAND_TYPE_OPTIONAL_PACKED_VECTOR_FORMAT:
+    case SPV_OPERAND_TYPE_OPTIONAL_CIV:
+      return true;
+    default:
+      break;
+  }
+  // Any variable operand is also optional.
+  return spvOperandIsVariable(type);
 }
 
 bool spvOperandIsVariable(spv_operand_type_t type) {
-  return SPV_OPERAND_TYPE_FIRST_VARIABLE_TYPE <= type &&
-         type <= SPV_OPERAND_TYPE_LAST_VARIABLE_TYPE;
+  switch (type) {
+    case SPV_OPERAND_TYPE_VARIABLE_ID:
+    case SPV_OPERAND_TYPE_VARIABLE_LITERAL_INTEGER:
+    case SPV_OPERAND_TYPE_VARIABLE_LITERAL_INTEGER_ID:
+    case SPV_OPERAND_TYPE_VARIABLE_ID_LITERAL_INTEGER:
+      return true;
+    default:
+      break;
+  }
+  return false;
 }
 
 bool spvExpandOperandSequenceOnce(spv_operand_type_t type,
@@ -420,7 +498,7 @@ bool spvIsInIdType(spv_operand_type_t type) {
     return false;
   }
   switch (type) {
-    // Blacklist non-input IDs.
+    // Deny non-input IDs.
     case SPV_OPERAND_TYPE_TYPE_ID:
     case SPV_OPERAND_TYPE_RESULT_ID:
       return false;
@@ -432,6 +510,11 @@ bool spvIsInIdType(spv_operand_type_t type) {
 std::function<bool(unsigned)> spvOperandCanBeForwardDeclaredFunction(
     SpvOp opcode) {
   std::function<bool(unsigned index)> out;
+  if (spvOpcodeGeneratesType(opcode)) {
+    // All types can use forward pointers.
+    out = [](unsigned) { return true; };
+    return out;
+  }
   switch (opcode) {
     case SpvOpExecutionMode:
     case SpvOpExecutionModeId:
@@ -444,7 +527,6 @@ std::function<bool(unsigned)> spvOperandCanBeForwardDeclaredFunction(
     case SpvOpDecorateId:
     case SpvOpDecorateStringGOOGLE:
     case SpvOpMemberDecorateStringGOOGLE:
-    case SpvOpTypeStruct:
     case SpvOpBranch:
     case SpvOpLoopMerge:
       out = [](unsigned) { return true; };
@@ -490,6 +572,46 @@ std::function<bool(unsigned)> spvOperandCanBeForwardDeclaredFunction(
     default:
       out = [](unsigned) { return false; };
       break;
+  }
+  return out;
+}
+
+std::function<bool(unsigned)> spvDbgInfoExtOperandCanBeForwardDeclaredFunction(
+    spv_ext_inst_type_t ext_type, uint32_t key) {
+  // The Vulkan debug info extended instruction set is non-semantic so allows no
+  // forward references ever.
+  if (ext_type == SPV_EXT_INST_TYPE_NONSEMANTIC_VULKAN_DEBUGINFO_100) {
+    return [](unsigned) { return false; };
+  }
+
+  // TODO(https://gitlab.khronos.org/spirv/SPIR-V/issues/532): Forward
+  // references for debug info instructions are still in discussion. We must
+  // update the following lines of code when we conclude the spec.
+  std::function<bool(unsigned index)> out;
+  if (ext_type == SPV_EXT_INST_TYPE_OPENCL_DEBUGINFO_100) {
+    switch (OpenCLDebugInfo100Instructions(key)) {
+      case OpenCLDebugInfo100DebugFunction:
+        out = [](unsigned index) { return index == 13; };
+        break;
+      case OpenCLDebugInfo100DebugTypeComposite:
+        out = [](unsigned index) { return index >= 13; };
+        break;
+      default:
+        out = [](unsigned) { return false; };
+        break;
+    }
+  } else {
+    switch (DebugInfoInstructions(key)) {
+      case DebugInfoDebugFunction:
+        out = [](unsigned index) { return index == 13; };
+        break;
+      case DebugInfoDebugTypeComposite:
+        out = [](unsigned index) { return index >= 12; };
+        break;
+      default:
+        out = [](unsigned) { return false; };
+        break;
+    }
   }
   return out;
 }
