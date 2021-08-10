@@ -11069,7 +11069,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="elite">
+	<software name="elite" supported="no">
 		<description>Elite (Euro)</description>
 		<year>1992</year>
 		<publisher>Imagineering</publisher>
@@ -46320,7 +46320,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="eliteu" cloneof="elite">
+	<software name="eliteu" cloneof="elite" supported="no">
 		<description>Elite (NTSC Demo?)</description>
 		<year>1992</year>
 		<publisher>Ian Bell</publisher>
@@ -58159,7 +58159,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="quanhr2">
+	<software name="quanhr2" supported="no">
 		<description>Quan Huang R2 - Dashe Sitian Wang (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -61936,7 +61936,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="mihunche" cloneof="bbcar">
 		<description>Mi Hun Che (Chi)</description>
-		<year>19??</year>
+		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cc21" />
@@ -61950,9 +61950,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="scche" cloneof="bbcar" supported="partial">
+	<software name="scche" cloneof="bbcar">
 		<description>Super Car (Chi)</description>  <!-- This is not the correct title! -->
-		<year>19??</year>
+		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cc21" />
@@ -73393,7 +73393,7 @@ Other
 		</part>
 	</software>
 
-	<software name="lordkinga" cloneof="astyanax">
+	<software name="lordkinga" cloneof="astyanax" supported="no">
 		<description>The Lord of King (Asia, Pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
