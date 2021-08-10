@@ -59,7 +59,7 @@ ioport_constructor bitmap_printer_device::device_input_ports() const
 
 void bitmap_printer_device::device_add_mconfig(machine_config &config)
 {
-   /* video hardware (simulates paper) */
+    // video hardware (simulates paper) 
 	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -93,13 +93,8 @@ void bitmap_printer_device::device_start()
 	time(&m_lp_session_time);  // initialize session time
 	initprintername();
 	
-//	m_bitmap.allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
-//	m_bitmap.fill(0xffffff); // Start with a white piece of paper
-
-
 	m_lp_bitmap->allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
 	m_lp_bitmap->fill(0xffffff); // Start with a white piece of paper
-
 
 
 /*	save_item(NAME(m_bitmap));
@@ -136,21 +131,12 @@ void bitmap_printer_device::device_reset()
 uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 							 bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-//	int scrolly = bitmap.height() - distfrombottom - (m_ypos * 7 / 4);
-	int scrolly = bitmap.height() - distfrombottom - (m_ypos * 7 / 4);
 
-/*
+	int scrolly = bitmap.height() - distfrombottom - m_ypos;
 
-	int bottomlinetoclear = std::min(PAPER_HEIGHT - PAPER_SCREEN_HEIGHT, PAPER_HEIGHT);
-
-	m_bitmap.plot_box(0, m_ypos * 7 / 4 + 10, PAPER_WIDTH, bottomlinetoclear, rgb_t::white());
-
-*/
-
-//	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 	copyscrollbitmap(bitmap, *m_lp_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
-	bitmap.plot_box(0, bitmap.height() - distfrombottom - (m_ypos * 7/4), PAPER_WIDTH, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
+	bitmap.plot_box(0, bitmap.height() - distfrombottom - m_ypos, PAPER_WIDTH, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
 	bitmap.plot_box(m_xpos - 10, bitmap.height() - distfrombottom + 10,     20, 30, 0xBDB76B);
 	bitmap.plot_box(m_xpos - 5,  bitmap.height() - distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
@@ -169,10 +155,7 @@ void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_lin
 {
 //	printf("clear band (%d,%d)\n",from_line,to_line);
 	bitmap.plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
-
 }
-
-
 
 void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
 {
@@ -225,30 +208,6 @@ std::string bitmap_printer_device::tagname()
 //   return fixcolons(std::string(getrootdev()->shortname())+std::string(device().tag()));
 }
 
-/*
-[MAME]> print(manager.machine.devices[":sl1:silentype"].name)
-Apple Silentype Printer
-[MAME]> print(manager.machine.devices[":sl1:silentype"].tag)
-:sl1:silentype
-[MAME]> print(manager.machine.devices[":sl1:silentype"].basetag)
-silentype
-[MAME]> print(manager.machine.devices[":sl1:silentype"].shortname)
-a2silentype
-[MAME]> print(manager.machine.devices[":sl1:silentype"].memregion)
-function: 0x56245c037fa0
-[MAME]> print(manager.machine.devices[":sl1:silentype"]:memregion())
-nil
-[MAME]> print(manager.machine.devices[":sl1:silentype"]:membank())
-nil
-[MAME]> print(manager.machine.devices[":sl1:silentype"].subtag())
-error: 	[string "..."]:2: sol: received nil for 'self' argument (use ':' for accessing member functions, make sure member variables are preceeded by the actual object with '.' syntax)
-[MAME]> print(manager.machine.devices[":sl1:silentype"]:subtag())
-:sl1:silentype
-[MAME]> print(manager.machine.devices[":sl1:silentype"]:siblingtag())
-:sl1
-*/
-
-
 std::string bitmap_printer_device::simplename()
 {
         device_t * dev;
@@ -268,7 +227,6 @@ std::string bitmap_printer_device::simplename()
         }
         return s;
 }
-
 
 device_t* bitmap_printer_device::getrootdev()
 {

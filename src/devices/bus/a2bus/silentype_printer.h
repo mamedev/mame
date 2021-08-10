@@ -86,9 +86,11 @@ private:
 
 	int wrap(int x, int mod) {if (x<0) return (x + ((-1 * (x / mod)) + 1) * mod) % mod; else return x % mod;}
 	u8 bitswap(u16 val, u8 a, u8 b);
+	u8 bitpattern(u16 val, u8 a, u8 b, u8 c, u8 d);
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, unsigned int& pixel);
-int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern);
+	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern);
+	s32 ypos_coord(s32 ypos) { return ypos * 7 / 4 / 2; }
 };
 
 DECLARE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device)

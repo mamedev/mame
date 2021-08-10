@@ -120,8 +120,8 @@ void silentype_printer_device::device_add_mconfig(machine_config &config)
 */	
 	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, 0));
 	
-	STEPPER(config, m_pf_stepper, (uint8_t)1);
-	STEPPER(config, m_cr_stepper, (uint8_t)1);
+	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
+	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
 
 }
 
@@ -250,7 +250,7 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 		adjust_headtemp( BIT(lastheadbits,i), time_elapsed,  headtemp[i] );
 
 		int xpixel = (m_xpos/2) + ((xdirection == 1) ? right_offset : left_offset);
-		int ypixel = ((m_ypos/2) * 7 / 4) + (6 - i);
+		int ypixel = ypos_coord(m_ypos) + (6 - i);
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
@@ -272,6 +272,18 @@ u8 silentype_printer_device::bitswap(u16 val, u8 a, u8 b)
 	return (val & ~( (1 << a) | (1 << b) ) ) | 
 			(bita << b) | (bitb << a);
 }
+
+
+
+u8 silentype_printer_device::bitpattern(u16 val, u8 a, u8 b, u8 c, u8 d)
+{ 
+	u8 bita = BIT(val,3); 
+	u8 bitb = BIT(val,2);
+	u8 bitc = BIT(val,1);
+	u8 bitd = BIT(val,0);
+	return 	(bita << a) | (bitb << b)| (bitc << c)| (bitd << d);
+}
+
 
 
 /*
@@ -309,7 +321,10 @@ int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uin
 {
 	int lastpos = stepper->get_absolute_position();	
 
-	stepper->update(bitswap(pattern, 1, 2));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
+//	stepper->update(bitswap(pattern, 1, 2));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
+
+	stepper->update(bitpattern(pattern, 3, 1, 2, 0));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
+
 
 	int delta = stepper->get_absolute_position() - lastpos;
 
@@ -334,13 +349,13 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 		{
 			m_ypos = 10;  // lock to the top of page until we seek horizontally
 		}
-		if (m_ypos * 7 / 4 > m_bitmap_printer->get_m_lp_bitmap().height() - 50)  // i see why it's failing
+		if (ypos_coord(m_ypos) > m_bitmap_printer->get_m_lp_bitmap().height() - 50)  // i see why it's failing
 			// if we are within 50 pixels of the bottom of the page we will
 			// write the page to a file, then erase the top part of the page
 			// so we can still see the last page printed.
 		{
 			// clear paper to bottom from current position
-			m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
+			m_bitmap_printer->bitmap_clear_band(ypos_coord(m_ypos) + 7, PAPER_HEIGHT - 1, rgb_t::white());
 
 			// save a snapshot with the slot and page as part of the filename
 			m_bitmap_printer->write_snapshot_to_file(
@@ -358,7 +373,7 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 			m_ypos = 10;
 		}
 		// clear page down to visible area
-		m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4 + distfrombottom, std::min(m_ypos * 7 / 4 + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
+		m_bitmap_printer->bitmap_clear_band(ypos_coord(m_ypos) + distfrombottom, std::min(ypos_coord(m_ypos) + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
 
 	}
 	else if (delta < 0) // we are moving up the page
@@ -367,7 +382,7 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
 	}
 
-	m_bitmap_printer->setheadpos(m_xpos/2, m_ypos/(7.0/4));
+	m_bitmap_printer->setheadpos(m_xpos / 2, ypos_coord(m_ypos));
 }
 
 //-------------------------------------------------
@@ -395,6 +410,6 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 		}
 	}
 
-	m_bitmap_printer->setheadpos(m_xpos/2, m_ypos/(7.0/4));
+	m_bitmap_printer->setheadpos(m_xpos / 2, ypos_coord(m_ypos));
 }
 
