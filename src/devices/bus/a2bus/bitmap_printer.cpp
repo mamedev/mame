@@ -90,11 +90,11 @@ bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, cons
 
 void bitmap_printer_device::device_start()
 {
-	time(&m_lp_session_time);  // initialize session time
+	time(&m_session_time);  // initialize session time
 	initprintername();
 	
-	m_lp_bitmap->allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
-	m_lp_bitmap->fill(0xffffff); // Start with a white piece of paper
+	m_bitmap->allocate(PAPER_WIDTH,PAPER_HEIGHT);  // try 660 pixels for 11 inch long
+	m_bitmap->fill(0xffffff); // Start with a white piece of paper
 
 
 /*	save_item(NAME(m_bitmap));
@@ -134,7 +134,7 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 	int scrolly = bitmap.height() - distfrombottom - m_ypos;
 
-	copyscrollbitmap(bitmap, *m_lp_bitmap, 0, nullptr, 1, &scrolly, cliprect);
+	copyscrollbitmap(bitmap, *m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
 	bitmap.plot_box(0, bitmap.height() - distfrombottom - m_ypos, PAPER_WIDTH, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
@@ -148,7 +148,7 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 void bitmap_printer_device::bitmap_clear_band(int from_line, int to_line, u32 color)
 {
 //	printf("clear band (%d,%d)\n",from_line,to_line);
-	m_lp_bitmap->plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
+	m_bitmap->plot_box(0, from_line, PAPER_WIDTH, to_line - from_line + 1, color);
 }
 
 void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
@@ -170,7 +170,7 @@ void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::s
 		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
 
 		// save the paper into a png
-		util::png_write_bitmap(file, nullptr, *m_lp_bitmap, 2, png_palette);
+		util::png_write_bitmap(file, nullptr, *m_bitmap, 2, png_palette);
 	}
 }
 
@@ -197,7 +197,7 @@ std::string bitmap_printer_device::sessiontime()
 {
         struct tm *info;
         char buffer[80];
-        info = localtime( &m_lp_session_time );
+        info = localtime( &m_session_time );
         strftime(buffer,120,"%Y-%m-%d %H-%M-%S", info);
         return std::string(buffer);
 }

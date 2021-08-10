@@ -31,39 +31,34 @@ protected:
 
 private:
 
-	uint8_t *m_rom;
-	uint8_t m_ram[256];
-
-//	bitmap_rgb32 m_bitmap;
-
 	int m_xpos = 250;
 	int m_ypos = 0;
 
 	required_device<screen_device> m_screen;
 	
-	bitmap_rgb32 m_lp_internal_bitmap;  // pointer to bitmap
-	bitmap_rgb32 *m_lp_bitmap = &m_lp_internal_bitmap;  // pointer to bitmap  use internal bitmap by default
+	bitmap_rgb32 m_internal_bitmap;  // pointer to bitmap
+	bitmap_rgb32 *m_bitmap = &m_internal_bitmap;  // pointer to bitmap  use internal bitmap by default
 public:
-	bitmap_rgb32& get_m_lp_bitmap(){ return *m_lp_bitmap; }
+	bitmap_rgb32& get_bitmap(){ return *m_bitmap; }
 private:
       	
-	std::string m_lp_luaprintername;
-    std::string m_lp_snapshotdir;
-    time_t m_lp_session_time;
+	std::string m_printername;
+    std::string m_snapshotdir;
+    time_t m_session_time;
 	
-	int m_lp_pagecount;  // page count
-	int m_lp_pagelimit = 0;  // limit on pages (0 = no limit)
-	int m_lp_printheadcolor       = 0xEEE8AA;
-	int m_lp_printheadbordercolor = 0xBDB76B;
-	int m_lp_printheadbordersize = 5;
-	int m_lp_printheadxsize = 15;
-	int m_lp_printheadysize = 30;
-	int m_lp_distfrombottom = 50;  // print head position from bottom of screen
-	int m_lp_clearlinepos = 0;
-//	int m_lp_papercolor=0xffffff;
-	int m_lp_pagedirty = 0;
-	int m_lp_paperwidth;
-	int m_lp_paperheight;
+	int m_pagecount;  // page count
+	int m_pagelimit = 0;  // limit on pages (0 = no limit)
+	int m_printheadcolor       = 0xEEE8AA;
+	int m_printheadbordercolor = 0xBDB76B;
+	int m_printheadbordersize = 5;
+	int m_printheadxsize = 15;
+	int m_printheadysize = 30;
+	int m_distfrombottom = 50;  // print head position from bottom of screen
+	int m_clearlinepos = 0;
+//	int m_papercolor=0xffffff;
+	int m_pagedirty = 0;
+	int m_paperwidth;
+	int m_paperheight;
 
  private:
 	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -83,36 +78,29 @@ public:
 public:
 
 
-//	void drawpixel(int x, int y, int pixelval);
-//	int getpixel(int x, int y);
+	void drawpixel(int x, int y, int pixelval)
+	{
+		y += m_paperheight;
+		m_bitmap->pix(y,x) = pixelval;
 
-void drawpixel(int x, int y, int pixelval)
-{
-	y += m_lp_paperheight;
-//	m_lp_bitmap->pix32(y,x) = pixelval;
-	m_lp_bitmap->pix(y,x) = pixelval;
+		m_pagedirty = 1;
+	};
 
-	m_lp_pagedirty = 1;
-};
+	int getpixel(int x, int y)
+	{
+		y += m_paperheight;
+		return m_bitmap->pix(y,x);
+	};
 
-int getpixel(int x, int y)
-{
-	y += m_lp_paperheight;
-//	return m_lp_bitmap->pix32(y,x);
-	return m_lp_bitmap->pix(y,x);
-};
+	unsigned int& pix(int y, int x)    // reversed y x
+	{
+		//	y += m_paperheight;
 
-//unsigned int& pix(int x, int y)
-unsigned int& pix(int y, int x)    // reversed y x
-{
-//	y += m_lp_paperheight;
+		if (y>=m_bitmap->height()) y = 0;
+		if (x>=m_bitmap->width()) x = 0;
 
-	if (y>=m_lp_bitmap->height()) y = 0;
-	if (x>=m_lp_bitmap->width()) x = 0;
-
-	return m_lp_bitmap->pix(y,x);
-};
-
+		return m_bitmap->pix(y,x);
+	};
 
 	void setheadpos(int x, int y){m_xpos = x; m_ypos=y;}
 
@@ -125,21 +113,11 @@ unsigned int& pix(int y, int x)    // reversed y x
     std::string sessiontime();
     std::string tagname();
     std::string simplename();
-    void setprintername(std::string name){ m_lp_luaprintername = name; }
-    std::string getprintername(){ return m_lp_luaprintername; }
-    void initprintername(){ 
-    	//setprintername(sessiontime()+std::string(" ")+tagname());
-    	setprintername(sessiontime()+std::string(" ")+simplename());  
-    }
+    void setprintername(std::string name){ m_printername = name; }
+    std::string getprintername(){ return m_printername; }
+    void initprintername(){ setprintername(sessiontime()+std::string(" ")+simplename()); }
 
-//	std::string padzeroes( std::string s, int len) { return std::string(len -s.length(), '0').append(s); }
-	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
-
-//    void initluaprinter(bitmap_rgb32 &mybitmap);
-//  void setsnapshotdir(std::string dir){ m_lp_snapshotdir = dir; };
-//   std::string getsnapshotdir(std::string dir){ return m_lp_snapshotdir; };
-
-    
+	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }    
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)

@@ -349,7 +349,7 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 		{
 			m_ypos = 10;  // lock to the top of page until we seek horizontally
 		}
-		if (ypos_coord(m_ypos) > m_bitmap_printer->get_m_lp_bitmap().height() - 50)  // i see why it's failing
+		if (ypos_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
 			// if we are within 50 pixels of the bottom of the page we will
 			// write the page to a file, then erase the top part of the page
 			// so we can still see the last page printed.
