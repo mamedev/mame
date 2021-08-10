@@ -355,16 +355,44 @@ u8 silentype_printer_device::bitswap(u16 val, u8 a, u8 b)
 }
 
 
+/*
+//Standard drive table in steppers.cpp is 2,6,4,5,1,9,8,a
+
+abcd
+0010      c
+0110     bc
+0100     b
+0101     b d
+0001       d
+1001    a  d
+1000    a
+1010    a c
+
+SILENTYPE STEPPER WINDING TABLE: 3,2,6,4,c,8,9,1
+
+                 swap 0 3          reversing bit pattern is opposite direction  
+0011  3           1010  a           1100  c
+0010  2           0010  2           0100  4
+0110  6           0110  6           0110  6
+0100  4           0100  4           0010  2
+1100  c           0101  5           0011  3
+1000  8           0001  1           0001  1
+1001  9           1001  9           1001  9
+0001  1           1000  8           1000  8
+
+*/
 
 int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern)
 {
 	int lastpos = stepper->get_absolute_position();	
 
-	stepper->update(bitswap(pattern, 3, 0));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
+//	stepper->update(bitswap(pattern, 3, 0));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
+
+	stepper->update(bitswap(pattern, 1, 2));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
 
 	int delta = stepper->get_absolute_position() - lastpos;
 
-	delta *= -1;  // opposite direction
+//	delta *= -1;  // opposite direction    (also reversing the bit pattern 3210 -> 0123 will give you reversed direction)
 	
 	return delta;
 }
@@ -485,7 +513,7 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 */	
 	int delta = update_stepper_delta(m_cr_stepper, hstepper);
 	
-	printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
+//	printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
 	
 	if (delta != 0)
 	{
