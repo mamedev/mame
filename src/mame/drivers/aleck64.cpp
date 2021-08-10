@@ -208,7 +208,8 @@ private:
 
 	void e90_map(address_map &map);
 	void n64_map(address_map &map);
-	void rsp_map(address_map &map);
+	void rsp_imem_map(address_map &map);
+	void rsp_dmem_map(address_map &map);
 	optional_shared_ptr<uint32_t> m_e90_vram;
 	optional_shared_ptr<uint32_t> m_e90_pal;
 
@@ -380,12 +381,14 @@ void aleck64_state::e90_map(address_map &map)
 	map(0xd0030000, 0xd003001f).rw(FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
 }
 
-void aleck64_state::rsp_map(address_map &map)
+void aleck64_state::rsp_imem_map(address_map &map)
+{
+	map(0x00000000, 0x00000fff).ram().share("rsp_imem");
+}
+
+void aleck64_state::rsp_dmem_map(address_map &map)
 {
 	map(0x00000000, 0x00000fff).ram().share("rsp_dmem");
-	map(0x00001000, 0x00001fff).ram().share("rsp_imem");
-	map(0x04000000, 0x04000fff).ram().share("rsp_dmem");
-	map(0x04001000, 0x04001fff).ram().share("rsp_imem");
 }
 
 static INPUT_PORTS_START( aleck64 )
@@ -1044,8 +1047,8 @@ void aleck64_state::aleck64(machine_config &config)
 	m_rsp->sp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_r));
 	m_rsp->sp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_w));
 	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
-	m_rsp->set_addrmap(AS_PROGRAM, &aleck64_state::rsp_map);
-	m_rsp->set_force_no_drc(true);
+	m_rsp->set_addrmap(AS_PROGRAM, &aleck64_state::rsp_imem_map);
+	m_rsp->set_addrmap(AS_DATA, &aleck64_state::rsp_dmem_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
