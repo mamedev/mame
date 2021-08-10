@@ -260,91 +260,10 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 	lastheadbits = headbits;
 }
 
+
 //-------------------------------------------------
-//    Update Paper Stepper
+//    Bitswap routine
 //-------------------------------------------------
-/*
-void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
-{
-	int halfstepflag;
-	const int drivetable[4]    = {3, 9, 12, 6};
-	const int halfsteptable[4] = {2, 4, 8, 1};
-
-	if (vstepper != 0)
-	{
-		for(int i = 0; i < 4; i++)
-		{
-			if (drivetable[i] == vstepperlast) // scan table until we match index
-			{
-				if (drivetable[wrap(i + 1, 4)] == vstepper) // we are moving down the page
-				{
-//					printf("moving down\n");
-					m_ypos += 1; // move down
-
-					if (newpageflag == 1)
-					{
-						m_ypos = 10;  // lock to the top of page until we seek horizontally
-					}
-//					if (m_ypos * 7 / 4 > m_bitmap.height() - 50)  // i see why it's failing
-					if (m_ypos * 7 / 4 > m_bitmap_printer->get_m_lp_bitmap().height() - 50)  // i see why it's failing
-						// if we are within 50 pixels of the bottom of the page we will
-						// write the page to a file, then erase the top part of the page
-						// so we can still see the last page printed.
-					{
-
-						// clear paper to bottom from current position
-						m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4, PAPER_HEIGHT - 1, rgb_t::white());
-
-//	printf("Silentype Device Tag = %s\n",this->device().tag());
-
-	printf("Silentype Device Tag = %s\n",tag());
-//	printf("Silentype Device Tag = %s\n",device().tag());
-//	printf("Silentype Owner Tag = %s\n",device().owner()->tag());
-
-
-						// save a snapshot with the slot and page as part of the filename
-						m_bitmap_printer->write_snapshot_to_file(
-//						write_snapshot_to_file(
-									std::string("silentype"),
-									std::string("silentype_") +
-//                                  std::string("_slot") + std::to_string(slotno()) +
-//								  std::string("_slot") +
-//                                std::to_string(((a2bus_silentype_device *) (this->owner()))->get_slotno()) +
-//								  std::to_string( static_cast<a2bus_silentype_device *> (this->owner()) -> get_slotno() ) +
-									m_bitmap_printer->getprintername() + 
-									" page_" + 
-									m_bitmap_printer->padzeroes(std::to_string(page_count++),3) + 
-//									std::to_string(page_count++) + 
-									".png");
-
-						newpageflag = 1;
-						// clear page down to visible area, starting from the top of page
-						m_bitmap_printer->bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
-
-						m_ypos = 10;
-					}
-					// clear page down to visible area
-					m_bitmap_printer->bitmap_clear_band(m_ypos * 7 / 4 + distfrombottom, std::min(m_ypos * 7 / 4 + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
-
-				}
-				else if (drivetable[wrap(i - 1, 4)] == vstepper) // we are moving up the page
-				{
-					m_ypos -= 1;
-					if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
-				}
-			}
-		} // end for
-
-		// ignore half steps
-		halfstepflag=0;
-		for (int i = 0; i < 4; i++) if (halfsteptable[i] == vstepper) halfstepflag = 1;
-
-		if (!halfstepflag) vstepperlast = vstepper; // update the vstepperlast ignoring half steps
-	}
-	m_bitmap_printer->setheadpos(m_xpos,m_ypos);
-}
-*/
-
 
 u8 silentype_printer_device::bitswap(u16 val, u8 a, u8 b)
 { 
@@ -382,6 +301,10 @@ SILENTYPE STEPPER WINDING TABLE: 3,2,6,4,c,8,9,1
 
 */
 
+//-------------------------------------------------
+//    Update Stepper and return delta
+//-------------------------------------------------
+
 int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern)
 {
 	int lastpos = stepper->get_absolute_position();	
@@ -395,7 +318,9 @@ int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uin
 	return delta;
 }
 
-
+//-------------------------------------------------
+//    Update Paper Feed Stepper
+//-------------------------------------------------
 
 void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 {
@@ -445,49 +370,9 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 	m_bitmap_printer->setheadpos(m_xpos/2, m_ypos/(7.0/4));
 }
 
-
-
 //-------------------------------------------------
 //    Update Carriage Stepper
 //-------------------------------------------------
-
-/*
-void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
-{
-	int halfstepflag;
-	const int drivetable[4]    = {3, 9, 12, 6};
-	const int halfsteptable[4] = {2, 4, 8, 1};
-
-	if (hstepper != 0)
-	{
-		newpageflag = 0;
-
-		for(int i = 0; i < 4; i++)
-		{
-			if (drivetable[i] == hstepperlast) // scan table until we match index
-			{
-				if (drivetable[wrap(i + 1, 4)] == hstepper)
-				{
-					m_xpos += 1; xdirection = 1;
-				}
-				else if (drivetable[wrap(i - 1, 4)] == hstepper)
-				{
-					m_xpos -= 1; xdirection = -1;
-					if (m_xpos < 0) m_xpos = 0;
-				}
-			}
-		} // end for
-
-		// ignore half steps
-		halfstepflag = 0;
-		for (int i = 0; i < 4; i++) if (halfsteptable[i] == hstepper) halfstepflag = 1;
-
-		if (!halfstepflag) hstepperlast = hstepper; // update the hstepperlast ignoring half steps
-	}
-	m_bitmap_printer->setheadpos(m_xpos,m_ypos);
-}
-*/
-
 
 void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 {
