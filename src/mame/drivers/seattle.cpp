@@ -2118,7 +2118,7 @@ void seattle_state::wg3dh(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
-	m_ioasic->set_upper(310); // others?
+	m_ioasic->set_upper(310); // no alternates
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2132,7 +2132,7 @@ void seattle_state::mace(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
-	m_ioasic->set_upper(319); // others?
+	m_ioasic->set_upper(319); // or 314
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2161,7 +2161,7 @@ void seattle_state::sfrushrk(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
-	m_ioasic->set_upper(331); // others?
+	m_ioasic->set_upper(331); // no alternates
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
@@ -2182,7 +2182,7 @@ void seattle_state::calspeed(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
-	m_ioasic->set_upper(328); // others?
+	m_ioasic->set_upper(328); // 328 = 27"; may or may not have a 31" ID
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
@@ -2197,7 +2197,7 @@ void seattle_state::vaportrx(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_VAPORTRX);
-	m_ioasic->set_upper(324); // 334? unknown
+	m_ioasic->set_upper(324); // or 334
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2211,7 +2211,7 @@ void seattle_state::biofreak(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
-	m_ioasic->set_upper(231); // unknown
+	m_ioasic->set_upper(231); // no alternates
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2272,7 +2272,7 @@ void seattle_state::carnevil(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
-	m_ioasic->set_upper(469); // or 486 or 528
+	m_ioasic->set_upper(469); // 469 = 25"; 486 = 39";
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2286,7 +2286,7 @@ void seattle_state::hyprdriv(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
-	m_ioasic->set_upper(471); // others?
+	m_ioasic->set_upper(471); // 471 = 25"; 479 = 31"
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
