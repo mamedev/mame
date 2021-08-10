@@ -408,17 +408,38 @@ private:
 	uint16_t egc_color_pat(int plane) const;
 };
 
+class pc9801us_state : public pc9801_state
+{
+public:
+	pc9801us_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9801_state(mconfig, type, tag)
+	{
+	}
+	void pc9801us(machine_config &config);
+
+protected:
+	void pc9801us_io(address_map &map);
+
+	DECLARE_MACHINE_START(pc9801us);
+
+private:
+	// SDIP, PC9801DA onward
+	uint8_t m_sdip[24], m_sdip_bank;
+	template<unsigned port> u8 sdip_r(offs_t offset);
+	template<unsigned port> void sdip_w(offs_t offset, u8 data);
+};
+
 /**********************************************************
  *
- * BX class
+ * BX class ("98Fellow")
  *
  **********************************************************/
 
-class pc9801bx_state : public pc9801_state
+class pc9801bx_state : public pc9801us_state
 {
 public:
 	pc9801bx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc9801_state(mconfig, type, tag)
+		: pc9801us_state(mconfig, type, tag)
 	{
 	}
 
@@ -431,11 +452,6 @@ protected:
 	DECLARE_MACHINE_START(pc9801bx2);
 
 private:
-	// SDIP, PC9801DA onward
-	uint8_t m_sdip[24], m_sdip_bank;
-	template<unsigned port> u8 sdip_r(offs_t offset);
-	template<unsigned port> void sdip_w(offs_t offset, u8 data);
-	
 	u8 i486_cpu_mode_r(offs_t offset);
 	u8 gdc_31kHz_r(offs_t offset);
 	void gdc_31kHz_w(offs_t offset, u8 data);

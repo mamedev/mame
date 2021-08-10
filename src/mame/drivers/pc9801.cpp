@@ -31,9 +31,13 @@
     - Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
     - clean-up duplicate code;
 
+	TODO (PC-9801US):
+	- "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
+	- "SYSTEM SHUTDOWN" after setting the SDIP values;
+
 	TODO (PC-9801BX2)
-	- "system shutdown" at POST, a soft reset fixes it? 
-	- A non-fatal "memory error" is always thrown no matter the RAM size afterwards, related?
+	- "SYSTEM SHUTDOWN" at POST, a soft reset fixes it? 
+	- A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
 	- unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM size;
 
 ===================================================================================================
@@ -993,6 +997,65 @@ void pc9801_state::pc9801rs_io(address_map &map)
 	map(0xe0d0, 0xe0d3).r(FUNC(pc9801_state::midi_r));
 }
 
+// SDIP handling
+// TODO: move to device
+
+template<unsigned port> u8 pc9801us_state::sdip_r(offs_t offset)
+{
+	u8 sdip_offset = port + (m_sdip_bank * 12);
+
+	if (offset == 2)
+		return m_sdip[sdip_offset];
+
+	logerror("Warning: read from unknown SDIP area %02x %04x\n", 
+		offset,
+		0x841c + offset + (sdip_offset % 12) * 0x100
+	);
+	return 0xff;
+}
+
+template<unsigned port> void pc9801us_state::sdip_w(offs_t offset, u8 data)
+{
+	u8 sdip_offset = port + (m_sdip_bank * 12);
+
+	if (offset == 2)
+	{
+		m_sdip[sdip_offset] = data;
+		return;
+	}
+
+	// TODO: depending on model type this is hooked up differently
+	// (or be not hooked up at all like in 9801US case)
+	if(offset == 3 && port == 0xb)
+	{
+		m_sdip_bank = (data & 0x40) >> 6;
+		return;
+	}
+	
+	logerror("Warning: write from unknown SDIP area %02x %04x %02x\n",
+		port,
+		0x841c + port + (sdip_offset % 12) * 0x100,
+		data
+	);
+}
+
+void pc9801us_state::pc9801us_io(address_map &map)
+{
+	pc9801rs_io(map);
+	map(0x841c, 0x841f).rw(FUNC(pc9801bx_state::sdip_r<0x0>), FUNC(pc9801bx_state::sdip_w<0x0>));
+	map(0x851c, 0x851f).rw(FUNC(pc9801bx_state::sdip_r<0x1>), FUNC(pc9801bx_state::sdip_w<0x1>));
+	map(0x861c, 0x861f).rw(FUNC(pc9801bx_state::sdip_r<0x2>), FUNC(pc9801bx_state::sdip_w<0x2>));
+	map(0x871c, 0x871f).rw(FUNC(pc9801bx_state::sdip_r<0x3>), FUNC(pc9801bx_state::sdip_w<0x3>));
+	map(0x881c, 0x881f).rw(FUNC(pc9801bx_state::sdip_r<0x4>), FUNC(pc9801bx_state::sdip_w<0x4>));
+	map(0x891c, 0x891f).rw(FUNC(pc9801bx_state::sdip_r<0x5>), FUNC(pc9801bx_state::sdip_w<0x5>));
+	map(0x8a1c, 0x8a1f).rw(FUNC(pc9801bx_state::sdip_r<0x6>), FUNC(pc9801bx_state::sdip_w<0x6>));
+	map(0x8b1c, 0x8b1f).rw(FUNC(pc9801bx_state::sdip_r<0x7>), FUNC(pc9801bx_state::sdip_w<0x7>));
+	map(0x8c1c, 0x8c1f).rw(FUNC(pc9801bx_state::sdip_r<0x8>), FUNC(pc9801bx_state::sdip_w<0x8>));
+	map(0x8d1c, 0x8d1f).rw(FUNC(pc9801bx_state::sdip_r<0x9>), FUNC(pc9801bx_state::sdip_w<0x9>));
+	map(0x8e1c, 0x8e1f).rw(FUNC(pc9801bx_state::sdip_r<0xa>), FUNC(pc9801bx_state::sdip_w<0xa>));
+	map(0x8f1c, 0x8f1f).rw(FUNC(pc9801bx_state::sdip_r<0xb>), FUNC(pc9801bx_state::sdip_w<0xb>));
+}
+
 void pc9801bx_state::pc9801bx2_map(address_map &map)
 {
 	pc9801rs_map(map);
@@ -1025,7 +1088,7 @@ u8 pc9801bx_state::i486_cpu_mode_r(offs_t offset)
  *
  * x--- ---- unknown, if set high then DAC1BIT goes berserk at POST.
  * ---- --xx (R/W) horizontal frequency
- * ---- --1x ^ setting prohibited (?)
+ * ---- --1x ^ "setting prohibited" (?)
  * ---- --01 ^ 31.47kHz
  * ---- --00 ^ 24.83kHz
  *
@@ -1043,60 +1106,11 @@ void pc9801bx_state::gdc_31kHz_w(offs_t offset, u8 data)
 //		popmessage("31kHz register set %02x, contact MAMEdev", data);
 }
 
-template<unsigned port> u8 pc9801bx_state::sdip_r(offs_t offset)
-{
-	u8 sdip_offset = port + (m_sdip_bank * 12);
-
-	if (offset == 2)
-		return m_sdip[sdip_offset];
-
-	logerror("Warning: read from unknown SDIP area %02x %04x\n", 
-		offset,
-		0x841c + offset + (sdip_offset % 12) * 0x100
-	);
-	return 0xff;
-}
-
-template<unsigned port> void pc9801bx_state::sdip_w(offs_t offset, u8 data)
-{
-	u8 sdip_offset = port + (m_sdip_bank * 12);
-
-	if (offset == 2)
-	{
-		m_sdip[sdip_offset] = data;
-		return;
-	}
-
-	if(offset == 3 && port == 0xb)
-	{
-		m_sdip_bank = (data & 0x40) >> 6;
-		return;
-	}
-	
-	logerror("Warning: write from unknown SDIP area %02x %04x %02x\n",
-		port,
-		0x841c + port + (sdip_offset % 12) * 0x100,
-		data
-	);
-}
-
 void pc9801bx_state::pc9801bx2_io(address_map &map)
 {
-	pc9801rs_io(map);
+	pc9801us_io(map);
 	map(0x0534, 0x0534).r(FUNC(pc9801bx_state::i486_cpu_mode_r));
 	map(0x09a8, 0x09a8).rw(FUNC(pc9801bx_state::gdc_31kHz_r), FUNC(pc9801bx_state::gdc_31kHz_w));
-	map(0x841c, 0x841f).rw(FUNC(pc9801bx_state::sdip_r<0x0>), FUNC(pc9801bx_state::sdip_w<0x0>));
-	map(0x851c, 0x851f).rw(FUNC(pc9801bx_state::sdip_r<0x1>), FUNC(pc9801bx_state::sdip_w<0x1>));
-	map(0x861c, 0x861f).rw(FUNC(pc9801bx_state::sdip_r<0x2>), FUNC(pc9801bx_state::sdip_w<0x2>));
-	map(0x871c, 0x871f).rw(FUNC(pc9801bx_state::sdip_r<0x3>), FUNC(pc9801bx_state::sdip_w<0x3>));
-	map(0x881c, 0x881f).rw(FUNC(pc9801bx_state::sdip_r<0x4>), FUNC(pc9801bx_state::sdip_w<0x4>));
-	map(0x891c, 0x891f).rw(FUNC(pc9801bx_state::sdip_r<0x5>), FUNC(pc9801bx_state::sdip_w<0x5>));
-	map(0x8a1c, 0x8a1f).rw(FUNC(pc9801bx_state::sdip_r<0x6>), FUNC(pc9801bx_state::sdip_w<0x6>));
-	map(0x8b1c, 0x8b1f).rw(FUNC(pc9801bx_state::sdip_r<0x7>), FUNC(pc9801bx_state::sdip_w<0x7>));
-	map(0x8c1c, 0x8c1f).rw(FUNC(pc9801bx_state::sdip_r<0x8>), FUNC(pc9801bx_state::sdip_w<0x8>));
-	map(0x8d1c, 0x8d1f).rw(FUNC(pc9801bx_state::sdip_r<0x9>), FUNC(pc9801bx_state::sdip_w<0x9>));
-	map(0x8e1c, 0x8e1f).rw(FUNC(pc9801bx_state::sdip_r<0xa>), FUNC(pc9801bx_state::sdip_w<0xa>));
-	map(0x8f1c, 0x8f1f).rw(FUNC(pc9801bx_state::sdip_r<0xb>), FUNC(pc9801bx_state::sdip_w<0xb>));
 }
 
 uint16_t pc9801_state::timestamp_r(offs_t offset)
@@ -1755,11 +1769,18 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	m_sys_type = 0x80 >> 6;
 }
 
-MACHINE_START_MEMBER(pc9801bx_state,pc9801bx2)
+MACHINE_START_MEMBER(pc9801us_state,pc9801us)
 {
 	MACHINE_START_CALL_MEMBER(pc9801rs);
 
 	save_pointer(NAME(m_sdip), 24);
+}
+
+MACHINE_START_MEMBER(pc9801bx_state,pc9801bx2)
+{
+	MACHINE_START_CALL_MEMBER(pc9801us);
+
+	// ...
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
@@ -2088,7 +2109,7 @@ void pc9801_state::pc9801(machine_config &config)
 
 void pc9801_state::pc9801rs(machine_config &config)
 {
-	I386SX(config, m_maincpu, MAIN_CLOCK_X1*8); // unknown clock.
+	I386SX(config, m_maincpu, MAIN_CLOCK_X1*8); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801rs_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801rs_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -2154,6 +2175,18 @@ void pc9801_state::pc9801vx(machine_config &config)
 	// GDC & EGC, DAC1BIT built-in
 	// Either 2x 5.25 or 2x 3.5 internal floppy drives
 	// 4x C-Bus slots (3x plus 1x dedicated RAM?)
+}
+
+void pc9801us_state::pc9801us(machine_config &config)
+{
+	pc9801rs(config);
+	I386SX(config.replace(), m_maincpu, MAIN_CLOCK_X1*8); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801us_state::pc9801rs_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801us_state::pc9801us_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:0", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:1", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
 }
 
 void pc9801bx_state::pc9801bx2(machine_config &config)
@@ -2304,7 +2337,7 @@ ROM_START( pc9801vx )
 	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll03.bin", 0x00001, 0x08000, CRC(33605ae3) SHA1(f644ff15c54c8568e643324f38aa3b6211912af0) )
 	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll02.bin", 0x10000, 0x08000, CRC(948f8658) SHA1(674378d4e90fee715ccfdd49378cd5c2fe8d7f62) )
 	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll04.bin", 0x10001, 0x08000, CRC(2ce2101b) SHA1(2158d022d5424daf6981bf4da0ab9613bf9646f5) )
-	
+
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	ROM_COPY( "biosrom", 0x18000, 0x10000, 0x08000 )  //ITF ROM
 	ROM_COPY( "biosrom", 0x08000, 0x18000, 0x08000 )  //BIOS ROM
@@ -2333,6 +2366,35 @@ ROM_START( pc9801ux )
 	LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
 ROM_END
+
+/*
+US - i386SX @ 16 MHz
+*/
+
+ROM_START( pc9801us )
+	ROM_REGION16_LE( 0x80000, "biosrom", ROMREGION_ERASEFF )
+    ROM_LOAD( "lrh8a00.bin",  0x000000, 0x080000, CRC(a86d8cdb) SHA1(01c805274ca943c1febedda5ad85ba532aac949c) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// 0x0c000-0x0ffff sound ROM BIOS
+	// 0x10000-0x13fff ^ mirror
+	// 0x14000-0x17fff <empty>
+	// 0x18000-0x191ff unknown, disk BIOS?
+	// 0x20000-0x27fff ITF ROM
+	// 0x40000-0x7ffff <empty>
+	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )  //ITF ROM
+	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x08000 )  //BIOS ROM
+	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x38000, 0x28000, 0x08000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
+
+	LOAD_KANJI_ROMS
+	// SASI HDDs
+//  LOAD_IDE_ROM
+ROM_END
+
 
 /*
 RX - 80286 12 (no V30?)
@@ -2590,6 +2652,8 @@ COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9
 COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // DA class (i386SX + SDIP and EMS)
 // ...
+// UF/UR/US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
+COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // FA class (i486SX)
 // ...
 // BX class (official nickname "98 FELLOW", last releases prior to 9821 line)
