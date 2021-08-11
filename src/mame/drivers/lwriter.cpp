@@ -378,7 +378,7 @@ void lwriter_state::fifo_out_w(uint8_t data)
  * 1 - print sbsy
  * 2 - ?
  * 3 - ?
- * 4 - some print thing
+ * 4 - print vsreq
  * 5 - switch setting low
  * 6 - switch setting high
  * 7 - print (STATUS/COMMAND Message Line)
@@ -411,13 +411,23 @@ WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
 	logerror(" VIA: CA2 written with %d!\n", state);
 }
 
+/* via port b bits:
+ * 0 - ?
+ * 1 - print rdy
+ * 2 - print pprdy
+ * 3 - overlay
+ * 4 -
+ * 5 -
+ * 6 - timer 2 clk
+ * 7 - print related timing thing
+ */
 uint8_t lwriter_state::via_pb_r()
 {
 	logerror(" VIA: Port B read!\n");
 	return 0xFB;
 }
 
-// The 3rd bit is used for talking with the print controller
+// The 3rd bit (PPRDY) is used for talking with the print controller
 // and is inverted on II NT
 uint8_t lwriter_state::via_pb_lw2nt_r()
 {
