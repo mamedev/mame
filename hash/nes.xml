@@ -79371,10 +79371,6 @@ be better to redump them properly. -->
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<dipswitch name="Menu type" tag="DSW" mask="1">
-				<dipvalue name="20-in-1" value="0"/>
-				<dipvalue name="4-in-1" value="1" default="yes"/>
-			</dipswitch>
 		</part>
 	</software>
 
