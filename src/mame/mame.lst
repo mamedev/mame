@@ -43817,16 +43817,16 @@ wavesynth
 simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
 
-@source:gsz80.cpp
+@source:gsz80.cpp               // Grant Searle's Simple Z-80 Machine
 gsz80
 
-@source:gscpm.cpp
+@source:gscpm.cpp               // Grant Searle's Simple CP/M Machine
 gscpm
 
-@source:gs6502.cpp
+@source:gs6502.cpp              // Grant Searle's Simple 6502 Machine
 gs6502
 
-@source:gs6809.cpp
+@source:gs6809.cpp              // Grant Searle's Simple 6809 Machine
 gs6809
 
 @source:ultim809.cpp
