@@ -569,10 +569,12 @@ public:
 
 protected:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
 private:
-	u8 m_latch, m_dipsetting;
+	required_ioport m_jumper;
+	u8 m_latch;
 };
 
 

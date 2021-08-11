@@ -87,6 +87,29 @@ DEFINE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device, "nes_bmc_42in1
 DEFINE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device,      "nes_bmc_lc160",      "NES Cart BMC Little Com 160 PCB")
 
 
+INPUT_PORTS_START( bmc_8157 )
+	PORT_START("JUMPER")
+	PORT_CONFNAME( 0x01, 0x01, "Menu Type" )
+	PORT_CONFSETTING(    0x00, "20-in-1" )
+	PORT_CONFSETTING(    0x01, "4-in-1" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor nes_bmc_8157_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bmc_8157 );
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
 nes_action52_device::nes_action52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_ACTION52, tag, owner, clock)
 {
@@ -243,7 +266,9 @@ nes_bmc_2751_device::nes_bmc_2751_device(const machine_config &mconfig, const ch
 }
 
 nes_bmc_8157_device::nes_bmc_8157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_BMC_8157, tag, owner, clock), m_latch(0), m_dipsetting(0)
+	: nes_nrom_device(mconfig, NES_BMC_8157, tag, owner, clock)
+	, m_jumper(*this, "JUMPER")
+	, m_latch(0)
 {
 }
 
@@ -741,7 +766,6 @@ void nes_bmc_8157_device::device_start()
 {
 	common_start();
 	save_item(NAME(m_latch));
-	save_item(NAME(m_dipsetting));
 }
 
 void nes_bmc_8157_device::pcb_reset()
@@ -751,7 +775,6 @@ void nes_bmc_8157_device::pcb_reset()
 	chr8(0, CHRRAM);
 
 	m_latch = 0;
-	m_dipsetting = 1;    // TODO: there is no way of toggling this yet
 }
 
 void nes_bmc_hik300_device::device_start()
@@ -2015,7 +2038,7 @@ void nes_bmc_2751_device::write_h(offs_t offset, u8 data)
 
  NES 2.0: mapper 301
 
- In MAME: Partially supported.
+ In MAME: Preliminary supported.
 
  TODO: Determine the cause of Contra graphics glitches.
  Is NesDev description of board wrong? It seems b9 = 1
@@ -2044,7 +2067,7 @@ u8 nes_bmc_8157_device::read_h(offs_t offset)
 {
 	LOG_MMC(("bmc_8157 read_h, offset: %04x\n", offset));
 	if (m_latch)
-		offset = (offset & ~0x01) | m_dipsetting;
+		offset = (offset & ~0x01) | m_jumper->read();
 	return hi_access_rom(offset);
 }
 
