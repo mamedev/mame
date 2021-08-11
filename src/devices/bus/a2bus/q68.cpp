@@ -50,7 +50,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2BUS_Q68, a2bus_q68_device, "q68", "Stellation Two Q-68")
-DEFINE_DEVICE_TYPE(A2BUS_Q68PLUS, a2bus_q68plus_device, "q68plus", "Stellation Two Q-68 Plus")
+DEFINE_DEVICE_TYPE(A2BUS_Q68PLUS, a2bus_q68plus_device, "q68", "Stellation Two Q-68 Plus")
 
 void a2bus_q68_device::m68008_mem(address_map &map)
 {
