@@ -79799,7 +79799,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_6gs1" supported="partial">
+	<software name="mc_6gs1">
 		<description>6 in 1 (GK-L01A)</description>
 		<year>19??</year>
 		<publisher>Game Star</publisher>
@@ -79821,7 +79821,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_6gs2" supported="partial">
+	<software name="mc_6gs2">
 		<description>6 in 1 (SuperGK-L02A)</description>
 		<year>19??</year>
 		<publisher>Game Star?</publisher>
@@ -80013,13 +80013,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- This has at least seven 16K NROM games. Perhaps there's a menu in the last 16K bank or it's meant to be reset based? -->
 	<software name="mc_68" supported="no">
 		<description>68 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gka" />
-			<feature name="pcb" value="BMC-GKA" /> <!-- Mapper 57? -->
+			<feature name="slot" value="bmc_gka" /> <!-- FIXME: wrong board! -->
 			<dataarea name="chr" size="65536">
 				<rom name="68-in-1 (1-f1 race meq &amp; 68-maross dli).chr" size="65536" crc="26c744ee" sha1="01af2b2fe5ba33b2de26e6b4fea6f40eddeda3fc" offset="00000" status="baddump" />
 			</dataarea>

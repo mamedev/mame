@@ -396,9 +396,10 @@ class nes_bmc_gka_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_gka_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_gka_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -407,7 +408,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch1, m_latch2;
+	u8 m_reg[2];
 };
 
 
