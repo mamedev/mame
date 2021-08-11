@@ -16,7 +16,7 @@
     IRQ0: ???               (Task 4)
     IRQ1: unused
     IRQ2: ???               Possibly UART? Accesses registers at 0xffe00008...f
-    IRQ3: ???               (Task 5, sound?)
+    IRQ3: Sound             (Task 5)
     IRQ4: Voodoo3           Currently only for User Interrupt Command, maybe a more extensive handler gets installed later?
 
     I2C:  ???               (no task switch) what drives this? network? U13 (ADC838) test fails if I2C doesn't work
@@ -36,6 +36,13 @@
                             0x06-07:    unknown
                             0x08:       unknown mem pointer, task stack pointer?
                             0x0c:       pointer to task PC (also top of stack?)
+
+	Sound:
+	0x00001320:             A flag that's used when sound effects(?) are being played
+	0x00001324:             Pointer to the data cache buffer to be used for loading and mixing BGM/SE.
+	                        Each buffer is 0x800 bytes in size and the game will switch between the two every IRQ3(?).
+	                        The original audio typically seems to be ADPCM which is then decoded and mixed in software.
+	0x00001330:             L/R channel PCM data when a sound effect is played? Seems to be the last result when mixing down buffers.
 
 
     0x00000310:             Global timer 0 IRQ handler
@@ -77,7 +84,7 @@
     - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
 
     Game status:
-        ppp2nd              Boots in-game, no sound or DVD support, crashes when going into song selection screen
+        ppp2nd              Boots in-game, no sound or DVD support
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
         code1d,b            RTC self check bad
         gticlub2,ea         Attract mode works. Coins up. Hangs in car selection.
@@ -286,6 +293,16 @@ Player 2 gun connects to the same pin numbers on the solder side.
 Jurassic Park III also uses 2 additional buttons for escaping left and right. These are wired to buttons on the Jamma
 connector.
 
+Additionally on the 28-WAY connector is...
+Pin 7 parts side       - Serial TX
+Pin 7 solder side      - Serial RX
+Pin 8 solder side      - GND (used by serial)
+
+Pin 9 parts side       - SP_LP (outputs to SP-F, front speaker)
+Pin 9 solder side      - SP_LN
+Pin 9 parts side       - SP_RP (output splits into SP-BL and SP-BR, rear speaker(s))
+Pin 9 solder side      - SP_RN
+
 
 Measurements
 ------------
@@ -355,6 +372,7 @@ some other components. It will be documented at a later date.
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
+#include "sound/dmadac.h"
 #include "video/voodoo_banshee.h"
 #include "emupal.h"
 #include "screen.h"
@@ -385,7 +403,8 @@ public:
 		m_workram(*this, "workram"),
 		m_ds2430_rom(*this, "ds2430"),
 		m_io_ports(*this, "IN%u", 0U),
-		m_io_ppp_sensors(*this, "SENSOR%u", 1U)
+		m_io_ppp_sensors(*this, "SENSOR%u", 1U),
+		m_dmadac(*this, { "dacr", "dacl" })
 	{
 	}
 
@@ -458,6 +477,10 @@ private:
 	uint16_t m_unk_serial_data_r;
 	uint8_t m_unk_serial_regs[0x80];
 	uint64_t m_e00008_data;
+	uint32_t m_sound_buffer_offset;
+	bool m_sound_irq_enabled;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 
 	// MPC8240 EPIC, to be device-ified
 	enum
@@ -574,6 +597,7 @@ private:
 	required_region_ptr<uint8_t> m_ds2430_rom;
 	required_ioport_array<8> m_io_ports;
 	optional_ioport_array<4> m_io_ppp_sensors;
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
 	uint32_t mpc8240_pci_r(int function, int reg, uint32_t mem_mask);
 	void mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
@@ -2074,7 +2098,7 @@ void viper_state::viper_map(address_map &map)
 	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
 	map(0xffe08000, 0xffe08007).noprw();
 	map(0xffe10000, 0xffe10007).r(FUNC(viper_state::input_r));
-	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd lamps
+	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd leds
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0xffe40000, 0xffe4000f).noprw();
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
@@ -2090,6 +2114,7 @@ void viper_state::viper_map(address_map &map)
 void viper_state::viper_ppp_map(address_map &map)
 {
 	viper_map(map);
+	map(0xff400108, 0xff40012f).nopw(); // ppp2nd lamps
 	map(0xff400200, 0xff40023f).r(FUNC(viper_state::ppp_sensor_r));
 }
 
@@ -2287,8 +2312,7 @@ INPUT_PORTS_START( p911 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
 
 	PORT_MODIFY("IN5")
-	// one of these is P2 SHT2 (checks and fails serial if pressed)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // P2 SHT2 (checks and fails serial if pressed)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -2323,8 +2347,37 @@ WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 
 WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
 {
-	if (state)
+	if (state) {
+		// This is a hack.
+		// There's no obvious (to me) trigger for when it's safe to start the audio interrupts, but after testing all of the games that can boot, it's safe to start audio interrupts once pciint is triggering.
+		m_sound_irq_enabled = true;
+
 		mpc8240_interrupt(MPC8240_IRQ4);
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(viper_state::sound_timer_callback)
+{
+	if (!m_sound_irq_enabled) {
+		// If IRQ3 is triggered too soon into the boot process then it'll freeze on the blue boot screen.
+		return;
+	}
+
+	mpc8240_interrupt(MPC8240_IRQ3);
+
+	// Get samples from memory
+	int32_t* samplePtr = (int32_t*)(m_workram + (m_sound_buffer_offset >> 3));
+	for (int i = 0; i < 2; i++) {
+		m_dmadac[i]->transfer(
+			i,
+			1,
+			2,
+			0x800 / 4 / 2, // Each buffer is 0x800 bytes in size, containing stereo 32-bit audio
+			samplePtr
+		);
+	}
+
+	m_sound_buffer_offset ^= 0x800;
 }
 
 void viper_state::machine_start()
@@ -2346,6 +2399,8 @@ void viper_state::machine_start()
 	save_item(NAME(m_unk_serial_data));
 	save_item(NAME(m_unk_serial_data_r));
 	save_item(NAME(m_unk_serial_regs));
+	save_item(NAME(m_sound_buffer_offset));
+	save_item(NAME(m_sound_irq_enabled));
 
 	save_item(NAME(m_ds2430_unk_status));
 	save_item(NAME(m_ds2430_data));
@@ -2398,6 +2453,14 @@ void viper_state::machine_reset()
 	identify_device[51] = 0x0200;           /* 51: PIO data transfer cycle timing mode */
 	identify_device[67] = 0x00f0;           /* 67: minimum PIO transfer cycle time without flow control */
 
+	m_sound_buffer_offset = 0xfff800; // The games swap between 0xfff800 and 0xfff000 every IRQ3 call
+	m_sound_irq_enabled = false;
+
+	for (int i = 0; i < 2; i++) {
+		m_dmadac[i]->set_frequency(44100);
+		m_dmadac[i]->enable(1);
+	}
+
 	m_ds2430_unk_status = 1;
 }
 
@@ -2439,8 +2502,16 @@ void viper_state::viper(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	M48T58(config, "m48t58", 0);
+
+	// Each IRQ3 will update the data buffers with 256 samples, and the playback rate is always 44100hz.
+	// The frequency is picked such that the DMADAC buffer should never overflow or underflow.
+	// Note that adjusting this value has gameplay consequences for ppp2nd: the gameplay's note and animation timings are tied directly to values updated using IRQ3,
+	// so having IRQ3 trigger too quickly or too slowly will mean that the gameplay will either be too fast or too slow.
+	TIMER(config, "sound_timer").configure_periodic(FUNC(viper_state::sound_timer_callback), attotime::from_hz(44100.0 / 256));
 }
 
 void viper_state::viper_ppp(machine_config &config)

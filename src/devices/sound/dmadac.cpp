@@ -38,9 +38,6 @@
 
 void dmadac_sound_device::device_start()
 {
-	/* reset the state */
-	m_volume = 1.0;
-
 	/* allocate a stream channel */
 	m_channel = stream_alloc(0, 1, DEFAULT_SAMPLE_RATE);
 
@@ -49,11 +46,18 @@ void dmadac_sound_device::device_start()
 	save_item(NAME(m_bufout));
 	save_item(NAME(m_volume));
 	save_item(NAME(m_enabled));
-	save_item(NAME(m_frequency));
 	save_item(NAME(m_buffer));
 }
 
+void dmadac_sound_device::device_reset()
+{
+	/* reset the state */
+	m_volume = 1.0;
+	m_bufin = m_bufout = 0;
+	m_enabled = 0;
 
+	std::fill_n(m_buffer.begin(), BUFFER_SIZE, 0);
+}
 
 /*************************************
  *
@@ -88,7 +92,7 @@ void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t f
 	int j;
 
 	/* loop over all channels and accumulate the data */
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / double(std::numeric_limits<int16_t>::max());
 	if (m_enabled)
 	{
 		int maxin = (m_bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
@@ -108,9 +112,33 @@ void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t f
 		if (j != total_frames)
 			logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
 	}
+}
 
-	// FIXME: this line has rotted and can no longer compile - it should be fixed and uncommented or removed
-	//LOG("dmadac_transfer - %d samples, %d effective, %d in buffer\n", total_frames, int(total_frames * double(DEFAULT_SAMPLE_RATE) / dmadac[first_channel].frequency), dmadac[first_channel].curinpos - dmadac[first_channel].curoutpos);
+void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int32_t *data)
+{
+	int j;
+
+	/* loop over all channels and accumulate the data */
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / double(std::numeric_limits<int32_t>::max());
+	if (m_enabled)
+	{
+		int maxin = (m_bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
+		int32_t *src = data + channel * channel_spacing;
+		int curin = m_bufin;
+
+		/* copy the data */
+		for (j = 0; j < total_frames && curin != maxin; j++)
+		{
+			m_buffer[curin] = stream_buffer::sample_t(*src) * sample_scale;
+			curin = (curin + 1) % BUFFER_SIZE;
+			src += frame_spacing;
+		}
+		m_bufin = curin;
+
+		/* log overruns */
+		if (j != total_frames)
+			logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
+	}
 }
 
 void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, stream_buffer::sample_t *data)
@@ -137,9 +165,6 @@ void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t f
 		if (j != total_frames)
 			logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
 	}
-
-	// FIXME: this line has rotted and can no longer compile - it should be fixed and uncommented or removed
-	//LOG("dmadac_transfer - %d samples, %d effective, %d in buffer\n", total_frames, int(total_frames * double(DEFAULT_SAMPLE_RATE) / dmadac[first_channel].frequency), dmadac[first_channel].curinpos - dmadac[first_channel].curoutpos);
 }
 
 
@@ -226,8 +251,7 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 		m_bufin(0),
 		m_bufout(0),
 		m_volume(0),
-		m_enabled(0),
-		m_frequency(0)
+		m_enabled(0)
 {
 }
 
