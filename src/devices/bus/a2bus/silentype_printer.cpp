@@ -108,7 +108,7 @@ ioport_constructor silentype_printer_device::device_input_ports() const
 
 void silentype_printer_device::device_add_mconfig(machine_config &config)
 {
-	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, 0));
+	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT));
 	
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);

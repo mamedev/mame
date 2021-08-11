@@ -61,7 +61,7 @@ private:
 	int right_offset = 0;
 	int left_offset = 3;
 
-	double headtemp[7] = {0.0}; // initialize to zero - nan bugs
+	double headtemp[7] = {0.0}; // initialize to zero - avoid nan bugs
 	int heattime = 3000;   // time in usec to hit max temp  (smaller numbers mean faster)
 	int decaytime = 1000;  // time in usec to cool off
 

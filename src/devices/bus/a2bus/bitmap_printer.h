@@ -15,6 +15,14 @@ class bitmap_printer_device : public device_t
 {
 public:
 	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	
+	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paperwidth, int paperheight) : 
+		bitmap_printer_device(mconfig, tag, owner, u32(0))
+	{
+		m_paperwidth = paperwidth;
+		m_paperheight = paperheight;
+	}
+
 protected:
 	bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -30,9 +38,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	const int dpi = 60;
-	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide at 60 dpi
-	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high at 60 dpi
+
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int distfrombottom = 50;  // print position from bottom of screen
 
@@ -68,10 +74,6 @@ private:
  private:
 	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-
-	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
-
-	int wrap(int x, int mod) {if (x<0) return (x + ((-1 * (x / mod)) + 1) * mod) % mod; else return x % mod;}
 public:
 	void write_snapshot_to_file(std::string directory, std::string name);
 
