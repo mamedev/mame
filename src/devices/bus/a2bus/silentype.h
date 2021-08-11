@@ -57,8 +57,6 @@ protected:
 
  private:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
 };
 
 // device type definition

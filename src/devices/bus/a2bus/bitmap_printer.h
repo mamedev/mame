@@ -30,8 +30,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	const int dpi = 60;
+	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide at 60 dpi
+	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high at 60 dpi
+	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
+	const int distfrombottom = 50;  // print position from bottom of screen
 
-	int m_xpos = 250;
+	int m_xpos = PAPER_WIDTH / 2 * 2;
 	int m_ypos = 0;
 
 	required_device<screen_device> m_screen;
@@ -63,11 +68,6 @@ private:
  private:
 	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	const int dpi=60;
-	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide at 60 dpi
-	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high at 60 dpi
-	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
-	const int distfrombottom = 50;  // print position from bottom of screen
 
 	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
 

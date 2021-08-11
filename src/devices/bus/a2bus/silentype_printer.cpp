@@ -129,7 +129,6 @@ silentype_printer_device::silentype_printer_device(const machine_config &mconfig
 silentype_printer_device::silentype_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		silentype_printer_device(mconfig, SILENTYPE_PRINTER, tag, owner, clock)
 {
-
 }
 
 //-------------------------------------------------
@@ -171,7 +170,6 @@ void silentype_printer_device::darken_pixel(double headtemp, unsigned int& pixel
 {
 	if (headtemp > 0.0)
 	{
-//      u8 intensity = headtemp * 15.0;
 		u8 intensity = (
 						ioport("CNF")->read() & 0x1 ?
 							std::min(headtemp * 4, 1.0) :
@@ -182,13 +180,13 @@ void silentype_printer_device::darken_pixel(double headtemp, unsigned int& pixel
 
 		pixelval &= 0xffffff;
 
-		u32 rp = BITS(pixelval, 23, 16);
-		u32 gp = BITS(pixelval, 15,  8);
-		u32 bp = BITS(pixelval,  7,  0);
+		u32 rp = BIT(pixelval, 16, 8);
+		u32 gp = BIT(pixelval, 8, 8);
+		u32 bp = BIT(pixelval, 0, 8);
 
-		u32 rd = BITS(darkenval, 23, 16);
-		u32 gd = BITS(darkenval, 15,  8);
-		u32 bd = BITS(darkenval,  7,  0);
+		u32 rd = BIT(darkenval, 16, 8);
+		u32 gd = BIT(darkenval, 8, 8);
+		u32 bd = BIT(darkenval, 0, 8);
 
 		u32 r = (rp >= rd) ? rp - rd : 0;    // subtract the amount to darken
 		u32 g = (gp >= gd) ? gp - gd : 0;
@@ -244,47 +242,6 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 }
 
 
-//-------------------------------------------------
-//    Bitswap routine
-//-------------------------------------------------
-
-u8 silentype_printer_device::bitswap(u16 val, u8 a, u8 b)
-{ 
-	u8 bita = BIT(val,a); 
-	u8 bitb = BIT(val,b);
-	return (val & ~( (1 << a) | (1 << b) ) ) | 
-			(bita << b) | (bitb << a);
-}
-
-
-
-u8 silentype_printer_device::bitpattern(u16 val, u8 a, u8 b, u8 c, u8 d)
-{ 
-	u8 bita = BIT(val,3); 
-	u8 bitb = BIT(val,2);
-	u8 bitc = BIT(val,1);
-	u8 bitd = BIT(val,0);
-	return 	(bita << a) | (bitb << b)| (bitc << c)| (bitd << d);
-}
-
-
-
-/*
-//Standard drive table in steppers.cpp is 2,6,4,5,1,9,8,a
-
-SILENTYPE STEPPER WINDING TABLE: 3,2,6,4,c,8,9,1
-
-                 swap 0 3          reversing bit pattern is opposite direction  
-0011  3           1010  a           1100  c
-0010  2           0010  2           0100  4
-0110  6           0110  6           0110  6
-0100  4           0100  4           0010  2
-1100  c           0101  5           0011  3
-1000  8           0001  1           0001  1
-1001  9           1001  9           1001  9
-0001  1           1000  8           1000  8
-
-*/
 
 //-------------------------------------------------
 //    Update Stepper and return delta
@@ -293,16 +250,8 @@ SILENTYPE STEPPER WINDING TABLE: 3,2,6,4,c,8,9,1
 int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern)
 {
 	int lastpos = stepper->get_absolute_position();	
-
-//	stepper->update(bitswap(pattern, 1, 2));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
-
-	stepper->update(bitpattern(pattern, 3, 1, 2, 0));  // drive pattern is the "standard" reel pattern with bits 3,0 swapped
-
-
+	stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
 	int delta = stepper->get_absolute_position() - lastpos;
-
-//	delta *= -1;  // opposite direction    (also reversing the bit pattern 3210 -> 0123 will give you reversed direction)
-	
 	return delta;
 }
 

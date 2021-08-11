@@ -38,11 +38,6 @@ protected:
 
 private:
 
-/*
-	uint8_t m_serial_data_out;
-	uint8_t m_serial_clock_out;
-	uint8_t m_store_clock_out;
-*/
 	uint8_t *m_rom;
 	uint8_t m_ram[256];
 
@@ -82,11 +77,6 @@ private:
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int distfrombottom = 50;
 
-	uint32_t BITS(uint32_t x, u8 m, u8 n) {return ( ((x) >> (n)) & ( ((uint32_t) 1 << ((m) - (n) + 1)) - 1));}
-
-	int wrap(int x, int mod) {if (x<0) return (x + ((-1 * (x / mod)) + 1) * mod) % mod; else return x % mod;}
-	u8 bitswap(u16 val, u8 a, u8 b);
-	u8 bitpattern(u16 val, u8 a, u8 b, u8 c, u8 d);
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, unsigned int& pixel);
 	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern);

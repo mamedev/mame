@@ -160,7 +160,7 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, "a2silentype", "Apple Silentype Printer")
+DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, "a2silentype", "Apple Silentype Interface Card")
 //DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, <<shortname>>, <<name>>)   tag comes from including device constructor
 
 #define SILENTYPE_ROM_REGION  "rom"
@@ -201,9 +201,8 @@ const tiny_rom_entry *a2bus_silentype_device::device_rom_region() const
 a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
-//      m_rom(nullptr),
 		m_silentype_printer(*this, "silentype_printer"),
-		m_rom(*this, "rom") // had to reorder
+		m_rom(*this, "rom")
 {
 }
 
@@ -218,11 +217,6 @@ a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, co
 
 void a2bus_silentype_device::device_start()
 {
-//  m_rom = device().machine().root_device().memregion(this->subtag(SILENTYPE_ROM_REGION).c_str())->base();
-
-	printf("Silentype Device Tag = %s\n",device().tag());
-	printf("Silentype Owner Tag = %s\n",device().owner()->tag());
-
 	memset(m_ram, 0, sizeof(m_ram));
 	save_item(NAME(m_ram));
 }
@@ -243,7 +237,6 @@ uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 {
 	if (offset == 4)
 	{
-//      return (m_xpos <= 0) << SILENTYPE_STATUS;
 		return m_silentype_printer->margin_switch_input() << SILENTYPE_STATUS;
 	}
 	else
@@ -285,9 +278,11 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 	{
 		LOG("Silentype Clear Parallel Register\n");
 		m_parallel_reg = 0;
-		m_silentype_printer->update_cr_stepper(BITS(m_parallel_reg, 3,  0));
-		m_silentype_printer->update_pf_stepper(BITS(m_parallel_reg, 7,  4));
-		m_silentype_printer->update_printhead (BITS(m_parallel_reg, 15, 9));
+
+		m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
+		m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
+		m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
+
 	}
 	else if (
 		(BIT(last_write_c0nx, SILENTYPE_STORECLOCK) == 1) &&  // transition from 1 to 0
@@ -298,9 +293,10 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 
 		LOG("Silentype Store Parallel Register = %4x\n", m_parallel_reg);
 
-		m_silentype_printer->update_cr_stepper(BITS(m_parallel_reg, 3,  0));
-		m_silentype_printer->update_pf_stepper(BITS(m_parallel_reg, 7,  4));
-		m_silentype_printer->update_printhead (BITS(m_parallel_reg, 15, 9));
+		m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
+		m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
+		m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
+
 	}
 	last_write_c0nx = data;
 }
