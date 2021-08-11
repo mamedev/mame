@@ -83,7 +83,7 @@ nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char
 {
 }
 
-nes_cc21_device::nes_cc21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_cc21_device::nes_cc21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_CC21, tag, owner, clock)
 {
 }
@@ -233,18 +233,6 @@ void nes_daou306_device::pcb_reset()
 	set_nt_mirroring(PPU_MIRROR_LOW);
 
 	memset(m_reg, 0, sizeof(m_reg));
-}
-
-void nes_cc21_device::device_start()
-{
-	common_start();
-}
-
-void nes_cc21_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
 }
 
 void nes_xiaozy_device::device_start()
@@ -739,16 +727,19 @@ void nes_daou306_device::write_h(offs_t offset, uint8_t data)
 
  Games: Mi Hun Che
 
- In MESS: Supported
+ iNES: mapper 27 (overlaps with incompatible World Hero)
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_cc21_device::write_h(offs_t offset, uint8_t data)
+void nes_cc21_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("cc21 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(BIT(offset, 1) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-	chr8((offset & 0x01), CHRROM);
+	set_nt_mirroring(BIT(offset, 0) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	chr4_0(BIT(offset, 0), CHRROM);
+	chr4_4(BIT(offset, 0), CHRROM);
 }
 
 /*-------------------------------------------------
