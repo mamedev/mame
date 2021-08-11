@@ -41,7 +41,13 @@ private:
 	uint8_t *m_rom;
 	uint8_t m_ram[256];
 
-	int m_xpos = 250;
+	const int dpi = 60;
+	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide at 60 dpi
+	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high at 60 dpi
+	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
+	const int distfrombottom = 50;
+
+	int m_xpos = PAPER_WIDTH / 2 * 2;
 	int m_ypos = 0;
 	uint16_t m_shift_reg = 0;
 	uint16_t m_parallel_reg = 0;
@@ -70,12 +76,6 @@ private:
 	double last_update_time = 0.0;  // strange behavior if we don't initialize
 
  private:
-
-	const int dpi=60;
-	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide at 60 dpi
-	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high at 60 dpi
-	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
-	const int distfrombottom = 50;
 
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, unsigned int& pixel);

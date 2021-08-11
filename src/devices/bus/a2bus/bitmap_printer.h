@@ -36,7 +36,7 @@ private:
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int distfrombottom = 50;  // print position from bottom of screen
 
-	int m_xpos = PAPER_WIDTH / 2 * 2;
+	int m_xpos = 0;
 	int m_ypos = 0;
 
 	required_device<screen_device> m_screen;
