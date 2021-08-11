@@ -182,8 +182,8 @@ nes_bmc_gb63_device::nes_bmc_gb63_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_bmc_gka_device::nes_bmc_gka_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_GKA, tag, owner, clock), m_latch1(0), m_latch2(0)
+nes_bmc_gka_device::nes_bmc_gka_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_GKA, tag, owner, clock)
 {
 }
 
@@ -661,19 +661,16 @@ void nes_bmc_gb63_device::pcb_reset()
 void nes_bmc_gka_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
+	save_item(NAME(m_reg));
 }
 
 void nes_bmc_gka_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
-	chr8(0, m_chr_source);
+	chr8(0, CHRROM);
 
-	m_latch1 = 0;
-	m_latch2 = 0;
+	m_reg[0] = m_reg[1] = 0;
 }
 
 void nes_bmc_gkb_device::device_start()
@@ -1772,32 +1769,30 @@ uint8_t nes_bmc_gb63_device::read_h(offs_t offset)
 
  iNES: mapper 57
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_bmc_gka_device::write_h(offs_t offset, uint8_t data)
+u8 nes_bmc_gka_device::read_m(offs_t offset)
+{
+	LOG_MMC(("bmc_gka read_m, offset: %04x\n", offset));
+	return 0; // TODO: menus differ by jumper/DIP settings readable at 0x6000.
+}
+
+void nes_bmc_gka_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_gka write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset & 0x0800)
-		m_latch2 = data;
-	else
-		m_latch1 = data;
+	m_reg[BIT(offset, 11)] = data;
 
-	if (m_latch2 & 0x80)
-		prg32(2 | (m_latch2 >> 6));
-	else
-	{
-		prg16_89ab((m_latch2 >> 5) & 0x03);
-		prg16_cdef((m_latch2 >> 5) & 0x03);
-	}
+	u8 bank = m_reg[1] >> 5;
+	u8 mode = BIT(m_reg[1], 4);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
 
-	set_nt_mirroring((m_latch2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	chr8((m_latch1 & 0x03) | (m_latch2 & 0x07) | ((m_latch2 & 0x10) >> 1), CHRROM);
+	chr8((m_reg[0] & 0x40) >> 3 | (m_reg[1] & 0x04) | (m_reg[BIT(m_reg[0], 7)] & 0x03), CHRROM);
+	set_nt_mirroring(BIT(m_reg[1], 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
-
 
 /*-------------------------------------------------
 
