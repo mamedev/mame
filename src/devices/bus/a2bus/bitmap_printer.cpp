@@ -112,16 +112,16 @@ void bitmap_printer_device::device_reset()
 uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 							 bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scrolly = bitmap.height() - distfrombottom - m_ypos;
+	int scrolly = bitmap.height() - m_distfrombottom - m_ypos;
 
 	copyscrollbitmap(bitmap, *m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
-	bitmap.plot_box(0, bitmap.height() - distfrombottom - m_ypos, m_paperwidth, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
+	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paperwidth, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
-	drawprinthead(bitmap, m_xpos, bitmap.height() - distfrombottom);
+	drawprinthead(bitmap, m_xpos, bitmap.height() - m_distfrombottom);
 	
-//	bitmap.plot_box(m_xpos - 10, bitmap.height() - distfrombottom + 10,     20, 30, 0xBDB76B);
-//	bitmap.plot_box(m_xpos - 5,  bitmap.height() - distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
+//	bitmap.plot_box(m_xpos - 10, bitmap.height() - m_distfrombottom + 10,     20, 30, 0xBDB76B);
+//	bitmap.plot_box(m_xpos - 5,  bitmap.height() - m_distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
 
 	return 0;
 }

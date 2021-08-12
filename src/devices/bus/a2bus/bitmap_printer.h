@@ -40,7 +40,7 @@ protected:
 private:
 
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
-	const int distfrombottom = 50;  // print position from bottom of screen
+	const int m_distfrombottom = 50;  // print position from bottom of screen
 
 	int m_xpos = 0;
 	int m_ypos = 0;
@@ -64,7 +64,7 @@ private:
 	int m_printheadbordersize = 3;
 	int m_printheadxsize = 10;
 	int m_printheadysize = 20;
-	int m_distfrombottom = 50;  // print head position from bottom of screen
+//	int m_distfrombottom = 50;  // print head position from bottom of screen
 //	int m_clearlinepos = 0;
 //	int m_papercolor=0xffffff;
 	int m_pagedirty = 0;
