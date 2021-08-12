@@ -11,17 +11,21 @@ PC with Chinese Windows 2000 Pro and several emulators, including:
  -FB Alpha v0.2.94.98
  -ZiNc 1.1
 
-
-PC motherboard plus an additional PCB for JAMMA, inputs and basic config.
+PC motherboard plus an additional PCB for JAMMA, inputs and basic config (and protection).
 
 PC board:
-CPU: Intel Celeron 1.7GHz / 128kb / 400MHz SL6SC
-RAM: 256MB-DDR400
-PCB: 04/082006-SiS-651-6A6IXRMAC-00, Realtec ALC655 audio, Realtec RTL8201BL Ethernet (25.000 MHz xtal), Winbond W83194BG-648 (14.31818 MHz xtal)
-BIOS: 686 AMIBIOS (c) 2006 AY36 8897
+ CPU: Intel Celeron 1.7GHz / 128kb / 400MHz SL6SC
+ RAM: 256MB-DDR400
+ PCB: 04/082006-SiS-651-6A6IXRMAC-00, Realtec ALC655 audio, Realtec RTL8201BL Ethernet (25.000 MHz xtal), Winbond W83194BG-648 (14.31818 MHz xtal)
+ BIOS: 686 AMIBIOS (c) 2006 AY36 8897
 
 I/O board:
-AT89C2051 + Microchip CF745 + 2 x Microchip PIC12F508 + Altera Max CPLD
+ Atmel AT89C2051 (near a 4 dipswitches bank and a 6.000 MHz xtal)
+ Microchip CF745 (near another 4 dipswitches bank and a 4.000 MHz xtal)
+ 2 x Microchip PIC12F508
+ Altera Max EPM7128SQC100-10 CPLD
+
+Newer versions use the same I/O board, but with different PC motherboards with faster CPUs (seen with Pentium 4 2.40GHz/512/533 SL6DV).
 
 */
 
