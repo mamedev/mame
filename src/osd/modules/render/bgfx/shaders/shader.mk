@@ -176,8 +176,6 @@ dirs:
 .PHONY: rebuild
 rebuild: clean all
 
-$(BIN) : | $(BUILD_INTERMEDIATE_DIR)
-
 endif # TARGET
 
 -include $(VS_DEPS)
