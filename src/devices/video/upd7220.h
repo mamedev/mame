@@ -122,10 +122,10 @@ private:
 	uint16_t get_pitch();
 	uint16_t get_pattern(uint8_t cycle);
 	void next_pixel(int direction);
-	void draw_pixel(int x, int y, int xi, uint16_t tile_data);
-	void draw_line(int x, int y);
-	void draw_rectangle(int x, int y);
-	void draw_arc(int x, int y);
+	void draw_pixel();
+	void draw_line();
+	void draw_rectangle();
+	void draw_arc();
 	void draw_char();
 	int translate_command(uint8_t data);
 	void process_fifo();
@@ -154,7 +154,6 @@ private:
 	uint16_t m_mask;                  // mask register
 	uint8_t m_pitch;                  // number of word addresses in display memory in the horizontal direction
 	uint32_t m_ead;                   // execute word address
-	uint16_t m_dad;                   // dot address within the word
 	uint32_t m_lad;                   // light pen address
 
 	uint8_t m_ra[16];                 // parameter RAM
