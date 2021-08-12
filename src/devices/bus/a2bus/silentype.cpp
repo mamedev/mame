@@ -5,7 +5,7 @@
     silentype.cpp
 
     Implementation of the Apple Silentype Printer Interface Card
-    
+
     (implements Silentype Synch Interface and Printer Deserializer Board)
 
 **********************************************************************
@@ -181,7 +181,7 @@ ROM_END
 void a2bus_silentype_device::device_add_mconfig(machine_config &config)
 {
 	[[maybe_unused]] silentype_printer_device &printer(SILENTYPE_PRINTER(config, m_silentype_printer, 0));
-	
+
 }
 
 //-------------------------------------------------

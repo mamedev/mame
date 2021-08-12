@@ -15,8 +15,8 @@ class bitmap_printer_device : public device_t
 {
 public:
 	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
-	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paperwidth, int paperheight) : 
+
+	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paperwidth, int paperheight) :
 		bitmap_printer_device(mconfig, tag, owner, u32(0))
 	{
 		m_paperwidth = paperwidth;
@@ -46,27 +46,27 @@ private:
 	int m_ypos = 0;
 
 	required_device<screen_device> m_screen;
-	
+
 	bitmap_rgb32 m_internal_bitmap;  // pointer to bitmap
 	bitmap_rgb32 *m_bitmap = &m_internal_bitmap;  // pointer to bitmap  use internal bitmap by default
 public:
 	bitmap_rgb32& get_bitmap(){ return *m_bitmap; }
 private:
-      	
+
 	std::string m_printername;
-    std::string m_snapshotdir;
-    time_t m_session_time;
-	
-//	int m_pagecount;  // page count
-//	int m_pagelimit = 0;  // limit on pages (0 = no limit)
+	std::string m_snapshotdir;
+	time_t m_session_time;
+
+//  int m_pagecount;  // page count
+//  int m_pagelimit = 0;  // limit on pages (0 = no limit)
 	int m_printheadcolor       = 0xEEE8AA;
 	int m_printheadbordercolor = 0xBDB76B;
 	int m_printheadbordersize = 3;
 	int m_printheadxsize = 10;
 	int m_printheadysize = 20;
-//	int m_distfrombottom = 50;  // print head position from bottom of screen
-//	int m_clearlinepos = 0;
-//	int m_papercolor=0xffffff;
+//  int m_distfrombottom = 50;  // print head position from bottom of screen
+//  int m_clearlinepos = 0;
+//  int m_papercolor=0xffffff;
 	int m_pagedirty = 0;
 	int m_paperwidth;
 	int m_paperheight;
@@ -100,7 +100,7 @@ public:
 
 	unsigned int& pix(int y, int x)    // reversed y x
 	{
-		//	y += m_paperheight;
+		//  y += m_paperheight;
 
 		if (y>=m_bitmap->height()) y = 0;
 		if (x>=m_bitmap->width()) x = 0;
@@ -113,17 +113,17 @@ public:
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
 	void bitmap_clear_band(int from_line, int to_line, u32 color);
 
-    device_t* getrootdev();
-    std::string fixchar(std::string in, char from, char to);
-    std::string fixcolons(std::string in);
-    std::string sessiontime();
-    std::string tagname();
-    std::string simplename();
-    void setprintername(std::string name){ m_printername = name; }
-    std::string getprintername(){ return m_printername; }
-    void initprintername(){ setprintername(sessiontime() + std::string(" ") + simplename()); }
+	device_t* getrootdev();
+	std::string fixchar(std::string in, char from, char to);
+	std::string fixcolons(std::string in);
+	std::string sessiontime();
+	std::string tagname();
+	std::string simplename();
+	void setprintername(std::string name){ m_printername = name; }
+	std::string getprintername(){ return m_printername; }
+	void initprintername(){ setprintername(sessiontime() + std::string(" ") + simplename()); }
 
-	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }    
+	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)

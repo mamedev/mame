@@ -5,7 +5,7 @@
     silentype_printer.cpp
 
     Implementation of the Apple Silentype Printer
-    
+
     (Implements physical printhead and stepper motors)
 
 **********************************************************************/
@@ -109,7 +109,7 @@ ioport_constructor silentype_printer_device::device_input_ports() const
 void silentype_printer_device::device_add_mconfig(machine_config &config)
 {
 	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT));
-	
+
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
 }
@@ -249,7 +249,7 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 
 int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern)
 {
-	int lastpos = stepper->get_absolute_position();	
+	int lastpos = stepper->get_absolute_position();
 	stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
 	int delta = stepper->get_absolute_position() - lastpos;
 	return delta;
@@ -262,7 +262,7 @@ int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uin
 void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 {
 	int delta = update_stepper_delta(m_pf_stepper, vstepper);
-		
+
 	if (delta > 0)
 	{
 		m_ypos += delta; // move down
@@ -283,9 +283,9 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 			m_bitmap_printer->write_snapshot_to_file(
 						std::string("silentype"),
 						std::string("silentype_") +
-						m_bitmap_printer->getprintername() + 
-						" page_" + 
-						m_bitmap_printer->padzeroes(std::to_string(page_count++),3) + 
+						m_bitmap_printer->getprintername() +
+						" page_" +
+						m_bitmap_printer->padzeroes(std::to_string(page_count++),3) +
 						".png");
 
 			newpageflag = 1;
@@ -314,13 +314,13 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 {
 	int delta = update_stepper_delta(m_cr_stepper, hstepper);
-	
-//	printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
-	
+
+//  printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
+
 	if (delta != 0)
 	{
 		newpageflag = 0;
-		
+
 		if (delta > 0)
 		{
 			m_xpos += delta; xdirection = 1;

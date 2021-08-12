@@ -55,7 +55,7 @@ ioport_constructor bitmap_printer_device::device_input_ports() const
 
 void bitmap_printer_device::device_add_mconfig(machine_config &config)
 {
-    // video hardware (simulates paper) 
+	// video hardware (simulates paper)
 	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -88,7 +88,7 @@ void bitmap_printer_device::device_start()
 	time(&m_session_time);  // initialize session time
 	initprintername();
 
-	m_bitmap->allocate(m_paperwidth, m_paperheight);  // try 660 pixels for 11 inch long	
+	m_bitmap->allocate(m_paperwidth, m_paperheight);  // try 660 pixels for 11 inch long
 	m_bitmap->fill(0xffffff);  // Start with a white piece of paper
 
 	save_item(NAME(m_internal_bitmap));
@@ -119,9 +119,6 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paperwidth, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
 	drawprinthead(bitmap, m_xpos, bitmap.height() - m_distfrombottom);
-	
-//	bitmap.plot_box(m_xpos - 10, bitmap.height() - m_distfrombottom + 10,     20, 30, 0xBDB76B);
-//	bitmap.plot_box(m_xpos - 5,  bitmap.height() - m_distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
 
 	return 0;
 }
@@ -134,7 +131,7 @@ void bitmap_printer_device::bitmap_clear_band(int from_line, int to_line, u32 co
 
 void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
 {
-//	printf("clear band (%d,%d)\n",from_line,to_line);
+//  printf("clear band (%d,%d)\n",from_line,to_line);
 	bitmap.plot_box(0, from_line, m_paperwidth, to_line - from_line + 1, color);
 }
 
@@ -157,16 +154,16 @@ void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::s
 
 std::string bitmap_printer_device::fixchar(std::string in, char from, char to)
 {
-    std::string final;
-    for(std::string::const_iterator it = in.begin(); it != in.end(); ++it)
-    {
-        if((*it) != from)
-        {
-            final += *it;
-        }
-        else final += to;
-    }
-    return final;
+	std::string final;
+	for(std::string::const_iterator it = in.begin(); it != in.end(); ++it)
+	{
+		if((*it) != from)
+		{
+			final += *it;
+		}
+		else final += to;
+	}
+	return final;
 }
 
 std::string bitmap_printer_device::fixcolons(std::string in)
@@ -176,11 +173,11 @@ std::string bitmap_printer_device::fixcolons(std::string in)
 
 std::string bitmap_printer_device::sessiontime()
 {
-    struct tm *info;
-    char buffer[80];
-    info = localtime( &m_session_time );
-    strftime(buffer,120,"%Y-%m-%d %H-%M-%S", info);
-    return std::string(buffer);
+	struct tm *info;
+	char buffer[80];
+	info = localtime( &m_session_time );
+	strftime(buffer,120,"%Y-%m-%d %H-%M-%S", info);
+	return std::string(buffer);
 }
 
 std::string bitmap_printer_device::tagname()
@@ -190,39 +187,37 @@ std::string bitmap_printer_device::tagname()
 
 std::string bitmap_printer_device::simplename()
 {
-    device_t * dev;
+	device_t * dev;
 	dev = this;
 	device_t * rootdev = getrootdev();
-	[[maybe_unused]]device_t * rootdev2 = & machine().root_device();
-	printf("rootdevs equal %x\n",rootdev == rootdev2);
+//  [[maybe_unused]]device_t * rootdev2 = & machine().root_device();
+//  printf("rootdevs equal %x\n",rootdev == rootdev2);
 
 	std::string s;
 	int skipcount = 2;
-	
-    while (dev){
-    		if (skipcount-- <= 0)
-            	s = std::string( (dev == rootdev ? dev->shortname() : dev->basetag() ) ) + 
-            			std::string( s.length() ? "-" : "") + s;
+
+	while (dev){
+			if (skipcount-- <= 0)
+				s = std::string( (dev == rootdev ? dev->shortname() : dev->basetag() ) ) +
+						std::string( s.length() ? "-" : "") + s;
 //              s=std::string(dev->shortname()) + std::string(" ") + s;
-            dev=dev->owner();
-    }
-    return s;
+			dev=dev->owner();
+	}
+	return s;
 }
 
 device_t* bitmap_printer_device::getrootdev()
 {
-    device_t* dev;
-    device_t* lastdev = NULL;
+	device_t* dev;
+	device_t* lastdev = NULL;
 
 	dev = this;
-    while (dev){
-            lastdev = dev;
-            dev=dev->owner();
-    }
-    return lastdev;
+	while (dev){
+			lastdev = dev;
+			dev=dev->owner();
+	}
+	return lastdev;
 }
-
-
 
 
 void bitmap_printer_device::setprintheadcolor(int headcolor, int bordcolor)
