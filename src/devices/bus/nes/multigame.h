@@ -343,6 +343,27 @@ protected:
 };
 
 
+// ======================> nes_bmc_830425c_device
+
+class nes_bmc_830425c_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_830425c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch;
+};
+
+
 // ======================> nes_ntd03_device
 
 class nes_ntd03_device : public nes_nrom_device
@@ -1078,6 +1099,29 @@ protected:
 };
 
 
+// ======================> nes_bmc_60311c_device
+
+class nes_bmc_60311c_device : public nes_vram_protect_device
+{
+public:
+	// construction/destruction
+	nes_bmc_60311c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	void update_banks();
+	u8 m_reg[3];
+};
+
+
 // ======================> nes_bmc_th22913_device
 
 class nes_bmc_th22913_device : public nes_vram_protect_device
@@ -1107,8 +1151,10 @@ DECLARE_DEVICE_TYPE(NES_NOVEL2,         nes_novel2_device)
 DECLARE_DEVICE_TYPE(NES_STUDYNGAME,     nes_studyngame_device)
 DECLARE_DEVICE_TYPE(NES_SUPERGUN20IN1,  nes_sgun20in1_device)
 DECLARE_DEVICE_TYPE(NES_VT5201,         nes_vt5201_device)
+DECLARE_DEVICE_TYPE(NES_BMC_60311C,     nes_bmc_60311c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_80013B,     nes_bmc_80013b_device)
 DECLARE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device)
+DECLARE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device)
 DECLARE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device)
