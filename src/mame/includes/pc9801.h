@@ -163,6 +163,8 @@ protected:
 	void pc9801_sasi(machine_config &config);
 	void pc9801_ide(machine_config &config);
 	void pc9801_common(machine_config &config);
+	void config_floppy_525hd(machine_config &config);
+	void config_floppy_35hd(machine_config &config);
 
 	void pit_clock_config(machine_config &config, const XTAL clock);
 

@@ -18,22 +18,24 @@ license:CC0
 
 TODO:
 - test all games and double check support status
-- identify any FDI that has a size different than 1265664 (== 3'5" floppy image)
+- identify any FDI that has a size bigger than 1265664 (== 3'5" floppy image)
 - document any unorthodox way for running a given sw
 - document (and support) alternative file types (FDD, NFD, FIX)
   can we convert some of those to FDI or D88? or some protection schemes need
   such format? (Note that some disks come in DIP, DCP, DCU formats: these shall
   be just plain images, like FDI, just with different headers with the track
   "map")
-- fix doujin software names
+- fix doujin software names;
+- Identify any software that uses the MAD Factory NAX.EXE driver for Otomi-chan Kai sound board;
 
 -->
 
 
 <!-- System disks & Utils -->
 
-
-	<software name="pc98dosd">
+	<!-- Heavy GFX glitches on VM class, on RS class it has minor GFX layer clearance issues -->
+	<!-- TODO: Does the disk requires 98DO+ specifically? -->
+	<software name="pc98dosd" supported="partial">
 		<description>PC-98DO+ System Disk</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
@@ -44,15 +46,11 @@ TODO:
 		</part>
 	</software>
 
-<!--
-PC-9821Xw System Restore startup disk
-
-this is a System Restore startup disk for PC-9821Xw
-but not a Windows install source(need more disk?)
-
-only have some part of Windows file and a Video driver(CLGD?).
--->
-	<software name="sysrest">
+	<!-- PC-9821Xw System Restore startup disk -->
+	<!-- this is a System Restore startup disk for PC-9821Xw -->
+	<!-- but not a Windows install source(need more disk?) -->
+	<!-- only have some part of Windows file and a Video driver(CLGD?). -->
+	<software name="sysrest" supported="no">
 		<description>System Restore Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18371,6 +18369,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 
 	<!-- boot OK -->
 	<!-- Sometimes keyboard stuck pressed keys and becomes unresponsive (on RS class at very least) -->
+	<!-- VM class sports video glitches on scroll -->
 	<!-- Omake: boot up an MS-DOS, insert Opening Disk, execute "CKMUS %1" for music test -->
 	<!--        Parameter is a file with .s extension also inside disk contents (also cfr. readme.doc) -->
 	<software name="emeraldd" supported="no">
@@ -65778,8 +65777,11 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="superdep">
-		<description>Super Depth - The Ultimate Hyper Battleship</description>
+	<!-- boot OK (abuses of DAC1BIT for sound) -->
+	<software name="superdep" supported="yes">
+		<!-- versioning is in depth.doc -->
+		<!-- 10th August 1991 according to ranking screen -->
+		<description>Super Depth - The Ultimate Hyper Battleship (v1.00)</description>
 		<year>1991</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -69511,11 +69513,12 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-
-	<software name="sengoku">
-		<description>Sengoku (?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<!-- boot OK on RS class -->
+	<software name="sengoku" supported="yes">
+		<description>Yamashina Keisuke no Sengoku</description>
+		<year>1992</year>
+		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<info name="alt_title" value="山科けいすけのSENGOKU" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -69530,13 +69533,16 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<!-- "Presented by Splush Wave" then black screen -->
-	<software name="datsumj" supported="no">
+	<!-- "Presented by Splush Wave" then hard crashes machine -->
+	<!-- It actually checks for the presence of PCM.TBL, which is provided by the Otomi-chan Kai install disks (undumped) -->
+	<!-- boot otherwise with the provided instructions with no voice samples -->
+	<software name="datsumj" supported="partial">
 		<description>Datsui Mahjong Margarita</description>
 		<year>199?</year>
 		<publisher>Splush Wave (Doujin)</publisher>
 		<info name="alt_title" value="脱衣麻雀マルガリータ" />
-		<info name="usage" value="From DOS, run MA.BAT" />
+		<info name="usage" value="From DOS, install to HDD via INSTALL.BAT. SEDIT the resulting MA.BAT, edit NAX.EXE line suffixing a -2 or -3 (-26/-86 compatible mode respectively), save and launch it" />
+		<!-- alt way: Just save an empty PCM.TBL in the directory -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="margarita.fdi" size="1265664" crc="2d77f72a" sha1="d0788b24bd6e32ea74b6edefd59bddb6795b3d64" offset="0" />
@@ -69556,10 +69562,13 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="joro2">
+	<!-- definitely needs a 9821 machine -->
+	<!-- after install instructions claims to switch to HDD directory and run "kumo", this is nowhere to be found? -->
+	<software name="joro2" supported="no">
 		<description>Joro v2 (?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997?</year>
+		<publisher>Stone Heads</publisher>
+		<info name="usage" value="From DOS, run hds.bat and select a drive to install separated with semicolon (a; not a:)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jorov21.fdi" size="1265664" crc="973c2459" sha1="1650606de9b246cfa24c8731d36c2204dac4e04f" offset="0" />
@@ -69571,8 +69580,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 			</dataarea>
 		</part>
 	</software>
-
-
 
 <!--    <software name="">
         <description>lodoss tou senki - custom (turbo program?) / ロードス島戦記カスタム</description>

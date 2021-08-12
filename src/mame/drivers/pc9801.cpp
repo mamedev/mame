@@ -6,21 +6,56 @@
 
     TODO:
     - proper 8251 uart hook-up on keyboard;
-    - SASI/SCSI support;
-    - Finish DIP-Switches support;
     - text scrolling, μPD52611 (cfr. clipping in edge & arcus2, madoum* too?);
+	- Abnormal 90 Hz refresh rate adjust for normal display mode (15KHz).
+	  Should really be 61.xx instead, understand how CRTC really switches clock;
     - AGDC emulation, μPD72120;
 	- GP-IB emulation, μPD7210;
-    - CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
+    - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
     - Write a PC80S31K device for 2d type floppies
       (also used on PC-6601SR, PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-    - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
-    - clean-ups & split into separate devices and driver flavours;
-    - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
+	- FDC (note: epdiag FDC test looks a good candidate for all this):
+		- floppy_connector requires a "disk is in drive" flag that isn't honored properly;
+		- Has on board dip-switches, we currently just return 2HD/2DD autodetect;
+		- 3'5 floppy disks don't load at all;
+		- fix FDC duplication: according to docs I/O ports $90-$95 are basically mirrors
+		  with a subset of the drive related flags;
+		- floppy sounds never silences when drive is idle (disabled for the time being);
+    - CMT support (-03/-13/-36 i/f or cbus only, supported by i86/V30 fully compatible machines
+	  only);
+    - SASI/SCSI support (fully supported by now?);
+	- IDE sports an hack to not make 512 to 256 sector byte translations.
+	  Apparently a SDIP setting is responsible for this?
     - Remove kludge for POR bit in a20_ctrl_w fn;
-    - floppy sounds never silences when drive is idle (disabled for the time being);
-	- Abnormal 90 Hz refresh rate adjust for normal display mode (15KHz).
-	  Should really be 61.xx instead.
+	- I/O:
+		- HW Dip-switches (where applicable) needs a serious clean-up and naming/position 
+		  fixing in some cases;
+		- Export mouse support to an actual PC9871 device;
+		- Implement IF-SEGA/98 support (Sega Saturn peripheral compatibility for Windows,
+		  available DOS C snippet clearly shows reading in direct mode, an actual SMPC
+		  sub-device sounds unlikely but possible);
+	- Incomplete SDIP support:
+		- SDIP never returns a valid state and returns default values even if machine is
+		  soft resetted. By logic should read-back the already existing state, instead
+		  all machines just returns a "set SDIP" warning message at POST no matter what;
+		- SDIP bank hookup is different across machines, either unmapped or diverging 
+		  implementation wise both in port select and behaviour;
+		- In theory SDIP can be initialized via a BIOS menu, callable by holding down
+		  HELP key at POST. This actually doesn't work for any machine, is it expected to
+		  have key repeat support? Later BIOSes actually have strings for an extended menu
+		  with 3 or 4 pages strings, may be also requiring a jump/bankswitch to unmapped area?
+		- Expose SDIP to an actual device_nvram_interface;
+	- clean-up functions/variables naming by actual documentation nomenclature;
+    - derive machine configs & romsets by actual default options, examples:
+		- 3.5 built-in floppy drives vs. default 5.25;
+		- separate pc9801f (2DD) available romset to pc9801 (none) & pc9801m (2HD), and 
+		  remove the correlated machine config option;
+		- cbus available number of slots & built-in or provided boards;
+		- separate machines HDD hooks by SASI/SCSI/IDE;
+		- load actual IDE bioses from IPL romsets where applicable 
+		  (late era 9801 and 9821 class machines);
+		- pinpoint machines that uses GRCG instead of EGC, we are currently too lenient and support
+		  latter on most (use dbuster and hypbingo to checkout);
 
     TODO (PC-9801F)
     - kanji port 0xa9 readback is broken for several games (balpower, lovelyho).
@@ -33,7 +68,7 @@
 
 	TODO (PC-9801US):
 	- "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
-	- "SYSTEM SHUTDOWN" after setting the SDIP values;
+	- "SYSTEM SHUTDOWN" after BIOS sets up the SDIP values;
 
 	TODO (PC-9801BX2)
 	- "SYSTEM SHUTDOWN" at POST, a soft reset fixes it? 
@@ -468,7 +503,7 @@ WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
 	{
 		m_sasi_data_out->write(0);
 	}
-	if((m_sasi_ctrl_in->read() & 0x9C) == 0x8C)
+	if((m_sasi_ctrl_in->read() & 0x9c) == 0x8c)
 		m_pic2->ir1_w(m_sasi_ctrl & 1);
 	else
 		m_pic2->ir1_w(0);
@@ -551,6 +586,7 @@ uint8_t pc9801_state::f0_r(offs_t offset)
 	if(offset == 0)
 	{
 		// iterate thru all devices to check if an AMD98 is present
+		// TODO: move to cbus
 		for (pc9801_amd98_device &amd98 : device_type_enumerator<pc9801_amd98_device>(machine().root_device()))
 		{
 			logerror("Read AMD98 ID %s\n",amd98.tag());
@@ -1661,18 +1697,21 @@ static void pc9801_floppies(device_slot_interface &device)
 
 static void pc9801_cbus_devices(device_slot_interface &device)
 {
+	// official HW
 //  PC-9801-14
 	device.option_add("pc9801_26", PC9801_26);
 	device.option_add("pc9801_86", PC9801_86);
-//  PC-9801-86
-//  PC-9801-26 + PC-9801-86 (?)
-//  PC-9801-86 + Chibi-Oto
 	device.option_add("pc9801_118", PC9801_118);
 	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
 //  Spark Board
-//  AMD-98 (AmuseMent boarD)
-	device.option_add("pc9801_amd98", PC9801_AMD98);
+	device.option_add("pc9801_amd98", PC9801_AMD98); // AmuseMent boarD
 	device.option_add("mpu_pc98", MPU_PC98);
+
+	// doujinshi HW
+// MAD Factory / Doujin Hard (MAD Factory / 同人ハード)
+// MAD Factory Chibi-Oto: an ADPCM override for -86
+// MAD Factory Otomi-chan: "TORIE9211 MAD FACTORY" printed on proto PCB, just overrides for ADPCM for -86?
+	device.option_add("otomichan_kai", OTOMICHAN_KAI);
 }
 
 //  Jast Sound, could be put independently
@@ -2075,6 +2114,18 @@ void pc9801_state::pc9801_common(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc9801);
 }
 
+void pc9801_state::config_floppy_525hd(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+}
+
+void pc9801_state::config_floppy_35hd(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:0", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:1", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
+}
+
 void pc9801_state::pc9801(machine_config &config)
 {
 	I8086(config, m_maincpu, 5000000); //unknown clock
@@ -2160,12 +2211,17 @@ void pc9801_state::pc9801ux(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc9801_state::pc9801ux_io);
 	maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801_state::a20_286, this));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	
+	config_floppy_35hd(config);
 //  AM9157A(config, "i8237", 10000000); // unknown clock
 }
 
 void pc9801_state::pc9801vx(machine_config &config)
 {
 	pc9801ux(config);
+
+	config_floppy_525hd(config);
+
 	// TODO: EGC initial buggy revision
 	// Reportedly has a bug with a RMW op, details TBD
 	// ...
@@ -2185,8 +2241,7 @@ void pc9801us_state::pc9801us(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9801us_state::pc9801us_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:0", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:1", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
+	config_floppy_35hd(config);
 }
 
 void pc9801bx_state::pc9801bx2(machine_config &config)
@@ -2205,7 +2260,8 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 	// minimum RAM: 1.8 / 3.6 MB (?)
 	// maximum RAM: 19.6 MB
 	// GDC & EGC, DAC1BIT built-in
-	// 2x 3.5 internal floppy drives + 1x mountable File Bay
+	// 2x 3.5/5.25 internal floppy drives or 1x 3.5 and 120MB IDE HDD
+	// 1x mountable File Bay
 	// 3x C-Bus slots
 }
 

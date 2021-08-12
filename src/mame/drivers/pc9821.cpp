@@ -571,6 +571,9 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_a_state::pc9821as_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	// 9821Ap, As, Ae has no dips to port A but reads back written content
+	m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
+
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
 
