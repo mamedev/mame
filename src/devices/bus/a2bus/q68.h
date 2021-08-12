@@ -23,9 +23,6 @@ class a2bus_68k_device:
 	public device_t,
 	public device_a2bus_card_interface
 {
-	friend class a2bus_q68_device;
-	friend class a2bus_q68plus_device;
-
 protected:
 	a2bus_68k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -38,10 +35,10 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override { return false; }
 
-	required_device<cpu_device> m_m68008;
-
 	uint8_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint8_t data);
+
+	required_device<cpu_device> m_m68008;
 
 private:
 	bool m_bEnabled;
@@ -52,9 +49,10 @@ class a2bus_q68_device : public a2bus_68k_device
 public:
 	a2bus_q68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	//virtual const tiny_rom_entry *device_rom_region() const override;
 
+private:
 	void m68008_mem(address_map &map);
 };
 
@@ -63,9 +61,10 @@ class a2bus_q68plus_device : public a2bus_68k_device
 public:
 	a2bus_q68plus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	//virtual const tiny_rom_entry *device_rom_region() const override;
 
+private:
 	void m68008_mem(address_map &map);
 };
 

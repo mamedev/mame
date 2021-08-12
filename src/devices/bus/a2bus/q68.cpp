@@ -38,8 +38,11 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "q68.h"
+
 #include "cpu/m68000/m68000.h"
+
 
 /***************************************************************************
     PARAMETERS
@@ -49,21 +52,21 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_Q68, a2bus_q68_device, "q68", "Stellation Two Q-68")
-DEFINE_DEVICE_TYPE(A2BUS_Q68PLUS, a2bus_q68plus_device, "q68plus", "Stellation Two Q-68 Plus")
+DEFINE_DEVICE_TYPE(A2BUS_Q68, a2bus_q68_device, "a2q68", "Stellation Two Q-68")
+DEFINE_DEVICE_TYPE(A2BUS_Q68PLUS, a2bus_q68plus_device, "a2q68plus", "Stellation Two Q-68 Plus")
 
 void a2bus_q68_device::m68008_mem(address_map &map)
 {
-	map(0x00000, 0x0ffff).rw(FUNC(a2bus_68k_device::dma_r), FUNC(a2bus_68k_device::dma_w));
-	map(0x10000, 0x11fff).mirror(0x6000).rom(); //8k debug rom
-	map(0x18000, 0x19fff).mirror(0x6000).ram(); //8k ram
+	map(0x00000, 0x0ffff).rw(FUNC(a2bus_q68_device::dma_r), FUNC(a2bus_q68_device::dma_w));
+	map(0x10000, 0x11fff).mirror(0x6000).rom(); // 8k debug rom
+	map(0x18000, 0x19fff).mirror(0x6000).ram(); // 8k of ram
 }
 
 void a2bus_q68plus_device::m68008_mem(address_map &map)
 {
-  map(0x00000, 0x0ffff).rw(FUNC(a2bus_68k_device::dma_r), FUNC(a2bus_68k_device::dma_w));
-  map(0x10000, 0x11fff).rom(); // 8k debug rom
-  map(0x12000, 0xfffff).ram(); // 1 MB of RAM
+	map(0x00000, 0x0ffff).rw(FUNC(a2bus_q68plus_device::dma_r), FUNC(a2bus_q68plus_device::dma_w));
+	map(0x10000, 0x11fff).rom(); // 8k debug rom
+	map(0x12000, 0xfffff).ram(); // 1 MB of RAM
 }
 
 ROM_START( q68 )
@@ -193,25 +196,25 @@ void a2bus_68k_device::write_c0nx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_68k_device::dma_r(offs_t offset)
 {
-  if(m_bEnabled)
-  {
-	if (offset <= 0x03ff)        //0x0000-0x03ff
+	if (m_bEnabled)
 	{
-		return slot_dma_read(offset+0x800);
+		if (offset <= 0x03ff)        //0x0000-0x03ff
+		{
+			return slot_dma_read(offset+0x800);
+		}
+		else if (offset <= 0x07ff)   //0x0400-0x07ff
+		{
+			return slot_dma_read(offset);
+		}
+		else if (offset <= 0x0bff)   //0x0800-0x0bff
+		{
+			return slot_dma_read(offset-0x800);
+		}
+		else if (offset <= 0xffff)   //0x0c00-0xffff
+		{
+			return slot_dma_read(offset);
+		}
 	}
-	else if (offset <= 0x07ff)   //0x0400-0x07ff
-	{
-		return slot_dma_read(offset);
-	}
-	else if (offset <= 0x0bff)   //0x0800-0x0bff
-	{
-		return slot_dma_read(offset-0x800);
-	}
-	else if (offset <= 0xffff)   //0x0c00-0xffff
-	{
-		return slot_dma_read(offset);
-	}
-  }
 	return 0xff;
 }
 
@@ -222,23 +225,23 @@ uint8_t a2bus_68k_device::dma_r(offs_t offset)
 
 void a2bus_68k_device::dma_w(offs_t offset, uint8_t data)
 {
-  if(m_bEnabled)
-  {
-	if (offset <= 0x03ff)        //0x0000-0x03ff
+	if (m_bEnabled)
 	{
-		return slot_dma_write(offset+0x800, data);
+		if (offset <= 0x03ff)        //0x0000-0x03ff
+		{
+			return slot_dma_write(offset+0x800, data);
+		}
+		else if (offset <= 0x07ff)   //0x0400-0x07ff
+		{
+			return slot_dma_write(offset, data);
+		}
+		else if (offset <= 0x0bff)   //0x0800-0x0bff
+		{
+			return slot_dma_write(offset-0x800, data);
+		}
+		else if (offset <= 0xffff)   //0x0c00-0xffff
+		{
+			return slot_dma_write(offset, data);
+		}
 	}
-	else if (offset <= 0x07ff)   //0x0400-0x07ff
-	{
-		return slot_dma_write(offset, data);
-	}
-	else if (offset <= 0x0bff)   //0x0800-0x0bff
-	{
-		return slot_dma_write(offset-0x800, data);
-	}
-	else if (offset <= 0xffff)   //0x0c00-0xffff
-	{
-		return slot_dma_write(offset, data);
-	}
-  }
 }
