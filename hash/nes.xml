@@ -52820,19 +52820,41 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<!-- SA-002 is Penguin and Seal, and its dump coincide with the HES version -->
+	<!-- SA-002 is Penguin and Seal, and its dump coincides with the HES version, Arctic Adventure -->
 	<software name="pengseal">
 		<description>The Penguin &amp; Seal (Tw, Aus)</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>Sachen ~ HES</publisher>
+		<info name="serial" value="SA-002"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="penguin &amp; seal, the (asia, australia) (unl).chr" size="8192" crc="8213c68d" sha1="4a78f686ab8945b32cd32d8c1033bbeedcc24579" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="penguin &amp; seal, the (asia, australia) (unl).prg" size="16384" crc="a90b980e" sha1="136f0ac17e874d7e38c9dff0b833a5c020d7a6b2" offset="00000" status="baddump" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- nointro -->
+	<software name="dongdong" cloneof="pengseal">
+		<description>Dong Dong Nao 1 (Tw)</description>
+		<year>1989</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="SA-002"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="s3013" />
+			<feature name="pcb" value="SACHEN-3013" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="dong dong no 1 (asia) (unl).chr" size="8192" crc="6bd749f5" sha1="25c2c8ed044c0b282ef3a6555baab76e380f0fac" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="dong dong no 1 (asia) (unl).prg" size="16384" crc="e732a4bc" sha1="af9cb94b091405bb432019bff2ab4c4179316030" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -53444,25 +53466,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="chinese kungfu (asia) (unl).prg" size="131072" crc="6b751b85" sha1="75a4c2e78e265e13c9d29b1e2701a7337f599dcf" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- nointro -->
-	<software name="dongdong" supported="partial">
-		<description>Dong Dong Nao 1 (Tw)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-128" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="8192">
-				<rom name="dong dong no 1 (asia) (unl).chr" size="8192" crc="6bd749f5" sha1="25c2c8ed044c0b282ef3a6555baab76e380f0fac" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="dong dong no 1 (asia) (unl).prg" size="16384" crc="e732a4bc" sha1="af9cb94b091405bb432019bff2ab4c4179316030" offset="00000" status="baddump" />
-				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -65666,6 +65669,7 @@ All musics were removed in this game.
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="magicseries" />
 			<feature name="pcb" value="MAGICSERIES" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
 				<rom name="magic dragon (unl).chr" size="65536" crc="4937921d" sha1="bf9b79c09fcf821a27090394a8c3f1de0ac0584c" offset="00000" status="baddump" />
 			</dataarea>
@@ -78154,12 +78158,13 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="mc_190">
-		<description>190 in 1</description>
+		<description>Golden 190 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_190in1" />
 			<feature name="pcb" value="BMC-190IN1" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="65536">
 				<rom name="190-in-1 [p1][u].chr" size="65536" crc="d94022fb" sha1="2f1e7ebbf748991dd468f591c793f3916325b25c" offset="00000" status="baddump" />
 			</dataarea>
@@ -78169,7 +78174,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_1994" supported="no">
+	<software name="mc_1994">
 		<description>1994 Super HIK 14 in 1 (G-136)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -79344,7 +79349,7 @@ be better to redump them properly. -->
 	</software>
 
 <!-- The UNIF file contained separate PRG banks -->
-	<software name="mc_4ck1" supported="no">
+	<software name="mc_4ck1" supported="partial">
 		<description>4 in 1 1993 (CK-001)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -79362,15 +79367,11 @@ be better to redump them properly. -->
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<dipswitch name="Menu type" tag="DSW" mask="1">
-				<dipvalue name="4-in-1" value="0" default="yes"/>
-				<dipvalue name="20-in-1" value="1"/>
-			</dipswitch>
 		</part>
 	</software>
 
 <!-- Is this really from a single-chip cart? or the dumping tools have merged the PRG contents? -->
-	<software name="mc_4ck1a" cloneof="mc_4ck1" supported="no">
+	<software name="mc_4ck1a" cloneof="mc_4ck1" supported="partial">
 		<description>4 in 1 1993 (CK-001, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -79891,13 +79892,14 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_6m23" supported="no">
+	<software name="mc_6m23" supported="partial">
 		<description>6 in 1 (MGC-023)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>TXC Corp</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_11160" />
 			<feature name="pcb" value="BMC-11160" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="131072">
 				<rom name="6-in-1 (mgc-023)[u].chr" size="131072" crc="9660700e" sha1="68181b5f172aed2fa9ab8799cf15755d3157be53" offset="00000" status="baddump" />
 			</dataarea>
@@ -81620,13 +81622,14 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_sg20" supported="partial">
+	<software name="mc_sg20">
 		<description>Super Gun 20 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sgun20in1" />
 			<feature name="pcb" value="BMC-SUPERGUN-20IN1" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="32768">
 				<rom name="super gun 20-in-1 [p1].chr" size="32768" crc="2d5d160c" sha1="887efc66eca7af81b11c94874d15add6c156da09" offset="00000" status="baddump" />
 			</dataarea>

@@ -258,15 +258,26 @@ class nes_sgun20in1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sgun20in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sgun20in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	nes_sgun20in1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+};
+
+
+// ======================> nes_bmc_190in1_device
+
+class nes_bmc_190in1_device : public nes_sgun20in1_device
+{
+public:
+	// construction/destruction
+	nes_bmc_190in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -511,15 +522,9 @@ class nes_bmc_11160_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_11160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_11160_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -529,15 +534,9 @@ class nes_bmc_g146_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_g146_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_g146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -562,16 +561,21 @@ class nes_bmc_8157_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_8157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_8157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_h(offs_t offset) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
+
+private:
+	required_ioport m_jumper;
+	u8 m_latch;
 };
 
 
@@ -887,24 +891,6 @@ class nes_bmc_150in1_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_bmc_150in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-};
-
-
-// ======================> nes_bmc_190in1_device
-
-class nes_bmc_190in1_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_bmc_190in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
