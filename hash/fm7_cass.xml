@@ -1677,7 +1677,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="proyakyu">
-		<description>Pro Yakyu Super Simulation</description>
+		<description>Pro Yakyuu Super Simulation</description>
 		<year>1983</year>
 		<publisher>JDS</publisher>
 		<info name="serial" value="JS-05"/>
@@ -1892,7 +1892,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="sanjutsu">
-		<description>Iwasanjutsunari</description>
+		<description>I wa Sanjutsu Nari</description>
 		<year>1982</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="serial" value="LA-1009"/>
@@ -2430,7 +2430,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="yakyukyo">
-		<description>Yakyu Kyo</description>
+		<description>Yakyuu Kyou</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="serial" value="LA-2008"/>
@@ -2444,7 +2444,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="yakyuken">
-		<description>Yakyu Ken</description>
+		<description>Yakyuuken</description>
 		<year>1982</year>
 		<publisher>九十九電機 (Tsukumo Denki)</publisher>
 		<info name="alt_title" value="野球拳"/>

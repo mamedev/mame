@@ -592,7 +592,7 @@ Shootout Pool                                               840-0098C    23844  
 \Shootout Pool The Medal (Japan, Rev A)                     840-0128C    24065A   4 (64Mb)   present  317-0367-COM  requires Naomi-based hopper controller
 /Shootout Pool Prize (Export) /
 \Shootout Pool The Medal (Japan) Version B                  840-0136C    24148    4 (64Mb)   present  317-0367-COM  requires Naomi-based or 837-14438 hopper controller (selected by P1 BUTTON1 bit)
-Soreike! Anpanman Popcorn Factory 2 (Rev C)                 840-0117C    24049B   4 (64Mb)   present  317-0359-JPN  require 838-14403 popcorn vendor control BD, Type-2 JVS I/O, 838-14245 "MAPLE/232C CONVERT BD" (MIE-based), 610-0760 "RFID CHIP R/W BD" and RFID chip
+Soreike! Anpanman Popcorn Koujou 2 (Rev C)                  840-0117C    24049B   4 (64Mb)   present  317-0359-JPN  require 838-14403 popcorn vendor control BD, Type-2 JVS I/O, 838-14245 "MAPLE/232C CONVERT BD" (MIE-based), 610-0760 "RFID CHIP R/W BD" and RFID chip
 Star Horse 2002 (sound, Export/Taiwan)                      840-0112B*   23964    6 (64Mb)   present  317-0347-COM  *no case
 SWP Hopper Board                                            840-0130C    24083   20 (64Mb)   present  317-0339-COM  reused VF4 Evo ROM board with all maskROMs still in place; there is an additional 837-14381 IO board
 Touch de Uno! 2                                             840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
@@ -11780,7 +11780,7 @@ ROM_END
 /* 0103    */ GAME( 2002, shors2k2s, naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (sound and backup, Rev A)", GAME_FLAGS )
 /* 0104    */ GAME( 2002, shors2k2l, naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (live)", GAME_FLAGS )
 /* 0112    */ GAME( 2002, shors2k2,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (sound, Export/Taiwan)", GAME_FLAGS )
-/* 0117    */ GAME( 2003, anpanman2, naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Soreike! Anpanman Popcorn Factory 2 (Rev C)", GAME_FLAGS ) // それいけ！アンパンマン ポップコーンこうじょう2
+/* 0117    */ GAME( 2003, anpanman2, naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Soreike! Anpanman Popcorn Koujou 2 (Rev C)", GAME_FLAGS ) // それいけ！アンパンマン ポップコーンこうじょう2
 /* 0120    */ GAME( 2003, shorsepm,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (main screens, Rev B)", GAME_FLAGS )
 /* 0121    */ GAME( 2003, shorseps,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (sound & backup, Rev A)", GAME_FLAGS )
 /* 0122    */ GAME( 2003, shorsepl,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (live, Rev A)", GAME_FLAGS )
