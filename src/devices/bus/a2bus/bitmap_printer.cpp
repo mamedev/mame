@@ -118,8 +118,10 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 	bitmap.plot_box(0, bitmap.height() - distfrombottom - m_ypos, m_paperwidth, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
-	bitmap.plot_box(m_xpos - 10, bitmap.height() - distfrombottom + 10,     20, 30, 0xBDB76B);
-	bitmap.plot_box(m_xpos - 5,  bitmap.height() - distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
+	drawprinthead(bitmap, m_xpos, bitmap.height() - distfrombottom);
+	
+//	bitmap.plot_box(m_xpos - 10, bitmap.height() - distfrombottom + 10,     20, 30, 0xBDB76B);
+//	bitmap.plot_box(m_xpos - 5,  bitmap.height() - distfrombottom + 10 + 5, 10, 20, 0xEEE8AA);
 
 	return 0;
 }
@@ -220,4 +222,30 @@ device_t* bitmap_printer_device::getrootdev()
     return lastdev;
 }
 
+
+
+
+void bitmap_printer_device::setprintheadcolor(int headcolor, int bordcolor)
+{
+	m_printheadcolor = headcolor;
+	m_printheadbordercolor = bordcolor;
+}
+
+void bitmap_printer_device::setprintheadsize(int xsize, int ysize, int bordersize)
+{
+	m_printheadxsize = xsize;
+	m_printheadysize = ysize;
+	m_printheadbordersize = bordersize;
+}
+
+void bitmap_printer_device::drawprinthead(bitmap_rgb32 &bitmap, int x, int y)
+{
+	int bordx = m_printheadbordersize;
+	int bordy = m_printheadbordersize;
+	int offy = 9 + bordy;
+	int sizex = m_printheadxsize;
+	int sizey = m_printheadysize;
+	bitmap.plot_box(x-sizex/2-bordx, y+offy-bordy, sizex+2*bordx, sizey+bordy*2, m_printheadbordercolor);
+	bitmap.plot_box(x-sizex/2,       y+offy,       sizex,         sizey,         m_printheadcolor);
+}
 

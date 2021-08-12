@@ -57,19 +57,26 @@ private:
     std::string m_snapshotdir;
     time_t m_session_time;
 	
-	int m_pagecount;  // page count
-	int m_pagelimit = 0;  // limit on pages (0 = no limit)
+//	int m_pagecount;  // page count
+//	int m_pagelimit = 0;  // limit on pages (0 = no limit)
 	int m_printheadcolor       = 0xEEE8AA;
 	int m_printheadbordercolor = 0xBDB76B;
-	int m_printheadbordersize = 5;
-	int m_printheadxsize = 15;
-	int m_printheadysize = 30;
+	int m_printheadbordersize = 3;
+	int m_printheadxsize = 10;
+	int m_printheadysize = 20;
 	int m_distfrombottom = 50;  // print head position from bottom of screen
-	int m_clearlinepos = 0;
+//	int m_clearlinepos = 0;
 //	int m_papercolor=0xffffff;
 	int m_pagedirty = 0;
 	int m_paperwidth;
 	int m_paperheight;
+
+
+void setprintheadcolor(int headcolor, int bordcolor);
+void setprintheadsize(int xsize, int ysize, int bordersize);
+
+void drawprinthead(bitmap_rgb32 &bitmap, int x, int y);
+
 
  private:
 	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
