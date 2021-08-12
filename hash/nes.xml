@@ -66357,14 +66357,13 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="sk5" supported="no">
+	<software name="sk5">
 		<description>Sonic &amp; Knuckles 5 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Super Sonic 5 (on cart label)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="kay" />
 			<dataarea name="chr" size="262144">
 				<rom name="super sonic 5 (unl).chr" size="262144" crc="796303be" sha1="476cf4034fa5e69b8f74a33e8883cf9f96d47540" offset="00000" status="baddump" />
 			</dataarea>
@@ -77259,14 +77258,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="umk4" supported="no">
+	<software name="umk4" supported="partial">
 		<description>Ultimate Mortal Kombat 4 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="NT-873"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="kay" />
 			<dataarea name="chr" size="262144">
 				<rom name="ultimate mortal kombat 4 (unl).chr" size="262144" crc="06cd8beb" sha1="dd2bc817637805deacf0d19a81c434e0107e6a49" offset="00000" status="baddump" />
 			</dataarea>
