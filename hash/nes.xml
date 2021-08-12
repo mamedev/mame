@@ -76689,13 +76689,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="sf2a" cloneof="sf2" supported="no">
+<!-- Is this or the parent a bad dump? They differ in only one byte in CHR ROM. -->
+	<software name="sf2a" cloneof="sf2">
 		<description>Street Fighter II - The World Warrior (Asia, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Yoko Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="kof96" />
-			<feature name="pcb" value="UNL-KOF96" />
+			<feature name="slot" value="txc_tw" />
 			<dataarea name="chr" size="131072">
 				<rom name="street fighter ii - the world warrior (unl) [a1].chr" size="131072" crc="cb8b2ca2" sha1="2a9814350c33cb156b25e17ee46d3be9134e3b42" offset="00000" status="baddump" />
 			</dataarea>
@@ -76705,13 +76705,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="sf2b" cloneof="sf2" supported="no">
+	<software name="sf2b" cloneof="sf2">
 		<description>Street Fighter II - The World Warrior (Asia, Alt 2)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Yoko Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="kof96" />
-			<feature name="pcb" value="UNL-KOF96" />
+			<feature name="slot" value="txc_tw" />
 			<dataarea name="chr" size="131072">
 				<rom name="street fighter ii - the world warrior (unl) [a2].chr" size="131072" crc="d1390da0" sha1="d9f71c2f15cd020aebc6a799e9422fbe5b7de98b" offset="00000" status="baddump" />
 			</dataarea>
@@ -76721,13 +76720,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="sf2" supported="no">
+	<software name="sf2">
 		<description>Street Fighter II - The World Warrior (Asia)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>Yoko Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="kof96" />
-			<feature name="pcb" value="UNL-KOF96" />
+			<feature name="slot" value="txc_tw" />
 			<dataarea name="chr" size="131072">
 				<rom name="street fighter ii - the world warrior (unl).chr" size="131072" crc="533be7c5" sha1="08e0be7bcb44ff8b31c603cd20b0d0ed413777ed" offset="00000" status="baddump" />
 			</dataarea>
