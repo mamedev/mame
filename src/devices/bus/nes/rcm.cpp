@@ -66,7 +66,9 @@ nes_tf9_device::nes_tf9_device(const machine_config &mconfig, const char *tag, d
 }
 
 nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_3DBLOCK, tag, owner, clock), m_irq_count(0)
+	: nes_nrom_device(mconfig, NES_3DBLOCK, tag, owner, clock)
+	, m_irq_count(0)
+	//, m_protcpu(*this, "protcpu")
 {
 }
 
@@ -120,6 +122,12 @@ void nes_tf9_device::pcb_reset()
 	prg32(0);
 	chr8(0, m_chr_source);
 }
+
+void nes_3dblock_device::device_add_mconfig(machine_config &config)
+{
+	//PIC16C54(config, m_protcpu, 4000000); /* ? Mhz */
+}
+
 
 void nes_3dblock_device::device_start()
 {

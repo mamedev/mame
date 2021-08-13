@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nxrom.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 
 
 // ======================> nes_gs2015_device
@@ -98,10 +99,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 
 private:
 	uint8_t m_reg[4];
 	uint8_t m_irq_count;
+
+	//required_device<pic16c54_device> m_protcpu;
 };
 
 
