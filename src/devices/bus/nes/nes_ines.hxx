@@ -323,7 +323,7 @@ static const nes_mmc mmc_list[] =
 	{ 285, BMC_A65AS },
 	{ 286, BMC_BENSHIENG },
 	{ 287, BMC_411120C },
-	// 288 GKCX1 21 in 1 multicarts, not in nes.xml?
+	{ 288, BMC_GKCXIN1 },
 	{ 289, BMC_60311C },
 	{ 290, BMC_NTD_03 },
 	// 291 Kasheng 2-in-1 multicarts not yet in nes.xml?

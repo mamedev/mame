@@ -51,6 +51,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09
 DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63",       "NES Cart BMC Ghostbusters 63 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device,    "nes_bmc_gkcxin1",    "NES Cart BMC GKCXIN1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device,      "nes_bmc_k3036",      "NES Cart BMC K-3036 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device,      "nes_bmc_k3046",      "NES Cart BMC K-3046 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device,     "nes_bmc_sa005a",     "NES Cart BMC SA005-A PCB")
@@ -230,6 +231,11 @@ nes_bmc_gka_device::nes_bmc_gka_device(const machine_config &mconfig, const char
 
 nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_GKB, tag, owner, clock)
+{
+}
+
+nes_bmc_gkcxin1_device::nes_bmc_gkcxin1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_GKCXIN1, tag, owner, clock)
 {
 }
 
@@ -1891,6 +1897,27 @@ void nes_bmc_gkb_device::write_h(offs_t offset, uint8_t data)
 	prg16_cdef(offset | bank);
 	chr8(offset >> 3, m_chr_source);
 	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ Board BMC-GKCXIN1
+
+ Unknown Bootleg Multigame Board
+ Games: 21 in 1
+
+ NES 2.0: mapper 288
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_gkcxin1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_gkcxin1 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	prg32((offset >> 3) & 0x03);
+	chr8(offset & 0x07, CHRROM);
 }
 
 /*-------------------------------------------------
