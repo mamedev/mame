@@ -627,7 +627,7 @@ configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
 		"MAME_PROFILER",
---      "BGFX_CONFIG_DEBUG=1",
+		"BGFX_CONFIG_DEBUG=1",
 	}
 
 configuration { }
