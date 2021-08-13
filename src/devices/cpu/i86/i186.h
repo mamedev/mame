@@ -66,7 +66,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual uint8_t fetch() override;
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 

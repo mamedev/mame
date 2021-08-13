@@ -13,7 +13,7 @@ DECLARE_DEVICE_TYPE(I8086, i8086_cpu_device)
 DECLARE_DEVICE_TYPE(I8088, i8088_cpu_device)
 
 #define INPUT_LINE_INT0         INPUT_LINE_IRQ0
-#define INPUT_LINE_TEST         20
+#define INPUT_LINE_TEST         INPUT_LINE_IRQ1
 
 
 enum
@@ -358,7 +358,7 @@ protected:
 
 	virtual void execute_run() override;
 	virtual void device_start() override;
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual uint8_t fetch() override;
 	inline address_space *sreg_to_space(int sreg) const;
 	virtual uint8_t read_byte(uint32_t addr) override;

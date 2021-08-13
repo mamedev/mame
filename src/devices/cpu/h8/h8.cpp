@@ -188,7 +188,7 @@ uint32_t h8_device::execute_max_cycles() const noexcept
 
 uint32_t h8_device::execute_input_lines() const noexcept
 {
-	return 0;
+	return 18;
 }
 
 bool h8_device::execute_input_edge_triggered(int inputnum) const noexcept
