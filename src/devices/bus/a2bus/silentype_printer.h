@@ -20,8 +20,8 @@ protected:
 	silentype_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 public:
-
 	DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_xpos <= 0); }
+	DECLARE_READ_LINE_MEMBER( serial_data ) { return 0; } // should return shift register on read (unimplemented)
 
 	void update_printhead(uint8_t data);
 	void update_pf_stepper(uint8_t data);

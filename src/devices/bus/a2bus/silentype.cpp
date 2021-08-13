@@ -125,9 +125,9 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 //    0x0e will shift in a 0
 //    0x0f will shift in a 1
 //
-//       hstepperbits = BITS(m_parallel_reg, 3,  0);  // bits 0-3 are for the horizontal stepper
-//       vstepperbits = BITS(m_parallel_reg, 7,  4);  // bits 4-7 are for the vertical stepper
-//       headbits     = BITS(m_parallel_reg, 15, 9);  // bits 9-15 are for the print head
+//       hstepperbits = BITS(m_parallel_reg, 0, 4);  // bits 0-3 are for the horizontal stepper
+//       vstepperbits = BITS(m_parallel_reg, 4, 4);  // bits 4-7 are for the vertical stepper
+//       headbits     = BITS(m_parallel_reg, 9, 7);  // bits 9-15 are for the print head
 //
 //    Bit 8 is for R/W* input to the shift register and is normally sent as a 0.
 //
@@ -149,7 +149,7 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 
 // read bits @ c092
 #define SERIAL_DATA_Q15               (7)  // shift register Q15 output
-#define SERIAL_CLOCK_STATUS           (6)  // current shift clock output, read on A01
+#define SHIFT_CLOCK_STATUS           (6)  // current shift clock output or shift clock from printer, read on A01
 
 
 /***************************************************************************
@@ -218,6 +218,7 @@ a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, co
 void a2bus_silentype_device::device_start()
 {
 	memset(m_ram, 0, sizeof(m_ram));
+
 	save_item(NAME(m_ram));
 }
 
@@ -235,12 +236,23 @@ void a2bus_silentype_device::device_reset()
 
 uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 {
-	if (offset == 4)
+	u8 retval = 0;
+	
+	if (BIT(offset,2))  // c094  (decodes bit a02)
 	{
-		return m_silentype_printer->margin_switch_input() << SILENTYPE_STATUS;
+		retval |= m_silentype_printer->margin_switch_input() << SILENTYPE_STATUS;  // margin switch on d7
 	}
-	else
-		return 0x00;
+	
+	if (BIT(offset,1))  // c091  (decodes bit a01)
+	{
+		retval |= m_silentype_printer->serial_data() << SERIAL_DATA_Q15; // if datawriteenable is off, read serial data from the printer on d7, otherwise reads serial data out (unimplemented)
+//		retval |= 0 << SHIFT_CLOCK_STATUS; // read shift clock status on d6 (unimplemented) (pulled up to +5v if printer connected and shift clock output disabled)
+		
+		retval |= (BIT(last_write_c0nx, SILENTYPE_SHIFT_CLOCK_DISABLE) ? 1 : 
+					BIT(last_write_c0nx, SILENTYPE_SHIFT_CLOCKA)) << SHIFT_CLOCK_STATUS; // read shift clock status on d6 (unimplemented) (pulled up to +5v if printer connected and shift clock output disabled)
+
+	}
+	return retval;
 }
 
 //-------------------------------------------------
@@ -249,56 +261,59 @@ uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 
 void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	LOG("Silentype WRITE %x = %x\n",offset+slotno()*0x10+0xc080,data);
+	LOG("Silentype WRITE %x = %x\n",offset + slotno()* 0x10 + 0xc080,data);
 
-	m_romenable = BIT(data, SILENTYPE_ROMENABLE) ? 1 : 0;
-
-	if (
-		(
-		(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
-		(BIT(data, SILENTYPE_SHIFTCLOCKB) == 1)     // transitory shift clock
-		)
-			||
-		(
-		(BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKA) == 1) &&   // latched transition from 1 to 0
-		(BIT(data,            SILENTYPE_SHIFTCLOCKA) == 0)
-		)
-		)
+	if (BIT(offset,0))  // decodes a0
 	{
-		u8 databit = BIT(data, SILENTYPE_DATAWRITEENABLE) ? BIT(data, SILENTYPE_DATA) : 0;
-		LOG("Silentype Shift Bit = %x\n", databit);
-		m_shift_reg = (m_shift_reg << 1) | databit;
+		m_romenable = BIT(data, SILENTYPE_ROMENABLE) ? 1 : 0;
+
+		if (
+			(
+			(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
+			(BIT(data, SILENTYPE_SHIFTCLOCKB) == 1)     // transitory shift clock
+			)
+				||
+			(
+			(BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKA) == 1) &&   // latched transition from 1 to 0
+			(BIT(data,            SILENTYPE_SHIFTCLOCKA) == 0)
+			)
+			)
+		{
+			u8 databit = BIT(data, SILENTYPE_DATAWRITEENABLE) ? BIT(data, SILENTYPE_DATA) : 0;
+			LOG("Silentype Shift Bit = %x\n", databit);
+			m_shift_reg = (m_shift_reg << 1) | databit;
+		}
+
+		if (
+			(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
+			(BIT(data, SILENTYPE_SHIFTCLOCKB) == 0) &&
+			(BIT(data, SILENTYPE_STORECLOCK) == 0)
+			)
+		{
+			LOG("Silentype Clear Parallel Register\n");
+			m_parallel_reg = 0;
+
+			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
+			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
+			m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
+
+		}
+		else if (
+			(BIT(last_write_c0nx, SILENTYPE_STORECLOCK) == 1) &&  // transition from 1 to 0
+			(BIT(data,            SILENTYPE_STORECLOCK) == 0)
+			)  // store shift register to parallel register
+		{
+			m_parallel_reg = m_shift_reg;
+
+			LOG("Silentype Store Parallel Register = %4x\n", m_parallel_reg);
+
+			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
+			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
+			m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
+
+		}
+		last_write_c0nx = data;
 	}
-
-	if (
-		(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
-		(BIT(data, SILENTYPE_SHIFTCLOCKB) == 0) &&
-		(BIT(data, SILENTYPE_STORECLOCK) == 0)
-		)
-	{
-		LOG("Silentype Clear Parallel Register\n");
-		m_parallel_reg = 0;
-
-		m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
-		m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
-		m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
-
-	}
-	else if (
-		(BIT(last_write_c0nx, SILENTYPE_STORECLOCK) == 1) &&  // transition from 1 to 0
-		(BIT(data,            SILENTYPE_STORECLOCK) == 0)
-		)  // store shift register to parallel register
-	{
-		m_parallel_reg = m_shift_reg;
-
-		LOG("Silentype Store Parallel Register = %4x\n", m_parallel_reg);
-
-		m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
-		m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
-		m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
-
-	}
-	last_write_c0nx = data;
 }
 
 /*-------------------------------------------------
