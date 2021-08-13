@@ -129,23 +129,39 @@ class nes_sglionk_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+	virtual void prg_cb(int start, int bank) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	// construction/destruction
+	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u8 *reg_table, const u16 *addr_table);
+
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
-	uint8_t m_reg;
-	int m_reg_enabled;
+	bool m_mmc3_mode;
+	const u8 *m_reg_table;
+	const u16 *m_addr_table;
 };
 
 
+// ======================> nes_sgboog_device
+
+class nes_sgboog_device : public nes_sglionk_device
+{
+public:
+	// construction/destruction
+	nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+/*
 // ======================> nes_sgboog_device
 
 class nes_sgboog_device : public nes_txrom_device
@@ -171,6 +187,7 @@ private:
 	uint8_t m_reg[3];
 	uint8_t m_mode;
 };
+*/
 
 
 // ======================> nes_kasing_device
