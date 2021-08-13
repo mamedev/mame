@@ -61,6 +61,47 @@ private:
 	void nes_clone_map(address_map &map);
 };
 
+
+class nes_clone_dancexpt_state : public nes_clone_state
+{
+public:
+	nes_clone_dancexpt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nes_clone_state(mconfig, type, tag),
+		m_nametables(*this, "nametable%u", 0),
+		m_prgrom(*this, "prgrom"),
+		m_gfxrom(*this, "gfxrom"),
+		m_mainrom(*this, "maincpu")
+	{ }
+	void nes_clone_dancexpt(machine_config &config);
+
+private:
+	void nes_clone_dancexpt_map(address_map &map);
+	memory_bank_array_creator<4> m_nametables;
+	required_memory_bank m_prgrom;
+	memory_bank_creator m_gfxrom;
+	required_region_ptr<uint8_t> m_mainrom;
+
+	std::unique_ptr<u8[]> m_nt_ram;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void mapper_5000_w(offs_t offset, uint8_t data);
+	void mapper_5100_w(offs_t offset, uint8_t data);
+	void mapper_5200_w(offs_t offset, uint8_t data);
+
+	virtual uint8_t in0_r() override;
+	virtual uint8_t in1_r() override;
+	virtual void in0_w(uint8_t data) override;
+
+	void update_video_bank();
+
+	uint8_t m_5000_val;
+	uint8_t m_5100_val;
+	uint8_t m_5200_val;
+};
+
+
 class nes_clone_dnce2000_state : public nes_clone_state
 {
 public:
@@ -141,7 +182,6 @@ public:
 		m_cbank(*this, "cbank%u", 0),
 		m_nametables(*this, "nametable%u", 0),
 		m_charbank(*this, "charbank"),
-		m_ntbank(*this, "ntbank"),
 		m_rom_solderpad_bank(*this, "rom_sldpad_bank")
 	{ }
 	void nes_clone_afbm7800(machine_config& config);
@@ -180,9 +220,9 @@ private:
 	uint8_t m_extraregs[4];
 
 	void update_banks();
-	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
-	int16_t m_multigam3_mmc3_scanline_counter;
-	uint8_t m_multigam3_mmc3_scanline_latch;
+	void mmc3_scanline_cb(int scanline, int vblank, int blanked);
+	int16_t m_mmc3_scanline_counter;
+	uint8_t m_mmc3_scanline_latch;
 	uint8_t m_mmc3_irq_enable;
 
 	std::vector<u8> m_vram;
@@ -193,19 +233,15 @@ private:
 	void update_nt_mirroring();
 	std::vector<u8> m_nt_ram;
 
-	void multigam_nt_w(offs_t offset, uint8_t data);
-	uint8_t multigam_nt_r(offs_t offset);
-
 	void vram_map(address_map &map);
 	void ntram_map(address_map &map);
 	void romarea_map(address_map &map);
 
 	required_memory_bank_array<4> m_prgbank;
 	required_memory_bank_array<6> m_cbank;
-	required_memory_bank_array<4> m_nametables;
+	memory_bank_array_creator<4> m_nametables;
 
 	required_device<address_map_bank_device> m_charbank;
-	required_device<address_map_bank_device> m_ntbank;
 	required_device<address_map_bank_device> m_rom_solderpad_bank;
 };
 
@@ -329,6 +365,20 @@ static INPUT_PORTS_START( dnce2000 )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+
+static INPUT_PORTS_START( dancexpt )
+	PORT_START("IO1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 void nes_clone_state::video_start()
 {
 }
@@ -396,6 +446,124 @@ void nes_clone_state::nes_clone_pal(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
+
+/**************************************************
+ Dancing Expert specifics
+**************************************************/
+
+void nes_clone_dancexpt_state::machine_start()
+{
+	nes_clone_state::machine_start();
+
+	m_nt_ram = std::make_unique<u8[]>(0x800);
+
+	m_prgrom->configure_entries(0, 0x08, &m_mainrom[0], 0x4000);
+	m_gfxrom->configure_entries(0, 0x20, memregion("gfx1")->base(), 0x2000);
+
+	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_gfxrom);
+
+	for (int i = 0; i < 4; i++)
+		m_nametables[i]->configure_entries(0, 2, &m_nt_ram[0], 0x400);
+
+	save_pointer(NAME(m_nt_ram), 0x800);
+
+	m_nametables[0]->set_entry(0);
+	m_nametables[1]->set_entry(1);
+	m_nametables[2]->set_entry(0);
+	m_nametables[3]->set_entry(1);
+
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2000,0x23ff,m_nametables[0]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2400,0x27ff,m_nametables[1]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2800,0x2bff,m_nametables[2]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2c00,0x2fff,m_nametables[3]);
+}
+
+
+uint8_t nes_clone_dancexpt_state::in0_r()
+{
+	// polled frequently during game, music data? from some other device?
+	return 0xfe; // bit 0x01 exits the song?
+}
+
+uint8_t nes_clone_dancexpt_state::in1_r()
+{
+	// read directly, not through shifter here
+	return m_io1->read();
+}
+
+void nes_clone_dancexpt_state::machine_reset()
+{
+	nes_clone_state::machine_reset();
+	m_5000_val = 0x6;
+}
+
+void nes_clone_dancexpt_state::update_video_bank()
+{
+	int bank = (m_previous_port0 & 0x7) * 4;
+	bank += m_5100_val & 0x3;
+
+	m_gfxrom->set_entry(bank);
+}
+
+void nes_clone_dancexpt_state::mapper_5000_w(offs_t offset, uint8_t data)
+{
+	// xxxx -bbb  b = CPU bank at 8000-bfff  x = unknown (sometimes 2, sometimes d)
+
+	if (data & ~0x27)
+		logerror("%s: mapper_5000_w %02x\n", machine().describe_context(), data);
+
+	m_5000_val = data;
+
+	m_prgrom->set_entry(m_5000_val & 0x7);
+}
+
+void nes_clone_dancexpt_state::mapper_5100_w(offs_t offset, uint8_t data)
+{
+	// ---- --cc   c = lower character ROM bank
+
+	if (data & 0xfc)
+		logerror("%s: mapper_5100_w %02x\n", machine().describe_context(), data);
+
+	m_5100_val = data;
+	update_video_bank();
+}
+
+void nes_clone_dancexpt_state::in0_w(uint8_t data)
+{
+	// ---- -CCC   C = upper character ROM bank
+
+	// instead of input related writes, the video banking is here?!
+	m_previous_port0 = data;
+	update_video_bank();
+}
+
+void nes_clone_dancexpt_state::mapper_5200_w(offs_t offset, uint8_t data)
+{
+	// ---- ----  unknown
+
+	logerror("%s: mapper_5200_w %02x\n", machine().describe_context(), data);
+	m_5200_val = data;
+	//update_video_bank();
+}
+
+void nes_clone_dancexpt_state::nes_clone_dancexpt(machine_config &config)
+{
+	nes_clone(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_dancexpt_state::nes_clone_dancexpt_map);
+}
+
+void nes_clone_dancexpt_state::nes_clone_dancexpt_map(address_map &map)
+{
+	nes_clone_basemap(map);
+
+	map(0x5000, 0x5000).w(FUNC(nes_clone_dancexpt_state::mapper_5000_w));
+	map(0x5100, 0x5100).w(FUNC(nes_clone_dancexpt_state::mapper_5100_w));
+	map(0x5200, 0x5200).w(FUNC(nes_clone_dancexpt_state::mapper_5200_w));
+
+	map(0x8000, 0xbfff).bankr("prgrom");
+	map(0xc000, 0xffff).rom().region("maincpu", 0x1c000);
+}
+
 
 /**************************************************
  Dance 2000 Specifics
@@ -639,13 +807,13 @@ void nes_clone_afbm7800_state::mapper_a001_w(uint8_t data)
 void nes_clone_afbm7800_state::mapper_c000_w(uint8_t data)
 {
 	// irq latch
-	m_multigam3_mmc3_scanline_counter = data ^ 0xff;
+	m_mmc3_scanline_counter = data ^ 0xff;
 }
 
 void nes_clone_afbm7800_state::mapper_c001_w(uint8_t data)
 {
 	// irq reload
-	m_multigam3_mmc3_scanline_latch = data;
+	m_mmc3_scanline_latch = data;
 }
 
 void nes_clone_afbm7800_state::mapper_e000_w(uint8_t data)
@@ -663,15 +831,15 @@ void nes_clone_afbm7800_state::mapper_e001_w(uint8_t data)
 
 
 
-void nes_clone_afbm7800_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int blanked )
+void nes_clone_afbm7800_state::mmc3_scanline_cb( int scanline, int vblank, int blanked )
 {
 	if (m_mmc3_irq_enable)
 	{
 		if (!vblank && !blanked)
 		{
-			if (--m_multigam3_mmc3_scanline_counter == -1)
+			if (--m_mmc3_scanline_counter == -1)
 			{
-				m_multigam3_mmc3_scanline_counter = m_multigam3_mmc3_scanline_latch;
+				m_mmc3_scanline_counter = m_mmc3_scanline_latch;
 				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 			}
 		}
@@ -816,8 +984,8 @@ void nes_clone_afbm7800_state::machine_reset()
 	update_banks();
 	update_nt_mirroring();
 
-	m_multigam3_mmc3_scanline_counter = 0;
-	m_multigam3_mmc3_scanline_latch = 0;
+	m_mmc3_scanline_counter = 0;
+	m_mmc3_scanline_latch = 0;
 	m_mmc3_irq_enable = 0;
 }
 
@@ -831,15 +999,6 @@ void nes_clone_afbm7800_state::vram_w(offs_t offset, uint8_t data)
 	m_charbank->write8(offset, data);
 }
 
-uint8_t nes_clone_afbm7800_state::multigam_nt_r(offs_t offset)
-{
-	return m_ntbank->read8(offset);
-}
-
-void nes_clone_afbm7800_state::multigam_nt_w(offs_t offset, uint8_t data)
-{
-	m_ntbank->write8(offset, data);
-}
 
 void nes_clone_afbm7800_state::machine_start()
 {
@@ -867,15 +1026,18 @@ void nes_clone_afbm7800_state::machine_start()
 		m_nametables[i]->configure_entries(0, 0x800 / 0x400, &m_nt_ram[0], 0x400);
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x1fff, read8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::vram_r)), write8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::vram_w)));
-	m_ppu->set_scanline_callback(*this, FUNC(nes_clone_afbm7800_state::multigam3_mmc3_scanline_cb));
+	m_ppu->set_scanline_callback(*this, FUNC(nes_clone_afbm7800_state::mmc3_scanline_cb));
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::multigam_nt_r)), write8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::multigam_nt_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2000,0x23ff,m_nametables[0]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2400,0x27ff,m_nametables[1]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2800,0x2bff,m_nametables[2]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2c00,0x2fff,m_nametables[3]);
 
 	save_item(NAME(m_vram));
 	save_item(NAME(m_nt_ram));
 
-	save_item(NAME(m_multigam3_mmc3_scanline_counter));
-	save_item(NAME(m_multigam3_mmc3_scanline_latch));
+	save_item(NAME(m_mmc3_scanline_counter));
+	save_item(NAME(m_mmc3_scanline_latch));
 	save_item(NAME(m_mmc3_irq_enable));
 
 	save_item(NAME(m_ntmirror));
@@ -1084,6 +1246,13 @@ ROM_START( hs36blk )
 	ROM_LOAD( "mx29lv160cbtc.u3", 0x00000, 0x200000, CRC(b5cf91a0) SHA1(399f015fb0580c90928e7f3d73810cc4b6cc70d9) )
 ROM_END
 
+ROM_START( dancexpt )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dancingexpert27c010.bin", 0x0000, 0x20000, CRC(658ba2ea) SHA1(c08f6a2735b3c7383cba3a5fa3af905d5af6926f) )
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "dancingexpert27c020.bin", 0x00000, 0x40000, CRC(b653c40c) SHA1(9b74e56768ea5b5309df9761fb442b9be0be46e9) )
+ROM_END
 
 void nes_clone_state::init_nes_clone()
 {
@@ -1106,6 +1275,24 @@ CONS( 200?, nytsudo,      0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_s
 CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
+
+//
+
+/*
+    Dancing Export by Daidaixing (aka TimeTop)
+
+    (notes from Sean Riddle regarding missing sound)
+    There are two globs on the main PCB, the bigger one next to a label that says NT6561.
+    Also two 32-pin COBs, one marked 27C020 and the other 27C010 (both dumped)
+
+    Finally, a daughterboard with 1 glob.
+    The daughterboard has 10 traces going to it; power, ground, and 7 from the smaller glob.
+    The 10th trace looks like the audio output.
+
+    I assume the daughterboard has a microcontroller for sound
+    I'm not sure what the smaller glob is, but it looks like it sends commands to the daughterboard.
+*/
+CONS( 200?, dancexpt, 0, 0, nes_clone_dancexpt, dancexpt, nes_clone_dancexpt_state, init_nes_clone, "Daidaixing", "Dancing Expert", MACHINE_NOT_WORKING )
 
 CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "Virtual TV Soccer", MACHINE_NOT_WORKING )
 

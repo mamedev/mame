@@ -1236,41 +1236,41 @@ ROM_END
 
 ROM_START( spectar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "spl11a-3", 0x1000, 0x0800, CRC(08880aff) SHA1(3becef348245ff4c8b0aae4a14751ab740b7d160) )
-	ROM_LOAD( "spl10a-2", 0x1800, 0x0800, CRC(fca667c1) SHA1(168426f9e87c002d2673c0230fceac4d0831d594) )
-	ROM_LOAD( "spl9a-3",  0x2000, 0x0800, CRC(9d4ce8ba) SHA1(2ef45c225fe704e49d10247c3eba1ef14141b3b7) )
-	ROM_LOAD( "spl8a-2",  0x2800, 0x0800, CRC(cfacbadf) SHA1(77b27cf6f35e8e8dd2fd4f31bba2a96f3076163e) )
-	ROM_LOAD( "spl7a-2",  0x3000, 0x0800, CRC(4c4741ff) SHA1(8de72613a385095253bb9e6da76493caec3115e4) )
-	ROM_LOAD( "spl6a-2",  0x3800, 0x0800, CRC(0cb46b25) SHA1(65c5d2cc8df67225339dc8781dd29d4b57ded70c) )
+	ROM_LOAD( "spl11a-3.11a", 0x1000, 0x0800, CRC(08880aff) SHA1(3becef348245ff4c8b0aae4a14751ab740b7d160) )
+	ROM_LOAD( "spl10a-2.10a", 0x1800, 0x0800, CRC(fca667c1) SHA1(168426f9e87c002d2673c0230fceac4d0831d594) )
+	ROM_LOAD( "spl9a-3.9a",   0x2000, 0x0800, CRC(9d4ce8ba) SHA1(2ef45c225fe704e49d10247c3eba1ef14141b3b7) )
+	ROM_LOAD( "spl8a-2.8a",   0x2800, 0x0800, CRC(cfacbadf) SHA1(77b27cf6f35e8e8dd2fd4f31bba2a96f3076163e) )
+	ROM_LOAD( "spl7a-2.7a",   0x3000, 0x0800, CRC(4c4741ff) SHA1(8de72613a385095253bb9e6da76493caec3115e4) )
+	ROM_LOAD( "spl6a-2.6a",   0x3800, 0x0800, CRC(0cb46b25) SHA1(65c5d2cc8df67225339dc8781dd29d4b57ded70c) )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "hrl11d-2", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
-	ROM_CONTINUE(         0x0000, 0x0400 )  /* overwrite with the real one */
+	ROM_LOAD( "hrl11d-2.11d", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
+	ROM_CONTINUE(             0x0000, 0x0400 )  /* overwrite with the real one */
 
-	ROM_REGION( 0x0140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. The 2 6331 match the Targ ones.
-	ROM_LOAD( "prom.5c",  0x0000, 0x0100, BAD_DUMP CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual
-	ROM_LOAD( "prom.6d",  0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Spectar manual
-	ROM_LOAD( "hrl14h-1", 0x0120, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "spl5c-2.5c",   0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual, also seen as IM 5623CPE on PCB
+	ROM_LOAD( "prom.6d",      0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, dumped from a bootleg
+	ROM_LOAD( "hrl14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
 ROM_START( spectar1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "spl12a1",  0x0800, 0x0800, CRC(7002efb4) SHA1(fbb19ccd2aee49b78606eadcbef94e842e1be905) )
-	ROM_LOAD( "spl11a1",  0x1000, 0x0800, CRC(8eb8526a) SHA1(0c42ee073fc73c89731dec4e3ecfc82c9b8301e9) )
-	ROM_LOAD( "spl10a1",  0x1800, 0x0800, CRC(9d169b3d) SHA1(bee9d029df6e2fba24a5ba41a76f1658e9038838) )
-	ROM_LOAD( "spl9a1",   0x2000, 0x0800, CRC(40e3eba1) SHA1(197aaed9a6159b6f3e347c0446be9e44733c1341) )
-	ROM_LOAD( "spl8a1",   0x2800, 0x0800, CRC(64d8eb84) SHA1(a249c832ea951fddc6699f7ac0b4486e8a5be98e) )
-	ROM_LOAD( "spl7a1",   0x3000, 0x0800, CRC(e08b0d8d) SHA1(6ffd6f8fb50c9fc09c38f56da7d6d005b66e78cc) )
-	ROM_LOAD( "spl6a1",   0x3800, 0x0800, CRC(f0e4e71a) SHA1(5487a94650c964a7ab07f30aacab0b470dcb3b40) )
+	ROM_LOAD( "spl12a-1.12a", 0x0800, 0x0800, CRC(7002efb4) SHA1(fbb19ccd2aee49b78606eadcbef94e842e1be905) )
+	ROM_LOAD( "spl11a-1.11a", 0x1000, 0x0800, CRC(8eb8526a) SHA1(0c42ee073fc73c89731dec4e3ecfc82c9b8301e9) )
+	ROM_LOAD( "spl10a-1.10a", 0x1800, 0x0800, CRC(9d169b3d) SHA1(bee9d029df6e2fba24a5ba41a76f1658e9038838) )
+	ROM_LOAD( "spl9a-1.9a",   0x2000, 0x0800, CRC(40e3eba1) SHA1(197aaed9a6159b6f3e347c0446be9e44733c1341) )
+	ROM_LOAD( "spl8a-1.8a",   0x2800, 0x0800, CRC(64d8eb84) SHA1(a249c832ea951fddc6699f7ac0b4486e8a5be98e) )
+	ROM_LOAD( "spl7a-1.7a",   0x3000, 0x0800, CRC(e08b0d8d) SHA1(6ffd6f8fb50c9fc09c38f56da7d6d005b66e78cc) )
+	ROM_LOAD( "spl6a-1.6a",   0x3800, 0x0800, CRC(f0e4e71a) SHA1(5487a94650c964a7ab07f30aacab0b470dcb3b40) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "hrl11d-2", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
-	ROM_CONTINUE(         0x0000, 0x0400 )  /* overwrite with the real one */
+	ROM_REGION( 0x0400, "gfx1", 0 ) // some PCBs were seen with hrl11d-1
+	ROM_LOAD( "hrl11d-2.11d", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
+	ROM_CONTINUE(             0x0000, 0x0400 )  /* overwrite with the real one */
 
-	ROM_REGION( 0x0140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. The 2 6331 match the Targ ones.
-	ROM_LOAD( "prom.5c",  0x0000, 0x0100, BAD_DUMP CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual
-	ROM_LOAD( "prom.6d",  0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Spectar manual
-	ROM_LOAD( "hrl14h-1", 0x0120, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "spl5c-2.5c",   0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual, also seen as IM 5623CPE on PCB
+	ROM_LOAD( "prom.6d",      0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, dumped from a bootleg
+	ROM_LOAD( "hrl14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
 ROM_START( spectarrf )
@@ -1677,8 +1677,8 @@ ROM_START( pepper2 )
 	ROM_LOAD( "p2l-8_6a.6a",   0xf000, 0x1000, CRC(515b1046) SHA1(bdcccd4e415c00ee8e5ec185597df75ecafe7d3d) )
 
 	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
-	ROM_LOAD( "p2a-2_5a.5a", 0x6800, 0x0800, CRC(caa857ed) SHA1(e92a9c84e958b1811d29960acd3590c8c6a904e8) ) // revision 2
-	ROM_LOAD( "p2a-2_6a.6a", 0x7000, 0x0800, CRC(6c4cb05b) SHA1(ab49abc937159fdc814742582ffdfd1e7dce12e6) )
+	ROM_LOAD( "p2a-2_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) )
+	ROM_LOAD( "p2a-2_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
 	ROM_LOAD( "p2a-2_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
@@ -1702,9 +1702,9 @@ ROM_START( pepper27 )
 	ROM_LOAD( "p2l-7_6a.6a",   0xf000, 0x1000, CRC(db8dd4fc) SHA1(9ae00f8d1a19280670dc65a20cf9cc4e7f1cc973) )
 
 	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
-	ROM_LOAD( "p2a-1_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) ) // revision 1
-	ROM_LOAD( "p2a-1_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
-	ROM_LOAD( "p2a-1_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
+	ROM_LOAD( "p2a-2_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) )
+	ROM_LOAD( "p2a-2_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
+	ROM_LOAD( "p2a-2_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "p2l-1_11d.11d", 0x0000, 0x0800, CRC(b25160cd) SHA1(3d768552960a3a660891dcb85da6a5c382b33991) )

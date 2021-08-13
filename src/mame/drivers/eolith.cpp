@@ -76,7 +76,7 @@
   - racooon (Raccoon World)
 
       Game animation & timers seem too fast? demoted to NOT WORKING as a
-	  result
+      result
 
 -----------------------------------------------------------------------------
  Game Issues (unknown):
@@ -571,8 +571,6 @@ void eolith_state::eolith45(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
-
-	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

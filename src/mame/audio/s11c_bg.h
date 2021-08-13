@@ -17,7 +17,7 @@
 #include "sound/dac.h"
 #include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 class s11c_bg_device : public device_t, public device_mixer_interface

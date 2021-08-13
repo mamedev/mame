@@ -30,7 +30,7 @@ public:
 		m_maincpu(*this, Z80_TAG),
 		m_cop(*this, COP420_TAG),
 		m_palette(*this, "palette"),
-		m_exp(*this, NEWBRAIN_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_cassette1(*this, "cassette1"),
 		m_cassette2(*this, "cassette2"),
 		m_rs232_v24(*this, RS232_V24_TAG),

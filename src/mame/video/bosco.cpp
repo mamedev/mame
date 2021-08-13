@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(bosco_state::fg_get_tile_info )
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(bosco_state,bosco)
+void bosco_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bosco_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bosco_state::fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(bosco_state::fg_tilemap_scan)), 8,8, 8,32);

@@ -10,8 +10,6 @@
     - implement sound as a bml3bus slot device
     - account for hardware differences between MB-6890, MB-6891 and MB-6892
       (e.g. custom font support on the MB-6892)
-    - both floppy disk controllers exhibit instability and can cause random
-      problems.
 
 **************************************************************************************/
 
@@ -24,7 +22,7 @@
 #include "machine/clock.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 
@@ -66,7 +64,7 @@
 // D80_CLOCK / 105.0    // 153600 Hz
 
 // Frequencies for cassette mode:
-// / 13440  //1200
+// / 13440  // 1200
 // / 6720   // 2400
 // / 3360   // 4800
 // / 1680   // 9600
@@ -91,6 +89,7 @@ public:
 		, m_banke(*this, "banke")
 		, m_bankf(*this, "bankf")
 		, m_bankg(*this, "bankg")
+		, m_io_keyboard(*this, "X%u", 0U)
 		{ }
 
 	void bml3mk2(machine_config &config);
@@ -127,7 +126,6 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	// INTERRUPT_GEN_MEMBER(irq);
 	INTERRUPT_GEN_MEMBER(timer_firq);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
@@ -140,11 +138,12 @@ private:
 	u8 m_psg_latch;
 	u8 m_attr_latch;
 	u8 m_vres_reg;
-	bool m_keyb_interrupt_disabled;
+	bool m_keyb_interrupt_enabled;
 	bool m_keyb_nmi_disabled; // not used yet
 	bool m_keyb_counter_operation_disabled;
 	u8 m_keyb_empty_scan;
 	u8 m_keyb_scancode;
+	u16 m_kbt = 0;
 	bool m_keyb_capslock_led_on;
 	bool m_keyb_hiragana_led_on;
 	bool m_keyb_katakana_led_on;
@@ -175,6 +174,7 @@ private:
 	required_memory_bank m_banke;
 	required_memory_bank m_bankf;
 	required_memory_bank m_bankg;
+	required_ioport_array<4> m_io_keyboard;
 };
 
 u8 bml3_state::mc6845_r(offs_t offset)
@@ -201,6 +201,7 @@ void bml3_state::mc6845_w(offs_t offset, u8 data)
 
 u8 bml3_state::keyboard_r()
 {
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	u8 ret = m_keyb_scancode;
 	if (!machine().side_effects_disabled())
 		m_keyb_scancode &= 0x7f;
@@ -213,7 +214,7 @@ void bml3_state::keyboard_w(u8 data)
 	m_keyb_hiragana_led_on = BIT(data, 1);
 	m_keyb_capslock_led_on = BIT(data, 2);
 	m_keyb_counter_operation_disabled = BIT(data, 3);
-	m_keyb_interrupt_disabled = !BIT(data, 6);
+	m_keyb_interrupt_enabled = BIT(data, 6);
 	m_keyb_nmi_disabled = !BIT(data, 7);
 }
 
@@ -472,7 +473,7 @@ static INPUT_PORTS_START( bml3 )
     PORT_DIPSETTING(   0x0002, "60 kiB (32 kiB + 28 kiB)" )
 */
 
-	PORT_START("key1") //0x00-0x1f
+	PORT_START("X0") //0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("? PAD")
@@ -506,7 +507,7 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Delete PAD") //backspace
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xC2\xA5") PORT_CODE(KEYCODE_TAB) // yen sign
 
-	PORT_START("key2") //0x20-0x3f
+	PORT_START("X1") //0x20-0x3f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('u')
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
 	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
@@ -540,7 +541,7 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6 PAD") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- PAD") PORT_CODE(KEYCODE_MINUS_PAD)
 
-	PORT_START("key3") //0x40-0x5f
+	PORT_START("X2") //0x40-0x5f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
 	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
@@ -564,7 +565,7 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
 	PORT_BIT(0xffe00000,IP_ACTIVE_HIGH,IPT_UNKNOWN)
 
-	PORT_START("key4")
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_CHANGED_MEMBER(DEVICE_SELF, bml3_state, nmi_button, 0)
 INPUT_PORTS_END
 
@@ -661,8 +662,6 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 {
-	static const char *const portnames[3] = { "key1","key2","key3" };
-	int i,port_i;
 	bool trigger = false;
 
 	if(!BIT(m_keyb_scancode, 7))
@@ -685,9 +684,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 		}
 		else if (m_keyb_scancode < 32*3)
 		{
-			port_i = m_keyb_scancode / 32;
-			i = m_keyb_scancode % 32;
-			if((ioport(portnames[port_i])->read()>>i) & 1)
+			u8 port_i = m_keyb_scancode / 32;
+			u8 i = m_keyb_scancode % 32;
+			if(BIT(m_io_keyboard[port_i]->read(),i))
 			{
 				m_keyb_empty_scan = 2;
 				trigger = true;
@@ -695,16 +694,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 		}
 		if (trigger)
 		{
+			m_kbt = 0xfff;
 			m_keyb_scancode |= 0x80;
-			if (!m_keyb_interrupt_disabled)
+			if (m_keyb_interrupt_enabled)
 				m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 		}
-		/* Don't need this apparently...
-		else
-		{
-		    m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		}
-		*/
+	}
+	else
+	{
+		if (m_kbt > 0)
+			m_kbt--;
+		if (m_kbt == 1)
+			m_keyb_scancode &= 0x7f;
 	}
 }
 
@@ -754,7 +755,7 @@ void bml3_state::machine_start()
 	save_item(NAME(m_psg_latch));
 	save_item(NAME(m_attr_latch));
 	save_item(NAME(m_vres_reg));
-	save_item(NAME(m_keyb_interrupt_disabled));
+	save_item(NAME(m_keyb_interrupt_enabled));
 	save_item(NAME(m_keyb_nmi_disabled));
 	save_item(NAME(m_keyb_counter_operation_disabled));
 	save_item(NAME(m_keyb_empty_scan));
@@ -762,6 +763,7 @@ void bml3_state::machine_start()
 	save_item(NAME(m_keyb_capslock_led_on));
 	save_item(NAME(m_keyb_hiragana_led_on));
 	save_item(NAME(m_keyb_katakana_led_on));
+	save_item(NAME(m_kbt));
 	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cass_data));
@@ -797,7 +799,7 @@ void bml3_state::machine_reset()
 	m_psg_latch = 0;
 	m_attr_latch = 0;
 	m_vres_reg = 0;
-	m_keyb_interrupt_disabled = 0;
+	m_keyb_interrupt_enabled = 0;
 	m_keyb_nmi_disabled = 0;
 	m_keyb_counter_operation_disabled = 0;
 	m_keyb_empty_scan = 0;
@@ -810,6 +812,7 @@ void bml3_state::machine_reset()
 	m_cassbit = 0;
 	m_cassold = 0;
 	m_nmi = 0;
+	m_kbt = 0;
 }
 
 void bml3_state::piaA_w(uint8_t data)
@@ -933,11 +936,12 @@ void bml3_state::bml3_common(machine_config &config)
 	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_bml3bus->firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
-	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes the MP-1805 ROM.
-	   User may want to switch this to MP-1802 (5.25" DS/DD).
+	/* Default to nothing, to stop machine hanging at start.
+	   Can use MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes the MP-1805 ROM.
+	   Or use MP-1802 (5.25" DS/DD).
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
-	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, "bml3mp1805");
+	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, "bml3rtc");
 	BML3BUS_SLOT(config, "sl3", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl4", m_bml3bus, bml3_cards, nullptr);

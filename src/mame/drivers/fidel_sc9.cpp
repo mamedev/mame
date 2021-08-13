@@ -3,6 +3,15 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
+Fidelity SC9, Fidelity Playmatic "S"
+
+TODO:
+- fscc9ps module switch and led
+- verify fscc9ps XTAL (checked against sound recording, 99.97% similarity)
+
+
+Hardware notes:
+
 Fidelity Sensory Chess Challenger "9" (SC9) overview:
 - 8*(8+1) buttons, 8*8+1 LEDs
 - 36-pin edge connector, assume same as SC12
@@ -19,12 +28,13 @@ I/O is via TTL, not further documented here
 The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
 with magnet sensors and came with CB9 and CB16.
 
+
 Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
 extra book opening databases and recorded games.
 
 Known modules (*denotes undumped):
 - CB9: Challenger Book Openings 1 - 8KB (label not known)
-- CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
+- CB16: Challenger Book Openings 2 - 2*8KB 101-1042A01,101-1042A02
 - *CG64: 64 Greatest Games
 - *EOA-EOE: Challenger Book Openings: Chess Encyclopedia Volume A-E (5 modules)
 - *TDF: Challenger Book Openings: Tarrasch Defense to the Queen's Gambit
@@ -35,20 +45,21 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_playmatic.lh" // clickable
-#include "fidel_sc9.lh" // clickable
+#include "fidel_playmatic.lh"
+#include "fidel_sc9.lh"
 
 
 namespace {
@@ -100,16 +111,12 @@ protected:
 	u8 input_r();
 	u8 input_d7_r(offs_t offset);
 
-	u8 m_inp_mux;
-	u8 m_led_data;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
 };
 
 void sc9_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
@@ -259,7 +266,7 @@ INPUT_PORTS_END
 void sc9_state::sc9d(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // R6502AP, 3.9MHz resonator
+	M6502(config, m_maincpu, 3.9_MHz_XTAL / 2); // R6502AP, 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9d_map);
 
 	const attotime irq_period = attotime::from_hz(600); // from 555 timer (22nF, 102K, 2.7K), ideal frequency is 600Hz
@@ -298,7 +305,7 @@ void sc9_state::playmatic(machine_config &config)
 	sc9b(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(1500000 * 2); // advertised as double the speed of SC9
+	m_maincpu->set_clock(5.626_MHz_XTAL / 2); // advertised as double the speed of SC9
 	m_board->set_type(sensorboard_device::MAGNETS);
 
 	config.set_default_layout(layout_fidel_playmatic);

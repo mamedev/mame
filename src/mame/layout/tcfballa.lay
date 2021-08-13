@@ -39,9 +39,22 @@ license:CC0
 		<led7seg><color red="1.0" green="0.25" blue="0.26" /></led7seg>
 	</element>
 	<element name="seg" defstate="0">
-		<rect state="0"><color red="0.13" green="0.0325" blue="0.0338" /></rect>
-		<rect state="1"><color red="0.5" green="0.125" blue="0.13" /></rect>
-		<rect state="2"><color red="1.0" green="0.25" blue="0.26" /></rect>
+		<rect>
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color alpha="0" />
+		</rect>
+		<rect state="0">
+			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
+			<color red="0.13" green="0.0325" blue="0.0338" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
+			<color red="0.5" green="0.125" blue="0.13" />
+		</rect>
+		<rect state="2">
+			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
+			<color red="1.0" green="0.25" blue="0.26" />
+		</rect>
 	</element>
 
 
@@ -52,18 +65,17 @@ license:CC0
 
 		<element ref="static_green"><bounds x="-1" y="-3" width="205" height="133" /></element>
 
-	<!-- score/status panel -->
-
+		<!-- score/status panel -->
 		<element ref="static_white"><bounds x="-1" y="0" width="205" height="48" /></element>
 		<element ref="static_black"><bounds x="-2" y="11" width="207" height="26" /></element>
 
-		<element name="digit6" ref="digit"><bounds x="24.5" y="16.5" width="12" height="15" /></element>
-		<element name="digit5" ref="digit"><bounds x="40.5" y="16.5" width="12" height="15" /></element>
-		<element name="digit4" ref="digit"><bounds x="77.5" y="16.5" width="12" height="15" /></element>
-		<element name="digit3" ref="digit"><bounds x="93.5" y="16.5" width="12" height="15" /></element>
-		<element name="digit2" ref="digit"><bounds x="109.5" y="16.5" width="12" height="15" /></element>
-		<element name="digit1" ref="digit"><bounds x="146.5" y="16.5" width="12" height="15" /></element>
-		<element name="digit0" ref="digit"><bounds x="162.5" y="16.5" width="12" height="15" /></element>
+		<element name="digit6" ref="digit"><bounds x="24.5"  y="16" width="12" height="16" /></element>
+		<element name="digit5" ref="digit"><bounds x="40.5"  y="16" width="12" height="16" /></element>
+		<element name="digit4" ref="digit"><bounds x="77.5"  y="16" width="12" height="16" /></element>
+		<element name="digit3" ref="digit"><bounds x="93.5"  y="16" width="12" height="16" /></element>
+		<element name="digit2" ref="digit"><bounds x="109.5" y="16" width="12" height="16" /></element>
+		<element name="digit1" ref="digit"><bounds x="146.5" y="16" width="12" height="16" /></element>
+		<element name="digit0" ref="digit"><bounds x="162.5" y="16" width="12" height="16" /></element>
 
 		<element ref="text_down"><bounds x="9" y="1" width="54" height="9" /></element>
 		<element ref="text_field"><bounds x="68" y="1" width="67" height="9" /></element>
@@ -73,8 +85,7 @@ license:CC0
 		<element ref="text_time"><bounds x="68" y="38" width="67" height="9" /></element>
 		<element ref="text_visitor"><bounds x="139" y="38" width="56" height="9" /></element>
 
-	<!-- playing field -->
-
+		<!-- playing field -->
 		<element ref="static_white"><bounds x="-1" y="53" width="205" height="74" /></element>
 
 		<element ref="static_black"><bounds x="2" y="55" width="19" height="70" /></element>
@@ -139,6 +150,12 @@ license:CC0
 		<element name="10.5" ref="seg"><bounds x="187" y="72" width="9" height="2" /></element>
 		<element name="10.4" ref="seg"><bounds x="187" y="89" width="9" height="2" /></element>
 		<element name="10.3" ref="seg"><bounds x="187" y="106" width="9" height="2" /></element>
+
+		<!-- cut edges -->
+		<element ref="static_black"><bounds x="-10" y="-10" width="10" height="150" /></element>
+		<element ref="static_black"><bounds x="203" y="-10" width="10" height="150" /></element>
+		<element ref="static_black"><bounds x="-10" y="-12" width="300" height="10" /></element>
+		<element ref="static_black"><bounds x="-10" y="129" width="300" height="10" /></element>
 
 	</view>
 </mamelayout>

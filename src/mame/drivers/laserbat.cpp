@@ -65,6 +65,11 @@
     * The sprite ROM is twice the size as Laser Battle with the bank
       selected using bit 9 of the 16-bit sound interface (there's a wire
       making this connection visible on the component side of the PCB)
+    * At least some boards have IC13I pins 8, 9, 10 and 11 bent out of
+      the socket, tied together, and pulled high via a 4k7 resistor,
+      which quantises the shell/area effect 2 to four-pixel boundaries
+      (implemented as m_eff2_mask) - would be good to see whether this
+      mod is present on all boards
     * If demo sounds are enabled (using DIP switches), background music
       is played every sixth time through the attract loop
     * Sound board emulation is based on tracing the program and guessing
@@ -412,9 +417,14 @@ INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-void laserbat_state_base::init_laserbat()
+void laserbat_state_base::machine_start()
 {
+	// start rendering scanlines
+	m_screen->register_screen_bitmap(m_bitmap);
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_scanline_timer->adjust(m_screen->time_until_pos(1, 0));
+
+	save_item(NAME(m_gfx2_base));
 
 	save_item(NAME(m_input_mux));
 	save_item(NAME(m_mpx_p_1_2));
@@ -436,10 +446,10 @@ void laserbat_state_base::init_laserbat()
 	save_item(NAME(m_neg1));
 	save_item(NAME(m_neg2));
 
-	save_item(NAME(m_csound1));
-	save_item(NAME(m_csound2));
 	save_item(NAME(m_rhsc));
 	save_item(NAME(m_whsc));
+	save_item(NAME(m_csound1));
+	save_item(NAME(m_csound2));
 }
 
 void laserbat_state::machine_start()
@@ -732,7 +742,7 @@ ROM_START( catnmousa )
 ROM_END
 
 
-GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state, init_laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state, init_laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous,  0,        catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (type 02 program)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (type 01 program)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state, empty_init, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state, empty_init, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous,  0,        catnmous, catnmous, catnmous_state, empty_init, ROT90, "Zaccaria", "Cat and Mouse (type 02 program)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, empty_init, ROT90, "Zaccaria", "Cat and Mouse (type 01 program)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

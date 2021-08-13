@@ -13,7 +13,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 class pinsnd88_device : public device_t, public device_mixer_interface

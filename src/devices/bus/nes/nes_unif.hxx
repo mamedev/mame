@@ -54,7 +54,7 @@ enum
 static const unif unif_list[] =
 {
 /*       UNIF                       NVW  WRAM  CRAM     IDX*/
-	{ "DREAMTECH01",                0,    0, CHRRAM_8,  DREAMTECH_BOARD},       //UNIF only!
+	{ "DREAMTECH01",                0,    0, CHRRAM_8,  DREAMTECH_BOARD},
 	{ "NES-ANROM",                  0,    0, CHRRAM_8,  STD_AXROM},
 	{ "NES-AOROM",                  0,    0, CHRRAM_8,  STD_AXROM},
 	{ "NES-CNROM",                  0,    0, CHRRAM_0,  STD_CNROM},
@@ -93,15 +93,15 @@ static const unif unif_list[] =
 	{ "UNL-SACHEN-8259A",           0,    0, CHRRAM_0,  SACHEN_8259A},
 	{ "UNL-SACHEN-8259B",           0,    0, CHRRAM_0,  SACHEN_8259B},
 	{ "BMC-190IN1",                 0,    0, CHRRAM_0,  BMC_190IN1},
-	{ "BMC-64IN1NOREPEAT",          0,    0, CHRRAM_0,  BMC_64IN1NR},       //UNIF only!
-	{ "BMC-A65AS",                  0,    0, CHRRAM_8,  BMC_A65AS},     //UNIF only!
-	{ "BMC-GS-2004",                0,    0, CHRRAM_8,  RCM_GS2004},        //UNIF only!
-	{ "BMC-GS-2013",                0,    0, CHRRAM_8,  RCM_GS2013},        //UNIF only!
+	{ "BMC-64IN1NOREPEAT",          0,    0, CHRRAM_0,  BMC_64IN1NR},
+	{ "BMC-A65AS",                  0,    0, CHRRAM_8,  BMC_A65AS},
+	{ "BMC-GS-2004",                0,    0, CHRRAM_8,  RCM_GS2004},
+	{ "BMC-GS-2013",                0,    0, CHRRAM_8,  RCM_GS2013},
 	{ "BMC-NOVELDIAMOND9999999IN1", 0,    0, CHRRAM_0,  BMC_NOVEL1},
 	{ "BMC-SUPER24IN1SC03",         8,    0, CHRRAM_8,  BMC_S24IN1SC03},
 	{ "BMC-SUPERHIK8IN1",           8,    0, CHRRAM_0,  BMC_HIK8IN1},
-	{ "BMC-T-262",                  0,    0, CHRRAM_8,  BMC_T262},      //UNIF only!
-	{ "BMC-WS",                     0,    0, CHRRAM_0,  BMC_WS},        //UNIF only!
+	{ "BMC-T-262",                  0,    0, CHRRAM_8,  BMC_T262},
+	{ "BMC-WS",                     0,    0, CHRRAM_0,  BMC_WS},
 	{ "BMC-N625092",                0,    0, CHRRAM_0,  UNL_N625092},
 	// below are boards which are not yet supported, but are used by some UNIF files. they are here as a reminder to what is missing to be added
 	{ "UNL-TEK90",                  0,    0, CHRRAM_0,  JYCOMPANY_A}, // JY Company A (is TEK90 the real PCB name?)
@@ -119,7 +119,7 @@ static const unif unif_list[] =
 	{ "BMC-FK23CA",                 0,    0, CHRRAM_0,  BMC_FK23CA},
 	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  BMC_G63IN1 },
 	{ "BMC-BS-5",                   0,    0, CHRRAM_0,  BMC_BENSHIENG},
-	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  BMC_810544},
+	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  BMC_810544C},
 	{ "BMC-411120-C",               0,    0, CHRRAM_0,  BMC_411120C},
 	{ "BMC-8157",                   0,    0, CHRRAM_8,  BMC_8157},
 	{ "BMC-830118C",                0,    0, CHRRAM_0,  BMC_830118C},
@@ -127,7 +127,6 @@ static const unif unif_list[] =
 	{ "BMC-SUPERVISION16IN1",       0,    0, CHRRAM_0,  SVISION16_BOARD}, // mapper 53
 	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  BMC_NTD_03},
 	{ "UNL-AC08",                   0,    0, CHRRAM_0,  UNL_AC08},
-	{ "UNL-BB",                     0,    0, CHRRAM_0,  UNL_BB},
 	{ "UNL-LH32",                   0,    0, CHRRAM_0,  UNL_LH32},
 	{ "UNL-LH53",                   0,    0, CHRRAM_0,  UNL_LH53},
 	{ "BMC-G-146",                  0,    0, CHRRAM_0,  BMC_G146},
@@ -385,7 +384,7 @@ void nes_cart_slot_device::call_load_unif()
 				else
 				{
 					small_prg = true;
-					logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MESS forums.\n");
+					logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MAME forums.\n");
 				}
 
 				/* Read in the program chunks */
@@ -411,7 +410,7 @@ void nes_cart_slot_device::call_load_unif()
 			}
 			else
 			{
-				logerror("Unsupported UNIF chunk or corrupted header. Please report the problem at MESS Board.\n");
+				logerror("Unsupported UNIF chunk or corrupted header. Please report the problem at MAME Board.\n");
 				read_length = size;
 			}
 		}
@@ -424,7 +423,7 @@ void nes_cart_slot_device::call_load_unif()
 
 	if (!prg_start)
 	{
-		fatalerror("No PRG found. Please report the problem at MESS Board.\n");
+		fatalerror("No PRG found. Please report the problem at MAME Board.\n");
 	}
 
 	// SETUP step 2: getting PCB and other settings
@@ -489,7 +488,7 @@ void nes_cart_slot_device::call_load_unif()
 	}
 
 	if (small_prg)  // This is not supported yet, so warn users about this
-		osd_printf_error("Loaded UNIF file with non-16k PRG chunk. This is not supported in MESS yet.");
+		osd_printf_error("Loaded UNIF file with non-16k PRG chunk. This is not supported in MAME yet.");
 
 	if (vrom_size)
 	{

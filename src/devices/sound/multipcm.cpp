@@ -44,7 +44,7 @@ ALLOW_SAVE_TYPE(multipcm_device::state_t); // allow save_item on a non-fundament
         ENVELOPE SECTION
 *******************************/
 
-//Times are based on a 44100Hz timebase. It's adjusted to the actual sampling rate on startup
+// Times are based on a 44100Hz timebase. It's adjusted to the actual sampling rate on startup
 
 const double multipcm_device::BASE_TIMES[64] = {
 	0,          0,          0,          0,
@@ -93,6 +93,21 @@ void multipcm_device::init_sample(sample_t *sample, uint32_t index)
 	sample->m_key_rate_scale = (read_byte(address + 10) >> 4) & 0xf;
 	sample->m_lfo_vibrato_reg = read_byte(address + 7);
 	sample->m_lfo_amplitude_reg = read_byte(address + 11) & 0xf;
+}
+
+void multipcm_device::retrigger_sample(slot_t &slot)
+{
+	slot.m_offset = 0;
+	slot.m_prev_sample = 0;
+	slot.m_total_level = slot.m_dest_total_level << TL_SHIFT;
+
+	envelope_generator_calc(slot);
+	slot.m_envelope_gen.m_state = state_t::ATTACK;
+	slot.m_envelope_gen.m_volume = 0;
+
+#if MULTIPCM_LOG_SAMPLES
+	dump_sample(slot);
+#endif
 }
 
 int32_t multipcm_device::envelope_generator_update(slot_t &slot)
@@ -334,15 +349,21 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 
 		case 1: // Sample
 		{
-			//according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
-			//the game should never change the sample while playing.
-			sample_t sample;
-			init_sample(&sample, slot.m_regs[1] | ((slot.m_regs[2] & 1) << 8));
-			write_slot(slot, 6, sample.m_lfo_vibrato_reg);
-			write_slot(slot, 7, sample.m_lfo_amplitude_reg);
+			// according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
+			init_sample(&slot.m_sample, slot.m_regs[1] | ((slot.m_regs[2] & 1) << 8));
+			write_slot(slot, 6, slot.m_sample.m_lfo_vibrato_reg);
+			write_slot(slot, 7, slot.m_sample.m_lfo_amplitude_reg);
+
+			slot.m_base = slot.m_sample.m_start;
+			slot.m_format = slot.m_sample.m_format;
+
+			// retrigger if key is on
+			if (slot.m_playing)
+				retrigger_sample(slot);
+
 			break;
 		}
-		case 2: //Pitch
+		case 2: // Pitch
 		case 3:
 			{
 				uint32_t oct = ((slot.m_regs[3] >> 4) - 1) & 0xf;
@@ -359,24 +380,11 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 				slot.m_step = pitch / m_rate;
 			}
 			break;
-		case 4:     //KeyOn/Off (and more?)
-			if (data & 0x80)       //KeyOn
+		case 4: // KeyOn/Off
+			if (data & 0x80) // KeyOn
 			{
-				init_sample(&slot.m_sample, slot.m_regs[1] | ((slot.m_regs[2] & 1) << 8));
 				slot.m_playing = true;
-				slot.m_base = slot.m_sample.m_start;
-				slot.m_offset = 0;
-				slot.m_prev_sample = 0;
-				slot.m_total_level = slot.m_dest_total_level << TL_SHIFT;
-				slot.m_format = slot.m_sample.m_format;
-
-				envelope_generator_calc(slot);
-				slot.m_envelope_gen.m_state = state_t::ATTACK;
-				slot.m_envelope_gen.m_volume = 0;
-
-#if MULTIPCM_LOG_SAMPLES
-				dump_sample(slot);
-#endif
+				retrigger_sample(slot);
 			}
 			else
 			{
@@ -395,7 +403,7 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 			break;
 		case 5: // TL + Interpolation
 			slot.m_dest_total_level = (data >> 1) & 0x7f;
-			if (!(data & 1))   //Interpolate TL
+			if (!(data & 1)) // Interpolate TL
 			{
 				if ((slot.m_total_level >> TL_SHIFT) > slot.m_dest_total_level)
 				{
@@ -437,7 +445,7 @@ void multipcm_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0:     //Data write
+		case 0: // Data write
 			write_slot(m_slots[m_cur_slot], m_address, data);
 			break;
 		case 1:
@@ -450,7 +458,8 @@ void multipcm_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-/* MAME/M1 access functions */
+
+/* MAME access functions */
 
 DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "ymw258f", "Yamaha YMW-258-F")
 
@@ -539,7 +548,7 @@ void multipcm_device::device_start()
 		}
 	}
 
-	//Pitch steps
+	// Pitch steps
 	m_freq_step_table = make_unique_clear<uint32_t[]>(0x400);
 	for (int32_t i = 0; i < 0x400; ++i)
 	{
@@ -633,8 +642,7 @@ void multipcm_device::device_clock_changed()
 }
 
 //-----------------------------------------------------
-//  convert_to_stream_sample - clamp a 32-bit value to
-//  16 bits and convert to a stream_buffer::sample_t
+//  dump_sample - dump current sample to WAV file
 //-----------------------------------------------------
 
 #if MULTIPCM_LOG_SAMPLES

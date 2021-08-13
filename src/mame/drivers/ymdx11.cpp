@@ -11,7 +11,7 @@
 #include "cpu/m6800/m6801.h"
 #include "machine/adc0808.h"
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
+#include "sound/ymopz.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"

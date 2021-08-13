@@ -42,6 +42,7 @@ void menu_input_groups::populate(float &customtop, float &custombottom)
 		item_append(s, 0, (void *)uintptr_t(IPG_PLAYER1 + player + 1));
 	}
 	item_append(_("Other Controls"), 0, (void *)uintptr_t(IPG_OTHER + 1));
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_groups::handle()
@@ -113,6 +114,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 
 	// populate the menu in a standard fashion
 	populate_sorted(customtop, custombottom);
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_general::update_input(input_item_data &seqchangeditem)
@@ -219,7 +221,12 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 	}
 
 	// populate the menu in a standard fashion
-	populate_sorted(customtop, custombottom);
+	if (!data.empty())
+		populate_sorted(customtop, custombottom);
+	else
+		item_append(_("This machine has no configurable inputs."), FLAG_DISABLE, nullptr);
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_specific::update_input(input_item_data &seqchangeditem)
@@ -328,7 +335,7 @@ void menu_input::handle()
 	bool invalidate = false;
 
 	// process the menu
-	const event *const menu_event = process((pollingitem != nullptr) ? PROCESS_NOKEYS : 0);
+	const event *const menu_event = process(pollingitem ? PROCESS_NOKEYS : PROCESS_LR_ALWAYS);
 	if (pollingitem)
 	{
 		// if we are polling, handle as a special case
@@ -405,6 +412,12 @@ void menu_input::handle()
 			toggle_none_default(item.seq, item.seq, *item.defseq);
 			record_next = false;
 			seqchangeditem = &item;
+			break;
+
+		case IPT_UI_LEFT: // flip between set and append
+		case IPT_UI_RIGHT: // not very discoverable, but with the prompt it isn't opaque
+			if (record_next || !item.seq.empty())
+				record_next = !record_next;
 			break;
 		}
 

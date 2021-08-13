@@ -294,7 +294,7 @@ uint32_t menghong_state::key_r()
 	int mux = (m_pio >> 8) & 0x1f;
 
 	uint8_t data = 0x3f;
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < m_keys.size(); ++i)
 		if (!BIT(mux,i))
 			data = m_keys[i]->read();
 

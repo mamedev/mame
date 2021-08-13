@@ -43,7 +43,7 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"
@@ -164,8 +164,8 @@ void hnayayoi_state::untoucha_map(address_map &map)
 void hnayayoi_state::untoucha_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).w("ymsnd", FUNC(ym2203_device::control_port_w));
-	map(0x11, 0x11).r("ymsnd", FUNC(ym2203_device::status_port_r));
+	map(0x10, 0x10).w("ymsnd", FUNC(ym2203_device::address_w));
+	map(0x11, 0x11).r("ymsnd", FUNC(ym2203_device::status_r));
 	map(0x12, 0x12).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0x13, 0x13).w(FUNC(hnayayoi_state::adpcm_data_w));
 	map(0x14, 0x14).portr("COIN");
@@ -177,8 +177,8 @@ void hnayayoi_state::untoucha_io_map(address_map &map)
 	map(0x20, 0x20).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
 	map(0x28, 0x28).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
 	map(0x30, 0x37).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x50, 0x50).w("ymsnd", FUNC(ym2203_device::write_port_w));
-	map(0x51, 0x51).r("ymsnd", FUNC(ym2203_device::read_port_r));
+	map(0x50, 0x50).w("ymsnd", FUNC(ym2203_device::data_w));
+	map(0x51, 0x51).r("ymsnd", FUNC(ym2203_device::data_r));
 	map(0x52, 0x52).w("crtc", FUNC(hd6845s_device::register_w));
 }
 

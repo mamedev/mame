@@ -52,8 +52,8 @@ Winning Run
           - priority, mixing incorrection
 
     reference videos
-	- https://youtu.be/ZNNveBLWevg
-	- https://youtu.be/KazxHW9wQ60
+    - https://youtu.be/ZNNveBLWevg
+    - https://youtu.be/KazxHW9wQ60
 
 *****************************
 
@@ -295,7 +295,7 @@ Filter Board
 #include "machine/namco_c148.h"
 #include "video/namcos21_3d.h"
 #include "sound/c140.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 namespace {

@@ -16,7 +16,6 @@
 #include "formats/imageutl.h"
 #include "library.h"
 #include "modules.h"
-#include "pool.h"
 
 
 /***************************************************************************
@@ -140,7 +139,7 @@ static imgtoolerr_t markerrorsource(imgtoolerr_t err)
 static void internal_error(const imgtool_module *module, const char *message)
 {
 #ifdef MAME_DEBUG
-	printf("%s: %s\n", module->name, message);
+	printf("%s: %s\n", module->name.c_str(), message);
 #endif
 }
 
@@ -335,7 +334,7 @@ imgtoolerr_t imgtool::image::identify_file(const char *fname, imgtool_module **m
 	/* iterate through all modules */
 	for (const auto &module : library.modules())
 	{
-		if (!extension || image_find_extension(module->extensions, extension))
+		if (!extension || image_find_extension(module->extensions.c_str(), extension))
 		{
 			err = evaluate_module(fname, module.get(), val);
 			if (err)
@@ -530,16 +529,6 @@ imgtoolerr_t imgtool::image::list_partitions(std::vector<imgtool::partition_info
 		partitions.emplace_back(module().imgclass, 0, ~0);
 	}
 	return IMGTOOLERR_SUCCESS;
-}
-
-
-//-------------------------------------------------
-//  malloc - allocates memory associated with an image
-//-------------------------------------------------
-
-void *imgtool::image::malloc(size_t size)
-{
-	return pool_malloc_lib(m_pool, size);
 }
 
 
@@ -850,17 +839,17 @@ bool imgtool_validitychecks(void)
 	{
 		features = imgtool_get_module_features(module.get());
 
-		if (!module->name)
+		if (module->name.empty())
 		{
-			util::stream_format(std::wcerr, L"imgtool module %s has null 'name'\n", wstring_from_utf8(module->name));
+			util::stream_format(std::wcerr, L"imgtool module has null 'name'\n");
 			error = true;
 		}
-		if (!module->description)
+		if (module->description.empty())
 		{
 			util::stream_format(std::wcerr, L"imgtool module %s has null 'description'\n", wstring_from_utf8(module->name));
 			error = true;
 		}
-		if (!module->extensions)
+		if (module->extensions.empty())
 		{
 			util::stream_format(std::wcerr, L"imgtool module %s has null 'extensions'\n", wstring_from_utf8(module->extensions));
 			error = true;
@@ -894,24 +883,24 @@ bool imgtool_validitychecks(void)
 #endif
 
 		/* sanity checks on creation options */
-		if (module->createimage_optguide || module->createimage_optspec)
+		if (module->createimage_optguide || !module->createimage_optspec.empty())
 		{
 			if (!module->create)
 			{
 				util::stream_format(std::wcerr, L"imgtool module %s has creation options without supporting create\n", wstring_from_utf8(module->name));
 				error = true;
 			}
-			if ((!module->createimage_optguide && module->createimage_optspec)
-				|| (module->createimage_optguide && !module->createimage_optspec))
+			if ((!module->createimage_optguide && !module->createimage_optspec.empty())
+				|| (module->createimage_optguide && module->createimage_optspec.empty()))
 			{
 				util::stream_format(std::wcerr, L"imgtool module %s does has partially incomplete creation options\n", wstring_from_utf8(module->name));
 				error = true;
 			}
 
-			if (module->createimage_optguide && module->createimage_optspec)
+			if (module->createimage_optguide && !module->createimage_optspec.empty())
 			{
 				auto resolution = std::make_unique<util::option_resolution>(*module->createimage_optguide);
-				resolution->set_specification(module->createimage_optspec);
+				resolution->set_specification(module->createimage_optspec.c_str());
 			}
 		}
 	}
@@ -954,8 +943,6 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const s
 	imgtoolerr_t err;
 	imgtool::stream::ptr stream;
 	imgtool::image::ptr image;
-	object_pool *pool = nullptr;
-	void *extra_bytes = nullptr;
 
 	outimg.reset();
 
@@ -963,14 +950,6 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const s
 	if ((read_or_write == OSD_FOPEN_RW_CREATE) ? !module->create : !module->open)
 	{
 		err = imgtoolerr_t(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
-		goto done;
-	}
-
-	// create a memory pool
-	pool = pool_alloc_lib(nullptr);
-	if (!pool)
-	{
-		err = imgtoolerr_t(IMGTOOLERR_OUTOFMEMORY);
 		goto done;
 	}
 
@@ -982,28 +961,13 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const s
 		goto done;
 	}
 
-	// allocate extra
-	if (module->image_extra_bytes > 0)
-	{
-		extra_bytes = pool_malloc_lib(pool, module->image_extra_bytes);
-		if (!extra_bytes)
-		{
-			err = imgtoolerr_t(IMGTOOLERR_OUTOFMEMORY);
-			goto done;
-		}
-		memset(extra_bytes, 0, module->image_extra_bytes);
-	}
-
 	// setup the image structure
-	try { image = std::make_unique<imgtool::image>(*module, pool, extra_bytes); }
+	try { image = std::make_unique<imgtool::image>(*module); }
 	catch (std::bad_alloc const &)
 	{
 		err = imgtoolerr_t(IMGTOOLERR_OUTOFMEMORY);
 		goto done;
 	}
-
-	// the pool is no longer owned by this function
-	pool = nullptr;
 
 	// actually call create or open
 	err = (read_or_write == OSD_FOPEN_RW_CREATE)
@@ -1021,8 +985,6 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const s
 	outimg = std::move(image);
 
 done:
-	if (pool)
-		pool_free_lib(pool);
 	return err;
 }
 
@@ -1058,12 +1020,16 @@ imgtoolerr_t imgtool::image::open(const std::string &modulename, const std::stri
 //  imgtool::image::image
 //-------------------------------------------------
 
-imgtool::image::image(const imgtool_module &module, object_pool *pool, void *extra_bytes)
+imgtool::image::image(const imgtool_module &module)
 	: m_module(module)
-	, m_pool(pool)
-	, m_extra_bytes(extra_bytes)
 	, m_okay_to_close(false)
 {
+	if (module.image_extra_bytes > 0)
+	{
+		m_extra_bytes = std::make_unique<uint8_t[]>(module.image_extra_bytes);
+		std::fill_n(&m_extra_bytes[0], module.image_extra_bytes, 0);
+	}
+
 }
 
 
@@ -1075,7 +1041,6 @@ imgtool::image::~image()
 {
 	if (m_okay_to_close && module().close)
 		module().close(*this);
-	pool_free_lib(m_pool);
 }
 
 
@@ -1094,8 +1059,8 @@ imgtoolerr_t imgtool::image::create(const imgtool_module *module, const std::str
 		try { alloc_resolution.reset(new util::option_resolution(*module->createimage_optguide)); }
 		catch (...) { return (imgtoolerr_t)IMGTOOLERR_OUTOFMEMORY; }
 
-		if (module->createimage_optspec)
-			alloc_resolution->set_specification(module->createimage_optspec);
+		if (!module->createimage_optspec.empty())
+			alloc_resolution->set_specification(module->createimage_optspec.c_str());
 
 		opts = alloc_resolution.get();
 	}

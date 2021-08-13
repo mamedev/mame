@@ -24,6 +24,7 @@
         { "name": "s_phosphor",   "type": "int",  "values": [ 1 ] },
         { "name": "u_phosphor_power",    "type": "vec4", "values": [ 1.3, 0.0, 0.0, 0.0 ] },
         { "name": "u_phosphor_amplitude","type": "vec4", "values": [ 0.2, 0.0, 0.0, 0.0 ] },
+        { "name": "u_phosphor_cutoff",   "type": "vec4", "values": [300.0,0.0, 0.0, 0.0 ] },
         { "name": "u_gamma",             "type": "vec4", "values": [ 2.2, 0.0, 0.0, 0.0 ] }
     ]
 }

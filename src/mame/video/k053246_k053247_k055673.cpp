@@ -978,7 +978,8 @@ void k055673_device::device_start()
 			size4 = (m_gfxrom.length()/(1024*1024))/5;
 			size4 *= 4*1024*1024;
 			/* set the # of tiles based on the 4bpp section */
-			alt_k055673_rom = auto_alloc_array(machine(), u16, size4 * 5 / 2);
+			m_combined_gfx = std::make_unique<u16[]>(size4 * 5 / 2);
+			alt_k055673_rom = m_combined_gfx.get();
 			d = (u8 *)alt_k055673_rom;
 			// now combine the graphics together to form 5bpp
 			s1 = (u8 *)&m_gfxrom[0]; // 4bpp area

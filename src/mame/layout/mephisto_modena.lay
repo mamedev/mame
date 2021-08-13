@@ -3,22 +3,18 @@
 license:CC0
 -->
 <mamelayout version="2">
+
 <!-- define elements -->
 
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
-
-	<element name="digit" defstate="0">
-		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
-	</element>
 
 	<element name="led" defstate="0">
 		<disk state="0">
 			<color red="0.20" green="0.0" blue="0.0" />
 		</disk>
 		<disk state="1">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="1" green="0.1" blue="0.1" />
 		</disk>
 	</element>
 	<element name="ledr" defstate="0">
@@ -26,7 +22,7 @@ license:CC0
 			<color red="0.20" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="1">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="1" green="0.1" blue="0.1" />
 		</rect>
 	</element>
 	<element name="hlb" defstate="0">
@@ -353,17 +349,47 @@ license:CC0
 	</group>
 
 
-<!-- lcd/button panel -->
+<!-- display -->
 
-	<group name="panel1">
-		<element ref="lcd_bg"><bounds x="0" y="0" width="31" height="14" /></element>
-		<element name="digit3" ref="digit"><bounds x="2"  y="2" width="6" height="10" /></element>
-		<element name="digit2" ref="digit"><bounds x="9"  y="2" width="6" height="10" /></element>
-		<element name="digit1" ref="digit"><bounds x="16" y="2" width="6" height="10" /></element>
-		<element name="digit0" ref="digit"><bounds x="23" y="2" width="6" height="10" /></element>
+	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+	<element name="ldot_hide"><disk><color red="0.54" green="0.57" blue="0.58" /></disk></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
+	</element>
+	<element name="ldot">
+		<rect><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
+		<rect statemask="0x80"><color red="0.2" green="0.16" blue="0.16" /></rect>
+	</element>
+
+	<group name="display">
+		<bounds x="31" y="90.3" width="22.5" height="7.4" />
+
+		<element ref="lcd_bg"><bounds x="31" y="90.3" width="22.5" height="7.4" /></element>
+
+		<element name="digit3" ref="digit"><bounds x="32.6" y="91" width="4" height="6" /></element>
+		<element name="digit2" ref="digit"><bounds x="37.7" y="91" width="4" height="6" /></element>
+		<element name="digit1" ref="digit"><bounds x="42.8" y="91" width="4" height="6" /></element>
+		<element name="digit0" ref="digit"><bounds x="47.9" y="91" width="4" height="6" /></element>
+
+		<!-- digits DP are different from normal 7seg -->
+		<element ref="ldot_hide"><bounds x="35.9" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="41.0" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="46.1" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="51.2" y="96.3" width="0.85" height="0.85" /></element>
+
+		<element name="digit3" ref="ldot"><bounds x="36.59" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit2" ref="ldot"><bounds x="41.69" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit1" ref="ldot"><bounds x="46.79" y="96.42" width="0.6" height="0.6" /></element>
+
+		<element name="digit0" ref="ldot"><bounds x="42.06" y="92.30" width="0.6" height="0.6" /></element>
+		<element name="digit0" ref="ldot"><bounds x="41.80" y="95.12" width="0.6" height="0.6" /></element>
 	</group>
 
-	<group name="panel2">
+
+<!-- button panel -->
+
+	<group name="buttons">
 		<bounds left="0" right="24" top="7" bottom="24" />
 
 		<element ref="white"><bounds x="13.2" y="21.4" width="9.6" height="0.8" /> </element>
@@ -405,11 +431,15 @@ license:CC0
 
 
 <!-- build screen -->
+
 	<view name="Internal Layout">
 		<bounds left="1" right="129" top="0.5" bottom="90" />
 
-	<!-- chessboard coords -->
+		<element ref="cwhite"><bounds x="19.5" y="2.5" width="81" height="81" /></element>
+		<group ref="sb_board"><bounds x="20" y="3" width="80" height="80" /></group>
+		<group ref="sb_ui"><bounds x="2.5" y="3" width="10" height="80" /></group>
 
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="14.2" y="7" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="14.2" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="14.2" y="27" width="2" height="2" /></element>
@@ -428,9 +458,7 @@ license:CC0
 		<element ref="text_g"><bounds x="84" y="86.5" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="94" y="86.5" width="2" height="2" /></element>
 
-		<element ref="cwhite"><bounds x="19.5" y="2.5" width="81" height="81" /></element>
-
-	<!-- chessboard leds -->
+		<!-- chessboard leds -->
 		<element name="1.0" ref="ledr"><bounds x="24" y="85" width="2" height="1" /></element>
 		<element name="1.1" ref="ledr"><bounds x="34" y="85" width="2" height="1" /></element>
 		<element name="1.2" ref="ledr"><bounds x="44" y="85" width="2" height="1" /></element>
@@ -449,11 +477,9 @@ license:CC0
 		<element name="2.6" ref="ledr"><bounds x="16.5" y="17.5" width="2" height="1" /></element>
 		<element name="2.7" ref="ledr"><bounds x="16.5" y="7.5"  width="2" height="1" /></element>
 
-	<!-- LCD panel -->
-		<group ref="panel1"><bounds x="107.5" y="59" width="15" height="6" /></group>
-		<group ref="panel2"><bounds x="103" y="69" width="24" height="17" /></group>
-
-		<group ref="sb_board"><bounds x="20" y="3" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="2.5" y="3" width="10" height="80" /></group>
+		<!-- side panel -->
+		<element ref="lcd_bg"><bounds x="106.2" y="56.3" width="17.6" height="6.7" /></element>
+		<group ref="display"><bounds x="106.5" y="56.8" width="17" height="5.7" /></group>
+		<group ref="buttons"><bounds x="103" y="69" width="24" height="17" /></group>
 	</view>
 </mamelayout>

@@ -9,7 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -52,7 +52,7 @@ public:
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
-	optional_device<ym2612_device> m_ymsnd;
+	optional_device<ym_generic_device> m_ymsnd;
 	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;

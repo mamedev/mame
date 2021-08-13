@@ -82,6 +82,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/sound/js_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/pa_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/pulse_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
@@ -161,7 +162,6 @@ function osdmodulesbuild()
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
-		"IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
 	}
 
 	files {
@@ -267,6 +267,12 @@ function osdmodulesbuild()
 	else
 		includedirs {
 			ext_includedir("portaudio"),
+		}
+	end
+
+	if _OPTIONS["NO_USE_PULSEAUDIO"]=="1" then
+		defines {
+			"NO_USE_PULSEAUDIO",
 		}
 	end
 
@@ -501,6 +507,11 @@ function osdmodulestargetconf()
 		}
 	end
 
+	if _OPTIONS["NO_USE_PULSEAUDIO"]=="0" then
+		links {
+			ext_lib("pulse"),
+		}
+	end
 end
 
 
@@ -575,6 +586,23 @@ if not _OPTIONS["NO_USE_PORTAUDIO"] then
 		_OPTIONS["NO_USE_PORTAUDIO"] = "0"
 	else
 		_OPTIONS["NO_USE_PORTAUDIO"] = "1"
+	end
+end
+
+newoption {
+	trigger = "NO_USE_PULSEAUDIO",
+	description = "Disable PulseAudio interface",
+	allowed = {
+		{ "0",  "Enable PulseAudio"  },
+		{ "1",  "Disable PulseAudio" },
+	},
+}
+
+if not _OPTIONS["NO_USE_PULSEAUDIO"] then
+	if _OPTIONS["targetos"]=="linux" then
+		_OPTIONS["NO_USE_PULSEAUDIO"] = "0"
+	else
+		_OPTIONS["NO_USE_PULSEAUDIO"] = "1"
 	end
 end
 

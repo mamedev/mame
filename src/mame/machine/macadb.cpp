@@ -290,20 +290,20 @@ static char const *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 
 int macadb_device::adb_pollkbd(int update)
 {
-	int i, j, keybuf, report, codes[2], result;
+	int report, codes[2], result;
 
 	codes[0] = codes[1] = 0xff; // key up
 	report = result = 0;
 
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		keybuf = m_keys[i]->read();
+		int keybuf = m_keys[i]->read();
 
 		// any changes in this row?
 		if ((keybuf != m_key_matrix[i]) && (report < 2))
 		{
 			// check each column bit
-			for (j=0; j<16; j++)
+			for (int j = 0; j < 16; j++)
 			{
 				if (((keybuf ^ m_key_matrix[i]) >> j) & 1)
 				{
@@ -538,7 +538,7 @@ void macadb_device::adb_talk()
 				}
 				else
 				{
-					LOGMASKED(LOG_TALK_LISTEN, "ADB LISTEN to unknown device, timing out\n");
+					LOGMASKED(LOG_TALK_LISTEN, "ADB LISTEN to unknown device %d, timing out\n", addr);
 					m_adb_direction = 0;
 				}
 				break;
@@ -1026,7 +1026,7 @@ void macadb_device::device_reset()
 
 WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 {
-/*	static char const *const states[] =
+/*  static char const *const states[] =
     {
         "idle",
         "attention",
@@ -1053,14 +1053,14 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 	int dtime = (int)(machine().time().as_ticks(adb_timebase) - m_last_adb_time);
 	m_last_adb_time = machine().time().as_ticks(adb_timebase);
 
-/*	if (m_adb_linestate <= 12)
-	{
-	    printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
-	}
-	else
-	{
-	    printf("linechange: %d -> %d, time %d (state %d)\n", state^1, state, dtime, m_adb_linestate);
-	}*/
+/*  if (m_adb_linestate <= 12)
+    {
+        printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
+    }
+    else
+    {
+        printf("linechange: %d -> %d, time %d (state %d)\n", state^1, state, dtime, m_adb_linestate);
+    }*/
 
 	if ((m_adb_direction) && (m_adb_linestate == LST_TSTOP))
 	{
@@ -1118,7 +1118,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 				{
 					m_adb_command |= 1;
 				}
-				LOGMASKED(LOG_LINESTATE, "ADB bit %d\n", m_adb_command & 1);
+				LOGMASKED(LOG_LINESTATE, "ADB bit %d (dtime = %d)\n", m_adb_command & 1, dtime);
 
 				if (m_adb_linestate != LST_BIT7)
 				{

@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER( taito_state::votrax_request )
 
 void taito_state::machine_start()
 {
-	m_digits.resolve(); 
+	m_digits.resolve();
 
 	m_out_offs = 0;
 	std::fill(std::begin(m_io), std::end(m_io), 0);

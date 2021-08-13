@@ -558,7 +558,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::kb_scan)
 void hp9825_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
 {
 	while (pressed) {
-		unsigned bit_no = 31 - count_leading_zeros(pressed);
+		unsigned bit_no = 31 - count_leading_zeros_32(pressed);
 		ioport_value mask = BIT_MASK<ioport_value>(bit_no);
 		int seq_len = port.field(mask)->seq().length();
 		if (seq_len > max_seq_len) {

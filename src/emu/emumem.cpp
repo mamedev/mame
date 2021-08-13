@@ -97,182 +97,156 @@ void handler_entry::enumerate_references(handler_entry::reflist &refs) const
 {
 }
 
-template<int Width, int AddrShift, endianness_t Endian> const handler_entry_read<Width, AddrShift, Endian> *const *handler_entry_read<Width, AddrShift, Endian>::get_dispatch() const
+template<int Width, int AddrShift> const handler_entry_read<Width, AddrShift> *const *handler_entry_read<Width, AddrShift>::get_dispatch() const
 {
 	fatalerror("get_dispatch called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_mismatched called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_mismatched called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_passthrough called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_passthrough called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift, Endian> *&handler) const
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift> *&handler) const
 {
 	fatalerror("lookup called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void *handler_entry_read<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
+template<int Width, int AddrShift> void *handler_entry_read<Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return nullptr;
 }
 
-template<int Width, int AddrShift, endianness_t Endian> handler_entry_read<Width, AddrShift, Endian> *handler_entry_read<Width, AddrShift, Endian>::dup()
+template<int Width, int AddrShift> handler_entry_read<Width, AddrShift> *handler_entry_read<Width, AddrShift>::dup()
 {
 	ref();
 	return this;
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	fatalerror("detach called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift, Endian> **dispatch, handler_entry::range *ranges)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges)
 {
 	fatalerror("init_handlers called on non-view class\n");
 }
 
 
-template<int Width, int AddrShift, endianness_t Endian> const handler_entry_write<Width, AddrShift, Endian> *const *handler_entry_write<Width, AddrShift, Endian>::get_dispatch() const
+template<int Width, int AddrShift> const handler_entry_write<Width, AddrShift> *const *handler_entry_write<Width, AddrShift>::get_dispatch() const
 {
 	fatalerror("get_dispatch called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift, Endian> *handler)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_mismatched called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_mismatched called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_passthrough called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_passthrough called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift, Endian> *&handler) const
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift> *&handler) const
 {
 	fatalerror("lookup called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void *handler_entry_write<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
+template<int Width, int AddrShift> void *handler_entry_write<Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return nullptr;
 }
 
-template<int Width, int AddrShift, endianness_t Endian> handler_entry_write<Width, AddrShift, Endian> *handler_entry_write<Width, AddrShift, Endian>::dup()
+template<int Width, int AddrShift> handler_entry_write<Width, AddrShift> *handler_entry_write<Width, AddrShift>::dup()
 {
 	ref();
 	return this;
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	fatalerror("detach called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_write<Width, AddrShift, Endian> **dispatch, handler_entry::range *ranges)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges)
 {
 	fatalerror("init_handlers called on non-view class\n");
 }
 
-template class handler_entry_read<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read<0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read<0,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read<0,  0, ENDIANNESS_BIG>;
-template class handler_entry_read<1,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_read<1,  3, ENDIANNESS_BIG>;
-template class handler_entry_read<1,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read<1,  0, ENDIANNESS_BIG>;
-template class handler_entry_read<1, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read<1, -1, ENDIANNESS_BIG>;
-template class handler_entry_read<2,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_read<2,  3, ENDIANNESS_BIG>;
-template class handler_entry_read<2,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read<2,  0, ENDIANNESS_BIG>;
-template class handler_entry_read<2, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read<2, -1, ENDIANNESS_BIG>;
-template class handler_entry_read<2, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_read<2, -2, ENDIANNESS_BIG>;
-template class handler_entry_read<3,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read<3,  0, ENDIANNESS_BIG>;
-template class handler_entry_read<3, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read<3, -1, ENDIANNESS_BIG>;
-template class handler_entry_read<3, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_read<3, -2, ENDIANNESS_BIG>;
-template class handler_entry_read<3, -3, ENDIANNESS_LITTLE>;
-template class handler_entry_read<3, -3, ENDIANNESS_BIG>;
+template class handler_entry_read<0,  1>;
+template class handler_entry_read<0,  0>;
+template class handler_entry_read<1,  3>;
+template class handler_entry_read<1,  0>;
+template class handler_entry_read<1, -1>;
+template class handler_entry_read<2,  3>;
+template class handler_entry_read<2,  0>;
+template class handler_entry_read<2, -1>;
+template class handler_entry_read<2, -2>;
+template class handler_entry_read<3,  0>;
+template class handler_entry_read<3, -1>;
+template class handler_entry_read<3, -2>;
+template class handler_entry_read<3, -3>;
 
-template class handler_entry_write<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_write<0,  1, ENDIANNESS_BIG>;
-template class handler_entry_write<0,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write<0,  0, ENDIANNESS_BIG>;
-template class handler_entry_write<1,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_write<1,  3, ENDIANNESS_BIG>;
-template class handler_entry_write<1,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write<1,  0, ENDIANNESS_BIG>;
-template class handler_entry_write<1, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write<1, -1, ENDIANNESS_BIG>;
-template class handler_entry_write<2,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_write<2,  3, ENDIANNESS_BIG>;
-template class handler_entry_write<2,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write<2,  0, ENDIANNESS_BIG>;
-template class handler_entry_write<2, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write<2, -1, ENDIANNESS_BIG>;
-template class handler_entry_write<2, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_write<2, -2, ENDIANNESS_BIG>;
-template class handler_entry_write<3,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write<3,  0, ENDIANNESS_BIG>;
-template class handler_entry_write<3, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write<3, -1, ENDIANNESS_BIG>;
-template class handler_entry_write<3, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_write<3, -2, ENDIANNESS_BIG>;
-template class handler_entry_write<3, -3, ENDIANNESS_LITTLE>;
-template class handler_entry_write<3, -3, ENDIANNESS_BIG>;
+template class handler_entry_write<0,  1>;
+template class handler_entry_write<0,  0>;
+template class handler_entry_write<1,  3>;
+template class handler_entry_write<1,  0>;
+template class handler_entry_write<1, -1>;
+template class handler_entry_write<2,  3>;
+template class handler_entry_write<2,  0>;
+template class handler_entry_write<2, -1>;
+template class handler_entry_write<2, -2>;
+template class handler_entry_write<3,  0>;
+template class handler_entry_write<3, -1>;
+template class handler_entry_write<3, -2>;
+template class handler_entry_write<3, -3>;
 
 //**************************************************************************
 //  MEMORY MANAGER
@@ -308,8 +282,6 @@ void memory_manager::initialize()
 		memories.push_back(&memory);
 		allocate(memory);
 	}
-
-	allocate(m_machine.m_dummy_space);
 
 	// construct and preprocess the address_map for each space
 	for (auto const memory : memories)
@@ -595,7 +567,7 @@ void address_space_installer::check_optimize_all(const char *function, int width
 		// 1. Adjusting
 		nstart &= ~default_lowbits_mask;
 		nend |= default_lowbits_mask;
-		
+
 		// 2. Clearing
 		u64 smask, emask;
 		if(m_config.endianness() == ENDIANNESS_BIG) {
@@ -1045,7 +1017,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 
 	// fill in the requested bank entries
 	for (int entrynum = 0; entrynum < numentries; entrynum ++)
-		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride ;
+		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride;
 }
 
 

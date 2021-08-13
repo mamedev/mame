@@ -455,7 +455,7 @@ void lc89510_temp_device::CDD_Play()
 	SCD_CURLBA = msf_to_lba(msf)-150;
 	if(segacd.cd == nullptr) // no CD is there, bail out
 		return;
-	uint32_t end_msf = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].logframeofs;
+	uint32_t track_length = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) ].logframes;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
 	LC8951UpdateHeader();
 	SCD_STATUS = CDD_PLAYINGCDDA;
@@ -464,7 +464,7 @@ void lc89510_temp_device::CDD_Play()
 	printf("%d Track played\n",SCD_CURTRK);
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
 	if(!(CURRENT_TRACK_IS_DATA))
-		m_cdda->start_audio(SCD_CURLBA, end_msf - SCD_CURLBA);
+		m_cdda->start_audio(SCD_CURLBA, SCD_CURLBA + track_length);
 	SET_CDC_READ
 
 

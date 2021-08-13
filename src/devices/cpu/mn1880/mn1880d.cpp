@@ -11,10 +11,17 @@
     reverse engineering (which include CALL XP actually being provided by
     the MN1880 despite the MN1870 manual claiming it as exclusive).
 
+    Almost nothing about MN1860 is known except that it seems to be
+    closely related to the MN1880. The MN1880 and MN1860 opcode maps are
+    currently believed to be complete; it remains possible that a few
+    rarely-used instructions are missing, or that some mnemonics were
+    renamed.
+
     The direct flag (bit 5 of the flag status register) is the key to
     data memory addressing. When DF is cleared, the upper bytes of direct
     addresses are zeroed; when DF is set, the upper address bytes are
     taken from YPh for source operands and XPh for destination operands.
+    MN1860 appears to have a somewhat more complex bankswitching model.
 
     Note that the REP opcode causes a temporary mode switch, decoding
     up to 15 extra sets of operands for the following instruction.
@@ -42,7 +49,7 @@ mn1880_disassembler::mn1880_disassembler()
 {
 }
 
-// MOV, RDTBL, MOV1 and MOV1N may also be known as MV, MVROM, MV1 and MV1CPL
+// MOV, RDTBL, MOV1, MOV1N, ADDC, SUBC and NOT may also be known as MV, MVROM, MV1, MV1CPL, ADD, SUB and CPL
 const char *const mn1880_disassembler::s_inst_names[256] =
 {
 	"nop", "rep", "rep", "rep", "rep", "rep", "rep", "rep",
@@ -120,6 +127,48 @@ const char *const mn1870_disassembler::s_inst_names[256] =
 	nullptr, "addr", nullptr, "addr", nullptr, "addr", nullptr, "addr",
 	"cmpbne", "cmpbne", "mov1", nullptr, "ret", "reti", "br", "call",
 	"cmpbe", "cmpbe", "mov1n", "push", "br", "call", "rdtbl", nullptr
+};
+
+mn1860_disassembler::mn1860_disassembler()
+	: mn1880_disassembler(s_inst_names)
+{
+}
+
+// MN1860 probably includes most if not all MN1880 opcodes
+const char *const mn1860_disassembler::s_inst_names[256] =
+{
+	"nop", "rep", "rep", "rep", "rep", "rep", "rep", "rep",
+	"rep", "rep", "rep", "rep", "rep", "rep", "rep", "rep",
+	"clr", "clr", "clr", "clr", "clr", "clr", "clr", "clr",
+	"set", "set", "set", "set", "set", "set", "set", "set",
+	"t1bnz", "t1bnz", "t1bnz", "t1bnz", "t1bnz", "t1bnz", "t1bnz", "t1bnz",
+	"t1bz", "t1bz", "t1bz", "t1bz", "t1bz", "t1bz", "t1bz", "t1bz",
+	"addrl", "movl", "addrl", "movl", "movl", "movl", "mov", "mov",
+	"movl", "movl", "movl", "movl", "asl", "asl", "asr", "asr",
+	"dec", "dec", "not", "not", "cmpm", "cmpm", "xch4", "xch4",
+	"inc", "inc", "clr", "clr", "rol", "rol", "ror", "ror",
+	"cmpm", "div", "cmpm", "movda", "mov", "mov", "mov", "mov",
+	"xch", "mul", "xch", "movda", "movl", "movl", "movl", "movl",
+	"cmp", "cmp", "cmp", "cmp", "and", "and", "and", "and",
+	"xor", "xor", "xor", "xor", "or", "or", "or", "or",
+	"subc", "subc", "subc", "subc", "subd", "subd", "subd", "subd",
+	"addc", "addc", "addc", "addc", "addd", "addd", "addd", "addd",
+	"skip", "bc", "bz", "ble", "cmpl", "clr", "cmpl", "clr",
+	"br", "bnc", "bnz", "bgt", "cmpl", "set", "cmpl", "set",
+	"call", "call", "call", "call", "call", "call", "call", "call",
+	"call", "call", "call", "call", "call", "call", "call", "call",
+	"br", "br", "br", "br", "br", "br", "br", "br",
+	"br", "br", "br", "br", "br", "br", "br", "br",
+	"roll", "asll", "divl", "pop", "pop", "pop", "pop", "pop",
+	"rorl", "asrl", "mull", "push", "push", "push", "push", "push",
+	"subcl", "div", "subcl", "subcl", "xch", "xch", "xch", "xch",
+	"addcl", "mul", "addcl", "addcl", "mov", "mov", "mov", "mov",
+	"cmp", "cmp", "cmp", "cmp", "xch", "xch", nullptr, "xch",
+	"mov", "mov", "mov", "mov", "mov", "mov", "mov", "mov",
+	"loop", "rloop", "loop", "rloop", "dec", "inc", "dec", "inc",
+	"addr", "addr", "addr", "addr", "addr", "addr", "addr", "addr",
+	"cmpbne", "cmpbne", "mov1", "wait", "ret", "reti", "br", "call",
+	"cmpbe", "cmpbe", "mov1n", "push", "br", "call", "rdtbl", "pi"
 };
 
 u32 mn1880_disassembler::opcode_alignment() const
@@ -207,15 +256,21 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 	}
 	else if (opcode < 0x34)
 	{
-		// MOVL immediate to pointer register
+		util::stream_format(stream, "%s, ", BIT(opcode, 1) ? "yp" : "xp");
 		if (BIT(opcode, 0))
 		{
-			util::stream_format(stream, "%s, ", BIT(opcode, 1) ? "yp" : "xp");
+			// MOVL immediate to pointer register
 			format_imm16(stream, swapendian_int16(opcodes.r16(pc)));
 			pc += 2;
 		}
 		else
-			stream << "(unknown)";
+		{
+			// ADDRL direct + immediate? (MN1860 only)
+			format_direct(stream, opcodes.r8(pc + 1));
+			stream << ", ";
+			format_imm16(stream, u16(opcodes.r8(pc + 2)) << 8 | opcodes.r8(pc));
+			pc += 3;
+		}
 	}
 	else if (opcode < 0x3c)
 	{
@@ -250,10 +305,10 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 		stream << ", ";
 		format_imm(stream, opcodes.r8(pc++));
 	}
-	else if (opcode < 0x50 || (opcode & 0xf7) == 0xb5 || (opcode & 0xf7) == 0xc3)
+	else if (opcode < 0x50 || (opcode & 0xf7) == 0xb5 || ((opcode & 0xf6) == 0xb0 && m_inst_names[opcode][3] == 'l') || ((opcode & 0xf7) == 0xc3 && m_inst_names[opcode][4] == '\0'))
 	{
 		// Unary operations
-		if (BIT(opcode, 0))
+		if (BIT(opcode, 0) || opcode >= 0xb0)
 			format_direct(stream, opcodes.r8(pc++));
 		else
 			stream << "(xp)";
@@ -284,13 +339,21 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 	}
 	else if (opcode == 0x53)
 	{
-		// MOVDA (MN1880 only)
+		// MOVDA (MN1880, MN1860 only)
 		format_direct16(stream, opcodes.r16(pc + 2));
 		stream << ", ";
 		format_direct16(stream, opcodes.r16(pc));
 		pc += 4;
 	}
-	else if (opcode < 0x80 || (opcode & 0xfd) == 0x84 || (opcode & 0xf4) == 0xc0)
+	else if (opcode == 0x5b)
+	{
+		// MOVDA with immediate source? (MN1860 only)
+		format_direct16(stream, opcodes.r16(pc + 1));
+		stream << ", ";
+		format_imm(stream, opcodes.r8(pc));
+		pc += 3;
+	}
+	else if (opcode < 0x80 || (opcode & 0xfd) == 0x84 || (opcode & 0xfd) == 0x8c || (opcode & 0xf4) == 0xc0)
 	{
 		// Binary operations
 		if (BIT(opcode, 1))
@@ -299,11 +362,11 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 			u8 op2 = opcodes.r8(pc++);
 			format_direct(stream, opcodes.r8(pc++));
 			stream << ", ";
-			if (BIT(opcode, 0))
+			if (opcode == 0x5f || opcode == 0x8e || (opcode & 0xf7) == 0xc3)
+				format_imm16(stream, op2 | u16(opcodes.r8(pc++)) << 8);
+			else if (BIT(opcode, 0))
 			{
-				if (opcode == 0x5f)
-					format_imm16(stream, op2 | u16(opcodes.r8(pc++)) << 8);
-				else if ((opcode & 0xf4) == 0x74)
+				if ((opcode & 0xf4) == 0x74)
 					format_imm4(stream, op2);
 				else
 					format_imm(stream, op2);
@@ -315,7 +378,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 		{
 			// Indirect modes
 			stream << "(xp), ";
-			if (opcode == 0x5d)
+			if (opcode == 0x5d || opcode == 0x8c)
 			{
 				format_imm16(stream, swapendian_int16(opcodes.r16(pc)));
 				pc += 2;
@@ -367,7 +430,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 	{
 		if (BIT(opcode, 0))
 			stream << "fs";
-		else
+		else if (m_inst_names[opcode][0] == 't' || m_inst_names[opcode][3] == '\0')
 		{
 			// CLR, SET, T1BNZ, T1BZ indirect (MN1870 only)
 			format_indirect_bp(stream, "xp", opcodes.r8(pc++) & 0x07);
@@ -377,6 +440,16 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 				format_rel(stream, pc + 1, opcodes.r8(pc));
 				++pc;
 			}
+		}
+		else
+		{
+			// 3 direct operands? (MN1860 only)
+			format_direct(stream, opcodes.r8(pc + 2));
+			stream << ", ";
+			format_direct(stream, opcodes.r8(pc));
+			stream << ", ";
+			format_direct(stream, opcodes.r8(pc + 1));
+			pc += 3;
 		}
 	}
 	else if (opcode < 0xc0 || (opcode & 0xfc) == 0xe4 || (opcode & 0xfe) == 0xfc)

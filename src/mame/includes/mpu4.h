@@ -10,7 +10,7 @@
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"

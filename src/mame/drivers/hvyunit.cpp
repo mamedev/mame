@@ -64,7 +64,7 @@ To Do:
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "video/kan_pand.h"
 #include "emupal.h"
 #include "screen.h"

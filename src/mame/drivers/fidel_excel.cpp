@@ -205,20 +205,14 @@ private:
 	void ttl_w(offs_t offset, u8 data);
 	u8 ttl_r(offs_t offset);
 
-	u8 m_select;
-	u8 m_7seg_data;
-	u8 m_speech_data;
-	u8 m_speech_bank;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_speech_data = 0;
+	u8 m_speech_bank = 0;
 };
 
 void excel_state::machine_start()
 {
-	// zerofill
-	m_select = 0;
-	m_7seg_data = 0;
-	m_speech_data = 0;
-	m_speech_bank = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_7seg_data));
@@ -273,7 +267,7 @@ void excel_state::ttl_w(offs_t offset, u8 data)
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
 
 	// update display: 4 7seg leds, 2*8 chessboard leds
-	m_display->matrix_partial(0, 2, led_sel, led_data, false);
+	m_display->matrix_partial(0, 2, led_sel, led_data);
 	m_display->matrix_partial(2, 4, led_sel >> 2, seg_data); // 6093
 
 	// speech (model 6092)

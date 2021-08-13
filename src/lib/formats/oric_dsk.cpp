@@ -11,10 +11,6 @@
 #include "formats/oric_dsk.h"
 
 
-oric_dsk_format::oric_dsk_format()
-{
-}
-
 const char *oric_dsk_format::name() const
 {
 	return "oric_dsk";
@@ -109,3 +105,97 @@ bool oric_dsk_format::save(io_generic *io, const std::vector<uint32_t> &variants
 }
 
 const floppy_format_type FLOPPY_ORIC_DSK_FORMAT = &floppy_image_format_creator<oric_dsk_format>;
+
+
+const char *oric_jasmin_format::name() const
+{
+	return "oric_jasmin";
+}
+
+const char *oric_jasmin_format::description() const
+{
+	return "Oric Jasmin pure sector image";
+}
+
+const char *oric_jasmin_format::extensions() const
+{
+	return "dsk";
+}
+
+bool oric_jasmin_format::supports_save() const
+{
+	return true;
+}
+
+int oric_jasmin_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+{
+	int size = io_generic_size(io);
+	bool can_ds = variants.empty() || has_variant(variants, floppy_image::DSDD);
+	if(size == 41*17*256 || (can_ds && size == 41*17*256*2))
+		return 50;
+
+	return 0;
+}
+
+bool oric_jasmin_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	int size = io_generic_size(io);
+	bool can_ds = variants.empty() || has_variant(variants, floppy_image::DSDD);
+
+	if(size != 41*17*256 && (!can_ds || size != 41*17*256*2))
+		return false;
+
+	int heads = size == 41*17*256 ? 1 : 2;
+
+	std::vector<uint8_t> data(size);
+	io_generic_read(io, data.data(), 0, size);
+
+	for(int head = 0; head != heads; head++)
+		for(int track = 0; track != 41; track++) {
+			desc_pc_sector sdesc[17];
+			for(int s = 0; s != 17; s++) {
+				int sector = (s + 6*(track+1)) % 17;
+				sdesc[s].track = track;
+				sdesc[s].head = head;
+				sdesc[s].sector = sector + 1;
+				sdesc[s].size = 1;
+				sdesc[s].actual_size = 256;
+				sdesc[s].data = data.data() + 256 * (sector + track*17 + head*17*41);
+				sdesc[s].deleted = false;
+				sdesc[s].bad_crc = false;
+			}
+
+			build_wd_track_mfm(track, head, image, 100000, 17, sdesc, 38, 40);
+		}
+
+	image->set_form_variant(floppy_image::FF_3, heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
+
+	return true;
+}
+
+bool oric_jasmin_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	int tracks, heads;
+	image->get_actual_geometry(tracks, heads);
+
+	bool can_ds = variants.empty() || has_variant(variants, floppy_image::DSDD);
+	if(heads == 2 && !can_ds)
+		return false;
+	if(heads == 0)
+		heads = 1;
+
+	uint8_t zero[256];
+	memset(zero, 0, 256);
+
+	for(int head = 0; head != heads; head++)
+		for(int track = 0; track != 41; track++) {
+			auto sectors = extract_sectors_from_bitstream_mfm_pc(generate_bitstream_from_track(track, head, 2000, image));
+			for(unsigned int sector = 0; sector != 17; sector ++) {
+				const uint8_t *data = sector+1 < sectors.size() && !sectors[sector+1].empty() ? sectors[sector+1].data() : zero;
+				io_generic_write(io, data, 256 * (sector + track*17 + head*17*41), 256);
+			}
+		}
+	return true;
+}
+
+const floppy_format_type FLOPPY_ORIC_JASMIN_FORMAT = &floppy_image_format_creator<oric_jasmin_format>;

@@ -6,10 +6,10 @@
 
     TODO:
     - Needs better I82730 emulation
-	- Floppy I/O errors
+    - Floppy I/O errors
     - Many more things
 
-	Notes:
+    Notes:
     - Press SPACE during self-test for an extended menu
 
 ***************************************************************************/
@@ -283,17 +283,17 @@ void rc759_state::palette_w(offs_t offset, uint8_t data)
 	// two colors/byte. format: IRGBIRGB
 	static constexpr uint8_t val[4] = { 0x00, 0x55, 0xaa, 0xff };
 	int r, g, b;
-	
+
 	r = (BIT(data, 2) << 1) | BIT(data, 3);
 	g = (BIT(data, 1) << 1) | BIT(data, 3);
 	b = (BIT(data, 0) << 1) | BIT(data, 3);
-	
+
 	m_palette->set_pen_color(offset * 2 + 0, rgb_t(val[r], val[g], val[b]));
 
 	r = (BIT(data, 6) << 1) | BIT(data, 7);
 	g = (BIT(data, 5) << 1) | BIT(data, 7);
 	b = (BIT(data, 4) << 1) | BIT(data, 7);
-	
+
 	m_palette->set_pen_color(offset * 2 + 1, rgb_t(val[r], val[g], val[b]));
 }
 

@@ -29,11 +29,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="card" supported="no">
+	<software name="card"><!-- pressing space now and then kicks things along, but really need instructions -->
 		<description>Card Game</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Press F12" />
+		<year>1994</year>
+		<publisher>S.E.S., VM Group</publisher>
+		<info name="usage" value="Press F12. Press Space then Enter. Select 3 players by using arrows and Space." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
 				<rom name="card.fdd" size="839680" crc="334e1379" sha1="2c15dac696942b0f3abe051a30bd954169344ad7"/>
@@ -58,7 +58,6 @@ license:CC0
 		<description>Game 15 Part 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-	<!--- hold Ctrl while booting -->
 		<info name="usage" value="Press F12, and hold CTRL until it has finished starting up." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
@@ -79,7 +78,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lemmings">
+	<software name="lemmings"><!-- lemmings die more easily than in the PC version -->
 		<description>Lemmings</description>
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -104,10 +103,10 @@ license:CC0
 	</software>
 
 	<software name="mreversi">
-		<description>Master Reversi</description>
+		<description>Reversi Master</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Press F12" />
+		<info name="usage" value="Press F12. Press N, Space, right-arrow, right-arrow, Space, Space, Esc, left-arrow, Space." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
 				<rom name="mreversi.fdd" size="839680" crc="0175f570" sha1="c13eed04a92da8dd814dae0bc3079c2689c8cbb3"/>
@@ -151,7 +150,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="zoo"><!-- unreadable dark blue screen -->
+	<software name="zoo" supported="partial"><!-- unreadable dark blue screen -->
 		<description>Zoo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -159,6 +158,54 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
 				<rom name="zoo.fdd" size="839680" crc="7def2d07" sha1="80b8103b2c349d7993e5365453ca88c7685753d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gt">
+		<description>Great Battle Super Tank</description>
+		<year>2000</year>
+		<publisher>gDW</publisher>
+		<info name="usage" value="Press F12. When A&gt; shows, enter GT then Y" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="839680">
+				<rom name="gt.fdd" size="839680" crc="2f439145" sha1="1889cf5e9ac50af752be3159280dd135e729a464"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incubus">
+		<description>Incubus</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press F12" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="839680">
+				<rom name="incubus.fdd" size="839680" crc="04b01bf7" sha1="5ad6b4787aa2baa1412f9db38fb6a1051e8e45ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rpm">
+		<description>Real Player demo</description>
+		<year>1997</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press F12, arrows to choose track, Enter to play it." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="839680">
+				<rom name="rpm.fdd" size="839680" crc="f3712988" sha1="99709cff59e185cbe9cf0f0d84a8af17afd220d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trex">
+		<description>T.Rex 0.5: Take One</description>
+		<year>19??</year>
+		<publisher>S.E.S.</publisher>
+		<info name="usage" value="Press F12. Press Space. Space performs most in-game actions." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="839680">
+				<rom name="t-rex-05.fdd" size="839680" crc="e090320d" sha1="822d4fc3537e4c4a86d46c349f8fac88bb08cfc1"/>
 			</dataarea>
 		</part>
 	</software>

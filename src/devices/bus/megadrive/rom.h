@@ -39,10 +39,25 @@ public:
 	// construction/destruction
 	md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	md_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+public:
 	// reading and writing
 	virtual uint16_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	virtual void write_a13(offs_t offset, uint16_t data) override;
+};
+
+// ======================> md_rom_sram_arg96_device
+
+class md_rom_sram_arg96_device : public md_rom_sram_device
+{
+public:
+	md_rom_sram_arg96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 // ======================> md_rom_fram_device
@@ -468,6 +483,28 @@ private:
 	uint16_t m_latch;
 };
 
+// ======================> md_rom_tc2000_device
+
+class md_rom_tc2000_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_tc2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	uint16_t m_retvalue;
+};
+
+
 // ======================> md_rom_tekkensp_device
 
 class md_rom_tekkensp_device : public md_std_rom_device
@@ -631,6 +668,8 @@ DECLARE_DEVICE_TYPE(MD_ROM_POKESTAD, md_rom_pokestad_device)
 DECLARE_DEVICE_TYPE(MD_ROM_REALTEC,  md_rom_realtec_device)
 DECLARE_DEVICE_TYPE(MD_ROM_REDCL,    md_rom_redcl_device)
 DECLARE_DEVICE_TYPE(MD_ROM_SQUIR,    md_rom_squir_device)
+DECLARE_DEVICE_TYPE(MD_ROM_SRAM_ARG96, md_rom_sram_arg96_device)
+DECLARE_DEVICE_TYPE(MD_ROM_TC2000,   md_rom_tc2000_device)
 DECLARE_DEVICE_TYPE(MD_ROM_TEKKENSP, md_rom_tekkensp_device)
 DECLARE_DEVICE_TYPE(MD_ROM_TOPF,     md_rom_topf_device)
 DECLARE_DEVICE_TYPE(MD_ROM_RADICA,   md_rom_radica_device)

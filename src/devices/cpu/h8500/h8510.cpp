@@ -12,7 +12,7 @@
 DEFINE_DEVICE_TYPE(HD6415108, hd6415108_device, "hd6415108", "Hitachi HD6415108 (H8/510)")
 
 h8510_device::h8510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: h8500_device(mconfig, type, tag, owner, clock, 24, 16, 0, address_map_constructor(FUNC(h8510_device::internal_map), this))
+	: h8500_device(mconfig, type, tag, owner, clock, 24, 16, 0, 4, address_map_constructor(FUNC(h8510_device::internal_map), this))
 {
 }
 

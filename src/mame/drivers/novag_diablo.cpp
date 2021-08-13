@@ -3,11 +3,13 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-Novag Diablo 68000 / Novag Scorpio 68000
+Novag Diablo 68000 (model 908)
+Novag Scorpio 68000 (model 909)
 
 Hardware notes (Diablo):
 - M68000 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
-- 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257 3*32KB ROM
+- 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257
+- 3*32KB ROM (27C256 or equivalent)
 - HD44780 LCD controller (16x1)
 - R65C51P2 ACIA @ 1.8432MHz, RS232
 - magnetic sensors, 8*8 chessboard leds
@@ -17,6 +19,7 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/sensorboard.h"
@@ -94,22 +97,15 @@ private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void lcd_palette(palette_device &palette) const;
 
-	u8 m_inp_mux;
-	u8 m_led_data;
-	u8 m_led_side;
-	u8 m_lcd_control;
-	u8 m_lcd_data;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_led_side = 0;
+	u8 m_lcd_control = 0;
+	u8 m_lcd_data = 0;
 };
 
 void diablo_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_data = 0;
-	m_led_side = 0;
-	m_lcd_control = 0;
-	m_lcd_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
@@ -291,7 +287,7 @@ void diablo_state::diablo68k(machine_config &config)
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(diablo_state::irq_on<M68K_IRQ_IPL1>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1100)); // active for 1.1us
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1380)); // active for 1.38us
 	TIMER(config, "irq_off").configure_periodic(FUNC(diablo_state::irq_off<M68K_IRQ_IPL1>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -357,9 +353,16 @@ void diablo_state::scorpio68k(machine_config &config)
 
 ROM_START( diablo68 ) // ID = D 1.08
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
-	ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) )
-	ROM_LOAD16_BYTE("book.bin",     0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
+	ROM_LOAD16_BYTE("d_evn_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
+	ROM_LOAD16_BYTE("d_odd_904.u2", 0x00001, 0x8000, CRC(d46fcc7a) SHA1(8ed69cd0fec07bf5451eaa882c87cf7cf70c87eb) )
+	ROM_LOAD16_BYTE("ds_bk.u4",     0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
+ROM_END
+
+ROM_START( diablo68a ) // ID = D 1.08
+	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE("d_evn_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
+	ROM_LOAD16_BYTE("d_odd_904.u2", 0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) ) // only 2 bytes differ (one of them is the checksum)
+	ROM_LOAD16_BYTE("ds_bk.u4",     0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
 ROM_END
 
 
@@ -378,7 +381,8 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE     INPUT       CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1991, diablo68,  0,      0, diablo68k,  diablo68k,  diablo_state, empty_init, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   CMP MACHINE     INPUT       CLASS         INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1991, diablo68,  0,        0, diablo68k,  diablo68k,  diablo_state, empty_init, "Novag", "Diablo 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, diablo68a, diablo68, 0, diablo68k,  diablo68k,  diablo_state, empty_init, "Novag", "Diablo 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1991, scorpio68, 0,      0, scorpio68k, diablo68k,  diablo_state, empty_init, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, scorpio68, 0,        0, scorpio68k, diablo68k,  diablo_state, empty_init, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

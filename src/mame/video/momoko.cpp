@@ -6,15 +6,15 @@
 
     Video hardware driver by Uki 02/Mar/2001
 
-	Video consists of
-	- Sprites
-	- 2x ROM based tilemaps (bg and fg) with priority over some sprites
-	- 1x RAM based tilemap (text layer) (no wrapping?)
+    Video consists of
+    - Sprites
+    - 2x ROM based tilemaps (bg and fg) with priority over some sprites
+    - 1x RAM based tilemap (text layer) (no wrapping?)
 
-	TODO:
-	- update to use tilemap system?
-	- check if any of this is common Jaleco/NMK etc. hardware and use shared
-	  devices if possible
+    TODO:
+    - update to use tilemap system?
+    - check if any of this is common Jaleco/NMK etc. hardware and use shared
+      devices if possible
 
 *******************************************************************************/
 

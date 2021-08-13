@@ -382,7 +382,7 @@ image_init_result gb_cart_slot_device_base::call_load()
 
 		//printf("Type: %s\n", gb_get_slot(m_type));
 
-		internal_header_logging(ROM + offset, len);
+		internal_header_logging(ROM + offset, len - offset);
 
 		return image_init_result::PASS;
 	}
@@ -818,8 +818,8 @@ void gb_cart_slot_device_base::internal_header_logging(uint8_t *ROM, uint32_t le
 		logerror("\nWarning loading cartridge: Unknown ROM size in header [0x%x].\n", ROM[0x0148]);
 
 	if ((len / 0x4000) != rom_banks)
-		logerror("\nWarning loading cartridge: Filesize (0x%x) and reported ROM banks (0x%x) don't match.\n",
-					len, rom_banks * 0x4000);
+		logerror("\nWarning loading cartridge: Filesize (0x%x) and reported ROM banks (0x%x) don't match.\n", len, rom_banks * 0x4000);
+
 	/* Calculate and check checksum */
 	tmp = (ROM[0x014e] << 8) + ROM[0x014f];
 	for (int i = 0; i < len; i++)
@@ -829,5 +829,4 @@ void gb_cart_slot_device_base::internal_header_logging(uint8_t *ROM, uint32_t le
 
 	if (csum != tmp)
 		logerror("\nWarning loading cartridge: Checksum is wrong (Actual 0x%04X vs Internal 0x%04X)\n", csum, tmp);
-
 }

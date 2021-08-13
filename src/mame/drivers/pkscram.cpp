@@ -17,7 +17,7 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

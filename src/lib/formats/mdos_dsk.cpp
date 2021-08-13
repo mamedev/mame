@@ -74,7 +74,7 @@ const char *mdos_format::extensions() const
 
 int mdos_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor);
+  int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 75;
@@ -109,7 +109,7 @@ int mdos_format::parse_date_field(uint8_t *str)
 	return (high - 0x30) * 10 + (low - 0x30);
 }
 
-int mdos_format::find_size(io_generic *io, uint32_t form_factor)
+int mdos_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 

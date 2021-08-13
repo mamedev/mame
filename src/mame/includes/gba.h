@@ -22,24 +22,25 @@ public:
 		m_ldacb(*this, "ldacb"),
 		m_rdacb(*this, "rdacb"),
 		m_gbsound(*this, "custom"),
-		m_cart(*this, "cartslot"),
-		m_region_maincpu(*this, "maincpu"),
-		m_io_inputs(*this, "INPUTS"),
-		m_bios_hack(*this, "SKIP_CHECK")
+		m_io_inputs(*this, "INPUTS")
 	{ }
 
 	void gbadv(machine_config &config);
 
-	void init_gbadv();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+
+	void gba_map(address_map &map);
 
 private:
-	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_ldaca;
 	required_device<dac_byte_interface> m_rdaca;
 	required_device<dac_byte_interface> m_ldacb;
 	required_device<dac_byte_interface> m_rdacb;
 	required_device<gameboy_sound_device> m_gbsound;
-	required_device<gba_cart_slot_device> m_cart;
 
 	void request_irq(uint32_t int_type);
 
@@ -71,24 +72,57 @@ private:
 
 	uint32_t gba_io_r(offs_t offset, uint32_t mem_mask = ~0);
 	void gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t gba_bios_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t gba_10000000_r(offs_t offset, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);
 	DECLARE_WRITE_LINE_MEMBER(dma_hblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(dma_vblank_callback);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	TIMER_CALLBACK_MEMBER(timer_expire);
 	TIMER_CALLBACK_MEMBER(handle_irq);
 
-	void gba_map(address_map &map);
+	required_ioport m_io_inputs;
+};
+
+class gba_cons_state : public gba_state
+{
+public:
+	gba_cons_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gba_state(mconfig, type, tag),
+		m_region_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot"),
+		m_bios_hack(*this, "SKIP_CHECK")
+	{ }
+
+	void gbadv_cons(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+	void gba_cons_map(address_map &map);
+
+	uint32_t gba_bios_r(offs_t offset, uint32_t mem_mask = ~0);
 
 	required_region_ptr<uint32_t> m_region_maincpu;
-	required_ioport m_io_inputs;
+	required_device<gba_cart_slot_device> m_cart;
 	required_ioport m_bios_hack;
 };
+
+
+class gba_robotech_state : public gba_state
+{
+public:
+	gba_robotech_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gba_state(mconfig, type, tag)
+	{ }
+
+	void gbadv_robotech(machine_config &config);
+
+protected:
+
+	void gba_robotech_map(address_map &map);
+};
+
 
 #endif

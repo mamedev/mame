@@ -61,7 +61,6 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B
 	m_opna->irq_handler().set(FUNC(pc9801_86_device::sound_irq));
-	m_opna->set_flags(AY8910_SINGLE_OUTPUT);
 	m_opna->port_a_read_callback().set(FUNC(pc9801_86_device::opn_porta_r));
 	//m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
 	//m_opna->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
@@ -404,7 +403,6 @@ void pc9801_speakboard_device::device_add_mconfig(machine_config &config)
 	m_opna->add_route(2, "rspeaker", 0.50);
 
 	YM2608(config, m_opna_slave, 7.987_MHz_XTAL);
-	m_opna_slave->set_flags(AY8910_SINGLE_OUTPUT);
 	m_opna_slave->add_route(0, "lspeaker", 0.50);
 	m_opna_slave->add_route(0, "rspeaker", 0.50);
 	m_opna_slave->add_route(1, "lspeaker", 0.50);

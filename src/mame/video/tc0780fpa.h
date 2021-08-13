@@ -18,7 +18,7 @@ struct tc0780fpa_polydata
 };
 
 
-class tc0780fpa_renderer : public poly_manager<float, tc0780fpa_polydata, 6, 10000>
+class tc0780fpa_renderer : public poly_manager<float, tc0780fpa_polydata, 6>
 {
 public:
 	tc0780fpa_renderer(device_t &parent, screen_device &screen, const uint8_t *texture_ram);

@@ -39,7 +39,7 @@ DAC               -26.6860Mhz
 
 #include "cpu/m68000/m68000.h"
 #include "machine/taitoio.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -215,7 +215,7 @@ void _2mindril_state::drill_map(address_map &map)
 	map(0x460010, 0x46001f).w(FUNC(_2mindril_state::control_1_w));
 	map(0x500000, 0x501fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x502022, 0x502023).nopw(); //countinously switches between 0 and 2
-	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
+	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write)).umask16(0x00ff);
 	map(0x60000c, 0x60000d).rw(FUNC(_2mindril_state::irq_r), FUNC(_2mindril_state::irq_w));
 	map(0x60000e, 0x60000f).ram(); // unknown purpose, zeroed at start-up and nothing else
 	map(0x700000, 0x70000f).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0xff00);

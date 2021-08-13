@@ -93,7 +93,7 @@ ROM labels are in this format:
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "speaker.h"
 

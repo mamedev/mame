@@ -64,7 +64,7 @@ class menu_select_format : public menu
 {
 public:
 	menu_select_format(mame_ui_manager &mui, render_container &container,
-		floppy_image_format_t **formats, int ext_match, int total_usable, int *result);
+					   const std::vector<floppy_image_format_t *> &formats, int ext_match, floppy_image_format_t **result);
 	virtual ~menu_select_format() override;
 
 private:
@@ -72,10 +72,9 @@ private:
 	virtual void handle() override;
 
 	// internal state
-	floppy_image_format_t **    m_formats;
-	int                         m_ext_match;
-	int                         m_total_usable;
-	int *                       m_result;
+	std::vector<floppy_image_format_t *> m_formats;
+	int                                  m_ext_match;
+	floppy_image_format_t *             *m_result;
 };
 
 // ======================> menu_select_floppy_init

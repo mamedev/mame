@@ -493,14 +493,20 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		}
 	}
 
-	// Check if the drive is QD or HD but we're a 40 track image.
-	// If so, put the image on even tracks.
-	if ((has_variant(variants, floppy_image::DSQD)) ||
-		(has_variant(variants, floppy_image::DSHD)))
+	if(form_factor == floppy_image::FF_525)
 	{
-		if (maxtrack <= 39)
+		// On 5.25, check if the drive is QD or HD but we're a 40 track
+		// image.  If so, put the image on even tracks.
+		if ((has_variant(variants, floppy_image::DSQD)) ||
+			(has_variant(variants, floppy_image::DSHD)))
 		{
-			m_trackmult = 2;
+			if (maxtrack <= 39)
+				m_trackmult = 2;
+		}
+		else
+		{
+			if (maxtrack > 42)
+				return false;
 		}
 	}
 
@@ -655,7 +661,7 @@ bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 
 		bool fm = m_mode[i]< 3;
 
-		auto bitstream = generate_bitstream_from_track(m_track[i]*m_trackmult, head, 2000, image);
+		auto bitstream = generate_bitstream_from_track(m_track[i]*m_trackmult, head, fm ? 4000 : 2000, image);
 		std::vector<std::vector<uint8_t>> sectors;
 
 		if (fm)

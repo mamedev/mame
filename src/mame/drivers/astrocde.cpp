@@ -1560,7 +1560,7 @@ ROM_START( wow )
 	ROM_LOAD( "wow.x5",       0x8000, 0x1000, CRC(16912c2b) SHA1(faf9c96d99bc111c5f1618f6863f22fd9269027b) )
 	ROM_LOAD( "wow.x6",       0x9000, 0x1000, CRC(35797f82) SHA1(376bba29e88c16d95438fa996913b76581df0937) )
 	ROM_LOAD( "wow.x7",       0xa000, 0x1000, CRC(ce404305) SHA1(a52c6c7b77842f25c79515460be6b7ed959b5edb) )
-/*  ROM_LOAD( "wow.x11",      0xc000, CRC(00001000) , ? )   here would go the foreign language ROM */
+	//ROM_LOAD( "wow.x11",      0xc000, 0x1000 NO_DUMP ) // here would go the foreign language ROM
 ROM_END
 
 

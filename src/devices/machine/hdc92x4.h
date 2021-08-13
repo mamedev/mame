@@ -364,6 +364,9 @@ protected:
 	// Are we in FM mode?
 	bool fm_mode();
 
+	// Do we have timed steps?
+	bool timed_steps();
+
 	// Seek completed?
 	bool seek_complete();
 

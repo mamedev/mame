@@ -71,7 +71,7 @@
 #define LOG_CRU         (1U<<10)
 #define LOG_CONFIG      (1U<<15)    // Configuration
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
@@ -81,6 +81,8 @@ namespace bus::ti99::peb {
 #define BUFFER "ram"
 #define FDC_TAG "hdc9234"
 #define CLOCK_TAG "mm58274c"
+
+#define NONE -1
 
 #define MOTOR_TIMER 1
 
@@ -100,8 +102,12 @@ myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_motor_on_timer(nullptr),
 	m_hdc9234(*this, FDC_TAG),
-	m_clock(*this, CLOCK_TAG), m_current_floppy(nullptr),
-	m_current_harddisk(nullptr), m_see_switches(false),
+	m_clock(*this, CLOCK_TAG),
+	m_current_floppy(nullptr),
+	m_current_harddisk(nullptr),
+	m_current_floppy_index(NONE),
+	m_current_hd_index(NONE),
+	m_see_switches(false),
 	m_irq(), m_dip(), m_motor_running(false),
 	m_inDsrArea(false), m_HDCsel(false), m_RTCsel(false),
 	m_tapesel(false), m_RAMsel(false), m_ROMsel(false), m_address(0),
@@ -714,7 +720,7 @@ enum
 void myarc_hfdc_device::connect_floppy_unit(int index)
 {
 	// Check if we have a new floppy
-	if (m_floppy_unit[index] != m_current_floppy)
+	if (index != m_current_floppy_index)
 	{
 		// Clear all latched flags from other drives
 		m_status_latch = 0;
@@ -723,6 +729,7 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 
 		// Connect new drive
 		m_current_floppy = m_floppy_unit[index];
+		m_current_floppy_index = index;
 
 		// We don't use the READY line of floppy drives.
 		// READY is asserted when DSKx = 1
@@ -732,7 +739,9 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&myarc_hfdc_device::floppy_index_callback, this));
 		else
 			LOGMASKED(LOG_WARN, "Connection to DSK%d failed because no drive is connected\n", index+1);
-		m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
+
+		// Connect to HDC (or disconnect)
+		m_hdc9234->connect_floppy_drive(m_current_floppy);
 	}
 
 	// We can only run a floppy or a harddisk at a time, not both
@@ -741,15 +750,16 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 
 void myarc_hfdc_device::connect_harddisk_unit(int index)
 {
-	if (m_harddisk_unit[index] != m_current_harddisk)
+	if (index != m_current_hd_index)
 	{
-		// Clear all latched flags form other drives
+		// Clear all latched flags from other drives
 		m_status_latch = 0;
 		disconnect_hard_drives();
 		LOGMASKED(LOG_LINES, "Select hard disk WDS%d\n", index+1);
 
 		// Connect new drive
 		m_current_harddisk = m_harddisk_unit[index];
+		m_current_hd_index = index;
 
 		LOGMASKED(LOG_LINES, "Connect index callback WDS%d\n", index+1);
 		if (m_current_harddisk != nullptr)
@@ -760,6 +770,8 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 		}
 		else
 			LOGMASKED(LOG_WARN, "Connection to WDS%d failed because no drive is connected\n", index+1);
+
+		// Connect to HDC (or disconnect)
 		m_hdc9234->connect_hard_drive(m_current_harddisk);
 	}
 
@@ -776,6 +788,7 @@ void myarc_hfdc_device::disconnect_floppy_drives()
 		m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		m_current_floppy = nullptr;
 	}
+	m_current_floppy_index = NONE;
 }
 
 void myarc_hfdc_device::disconnect_hard_drives()
@@ -787,6 +800,7 @@ void myarc_hfdc_device::disconnect_hard_drives()
 		m_current_harddisk->setup_seek_complete_cb(mfm_harddisk_device::seek_complete_cb());
 		m_current_harddisk = nullptr;
 	}
+	m_current_hd_index = NONE;
 }
 
 /*
@@ -875,6 +889,8 @@ void myarc_hfdc_device::device_start()
 	// The HFDC does not use READY; it has on-board RAM for DMA
 	m_current_floppy = nullptr;
 	m_current_harddisk = nullptr;
+	m_current_floppy_index = NONE;
+	m_current_hd_index = NONE;
 
 	// Parent class members
 	save_item(NAME(m_senila));

@@ -139,32 +139,35 @@ DEFINE_DEVICE_TYPE(SEGA315_5377, sega315_5377_device, "sega315_5377", "Sega 315-
 // (reference for VDP colors: http://www.sega-16.com/forum/showthread.php?30530-SMS-VDP-output-levels)
 void sega315_5124_device::sega315_5124_palette(palette_device &palette) const
 {
-	static constexpr u8 level[4] = {0,90,173,255};
+	// blue channel is non-linear, verified from die shot
+	// reference: https://www.retrorgb.com/sega-master-system-blue-channel-mysteries-further-uncovered.html
+	static constexpr u8 level[4] = {0,78,160,238};
+	static constexpr u8 blue_level[4] = {0,98,160,238};
 	for (int i = 0; i < 64; i++)
 	{
 		const u8 r = i & 0x03;
 		const u8 g = (i & 0x0c) >> 2;
 		const u8 b = (i & 0x30) >> 4;
-		palette.set_pen_color(i, level[r], level[g], level[b]);
+		palette.set_pen_color(i, level[r], level[g], blue_level[b]);
 	}
 	// sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette
 	// TMS9918 palette
-	palette.set_pen_color(64+ 0, level[0], level[0], level[0]); // palette.set_pen_color(64+ 0,   0,   0,   0);
-	palette.set_pen_color(64+ 1, level[0], level[0], level[0]); // palette.set_pen_color(64+ 1,   0,   0,   0);
-	palette.set_pen_color(64+ 2, level[0], level[2], level[0]); // palette.set_pen_color(64+ 2,  33, 200,  66);
-	palette.set_pen_color(64+ 3, level[0], level[3], level[0]); // palette.set_pen_color(64+ 3,  94, 220, 120);
-	palette.set_pen_color(64+ 4, level[0], level[0], level[1]); // palette.set_pen_color(64+ 4,  84,  85, 237);
-	palette.set_pen_color(64+ 5, level[0], level[0], level[3]); // palette.set_pen_color(64+ 5, 125, 118, 252);
-	palette.set_pen_color(64+ 6, level[1], level[0], level[0]); // palette.set_pen_color(64+ 6, 212,  82,  77);
-	palette.set_pen_color(64+ 7, level[0], level[3], level[3]); // palette.set_pen_color(64+ 7,  66, 235, 245);
-	palette.set_pen_color(64+ 8, level[2], level[0], level[0]); // palette.set_pen_color(64+ 8, 252,  85,  84);
-	palette.set_pen_color(64+ 9, level[3], level[0], level[0]); // palette.set_pen_color(64+ 9, 255, 121, 120);
-	palette.set_pen_color(64+10, level[1], level[1], level[0]); // palette.set_pen_color(64+10, 212, 193,  84);
-	palette.set_pen_color(64+11, level[3], level[3], level[0]); // palette.set_pen_color(64+11, 230, 206, 128);
-	palette.set_pen_color(64+12, level[0], level[1], level[0]); // palette.set_pen_color(64+12,  33, 176,  59);
-	palette.set_pen_color(64+13, level[3], level[0], level[3]); // palette.set_pen_color(64+13, 201,  91, 186);
-	palette.set_pen_color(64+14, level[1], level[1], level[1]); // palette.set_pen_color(64+14, 204, 204, 204);
-	palette.set_pen_color(64+15, level[3], level[3], level[3]); // palette.set_pen_color(64+15, 255, 255, 255);
+	palette.set_pen_color(64+ 0, level[0], level[0], blue_level[0]); // palette.set_pen_color(64+ 0,   0,   0,   0);
+	palette.set_pen_color(64+ 1, level[0], level[0], blue_level[0]); // palette.set_pen_color(64+ 1,   0,   0,   0);
+	palette.set_pen_color(64+ 2, level[0], level[2], blue_level[0]); // palette.set_pen_color(64+ 2,  33, 200,  66);
+	palette.set_pen_color(64+ 3, level[0], level[3], blue_level[0]); // palette.set_pen_color(64+ 3,  94, 220, 120);
+	palette.set_pen_color(64+ 4, level[0], level[0], blue_level[1]); // palette.set_pen_color(64+ 4,  84,  85, 237);
+	palette.set_pen_color(64+ 5, level[0], level[0], blue_level[3]); // palette.set_pen_color(64+ 5, 125, 118, 252);
+	palette.set_pen_color(64+ 6, level[1], level[0], blue_level[0]); // palette.set_pen_color(64+ 6, 212,  82,  77);
+	palette.set_pen_color(64+ 7, level[0], level[3], blue_level[3]); // palette.set_pen_color(64+ 7,  66, 235, 245);
+	palette.set_pen_color(64+ 8, level[2], level[0], blue_level[0]); // palette.set_pen_color(64+ 8, 252,  85,  84);
+	palette.set_pen_color(64+ 9, level[3], level[0], blue_level[0]); // palette.set_pen_color(64+ 9, 255, 121, 120);
+	palette.set_pen_color(64+10, level[1], level[1], blue_level[0]); // palette.set_pen_color(64+10, 212, 193,  84);
+	palette.set_pen_color(64+11, level[3], level[3], blue_level[0]); // palette.set_pen_color(64+11, 230, 206, 128);
+	palette.set_pen_color(64+12, level[0], level[1], blue_level[0]); // palette.set_pen_color(64+12,  33, 176,  59);
+	palette.set_pen_color(64+13, level[3], level[0], blue_level[3]); // palette.set_pen_color(64+13, 201,  91, 186);
+	palette.set_pen_color(64+14, level[1], level[1], blue_level[1]); // palette.set_pen_color(64+14, 204, 204, 204);
+	palette.set_pen_color(64+15, level[3], level[3], blue_level[3]); // palette.set_pen_color(64+15, 255, 255, 255);
 }
 
 

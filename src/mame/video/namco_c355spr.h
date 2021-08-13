@@ -12,7 +12,7 @@ class namco_c355spr_device : public device_t, public device_gfx_interface, publi
 {
 public:
 	// construction/destruction
-	namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void set_color_base(u16 base) { m_colbase = base; }
 	void set_scroll_offsets(int x, int y) { m_scrolloffs[0] = x; m_scrolloffs[1] = y; }

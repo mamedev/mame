@@ -32,7 +32,7 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_sf001",  MD_ROM_BEGGARP);
 	device.option_add_internal("rom_sf002",  MD_ROM_WUKONG);
 	device.option_add_internal("rom_sf004",  MD_ROM_STARODYS);
-// EEPROM handling (not supported fully yet)
+// EEPROM handling (most not supported fully yet)
 	device.option_add_internal("rom_eeprom",  MD_STD_EEPROM);
 	device.option_add_internal("rom_nbajam",  MD_EEPROM_NBAJAM);
 	device.option_add_internal("rom_nbajamte",  MD_EEPROM_NBAJAMTE);
@@ -40,6 +40,7 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_cslam",  MD_EEPROM_CSLAM);
 	device.option_add_internal("rom_nhlpa",  MD_EEPROM_NHLPA);
 	device.option_add_internal("rom_blara",  MD_EEPROM_BLARA);
+	device.option_add_internal("rom_eeprom_mode1",  MD_EEPROM_MODE1);
 // J-Cart controller (Sampras Tennis)
 	device.option_add_internal("rom_jcart",  MD_JCART);
 // J-Cart controller + EEPROM handling (not supported fully yet)
@@ -79,6 +80,8 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_smouse",  MD_ROM_SMOUSE);
 	device.option_add_internal("rom_soulb",  MD_ROM_SOULB);
 	device.option_add_internal("rom_squir",  MD_ROM_SQUIR);
+	device.option_add_internal("rom_sram_arg96",  MD_ROM_SRAM_ARG96);
+	device.option_add_internal("rom_tc2000",  MD_ROM_TC2000);
 	device.option_add_internal("rom_tekkensp",  MD_ROM_TEKKENSP);
 	device.option_add_internal("rom_topf",  MD_ROM_TOPF);
 

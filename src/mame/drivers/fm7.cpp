@@ -46,7 +46,7 @@
 
 #include "sound/ay8910.h"
 #include "sound/beep.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 
 #include "bus/centronics/dsjoy.h"
 

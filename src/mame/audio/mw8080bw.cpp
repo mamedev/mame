@@ -324,7 +324,7 @@ discrete_op_amp_1sht_info const invaders_missle_1sht =
 	RES_M(1),                           // R31
 	RES_M(1),                           // R33
 	RES_M(2.2),                         // R34
-	CAP_U(1),                           // C12
+	CAP_U(1),                           // C12, CAP_U(0.22) on Taito PCB
 	CAP_P(470),                         // C15
 	0,                                  // vN
 	12                                  // vP
@@ -344,14 +344,14 @@ discrete_op_amp_info const invaders_missle_op_amp_B3 =
 
 discrete_op_amp_osc_info const invaders_missle_op_amp_osc =
 {
-	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW, // DISC_OP_AMP_OSCILLATOR_VCO_3 doesn't fully represent the actual circuit on a Taito PCB, missile sound is off
 	1.0 / (1.0 / RES_M(1) + 1.0 / RES_K(330)) + RES_M(1.5),     // R29||R11 + R12
 	RES_M(1),                           // R16
 	RES_K(560),                         // R17
 	RES_M(2.2),                         // R19
 	RES_M(1),                           // R16
 	RES_M(4.7),                         // R14
-	RES_M(3.3),                         // R13
+	RES_M(3.3),                         // R13, RES_M(2.2) on Taito PCB
 	0,                                  // no r8
 	CAP_P(330),                         // C58
 	12,                                 // vP

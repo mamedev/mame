@@ -27,7 +27,7 @@ public:
 	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
 	virtual bool supports_save() const override { return false; }
 
-	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track) override;
 

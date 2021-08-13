@@ -145,7 +145,7 @@ reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 #include "machine/k053252.h"
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 

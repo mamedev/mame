@@ -142,7 +142,19 @@ u8 swim1_device::read(offs_t offset)
 	if(m_ism_mode & 0x40)
 		return ism_read(offset);
 	else
-		return iwm_control(offset, 0x00);
+	{
+		if(!machine().side_effects_disabled())
+			iwm_control(offset, 0x00);
+
+		switch(m_iwm_control & 0xc0) {
+		case 0x00: return m_iwm_active ? m_iwm_data : 0xff;
+		case 0x40: return (m_iwm_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
+		case 0x80: return m_iwm_whd;
+		case 0xc0: return 0xff;
+		}
+
+		abort();
+	}
 }
 
 void swim1_device::write(offs_t offset, u8 data)
@@ -298,8 +310,12 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		m_ism_mode &= ~data;
 		m_ism_param_idx = 0;
 		ism_show_mode();
-		if(!(m_ism_mode & 0x40))
+		if(!(m_ism_mode & 0x40)) {
 			logerror("switch to iwm\n");
+			u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
+			if(ism_devsel != m_iwm_devsel)
+				m_devsel_cb(m_iwm_devsel);
+		}
 		break;
 
 	case 0x7:
@@ -315,7 +331,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	if(m_ism_mode & 0x01)
 		ism_fifo_clear();
 
-	if((m_ism_mode ^ prev_mode) & 0x06)
+	if((m_ism_mode ^ prev_mode) & 0x86)
 		m_devsel_cb(m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0);
 	if((m_ism_mode ^ prev_mode) & 0x20)
 		m_hdsel_cb((m_ism_mode >> 5) & 1);
@@ -405,7 +421,7 @@ void swim1_device::flush_write(u64 when)
 		m_flux_write_count = 0;
 }
 
-u8 swim1_device::iwm_control(int offset, u8 data)
+void swim1_device::iwm_control(int offset, u8 data)
 {
 	iwm_sync();
 
@@ -533,6 +549,9 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 			if(data & 0x40) {
 				m_ism_mode |= 0x40;
 				logerror("switch to ism\n");
+				u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
+				if(ism_devsel != m_iwm_devsel)
+					m_devsel_cb(ism_devsel);
 			}
 			break;
 		}
@@ -542,14 +561,13 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 	else
 		logerror("iwm counter = %d\n", m_iwm_to_ism_counter);
 
-	switch(m_iwm_control & 0xc0) {
-	case 0x00: return m_iwm_active ? m_iwm_data : 0xff;
-	case 0x40: return (m_iwm_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
-	case 0x80: return m_iwm_whd;
-	case 0xc0: if(offset & 1) { if(m_iwm_active) iwm_data_w(data); else iwm_mode_w(data); } return 0xff;
+	if((m_iwm_control & 0xc0) == 0xc0 && (offset & 1))
+	{
+		if(m_iwm_active)
+			iwm_data_w(data);
+		else
+			iwm_mode_w(data);
 	}
-
-	abort();
 }
 
 void swim1_device::ism_crc_clear()

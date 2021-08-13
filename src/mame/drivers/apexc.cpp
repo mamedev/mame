@@ -1,11 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
 /*
-    drivers/apexc.c : APEXC driver
+    drivers/apexc.cpp : APEXC driver
 
     By Raphael Nabet
 
-    see cpu/apexc.c for background and tech info
+    see cpu/apexc.cpp for background and tech info
 */
 
 #include "emu.h"
@@ -384,6 +384,8 @@ void apexc_state::apexc(machine_config &config)
 	APEXC_CYLINDER(config, m_cylinder);
 	APEXC_TAPE_PUNCHER(config, m_tape_puncher);
 	APEXC_TAPE_READER(config, m_tape_reader);
+
+	SOFTWARE_LIST(config, "cyl_list").set_original("apexc_cyl");
 }
 
 ROM_START(apexc)

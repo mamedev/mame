@@ -71,14 +71,14 @@ const char *os9_format::extensions() const
 
 int os9_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 75;
 	return 0;
 }
 
-int os9_format::find_size(io_generic *io, uint32_t form_factor)
+int os9_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 

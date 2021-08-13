@@ -78,7 +78,12 @@ Construct::ConstructBlockSet Construct::blocks(Function* function) const {
   ConstructBlockSet construct_blocks;
   std::unordered_set<BasicBlock*> corresponding_headers;
   for (auto& other : corresponding_constructs()) {
-    corresponding_headers.insert(other->entry_block());
+    // The corresponding header can be the same block as this construct's
+    // header for loops with no loop construct. In those cases, don't add the
+    // loop header as it prevents finding any blocks in the construct.
+    if (type() != ConstructType::kContinue || other->entry_block() != header) {
+      corresponding_headers.insert(other->entry_block());
+    }
   }
   std::vector<BasicBlock*> stack;
   stack.push_back(const_cast<BasicBlock*>(header));
@@ -169,9 +174,22 @@ bool Construct::IsStructuredExit(ValidationState_t& _, BasicBlock* dest) const {
       return true;
     }
 
+    // The next block in the traversal is either:
+    //  i.  The header block that declares |block| as its merge block.
+    //  ii. The immediate dominator of |block|.
+    auto NextBlock = [](const BasicBlock* block) -> const BasicBlock* {
+      for (auto& use : block->label()->uses()) {
+        if ((use.first->opcode() == SpvOpLoopMerge ||
+             use.first->opcode() == SpvOpSelectionMerge) &&
+            use.second == 1)
+          return use.first->block();
+      }
+      return block->immediate_dominator();
+    };
+
     bool seen_switch = false;
     auto header = entry_block();
-    auto block = header->immediate_dominator();
+    auto block = NextBlock(header);
     while (block) {
       auto terminator = block->terminator();
       auto index = terminator - &_.ordered_instructions()[0];
@@ -183,7 +201,7 @@ bool Construct::IsStructuredExit(ValidationState_t& _, BasicBlock* dest) const {
         auto merge_target = merge_inst->GetOperandAs<uint32_t>(0u);
         auto merge_block = merge_inst->function()->GetBlock(merge_target).first;
         if (merge_block->dominates(*header)) {
-          block = block->immediate_dominator();
+          block = NextBlock(block);
           continue;
         }
 
@@ -197,13 +215,15 @@ bool Construct::IsStructuredExit(ValidationState_t& _, BasicBlock* dest) const {
           }
         }
 
-        if (terminator->opcode() == SpvOpSwitch) seen_switch = true;
+        if (terminator->opcode() == SpvOpSwitch) {
+          seen_switch = true;
+        }
 
         // Hit an enclosing loop and didn't break or continue.
         if (merge_inst->opcode() == SpvOpLoopMerge) return false;
       }
 
-      block = block->immediate_dominator();
+      block = NextBlock(block);
     }
   }
 

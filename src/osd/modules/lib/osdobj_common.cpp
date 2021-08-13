@@ -129,7 +129,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD SOUND OPTIONS" },
 	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "sound output method: " },
-	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+	{ OSDOPTION_AUDIO_LATENCY "(0-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 #ifndef NO_USE_PORTAUDIO
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "PORTAUDIO OPTIONS" },
@@ -155,7 +155,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
 	{ OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
-	{ OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
+	{ OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, d3d12, metal, opengl, gles, vulkan)" },
 	{ OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
 	{ OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
 	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
@@ -225,6 +225,9 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
 #ifndef NO_USE_PORTAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
+#endif
+#ifndef NO_USE_PULSEAUDIO
+	REGISTER_MODULE(m_mod_man, SOUND_PULSEAUDIO);
 #endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 

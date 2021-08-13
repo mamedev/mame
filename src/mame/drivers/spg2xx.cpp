@@ -494,7 +494,7 @@ static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode
 	PORT_CONFNAME( 0x7000, 0x0000, "Non-TV Mode Game" )
 	PORT_CONFSETTING(      0x1000, "Learning Game" )
 	PORT_CONFSETTING(      0x2000, "Finding Game" )
-	PORT_CONFSETTING(      0x4000, "Memory Game" ) 
+	PORT_CONFSETTING(      0x4000, "Memory Game" )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -1041,6 +1041,28 @@ static INPUT_PORTS_START( dreamlss )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( knd )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tmntbftc )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -1203,7 +1225,7 @@ static INPUT_PORTS_START( doraglobe )
 
 	PORT_START("P1_ROW4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("Continent Button: Australia")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // skips over some cutscenes and makes a 'button press' sound, but doesn't seem to be a real input on the device 
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // skips over some cutscenes and makes a 'button press' sound, but doesn't seem to be a real input on the device
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_PLAYER(1) PORT_NAME("Reset")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_PLAYER(1) PORT_NAME("Mode Button: Explore and Find")
 
@@ -1870,14 +1892,14 @@ void spg2xx_game_hotwheels_state::hotwheels(machine_config &config)
 
 uint16_t spg2xx_game_doraphone_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
-    uint16_t matrix = 0x000f;
-    for (int b = 1; 6 >= b; ++b)
-    {
-        if (!BIT(m_portb_data, b))
-            matrix &= m_io_p1_rows[b - 1]->read();
-    }
+	uint16_t matrix = 0x000f;
+	for (int b = 1; 6 >= b; ++b)
+	{
+		if (!BIT(m_portb_data, b))
+			matrix &= m_io_p1_rows[b - 1]->read();
+	}
 
-    return matrix | (m_io_p1->read() & 0xfff0);
+	return matrix | (m_io_p1->read() & 0xfff0);
 }
 
 void spg2xx_game_doraphone_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1993,6 +2015,10 @@ ROM_START( tmntbftc )
 	ROM_LOAD16_WORD_SWAP( "tmntbftc.bin", 0x000000, 0x400000, CRC(f923da5b) SHA1(79b290b75d06dabd0f579800edc4453b044c8fd4) )
 ROM_END
 
+ROM_START( knd )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "knd_sst39vf3201_00bf235b.bin", 0x000000, 0x400000, CRC(3b82479d) SHA1(2a4ddd5c6af2376e4725aeb44e79b0f9c45ca8c1) )
+ROM_END
 
 ROM_START( gssytts )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
@@ -2220,6 +2246,10 @@ CONS( 2008, senspeed,  0,         0, senspeed,  senspeed,  spg2xx_game_senspeed_
 CONS( 200?, jjstrip,    0,        0, tvsprt10,  jjstrip,   spg2xx_game_state,          empty_init,    "Shiggles Inc.",                                          "Club Jenna Presents: Jenna Jameson's Strip Poker",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, tmntbftc,   0,        0, spg2xx,    tmntbftc,  spg2xx_game_state,          empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Battle for the City",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// The black flashing square on startup is part of the tilemap layer, it doesn't appear to happen on hardware
+// P.L.U.G.G.U.H.S. = Play Lots of Unbelievable Games, Getting Ultra High Scores
+CONS( 2005, knd,        0,        0, spg2xx,    knd,       spg2xx_game_state,          init_crc,      "Tech2Go / One Man Band",                                 "Codename: Kids Next Door - Operation: P.L.U.G.G.U.H.S.",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_state, empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

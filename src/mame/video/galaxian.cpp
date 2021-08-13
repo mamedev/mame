@@ -358,7 +358,7 @@ void galaxian_state::galaxian_palette(palette_device &palette)
 	m_bullet_color[7] = rgb_t(0xff,0xff,0x00);
 }
 
-void galaxian_state::moonwar_palette(palette_device &palette)
+void moonwar_state::moonwar_palette(palette_device &palette)
 {
 	galaxian_palette(palette);
 
@@ -448,7 +448,7 @@ void galaxian_state::state_save_register()
 uint32_t galaxian_state::screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* draw the background layer (including stars) */
-	(this->*m_draw_background_ptr)(bitmap, cliprect);
+	m_draw_background_ptr(bitmap, cliprect);
 
 	/* draw the tilemap characters over top */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -458,7 +458,7 @@ uint32_t galaxian_state::screen_update_galaxian(screen_device &screen, bitmap_rg
 		sprites_draw(bitmap, cliprect, &m_spriteram[m_sprites_base + i * 0x20]);
 
 	/* if we have bullets to draw, render them following */
-	if (m_draw_bullet_ptr != nullptr)
+	if (!m_draw_bullet_ptr.isnull())
 		bullets_draw(bitmap, cliprect, &m_spriteram[m_bullets_base]);
 
 	return 0;
@@ -482,8 +482,7 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 	uint8_t attrib = m_spriteram[x*2+1];
 	uint8_t color = attrib & 7;
 
-	if (m_extend_tile_info_ptr != nullptr)
-		(this->*m_extend_tile_info_ptr)(&code, &color, attrib, x, y);
+	m_extend_tile_info_ptr(&code, &color, attrib, x, y);
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -573,8 +572,7 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		uint8_t sx = base[3] + hoffset;
 
 		/* extend the sprite information */
-		if (m_extend_sprite_info_ptr != nullptr)
-			(this->*m_extend_sprite_info_ptr)(base, &sx, &sy, &flipx, &flipy, &code, &color);
+		m_extend_sprite_info_ptr(base, &sx, &sy, &flipx, &flipy, &code, &color);
 
 		/* apply flipscreen in X direction */
 		if (m_flipscreen_x)
@@ -591,11 +589,10 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		}
 
 		/* draw */
-
-				m_gfxdecode->gfx(1)->transpen(bitmap,clip,
-				code, color,
-				flipx, flipy,
-				m_h0_start + m_x_scale * sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,clip,
+		code, color,
+		flipx, flipy,
+		m_h0_start + m_x_scale * sx, sy, 0);
 	}
 }
 
@@ -609,25 +606,22 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 void galaxian_state::bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base)
 {
-	int y;
-
 	/* iterate over scanlines */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint8_t shell = 0xff, missile = 0xff;
 		uint8_t effy;
-		int which;
 
 		/* the first 3 entries match Y-1 */
 		effy = m_flipscreen_y ? ((y - 1) ^ 255) : (y - 1);
-		for (which = 0; which < 3; which++)
-			if ((uint8_t)(base[which*4+1] + effy) == 0xff)
+		for (int which = 0; which < 3; which++)
+			if (uint8_t(base[which*4+1] + effy) == 0xff)
 				shell = which;
 
 		/* remaining entries match Y */
 		effy = m_flipscreen_y ? (y ^ 255) : y;
-		for (which = 3; which < 8; which++)
-			if ((uint8_t)(base[which*4+1] + effy) == 0xff)
+		for (int which = 3; which < 8; which++)
+			if (uint8_t(base[which*4+1] + effy) == 0xff)
 			{
 				if (which != 7)
 					shell = which;
@@ -637,9 +631,9 @@ void galaxian_state::bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 		/* draw the shell */
 		if (shell != 0xff)
-			(this->*m_draw_bullet_ptr)(bitmap, cliprect, shell, 255 - base[shell*4+3], y);
+			m_draw_bullet_ptr(bitmap, cliprect, shell, 255 - base[shell*4+3], y);
 		if (missile != 0xff)
-			(this->*m_draw_bullet_ptr)(bitmap, cliprect, missile, 255 - base[missile*4+3], y);
+			m_draw_bullet_ptr(bitmap, cliprect, missile, 255 - base[missile*4+3], y);
 	}
 }
 
@@ -1072,9 +1066,9 @@ void galaxian_state::turtles_draw_background(bitmap_rgb32 &bitmap, const rectang
 }
 
 
-void galaxian_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void taiyo_sfx_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* current schematics are unreadable, assuming like Turtles */
+	// current schematics are unreadable, assuming like Turtles
 	bitmap.fill(rgb_t(m_background_red * 0x55, m_background_green * 0x47, m_background_blue * 0x55), cliprect);
 	scramble_draw_stars(bitmap, cliprect, 256);
 }
@@ -1244,6 +1238,14 @@ void galaxian_state::theend_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &c
  *************************************/
 
 /*** generic ***/
+void galaxian_state::empty_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
+{
+}
+
+void galaxian_state::empty_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+{
+}
+
 void galaxian_state::upper_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	/* tiles are in the upper half of a larger ROM */
@@ -1269,14 +1271,14 @@ void galaxian_state::frogger_extend_sprite_info(const uint8_t *base, uint8_t *sx
 }
 
 
-/*** Ghostmuncher Galaxian ***/
-void galaxian_state::gmgalax_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
+/*** Bagman on Moon Cresta hardware, Ghostmuncher Galaxian ***/
+void bagmanmc_state::bagmanmc_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= m_gfxbank[0] << 9;
-//  *color |= m_gfxbank[0] << 3;
+	//*color |= m_gfxbank[0] << 3;
 }
 
-void galaxian_state::gmgalax_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+void bagmanmc_state::bagmanmc_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
 {
 	*code |= (m_gfxbank[0] << 7) | 0x40;
 	*color |= m_gfxbank[0] << 3;
@@ -1284,12 +1286,12 @@ void galaxian_state::gmgalax_extend_sprite_info(const uint8_t *base, uint8_t *sx
 
 
 /*** Pisces ***/
-void galaxian_state::pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
+void pisces_state::pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= m_gfxbank[0] << 8;
 }
 
-void galaxian_state::pisces_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+void pisces_state::pisces_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
 {
 	*code |= m_gfxbank[0] << 6;
 }
@@ -1384,17 +1386,15 @@ void galaxian_state::jumpbug_extend_sprite_info(const uint8_t *base, uint8_t *sx
 	}
 }
 
-void galaxian_state::namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y) // should be in namenayo_state
+void namenayo_state::namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
-	// main game display
-	if ((attrib & 0x01) == 0x00)
+	if ((attrib & 0x01) == 0x00) // main game display
 	{
 		int attr = m_exattrram[y & 0x1f];
 		*code += ((attr & 0x38) >> 3) * 0x100;
 		*color = attr & 0x07;
 	}
-	// status bar
-	else
+	else // status bar
 	{
 		// course map
 		if ((attrib & 0xfe) == 0x20)
@@ -1402,7 +1402,7 @@ void galaxian_state::namenayo_extend_tile_info(uint16_t *code, uint8_t *color, u
 	}
 }
 
-void galaxian_state::namenayo_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+void namenayo_state::namenayo_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
 {
 	if (base[2] & 0x08)
 		*code += 0x40;
@@ -1418,7 +1418,7 @@ void namenayo_state::namenayo_unk_d800_w(uint8_t data)
 }
 
 
-void galaxian_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void namenayo_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
 
@@ -1441,6 +1441,13 @@ void galaxian_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectan
 	m_bg_tilemap->draw(*m_screen, bitmap, draw, TILEMAP_DRAW_OPAQUE, 0);
 }
 
+// Guttang Gottong bootleg
+void galaxian_state::guttangt_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+{
+	// is this configurable or a hardwired mod?
+	*code |= 0x40;
+}
+
 
 /*************************************
  *
@@ -1448,14 +1455,14 @@ void galaxian_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectan
  *
  *************************************/
 
-/* gfxbank[4] is used as a cpu bank number, and gfxbank[0] for graphics banking */
-void galaxian_state::fourplay_rombank_w(offs_t offset, uint8_t data)
+// gfxbank[4] is used as a cpu bank number, and gfxbank[0] for graphics banking
+void fourplay_state::fourplay_rombank_w(offs_t offset, uint8_t data)
 {
 	m_gfxbank[4] = (m_gfxbank[4] & (2 - offset)) | (data << offset);
 
 	m_gfxbank[0] = (m_gfxbank[4] == 3); // 1 = true, 0 = false
 
-	membank("bank1")->set_entry( m_gfxbank[4] );
+	m_rombank->set_entry(m_gfxbank[4]);
 }
 
 
@@ -1466,13 +1473,13 @@ void galaxian_state::fourplay_rombank_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void galaxian_state::videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
+void videight_state::videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= (m_gfxbank[0] << 8);
 	*color |= (m_gfxbank[4] << 3);
 }
 
-void galaxian_state::videight_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+void videight_state::videight_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
 {
 	*code |= (m_gfxbank[0] << 6);
 	*color |= (m_gfxbank[4] << 3);
@@ -1480,26 +1487,26 @@ void galaxian_state::videight_extend_sprite_info(const uint8_t *base, uint8_t *s
 
 
 /* This handles the main bankswitching for code and one-bank gfx games */
-void galaxian_state::videight_rombank_w(offs_t offset, uint8_t data)
+void videight_state::videight_rombank_w(offs_t offset, uint8_t data)
 {
-	uint8_t gfxbanks[] = { 0, 10, 2, 8, 1, 9, 4, 11 };
+	static constexpr uint8_t gfxbanks[] = { 0, 10, 2, 8, 1, 9, 4, 11 };
 	if (offset == 2)
-		galaxian_stars_enable_w( data );
+		galaxian_stars_enable_w(data);
 	else
 	{
 		m_gfxbank[4] = (m_gfxbank[4] & (6 - offset)) | (data << ((offset + 1) >> 1));
 		galaxian_gfxbank_w (0, gfxbanks[m_gfxbank[4]]);
-		membank("bank1")->set_entry( m_gfxbank[4] );
+		m_rombank->set_entry(m_gfxbank[4]);
 	}
 }
 
 /* This handles those games with multiple gfx banks */
-void galaxian_state::videight_gfxbank_w(offs_t offset, uint8_t data)
+void videight_state::videight_gfxbank_w(offs_t offset, uint8_t data)
 {
 	/* Moon Cresta (mooncrgx) */
-	if (( data < 2 ) && (m_gfxbank[4] == 3))
+	if ((data < 2) && (m_gfxbank[4] == 3))
 	{
-		uint8_t gfxbanks[] = { 8, 12, 8, 14, 8, 13, 8, 15 };
+		static constexpr uint8_t gfxbanks[] = { 8, 12, 8, 14, 8, 13, 8, 15 };
 		if (!offset) m_gfxbank[3] = (m_gfxbank[3] & 6) | data;
 		if (offset == 1) m_gfxbank[3] = (m_gfxbank[3] & 5) | (data << 1);
 		if (offset == 2) m_gfxbank[3] = (m_gfxbank[3] & 3) | (data << 2);
@@ -1507,12 +1514,12 @@ void galaxian_state::videight_gfxbank_w(offs_t offset, uint8_t data)
 	}
 
 	/* Uniwar S */
-	if (( data < 2 ) && (m_gfxbank[4] == 2) && (offset == 2))
-		galaxian_gfxbank_w( 0, data+2 );
+	if ((data < 2) && (m_gfxbank[4] == 2) && (offset == 2))
+		galaxian_gfxbank_w(0, data + 2);
 
 	/* Pisces (piscesb) */
-	if (( data < 2 ) && (m_gfxbank[4] == 6) && (offset == 2))
-		galaxian_gfxbank_w( 0, data+4 );
+	if ((data < 2) && (m_gfxbank[4] == 6) && (offset == 2))
+		galaxian_gfxbank_w(0, data + 4);
 }
 
 void namenayo_state::namenayo_extattr_w(offs_t offset, uint8_t data)

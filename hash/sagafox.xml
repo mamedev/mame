@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="sagafox" description="Saga Fox floppies">
+
+	<software name="foxcpm">
+		<description>Saga Fox CP/M</description>
+		<year>1983</year>
+		<publisher>Saga</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278364">
+				<rom name="sagafox_cpm.td0" size="278364" crc="621134df" sha1="d822489d068a6739181ed36fb6b8a3b81b136aac"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

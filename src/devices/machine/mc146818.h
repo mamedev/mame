@@ -157,12 +157,12 @@ protected:
 	uint8_t           m_index;
 	std::unique_ptr<uint8_t[]> m_data;
 
-	attotime        m_last_refresh;
-
 	static const device_timer_id TIMER_CLOCK = 0;
-	static const device_timer_id TIMER_PERIODIC = 1;
+	static const device_timer_id TIMER_UPDATE = 1;
+	static const device_timer_id TIMER_PERIODIC = 2;
 
 	emu_timer *m_clock_timer;
+	emu_timer *m_update_timer;
 	emu_timer *m_periodic_timer;
 
 	devcb_write_line m_write_irq;
@@ -170,10 +170,17 @@ protected:
 	int m_century_index, m_epoch;
 	bool m_use_utc, m_binary, m_hour, m_binyear;
 	bool m_sqw_state;
+	unsigned m_tuc; // update cycle time
 };
 
+class ds1287_device : public mc146818_device
+{
+public:
+	ds1287_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(MC146818, mc146818_device)
+DECLARE_DEVICE_TYPE(DS1287, ds1287_device)
 
 #endif // MAME_MACHINE_MC146818_H

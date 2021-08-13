@@ -1697,7 +1697,7 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 		uint32_t rm = insn&0xf;
 		uint32_t rd = (insn>>12)&0xf;
 
-		SetRegister(rd, count_leading_zeros(GetRegister(rm)));
+		SetRegister(rd, count_leading_zeros_32(GetRegister(rm)));
 
 		R15 += 4;
 	}

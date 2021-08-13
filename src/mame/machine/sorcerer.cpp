@@ -529,121 +529,140 @@ void sorcererd_state::machine_reset()
 }
 
 
-/******************************************************************************
- Snapshot Handling
-******************************************************************************/
-
-SNAPSHOT_LOAD_MEMBER(sorcerer_state::snapshot_cb)
-{
-	u8 *RAM = memregion(m_maincpu->tag())->base();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	u8 header[28];
-	unsigned char s_byte;
-
-	/* check size */
-	if (image.length() != 0x1001c)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
-		image.message("Snapshot must be 65564 bytes");
-		return image_init_result::FAIL;
-	}
-
-	/* get the header */
-	image.fread( &header, sizeof(header));
-
-	/* write it to ram */
-	for (int i = 0; i < 0xc000; i++)
-	{
-		image.fread( &s_byte, 1);
-		space.write_byte(i, s_byte);
-	}
-	image.fread( RAM+0xc000, 0x4000);
-
-	/* patch CPU registers */
-	m_maincpu->set_state_int(Z80_I, header[0]);
-	m_maincpu->set_state_int(Z80_HL2, header[1] | (header[2] << 8));
-	m_maincpu->set_state_int(Z80_DE2, header[3] | (header[4] << 8));
-	m_maincpu->set_state_int(Z80_BC2, header[5] | (header[6] << 8));
-	m_maincpu->set_state_int(Z80_AF2, header[7] | (header[8] << 8));
-	m_maincpu->set_state_int(Z80_HL, header[9] | (header[10] << 8));
-	m_maincpu->set_state_int(Z80_DE, header[11] | (header[12] << 8));
-	m_maincpu->set_state_int(Z80_BC, header[13] | (header[14] << 8));
-	m_maincpu->set_state_int(Z80_IY, header[15] | (header[16] << 8));
-	m_maincpu->set_state_int(Z80_IX, header[17] | (header[18] << 8));
-	m_maincpu->set_state_int(Z80_IFF1, header[19]&2 ? 1 : 0);
-	m_maincpu->set_state_int(Z80_IFF2, header[19]&4 ? 1 : 0);
-	m_maincpu->set_state_int(Z80_R, header[20]);
-	m_maincpu->set_state_int(Z80_AF, header[21] | (header[22] << 8));
-	m_maincpu->set_state_int(STATE_GENSP, header[23] | (header[24] << 8));
-	m_maincpu->set_state_int(Z80_IM, header[25]);
-	m_maincpu->set_pc(header[26] | (header[27] << 8));
-
-	return image_init_result::PASS;
-}
-
-
 /*-------------------------------------------------
     QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
+    Handles BIN and SNP extensions.
 -------------------------------------------------*/
 
 QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 {
-	uint16_t execute_address, start_address, end_address;
-	int autorun;
+	// get autorun setting
+	bool autorun = BIT(m_iop_config->read(), 0);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	/* load the binary into memory */
-	if (z80bin_load_file(image, space, execute_address, start_address, end_address) != image_init_result::PASS)
-		return image_init_result::FAIL;
-
-	/* is this file executable? */
-	if (execute_address != 0xffff)
+	if (image.is_filetype("bin"))
 	{
-		/* check to see if autorun is on */
-		autorun = m_iop_config->read() & 1;
+		u16 execute_address, start_address, end_address;
 
-		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
-			return image_init_result::FAIL;     /* can't run a program if the cartridge isn't in */
+		// load the binary into memory
+		if (z80bin_load_file(image, space, execute_address, start_address, end_address) != image_init_result::PASS)
+			return image_init_result::FAIL;
 
-		/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
-		1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
-		2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
-		Important addresses:
-		    01D5 = start (load) address of a conventional basic program
-		    C858 = an autorun basic program will have this exec address on the tape
-		    C3DD = part of basic that displays READY and lets user enter input */
-
-		if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
+		// is this file executable?
+		if (execute_address != 0xffff)
 		{
-			static const u8 data[]={
-				0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
-				0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
-				0x36, 0,        // LD (HL),00   ;make sure dummy end-of-line is there
-				0xc3, 0x89, 0xc6    // JP C689  ;run program
-			};
 
-			for (u8 i = 0; i < std::size(data); i++)
-				space.write_byte(0xf01f + i, data[i]);
+			if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
+				return image_init_result::FAIL;     // can't run a program if the cartridge isn't in
 
-			if (!autorun)
-				space.write_word(0xf028,0xc3dd);
+			/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
+			1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
+			2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
+			Important addresses:
+			    01D5 = start (load) address of a conventional basic program
+			    C858 = an autorun basic program will have this exec address on the tape
+			    C3DD = part of basic that displays READY and lets user enter input */
 
-			/* tell BASIC where program ends */
-			space.write_byte(0x1b7, end_address & 0xff);
-			space.write_byte(0x1b8, (end_address >> 8) & 0xff);
+			if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
+			{
+				static const u8 data[]={
+					0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
+					0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
+					0x36, 0,            // LD (HL),00   ;make sure dummy end-of-line is there
+					0xc3, 0x89, 0xc6    // JP C689  ;run program
+				};
 
-			if ((execute_address != 0xc858) && autorun)
-				space.write_word(0xf028, execute_address);
+				for (u8 i = 0; i < std::size(data); i++)
+					space.write_byte(0xf01f + i, data[i]);
 
-			m_maincpu->set_pc(0xf01f);
+				if (!autorun)
+					space.write_word(0xf028,0xc3dd);
+
+				/* tell BASIC where program ends */
+				space.write_byte(0x1b7, end_address & 0xff);
+				space.write_byte(0x1b8, (end_address >> 8) & 0xff);
+
+				if ((execute_address != 0xc858) && autorun)
+					space.write_word(0xf028, execute_address);
+
+				m_maincpu->set_pc(0xf01f);
+			}
+			else
+			{
+				if (autorun)
+					m_maincpu->set_pc(execute_address);
+			}
+		}
+	}
+	else
+	{
+		// SNP extension
+		// check size
+		if (image.length() != 0x1001c)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
+			image.message("Snapshot must be 65564 bytes");
+			return image_init_result::FAIL;
+		}
+
+		/* get the header */
+		u8 header[28];
+		image.fread( &header, sizeof(header));
+
+		logerror("SNP PC register = 0x%04x\n", header[26] | (header[27] << 8));
+
+		// write it to ram, and skip roms
+		unsigned char s_byte;
+		for (int i = 0; i < 0xe000; i++)
+		{
+			image.fread( &s_byte, 1);
+			space.write_byte(i, s_byte);  // ram
+		}
+
+		for (int i = 0xe000; i < 0xf000; i++)
+			image.fread( &s_byte, 1);
+
+		for (int i = 0xf000; i < 0xf800; i++)
+		{
+			image.fread( &s_byte, 1);
+			space.write_byte(i, s_byte);  // screen
+		}
+
+		for (int i = 0xf800; i < 0xfc00; i++)
+			image.fread( &s_byte, 1);
+
+		for (int i = 0xfc00; i < 0x10000; i++)
+		{
+			image.fread( &s_byte, 1);
+			space.write_byte(i, s_byte);  //pcg
+		}
+
+		// it's assumed if autorun was off that you wished to examine the image rather than to play it
+		if (autorun)
+		{
+			// patch CPU registers
+			m_maincpu->set_state_int(Z80_I, header[0]);
+			m_maincpu->set_state_int(Z80_HL2, header[1] | (header[2] << 8));
+			m_maincpu->set_state_int(Z80_DE2, header[3] | (header[4] << 8));
+			m_maincpu->set_state_int(Z80_BC2, header[5] | (header[6] << 8));
+			m_maincpu->set_state_int(Z80_AF2, header[7] | (header[8] << 8));
+			m_maincpu->set_state_int(Z80_HL, header[9] | (header[10] << 8));
+			m_maincpu->set_state_int(Z80_DE, header[11] | (header[12] << 8));
+			m_maincpu->set_state_int(Z80_BC, header[13] | (header[14] << 8));
+			m_maincpu->set_state_int(Z80_IY, header[15] | (header[16] << 8));
+			m_maincpu->set_state_int(Z80_IX, header[17] | (header[18] << 8));
+			m_maincpu->set_state_int(Z80_IFF1, header[19]&2 ? 1 : 0);
+			m_maincpu->set_state_int(Z80_IFF2, header[19]&4 ? 1 : 0);
+			m_maincpu->set_state_int(Z80_R, header[20]);
+			m_maincpu->set_state_int(Z80_AF, header[21] | (header[22] << 8));
+			m_maincpu->set_state_int(STATE_GENSP, header[23] | (header[24] << 8));
+			m_maincpu->set_state_int(Z80_IM, header[25]);
+			m_maincpu->set_pc(header[26] | (header[27] << 8));
 		}
 		else
-		{
-			if (autorun)
-				m_maincpu->set_pc(execute_address);
-		}
-
+			m_maincpu->set_pc(0xe000);  // SNP destroys workspace, so do cold start.
 	}
 
 	return image_init_result::PASS;
 }
+

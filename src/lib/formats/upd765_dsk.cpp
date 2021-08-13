@@ -15,12 +15,14 @@ upd765_format::upd765_format(const format *_formats) : file_header_skip_bytes(0)
 {
 }
 
-int upd765_format::find_size(io_generic *io, uint32_t form_factor) const
+int upd765_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size = io_generic_size(io);
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
+			continue;
+		if(!variants.empty() && !has_variant(variants, f.variant))
 			continue;
 
 		if(size == file_header_skip_bytes + (uint64_t) compute_track_size(f) * f.track_count * f.head_count + file_footer_skip_bytes)
@@ -31,7 +33,7 @@ int upd765_format::find_size(io_generic *io, uint32_t form_factor) const
 
 int upd765_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 
 	if(type != -1)
 		return 50;
@@ -175,7 +177,7 @@ floppy_image_format_t::desc_e* upd765_format::get_desc_mfm(const format &f, int 
 
 bool upd765_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 	if(type == -1)
 		return false;
 

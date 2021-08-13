@@ -903,7 +903,7 @@ ROM_START( asteroidb2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "p88.bin",        0x6800, 0x0800, CRC(e9bfda64) SHA1(291dc567ebb31b35df83d9fb87f4080f251ff9c8) )
 	ROM_LOAD( "p37.bin",        0x7000, 0x0800, CRC(e53c28a9) SHA1(d9f081e73511ec43377f0c6457747f15a470d4dc) )
-	ROM_LOAD( "p86,bin",        0x7800, 0x0800, CRC(7d4e3d05) SHA1(d88000e904e158efde50e453e2889ecd2cb95f24) )
+	ROM_LOAD( "p86.bin",        0x7800, 0x0800, CRC(7d4e3d05) SHA1(d88000e904e158efde50e453e2889ecd2cb95f24) )
 	// Vector ROM
 	ROM_LOAD( "p35.bin",        0x5000, 0x0800, CRC(7b0260df) SHA1(5781c15adfcb3c8e182ea87041b1055d3e62aa7f) )
 

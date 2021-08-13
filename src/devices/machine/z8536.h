@@ -381,7 +381,6 @@ protected:
 	void match_pattern(int port);
 	void external_port_w(int port, int bit, int state);
 
-private:
 	devcb_write_line       m_write_irq;
 
 	devcb_read8            m_read_pa;
@@ -444,6 +443,15 @@ protected:
 	virtual void z80daisy_irq_reti() override;
 
 private:
+	// direct external access to ports
+	enum
+	{
+		EXT_PORT_C = 0,
+		EXT_PORT_B,
+		EXT_PORT_A,
+		EXT_CONTROL
+	};
+
 	// control state machine
 	bool m_state0;
 	u8 m_pointer;

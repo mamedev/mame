@@ -7,7 +7,15 @@
   Driver by R. Belmont & smf
 
 
-Known Dumps
+***************************************************************************
+Konami GV
+Hardware Info by Guru
+---------------------
+
+Konami GV uses Playstation 1 based hardware.
+
+
+Known Games
 -----------
 
 Game       Description                                              Mother Board   Code       Version       Date   Time
@@ -19,13 +27,24 @@ susume     Susume! Taisen Puzzle-Dama                               ZV610       
 btchamp    Beat the Champ                                           GV999          GV053   UAA01        ?
 kdeadeye   Dead Eye                                                 GV999          GV054   UAA01        ?
 weddingr   Wedding Rhapsody                                         ?              GX624   JAA          97.05.29   9:12
-tmosh      Tokimeki Memorial Oshiete Your Heart                     ?              GQ673   JAA          97.03.14  ?
-tmoshs     Tokimeki Memorial Oshiete Your Heart Seal Version        ?              GE755   JAA          97.08.06  11:52
-tmoshspa   Tokimeki Memorial Oshiete Your Heart Seal Version Plus   ?              GE756   JAA          97.08.24  12:20
-tmoshsp    Tokimeki Memorial Oshiete Your Heart Seal Version Plus   ?              GE756   JAB          97.09.27   9:10
+tmosh      Tokimeki Memorial Oshiete Your Heart                     GV999          GQ673   JAA          97.03.14  ?
+tmoshs     Tokimeki Memorial Oshiete Your Heart Seal Version        GV999          GE755   JAA          97.08.06  11:52
+tmoshspa   Tokimeki Memorial Oshiete Your Heart Seal Version Plus   GV999          GE756   JAA          97.08.24  12:20
+tmoshsp    Tokimeki Memorial Oshiete Your Heart Seal Version Plus   GV999          GE756   JAB          97.09.27   9:10
 nagano98   Winter Olypmics in Nagano 98                             GV999          GX720   EAA01 1.03   98.01.08  10:45
 naganoj    Hyper Olympic in Nagano                                  GV999          GX720   JAA01 1.02   98.01.07  01:10
 simpbowl   Simpsons Bowling                                         GV999          GQ829   UAA          ?
+
+Notes:
+
+The Tokimeki Memorial Oshiete Your Heart games use an extra PCB plugged in on top for controlling the printer and the sensors.
+Additionally, there is a small PCB for connecting to a sensor... PCB number GE755-PWB(S)
+
+Simpsons Bowling uses an extra PCB plugged in on top containing flash ROMs and circuitry to control the trackball.
+
+Some of the other games may also have extra PCBs.
+
+
 
 PCB Layouts
 -----------
@@ -60,7 +79,7 @@ GV999 PWB301949A
 |CN2                                    |
 |TEST_SW                                |
 |      999A01.7E                     CN6|
-|MC44200                  CXD2925Q      |
+|MC44200         CN4      CXD2925Q      |
 |      9E                 TC51V4260BJ-80|
 |                                       |
 |J     12E                              |
@@ -79,6 +98,9 @@ GV999 PWB301949A
 |---------------------------------------|
 
 Notes:
+
+      - These two PCBs are functionally equivalent and can be exchanged between games and work fine (see CD-swapping note below).
+
       - Simpsons Bowling and Dead Eye use a GV999 with a daughtercard containing flash ROMs and CPLDs:
         PWB402610
         Xilinx XC3020A
@@ -111,6 +133,11 @@ Notes:
 
       - CN3, CN5 used for connecting 3rd and 4th player controls.
 
+      - CN4 is present only on GV999 and is used to connect extra PCBs with additional functionality.
+        For example:
+        Simpsons Bowling additional flash ROM & trackball control PCB.
+        Tokimeki Memorial Oshiete Your Heart printer and sensor control PCB.
+
       - 001231, 058239 are PALCE16V8H PALs.
 
       - 10E, 12E are unpopulated positions for 16M TSOP56 FLASHROMs (10E is 9E on GV999).
@@ -120,7 +147,71 @@ Notes:
         This appears to be some form of mild protection to stop operators swapping CD's.
         However it is possible to swap games to another PCB by exchanging the CD _AND_ the EEPROM from another PCB which belongs
         to that same game. It won't work with a blank EEPROM or a different games' EEPROM.
-*/
+
+
+Tokimeki Memorial Oshiete Your Heart control PCB Layout
+-------------------------------------------------------
+
+GQ673 PWB404691A
+
+    |------------------------|
+    |CN11                    |
+    |             003673     |----------|
+    |CN10   74QST3383    LVT245  CN3    |
+    |                               CN4 |
+    |CN9  2SC2320        LS245          |
+    |     2SC2320        LS273          |
+    |CN8  2SC2320        HCT04          |
+    |     2SC2320  MB3516A              |
+    |CN7           14.31818MHz          |
+    |                                   |
+    |CN6                         2SC2320|
+|---|             uPC324                |---|
+|CN5    2SC2320  ADC0838         CXA1585Q   |
+|                PC817     VR   3.579545MHz |
+|-------------------------------------------|
+
+Notes: (all main parts shown)
+
+       This PCB is plugged into the Tokimeki Memorial Oshiete Your Heart main board into CN4
+       It provides additional functionality for the printer and sensor(s) and possibly other things.
+
+       CN10 & CN11 - TCS7927-54 4-pin mini DIN connectors
+               CN9 - 6 pin connector
+               CN8 - 5 pin connector
+               CN7 - 7 pin connector
+               CN6 - 3 pin connector
+               CN5 - 2 pin connector
+               CN3 - 4 pin power connector. Joins to CN6 on mainboard via a Y-splitter cable. The other end of the
+                     Y cable is approximately 300mm long and joins to the GE755-PWB(S) PCB.
+               CN4 - 6 pin connector used to power the CDROM drive
+            003673 - PAL16V8D
+         74QST3383 - Quality Semiconductor Inc. High Speed CMOS Bus Exchange Switch
+           2SC2320 - NPN Transistor equivalent to 2SC945
+           MB3516A - Fujitsu MB3516A RGB Encoder
+            uPC324 - NEC uPC324 Low power quad operational amplifier
+           ADC0838 - Analog Devices ADC0838 8-Bit Serial I/O A/D Converter with Multiplexer Options
+             PC817 - Sharp PC817 Optocoupler
+                VR - 500 Ohm potentiometer
+          CXA1585Q - Sony CXA1585Q RGB Decoder
+
+Tokimeki Memorial Oshiete Your Heart Sensor PCB
+-----------------------------------------------
+
+GQ673 PWB404691A
+|----------------|
+| LS14  E756S1   |
+|         uPC817 |
+| CN1  CN2  CN3  |
+|----------------|
+Notes:
+      E756S1 - PAL16V8H
+      uPC817 - Sharp PC817 Optocoupler
+         CN1 - 4 pin power connector joining to GQ673 PCB CN3 and CN6 on mainboard via a Y-splitter cable.
+     CN1/CN2 - 2 pin connector
+
+***************************************************************************/
+
 
 #include "emu.h"
 #include "bus/scsi/scsi.h"
@@ -139,6 +230,8 @@ Notes:
 #include "speaker.h"
 #include "cdrom.h"
 
+
+namespace {
 
 class konamigv_state : public driver_device
 {
@@ -212,7 +305,7 @@ void konamigv_state::konamigv_map(address_map &map)
 	map(0x1f100008, 0x1f10000b).portr("P3_P4");
 	map(0x1f180000, 0x1f180003).portw("EEPROMOUT");
 	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
-	map(0x1f780000, 0x1f780003).nopw(); /* watchdog? */
+	map(0x1f780000, 0x1f780003).nopw(); // watchdog?
 }
 
 void simpbowl_state::simpbowl_map(address_map &map)
@@ -256,7 +349,7 @@ void konamigv_state::tmosh_map(address_map &map)
 	map(0x1f680090, 0x1f680091).w(FUNC(konamigv_state::tokimeki_serial_w));
 }
 
-/* SCSI */
+// SCSI
 
 void konamigv_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
@@ -276,12 +369,12 @@ void konamigv_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, in
 		}
 		if( n_this < 2048 / 4 )
 		{
-			/* non-READ commands */
+			// non-READ commands
 			m_am53cf96->dma_read_data( n_this * 4, sector_buffer );
 		}
 		else
 		{
-			/* assume normal 2048 byte data for now */
+			// assume normal 2048 byte data for now
 			m_am53cf96->dma_read_data( 2048, sector_buffer );
 			n_this = 2048 / 4;
 		}
@@ -356,7 +449,7 @@ void konamigv_state::cdrom_config(device_t *device)
 
 void konamigv_state::konamigv(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	CXD8530BQ(config, m_maincpu, XTAL(67'737'600));
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::konamigv_map);
 	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this));
@@ -374,12 +467,12 @@ void konamigv_state::konamigv(machine_config &config)
 	m_am53cf96->set_scsi_port("scsi");
 	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
-	/* video hardware */
+	// video hardware
 	CXD8514Q(config, "gpu", XTAL(53'693'175), 0x100000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -453,7 +546,7 @@ static INPUT_PORTS_START( konamigv )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 INPUT_PORTS_END
 
-/* Simpsons Bowling */
+// Simpsons Bowling
 
 uint16_t simpbowl_state::flash_r(offs_t offset)
 {
@@ -532,7 +625,7 @@ static INPUT_PORTS_START( simpbowl )
 
 INPUT_PORTS_END
 
-/* Beat the Champ */
+// Beat the Champ
 
 void konamigv_state::btc_trackball_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -578,7 +671,7 @@ static INPUT_PORTS_START( btchamp )
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
-/* Tokimeki Memorial games - have a mouse and printer and who knows what else */
+// Tokimeki Memorial games - have a mouse and printer and who knows what else
 
 uint16_t konamigv_state::tokimeki_serial_r()
 {
@@ -672,7 +765,7 @@ static INPUT_PORTS_START( kdeadeye )
 
 INPUT_PORTS_END
 
-/* Wedding Rhapsody */
+// Wedding Rhapsody
 
 static INPUT_PORTS_START( weddingr )
 	PORT_INCLUDE( konamigv )
@@ -726,13 +819,13 @@ INPUT_PORTS_END
 ROM_START( konamigv )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", ROMREGION_ERASE00 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", ROMREGION_ERASE00 ) // default EEPROM
 ROM_END
 
 ROM_START( lacrazyc )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "lacrazyc.25c",   0x000000, 0x000080, CRC(e20e5730) SHA1(066b49236c658a4ef2930f7bacc4b2354dd7f240) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -742,7 +835,7 @@ ROM_END
 ROM_START( susume )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "susume.25c",   0x000000, 0x000080, CRC(52f17df7) SHA1(b8ad7787b0692713439d7d9bebfa0c801c806006) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -752,7 +845,7 @@ ROM_END
 ROM_START( hyperath )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "hyperath.25c", 0x000000, 0x000080, CRC(20a8c435) SHA1(a0f203a999757fba68b391c525ac4b9684a57ba9) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -762,7 +855,7 @@ ROM_END
 ROM_START( powyak96 )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "powyak96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -772,7 +865,7 @@ ROM_END
 ROM_START( weddingr )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "weddingr.25c", 0x000000, 0x000080, CRC(b90509a0) SHA1(41510a0ceded81dcb26a70eba97636d38d3742c3) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -782,7 +875,7 @@ ROM_END
 ROM_START( simpbowl )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "simpbowl.25c", 0x000000, 0x000080, CRC(2c61050c) SHA1(16ae7f81cbe841c429c5c7326cf83e87db1782bf) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -792,7 +885,7 @@ ROM_END
 ROM_START( btchamp )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "btchmp.25c", 0x000000, 0x000080, CRC(6d02ea54) SHA1(d3babf481fd89db3aec17f589d0d3d999a2aa6e1) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -802,7 +895,7 @@ ROM_END
 ROM_START( kdeadeye )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -812,7 +905,7 @@ ROM_END
 ROM_START( nagano98 )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "nagano98.25c",  0x000000, 0x000080, CRC(b64b7451) SHA1(a77a37e0cc580934d1e7e05d523bae0acd2c1480) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -822,7 +915,7 @@ ROM_END
 ROM_START( naganoj )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "720ja.25c",  0x000000, 0x000080, CRC(34c473ba) SHA1(768225b04a293bdbc114a092d14dee28d52044e9) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -832,7 +925,7 @@ ROM_END
 ROM_START( tmosh )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "tmosh.25c", 0x000000, 0x000080, NO_DUMP )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -842,7 +935,7 @@ ROM_END
 ROM_START( tmoshs )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "tmoshs.25c", 0x000000, 0x000080, CRC(e57b833f) SHA1(f18a0974a6be69dc179706643aab837ff61c2738) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -852,7 +945,7 @@ ROM_END
 ROM_START( tmoshsp )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "tmoshsp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -862,14 +955,17 @@ ROM_END
 ROM_START( tmoshspa )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "tmoshsp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "756jaa01", 0, BAD_DUMP SHA1(5e6d349ad1a22c0dbb1ec26aa05febc830254339) ) // The CD was damaged
 ROM_END
 
-/* BIOS placeholder */
+} // Anonymous namespace
+
+
+// BIOS placeholder
 GAME( 1995, konamigv, 0,        konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Baby Phoenix/GV System", MACHINE_IS_BIOS_ROOT )
 
 GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", MACHINE_IMPERFECT_SOUND )

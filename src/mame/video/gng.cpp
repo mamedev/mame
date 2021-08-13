@@ -53,6 +53,11 @@ void gng_state::video_start()
 	m_fg_tilemap->set_transparent_pen(3);
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); // split type 0 is totally transparent in front half
 	m_bg_tilemap->set_transmask(1, 0x41, 0xbe); // split type 1 has pens 0 and 6 transparent in front half
+
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
 }
 
 
@@ -128,7 +133,7 @@ void gng_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 				buffered_spriteram[offs] + ((attributes << 2) & 0x300),
 				(attributes >> 4) & 3,
 				flipx,flipy,
-				sx,sy,15);
+				sx+128,sy+6,15);
 	}
 }
 

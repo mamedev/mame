@@ -105,6 +105,7 @@ private:
 	int        m_dial_selected;
 	int        m_dir[2];
 	int        m_keymatrix;
+	std::unique_ptr<uint8_t[]> m_decoded;
 
 	uint8_t m_irq_source;
 	uint8_t pang_port5_r();

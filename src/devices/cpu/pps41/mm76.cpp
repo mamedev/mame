@@ -82,7 +82,6 @@ std::unique_ptr<util::disasm_interface> mm76_device::create_disassembler()
 void mm76_device::device_start()
 {
 	pps41_base_device::device_start();
-	m_stack_levels = 1;
 }
 
 void mm76_device::device_reset()

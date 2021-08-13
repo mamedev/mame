@@ -4,7 +4,7 @@
 #include "cpu/m6805/m68705.h"
 #include "cpu/m6800/m6801.h"
 
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -52,7 +52,7 @@ private:
 
 	/* devices */
 	optional_device<cpu_device>         m_subcpu;   // kicknrun / mexico86 only
-	optional_device<cpu_device>         m_mcu;
+	optional_device<m6801_cpu_device>   m_mcu;
 	required_device<ym2203_device>      m_ymsnd;
 	required_device<gfxdecode_device>   m_gfxdecode;
 	required_device<palette_device>     m_palette;
@@ -75,34 +75,16 @@ private:
 	void mcu_map(address_map& map);
 
 	/* Kiki KaiKai / Kick 'n Run MCU */
-	uint8_t    m_ddr1;
-	uint8_t    m_ddr2;
-	uint8_t    m_ddr3;
-	uint8_t    m_ddr4;
-	uint8_t    m_port1_in;
-	uint8_t    m_port2_in;
 	uint8_t    m_port3_in;
-	uint8_t    m_port4_in;
 	uint8_t    m_port1_out;
 	uint8_t    m_port2_out;
 	uint8_t    m_port3_out;
 	uint8_t    m_port4_out;
 
-	uint8_t kikikai_mcu_ddr1_r();
-	void kikikai_mcu_ddr1_w(uint8_t data);
-	uint8_t kikikai_mcu_ddr2_r();
-	void kikikai_mcu_ddr2_w(uint8_t data);
-	uint8_t kikikai_mcu_ddr3_r();
-	void kikikai_mcu_ddr3_w(uint8_t data);
-	uint8_t kikikai_mcu_ddr4_r();
-	void kikikai_mcu_ddr4_w(uint8_t data);
-	uint8_t kikikai_mcu_port1_r();
 	void kikikai_mcu_port1_w(uint8_t data);
-	uint8_t kikikai_mcu_port2_r();
 	void kikikai_mcu_port2_w(uint8_t data);
 	uint8_t kikikai_mcu_port3_r();
 	void kikikai_mcu_port3_w(uint8_t data);
-	uint8_t kikikai_mcu_port4_r();
 	void kikikai_mcu_port4_w(uint8_t data);
 };
 

@@ -65,6 +65,7 @@ private:
 	devcb_write_line    m_interrupt_cb;
 
 	transient_timer_factory m_rtc_end_update_cb;
+	optional_region_ptr<u8> m_default_data;
 };
 
 // device type definition

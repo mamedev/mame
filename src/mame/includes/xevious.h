@@ -31,6 +31,8 @@ public:
 	void init_xevios();
 
 protected:
+	virtual void video_start() override;
+
 	required_shared_ptr<uint8_t> m_xevious_sr1;
 	required_shared_ptr<uint8_t> m_xevious_sr2;
 	required_shared_ptr<uint8_t> m_xevious_sr3;
@@ -39,14 +41,13 @@ protected:
 	required_shared_ptr<uint8_t> m_xevious_fg_videoram;
 	required_shared_ptr<uint8_t> m_xevious_bg_videoram;
 	optional_device<samples_device> m_samples;
+	optional_device<cpu_device> m_subcpu3;
 
 	int32_t m_xevious_bs[2];
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_VIDEO_START(xevious);
 	void xevious_palette(palette_device &palette) const;
-	DECLARE_MACHINE_RESET(xevios);
 	uint32_t screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void xevious_fg_videoram_w(offs_t offset, uint8_t data);
@@ -56,8 +57,6 @@ protected:
 	void xevious_vh_latch_w(offs_t offset, uint8_t data);
 	void xevious_bs_w(offs_t offset, uint8_t data);
 	uint8_t xevious_bb_r(offs_t offset);
-
-	optional_device<cpu_device> m_subcpu3;
 
 	void xevious_map(address_map &map);
 };
@@ -76,8 +75,9 @@ public:
 	void battles(machine_config &config);
 
 protected:
-	void machine_reset() override;
+	virtual void machine_reset() override;
 
+private:
 	DECLARE_WRITE_LINE_MEMBER(interrupt_4);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_generate);
 

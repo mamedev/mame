@@ -20,7 +20,7 @@
 
 // ======================> vtech_laser110_16k_device
 
-class vtech_laser110_16k_device : public device_t, public device_vtech_memexp_interface
+class vtech_laser110_16k_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
@@ -28,15 +28,13 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-private:
-	std::vector<uint8_t> m_ram;
+	virtual void mem_map(address_map &map) override;
 };
 
 // ======================> vtech_laser210_16k_device
 
-class vtech_laser210_16k_device : public device_t, public device_vtech_memexp_interface
+class vtech_laser210_16k_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
@@ -44,15 +42,13 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-private:
-	std::vector<uint8_t> m_ram;
+	virtual void mem_map(address_map &map) override;
 };
 
 // ======================> vtech_laser310_16k_device
 
-class vtech_laser310_16k_device : public device_t, public device_vtech_memexp_interface
+class vtech_laser310_16k_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
@@ -60,29 +56,29 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-private:
-	std::vector<uint8_t> m_ram;
+	virtual void mem_map(address_map &map) override;
 };
 
 // ======================> vtech_laser_64k_device
 
-class vtech_laser_64k_device : public device_t, public device_vtech_memexp_interface
+class vtech_laser_64k_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
 	vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void bankswitch_w(uint8_t data);
-
 protected:
 	virtual void device_start() override;
-	virtual void device_reset() override;
+
+	virtual void mem_map(address_map &map) override;
+	virtual void io_map(address_map &map) override;
 
 private:
-	memory_bank_creator m_bank;
-	std::vector<uint8_t> m_ram;
+	required_memory_bank m_fixed_bank;
+	required_memory_bank m_bank;
+
+	std::unique_ptr<uint8_t[]> m_ram;
 };
 
 // device type definition

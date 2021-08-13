@@ -140,6 +140,7 @@ public:
 	// internal communications
 	uint8_t speech_data_r();
 	uint8_t audio_data_r();
+	uint8_t signal_audio_nmi_r();
 	void signal_audio_nmi_w(uint8_t data);
 	void nmi_rate_w(uint8_t data);
 	CUSTOM_INPUT_MEMBER( speech_drq_custom_r );

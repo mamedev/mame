@@ -2964,10 +2964,54 @@ ROM_START( bloodwar )
 	ROM_LOAD( "of-100-0222.99",    0x000000, 0x100000, CRC(42b12269) SHA1(f9d9c42057e176710f09e8db0bfcbf603c15ca11) )
 ROM_END
 
-ROM_START( oedfight )
+ROM_START( oedfight ) // Bloodshed version
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "ofp0j3.514", 0x000000, 0x080000, CRC(0c93da15) SHA1(65b6b1b4acfc32c551ae4fbe6a13f7f2b8554dbf) )
 	ROM_LOAD16_BYTE( "ofp1j3.513", 0x000001, 0x080000, CRC(cc59de49) SHA1(48ff4ed40ad22768054a59bdf5ce0e00891d8f0e) )
+
+	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
+	ROM_LOAD16_WORD_SWAP( "ofd0x3.124",  0x000000, 0x020000, CRC(399f2005) SHA1(ff0370724770c35963953fd9596d9f808ba87d8f) )
+
+	ROM_REGION( 0x1e00000, "kan_spr", 0 )  /* Sprites */
+	ROM_LOAD       ( "of-200-0201.8",   0x0000000, 0x200000, CRC(bba63025) SHA1(daec5285469ee953f6f838fe3cb3903524e9ac39) )
+	ROM_LOAD       ( "of-201-0202.9",   0x0200000, 0x200000, CRC(4ffd9ddc) SHA1(62bc8c0ed2efab407fc2956c514c3e732bcc47ee) )
+	ROM_LOAD       ( "of-202-0203.10",  0x0400000, 0x200000, CRC(fbcc5363) SHA1(9eff48c29d5c887d39e4db442c6ee51ec879521e) )
+	ROM_LOAD       ( "of-203-0204.11",  0x0600000, 0x200000, CRC(8e818ce9) SHA1(bc37d35247edfc563400cd67459d455b1fea6eab) )
+	ROM_LOAD       ( "of-204-0205.12",  0x0800000, 0x200000, CRC(70c4a76b) SHA1(01b17bda156f2e6f480bdc976927c8bba47c1186) )
+	ROM_LOAD       ( "of-205-0206.13",  0x0a00000, 0x200000, CRC(80c667bb) SHA1(7edf33c713c8448ff73fa84b9f7684dd4d46eed1) )
+	ROM_LOAD       ( "of-206-0207.14",  0x0c00000, 0x200000, CRC(c2028c97) SHA1(ac3b73ff34f84015432ceb22cf9c57ab0ff07a70) )
+	ROM_LOAD       ( "of-207-0208.15",  0x0e00000, 0x200000, CRC(b1f30c61) SHA1(2ae010c10b7a2ae09df904f7ea81425e80389622) )
+	ROM_LOAD       ( "of-208-0209.28",  0x1000000, 0x200000, CRC(a8f29545) SHA1(5d018147aa71207f679909343104deaa0f08fd9d) )
+	ROM_LOAD16_BYTE( "of-209e-0210.16", 0x1200000, 0x100000, CRC(93018468) SHA1(d156f408a78fbd736048ce33e44c0b1e10403b0e) )
+	ROM_LOAD16_BYTE( "of-2090-2011.17", 0x1200001, 0x100000, CRC(3fb226a1) SHA1(efba54f82fb9914559faad5fba92aa108ec039d5) )
+	ROM_LOAD16_BYTE( "of-210e-0212.18", 0x1400000, 0x100000, CRC(80f3fa1b) SHA1(ca0e84cb47228ef5ac3b94238a33c3ebc3c2f528) )
+	ROM_LOAD16_BYTE( "of-2100-0213.19", 0x1400001, 0x100000, CRC(8ca3a3d6) SHA1(b6f3876f987ce6828bfa26ca492ff6ca2d282d80) )
+	ROM_LOAD16_BYTE( "of-211e-0214.20", 0x1600000, 0x100000, CRC(8d3d96f7) SHA1(0a7c459f02938f86d53979498647c73837eb9e51) )
+	ROM_LOAD16_BYTE( "of-2110-0215.21", 0x1600001, 0x100000, CRC(78268230) SHA1(63fbf88551f6fde833222ae6a4382891e1bf5b39) )
+	ROM_LOAD16_BYTE( "of-212e-0216.22", 0x1800000, 0x100000, CRC(5a013d99) SHA1(c4af944c8f0b33a93b4bb083e32e2901c5607a39) )
+	ROM_LOAD16_BYTE( "of-2120-0217.23", 0x1800001, 0x100000, CRC(84ed25bd) SHA1(ddff811d326586eb7353230e74db37867af075eb) )
+	ROM_LOAD16_BYTE( "of-213e-0218.24", 0x1a00000, 0x100000, CRC(861bc5b1) SHA1(a85936781a56b5406bee2e4f36fadcb5b9f43b05) )
+	ROM_LOAD16_BYTE( "of-2130-0219.25", 0x1a00001, 0x100000, CRC(a79b8119) SHA1(62e3fb28fd3a538a8191a51242dbed7e88c62a54) )
+	ROM_LOAD16_BYTE( "of-214e-0220.26", 0x1c00000, 0x100000, CRC(43c622de) SHA1(73efe57233f056127e2d34590c624f39d1c0ab79) )
+	ROM_LOAD16_BYTE( "of-2140-0221.27", 0x1c00001, 0x100000, CRC(d10bf03c) SHA1(a81d6b7df7382fc8d50614c1332611e0c202b805) )
+
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
+	ROM_LOAD( "of-300-0225.51",    0x000000, 0x100000, CRC(fbc3c08a) SHA1(0ba52b381e7a10fb1513244b394438b440950af3) )
+
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
+	ROM_LOAD( "of-301-0226.55",    0x000000, 0x100000, CRC(fcf215de) SHA1(83015f10e62b917efd6e3edfbd45fb8f9b35db2b) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
+	ROM_LOAD( "of-101-j-0224.101", 0x000000, 0x100000, CRC(83a1f826) SHA1(3b5f576735d5954770cd572b03e71bf121ae88d2) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* Samples */
+	ROM_LOAD( "of-100-0222.99",    0x000000, 0x100000, CRC(42b12269) SHA1(f9d9c42057e176710f09e8db0bfcbf603c15ca11) )
+ROM_END
+
+ROM_START( oedfighta ) // Original Bloodless version
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "ofp0j3_u514.u514", 0x000000, 0x080000, CRC(b5146417) SHA1(24d51f342c05e4f36aff8a47e0a7f8fdbb1f04d7) ) // labeled OFP0J3/U514
+	ROM_LOAD16_BYTE( "ofp1j3_u513.u513", 0x000001, 0x080000, CRC(afe42a8a) SHA1(817241463feb9f5b94526e5ea83ba8e5f1edf8ef) ) // labeled OFP1J3/U513
 
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "ofd0x3.124",  0x000000, 0x020000, CRC(399f2005) SHA1(ff0370724770c35963953fd9596d9f808ba87d8f) )
@@ -4300,7 +4344,8 @@ GAME( 1993, wingforc,   0,        wingforc, wingforc,  kaneko16_state,          
 
 GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bloodwar,   0,        bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodshed version)", MACHINE_SUPPORTS_SAVE ) // shows blood effects like Blood Warrior version
+GAME( 1994, oedfighta,  bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodless version)", MACHINE_SUPPORTS_SAVE ) // shows no blood effects
 GAME( 1994, gtmr,       0,        gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (Taiwan 94/07/18)", MACHINE_SUPPORTS_SAVE ) // this set shows 'PCB by Jinwei Co Ltd. ROC', bootleg?
 GAME( 1994, gtmra,      gtmr,     gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gtmrb,      gtmr,     gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/26)", MACHINE_SUPPORTS_SAVE )

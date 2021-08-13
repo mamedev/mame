@@ -152,8 +152,8 @@ void paddlemania_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xe000, 0xe000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
-	map(0xe800, 0xe800).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0xec00, 0xec00).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0xe800, 0xe800).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0xec00, 0xec00).w("ymsnd", FUNC(ym3812_device::data_w));
 	map(0xf000, 0xf7ff).ram();
 	map(0xfc00, 0xfc00).ram(); // unknown port
 }
@@ -168,8 +168,8 @@ void thenextspace_state::sound_map(address_map &map)
 void thenextspace_state::sound_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::data_w));
 	map(0x3b, 0x3b).nopr(); // unknown read port
 	map(0x3d, 0x3d).nopr(); // unknown read port
 	map(0x7b, 0x7b).nopr(); // unknown read port

@@ -83,6 +83,7 @@ public:
 	// configuration
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_config(const atari_motion_objects_config &config) { static_cast<atari_motion_objects_config &>(*this) = config; }
+	void set_xoffset(int xoffset) { m_xoffset = xoffset; }
 
 	// getters
 	int bank() const { return m_bank; }
@@ -217,6 +218,9 @@ private:
 
 	uint32_t                m_last_xpos;          // (during processing) the previous X position
 	uint32_t                m_next_xpos;          // (during processing) the next X position
+
+	int                     m_xoffset;            // global xoffset for sprites
+
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

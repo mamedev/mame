@@ -679,11 +679,11 @@ void nes_konami_vrc7_device::write_h(offs_t offset, uint8_t data)
 
 		case 0x1010:
 		case 0x1018:
-			m_vrc7snd->register_port_w(data);
+			m_vrc7snd->address_w(data);
 			break;
 		case 0x1030:
 		case 0x1038:
-			m_vrc7snd->data_port_w(data);
+			m_vrc7snd->data_w(data);
 			break;
 
 		case 0x2000:
@@ -763,5 +763,5 @@ void nes_konami_vrc7_device::device_add_mconfig(machine_config &config)
 
 	// TODO: this is not how VRC7 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	VRC7(config, m_vrc7snd, XTAL(21'477'272)/6).add_route(0, "addon", 1.0).add_route(1, "addon", 0.0);
+	DS1001(config, m_vrc7snd, XTAL(21'477'272)/6).add_route(0, "addon", 1.0).add_route(1, "addon", 0.0);
 }

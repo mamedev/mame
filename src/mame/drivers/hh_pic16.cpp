@@ -38,7 +38,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same game:
+ROM source notes when dumped from another publisher, but confident it's the same:
 - drdunk: Tandy Electronic Basketball
 - flash: Radio Shack Sound Effects Chassis
 - hccbaskb: Sears Electronic Basketball
@@ -582,7 +582,6 @@ void maniac_state::update_display()
 {
 	m_display->write_row(0, ~m_b & 0x7f);
 	m_display->write_row(1, ~m_c & 0x7f);
-	m_display->update();
 }
 
 void maniac_state::update_speaker()
@@ -1281,7 +1280,7 @@ public:
 void rockpin_state::update_display()
 {
 	// 3 7seg leds from ports A and B
-	m_display->matrix_partial(0, 3, m_a, m_b, false);
+	m_display->matrix_partial(0, 3, m_a, m_b);
 
 	// 44 leds from ports C and D
 	m_display->matrix_partial(3, 6, m_d, m_c);

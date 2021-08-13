@@ -135,7 +135,7 @@ Dip locations added based on the notes above.
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

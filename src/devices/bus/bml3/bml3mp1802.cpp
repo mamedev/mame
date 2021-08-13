@@ -65,6 +65,7 @@ void bml3bus_mp1802_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, mp1802_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy2, mp1802_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy3, mp1802_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("bml3_flop").set_filter("5");
 }
 
 //-------------------------------------------------

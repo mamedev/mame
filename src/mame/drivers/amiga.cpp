@@ -1953,6 +1953,7 @@ void a600_state::a600(machine_config &config)
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("amiga_hdd");
 }
 
 void a600_state::a600n(machine_config &config)
@@ -2012,6 +2013,7 @@ void a1200_state::a1200(machine_config &config)
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("amiga_hdd");
 }
 
 void a1200_state::a1200n(machine_config &config)
@@ -2062,6 +2064,7 @@ void a4000_state::a4000(machine_config &config)
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("amiga_hdd");
 }
 
 void a4000_state::a4000n(machine_config &config)

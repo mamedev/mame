@@ -123,7 +123,7 @@ Bucky:
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #define MOO_DEBUG 0

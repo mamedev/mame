@@ -11,7 +11,7 @@ TODO:
 ***************************************************************************/
 
 // the new RIOT does not work with the SuperCharger
-// for example "mame64 a2600 scharger -cass offifrog" fails to load after playing the tape
+// for example "mame a2600 scharger -cass offifrog" fails to load after playing the tape
 
 #include "emu.h"
 
@@ -23,9 +23,8 @@ TODO:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK_NTSC   3579545
-#define MASTER_CLOCK_PAL    3546894
-#define CATEGORY_SELECT     16
+static constexpr auto MASTER_CLOCK_NTSC = 3.579575_MHz_XTAL;
+static constexpr auto MASTER_CLOCK_PAL  = 3.546894_MHz_XTAL;
 
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
@@ -123,7 +122,7 @@ void a2600_base_state::switch_A_w(uint8_t data)
 	/* Right controller port */
 	m_joy2->joy_w( data & 0x0f );
 
-//  switch( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
+//  switch( ioport("CONTROLLERS")->read() % 16 )
 //  {
 //  case 0x0a:  /* KidVid voice module */
 //      m_cassette->change_state(( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : (CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), CASSETTE_MOTOR_DISABLED );
@@ -353,94 +352,7 @@ void a2600_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1000, 0x1fff, write8m_delegate(*m_cart, FUNC(vcs_cart_slot_device::write_bank)));
 		break;
 	}
-
-	// Banks may have changed, reset the cpu so it uses the correct reset vector
-	m_maincpu->reset();
 }
-
-
-#ifdef UNUSED_FUNCTIONS
-// try to detect 2600 controller setup. returns 32bits with left/right controller info
-unsigned a2600_state::long detect_2600controllers()
-{
-	enum
-	{
-		JOYS = 0x001,
-		PADD = 0x002,
-		KEYP = 0x004,
-		LGUN = 0x008,
-		INDY = 0x010,
-		BOOS = 0x020,
-		KVID = 0x040,
-		CMTE = 0x080,
-		MLNK = 0x100,
-		AMSE = 0x200,
-		CX22 = 0x400,
-		CX80 = 0x800
-	};
-
-	unsigned int left,right;
-	int i,j,foundkeypad = 0;
-	uint8_t *cart;
-	static const unsigned char signatures[][5] =  {
-		{ 0x55, 0xa5, 0x3c, 0x29, 0}, // star raiders
-		{ 0xf9, 0xff, 0xa5, 0x80, 1}, // sentinel
-		{ 0x81, 0x02, 0xe8, 0x86, 1}, // shooting arcade
-		{ 0x02, 0xa9, 0xec, 0x8d, 1}, // guntest4 tester
-		{ 0x85, 0x2c, 0x85, 0xa7, 2}, // INDY 500
-		{ 0xa1, 0x8d, 0x9d, 0x02, 2}, // omega race INDY
-		{ 0x65, 0x72, 0x44, 0x43, 2}, // Sprintmaster INDY
-		{ 0x89, 0x8a, 0x99, 0xaa, 3}, // omega race
-		{ 0x9a, 0x8e, 0x81, 0x02, 4},
-		{ 0xdd, 0x8d, 0x80, 0x02, 4},
-		{ 0x85, 0x8e, 0x81, 0x02, 4},
-		{ 0x8d, 0x81, 0x02, 0xe6, 4},
-		{ 0xff, 0x8d, 0x81, 0x02, 4},
-		{ 0xa9, 0x03, 0x8d, 0x81, 5},
-		{ 0xa9, 0x73, 0x8d, 0x80, 6},
-		//                                  { 0x82, 0x02, 0x85, 0x8f, 7}, // Mind Maze (really Mind Link??)
-		{ 0xa9, 0x30, 0x8d, 0x80, 7}, // Bionic Breakthrough
-		{ 0x02, 0x8e, 0x81, 0x02, 7}, // Telepathy
-		{ 0x41, 0x6d, 0x69, 0x67, 9}, // Missile Command Amiga Mouse
-		{ 0x43, 0x58, 0x2d, 0x32, 10}, // Missile Command CX22 TrackBall
-		{ 0x43, 0x58, 0x2d, 0x38, 11}, // Missile Command CX80 TrackBall
-		{ 0x4e, 0xa8, 0xa4, 0xa2, 12}, // Omega Race for Joystick ONLY
-		{ 0xa6, 0xef, 0xb5, 0x38, 8} // Warlords.. paddles ONLY
-	};
-	// start with this.. if anyone finds a game that does NOT work with both controllers enabled
-	// it can be fixed here with a new signature (note that the Coleco Gemini has this setup also)
-	left = JOYS+PADD; right = JOYS+PADD;
-	// default for bad dumps and roms too large to have special controllers
-	if ((m_cart_size > 0x4000) || (m_cart_size & 0x7ff)) return (left << 16) + right;
-
-	cart = CART;
-	for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
-	{
-		for (j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
-		{
-			if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0] - 1))
-			{
-				int k = signatures[j][4];
-				if (k == 0) return (JOYS << 16) + KEYP;
-				if (k == 1) return (LGUN << 16);
-				if (k == 2) return (INDY << 16) + INDY;
-				if (k == 3) return (BOOS << 16) + BOOS;
-				if (k == 5) return (JOYS << 16) + KVID;
-				if (k == 6) return (CMTE << 16) + CMTE;
-				if (k == 7) return (MLNK << 16) + MLNK;
-				if (k == 8) return (PADD << 16) + PADD;
-				if (k == 9) return (AMSE << 16) + AMSE;
-				if (k == 10) return (CX22 << 16) + CX22;
-				if (k == 11) return (CX80 << 16) + CX80;
-				if (k == 12) return (JOYS << 16) + JOYS;
-				if (k == 4) foundkeypad = 1;
-			}
-		}
-	}
-	if (foundkeypad) return (KEYP << 16) + KEYP;
-	return (left << 16) + right;
-}
-#endif
 
 
 static INPUT_PORTS_START( a2600 )
@@ -464,31 +376,31 @@ INPUT_PORTS_END
 
 static void a2600_cart(device_slot_interface &device)
 {
-	device.option_add_internal("a26_2k",    A26_ROM_2K);
-	device.option_add_internal("a26_4k",    A26_ROM_4K);
-	device.option_add_internal("a26_f4",    A26_ROM_F4);
-	device.option_add_internal("a26_f6",    A26_ROM_F6);
-	device.option_add_internal("a26_f8",    A26_ROM_F8);
-	device.option_add_internal("a26_f8sw",  A26_ROM_F8_SW);
-	device.option_add_internal("a26_fa",    A26_ROM_FA);
-	device.option_add_internal("a26_fe",    A26_ROM_FE);
-	device.option_add_internal("a26_3e",    A26_ROM_3E);
-	device.option_add_internal("a26_3f",    A26_ROM_3F);
-	device.option_add_internal("a26_e0",    A26_ROM_E0);
-	device.option_add_internal("a26_e7",    A26_ROM_E7);
-	device.option_add_internal("a26_ua",    A26_ROM_UA);
-	device.option_add_internal("a26_cv",    A26_ROM_CV);
-	device.option_add_internal("a26_dc",    A26_ROM_DC);
-	device.option_add_internal("a26_fv",    A26_ROM_FV);
-	device.option_add_internal("a26_jvp",   A26_ROM_JVP);
-	device.option_add_internal("a26_cm",    A26_ROM_COMPUMATE);
-	device.option_add_internal("a26_ss",    A26_ROM_SUPERCHARGER);
-	device.option_add_internal("a26_dpc",   A26_ROM_DPC);
-	device.option_add_internal("a26_4in1",  A26_ROM_4IN1);
-	device.option_add_internal("a26_8in1",  A26_ROM_8IN1);
-	device.option_add_internal("a26_32in1", A26_ROM_32IN1);
-	device.option_add_internal("a26_x07",   A26_ROM_X07);
-	device.option_add_internal("a26_harmony",   A26_ROM_HARMONY);
+	device.option_add("a26_2k",    A26_ROM_2K);
+	device.option_add("a26_4k",    A26_ROM_4K);
+	device.option_add("a26_f4",    A26_ROM_F4);
+	device.option_add("a26_f6",    A26_ROM_F6);
+	device.option_add("a26_f8",    A26_ROM_F8);
+	device.option_add("a26_f8sw",  A26_ROM_F8_SW);
+	device.option_add("a26_fa",    A26_ROM_FA);
+	device.option_add("a26_fe",    A26_ROM_FE);
+	device.option_add("a26_3e",    A26_ROM_3E);
+	device.option_add("a26_3f",    A26_ROM_3F);
+	device.option_add("a26_e0",    A26_ROM_E0);
+	device.option_add("a26_e7",    A26_ROM_E7);
+	device.option_add("a26_ua",    A26_ROM_UA);
+	device.option_add("a26_cv",    A26_ROM_CV);
+	device.option_add("a26_dc",    A26_ROM_DC);
+	device.option_add("a26_fv",    A26_ROM_FV);
+	device.option_add("a26_jvp",   A26_ROM_JVP);
+	device.option_add("a26_cm",    A26_ROM_COMPUMATE);
+	device.option_add("a26_ss",    A26_ROM_SUPERCHARGER);
+	device.option_add("a26_dpc",   A26_ROM_DPC);
+	device.option_add("a26_4in1",  A26_ROM_4IN1);
+	device.option_add("a26_8in1",  A26_ROM_8IN1);
+	device.option_add("a26_32in1", A26_ROM_32IN1);
+	device.option_add("a26_x07",   A26_ROM_X07);
+	device.option_add("a26_harmony",   A26_ROM_HARMONY);
 }
 
 void a2600_state::a2600_cartslot(machine_config &config)

@@ -222,7 +222,7 @@ static uint8_t *              ignorepc;
 static uint8_t                ignore_all;
 
 /* array of information about each opcode */
-static optable_entry *      optable;
+static std::unique_ptr<optable_entry[]> optable;
 
 /* buffer for undoing operations */
 static uint8_t *              undobuff;
@@ -2087,7 +2087,7 @@ static void build_optable(running_machine &machine)
 	int opnum, inum;
 
 	/* allocate and initialize the opcode table */
-	optable = auto_alloc_array(machine, optable_entry, 65536);
+	optable = std::make_unique<optable_entry[]>(65536);
 	for (opnum = 0; opnum < 65536; opnum++)
 	{
 		optable[opnum].flags = OF_INVALID;

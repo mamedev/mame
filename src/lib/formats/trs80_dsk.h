@@ -14,10 +14,10 @@
 
 #include "wd177x_dsk.h"
 
-class trs80_format : public wd177x_format
+class jv1_format : public wd177x_format
 {
 public:
-	trs80_format();
+	jv1_format();
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -30,6 +30,22 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_TRS80_FORMAT;
+class jv3_format : public floppy_image_format_t
+{
+public:
+	jv3_format();
+
+	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
+	virtual bool supports_save() const override;
+};
+
+extern const floppy_format_type FLOPPY_JV1_FORMAT;
+extern const floppy_format_type FLOPPY_JV3_FORMAT;
 
 #endif // MAME_FORMATS_TRS80_DSK_H

@@ -368,7 +368,7 @@ void c1551_device::device_add_mconfig(machine_config &config)
 	connector.set_fixed(true);
 	connector.set_formats(c1551_device::floppy_formats);
 
-	PLUS4_EXPANSION_SLOT(config, m_exp, 0);
+	PLUS4_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1));
 	m_exp->irq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::irq_w));
 	m_exp->cd_rd_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::dma_cd_r));
 	m_exp->cd_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::dma_cd_w));
@@ -417,7 +417,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	, m_ga(*this, C64H156_TAG)
 	, m_pla(*this, PLA_TAG)
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
-	, m_exp(*this, PLUS4_EXPANSION_SLOT_TAG)
+	, m_exp(*this, "exp")
 	, m_jp1(*this, "JP1")
 	, m_leds(*this, "led%u", 0U)
 	, m_tcbm_data(0xff)

@@ -133,9 +133,6 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri)
 {
-	device_palette_interface &palette = gfx(0)->palette();
-	const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
-	const pen_t black = palette.black_pen();
 	if (m_palxor)
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
@@ -186,10 +183,9 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 					{
 						if ((c & 0xff) != 0xff)
 						{
-							if (c == 0xffe && shadow_offset)
+							if (c == 0xffe)
 							{
-								if (dest[x] != black)
-									dest[x] |= shadow_offset;
+								dest[x] |= 0x800;
 							}
 							else
 							{
@@ -206,8 +202,6 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri)
 {
 	device_palette_interface &palette = gfx(0)->palette();
-	const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
-	const pen_t black = palette.black_pen();
 	const pen_t *pal = &palette.pen(gfx(0)->colorbase());
 	if (m_palxor)
 	{
@@ -264,10 +258,9 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 					{
 						if ((c & 0xff) != 0xff)
 						{
-							if (c == 0xffe && shadow_offset)
+							if (c == 0xffe)
 							{
-								if (srcrender[x] != black)
-									srcrender[x] |= shadow_offset;
+								srcrender[x] |= 0x800;
 							}
 							else
 							{
@@ -363,20 +356,14 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	const u16 palette = pSource[6];
 	sprite_ptr->pri = ((palette >> 4) & 0xf);
 
-	const u16 linkno   = pSource[0]; /* LINKNO */
-	sprite_ptr->offset = pSource[1]; /* OFFSET */
-	int hpos           = pSource[2]; /* HPOS       0x000..0x7ff (signed) */
-	int vpos           = pSource[3]; /* VPOS       0x000..0x7ff (signed) */
-	u16 hsize          = pSource[4]; /* HSIZE      max 0x3ff pixels */
-	u16 vsize          = pSource[5]; /* VSIZE      max 0x3ff pixels */
+	const u16 linkno   = pSource[0] & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
+	sprite_ptr->offset = pSource[1];         /* OFFSET */
+	int hpos           = pSource[2];         /* HPOS       0x000..0x7ff (signed) */
+	int vpos           = pSource[3];         /* VPOS       0x000..0x7ff (signed) */
+	u16 hsize          = pSource[4];         /* HSIZE      max 0x3ff pixels */
+	u16 vsize          = pSource[5];         /* VSIZE      max 0x3ff pixels */
 	/* pSource[6] contains priority/palette */
 	/* pSource[7] is used in Lucky & Wild, possibly for sprite-road priority */
-
-	if (linkno * 4 >= 0x4000 / 2) /* avoid garbage memory reads */
-	{
-		sprite_ptr->disable = true;
-		return;
-	}
 
 	int xscroll = (s16)m_position[1];
 	int yscroll = (s16)m_position[0];
@@ -411,13 +398,13 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 
 	int tile_index   = spriteformat16[linkno * 4 + 0];
 	const u16 format = spriteformat16[linkno * 4 + 1];
-	int dx           = spriteformat16[linkno * 4 + 2];
-	int dy           = spriteformat16[linkno * 4 + 3];
+	int dx           = spriteformat16[linkno * 4 + 2]; // should this also be masked and have a sign bit like dy?
+	const int dy     = spriteformat16[linkno * 4 + 3] & 0x1ff;
 	int num_cols     = (format >> 4) & 0xf;
 	int num_rows     = (format) & 0xf;
 
 	if (num_cols == 0) num_cols = 0x10;
-	bool flipx = (hsize & 0x8000);
+	const bool flipx = (hsize & 0x8000);
 	hsize &= 0x3ff;//0x1ff;
 	if (hsize == 0)
 	{
@@ -436,7 +423,7 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	}
 
 	if (num_rows == 0) num_rows = 0x10;
-	bool flipy = (vsize & 0x8000);
+	const bool flipy = (vsize & 0x8000);
 	vsize &= 0x3ff;
 	if (vsize == 0)
 	{
@@ -444,14 +431,16 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 		return;
 	}
 	u32 zoomy = (vsize << 16) / (num_rows * 16);
-	dy = (dy * zoomy + 0x8000) >> 16;
-	if (flipy)
+	s32 dy_zoomed = ((dy & 0xff) * zoomy + 0x8000) >> 16;
+	if (dy & 0x100) dy_zoomed = -dy_zoomed;
+
+	if (!flipy)
 	{
-		vpos += dy;
+		vpos -= dy_zoomed;
 	}
 	else
 	{
-		vpos -= dy;
+		vpos += dy_zoomed;
 	}
 
 	sprite_ptr->flipx = flipx;
@@ -536,6 +525,7 @@ void namco_c355spr_device::get_sprites(const rectangle cliprect)
 
 //  if (offs == 0)  // boot
 	// TODO: solvalou service mode wants 0x14000/2 & 0x00000/2
+	// drawing this is what causes the bad tile in vshoot, do any games need 2 lists at the same time or should 1 list be configurable?
 		get_list(0, &m_spriteram[buffer][0x02000/2], &m_spriteram[buffer][0x00000/2]);
 //  else
 		get_list(1, &m_spriteram[buffer][0x14000/2], &m_spriteram[buffer][0x10000/2]);

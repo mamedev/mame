@@ -57,7 +57,25 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define LOG_SAM     0
+#define LOG_FBITS   (1U <<  1)
+#define LOG_VBITS   (1U <<  2)
+#define LOG_PBITS   (1U <<  3)
+#define LOG_TBITS   (1U <<  4)
+#define LOG_MBITS   (1U <<  5)
+#define LOG_RBITS   (1U <<  6)
+
+#define VERBOSE (0)
+// #define VERBOSE (LOG_FBITS)
+// #define VERBOSE (LOG_FBITS | LOG_VBITS | LOG_PBITS | LOG_MBITS | LOG_RBITS)
+
+#include "logmacro.h"
+
+#define LOGFBITS(...) LOGMASKED(LOG_FBITS, __VA_ARGS__)
+#define LOGVBITS(...) LOGMASKED(LOG_VBITS, __VA_ARGS__)
+#define LOGPBITS(...) LOGMASKED(LOG_PBITS, __VA_ARGS__)
+#define LOGTBITS(...) LOGMASKED(LOG_TBITS, __VA_ARGS__)
+#define LOGMBITS(...) LOGMASKED(LOG_MBITS, __VA_ARGS__)
+#define LOGRBITS(...) LOGMASKED(LOG_RBITS, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(SAM6883, sam6883_device, "sam6883", "MC6883 SAM")
 
@@ -302,16 +320,9 @@ void sam6883_device::update_memory()
 			// 64k mode (dynamic)
 		case SAM_STATE_M1|SAM_STATE_M0:
 			// 64k mode (static)
-			if (m_sam_state & SAM_STATE_TY)
-			{
-				// full 64k RAM
-				m_counter_mask = 0xFFFF;
-			}
-			else
-			{
-				// ROM/RAM
-				m_counter_mask = 0x7FFF;
-			}
+			// full 64k RAM or ROM/RAM
+			// CoCo Max requires these two be treated the same
+			m_counter_mask = 0xfFFF;
 			break;
 	}
 }
@@ -370,6 +381,54 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 		update_memory();
 	if (xorval & (SAM_STATE_R1|SAM_STATE_R0))
 		update_cpu_clock();
+
+	if (xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
+	{
+		/* Video frame buffer address changed */
+		LOGFBITS("%s: SAM F Address: $%04x\n",
+			machine().describe_context(),
+			display_offset());
+	}
+
+	if (xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
+	{
+		/* Video frame buffer address changed */
+		LOGVBITS("%s: SAM V Bits: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2)));
+	}
+
+	if (xorval & (SAM_STATE_P1))
+	{
+		/* Video frame buffer address changed */
+		LOGPBITS("%s: SAM P1 Bit: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_P1)) >> 10);
+	}
+
+	if (xorval & (SAM_STATE_TY))
+	{
+		/* Video frame buffer address changed */
+		LOGTBITS("%s: SAM TY Bits: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_TY)) >> 15);
+	}
+
+	if (xorval & (SAM_STATE_M0|SAM_STATE_M1))
+	{
+		/* Video frame buffer address changed */
+		LOGMBITS("%s: SAM M Bits: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 9);
+	}
+
+	if (xorval & (SAM_STATE_R0|SAM_STATE_R1))
+	{
+		/* Video frame buffer address changed */
+		LOGRBITS("%s: SAM R Bits: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_R0|SAM_STATE_R1)) >> 11);
+	}
 }
 
 

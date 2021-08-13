@@ -348,53 +348,6 @@ Kiki KaiKai / Kick 'n Run MCU
 
 ***************************************************************************/
 
-uint8_t kikikai_state::kikikai_mcu_ddr1_r()
-{
-	return m_ddr1;
-}
-
-void kikikai_state::kikikai_mcu_ddr1_w(uint8_t data)
-{
-	m_ddr1 = data;
-}
-
-uint8_t kikikai_state::kikikai_mcu_ddr2_r()
-{
-	return m_ddr2;
-}
-
-void kikikai_state::kikikai_mcu_ddr2_w(uint8_t data)
-{
-	m_ddr2 = data;
-}
-
-uint8_t kikikai_state::kikikai_mcu_ddr3_r()
-{
-	return m_ddr3;
-}
-
-void kikikai_state::kikikai_mcu_ddr3_w(uint8_t data)
-{
-	m_ddr3 = data;
-}
-
-uint8_t kikikai_state::kikikai_mcu_ddr4_r()
-{
-	return m_ddr4;
-}
-
-void kikikai_state::kikikai_mcu_ddr4_w(uint8_t data)
-{
-	m_ddr4 = data;
-}
-
-uint8_t kikikai_state::kikikai_mcu_port1_r()
-{
-	//logerror("%04x: 6801U4 port 1 read\n", m_mcu->pc());
-	m_port1_in = ioport("IN0")->read();
-	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
-}
-
 void kikikai_state::kikikai_mcu_port1_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
@@ -413,14 +366,7 @@ void kikikai_state::kikikai_mcu_port1_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 
 	// bit 7: ? (set briefly while MCU boots)
-
 	m_port1_out = data;
-}
-
-uint8_t kikikai_state::kikikai_mcu_port2_r()
-{
-	//logerror("%04x: 6801U4 port 2 read\n", m_mcu->pc());
-	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }
 
 void kikikai_state::kikikai_mcu_port2_w(uint8_t data)
@@ -459,7 +405,7 @@ void kikikai_state::kikikai_mcu_port2_w(uint8_t data)
 uint8_t kikikai_state::kikikai_mcu_port3_r()
 {
 	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
-	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
+	return m_port3_in;
 }
 
 void kikikai_state::kikikai_mcu_port3_w(uint8_t data)
@@ -468,17 +414,9 @@ void kikikai_state::kikikai_mcu_port3_w(uint8_t data)
 	m_port3_out = data;
 }
 
-uint8_t kikikai_state::kikikai_mcu_port4_r()
-{
-	//logerror("%04x: 6801U4 port 4 read\n", m_mcu->pc());
-	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
-}
-
 void kikikai_state::kikikai_mcu_port4_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
-
 	// bits 0-7 of shared RAM address
-
 	m_port4_out = data;
 }

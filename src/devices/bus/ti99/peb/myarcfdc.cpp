@@ -385,16 +385,16 @@ INPUT_PORTS_START(myarc_ddcc )
 		PORT_DIPSETTING(0x01, DEF_STR( On ))
 
 	PORT_START( "SW1" )
-	PORT_DIPNAME( 0x01, 0x01, "DSK1 head step time" )
+	PORT_DIPNAME( 0x01, 0x00, "DSK1 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")          // 6 ms for 1770
 		PORT_DIPSETTING( 0x01, "20ms/2ms")     // 20 ms for 1770 and 2ms for 1772
-	PORT_DIPNAME( 0x02, 0x02, "DSK2 head step time" )
+	PORT_DIPNAME( 0x02, 0x00, "DSK2 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")
 		PORT_DIPSETTING( 0x02, "20ms/2ms")
-	PORT_DIPNAME( 0x04, 0x04, "DSK3 head step time" )
+	PORT_DIPNAME( 0x04, 0x00, "DSK3 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")
 		PORT_DIPSETTING( 0x04, "20ms/2ms")
-	PORT_DIPNAME( 0x08, 0x08, "DSK4 head step time" )
+	PORT_DIPNAME( 0x08, 0x00, "DSK4 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")
 		PORT_DIPSETTING( 0x08, "20ms/2ms")
 INPUT_PORTS_END

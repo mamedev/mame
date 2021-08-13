@@ -14,9 +14,9 @@ Hardware notes:
 
 Games released, MCU: (*denotes undumped)
 - Baseball 4       - HD38800
-- *Basketball 3    - ?
+- Basketball 3     - HD38800
 - Football 4       - TMS1670
-- *Pac-Man 2       - HD38800?
+- *Pac-Man 2       - HD38800
 - Pinball          - HD38800
 - Space Invader 2  - HD38800
 
@@ -179,7 +179,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 void sag_state::update_display()
 {
 	// grid 0-7 are the 'pixels'
-	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
+	m_display->matrix_partial(0, 8, m_grid, m_plate);
 
 	// grid 8-13 are 7segs
 	u8 seg = bitswap<7>(m_plate,4,5,6,7,8,9,10);

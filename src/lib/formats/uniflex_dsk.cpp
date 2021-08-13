@@ -33,14 +33,14 @@ const char *uniflex_format::extensions() const
 
 int uniflex_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 75;
 	return 0;
 }
 
-int uniflex_format::find_size(io_generic *io, uint32_t form_factor)
+int uniflex_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	uint8_t sir[192];

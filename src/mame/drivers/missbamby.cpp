@@ -198,7 +198,7 @@ ROM_START( minisupf )
 	ROM_LOAD( "mini_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) )
 ROM_END
 
-// Cirsa PCB 810702 A. The 8155 was missing on this PCB, but probably it was just removed for reusing it elsewhere.
+// Cirsa PCB 810702 A
 ROM_START( luckyplr )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "lucky_player_24.a", 0x0000, 0x1000, CRC(11a3daf2) SHA1(239d2e53f05eecfcbc0cf5e037df21e3851e4d69) )
@@ -234,7 +234,7 @@ ROM_START( gwinner )
 	ROM_LOAD( "reben_sa_gw-b_chk_f884_crc_7822.bin", 0x2000, 0x1000, CRC(0146a4ff) SHA1(d23048ba0f23daf5caba07affc57e88ab09ca91e) )
 
 	ROM_REGION(0x20, "prom", 0)
-	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, NO_DUMP )
+	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, CRC(27ed5f29) SHA1(2d5f190fac6be15d3c5b344647333bbf47a04fc3) )
 ROM_END
 
 ROM_START( unkslot )

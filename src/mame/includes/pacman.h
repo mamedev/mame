@@ -300,7 +300,6 @@ public:
 		: clubpacm_state(mconfig, type, tag)
 		, m_screen(*this, "screen")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-		, m_decrypted_opcodes_mirror(*this, "decrypted_opcodes_mirror")
 		, m_decrypted_opcodes_high(*this, "decrypted_opcodes_high")
 	{ }
 
@@ -314,16 +313,13 @@ private:
 	required_device<screen_device> m_screen;
 
 protected:
-
 	void mspactwin_map(address_map &map);
 	void mspactwin_decrypted_map(address_map &map);
 
 	void mspactwin_videoram_w(offs_t offset, uint8_t data);
 
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes_mirror;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes_high;
-
+	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_decrypted_opcodes_high;
 };
 
 

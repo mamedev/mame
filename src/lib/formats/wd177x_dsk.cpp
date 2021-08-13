@@ -29,14 +29,15 @@ const wd177x_format::format &wd177x_format::get_track_format(const format &f, in
 /*
     Default implementation for find_size. May be overwritten by subclasses.
 */
-int wd177x_format::find_size(io_generic *io, uint32_t form_factor)
+int wd177x_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
-
+		if(!variants.empty() && !has_variant(variants, f.variant))
+			continue;
 		uint64_t format_size = 0;
 		for(int track=0; track < f.track_count; track++) {
 			for(int head=0; head < f.head_count; head++) {
@@ -53,7 +54,7 @@ int wd177x_format::find_size(io_generic *io, uint32_t form_factor)
 
 int wd177x_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 
 	if(type != -1)
 		return 50;
@@ -198,11 +199,18 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int 
 
 bool wd177x_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 	if(type == -1)
 		return false;
 
 	const format &f = formats[type];
+	int max_tracks, max_heads;
+	image->get_maximal_geometry(max_tracks, max_heads);
+
+	if(f.track_count > max_tracks) {
+		osd_printf_error("wd177x_format: Number of tracks in image file too high for floppy drive (%d > %d)\n", f.track_count, max_tracks);
+		return false;
+	}
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
@@ -420,6 +428,15 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 	int *ok_cands = &candidates[0];
 	for(unsigned int i=0; i < candidates.size(); i++) {
 		const format &f = formats[candidates[i]];
+
+		int max_tracks, max_heads;
+		image->get_maximal_geometry(max_tracks, max_heads);
+
+		// Fail if floppy drive can't handle track count
+		if(f.track_count > max_tracks) {
+			goto fail;
+		}
+
 		for(int track=0; track < f.track_count; track++) {
 			for(int head=0; head < f.head_count; head++) {
 				const format &tf = get_track_format(f, head, track);
@@ -437,7 +454,7 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 					break;
 				}
 				int ns = 0;
-				for(int j=0; j<256; j++)
+				for(int j=0; j<int(sectors.size()); j++)
 					if(!sectors[j].empty()) {
 						int sid;
 						if(tf.sector_base_id == -1) {

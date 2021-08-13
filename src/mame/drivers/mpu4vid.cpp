@@ -192,7 +192,7 @@ TODO:
 #include "sound/okim6376.h"
 #include "sound/saa1099.h"
 #include "sound/upd7759.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 
 #include "video/ef9369.h"
 #include "video/scn2674.h"

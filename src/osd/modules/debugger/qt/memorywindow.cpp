@@ -169,21 +169,24 @@ MemoryWindow::~MemoryWindow()
 
 void MemoryWindow::memoryRegionChanged(int index)
 {
-	m_memTable->view()->set_source(*m_memTable->view()->source(index));
-	m_memTable->viewport()->update();
-
-	// Update the data format radio buttons to the memory region's default
-	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
-	switch (memView->get_data_format())
+	if (index < m_memTable->view()->source_count())
 	{
-	case 1: dataFormatMenuItem("formatActOne")->setChecked(true); break;
-	case 2: dataFormatMenuItem("formatActTwo")->setChecked(true); break;
-	case 4: dataFormatMenuItem("formatActFour")->setChecked(true); break;
-	case 8: dataFormatMenuItem("formatActEight")->setChecked(true); break;
-	case 9: dataFormatMenuItem("formatAct32bitFloat")->setChecked(true); break;
-	case 10: dataFormatMenuItem("formatAct64bitFloat")->setChecked(true); break;
-	case 11: dataFormatMenuItem("formatAct80bitFloat")->setChecked(true); break;
-	default: break;
+		m_memTable->view()->set_source(*m_memTable->view()->source(index));
+		m_memTable->viewport()->update();
+
+		// Update the data format radio buttons to the memory region's default
+		debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
+		switch (memView->get_data_format())
+		{
+		case 1: dataFormatMenuItem("formatActOne")->setChecked(true); break;
+		case 2: dataFormatMenuItem("formatActTwo")->setChecked(true); break;
+		case 4: dataFormatMenuItem("formatActFour")->setChecked(true); break;
+		case 8: dataFormatMenuItem("formatActEight")->setChecked(true); break;
+		case 9: dataFormatMenuItem("formatAct32bitFloat")->setChecked(true); break;
+		case 10: dataFormatMenuItem("formatAct64bitFloat")->setChecked(true); break;
+		case 11: dataFormatMenuItem("formatAct80bitFloat")->setChecked(true); break;
+		default: break;
+		}
 	}
 }
 

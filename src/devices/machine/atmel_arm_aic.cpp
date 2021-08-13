@@ -53,7 +53,7 @@ uint32_t arm_aic_device::irq_vector_r()
 		int midx = -1;
 		do
 		{
-			uint8_t idx = 31 - count_leading_zeros(mask);
+			uint8_t idx = 31 - count_leading_zeros_32(mask);
 			if ((int)(m_aic_smr[idx] & 7) >= pri)
 			{
 				midx = idx;
@@ -146,7 +146,7 @@ void arm_aic_device::check_irqs()
 		int pri = get_level();
 		do
 		{
-			uint8_t idx = 31 - count_leading_zeros(mask);
+			uint8_t idx = 31 - count_leading_zeros_32(mask);
 			if ((int)(m_aic_smr[idx] & 7) > pri)
 			{
 				m_core_status |= 2;

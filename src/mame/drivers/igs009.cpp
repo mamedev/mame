@@ -32,7 +32,7 @@ Year  Game                         Manufacturer    Notes
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"

@@ -482,7 +482,7 @@ void am7990_device_base::transmit()
 		}
 	}
 
-	send(buf, length);
+	send(buf, length, 4);
 }
 
 void am7990_device_base::send_complete_cb(int result)

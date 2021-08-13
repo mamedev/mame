@@ -62,8 +62,8 @@ Notes:
                 V106.U16 - MX27C4000 4MBit DIP32 EPROM; Main Program
                 V100.U7  - ST M27C801 8MBit DIP32 EPROM; Audio Samples?
 
-	TODO:
-	 - Game speed seems to be completely wrong, timers and player movement too fast?
+    TODO:
+     - Game speed seems to be completely wrong, timers and player movement too fast?
 
 *********************************************************************************************************************/
 

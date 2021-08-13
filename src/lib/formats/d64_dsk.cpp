@@ -298,14 +298,15 @@ void d64_format::extract_sectors(floppy_image *image, const format &f, desc_s *s
 
 	for(int i=0; i<sector_count; i++) {
 		desc_s &ds = sdesc[i];
-		const auto &data = sectors[ds.sector_id];
-		if(data.empty())
+		if(ds.sector_id >= sectors.size() || sectors[ds.sector_id].empty())
 			memset((void *)ds.data, 0, ds.size);
-		else if(data.size() < ds.size) {
-			memcpy((void *)ds.data, data.data(), data.size());
-			memset((uint8_t *)ds.data + data.size(), 0, data.size() - ds.size);
+
+		else if(sectors[ds.sector_id].size() < ds.size) {
+			memcpy((void *)ds.data, sectors[ds.sector_id].data(), sectors[ds.sector_id].size());
+			memset((uint8_t *)ds.data + sectors[ds.sector_id].size(), 0, sectors[ds.sector_id].size() - ds.size);
+
 		} else
-			memcpy((void *)ds.data, data.data(), ds.size);
+			memcpy((void *)ds.data, sectors[ds.sector_id].data(), ds.size);
 	}
 }
 

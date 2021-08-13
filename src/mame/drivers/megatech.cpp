@@ -411,7 +411,7 @@ void mtech_state::set_genz80_as_md()
 
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram.get());
 
-	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(*m_ymsnd, FUNC(ym2612_device::read)), write8sm_delegate(*m_ymsnd, FUNC(ym2612_device::write)));
+	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(*m_ymsnd, FUNC(ym_generic_device::read)), write8sm_delegate(*m_ymsnd, FUNC(ym_generic_device::write)));
 	prg.install_write_handler    (0x6000, 0x6000, write8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
 	prg.install_write_handler    (0x6001, 0x6001, write8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
 	prg.install_read_handler     (0x6100, 0x7eff, read8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_unmapped_read)));

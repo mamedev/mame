@@ -44,6 +44,8 @@ atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *ta
 	, m_pf1_yscroll(0)
 	, m_mo_xscroll(0)
 	, m_mo_yscroll(0)
+	, m_pf_xoffset(0)
+	, m_pf2_xoffset(4)
 {
 }
 
@@ -362,11 +364,10 @@ void atari_vad_device::internal_control_write(offs_t offset, uint16_t newword)
 
 inline void atari_vad_device::update_pf_xscrolls()
 {
-	m_playfield_tilemap->set_scrollx(0, m_pf0_xscroll_raw + ((m_pf1_xscroll_raw) & 7));
+	m_playfield_tilemap->set_scrollx(0, m_pf0_xscroll_raw + ((m_pf1_xscroll_raw) & 7) + m_pf_xoffset);
 	if (m_playfield2_tilemap != nullptr)
-		m_playfield2_tilemap->set_scrollx(0, m_pf1_xscroll_raw + 4);
+		m_playfield2_tilemap->set_scrollx(0, m_pf1_xscroll_raw + m_pf2_xoffset);
 }
-
 
 //-------------------------------------------------
 //  update_parameter: Update parameters, shared

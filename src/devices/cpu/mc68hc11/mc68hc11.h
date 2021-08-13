@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde, Angelo Salese, hap
+// copyright-holders:Ville Linde, Angelo Salese
 #ifndef MAME_CPU_MC68HC11_MC68HC11_H
 #define MAME_CPU_MC68HC11_MC68HC11_H
 
@@ -8,11 +8,13 @@
 
 enum {
 	MC68HC11_IRQ_LINE           = 0,
-	MC68HC11_TOC1_LINE          = 1
+	MC68HC11_TOC1_LINE          = 1,
+	MC68HC11_RTI_LINE           = 2
 };
 
 DECLARE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device)
 DECLARE_DEVICE_TYPE(MC68HC11D0, mc68hc11d0_device)
+DECLARE_DEVICE_TYPE(MC68HC811E2, mc68hc811e2_device)
 DECLARE_DEVICE_TYPE(MC68HC11F1, mc68hc11f1_device)
 DECLARE_DEVICE_TYPE(MC68HC11K1, mc68hc11k1_device)
 DECLARE_DEVICE_TYPE(MC68HC11M0, mc68hc11m0_device)
@@ -49,7 +51,7 @@ public:
 	auto out_spi2_data_callback() { return m_spi2_data_output_cb.bind(); }
 
 protected:
-	mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t internal_ram_size, uint16_t reg_block_size, uint8_t init_value, address_map_constructor reg_map);
+	mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t ram_size, uint16_t reg_block_size, uint16_t rom_size, uint16_t eeprom_size, uint8_t init_value, uint8_t config_mask, uint8_t option_mask);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -74,6 +76,8 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) = 0;
+
 	template <int P> uint8_t port_r();
 	template <int P> void port_w(uint8_t data);
 	template <int P> uint8_t ddr_r();
@@ -81,15 +85,20 @@ protected:
 	uint8_t pioc_r();
 	uint8_t tcnt_r(offs_t offset);
 	void tcnt_w(offs_t offset, uint8_t data);
-	uint8_t toc1_r(offs_t offset);
-	void toc1_w(offs_t offset, uint8_t data);
+	uint8_t toc_r(offs_t offset);
+	void toc_w(offs_t offset, uint8_t data);
 	uint8_t tmsk1_r();
 	void tmsk1_w(uint8_t data);
 	uint8_t tflg1_r();
 	void tflg1_w(uint8_t data);
+	uint8_t tflg2_r();
+	void tflg2_w(uint8_t data);
+	uint8_t tmsk2_r();
 	void tmsk2_w(uint8_t data);
 	uint8_t pactl_r();
 	void pactl_w(uint8_t data);
+	uint8_t pactl_ddra_r();
+	void pactl_ddra_w(uint8_t data);
 	template <int N> uint8_t spcr_r();
 	template <int N> uint8_t spsr_r();
 	template <int N> uint8_t spdr_r();
@@ -98,8 +107,13 @@ protected:
 	void adctl_w(uint8_t data);
 	uint8_t adr_r(offs_t offset);
 	uint8_t opt2_r();
+	uint8_t config_r();
+	uint8_t config_1s_r();
+	void config_w(uint8_t data);
 	uint8_t init_r();
 	void init_w(uint8_t data);
+	uint8_t option_r();
+	void option_w(uint8_t data);
 	uint8_t scbd_r(offs_t offset);
 	uint8_t sccr1_r();
 	uint8_t sccr2_r();
@@ -109,8 +123,6 @@ protected:
 
 private:
 	address_space_config m_program_config;
-	address_space_config m_data_config;
-	address_space_config m_io_config;
 
 	union {
 		struct {
@@ -140,11 +152,9 @@ private:
 	uint8_t m_adctl;
 	int m_ad_channel;
 
-	uint8_t m_irq_state[2];
+	uint8_t m_irq_state[3];
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
-	memory_access<11, 0, 0, ENDIANNESS_BIG>::specific m_data;
-	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_io;
 	devcb_read8::array<8> m_port_input_cb;
 	devcb_write8::array<8> m_port_output_cb;
 	devcb_read8::array<8> m_analog_cb;
@@ -152,25 +162,37 @@ private:
 	devcb_write8 m_spi2_data_output_cb;
 	int m_icount;
 
-	int m_ram_position;
-	int m_reg_position;
+	memory_view m_ram_view;
+	memory_view m_reg_view;
 
 	const uint16_t m_internal_ram_size;
 	const uint16_t m_reg_block_size; // size of internal I/O space
+	const uint16_t m_internal_rom_size;
+	const uint16_t m_internal_eeprom_size;
 	const uint8_t m_init_value; // default value for INIT register
+	const uint8_t m_config_mask;
+	const uint8_t m_option_mask;
 
 	uint8_t m_wait_state;
 	uint8_t m_stop_state;
 
 	uint8_t m_tflg1;
 	uint8_t m_tmsk1;
-	uint16_t m_toc1;
+	uint16_t m_toc[5];
 	uint16_t m_tcnt;
 //  uint8_t m_por;
-	uint8_t m_pr;
+	uint8_t m_tflg2;
+	uint8_t m_tmsk2;
 	uint8_t m_pactl;
+	uint8_t m_init;
 
+protected:
+	uint8_t m_config;
+	uint8_t m_option;
+
+private:
 	uint64_t m_frc_base;
+	uint64_t m_reset_time;
 
 	typedef void (mc68hc11_cpu_device::*ophandler)();
 	struct hc11_opcode_list_struct
@@ -186,7 +208,7 @@ private:
 	ophandler hc11_optable_page3[256];
 	ophandler hc11_optable_page4[256];
 
-	void ram_map(address_map &map);
+	void internal_map(address_map &map);
 
 	uint8_t FETCH();
 	uint16_t FETCH16();
@@ -524,10 +546,10 @@ public:
 protected:
 	virtual void device_reset() override;
 
-	uint8_t pactl_r();
-	void pactl_w(uint8_t data);
+	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 
-	void io_map(address_map &map);
+	uint8_t pactl_ddra7_r();
+	void pactl_ddra7_w(uint8_t data);
 };
 
 class mc68hc11d0_device : public mc68hc11_cpu_device
@@ -539,10 +561,19 @@ public:
 protected:
 	virtual void device_reset() override;
 
-	uint8_t pactl_r();
-	void pactl_w(uint8_t data);
+	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
+};
 
-	void io_map(address_map &map);
+class mc68hc811e2_device : public mc68hc11_cpu_device
+{
+public:
+	// construction/destruction
+	mc68hc811e2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+
+	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 };
 
 class mc68hc11f1_device : public mc68hc11_cpu_device
@@ -552,7 +583,9 @@ public:
 	mc68hc11f1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void io_map(address_map &map);
+	virtual void device_reset() override;
+
+	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 };
 
 class mc68hc11k1_device : public mc68hc11_cpu_device
@@ -562,7 +595,7 @@ public:
 	mc68hc11k1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void io_map(address_map &map);
+	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 };
 
 class mc68hc11m0_device : public mc68hc11_cpu_device
@@ -572,7 +605,9 @@ public:
 	mc68hc11m0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void io_map(address_map &map);
+	virtual void device_reset() override;
+
+	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 };
 
 #endif // MAME_CPU_MC68HC11_MC68HC11_H

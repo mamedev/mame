@@ -26,7 +26,7 @@ displayed.
 #include "video/hd63484.h"
 #include "audio/seibu.h"
 #include "sound/msm5205.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

@@ -15,7 +15,6 @@
 #include "emuopts.h"
 
 #include "hash.h"
-#include "pool.h"
 
 #include <pugixml.hpp>
 

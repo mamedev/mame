@@ -457,6 +457,10 @@
 #include "oric_tap.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_ORIC_JASMIN
+#include "fs_oric_jasmin.h"
+#endif
+
 #ifdef HAS_FORMATS_IBMXDF_DSK
 #include "ibmxdf_dsk.h"
 #endif
@@ -589,6 +593,10 @@
 #include "thom_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_THOM_DSK
+#include "thom_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_TI99_DSK
 #include "ti99_dsk.h"
 #endif
@@ -643,6 +651,14 @@
 
 #ifdef HAS_FORMATS_VT_CAS
 #include "vt_cas.h"
+#endif
+
+#ifdef HAS_FORMATS_VT_DSK
+#include "vt_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_VTECH
+#include "fs_vtech.h"
 #endif
 
 #ifdef HAS_FORMATS_WD177X_DSK
@@ -1053,7 +1069,8 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_SDF_FORMAT); // sdf_dsk.h
 #endif
 #ifdef HAS_FORMATS_TRS80_DSK
-	en.add(FLOPPY_TRS80_FORMAT); // trs80_dsk.h
+	en.add(FLOPPY_JV1_FORMAT); // trs80_dsk.h
+	en.add(FLOPPY_JV3_FORMAT); // trs80_dsk.h
 #endif
 
 	en.category("Kaypro");
@@ -1125,6 +1142,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_ORIC_DSK
 	en.add(FLOPPY_ORIC_DSK_FORMAT); // oric_dsk.h
+	en.add(FLOPPY_ORIC_JASMIN_FORMAT); // oric_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_ORIC_JASMIN
+	en.add(FS_ORIC_JASMIN); // fs_oric_jasmin.h
 #endif
 
 	en.category("Atari");
@@ -1189,6 +1210,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 
 	en.category("Tandy");
 #ifdef HAS_FORMATS_TRS_CAS
+	en.add(trs80l1_cassette_formats); // trs_cas.h
 	en.add(trs80l2_cassette_formats); // trs_cas.h
 #endif
 #ifdef HAS_FORMATS_TANDY2K_DSK
@@ -1199,6 +1221,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_THOM_CAS
 	en.add(to7_cassette_formats); // thom_cas.h
 	en.add(mo5_cassette_formats); // thom_cas.h
+#endif
+#ifdef HAS_FORMATS_THOM_DSK
+	en.add(FLOPPY_THOMSON_525_FORMAT); // thom_dsk.h
+	en.add(FLOPPY_THOMSON_35_FORMAT); // thom_dsk.h
 #endif
 
 	en.category("Texas Instruments");
@@ -1360,6 +1386,13 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_VT_CAS
 	en.add(vtech1_cassette_formats); // vt_cas.h
 	en.add(vtech2_cassette_formats); // vt_cas.h
+#endif
+#ifdef HAS_FORMATS_VT_DSJ
+	en.add(FLOPPY_VTECH_BIN_FORMAT); // vt_dsk.h
+	en.add(FLOPPY_VTECH_DSK_FORMAT); // vt_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_VTECH
+	en.add(FS_VTECH); // fs_vtech.h
 #endif
 
 	en.category("Canon");

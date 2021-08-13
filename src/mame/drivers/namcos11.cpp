@@ -1267,10 +1267,51 @@ ROM_START( ptblank2b )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 
+// no rom labels, converted from Soul Edge (Japan, SO1/VER.A)
+ROM_START( ptblank2c )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "gnb2verx.2l",  0x0000000, 0x100000, CRC(c2a02ccf) SHA1(fa637ecacc3e72d432c91dbff7d59fe56f28bab2) )
+	ROM_LOAD16_BYTE( "gnb2verx.2j",  0x0000001, 0x100000, CRC(96abd746) SHA1(13720d02ef9e7445422c07836296acde4db4aa50) )
+	ROM_LOAD16_BYTE( "gnb1vera.2k",  0x0200000, 0x100000, CRC(e6335e4e) SHA1(9067f05d848c1c8a88967a3c6552d2d24e80672b) )
+	ROM_LOAD16_BYTE( "gnb1vera.2f",  0x0200001, 0x100000, CRC(2bb7eb6d) SHA1(d1b1e031a28443140ac8652dfd77a65a042b67fc) )
+
+	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "gnb2prg.1",    0x0000000, 0x400000, CRC(8a8e77c3) SHA1(1a37e04a0acd1ab8c5fcbf807f24fd22f1d90a82) ) // == same data as the 64Mbit ROMs
+	ROM_LOAD16_BYTE( "gnb2prg.2",    0x0000001, 0x400000, CRC(563edc3f) SHA1(d691560bded88fe7738de01b293f1e761ab9304c) )
+	ROM_LOAD16_BYTE( "gnb2prg.3",    0x0800000, 0x400000, CRC(94fbe733) SHA1(74634c3680d22697c1cc3059c2bbe1703e77ddf1) )
+	ROM_LOAD16_BYTE( "gnb2prg.4",    0x0800001, 0x400000, CRC(1cbe79a6) SHA1(46e9f72c121ece3457b2f66413489ce6568e5510) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "gnb1vera.6d",  0x0000000, 0x040000, CRC(6461ae77) SHA1(1377b716a69ef9d4d2e48083d23f22bd5c103c00) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "gnb1wave.8k",  0x0000000, 0x400000, CRC(4e19d9d6) SHA1(0a92c987536999a789663a30c787950ab6995128) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
 ROM_START( ptblank2ua )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "gnb3vera.2l",  0x0000000, 0x100000, CRC(57ad719a) SHA1(f22a02d33c7c23cccffb8ce2e3aca26b07ecac0a) )
 	ROM_LOAD16_BYTE( "gnb3vera.2j",  0x0000001, 0x100000, CRC(0378af98) SHA1(601444b5a0935a4b69b5ada618aaf1bc6bb12a3b) )
+	ROM_LOAD16_BYTE( "gnb1vera.2k",  0x0200000, 0x100000, CRC(e6335e4e) SHA1(9067f05d848c1c8a88967a3c6552d2d24e80672b) )
+	ROM_LOAD16_BYTE( "gnb1vera.2f",  0x0200001, 0x100000, CRC(2bb7eb6d) SHA1(d1b1e031a28443140ac8652dfd77a65a042b67fc) )
+
+	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "gnb1prg0l.ic2", 0x000000, 0x800000, CRC(78746037) SHA1(d130ca1153a730e3c967945248f00662f9fab304) )
+	ROM_LOAD16_BYTE( "gnb1prg0u.ic5", 0x000001, 0x800000, CRC(697d3279) SHA1(40302780f7494d9413888b2d1da38bd14a9a444f) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "gnb1vera.6d",  0x0000000, 0x040000, CRC(6461ae77) SHA1(1377b716a69ef9d4d2e48083d23f22bd5c103c00) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "gnb1wave.8k",  0x0000000, 0x400000, CRC(4e19d9d6) SHA1(0a92c987536999a789663a30c787950ab6995128) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
+ROM_START( gunbarla )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "gnb1vera.2l",  0x0000000, 0x100000, CRC(405e2585) SHA1(dc05ce7692e9244db0276fba13800b00a68d2054) )
+	ROM_LOAD16_BYTE( "gnb1vera.2j",  0x0000001, 0x100000, CRC(2d2af8cf) SHA1(e9ad303777d71e8c37f2a83b12fe61ee018dbd8e) )
 	ROM_LOAD16_BYTE( "gnb1vera.2k",  0x0200000, 0x100000, CRC(e6335e4e) SHA1(9067f05d848c1c8a88967a3c6552d2d24e80672b) )
 	ROM_LOAD16_BYTE( "gnb1vera.2f",  0x0200001, 0x100000, CRC(2bb7eb6d) SHA1(d1b1e031a28443140ac8652dfd77a65a042b67fc) )
 
@@ -1776,4 +1817,6 @@ GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, empty_
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, empty_init, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", 0 )
 GAME( 1999, ptblank2a,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A)",            0 )
 GAME( 1999, ptblank2b,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A alt)",        0 )
+GAME( 1999, ptblank2c,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (unknown region)",               0 )
 GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (US, GNB3/VER.A)",               0 )
+GAME( 1999, gunbarla,   ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Gunbarl (Japan, GNB1/VER.A)",                  0 )

@@ -69,6 +69,7 @@ protected:
 	void pop_pc();
 	void push_pc();
 	void op_illegal();
+	void op_todo();
 
 	virtual bool op_is_tr(u8 op) override { return (op & 0xf0) == 0x30; };
 	virtual bool op_is_eob(u8 op) { return (op & 0xfc) == 0x1c; };

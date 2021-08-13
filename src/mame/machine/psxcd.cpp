@@ -1149,7 +1149,8 @@ void psxcd_device::start_play()
 
 	if (mode&mode_autopause)
 	{
-		autopause_sector = cdrom_get_track_start(m_cdrom_handle, track) + cdrom_get_toc(m_cdrom_handle)->tracks[track].frames;
+		auto toc = cdrom_get_toc(m_cdrom_handle);
+		autopause_sector = cdrom_get_track_start(m_cdrom_handle, track) + toc->tracks[track].logframes;
 //      printf("pos=%d auto=%d\n",pos,autopause_sector);
 	}
 

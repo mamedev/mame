@@ -211,10 +211,8 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 // TODO: RF5C164 only?
 u8 rf5c68_device::rf5c68_r(offs_t offset)
 {
-	u8 shift;
-
 	m_stream->update();
-	shift = (offset & 1) ? 11 + 8 : 11;
+	u8 shift = (offset & 1) ? 11 + 8 : 11;
 
 //  printf("%08x\n",(m_chan[(offset & 0x0e) >> 1].addr));
 
@@ -224,7 +222,6 @@ u8 rf5c68_device::rf5c68_r(offs_t offset)
 void rf5c68_device::rf5c68_w(offs_t offset, u8 data)
 {
 	pcm_channel &chan = m_chan[m_cbank];
-	int i;
 
 	/* force the stream to update first */
 	m_stream->update();
@@ -271,7 +268,7 @@ void rf5c68_device::rf5c68_w(offs_t offset, u8 data)
 			break;
 
 		case 0x08:  /* channel on/off reg */
-			for (i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++)
 			{
 				m_chan[i].enable = (~data >> i) & 1;
 				if (!m_chan[i].enable)
@@ -298,5 +295,6 @@ u8 rf5c68_device::rf5c68_mem_r(offs_t offset)
 
 void rf5c68_device::rf5c68_mem_w(offs_t offset, u8 data)
 {
+	m_stream->update();
 	m_cache.write_byte(m_wbank | offset, data);
 }

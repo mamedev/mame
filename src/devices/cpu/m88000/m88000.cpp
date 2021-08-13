@@ -996,14 +996,14 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x740: // ff1: find first bit set
 			{
-				unsigned const count = count_leading_zeros(m_r[S2]);
+				unsigned const count = count_leading_zeros_32(m_r[S2]);
 
 				m_r[D] = (count == 32) ? count : 31 - count;
 			}
 			break;
 		case 0x760: // ff0: find first bit clear
 			{
-				unsigned const count = count_leading_ones(m_r[S2]);
+				unsigned const count = count_leading_ones_32(m_r[S2]);
 
 				m_r[D] = (count == 32) ? count : 31 - count;
 			}

@@ -82,12 +82,13 @@
         code1d,b            RTC self check bad
         gticlub2,ea         Attract mode works. Coins up. Hangs in car selection.
         jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC) - with IRQ3 crashes at first 3d frame
-        mocapglf            Security code error
+        mocapglf            Sensor I/O error
         mocapb,j            Crash after self checks
         p911                "Distribution error"
         p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
         p9112               RTC self check bad
         sscopex/sogeki      Security code error
+        sscopefh            Needs gun inputs.
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in car selection screen.
         thrild2c            Inf loop on blue screen
         tsurugi             Goes to attract mode when ran with memory card check. Coins up.
@@ -354,7 +355,7 @@ some other components. It will be documented at a later date.
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
-#include "video/voodoo.h"
+#include "video/voodoo_banshee.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -582,50 +583,7 @@ private:
 
 uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
-}
-
-#ifdef UNUSED_FUNCTION
-static inline uint64_t read64le_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result |= (uint64_t)(handler)(offset * 2 + 0) << 0;
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
-	return result;
-}
-
-
-static inline uint64_t read64le_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result |= (uint64_t)(handler)(offset * 2 + 0, mem_mask >> 0) << 0;
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1, mem_mask >> 32) << 32;
-	return result;
-}
-
-
-static inline void write64le_with_32sle_device_handler(write32s_delegate handler, offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_0_31)
-		handler(offset * 2 + 0, data >> 0, mem_mask >> 0);
-	if (ACCESSING_BITS_32_63)
-		handler(offset * 2 + 1, data >> 32, mem_mask >> 32);
-}
-#endif
-
-static inline uint64_t read64be_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	mem_mask = swapendian_int64(mem_mask);
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result = (uint64_t)(handler)(offset * 2);
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
-	return swapendian_int64(result);
+	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 static inline uint64_t read64be_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
@@ -1744,35 +1702,35 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 
 uint64_t viper_state::voodoo3_io_r(offs_t offset, uint64_t mem_mask)
 {
-	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_io_r)), offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::read_io)), offset, mem_mask);
 }
 void viper_state::voodoo3_io_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_io_w)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::write_io)), offset, data, mem_mask);
 }
 
 uint64_t viper_state::voodoo3_r(offs_t offset, uint64_t mem_mask)
 {
-	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_r)), offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::read)), offset, mem_mask);
 }
 void viper_state::voodoo3_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_w)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::write)), offset, data, mem_mask);
 }
 
 uint64_t viper_state::voodoo3_lfb_r(offs_t offset, uint64_t mem_mask)
 {
-	return read64be_with_32smle_device_handler(read32sm_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_fb_r)), offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::read_lfb)), offset, mem_mask);
 }
 void viper_state::voodoo3_lfb_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_fb_w)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::write_lfb)), offset, data, mem_mask);
 }
 
 
@@ -2457,10 +2415,11 @@ void viper_state::viper(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	VOODOO_3(config, m_voodoo, STD_VOODOO_3_CLOCK);
+	VOODOO_3(config, m_voodoo, voodoo_3_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(8);
-	m_voodoo->set_screen_tag("screen");
-	m_voodoo->set_cpu_tag("maincpu");
+	m_voodoo->set_screen("screen");
+	m_voodoo->set_cpu("maincpu");
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo->vblank_callback().set(FUNC(viper_state::voodoo_vblank));
 	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 
@@ -2677,10 +2636,10 @@ ROM_START(mocapglf) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(4d9d7178) SHA1(97215aa13136c1393363a0ebd1e5b885ca602293))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x1ff8, BAD_DUMP CRC(0f0ba988) SHA1(5618c03b21fc2ba14b2e159cee3aab7f53c2c34d)) //data looks plain bad (compared to the other games)
+	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x2000, CRC(5eece882) SHA1(945e5e9882bd16513a2947f6823b985d51501fad))
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b33a02", 0, SHA1(819d8fac5d2411542c1b989105cffe38a5545fc2) )
@@ -2835,10 +2794,10 @@ ROM_START(sscopefh)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, NO_DUMP )
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(9271c24f) SHA1(f194fea15969b322c96cce8f0335dccd3475a3e6) )
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
+	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2dd07bdf) SHA1(dadc189625e11c98f68afd988700a842c78b0ca7) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "ccca02", 0, SHA1(ec0d9a1520f17c73750de71dba8b31bc8c9d0409) )

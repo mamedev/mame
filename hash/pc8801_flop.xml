@@ -15338,7 +15338,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="hitsuji">
-		<description>Hitsuji-Ya</description>
+		<description>Hitsuji Yaai</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
@@ -20100,7 +20100,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 	</software>
 
 	<software name="lolitaya">
-		<description>Lolita - Yakyuken</description>
+		<description>Lolita - Yakyuuken</description>
 		<year>1983</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
 		<!-- PC8801 -->
@@ -20114,7 +20114,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 	</software>
 
 	<software name="lolitayaa" cloneof="lolitaya">
-		<description>Lolita - Yakyuken (Alt)</description>
+		<description>Lolita - Yakyuuken (Alt)</description>
 		<year>1983</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
 		<!-- PC8801 -->
@@ -32337,7 +32337,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="sugoroku">
-		<description>Sugoroku Yakyuu-do</description>
+		<description>Sugoroku Yakyuu-dou</description>
 		<year>1989</year>
 		<publisher>日本クリエイト (Nihon Create) / タケル (Takeru)</publisher>
 		<!-- PC8801 -->
@@ -38810,7 +38810,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudo">
-		<description>Yakyuu-do</description>
+		<description>Yakyuu-dou</description>
 		<year>1988</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38849,7 +38849,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudoa" cloneof="yakyudo">
-		<description>Yakyuu-do (Alt)</description>
+		<description>Yakyuu-dou (Alt)</description>
 		<year>1988</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38888,7 +38888,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudod89" cloneof="yakyudo">
-		<description>Yakyuu-do Data Book '89</description>
+		<description>Yakyuu-dou Data Book '89</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38903,7 +38903,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudou" cloneof="yakyudo">
-		<description>Yakyuu-do Taisen Disk Vol.1</description>
+		<description>Yakyuu-dou Taisen Disk Vol.1</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38918,7 +38918,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudo2">
-		<description>Yakyuu-do II</description>
+		<description>Yakyuu-dou II</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38964,7 +38964,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudo2a" cloneof="yakyudo2">
-		<description>Yakyuu-do II (Alt User Disk)</description>
+		<description>Yakyuu-dou II (Alt User Disk)</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -39010,7 +39010,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudo2d90" cloneof="yakyudo2">
-		<description>Yakyuu-do II Data Book '90</description>
+		<description>Yakyuu-dou II Data Book '90</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -39025,7 +39025,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyukyo">
-		<description>Yakyuu Kyo</description>
+		<description>Yakyuu Kyou</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
@@ -45360,7 +45360,7 @@ ExtractDisk  [02]"              " -> "sound on-ten vol.1(a)_02.d88"
 	</software>
 
 	<software name="streetya">
-		<description>Street Yakyuken</description>
+		<description>Street Yakyuuken</description>
 		<year>1991?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="NAMECO" />
@@ -45373,7 +45373,7 @@ ExtractDisk  [02]"              " -> "sound on-ten vol.1(a)_02.d88"
 	</software>
 
 	<software name="streetyaa" cloneof="streetya">
-		<description>Street Yakyuken (Alt)</description>
+		<description>Street Yakyuuken (Alt)</description>
 		<year>1991?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="NAMECO" />
@@ -47966,7 +47966,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<software name="iwasanju">
-		<description>Iwasanjutsunari</description>
+		<description>I wa Sanjutsu Nari</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -50058,9 +50058,10 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<software name="yakyuken">
-		<description>Yakyuken</description>
+		<description>Yakyuuken</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>九十九電機 (Tsukumo Denki)</publisher>
+		<info name="alt_title" value="野球拳"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="yakyuken.d88" size="348848" crc="ab1bb9b7" sha1="26abd7aed8c14c6a321caf8dc3a094d38a879be4"/>
@@ -54417,7 +54418,7 @@ ExtractDisk  [02]"DATA_DISK    " -> "ncs music art v.2_02.d88"
 	</software>
 
 	<software name="packtrum">
-		<description>Pack(Trump Kyo, Yakyuu Kyo,etc)</description>
+		<description>Pack (Trump Kyou, Yakyuu Kyou, etc.)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

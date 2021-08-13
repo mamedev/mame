@@ -240,30 +240,36 @@ public:
 		, m_dvg(*this, "dvg")
 		, m_soundlatch(*this, "soundlatch")
 		, m_leds(*this, "led%u", 0U)
+		, m_spinner(*this, "SPIN%u", 0)
 	{ }
 
 	void omegrace(machine_config &config);
 
 	void init_omegrace();
 
-private:
-	TIMER_CALLBACK_MEMBER(periodic_int);
-	uint8_t omegrace_vg_go_r();
-	uint8_t omegrace_spinner1_r();
-	void omegrace_leds_w(uint8_t data);
-	void main_map(address_map &map);
-	void port_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port(address_map &map);
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dvg_device> m_dvg;
 	required_device<generic_latch_8_device> m_soundlatch;
 	output_finder<4> m_leds;
+	required_ioport_array<2> m_spinner;
+
+	void main_map(address_map &map);
+	void port_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(periodic_int);
+	uint8_t vg_go_r();
+	uint8_t spinner1_r();
+	uint8_t spinner2_r();
+	void outputs_w(uint8_t data);
+
 	emu_timer *m_gbnmi;
 };
 
@@ -304,7 +310,7 @@ TIMER_CALLBACK_MEMBER(omegrace_state::periodic_int)
  *
  *************************************/
 
-uint8_t omegrace_state::omegrace_vg_go_r()
+uint8_t omegrace_state::vg_go_r()
 {
 	if (!machine().side_effects_disabled())
 		m_dvg->go_w();
@@ -322,30 +328,34 @@ uint8_t omegrace_state::omegrace_vg_go_r()
  * Encoder bit mappings
  * The encoder is a 64 way switch, with the inputs scrambled
  * on the input port (and shifted 2 bits to the left for the
- * 1 player encoder
+ * 1 player encoder)
  *
  * 3 6 5 4 7 2 for encoder 1 (shifted two bits left..)
  *
- *
- * 5 4 3 2 1 0 for encoder 2 (not shifted..)
+ * 1 4 3 2 5 0 for encoder 2 (not shifted..)
  */
 
 static const uint8_t spinnerTable[64] =
 {
-	0x00, 0x04, 0x14, 0x10, 0x18, 0x1c, 0x5c, 0x58,
-	0x50, 0x54, 0x44, 0x40, 0x48, 0x4c, 0x6c, 0x68,
-	0x60, 0x64, 0x74, 0x70, 0x78, 0x7c, 0xfc, 0xf8,
-	0xf0, 0xf4, 0xe4, 0xe0, 0xe8, 0xec, 0xcc, 0xc8,
-	0xc0, 0xc4, 0xd4, 0xd0, 0xd8, 0xdc, 0x9c, 0x98,
-	0x90, 0x94, 0x84, 0x80, 0x88, 0x8c, 0xac, 0xa8,
-	0xa0, 0xa4, 0xb4, 0xb0, 0xb8, 0xbc, 0x3c, 0x38,
-	0x30, 0x34, 0x24, 0x20, 0x28, 0x2c, 0x0c, 0x08
+	0x00, 0x01, 0x05, 0x04, 0x06, 0x07, 0x17, 0x16,
+	0x14, 0x15, 0x11, 0x10, 0x12, 0x13, 0x1b, 0x1a,
+	0x18, 0x19, 0x1d, 0x1c, 0x1e, 0x1f, 0x3f, 0x3e,
+	0x3c, 0x3d, 0x39, 0x38, 0x3a, 0x3b, 0x33, 0x32,
+	0x30, 0x31, 0x35, 0x34, 0x36, 0x37, 0x27, 0x26,
+	0x24, 0x25, 0x21, 0x20, 0x22, 0x23, 0x2b, 0x2a,
+	0x28, 0x29, 0x2d, 0x2c, 0x2e, 0x2f, 0x0f, 0x0e,
+	0x0c, 0x0d, 0x09, 0x08, 0x0a, 0x0b, 0x03, 0x02
 };
 
 
-uint8_t omegrace_state::omegrace_spinner1_r()
+uint8_t omegrace_state::spinner1_r()
 {
-	return (spinnerTable[ioport("SPIN0")->read() & 0x3f]);
+	return spinnerTable[m_spinner[0]->read() & 0x3f] << 2;
+}
+
+uint8_t omegrace_state::spinner2_r()
+{
+	return spinnerTable[m_spinner[1]->read() & 0x3f];
 }
 
 
@@ -356,7 +366,7 @@ uint8_t omegrace_state::omegrace_spinner1_r()
  *
  *************************************/
 
-void omegrace_state::omegrace_leds_w(uint8_t data)
+void omegrace_state::outputs_w(uint8_t data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -392,7 +402,7 @@ void omegrace_state::main_map(address_map &map)
 void omegrace_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x08, 0x08).r(FUNC(omegrace_state::omegrace_vg_go_r));
+	map(0x08, 0x08).r(FUNC(omegrace_state::vg_go_r));
 	map(0x09, 0x09).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x0a, 0x0a).w(m_dvg, FUNC(dvg_device::reset_w));
 	map(0x0b, 0x0b).portr("AVGDVG");             /* vg_halt */
@@ -400,10 +410,10 @@ void omegrace_state::port_map(address_map &map)
 	map(0x17, 0x17).portr("DSW2");               /* DIP SW C6 */
 	map(0x11, 0x11).portr("IN0");                /* Player 1 input */
 	map(0x12, 0x12).portr("IN1");                /* Player 2 input */
-	map(0x13, 0x13).w(FUNC(omegrace_state::omegrace_leds_w));          /* coin counters, leds, flip screen */
+	map(0x13, 0x13).w(FUNC(omegrace_state::outputs_w)); /* coin counters, leds, flip screen */
 	map(0x14, 0x14).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x15, 0x15).r(FUNC(omegrace_state::omegrace_spinner1_r));       /* 1st controller */
-	map(0x16, 0x16).portr("SPIN1");              /* 2nd controller (cocktail) */
+	map(0x15, 0x15).r(FUNC(omegrace_state::spinner1_r)); /* 1st controller */
+	map(0x16, 0x16).r(FUNC(omegrace_state::spinner2_r)); /* 2nd controller (cocktail) */
 }
 
 

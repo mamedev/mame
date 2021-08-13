@@ -239,13 +239,13 @@ _mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    count_leading_zeros - return the number of
+    count_leading_zeros_32 - return the number of
     leading zero bits in a 32-bit value
 -------------------------------------------------*/
 
-#define count_leading_zeros _count_leading_zeros
+#define count_leading_zeros_32 _count_leading_zeros_32
 inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_zeros(uint32_t value)
+_count_leading_zeros_32(uint32_t value)
 {
 	uint32_t result;
 
@@ -255,18 +255,18 @@ _count_leading_zeros(uint32_t value)
 		: [value]  "r"  (value)
 	);
 
-	return result;
+	return uint8_t(result);
 }
 
 
 /*-------------------------------------------------
-    count_leading_ones - return the number of
+    count_leading_ones_32 - return the number of
     leading one bits in a 32-bit value
 -------------------------------------------------*/
 
-#define count_leading_ones _count_leading_ones
+#define count_leading_ones_32 _count_leading_ones_32
 inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_ones(uint32_t value)
+_count_leading_ones_32(uint32_t value)
 {
 	uint32_t result;
 
@@ -276,7 +276,53 @@ _count_leading_ones(uint32_t value)
 		: [value]  "r"  (~value)
 	);
 
-	return result;
+	return uint8_t(result);
 }
+
+
+/*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#if defined(__ppc64__)
+#define count_leading_zeros_64 _count_leading_zeros_64
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_zeros_64(uint64_t value)
+{
+	uint64_t result;
+
+	__asm__ (
+		" cntlzd  %[result], %[value] \n"
+		: [result] "=r" (result)
+		: [value]  "r"  (value)
+	);
+
+	return uint8_t(result);
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_64 - return the number of
+    leading one bits in a 64-bit value
+-------------------------------------------------*/
+
+#if defined(__ppc64__)
+#define count_leading_ones_64 _count_leading_ones_64
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_ones_64(uint64_t value)
+{
+	uint64_t result;
+
+	__asm__ (
+		" cntlzd  %[result], %[value] \n"
+		: [result] "=r" (result)
+		: [value]  "r"  (~value)
+	);
+
+	return uint8_t(result);
+}
+#endif
 
 #endif // MAME_OSD_EIGCCPPC_H

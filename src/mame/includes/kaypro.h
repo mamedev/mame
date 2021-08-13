@@ -80,6 +80,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	u8 kaypro_videoram_r(offs_t offset);
 	void kaypro_videoram_w(offs_t offset, u8 data);
+	static void floppy_formats(format_registration &fr);
 
 	void kaypro_palette(palette_device &palette) const;
 	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -81,6 +81,7 @@ private:
 	uint8_t    m_video_y;
 	uint8_t    m_video_command;
 	uint8_t    m_video_data;
+	uint8_t    m_video_previous;
 
 	/* devices */
 	optional_device<cpu_device> m_audiocpu;

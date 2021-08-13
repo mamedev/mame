@@ -169,8 +169,6 @@ void desdis_state::update_lcd()
 	u8 mask = (m_select & 8) ? 0 : 0xff;
 	for (int i = 0; i < 4; i++)
 		m_display->write_row(i+2, (m_lcd_data >> (8*i) & 0xff) ^ mask);
-
-	m_display->update();
 }
 
 void desdis_state::control_w(offs_t offset, u8 data)
@@ -188,7 +186,7 @@ void desdis_state::control_w(offs_t offset, u8 data)
 	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q0,Q1: led select (active low)
-	m_display->matrix_partial(0, 2, ~m_select & 3, led_data, false);
+	m_display->matrix_partial(0, 2, ~m_select & 3, led_data);
 
 	// 74259 Q2: book rom A14
 	if (m_rombank != nullptr)

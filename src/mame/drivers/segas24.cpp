@@ -347,7 +347,7 @@ Notes:
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/segaic24.h"
 #include "speaker.h"
 

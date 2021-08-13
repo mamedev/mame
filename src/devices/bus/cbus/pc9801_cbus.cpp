@@ -2,7 +2,12 @@
 // copyright-holders:Angelo Salese
 /**********************************************************************
 
-    CCBUS Slot interface for PC-98xx family
+    C-bus slot interface for PC-98xx family
+
+    a.k.a. NEC version of the ISA bus.
+
+    TODO:
+    - stub interface, checkout what actually belongs here.
 
 **********************************************************************/
 
@@ -15,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device, "pc9801_slot", "PC-9801 sound cbus slot")
+DEFINE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device, "pc9801_slot", "PC-9801 C-bus slot")
 
 
 
@@ -110,7 +115,7 @@ template<typename R, typename W> void pc9801_slot_device::install_io(offs_t star
 			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
 			break;
 		default:
-			fatalerror("PC-9801-26: Bus width %d not supported\n", buswidth);
+			fatalerror("PC-9801 C-bus: Bus width %d not supported\n", buswidth);
 	}
 }
 

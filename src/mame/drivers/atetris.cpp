@@ -9,9 +9,8 @@
     Games supported:
         * Tetris
 
-    Known bugs:
-        * the bootlegs don't actually have the slapstic. The additional
-          hardware needs to be emulated.
+    Though of course none of the bootlegs have the actual SLAPSTIC, at
+    least some appear to have simulated it using TTL and PLDs.
 
 ****************************************************************************
 
@@ -382,9 +381,9 @@ void atetris_state::atetris(machine_config &config)
 
 void atetris_state::atetrisb2(machine_config &config)
 {
-	atetris_base(config);
-
-	EEPROM_2804(config, "eeprom").lock_after_write(true);
+	atetris(config);
+	config.device_remove("pokey1");
+	config.device_remove("pokey2");
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(BOOTLEG_CLOCK/8);
@@ -398,11 +397,11 @@ void atetris_state::atetrisb2(machine_config &config)
 
 void atetris_mcu_state::atetrisb3(machine_config &config)
 {
-	atetris_base(config);
+	atetris(config);
+	config.device_remove("pokey1");
+	config.device_remove("pokey2");
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_mcu_state::atetrisb3_map);
-
-	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	I8749(config, m_mcu, 10_MHz_XTAL);
 	m_mcu->bus_in_cb().set(FUNC(atetris_mcu_state::mcu_bus_r));
@@ -417,7 +416,7 @@ void atetris_mcu_state::atetrisb3(machine_config &config)
 
 	for (int i = 0; i < 4; i++)
 	{
-		SN76489A(config, m_sn[i], 4000000).add_route(ALL_OUTPUTS, "mono", 0.50);
+		SN76489A(config, m_sn[i], 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.50);
 	}
 }
 

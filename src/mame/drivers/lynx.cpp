@@ -169,7 +169,10 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 
 	/* Check the image */
 	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) != image_verify_result::PASS)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a valid Lynx file");
 		return image_init_result::FAIL;
+	}
 
 	start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
 	length = header[5] | (header[4]<<8);
@@ -179,6 +182,7 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 
 	if (image.fread( &data[0], length) != length)
 	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid length in file header");
 		return image_init_result::FAIL;
 	}
 

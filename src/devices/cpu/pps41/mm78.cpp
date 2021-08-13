@@ -50,17 +50,17 @@ void mm78_device::program_2k(address_map &map)
 	map(0x000, 0x7ff).rom();
 }
 
-void mm77_device::program_1_3k(address_map &map)
+void mm78_device::program_1_3k(address_map &map)
 {
 	map(0x040, 0x1ff).rom();
 	map(0x240, 0x3ff).rom();
 	map(0x640, 0x7ff).rom();
 }
 
-void mm77l_device::program_1_5k(address_map &map)
+void mm78_device::program_1_5k(address_map &map)
 {
 	map(0x000, 0x3ff).rom();
-	map(0x600, 0x7ff).rom();
+	map(0x400, 0x5ff).mirror(0x200).rom();
 }
 
 void mm78_device::data_128x4(address_map &map)
@@ -68,7 +68,7 @@ void mm78_device::data_128x4(address_map &map)
 	map(0x00, 0x7f).ram();
 }
 
-void mm77_device::data_96x4(address_map &map)
+void mm78_device::data_96x4(address_map &map)
 {
 	map(0x00, 0x3f).ram();
 	map(0x40, 0x47).mirror(0x18).ram(); // not to 0x50

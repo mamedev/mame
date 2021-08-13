@@ -79,7 +79,7 @@ protected:
 	uint8_t   m_wai_state;      /* WAI opcode state ,(or sleep opcode state) */
 	uint8_t   m_nmi_state;      /* NMI line state */
 	uint8_t   m_nmi_pending;    /* NMI pending */
-	uint8_t   m_irq_state[3];   /* IRQ line state [IRQ1,TIN,SC1] */
+	uint8_t   m_irq_state[4];   /* IRQ line state [IRQ1,TIN,SC1,IS] */
 
 	/* Memory spaces */
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cprogram, m_copcodes;
@@ -103,11 +103,11 @@ protected:
 	void WM16(uint32_t Addr, PAIR *p );
 	void enter_interrupt(const char *message,uint16_t irq_vector);
 	virtual void m6800_check_irq2() { }
-	void CHECK_IRQ_LINES();
+	void check_irq_lines();
 	virtual void increment_counter(int amount);
-	virtual void EAT_CYCLES();
-	virtual void CLEANUP_COUNTERS() { }
-	virtual void TAKE_TRAP() { }
+	virtual void eat_cycles();
+	virtual void cleanup_counters() { }
+	virtual void take_trap() { }
 
 	void aba();
 	void abx();

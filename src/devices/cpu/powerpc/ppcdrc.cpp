@@ -1739,7 +1739,10 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 		if (PRINTF_MMU)
 		{
 			const char *text = "Compiler page fault @ %08X\n";
-			UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
+			if (sizeof(uintptr_t) == 8)
+				UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);                   // mov     [format],text
+			else
+				UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
 			UML_MOV(block, mem(&m_core->arg0), desc->pc);                        // mov     [arg0],desc->pc
 			UML_CALLC(block, cfunc_printf_debug, this);                                      // callc   printf_debug
 		}
@@ -1757,7 +1760,10 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			if (PRINTF_MMU)
 			{
 				const char *text = "Checking TLB at @ %08X\n";
-				UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                // mov     [format],text
+				if (sizeof(uintptr_t) == 8)
+					UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);                   // mov     [format],text
+				else
+					UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
 				UML_MOV(block, mem(&m_core->arg0), desc->pc);                    // mov     [arg0],desc->pc
 				UML_CALLC(block, cfunc_printf_debug, this);                                  // callc   printf_debug
 			}
@@ -1772,7 +1778,10 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			if (PRINTF_MMU)
 			{
 				const char *text = "No valid TLB @ %08X\n";
-				UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                // mov     [format],text
+				if (sizeof(uintptr_t) == 8)
+					UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);                   // mov     [format],text
+				else
+					UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
 				UML_MOV(block, mem(&m_core->arg0), desc->pc);                    // mov     [arg0],desc->pc
 				UML_CALLC(block, cfunc_printf_debug, this);                                  // callc   printf_debug
 			}
@@ -3066,9 +3075,11 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 
 		case 0x215: /* LSWX */
 			UML_ADD(block, mem(&m_core->updateaddr), R32Z(G_RA(op)), R32(G_RB(op))); // add     [updateaddr],ra,rb
-			UML_AND(block, mem(&m_core->swcount), SPR32(SPR_XER), 0x7f);     // and     [swcount],[xer],0x7f
-			UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), mem(&m_core->swcount));// sub  icount,icount,[swcount]
-			UML_CALLHc(block, COND_NZ, *m_lsw[m_core->mode][G_RD(op)]); // call    lsw[rd],nz
+			UML_AND(block, I0, SPR32(SPR_XER), 0x7f);   // and     i0,[xer],0x7f
+			UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I0);// sub  icount,icount,i0
+			UML_MOV(block, mem(&m_core->swcount), I0);  // mov [swcount],i0
+			UML_TEST(block, I0, I0); // test i0,i0
+			UML_CALLHc(block, COND_NZ, *m_lsw[m_core->mode][G_RD(op)]);    // call   lsw[rd]
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
 
@@ -3218,8 +3229,10 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 
 		case 0x295: /* STSWX */
 			UML_ADD(block, mem(&m_core->updateaddr), R32Z(G_RA(op)), R32(G_RB(op))); // add     [updateaddr],ra,rb
-			UML_AND(block, mem(&m_core->swcount), SPR32(SPR_XER), 0x7f);     // and     [swcount],[xer],0x7f
-			UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), mem(&m_core->swcount));// sub  icount,icount,[swcount]
+			UML_AND(block, I0, SPR32(SPR_XER), 0x7f);   // and     i0,[xer],0x7f
+			UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I0);// sub  icount,icount,i0
+			UML_MOV(block, mem(&m_core->swcount), I0);  // mov [swcount],i0
+			UML_TEST(block, I0, I0); // test i0,i0
 			UML_CALLHc(block, COND_NZ, *m_stsw[m_core->mode][G_RD(op)]);    // call   stsw[rd]
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
@@ -3405,7 +3418,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			return true;
 
 		case 0x200: /* MCRXR */
-			UML_ROLAND(block, I0, SPR32(SPR_XER), 28, 0x0f);                    // roland  i0,[xer],28,0x0f
+			UML_ROLAND(block, I0, SPR32(SPR_XER), 4, 0x0f);                    // roland  i0,[xer],4,0x0f
 			UML_SHL(block, I1, XERSO32, 3);                                     // shl     i1,[xerso],3
 			UML_OR(block, CR32(G_CRFD(op)), I0, I1);                                // or      [crd],i0,i1
 			UML_AND(block, SPR32(SPR_XER), SPR32(SPR_XER), ~0xf0000000);                // and     [xer],[xer],~0xf0000000

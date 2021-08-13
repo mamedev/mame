@@ -100,6 +100,7 @@ bagman.cpp
 bailey.cpp
 balsente.cpp
 bankp.cpp
+banprestoms.cpp
 baraduke.cpp
 barata.cpp
 barni.cpp
@@ -296,6 +297,7 @@ d9final.cpp
 dacholer.cpp
 dai3wksi.cpp
 dambustr.cpp
+dangbar.cpp
 darius.cpp
 darkmist.cpp
 darkseal.cpp
@@ -439,6 +441,7 @@ funworld.cpp
 funybubl.cpp
 fuukifg2.cpp
 fuukifg3.cpp
+fwheel.cpp
 g627.cpp
 gaelco.cpp
 gaelco2.cpp
@@ -452,6 +455,7 @@ galastrm.cpp
 galaxi.cpp
 galaxia.cpp
 galaxian.cpp
+galaxian_rockclim.cpp
 galaxold.cpp
 galgame.cpp
 galgames.cpp
@@ -751,6 +755,7 @@ mcr3.cpp
 mcr68.cpp
 meadows.cpp
 meadwttl.cpp
+mechatt.cpp
 mediagx.cpp
 megadriv_acbl.cpp
 megaphx.cpp
@@ -796,6 +801,7 @@ minivadr.cpp
 minivideo.cpp
 mirage.cpp
 mirax.cpp
+missamer.cpp
 missb2.cpp
 missbamby.cpp
 missile.cpp
@@ -973,6 +979,7 @@ play_1.cpp
 play_2.cpp
 play_3.cpp
 playcenter.cpp
+plsonic4.cpp
 pluto5.cpp
 plygonet.cpp
 pntnpuzl.cpp
@@ -1001,6 +1008,7 @@ pse.cpp
 psikyo.cpp
 psikyo4.cpp
 psikyosh.cpp
+psrockman.cpp
 psychic5.cpp
 pturn.cpp
 pubtimed.cpp
@@ -1022,6 +1030,7 @@ quizshow.cpp
 r2dtank.cpp
 r2dx_v33.cpp
 rabbit.cpp
+radikaldarts.cpp
 raiden.cpp
 raiden2.cpp
 raiden_ms.cpp
@@ -1042,6 +1051,7 @@ renegade.cpp
 retofinv.cpp
 rf51w14cg.cpp
 rfslots8085.cpp
+rfslotsmcs48.cpp
 rfslotspcpent.cpp
 rgum.cpp
 rltennis.cpp
@@ -1088,6 +1098,7 @@ sbmjb.cpp
 sbowling.cpp
 sbrkout.cpp
 sbugger.cpp
+schexx4gen.cpp
 schick.cpp
 scm_500.cpp
 scobra.cpp
@@ -1115,6 +1126,7 @@ segaorun.cpp
 segas16a.cpp
 segas16b.cpp
 segas18.cpp
+segas18_astormbl.cpp
 segas24.cpp
 segas32.cpp
 segasp.cpp
@@ -1413,11 +1425,13 @@ vigilant.cpp
 vindictr.cpp
 viper.cpp
 vlc.cpp
+vlc34010.cpp
 volfied.cpp
 voyager.cpp
 vp101.cpp
 vpoker.cpp
 vroulet.cpp
+vsmjtria.cpp
 vsnes.cpp
 vulgus.cpp
 wacky_gator.cpp

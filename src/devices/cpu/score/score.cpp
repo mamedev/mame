@@ -126,7 +126,7 @@ void score7_cpu_device::device_reset()
 	memset(m_cr, 0, sizeof(m_cr));
 	memset(m_sr, 0, sizeof(m_sr));
 	memset(m_ce, 0, sizeof(m_ce));
-	memset(m_pending_interrupt, 0, sizeof(m_pending_interrupt));
+	m_pending_interrupt = 0;
 
 	REG_EXCPVEC = m_pc = 0x9f000000;
 }
@@ -180,7 +180,8 @@ void score7_cpu_device::execute_run()
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
-		check_irq();
+		if (m_pending_interrupt)
+			check_irq();
 
 		uint32_t op = fetch();
 
@@ -223,9 +224,7 @@ void score7_cpu_device::execute_set_input(int inputnum, int state)
 	{
 		standard_irq_callback(inputnum);
 		if (inputnum > 0 && inputnum < 64)
-		{
-			m_pending_interrupt[inputnum] = true;
-		}
+			m_pending_interrupt |= 1ULL << inputnum;
 	}
 }
 
@@ -322,9 +321,9 @@ void score7_cpu_device::check_irq()
 	{
 		for (int i=63; i>0; i--)
 		{
-			if (m_pending_interrupt[i])
+			if (m_pending_interrupt & (1ULL << i))
 			{
-				m_pending_interrupt[i] = false;
+				m_pending_interrupt &= ~(1ULL << i);
 				standard_irq_callback(i);
 				gen_exception(EXCEPTION_INTERRUPT, i);
 				return;
@@ -1320,6 +1319,11 @@ void score7_cpu_device::op_iform1a()
 		case 0x06:  // bittst!
 			CHECK_N(m_gpr[rd]);
 			CHECK_Z(m_gpr[rd] & (1 << imm5));
+			break;
+		case 0x07:  // bittgl!
+			m_gpr[rd] ^= (1 << imm5);
+			CHECK_Z(m_gpr[rd]);
+			CHECK_N(m_gpr[rd]);
 			break;
 		default:
 			op_undef();

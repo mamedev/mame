@@ -74,17 +74,7 @@ Address  Function Register  R/W  When Reset          Remarks
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
 /* ======================================================================== */
 
-#undef int8
-
-/* Allow for architectures that don't have 8-bit sizes */
-#if UCHAR_MAX == 0xff
-#define int8 char
-#define MAKE_INT_8(A) (int8)((A)&0xff)
-#else
-#define int8   int
-static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
-#endif /* UCHAR_MAX == 0xff */
-
+#define MAKE_INT_8(A) (int8_t)((A)&0xff)
 #define MAKE_UINT_8(A) ((A)&0xff)
 #define MAKE_UINT_16(A) ((A)&0xffff)
 

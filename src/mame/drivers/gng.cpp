@@ -408,10 +408,7 @@ void gng_state::gng(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.59);    /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(XTAL(12'000'000)/2, 384, 128, 0, 262, 22, 246);  // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(gng_state::screen_update_gng));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
