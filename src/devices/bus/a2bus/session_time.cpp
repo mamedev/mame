@@ -35,6 +35,7 @@ DEFINE_DEVICE_TYPE(SESSION_TIME, session_time_device, "session_time", "Session T
 
 INPUT_PORTS_START(session_time)
 	PORT_START("CNF")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, session_time_device, reset_session_time, 0)
 INPUT_PORTS_END
 
 
@@ -77,6 +78,7 @@ void session_time_device::device_start()
 {
 	time(&m_session_time);  // initialize session time
 	initprintername();
+	pagecount = 0;
 
 }
 
@@ -86,6 +88,13 @@ void session_time_device::device_reset_after_children()
 
 void session_time_device::device_reset()
 {
+}
+
+
+INPUT_CHANGED_MEMBER(session_time_device::reset_session_time)
+{
+	device_start();
+	machine().popmessage("Reset Session Time = " + getprintername());
 }
 
 void session_time_device::write_snapshot_to_file(std::string directory, std::string name)
@@ -129,7 +138,7 @@ std::string session_time_device::sessiontime()
 	struct tm *info;
 	char buffer[80];
 	info = localtime( &m_session_time );
-	strftime(buffer,120,"%Y-%m-%d %H-%M-%S", info);
+	strftime(buffer,120,"%Y-%m-%d__%H-%M-%S", info);
 	return std::string(buffer);
 }
 

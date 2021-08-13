@@ -40,6 +40,7 @@ private:
 	std::string m_snapshotdir;
 	time_t m_session_time;
 
+	DECLARE_INPUT_CHANGED_MEMBER(reset_session_time);
 public:
 
 	u32 pagecount = 0;
