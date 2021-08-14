@@ -103,9 +103,16 @@
 #define LOG_GIME        (1U <<  2)
 #define LOG_TIMER       (1U <<  3)
 #define LOG_PALETTE     (1U <<  4)
+#define LOG_MMU         (1U <<  5)
+#define LOG_FBITS       (1U <<  6)
+#define LOG_VBITS       (1U <<  7)
+#define LOG_PBITS       (1U <<  8)
+#define LOG_TBITS       (1U <<  9)
+#define LOG_MBITS       (1U << 10)
+#define LOG_RBITS       (1U << 11)
 
 #define VERBOSE (0)
-//#define VERBOSE (LOG_INT_MASKING|LOG_GIME|LOG_TIMER)
+//#define VERBOSE (LOG_GIME|LOG_PBITS|LOG_PBITS|LOG_MMU)
 
 #include "logmacro.h"
 
@@ -113,6 +120,13 @@
 #define LOGGIME(...) LOGMASKED(LOG_GIME, __VA_ARGS__)
 #define LOGTIMER(...) LOGMASKED(LOG_TIMER, __VA_ARGS__)
 #define LOGPALETTE(...) LOGMASKED(LOG_PALETTE, __VA_ARGS__)
+#define LOGMMU(...) LOGMASKED(LOG_MMU, __VA_ARGS__)
+#define LOGFBITS(...) LOGMASKED(LOG_FBITS, __VA_ARGS__)
+#define LOGVBITS(...) LOGMASKED(LOG_VBITS, __VA_ARGS__)
+#define LOGPBITS(...) LOGMASKED(LOG_PBITS, __VA_ARGS__)
+#define LOGTBITS(...) LOGMASKED(LOG_TBITS, __VA_ARGS__)
+#define LOGMBITS(...) LOGMASKED(LOG_MBITS, __VA_ARGS__)
+#define LOGRBITS(...) LOGMASKED(LOG_RBITS, __VA_ARGS__)
 
 
 
@@ -531,16 +545,19 @@ void gime_device::update_memory(int bank)
 
 	// bank 8 is really $FE00-$FEFF; it is weird so adjust for it
 	offs_t offset;
+	bool force_ram;
 	bool enable_mmu = (m_gime_registers[0] & 0x40) ? true : false;
 	if (bank == 8)
 	{
 		bank = 7;
 		offset = 0x1E00;
+		force_ram = (m_gime_registers[0] & 0x08);
 		enable_mmu = enable_mmu && !(m_gime_registers[0] & 0x08);
 	}
 	else
 	{
 		offset = 0x0000;
+		force_ram = false;
 	}
 
 	// is the MMU enabled at $FF90?
@@ -565,7 +582,7 @@ void gime_device::update_memory(int bank)
 	// are we actually in ROM?
 	uint8_t *memory;
 	bool is_read_only;
-	if (((block & 0x3F) >= 0x3C) && !(m_sam_state & SAM_STATE_TY))
+	if (((block & 0x3F) >= 0x3C) && !(m_sam_state & SAM_STATE_TY) && !force_ram)
 	{
 		// we're in ROM
 		const uint8_t rom_mode = m_gime_registers[0] & 3;
@@ -1023,6 +1040,8 @@ inline void gime_device::write_mmu_register(offs_t offset, uint8_t data)
 		m_mmu[offset] = data;
 		update_memory(offset & 0x07);
 	}
+
+	LOGMMU("%s: MMU Write: $%04x <== $%02X\n",describe_context(), 0xffa0+offset, data );
 }
 
 
@@ -1077,6 +1096,48 @@ inline void gime_device::write_sam_register(offs_t offset)
 
 	if (xorval & (SAM_STATE_R1|SAM_STATE_R0))
 		update_cpu_clock();
+
+	if (xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
+	{
+		LOGFBITS("%s: SAM F Address: $%04x\n",
+			describe_context(),
+			display_offset());
+	}
+
+	if (xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
+	{
+		LOGVBITS("%s: SAM V Bits: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2)));
+	}
+
+	if (xorval & (SAM_STATE_P1))
+	{
+		LOGPBITS("%s: SAM P1 Bit: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_P1)) >> 10);
+	}
+
+	if (xorval & (SAM_STATE_TY))
+	{
+		LOGTBITS("%s: SAM TY Bits: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_TY)) >> 15);
+	}
+
+	if (xorval & (SAM_STATE_M0|SAM_STATE_M1))
+	{
+		LOGMBITS("%s: SAM M Bits: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 9);
+	}
+
+	if (xorval & (SAM_STATE_R0|SAM_STATE_R1))
+	{
+		LOGRBITS("%s: SAM R Bits: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_R0|SAM_STATE_R1)) >> 11);
+	}
 }
 
 
