@@ -1292,7 +1292,7 @@ license:CC0
 		<description>Chuushaki - Hirasawa Nurse School</description>
 		<year>1996</year>
 		<publisher>アーヴォリオ (Aypio)</publisher>
-		<info name="alt_title" value="注射器" />
+		<info name="alt_title" value="注射器　Ｈｉｒａｓａｗａ　Ｎｕｒｓｅ　Ｓｃｈｏｏｌ" />
 		<info name="release" value="19960726" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2901,7 +2901,7 @@ license:CC0
 		<year>1993</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="HME-152 / MTC-1051"/>
-		<info name="alt_title" value="イフ" />
+		<info name="alt_title" value="イフ　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="199306xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2940,7 +2940,7 @@ license:CC0
 		<year>1993</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="HMF-228 / 2TD-3003"/>
-		<info name="alt_title" value="イフ2" />
+		<info name="alt_title" value="イフ２　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="19931119" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2960,7 +2960,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="2TD-3021"/>
-		<info name="alt_title" value="イフ3" />
+		<info name="alt_title" value="イフ３　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="199504xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
