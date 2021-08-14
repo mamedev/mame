@@ -96,24 +96,7 @@ INPUT_CHANGED_MEMBER(session_time_device::reset_session_time)
 	device_start();
 	machine().popmessage("Reset Session Time = " + getprintername());
 }
-/*
-void session_time_device::write_snapshot_to_file(std::string directory, std::string name)
-{
-	printf("write snapshot\n");
-	emu_file file(machine().options().snapshot_directory() + std::string("/") + directory,
-		  OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-	auto const filerr = file.open(name);
-
-	if (filerr == osd_file::error::NONE)
-	{
-		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
-
-		// save the paper into a png
-		util::png_write_bitmap(file, nullptr, *m_bitmap, 2, png_palette);
-	}
-}
-*/
 std::string session_time_device::fixchar(std::string in, char from, char to)
 {
 	std::string final;

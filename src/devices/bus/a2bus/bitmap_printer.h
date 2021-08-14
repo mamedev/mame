@@ -113,17 +113,6 @@ public:
 
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
 	void bitmap_clear_band(int from_line, int to_line, u32 color);
-/*
-	device_t* getrootdev();
-	std::string fixchar(std::string in, char from, char to);
-	std::string fixcolons(std::string in);
-	std::string sessiontime();
-	std::string tagname();
-	std::string simplename();
-	void setprintername(std::string name){ m_printername = name; }
-	std::string getprintername(){ return m_printername; }
-	void initprintername(){ setprintername(sessiontime() + std::string(" ") + simplename()); }
-*/
 	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
 };
 
