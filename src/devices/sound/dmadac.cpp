@@ -23,8 +23,6 @@
 
 #define DEFAULT_SAMPLE_RATE         (48000)
 
-#define BUFFER_SIZE                 32768
-
 
 /*************************************
  *
@@ -88,87 +86,6 @@ void dmadac_sound_device::flush()
 {
 	m_channel->update();
 }
-
-void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int16_t *data)
-{
-	int j;
-
-	/* loop over all channels and accumulate the data */
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / double(std::numeric_limits<int16_t>::max());
-	if (m_enabled)
-	{
-		int maxin = (m_bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
-		int16_t *src = data + channel * channel_spacing;
-		int curin = m_bufin;
-
-		/* copy the data */
-		for (j = 0; j < total_frames && curin != maxin; j++)
-		{
-			m_buffer[curin] = stream_buffer::sample_t(*src) * sample_scale;
-			curin = (curin + 1) % BUFFER_SIZE;
-			src += frame_spacing;
-		}
-		m_bufin = curin;
-
-		/* log overruns */
-		if (j != total_frames)
-			logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
-	}
-}
-
-void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int32_t *data)
-{
-	int j;
-
-	/* loop over all channels and accumulate the data */
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / double(std::numeric_limits<int32_t>::max());
-	if (m_enabled)
-	{
-		int maxin = (m_bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
-		int32_t *src = data + channel * channel_spacing;
-		int curin = m_bufin;
-
-		/* copy the data */
-		for (j = 0; j < total_frames && curin != maxin; j++)
-		{
-			m_buffer[curin] = stream_buffer::sample_t(*src) * sample_scale;
-			curin = (curin + 1) % BUFFER_SIZE;
-			src += frame_spacing;
-		}
-		m_bufin = curin;
-
-		/* log overruns */
-		if (j != total_frames)
-			logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
-	}
-}
-
-void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, stream_buffer::sample_t *data)
-{
-	int j;
-
-	/* loop over all channels and accumulate the data */
-	if (m_enabled)
-	{
-		int maxin = (m_bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
-		stream_buffer::sample_t *src = data + channel * channel_spacing;
-		int curin = m_bufin;
-
-		/* copy the data */
-		for (j = 0; j < total_frames && curin != maxin; j++)
-		{
-			m_buffer[curin] = *src;
-			curin = (curin + 1) % BUFFER_SIZE;
-			src += frame_spacing;
-		}
-		m_bufin = curin;
-
-		/* log overruns */
-		if (j != total_frames)
-			logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
-	}
-}
-
 
 
 /*************************************
