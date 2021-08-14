@@ -70,6 +70,7 @@ void swim2_device::device_reset()
 	m_devsel_cb(0);
 	m_sel35_cb(true);
 	m_hdsel_cb(false);
+	m_dat1byte_cb(0);
 	m_flux_write_start = 0;
 	m_flux_write_count = 0;
 	std::fill(m_flux_write.begin(), m_flux_write.end(), 0);
@@ -282,11 +283,15 @@ void swim2_device::write(offs_t offset, u8 data)
 		m_mode |= 0x40;
 		m_param_idx = 0;
 		show_mode();
+		if(data & 0x10)
+			m_dat1byte_cb((m_fifo_pos != 0) ? 1 : 0);
 		break;
 
 	case 7: // mode set
 		m_mode |= data;
 		show_mode();
+		if(data & 0x10)
+			m_dat1byte_cb((m_fifo_pos != 2) ? 1 : 0);
 		break;
 
 	default:
@@ -367,6 +372,7 @@ attotime swim2_device::cycles_to_time(u64 cycles) const
 void swim2_device::fifo_clear()
 {
 	m_fifo_pos = 0;
+	m_dat1byte_cb((m_mode & 0x10) ? 1 : 0);
 	crc_clear();
 }
 
@@ -375,6 +381,15 @@ bool swim2_device::fifo_push(u16 data)
 	if(m_fifo_pos == 2)
 		return true;
 	m_fifo[m_fifo_pos ++] = data;
+	if(m_mode & 0x10) {
+		// write
+		if(m_fifo_pos == 2)
+			m_dat1byte_cb(0);
+	} else {
+		// read
+		if(m_fifo_pos == 1)
+			m_dat1byte_cb(1);
+	}
 	return false;
 }
 
@@ -385,6 +400,15 @@ u16 swim2_device::fifo_pop()
 	u16 r = m_fifo[0];
 	m_fifo[0] = m_fifo[1];
 	m_fifo_pos --;
+	if(m_mode & 0x10) {
+		// write
+		if(m_fifo_pos == 1)
+			m_dat1byte_cb(1);
+	} else {
+		// read
+		if(m_fifo_pos == 0)
+			m_dat1byte_cb(0);
+	}
 	return r;
 }
 

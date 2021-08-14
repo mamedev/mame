@@ -110,12 +110,14 @@ static const nes_pcb pcb_list[] =
 	{ "nanjing",          NANJING_BOARD },  // mapper 163
 	{ "ntdec_asder",      NTDEC_ASDER },    // mapper 112
 	{ "ntdec_fh",         NTDEC_FIGHTINGHERO },     // mapper 193
+	{ "ntdec_n715021",    NTDEC_N715021 },  // mapper 81
 	{ "sa009",            SACHEN_SA009 },
 	{ "sa0036",           SACHEN_SA0036 },
 	{ "sa0037",           SACHEN_SA0037 },
 	{ "sa72007",          SACHEN_SA72007 },
 	{ "sa72008",          SACHEN_SA72008 },
 	{ "tca01",            SACHEN_TCA01 },
+	{ "s3013",            SACHEN_3013 },
 	{ "s8259a",           SACHEN_8259A },
 	{ "s8259b",           SACHEN_8259B },
 	{ "s8259c",           SACHEN_8259C },
@@ -161,16 +163,22 @@ static const nes_pcb pcb_list[] =
 	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
 	{ "hes",              HES_BOARD },
 	{ "hosenkan",         HOSENKAN_BOARD },
-	{ "ks7058",           KAISER_KS7058 },
+	{ "ks106c",           KAISER_KS106C },  // mapper 352
 	{ "ks202",            KAISER_KS202 },   // mapper 56
-	{ "ks7022",           KAISER_KS7022 }, // mapper 175
-	{ "ks7017",           KAISER_KS7017 },
-	{ "ks7032",           KAISER_KS7032 },  //  mapper 142
-	{ "ks7031",           KAISER_KS7031 },  //  used in Dracula II (FDS Conversion)
-	{ "ks7012",           KAISER_KS7012 },     // used in Zanac (FDS Conversion)
-	{ "ks7013b",          KAISER_KS7013B },    // used in Highway Star (FDS Conversion)
+	{ "ks7010",           KAISER_KS7010 },  // used in Akumajo Dracula (FDS Conversion)
+	{ "ks7012",           KAISER_KS7012 },  // used in Zanac (FDS Conversion)
+	{ "ks7013b",          KAISER_KS7013B }, // used in Highway Star (FDS Conversion)
 	{ "ks7016",           KAISER_KS7016 },  // used in Exciting Basketball (FDS Conversion)
-	{ "ks7037",           KAISER_KS7037 },  // Metroid FDS Chinese
+	{ "ks7016b",          KAISER_KS7016B }, // used in Meikyuu Jiin Dababa alt (FDS Conversion)
+	{ "ks7017",           KAISER_KS7017 },
+	{ "ks7021a",          KAISER_KS7021A }, // GetsuFumaDen pirate cart
+	{ "ks7022",           KAISER_KS7022 },  // mapper 175
+	{ "ks7030",           KAISER_KS7030 },  // used in Doki Doki Panic alt (FDS Conversion)
+	{ "ks7031",           KAISER_KS7031 },  // used in Dracula II (FDS Conversion)
+	{ "ks7032",           KAISER_KS7032 },  // mapper 142
+	{ "ks7037",           KAISER_KS7037 },  // Metroid (FDS Conversion)
+	{ "ks7057",           KAISER_KS7057 },  // Gyruss (FDS Conversion)
+	{ "ks7058",           KAISER_KS7058 },
 	{ "gs2015",           RCM_GS2015 },
 	{ "gs2004",           RCM_GS2004 },
 	{ "gs2013",           RCM_GS2013 },
@@ -198,18 +206,22 @@ static const nes_pcb pcb_list[] =
 	{ "mariobaby",        BTL_MARIOBABY },
 	{ "asnicol",          BTL_AISENSHINICOL },
 	{ "smb3pirate",       BTL_SMB3 },
+	{ "btl_contraj",      BTL_CONTRAJ },
 	{ "btl_dninja",       BTL_DRAGONNINJA },
-	{ "whirl2706",        WHIRLWIND_2706 },
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
 	{ "smb2jb",           BTL_SMB2JB },
+	{ "yung08",           BTL_YUNG08 },
+	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
+	{ "batmanfs",         BTL_BATMANFS },
+	{ "palthena",         BTL_PALTHENA },
 	{ "tobidase",         BTL_TOBIDASE },  // mapper 120
 	{ "dbz5",             REXSOFT_DBZ5 },
 	{ "sl1632",           REXSOFT_SL1632 },
 	{ "somari",           SOMARI_SL12 },  // mapper 116
 	{ "nitra",            NITRA_TDA },
-	{ "ks7057",           UNL_KS7057 },  // mapper 196 alt (for Street Fighter VI / Fight Street VI },
+	{ "fs6",              UNL_FS6 },  // mapper 196 alt? (for Street Fighter VI / Fight Street VI },
 	{ "sbros11",          BTL_SBROS11 },
 	{ "family4646",       BMC_FAMILY_4646 },
 	{ "pikay2k",          BTL_PIKACHUY2K },  // mapper 254
@@ -228,8 +240,10 @@ static const nes_pcb pcb_list[] =
 	{ "benshieng",        BMC_BENSHIENG },
 	{ "action52",         ACTENT_ACT52 },
 	{ "caltron6in1",      CALTRON_6IN1 },
+	{ "caltron9in1",      CALTRON_9IN1 },
 	{ "rumblestation",    RUMBLESTATION_BOARD },     // mapper 46
 	{ "svision16",        SVISION16_BOARD },
+	{ "kn42",             UNL_KN42 },
 	{ "n625092",          UNL_N625092 },
 	{ "a65as",            BMC_A65AS },
 	{ "t262",             BMC_T262 },
@@ -237,13 +251,23 @@ static const nes_pcb pcb_list[] =
 	{ "novel2",           BMC_NOVEL2 },  // mapper 213... same as BMC-NOVELDIAMOND9999999IN1 board?
 	{ "studyngame",       UNL_STUDYNGAME },  // mapper 39
 	{ "sgun20in1",        BMC_SUPERGUN_20IN1 },
-	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 60 otherwise
-	{ "bmc_d1038",        BMC_VT5201 },  // mapper 60?
-	{ "810544c",          BMC_810544 },
+	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 59?
+	{ "bmc_d1038",        BMC_VT5201 },  // mapper 59?
+	{ "bmc_60311c",       BMC_60311C },
+	{ "bmc_80013b",       BMC_80013B },
+	{ "bmc_810544c",      BMC_810544C },
+	{ "bmc_830425c",      BMC_830425C },
 	{ "ntd03",            BMC_NTD_03 },
+	{ "bmc_ctc09",        BMC_CTC09 },
 	{ "bmc_gb63",         BMC_G63IN1 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
+	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
+	{ "bmc_k3006",        BMC_K3006 },
+	{ "bmc_k3036",        BMC_K3036 },
+	{ "bmc_k3046",        BMC_K3046 },
+	{ "bmc_sa005a",       BMC_SA005A },
+	{ "bmc_tj03",         BMC_TJ03 },
 	{ "bmc_ws",           BMC_WS },
 	{ "bmc_hik300",       BMC_SUPERHIK_300IN1 },
 	{ "bmc_s700",         BMC_SUPER_700IN1 },
@@ -264,30 +288,37 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_110in1",       BMC_110IN1 },
 	{ "bmc_150in1",       BMC_150IN1 },
 	{ "bmc_190in1",       BMC_190IN1 },
+	{ "bmc_500in1",       BMC_500IN1 },
 	{ "bmc_800in1",       BMC_800IN1 },
 	{ "bmc_1200in1",      BMC_1200IN1 },
+	{ "bmc_2751",         BMC_2751 },
 	{ "bmc_8157",         BMC_8157 },
 	{ "bmc_g146",         BMC_G146 },
 	{ "bmc_11160",        BMC_11160 },
+	{ "fcgj8in1",         BMC_FCGENJIN_8IN1 },
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
 	{ "bmc_hik8in1",      BMC_HIK8IN1 },
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
 	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
+	{ "bmc_f15",          BMC_F15 },
 	{ "bmc_gold7in1",     BMC_GOLD_7IN1 },
 	{ "bmc_gc6in1",       BMC_GOLDENCARD_6IN1 },
 	{ "bmc_411120c",      BMC_411120C },
 	{ "bmc_830118c",      BMC_830118C },
+	{ "bmc_841101c",      BMC_841101C },
 	{ "pjoy84",           BMC_PJOY84 },
 	{ "bmc_gold150",      BMC_GOLD150 },
 	{ "bmc_gold260",      BMC_GOLD260 },
-	{ "bmc_power255",     BMC_CH001 },
+	{ "bmc_th22913",      BMC_TH22913 },
 	{ "bmc_s22games",     BMC_SUPER22 },
 	{ "bmc_reset4",       BMC_4IN1RESET },
 	{ "bmc_reset42",      BMC_42IN1RESET },
+	{ "bmc_lc160",        BMC_LITTLECOM160 },
 	{ "jyc_a",            JYCOMPANY_A },
 	{ "jyc_b",            JYCOMPANY_B },
 	{ "jyc_c",            JYCOMPANY_C },
@@ -296,11 +327,16 @@ static const nes_pcb pcb_list[] =
 	{ "unl_shero",        SACHEN_SHERO },
 	{ "mmalee2",          UNL_MMALEE },
 	{ "unl_2708",         UNL_2708 },
+	{ "unl_dh08",         UNL_DH08 },
+	{ "unl_le05",         UNL_LE05 },
+	{ "unl_lg25",         UNL_LG25 },
 	{ "unl_lh10",         UNL_LH10 },
+	{ "unl_lh28_lh54",    UNL_LH28_LH54 },
+	{ "unl_lh31",         UNL_LH31 },
 	{ "unl_lh32",         UNL_LH32 },
+	{ "unl_lh51",         UNL_LH51 },
 	{ "unl_lh53",         UNL_LH53 },
 	{ "unl_ac08",         UNL_AC08 },
-	{ "unl_bb",           UNL_BB },
 	{ "unl_malisb",       UNL_MALISB },
 	{ "sgpipe",           BTL_SHUIGUAN },
 	{ "rt01",             UNL_RT01 },   // Russian Test Cart
@@ -308,14 +344,17 @@ static const nes_pcb pcb_list[] =
 	{ "unl_43272",        UNL_43272 },
 	{ "tf1201",           UNL_TF1201 },
 	{ "unl_cfight",       UNL_CITYFIGHT },
+	{ "ninjaryu",         UNL_NINJARYU },
+	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II
 	{ "nocash_nochr",     NOCASH_NOCHR },
-	{ "nes_action53",     BTL_ACTION53 },
-	{ "nes_2a03pur",      BTL_2A03_PURITANS },
+	{ "action53",         UNL_ACTION53 },
+	{ "cufrom",           UNL_CUFROM },
+	{ "unrom512",         UNL_UNROM512 },
+	{ "2a03pur",          UNL_2A03PURITANS },
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
 	{ "8237a",            UNSUPPORTED_BOARD },
-	{ "ninjaryu",         UNSUPPORTED_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
@@ -323,10 +362,7 @@ static const nes_pcb pcb_list[] =
 	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "bmc_f15",          UNSUPPORTED_BOARD },  // 150-in-1 Unchained Melody
 	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
-	{ "bmc_8in1",         UNSUPPORTED_BOARD },  // Super 8-in-1 (Incl. Rockin' Kats)
-	{ "unl_eh8813a",      UNSUPPORTED_BOARD },  // Dr. Mario II
 	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
@@ -605,7 +641,7 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		logerror("-- PCB: %s", get_feature("pcb"));
 		if (m_pcb_id == UNSUPPORTED_BOARD)
-			logerror(" (currently not supported by MESS)");
+			logerror(" (currently not supported by MAME)");
 		logerror("\n");
 	}
 	logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);

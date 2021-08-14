@@ -417,8 +417,7 @@ uint8_t coco_state::pia1_pa_r()
 {
 	// Port A: we need to specify the values of all the lines, regardless of whether
 	// they are in input or output mode in the DDR
-	return (m_cassette->input() >= 0 ? 0x01 : 0x00)
-		| (dac_output() << 2);
+	return (m_cassette->input() >= 0 ? 0x01 : 0x00) | 0xfe;
 }
 
 

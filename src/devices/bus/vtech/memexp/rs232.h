@@ -36,10 +36,10 @@ protected:
 
 private:
 	required_device<rs232_port_device> m_rs232;
-	
+
 	uint8_t receive_data_r();
 	void transmit_data_w(uint8_t data);
-	
+
 	int m_rx;
 };
 

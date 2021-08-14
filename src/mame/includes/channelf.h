@@ -46,7 +46,9 @@ public:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	void channelf_palette(palette_device &palette) const;
-	uint32_t screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ntsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_rpt);
 	required_device<cpu_device> m_maincpu;
 	required_device<channelf_sound_device> m_custom;
 	required_device<channelf_cart_slot_device> m_cart;

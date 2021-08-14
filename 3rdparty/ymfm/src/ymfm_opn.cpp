@@ -396,7 +396,7 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d freq=%04X dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X",
+	end += sprintf(end, "%u.%02u freq=%04X dt=%u fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X",
 		chnum, opnum,
 		block_freq,
 		op_detune(opoffs),
@@ -419,10 +419,10 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 		end += sprintf(end, " ssg=%X", op_ssg_eg_mode(opoffs));
 	bool am = (lfo_enable() && op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%d", ch_lfo_am_sens(choffs));
+		end += sprintf(end, " am=%u", ch_lfo_am_sens(choffs));
 	bool pm = (lfo_enable() && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%d", ch_lfo_pm_sens(choffs));
+		end += sprintf(end, " pm=%u", ch_lfo_pm_sens(choffs));
 	if (am || pm)
 		end += sprintf(end, " lfo=%02X", lfo_rate());
 	if (multi_freq() && choffs == 2)
@@ -1831,7 +1831,7 @@ ym2610::ym2610(ymfm_interface &intf, uint8_t channel_mask) :
 	m_address(0),
 	m_fm_mask(channel_mask),
 	m_eos_status(0x00),
-	m_flag_mask(0xbf),
+	m_flag_mask(EOS_FLAGS_MASK),
 	m_fm(intf),
 	m_ssg(intf),
 	m_ssg_resampler(m_ssg),
@@ -1856,7 +1856,7 @@ void ym2610::reset()
 
 	// initialize our special interrupt states
 	m_eos_status = 0x00;
-	m_flag_mask = 0xbf;
+	m_flag_mask = EOS_FLAGS_MASK;
 }
 
 
@@ -2010,8 +2010,8 @@ void ym2610::write_data(uint8_t data)
 	else if (m_address == 0x1c)
 	{
 		// 1C: EOS flag reset
-		m_flag_mask = ~data;
-		m_eos_status &= ~data;
+		m_flag_mask = ~data & EOS_FLAGS_MASK;
+		m_eos_status &= ~(data & EOS_FLAGS_MASK);
 	}
 	else
 	{
@@ -2158,8 +2158,12 @@ void ym2610::clock_fm_and_adpcm()
 
 	// clock the ADPCM-B engine every cycle
 	m_adpcm_b.clock();
-	if ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0)
-		m_eos_status |= 0x80;
+
+	// we track the last ADPCM-B EOS value in bit 6 (which is hidden from callers);
+	// if it changed since the last sample, update the visible EOS state in bit 7
+	uint8_t live_eos = ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0) ? 0x40 : 0x00;
+	if (((live_eos ^ m_eos_status) & 0x40) != 0)
+		m_eos_status = (m_eos_status & ~0xc0) | live_eos | (live_eos << 1);
 
 	// update the FM content; OPNB is 13-bit with no intermediate clipping
 	m_fm.output(m_last_fm.clear(), 1, 32767, m_fm_mask);

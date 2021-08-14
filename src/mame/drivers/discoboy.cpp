@@ -205,13 +205,15 @@ uint32_t discoboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			if (tileno > 0x2000)
 			{
-				if ((m_gfxbank & 0x40) == 0x40)
-					tileno = 0x2000 + (tileno & 0x1fff) + 0x2000;
-				else
-					tileno = 0x2000 + (tileno & 0x1fff) + 0x0000;
+				tileno = (tileno & 0x1fff) + ((m_gfxbank & 0xc0) << 7);
+
+				m_gfxdecode->gfx(2)->opaque(bitmap, cliprect, tileno, m_ram_att[count / 2], 0, 0, x * 8, y * 8);
+			}
+			else
+			{
+				m_gfxdecode->gfx(1)->opaque(bitmap, cliprect, tileno, m_ram_att[count / 2], 0, 0, x * 8, y * 8);
 			}
 
-			m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tileno, m_ram_att[count / 2], 0, 0, x*8, y*8);
 			count += 2;
 		}
 	}
@@ -427,7 +429,8 @@ static const gfx_layout tiles8x8_layout2 =
 
 static GFXDECODE_START( gfx_discoboy )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x000, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0x000, 128 )
+	GFXDECODE_ENTRY( "bgtiles", 0, tiles8x8_layout2, 0x000, 128 )
+	GFXDECODE_ENTRY( "bgtiles_bank", 0, tiles8x8_layout2, 0x000, 128 )
 GFXDECODE_END
 
 void discoboy_state::machine_start()
@@ -516,15 +519,17 @@ ROM_START( discoboy )
 	ROM_LOAD( "7.u95",   0x80000, 0x10000, CRC(1d5617a2) SHA1(6b6bd50c1984748dc8bf6600431d9bb6fe443873) )
 	ROM_LOAD( "8.u125",  0x90000, 0x40000, CRC(30be1340) SHA1(e4765b75c8f774c6f7f7b5496a50c33ee3950550) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "bgtiles", ROMREGION_INVERT )
 	ROM_LOAD( "u80",   0x00000, 0x10000, CRC(4cc642ae) SHA1(2a59ebc8ab27bf7c3c1aa389ea32fb01d5cfdce8) )
-	ROM_LOAD( "u50",   0x10000, 0x20000, CRC(1557ca92) SHA1(5a0afbeede6f0ae1c75bdec446132c673aeb0fe7) )
-	ROM_LOAD( "u81",   0x40000, 0x10000, CRC(9e04274e) SHA1(70c28212b242335353e6dd48b7eb176146bec457) )
-	ROM_LOAD( "u5",    0x50000, 0x20000, CRC(a07df669) SHA1(7f09b2508b9bffed7a4cd191f707af3c0c2a1de2) )
-	ROM_LOAD( "u78",   0x80000, 0x10000, CRC(04571f70) SHA1(afdc7d84f7804c2ced413d13e6985a05f841e79e) )
-	ROM_LOAD( "u46",   0x90000, 0x20000, CRC(764ffde4) SHA1(637df403a6ac73456892add3f2403a92afb67f19) )
-	ROM_LOAD( "u79",   0xc0000, 0x10000, CRC(646f0f83) SHA1(d5cd050872d4b8c2fc89c3c0f434b1d66e5f1c59) )
-	ROM_LOAD( "u49",   0xd0000, 0x20000, CRC(0b6c0d8d) SHA1(820a12c84af4fd5a04e1eca3cbace0002d3024b6) )
+	ROM_LOAD( "u81",   0x10000, 0x10000, CRC(9e04274e) SHA1(70c28212b242335353e6dd48b7eb176146bec457) )
+	ROM_LOAD( "u78",   0x20000, 0x10000, CRC(04571f70) SHA1(afdc7d84f7804c2ced413d13e6985a05f841e79e) )
+	ROM_LOAD( "u79",   0x30000, 0x10000, CRC(646f0f83) SHA1(d5cd050872d4b8c2fc89c3c0f434b1d66e5f1c59) )
+
+	ROM_REGION( 0x80000, "bgtiles_bank", ROMREGION_INVERT )
+	ROM_LOAD( "u50",   0x00000, 0x20000, CRC(1557ca92) SHA1(5a0afbeede6f0ae1c75bdec446132c673aeb0fe7) )
+	ROM_LOAD( "u5",    0x20000, 0x20000, CRC(a07df669) SHA1(7f09b2508b9bffed7a4cd191f707af3c0c2a1de2) )
+	ROM_LOAD( "u46",   0x40000, 0x20000, CRC(764ffde4) SHA1(637df403a6ac73456892add3f2403a92afb67f19) )
+	ROM_LOAD( "u49",   0x60000, 0x20000, CRC(0b6c0d8d) SHA1(820a12c84af4fd5a04e1eca3cbace0002d3024b6) )
 ROM_END
 
 
@@ -543,15 +548,17 @@ ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game
 	ROM_LOAD( "discob.u95",   0x80000, 0x10000, CRC(ddea540e) SHA1(b69b94409bb15174f7780c637b183a2563c3d6c3) )
 	ROM_LOAD( "discob.u125",  0x90000, 0x40000, CRC(fcac2cb8) SHA1(cb629b28acbb3ab42572b52ee85bf18a556b8e24) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "bgtiles", ROMREGION_INVERT )
 	ROM_LOAD( "discob.u80",   0x000000, 0x10000, CRC(48a7ebdf) SHA1(942ddfdebb53f3f7f9256a4c8e8aa24887310775) )
-	ROM_LOAD( "discob.u50",   0x010000, 0x40000, CRC(ea7231db) SHA1(8f42e39aeda97351a5ca5e926df544bc019f178f) )
-	ROM_LOAD( "discob.u81",   0x080000, 0x10000, CRC(9ca358e1) SHA1(c711af363b466e40e514a7cec7a5098f178c3d9c) )
-	ROM_LOAD( "discob.u5",    0x090000, 0x40000, CRC(afeefecc) SHA1(9f85e0e5955876b85d91341a7fc355674c30a0bb) )
-	ROM_LOAD( "discob.u78",   0x100000, 0x10000, CRC(2b39eb08) SHA1(c275041e54d53da58730e18f5b8f6443b4301cb2) )
-	ROM_LOAD( "discob.u46",   0x110000, 0x40000, CRC(835c513b) SHA1(eab400cb9af556b2762c4bbae55a2c04a1a7d8ba) )
-	ROM_LOAD( "discob.u79",   0x180000, 0x10000, CRC(77ffc6bf) SHA1(15fd3b1d2b435d8ff7da5deaddbed7f3f9ccc609) )
-	ROM_LOAD( "discob.u49",   0x190000, 0x40000, CRC(9f884db4) SHA1(fd916b0ac54961bbd9b3f23d3ee5d35d747cbf17) )
+	ROM_LOAD( "discob.u81",   0x010000, 0x10000, CRC(9ca358e1) SHA1(c711af363b466e40e514a7cec7a5098f178c3d9c) )
+	ROM_LOAD( "discob.u78",   0x020000, 0x10000, CRC(2b39eb08) SHA1(c275041e54d53da58730e18f5b8f6443b4301cb2) )
+	ROM_LOAD( "discob.u79",   0x030000, 0x10000, CRC(77ffc6bf) SHA1(15fd3b1d2b435d8ff7da5deaddbed7f3f9ccc609) )
+
+	ROM_REGION( 0x100000, "bgtiles_bank", ROMREGION_INVERT )
+	ROM_LOAD( "discob.u50",   0x000000, 0x40000, CRC(ea7231db) SHA1(8f42e39aeda97351a5ca5e926df544bc019f178f) )
+	ROM_LOAD( "discob.u5",    0x040000, 0x40000, CRC(afeefecc) SHA1(9f85e0e5955876b85d91341a7fc355674c30a0bb) )
+	ROM_LOAD( "discob.u46",   0x080000, 0x40000, CRC(835c513b) SHA1(eab400cb9af556b2762c4bbae55a2c04a1a7d8ba) )
+	ROM_LOAD( "discob.u49",   0x0c0000, 0x40000, CRC(9f884db4) SHA1(fd916b0ac54961bbd9b3f23d3ee5d35d747cbf17) )
 ROM_END
 
 void discoboy_state::init_discoboy()

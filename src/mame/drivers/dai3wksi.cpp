@@ -5,7 +5,7 @@
 --------------------------
 Galaxy Force
 PCB: SIV-01-A
-Run Away
+Runaway
 PCB: SIV-01-B
 --------------------------
 Dai 3 Wakusei
@@ -41,10 +41,13 @@ TODO:
   Note: warp1 colors match the ones of dai3wksi according to flyer and game photos.
   DIP switch for changing cyan to white does not make sense.
   PCB video of warp1 does not red-blink the 'fuel low' message.
+- runaways colors are wrong (video is available).
 - Two player games are automatically displayed in cocktail mode.
   Is this by design (a cocktail only romset)?
 - Discrete audio needs adding to replace hardcoded samples
 - Is warp1 sound same as dai3wksi?
+- runaways uses less SN76477, it has different sound and should use different samples
+  (until it's done via netlist).
 - Dips need identifying
 - warp1 service mode is started by booting with coin1 held down,
   the service switch can still be tested there but otherwise has no function?
@@ -481,6 +484,35 @@ static INPUT_PORTS_START( warp1bl ) // the bootleg seems to expect active low
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( runaways ) // only dips 7 and 8 tested in service mode, but 1 8 dip bank on PCB
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // hold down at boot for service mode
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0x10, 0x00, "DIPSW #7" )                      PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -667,6 +699,13 @@ ROM_START( warp1bl )
 	ROM_LOAD( "6",  0x1800, 0x0400, CRC(44e9327f) SHA1(aa217b0fbbef6a408231dc0dfedd94167c351c28) )
 ROM_END
 
+ROM_START( runaways ) // only 4 SN76477 are populated
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gf10",  0x0000, 0x0800, CRC(3d8ace0a) SHA1(e1f1393724e2f66d4ce9269dd982fdbfa96f8b6f) )
+	ROM_LOAD( "gf11",  0x0800, 0x0800, CRC(a67b889f) SHA1(bfe1ebbcf2fb14b7557343229eaa0a42af70a3ad) )
+	ROM_LOAD( "gf12",  0x1000, 0x0800, CRC(10350c4c) SHA1(32a505180d3212eb4c7abbe1459b3a3b6a55fe20) )
+ROM_END
+
 } // Anonymous namespace
 
 
@@ -675,6 +714,8 @@ ROM_END
  *  Game drivers
  *
  *************************************/
+
+GAME( 1979, runaways, 0,     dai3wksi, runaways, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Runaway (Sun Electronics, Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1979, dai3wksi, 0,     dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai 3 Wakusei (Japan)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 

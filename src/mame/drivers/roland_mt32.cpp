@@ -393,8 +393,8 @@ ROM_START( mt32 )
 	ROMX_LOAD(       "mt32_1.0.6.ic26.bin",          1,   0x8000, CRC(4d495d98) SHA1(bf4f15666bc46679579498386704893b630c1171), ROM_BIOS(2) | ROM_SKIP(1) )
 
 	ROM_SYSTEM_BIOS( 3, "107", "Firmware 1.0.7" )
-	ROMX_LOAD(       "mt32_1.0.7.ic27.bin",          0,   0x8000, CRC(67fd8968) SHA1(13f06b38f0d9e0fc050b6503ab777bb938603260), ROM_BIOS(3) | ROM_SKIP(1) )
-	ROMX_LOAD(       "mt32_1.0.7.ic26.bin",          1,   0x8000, CRC(60f45882) SHA1(c55e165487d71fa88bd8c5e9c083bc456c1a89aa), ROM_BIOS(3) | ROM_SKIP(1) )
+	ROMX_LOAD(       "mt32_1.0.7.ic27.bin",          0,   0x8000, CRC(67fd8968) SHA1(13f06b38f0d9e0fc050b6503ab777bb938603260), ROM_BIOS(3) | ROM_SKIP(1) ) // also exists as a Mask ROM "R15449122 // HN623258PH26" @IC27
+	ROMX_LOAD(       "mt32_1.0.7.ic26.bin",          1,   0x8000, CRC(60f45882) SHA1(c55e165487d71fa88bd8c5e9c083bc456c1a89aa), ROM_BIOS(3) | ROM_SKIP(1) ) // also exists as a Mask ROM "R15449123 // HN623258PH27" @IC26
 
 	ROM_SYSTEM_BIOS( 4, "br", "Blue Ridge enhanced firmware" )
 	ROMX_LOAD(       "blue_ridge__mt32b.bin",        1,   0x8000, CRC(5816476f) SHA1(e0934320d7cbb5edfaa29e0d01ae835ef620085b), ROM_BIOS(4) | ROM_SKIP(1) )
@@ -411,9 +411,11 @@ ROM_START( mt32 )
 
 // We need a bios-like selection for these too
 	ROM_REGION( 0x80000, "la32", 0 )
-	ROM_LOAD16_BYTE( "r15179844.ic21.bin",           0,  0x40000, CRC(dd9deac3) SHA1(3a1e19b0cd4036623fd1d1d11f5f25995585962b) )
-	ROM_LOAD16_BYTE( "r15179845.ic22.bin",           1,  0x40000, CRC(4ee6506c) SHA1(2cadb99d21a6a4a6f5b61b6218d16e9b43f61d01) )
+	// separate PCM Mask ROMs from the MT-32 1.x older PCB
+	ROM_LOAD(        "r15179844.ic21.bin",           0,  0x40000, CRC(dd9deac3) SHA1(3a1e19b0cd4036623fd1d1d11f5f25995585962b) )
+	ROM_LOAD(        "r15179845.ic22.bin",     0x40000,  0x40000, CRC(4ee6506c) SHA1(2cadb99d21a6a4a6f5b61b6218d16e9b43f61d01) )
 
+	// combined PCM Mask ROM from the MT-32 1.x newer PCB; same contents as the two ROMs above, concatenated.
 	ROM_LOAD(        "r15449121.ic37.bin",           0,  0x80000, CRC(573e31cc) SHA1(f6b1eebc4b2d200ec6d3d21d51325d5b48c60252) )
 
 
@@ -433,13 +435,15 @@ ROM_START( cm32l )
 
 	ROM_REGION( 0x100000, "la32", 0 )
 // We need a bios-like selection for these too
-	ROM_LOAD(        "r15179945.ic8.bin",            0,  0x80000, CRC(8e9ea06e) SHA1(3ad889fde5db5b6437cbc2eb6e305312fec3df93) )
-	ROM_LOAD(        "r15449121.ic9.bin",      0x80000,  0x80000, CRC(0d81f53c) SHA1(7cc7bf1d1f27b6fc5fbb75c5d6a9458703275b28) )
+	// separate PCM Mask ROMS from the LAPC-I and CM-32L
+	ROM_LOAD(        "r15449121.ic9.bin",            0,  0x80000, CRC(573e31cc) SHA1(f6b1eebc4b2d200ec6d3d21d51325d5b48c60252) ) // shared with MT-32 1.x newer pcb, RA-50 and others
+	ROM_LOAD(        "r15179945.ic8.bin",      0x80000,  0x80000, CRC(8e9ea06e) SHA1(3ad889fde5db5b6437cbc2eb6e305312fec3df93) ) // extended CM-32L specific sounds
 
+	// combined PCM Mask ROM; same contents as the two roms above, concatenated; this may match the contents of the LAPC-N rom "R15209324" but needs verification
 	ROM_LOAD(        "cm32l_pcm.rom",                0, 0x100000, CRC(04204baa) SHA1(f2a10225b0c191a10fbf068f1320c91b35c1c3f2) )
 
 	ROM_REGION( 0x8000, "boss", 0 )
-	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) )
+	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) ) // shared with RA-50 and others
 ROM_END
 
 CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

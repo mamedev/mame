@@ -696,7 +696,7 @@ static const uint8_t keyboard_table[ 80 ][ 2 ] = {
 bool hp80_base_state::kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& row , uint8_t& col)
 {
 	if (pressed) {
-		unsigned bit_no = 31 - count_leading_zeros(pressed);
+		unsigned bit_no = 31 - count_leading_zeros_32(pressed);
 		row = (idx_base + bit_no) / 8;
 		col = (idx_base + bit_no) % 8;
 		return true;

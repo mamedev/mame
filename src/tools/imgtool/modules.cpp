@@ -60,7 +60,7 @@ imgtoolerr_t imgtool_create_canonical_library(bool omit_untested, std::unique_pt
 			{
 				module->create = nullptr;
 				module->createimage_optguide = nullptr;
-				module->createimage_optspec = nullptr;
+				module->createimage_optspec.clear();
 			}
 		}
 	}

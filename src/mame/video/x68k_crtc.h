@@ -41,6 +41,7 @@ public:
 	bool is_1024x1024() const { return BIT(m_reg[20], 10); }
 	bool gfx_double_scan() const { return (m_reg[20] & 0x1e) == 0x10; }
 	bool gfx_layer_buffer() const { return BIT(m_reg[20], 11); }
+	u8 gfx_color_mode() const { return (m_reg[20] >> 8) & 3; }
 	bool text_layer_buffer() const { return BIT(m_reg[20], 12); }
 	u16 hbegin() const { return m_hbegin; }
 	u16 vbegin() const { return m_vbegin; }

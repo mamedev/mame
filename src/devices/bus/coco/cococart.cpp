@@ -54,6 +54,17 @@
 #include "coco_ssc.h"
 #include "coco_stecomp.h"
 #include "coco_sym12.h"
+#include "coco_wpk.h"
+#include "coco_wpk2p.h"
+
+#include "dragon_amtor.h"
+#include "dragon_claw.h"
+#include "dragon_fdc.h"
+#include "dragon_jcbsnd.h"
+#include "dragon_jcbspch.h"
+#include "dragon_msx2.h"
+#include "dragon_serial.h"
+#include "dragon_sprites.h"
 
 
 /***************************************************************************
@@ -702,12 +713,17 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("max", COCO_PAK_MAX);
 	device.option_add("midi", COCO_MIDI);
+	device.option_add("msx2", DRAGON_MSX2);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("stecomp", COCO_STEREO_COMPOSER);
 	device.option_add("sym12", COCO_SYM12);
+	device.option_add("wpk", COCO_WPK);
+	device.option_add("wpk2", COCO_WPK2);
+	device.option_add("wpkrs", COCO_WPKRS);
+	device.option_add("wpk2p", COCO_WPK2P);
 }
 
 
@@ -736,4 +752,53 @@ void coco_cart_add_multi_pak(device_slot_interface &device)
 {
 	// and the Multi-Pak itself is optional because they cannot be daisy chained
 	device.option_add("multi", COCO_MULTIPAK);
+}
+
+
+//-------------------------------------------------
+//  dragon_cart_add_basic_devices
+//-------------------------------------------------
+
+void dragon_cart_add_basic_devices(device_slot_interface &device)
+{
+	device.option_add_internal("amtor", DRAGON_AMTOR);
+	device.option_add("ccpsg", COCO_PSG);
+	device.option_add("claw", DRAGON_CLAW);
+	device.option_add("gmc", COCO_PAK_GMC);
+	device.option_add("jcbsnd", DRAGON_JCBSND);
+	device.option_add("jcbspch", DRAGON_JCBSPCH);
+	device.option_add("max", COCO_PAK_MAX);
+	device.option_add("midi", DRAGON_MIDI);
+	device.option_add("msx2", DRAGON_MSX2);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("pak", COCO_PAK);
+	device.option_add("serial", DRAGON_SERIAL);
+	device.option_add("ram", COCO_PAK_RAM);
+	device.option_add("sprites", DRAGON_SPRITES);
+	device.option_add("ssc", COCO_SSC);
+	device.option_add("stecomp", COCO_STEREO_COMPOSER);
+	device.option_add("sym12", COCO_SYM12);
+	device.option_add("wpk2p", COCO_WPK2P);
+}
+
+
+//-------------------------------------------------
+//  dragon_cart_add_fdcs
+//-------------------------------------------------
+
+void dragon_cart_add_fdcs(device_slot_interface &device)
+{
+	device.option_add("dragon_fdc", DRAGON_FDC);
+	device.option_add("premier_fdc", PREMIER_FDC);
+	device.option_add("sdtandy_fdc", SDTANDY_FDC);
+}
+
+
+//-------------------------------------------------
+//  dragon_cart_add_multi_pak
+//-------------------------------------------------
+
+void dragon_cart_add_multi_pak(device_slot_interface &device)
+{
+	device.option_add("multi", DRAGON_MULTIPAK);
 }

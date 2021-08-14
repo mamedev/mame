@@ -2,62 +2,62 @@
 // copyright-holders:R. Belmont, tim lindner
 /***************************************************************************
 
-	drivers/enmirage.c
+    drivers/enmirage.c
 
-	Ensoniq Mirage Sampler
-	Preliminary driver by R. Belmont
-	Fleshed out by tim lindner
+    Ensoniq Mirage Sampler
+    Preliminary driver by R. Belmont
+    Fleshed out by tim lindner
 
-	Models:
-		DSK-8: Pratt-Reed keyboard (early 1984)
-		DSK-8: Fatar keyboard (late 1984)
-		DMS-8: Rack mount (1985)
-		DSK-1: Unweighted keyboard, stereo output (1986)
+    Models:
+        DSK-8: Pratt-Reed keyboard (early 1984)
+        DSK-8: Fatar keyboard (late 1984)
+        DMS-8: Rack mount (1985)
+        DSK-1: Unweighted keyboard, stereo output (1986)
 
-	M6809 Map for Mirage:
-		0000-7fff: 32k window on 128k of sample RAM
-		8000-bfff: main RAM
-		c000-dfff: optional expansion RAM
-		e100-e101: 6850 UART (for MIDI)
-		e200-e2ff: 6522 VIA
-		e400-e407: write to both filters
-		e408-e40f: filter cut-off frequency
-		e410-e417: filter resonance
-		e418-e41f: DAC pre-set
-		e800-e803: WD1770 FDC
-		ec00-ecef: ES5503 "DOC" sound chip
-		f000-ffff: boot ROM
+    M6809 Map for Mirage:
+        0000-7fff: 32k window on 128k of sample RAM
+        8000-bfff: main RAM
+        c000-dfff: optional expansion RAM
+        e100-e101: 6850 UART (for MIDI)
+        e200-e2ff: 6522 VIA
+        e400-e407: write to both filters
+        e408-e40f: filter cut-off frequency
+        e410-e417: filter resonance
+        e418-e41f: DAC pre-set
+        e800-e803: WD1770 FDC
+        ec00-ecef: ES5503 "DOC" sound chip
+        f000-ffff: boot ROM
 
-	M6809 Interrupts:
-		NMI: IRQ from WD1772
-		IRQ: wired-ORed: DRQ from WD1772, IRQ from ES5503, IRQ from VIA6522, IRQ from cartridge
-		FIRQ: IRQ from 6850 UART
+    M6809 Interrupts:
+        NMI: IRQ from WD1772
+        IRQ: wired-ORed: DRQ from WD1772, IRQ from ES5503, IRQ from VIA6522, IRQ from cartridge
+        FIRQ: IRQ from 6850 UART
 
-	LED / switch matrix:
+    LED / switch matrix:
 
-			A			B			C			  D			E		  F			G		 DP
-	ROW 0:	LOAD UPPER	LOAD LOWER	SAMPLE UPPER  PLAY SEQ	LOAD SEQ  SAVE SEQ	REC SEQ	 SAMPLE LOWER
-	ROW 1:	3			6			9			  5			8		  0			2		 Enter
-	ROW 2:	1			4			7			  up arrow	PARAM	  dn arrow	VALUE	 CANCEL
-	L. AN:	SEG A		SEG B		SEG C		  SEG D		SEG E	  SEG F		SEG G	 SEG DP (decimal point)
-	R. AN:	SEG A		SEG B		SEG C		  SEG D		SEG E	  SEG F		SEG G	 SEG DP
+            A           B           C             D         E         F         G        DP
+    ROW 0:  LOAD UPPER  LOAD LOWER  SAMPLE UPPER  PLAY SEQ  LOAD SEQ  SAVE SEQ  REC SEQ  SAMPLE LOWER
+    ROW 1:  3           6           9             5         8         0         2        Enter
+    ROW 2:  1           4           7             up arrow  PARAM     dn arrow  VALUE    CANCEL
+    L. AN:  SEG A       SEG B       SEG C         SEG D     SEG E     SEG F     SEG G    SEG DP (decimal point)
+    R. AN:  SEG A       SEG B       SEG C         SEG D     SEG E     SEG F     SEG G    SEG DP
 
-	Column number in VIA port A bits 0-2 is converted to discrete lines by a 74LS145.
-	Port A bit 3 is right anode, bit 4 is left anode
-	ROW 0 is read on VIA port A bit 5, ROW 1 in port A bit 6, and ROW 2 in port A bit 7.
+    Column number in VIA port A bits 0-2 is converted to discrete lines by a 74LS145.
+    Port A bit 3 is right anode, bit 4 is left anode
+    ROW 0 is read on VIA port A bit 5, ROW 1 in port A bit 6, and ROW 2 in port A bit 7.
 
-	Keyboard models talk to the R6500/11 through the VIA shifter: CA2 is handshake, CB1 is shift clock,
-	CB2 is shift data.
-	This is unconnected on the rackmount version.
+    Keyboard models talk to the R6500/11 through the VIA shifter: CA2 is handshake, CB1 is shift clock,
+    CB2 is shift data.
+    This is unconnected on the rackmount version.
 
-	Unimplemented:
-		* Four Pole Low-Pass Voltage Controlled Filter section
-		* External sync signal
-		* Foot pedal
-		* ADC feedback
-		* Piano keyboard controller
-		* Expansion connector
-		* Stereo output
+    Unimplemented:
+        * Four Pole Low-Pass Voltage Controlled Filter section
+        * External sync signal
+        * Foot pedal
+        * ADC feedback
+        * Piano keyboard controller
+        * Expansion connector
+        * Stereo output
 
 ***************************************************************************/
 
@@ -79,15 +79,15 @@
 
 #include "enmirage.lh"
 
-#define LOG_ADC_READ		(1U <<	1)
-#define LOG_FILTER_WRITE	(1U <<	2)
+#define LOG_ADC_READ        (1U <<  1)
+#define LOG_FILTER_WRITE    (1U <<  2)
 #define VERBOSE (0)
 //#define VERBOSE (LOG_ADC_READ)
 //#define VERBOSE (LOG_ADC_READ|LOG_FILTER_WRITE)
 
 #include "logmacro.h"
 
-#define LOGADCREAD(...)		LOGMASKED(LOG_ADC_READ, __VA_ARGS__)
+#define LOGADCREAD(...)     LOGMASKED(LOG_ADC_READ, __VA_ARGS__)
 #define LOGFILTERWRITE(...) LOGMASKED(LOG_FILTER_WRITE, __VA_ARGS__)
 
 #define PITCH_TAG "pitch"
@@ -175,7 +175,7 @@ uint8_t enmirage_state::mirage_adc_read()
 	switch(m_mux_value & 0x03)
 	{
 		case 0:
-// 			value = m_cassette->input(); /* compressed and mixed input: audio in and ES 5503 (TODO) */
+//          value = m_cassette->input(); /* compressed and mixed input: audio in and ES 5503 (TODO) */
 			value = m_wave[m_wave_index]; /* fake data to get past filter calibration (remove when filter implemented) */
 			LOGADCREAD("%s, 5503 sample: channel: compressed input, data: $%02x\n", machine().describe_context(), value);
 			if(++m_wave_index == 34) m_wave_index = 0;
@@ -241,7 +241,7 @@ void enmirage_state::coefficients_w(offs_t offset, uint8_t data)
 }
 
 // port A:
-//	bits 5/6/7 keypad rows 0/1/2 return
+//  bits 5/6/7 keypad rows 0/1/2 return
 INPUT_CHANGED_MEMBER(enmirage_state::input_changed)
 {
 	update_keypad_matrix();
@@ -259,8 +259,8 @@ void enmirage_state::update_keypad_matrix()
 }
 
 // port B:
-//	bit 6: IN disk load
-//	bit 5: IN Q Chip sync
+//  bit 6: IN disk load
+//  bit 5: IN Q Chip sync
 
 uint8_t enmirage_state::mirage_via_read_portb()
 {
@@ -280,10 +280,10 @@ uint8_t enmirage_state::mirage_via_read_portb()
 
 // port A: front panel
 // bits 0/1/2: dual purpose (0 to 7 lines, though a 74LS145 decoder):
-//		keyboard matrix column select
-//		7 segment display driver
-//	bits 3/4 = right and left 7 segment display enable
-//	bits 5/6/7 = Keyboard matrix row sense from 0 to 2
+//      keyboard matrix column select
+//      7 segment display driver
+//  bits 3/4 = right and left 7 segment display enable
+//  bits 5/6/7 = Keyboard matrix row sense from 0 to 2
 void enmirage_state::mirage_via_write_porta(uint8_t data)
 {
 	u8 segdata = data & 7;
@@ -298,12 +298,12 @@ void enmirage_state::mirage_via_write_porta(uint8_t data)
 }
 
 // port B:
-//	bit 7: OUT UART clock
-//	bit 4: OUT disk select, motor on, and 6500/11 reset
-//	bit 3: OUT sample/play
-//	bit 2: OUT mic line/in
-//	bit 1: OUT upper/lower bank (64k halves)
-//	bit 0: OUT bank 0/bank 1 (32k quarters)
+//  bit 7: OUT UART clock
+//  bit 4: OUT disk select, motor on, and 6500/11 reset
+//  bit 3: OUT sample/play
+//  bit 2: OUT mic line/in
+//  bit 1: OUT upper/lower bank (64k halves)
+//  bit 0: OUT bank 0/bank 1 (32k quarters)
 
 void enmirage_state::mirage_via_write_portb(uint8_t data)
 {
@@ -386,32 +386,32 @@ void enmirage_state::mirage(machine_config &config)
 
 static INPUT_PORTS_START(mirage)
 	PORT_START("pb5") /* KEY ROW 0 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Upper")			PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Lower")			PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample Upper")		PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Play Sequence")		PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Sequence")		PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save Sequence")		PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Record Sequence")	PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample Lower")		PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Upper")         PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Lower")         PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample Upper")       PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Play Sequence")      PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Sequence")      PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save Sequence")      PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Record Sequence")    PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample Lower")       PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
 	PORT_START("pb6") /* KEY ROW 1 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")		PORT_CODE(KEYCODE_3)		PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")		PORT_CODE(KEYCODE_6)		PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")		PORT_CODE(KEYCODE_9)		PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")		PORT_CODE(KEYCODE_5)		PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")		PORT_CODE(KEYCODE_8)		PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0/Prog")	PORT_CODE(KEYCODE_0)		PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")		PORT_CODE(KEYCODE_2)		PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter")	PORT_CODE(KEYCODE_ENTER)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")      PORT_CODE(KEYCODE_3)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")      PORT_CODE(KEYCODE_6)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")      PORT_CODE(KEYCODE_9)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")      PORT_CODE(KEYCODE_5)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")      PORT_CODE(KEYCODE_8)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0/Prog") PORT_CODE(KEYCODE_0)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")      PORT_CODE(KEYCODE_2)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter")  PORT_CODE(KEYCODE_ENTER)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
 	PORT_START("pb7") /* KEY ROW 2 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")			PORT_CODE(KEYCODE_1)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")			PORT_CODE(KEYCODE_4)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")			PORT_CODE(KEYCODE_7)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On/Up")		PORT_CODE(KEYCODE_UP)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Param")		PORT_CODE(KEYCODE_I)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Off/Down")	PORT_CODE(KEYCODE_DOWN)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Value")		PORT_CODE(KEYCODE_J)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cancel")		PORT_CODE(KEYCODE_K)	PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")          PORT_CODE(KEYCODE_1)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")          PORT_CODE(KEYCODE_4)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")          PORT_CODE(KEYCODE_7)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On/Up")      PORT_CODE(KEYCODE_UP)   PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Param")      PORT_CODE(KEYCODE_I)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Off/Down")   PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Value")      PORT_CODE(KEYCODE_J)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cancel")     PORT_CODE(KEYCODE_K)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
 
 	PORT_START(PITCH_TAG)
 	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_4_PAD) PORT_CODE_DEC(KEYCODE_1_PAD) PORT_PLAYER(1)

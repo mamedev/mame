@@ -125,7 +125,7 @@ namespace {
 			m_format->m_floppy_raw = true;
 			m_format->m_floppy_create.emplace_back(std::make_unique<floppy_create_info>(name, key, description));
 		}
-	};	
+	};
 }
 
 void formats_table::init()
@@ -268,7 +268,7 @@ void image_handler::fsave(std::string path, const std::vector<u8> &data)
 void image_handler::fsave_rsrc(std::string path, const std::vector<u8> &data)
 {
 	u8 head[0x2a];
-	
+
 	filesystem_t::w32b(head+0x00, 0x00051607);  // Magic
 	filesystem_t::w32b(head+0x04, 0x00020000);  // Version
 	filesystem_t::fill(head+0x08, 0, 16);       // Filler
@@ -377,7 +377,7 @@ void image_handler::floppy_create(const floppy_create_info *format, fs_meta_data
 		source_format->load(iog, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
 		delete source_format;
 		delete iog;
-		
+
 	} else
 		fs_unformatted::format(format->m_key, &m_floppy_image);
 }

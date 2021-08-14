@@ -12,9 +12,10 @@
         * Rougien
 
     Known issues:
-        * stars playfield colors and scrolling is wrong in Rougien;
+        * stars playfield colors and scrolling are wrong in Rougien;
         * Dunno where the "alien whistle" sample is supposed to play in Rougien;
-        * Mermaid has a ROM for sample playback, identify and hook it up;
+        * Incomplete GFX emulation in Mermaid (see MT07985 and MT08000);
+        * Mermaid has a ROM for sample playback, identify and hook it up (see MT07987);
 
 Yachtsman
 Esco/Sanritsu, 1982
@@ -89,13 +90,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 1) 'mermaid'
 
-  - Player 2 uses 2nd set of inputs ONLY when "Cabinet" Dip Switch is set to "Cokctail".
+  - Player 2 uses 2nd set of inputs ONLY when "Cabinet" Dip Switch is set to "Cocktail".
   - Continue Play is determined via DSW bit 3. When it's ON, insert a coin when
     the message is displayed on the screen. Beware that there is no visible timer !
 
 2) 'yachtmn'
 
-  - Player 2 uses 2nd set of inputs ONLY when "Cabinet" Dip Switch is set to "Cokctail".
+  - Player 2 uses 2nd set of inputs ONLY when "Cabinet" Dip Switch is set to "Cocktail".
   - Continue Play is always possible provided that you insert a coin when the
     message (much shorter than in 'mermaid') is displayed on the screen (there is
     also no timer). Then when you press START, you need to press START again when
@@ -120,7 +121,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/mermaid.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/msm5205.h"
 #include "speaker.h"
 
 
@@ -162,7 +162,7 @@ void mermaid_state::mermaid_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcbff).ram().w(FUNC(mermaid_state::mermaid_videoram2_w)).share("videoram2");
+	map(0xc800, 0xcbff).ram().w(FUNC(mermaid_state::mermaid_videoram2_w)).share("videoram2").mirror(0x400);
 	map(0xd000, 0xd3ff).ram().w(FUNC(mermaid_state::mermaid_videoram_w)).share("videoram");
 	map(0xd800, 0xd81f).ram().w(FUNC(mermaid_state::mermaid_bg_scroll_w)).share("bg_scrollram");
 	map(0xd840, 0xd85f).ram().w(FUNC(mermaid_state::mermaid_fg_scroll_w)).share("fg_scrollram");
@@ -174,7 +174,7 @@ void mermaid_state::mermaid_map(address_map &map)
 	map(0xe800, 0xe807).w("latch2", FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).portr("P2");
 	map(0xf800, 0xf800).r(FUNC(mermaid_state::mermaid_collision_r));
-	map(0xf802, 0xf802).nopw();    // ???
+	//  map(0xf802, 0xf802).nopw();    // ???
 	map(0xf806, 0xf806).w(FUNC(mermaid_state::mermaid_ay8910_write_port_w));
 	map(0xf807, 0xf807).w(FUNC(mermaid_state::mermaid_ay8910_control_port_w));
 }
@@ -365,9 +365,12 @@ void mermaid_state::machine_start()
 	save_item(NAME(m_coll_bit2));
 	save_item(NAME(m_coll_bit3));
 	save_item(NAME(m_coll_bit6));
+	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_rougien_gfxbank1));
 	save_item(NAME(m_rougien_gfxbank2));
 	save_item(NAME(m_ay8910_enable));
+	save_item(NAME(m_bg_mask));
+	save_item(NAME(m_nmi_mask));
 
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_data));
@@ -382,6 +385,8 @@ void mermaid_state::machine_reset()
 	m_coll_bit2 = 0;
 	m_coll_bit3 = 0;
 	m_coll_bit6 = 0;
+	m_bg_mask = 0;
+	m_bg_bank = 0;
 	m_rougien_gfxbank1 = 0;
 	m_rougien_gfxbank2 = 0;
 
@@ -396,7 +401,7 @@ void mermaid_state::machine_reset()
 	}
 }
 
-/* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
+// Similar to Jantotsu, apparently the HW has three ports that control what kind of sample should be played. Every sample size is 0x1000 in rougien, 0x800 (?) in mermaid.
 void mermaid_state::adpcm_data_w(uint8_t data)
 {
 	m_adpcm_data = data;
@@ -422,22 +427,28 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 void mermaid_state::mermaid(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);    // ???
+	Z80(config, m_maincpu, 24.576_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mermaid_state::mermaid_map);
 
 	LS259(config, m_latch[0]);
 	m_latch[0]->q_out_cb<0>().set(FUNC(mermaid_state::ay1_enable_w));
 	m_latch[0]->q_out_cb<1>().set(FUNC(mermaid_state::ay2_enable_w));
-	m_latch[0]->q_out_cb<4>().set_nop(); // ???
+	m_latch[0]->q_out_cb<2>().set([this](int state){ logerror("02 = %d\n", state); }); // plays sample
+	m_latch[0]->q_out_cb<3>().set([this](int state){ logerror("03 = %d\n", state); }); // ???
+	m_latch[0]->q_out_cb<4>().set([this](int state){ logerror("04 = %d\n", state); }); // ???
 	m_latch[0]->q_out_cb<5>().set(FUNC(mermaid_state::flip_screen_x_w));
 	m_latch[0]->q_out_cb<6>().set(FUNC(mermaid_state::flip_screen_y_w));
 	m_latch[0]->q_out_cb<7>().set(FUNC(mermaid_state::nmi_mask_w));
 
 	LS259(config, m_latch[1]);
-	m_latch[1]->q_out_cb<0>().set_nop(); // ???
+	m_latch[1]->q_out_cb<0>().set(FUNC(mermaid_state::bg_mask_w));
+	m_latch[1]->q_out_cb<1>().set(FUNC(mermaid_state::bg_bank_w));
+	m_latch[1]->q_out_cb<2>().set([this](int state){ logerror("12 = %d\n", state); }); // ???
+	m_latch[1]->q_out_cb<3>().set([this](int state){ logerror("13 = %d\n", state); }); // ???
 	m_latch[1]->q_out_cb<4>().set(FUNC(mermaid_state::rougien_gfxbankswitch1_w));
 	m_latch[1]->q_out_cb<5>().set(FUNC(mermaid_state::rougien_gfxbankswitch2_w));
-	m_latch[1]->q_out_cb<7>().set_nop(); // very frequent
+	m_latch[1]->q_out_cb<6>().set([this](int state){ logerror("16 = %d\n", state); }); // ???
+	m_latch[1]->q_out_cb<7>().set_nop(); // probable watchdog
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -462,9 +473,12 @@ void mermaid_state::mermaid(machine_config &config)
 void mermaid_state::rougien(machine_config &config)
 {
 	mermaid(config);
+	m_bg_split = 1;
 
 	m_latch[0]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_playback_w));
 
+	m_latch[1]->q_out_cb<0>().set([this](int state){ logerror("10 = %d\n", state); }); // ???
+	m_latch[1]->q_out_cb<1>().set([this](int state){ logerror("11 = %d\n", state); }); // ???
 	m_latch[1]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_rom_hi_w));
 	m_latch[1]->q_out_cb<3>().set(FUNC(mermaid_state::rougien_sample_rom_lo_w));
 
@@ -586,6 +600,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid,  0,        mermaid,  mermaid, mermaid_state, empty_init, ROT0, "Sanritsu / Rock-Ola", "Mermaid",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, mermaid_state, empty_init, ROT0, "Sanritsu / Esco",     "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid, mermaid_state, empty_init, ROT0, "Sanritsu / Rock-Ola", "Mermaid",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, mermaid_state, empty_init, ROT0, "Sanritsu / Esco",     "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1982, rougien,  0,        rougien,  rougien, mermaid_state, empty_init, ROT0, "Sanritsu",            "Rougien",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

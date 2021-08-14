@@ -576,7 +576,7 @@ ROM_START( gyruss )
 	// Diagnostic ROM, not populated. Checksums are from Shoestring's unofficial version.
 	// The game jumps to this location at startup if the first byte is 0x55.
 #if 0
-	ROM_LOAD( "gyrussk.4",    0x6000, 0x2000, CRC(6803b04d) SHA1(282fae01999eed919c128add67d940b340d0c78a) )
+	ROM_LOAD( "gyrussk.4",    0x6000, 0x2000, CRC(7f28f9e4) SHA1(10f2de94f17ace513410cb358f67632b5b201896) )
 #endif
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -614,7 +614,7 @@ ROM_START( gyrussce )
 	// Diagnostic ROM, not populated. Checksums are from Shoestring's unofficial version.
 	// The game jumps to this location at startup if the first byte is 0x55.
 #if 0
-	ROM_LOAD( "gya-4.14j",    0x6000, 0x2000, CRC(6803b04d) SHA1(282fae01999eed919c128add67d940b340d0c78a) )
+	ROM_LOAD( "gya-4.14j",    0x6000, 0x2000, CRC(7f28f9e4) SHA1(10f2de94f17ace513410cb358f67632b5b201896) )
 #endif
 
 	ROM_REGION( 0x10000, "sub", 0 )

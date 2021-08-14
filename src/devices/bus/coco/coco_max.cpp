@@ -11,10 +11,10 @@
 #include "emu.h"
 #include "coco_max.h"
 
-#define MOUSE_SENSITIVITY	75
-#define COCOMAX_X_TAG		"cocomax_x"
-#define COCOMAX_Y_TAG		"cocomax_y"
-#define COCOMAX_BUTTONS		"cocomax_buttons"
+#define MOUSE_SENSITIVITY   75
+#define COCOMAX_X_TAG       "cocomax_x"
+#define COCOMAX_Y_TAG       "cocomax_y"
+#define COCOMAX_BUTTONS     "cocomax_buttons"
 
 // #define VERBOSE (LOG_GENERAL )
 #include "logmacro.h"
@@ -106,10 +106,10 @@ ioport_constructor coco_pak_max_device::device_input_ports() const
 void coco_pak_max_device::device_start()
 {
 	// initial state
- 	m_a2d_result = 0;
+	m_a2d_result = 0;
 
 	// save state
- 	save_item(NAME(m_a2d_result));
+	save_item(NAME(m_a2d_result));
 
 	// install $ff90-$ff97 handler
 	install_read_handler(0xff90, 0xff97, read8sm_delegate(*this, FUNC(coco_pak_max_device::ff90_read)));
@@ -123,7 +123,7 @@ void coco_pak_max_device::device_start()
 
 void coco_pak_max_device::device_reset()
 {
- 	m_a2d_result = 0;
+	m_a2d_result = 0;
 }
 
 

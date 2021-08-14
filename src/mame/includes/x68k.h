@@ -198,7 +198,6 @@ protected:
 		int bg_hshift;
 		int bg_vshift;
 		int bg_hvres;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
-		int bg_double;  // 1 if PCG is to be doubled.
 	} m_video;
 	struct
 	{

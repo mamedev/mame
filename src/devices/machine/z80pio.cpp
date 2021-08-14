@@ -601,11 +601,6 @@ void z80pio_device::pio_port::control_write(uint8_t data)
 			// load interrupt vector
 			m_vector = data;
 			if (LOG) m_device->logerror("Z80PIO Port %c Interrupt Vector: %02x\n", 'A' + m_index, data);
-
-			// set interrupt enable
-			m_icw |= ICW_ENABLE_INT;
-			m_ie = true;
-			check_interrupts();
 		}
 		else
 		{

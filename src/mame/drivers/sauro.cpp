@@ -671,6 +671,39 @@ ROM_START( saurorr ) // all roms have original Tecfri stickers
 	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
+ROM_START( seawolft )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",           0x00000, 0x8000, CRC(bd8bd328) SHA1(f898d882790cc167ca82b55f93e47512c5195b45) ) // Passes the ROM test OK
+	ROM_LOAD( "2.bin",           0x08000, 0x8000, CRC(870b05ef) SHA1(c841f80a7e014a90fc81b00fa8c99405de9f660f) ) // Passes the ROM test OK
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "tmm24256ap.bin",  0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) ) // Same as parent
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "4.bin",           0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) ) // Same as parent
+	ROM_LOAD( "3.bin",           0x08000, 0x8000, CRC(883bb7d1) SHA1(7320e5cddb5c2127b3679b7bc72b273860d178b9) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "6.bin",           0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) ) // Same as parent
+	ROM_LOAD( "5.bin",           0x08000, 0x8000, CRC(a6e2640d) SHA1(346ffcf62e27ce8134f4e5e0dbcf11f110e19e04) ) // Same as parent
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "10.bin",          0x00000, 0x8000, CRC(b93f5487) SHA1(a3f36793ded053db7b370bc54a1b59d7b0603590) )
+	ROM_LOAD( "9.bin",           0x08000, 0x8000, CRC(0964ac95) SHA1(acc55ed318adee33c76ac24002a0cd7d35f38d98) )
+	ROM_LOAD( "8.bin",           0x10000, 0x8000, CRC(e71726a9) SHA1(2ef83432eb02ea0849547e5cb2b2215b8e68d714) )
+	ROM_LOAD( "7.bin",           0x18000, 0x8000, CRC(8a700276) SHA1(7c450d472a41f74c69bf357a31ad5418d7dbd2ed) )
+
+	// PROMs not dumped on this PCB
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "82s137-3.bin",    0x0000, 0x0400, CRC(d52c4cd0) SHA1(27d6126b46616c06b55d8018c97f6c3d7805ae9e) )  // Red component
+	ROM_LOAD( "82s137-2.bin",    0x0400, 0x0400, CRC(c3e96d5d) SHA1(3f6f21526a4357e4a9a9d56a6f4ef5911af2d120) )  // Green component
+	ROM_LOAD( "82s137-1.bin",    0x0800, 0x0400, CRC(bdfcf00c) SHA1(9faf4d7f8959b64faa535c9945eec59c774a3760) )  // Blue component
+
+	ROM_REGION( 0x10000, "speech", 0 )
+	// SP0256 mask ROM, not dumped on this PCB, but it's a generic GI ROM
+	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
+ROM_END
+
 
 /*
 Sauro (bootleg)
@@ -783,6 +816,7 @@ GAME( 1987, sauroa,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, R
 GAME( 1987, saurop,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1987, saurorr,  sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, saurob,   sauro,    saurob,   saurob,    sauro_state, init_tecfri, ROT0, "bootleg",                               "Sauro (bootleg)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, seawolft, sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sea Wolf (Tecfri)",                     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )

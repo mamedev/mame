@@ -32,7 +32,7 @@ static void display_usage()
 }
 
 static void display_formats()
-{	
+{
 	int sk = 0;
 	for(const auto &e : formats.floppy_format_info_by_key) {
 		int sz = e.first.size();
@@ -80,7 +80,7 @@ static void display_formats()
 					fprintf(stderr, "    %-*s         - %s\n",
 							sk,
 							f2->m_name,
-							f2->m_description);					
+							f2->m_description);
 			}
 		}
 }
@@ -111,7 +111,7 @@ static int identify(int argc, char *argv[])
 		if(len > sz)
 			sz = len;
 	}
-		
+
 	for(int i=2; i<argc; i++) {
 		image_handler ih;
 		ih.set_on_disk_path(argv[i]);
@@ -124,7 +124,7 @@ static int identify(int argc, char *argv[])
 			if(len > sz2)
 				sz2 = len;
 		}
-			
+
 		bool first = true;
 		for(const auto &e : scores) {
 			printf("%-*s %c %3d - %-*s %s\n", sz, first ? argv[i] : "", first ? ':' : ' ', e.first, sz2, e.second->m_format->name(), e.second->m_format->description());
@@ -151,7 +151,7 @@ static const floppy_format_info *find_floppy_source_format(const char *name, ima
 				if(len > sz)
 					sz = len;
 			}
-			
+
 			for(const auto &e : scores)
 				printf("  %3d - %-*s %s\n", e.first, sz, e.second->m_format->name(), e.second->m_format->description());
 			return nullptr;
@@ -179,7 +179,7 @@ static int flopconvert(int argc, char *argv[])
 
 	image_handler ih;
 	ih.set_on_disk_path(argv[4]);
-	
+
 	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
 	if(!source_format)
 		return 1;
@@ -317,7 +317,7 @@ static int generic_dir(image_handler &ih)
 	std::unordered_map<fs_meta_name, size_t> nmap;
 	for(size_t i = 0; i != names.size(); i++)
 		nmap[names[i]] = i;
-	
+
 	auto root = fs->root();
 	std::vector<std::vector<std::string>> entries;
 
@@ -356,7 +356,7 @@ static int flopdir(int argc, char *argv[])
 
 	image_handler ih;
 	ih.set_on_disk_path(argv[4]);
-	
+
 	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
 	if(!source_format)
 		return 1;
@@ -480,7 +480,7 @@ static int flopread(int argc, char *argv[])
 
 	image_handler ih;
 	ih.set_on_disk_path(argv[4]);
-	
+
 	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
 	if(!source_format)
 		return 1;
@@ -601,7 +601,7 @@ static int flopwrite(int argc, char *argv[])
 
 	image_handler ih;
 	ih.set_on_disk_path(argv[4]);
-	
+
 	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
 	if(!source_format)
 		return 1;
@@ -626,7 +626,7 @@ static int flopwrite(int argc, char *argv[])
 		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
 		return 1;
 	}
-	
+
 	int err = generic_write(ih, argv[5], argv[6]);
 	if(err)
 		return err;
@@ -634,7 +634,7 @@ static int flopwrite(int argc, char *argv[])
 	ih.fs_to_floppy();
 	if(ih.floppy_save(source_format))
 		return 1;
-	
+
 	return 0;
 }
 

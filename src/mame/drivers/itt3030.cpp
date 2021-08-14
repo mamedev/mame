@@ -4,6 +4,8 @@
 
     ITT 3030
 
+    When the machine is started you get a black screen.
+    Hold down B until the cursor appears. It will then boot from the floppy.
 
     ToDo:
     - Check Beeper

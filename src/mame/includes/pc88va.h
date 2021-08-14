@@ -101,7 +101,7 @@ private:
 	required_device<address_map_bank_device> m_sysbank;
 	required_shared_ptr<uint16_t> m_tvram;
 	required_shared_ptr<uint16_t> m_gvram;
-	uint8_t *m_kanjiram;
+	std::unique_ptr<uint8_t[]> m_kanjiram;
 	uint16_t m_bank_reg;
 	uint16_t m_screen_ctrl_reg;
 	uint8_t m_timer3_io_reg;

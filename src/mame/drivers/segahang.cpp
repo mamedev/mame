@@ -24,6 +24,7 @@
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
+
 #include "speaker.h"
 
 
@@ -1387,6 +1388,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Super Hang On Beta bootleg
 //  Has Beta 1987 copyright but is otherwise identical to the bootleg above
+//  Has a custom Philko chip marked "Philko PK8706"
 //
 ROM_START( shangonrb2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1513,7 +1515,7 @@ ROM_START( sharrier )
 	ROM_LOAD( "epr-7232.ic6", 0x08000, 0x8000, CRC(4b59340c) SHA1(a01ba8580b65dd17bfd92560265e502d95d3ff16) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // Internal i8751 MCU code
-	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, CRC(203dffeb) SHA1(73801db79756b0ffdd54b298814e3eeb088fe8c2) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -2280,7 +2282,6 @@ GAME( 1986, endurorb,   enduror,  enduror,  enduror,   segahang_state, init_endu
 GAME( 1986, enduror1,   enduror,  enduror1, enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (YM2203, FD1089B 317-0013A)",                            0 )
 GAME( 1986, endurobl,   enduror,  endurobl, enduror,   segahang_state, init_endurobl, ROT0,  "bootleg",        "Enduro Racer (bootleg set 1)",                                        0 )
 GAME( 1986, endurob2,   enduror,  endurob2, enduror,   segahang_state, init_endurob2, ROT0,  "bootleg",        "Enduro Racer (bootleg set 2)",                                        MACHINE_NOT_WORKING )
-
 
 GAME( 1986, endurord,   enduror,  endurord,  enduror,  segahang_state, init_enduror,  ROT0,  "bootleg",        "Enduro Racer (bootleg of Rev A, YM2151, FD1089B 317-0013A set)",      0 )
 GAME( 1986, enduror1d,  enduror,  enduror1d, enduror,  segahang_state, init_enduror,  ROT0,  "bootleg",        "Enduro Racer (bootleg of YM2203, FD1089B 317-0013A set)",             0 )

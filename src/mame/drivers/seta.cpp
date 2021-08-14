@@ -4572,7 +4572,8 @@ static INPUT_PORTS_START( downtown )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )    PORT_CONDITION("DSW",0x8000,NOTEQUALS,0x8000)
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )    PORT_CONDITION("DSW",0x8000,NOTEQUALS,0x8000)
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )    PORT_CONDITION("DSW",0x8000,NOTEQUALS,0x8000)
-	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	// default "Normal" on Romstar manual, and matches ALL OFF scheme
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
@@ -4582,6 +4583,8 @@ static INPUT_PORTS_START( downtown )
 	PORT_DIPSETTING(      0x0800, "50K Only" )
 	PORT_DIPSETTING(      0x0400, "100K Only" )
 	PORT_DIPSETTING(      0x0000, "50K, Every 150K" )
+	// TODO: defaults to 2 lives in the Romstar manual, contradicts with DIPSW ALL OFF convention.
+	// Is it a regional difference? Verify with a Mokugeki Jp manual.
 	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x1000, "2" )
 	PORT_DIPSETTING(      0x3000, "3" )
@@ -12138,12 +12141,15 @@ u16 downtown_state::downtown_protection_r(offs_t offset)
 		case 0xa3:
 		{
 			static const u8 word[] = "WALTZ0";
-			if (offset >= 0x100/2 && offset <= 0x10a/2) return word[offset - 0x100/2];
-			else                                        return 0;
+			if (offset >= 0x100/2 && offset <= 0x10a/2)
+				return word[offset - 0x100/2];
+
+			// definitely wants to read-back hi-score table from 0x110-0x15f
+			break;
 		}
-		default:
-			return m_downtown_protection[offset] & 0xff;
 	}
+
+	return m_downtown_protection[offset] & 0xff;
 }
 
 void downtown_state::downtown_protection_w(offs_t offset, u16 data, u16 mem_mask)
@@ -12155,8 +12161,12 @@ void downtown_state::init_downtown()
 {
 	init_bank6502();
 
-	m_downtown_protection = make_unique_clear<u16[]>(0x200/2);
-	save_pointer(NAME(m_downtown_protection),0x200/2);
+	m_downtown_protection = make_unique_clear<u8[]>(0x100);
+	// TODO: protection RAM area is user clearable from service mode, most likely has some sort of battery backed RAM
+	// initializing with 0xff is enough for host CPU to catch up and default it with sensible defaults.
+	for (int i = 0; i < 0x100; i++)
+		m_downtown_protection[i] = 0xff;
+	save_pointer(NAME(m_downtown_protection), 0x200/2);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2001ff, read16sm_delegate(*this, FUNC(downtown_state::downtown_protection_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x2001ff, write16s_delegate(*this, FUNC(downtown_state::downtown_protection_w)));

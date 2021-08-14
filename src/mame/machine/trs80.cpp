@@ -175,12 +175,12 @@ void trs80_state::port_ff_w(u8 data)
 
 	m_cpl = BIT(data, 3);
 
-	static const double speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-	m_speaker->set_levels(4, speaker_levels);
-
 	/* Speaker for System-80 MK II - only sounds if relay is off */
 	if (!(BIT(data, 2)))
+	{
+		m_speaker->set_levels(4, levels);
 		m_speaker->level_w(data & 3);
+	}
 }
 
 /*************************************

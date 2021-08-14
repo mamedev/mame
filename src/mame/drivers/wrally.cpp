@@ -165,9 +165,9 @@ uint8_t wrally_state::shareram_r(offs_t offset)
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 
-void wrally_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void wrally_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	data = gaelco_decrypt(space, offset, data, 0x1f, 0x522a);
+	data = gaelco_decrypt(*m_maincpu, offset, data, 0x1f, 0x522a);
 	COMBINE_DATA(&m_videoram[offset]);
 
 	m_tilemap[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);

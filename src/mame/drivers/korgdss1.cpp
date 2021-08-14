@@ -16,7 +16,7 @@
 #include "machine/gen_latch.h"
 #include "machine/i8155.h"
 #include "machine/i8255.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"

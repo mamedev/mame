@@ -156,7 +156,8 @@ protected:
 						// 0 means no card loaded
 	int m_log2_pages_per_block; // log2 of number of pages per erase block (usually 4 or 5)
 
-	uint8_t* m_data_ptr;  // FEEPROM data area
+	uint8_t *m_feeprom_data;  // FEEPROM data area
+	std::unique_ptr<uint8_t[]> m_feeprom_data_alloc;
 	std::unique_ptr<uint8_t[]> m_data_uid_ptr;
 
 	sm_mode_t m_mode;               // current operation mode

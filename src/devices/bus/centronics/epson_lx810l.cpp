@@ -163,6 +163,7 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	e05a30.centronics_perror().set(FUNC(epson_lx810l_device::e05a30_centronics_perror));
 	e05a30.centronics_fault().set(FUNC(epson_lx810l_device::e05a30_centronics_fault));
 	e05a30.centronics_select().set(FUNC(epson_lx810l_device::e05a30_centronics_select));
+	e05a30.cpu_reset().set(FUNC(epson_lx810l_device::e05a30_cpu_reset));
 
 	/* 256-bit eeprom */
 	EEPROM_93C06_16BIT(config, "eeprom");
@@ -189,6 +190,9 @@ static INPUT_PORTS_START( epson_lx810l )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load/Eject") PORT_CODE(KEYCODE_1_PAD)
 	PORT_START("PAPEREND")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD)
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, reset_printer, 0)
+
 
 	/* DIPSW1 */
 	PORT_START("DIPSW1")
@@ -265,6 +269,17 @@ INPUT_CHANGED_MEMBER(epson_lx810l_device::online_sw)
 {
 	m_maincpu->set_input_line(UPD7810_INTF2, newval ? CLEAR_LINE : ASSERT_LINE);
 }
+
+INPUT_CHANGED_MEMBER(epson_lx810l_device::reset_printer)
+{
+	if (newval)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);  // reset cpu
+		m_e05a30->reset();  // this will generate an NMI interrupt when the e05a30 is ready (minimum 0.9 seconds after reset)
+	}
+}
+
+
 
 
 //**************************************************************************

@@ -15,9 +15,10 @@ license:CC0
 <softwarelist name="leapfrog_zippity_cart" description="LeapFrog Zippity Cartridges">
 
 	<software name="prinfrog" supported="no">
-		<description>The Princess and the Frog - Magical Bayou Adventure (500-13779-A) (UK)</description>
+		<description>The Princess and the Frog - Magical Bayou Adventure (UK)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13779-A" />
 		<part name="cart" interface="leapfrog_zippity_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="500-13779-A - The Princess and the Frog - Magical Bayou Adventure.bin" size="0x4200000" crc="f41715d0" sha1="c6654f021ac0b12fecb056f1d21058957a6e1e30" />
@@ -26,9 +27,10 @@ license:CC0
 	</software>
 
 	<software name="cars" supported="no">
-		<description>The World of Cars - Driven to Learn (500-13589-B) (UK)</description>
+		<description>The World of Cars - Driven to Learn (UK)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13589-B" />
 		<part name="cart" interface="leapfrog_zippity_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="500-13589-B - The World of Cars - Driven to Learn.bin" size="0x4200000" crc="f52e613e" sha1="81da432cbdf6f80ac1a42656978d4027b50e0587" />
@@ -37,9 +39,10 @@ license:CC0
 	</software>
 
 	<software name="disprin" supported="no">
-		<description>Disney Princess - Magical Movement &amp; Learning (500-13590-A) (UK)</description>
+		<description>Disney Princess - Magical Movement &amp; Learning (UK)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13590-A" />
 		<part name="cart" interface="leapfrog_zippity_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="500-13590-A - DisneyPrincess - Magical Movement &amp; Learning.bin" size="0x4200000" crc="d060a223" sha1="00f454b629d7bcc7f58a43dd453d410a8ed60a99" />

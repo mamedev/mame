@@ -7,7 +7,7 @@
         XTAL: Y1 16MHz
         XTAL: Y2 32.768KHz
     LCDC: ST7626 (https://www.crystalfontz.com/controllers/Sitronix/ST7626/)
-        the ST7626 is embedded into a epoxy part just below the screen glass with the flex cable attached to iter_swap
+        the ST7626 is embedded into a epoxy part just below the screen glass with the flex cable attached to it
         it has internal 98x68x16bit ram
 
     Extremely preliminary

@@ -657,10 +657,11 @@ void tumbleb_state::tumblepopba_main_map(address_map &map)
 #if TUMBLEP_HACK
 	map(0x000000, 0x07ffff).writeonly();   /* To write levels modifications */
 #endif
-	//map(0x100000, 0x100001).rw(FUNC(tumbleb_state::tumblepb_prot_r), FUNC(tumbleb_state::tumblepb_oki_w)); // where's the oki mapped?
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x180005, 0x180005).lw8(NAME([this] (uint8_t data) { m_oki->set_rom_bank((data >> 4) & 0x03); })); // TODO: verify this
+	map(0x180007, 0x180007).w(m_oki, FUNC(okim6295_device::write));
 	map(0x1a0000, 0x1a07ff).ram().share("spriteram"); /* Bootleg sprite buffer */
 	map(0x1a1000, 0x1a1fff).ram(); // ?
 	map(0x200000, 0x200fff).ram(); // ?
@@ -2611,9 +2612,8 @@ ROM_START( tumblepba )
 	ROM_LOAD16_BYTE( "7.ic115",  0x80000, 0x40000, CRC(0273eec0) SHA1(305d1a111f04650b7e3616fb6ecac1c579312acc) )
 	ROM_LOAD16_BYTE( "6.ic117",  0x80001, 0x40000, CRC(7f8daf52) SHA1(aa5f111a9c75c260bb77878bb95c1e34d70ea7b6) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "3.ic24", 0x00000, 0x80000, CRC(63e45de7) SHA1(417f945ee8cf820b1733c4dee26ef05e91e80457) )
-	ROM_RELOAD(0x80000,0x80000)
 ROM_END
 
 ROM_START( funkyjetb )
@@ -3858,7 +3858,7 @@ void tumbleb_state::init_dquizgo()
 /* Misc 'bootleg' hardware - close to base Tumble Pop */
 GAME( 1991, tumbleb,  tumblep, tumblepb,     tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tumbleb2, tumblep, tumbleb2,     tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // PIC is protected, sound simulation not 100%
-GAME( 1991, tumblepba,tumblep, tumblepba,    tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
+GAME( 1991, tumblepba,tumblep, tumblepba,    tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI banking not confirmed + volume issues?
 
 GAME( 1992, funkyjetb,funkyjet,funkyjetb,    tumblepb, tumbleb_pic_state, init_tumblepb, ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong palette, inputs not working, PIC driving an OKI
 

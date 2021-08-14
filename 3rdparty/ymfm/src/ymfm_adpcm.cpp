@@ -157,20 +157,25 @@ bool adpcm_a_channel::clock()
 		return false;
 	}
 
-	// stop when we hit the end address; apparently only low 20 bits are used for
-	// comparison on the YM2610: this affects sample playback in some games, for
-	// example twinspri character select screen music will skip some samples if
-	// this is not correct
-	if (((m_curaddress ^ (m_regs.ch_end(m_choffs) << m_address_shift)) & 0xfffff) == 0)
-	{
-		m_playing = m_accumulator = 0;
-		return true;
-	}
-
 	// if we're about to read nibble 0, fetch the data
 	uint8_t data;
 	if (m_curnibble == 0)
 	{
+		// stop when we hit the end address; apparently only low 20 bits are used for
+		// comparison on the YM2610: this affects sample playback in some games, for
+		// example twinspri character select screen music will skip some samples if
+		// this is not correct
+		//
+		// note also: end address is inclusive, so wait until we are about to fetch
+		// the sample just after the end before stopping; this is needed for nitd's
+		// jump sound, for example
+		uint32_t end = (m_regs.ch_end(m_choffs) + 1) << m_address_shift;
+		if (((m_curaddress ^ end) & 0xfffff) == 0)
+		{
+			m_playing = m_accumulator = 0;
+			return true;
+		}
+
 		m_curbyte = m_owner.intf().ymfm_external_read(ACCESS_ADPCM_A, m_curaddress++);
 		data = m_curbyte >> 4;
 		m_curnibble = 1;

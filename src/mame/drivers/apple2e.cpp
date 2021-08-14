@@ -175,9 +175,11 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/grappler.h"
+#include "bus/a2bus/lancegs.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/q68.h"
 #include "bus/a2bus/sider.h"
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/ssprite.h"
@@ -3380,8 +3382,8 @@ void apple2e_state::r4000bank_map(address_map &map)
 void apple2e_state::c100bank_map(address_map &map)
 {
 	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
-	map(0x0200, 0x03ff).r(FUNC(apple2e_state::c100_int_r)).nopw();
-	map(0x0400, 0x05ff).r(FUNC(apple2e_state::c100_int_bank_r)).nopw();
+	map(0x0200, 0x03ff).rw(FUNC(apple2e_state::c100_int_r), FUNC(apple2e_state::c100_w));
+	map(0x0400, 0x05ff).rw(FUNC(apple2e_state::c100_int_bank_r), FUNC(apple2e_state::c100_w));
 	map(0x0600, 0x07ff).r(FUNC(apple2e_state::c100_cec_r)).nopw();
 	map(0x0800, 0x09ff).r(FUNC(apple2e_state::c100_cec_bank_r)).nopw();
 
@@ -3390,8 +3392,8 @@ void apple2e_state::c100bank_map(address_map &map)
 void apple2e_state::c300bank_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
-	map(0x0100, 0x01ff).r(FUNC(apple2e_state::c300_int_r)).nopw();
-	map(0x0200, 0x02ff).r(FUNC(apple2e_state::c300_int_bank_r)).nopw();
+	map(0x0100, 0x01ff).rw(FUNC(apple2e_state::c300_int_r), FUNC(apple2e_state::c300_w));
+	map(0x0200, 0x02ff).rw(FUNC(apple2e_state::c300_int_bank_r), FUNC(apple2e_state::c300_w));
 	map(0x0300, 0x03ff).r(FUNC(apple2e_state::c300_cec_r)).nopw();
 	map(0x0400, 0x04ff).r(FUNC(apple2e_state::c300_cec_bank_r)).nopw();
 }
@@ -4700,6 +4702,9 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 	device.option_add("booti", A2BUS_BOOTI);  /* Booti Card */
+	device.option_add("lancegs", A2BUS_LANCEGS);  /* ///SHH SYSTEME LANceGS Card */
+	device.option_add("q68", A2BUS_Q68);        /* Stellation Q68 68000 card */
+	device.option_add("q68plus", A2BUS_Q68PLUS); /* Stellation Q68 Plus 68000 card */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)
@@ -4832,7 +4837,10 @@ void apple2e_state::apple2e(machine_config &config)
 void apple2e_state::apple2epal(machine_config &config)
 {
 	apple2e(config);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 312, 0, 192);
+	M6502(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::mprof3(machine_config &config)
@@ -4855,7 +4863,11 @@ void apple2e_state::apple2ee(machine_config &config)
 void apple2e_state::apple2eepal(machine_config &config)
 {
 	apple2ee(config);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 312, 0, 192);
+	M65C02(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::spectred(machine_config &config)
@@ -5515,7 +5527,7 @@ ROM_START(cecm)
 
 	ROM_REGION(0x800,"keyboard",0)
 	ROM_LOAD( "u26.9433c-0201.rcl-zh-16.bin", 0x000000, 0x000800, CRC(f3190603) SHA1(7efdf6f4ee0ed01ff06341c601496a43d06afd6b) )
-	// ROM_LOAD( "u10_2732_0081.bin", 0x000000, 0x001000, CRC(505eed67) SHA1(4acbee7c957528d1f9fbfd54464f85fb493175d7) )
+	// ROM_LOAD( "u10_2732_0081.bin", 0x000000, 0x00800, CRC(505eed67) SHA1(4acbee7c957528d1f9fbfd54464f85fb493175d7) )
 ROM_END
 
 ROM_START(cec2000)

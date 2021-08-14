@@ -26,7 +26,8 @@ public:
 		m_cryptdevice(*this, "315_5881"),
 		m_5838crypt(*this, "315_5838"),
 		m_hopper(*this, "hopper"),
-		m_billboard(*this, "billboard")
+		m_billboard(*this, "billboard"),
+		m_cc_digits(*this, "cc_digit%u", 0U)
 	{
 	}
 
@@ -88,10 +89,15 @@ public:
 	void init_othellos();
 	void init_mausuke();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t stv_ioga_r(offs_t offset);
 	void stv_ioga_w(offs_t offset, uint8_t data);
 	uint8_t critcrsh_ioga_r(offs_t offset);
+	void critcrsh_ioga_w(offs_t offset, uint8_t data);
 	uint8_t magzun_ioga_r(offs_t offset);
 	void magzun_ioga_w(offs_t offset, uint8_t data);
 	uint8_t stvmp_ioga_r(offs_t offset);
@@ -112,10 +118,6 @@ private:
 
 	void install_stvbios_speedups( void );
 
-	DECLARE_MACHINE_START(stv);
-	DECLARE_MACHINE_RESET(stv);
-
-	DECLARE_MACHINE_RESET(batmanfr);
 	void batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	optional_device<acclaim_rax_device> m_rax;
 
@@ -149,6 +151,7 @@ private:
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	optional_device<ticket_dispenser_device> m_hopper;
 	required_device<sega_billboard_device> m_billboard;
+	output_finder<2> m_cc_digits;
 	uint16_t crypt_read_callback(uint32_t addr);
 
 	uint8_t pdr1_input_r();

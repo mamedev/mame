@@ -100,6 +100,7 @@ void swim1_device::device_reset()
 	m_devsel_cb(0);
 	m_sel35_cb(true);
 	m_hdsel_cb(false);
+	m_dat1byte_cb(0);
 }
 
 void swim1_device::set_floppy(floppy_image_device *floppy)
@@ -142,7 +143,19 @@ u8 swim1_device::read(offs_t offset)
 	if(m_ism_mode & 0x40)
 		return ism_read(offset);
 	else
-		return iwm_control(offset, 0x00);
+	{
+		if(!machine().side_effects_disabled())
+			iwm_control(offset, 0x00);
+
+		switch(m_iwm_control & 0xc0) {
+		case 0x00: return m_iwm_active ? m_iwm_data : 0xff;
+		case 0x40: return (m_iwm_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
+		case 0x80: return m_iwm_whd;
+		case 0xc0: return 0xff;
+		}
+
+		abort();
+	}
 }
 
 void swim1_device::write(offs_t offset, u8 data)
@@ -298,6 +311,8 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		m_ism_mode &= ~data;
 		m_ism_param_idx = 0;
 		ism_show_mode();
+		if(data & 0x10)
+			m_dat1byte_cb((m_ism_fifo_pos != 0) ? 1 : 0);
 		if(!(m_ism_mode & 0x40)) {
 			logerror("switch to iwm\n");
 			u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
@@ -309,6 +324,8 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	case 0x7:
 		m_ism_mode |= data;
 		ism_show_mode();
+		if(data & 0x10)
+			m_dat1byte_cb((m_ism_fifo_pos != 2) ? 1 : 0);
 		break;
 
 	default:
@@ -409,7 +426,7 @@ void swim1_device::flush_write(u64 when)
 		m_flux_write_count = 0;
 }
 
-u8 swim1_device::iwm_control(int offset, u8 data)
+void swim1_device::iwm_control(int offset, u8 data)
 {
 	iwm_sync();
 
@@ -549,14 +566,13 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 	else
 		logerror("iwm counter = %d\n", m_iwm_to_ism_counter);
 
-	switch(m_iwm_control & 0xc0) {
-	case 0x00: return m_iwm_active ? m_iwm_data : 0xff;
-	case 0x40: return (m_iwm_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
-	case 0x80: return m_iwm_whd;
-	case 0xc0: if(offset & 1) { if(m_iwm_active) iwm_data_w(data); else iwm_mode_w(data); } return 0xff;
+	if((m_iwm_control & 0xc0) == 0xc0 && (offset & 1))
+	{
+		if(m_iwm_active)
+			iwm_data_w(data);
+		else
+			iwm_mode_w(data);
 	}
-
-	abort();
 }
 
 void swim1_device::ism_crc_clear()
@@ -587,6 +603,7 @@ attotime swim1_device::cycles_to_time(u64 cycles) const
 void swim1_device::ism_fifo_clear()
 {
 	m_ism_fifo_pos = 0;
+	m_dat1byte_cb((m_ism_mode & 0x10) ? 1 : 0);
 	ism_crc_clear();
 }
 
@@ -595,6 +612,15 @@ bool swim1_device::ism_fifo_push(u16 data)
 	if(m_ism_fifo_pos == 2)
 		return true;
 	m_ism_fifo[m_ism_fifo_pos ++] = data;
+	if(m_ism_mode & 0x10) {
+		// write
+		if(m_ism_fifo_pos == 2)
+			m_dat1byte_cb(0);
+	} else {
+		// read
+		if(m_ism_fifo_pos == 1)
+			m_dat1byte_cb(1);
+	}
 	return false;
 }
 
@@ -605,6 +631,15 @@ u16 swim1_device::ism_fifo_pop()
 	u16 r = m_ism_fifo[0];
 	m_ism_fifo[0] = m_ism_fifo[1];
 	m_ism_fifo_pos --;
+	if(m_ism_mode & 0x10) {
+		// write
+		if(m_ism_fifo_pos == 1)
+			m_dat1byte_cb(1);
+	} else {
+		// read
+		if(m_ism_fifo_pos == 0)
+			m_dat1byte_cb(0);
+	}
 	return r;
 }
 

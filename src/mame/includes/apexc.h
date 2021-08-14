@@ -7,6 +7,7 @@
 
 #include "cpu/apexc/apexc.h"
 #include "machine/apexc.h"
+#include "softlist_dev.h"
 #include "emupal.h"
 #include "screen.h"
 

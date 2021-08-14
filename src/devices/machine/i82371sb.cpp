@@ -12,13 +12,17 @@ DEFINE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device, "i82371sb_isa", "Intel 823
 void i82371sb_isa_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
+	map(0x06, 0x07).rw(FUNC(i82371sb_isa_device::status_r), FUNC(i82371sb_isa_device::status_w));
+	map(0x10, 0x4b).noprw();
 	map(0x4c, 0x4c).rw(FUNC(i82371sb_isa_device::iort_r), FUNC(i82371sb_isa_device::iort_w));
 	map(0x4e, 0x4f).rw(FUNC(i82371sb_isa_device::xbcs_r), FUNC(i82371sb_isa_device::xbcs_w));
 	map(0x60, 0x63).rw(FUNC(i82371sb_isa_device::pirqrc_r), FUNC(i82371sb_isa_device::pirqrc_w));
-	map(0x68, 0x68).rw(FUNC(i82371sb_isa_device::tom_r), FUNC(i82371sb_isa_device::tom_w));
+	map(0x69, 0x69).rw(FUNC(i82371sb_isa_device::tom_r), FUNC(i82371sb_isa_device::tom_w));
 	map(0x6a, 0x6b).rw(FUNC(i82371sb_isa_device::mstat_r), FUNC(i82371sb_isa_device::mstat_w));
 	map(0x70, 0x71).rw(FUNC(i82371sb_isa_device::mbirq01_r), FUNC(i82371sb_isa_device::mbirq01_w));
 	map(0x76, 0x77).rw(FUNC(i82371sb_isa_device::mbdma_r), FUNC(i82371sb_isa_device::mbdma_w));
+	map(0x78, 0x79).rw(FUNC(i82371sb_isa_device::pcsc_r), FUNC(i82371sb_isa_device::pcsc_w));
+	map(0x80, 0x80).rw(FUNC(i82371sb_isa_device::apicbase_r), FUNC(i82371sb_isa_device::apicbase_w));
 	map(0x82, 0x82).rw(FUNC(i82371sb_isa_device::dlc_r), FUNC(i82371sb_isa_device::dlc_w));
 	map(0xa0, 0xa0).rw(FUNC(i82371sb_isa_device::smicntl_r), FUNC(i82371sb_isa_device::smicntl_w));
 	map(0xa2, 0xa3).rw(FUNC(i82371sb_isa_device::smien_r), FUNC(i82371sb_isa_device::smien_w));
@@ -40,6 +44,7 @@ void i82371sb_isa_device::internal_io_map(address_map &map)
 	map(0x00b2, 0x00b3).rw(FUNC(i82371sb_isa_device::read_apmcapms), FUNC(i82371sb_isa_device::write_apmcapms));
 	map(0x00c0, 0x00df).rw(FUNC(i82371sb_isa_device::at_dma8237_2_r), FUNC(i82371sb_isa_device::at_dma8237_2_w));
 	map(0x04d0, 0x04d1).rw(FUNC(i82371sb_isa_device::eisa_irq_read), FUNC(i82371sb_isa_device::eisa_irq_write));
+	map(0x0cf9, 0x0cf9).rw(FUNC(i82371sb_isa_device::reset_control_r), FUNC(i82371sb_isa_device::reset_control_w));
 	map(0x00e0, 0x00ef).noprw();
 }
 
@@ -130,6 +135,8 @@ void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pci_device(mconfig, I82371SB_ISA, tag, owner, clock),
 	m_smi_callback(*this),
+	m_nmi_callback(*this),
+	m_stpclk_callback(*this),
 	m_boot_state_hook(*this),
 	m_maincpu(*this, ":maincpu"),
 	m_pic8259_master(*this, "pic8259_master"),
@@ -148,6 +155,8 @@ void i82371sb_isa_device::device_start()
 {
 	pci_device::device_start();
 	m_smi_callback.resolve();
+	m_nmi_callback.resolve_safe();
+	m_stpclk_callback.resolve_safe();
 	m_boot_state_hook.resolve();
 }
 
@@ -155,6 +164,7 @@ void i82371sb_isa_device::device_reset()
 {
 	pci_device::device_reset();
 
+	status = 0x0280;
 	iort = 0x4d;
 	xbcs = 0x0003;
 	memset(pirqrc, 0x80, sizeof(pirqrc));
@@ -175,6 +185,7 @@ void i82371sb_isa_device::device_reset()
 	smireq = 0x0000;
 	ctlmtr = 0x00;
 	cthmtr = 0x00;
+	reset_control = 0;
 
 	m_at_spkrdata = 0;
 	m_pit_out2 = 1;
@@ -196,6 +207,12 @@ void i82371sb_isa_device::boot_state_w(uint8_t data)
 
 void i82371sb_isa_device::nop_w(uint8_t data)
 {
+}
+
+void i82371sb_isa_device::status_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// bits 11-13 are clear on write
+	status = status & ~(data & (0x3800 & mem_mask));
 }
 
 uint8_t i82371sb_isa_device::iort_r()
@@ -284,6 +301,17 @@ void i82371sb_isa_device::mbdma_w(offs_t offset, uint8_t data)
 {
 	mbdma[offset] = data;
 	logerror("mbdma[%d] = %02x\n", offset, mbdma);
+}
+
+uint16_t i82371sb_isa_device::pcsc_r()
+{
+	return pcsc;
+}
+
+void i82371sb_isa_device::pcsc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&pcsc);
+	logerror("pcsc = %04x\n", pcsc);
 }
 
 uint8_t i82371sb_isa_device::apicbase_r()
@@ -783,7 +811,13 @@ WRITE_LINE_MEMBER( i82371sb_isa_device::pc_mirq1_w )
 
 WRITE_LINE_MEMBER( i82371sb_isa_device::pc_ferr_w )
 {
+	if (!(xbcs & 32))
+		return;
 	m_pic8259_slave->ir5_w(state);
+}
+
+WRITE_LINE_MEMBER(i82371sb_isa_device::pc_extsmi_w)
+{
 }
 
 WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq1_w )   { m_pic8259_master->ir1_w(state); }
@@ -878,6 +912,18 @@ void i82371sb_isa_device::write_apmcapms(offs_t offset, uint8_t data)
 	}
 	else
 		apms = data;
+	logerror("write apmcapms %d %02x\n", offset, data);
+}
+
+uint8_t i82371sb_isa_device::reset_control_r(offs_t offset)
+{
+	return reset_control;
+}
+
+void i82371sb_isa_device::reset_control_w(offs_t offset, uint8_t data)
+{
+	reset_control = data;
+	logerror("reset_control = %02x\n", reset_control);
 }
 
 void i82371sb_isa_device::update_smireq_line()
@@ -898,8 +944,11 @@ DEFINE_DEVICE_TYPE(I82371SB_IDE, i82371sb_ide_device, "i82371sb_ide", "Intel 823
 void i82371sb_ide_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x04, 0x05).rw(FUNC(i82371sb_ide_device::command_r), FUNC(i82371sb_ide_device::command_w));
+	map(0x06, 0x07).rw(FUNC(i82371sb_ide_device::status_r), FUNC(i82371sb_ide_device::status_w));
+	map(0x0d, 0x0d).rw(FUNC(i82371sb_ide_device::latency_timer_r), FUNC(i82371sb_ide_device::latency_timer_w));
+	map(0x10, 0x1f).noprw();
 	map(0x20, 0x23).rw(FUNC(i82371sb_ide_device::bmiba_r), FUNC(i82371sb_ide_device::bmiba_w));
+	map(0x24, 0x3b).noprw();
 	map(0x40, 0x41).rw(FUNC(i82371sb_ide_device::idetim_primary_r), FUNC(i82371sb_ide_device::idetim_primary_w));
 	map(0x42, 0x43).rw(FUNC(i82371sb_ide_device::idetim_secondary_r), FUNC(i82371sb_ide_device::idetim_secondary_w));
 	map(0x44, 0x44).rw(FUNC(i82371sb_ide_device::sidetim_r), FUNC(i82371sb_ide_device::sidetim_w));
@@ -926,7 +975,7 @@ void i82371sb_ide_device::device_add_mconfig(machine_config &config)
 
 i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, I82371SB_IDE, tag, owner, clock)
-	, command(2)
+	, latency_timer(0)
 	, bmiba(1)
 	, idetim_primary(0)
 	, idetim_secondary(0)
@@ -941,6 +990,10 @@ i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, const ch
 
 void i82371sb_ide_device::device_start()
 {
+	pci_device::device_start();
+	status = 0x0280;
+	command = 2;
+	command_mask = 5;
 	m_irq_pri_callback.resolve();
 	m_irq_sec_callback.resolve();
 }
@@ -976,17 +1029,22 @@ WRITE_LINE_MEMBER(i82371sb_ide_device::secondary_int)
 	m_irq_sec_callback(state);
 }
 
-uint16_t i82371sb_ide_device::command_r()
+void i82371sb_ide_device::status_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	return command;
+	// bits 11-13 are clear on write
+	status = status & ~(data & (0x3800 & mem_mask));
+	logerror("status = %04x\n", status);
 }
 
-void i82371sb_ide_device::command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+uint8_t i82371sb_ide_device::latency_timer_r()
 {
-	mem_mask &= 5;
-	COMBINE_DATA(&command);
-	if (mem_mask & 1)
-		remap_cb();
+	return latency_timer;
+}
+
+void i82371sb_ide_device::latency_timer_w(uint8_t data)
+{
+	latency_timer = data;
+	logerror("latency_timer = %02x\n", latency_timer);
 }
 
 uint32_t i82371sb_ide_device::bmiba_r()
@@ -998,6 +1056,7 @@ void i82371sb_ide_device::bmiba_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	mem_mask &= 0xfff0;
 	COMBINE_DATA(&bmiba);
+	logerror("bmiba = %04x\n", bmiba);
 	if (command & 1)
 		remap_cb();
 }
@@ -1007,8 +1066,10 @@ uint16_t i82371sb_ide_device::idetim_primary_r()
 	return idetim_primary;
 }
 
-void i82371sb_ide_device::idetim_primary_w(uint16_t data)
+void i82371sb_ide_device::idetim_primary_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	COMBINE_DATA(&idetim_primary);
+	logerror("idetim_primary = %04x\n", idetim_primary);
 }
 
 uint16_t i82371sb_ide_device::idetim_secondary_r()
@@ -1016,8 +1077,10 @@ uint16_t i82371sb_ide_device::idetim_secondary_r()
 	return idetim_secondary;
 }
 
-void i82371sb_ide_device::idetim_secondary_w(uint16_t data)
+void i82371sb_ide_device::idetim_secondary_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	COMBINE_DATA(&idetim_secondary);
+	logerror("idetim_secondary = %04x\n", idetim_secondary);
 }
 
 uint8_t i82371sb_ide_device::sidetim_r()
@@ -1027,6 +1090,8 @@ uint8_t i82371sb_ide_device::sidetim_r()
 
 void i82371sb_ide_device::sidetim_w(uint8_t data)
 {
+	sidetim = data;
+	logerror("sidetim = %02x\n", sidetim);
 }
 
 uint32_t i82371sb_ide_device::ide1_read32_cs0_r(offs_t offset, uint32_t mem_mask)

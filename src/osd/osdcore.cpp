@@ -139,7 +139,13 @@ void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args)
 
 osd_ticks_t osd_ticks()
 {
+#ifdef WIN32
+	LARGE_INTEGER val;
+	QueryPerformanceCounter(&val);
+	return val.QuadPart;
+#else
 	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+#endif
 }
 
 
@@ -149,7 +155,13 @@ osd_ticks_t osd_ticks()
 
 osd_ticks_t osd_ticks_per_second()
 {
+#ifdef WIN32
+	LARGE_INTEGER val;
+	QueryPerformanceFrequency(&val);
+	return val.QuadPart;
+#else
 	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
+#endif
 }
 
 //============================================================

@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(galaga_state,galaga)
+void galaga_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaga_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(galaga_state::tilemap_scan)), 8,8,36,28);
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);

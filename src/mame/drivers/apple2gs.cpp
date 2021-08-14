@@ -115,9 +115,11 @@
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/grappler.h"
 //#include "bus/a2bus/hostram.h"
+#include "bus/a2bus/lancegs.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 //#include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/q68.h"
 #include "bus/a2bus/ramcard16k.h"
 //#include "bus/a2bus/ramfast.h"
 #include "bus/a2bus/sider.h"
@@ -509,7 +511,7 @@ private:
 	bool m_ioudis;
 
 	u8 m_shadow, m_speed, m_textcol;
-	u8 m_motors_active, m_slotromsel, m_intflag, m_vgcint, m_inten;
+	u8 m_motors_active, m_slotromsel, m_intflag, m_vgcint, m_inten, m_newvideo;
 
 	bool m_last_speed;
 
@@ -1300,6 +1302,12 @@ u8 apple2gs_state::adb_read_mousedata()
 
 		result = (absolute & 0x80) | (delta & 0x7F);
 	}
+	else
+	{
+		// no mouse axis data, so just return the button status.  used by some 3200 viewers.
+		result = m_adb_mousey->read() & 0x80;
+	}
+
 	return result;
 }
 
@@ -1513,6 +1521,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_accel_temp_slowdown));
 	save_item(NAME(m_accel_speed));
 	save_item(NAME(m_motoroff_time));
+	save_item(NAME(m_newvideo));
 }
 
 void apple2gs_state::machine_reset()
@@ -1534,6 +1543,7 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_ioudis = true;
+	m_newvideo = 0x01;
 	m_clock_frame = 0;
 	m_mouse_x = 0x00;
 	m_mouse_y = 0x00;
@@ -1770,8 +1780,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	if ((m_video->m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
 	{
 		u8 scb;
+		const int shrline = scanline - BORDER_TOP + 1;
 
-		scb = m_megaii_ram[0x19d00 + scanline - BORDER_TOP + 1];
+		if (shrline & 1)
+		{
+			scb = m_megaii_ram[0x19e80 + (shrline >> 1)];
+		}
+		else
+		{
+			scb = m_megaii_ram[0x15e80 + (shrline >> 1)];
+		}
 
 		if (scb & 0x40)
 		{
@@ -2186,7 +2204,12 @@ int apple2gs_state::get_vpos()
 {
 	// as per IIgs Tech Note #39, this is simply scanline + 250 on NTSC (262 lines),
 	// or scanline + 200 on PAL (312 lines)
-	return ((m_screen->vpos() + BORDER_TOP) % 262) + 250;
+	int vpos = m_screen->vpos() + (511 - BORDER_TOP + 6);
+	if (vpos > 511)
+	{
+		vpos -= (511 - 250);
+	}
+	return vpos;
 }
 
 void apple2gs_state::process_clock()
@@ -2464,7 +2487,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 #endif
 
 		case 0x29:  // NEWVIDEO
-			return m_video->m_newvideo;
+			return m_newvideo;
 
 		case 0x2d:  // SLOTROMSEL
 			return m_slotromsel;
@@ -2801,7 +2824,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 #endif
 
 		case 0x29:  // NEWVIDEO
-			m_video->m_newvideo = data;
+			m_video->m_newvideo = m_newvideo = data;
 			break;
 
 		case 0x2d:  // SLOTROMSEL
@@ -3692,20 +3715,51 @@ u8 apple2gs_state::read_floatingbus()
 
 u8 apple2gs_state::ram0000_r(offs_t offset)  { slow_cycle(); return m_megaii_ram[offset]; }
 void apple2gs_state::ram0000_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset] = data; }
-u8 apple2gs_state::auxram0000_r(offs_t offset)  { slow_cycle(); return m_megaii_ram[offset+0x10000]; }
-void apple2gs_state::auxram0000_w(offs_t offset, u8 data)
+u8 apple2gs_state::auxram0000_r(offs_t offset)
 {
 	slow_cycle();
+	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_newvideo & 0xc0) != 0))
+	{
+		if (offset & 1)
+		{
+			offset = ((offset - 0x2000) >> 1) + 0x6000;
+		}
+		else
+		{
+			offset = ((offset - 0x2000) >> 1) + 0x2000;
+		}
+	}
+	return m_megaii_ram[offset+0x10000];
+}
+
+void apple2gs_state::auxram0000_w(offs_t offset, u8 data)
+{
+	u16 orig_addr = offset;
+
+	slow_cycle();
+
+	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_newvideo & 0xc0) != 0))
+	{
+		if (offset & 1)
+		{
+			offset = ((offset - 0x2000) >> 1) + 0x6000;
+		}
+		else
+		{
+			offset = ((offset - 0x2000) >> 1) + 0x2000;
+		}
+	}
+
 	m_megaii_ram[offset+0x10000] = data;
 
-	if ((offset >= 0x9e00) && (offset <= 0x9fff))
+	if ((orig_addr >= 0x9e00) && (orig_addr <= 0x9fff))
 	{
-		int color = (offset - 0x9e00) >> 1;
+		int color = (orig_addr - 0x9e00) >> 1;
 
 		m_video->m_shr_palette[color] = rgb_t(
-			((m_megaii_ram[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
-			((m_megaii_ram[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
-			((m_megaii_ram[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
+			((m_megaii_ram[0x19f00 + color] >> 0) & 0x0f) * 17,
+			((m_megaii_ram[0x15f00 + color] >> 4) & 0x0f) * 17,
+			((m_megaii_ram[0x15f00 + color] >> 0) & 0x0f) * 17);
 	}
 }
 
@@ -3883,8 +3937,7 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 		case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 			if ((!(m_shadow & SHAD_HIRESPG1) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
 			{
-				slow_cycle();
-				m_megaii_ram[offset + 0x10000] = data;
+				auxram0000_w(offset, data);
 			}
 			break;
 
@@ -3895,8 +3948,7 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 			if ((!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
 			{
-				slow_cycle();
-				m_megaii_ram[offset + 0x10000] = data;
+				auxram0000_w(offset, data);
 			}
 			break;
 
@@ -4777,6 +4829,9 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 	device.option_add("booti", A2BUS_BOOTI);     /* Booti Card */
+	device.option_add("lancegs", A2BUS_LANCEGS);  /* ///SHH SYSTEME LANceGS Card */
+	device.option_add("q68", A2BUS_Q68);          /* Stellation Q68 68000 card */
+	device.option_add("q68plus", A2BUS_Q68PLUS);  /* Stellation Q68 Plus 68000 card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
@@ -4856,8 +4911,9 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
 	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
 	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
-	m_doc->add_route(0, "lspeaker", 1.0);
-	m_doc->add_route(1, "rspeaker", 1.0);
+	// IIgs Tech Node #19 says even channels are right, odd are left, and 80s/90s stereo cards followed that.
+	m_doc->add_route(0, "rspeaker", 1.0);
+	m_doc->add_route(1, "lspeaker", 1.0);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
@@ -4955,7 +5011,8 @@ void apple2gs_state::apple2gs(machine_config &config)
 	applefdintf_device::add_35(config, m_floppy[2]);
 	applefdintf_device::add_35(config, m_floppy[3]);
 
-	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
+	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs_flop_orig"); // Until we have clean cracks, use this as the default
+	SOFTWARE_LIST(config, "flop35_misc").set_compatible("apple2gs_flop_misc"); // Legacy software list pre-June 2021 and defaced cracks
 	SOFTWARE_LIST(config, "flop525_clean").set_compatible("apple2_flop_clcracked"); // No filter on clean cracks yet.
 	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
 	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");

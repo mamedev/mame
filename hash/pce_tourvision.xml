@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="pce_tourvision" description="TourVision (bootleg Arcade NEC PC-Engine) cartridges">
+<softwarelist name="pce_tourvision" description="TourVisión (bootleg Arcade NEC PC-Engine) cartridges">
 
 <!--
 
@@ -66,7 +66,6 @@ Space Invader
 Strange Zone
 Taito Motor Bike
 Tales Of Monster Path
-Titan
 TV Sports Football
 World Beach Volley
 World Court Tennis
@@ -79,9 +78,9 @@ Parasol Stars
 -->
 
 	<software name="1943kai">
-		<description>1943 Kai (TourVision PCE bootleg)</description>
+		<description>1943 Kai (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="1943改"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x41"/>
@@ -92,9 +91,9 @@ Parasol Stars
 	</software>
 
 	<software name="advislnd">
-		<description>Adventure Island (TourVision PCE bootleg)</description>
+		<description>Adventure Island (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="アドベンチャーアイランド"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x40"/>
@@ -105,9 +104,9 @@ Parasol Stars
 	</software>
 
 	<software name="aeroblst">
-		<description>Aero Blasters (TourVision PCE bootleg)</description>
+		<description>Aero Blasters (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="エアロブラスターズ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x20"/>
@@ -118,9 +117,9 @@ Parasol Stars
 	</software>
 
 	<software name="aburner2">
-		<description>After Burner (TourVision PCE bootleg)</description>
+		<description>After Burner (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / NEC Avenue</publisher>
+		<publisher>bootleg (TourVisión) / NEC Avenue</publisher>
 		<info name="alt_title" value="アフターバーナーII"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2e"/>
@@ -131,9 +130,9 @@ Parasol Stars
 	</software>
 
 	<software name="alice">
-		<description>Alice In Wonderland (TourVision PCE bootleg)</description>
+		<description>Alice In Wonderland (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Face</publisher>
+		<publisher>bootleg (TourVisión) / Face</publisher>
 		<info name="alt_title" value="不思議の夢のアリス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x3d"/>
@@ -144,9 +143,9 @@ Parasol Stars
 	</software>
 
 	<software name="ankoku">
-		<description>Ankoku Densetsu (TourVision PCE bootleg)</description>
+		<description>Ankoku Densetsu (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Victor Interactive Software</publisher>
+		<publisher>bootleg (TourVisión) / Victor Interactive Software</publisher>
 		<info name="alt_title" value="暗黒伝説"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x21"/>
@@ -157,9 +156,9 @@ Parasol Stars
 	</software>
 
 	<software name="armedf">
-		<description>Armed-F (TourVision PCE bootleg)</description>
+		<description>Armed-F (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Pack-In-Video</publisher>
+		<publisher>bootleg (TourVisión) / Pack-In-Video</publisher>
 		<info name="alt_title" value="FORMATION アームドF"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xff"/> <!-- Possible IDs: 4,5,15,18,24,31,40,61,75,76,77,78,101,111,114,120,127,136 (medium both delays) -->
@@ -170,9 +169,9 @@ Parasol Stars
 	</software>
 
 	<software name="ballistx">
-		<description>Ballistix (TourVision PCE bootleg)</description>
+		<description>Ballistix (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Coconuts Japan</publisher>
+		<publisher>bootleg (TourVisión) / Coconuts Japan</publisher>
 		<info name="alt_title" value="バリスティックス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xba"/>
@@ -183,9 +182,9 @@ Parasol Stars
 	</software>
 
 	<software name="barunba">
-		<description>Barunba (TourVision PCE bootleg)</description>
+		<description>Barunba (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="バルンバ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x27"/>
@@ -196,9 +195,9 @@ Parasol Stars
 	</software>
 
 	<software name="batman">
-		<description>Batman (TourVision PCE bootleg)</description>
+		<description>Batman (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Sunsoft</publisher>
+		<publisher>bootleg (TourVisión) / Sunsoft</publisher>
 		<info name="alt_title" value="バットマン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1e"/>
@@ -209,9 +208,9 @@ Parasol Stars
 	</software>
 
 	<software name="beball">
-		<description>Be Ball (TourVision PCE bootleg)</description>
+		<description>Be Ball (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ビーボール"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x5d"/>
@@ -222,9 +221,9 @@ Parasol Stars
 	</software>
 
 	<software name="blodia">
-		<description>Blodia (TourVision PCE bootleg)</description>
+		<description>Blodia (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ブロディア"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x07"/>
@@ -235,9 +234,9 @@ Parasol Stars
 	</software>
 
 	<software name="bombman">
-		<description>Bomberman (TourVision PCE bootleg)</description>
+		<description>Bomberman (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ボンバーマン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x47"/>
@@ -248,9 +247,9 @@ Parasol Stars
 	</software>
 
 	<software name="bombmn93">
-		<description>Bomberman '93 (TourVision PCE bootleg)</description>
+		<description>Bomberman '93 (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ボンバーマン'93"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xcc"/>
@@ -261,9 +260,9 @@ Parasol Stars
 	</software>
 
 	<software name="bullfght">
-		<description>Bull Fight - Ring no Haja (TourVision PCE bootleg)</description>
+		<description>Bull Fight - Ring no Haja (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Cream</publisher>
+		<publisher>bootleg (TourVisión) / Cream</publisher>
 		<info name="alt_title" value="ブルファイト リングの覇者"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xb9"/>
@@ -274,9 +273,9 @@ Parasol Stars
 	</software>
 
 	<software name="burnangl">
-		<description>Burning Angels (TourVision PCE bootleg)</description>
+		<description>Burning Angels (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="バーニングエンジェル"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x31"/>
@@ -287,9 +286,9 @@ Parasol Stars
 	</software>
 
 	<software name="cadash">
-		<description>Cadash (TourVision PCE bootleg)</description>
+		<description>Cadash (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="カダッシュ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xcb"/>
@@ -301,9 +300,9 @@ Parasol Stars
 
 	<!--Super Foolist Man -->
 	<software name="bravoman">
-		<description>Chouzetsu Rinjin - Bravoman (TourVision PCE bootleg)</description>
+		<description>Chouzetsu Rinjin - Bravoman (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="超絶倫人ベラボーマン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1b"/>
@@ -314,9 +313,9 @@ Parasol Stars
 	</software>
 
 	<software name="chukatai">
-		<description>Chuka Taisen (TourVision PCE bootleg)</description>
+		<description>Chuka Taisen (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="極楽!中華大仙"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x25"/>
@@ -327,9 +326,9 @@ Parasol Stars
 	</software>
 
 	<software name="columns">
-		<description>Columns (TourVision PCE bootleg)</description>
+		<description>Columns (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Nihon Telenet</publisher>
+		<publisher>bootleg (TourVisión) / Nihon Telenet</publisher>
 		<info name="alt_title" value="コラムス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x5a"/>
@@ -340,9 +339,9 @@ Parasol Stars
 	</software>
 
 	<software name="coryoon">
-		<description>Coryoon - Child of Dragon (TourVision PCE bootleg)</description>
+		<description>Coryoon - Child of Dragon (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="コリューン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="43"/>
@@ -353,9 +352,9 @@ Parasol Stars
 	</software>
 
 	<software name="cybrcore">
-		<description>Cyber Core (TourVision PCE bootleg)</description>
+		<description>Cyber Core (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / IGS</publisher>
+		<publisher>bootleg (TourVisión) / IGS</publisher>
 		<info name="alt_title" value="サイバーコア"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0d"/>
@@ -366,9 +365,9 @@ Parasol Stars
 	</software>
 
 	<software name="daisenpu">
-		<description>Daisenpu (TourVision PCE bootleg)</description>
+		<description>Daisenpu (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / NEC Avenue</publisher>
+		<publisher>bootleg (TourVisión) / NEC Avenue</publisher>
 		<info name="alt_title" value="大旋風"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x03"/>
@@ -379,9 +378,9 @@ Parasol Stars
 	</software>
 
 	<software name="deadmoon">
-		<description>Dead Moon (TourVision PCE bootleg)</description>
+		<description>Dead Moon (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / T.S.S</publisher>
+		<publisher>bootleg (TourVisión) / T.S.S</publisher>
 		<info name="alt_title" value="デッドムーン 月世界の悪夢"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x37"/>
@@ -392,9 +391,9 @@ Parasol Stars
 	</software>
 
 	<software name="devlcrsh">
-		<description>Devil Crash - Naxat Pinball (TourVision PCE bootleg)</description>
+		<description>Devil Crash - Naxat Pinball (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="デビルクラッシュ ナグザットピンボール"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2f"/>
@@ -405,9 +404,9 @@ Parasol Stars
 	</software>
 
 	<software name="diehard">
-		<description>Die Hard (TourVision PCE bootleg)</description>
+		<description>Die Hard (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Pack In Video</publisher>
+		<publisher>bootleg (TourVisión) / Pack In Video</publisher>
 		<info name="alt_title" value="ダイハード"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x49"/>
@@ -419,9 +418,9 @@ Parasol Stars
 
 	<!--Dodge Ball -->
 	<software name="nekdodge">
-		<description>Nekketsu Koukou Dodgeball Bu - PC Bangai Hen (TourVision PCE bootleg)</description>
+		<description>Nekketsu Koukou Dodgeball Bu - PC Bangai Hen (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="熱血高校ドッジボール部 PC番外編"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc2"/>
@@ -432,9 +431,9 @@ Parasol Stars
 	</software>
 
 	<software name="dorams">
-		<description>Doraemon - Meikyuu Dai Sakusen (TourVision PCE bootleg)</description>
+		<description>Doraemon - Meikyuu Dai Sakusen (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x14"/>
 			<dataarea name="rom" size="262144">
@@ -444,9 +443,9 @@ Parasol Stars
 	</software>
 
 	<software name="dorandn">
-		<description>Doraemon - Nobita no Dorabian Night (TourVision PCE bootleg)</description>
+		<description>Doraemon - Nobita no Dorabian Night (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ドラえもん のび太のドラビアンナイト"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2b"/>
@@ -457,9 +456,9 @@ Parasol Stars
 	</software>
 
 	<software name="download">
-		<description>Down Load (TourVision PCE bootleg)</description>
+		<description>Down Load (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / NEC Avenue</publisher>
+		<publisher>bootleg (TourVisión) / NEC Avenue</publisher>
 		<info name="alt_title" value="ダウンロード"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2b"/>
@@ -470,9 +469,9 @@ Parasol Stars
 	</software>
 
 	<software name="dragnegg">
-		<description>Dragon Egg! (TourVision PCE bootleg)</description>
+		<description>Dragon Egg! (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Masiya</publisher>
+		<publisher>bootleg (TourVisión) / Masaya</publisher>
 		<info name="alt_title" value="どらごんEGG!"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x62"/>
@@ -483,9 +482,9 @@ Parasol Stars
 	</software>
 
 	<software name="dsaber">
-		<description>Dragon Saber - After Story of Dragon Spirit (TourVision PCE bootleg)</description>
+		<description>Dragon Saber - After Story of Dragon Spirit (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="ドラゴンセイバー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x41"/>
@@ -496,9 +495,9 @@ Parasol Stars
 	</software>
 
 	<software name="dspirit">
-		<description>Dragon Spirit (TourVision PCE bootleg)</description>
+		<description>Dragon Spirit (TourVisión PCE bootleg)</description>
 		<year>1988</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="ドラゴンスピリット"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xff"/> <!-- Possible IDs: 4,5,15,18,24,31,40,61,75,76,77,78,101,111,114,120,127,136 (long final delay short initial one) -->
@@ -509,9 +508,9 @@ Parasol Stars
 	</software>
 
 	<software name="droprock">
-		<description>Drop Rock Hora Hora (TourVision PCE bootleg)</description>
+		<description>Drop Rock Hora Hora (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Data East</publisher>
+		<publisher>bootleg (TourVisión) / Data East</publisher>
 		<info name="alt_title" value="ドロップロック ほらホラ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0c"/>
@@ -522,9 +521,9 @@ Parasol Stars
 	</software>
 
 	<software name="dungexpl">
-		<description>Dungeon Explorer (TourVision PCE bootleg)</description>
+		<description>Dungeon Explorer (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ダンジョン エクスプローラー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xd1"/>
@@ -536,9 +535,9 @@ Parasol Stars
 
 	<!-- Confirmed to exist, but not dumped from actual TourVisión cart -->
 	<software name="f1tb">
-		<description>F1 Triple Battle (TourVision PCE bootleg)</description>
+		<description>F1 Triple Battle (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Human</publisher>
+		<publisher>bootleg (TourVisión) / Human</publisher>
 		<info name="alt_title" value="F1トリプルバトル"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x64"/> <!-- ID = 100d. It was not actually read from the cart, but reversed-engineered -->
@@ -549,9 +548,9 @@ Parasol Stars
 	</software>
 
 	<software name="fightrun">
-		<description>Fighting Run (TourVision PCE bootleg)</description>
+		<description>Fighting Run (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Nihon Bussan</publisher>
+		<publisher>bootleg (TourVisión) / Nihon Bussan</publisher>
 		<info name="alt_title" value="ファイティングラン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc3"/>
@@ -562,9 +561,9 @@ Parasol Stars
 	</software>
 
 	<software name="finlblst">
-		<description>Final Blaster (TourVision PCE bootleg)</description>
+		<description>Final Blaster (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="ファイナルブラスター"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1d"/>
@@ -575,9 +574,9 @@ Parasol Stars
 	</software>
 
 	<software name="finallap">
-		<description>Final Lap Twin (TourVision PCE bootleg)</description>
+		<description>Final Lap Twin (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="ファイナルラップ・ツイン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x4f"/>
@@ -588,9 +587,9 @@ Parasol Stars
 	</software>
 
 	<software name="finalmt">
-		<description>Final Match Tennis (TourVision PCE bootleg)</description>
+		<description>Final Match Tennis (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Human</publisher>
+		<publisher>bootleg (TourVisión) / Human</publisher>
 		<info name="alt_title" value="ファイナルマッチテニス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x3e"/>
@@ -601,9 +600,9 @@ Parasol Stars
 	</software>
 
 	<software name="finalsol">
-		<description>Final Soldier (TourVision PCE bootleg)</description>
+		<description>Final Soldier (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ファイナルソルジャー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2d"/>
@@ -614,9 +613,9 @@ Parasol Stars
 	</software>
 
 	<software name="fsoccr90">
-		<description>Formation Soccer - Human Cup '90 (TourVision PCE bootleg)</description>
+		<description>Formation Soccer - Human Cup '90 (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Human</publisher>
+		<publisher>bootleg (TourVisión) / Human</publisher>
 		<info name="alt_title" value="フォーメーション・サッカー ヒューマンカップ'90"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x01"/>
@@ -627,9 +626,9 @@ Parasol Stars
 	</software>
 
 	<software name="ganbgolf">
-		<description>Ganbare! Golf Boys (TourVision PCE bootleg)</description>
+		<description>Ganbare! Golf Boys (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / NCS</publisher>
+		<publisher>bootleg (TourVisión) / NCS</publisher>
 		<info name="alt_title" value="がんばれ!ゴルフボーイズ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x43"/>
@@ -640,9 +639,9 @@ Parasol Stars
 	</software>
 
 	<software name="gomola">
-		<description>Gomola Speed (TourVision PCE bootleg)</description>
+		<description>Gomola Speed (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / UPL</publisher>
+		<publisher>bootleg (TourVisión) / UPL</publisher>
 		<info name="alt_title" value="ゴモラスピード"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1b"/>
@@ -653,9 +652,9 @@ Parasol Stars
 	</software>
 
 	<software name="gradius">
-		<description>Gradius (TourVision PCE bootleg)</description>
+		<description>Gradius (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Konami</publisher>
+		<publisher>bootleg (TourVisión) / Konami</publisher>
 		<info name="alt_title" value="グラディウス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xbb"/>
@@ -666,9 +665,9 @@ Parasol Stars
 	</software>
 
 	<software name="gunhed">
-		<description>GunHed (TourVision PCE bootleg)</description>
+		<description>GunHed (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ガンヘッド"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x94"/>
@@ -681,9 +680,9 @@ Parasol Stars
 
 	<!--Super Long Nose Goblin -->
 	<software name="hanataka">
-		<description>Hana Taaka Daka!? (TourVision PCE bootleg)</description>
+		<description>Hana Taaka Daka!? (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="はなたーかだか!?"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x06"/>
@@ -694,9 +693,9 @@ Parasol Stars
 	</software>
 
 	<software name="haniirod">
-		<description>Hanii on the Road (TourVision PCE bootleg)</description> <!-- The cart was hand-labeled as "Money in the Sky II" -->
+		<description>Hanii on the Road (TourVisión PCE bootleg)</description> <!-- The cart was hand-labeled as "Money in the Sky II" -->
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Face</publisher>
+		<publisher>bootleg (TourVisión) / Face</publisher>
 		<info name="alt_title" value="はにい・おんざ・ろおど"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x53"/>
@@ -707,9 +706,9 @@ Parasol Stars
 	</software>
 
 	<software name="hitice">
-		<description>Hit the Ice - VHL - The Official Video Hockey League (TourVision PCE bootleg)</description>
+		<description>Hit the Ice - VHL - The Official Video Hockey League (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="ヒット ジ アイス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x61"/>
@@ -720,9 +719,9 @@ Parasol Stars
 	</software>
 
 	<software name="imagefgt">
-		<description>Image Fight (TourVision PCE bootleg)</description>
+		<description>Image Fight (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Irem</publisher>
+		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="イメージファイト"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x63"/>
@@ -733,9 +732,9 @@ Parasol Stars
 	</software>
 
 	<software name="jchan">
-		<description>Jackie Chan (TourVision PCE bootleg)</description>
+		<description>Jackie Chan (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ジャッキーチェン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x36"/>
@@ -746,9 +745,9 @@ Parasol Stars
 	</software>
 
 	<software name="jinmu">
-		<description>Jinmu Denshou (TourVision PCE bootleg)</description>
+		<description>Jinmu Denshou (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Big Club</publisher>
+		<publisher>bootleg (TourVisión) / Big Club</publisher>
 		<info name="alt_title" value="神武伝承"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x13"/>
@@ -759,9 +758,9 @@ Parasol Stars
 	</software>
 
 	<software name="katochan">
-		<description>Kato Chan &amp; Ken Chan (TourVision PCE bootleg)</description>
+		<description>Kato Chan &amp; Ken Chan (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="カトちゃんケンちゃん"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2a"/>
@@ -772,9 +771,9 @@ Parasol Stars
 	</software>
 
 	<software name="kikikai">
-		<description>Kiki Kaikai (TourVision PCE bootleg)</description>
+		<description>Kiki Kaikai (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="奇々怪界"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x78"/>
@@ -785,9 +784,9 @@ Parasol Stars
 	</software>
 
 	<software name="knightrs">
-		<description>Knight Rider Special (TourVision PCE bootleg)</description>
+		<description>Knight Rider Special (TourVisión PCE bootleg)</description>
 		<year>1994</year>
-		<publisher>bootleg (TourVision) / Pack In Video</publisher>
+		<publisher>bootleg (TourVisión) / Pack In Video</publisher>
 		<info name="alt_title" value="ナイトライダースペシャル"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc1"/>
@@ -798,9 +797,9 @@ Parasol Stars
 	</software>
 
 	<software name="loht">
-		<description>Legend of Hero Tonma (TourVision PCE bootleg)</description>
+		<description>Legend of Hero Tonma (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Irem</publisher>
+		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="レジェンド・オブ・ヒーロー・トンマ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x38"/>
@@ -811,9 +810,9 @@ Parasol Stars
 	</software>
 
 	<software name="makyoden">
-		<description>Makyou Densetsu - The Legendary Axe (TourVision PCE bootleg)</description>
+		<description>Makyou Densetsu - The Legendary Axe (TourVisión PCE bootleg)</description>
 		<year>1988</year>
-		<publisher>bootleg (TourVision) / Victor Interactive Software</publisher>
+		<publisher>bootleg (TourVisión) / Victor Interactive Software</publisher>
 		<info name="alt_title" value="魔境伝説"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x28"/>
@@ -824,9 +823,9 @@ Parasol Stars
 	</software>
 
 	<software name="mesopot">
-		<description>Mesopotamia (TourVision PCE bootleg)</description>
+		<description>Mesopotamia (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Atlus</publisher>
+		<publisher>bootleg (TourVisión) / Atlus</publisher>
 		<info name="alt_title" value="メソポタミア"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc5"/>
@@ -838,9 +837,9 @@ Parasol Stars
 
 	<!--Liquid Kids -->
 	<software name="mizubaku">
-		<description>Mizubaku Dai Bouken (TourVision PCE bootleg)</description>
+		<description>Mizubaku Dai Bouken (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="ミズバク大冒険"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0a"/>
@@ -851,9 +850,9 @@ Parasol Stars
 	</software>
 
 	<software name="mrheli">
-		<description>Mr. Heli no Daibouken (TourVision PCE bootleg)</description>
+		<description>Mr. Heli no Daibouken (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Irem</publisher>
+		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="ミスターヘリの大冒険"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x17"/>
@@ -864,9 +863,9 @@ Parasol Stars
 	</software>
 
 	<software name="nryukend">
-		<description>Ninja Ryukenden (TourVision PCE bootleg)</description>
+		<description>Ninja Ryukenden (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="忍者龍剣伝"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0a"/>
@@ -877,9 +876,9 @@ Parasol Stars
 	</software>
 
 	<software name="opwolf">
-		<description>Operation Wolf (TourVision PCE bootleg)</description>
+		<description>Operation Wolf (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / NEC Avenue</publisher>
+		<publisher>bootleg (TourVisión) / NEC Avenue</publisher>
 		<info name="alt_title" value="オペレーション ウルフ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1a"/>
@@ -890,9 +889,9 @@ Parasol Stars
 	</software>
 
 	<software name="ordyne">
-		<description>Ordyne (TourVision PCE bootleg)</description>
+		<description>Ordyne (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="オーダイン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x5e"/>
@@ -903,9 +902,9 @@ Parasol Stars
 	</software>
 
 	<software name="outruna">
-		<description>Out Run (alt) (TourVision PCE bootleg)</description>
+		<description>Out Run (alt) (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / NEC Avenue</publisher>
+		<publisher>bootleg (TourVisión) / NEC Avenue</publisher>
 		<info name="alt_title" value="アウトラン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x26"/>
@@ -920,9 +919,9 @@ Parasol Stars
 	</software>
 
 	<software name="override">
-		<description>Override (TourVision PCE bootleg)</description>
+		<description>Override (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Data East</publisher>
+		<publisher>bootleg (TourVisión) / Data East</publisher>
 		<info name="alt_title" value="オーバーライド"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x35"/>
@@ -933,9 +932,9 @@ Parasol Stars
 	</software>
 
 	<software name="pacland">
-		<description>Pac-Land (TourVision PCE bootleg)</description>
+		<description>Pac-Land (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="パックランド"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x10"/>
@@ -947,9 +946,9 @@ Parasol Stars
 
 	<!-- Confirmed to exist, but not dumped from actual TourVisión cart -->
 	<software name="paranoia">
-		<description>Paranoia (TourVision PCE bootleg)</description>
+		<description>Paranoia (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="パラノイア"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x12"/> <!-- 18d, readed from the riser (without the cart) -->
@@ -960,9 +959,9 @@ Parasol Stars
 	</software>
 
 	<software name="pcdenj">
-		<description>PC Denjin - Punkic Cyborg (TourVision PCE bootleg)</description>
+		<description>PC Denjin - Punkic Cyborg (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="PC電人 PUNKIC CYBORGS"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc9"/>
@@ -973,9 +972,9 @@ Parasol Stars
 	</software>
 
 	<software name="pcgenja">
-		<description>PC Genjin - Pithecanthropus Computerurus (Alt) (TourVision PCE bootleg)</description>
+		<description>PC Genjin - Pithecanthropus Computerurus (Alt) (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="PC原人"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x08"/>
@@ -986,9 +985,9 @@ Parasol Stars
 	</software>
 
 	<software name="pcgenj2">
-		<description>PC Genjin 2 - Pithecanthropus Computerurus (TourVision PCE bootleg)</description>
+		<description>PC Genjin 2 - Pithecanthropus Computerurus (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="PC原人2"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x54"/>
@@ -999,9 +998,9 @@ Parasol Stars
 	</software>
 
 	<software name="pdrift">
-		<description>Power Drift (TourVision PCE bootleg)</description>
+		<description>Power Drift (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Asmik</publisher>
+		<publisher>bootleg (TourVisión) / Asmik</publisher>
 		<info name="alt_title" value="パワードリフト"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc8"/>
@@ -1012,9 +1011,9 @@ Parasol Stars
 	</software>
 
 	<software name="power11">
-		<description>Power Eleven (TourVision PCE bootleg)</description>
+		<description>Power Eleven (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="パワーイレブン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x53"/>
@@ -1025,9 +1024,9 @@ Parasol Stars
 	</software>
 
 	<software name="pleag4">
-		<description>Power League IV (TourVision PCE bootleg)</description>
+		<description>Power League IV (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="パワーリーグ4"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xff"/>
@@ -1038,9 +1037,9 @@ Parasol Stars
 	</software>
 
 	<software name="psports">
-		<description>Power Sports (TourVision PCE bootleg)</description>
+		<description>Power Sports (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="パワースポーツ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc7"/>
@@ -1051,9 +1050,9 @@ Parasol Stars
 	</software>
 
 	<software name="ptennis" supported="partial">
-		<description>Power Tennis (TourVision PCE bootleg)</description>
+		<description>Power Tennis (TourVisión PCE bootleg)</description>
 		<year>1993</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="パワーテニス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xb7"/>
@@ -1064,9 +1063,9 @@ Parasol Stars
 	</software>
 
 	<software name="proyak91">
-		<description>Pro Yakyuu World Stadium '91 (TourVision PCE bootleg)</description>
+		<description>Pro Yakyuu World Stadium '91 (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="プロ野球 ワールドスタジアム'91"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc0"/>
@@ -1077,9 +1076,9 @@ Parasol Stars
 	</software>
 
 	<software name="psychas">
-		<description>Psycho Chaser (TourVision PCE bootleg)</description>
+		<description>Psycho Chaser (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="サイコチェイサー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0e"/>
@@ -1090,9 +1089,9 @@ Parasol Stars
 	</software>
 
 	<software name="puzzlboy">
-		<description>Puzzle Boy (TourVision PCE bootleg)</description>
+		<description>Puzzle Boy (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Nihon Telenet</publisher>
+		<publisher>bootleg (TourVisión) / Nihon Telenet</publisher>
 		<info name="alt_title" value="パズルボーイ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x39"/>
@@ -1103,9 +1102,9 @@ Parasol Stars
 	</software>
 
 	<software name="puzznic">
-		<description>Puzznic (TourVision PCE bootleg)</description>
+		<description>Puzznic (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="パズニック"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x45"/>
@@ -1119,9 +1118,9 @@ Parasol Stars
 	<!-- Confirmed to exist, but not dumped from actual TourVisión cart -->
 	<!-- Racing Spirit -->
 	<software name="racindam">
-		<description>Racing Damashii (TourVision PCE bootleg)</description>
+		<description>Racing Damashii (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Irem</publisher>
+		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="レーシング魂"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x5B"/> <!-- ID = 91d. It was not actually read from the cart, but reversed-engineered -->
@@ -1132,9 +1131,9 @@ Parasol Stars
 	</software>
 
 	<software name="raiden">
-		<description>Raiden (TourVision PCE bootleg)</description>
+		<description>Raiden (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="雷電"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x6f"/>
@@ -1145,9 +1144,9 @@ Parasol Stars
 	</software>
 
 	<software name="rastan2">
-		<description>Rastan Saga II (TourVision PCE bootleg)</description>
+		<description>Rastan Saga II (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="ラスタン・サーガII"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x21"/>
@@ -1158,9 +1157,9 @@ Parasol Stars
 	</software>
 
 	<software name="rtypep2a">
-		<description>R-Type II (hack, no copyright string) (TourVision PCE bootleg)</description>
+		<description>R-Type II (hack, no copyright string) (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / IREM Corp</publisher>
+		<publisher>bootleg (TourVisión) / IREM Corp</publisher>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x3d"/>
 			<dataarea name="rom" size="262144">
@@ -1171,9 +1170,9 @@ Parasol Stars
 	</software>
 
 	<software name="sdragon">
-		<description>Tenseiryuu - Saint Dragon (TourVision PCE bootleg)</description>
+		<description>Tenseiryuu - Saint Dragon (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Irem</publisher>
+		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="天聖龍"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x24"/>
@@ -1184,9 +1183,9 @@ Parasol Stars
 	</software>
 
 	<software name="saigonin">
-		<description>Saigo no Nindou - Ninja Spirit (TourVision PCE bootleg)</description>
+		<description>Saigo no Nindou - Ninja Spirit (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Irem</publisher>
+		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="最後の忍道 NINJA SPIRIT"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2c"/>
@@ -1197,9 +1196,9 @@ Parasol Stars
 	</software>
 
 	<software name="salamand">
-		<description>Salamander (TourVision PCE bootleg)</description>
+		<description>Salamander (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Konami</publisher>
+		<publisher>bootleg (TourVisión) / Konami</publisher>
 		<info name="alt_title" value="沙羅曼蛇"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xb8"/>
@@ -1210,9 +1209,9 @@ Parasol Stars
 	</software>
 
 	<software name="shinobi">
-		<description>Shinobi (TourVision PCE bootleg)</description>
+		<description>Shinobi (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Asmik</publisher>
+		<publisher>bootleg (TourVisión) / Asmik</publisher>
 		<info name="alt_title" value="忍"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x05"/>
@@ -1223,9 +1222,9 @@ Parasol Stars
 	</software>
 
 	<software name="sidearms">
-		<description>Side Arms - Hyper Dyne (TourVision PCE bootleg)</description>
+		<description>Side Arms - Hyper Dyne (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / NEC</publisher>
+		<publisher>bootleg (TourVisión) / NEC</publisher>
 		<info name="alt_title" value="サイドアーム"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x02"/>
@@ -1236,9 +1235,9 @@ Parasol Stars
 	</software>
 
 	<software name="skweek">
-		<description>Skweek (TourVision PCE bootleg)</description>
+		<description>Skweek (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Victor Interactive Software</publisher>
+		<publisher>bootleg (TourVisión) / Victor Interactive Software</publisher>
 		<info name="alt_title" value="スクウィーク"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x59"/>
@@ -1249,9 +1248,9 @@ Parasol Stars
 	</software>
 
 	<software name="sokoban">
-		<description>Sokoban World (TourVision PCE bootleg)</description>
+		<description>Sokoban World (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Media Rings Corporation</publisher>
+		<publisher>bootleg (TourVisión) / Media Rings Corporation</publisher>
 		<info name="alt_title" value="倉庫番ワールド"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x42"/>
@@ -1262,9 +1261,9 @@ Parasol Stars
 	</software>
 
 	<software name="soldblad">
-		<description>Soldier Blade (TourVision PCE bootleg)</description>
+		<description>Soldier Blade (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="ソルジャーブレイド"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x17"/>
@@ -1275,9 +1274,9 @@ Parasol Stars
 	</software>
 
 	<software name="sonson2">
-		<description>Son Son II (TourVision PCE bootleg)</description>
+		<description>Son Son II (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / NEC</publisher>
+		<publisher>bootleg (TourVisión) / NEC</publisher>
 		<info name="alt_title" value="ソンソンII"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x50"/>
@@ -1288,9 +1287,9 @@ Parasol Stars
 	</software>
 
 	<software name="sci">
-		<description>Special Criminal Investigation (TourVision PCE bootleg)</description>
+		<description>Special Criminal Investigation (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x3a"/>
 			<dataarea name="rom" size="524288">
@@ -1300,9 +1299,9 @@ Parasol Stars
 	</software>
 
 	<software name="spinpair">
-		<description>Spin Pair (TourVision PCE bootleg)</description>
+		<description>Spin Pair (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Media Rings Corporation</publisher>
+		<publisher>bootleg (TourVisión) / Media Rings Corporation</publisher>
 		<info name="alt_title" value="スピンペア"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x32"/>
@@ -1313,9 +1312,9 @@ Parasol Stars
 	</software>
 
 	<software name="splatth">
-		<description>Splatterhouse (TourVision PCE bootleg)</description>
+		<description>Splatterhouse (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="スプラッターハウス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x94"/>
@@ -1326,9 +1325,9 @@ Parasol Stars
 	</software>
 
 	<software name="sssoldr">
-		<description>Super Star Soldier (TourVision PCE bootleg)</description>
+		<description>Super Star Soldier (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="スーパースターソルジャー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2a"/>
@@ -1340,9 +1339,9 @@ Parasol Stars
 
 
 	<software name="svolley">
-		<description>Super Volley ball (TourVision PCE bootleg)</description>
+		<description>Super Volley ball (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Video System</publisher>
+		<publisher>bootleg (TourVisión) / Video System</publisher>
 		<info name="alt_title" value="スーパーバレーボール"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x09"/>
@@ -1353,9 +1352,9 @@ Parasol Stars
 	</software>
 
 	<software name="tatsujin">
-		<description>Tatsujin (TourVision PCE bootleg)</description>
+		<description>Tatsujin (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="タツジン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1f"/>
@@ -1366,9 +1365,9 @@ Parasol Stars
 	</software>
 
 	<software name="terracr2">
-		<description>Terra Cresta II (TourVision PCE bootleg)</description>
+		<description>Terra Cresta II (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Nihon Bussan</publisher>
+		<publisher>bootleg (TourVisión) / Nihon Bussan</publisher>
 		<info name="alt_title" value="テラクレスタII マンドラーの逆襲"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1b"/>
@@ -1379,9 +1378,9 @@ Parasol Stars
 	</software>
 
 	<software name="tnzs">
-		<description>The NewZealand Story (TourVision PCE bootleg)</description>
+		<description>The NewZealand Story (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="ニュージーランドストーリー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0b"/>
@@ -1392,9 +1391,9 @@ Parasol Stars
 	</software>
 
 	<software name="tblade">
-		<description>Thunder Blade (TourVision PCE bootleg)</description>
+		<description>Thunder Blade (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / NEC Avenue</publisher>
+		<publisher>bootleg (TourVisión) / NEC Avenue</publisher>
 		<info name="alt_title" value="サンダーブレード"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x22"/>
@@ -1405,9 +1404,9 @@ Parasol Stars
 	</software>
 
 	<software name="timcrus2">
-		<description>Time Cruise II (TourVision PCE bootleg)</description>
+		<description>Time Cruise II (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Face</publisher>
+		<publisher>bootleg (TourVisión) / Face</publisher>
 		<info name="alt_title" value="タイムクルーズII"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2a"/>
@@ -1417,10 +1416,23 @@ Parasol Stars
 		</part>
 	</software>
 
+	<software name="titan">
+		<description>Titan (TourVisión PCE bootleg)</description>
+		<year>1991</year>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
+		<info name="alt_title" value="タイタン"/>
+		<part name="cart" interface="tourvision_cart">
+			<feature name="id" value="0x2b"/>
+			<dataarea name="rom" size="262144">
+				<rom name="titan (japan).pce" size="262144" crc="d20f382f" sha1="7d12a65453c8d3d539104904a9a1eb9e429f9ab4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="toiletk">
-		<description>Toilet Kids (TourVision PCE bootleg)</description>
+		<description>Toilet Kids (TourVisión PCE bootleg)</description>
 		<year>1992</year>
-		<publisher>bootleg (TourVision) / Media Rings Corporation</publisher>
+		<publisher>bootleg (TourVisión) / Media Rings Corporation</publisher>
 		<info name="alt_title" value="トイレキッズ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc4"/>
@@ -1432,9 +1444,9 @@ Parasol Stars
 
 	<!--Tiger Road -->
 	<software name="toramich">
-		<description>Tora e no Michi (TourVision PCE bootleg)</description>
+		<description>Tora e no Michi (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Victor Entertainment</publisher>
+		<publisher>bootleg (TourVisión) / Victor Entertainment</publisher>
 		<info name="alt_title" value="虎への道"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0a"/>
@@ -1445,9 +1457,9 @@ Parasol Stars
 	</software>
 
 	<software name="toyshopb">
-		<description>Toy Shop Boys (TourVision PCE bootleg)</description>
+		<description>Toy Shop Boys (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Victor Musical Industries, Inc.</publisher>
+		<publisher>bootleg (TourVisión) / Victor Musical Industries, Inc.</publisher>
 		<info name="alt_title" value="トイ・ショップ・ボーイズ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x33"/>
@@ -1458,9 +1470,9 @@ Parasol Stars
 	</software>
 
 	<software name="tricky">
-		<description>Tricky (TourVision PCE bootleg)</description>
+		<description>Tricky (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / IGS</publisher>
+		<publisher>bootleg (TourVisión) / IGS</publisher>
 		<info name="alt_title" value="トリッキー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x2a"/>
@@ -1471,9 +1483,9 @@ Parasol Stars
 	</software>
 
 	<software name="usaprobs">
-		<description>USA Pro Basketball (TourVision PCE bootleg)</description>
+		<description>USA Pro Basketball (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Aicom</publisher>
+		<publisher>bootleg (TourVisión) / Aicom</publisher>
 		<info name="alt_title" value="USAプロバスケットボール"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xce"/>
@@ -1484,9 +1496,9 @@ Parasol Stars
 	</software>
 
 	<software name="veigues">
-		<description>Veigues - Tactical Gladiator (TourVision PCE bootleg)</description>
+		<description>Veigues - Tactical Gladiator (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Victor Entertainment</publisher>
+		<publisher>bootleg (TourVisión) / Victor Entertainment</publisher>
 		<info name="alt_title" value="ヴェイグスTACTICAL GLADIATOR"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x28"/>
@@ -1497,9 +1509,9 @@ Parasol Stars
 	</software>
 
 	<software name="vigilant">
-		<description>Vigilante (TourVision PCE bootleg)</description>
+		<description>Vigilante (TourVisión PCE bootleg)</description>
 		<year>1988</year>
-		<publisher>bootleg (TourVision) / Irem</publisher>
+		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="ビジランテ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x08"/>
@@ -1510,9 +1522,9 @@ Parasol Stars
 	</software>
 
 	<software name="violents">
-		<description>Violent Soldier (TourVision PCE bootleg)</description>
+		<description>Violent Soldier (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / IGS</publisher>
+		<publisher>bootleg (TourVisión) / IGS</publisher>
 		<info name="alt_title" value="バイオレント・ソルジャー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xff"/>
@@ -1523,9 +1535,9 @@ Parasol Stars
 	</software>
 
 	<software name="volfied">
-		<description>Volfied (TourVision PCE bootleg)</description>
+		<description>Volfied (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Taito</publisher>
+		<publisher>bootleg (TourVisión) / Taito</publisher>
 		<info name="alt_title" value="ヴォルフィード"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x44"/>
@@ -1536,9 +1548,9 @@ Parasol Stars
 	</software>
 
 	<software name="wataru">
-		<description>Majin Eiyuu Den Wataru (TourVision PCE bootleg)</description>
+		<description>Majin Eiyuu Den Wataru (TourVisión PCE bootleg)</description>
 		<year>1988</year>
-		<publisher>bootleg (TourVision) / Hudson</publisher>
+		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="魔神英雄伝ワタル"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1b"/>
@@ -1549,9 +1561,9 @@ Parasol Stars
 	</software>
 
 	<software name="winshot">
-		<description>Winning Shot (TourVision PCE bootleg)</description>
+		<description>Winning Shot (TourVisión PCE bootleg)</description>
 		<year>1989</year>
-		<publisher>bootleg (TourVision) / Data East</publisher>
+		<publisher>bootleg (TourVisión) / Data East</publisher>
 		<info name="alt_title" value="ウィニングショット"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x15"/>
@@ -1562,9 +1574,9 @@ Parasol Stars
 	</software>
 
 	<software name="wjockey">
-		<description>World Jockey (TourVision PCE bootleg)</description>
+		<description>World Jockey (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="ワールドジョッキー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xca"/>
@@ -1575,9 +1587,9 @@ Parasol Stars
 	</software>
 
 	<software name="wring">
-		<description>W-Ring - The Double Rings (TourVision PCE bootleg)</description>
+		<description>W-Ring - The Double Rings (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="ダブルリング"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1c"/>
@@ -1588,9 +1600,9 @@ Parasol Stars
 	</software>
 
 	<software name="xevious">
-		<description>Xevious - Fardraut Densetsu (TourVision PCE bootleg)</description>
+		<description>Xevious - Fardraut Densetsu (TourVisión PCE bootleg)</description>
 		<year>1990</year>
-		<publisher>bootleg (TourVision) / Namcot</publisher>
+		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="ゼビウスファードラウト伝説"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xff"/>

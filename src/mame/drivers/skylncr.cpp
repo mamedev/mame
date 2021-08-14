@@ -166,6 +166,7 @@ public:
 	void init_miaction();
 	void init_olymp();
 	void init_sonikfig();
+	void init_superb2k();
 
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 
@@ -2257,6 +2258,28 @@ void skylncr_state::init_olymp() // very weird, needs to be checked / finished, 
 		m_decrypted_opcodes[x] = ROM[x] ^ 0x18;
 }
 
+void skylncr_state::init_superb2k() // TODO: very preliminary, just enough to read some strings
+{
+	uint8_t *const rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	// descramble addresses. At a first glance, swaps seem to change if address line bits 13 or 14 are set (possibly 15 too, but not verified yet)
+	// the scrambled address line bits appear to be 1, 3, 6, 9 and 12
+	// it's possible XORs and are data lines swaps are involved, too, at least for opcodes
+	for (int i = 0x00000; i < 0x10000; i++)
+	{
+		switch (i & 0x6000)
+		{
+			case 0x0000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4,  3, 2,  1, 0)]; break; // TODO: everything
+			case 0x2000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,  1, 11, 10, 9, 8, 7, 3, 5, 4, 12, 2,  6, 0)]; break; // TODO: 0x200 blocks are good (see 0x3e00-0x3fff), rest to be determined
+			case 0x4000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,  1, 11, 10, 3, 8, 7, 6, 5, 4,  9, 2, 12, 0)]; break; // TODO: 0x40 blocks are good, there's still at least a wrong swap (see 0x5200-0x52ff)
+			case 0x6000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,  3, 11, 10, 1, 8, 7, 9, 5, 4, 12, 2,  6, 0)]; break; // TODO: 0x20 blocks are good (see 0x7fa0-0x7fbf)
+		}
+	}
+}
+
 } // Anonymous namespace
 
 
@@ -2280,4 +2303,4 @@ GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Random Games",         "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
 GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
-GAME( 2000?,superb2k,  0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Random Games",         "Super Butterfly 2000",                           MACHINE_IS_SKELETON ) // encrypted / different CPU type ?
+GAME( 2000?,superb2k,  0,        skylncr,  skylncr,  skylncr_state,  init_superb2k, ROT0, "Random Games",         "Super Butterfly 2000",                           MACHINE_IS_SKELETON ) // encrypted / different CPU type ?

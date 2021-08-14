@@ -39,7 +39,7 @@ public:
 	void init_vegaeo();
 
 protected:
-	void video_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;

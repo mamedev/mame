@@ -33,6 +33,7 @@ public:
 	}
 
 	void zpinball(machine_config &config);
+	void eballchps(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -269,7 +270,13 @@ void zpinball_state::zpinball(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SAA1099(config, "saa", 8_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	EFO_ZSU1(config, m_zsu, 0);
+	EFO_ZSU1(config, m_zsu);
+}
+
+void zpinball_state::eballchps(machine_config &config)
+{
+	zpinball(config);
+	EFO_ZSU(config.replace(), m_zsu);
 }
 
 
@@ -311,6 +318,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1986, eballchps, eballchp, zpinball, zpinball, zpinball_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, cobrapb,   0,        zpinball, zpinball, zpinball_state, empty_init, ROT0, "Playbar", "Cobra (Playbar)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, comeback,  0,        zpinball, zpinball, zpinball_state, empty_init, ROT0, "Nondum / CIFA", "Come Back", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, eballchps, eballchp, eballchps, zpinball, zpinball_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, cobrapb,   0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Playbar", "Cobra (Playbar)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?, comeback,  0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Nondum / CIFA", "Come Back", MACHINE_IS_SKELETON_MECHANICAL)

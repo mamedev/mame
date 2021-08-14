@@ -1175,7 +1175,7 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 			u32 const iphw = CAUSE & SR & CAUSE_IPHW;
 
 			if (iphw)
-				debug()->interrupt_hook(22 - count_leading_zeros((iphw - 1) & ~iphw));
+				debug()->interrupt_hook(22 - count_leading_zeros_32((iphw - 1) & ~iphw));
 		}
 	}
 	else
@@ -1530,7 +1530,7 @@ void r4000_base_device::cp0_tlbwi(u8 const index)
 		entry.pfn[0] = m_cp0[CP0_EntryLo0] & EL_WM;
 		entry.pfn[1] = m_cp0[CP0_EntryLo1] & EL_WM;
 
-		entry.low_bit = 32 - count_leading_zeros((entry.mask >> 1) | 0xfff);
+		entry.low_bit = 32 - count_leading_zeros_32((entry.mask >> 1) | 0xfff);
 
 		LOGMASKED(LOG_TLB, "tlb write index %02d mask 0x%016x vpn2 0x%016x %c asid 0x%02x pfn0 0x%016x %c%c pfn1 0x%016x %c%c (%s)\n",
 			index, entry.mask,

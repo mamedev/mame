@@ -18,6 +18,7 @@
 
 DEFINE_DEVICE_TYPE(MB90610A, mb90610_device, "mb90610a", "Fujitsu MB90610A")
 DEFINE_DEVICE_TYPE(MB90611A, mb90611_device, "mb90611a", "Fujitsu MB90611A")
+DEFINE_DEVICE_TYPE(MB90641A, mb90641_device, "mb90641a", "Fujitsu MB90641A")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -418,5 +419,24 @@ mb90611_device::mb90611_device(const machine_config &mconfig, const char *tag, d
 
 mb90611_device::mb90611_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	mb9061x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mb90611_device::mb90611_map), this))
+{
+}
+
+/* MB90641 - no A/D, extra UART and timers, optional internal ROM */
+void mb90641_device::mb90641_map(address_map &map)
+{
+	map(0x0038, 0x003f).rw(FUNC(mb9061x_device::timer_r), FUNC(mb9061x_device::timer_w));
+	map(0x00a9, 0x00a9).rw(FUNC(mb9061x_device::tbtc_r), FUNC(mb9061x_device::tbtc_w));
+	map(0x00b0, 0x00bf).rw(FUNC(mb9061x_device::intc_r), FUNC(mb9061x_device::intc_w));
+	map(0x0100, 0x08ff).ram();  // 2K of internal RAM
+}
+
+mb90641_device::mb90641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mb90641_device(mconfig, MB90641A, tag, owner, clock)
+{
+}
+
+mb90641_device::mb90641_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	mb9061x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mb90641_device::mb90641_map), this))
 {
 }

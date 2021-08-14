@@ -129,6 +129,7 @@ from Brett Selwood and Andrew Davies.
 #include "emu.h"
 #include "includes/mbee.h"
 #include "formats/mbee_cas.h"
+#include "sound/sn76496.h"
 #include "speaker.h"
 
 void mbee_state::mbee_mem(address_map &map)
@@ -288,6 +289,14 @@ void mbee_state::mbee128_io(address_map &map)
 	map(0x50, 0x57).w(FUNC(mbee_state::port50_w));
 }
 
+void mbee_state::mbee128p_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	mbee128_io(map);
+	map(0x10, 0x13).w("sn1", FUNC(sn76489a_device::write));
+}
+
 void mbee_state::mbee256_io(address_map &map)
 {
 	map.unmap_value_high();
@@ -301,7 +310,7 @@ void mbee_state::mbee256_io(address_map &map)
 	map(0x000b, 0x000b).mirror(0xff00).w(FUNC(mbee_state::port0b_w));
 	map(0x000c, 0x000c).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(mbee_state::m6545_index_w));
 	map(0x000d, 0x000d).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(mbee_state::m6545_data_w));
-	// map(0x0010, 0x0013).mirror(0xff00); Optional SN76489AN audio chip (never used)
+	map(0x0010, 0x0013).mirror(0xff00).w("sn1", FUNC(sn76489a_device::write));
 	map(0x0018, 0x001b).mirror(0xff00).r(FUNC(mbee_state::port18_r));
 	map(0x001c, 0x001f).mirror(0xff00).rw(FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
 	map(0x0044, 0x0047).mirror(0xff00).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
@@ -433,7 +442,7 @@ static INPUT_PORTS_START( mbee128 )
 	PORT_CONFSETTING(    0x20, "Amber")
 	PORT_CONFSETTING(    0x30, "White")
 	// Wire links on motherboard
-	PORT_CONFNAME( 0xc0, 0x40, "PIO B7")
+	PORT_CONFNAME( 0xc0, 0x80, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
 	PORT_CONFSETTING(    0x40, "RTC") // RTC IRQ for clock
 	PORT_CONFSETTING(    0x80, "Tied high") // default resistor to vcc
@@ -568,7 +577,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
 	// Wire links on motherboard
-	PORT_CONFNAME( 0xc0, 0x40, "PIO B7")
+	PORT_CONFNAME( 0xc0, 0x80, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
 	PORT_CONFSETTING(    0x40, "RTC") // RTC IRQ must be used on teleterm
 	PORT_CONFSETTING(    0x80, "Tied high") // default resistor to vcc
@@ -688,8 +697,12 @@ void mbee_state::mbee(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mbee_cass");
 
-	GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn").set_device_load(FUNC(mbee_state::pak_load<1U>)); // net
-	GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<2U>)); // edasm
+	generic_slot_device &optrom1(GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn")); // net
+	optrom1.set_device_load(FUNC(mbee_state::pak_load<1U>));
+	optrom1.set_device_unload(FUNC(mbee_state::pak_unload<1U>));
+	generic_slot_device &optrom2(GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp")); // edasm
+	optrom2.set_device_load(FUNC(mbee_state::pak_load<2U>));
+	optrom2.set_device_unload(FUNC(mbee_state::pak_unload<2U>));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("1");
 	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("1");
@@ -752,13 +765,27 @@ void mbee_state::mbeeic(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mbee_cass");
 
-	GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn").set_device_load(FUNC(mbee_state::pak_load<1U>)); // net
-	GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<2U>)); // pak0
-	GENERIC_SOCKET(config, "optrom3", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<3U>)); // pak1
-	GENERIC_SOCKET(config, "optrom4", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<4U>)); // pak2
-	GENERIC_SOCKET(config, "optrom5", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<5U>)); // pak3
-	GENERIC_SOCKET(config, "optrom6", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<6U>)); // pak4
-	GENERIC_SOCKET(config, "optrom7", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<7U>)); // pak5
+	generic_slot_device &optrom1(GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn")); // net
+	optrom1.set_device_load(FUNC(mbee_state::pak_load<1U>));
+	optrom1.set_device_unload(FUNC(mbee_state::pak_unload<1U>));
+	generic_slot_device &optrom2(GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp")); // pak0
+	optrom2.set_device_load(FUNC(mbee_state::pak_load<2U>));
+	optrom2.set_device_unload(FUNC(mbee_state::pak_unload<2U>));
+	generic_slot_device &optrom3(GENERIC_SOCKET(config, "optrom3", generic_plain_slot, "mbee_pak", "mbp")); // pak1
+	optrom3.set_device_load(FUNC(mbee_state::pak_load<3U>));
+	optrom3.set_device_unload(FUNC(mbee_state::pak_unload<3U>));
+	generic_slot_device &optrom4(GENERIC_SOCKET(config, "optrom4", generic_plain_slot, "mbee_pak", "mbp")); // pak2
+	optrom4.set_device_load(FUNC(mbee_state::pak_load<4U>));
+	optrom4.set_device_unload(FUNC(mbee_state::pak_unload<4U>));
+	generic_slot_device &optrom5(GENERIC_SOCKET(config, "optrom5", generic_plain_slot, "mbee_pak", "mbp")); // pak3
+	optrom5.set_device_load(FUNC(mbee_state::pak_load<5U>));
+	optrom5.set_device_unload(FUNC(mbee_state::pak_unload<5U>));
+	generic_slot_device &optrom6(GENERIC_SOCKET(config, "optrom6", generic_plain_slot, "mbee_pak", "mbp")); // pak4
+	optrom6.set_device_load(FUNC(mbee_state::pak_load<6U>));
+	optrom6.set_device_unload(FUNC(mbee_state::pak_unload<6U>));
+	generic_slot_device &optrom7(GENERIC_SOCKET(config, "optrom7", generic_plain_slot, "mbee_pak", "mbp")); // pak5
+	optrom7.set_device_load(FUNC(mbee_state::pak_load<7U>));
+	optrom7.set_device_unload(FUNC(mbee_state::pak_unload<7U>));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("2");
 	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("2");
@@ -794,8 +821,8 @@ void mbee_state::mbee56(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
 	m_fdc->enmf_rd_callback().set_constant(0);
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("1");
 	remove_carts(config);
@@ -818,18 +845,26 @@ void mbee_state::mbee128p(machine_config &config)
 {
 	mbeeppc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
-	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee128_io);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee128p_io);
 
 	WD2793(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
 	m_fdc->enmf_rd_callback().set_constant(0);
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	SN76489A(config, "sn1", 13.5_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("3");
 	remove_carts(config);
 	remove_quick(config);
+}
+
+void mbee_state::mbeepp(machine_config &config)
+{
+	mbee128p(config);
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mbee_flop").set_filter("2,3");
 }
 
 void mbee_state::mbee256(machine_config &config)
@@ -838,10 +873,6 @@ void mbee_state::mbee256(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee256_io);
 
-	config.device_remove("fdc:0");
-	config.device_remove("fdc:1");
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
 
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mbee_flop").set_filter("4");
@@ -1154,4 +1185,4 @@ COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeep
 COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Microbee Systems",   "Microbee Teleterm",           MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128p, "Microbee Systems",   "Microbee 128k Premium",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1987, mbee256,   mbee,   0,      mbee256,  mbee256, mbee_state, init_mbee256,  "Microbee Systems",   "Microbee 256TC",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 2012, mbeepp,    mbee,   0,      mbee256,  mbee128, mbee_state, init_mbeepp,   "Microbee Systems",   "Microbee Premium Plus",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2012, mbeepp,    mbee,   0,      mbeepp,   mbee128, mbee_state, init_mbeepp,   "Microbee Systems",   "Microbee Premium Plus+",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

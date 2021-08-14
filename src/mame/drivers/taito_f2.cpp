@@ -1911,7 +1911,7 @@ static INPUT_PORTS_START( hthero )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( footchmpbl  )
+static INPUT_PORTS_START( footchmpbl )
 	PORT_INCLUDE(footchmp)
 
 	PORT_MODIFY("IN1")
@@ -1947,7 +1947,7 @@ static INPUT_PORTS_START( ninjak )
 	PORT_DIPSETTING(    0x08, "TROG (4 players / 2 coin slots)" )
 	PORT_DIPSETTING(    0x04, "MTX2 (4 players / 2 cabinets combined)" )
 	PORT_DIPSETTING(    0x00, "TMNT (4 players / 4 coin slots)" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
@@ -5387,10 +5387,10 @@ void taitof2_state::init_finalb()
 	gfx_element *gx1 = m_gfxdecode->gfx(1);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
+	m_decoded_gfx = std::make_unique<u8[]>(gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
-	u8 *dest = srcdata;
+	u8 *dest = m_decoded_gfx.get();
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const u8 *c0base = gx0->get_data(c);
@@ -5412,7 +5412,7 @@ void taitof2_state::init_finalb()
 		}
 	}
 
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_raw_layout(m_decoded_gfx.get(), gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_colors(4096 / 64);
 	gx0->set_granularity(64);
 	m_gfxdecode->set_gfx(1, nullptr);

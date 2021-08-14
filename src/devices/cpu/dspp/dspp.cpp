@@ -1588,7 +1588,7 @@ void dspp_device::update_fifo_dma()
 
 	while (mask != 0)
 	{
-		uint32_t channel = 31 - count_leading_zeros(mask);
+		uint32_t channel = 31 - count_leading_zeros_32(mask);
 
 		const fifo_dma & dma = m_fifo_dma[channel];
 

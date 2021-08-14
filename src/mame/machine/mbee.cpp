@@ -262,7 +262,7 @@ void mbee_state::setup_banks(u8 data, bool first_time, u8 b_mask)
 {
 	b_mask &= 7;
 	u32 dbank = m_ramsize / 0x1000;
-	u8 extra_bits = data & 0xc0;
+	u8 extra_bits = (data & 0xc0) & (dbank - 1);
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	u8 *prom = memregion("pals")->base();
@@ -370,7 +370,7 @@ void mbee_state::port50_w(u8 data)
     Output the PAK number to choose an optional PAK ROM.
 
     The bios will support 256 PAKs, although normally only
-    8 are available in hardware. Each PAK is normally a 8K
+    6 are available in hardware. Each PAK is normally a 8K
     ROM. If 16K ROMs are used, the 2nd half becomes PAK+8,
     thus 16 PAKs in total. This is used in the PC85 models.
 
@@ -386,7 +386,7 @@ void mbee_state::port0a_w(u8 data)
 u8 mbee_state::telcom_r(offs_t offset)
 {
 	m_09 = BIT(offset, 8);
-	return 0xff;
+	return m_09;
 }
 
 u8 mbee_state::pak_r(offs_t offset)
@@ -540,13 +540,14 @@ void mbee_state::machine_start()
 	// set pak index to true for 16k roms
 	if (m_pakdef)
 		for (u8 i = 8; i < 14; i++)
-			m_pak_extended[(i & 7)+2] = (m_p_pakdef[(i<<13)] == 0xff) ? false : true;
-	else
-		for (u8 i = 2; i < 8; i++)
-			m_pak_extended[i] = false;
+			if (!(m_pak[i-8] && m_pak[i-8]->exists()))
+				if (m_p_pakdef[(i<<13)] != 0xff)
+					m_pak_extended[(i & 7)+2] = true;
 
 	// set net index to true for 8k roms
-	m_pak_extended[1] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
+	if (m_netdef && (m_netdef->bytes() > 0x1000))
+		if (!(m_pak[1] && m_pak[1]->exists()))
+			m_pak_extended[1] = true;
 }
 
 void mbee_state::machine_reset()
@@ -745,10 +746,6 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a PAK rom");
 			slot->call_unload();
-			if (m_pakdef)
-				m_pak_extended[pak_index] = (m_p_pakdef[((pak_index+8)<<13)] == 0xff) ? false : true;
-			else
-				m_pak_extended[pak_index] = false;
 			return image_init_result::FAIL;
 		}
 	}
@@ -760,7 +757,6 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
 			return image_init_result::FAIL;
 		}
-
 		m_pak_extended[pak_index] = (size > 0x1000) ? true : false;
 
 		slot->rom_alloc(m_pak_extended ? 0x2000 : 0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -768,15 +764,30 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 
 		// Validate the rom
 		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
-		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
+		if (!image.loaded_through_softlist())  // need to let pascal through without testing
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
-			slot->call_unload();
-			m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
-			return image_init_result::FAIL;
+			if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
+			{
+				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
+				slot->call_unload();
+				return image_init_result::FAIL;
+			}
 		}
 	}
 
 	return image_init_result::PASS;
+}
+
+void mbee_state::unload_cart(u8 pak_index)
+{
+	if (pak_index > 1)
+	{
+		if (m_pakdef)
+			m_pak_extended[pak_index] = (m_p_pakdef[((pak_index+8)<<13)] == 0xff) ? false : true;
+		else
+			m_pak_extended[pak_index] = false;
+	}
+	else
+		m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
 }
 

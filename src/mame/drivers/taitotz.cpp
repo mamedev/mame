@@ -178,6 +178,7 @@ Notes:
 #include "cpu/tlcs900/tmp95c063.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
+#include "screen.h"
 
 /*
     Interesting mem areas
@@ -213,7 +214,7 @@ Notes:
         0x7004:            0x4003d554()
         0x7005:            0x4003d168()
         0x8000:            ?                                        Used by vibration (force feedback?) on pwrshovl
-		0x9100:            ?                                        Dendego3 speedometer and brake meter. io_shared[0x1c3c] = speed, io_shared[0x1c3e] = brake
+        0x9100:            ?                                        Dendego3 speedometer and brake meter. io_shared[0x1c3c] = speed, io_shared[0x1c3e] = brake
         0xa000:            ?                                        Used by vibration (force feedback?) on pwrshovl
         0xf000:            0x4002f328() TLCS_Init
         0xf010:            0x4002f074()                             Enables TLCS watchdog timer
@@ -638,11 +639,11 @@ private:
 	void tlcs900h_mem(address_map &map);
 };
 
-class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
+class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6>
 {
 public:
 	taitotz_renderer(taitotz_state &state, int width, int height, uint32_t *scrram, uint32_t *texram)
-		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
+		: poly_manager<float, taitotz_polydata, 6>(state.machine()),
 			m_state(state)
 	{
 		m_fb = std::make_unique<bitmap_rgb32>(width, height);
@@ -1344,7 +1345,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), 6, v[0], v[i-1], v[i]);
+			render_triangle<6>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), v[0], v[i-1], v[i]);
 		}
 	}
 	while (!end);
@@ -1434,7 +1435,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), 3, v[0], v[i-1], v[i]);
+			render_triangle<3>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), v[0], v[i-1], v[i]);
 		}
 
 		m_direct_fifo_ptr = 0;
@@ -1989,7 +1990,7 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 		/*
 		if (m_io_share_ram[0xfff] == 0x1010)
 		{
-			printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
+		    printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
 		}
 		*/
 

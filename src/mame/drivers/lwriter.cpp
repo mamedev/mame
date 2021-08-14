@@ -92,10 +92,19 @@
  */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+
 #include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/z80scc.h"
+
+
+namespace {
+
+enum print_state {
+	READING_CMD,
+	WRITING_RESULT
+};
 
 class lwriter_state : public driver_device
 {
@@ -105,35 +114,66 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_scc(*this, "scc")
 		, m_via(*this, "via")
+		, m_dsw1(*this, "DSW1")
+		, m_dram_ptr(*this, "dram")
+		, m_sram_ptr(*this, "sram")
+		, m_rom_ptr(*this, "rom")
 		, m_overlay(1)
+		, m_via_pb(0)
+		, m_print_sc(1)
+		, m_print_state(READING_CMD)
+		, m_print_bit(0)
+		, m_print_cmd(0)
+		, m_print_result(0)
+		, m_sbsy(0)
+		, m_cbsy(0)
 	{ }
 
 	void lwriter(machine_config &config);
+	void lwriter2nt(machine_config &config);
+
+protected:
+	virtual void machine_start () override;
+	virtual void machine_reset () override;
 
 private:
 	uint16_t bankedarea_r(offs_t offset);
 	void bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t eeprom_r(offs_t offset);
+	void eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void dram_or_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void led_out_w(uint8_t data);
 	void fifo_out_w(uint8_t data);
 	uint8_t via_pa_r();
 	void via_pa_w(uint8_t data);
+	void via_pa_lw_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
 	uint8_t via_pb_r();
+	uint8_t via_pb_lw2nt_r();
+	void write_dtr(int state);
 	void via_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_int_w);
 	//DECLARE_WRITE_LINE_MEMBER(scc_int);
-	virtual void machine_start () override;
-	virtual void machine_reset () override;
 	void maincpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
 	required_device<via6522_device> m_via;
+	required_ioport m_dsw1;
 
-	uint16_t *m_dram_ptr, *m_sram_ptr, *m_rom_ptr;
+	required_shared_ptr<uint16_t> m_dram_ptr;
+	required_region_ptr<uint16_t> m_sram_ptr, m_rom_ptr;
 	bool m_overlay;
+	uint8_t m_via_pb;
+	bool m_print_sc;
+	print_state m_print_state;
+	int m_print_bit;
+	int m_print_cmd;
+	int m_print_result;
+	bool m_sbsy;
+	bool m_cbsy;
 };
 
 /*
@@ -199,38 +239,55 @@ void lwriter_state::maincpu_map(address_map &map)
 	map(0x000000, 0x1fffff).rw(FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
 	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
 	//map(0x300000, 0x3fffff) // open bus?
-	map(0x400000, 0x5fffff).ram().share("dram").mirror(0x200000); // 2MB DRAM
+	map(0x400000, 0x5fffff).ram().share(m_dram_ptr); // 2MB DRAM
+	// DRAM appears to mirrored through 0x600000 but when written to does a bitwise-or with the existing data
+	// instead of replacing it. This presumeably improves the performance of these operations by avoiding
+	// an extra memory read.
+	map(0x600000, 0x7fffff).readonly().share(m_dram_ptr).w(FUNC(lwriter_state::dram_or_w));
 	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
-	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
-	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
-	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
-	map(0xa00004, 0xa00004).r(m_scc, FUNC(scc8530_device::da_r)).mirror(0x1ffff8);
+	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
+	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::db_w)).mirror(0x1ffff8);
+	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::cb_r)).mirror(0x1ffff8);
+	map(0xa00004, 0xa00004).r(m_scc, FUNC(scc8530_device::db_r)).mirror(0x1ffff8);
 
-	map(0xc00003, 0xc00003).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
-	map(0xc00007, 0xc00007).w(m_scc, FUNC(scc8530_device::db_w)).mirror(0x1ffff8);
-	map(0xa00002, 0xa00002).r(m_scc, FUNC(scc8530_device::cb_r)).mirror(0x1ffff8);
-	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::db_r)).mirror(0x1ffff8);
+	map(0xc00003, 0xc00003).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
+	map(0xc00007, 0xc00007).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
+	map(0xa00002, 0xa00002).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
+	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::da_r)).mirror(0x1ffff8);
 
 	map(0xe00000, 0xe0001f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff).mirror(0x17ffe0);
+
+	// overlaps with SCC but only uses even addresses
+	map(0xc00000, 0xc00400).rw(FUNC(lwriter_state::eeprom_r), FUNC(lwriter_state::eeprom_w)).umask16(0xff00);
 }
 
 static INPUT_PORTS_START( lwriter )
+	PORT_START("DSW1")
+	// Switch 1 | Switch 2 | switchsetting value | Meaning
+	// Down       Down                         0   serial batch mode 1200 baud (0)
+	// Up         Down                         1   serial batch mode 9600 baud (1)
+	// Down       Up                           2   diablo emulation (special switch = 0)
+	// Down       Up                           2   executive mode (special switch = 1)
+	// Up         Up                           3   apple talk
+	PORT_DIPNAME(0x60, 0x20, "Switch")
+	PORT_DIPSETTING(  0x00, "Serial batch mode 1200 baud")
+	PORT_DIPSETTING(  0x40, "Serial batch mode 9600 baud")
+	PORT_DIPSETTING(  0x20, "Diablo emulation (special switch = 0) / Executive mode (special switch = 1)")
+	PORT_DIPSETTING(  0x60, "AppleTalk")
 INPUT_PORTS_END
 
 /* Start it up */
 void lwriter_state::machine_start()
 {
-	m_rom_ptr = (uint16_t*)memregion("rom")->base();
-	m_dram_ptr = (uint16_t*)memshare("dram")->ptr();
-	m_sram_ptr = (uint16_t*)memregion("sram")->base();
 	// do stuff here later on like setting up printer mechanisms HLE timers etc
+
+	// Initialize ca1 to 1 so that we don't miss the first interrupt/transition to 0
+	m_via->write_ca1(1);
 }
 
 void lwriter_state::machine_reset()
 {
-	/* Reset the VIA */
-	m_via->reset();
 }
 
 /* Overlay area */
@@ -245,7 +302,7 @@ uint16_t lwriter_state::bankedarea_r(offs_t offset)
 		if ((offset > 0x7ff) && !machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X!\n",offset<<1); }
 		return m_sram_ptr[offset&0x7FF];
 	}
-	if(!machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
+	if (!machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
 	return 0xFFFF;
 }
 
@@ -262,7 +319,43 @@ void lwriter_state::bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		COMBINE_DATA(&m_sram_ptr[offset&0x7FF]);
 		return;
 	}
-	if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
+	if (!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
+}
+
+void lwriter_state::dram_or_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_dram_ptr[offset] |= data & mem_mask;
+}
+
+uint8_t lwriter_state::eeprom_r(offs_t offset)
+{
+	uint8_t result = 0;
+	// adjust offset to match real hardware mapping
+	switch (offset)
+	{
+		case 0x80:
+		case 0x81:
+		case 0x82:
+		case 0x83: {
+			constexpr uint8_t signature[] = {0x7a, 0x53, 0xda, 0x71};
+			result = signature[offset-0x80];
+			break;
+		}
+		case 0xb0:
+			result = 0x1; // disable printing the test page (dostartpage)
+			break;
+		case 0xf3:
+			result = 0x1; // special switch procedure 1 to invoke executive (58 + 0xb9)
+			break;
+	}
+
+	logerror("eeprom_r! %x %x\n", offset, result);
+	return result;
+}
+
+void lwriter_state::eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	logerror("eeprom_w! %x %x %x\n", offset, data, mem_mask);
 }
 
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */
@@ -270,6 +363,7 @@ void lwriter_state::led_out_w(uint8_t data)
 {
 	//popmessage("LED status: %02X\n", data&0xFF);
 	logerror("LED status: %02X\n", data&0xFF);
+	m_cbsy = data & 1;
 	popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
@@ -279,12 +373,26 @@ void lwriter_state::fifo_out_w(uint8_t data)
 	/** TODO: actually emulate this */
 	logerror("FIFO written with: %02X\n", data&0xFF);
 }
-
-/* via stuff */
+/* via port a bits */
+/* 0 - ?
+ * 1 - print sbsy
+ * 2 - ?
+ * 3 - ?
+ * 4 - print vsreq
+ * 5 - switch setting low
+ * 6 - switch setting high
+ * 7 - print (STATUS/COMMAND Message Line)
+ */
 uint8_t lwriter_state::via_pa_r()
 {
 	logerror(" VIA: Port A read!\n");
-	return 0xFF;
+	uint8_t result = m_dsw1->read();
+	if (m_sbsy)
+	{
+		result |= 2;
+	}
+	result |= (m_print_sc << 7);
+	return result | 0x1C;
 }
 
 void lwriter_state::via_pa_w(uint8_t data)
@@ -292,15 +400,38 @@ void lwriter_state::via_pa_w(uint8_t data)
 	logerror(" VIA: Port A written with data of 0x%02x!\n", data);
 }
 
+void lwriter_state::via_pa_lw_w(uint8_t data)
+{
+	via_pa_w(data);
+	m_cbsy = data & 1;
+}
+
 WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
 {
 	logerror(" VIA: CA2 written with %d!\n", state);
 }
 
+/* via port b bits:
+ * 0 - ?
+ * 1 - print rdy
+ * 2 - print pprdy
+ * 3 - overlay
+ * 4 -
+ * 5 -
+ * 6 - timer 2 clk
+ * 7 - print related timing thing
+ */
 uint8_t lwriter_state::via_pb_r()
 {
 	logerror(" VIA: Port B read!\n");
-	return 0xFF;
+	return 0xFB;
+}
+
+// The 3rd bit (PPRDY) is used for talking with the print controller
+// and is inverted on II NT
+uint8_t lwriter_state::via_pb_lw2nt_r()
+{
+	return via_pb_r() ^ 0x4;
 }
 
 void lwriter_state::via_pb_w(uint8_t data)
@@ -309,6 +440,7 @@ void lwriter_state::via_pb_w(uint8_t data)
 	/* Like early Mac models which had VIA A4 control overlaying, the
 	 * LaserWriter II NT overlay is controlled by VIA B3 */
 	m_overlay = BIT(data,3);
+	m_via_pb = data;
 }
 
 WRITE_LINE_MEMBER (lwriter_state::via_cb1_w)
@@ -340,6 +472,89 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 #define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
+/* These are from LBP-CX Series Video Interface Manual:
+ * http://beefchicken.com/retro/laserwriter/LBP-CX%20Series%20Video%20Interface%20Service%20Manual.pdf
+ */
+#define SR0 1
+#define SR1 2
+#define SR2 4
+#define SR4 8
+#define SR5 0xb
+#define EC0 0x40
+#define EC1 0x43
+#define EC2 0x45
+#define EC3 0x46
+#define EC4 0x49
+#define EC5 0x4a
+#define EC6 0x4c
+#define EC7 0x4f
+#define EC14 0x5d
+
+void lwriter_state::write_dtr(int state)
+{
+	// DTR seems to be used as a clock for communication with
+	// the print controller. We arbitrarily choose state == 1
+	// to run our code
+	if (state == 1 && (m_cbsy || m_sbsy))
+	{
+		logerror("pb line %d %d %d!\n", m_via_pb & 1, m_print_state, m_print_bit);
+		switch (m_print_state)
+		{
+			case READING_CMD: {
+				m_print_cmd <<= 1;
+				m_print_cmd |= (m_via_pb & 1);
+				m_print_bit += 1;
+				if (m_print_bit == 8)
+				{
+					logerror("PRINT_CMD %x!\n", m_print_cmd);
+					m_print_bit = 0;
+					m_print_state = WRITING_RESULT;
+					m_sbsy = true;
+					// The status messages have odd parity in the high bit
+					// right now we just manually make sure that's true.
+					switch (m_print_cmd)
+					{
+						case SR1:
+						case SR2:
+						case SR4:
+							m_print_result = 1 << 7; // parity
+							break;
+						case SR5: // paper size
+							m_print_result = 1 << 6; // A4
+							break;
+						case SR0:
+						default:
+							m_print_result = 1 << 1; // print request
+							break;
+					}
+					m_print_cmd = 0;
+				}
+				break;
+			}
+			case WRITING_RESULT: {
+				m_print_sc = m_print_result & 0x1;
+				m_print_result >>= 1;
+				m_print_bit += 1;
+				if (m_print_bit == 8)
+				{
+					logerror("PRINT_RESULT!\n");
+					m_print_bit = 0;
+					m_print_state = READING_CMD;
+					m_sbsy = false;
+				}
+				break;
+			}
+		}
+	}
+}
+
+void lwriter_state::lwriter2nt(machine_config &config)
+{
+	lwriter(config);
+	m_via->readpb_handler().set(FUNC(lwriter_state::via_pb_lw2nt_r));
+	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_w));
+}
+
 void lwriter_state::lwriter(machine_config &config)
 {
 	M68000(config, m_maincpu, CPU_CLK);
@@ -353,24 +568,26 @@ void lwriter_state::lwriter(machine_config &config)
 	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 	/* Port B */
 	m_scc->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
-	m_scc->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_dtrb_callback().set(FUNC(lwriter_state::write_dtr));
 	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	/* Interrupt */
-	m_scc->out_int_callback().set("via", FUNC(via6522_device::write_ca1));
+	// The "CA1 Latch/Interrupt Control" bit in VIA PCR gets set to "negative
+	// active edge" so we invert the SCC interrupt.
+	m_scc->out_int_callback().set(m_via, FUNC(via6522_device::write_ca1)).invert();
 	//m_scc->out_int_callback().set(FUNC(lwriter_state::scc_int));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
-	rs232a.rxd_handler().set("scc", FUNC(scc8530_device::rxa_w));
-	rs232a.cts_handler().set("scc", FUNC(scc8530_device::ctsa_w));
+	rs232a.rxd_handler().set(m_scc, FUNC(scc8530_device::rxa_w));
+	rs232a.cts_handler().set(m_scc, FUNC(scc8530_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
-	rs232b.rxd_handler().set("scc", FUNC(scc8530_device::rxb_w));
-	rs232b.cts_handler().set("scc", FUNC(scc8530_device::ctsb_w));
+	rs232b.rxd_handler().set(m_scc, FUNC(scc8530_device::rxb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(scc8530_device::ctsb_w));
 
 	R65NC22(config, m_via, CPU_CLK/10); // 68000 E clock presumed
 	m_via->readpa_handler().set(FUNC(lwriter_state::via_pa_r));
 	m_via->readpb_handler().set(FUNC(lwriter_state::via_pb_r));
-	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_w));
+	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_lw_w));
 	m_via->writepb_handler().set(FUNC(lwriter_state::via_pb_w));
 	m_via->cb1_handler().set(FUNC(lwriter_state::via_cb1_w));
 	m_via->ca2_handler().set(FUNC(lwriter_state::via_ca2_w));
@@ -412,6 +629,42 @@ void lwriter_state::lwriter(machine_config &config)
 
 ROM_START(lwriter)
 	ROM_REGION16_BE( 0x200000, "rom", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE("342-0568a.rom", 0x000001, 0x10000, CRC (83341c75) SHA1 (d7c65d09abaaf862fef00ac4df7a094ddedd24c5)) // Label: "342-0568-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0569a.rom", 0x000000, 0x10000, CRC (47d33a6b) SHA1 (0e79fa9204f9be6539abcdb619a17a4ced912b13)) // Label: "342-0569-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0570a.rom", 0x020001, 0x10000, CRC (38753dd2) SHA1 (931eb3386fe0fff1de1311b2bc1cee8ee02ed599)) // Label: "342-0570-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0571a.rom", 0x020000, 0x10000, CRC (08888acd) SHA1 (f771306d8f876e6e4ed14f3c6e5b71dff75cf49e)) // Label: "342-0571-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0572a.rom", 0x040001, 0x10000, CRC (0a64af91) SHA1 (22cd61ed7c2f64bfd4ddbd7b5cde64311a3db5e6)) // Label: "342-0572-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0573a.rom", 0x040000, 0x10000, CRC (f8e529fe) SHA1 (8a4511a4c12eb24c731e1de747886aacfa2057d5)) // Label: "342-0573-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0574a.rom", 0x060001, 0x10000, CRC (bb694699) SHA1 (2e208b30e8d05725f7e8b469974b6357008fbb1d)) // Label: "342-0574-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE("342-0575a.rom", 0x060000, 0x10000, CRC (c21c1d22) SHA1 (9fc6cd059380c11588c182fb8ec6422e5db472e1)) // Label: "342-0575-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+
+	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START(lwriterplus)
+	ROM_REGION16_BE( 0x200000, "rom", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE("342-0089a.l0", 0x000001, 0x10000, CRC (d5dc7d6e) SHA1 (b9a1f807facf6a6de92fae5887044df961d73ab1)) // Label: "342-0089-A+L0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0090a.h0", 0x000000, 0x10000, CRC (32dc1f96) SHA1 (f3647b11c712979f6c5658a15a3e8647bd4d1a1d)) // Label: "342-0090-A+H0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0091a.l1", 0x020001, 0x10000, CRC (a24dcb05) SHA1 (9edfb94a1e6723a7580caed629418ee1d2472a84)) // Label: "342-0091-A+L1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0092a.h1", 0x020000, 0x10000, CRC (8600e85d) SHA1 (332308825f78a768e30eaa36f10f0ac1c5eacc19)) // Label: "342-0092-A+H1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0093a.l2", 0x040001, 0x10000, CRC (3c8fd0f7) SHA1 (36315be1ed691b24c49471eab0cd93a4242d6e10)) // Label: "342-0093-A+L2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0094a.h2", 0x040000, 0x10000, CRC (e1a9d862) SHA1 (ffdd96eb70f54c6bb10dfc94f49ce2d916a74ab6)) // Label: "342-0094-A+H2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0095a.l3", 0x060001, 0x10000, CRC (47f637f3) SHA1 (d04548144f906a8d89b826692812acdcbfbed144)) // Label: "342-0095-A+L3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0096a.h3", 0x060000, 0x10000, CRC (3213e057) SHA1 (94d2ac1849b48628004877521c882e0f828f97b3)) // Label: "342-0096-A+H3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0097a.l4", 0x080001, 0x10000, CRC (9ecdc5fc) SHA1 (336ecaaf29c5396c30a11aaa86533f0598cb50b3)) // Label: "342-0097-A+L4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0098a.h4", 0x080000, 0x10000, CRC (867657e3) SHA1 (0c9c29bac49fdfcd26f22a751be71508add0a25a)) // Label: "342-0098-A+H4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0099a.l5", 0x0a0001, 0x10000, CRC (820c0f63) SHA1 (0f8d45fc886f996fbcb4103961810b673e9ab7e4)) // Label: "342-0099-A+L5 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0100a.h5", 0x0a0000, 0x10000, CRC (40aeb030) SHA1 (2a34280a6b2ab54d1c82145ec1a8aaac1f57ae15)) // Label: "342-0100-A+H5 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0101a.l6", 0x0c0001, 0x10000, CRC (aed532c4) SHA1 (39d7d3ae1d35d8b4ec33fd8c88a569c607628e2a)) // Label: "342-0101-A+L6 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0102a.h6", 0x0c0000, 0x10000, CRC (653979d1) SHA1 (bf56df6a7eaee2bc8edfbc45f78d1abb19e6807a)) // Label: "342-0102-A+H6 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0103b.l7", 0x0e0001, 0x10000, CRC (dbafb1ed) SHA1 (b9f5b65b04f8f804c473b62c292dc83d14b2ab33)) // Label: "342-0103-B+L7 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE("342-0104b.h7", 0x0e0000, 0x10000, CRC (50c72f89) SHA1 (bdbc0e282121f7dc4d701aa12f94296e436b504b)) // Label: "342-0104-B+H7 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+
+	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START(lwriter2nt)
+	ROM_REGION16_BE( 0x200000, "rom", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE("342-0545.l0", 0x000001, 0x20000, CRC (6431742d) SHA1 (040bd5b84b49b86f2b0fe9ece378bbc7a10a94ec)) // Label: "342-0545-A JAPAN // TC531000CP-F700 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L0
 	ROM_LOAD16_BYTE("342-0546.h0", 0x000000, 0x20000, CRC (c592bfb7) SHA1 (b595ae225238f7fabd1566a3133ea6154e082e2d)) // Label: "342-0546-A JAPAN // TC531000CP-F701 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H0
 	ROM_LOAD16_BYTE("342-0547.l1", 0x040001, 0x20000, CRC (205a5ea8) SHA1 (205fefbb5c67a07d57cb6184c69648321a34a8fe)) // Label: "342-0547-A JAPAN // TC531000CP-F702 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L1
@@ -420,9 +673,14 @@ ROM_START(lwriter)
 	ROM_LOAD16_BYTE("342-0550.h2", 0x080000, 0x20000, CRC (82adcf85) SHA1 (e2ab728afdae802c0c67fc25c9ba278b9cb04e31)) // Label: "342-0550-A JAPAN // TC531000CP-F705 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H2
 	ROM_LOAD16_BYTE("342-0551.l3", 0x0c0001, 0x20000, CRC (176b3346) SHA1 (eb8dfc7e44f2bc884097e51a47e2f10ee091c9e9)) // Label: "342-0551-A JAPAN // TC531000CP-F706 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L3
 	ROM_LOAD16_BYTE("342-0552.h3", 0x0c0000, 0x20000, CRC (69b175c6) SHA1 (a84c82be1ec7e373bb097ee74b941920a3b091aa)) // Label: "342-0552-A JAPAN // TC531000CP-F707 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H3
-	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
 
+	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
 ROM_END
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY            FULLNAME                    FLAGS */
-CONS( 1988, lwriter, 0,      0,      lwriter, lwriter, lwriter_state, empty_init, "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)
+} // anonymous namespace
+
+
+/*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY            FULLNAME             FLAGS */
+CONS( 1985, lwriter,     0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_IS_SKELETON)
+CONS( 1986, lwriterplus, 0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter Plus",  MACHINE_IS_SKELETON)
+CONS( 1988, lwriter2nt,  0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_IS_SKELETON)

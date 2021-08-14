@@ -859,6 +859,62 @@ ROM_START( ainferno )
 	ROM_LOAD16_BYTE( "c45_22.43", 0x00000, 0x20000, CRC(50300926) SHA1(9c2a60282d3f9f115b94cb5b6d64bbfc9d726d1d) )
 	ROM_LOAD16_BYTE( "c45_20.14", 0x00001, 0x20000, CRC(39b189d9) SHA1(002013c02b546d3f5a9f3a3149971975a73cc8ce) )
 	ROM_LOAD16_BYTE( "c45_21.42", 0x40000, 0x20000, CRC(1b687241) SHA1(309e42f79cbd48ceae58a15afb648aef838822f0) )
+	ROM_LOAD16_BYTE( "c45_29.13", 0x40001, 0x20000, CRC(b0ca15f1) SHA1(b02805d934b4b7dcfb4fa48bd707a1b81ccb40cf) )
+
+	/* 0x80000 to 0xbffff is empty for this game */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 */
+	ROM_LOAD( "c45-23.34", 0x00000, 0x10000, CRC(d0750c78) SHA1(63232c2acef86e8c8ffaad36ab0b6c4cc1eb48f8) )
+
+	ROM_REGION( 0x20000, "dsp", 0 ) /* TMS320C25 */
+	ROM_LOAD16_BYTE( "c45-25.35", 0x00000, 0x02000, CRC(c0d39f95) SHA1(542aa6e2af510aea00db40bf803cb6653d4e7747) )
+	ROM_LOAD16_BYTE( "c45-24.6",  0x00001, 0x02000, CRC(1013d937) SHA1(817769d21583f5281ba044ce8c134c9239d1e83e) )
+
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on "Controller P.C.B."
+	ROM_LOAD( "c45-30.9", 0x00000, 0x10000, CRC(fa2db40f) SHA1(91c34a53d2fec619f2536ca79fdc6a17fb0d21e4) ) // 27c512, 1111xxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
+	ROM_LOAD64_BYTE( "c45-11.28", 0x000007, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
+	ROM_LOAD64_BYTE( "c45-15.40", 0x000006, 0x20000, CRC(d4610698) SHA1(5de519a23300d5b3b09ce7cf8c02a1a6b2fb985c) )
+	ROM_LOAD64_BYTE( "c45-12.29", 0x000005, 0x20000, CRC(4ae305b8) SHA1(2bbb981853a7abbba90afb8eb58f6869357551d3) )
+	ROM_LOAD64_BYTE( "c45-16.41", 0x000004, 0x20000, CRC(c6eb93b0) SHA1(d0b1adfce5c1f4e21c5d84527d22ace14578f2d7) )
+	ROM_LOAD64_BYTE( "c45-13.30", 0x000003, 0x20000, CRC(69b82af6) SHA1(13c035e84affa59734c6dd1b07963c08654b5f5a) )
+	ROM_LOAD64_BYTE( "c45-17.42", 0x000002, 0x20000, CRC(0dbee000) SHA1(41073d5cf20df12d5ba1c424c9d9f0b2d9836d5d) )
+	ROM_LOAD64_BYTE( "c45-14.31", 0x000001, 0x20000, CRC(481b6f29) SHA1(0b047e805663b144dc2388c86438950fcdc29658) )
+	ROM_LOAD64_BYTE( "c45-18.43", 0x000000, 0x20000, CRC(ba7ecf3b) SHA1(dd073b7bfbf2f88432337027ae9fb6c4f02a538f) )
+
+	ROM_REGION( 0xa0000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c45-01.5",  0x00000, 0x20000, CRC(052997b2) SHA1(3aa8b4f759a1c196de39754a9ccdf4fabdbab388) )
+	ROM_LOAD( "c45-02.4",  0x20000, 0x20000, CRC(2fc0a88e) SHA1(6a635671fa2518f74015429ce580d7b7f00299ad) )
+	ROM_LOAD( "c45-03.3",  0x40000, 0x20000, CRC(0e1e5b5f) SHA1(a53d5ba01825f825e31a014cb4808f59ef86f0c9) )
+	ROM_LOAD( "c45-04.2",  0x60000, 0x20000, CRC(6d081044) SHA1(2d98bde55621762509dfc645d9ca5e267b1757ae) )
+	ROM_LOAD( "c45-05.1",  0x80000, 0x20000, CRC(6c59a808) SHA1(6264bbe4d7ad3070c6441859eb704a42910a82f0) )
+
+	ROM_REGION( 0x20000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
+	ROM_LOAD( "c45-06.31", 0x00000, 0x20000, CRC(6a7976d4) SHA1(a465f9bb874b1eff08742b33cc3c364703b281ca) )
+
+	ROM_REGION( 0x1c00, "plds", 0 )
+	ROM_LOAD( "pal16l8b-c45-07.ic6",   0x0000, 0x0104, CRC(a139114f) SHA1(d21f0c02c34a59b2cea925a9a417d5c2db27a30e) )
+	ROM_LOAD( "pal16l8b-c45-08.ic62",  0x0200, 0x0104, CRC(6f8ec860) SHA1(25161f6e5a5a76c35e697312567abe995b08b945) )
+	ROM_LOAD( "pal16l8b-c45-09.ic63",  0x0400, 0x0104, CRC(6703d122) SHA1(8636ee19cf850461e95318b2b82ace036d92225d) )
+	ROM_LOAD( "pal20l8b-c45-10.ic2",   0x0600, 0x0144, CRC(c41c2a1b) SHA1(33ef3449bea145d6b6a5b7067587ea91795f8383) )
+	ROM_LOAD( "pal16l8b-c45-26.ic76",  0x0800, 0x0104, CRC(23b59efc) SHA1(20965dcf73d4f98f38788b01891b64a756bd823c) )
+	ROM_LOAD( "pal16l8b-c45-27.ic114", 0x0a00, 0x0104, CRC(2bdc4831) SHA1(dcf4845e7f793a4233af6131638267fea0d864b9) )
+	ROM_LOAD( "pal20l8b-b62-02.ic60",  0x0c00, 0x0144, CRC(c43ab9d8) SHA1(38542b10e9206a25669534ee26a0472e5f2d6257) )
+	ROM_LOAD( "pal20l8b-b62-03.ic62",  0x0e00, 0x0144, CRC(904753fa) SHA1(87f7414c3eab5740b188276b06c5b898ed07c1cd) )
+	ROM_LOAD( "pal20l8b-b62-04.ic63",  0x1000, 0x0144, CRC(80512abc) SHA1(0e87e59df3c4d3b4adba295dbd5a2c27b9d5fefd) )
+	ROM_LOAD( "pal16l8b-b62-07.ic82",  0x1200, 0x0104, CRC(dc524371) SHA1(d7529d812fc37043ad302380adc8bb6172fb837c) )
+	ROM_LOAD( "pal16l8b-b62-08.ic23",  0x1400, 0x0104, CRC(b2d7ec83) SHA1(4e2e4af4b77ab1482520cc9644fec009beff014c) )
+	ROM_LOAD( "pal16l8b-b62-11.ic26",  0x1600, 0x0104, CRC(44e9a034) SHA1(9d7e916baf797994469ddbcfe21fa0fff24b5acb) )
+	ROM_LOAD( "pal16l8b-b62-12.ic27",  0x1800, 0x0104, CRC(f1182381) SHA1(3a76064f2bf322324575bbc111f93c9990da8ac1) )
+ROM_END
+
+
+ROM_START( ainfernou )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 */
+	ROM_LOAD16_BYTE( "c45_22.43", 0x00000, 0x20000, CRC(50300926) SHA1(9c2a60282d3f9f115b94cb5b6d64bbfc9d726d1d) )
+	ROM_LOAD16_BYTE( "c45_20.14", 0x00001, 0x20000, CRC(39b189d9) SHA1(002013c02b546d3f5a9f3a3149971975a73cc8ce) )
+	ROM_LOAD16_BYTE( "c45_21.42", 0x40000, 0x20000, CRC(1b687241) SHA1(309e42f79cbd48ceae58a15afb648aef838822f0) )
 	ROM_LOAD16_BYTE( "c45_28.13", 0x40001, 0x20000, CRC(c7cd2567) SHA1(cf1f163ec252e9986132095f22bca8d061bfdf9a) )
 
 	/* 0x80000 to 0xbffff is empty for this game */
@@ -968,5 +1024,6 @@ ROM_END
 //    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY                      FULLNAME               FLAGS
 GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
+GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Air Inferno (World)", MACHINE_NOT_WORKING )
+GAME( 1990, ainfernou, ainferno, airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
 GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )

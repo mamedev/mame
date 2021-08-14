@@ -57,7 +57,7 @@ public:
 	}
 
 	enum translate_result : unsigned { COMPLETE, CANCEL, ABORT };
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool debug = false) = 0;
+	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs = false, bool debug = false) = 0;
 };
 
 #endif // MAME_CPU_NS32000_SLAVE_H

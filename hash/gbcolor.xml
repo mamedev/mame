@@ -6533,7 +6533,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gakkyamaa">
+	<software name="gakkyama">
 		<description>Gakkyuu Ou Yamazaki (Japan, Rev 1)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
@@ -6556,7 +6556,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gakkyama" cloneof="gakkyamaa">
+	<software name="gakkyamaa" cloneof="gakkyama">
 		<description>Gakkyuu Ou Yamazaki (Japan)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
@@ -9132,7 +9132,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jissena">
+	<software name="jissen">
 		<!-- Notes: GBC only -->
 		<description>Jissen ni Yakudatsu Tsumego (Japan, Rev 1)</description>
 		<year>2000</year>
@@ -9151,7 +9151,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jissen" cloneof="jissena">
+	<software name="jissena" cloneof="jissen">
 		<!-- Notes: GBC only -->
 		<description>Jissen ni Yakudatsu Tsumego (Japan)</description>
 		<year>2000</year>
@@ -9579,7 +9579,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kawaipt2a">
+	<software name="kawaipt2">
 		<description>Kawaii Pet Shop Monogatari 2 (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Taito</publisher>
@@ -9595,7 +9595,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kawaipt2" cloneof="kawaipt2a">
+	<software name="kawaipt2a" cloneof="kawaipt2">
 		<description>Kawaii Pet Shop Monogatari 2 (Japan)</description>
 		<year>2000</year>
 		<publisher>Taito</publisher>
@@ -11248,7 +11248,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kangpzl2a">
+	<software name="kangpzl2">
 		<!-- NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-2-gou (Japan, Rev 1, NP)</description>
 		<year>2001</year>
@@ -11267,7 +11267,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kangpzl2" cloneof="kangpzl2a">
+	<software name="kangpzl2a" cloneof="kangpzl2">
 		<!-- NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-2-gou (Japan, NP)</description>
 		<year>2001</year>
@@ -11286,7 +11286,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kangpzl3a">
+	<software name="kangpzl3">
 		<!-- NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Japan, Rev 1, NP)</description>
 		<year>2001</year>
@@ -11305,7 +11305,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kangpzl3" cloneof="kangpzl3a">
+	<software name="kangpzl3a" cloneof="kangpzl3">
 		<!-- NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Japan, NP)</description>
 		<year>2001</year>
@@ -11324,7 +11324,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kangpzlsa">
+	<software name="kangpzls">
 		<!-- NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Japan, Rev 1, NP)</description>
 		<year>2001</year>
@@ -11343,7 +11343,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kangpzls" cloneof="kangpzlsa">
+	<software name="kangpzlsa" cloneof="kangpzls">
 		<!-- NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Japan, NP)</description>
 		<year>2001</year>
@@ -13322,7 +13322,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="monstrvla">
+	<software name="monstrvl">
 		<!-- Notes: GBC only -->
 		<description>Monster Traveler (Japan, Rev 1)</description>
 		<year>2002</year>
@@ -13340,7 +13340,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="monstrvl" cloneof="monstrvla">
+	<software name="monstrvla" cloneof="monstrvl">
 		<!-- Notes: GBC only -->
 		<description>Monster Traveler (Japan)</description>
 		<year>2002</year>
@@ -19341,7 +19341,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shinmtaa">
+	<software name="shinmta">
 		<description>Shin Megami Tensei Devil Children - Aka no Sho (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
@@ -19359,7 +19359,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shinmta" cloneof="shinmtaa">
+	<software name="shinmtaa" cloneof="shinmta">
 		<description>Shin Megami Tensei Devil Children - Aka no Sho (Japan)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
@@ -19383,7 +19383,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shinmtka">
+	<software name="shinmtk">
 		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Japan, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
@@ -19401,7 +19401,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shinmtk" cloneof="shinmtka">
+	<software name="shinmtka" cloneof="shinmtk">
 		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Japan)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
@@ -22203,7 +22203,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tradebata">
+	<software name="tradebat">
 		<!--    Only released on the 3DS Virtual Console?   -->
 		<!--    Planned for physical release?   -->
 		<description>Trade &amp; Battle Card Hero (Japan, Rev 1)</description>
@@ -22223,7 +22223,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tradebat" cloneof="tradebata">
+	<software name="tradebata" cloneof="tradebat">
 		<description>Trade &amp; Battle Card Hero (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>

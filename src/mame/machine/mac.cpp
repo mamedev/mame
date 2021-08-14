@@ -1029,7 +1029,10 @@ void mac_state::machine_start()
 		m_adbupdate_timer->adjust(attotime::from_hz(70));
 	}
 
-	m_6015_timer = timer_alloc(*this, FUNC(mac_state::mac_6015_tick));
+	if (m_model != MODEL_MAC_IIFX)
+		m_6015_timer = timer_alloc(*this, FUNC(mac_state::mac_6015_tick));
+	else
+		m_6015_timer = timer_alloc(*this, FUNC(mac_state::oss_6015_tick));
 	m_6015_timer->adjust(attotime::never);
 }
 
@@ -1046,7 +1049,7 @@ void mac_state::machine_reset()
 	m_rbv_vbltime = 0;
 
 	// start 60.15 Hz timer for most systems
-	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || (m_model >= MODEL_MAC_LC))
+	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIFX)) || (m_model >= MODEL_MAC_LC))
 	{
 		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 	}

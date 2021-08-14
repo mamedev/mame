@@ -90,7 +90,7 @@ List of known B-System games:
 
     Violence Fight                  (YM2203 sound, 1xMSM6295 )
     Hit The Ice                     (YM2203 sound, 1xMSM6295 )
-    Master of Weapons               (YM2203 sound)
+    Master of Weapon                (YM2203 sound)
 
     Quiz Sekai wa SHOW by shobai    (YM2610-B sound, MB87078 - electronic volume control)
     Puzzle Bobble                   (YM2610-B sound, MB87078 - electronic volume control)
@@ -1587,8 +1587,8 @@ static INPUT_PORTS_START( sbm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)//LADY ????
 
 	PORT_START("START")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )//select; ok (1P in object test)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )//start ; ok (2P in object test)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Select")//select; ok (1P in object test)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start")//start ; ok (2P in object test)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3055,6 +3055,24 @@ ROM_START( rambo3p ) /* Is this set a prototype or possible bootleg? */
 	ROM_LOAD( "r3-a4.rom", 0x60000, 0x20000, CRC(9cf4c21b) SHA1(756fc6bbc798a39a18eab3829e032cac8fe3f8ed) )
 ROM_END
 
+ROM_START( bublbust ) // Purportedly a location test version, but has the same version number and build date as the released Japanese set below
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 512k for 68000 code - located on Taito C0503005B main board
+	ROM_LOAD16_BYTE( "p.bobble_prg_h_usa_6-15_c681.ic18", 0x00000, 0x40000, CRC(ba83e398) SHA1(2512ea5a805f0e5c470c4d216d679f3dc3c4aa82) ) // hand written label P.Bobble PRG H USA 6/15 C681  - "Bobble" written in Kanji
+	ROM_LOAD16_BYTE( "p.bobble_prg_l_usa_6-15_e9e1.ic2",  0x00001, 0x40000, CRC(a12cb3f2) SHA1(06271d3a0af101a959e6e777f1f9e99bae1e6076) ) // hand written label P.Bobble PRG L USA 6/15 E9E1  - "Bobble" written in Kanji
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 128k for Z80 code - located on Taito C0503005B main board
+	ROM_LOAD( "prg_snd.ic27", 0x00000, 0x20000, CRC(2f288fe0) SHA1(4ba707f4b3a1ca0e573652d1c733ee889f9fef8a) ) // hand written label PRG SND IC 27 - no checksum listed
+
+	ROM_REGION( 0x100000, "tc0180vcu", 0 ) // located on Taito C0503002A ROM PCB
+	ROM_LOAD16_BYTE( "p.bobble_chr-1l_6-14_eaa0.ic11_ch_1_0l", 0x00000, 0x40000, CRC(8d3fa2f0) SHA1(3d36944e35081740469df61a40e538eb94ea2ef6) ) // hand written label P.Bobble CHR 1L 6/14 EAA0  - "Bobble" written in Kanji
+	ROM_LOAD16_BYTE( "p.bobble_chr-1h_6-14_1515.ic12_ch_1_0h", 0x00001, 0x40000, CRC(a2eb4d32) SHA1(571811a543af50cc5e0f1d7aad9fc388919e93e6) ) // hand written label P.Bobble CHR 1H 6/14 1515  - "Bobble" written in Kanji
+	ROM_LOAD16_BYTE( "p.bobble_chr-0l_6-14_86d5.ic7_ch_0_0l",  0x80000, 0x40000, CRC(80f1aab0) SHA1(f5cdb93aa702fb8ba91eaf8f470b6e2a61a581b5) ) // hand written label P.Bobble CHR 0L 6/14 86D5  - "Bobble" written in Kanji
+	ROM_LOAD16_BYTE( "p.bobble_chr-0h_6-14_d180.ic8_ch_0_0h",  0x80001, 0x40000, CRC(d773cac8) SHA1(b008a21c39650a28cba402cd1c4de0567e275bc9) ) // hand written label P.Bobble CHR 0H 6/14 D180  - "Bobble" written in Kanji
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // located on Taito C0503002A ROM PCB - Half the size of the Japanese ADPCMA sample ROM
+	ROM_LOAD( "ach0-kaigai.ic15_ach_0", 0x00000, 0x80000, CRC(f203ae52) SHA1(d41b880ef17eea6614e2911318db5cd070473381) ) // hand written ???
+ROM_END
+
 ROM_START( pbobble )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "pb-1c18.bin", 0x00000, 0x40000, CRC(5de14f49) SHA1(91d537748f26e19a5c32de4b8dad341750de39ef) )
@@ -3276,7 +3294,7 @@ ROM_START( masterwj )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
 
-ROM_START( yukiwo ) /* Prototype of Master of Weapons */
+ROM_START( yukiwo ) /* Prototype of Master of Weapon */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "ic33-rom0e.bin", 0x00000, 0x20000, CRC(a0dd51d9) SHA1(a4740bf08e26e1e576344c95d945df5d970738f2) )
 	ROM_LOAD16_BYTE( "ic24-e882.bin",  0x00001, 0x20000, CRC(d66f29d4) SHA1(0854f1a0943a20693e6cd02825666e39b4fe28ca) )
@@ -3556,7 +3574,8 @@ GAME( 1993, ryujina,  ryujin,  selfeena, ryujin,    taitob_state, init_taito_b, 
 
 GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bublbust, 0,       pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Bubble Buster (USA, B-System)",   MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0A   1994/06/15  15:28:30 - Location test but same build as Japan release?
+GAME( 1994, pbobble,  bublbust,pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0J   1994/06/15  15:28:30
 
 GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", MACHINE_SUPPORTS_SAVE )

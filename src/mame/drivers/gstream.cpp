@@ -117,7 +117,7 @@
 +------------------------------------------------+
 
   CPU: Hyperstone E1-32XT
-Sound: OKI 6295 x 2 (rebaged as AD-65)
+Sound: OKI 6295 x 2 (rebadged as AD-65)
   OSC: 54.000MHz, 27.000MHz, 16.000MHz & 1.000MHz
 Other: Sigma Xilinx XC95255 x 2
 

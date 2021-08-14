@@ -1657,8 +1657,6 @@ void bosco_state::bosco(machine_config &config)
 	STARFIELD_05XX(config, m_starfield, 0);
 	m_starfield->set_starfield_config(0, STARFIELD_Y_OFFSET_BOSCO, STARFIELD_X_LIMIT_BOSCO);
 
-	MCFG_VIDEO_START_OVERRIDE(bosco_state,bosco)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -1735,8 +1733,6 @@ void galaga_state::galaga(machine_config &config)
 
 	STARFIELD_05XX(config, m_starfield, 0);
 	m_starfield->set_starfield_config(STARFIELD_X_OFFSET_GALAGA, 0, STARFIELD_X_LIMIT_GALAGA);
-
-	MCFG_VIDEO_START_OVERRIDE(galaga_state,galaga)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1850,8 +1846,6 @@ void xevious_state::xevious(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xevious);
 	PALETTE(config, m_palette, FUNC(xevious_state::xevious_palette), 128*4 + 64*8 + 64*2, 128+1);
-
-	MCFG_VIDEO_START_OVERRIDE(xevious_state,xevious)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1970,8 +1964,6 @@ void digdug_state::digdug(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_digdug);
 	PALETTE(config, m_palette, FUNC(digdug_state::digdug_palette), 16*2 + 64*4 + 64*4, 32);
-
-	MCFG_VIDEO_START_OVERRIDE(digdug_state,digdug)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

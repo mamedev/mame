@@ -77,13 +77,13 @@ void ddribble_state::vlm5030_ctrl_w(uint8_t data)
 	m_vlmbank->set_entry(BIT(data, 3));
 
 	// b2 : SSG-C rc filter enable
-	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, BIT(data, 2) ? CAP_N(150) : 0); // YM2203-SSG-C
+	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); // YM2203-SSG-C
 
 	// b1 : SSG-B rc filter enable
-	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, BIT(data, 1) ? CAP_N(150) : 0); // YM2203-SSG-B
+	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); // YM2203-SSG-B
 
 	// b0 : SSG-A rc filter enable
-	m_filter[0]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, BIT(data, 0) ? CAP_N(150) : 0); // YM2203-SSG-A
+	m_filter[0]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); // YM2203-SSG-A
 }
 
 

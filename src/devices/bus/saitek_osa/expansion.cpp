@@ -11,6 +11,10 @@ Used by Saitek(SciSys) chess computers Leonardo, Galileo, Renaissance.
 #include "emu.h"
 #include "expansion.h"
 
+#include "maestro.h"
+#include "maestroa.h"
+#include "sparc.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -152,4 +156,16 @@ device_saitekosa_expansion_interface::device_saitekosa_expansion_interface(const
 
 device_saitekosa_expansion_interface::~device_saitekosa_expansion_interface()
 {
+}
+
+//-------------------------------------------------
+//  module list
+//-------------------------------------------------
+
+void saitekosa_expansion_modules(device_slot_interface &device)
+{
+	device.option_add("analyst", OSA_ANALYST);
+	device.option_add("maestro", OSA_MAESTRO);
+	device.option_add("maestroa", OSA_MAESTROA);
+	device.option_add("sparc", OSA_SPARC);
 }

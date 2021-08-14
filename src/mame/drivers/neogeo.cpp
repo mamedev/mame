@@ -2198,38 +2198,39 @@ void aes_state::aes_ntsc(machine_config &config)
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
-#define NEOGEO_UNIBIOS(x) \
-	ROM_SYSTEM_BIOS( x+ 0, "unibios40", "Universe Bios (Hack, Ver. 4.0)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 0, "uni-bios_4_0.rom",  0x00000, 0x020000, CRC(a7aab458) SHA1(938a0bda7d9a357240718c2cec319878d36b8f72) ) /* Universe Bios v4.0 (hack) */ \
-	ROM_SYSTEM_BIOS( x+ 1, "unibios33", "Universe Bios (Hack, Ver. 3.3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 1, "uni-bios_3_3.rom",  0x00000, 0x020000, CRC(24858466) SHA1(0ad92efb0c2338426635e0159d1f60b4473d0785) ) /* Universe Bios v3.3 (hack) */ \
-	ROM_SYSTEM_BIOS( x+ 2, "unibios32", "Universe Bios (Hack, Ver. 3.2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 2, "uni-bios_3_2.rom",  0x00000, 0x020000, CRC(a4e8b9b3) SHA1(c92f18c3f1edda543d264ecd0ea915240e7c8258) ) /* Universe Bios v3.2 (hack) */ \
-	ROM_SYSTEM_BIOS( x+ 3, "unibios31", "Universe Bios (Hack, Ver. 3.1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 3, "uni-bios_3_1.rom",  0x00000, 0x020000, CRC(0c58093f) SHA1(29329a3448c2505e1ff45ffa75e61e9693165153) ) /* Universe Bios v3.1 (hack) */ \
-	ROM_SYSTEM_BIOS( x+ 4, "unibios30", "Universe Bios (Hack, Ver. 3.0)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 4, "uni-bios_3_0.rom",  0x00000, 0x020000, CRC(a97c89a9) SHA1(97a5eff3b119062f10e31ad6f04fe4b90d366e7f) ) /* Universe Bios v3.0 (hack) */ \
-	ROM_SYSTEM_BIOS( x+ 5, "unibios23", "Universe Bios (Hack, Ver. 2.3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 5, "uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0) ) /* Universe Bios v2.3 (hack) */ \
-	ROM_SYSTEM_BIOS( x+ 6, "unibios23o", "Universe Bios (Hack, Ver. 2.3, older?)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 6, "uni-bios_2_3o.rom", 0x00000, 0x020000, CRC(601720ae) SHA1(1b8a72c720cdb5ee3f1d735bbcf447b09204b8d9) ) /* Universe Bios v2.3 (hack) alt version, withdrawn? */ \
-	ROM_SYSTEM_BIOS( x+ 7, "unibios22", "Universe Bios (Hack, Ver. 2.2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 7, "uni-bios_2_2.rom",  0x00000, 0x020000, CRC(2d50996a) SHA1(5241a4fb0c63b1a23fd1da8efa9c9a9bd3b4279c) ) /* Universe Bios v2.2 (hack) */ \
-	ROM_SYSTEM_BIOS( x+ 8, "unibios21", "Universe Bios (Hack, Ver. 2.1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 8, "uni-bios_2_1.rom",  0x00000, 0x020000, CRC(8dabf76b) SHA1(c23732c4491d966cf0373c65c83c7a4e88f0082c) ) /* Universe Bios v2.1 (hack) */ \
-	ROM_SYSTEM_BIOS( x+ 9, "unibios20", "Universe Bios (Hack, Ver. 2.0)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 9, "uni-bios_2_0.rom",  0x00000, 0x020000, CRC(0c12c2ad) SHA1(37bcd4d30f3892078b46841d895a6eff16dc921e) ) /* Universe Bios v2.0 (hack) */ \
-	ROM_SYSTEM_BIOS( x+10, "unibios13", "Universe Bios (Hack, Ver. 1.3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+10, "uni-bios_1_3.rom",  0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e) ) /* Universe Bios v1.3 (hack) */
+#define NEOGEO_UNIBIOS_2_2_AND_NEWER(x) \
+	ROM_SYSTEM_BIOS( x+ 0, "unibios40", "Universe BIOS (Hack, Ver. 4.0)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 0, "uni-bios_4_0.rom",  0x00000, 0x020000, CRC(a7aab458) SHA1(938a0bda7d9a357240718c2cec319878d36b8f72) ) /* Universe BIOS v4.0 (hack) */ \
+	ROM_SYSTEM_BIOS( x+ 1, "unibios33", "Universe BIOS (Hack, Ver. 3.3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 1, "uni-bios_3_3.rom",  0x00000, 0x020000, CRC(24858466) SHA1(0ad92efb0c2338426635e0159d1f60b4473d0785) ) /* Universe BIOS v3.3 (hack) */ \
+	ROM_SYSTEM_BIOS( x+ 2, "unibios32", "Universe BIOS (Hack, Ver. 3.2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 2, "uni-bios_3_2.rom",  0x00000, 0x020000, CRC(a4e8b9b3) SHA1(c92f18c3f1edda543d264ecd0ea915240e7c8258) ) /* Universe BIOS v3.2 (hack) */ \
+	ROM_SYSTEM_BIOS( x+ 3, "unibios31", "Universe BIOS (Hack, Ver. 3.1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 3, "uni-bios_3_1.rom",  0x00000, 0x020000, CRC(0c58093f) SHA1(29329a3448c2505e1ff45ffa75e61e9693165153) ) /* Universe BIOS v3.1 (hack) */ \
+	ROM_SYSTEM_BIOS( x+ 4, "unibios30", "Universe BIOS (Hack, Ver. 3.0)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 4, "uni-bios_3_0.rom",  0x00000, 0x020000, CRC(a97c89a9) SHA1(97a5eff3b119062f10e31ad6f04fe4b90d366e7f) ) /* Universe BIOS v3.0 (hack) */ \
+	ROM_SYSTEM_BIOS( x+ 5, "unibios23", "Universe BIOS (Hack, Ver. 2.3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 5, "uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0) ) /* Universe BIOS v2.3 (hack) */ \
+	ROM_SYSTEM_BIOS( x+ 6, "unibios23o", "Universe BIOS (Hack, Ver. 2.3, older?)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 6, "uni-bios_2_3o.rom", 0x00000, 0x020000, CRC(601720ae) SHA1(1b8a72c720cdb5ee3f1d735bbcf447b09204b8d9) ) /* Universe BIOS v2.3 (hack) alt version, withdrawn? */ \
+	ROM_SYSTEM_BIOS( x+ 7, "unibios22", "Universe BIOS (Hack, Ver. 2.2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 7, "uni-bios_2_2.rom",  0x00000, 0x020000, CRC(2d50996a) SHA1(5241a4fb0c63b1a23fd1da8efa9c9a9bd3b4279c) ) /* Universe BIOS v2.2 (hack) */
+#define NEOGEO_UNIBIOS_1_3_TO_2_1(x) \
+	ROM_SYSTEM_BIOS( x+ 8, "unibios21", "Universe BIOS (Hack, Ver. 2.1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 8, "uni-bios_2_1.rom",  0x00000, 0x020000, CRC(8dabf76b) SHA1(c23732c4491d966cf0373c65c83c7a4e88f0082c) ) /* Universe BIOS v2.1 (hack) */ \
+	ROM_SYSTEM_BIOS( x+ 9, "unibios20", "Universe BIOS (Hack, Ver. 2.0)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 9, "uni-bios_2_0.rom",  0x00000, 0x020000, CRC(0c12c2ad) SHA1(37bcd4d30f3892078b46841d895a6eff16dc921e) ) /* Universe BIOS v2.0 (hack) */ \
+	ROM_SYSTEM_BIOS( x+10, "unibios13", "Universe BIOS (Hack, Ver. 1.3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+10, "uni-bios_1_3.rom",  0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e) ) /* Universe BIOS v1.3 (hack) */
 #define NEOGEO_UNIBIOS_1_2_AND_OLDER(x) \
-	ROM_SYSTEM_BIOS( x+11, "unibios12", "Universe Bios (Hack, Ver. 1.2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+11, "uni-bios_1_2.rom",  0x00000, 0x020000, CRC(4fa698e9) SHA1(682e13ec1c42beaa2d04473967840c88fd52c75a) ) /* Universe Bios v1.2 (hack) */ \
-	ROM_SYSTEM_BIOS( x+12, "unibios12o", "Universe Bios (Hack, Ver. 1.2, older)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+12, "uni-bios_1_2o.rom", 0x00000, 0x020000, CRC(e19d3ce9) SHA1(af88ef837f44a3af2d7144bb46a37c8512b67770) ) /* Universe Bios v1.2 (hack) alt version */ \
-	ROM_SYSTEM_BIOS( x+13, "unibios11", "Universe Bios (Hack, Ver. 1.1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+13, "uni-bios_1_1.rom",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */ \
-	ROM_SYSTEM_BIOS( x+14, "unibios10", "Universe Bios (Hack, Ver. 1.0)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+14, "uni-bios_1_0.rom",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
+	ROM_SYSTEM_BIOS( x+11, "unibios12", "Universe BIOS (Hack, Ver. 1.2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+11, "uni-bios_1_2.rom",  0x00000, 0x020000, CRC(4fa698e9) SHA1(682e13ec1c42beaa2d04473967840c88fd52c75a) ) /* Universe BIOS v1.2 (hack) */ \
+	ROM_SYSTEM_BIOS( x+12, "unibios12o", "Universe BIOS (Hack, Ver. 1.2, older)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+12, "uni-bios_1_2o.rom", 0x00000, 0x020000, CRC(e19d3ce9) SHA1(af88ef837f44a3af2d7144bb46a37c8512b67770) ) /* Universe BIOS v1.2 (hack) alt version */ \
+	ROM_SYSTEM_BIOS( x+13, "unibios11", "Universe BIOS (Hack, Ver. 1.1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+13, "uni-bios_1_1.rom",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe BIOS v1.1 (hack) */ \
+	ROM_SYSTEM_BIOS( x+14, "unibios10", "Universe BIOS (Hack, Ver. 1.0)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+14, "uni-bios_1_0.rom",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe BIOS v1.0 (hack) */
 
 /* The number shown in the top right corner (only displayed on the colour test in early versions) should be connected to the revision, the actual numbering / naming here is a mess, possibly due to upgrades where stickers weren't replaced
    The colour of the outside of the test grid appears to be connected to the region / cabinet type (most regions have a single colour, but for the US there are multiple colours, which seem to indicate defaults / intended cabinet type)
@@ -2284,7 +2285,8 @@ void aes_state::aes_ntsc(machine_config &config)
 	ROM_SYSTEM_BIOS( 15, "japan-hotel", "Custom Japanese Hotel" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 15, "sp-1v1_3db8c.bin", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 6 Red - 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
 	\
-	NEOGEO_UNIBIOS(16) \
+	NEOGEO_UNIBIOS_2_2_AND_NEWER(16) \
+	NEOGEO_UNIBIOS_1_3_TO_2_1(16) \
 	NEOGEO_UNIBIOS_1_2_AND_OLDER(16)
 
 
@@ -2397,12 +2399,13 @@ ROM_END
 ROM_START( aes )
 	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "asia", "Asia AES" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "neo-epo.bin",  0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) // AES Console (Asia?) Bios
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "neo-epo.bin",  0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) // AES Console (Asia?) BIOS
 	ROM_SYSTEM_BIOS( 1, "japan", "Japan AES" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "neo-po.bin",   0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) // AES Console (Japan) Bios
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "neo-po.bin",   0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) // AES Console (Japan) BIOS
 	ROM_SYSTEM_BIOS( 2, "devel", "Development System ROM" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) // Official debug (development) ROM, for home-use base board
-	NEOGEO_UNIBIOS(3)
+	NEOGEO_UNIBIOS_2_2_AND_NEWER(3)
+	NEOGEO_UNIBIOS_1_3_TO_2_1(3)
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 
@@ -2479,7 +2482,7 @@ void mvs_state::irrmaze(machine_config &config)
 	neogeo_arcade(config);
 	neogeo_mono(config);
 
-	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge_fixed, "irrmaze", true);
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge_irrmaze, "irrmaze", false);
 
 	config.set_default_layout(layout_irrmaze);
 
@@ -2921,7 +2924,7 @@ void mvs_led_state::sbp(machine_config &config)
 
     MULTI PLAY MODE:
     ================
-    The NeoGeo has three games which support MULTI PLAY MODE (Riding Hero / League Bowling / Trash Rally).
+    The NeoGeo has three games which support MULTI PLAY MODE (Riding Hero / League Bowling / Thrash Rally).
     This allows you to 'link' 4 games (MVS) / 2 games (AES) using in game 'Multi-Play' option. To establish
     a link between the carts you have to connect the carts to each other by a communicator cable. The communicator
     cable is a regular headphone cable with stereo pin jack. It has been reported that you can also 'link' MVS <-> AES.
@@ -2929,7 +2932,7 @@ void mvs_led_state::sbp(machine_config &config)
     All three games use a special PROG board for MULTI PLAY MODE support:
     . Riding Hero    (AES - NEO-AEG PROG-HERO   / MVS NEO-MVS PROG-HERO)
     . League Bowling (AES - NEO-AEG PROG-HERO   / MVS NEO-MVS PROG-HERO)
-    . Trash Rally    (AES - NEO-AEG PROG42G-COM / NEO-MVS PROG42G-COM)
+    . Thrash Rally   (AES - NEO-AEG PROG42G-COM / NEO-MVS PROG42G-COM)
 
     A HD6301V1P MCU on the above boards is used for establishing the 'link'. The MCU has a 4kb internal ROM which
     is not dumped.
@@ -4321,7 +4324,7 @@ ROM_START( roboarmy )
 	ROM_LOAD16_BYTE( "032-c4.c4", 0x200001, 0x080000, CRC(462571de) SHA1(5c3d610d492f91564423873b3b434dcda700373f) ) /* Plane 2,3 */ /* TC534200 */
 ROM_END
 
-ROM_START( roboarma ) /* MVS AND AES VERSION*/
+ROM_START( roboarmya ) /* MVS AND AES VERSION*/
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "032-epr.p1", 0x000000, 0x080000, CRC(27c773cb) SHA1(597ca73f142b1129cc7780540bb9cfacd47bc6ce) ) /* D27C4000 */
 	/* Found on legitimate Robo Army MVS and AES Carts. Debug code button which check control a sound test has been patched out because in a multislot situation that code could have been enabled
@@ -7977,8 +7980,11 @@ ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	NEO_SFIX_128K( "236-s1.s1", CRC(5d1ca640) SHA1(40a9668a1742a44597a07ce72273d17119815637) ) /* TC531000 */
 
 	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
-	/* special BIOS with trackball support, we only have one Irritating Maze bios and that's Asian */
-	ROM_LOAD16_WORD_SWAP("236-bios.sp1", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) )
+	// special BIOS with trackball support, we only have one Irritating Maze bios and that's Asian
+	ROM_SYSTEM_BIOS( 0, "asia-sp1", "Asia MV1B 263" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "236-bios.sp1", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) )
+	// Universe BIOS 2.2 and later allow joystick play as a cheat
+	NEOGEO_UNIBIOS_2_2_AND_NEWER(1)
 
 	ROM_REGION( 0x30000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) ) /* TC531001 */
@@ -11882,7 +11888,7 @@ GAME( 1991, socbrawl,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1991, socbrawlh,  socbrawl, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Soccer Brawl (NGH-031)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, fatfury1,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Fatal Fury - King of Fighters / Garou Densetsu - Shukumei no Tatakai (NGM-033 ~ NGH-033)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, roboarmy,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Robo Army", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, roboarma,   roboarmy, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Robo Army (NGM-032 ~ NGH-032)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, roboarmya,  roboarmy, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Robo Army (NGM-032 ~ NGH-032)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, fbfrenzy,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Football Frenzy (NGM-034 ~ NGH-034)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, kotm2,      neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "King of the Monsters 2 - The Next Thing (NGM-039 ~ NGH-039)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, kotm2a,     kotm2,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "King of the Monsters 2 - The Next Thing (older)", MACHINE_SUPPORTS_SAVE )
@@ -12148,8 +12154,8 @@ GAME( 2000, bangbead,   neogeo,   bangbead,  neogeo,    mvs_led_state, empty_ini
 GAME( 2000, b2b,        neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bang Busters (2010 NCI release)" , MACHINE_SUPPORTS_SAVE )
 
 // Mega Enterprise
-GAME( 2002, mslug4,     neogeo,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Playmore", "Metal Slug 4 (NGM-2630)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, mslug4h,    mslug4,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Playmore", "Metal Slug 4 (NGH-2630)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mslug4,     neogeo,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Noise Factory / Playmore", "Metal Slug 4 (NGM-2630)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mslug4h,    mslug4,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Noise Factory / Playmore", "Metal Slug 4 (NGH-2630)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ms4plus,    mslug4,   ms4plus,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 4 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Evoga

@@ -8,6 +8,7 @@
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
+#include "video/n64.h"
 
 /*----------- driver state -----------*/
 
@@ -38,11 +39,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_n64);
 
 	// Getters
-	n64_rdp* rdp() { return m_rdp; }
+	n64_rdp* rdp() { return m_rdp.get(); }
 	uint32_t* rdram() { return m_rdram; }
 	uint32_t* sram() { return m_sram; }
-	uint32_t* rsp_imem() { return m_rsp_imem; }
-	uint32_t* rsp_dmem() { return m_rsp_dmem; }
 
 protected:
 	required_device<mips3_device> m_vr4300;
@@ -56,7 +55,7 @@ protected:
 	required_device<n64_periphs> m_rcp_periphs;
 
 	/* video-related */
-	n64_rdp *m_rdp;
+	std::unique_ptr<n64_rdp> m_rdp;
 };
 
 /*----------- devices -----------*/
@@ -173,11 +172,11 @@ private:
 	address_space *m_mem_map;
 	required_device<mips3_device> m_vr4300;
 	required_device<rsp_device> m_rsp;
+	required_shared_ptr<uint32_t> m_rsp_imem;
+	required_shared_ptr<uint32_t> m_rsp_dmem;
 
 	uint32_t *m_rdram;
 	uint32_t *m_sram;
-	uint32_t *m_rsp_imem;
-	uint32_t *m_rsp_dmem;
 
 	void clear_rcp_interrupt(int interrupt);
 
@@ -227,6 +226,8 @@ private:
 
 	uint32_t sp_mem_addr;
 	uint32_t sp_dram_addr;
+	uint32_t sp_mem_addr_start;
+	uint32_t sp_dram_addr_start;
 	int sp_dma_length;
 	int sp_dma_count;
 	int sp_dma_skip;

@@ -149,7 +149,7 @@
   The rewrite also introduces a generic model for the DAC. This model is
   not perfect, but allows channel mixing based on a parametrized approach.
   This model also allows to factor in different loads on individual channels.
-  If a better model is developped in the future or better measurements are
+  If a better model is developed in the future or better measurements are
   available, the driver should be easy to change. The model is described
   later.
 

@@ -119,10 +119,10 @@ protected:
 	saitekosa_expansion_device *m_expansion;
 };
 
+void saitekosa_expansion_modules(device_slot_interface &device);
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(SAITEKOSA_EXPANSION, saitekosa_expansion_device)
-
-// include here so drivers don't need to
-#include "modules.h"
 
 #endif // MAME_BUS_SAITEKOSA_EXPANSION_H

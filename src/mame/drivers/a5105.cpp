@@ -114,7 +114,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	int const gfx = m_video_ram[(address & 0x1ffff) >> 1];
+	int const gfx = m_video_ram[(address & 0xffff)];
 
 	for (int xi = 0; xi < 16; xi++)
 	{

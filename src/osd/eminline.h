@@ -33,8 +33,10 @@
 
 #elif defined(_MSC_VER)
 
-#if (defined(_M_IX86) || defined(_M_X64))
+#if defined(_M_IX86) || defined(_M_X64)
 #include "eivcx86.h"
+#elif defined(_M_ARM) || defined(_M_ARM64)
+#include "eivcarm.h"
 #endif
 
 #include "eivc.h"
@@ -42,128 +44,6 @@
 #endif
 
 #endif // !defined(MAME_NOASM)
-
-
-/***************************************************************************
-    INLINE BIT MANIPULATION FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    count_leading_zeros - return the number of
-    leading zero bits in a 32-bit value
--------------------------------------------------*/
-
-#ifndef count_leading_zeros
-inline uint8_t count_leading_zeros(uint32_t val)
-{
-	if (!val) return 32U;
-	uint8_t count;
-	for (count = 0; int32_t(val) >= 0; count++) val <<= 1;
-	return count;
-}
-#endif
-
-
-/*-------------------------------------------------
-    count_leading_ones - return the number of
-    leading one bits in a 32-bit value
--------------------------------------------------*/
-
-#ifndef count_leading_ones
-inline uint8_t count_leading_ones(uint32_t val)
-{
-	uint8_t count;
-	for (count = 0; int32_t(val) < 0; count++) val <<= 1;
-	return count;
-}
-#endif
-
-
-/*-------------------------------------------------
-    count_leading_zeros_64 - return the number of
-    leading zero bits in a 64-bit value
--------------------------------------------------*/
-
-#ifndef count_leading_zeros_64
-inline uint8_t count_leading_zeros_64(uint64_t val)
-{
-	uint32_t upper = uint32_t(val >> 32);
-	return (upper != 0) ? count_leading_zeros(upper) : 32 + count_leading_zeros(uint32_t(val));
-}
-#endif
-
-
-/*-------------------------------------------------
-    count_leading_ones_64 - return the number of
-    leading one bits in a 64-bit value
--------------------------------------------------*/
-
-#ifndef count_leading_ones_64
-inline uint8_t count_leading_ones_64(uint64_t val)
-{
-	uint32_t upper = uint32_t(val >> 32);
-	return (upper != 0xffffffff) ? count_leading_ones(upper) : 32 + count_leading_ones(uint32_t(val));
-}
-#endif
-
-
-/*-------------------------------------------------
-    population_count_32 - return the number of
-    one bits in a 32-bit value
--------------------------------------------------*/
-
-#ifndef population_count_32
-inline unsigned population_count_32(uint32_t val)
-{
-#if defined(__NetBSD__)
-	return popcount32(val);
-#else
-	// optimal Hamming weight assuming fast 32*32->32
-	constexpr uint32_t m1(0x55555555);
-	constexpr uint32_t m2(0x33333333);
-	constexpr uint32_t m4(0x0f0f0f0f);
-	constexpr uint32_t h01(0x01010101);
-	val -= (val >> 1) & m1;
-	val = (val & m2) + ((val >> 2) & m2);
-	val = (val + (val >> 4)) & m4;
-	return unsigned((val * h01) >> 24);
-#endif
-}
-#endif
-
-
-/*-------------------------------------------------
-    population_count_64 - return the number of
-    one bits in a 64-bit value
--------------------------------------------------*/
-
-#ifndef population_count_64
-inline unsigned population_count_64(uint64_t val)
-{
-#if defined(__NetBSD__)
-	return popcount64(val);
-#else
-	// guess that architectures with 64-bit pointers have 64-bit multiplier
-	if (sizeof(void *) >= sizeof(uint64_t))
-	{
-		// optimal Hamming weight assuming fast 64*64->64
-		constexpr uint64_t m1(0x5555555555555555);
-		constexpr uint64_t m2(0x3333333333333333);
-		constexpr uint64_t m4(0x0f0f0f0f0f0f0f0f);
-		constexpr uint64_t h01(0x0101010101010101);
-		val -= (val >> 1) & m1;
-		val = (val & m2) + ((val >> 2) & m2);
-		val = (val + (val >> 4)) & m4;
-		return unsigned((val * h01) >> 56);
-	}
-	else
-	{
-		// fall back to two 32-bit operations to avoid slow multiply
-		return population_count_32(uint32_t(val)) + population_count_32(uint32_t(val >> 32));
-	}
-#endif
-}
-#endif
 
 
 /***************************************************************************
@@ -664,6 +544,131 @@ inline bool addu_64x64_co(uint64_t a, uint64_t b, uint64_t &sum)
 }
 #endif
 
+
+
+/***************************************************************************
+    INLINE BIT MANIPULATION FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    count_leading_zeros_32 - return the number of
+    leading zero bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros_32
+inline uint8_t count_leading_zeros_32(uint32_t val)
+{
+	if (!val) return 32U;
+	uint8_t count;
+	for (count = 0; int32_t(val) >= 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_32 - return the number of
+    leading one bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones_32
+inline uint8_t count_leading_ones_32(uint32_t val)
+{
+	uint8_t count;
+	for (count = 0; int32_t(val) < 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros_64
+inline uint8_t count_leading_zeros_64(uint64_t val)
+{
+	if (!val) return 64U;
+	uint8_t count;
+	for (count = 0; int64_t(val) >= 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_64 - return the number of
+    leading one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones_64
+inline uint8_t count_leading_ones_64(uint64_t val)
+{
+	uint8_t count;
+	for (count = 0; int64_t(val) < 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    population_count_32 - return the number of
+    one bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef population_count_32
+inline unsigned population_count_32(uint32_t val)
+{
+#if defined(__NetBSD__)
+	return popcount32(val);
+#else
+	// optimal Hamming weight assuming fast 32*32->32
+	constexpr uint32_t m1(0x55555555);
+	constexpr uint32_t m2(0x33333333);
+	constexpr uint32_t m4(0x0f0f0f0f);
+	constexpr uint32_t h01(0x01010101);
+	val -= (val >> 1) & m1;
+	val = (val & m2) + ((val >> 2) & m2);
+	val = (val + (val >> 4)) & m4;
+	return unsigned((val * h01) >> 24);
+#endif
+}
+#endif
+
+
+/*-------------------------------------------------
+    population_count_64 - return the number of
+    one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef population_count_64
+inline unsigned population_count_64(uint64_t val)
+{
+#if defined(__NetBSD__)
+	return popcount64(val);
+#else
+	// guess that architectures with 64-bit pointers have 64-bit multiplier
+	if (sizeof(void *) >= sizeof(uint64_t))
+	{
+		// optimal Hamming weight assuming fast 64*64->64
+		constexpr uint64_t m1(0x5555555555555555);
+		constexpr uint64_t m2(0x3333333333333333);
+		constexpr uint64_t m4(0x0f0f0f0f0f0f0f0f);
+		constexpr uint64_t h01(0x0101010101010101);
+		val -= (val >> 1) & m1;
+		val = (val & m2) + ((val >> 2) & m2);
+		val = (val + (val >> 4)) & m4;
+		return unsigned((val * h01) >> 56);
+	}
+	else
+	{
+		// fall back to two 32-bit operations to avoid slow multiply
+		return population_count_32(uint32_t(val)) + population_count_32(uint32_t(val >> 32));
+	}
+#endif
+}
+#endif
 
 
 /***************************************************************************

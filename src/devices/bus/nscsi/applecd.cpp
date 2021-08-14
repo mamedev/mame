@@ -40,7 +40,7 @@
 
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6502/m3745x.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 
 DEFINE_DEVICE_TYPE(APPLECD150, applecd150_device, "aplcd150", "AppleCD 150")
 

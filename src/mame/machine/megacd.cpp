@@ -750,14 +750,14 @@ void sega_segacd_device::segacd_comms_flags_maincpu_w(offs_t offset, uint16_t da
 
 uint16_t sega_segacd_device::scd_4m_prgbank_ram_r(offs_t offset)
 {
-	uint16_t realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
+	uint32_t realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
 	return m_prgram[realoffset];
 
 }
 
 void sega_segacd_device::scd_4m_prgbank_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
+	uint32_t realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
 
 	// todo:
 	// check for write protection? (or does that only apply to writes on the SubCPU side?

@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-29 22:30+1000\n"
-"PO-Revision-Date: 2019-03-19 23:30+0200\n"
-"Last-Translator: Mame.gr\n"
+"PO-Revision-Date: 2021-06-06 22:30+0300\n"
+"Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -38,6 +38,8 @@ msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"Χειρισμός UI ενεργοποιημένος\n"
+"Χρήση %1$s για εναλλαγή"
 
 #: src/frontend/mame/ui/ui.cpp:1249
 #, c-format
@@ -45,6 +47,8 @@ msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"Χειρισμός UI απενεργοποιημένος\n"
+"Χρήση %1$s για εναλλαγή"
 
 #: src/frontend/mame/ui/ui.cpp:1442
 #, c-format
@@ -144,15 +148,15 @@ msgstr "Τρεμόπαιγμα Διανύσματος"
 
 #: src/frontend/mame/ui/ui.cpp:1604
 msgid "Beam Width Minimum"
-msgstr "Ελάχιστο Πλάτος Ακτινών"
+msgstr "Ελάχιστο Πλάτος Ακτίνας"
 
 #: src/frontend/mame/ui/ui.cpp:1605
 msgid "Beam Width Maximum"
-msgstr "Μέγιστο Πλάτος Ακτινών"
+msgstr "Μέγιστο Πλάτος Ακτίνας"
 
 #: src/frontend/mame/ui/ui.cpp:1606
 msgid "Beam Dot Size"
-msgstr ""
+msgstr "Μέγεθος Κουκίδας Ακτίνας"
 
 #: src/frontend/mame/ui/ui.cpp:1607
 msgid "Beam Intensity Weight"
@@ -364,11 +368,11 @@ msgstr "Διάφορες Επιλογές"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip imperfect emulation warnings"
-msgstr ""
+msgstr "Παράλειψη προειδοποιησεων ημιτελούς εξομοίωσης"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Re-select last machine launched"
-msgstr ""
+msgstr "Επιλογή του τελευταίου μηχανήματος που εκτελέστηκε"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Enlarge images in the right panel"
@@ -436,7 +440,7 @@ msgstr "Πλήρης ισχύς"
 
 #: src/frontend/mame/ui/submenu.cpp:55
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "Σίγαση οταν τρεχει σε πληρη ισχυ"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Sleep"
@@ -448,11 +452,11 @@ msgstr "Ταχύτητα"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Adjust speed to match refresh rate"
-msgstr ""
+msgstr "Ρύθμιση την ταχύτητας ώστε να ταιριάζει με το ρυθμό ανανέωσης"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Low latency"
-msgstr ""
+msgstr "Χαμηλή καθυστέρηση"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Rotation Options"
@@ -492,7 +496,7 @@ msgstr "Επιλογές Artwork"
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Zoom to screen area"
-msgstr ""
+msgstr "Μεγέθυνση στην περιοχής της οθόνης"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "State/Playback Options"
@@ -504,7 +508,7 @@ msgstr "Αυτόματη αποθήκευση/επαναφορά"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "Allow rewind"
-msgstr ""
+msgstr "Επιτρέπεται η επαναφορά"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Rewind capacity"
@@ -512,7 +516,7 @@ msgstr "Χωρητικότητα επαναφοράς"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Bilinear filtering for snapshots"
-msgstr ""
+msgstr "Bilinear φιλτράρισμα για στιγμιότυπα"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Burn-in"
@@ -685,7 +689,7 @@ msgstr "Αυτόματο"
 
 #: src/frontend/mame/ui/menu.cpp:1178
 msgid "Start Machine"
-msgstr ""
+msgstr "Έναρξη Μηχανήματος"
 
 #: src/frontend/mame/ui/menu.cpp:1180
 msgid "Return to Machine"
@@ -706,31 +710,31 @@ msgstr "Οθόνη #%d"
 
 #: src/frontend/mame/ui/videoopt.cpp:184
 msgid "Zoom to Screen Area"
-msgstr ""
+msgstr "Μεγέθυνση στην Περιοχή της Οθόνης"
 
 #: src/frontend/mame/ui/videoopt.cpp:196
 msgid "X Only"
-msgstr ""
+msgstr "Μόνο X"
 
 #: src/frontend/mame/ui/videoopt.cpp:200
 msgid "Y Only"
-msgstr ""
+msgstr "Μόνο Y"
 
 #: src/frontend/mame/ui/videoopt.cpp:204
 msgid "X or Y (Auto)"
-msgstr ""
+msgstr "X ή Y (Αυτόματο)"
 
 #: src/frontend/mame/ui/videoopt.cpp:211
 msgid "Non-Integer Scaling"
-msgstr ""
+msgstr "Μη Ακέραια Κλίμακα"
 
 #: src/frontend/mame/ui/videoopt.cpp:214
 msgid "Maintain Aspect Ratio"
-msgstr ""
+msgstr "Διατήρηση Αναλογίας Διαστάσεων"
 
 #: src/frontend/mame/ui/videoopt.cpp:228
 msgid "Cannot change options while recording!"
-msgstr ""
+msgstr "Δεν είναι δυνατή η αλλαγή επιλογών κατά την εγγραφή!"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "protection"
@@ -903,6 +907,10 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"Στοιχεία αυτού του μηχανήματος δεν μπορούν να εξομοιωθούν, καθώς απαιτούν "
+"φυσική αλληλεπίδραση ή αποτελούνται από μηχανικές συσκευές. Δεν είναι "
+"δυνατόν να δοκιμάσετε πλήρως αυτό το μηχάνημα.\n"
 
 #: src/frontend/mame/ui/info.cpp:315
 #, c-format
@@ -933,7 +941,7 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
 #: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
 msgid "GHz"
-msgstr ""
+msgstr "GHz"
 
 #: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
 #: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
@@ -948,7 +956,7 @@ msgstr "kHz"
 #: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
 #: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
 msgid "Hz"
-msgstr ""
+msgstr "Hz"
 
 #: src/frontend/mame/ui/info.cpp:395
 msgid ""
@@ -1064,7 +1072,7 @@ msgstr "Επιλέξτε μορφή εικόνας"
 
 #: src/frontend/mame/ui/filecreate.cpp:325
 msgid "Select initial contents"
-msgstr ""
+msgstr "Επιλογή αρχικού περιεχομένου"
 
 #: src/frontend/mame/ui/keyboard.cpp:39 src/frontend/mame/ui/mainmenu.cpp:113
 msgid "Keyboard Mode"
@@ -1081,11 +1089,11 @@ msgstr "Εξομοιωμένο"
 #: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:478
 #, c-format
 msgid "%1$s [root%2$s]"
-msgstr ""
+msgstr "%1$s [root%2$s]"
 
 #: src/frontend/mame/ui/keyboard.cpp:53
 msgid "[root%2$s]"
-msgstr ""
+msgstr "[root%2$s]"
 
 #: src/frontend/mame/ui/keyboard.cpp:56
 msgid "Enabled"
@@ -1320,12 +1328,12 @@ msgstr " (κλειδωμένο)"
 #: src/frontend/mame/ui/miscmenu.cpp:455
 #, c-format
 msgid "P%d Visibility"
-msgstr ""
+msgstr "Ορατότητα P%d"
 
 #: src/frontend/mame/ui/miscmenu.cpp:509
 #, c-format
 msgid "P%d Crosshair"
-msgstr ""
+msgstr "Στόχαστρο P%d"
 
 #: src/frontend/mame/ui/miscmenu.cpp:526
 msgid "Visible Delay"
@@ -1375,11 +1383,11 @@ msgstr "Αφαίρεση Από Τα Αγαπημένα"
 
 #: src/frontend/mame/ui/miscmenu.cpp:827
 msgid "Save Machine Configuration"
-msgstr ""
+msgstr "Αποθήκευση Παραμετροποίησης Μηχανήματος"
 
 #: src/frontend/mame/ui/miscmenu.cpp:838
 msgid "Configure Machine:"
-msgstr ""
+msgstr "Ρύθμιση Μηχανήματος:"
 
 #: src/frontend/mame/ui/miscmenu.cpp:872 src/frontend/mame/ui/selmenu.cpp:2595
 msgid " (default)"
@@ -1399,7 +1407,7 @@ msgstr "[απέτυχε]"
 
 #: src/frontend/mame/ui/state.cpp:213
 msgid "No save states found"
-msgstr ""
+msgstr "Δε βρέθηκαν αποθηκευμένες καταστάσεις"
 
 #: src/frontend/mame/ui/state.cpp:404
 msgid "Load State"
@@ -1407,7 +1415,7 @@ msgstr "Φόρτωση Κατάστασης"
 
 #: src/frontend/mame/ui/state.cpp:404
 msgid "Select state to load"
-msgstr ""
+msgstr "Επιλογή κατάστασης για φόρτωση"
 
 #: src/frontend/mame/ui/state.cpp:428
 msgid "Save State"
@@ -1416,6 +1424,8 @@ msgstr "Αποθήκευση Κατάστασης"
 #: src/frontend/mame/ui/state.cpp:428
 msgid "Press a key or joystick button, or select state to overwrite"
 msgstr ""
+"Πατήστε ένα πλήκτρο ή κουμπί μοχλού, ή επιλέξτε κατάσταση για "
+"αντικατάσταση"
 
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
@@ -1429,7 +1439,7 @@ msgstr "Περιβάλλον Χρήστη"
 #: src/frontend/mame/ui/inputmap.cpp:41
 #, c-format
 msgid "Player %1$d Controls"
-msgstr ""
+msgstr "Χειρισμός Παίκτη %1$d"
 
 #: src/frontend/mame/ui/inputmap.cpp:44
 msgid "Other Controls"
@@ -1437,41 +1447,41 @@ msgstr "Άλλα Στοιχεία Ελέγχου"
 
 #: src/frontend/mame/ui/inputmap.cpp:227
 msgid "This machine has no input map."
-msgstr ""
+msgstr "Αυτό το μηχάνημα δεν έχει χαρτογραφηση εισαγωγής."
 
 #: src/frontend/mame/ui/inputmap.cpp:310
 msgid "Pressed"
-msgstr ""
+msgstr "Πατήθηκε"
 
 #: src/frontend/mame/ui/inputmap.cpp:379 plugins/autofire/autofire_menu.lua:123
 #: plugins/cheat/init.lua:626
 msgid "Invalid sequence entered"
-msgstr ""
+msgstr "Έγινε εισαγωγή μη έγκυρης ακολουθίας"
 
 #: src/frontend/mame/ui/inputmap.cpp:480
 #, c-format
 msgid "[root%1$s]"
-msgstr ""
+msgstr "[root%1$s]"
 
 #: src/frontend/mame/ui/inputmap.cpp:507
 #, c-format
 msgid "Press %1$s to set\n"
-msgstr ""
+msgstr "Πιέστε το πλήκτρο %1$s για να ορίσετε\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:508
 #, c-format
 msgid "Press %1$s to append\n"
-msgstr ""
+msgstr "Πιέστε το πλήκτρο %1$s για προσθήκη\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:509
 #, c-format
 msgid "Press %1$s to clear\n"
-msgstr ""
+msgstr "Πιέστε το πλήκτρο %1$s για καθαρισμό"
 
 #: src/frontend/mame/ui/inputmap.cpp:510
 #, c-format
 msgid "Press %1$s to restore default\n"
-msgstr ""
+msgstr "Πιέστε το πλήκτρο %1$s για επαναφορά προεπιλογών\n"
 
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
@@ -1522,6 +1532,8 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
+"Στο επιλεγμένο λογισμικό λείπει μία ή περισσότερες ROMs ή εικόνες CHD.\n"
+"Παρακαλώ προμηθευτείτε τα σωστά αρχεία ή επιλέξτε ένα διαφορετικό."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:150
 msgid ""
@@ -2418,7 +2430,7 @@ msgstr "Αναλογικά Χειριστήρια"
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "DIP Switches"
-msgstr ""
+msgstr "Μικροδιακόπτες"
 
 #: src/frontend/mame/ui/mainmenu.cpp:73
 msgid "Machine Configuration"
@@ -2434,7 +2446,7 @@ msgstr "Πληροφορίες Μηχανήματος"
 
 #: src/frontend/mame/ui/mainmenu.cpp:80
 msgid "Warning Information"
-msgstr ""
+msgstr "Πληροφορίες Προειδοποιήσεων"
 
 #: src/frontend/mame/ui/mainmenu.cpp:86
 msgid "Image Information"
@@ -2487,7 +2499,7 @@ msgstr "Προβολή Εξωτερικού DAT"
 #: src/frontend/mame/ui/mainmenu.cpp:140
 #, c-format
 msgid "About %s"
-msgstr ""
+msgstr "Σχετικά με το %s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:146
 msgid "Select New Machine"
@@ -2574,6 +2586,10 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
+"Οι απαιτούμενες εικόνες ROM / δίσκου για το επιλεγμένο σύστημα λείπουν ή δεν "
+"είναι σωστές.\n"
+"Παρακαλώ προμηθευτείτε τα σωστά αρχεία ή επιλέξτε ένα διαφορετικό σύστημα.\n"
+"\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2524
 msgid ""
@@ -2581,28 +2597,33 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
+"Οι απαιτούμενες εικόνες ROM / δίσκου για το επιλεγμένο λογισμικό λείπουν ή "
+"δεν είναι σωστές.\n"
+"Παρακαλώ προμηθευτείτε τα σωστά αρχεία ή επιλέξτε ένα διαφορετικό "
+"αντικείμενο λογισμικού.\n"
+"\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2540
 msgid "incorrect checksum"
-msgstr ""
+msgstr "λανθασμένο άθροισμα ελέγχου"
 
 #: src/frontend/mame/ui/selmenu.cpp:2543
 msgid "incorrect length"
-msgstr ""
+msgstr "λανθασμένο μήκος"
 
 #: src/frontend/mame/ui/selmenu.cpp:2546
 msgid "not found"
-msgstr ""
+msgstr "δεν βρέθηκε"
 
 #: src/frontend/mame/ui/selmenu.cpp:2557
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
-msgstr ""
+msgstr "%1$s (%2$s) - %3$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2559
 #, c-format
 msgid "%1$s - %2$s\n"
-msgstr ""
+msgstr "%1$s - %2$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2563
 msgid "Press any key to continue."
@@ -2678,12 +2699,12 @@ msgstr "  Οθόνη '%1$s': Διάνυσμα\n"
 #: src/frontend/mame/ui/devopt.cpp:116
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr ""
+msgstr "  Οθόνη '%1$s': %2$d × %3$d (V) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:117
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-msgstr ""
+msgstr "  Οθόνη '%1$s': %2$d × %3$d (H) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:130
 msgid "* Sound:\n"
@@ -2780,7 +2801,7 @@ msgstr "[Καμία]\n"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
-msgstr ""
+msgstr "Άλλο: "
 
 #: plugins/cheatfind/init.lua:388
 msgid "Save Cheat"
@@ -2813,11 +2834,11 @@ msgstr "Τύπος"
 
 #: plugins/cheatfind/init.lua:411
 msgid "(empty)"
-msgstr ""
+msgstr "(κενό)"
 
 #: plugins/cheatfind/init.lua:427
 msgid "You can enter any type name"
-msgstr ""
+msgstr "Μπορείτε να εισαγάγετε οποιοδήποτε τύπου όνομα"
 
 #: plugins/cheatfind/init.lua:436
 msgid "Save"
@@ -2825,7 +2846,7 @@ msgstr "Αποθήκευση"
 
 #: plugins/cheatfind/init.lua:444
 msgid "Type name is empty"
-msgstr ""
+msgstr "Το όνομα τύπου είναι κενό"
 
 #: plugins/cheatfind/init.lua:468
 #, lua-format
@@ -2860,11 +2881,11 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:510
 msgid "Automatic"
-msgstr ""
+msgstr "Αυτόματα"
 
 #: plugins/cheatfind/init.lua:510
 msgid "Manual"
-msgstr ""
+msgstr "Χειροκίνητα"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Pause Mode"
@@ -2872,11 +2893,11 @@ msgstr "Λειτουργία Παύσης"
 
 #: plugins/cheatfind/init.lua:518
 msgid "Manually toggle pause when needed"
-msgstr ""
+msgstr "Μη αυτόματη εναλλαγή παύσης όταν χρειάζεται"
 
 #: plugins/cheatfind/init.lua:521
 msgid "Automatically toggle pause with on-screen menus"
-msgstr ""
+msgstr "Αυτόματη εναλλαγή παύσης με τα μενού της οθόνης"
 
 #: plugins/cheatfind/init.lua:542
 msgid "All slots cleared and current state saved to Slot 1"
@@ -2890,12 +2911,12 @@ msgstr "Έναρξη νέας αναζήτησης"
 #: plugins/cheatfind/init.lua:565
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr ""
+msgstr "Η Κατάσταση Μνήμης αποθηκεύτηκε στη θέση %d"
 
 #: plugins/cheatfind/init.lua:581
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr ""
+msgstr "Αποθήκευση τρέχουσας κατάστασης μνήμης στη Θέση %d"
 
 #: plugins/cheatfind/init.lua:612
 #, lua-format
@@ -2905,27 +2926,27 @@ msgstr "Βρέθηκαν συνολικά %d αντιστοιχίες"
 #: plugins/cheatfind/init.lua:620
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr ""
+msgstr "Εκτέλεση σύγκρισης : Θέση %d %s Θέση %d"
 
 #: plugins/cheatfind/init.lua:621
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr ""
+msgstr "Εκτέλεση σύγκρισης : Θέση %d %s Θέση %d %s %d"
 
 #: plugins/cheatfind/init.lua:622
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr ""
+msgstr "Εκτέλεση σύγκρισης : Θέση %d BITWISE%s Θέση %d"
 
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr ""
+msgstr "Εκτέλεση σύγκρισης : Θέση %d %s %d"
 
 #: plugins/cheatfind/init.lua:664 plugins/cheatfind/init.lua:706
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "Θέση %d"
 
 #: plugins/cheatfind/init.lua:675
 msgid "Left less than right"
@@ -2985,11 +3006,11 @@ msgstr "Μορφή Δεδομένων"
 
 #: plugins/cheatfind/init.lua:734
 msgid "Slot 1 Value"
-msgstr ""
+msgstr "Τιμή θέσης 1"
 
 #: plugins/cheatfind/init.lua:734
 msgid "Last Slot Value"
-msgstr ""
+msgstr "Τιμή τελευταίας θέσης"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Test/Write Poke Value"
@@ -3014,11 +3035,11 @@ msgstr ""
 #: plugins/cheatfind/init.lua:748
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr ""
+msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το %s"
 
 #: plugins/cheatfind/init.lua:771
 msgid "Aligned only"
-msgstr ""
+msgstr "Ευθυγράμμιση μόνο"
 
 #: plugins/cheatfind/init.lua:787
 msgid "Undo last search -- #"
@@ -3035,7 +3056,7 @@ msgstr "Όλα"
 #: plugins/cheatfind/init.lua:903
 #, lua-format
 msgid "Test Cheat %08X_%02X"
-msgstr ""
+msgstr "Δοκιμή Cheat %08X_%02X"
 
 #: plugins/cheatfind/init.lua:943
 msgid "Cheat engine not available"
@@ -3085,61 +3106,61 @@ msgstr "Θύρες εισόδου"
 
 #: plugins/autofire/init.lua:103
 msgid "Failed to load autofire menu"
-msgstr ""
+msgstr "Αποτυχία φόρτωσης μενού autofire"
 
 #: plugins/autofire/init.lua:110
 msgid "Autofire"
-msgstr ""
+msgstr "Autofire"
 
 #: plugins/autofire/autofire_menu.lua:58
 msgid "Autofire buttons"
-msgstr ""
+msgstr "Πλήκτρα autofire"
 
 #: plugins/autofire/autofire_menu.lua:59
 #, lua-format
 msgid "Press %s to delete"
-msgstr ""
+msgstr "Πατήστε %s για διαγραφή"
 
 #: plugins/autofire/autofire_menu.lua:75 plugins/autofire/autofire_menu.lua:208
 msgid "Add autofire button"
-msgstr ""
+msgstr "Προσθήκη πλήκτρου autofire"
 
 #: plugins/autofire/autofire_menu.lua:103
 #: plugins/autofire/autofire_menu.lua:104
 msgid "NOT SET"
-msgstr ""
+msgstr "ΔΕΝ ΡΥΘΜΙΣΤΗΚΕ"
 
 #: plugins/autofire/autofire_menu.lua:105
 msgid "Input"
-msgstr ""
+msgstr "Εισαγωγή"
 
 #: plugins/autofire/autofire_menu.lua:106
 msgid "Hotkey"
-msgstr ""
+msgstr "Πλήκτρο συντόμευσης"
 
 #: plugins/autofire/autofire_menu.lua:107
 msgid "On frames"
-msgstr ""
+msgstr "Ανοικτά καρέ"
 
 #: plugins/autofire/autofire_menu.lua:108
 msgid "Off frames"
-msgstr ""
+msgstr "Κλειστά καρέ"
 
 #: plugins/autofire/autofire_menu.lua:115 plugins/cheat/init.lua:618
 msgid "Press button for hotkey or wait to leave unchanged"
-msgstr ""
+msgstr "Πιέστε πλήκτρο για συντόμευση ή περιμένετε για να μείνει ως έχει"
 
 #: plugins/autofire/autofire_menu.lua:161
 msgid "Number of frames button will be pressed"
-msgstr ""
+msgstr "Αριθμός καρέ που θα πατηθεί το πλήκτρο"
 
 #: plugins/autofire/autofire_menu.lua:169
 msgid "Number of frames button will be released"
-msgstr ""
+msgstr "Αριθμός καρέ που θα ελευθερωθεί το πλήκτρο"
 
 #: plugins/autofire/autofire_menu.lua:181
 msgid "Edit autofire button"
-msgstr ""
+msgstr "Επεξεργασία πλήκτρου autofire"
 
 #: plugins/autofire/autofire_menu.lua:189 plugins/cheat/init.lua:650
 msgid "Done"
@@ -3147,7 +3168,7 @@ msgstr "Έγινε"
 
 #: plugins/autofire/autofire_menu.lua:245
 msgid "Select an input for autofire"
-msgstr ""
+msgstr "Επιλέξτε μια είσαγωγή για autofire"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
@@ -3172,7 +3193,7 @@ msgstr "Επιλογή cheat για ρύθμιση συντόμευσης"
 #: plugins/cheat/init.lua:607
 #, lua-format
 msgid "Press %s to clear hotkey"
-msgstr ""
+msgstr "Πατήστε το %s για καθαρισμό του πλήκτρου συντόμευσης"
 
 #: plugins/cheat/init.lua:645
 msgid "None"
@@ -3259,251 +3280,3 @@ msgstr "MESSinfo"
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
 
-#~ msgid "Backdrops"
-#~ msgstr "Σκηνικά"
-
-#~ msgid "Overlays"
-#~ msgstr "Επικαλύψεις"
-
-#~ msgid "Bezels"
-#~ msgstr "Προσόψεις"
-
-#~ msgid "CPanels"
-#~ msgstr "Πίνακες Ελέγχου"
-
-#~ msgid "View"
-#~ msgstr "Εμφάνιση"
-
-#~ msgid "Cropped"
-#~ msgstr "Περικοπή"
-
-#~ msgid "Full"
-#~ msgstr "Πλήρες"
-
-#~ msgid "Dip Switches"
-#~ msgstr "Μικροδιακόπτες"
-
-#~ msgid "Select position to load from"
-#~ msgstr "Επιλέξτε τη θέση φόρτωσης από"
-
-#~ msgid "Select position to save to"
-#~ msgstr "Επιλέξτε τη θέση για αποθήκευση σε"
-
-#~ msgid "Keyboard Emulation Status"
-#~ msgstr "Κατάσταση Εξομοίωσης Πληκτρολογίου"
-
-#~ msgid "Mode: PARTIAL Emulation"
-#~ msgstr "Λειτουργία: ΜΕΡΙΚΗ Εξομοίωση"
-
-#~ msgid "UI:   Enabled"
-#~ msgstr "UI:   Ενεργοποιημένο"
-
-#~ msgid "**Use ScrLock to toggle**"
-#~ msgstr "**Χρήση ScrLock να εναλλαγή**"
-
-#~ msgid "Mode: FULL Emulation"
-#~ msgstr "Λειτουργία: ΠΛΗΡΗΣ Εξομοίωση"
-
-#~ msgid "UI:   Disabled"
-#~ msgstr "UI:   Απενεργοποιημένο"
-
-#~ msgid "Autofire can't be enabled"
-#~ msgstr "Δεν μπορεί να ενεργοποιηθεί το Autofire"
-
-#, c-format
-#~ msgid "%1$.3ffps"
-#~ msgstr "%1$.3ffps"
-
-#~ msgid "Autofire Settings"
-#~ msgstr "Ρυθμίσεις Autofire"
-
-#~ msgid "Autofire Status"
-#~ msgstr "Κατάσταση Autofire"
-
-#~ msgid "No buttons found on this machine!"
-#~ msgstr "Δεν βρέθηκαν κουμπιά σε αυτό το μηχάνημα!"
-
-#~ msgid "Autofire Delay"
-#~ msgstr "Καθυστέρηση Autofire"
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Στο επιλεγμένο λογισμικό λείπει ένα ή περισσότερα απαραίτητα αρχεία. "
-#~ "Παρακαλώ επιλέξτε ένα διαφορετικό λογισμικό.\n"
-#~ "\n"
-
-#~ msgid "Keyboard Mode:"
-#~ msgstr "Λειτουργία Πληκτρολογίου:"
-
-#~ msgid "Save machine configuration"
-#~ msgstr "Αποθήκευση παραμετροποίησης μηχανήματος"
-
-#~ msgid "Configure machine:"
-#~ msgstr "Ρύθμιση μηχανήματος:"
-
-#~ msgid "Support Cocktail\tYes\n"
-#~ msgstr "Υποστήριξη Κοκτέιλ\tΝαι\n"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Στο επιλεγμένο μηχάνημα λείπουν ένα ή περισσότερα απαιτούμενα αρχεία ROM "
-#~ "ή CHD. Παρακαλώ επιλέξτε διαφορετικό μηχάνημα.\n"
-#~ "\n"
-
-#~ msgid "Re-select last machine played"
-#~ msgstr "Επιλογή του τελευταίου μηχανήματος που έπαιζε"
-
-#~ msgid "Refresh speed"
-#~ msgstr "Ταχύτητα ανανέωσης"
-
-#~ msgid "Artwork Crop"
-#~ msgstr "Αποκοπή Artwork"
-
-#~ msgid "Use Backdrops"
-#~ msgstr "Χρήση Backdrops"
-
-#~ msgid "Use Overlays"
-#~ msgstr "Χρήση Overlays"
-
-#~ msgid "Use Bezels"
-#~ msgstr "Χρήση Bezels"
-
-#~ msgid "Use Control Panels"
-#~ msgstr "Χρήση Control Panels"
-
-#~ msgid "Use Marquees"
-#~ msgstr "Χρήση Marquees"
-
-#~ msgid "Bilinear snapshot"
-#~ msgstr "Στιγμιότυπο Bilinear"
-
-#, c-format
-#~ msgid "  %1$d×%2$s %3$d.%4$06d MHz\n"
-#~ msgstr "  %1$d×%2$s %3$d.%4$06d MHz\n"
-
-#~ msgid "  %1$d×%2$s %5$d.%6$03d kHz\n"
-#~ msgstr "  %1$d×%2$s %5$d.%6$03d kHz\n"
-
-#~ msgid "  %2$s %3$d.%4$06d MHz\n"
-#~ msgstr "  %2$s %3$d.%4$06d MHz\n"
-
-#~ msgid "  %2$s %5$d.%6$03d kHz\n"
-#~ msgstr "  %2$s %5$d.%6$03d kHz\n"
-
-#, c-format
-#~ msgid "  Screen '%1$s': %2$d × %3$d (V) %4$f Hz\n"
-#~ msgstr "  Οθόνη '%1$s': %2$d × %3$d (Κ) %4$f Hz\n"
-
-#, c-format
-#~ msgid "  Screen '%1$s': %2$d × %3$d (H) %4$f Hz\n"
-#~ msgstr "  Οθόνη '%1$s': %2$d × %3$d (Ο) %4$f Hz\n"
-
-#, c-format
-#~ msgid "  %1$d×%2$s\n"
-#~ msgstr "  %1$d×%2$s\n"
-
-#~ msgid "  %2$s\n"
-#~ msgstr "  %2$s\n"
-
-#~ msgid ""
-#~ "The software selected is missing one or more required ROM or CHD images. "
-#~ "Please select a different one."
-#~ msgstr ""
-#~ "Στο επιλεγμένο λογισμικό λείπει μία ή περισσότερες ROMs ή εικόνες CHD. "
-#~ "Παρακαλώ επιλέξτε ένα διαφορετικό."
-
-#~ msgid ""
-#~ "\n"
-#~ "Elements of this machine cannot be emulated as they requires physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this machine.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Στοιχεία αυτού του μηχανήματος δεν μπορούν να εξομοιωθούν, καθώς απαιτούν "
-#~ "φυσική αλληλεπίδραση ή αποτελούνται από μηχανικές συσκευές. Δεν είναι "
-#~ "δυνατόν να δοκιμάσετε πλήρως αυτό το μηχάνημα.\n"
-
-#~ msgid "Press button for hotkey or wait to clear"
-#~ msgstr "Πιέστε πλήκτρο για συντόμευση ή περιμένετε για καθαρισμό"
-
-#~ msgid "Manually pause & unpause the game when needed with the pause hotkey"
-#~ msgstr ""
-#~ "Μη αυτόματη παύση & συνέχιση του παιχνιδιού όταν χρειάζεται με το πλήκτρο "
-#~ "παύσης"
-
-#, lua-format
-#~ msgid "Memory State saved to Slot %d"
-#~ msgstr "Η Κατάσταση Μνήμης αποθηκεύτηκε στη θέση %d"
-
-#~ msgid "Save Current Memory State to Slot "
-#~ msgstr "Αποθήκευση Τρέχουσας Κατάστασης Μνήμης στη Θέση "
-
-#~ msgid "Perform Compare  :  "
-#~ msgstr "Εκτέλεση Σύγκρισης  :  "
-
-#~ msgid "Use this if you want to poke 0x00"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x00"
-
-#~ msgid "Use this if you want to poke 0x01"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x01"
-
-#~ msgid "Use this if you want to poke 0x02"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x02"
-
-#~ msgid "Use this if you want to poke 0x03"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x03"
-
-#~ msgid "Use this if you want to poke 0x04"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x04"
-
-#~ msgid "Use this if you want to poke 0x05"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x05"
-
-#~ msgid "Use this if you want to poke 0x06"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x06"
-
-#~ msgid "Use this if you want to poke 0x07"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x07"
-
-#~ msgid "Use this if you want to poke 0x08"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x08"
-
-#~ msgid "Use this if you want to poke 0x09"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x09"
-
-#~ msgid "Use this if you want to poke 0x63 (Decimal 99)"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x63 (Δεκαδικό 99)"
-
-#~ msgid "Use this if you want to poke 0x99 (BCD 99)"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x99 (BCD 99)"
-
-#~ msgid "Use this if you want to poke 0xFF (Decimal 255)"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0xFF (Δεκαδικό 255)"
-
-#~ msgid "Use this if you want to poke 0x3E7 (Decimal 999)"
-#~ msgstr ""
-#~ "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x3E7 (Δεκαδικό 999)"
-
-#~ msgid "Use this if you want to poke 0x999 (BCD 999)"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x999 (BCD 999)"
-
-#~ msgid "Use this if you want to poke 0x270F (Decimal 9999)"
-#~ msgstr ""
-#~ "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x270F (Δεκαδικό 9999)"
-
-#~ msgid "Use this if you want to poke 0x9999 (BCD 9999)"
-#~ msgstr "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0x9999 (BCD 9999)"
-
-#~ msgid "Use this if you want to poke 0xFFFF (Decimal 65535)"
-#~ msgstr ""
-#~ "Χρησιμοποιήστε αυτό αν θέλετε να κάνετε poke το 0xFFFF (Δεκαδικό 65535)"
-
-#, lua-format
-#~ msgid "Test Cheat %08X:%02X"
-#~ msgstr "Δοκιμή Cheat %08X:%02X"

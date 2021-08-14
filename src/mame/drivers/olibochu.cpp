@@ -257,7 +257,7 @@ void olibochu_state::sound_command_w(offs_t offset, uint8_t data)
 	else
 		m_cmd = (m_cmd & 0xff00) | uint16_t(data);
 
-	unsigned c = count_leading_zeros(uint32_t(m_cmd)) - 16;
+	unsigned c = count_leading_zeros_32(uint32_t(m_cmd)) - 16;
 	if (c < 16)
 		m_soundlatch->write(c);
 }

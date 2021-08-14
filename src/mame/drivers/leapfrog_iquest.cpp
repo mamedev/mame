@@ -651,7 +651,7 @@ void leapfrog_turboextreme_state::leapfrog_turboex(machine_config &config)
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_turboextreme_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turboextreme_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("turboextreme_cart");
 }
 
 void leapfrog_turbotwistmath_state::leapfrog_turbotwistmath(machine_config &config)
@@ -670,7 +670,7 @@ void leapfrog_turbotwistmath_state::leapfrog_turbotwistmath(machine_config &conf
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_turbotwistmath_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turbotwistmath_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("ttwist_math_cart");
 }
 
 void leapfrog_turbotwistspelling_state::leapfrog_turbotwistspelling(machine_config &config)
@@ -689,7 +689,7 @@ void leapfrog_turbotwistspelling_state::leapfrog_turbotwistspelling(machine_conf
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_turbotwistspelling_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turbotwistspelling_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("ttwist_spelling_cart");
 }
 
 void leapfrog_turbotwistvocabulator_state::leapfrog_turbotwistvocabulator(machine_config &config)
@@ -708,7 +708,7 @@ void leapfrog_turbotwistvocabulator_state::leapfrog_turbotwistvocabulator(machin
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_turbotwistvocabulator_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turbotwistvocabulator_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("ttwist_vocabulator_cart");
 }
 
 
@@ -728,7 +728,7 @@ void leapfrog_turbotwistbrainquest_state::leapfrog_turbotwistbrainquest(machine_
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_turbotwistbrainquest_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turbotwistbrainquest_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("ttwist_brainquest_cart");
 }
 
 ROM_START( iquest )

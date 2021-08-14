@@ -11,11 +11,16 @@
 
 #include "video/crt.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 /*
-    driver init function
+
+TODO:
+- due to no known software, it is unknown if this system is capable of running anything.
+
 */
+
 void tx0_state::init_tx0()
 {
 	static const unsigned char fontdata6x8[tx0_fontdata_size] =
@@ -372,6 +377,8 @@ public:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+	virtual const char *image_interface() const noexcept override { return "tx0_ptp"; }
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 protected:
 	// device-level overrides
@@ -399,6 +406,7 @@ public:
 
 	// image-level overrides
 	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
@@ -757,7 +765,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_prt )
 	/* read current AC */
 	ac = m_maincpu->state_int(TX0_AC);
 	/* shuffle and print 6-bit word */
-	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
+	ch = bitswap<6>(ac, 15, 12, 9, 6, 3, 0);
 	typewriter_out(ch);
 
 	m_typewriter.prt_timer->adjust(attotime::from_msec(100));
@@ -1577,6 +1585,8 @@ void tx0_state::tx0_64kw(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
 	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);
+
+	SOFTWARE_LIST(config, "ptp_list").set_original("tx0_ptp").set_filter("64");
 }
 
 void tx0_state::tx0_8kw(machine_config &config)
@@ -1586,23 +1596,30 @@ void tx0_state::tx0_8kw(machine_config &config)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
 	approximately 6usec) */
+	TX0_8KW(config.replace(), m_maincpu, 166667);
+	m_maincpu->cpy().set(FUNC(tx0_state::tx0_io_cpy));
+	m_maincpu->r1l().set(FUNC(tx0_state::tx0_io_r1l));
+	m_maincpu->dis().set(FUNC(tx0_state::tx0_io_dis));
+	m_maincpu->r3l().set(FUNC(tx0_state::tx0_io_r3l));
+	m_maincpu->prt().set(FUNC(tx0_state::tx0_io_prt));
+	m_maincpu->rsv().set_nop();
+	m_maincpu->p6h().set(FUNC(tx0_state::tx0_io_p6h));
+	m_maincpu->p7h().set(FUNC(tx0_state::tx0_io_p7h));
+	m_maincpu->sel().set(FUNC(tx0_state::tx0_sel));
+	m_maincpu->res().set(FUNC(tx0_state::tx0_io_reset_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_8kw_map);
+	/* dummy interrupt: handles input */
+	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
+
+	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8");
 }
 
 ROM_START(tx0_64kw)
-	/*CPU memory space*/
-	ROM_REGION(0x10000 * sizeof(uint32_t),"maincpu",ROMREGION_ERASEFF)
-		/* Note this computer has no ROM... */
-
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 
 ROM_START(tx0_8kw)
-	/*CPU memory space*/
-	ROM_REGION(0x2000 * sizeof(uint32_t),"maincpu",ROMREGION_ERASEFF)
-		/* Note this computer has no ROM... */
-
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END

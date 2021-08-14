@@ -745,7 +745,7 @@ CONS( 2005, jak_care,  0,        0, jakks_gkr_cb,     jak_care,     jakks_gkr_st
 // release version of X-Men is not dumped yet
 CONS( 2005, jak_xmenp, 0,        0, jakks_gkr_2m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",     "X-Men - Mutant Reign (JAKKS Pacific TV Game, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// Dreamworks Movie Night was never manufactured 
+// Dreamworks Movie Night was never manufactured
 CONS( 2006, jak_dwmn, 0,        0, jakks_gkr_2m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",      "Dreamworks Movie Night (JAKKS Pacific TV Game, Oct 18 2006, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, jak_dwmno,jak_dwmn, 0, jakks_gkr_2m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",      "Dreamworks Movie Night (JAKKS Pacific TV Game, Apr 24 2006, test program)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

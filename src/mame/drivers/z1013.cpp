@@ -57,6 +57,7 @@ Due to no input checking, misuse of commands can crash the system.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "sound/spkrdev.h"
 
 
 class z1013_state : public driver_device
@@ -68,16 +69,21 @@ public:
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
 		, m_cass(*this, "cassette")
+		, m_speaker(*this, "speaker")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void z1013k76(machine_config &config);
+	void z1013a2(machine_config &config);
 	void z1013(machine_config &config);
 
 private:
 	void z1013_keyboard_w(uint8_t data);
+	uint8_t port_a_r();
 	uint8_t port_b_r();
+	uint8_t a2_port_b_r();
 	void port_b_w(uint8_t data);
 	uint8_t k7659_port_b_r();
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
@@ -86,8 +92,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_keyboard_line;
-	bool m_keyboard_part;
+	uint8_t m_keyboard_line = 0U;
+	bool m_keyboard_part = false;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -95,8 +101,10 @@ private:
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
 	required_device<cassette_image_device> m_cass;
+	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
+	optional_ioport_array<9> m_io_keyboard;
 };
 
 
@@ -157,6 +165,11 @@ static INPUT_PORTS_START( z1013_8x4 )
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ent") PORT_CODE(KEYCODE_ENTER)
+	PORT_START("X8")
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( z1013_8x8 )
@@ -232,9 +245,19 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift Lock") PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_START("X8")
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( z1013 )
+	PORT_START("X8")
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 INPUT_PORTS_END
 
 
@@ -273,8 +296,8 @@ uint32_t z1013_state::screen_update_z1013(screen_device &screen, bitmap_ind16 &b
 
 void z1013_state::machine_reset()
 {
-	m_keyboard_part = 0;
-	m_keyboard_line = 0;
+	m_keyboard_part = false;
+	m_keyboard_line = 0U;
 
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
@@ -287,19 +310,31 @@ void z1013_state::machine_start()
 
 void z1013_state::z1013_keyboard_w(uint8_t data)
 {
-	m_keyboard_line = data;
+	m_keyboard_line = data & 7;
+}
+
+uint8_t z1013_state::port_a_r()
+{
+	return m_io_keyboard[8]->read();
 }
 
 uint8_t z1013_state::port_b_r()
 {
-	char kbdrow[6];
-	sprintf(kbdrow,"X%d", m_keyboard_line & 7);
-	uint8_t data = ioport(kbdrow)->read();
+	uint8_t data = m_io_keyboard[m_keyboard_line]->read() & 15;
 
+	if (m_cass->input() > 0.03)
+		data |= 0x40;
+
+	return data;
+}
+
+uint8_t z1013_state::a2_port_b_r()
+{
+	u8 data;
 	if (m_keyboard_part)
-		data >>= 4;
-
-	data &= 0x0f;
+		data = BIT(m_io_keyboard[m_keyboard_line]->read(),4,4);
+	else
+		data = BIT(m_io_keyboard[m_keyboard_line]->read(),0,4);
 
 	if (m_cass->input() > 0.03)
 		data |= 0x40;
@@ -311,6 +346,7 @@ void z1013_state::port_b_w(uint8_t data)
 {
 	m_keyboard_part = BIT(data, 4); // for z1013a2 only
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+	m_speaker->level_w(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 uint8_t z1013_state::k7659_port_b_r()
@@ -403,17 +439,34 @@ void z1013_state::z1013(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(1'000'000)));
+	pio.in_pa_callback().set(FUNC(z1013_state::port_a_r));
 	pio.in_pb_callback().set(FUNC(z1013_state::port_b_r));
 	pio.out_pb_callback().set(FUNC(z1013_state::port_b_w));
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_interface("z1013_cass");
 
-	SNAPSHOT(config, "snapshot", "z80").set_load_callback(FUNC(z1013_state::snapshot_cb));
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "z80"));
+	snapshot.set_delay(attotime::from_seconds(2));
+	snapshot.set_load_callback(FUNC(z1013_state::snapshot_cb));
+	snapshot.set_interface("z1013_snap");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("z1013_cass");
+	SOFTWARE_LIST(config, "snap_list").set_original("z1013_snap");
+}
+
+void z1013_state::z1013a2(machine_config &config)
+{
+	z1013(config);
+
+	z80pio_device &pio(*subdevice<z80pio_device>("z80pio"));
+	pio.in_pb_callback().set(FUNC(z1013_state::a2_port_b_r));
 }
 
 void z1013_state::z1013k76(machine_config &config)
@@ -485,7 +538,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS        INIT        COMPANY                           FULLNAME               FLAGS
 COMP( 1985, z1013,    0,      0,      z1013,    z1013_8x4, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1985, z1013a2,  z1013,  0,      z1013,    z1013_8x8, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1985, z1013a2,  z1013,  0,      z1013a2,  z1013_8x8, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1985, z1013k76, z1013,  0,      z1013k76, z1013,     z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7659)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, z1013s60, z1013,  0,      z1013k76, z1013_8x8, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7652/S6009)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, z1013k69, z1013,  0,      z1013k76, z1013,     z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7669)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

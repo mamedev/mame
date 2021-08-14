@@ -26,4 +26,4 @@ struct CX4
 };
 
 uint8_t CX4_read(uint32_t addr);
-void CX4_write(running_machine &machine, uint32_t addr, uint8_t data);
+void CX4_write(address_space &space, uint32_t addr, uint8_t data);
