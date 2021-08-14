@@ -2116,6 +2116,7 @@ void viper_state::viper_map(address_map &map)
 	map(0xffe08000, 0xffe08007).noprw();
 	map(0xffe10000, 0xffe10007).r(FUNC(viper_state::input_r));
 	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd leds
+	map(0xffe28008, 0xffe2801f).nopw(); // boxingm reads and writes here to read the pad sensor values
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0xffe40000, 0xffe4000f).noprw();
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
