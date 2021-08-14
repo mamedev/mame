@@ -79233,6 +79233,42 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_4k1gs">
+		<description>4 in 1 (K-3131GS)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_gn45" />
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 (k-3131gs, gn-45).prg" size="524288" crc="dc835c48" sha1="ef17c86e521110637b443437fca269f2e3f2385f" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 (k-3131gs, gn-45).chr" size="524288" crc="b551ccdb" sha1="fc17c81a23bd55b9195d8f166aad313f29067ed1" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4k1ss">
+		<description>4 in 1 (K-3131SS)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_gn45" />
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 (k-3131ss, gn-45).prg" size="524288" crc="466bdb58" sha1="354116730efa2131172ccca3793a065abee6026e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 (k-3131ss, gn-45).chr" size="524288" crc="08d7aa1b" sha1="f78aa3ff4345a31ece3b26cacdb86d437c5c0e17" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4kt34" supported="no">
 		<description>4 in 1 (KT-3445AB)</description>
 		<year>19??</year>

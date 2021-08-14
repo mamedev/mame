@@ -61,6 +61,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device,      "nes_bmc_hik8", 
 DEFINE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device,      "nes_bmc_hik4",      "NES Cart BMC HIK 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device, "nes_bmc_mario7in1", "NES Cart BMC Mario 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device,       "nes_bmc_f15",       "NES Cart BMC F-15 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45",      "NES Cart BMC GN-45 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GC6IN1,    nes_bmc_gc6in1_device,    "nes_bmc_gc6in1",    "NES Cart BMC Golden Card 6 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device,     "nes_bmc_k3006",     "NES Cart BMC K-3006 PCB")
@@ -233,6 +234,11 @@ nes_bmc_mario7in1_device::nes_bmc_mario7in1_device(const machine_config &mconfig
 
 nes_bmc_f15_device::nes_bmc_f15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_F15, tag, owner, clock)
+{
+}
+
+nes_bmc_gn45_device::nes_bmc_gn45_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_GN45, tag, owner, clock), m_lock(false)
 {
 }
 
@@ -588,6 +594,20 @@ void nes_bmc_f15_device::pcb_reset()
 	mmc3_common_initialize(0x1f, 0xff, 0);
 	prg16_89ab(0);
 	prg16_cdef(0);
+}
+
+void nes_bmc_gn45_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_lock));
+}
+
+void nes_bmc_gn45_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_lock = false;
+	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
 void nes_bmc_gold7in1_device::device_start()
@@ -2345,6 +2365,37 @@ void nes_fcgj8in1_device::write_m(offs_t offset, u8 data)
 		set_prg(m_prg_base, m_prg_mask);
 		m_chr_base = m_prg_base << 2;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+/*-------------------------------------------------
+
+ BMC-GN-45
+
+ Games: 4 in 1 (K-3131GS and K-3131SS)
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 366
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_gn45_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_gn45 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	nes_txrom_device::write_m(offset, data);    // write to overlapping WRAM
+
+	if (!m_lock)
+	{
+		m_prg_base = offset & 0x70;
+		set_prg(m_prg_base, m_prg_mask);
+		m_chr_base = m_prg_base << 3;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+
+		m_lock = BIT(offset, 7);
 	}
 }
 
