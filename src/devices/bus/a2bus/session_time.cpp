@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(SESSION_TIME, session_time_device, "session_time", "Session T
 
 INPUT_PORTS_START(session_time)
 	PORT_START("CNF")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, session_time_device, reset_session_time, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Session Time") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, session_time_device, reset_session_time, 0)
 INPUT_PORTS_END
 
 
@@ -96,7 +96,7 @@ INPUT_CHANGED_MEMBER(session_time_device::reset_session_time)
 	device_start();
 	machine().popmessage("Reset Session Time = " + getprintername());
 }
-
+/*
 void session_time_device::write_snapshot_to_file(std::string directory, std::string name)
 {
 	printf("write snapshot\n");
@@ -113,7 +113,7 @@ void session_time_device::write_snapshot_to_file(std::string directory, std::str
 		util::png_write_bitmap(file, nullptr, *m_bitmap, 2, png_palette);
 	}
 }
-
+*/
 std::string session_time_device::fixchar(std::string in, char from, char to)
 {
 	std::string final;
@@ -138,7 +138,7 @@ std::string session_time_device::sessiontime()
 	struct tm *info;
 	char buffer[80];
 	info = localtime( &m_session_time );
-	strftime(buffer,120,"%Y-%m-%d__%H-%M-%S", info);
+	strftime(buffer,120,"%Y-%m-%d_%H-%M-%S", info);
 	return std::string(buffer);
 }
 
@@ -156,7 +156,8 @@ std::string session_time_device::simplename()
 //  printf("rootdevs equal %x\n",rootdev == rootdev2);
 
 	std::string s;
-	int skipcount = 2;
+//	int skipcount = 2;
+	int skipcount = 3;
 
 	while (dev){
 			if (skipcount-- <= 0)

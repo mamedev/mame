@@ -40,6 +40,8 @@ private:
 	std::string m_snapshotdir;
 	time_t m_session_time;
 
+public:
+
 	DECLARE_INPUT_CHANGED_MEMBER(reset_session_time);
 public:
 
@@ -52,7 +54,7 @@ public:
 	std::string simplename();
 	void setprintername(std::string name){ m_printername = name; }
 	std::string getprintername(){ return m_printername; }
-	void initprintername(){ setprintername(sessiontime() + std::string(" ") + simplename()); }
+	void initprintername(){ setprintername(sessiontime() + std::string("_") + simplename()); }
 
 	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
 };

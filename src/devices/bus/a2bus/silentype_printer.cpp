@@ -283,8 +283,9 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 			m_bitmap_printer->write_snapshot_to_file(
 						std::string("silentype"),
 						std::string("silentype_") +
-						m_bitmap_printer->getprintername() +
-						" page_" +
+//						m_bitmap_printer->getprintername() +
+						m_bitmap_printer->get_session_time_device()->getprintername() +
+						"_page_" +
 						m_bitmap_printer->padzeroes(std::to_string(page_count++),3) +
 						".png");
 

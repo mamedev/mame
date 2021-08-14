@@ -5,6 +5,7 @@
  *
  */
 #include "screen.h"
+#include "session_time.h"        
 
 #ifndef MAME_MACHINE_BITMAP_PRINTER_H
 #define MAME_MACHINE_BITMAP_PRINTER_H
@@ -46,6 +47,7 @@ private:
 	int m_ypos = 0;
 
 	required_device<screen_device> m_screen;
+	required_device<session_time_device> m_session_time;
 
 	bitmap_rgb32 m_internal_bitmap;  // pointer to bitmap
 	bitmap_rgb32 *m_bitmap = &m_internal_bitmap;  // pointer to bitmap  use internal bitmap by default
@@ -55,7 +57,7 @@ private:
 
 	std::string m_printername;
 	std::string m_snapshotdir;
-	time_t m_session_time;
+//	time_t m_session_time;
 
 	int m_printheadcolor       = 0xEEE8AA;
 	int m_printheadbordercolor = 0xBDB76B;
@@ -78,6 +80,9 @@ void drawprinthead(bitmap_rgb32 &bitmap, int x, int y);
 	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 public:
+
+	session_time_device * get_session_time_device() {return m_session_time;}
+	
 	void write_snapshot_to_file(std::string directory, std::string name);
 
 	void drawpixel(int x, int y, int pixelval)
@@ -108,7 +113,7 @@ public:
 
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
 	void bitmap_clear_band(int from_line, int to_line, u32 color);
-
+/*
 	device_t* getrootdev();
 	std::string fixchar(std::string in, char from, char to);
 	std::string fixcolons(std::string in);
@@ -118,7 +123,7 @@ public:
 	void setprintername(std::string name){ m_printername = name; }
 	std::string getprintername(){ return m_printername; }
 	void initprintername(){ setprintername(sessiontime() + std::string(" ") + simplename()); }
-
+*/
 	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
 };
 
