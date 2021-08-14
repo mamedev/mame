@@ -111,8 +111,8 @@
 #define LOG_MBITS       (1U << 10)
 #define LOG_RBITS       (1U << 11)
 
-//#define VERBOSE (0)
-#define VERBOSE (LOG_GIME|LOG_PBITS|LOG_PBITS|LOG_MMU)
+#define VERBOSE (0)
+//#define VERBOSE (LOG_GIME|LOG_PBITS|LOG_PBITS|LOG_MMU)
 
 #include "logmacro.h"
 
