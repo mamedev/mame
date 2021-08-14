@@ -196,6 +196,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("nanjing",          NES_NANJING);     // mapper 163
 	device.option_add_internal("ntdec_asder",      NES_NTDEC_ASDER); // mapper 112
 	device.option_add_internal("ntdec_fh",         NES_NTDEC_FH);    // mapper 193
+	device.option_add_internal("ntdec_n715021",    NES_NTDEC_N715021);    // mapper 81
 	device.option_add_internal("jyc_a",            NES_JY_TYPEA);    // mapper 90
 	device.option_add_internal("jyc_b",            NES_JY_TYPEB);    // mapper 211
 	device.option_add_internal("jyc_c",            NES_JY_TYPEC);    // mapper 209
@@ -205,6 +206,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("sa72007",          NES_SACHEN_SA72007);
 	device.option_add_internal("sa72008",          NES_SACHEN_SA72008);
 	device.option_add_internal("tca01",            NES_SACHEN_TCA01);
+	device.option_add_internal("s3013",            NES_SACHEN_3013);
 	device.option_add_internal("s8259a",           NES_SACHEN_8259A);
 	device.option_add_internal("s8259b",           NES_SACHEN_8259B);
 	device.option_add_internal("s8259c",           NES_SACHEN_8259C);
@@ -298,6 +300,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("mariobaby",        NES_MARIOBABY);
 	device.option_add_internal("asnicol",          NES_ASN);
 	device.option_add_internal("smb3pirate",       NES_SMB3PIRATE);
+	device.option_add_internal("btl_contraj",      NES_BTL_CONTRAJ);
 	device.option_add_internal("btl_dninja",       NES_BTL_DNINJA);
 	device.option_add_internal("smb2j",            NES_SMB2J);
 	device.option_add_internal("smb2ja",           NES_SMB2JA);
@@ -365,13 +368,18 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("sgun20in1",        NES_SUPERGUN20IN1);
 	device.option_add_internal("bmc_vt5201",       NES_VT5201); // mapper 59?
 	device.option_add_internal("bmc_d1038",        NES_VT5201); // mapper 59?
+	device.option_add_internal("bmc_60311c",       NES_BMC_60311C);
 	device.option_add_internal("bmc_80013b",       NES_BMC_80013B);
 	device.option_add_internal("bmc_810544c",      NES_BMC_810544C);
+	device.option_add_internal("bmc_830425c",      NES_BMC_830425C);
 	device.option_add_internal("ntd03",            NES_NTD03);
 	device.option_add_internal("bmc_ctc09",        NES_BMC_CTC09);
 	device.option_add_internal("bmc_gb63",         NES_BMC_GB63);
 	device.option_add_internal("bmc_gka",          NES_BMC_GKA);
 	device.option_add_internal("bmc_gkb",          NES_BMC_GKB);
+	device.option_add_internal("bmc_gkcxin1",      NES_BMC_GKCXIN1);
+	device.option_add_internal("bmc_k3006",        NES_BMC_K3006);
+	device.option_add_internal("bmc_k3036",        NES_BMC_K3036);
 	device.option_add_internal("bmc_k3046",        NES_BMC_K3046);
 	device.option_add_internal("bmc_sa005a",       NES_BMC_SA005A);
 	device.option_add_internal("bmc_tj03",         NES_BMC_TJ03);
@@ -399,11 +407,12 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_110in1",       NES_BMC_110IN1);
 	device.option_add_internal("bmc_150in1",       NES_BMC_150IN1);
 	device.option_add_internal("bmc_190in1",       NES_BMC_190IN1);
+	device.option_add_internal("bmc_500in1",       NES_BMC_500IN1);
 	device.option_add_internal("bmc_800in1",       NES_BMC_800IN1);     // mapper 236?
 	device.option_add_internal("bmc_1200in1",      NES_BMC_1200IN1);
 	device.option_add_internal("bmc_gold150",      NES_BMC_GOLD150);    // mapper 235 with 2M PRG
 	device.option_add_internal("bmc_gold260",      NES_BMC_GOLD260);    // mapper 235 with 4M PRG
-	device.option_add_internal("bmc_power255",     NES_BMC_CH001);      // mapper 63?
+	device.option_add_internal("bmc_th22913",      NES_BMC_TH22913);    // mapper 63
 	device.option_add_internal("bmc_s22games",     NES_BMC_SUPER22);    // mapper 233
 	device.option_add_internal("bmc_reset4",       NES_BMC_4IN1RESET);  // mapper 60 with 64k prg and 32k chr
 	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 226? or 233?
@@ -413,11 +422,13 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("fk23c",            NES_FK23C);
 	device.option_add_internal("fk23ca",           NES_FK23CA);
 	device.option_add_internal("s24in1c03",        NES_S24IN1SC03);
+	device.option_add_internal("bmc_8in1",         NES_BMC_8IN1);
 	device.option_add_internal("bmc_15in1",        NES_BMC_15IN1);
 	device.option_add_internal("bmc_sbig7in1",     NES_BMC_SBIG7);
 	device.option_add_internal("bmc_hik8in1",      NES_BMC_HIK8);
 	device.option_add_internal("bmc_hik4in1",      NES_BMC_HIK4);
 	device.option_add_internal("bmc_mario7in1",    NES_BMC_MARIO7IN1);
+	device.option_add_internal("bmc_f15",          NES_BMC_F15);
 	device.option_add_internal("bmc_gold7in1",     NES_BMC_GOLD7IN1);
 	device.option_add_internal("bmc_gc6in1",       NES_BMC_GC6IN1);
 	device.option_add_internal("bmc_411120c",      NES_BMC_411120C);
@@ -434,9 +445,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("pec586",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("coolboy",          NES_NROM);    // UNSUPPORTED
-	device.option_add_internal("bmc_f15",          NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("bmc_hp898f",       NES_NROM);    // UNSUPPORTED
-	device.option_add_internal("bmc_8in1",         NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_158b",         NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_drgnfgt",      NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?

@@ -267,7 +267,7 @@ Color Ball - [GH034] Al Alamiah
 Confused? - [GA016] Al Alamiah
 Fire Rescue - [GH033] Al Alamiah
 H.E.R.O. - [GV025] Al Alamiah
-Hitsuji Yai - [GH032] Al Alamiah
+Hitsuji Yaai - [GH032] Al Alamiah
 Hopper - [GA012] Al Alamiah
 Ice - Al Alamiah
 Kick It! - [GA008] Al Alamiah
@@ -5996,7 +5996,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="hitsuji">
-		<description>Hitsuji-Ya (Jpn)</description>
+		<description>Hitsuji Yaai (Jpn)</description>
 		<year>1984</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="MX-1001" />

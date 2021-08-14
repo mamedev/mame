@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -124,7 +124,11 @@ namespace bx
 
 	inline BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t)
 	{
-		return _a + (_b - _a) * _t;
+		// Reference(s):
+		// - Linear interpolation past, present and future
+		//   https://web.archive.org/web/20200404165201/https://fgiesen.wordpress.com/2012/08/15/linear-interpolation-past-present-and-future/
+		//
+		return mad(_t, _b, nms(_t, _a, _a) );
 	}
 
 	inline BX_CONSTEXPR_FUNC float invLerp(float _a, float _b, float _value)
@@ -277,9 +281,19 @@ namespace bx
 		return _a - trunc(_a);
 	}
 
+	inline BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c)
+	{
+		return _c - _a * _b;
+	}
+
 	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
 	{
 		return _a * _b + _c;
+	}
+
+	inline BX_CONSTEXPR_FUNC float rcp(float _a)
+	{
+		return 1.0f / _a;
 	}
 
 	inline BX_CONST_FUNC float mod(float _a, float _b)
@@ -328,6 +342,11 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC float smoothStep(float _a)
 	{
 		return square(_a)*(3.0f - 2.0f*_a);
+	}
+
+	inline BX_CONST_FUNC float invSmoothStep(float _a)
+	{
+		return 0.5f - sin(asin(1.0f - 2.0f * _a) / 3.0f);
 	}
 
 	inline BX_CONSTEXPR_FUNC float bias(float _time, float _bias)
@@ -481,6 +500,16 @@ namespace bx
 			_a.y * _b,
 			_a.z * _b,
 		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, const Vec3 _b)
+	{
+		return mul(_a, rcp(_b) );
+	}
+
+	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b)
+	{
+		return mul(_a, rcp(_b) );
 	}
 
 	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const float _b, const Vec3 _c)

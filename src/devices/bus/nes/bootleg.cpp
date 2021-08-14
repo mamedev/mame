@@ -45,6 +45,7 @@ DEFINE_DEVICE_TYPE(NES_SC127,          nes_sc127_device,     "nes_sc127",     "N
 DEFINE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device,     "nes_mbaby",     "NES Cart Mario Baby Bootleg PCB")
 DEFINE_DEVICE_TYPE(NES_ASN,            nes_asn_device,       "nes_asn",       "NES Cart Ai Senshi Nicol Bootleg PCB")
 DEFINE_DEVICE_TYPE(NES_SMB3PIRATE,     nes_smb3p_device,     "nes_smb3p",     "NES Cart Super Mario Bros. 3 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_BTL_CONTRAJ,    nes_btl_cj_device,    "nes_btl_cj",    "NES Cart Contra Japan Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device,    "nes_btl_dn",    "NES Cart DragonNinja Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device,     "nes_smb2j",     "NES Cart Super Mario Bros. 2 Jpn PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device,    "nes_smb2ja",    "NES Cart Super Mario Bros. 2 Jpn (Alt) PCB")
@@ -93,6 +94,11 @@ nes_asn_device::nes_asn_device(const machine_config &mconfig, const char *tag, d
 
 nes_smb3p_device::nes_smb3p_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SMB3PIRATE, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
+}
+
+nes_btl_cj_device::nes_btl_cj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BTL_CONTRAJ, tag, owner, clock)
 {
 }
 
@@ -339,6 +345,12 @@ void nes_batmanfs_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
+}
+
+void nes_btl_cj_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);    // Last 8K bank is fixed, the rest are swappable
+	chr8(0, CHRROM);
 }
 
 void nes_btl_dn_device::device_start()
@@ -987,6 +999,48 @@ void nes_smb3p_device::write_h(offs_t offset, u8 data)
 			m_irq_count = (m_irq_count & 0x00ff) | (data << 8);
 			m_irq_enable = 1;
 			break;
+	}
+}
+
+/*-------------------------------------------------
+
+ BTL-CONTRAJ
+
+ Games: Contra (J) pirate
+
+ NES 2.0: mapper 326
+
+ This PCB has swappable 8K banks at 0x8000-0x9fff,
+ 0xa000-0xbfff, and 0xc000-0xdfff and associated
+ registers in those ranges. Selectable 1K banks for
+ both CHRROM and CIRAM are also in registers across
+ upper memory, 0x8000-0xffff, with mask 0x8010.
+
+ In MAME: Supported.
+
+ TODO: Find out why this crashes in the intro story.
+ Bootleggers missed the bug? Bad dump? This differs
+ only in a couple hundred bytes from contraj, so there
+ aren't that many places for the problem to hide.
+
+ -------------------------------------------------*/
+
+void nes_btl_cj_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("btl_cj write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 4))
+	{
+		if (BIT(offset, 3))
+			set_nt_page(offset & 0x03, CIRAM, data & 1, 1);
+		else
+			chr1_x(offset & 0x07, data, CHRROM);
+	}
+	else
+	{
+		offset = (offset >> 13) & 0x03;
+		if (offset != 3)
+			prg8_x(offset, data & 0x0f);
 	}
 }
 

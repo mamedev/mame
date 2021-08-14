@@ -128,6 +128,19 @@ private:
 };
 
 
+// ======================> nes_btl_cj_device
+
+class nes_btl_cj_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_btl_cj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_btl_dn_device
 
 class nes_btl_dn_device : public nes_nrom_device
@@ -689,6 +702,7 @@ DECLARE_DEVICE_TYPE(NES_SC127,          nes_sc127_device)
 DECLARE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device)
 DECLARE_DEVICE_TYPE(NES_ASN,            nes_asn_device)
 DECLARE_DEVICE_TYPE(NES_SMB3PIRATE,     nes_smb3p_device)
+DECLARE_DEVICE_TYPE(NES_BTL_CONTRAJ,    nes_btl_cj_device)
 DECLARE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device)
 DECLARE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device)
 DECLARE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device)

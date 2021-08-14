@@ -110,12 +110,14 @@ static const nes_pcb pcb_list[] =
 	{ "nanjing",          NANJING_BOARD },  // mapper 163
 	{ "ntdec_asder",      NTDEC_ASDER },    // mapper 112
 	{ "ntdec_fh",         NTDEC_FIGHTINGHERO },     // mapper 193
+	{ "ntdec_n715021",    NTDEC_N715021 },  // mapper 81
 	{ "sa009",            SACHEN_SA009 },
 	{ "sa0036",           SACHEN_SA0036 },
 	{ "sa0037",           SACHEN_SA0037 },
 	{ "sa72007",          SACHEN_SA72007 },
 	{ "sa72008",          SACHEN_SA72008 },
 	{ "tca01",            SACHEN_TCA01 },
+	{ "s3013",            SACHEN_3013 },
 	{ "s8259a",           SACHEN_8259A },
 	{ "s8259b",           SACHEN_8259B },
 	{ "s8259c",           SACHEN_8259C },
@@ -204,6 +206,7 @@ static const nes_pcb pcb_list[] =
 	{ "mariobaby",        BTL_MARIOBABY },
 	{ "asnicol",          BTL_AISENSHINICOL },
 	{ "smb3pirate",       BTL_SMB3 },
+	{ "btl_contraj",      BTL_CONTRAJ },
 	{ "btl_dninja",       BTL_DRAGONNINJA },
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
@@ -250,13 +253,18 @@ static const nes_pcb pcb_list[] =
 	{ "sgun20in1",        BMC_SUPERGUN_20IN1 },
 	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 59?
 	{ "bmc_d1038",        BMC_VT5201 },  // mapper 59?
+	{ "bmc_60311c",       BMC_60311C },
 	{ "bmc_80013b",       BMC_80013B },
 	{ "bmc_810544c",      BMC_810544C },
+	{ "bmc_830425c",      BMC_830425C },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
 	{ "bmc_gb63",         BMC_G63IN1 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
+	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
+	{ "bmc_k3006",        BMC_K3006 },
+	{ "bmc_k3036",        BMC_K3036 },
 	{ "bmc_k3046",        BMC_K3046 },
 	{ "bmc_sa005a",       BMC_SA005A },
 	{ "bmc_tj03",         BMC_TJ03 },
@@ -280,6 +288,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_110in1",       BMC_110IN1 },
 	{ "bmc_150in1",       BMC_150IN1 },
 	{ "bmc_190in1",       BMC_190IN1 },
+	{ "bmc_500in1",       BMC_500IN1 },
 	{ "bmc_800in1",       BMC_800IN1 },
 	{ "bmc_1200in1",      BMC_1200IN1 },
 	{ "bmc_2751",         BMC_2751 },
@@ -290,11 +299,13 @@ static const nes_pcb pcb_list[] =
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
 	{ "bmc_hik8in1",      BMC_HIK8IN1 },
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
 	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
+	{ "bmc_f15",          BMC_F15 },
 	{ "bmc_gold7in1",     BMC_GOLD_7IN1 },
 	{ "bmc_gc6in1",       BMC_GOLDENCARD_6IN1 },
 	{ "bmc_411120c",      BMC_411120C },
@@ -303,7 +314,7 @@ static const nes_pcb pcb_list[] =
 	{ "pjoy84",           BMC_PJOY84 },
 	{ "bmc_gold150",      BMC_GOLD150 },
 	{ "bmc_gold260",      BMC_GOLD260 },
-	{ "bmc_power255",     BMC_CH001 },
+	{ "bmc_th22913",      BMC_TH22913 },
 	{ "bmc_s22games",     BMC_SUPER22 },
 	{ "bmc_reset4",       BMC_4IN1RESET },
 	{ "bmc_reset42",      BMC_42IN1RESET },
@@ -351,9 +362,7 @@ static const nes_pcb pcb_list[] =
 	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "bmc_f15",          UNSUPPORTED_BOARD },  // 150-in-1 Unchained Melody
 	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
-	{ "bmc_8in1",         UNSUPPORTED_BOARD },  // Super 8-in-1 (Incl. Rockin' Kats)
 	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },

@@ -3677,4 +3677,4 @@ GAME( 2001, aoh,        0,        aoh,       aoh,      vamphalf_state,      init
 
 GAME( 2001, boonggab,   0,        boonggab,  boonggab, vamphalf_state,      init_boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, yorijori,   0,        yorijori,  yorijori, vamphalf_qdsp_state, init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM patch needed to boot
+GAME( 2002, yorijori,   0,        yorijori,  yorijori, vamphalf_qdsp_state, init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM patch needed to boot

@@ -1,5 +1,4 @@
-#if !defined(__glx_glxext_h_) && !defined(__glxext_h_)
-#define __glx_glxext_h_ 1
+#ifndef __glxext_h_
 #define __glxext_h_ 1
 
 #ifdef __cplusplus

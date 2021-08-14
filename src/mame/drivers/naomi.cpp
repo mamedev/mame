@@ -592,7 +592,7 @@ Shootout Pool                                               840-0098C    23844  
 \Shootout Pool The Medal (Japan, Rev A)                     840-0128C    24065A   4 (64Mb)   present  317-0367-COM  requires Naomi-based hopper controller
 /Shootout Pool Prize (Export) /
 \Shootout Pool The Medal (Japan) Version B                  840-0136C    24148    4 (64Mb)   present  317-0367-COM  requires Naomi-based or 837-14438 hopper controller (selected by P1 BUTTON1 bit)
-Soreike! Anpanman Popcorn Factory 2                         840-0117C    24049B   4 (64Mb)   present  317-0359-JPN  require 838-14403 popcorn vendor control BD, Type-2 JVS I/O, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
+Soreike! Anpanman Popcorn Koujou 2 (Rev C)                  840-0117C    24049B   4 (64Mb)   present  317-0359-JPN  require 838-14403 popcorn vendor control BD, Type-2 JVS I/O, 838-14245 "MAPLE/232C CONVERT BD" (MIE-based), 610-0760 "RFID CHIP R/W BD" and RFID chip
 Star Horse 2002 (sound, Export/Taiwan)                      840-0112B*   23964    6 (64Mb)   present  317-0347-COM  *no case
 SWP Hopper Board                                            840-0130C    24083   20 (64Mb)   present  317-0339-COM  reused VF4 Evo ROM board with all maskROMs still in place; there is an additional 837-14381 IO board
 Touch de Uno! 2                                             840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
@@ -633,7 +633,7 @@ Notes:
 
    Games known to use this PCB include....
                                                 Sticker    EPROM   mask ROMs   EPM7032    XC9536    315-5881      X76F100
-Game                                            on cart    IC22#   # of SOP44  IC27#      IC41#     IC42#         IC46#        Notes
+Game                                            on cart    IC22#   # of SOP48  IC27#      IC41#     IC42#         IC46#        Notes
 -----------------------------------------------------------------------------------------------------------------------------------------
 Alien Front (Rev A)                             840-0048C  23586A   5 (128Mb)  315-6319A  315-6213  317-0293-COM  present
 Alien Front (Rev T)                             840-0048C  23586T   5 (128Mb)  315-6319A  315-6213  317-0293-COM  ?
@@ -722,8 +722,8 @@ Mamoru-kun wa Norowarete Shimatta                   841-0060C    not present  4 
 Manic Panic Ghost! (USA)                            840-0170C-01 not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based) - PCB s/n is 840-0170B-01
 Melty Blood Actress Again (Japan)                   841-0061C    not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
 Melty Blood Actress Again Version A (Rev A)         841-0061C    24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
-MushiKing The King of Beetles
-(2K3 2ND Ver. 1.000-, China)                        840-0157C    not present  1 (512Mb)   present  317-0???-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
+/MushiKing The King of Beetles
+\(2K3 2ND Ver. 1.000-, China)                       840-0157C    not present  1 (512Mb)   present  317-0???-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 /Mushiking The King Of Beetles
 \Mushiking II / III / III+ (Ver. 1.001) (World)     840-0164C    not present  2 (512Mb)   present  317-0437-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 /Mushiking The King Of Beetles
@@ -4903,6 +4903,37 @@ ROM_START( ggram2 )
 
 	// 840-0007    1999     317-0253-JPN   Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28074a61" )
+ROM_END
+
+// Popcorn vending machine
+ROM_START( anpanman2 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x3000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24049b.ic11",        0x0000000, 0x0400000, CRC(7c810603) SHA1(edd2271731838babab50242c232ff223583f7866) )
+	// ic 17&18 contain older program ver, it may/will be boot if ic11 not populated
+	ROM_LOAD32_WORD( "opr-24038.ic17s", 0x1000000, 0x0800000, CRC(7addc59b) SHA1(85f30fd61837739948e9a5c9c81b4dd18c247210) )
+	ROM_LOAD32_WORD( "opr-24039.ic18",  0x1000002, 0x0800000, CRC(97e16543) SHA1(68e7355f2145c2aecd723413eb0e9f1c04591e60) )
+	ROM_LOAD32_WORD( "opr-24040.ic19s", 0x2000000, 0x0800000, CRC(59a8d850) SHA1(c95423082d70baa52542e66a81c578a355fc11c8) )
+	ROM_LOAD32_WORD( "opr-24041.ic20",  0x2000002, 0x0800000, CRC(d0e6dfd0) SHA1(80a25825ebd42cac79976064fe9f93bc5bdf8487) )
+
+	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
+
+	ROM_REGION( 0x200, "some_eeprom", ROMREGION_ERASEFF )
+	ROM_LOAD( "at25010.ic13s", 0, 0x84, CRC(bd5d61f3) SHA1(67d8155287d78abe0ff65e1a558a8134b5e3013b) )
+
+	// 838-14367 LED CONTROL BD
+	// Toshiba TMP95C061BFG MCU
+	// Cypress CY62128BLL-70SXC 128K x8 SRAM
+	// EXO-3 24.576MHz CMOS Crystal Oscillator
+	// M27C4002 256K x16 EEPROM
+	// connected to JVS I/O board
+	ROM_REGION( 0x80000, "led_ctrl_pcb", 0 )
+	ROM_LOAD( "epr-24019a.ic2", 0, 0x80000, CRC(47d6f064) SHA1(8277de68522d9d60f261575dff3bb74df5889b3c) )
+
+	// 840-0117    2003     317-0359-JPN   Naomi
+	ROM_PARAMETER( ":rom_board:key", "2f68b225" )
 ROM_END
 
 /*
@@ -11664,12 +11695,12 @@ ROM_END
 /* 13636    */ GAME( 1998, hotd2o,   hotd2,    naomim2_gun, hotd2, naomi_state, init_hotd2, ROT0, "Sega", "The House of the Dead 2", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* ?????    */ GAME( 1998, hotd2e,   hotd2,    naomim2_gun, hotd2, naomi_state, init_hotd2, ROT0, "Sega", "The House of the Dead 2 (Export)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* none     */ GAME( 1998, hotd2p,   hotd2,    naomim2_gun, hotd2, naomi_state, init_hotd2, ROT0, "Sega", "The House of the Dead 2 (prototype)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
+/* 13763-01 */ GAME( 1999, alpilot,  airlbios, naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Airline Pilots (World, Rev B)", GAME_FLAGS ) // have "Sega Airlines" texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
 /* 13842    */ GAME( 1999, f355,     f355dlx,  naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Ferrari F355 Challenge (deluxe, no link)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
 /* none     */ GAME( 1999, f355p,    f355,     naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Ferrari F355 Challenge (private show version)", GAME_FLAGS ) /* specific BIOS epr-21862p or epr-21864p needed */
 /* 13950    */ GAME( 1999, f355twin, f355bios, naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
 /* 13950P   */ GAME( 1999, f355twinp,f355twin, naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe, preview)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
 /* none     */ GAME( 2001, f355twn2, f355bios, naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
-/* 13763-01 */ GAME( 1999, alpilot,  airlbios, naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Airline Pilots (World, Rev B)", GAME_FLAGS ) // have "Sega Airlines" texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
 
 /* 840-xxxxx (Sega Naomi cart games)*/
 /* 0001    */ GAME( 1998, dybbnao,   naomi,    naomim2, dybbnao, naomi_state, init_naomi,   ROT0, "Sega", "Dynamite Baseball NAOMI (Japan)", GAME_FLAGS )
@@ -11749,7 +11780,7 @@ ROM_END
 /* 0103    */ GAME( 2002, shors2k2s, naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (sound and backup, Rev A)", GAME_FLAGS )
 /* 0104    */ GAME( 2002, shors2k2l, naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (live)", GAME_FLAGS )
 /* 0112    */ GAME( 2002, shors2k2,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse 2002 (sound, Export/Taiwan)", GAME_FLAGS )
-// 0117 それいけ！アンパンマン ポップコーンこうじょう2 / Soreike! Anpanman Popcorn Kojo 2
+/* 0117    */ GAME( 2003, anpanman2, naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Soreike! Anpanman Popcorn Koujou 2 (Rev C)", GAME_FLAGS ) // それいけ！アンパンマン ポップコーンこうじょう2
 /* 0120    */ GAME( 2003, shorsepm,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (main screens, Rev B)", GAME_FLAGS )
 /* 0121    */ GAME( 2003, shorseps,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (sound & backup, Rev A)", GAME_FLAGS )
 /* 0122    */ GAME( 2003, shorsepl,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (live, Rev A)", GAME_FLAGS )
@@ -11780,7 +11811,6 @@ ROM_END
 /* 0175    */ GAME( 2007, asndynmt,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX", GAME_FLAGS )
 /* 0175    */ GAME( 2007, asndynmto, asndynmt, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX (older)", GAME_FLAGS ) // no revision stickers, presumably older revision but might be release for Asian market
 /* 0177    */ GAME( 2007, rhytngk,   naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Nintendo - J.P ROOM", "Rhythm Tengoku (Japan)", GAME_FLAGS )
-// 0178 ドライビングシミュレーター / Driving Simulator
 /* 0180    */ GAME( 2007, mushik4e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking IV / V / VI (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K6 versions.
 /* 0183    */ GAME( 2009, shorseprvl,shorsepr, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress Returns (main screen left)", GAME_FLAGS )
 /* 0184    */ GAME( 2009, shorseprvr,shorsepr, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress Returns (main screen right)", GAME_FLAGS )
@@ -11817,7 +11847,7 @@ ROM_END
 /* 0139 */ GAME( 2003, clubk2k3, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, Rev A)", GAME_FLAGS )
 /* none */ GAME( 2003, clubk2kp, clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype, set 1)", GAME_FLAGS )
 /* none */ GAME( 2003, clubk2kpa,clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype, set 2)", GAME_FLAGS )
-/* 0178 */ GAME( 2007, sgdrvsim, naomi2,  naomi2m4, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Driving Simulator", GAME_FLAGS )
+/* 0178 */ GAME( 2007, sgdrvsim, naomi2,  naomi2m4, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Driving Simulator", GAME_FLAGS ) // ドライビングシミュレーター
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */       GAME( 1999, pstone,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Power Stone", GAME_FLAGS )

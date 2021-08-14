@@ -95,7 +95,7 @@ static const nes_mmc mmc_list[] =
 	{ 60, BMC_4IN1RESET },
 	{ 61, RCM_TF9IN1 },
 	{ 62, BMC_SUPER_700IN1 },
-	{ 63, BMC_CH001 },  // Powerful 255
+	{ 63, BMC_TH22913 },  // Powerful 250/255
 	{ 64, TENGEN_800032 },
 	{ 65, IREM_H3001 },
 	{ 66, STD_GXROM },
@@ -113,7 +113,7 @@ static const nes_mmc mmc_list[] =
 	{ 78, IREM_HOLYDIVR },
 	{ 79, AVE_NINA06 },
 	{ 80, TAITO_X1_005 },
-	// 81 NTDEC's Super Gun. Dump available?
+	{ 81, NTDEC_N715021 }, // 81 Super Gun
 	{ 82, TAITO_X1_017 },
 	{ 83, CONY_BOARD },
 	// 84 Pasofami hacked images?
@@ -250,7 +250,7 @@ static const nes_mmc mmc_list[] =
 	{ 214, BMC_SUPERGUN_20IN1 },
 	{ 215, SUPERGAME_BOOGERMAN },
 	{ 216, RCM_GS2015 },
-	{ 217, BMC_GOLDENCARD_6IN1 },
+	{ 217, BMC_500IN1 },
 	{ 218, NOCASH_NOCHR },
 	// 219 UNL-A9746 (according to Cah4e3's code, no dump available (yet)
 	// 220 Unused - reserved for emulator debugging
@@ -294,7 +294,7 @@ static const nes_mmc mmc_list[] =
 	// 256 OneBus Famiclones
 	// 257 UNIF MAPR PEC-586?
 	// 258 UNIF MAPR 158B?
-	// 259 UNIF MAPR F-15?
+	{ 259, BMC_F15 },
 	// 260 HP10xx/HP20xx multicarts?
 	{ 261, BMC_810544C },
 	{ 262, SACHEN_SHERO },
@@ -322,9 +322,9 @@ static const nes_mmc mmc_list[] =
 	// 284 UNL_DRIPGAME, not in nes.xml
 	{ 285, BMC_A65AS },
 	{ 286, BMC_BENSHIENG },
-	{ 287, BMC_411120C }, // also BMC-K-3088, not in nes.xml?
-	// 288 GKCX1 21 in 1 multicarts, not in nes.xml?
-	// { 289, BMC_60311C }, not in nes.xml?
+	{ 287, BMC_411120C },
+	{ 288, BMC_GKCXIN1 },
+	{ 289, BMC_60311C },
 	{ 290, BMC_NTD_03 },
 	// 291 Kasheng 2-in-1 multicarts not yet in nes.xml?
 	// { 292, UNL_DRAGONFIGHTER }, in nes.xml, not emulated yet
@@ -355,27 +355,27 @@ static const nes_mmc mmc_list[] =
 	// 317 Unused
 	// 318 Unused
 	// 319 HP-898F (has different bank order than UNIF!) and KD-7/9-E boards
-	// 320 BMC-830425C-4391T, not in nes.xml?
+	{ 320, BMC_830425C },
 	// 321 duplicate of 287?
 	// 322 BMC-K-3033 35-in-1, related to mc_35?
 	// 323 Farid SLROM homebrew 8-in-1
 	// 324 Farid UNROM homebrew 8-in-1
 	{ 325, UNL_MALISB },           // Super Mali Splash Bomb pirate hack
-	// 326 yet another Contra bootleg, dump available?
+	{ 326, BTL_CONTRAJ },
 	// 327 BMC-10-24-C-A1 6-in-1
 	{ 328, UNL_RT01 },             // test cart (Russia)
 	{ 329, UNL_EDU2K },
 	// 330 Sangokushi II - Haou no Tairiku hack - N163 bootleg
 	{ 331, BMC_12IN1 },
 	{ 332, BMC_WS },
-	// 333 BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
+	{ 333, BMC_8IN1 },
 	// 334 5/20-in-1 1993 Copyright multicart, not in nes.xml?
 	{ 335, BMC_CTC09 },
 	{ 336, BMC_K3046 },
 	// { 337, BMC_CTC_12IN1 }, not in nes.xml
 	{ 338, BMC_SA005A },
-	// 339 BMC-K-3006 21-in-1, not in nes.xml?
-	// 340 BMC-K-3036 35-in-1, not in nes.xml?
+	{ 339, BMC_K3006 },
+	{ 340, BMC_K3036 },
 	{ 341, BMC_TJ03 },
 	// 342 COOLGIRL homebrew
 	// 343 reset-based 4-in-1 pirate?

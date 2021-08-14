@@ -52,6 +52,9 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class onetwo_state : public driver_device
 {
 public:
@@ -74,14 +77,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint8_t> m_fgram;
 	required_memory_bank m_mainbank;
 
-	/* video-related */
+	// video-related
 	tilemap_t *m_fg_tilemap;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -251,7 +254,7 @@ static INPUT_PORTS_START( onetwo )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) ) PORT_DIPLOCATION("SW2:1") /* Flip Screen? */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) ) PORT_DIPLOCATION("SW2:1") // Flip Screen?
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
@@ -266,7 +269,7 @@ static INPUT_PORTS_START( onetwo )
 	PORT_DIPNAME( 0x10, 0x10, "Women Select" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	/* In stop mode, press 2 to stop and 1 to restart */
+	// In stop mode, press 2 to stop and 1 to restart
 	PORT_DIPNAME( 0x20, 0x20, "Stop Mode (Cheat)") PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -343,7 +346,7 @@ void onetwo_state::machine_start()
 
 void onetwo_state::onetwo(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &onetwo_state::main_cpu);
 	m_maincpu->set_addrmap(AS_IO, &onetwo_state::main_cpu_io);
@@ -355,7 +358,7 @@ void onetwo_state::onetwo(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(16));
@@ -367,7 +370,7 @@ void onetwo_state::onetwo(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_onetwo);
 	PALETTE(config, m_palette).set_format(2, &onetwo_state::BBBGGGGGxBBRRRRR, 0x80);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -378,7 +381,7 @@ void onetwo_state::onetwo(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000*2, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 4_MHz_XTAL / 2, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified, no resonator on PCB so probably derived from the 4 MHz XTAL
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -389,10 +392,10 @@ void onetwo_state::onetwo(machine_config &config)
  *************************************/
 
 ROM_START( onetwo )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* main z80 */
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "maincpu", 0x00000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -405,10 +408,10 @@ ROM_START( onetwo )
 ROM_END
 
 ROM_START( onetwoe )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* main z80 */
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "main_prog", 0x00000,  0x20000, CRC(6c1936e9) SHA1(d8fb3056299c9b45e0b537e77dc0d633882705dd) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -419,6 +422,9 @@ ROM_START( onetwoe )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*************************************
  *

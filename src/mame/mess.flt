@@ -836,6 +836,7 @@ pv1000.cpp
 pv2000.cpp
 pv9234.cpp
 pve500.cpp
+pwp14.cpp
 pwrview.cpp
 px4.cpp
 px8.cpp
