@@ -23691,12 +23691,12 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="navitune">
-		<description>Navitune</description>
+		<description>Navitune - Dragon Koukaiki</description>
 		<year>1989</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198911xx"/>
-		<info name="alt_title" value="ナビチューン"/>
+		<info name="alt_title" value="ナビチューン ドラゴン航海記"/>
 		<!--combined image-->
 		<!--rom name="navitune.d88" size="1662512" crc="b9540b35" sha1="8d937c8acfb62a12d24596114e7168db1087eaf0"/-->
 

@@ -560,6 +560,7 @@ public:
 
 protected:
 	void pc9821cx3_io(address_map &map);
+
 private:
 	void remote_addr_w(offs_t offset, u8 data);
 	u8 remote_data_r(offs_t offset);

@@ -1403,11 +1403,11 @@ static const gfx_layout charset_16x16 =
 };
 
 static GFXDECODE_START( gfx_pc9801 )
-	GFXDECODE_ENTRY( "chargen", 0x00000, charset_8x8,     0x000, 0x01 )
-	GFXDECODE_ENTRY( "chargen", 0x00800, charset_8x16,    0x000, 0x01 )
-	GFXDECODE_ENTRY( "kanji",   0x00000, charset_16x16,   0x000, 0x01 )
+	GFXDECODE_ENTRY( "chargen",     0x00000, charset_8x8,     0x000, 0x01 )
+	GFXDECODE_ENTRY( "chargen",     0x00800, charset_8x16,    0x000, 0x01 )
+	GFXDECODE_ENTRY( "kanji",       0x00000, charset_16x16,   0x000, 0x01 )
 	GFXDECODE_ENTRY( "raw_kanji",   0x00000, charset_16x16,   0x000, 0x01 )
-	GFXDECODE_ENTRY( "new_chargen",0, charset_16x16,   0x000, 0x01 )
+	GFXDECODE_ENTRY( "new_chargen", 0x00000, charset_16x16,   0x000, 0x01 )
 GFXDECODE_END
 
 /****************************************

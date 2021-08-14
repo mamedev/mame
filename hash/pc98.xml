@@ -3449,7 +3449,7 @@ TODO:
 	<software name="advpowd2pd" cloneof="advpowd2">
 		<description>Advanced Power Dolls 2 - Premium Disk</description>
 		<year>1995</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="アドヴァンスド パワードール２ プレミアムディスク" />
 		<info name="release" value="199502xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -4281,7 +4281,7 @@ TODO:
 	<software name="algtsub">
 		<description>Algeese no Tsubasa - Youka Ankoku Hen</description>
 		<year>1988</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="アルギースの翼 ～妖華暗黒変～" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Game"/>
@@ -11401,7 +11401,7 @@ TODO:
 	<software name="csoldier">
 		<description>Cosmic Soldier</description>
 		<year>1985</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="コズミックソルジャー" />
 		<info name="release" value="198510xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -23176,7 +23176,7 @@ TODO:
 	<software name="afterdrk">
 		<description>Harajuku After Dark</description>
 		<year>1988</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="原宿アフターダーク" />
 		<info name="release" value="198806xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -25976,6 +25976,7 @@ TODO:
 	</software>
 
 	<!-- boot OK -->
+	<!-- TODO: cannot make sound to work on VM class, regressed? -->
 	<software name="karateka" supported="yes">
 		<description>Karateka</description>
 		<year>1988</year>
@@ -31931,7 +31932,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="madara">
 		<description>Mouryou Senki Madara - Daikongourin Hen</description>
 		<year>1993</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="魍魎戦記ＭＡＤＡＲＡ 大金剛輪編" />
 		<info name="release" value="19930910" />
 		<part name="flop1" interface="floppy_5_25">
@@ -32356,9 +32357,9 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="navitune">
-		<description>Navitune</description>
+		<description>Navitune - Dragon Koukaiki</description>
 		<year>1990</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="ナビチューン ドラゴン航海記" />
 		<info name="release" value="19901207" />
 		<part name="flop1" interface="floppy_5_25">
@@ -32375,9 +32376,11 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="nazopuyo">
+	<!-- Cannot read neither keyboard nor joystick inputs, only mouse works -->
+	<!-- (Happens on 9821 and RS class and sound boards -26 and -86) -->
+	<software name="nazopuyo" supported="no">
 		<description>Nazo Puyo</description>
-		<year>1984</year>
+		<year>1994</year>
 		<publisher>コンパイル (Compile)</publisher>
 		<info name="alt_title" value="なぞぷよ" />
 		<info name="release" value="19941111" />
@@ -35548,7 +35551,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="powdoll">
 		<description>Power Dolls</description>
 		<year>1994</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="パワードール" />
 		<info name="release" value="19940114" />
 		<part name="flop1" interface="floppy_5_25">
@@ -35581,7 +35584,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="powdoll2pd" cloneof="powdoll2">
 		<description>Power Dolls 2 Premium Disc</description>
 		<year>1995</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="パワードール２ プレミアムディスク" />
 		<info name="release" value="199502xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -36492,7 +36495,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="psychwar">
 		<description>Psychic War - Cosmic Soldier 2</description>
 		<year>1988</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="サイキックウォー コズミックソルジャー２" />
 		<info name="release" value="19880626" />
 		<part name="flop1" interface="floppy_5_25">
@@ -38724,7 +38727,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="sabnack">
 		<description>Sabnack</description>
 		<year>1991</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="サブナック" />
 		<info name="release" value="19910628" />
 		<part name="flop1" interface="floppy_5_25">
@@ -39259,7 +39262,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="schwarzs">
 		<description>Schwarzschild - Kyouran no Ginga</description>
 		<year>1988</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="シュヴァルツシルト" />
 		<info name="release" value="19881209" />
 		<part name="flop1" interface="floppy_5_25">
@@ -39279,7 +39282,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="schwarz2">
 		<description>Schwarzschild II - Teikoku no Haishin</description>
 		<year>1989</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="シュヴァルツシルト２ 帝國ノ背信" />
 		<info name="release" value="19890630" />
 		<part name="flop1" interface="floppy_5_25">
@@ -39299,7 +39302,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="schwarz3">
 		<description>Schwarzschild III - Wakusei Desperan</description>
 		<year>1992</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="シュヴァルツシルト３ 惑星デスペラン" />
 		<info name="release" value="19920228" />
 		<part name="flop1" interface="floppy_5_25">
@@ -39325,7 +39328,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="schwarz3a" cloneof="schwarz3">
 		<description>Schwarzschild III - Wakusei Desperan (Alt)</description>
 		<year>1992</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="シュヴァルツシルト３ 惑星デスペラン" />
 		<info name="release" value="19920228" />
 		<part name="flop1" interface="floppy_5_25">
@@ -39351,7 +39354,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="schwarz4">
 		<description>Schwarzschild IV - The Cradle End</description>
 		<year>1993</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="シュヴァルツシルト４ ＴＨＥ ＣＲＡＤＬＥ ＥＮＤ" />
 		<info name="release" value="19930402" />
 		<part name="flop1" interface="floppy_5_25">
@@ -53299,7 +53302,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="lavaleur" supported="no">
 		<description>Mashou Denki La Valeur</description>
 		<year>1989</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="魔晶伝記ラヴァルー" />
 		<info name="release" value="19891130" />
 		<part name="flop1" interface="floppy_5_25">
@@ -56270,7 +56273,7 @@ SPACE EMPIRE
 	<software name="advpowd2">
 		<description>Advanced Power Dolls 2</description>
 		<year>1996</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="アドヴァンスド パワードール２" />
 		<info name="release" value="19960223" />
 		<info name="usage" value="Boot DOS from floppy, insert disk 1 and run INST.EXE" />
@@ -61976,7 +61979,7 @@ SPACE EMPIRE
 	<software name="powdoll2" supported="no">
 		<description>Power Dolls 2</description>
 		<year>1995</year>
-		<publisher>工画堂 (Kogado)</publisher>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="パワードール２" />
 		<info name="release" value="19941202" />
 		<part name="flop1" interface="floppy_5_25">
