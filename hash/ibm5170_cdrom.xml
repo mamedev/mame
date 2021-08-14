@@ -2448,12 +2448,13 @@ license:CC0
 	
 	<!-- DOS -->
 	<!-- Created from an ISO. size="6352896" crc="DCEEEB82" sha1="EA7BE8CB7E91FB97C590D23AEDFA371DC98CF5C0" -->
-	<!-- Originally released on two 5.25" floppies. Reprinted on CD by GT Interactive and included in -->
+	<!-- Originally released on 3.5" and 5.25" floppies. Reprinted on CD by GT Interactive and included in -->
 	<!-- "Arcade Favorites CD-Rom 5 Pak." Game can be run straight from the CD or installed to a hard drive. -->
 	<software name="pipemaniacd">
 		<description>Pipe Mania (1995 CD release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="alt_title" value="Pipe Dream" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
