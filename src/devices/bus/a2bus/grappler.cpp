@@ -134,6 +134,10 @@ void a2bus_grappler_device_base::device_add_mconfig(machine_config &config)
 
 void a2bus_grappler_device_base::device_start()
 {
+	m_set_busy_in.init(*this, FUNC(a2bus_grappler_device_base::set_busy_in));
+	m_set_pe_in.init(*this, FUNC(a2bus_grappler_device_base::set_pe_in));
+	m_set_slct_in.init(*this, FUNC(a2bus_grappler_device_base::set_slct_in));
+
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_busy_in));
 	save_item(NAME(m_pe_in));
@@ -161,19 +165,19 @@ void a2bus_grappler_device_base::set_rom_bank(u16 rom_bank)
 
 WRITE_LINE_MEMBER(a2bus_grappler_device_base::busy_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_busy_in), this), state ? 1 : 0);
+	m_set_busy_in.synchronize(state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_grappler_device_base::pe_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_pe_in), this), state ? 1 : 0);
+	m_set_pe_in.synchronize(state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_grappler_device_base::slct_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_slct_in), this), state ? 1 : 0);
+	m_set_slct_in.synchronize(state ? 1 : 0);
 }
 
 
@@ -238,9 +242,9 @@ u8 a2bus_grappler_device::read_c0nx(u8 offset)
 	if (!machine().side_effects_disabled())
 	{
 		if (BIT(offset, 1)) // A1 - assert strobe
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 0);
+			m_set_strobe.synchronize(0);
 		else if (BIT(offset, 2)) // A2 - release strobe
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
+			m_set_strobe.synchronize(1);
 	}
 
 	if (BIT(offset, 0)) // A0 - printer status
@@ -264,12 +268,12 @@ void a2bus_grappler_device::write_c0nx(u8 offset, u8 data)
 	LOG("Write C0n%01X=%02X\n", offset, data);
 
 	if (BIT(offset, 0)) // A0 - write data
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_data), this), int(unsigned(data)));
+		m_set_data.synchronize(int(unsigned(data)));
 
 	if (BIT(offset, 1)) // A1 - assert strobe
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 0);
+		m_set_strobe.synchronize(0);
 	else if (BIT(offset, 2)) // A2 - release strobe
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
+		m_set_strobe.synchronize(1);
 }
 
 
@@ -308,6 +312,10 @@ void a2bus_grappler_device::device_start()
 {
 	a2bus_grappler_device_base::device_start();
 
+	m_set_data.init(*this, FUNC(a2bus_grappler_device::set_data));
+	m_set_strobe.init(*this, FUNC(a2bus_grappler_device::set_strobe));;
+	m_set_ack_in.init(*this, FUNC(a2bus_grappler_device::set_ack_in));;
+
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_ack_latch));
 	save_item(NAME(m_ack_in));
@@ -316,7 +324,7 @@ void a2bus_grappler_device::device_start()
 
 void a2bus_grappler_device::device_reset()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
+	m_set_strobe.synchronize(1);
 }
 
 
@@ -327,7 +335,7 @@ void a2bus_grappler_device::device_reset()
 
 WRITE_LINE_MEMBER(a2bus_grappler_device::ack_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_ack_in), this), state ? 1 : 0);
+	m_set_ack_in.synchronize(state ? 1 : 0);
 }
 
 
@@ -418,6 +426,8 @@ void a2bus_grapplerplus_device_base::device_start()
 {
 	a2bus_grappler_device_base::device_start();
 
+	m_set_ack_in.init(*this, FUNC(a2bus_grapplerplus_device_base::set_ack_in));
+
 	save_item(NAME(m_ack_latch));
 	save_item(NAME(m_ack_in));
 }
@@ -488,7 +498,7 @@ void a2bus_grapplerplus_device_base::write_cnxx(u8 offset, u8 data)
 
 WRITE_LINE_MEMBER(a2bus_grapplerplus_device_base::ack_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grapplerplus_device_base::set_ack_in), this), state ? 1 : 0);
+	m_set_ack_in.synchronize(state ? 1 : 0);
 }
 
 
@@ -780,6 +790,10 @@ void a2bus_buf_grapplerplus_device::device_start()
 
 	m_ram = std::make_unique<u8 []>(0x10000);
 
+	m_set_buf_data.init(*this, FUNC(a2bus_buf_grapplerplus_device::set_buf_data));
+	m_set_buf_ack_in.init(*this, FUNC(a2bus_buf_grapplerplus_device::set_buf_ack_in));
+	m_clear_ibusy.init(*this, FUNC(a2bus_buf_grapplerplus_device::clear_ibusy));
+
 	save_pointer(NAME(m_ram), 0x10000);
 	save_item(NAME(m_ram_row));
 	save_item(NAME(m_ram_mask));
@@ -848,7 +862,7 @@ void a2bus_buf_grapplerplus_device::data_latched(u8 data)
 	m_ibusy = 1U;
 
 	// these signals cross executable device domains
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_buf_grapplerplus_device::set_buf_data), this), int(unsigned(data)));
+	m_set_buf_data.synchronize(int(unsigned(data)));
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
 }
 
@@ -860,7 +874,7 @@ void a2bus_buf_grapplerplus_device::data_latched(u8 data)
 
 DECLARE_WRITE_LINE_MEMBER(a2bus_buf_grapplerplus_device::buf_ack_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_buf_grapplerplus_device::set_buf_ack_in), this), state ? 1 : 0);
+	m_set_buf_ack_in.synchronize(state ? 1 : 0);
 }
 
 
@@ -955,7 +969,7 @@ u8 a2bus_buf_grapplerplus_device::mcu_bus_r()
 	{
 		LOG("Read data latch %02X\n", m_data_latch);
 		result &= m_data_latch;
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_buf_grapplerplus_device::clear_ibusy), this));
+		m_clear_ibusy.synchronize();
 		m_mcu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
 		ack_w(0);
 		ack_w(1);

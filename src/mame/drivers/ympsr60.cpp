@@ -234,7 +234,7 @@ attoseconds_t psr60_state::cv_handler(attotime const &cvtime)
 	if (BIT(m_bbd_config, 1) && !BIT(m_bbd_config, 2))
 	{
 		// Stereo symphonic off: min freq 35 kHz, max freq 107 kHz, varies at 0,3 Hz
-		curtime.m_seconds %= 3;
+		curtime.set_seconds(curtime.seconds() % 3);
 		double pos = curtime.as_double() / 3;
 		pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);
 		bbd_freq = 35000 + (107000 - 35000) * pos;
@@ -242,7 +242,7 @@ attoseconds_t psr60_state::cv_handler(attotime const &cvtime)
 	else
 	{
 		// Stereo symphonic on: min freq 48 kHz, max freq 61 kHz, varies at 6 Hz
-		curtime.m_seconds = 0;
+		curtime.set_seconds(0);
 		double pos = curtime.as_double() * 6;
 		pos -= floor(pos);
 		pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);

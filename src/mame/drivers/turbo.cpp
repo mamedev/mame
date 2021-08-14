@@ -196,6 +196,8 @@ void buckrog_state::machine_start()
 {
 	turbo_base_state::machine_start();
 
+	m_delayed_i8255_w.init(*this, FUNC(buckrog_state::delayed_i8255_w));
+
 	save_item(NAME(m_fchg));
 	save_item(NAME(m_mov));
 	save_item(NAME(m_obch));

@@ -37,7 +37,6 @@ protected:
 private:
 
 	required_device<cpu_device> m_cpu;
-	transient_timer_factory m_network_irq_clear;
 	uint32_t m_ram[0x2000];
 };
 

@@ -99,6 +99,10 @@ private:
 	u8  m_busy_in;      // printer connector pin 21 (synchronised)
 	u8  m_pe_in;        // printer connector pin 23 (synchronised)
 	u8  m_slct_in;      // printer connector pin 25 (synchronised)
+
+	transient_timer_factory m_set_busy_in;
+	transient_timer_factory m_set_pe_in;
+	transient_timer_factory m_set_slct_in;
 };
 
 
@@ -132,6 +136,10 @@ private:
 	u8  m_strobe;       // U3 (pin 4)
 	u8  m_ack_latch;    // U3 (pin 13)
 	u8  m_ack_in;       // printer connector pin 19 (synchronised)
+
+	transient_timer_factory m_set_data;
+	transient_timer_factory m_set_strobe;
+	transient_timer_factory m_set_ack_in;
 };
 
 
@@ -173,6 +181,8 @@ private:
 
 	u8  m_ack_latch;    // U2C (pin 9)
 	u8  m_ack_in;       // printer connector pin 19 (synchronised)
+
+	transient_timer_factory m_set_ack_in;
 };
 
 
@@ -262,6 +272,10 @@ private:
 	u8  m_ibusy;            // U12
 	u8  m_buf_ack_latch;    // U12
 	u8  m_buf_ack_in;       // printer connector pin 19 (synchronised)
+
+	transient_timer_factory m_set_buf_data;
+	transient_timer_factory m_set_buf_ack_in;
+	transient_timer_factory m_clear_ibusy;
 };
 
 
