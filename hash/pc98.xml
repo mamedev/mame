@@ -26,6 +26,8 @@ TODO:
   be just plain images, like FDI, just with different headers with the track
   "map")
 - fix doujin software names;
+- Remove manufacturer=<unofficial> and instead assign proper manufacturer naming for
+  Victor freeware software (+ bad dump flag), bootleg for the PC9801 Game Packs;
 - Identify any software that uses the MAD Factory NAX.EXE driver for Otomi-chan Kai sound board;
 
 -->
@@ -6513,7 +6515,7 @@ TODO:
 	</software>
 
 	<!-- Can't play any music. It recognizes the MIDI interface correctly, but complains about the interrupt line settings not being correct. -->
-	<!-- Supported MIDI interfaces: Roland MT-32, Roland D-10/D-110, Kawai MSB-98, Korg M1 -->
+	<!-- Supported MIDI interfaces according to menu: Roland MT-32, Roland D-10/D-110, Kawai MSB-98, Korg M1 -->
 	<software name="bandkun" supported="no">
 		<description>Band-kun - Sound Entertainment</description>
 		<year>1990</year>
@@ -6521,6 +6523,7 @@ TODO:
 		<info name="alt_title" value="バンドくん" />
 		<info name="release" value="199011xx" />
 		<info name="usage" value="Requires a MIDI interface. Run KOEI.COM from DOS to boot, or BKINST.EXE to install to HDD." />
+		<!-- TODO: additional instructions to actually interface MIDI properly, cfr. manual -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk"/>
 			<dataarea name="flop" size="1281968">
@@ -65798,7 +65801,6 @@ SPACE EMPIRE
 
   These were available for download at Vector's homepage
   The disk images below have been created by users to launch the games in emulators
-
  -->
 
 	<software name="7narabe">
@@ -65835,7 +65837,8 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- This game plays music through the beeper, but it doesn't work in MAME - it just outputs a constant beep -->
+	<!-- boot OK -->
+	<!-- DAC1BIT is very grainy to say the least on RS class -->
 	<software name="aisland" supported="partial">
 		<description>Aisland</description>
 		<year>19??</year>
@@ -65858,7 +65861,9 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- Wrong sound effects (they are supposed to have different tones, not just a constant beep) -->
+	<!-- boot OK -->
+	<!-- TODO: checkout if it needs a specific key to attack or somehow increase the score -->
+	<!-- (X jumps, left/right to move. Marked as kusoge by game itself) -->
 	<software name="baka" supported="partial">
 		<description>BAKA - Boss of the Sunset</description>
 		<year>19??</year>
@@ -65893,8 +65898,10 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="casinodr">
-		<description>Casino Dream</description>
+	<!-- boot OK -->
+	<software name="casinodr" supported="yes">
+		<!-- Ver.4.4 By SIMONS -->
+		<description>Casino Dream (v4.4)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -69493,8 +69500,10 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 
 <!-- Investigate! Identify precisely these sets -->
 
-<!-- Dante 98 soft? check: http://nekonojidai.web.fc2.com/otherdante.htm -->
-	<software name="seikenmd">
+	<!-- Based off RPGツクールDante98 software ('92 ASCII/LOGiN original print of RPG Maker) -->
+	<!-- http://nekonojidai.web.fc2.com/otherdante.htm -->
+	<!-- Hangs on bare title display on RS class -->
+	<software name="seikenmd" supported="no">
 		<description>Seiken to Maken no Densetsu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

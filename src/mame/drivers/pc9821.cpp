@@ -11,14 +11,21 @@
     - undumped IDE ROM, kludged to work;
 	- further state machine breakdowns;
 
-    TODO (PC-9821As)
+    TODO (PC-9821As):
 	- unimplemented SDIP specific access;
 	- "SYSTEM SHUTDOWN" while accessing above;
+	- Update: it never goes into above after I changed default m_dma_access_ctrl to 0xfe?
 
-    TODO: (PC-9821Ap2)
-    - No way to exit the initial loop. Code looks broken, bad dump?
+	TODO (PC-9821Cx3):
+	- "MICON ERROR" at POST, we currently return a ready state in remote control register 
+	  to bypass it, is it always the case?
+	- Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os $b00-$b03 then
+	  keeps looping;
+	- Reportedly should display a CanBe logo at POST (always blue with white fg?),
+	  at least pc9821cx3 ROM has some VRAM data at 0x20000 + other places.
+	  How HW even accesses it out? Maybe it is hardwired in VRAM instead of returning garbage data?
 
-    TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333/PC-9821Cx3)
+    TODO (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333):
     - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
 	  involved bankswitch with Pentium based machines);
 
@@ -340,10 +347,11 @@ void pc9821_state::pc9821_io(address_map &map)
  * 98MATE A overrides
  */
 // TODO: SDIP extended access for 9821Ap, As, Ae
-// (it never r/w the conventional ports, at least on POST)
+// It never r/w the conventional ports, at least on POST.
+// I also suspect a few ports here not being direct RAM r/w but actual regs instead.
 u8 pc9821_mate_a_state::ext_sdip_data_r(offs_t offset)
 {
-	logerror("%s: %02x %02x\n", machine().describe_context(), m_ext_sdip_addr, m_ext_sdip[m_ext_sdip_addr]);
+	logerror("%s: EXT SDIP access read %02x %02x\n", machine().describe_context(), m_ext_sdip_addr, m_ext_sdip[m_ext_sdip_addr]);
 	return m_ext_sdip[m_ext_sdip_addr];
 }
 
@@ -369,6 +377,88 @@ void pc9821_mate_a_state::pc9821as_io(address_map &map)
 	map(0x046a, 0x046a).w(FUNC(pc9821_mate_a_state::ext_sdip_access_w));
 	map(0x046c, 0x046c).w(FUNC(pc9821_mate_a_state::ext_sdip_address_w));
 	// TODO: specific MATE A local bus (location?)
+}
+
+/*
+ * CanBe overrides
+ */
+
+/*
+ * CanBe Remote control
+ * I/O $f4a: remote index (write only?)
+ * I/O $f4b: remote data r/w
+ * [0x00] <unknown>
+ * [0x01] Windows Sound System related
+ * ---- xxxx irq select
+ * ---- 1000 INT8
+ * ---- 0011 INT0
+ * ---- 0010 INT41
+ * ---- 0000 INT5
+ * [0x02] <unknown>
+ * [0x03] Remote control reset
+ * ---- -x-- (1) Mic through (loopback?)
+ * ---- ---x (1) Remote control reset
+ * [0x04] Mute control
+ * ---- ---x (Global?) sound mute
+ * [0x10] Remote control data status
+ * ---- --x- (1) device ready (0) busy
+ * ---- ---x (1) received data available
+ * [0x11] Remote control code
+ * <returns the button pressed in 2 bytes form, 2nd byte is the XOR-ed version of 1st>
+ * [0x12] <unknown>
+ * [0x13] Power control
+ * <succession of bytes to power on/off>
+ * [0x14] remote irq control
+ * ---- -x-- irq enable
+ * ---- --xx irq select
+ * ---- --11 INT41
+ * ---- --10 INT1
+ * ---- --01 INT2
+ * ---- --00 INT0
+ * [0x30] VOL1,2 YMF288 Left sound output
+ * [0x31] VOL1,2 YMF288 Right sound output
+ * [0x32] VOL3,4 Line Left input
+ * [0x33] VOL3,4 Line Right input
+ * [0x34] <unknown>
+ * [0x35] <unknown>
+ */
+// TODO: export remote control to an actual device, and pinpoint actual name
+void pc9821_canbe_state::remote_addr_w(offs_t offset, u8 data)
+{
+	m_remote.index = data;
+}
+
+u8 pc9821_canbe_state::remote_data_r(offs_t offset)
+{
+	uint8_t res;
+
+	res = 0;
+
+	logerror("%s: remote control reg read %02x\n", machine().describe_context(), m_remote.index);
+
+	switch(m_remote.index)
+	{
+		case 0x10:
+			res |= 2; // POST will throw "MICOM ERROR" otherwise
+			break;
+	}
+	return res;
+}
+
+void pc9821_canbe_state::remote_data_w(offs_t offset, u8 data)
+{
+	switch(m_remote.index)
+	{
+		default:
+			logerror("%s: remote control reg write %02x %02x\n", machine().describe_context(), m_remote.index, data);
+	}
+}
+
+void pc9821_canbe_state::pc9821cx3_io(address_map &map)
+{
+	pc9821_io(map);
+	map(0x0f4a, 0x0f4a).w(FUNC(pc9821_canbe_state::remote_addr_w));
+	map(0x0f4b, 0x0f4b).rw(FUNC(pc9821_canbe_state::remote_data_r), FUNC(pc9821_canbe_state::remote_data_w));
 }
 
 static INPUT_PORTS_START( pc9821 )
@@ -532,6 +622,13 @@ MACHINE_START_MEMBER(pc9821_mate_a_state,pc9821ap2)
 	// ...
 }
 
+MACHINE_RESET_MEMBER(pc9821_state,pc9821)
+{
+	MACHINE_RESET_CALL_MEMBER(pc9801rs);
+
+	m_pc9821_window_bank = 0x08;
+}
+
 // TODO: setter for DMAC clock should follow up whatever is the CPU clock
 
 // TODO: remove me, cfr. pc9801.cpp
@@ -609,7 +706,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	const XTAL xtal = XTAL(100'000'000);
 	PENTIUM(config.replace(), m_maincpu, xtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821cx3_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
 

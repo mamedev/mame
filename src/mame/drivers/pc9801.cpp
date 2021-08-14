@@ -15,7 +15,7 @@
     - Write a PC80S31K device for 2d type floppies
       (also used on PC-6601SR, PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
 	- FDC (note: epdiag FDC test looks a good candidate for all this):
-		- floppy_connector requires a "disk is in drive" flag that isn't honored properly;
+		- floppy_connector requires a "disk is in drive" flag that isn't honored properly (note: 2DD only);
 		- Has on board dip-switches, we currently just return 2HD/2DD autodetect;
 		- 3'5 floppy disks don't load at all;
 		- fix FDC duplication: according to docs I/O ports $90-$95 are basically mirrors
@@ -924,18 +924,36 @@ void pc9801_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
 	pc9801_a0_w(offset,data);
 }
 
-uint8_t pc9801_state::access_ctrl_r(offs_t offset)
+/*
+ * DMA access control (I/O $439)
+ *
+ * x--- ---- Mate A: Printer select (1) built-in (0) PC-9821-E02
+ *           ^ on 98Fellow with 0 it disconnects the printer interface,
+ *           ^ may still select anything but -E02?
+ * --?? ---- <unknown>
+ * ---- -x-- DMA address mask (1) inhibit DMA access for anything higher than 1MB
+ *           ^ defaults to 0 high-reso equipped machines (?), 1 otherwise
+ * ---- --x- Graph LIO BIOS select (?), on 9801VX21
+ * ---- ---x Mate A: selects high-reso mode
+ *           ^ unknown otherwise
+ */
+u8 pc9801_state::dma_access_ctrl_r(offs_t offset)
 {
-	if(offset == 1)
-		return m_access_ctrl;
-
-	return 0xff;
+	logerror("%s: DMA access control read\n", machine().describe_context());
+	return m_dma_access_ctrl;
 }
 
-void pc9801_state::access_ctrl_w(offs_t offset, uint8_t data)
+void pc9801_state::dma_access_ctrl_w(offs_t offset, u8 data)
 {
-	if(offset == 1)
-		m_access_ctrl = data;
+	logerror("%s: DMA access control write %02x\n", machine().describe_context(), data);
+	m_dma_access_ctrl = data;
+}
+
+// ARTIC device
+
+uint16_t pc9801_state::timestamp_r(offs_t offset)
+{
+	return (m_maincpu->total_cycles() >> (16 * offset));
 }
 
 uint8_t pc9801_state::midi_r()
@@ -1006,7 +1024,7 @@ void pc9801_state::pc9801ux_io(address_map &map)
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
 	map(0x00f0, 0x00ff).rw(FUNC(pc9801_state::a20_ctrl_r), FUNC(pc9801_state::a20_ctrl_w)).umask16(0x00ff);
-	map(0x0438, 0x043b).rw(FUNC(pc9801_state::access_ctrl_r), FUNC(pc9801_state::access_ctrl_w));
+	map(0x0439, 0x0439).rw(FUNC(pc9801_state::dma_access_ctrl_r), FUNC(pc9801_state::dma_access_ctrl_w));
 	map(0x043c, 0x043f).w(FUNC(pc9801_state::pc9801rs_bank_w)); //ROM/RAM bank
 	map(0x04a0, 0x04af).w(FUNC(pc9801_state::egc_w));
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
@@ -1147,11 +1165,6 @@ void pc9801bx_state::pc9801bx2_io(address_map &map)
 	pc9801us_io(map);
 	map(0x0534, 0x0534).r(FUNC(pc9801bx_state::i486_cpu_mode_r));
 	map(0x09a8, 0x09a8).rw(FUNC(pc9801bx_state::gdc_31kHz_r), FUNC(pc9801bx_state::gdc_31kHz_w));
-}
-
-uint16_t pc9801_state::timestamp_r(offs_t offset)
-{
-	return (m_maincpu->total_cycles() >> (16 * offset));
 }
 
 /*uint8_t pc9801_state::winram_r(offs_t offset)
@@ -1804,6 +1817,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	MACHINE_START_CALL_MEMBER(pc9801_common);
 
 	save_item(NAME(m_dac_disable));
+	save_item(NAME(m_dma_access_ctrl));
 
 	m_sys_type = 0x80 >> 6;
 }
@@ -1865,7 +1879,8 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 
 	m_gate_a20 = 0;
 	m_fdc_ctrl = 3;
-	m_access_ctrl = 0;
+	// 0xfb on PC98XL
+	m_dma_access_ctrl = 0xfe;
 	m_ide_sel = 0;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 
@@ -1880,11 +1895,12 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_dac_disable = true;
 }
 
-MACHINE_RESET_MEMBER(pc9821_state,pc9821)
+MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801rs);
 
-	m_pc9821_window_bank = 0x08;
+	// TODO: if returning default 0xfe / 0xfb then it never ever surpass the "SYSTEM SHUTDOWN" even with a soft reset
+	m_dma_access_ctrl = 0x00;
 }
 
 WRITE_LINE_MEMBER(pc9801_state::vrtc_irq)
@@ -2254,6 +2270,7 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801bx_state, pc9801bx2)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801bx_state, pc9801bx2)
 
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST, /4 ~ /7
 
@@ -2286,6 +2303,7 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 	ROM_CONTINUE(                      0x60001, 0x4000  ) \
 	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
+
 /*
 F - 8086 5
 */
@@ -2508,15 +2526,21 @@ Yet another franken-romset done with direct memory dump, shrug
 */
 
 ROM_START( pc9801bx2 )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "pc98bank0.bin",  0x00000, 0x08000, BAD_DUMP CRC(bfd100cc) SHA1(cf8e6a5679cca7761481abef0ba4b35ead39efdb) )
-	ROM_LOAD( "pc98bank1.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
-	ROM_LOAD( "pc98bank2.bin",  0x00000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
-	ROM_LOAD( "pc98bank3.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
-	ROM_LOAD( "pc98bank4.bin",  0x10000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
-	ROM_LOAD( "pc98bank5.bin",  0x18000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
-	ROM_LOAD( "pc98bank6.bin",  0x20000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
-	ROM_LOAD( "pc98bank7.bin",  0x28000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
+	ROM_LOAD( "pc98bank1.bin",  0x08000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
+	ROM_LOAD( "pc98bank2.bin",  0x10000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
+	ROM_LOAD( "pc98bank3.bin",  0x18000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
+	ROM_LOAD( "pc98bank4.bin",  0x20000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
+	ROM_LOAD( "pc98bank5.bin",  0x28000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
+	ROM_LOAD( "pc98bank6.bin",  0x30000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
+	ROM_LOAD( "pc98bank7.bin",  0x38000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x8000 ) // ITF ROM
+	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x8000 ) // BIOS ROM
+	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x8000 )
+	ROM_COPY( "biosrom", 0x38000, 0x28000, 0x8000 )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )

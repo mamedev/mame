@@ -274,8 +274,9 @@ private:
 	void fdc_mode_ctrl_w(uint8_t data);
 //  uint8_t pc9801rs_2dd_r();
 //  void pc9801rs_2dd_w(uint8_t data);
-	uint8_t access_ctrl_r(offs_t offset);
-	void access_ctrl_w(offs_t offset, uint8_t data);
+	// 286-based machines except for PC98XA
+	u8 dma_access_ctrl_r(offs_t offset);
+	void dma_access_ctrl_w(offs_t offset, u8 data);
 	uint8_t midi_r();
 //  uint8_t winram_r();
 //  void winram_w(uint8_t data);
@@ -372,8 +373,10 @@ private:
 	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
 	bool m_dac_disable;
 
-	/* PC9801RS specific, move to specific state */
-	uint8_t m_access_ctrl; // DMA related
+	/* 286+ specific, move to specific state */
+protected:
+	u8 m_dma_access_ctrl; // DMA related
+private:
 	uint8_t m_fdc_ctrl;
 
 	struct {
@@ -452,6 +455,7 @@ protected:
 	void pc9801bx2_map(address_map &map);
 
 	DECLARE_MACHINE_START(pc9801bx2);
+	DECLARE_MACHINE_RESET(pc9801bx2);
 
 private:
 	u8 i486_cpu_mode_r(offs_t offset);
@@ -553,6 +557,17 @@ public:
 
 	void pc9821ce2(machine_config &config);
 	void pc9821cx3(machine_config &config);
+
+protected:
+	void pc9821cx3_io(address_map &map);
+private:
+	void remote_addr_w(offs_t offset, u8 data);
+	u8 remote_data_r(offs_t offset);
+	void remote_data_w(offs_t offset, u8 data);
+
+	struct {
+		u8 index;
+	}m_remote;
 };
 
 // class pc9821_cereb_state : public pc9821_canbe_state
