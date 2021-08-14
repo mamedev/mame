@@ -13,6 +13,13 @@ jobs:
       with:
         install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-libc++    
     - uses: actions/checkout@master
+    - name: Fix GLSL parser potential issues
+      run: |
+        touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-lex.c
+        touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-parse.c
+        touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-parse.h
+        touch 3rdparty/bgfx/3rdparty/glslang/glslang/MachineIndependent/glslang_tab.cpp
+        touch 3rdparty/bgfx/3rdparty/glslang/glslang/MachineIndependent/glslang_tab.cpp.h
     - name: Build
       env:
         MINGW64: "/mingw64"
