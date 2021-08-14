@@ -301,8 +301,8 @@ nes_bmc_ball11_device::nes_bmc_ball11_device(const machine_config &mconfig, cons
 {
 }
 
-nes_bmc_22games_device::nes_bmc_22games_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_22GAMES, tag, owner, clock)
+nes_bmc_22games_device::nes_bmc_22games_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_22GAMES, tag, owner, clock), m_latch(0), m_reset(0)
 {
 }
 
@@ -851,14 +851,25 @@ void nes_bmc_ball11_device::pcb_reset()
 void nes_bmc_22games_device::device_start()
 {
 	common_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reset));
 }
 
 void nes_bmc_22games_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(7);
-	chr8(0, m_chr_source);
+	if (m_reset)
+	{
+		prg32(4);
+		m_latch = 1;
+	}
+	else
+	{
+		prg16_89ab(0);
+		prg16_cdef(7);
+		set_nt_mirroring(PPU_MIRROR_VERT);
+		m_reset = 1;
+	}
+	chr8(0, CHRRAM);
 }
 
 void nes_bmc_64y2k_device::device_start()
@@ -2278,37 +2289,33 @@ void nes_bmc_ball11_device::write_h(offs_t offset, u8 data)
  BMC-22GAMES
 
  Unknown Bootleg Multigame Board
- Games: 22 in 1
+ Games: Contra/22 in 1 combo
 
  iNES: mapper 230
 
- In MESS: Partially Supported. It would need a reset
- to work (not possible yet)
+ In MAME: Supported.
+
+ TODO: Determine whether reset works as written or
+ whether it toggles between Contra and the game menu.
+ Reset to Contra from the menu or other games often
+ fails due to RAM contents it seems.
 
  -------------------------------------------------*/
 
-void nes_bmc_22games_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_22games_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_22games write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (1)  // this should flip at reset
+	if (m_latch)
 	{
-		prg16_89ab(data & 0x07);
-	}
-	else
-	{
-		if (data & 0x20)
-		{
-			prg16_89ab((data & 0x1f) + 8);
-			prg16_cdef((data & 0x1f) + 8);
-		}
-		else
-		{
-			prg16_89ab((data & 0x1f) + 8);
-			prg16_cdef((data & 0x1f) + 9);
-		}
+		u8 bank = (data & 0x1f) + 8;
+		u8 mode = !BIT(data, 5);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
 		set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	}
+	else
+		prg16_89ab(data & 0x07);
 }
 
 /*-------------------------------------------------
