@@ -78386,7 +78386,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />  <!-- header gives 212, but is it correct? -->
+			<feature name="slot" value="bmc_hik300" />
 			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
 			<dataarea name="chr" size="65536">
 				<rom name="200-in-1 (unchained melody)[p1].chr" size="65536" crc="aa97eff7" sha1="68ffcb379e3c3ad44b0b5ea4df47118c811d9d0d" offset="00000" status="baddump" />
@@ -78397,13 +78397,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_2kum" supported="no">
+	<software name="mc_2kum">
 		<description>2000 in 1 (No Splash, No Rev, Alt Mapper)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gc6in1" />  <!-- header gives 217, but is it correct? -->
-			<feature name="pcb" value="BMC-GOLDENCARD-6IN1" />
+			<feature name="slot" value="bmc_500in1" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
 				<rom name="2000-in-1 (no splash, no rev, alt mapper)[p1].chr" size="65536" crc="4a0611c1" sha1="8a1869ce3aff1c34a743c9cc3f22f01df5be2c77" offset="00000" status="baddump" />
 			</dataarea>
@@ -78426,6 +78426,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="21 in 1 (2006-ca).prg" size="131072" crc="621eeaaf" sha1="14d61e4519955548c5da2ee1e255b04a0cae23c8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_21ga3">
+		<description>21 in 1 (GA-003)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_gkcxin1" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="21-in-1 (ga-003).prg" size="131072" crc="c6a91589" sha1="d49788201ddc21f23cf33009e1bd72b51bf7e238" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="21-in-1 (ga-003).chr" size="65536" crc="0c6f5a24" sha1="04ce852a20e8e5ddfbfe00d7633a6a50873ba8cb" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -78478,13 +78494,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_255" supported="no">
+	<software name="mc_255">
 		<description>255 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_64in1" />
-			<feature name="pcb" value="BMC-64IN1" /> <!-- header says mapper 204, but it's not correct -->
+			<feature name="slot" value="bmc_500in1" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="255-in-1 (duck hunt 100 to mario j 515).chr" size="32768" crc="f7096ccd" sha1="85f40ddc03af4e2824e742c18d20efe4fa5da325" offset="00000" status="baddump" />
 			</dataarea>
@@ -78955,13 +78971,15 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4fg">
+<!-- Like many unlicensed games the 3 zapper games do not work. -->
+	<software name="mc_4fg" supported="partial">
 		<description>Super 4-in-1 Fantasy Gun</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_hik300" />
 			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="65536">
 				<rom name="super 4-in-1 fantasy gun [p1].chr" size="65536" crc="5516b3f9" sha1="bdbfef593273dd442aeaf38bb6c9b6dd80384c10" offset="00000" status="baddump" />
 			</dataarea>
@@ -79629,13 +79647,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_500" supported="no">
+	<software name="mc_500">
 		<description>500 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />  <!-- mapper says 217 but it's not gc6in1 either! -->
-			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
+			<feature name="slot" value="bmc_500in1" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
 				<rom name="500-in-1 (anim splash, no rev, alt mapper)[p1].chr" size="65536" crc="25bdd64a" sha1="1f95eaf20fec9058b6917aa47dbdcec4b7a5b87d" offset="00000" status="baddump" />
 			</dataarea>
@@ -79645,13 +79663,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_500a" supported="no">
+	<software name="mc_500a">
 		<description>500 in 1 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />  <!-- mapper says 217 but it's not gc6in1 either! -->
-			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
+			<feature name="slot" value="bmc_500in1" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
 				<rom name="500-in-1 (static splash, no rev, alt mapper)[p1].chr" size="65536" crc="e7dacb8a" sha1="ece1b9c7fd8be955a1df6c8505533b4fac194eeb" offset="00000" status="baddump" />
 			</dataarea>
@@ -80589,7 +80607,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_9999" supported="partial">
+	<software name="mc_9999">
 		<description>9999 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -80605,7 +80623,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_9999a" supported="partial">
+	<software name="mc_9999a">
 		<description>9999 in 1 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -80621,7 +80639,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_9999b" supported="partial">
+	<software name="mc_9999b">
 		<description>9999 in 1 (Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -80637,12 +80655,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_9999c" supported="no">
+	<software name="mc_9999c">
 		<description>9999 in 1 (Anim. Splash, Rev 13)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />  <!-- header gives 212, but is it correct? -->
+			<feature name="slot" value="bmc_hik300" />
 			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
 			<dataarea name="chr" size="65536">
 				<rom name="9999-in-1 (anim splash, rev 13)[p1].chr" size="65536" crc="9b6e8be7" sha1="4c53a3d5e510c4355041b9ad88f1e633ce85f916" offset="00000" status="baddump" />
@@ -80669,13 +80687,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_9x7a" supported="no">
+	<software name="mc_9x7a">
 		<description>9999999 in 1 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />  <!-- mapper says 217 but it's not gc6in1 either! -->
-			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
+			<feature name="slot" value="bmc_500in1" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
 				<rom name="9999999-in-1 (static splash, no rev, alt mapper)[p1].chr" size="65536" crc="25bdd64a" sha1="1f95eaf20fec9058b6917aa47dbdcec4b7a5b87d" offset="00000" status="baddump" />
 			</dataarea>

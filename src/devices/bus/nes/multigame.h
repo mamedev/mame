@@ -462,6 +462,18 @@ protected:
 };
 
 
+// ======================> nes_bmc_gkcxin1_device
+
+class nes_bmc_gkcxin1_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_gkcxin1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+};
+
+
 // ======================> nes_bmc_k3036_device
 
 class nes_bmc_k3036_device : public nes_nrom_device
@@ -606,15 +618,12 @@ class nes_bmc_hik300_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_hik300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_hik300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -923,6 +932,18 @@ protected:
 };
 
 
+// ======================> nes_bmc_500in1_device
+
+class nes_bmc_500in1_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_500in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, uint8_t data) override;
+};
+
+
 // ======================> nes_bmc_800in1_device
 
 class nes_bmc_800in1_device : public nes_nrom_device
@@ -1160,6 +1181,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device)
+DECLARE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device)
 DECLARE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device)
@@ -1187,6 +1209,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_76IN1,      nes_bmc_76in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_110IN1,     nes_bmc_110in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_150IN1,     nes_bmc_150in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_190IN1,     nes_bmc_190in1_device)
+DECLARE_DEVICE_TYPE(NES_BMC_500IN1,     nes_bmc_500in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_800IN1,     nes_bmc_800in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_1200IN1,    nes_bmc_1200in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GOLD150,    nes_bmc_gold150_device)
