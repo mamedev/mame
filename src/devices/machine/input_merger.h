@@ -25,8 +25,8 @@ public:
 
 	// input lines
 	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(in_w) { static_assert(Bit < 32, "invalid bit"); m_update_state.synchronize((Bit << 1) | (state ? 1U : 0U)); }
-	template <unsigned Bit> void in_set(u8 data) { in_w<Bit>(1); }
-	template <unsigned Bit> void in_clear(u8 data) { in_w<Bit>(0); }
+	template <unsigned Bit> void in_set(u8 data = 0) { in_w<Bit>(1); }
+	template <unsigned Bit> void in_clear(u8 data = 0) { in_w<Bit>(0); }
 
 protected:
 	// constructor/destructor

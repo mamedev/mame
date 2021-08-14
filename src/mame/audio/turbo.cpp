@@ -69,9 +69,6 @@ void turbo_state::sound_a_w(uint8_t data)
 
 	// /CRASH.L: channel 3
 	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(3, 5);
-
-	/* update any samples */
-	turbo_update_samples();
 }
 
 

@@ -4303,7 +4303,7 @@ MACHINE_START_MEMBER( mo6_state, mo6 )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	m_mo5_periodic_timer = timer_alloc(*this, FUNC(thomson_state::mo5_periodic_cb));
+	m_mo5_periodic_timer = timer_alloc(*this, FUNC(mo6_state::mo5_periodic_cb));
 
 	/* memory */
 	m_thom_cart_bank = 0;
