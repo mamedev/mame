@@ -548,7 +548,7 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_vblank_time(subseconds::from_usec(0));
 	lscreen.set_size(64*8, 32*8);
 	lscreen.set_visarea(4*8, 60*8-1, 2*8, 30*8-1);
 	lscreen.set_screen_update(FUNC(vsmjtria_state::screen_update<0>));
@@ -556,7 +556,7 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_vblank_time(subseconds::from_usec(0));
 	rscreen.set_size(64*8, 32*8);
 	rscreen.set_visarea(4*8, 60*8-1, 2*8, 30*8-1);
 	rscreen.set_screen_update(FUNC(vsmjtria_state::screen_update<1>));

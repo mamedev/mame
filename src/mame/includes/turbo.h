@@ -151,6 +151,8 @@ private:
 	void main_prg_map(address_map &map);
 	void sub_prg_map(address_map &map);
 	void sub_portmap(address_map &map);
+
+	transient_timer_factory m_delayed_i8255_w;
 };
 
 class subroc3d_state : public turbo_base_state

@@ -2758,15 +2758,15 @@ void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis
 	visarea.max_y = std::min<s32>(visarea.max_y, vtotal - 1);
 
 	// compute the new period for standard res, medium res, and VGA res
-	attoseconds_t stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
-	attoseconds_t medperiod = HZ_TO_ATTOSECONDS(25000) * vtotal;
-	attoseconds_t vgaperiod = HZ_TO_ATTOSECONDS(31500) * vtotal;
+	subseconds stdperiod = subseconds::from_hz(15750) * vtotal;
+	subseconds medperiod = subseconds::from_hz(25000) * vtotal;
+	subseconds vgaperiod = subseconds::from_hz(31500) * vtotal;
 
 	// compute a diff against the current refresh period
-	attoseconds_t refresh = screen().frame_period().attoseconds();
-	attoseconds_t stddiff = std::abs(stdperiod - refresh);
-	attoseconds_t meddiff = std::abs(medperiod - refresh);
-	attoseconds_t vgadiff = std::abs(vgaperiod - refresh);
+	subseconds refresh = screen().frame_period_subseconds();
+	subseconds stddiff = (stdperiod >= refresh) ? (stdperiod - refresh) : (refresh - stdperiod);
+	subseconds meddiff = (medperiod >= refresh) ? (medperiod - refresh) : (refresh - medperiod);
+	subseconds vgadiff = (vgaperiod >= refresh) ? (vgaperiod - refresh) : (refresh - vgaperiod);
 
 	logerror("hSync=%d-%d, bp=%d, vis=%d  vSync=%d-%d, bp=%d, vis=%d\n", hsyncon, hsyncoff, hbp, hvis, vsyncon, vsyncoff, vbp, vvis);
 	logerror("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
@@ -2775,17 +2775,17 @@ void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis
 	if (stddiff < meddiff && stddiff < vgadiff)
 	{
 		screen().configure(htotal, vtotal, visarea, stdperiod);
-		logerror("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
+		logerror("Standard resolution, %f Hz\n", stdperiod.as_hz());
 	}
 	else if (meddiff < vgadiff)
 	{
 		screen().configure(htotal, vtotal, visarea, medperiod);
-		logerror("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
+		logerror("Medium resolution, %f Hz\n", medperiod.as_hz());
 	}
 	else
 	{
 		screen().configure(htotal, vtotal, visarea, vgaperiod);
-		logerror("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
+		logerror("VGA resolution, %f Hz\n", vgaperiod.as_hz());
 	}
 
 	// configure the new framebuffer info

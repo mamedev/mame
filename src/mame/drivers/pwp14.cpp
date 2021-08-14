@@ -224,7 +224,7 @@ void pwp14_state::pwp14(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(pwp14_state::screen_update_pwp14));

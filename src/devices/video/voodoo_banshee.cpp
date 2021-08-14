@@ -1498,7 +1498,7 @@ void voodoo_banshee_device::recompute_video()
 
 	// configure the screen
 	rectangle visarea(0, width - 1, 0, height - 1);
-	screen().configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
+	screen().configure(htotal, vtotal, visarea, subseconds::from_double(frame_period));
 
 	// set the vsync start and stop
 	m_vsyncstart = vstart;
