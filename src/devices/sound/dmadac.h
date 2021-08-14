@@ -18,6 +18,7 @@ class dmadac_sound_device : public device_t, public device_sound_interface
 public:
 	dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	void reset();
 	void flush();
 	void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int16_t *data);
 	void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int32_t *data);
@@ -29,7 +30,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

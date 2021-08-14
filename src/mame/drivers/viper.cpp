@@ -2614,6 +2614,7 @@ void viper_state::machine_reset()
 	m_sound_irq_enabled = false;
 
 	for (int i = 0; i < 2; i++) {
+		m_dmadac[i]->reset();
 		m_dmadac[i]->set_frequency(44100);
 		m_dmadac[i]->enable(1);
 	}

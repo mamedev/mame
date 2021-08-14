@@ -38,6 +38,8 @@
 
 void dmadac_sound_device::device_start()
 {
+	reset();
+
 	/* allocate a stream channel */
 	m_channel = stream_alloc(0, 1, DEFAULT_SAMPLE_RATE);
 
@@ -49,7 +51,7 @@ void dmadac_sound_device::device_start()
 	save_item(NAME(m_buffer));
 }
 
-void dmadac_sound_device::device_reset()
+void dmadac_sound_device::reset()
 {
 	/* reset the state */
 	m_volume = 1.0;
