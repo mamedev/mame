@@ -117,6 +117,7 @@
         sscopex/sogeki      Security code error
 
         wcombat             Can boot into a test menu by using a combination of dipswitches, but it says "serial check bad". Can't boot normally.
+		wcombatu            Bootable when dipsw 4 is set to on. Controls not implemented so it's not possible to pass nickname selection screen. Freezes when test button is pressed.
         thrild2c,ac         Inf loop on blue screen
 
 
@@ -2436,9 +2437,15 @@ INPUT_PORTS_START( wcombat )
 	PORT_INCLUDE( viper )
 
 	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:2") // Skip device check? wcombatu is playable when this is set
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING( 0x04, DEF_STR( No ) )
+	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
@@ -2469,7 +2476,7 @@ INPUT_PORTS_START( code1d )
 	PORT_DIPNAME( 0x04, 0x00, "Calibrate Controls On Boot" ) PORT_DIPLOCATION("SW:2") // Game crashes during boot when this is on
 	PORT_DIPSETTING( 0x04, DEF_STR( Yes ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1") // Crashes at 45% when card checks are enabled
+	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 
