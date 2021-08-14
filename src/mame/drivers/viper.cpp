@@ -2437,7 +2437,7 @@ INPUT_PORTS_START( wcombat )
 	PORT_INCLUDE( viper )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:2") // Skip device check? wcombatu is playable when this is set
+	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4") // Skip device check? wcombatu is playable when this is set
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW:2")
@@ -2470,7 +2470,7 @@ INPUT_PORTS_START( code1d )
 	PORT_INCLUDE( viper )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:2") // Unknown, but without this set the game won't display anything besides a blue screen
+	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4") // Unknown, but without this set the game won't display anything besides a blue screen
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, "Calibrate Controls On Boot" ) PORT_DIPLOCATION("SW:2") // Game crashes during boot when this is on
