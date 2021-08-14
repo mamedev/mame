@@ -205,7 +205,7 @@ osd_file::error zippath_resolve(std::string_view path, osd::directory::entry::en
 	bool went_up = false;
 	do
 	{
-		if(!is_root(apath))
+		if (!is_root(apath))
 		{
 			// trim the path of trailing path separators
 			auto i = apath.find_last_not_of(PATH_SEPARATOR);
@@ -213,6 +213,7 @@ osd_file::error zippath_resolve(std::string_view path, osd::directory::entry::en
 				break;
 			apath = apath.substr(0, i + 1);
 		}
+
 		apath_trimmed = apath;
 
 		// stat the path
