@@ -862,6 +862,28 @@ void pc9821_note_lavie_state::pc9821nr166(machine_config &config)
 	// Has FAX or ethernet 100BASE-TX/10BASE-T (depending on submodel type)
 }
 
+void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
+{
+	pc9821(config);
+	const double xtal = 150000000;
+	PENTIUM_MMX(config.replace(), m_maincpu, xtal);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	
+	// 256KB CPU cache RAM
+	// TFT 12.1 screen with 800x600 resolution & true color
+	// Trident Cyber9385-1 Flat Panel Controller (SVGA, PCI?)
+	// built-in CD-Rom x16
+	// equivalent sound board -86 built-in
+	// PCI TypeII x 2 (Type III x 1)
+	// C-Bus x 1 or ZV port (?)
+	// 2GB HDD (max 31.51GB)
+	// has composite video output
+	// Has 33.6Kbps FAX
+	// Ni-cd (?) battery with 1.5 ~ 2.3 hours of duration
+}
+
 /* took from "raw" memory dump */
 #define LOAD_IDE_ROM \
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) ) \
@@ -1241,6 +1263,7 @@ ROM_START( pc9821nr15 )
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
 ROM_END
+
 /*
 PC-9821Nr166
 
@@ -1280,12 +1303,29 @@ ROM_START( pc9821nr166 )
 	LOAD_IDE_ROM
 ROM_END
 
+ROM_START( pc9821nw150 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+    ROM_LOAD( "g8yxb_b7a_yxb00_ab28f200bx-t.bin", 0x000000, 0x040000, CRC(75f547f6) SHA1(5ff610f3796a3742b674151e4e5a750ded48c951) ) // SOP44
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+
 // PC9821 [desktop] class
 // NB: several of these sub-models don't have the final letter in the original flyers but present in later docs as an afterthought.
 // To mark this we intentionally add square brackets here as optional omission notation.
 
 // 98MULTi (i386, desktop)
-COMP( 1994, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
 COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -1328,6 +1368,7 @@ COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_note_sta
 // 98NOTE Lavie
 COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1997, pc9821nr166, pc9821nr15,   0, pc9821nr166, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, pc9821nw150, pc9821nr15,   0, pc9821nw150, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nw150 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Light
 // ...

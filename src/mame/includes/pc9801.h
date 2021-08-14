@@ -641,6 +641,7 @@ public:
 
 	void pc9821nr15(machine_config &config);
 	void pc9821nr166(machine_config &config);
+	void pc9821nw150(machine_config &config);
 };
 
 /******************************************
