@@ -405,7 +405,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_72in1",        NES_BMC_72IN1);
 	device.option_add_internal("bmc_76in1",        NES_BMC_76IN1);
 	device.option_add_internal("bmc_s42in1",       NES_BMC_76IN1);
-	device.option_add_internal("bmc_110in1",       NES_BMC_110IN1);
 	device.option_add_internal("bmc_150in1",       NES_BMC_150IN1);
 	device.option_add_internal("bmc_190in1",       NES_BMC_190IN1);
 	device.option_add_internal("bmc_500in1",       NES_BMC_500IN1);

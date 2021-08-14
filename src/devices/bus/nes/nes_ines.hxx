@@ -288,7 +288,7 @@ static const nes_mmc mmc_list[] =
 	{ 252, WAIXING_SGZ },
 	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
 	{ 254, BTL_PIKACHUY2K },
-	{ 255, BMC_110IN1 },
+	{ 255, BMC_72IN1 },
 
 	// NES 2.0
 	// 256 OneBus Famiclones
@@ -513,7 +513,7 @@ static const nes_mmc mmc_list[] =
 	// 550 JY-015 multicart
 	// 551 variant of mapper 178, likely shenghuo, jingkzx, xiaokecq, zgfyun in nes.xml
 	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
-	// { 553, SACHEN_3013 },          // Dong Dong Nao 1
+	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
 	// 555 retroUSB re-release of 1991 Nintendo Campus Challenge
 	// 556 JY-215 multicart
