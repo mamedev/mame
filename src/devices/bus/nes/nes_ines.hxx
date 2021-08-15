@@ -399,7 +399,7 @@ static const nes_mmc mmc_list[] =
 	{ 361, BMC_841101C },
 	// 362 JY-005 multicart
 	// 363 variant of mapper 358?
-	// 364 JY-007, is this ttoons6 in nes.xml?
+	{ 364, BMC_830832C },
 	// 365 is this asderp95 in nes.xml?
 	{ 366, BMC_GN45 },
 	// 367 7-in-1 cart that is a close variant of mapper 205
@@ -431,7 +431,7 @@ static const nes_mmc mmc_list[] =
 	// 393 820720C multicart
 	// 394 Realtec HSK007 multicart
 	// 395 Realtec 8210 multicarts
-	// 396 various JY multicarts
+	{ 396, BMC_850437C },
 	// 397 JY-082 multicart, not in nes.xml?
 	// 398 JY-048 multicart, not in nes.xml?
 	// 399 homebrew game Star Versus
