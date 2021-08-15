@@ -1331,6 +1331,9 @@ COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state, 
 COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// SC-9821A (rebranded MATE A machines with minor differences such as SW power control)
+// ...
+
 // 98MATE [B] (i486, desktop, has GD5428 and no built-in sound)
 // ...
 

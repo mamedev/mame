@@ -17,9 +17,10 @@ license:CC0
 <!--
 
 TODO:
-- test all games and double check support status
-- identify any FDI that has a size bigger than 1265664 (== 3'5" floppy image)
-- document any unorthodox way for running a given sw
+- Verify disk labels, several are mislabeled (i.e. has numbers instead of letters and viceversa);
+- Mark as baddump any SW disk(s) that sports non-default factory saves;
+- identify any FDI that has a size bigger than 1265664 (== 3'5" floppy image);
+- document any unorthodox way for running a given sw;
 - document (and support) alternative file types (FDD, NFD, FIX)
   can we convert some of those to FDI or D88? or some protection schemes need
   such format? (Note that some disks come in DIP, DCP, DCU formats: these shall
@@ -29,6 +30,8 @@ TODO:
 - Remove manufacturer=<unofficial> and instead assign proper manufacturer naming for
   Victor freeware software (+ bad dump flag), bootleg for the PC9801 Game Packs;
 - Identify any software that uses the MAD Factory NAX.EXE driver for Otomi-chan Kai sound board;
+- Find a bulletproof way to anti-virus scan all disks, particularly true for DOS SWs;
+- DIR the Wizard98 disks and understand how they works exactly (those supposedly are cracks for copy protected disks);
 
 -->
 
@@ -2504,16 +2507,21 @@ TODO:
 		</part>
 	</software>
 
-	<software name="38man">
+	<!-- no sound on VM class (regression?) -->
+	<!-- eventually hangs on gameplay with no drawn text -->
+	<!-- loading save box doesn't draw on RS class and UX class (and hangs) -->
+	<!-- TODO: sometimes it throws an error during MEGDOS boot, translate message -->
+	<software name="38man" supported="no">
 		<description>38 Man Kilo no Kokuu</description>
 		<year>1989</year>
 		<publisher>システムサコム (System Sacom)</publisher>
 		<info name="alt_title" value="３８万キロの虚空" />
 		<info name="release" value="198912xx" />
+		<!-- baddump: contains non-factory saves -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="38mank1.fdi" size="1265664" crc="2ff633b4" sha1="c7f4a7b6c7baf944aac85e0786b0f31b95510892" offset="0" />
+				<rom name="38mank1.fdi" size="1265664" crc="2ff633b4" sha1="c7f4a7b6c7baf944aac85e0786b0f31b95510892" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -4142,7 +4150,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="alantia">
+	<!-- boot OK -->
+	<software name="alantia" supported="yes">
 		<description>Alantia</description>
 		<year>1988</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -22012,7 +22021,9 @@ TODO:
 		</part>
 	</software>
 
-	<software name="gods">
+	<!-- "Packed file is corrupt" during boot -->
+	<!-- eventually goes to title screen with no working inputs & selection cursor that keeps switching (related?) -->
+	<software name="gods" supported="no">
 		<description>Gods - Kami to Naru Otoko no Densetsu</description>
 		<year>1992</year>
 		<publisher>ＰＣＭコンプリート (PCM Complete)</publisher>
@@ -22032,7 +22043,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="goh2">
+	<!-- boot OK -->
+	<software name="goh2" supported="yes">
 		<description>Goh II</description>
 		<year>1992</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -22365,6 +22377,7 @@ TODO:
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="ザ・グレイル・ハンター" />
 		<info name="release" value="19941224" />
+		<info name="usage" value="Boot DOS from floppy, insert disk 1 and run INSTALL.EXE" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -28932,8 +28945,9 @@ TODO:
 		</part>
 	</software>
 
-<!-- mixed? -->
-	<software name="mjclinic">
+	<!-- Throws "error code 34" on boot -->
+	<!-- mixed 5'25/3'5 dump? Looks extremely unlikely -->
+	<software name="mjclinic" supported="no">
 		<description>Mahjong Clinic Zoukan-gou</description>
 		<year>1990</year>
 		<publisher>ホームデータ (Home Data)</publisher>
@@ -36351,12 +36365,14 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="proyakfn">
+	<!-- boot OK -->
+	<software name="proyakfn" supported="yes">
 		<description>Pro Yakyu FAN Telenet Stadium</description>
 		<year>1988</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="プロ野球ＦＡＮ テレネットスタジアム" />
 		<info name="release" value="198803xx" />
+		<!-- key mapping: numpad to move, '_' button 1, ':' button 2 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1357680">
 				<rom name="pro yakyu fan telenet stadium (1988)(telenet).d88" size="1357680" crc="0af4321b" sha1="780ac406b24c0b8f33ce1c0b25918f73d1b94ac3" offset="0" />
@@ -36525,16 +36541,19 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="pure">
+	<!-- boot OK -->
+	<software name="pure" supported="yes">
 		<description>Pure</description>
 		<year>1989</year>
 		<publisher>クィーンソフト (Queensoft)</publisher>
 		<info name="alt_title" value="ピュア" />
 		<info name="release" value="19890513" />
+		<!-- baddump: contains non-default saves -->
+		<!-- CONFIG.BAK and AUTOEXEC.BAK seems hotfixes that are left in production? -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1261568">
-				<rom name="pure_a.fdi" size="1261568" crc="21e59c3d" sha1="82aa702c52adbe08e64be0dc4b012526d0a4ad9c" offset="0" />
+				<rom name="pure_a.fdi" size="1261568" crc="21e59c3d" sha1="82aa702c52adbe08e64be0dc4b012526d0a4ad9c" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -38858,9 +38877,11 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="salamand">
-		<description>Salamander</description>
+	<!-- boot OK on RS class -->
+	<software name="salamand" supported="yes">
+		<description>Salamander (v92-03-01)</description>
 		<year>1992</year>
+		<!-- Konami / LOGIN / Gold Cats -->
 		<publisher>Gold Cats</publisher>
 		<info name="alt_title" value="沙羅曼蛇" />
 		<part name="flop1" interface="floppy_5_25">
@@ -43687,7 +43708,9 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="tenkyuh">
+	<!-- boot OK on RS class -->
+	<!-- throws "heap stack over" on VM class (or outright hangs on title screen) -->
+	<software name="tenkyuh" supported="partial">
 		<description>Tenkyuuhai</description>
 		<year>1989</year>
 		<publisher>パンサーソフトウェア (Panther Software)</publisher>
@@ -50819,6 +50842,10 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<!-- Hangs at the main menu -->
+	<!-- Expect upd7220 bitmap port to have bit 3 status (drawing in progress) held high for a bit longer causing the hang. -->
+	<!-- Draws GFX boxes with incorrect doubled height. -->
+	<!-- Eventually hangs after disk swap on gameplay anyway. -->
+	<!-- Uses NAX.EXE -->
 	<software name="deep" supported="no">
 		<description>Deep</description>
 		<year>1994</year>
@@ -50875,7 +50902,9 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="diamondp">
+	<!-- boot OK -->
+	<!-- during a game mouse clicking is too fast (skips intermediate selections) -->
+	<software name="diamondp" supported="partial">
 		<description>Diamond Players</description>
 		<year>1992</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -53050,6 +53079,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- Doesn't display GFXs properly, gameplay is blacked out etc. -->
 	<software name="loopz" supported="no">
 		<description>Loopz</description>
 		<year>1991</year>
@@ -53070,12 +53100,15 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="loopyq">
+	<!-- boot OK -->
+	<software name="loopyq" supported="yes">
 		<description>LoopyQ</description>
 		<year>1992</year>
 		<publisher>日本ソフテック (Nihon Softec)</publisher>
 		<info name="alt_title" value="ルービーＱ" />
 		<info name="release" value="19921119" />
+		<!-- Directions with numpad, 'Z' key to select -->
+		<!-- cfr. bp 10900, (eax & 0xff) != 0 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="loopyq.hdm" size="1261568" crc="5aaf0dc8" sha1="d9720bc05f91354187ff362ceefe43d81234f84d" offset="0" />
@@ -53083,13 +53116,18 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="lotus123" supported="no">
+	<!-- Launching LOTUS.COM and selecting any option except the demo prompts the user for a system or data disk -->
+	<!-- Is this a partial user massaged dump to be autobootable? -->
+	<software name="lotus123" supported="partial">
+		<!-- based off R2.2J according to LOTUS.COM -->
 		<description>Lotus 1-2-3 (Demo)</description>
-		<year>19??</year>
+		<!-- all files sports a 1989 timestamp but AUTOEXEC.BAT (1990-08-02) -->
+		<year>1989?</year>
+		<!-- "Lotus Development Japan Ltd." -->
 		<publisher>Lotus</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="lotus123_demo.hdm" size="1261568" crc="20a570a9" sha1="d74a9dc3564adf145427200faa13521d57a27a22" offset="0" />
+				<rom name="lotus123_demo.hdm" size="1261568" crc="20a570a9" sha1="d74a9dc3564adf145427200faa13521d57a27a22" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -53168,6 +53206,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- Hangs while executing ISD.EXE -->
+	<!-- (r/w I/O ports $d0 and $40, expecting a device to be connected to parallel port?) -->
 	<software name="magicart" supported="no">
 		<description>Magical Art</description>
 		<year>19??</year>
@@ -53201,6 +53241,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<publisher>日本物産 (Nihon Bussan)</publisher>
 		<info name="alt_title" value="麻雀王伝説" />
 		<info name="release" value="19920626" />
+		<!-- TODO: Most likely requires DOS user disk creation like 46okunen -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1329680">
@@ -55538,8 +55579,10 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by peter_j -->
-	<software name="trial4" supported="no">
+	<!-- doesn't boot if launched stand-alone -->
+	<!-- It does from a DOS HDD install with no FM sound -->
+	<!-- confirmed as good by peter_j -->
+	<software name="trial4" supported="partial">
 		<description>Trial of Fours</description>
 		<year>1992</year>
 		<publisher>ウエストサイド (WestSide)</publisher>
@@ -55552,12 +55595,17 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ultrasak">
+	<!-- fails disk swap, even on DOS while installing game -->
+	<!-- Omake: system disk contains a "jafcon92.lzh" in a demo folder -->
+	<software name="ultrasak" supported="no">
 		<description>Ultra Sakusen - Kagaku Tokusoutai Shutsugeki Seyo!</description>
 		<year>1992</year>
 		<publisher>バンプレスト (Banpresto)</publisher>
 		<info name="alt_title" value="ウルトラ作戦 科学特捜隊出撃せよ！" />
 		<info name="release" value="19921208" />
+		<!-- all disks contains a "DID" file with single ASCII byte for identification -->
+		<!-- 0 for System Disk, 1 for Disk 1, 2 for Disk 2 etc. -->
+		<!-- TODO: actual disks comes with story labels -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1261568">
@@ -55565,37 +55613,37 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="a.hdm" size="1261568" crc="8daf39f0" sha1="53a1f3290b2cd07b72fb42eb970b0120106b76fd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="b.hdm" size="1261568" crc="bc7ebede" sha1="b6cc7d3d18198deb918556eaefb422c3f9311148" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="c.hdm" size="1261568" crc="1513def4" sha1="fabc4016c6f38e98a36a6a8b04e9e8b6a21a9599" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="d.hdm" size="1261568" crc="dfa1fbd2" sha1="22bbc1bfcbef5807241a3958a3773c959948b209" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="e.hdm" size="1261568" crc="553015ef" sha1="085e87a73ccc767ff157e0ef8342fc2dd3a69217" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="f.hdm" size="1261568" crc="1e0680ce" sha1="52fb9ecd5edab9c8f653330699849ad075344cbb" offset="0" />
 			</dataarea>
@@ -57776,16 +57824,19 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="dennoga3">
+	<!-- boot OK -->
+	<software name="dennoga3" supported="yes">
 		<description>Cybernetic Hi-School / Dennou Gakuen III - Top wo Nerae!</description>
 		<year>1990</year>
+		<!-- Bandai/Victor/Gainax -->
 		<publisher>ガイナックス (Gainax)</publisher>
 		<info name="alt_title" value="電脳学園３ トップをねらえ！" />
 		<info name="release" value="19900324" />
+		<!-- baddump: contains non-factory save -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1143804">
-				<rom name="denno gakuen 3 (1990)(gainax)(disk 1 of 4)(disk a).fdd" size="1143804" crc="cd97dbbd" sha1="8c44093cd8a303dfe764f675444a8259cc144d35" offset="0" />
+				<rom name="denno gakuen 3 (1990)(gainax)(disk 1 of 4)(disk a).fdd" size="1143804" crc="cd97dbbd" sha1="8c44093cd8a303dfe764f675444a8259cc144d35" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -61402,7 +61453,9 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="jastrike" supported="no">
+	<!-- boot OK -->
+	<!-- TODO: is mouse input supposed to work on gameplay too? -->
+	<software name="jastrike" supported="partial">
 		<description>Metal Mover Jastrike</description>
 		<year>1995</year>
 		<publisher>アップルパイ／コーヒーぶれいく (Apple Pie / Coffee Break)</publisher>
@@ -66957,7 +67010,8 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="smajokko">
+	<!-- boot OK -->
+	<software name="smajokko" supported="yes">
 		<description>Dai-2-Ji Super Majokko Taisen</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -68957,9 +69011,11 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="yukoanat">
+	<!-- boot OK -->
+	<software name="yukoanat" supported="yes">
 		<description>Youko to Anata - Hard Porno Soft</description>
-		<year>19??</year>
+		<!-- Latest file has a timestamp of 1988-12-24, may be released in '89 -->
+		<year>1988?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="ようことあなた" />
 		<info name="author" value="OPC Soft" />
@@ -69546,7 +69602,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 	</software>
 
 	<!-- "Presented by Splush Wave" then hard crashes machine -->
-	<!-- It actually checks for the presence of PCM.TBL, which is provided by the Otomi-chan Kai install disks (undumped) -->
+	<!-- Uses NAX.EXE, and it actually checks for the presence of PCM.TBL, which is provided by the Otomi-chan Kai install disks (undumped) -->
 	<!-- boot otherwise with the provided instructions with no voice samples -->
 	<software name="datsumj" supported="partial">
 		<description>Datsui Mahjong Margarita</description>

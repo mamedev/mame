@@ -45,6 +45,7 @@
 		  have key repeat support? Later BIOSes actually have strings for an extended menu
 		  with 3 or 4 pages strings, may be also requiring a jump/bankswitch to unmapped area?
 		- Expose SDIP to an actual device_nvram_interface;
+		- Derive defaults off what the model sets up at POST;
 	- clean-up functions/variables naming by actual documentation nomenclature;
     - derive machine configs & romsets by actual default options, examples:
 		- 3.5 built-in floppy drives vs. default 5.25;
@@ -1509,8 +1510,7 @@ uint8_t pc9801_state::dma_read_byte(offs_t offset)
 		}
 	}
 
-//  logerror("%08x\n",addr);
-
+//	logerror("%08x %02x\n",addr, m_dma_access_ctrl);
 	return program.read_byte(addr);
 }
 
@@ -1534,7 +1534,7 @@ void pc9801_state::dma_write_byte(offs_t offset, uint8_t data)
 				break;
 		}
 	}
-//  logerror("%08x %02x\n",addr,data);
+//	logerror("%08x %02x %02x\n",addr,data, m_dma_access_ctrl);
 
 	program.write_byte(addr, data);
 }
@@ -1672,14 +1672,22 @@ u8 pc9801_state::mouse_freq_r(offs_t offset)
 void pc9801_state::mouse_freq_w(offs_t offset, u8 data)
 {
 	// Port unavailable on PC-9871 1st gen & PC-9871/K, PC-9801F3, PC-9801M2, PC-9801M3
-	// Has hardcoded HW switch for changing the timing instead
+	// Some if not all of those have hardcoded HW switch for changing the timing instead
 	/*
 	 * xxxx xx-- mouse irq cycle setting (edge selection?)
 	 * 0000 10-- ^ set on POST
 	 * 0000 00-- ^ set by MS-DOS 6.20
+	 * 0010 0111 ^ jastrike (main menu)
+	 * 1010 0100 ^ jastrike (gameplay)
 	 * ---- --xx mouse irq frequency setting (120 >> x) Hz
 	 */
 	logerror("%s: mouse $bfdb register write %02x\n",machine().describe_context(), data);
+
+	// jastrike definitely don't intend to write to frequency too when
+	// feeding 0x27/0xa* values at PC=156ec
+	// (without this options menu barely detects any mouse input)
+	if (data & 0xfc)
+		return;
 
 	m_mouse.freq_reg = data & 3;
 	m_mouse.freq_index = 0;
@@ -2720,7 +2728,8 @@ COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801_state, init_pc9
 
 // PC-H98 (Hyper 98, '90-'93 high end line with High-reso, proprietary NESA bus, E²GC)
 // PC-H98T (LCD Hyper 98)
-// SV-H98 "98SERVER" (Later Hyper 98 revision, up to Pentium CPU)
+// SV-H98 "98SERVER" (i486, later Hyper 98 revision)
+// SV-98 (Pentium based, second gen of 98SERVER)
 // OP-98 ("Office Processor", released around '91. Reports claims to be H98-like, with extra connectivity with NEC 7200 workstation)
 // ...
 
