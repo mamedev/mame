@@ -115,6 +115,8 @@ void heromem_state::maincpu_prg_map(address_map &map)
 	map(0xf201, 0xf201).rw("tc0140syt_l", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xf300, 0xf300).w("tc0140syt_r", FUNC(tc0140syt_device::master_port_w));
 	map(0xf301, 0xf301).rw("tc0140syt_r", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0xf400, 0xf403).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf500, 0xf50f).rw("io", FUNC(te7751_device::read), FUNC(te7751_device::write));
 	// TODO: lots more writes
 }
 
@@ -218,7 +220,7 @@ void heromem_state::heromem(machine_config &config)
 
 	I8255(config, "ppi"); // MB89255B
 
-	TE7750(config, "io"); // TE7751
+	TE7751(config, "io");
 
 	// video hardware
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER)); // all wrong
@@ -299,8 +301,8 @@ ROM_START( heromem )
 	ROM_REGION( 0x200000, "tc0091lvc_l:gfx", 0 ) // marked LV-CHR0-3 on PCB (LV probably stands for left video)
 	ROM_LOAD16_BYTE( "e34-08.ic41", 0x000000, 0x80000, CRC(a8c572f8) SHA1(f98de6a9eaa49e037f02f9e56da9edbebc535cd7) )
 	ROM_LOAD16_BYTE( "e34-09.ic43", 0x000001, 0x80000, CRC(2c8849b7) SHA1(090ab881b0a98b8b1522282f46b70edeb83681d9) )
-	ROM_LOAD16_BYTE( "e34-10.ic42", 0x080000, 0x80000, CRC(e7986216) SHA1(43fea3f1c80f9e7e051e9321d8d28e9ce5ae22f3) )
-	ROM_LOAD16_BYTE( "e34-11.ic44", 0x080001, 0x80000, CRC(4da5904d) SHA1(280a63444af25d143c7543607cd942d0ffc33a56) )
+	ROM_LOAD16_BYTE( "e34-10.ic42", 0x100000, 0x80000, CRC(e7986216) SHA1(43fea3f1c80f9e7e051e9321d8d28e9ce5ae22f3) )
+	ROM_LOAD16_BYTE( "e34-11.ic44", 0x100001, 0x80000, CRC(4da5904d) SHA1(280a63444af25d143c7543607cd942d0ffc33a56) )
 
 	ROM_REGION( 0x80000, "tc0091lvc_r", 0 )
 	ROM_LOAD( "e34-07.ic54", 0x00000, 0x80000, CRC(7f4d2664) SHA1(6d249f1e5f341da5923b45c2863ee418bb057586) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
@@ -308,8 +310,8 @@ ROM_START( heromem )
 	ROM_REGION( 0x200000, "tc0091lvc_r:gfx", 0 ) // marked RV-CHR0-3 on PCB (RV probably stands for right video)
 	ROM_LOAD16_BYTE( "e34-08.ic55", 0x000000, 0x80000, CRC(a8c572f8) SHA1(f98de6a9eaa49e037f02f9e56da9edbebc535cd7) )
 	ROM_LOAD16_BYTE( "e34-09.ic57", 0x000001, 0x80000, CRC(2c8849b7) SHA1(090ab881b0a98b8b1522282f46b70edeb83681d9) )
-	ROM_LOAD16_BYTE( "e34-10.ic56", 0x080000, 0x80000, CRC(e7986216) SHA1(43fea3f1c80f9e7e051e9321d8d28e9ce5ae22f3) )
-	ROM_LOAD16_BYTE( "e34-11.ic58", 0x080001, 0x80000, CRC(4da5904d) SHA1(280a63444af25d143c7543607cd942d0ffc33a56) )
+	ROM_LOAD16_BYTE( "e34-10.ic56", 0x100000, 0x80000, CRC(e7986216) SHA1(43fea3f1c80f9e7e051e9321d8d28e9ce5ae22f3) )
+	ROM_LOAD16_BYTE( "e34-11.ic58", 0x100001, 0x80000, CRC(4da5904d) SHA1(280a63444af25d143c7543607cd942d0ffc33a56) )
 
 	ROM_REGION( 0x200000, "ym_l:adpcma", 0 ) // marked LS-PCM0 to LS-PCM3 on PCB (LS probably stands for left sound), same ROM content for the two YMs
 	ROM_LOAD( "e34-12.ic29", 0x000000, 0x80000, CRC(7bb1f476) SHA1(c06c27a2c59953f9ff1eb7679257970fd9c346a3) )

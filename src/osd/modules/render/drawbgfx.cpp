@@ -174,8 +174,6 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	return wmi.info.cocoa.window;
 #   elif BX_PLATFORM_WINDOWS
 	return wmi.info.win.window;
-#   elif BX_PLATFORM_STEAMLINK
-	return wmi.info.vivante.window;
 #   elif BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_ANDROID
 	return nullptr;
 #   endif // BX_PLATFORM_
@@ -200,9 +198,6 @@ inline bool sdlSetWindow(SDL_Window* _window)
 #   elif BX_PLATFORM_WINDOWS
 	pd.ndt          = NULL;
 	pd.nwh          = wmi.info.win.window;
-#   elif BX_PLATFORM_STEAMLINK
-	pd.ndt          = wmi.info.vivante.display;
-	pd.nwh          = wmi.info.vivante.window;
 #   endif // BX_PLATFORM_
 	pd.context      = NULL;
 	pd.backBuffer   = NULL;

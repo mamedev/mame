@@ -198,7 +198,7 @@ ROM_START( minisupf )
 	ROM_LOAD( "mini_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) )
 ROM_END
 
-// Cirsa PCB 810702 A. The 8155 was missing on this PCB, but probably it was just removed for reusing it elsewhere.
+// Cirsa PCB 810702 A
 ROM_START( luckyplr )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "lucky_player_24.a", 0x0000, 0x1000, CRC(11a3daf2) SHA1(239d2e53f05eecfcbc0cf5e037df21e3851e4d69) )

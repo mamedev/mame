@@ -113,7 +113,7 @@ struct hng64_poly_data
 
 class hng64_state;
 
-class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>
+class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7>
 {
 public:
 	hng64_poly_renderer(hng64_state& state);

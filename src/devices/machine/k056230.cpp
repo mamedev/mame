@@ -56,7 +56,7 @@ uint8_t k056230_device::read(offs_t offset)
 		{
 			return 0x08;
 		}
-		case 1:		// CRC Error register
+		case 1:     // CRC Error register
 		{
 			return 0x00;
 		}
@@ -80,7 +80,7 @@ void k056230_device::write(offs_t offset, uint8_t data)
 			if(data & 0x20)
 			{
 				if (m_cpu)
-					m_cpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);			
+					m_cpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			if ((data & 1) == 0)
 			{

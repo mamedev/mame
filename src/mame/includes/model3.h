@@ -78,11 +78,11 @@ struct model3_polydata
 
 class model3_state;
 
-class model3_renderer : public poly_manager<float, model3_polydata, 6, 50000>
+class model3_renderer : public poly_manager<float, model3_polydata, 6>
 {
 public:
 	model3_renderer(running_machine &machine, int width, int height)
-		: poly_manager<float, model3_polydata, 6, 50000>(machine)
+		: poly_manager<float, model3_polydata, 6>(machine)
 	{
 		m_fb = std::make_unique<bitmap_rgb32>(width, height);
 		m_zb = std::make_unique<bitmap_ind32>(width, height);

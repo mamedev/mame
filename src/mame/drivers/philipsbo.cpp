@@ -13,7 +13,7 @@
 #include "machine/am79c90.h"
 #include "machine/hd63450.h"
 #include "machine/mc68681.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80scc.h"
@@ -36,7 +36,7 @@ public:
 		, m_scc(*this, "scc")
 		, m_rs232(*this, "rs232%u", 0U)
 		, m_fdc(*this, "fdc")
-		, m_hdc(*this, "scsi:7:ncr5380n")
+		, m_hdc(*this, "scsi:7:ncr5380")
 		, m_dmac(*this, "dmac")
 		, m_lance(*this, "lance")
 		, m_main_ram_share(*this, "main_ram")
@@ -57,7 +57,7 @@ protected:
 	required_device<scc85c30_device> m_scc;
 	required_device_array<rs232_port_device, 2> m_rs232;
 	required_device<mb8877_device> m_fdc;
-	required_device<ncr5380n_device> m_hdc;
+	required_device<ncr5380_device> m_hdc;
 	required_device<hd63450_device> m_dmac;
 	required_device<am7990_device> m_lance;
 	required_shared_ptr<uint16_t> m_main_ram_share;
@@ -83,7 +83,7 @@ void pbo_state::main_map(address_map &map)
 	map(0xfa0000, 0xfa0007).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)).umask16(0x00ff);
 	map(0xfa0011, 0xfa0011).w(FUNC(pbo_state::floppy_select_w));
 	map(0xfa0030, 0xfa0037).rw(m_scc, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w)).umask16(0x00ff);
-	map(0xfa8400, 0xfa840f).rw(m_hdc, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
+	map(0xfa8400, 0xfa840f).rw(m_hdc, FUNC(ncr5380_device::read), FUNC(ncr5380_device::write)).umask16(0x00ff);
 	map(0xfa0100, 0xfa0101).r(FUNC(pbo_state::fa0101_read)).umask16(0x00ff);
 }
 
@@ -220,8 +220,8 @@ void pbo_state::pbo(machine_config &config)
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2)); // Guesses
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50)); // Guesses
 	m_dmac->irq_callback().set(FUNC(pbo_state::dma_irq_w));
-	//m_dmac->dma_read<0>().set(m_hdc, FUNC(ncr5380n_device::dma_r));
-	//m_dmac->dma_write<0>().set(m_hdc, FUNC(ncr5380n_device::dma_w));
+	//m_dmac->dma_read<0>().set(m_hdc, FUNC(ncr5380_device::dma_r));
+	//m_dmac->dma_write<0>().set(m_hdc, FUNC(ncr5380_device::dma_w));
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8); // Unknown clock
 	//m_fdc->set_force_ready(true);
@@ -239,10 +239,10 @@ void pbo_state::pbo(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", pbo_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", pbo_scsi_devices, nullptr);
 
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380n", NCR5380N).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380).machine_config(
 		[this](device_t *device)
 		{
-			ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
+			ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
 
 			adapter.irq_handler().set(*this, FUNC(pbo_state::scsi_irq_w));
 		});

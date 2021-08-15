@@ -104,7 +104,6 @@ Joou-sama ga Oshiete Ageru: Kanji no Gakushuu                       Nikkonren Ki
 Joou-sama ga Oshiete Ageru: Rekishi Nengou: Eitango 600             Nikkonren Kikaku                  1994/7     FD
 Jouhou Kiso Lunch Box                                               Uchida Youkou                     1994/3     FD×04
 JPEG Support Library V2.1                                           Fujitsu                           1993/1     FD
-Kakeibo + Fukubukuro                                                Cosmos Computer                   1989/11    FD×02
 Kakikomi Jiyuu na Gakushuu Note                                     Nihon Kyouiku Shinbunsha          1992/5     FD
 Kakitaoshi Ver 2.0                                                  Nikkonren Kikaku                  1993/?     FD
 Kanji Match                                                         Tokyo Shoseki                     1993/4     FD
@@ -223,10 +222,8 @@ Towns Drill Shougaku Sansuu 2-nen Gear V2.1                         Kyouiku Soft
 Towns Drill Shougaku Sansuu 3-nen Gear V1.1L20                      Kyouiku Soft Kenkyuusho           1992/3     FD
 Towns Drill Shougaku Sansuu 3-nen Gear V2.1                         Kyouiku Soft Kenkyuusho           1989/9     FD
 Towns Drill Shougaku Sansuu 4-nen Gear V1.1L20                      Kyouiku Soft Kenkyuusho           1992/3     FD
-Towns Drill Shougaku Sansuu 4-nen Gear V2.1                         Kyouiku Soft Kenkyuusho           1989/9     FD
 Towns Drill Shougaku Sansuu 4-nen~6-nen                             Kyouiku Soft Kenkyuusho           1994/3     FD×03
 Towns Drill Shougaku Sansuu 5-nen Gear V1.1L20                      Kyouiku Soft Kenkyuusho           1992/3     FD
-Towns Drill Shougaku Sansuu 5-nen Gear V2.1                         Kyouiku Soft Kenkyuusho           1990/2     FD
 Towns Drill Shougaku Sansuu 6-nen Gear V1.1L20                      Kyouiku Soft Kenkyuusho           1992/3     FD
 Towns Drill Shougaku Sansuu 6-nen Gear V2.1                         Kyouiku Soft Kenkyuusho           1990/2     FD
 Towns Hair Simulator: Hair Maker Towns                              Computer System                   1991/12    FD×10
@@ -332,6 +329,19 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
 				<rom name="asuka120_disk_c.hdm" size="1261568" crc="ac9a582e" sha1="726b05d573e0776006cee6aa8c71009b1e66b5cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ayumihint">
+		<description>Ayumi-chan Monogatari Hint Disk</description>
+		<year>1993</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="あゆみちゃん物語ヒントディスク" />
+		<info name="usage" value="Boot from the Ayumi-chan Monogatari CD with this disk inserted instead of the normal startup disk"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="ayumi-chan_monogatari_hint_disk.hdm" size="1261568" crc="5a408219" sha1="2a794ea767affb47d95812b217153517ce301289"/>
 			</dataarea>
 		</part>
 	</software>
@@ -592,6 +602,118 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
+	<!-- Runs too fast -->
+	<software name="dpssg2" supported="partial">
+		<description>D.P.S SG 2 - Dream Program System SG Set 2</description>
+		<year>1991</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="release" value="199104xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dream program system sg set 2 (disk 1 - system).hdm" size="1261568" crc="525e09d5" sha1="a3f06b510030f1a1885c24eb7c3ae3b61678d0c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Antique House" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dream program system sg set 2 (disk 2 - antique house).hdm" size="1261568" crc="d8acfb80" sha1="3738e56fd64275db692acbcb4e1dc8bcc004034c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Akai Yoru" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dream program system sg set 2 (disk 3 - akai yoru).hdm" size="1261568" crc="056ce9a1" sha1="995eff863368220b1ff679979ea0b70b75bf1c22"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Ikenai Naika Kenshin Futatabi" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dream program system sg set 2 (disk 4 - ikenai naika kenshin futatabi).hdm" size="1261568" crc="8e7df733" sha1="4830294b8fa1196391ca96cdd6ae78b68b0ec751"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Runs too fast -->
+	<software name="dpssg3" supported="partial">
+		<description>D.P.S SG 3 - Dream Program System SG Set 3</description>
+		<year>1991</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="release" value="199111xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dream program system sg set 3 (disk 1 - system).hdm" size="1261568" crc="9133028a" sha1="a344c08dfe37f8da333eee2f2f85a538ffa00e62"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Sotsugyou" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dream program system sg set 3 (disk 2 - sotsugyou).hdm" size="1261568" crc="d2132d93" sha1="bc949f2b56fdacb61cc4799da57dc9691f134e7c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Rabbit P4P" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dream program system sg set 3 (disk 3 - rabbit p4p).hdm" size="1261568" crc="eeadc748" sha1="80fd11fefde38b4abcbce95dbe2042d5016c8c06"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Shinkonsan Monogatari" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dream program system sg set 3 (disk 4 - shinkonsan monogatari).hdm" size="1261568" crc="868fe008" sha1="0f3a452e4614cf5f1c72ee5a31fa678b3f059a84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drill4">
+		<description>Towns Drill - Shougaku Sansuu Series - Sansuu 4-nen (TownsGEAR V2.1 version)</description>
+		<year>1992</year>
+		<publisher>教育ソフト研究所 (Kyouiku Soft Kenkyuusho)</publisher>
+		<info name="alt_title" value="ＴＯＷＮＳドリル　小学算数シリーズ　算数４年" />
+		<info name="usage" value="Requires 2 MB RAM. Run TownsGEAR V2.1 and switch the active drive to A: to start the software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="towns_drill_shougaku_sansuu_4-nen_gear_v2.1.hdm" size="1261568" crc="2dcbb79b" sha1="81de3ed14da4ca341594072ee21ac95cf0d0ff9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drill5">
+		<description>Towns Drill - Shougaku Sansuu Series - Sansuu 5-nen (TownsGEAR V2.1 version)</description>
+		<year>1992</year>
+		<publisher>教育ソフト研究所 (Kyouiku Soft Kenkyuusho)</publisher>
+		<info name="alt_title" value="ＴＯＷＮＳドリル　小学算数シリーズ　算数５年" />
+		<info name="usage" value="Requires 2 MB RAM. Run TownsGEAR V2.1 and switch the active drive to A: to start the software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="towns_drill_shougaku_sansuu_5-nen_gear_v2.1.hdm" size="1261568" crc="6eb42679" sha1="25ebbc26a0affb3b62d5df80187728e12727023c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- For some reason, it needs to have a CD inserted in the drive (any CD with a data track will work), or it will hang -->
+	<software name="drstop">
+		<description>Dr. Stop!</description>
+		<year>1990</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="release" value="199204xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dr. stop (disk a).hdm" size="1261568" crc="622bc757" sha1="7b0e12a71c8b531ac355d733239d72a4223a5bd6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dr. stop (disk b).hdm" size="1261568" crc="faf6169c" sha1="c1cf3ecbcda6da2e581b0b00f481abef33c0c626"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!--
 	All disks contain an additional track.
 
@@ -749,6 +871,28 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="jissen_igo_taikyoku_gokichi-kun_chuukyuu_jou_disk_b.hdm" size="1261568" crc="f833ae7a" sha1="ff3ed44ae9ff071f37b1fd107c5c7a366c32fae4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kakefuku">
+		<description>Kakeibo + Fukubukuro - Wagaya no Benrichou Vol. 1</description>
+		<year>1989</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<info name="alt_title" value="家計簿+福袋　わが家の便利帳 vol.1" />
+		<info name="release" value="198911xx" />
+		<info name="usage" value="These programs require the F-BASIC386 V1.1 interpreter. Boot from the F-BASIC386 CD, then insert one of the disks and load/run A.BAS for Kakeibo, or B.BAS for Fukubukuro."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Kakeibo" />
+			<dataarea name="flop" size="3430257">
+				<!-- Sector 7 of track 66 head 1 has a wrong CRC value. It's unclear if this is intentional (protection) or a damaged disk. A redump would be welcome. -->
+				<rom name="kakeibo.mfm" size="3430257" crc="355f3e82" sha1="64f1e2bcfd8a924ff225e66787814667cb83f235" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Fukubukuro" />
+			<dataarea name="flop" size="1261568">
+				<rom name="fukubukuro.hdm" size="1261568" crc="034f84cf" sha1="d6a0adcf46090a59fc3750537590c2bb5ff4463b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1305,6 +1449,132 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
+	<software name="rance">
+		<description>Rance - Hikari o Motomete</description>
+		<year>1990</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="ランス 光をもとめて" />
+		<info name="release" value="199003xx" />
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="rance - hikari o motomete (disk 1).hdm" size="1261568" crc="7b5d9e5a" sha1="72bf8559cbeeb717d642b86ffd9c490f2cd62d40"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="rance - hikari o motomete (disk 2).hdm" size="1261568" crc="d7363c2d" sha1="4d180fca874338f5a9731a21141e7e98eee7f87e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="rance - hikari o motomete (disk 3).hdm" size="1261568" crc="0d1d959a" sha1="8a412c2e7668bd6a764b95e51a09137e373cea9c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="rance - hikari o motomete (disk 4).hdm" size="1261568" crc="365710d6" sha1="42b014827762ac70edb6a7f0d235b4fc37f623a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rance2">
+		<description>Rance 2 - Hangyaku no Shoujo-tachi</description>
+		<year>1990</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="ランス２ 反逆の少女たち" />
+		<info name="release" value="199006xx" />
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance 2 - hangyaku no shoujotachi (disk a).hdm" size="1261568" crc="6a6e9ef0" sha1="c4fdb444e042e1e99327f1afb85e62070464b838"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance 2 - hangyaku no shoujotachi (disk b).hdm" size="1261568" crc="116f4cd2" sha1="5d1acf08309a3c33b2578d1d608d73122c2029d0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance 2 - hangyaku no shoujotachi (disk c).hdm" size="1261568" crc="18c701c0" sha1="5379383e7acebc189712e3cb4cfc8a5dfda37f4c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance 2 - hangyaku no shoujotachi (disk d).hdm" size="1261568" crc="4657f014" sha1="ff5ae040d04383a8c5f19cc2d665877056f4fed0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance 2 - hangyaku no shoujotachi (disk e).hdm" size="1261568" crc="446c28e8" sha1="cdcb1c27b7a6dcaa091176e0522a28daa188b222"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance 2 - hangyaku no shoujotachi (disk f).hdm" size="1261568" crc="c5b0b6bd" sha1="76eec3eec751007c690e36045b6bcf390acb99c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rance2hint">
+		<description>Rance 2 Hint Disk</description>
+		<year>1990</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="ランス２ヒントＤｉｓｋ" />
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2. Boot from this disk with Rance 2 Disk B on the second drive."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance2_hint_disk.hdm" size="1261568" crc="607015ae" sha1="ee2e8a41c8ef3766a325b02a15efab85299576bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rance4demo">
+		<description>Rance IV Demonstration Disk</description>
+		<year>1993</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="usage" value="Boot from the Ayumi-chan Monogatari CD with this disk inserted instead of the normal startup disk"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="rance_4_demo.hdm" size="1261568" crc="0b1db400" sha1="e6ce4b08e7d8c602e08d9b9ccde1460f69521d7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rance4opt">
+		<description>Rance IV Option Disk</description>
+		<year>1994</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="ランス４オプションＤＩＳＫ" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance4_option_disk_a.hdm" size="1261568" crc="cd379f22" sha1="03efcf1ee53d0d8c407fdd96fa77a426ec64ee2b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance4_option_disk_b.hdm" size="1261568" crc="6643b519" sha1="bc62213fc3ae5137bc78288fc2513959ff92f921"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="rance4_option_disk_c.hdm" size="1261568" crc="c0f5f821" sha1="25a37cb934a97ebbb5cd4b33bc74b1590fb6442a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="reira">
 		<description>Reira</description>
 		<year>1994</year>
@@ -1425,6 +1695,50 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
+	<software name="superdps">
+		<description>Super D.P.S.</description>
+		<year>1992</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="release" value="199209xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="super d.p.s. (disk 1 - system).hdm" size="1261568" crc="af618979" sha1="bfaf62b06e25f92a731a76208ab8bf69d6ac965a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Maria to Kanpan" />
+			<dataarea name="flop" size="1261568">
+				<rom name="super d.p.s. (disk 2 - maria to kanpan a).hdm" size="1261568" crc="5c762738" sha1="f09d00215967e015258e7bde7fb22094927d0a17"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Kaizoku Kagyou Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="super d.p.s. (disk 3 - kaizoku kagyou a).hdm" size="1261568" crc="2728576a" sha1="406741790efc9106a7b51df07035d49d78015db2"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Kaizoku Kagyou Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="super d.p.s. (disk 4 - kaizoku kagyou b).hdm" size="1261568" crc="dc71038d" sha1="245001245db86d8631c74c2e4378c0e7b0de97c3"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Tonoo no Mori Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="super d.p.s. (disk 5 - toono no mori a).hdm" size="1261568" crc="fd1011f4" sha1="e16fa1a641eb4d9448c9bc37639896ae355e1cdd"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Tonoo no Mori Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="super d.p.s. (disk 6 - toono no mori b).hdm" size="1261568" crc="78ae11c6" sha1="8410d7c8932eb94178d821d93afd6ce3f03b0c00"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sweetang">
 		<description>Sweet Angel</description>
 		<year>1992</year>
@@ -1486,9 +1800,13 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
-	<!-- Runs too fast -->
+	<!--
+	    Runs too fast.
+	    Both versions of Toushin Toshi have been dumped from original disks. The newer set only differs in a small amount of text just after
+	    the boot sector of disks A and E ("90.12.10ｶﾞｲﾁｭｳ"). No other changes are present.
+	-->
 	<software name="toshinto" supported="partial">
-		<description>Toushin Toshi</description>
+		<description>Toushin Toshi (1990-12-10)</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="闘神都市" />
@@ -1497,43 +1815,94 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk a).hdm" size="1261568" crc="f60163e6" sha1="07a98fe3abf515ebada8c2f29d54d6bd43ed6e7d"/>
+				<rom name="toushin_toshi_1990-12-10_disk_a.hdm" size="1261568" crc="f60163e6" sha1="07a98fe3abf515ebada8c2f29d54d6bd43ed6e7d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk b).hdm" size="1261568" crc="092e59ef" sha1="509adda6a0260e2da433af8305f6c360175fd5e2"/>
+				<rom name="toushin_toshi_disk_b.hdm" size="1261568" crc="092e59ef" sha1="509adda6a0260e2da433af8305f6c360175fd5e2"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk c).hdm" size="1261568" crc="ff4377b2" sha1="0ea45b4a9cf6be8bcabe394c46fab6fb96497d4f"/>
+				<rom name="toushin_toshi_disk_c.hdm" size="1261568" crc="c5ccec45" sha1="b8139927fbb394bb710023cabda8dbed130491ad"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk d).hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90"/>
+				<rom name="toushin_toshi_disk_d.hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk e).hdm" size="1261568" crc="5e0b762d" sha1="a256a0c8117ea84edbe66b19f3337752d31781c7"/>
+				<rom name="toushin_toshi_1990-12-10_disk_e.hdm" size="1261568" crc="5e0b762d" sha1="a256a0c8117ea84edbe66b19f3337752d31781c7"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk f).hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f"/>
+				<rom name="toushin_toshi_disk_f.hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk G" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk g).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
+				<rom name="toushin_toshi_disk_g.hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toshintoo" cloneof="toshinto" supported="partial">
+		<description>Toushin Toshi (1990-12-07)</description>
+		<year>1991</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="闘神都市" />
+		<info name="release" value="199012xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="toushin_toshi_1990-12-07_disk_a.hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="toushin_toshi_disk_b.hdm" size="1261568" crc="092e59ef" sha1="509adda6a0260e2da433af8305f6c360175fd5e2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="toushin_toshi_disk_c.hdm" size="1261568" crc="c5ccec45" sha1="b8139927fbb394bb710023cabda8dbed130491ad"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="toushin_toshi_disk_d.hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="toushin_toshi_1990-12-07_disk_e.hdm" size="1261568" crc="e7511be5" sha1="efda6d406431ac838acc50d18a0aa05d63782bd5"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F" />
+			<dataarea name="flop" size="1261568">
+				<rom name="toushin_toshi_disk_f.hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk G" />
+			<dataarea name="flop" size="1261568">
+				<rom name="toushin_toshi_disk_g.hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
 			</dataarea>
 		</part>
 	</software>

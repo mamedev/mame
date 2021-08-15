@@ -1706,7 +1706,7 @@ void validity_checker::validate_roms(device_t &root)
 //  analog input field
 //-------------------------------------------------
 
-void validity_checker::validate_analog_input_field(ioport_field &field)
+void validity_checker::validate_analog_input_field(const ioport_field &field)
 {
 	// analog ports must have a valid sensitivity
 	if (field.sensitivity() == 0)
@@ -1787,7 +1787,7 @@ void validity_checker::validate_analog_input_field(ioport_field &field)
 //  setting
 //-------------------------------------------------
 
-void validity_checker::validate_dip_settings(ioport_field &field)
+void validity_checker::validate_dip_settings(const ioport_field &field)
 {
 	const char *demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
 	const char *flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
@@ -1795,30 +1795,31 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 	bool coin_error = false;
 
 	// iterate through the settings
-	for (ioport_setting &setting : field.settings())
+	for (auto setting = field.settings().begin(); field.settings().end() != setting; ++setting)
 	{
 		// note any coinage strings
-		int strindex = get_defstr_index(setting.name());
+		int strindex = get_defstr_index(setting->name());
 		if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end)
 			coin_list[strindex - __input_string_coinage_start] = 1;
 
 		// make sure demo sounds default to on
-		if (field.name() == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting.value())
+		if (field.name() == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting->value())
 			osd_printf_error("Demo Sounds must default to On\n");
 
 		// check for bad demo sounds options
 		if (field.name() == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			osd_printf_error("Demo Sounds option must be Off/On, not %s\n", setting.name());
+			osd_printf_error("Demo Sounds option must be Off/On, not %s\n", setting->name());
 
 		// check for bad flip screen options
 		if (field.name() == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting.name());
+			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name());
 
 		// if we have a neighbor, compare ourselves to him
-		if (setting.next() != nullptr)
+		auto const nextsetting = std::next(setting);
+		if (field.settings().end() != nextsetting)
 		{
 			// check for inverted off/on dispswitch order
-			int next_strindex = get_defstr_index(setting.next()->name(), true);
+			int next_strindex = get_defstr_index(nextsetting->name(), true);
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
 				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", field.name());
 
@@ -1832,9 +1833,9 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 
 			// check for proper coin ordering
 			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
-						strindex >= next_strindex && setting.condition() == setting.next()->condition())
+						strindex >= next_strindex && setting->condition() == nextsetting->condition())
 			{
-				osd_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting.name(), setting.next()->name());
+				osd_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting->name(), nextsetting->name());
 				coin_error = true;
 			}
 		}
@@ -1856,7 +1857,7 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 //  stored within an ioport field or setting
 //-------------------------------------------------
 
-void validity_checker::validate_condition(ioport_condition &condition, device_t &device)
+void validity_checker::validate_condition(const ioport_condition &condition, device_t &device)
 {
 	// resolve the tag, then find a matching port
 	if (m_ioport_set.find(device.subtag(condition.tag())) == m_ioport_set.end())
@@ -1916,7 +1917,7 @@ void validity_checker::validate_inputs(device_t &root)
 			}
 
 			// iterate through the fields on this port
-			for (ioport_field &field : port.second->fields())
+			for (ioport_field const &field : port.second->fields())
 			{
 				// verify analog inputs
 				if (field.is_analog())
@@ -1973,7 +1974,7 @@ void validity_checker::validate_inputs(device_t &root)
 					validate_condition(field.condition(), device);
 
 				// verify conditions on the settings
-				for (ioport_setting &setting : field.settings())
+				for (ioport_setting const &setting : field.settings())
 					if (!setting.condition().none())
 						validate_condition(setting.condition(), device);
 

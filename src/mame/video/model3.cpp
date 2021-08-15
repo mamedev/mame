@@ -2063,14 +2063,14 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 
 			if (tri->param & TRI_PARAM_ALPHA_TEST)
 			{
-				render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_contour, this), 5, v[0], v[1], v[2]);
+				render_triangle<5>(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_contour, this), v[0], v[1], v[2]);
 			}
 			else
 			{
 				if (tri->param & TRI_PARAM_COLOR_MOD)
-					render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_colormod, this), 5, v[0], v[1], v[2]);
+					render_triangle<5>(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_colormod, this), v[0], v[1], v[2]);
 				else
-					render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex, this), 5, v[0], v[1], v[2]);
+					render_triangle<5>(cliprect, render_delegate(&model3_renderer::draw_scanline_tex, this), v[0], v[1], v[2]);
 			}
 		}
 		else
@@ -2086,7 +2086,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 			model3_polydata &extra = object_data_alloc();
 			extra.color = tri->color;
 
-			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_solid, this), 2, v[0], v[1], v[2]);
+			render_triangle<2>(cliprect, render_delegate(&model3_renderer::draw_scanline_solid, this), v[0], v[1], v[2]);
 		}
 	}
 }
@@ -2125,7 +2125,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
 
-			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_alpha, this), 5, v[0], v[1], v[2]);
+			render_triangle<5>(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_alpha, this), v[0], v[1], v[2]);
 		}
 		else
 		{
@@ -2141,7 +2141,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 			extra.color = tri->color;
 			extra.transparency = tri->transparency;
 
-			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_solid_trans, this), 2, v[0], v[1], v[2]);
+			render_triangle<2>(cliprect, render_delegate(&model3_renderer::draw_scanline_solid_trans, this), v[0], v[1], v[2]);
 		}
 	}
 }

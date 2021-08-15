@@ -8,12 +8,7 @@
 
 #include "ymfm/src/ymfm.h"
 #include "ymfm/src/ymfm_ssg.h"
-#include "ay8910.h"
 
-
-// set this to 1 to use ymfm's built-in SSG implementation
-// set it to 0 to use MAME's ay8910 as the SSG implementation
-#define USE_BUILTIN_SSG (1)
 
 // set this to control the output sample rate for SSG-based chips
 #define SSG_FIDELITY (ymfm::OPN_FIDELITY_MED)
@@ -151,6 +146,9 @@ protected:
 		m_io_read[1].resolve();
 		m_io_write[0].resolve();
 		m_io_write[1].resolve();
+
+		// remember the busy end time
+		save_item(NAME(m_busy_end));
 	}
 
 	// timer callbacks
@@ -170,18 +168,12 @@ protected:
 // ======================> ymfm_device_base
 
 // this template provides most of the basics used by device objects in MAME
-// that wrap ymfm chips; it provides basic read/write functions; however, this
-// class is not intended to be used directly -- rather, devices should inherit
-// from either ymfm_device_base or ymfm_ssg_device_base, depending on whether
-// they include an SSG or not
-template<typename ChipClass, bool FMOnly = false>
+// that wrap ymfm chips; it provides basic read/write functions
+template<typename ChipClass>
 class ymfm_device_base : public ym_generic_device
 {
 protected:
-	// for SSG chips, we only create a subset of outputs here:
-	// YM2203 is 4 outputs: 1 mono FM + 3 SSG
-	// YM2608/2610 is 3 outputs: 2 stereo FM + 1 SSG
-	static constexpr int OUTPUTS = FMOnly ? ((ChipClass::OUTPUTS == 4) ? 1 : 2) : ChipClass::OUTPUTS;
+	static constexpr int OUTPUTS = ChipClass::OUTPUTS;
 
 public:
 	// constructor
@@ -300,24 +292,21 @@ protected:
 };
 
 
-// ======================> ymfm_ssg_internal_device_base
+// ======================> ymfm_ssg_device_base
 
 // this template adds SSG support to the base template, using ymfm's internal
 // SSG implementation
 template<typename ChipClass>
-class ymfm_ssg_internal_device_base : public ymfm_device_base<ChipClass>
+class ymfm_ssg_device_base : public ymfm_device_base<ChipClass>
 {
 	using parent = ymfm_device_base<ChipClass>;
 
 public:
 	// constructor
-	ymfm_ssg_internal_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+	ymfm_ssg_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 		ymfm_device_base<ChipClass>(mconfig, tag, owner, clock, type)
 	{
 	}
-
-	// configuration helpers
-	void set_flags(int flags) { /* not supported when using internal SSG */ }
 
 protected:
 	// sound overrides
@@ -334,162 +323,5 @@ protected:
 			outputs[0].apply_gain(3.0);
 	}
 };
-
-
-// ======================> ymfm_ssg_external_device_base
-
-// this template adds SSG support to the base template, using MAME's YM2149
-// implementation in ay8910.cpp; this is the "classic" way to do it in MAME
-// and is more flexible in terms of output handling
-template<typename ChipClass>
-class ymfm_ssg_external_device_base : public ymfm_device_base<ChipClass, true>, public ymfm::ssg_override
-{
-	using parent = ymfm_device_base<ChipClass, true>;
-
-public:
-	// constructor
-	ymfm_ssg_external_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
-		ymfm_device_base<ChipClass, true>(mconfig, tag, owner, clock, type),
-		m_ssg_stream(nullptr),
-		m_ssg(*this, "ssg"),
-		m_ssg_flags(((ChipClass::SSG_OUTPUTS == 1) ? AY8910_SINGLE_OUTPUT : 0) | AY8910_LEGACY_OUTPUT)
-	{
-	}
-
-	// configuration helpers
-	void set_flags(int flags)
-	{
-		// don't allow some flags to be changed: there is no pin26 in the embedded chip,
-		// and the number of outputs is configured by the chip itself
-		flags &= ~(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW);
-		flags |= m_ssg_flags & AY8910_SINGLE_OUTPUT;
-		m_ssg_flags = flags;
-		if (m_ssg)
-			m_ssg->set_flags(m_ssg_flags);
-	}
-
-protected:
-	using parent::m_chip;
-	using parent::m_io_read;
-	using parent::m_io_write;
-
-	// SSG overrides
-	virtual void ssg_reset() override
-	{
-		m_ssg->reset();
-	}
-
-	virtual uint8_t ssg_read(uint32_t offset) override
-	{
-		m_ssg->address_w(offset);
-		return m_ssg->data_r();
-	}
-
-	virtual void ssg_write(uint32_t offset, uint8_t data) override
-	{
-		m_ssg->address_w(offset);
-		m_ssg->data_w(data);
-	}
-
-	virtual void ssg_prescale_changed() override
-	{
-		device_clock_changed();
-	}
-
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override
-	{
-		YM2149(config, m_ssg, device_t::clock());
-		m_ssg->set_flags(m_ssg_flags);
-
-		// configure the callbacks to route through our callbacks
-		m_ssg->port_a_read_callback().set(FUNC(ymfm_ssg_external_device_base::io_reader<0>));
-		m_ssg->port_a_write_callback().set(FUNC(ymfm_ssg_external_device_base::io_writer<0>));
-		m_ssg->port_b_read_callback().set(FUNC(ymfm_ssg_external_device_base::io_reader<1>));
-		m_ssg->port_b_write_callback().set(FUNC(ymfm_ssg_external_device_base::io_writer<1>));
-
-		// route outputs through us
-		m_ssg->add_route(0, *this, 1.0, 0);
-		if (ChipClass::SSG_OUTPUTS > 1)
-		{
-			m_ssg->add_route(1, *this, 1.0, 1);
-			m_ssg->add_route(2, *this, 1.0, 2);
-		}
-	}
-
-	// handle device start
-	virtual void device_start() override
-	{
-		// to use the YM2149 in MAME, we allocate our stream with the same number of inputs
-		// and outputs; in our update handler we'll just forward each output from the
-		// embedded YM2149 device through our stream to make it look like it used to when
-		// we were inheriting from ay8910_device
-		m_ssg_stream = device_sound_interface::stream_alloc(ChipClass::SSG_OUTPUTS, ChipClass::SSG_OUTPUTS, SAMPLE_RATE_INPUT_ADAPTIVE);
-
-		// also tell the chip we want to override reads & writes
-		m_chip.ssg_override(*this);
-
-		// SSG streams are expected to be first, so call the parent afterwards
-		parent::device_start();
-	}
-
-	// handle clock changed
-	virtual void device_clock_changed() override
-	{
-		parent::device_clock_changed();
-
-		// derive the effective clock from the computed sample rate
-		m_ssg->set_unscaled_clock(m_chip.ssg_effective_clock(device_t::clock()));
-	}
-
-	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
-	{
-		// if not the SSG stream, pass it along to our parent
-		if (&stream != m_ssg_stream)
-			return parent::sound_stream_update(stream, inputs, outputs);
-
-		// just copy the streams from the SSG
-		for (int index = 0; index < ChipClass::SSG_OUTPUTS; index++)
-			outputs[index] = inputs[index];
-	}
-
-	// internal helper to update all our streams
-	virtual ChipClass &update_streams() override
-	{
-		m_ssg_stream->update();
-		return parent::update_streams();
-	}
-
-	// I/O reader trampoline
-	template<int Index>
-	uint8_t io_reader()
-	{
-		return m_io_read[Index].isnull() ? 0 : m_io_read[Index](0);
-	}
-
-	// I/O writer trampoline
-	template<int Index>
-	void io_writer(uint8_t data)
-	{
-		if (!m_io_write[Index].isnull())
-			m_io_write[Index](0, data);
-	}
-
-	// internal state
-	sound_stream *m_ssg_stream;           // SSG sound stream
-	required_device<ay8910_device> m_ssg; // our embedded SSG device
-	int m_ssg_flags;                      // SSG flags
-};
-
-
-// now pick the right one
-#if USE_BUILTIN_SSG
-template<typename ChipClass>
-using ymfm_ssg_device_base = ymfm_ssg_internal_device_base<ChipClass>;
-#else
-template<typename ChipClass>
-using ymfm_ssg_device_base = ymfm_ssg_external_device_base<ChipClass>;
-#endif
 
 #endif // MAME_SOUND_YMFM_H

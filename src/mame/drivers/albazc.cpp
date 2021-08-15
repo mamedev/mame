@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Stephane Humbert
-/* Hanaroku - Alba ZC HW */
-
+// Hanaroku - Alba ZC HW
 /*
 TODO:
 - colour decoding might not be perfect
@@ -21,14 +20,14 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
+
 class albazc_state : public driver_device
 {
 public:
 	albazc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_spriteram1(*this, "spriteram1"),
-		m_spriteram2(*this, "spriteram2"),
-		m_spriteram3(*this, "spriteram3"),
+		m_spriteram(*this, "spriteram%u", 1U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -38,21 +37,17 @@ public:
 	void hanaroku(machine_config &config);
 
 private:
-	/* video-related */
-	void hanaroku_out_0_w(uint8_t data);
-	void hanaroku_out_1_w(uint8_t data);
-	void hanaroku_out_2_w(uint8_t data);
-	void albazc_vregs_w(offs_t offset, uint8_t data);
-	virtual void video_start() override;
-	void albazc_palette(palette_device &palette) const;
-	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	// video-related
+	void out_0_w(uint8_t data);
+	void out_1_w(uint8_t data);
+	void out_2_w(uint8_t data);
+	void vregs_w(offs_t offset, uint8_t data);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void hanaroku_map(address_map &map);
+	void prg_map(address_map &map);
 
-	required_shared_ptr<uint8_t> m_spriteram1;
-	required_shared_ptr<uint8_t> m_spriteram2;
-	required_shared_ptr<uint8_t> m_spriteram3;
-	uint8_t m_flip_bit;
+	required_shared_ptr_array <uint8_t, 3> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -61,9 +56,9 @@ private:
 
 
 
-/* video */
+// video
 
-void albazc_state::albazc_palette(palette_device &palette) const
+void albazc_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom(memregion("proms")->base());
 	for (int i = 0; i < 0x200; i++)
@@ -77,43 +72,36 @@ void albazc_state::albazc_palette(palette_device &palette) const
 }
 
 
-void albazc_state::video_start()
-{
-}
-
 void albazc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
-	for (i = 511; i >= 0; i--)
+	for (int i = 511; i >= 0; i--)
 	{
-		int code = m_spriteram1[i] | (m_spriteram2[i] << 8);
-		int color = (m_spriteram2[i + 0x200] & 0xf8) >> 3;
+		int code = m_spriteram[0][i] | (m_spriteram[1][i] << 8);
+		int color = (m_spriteram[1][i + 0x200] & 0xf8) >> 3;
 		int flipx = 0;
 		int flipy = 0;
-		int sx = m_spriteram1[i + 0x200] | ((m_spriteram2[i + 0x200] & 0x07) << 8);
-		int sy = 242 - m_spriteram3[i];
+		int sx = m_spriteram[0][i + 0x200] | ((m_spriteram[1][i + 0x200] & 0x07) << 8);
+		int sy = 242 - m_spriteram[2][i];
 
-		if (m_flip_bit)
+		if (flip_screen())
 		{
 			sy = 242 - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, flipx, flipy,
-			sx, sy, 0);
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
-uint32_t albazc_state::screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t albazc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);   // ???
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
-void albazc_state::hanaroku_out_0_w(uint8_t data)
+void albazc_state::out_0_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -135,7 +123,7 @@ void albazc_state::hanaroku_out_0_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(4, data & 0x80);
 }
 
-void albazc_state::hanaroku_out_1_w(uint8_t data)
+void albazc_state::out_1_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -153,12 +141,12 @@ void albazc_state::hanaroku_out_1_w(uint8_t data)
 	m_hopper->motor_w(BIT(data, 0));
 }
 
-void albazc_state::hanaroku_out_2_w(uint8_t data)
+void albazc_state::out_2_w(uint8_t data)
 {
 	// unused
 }
 
-void albazc_state::albazc_vregs_w(offs_t offset, uint8_t data)
+void albazc_state::vregs_w(offs_t offset, uint8_t data)
 {
 	#ifdef UNUSED_FUNCTION
 	{
@@ -168,38 +156,34 @@ void albazc_state::albazc_vregs_w(offs_t offset, uint8_t data)
 	}
 	#endif
 
-	if(offset == 0)
-	{
-		/* core bug with this? */
-		//flip_screen_set((data & 0x40) >> 6);
-		m_flip_bit = (data & 0x40) >> 6;
-	}
+	if (offset == 0)
+		flip_screen_set((data & 0x40) >> 6);
 }
 
-/* main cpu */
+// main CPU
 
-void albazc_state::hanaroku_map(address_map &map)
+void albazc_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().share("spriteram1");
-	map(0x9000, 0x97ff).ram().share("spriteram2");
-	map(0xa000, 0xa1ff).ram().share("spriteram3");
+	map(0x8000, 0x87ff).ram().share(m_spriteram[0]);
+	map(0x9000, 0x97ff).ram().share(m_spriteram[1]);
+	map(0xa000, 0xa1ff).ram().share(m_spriteram[2]);
 	map(0xa200, 0xa2ff).nopw();    // ??? written once during P.O.S.T.
-	map(0xa300, 0xa304).w(FUNC(albazc_state::albazc_vregs_w));   // ???
+	map(0xa300, 0xa304).w(FUNC(albazc_state::vregs_w));   // ???
 	map(0xb000, 0xb000).nopw();    // ??? always 0x40
-	map(0xc000, 0xc3ff).ram();         // main ram
+	map(0xc000, 0xc3ff).ram();         // main RAM
 	map(0xc400, 0xc4ff).ram().share("nvram");
 	map(0xd000, 0xd000).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xe000, 0xe000).portr("IN0").w(FUNC(albazc_state::hanaroku_out_0_w));
+	map(0xe000, 0xe000).portr("IN0").w(FUNC(albazc_state::out_0_w));
 	map(0xe001, 0xe001).portr("IN1");
-	map(0xe002, 0xe002).portr("IN2").w(FUNC(albazc_state::hanaroku_out_1_w));
-	map(0xe004, 0xe004).portr("DSW3").w(FUNC(albazc_state::hanaroku_out_2_w));
+	map(0xe002, 0xe002).portr("IN2").w(FUNC(albazc_state::out_1_w));
+	map(0xe004, 0xe004).portr("DSW3").w(FUNC(albazc_state::out_2_w));
 }
 
 
 static INPUT_PORTS_START( hanaroku )
-	PORT_START("IN0")   /* 0xe000 */
+	PORT_START("IN0")   // 0xe000
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )      // adds n credits depending on "Coinage" Dip Switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )      // adds 5 credits
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_NAME("1/2 D-Up")
@@ -209,7 +193,7 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Play")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 
-	PORT_START("IN1")   /* 0xe001 */
+	PORT_START("IN1")   // 0xe001
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C )
@@ -219,7 +203,7 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )
 
-	PORT_START("IN2")   /* 0xe002 */
+	PORT_START("IN2")   // 0xe002
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Data Clear")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // "Medal In"
@@ -228,10 +212,10 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 2")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")  /* 0xd000 - Port A */
+	PORT_START("DSW1")  // 0xd000 - Port A
 	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW2")  /* 0xd000 - Port B */
+	PORT_START("DSW2")  // 0xd000 - Port B
 	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW3")  /* 0xe004 */
@@ -272,37 +256,37 @@ static const gfx_layout hanaroku_charlayout =
 
 
 static GFXDECODE_START( gfx_hanaroku )
-	GFXDECODE_ENTRY( "gfx1", 0, hanaroku_charlayout,   0, 32  )
+	GFXDECODE_ENTRY( "tiles", 0, hanaroku_charlayout,   0, 32  )
 GFXDECODE_END
 
 
 void albazc_state::hanaroku(machine_config &config)
 {
-	Z80(config, m_maincpu, 6000000);         /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &albazc_state::hanaroku_map);
+	Z80(config, m_maincpu, 6000000);         // ? MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &albazc_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(albazc_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(albazc_state::screen_update_hanaroku));
+	screen.set_screen_update(FUNC(albazc_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hanaroku);
 
-	PALETTE(config, m_palette, FUNC(albazc_state::albazc_palette), 0x200);
+	PALETTE(config, m_palette, FUNC(albazc_state::palette), 0x200);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); /* ? MHz */
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); // ? MHz
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -310,19 +294,21 @@ void albazc_state::hanaroku(machine_config &config)
 
 
 ROM_START( hanaroku )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* z80 code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "zc5_1a.u02",  0x00000, 0x08000, CRC(9e3b62ce) SHA1(81aee570b67950c21ab3c8f9235dd383529b34d5) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x20000, "tiles", 0 )
 	ROM_LOAD( "zc0_002.u14",  0x00000, 0x08000, CRC(76adab7f) SHA1(6efbe52ae4a1d15fe93bd05058546bf146a64154) )
 	ROM_LOAD( "zc0_003.u15",  0x08000, 0x08000, CRC(c208e64b) SHA1(0bc226c39331bb2e1d4d8f756199ceec85c28f28) )
 	ROM_LOAD( "zc0_004.u16",  0x10000, 0x08000, CRC(e8a46ee4) SHA1(09cac230c1c49cb282f540b1608ad33b1cc1a943) )
 	ROM_LOAD( "zc0_005.u17",  0x18000, 0x08000, CRC(7ad160a5) SHA1(c897fbe4a7c2a2f352333131dfd1a76e176f0ed8) )
 
-	ROM_REGION( 0x0400, "proms", 0 ) /* colour */
+	ROM_REGION( 0x0400, "proms", 0 ) // colour
 	ROM_LOAD16_BYTE( "zc0_006.u21",  0x0000, 0x0200, CRC(8e8fbc30) SHA1(7075521bbd790c46c58d9e408b0d7d6a42ed00bc) )
 	ROM_LOAD16_BYTE( "zc0_007.u22",  0x0001, 0x0200, CRC(67225de1) SHA1(98322e71d93d247a67fb4e52edad6c6c32a603d8) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1988, hanaroku, 0, hanaroku, hanaroku, albazc_state, empty_init, ROT0, "Alba", "Hanaroku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

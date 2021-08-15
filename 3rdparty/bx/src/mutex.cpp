@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -158,4 +158,26 @@ namespace bx
 
 } // namespace bx
 
-#endif // BX_MUTEX_H_HEADER_GUARD
+#else
+
+namespace bx
+{
+	Mutex::Mutex()
+	{
+	}
+
+	Mutex::~Mutex()
+	{
+	}
+
+	void Mutex::lock()
+	{
+	}
+
+	void Mutex::unlock()
+	{
+	}
+
+} // namespace bx
+
+#endif // BX_CONFIG_SUPPORTS_THREADING

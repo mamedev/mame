@@ -334,7 +334,7 @@ void lua_engine::initialize_input(sol::table &emu)
 			[this] (ioport_field &f)
 			{
 				sol::table result = sol().create_table();
-				for (ioport_setting &setting : f.settings())
+				for (ioport_setting const &setting : f.settings())
 					if (setting.enabled())
 						result[setting.value()] = setting.name();
 				return result;

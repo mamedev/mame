@@ -826,6 +826,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/applepic.h,MACHINES["APPLEPIC"] = true
+---------------------------------------------------
+
+if (MACHINES["APPLEPIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/applepic.cpp",
+		MAME_DIR .. "src/devices/machine/applepic.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/at28c16.h,MACHINES["AT28C16"] = true
 ---------------------------------------------------
 
@@ -3282,6 +3294,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tmc0999.h,MACHINES["TMC0999"] = true
+---------------------------------------------------
+
+if (MACHINES["TMC0999"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tmc0999.cpp",
+		MAME_DIR .. "src/devices/machine/tmc0999.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/tmc208k.h,MACHINES["TMC208K"] = true
 ---------------------------------------------------
 
@@ -3802,13 +3826,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr5380n.h,MACHINES["NCR5380N"] = true
+--@src/devices/machine/ncr5380.h,MACHINES["NCR5380"] = true
 ---------------------------------------------------
 
-if (MACHINES["NCR5380N"]~=null) then
+if (MACHINES["NCR5380"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/ncr5380n.cpp",
-		MAME_DIR .. "src/devices/machine/ncr5380n.h",
+		MAME_DIR .. "src/devices/machine/ncr5380.cpp",
+		MAME_DIR .. "src/devices/machine/ncr5380.h",
 	}
 end
 

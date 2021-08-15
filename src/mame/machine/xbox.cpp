@@ -13,6 +13,7 @@
 
 #include "debugger.h"
 #include "romload.h"
+#include "screen.h"
 
 #include <functional>
 

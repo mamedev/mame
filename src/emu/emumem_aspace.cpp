@@ -125,8 +125,8 @@ class address_space_specific : public address_space
 	static constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
 
 public:
-	const handler_entry_read<Width, AddrShift, Endian> *const *m_dispatch_read;
-	const handler_entry_write<Width, AddrShift, Endian> *const *m_dispatch_write;
+	const handler_entry_read<Width, AddrShift> *const *m_dispatch_read;
+	const handler_entry_write<Width, AddrShift> *const *m_dispatch_write;
 
 	std::string get_handler_string(read_or_write readorwrite, offs_t byteaddress) const override;
 	void dump_maps(std::vector<memory_entry> &read_map, std::vector<memory_entry> &write_map) const override;
@@ -300,46 +300,46 @@ public:
 	address_space_specific(memory_manager &manager, device_memory_interface &memory, int spacenum, int address_width)
 		: address_space(manager, memory, spacenum)
 	{
-		m_unmap_r = new handler_entry_read_unmapped <Width, AddrShift, Endian>(this);
-		m_unmap_w = new handler_entry_write_unmapped<Width, AddrShift, Endian>(this);
-		m_nop_r = new handler_entry_read_nop <Width, AddrShift, Endian>(this);
-		m_nop_w = new handler_entry_write_nop<Width, AddrShift, Endian>(this);
+		m_unmap_r = new handler_entry_read_unmapped <Width, AddrShift>(this);
+		m_unmap_w = new handler_entry_write_unmapped<Width, AddrShift>(this);
+		m_nop_r = new handler_entry_read_nop <Width, AddrShift>(this);
+		m_nop_w = new handler_entry_write_nop<Width, AddrShift>(this);
 
 		handler_entry::range r{ 0, 0xffffffff >> (32 - address_width) };
 
 		switch (address_width) {
-			case  1: m_root_read = new handler_entry_read_dispatch< std::max(1, Width), Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< std::max(1, Width), Width, AddrShift, Endian>(this, r, nullptr); break;
-			case  2: m_root_read = new handler_entry_read_dispatch< std::max(2, Width), Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< std::max(2, Width), Width, AddrShift, Endian>(this, r, nullptr); break;
-			case  3: m_root_read = new handler_entry_read_dispatch< std::max(3, Width), Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< std::max(3, Width), Width, AddrShift, Endian>(this, r, nullptr); break;
-			case  4: m_root_read = new handler_entry_read_dispatch< 4, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 4, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case  5: m_root_read = new handler_entry_read_dispatch< 5, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 5, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case  6: m_root_read = new handler_entry_read_dispatch< 6, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 6, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case  7: m_root_read = new handler_entry_read_dispatch< 7, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 7, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case  8: m_root_read = new handler_entry_read_dispatch< 8, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 8, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case  9: m_root_read = new handler_entry_read_dispatch< 9, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 9, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 10: m_root_read = new handler_entry_read_dispatch<10, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<10, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 11: m_root_read = new handler_entry_read_dispatch<11, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<11, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 12: m_root_read = new handler_entry_read_dispatch<12, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<12, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 13: m_root_read = new handler_entry_read_dispatch<13, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<13, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 14: m_root_read = new handler_entry_read_dispatch<14, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<14, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 15: m_root_read = new handler_entry_read_dispatch<15, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<15, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 16: m_root_read = new handler_entry_read_dispatch<16, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<16, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 17: m_root_read = new handler_entry_read_dispatch<17, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<17, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 18: m_root_read = new handler_entry_read_dispatch<18, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<18, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 19: m_root_read = new handler_entry_read_dispatch<19, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<19, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 20: m_root_read = new handler_entry_read_dispatch<20, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<20, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 21: m_root_read = new handler_entry_read_dispatch<21, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<21, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 22: m_root_read = new handler_entry_read_dispatch<22, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<22, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 23: m_root_read = new handler_entry_read_dispatch<23, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<23, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 24: m_root_read = new handler_entry_read_dispatch<24, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<24, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 25: m_root_read = new handler_entry_read_dispatch<25, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<25, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 26: m_root_read = new handler_entry_read_dispatch<26, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<26, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 27: m_root_read = new handler_entry_read_dispatch<27, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<27, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 28: m_root_read = new handler_entry_read_dispatch<28, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<28, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 29: m_root_read = new handler_entry_read_dispatch<29, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<29, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 30: m_root_read = new handler_entry_read_dispatch<30, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<30, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 31: m_root_read = new handler_entry_read_dispatch<31, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<31, Width, AddrShift, Endian>(this, r, nullptr); break;
-			case 32: m_root_read = new handler_entry_read_dispatch<32, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<32, Width, AddrShift, Endian>(this, r, nullptr); break;
+			case  1: m_root_read = new handler_entry_read_dispatch< std::max(1, Width), Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< std::max(1, Width), Width, AddrShift>(this, r, nullptr); break;
+			case  2: m_root_read = new handler_entry_read_dispatch< std::max(2, Width), Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< std::max(2, Width), Width, AddrShift>(this, r, nullptr); break;
+			case  3: m_root_read = new handler_entry_read_dispatch< std::max(3, Width), Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< std::max(3, Width), Width, AddrShift>(this, r, nullptr); break;
+			case  4: m_root_read = new handler_entry_read_dispatch< 4, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 4, Width, AddrShift>(this, r, nullptr); break;
+			case  5: m_root_read = new handler_entry_read_dispatch< 5, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 5, Width, AddrShift>(this, r, nullptr); break;
+			case  6: m_root_read = new handler_entry_read_dispatch< 6, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 6, Width, AddrShift>(this, r, nullptr); break;
+			case  7: m_root_read = new handler_entry_read_dispatch< 7, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 7, Width, AddrShift>(this, r, nullptr); break;
+			case  8: m_root_read = new handler_entry_read_dispatch< 8, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 8, Width, AddrShift>(this, r, nullptr); break;
+			case  9: m_root_read = new handler_entry_read_dispatch< 9, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch< 9, Width, AddrShift>(this, r, nullptr); break;
+			case 10: m_root_read = new handler_entry_read_dispatch<10, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<10, Width, AddrShift>(this, r, nullptr); break;
+			case 11: m_root_read = new handler_entry_read_dispatch<11, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<11, Width, AddrShift>(this, r, nullptr); break;
+			case 12: m_root_read = new handler_entry_read_dispatch<12, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<12, Width, AddrShift>(this, r, nullptr); break;
+			case 13: m_root_read = new handler_entry_read_dispatch<13, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<13, Width, AddrShift>(this, r, nullptr); break;
+			case 14: m_root_read = new handler_entry_read_dispatch<14, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<14, Width, AddrShift>(this, r, nullptr); break;
+			case 15: m_root_read = new handler_entry_read_dispatch<15, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<15, Width, AddrShift>(this, r, nullptr); break;
+			case 16: m_root_read = new handler_entry_read_dispatch<16, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<16, Width, AddrShift>(this, r, nullptr); break;
+			case 17: m_root_read = new handler_entry_read_dispatch<17, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<17, Width, AddrShift>(this, r, nullptr); break;
+			case 18: m_root_read = new handler_entry_read_dispatch<18, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<18, Width, AddrShift>(this, r, nullptr); break;
+			case 19: m_root_read = new handler_entry_read_dispatch<19, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<19, Width, AddrShift>(this, r, nullptr); break;
+			case 20: m_root_read = new handler_entry_read_dispatch<20, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<20, Width, AddrShift>(this, r, nullptr); break;
+			case 21: m_root_read = new handler_entry_read_dispatch<21, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<21, Width, AddrShift>(this, r, nullptr); break;
+			case 22: m_root_read = new handler_entry_read_dispatch<22, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<22, Width, AddrShift>(this, r, nullptr); break;
+			case 23: m_root_read = new handler_entry_read_dispatch<23, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<23, Width, AddrShift>(this, r, nullptr); break;
+			case 24: m_root_read = new handler_entry_read_dispatch<24, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<24, Width, AddrShift>(this, r, nullptr); break;
+			case 25: m_root_read = new handler_entry_read_dispatch<25, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<25, Width, AddrShift>(this, r, nullptr); break;
+			case 26: m_root_read = new handler_entry_read_dispatch<26, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<26, Width, AddrShift>(this, r, nullptr); break;
+			case 27: m_root_read = new handler_entry_read_dispatch<27, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<27, Width, AddrShift>(this, r, nullptr); break;
+			case 28: m_root_read = new handler_entry_read_dispatch<28, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<28, Width, AddrShift>(this, r, nullptr); break;
+			case 29: m_root_read = new handler_entry_read_dispatch<29, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<29, Width, AddrShift>(this, r, nullptr); break;
+			case 30: m_root_read = new handler_entry_read_dispatch<30, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<30, Width, AddrShift>(this, r, nullptr); break;
+			case 31: m_root_read = new handler_entry_read_dispatch<31, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<31, Width, AddrShift>(this, r, nullptr); break;
+			case 32: m_root_read = new handler_entry_read_dispatch<32, Width, AddrShift>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<32, Width, AddrShift>(this, r, nullptr); break;
 			default: fatalerror("Unhandled address bus width %d\n", address_width);
 		}
 
@@ -425,25 +425,25 @@ public:
 	// native read
 	NativeType read_native(offs_t offset, NativeType mask)
 	{
-		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);
+		return dispatch_read<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);
 	}
 
 	// mask-less native read
 	NativeType read_native(offs_t offset)
 	{
-		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, uX(0xffffffffffffffffU), m_dispatch_read);
+		return dispatch_read<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, uX(0xffffffffffffffffU), m_dispatch_read);
 	}
 
 	// native write
 	void write_native(offs_t offset, NativeType data, NativeType mask)
 	{
-		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);
+		dispatch_write<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);
 	}
 
 	// mask-less native write
 	void write_native(offs_t offset, NativeType data)
 	{
-		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);
+		dispatch_write<Level, Width, AddrShift>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);
 	}
 
 	// virtual access to these functions
@@ -491,8 +491,8 @@ public:
 	static void write_qword_static(this_type &space, offs_t address, u64 data) { if (Width == 3) space.write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 3, false>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, 0xffffffffffffffffU); }
 	static void write_qword_masked_static(this_type &space, offs_t address, u64 data, u64 mask) { memory_write_generic<Width, AddrShift, Endian, 3, false>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, mask); }
 
-	handler_entry_read <Width, AddrShift, Endian> *m_root_read;
-	handler_entry_write<Width, AddrShift, Endian> *m_root_write;
+	handler_entry_read <Width, AddrShift> *m_root_read;
+	handler_entry_write<Width, AddrShift> *m_root_write;
 
 	std::unordered_set<handler_entry *> m_delayed_unrefs;
 
@@ -554,12 +554,12 @@ private:
 			check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 			if constexpr (Width == AccessWidth) {
-				auto hand_r = new handler_entry_read_delegate<Width, AddrShift, Endian, READ>(this, handler_r);
+				auto hand_r = new handler_entry_read_delegate<Width, AddrShift, READ>(this, handler_r);
 				hand_r->set_address_info(nstart, nmask);
 				m_root_read->populate(nstart, nend, nmirror, hand_r);
 			} else {
-				auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, Endian, READ>(this, handler_r);
-				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
+				auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, READ>(this, handler_r);
+				memory_units_descriptor<Width, AddrShift> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
 				hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 				m_root_read->populate_mismatched(nstart, nend, nmirror, descriptor);
 				hand_r->unref();
@@ -587,12 +587,12 @@ private:
 			check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 			if constexpr (Width == AccessWidth) {
-				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(this, handler_w);
+				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, WRITE>(this, handler_w);
 				hand_w->set_address_info(nstart, nmask);
 				m_root_write->populate(nstart, nend, nmirror, hand_w);
 			} else {
-				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(this, handler_w);
-				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_w, nstart, nend, nmask, nunitmask, ncswidth);
+				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, WRITE>(this, handler_w);
+				memory_units_descriptor<Width, AddrShift> descriptor(AccessWidth, Endian, hand_w, nstart, nend, nmask, nunitmask, ncswidth);
 				hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 				m_root_write->populate_mismatched(nstart, nend, nmirror, descriptor);
 				hand_w->unref();
@@ -621,21 +621,21 @@ private:
 			check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 			if constexpr (Width == AccessWidth) {
-				auto hand_r = new handler_entry_read_delegate <Width, AddrShift, Endian, READ>(this, handler_r);
+				auto hand_r = new handler_entry_read_delegate <Width, AddrShift, READ>(this, handler_r);
 				hand_r->set_address_info(nstart, nmask);
 				m_root_read ->populate(nstart, nend, nmirror, hand_r);
 
-				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(this, handler_w);
+				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, WRITE>(this, handler_w);
 				hand_w->set_address_info(nstart, nmask);
 				m_root_write->populate(nstart, nend, nmirror, hand_w);
 			} else {
-				auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, Endian, READ>(this, handler_r);
-				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
+				auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, READ>(this, handler_r);
+				memory_units_descriptor<Width, AddrShift> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
 				hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 				m_root_read ->populate_mismatched(nstart, nend, nmirror, descriptor);
 				hand_r->unref();
 
-				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(this, handler_w);
+				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, WRITE>(this, handler_w);
 				descriptor.set_subunit_handler(hand_w);
 				hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 				m_root_write->populate_mismatched(nstart, nend, nmirror, descriptor);
@@ -947,12 +947,12 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> std::string a
 {
 	if (readorwrite == read_or_write::READ) {
 		offs_t start, end;
-		handler_entry_read<Width, AddrShift, Endian> *handler;
+		handler_entry_read<Width, AddrShift> *handler;
 		m_root_read->lookup(address, start, end, handler);
 		return handler->name();
 	} else {
 		offs_t start, end;
-		handler_entry_write<Width, AddrShift, Endian> *handler;
+		handler_entry_write<Width, AddrShift> *handler;
 		m_root_write->lookup(address, start, end, handler);
 		return handler->name();
 	}
@@ -988,14 +988,14 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 
 	// read space
 	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE) {
-		auto handler = static_cast<handler_entry_read<Width, AddrShift, Endian> *>(quiet ? m_nop_r : m_unmap_r);
+		auto handler = static_cast<handler_entry_read<Width, AddrShift> *>(quiet ? m_nop_r : m_unmap_r);
 		handler->ref();
 		m_root_read->populate(nstart, nend, nmirror, handler);
 	}
 
 	// write space
 	if (readorwrite == read_or_write::WRITE || readorwrite == read_or_write::READWRITE) {
-		auto handler = static_cast<handler_entry_write<Width, AddrShift, Endian> *>(quiet ? m_nop_w : m_unmap_w);
+		auto handler = static_cast<handler_entry_write<Width, AddrShift> *>(quiet ? m_nop_w : m_unmap_w);
 		handler->ref();
 		m_root_write->populate(nstart, nend, nmirror, handler);
 	}
@@ -1012,8 +1012,8 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	check_optimize_mirror("install_view", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	auto handlers = view.make_handlers(*this, addrstart, addrend);
-	m_root_read ->populate(nstart, nend, nmirror, static_cast<handler_entry_read <Width, AddrShift, Endian> *>(handlers.first));
-	m_root_write->populate(nstart, nend, nmirror, static_cast<handler_entry_write<Width, AddrShift, Endian> *>(handlers.second));
+	m_root_read ->populate(nstart, nend, nmirror, static_cast<handler_entry_read <Width, AddrShift> *>(handlers.first));
+	m_root_write->populate(nstart, nend, nmirror, static_cast<handler_entry_write<Width, AddrShift> *>(handlers.second));
 	view.make_subdispatch(""); // Must be called after populate
 }
 
@@ -1034,7 +1034,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	if (!mph)
 		mph = make_mph();
 
-	auto handler = new handler_entry_read_tap<Width, AddrShift, Endian>(this, *mph, name, tap);
+	auto handler = new handler_entry_read_tap<Width, AddrShift>(this, *mph, name, tap);
 	m_root_read->populate_passthrough(nstart, nend, nmirror, handler);
 	handler->unref();
 
@@ -1054,7 +1054,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	if (!mph)
 		mph = make_mph();
 
-	auto handler = new handler_entry_write_tap<Width, AddrShift, Endian>(this, *mph, name, tap);
+	auto handler = new handler_entry_write_tap<Width, AddrShift>(this, *mph, name, tap);
 	m_root_write->populate_passthrough(nstart, nend, nmirror, handler);
 	handler->unref();
 
@@ -1073,11 +1073,11 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	if (!mph)
 		mph = make_mph();
 
-	auto rhandler = new handler_entry_read_tap <Width, AddrShift, Endian>(this, *mph, name, tapr);
+	auto rhandler = new handler_entry_read_tap <Width, AddrShift>(this, *mph, name, tapr);
 	m_root_read ->populate_passthrough(nstart, nend, nmirror, rhandler);
 	rhandler->unref();
 
-	auto whandler = new handler_entry_write_tap<Width, AddrShift, Endian>(this, *mph, name, tapw);
+	auto whandler = new handler_entry_write_tap<Width, AddrShift>(this, *mph, name, tapw);
 	m_root_write->populate_passthrough(nstart, nend, nmirror, whandler);
 	whandler->unref();
 
@@ -1130,7 +1130,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
 
 		// map the range and set the ioport
-		auto hand_r = new handler_entry_read_ioport<Width, AddrShift, Endian>(this, port);
+		auto hand_r = new handler_entry_read_ioport<Width, AddrShift>(this, port);
 		m_root_read->populate(nstart, nend, nmirror, hand_r);
 	}
 
@@ -1142,7 +1142,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
 
 		// map the range and set the ioport
-		auto hand_w = new handler_entry_write_ioport<Width, AddrShift, Endian>(this, port);
+		auto hand_w = new handler_entry_write_ioport<Width, AddrShift>(this, port);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
 
@@ -1168,7 +1168,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	// map the read bank
 	if (rbank != nullptr)
 	{
-		auto hand_r = new handler_entry_read_memory_bank<Width, AddrShift, Endian>(this, *rbank);
+		auto hand_r = new handler_entry_read_memory_bank<Width, AddrShift>(this, *rbank);
 		hand_r->set_address_info(nstart, nmask);
 		m_root_read->populate(nstart, nend, nmirror, hand_r);
 	}
@@ -1176,7 +1176,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	// map the write bank
 	if (wbank != nullptr)
 	{
-		auto hand_w = new handler_entry_write_memory_bank<Width, AddrShift, Endian>(this, *wbank);
+		auto hand_w = new handler_entry_write_memory_bank<Width, AddrShift>(this, *wbank);
 		hand_w->set_address_info(nstart, nmask);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
@@ -1204,7 +1204,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	// map for read
 	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE)
 	{
-		auto hand_r = new handler_entry_read_memory<Width, AddrShift, Endian>(this, baseptr);
+		auto hand_r = new handler_entry_read_memory<Width, AddrShift>(this, baseptr);
 		hand_r->set_address_info(nstart, nmask);
 		m_root_read->populate(nstart, nend, nmirror, hand_r);
 	}
@@ -1212,7 +1212,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	// map for write
 	if (readorwrite == read_or_write::WRITE || readorwrite == read_or_write::READWRITE)
 	{
-		auto hand_w = new handler_entry_write_memory<Width, AddrShift, Endian>(this, baseptr);
+		auto hand_w = new handler_entry_write_memory<Width, AddrShift>(this, baseptr);
 		hand_w->set_address_info(nstart, nmask);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}

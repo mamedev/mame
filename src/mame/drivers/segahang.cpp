@@ -24,6 +24,7 @@
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
+
 #include "speaker.h"
 
 
@@ -1514,7 +1515,7 @@ ROM_START( sharrier )
 	ROM_LOAD( "epr-7232.ic6", 0x08000, 0x8000, CRC(4b59340c) SHA1(a01ba8580b65dd17bfd92560265e502d95d3ff16) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // Internal i8751 MCU code
-	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, CRC(203dffeb) SHA1(73801db79756b0ffdd54b298814e3eeb088fe8c2) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )

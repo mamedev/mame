@@ -14,7 +14,7 @@
 #pragma once
 
 #include "a2bus.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

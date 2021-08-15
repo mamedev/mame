@@ -2123,7 +2123,6 @@ void i386_device::register_state_i386()
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%32s").noshow();
-	state_add( STATE_GENSP, "GENSP", REG32(ESP)).noshow();
 }
 
 void i386_device::register_state_i386_x87()

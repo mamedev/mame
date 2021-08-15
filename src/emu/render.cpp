@@ -899,7 +899,11 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 	, m_listindex(0)
 	, m_width(640)
 	, m_height(480)
+	, m_keepaspect(false)
+	, m_int_overscan(false)
 	, m_pixel_aspect(0.0f)
+	, m_int_scale_x(0)
+	, m_int_scale_y(0)
 	, m_max_refresh(0)
 	, m_orientation(0)
 	, m_base_view(nullptr)
@@ -913,20 +917,25 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
 	// aspect and scale options
-	m_keepaspect = (manager.machine().options().keep_aspect() && !(flags & RENDER_CREATE_HIDDEN));
-	m_int_overscan = manager.machine().options().int_overscan();
-	m_int_scale_x = manager.machine().options().int_scale_x();
-	m_int_scale_y = manager.machine().options().int_scale_y();
-	if (m_manager.machine().options().auto_stretch_xy())
-		m_scale_mode = SCALE_FRACTIONAL_AUTO;
-	else if (manager.machine().options().uneven_stretch_x())
-		m_scale_mode = SCALE_FRACTIONAL_X;
-	else if (manager.machine().options().uneven_stretch_y())
-		m_scale_mode = SCALE_FRACTIONAL_Y;
-	else if (manager.machine().options().uneven_stretch())
-		m_scale_mode = SCALE_FRACTIONAL;
+	if (!(flags & RENDER_CREATE_HIDDEN))
+	{
+		m_keepaspect = manager.machine().options().keep_aspect();
+		m_int_overscan = manager.machine().options().int_overscan();
+		m_int_scale_x = manager.machine().options().int_scale_x();
+		m_int_scale_y = manager.machine().options().int_scale_y();
+		if (m_manager.machine().options().auto_stretch_xy())
+			m_scale_mode = SCALE_FRACTIONAL_AUTO;
+		else if (manager.machine().options().uneven_stretch_x())
+			m_scale_mode = SCALE_FRACTIONAL_X;
+		else if (manager.machine().options().uneven_stretch_y())
+			m_scale_mode = SCALE_FRACTIONAL_Y;
+		else if (manager.machine().options().uneven_stretch())
+			m_scale_mode = SCALE_FRACTIONAL;
+		else
+			m_scale_mode = SCALE_INTEGER;
+	}
 	else
-		m_scale_mode = SCALE_INTEGER;
+		m_scale_mode = SCALE_FRACTIONAL;
 
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
@@ -3057,7 +3066,10 @@ render_manager::render_manager(running_machine &machine)
 	, m_ui_container(new render_container(*this))
 {
 	// register callbacks
-	machine.configuration().config_register("video", config_load_delegate(&render_manager::config_load, this), config_save_delegate(&render_manager::config_save, this));
+	machine.configuration().config_register(
+			"video",
+			configuration_manager::load_delegate(&render_manager::config_load, this),
+			configuration_manager::save_delegate(&render_manager::config_save, this));
 
 	// create one container per screen
 	for (screen_device &screen : screen_device_enumerator(machine.root_device()))
@@ -3312,10 +3324,10 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void render_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// we only care about game files with matching nodes
-	if ((cfg_type != config_type::GAME) || !parentnode)
+	// we only care about system-specific configuration with matching nodes
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
 	// check the UI target
@@ -3368,8 +3380,8 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 
 void render_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
+	// we only save system-specific configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	// write out the interface target

@@ -5,8 +5,10 @@ license:CC0
 -->
 
 <!--
+
 Cartridges(MCU+ROM) for Entex Select-A-Game Machine, note that the manual and
 label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartridge"
+
 -->
 
 <softwarelist name="entex_sag" description="Select-A-Game cartridges">
@@ -18,6 +20,18 @@ label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartrid
 		<part name="cart" interface="sag_cart">
 			<dataarea name="rom" size="0x2000"> <!-- HD38800 MCU -->
 				<rom name="b-b5_hd38800a37" offset="0x0000" size="0x1000" crc="64852bd5" sha1="fb1c24ca43934ceb6fc35ac7c35b71e6e843dbc5" />
+				<rom offset="0x1e80" size="0x0100" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baskb3">
+		<description>Basketball 3</description>
+		<year>1981</year>
+		<publisher>Entex</publisher>
+		<part name="cart" interface="sag_cart">
+			<dataarea name="rom" size="0x2000"> <!-- HD38800 MCU -->
+				<rom name="bask_hd38800a16" offset="0x0000" size="0x1000" crc="ccb3ecb0" sha1="a686bde6f678f2019ff8c971cf65adf92f9b46e1" />
 				<rom offset="0x1e80" size="0x0100" loadflag="continue" />
 			</dataarea>
 		</part>

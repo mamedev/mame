@@ -50,7 +50,7 @@ using util::BIT;
 #include "cpu/e132xs/32xsdasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
-#include "cpu/f2mc16/f2mc16dasm.h"
+#include "cpu/f2mc16/f2mc16d.h"
 #include "cpu/f8/f8dasm.h"
 #include "cpu/fr/frdasm.h"
 #include "cpu/g65816/g65816ds.h"

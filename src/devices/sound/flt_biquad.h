@@ -68,6 +68,11 @@ public:
 	// Multiple-Feedback high-pass
 	filter_biquad_device& opamp_mfb_highpass_setup(double r1, double r2, double c1, double c2, double c3);
 
+	// Differentiator band-pass
+	filter_biquad_device& opamp_diff_bandpass_setup(double r1, double r2, double c1, double c2);
+	void opamp_diff_bandpass_modify(double r1, double r2, double c1, double c2);
+	biquad_params opamp_diff_bandpass_calc(double r1, double r2, double c1, double c2);
+
 
 protected:
 	// device-level overrides

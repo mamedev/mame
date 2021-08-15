@@ -26,7 +26,7 @@
 
 
 gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
-	: poly_manager<float, gaelco3d_object_data, 1, 2000>(state.machine()),
+	: poly_manager<float, gaelco3d_object_data, 1>(state.machine()),
 		m_state(state),
 		m_screenbits(state.m_screen->width(), state.m_screen->height()),
 		m_zbuffer(state.m_screen->width(), state.m_screen->height()),
@@ -185,15 +185,15 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 
 		/* special case: no Z buffering and no perspective correction */
 		if (color != 0x7f00 && z0 < 0 && ooz_dx == 0 && ooz_dy == 0)
-			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_noz_noperspective, this), 0, vertnum, &vert[0]);
+			render_triangle_fan<0>(visarea, render_delegate(&gaelco3d_renderer::render_noz_noperspective, this), vertnum, &vert[0]);
 
 		/* general case: non-alpha blended */
 		else if (color != 0x7f00)
-			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_normal, this), 0, vertnum, &vert[0]);
+			render_triangle_fan<0>(visarea, render_delegate(&gaelco3d_renderer::render_normal, this), vertnum, &vert[0]);
 
 		/* color 0x7f seems to be hard-coded as a 50% alpha blend */
 		else
-			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_alphablend, this), 0, vertnum, &vert[0]);
+			render_triangle_fan<0>(visarea, render_delegate(&gaelco3d_renderer::render_alphablend, this), vertnum, &vert[0]);
 
 		m_polygons += vertnum - 2;
 	}

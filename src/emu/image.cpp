@@ -86,7 +86,10 @@ image_manager::image_manager(running_machine &machine)
 		}
 	}
 
-	machine.configuration().config_register("image_directories", config_load_delegate(&image_manager::config_load, this), config_save_delegate(&image_manager::config_save, this));
+	machine.configuration().config_register(
+			"image_directories",
+			configuration_manager::load_delegate(&image_manager::config_load, this),
+			configuration_manager::save_delegate(&image_manager::config_save, this));
 }
 
 //-------------------------------------------------
@@ -105,9 +108,9 @@ void image_manager::unload_all()
 	}
 }
 
-void image_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void image_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	if ((cfg_type == config_type::GAME) && (parentnode != nullptr))
+	if ((cfg_type == config_type::SYSTEM) && parentnode)
 	{
 		for (util::xml::data_node const *node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
 		{
@@ -136,8 +139,8 @@ void image_manager::config_load(config_type cfg_type, util::xml::data_node const
 
 void image_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	/* only care about game-specific data */
-	if (cfg_type == config_type::GAME)
+	// only save system-specific data
+	if (cfg_type == config_type::SYSTEM)
 	{
 		for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		{

@@ -16057,10 +16057,10 @@ but dumps still have to be confirmed.
 		<publisher>Taito</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-			<rom name="flint0 stones genesis odd-0 a081h 1992.11.5.eprom" size="131072" crc="df222147" sha1="d9ea35d7d4c81fcff0093d26e72e01ae306a8551" offset="0x000001" loadflag="load16_byte"/>
-			<rom name="flint1 stones genesis even-0 f00eh 1992.11.5.eprom" size="131072" crc="6a4b2996" sha1="e7227a53a872173541cddeb875b9505633dc27ab" offset="0x000000" loadflag="load16_byte"/>
-			<rom name="flint2 stones genesis odd-1 54c9h 1992.11.5.eprom" size="131072" crc="498b7a6c" sha1="0f17e8ae5f93e05673ec598a427584c4c9878032" offset="0x040001" loadflag="load16_byte"/>
-			<rom name="flint3 stones genesis even-1 ae14h 1992.11.5.eprom" size="131072" crc="57c7b47a" sha1="c3a2bc68bd0333ca193556d546a2904eaa33dbbf" offset="0x040000" loadflag="load16_byte"/>
+				<rom name="flint0 stones genesis odd-0 a081h 1992.11.5.eprom" size="131072" crc="df222147" sha1="d9ea35d7d4c81fcff0093d26e72e01ae306a8551" offset="0x000001" loadflag="load16_byte"/>
+				<rom name="flint1 stones genesis even-0 f00eh 1992.11.5.eprom" size="131072" crc="6a4b2996" sha1="e7227a53a872173541cddeb875b9505633dc27ab" offset="0x000000" loadflag="load16_byte"/>
+				<rom name="flint2 stones genesis odd-1 54c9h 1992.11.5.eprom" size="131072" crc="498b7a6c" sha1="0f17e8ae5f93e05673ec598a427584c4c9878032" offset="0x040001" loadflag="load16_byte"/>
+				<rom name="flint3 stones genesis even-1 ae14h 1992.11.5.eprom" size="131072" crc="57c7b47a" sha1="c3a2bc68bd0333ca193556d546a2904eaa33dbbf" offset="0x040000" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16072,7 +16072,7 @@ but dumps still have to be confirmed.
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-			<rom name="the flintstones (ocean) (prototype).bin" size="1048576" crc="9281ff45" sha1="23c1ad486457ee73b504133014970aea316634f6"/>
+				<rom name="the flintstones (ocean) (prototype).bin" size="1048576" crc="9281ff45" sha1="23c1ad486457ee73b504133014970aea316634f6"/>
 			</dataarea>
 		</part>
 	</software>

@@ -12,7 +12,7 @@
 
 // poly constructor
 namcos22_renderer::namcos22_renderer(namcos22_state &state)
-	: poly_manager<float, namcos22_object_data, 4, 8000>(state.machine()),
+	: poly_manager<float, namcos22_object_data, 4>(state.machine()),
 		m_state(state)
 	{
 		init();
@@ -260,7 +260,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			v[vertnum].p[3] = node->data.quad.v[vertnum].bri;
 		}
 
-		clipverts = zclip_if_less(4, v, clipv, 4, 10.0f);
+		clipverts = zclip_if_less<4>(4, v, clipv, 10.0f);
 		assert(clipverts <= std::size(clipv));
 		if (clipverts < 3)
 			return;
@@ -390,7 +390,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	render_triangle_fan(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_uvi_full, this), 4, clipverts, clipv);
+	render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_uvi_full, this), clipverts, clipv);
 }
 
 
@@ -468,7 +468,7 @@ void namcos22_renderer::poly3d_drawsprite(
 			extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 		}
 
-		render_triangle_fan(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_sprite, this), 2, 4, vert);
+		render_triangle_fan<2>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_sprite, this), 4, vert);
 	}
 }
 

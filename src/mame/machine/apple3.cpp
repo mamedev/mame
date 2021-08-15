@@ -901,11 +901,11 @@ uint8_t apple3_state::apple3_memory_r(offs_t offset)
 		{
 			rv = m_bank7wr[offset - 0xf000];
 		}
-		else if (offset >= 0xffd0 && offset <= 0xffdf)
+		else if ((offset >= 0xffd0 && offset <= 0xffdf) && (m_via_1_a & 0x40))
 		{
 			rv = m_via[0]->read(offset);
 		}
-		else if (offset >= 0xffe0 && offset <= 0xffef)
+		else if ((offset >= 0xffe0 && offset <= 0xffef) && (m_via_1_a & 0x40))
 		{
 			rv = m_via[1]->read(offset);
 		}
@@ -1059,14 +1059,14 @@ void apple3_state::apple3_memory_w(offs_t offset, uint8_t data)
 				m_bank7wr[offset - 0xf000] = data;
 			}
 		}
-		else if (offset >= 0xffd0 && offset <= 0xffdf)
+		else if ((offset >= 0xffd0 && offset <= 0xffdf) && (m_via_1_a & 0x40))
 		{
 			if (!machine().side_effects_disabled())
 			{
 				m_via[0]->write(offset, data);
 			}
 		}
-		else if (offset >= 0xffe0 && offset <= 0xffef)
+		else if ((offset >= 0xffe0 && offset <= 0xffef) && (m_via_1_a & 0x40))
 		{
 			if (!machine().side_effects_disabled())
 			{
