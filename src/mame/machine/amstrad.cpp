@@ -2245,12 +2245,9 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 
 	RegData = (pSnapshot[0x021] & 0x0ff) | ((pSnapshot[0x022] & 0x0ff)<<8);
 	m_maincpu->set_state_int(Z80_SP, RegData);
-	m_maincpu->set_state_int(STATE_GENSP, RegData);
 
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
-
 	m_maincpu->set_state_int(Z80_PC, RegData);
-//  m_maincpu->set_state_int(REG_SP, RegData);
 
 	RegData = (pSnapshot[0x025] & 0x0ff);
 	m_maincpu->set_state_int(Z80_IM, RegData);
