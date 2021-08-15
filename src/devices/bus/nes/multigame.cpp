@@ -46,6 +46,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_60311C,     nes_bmc_60311c_device,     "nes_bmc_60311
 DEFINE_DEVICE_TYPE(NES_BMC_80013B,     nes_bmc_80013b_device,     "nes_bmc_80013b",     "NES Cart BMC 80013-B PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device,    "nes_bmc_810544c",    "NES Cart BMC 810544-C-A1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device,    "nes_bmc_830425c",    "NES Cart BMC 830425C-4391T PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device,    "nes_bmc_850437c",    "NES Cart BMC 850437C PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63",       "NES Cart BMC Ghostbusters 63 in 1 PCB")
@@ -206,6 +207,11 @@ nes_bmc_810544c_device::nes_bmc_810544c_device(const machine_config &mconfig, co
 
 nes_bmc_830425c_device::nes_bmc_830425c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_830425C, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_bmc_850437c_device::nes_bmc_850437c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_850437C, tag, owner, clock)
 {
 }
 
@@ -678,6 +684,21 @@ void nes_bmc_830425c_device::pcb_reset()
 	set_nt_mirroring(PPU_MIRROR_VERT);
 
 	m_latch = 0;
+}
+
+void nes_bmc_850437c_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_850437c_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_reg[0] = m_reg[1] = 0;
 }
 
 void nes_ntd03_device::device_start()
@@ -1718,7 +1739,7 @@ void nes_bmc_810544c_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-820425C-4391T
+ BMC-830425C-4391T
 
  Games: Super HiK 6-in-1 (A-030)
 
@@ -1739,6 +1760,31 @@ void nes_bmc_830425c_device::write_h(offs_t offset, u8 data)
 	u8 mode = !BIT(m_latch, 4) << 3 | 0x07;
 	prg16_89ab(outer | (data & mode));
 	prg16_cdef(outer | mode);
+}
+
+/*-------------------------------------------------
+
+ BMC-850437C
+
+ Games: Super 8-in-1 (JY-050 rev0, JY-085, JY-086)
+
+ NES 2.0: mapper 396
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_850437c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_850437c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	m_reg[(offset & 0x6000) == 0x2000] = data;    // outer banking is always at 0xa000, mask is a guess
+
+	u8 bank = (m_reg[1] & 0x07) << 3 | (m_reg[0] & 0x07);
+	prg16_89ab(bank);
+	prg16_cdef(bank | 0x07);
+
+	set_nt_mirroring(BIT(m_reg[1], 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------
