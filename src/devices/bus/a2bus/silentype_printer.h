@@ -54,6 +54,18 @@ private:
 	int right_offset = 0;
 	int left_offset = 3;
 
+
+	// The silentype printer has a thermal printhead that can overheat if continuously powered.
+	// A 555 timer is triggered upon activation of any of the printhead drive lines.
+	// The timer will clear all of the printhead drive lines after 10ms (10000 usec) to
+	// protect the printhead from damage and to prevent a fire hazard.
+
+	// It's possible that the bidirectional capability of the interface was to verify that this
+	// failsafe protection circuit was functioning correctly as the shift register would be cleared after
+	// 10 ms.  Values could be written to the shift register and then read back out after a delay.
+	// If the shift register values could still be read back after 10 ms, then the protection circuit would
+	// not be functioning properly since those bits should be cleared.
+
 	double headtemp[7] = {0.0}; // initialize to zero - avoid nan bugs
 	int heattime = 3000;   // time in usec to hit max temp  (smaller numbers mean faster)
 	int decaytime = 1000;  // time in usec to cool off
@@ -73,7 +85,9 @@ private:
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, unsigned int& pixel);
 	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern);
-	s32 ypos_coord(s32 ypos) { return ypos * 7 / 4 / 2; }  // y position given in half steps, full step is 7/4 pixels
+//  s32 x_pixel_coord(s32 xpos) { return xpos / 2; )  // x position in half steps   yikes!!! ) instead of } broke compilation
+	s32 x_pixel_coord(s32 xpos) { return xpos / 2; }  // x position in half steps
+	s32 y_pixel_coord(s32 ypos) { return ypos * 7 / 4 / 2; }  // y position given in half steps, full step is 7/4 pixels
 };
 
 DECLARE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device)

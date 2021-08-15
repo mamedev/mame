@@ -5,7 +5,7 @@
  *
  */
 #include "screen.h"
-#include "session_time.h"        
+#include "session_time.h"
 
 #ifndef MAME_MACHINE_BITMAP_PRINTER_H
 #define MAME_MACHINE_BITMAP_PRINTER_H
@@ -57,7 +57,7 @@ private:
 
 	std::string m_printername;
 	std::string m_snapshotdir;
-//	time_t m_session_time;
+//  time_t m_session_time;
 
 	int m_printheadcolor       = 0xEEE8AA;
 	int m_printheadbordercolor = 0xBDB76B;
@@ -82,7 +82,7 @@ void drawprinthead(bitmap_rgb32 &bitmap, int x, int y);
 public:
 
 	session_time_device * get_session_time_device() {return m_session_time;}
-	
+
 	void write_snapshot_to_file(std::string directory, std::string name);
 
 	void drawpixel(int x, int y, int pixelval)

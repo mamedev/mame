@@ -15,10 +15,10 @@ class session_time_device : public device_t
 public:
 	session_time_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	session_time_device(const machine_config &mconfig, const char *tag, device_t *owner, int paperwidth, int paperheight) :
+	session_time_device(const machine_config &mconfig, const char *tag, device_t *owner, int skip_device_level) :
 		session_time_device(mconfig, tag, owner, u32(0))
 	{
-
+		m_skip_device_level = skip_device_level;
 	}
 
 protected:
@@ -37,9 +37,8 @@ protected:
 
 private:
 	std::string m_printername;
-	std::string m_snapshotdir;
 	time_t m_session_time;
-
+	int m_skip_device_level = 0;
 public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_session_time);

@@ -237,18 +237,18 @@ void a2bus_silentype_device::device_reset()
 uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 {
 	u8 retval = 0;
-	
+
 	if (BIT(offset,2))  // c094  (decodes bit a02)
 	{
 		retval |= m_silentype_printer->margin_switch_input() << SILENTYPE_STATUS;  // margin switch on d7
 	}
-	
+
 	if (BIT(offset,1))  // c091  (decodes bit a01)
 	{
 		retval |= m_silentype_printer->serial_data() << SERIAL_DATA_Q15; // if datawriteenable is off, read serial data from the printer on d7, otherwise reads serial data out (unimplemented)
-//		retval |= 0 << SHIFT_CLOCK_STATUS; // read shift clock status on d6 (unimplemented) (pulled up to +5v if printer connected and shift clock output disabled)
-		
-		retval |= (BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKDISABLE) ? 1 : 
+//      retval |= 0 << SHIFT_CLOCK_STATUS; // read shift clock status on d6 (unimplemented) (pulled up to +5v if printer connected and shift clock output disabled)
+
+		retval |= (BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKDISABLE) ? 1 :
 					BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKA)) << SHIFT_CLOCK_STATUS; // read shift clock status on d6 (unimplemented) (pulled up to +5v if printer connected and shift clock output disabled)
 
 	}

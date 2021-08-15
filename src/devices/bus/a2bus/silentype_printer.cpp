@@ -43,9 +43,9 @@
 //    0x0e will shift in a 0
 //    0x0f will shift in a 1
 //
-//       hstepperbits = BITS(m_parallel_reg, 3,  0);  // bits 0-3 are for the horizontal stepper
-//       vstepperbits = BITS(m_parallel_reg, 7,  4);  // bits 4-7 are for the vertical stepper
-//       headbits     = BITS(m_parallel_reg, 15, 9);  // bits 9-15 are for the print head
+//       hstepperbits = BITS(m_parallel_reg, 0, 4);  // bits 0-3 are for the horizontal stepper
+//       vstepperbits = BITS(m_parallel_reg, 4, 4);  // bits 4-7 are for the vertical stepper
+//       headbits     = BITS(m_parallel_reg, 9, 7);  // bits 9-15 are for the print head
 //
 //    Bit 8 is for R/W* input to the shift register and is normally sent as a 0.
 //
@@ -230,8 +230,8 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 	{
 		adjust_headtemp( BIT(lastheadbits,i), time_elapsed,  headtemp[i] );
 
-		int xpixel = (m_xpos/2) + ((xdirection == 1) ? right_offset : left_offset);
-		int ypixel = ypos_coord(m_ypos) + (6 - i);
+		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
+		int ypixel = y_pixel_coord(m_ypos) + (6 - i);
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
@@ -271,19 +271,19 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 		{
 			m_ypos = 10;  // lock to the top of page until we seek horizontally
 		}
-		if (ypos_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
+		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
 			// if we are within 50 pixels of the bottom of the page we will
 			// write the page to a file, then erase the top part of the page
 			// so we can still see the last page printed.
 		{
 			// clear paper to bottom from current position
-			m_bitmap_printer->bitmap_clear_band(ypos_coord(m_ypos) + 7, PAPER_HEIGHT - 1, rgb_t::white());
+			m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + 7, PAPER_HEIGHT - 1, rgb_t::white());
 
 			// save a snapshot with the slot and page as part of the filename
 			m_bitmap_printer->write_snapshot_to_file(
 						std::string("silentype"),
 						std::string("silentype_") +
-//						m_bitmap_printer->getprintername() +
+//                      m_bitmap_printer->getprintername() +
 						m_bitmap_printer->get_session_time_device()->getprintername() +
 						"_page_" +
 						m_bitmap_printer->padzeroes(std::to_string(page_count++),3) +
@@ -296,7 +296,7 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 			m_ypos = 10;
 		}
 		// clear page down to visible area
-		m_bitmap_printer->bitmap_clear_band(ypos_coord(m_ypos) + distfrombottom, std::min(ypos_coord(m_ypos) + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
+		m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + distfrombottom, std::min(y_pixel_coord(m_ypos) + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
 
 	}
 	else if (delta < 0) // we are moving up the page
@@ -305,7 +305,7 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
 	}
 
-	m_bitmap_printer->setheadpos(m_xpos / 2, ypos_coord(m_ypos));
+	m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
 }
 
 //-------------------------------------------------
@@ -333,6 +333,6 @@ void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
 		}
 	}
 
-	m_bitmap_printer->setheadpos(m_xpos / 2, ypos_coord(m_ypos));
+	m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
 }
 

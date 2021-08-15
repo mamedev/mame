@@ -2484,6 +2484,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/silentype_printer.h",
 		MAME_DIR .. "src/devices/bus/a2bus/bitmap_printer.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/bitmap_printer.h",
+		MAME_DIR .. "src/devices/bus/a2bus/session_time.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/session_time.h",
 		MAME_DIR .. "src/devices/bus/a2bus/softcard3.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/softcard3.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",

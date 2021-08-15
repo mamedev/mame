@@ -139,8 +139,8 @@ std::string session_time_device::simplename()
 //  printf("rootdevs equal %x\n",rootdev == rootdev2);
 
 	std::string s;
-//	int skipcount = 2;
-	int skipcount = 3;
+//  int skipcount = 2;
+	int skipcount = m_skip_device_level;
 
 	while (dev){
 			if (skipcount-- <= 0)

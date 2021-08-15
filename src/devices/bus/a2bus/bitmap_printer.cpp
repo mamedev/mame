@@ -62,8 +62,8 @@ void bitmap_printer_device::device_add_mconfig(machine_config &config)
 	screen.set_size(m_paperwidth, PAPER_SCREEN_HEIGHT);
 	screen.set_visarea(0, m_paperwidth - 1, 0, PAPER_SCREEN_HEIGHT - 1);
 	screen.set_screen_update(FUNC(bitmap_printer_device::screen_update_bitmap));
-	
-	SESSION_TIME(config, m_session_time,0);
+
+	SESSION_TIME(config, m_session_time, 3);  // skip 3 levels
 }
 
 //**************************************************************************
@@ -88,8 +88,8 @@ bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, cons
 
 void bitmap_printer_device::device_start()
 {
-//	time(&m_session_time);  // initialize session time
-//	initprintername();
+//  time(&m_session_time);  // initialize session time
+//  initprintername();
 
 	m_bitmap->allocate(m_paperwidth, m_paperheight);  // try 660 pixels for 11 inch long
 	m_bitmap->fill(0xffffff);  // Start with a white piece of paper
@@ -106,9 +106,9 @@ void bitmap_printer_device::device_reset_after_children()
 
 void bitmap_printer_device::device_reset()
 {
-//	printf("Bitmap Printer : Tagname=%s\n",tagname().c_str());
-//	printf("Bitmap Printer : Simplename=%s\n",simplename().c_str());
-//	printf("Bitmap Printer : name=%s\n",getprintername().c_str());
+//  printf("Bitmap Printer : Tagname=%s\n",tagname().c_str());
+//  printf("Bitmap Printer : Simplename=%s\n",simplename().c_str());
+//  printf("Bitmap Printer : name=%s\n",getprintername().c_str());
 }
 
 
