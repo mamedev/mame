@@ -107,7 +107,7 @@ private:
 		uint32_t identify = 0;
 
 /*70*/  uint32_t complete = 0;
-		uint32_t scsi_status = 0x1; // MROM reads this to check if the SPIFI is alive at system boot, so the WO description from NetBSD might be wrong.
+		uint32_t scsi_status = 0x0; //0x1; // MROM reads this to check if the SPIFI is alive at system boot, so the WO description from NetBSD might be wrong.
 		uint32_t data = 0;
 		uint32_t icond = 0;
 
