@@ -18,7 +18,7 @@ class dmadac_sound_device : public device_t, public device_sound_interface
 public:
 	dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void reset();
+	void initialize_state();
 	void flush();
 
 	template <typename T> void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, T* data) {
@@ -70,7 +70,7 @@ private:
 	stream_buffer::sample_t m_volume;
 	uint8_t           m_enabled;
 
-	static const int BUFFER_SIZE = 32768;
+	static constexpr int BUFFER_SIZE = 32768;
 };
 
 DECLARE_DEVICE_TYPE(DMADAC, dmadac_sound_device)
