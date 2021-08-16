@@ -224,7 +224,10 @@ void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
 	// video hardware
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 8);
+}
 
+void saitekosa_analyst_device::device_config_complete()
+{
 	auto *screen = subdevice<screen_device>("^screen");
 	screen->set_size(6 * 16 + 3, 16);
 	screen->set_visarea_full();

@@ -53,6 +53,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
  @MP1211   TMS1100   1980, Entex Space Invader (6012)
+ *MP1215   TMS1100   1980, Tiger Playmaker
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
@@ -122,6 +123,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
+ *MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
