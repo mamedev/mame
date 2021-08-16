@@ -286,7 +286,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_72in1",        BMC_72IN1 },
 	{ "bmc_76in1",        BMC_76IN1 },
 	{ "bmc_s42in1",       BMC_76IN1 },
-	{ "bmc_110in1",       BMC_110IN1 },
 	{ "bmc_150in1",       BMC_150IN1 },
 	{ "bmc_190in1",       BMC_190IN1 },
 	{ "bmc_500in1",       BMC_500IN1 },

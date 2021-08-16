@@ -887,15 +887,20 @@ class nes_bmc_72in1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_72in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_72in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual u8 read_l(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
-	virtual void pcb_reset() override;
+//	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+private:
+	u8 m_extra_ram[4];
 };
 
 
@@ -917,24 +922,6 @@ protected:
 
 private:
 	uint8_t m_reg[2];
-};
-
-
-// ======================> nes_bmc_110in1_device
-
-class nes_bmc_110in1_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_bmc_110in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -1231,7 +1218,6 @@ DECLARE_DEVICE_TYPE(NES_BMC_64IN1,      nes_bmc_64in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_70IN1,      nes_bmc_70in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_72IN1,      nes_bmc_72in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_76IN1,      nes_bmc_76in1_device)
-DECLARE_DEVICE_TYPE(NES_BMC_110IN1,     nes_bmc_110in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_150IN1,     nes_bmc_150in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_190IN1,     nes_bmc_190in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_500IN1,     nes_bmc_500in1_device)
