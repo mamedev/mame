@@ -1026,6 +1026,8 @@ void debug_view_memory::set_data_format(data_format format)
 
 		m_bytes_per_chunk = get_posdata(format).m_bytes;
 		m_chunks_per_row = m_bytes_per_row / m_bytes_per_chunk;
+		if (m_chunks_per_row < 1)
+			m_chunks_per_row = 1;
 		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
 		pos.m_shift = 0;
 		pos.m_address -= pos.m_address % m_bytes_per_chunk;
