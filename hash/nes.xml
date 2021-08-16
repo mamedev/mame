@@ -61498,9 +61498,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="2dkjb" supported="no">
+	<software name="2dkjb" supported="partial">
 		<description>2 in 1 - Donkey Kong &amp; Jungle Book</description>
-		<year>19??</year>
+		<year>1997</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jyc_b" />
@@ -61562,13 +61562,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sdance" supported="no">
+	<software name="sdance" supported="partial">
 		<description>Street Dance (Asia, Hacked?)</description>
-		<year>19??</year>
+		<year>2000</year>
 		<publisher>Invent</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-128" /> <!-- wrong PCB? -->
+			<feature name="slot" value="txrom" /> <!-- is this the right board? some songs don't play -->
 			<dataarea name="chr" size="262144">
 				<rom name="street dance (invent) (unl).chr" size="262144" crc="28cf7806" sha1="7332aa10ad616dbbf74e1e53bb204d431caa0c6f" offset="00000" status="baddump" />
 			</dataarea>
@@ -61594,7 +61593,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
+<!-- FIXME: which board should this game use?? -->
 	<software name="2yudb" supported="no">
 		<description>2 in 1 - Yu Yu + Dragonball Z</description>
 		<year>19??</year>
@@ -62545,14 +62544,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="ejim2d" cloneof="ejim2" supported="no">
+<!-- This seems to be a slightly modified extract from Golden Card 6 in 1. -->
+	<software name="ejim2d" cloneof="ejim2" supported="partial">
 		<description>Earthworm Jim 2 (Asia, Hacked?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="slot" value="bmc_gc6in1" />
 			<dataarea name="chr" size="262144">
 				<rom name="earth worm jim 2 (unl)[no memu by maxzhou88].chr" size="262144" crc="66c57a10" sha1="0f6a5f2c75037a2213629ea45d79dcd0acacf48f" offset="00000" status="baddump" />
 			</dataarea>
@@ -67619,7 +67617,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
+<!-- FIXME: which board should this game use?? -->
 	<software name="cluclud" supported="no">
 		<description>Clu Clu Land D (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -74294,13 +74292,14 @@ Other
 		</part>
 	</software>
 
+<!-- CHR hack of dondoko2. As such it crashes in exactly the same spot at the first boss. -->
 	<software name="smb8a" cloneof="dondoko2" supported="partial">
 		<description>Super Bros 8 (Don Doko Don 2 pirate, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="tc0190fmc" />
-			<feature name="pcb" value="TAITO-TC0190FMC" />
+			<feature name="slot" value="tc0190fmcp" />
+			<feature name="pcb" value="TAITO-TC0190FMC+PAL16R4" />
 			<dataarea name="chr" size="262144">
 				<rom name="super bros 8 (unl).chr" size="262144" crc="6b0b0d7e" sha1="fd7900112340f16ab9015f38bf288ae594a2db3f" offset="00000" status="baddump" />
 			</dataarea>
@@ -76311,6 +76310,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Did this ever exist on an individual cart? Its CRCs match Golden Card 6 in 1 (the third 256K chunks). -->
 	<software name="mk3a">
 		<description>Mortal Kombat 3 (Asia, Alt)</description>
 		<year>19??</year>
