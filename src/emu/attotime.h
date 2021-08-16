@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-attotime.h
+	attotime.h
 
-Support functions for working with attotime data.
+	Support functions for working with attotime data.
 
 ***************************************************************************/
 #ifndef MAME_EMU_ATTOTIME_H
@@ -22,20 +22,20 @@ Support functions for working with attotime data.
 
 //**************************************************************************
 //  TYPE DEFINITIONS
-//***************************************************************************/
+//**************************************************************************
 
 class save_manager;
 
 //
 // "Attotime" is the name for the core timing structure in MAME. It comes from
-// the level of accuracy it attempts to capture, which is 1 attosecond, or
-// 10e-18. This may seem ridiculously overaccurate, but the goal was to be
-// able to compute the time of a clock pulse in the GHz range, and increment
-// it at a granularity of a single tick, and not create significant drift over
-// the course of a second.
+// the level of accuracy it attempts to capture, which is on the order of an
+// attosecond, or 10e-18. This may seem ridiculously overaccurate, but the goal
+// was to be able to compute the time of a clock pulse in the GHz range, and
+// increment it at a granularity of a single tick, and not create significant
+// drift over the course of a second.
 //
 // There are two structures used to represent these times: a full 'attotime'
-// and a 'subsecond'.
+// and a 'subseconds'.
 //
 // An attotime is conceptually a 96-bit signed integral value that holds 62 bits
 // of fractional seconds, plus 32 bits of seconds, plus 2 bits of flags. A
@@ -121,39 +121,45 @@ public:
 		return *this;
 	}
 
-	// simple getters
+	// extract the raw value
 	constexpr s64 raw() const noexcept { return m_subseconds; }
 
 	// queries
 	constexpr bool is_zero() const noexcept { return (m_subseconds == 0); }
 
-	// constant values
-	static constexpr subseconds max() noexcept { return subseconds::from_raw(MAX_RAW); }
-	static constexpr subseconds min() noexcept { return subseconds::from_raw(MIN_RAW); }
+	// constant values; in contrast to attotime below, these are functions and not
+	// static constants
+	static constexpr subseconds zero() noexcept { return subseconds::from_raw(0); }
 	static constexpr subseconds unit() noexcept { return subseconds::from_raw(1); }
 	static constexpr subseconds one_second() noexcept { return subseconds::from_raw(PER_SECOND); }
-	static constexpr subseconds zero() noexcept { return subseconds::from_raw(0); }
+	static constexpr subseconds min() noexcept { return subseconds::from_raw(MIN_RAW); }
+	static constexpr subseconds max() noexcept { return subseconds::from_raw(MAX_RAW); }
 
-	// static creators
+	// static creation of subseconds from a raw value
 	static constexpr subseconds from_raw(s64 raw) noexcept { return subseconds(raw); }
-	static constexpr subseconds from_double(double secs) noexcept { return subseconds(s64(secs * double(PER_SECOND))); }
+
+	// static creation of subseconds from an integral milli-/micro-/nano-seconds value
 	static constexpr subseconds from_msec(s32 msec) noexcept { return subseconds(s64(msec) * PER_MILLISECOND); }
 	static constexpr subseconds from_usec(s32 usec) noexcept { return subseconds(s64(usec) * PER_MICROSECOND); }
 	static constexpr subseconds from_nsec(s32 nsec) noexcept { return subseconds(s64(nsec) * PER_NANOSECOND); }
 
-	// static creator from integral hz value
+	// static creation of subseconds from a double seconds value
+	static constexpr subseconds from_double(double secs) noexcept { return subseconds(s64(secs * double(PER_SECOND))); }
+
+	// static creation of subseconds from an integral hz value
 	template<typename T>
 	static constexpr std::enable_if_t<std::is_integral<T>::value, subseconds> from_hz(T hz) noexcept
 	{
 		return subseconds((hz > 0) ? divide_up(PER_SECOND, hz) : MAX_RAW);
 	}
 
-	// static creator from floating-point hz value
+	// static creation of subseconds from a floating-point hz value
 	static constexpr subseconds from_hz(double hz) noexcept
 	{
-		// prefer to use integral logic if the value is effectively an integer
 		if (hz <= 0)
 			return max();
+
+		// prefer to use integral logic if the value is effectively an integer
 		s64 const hz_int = s64(hz);
 		if (hz == double(hz_int))
 			return subseconds(divide_up(PER_SECOND, hz_int));
@@ -162,42 +168,61 @@ public:
 		return subseconds(s64(double(PER_SECOND) / hz) + 1);
 	}
 
-	// static creator from XTAL; just extract the double value and use that
+	// static creation of subseconds from an XTAL
 	static constexpr subseconds from_hz(XTAL const &xtal) noexcept { return from_hz(xtal.dvalue()); }
 
-	// conversion to subseconds from ticks
+	// static creation of subseconds from a tick count and frequency
 	template<typename T>
 	static constexpr subseconds from_ticks(s64 ticks, T hz) noexcept { return ticks * from_hz(hz); }
 
-	// conversion helpers
+	// conversion of subseconds to a frequency in Hz
 	constexpr double as_hz() const noexcept { assert(!is_zero()); return double(PER_SECOND) / double(m_subseconds); }
+
+	// conversion of subseconds to a frequency in kHz
 	constexpr double as_khz() const noexcept { assert(!is_zero()); return (double(PER_SECOND) * 1e-3) / double(m_subseconds); }
+
+	// conversion of subseconds to a frequency in MHz
 	constexpr double as_mhz() const noexcept { assert(!is_zero()); return (double(PER_SECOND) * 1e-6) / double(m_subseconds); }
+
+	// conversion of subseconds to a floating-point seconds count
 	constexpr double as_double() const noexcept { return m_subseconds * (1.0 / double(PER_SECOND)); }
+
+	// conversion of subseconds to a floating-point milli-/micro-/nano-seconds count
 	constexpr double as_msec() const noexcept { return m_subseconds * (1.0 / double(PER_MILLISECOND)); }
 	constexpr double as_usec() const noexcept { return m_subseconds * (1.0 / double(PER_MICROSECOND)); }
 	constexpr double as_nsec() const noexcept { return m_subseconds * (1.0 / double(PER_NANOSECOND)); }
+
+	// conversion of subseconds to an integral milli-/micro-/nano-seconds count
 	constexpr s32 as_msec_int() const noexcept { return m_subseconds / PER_MILLISECOND; }
 	constexpr s32 as_usec_int() const noexcept { return m_subseconds / PER_MICROSECOND; }
 	constexpr s32 as_nsec_int() const noexcept { return m_subseconds / PER_NANOSECOND; }
 
-	// conversion to ticks from subseconds
+	// conversion of subseconds to a tick count at the provided integral frequency
 	template<typename T>
 	std::enable_if_t<std::is_integral<T>::value, s64> as_ticks(T hz) const noexcept
 	{
 		assert(hz > 0);
 		return (m_subseconds >> 62) * hz + mulu_64x64_hi(m_subseconds << 2, hz);
 	}
+
+	// conversion of subseconds to a tick count at the provided floating-point frequency
 	s64 as_ticks(double hz) const noexcept
 	{
-		assert(hz > 0);
+		// leverage the integral frequency version to do the heavy lifting by converting the
+		// floating-point frequency to a 33.31 fixed point value
 		return as_ticks(s64(hz * 2e31)) >> 31;
 	}
+
+	// conversion of subseconds to a tick count at the provided XTAL frequency
 	s64 as_ticks(XTAL const &xtal) const noexcept { return as_ticks(xtal.dvalue()); }
+
+	// conversion of subseconds to a tick count at the provided subseconds period
 	s64 as_ticks(subseconds period) const noexcept { return *this / period; }
 
-	// conversion to string
+	// conversion to string using an internal static rotating buffer (not thread safe, but convenient)
 	const char *as_string(int precision = 9, bool dividers = false) const noexcept;
+
+	// conversion to a C++ std::string
 	std::string to_string(int precision = 9, bool dividers = true) const;
 
 	// functions for addition of two subseconds
@@ -258,25 +283,41 @@ private:
 	s64 m_subseconds;
 };
 
-// addition of two subseconds
+
+//-------------------------------------------------
+//  operator+ - add two subseconds values
+//-------------------------------------------------
+
 inline constexpr subseconds operator+(subseconds const &left, subseconds const &right) noexcept
 {
 	return subseconds(left.m_subseconds + right.m_subseconds);
 }
 
-// negation of a subseconds value
+
+//-------------------------------------------------
+//  operator- - negate a subseconds value
+//-------------------------------------------------
+
 inline constexpr subseconds operator-(subseconds const &left) noexcept
 {
 	return subseconds(-left.m_subseconds);
 }
 
-// subtactions of two subseconds
+
+//-------------------------------------------------
+//  operator- - subtract two subseconds values
+//-------------------------------------------------
+
 inline constexpr subseconds operator-(subseconds const &left, subseconds const &right) noexcept
 {
 	return subseconds(left.m_subseconds - right.m_subseconds);
 }
 
-// multiplication of subseconds by an integral factor
+
+//-------------------------------------------------
+//  operator* - multiply subseconds by integer
+//-------------------------------------------------
+
 template<typename T>
 inline constexpr std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(subseconds const &left, T factor) noexcept
 {
@@ -289,44 +330,86 @@ inline constexpr std::enable_if_t<std::is_integral<T>::value, subseconds> operat
 	return subseconds(s64(factor) * right.m_subseconds);
 }
 
-// division of subseconds by an integral factor
+
+//-------------------------------------------------
+//  operator/ - divide subseconds by integer
+//-------------------------------------------------
+
 template<typename T>
 inline constexpr std::enable_if_t<std::is_integral<T>::value, subseconds> operator/(subseconds const &left, T factor) noexcept
 {
 	return subseconds(left.m_subseconds / s64(factor));
 }
 
-// division of subseconds by another subseconds value
+
+//-------------------------------------------------
+//  operator/ - divide subseconds by subseconds
+//-------------------------------------------------
+
 inline constexpr s64 operator/(subseconds const &left, subseconds const &right) noexcept
 {
 	return left.m_subseconds / right.m_subseconds;
 }
 
-// equality comparisons
+
+//-------------------------------------------------
+//  operator== - equality comparison of subseconds
+//-------------------------------------------------
+
 inline constexpr bool operator==(subseconds const &left, subseconds const &right) noexcept
 {
 	return left.m_subseconds == right.m_subseconds;
 }
+
+
+//-------------------------------------------------
+//  operator!= - inequality comparison of
+//  subseconds
+//-------------------------------------------------
+
 inline constexpr bool operator!=(subseconds const &left, subseconds const &right) noexcept
 {
 	return left.m_subseconds != right.m_subseconds;
 }
 
-// less than comparisons
+
+//-------------------------------------------------
+//  operator< - less than comparison of subseconds
+//-------------------------------------------------
+
 inline constexpr bool operator<(subseconds const &left, subseconds const &right) noexcept
 {
 	return left.m_subseconds < right.m_subseconds;
 }
+
+
+//-------------------------------------------------
+//  operator<= - less than or equals comparison of
+//  subseconds
+//-------------------------------------------------
+
 inline constexpr bool operator<=(subseconds const &left, subseconds const &right) noexcept
 {
 	return left.m_subseconds <= right.m_subseconds;
 }
 
-// greater than comparisons
+
+//-------------------------------------------------
+//  operator> - greater than comparison of
+//  subseconds
+//-------------------------------------------------
+
 inline constexpr bool operator>(subseconds const &left, subseconds const &right) noexcept
 {
 	return left.m_subseconds > right.m_subseconds;
 }
+
+
+//-------------------------------------------------
+//  operator>= - greater than or equals comparison
+//  of subseconds
+//-------------------------------------------------
+
 inline constexpr bool operator>=(subseconds const &left, subseconds const &right) noexcept
 {
 	return left.m_subseconds >= right.m_subseconds;
@@ -340,7 +423,7 @@ inline constexpr bool operator>=(subseconds const &left, subseconds const &right
 class attotime
 {
 	// save_manager needs direct access for save/restore purposes
-	friend class ::save_manager;
+	friend class save_manager;
 
 	// coarse and fine resolutions
 	static constexpr double COARSE_FACTOR = double(1ll << 32);
@@ -352,7 +435,7 @@ class attotime
 	static constexpr s32 MAX_SECONDS = s32(0x7fffffff);
 	static constexpr s32 MIN_SECONDS = s32(0x80000000);
 
-	// internal helper for creation
+	// internal constructor from raw coarse/fine values
 	constexpr attotime(s64 coarse, u32 fine) noexcept :
 		m_fine(fine), m_coarse(coarse)
 	{
@@ -367,30 +450,26 @@ class attotime
 	constexpr static bool is_never(u64 fineval) noexcept { return (BIT(fineval, 0, 2) != 0); }
 
 public:
-	// constants
-	static attotime const zero;
-	static attotime const never;
-
-	// construction/destruction
+	// empty constructor
 	constexpr attotime() noexcept :
 		m_fine(0),
 		m_coarse(0)
 	{
 	}
 
-	// construction with integral seconds
+	// construct from integral seconds
 	constexpr explicit attotime(s32 secs) noexcept :
 		attotime(s64(secs) << 32, 0)
 	{
 	}
 
-	// construction from subseconds
+	// construct from subseconds
 	constexpr attotime(subseconds subs) noexcept :
 		attotime(subs.raw() >> 30, u32(subs.raw() << 2))
 	{
 	}
 
-	// construction with integral seconds plus fractional subseconds
+	// construct from integral seconds plus fractional subseconds
 	constexpr attotime(s32 secs, subseconds subs) noexcept :
 		attotime((s64(secs) << 32) + (subs.raw() >> 30), u32(subs.raw() << 2))
 	{
@@ -403,7 +482,7 @@ public:
 	{
 	}
 
-	// assignment
+	// copy assignment
 	constexpr attotime &operator=(attotime const &src) noexcept
 	{
 		m_coarse = src.m_coarse;
@@ -411,63 +490,84 @@ public:
 		return *this;
 	}
 
-	// extraction of full seconds and fractional subseconds
+	// extract full seconds as an integer
 	constexpr s32 seconds() const noexcept { return s32(m_coarse >> 32); }
+
+	// extract fractional seconds as a subseconds value
 	constexpr subseconds frac() const noexcept { return subseconds::from_raw(((m_coarse & 0xffffffffll) << 30) | (m_fine >> 2)); }
 
 	// queries
 	constexpr bool is_zero() const noexcept { return ((m_coarse | m_fine) == 0); }
 	constexpr bool is_never() const noexcept { return is_never(m_fine); }
 
-	// static creators
+	// constant values; defined as static globals
+	static attotime const zero;
+	static attotime const never;
+
+	// static creation of attotime from a raw coarse/fine value pair
 	static constexpr attotime from_raw(s64 coarse, u32 fine) noexcept { return attotime(coarse, fine); }
+
+	// static creation of attotime from an integral seconds value
 	static constexpr attotime from_seconds(s32 seconds) noexcept { return attotime(seconds); }
+
+	// static creation of attotime from an integral milli-/micro-/nano-seconds value
 	static constexpr attotime from_msec(s64 msec) noexcept { return attotime(msec / 1000, subseconds::from_msec(msec % 1000)); }
 	static constexpr attotime from_usec(s64 usec) noexcept { return attotime(usec / 1000000, subseconds::from_usec(usec % 1000000)); }
 	static constexpr attotime from_nsec(s64 nsec) noexcept { return attotime(nsec / 1000000000, subseconds::from_nsec(nsec % 1000000000)); }
 
-	// static creator from double
+	// static creation of attotime from a double seconds value
 	static constexpr attotime from_double(double _time) noexcept
 	{
+		// out of bounds values give never
 		if (_time > MAX_SECONDS || _time < MIN_SECONDS)
 			return never;
+
+		// compute the coarse value first, and the fine from the residual
 		double upper = floor(_time * COARSE_FACTOR);
 		s64 coarse = s64(upper);
 		u32 fine = u32((_time - upper) * (FINE_FACTOR / COARSE_FACTOR));
 		return attotime(coarse, fine);
 	}
 
-	// static creator from integral hz value
+	// static creation of attotime from an integral hz value
 	template<typename T>
 	static constexpr std::enable_if_t<std::is_integral<T>::value, attotime> from_hz(T hz) noexcept
 	{
 		return (hz > 0) ? attotime(subseconds::from_hz(hz)) : never;
 	}
 
-	// static creator from floating-point hz value
+	// static creation of attotime from a floating-point hz value
 	static constexpr attotime from_hz(double hz) noexcept
 	{
+		// just leverage subseconds logic if frequency is above one
 		if (hz > 1.0)
 			return attotime(subseconds::from_hz(hz));
-		else if (hz > 0.0)
+
+		// if between 0 and 1 just compute the period in double and make that the result
+		if (hz > 0.0)
 			return from_double(1.0 / hz);
-		else
-			return never;
+
+		// anything else is just never
+		return never;
 	}
 
-	// static creator from XTAL; just extract the double value and use that
+	// static creation of attotime from an XTAL
 	static constexpr attotime from_hz(const XTAL &xtal) noexcept { return from_hz(xtal.dvalue()); }
 
-	// conversion to attotime from ticks
+	// static creation of subseconds from a tick count and an integral frequency
 	template<typename T>
 	static constexpr std::enable_if_t<std::is_integral<T>::value, attotime> from_ticks(s64 ticks, T hz) noexcept
 	{
+		// check for invalid frequency here because subseconds::from_ticks will return subseconds::max()
 		if (hz <= 0)
 			return never;
 		return attotime(ticks / s64(hz), subseconds::from_ticks(ticks % s64(hz), hz));
 	}
+
+	// static creation of subseconds from a tick count and a floating-point frequency
 	static constexpr attotime from_ticks(s64 ticks, double hz) noexcept
 	{
+		// check for invalid frequency here because subseconds::from_ticks will return subseconds::max()
 		if (hz <= 0)
 			return never;
 
@@ -479,36 +579,54 @@ public:
 		// otherwise, just do it in floating-point
 		return from_double(double(ticks) / hz);
 	}
+
+	// static creation of subseconds from a tick count and an XTAL
 	static constexpr attotime from_ticks(s64 ticks, const XTAL &xtal) noexcept { return from_ticks(ticks, xtal.dvalue()); }
 
-	// conversion helpers
+	// conversion of attotime to a frequency in Hz
 	constexpr double as_hz() const noexcept { assert(!is_zero()); return 1.0 / as_double(); }
+
+	// conversion of attotime to a frequency in kHz
 	constexpr double as_khz() const noexcept { assert(!is_zero()); return 1e-3 / as_double(); }
+
+	// conversion of attotime to a frequency in MHz
 	constexpr double as_mhz() const noexcept { assert(!is_zero()); return 1e-6 / as_double(); }
+
+	// conversion of attotime to a floating-point seconds count
 	constexpr double as_double() const noexcept { return double(m_coarse) * COARSE_FACTOR_INV + double(m_fine >> 2) * FINE_FACTOR_INV; }
+
+	// conversion of attotime to a floating-point milli-/micro-/nano-seconds count
 	constexpr double as_msec() const noexcept { return double(m_coarse) * (COARSE_FACTOR_INV * 1e3) + double(m_fine >> 2) * (FINE_FACTOR_INV * 1e3); }
 	constexpr double as_usec() const noexcept { return double(m_coarse) * (COARSE_FACTOR_INV * 1e6) + double(m_fine >> 2) * (FINE_FACTOR_INV * 1e6); }
 	constexpr double as_nsec() const noexcept { return double(m_coarse) * (COARSE_FACTOR_INV * 1e9) + double(m_fine >> 2) * (FINE_FACTOR_INV * 1e9); }
+
+	// conversion of attotime to an integral milli-/micro-/nano-seconds count
 	s64 as_msec_int() const noexcept { return as_ticks(1000); }
 	s64 as_usec_int() const noexcept { return as_ticks(1000000); }
 	s64 as_nsec_int() const noexcept { return as_ticks(1000000000); }
 
-	// conversion to ticks from attotime
+	// conversion of attotime to a tick count at the provided integral frequency
 	template<typename T>
 	std::enable_if_t<std::is_integral<T>::value, s64> as_ticks(T hz) const noexcept
 	{
 		assert(hz > 0);
 		return s64(seconds()) * s64(hz) + frac().as_ticks(hz);
 	}
+
+	// conversion of attotime to a tick count at the provided floating-point frequency
 	s64 as_ticks(double hz) const
 	{
 		assert(hz > 0);
-		return double(seconds()) * hz + frac().as_ticks(hz);
+		return s64(as_double() / hz);
 	}
+
+	// conversion of attotime to a tick count at the provided XTAL frequency
 	s64 as_ticks(XTAL const &xtal) const noexcept { return as_ticks(xtal.dvalue()); }
+
+	// conversion of attotime to a tick count at the provided subseconds period
 	s64 as_ticks(subseconds period) const noexcept { return *this / period; }
 
-	// conversion to subseconds
+	// conversion of attotime to subseconds, with clamping
 	constexpr subseconds as_subseconds() const noexcept
 	{
 		s64 value = m_coarse << 30;
@@ -517,8 +635,10 @@ public:
 		return (m_coarse >= 0) ? subseconds::max() : subseconds::min();
 	}
 
-	// conversion to string
+	// conversion to string using an internal static rotating buffer (not thread safe, but convenient)
 	const char *as_string(int precision = 9, bool dividers = false) const noexcept;
+
+	// conversion to a C++ std::string
 	std::string to_string(int precision = 9, bool dividers = true) const;
 
 	// functions for addition of two attotimes
@@ -563,7 +683,11 @@ private:
 	s64 m_coarse;
 };
 
-// functions for addition of two attotimes
+
+//-------------------------------------------------
+//  operator+ - add two attotime values
+//-------------------------------------------------
+
 inline constexpr attotime operator+(const attotime &left, const attotime &right) noexcept
 {
 	// first add the two fine parts
@@ -593,7 +717,11 @@ inline constexpr attotime &attotime::operator+=(const attotime &right) noexcept
 	return *this;
 }
 
-// functions for negation of an attotime value
+
+//-------------------------------------------------
+//  operator- - negate an attotime value
+//-------------------------------------------------
+
 inline constexpr attotime operator-(const attotime &left) noexcept
 {
 	// check for never
@@ -603,7 +731,11 @@ inline constexpr attotime operator-(const attotime &left) noexcept
 	return attotime(-left.m_coarse - (left.m_fine != 0), -left.m_fine);
 }
 
-// functions for subtraction of two attotimes
+
+//-------------------------------------------------
+//  operator- - subtract two attotime values
+//-------------------------------------------------
+
 inline constexpr attotime operator-(const attotime &left, const attotime &right) noexcept
 {
 	// check for never
@@ -633,7 +765,11 @@ inline constexpr attotime &attotime::operator-=(const attotime &right) noexcept
 	return *this;
 }
 
-// functions for multiplication of attotime by an integral factor
+
+//-------------------------------------------------
+//  operator* - multiply attotime by integer
+//-------------------------------------------------
+
 template<typename T>
 inline std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor) noexcept
 {
@@ -698,7 +834,11 @@ inline std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operato
 	return *this;
 }
 
-// functions for division of attotime by an integral factor
+
+//-------------------------------------------------
+//  operator/ - divide attotime by integer
+//-------------------------------------------------
+
 template<typename T>
 inline std::enable_if_t<std::is_integral<T>::value, attotime> operator/(const attotime &left, T factor) noexcept
 {
@@ -769,7 +909,11 @@ inline std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operato
 	return *this;
 }
 
-// functions for division of attotime by a subseconds value
+
+//-------------------------------------------------
+//  operator/ - divide attotime by subseconds
+//-------------------------------------------------
+
 inline s64 operator/(const attotime &left, subseconds factor) noexcept
 {
 	// check for never
@@ -794,37 +938,68 @@ inline s64 attotime::operator/=(subseconds factor) noexcept
 	return div_128x64(upper, lower, factor.raw());
 }
 
-// functions for equality comparisons
+
+//-------------------------------------------------
+//  operator== - equality comparison of attotimes
+//-------------------------------------------------
+
 inline constexpr bool operator==(const attotime &left, const attotime &right) noexcept
 {
 	return (left.m_coarse == right.m_coarse && left.m_fine == right.m_fine);
 }
+
+
+//-------------------------------------------------
+//  operator!= - inequality comparison of
+//  attotimes
+//-------------------------------------------------
 
 inline constexpr bool operator!=(const attotime &left, const attotime &right) noexcept
 {
 	return (left.m_coarse != right.m_coarse || left.m_fine != right.m_fine);
 }
 
-// functions for less than comparisons
+
+//-------------------------------------------------
+//  operator< - less than comparison of attotimes
+//-------------------------------------------------
+
 inline constexpr bool operator<(const attotime &left, const attotime &right) noexcept
 {
-	return (left.m_coarse < right.m_coarse || (left.m_coarse == right.m_coarse && left.m_fine < right.m_fine));
+	return (left.m_coarse < right.m_coarse || UNEXPECTED(left.m_coarse == right.m_coarse && left.m_fine < right.m_fine));
 }
+
+
+//-------------------------------------------------
+//  operator<= - less than or equals comparison of
+//  attotimes
+//-------------------------------------------------
 
 inline constexpr bool operator<=(const attotime &left, const attotime &right) noexcept
 {
-	return (left.m_coarse < right.m_coarse || (left.m_coarse == right.m_coarse && left.m_fine <= right.m_fine));
+	return (left.m_coarse < right.m_coarse || UNEXPECTED(left.m_coarse == right.m_coarse && left.m_fine <= right.m_fine));
 }
 
-// functions for greater than comparisons
+
+//-------------------------------------------------
+//  operator> - greater than comparison of
+//  attotimes
+//-------------------------------------------------
+
 inline constexpr bool operator>(const attotime &left, const attotime &right) noexcept
 {
-	return (left.m_coarse > right.m_coarse || (left.m_coarse == right.m_coarse && left.m_fine > right.m_fine));
+	return (left.m_coarse > right.m_coarse || UNEXPECTED(left.m_coarse == right.m_coarse && left.m_fine > right.m_fine));
 }
+
+
+//-------------------------------------------------
+//  operator>= - greater than or equals comparison
+//  of attotimes
+//-------------------------------------------------
 
 inline constexpr bool operator>=(const attotime &left, const attotime &right) noexcept
 {
-	return (left.m_coarse > right.m_coarse || (left.m_coarse == right.m_coarse && left.m_fine >= right.m_fine));
+	return (left.m_coarse > right.m_coarse || UNEXPECTED(left.m_coarse == right.m_coarse && left.m_fine >= right.m_fine));
 }
 
 
@@ -833,13 +1008,26 @@ inline constexpr bool operator>=(const attotime &left, const attotime &right) no
 //  INLINE FUNCTIONS
 //***************************************************************************/
 
+//-------------------------------------------------
+//  as_string - return a pointer to a generated
+//  string describing a subseconds value
+//-------------------------------------------------
+
 inline const char *subseconds::as_string(int precision, bool dividers) const noexcept
 {
+	// just leverage the full attotime logic to do this
 	return attotime(*this).as_string(precision, dividers);
 }
 
+
+//-------------------------------------------------
+//  to_string - return a std::string describing a
+//  subseconds value
+//-------------------------------------------------
+
 inline std::string subseconds::to_string(int precision, bool dividers) const
 {
+	// just leverage the full attotime logic to do this
 	return attotime(*this).to_string(precision, dividers);
 }
 

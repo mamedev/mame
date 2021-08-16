@@ -62,7 +62,7 @@ char const *attotime::generate_string(char *buffer, int precision, bool dividers
 				*dest++ = '\'';
 			s64 digit = rem / s_divisors[index];
 			rem -= digit * s_divisors[index];
-			*dest++ = '0' + digit;
+			*dest++ = '0' + std::clamp<int>(digit, 0, 9);
 		}
 		*dest = 0;
 	}
