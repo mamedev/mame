@@ -676,13 +676,16 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 		return m_char_rom[(m_font_addr >> 8) * (8 << char_size) + (char_size * 0x800) + ((offset >> 1) & 0xf)];
 	}
 
-	/* TODO: investigate on this difference */
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 		return m_kanji_rom[pcg_offset];
 
+	// TODO: do we really need to recalculate?
 	pcg_offset = (m_font_addr & 0x7fff) << 5;
-	pcg_offset|= offset & 0x1f;
-//  pcg_offset|= m_font_lr;
+	pcg_offset|= (offset & 0x1e);
+	// telenetm defintely needs this for 8x16 romaji title songs, otherwise it blanks them out
+	// (pc9801vm never reads this area btw)
+	pcg_offset|= (offset & m_font_lr) & 1;
+//	pcg_offset|= (m_font_lr);
 
 	return m_kanji_rom[pcg_offset];
 }
