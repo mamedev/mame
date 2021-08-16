@@ -113,9 +113,9 @@ void astrocde_state::astrocade_palette(palette_device &palette) const
 			int b = (by + y) * 255;
 
 			// clamp and store
-			r = (std::min)((std::max)(r, 0), 255);
-			g = (std::min)((std::max)(g, 0), 255);
-			b = (std::min)((std::max)(b, 0), 255);
+			r = std::clamp(r, 0, 255);
+			g = std::clamp(g, 0, 255);
+			b = std::clamp(b, 0, 255);
 			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}
