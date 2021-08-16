@@ -50235,8 +50235,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="release" value="19880826"/>
 		<info name="alt_title" value="スーパーダイナミックス バドミントン"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="d0eda7ba" sha1="7ae0bb48c4cdd8b634a77af2a486634ff8a1fac4" offset="00000" status="baddump" />
