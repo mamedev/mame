@@ -23,7 +23,7 @@ typedef uint64_t HashT;
 #endif
 
 // standard SDL headers
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 struct quad_setup_data
 {

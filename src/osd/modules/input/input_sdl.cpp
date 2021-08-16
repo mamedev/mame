@@ -17,7 +17,7 @@
 #if defined(SDLMAME_SDL2)
 
 // standard sdl header
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <cctype>
 // ReSharper disable once CppUnusedIncludeDirective
 #include <cstddef>

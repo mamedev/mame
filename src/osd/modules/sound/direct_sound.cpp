@@ -27,7 +27,7 @@
 
 #ifdef SDLMAME_WIN32
 #include "../../sdl/osdsdl.h"
-#include <SDL2/SDL_syswm.h>
+#include <SDL_syswm.h>
 #include "../../sdl/window.h"
 #else
 #include "winmain.h"

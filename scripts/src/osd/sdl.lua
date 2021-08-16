@@ -253,7 +253,7 @@ end
 
 if _OPTIONS["with-bundled-sdl2"]~=nil then
 	includedirs {
-		GEN_DIR .. "includes",
+		MAME_DIR .. "3rdparty/SDL2/include",
 	}
 end
 if BASE_TARGETOS=="unix" then

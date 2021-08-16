@@ -28,7 +28,7 @@
 #if !defined(OSD_WINDOWS) && !defined(OSD_MAC)
 // standard SDL headers
 #define TOBEMIGRATED 1
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #endif
 
 #include "modules/lib/osdlib.h"

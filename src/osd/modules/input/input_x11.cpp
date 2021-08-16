@@ -19,7 +19,7 @@
 #include <X11/Xutil.h>
 
 // standard sdl header
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <cctype>
 #include <cstddef>
 #include <mutex>

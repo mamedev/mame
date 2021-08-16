@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 /* renderer_sdl1 is the information about SDL for the current screen */
 class renderer_sdl1 : public osd_renderer

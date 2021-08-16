@@ -12,7 +12,7 @@
 #if defined(OSD_SDL)
 
 #include <algorithm>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #include "modules/osdwindow.h"
 #include "monitor_common.h"

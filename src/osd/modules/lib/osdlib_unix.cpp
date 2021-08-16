@@ -12,7 +12,7 @@
 #include "osdcore.h"
 #include "osdlib.h"
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #include <csignal>
 #include <cstdio>

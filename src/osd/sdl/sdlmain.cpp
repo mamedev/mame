@@ -33,7 +33,7 @@
 #include <windows.h>
 #endif
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 // MAME headers
 #include "corestr.h"

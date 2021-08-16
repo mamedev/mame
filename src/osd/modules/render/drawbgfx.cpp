@@ -12,13 +12,13 @@
 // standard windows headers
 #include <windows.h>
 #if defined(SDLMAME_WIN32)
-#include <SDL2/SDL_syswm.h>
+#include <SDL_syswm.h>
 #endif
 #else
 #if defined(OSD_MAC)
 extern void *GetOSWindow(void *wincontroller);
 #else
-#include <SDL2/SDL_syswm.h>
+#include <SDL_syswm.h>
 #endif
 #endif
 

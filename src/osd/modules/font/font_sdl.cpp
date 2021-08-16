@@ -14,11 +14,7 @@
 #include "fileio.h"
 #include "unicode.h"
 
-#ifdef SDLMAME_EMSCRIPTEN
 #include <SDL_ttf.h>
-#else
-#include <SDL2/SDL_ttf.h>
-#endif
 #if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 #include <fontconfig/fontconfig.h>
 #endif

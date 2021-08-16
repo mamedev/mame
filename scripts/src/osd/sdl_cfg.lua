@@ -99,13 +99,14 @@ if BASE_TARGETOS=="unix" then
 			if _OPTIONS["USE_LIBSDL"]~="1" then
 				buildoptions {
 					"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
+					"-I" .. _OPTIONS["SDL_FRAMEWORK_PATH"] .. '/SDL2.framework/Headers',
 				}
 			else
 				defines {
 					"MACOSX_USE_LIBSDL",
 				}
 				buildoptions {
-					backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
+					backtick(sdlconfigcmd() .. " --cflags"),
 				}
 			end
 		end
