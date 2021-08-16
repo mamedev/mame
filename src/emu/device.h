@@ -606,12 +606,12 @@ public:
 	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
 	// timer interfaces
-	template<typename DeviceType, typename FuncType, std::enable_if_t<std::is_base_of<device_t, DeviceType>::value, bool> = true>
-	emu_timer *timer_alloc(DeviceType &device, FuncType callback, char const *name, void *ptr = nullptr)
+	template<typename DeviceType, typename FuncType>
+	std::enable_if_t<std::is_base_of<device_t, DeviceType>::value, persistent_timer *> timer_alloc(DeviceType &device, FuncType callback, char const *name, void *ptr = nullptr)
 	{
 		return m_scheduler->timer_alloc(timer_expired_delegate(callback, name, &device), ptr);
 	}
-	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr)
+	persistent_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr)
 	{
 		return m_scheduler->timer_alloc(*this, id, ptr);
 	}
