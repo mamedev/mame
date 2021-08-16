@@ -279,7 +279,7 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask32(0xff00ff00); //i8255 printer port / i8251 keyboard
 //	map(0x0050, 0x0053).w(FUNC(pc9821_state::nmi_ctrl_w)).umask32(0x00ff00ff);
 //	map(0x005c, 0x005f).r(FUNC(pc9821_state::timestamp_r)).nopw(); // artic
-//	map(0x0060, 0x0063).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>
+//	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>
 //	map(0x0060, 0x0063).r(FUNC(pc9821_state::unk_r)).umask32(0xff00ff00); // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
 //	map(0x0064, 0x0064).w(FUNC(pc9821_state::vrtc_clear_w));
 	map(0x0068, 0x006b).w(FUNC(pc9821_state::pc9821_video_ff_w)).umask32(0x00ff00ff); //mode FF / <undefined>
@@ -656,7 +656,7 @@ void pc9821_state::pc9821(machine_config &config)
 
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
 	
-	m_hgdc2->set_display_pixels(FUNC(pc9821_state::pc9821_hgdc_display_pixels));
+	m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pc9821_hgdc_display_pixels));
 }
 
 void pc9821_mate_a_state::pc9821as(machine_config &config)

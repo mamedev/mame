@@ -629,7 +629,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 	map(0x0050, 0x0057).rw("ppi8255_fdd", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / i8255 floppy port (2d?)
-	map(0x0060, 0x0063).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
+	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
 //  map(0x006c, 0x006f) border color / <undefined>
 	map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
@@ -2095,14 +2095,14 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_screen->set_screen_update(FUNC(pc9801_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(pc9801_state::vrtc_irq));
 
-	UPD7220(config, m_hgdc1, 21.0526_MHz_XTAL / 8);
-	m_hgdc1->set_addrmap(0, &pc9801_state::upd7220_1_map);
-	m_hgdc1->set_draw_text(FUNC(pc9801_state::hgdc_draw_text));
-	m_hgdc1->vsync_wr_callback().set(m_hgdc2, FUNC(upd7220_device::ext_sync_w));
+	UPD7220(config, m_hgdc[0], 21.0526_MHz_XTAL / 8);
+	m_hgdc[0]->set_addrmap(0, &pc9801_state::upd7220_1_map);
+	m_hgdc[0]->set_draw_text(FUNC(pc9801_state::hgdc_draw_text));
+	m_hgdc[0]->vsync_wr_callback().set(m_hgdc[1], FUNC(upd7220_device::ext_sync_w));
 
-	UPD7220(config, m_hgdc2, 21.0526_MHz_XTAL / 8);
-	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_2_map);
-	m_hgdc2->set_display_pixels(FUNC(pc9801_state::hgdc_display_pixels));
+	UPD7220(config, m_hgdc[1], 21.0526_MHz_XTAL / 8);
+	m_hgdc[1]->set_addrmap(0, &pc9801_state::upd7220_2_map);
+	m_hgdc[1]->set_display_pixels(FUNC(pc9801_state::hgdc_display_pixels));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -2177,7 +2177,7 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
 
-	m_hgdc2->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
+	m_hgdc[1]->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
 
 //  DAC_1BIT(config, m_dac1bit, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);

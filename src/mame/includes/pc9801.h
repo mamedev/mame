@@ -125,19 +125,17 @@ public:
 		, m_pit(*this, "pit")
 		, m_fdc_2hd(*this, "upd765_2hd")
 		, m_fdc_2dd(*this, "upd765_2dd")
+		, m_ram(*this, RAM_TAG)
+		, m_hgdc(*this, "hgdc%d", 1)
+		, m_video_ram(*this, "video_ram_%d", 1)
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
 		, m_sio(*this, UPD8251_TAG)
-		, m_hgdc1(*this, "upd7220_chr")
-		, m_hgdc2(*this, "upd7220_btm")
 		, m_sasibus(*this, SASIBUS_TAG)
 		, m_sasi_data_out(*this, "sasi_data_out")
 		, m_sasi_data_in(*this, "sasi_data_in")
 		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
-		, m_video_ram_1(*this, "video_ram_1")
-		, m_video_ram_2(*this, "video_ram_2")
-		, m_ram(*this, RAM_TAG)
 	{
 	}
 
@@ -155,23 +153,18 @@ protected:
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
+	optional_device<ram_device> m_ram;
+	required_device_array<upd7220_device, 2> m_hgdc;
+	required_shared_ptr_array<uint16_t, 2> m_video_ram;
 private:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<pc9801_memsw_device> m_memsw;
 	required_device<i8251_device> m_sio;
-	required_device<upd7220_device> m_hgdc1;
-protected:
-	required_device<upd7220_device> m_hgdc2;
-private:
 	optional_device<scsi_port_device> m_sasibus;
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
 	optional_device<input_buffer_device> m_sasi_ctrl_in;
-	required_shared_ptr<uint16_t> m_video_ram_1;
-protected:
-	required_shared_ptr<uint16_t> m_video_ram_2;
-	optional_device<ram_device> m_ram;
 
 //  Infrastructure declaration
 protected:
