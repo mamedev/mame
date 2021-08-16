@@ -478,7 +478,7 @@ void pc9801_state::gvram_w(offs_t offset, uint8_t data)
  *
  ************************************************/
 
-uint16_t pc9801_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
+uint16_t pc9801vm_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = 0;
 
@@ -506,7 +506,7 @@ uint16_t pc9801_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
 	return res;
 }
 
-void pc9801_state::upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!(m_grcg.mode & 0x80))
 		COMBINE_DATA(&m_video_ram_2[offset]);
@@ -560,7 +560,7 @@ void pc9801_state::upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mas
  *
  ************************************************/
 
-uint16_t pc9801_state::egc_color_pat(int plane) const
+uint16_t pc9801vm_state::egc_color_pat(int plane) const
 {
 	uint8_t color = 0;
 	switch((m_egc.regs[1] >> 13) & 3)
@@ -579,7 +579,7 @@ uint16_t pc9801_state::egc_color_pat(int plane) const
 	return BIT(color, plane) ? 0xffff : 0;
 }
 
-uint16_t pc9801_state::egc_shift(int plane, uint16_t val)
+uint16_t pc9801vm_state::egc_shift(int plane, uint16_t val)
 {
 	int src_off = m_egc.regs[6] & 0xf, dst_off = (m_egc.regs[6] >> 4) & 0xf;
 	int left = src_off - dst_off, right = dst_off - src_off;
@@ -613,7 +613,7 @@ uint16_t pc9801_state::egc_shift(int plane, uint16_t val)
 	return out;
 }
 
-uint16_t pc9801_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const
+uint16_t pc9801vm_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const
 {
 	uint16_t out = 0;
 
@@ -628,7 +628,7 @@ uint16_t pc9801_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, 
 	return out;
 }
 
-void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t mask = m_egc.regs[4] & mem_mask, out = 0;
 	bool dir = !(m_egc.regs[6] & 0x1000);
@@ -728,7 +728,7 @@ void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-uint16_t pc9801_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
+uint16_t pc9801vm_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
 {
 	uint32_t plane_off = offset & 0x13fff;
 	if((m_egc.regs[2] & 0x300) == 0x100)

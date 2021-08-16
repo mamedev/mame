@@ -18,7 +18,8 @@
 	  - refactor memory banking to use address maps;
 	  - video;
       - double check dipswitches;
-	  - move PC80S31K to device;
+	  - move PC80S31K to device, needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801.
+	    Also notice that there are common points with SPC-1000 and TF-20 FDDs;
 	  - backport/merge what is portable to PC-8001;
 	- implement bus slot mechanism for NEC boards ("PC-8800-**"), HAL PCG-8100 & GSX8800,
 	  probably others (does bus have an actual codename or just "PC-8801 bus"?);

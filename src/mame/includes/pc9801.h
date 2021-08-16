@@ -135,24 +135,15 @@ public:
 		, m_sasi_data_out(*this, "sasi_data_out")
 		, m_sasi_data_in(*this, "sasi_data_in")
 		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
-		, m_ide(*this, "ide%u", 1U)
 		, m_video_ram_1(*this, "video_ram_1")
 		, m_video_ram_2(*this, "video_ram_2")
-		, m_dac(*this, "dac")
 		, m_ram(*this, RAM_TAG)
 	{
 	}
 
 	void pc9801(machine_config &config);
 
-	void pc9801vm(machine_config &config);
-
-	void pc9801ux(machine_config &config);
-	void pc9801vx(machine_config &config);
-	void pc9801rs(machine_config &config);
-
 	void init_pc9801_kanji();
-	void init_pc9801vm_kanji();
 
 protected:
 	virtual void video_start() override;
@@ -161,7 +152,6 @@ protected:
 	void pc9801_mouse(machine_config &config);
 	void pc9801_cbus(machine_config &config);
 	void pc9801_sasi(machine_config &config);
-	void pc9801_ide(machine_config &config);
 	void pc9801_common(machine_config &config);
 	void config_floppy_525hd(machine_config &config);
 	void config_floppy_35hd(machine_config &config);
@@ -177,42 +167,39 @@ protected:
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
 
-	void pc9801rs_io(address_map &map);
-	void pc9801rs_map(address_map &map);
-
-	u8 m_vram_bank;
-	u8 m_vram_disp;
-	u8 m_gate_a20;
-	uint8_t m_video_ff[8];
-	uint8_t m_ex_video_ff[128];
+	void pc9801_common_io(address_map &map);
 
 	u8 mouse_freq_r(offs_t offset);
 	void mouse_freq_w(offs_t offset, u8 data);
 	uint8_t pic_r(offs_t offset);
 	void pic_w(offs_t offset, uint8_t data);
 	void dmapg8_w(offs_t offset, uint8_t data);
-	void pc9801rs_video_ff_w(offs_t offset, uint8_t data);
-	void pc9801rs_a0_w(offs_t offset, uint8_t data);	
+protected:
 	uint8_t pc9801_a0_r(offs_t offset);
 	void pc9801_a0_w(offs_t offset, uint8_t data);
-	uint16_t grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
-	void grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t grcg_gvram0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void pc9801_palette(palette_device &palette) const;
+
 	uint8_t fdc_2hd_ctrl_r();
 	void fdc_2hd_ctrl_w(uint8_t data);
+private:
 	uint8_t fdc_2dd_ctrl_r();
 	void fdc_2dd_ctrl_w(uint8_t data);
 
-	DECLARE_MACHINE_START(pc9801rs);
-	DECLARE_MACHINE_RESET(pc9801rs);
-	void pc9801_palette(palette_device &palette) const;
-
+protected:
 	u8 unk_r(offs_t offset);
+	uint8_t f0_r(offs_t offset);
+
+	uint8_t m_video_ff[8];
+	// TODO: move to derived state
+	uint8_t m_ex_video_ff[128];
+	uint8_t m_nmi_ff;
+	u8 m_vram_bank;
+	u8 m_vram_disp;
+
+	u8 m_fdc_ctrl;
 
 private:
-	static void cdrom_headphones(device_t *device);
-
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<pc9801_memsw_device> m_memsw;
@@ -225,37 +212,28 @@ private:
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
 	optional_device<input_buffer_device> m_sasi_ctrl_in;
-	optional_device_array<ata_interface_device, 2> m_ide;
 	required_shared_ptr<uint16_t> m_video_ram_1;
+protected:
 	required_shared_ptr<uint16_t> m_video_ram_2;
-//	optional_device<dac_1bit_device> m_dac;
-	optional_device<speaker_sound_device> m_dac;
 	optional_device<ram_device> m_ram;
-
+private:
 	void dmapg4_w(offs_t offset, uint8_t data);
 	void nmi_ctrl_w(offs_t offset, uint8_t data);
 	void vrtc_clear_w(uint8_t data);
-	void pc9801_video_ff_w(uint8_t data);
 	uint8_t txt_scrl_r(offs_t offset);
 	void txt_scrl_w(offs_t offset, uint8_t data);
-	uint8_t grcg_r(offs_t offset);
-	void grcg_w(offs_t offset, uint8_t data);
 
+protected:
 	uint16_t tvram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void tvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t gvram_r(offs_t offset);
 	void gvram_w(offs_t offset, uint8_t data);
+	uint8_t grcg_r(offs_t offset);
+	void grcg_w(offs_t offset, uint8_t data);
+	
+	void pc9801_video_ff_w(uint8_t data);
 
-	uint16_t upd7220_grcg_r(offs_t offset, uint16_t mem_mask = ~0);
-	void upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	uint8_t ide_ctrl_r();
-	void ide_ctrl_w(uint8_t data);
-	uint16_t ide_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ide_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ide_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
+private:
 	void sasi_data_w(uint8_t data);
 	uint8_t sasi_data_r();
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
@@ -263,34 +241,21 @@ private:
 	uint8_t sasi_status_r();
 	void sasi_ctrl_w(uint8_t data);
 
-	uint8_t pc9801rs_knjram_r(offs_t offset);
-	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
-	void pc9801rs_bank_w(offs_t offset, uint8_t data);
-	uint8_t f0_r(offs_t offset);
-
-	uint8_t a20_ctrl_r(offs_t offset);
-	void a20_ctrl_w(offs_t offset, uint8_t data);
-	uint8_t fdc_mode_ctrl_r();
-	void fdc_mode_ctrl_w(uint8_t data);
-//  uint8_t pc9801rs_2dd_r();
-//  void pc9801rs_2dd_w(uint8_t data);
-	// 286-based machines except for PC98XA
-	u8 dma_access_ctrl_r(offs_t offset);
-	void dma_access_ctrl_w(offs_t offset, u8 data);
-	uint8_t midi_r();
 //  uint8_t winram_r();
 //  void winram_w(uint8_t data);
 
-	uint16_t timestamp_r(offs_t offset);
-
 protected:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+
+	DECLARE_MACHINE_START(pc9801_common);
+
+	DECLARE_MACHINE_RESET(pc9801_common);
+
+	void ipl_bank(address_map &map);
 private:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_START(pc9801f);
-	DECLARE_MACHINE_RESET(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801f);
 
 	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
@@ -303,11 +268,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	void ppi_sys_dac_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
-	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_drq);
 
 	uint8_t ppi_mouse_porta_r();
 	void ppi_mouse_porta_w(uint8_t data);
@@ -316,18 +278,12 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t a20_286(bool state);
 
-	void ipl_bank(address_map &map);
-	void pc9801_common_io(address_map &map);
 	void pc9801_io(address_map &map);
 	void pc9801_map(address_map &map);
-	void pc9801ux_io(address_map &map);
-	void pc9801ux_map(address_map &map);
 
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
-	void upd7220_grcg_2_map(address_map &map);
 
 	enum
 	{
@@ -335,9 +291,10 @@ private:
 	};
 
 	inline void set_dma_channel(int channel, int state);
+protected:
 	uint8_t *m_char_rom;
 	uint8_t *m_kanji_rom;
-
+private:
 	uint8_t m_dma_offset[4];
 	uint8_t m_dma_autoinc[4];
 	int m_dack;
@@ -348,12 +305,13 @@ private:
 
 	std::unique_ptr<uint16_t[]> m_tvram;
 
+protected:
 	uint16_t m_font_addr;
-	uint8_t m_font_line;
 	uint16_t m_font_lr;
+private:
+	uint8_t m_font_line;
 
 	uint8_t m_fdc_2dd_ctrl, m_fdc_2hd_ctrl;
-	uint8_t m_nmi_ff;
 
 	uint8_t m_sasi_data;
 	int m_sasi_data_enable;
@@ -368,21 +326,104 @@ private:
 		uint8_t freq_index;
 	}m_mouse;
 
-	uint8_t m_ide_sel;
-
-	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
-	bool m_dac_disable;
-
-	/* 286+ specific, move to specific state */
 protected:
-	u8 m_dma_access_ctrl; // DMA related
-private:
-	uint8_t m_fdc_ctrl;
-
 	struct {
 		uint8_t mode;
 		uint8_t tile[4], tile_index;
 	}m_grcg;
+};
+
+/**********************************************************
+ *
+ * VM class
+ *
+ **********************************************************/
+
+class pc9801vm_state : public pc9801_state
+{
+public:
+	pc9801vm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc9801_state(mconfig, type, tag)
+		, m_ide(*this, "ide%u", 1U)
+		, m_dac1bit(*this, "dac1bit")
+	{
+	}
+	void pc9801vm(machine_config &config);
+
+	void pc9801ux(machine_config &config);
+	void pc9801vx(machine_config &config);
+	void pc9801rs(machine_config &config);
+
+	void init_pc9801vm_kanji();
+
+protected:
+	void pc9801rs_io(address_map &map);
+	void pc9801rs_map(address_map &map);
+
+	uint16_t grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t grcg_gvram0_r(offs_t offset, uint16_t mem_mask = ~0);
+	void grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t upd7220_grcg_r(offs_t offset, uint16_t mem_mask = ~0);
+	void upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void upd7220_grcg_2_map(address_map &map);
+
+	void pc9801_ide(machine_config &config);
+	static void cdrom_headphones(device_t *device);
+
+	void pc9801rs_video_ff_w(offs_t offset, uint8_t data);
+	void pc9801rs_a0_w(offs_t offset, uint8_t data);	
+
+	uint8_t ide_ctrl_r();
+	void ide_ctrl_w(uint8_t data);
+	uint16_t ide_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ide_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ide_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t timestamp_r(offs_t offset);
+
+	void ppi_sys_dac_portc_w(uint8_t data);
+
+	DECLARE_MACHINE_START(pc9801rs);
+	DECLARE_MACHINE_RESET(pc9801rs);
+
+	u8 m_gate_a20;
+	u8 m_dma_access_ctrl;
+	u8 m_ide_sel;
+
+	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
+	bool m_dac1bit_disable;
+
+private:
+	optional_device_array<ata_interface_device, 2> m_ide;
+//	optional_device<dac_1bit_device> m_dac1bit;
+	required_device<speaker_sound_device> m_dac1bit;
+
+	void pc9801ux_io(address_map &map);
+	void pc9801ux_map(address_map &map);
+
+	uint32_t a20_286(bool state);
+
+	uint8_t pc9801rs_knjram_r(offs_t offset);
+	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
+	void pc9801rs_bank_w(offs_t offset, uint8_t data);
+	uint8_t midi_r();
+
+	// 286-based machines except for PC98XA
+	u8 dma_access_ctrl_r(offs_t offset);
+	void dma_access_ctrl_w(offs_t offset, u8 data);
+
+	uint8_t a20_ctrl_r(offs_t offset);
+	void a20_ctrl_w(offs_t offset, uint8_t data);
+
+	uint8_t fdc_mode_ctrl_r();
+	void fdc_mode_ctrl_w(uint8_t data);
+
+//	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
+//	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_drq);
 
 protected:
 	struct {
@@ -413,11 +454,11 @@ private:
 	uint16_t egc_color_pat(int plane) const;
 };
 
-class pc9801us_state : public pc9801_state
+class pc9801us_state : public pc9801vm_state
 {
 public:
 	pc9801us_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc9801_state(mconfig, type, tag)
+		: pc9801vm_state(mconfig, type, tag)
 	{
 	}
 	void pc9801us(machine_config &config);
@@ -650,11 +691,11 @@ public:
  *
  ******************************************/
 
-class pc98_epson_state : public pc9801_state
+class pc98_epson_state : public pc9801vm_state
 {
 public:
 	pc98_epson_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc9801_state(mconfig, type, tag)
+		: pc9801vm_state(mconfig, type, tag)
 		, m_shadow_ipl(*this, "shadow_ipl_%u", 0)
 	{
 	}

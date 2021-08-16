@@ -57,6 +57,8 @@
 		  (late era 9801 and 9821 class machines);
 		- pinpoint machines that uses GRCG instead of EGC, we are currently too lenient and support
 		  latter on most (use dbuster and hypbingo to checkout);
+		- Improve opacity of video flip/flop registers, consider using an address space instead of
+		  current array format;
 
     TODO (PC-9801F)
     - kanji port 0xa9 readback is broken for several games (balpower, lovelyho).
@@ -66,6 +68,10 @@
     - keyboard shift doesn't seem to disable properly (fixed by now?);
     - Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
     - clean-up duplicate code;
+
+	TODO (PC-9801RX):
+	- Identify model type, it clearly accesses PCI and it's not a 286 CPU;
+	- Floppy boot fails;
 
 	TODO (PC-9801US):
 	- "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
@@ -435,7 +441,7 @@ void pc9801_state::fdc_2dd_ctrl_w(uint8_t data)
 	m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 }
 
-uint8_t pc9801_state::ide_ctrl_r()
+u8 pc9801vm_state::ide_ctrl_r()
 {
 	address_space &ram = m_maincpu->space(AS_PROGRAM);
 	// this makes the ide driver not do 512 to 256 byte sector translation, the 9821 looks for bit 6 of offset 0xac403 of the kanji ram to set this, the rs unknown
@@ -443,28 +449,28 @@ uint8_t pc9801_state::ide_ctrl_r()
 	return m_ide_sel;
 }
 
-void pc9801_state::ide_ctrl_w(uint8_t data)
+void pc9801vm_state::ide_ctrl_w(u8 data)
 {
 	if(!(data & 0x80))
 		m_ide_sel = data & 1;
 }
 
-uint16_t pc9801_state::ide_cs0_r(offs_t offset, uint16_t mem_mask)
+uint16_t pc9801vm_state::ide_cs0_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_ide[m_ide_sel]->cs0_r(offset, mem_mask);
 }
 
-void pc9801_state::ide_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::ide_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ide[m_ide_sel]->cs0_w(offset, data, mem_mask);
 }
 
-uint16_t pc9801_state::ide_cs1_r(offs_t offset, uint16_t mem_mask)
+uint16_t pc9801vm_state::ide_cs1_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_ide[m_ide_sel]->cs1_r(offset, mem_mask);
 }
 
-void pc9801_state::ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ide[m_ide_sel]->cs1_w(offset, data, mem_mask);
 }
@@ -654,9 +660,9 @@ void pc9801_state::pc9801_io(address_map &map)
  *
  ************************************/
 
-/* TODO: it's possible that the offset calculation is actually linear. */
-/* TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these? */
-uint8_t pc9801_state::pc9801rs_knjram_r(offs_t offset)
+// TODO: it's possible that the offset calculation is actually linear.
+// TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these?
+uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 {
 	uint32_t pcg_offset;
 
@@ -681,7 +687,7 @@ uint8_t pc9801_state::pc9801rs_knjram_r(offs_t offset)
 	return m_kanji_rom[pcg_offset];
 }
 
-void pc9801_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
+void pc9801vm_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
 {
 	uint32_t pcg_offset;
 
@@ -696,8 +702,7 @@ void pc9801_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
 	}
 }
 
-/* FF-based */
-void pc9801_state::pc9801rs_bank_w(offs_t offset, uint8_t data)
+void pc9801vm_state::pc9801rs_bank_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
 	{
@@ -723,7 +728,7 @@ void pc9801_state::pc9801rs_bank_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t pc9801_state::a20_ctrl_r(offs_t offset)
+uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 {
 	if(offset == 0x01)
 		return (m_gate_a20 ^ 1) | 0xfe;
@@ -733,7 +738,7 @@ uint8_t pc9801_state::a20_ctrl_r(offs_t offset)
 	return f0_r(offset);
 }
 
-void pc9801_state::a20_ctrl_w(offs_t offset, uint8_t data)
+void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0x00)
 	{
@@ -796,7 +801,7 @@ void pc9801_state::grcg_w(offs_t offset, uint8_t data)
 	txt_scrl_w(offset,data);
 }
 
-void pc9801_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!(m_egc.regs[1] & 0x6000) || (offset != 4)) // why?
 		COMBINE_DATA(&m_egc.regs[offset]);
@@ -811,12 +816,12 @@ void pc9801_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-uint8_t pc9801_state::fdc_mode_ctrl_r()
+uint8_t pc9801vm_state::fdc_mode_ctrl_r()
 {
 	return (m_fdc_ctrl & 3) | 0xf0 | 8 | 4;
 }
 
-void pc9801_state::fdc_mode_ctrl_w(uint8_t data)
+void pc9801vm_state::fdc_mode_ctrl_w(uint8_t data)
 {
 	/*
 	---- x--- ready line?
@@ -834,46 +839,7 @@ void pc9801_state::fdc_mode_ctrl_w(uint8_t data)
 	//  logerror("FDC ctrl called with %02x\n",data);
 }
 
-#if 0
-uint8_t pc9801_state::pc9801rs_2dd_r()
-{
-//  if(m_fdc_ctrl & 1)
-//      return 0xff;
-
-	if((offset & 1) == 0)
-	{
-		switch(offset & 6)
-		{
-			case 0: return m_fdc_2hd->msr_r();
-			case 2: return m_fdc_2hd->fifo_r();
-			case 4: return 0x44; //2dd flag
-		}
-	}
-
-	logerror("Read to undefined port [%02x]\n",offset+0x90);
-
-	return 0xff;
-}
-
-void pc9801_state::pc9801rs_2dd_w(uint8_t data)
-{
-//  if(m_fdc_ctrl & 1)
-//      return;
-
-	if((offset & 1) == 0)
-	{
-		switch(offset & 6)
-		{
-			case 2: m_fdc_2hd->fifo_w(data); return;
-			case 4: logerror("%02x 2DD FDC ctrl\n",data); return;
-		}
-	}
-
-	logerror("Write to undefined port [%02x] %02x\n",offset+0x90,data);
-}
-#endif
-
-void pc9801_state::pc9801rs_video_ff_w(offs_t offset, uint8_t data)
+void pc9801vm_state::pc9801rs_video_ff_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
 	{
@@ -901,7 +867,7 @@ void pc9801_state::pc9801rs_video_ff_w(offs_t offset, uint8_t data)
 	pc9801_video_ff_w(data);
 }
 
-void pc9801_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
+void pc9801vm_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
 {
 	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_16_MODE])
 	{
@@ -938,13 +904,13 @@ void pc9801_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
  * ---- ---x Mate A: selects high-reso mode
  *           ^ unknown otherwise
  */
-u8 pc9801_state::dma_access_ctrl_r(offs_t offset)
+u8 pc9801vm_state::dma_access_ctrl_r(offs_t offset)
 {
 	logerror("%s: DMA access control read\n", machine().describe_context());
 	return m_dma_access_ctrl;
 }
 
-void pc9801_state::dma_access_ctrl_w(offs_t offset, u8 data)
+void pc9801vm_state::dma_access_ctrl_w(offs_t offset, u8 data)
 {
 	logerror("%s: DMA access control write %02x\n", machine().describe_context(), data);
 	m_dma_access_ctrl = data;
@@ -952,12 +918,12 @@ void pc9801_state::dma_access_ctrl_w(offs_t offset, u8 data)
 
 // ARTIC device
 
-uint16_t pc9801_state::timestamp_r(offs_t offset)
+uint16_t pc9801vm_state::timestamp_r(offs_t offset)
 {
 	return (m_maincpu->total_cycles() >> (16 * offset));
 }
 
-uint8_t pc9801_state::midi_r()
+uint8_t pc9801vm_state::midi_r()
 {
 	/* unconnect, needed by Amaranth KH to boot */
 	return 0xff;
@@ -973,25 +939,25 @@ void pc9801_state::pic_w(offs_t offset, uint8_t data)
 	((offset >= 4) ? m_pic2 : m_pic1)->write(offset & 3, data);
 }
 
-uint16_t pc9801_state::grcg_gvram_r(offs_t offset, uint16_t mem_mask)
+uint16_t pc9801vm_state::grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = upd7220_grcg_r((offset + 0x4000) | (m_vram_bank << 16), mem_mask);
 	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
-void pc9801_state::grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 	upd7220_grcg_w((offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
 }
 
-uint16_t pc9801_state::grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
+uint16_t pc9801vm_state::grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = upd7220_grcg_r(offset | (m_vram_bank << 16), mem_mask);
 	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
-void pc9801_state::grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 	upd7220_grcg_w(offset | (m_vram_bank << 16), data, mem_mask);
@@ -1002,36 +968,36 @@ void pc9801_state::ipl_bank(address_map &map)
 	map(0x00000, 0x2ffff).rom().region("ipl", 0);
 }
 
-void pc9801_state::pc9801ux_map(address_map &map)
+void pc9801vm_state::pc9801ux_map(address_map &map)
 {
-	map(0x0a0000, 0x0a3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
-	map(0x0a4000, 0x0a4fff).rw(FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
-	map(0x0a8000, 0x0bffff).rw(FUNC(pc9801_state::grcg_gvram_r), FUNC(pc9801_state::grcg_gvram_w));
-	map(0x0e0000, 0x0e7fff).rw(FUNC(pc9801_state::grcg_gvram0_r), FUNC(pc9801_state::grcg_gvram0_w));
+	map(0x0a0000, 0x0a3fff).rw(FUNC(pc9801vm_state::tvram_r), FUNC(pc9801vm_state::tvram_w));
+	map(0x0a4000, 0x0a4fff).rw(FUNC(pc9801vm_state::pc9801rs_knjram_r), FUNC(pc9801vm_state::pc9801rs_knjram_w));
+	map(0x0a8000, 0x0bffff).rw(FUNC(pc9801vm_state::grcg_gvram_r), FUNC(pc9801vm_state::grcg_gvram_w));
+	map(0x0e0000, 0x0e7fff).rw(FUNC(pc9801vm_state::grcg_gvram0_r), FUNC(pc9801vm_state::grcg_gvram0_w));
 	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
-void pc9801_state::pc9801ux_io(address_map &map)
+void pc9801vm_state::pc9801ux_io(address_map &map)
 {
 //	map.unmap_value_high();
 	pc9801_common_io(map);
-	map(0x0020, 0x002f).w(FUNC(pc9801_state::dmapg8_w)).umask16(0xff00);
+	map(0x0020, 0x002f).w(FUNC(pc9801vm_state::dmapg8_w)).umask16(0xff00);
 //	map(0x0050, 0x0057).noprw(); // 2dd ppi?
-	map(0x005c, 0x005f).r(FUNC(pc9801_state::timestamp_r)).nopw(); // artic
-	map(0x0068, 0x006b).w(FUNC(pc9801_state::pc9801rs_video_ff_w)).umask16(0x00ff); //mode FF / <undefined>
-	map(0x0070, 0x007f).rw(FUNC(pc9801_state::grcg_r), FUNC(pc9801_state::grcg_w)).umask16(0x00ff); //display registers "GRCG" / i8253 pit
-	map(0x00a0, 0x00af).rw(FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801rs_a0_w)); //upd7220 bitmap ports / display registers
-	map(0x00bc, 0x00bf).rw(FUNC(pc9801_state::fdc_mode_ctrl_r), FUNC(pc9801_state::fdc_mode_ctrl_w));
+	map(0x005c, 0x005f).r(FUNC(pc9801vm_state::timestamp_r)).nopw(); // artic
+	map(0x0068, 0x006b).w(FUNC(pc9801vm_state::pc9801rs_video_ff_w)).umask16(0x00ff); //mode FF / <undefined>
+	map(0x0070, 0x007f).rw(FUNC(pc9801vm_state::grcg_r), FUNC(pc9801vm_state::grcg_w)).umask16(0x00ff); //display registers "GRCG" / i8253 pit
+	map(0x00a0, 0x00af).rw(FUNC(pc9801vm_state::pc9801_a0_r), FUNC(pc9801vm_state::pc9801rs_a0_w)); //upd7220 bitmap ports / display registers
+	map(0x00bc, 0x00bf).rw(FUNC(pc9801vm_state::fdc_mode_ctrl_r), FUNC(pc9801vm_state::fdc_mode_ctrl_w));
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
-	map(0x00f0, 0x00ff).rw(FUNC(pc9801_state::a20_ctrl_r), FUNC(pc9801_state::a20_ctrl_w)).umask16(0x00ff);
-	map(0x0439, 0x0439).rw(FUNC(pc9801_state::dma_access_ctrl_r), FUNC(pc9801_state::dma_access_ctrl_w));
-	map(0x043c, 0x043f).w(FUNC(pc9801_state::pc9801rs_bank_w)); //ROM/RAM bank
-	map(0x04a0, 0x04af).w(FUNC(pc9801_state::egc_w));
+	map(0x00cc, 0x00cc).rw(FUNC(pc9801vm_state::fdc_2hd_ctrl_r), FUNC(pc9801vm_state::fdc_2hd_ctrl_w));
+	map(0x00f0, 0x00ff).rw(FUNC(pc9801vm_state::a20_ctrl_r), FUNC(pc9801vm_state::a20_ctrl_w)).umask16(0x00ff);
+	map(0x0439, 0x0439).rw(FUNC(pc9801vm_state::dma_access_ctrl_r), FUNC(pc9801vm_state::dma_access_ctrl_w));
+	map(0x043c, 0x043f).w(FUNC(pc9801vm_state::pc9801rs_bank_w)); //ROM/RAM bank
+	map(0x04a0, 0x04af).w(FUNC(pc9801vm_state::egc_w));
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 }
 
-void pc9801_state::pc9801rs_map(address_map &map)
+void pc9801vm_state::pc9801rs_map(address_map &map)
 {
 	pc9801ux_map(map);
 //  map(0x0d8000, 0x0d9fff).rom().region("ide",0);
@@ -1040,16 +1006,16 @@ void pc9801_state::pc9801rs_map(address_map &map)
 	map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
-void pc9801_state::pc9801rs_io(address_map &map)
+void pc9801vm_state::pc9801rs_io(address_map &map)
 {
 //	map.unmap_value_high();
 	pc9801ux_io(map);
-	map(0x0430, 0x0433).rw(FUNC(pc9801_state::ide_ctrl_r), FUNC(pc9801_state::ide_ctrl_w)).umask16(0x00ff);
-	map(0x0640, 0x064f).rw(FUNC(pc9801_state::ide_cs0_r), FUNC(pc9801_state::ide_cs0_w));
-	map(0x0740, 0x074f).rw(FUNC(pc9801_state::ide_cs1_r), FUNC(pc9801_state::ide_cs1_w));
+	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
+	map(0x0640, 0x064f).rw(FUNC(pc9801vm_state::ide_cs0_r), FUNC(pc9801vm_state::ide_cs0_w));
+	map(0x0740, 0x074f).rw(FUNC(pc9801vm_state::ide_cs1_r), FUNC(pc9801vm_state::ide_cs1_w));
 	map(0x1e8c, 0x1e8f).noprw(); // temp
-	map(0xbfdb, 0xbfdb).w(FUNC(pc9801_state::mouse_freq_w));
-	map(0xe0d0, 0xe0d3).r(FUNC(pc9801_state::midi_r));
+	map(0xbfdb, 0xbfdb).w(FUNC(pc9801vm_state::mouse_freq_w));
+	map(0xe0d0, 0xe0d3).r(FUNC(pc9801vm_state::midi_r));
 }
 
 // SDIP handling
@@ -1191,9 +1157,9 @@ void pc9801_state::upd7220_2_map(address_map &map)
 	map(0x00000, 0x3ffff).ram().share("video_ram_2");
 }
 
-void pc9801_state::upd7220_grcg_2_map(address_map &map)
+void pc9801vm_state::upd7220_grcg_2_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rw(FUNC(pc9801_state::upd7220_grcg_r), FUNC(pc9801_state::upd7220_grcg_w)).share("video_ram_2");
+	map(0x00000, 0x3ffff).rw(FUNC(pc9801vm_state::upd7220_grcg_r), FUNC(pc9801vm_state::upd7220_grcg_w)).share("video_ram_2");
 }
 
 CUSTOM_INPUT_MEMBER(pc98_base_state::system_type_r)
@@ -1566,12 +1532,12 @@ void pc98_base_state::ppi_sys_beep_portc_w(uint8_t data)
 	m_beeper->set_state(!(data & 0x08));
 }
 
-void pc9801_state::ppi_sys_dac_portc_w(uint8_t data)
+void pc9801vm_state::ppi_sys_dac_portc_w(uint8_t data)
 {
-	m_dac_disable = BIT(data, 3);
+	m_dac1bit_disable = BIT(data, 3);
 	// TODO: some models have a finer grained volume control at I/O port 0xae8e
 	// (98NOTE only?)
-	m_dac->set_output_gain(0, m_dac_disable ? 0.0 : 1.0);
+	m_dac1bit->set_output_gain(0, m_dac1bit_disable ? 0.0 : 1.0);
 }
 
 /*
@@ -1747,6 +1713,7 @@ WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_irq )
 {
 	/* 0xffaf8 */
@@ -1759,15 +1726,16 @@ WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_irq )
 		m_pic2->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_drq )
+WRITE_LINE_MEMBER( pc9801vm_state::pc9801rs_fdc_drq )
 {
 	if(m_fdc_ctrl & 1)
 		m_dmac->dreq2_w(state ^ 1);
 	else
 		m_dmac->dreq3_w(state ^ 1);
 }
+#endif
 
-uint32_t pc9801_state::a20_286(bool state)
+uint32_t pc9801vm_state::a20_286(bool state)
 {
 	return (state ? 0xffffff : 0x0fffff);
 }
@@ -1802,13 +1770,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	save_item(NAME(m_sasi_data));
 	save_item(NAME(m_sasi_data_enable));
 	save_item(NAME(m_sasi_ctrl));
-	save_item(NAME(m_egc.regs));
-	save_item(NAME(m_egc.pat));
-	save_item(NAME(m_egc.src));
-	save_item(NAME(m_egc.count));
-	save_item(NAME(m_egc.leftover));
-	save_item(NAME(m_egc.first));
-	save_item(NAME(m_egc.init));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
@@ -1820,14 +1781,23 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 	m_sys_type = 0x00 >> 6;
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801rs)
+MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 {
 	MACHINE_START_CALL_MEMBER(pc9801_common);
 
-	save_item(NAME(m_dac_disable));
+	m_sys_type = 0x80 >> 6;
+
+	save_item(NAME(m_dac1bit_disable));
+
 	save_item(NAME(m_dma_access_ctrl));
 
-	m_sys_type = 0x80 >> 6;
+	save_item(NAME(m_egc.regs));
+	save_item(NAME(m_egc.pat));
+	save_item(NAME(m_egc.src));
+	save_item(NAME(m_egc.count));
+	save_item(NAME(m_egc.leftover));
+	save_item(NAME(m_egc.first));
+	save_item(NAME(m_egc.init));
 }
 
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
@@ -1854,7 +1824,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 	m_mouse.freq_index = 0;
 	m_mouse.lx = m_mouse.ly = m_mouse.prev_dx = m_mouse.prev_dy = m_mouse.dx = m_mouse.dy = 0;
 	m_dma_autoinc[0] = m_dma_autoinc[1] = m_dma_autoinc[2] = m_dma_autoinc[3] = 0;
-	memset(&m_egc, 0, sizeof(m_egc));
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
@@ -1881,7 +1850,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 	m_beeper->set_state(0);
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
+MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
@@ -1900,7 +1869,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
 	}
 
-	m_dac_disable = true;
+	m_dac1bit_disable = true;
+	
+	memset(&m_egc, 0, sizeof(m_egc));
 }
 
 MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)
@@ -2033,14 +2004,14 @@ void pc9801_state::pc9801_sasi(machine_config &config)
 	m_dmac->out_iow_callback<0>().set(FUNC(pc9801_state::sasi_data_w));
 }
 
-void pc9801_state::cdrom_headphones(device_t *device)
+void pc9801vm_state::cdrom_headphones(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
 	cdda->add_route(0, "^^lheadphone", 1.0);
 	cdda->add_route(1, "^^rheadphone", 1.0);
 }
 
-void pc9801_state::pc9801_ide(machine_config &config)
+void pc9801vm_state::pc9801_ide(machine_config &config)
 {
 	SPEAKER(config, "lheadphone").front_left();
 	SPEAKER(config, "rheadphone").front_right();
@@ -2152,7 +2123,7 @@ void pc9801_state::config_floppy_35hd(machine_config &config)
 
 void pc9801_state::pc9801(machine_config &config)
 {
-	I8086(config, m_maincpu, 5000000); //unknown clock
+	I8086(config, m_maincpu, 5000000); // 5 MHz for vanilla, 8 MHz for direct children
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -2182,22 +2153,22 @@ void pc9801_state::pc9801(machine_config &config)
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 }
 
-void pc9801_state::pc9801rs(machine_config &config)
+void pc9801vm_state::pc9801rs(machine_config &config)
 {
 	I386SX(config, m_maincpu, MAIN_CLOCK_X1*8); // unknown clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801rs_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801rs_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801rs_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801rs_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
-	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_dac_portc_w));
+	m_ppi_sys->out_pc_callback().set(FUNC(pc9801vm_state::ppi_sys_dac_portc_w));
 	// TODO: verify if it needs invert();
-	m_pit->out_handler<1>().set( m_dac, FUNC(speaker_sound_device::level_w));
+	m_pit->out_handler<1>().set( m_dac1bit, FUNC(speaker_sound_device::level_w));
 
-	ADDRESS_MAP_BANK(config, m_ipl).set_map(&pc9801_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
+	ADDRESS_MAP_BANK(config, m_ipl).set_map(&pc9801vm_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801rs)
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
 
 	m_dmac->set_clock(MAIN_CLOCK_X1*8); // unknown clock
 
@@ -2206,41 +2177,41 @@ void pc9801_state::pc9801rs(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
 
-	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_grcg_2_map);
+	m_hgdc2->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
 
-//  DAC_1BIT(config, m_dac, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.40);
-	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16 + 16);
+//  DAC_1BIT(config, m_dac1bit, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);
+	PALETTE(config, m_palette, FUNC(pc9801vm_state::pc9801_palette), 16 + 16);
 }
 
-void pc9801_state::pc9801vm(machine_config &config)
+void pc9801vm_state::pc9801vm(machine_config &config)
 {
 	pc9801rs(config);
 	V30(config.replace(), m_maincpu, 10000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801ux_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801ux_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	m_ram->set_default_size("640K").set_extra_options("640K"); // ???
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801_common)
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801_common)
 }
 
-void pc9801_state::pc9801ux(machine_config &config)
+void pc9801vm_state::pc9801ux(machine_config &config)
 {
 	pc9801rs(config);
-	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
-	maincpu.set_addrmap(AS_PROGRAM, &pc9801_state::pc9801ux_map);
-	maincpu.set_addrmap(AS_IO, &pc9801_state::pc9801ux_io);
-	maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801_state::a20_286, this));
-	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+    i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
+    maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
+    maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
+    maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801vm_state::a20_286, this));
+    maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	
 	config_floppy_35hd(config);
 //  AM9157A(config, "i8237", 10000000); // unknown clock
 }
 
-void pc9801_state::pc9801vx(machine_config &config)
+void pc9801vm_state::pc9801vx(machine_config &config)
 {
 	pc9801ux(config);
 
@@ -2615,7 +2586,7 @@ void pc9801_state::init_pc9801_kanji()
 	#undef copy_kanji_strip
 }
 
-void pc9801_state::init_pc9801vm_kanji()
+void pc9801vm_state::init_pc9801vm_kanji()
 {
 	uint32_t raw_tile;
 	uint8_t *chargen = memregion("chargen")->base();
@@ -2714,14 +2685,17 @@ COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9
 // JX series
 // ...
 
-// VM class (V30 and/or i286)
-COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
-COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// VM class (V30)
+COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
+COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC", 
+  "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// UX class (i286)
+COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // VX class (first model using an EGC)
 // original VX0/VX2/VX4 released in Nov 1986, minor updates with OS pre-installed etc. in 1987
-COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // XA/XL class (1120 x 750 true color, nicknamed "High-reso")
 // ...
@@ -2737,8 +2711,8 @@ COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801_state, init_pc9
 // ...
 
 // RS class (i386SX)
-COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // DA class (i386SX + SDIP and EMS)
 // ...
 // UF/UR/US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
