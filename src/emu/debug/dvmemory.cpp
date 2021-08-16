@@ -985,7 +985,7 @@ void debug_view_memory::set_chunks_per_row(u32 rowchunks)
 
 //-------------------------------------------------
 //  set_data_format - specify what kind of values
-//  are shown, 1-8 8-64 bits, 9 32bit floating point
+//  are shown
 //-------------------------------------------------
 
 void debug_view_memory::set_data_format(data_format format)

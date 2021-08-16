@@ -220,31 +220,31 @@ bool memorywin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		switch (LOWORD(wparam))
 		{
 		case ID_1_BYTE_CHUNKS:
-			memview->set_data_format(1);
+			memview->set_data_format(debug_view_memory::data_format::HEX_8BIT);
 			return true;
 
 		case ID_2_BYTE_CHUNKS:
-			memview->set_data_format(2);
+			memview->set_data_format(debug_view_memory::data_format::HEX_16BIT);
 			return true;
 
 		case ID_4_BYTE_CHUNKS:
-			memview->set_data_format(4);
+			memview->set_data_format(debug_view_memory::data_format::HEX_32BIT);
 			return true;
 
 		case ID_8_BYTE_CHUNKS:
-			memview->set_data_format(8);
+			memview->set_data_format(debug_view_memory::data_format::HEX_64BIT);
 			return true;
 
 		case ID_FLOATING_POINT_32BIT:
-			memview->set_data_format(9);
+			memview->set_data_format(debug_view_memory::data_format::FLOAT_32BIT);
 			return true;
 
 		case ID_FLOATING_POINT_64BIT:
-			memview->set_data_format(10);
+			memview->set_data_format(debug_view_memory::data_format::FLOAT_64BIT);
 			return true;
 
 		case ID_FLOATING_POINT_80BIT:
-			memview->set_data_format(11);
+			memview->set_data_format(debug_view_memory::data_format::FLOAT_80BIT);
 			return true;
 
 		case ID_LOGICAL_ADDRESSES:
