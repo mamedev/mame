@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "memoryviewinfo.h"
 
-#include "debug/dvmemory.h"
-
 #include "strconv.h"
 
 
@@ -25,7 +23,7 @@ memoryview_info::~memoryview_info()
 }
 
 
-uint8_t memoryview_info::data_format() const
+debug_view_memory::data_format memoryview_info::data_format() const
 {
 	return view<debug_view_memory>()->get_data_format();
 }
@@ -54,7 +52,7 @@ void memoryview_info::set_expression(const std::string &string)
 	view<debug_view_memory>()->set_expression(string);
 }
 
-void memoryview_info::set_data_format(uint8_t dataformat)
+void memoryview_info::set_data_format(debug_view_memory::data_format dataformat)
 {
 	view<debug_view_memory>()->set_data_format(dataformat);
 }
