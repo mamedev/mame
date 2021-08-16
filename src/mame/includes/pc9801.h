@@ -145,19 +145,8 @@ public:
 
 	void init_pc9801_kanji();
 
+//  Device declarations
 protected:
-	virtual void video_start() override;
-
-	void pc9801_keyboard(machine_config &config);
-	void pc9801_mouse(machine_config &config);
-	void pc9801_cbus(machine_config &config);
-	void pc9801_sasi(machine_config &config);
-	void pc9801_common(machine_config &config);
-	void config_floppy_525hd(machine_config &config);
-	void config_floppy_35hd(machine_config &config);
-
-	void pit_clock_config(machine_config &config, const XTAL clock);
-
 	required_device<cpu_device> m_maincpu;
 	optional_device<address_map_bank_device> m_ipl;
 	required_device<am9517a_device> m_dmac;
@@ -166,39 +155,6 @@ protected:
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
-
-	void pc9801_common_io(address_map &map);
-
-	u8 mouse_freq_r(offs_t offset);
-	void mouse_freq_w(offs_t offset, u8 data);
-	uint8_t pic_r(offs_t offset);
-	void pic_w(offs_t offset, uint8_t data);
-	void dmapg8_w(offs_t offset, uint8_t data);
-protected:
-	uint8_t pc9801_a0_r(offs_t offset);
-	void pc9801_a0_w(offs_t offset, uint8_t data);
-
-	void pc9801_palette(palette_device &palette) const;
-
-	uint8_t fdc_2hd_ctrl_r();
-	void fdc_2hd_ctrl_w(uint8_t data);
-private:
-	uint8_t fdc_2dd_ctrl_r();
-	void fdc_2dd_ctrl_w(uint8_t data);
-
-protected:
-	u8 unk_r(offs_t offset);
-	uint8_t f0_r(offs_t offset);
-
-	uint8_t m_video_ff[8];
-	// TODO: move to derived state
-	uint8_t m_ex_video_ff[128];
-	uint8_t m_nmi_ff;
-	u8 m_vram_bank;
-	u8 m_vram_disp;
-
-	u8 m_fdc_ctrl;
-
 private:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
@@ -216,24 +172,38 @@ private:
 protected:
 	required_shared_ptr<uint16_t> m_video_ram_2;
 	optional_device<ram_device> m_ram;
-private:
-	void dmapg4_w(offs_t offset, uint8_t data);
-	void nmi_ctrl_w(offs_t offset, uint8_t data);
-	void vrtc_clear_w(uint8_t data);
-	uint8_t txt_scrl_r(offs_t offset);
-	void txt_scrl_w(offs_t offset, uint8_t data);
 
+//  Infrastructure declaration
 protected:
-	uint16_t tvram_r(offs_t offset, uint16_t mem_mask = ~0);
-	void tvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t gvram_r(offs_t offset);
-	void gvram_w(offs_t offset, uint8_t data);
-	uint8_t grcg_r(offs_t offset);
-	void grcg_w(offs_t offset, uint8_t data);
-	
-	void pc9801_video_ff_w(uint8_t data);
+	DECLARE_MACHINE_START(pc9801_common);
+	DECLARE_MACHINE_RESET(pc9801_common);
+
+	void pc9801_keyboard(machine_config &config);
+	void pc9801_mouse(machine_config &config);
+	void pc9801_cbus(machine_config &config);
+	void pc9801_sasi(machine_config &config);
+	void pc9801_common(machine_config &config);
+	void config_floppy_525hd(machine_config &config);
+	void config_floppy_35hd(machine_config &config);
+
+	void pit_clock_config(machine_config &config, const XTAL clock);
+
+	void pc9801_common_io(address_map &map);
+	void ipl_bank(address_map &map);
+
+	uint8_t pc9801_a0_r(offs_t offset);
+	void pc9801_a0_w(offs_t offset, uint8_t data);
+	u8 unk_r(offs_t offset);
+	uint8_t f0_r(offs_t offset);
+
+	uint8_t m_nmi_ff;
 
 private:
+	void pc9801_io(address_map &map);
+	void pc9801_map(address_map &map);
+
+	void nmi_ctrl_w(offs_t offset, uint8_t data);
+
 	void sasi_data_w(uint8_t data);
 	uint8_t sasi_data_r();
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
@@ -244,22 +214,39 @@ private:
 //  uint8_t winram_r();
 //  void winram_w(uint8_t data);
 
-protected:
-	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-
-	DECLARE_MACHINE_START(pc9801_common);
-
-	DECLARE_MACHINE_RESET(pc9801_common);
-
-	void ipl_bank(address_map &map);
-private:
-	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
-
 	DECLARE_MACHINE_START(pc9801f);
 	DECLARE_MACHINE_RESET(pc9801f);
 
-	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
+//  PIC
+protected:
+	uint8_t pic_r(offs_t offset);
+	void pic_w(offs_t offset, uint8_t data);
+private:
 	uint8_t get_slave_ack(offs_t offset);
+
+//  FDC
+protected:
+	uint8_t fdc_2hd_ctrl_r();
+	void fdc_2hd_ctrl_w(uint8_t data);
+
+	u8 m_fdc_ctrl;
+	uint8_t m_fdc_2dd_ctrl, m_fdc_2hd_ctrl;
+private:
+	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
+
+	uint8_t fdc_2dd_ctrl_r();
+	void fdc_2dd_ctrl_w(uint8_t data);
+
+//	DMA
+protected:
+	uint8_t m_dma_offset[4];
+	uint8_t m_dma_autoinc[4];
+	int m_dack;
+private:
+	void dmapg4_w(offs_t offset, uint8_t data);
+
+	inline void set_dma_channel(int channel, int state);
+
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	uint8_t dma_read_byte(offs_t offset);
@@ -269,54 +256,69 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
-
-	uint8_t ppi_mouse_porta_r();
-	void ppi_mouse_porta_w(uint8_t data);
-	void ppi_mouse_portb_w(uint8_t data);
-	void ppi_mouse_portc_w(uint8_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void pc9801_io(address_map &map);
-	void pc9801_map(address_map &map);
-
+//	Video
+protected:
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
+
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+
+	virtual void video_start() override;
+	void pc9801_palette(palette_device &palette) const;
+
+	uint8_t *m_char_rom;
+	uint8_t *m_kanji_rom;
+
+	struct {
+		uint8_t mode;
+		uint8_t tile[4], tile_index;
+	}m_grcg;
 
 	enum
 	{
 		TIMER_VBIRQ
 	};
 
-	inline void set_dma_channel(int channel, int state);
-protected:
-	uint8_t *m_char_rom;
-	uint8_t *m_kanji_rom;
-private:
-	uint8_t m_dma_offset[4];
-	uint8_t m_dma_autoinc[4];
-	int m_dack;
+	uint16_t tvram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void tvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t gvram_r(offs_t offset);
+	void gvram_w(offs_t offset, uint8_t data);
+	uint8_t grcg_r(offs_t offset);
+	void grcg_w(offs_t offset, uint8_t data);
+	
+	void pc9801_video_ff_w(uint8_t data);
 
+	uint16_t m_font_addr;
+	uint16_t m_font_lr;
+	uint8_t m_video_ff[8];
+	// TODO: move to derived state
+	uint8_t m_ex_video_ff[128];
+	u8 m_vram_bank;
+	u8 m_vram_disp;
+
+private:
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+
+	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
+	void vrtc_clear_w(uint8_t data);
+	uint8_t txt_scrl_r(offs_t offset);
+	void txt_scrl_w(offs_t offset, uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint8_t m_font_line;
+	std::unique_ptr<uint16_t[]> m_tvram;
 	uint8_t m_gfx_ff;
 	uint8_t m_txt_scroll_reg[8];
 	uint8_t m_pal_clut[4];
 
-	std::unique_ptr<uint16_t[]> m_tvram;
-
-protected:
-	uint16_t m_font_addr;
-	uint16_t m_font_lr;
-private:
-	uint8_t m_font_line;
-
-	uint8_t m_fdc_2dd_ctrl, m_fdc_2hd_ctrl;
-
+//  SASI
 	uint8_t m_sasi_data;
 	int m_sasi_data_enable;
 	uint8_t m_sasi_ctrl;
 
+//	Mouse
+protected:
 	struct{
 		uint8_t control;
 		uint8_t lx, ly;
@@ -326,11 +328,13 @@ private:
 		uint8_t freq_index;
 	}m_mouse;
 
-protected:
-	struct {
-		uint8_t mode;
-		uint8_t tile[4], tile_index;
-	}m_grcg;
+private:
+	uint8_t ppi_mouse_porta_r();
+	void ppi_mouse_porta_w(uint8_t data);
+	void ppi_mouse_portb_w(uint8_t data);
+	void ppi_mouse_portc_w(uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 };
 
 /**********************************************************
@@ -348,6 +352,7 @@ public:
 		, m_dac1bit(*this, "dac1bit")
 	{
 	}
+
 	void pc9801vm(machine_config &config);
 
 	void pc9801ux(machine_config &config);
@@ -383,6 +388,8 @@ protected:
 	uint16_t ide_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	void dmapg8_w(offs_t offset, uint8_t data);
+
 	uint16_t timestamp_r(offs_t offset);
 
 	void ppi_sys_dac_portc_w(uint8_t data);
@@ -411,6 +418,7 @@ private:
 	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
 	void pc9801rs_bank_w(offs_t offset, uint8_t data);
 	uint8_t midi_r();
+
 
 	// 286-based machines except for PC98XA
 	u8 dma_access_ctrl_r(offs_t offset);
@@ -452,6 +460,10 @@ private:
 	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const;
 	uint16_t egc_shift(int plane, uint16_t val);
 	uint16_t egc_color_pat(int plane) const;
+
+protected:
+	u8 mouse_freq_r(offs_t offset);
+	void mouse_freq_w(offs_t offset, u8 data);
 };
 
 class pc9801us_state : public pc9801vm_state

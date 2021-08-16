@@ -372,7 +372,7 @@ void pc9801_state::dmapg4_w(offs_t offset, uint8_t data)
 		m_dma_offset[(offset+1) & 3] = data & 0x0f;
 }
 
-void pc9801_state::dmapg8_w(offs_t offset, uint8_t data)
+void pc9801vm_state::dmapg8_w(offs_t offset, uint8_t data)
 {
 	if(offset == 4)
 		m_dma_autoinc[data & 3] = (data >> 2) & 3;
@@ -1624,7 +1624,7 @@ void pc9801_state::ppi_mouse_portc_w(uint8_t data)
 }
 
 // extended port $bfdb
-u8 pc9801_state::mouse_freq_r(offs_t offset)
+u8 pc9801vm_state::mouse_freq_r(offs_t offset)
 {
 	// TODO: not all models support read-back
 	// PC-9801DA: 0xff
@@ -1635,7 +1635,7 @@ u8 pc9801_state::mouse_freq_r(offs_t offset)
 	return m_mouse.freq_reg;
 }
 
-void pc9801_state::mouse_freq_w(offs_t offset, u8 data)
+void pc9801vm_state::mouse_freq_w(offs_t offset, u8 data)
 {
 	// Port unavailable on PC-9871 1st gen & PC-9871/K, PC-9801F3, PC-9801M2, PC-9801M3
 	// Some if not all of those have hardcoded HW switch for changing the timing instead
