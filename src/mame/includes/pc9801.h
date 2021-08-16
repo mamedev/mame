@@ -352,7 +352,7 @@ private:
 	uint8_t m_font_line;
 	uint16_t m_font_lr;
 
-	uint8_t m_fdc_2dd_ctrl,m_fdc_2hd_ctrl;
+	uint8_t m_fdc_2dd_ctrl, m_fdc_2hd_ctrl;
 	uint8_t m_nmi_ff;
 
 	uint8_t m_sasi_data;

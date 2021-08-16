@@ -1644,10 +1644,13 @@ uint8_t pc8801_state::upd765_tc_r()
 {
 	//printf("%04x 1\n",m_fdccpu->pc());
 
-	m_fdc->tc_w(true);
-	//TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-	//OTOH, 50 seems more than enough for the new upd...
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
+	if (!machine().side_effects_disabled())
+	{
+		m_fdc->tc_w(true);
+		//TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
+		//OTOH, 50 seems more than enough for the new upd...
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
+	}
 	return 0xff; // value is meaningless
 }
 
@@ -2445,15 +2448,7 @@ void pc8801_state::pc8801mc(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
 }
 
-
-/* TODO: clean this up */
-#define PC8801_MEM_LOAD \
-	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
-
-
 ROM_START( pc8801 )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.2
 	ROM_LOAD( "n80.rom",   0x0000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
 
@@ -2474,8 +2469,6 @@ ROM_END
 /* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be
 at least 1 Kanji ROM). */
 ROM_START( pc8801mk2 )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.4
 	ROM_LOAD( "m2_n80.rom",   0x0000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
 
@@ -2494,8 +2487,6 @@ ROM_START( pc8801mk2 )
 ROM_END
 
 ROM_START( pc8801mk2sr )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.5
 	ROM_LOAD( "mk2sr_n80.rom",   0x0000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
 
@@ -2522,8 +2513,6 @@ ROM_START( pc8801mk2sr )
 ROM_END
 
 ROM_START( pc8801mk2fr )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.5
 	ROM_LOAD( "m2fr_n80.rom",   0x0000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
 
@@ -2549,8 +2538,6 @@ ROM_START( pc8801mk2fr )
 ROM_END
 
 ROM_START( pc8801mk2mr )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "m2mr_n80.rom",   0x0000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
 
@@ -2577,8 +2564,6 @@ ROM_START( pc8801mk2mr )
 ROM_END
 
 ROM_START( pc8801mh )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "mh_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2605,8 +2590,6 @@ ROM_START( pc8801mh )
 ROM_END
 
 ROM_START( pc8801fa )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "fa_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2633,8 +2616,6 @@ ROM_START( pc8801fa )
 ROM_END
 
 ROM_START( pc8801ma ) // newer floppy BIOS and Jisyo (dictionary) ROM
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "ma_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2665,8 +2646,6 @@ ROM_START( pc8801ma ) // newer floppy BIOS and Jisyo (dictionary) ROM
 ROM_END
 
 ROM_START( pc8801ma2 )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "ma2_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2696,8 +2675,6 @@ ROM_START( pc8801ma2 )
 ROM_END
 
 ROM_START( pc8801mc )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x08000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
