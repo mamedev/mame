@@ -660,8 +660,8 @@ chd_error chd_file::create(const char *filename, uint64_t logicalbytes, uint32_t
 
 	// create the new file
 	util::core_file::ptr file;
-	const osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-	if (filerr != osd_file::error::NONE)
+	const std::error_condition filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// create the file normally, then claim the file
@@ -705,8 +705,8 @@ chd_error chd_file::create(const char *filename, uint64_t logicalbytes, uint32_t
 
 	// create the new file
 	util::core_file::ptr file;
-	const osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-	if (filerr != osd_file::error::NONE)
+	const std::error_condition filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// create the file normally, then claim the file
@@ -749,8 +749,8 @@ chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
 	// open the file
 	const uint32_t openflags = writeable ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_READ;
 	util::core_file::ptr file;
-	const osd_file::error filerr = util::core_file::open(filename, openflags, file);
-	if (filerr != osd_file::error::NONE)
+	const std::error_condition filerr = util::core_file::open(filename, openflags, file);
+	if (filerr)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// now open the CHD

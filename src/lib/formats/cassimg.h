@@ -185,14 +185,14 @@ public:
 	void dump(const char *filename);
 
 	error save();
-	void change(void *file, const io_procs *procs, const Format *format, int flags);
+	void change(util::random_read_write::ptr &&io, const Format *format, int flags);
 	Info get_info() const;
 
-	static error open(void *file, const io_procs *procs,
+	static error open(util::random_read_write::ptr &&io,
 		const Format *format, int flags, ptr &outcassette);
-	static error open_choices(void *file, const io_procs *procs, const std::string &extension,
+	static error open_choices(util::random_read_write::ptr &&io, const std::string &extension,
 		const Format *const *formats, int flags, ptr &outcassette);
-	static error create(void *file, const io_procs *procs, const cassette_image::Format *format,
+	static error create(util::random_read_write::ptr &&io, const cassette_image::Format *format,
 		const cassette_image::Options *opts, int flags, ptr &outcassette);
 
 	// builtin formats
@@ -201,7 +201,7 @@ public:
 private:
 	struct manipulation_ranges;
 
-	cassette_image(const Format *format, void *file, const io_procs *procs, int flags);
+	cassette_image(const Format *format, util::random_read_write::ptr &&io, int flags);
 	cassette_image(const cassette_image &) = delete;
 	cassette_image(cassette_image &&) = delete;
 	cassette_image &operator=(const cassette_image &) = delete;
@@ -212,15 +212,15 @@ private:
 	error compute_manipulation_ranges(int channel, double time_index, double sample_period, manipulation_ranges &ranges) const;
 	error lookup_sample(int channel, size_t sample, int32_t *&ptr);
 
-	const Format *m_format = nullptr;
-	io_generic m_io;
+	const Format *m_format;
+	util::random_read_write::ptr m_io;
 
-	int m_channels = 0;
-	int m_flags = 0;
-	uint32_t m_sample_frequency = 0;
+	int m_channels;
+	int m_flags;
+	uint32_t m_sample_frequency;
 
 	std::vector<std::unique_ptr<int32_t []> > m_blocks;
-	size_t m_sample_count = 0;
+	size_t m_sample_count;
 };
 
 /* macros for specifying format lists */

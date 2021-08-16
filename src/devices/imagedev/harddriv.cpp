@@ -193,8 +193,8 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 	/* try to open the diff */
 	//printf("Opening differencing image file: %s\n", fname.c_str());
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	osd_file::error filerr = diff_file.open(fname.c_str());
-	if (filerr == osd_file::error::NONE)
+	std::error_condition filerr = diff_file.open(fname.c_str());
+	if (!filerr)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
@@ -207,7 +207,7 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 	//printf("Creating differencing image: %s\n", fname.c_str());
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	filerr = diff_file.open(fname.c_str());
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
@@ -317,7 +317,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 	m_origchd.close();
 	m_diffchd.close();
 	m_chd = nullptr;
-	seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
+	seterror(image_error::UNSPECIFIED, chd_file::error_string(err));
 
 	return image_init_result::FAIL;
 }

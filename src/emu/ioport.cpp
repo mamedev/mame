@@ -2693,15 +2693,15 @@ time_t ioport_manager::playback_init()
 		return 0;
 
 	// open the playback file
-	osd_file::error filerr = m_playback_file.open(filename);
+	std::error_condition const filerr = m_playback_file.open(filename);
 
 	// return an explicit error if file isn't found in given path
-	if(filerr == osd_file::error::NOT_FOUND)
+	if (filerr == std::errc::no_such_file_or_directory)
 		fatalerror("Input file %s not found\n",filename);
 
 	// TODO: bail out any other error laconically for now
-	if(filerr != osd_file::error::NONE)
-		fatalerror("Failed to open file %s for playback (code error=%d)\n",filename,int(filerr));
+	if (filerr)
+		fatalerror("Failed to open file %s for playback (%s:%d %s)\n", filename, filerr.category().name(), filerr.value(), filerr.message());
 
 	// read the header and verify that it is a modern version; if not, print an error
 	inp_header header;
@@ -2875,9 +2875,9 @@ void ioport_manager::record_init()
 		return;
 
 	// open the record file
-	osd_file::error filerr = m_record_file.open(filename);
-	if (filerr != osd_file::error::NONE)
-		throw emu_fatalerror("ioport_manager::record_init: Failed to open file for recording");
+	std::error_condition const filerr = m_record_file.open(filename);
+	if (filerr)
+		throw emu_fatalerror("ioport_manager::record_init: Failed to open file for recording (%s:%d %s)", filerr.category().name(), filerr.value(), filerr.message());
 
 	// get the base time
 	system_time systime;
@@ -2922,9 +2922,9 @@ void ioport_manager::timecode_init()
 	filename.append(record_filename).append(".timecode");
 	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
-	osd_file::error filerr = m_timecode_file.open(filename);
-	if (filerr != osd_file::error::NONE)
-		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording");
+	std::error_condition const filerr = m_timecode_file.open(filename);
+	if (filerr)
+		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording (%s:%d %s)", filerr.category().name(), filerr.value(), filerr.message());
 
 	m_timecode_file.puts("# ==========================================\n");
 	m_timecode_file.puts("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n");

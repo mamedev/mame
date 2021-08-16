@@ -322,48 +322,12 @@ public:
 } // namespace sol
 
 
-int sol_lua_push(sol::types<osd_file::error>, lua_State *L, osd_file::error &&value)
+int sol_lua_push(sol::types<std::error_condition>, lua_State *L, std::error_condition &&value)
 {
-	const char *strerror;
-	switch(value)
-	{
-		case osd_file::error::NONE:
-			return sol::stack::push(L, sol::lua_nil);
-		case osd_file::error::FAILURE:
-			strerror = "failure";
-			break;
-		case osd_file::error::OUT_OF_MEMORY:
-			strerror = "out_of_memory";
-			break;
-		case osd_file::error::NOT_FOUND:
-			strerror = "not_found";
-			break;
-		case osd_file::error::ACCESS_DENIED:
-			strerror = "access_denied";
-			break;
-		case osd_file::error::ALREADY_OPEN:
-			strerror = "already_open";
-			break;
-		case osd_file::error::TOO_MANY_FILES:
-			strerror = "too_many_files";
-			break;
-		case osd_file::error::INVALID_DATA:
-			strerror = "invalid_data";
-			break;
-		case osd_file::error::INVALID_ACCESS:
-			strerror = "invalid_access";
-			break;
-		default:
-			strerror = "unknown_error";
-			break;
-	}
-	return sol::stack::push(L, strerror);
-}
-
-template <typename Handler>
-bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler &&handler, sol::stack::record &tracking)
-{
-	return sol::stack::check<int>(L, index, std::forward<Handler>(handler));
+	if (!value)
+		return sol::stack::push(L, sol::lua_nil);
+	else
+		return sol::stack::push(L, value.message());
 }
 
 
@@ -884,7 +848,7 @@ void lua_engine::initialize()
 				}));
 	file_type.set("read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; });
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
-	file_type.set("open", static_cast<osd_file::error (emu_file::*)(std::string_view)>(&emu_file::open));
+	file_type.set("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
 	file_type.set("open_next", &emu_file::open_next);
 	file_type.set("seek", sol::overload(
 			[](emu_file &file) { return file.tell(); },
@@ -1534,12 +1498,12 @@ void lua_engine::initialize()
 
 			// open the file
 			emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr;
+			std::error_condition filerr;
 			if (!snapstr.empty())
 				filerr = file.open(snapstr);
 			else
 				filerr = machine().video().open_next(file, "png");
-			if (filerr != osd_file::error::NONE)
+			if (filerr)
 				return sol::make_object(sol(), filerr);
 
 			// and save the snapshot

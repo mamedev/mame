@@ -69,15 +69,11 @@ namespace emu::detail {
 class device_type_impl_base;
 
 
-template <typename T> struct is_device_implementation
-{
-	static constexpr bool value = std::is_base_of<device_t, T>::value;
-};
+template <typename T>
+using is_device_implementation = std::bool_constant<std::is_base_of_v<device_t, T> >;
 
-template <typename T> struct is_device_interface
-{
-	static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value;
-};
+template <typename T>
+using is_device_interface = std::bool_constant<std::is_base_of_v<device_interface, T> && !is_device_implementation<T>::value>;
 
 
 struct device_feature

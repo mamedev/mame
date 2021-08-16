@@ -514,7 +514,7 @@ image_init_result force68k_state::force68k_load_cart(device_image_interface &ima
 	if (size > 0x20000) // Max 128Kb
 	{
 		LOG("Cartridge size exceeding max size (128Kb): %d\n", size);
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge size exceeding max size (128Kb)");
+		image.seterror(image_error::INVALIDIMAGE, "Cartridge size exceeding max size (128Kb)");
 		return image_init_result::FAIL;
 	}
 

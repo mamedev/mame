@@ -230,8 +230,8 @@ static uint32_t parse_wav_sample(const char *filename, uint32_t *dataoffs)
 	uint64_t fsize = 0;
 	std::uint32_t actual;
 
-	osd_file::error filerr = osd_file::open(filename, OPEN_FLAG_READ, file, fsize);
-	if (filerr != osd_file::error::NONE)
+	std::error_condition const filerr = osd_file::open(filename, OPEN_FLAG_READ, file, fsize);
+	if (filerr)
 	{
 		printf("ERROR: could not open (%s)\n", filename);
 		return 0;

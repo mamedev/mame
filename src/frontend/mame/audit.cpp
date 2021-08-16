@@ -425,11 +425,11 @@ media_auditor::summary media_auditor::audit_samples()
 			while (path.next(curpath, samplename))
 			{
 				// attempt to access the file (.flac) or (.wav)
-				osd_file::error filerr = file.open(curpath + ".flac");
-				if (filerr != osd_file::error::NONE)
+				std::error_condition filerr = file.open(curpath + ".flac");
+				if (filerr)
 					filerr = file.open(curpath + ".wav");
 
-				if (filerr == osd_file::error::NONE)
+				if (!filerr)
 				{
 					record.set_status(audit_status::GOOD, audit_substatus::GOOD);
 					found++;
@@ -589,14 +589,14 @@ media_auditor::audit_record &media_auditor::audit_one_rom(const std::vector<std:
 	file.set_restrict_to_mediapath(1);
 
 	// open the file if we can
-	osd_file::error filerr;
+	std::error_condition filerr;
 	if (has_crc)
 		filerr = file.open(record.name(), crc);
 	else
 		filerr = file.open(record.name());
 
 	// if it worked, get the actual length and hashes, then stop
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 		record.set_actual(file.hashes(m_validation), file.size());
 
 	// compute the final status

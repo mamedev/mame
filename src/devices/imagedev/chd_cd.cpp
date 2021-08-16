@@ -116,7 +116,7 @@ error:
 	if ( chd && chd == &m_self_chd )
 		m_self_chd.close( );
 	if ( err )
-		seterror( IMAGE_ERROR_UNSPECIFIED, chd_file::error_string( err ) );
+		seterror( image_error::UNSPECIFIED, chd_file::error_string( err ) );
 	return image_init_result::FAIL;
 }
 

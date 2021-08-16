@@ -385,8 +385,8 @@ public:
 				{
 					m_file.reset();
 					m_lastfile = m_info.track[tracknum].fname;
-					osd_file::error filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
-					if (filerr != osd_file::error::NONE)
+					std::error_condition const filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
+					if (filerr)
 						report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
 				}
 
@@ -411,8 +411,8 @@ public:
 					{
 						m_file.reset();
 						m_lastfile = m_info.track[tracknum+1].fname;
-						osd_file::error filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
-						if (filerr != osd_file::error::NONE)
+						std::error_condition const filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
+						if (filerr)
 							report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
 					}
 
@@ -1102,8 +1102,8 @@ static void check_existing_output_file(const parameters_map &params, const char 
 	if (params.find(OPTION_OUTPUT_FORCE) == params.end())
 	{
 		util::core_file::ptr file;
-		osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ, file);
-		if (filerr == osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::open(filename, OPEN_FLAG_READ, file);
+		if (!filerr)
 		{
 			file.reset();
 			report_error(1, "Error: file already exists (%s)\nUse --force (or -f) to force overwriting", filename);
@@ -1665,8 +1665,8 @@ static void do_create_raw(parameters_map &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
-		if (filerr != osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr)
 			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
 	}
 
@@ -1758,8 +1758,8 @@ static void do_create_hd(parameters_map &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
-		if (filerr != osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr)
 			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
 	}
 
@@ -1833,8 +1833,8 @@ static void do_create_hd(parameters_map &params)
 	if (ident_str != params.end())
 	{
 		// load the file
-		osd_file::error filerr = util::core_file::load(ident_str->second->c_str(), identdata);
-		if (filerr != osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::load(ident_str->second->c_str(), identdata);
+		if (filerr)
 			report_error(1, "Error reading ident file (%s)", ident_str->second->c_str());
 
 		// must be at least 14 bytes; extract CHS data from there
@@ -2342,8 +2342,8 @@ static void do_extract_raw(parameters_map &params)
 	try
 	{
 		// process output file
-		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
-		if (filerr != osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+		if (filerr)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// copy all data
@@ -2446,15 +2446,15 @@ static void do_extract_cd(parameters_map &params)
 		}
 
 		// process output file
-		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
-		if (filerr != osd_file::error::NONE)
+		std::error_condition filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
+		if (filerr)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// process output BIN file
 		if (mode != MODE_GDI)
 		{
 			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
-			if (filerr != osd_file::error::NONE)
+			if (filerr)
 				report_error(1, "Unable to open file (%s)", output_bin_file_str->c_str());
 		}
 
@@ -2490,7 +2490,7 @@ static void do_extract_cd(parameters_map &params)
 				output_bin_file.reset();
 
 				filerr = util::core_file::open(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
-				if (filerr != osd_file::error::NONE)
+				if (filerr)
 					report_error(1, "Unable to open file (%s)", trackbin_name.c_str());
 
 				outputoffs = 0;
@@ -2773,8 +2773,8 @@ static void do_add_metadata(parameters_map &params)
 	std::vector<uint8_t> file;
 	if (file_str != params.end())
 	{
-		osd_file::error filerr = util::core_file::load(file_str->second->c_str(), file);
-		if (filerr != osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::load(file_str->second->c_str(), file);
+		if (filerr)
 			report_error(1, "Error reading metadata file (%s)", file_str->second->c_str());
 	}
 
@@ -2895,8 +2895,8 @@ static void do_dump_metadata(parameters_map &params)
 		// create the file
 		if (output_file_str != params.end())
 		{
-			osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
-			if (filerr != osd_file::error::NONE)
+			std::error_condition const filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+			if (filerr)
 				report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 			// output the metadata

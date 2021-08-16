@@ -26,8 +26,11 @@
 
 #include "screen.h"
 #include "speaker.h"
+
 #include "formats/imageutl.h"
-#include "zippath.h"
+
+#include "util/ioprocs.h"
+#include "util/zippath.h"
 
 /*
     Debugging flags. Set to 0 or 1.
@@ -273,7 +276,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		m_flux_screen(*this, "flux")
 {
 	extension_list[0] = '\0';
-	m_err = IMAGE_ERROR_INVALIDIMAGE;
+	m_err = image_error::INVALIDIMAGE;
 }
 
 //-------------------------------------------------
@@ -398,17 +401,19 @@ void floppy_image_device::commit_image()
 	image_dirty = false;
 	if(!output_format || !output_format->supports_save())
 		return;
-	io_generic io;
-	// Do _not_ remove this cast otherwise the pointer will be incorrect when used by the ioprocs.
-	io.file = (device_image_interface *)this;
-	io.procs = &image_ioprocs;
-	io.filler = 0xff;
 
-	osd_file::error err = image_core_file().truncate(0);
-	if (err != osd_file::error::NONE)
-		popmessage("Error, unable to truncate image: %d", int(err));
+	check_for_file();
+	auto io = util::core_file_read_write(image_core_file(), 0xff);
+	if(!io) {
+		popmessage("Error, out of memory");
+		return;
+	}
 
-	output_format->save(&io, variants, image.get());
+	std::error_condition const err = image_core_file().truncate(0);
+	if (err)
+		popmessage("Error, unable to truncate image: %s", err.message());
+
+	output_format->save(*io, variants, image.get());
 }
 
 void floppy_image_device::device_config_complete()
@@ -532,28 +537,28 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 {
 	util::core_file::ptr fd;
 	std::string revised_path;
-
-	osd_file::error err = util::zippath_fopen(filename, OPEN_FLAG_READ, fd, revised_path);
-	if(err != osd_file::error::NONE) {
-		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to open the image file");
+	std::error_condition err = util::zippath_fopen(filename, OPEN_FLAG_READ, fd, revised_path);
+	if(err) {
+		seterror(err, nullptr);
 		return nullptr;
 	}
 
-	io_generic io;
-	io.file = fd.get();
-	io.procs = &corefile_ioprocs_noclose;
-	io.filler = 0xff;
+	auto io = util::core_file_read(std::move(fd), 0xff);
+	if(!io) {
+		seterror(std::errc::not_enough_memory, nullptr);
+		return nullptr;
+	}
+
 	int best = 0;
 	floppy_image_format_t *best_format = nullptr;
-	for (floppy_image_format_t *format : fif_list)
-	{
-		int score = format->identify(&io, form_factor, variants);
+	for(floppy_image_format_t *format : fif_list) {
+		int score = format->identify(*io, form_factor, variants);
 		if(score > best) {
 			best = score;
 			best_format = format;
 		}
 	}
-	fd.reset();
+
 	return best_format;
 }
 
@@ -585,16 +590,17 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 
 image_init_result floppy_image_device::call_load()
 {
-	io_generic io;
+	check_for_file();
+	auto io = util::core_file_read(image_core_file(), 0xff);
+	if(!io) {
+		seterror(std::errc::not_enough_memory, nullptr);
+		return image_init_result::FAIL;
+	}
 
-	// Do _not_ remove this cast otherwise the pointer will be incorrect when used by the ioprocs.
-	io.file = (device_image_interface *)this;
-	io.procs = &image_ioprocs;
-	io.filler = 0xff;
 	int best = 0;
 	floppy_image_format_t *best_format = nullptr;
 	for (floppy_image_format_t *format : fif_list) {
-		int score = format->identify(&io, form_factor, variants);
+		int score = format->identify(*io, form_factor, variants);
 		if(score > best) {
 			best = score;
 			best_format = format;
@@ -602,13 +608,13 @@ image_init_result floppy_image_device::call_load()
 	}
 
 	if (!best_format) {
-		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
+		seterror(image_error::INVALIDIMAGE, "Unable to identify the image format");
 		return image_init_result::FAIL;
 	}
 
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
-	if (!best_format->load(&io, form_factor, variants, image.get())) {
-		seterror(IMAGE_ERROR_UNSUPPORTED, "Incompatible image format or corrupted data");
+	if (!best_format->load(*io, form_factor, variants, image.get())) {
+		seterror(image_error::UNSUPPORTED, "Incompatible image format or corrupted data");
 		image.reset();
 		return image_init_result::FAIL;
 	}
@@ -822,88 +828,22 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 	return image_init_result::PASS;
 }
 
-// Should that go into ioprocs?  Should ioprocs be turned into something C++?
-
-struct iofile_ram {
-	std::vector<u8> *data;
-	int64_t pos;
-};
-
-static void ram_closeproc(void *file)
-{
-	auto f = (iofile_ram *)file;
-	delete f;
-}
-
-static int ram_seekproc(void *file, int64_t offset, int whence)
-{
-	auto f = (iofile_ram *)file;
-	switch(whence) {
-	case SEEK_SET: f->pos = offset; break;
-	case SEEK_CUR: f->pos += offset; break;
-	case SEEK_END: f->pos = f->data->size() + offset; break;
-	}
-
-	f->pos = std::clamp(f->pos, int64_t(0), int64_t(f->data->size()));
-	return 0;
-}
-
-static size_t ram_readproc(void *file, void *buffer, size_t length)
-{
-	auto f = (iofile_ram *)file;
-	size_t l = std::min(length, size_t(f->data->size() - f->pos));
-	memcpy(buffer, f->data->data() + f->pos, l);
-	return l;
-}
-
-static size_t ram_writeproc(void *file, const void *buffer, size_t length)
-{
-	auto f = (iofile_ram *)file;
-	size_t l = std::min(length, size_t(f->data->size() - f->pos));
-	memcpy(f->data->data() + f->pos, buffer, l);
-	return l;
-}
-
-static uint64_t ram_filesizeproc(void *file)
-{
-	auto f = (iofile_ram *)file;
-	return f->data->size();
-}
-
-
-static const io_procs iop_ram = {
-	ram_closeproc,
-	ram_seekproc,
-	ram_readproc,
-	ram_writeproc,
-	ram_filesizeproc
-};
-
-static io_generic *ram_open(std::vector<u8> &data)
-{
-	iofile_ram *f = new iofile_ram;
-	f->data = &data;
-	f->pos = 0;
-	return new io_generic({ &iop_ram, f });
-}
-
 void floppy_image_device::init_fs(const fs_info *fs, const fs_meta_data &meta)
 {
 	assert(image);
-	if (fs->m_type)
-	{
+	if (fs->m_type) {
 		std::vector<u8> img(fs->m_image_size);
 		fsblk_vec_t blockdev(img);
 		auto cfs = fs->m_manager->mount(blockdev);
 		cfs->format(meta);
 
-		auto iog = ram_open(img);
 		auto source_format = fs->m_type();
-		source_format->load(iog, floppy_image::FF_UNKNOWN, variants, image.get());
+		auto io = util::ram_read(img.data(), img.size(), 0xff);
+		source_format->load(*io, floppy_image::FF_UNKNOWN, variants, image.get());
 		delete source_format;
-		delete iog;
-	} else
+	} else {
 		fs_unformatted::format(fs->m_key, image.get());
+	}
 }
 
 /* write protect, active high

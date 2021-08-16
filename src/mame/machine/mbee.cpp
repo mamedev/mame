@@ -731,7 +731,7 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		// "mbp" roms
 		if ((size == 0) || (size > 0x4000))
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
 			return image_init_result::FAIL;
 		}
 
@@ -744,7 +744,7 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
 		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xe0) != 0xc0))
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a PAK rom");
+			image.seterror(image_error::INVALIDIMAGE, "Not a PAK rom");
 			slot->call_unload();
 			return image_init_result::FAIL;
 		}
@@ -754,7 +754,7 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		// "mbn" roms
 		if ((size == 0) || (size > 0x2000))
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
 			return image_init_result::FAIL;
 		}
 		m_pak_extended[pak_index] = (size > 0x1000) ? true : false;
@@ -768,7 +768,7 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		{
 			if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
 			{
-				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
+				image.seterror(image_error::INVALIDIMAGE, "Not a NET rom");
 				slot->call_unload();
 				return image_init_result::FAIL;
 			}

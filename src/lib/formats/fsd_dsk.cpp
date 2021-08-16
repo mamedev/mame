@@ -10,6 +10,8 @@
 
 #include "fsd_dsk.h"
 
+#include "ioprocs.h"
+
 
 /*********************************************************************
 
@@ -83,11 +85,12 @@ bool fsd_format::supports_save() const
 	return false;
 }
 
-int fsd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[3];
 
-	io_generic_read(io, h, 0, 3);
+	size_t actual;
+	io.read_at(0, h, 3, actual);
 	if (memcmp(h, "FSD", 3) == 0) {
 		return 100;
 	}
@@ -95,16 +98,19 @@ int fsd_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 	return 0;
 }
 
-bool fsd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	const char* result[255];
 	result[0x00] = "OK";
 	result[0x0e] = "Data CRC Error";
 	result[0x20] = "Deleted Data";
 
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return false;
 	std::vector<uint8_t> img(size);
-	io_generic_read(io, &img[0], 0, size);
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	uint64_t pos;
 	std::string title;

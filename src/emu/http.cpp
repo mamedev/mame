@@ -422,8 +422,8 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 	std::ostringstream full_path;
 	full_path << m_root << path;
 	util::core_file::ptr f;
-	osd_file::error e = util::core_file::open(full_path.str(), OPEN_FLAG_READ, f);
-	if (e == osd_file::error::NONE)
+	std::error_condition const e = util::core_file::open(full_path.str(), OPEN_FLAG_READ, f);
+	if (!e)
 	{
 		int c;
 		while ((c = f->getc()) >= 0)
@@ -431,7 +431,7 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 			os.put(c);
 		}
 	}
-	return e == osd_file::error::NONE;
+	return !e;
 }
 
 void http_manager::serve_document(http_request_ptr request, http_response_ptr response, const std::string &filename) {

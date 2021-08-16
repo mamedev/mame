@@ -18,6 +18,7 @@
 #include <functional>
 #include <initializer_list>
 #include <string>
+#include <system_error>
 #include <type_traits>
 #include <vector>
 
@@ -441,7 +442,7 @@ private:
 	void display_rom_load_results(bool from_list);
 	void region_post_process(memory_region *region, bool invert);
 	std::unique_ptr<emu_file> open_rom_file(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, std::vector<std::string> &tried_file_names, bool from_list);
-	std::unique_ptr<emu_file> open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, osd_file::error &filerr);
+	std::unique_ptr<emu_file> open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, std::error_condition &filerr);
 	int rom_fread(emu_file *file, u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(emu_file *file, const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(const rom_entry *romp);

@@ -238,14 +238,15 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 	for (i = 0; i < file->cdtoc.numtrks; i++)
 	{
-		osd_file::error filerr = util::core_file::open(file->track_info.track[i].fname, OPEN_FLAG_READ, file->fhandle[i]);
-		if (filerr != osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::open(file->track_info.track[i].fname, OPEN_FLAG_READ, file->fhandle[i]);
+		if (filerr)
 		{
 			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.c_str());
 			cdrom_close(file);
 			return nullptr;
 		}
 	}
+
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
 	   pads tracks out with extra frames to fit 4-frame size boundries
 	*/

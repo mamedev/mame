@@ -120,8 +120,8 @@ chd_error do_open_disk(const emu_options &options, std::initializer_list<std::re
 			{
 				imgfile.reset(new emu_file(options.media_path(), paths, OPEN_FLAG_READ));
 				imgfile->set_restrict_to_mediapath(1);
-				const osd_file::error filerr(imgfile->open(filename, OPEN_FLAG_READ));
-				if (osd_file::error::NONE == filerr)
+				const std::error_condition filerr(imgfile->open(filename, OPEN_FLAG_READ));
+				if (!filerr)
 					break;
 				else
 					imgfile.reset();
@@ -638,7 +638,7 @@ void rom_load_manager::region_post_process(memory_region *region, bool invert)
 
 std::unique_ptr<emu_file> rom_load_manager::open_rom_file(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, std::vector<std::string> &tried_file_names, bool from_list)
 {
-	osd_file::error filerr = osd_file::error::NOT_FOUND;
+	std::error_condition filerr = std::errc::no_such_file_or_directory;
 	u32 const romsize = rom_file_size(romp);
 	tried_file_names.clear();
 
@@ -664,14 +664,14 @@ std::unique_ptr<emu_file> rom_load_manager::open_rom_file(std::initializer_list<
 	m_romsloadedsize += romsize;
 
 	// return the result
-	if (osd_file::error::NONE != filerr)
+	if (filerr)
 		return nullptr;
 	else
 		return result;
 }
 
 
-std::unique_ptr<emu_file> rom_load_manager::open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, osd_file::error &filerr)
+std::unique_ptr<emu_file> rom_load_manager::open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, std::error_condition &filerr)
 {
 	// record the set names we search
 	tried.insert(tried.end(), paths.begin(), paths.end());
@@ -685,7 +685,7 @@ std::unique_ptr<emu_file> rom_load_manager::open_rom_file(const std::vector<std:
 		filerr = result->open(name);
 
 	// don't return anything if unsuccessful
-	if (osd_file::error::NONE != filerr)
+	if (filerr)
 		return nullptr;
 	else
 		return result;
@@ -1005,11 +1005,11 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	// TODO: use system name and/or software list name in the path - the current setup doesn't scale
 	std::string fname = romp->name() + ".dif";
 
-	/* try to open the diff */
+	// try to open the diff
 	LOG("Opening differencing image file: %s\n", fname.c_str());
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	osd_file::error filerr = diff_file.open(fname);
-	if (filerr == osd_file::error::NONE)
+	std::error_condition filerr = diff_file.open(fname);
+	if (!filerr)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
@@ -1018,16 +1018,16 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 		return diff_chd.open(fullpath.c_str(), true, &source);
 	}
 
-	/* didn't work; try creating it instead */
+	// didn't work; try creating it instead
 	LOG("Creating differencing image: %s\n", fname.c_str());
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	filerr = diff_file.open(fname);
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
-		/* create the CHD */
+		// create the CHD
 		LOG("Creating differencing image file: %s\n", fullpath.c_str());
 		chd_codec_type compression[4] = { CHD_CODEC_NONE };
 		chd_error err = diff_chd.create(fullpath.c_str(), source.logical_bytes(), source.hunk_bytes(), compression, source);

@@ -353,8 +353,8 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	}
 
 	emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr = machine->video().open_next(file, "png");
-	if (filerr != osd_file::error::NONE)
+	std::error_condition const filerr = machine->video().open_next(file, "png");
+	if (filerr)
 		return;
 
 	// add two text entries describing the image
@@ -722,7 +722,7 @@ int shaders::create_resources()
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 
 	emu_file file(machine->options().art_path(), OPEN_FLAG_READ);
-	if (file.open(options->shadow_mask_texture) == osd_file::error::NONE)
+	if (!file.open(options->shadow_mask_texture))
 	{
 		render_load_png(shadow_bitmap, file);
 		file.close();
@@ -747,7 +747,7 @@ int shaders::create_resources()
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
-	if (file.open(options->lut_texture) == osd_file::error::NONE)
+	if (!file.open(options->lut_texture))
 	{
 		render_load_png(lut_bitmap, file);
 		file.close();
@@ -770,7 +770,7 @@ int shaders::create_resources()
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
-	if (file.open(options->ui_lut_texture) == osd_file::error::NONE)
+	if (!file.open(options->ui_lut_texture))
 	{
 		render_load_png(ui_lut_bitmap, file);
 		file.close();

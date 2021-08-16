@@ -489,7 +489,7 @@ DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
 
 	if (size != 0x2000 && size != 0x4000 && size != 0x8000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

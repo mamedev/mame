@@ -265,7 +265,7 @@ void menu_game_options::handle_item_event(event const &menu_event)
 						if (machine_filter::CUSTOM == filter.get_type())
 						{
 							emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-							if (file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())) == osd_file::error::NONE)
+							if (!file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())))
 							{
 								filter.save_ini(file, 0);
 								file.close();
