@@ -104,11 +104,21 @@ u8 k054000_device::read(offs_t offset)
 	Acx = (m_regs[0x01] << 16) | (m_regs[0x02] << 8) | m_regs[0x03];
 	Acy = (m_regs[0x09] << 16) | (m_regs[0x0a] << 8) | m_regs[0x0b];
 
-	/* TODO: this is a hack to make thndrx2 pass the startup check. It is certainly wrong. */
-	if (m_regs[0x04] == 0xff)
-		Acx+=3;
-	if (m_regs[0x0c] == 0xff)
-		Acy+=3;
+	// TODO: this is a hack to make thndrx2 pass the startup check. It is certainly wrong.
+//	if (m_regs[0x04] == 0xff)
+//		Acx+=3;
+//	if (m_regs[0x0c] == 0xff)
+//		Acy+=3;
+	// Used as OTG correction in Vendetta
+	if (m_regs[0x04] & 0x80)
+		Acx -= (0x100 - m_regs[0x04]);
+	else
+		Acx += m_regs[0x04];
+	
+	if (m_regs[0x0c] & 0x80)
+		Acy -= (0x100 - m_regs[0x0c]);
+	else
+		Acy += m_regs[0x0c];
 
 	Aax = m_regs[0x06] + 1;
 	Aay = m_regs[0x07] + 1;
@@ -117,6 +127,9 @@ u8 k054000_device::read(offs_t offset)
 	Bcy = (m_regs[0x11] << 16) | (m_regs[0x12] << 8) | m_regs[0x13];
 	Bax = m_regs[0x0e] + 1;
 	Bay = m_regs[0x0f] + 1;
+
+	if (m_regs[0x04] || m_regs[0x0c])
+		printf("%d %d %d %d (%d|%d)|%d %d %d %d\n", Acx, Acy, Aax, Aay, m_regs[0x04], m_regs[0x0c], Bcx, Bcy, Bax, Bay);
 
 	if (Acx + Aax < Bcx - Bax)
 		return 1;
