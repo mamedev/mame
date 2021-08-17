@@ -53,7 +53,6 @@ public:
 	}
 
 	void igoabasket(machine_config &config);
-	void gldwinner(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
