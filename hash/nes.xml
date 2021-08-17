@@ -52115,6 +52115,96 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_7j201">
+		<description>1997 Super 7 in 1 (JY-201)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="a88s1" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super 7-in-1 (jy-201).prg" size="524288" crc="9cbd3e46" sha1="22fc415f12784577f001cc869099646fca44cb36" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super 7-in-1 (jy-201).chr" size="524288" crc="2bd6a3b9" sha1="e05518cfc75c87a2ac1148c86459bcbfd9b8de0f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_6j202">
+		<description>1997 Super 6 in 1 (JY-202)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="a88s1" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super 6-in-1 (jy-202).prg" size="524288" crc="8e0fbb39" sha1="b39be158a396d5200593146348258835a603c647" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super 6-in-1 (jy-202).chr" size="524288" crc="1d7fbd76" sha1="0507c7faf786760c9d23e69293f7a098dc429f67" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7j203">
+		<description>1997 Super 7 in 1 (JY-203)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="a88s1" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super 7-in-1 (jy-203).prg" size="524288" crc="e6f92fb4" sha1="7aaf73138354ee1ccc4820b4f7583fdeadcc85e3" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super 7-in-1 (jy-203).chr" size="524288" crc="6a07ab58" sha1="7987431bf7f6cb2bf5d66243477ac719e1c2ea27" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7j204">
+		<description>1997 Super 7 in 1 (JY-204)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="a88s1" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super 7-in-1 (jy-204).prg" size="524288" crc="709fd021" sha1="75c7861c574187e866a41750fefc3207f4da3ab7" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super 7-in-1 (jy-204).chr" size="524288" crc="b40d4712" sha1="6b2302f8f8e4798a242f7944976dacbb13bb00bb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7j205">
+		<description>1997 Super 7 in 1 (JY-205)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="a88s1" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super 7-in-1 (jy-205).prg" size="524288" crc="469c347c" sha1="38743af3e494f33f0a974b8c8c8df901d93df226" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super 7-in-1 (jy-205).chr" size="524288" crc="7adad667" sha1="c0d5719dd545af977cef7c425567207c2056954b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7j206">
+		<description>1997 Super 7 in 1 (JY-206)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="a88s1" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super 7-in-1 (jy-206).prg" size="524288" crc="1ffec616" sha1="2e8c2d51fa28d460ce03620eac2b5de33bcb4215" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super 7-in-1 (jy-206).chr" size="524288" crc="02f10803" sha1="d8bc4e1fbbd14fc2279036df87bad148d2c27204" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Sachen / Thin Chen (and clones) -->
 

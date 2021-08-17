@@ -446,7 +446,7 @@ static const nes_mmc mmc_list[] =
 	// 408 Konami PnP
 	// 409 (Sealie) homebrew game A Winner is You, 64MB music cart, easy to support if dump is available
 	// 410 Unused or JY?
-	// 411 various JY multicarts
+	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
 	// 413 homebrew game Super Russian Roulette
 	// 414 9999999-in-1 multicart
