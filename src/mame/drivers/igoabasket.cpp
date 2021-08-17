@@ -38,7 +38,7 @@ Spanish company IGOA S.A.
 #include "emu.h"
 #include "emupal.h"
 #include "speaker.h"
-#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/ay8910.h"
 
@@ -94,7 +94,7 @@ void igoabasket_state::machine_start()
 
 void igoabasket_state::igoabasket(machine_config &config)
 {
-	Z80(config, m_maincpu, 6.144_MHz_XTAL);
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igoabasket_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &igoabasket_state::io_map);
 
