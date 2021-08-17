@@ -34,33 +34,27 @@ class nes_gs2004_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// construction/destruction
+	nes_gs2004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int bank);
+
+private:
+	u32 m_base;
 };
 
 
 // ======================> nes_gs2013_device
 
-class nes_gs2013_device : public nes_nrom_device
+class nes_gs2013_device : public nes_gs2004_device
 {
 public:
 	// construction/destruction
-	nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -70,15 +64,9 @@ class nes_tf9_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -106,9 +94,9 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NES_GS2015,  nes_gs2015_device)
 DECLARE_DEVICE_TYPE(NES_GS2004,  nes_gs2004_device)
 DECLARE_DEVICE_TYPE(NES_GS2013,  nes_gs2013_device)
+DECLARE_DEVICE_TYPE(NES_GS2015,  nes_gs2015_device)
 DECLARE_DEVICE_TYPE(NES_TF9IN1,  nes_tf9_device)
 DECLARE_DEVICE_TYPE(NES_3DBLOCK, nes_3dblock_device)
 
