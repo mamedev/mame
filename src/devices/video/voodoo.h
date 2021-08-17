@@ -678,9 +678,9 @@ protected:
 	u8 m_dac_read_result;                    // pending DAC read result
 
 	// timers
-	emu_timer *m_vsync_start_timer;          // VBLANK timer
-	emu_timer *m_vsync_stop_timer;           // VBLANK end timer
-	emu_timer *m_stall_resume_timer;         // timer to resume processing after stall
+	persistent_timer m_vsync_start_timer;    // VBLANK timer
+	persistent_timer m_vsync_stop_timer;     // VBLANK end timer
+	persistent_timer m_stall_resume_timer;   // timer to resume processing after stall
 
 	// statistics
 	voodoo::debug_stats m_stats;             // internal statistics

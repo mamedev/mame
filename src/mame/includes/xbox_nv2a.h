@@ -879,7 +879,7 @@ public:
 		uint32_t destinationx;
 		uint32_t destinationy;
 	} bitblit;
-	emu_timer *puller_timer;
+	persistent_timer puller_timer;
 	int puller_waiting;
 	address_space *puller_space;
 	uint32_t dilated0[16][2048];

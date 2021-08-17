@@ -27,7 +27,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define VERBOSE 0
+#define VERBOSE 1
 
 #define LOG(...)  do { if (VERBOSE) machine().logerror(__VA_ARGS__); } while (0)
 #define PRECISION 18
@@ -174,6 +174,7 @@ timer_callback &timer_callback::init_base(device_scheduler *scheduler, timer_exp
 		if (m_unique_id != fullid)
 			throw emu_fatalerror("timer_callback::init called multiple times on the same object with different ids (%s vs. %s).", m_unique_id.c_str(), fullid.c_str());
 	}
+printf("init_base(%s)\n", fullid.c_str());
 	return *this;
 }
 
@@ -185,7 +186,7 @@ timer_callback &timer_callback::init_base(device_scheduler *scheduler, timer_exp
 
 timer_callback &timer_callback::init_device(device_t &device, timer_expired_delegate const &delegate, char const *unique)
 {
-	return init_base(device.has_running_machine() ? &device.machine().scheduler() : nullptr, delegate, device.tag(), unique).set_device(device);
+	return init_base(device.has_running_machine() ? &device.machine().scheduler() : nullptr, delegate, device.tag(), unique);
 }
 
 
@@ -383,7 +384,7 @@ void timer_instance::dump() const
 	if (persistent != nullptr)
 		printf(" per=%15s", persistent->period().as_string(PRECISION));
 
-	if (m_callback->device() != nullptr)
+	if (is_device_timer())
 		printf(" dev=%s id=%d\n", m_callback->device()->tag(), int(param(2)));
 	else
 		printf(" cb=%s\n", m_callback->name());
@@ -599,6 +600,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 
 device_scheduler::~device_scheduler()
 {
+	printf("~device_scheduler()\n\n");
 #if (COLLECT_SCHEDULER_STATS)
 	double seconds = m_basetime.absolute().as_double();
 	if (seconds > 0)
@@ -913,38 +915,6 @@ void device_scheduler::deregister_callback(timer_callback &callback)
 
 
 //-------------------------------------------------
-//  timer_alloc - allocate a persistent timer
-//  and return a pointer
-//-------------------------------------------------
-
-persistent_timer *device_scheduler::timer_alloc(timer_expired_delegate const &callback, void *ptr)
-{
-	// allocate a new persistent timer and save it in a vector
-	m_allocated_persistents.push_back(std::make_unique<persistent_timer>());
-	persistent_timer &timer = *m_allocated_persistents.back().get();
-
-	// initialize the timer instance
-	return &timer.init(*this, callback).set_ptr(ptr);
-}
-
-
-//-------------------------------------------------
-//  timer_alloc - allocate a persistent device
-//  timer and return a pointer
-//-------------------------------------------------
-
-persistent_timer *device_scheduler::timer_alloc(device_t &device, device_timer_id id, void *ptr)
-{
-	// allocate a new persistent timer and save it in a vector
-	m_allocated_persistents.push_back(std::make_unique<device_persistent_timer>());
-	device_persistent_timer &timer = static_cast<device_persistent_timer &>(*m_allocated_persistents.back().get());
-
-	// initialize the timer instance
-	return &timer.init(device, id, ptr);
-}
-
-
-//-------------------------------------------------
 //  presave - before creating a save state
 //-------------------------------------------------
 
@@ -1069,7 +1039,7 @@ inline void device_scheduler::execute_timers(attotime const &basetime)
 		// call the callback
 		g_profiler.start(PROFILER_TIMER_CALLBACK);
 		{
-			if (timer.m_callback->device() != nullptr)
+			if (timer.is_device_timer())
 				LOG("execute_timers: timer device %s timer %d\n", timer.m_callback->device()->tag(), int(timer.param(2)));
 			else
 				LOG("execute_timers: timer callback %s\n", timer.m_callback->name());

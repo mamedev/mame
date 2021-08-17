@@ -61,8 +61,7 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 	m_plugins(std::make_unique<plugin_options>()),
 	m_lua(std::make_unique<lua_engine>()),
 	m_new_driver_pending(nullptr),
-	m_firstrun(true),
-	m_autoboot_timer(nullptr)
+	m_firstrun(true)
 {
 }
 
@@ -265,6 +264,10 @@ int mame_machine_manager::execute()
 
 		set_machine(&machine);
 
+		// allocate autoboot timer
+		m_autoboot_timer = std::make_unique<persistent_timer>();
+		m_autoboot_timer->init(machine.scheduler(), *this, FUNC(mame_machine_manager::autoboot_callback));
+
 		// run the machine
 		error = machine.run(is_empty);
 		m_firstrun = false;
@@ -284,6 +287,8 @@ int mame_machine_manager::execute()
 
 		if (machine.exit_pending() && (!started_empty || is_empty))
 			exit_pending = true;
+
+		m_autoboot_timer.reset();
 
 		// machine will go away when we exit scope
 		set_machine(nullptr);
@@ -340,9 +345,6 @@ void mame_machine_manager::create_custom(running_machine& machine)
 {
 	// start the inifile manager
 	m_inifile = std::make_unique<inifile_manager>(m_ui->options());
-
-	// allocate autoboot timer
-	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
 
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(m_ui->options());

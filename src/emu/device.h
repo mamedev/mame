@@ -609,12 +609,15 @@ public:
 	template<typename DeviceType, typename FuncType>
 	std::enable_if_t<std::is_base_of<device_t, DeviceType>::value, persistent_timer *> timer_alloc(DeviceType &device, FuncType callback, char const *name, void *ptr = nullptr)
 	{
-		return m_scheduler->timer_alloc(timer_expired_delegate(callback, name, &device), ptr);
+		printf("timer_alloc(%s) from %s\n", name, tag());
+		// allocate a new persistent timer and save it in a vector
+		m_allocated_timers.push_back(std::make_unique<persistent_timer>());
+		persistent_timer &timer = *m_allocated_timers.back().get();
+
+		// initialize the timer instance
+		return &timer.init(device, std::forward<FuncType>(callback), name).set_ptr(ptr);
 	}
-	persistent_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr)
-	{
-		return m_scheduler->timer_alloc(*this, id, ptr);
-	}
+	persistent_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
 	void timer_set(const attotime &duration, device_timer_id id = 0, u64 param = 0, u64 param2 = 0)
 	{
 		m_device_timer.call_after(duration, param, param2, id);
@@ -854,6 +857,7 @@ private:
 	std::list<devcb_base *> m_callbacks;
 	std::vector<memory_view *> m_viewlist;          // list of views
 	transient_timer_factory m_device_timer;
+	std::vector<std::unique_ptr<persistent_timer>> m_allocated_timers;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;
@@ -1360,7 +1364,7 @@ public:
 
 		// call through to the base class to register this
 		persistent_timer::init(device, FUNC(device_t::device_timer), tempstr).set_param(2, id);
-		m_callback.set_ptr(ptr);
+		m_callback.set_ptr(ptr).set_device(device);
 		return *this;
 	}
 
@@ -1430,5 +1434,23 @@ inline device_t::interface_list::auto_iterator device_t::interface_list::auto_it
 	return result;
 }
 
+
+//-------------------------------------------------
+//  timer_alloc - allocate a device timer; in
+//  general it is preferred to embed a
+//  device_persistent_timer in your class and use
+//  that directly
+//-------------------------------------------------
+
+inline persistent_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
+{
+	printf("timer_alloc(%d) from %s\n", id, tag());
+	// allocate a new persistent timer and save it in a vector
+	m_allocated_timers.push_back(std::make_unique<device_persistent_timer>());
+	device_persistent_timer &timer = static_cast<device_persistent_timer &>(*m_allocated_timers.back().get());
+
+	// initialize the timer instance
+	return &timer.init(*this, id, ptr);
+}
 
 #endif // MAME_EMU_DEVICE_H

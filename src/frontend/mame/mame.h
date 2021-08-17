@@ -78,7 +78,7 @@ private:
 	bool                    m_firstrun;
 
 	static mame_machine_manager *s_manager;
-	emu_timer               *m_autoboot_timer;      // autoboot timer
+	std::unique_ptr<persistent_timer> m_autoboot_timer;      // autoboot timer
 	std::unique_ptr<mame_ui_manager> m_ui;                  // internal data from ui.cpp
 	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.cpp
 	std::unique_ptr<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs

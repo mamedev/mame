@@ -730,9 +730,6 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type
 	m_vblank_swap_pending(0),
 	m_vblank_swap(0),
 	m_vblank_dont_swap(0),
-	m_vsync_start_timer(nullptr),
-	m_vsync_stop_timer(nullptr),
-	m_stall_resume_timer(nullptr),
 	m_last_status_pc(0),
 	m_last_status_value(0),
 	m_clut_dirty(true),
@@ -924,8 +921,8 @@ void voodoo_1_device::device_start()
 	m_stall_trigger = 51324 + index;
 
 	// allocate timers for VBLANK
-	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_stop), this), this);
-	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_start),this), this);
+	m_vsync_stop_timer.init(*this, FUNC(voodoo_1_device::vblank_stop));
+	m_vsync_start_timer.init(*this, FUNC(voodoo_1_device::vblank_start));
 
 	// add TMUs to the chipmask if memory is specified (later chips leave
 	// the tmumem values at 0 and set the chipmask directly to indicate
@@ -1011,7 +1008,7 @@ void voodoo_1_device::device_start()
 	// set up the PCI FIFO
 	m_pci_fifo.configure(m_pci_fifo_mem, 64*2);
 	m_stall_state = NOT_STALLED;
-	m_stall_resume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::stall_resume_callback), this));
+	m_stall_resume_timer.init(*this, FUNC(voodoo_1_device::stall_resume_callback));
 
 	// initialize registers
 	m_init_enable = 0;
@@ -2533,7 +2530,7 @@ void voodoo_1_device::adjust_vblank_start_timer()
 	// if zero, adjust to next frame, otherwise we may get stuck in an infinite loop
 	if (time_until_blank == attotime::zero)
 		time_until_blank = screen().frame_period();
-	m_vsync_start_timer->adjust(time_until_blank);
+	m_vsync_start_timer.adjust(time_until_blank);
 }
 
 
@@ -2573,7 +2570,7 @@ void voodoo_1_device::vblank_start(void *ptr, s32 param)
 		swap_buffers();
 
 	// set a timer for the next off state
-	m_vsync_stop_timer->adjust(screen().time_until_pos(m_vsyncstop));
+	m_vsync_stop_timer.adjust(screen().time_until_pos(m_vsyncstop));
 
 	// set internal state and call the client
 	m_vblank = true;
@@ -3145,7 +3142,7 @@ void voodoo_1_device::check_stalled_cpu(attotime current_time)
 
 	// if not, set a timer for the next one
 	else
-		m_stall_resume_timer->adjust(m_operation_end - current_time);
+		m_stall_resume_timer.adjust(m_operation_end - current_time);
 }
 
 
@@ -3171,7 +3168,7 @@ void voodoo_1_device::stall_cpu(stall_state state)
 		m_cpu->spin_until_trigger(m_stall_trigger);
 
 	// set a timer to clear the stall
-	m_stall_resume_timer->adjust(m_operation_end - machine().time());
+	m_stall_resume_timer.adjust(m_operation_end - machine().time());
 }
 
 

@@ -26,7 +26,7 @@
 #ifdef MAME_DEBUG
 #define SCHEDULER_DEBUG (1)
 #else
-#define SCHEDULER_DEBUG (0)
+#define SCHEDULER_DEBUG (1)
 #endif
 
 // if SCHEDULER_DEBUG is on, make assertions fire regardless of MAME_DEBUG
@@ -36,7 +36,7 @@
 #define scheduler_assert assert
 #endif
 
-#define COLLECT_SCHEDULER_STATS (0)
+#define COLLECT_SCHEDULER_STATS (1)
 #if (COLLECT_SCHEDULER_STATS)
 #define INCREMENT_SCHEDULER_STAT(x) do { x += 1; } while (0)
 #define SET_SCHEDULER_STAT(x, y) do { x = y; } while (0)
@@ -263,23 +263,23 @@ public:
 
 	// registration of an arbitrary member function bound to an arbitrary object; requires the
 	// device_scheduler as the first parameter since we don't know how to get one
-	template<typename ObjectType, typename FuncType, std::enable_if_t<std::is_member_function_pointer<FuncType>::value, bool> = true>
-	timer_callback &init(device_scheduler &scheduler, ObjectType &object, FuncType callback, char const *string, char const *unique = nullptr)
+	template<typename ObjectType, typename FuncType>
+	std::enable_if_t<std::is_member_function_pointer<FuncType>::value, timer_callback &> init(device_scheduler &scheduler, ObjectType &object, FuncType callback, char const *string, char const *unique = nullptr)
 	{
 		return init_base(&scheduler, timer_expired_delegate(callback, string, &object), unique);
 	}
 
 	// registration of a device member function bound to that device
-	template<typename DeviceType, typename FuncType, std::enable_if_t<std::is_base_of<device_t, DeviceType>::value && std::is_member_function_pointer<FuncType>::value, bool> = true>
-	timer_callback &init(DeviceType &device, FuncType callback, char const *string, char const *unique = nullptr)
+	template<typename DeviceType, typename FuncType>
+	std::enable_if_t<std::is_base_of<device_t, DeviceType>::value && std::is_member_function_pointer<FuncType>::value, timer_callback &> init(DeviceType &device, FuncType callback, char const *string, char const *unique = nullptr)
 	{
 		return init_device(device, timer_expired_delegate(callback, string, &device), unique);
 	}
 
 	// registration of a device interface member function bound to the interface
 	// this is only enabled if the call is NOT a device_t (to prevent ambiguity)
-	template<typename IntfType, typename FuncType, std::enable_if_t<std::is_base_of<device_interface, IntfType>::value && !std::is_base_of<device_t, IntfType>::value, bool> = true>
-	timer_callback &init(IntfType &intf, FuncType callback, char const *string, char const *unique = nullptr)
+	template<typename IntfType, typename FuncType>
+	std::enable_if_t<std::is_base_of<device_interface, IntfType>::value && !std::is_base_of<device_t, IntfType>::value, timer_callback &> init(IntfType &intf, FuncType callback, char const *string, char const *unique = nullptr)
 	{
 		return init_device(intf.device(), timer_expired_delegate(callback, string, &intf), unique);
 	}
@@ -374,6 +374,7 @@ public:
 	u64 param(int index = 0) const { return m_param[index]; }
 	void *ptr() const { return m_callback->ptr(); }
 	bool active() const { return m_active; }
+	bool is_device_timer() const { return (m_callback->device() != nullptr); }
 
 	// timing queries
 	attotime elapsed() const noexcept;
@@ -423,6 +424,8 @@ private:
 // modify or cancel them once issued
 class transient_timer_factory
 {
+	friend class device_t;
+
 	DISABLE_COPYING(transient_timer_factory);
 
 public:
@@ -529,7 +532,7 @@ protected:
 	bool m_modified;                    // true if modified
 	timer_instance m_instance;          // the embedded timer instance
 	timer_callback m_callback;          // the embedded timer callback
-	timer_callback m_periodic_callback; // an wrapper callback for periodic timers
+	timer_callback m_periodic_callback; // a wrapper callback for periodic timers
 };
 
 // eventually replace emu_timer with persistent_timer
@@ -543,7 +546,6 @@ class device_scheduler
 	friend class device_execute_interface;
 	friend class transient_timer_factory;
 	friend class timer_instance;
-	friend class device_t; // for access to timer_alloc/timer_set device forms
 
 	// due to save state limitations these have to be fixed
 	static constexpr int TIMER_SAVE_SLOTS = 256;
@@ -621,7 +623,6 @@ public:
 	void deregister_callback(timer_callback &callback);
 
 	// timers, specified by callback/name; using persistent_timer is preferred
-	persistent_timer *timer_alloc(timer_expired_delegate const &callback, void *ptr = nullptr);
 	void synchronize() { m_empty_timer.synchronize(); }
 
 	// pointer to the current callback timer, if live
@@ -637,10 +638,6 @@ public:
 	void register_save(save_manager &save);
 
 private:
-	// timers, specified by device/id; generally devices should use the device_t methods instead
-	persistent_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
-	void timer_set(attotime const &duration, device_t &device, device_timer_id id = 0, s32 param = 0, u64 param2 = 0, u64 param3 = 0);
-
 	// callbacks
 	void presave();
 	void postload();
@@ -682,7 +679,6 @@ private:
 	timer_callback *            m_registered_callbacks;     // list of registered callbacks
 	transient_timer_factory     m_empty_timer;              // empty timer factory
 	transient_timer_factory     m_timed_trigger;            // timed trigger factory
-	std::vector<std::unique_ptr<persistent_timer>> m_allocated_persistents;
 	std::vector<std::unique_ptr<timer_instance>> m_allocated_instances;
 
 	// other internal states
@@ -836,7 +832,7 @@ inline void transient_timer_factory::call_after(attotime const &duration, u64 pa
 
 inline void transient_timer_factory::call_at(attotime const &abstime, u64 param, u64 param2, u64 param3)
 {
-	scheduler_assert(!duration.is_never());
+	scheduler_assert(!abstime.is_never());
 	scheduler_assert(m_callback.is_initialized());
 	m_callback.scheduler().instance_alloc().init_transient(m_callback, abstime, true)
 		.set_params(param, param2, param3);

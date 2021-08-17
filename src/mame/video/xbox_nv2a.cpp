@@ -4889,7 +4889,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 							break;
 					}
 					if (ret != 0) {
-						puller_timer->enable(false);
+						puller_timer.enable(false);
 						puller_waiting = ret;
 						return;
 					}
@@ -5040,8 +5040,7 @@ void nv2a_renderer::geforce_w(address_space &space, offs_t offset, uint32_t data
 		if (e == 0x720 / 4) {
 			if ((data & 1) && (puller_waiting == 2)) {
 				puller_waiting = 0;
-				puller_timer->enable();
-				puller_timer->adjust(attotime::zero);
+				puller_timer.adjust(attotime::zero);
 			}
 		}
 		if ((e >= 0x900 / 4) && (e < 0xa00 / 4))
@@ -5101,8 +5100,7 @@ void nv2a_renderer::geforce_w(address_space &space, offs_t offset, uint32_t data
 			if (*dmaget != *dmaput) {
 				if (puller_waiting == 0) {
 					puller_space = &space;
-					puller_timer->enable();
-					puller_timer->adjust(attotime::zero);
+					puller_timer.adjust(attotime::zero);
 				}
 			}
 		}
@@ -5129,6 +5127,6 @@ void nv2a_renderer::set_ram_base(void *base)
 
 void nv2a_renderer::start(address_space *cpu_space)
 {
-	puller_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nv2a_renderer::puller_timer_work), this), (void *)"NV2A Puller Timer");
-	puller_timer->enable(false);
+	puller_timer.init(cpu_space->device().scheduler(), *this, FUNC(nv2a_renderer::puller_timer_work));
+	puller_timer.enable(false);
 }
