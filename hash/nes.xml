@@ -81949,15 +81949,34 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_tf6" supported="no">
+	<software name="mc_tf5" cloneof="mc_tf6">
+		<description>Tetris Family 5 in 1</description>
+		<year>199?</year>
+		<publisher>RCM</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="gs2004" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="270336">
+				<rom name="tetris family 5-in-1.prg0" size="262144" crc="0ab2e826" sha1="b813808fc4ac25fbb9bd829410ab1a8d39c56576" offset="0x00000" status="baddump" />
+				<rom name="tetris family 5-in-1.prg1" size="8192" crc="255bc6ed" sha1="6226ec49d548a92d8abefb619efc52fe08a08899" offset="0x40000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_tf6">
 		<description>Tetris Family 6 in 1 (GS-2004)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>199?</year>
+		<publisher>RCM</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gs2004" />
 			<feature name="pcb" value="BMC-GS-2004" />
-			<dataarea name="prg" size="262144">
-				<rom name="tetris family 6-in-1 (gs-2004) [u].prg" size="262144" crc="0ab2e826" sha1="b813808fc4ac25fbb9bd829410ab1a8d39c56576" offset="00000" status="baddump" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="270336">
+				<rom name="tetris family 6-in-1 (gs-2004).prg0" size="262144" crc="0ab2e826" sha1="b813808fc4ac25fbb9bd829410ab1a8d39c56576" offset="0x00000" status="baddump" />
+				<rom name="tetris family 6-in-1 (gs-2004).prg1" size="8192" crc="08e73de1" sha1="1ff9bdf51482adfcd040c81fa0243c75c0f0536f" offset="0x40000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -81967,8 +81986,8 @@ to check why this is different -->
 
 	<software name="mc_tf9">
 		<description>Tetris Family 9 in 1</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<year>1991</year>
+		<publisher>RCM</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="tf9in1" />
 			<feature name="pcb" value="RCM-TETRISFAMILY" />
@@ -81981,13 +82000,14 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_tf12" supported="no">
+	<software name="mc_tf12">
 		<description>Tetris Family 12 in 1 (GS-2013)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>RCM</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gs2013" />
 			<feature name="pcb" value="BMC-GS-2013" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="327680">
 				<rom name="tetris family 12-in-1 (gs-2013) [u].prg" size="327680" crc="8cde7cb9" sha1="0119413febd9a6c5a7c4f0673c42356247a4ade8" offset="00000" status="baddump" />
 			</dataarea>

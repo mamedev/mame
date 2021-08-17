@@ -318,7 +318,7 @@ static const nes_mmc mmc_list[] =
 	// 280 Unused
 	// 281 seems to be mc_sh4b and many other JY multicarts not in nes.xml?
 	// 282 more JY multicarts not in nes.xml?
-	// 283 RCM_GS2004 and RCM_GS2013 (why are these RCM?), these are in nes.xml
+	{ 283, RCM_GS2004 },           // and RCM_GS2013
 	// 284 UNL_DRIPGAME, not in nes.xml
 	{ 285, BMC_A65AS },
 	{ 286, BMC_BENSHIENG },
@@ -896,6 +896,11 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = UNL_DH08;
 			break;
 
+		case RCM_GS2004:
+			if (prg_size >= 0x50000)
+				m_pcb_id = RCM_GS2013;
+			break;
+
 		case HES_BOARD:
 			if (crc_hack)
 				m_cart->set_pcb_ctrl_mirror(true);    // Mapper 113 is used for 2 diff boards
@@ -1207,6 +1212,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 			if (crc_hack)
 				pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
 			break;
+
 		case UNL_LH28_LH54:                            // Mapper 108 is used for 4 diff boards
 			if (ROM[5])
 				pcb_id = (ROM[5] == 2) ? UNL_LE05 : UNL_LH31;
@@ -1214,6 +1220,10 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 				pcb_id = UNL_DH08;
 			break;
 
+		case RCM_GS2004:                               // Mapper 283 is used for 2 diff boards
+			if (ROM[4] >= 20)
+				pcb_id = RCM_GS2013;
+			break;
 	}
 
 	return nes_get_slot(pcb_id);
