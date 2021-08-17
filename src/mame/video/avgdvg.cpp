@@ -16,7 +16,9 @@
 
 #include "emu.h"
 #include "avgdvg.h"
+
 #include "screen.h"
+
 
 /*************************************
  *
@@ -847,12 +849,12 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 			const u8 b = bit0 * 0xcb;
 
 			int x = m_xpos;
-				int y = m_ypos;
-				apply_flipping(x, y);
+			int y = m_ypos;
+			apply_flipping(x, y);
 
-				vg_add_point_buf(
-						x,
-						y,
+			vg_add_point_buf(
+					x,
+					y,
 					rgb_t(r, g, b),
 					(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
 		}

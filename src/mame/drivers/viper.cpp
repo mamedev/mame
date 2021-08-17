@@ -107,17 +107,17 @@
         xtrial              Hangs at "Please set the time for the bookkeeping" message.
 
         p9112               RTC self check bad.
-							The game checks the checksum of 0x157d4d0-0x157d4ee against the checksum that should be at 0x157d4ee-0x157d4ef,
-							but this part of memory is never written to after its initial clearing on boot.
-							If 0xffff is placed at 0x157d4ee then the game will pass the RTC check.
-							The game will later complain about "Hardware Error: Security Key Error" if you try starting the game.
+                            The game checks the checksum of 0x157d4d0-0x157d4ee against the checksum that should be at 0x157d4ee-0x157d4ef,
+                            but this part of memory is never written to after its initial clearing on boot.
+                            If 0xffff is placed at 0x157d4ee then the game will pass the RTC check.
+                            The game will later complain about "Hardware Error: Security Key Error" if you try starting the game.
         code1d,b            Can boot but crashes randomly and quickly so it's hard to do anything.
 
         mocapglf            Security code error
         sscopex/sogeki      Security code error
 
         wcombat             Can boot into a test menu by using a combination of dipswitches, but it says "serial check bad". Can't boot normally.
-		wcombatu            Bootable when dipsw 4 is set to on. Controls not implemented so it's not possible to pass nickname selection screen. Freezes when test button is pressed.
+        wcombatu            Bootable when dipsw 4 is set to on. Controls not implemented so it's not possible to pass nickname selection screen. Freezes when test button is pressed.
         thrild2c,ac         Inf loop on blue screen
 
 
@@ -2505,7 +2505,8 @@ WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 
 WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
 {
-	if (state) {
+	if (state)
+	{
 		// This is a hack.
 		// There's no obvious (to me) trigger for when it's safe to start the audio interrupts, but after testing all of the games that can boot, it's safe to start audio interrupts once pciint is triggering.
 		m_sound_irq_enabled = true;
@@ -2516,7 +2517,8 @@ WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
 
 TIMER_DEVICE_CALLBACK_MEMBER(viper_state::sound_timer_callback)
 {
-	if (!m_sound_irq_enabled) {
+	if (!m_sound_irq_enabled)
+	{
 		// If IRQ3 is triggered too soon into the boot process then it'll freeze on the blue boot screen.
 		return;
 	}
@@ -2525,7 +2527,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(viper_state::sound_timer_callback)
 
 	// Get samples from memory
 	int32_t* samplePtr = (int32_t*)(m_workram + (m_sound_buffer_offset >> 3));
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 2; i++)
+	{
 		m_dmadac[i]->transfer(
 			i,
 			1,
@@ -2614,7 +2617,8 @@ void viper_state::machine_reset()
 	m_sound_buffer_offset = 0xfff800; // The games swap between 0xfff800 and 0xfff000 every IRQ3 call
 	m_sound_irq_enabled = false;
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 2; i++)
+	{
 		m_dmadac[i]->initialize_state();
 		m_dmadac[i]->set_frequency(44100);
 		m_dmadac[i]->enable(1);
@@ -2705,7 +2709,8 @@ void viper_state::init_vipercf()
 
 uint16_t viper_state::ppp_sensor_r(offs_t offset)
 {
-	switch(offset) {
+	switch(offset)
+	{
 		case 0x06: return m_io_ppp_sensors[0]->read();
 		case 0x0e: return m_io_ppp_sensors[1]->read();
 		case 0x16: return m_io_ppp_sensors[2]->read();
