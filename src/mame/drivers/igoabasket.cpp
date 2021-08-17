@@ -36,7 +36,6 @@ Spanish company IGOA S.A.
 */
 
 #include "emu.h"
-#include "emupal.h"
 #include "speaker.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
