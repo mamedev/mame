@@ -218,7 +218,7 @@ ROM_START( goldfrts )
 	ROM_LOAD( "golden_fruits_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) ) // Same as Mini Super Fruits
 ROM_END
 
-/* Golden Winner - Reben (PCB withou battery), 6 MHz xtal
+/* Golden Winner - Reben. PCB without battery, 6 MHz xtal
    _____________________________________________________________
    |                             _______                        |
    |                            DM74S188N      ____________     |
