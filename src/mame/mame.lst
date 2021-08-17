@@ -16947,6 +16947,9 @@ iez80                           //
 @source:if800.cpp
 if800                           //
 
+@source:igoabasket.cpp
+basket                          // (c) 198? IGOA S.A.
+
 @source:igs_fear.cpp
 fearless                        // (c) 2006
 
