@@ -235,6 +235,7 @@ protected:
 	uint8_t m_dma_offset[4];
 	uint8_t m_dma_autoinc[4];
 	int m_dack;
+	
 private:
 	void dmapg4_w(offs_t offset, uint8_t data);
 
@@ -396,7 +397,6 @@ protected:
 
 	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
 	bool m_dac1bit_disable;
-
 private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //	optional_device<dac_1bit_device> m_dac1bit;

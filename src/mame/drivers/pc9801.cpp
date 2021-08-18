@@ -69,8 +69,9 @@
     - Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
     - clean-up duplicate code;
 
-	TODO (PC-9801RX):
-	- Identify model type, it clearly accesses PCI and it's not a 286 CPU;
+	TODO (PC-9801RX?):
+	- Identify model type, it clearly accesses PCI, the extended 3'5 floppy I/O at 0x4be and
+	  it's not a 286 CPU;
 	- Floppy boot fails;
 
 	TODO (PC-9801US):
@@ -424,11 +425,19 @@ void pc9801_state::fdc_2hd_ctrl_w(uint8_t data)
 
 uint8_t pc9801_state::fdc_2dd_ctrl_r()
 {
-	// TODO: not really working, it's supposed to detect if the drive has a disk in
-	// (it also clearly has a code smell atm)
-	int ret = (!m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
-	ret |= (m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
-	return ret | 0x40; //unknown port meaning, might be 0x70
+	floppy_image_device *floppy0 = m_fdc_2dd->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = m_fdc_2dd->subdevice<floppy_connector>("1")->get_device();
+	u8 ret = 0;
+
+	// 2dd BIOS specifically tests if a disk is in any drive
+	// (does not happen on 2HD and 2HD/2DD later rev)
+	if (!floppy0->ready_r() || !floppy1->ready_r())
+		ret |= 0x10;
+
+	//popmessage("%d %d %02x", floppy0->ready_r(), floppy1->ready_r(), ret);
+	
+	// TODO: dips et al.
+	return ret | 0x40;
 }
 
 void pc9801_state::fdc_2dd_ctrl_w(uint8_t data)
@@ -819,6 +828,21 @@ void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
+/*
+ * FDC MODE control
+ * 
+ * ???? ---- <undefined>
+ * ---- x--- (r/o) DIP-SW 3-2 built-in FDC spec (1) OFF 2HD (0) ON 2DD
+ * ---- -x-- (r) DIP-SW 3-1 FDC FIXed mode (1) ON
+ *           (w) Enable motor ON (1) defined by 0x94 bit 3 (0) always on
+ * ---- --x- (r/w) FDD EXC access mode status (1) 2HD (0) 2DD
+ * ---- ---x (r/w) I/F mode select (1) 2HD (0) 2DD
+ *           (Disables I/O port access)
+ *
+ * NB: high-reso class diverges here:
+ * - XA/XL themselves have no way to access any of this;
+ * - post-XA/XL just has Enable motor ON writes;
+ */
 uint8_t pc9801vm_state::fdc_mode_ctrl_r()
 {
 	return (m_fdc_ctrl & 3) | 0xf0 | 8 | 4;
@@ -826,12 +850,6 @@ uint8_t pc9801vm_state::fdc_mode_ctrl_r()
 
 void pc9801vm_state::fdc_mode_ctrl_w(uint8_t data)
 {
-	/*
-	---- x--- ready line?
-	---- --x- select type (1) 2hd (0) 2dd
-	---- ---x select irq
-	*/
-
 	m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 	m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 
@@ -902,7 +920,7 @@ void pc9801vm_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
  *           ^ may still select anything but -E02?
  * --?? ---- <unknown>
  * ---- -x-- DMA address mask (1) inhibit DMA access for anything higher than 1MB
- *           ^ defaults to 0 high-reso equipped machines (?), 1 otherwise
+ *           ^ defaults to 0 on high-reso equipped machines (?), 1 otherwise
  * ---- --x- Graph LIO BIOS select (?), on 9801VX21
  * ---- ---x Mate A: selects high-reso mode
  *           ^ unknown otherwise
@@ -1704,12 +1722,14 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 	device.option_add("otomichan_kai", OTOMICHAN_KAI);
 }
 
-//  Jast Sound, could be put independently
+//  Jast Sound, could be installed independently
 
 WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
 {
 	logerror("IRQ 2DD %d\n",state);
-
+	
+	// TODO: does this mask applies to the specific timer irq trigger only?
+	// (bit 0 of control)
 	if(m_fdc_2dd_ctrl & 8)
 	{
 		m_pic2->ir2_w(state);

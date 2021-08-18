@@ -41423,92 +41423,95 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="sstrider">
+	<!-- During install pcm482.pc8 throws a CRC error at the end of disk J extraction -->
+	<!-- TODO: check if it needs redump -->
+	<!-- Extremely slow during gameplay (at least on RS class) -->
+	<software name="sstrider" supported="no">
 		<description>Star Striders</description>
 		<year>1994</year>
 		<publisher>ケイエスエス (KSS)</publisher>
 		<info name="alt_title" value="スターストライダーズ" />
 		<info name="release" value="19941216" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_01.fdi" size="1265664" crc="4cc2d7b9" sha1="304d875d0e98ab96b2e7aa218983b2939cb4e64d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_02.fdi" size="1265664" crc="3fc15627" sha1="45f8de723fd987db1c954b44e4c8297bffaaf83d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_03.fdi" size="1265664" crc="b2cbd5af" sha1="dcf5c6087d35cb05ff492b99ce1d7c3e3e24c782" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_04.fdi" size="1265664" crc="3472dd1d" sha1="2bb6e4efcac4e5dc283a641f2b4dc130750a2db5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_05.fdi" size="1265664" crc="b8461eee" sha1="65883e9a9b6dbeafc752b6207853aa8af88be97c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
+			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_06.fdi" size="1265664" crc="eb432a33" sha1="cef1f47d35457f0e6cf2c84f41085805ce882be2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7"/>
+			<feature name="part_id" value="Disk G"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_07.fdi" size="1265664" crc="70bb07a0" sha1="f484f263f7db17760bc655da7882c049e769d0a8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 8"/>
+			<feature name="part_id" value="Disk H"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_08.fdi" size="1265664" crc="fab000b7" sha1="1a96b7ef8ece87fb99621719393d899d999f7c34" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 9"/>
+			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_09.fdi" size="1265664" crc="94bd08f2" sha1="4cdb7d3eaae9a0c13174312fe8ca9b451ee9d05e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 10"/>
+			<feature name="part_id" value="Disk J"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_10.fdi" size="1265664" crc="6610a8e6" sha1="0c44e7f57056939f014dc76bd78a8dab7aafbe17" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 11"/>
+			<feature name="part_id" value="Disk K"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_11.fdi" size="1265664" crc="f0b38f13" sha1="b1653ee90c732344262343b59133894a5809cb65" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 12"/>
+			<feature name="part_id" value="Disk L"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_12.fdi" size="1265664" crc="946e1f33" sha1="40b043f86a66d1f025e0ef44711b14f5f520e2bf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 13"/>
+			<feature name="part_id" value="Disk M"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_13.fdi" size="1265664" crc="eff2168d" sha1="5934fe8379937296ee4e68d9826dcfdf355535b9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop14" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 14"/>
+			<feature name="part_id" value="Disk N"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="sstriders_14.fdi" size="1265664" crc="6b66e4a8" sha1="0a1a2a9f4be6d5a8b6b6cc08a9693ab7e67e85fb" offset="0" />
 			</dataarea>
