@@ -109,6 +109,11 @@ Original FindSDL_ttf.cmake module:
   module, but with modifications to recognize OS X frameworks and
   additional Unix paths (FreeBSD, etc).
 #]=======================================================================]
+# MAME Changes
+# ============
+# Added 2021/08/17 (Micko) changes so we use <SDL2/SDL.h> in includes
+#
+#
 
 # SDL2 Library required
 find_package(SDL2 QUIET)
@@ -145,15 +150,15 @@ if(SDL2_TTF_NO_DEFAULT_PATH)
 endif()
 
 # Search for the SDL2_ttf include directory
-find_path(SDL2_TTF_INCLUDE_DIR SDL_ttf.h
+find_path(SDL2_TTF_INCLUDE_DIR SDL2/SDL_ttf.h
   HINTS
 	ENV SDL2TTFDIR
 	ENV SDL2DIR
 	${SDL2_TTF_NO_DEFAULT_PATH_CMD}
-  PATH_SUFFIXES SDL2
+  PATH_SUFFIXES 
 				# path suffixes to search inside ENV{SDL2DIR}
 				# and ENV{SDL2TTFDIR}
-				include/SDL2 include
+				include
   PATHS ${SDL2_TTF_PATH}
   DOC "Where the SDL2_ttf headers can be found"
 )
@@ -177,10 +182,10 @@ find_library(SDL2_TTF_LIBRARY
 )
 
 # Read SDL2_ttf version
-if(SDL2_TTF_INCLUDE_DIR AND EXISTS "${SDL2_TTF_INCLUDE_DIR}/SDL_ttf.h")
-  file(STRINGS "${SDL2_TTF_INCLUDE_DIR}/SDL_ttf.h" SDL2_TTF_VERSION_MAJOR_LINE REGEX "^#define[ \t]+SDL_TTF_MAJOR_VERSION[ \t]+[0-9]+$")
-  file(STRINGS "${SDL2_TTF_INCLUDE_DIR}/SDL_ttf.h" SDL2_TTF_VERSION_MINOR_LINE REGEX "^#define[ \t]+SDL_TTF_MINOR_VERSION[ \t]+[0-9]+$")
-  file(STRINGS "${SDL2_TTF_INCLUDE_DIR}/SDL_ttf.h" SDL2_TTF_VERSION_PATCH_LINE REGEX "^#define[ \t]+SDL_TTF_PATCHLEVEL[ \t]+[0-9]+$")
+if(SDL2_TTF_INCLUDE_DIR AND EXISTS "${SDL2_TTF_INCLUDE_DIR}/SDL2/SDL_ttf.h")
+  file(STRINGS "${SDL2_TTF_INCLUDE_DIR}/SDL2/SDL_ttf.h" SDL2_TTF_VERSION_MAJOR_LINE REGEX "^#define[ \t]+SDL_TTF_MAJOR_VERSION[ \t]+[0-9]+$")
+  file(STRINGS "${SDL2_TTF_INCLUDE_DIR}/SDL2/SDL_ttf.h" SDL2_TTF_VERSION_MINOR_LINE REGEX "^#define[ \t]+SDL_TTF_MINOR_VERSION[ \t]+[0-9]+$")
+  file(STRINGS "${SDL2_TTF_INCLUDE_DIR}/SDL2/SDL_ttf.h" SDL2_TTF_VERSION_PATCH_LINE REGEX "^#define[ \t]+SDL_TTF_PATCHLEVEL[ \t]+[0-9]+$")
   string(REGEX REPLACE "^#define[ \t]+SDL_TTF_MAJOR_VERSION[ \t]+([0-9]+)$" "\\1" SDL2_TTF_VERSION_MAJOR "${SDL2_TTF_VERSION_MAJOR_LINE}")
   string(REGEX REPLACE "^#define[ \t]+SDL_TTF_MINOR_VERSION[ \t]+([0-9]+)$" "\\1" SDL2_TTF_VERSION_MINOR "${SDL2_TTF_VERSION_MINOR_LINE}")
   string(REGEX REPLACE "^#define[ \t]+SDL_TTF_PATCHLEVEL[ \t]+([0-9]+)$" "\\1" SDL2_TTF_VERSION_PATCH "${SDL2_TTF_VERSION_PATCH_LINE}")
@@ -195,6 +200,9 @@ endif()
 
 set(SDL2_TTF_LIBRARIES ${SDL2_TTF_LIBRARY})
 set(SDL2_TTF_INCLUDE_DIRS ${SDL2_TTF_INCLUDE_DIR})
+if(NOT SDL2_TTF_INCLUDE_DIRS MATCHES ".framework")
+	set(SDL2_TTF_INCLUDE_DIRS "${SDL2_TTF_INCLUDE_DIR};${SDL2_TTF_INCLUDE_DIR}/SDL2")
+endif()
 
 include(FindPackageHandleStandardArgs)
 
@@ -206,7 +214,8 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2_ttf
 mark_as_advanced(SDL2_TTF_PATH
 				 SDL2_TTF_NO_DEFAULT_PATH
 				 SDL2_TTF_LIBRARY
-				 SDL2_TTF_INCLUDE_DIR)
+				 SDL2_TTF_INCLUDE_DIR
+         SDL2_TTF_INCLUDE_DIRS)
 
 
 if(SDL2_TTF_FOUND)
@@ -216,7 +225,7 @@ if(SDL2_TTF_FOUND)
 	add_library(SDL2::TTF UNKNOWN IMPORTED)
 	set_target_properties(SDL2::TTF PROPERTIES
 						  IMPORTED_LOCATION "${SDL2_TTF_LIBRARY}"
-						  INTERFACE_INCLUDE_DIRECTORIES "${SDL2_TTF_INCLUDE_DIR}"
+						  INTERFACE_INCLUDE_DIRECTORIES "${SDL2_TTF_INCLUDE_DIRS}"
 						  INTERFACE_LINK_LIBRARIES SDL2::Core)
   endif()
 endif()

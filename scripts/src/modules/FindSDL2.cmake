@@ -144,7 +144,11 @@ This needed to change because "proper" SDL convention is #include
 "SDL.h", not <SDL/SDL.h>.  This is done for portability reasons
 because not all systems place things in SDL/ (see FreeBSD).
 #]=======================================================================]
-
+# MAME Changes
+# ============
+# Added 2021/08/17 (Micko) changes so we use <SDL2/SDL.h> in includes
+#
+#
 # Define options for searching SDL2 Library in a custom path
 
 set(SDL2_PATH "" CACHE STRING "Custom SDL2 Library path")
@@ -164,18 +168,21 @@ if(SDL2_NO_DEFAULT_PATH)
 endif()
 
 # Search for the SDL2 include directory
-find_path(SDL2_INCLUDE_DIR SDL.h
+find_path(SDL2_INCLUDE_DIR SDL2/SDL.h
   HINTS
 	ENV SDL2DIR
 	${SDL2_NO_DEFAULT_PATH_CMD}
-  PATH_SUFFIXES SDL2
+  PATH_SUFFIXES 
 				# path suffixes to search inside ENV{SDL2DIR}
-				include/SDL2 include
+				include
   PATHS ${SDL2_PATH}
   DOC "Where the SDL2 headers can be found"
 )
 
 set(SDL2_INCLUDE_DIRS "${SDL2_INCLUDE_DIR}")
+if(NOT SDL2_INCLUDE_DIR MATCHES ".framework")
+	set(SDL2_INCLUDE_DIRS "${SDL2_INCLUDE_DIR};${SDL2_INCLUDE_DIR}/SDL2")
+endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(VC_LIB_PATH_SUFFIX lib/x64)
@@ -291,11 +298,17 @@ if(SDL2_LIBRARY)
 
 endif()
 
+if(SDL2_INCLUDE_DIR MATCHES ".framework")
+	set(SDL2_VERSION_FILE "${SDL2_INCLUDE_DIR}/Headers/SDL_version.h")
+else()
+	set(SDL2_VERSION_FILE "${SDL2_INCLUDE_DIR}/SDL2/SDL_version.h")
+endif()
+
 # Read SDL2 version
-if(SDL2_INCLUDE_DIR AND EXISTS "${SDL2_INCLUDE_DIR}/SDL_version.h")
-  file(STRINGS "${SDL2_INCLUDE_DIR}/SDL_version.h" SDL2_VERSION_MAJOR_LINE REGEX "^#define[ \t]+SDL_MAJOR_VERSION[ \t]+[0-9]+$")
-  file(STRINGS "${SDL2_INCLUDE_DIR}/SDL_version.h" SDL2_VERSION_MINOR_LINE REGEX "^#define[ \t]+SDL_MINOR_VERSION[ \t]+[0-9]+$")
-  file(STRINGS "${SDL2_INCLUDE_DIR}/SDL_version.h" SDL2_VERSION_PATCH_LINE REGEX "^#define[ \t]+SDL_PATCHLEVEL[ \t]+[0-9]+$")
+if(SDL2_INCLUDE_DIR AND EXISTS "${SDL2_VERSION_FILE}")
+  file(STRINGS "${SDL2_VERSION_FILE}" SDL2_VERSION_MAJOR_LINE REGEX "^#define[ \t]+SDL_MAJOR_VERSION[ \t]+[0-9]+$")
+  file(STRINGS "${SDL2_VERSION_FILE}" SDL2_VERSION_MINOR_LINE REGEX "^#define[ \t]+SDL_MINOR_VERSION[ \t]+[0-9]+$")
+  file(STRINGS "${SDL2_VERSION_FILE}" SDL2_VERSION_PATCH_LINE REGEX "^#define[ \t]+SDL_PATCHLEVEL[ \t]+[0-9]+$")
   string(REGEX REPLACE "^#define[ \t]+SDL_MAJOR_VERSION[ \t]+([0-9]+)$" "\\1" SDL2_VERSION_MAJOR "${SDL2_VERSION_MAJOR_LINE}")
   string(REGEX REPLACE "^#define[ \t]+SDL_MINOR_VERSION[ \t]+([0-9]+)$" "\\1" SDL2_VERSION_MINOR "${SDL2_VERSION_MINOR_LINE}")
   string(REGEX REPLACE "^#define[ \t]+SDL_PATCHLEVEL[ \t]+([0-9]+)$" "\\1" SDL2_VERSION_PATCH "${SDL2_VERSION_PATCH_LINE}")
@@ -326,6 +339,7 @@ mark_as_advanced(SDL2_PATH
 				 SDL2_LIBRARY
 				 SDL2MAIN_LIBRARY
 				 SDL2_INCLUDE_DIR
+				 SDL2_INCLUDE_DIRS
 				 SDL2_BUILDING_LIBRARY)
 
 
@@ -337,7 +351,7 @@ if(SDL2_FOUND)
 	add_library(SDL2::Core UNKNOWN IMPORTED)
 	set_target_properties(SDL2::Core PROPERTIES
 						  IMPORTED_LOCATION "${SDL2_LIBRARY}"
-						  INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIR}")
+						  INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}")
 
 	if(APPLE)
 	  # For OS X, SDL2 uses Cocoa as a backend so it must link to Cocoa.
