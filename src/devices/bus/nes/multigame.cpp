@@ -53,6 +53,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63"
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device,    "nes_bmc_gkcxin1",    "NES Cart BMC GKCXIN1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_K1029,      nes_bmc_k1029_device,      "nes_bmc_k1029",      "NES Cart BMC K-1029 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device,      "nes_bmc_k3036",      "NES Cart BMC K-3036 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device,      "nes_bmc_k3046",      "NES Cart BMC K-3046 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device,     "nes_bmc_sa005a",     "NES Cart BMC SA005-A PCB")
@@ -423,6 +424,11 @@ nes_vram_protect_device::nes_vram_protect_device(const machine_config &mconfig, 
 
 nes_bmc_60311c_device::nes_bmc_60311c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_vram_protect_device(mconfig, NES_BMC_60311C, tag, owner, clock)
+{
+}
+
+nes_bmc_k1029_device::nes_bmc_k1029_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_vram_protect_device(mconfig, NES_BMC_K1029, tag, owner, clock)
 {
 }
 
@@ -1155,6 +1161,7 @@ void nes_vram_protect_device::device_start()
 
 void nes_vram_protect_device::pcb_reset()
 {
+	prg32(0);
 	chr8(0, CHRRAM);
 	m_vram_protect = false;
 }
@@ -3085,8 +3092,8 @@ void nes_bmc_60311c_device::update_banks()
 		prg16_cdef(m_reg[1] | BIT(m_reg[0], 0));
 	}
 
-	m_vram_protect = BIT(m_reg[0], 2);
 	set_nt_mirroring(BIT(m_reg[0], 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	m_vram_protect = BIT(m_reg[0], 2);
 }
 
 void nes_bmc_60311c_device::write_m(offs_t offset, u8 data)
@@ -3101,6 +3108,53 @@ void nes_bmc_60311c_device::write_h(offs_t offset, u8 data)
 	LOG_MMC(("bmc_60311c write_h, offset: %04x, data: %02x\n", offset, data));
 	m_reg[2] = data & 0x07;
 	update_banks();
+}
+
+/*-------------------------------------------------
+
+ BMC-K-1029
+
+ Games: 100 in 1 Contra Function 16, 168 in 1
+
+ iNES: mapper 15
+
+ In MAME: Supported.
+
+ TODO: Contra games in 100-in-1 endlessly loop the
+ second level played regardless of starting level.
+ BTANB? Bad dump? FCEUX exhibits the same behavior.
+
+ -------------------------------------------------*/
+
+void nes_bmc_k1029_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_k1029 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	u8 bank = data & 0x3f;
+	switch (offset & 3)
+	{
+		case 0:
+			prg32(bank >> 1);
+			break;
+		case 1:
+			prg16_89ab(bank);
+			prg16_cdef(bank | 0x07);
+			break;
+		case 2:
+			bank = bank << 1 | BIT(data, 7);
+			prg8_89(bank);
+			prg8_ab(bank);
+			prg8_cd(bank);
+			prg8_ef(bank);
+			break;
+		case 3:
+			prg16_89ab(bank);
+			prg16_cdef(bank);
+			break;
+	}
+
+	set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	m_vram_protect = BIT(offset, 0) == BIT(offset, 1);
 }
 
 /*-------------------------------------------------

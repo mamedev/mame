@@ -47,7 +47,7 @@ static const nes_mmc mmc_list[] =
 	{ 12, REXSOFT_DBZ5 },
 	{ 13, STD_CPROM },
 	{ 14, REXSOFT_SL1632 },
-	{ 15, WAIXING_WXZS2 },
+	{ 15, BMC_K1029 },
 	{ 16, BANDAI_LZ93EX2 },  // with 24c02
 	{ 17, FFE8_BOARD },
 	{ 18, JALECO_SS88006 },

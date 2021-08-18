@@ -77654,8 +77654,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_wxzs2" />
-			<feature name="pcb" value="WAIXING-PS2" />
+			<feature name="slot" value="bmc_k1029" />
 			<dataarea name="prg" size="1048576">
 				<rom name="100-in-1 contra function 16.prg" size="1048576" crc="1b219e01" sha1="6b519f41bbd1984739b6a226140c0f0871889c2f" offset="00000" status="baddump" />
 			</dataarea>
@@ -78127,12 +78126,11 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="mc_168">
-		<description>168 in 1</description>
+		<description>168 in 1 New Contra Function 16</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_wxzs2" />
-			<feature name="pcb" value="WAIXING-PS2" />
+			<feature name="slot" value="bmc_k1029" />
 			<dataarea name="prg" size="1048576">
 				<rom name="168-in-1 [p1].prg" size="1048576" crc="9bbf3e5d" sha1="123105a996b3f325e55b7080ddd83d4cf043e543" offset="00000" status="baddump" />
 			</dataarea>
