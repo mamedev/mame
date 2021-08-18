@@ -2487,6 +2487,42 @@ ROM_START( killbld106 )
 	ROM_LOAD( "pgm_m0300.u1",     0x400000, 0x400000, CRC(93159695) SHA1(50c5976c9b681bd3d1ebefa3bfa9fe6e72dcb96f) )
 ROM_END
 
+ROM_START( killbld100 ) // was dumped from a Taiwanese board
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_BYTE( "kb_u3_v100.u3",     0x100001, 0x080000, CRC(ba3233a9) SHA1(d41f00c0c83ead8567b2e4ebf3fd7b8525f06b73) )
+	ROM_LOAD16_BYTE( "kb_u6_v100.u6",     0x100000, 0x080000, CRC(55ae1d39) SHA1(931411c0d7d02a636010bb5f7f312906de32d839) )
+	ROM_LOAD16_BYTE( "kb_u4_v100.u4",     0x200001, 0x080000, CRC(d56a8407) SHA1(1c43c62ec9e3b11f77d9c14647797493f7b8f960) )
+	ROM_LOAD16_BYTE( "kb_u5_v100.u5",     0x200000, 0x080000, CRC(99afff2b) SHA1(4167efc81daf365e632177bb26650c95dcc32ccb) )
+
+	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
+	ROM_LOAD( "kb_u2_v100.u2", 0x000000, 0x010000,  CRC(6fbbdcb7) SHA1(2928b66cd605d38a5d4e5876890e52af89dfadc4) )
+
+	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "pgm_t0300.u14",    0x180000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
+
+	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "pgm_a0300.u9",   0x0000000, 0x0400000,  CRC(3f9455d3) SHA1(3718ce00ad93975383aafc14e5a74dc297b011a1) )
+	ROM_LOAD( "pgm_a0301.u10",  0x0400000, 0x0400000,  CRC(92776889) SHA1(6d677837fefff47bfd1c6166322f69f89989a5e2) )
+	ROM_LOAD( "pgm_a0303.u11",  0x0800000, 0x0400000,  CRC(33f5cc69) SHA1(9cacd5058d4bb25b77f71658bbbbd4b38d0a6b6a) )
+	ROM_LOAD( "pgm_a0306.u12",  0x0c00000, 0x0400000,  CRC(cc018a8e) SHA1(37752d46f238fb57c0ab5a4f96b1e013f2077347) )
+	ROM_LOAD( "pgm_a0307.u2",   0x1000000, 0x0400000,  CRC(bc772e39) SHA1(079cc42a190cb916f02b59bca8fa90e524acefe9) )
+//  ROM_LOAD( "pgm_a0302.u3",   0x1400000, 0x0200000,  CRC(a4810e38) SHA1(c31fe641feab2c93795fc35bf71d4f37af1056d4) ) // from lord of gun! unused..
+//  ROM_LOAD( "pgm_a0304.u4",   0x1600000, 0x0200000,  CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) ) // from lord of gun! unused..
+//  ROM_LOAD( "pgm_a0305.u5",   0x1800000, 0x0200000,  CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) ) // from lord of gun! unused..
+
+	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "pgm_b0300.u13",    0x0000000, 0x0400000, CRC(7f876981) SHA1(43555a200929ad5ecc42137fc9aeb42dc4f50d20) )
+	ROM_LOAD( "pgm_b0302.u14",    0x0400000, 0x0400000, CRC(eea9c502) SHA1(04b3972c7111ea59a3cceab6ad124080c4ce3520) )
+	ROM_LOAD( "pgm_b0303.u15",    0x0800000, 0x0200000, CRC(77a9652e) SHA1(2342f643d37945fbda224a5034c013796e5134ca) )
+//  ROM_LOAD( "pgm_b0301.u8",     0x0a00000, 0x0200000, CRC(400abe33) SHA1(20de1eb626424ea41bd55eb3cecd6b50be744ee0) ) // from lord of gun! unused..
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "pgm_m0300.u1",     0x400000, 0x400000, CRC(93159695) SHA1(50c5976c9b681bd3d1ebefa3bfa9fe6e72dcb96f) )
+ROM_END
+
 
 /*
 Puzzle Star
@@ -5364,6 +5400,7 @@ GAME( 1997, drgw2100hk,   drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_
 GAME( 1998, killbld,      pgm,       pgm_022_025_killbld,    killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 109, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 GAME( 1998, killbld104,   killbld,   pgm_022_025_killbld,    killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 104)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 GAME( 1998, killbld106,   killbld,   pgm_022_025_killbld,    killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 106)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, killbld100,   killbld,   pgm_022_025_killbld,    killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 
 //中國龍3/Zhōngguó lóng 3 (China, Taiwan, Japan; Traditional chinese only in title screen)
 //東方之珠3/Dung1Fong1 Zi1 Zyu1 3 (Hong Kong)/dongbang jiju 3 (Korea)

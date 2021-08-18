@@ -31458,6 +31458,7 @@ swcourtb                        // bootleg (Playmark?)
 swcourtj                        // (c) 1992 (Japan)
 tinklpit                        // (c) 1993 (Japan)
 xday2                           // (c) 1995 (Japan)
+zelos                           // (c) 199? (Japan)
 
 @source:namconb1.cpp
 gslgr94j                        // (c) 1994 (Japan)
@@ -34665,6 +34666,7 @@ ketarrs151                      // hack
 ketb                            //
 ketbl                           //
 killbld                         // (c) 1998 The Killing Blade
+killbld100                      //
 killbld104                      //
 killbld106                      //
 killbldp                        // (c) 2004 Killing Blade Plus
