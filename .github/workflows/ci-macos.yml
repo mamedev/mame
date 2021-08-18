@@ -24,12 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Install dependencies
-        run: brew install python3 sdl2
+        run: brew install python3 sdl2 cmake
       - name: Build
-        env:
-          USE_LIBSDL: 1
-          TOOLS: 1
-        run: make -j2
+        run: |
+          cmake . -DTOOLS=ON
+          make -j2
       - name: Validate
         run: ./mame -validate
       - uses: actions/upload-artifact@master

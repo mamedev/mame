@@ -28,15 +28,14 @@ jobs:
     steps:
     - uses: msys2/setup-msys2@v2
       with:
-        install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-libc++
+        install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-libc++ mingw-w64-x86_64-cmake
     - uses: actions/checkout@master
     - name: Build
       env:
         MINGW64: "/mingw64"
-        ARCHOPTS: "-fuse-ld=lld"
-        OVERRIDE_AR: "llvm-ar"
-        TOOLS: 1
-      run: make -j2
+      run: |
+        cmake . -DTOOLS=ON -G"MSYS Makefiles" -DLLVM_TOOLS=ON
+        make -j2
     - name: Validate
       run: ./mame -validate
     - uses: actions/upload-artifact@master
