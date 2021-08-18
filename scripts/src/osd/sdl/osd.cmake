@@ -31,12 +31,6 @@ option(NO_USE_XINPUT "Disable use of Xinput" ${NO_USE_XINPUT_DEFAULT})
 
 option(NO_USE_XINPUT_WII_LIGHTGUN_HACK "Disable use of Xinput Wii Lightgun Hack" ON)
 
-
-option(SDL2_MULTIAPI "Use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)" OFF)
-
-option(USE_LIBSDL "Use SDL library on OS (rather than framework/dll)" OFF)
-
-
 ########################
 # Setup
 ########################

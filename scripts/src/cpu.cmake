@@ -13,7 +13,7 @@
 ## Dynamic recompiler objects
 ##################################################
 
-set(DRC_CPUS "E1;SH;MIPS3;POWERPC;RSP;ARM7;ADSP21062;MB86235;DSP16;UNSP")
+set(DRC_CPUS "E1;SH;MIPS3;POWERPC;ARM7;ADSP21062;MB86235;DSP16;UNSP")
 
 set(CPU_INCLUDE_DRC false)
 foreach(DRC_CPU ${DRC_CPUS})
@@ -2359,39 +2359,6 @@ if("RSP" IN_LIST CPUS)
 		${MAME_DIR}/src/devices/cpu/rsp/rsp.cpp
 		${MAME_DIR}/src/devices/cpu/rsp/rsp.h
 		${MAME_DIR}/src/devices/cpu/rsp/rspdefs.h
-		${MAME_DIR}/src/devices/cpu/rsp/rspdrc.cpp
-		${MAME_DIR}/src/devices/cpu/rsp/rspfe.cpp
-		${MAME_DIR}/src/devices/cpu/rsp/rspfe.h
-		${MAME_DIR}/src/devices/cpu/rsp/rspcp2.cpp
-		${MAME_DIR}/src/devices/cpu/rsp/rspcp2.h
-		${MAME_DIR}/src/devices/cpu/rsp/rspcp2d.cpp
-		${MAME_DIR}/src/devices/cpu/rsp/rspcp2d.h
-		${MAME_DIR}/src/devices/cpu/rsp/clamp.h
-		${MAME_DIR}/src/devices/cpu/rsp/vabs.h
-		${MAME_DIR}/src/devices/cpu/rsp/vadd.h
-		${MAME_DIR}/src/devices/cpu/rsp/vaddc.h
-		${MAME_DIR}/src/devices/cpu/rsp/vand.h
-		${MAME_DIR}/src/devices/cpu/rsp/vch.h
-		${MAME_DIR}/src/devices/cpu/rsp/vcl.h
-		${MAME_DIR}/src/devices/cpu/rsp/vcmp.h
-		${MAME_DIR}/src/devices/cpu/rsp/vcr.h
-		${MAME_DIR}/src/devices/cpu/rsp/vdivh.h
-		${MAME_DIR}/src/devices/cpu/rsp/vldst.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmac.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmov.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmrg.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmudh.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmul.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmulh.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmull.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmulm.h
-		${MAME_DIR}/src/devices/cpu/rsp/vmuln.h
-		${MAME_DIR}/src/devices/cpu/rsp/vor.h
-		${MAME_DIR}/src/devices/cpu/rsp/vrcpsq.h
-		${MAME_DIR}/src/devices/cpu/rsp/vrsq.h
-		${MAME_DIR}/src/devices/cpu/rsp/vsub.h
-		${MAME_DIR}/src/devices/cpu/rsp/vsubc.h
-		${MAME_DIR}/src/devices/cpu/rsp/vxor.h
 		${MAME_DIR}/src/devices/cpu/rsp/rspdiv.h
 	)
 endif()
@@ -2838,16 +2805,24 @@ endif()
 
 add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/tms57002/
-	COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/tms57002/tmsmake.py ${MAME_DIR}/src/devices/cpu/tms57002/tmsinstr.lst ${GEN_DIR}/emu/cpu/tms57002/tms57002.hxx
+	COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/tms57002/tmsmake.py s ${MAME_DIR}/src/devices/cpu/tms57002/tmsinstr.lst ${GEN_DIR}/emu/cpu/tms57002/tms57002.hxx
 	DEPENDS ${MAME_DIR}/src/devices/cpu/tms57002/tmsmake.py ${MAME_DIR}/src/devices/cpu/tms57002/tmsinstr.lst
 	OUTPUT ${GEN_DIR}/emu/cpu/tms57002/tms57002.hxx
 	COMMENT "Generating TMS57002 source file..."
 )
 
+add_custom_command(
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/tms57002/
+	COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/tms57002/tmsmake.py d ${MAME_DIR}/src/devices/cpu/tms57002/tmsinstr.lst ${GEN_DIR}/emu/cpu/tms57002/tms57002d.hxx
+	DEPENDS ${MAME_DIR}/src/devices/cpu/tms57002/tmsmake.py ${MAME_DIR}/src/devices/cpu/tms57002/tmsinstr.lst
+	OUTPUT ${GEN_DIR}/emu/cpu/tms57002/tms57002d.hxx
+	COMMENT "Generating TMS57002 dasm file..."
+)
+
 if(("TMS57002" IN_LIST CPUS) OR TOOLS)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/tms57002/57002dsm.cpp)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/tms57002/57002dsm.h)
-	list(APPEND DASM_SRCS ${GEN_DIR}/emu/cpu/tms57002/tms57002.hxx)
+	list(APPEND DASM_SRCS ${GEN_DIR}/emu/cpu/tms57002/tms57002d.hxx)
 endif()
 
 ##################################################

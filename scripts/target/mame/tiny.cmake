@@ -97,7 +97,7 @@ macro(createProjects_mame_tiny _target  _subtarget)
 	add_library(mame_tiny ${LIBTYPE})
 	addprojectflags(mame_tiny)
 	precompiledheaders_novs(mame_tiny)
-	add_dependencies(mame_tiny layouts)
+	add_dependencies(mame_tiny layouts optional)
 
 	target_include_directories(mame_tiny PRIVATE
 		${MAME_DIR}/src/osd

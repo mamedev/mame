@@ -16,7 +16,7 @@ macro(createProjects_mame_dummy _target  _subtarget)
 	add_library(mame_dummy ${LIBTYPE})
 	addprojectflags(mame_dummy)
 	precompiledheaders_novs(mame_dummy)
-	add_dependencies(mame_dummy layouts)
+	add_dependencies(mame_dummy layouts optional)
 
 	target_include_directories(mame_dummy PRIVATE
 		${MAME_DIR}/src/osd

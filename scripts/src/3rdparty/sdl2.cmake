@@ -18,6 +18,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
 	)
 	target_link_options(SDL2 PRIVATE "-Wl,-soname,libSDL2.so")
 	target_compile_definitions(SDL2 PRIVATE GL_GLEXT_PROTOTYPES)
+	set_target_properties(SDL2 PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${MAME_DIR}/android-project/app/src/main/libs/${ANDROID_ABI}/" )
 
 	target_compile_options(SDL2 PRIVATE -Wno-strict-prototypes)
 	target_compile_options(SDL2 PRIVATE -Wno-implicit-function-declaration)
@@ -473,4 +474,11 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	)
 endif()
 
-target_include_directories(SDL2 PUBLIC ${MAME_DIR}/3rdparty/SDL2/include)
+target_include_directories(SDL2 PRIVATE ${MAME_DIR}/3rdparty/SDL2/include)
+target_include_directories(SDL2 INTERFACE ${GEN_DIR}/includes)
+
+add_custom_command(
+	TARGET SDL2 POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${MAME_DIR}/3rdparty/SDL2/include ${GEN_DIR}/includes/SDL2
+	COMMENT "Copy SDL2 includes..."
+)

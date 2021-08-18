@@ -44,4 +44,6 @@ if(NOT FORCE_DRC_C_BACKEND)
 	add_project_to_group_and_include(3rdparty asmjit scripts/src/3rdparty/asmjit.cmake)
 endif()
 
-add_project_to_group_and_include(3rdparty SDL2 scripts/src/3rdparty/sdl2.cmake)
+if(NOT WITH_SYSTEM_SDL2)
+	add_project_to_group_and_include(3rdparty SDL2 scripts/src/3rdparty/sdl2.cmake)
+endif()

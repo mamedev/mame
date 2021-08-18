@@ -54,10 +54,6 @@ macro(osd_cfg _project)
 
 	target_compile_definitions(${_project} PRIVATE SDLMAME_SDL2=1)
 
-	if(SDL2_MULTIAPI)
-		target_compile_definitions(${_project} PRIVATE SDL2_MULTIAPI)
-	endif()
-
 	target_compile_definitions(${_project} PRIVATE OSD_SDL)
 
 	if(${BASE_TARGETOS} STREQUAL "unix")

@@ -31,7 +31,6 @@ target_include_directories(bgfx
 
 target_compile_definitions(bgfx PRIVATE
 	BGFX_CONFIG_MAX_FRAME_BUFFERS=128
-	IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 )
 
 if((${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR (${CMAKE_SYSTEM_NAME} STREQUAL "NetBSD") OR (${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD"))
@@ -64,17 +63,19 @@ target_sources(bgfx PRIVATE
 	${MAME_DIR}/3rdparty/bgfx/src/renderer_noop.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/renderer_nvn.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/renderer_vk.cpp
+	${MAME_DIR}/3rdparty/bgfx/src/renderer_webgpu.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/shader.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/shader_dx9bc.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/shader_dxbc.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/shader_spirv.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/topology.cpp
-	${MAME_DIR}/3rdparty/bgfx/src/vertexdecl.cpp
+	${MAME_DIR}/3rdparty/bgfx/src/vertexlayout.cpp
 	${MAME_DIR}/3rdparty/bgfx/examples/common/imgui/imgui.cpp
 	${MAME_DIR}/3rdparty/bgfx/examples/common/nanovg/nanovg.cpp
 	${MAME_DIR}/3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp
 	${MAME_DIR}/3rdparty/bgfx/3rdparty/dear-imgui/imgui.cpp
 	${MAME_DIR}/3rdparty/bgfx/3rdparty/dear-imgui/imgui_draw.cpp
+	${MAME_DIR}/3rdparty/bgfx/3rdparty/dear-imgui/imgui_tables.cpp
 	${MAME_DIR}/3rdparty/bgfx/3rdparty/dear-imgui/imgui_widgets.cpp
 )
 

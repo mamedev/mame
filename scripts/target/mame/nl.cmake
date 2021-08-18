@@ -124,7 +124,7 @@ macro(createProjects_mame_nl _target  _subtarget)
 	add_library(mame_netlist ${LIBTYPE})
 	addprojectflags(mame_netlist)
 	precompiledheaders_novs(mame_netlist)
-	add_dependencies(mame_netlist layouts)
+	add_dependencies(mame_netlist layouts optional)
 
 	target_include_directories(mame_netlist PRIVATE
 		${MAME_DIR}/src/osd

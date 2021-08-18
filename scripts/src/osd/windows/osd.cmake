@@ -13,8 +13,6 @@
 #       OPTIONS
 ########################
 
-set(DIRECTINPUT "8" CACHE STRING "inimum DirectInput version to support.")
-
 option(USE_SDL "Enable SDL sound output." OFF)
 
 if(USE_SDL)
@@ -59,11 +57,7 @@ endif()
 
 target_compile_definitions(osd_${OSD} PRIVATE DIRECT3D_VERSION=0x0900)
 
-if(DIRECTINPUT STREQUAL "8")
-	target_compile_definitions(osd_${OSD} PRIVATE DIRECTINPUT_VERSION=0x0800)
-else()
-	target_compile_definitions(osd_${OSD} PRIVATE DIRECTINPUT_VERSION=0x0700)
-endif()
+target_compile_definitions(osd_${OSD} PRIVATE DIRECTINPUT_VERSION=0x0800)
 
 target_sources(osd_${OSD} PRIVATE
 	${MAME_DIR}/src/osd/modules/render/d3d/d3dhlsl.cpp
@@ -189,9 +183,5 @@ macro(maintargetosdoptions _projectname)
 		target_link_libraries(${_projectname} PUBLIC mingw32)
 	endif()
 
-	if(DIRECTINPUT STREQUAL "8")
-		target_link_libraries(${_projectname} PUBLIC dinput8)
-	else()
-		target_link_libraries(${_projectname} PUBLIC dinput)
-	endif()
+	target_link_libraries(${_projectname} PUBLIC dinput8)
 endmacro()

@@ -103,7 +103,7 @@ macro(createProjects_mame_ci _target  _subtarget)
 	add_library(mame_ci ${LIBTYPE})
 	addprojectflags(mame_ci)
 	precompiledheaders_novs(mame_ci)
-	add_dependencies(mame_ci layouts)
+	add_dependencies(mame_ci layouts optional)
 
 	target_include_directories(mame_ci PRIVATE
 		${MAME_DIR}/src/osd

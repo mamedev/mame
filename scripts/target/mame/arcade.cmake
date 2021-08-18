@@ -150,6 +150,7 @@ list(APPEND CPUS UPD78K)
 list(APPEND CPUS KS0164)
 #list(APPEND CPUS COPS1)
 list(APPEND CPUS MEG)
+list(APPEND CPUS F2MC16)
 
 ##################################################
 ## specify available sound cores
@@ -456,6 +457,7 @@ list(APPEND MACHINES AM79C90)
 #list(APPEND MACHINES AM9513)
 list(APPEND MACHINES AM9517A)
 list(APPEND MACHINES AMIGAFDC)
+#list(APPEND MACHINES APPLEPIC)
 list(APPEND MACHINES AT_KEYBC)
 list(APPEND MACHINES AT28C16)
 #list(APPEND MACHINES AT28C64B)
@@ -981,7 +983,7 @@ function(createMAMEProjects _target  _subtarget _name)
 	add_library(${_name} ${LIBTYPE})
 	addprojectflags(${_name})
 	precompiledheaders_novs(${_name})
-	add_dependencies(${_name} layouts)
+	add_dependencies(${_name} layouts optional)
 
 	target_include_directories(${_name} PRIVATE
 		${MAME_DIR}/src/osd
@@ -4980,6 +4982,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/pse.cpp
 	${MAME_DIR}/src/mame/drivers/quizo.cpp
 	${MAME_DIR}/src/mame/drivers/quizpun2.cpp
+	${MAME_DIR}/src/mame/drivers/radikaldarts.cpp
 	${MAME_DIR}/src/mame/drivers/rbmk.cpp
 	${MAME_DIR}/src/mame/drivers/rcorsair.cpp
 	${MAME_DIR}/src/mame/drivers/re900.cpp

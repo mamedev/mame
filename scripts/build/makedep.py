@@ -706,30 +706,30 @@ def write_project(options, f, mappings, sources):
     f.write(
             '\n' \
             'macro(createProjects_mame_%s _target  _subtarget)\n' \
-	        '    set(CUSTOM_BUILD_SRCS \n'
+            '    set(CUSTOM_BUILD_SRCS \n'
             '%s' \
             '    )\n' \
         	'    add_library(mame_%s ${LIBTYPE} ${CUSTOM_BUILD_SRCS})\n' \
-	        '    addprojectflags(mame_%s)\n' \
-	        '    precompiledheaders_novs(mame_%s)\n' \
-	        '    add_dependencies(mame_%s layouts)\n' \
-	        '    add_project_to_group(drivers mame_%s)\n' \
+            '    addprojectflags(mame_%s)\n' \
+            '    precompiledheaders_novs(mame_%s)\n' \
+            '    add_dependencies(mame_%s layouts optional)\n' \
+            '    add_project_to_group(drivers mame_%s)\n' \
             '    target_include_directories(mame_%s PRIVATE\n' \
-	        '        ${MAME_DIR}/src/osd\n' \
-	        '        ${MAME_DIR}/src/emu\n' \
-	        '        ${MAME_DIR}/src/devices\n' \
-	        '        ${MAME_DIR}/src/mame\n' \
-	        '        ${MAME_DIR}/src/lib\n' \
-	        '        ${MAME_DIR}/src/lib/util\n' \
+            '        ${MAME_DIR}/src/osd\n' \
+            '        ${MAME_DIR}/src/emu\n' \
+            '        ${MAME_DIR}/src/devices\n' \
+            '        ${MAME_DIR}/src/mame\n' \
+            '        ${MAME_DIR}/src/lib\n' \
+            '        ${MAME_DIR}/src/lib/util\n' \
             '        ${MAME_DIR}/src/lib/netlist\n' \
-	        '        ${MAME_DIR}/3rdparty\n' \
+            '        ${MAME_DIR}/3rdparty\n' \
             '        ${EXT_INCLUDEDIR_FLAC}\n' \
             '        ${EXT_INCLUDEDIR_GLM}\n' \
             '        ${EXT_INCLUDEDIR_JPEG}\n' \
             '        ${EXT_INCLUDEDIR_RAPIDJSON}\n' \
             '        ${EXT_INCLUDEDIR_ZLIB}\n' \
-	        '        ${GEN_DIR}/mame/layout\n' \
-	        ')\n' \
+            '        ${GEN_DIR}/mame/layout\n' \
+            ')\n' \
             'endmacro()\n' \
             '\n' \
             'macro(linkProjects_mame_%s _target _subtarget _projectname)\n' \

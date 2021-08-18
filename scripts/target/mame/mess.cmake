@@ -479,6 +479,7 @@ list(APPEND MACHINES AM9513)
 list(APPEND MACHINES AM9517A)
 list(APPEND MACHINES AM9519)
 list(APPEND MACHINES AMIGAFDC)
+list(APPEND MACHINES APPLEPIC)
 list(APPEND MACHINES ARM_IOMD)
 list(APPEND MACHINES AT_KEYBC)
 list(APPEND MACHINES AT28C16)
@@ -837,6 +838,7 @@ list(APPEND BUSES AMIGA_KEYBOARD)
 list(APPEND BUSES APF)
 list(APPEND BUSES APRICOT_EXPANSION)
 list(APPEND BUSES APRICOT_KEYBOARD)
+list(APPEND BUSES APRICOT_VIDEO)
 list(APPEND BUSES AQUARIUS)
 list(APPEND BUSES ARCADIA)
 list(APPEND BUSES ASTROCADE)
@@ -1450,7 +1452,7 @@ function(createMESSProjects _target  _subtarget _name)
 	add_library(${_name} ${LIBTYPE})
 	addprojectflags(${_name})
 	precompiledheaders_novs(${_name})
-	add_dependencies(${_name} layouts)
+	add_dependencies(${_name} layouts optional)
 
 	target_include_directories(${_name} PRIVATE
 		${MAME_DIR}/src/osd
@@ -4391,6 +4393,7 @@ createMESSProjects(_target _subtarget "skeleton"
 	${MAME_DIR}/src/mame/drivers/ptcsol.cpp
 	${MAME_DIR}/src/mame/drivers/pulsar.cpp
 	${MAME_DIR}/src/mame/drivers/pv9234.cpp
+	${MAME_DIR}/src/mame/drivers/pwp14.cpp
 	${MAME_DIR}/src/mame/drivers/qtsbc.cpp
 	${MAME_DIR}/src/mame/drivers/rd100.cpp
 	${MAME_DIR}/src/mame/drivers/rvoice.cpp

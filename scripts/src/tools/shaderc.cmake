@@ -182,6 +182,7 @@ target_compile_definitions(glslang PRIVATE
 
 target_include_directories(glslang PRIVATE
 	${GLSLANG}
+	${GLSLANG}/..
 	${SPIRV_TOOLS}/include
 	${SPIRV_TOOLS}/source
 )
@@ -481,6 +482,7 @@ target_include_directories(shaderc PRIVATE
 	${MAME_DIR}/3rdparty/bimg/include
 	${MAME_DIR}/3rdparty/bgfx/include
 
+	${MAME_DIR}/3rdparty/bgfx/3rdparty/webgpu/include
 	${MAME_DIR}/3rdparty/bgfx/3rdparty/dxsdk/include
 
 	${FCPP_DIR}
@@ -513,12 +515,17 @@ target_sources(shaderc PRIVATE
 		${MAME_DIR}/3rdparty/bgfx/tools/shaderc/shaderc_hlsl.cpp
 		${MAME_DIR}/3rdparty/bgfx/tools/shaderc/shaderc_glsl.cpp
 		${MAME_DIR}/3rdparty/bgfx/tools/shaderc/shaderc_pssl.cpp
-		${MAME_DIR}/3rdparty/bgfx/src/vertexdecl.cpp
+		${MAME_DIR}/3rdparty/bgfx/src/vertexlayout.cpp
+		${MAME_DIR}/3rdparty/bgfx/src/shader.cpp
+		${MAME_DIR}/3rdparty/bgfx/src/shader_dx9bc.cpp
+		${MAME_DIR}/3rdparty/bgfx/src/shader_dxbc.cpp		
 		${MAME_DIR}/3rdparty/bgfx/src/shader_spirv.cpp
 )
 
 if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	target_link_libraries(shaderc PRIVATE pthread dl)
+else()
+	target_link_libraries(shaderc PUBLIC psapi)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

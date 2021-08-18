@@ -270,7 +270,6 @@ macro(osdmodulesbuild _project)
 		__STDC_LIMIT_MACROS
 		__STDC_FORMAT_MACROS
 		__STDC_CONSTANT_MACROS
-		IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 	)
 
 	target_include_directories(${_project} PRIVATE
@@ -300,6 +299,26 @@ macro(osdmodulesbuild _project)
 	else()
 		target_include_directories(${_project} PRIVATE ${EXT_INCLUDEDIR_PORTMIDI})
 		target_link_libraries(${_project} PRIVATE ${EXT_LIB_PORTMIDI})
+	endif()
+
+	if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+		target_link_libraries(${_project} PRIVATE winmm)
+	endif()
+
+	if((NOT NO_USE_MIDI) AND (NOT NO_USE_PORTAUDIO))
+		if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+			find_package(ALSA REQUIRED)
+			if(NOT ALSA_FOUND)
+				message(FATAL_ERROR "ALSA not found")
+			endif()
+			target_link_libraries(${_project} PRIVATE ALSA::ALSA)
+		endif()
+	endif()
+
+	if(NOT NO_USE_MIDI)
+		if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+			target_link_libraries(${_project} PRIVATE "-framework CoreMIDI")
+		endif()
 	endif()
 
 	if(USE_QTDEBUG)
@@ -413,26 +432,12 @@ macro(osdmodulestargetconf _projectname)
 		endif()
 	endif()
 
-	if(NOT NO_USE_MIDI)
-		if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-			find_package(ALSA REQUIRED)
-			if(NOT ALSA_FOUND)
-				message(FATAL_ERROR "ALSA not found")
-			endif()
-			target_link_libraries(${_projectname} PRIVATE ALSA::ALSA)
-		elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-			target_link_libraries(${_projectname} PRIVATE "-framework CoreMIDI")
-		endif()
-	endif()
-
-
 	if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 		target_link_libraries(${_projectname} PRIVATE
 			gdi32
 			dsound
 			dxguid
 			oleaut32
-			winmm
 		)
 	elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 		target_link_libraries(${_projectname} PRIVATE

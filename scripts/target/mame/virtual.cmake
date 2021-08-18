@@ -103,7 +103,7 @@ function(createVirtualProjects _target  _subtarget _name)
 	add_library(${_name} ${LIBTYPE})
 	addprojectflags(${_name})
 	precompiledheaders_novs(${_name})
-	add_dependencies(${_name} layouts)
+	add_dependencies(${_name} layouts optional)
 
 	target_include_directories(${_name} PRIVATE
 		${MAME_DIR}/src/osd

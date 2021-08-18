@@ -259,6 +259,23 @@ endif()
 
 ###################################################
 ##
+##@src/devices/bus/apricot/video/video.h,list(APPEND BUSES APRICOT_VIDEO)
+###################################################
+
+if("APRICOT_VIDEO" IN_LIST BUSES)
+	list(APPEND BUS_SRCS
+		${MAME_DIR}/src/devices/bus/apricot/video/video.cpp
+		${MAME_DIR}/src/devices/bus/apricot/video/video.h
+		${MAME_DIR}/src/devices/bus/apricot/video/cards.cpp
+		${MAME_DIR}/src/devices/bus/apricot/video/cards.h
+		${MAME_DIR}/src/devices/bus/apricot/video/mono.cpp
+		${MAME_DIR}/src/devices/bus/apricot/video/mono.h
+	)
+endif()
+
+
+###################################################
+##
 ##@src/devices/bus/aquarius/slot.h,list(APPEND BUSES AQUARIUS)
 ###################################################
 
@@ -2466,6 +2483,8 @@ if("A2BUS" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/a2bus/nippelclock.h
 		${MAME_DIR}/src/devices/bus/a2bus/pc_xporter.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/pc_xporter.h
+		${MAME_DIR}/src/devices/bus/a2bus/q68.cpp
+		${MAME_DIR}/src/devices/bus/a2bus/q68.h
 		${MAME_DIR}/src/devices/bus/a2bus/ramcard128k.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/ramcard128k.h
 		${MAME_DIR}/src/devices/bus/a2bus/ramcard16k.cpp

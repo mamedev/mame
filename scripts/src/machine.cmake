@@ -825,6 +825,18 @@ endif()
 
 ###################################################
 ##
+##@src/devices/machine/applepic.h,list(APPEND MACHINES APPLEPIC)
+###################################################
+
+if("APPLEPIC" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/applepic.cpp
+		${MAME_DIR}/src/devices/machine/applepic.h
+	)
+endif()
+
+###################################################
+##
 ##@src/devices/machine/at28c16.h,list(APPEND MACHINES AT28C16)
 ###################################################
 
