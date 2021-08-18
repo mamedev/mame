@@ -371,6 +371,7 @@ gimix.cpp
 gizmondo.cpp
 gkidabc.cpp
 glcx.cpp
+gm1000.cpp
 gmaster.cpp
 gnat10.cpp
 goupil.cpp
@@ -1194,6 +1195,8 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr16.cpp
+ympsr40.cpp
 ympsr60.cpp
 ympsr340.cpp
 ymsy35.cpp
