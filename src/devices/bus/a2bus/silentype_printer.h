@@ -85,7 +85,6 @@ private:
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, unsigned int& pixel);
 	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern);
-//  s32 x_pixel_coord(s32 xpos) { return xpos / 2; )  // x position in half steps   yikes!!! ) instead of } broke compilation
 	s32 x_pixel_coord(s32 xpos) { return xpos / 2; }  // x position in half steps
 	s32 y_pixel_coord(s32 ypos) { return ypos * 7 / 4 / 2; }  // y position given in half steps, full step is 7/4 pixels
 };

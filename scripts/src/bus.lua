@@ -2674,6 +2674,8 @@ end
 
 if (BUSES["RS232"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/rs232/imagewriter_printer.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/imagewriter_printer.h",
 		MAME_DIR .. "src/devices/bus/rs232/keyboard.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/keyboard.h",
 		MAME_DIR .. "src/devices/bus/rs232/loopback.cpp",

@@ -173,11 +173,13 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "ie15.h"
 #include "rs232_sync_io.h"
 #include "mboardd.h"
+#include "imagewriter_printer.h"
 
 void default_rs232_devices(device_slot_interface &device)
 {
 	device.option_add("dec_loopback", DEC_RS232_LOOPBACK);
 	device.option_add("ie15", SERIAL_TERMINAL_IE15);
+	device.option_add("imagewriter", APPLE_IMAGEWRITER_PRINTER);
 	device.option_add("keyboard", SERIAL_KEYBOARD);
 	device.option_add("loopback", RS232_LOOPBACK);
 	device.option_add("null_modem", NULL_MODEM);
