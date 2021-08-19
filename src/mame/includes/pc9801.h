@@ -128,6 +128,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
+		, m_cbus(*this, "cbus%d", 0)
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
@@ -156,6 +157,7 @@ protected:
 	optional_device<ram_device> m_ram;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
+	required_device_array<pc9801_slot_device, 2> m_cbus;
 private:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
@@ -473,11 +475,15 @@ protected:
 
 	DECLARE_MACHINE_START(pc9801us);
 
-private:
+
 	// SDIP, PC9801DA onward
-	uint8_t m_sdip[24], m_sdip_bank;
+protected:
+	u8 m_sdip[24];
+private:
+	u8 m_sdip_bank;
 	template<unsigned port> u8 sdip_r(offs_t offset);
 	template<unsigned port> void sdip_w(offs_t offset, u8 data);
+	void sdip_bank_w(offs_t offset, u8 data);
 };
 
 /**********************************************************
@@ -605,12 +611,15 @@ public:
 	void pc9821cx3(machine_config &config);
 
 protected:
+	void pc9821cx3_map(address_map &map);
 	void pc9821cx3_io(address_map &map);
 
 private:
 	void remote_addr_w(offs_t offset, u8 data);
 	u8 remote_data_r(offs_t offset);
 	void remote_data_w(offs_t offset, u8 data);
+
+	DECLARE_MACHINE_START(pc9821_canbe);
 
 	struct {
 		u8 index;

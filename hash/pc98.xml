@@ -1952,7 +1952,10 @@ TODO:
 		</part>
 	</software>
 
-	<software name="epsonb2">
+	<!-- boot OK -->
+	<!-- Utility disk file "BMENU." sports ugly GFX cyan fills -->
+	<!-- (especially noticeable when clearing them, leaving black trails) -->
+	<software name="epsonb2" supported="partial">
 		<description>EPSON Nihongo Disk BASIC v2.0</description>
 		<year>1988</year>
 		<publisher>EPSON</publisher>
@@ -1970,7 +1973,10 @@ TODO:
 		</part>
 	</software>
 
-	<software name="epsonb5">
+	<!-- boot OK -->
+	<!-- Utility disk file "BMENU." sports ugly GFX cyan fills -->
+	<!-- (especially noticeable when clearing them, leaving black trails) -->
+	<software name="epsonb5" supported="partial">
 		<description>EPSON Nihongo Disk BASIC v5.0</description>
 		<year>1990</year>
 		<publisher>EPSON</publisher>
@@ -1987,8 +1993,6 @@ TODO:
 			</dataarea>
 		</part>
 	</software>
-
-
 
 	<software name="wrp91021" supported="no">
 		<description>Wizard98 Report Vol 91.2-1</description>
@@ -2410,7 +2414,10 @@ TODO:
 		</part>
 	</software>
 
-	<!-- Keyboard doesn't work on PC-9801F; runs too fast on later models -->
+	<!-- boot OK -->
+	<!-- Keyboard is sometimes unresponsive on vanilla class (noticeable with jumps) -->
+	<!-- Runs too fast on later models -->
+	<!-- TODO: may require 8MHz fix -->
 	<software name="177" supported="partial">
 		<description>177</description>
 		<year>1986</year>

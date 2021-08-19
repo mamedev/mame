@@ -18,12 +18,19 @@
 
 	TODO (PC-9821Cx3):
 	- "MICON ERROR" at POST, we currently return a ready state in remote control register 
-	  to bypass it, is it always the case?
-	- Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os $b00-$b03 then
-	  keeps looping;
+	  to bypass it, is it expected behaviour?
+	- Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
+	  $b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
+	  looping;
+	- 0xfa2c8 contains ITF test routines, to access it's supposedly CTRL+CAPS+KANA,
+	  which currently doesn't work. It also never returns a valid processor or CPU clock,
+	  is it a debug side-effect or supposed to be read somehow?
+	- Expects 0xc0000-0xdffff to be r/w at PC=0x104e8, currently failing for inner C-Bus mappings.
+	  Is PCI supposed to overlay the C-Bus section?
+	- Eventually jump off the weeds by taking an invalid irq in timer test;
 	- Reportedly should display a CanBe logo at POST (always blue with white fg?),
-	  at least pc9821cx3 ROM has some VRAM data at 0x20000 + other places.
-	  How HW even accesses it out? Maybe it is hardwired in VRAM instead of returning garbage data?
+	  at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
+	  Where this is mapped is currently unknown;
 
     TODO (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333):
     - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
@@ -189,7 +196,8 @@ void pc9821_state::ext2_video_ff_w(uint8_t data)
 	m_ext2_ff = data;
 }
 
-// TODO: analog 256 mode needs HW tests
+// TODO: rename ANALOG_256 refs to pegc
+// (it's seemingly the official NEC naming)
 uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
@@ -454,6 +462,13 @@ void pc9821_canbe_state::remote_data_w(offs_t offset, u8 data)
 	}
 }
 
+void pc9821_canbe_state::pc9821cx3_map(address_map &map)
+{
+	pc9821_map(map);
+	// TODO: overwritten by C-bus mapping, but definitely tested as RAM on POST
+	map(0x000c0000, 0x000dffff).ram();
+}
+
 void pc9821_canbe_state::pc9821cx3_io(address_map &map)
 {
 	pc9821_io(map);
@@ -463,6 +478,10 @@ void pc9821_canbe_state::pc9821cx3_io(address_map &map)
 
 static INPUT_PORTS_START( pc9821 )
 	// TODO: verify how many "switches" are really present on pc9821
+	// I suspect there are none: if you flip some of these then BIOS keeps throwing
+	// "set the sdip" warning until it matches parity odd.
+	// They may actually be hardwired defaults that should return constant values depending
+	// on machine type.
 	PORT_START("DSW1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(RTC_TAG, upd1990a_device, data_out_r)
 	PORT_DIPNAME( 0x02, 0x00, "DSW1" )
@@ -488,11 +507,10 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Initialize sdip SW" ) // With off it keeps trying to check sdip contents without actual init
-	// TODO: meaning is flipped on some models
+	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW2" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
@@ -622,6 +640,13 @@ MACHINE_START_MEMBER(pc9821_mate_a_state,pc9821ap2)
 	// ...
 }
 
+MACHINE_START_MEMBER(pc9821_canbe_state,pc9821_canbe)
+{
+	MACHINE_START_CALL_MEMBER(pc9821);
+
+	// ...
+}
+
 MACHINE_RESET_MEMBER(pc9821_state,pc9821)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801rs);
@@ -648,6 +673,8 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<0>(MAIN_CLOCK_X2);
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
+
+	m_cbus[0]->set_default_option("pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_state, pc9821)
@@ -696,18 +723,40 @@ void pc9821_canbe_state::pc9821ce2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+
+	m_cbus[0]->set_default_option("pc9801_118");
+
+	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 }
 
 void pc9821_canbe_state::pc9821cx3(machine_config &config)
 {
 	pc9821(config);
-	const XTAL xtal = XTAL(100'000'000);
+	const XTAL xtal = XTAL(100'000'000); // Pentium Pro, 512 kB second cache option RAM
 	PENTIUM(config.replace(), m_maincpu, xtal);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821cx3_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821cx3_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+
+//	m_cbus[0]->set_default_option(nullptr);
+	m_cbus[0]->set_default_option("pc9801_118");
+
+	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
+	
+	// VLSI Supercore594 (Wildcat) PCI 2.0
+	// GD5440
+	// built-in 3.5 floppy x 1
+	// file bay with built-in CD-Rom (4x)
+	// HDD with pre-installed software (850MB, 1.2GB)
+	// minimum RAM: 16MB
+	// maximum RAM: 128MB
+	// C-Bus x 3
+	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
+	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
 }
 
 void pc9821_mate_x_state::pc9821xs(machine_config &config)
@@ -1035,10 +1084,16 @@ PCI VLSI Supercore594 (Wildcat), PCI Rev. 2.0
 
 ROM_START( pc9821cx3 )
 	ROM_REGION16_LE( 0x80000, "biosrom", ROMREGION_ERASEFF )
+	// ROM BIOS rev. 0.13
     ROM_LOAD( "pc-9821cx3.bin", 0x000000, 0x080000, CRC(0360ed78) SHA1(2e4fe059d001d980add1656816bda97cd11ef331) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 512k space seems valid
+	// all GFXs are 1bpp packed with different pitches
+	// 0 - 0x56xx: CanBe mascot GFX animations
+	// 0x1fda8 (?) - 0x2458f: monitor GFXs
+	// 0x24590 - 0x36xxx: more CanBe mascot GFX animations
+	// 0x3c000: NEC & CanBe logo GFXs
 	ROM_COPY( "biosrom", 0x68000, 0x00000, 0x18000 )
 	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
 

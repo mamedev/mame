@@ -605,11 +605,11 @@ uint8_t pc9801_state::f0_r(offs_t offset)
 		// TODO: move to cbus
 		for (pc9801_amd98_device &amd98 : device_type_enumerator<pc9801_amd98_device>(machine().root_device()))
 		{
-			logerror("Read AMD98 ID %s\n",amd98.tag());
+			logerror("%s: Read AMD98 ID %s\n", machine().describe_context(), amd98.tag());
 			return 0x18; // return the right ID
 		}
 
-		logerror("Read port 0 from 0xf0 (AMD98 check?)\n");
+		logerror("%s: Read port 0 from 0xf0 (AMD98 check?)\n", machine().describe_context());
 		return 0; // card not present
 	}
 
@@ -1046,56 +1046,39 @@ template<unsigned port> u8 pc9801us_state::sdip_r(offs_t offset)
 {
 	u8 sdip_offset = port + (m_sdip_bank * 12);
 
-	if (offset == 2)
-		return m_sdip[sdip_offset];
-
-	logerror("Warning: read from unknown SDIP area %02x %04x\n", 
-		offset,
-		0x841c + offset + (sdip_offset % 12) * 0x100
-	);
-	return 0xff;
+	return m_sdip[sdip_offset];
 }
 
 template<unsigned port> void pc9801us_state::sdip_w(offs_t offset, u8 data)
 {
 	u8 sdip_offset = port + (m_sdip_bank * 12);
 
-	if (offset == 2)
-	{
-		m_sdip[sdip_offset] = data;
-		return;
-	}
+	m_sdip[sdip_offset] = data;
+}
 
+void pc9801us_state::sdip_bank_w(offs_t offset, u8 data)
+{
 	// TODO: depending on model type this is hooked up differently
 	// (or be not hooked up at all like in 9801US case)
-	if(offset == 3 && port == 0xb)
-	{
-		m_sdip_bank = (data & 0x40) >> 6;
-		return;
-	}
-	
-	logerror("Warning: write from unknown SDIP area %02x %04x %02x\n",
-		port,
-		0x841c + port + (sdip_offset % 12) * 0x100,
-		data
-	);
+	m_sdip_bank = (data & 0x40) >> 6;
 }
 
 void pc9801us_state::pc9801us_io(address_map &map)
 {
 	pc9801rs_io(map);
-	map(0x841c, 0x841f).rw(FUNC(pc9801bx_state::sdip_r<0x0>), FUNC(pc9801bx_state::sdip_w<0x0>));
-	map(0x851c, 0x851f).rw(FUNC(pc9801bx_state::sdip_r<0x1>), FUNC(pc9801bx_state::sdip_w<0x1>));
-	map(0x861c, 0x861f).rw(FUNC(pc9801bx_state::sdip_r<0x2>), FUNC(pc9801bx_state::sdip_w<0x2>));
-	map(0x871c, 0x871f).rw(FUNC(pc9801bx_state::sdip_r<0x3>), FUNC(pc9801bx_state::sdip_w<0x3>));
-	map(0x881c, 0x881f).rw(FUNC(pc9801bx_state::sdip_r<0x4>), FUNC(pc9801bx_state::sdip_w<0x4>));
-	map(0x891c, 0x891f).rw(FUNC(pc9801bx_state::sdip_r<0x5>), FUNC(pc9801bx_state::sdip_w<0x5>));
-	map(0x8a1c, 0x8a1f).rw(FUNC(pc9801bx_state::sdip_r<0x6>), FUNC(pc9801bx_state::sdip_w<0x6>));
-	map(0x8b1c, 0x8b1f).rw(FUNC(pc9801bx_state::sdip_r<0x7>), FUNC(pc9801bx_state::sdip_w<0x7>));
-	map(0x8c1c, 0x8c1f).rw(FUNC(pc9801bx_state::sdip_r<0x8>), FUNC(pc9801bx_state::sdip_w<0x8>));
-	map(0x8d1c, 0x8d1f).rw(FUNC(pc9801bx_state::sdip_r<0x9>), FUNC(pc9801bx_state::sdip_w<0x9>));
-	map(0x8e1c, 0x8e1f).rw(FUNC(pc9801bx_state::sdip_r<0xa>), FUNC(pc9801bx_state::sdip_w<0xa>));
-	map(0x8f1c, 0x8f1f).rw(FUNC(pc9801bx_state::sdip_r<0xb>), FUNC(pc9801bx_state::sdip_w<0xb>));
+	map(0x841e, 0x841e).rw(FUNC(pc9801us_state::sdip_r<0x0>), FUNC(pc9801us_state::sdip_w<0x0>));
+	map(0x851e, 0x851e).rw(FUNC(pc9801us_state::sdip_r<0x1>), FUNC(pc9801us_state::sdip_w<0x1>));
+	map(0x861e, 0x861e).rw(FUNC(pc9801us_state::sdip_r<0x2>), FUNC(pc9801us_state::sdip_w<0x2>));
+	map(0x871e, 0x871e).rw(FUNC(pc9801us_state::sdip_r<0x3>), FUNC(pc9801us_state::sdip_w<0x3>));
+	map(0x881e, 0x881e).rw(FUNC(pc9801us_state::sdip_r<0x4>), FUNC(pc9801us_state::sdip_w<0x4>));
+	map(0x891e, 0x891e).rw(FUNC(pc9801us_state::sdip_r<0x5>), FUNC(pc9801us_state::sdip_w<0x5>));
+	map(0x8a1e, 0x8a1e).rw(FUNC(pc9801us_state::sdip_r<0x6>), FUNC(pc9801us_state::sdip_w<0x6>));
+	map(0x8b1e, 0x8b1e).rw(FUNC(pc9801us_state::sdip_r<0x7>), FUNC(pc9801us_state::sdip_w<0x7>));
+	map(0x8c1e, 0x8c1e).rw(FUNC(pc9801us_state::sdip_r<0x8>), FUNC(pc9801us_state::sdip_w<0x8>));
+	map(0x8d1e, 0x8d1e).rw(FUNC(pc9801us_state::sdip_r<0x9>), FUNC(pc9801us_state::sdip_w<0x9>));
+	map(0x8e1e, 0x8e1e).rw(FUNC(pc9801us_state::sdip_r<0xa>), FUNC(pc9801us_state::sdip_w<0xa>));
+	map(0x8f1e, 0x8f1e).rw(FUNC(pc9801us_state::sdip_r<0xb>), FUNC(pc9801us_state::sdip_w<0xb>));
+	map(0x8f1f, 0x8f1f).w(FUNC(pc9801us_state::sdip_bank_w));
 }
 
 void pc9801bx_state::pc9801bx2_map(address_map &map)
@@ -1975,27 +1958,27 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-	pc9801_slot_device &cbus0(PC9801CBUS_SLOT(config, "cbus0", pc9801_cbus_devices, "pc9801_26"));
-	cbus0.set_memspace(m_maincpu, AS_PROGRAM);
-	cbus0.set_iospace(m_maincpu, AS_IO);
-	cbus0.int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
-	cbus0.int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<0>));
-	cbus0.int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<0>));
-	cbus0.int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
-	cbus0.int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
-	cbus0.int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
-	cbus0.int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
+	PC9801CBUS_SLOT(config, m_cbus[0], pc9801_cbus_devices, "pc9801_26");
+	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
+	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
+	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
+	m_cbus[0]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<0>));
+	m_cbus[0]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<0>));
+	m_cbus[0]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
+	m_cbus[0]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
+	m_cbus[0]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
+	m_cbus[0]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
 
-	pc9801_slot_device &cbus1(PC9801CBUS_SLOT(config, "cbus1", pc9801_cbus_devices, nullptr));
-	cbus1.set_memspace(m_maincpu, AS_PROGRAM);
-	cbus1.set_iospace(m_maincpu, AS_IO);
-	cbus1.int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
-	cbus1.int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<1>));
-	cbus1.int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<1>));
-	cbus1.int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<1>));
-	cbus1.int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
-	cbus1.int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<1>));
-	cbus1.int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<1>));
+	PC9801CBUS_SLOT(config, m_cbus[1], pc9801_cbus_devices, nullptr);
+	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
+	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
+	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
+	m_cbus[1]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<1>));
+	m_cbus[1]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<1>));
+	m_cbus[1]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<1>));
+	m_cbus[1]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
+	m_cbus[1]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<1>));
+	m_cbus[1]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<1>));
 //  TODO: six max slots
 
 	INPUT_MERGER_ANY_HIGH(config, "ir3").output_handler().set("pic8259_master", FUNC(pic8259_device::ir3_w));

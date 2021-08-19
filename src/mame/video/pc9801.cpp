@@ -33,6 +33,7 @@ uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	if(m_video_ff[DISPLAY_REG] != 0)
 		m_hgdc[1]->screen_update(screen, bitmap, cliprect);
 	m_hgdc[0]->screen_update(screen, bitmap, cliprect);
+
 	return 0;
 }
 
