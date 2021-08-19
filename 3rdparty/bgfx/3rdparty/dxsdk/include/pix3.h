@@ -26,7 +26,7 @@
 //
 // The PIX event/marker APIs compile to nothing on retail builds and on x86 builds
 //
-#if (!defined(USE_PIX)) && ((defined(_DEBUG) || DBG || (defined(PROFILE) && !defined(FASTCAP)) || defined(PROFILE_BUILD)) && !defined(i386) && defined(_AMD64_) && !defined(_PREFAST_))
+#if (!defined(USE_PIX)) && ((defined(_DEBUG) || (defined(DBG) && DBG) || (defined(PROFILE) && !defined(FASTCAP)) || defined(PROFILE_BUILD)) && !defined(i386) && defined(_AMD64_) && !defined(_PREFAST_))
 #define USE_PIX
 #endif
 
