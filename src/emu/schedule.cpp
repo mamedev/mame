@@ -174,7 +174,6 @@ timer_callback &timer_callback::init_base(device_scheduler *scheduler, timer_exp
 		if (m_unique_id != fullid)
 			throw emu_fatalerror("timer_callback::init called multiple times on the same object with different ids (%s vs. %s).", m_unique_id.c_str(), fullid.c_str());
 	}
-printf("init_base(%s)\n", fullid.c_str());
 	return *this;
 }
 
@@ -600,7 +599,6 @@ device_scheduler::device_scheduler(running_machine &machine) :
 
 device_scheduler::~device_scheduler()
 {
-	printf("~device_scheduler()\n\n");
 #if (COLLECT_SCHEDULER_STATS)
 	double seconds = m_basetime.absolute().as_double();
 	if (seconds > 0)

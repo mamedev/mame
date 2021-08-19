@@ -609,7 +609,6 @@ public:
 	template<typename DeviceType, typename FuncType>
 	std::enable_if_t<std::is_base_of<device_t, DeviceType>::value, persistent_timer *> timer_alloc(DeviceType &device, FuncType callback, char const *name, void *ptr = nullptr)
 	{
-		printf("timer_alloc(%s) from %s\n", name, tag());
 		// allocate a new persistent timer and save it in a vector
 		m_allocated_timers.push_back(std::make_unique<persistent_timer>());
 		persistent_timer &timer = *m_allocated_timers.back().get();
@@ -1444,7 +1443,6 @@ inline device_t::interface_list::auto_iterator device_t::interface_list::auto_it
 
 inline persistent_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
 {
-	printf("timer_alloc(%d) from %s\n", id, tag());
 	// allocate a new persistent timer and save it in a vector
 	m_allocated_timers.push_back(std::make_unique<device_persistent_timer>());
 	device_persistent_timer &timer = static_cast<device_persistent_timer &>(*m_allocated_timers.back().get());

@@ -616,6 +616,11 @@ public:
 	// conversion of attotime to a tick count at the provided floating-point frequency
 	s64 as_ticks(double hz) const
 	{
+		// prefer to use integral logic if the value is effectively an integer
+		s64 const hz_int = s64(hz);
+		if (hz == double(hz_int))
+			return as_ticks(hz_int);
+
 		assert(hz > 0);
 		return s64(as_double() / hz);
 	}

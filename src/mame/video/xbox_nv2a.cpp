@@ -5127,6 +5127,6 @@ void nv2a_renderer::set_ram_base(void *base)
 
 void nv2a_renderer::start(address_space *cpu_space)
 {
-	puller_timer.init(cpu_space->device().scheduler(), *this, FUNC(nv2a_renderer::puller_timer_work));
+	puller_timer.init(machine().scheduler(), *this, FUNC(nv2a_renderer::puller_timer_work));
 	puller_timer.enable(false);
 }
