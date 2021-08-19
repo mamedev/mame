@@ -118,6 +118,8 @@
     		"values": [ 1.0 ]
     	},
     	{ "name": "s_pal", "type": "int", "values": [ 1.0 ] },
+    	{ "name": "u_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+    	{ "name": "u_inv_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
     	{ "name": "u_inv_tex_size1", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
     ]
 }
