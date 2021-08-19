@@ -53,6 +53,7 @@ DEFINE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device,  "nes_shero",    
 DEFINE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device,      "nes_fcgj8in1",      "NES Cart BMC FC Genjin 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device,         "nes_fk23c",         "NES Cart FK23C PCB")
 DEFINE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device,        "nes_fk23ca",        "NES Cart FK23CA PCB")
+DEFINE_DEVICE_TYPE(NES_NT639,         nes_nt639_device,         "nes_nt639",         "NES Cart NT-639 PCB")
 DEFINE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device,    "nes_s24in1c03",     "NES Cart Super 24 in 1 SC-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device,      "nes_bmc_8in1",      "NES Cart BMC GRM070 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device,     "nes_bmc_15in1",     "NES Cart BMC 15 in 1 PCB")
@@ -195,6 +196,11 @@ nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, const char *ta
 
 nes_fk23ca_device::nes_fk23ca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_fk23c_device(mconfig, NES_FK23CA, tag, owner, clock)
+{
+}
+
+nes_nt639_device::nes_nt639_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_NT639, tag, owner, clock)
 {
 }
 
@@ -518,6 +524,12 @@ void nes_fk23ca_device::pcb_reset()
 	mmc3_common_initialize(0xff, 0xff, 0);
 	fk23c_set_prg();
 	fk23c_set_chr();
+}
+
+void nes_nt639_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x0f, 0xff, 0);
 }
 
 void nes_s24in1sc03_device::device_start()
@@ -2040,6 +2052,35 @@ void nes_fk23c_device::write_h(offs_t offset, uint8_t data)
 				break;
 		}
 	}
+}
+
+/*-------------------------------------------------
+
+ BMC-NT-639
+
+ Unknown Bootleg Multigame Board
+ Games: 2 in 1 Mortal Kombat VI/VII
+
+ NES 2.0: mapper 291
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_nt639_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("nt639 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(data, 5))
+		prg32(bitswap<3>(data, 6, 2, 1));
+	else
+	{
+		m_prg_base = (data & 0x40) >> 2;
+		set_prg(m_prg_base, m_prg_mask);
+	}
+
+	m_chr_base = (data & 0x40) << 2;
+	set_chr(m_chr_source, m_chr_base, m_chr_mask);
 }
 
 /*-------------------------------------------------

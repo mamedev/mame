@@ -326,7 +326,7 @@ static const nes_mmc mmc_list[] =
 	{ 288, BMC_GKCXIN1 },
 	{ 289, BMC_60311C },
 	{ 290, BMC_NTD_03 },
-	// 291 Kasheng 2-in-1 multicarts not yet in nes.xml?
+	{ 291, BMC_NT639 },
 	// { 292, UNL_DRAGONFIGHTER }, in nes.xml, not emulated yet
 	// 293 NewStar multicarts, do we have these in nes.xml?
 	// 294 variant of mapper 134?
