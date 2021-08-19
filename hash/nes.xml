@@ -80627,6 +80627,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_250">
+		<description>250 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_fam250" />
+			<feature name="pcb_model" value="FAM250" />
+			<dataarea name="prg" size="524288">
+				<rom name="g4-3" size="524288" crc="416ed0bc" sha1="4958d75a445150ad6a73c1309db3af708912f8a1" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_255">
 		<description>255 in 1</description>
 		<year>19??</year>
