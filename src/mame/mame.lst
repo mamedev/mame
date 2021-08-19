@@ -33387,6 +33387,9 @@ onetwoe                         // (c) 1997 Barko
 c5000                           // 1981
 c8002                           //
 
+@source:opercoin.cpp
+multibaby                       // (c) 1990 oper Coin
+
 @source:opwolf.cpp
 opwolf                          // B20 (c) 1987 Taito Corporation Japan (World)
 opwolfa                         // B20 (c) 1987 Taito Corporation Japan (World)
