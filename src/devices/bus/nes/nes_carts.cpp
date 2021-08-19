@@ -379,6 +379,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_gka",          NES_BMC_GKA);
 	device.option_add_internal("bmc_gkb",          NES_BMC_GKB);
 	device.option_add_internal("bmc_gkcxin1",      NES_BMC_GKCXIN1);
+	device.option_add_internal("bmc_k1029",        NES_BMC_K1029);
 	device.option_add_internal("bmc_k3006",        NES_BMC_K3006);
 	device.option_add_internal("bmc_k3036",        NES_BMC_K3036);
 	device.option_add_internal("bmc_k3046",        NES_BMC_K3046);
