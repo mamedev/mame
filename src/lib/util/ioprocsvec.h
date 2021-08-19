@@ -103,6 +103,11 @@ public:
 		return std::error_condition();
 	}
 
+	virtual std::error_condition finalize() noexcept override
+	{
+		return std::error_condition();
+	}
+
 	virtual std::error_condition flush() noexcept override
 	{
 		return std::error_condition();

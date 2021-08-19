@@ -431,18 +431,6 @@ void emu_file::close()
 
 
 //-------------------------------------------------
-//  compress - enable/disable streaming file
-//  compression via zlib; level is 0 to disable
-//  compression, or up to 9 for max compression
-//-------------------------------------------------
-
-std::error_condition emu_file::compress(int level)
-{
-	return m_file->compress(level);
-}
-
-
-//-------------------------------------------------
 //  compressed_file_ready - ensure our zip is ready
 //   loading if needed
 //-------------------------------------------------

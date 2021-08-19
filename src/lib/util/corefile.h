@@ -31,11 +31,6 @@ namespace util {
 
 #define OPEN_FLAG_NO_BOM        0x0100      /* don't output BOM */
 
-#define FCOMPRESS_NONE          0           /* no compression */
-#define FCOMPRESS_MIN           1           /* minimal compression */
-#define FCOMPRESS_MEDIUM        6           /* standard compression */
-#define FCOMPRESS_MAX           9           /* maximum compression */
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -63,9 +58,6 @@ public:
 
 	// close an open file
 	virtual ~core_file();
-
-	// enable/disable streaming file compression via zlib; level is 0 to disable compression, or up to 9 for max compression
-	virtual std::error_condition compress(int level) = 0;
 
 
 	// ----- file positioning -----

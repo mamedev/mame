@@ -19,6 +19,7 @@
 #include <cassert>
 #include <cerrno>
 #include <cstring>
+#include <iterator>
 #include <limits>
 #include <type_traits>
 
@@ -27,7 +28,7 @@ namespace util {
 
 namespace {
 
-// helper for holding a block of memory and closing it (or not) as necessary
+// helper for holding a block of memory and deallocating it (or not) as necessary
 
 template <typename T, bool Owned>
 class ram_adapter_base : public virtual random_access
@@ -321,6 +322,11 @@ class stdio_read_write_adapter : public stdio_read_adapter, public random_read_w
 {
 public:
 	using stdio_read_adapter::stdio_read_adapter;
+
+	virtual std::error_condition finalize() noexcept override
+	{
+		return std::error_condition();
+	}
 
 	virtual std::error_condition flush() noexcept override
 	{
@@ -681,6 +687,11 @@ class osd_file_read_write_adapter : public osd_file_read_adapter, public random_
 public:
 	using osd_file_read_adapter::osd_file_read_adapter;
 
+	virtual std::error_condition finalize() noexcept override
+	{
+		return std::error_condition();
+	}
+
 	virtual std::error_condition flush() noexcept override
 	{
 		return file().flush();
@@ -840,6 +851,11 @@ class core_file_read_write_adapter : public core_file_read_adapter, public rando
 {
 public:
 	using core_file_read_adapter::core_file_read_adapter;
+
+	virtual std::error_condition finalize() noexcept override
+	{
+		return std::error_condition();
+	}
 
 	virtual std::error_condition flush() noexcept override
 	{
@@ -1015,7 +1031,7 @@ public:
 
 // creating RAM read adapters
 
-random_read::ptr ram_read(void const *data, std::size_t size)
+random_read::ptr ram_read(void const *data, std::size_t size) noexcept
 {
 	random_read::ptr result;
 	if (data || !size)
@@ -1023,7 +1039,7 @@ random_read::ptr ram_read(void const *data, std::size_t size)
 	return result;
 }
 
-random_read::ptr ram_read(void const *data, std::size_t size, std::uint8_t filler)
+random_read::ptr ram_read(void const *data, std::size_t size, std::uint8_t filler) noexcept
 {
 	std::unique_ptr<random_read_fill_wrapper<ram_read_adapter<std::uint8_t const *const, false> > > result;
 	if (data || !size)
@@ -1033,7 +1049,7 @@ random_read::ptr ram_read(void const *data, std::size_t size, std::uint8_t fille
 	return result;
 }
 
-random_read::ptr ram_read_copy(void const *data, std::size_t size)
+random_read::ptr ram_read_copy(void const *data, std::size_t size) noexcept
 {
 	random_read::ptr result;
 	void *const copy = size ? std::malloc(size) : nullptr;
@@ -1046,7 +1062,7 @@ random_read::ptr ram_read_copy(void const *data, std::size_t size)
 	return result;
 }
 
-random_read::ptr ram_read_copy(void const *data, std::size_t size, std::uint8_t filler)
+random_read::ptr ram_read_copy(void const *data, std::size_t size, std::uint8_t filler) noexcept
 {
 	std::unique_ptr<random_read_fill_wrapper<ram_read_adapter<std::uint8_t *const, true> > > result;
 	void *const copy = size ? std::malloc(size) : nullptr;
@@ -1193,8 +1209,8 @@ random_read::ptr core_file_read(core_file &file) noexcept
 
 random_read::ptr core_file_read(core_file &file, std::uint8_t filler) noexcept
 {
-	std::unique_ptr<random_read_fill_wrapper<core_file_read_adapter> > result(
-			new (std::nothrow) decltype(result)::element_type(file));
+	std::unique_ptr<random_read_fill_wrapper<core_file_read_adapter> > result;
+	result.reset(new (std::nothrow) decltype(result)::element_type(file));
 	if (result)
 		result->set_filler(filler);
 	return result;

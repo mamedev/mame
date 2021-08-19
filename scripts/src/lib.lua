@@ -74,6 +74,8 @@ project "utils"
 		MAME_DIR .. "src/lib/util/ioprocs.cpp",
 		MAME_DIR .. "src/lib/util/ioprocs.h",
 		MAME_DIR .. "src/lib/util/ioprocsfill.h",
+		MAME_DIR .. "src/lib/util/ioprocsfilter.cpp",
+		MAME_DIR .. "src/lib/util/ioprocsfilter.h",
 		MAME_DIR .. "src/lib/util/ioprocsvec.h",
 		MAME_DIR .. "src/lib/util/jedparse.cpp",
 		MAME_DIR .. "src/lib/util/jedparse.h",

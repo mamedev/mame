@@ -100,6 +100,11 @@ class stream_read_write_wrapper : public stream_read_wrapper, public util::rando
 public:
 	using stream_read_wrapper::stream_read_wrapper;
 
+	virtual std::error_condition finalize() noexcept override
+	{
+		return std::error_condition();
+	}
+
 	virtual std::error_condition flush() noexcept override
 	{
 		return std::error_condition();

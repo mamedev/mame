@@ -167,9 +167,6 @@ public:
 	std::error_condition open_ram(const void *data, u32 length);
 	void close();
 
-	// control
-	std::error_condition compress(int compress);
-
 	// position
 	int seek(s64 offset, int whence);
 	u64 tell();
