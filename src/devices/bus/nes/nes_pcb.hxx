@@ -298,6 +298,7 @@ static const nes_pcb pcb_list[] =
 	{ "fcgj8in1",         BMC_FCGENJIN_8IN1 },
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
+	{ "nt639",            BMC_NT639 },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
 	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },

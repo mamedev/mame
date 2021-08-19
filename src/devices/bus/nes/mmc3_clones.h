@@ -487,6 +487,20 @@ public:
 };
 
 
+// ======================> nes_nt639_device
+
+class nes_nt639_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_nt639_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_s24in1sc03_device
 
 class nes_s24in1sc03_device : public nes_txrom_device
@@ -849,6 +863,7 @@ DECLARE_DEVICE_TYPE(NES_A9746,         nes_a9746_device)
 DECLARE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device)
 DECLARE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device)
 DECLARE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device)
+DECLARE_DEVICE_TYPE(NES_NT639,         nes_nt639_device)
 DECLARE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device)

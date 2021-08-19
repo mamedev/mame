@@ -61530,6 +61530,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="2mk67" supported="partial">
+		<description>2 in 1 - Mortal Kombat 6 &amp; Mortal Kombat 7</description>
+		<year>199?</year>
+		<publisher>Kasheng</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nt639" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 - mortal kombat 6 + 7 (nt-639).prg" size="262144" crc="e1e81430" sha1="4478cd97d34a1e5b7e0498851b36d6afa8172a76" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="2-in-1 - mortal kombat 6 + 7 (nt-639).chr" size="524288" crc="de87a98e" sha1="35ad99a2a3964be112d5a449f7208b52e6f476a3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2s5ej3" supported="no">
 		<description>2 in 1 - Sonic 5 + Earthworm Jim 3 (Asia)</description>
 		<year>19??</year>
@@ -76444,38 +76459,6 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk6u1" cloneof="mk6">
-		<description>Mortal Kombat 6 (Asia, Unprotected, Ripped from multicart)</description>
-		<year>1996</year>
-		<publisher>N.T</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="mortal kombat 6 (unprotected)(unl).chr" size="262144" crc="93c43dc7" sha1="5828c8d83ef5d70e935312f64d47bcc06e059fac" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="mortal kombat 6 (unprotected)(unl).prg" size="131072" crc="fa1a7d21" sha1="2ddfe7490716b960074b48c9e37f2ecf69975e7f" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mk7" supported="no">
-		<description>Mortal Kombat 7 (Asia, Unprotected, Ripped from multicart)</description>
-		<year>1996</year>
-		<publisher>N.T</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="mortal kombat 7 (unprotected)(unl).chr" size="262144" crc="991f0081" sha1="578c2ef7c90fd1397b3a5e82bafd4f0a16abd01f" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="mortal kombat 7 (unprotected)(unl).prg" size="131072" crc="11dff499" sha1="7f059f45d194559ac40a9c0f6097a88e0b5a76a1" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mk2blue" supported="partial">
 		<description>Mortal Kombat II (Asia, Blue Version)</description>
 		<year>19??</year>
@@ -77458,7 +77441,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="yuyu97">
+	<software name="yuyu97" supported="partial">
 		<description>Yu Yu Hakusho 97 V (Asia)</description>
 		<year>1997</year>
 		<publisher>N.T</publisher>
@@ -77477,7 +77460,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="yuyufinc" cloneof="yuyufin">
+	<software name="yuyufinc" cloneof="yuyufin" supported="partial">
 		<description>Yu Yu Hakusho Final - Makai Saikyou Retsuden (Asia, Chinese, Hacked)</description>
 		<year>1996</year>
 		<publisher>N.T</publisher>
@@ -77494,7 +77477,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="yuyufin">
+	<software name="yuyufin" supported="partial">
 		<description>Yu Yu Hakusho Final - Makai Saikyou Retsuden (Asia, English)</description>
 		<year>1996</year>
 		<publisher>N.T</publisher>
