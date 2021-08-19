@@ -71,7 +71,7 @@ void multibaby_state::machine_start()
 
 void multibaby_state::multibaby(machine_config &config)
 {
-	Z80(config, m_maincpu, 8.000_MHz_XTAL);
+	Z80(config, m_maincpu, 8.000_MHz_XTAL / 2);
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &psg(AY8910(config, "psg", 8.000_MHz_XTAL / 4)); // Divisor unknown

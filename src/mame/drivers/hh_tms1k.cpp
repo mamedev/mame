@@ -160,7 +160,7 @@ ROM source notes when dumped from another publisher, but confident it's the same
 - palmf31: Toshiba BC-8018B
 - ti1250: Texas Instruments TI-1200
 - ti25503: Texas Instruments TI-1265
-- ti5100: loose chip
+- ti5100: loose 1979 TMS1073NL chip
 
 TODO:
 - verify output PLA and microinstructions PLA for MCUs that have been dumped
