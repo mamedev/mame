@@ -829,11 +829,11 @@ void screen_device::device_start()
 	m_vblank_end_timer.init(*this, FUNC(screen_device::vblank_end));
 
 	// allocate a timer to reset partial updates
-	m_scanline0_timer.init(*this, TID_SCANLINE0);
+	m_scanline0_timer.init(*this, FUNC(screen_device::scanline0_timer));
 
 	// allocate a timer to generate per-scanline updates
 	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
-		m_scanline_timer.init(*this, TID_SCANLINE);
+		m_scanline_timer.init(*this, FUNC(screen_device::scanline_timer));
 
 	// configure the screen with the default parameters
 	configure(m_width, m_height, m_visarea, m_refresh);
@@ -917,48 +917,6 @@ void screen_device::device_stop()
 void screen_device::device_post_load()
 {
 	realloc_screen_bitmaps();
-}
-
-
-//-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
-//-------------------------------------------------
-
-void screen_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-		// first scanline
-		case TID_SCANLINE0:
-			reset_partial_updates();
-			if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
-			{
-				pre_update_scanline(0);
-			}
-			break;
-
-		// subsequent scanlines when scanline updates are enabled
-		case TID_SCANLINE:
-			if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
-			{
-				pre_update_scanline(param);
-			}
-			if (m_video_attributes & VIDEO_UPDATE_SCANLINE)
-			{
-				// force a partial update to the current scanline
-				update_partial(param);
-			}
-			if (m_scanline_cb)
-				m_scanline_cb(param);
-
-			// compute the next visible scanline
-			param++;
-			if (param > m_visarea.bottom())
-				param = m_visarea.top();
-			m_scanline_timer.adjust(time_until_pos(param), param);
-			break;
-	}
 }
 
 
@@ -1669,6 +1627,44 @@ void screen_device::vblank_end()
 
 	// increment the frame number counter
 	m_frame_number++;
+}
+
+
+//-------------------------------------------------
+//  scanline0_timer - timer callback for the first
+//  visible scanline, to reset partial updates
+//-------------------------------------------------
+
+void screen_device::scanline0_timer()
+{
+	reset_partial_updates();
+	if ((m_video_attributes & VIDEO_VARIABLE_WIDTH) != 0)
+		pre_update_scanline(0);
+}
+
+
+//-------------------------------------------------
+//  scanline_timer - timer callback for a
+//  particular scanline
+//-------------------------------------------------
+
+void screen_device::scanline_timer(int scanline)
+{
+	if ((m_video_attributes & VIDEO_VARIABLE_WIDTH) != 0)
+		pre_update_scanline(scanline);
+
+	// force a partial update to the current scanline
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+		update_partial(scanline);
+
+	if (m_scanline_cb)
+		m_scanline_cb(scanline);
+
+	// compute the next visible scanline
+	scanline++;
+	if (scanline > m_visarea.bottom())
+		scanline = m_visarea.top();
+	m_scanline_timer.adjust(time_until_pos(scanline), scanline);
 }
 
 

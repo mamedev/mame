@@ -429,13 +429,6 @@ public:
 private:
 	class svg_renderer;
 
-	// timer IDs
-	enum : device_timer_id
-	{
-		TID_SCANLINE0,
-		TID_SCANLINE
-	};
-
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_config_complete() override;
@@ -444,13 +437,14 @@ private:
 	virtual void device_reset() override;
 	virtual void device_stop() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal helpers
 	void set_container(render_container &container) { m_container = &container; }
 	void realloc_screen_bitmaps();
 	void vblank_begin();
 	void vblank_end();
+	void scanline0_timer();
+	void scanline_timer(int scanline);
 	void finalize_burnin();
 	void load_effect_overlay(const char *filename);
 	void update_scan_bitmap_size(int y);
@@ -512,8 +506,8 @@ private:
 	attotime            m_vblank_end_time;          // time of last VBLANK end
 	persistent_timer    m_vblank_begin_timer;       // timer to signal VBLANK start
 	persistent_timer    m_vblank_end_timer;         // timer to signal VBLANK end
-	device_persistent_timer m_scanline0_timer;      // scanline 0 timer
-	device_persistent_timer m_scanline_timer;       // scanline timer
+	persistent_timer    m_scanline0_timer;          // scanline 0 timer
+	persistent_timer    m_scanline_timer;           // scanline timer
 	u64                 m_frame_number;             // the current frame number
 	u32                 m_partial_updates_this_frame;// partial update counter this frame
 
