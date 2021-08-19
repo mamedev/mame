@@ -47,11 +47,14 @@ target_manager::~target_manager()
 
 bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen)
 {
-	auto* target = new bgfx_target(name, format, width, height, style, double_buffer, filter, scale, screen);
 	std::string full_name = name + std::to_string(screen);
 
-	m_targets[full_name] = target;
+	auto iter = m_targets.find(full_name);
+	if (iter != m_targets.end())
+		destroy_target(name, screen);
 
+	bgfx_target *target = new bgfx_target(name, format, width, height, style, double_buffer, filter, scale, screen);
+	m_targets[full_name] = target;
 	m_textures.add_provider(full_name, target);
 
 	return target;
@@ -60,10 +63,10 @@ bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat
 void target_manager::destroy_target(std::string name, uint32_t screen)
 {
 	std::string full_name = (screen < 0) ? name : (name + std::to_string(screen));
-	if (m_targets[full_name] != nullptr)
+	if (m_targets.find(full_name) != m_targets.end())
 	{
 		delete m_targets[full_name];
-		m_targets[full_name] = nullptr;
+		m_targets.erase(full_name);
 		m_textures.remove_provider(full_name);
 	}
 }
@@ -78,12 +81,11 @@ bgfx_target* target_manager::create_backbuffer(void *handle, uint16_t width, uin
 bgfx_target* target_manager::target(uint32_t screen, std::string name)
 {
 	std::string full_name = name + std::to_string(screen);
-	bgfx_target* target = m_targets[full_name];
-	if (target == nullptr)
+	if (m_targets.find(full_name) != m_targets.end())
 	{
 		osd_printf_verbose("Warning: Attempting to retrieve a nonexistent target '%s' for screen %d\n", name, screen);
 	}
-	return target;
+	return m_targets[full_name];
 }
 
 bool target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style)
@@ -133,8 +135,8 @@ void target_manager::rebuild_targets(uint32_t screen, uint32_t style)
 		const uint16_t scale = target->scale();
 		const uint16_t width(sizes[screen].width());
 		const uint16_t height(sizes[screen].height());
-		delete target;
 
+		destroy_target(name, screen);
 		create_target(name, format, width, height, style, double_buffered, filter, scale, screen);
 	}
 }
@@ -165,7 +167,7 @@ void target_manager::create_target_if_nonexistent(uint32_t screen, std::string n
 {
 	if (style == TARGET_STYLE_CUSTOM) return;
 
-	if (m_targets[name + std::to_string(screen)] != nullptr)
+	if (m_targets.find(name + std::to_string(screen)) != m_targets.end())
 	{
 		return;
 	}
@@ -174,7 +176,7 @@ void target_manager::create_target_if_nonexistent(uint32_t screen, std::string n
 	uint16_t width(sizes[screen].width());
 	uint16_t height(sizes[screen].height());
 
-	create_target(name, bgfx::TextureFormat::RGBA8, width, height, style, double_buffered, filter, 1, screen);
+	create_target(name, bgfx::TextureFormat::BGRA8, width, height, style, double_buffered, filter, 1, screen);
 }
 
 uint16_t target_manager::width(uint32_t style, uint32_t screen)
