@@ -22,7 +22,7 @@
 		- EMS fails at boot, it's never ever really checked;
         - MSDOS cannot detect EMS properly, is there a flag somewhere?
         - JEIDA memory card interface;
-        - optional docking station (for floppy device only or can mount other stuff?);
+        - optional docking station (for floppy device only or can mount other stuff too?);
 
 **************************************************************************************************/
 
@@ -315,9 +315,7 @@ static INPUT_PORTS_START( pc98lt )
 	PORT_DIPNAME( 0x01, 0x00, "PRNB" ) // checked on boot
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // CPUT LT/HA switch
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) // checked on boot
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
@@ -340,6 +338,9 @@ static INPUT_PORTS_START( pc98ha )
 	PORT_DIPNAME( 0x01, 0x00, "<rtc empty signal>" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	
+	PORT_MODIFY("PRNB")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 // debug
@@ -433,7 +434,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	m_keyb->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
 	I8255(config, m_ppi_sys, 0);
-	// PC98LT/HA has no dips to port A but reads back written content
+	// PC98LT/HA has no dips, port A acts as a RAM storage
 	m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
 	m_ppi_sys->in_pb_callback().set_ioport("SYSB");
 //	m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?

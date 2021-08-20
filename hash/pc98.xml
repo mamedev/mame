@@ -1892,7 +1892,7 @@ TODO:
 	<!-- several unsupported features, has misaligned vertical lines on GFX boxes -->
 	<!-- on VM class FM sound test runs way too fast -->
 	<software name="epdiag" supported="partial">
-		<description>EPSON Jiko Shindan Program</description>
+		<description>EPSON Jiko Shindan Program (v1.10)</description>
 		<year>1991</year>
 		<publisher>EPSON</publisher>
 		<info name="alt_title" value="自己診断プログラム" />
@@ -7880,6 +7880,7 @@ TODO:
 		</part>
 	</software>
 
+	<!-- -->
 	<software name="blockbst">
 		<description>The Block Buster</description>
 		<year>1995</year>
@@ -8141,12 +8142,14 @@ TODO:
 		</part>
 	</software>
 
-	<software name="panicbom">
+	<!-- boot OK -->
+	<software name="panicbom" supported="yes">
 		<description>Bomberman - Panic Bomber</description>
 		<year>1995</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ボンバーマン ぱにっくボンバー" />
 		<info name="release" value="19950405" />
+		<info name="usage" value="Requires a 9821 class machine and 3MB of RAM" />
 		<!-- was mislabeled as hldrun clone -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
@@ -31551,14 +31554,17 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- "File already open" on VM class -->
-	<!-- "System Error" on vanilla class (expects 16 colors mode?) -->
+	<!-- "System Error" on vanilla class (expects 16 colors mode, btanb) -->
+	<!-- boot OK on VM and RS class -->
+	<!-- On VM class it has slight layer clearance bugs -->
+	<!-- keyboard is very unresponsive on gameplay (or even won't work properly for VM class) -->
 	<software name="gundamco" supported="no">
 		<description>Mobile Suit Gundam - Classic Operation</description>
 		<year>1990</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="機動戦士ガンダム クラシックオペレーション" />
 		<info name="release" value="19900810" />
+		<info name="usage" value="Expects analog 16 mode on" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1089776">
@@ -40969,6 +40975,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<!-- 2dd images, attempt to map them on 9801F (in drive 2 + BIOS enabled in Machine Config) causes access violation -->
+	<!-- [On RS class with FDC set as 2HD it never completes sub-routine at PC=0x1fc99] -->
+	<!-- [Jumps off the weed with 2DD mode, never initializes 0x1fc00 onward.] -->
 	<software name="sorcer" supported="no">
 		<description>Sorcerian</description>
 		<year>1988</year>

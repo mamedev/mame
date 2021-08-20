@@ -123,6 +123,9 @@ public:
 		, m_ipl(*this, "ipl_bank")
 		, m_dmac(*this, "i8237")
 		, m_pit(*this, "pit")
+		, m_dsw1(*this, "DSW1")
+		, m_dsw2(*this, "DSW2")
+		, m_ppi_mouse(*this, "ppi_mouse")
 		, m_fdc_2hd(*this, "upd765_2hd")
 		, m_fdc_2dd(*this, "upd765_2dd")
 		, m_ram(*this, RAM_TAG)
@@ -150,6 +153,9 @@ protected:
 	optional_device<address_map_bank_device> m_ipl;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
+	required_ioport m_dsw1;
+	required_ioport m_dsw2;
+	required_device<i8255_device> m_ppi_mouse;
 	// TODO: should really be one FDC
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
@@ -158,9 +164,9 @@ protected:
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
 	required_device_array<pc9801_slot_device, 2> m_cbus;
-private:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
+private:
 	required_device<pc9801_memsw_device> m_memsw;
 	required_device<i8251_device> m_sio;
 	optional_device<scsi_port_device> m_sasibus;
@@ -193,12 +199,16 @@ protected:
 
 	uint8_t m_nmi_ff;
 
+	virtual u8 ppi_prn_portb_r();
+
 private:
 	void pc9801_io(address_map &map);
 	void pc9801_map(address_map &map);
 
 	void nmi_ctrl_w(offs_t offset, uint8_t data);
 
+	u8 ppi_sys_portb_r();
+	
 	void sasi_data_w(uint8_t data);
 	uint8_t sasi_data_r();
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
@@ -224,13 +234,16 @@ protected:
 	uint8_t fdc_2hd_ctrl_r();
 	void fdc_2hd_ctrl_w(uint8_t data);
 
-	u8 m_fdc_ctrl;
-	uint8_t m_fdc_2dd_ctrl, m_fdc_2hd_ctrl;
+	u8 m_fdc_2hd_ctrl;
+	
+	bool fdc_drive_ready_r(upd765a_device *fdc);
 private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
 
 	uint8_t fdc_2dd_ctrl_r();
 	void fdc_2dd_ctrl_w(uint8_t data);
+
+	u8 m_fdc_2dd_ctrl;
 
 //	DMA
 protected:
@@ -272,7 +285,8 @@ protected:
 
 	enum
 	{
-		TIMER_VBIRQ
+		TIMER_VBIRQ,
+		TIMER_FDC_TRIGGER
 	};
 
 	uint16_t tvram_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -325,7 +339,7 @@ protected:
 	}m_mouse;
 
 private:
-	uint8_t ppi_mouse_porta_r();
+	u8 ppi_mouse_porta_r();
 	void ppi_mouse_porta_w(uint8_t data);
 	void ppi_mouse_portb_w(uint8_t data);
 	void ppi_mouse_portc_w(uint8_t data);
@@ -344,6 +358,7 @@ class pc9801vm_state : public pc9801_state
 public:
 	pc9801vm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801_state(mconfig, type, tag)
+		, m_dsw3(*this, "DSW3")
 		, m_ide(*this, "ide%u", 1U)
 		, m_dac1bit(*this, "dac1bit")
 	{
@@ -358,6 +373,8 @@ public:
 	void init_pc9801vm_kanji();
 
 protected:
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	void pc9801rs_io(address_map &map);
 	void pc9801rs_map(address_map &map);
 
@@ -389,6 +406,7 @@ protected:
 	uint16_t timestamp_r(offs_t offset);
 
 	void ppi_sys_dac_portc_w(uint8_t data);
+	virtual u8 ppi_prn_portb_r() override;
 
 	DECLARE_MACHINE_START(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9801rs);
@@ -399,6 +417,8 @@ protected:
 
 	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
 	bool m_dac1bit_disable;
+
+	required_ioport m_dsw3;
 private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //	optional_device<dac_1bit_device> m_dac1bit;
@@ -414,7 +434,6 @@ private:
 	void pc9801rs_bank_w(offs_t offset, uint8_t data);
 	uint8_t midi_r();
 
-
 	// 286-based machines except for PC98XA
 	u8 dma_access_ctrl_r(offs_t offset);
 	void dma_access_ctrl_w(offs_t offset, u8 data);
@@ -422,11 +441,18 @@ private:
 	uint8_t a20_ctrl_r(offs_t offset);
 	void a20_ctrl_w(offs_t offset, uint8_t data);
 
-	uint8_t fdc_mode_ctrl_r();
-	void fdc_mode_ctrl_w(uint8_t data);
+	template <unsigned port> u8 fdc_2hd_2dd_ctrl_r();
+	template <unsigned port> void fdc_2hd_2dd_ctrl_w(u8 data);
 
-//	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
-//	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_drq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+
+	emu_timer *m_fdc_timer;
+
+	u8 m_fdc_mode;
+	u8 fdc_mode_r();
+	void fdc_mode_w(u8 data);
+	void fdc_set_density_mode(bool is_2hd);
 
 protected:
 	struct {
@@ -459,6 +485,9 @@ private:
 protected:
 	u8 mouse_freq_r(offs_t offset);
 	void mouse_freq_w(offs_t offset, u8 data);
+	
+	u8 ppi_mouse_portb_r();
+	u8 ppi_mouse_portc_r();
 };
 
 class pc9801us_state : public pc9801vm_state
@@ -801,7 +830,7 @@ private:
 	u8 m_bram_banks;
 	u8 m_bram_bank_reg;
 	u8 m_dict_bank_reg;
-	
+
 	u8 m_floppy_mode;
 	u8 m_fdc_ctrl;
 };

@@ -15,12 +15,15 @@
     - Write a PC80S31K device for 2d type floppies
       (also used on PC-6601SR, PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
 	- FDC (note: epdiag FDC test looks a good candidate for all this):
-		- floppy_connector requires a "disk is in drive" flag that isn't honored properly (note: 2DD only);
 		- Has on board dip-switches, we currently just return 2HD/2DD autodetect;
-		- 3'5 floppy disks don't load at all;
+		- 3'5 floppy disks don't load at all ($4be I/O port is the extra accessor);
 		- fix FDC duplication: according to docs I/O ports $90-$95 are basically mirrors
-		  with a subset of the drive related flags;
+		  with a subset of the drive related flags.
+		  Sounds like a afterthought of having 2HD/2DD separate boards from vanilla class;
+		- Move vanilla FDC 2HD/2DD to a separate (legacy?) bus, and split pc9801f (default: 2DD) 
+		  from pc9801m (2HD) and vanilla pc9801 (none);
 		- floppy sounds never silences when drive is idle (disabled for the time being);
+		- epdiag throws ID invalid when run with PORT EXC on (DIP-SW 3-1 -> 0);
     - CMT support (-03/-13/-36 i/f or cbus only, supported by i86/V30 fully compatible machines
 	  only);
     - SASI/SCSI support (fully supported by now?);
@@ -61,7 +64,7 @@
 		  current array format;
 
     TODO (PC-9801F)
-    - kanji port 0xa9 readback is broken for several games (balpower, lovelyho).
+    - it currently hooks up half size kanji ROMs, causing missing text in many games;
 
     TODO (PC-9801RS):
     - several unemulated extra f/f features;
@@ -391,12 +394,12 @@ void pc9801_state::vrtc_clear_w(uint8_t data)
 	m_pic1->ir2_w(0);
 }
 
-uint8_t pc9801_state::fdc_2hd_ctrl_r()
+u8 pc9801_state::fdc_2hd_ctrl_r()
 {
-	return 0x44; //unknown port meaning 2hd flag?
+	return 0x44;
 }
 
-void pc9801_state::fdc_2hd_ctrl_w(uint8_t data)
+void pc9801_state::fdc_2hd_ctrl_w(u8 data)
 {
 	//logerror("%02x ctrl\n",data);
 	m_fdc_2hd->reset_w(BIT(data, 7));
@@ -415,24 +418,23 @@ void pc9801_state::fdc_2hd_ctrl_w(uint8_t data)
 		m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
 		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
 	}
-	else if(!(m_fdc_ctrl & 4)) // required for 9821
-	{
-		m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-	}
 }
 
+bool pc9801_state::fdc_drive_ready_r(upd765a_device *fdc)
+{
+	floppy_image_device *floppy0 = fdc->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = fdc->subdevice<floppy_connector>("1")->get_device();
+	
+	return (!floppy0->ready_r() || !floppy1->ready_r());
+}
 
 uint8_t pc9801_state::fdc_2dd_ctrl_r()
 {
-	floppy_image_device *floppy0 = m_fdc_2dd->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_fdc_2dd->subdevice<floppy_connector>("1")->get_device();
 	u8 ret = 0;
 
 	// 2dd BIOS specifically tests if a disk is in any drive
-	// (does not happen on 2HD and 2HD/2DD later rev)
-	if (!floppy0->ready_r() || !floppy1->ready_r())
-		ret |= 0x10;
+	// (does not happen on 2HD standalone)
+	ret |= fdc_drive_ready_r(m_fdc_2dd) << 4;
 
 	//popmessage("%d %d %02x", floppy0->ready_r(), floppy1->ready_r(), ret);
 	
@@ -643,11 +645,8 @@ void pc9801_state::pc9801_common_io(address_map &map)
 //  map(0x006c, 0x006f) border color / <undefined>
 	map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
-	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
-	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
-	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
 	map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00);
-	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 }
 
 void pc9801_state::pc9801_io(address_map &map)
@@ -657,6 +656,9 @@ void pc9801_state::pc9801_io(address_map &map)
 	map(0x0068, 0x0068).w(FUNC(pc9801_state::pc9801_video_ff_w)); //mode FF / <undefined>
 	map(0x0080, 0x0080).rw(FUNC(pc9801_state::sasi_data_r), FUNC(pc9801_state::sasi_data_w));
 	map(0x0082, 0x0082).rw(FUNC(pc9801_state::sasi_status_r), FUNC(pc9801_state::sasi_ctrl_w));
+	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
+	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
+	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
 	map(0x00a0, 0x00af).rw(FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801_a0_w)); //upd7220 bitmap ports / display registers
 	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
@@ -813,6 +815,30 @@ void pc9801_state::grcg_w(offs_t offset, uint8_t data)
 	txt_scrl_w(offset,data);
 }
 
+void pc9801vm_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
+{
+	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_16_MODE])
+	{
+		switch(offset)
+		{
+			case 0x08: m_analog16.pal_entry = data & 0xf; break;
+			case 0x0a: m_analog16.g[m_analog16.pal_entry] = data & 0xf; break;
+			case 0x0c: m_analog16.r[m_analog16.pal_entry] = data & 0xf; break;
+			case 0x0e: m_analog16.b[m_analog16.pal_entry] = data & 0xf; break;
+		}
+
+		m_palette->set_pen_color(
+			m_analog16.pal_entry + 0x10,
+			pal4bit(m_analog16.r[m_analog16.pal_entry]),
+			pal4bit(m_analog16.g[m_analog16.pal_entry]),
+			pal4bit(m_analog16.b[m_analog16.pal_entry])
+		);
+		return;
+	}
+
+	pc9801_a0_w(offset,data);
+}
+
 void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!(m_egc.regs[1] & 0x6000) || (offset != 4)) // why?
@@ -828,6 +854,30 @@ void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
+uint16_t pc9801vm_state::grcg_gvram_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t ret = upd7220_grcg_r((offset + 0x4000) | (m_vram_bank << 16), mem_mask);
+	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+}
+
+void pc9801vm_state::grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	upd7220_grcg_w((offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
+}
+
+uint16_t pc9801vm_state::grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t ret = upd7220_grcg_r(offset | (m_vram_bank << 16), mem_mask);
+	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+}
+
+void pc9801vm_state::grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	upd7220_grcg_w(offset | (m_vram_bank << 16), data, mem_mask);
+}
+
 /*
  * FDC MODE control
  * 
@@ -836,28 +886,106 @@ void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  * ---- -x-- (r) DIP-SW 3-1 FDC FIXed mode (1) ON
  *           (w) Enable motor ON (1) defined by 0x94 bit 3 (0) always on
  * ---- --x- (r/w) FDD EXC access mode status (1) 2HD (0) 2DD
- * ---- ---x (r/w) I/F mode select (1) 2HD (0) 2DD
+ * ---- ---x (r/w) PORT EXC I/F mode select (1) 2HD (0) 2DD
  *           (Disables I/O port access)
  *
  * NB: high-reso class diverges here:
  * - XA/XL themselves have no way to access any of this;
  * - post-XA/XL just has Enable motor ON writes;
  */
-uint8_t pc9801vm_state::fdc_mode_ctrl_r()
+uint8_t pc9801vm_state::fdc_mode_r()
 {
-	return (m_fdc_ctrl & 3) | 0xf0 | 8 | 4;
+	return (m_fdc_mode & 3) | 0xf0 | (m_dsw3->read() & 3) << 2;
 }
 
-void pc9801vm_state::fdc_mode_ctrl_w(uint8_t data)
+void pc9801vm_state::fdc_set_density_mode(bool is_2hd)
 {
-	m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
-	m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+	floppy_image_device *floppy0 = m_fdc_2hd->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = m_fdc_2hd->subdevice<floppy_connector>("1")->get_device();
 
-	m_fdc_2hd->set_rate(data & 0x02 ? 500000 : 250000);
+	floppy0->set_rpm(is_2hd ? 360 : 300);
+	floppy1->set_rpm(is_2hd ? 360 : 300);
 
-	m_fdc_ctrl = data;
+	m_fdc_2hd->set_rate(is_2hd ? 500000 : 250000);
+//	printf("FDC set new mode %s\n", is_2hd ? "2HD" : "2DD");
+	logerror("%s: FDC set new mode %s\n", machine().describe_context(), is_2hd ? "2HD" : "2DD");
+}
+
+void pc9801vm_state::fdc_mode_w(uint8_t data)
+{
+	const bool old_mode = bool(BIT(m_fdc_mode, 1));
+	const bool new_mode = bool(BIT(data, 1));
+
+	if (old_mode != new_mode)
+		fdc_set_density_mode(new_mode);
+
+	m_fdc_mode = data;
+	
+	if(BIT(m_fdc_mode, 2))
+	{
+		m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(CLEAR_LINE);
+		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(CLEAR_LINE);
+	}
+	
 	//if(data & 0xfc)
 	//  logerror("FDC ctrl called with %02x\n",data);
+}
+
+// TODO: undefined/disallow read/writes if I/F mode doesn't match
+// (and that applies to FDC mapping too!)
+// id port 0 -> 2DD
+// id port 1 -> 2HD
+template <unsigned port> u8 pc9801vm_state::fdc_2hd_2dd_ctrl_r()
+{
+	u8 res = fdc_2hd_ctrl_r();
+	if (port == 0)
+	{
+		res |= 0x20;
+		res |= fdc_drive_ready_r(m_fdc_2hd) << 4;
+	}
+	return res;
+}
+
+void pc9801vm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_FDC_TRIGGER:
+			// TODO: sorcer definitely expects this irq to be taken
+			if (bool(BIT(m_fdc_2hd_ctrl, 2)))
+			{
+				m_pic2->ir2_w(0);
+				m_pic2->ir2_w(1);
+			}
+			break;
+	}
+}
+
+template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
+{
+	bool prev_trig = false;
+	bool cur_trig = false;
+
+	if (port == 0 && bool(BIT(m_fdc_mode, 0)) == false)
+	{
+		prev_trig = bool(BIT(m_fdc_2hd_ctrl, 0));
+		cur_trig = bool(BIT(data, 0));
+	}
+
+	fdc_2hd_ctrl_w(data);
+
+	// TODO: Enable motor ON is reversed compared to the docs
+	if(!(m_fdc_mode & 4)) // required for 9821
+	{
+		m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
+		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
+	}
+
+	if (port == 0 && !prev_trig && cur_trig)
+	{
+		m_fdc_timer->reset();
+		m_fdc_timer->adjust(attotime::from_msec(100));
+	}
 }
 
 void pc9801vm_state::pc9801rs_video_ff_w(offs_t offset, uint8_t data)
@@ -886,30 +1014,6 @@ void pc9801vm_state::pc9801rs_video_ff_w(offs_t offset, uint8_t data)
 	}
 
 	pc9801_video_ff_w(data);
-}
-
-void pc9801vm_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
-{
-	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_16_MODE])
-	{
-		switch(offset)
-		{
-			case 0x08: m_analog16.pal_entry = data & 0xf; break;
-			case 0x0a: m_analog16.g[m_analog16.pal_entry] = data & 0xf; break;
-			case 0x0c: m_analog16.r[m_analog16.pal_entry] = data & 0xf; break;
-			case 0x0e: m_analog16.b[m_analog16.pal_entry] = data & 0xf; break;
-		}
-
-		m_palette->set_pen_color(
-			m_analog16.pal_entry + 0x10,
-			pal4bit(m_analog16.r[m_analog16.pal_entry]),
-			pal4bit(m_analog16.g[m_analog16.pal_entry]),
-			pal4bit(m_analog16.b[m_analog16.pal_entry])
-		);
-		return;
-	}
-
-	pc9801_a0_w(offset,data);
 }
 
 /*
@@ -960,30 +1064,6 @@ void pc9801_state::pic_w(offs_t offset, uint8_t data)
 	((offset >= 4) ? m_pic2 : m_pic1)->write(offset & 3, data);
 }
 
-uint16_t pc9801vm_state::grcg_gvram_r(offs_t offset, uint16_t mem_mask)
-{
-	uint16_t ret = upd7220_grcg_r((offset + 0x4000) | (m_vram_bank << 16), mem_mask);
-	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-}
-
-void pc9801vm_state::grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-	upd7220_grcg_w((offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
-}
-
-uint16_t pc9801vm_state::grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
-{
-	uint16_t ret = upd7220_grcg_r(offset | (m_vram_bank << 16), mem_mask);
-	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-}
-
-void pc9801vm_state::grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-	upd7220_grcg_w(offset | (m_vram_bank << 16), data, mem_mask);
-}
-
 void pc9801_state::ipl_bank(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom().region("ipl", 0);
@@ -1007,10 +1087,13 @@ void pc9801vm_state::pc9801ux_io(address_map &map)
 	map(0x005c, 0x005f).r(FUNC(pc9801vm_state::timestamp_r)).nopw(); // artic
 	map(0x0068, 0x006b).w(FUNC(pc9801vm_state::pc9801rs_video_ff_w)).umask16(0x00ff); //mode FF / <undefined>
 	map(0x0070, 0x007f).rw(FUNC(pc9801vm_state::grcg_r), FUNC(pc9801vm_state::grcg_w)).umask16(0x00ff); //display registers "GRCG" / i8253 pit
+	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
+	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
+	map(0x0094, 0x0094).rw(FUNC(pc9801vm_state::fdc_2hd_2dd_ctrl_r<1>), FUNC(pc9801vm_state::fdc_2hd_2dd_ctrl_w<1>));
 	map(0x00a0, 0x00af).rw(FUNC(pc9801vm_state::pc9801_a0_r), FUNC(pc9801vm_state::pc9801rs_a0_w)); //upd7220 bitmap ports / display registers
-	map(0x00bc, 0x00bf).rw(FUNC(pc9801vm_state::fdc_mode_ctrl_r), FUNC(pc9801vm_state::fdc_mode_ctrl_w));
+	map(0x00be, 0x00be).rw(FUNC(pc9801vm_state::fdc_mode_r), FUNC(pc9801vm_state::fdc_mode_w));
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0x00cc, 0x00cc).rw(FUNC(pc9801vm_state::fdc_2hd_ctrl_r), FUNC(pc9801vm_state::fdc_2hd_ctrl_w));
+	map(0x00cc, 0x00cc).rw(FUNC(pc9801vm_state::fdc_2hd_2dd_ctrl_r<0>), FUNC(pc9801vm_state::fdc_2hd_2dd_ctrl_w<0>));
 	map(0x00f0, 0x00ff).rw(FUNC(pc9801vm_state::a20_ctrl_r), FUNC(pc9801vm_state::a20_ctrl_w)).umask16(0x00ff);
 	map(0x0439, 0x0439).rw(FUNC(pc9801vm_state::dma_access_ctrl_r), FUNC(pc9801vm_state::dma_access_ctrl_w));
 	map(0x043c, 0x043f).w(FUNC(pc9801vm_state::pc9801rs_bank_w)); //ROM/RAM bank
@@ -1174,121 +1257,40 @@ CUSTOM_INPUT_MEMBER(pc98_base_state::system_type_r)
 
 static INPUT_PORTS_START( pc9801 )
 	PORT_START("DSW1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(RTC_TAG, upd1990a_device, data_out_r)
-	PORT_DIPNAME( 0x0002, 0x0000, "DSW1" ) // error beep if OFF
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Display Type" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(      0x0000, "Normal Display" )
-	PORT_DIPSETTING(      0x0008, "Hi-Res Display" )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "DSW5" ) // goes into basic with this off, PC-9801VF / PC-9801U setting
-	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // V30 / V33
-	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) // printer busy
-	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) // 8 / 4096
-	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // LCD display
-	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) //system clock = 5 MHz (0) / 8 MHz (1)
-	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(pc9801_state, system_type_r)
+	PORT_DIPNAME( 0x0001, 0x0001, "Display Type" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0000, "Normal Display (15KHz)" )
+	PORT_DIPSETTING(      0x0001, "Hi-Res Display (24KHz)" )
+	// TODO: "GFX" screen selections (routing?) for vanilla class
+	PORT_DIPUNKNOWN_DIPLOC( 0x002, 0x002, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x004, 0x004, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x008, 0x008, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x010, 0x010, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x020, 0x000, "SW1:6" )
+	// TODO: built-in RXC / TXC clocks for RS-232C (routing?) for vanilla class
+	PORT_DIPUNKNOWN_DIPLOC( 0x040, 0x000, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x080, 0x080, "SW1:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x100, 0x000, "SW1:9" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x200, 0x200, "SW1:10" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW1:1") //jumps to daa00 if off, presumably some card booting
+	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW2:1") //jumps to daa00 if off, presumably some card booting
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Terminal Mode" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Terminal Mode" ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Text width" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Text width" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "40 chars/line" )
 	PORT_DIPSETTING(    0x00, "80 chars/line" )
-	PORT_DIPNAME( 0x08, 0x00, "Text height" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Text height" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "20 lines/screen" )
 	PORT_DIPSETTING(    0x00, "25 lines/screen" )
-	PORT_DIPNAME( 0x10, 0x00, "Memory Switch Init" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, "Memory Switch Init" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) ) //Fix memory switch condition
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) ) //Initialize Memory Switch with the system default
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
-
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	PORT_START("MOUSE_X")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
@@ -1304,10 +1306,10 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2hd BIOS" )
+	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2HD BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
-	PORT_CONFNAME( 0x02, 0x02, "Load floppy 2dd BIOS" )
+	PORT_CONFNAME( 0x02, 0x02, "Load floppy 2DD BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( No ) )
 INPUT_PORTS_END
@@ -1315,23 +1317,39 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pc9801rs )
 	PORT_INCLUDE( pc9801 )
 
+	PORT_MODIFY("DSW1")
+	// LCD display, 98DO Demo explicitly wants it to be non-Plasma
+	PORT_DIPNAME( 0x04, 0x04, "Monitor Type" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "RGB" )
+	PORT_DIPSETTING(    0x00, "Plasma" )
+	PORT_DIPNAME( 0x80, 0x00, "Graphic Function" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "Basic (8 Colors)" )
+	PORT_DIPSETTING(    0x00, "Expanded (16/4096 Colors)" )
+	PORT_BIT(0x300, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x80, 0x80, "GDC clock" ) PORT_DIPLOCATION("SW1:8") // DSW 2-8
+	PORT_DIPNAME( 0x80, 0x80, "GDC clock" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "2.5 MHz" )
 	PORT_DIPSETTING(    0x00, "5 MHz" )
 
-	PORT_MODIFY("DSW4")
-	PORT_DIPNAME( 0x04, 0x00, "CPU Type" ) PORT_DIPLOCATION("SW4:8") // DSW 3-8
-	PORT_DIPSETTING(    0x04, "V30" )
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "FDD Fix Mode" ) PORT_DIPLOCATION("SW3:1")
+	// with this OFF enables PORT EXC (fdc mode bit 0)
+	PORT_DIPSETTING(    0x00, "Auto-Detection" )
+	PORT_DIPSETTING(    0x01, "Fixed" )
+	PORT_DIPNAME( 0x02, 0x02, "FDD Density Select" ) PORT_DIPLOCATION("SW3:!2")
+	PORT_DIPSETTING(    0x00, "2DD" )
+	PORT_DIPSETTING(    0x02, "2HD" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPNAME( 0x20, 0x20, "Conventional RAM size" ) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, "640 KB" )
+	PORT_DIPSETTING(    0x00, "512 KB" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPNAME( 0x80, 0x00, "CPU Type" ) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, "V30" )
 	PORT_DIPSETTING(    0x00, "I386" )
-
-	PORT_MODIFY("DSW5")
-	PORT_DIPNAME( 0x08, 0x00, "Graphic Function" ) // DSW 1-8
-	PORT_DIPSETTING(      0x08, "Basic (8 Colors)" )
-	PORT_DIPSETTING(      0x00, "Expanded (16/4096 Colors)"  )
-	PORT_DIPNAME( 0x10, 0x10, "Display Type" ) // LCD display, 98DO Demo explicitly wants it to be non-Plasma
-	PORT_DIPSETTING(      0x10, "RGB" )
-	PORT_DIPSETTING(      0x00, "Plasma" )
 
 	PORT_MODIFY("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1339,6 +1357,18 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc9801vm11 )
+	PORT_INCLUDE( pc9801rs )
+
+	PORT_MODIFY("DSW3")
+	// TODO: "CPU Add Waitstate Penalty"?
+	// specific for PC-98DO, CV21, UV11 and VM11
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
 
 static const gfx_layout charset_8x8 =
 {
@@ -1464,6 +1494,7 @@ uint8_t pc9801_state::dma_read_byte(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+
 	if(offset == 0xffff)
 	{
 		switch(m_dma_autoinc[m_dack])
@@ -1489,6 +1520,7 @@ void pc9801_state::dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+	
 	if(offset == 0xffff)
 	{
 		switch(m_dma_autoinc[m_dack])
@@ -1514,22 +1546,58 @@ void pc9801_state::set_dma_channel(int channel, int state)
 	if (!state) m_dack = channel;
 }
 
-WRITE_LINE_MEMBER(pc9801_state::dack0_w){ /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack1_w){ /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack2_w){ /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack3_w){ /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
-
 /*
 ch1 cs-4231a
 ch2 FDC
 ch3 SCSI
 */
 
-/****************************************
-*
-* PPI interfaces
-*
-****************************************/
+WRITE_LINE_MEMBER(pc9801_state::dack0_w){ /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
+WRITE_LINE_MEMBER(pc9801_state::dack1_w){ /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
+WRITE_LINE_MEMBER(pc9801_state::dack2_w){ /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
+WRITE_LINE_MEMBER(pc9801_state::dack3_w){ /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
+
+/*
+ * PPI "system" I/F
+ *
+ * Port A:
+ * xxxx xxxx DIP SW 2
+ *           ^ treated as RAM on pc98lt/ha and 9821Ap, As, Ae
+ *
+ * Port B:
+ * x--- ---- RS-232C CI signal (active low)
+ * -x-- ---- RS-232C CS signal (active low)
+ * --x- ---- RS-232C CD signal (active low)
+ * (normal)
+ * ---x ---- INT3 status for expansion bus
+ * ---- x--- DIP SW 1-1 (0) 15 kHz (1) 24 kHz
+ * ---- -x-- IMCK internal RAM parity error
+ * ---- --x- EMCK expansion RAM parity error
+ * ---- ---x CDAT RTC data read
+ * H98 overrides bits 4, 3 with SHUTx status
+ *
+ * Port C:
+ * x--- ---- (286+ machines) SHUT0 status
+ * -x-- ---- PSTBM printer PSTB mask
+ * --x- ---- (286+ machines) SHUT1 status
+ *           ^ pc98lt/ha: ROM drive write protection (active low)
+ * ---x ---- MCHKEN RAM parity check (0) invalid
+ * ---- x--- buzzer/DAC1BIT mute
+ * ---- -x-- TXRE interrupt enable for TXRDY in RS-232C
+ * ---- --x- TXEE interrupt enable for TXEMPTY in RS-232C
+ * ---- ---x RXRE interrupt enable for RXRDY in RS-232C
+ *
+ */
+
+u8 pc9801_state::ppi_sys_portb_r()
+{
+	u8 res = 0;
+	
+	res |= m_rtc->data_out_r();
+	res |= BIT(m_dsw1->read(), 0) << 3;
+
+	return res;
+}
 
 void pc98_base_state::ppi_sys_beep_portc_w(uint8_t data)
 {
@@ -1545,6 +1613,49 @@ void pc9801vm_state::ppi_sys_dac_portc_w(uint8_t data)
 }
 
 /*
+ * PPI "printer" I/F
+ *
+ * Port B:
+ * xx-- ---- TYP1, 0 system type
+ * 11-- ---- PC-9801U, PC98LT/HA
+ * 10-- ---- <everything else>
+ * 01-- ---- <undefined>
+ * 00-- ---- vanilla PC-9801
+ * --x- ---- MOD system clock
+ * --1- ---- CPU 8 MHz Timer 2 MHz
+ * --0- ---- CPU 5/10 MHz Timer 2.5 MHz
+ * ---x ---- DIP SW 1-3 plasma display (notebooks & pc98lt/ha only)
+ * ---- x--- DIP SW 1-8 analog 16 enable
+ * ---- -x-- Printer BUSY signal (active low)
+ * ---- --x- (normal) CPUT V30 mode
+ *           ^ (pc98lt/ha) CPUT system type
+ * ---- ---x VF flag (PC-9801VF, PC-9801U)
+ *           ^ ? only for models with built-in 2DD
+ *
+ */
+
+u8 pc9801_state::ppi_prn_portb_r()
+{
+	u8 res = 0;
+
+//	res |= BIT(m_dsw1->read(), 7) << 3; 
+//	res |= BIT(m_dsw1->read(), 2) << 4;
+	res |= m_sys_type << 6;
+
+	return res;
+}
+
+u8 pc9801vm_state::ppi_prn_portb_r()
+{
+	u8 res = pc9801_state::ppi_prn_portb_r();
+
+	res |= BIT(m_dsw1->read(), 7) << 3; 
+	res |= BIT(m_dsw1->read(), 2) << 4;
+
+	return res;
+}
+
+/*
  * Mouse 8255 I/F
  *
  * Port A:
@@ -1555,6 +1666,13 @@ void pc9801vm_state::ppi_sys_dac_portc_w(uint8_t data)
  * ---? ---- <unused>
  * ---- xxxx MD3-0 mouse direction latch
  *
+ * Port B:
+ * x--- ---- H98 only: DIP SW 1-4 (FDD external drive select)
+ * -x-- ---- DIP SW 3-6: conventional RAM size (RAMKL)
+ * ---x ---- PC98RL only: DIP SW 3-3 SASI DMA channel 0
+ * ---- --x- SPDSW readout: selects CPU clock speed for 286/386 equipped machines
+ * ---- ---x SPDSW readout for H98
+ *
  * Port C:
  *
  * x--- ---- HC Latch Mode (1=read latch, 0=read delta)
@@ -1562,16 +1680,19 @@ void pc9801vm_state::ppi_sys_dac_portc_w(uint8_t data)
  * -x-- ---- SXY Axis select (1=Y 0=X)
  * --x- ---- SHL Read nibble select (1) upper (0) lower
  * ---x ---- INT # (1) disable (0) enable
+ * ---- x--- (r/o) H98 only: MODSW (0) High-reso mode (1) Normal mode
+ * ---- -x-- (r/o) CPUSW: DIP SW 3-8 (1) V30 compatible mode
+ * ---- --xx (r/o) RS-232C sync mode settings, DIP SWs 1-6 & 1-5
  *
  * Reading Port B and Port C low nibble are misc DIPSW selectors,
  * their meaning diverges on XA/XL/RL classes vs. the rest.
  *
  */
 
-uint8_t pc9801_state::ppi_mouse_porta_r()
+u8 pc9801_state::ppi_mouse_porta_r()
 {
-	uint8_t res = ioport("MOUSE_B")->read() & 0xf0;
-	const uint8_t isporthi = ((m_mouse.control & 0x20) >> 5)*4;
+	u8 res = ioport("MOUSE_B")->read() & 0xf0;
+	const u8 isporthi = ((m_mouse.control & 0x20) >> 5)*4;
 
 	if ((m_mouse.control & 0x80) == 0)
 	{
@@ -1597,9 +1718,19 @@ void pc9801_state::ppi_mouse_porta_w(uint8_t data)
 //  logerror("A %02x\n",data);
 }
 
+u8 pc9801vm_state::ppi_mouse_portb_r()
+{
+	return (BIT(m_dsw3->read(), 5) << 6) | 2;
+}
+
 void pc9801_state::ppi_mouse_portb_w(uint8_t data)
 {
-//  logerror("B %02x\n",data);
+	logerror("%s: PPI mouse port B %02x\n", machine().describe_context() ,data);
+}
+
+u8 pc9801vm_state::ppi_mouse_portc_r()
+{
+	return (BIT(m_dsw3->read(), 7) << 2); 
 }
 
 void pc9801_state::ppi_mouse_portc_w(uint8_t data)
@@ -1719,27 +1850,21 @@ WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_irq )
+WRITE_LINE_MEMBER( pc9801vm_state::fdc_irq_w )
 {
-	/* 0xffaf8 */
-
-	//logerror("%02x %d\n",m_fdc_ctrl,state);
-
-	if(m_fdc_ctrl & 1)
+	if(m_fdc_mode & 1)
 		m_pic2->ir3_w(state);
 	else
 		m_pic2->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER( pc9801vm_state::pc9801rs_fdc_drq )
+WRITE_LINE_MEMBER( pc9801vm_state::fdc_drq_w )
 {
-	if(m_fdc_ctrl & 1)
+	if(m_fdc_mode & 1)
 		m_dmac->dreq2_w(state ^ 1);
 	else
 		m_dmac->dreq3_w(state ^ 1);
 }
-#endif
 
 uint32_t pc9801vm_state::a20_286(bool state)
 {
@@ -1784,6 +1909,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 
 	m_fdc_2hd->set_rate(500000);
 	m_fdc_2dd->set_rate(250000);
+	// TODO: set_rpm for m_fdc_2dd?
 	m_sys_type = 0x00 >> 6;
 }
 
@@ -1793,6 +1919,8 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 
 	m_sys_type = 0x80 >> 6;
 
+	m_fdc_timer = timer_alloc(TIMER_FDC_TRIGGER);
+	
 	save_item(NAME(m_dac1bit_disable));
 
 	save_item(NAME(m_dma_access_ctrl));
@@ -1861,7 +1989,8 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
 	m_gate_a20 = 0;
-	m_fdc_ctrl = 3;
+	m_fdc_mode = 3;
+	fdc_set_density_mode(true); // 2HD
 	// 0xfb on PC98XL
 	m_dma_access_ctrl = 0xfe;
 	m_ide_sel = 0;
@@ -1944,13 +2073,17 @@ void pc9801_state::pit_clock_config(machine_config &config, const XTAL clock)
 
 void pc9801_state::pc9801_mouse(machine_config &config)
 {
-	i8255_device &ppi_mouse(I8255(config, "ppi8255_mouse"));
-	ppi_mouse.in_pa_callback().set(FUNC(pc9801_state::ppi_mouse_porta_r));
-	ppi_mouse.out_pa_callback().set(FUNC(pc9801_state::ppi_mouse_porta_w));
-	ppi_mouse.in_pb_callback().set_ioport("DSW3");
-	ppi_mouse.out_pb_callback().set(FUNC(pc9801_state::ppi_mouse_portb_w));
-	ppi_mouse.in_pc_callback().set_ioport("DSW4");
-	ppi_mouse.out_pc_callback().set(FUNC(pc9801_state::ppi_mouse_portc_w));
+	I8255(config, m_ppi_mouse);
+	m_ppi_mouse->in_pa_callback().set(FUNC(pc9801_state::ppi_mouse_porta_r));
+	m_ppi_mouse->out_pa_callback().set(FUNC(pc9801_state::ppi_mouse_porta_w));
+	// Regular vanilla doesn't have readouts of these
+	// (since mouse isn't built-in but comes from an external board at best)
+//	m_ppi_mouse->in_pb_callback().set_ioport("DSW3");
+	m_ppi_mouse->in_pb_callback().set_constant(0xff);
+	m_ppi_mouse->out_pb_callback().set(FUNC(pc9801_state::ppi_mouse_portb_w));
+//	m_ppi_mouse->in_pc_callback().set_ioport("DSW4");
+	m_ppi_mouse->in_pc_callback().set_constant(0xff);
+	m_ppi_mouse->out_pc_callback().set(FUNC(pc9801_state::ppi_mouse_portc_w));
 
 	// TODO: timing is configurable
 	TIMER(config, "mouse_timer").configure_periodic(FUNC(pc9801_state::mouse_irq_cb), attotime::from_hz(120));
@@ -2065,13 +2198,13 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 	I8255(config, m_ppi_sys, 0);
 	m_ppi_sys->in_pa_callback().set_ioport("DSW2");
-	m_ppi_sys->in_pb_callback().set_ioport("DSW1");
+	m_ppi_sys->in_pb_callback().set(FUNC(pc9801_state::ppi_sys_portb_r));
 	m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 //  m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_portc_w));
 
 	I8255(config, m_ppi_prn, 0);
-	// TODO: check this one
-	m_ppi_prn->in_pb_callback().set_ioport("DSW5");
+	// TODO: other ports
+	m_ppi_prn->in_pb_callback().set(FUNC(pc9801_state::ppi_prn_portb_r));
 
 	pc9801_keyboard(config);
 	pc9801_mouse(config);
@@ -2084,8 +2217,8 @@ void pc9801_state::pc9801_common(machine_config &config)
 	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
 	m_fdc_2hd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
-	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
+	FLOPPY_CONNECTOR(config, "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 
 	i8255_device &ppi_fdd(I8255(config, "ppi8255_fdd"));
 	ppi_fdd.in_pa_callback().set_constant(0xff);
@@ -2171,6 +2304,9 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 	// TODO: verify if it needs invert();
 	m_pit->out_handler<1>().set( m_dac1bit, FUNC(speaker_sound_device::level_w));
 
+	m_ppi_mouse->in_pb_callback().set(FUNC(pc9801vm_state::ppi_mouse_portb_r));
+	m_ppi_mouse->in_pc_callback().set(FUNC(pc9801vm_state::ppi_mouse_portc_r));
+
 	ADDRESS_MAP_BANK(config, m_ipl).set_map(&pc9801vm_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
@@ -2182,6 +2318,9 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 	UPD4990A(config, m_rtc);
 
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
+
+	m_fdc_2hd->intrq_wr_callback().set(FUNC(pc9801vm_state::fdc_irq_w));
+	m_fdc_2hd->drq_wr_callback().set(FUNC(pc9801vm_state::fdc_drq_w));
 
 	m_hgdc[1]->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
 
@@ -2290,7 +2429,7 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 
 /*
-F - 8086 5
+F - 8086 8
 */
 
 ROM_START( pc9801f )
@@ -2693,7 +2832,7 @@ COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9
 
 // VM class (V30)
 COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
-COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC", 
+COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801vm11, pc9801vm_state, init_pc9801_kanji,   "NEC", 
   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // UX class (i286)
