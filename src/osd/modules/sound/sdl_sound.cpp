@@ -284,7 +284,7 @@ void sound_sdl::update_audio_stream(bool is_throttled, const int16_t *buffer, in
 void sound_sdl::set_mastervolume(int _attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	attenuation = std::max(std::min(_attenuation, 0), -32);
+	attenuation = std::clamp(_attenuation, -32, 0);
 
 	if (stream_in_initialized)
 	{
@@ -373,7 +373,7 @@ int sound_sdl::init(const osd_options &options)
 		sdl_xfer_samples = obtained.samples;
 
 		// pin audio latency
-		audio_latency = std::max(std::min(m_audio_latency, MAX_AUDIO_LATENCY), 1);
+		audio_latency = std::clamp(m_audio_latency, 1, MAX_AUDIO_LATENCY);
 
 		// compute the buffer sizes
 		stream_buffer_size = (sample_rate() * 2 * sizeof(int16_t) * (2 + audio_latency)) / 30;

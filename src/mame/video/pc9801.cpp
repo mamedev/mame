@@ -77,7 +77,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pc9821_hgdc_display_pixels )
 			int res_x = x + xi;
 			int res_y = y;
 
-			uint8_t pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x40000)];
+			uint8_t pen = ext_gvram[(address)*16+xi+(m_vram_disp*0x40000)];
 
 			bitmap.pix(res_y, res_x) = palette[pen + 0x20];
 		}
@@ -103,6 +103,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 	uint8_t char_size = m_video_ff[FONTSEL_REG] ? 16 : 8;
 
 	uint8_t x_step;
+	uint8_t lastul = 0;
 	for(int x=0;x<pitch;x+=x_step)
 	{
 		uint32_t tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
@@ -192,7 +193,11 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					}
 
 					if(reverse) { tile_data^=0xff; }
-					if(u_line && yi == lr-1) { tile_data = 0xff; }
+					if(yi == lr-1)
+					{
+						if(u_line) tile_data = 0x0f;
+						if(lastul) tile_data |= 0xf0;
+					}
 					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
@@ -221,6 +226,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					}
 				}
 			}
+			lastul = u_line;
 		}
 	}
 }

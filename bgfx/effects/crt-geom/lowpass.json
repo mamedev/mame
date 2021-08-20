@@ -1,28 +1,28 @@
 {
-    "blend": {
-        "equation": "add",
-        "srcColor": "1",
-        "dstColor": "0",
-        "srcAlpha": "1",
-        "dstAlpha": "0"
-    },
-    "depth": {
-        "function": "always",
-        "writeenable": false
-    },
-    "cull": {
-        "mode": "none"
-    },
-    "write": {
-        "rgb": true,
-        "alpha": true
-    },
-    "vertex": "chains/crt-geom/vs_lowpass",
-    "fragment": "chains/crt-geom/fs_lowpass",
-    "uniforms": [
-        { "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-        { "name": "u_lowpass_cutoff","type": "vec4", "values": [ 200.0, 0.0, 0.0, 0.0 ] },
-        { "name": "u_lowpass_width", "type": "vec4", "values": [  80.0, 0.0, 0.0, 0.0 ] },
-        { "name": "s_screen",     "type": "int",  "values": [ 0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+	"vertex": "chains/crt-geom/vs_lowpass",
+	"fragment": "chains/crt-geom/fs_lowpass",
+	"uniforms": [
+		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_lowpass_cutoff","type": "vec4", "values": [ 200.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_lowpass_width", "type": "vec4", "values": [  80.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "s_screen",        "type": "int",  "values": [ 0 ] }
+	]
 }

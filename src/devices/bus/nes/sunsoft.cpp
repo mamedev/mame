@@ -16,7 +16,7 @@
  * Sunsoft-5B [mapper 69]
 
  TODO:
- - check 1-line glitches due to IRQ in Sunsoft-3
+ - 1-line glitches in Fantasy Zone II (Sunsoft-3) seem to be PPU timing related. The cycle-based IRQ timer below "should" be ok.
 
  ***********************************************************************************************************/
 
@@ -136,6 +136,7 @@ void nes_sunsoft_3_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
+
 	m_irq_toggle = 0;
 	m_irq_count = 0;
 	m_irq_enable = 0;
@@ -256,28 +257,20 @@ void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 
  Sunsoft-3 board emulation
 
- The two games using this board have incompatible mirroring
- wiring, making necessary two distinct mappers & pcb_id
+ Games: Fantasy Zone II, Mito Koumon II - Sekai Manyuki
 
  iNES: mapper 67
 
  -------------------------------------------------*/
 
-
 void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
-		if (m_irq_enable)
+		if (m_irq_enable && --m_irq_count == 0xffff)
 		{
-			if (!m_irq_count)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_count = 0xffff;
-				m_irq_enable = 0;
-			}
-			else
-				m_irq_count--;
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
 		}
 	}
 }
@@ -289,18 +282,11 @@ void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 	switch (offset & 0x7800)
 	{
 		case 0x0800:
-			chr2_0(data, CHRROM);
-			break;
 		case 0x1800:
-			chr2_2(data, CHRROM);
-			break;
 		case 0x2800:
-			chr2_4(data, CHRROM);
-			break;
 		case 0x3800:
-			chr2_6(data, CHRROM);
+			chr2_x((offset >> 11) & 0x06, data & 0x3f, CHRROM);
 			break;
-		case 0x4000:
 		case 0x4800:
 			m_irq_toggle ^= 1;
 			if (m_irq_toggle)
@@ -311,7 +297,6 @@ void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 		case 0x5800:
 			m_irq_enable = BIT(data, 4);
 			m_irq_toggle = 0;
-			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x6800:
 			switch (data & 3)
@@ -323,10 +308,10 @@ void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 			}
 			break;
 		case 0x7800:
-			prg16_89ab(data);
+			prg16_89ab(data & 0x0f);
 			break;
 		default:
-			LOG_MMC(("Sunsoft 3 write_h uncaught write, offset: %04x, data: %02x\n", offset, data));
+			set_irq_line(CLEAR_LINE);
 			break;
 	}
 }

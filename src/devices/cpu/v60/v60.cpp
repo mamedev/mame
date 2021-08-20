@@ -497,7 +497,6 @@ void v60_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", PC).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_PPC ).noshow();
-	state_add( STATE_GENSP, "GENSP", SP ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).callimport().formatstr("%7s").noshow();
 
 	set_icountptr(m_icount);

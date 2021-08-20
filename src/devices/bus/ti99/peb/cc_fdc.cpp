@@ -102,7 +102,7 @@ void corcomp_fdc_device::setaddress_dbin(offs_t offset, int state)
 /*
     Provides the current address to the PALs.
 */
-uint16_t corcomp_fdc_device::get_address()
+offs_t corcomp_fdc_device::get_address()
 {
 	return m_address;
 }
@@ -133,7 +133,7 @@ bool corcomp_fdc_device::write_access()
 */
 void corcomp_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
-	uint16_t saveaddress = m_address;
+	offs_t saveaddress = m_address;
 
 	m_address = offset;
 	*value = 0x00;
@@ -147,7 +147,7 @@ void corcomp_fdc_device::debug_read(offs_t offset, uint8_t* value)
 	if (m_ctrlpal->selectdsr())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x2000 : 0;
+		offs_t base = m_banksel? 0x2000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x1fff)];
 		*value = *rom;
 	}
@@ -156,7 +156,7 @@ void corcomp_fdc_device::debug_read(offs_t offset, uint8_t* value)
 
 void corcomp_fdc_device::debug_write(offs_t offset, uint8_t data)
 {
-	uint16_t saveaddress = m_address;
+	offs_t saveaddress = m_address;
 	m_address = offset;
 	if (m_ctrlpal->selectram())
 	{
@@ -219,7 +219,7 @@ void corcomp_fdc_device::readz(offs_t offset, uint8_t *value)
 	if (m_ctrlpal->selectdsr())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x2000 : 0;
+		offs_t base = m_banksel? 0x2000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x1fff)];
 		*value = *rom;
 

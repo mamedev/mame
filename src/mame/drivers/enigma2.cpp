@@ -19,6 +19,7 @@ enigma2b (1981)
 
 TODO:
  - enigma2  - Star blinking frequency
+ - enigma2  - Sound is incorrectly emulated (see MT07777)
  - enigma2a + enigma2b - bad sound ROM?
 
 
@@ -124,12 +125,15 @@ DIP Switches
 *********************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 #define LOG_PROT    (0)
 
@@ -613,25 +617,25 @@ static INPUT_PORTS_START( enigma2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x1c, 0x00, "Skill Level" )         PORT_DIPLOCATION("DSW:6,7,8")
+	PORT_DIPNAME( 0x1c, 0x00, "Skill Level" )         PORT_DIPLOCATION("DSW:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x14, "6" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )    PORT_DIPLOCATION("DSW:3")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )    PORT_DIPLOCATION("DSW:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, "Number of Invaders" )  PORT_DIPLOCATION("DSW:5")
+	PORT_DIPNAME( 0x40, 0x40, "Number of Invaders" )  PORT_DIPLOCATION("DSW:!5")
 	PORT_DIPSETTING(    0x40, "16" )
 	PORT_DIPSETTING(    0x00, "32" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW:4")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW:!4")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
@@ -818,6 +822,7 @@ void enigma2_state::init_enigma2()
 	}
 }
 
+} // Anonymous namespace
 
 
 GAME( 1981, enigma2,  0,       enigma2,  enigma2,  enigma2_state, init_enigma2, ROT270, "Game Plan (Zilec Electronics license)", "Enigma II",                             MACHINE_SUPPORTS_SAVE )

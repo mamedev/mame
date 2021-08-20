@@ -1683,7 +1683,6 @@ void z180_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     _PCD).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_PREPC.w.l).noshow();
 		state_add(Z180_SP,         "SP",        m_SP.w.l);
-		state_add(STATE_GENSP,     "GENSP",     m_SP.w.l).noshow();
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_AF.b.l).noshow().formatstr("%8s");
 		state_add(Z180_A,          "A",         _A).noshow();
 		state_add(Z180_B,          "B",         _B).noshow();

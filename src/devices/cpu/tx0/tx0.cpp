@@ -15,8 +15,9 @@
 #include "tx0dasm.h"
 #include "debugger.h"
 
-#define LOG 0
-#define LOG_EXTRA 0
+#define LOG_RIM (1 << 1U)
+//#define VERBOSE (LOG_RIM)
+#include "logmacro.h"
 
 
 #define READ_TX0_18BIT(A) ((signed)m_program->read_dword(A))
@@ -255,9 +256,6 @@ void tx0_64kw_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(PC);
-
-
 		if (m_ioh && m_ios)
 		{
 			m_ioh = 0;
@@ -265,7 +263,10 @@ void tx0_64kw_device::execute_run()
 
 
 		if ((! m_run) && (! m_rim))
+		{
+			debugger_instruction_hook(PC);
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
+		}
 		else if (m_rim)
 		{
 			switch (m_rim_step)
@@ -295,6 +296,7 @@ void tx0_64kw_device::execute_run()
 						m_rim = 0;  /* exit read-in mode */
 						m_run = (IR == 2) ? 1 : 0;  /* stop if add instruction */
 						m_rim_step = 0;
+						LOGMASKED(LOG_RIM, "RIM %s: PC <- %06o\n", (IR == 2) ? "start" : "stop", PC);
 					}
 					else if ((IR == 0) || (IR == 3))    /* sto or opr instruction? */
 					{
@@ -321,6 +323,7 @@ void tx0_64kw_device::execute_run()
 				{   /* data transfer complete */
 					m_ios = 0;
 
+					LOGMASKED(LOG_RIM, "RIM transfer: %06o <- %06o\n", MAR, AC);
 					tx0_write(MAR, MBR = AC);
 
 					m_rim_step = 0;
@@ -332,6 +335,7 @@ void tx0_64kw_device::execute_run()
 		{
 			if (m_cycle == 0)
 			{   /* fetch new instruction */
+				debugger_instruction_hook(PC);
 				MBR = tx0_read(MAR = PC);
 				INCREMENT_PC_64KW;
 				IR = MBR >> 16;     /* basic opcode */
@@ -358,9 +362,6 @@ void tx0_8kw_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(PC);
-
-
 		if (m_ioh && m_ios)
 		{
 			m_ioh = 0;
@@ -368,7 +369,10 @@ void tx0_8kw_device::execute_run()
 
 
 		if ((! m_run) && (! m_rim))
+		{
+			debugger_instruction_hook(PC);
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
+		}
 		else if (m_rim)
 		{
 			switch (m_rim_step)
@@ -398,6 +402,7 @@ void tx0_8kw_device::execute_run()
 						m_rim = 0;  /* exit read-in mode */
 						m_run = (IR == 16) ? 1 : 0; /* stop if add instruction */
 						m_rim_step = 0;
+						LOGMASKED(LOG_RIM, "RIM %s: PC <- %05o\n", (IR == 16) ? "start" : "stop", PC);
 					}
 					else if ((IR == 0) || (IR == 24))   /* sto or opr instruction? */
 					{
@@ -424,6 +429,7 @@ void tx0_8kw_device::execute_run()
 				{   /* data transfer complete */
 					m_ios = 0;
 
+					LOGMASKED(LOG_RIM, "RIM transfer: %05o <- %06o\n", MAR, AC);
 					tx0_write(MAR, MBR = AC);
 
 					m_rim_step = 0;
@@ -435,6 +441,7 @@ void tx0_8kw_device::execute_run()
 		{
 			if (m_cycle == 0)
 			{   /* fetch new instruction */
+				debugger_instruction_hook(PC);
 				MBR = tx0_read(MAR = PC);
 				INCREMENT_PC_8KW;
 				IR = MBR >> 13;     /* basic opcode */
@@ -551,6 +558,8 @@ void tx0_64kw_device::execute_instruction_64kw()
 			break;
 
 		case 3:     /* OPeRate */
+			MBR = 0;
+
 			if ((MAR & 0000104) == 0000100)
 				/* (1.1) PEN = Read the light pen flip-flops 1 and 2 into AC(0) and
 				    AC(1). */
@@ -560,19 +569,19 @@ void tx0_64kw_device::execute_instruction_64kw()
 				/* (1.1) TAC = Insert a one in each digital position of the AC
 				    wherever there is a one in the corresponding digital position
 				    of the TAC. */
-				/*...*/ { }
-
-			if (MAR & 0000040)
-				/* (1.2) COM = Complement every digit in the accumulator */
-				AC ^= 0777777;
+				AC |= m_tac;
 
 			if ((MAR & 0000003) == 1)
 				/* (1.2) AMB = Store the contents of the AC in the MBR. */
 				MBR = AC;
 
+			if (MAR & 0000040)
+				/* (1.2) COM = Complement every digit in the accumulator */
+				AC ^= 0777777;
+
 			if ((MAR & 0000003) == 3)
 				/* (1.2) TBR = Store the contents of the TBR in the MBR. */
-				/*...*/ { }
+				MBR |= m_tbr;
 
 			if ((MAR & 0000003) == 2)
 				/* (1.3) LMB = Store the contents of the LR in the MBR. */
@@ -633,8 +642,6 @@ void tx0_device::indexed_address_eval()
 {
 	MAR = MAR + XR;
 	MAR = (MAR + (MAR >> 14)) & 0037777;    /* propagate carry around */
-	if (MAR & 0020000)          /* fix negative (right???) */
-		MAR = (MAR + 1) & 0017777;
 }
 
 /* execute one instruction */
@@ -921,6 +928,9 @@ void tx0_8kw_device::execute_instruction_8kw()
 					/* (1.1) TAC = transfer TAC into ac (inclusive or) */
 					AC |= m_tac;
 
+				if ((IR & 002) == 00)
+					MBR = 0; // MBR cleared at 1.1
+
 				if (((IR & 001) == 00) && ((MAR & 017000) == 002000))
 					/* (1.2) TBR = transfer TBR into mbr (inclusive or) */
 					MBR |= m_tbr;
@@ -953,8 +963,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 						break;
 
 					default:
-						if (LOG)
-							logerror("unrecognized instruction");
+						LOG("unrecognized instruction\n");
 						break;
 					}
 				}
@@ -991,8 +1000,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 						break;
 
 					default:
-						if (LOG)
-							logerror("unrecognized instruction");
+						LOG("unrecognized instruction\n");
 						break;
 					}
 				}

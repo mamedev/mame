@@ -3,7 +3,7 @@
 
 /*
    Hyllian Smart-Blur Shader
-  
+
    Copyright (C) 2011-2016 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,29 +27,29 @@
 */
 
 {
-    "blend": {
-    	"equation": "add",
-    	"srcColor": "1",
-    	"dstColor": "0",
-    	"srcAlpha": "1",
-    	"dstAlpha": "0"
-    },
-    "depth": {
-    	"function": "always",
-    	"writeenable": false
-    },
-    "cull": {
-    	"mode": "none"
-    },
-    "write": {
-    	"rgb": true,
-    	"alpha": true
-    },
-    "vertex": "chains/blurs/vs_smart-blur",
-    "fragment": "chains/blurs/fs_smart-blur",
-    "uniforms": [
-    	{ "name": "s_p",          "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "SB_THRESHOLD", "type": "vec4", "values": [ 0.2, 0.2, 0.2, 0.0 ] },
-    	{ "name": "u_tex_size0",  "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+	"vertex": "chains/blurs/vs_smart-blur",
+	"fragment": "chains/blurs/fs_smart-blur",
+	"uniforms": [
+		{ "name": "s_p",          "type": "int",  "values": [ 1.0 ] },
+		{ "name": "SB_THRESHOLD", "type": "vec4", "values": [ 0.2, 0.2, 0.2, 0.0 ] },
+		{ "name": "u_tex_size0",  "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+	]
 }

@@ -3071,6 +3071,24 @@ ROM_START( pbobble )
 	ROM_LOAD( "pb-ic15.bin", 0x000000, 0x100000, CRC(0840cbc4) SHA1(1adbd7aef44fa80832f63dfb8efdf69fd7256a57) )
 ROM_END
 
+ROM_START( bublbust ) // Purportedly a location test version, but has the same version number and build date as the released Japanese set below
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 512k for 68000 code - located on Taito C0503005B main board
+	ROM_LOAD16_BYTE( "p.bobble_prg_h_kyotsu_6-15_c681.ic18", 0x00000, 0x40000, CRC(ba83e398) SHA1(2512ea5a805f0e5c470c4d216d679f3dc3c4aa82) ) // hand written label P.ボブル PRG H 共通 6/15 C681
+	ROM_LOAD16_BYTE( "p.bobble_prg_l_usa_6-15_e9e1.ic2",  0x00001, 0x40000, CRC(a12cb3f2) SHA1(06271d3a0af101a959e6e777f1f9e99bae1e6076) ) // hand written label P.ボブル PRG L USA 6/15 E9E1
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 128k for Z80 code - located on Taito C0503005B main board
+	ROM_LOAD( "prg_snd.ic27", 0x00000, 0x20000, CRC(2f288fe0) SHA1(4ba707f4b3a1ca0e573652d1c733ee889f9fef8a) ) // hand written label PRG SND IC 27 - no checksum listed
+
+	ROM_REGION( 0x100000, "tc0180vcu", 0 ) // located on Taito C0503002A ROM PCB
+	ROM_LOAD16_BYTE( "p.bobble_chr-1l_6-14_eaa0.ic11_ch_1_0l", 0x00000, 0x40000, CRC(8d3fa2f0) SHA1(3d36944e35081740469df61a40e538eb94ea2ef6) ) // hand written label P.ボブル CHR 1L 6/14 EAA0
+	ROM_LOAD16_BYTE( "p.bobble_chr-1h_6-14_1515.ic12_ch_1_0h", 0x00001, 0x40000, CRC(a2eb4d32) SHA1(571811a543af50cc5e0f1d7aad9fc388919e93e6) ) // hand written label P.ボブル CHR 1H 6/14 1515
+	ROM_LOAD16_BYTE( "p.bobble_chr-0l_6-14_86d5.ic7_ch_0_0l",  0x80000, 0x40000, CRC(80f1aab0) SHA1(f5cdb93aa702fb8ba91eaf8f470b6e2a61a581b5) ) // hand written label P.ボブル CHR 0L 6/14 86D5
+	ROM_LOAD16_BYTE( "p.bobble_chr-0h_6-14_d180.ic8_ch_0_0h",  0x80001, 0x40000, CRC(d773cac8) SHA1(b008a21c39650a28cba402cd1c4de0567e275bc9) ) // hand written label P.ボブル CHR 0H 6/14 D180 (label torn, checksum illegible besides final 0)
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // located on Taito C0503002A ROM PCB - Half the size of the Japanese ADPCMA sample ROM
+	ROM_LOAD( "cr40-kaigai-7bec.ic15_ach_0", 0x00000, 0x80000, CRC(f203ae52) SHA1(d41b880ef17eea6614e2911318db5cd070473381) ) // hand written label CR40 海外 7BEC
+ROM_END
+
 ROM_START( spacedx )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "d89-06",     0x00000, 0x40000, CRC(7122751e) SHA1(4b4eb58af28f1988ff102251407449d0affbd4c2) )
@@ -3556,7 +3574,8 @@ GAME( 1993, ryujina,  ryujin,  selfeena, ryujin,    taitob_state, init_taito_b, 
 
 GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0J   1994/06/15  15:28:30
+GAME( 1994, bublbust, pbobble, pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Bubble Buster (USA, B-System)",   MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0A   1994/06/15  15:28:30 - Location test but same build as Japan release?
 
 GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", MACHINE_SUPPORTS_SAVE )

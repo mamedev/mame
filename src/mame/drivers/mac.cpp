@@ -882,11 +882,15 @@ void mac_state::maciifx(machine_config &config)
 	sccpic.hint_callback().set(FUNC(mac_state::oss_interrupt<7>));
 
 	m_scc->intrq_callback().set("sccpic", FUNC(applepic_device::pint_w));
+	//m_scc->dtr_reqa_callback().set("sccpic", FUNC(applepic_device::reqa_w));
+	//m_scc->dtr_reqb_callback().set("sccpic", FUNC(applepic_device::reqb_w));
 
 	applepic_device &swimpic(APPLEPIC(config, "swimpic", C15M));
 	swimpic.prd_callback().set(m_fdc, FUNC(applefdintf_device::read));
 	swimpic.pwr_callback().set(m_fdc, FUNC(applefdintf_device::write));
 	swimpic.hint_callback().set(FUNC(mac_state::oss_interrupt<6>));
+
+	m_fdc->dat1byte_cb().set("swimpic", FUNC(applepic_device::reqa_w));
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("4M");

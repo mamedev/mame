@@ -108,8 +108,7 @@ renderer_bgfx::renderer_bgfx(std::shared_ptr<osd_window> w)
 renderer_bgfx::~renderer_bgfx()
 {
 	bgfx::reset(0, 0, BGFX_RESET_NONE);
-	//bgfx::touch(0);
-	//bgfx::frame();
+
 	if (m_avi_writer != nullptr && m_avi_writer->recording())
 	{
 		m_avi_writer->stop();
@@ -125,6 +124,9 @@ renderer_bgfx::~renderer_bgfx()
 	}
 
 	// Cleanup.
+	if (m_ortho_view)
+		delete m_ortho_view;
+
 	delete m_chains;
 	delete m_effects;
 	delete m_shaders;
@@ -174,8 +176,6 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	return wmi.info.cocoa.window;
 #   elif BX_PLATFORM_WINDOWS
 	return wmi.info.win.window;
-#   elif BX_PLATFORM_STEAMLINK
-	return wmi.info.vivante.window;
 #   elif BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_ANDROID
 	return nullptr;
 #   endif // BX_PLATFORM_
@@ -200,9 +200,6 @@ inline bool sdlSetWindow(SDL_Window* _window)
 #   elif BX_PLATFORM_WINDOWS
 	pd.ndt          = NULL;
 	pd.nwh          = wmi.info.win.window;
-#   elif BX_PLATFORM_STEAMLINK
-	pd.ndt          = wmi.info.vivante.display;
-	pd.nwh          = wmi.info.vivante.window;
 #   endif // BX_PLATFORM_
 	pd.context      = NULL;
 	pd.backBuffer   = NULL;
@@ -354,7 +351,7 @@ int renderer_bgfx::create()
 	m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
-	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
+	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::BGRA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
 
 	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
@@ -396,8 +393,8 @@ void renderer_bgfx::record()
 	else
 	{
 		m_avi_writer->record(m_options.bgfx_avi_name());
-		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::RGBA8, m_width[0], m_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
-		m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
+		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::BGRA8, m_width[0], m_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
+		m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
 
 		if (m_avi_view == nullptr)
 		{
@@ -604,9 +601,9 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	bgfx::TextureHandle texture = BGFX_INVALID_HANDLE;
 	if (is_screen)
 	{
-		const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_argb32(prim->flags & PRIMFLAG_TEXFORMAT_MASK
+		const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgra32(prim->flags & PRIMFLAG_TEXFORMAT_MASK
 			, tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
-		texture = bgfx::createTexture2D(tex_width, tex_height, false, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
+		texture = bgfx::createTexture2D(tex_width, tex_height, false, 1, bgfx::TextureFormat::BGRA8, texture_flags, mem);
 	}
 	else
 	{
@@ -1169,10 +1166,11 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 				continue;
 			}
 			m_hash_to_entry[rect.hash()] = rect;
-			bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::RGBA8;
+			bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 			uint16_t pitch = rect.width();
-			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, rect.format(), rect.rowpixels(), rect.height(), rect.palette(), rect.base(), &pitch);
-			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem, pitch);
+			int convert_stride = 1;
+			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, rect.format(), rect.rowpixels(), rect.height(), rect.palette(), rect.base(), pitch, convert_stride);
+			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), rect.width() / convert_stride, rect.height(), mem, pitch);
 		}
 	}
 }

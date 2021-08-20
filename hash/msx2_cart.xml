@@ -755,10 +755,10 @@ LZ93A13 (32 pin) - 8KB banks
             <feature name="mapper" value="M60002-0115FP" />
             <feature name="sram" value="D4464C-20L" />
             <dataarea name="rom" size="">
-                <rom name="jr_mate_1_v1.0" size="131072" crc="" sha1="" offset="0" />
-                <rom name="jr_mate_2_v1.0" size="131072" crc="" sha1="" offset="0x20000" />
+                <rom name="jr_mate_1_v1.0" size="131072" crc="" sha1="" offset="0" status="nodump" />
+                <rom name="jr_mate_2_v1.0" size="131072" crc="" sha1="" offset="0x20000" status="nodump" />
                 <!- Kanji rom ->
-                <rom name="tc531000p-6616" size="131072" crc="" sha1="" offset="0x40000" />
+                <rom name="tc531000p-6616" size="131072" crc="" sha1="" offset="0x40000" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -842,7 +842,7 @@ LZ93A13 (32 pin) - 8KB banks
             <feature name="slot" value="ascii8" />
             <feature name="mapper" value="NEOS MR6401" />
             <dataarea name="rom" size="131072">
-                <rom name="rp231024d" size="131072" crc="" sha1="" offset="0" />
+                <rom name="rp231024d" size="131072" crc="" sha1="" offset="0" status="nodump" />
             </dataarea>
         </part>
     </software>

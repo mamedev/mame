@@ -22,8 +22,8 @@
 
 #include <algorithm>
 
-static constexpr s32 clip16(int x) { return std::min(32767, std::max(-32768, x)); }
-static constexpr s32 clip18(int x) { return std::min(131071, std::max(-131072, x)); }
+static constexpr s32 clip16(int x) { return std::clamp(x, -32768, 32767); }
+static constexpr s32 clip18(int x) { return std::clamp(x, -131072, 131071); }
 
 #define SHIFT   12
 #define FIX(v)  ((u32)((float)(1 << SHIFT) * (v)))
