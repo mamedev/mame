@@ -72287,7 +72287,7 @@ Other
 		</part>
 	</software>
 
-	<software name="booger" supported="no">
+	<software name="booger">
 		<description>Boogerman (Rus)</description>
 		<year>19??</year>
 		<publisher>Sugar Softec</publisher>
@@ -73437,9 +73437,9 @@ Other
 	</software>
 
 	<software name="lionkingp2" cloneof="lionking">
-		<description>The Lion King (Pirate, Super Game, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<description>The Lion King (pirate, alt)</description>
+		<year>199?</year>
+		<publisher>Super Game</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sg_lionk" />
 			<feature name="pcb" value="UNL-SUPERGAME" />
@@ -73448,6 +73448,22 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="lion king, the (unl) (mapper 114).prg" size="262144" crc="c3384691" sha1="d093664a551cd05f09cb28968429c4b42379d254" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp3" cloneof="lionking">
+		<description>The Lion King (pirate, alt 2)</description>
+		<year>199?</year>
+		<publisher>Super Game</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sg_lionk" />
+			<feature name="pcb" value="UNL-SUPERGAME" />
+			<dataarea name="prg" size="262144">
+				<rom name="super lion king (rev0).prg" size="262144" crc="6de1fc41" sha1="2be2b2f4639a1e0b9a654e0cca7736da5486fd91" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="super lion king (rev0).chr" size="262144" crc="cf6908dd" sha1="2bb3d606ce7f84f540279ef4458a32d9560407bc" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
