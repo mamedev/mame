@@ -478,8 +478,10 @@ void c1551_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c1551_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void c1551_device::device_timer(timer_instance const &timer)
 {
+	int param = timer.param();
+
 	m_maincpu->set_input_line(M6502_IRQ_LINE, param);
 
 	if (param == ASSERT_LINE)

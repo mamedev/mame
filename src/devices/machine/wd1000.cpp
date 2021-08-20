@@ -114,13 +114,13 @@ void wd1000_device::device_reset()
 //  device_timer - device-specific timer
 //-------------------------------------------------
 
-void wd1000_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void wd1000_device::device_timer(timer_instance const &timer)
 {
-	switch (tid)
+	switch (timer.id())
 	{
 	case TIMER_SEEK:
 
-		m_drive_cylinder[drive()] = param;
+		m_drive_cylinder[drive()] = timer.param();
 		m_status |= S_SC;
 
 		switch (m_command >> 4)

@@ -117,9 +117,9 @@ int fmscsi_device::get_scsi_cmd_len(uint8_t cbyte)
 	//return 6;
 }
 
-void fmscsi_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void fmscsi_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_TRANSFER:
 		set_input_line(FMSCSI_LINE_REQ,1);
@@ -130,7 +130,7 @@ void fmscsi_device::device_timer(timer_instance const &timer, device_timer_id id
 		}
 		break;
 	case TIMER_PHASE:
-		set_phase(param);
+		set_phase(timer.param());
 		break;
 	}
 }

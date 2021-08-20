@@ -169,9 +169,10 @@ void asic65_device::reset_line(int state)
  *
  *************************************/
 
-void asic65_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void asic65_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_M68K_ASIC65_DEFERRED_W:
 		m_tfull = 1;

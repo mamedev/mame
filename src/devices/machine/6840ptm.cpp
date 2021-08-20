@@ -166,9 +166,9 @@ void ptm6840_device::device_resolve_objects()
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void ptm6840_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ptm6840_device::device_timer(timer_instance const &timer)
 {
-	timeout(id);
+	timeout(timer.id());
 }
 
 

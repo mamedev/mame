@@ -480,15 +480,15 @@ void vme_fccpu20_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void vme_fccpu20_device::device_timer(timer_instance const &timer, device_timer_id id, int32_t param, void *ptr)
+void vme_fccpu20_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_ID_BUS_GRANT:
 		m_pit->h1_w(ASSERT_LINE); // Grant bus always
 		break;
 	default:
-		LOG("Unhandled Timer ID %d\n", id);
+		LOG("Unhandled Timer ID %d\n", timer.id());
 		break;
 	}
 }

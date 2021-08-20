@@ -82,7 +82,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_digits.resolve(); }
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	uint8_t sound_r();
@@ -293,12 +293,12 @@ WRITE_LINE_MEMBER( s8_state::pia_irq )
 	}
 }
 
-void s8_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void s8_state::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_IRQ:
-		if(param == 1)
+		if(timer.param() == 1)
 		{
 			m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(32,1e6),0);

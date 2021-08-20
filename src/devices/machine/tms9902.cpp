@@ -256,9 +256,9 @@ void tms9902_device::rcv_break(bool value)
 /*
     Timer callback
 */
-void tms9902_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void tms9902_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	// This call-back is called by the MESS timer system when the decrementer
 	// reaches 0.

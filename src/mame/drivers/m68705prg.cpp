@@ -191,15 +191,15 @@ protected:
 		m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override
+	virtual void device_timer(timer_instance const &timer) override
 	{
-		switch (id)
+		switch (timer.id())
 		{
 		case TIMER_INPUT_POLL:
-			input_poll_callback(ptr, param);
+			input_poll_callback(timer.ptr(), timer.param());
 			break;
 		default:
-			driver_device::device_timer(timer, id, param, ptr);
+			driver_device::device_timer(timer);
 		}
 	}
 

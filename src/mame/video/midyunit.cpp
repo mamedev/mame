@@ -381,15 +381,16 @@ void midyunit_state::dma_draw(uint16_t command)
  *
  *************************************/
 
-void midyunit_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void midyunit_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_DMA:
-		dma_callback(ptr, param);
+		dma_callback(timer.ptr(), param);
 		break;
 	case TIMER_AUTOERASE_LINE:
-		autoerase_line(ptr, param);
+		autoerase_line(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in midyunit_state::device_timer");

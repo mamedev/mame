@@ -196,9 +196,9 @@ void psxdma_device::dma_finished( int index )
 	dma_stop_timer( index );
 }
 
-void psxdma_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void psxdma_device::device_timer(timer_instance const &timer)
 {
-	dma_finished(id);
+	dma_finished(timer.id());
 }
 
 void psxdma_device::install_read_handler( int index, read_delegate p_fn_dma_read )

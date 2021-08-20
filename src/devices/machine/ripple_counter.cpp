@@ -178,9 +178,9 @@ WRITE_LINE_MEMBER(ripple_counter_device::reset_w)
 //  fires
 //-------------------------------------------------
 
-void ripple_counter_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ripple_counter_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_COUNT:
 		set_count((m_count + 1) & m_count_mask);

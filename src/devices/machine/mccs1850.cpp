@@ -359,9 +359,9 @@ void mccs1850_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mccs1850_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mccs1850_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_CLOCK:
 		advance_seconds();

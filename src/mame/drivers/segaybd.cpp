@@ -171,9 +171,9 @@ void segaybd_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segaybd_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void segaybd_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_IRQ2_GEN:
 			//
@@ -211,7 +211,7 @@ void segaybd_state::device_timer(timer_instance const &timer, device_timer_id id
 			//
 			{
 				// on scanline 'irq2_scanline' generate an IRQ2
-				int scanline = param;
+				int scanline = timer.param();
 				if (scanline == m_irq2_scanline)
 				{
 					m_timer_irq_state = 1;

@@ -66,9 +66,9 @@ void m58846_device::reset_timer()
 	m_timer->adjust(base);
 }
 
-void m58846_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void m58846_device::device_timer(timer_instance const &timer)
 {
-	if (id != 0)
+	if (timer.id() != 0)
 		return;
 
 	// timer 1: 7-bit fixed counter (manual specifically says 127)

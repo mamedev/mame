@@ -1182,22 +1182,22 @@ void psxcd_device::stop_read()
 	m_spu->flush_cdda(sector);
 }
 
-void psxcd_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void psxcd_device::device_timer(timer_instance const &timer)
 {
-	if (!m_timerinuse[tid])
+	if (!m_timerinuse[timer.id()])
 	{
 		verboselog(*this, 0, "psxcd: timer fired for free event\n");
 		return;
 	}
 
-	m_timerinuse[tid] = false;
-	switch (param)
+	m_timerinuse[timer.id()] = false;
+	switch (timer.param())
 	{
 		case event_cmd_complete:
 		{
 			verboselog(*this, 1, "psxcd: event cmd complete\n");
 
-			cmd_complete((command_result *)ptr);
+			cmd_complete((command_result *)timer.ptr());
 			break;
 		}
 

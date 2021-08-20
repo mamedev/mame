@@ -952,9 +952,9 @@ void namcona1_state::scanline_interrupt(int scanline)
 	}
 }
 
-void namcona1_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void namcona1_state::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_SCANLINE)
+	if (timer.id() == TIMER_SCANLINE)
 	{
 		scanline_interrupt(m_screen->vpos());
 	}

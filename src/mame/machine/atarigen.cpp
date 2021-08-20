@@ -35,9 +35,9 @@ void atarigen_state::machine_reset()
 }
 
 
-void atarigen_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void atarigen_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		// unhalt the CPU that was passed as a pointer
 		case TID_UNHALT_CPU:

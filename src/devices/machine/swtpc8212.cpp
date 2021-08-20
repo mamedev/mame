@@ -329,9 +329,9 @@ MC6845_UPDATE_ROW(swtpc8212_device::update_row)
 	}
 }
 
-void swtpc8212_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void swtpc8212_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case BELL_TIMER_ID:
 		m_beeper->set_state(0);

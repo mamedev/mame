@@ -212,7 +212,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	required_shared_ptr<uint32_t> m_rambase;
@@ -346,9 +346,9 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
  *
  *************************************/
 
-void kinst_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void kinst_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_IRQ0_STOP:
 		m_maincpu->set_input_line(0, CLEAR_LINE);

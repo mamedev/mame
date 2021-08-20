@@ -188,9 +188,9 @@ const tiny_rom_entry *kc_d004_device::device_rom_region() const
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void kc_d004_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void kc_d004_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case TIMER_RESET:
 			m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

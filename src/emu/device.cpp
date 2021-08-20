@@ -841,7 +841,7 @@ void device_t::device_debug_setup()
 //  fires
 //-------------------------------------------------
 
-void device_t::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void device_t::device_timer(timer_instance const &timer)
 {
 	// do nothing by default
 }

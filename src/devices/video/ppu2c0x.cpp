@@ -505,11 +505,11 @@ void ppu2c04_clone_device::init_palette_tables()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void ppu2c0x_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void* ptr)
+void ppu2c0x_device::device_timer(timer_instance const &timer)
 {
 	int blanked, vblank;
 
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_HBLANK:
 		blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;

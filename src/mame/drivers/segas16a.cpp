@@ -626,9 +626,10 @@ void segas16a_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segas16a_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void segas16a_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 		// if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave
 		case TID_INIT_I8751:

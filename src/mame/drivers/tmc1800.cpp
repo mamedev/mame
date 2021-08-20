@@ -728,9 +728,9 @@ void tmc2000_state::machine_reset()
 
 // OSCOM Nano
 
-void nano_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nano_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_ID_EF4:
 		m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
@@ -927,9 +927,9 @@ ROM_END
 
 /* Driver Initialization */
 
-void tmc1800_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void tmc1800_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_SETUP_BEEP:
 		m_beeper->set_state(0);

@@ -101,7 +101,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_update);
 
 private:
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	static const device_timer_id TIMER_UART_TX = 0;
 
@@ -205,9 +205,9 @@ DEVICE_IMAGE_LOAD_MEMBER(clickstart_state::cart_load)
 	return image_init_result::PASS;
 }
 
-void clickstart_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void clickstart_state::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_UART_TX)
+	if (timer.id() == TIMER_UART_TX)
 	{
 		handle_uart_tx();
 	}

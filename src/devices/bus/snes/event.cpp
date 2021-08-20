@@ -267,9 +267,9 @@ ioport_constructor sns_pfest94_device::device_input_ports() const
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void sns_pfest94_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sns_pfest94_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_EVENT)
+	if (timer.id() == TIMER_EVENT)
 	{
 		if (!m_count)
 		{

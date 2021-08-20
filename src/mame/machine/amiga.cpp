@@ -227,24 +227,25 @@ uint32_t amiga_state::rom_mirror32_r(offs_t offset, uint32_t mem_mask)
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset + 0xf80000, mem_mask);
 }
 
-void amiga_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void amiga_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_SCANLINE:
-		scanline_callback(ptr, param);
+		scanline_callback(timer.ptr(), param);
 		break;
 	case TIMER_AMIGA_IRQ:
-		amiga_irq_proc(ptr, param);
+		amiga_irq_proc(timer.ptr(), param);
 		break;
 	case TIMER_AMIGA_BLITTER:
-		amiga_blitter_proc(ptr, param);
+		amiga_blitter_proc(timer.ptr(), param);
 		break;
 	case TIMER_SERIAL:
 		serial_shift();
 		break;
 	default:
-		fatalerror("Invalid timer: %d\n", id);
+		fatalerror("Invalid timer: %d\n", timer.id());
 	}
 }
 

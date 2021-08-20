@@ -221,18 +221,19 @@ TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
 }
 
 
-void amstrad_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void amstrad_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_PC2_LOW:
-		amstrad_pc2_low(ptr, param);
+		amstrad_pc2_low(timer.ptr(), param);
 		break;
 	case TIMER_VIDEO_UPDATE:
-		amstrad_video_update_timer(ptr, param);
+		amstrad_video_update_timer(timer.ptr(), param);
 		break;
 	case TIMER_SET_RESOLUTION:
-		cb_set_resolution(ptr, param);
+		cb_set_resolution(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in amstrad_state::device_timer");

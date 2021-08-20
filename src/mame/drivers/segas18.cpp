@@ -153,9 +153,9 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
  *
  *************************************/
 
-void segas18_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void segas18_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_INITIAL_BOOST:
 			machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));

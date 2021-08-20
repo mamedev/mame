@@ -150,7 +150,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	emu_timer *m_bit_rate_timer;
 	emu_timer *m_bit_rate_half_timer;
@@ -277,9 +277,9 @@ WRITE_LINE_MEMBER(mekd1_state::pia0_cb2_w)
 	// This is a tape reader control line.
 }
 
-void mekd1_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mekd1_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_BIT_RATE:
 		m_bit_rate_out = 1;

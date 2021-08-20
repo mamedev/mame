@@ -35,12 +35,12 @@ void triplhnt_state::video_start()
 }
 
 
-void triplhnt_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void triplhnt_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_HIT:
-		set_collision(param);
+		set_collision(timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in triplhnt_state::device_timer");

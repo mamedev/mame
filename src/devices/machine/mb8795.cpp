@@ -323,15 +323,15 @@ bool mb8795_device::recv_is_multicast()
 	return rxbuf[0] & 0x01;
 }
 
-void mb8795_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mb8795_device::device_timer(timer_instance const &timer)
 {
-	if(id == TIMER_TX) {
+	if(timer.id() == TIMER_TX) {
 		drq_tx = true;
 		if(!drq_tx_cb.isnull())
 			drq_tx_cb(drq_tx);
 	}
 
-	if(id == TIMER_RX && rxlen) {
+	if(timer.id() == TIMER_RX && rxlen) {
 		drq_rx = true;
 		if(!drq_rx_cb.isnull())
 			drq_rx_cb(drq_rx);

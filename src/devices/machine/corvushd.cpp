@@ -1316,9 +1316,9 @@ void corvus_hdc_device::corvus_process_command_packet(bool invalid_command_flag)
 // Returns:
 //      Nothing
 //
-void corvus_hdc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void corvus_hdc_device::device_timer(timer_instance const &timer)
 {
-	int function = param;
+	int function = timer.param();
 
 	switch(function) {
 		case CALLBACK_CTH_MODE:

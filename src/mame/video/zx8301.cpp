@@ -158,9 +158,9 @@ void zx8301_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void zx8301_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void zx8301_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_VSYNC:
 		//m_vsync = !m_vsync;

@@ -243,15 +243,15 @@ private:
 	void ep_io(address_map &map);
 	void ep_mem(address_map &map);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 };
 
-void notetaker_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void notetaker_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_FIFOCLK:
-		timer_fifoclk(ptr, param);
+		timer_fifoclk(timer.ptr(), timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in notetaker_state::device_timer");

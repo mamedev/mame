@@ -332,9 +332,9 @@ void lc8670_cpu_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void lc8670_cpu_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void lc8670_cpu_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case BASE_TIMER:
 			if (!(REG_ISL & 0x10))

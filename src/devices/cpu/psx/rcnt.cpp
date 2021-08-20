@@ -227,9 +227,9 @@ void psxrcnt_device::root_timer_adjust( int n_counter )
 	}
 }
 
-void psxrcnt_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void psxrcnt_device::device_timer(timer_instance const &timer)
 {
-	int n_counter = id;
+	int n_counter = timer.id();
 	psx_root *root = &root_counter[ n_counter ];
 
 	verboselog( *this, 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );

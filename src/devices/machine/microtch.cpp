@@ -160,9 +160,9 @@ void microtouch_device::send_touch_packet()
 	}
 }
 
-void microtouch_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void microtouch_device::device_timer(timer_instance const &timer)
 {
-	if (!id)
+	if (!timer.id())
 	{
 		if ( m_tx_buffer_ptr < m_tx_buffer_num )
 		{

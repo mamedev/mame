@@ -351,10 +351,10 @@ void tms9928a_device::register_write(u8 data)
 	}
 }
 
-void tms9928a_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void tms9928a_device::device_timer(timer_instance const &timer)
 {
 	// Handle GROM clock if present
-	if (id==GROMCLK)
+	if (timer.id()==GROMCLK)
 	{
 		// Pulse it
 		m_out_gromclk_cb(ASSERT_LINE);

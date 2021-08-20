@@ -731,9 +731,9 @@ void gottlieb_sound_r2_device::device_start()
 //  device_timer - handle timer-based behaviors
 //-------------------------------------------------
 
-void gottlieb_sound_r2_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void gottlieb_sound_r2_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_NMI_GENERATE:
 			// update state
@@ -755,8 +755,7 @@ void gottlieb_sound_r2_device::device_timer(timer_instance const &timer, device_
 
 		case TID_SOUND_LATCH_WRITE:
 			// each CPU has its own latch
-			m_audiocpu_latch = param;
-			m_speechcpu_latch = param;
+			m_audiocpu_latch = m_speechcpu_latch = timer.param();
 			break;
 	}
 }

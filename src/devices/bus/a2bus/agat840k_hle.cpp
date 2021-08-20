@@ -226,9 +226,9 @@ void a2bus_agat840k_hle_device::device_reset()
 	m_mxcs &= ~MXCSR_TR;
 }
 
-void a2bus_agat840k_hle_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void a2bus_agat840k_hle_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_ID_WAIT:
 	{

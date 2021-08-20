@@ -66,12 +66,12 @@ uint8_t btoads_state::nvram_r(offs_t offset)
  *
  *************************************/
 
-void btoads_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void btoads_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_ID_DELAYED_SOUND:
-			m_main_to_sound_data = param;
+			m_main_to_sound_data = timer.param();
 			m_main_to_sound_ready = 1;
 			m_audiocpu->signal_interrupt_trigger();
 

@@ -478,9 +478,10 @@ void sega315_5377_device::set_sega315_5124_compatibility_mode(bool sega315_5124_
 }
 
 
-void sega315_5124_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sega315_5124_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_LINE:
 		process_line_timer();

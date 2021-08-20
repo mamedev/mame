@@ -191,9 +191,9 @@ void pioneer_ldv1000_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void pioneer_ldv1000_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pioneer_ldv1000_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_MULTIJUMP:
 		{
@@ -251,7 +251,7 @@ void pioneer_ldv1000_device::device_timer(timer_instance const &timer, device_ti
 
 		// pass everything else onto the parent
 		default:
-			laserdisc_device::device_timer(timer, id, param, ptr);
+			laserdisc_device::device_timer(timer);
 			break;
 	}
 }

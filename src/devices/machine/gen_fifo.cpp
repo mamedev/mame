@@ -60,9 +60,9 @@ template<typename T> void generic_fifo_device_base<T>::device_start()
 	save_item(NAME(m_full_triggered));
 }
 
-template<typename T> void generic_fifo_device_base<T>::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+template<typename T> void generic_fifo_device_base<T>::device_timer(timer_instance const &timer)
 {
-	switch(id) {
+	switch(timer.id()) {
 	case T_FULL: {
 		// Add the extra values in if there's space
 		bool was_empty = is_empty();

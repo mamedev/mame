@@ -194,9 +194,9 @@ void ef9345_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void ef9345_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ef9345_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case BUSY_TIMER:
 			m_bf = 0;

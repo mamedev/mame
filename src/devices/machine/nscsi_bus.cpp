@@ -265,9 +265,9 @@ void nscsi_full_device::device_reset()
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 }
 
-void nscsi_full_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nscsi_full_device::device_timer(timer_instance const &timer)
 {
-	if(id != SCSI_TIMER)
+	if(timer.id() != SCSI_TIMER)
 		return;
 
 	step(true);

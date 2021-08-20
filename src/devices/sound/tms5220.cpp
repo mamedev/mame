@@ -1733,9 +1733,10 @@ void tms5220_device::device_reset()
 
 ***********************************************************************************************/
 
-void tms5220_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void tms5220_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	int param = timer.param();
+	switch(timer.id())
 	{
 	case 0: // m_timer_io_ready
 		/* bring up to date first */

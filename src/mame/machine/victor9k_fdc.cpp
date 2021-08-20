@@ -341,9 +341,9 @@ void victor_9000_fdc_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void victor_9000_fdc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void victor_9000_fdc_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TM_GEN:
 		live_sync();

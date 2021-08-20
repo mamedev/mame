@@ -416,9 +416,9 @@ GFXDECODE_END
             also used for water effects and titlescreen linescroll on gogomile
 */
 
-void fuuki16_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void fuuki16_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_LEVEL_1_INTERRUPT:
 		m_maincpu->set_input_line(1, HOLD_LINE);

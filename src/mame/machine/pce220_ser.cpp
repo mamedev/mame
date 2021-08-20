@@ -88,9 +88,9 @@ void pce220_serial_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void pce220_serial_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pce220_serial_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_SEND && m_enabled)
+	if (timer.id() == TIMER_SEND && m_enabled)
 	{
 		//send data
 		if (m_bytes_count <= length())
@@ -149,7 +149,7 @@ void pce220_serial_device::device_timer(timer_instance const &timer, device_time
 			m_din = m_xin = m_ack = 0;
 		}
 	}
-	else if (id == TIMER_RECEIVE && m_enabled)
+	else if (timer.id() == TIMER_RECEIVE && m_enabled)
 	{
 		//receive data
 		switch(m_state)

@@ -142,7 +142,7 @@ void timer_device::device_reset()
 //  device_timer - handle timer expiration events
 //-------------------------------------------------
 
-void timer_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void timer_device::device_timer(timer_instance const &timer)
 {
 	switch (m_type)
 	{
@@ -150,7 +150,7 @@ void timer_device::device_timer(timer_instance const &timer, device_timer_id id,
 		case TIMER_TYPE_GENERIC:
 		case TIMER_TYPE_PERIODIC:
 			if (!m_callback.isnull())
-				m_callback(ptr, param);
+				m_callback(timer.ptr(), timer.param());
 			break;
 
 		// scanline timers have to do some additional bookkeeping
@@ -165,7 +165,7 @@ void timer_device::device_timer(timer_instance const &timer, device_timer_id id,
 				// call the real callback
 				int vpos = m_screen->vpos();
 				if (!m_callback.isnull())
-					m_callback(ptr, vpos);
+					m_callback(timer.ptr(), vpos);
 
 				// advance by the increment only if we will still be within the screen bounds
 				if (m_increment != 0 && (vpos + m_increment) < m_screen->height())

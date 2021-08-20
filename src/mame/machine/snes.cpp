@@ -43,30 +43,31 @@ uint32_t snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
     Timers
 
 *************************************/
-void snes_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void snes_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_NMI_TICK:
-		snes_nmi_tick(ptr, param);
+		snes_nmi_tick(timer.ptr(), param);
 		break;
 	case TIMER_HIRQ_TICK:
-		snes_hirq_tick_callback(ptr, param);
+		snes_hirq_tick_callback(timer.ptr(), param);
 		break;
 	case TIMER_RESET_OAM_ADDRESS:
-		snes_reset_oam_address(ptr, param);
+		snes_reset_oam_address(timer.ptr(), param);
 		break;
 	case TIMER_RESET_HDMA:
-		snes_reset_hdma(ptr, param);
+		snes_reset_hdma(timer.ptr(), param);
 		break;
 	case TIMER_UPDATE_IO:
-		snes_update_io(ptr, param);
+		snes_update_io(timer.ptr(), param);
 		break;
 	case TIMER_SCANLINE_TICK:
-		snes_scanline_tick(ptr, param);
+		snes_scanline_tick(timer.ptr(), param);
 		break;
 	case TIMER_HBLANK_TICK:
-		snes_hblank_tick(ptr, param);
+		snes_hblank_tick(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in snes_state::device_timer");

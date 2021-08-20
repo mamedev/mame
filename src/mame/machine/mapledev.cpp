@@ -26,9 +26,9 @@ void maple_device::maple_reset()
 	device_reset();
 }
 
-void maple_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void maple_device::device_timer(timer_instance const &timer)
 {
-	if(id != TIMER_ID)
+	if(timer.id() != TIMER_ID)
 		return;
 
 	this->timer->adjust(attotime::never);

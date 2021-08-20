@@ -634,9 +634,14 @@ device_scheduler::~device_scheduler()
 				return (a->m_calls > b->m_calls);
 			});
 
-		static char const *forms[] = { "native", " void ", "device", " int  ", "legacy", "intint", " int3 " };
+		static char const *forms[] = { "native", " void ", " int  ", "legacy", "intint", " int3 " };
 		for (auto &cb : timers)
-			printf("%12.2f %s %s\n", cb->m_calls / seconds, forms[cb->m_delegate.m_form], cb->m_unique_id.c_str());
+		{
+			char const *form = forms[cb->m_delegate.m_form];
+			if (cb->device() != nullptr)
+				form = "device";
+			printf("%12.2f %s %s\n", cb->m_calls / seconds, form, cb->m_unique_id.c_str());
+		}
 	}
 #endif
 }
@@ -1038,7 +1043,7 @@ inline void device_scheduler::execute_timers(attotime const &basetime)
 		g_profiler.start(PROFILER_TIMER_CALLBACK);
 		{
 			if (timer.is_device_timer())
-				LOG("execute_timers: timer device %s timer %d\n", timer.m_callback->device()->tag(), int(timer.param(2)));
+				LOG("execute_timers: timer device %s timer %d\n", timer.m_callback->device()->tag(), timer.id());
 			else
 				LOG("execute_timers: timer callback %s\n", timer.m_callback->name());
 

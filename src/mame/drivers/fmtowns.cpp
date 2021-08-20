@@ -439,9 +439,9 @@ uint8_t towns_state::towns_intervaltimer2_r(offs_t offset)
 	return 0xff;
 }
 
-void towns_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void towns_state::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_FREERUN:
 		freerun_inc();
@@ -462,7 +462,7 @@ void towns_state::device_timer(timer_instance const &timer, device_timer_id id, 
 		towns_cd_status_ready();
 		break;
 	case TIMER_CDDA:
-		towns_delay_cdda((cdrom_image_device*)ptr);
+		towns_delay_cdda((cdrom_image_device*)timer.ptr());
 		break;
 	case TIMER_SPRITES:
 		draw_sprites();

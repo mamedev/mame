@@ -110,7 +110,7 @@ private:
 	// device overrides
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	// internal helpers
 	void update_irqs();

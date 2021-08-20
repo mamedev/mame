@@ -61,7 +61,7 @@ public:
 	void cball(machine_config &config);
 	void cpu_map(address_map &map);
 protected:
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 };
 
 
@@ -102,12 +102,12 @@ uint32_t cball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-void cball_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cball_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(timer.ptr(), timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in cball_state::device_timer");

@@ -65,7 +65,7 @@ protected:
 	virtual void machine_reset() override;
 	void boxer_map(address_map &map);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	/* memory pointers */
@@ -92,15 +92,16 @@ private:
  *
  *************************************/
 
-void boxer_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void boxer_state::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	int param = timer.param();
+	switch(timer.id())
 	{
 	case TIMER_POT_INTERRUPT:
-		pot_interrupt(ptr, param);
+		pot_interrupt(timer.ptr(), param);
 		break;
 	case TIMER_PERIODIC:
-		periodic_callback(ptr, param);
+		periodic_callback(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in boxer_state::device_timer");

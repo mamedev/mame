@@ -404,9 +404,9 @@ static void prof80_floppies(device_slot_interface &device)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void prof80_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void prof80_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_ID_MOTOR:
 		motor(1);

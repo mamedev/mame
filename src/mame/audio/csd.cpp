@@ -92,9 +92,9 @@ void midway_cheap_squeak_deluxe_device::device_start()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void midway_cheap_squeak_deluxe_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void midway_cheap_squeak_deluxe_device::device_timer(timer_instance const &timer)
 {
-	m_pia->ca1_w(param);
+	m_pia->ca1_w(timer.param());
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
 	// important, so we boost the interleave briefly while this happens

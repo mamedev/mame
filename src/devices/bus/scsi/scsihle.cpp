@@ -206,9 +206,10 @@ void scsihle_device::scsibus_write_data()
 	data_idx=0;
 }
 
-void scsihle_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void scsihle_device::device_timer(timer_instance const &timer)
 {
-	switch (tid)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case 0:
 		output_req(param);

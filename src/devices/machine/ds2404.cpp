@@ -317,9 +317,9 @@ void ds2404_device::clk_w(uint8_t data)
 	}
 }
 
-void ds2404_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ds2404_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case 0:
 			// tick

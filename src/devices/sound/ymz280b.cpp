@@ -639,10 +639,10 @@ void ymz280b_device::device_reset()
 }
 
 
-void ymz280b_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ymz280b_device::device_timer(timer_instance const &timer)
 {
-	if (id < 8)
-		update_irq_state_timer_common( id );
+	if (timer.id() < 8)
+		update_irq_state_timer_common( timer.id() );
 	else
 		throw emu_fatalerror("Unknown id in ymz280b_device::device_timer");
 }

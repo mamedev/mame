@@ -246,9 +246,9 @@ void smioc_device::SoftReset()
 }
 
 
-void smioc_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void smioc_device::device_timer(timer_instance const &timer)
 {
-	switch (tid)
+	switch (timer.id())
 	{
 	case 0: // DMA Timer
 		m_smioccpu->drq0_w(1);

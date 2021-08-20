@@ -58,12 +58,12 @@ static INPUT_PORTS_START( decocpu1 )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void decocpu_type1_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void decocpu_type1_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_IRQ:
-		if(param == 1)
+		if(timer.param() == 1)
 		{
 			m_cpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);

@@ -155,9 +155,9 @@ static INPUT_PORTS_START( s11 )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void s11_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void s11_state::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_IRQ:
 		// handle the cd4020 14-bit timer irq counter; this timer fires on the rising and falling edges of Q5, every 32 clocks

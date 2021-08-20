@@ -397,9 +397,9 @@ void crtc_ega_device::handle_line_timer()
 }
 
 
-void crtc_ega_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void crtc_ega_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_LINE:
 		handle_line_timer();

@@ -597,13 +597,13 @@ void segaxbd_state::smgp_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segaxbd_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void segaxbd_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_SCANLINE:
 		{
-			int scanline = param;
+			int scanline = timer.param();
 			int next_scanline = (scanline + 1) % 262;
 
 			// clock the timer with V0

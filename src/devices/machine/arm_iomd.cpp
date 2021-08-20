@@ -326,13 +326,13 @@ void arm7500fe_iomd_device::device_reset()
 	m_iolines_ddr = 0xff;
 }
 
-void arm_iomd_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void arm_iomd_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case T0_TIMER:
 		case T1_TIMER:
-			trigger_irq<IRQA>(id == T1_TIMER ? 0x40 : 0x20);
+			trigger_irq<IRQA>(timer.id() == T1_TIMER ? 0x40 : 0x20);
 			break;
 	}
 }

@@ -159,20 +159,20 @@ void spg2xx_audio_device::device_stop()
 #endif
 }
 
-void spg2xx_audio_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void spg2xx_audio_device::device_timer(timer_instance const &timer)
 {
-	if (id >= TIMER_IRQ && id < (TIMER_IRQ + 16))
+	if (timer.id() >= TIMER_IRQ && timer.id() < (TIMER_IRQ + 16))
 	{
-		const uint32_t bit = id - TIMER_IRQ;
+		const uint32_t bit = timer.id() - TIMER_IRQ;
 		if (!BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS], bit))
 		{
-			m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS] |= (1 << (id - TIMER_IRQ));
+			m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS] |= (1 << (timer.id() - TIMER_IRQ));
 			m_ch_irq_cb(1);
 		}
 		return;
 	}
 
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_BEAT:
 		audio_beat_tick();

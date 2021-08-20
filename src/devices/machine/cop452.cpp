@@ -178,11 +178,11 @@ void cop452_device::device_reset()
 	m_timers[ 1 ]->reset();
 }
 
-void cop452_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cop452_device::device_timer(timer_instance const &timer)
 {
 	switch (m_mode) {
 	case MODE_DUAL_FREQ:
-		toggle_n_reload(id);
+		toggle_n_reload(timer.id());
 		break;
 
 	case MODE_TRIG_PULSE:
@@ -190,7 +190,7 @@ void cop452_device::device_timer(timer_instance const &timer, device_timer_id id
 		break;
 
 	case MODE_NUMBER_PULSES:
-		if (id == 0) {
+		if (timer.id() == 0) {
 			toggle_n_reload(0);
 			if (!m_out[ 0 ]) {
 				// It seems that cnt B decrements each time OA goes low
@@ -228,7 +228,7 @@ void cop452_device::device_timer(timer_instance const &timer, device_timer_id id
 	case MODE_WHITE_NOISE:
 	case MODE_GATED_WHITE:
 		{
-			if (id == 0) {
+			if (timer.id() == 0) {
 				// Reg A & its 17th bit (m_regA_b16) form a 17-bit LFSR
 				// LFSR uses X^17+X^14+1 polynomial to generate a pseudo-random
 				// maximal-length sequence
@@ -251,7 +251,7 @@ void cop452_device::device_timer(timer_instance const &timer, device_timer_id id
 		break;
 	}
 
-	set_timer(id);
+	set_timer(timer.id());
 }
 
 attotime cop452_device::counts_to_attotime(unsigned counts) const

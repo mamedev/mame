@@ -54,9 +54,9 @@ void rollerg_state::soundirq_w(uint8_t data)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-void rollerg_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void rollerg_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_NMI:
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

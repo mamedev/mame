@@ -111,7 +111,7 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	template <int StoreNum> uint32_t store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -1062,17 +1062,17 @@ void dpb7000_state::machine_reset()
 	m_tablet_state = 0;
 }
 
-void dpb7000_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void dpb7000_state::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_DISKSEQ_COMPLETE)
+	if (timer.id() == TIMER_DISKSEQ_COMPLETE)
 		req_b_w(1);
-	else if (id == TIMER_FIELD_IN)
+	else if (timer.id() == TIMER_FIELD_IN)
 		req_a_w(1);
-	else if (id == TIMER_FIELD_OUT)
+	else if (timer.id() == TIMER_FIELD_OUT)
 		req_a_w(0);
-	else if (id == TIMER_TABLET_TX)
+	else if (timer.id() == TIMER_TABLET_TX)
 		tablet_tx_tick();
-	else if (id == TIMER_TABLET_IRQ)
+	else if (timer.id() == TIMER_TABLET_IRQ)
 		tablet_irq_tick();
 }
 

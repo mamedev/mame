@@ -440,15 +440,15 @@ void mace_device::rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 //  TIMERS
 //**************************************************************************
 
-void mace_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mace_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_UST)
+	if (timer.id() == TIMER_UST)
 	{
 		m_ust_msc.m_ust++;
 		m_ust_msc.m_ust_msc &= 0x00000000ffffffffULL;
 		m_ust_msc.m_ust_msc |= (uint64_t)m_ust_msc.m_ust << 32;
 	}
-	else if (id == TIMER_MSC)
+	else if (timer.id() == TIMER_MSC)
 	{
 		m_ust_msc.m_msc++;
 		m_ust_msc.m_ust_msc &= 0xffffffff00000000ULL;

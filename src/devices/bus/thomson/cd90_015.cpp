@@ -61,9 +61,9 @@ void cd90_015_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[3], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 }
 
-void cd90_015_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cd90_015_device::device_timer(timer_instance const &timer)
 {
-	m_floppy[id]->get_device()->mon_w(1);
+	m_floppy[timer.id()]->get_device()->mon_w(1);
 }
 
 void cd90_015_device::device_start()

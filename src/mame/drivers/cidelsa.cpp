@@ -356,9 +356,9 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-void cidelsa_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cidelsa_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_SET_CPU_MODE:
 		m_reset = 1;

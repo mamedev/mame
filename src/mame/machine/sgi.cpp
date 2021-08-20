@@ -721,9 +721,9 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-void sgi_mc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sgi_mc_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_RPSS)
+	if (timer.id() == TIMER_RPSS)
 	{
 		m_rpss_divide_counter--;
 		if (m_rpss_divide_counter < 0)
@@ -732,7 +732,7 @@ void sgi_mc_device::device_timer(timer_instance const &timer, device_timer_id id
 			m_rpss_counter += m_rpss_increment;
 		}
 	}
-	else if (id == TIMER_DMA)
+	else if (timer.id() == TIMER_DMA)
 	{
 		dma_immediate();
 	}

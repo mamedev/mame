@@ -480,9 +480,9 @@ void via6522_device::shift_in()
 	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
 }
 
-void via6522_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void via6522_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_SHIFT_IRQ: // This timer event is a delayed IRQ for improved cycle accuracy
 			set_int(INT_SR);  // triggered from shift_in or shift_out on the last rising edge

@@ -737,9 +737,10 @@ void upd7220_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void upd7220_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void upd7220_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_HSYNC:
 		if (param)

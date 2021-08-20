@@ -48,27 +48,28 @@ static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 
 
 
-void vectrex_base_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void vectrex_base_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_VECTREX_IMAGER_CHANGE_COLOR:
-		vectrex_imager_change_color(ptr, param);
+		vectrex_imager_change_color(timer.ptr(), param);
 		break;
 	case TIMER_UPDATE_LEVEL:
 		m_imager_pinlevel = param;
 		break;
 	case TIMER_VECTREX_IMAGER_EYE:
-		vectrex_imager_eye(ptr, param);
+		vectrex_imager_eye(timer.ptr(), param);
 		break;
 	case TIMER_LIGHTPEN_TRIGGER:
-		lightpen_trigger(ptr, param);
+		lightpen_trigger(timer.ptr(), param);
 		break;
 	case TIMER_VECTREX_REFRESH:
-		vectrex_refresh(ptr, param);
+		vectrex_refresh(timer.ptr(), param);
 		break;
 	case TIMER_VECTREX_ZERO_INTEGRATORS:
-		vectrex_zero_integrators(ptr, param);
+		vectrex_zero_integrators(timer.ptr(), param);
 		break;
 	case TIMER_UPDATE_SIGNAL:
 		update_signal(nullptr, param);

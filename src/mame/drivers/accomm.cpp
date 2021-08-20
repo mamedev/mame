@@ -94,7 +94,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -481,9 +481,9 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void accomm_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void accomm_state::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_SCANLINE_INTERRUPT)
+	if (timer.id() == TIMER_SCANLINE_INTERRUPT)
 	{
 		switch (m_screen->vpos())
 		{

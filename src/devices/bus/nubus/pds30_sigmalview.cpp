@@ -114,7 +114,7 @@ void nubus_lview_device::device_reset()
 }
 
 
-void nubus_lview_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void nubus_lview_device::device_timer(timer_instance const &timer)
 {
 	if (!m_vbl_disable)
 	{

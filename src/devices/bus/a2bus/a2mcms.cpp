@@ -238,15 +238,15 @@ void mcms_device::device_reset()
 	m_enabled = false;
 }
 
-void mcms_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void mcms_device::device_timer(timer_instance const &timer)
 {
-	if (tid == 0)
+	if (timer.id() == 0)
 	{
 		m_write_irq(ASSERT_LINE);
 		// clear this IRQ in 10 cycles (?)
 		m_clrtimer->adjust(attotime::from_usec(10), 0);
 	}
-	else if (tid == 1)
+	else if (timer.id() == 1)
 	{
 		m_write_irq(CLEAR_LINE);
 	}

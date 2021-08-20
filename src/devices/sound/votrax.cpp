@@ -334,11 +334,11 @@ void votrax_sc01_device::device_clock_changed()
 //  device_timer - handle device timer
 //-------------------------------------------------
 
-void votrax_sc01_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void votrax_sc01_device::device_timer(timer_instance const &timer)
 {
 	m_stream->update();
 
-	switch(param) {
+	switch(timer.param()) {
 	case T_COMMIT_PHONE:
 		// strobe -> commit transition,
 		phone_commit();

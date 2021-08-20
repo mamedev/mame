@@ -383,7 +383,7 @@ private:
 		TIMER_POWER_FAIL
 	};
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
@@ -1753,9 +1753,9 @@ void aristmk4_state::machine_reset()
 	m_power_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 }
 
-void aristmk4_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void aristmk4_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_POWER_FAIL: power_fail(); break;
 	default: throw emu_fatalerror("Unknown id in aristmk4_state::device_timer");

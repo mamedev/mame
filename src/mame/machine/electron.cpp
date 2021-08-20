@@ -28,18 +28,19 @@ void electron_state::waitforramsync()
 }
 
 
-void electron_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void electron_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_TAPE_HANDLER:
-		electron_tape_timer_handler(ptr, param);
+		electron_tape_timer_handler(timer.ptr(), param);
 		break;
 	case TIMER_SETUP_BEEP:
-		setup_beep(ptr, param);
+		setup_beep(timer.ptr(), param);
 		break;
 	case TIMER_SCANLINE_INTERRUPT:
-		electron_scanline_interrupt(ptr, param);
+		electron_scanline_interrupt(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in electron_state::device_timer");

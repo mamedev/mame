@@ -131,7 +131,7 @@ protected:
 		TIMER_UPDATE
 	};
 
-	void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(timer_instance const &timer) override;
 
 	void update();
 
@@ -283,9 +283,9 @@ void chexx_state::mem(address_map &map)
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
-void chexx_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void chexx_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_UPDATE:
 		update();

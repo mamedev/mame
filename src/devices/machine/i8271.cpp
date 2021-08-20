@@ -1546,11 +1546,11 @@ std::string i8271_device::ttsn() const
 	return machine().time().to_string();
 }
 
-void i8271_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void i8271_device::device_timer(timer_instance const &timer)
 {
 	live_sync();
 
-	floppy_info &fi = flopi[id];
+	floppy_info &fi = flopi[timer.id()];
 	switch(fi.sub_state) {
 	case SEEK_WAIT_STEP_SIGNAL_TIME:
 		fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME_DONE;

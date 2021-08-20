@@ -139,7 +139,7 @@ private:
 
 	bool keypad_key_pressed();
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 	uint8_t m_segment;
 	uint8_t m_digit;
 	virtual void machine_start() override;
@@ -240,9 +240,9 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-void mekd5_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mekd5_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_TRACE:
 		// CB2 is programmed to trigger on the falling edge, so after

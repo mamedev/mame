@@ -167,9 +167,9 @@ void wswan_video_device::device_reset()
 }
 
 
-void wswan_video_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void wswan_video_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_SCANLINE:
 			scanline_interrupt();

@@ -54,9 +54,9 @@ void geebee_sound_device::device_start()
 	save_item(NAME(m_vcount));
 }
 
-void geebee_sound_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void geebee_sound_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_VOLUME_DECAY:
 		if (--m_volume < 0)

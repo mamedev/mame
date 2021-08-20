@@ -62,9 +62,9 @@ void midiin_device::device_reset()
     device_timer
 -------------------------------------------------*/
 
-void midiin_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void midiin_device::device_timer(timer_instance const &timer)
 {
-	if (id == 0)
+	if (timer.id() == 0)
 	{
 		// if there's a sequence playing, that takes priority
 		midi_event *event = m_sequence.current_event();

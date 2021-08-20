@@ -305,9 +305,9 @@ void nbmj8891_state::update_pixel1(int x, int y)
 	m_tmpbitmap1.pix(y, x) = (color == 0x7f) ? 0xff : color;
 }
 
-void nbmj8891_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nbmj8891_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_BLITTER:
 		m_nb1413m3->busyflag_w(1);

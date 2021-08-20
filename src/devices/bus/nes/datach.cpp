@@ -381,9 +381,9 @@ void nes_datach_device::device_add_mconfig(machine_config &config)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nes_datach_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_datach_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
@@ -402,7 +402,7 @@ void nes_datach_device::device_timer(timer_instance const &timer, device_timer_i
 			}
 		}
 	}
-	if (id == TIMER_SERIAL)
+	if (timer.id() == TIMER_SERIAL)
 	{
 		m_datach_latch = (m_reader->read_pixel() << 3);
 	}

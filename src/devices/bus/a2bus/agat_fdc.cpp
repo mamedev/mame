@@ -162,9 +162,9 @@ void a2bus_agat_fdc_device::device_reset()
 	m_timer_lss->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
-void a2bus_agat_fdc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void a2bus_agat_fdc_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_ID_LSS:
 		lss_sync();

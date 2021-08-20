@@ -166,11 +166,11 @@ void cdp1864_device::device_reset()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void cdp1864_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cdp1864_device::device_timer(timer_instance const &timer)
 {
 	int scanline = screen().vpos();
 
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_INT:
 		if (scanline == SCANLINE_INT_START)

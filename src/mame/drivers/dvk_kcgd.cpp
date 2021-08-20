@@ -83,7 +83,7 @@ private:
 		TIMER_ID_VSYNC_OFF,
 		TIMER_ID_500HZ
 	};
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	uint16_t vram_addr_r();
 	uint16_t vram_data_r();
@@ -136,9 +136,9 @@ void kcgd_state::kcgd_mem(address_map &map)
 //  map(0177560, 0177567).ram();  // USART3 -- keyboard
 }
 
-void kcgd_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void kcgd_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 /*
     case TIMER_ID_VSYNC_ON:

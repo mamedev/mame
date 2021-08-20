@@ -213,14 +213,14 @@ void pc11_device::write(offs_t offset, uint16_t data)
 	}
 }
 
-void pc11_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pc11_device::device_timer(timer_instance const &timer)
 {
 	uint8_t reply;
 
 	if (!(m_rcsr & CSR_BUSY))
 		return;
 
-	LOGDBG("Timer rcsr %06o id %d param %d m_fd %p\n", m_rcsr, id, param, m_fd);
+	LOGDBG("Timer rcsr %06o id %d param %d m_fd %p\n", m_rcsr, timer.id(), int(timer.param()), m_fd);
 
 	m_rcsr = (m_rcsr | CSR_ERR) & ~CSR_BUSY;
 	if (m_fd && m_fd->exists() && (m_fd->fread(&reply, 1) == 1))

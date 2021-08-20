@@ -722,9 +722,9 @@ void duscc_channel::device_reset()
 	m_a7 = 0;
 }
 
-void duscc_channel::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void duscc_channel::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_ID:
 		if (m_ct-- == 0) // Zero detect
@@ -807,7 +807,7 @@ void duscc_channel::device_timer(timer_instance const &timer, device_timer_id id
 			m_uart->m_out_trxcb_cb(m_trxc);
 		break;
 	default:
-		LOGR("Unhandled Timer ID %d\n", id);
+		LOGR("Unhandled Timer ID %d\n", timer.id());
 		break;
 	}
 	//  LOG("%s %d\n", FUNCNAME, id);

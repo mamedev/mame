@@ -66,7 +66,7 @@ protected:
 	};
 
 	void machine_start() override;
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	void dice_palette(palette_device &palette) const;
 	u32 screen_update_dice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -122,9 +122,9 @@ static INPUT_PORTS_START(dice)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE3) PORT_NAME("RAM Test") PORT_CHANGED_MEMBER(DEVICE_SELF, dinaris_state, ram_test, 0)
 INPUT_PORTS_END
 
-void dinaris_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void dinaris_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_COLD_BOOT:
 		m_cold_boot = 1;

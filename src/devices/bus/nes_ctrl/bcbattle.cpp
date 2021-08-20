@@ -33,9 +33,9 @@ void nes_bcbattle_device::device_add_mconfig(machine_config &config)
 // This part is the hacky replacement for the real Barcode unit [shared with SNES implementation]:
 // code periodically checks whether a new code has been scanned and it moves it to the
 // m_current_barcode array
-void nes_bcbattle_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_bcbattle_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_BATTLER)
+	if (timer.id() == TIMER_BATTLER)
 	{
 		int old = m_new_code;
 		// has something new been scanned?

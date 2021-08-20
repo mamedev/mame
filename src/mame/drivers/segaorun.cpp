@@ -553,9 +553,9 @@ void segaorun_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segaorun_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void segaorun_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_IRQ2_GEN:
 			// set the IRQ2 line
@@ -565,7 +565,7 @@ void segaorun_state::device_timer(timer_instance const &timer, device_timer_id i
 
 		case TID_SCANLINE:
 		{
-			int scanline = param;
+			int scanline = timer.param();
 			int next_scanline = scanline;
 
 			// trigger IRQs on certain scanlines

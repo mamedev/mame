@@ -128,12 +128,12 @@
  *************************************/
 
 
-void spacefb_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void spacefb_state::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(timer.ptr(), timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in spacefb_state::device_timer");

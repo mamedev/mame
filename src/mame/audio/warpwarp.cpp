@@ -71,9 +71,9 @@ void warpwarp_sound_device::device_start()
 	save_item(NAME(m_mcount));
 }
 
-void warpwarp_sound_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void warpwarp_sound_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_SOUND_VOLUME_DECAY:
 		if (--m_sound_volume < 0)

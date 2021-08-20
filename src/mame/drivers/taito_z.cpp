@@ -1320,9 +1320,9 @@ void taitoz_state::dblaxle_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
                         INTERRUPTS
 ***********************************************************/
 
-void taitoz_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void taitoz_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_TAITOZ_INTERRUPT6:
 		/* 68000 A */

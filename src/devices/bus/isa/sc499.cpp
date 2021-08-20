@@ -489,8 +489,10 @@ void sc499_device::check_tape()
  timer_func - handle timer interrupts
  -------------------------------------------------*/
 
-void sc499_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sc499_device::device_timer(timer_instance const &timer)
 {
+	int param = timer.param();
+
 	LOG2(("timer_func param=%d status=%x", param, m_status));
 
 	switch (param)

@@ -88,7 +88,7 @@ private:
 	};
 
 protected:
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(timer_instance const &timer);
 	#endif
 };
 
@@ -132,9 +132,9 @@ void _2mindril_state::coins_w(u8 data)
     PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
 */
 #ifdef UNUSED_FUNCTION
-void _2mindril_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void _2mindril_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_SHUTTER_REQ:
 			m_shutter_sensor = param;

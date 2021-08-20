@@ -231,9 +231,9 @@ uint8_t ie15_device::kb_s_lin_r()
 
 /* serial port */
 
-void ie15_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ie15_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_HBLANK:
 		if (m_hblank) // Transitioning from in blanking to out of blanking

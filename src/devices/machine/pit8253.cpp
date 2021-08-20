@@ -948,10 +948,11 @@ void pit8254_device::readback_command(uint8_t data)
 			m_counter[timer]->readback(read_command);
 }
 
-void pit_counter_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pit_counter_device::device_timer(timer_instance const &timer)
 {
+	int param = timer.param();
 	update();
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_UPDATE:
 			break;

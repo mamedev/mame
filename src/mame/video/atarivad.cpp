@@ -212,16 +212,16 @@ void atari_vad_device::device_reset()
 //  calbacks
 //-------------------------------------------------
 
-void atari_vad_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void atari_vad_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_SCANLINE_INT:
 			m_scanline_int_cb(ASSERT_LINE);
 			break;
 
 		case TID_TILEROW_UPDATE:
-			update_tilerow(param);
+			update_tilerow(timer.param());
 			break;
 
 		case TID_EOF:

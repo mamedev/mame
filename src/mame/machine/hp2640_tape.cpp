@@ -311,11 +311,11 @@ void hp2640_tape_device::device_reset()
 	m_cell_timer->reset();
 }
 
-void hp2640_tape_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void hp2640_tape_device::device_timer(timer_instance const &timer)
 {
-	LOG("TMR %d @%s\n" , id , machine().time().to_string());
+	LOG("TMR %d @%s\n" , timer.id() , machine().time().to_string());
 
-	switch (id) {
+	switch (timer.id()) {
 	case GAP_TMR_ID:
 		m_gap = !m_gap;
 		if (m_gap) {

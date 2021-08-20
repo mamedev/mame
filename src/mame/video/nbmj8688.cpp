@@ -261,9 +261,9 @@ void nbmj8688_state::writeram_high(int x, int y, int color)
 	update_pixel(x, y);
 }
 
-void nbmj8688_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nbmj8688_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_BLITTER:
 		m_nb1413m3->busyflag_w(1);

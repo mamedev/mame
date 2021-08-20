@@ -459,8 +459,10 @@ void cdp1869_device::device_post_load()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void cdp1869_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cdp1869_device::device_timer(timer_instance const &timer)
 {
+	int param = timer.param();
+
 	m_write_prd(param);
 	m_prd = param;
 

@@ -745,9 +745,9 @@ static GFXDECODE_START( gfx_spectrum )
 	GFXDECODE_ENTRY( "maincpu", 0x3d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-void spectrum_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void spectrum_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_IRQ_OFF:
 		m_maincpu->set_input_line(0, CLEAR_LINE);

@@ -253,14 +253,14 @@ void mc6847_friend_device::update_field_sync_timer()
 //  device_timer
 //-------------------------------------------------
 
-void mc6847_friend_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mc6847_friend_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case TIMER_FRAME:       new_frame();                    break;
 		case TIMER_HSYNC_ON:    change_horizontal_sync(true);   break;
 		case TIMER_HSYNC_OFF:   change_horizontal_sync(false);  break;
-		case TIMER_FSYNC:       change_field_sync(param != 0);  break;
+		case TIMER_FSYNC:       change_field_sync(timer.param() != 0);  break;
 	}
 }
 

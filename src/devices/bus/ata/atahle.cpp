@@ -150,14 +150,14 @@ void ata_hle_device::soft_reset()
 	start_busy(DIAGNOSTIC_TIME, PARAM_DIAGNOSTIC);
 }
 
-void ata_hle_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ata_hle_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TID_BUSY:
 		m_status &= ~IDE_STATUS_BSY;
 
-		finished_busy(param);
+		finished_busy(timer.param());
 		break;
 	case TID_BUFFER_EMPTY:
 		m_buffer_empty_timer->enable(false);

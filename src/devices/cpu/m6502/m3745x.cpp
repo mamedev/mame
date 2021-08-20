@@ -116,9 +116,9 @@ void m3745x_device::device_reset()
 	m_last_all_ints = 0;
 }
 
-void m3745x_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void m3745x_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_ADC:
 			m_timers[TIMER_ADC]->adjust(attotime::never);
@@ -129,7 +129,7 @@ void m3745x_device::device_timer(timer_instance const &timer, device_timer_id id
 			break;
 
 		default:
-			printf("M3775x: unknown timer expire %d\n", id);
+			printf("M3775x: unknown timer expire %d\n", timer.id());
 			break;
 	}
 }

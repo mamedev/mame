@@ -948,9 +948,9 @@ void mc6845_device::handle_line_timer()
 }
 
 
-void mc6845_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mc6845_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_LINE:
 		handle_line_timer();
@@ -999,6 +999,7 @@ void mc6845_device::device_timer(timer_instance const &timer, device_timer_id id
 
 	case TIMER_UPD_TRANS:
 		{
+			int param = timer.param();
 			int addr = (param >> 8);
 			int strobe = (param & 0xff);
 
@@ -1018,9 +1019,9 @@ void mc6845_device::device_timer(timer_instance const &timer, device_timer_id id
 }
 
 
-void mos8563_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mos8563_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_BLOCK_COPY:
 	{
@@ -1039,7 +1040,7 @@ void mos8563_device::device_timer(timer_instance const &timer, device_timer_id i
 		break;
 	}
 	default:
-		mc6845_device::device_timer(timer, id, param, ptr);
+		mc6845_device::device_timer(timer);
 		break;
 	}
 }

@@ -865,9 +865,9 @@ void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_mbaby_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_mbaby_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		hold_irq_line();
 		irq_timer->adjust(attotime::never);
@@ -952,9 +952,9 @@ uint8_t nes_asn_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb3p_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_smb3p_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		// counter does not stop when interrupts are disabled
 		if (m_irq_count != 0xffff)
@@ -1169,9 +1169,9 @@ void nes_lh31_device::write_h(offs_t offset, u8 data)      // submapper 2
 
  -------------------------------------------------*/
 
-void nes_smb2j_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2j_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
@@ -1251,9 +1251,9 @@ uint8_t nes_smb2j_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2ja_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2ja_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
@@ -1308,9 +1308,9 @@ uint8_t nes_smb2ja_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2jb_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2jb_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
@@ -1415,9 +1415,9 @@ void nes_0353_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_09034a_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_09034a_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
@@ -1480,9 +1480,9 @@ u8 nes_09034a_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_batmanfs_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_batmanfs_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		// 10-bit counter does not stop when interrupts are disabled
 		m_irq_count = (m_irq_count + 1) & 0x3ff;
@@ -1825,9 +1825,9 @@ void nes_lh51_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_lh53_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_lh53_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
@@ -2034,9 +2034,9 @@ void nes_mmalee_device::write_m(offs_t offset, uint8_t data)
  -------------------------------------------------*/
 
 // timer always running and checking IRQ every 114 CPU cycles?
-void nes_shuiguan_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_shuiguan_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		m_irq_count++;
 		m_irq_count &= 0xff;
@@ -2145,9 +2145,9 @@ uint8_t nes_rt01_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_yung08_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_yung08_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (BIT(m_irq_latch, 0))
 		{

@@ -412,9 +412,9 @@ void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_namcot340_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_namcot340_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{

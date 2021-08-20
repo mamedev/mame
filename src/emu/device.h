@@ -811,7 +811,7 @@ protected:
 
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(timer_instance const &timer);
 
 	//------------------- end derived class overrides
 

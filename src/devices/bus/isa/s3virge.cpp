@@ -1427,10 +1427,10 @@ void s3virge_vga_device::bitblt_monosrc_step()
 	s3virge.s3d.bitblt_step_count++;
 }
 
-void s3virge_vga_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void s3virge_vga_device::device_timer(timer_instance const &timer)
 {
 	// TODO: S3D state timing
-	if(id == TIMER_DRAW_STEP)
+	if(timer.id() == TIMER_DRAW_STEP)
 	{
 		switch(s3virge.s3d.state)
 		{

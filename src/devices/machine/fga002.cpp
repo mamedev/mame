@@ -145,9 +145,9 @@ void fga002_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void fga002_device::device_timer(timer_instance const &timer, device_timer_id id, int32_t param, void *ptr)
+void fga002_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_ID_FGA:
 		if (m_tim0count-- == 0) // Zero detect
@@ -166,7 +166,7 @@ void fga002_device::device_timer(timer_instance const &timer, device_timer_id id
 		}
 		break;
 	default:
-		LOG("Unhandled Timer ID %d\n", id);
+		LOG("Unhandled Timer ID %d\n", timer.id());
 		break;
 	}
 }

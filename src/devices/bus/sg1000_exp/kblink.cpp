@@ -117,16 +117,16 @@ void sk1100_link_cable_device::device_add_mconfig(machine_config &config)
 }
 
 
-void sk1100_link_cable_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sk1100_link_cable_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_POLL:
 		queue();
 		break;
 
 	case TIMER_SEND:
-		m_stream->output(u8(param));
+		m_stream->output(u8(timer.param()));
 		break;
 
 	case TIMER_READ:

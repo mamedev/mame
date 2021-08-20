@@ -57,7 +57,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -212,9 +212,9 @@ void tugboat_state::ctrl_w(uint8_t data)
 	m_ctrl = data;
 }
 
-void tugboat_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void tugboat_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_INTERRUPT:
 		m_maincpu->set_input_line(0, HOLD_LINE);

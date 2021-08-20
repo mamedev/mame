@@ -188,9 +188,9 @@ void i8244_device::device_start()
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void i8244_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void i8244_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_HBLANK_START:
 			// hblank starts (updates sound shift register)

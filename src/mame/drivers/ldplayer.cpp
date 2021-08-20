@@ -42,7 +42,7 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -113,7 +113,7 @@ public:
 			void pr8210(machine_config &config);
 protected:
 	// device overrides
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -293,14 +293,14 @@ void ldplayer_state::process_commands()
 }
 
 
-void ldplayer_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ldplayer_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_ID_VSYNC_UPDATE:
 		{
 			// handle commands
-			if (param == 0)
+			if (timer.param() == 0)
 				process_commands();
 
 			// set a timer to go off on the next VBLANK
@@ -350,13 +350,14 @@ void pr8210_state::add_command(uint8_t command)
 }
 
 
-void pr8210_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pr8210_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_ID_BIT:
 		{
 			attotime duration = attotime::from_msec(30);
+			int param = timer.param();
 			uint8_t bitsleft = param >> 16;
 			uint8_t data = param;
 
@@ -390,7 +391,7 @@ void pr8210_state::device_timer(timer_instance const &timer, device_timer_id id,
 
 		// others to the parent class
 		default:
-			ldplayer_state::device_timer(timer, id, param, ptr);
+			ldplayer_state::device_timer(timer);
 			break;
 	}
 }

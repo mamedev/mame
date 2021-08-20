@@ -127,16 +127,16 @@ void wd1010_device::device_reset()
 //  device_timer - device-specific timer
 //-------------------------------------------------
 
-void wd1010_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void wd1010_device::device_timer(timer_instance const &timer)
 {
-	switch (tid)
+	switch (timer.id())
 	{
 	case TIMER_SEEK:
 
 		if ((m_command >> 4) != CMD_SCAN_ID)
 		{
 			LOGSEEK("Seek complete\n");
-			m_drives[drive()].cylinder = param;
+			m_drives[drive()].cylinder = timer.param();
 			m_status |= STATUS_SC;
 		}
 

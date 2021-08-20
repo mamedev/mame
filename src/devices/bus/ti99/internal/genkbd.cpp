@@ -206,16 +206,16 @@ geneve_xt_101_hle_keyboard_device::geneve_xt_101_hle_keyboard_device(const machi
 /*
     Called by the poll timer
 */
-void geneve_xt_101_hle_keyboard_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void geneve_xt_101_hle_keyboard_device::device_timer(timer_instance const &timer)
 {
-	if (id==0)
+	if (timer.id()==0)
 	{
 		poll();
 		send_key();
 	}
 	else
 	{
-		if (id==1)
+		if (timer.id()==1)
 		{
 			// Send timer
 			if (m_shift_count==10)

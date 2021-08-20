@@ -221,9 +221,9 @@ void sun4_mmu_base_device::device_reset()
 	memset(&m_cachedata[0], 0, sizeof(uint32_t) * 16384);
 }
 
-void sun4_mmu_base_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sun4_mmu_base_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_RESET)
+	if (timer.id() == TIMER_RESET)
 	{
 		m_reset_timer->adjust(attotime::never);
 		m_cpu->set_input_line(SPARC_RESET, CLEAR_LINE);

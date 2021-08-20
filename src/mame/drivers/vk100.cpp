@@ -277,7 +277,7 @@ private:
 	void vk100_io(address_map &map);
 	void vk100_mem(address_map &map);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 };
 
 // vram access functions:
@@ -349,12 +349,12 @@ void vk100_state::vram_write(uint8_t data)
 	m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
 }
 
-void vk100_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void vk100_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_EXECUTE_VG:
-		execute_vg(ptr, param);
+		execute_vg(timer.ptr(), timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in vk100_state::device_timer");

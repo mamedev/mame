@@ -270,25 +270,25 @@ void sega_scu_device::device_reset_after_children()
 }
 
 
-void sega_scu_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sega_scu_device::device_timer(timer_instance const &timer)
 {
 
-	switch(id)
+	switch(timer.id())
 	{
 		case DMALV0_ID:
 		case DMALV1_ID:
 		case DMALV2_ID:
 		{
-			const int irqlevel = id == 0 ? 5 : 6;
-			const int irqvector = 0x4b - id;
-			const uint16_t irqmask = 1 << (11-id);
+			const int irqlevel = timer.id() == 0 ? 5 : 6;
+			const int irqvector = 0x4b - timer.id();
+			const uint16_t irqmask = 1 << (11-timer.id());
 
 			if(!(m_ism & irqmask))
 				m_hostcpu->set_input_line_and_vector(irqlevel, HOLD_LINE, irqvector); // SH2
 			else
 				m_ist |= (irqmask);
 
-			update_dma_status(id,false);
+			update_dma_status(timer.id(),false);
 			machine().scheduler().synchronize(); // force resync
 			break;
 		}

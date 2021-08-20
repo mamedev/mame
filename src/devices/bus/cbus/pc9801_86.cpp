@@ -309,7 +309,7 @@ uint8_t pc9801_86_device::queue_pop()
 	return ret;
 }
 
-void pc9801_86_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void* ptr)
+void pc9801_86_device::device_timer(timer_instance const &timer)
 {
 	int16_t lsample, rsample;
 

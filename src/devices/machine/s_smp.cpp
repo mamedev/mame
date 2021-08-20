@@ -179,9 +179,9 @@ inline void s_smp_device::update_timer_tick(u8 which)
 	}
 }
 
-void s_smp_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void s_smp_device::device_timer(timer_instance const &timer)
 {
-	if (id != TIMER_TICK_ID)
+	if (timer.id() != TIMER_TICK_ID)
 		throw emu_fatalerror("Unknown id in s_smp_device::device_timer");
 
 	for (int ch = 0; ch < 3; ch++)

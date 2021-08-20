@@ -263,14 +263,14 @@ void i8275_device::dma_start()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void i8275_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void i8275_device::device_timer(timer_instance const &timer)
 {
 	//int y = screen().vpos();
 	//int x = screen().hpos();
 	int rc = m_scanline / SCANLINES_PER_ROW;
 	int lc = m_scanline % SCANLINES_PER_ROW;
 
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_HRTC_ON:
 		//LOG("I8275 y %u x %u HRTC 1\n", y, x);

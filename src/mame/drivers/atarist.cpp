@@ -52,9 +52,9 @@ static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0
 //  TIMERS
 //**************************************************************************
 
-void st_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void st_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_MOUSE_TICK:
 		mouse_tick();
@@ -825,9 +825,9 @@ void ste_state::dmasound_tick()
 }
 
 
-void ste_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ste_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_DMASOUND_TICK:
 		dmasound_tick();
@@ -836,7 +836,7 @@ void ste_state::device_timer(timer_instance const &timer, device_timer_id id, in
 		microwire_tick();
 		break;
 	default:
-		st_state::device_timer(timer, id, param, ptr);
+		st_state::device_timer(timer);
 	}
 }
 

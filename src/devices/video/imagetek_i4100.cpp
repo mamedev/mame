@@ -522,9 +522,9 @@ void imagetek_i4300_device::update_irq_state()
 	m_irq_cb(level);
 }
 
-void imagetek_i4100_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void imagetek_i4100_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_BLIT_END:
 			if (m_blit_irq_level != -1)

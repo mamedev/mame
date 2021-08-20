@@ -277,7 +277,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -898,12 +898,12 @@ static INPUT_PORTS_START( cat )
 INPUT_PORTS_END
 
 
-void cat_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cat_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_COUNTER_6MS:
-		counter_6ms_callback(ptr, param);
+		counter_6ms_callback(timer.ptr(), timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in cat_state::device_timer");

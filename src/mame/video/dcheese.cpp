@@ -64,16 +64,16 @@ void dcheese_state::update_scanline_irq()
 }
 
 
-void dcheese_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void dcheese_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_BLITTER_SCANLINE:
 		signal_irq(3);
 		update_scanline_irq();
 		break;
 	case TIMER_SIGNAL_IRQ:
-		signal_irq(param);
+		signal_irq(timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in dcheese_state::device_timer");

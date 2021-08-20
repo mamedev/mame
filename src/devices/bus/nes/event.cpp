@@ -228,9 +228,9 @@ ioport_constructor nes_event_device::device_input_ports() const
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nes_event_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_event_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_EVENT)
+	if (timer.id() == TIMER_EVENT)
 	{
 		m_timer_count--;
 		if (!m_timer_count)

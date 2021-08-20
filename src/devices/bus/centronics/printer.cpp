@@ -48,9 +48,10 @@ WRITE_LINE_MEMBER(centronics_printer_device::printer_online)
 	output_perror(!state);
 }
 
-void centronics_printer_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void centronics_printer_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_ACK:
 		output_ack(param);

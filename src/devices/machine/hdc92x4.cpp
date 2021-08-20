@@ -4766,12 +4766,12 @@ void hdc92x4_device::set_clock_divider(int line, int value)
 /*
     This is reached when a timer has expired
 */
-void hdc92x4_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void hdc92x4_device::device_timer(timer_instance const &timer)
 {
 	live_sync();
 	m_timed_wait = false;
 
-	switch (id)
+	switch (timer.id())
 	{
 	case GEN_TIMER:
 		reenter_command_processing();

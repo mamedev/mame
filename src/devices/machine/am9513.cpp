@@ -234,17 +234,17 @@ void am9513_device::device_clock_changed()
 //  fires
 //-------------------------------------------------
 
-void am9513_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void am9513_device::device_timer(timer_instance const &timer)
 {
-	assert(id >= TIMER_F1 && id <= TIMER_F5);
+	assert(timer.id() >= TIMER_F1 && timer.id() <= TIMER_F5);
 
-	int cycle = m_freq_timer_cycle[id - TIMER_F1] == 0 ? 2 : 1;
+	int cycle = m_freq_timer_cycle[timer.id() - TIMER_F1] == 0 ? 2 : 1;
 	while (cycle-- > 0)
 	{
-		m_f ^= 1 << (id - TIMER_F1);
-		bool level = BIT(m_f, id - TIMER_F1);
+		m_f ^= 1 << (timer.id() - TIMER_F1);
+		bool level = BIT(m_f, timer.id() - TIMER_F1);
 
-		int source = id - TIMER_F1 + 11;
+		int source = timer.id() - TIMER_F1 + 11;
 		for (int c = 0; c < 5; c++)
 		{
 			if ((m_counter_mode[c] & 0x0f00) >> 8 == source && BIT(m_counter_mode[c], 12) == !level)
@@ -252,7 +252,7 @@ void am9513_device::device_timer(timer_instance const &timer, device_timer_id id
 		}
 
 		// FOUT Source = Fn
-		if ((m_mmr & 0x00f0) >> 4 == source || ((m_mmr & 0x00f0) == 0 && id == TIMER_F1))
+		if ((m_mmr & 0x00f0) >> 4 == source || ((m_mmr & 0x00f0) == 0 && timer.id() == TIMER_F1))
 			fout_tick();
 	}
 }

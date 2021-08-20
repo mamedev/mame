@@ -177,11 +177,11 @@ void ncr539x_device::dma_write_data(int bytes, uint8_t *pData)
 	write_data(pData, bytes);
 }
 
-void ncr539x_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void ncr539x_device::device_timer(timer_instance const &timer)
 {
 	//printf("539X: device_timer expired, param = %d, m_command = %02x\n", param, m_command);
 
-	switch (param)
+	switch (timer.param())
 	{
 		case TIMER_539X_COMMAND:
 			// if this is a DMA command, raise DRQ now

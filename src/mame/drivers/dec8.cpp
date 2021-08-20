@@ -132,9 +132,9 @@ uint8_t dec8_state::gondo_player_2_r(offs_t offset)
 *
 ***************************************************/
 
-void dec8_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void dec8_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_DEC8_I8751:
 		// The schematics show a clocked LS194 shift register (3A) is used to automatically

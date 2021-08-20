@@ -258,12 +258,12 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
 	}
 }
 
-void wd_fdc_device_base::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void wd_fdc_device_base::device_timer(timer_instance const &timer)
 {
-	LOGEVENT("Event fired for timer %s\n", (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
+	LOGEVENT("Event fired for timer %s\n", (timer.id()==TM_GEN)? "TM_GEN" : (timer.id()==TM_CMD)? "TM_CMD" : (timer.id()==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
 	live_sync();
 
-	switch(id) {
+	switch(timer.id()) {
 	case TM_GEN: do_generic(); break;
 	case TM_CMD: do_cmd_w(); break;
 	case TM_TRACK: do_track_w(); break;

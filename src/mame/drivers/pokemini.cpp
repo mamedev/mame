@@ -51,7 +51,7 @@ protected:
 		TIMER_PRC
 	};
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -1696,9 +1696,9 @@ void pokemini_state::machine_start()
 }
 
 
-void pokemini_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pokemini_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_SECONDS:
 			seconds_timer_callback();

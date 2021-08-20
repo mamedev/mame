@@ -62,9 +62,10 @@ void saa1043_device::device_reset()
 	m_outputs[V2](ASSERT_LINE);
 }
 
-void saa1043_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void saa1043_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 		case V2:
 			m_outputs[V2](1 - param);

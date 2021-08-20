@@ -54,9 +54,9 @@ void wpc_device::device_reset()
 	m_alpha_pos = 0;
 }
 
-void wpc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void wpc_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_ZEROCROSS:
 		m_zerocross = true;

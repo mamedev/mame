@@ -159,9 +159,9 @@ void pinsnd88_device::pinsnd88_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("cpu",0x3c000); // fixed bank
 }
 
-void pinsnd88_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pinsnd88_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case TIMER_SYNC:
 			if (!m_syncq_cb.isnull())

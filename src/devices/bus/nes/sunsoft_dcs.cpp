@@ -295,9 +295,9 @@ void nes_sunsoft_dcs_device::device_add_mconfig(machine_config &config)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nes_sunsoft_dcs_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_dcs_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_PROTECT)
+	if (timer.id() == TIMER_PROTECT)
 	{
 		m_timer_on = 0;
 		ntb_enable_timer->reset();

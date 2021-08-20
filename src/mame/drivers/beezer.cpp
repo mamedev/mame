@@ -108,7 +108,7 @@ protected:
 		TIMER_SCANLINE
 	};
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -297,9 +297,9 @@ uint8_t beezer_state::line_r()
 //  AUDIO
 //**************************************************************************
 
-void beezer_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void beezer_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_DAC: dac_update_cb(); break;
 	case TIMER_SCANLINE: scanline_cb(); break;

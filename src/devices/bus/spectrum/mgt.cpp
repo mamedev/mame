@@ -714,9 +714,9 @@ void spectrum_disciple_device::mreq_w(offs_t offset, uint8_t data)
 		m_exp->mreq_w(offset, data);
 }
 
-void spectrum_disciple_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void spectrum_disciple_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_RESET:
 		m_reset_delay = false;

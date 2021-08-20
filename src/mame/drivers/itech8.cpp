@@ -674,21 +674,22 @@ void grmatch_state::machine_reset()
 	m_palette_timer->adjust(m_screen->time_until_pos(m_screen->vpos()+1));
 }
 
-void itech8_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void itech8_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_IRQ_OFF:
-		irq_off(ptr, param);
+		irq_off(timer.ptr(), param);
 		break;
 	case TIMER_BEHIND_BEAM_UPDATE:
-		behind_the_beam_update(ptr, param);
+		behind_the_beam_update(timer.ptr(), param);
 		break;
 	case TIMER_BLITTER_DONE:
-		blitter_done(ptr, param);
+		blitter_done(timer.ptr(), param);
 		break;
 	case TIMER_DELAYED_Z80_CONTROL:
-		delayed_z80_control_w(ptr, param);
+		delayed_z80_control_w(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in itech8_state::device_timer");

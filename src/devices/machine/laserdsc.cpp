@@ -282,9 +282,9 @@ void laserdisc_device::device_validity_check(validity_checker &valid) const
 //  device
 //-------------------------------------------------
 
-void laserdisc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void laserdisc_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_VBI_FETCH:
 		{

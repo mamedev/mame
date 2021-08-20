@@ -218,21 +218,21 @@ void hpc3_device::map(address_map &map)
 	map(0x00060000, 0x0007ffff).rw(FUNC(hpc3_device::bbram_r), FUNC(hpc3_device::bbram_w));
 }
 
-void hpc3_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void hpc3_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_PBUS_DMA+0:
 	case TIMER_PBUS_DMA+1:
 	case TIMER_PBUS_DMA+2:
 	case TIMER_PBUS_DMA+3:
-		do_pbus_dma(id - TIMER_PBUS_DMA);
+		do_pbus_dma(timer.id() - TIMER_PBUS_DMA);
 		break;
 	case TIMER_PBUS_DMA+4:
 	case TIMER_PBUS_DMA+5:
 	case TIMER_PBUS_DMA+6:
 	case TIMER_PBUS_DMA+7:
-		LOGMASKED(LOG_UNKNOWN, "HPC3: Ignoring active PBUS DMA on channel %d\n", id - TIMER_PBUS_DMA);
+		LOGMASKED(LOG_UNKNOWN, "HPC3: Ignoring active PBUS DMA on channel %d\n", timer.id() - TIMER_PBUS_DMA);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in hpc3_device::device_timer");

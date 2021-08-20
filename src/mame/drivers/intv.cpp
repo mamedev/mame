@@ -424,18 +424,19 @@ void intv_state::intvkbd2_mem(address_map &map)
 	map(0xe000, 0xffff).r(FUNC(intv_state::intvkb_iocart_r));
 }
 
-void intv_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void intv_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_INTV_INTERRUPT2_COMPLETE:
-		intv_interrupt2_complete(ptr, param);
+		intv_interrupt2_complete(timer.ptr(), param);
 		break;
 	case TIMER_INTV_INTERRUPT_COMPLETE:
-		intv_interrupt_complete(ptr, param);
+		intv_interrupt_complete(timer.ptr(), param);
 		break;
 	case TIMER_INTV_BTB_FILL:
-		intv_btb_fill(ptr, param);
+		intv_btb_fill(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in intv_state::device_timer");

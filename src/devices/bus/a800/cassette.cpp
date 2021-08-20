@@ -82,9 +82,9 @@ WRITE_LINE_MEMBER( a8sio_cassette_device::motor_w )
 	}
 }
 
-void a8sio_cassette_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void a8sio_cassette_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_CASSETTE_READ:
 			uint8_t cass_signal = m_cassette->input() < 0 ? 0 : 1;

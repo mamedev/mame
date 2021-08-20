@@ -195,7 +195,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	u8 m_sol20_fa;
@@ -240,12 +240,12 @@ cassette_image_device *sol20_state::cassette_device_image()
 }
 
 
-void sol20_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sol20_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_SOL20_CASSETTE_TC:
-		sol20_cassette_tc(ptr, param);
+		sol20_cassette_tc(timer.ptr(), timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in sol20_state::device_timer");

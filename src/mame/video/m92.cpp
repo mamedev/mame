@@ -46,9 +46,9 @@
 
 /*****************************************************************************/
 
-void m92_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void m92_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_SPRITEBUFFER:
 		m_sprite_buffer_busy = 1;

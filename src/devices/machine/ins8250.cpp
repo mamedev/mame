@@ -713,9 +713,9 @@ void ns16550_device::device_reset()
 	ins8250_uart_device::device_reset();
 }
 
-void ns16550_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ns16550_device::device_timer(timer_instance const &timer)
 {
-	if(!id)
+	if(!timer.id())
 	{
 		trigger_int(COM_INT_PENDING_CHAR_TIMEOUT);
 		m_timeout->adjust(attotime::never);

@@ -215,13 +215,13 @@ void mc14411_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mc14411_device::device_timer(timer_instance const &timer, device_timer_id id, int32_t param, void *ptr)
+void mc14411_device::device_timer(timer_instance const &timer)
 {
-	if (id >= TIMER_F1 && id <= TIMER_F16)
+	if (timer.id() >= TIMER_F1 && timer.id() <= TIMER_F16)
 	{
-		(m_out_fx_cbs[id])(m_fx_state[id]++ & 1);
+		(m_out_fx_cbs[timer.id()])(m_fx_state[timer.id()]++ & 1);
 	}
-	else if (id == TIMER_ID_RESET)
+	else if (timer.id() == TIMER_ID_RESET)
 	{
 		// NOTE: This check could be triggered by either faulty hardware design or non accurate emulation so is just informative if the reset line is handled
 		//       explicitelly instead of relying on calling device_reset
@@ -233,7 +233,7 @@ void mc14411_device::device_timer(timer_instance const &timer, device_timer_id i
 	}
 	else
 	{
-		LOG("Unhandled Timer ID %d\n", id);
+		LOG("Unhandled Timer ID %d\n", timer.id());
 	}
 }
 

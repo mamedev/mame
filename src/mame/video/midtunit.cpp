@@ -616,9 +616,9 @@ DEFINE_TEMPLATED_DMA_DRAW_GROUP(false, false);
  *
  *************************************/
 
-void midtunit_video_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void midtunit_video_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_DMA:
 		m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */

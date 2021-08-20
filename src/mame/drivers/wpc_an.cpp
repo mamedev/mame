@@ -114,7 +114,7 @@ private:
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 
@@ -276,10 +276,10 @@ static INPUT_PORTS_START( wpc_an )
 INPUT_PORTS_END
 
 
-void wpc_an_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void wpc_an_state::device_timer(timer_instance const &timer)
 {
 	int x;
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_VBLANK:
 		// update LED segments

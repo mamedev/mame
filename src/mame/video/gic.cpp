@@ -239,9 +239,9 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 /* AUDIO SECTION */
 
-void gic_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void gic_device::device_timer(timer_instance const &timer)
 {
-	switch ( id )
+	switch ( timer.id() )
 	{
 		case TIMER_VBLANK:
 			//flag the audio to reset

@@ -107,9 +107,9 @@ void mc146818_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mc146818_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mc146818_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_PERIODIC:
 		m_sqw_state = !m_sqw_state;
@@ -135,7 +135,7 @@ void mc146818_device::device_timer(timer_instance const &timer, device_timer_id 
 		break;
 
 	case TIMER_UPDATE:
-		if (!param)
+		if (!timer.param())
 		{
 			/// TODO: find out how the real chip deals with updates when binary/bcd values are already outside the normal range
 			int seconds = get_seconds() + 1;

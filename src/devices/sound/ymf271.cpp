@@ -1309,9 +1309,9 @@ void ymf271_device::ymf271_write_pcm(uint8_t address, uint8_t data)
 	}
 }
 
-void ymf271_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ymf271_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case 0:
 			m_status |= 1;

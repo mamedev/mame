@@ -291,7 +291,7 @@ void netlist_mame_analog_input_device::write(const double val)
 		synchronize(0);
 }
 
-void netlist_mame_analog_input_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void netlist_mame_analog_input_device::device_timer(timer_instance const &timer)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
@@ -320,25 +320,25 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 	}
 }
 
-void netlist_mame_int_input_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void netlist_mame_int_input_device::device_timer(timer_instance const &timer)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
 	nl_owner().log_add(m_param_name, param, false);
 #endif
-	m_param->set(param);
+	m_param->set(timer.param());
 }
 
-void netlist_mame_logic_input_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void netlist_mame_logic_input_device::device_timer(timer_instance const &timer)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
 	nl_owner().log_add(m_param_name, param, false);
 #endif
-	m_param->set(param);
+	m_param->set(timer.param());
 }
 
-void netlist_mame_ram_pointer_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void netlist_mame_ram_pointer_device::device_timer(timer_instance const &timer)
 {
 	m_data = (*m_param)();
 }

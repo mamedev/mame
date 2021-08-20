@@ -224,9 +224,9 @@ WRITE_LINE_MEMBER( at28c16_device::set_oe_12v )
 }
 
 
-void at28c16_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void at28c16_device::device_timer(timer_instance const &timer)
 {
-	switch( id )
+	switch( timer.id() )
 	{
 	case 0:
 		m_last_write = -1;

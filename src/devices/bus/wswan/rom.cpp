@@ -199,9 +199,9 @@ void ws_rom_eeprom_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void ws_rom_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ws_rom_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_RTC)
+	if (timer.id() == TIMER_RTC)
 	{
 		// a second passed
 		m_rtc_second++;

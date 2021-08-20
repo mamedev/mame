@@ -184,9 +184,9 @@ void nb1412m2_device::device_reset()
 	m_dac_timer->adjust(attotime::never);
 }
 
-void nb1412m2_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nb1412m2_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_MAIN:
 			m_timer_reg = true;

@@ -875,9 +875,11 @@ void wd2010_device::buffer_ready(bool state)
 }
 
 
-void wd2010_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
+void wd2010_device::device_timer(timer_instance const &timer)
 {
-	switch (tid)
+	int param = timer.param();
+
+	switch (timer.id())
 	{
 	case COMMAND_TIMER:
 		cmd_timer->adjust(attotime::never);
@@ -916,10 +918,9 @@ void wd2010_device::device_timer(timer_instance const &timer, device_timer_id ti
 			deassert_read_when_buffer_ready_high->adjust(attotime::never);
 
 			m_error &= ~ERROR_ID;
-			param &= ~STATUS_ERR;
 
 			m_out_bdrq_cb(0);
-			complete_immediate(param);
+			complete_immediate(param & ~STATUS_ERR);
 		}
 		else
 		{

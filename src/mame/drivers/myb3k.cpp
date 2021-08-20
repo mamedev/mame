@@ -209,7 +209,7 @@ private:
 	{
 		TIMER_ID_KEY_INTERRUPT
 	};
-	void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(timer_instance const &timer) override;
 
 	/* Status bits */
 	enum
@@ -281,9 +281,9 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 	timer_set(attotime::from_msec(1), TIMER_ID_KEY_INTERRUPT);
 }
 
-void myb3k_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void myb3k_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_ID_KEY_INTERRUPT:
 		/* The serial transfer of 8 bits is complete. Now trigger INT7. */

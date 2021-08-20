@@ -204,9 +204,9 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 	m_mouse.received = 0;
 }
 
-void kbdc8042_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void kbdc8042_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_UPDATE)
+	if (timer.id() == TIMER_UPDATE)
 	{
 		at_8042_check_keyboard();
 		if (m_mouse.on)

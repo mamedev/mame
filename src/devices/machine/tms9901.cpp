@@ -453,9 +453,9 @@ void tms9901_device::write_bit(int offset, bool data)
     Decrementer counts down the value set in clock mode; when it reaches 0,
     raises an interrupt and resets to the start value
 */
-void tms9901_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void tms9901_device::device_timer(timer_instance const &timer)
 {
-	if (id==DECREMENTER) // we have only that one
+	if (timer.id()==DECREMENTER) // we have only that one
 	{
 		timer_clock_in(ASSERT_LINE);
 		timer_clock_in(CLEAR_LINE);

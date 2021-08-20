@@ -1567,15 +1567,15 @@ void pxa255_periphs_device::device_reset()
 	memset(&m_clocks_regs, 0, sizeof(m_clocks_regs));
 }
 
-void pxa255_periphs_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pxa255_periphs_device::device_timer(timer_instance const &timer)
 {
-	if (id < TIMER_OSTIMER0)
-		dma_end_tick(id);
-	else if (id < TIMER_LCD_EOF0)
-		ostimer_match_tick(id - TIMER_OSTIMER0);
-	else if (id < TIMER_RTC)
-		lcd_dma_eof_tick(id - TIMER_LCD_EOF0);
-	else if (id == TIMER_RTC)
+	if (timer.id() < TIMER_OSTIMER0)
+		dma_end_tick(timer.id());
+	else if (timer.id() < TIMER_LCD_EOF0)
+		ostimer_match_tick(timer.id() - TIMER_OSTIMER0);
+	else if (timer.id() < TIMER_RTC)
+		lcd_dma_eof_tick(timer.id() - TIMER_LCD_EOF0);
+	else if (timer.id() == TIMER_RTC)
 		rtc_tick();
 }
 

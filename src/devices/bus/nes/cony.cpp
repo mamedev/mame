@@ -156,9 +156,9 @@ void nes_yoko_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_cony_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_cony_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{

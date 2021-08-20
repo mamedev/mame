@@ -732,9 +732,10 @@ uint32_t jaguar_state::cojag_gun_input_r(offs_t offset)
  *
  *************************************/
 
-void jaguar_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void jaguar_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 		case TID_SCANLINE:
 			scanline_update(param);
@@ -761,7 +762,7 @@ void jaguar_state::device_timer(timer_instance const &timer, device_timer_id id,
 		case TID_GPU_SYNC:
 			// if a command is still pending, and we haven't maxed out our timer, set a new one
 			if (m_gpu_command_pending && param < 1000)
-				timer_set(attotime::from_usec(50), TID_GPU_SYNC, ++param);
+				timer_set(attotime::from_usec(50), TID_GPU_SYNC, param + 1);
 			break;
 	}
 }

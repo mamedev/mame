@@ -86,9 +86,9 @@ void null_modem_device::device_reset()
 	queue();
 }
 
-void null_modem_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void null_modem_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_POLL:
 		queue();

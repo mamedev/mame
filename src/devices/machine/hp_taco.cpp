@@ -605,9 +605,9 @@ void hp_taco_device::device_reset()
 	m_error_timer->reset();
 }
 
-void hp_taco_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void hp_taco_device::device_timer(timer_instance const &timer)
 {
-	switch (id) {
+	switch (timer.id()) {
 	case GAP_TMR_ID:
 		m_tape->update_speed_pos();
 		LOG_DBG("Gap tmr @%g pos=%d cmd %02x st %d\n" , machine().time().as_double() , m_tape->get_pos() , get_cmd(m_cmd_reg) , m_cmd_state);

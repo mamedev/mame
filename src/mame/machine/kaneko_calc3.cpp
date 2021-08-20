@@ -95,9 +95,9 @@ void kaneko_calc3_device::reset_run_timer()
 	m_runtimer->adjust(attotime::from_hz(59.1854));
 }
 
-void kaneko_calc3_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void kaneko_calc3_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case MCU_RUN_TIMER:
 		mcu_run();

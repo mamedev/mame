@@ -179,9 +179,9 @@ void z80sti_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void z80sti_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void z80sti_device::device_timer(timer_instance const &timer)
 {
-	timer_count(id);
+	timer_count(timer.id());
 }
 
 

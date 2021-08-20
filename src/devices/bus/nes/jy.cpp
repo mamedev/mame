@@ -225,9 +225,9 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 	}
 }
 
-void nes_jy_typea_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_jy_typea_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		irq_clock(0, 0);
 	}

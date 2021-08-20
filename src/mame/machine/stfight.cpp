@@ -109,9 +109,9 @@ void stfight_state::stfight_bank_w(uint8_t data)
  *      CPU 1 timed interrupt - 60Hz???
  */
 
-void stfight_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void stfight_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_STFIGHT_INTERRUPT_1:
 		// Do a RST08

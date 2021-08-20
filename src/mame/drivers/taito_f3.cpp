@@ -424,9 +424,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-void taito_f3_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void taito_f3_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_F3_INTERRUPT3:
 		m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?

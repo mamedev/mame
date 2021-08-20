@@ -115,7 +115,7 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 
@@ -220,9 +220,9 @@ static INPUT_PORTS_START( ksm )
 	PORT_DIPSETTING(0x0E, "75")
 INPUT_PORTS_END
 
-void ksm_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ksm_state::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_ID_BRG)
+	if (timer.id() == TIMER_ID_BRG)
 	{
 		brg_state = !brg_state;
 		m_i8251line->write_txc(brg_state);

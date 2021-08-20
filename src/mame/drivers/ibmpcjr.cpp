@@ -99,7 +99,7 @@ private:
 	int m_signal_count;
 	uint8_t m_nmi_enabled;
 
-	void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(timer_instance const &timer) override;
 	emu_timer *m_pc_int_delay_timer;
 	emu_timer *m_pcjr_watchdog;
 	emu_timer *m_keyb_signal_timer;
@@ -153,12 +153,12 @@ void pcjr_state::machine_reset()
 	m_nmi_enabled = 0x80;
 }
 
-void pcjr_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pcjr_state::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 		case TIMER_IRQ_DELAY:
-			m_maincpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
+			m_maincpu->set_input_line(0, timer.param() ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case TIMER_WATCHDOG:

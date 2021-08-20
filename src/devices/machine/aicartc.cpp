@@ -111,7 +111,7 @@ void aicartc_device::device_reset()
 //-------------------------------------------------
 
 
-void aicartc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void aicartc_device::device_timer(timer_instance const &timer)
 {
 	m_rtc_tick++;
 	if(m_rtc_tick & 0x8000)

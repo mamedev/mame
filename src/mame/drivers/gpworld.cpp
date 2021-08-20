@@ -100,7 +100,7 @@ private:
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 };
 
 
@@ -454,9 +454,9 @@ static INPUT_PORTS_START( gpworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void gpworld_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void gpworld_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_IRQ_STOP:
 		m_maincpu->set_input_line(0, CLEAR_LINE);

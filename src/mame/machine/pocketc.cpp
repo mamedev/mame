@@ -14,9 +14,9 @@ READ_LINE_MEMBER(pocketc_state::brk_r)
 	return BIT(m_extra->read(), 0);
 }
 
-void pocketc_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pocketc_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_POWER_UP:
 		m_power = 0;

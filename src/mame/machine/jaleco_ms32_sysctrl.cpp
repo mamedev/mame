@@ -197,12 +197,12 @@ void jaleco_ms32_sysctrl_device::flush_scanline_timer(int current_scanline)
 	m_timer_scanline->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
-void jaleco_ms32_sysctrl_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void jaleco_ms32_sysctrl_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case SCANLINE_TIMER:
-			flush_scanline_timer(param);
+			flush_scanline_timer(timer.param());
 			break;
 		case PRG_TIMER:
 			m_prg_timer_cb(1);

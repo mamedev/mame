@@ -137,9 +137,9 @@ static INPUT_PORTS_START( wpc_dot )
 	PORT_DIPSETTING(0xf0,"USA 2")
 INPUT_PORTS_END
 
-void wpc_dot_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void wpc_dot_state::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_VBLANK:
 		if((m_vblank_count % 4) == (m_wpc->get_dmd_firq_line()*4/32))

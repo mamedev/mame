@@ -133,9 +133,9 @@ void upd1990a_device::rtc_clock_updated(int year, int month, int day, int day_of
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void upd1990a_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void upd1990a_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_CLOCK:
 		advance_seconds();

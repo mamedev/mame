@@ -267,13 +267,13 @@ void scc68070_device::device_reset()
 //  device_timer - device-specific timer callback
 //-------------------------------------------------
 
-void scc68070_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void scc68070_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_TMR0)
+	if (timer.id() == TIMER_TMR0)
 		timer0_callback();
-	else if (id == TIMER_UART_RX)
+	else if (timer.id() == TIMER_UART_RX)
 		rx_callback();
-	else if (id == TIMER_UART_TX)
+	else if (timer.id() == TIMER_UART_TX)
 		tx_callback();
 }
 

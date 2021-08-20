@@ -103,7 +103,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	enum
@@ -428,9 +428,9 @@ u32 mlanding_state::exec_dma()
 }
 
 
-void mlanding_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void mlanding_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_DMA_COMPLETE:
 		m_dma_busy = 0;

@@ -1185,12 +1185,12 @@ void z80scc_channel::device_reset()
 	m_extint_states = m_rr0;
 }
 
-void z80scc_channel::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void z80scc_channel::device_timer(timer_instance const &timer)
 {
 //  LOG("%s %d\n", FUNCNAME, id);
 
 #if Z80SCC_USE_LOCAL_BRG
-	switch(id)
+	switch(timer.id())
 	{
 	case TIMER_ID_BAUD:
 		{

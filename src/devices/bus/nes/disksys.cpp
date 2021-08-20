@@ -380,9 +380,9 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nes_disksys_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nes_disksys_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_IRQ)
+	if (timer.id() == TIMER_IRQ)
 	{
 		if (m_irq_enable && m_irq_count)
 		{

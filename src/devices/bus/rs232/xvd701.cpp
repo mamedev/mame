@@ -57,9 +57,9 @@ void jvc_xvd701_device::device_reset()
 	m_response_index = sizeof(m_response);
 }
 
-void jvc_xvd701_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void jvc_xvd701_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_RESPONSE:
 		send_response();

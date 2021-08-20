@@ -103,12 +103,12 @@ void nb1413m3_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void nb1413m3_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nb1413m3_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_CB:
-			timer_callback(ptr, param);
+			timer_callback(timer.ptr(), timer.param());
 			break;
 		default:
 			throw emu_fatalerror("Unknown id in nb1413m3_device::device_timer");

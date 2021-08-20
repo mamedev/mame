@@ -545,7 +545,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	static const device_timer_id TIMER_0 = 0;
 	static const device_timer_id TIMER_1 = 1;
@@ -1020,9 +1020,9 @@ WRITE_LINE_MEMBER( sun4_base_state::scc2_int )
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void sun4_base_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sun4_base_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_0:
 			//logerror("Timer 0 expired\n");

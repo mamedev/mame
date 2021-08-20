@@ -164,11 +164,11 @@ void uv201_device::device_reset()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void uv201_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void uv201_device::device_timer(timer_instance const &timer)
 {
 	int scanline = screen().vpos();
 
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_Y_ODD:
 	case TIMER_Y_EVEN:

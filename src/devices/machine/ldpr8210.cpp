@@ -316,9 +316,9 @@ void pioneer_pr8210_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void pioneer_pr8210_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pioneer_pr8210_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		// update the VBI data in the PIA as soon as it is ready;
 		// this must happen early in the frame because the player
@@ -374,7 +374,7 @@ void pioneer_pr8210_device::device_timer(timer_instance const &timer, device_tim
 
 		// pass everything else onto the parent
 		default:
-			laserdisc_device::device_timer(timer, id, param, ptr);
+			laserdisc_device::device_timer(timer);
 			break;
 	}
 }
@@ -986,9 +986,9 @@ void simutrek_special_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void simutrek_special_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void simutrek_special_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		// clear the 8748 IRQ
 		case TID_IRQ_OFF:
@@ -997,13 +997,13 @@ void simutrek_special_device::device_timer(timer_instance const &timer, device_t
 
 		// latch data
 		case TID_LATCH_DATA:
-			m_data = param;
+			m_data = timer.param();
 			m_data_ready = true;
 			break;
 
 		// pass everything else onto the parent
 		default:
-			pioneer_pr8210_device::device_timer(timer, id, param, ptr);
+			pioneer_pr8210_device::device_timer(timer);
 			break;
 	}
 }

@@ -146,10 +146,10 @@ void vino_device::device_add_mconfig(machine_config &config)
 	IMAGE_AVIVIDEO(config, m_avivideo);
 }
 
-void vino_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void vino_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_FETCH_CHA || id == TIMER_FETCH_CHB)
-		fetch_pixel((int)id);
+	if (timer.id() == TIMER_FETCH_CHA || timer.id() == TIMER_FETCH_CHB)
+		fetch_pixel((int)timer.id());
 }
 
 uint32_t vino_device::read(offs_t offset, uint32_t mem_mask)

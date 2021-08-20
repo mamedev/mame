@@ -523,7 +523,7 @@ void floppy_image_device::device_reset()
 	cache_clear();
 }
 
-void floppy_image_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void floppy_image_device::device_timer(timer_instance const &timer)
 {
 	index_resync();
 }

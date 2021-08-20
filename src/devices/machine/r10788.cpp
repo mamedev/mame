@@ -106,10 +106,10 @@ void r10788_device::device_reset()
  * @param param parameter
  * @param ptr pointer parameter
  */
-void r10788_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void r10788_device::device_timer(timer_instance const &timer)
 {
 	uint8_t data;
-	switch (id)
+	switch (timer.id())
 	{
 		case TIMER_DISPLAY:
 			data = (m_reg[0][m_scan_counter] & m_mask_a) +
@@ -118,7 +118,7 @@ void r10788_device::device_timer(timer_instance const &timer, device_timer_id id
 			m_display(m_scan_counter, data, 0xff);
 			break;
 		default:
-			LOG("%s: invalid timer id:%d\n", __FUNCTION__, id);
+			LOG("%s: invalid timer id:%d\n", __FUNCTION__, timer.id());
 	}
 	m_scan_counter = (m_scan_counter + 1) % 16;
 }

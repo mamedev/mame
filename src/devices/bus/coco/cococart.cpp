@@ -168,9 +168,10 @@ void cococart_slot_device::device_start()
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void cococart_slot_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cococart_slot_device::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	int param = timer.param();
+	switch(timer.id())
 	{
 		case TIMER_CART:
 			set_line(line::CART, m_cart_line, (line_value) param);

@@ -349,9 +349,9 @@ void epson_lx810l_device::device_reset()
 //  device_timer - device-specific timer
 //-------------------------------------------------
 
-void epson_lx810l_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void epson_lx810l_device::device_timer(timer_instance const &timer)
 {
-	switch (id) {
+	switch (timer.id()) {
 	case TIMER_CR:
 		/* The firmware issues two half-steps in sequence, one immediately
 		 * after the other. At full speed, the motor does two half-steps at
@@ -359,7 +359,7 @@ void epson_lx810l_device::device_timer(timer_instance const &timer, device_timer
 		 * the same period as each half-step (417 microseconds), but with
 		 * a 356 microseconds delay relative to the motor steps.
 		 */
-		m_real_cr_pos += param;
+		m_real_cr_pos += timer.param();
 		m_real_cr_steps--;
 		if (m_real_cr_steps)
 			m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);

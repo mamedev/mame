@@ -175,11 +175,11 @@ std::string video992_device::tts(attotime t)
 }
 
 
-void video992_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void video992_device::device_timer(timer_instance const &timer)
 {
 	int raw_vpos = screen().vpos();
 
-	if (id == HOLD_TIME)
+	if (timer.id() == HOLD_TIME)
 	{
 		// logerror("release time: %s, diff: %s\n", tts(machine().time()), tts(machine().time()-m_hold_time));
 		// We're holding the CPU; release it until the next start

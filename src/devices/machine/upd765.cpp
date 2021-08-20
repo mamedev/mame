@@ -2485,16 +2485,16 @@ std::string upd765_family_device::ttsn() const
 	return machine().time().to_string();
 }
 
-void upd765_family_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void upd765_family_device::device_timer(timer_instance const &timer)
 {
-	if(id == TIMER_DRIVE_READY_POLLING) {
+	if(timer.id() == TIMER_DRIVE_READY_POLLING) {
 		run_drive_ready_polling();
 		return;
 	}
 
 	live_sync();
 
-	floppy_info &fi = flopi[id];
+	floppy_info &fi = flopi[timer.id()];
 	switch(fi.sub_state) {
 	case SEEK_WAIT_STEP_SIGNAL_TIME:
 		fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME_DONE;

@@ -593,22 +593,22 @@ void upd775x_device::advance_state()
 
 *************************************************************/
 
-void upd7759_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void upd7759_device::device_timer(timer_instance const &timer)
 {
 	uint8_t olddrq = m_drq;
 
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_PORT_WRITE:
-			m_fifo_in = param;
+			m_fifo_in = timer.param();
 			break;
 
 		case TID_RESET_WRITE:
-			internal_reset_w(param);
+			internal_reset_w(timer.param());
 			break;
 
 		case TID_START_WRITE:
-			internal_start_w(param);
+			internal_start_w(timer.param());
 			break;
 
 		case TID_SLAVE_UPDATE:

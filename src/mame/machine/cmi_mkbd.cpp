@@ -79,9 +79,9 @@ void cmi_music_keyboard_device::device_start()
 	m_scnd = 0;
 }
 
-void cmi_music_keyboard_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void cmi_music_keyboard_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_CMI10_SCND:
 		m_cmi10_pia_u20->ca1_w(m_scnd);

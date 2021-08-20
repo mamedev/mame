@@ -368,24 +368,25 @@ uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-void pc88va_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void pc88va_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_PC8801FD_UPD765_TC_TO_ZERO:
-		pc8801fd_upd765_tc_to_zero(ptr, param);
+		pc8801fd_upd765_tc_to_zero(timer.ptr(), param);
 		break;
 	case TIMER_T3_MOUSE_CALLBACK:
-		t3_mouse_callback(ptr, param);
+		t3_mouse_callback(timer.ptr(), param);
 		break;
 	case TIMER_PC88VA_FDC_TIMER:
-		pc88va_fdc_timer(ptr, param);
+		pc88va_fdc_timer(timer.ptr(), param);
 		break;
 	case TIMER_PC88VA_FDC_MOTOR_START_0:
-		pc88va_fdc_motor_start_0(ptr, param);
+		pc88va_fdc_motor_start_0(timer.ptr(), param);
 		break;
 	case TIMER_PC88VA_FDC_MOTOR_START_1:
-		pc88va_fdc_motor_start_1(ptr, param);
+		pc88va_fdc_motor_start_1(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pc88va_state::device_timer");

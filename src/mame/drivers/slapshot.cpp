@@ -147,9 +147,9 @@ Region byte at offset 0x031:
                 INTERRUPTS
 ***********************************************************/
 
-void slapshot_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void slapshot_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_SLAPSHOT_INTERRUPT6:
 		m_maincpu->set_input_line(6, HOLD_LINE);

@@ -35,9 +35,9 @@ void snes_miracle_device::device_add_mconfig(machine_config &config)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void snes_miracle_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void snes_miracle_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_STROBE_ON)
+	if (timer.id() == TIMER_STROBE_ON)
 	{
 		m_strobe_clock++;
 	}

@@ -119,9 +119,9 @@ void artmagic_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  *
  *************************************/
 
-void artmagic_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void artmagic_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_IRQ_OFF:
 		m_hack_irq = 0;

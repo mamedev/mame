@@ -53,9 +53,9 @@ DEFINE_DEVICE_TYPE(SMS_SPORTS_PAD, sms_sports_pad_device, "sms_sports_pad", "Seg
 #define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL(10'738'635)/3/512)
 
 
-void sms_sports_pad_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void sms_sports_pad_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_SPORTSPAD:
 		// values for x and y axis need to be resetted for Sports Pad games, but

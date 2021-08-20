@@ -85,9 +85,9 @@ void z88cart_slot_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void z88cart_slot_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void z88cart_slot_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_FLP_CLEAR)
+	if (timer.id() == TIMER_FLP_CLEAR)
 	{
 		// close the flap
 		m_out_flp_cb(CLEAR_LINE);

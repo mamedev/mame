@@ -91,9 +91,9 @@ void dpc_device::decrement_counter(uint8_t data_fetcher)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void dpc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void dpc_device::device_timer(timer_instance const &timer)
 {
-	if (id == TIMER_OSC)
+	if (timer.id() == TIMER_OSC)
 	{
 		// callback
 		for (int data_fetcher = 5; data_fetcher < 8; data_fetcher++)

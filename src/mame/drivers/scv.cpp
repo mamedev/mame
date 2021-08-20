@@ -38,7 +38,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	void porta_w(uint8_t data);
@@ -265,9 +265,9 @@ void scv_state::scv_palette(palette_device &palette) const
 }
 
 
-void scv_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void scv_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_VB:
 		{

@@ -691,21 +691,22 @@ void gottlieb_state::qbert_knocker(machine_config &config)
 *
 *************************************/
 
-void gottlieb_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void gottlieb_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 	case TIMER_LASERDISC_PHILIPS:
-		laserdisc_philips_callback(ptr, param);
+		laserdisc_philips_callback(timer.ptr(), param);
 		break;
 	case TIMER_LASERDISC_BIT_OFF:
-		laserdisc_bit_off_callback(ptr, param);
+		laserdisc_bit_off_callback(timer.ptr(), param);
 		break;
 	case TIMER_LASERDISC_BIT:
-		laserdisc_bit_callback(ptr, param);
+		laserdisc_bit_callback(timer.ptr(), param);
 		break;
 	case TIMER_NMI_CLEAR:
-		nmi_clear(ptr, param);
+		nmi_clear(timer.ptr(), param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in gottlieb_state::device_timer");

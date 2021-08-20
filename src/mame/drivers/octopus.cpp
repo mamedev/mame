@@ -233,7 +233,7 @@ private:
 	void octopus_sub_mem(address_map &map);
 	void octopus_vram(address_map &map);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -369,9 +369,9 @@ static INPUT_PORTS_START( octopus )
 	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-void octopus_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void octopus_state::device_timer(timer_instance const &timer)
 {
-	switch(id)
+	switch(timer.id())
 	{
 	case BEEP_TIMER:  // switch off speaker
 		m_beep_active = false;

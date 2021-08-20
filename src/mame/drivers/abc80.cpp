@@ -378,9 +378,9 @@ void abc80_state::kbd_w(u8 data)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void abc80_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void abc80_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_ID_SCANLINE:
 		draw_scanline(m_bitmap, m_screen->vpos());

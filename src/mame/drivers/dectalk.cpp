@@ -326,7 +326,7 @@ private:
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 };
 
 
@@ -839,12 +839,12 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-void dectalk_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void dectalk_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_OUTFIFO_READ:
-		outfifo_read_cb(ptr, param);
+		outfifo_read_cb(timer.ptr(), timer.param());
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in dectalk_state::device_timer");

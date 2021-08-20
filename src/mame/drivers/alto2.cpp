@@ -31,7 +31,7 @@ public:
 	void alto2(machine_config &config);
 
 protected:
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 private:
 	u16 kb_r(offs_t offset);
@@ -306,10 +306,10 @@ void alto2_state::init_alto2()
 	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
 }
 
-void alto2_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void alto2_state::device_timer(timer_instance const &timer)
 {
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
-	switch (id) {
+	switch (timer.id()) {
 	case TIMER_VBLANK:
 		cpu->screen_vblank();
 		break;

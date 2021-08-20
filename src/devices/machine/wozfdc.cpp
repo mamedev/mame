@@ -178,12 +178,12 @@ void appleiii_fdc_device::device_reset()
 	enable1 = 1;
 }
 
-void wozfdc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void wozfdc_device::device_timer(timer_instance const &timer)
 {
 	if(active)
 		lss_sync();
 
-	if(id == 1 && active == MODE_DELAY) {
+	if(timer.id() == 1 && active == MODE_DELAY) {
 		if(floppy)
 			floppy->mon_w(true);
 		active = MODE_IDLE;

@@ -316,9 +316,9 @@ void hle_device_base::device_reset()
 	start_processing(attotime::from_hz(1'200));
 }
 
-void hle_device_base::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void hle_device_base::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case CLICK_TIMER_ID:
 		m_beeper_state &= ~u8(BEEPER_CLICK);

@@ -72,13 +72,13 @@ READ_LINE_MEMBER( upd7002_device::eoc_r )
 }
 
 
-void upd7002_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void upd7002_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_CONVERSION_COMPLETE:
 		{
-			int counter_value = param;
+			int counter_value = timer.param();
 			if (counter_value == m_conversion_counter)
 			{
 				// this really always does a 12 bit conversion

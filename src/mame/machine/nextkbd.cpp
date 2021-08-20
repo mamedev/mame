@@ -124,7 +124,7 @@ void nextkbd_device::update_mouse(bool force_update)
 	send();
 }
 
-void nextkbd_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void nextkbd_device::device_timer(timer_instance const &timer)
 {
 	if(!fifo_empty())
 		send();

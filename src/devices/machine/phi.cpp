@@ -417,9 +417,9 @@ void phi_device::device_reset()
 	update_488();
 }
 
-void phi_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void phi_device::device_timer(timer_instance const &timer)
 {
-	LOG_NOISY("tmr %d\n" , id);
+	LOG_NOISY("tmr %d\n" , timer.id());
 	update_fsm();
 }
 

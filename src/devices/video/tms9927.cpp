@@ -140,9 +140,9 @@ void tms9927_device::device_stop()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void tms9927_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void tms9927_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_VSYNC:
 		m_vsyn = !m_vsyn;

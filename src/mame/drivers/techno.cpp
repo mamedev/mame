@@ -58,7 +58,7 @@ private:
 	void techno_sub_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -259,9 +259,9 @@ void techno_state::cpu_space_map(address_map &map)
 	map(0xfffff2, 0xfffff3).lr16(NAME([this] () -> u16 { return m_vector; }));
 }
 
-void techno_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void techno_state::device_timer(timer_instance const &timer)
 {
-	if (id == IRQ_ADVANCE_TIMER)
+	if (timer.id() == IRQ_ADVANCE_TIMER)
 	{
 		// vectors change per int: 88-8F, 98-9F)
 		if ((m_vector & 7) == 7)
@@ -271,7 +271,7 @@ void techno_state::device_timer(timer_instance const &timer, device_timer_id id,
 		// schematics show a 74HC74 cleared only upon IRQ acknowledgment or reset, but this is clearly incorrect for xforce
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	}
-	else if (id == IRQ_SET_TIMER)
+	else if (timer.id() == IRQ_SET_TIMER)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 		m_irq_advance_timer->adjust(attotime::from_hz(XTAL(8'000'000) / 32));

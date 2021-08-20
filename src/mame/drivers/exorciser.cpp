@@ -221,7 +221,7 @@ private:
 
 	u8 m_restart_count;
 
-	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer) override;
 
 	void pia_dbg_pa_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(pia_dbg_ca1_r);
@@ -510,9 +510,9 @@ WRITE_LINE_MEMBER(exorciser_state::pia_dbg_ca2_w)
 }
 
 
-void exorciser_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void exorciser_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_TRACE:
 		m_mainnmi->input_merger_device::in_w<1>(ASSERT_LINE);

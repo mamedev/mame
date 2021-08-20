@@ -542,9 +542,9 @@ WRITE_LINE_MEMBER( comx35_state::irq_w )
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void comx35_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void comx35_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case TIMER_ID_RESET:
 		m_clear = 1;

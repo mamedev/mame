@@ -71,35 +71,35 @@ TIMER_CALLBACK_MEMBER(ti85_state::ti83_timer2_callback)
 	}
 }
 
-void ti85_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void ti85_state::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 	case CRYSTAL_TIMER3:
 	case CRYSTAL_TIMER2:
 	case CRYSTAL_TIMER1:
-		if (m_ctimer[id].count)
+		if (m_ctimer[timer.id()].count)
 		{
-			m_ctimer[id].count--;
-			if (!m_ctimer[id].count)
+			m_ctimer[timer.id()].count--;
+			if (!m_ctimer[timer.id()].count)
 			{
-				if (!(m_ctimer[id].loop & 4))
+				if (!(m_ctimer[timer.id()].loop & 4))
 				{
-					if (!(m_ctimer[id].loop & 1))
+					if (!(m_ctimer[timer.id()].loop & 1))
 					{
-						m_ctimer[id].setup = 0;
+						m_ctimer[timer.id()].setup = 0;
 					}
 					else
 					{
-						ti83pse_count(id, m_ctimer[id].max);
+						ti83pse_count(timer.id(), m_ctimer[timer.id()].max);
 					}
-					if (!(m_ctimer[id].loop & 2))
+					if (!(m_ctimer[timer.id()].loop & 2))
 					{
 						//generate interrupt
-						m_ctimer_interrupt_status |= (0x20 << id);
+						m_ctimer_interrupt_status |= (0x20 << timer.id());
 						m_maincpu->set_input_line(0, HOLD_LINE);
 					}
-					m_ctimer[id].loop &= 2;
+					m_ctimer[timer.id()].loop &= 2;
 				}
 			}
 		}

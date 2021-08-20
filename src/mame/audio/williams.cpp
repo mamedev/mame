@@ -245,9 +245,10 @@ void williams_cvsd_sound_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void williams_cvsd_sound_device::device_timer(timer_instance const &timer)
 {
 	// process incoming data write
+	int param = timer.param();
 	m_pia->portb_w(param & 0xff);
 	m_pia->cb1_w((param >> 8) & 1);
 	m_pia->cb2_w((param >> 9) & 1);
@@ -581,9 +582,10 @@ void williams_narc_sound_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void williams_narc_sound_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void williams_narc_sound_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 		case TID_MASTER_COMMAND:
 			m_latch = param & 0xff;
@@ -817,9 +819,10 @@ void williams_adpcm_sound_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void williams_adpcm_sound_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+void williams_adpcm_sound_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	int param = timer.param();
+	switch (timer.id())
 	{
 		case TID_COMMAND:
 			m_latch = param & 0xff;
