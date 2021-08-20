@@ -14,7 +14,7 @@ NA-1 Games:
 -   Emeraldia (C358)
 
 NA-2 Games:
--   Knuckle Heads (C3??)
+-   Knuckle Heads (C360)
 -   Numan Athletics (C359)
 -   Emeraldia (C358)
 -   Nettou! Gekitou! Quiztou!! (C365)
@@ -29,7 +29,7 @@ To Do:
   area is uninitialized, the game software automatically writes these values there,
   but then hangs.
   *cgangpzl, cgangpzlj, exvania, exvaniaj, knckheadjp, quiztou
-- xday2: unemulated printer and RTC devices (check test mode game options), also battery always returns NG
+- xday2: unemulated printer and RTC devices (check test mode game options)
 
 - X-Day 2:
     Rom board  M112
@@ -588,7 +588,7 @@ void namcona1_state::namcona1_main_map(address_map &map)
 	map(0xf00000, 0xf01fff).ram().w(FUNC(namcona1_state::paletteram_w)).share("paletteram");
 	map(0xf40000, 0xf7ffff).rw(FUNC(namcona1_state::gfxram_r), FUNC(namcona1_state::gfxram_w)).share("cgram");
 	map(0xff0000, 0xffbfff).ram().w(FUNC(namcona1_state::videoram_w)).share("videoram");
-	map(0xffd000, 0xffdfff).ram();                         /* unknown */
+	map(0xffc000, 0xffdfff).ram();                         /* expects RAM here for some games or it won't boot*/
 	map(0xffe000, 0xffefff).ram().share("scroll");      /* scroll registers */
 	map(0xfff000, 0xffffff).ram().share("spriteram");   /* spriteram */
 }
@@ -600,7 +600,7 @@ void namcona1_state::namcona1_c219_map(address_map &map)
 
 void namcona2_state::zelos_ctrl_w(u16 data)
 {
-	// bit 15 to 7 are set during I/O test when switching between the 9 'windows'. Input mux?
+	// bit 15 to 7 are set during I/O test when switching between the 9 'windows'. Output test? Maybe which 'window' screen to update?
 	// at least bit 4 to 1 are used, too
 
 	m_zelos_ctrl = data;
@@ -615,7 +615,6 @@ void namcona2_state::zelos_main_map(address_map &map)
 
 	map(0xd00000, 0xd00001).w(FUNC(namcona2_state::zelos_ctrl_w));
 	// map(0xd40000, 0xd40001).w(FUNC(namcona2_state::)); // bit 1 alternatively set and cleared in test mode
-	map(0xffc000, 0xffcfff).ram(); // expects RAM here or it won't boot
 }
 
 u8 xday2_namcona2_state::printer_r()
@@ -884,62 +883,6 @@ static INPUT_PORTS_START(namcona1_quiz)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START4)
-
-	PORT_START("DSW")
-	PORT_DIPNAME(0x01, 0x01, "DIP2 (Freeze)")
-	PORT_DIPSETTING(   0x01, DEF_STR(Off))
-	PORT_DIPSETTING(   0x00, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, "DIP1 (Test)")
-	PORT_DIPSETTING(   0x02, DEF_STR(Off))
-	PORT_DIPSETTING(   0x00, DEF_STR(On))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN4)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN3)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_SERVICE(0x40, IP_ACTIVE_LOW)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE1)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START(zelos)
-	PORT_START("P1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START1)
-
-	PORT_START("P2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START2)
-
-	PORT_START("P3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(3)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(3)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(3)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START3)
-
-	PORT_START("P4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(4)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(4)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(4)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START4)
 
 	PORT_START("DSW")
@@ -1543,4 +1486,4 @@ GAME(1993, numanath,   0,        namcona2,  namcona1_joy,  namcona2_state, init_
 GAME(1993, numanathj,  numanath, namcona2,  namcona1_joy,  namcona2_state, init_numanath, ROT0, "Namco", "Numan Athletics (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, init_quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, init_xday2, ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME(1994, zelos,      0,        zelos,     zelos,         namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
+GAME(1994, zelos,      0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
