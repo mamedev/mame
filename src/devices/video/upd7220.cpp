@@ -426,6 +426,7 @@ inline void upd7220_device::reset_figs_param()
 	m_figs.m_d2 = 0x0008;
 	m_figs.m_dm = 0xffff;
 	m_figs.m_gd = 0;
+	m_figs.m_figure_type = 0;
 }
 
 
@@ -1327,12 +1328,12 @@ void upd7220_device::process_fifo()
 
 		if (m_param_ptr == 3 || (m_param_ptr == 2 && m_cr & 0x10))
 		{
+			m_pattern = (m_pattern & 0xff00) | m_pr[1];
+			if (m_param_ptr == 3)
+				m_pattern = (m_pattern & 0xff) | (m_pr[2] << 8);
+			LOG("uPD7220 PATTERN: %04x\n", m_pattern);
 			if (m_figs.m_figure_type)
-			{
-				m_pattern = (m_pr[2] << 8) | m_pr[1];
-				LOG("uPD7220 PATTERN: %04x\n", m_pattern);
 				break;
-			}
 			LOG("%02x = %02x %02x (%c) %06x %04x\n",m_cr,m_pr[2],m_pr[1],m_pr[1]?m_pr[1]:' ',m_ead,m_figs.m_dc);
 			fifo_set_direction(FIFO_WRITE);
 
@@ -1406,7 +1407,6 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		//m_pattern = (m_ra[8]) | (m_ra[9]<<8);
 		if(m_figs.m_figure_type == 0)
 			draw_pixel();
 		else if(m_figs.m_figure_type == 1)
