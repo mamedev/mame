@@ -518,6 +518,49 @@ public:
 };
 
 
+// ======================> nes_resettxrom0_device
+
+class nes_resettxrom0_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_resettxrom0_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void pcb_reset() override;
+
+protected:
+	// construction/destruction
+	nes_resettxrom0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prg_shift, int chr_shift);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	int m_count;
+	int m_prg_shift, m_chr_shift;
+};
+
+
+// ======================> nes_resettxrom1_device
+
+class nes_resettxrom1_device : public nes_resettxrom0_device
+{
+public:
+	// construction/destruction
+	nes_resettxrom1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+// ======================> nes_resettxrom2_device
+
+class nes_resettxrom2_device : public nes_resettxrom0_device
+{
+public:
+	// construction/destruction
+	nes_resettxrom2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
 // ======================> nes_s24in1sc03_device
 
 class nes_s24in1sc03_device : public nes_txrom_device
@@ -881,6 +924,9 @@ DECLARE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device)
 DECLARE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device)
 DECLARE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device)
 DECLARE_DEVICE_TYPE(NES_NT639,         nes_nt639_device)
+DECLARE_DEVICE_TYPE(NES_RESETTXROM0,   nes_resettxrom0_device)
+DECLARE_DEVICE_TYPE(NES_RESETTXROM1,   nes_resettxrom1_device)
+DECLARE_DEVICE_TYPE(NES_RESETTXROM2,   nes_resettxrom2_device)
 DECLARE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device)

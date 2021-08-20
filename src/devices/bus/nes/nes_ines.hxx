@@ -348,7 +348,7 @@ static const nes_mmc mmc_list[] =
 	// 310 variant of mapper 125?
 	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
 	{ 312, KAISER_KS7013B },       // Highway Star FDS conversion
-	// { 313, BMC_RESETTXROM }, various multicarts, not in nes.xml?
+	{ 313, BMC_RESETTXROM0 },
 	{ 314, BMC_64IN1NR },
 	// 315 820732C and 830134C multicarts, not in nes.xml?
 	// 316 Unused
@@ -901,6 +901,15 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = RCM_GS2013;
 			break;
 
+		case BMC_RESETTXROM0:
+			if (submapper == 1)
+				m_pcb_id = BMC_RESETTXROM1;
+			else if (submapper == 2)
+				m_pcb_id = BMC_RESETTXROM2;
+			else if (submapper > 2)
+				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
+			break;
+
 		case HES_BOARD:
 			if (crc_hack)
 				m_cart->set_pcb_ctrl_mirror(true);    // Mapper 113 is used for 2 diff boards
@@ -1223,6 +1232,13 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		case RCM_GS2004:                               // Mapper 283 is used for 2 diff boards
 			if (ROM[4] >= 20)
 				pcb_id = RCM_GS2013;
+			break;
+
+		case BMC_RESETTXROM0:                          // Mapper 313 is used for 3 diff boards
+			if (submapper == 1)
+				pcb_id = BMC_RESETTXROM1;
+			if (submapper == 2)
+				pcb_id = BMC_RESETTXROM2;
 			break;
 	}
 

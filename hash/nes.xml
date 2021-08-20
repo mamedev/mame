@@ -51669,7 +51669,75 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 
-<!-- J.Y. Company -->
+<!-- J.Y. Company (sorted by serial code) -->
+
+<!-- Different game set than earlier JY-001 -->
+	<software name="mc_4jy1">
+		<description>1994 Super HiK 4 in 1 (JY-001)</description>
+		<year>1994</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 super hik 4-in-1 (jy-001 rev1).prg" size="524288" crc="dbdfef5e" sha1="289a97175056bc5bff5c5c09635a450bda7058ad" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 super hik 4-in-1 (jy-001 rev1).chr" size="524288" crc="07f696d6" sha1="1b54c0cb154de77d3b351032887fe694cdfb51e3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy1a">
+		<description>1993 Heroe Series 4 in 1 (JY-001)</description>
+		<year>1993</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1993 heroe series 4-in-1 (jy-001).prg" size="524288" crc="8e40296d" sha1="5d0b50d195f11a656f6d46c369bb3f60000ed085" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1993 heroe series 4-in-1 (jy-001).chr" size="524288" crc="1d88439b" sha1="6e7bbdbc468f36ab2e95361a5ae95de605dee1d7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy2">
+		<description>1994 Super HiK 4 in 1 (JY-002)</description>
+		<year>1994</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 super hik 4-in-1 (jy-002).prg" size="524288" crc="fbc1ee6b" sha1="7c82449372191ac3b6cfa4cc72e53b860c9f635b" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 super hik 4-in-1 (jy-002).chr" size="524288" crc="86ce512c" sha1="9ecbfe926d9f74680c6dba1464f2e7388dc17de2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy3">
+		<description>1994 Super HiK 4 in 1 (JY-003)</description>
+		<year>1994</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 super hik 4-in-1 (jy-003).prg" size="524288" crc="f6822fe5" sha1="81dcace66ae60a4fe4035bb8b2e7901a8b33170f" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 super hik 4-in-1 (jy-003).chr" size="524288" crc="cb00a07d" sha1="af2a4f72e0923ed2897efd0ca96fb79a0f242abd" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="mc_3jy7">
 		<description>1994 Super HiK 3 in 1 (JY-007)</description>
@@ -51686,6 +51754,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_4jy8">
+		<description>1995 Super HiK 4 in 1 (JY-008)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-008).prg" size="524288" crc="74a6176e" sha1="920e7a9a42b903b98c80166bc3dbf0aa50367709" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-008).chr" size="524288" crc="9127a998" sha1="1c607d8dab49b01e0b945f1ec4aa2af2f5f706d4" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4jy9">
 		<description>1994 Ball 4 in 1 Series (JY-009)</description>
 		<year>1994</year>
@@ -51697,6 +51785,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="1994 ball 4-in-1 series (jy-009).chr" size="524288" crc="560ca283" sha1="d00cfd3c0c65db543a635fcddb1b0cf86149f257" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy13">
+		<description>Mario Series 4 in 1 (JY-013)</description>
+		<year>199?</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="mario series 4-in-1 (jy-013).prg" size="524288" crc="4558acd5" sha1="86d99d13e813f19c792fac8802c15888739179d2" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="mario series 4-in-1 (jy-013).chr" size="524288" crc="c89f1e34" sha1="33debec38feca775d185c0cff578bcbdbe7c677b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -51746,6 +51850,160 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_4jy23">
+		<description>1995 Super HiK 4 in 1 (JY-023)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-023).prg" size="524288" crc="cadebc3e" sha1="92024688aaa583c673801bc585c4d693458f4d78" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-023).chr" size="524288" crc="dcdab70a" sha1="6374b768f0ca35f7b69708df573e69a327871247" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy24">
+		<description>1997 Super HiK 4 in 1 (JY-024)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super hik 4-in-1 (jy-024 rev1).prg" size="524288" crc="cef38f6c" sha1="5aebb9e0bb157d3eaa53204607610c22e8bc2548" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super hik 4-in-1 (jy-024 rev1).chr" size="524288" crc="4961a797" sha1="fe1e710c2d22c5480951e11f2326d2814521b358" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy24a" cloneof="mc_4jy24">
+		<description>1995 Super HiK 4 in 1 (JY-024)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-024).prg" size="524288" crc="cef38f6c" sha1="5aebb9e0bb157d3eaa53204607610c22e8bc2548" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-024).chr" size="524288" crc="62327fda" sha1="91716488bb6a9626234df2f7359f86bc6b5c8cfd" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy38">
+		<description>1995 Super HiK 4 in 1 (JY-038)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-038).prg" size="524288" crc="bd705234" sha1="499393d8bd79b3de5a2ada099fc9477a573cc6ef" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-038).chr" size="524288" crc="60f4b6b1" sha1="9bf65398797b3d02ef1c329ef44f5d1d404d1b9f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy39">
+		<description>1995 Super HiK 4 in 1 (JY-039)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom2" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-039).prg" size="524288" crc="a32b698b" sha1="f12d34c330d0577aa560507d15c3083a885138fa" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1995 super hik 4-in-1 (jy-039).chr" size="1048576" crc="dc8b5fbc" sha1="0cbefbc986b9ec9f231294004d2be32a3c75115f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy40">
+		<description>1995 Super HiK 4 in 1 (JY-040)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom2" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-040).prg" size="524288" crc="677c6862" sha1="1f212b29ac4c7fa52eed6dbe4ef2ce62ed7e3bda" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1995 super hik 4-in-1 (jy-040).chr" size="1048576" crc="dc6704ce" sha1="0aa69fb1cd5d9bdd8b4d6c8626dea7fd0fd869e1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy43">
+		<description>1995 Super HiK 4 in 1 (JY-043)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom1" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1995 super hik 4-in-1 (jy-043).prg" size="1048576" crc="a5d89dc1" sha1="cf238422714e35e86e6e2fa5dd3fc0a64230db6e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-043).chr" size="524288" crc="5325e3ca" sha1="1521ab5918bc13a3989fc7e08cf76c2ce04a21ce" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Different game set than earlier JY-047 -->
+	<software name="mc_4jy47">
+		<description>1997 Super HiK 4 in 1 (JY-047)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super hik 4-in-1 (jy-047).prg" size="524288" crc="7a82a25c" sha1="f05a95eecd16073e82d5ec8e05c6cdf262025735" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super hik 4-in-1 (jy-047).chr" size="524288" crc="4a6cb431" sha1="fcaa7266696e275b729690c67f8dc1d33fccd6c8" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy47a">
+		<description>1995 Super HiK 4 in 1 (JY-047)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-047 rev0).prg" size="524288" crc="113688e2" sha1="600e52f8a93cf3aa0bbb09e56bf570ad09d10184" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-047 rev0).chr" size="524288" crc="cb1a40b5" sha1="9dd3e05ec59efe91dfc465150d8420965714539a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_8jy50">
 		<description>1995 Super 8 in 1 (JY-050)</description>
 		<year>1995</year>
@@ -51757,6 +52015,57 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy57">
+		<description>1996 Super HiK 4 in 1 (JY-057)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom2" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-057).prg" size="524288" crc="142184be" sha1="eec27f45ded5a7111e7b2d5ac8e0d33b0f6449cc" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1996 super hik 4-in-1 (jy-057).chr" size="1048576" crc="9bf7f019" sha1="f5ed8782a1b1c7f33cb61fad174bd0a483748c12" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy58">
+		<description>1996 Super HiK 4 in 1 (JY-058)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom2" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-058).prg" size="524288" crc="019a5cf7" sha1="ace2c8eada92bda13ca9bd3e3dc336648ebb28c7" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1996 super hik 4-in-1 (jy-058).chr" size="1048576" crc="328168e5" sha1="9e457fbc8a784333be1dc88b68ceb2c6e832a0a2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy72">
+		<description>1996 Super HiK 4 in 1 (JY-072)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom0" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-072).prg" size="524288" crc="8b1f7c74" sha1="0987c7b4aaf4419605e71a65405c9fe7a1e98a04" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-072).chr" size="524288" crc="6369e559" sha1="ae52438a20d3d4da9cd999846b206c2f8f3799b7" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
