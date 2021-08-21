@@ -112,33 +112,18 @@ nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u8 *reg_table, const u16 *addr_table)
-	: nes_txrom_device(mconfig, type, tag, owner, clock)
-	, m_mmc3_mode(true)
-	, m_reg_table(reg_table)
-	, m_addr_table(addr_table)
+nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc3_mode(true), m_board(board)
 {
 }
 
 nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_sglionk_device(mconfig,
-			     NES_SG_LIONK,
-			     tag,
-			     owner,
-			     clock,
-			     (const u8 []) {0, 3, 1, 5, 6, 7, 2, 4},
-			     (const u16 []) {0xa001, 0xa000, 0x8000, 0xc000, 0x8001, 0xc001, 0xe000, 0xe001})
+	: nes_sglionk_device(mconfig, NES_SG_LIONK, tag, owner, clock, 0)
 {
 }
 
 nes_sgboog_device::nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_sglionk_device(mconfig,
-			     NES_SG_BOOG,
-			     tag,
-			     owner,
-			     clock,
-			     (const u8 []) {0, 2, 5, 3, 6, 1, 7, 4},
-			     (const u16 []) {0xa001, 0x8001, 0x8000, 0xc001, 0xa000, 0xc000, 0xe000, 0xe001})
+	: nes_sglionk_device(mconfig, NES_SG_BOOG, tag, owner, clock, 1)
 {
 }
 
@@ -1118,9 +1103,21 @@ void nes_sglionk_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("sglionk write_h, offset: %04x, data: %02x\n", offset, data));
 
-	u16 addr = m_addr_table[bitswap<3>(offset, 14, 13, 0)];
+	static constexpr u8 reg_table[2][8] =
+	{
+		{0, 3, 1, 5, 6, 7, 2, 4},
+		{0, 2, 5, 3, 6, 1, 7, 4}
+	};
+
+	static constexpr u16 addr_table[2][8] =
+	{
+		{0xa001, 0xa000, 0x8000, 0xc000, 0x8001, 0xc001, 0xe000, 0xe001},
+		{0xa001, 0x8001, 0x8000, 0xc001, 0xa000, 0xc000, 0xe000, 0xe001}
+	};
+
+	u16 addr = addr_table[m_board][bitswap<3>(offset, 14, 13, 0)];
 	if (addr == 0x8000)
-		data = (data & 0xc0) | m_reg_table[data & 0x07];
+		data = (data & 0xc0) | reg_table[m_board][data & 0x07];
 	txrom_write(addr & 0x6001, data);
 }
 
