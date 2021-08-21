@@ -34,7 +34,7 @@ TODO:
 
 - Find source of level 2 interrupt (sprite DMA end?);
 - magibomb: fix timings;
-- astoneag, magibombd: currently stop with 'ROM error'. The first few hundred bytes don't decrypt correctly,
+- astoneag, dinodino, magibombd: currently stop with 'ROM error'. The first few hundred bytes don't decrypt correctly,
   it is suspected there's a ROM overlay provided by the protection device;
 - winbingo and clones, zulu: these should be at the same state of the two above, but don't show anything on screen;
 - magibomba, westvent: need a redump of one of the program ROMs;
@@ -1527,7 +1527,7 @@ ROM_START( dinodino )
 	ROM_LOAD( "dd_rom5.u33", 0x00000, 0x80000, CRC(482e456a) SHA1(c7111522383c4e1fd98b0f759153be98dcbe06c1) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(6769bfb8) SHA1(bf6b905805c2c61a89fbc4c046b23069431e4709) )
+	ROM_LOAD16_WORD_SWAP( "93c46.u10", 0x0000, 0x0080, CRC(6769bfb8) SHA1(bf6b905805c2c61a89fbc4c046b23069431e4709) )
 ROM_END
 
 
@@ -1829,6 +1829,9 @@ void astoneage_state::init_dinodino()
 	u16 *rom = (u16 *)memregion("maincpu")->base();
 	rom[0x004/2] = 0x0000;
 	rom[0x006/2] = 0x0446;
+
+	// enable the patch below to pass ROM checksum, but then it jumps into the weeds after expecting to read something from 0xb80000
+	//rom[0x30b70/2] = 0xe5f5;
 }
 
 void magibomb_state::init_magibomb()
