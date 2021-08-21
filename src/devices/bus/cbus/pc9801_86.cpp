@@ -275,7 +275,7 @@ u8 pc9801_86_device::opna_r(offs_t offset)
 		return m_opna->read(offset >> 1);
 	else // odd
 	{
-		logerror("%s: Read to undefined port [%02x]\n", this->tag(), offset + m_io_base);
+		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + m_io_base);
 		return 0xff;
 	}
 }
@@ -285,7 +285,7 @@ void pc9801_86_device::opna_w(offs_t offset, u8 data)
 	if((offset & 1) == 0)
 		m_opna->write(offset >> 1,data);
 	else // odd
-		logerror("%s: Write to undefined port [%02x] %02x\n", this->tag(), offset + m_io_base, data);
+		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + m_io_base, data);
 }
 
 u8 pc9801_86_device::id_r()
@@ -299,7 +299,7 @@ void pc9801_86_device::mask_w(u8 data)
 {
 	m_mask = data & 1;
 	// TODO: bit 1 totally cuts off OPNA output
-	logerror("%s: OPNA mask setting %02x\n", this->tag(), data);
+	logerror("%s: OPNA mask setting %02x\n", machine().describe_context(), data);
 }
 
 u8 pc9801_86_device::pcm_r(offs_t offset)
@@ -486,7 +486,7 @@ u8 pc9801_speakboard_device::opna_slave_r(offs_t offset)
 		return m_opna_slave->read(offset >> 1);
 	else // odd
 	{
-		logerror("%s: Read to undefined port [%02x]\n", this->tag(), offset + 0x588);
+		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + 0x588);
 		return 0xff;
 	}
 }
@@ -496,7 +496,7 @@ void pc9801_speakboard_device::opna_slave_w(offs_t offset, u8 data)
 	if((offset & 1) == 0)
 		m_opna_slave->write(offset >> 1,data);
 	else // odd
-		logerror("%s: Write to undefined port [%02x] %02x\n", this->tag(), offset + 0x588, data);
+		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + 0x588, data);
 }
 
 //**************************************************************************
@@ -561,7 +561,7 @@ u8 otomichan_kai_device::opn2c_r(offs_t offset)
 		return m_opn2c->read(offset >> 1);
 	else // odd
 	{
-		logerror("%s: Read to undefined port [%02x]\n", this->tag(), offset + 0x788);
+		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + 0x788);
 		return 0xff;
 	}
 }
@@ -571,5 +571,5 @@ void otomichan_kai_device::opn2c_w(offs_t offset, u8 data)
 	if((offset & 1) == 0)
 		m_opn2c->write(offset >> 1, data);
 	else // odd
-		logerror("%s: Write to undefined port [%02x] %02x\n", this->tag(), offset + 0x788, data);
+		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + 0x788, data);
 }

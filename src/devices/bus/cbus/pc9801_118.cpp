@@ -247,9 +247,9 @@ void pc9801_118_device::ext_w(offs_t offset, uint8_t data)
 	{
 		m_ext_reg = data & 1;
 		if(data & 2)
-			logerror("%s: extended register %02x write\n", this->tag(), data);
+			logerror("%s: extended register %02x write\n", machine().describe_context(), data);
 		return;
 	}
 
-	logerror("%s: EXT write unk %02x -> [%02x]\n", this->tag(), data, offset);
+	logerror("%s: EXT write unk %02x -> [%02x]\n", machine().describe_context(), data, offset);
 }

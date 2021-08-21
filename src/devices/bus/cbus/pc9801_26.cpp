@@ -166,12 +166,12 @@ void pc9801_26_device::device_reset()
 
 	if (m_rom_base != 0)
 	{
-		logerror("%s: uninstall ROM at %08x-%08x\n", this->tag(), m_rom_base, m_rom_base + rom_size);
+		logerror("%s: uninstall ROM at %08x-%08x\n", machine().describe_context(), m_rom_base, m_rom_base + rom_size);
 		m_bus->program_space().unmap_readwrite(m_rom_base, m_rom_base + rom_size);
 	}
 	if (current_rom != 0)
 	{
-		logerror("%s: install ROM at %08x-%08x\n", this->tag(), current_rom, current_rom + rom_size);
+		logerror("%s: install ROM at %08x-%08x\n", machine().describe_context(), current_rom, current_rom + rom_size);
 		m_bus->program_space().unmap_readwrite(current_rom, current_rom + rom_size);
 		m_bus->program_space().install_rom(
 			current_rom,
