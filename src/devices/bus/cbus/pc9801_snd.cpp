@@ -3,14 +3,12 @@
 /***************************************************************************
 
     NEC PC-9801
-    common functions for CBUS sound boards -26, -86, -118
+    common functions for C-bus sound boards -26, -86, -118
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "pc9801_snd.h"
-
-//DEFINE_DEVICE_TYPE(PC9801_SND, pc9801_snd_device, "pc9801_snd", "PC9801 CBUS Sound")
 
 pc9801_snd_device::pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)

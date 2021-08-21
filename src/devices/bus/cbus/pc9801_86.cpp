@@ -42,7 +42,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "pc9801_86")
+DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86")
 
 WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 {
@@ -179,12 +179,12 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_snd_device(mconfig, type, tag, owner, clock),
-		m_bus(*this, DEVICE_SELF_OWNER),
-		m_opna(*this, "opna"),
-		m_ldac(*this, "ldac"),
-		m_rdac(*this, "rdac"),
-		m_queue(QUEUE_SIZE)
+	: pc9801_snd_device(mconfig, type, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_opna(*this, "opna")
+	, m_ldac(*this, "ldac")
+	, m_rdac(*this, "rdac")
+	, m_queue(QUEUE_SIZE)
 {
 }
 

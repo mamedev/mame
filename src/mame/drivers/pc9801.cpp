@@ -1822,6 +1822,8 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 	// official HW
 //  PC-9801-14
 	device.option_add("pc9801_26", PC9801_26);
+	device.option_add("pc9801_55u", PC9801_55U);
+	device.option_add("pc9801_55l", PC9801_55L);
 	device.option_add("pc9801_86", PC9801_86);
 	device.option_add("pc9801_118", PC9801_118);
 	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
@@ -1830,7 +1832,7 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 	device.option_add("mpu_pc98", MPU_PC98);
 
 	// doujinshi HW
-// MAD Factory / Doujin Hard (MAD Factory / 同人ハード)
+// MAD Factory / Doujin Hard (同人ハード)
 // MAD Factory Chibi-Oto: an ADPCM override for -86
 // MAD Factory Otomi-chan: "TORIE9211 MAD FACTORY" printed on proto PCB, just overrides for ADPCM for -86?
 	device.option_add("otomichan_kai", OTOMICHAN_KAI);

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     NEC PC-9801-26 sound card
 
@@ -11,7 +11,7 @@
 	- understand if dips can be read by SW;
 	- configurable irq level needs a binding flush in C-bus handling;
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "bus/cbus/pc9801_26.h"
@@ -25,7 +25,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "pc9801_26")
+DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26")
 
 WRITE_LINE_MEMBER(pc9801_26_device::sound_irq)
 {

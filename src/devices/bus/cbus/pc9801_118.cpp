@@ -35,7 +35,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "pc9801_118")
+DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118")
 
 WRITE_LINE_MEMBER(pc9801_118_device::sound_irq)
 {
