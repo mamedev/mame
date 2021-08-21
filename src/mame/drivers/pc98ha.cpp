@@ -27,7 +27,7 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "includes/pc9801.h"
+#include "includes/pc98ha.h"
 
 void pc98lt_state::lt_palette(palette_device &palette) const
 {

@@ -3125,8 +3125,11 @@ files {
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.h",
 	MAME_DIR .. "src/mame/drivers/pc98ha.cpp",
+	MAME_DIR .. "src/mame/includes/pc98ha.h",
 	MAME_DIR .. "src/mame/drivers/pc9801_epson.cpp",
+	MAME_DIR .. "src/mame/includes/pc9801_epson.h",
 	MAME_DIR .. "src/mame/drivers/pc9821.cpp",
+	MAME_DIR .. "src/mame/includes/pc9821.h",
 	MAME_DIR .. "src/mame/drivers/tk80bs.cpp",
 }
 

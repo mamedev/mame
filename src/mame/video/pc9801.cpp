@@ -66,27 +66,6 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 	}
 }
 
-UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pc9821_hgdc_display_pixels )
-{
-	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-
-	if(m_ex_video_ff[ANALOG_256_MODE])
-	{
-		uint8_t *ext_gvram = (uint8_t *)m_ext_gvram.target();
-		for(int xi=0;xi<16;xi++)
-		{
-			int res_x = x + xi;
-			int res_y = y;
-
-			uint8_t pen = ext_gvram[(address)*16+xi+(m_vram_disp*0x40000)];
-
-			bitmap.pix(res_y, res_x) = palette[pen + 0x20];
-		}
-	}
-	else
-		pc9801_state::hgdc_display_pixels(bitmap, y, x, address);
-}
-
 /*************************************************
  *
  * UPD7220 (GDC1) text layer
