@@ -861,7 +861,7 @@ image_init_result device_image_interface::load_internal(std::string_view path, b
 		{
 			// open the file
 			m_err = load_image_by_path(*iter, path);
-			if (m_err && (m_err != std::errc::no_such_file_or_directory))
+			if (m_err && (m_err != std::errc::no_such_file_or_directory) && (m_err != std::errc::permission_denied))
 				goto done;
 		}
 
