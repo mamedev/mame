@@ -242,23 +242,38 @@ void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data)
 
 
 
-//$70 HEAD
+//-------------------------------------------------
+//    8155 Head/Motor Functions
+//-------------------------------------------------
+//
+//  $70 base address for 8155 HEAD/MOTOR
+
+//-------------------------------------------------
+//    8155 Head/Motor Port A
+//-------------------------------------------------
 
 uint8_t apple_imagewriter_printer_device::head_pa_r(offs_t offset)
 {
-	// PORT A DOTS
 	u8 data = 0;
 	printf("8155 HEAD PORT_A_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 	return data;
 }
-//void apple_imagewriter_printer_device::head_pa_w(offs_t offset, uint8_t data)
+
+
 void apple_imagewriter_printer_device::head_pa_w(uint8_t data)
 {
+	// PA0..PA7 = PRINTHEAD DOTS 1-8 (active low)
+
 	printf("8155 HEAD PORT_A_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 	m_dotpattern &= ~(0xff);
 	m_dotpattern |= (data ^ 0xff);
 	printf("PRINTHEAD DOTPATTERN %x -> %x %s\n",data, m_dotpattern, std::bitset<9>(m_dotpattern).to_string().c_str());
 }
+
+//-------------------------------------------------
+//    8155 Head/Motor Port B
+//-------------------------------------------------
+
 uint8_t apple_imagewriter_printer_device::head_pb_r(offs_t offset)
 {
 	u8 data = 0;
@@ -266,17 +281,27 @@ uint8_t apple_imagewriter_printer_device::head_pb_r(offs_t offset)
 	return data;
 }
 
-void apple_imagewriter_printer_device::head_pb_w(uint8_t data) {
-	printf("8155 HEAD PORT_B_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
-	update_cr_stepper(BIT(data ^ 0xff, 1, 4));
-	m_dotpattern &= ~(1 << 8);  // gosh darn missed the ~
-	m_dotpattern |= (!BIT(data,0) << 8);  // realized that the dot pattern is inverted!
+void apple_imagewriter_printer_device::head_pb_w(uint8_t data)
+{
+	// PB0 = PRINTHEAD DOT 9 (active low)
+	// PB1..PB4 = CR MOTOR A-D
+	// PB5      = CR MOTOR ENABLE
+	// PB6
+	// PB7 = PRINTHEAD FIRE
 
-//  if (!BIT(data,7))
+	printf("8155 HEAD PORT_B_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
+	update_cr_stepper(BIT(data ^ 0xff, 1, 4));  // dot pattern inverted
+	m_dotpattern &= ~(1 << 8);
+	m_dotpattern |= (!BIT(data,0) << 8);  // dot pattern is inverted
+
 	if (BIT(data,7) == 1 && BIT(m_head_pb_last,7) == 0)  // transition from 1 to 0
 		update_printhead();
 	m_head_pb_last = data;
 }
+
+//-------------------------------------------------
+//    8155 Head/Motor Port C
+//-------------------------------------------------
 
 uint8_t apple_imagewriter_printer_device::head_pc_r(offs_t offset)
 {
@@ -293,9 +318,13 @@ void apple_imagewriter_printer_device::head_pc_w(uint8_t data)
 	if (!BIT(data,0))
 	{
 		m_ic17_flipflop = 0;
-		m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop);  // ASSERT_LINE, CLEAR_LINE
+		m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop);
 	}
 }
+
+//-------------------------------------------------
+//    8155 Head/Motor Timer Out
+//-------------------------------------------------
 
 void apple_imagewriter_printer_device::head_to(uint8_t data)
 {
@@ -305,12 +334,21 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 	{
 		m_ic17_flipflop = 1;
 	}
-	m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop);  // ASSERT_LINE, CLEAR_LINE
+	m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop);
 	m_head_to_last = data;
 }
 
 
-// $78 SWITCHES
+
+//-------------------------------------------------
+//    8155 Switches Functions
+//-------------------------------------------------
+//
+//  $78 base address for 8155 SWITCHES
+
+//-------------------------------------------------
+//    8155 Switches Functions Port A
+//-------------------------------------------------
 
 uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 {
@@ -331,25 +369,41 @@ uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 	return data;
 }
 
-
 void apple_imagewriter_printer_device::switch_pa_w(uint8_t data)
 {
 	printf("8155 SWITCH PORT_A_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
+
+//-------------------------------------------------
+//    8155 Switches Functions Port B
+//-------------------------------------------------
+
 uint8_t apple_imagewriter_printer_device::switch_pb_r(offs_t offset)
 {
 	return ioport("DIPSW1")->read();
 }
+
 void apple_imagewriter_printer_device::switch_pb_w(uint8_t data)
 {
 	printf("8155 SWTICH PORT_B_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
-uint8_t apple_imagewriter_printer_device::switch_pc_r(offs_t offset) { return 0; }
-void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 
+//-------------------------------------------------
+//    8155 Switches Functions Port C
+//-------------------------------------------------
+
+uint8_t apple_imagewriter_printer_device::switch_pc_r(offs_t offset) { return 0; }
+
+
+void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 {
 	printf("8155 SWTICH PORT_C_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
+
+//-------------------------------------------------
+//    8155 Switches Functions Timer Out
+//-------------------------------------------------
+
 
 void apple_imagewriter_printer_device::switch_to(uint8_t data)
 {
@@ -357,10 +411,10 @@ void apple_imagewriter_printer_device::switch_to(uint8_t data)
 	m_maincpu->set_input_line(I8085_RST75_LINE, data);  // ASSERT_LINE, CLEAR_LINE
 }
 
+//-------------------------------------------------
+//    Darken Pixel
+//-------------------------------------------------
 
-//-------------------------------------------------
-//    Update Printhead
-//-------------------------------------------------
 void apple_imagewriter_printer_device::darken_pixel(double darkpct, unsigned int& pixel)
 {
 	if (darkpct > 0.0)
@@ -393,6 +447,10 @@ void apple_imagewriter_printer_device::darken_pixel(double darkpct, unsigned int
 	}
 }
 
+
+//-------------------------------------------------
+//    Update Printhead
+//-------------------------------------------------
 
 void apple_imagewriter_printer_device::update_printhead()
 {
@@ -512,14 +570,14 @@ void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
 		if (delta > 0)
 		{
 			m_xpos += delta; xdirection = 1;
-			printf("M_XPOS = %d\n",m_xpos);
+		//  printf("M_XPOS = %d\n",m_xpos);
 		}
 		else if (delta < 0)
 		{
 
 			m_xpos += delta; xdirection = -1;
 			//if (m_xpos < 0) m_xpos = 0;
-			printf("M_XPOS = %d\n",m_xpos);
+		//  printf("M_XPOS = %d\n",m_xpos);
 
 		}
 	}

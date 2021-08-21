@@ -27,7 +27,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 	void optic_handler(uint8_t data) { printf("HANDLE OPTIC %d\n",data);}
-	void rxrdy_handler(uint8_t data) { 
+	void rxrdy_handler(uint8_t data) {
 			printf("HANDLE RXRDY %d\n",data);
 			m_maincpu->set_input_line(I8085_RST55_LINE, data);
 	}
