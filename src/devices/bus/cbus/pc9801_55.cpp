@@ -4,14 +4,14 @@
 
     NEC PC-9801-55/-55U/-55L
 
-	SCSI interface, running on WD33C93A
-	
-	TODO:
-	- Is PC-9801-55 also running on this except with WD33C93 instead?
-	  Will see once we obtain a dump of that;
-	- IRQ is never taken (definitely lies at vector 0x2c -> PC=0xdc01e);
-	- DRQ
-	- All roms seems to be misdumped (too generous sizes), is it intentional?
+    SCSI interface, running on WD33C93A
+
+    TODO:
+    - Is PC-9801-55 also running on this except with WD33C93 instead?
+      Will see once we obtain a dump of that;
+    - IRQ is never taken (definitely lies at vector 0x2c -> PC=0xdc01e);
+    - DRQ
+    - All roms seems to be misdumped (too generous sizes), is it intentional?
 
 **************************************************************************************************/
 
@@ -144,7 +144,7 @@ void pc9801_55_device::device_start()
 		0xddfff,
 		memregion(this->subtag("scsi_bios").c_str())->base()
 	);
-	
+
 	// TODO: docs hints that this has mirrors at 0xcd*, 0xce*, 0xcf*
 	m_bus->install_io(
 		0xcc0,
@@ -187,7 +187,7 @@ u8 pc9801_55_device::comms_r(offs_t offset)
 	// odd
 
 	logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + 0xcc0);
-	
+
 	return 0xff;
 }
 
@@ -206,7 +206,7 @@ void pc9801_55_device::comms_w(offs_t offset, u8 data)
 		m_wdc->indir_w(addr, data);
 		return;
 	}
-	
+
 	// odd
 	logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + 0xcc0, data);
 }

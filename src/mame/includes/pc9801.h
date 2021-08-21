@@ -93,7 +93,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
-    	, m_keyb(*this, "keyb")
+		, m_keyb(*this, "keyb")
 		, m_rtc(*this, RTC_TAG)
 		, m_ppi_sys(*this, "ppi_sys")
 		, m_ppi_prn(*this, "ppi_prn")
@@ -115,7 +115,7 @@ protected:
 
 	void rtc_w(uint8_t data);
 	void ppi_sys_beep_portc_w(uint8_t data);
-	
+
 	static void floppy_formats(format_registration &fr);
 
 	u8 m_sys_type;
@@ -215,7 +215,7 @@ private:
 	void nmi_ctrl_w(offs_t offset, uint8_t data);
 
 	u8 ppi_sys_portb_r();
-	
+
 	void sasi_data_w(uint8_t data);
 	uint8_t sasi_data_r();
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
@@ -242,7 +242,7 @@ protected:
 	void fdc_2hd_ctrl_w(uint8_t data);
 
 	u8 m_fdc_2hd_ctrl;
-	
+
 	bool fdc_drive_ready_r(upd765a_device *fdc);
 private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
@@ -252,12 +252,12 @@ private:
 
 	u8 m_fdc_2dd_ctrl;
 
-//	DMA
+//  DMA
 protected:
 	uint8_t m_dma_offset[4];
 	uint8_t m_dma_autoinc[4];
 	int m_dack;
-	
+
 private:
 	void dmapg4_w(offs_t offset, uint8_t data);
 
@@ -272,7 +272,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
 
-//	Video
+//  Video
 protected:
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
@@ -302,7 +302,7 @@ protected:
 	void gvram_w(offs_t offset, uint8_t data);
 	uint8_t grcg_r(offs_t offset);
 	void grcg_w(offs_t offset, uint8_t data);
-	
+
 	void pc9801_video_ff_w(uint8_t data);
 
 	uint16_t m_font_addr;
@@ -336,7 +336,7 @@ private:
 	int m_sasi_data_enable;
 	uint8_t m_sasi_ctrl;
 
-//	Mouse
+//  Mouse
 protected:
 	struct{
 		uint8_t control;
@@ -401,7 +401,7 @@ protected:
 	static void cdrom_headphones(device_t *device);
 
 	void pc9801rs_video_ff_w(offs_t offset, uint8_t data);
-	void pc9801rs_a0_w(offs_t offset, uint8_t data);	
+	void pc9801rs_a0_w(offs_t offset, uint8_t data);
 
 	uint8_t ide_ctrl_r();
 	void ide_ctrl_w(uint8_t data);
@@ -430,7 +430,7 @@ protected:
 	required_ioport m_dsw3;
 private:
 	optional_device_array<ata_interface_device, 2> m_ide;
-//	optional_device<dac_1bit_device> m_dac1bit;
+//  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
 
 	void pc9801ux_io(address_map &map);
@@ -494,7 +494,7 @@ private:
 protected:
 	u8 mouse_freq_r(offs_t offset);
 	void mouse_freq_w(offs_t offset, u8 data);
-	
+
 	u8 ppi_mouse_portb_r();
 	u8 ppi_mouse_portc_r();
 };

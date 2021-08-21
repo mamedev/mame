@@ -112,7 +112,7 @@ protected:
 
 private:
 	required_device<ym3438_device>  m_opn2c;
-	
+
 	virtual u8 id_r() override;
 };
 

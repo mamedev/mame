@@ -39,7 +39,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	// optional information overrides
-//	virtual const tiny_rom_entry *device_rom_region() const override;
+//  virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -47,7 +47,7 @@ private:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<nscsi_bus_device> m_scsi_bus;
 	required_device<wd33c9x_base_device> m_wdc;
-	
+
 	u8 comms_r(offs_t offset);
 	void comms_w(offs_t offset, u8 data);
 };

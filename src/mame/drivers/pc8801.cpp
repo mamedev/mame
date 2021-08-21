@@ -8,23 +8,23 @@
 
     TODO:
     - implement proper i8214 routing, and add irq latch mechanism;
-    - Fix up Floppy Terminal Count 0 / 1 writes properly, Castle Excellent (and presumably other 
-	  games) is very picky about it.
+    - Fix up Floppy Terminal Count 0 / 1 writes properly, Castle Excellent (and presumably other
+      games) is very picky about it.
     - implement proper upd3301 / i8257 text support (currently hacked around);
     - Add limits for extend work RAM;
     - waitstates;
-    - clean-ups: 
-	  - better state machine isolation of features between various models (currently pretty cheaty);
-	  - refactor memory banking to use address maps;
-	  - video;
+    - clean-ups:
+      - better state machine isolation of features between various models (currently pretty cheaty);
+      - refactor memory banking to use address maps;
+      - video;
       - double check dipswitches;
-	  - move PC80S31K to device, needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801.
-	    Also notice that there are common points with SPC-1000 and TF-20 FDDs;
-	  - backport/merge what is portable to PC-8001;
-	- implement bus slot mechanism for NEC boards ("PC-8800-**"), HAL PCG-8100 & GSX8800,
-	  probably others (does bus have an actual codename or just "PC-8801 bus"?);
+      - move PC80S31K to device, needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801.
+        Also notice that there are common points with SPC-1000 and TF-20 FDDs;
+      - backport/merge what is portable to PC-8001;
+    - implement bus slot mechanism for NEC boards ("PC-8800-**"), HAL PCG-8100 & GSX8800,
+      probably others (does bus have an actual codename or just "PC-8801 bus"?);
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks
-	  the floppy ports. Wrong info or check for external board anyway?
+      the floppy ports. Wrong info or check for external board anyway?
     - fix "jumps" in mouse support pointer (noticeable in Balance of Power);
 
     per-game specific TODO:
@@ -340,7 +340,7 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 				{
 					if(cliprect.contains(x+xi, y+0))
 						bitmap.pix(y+0, x+xi) = m_palette->pen(pen & 7);
-					
+
 					// TODO: real HW seems to actually just output to either even or odd line when in 3bpp mode
 					// investigate which is right
 					if(cliprect.contains(x+xi, y+1))
@@ -1179,7 +1179,7 @@ void pc8801_state::pc8801_palram_w(offs_t offset, uint8_t data)
 		m_palram[offset].g = data & 4 ? 7 : 0;
 	}
 
-    // TODO: What happens to the palette contents when the analog/digital palette mode changes?
+	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
 	// Preserve content? Translation? Undefined?
 	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
 }

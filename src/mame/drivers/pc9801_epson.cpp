@@ -5,38 +5,38 @@
     Epson PC98[01] class machine
 
     TODO (PC-386M):
-	- Incomplete shadow IPL banking, we currently never bankswitch to the other ROM bank
-	  (which barely contains program code);
-	- "ERR:VR" at POST (GFX VRAM)
-	  Sub-routine that throws this is at PC=0xfd9bc. Notice that you can actually skip this 
-	  with eip=0x1bf in debugger and make the system to actually checkout memory installed.
-	  (Shorthand: "bp fd9bc,eip=0x1bf")
-	- POST throws non-fatal "ERR:PA" (page fault, "Protected Address"?) after checking memory
-	  installed. Non-fatal as in POST will checkout bootable devices afterward.
+    - Incomplete shadow IPL banking, we currently never bankswitch to the other ROM bank
+      (which barely contains program code);
+    - "ERR:VR" at POST (GFX VRAM)
+      Sub-routine that throws this is at PC=0xfd9bc. Notice that you can actually skip this
+      with eip=0x1bf in debugger and make the system to actually checkout memory installed.
+      (Shorthand: "bp fd9bc,eip=0x1bf")
+    - POST throws non-fatal "ERR:PA" (page fault, "Protected Address"?) after checking memory
+      installed. Non-fatal as in POST will checkout bootable devices afterward.
 
     TODO: (PC-486SE/PC-486MU):
     - Verify ROM bankswitch;
       On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode
       is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads
       the same bank.
-	- Remove IDE regression hack at I/O $74e;
-	- Regressed with a ERR:RA (conventional memory!?) when moving driver to
-	  stand-alone file;
+    - Remove IDE regression hack at I/O $74e;
+    - Regressed with a ERR:RA (conventional memory!?) when moving driver to
+      stand-alone file;
     - Eventually errors with a ERR:VR (GFX VRAM);
 
-	Notes:
-	- A detailed list of Epson PC98s can be seen from here:
-	  http://www.pc-9800.net/db_epson/index.htm
+    Notes:
+    - A detailed list of Epson PC98s can be seen from here:
+      http://www.pc-9800.net/db_epson/index.htm
 
-	- Being these knockoffs means that there isn't 100% compatibility with all SWs.
-	  Additionally NEC introduced the so called "EPSON Protect" / "EPSON check" (エプソンチェック) 
-	  starting with MS-DOS 3.3 onward, which checks the presence of NEC / Microsoft copyright
-	  string at E800:0DD8 and refuses to boot if not satisfied.
-	  cfr. https://github.com/joncampbell123/dosbox-x/issues/682
-	  Epson offcially provided PC "Software Installation Program" (SIP) floppy disks
-	  (the "epinstal*" in SW list?) that counteracts with the protection check. 
-	  There's alternatively a freeware user released "Dispell!" program tool that can be used for
-	  the same purpose, which also works for 32-bit DOS/V machines.
+    - Being these knockoffs means that there isn't 100% compatibility with all SWs.
+      Additionally NEC introduced the so called "EPSON Protect" / "EPSON check" (エプソンチェック)
+      starting with MS-DOS 3.3 onward, which checks the presence of NEC / Microsoft copyright
+      string at E800:0DD8 and refuses to boot if not satisfied.
+      cfr. https://github.com/joncampbell123/dosbox-x/issues/682
+      Epson offcially provided PC "Software Installation Program" (SIP) floppy disks
+      (the "epinstal*" in SW list?) that counteracts with the protection check.
+      There's alternatively a freeware user released "Dispell!" program tool that can be used for
+      the same purpose, which also works for 32-bit DOS/V machines.
 
 **************************************************************************************************/
 
@@ -53,7 +53,7 @@ template <unsigned which> void pc98_epson_state::shadow_ipl_w(offs_t offset, u16
 
     Control port for Epson shadow IPL
 
-	If any of these isn't right system throws "ERR:BR" at boot (BIOS loader error).
+    If any of these isn't right system throws "ERR:BR" at boot (BIOS loader error).
     Executes some code in text VRAM area (PC=$a006e), trying to setup a writeable RAM bank
     to IPL window area.
 
@@ -122,7 +122,7 @@ void pc98_epson_state::epson_a20_w(offs_t offset, u8 data)
 
 void pc98_epson_state::epson_vram_bank_w(offs_t offset, u8 data)
 {
-//	m_vram_bank = (data & 1) ^ 1;
+//  m_vram_bank = (data & 1) ^ 1;
 	// accessed in the same routine that actually throws ERR:VR
 	logerror("%s: Epson $c06 write %02x\n", machine().describe_context(), data);
 }
@@ -131,7 +131,7 @@ void pc98_epson_state::pc386m_map(address_map &map)
 {
 	pc9801rs_map(map);
 	// TODO: is shadow RAM physically mapped here?
-//	map(0xd0000, 0xd**ff).ram();
+//  map(0xd0000, 0xd**ff).ram();
 }
 
 void pc98_epson_state::pc486se_map(address_map &map)
@@ -145,12 +145,12 @@ void pc98_epson_state::pc486se_map(address_map &map)
 void pc98_epson_state::pc386m_io(address_map &map)
 {
 	pc9801rs_io(map);
-//	map(0x0c03, 0x0c03).r Epson CPU mode, 'R' for Real mode, 'P' for Protected mode (lolwut)
+//  map(0x0c03, 0x0c03).r Epson CPU mode, 'R' for Real mode, 'P' for Protected mode (lolwut)
 	map(0x0c05, 0x0c05).w(FUNC(pc98_epson_state::epson_a20_w));
 	map(0x0c06, 0x0c06).w(FUNC(pc98_epson_state::epson_vram_bank_w));
 	map(0x0c07, 0x0c07).w(FUNC(pc98_epson_state::epson_ipl_bank_w));
-//	map(0x0c13, 0x0c13).r Epson <unknown> readback
-//	map(0x0c14, 0x0c14).r Epson <unknown> readback
+//  map(0x0c13, 0x0c13).r Epson <unknown> readback
+//  map(0x0c14, 0x0c14).r Epson <unknown> readback
 }
 
 void pc98_epson_state::pc486se_io(address_map &map)
@@ -158,13 +158,13 @@ void pc98_epson_state::pc486se_io(address_map &map)
 	pc386m_io(map);
 
 	map(0x0082, 0x0082).lr8(NAME([]() -> u8 { return 0x00; }));
-	
+
 	map(0x043c, 0x043f).w(FUNC(pc98_epson_state::epson_itf_bank_w)).umask16(0xff00);
 
 	map(0x0c42, 0x0c43).lr16(NAME([]() -> u16 { return 0x0000; }));
 
-//	map(0x0640, 0x064f).rw(FUNC(pc9801_state::ide_cs0_r), FUNC(pc9801_state::ide_cs0_w));
-//	map(0x0740, 0x074f).rw(FUNC(pc9801_state::ide_cs1_r), FUNC(pc9801_state::ide_cs1_w));
+//  map(0x0640, 0x064f).rw(FUNC(pc9801_state::ide_cs0_r), FUNC(pc9801_state::ide_cs0_w));
+//  map(0x0740, 0x074f).rw(FUNC(pc9801_state::ide_cs1_r), FUNC(pc9801_state::ide_cs1_w));
 	// HACK: avoid POST moaning for misconfigured HDDs (!?)
 	map(0x074e, 0x074e).lr8(NAME([]() -> u8 { return 0xff; }));
 
@@ -266,7 +266,7 @@ static INPUT_PORTS_START( pc386m )
 	PORT_DIPNAME( 0x80, 0x00, "CPU Type" )
 	PORT_DIPSETTING(    0x80, "V30" )
 	PORT_DIPSETTING(    0x00, "I386" )
-	
+
 	PORT_START("MOUSE_X")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
@@ -314,7 +314,7 @@ void pc98_epson_state::pc386m(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(pc98_epson_state, pc98_epson)
 	MCFG_MACHINE_RESET_OVERRIDE(pc98_epson_state, pc98_epson)
-	
+
 	// RAM: 640KB + 14.6MB max
 	// 2 3.5 floppy drives
 	// ...

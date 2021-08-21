@@ -8,8 +8,8 @@
 
     TODO:
     - verify sound irq;
-	- understand if dips can be read by SW;
-	- configurable irq level needs a binding flush in C-bus handling;
+    - understand if dips can be read by SW;
+    - configurable irq level needs a binding flush in C-bus handling;
 
 **************************************************************************************************/
 
@@ -93,7 +93,7 @@ static INPUT_PORTS_START( pc9801_26 )
 	PORT_CONFSETTING(    0x00, "0xc8000" )    // 1-10
 	PORT_CONFSETTING(    0x01, "0xcc000" )    // 2-9
 	PORT_CONFSETTING(    0x02, "0xd0000" )    // 3-8
-	PORT_CONFSETTING(    0x03, "0xd4000" ) 	  // 4-7
+	PORT_CONFSETTING(    0x03, "0xd4000" )    // 4-7
 	PORT_CONFSETTING(    0x04, "Disable ROM") // 5-6
 
 	PORT_START("OPN_JP6A4")
@@ -194,8 +194,8 @@ void pc9801_26_device::device_reset()
 	m_io_base = current_io;
 
 	// install IRQ line
-//	static const u8 irq_levels[4] = {0, 4, 5, 6};
-//	m_irq_level = irq_levels[ioport("OPN_JP6A1_JP6A3")->read() & 3];
+//  static const u8 irq_levels[4] = {0, 4, 5, 6};
+//  m_irq_level = irq_levels[ioport("OPN_JP6A1_JP6A3")->read() & 3];
 }
 
 

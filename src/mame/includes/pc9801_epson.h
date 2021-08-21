@@ -34,8 +34,8 @@ protected:
 	void pc486se_io(address_map &map);
 	void pc486se_map(address_map &map);
 
-//	virtual void machine_start() override;
-//	virtual void machine_reset() override;
+//  virtual void machine_start() override;
+//  virtual void machine_reset() override;
 
 	DECLARE_MACHINE_START(pc98_epson);
 	DECLARE_MACHINE_RESET(pc98_epson);
@@ -52,7 +52,7 @@ private:
 
 	u8 m_shadow_ipl_bank;
 	bool m_itf_bank_enable;
-//	u8 m_itf_bank;
+//  u8 m_itf_bank;
 };
 
 #endif // MAME_INCLUDES_PC9801_EPSON_H

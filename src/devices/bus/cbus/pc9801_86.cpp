@@ -4,19 +4,19 @@
 
     NEC PC-9801-86 sound card
     NEC PC-9801-SpeakBoard sound card
-	Mad Factory Otomi-chan Kai sound card
+    Mad Factory Otomi-chan Kai sound card
 
     Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
     additional DAC port
-    
-	SpeakBoard sound card seems to be derived design from -86, with an additional
+
+    SpeakBoard sound card seems to be derived design from -86, with an additional
     OPNA mapped at 0x58*
-	
-	Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
-	It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
-	expects this to be installed as default (cfr. datsumj).
-	To fallback to a regular -26/-86 board user needs to add parameter switches "-2" or "-3" 
-	respectively, cfr. "nax -?" for additional details.
+
+    Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
+    It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
+    expects this to be installed as default (cfr. datsumj).
+    To fallback to a regular -26/-86 board user needs to add parameter switches "-2" or "-3"
+    respectively, cfr. "nax -?" for additional details.
 
     TODO:
     - Test all pcm modes;
@@ -24,9 +24,9 @@
     - Recording;
     - SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
       "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM";
-	- Otomi-chan Kai: find a manual (マニュアル), it's mentioned with nax usage. 
-	  Very low-res scan of the PCB sports a 4-bit dip-sw bank at very least;
-	- Otomi-chan Kai: unknown ID port readback;
+    - Otomi-chan Kai: find a manual (マニュアル), it's mentioned with nax usage.
+      Very low-res scan of the PCB sports a 4-bit dip-sw bank at very least;
+    - Otomi-chan Kai: unknown ID port readback;
     - verify sound irq;
 
 **************************************************************************************************/
@@ -78,7 +78,7 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B
 	// shouldn't have one
-//	m_opna->set_addrmap(0, &pc9801_86_device::opna_map);
+//  m_opna->set_addrmap(0, &pc9801_86_device::opna_map);
 	m_opna->irq_handler().set(FUNC(pc9801_86_device::sound_irq));
 	m_opna->port_a_read_callback().set(FUNC(pc9801_86_device::opn_porta_r));
 	//m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));

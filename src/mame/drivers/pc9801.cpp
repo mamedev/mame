@@ -7,61 +7,61 @@
     TODO:
     - proper 8251 uart hook-up on keyboard;
     - text scrolling, μPD52611 (cfr. clipping in edge & arcus2, madoum* too?);
-	- Abnormal 90 Hz refresh rate adjust for normal display mode (15KHz).
-	  Should really be 61.xx instead, understand how CRTC really switches clock;
+    - Abnormal 90 Hz refresh rate adjust for normal display mode (15KHz).
+      Should really be 61.xx instead, understand how CRTC really switches clock;
     - AGDC emulation, μPD72120;
-	- GP-IB emulation, μPD7210;
+    - GP-IB emulation, μPD7210;
     - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
     - Write a PC80S31K device for 2d type floppies
       (also used on PC-6601SR, PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-	- FDC (note: epdiag FDC test looks a good candidate for all this):
-		- Has on board dip-switches, we currently just return 2HD/2DD autodetect;
-		- 3'5 floppy disks don't load at all ($4be I/O port is the extra accessor);
-		- fix FDC duplication: according to docs I/O ports $90-$95 are basically mirrors
-		  with a subset of the drive related flags.
-		  Sounds like a afterthought of having 2HD/2DD separate boards from vanilla class;
-		- Move vanilla FDC 2HD/2DD to a separate (legacy?) bus, and split pc9801f (default: 2DD) 
-		  from pc9801m (2HD) and vanilla pc9801 (none);
-		- floppy sounds never silences when drive is idle (disabled for the time being);
-		- epdiag throws ID invalid when run with PORT EXC on (DIP-SW 3-1 -> 0);
+    - FDC (note: epdiag FDC test looks a good candidate for all this):
+        - Has on board dip-switches, we currently just return 2HD/2DD autodetect;
+        - 3'5 floppy disks don't load at all ($4be I/O port is the extra accessor);
+        - fix FDC duplication: according to docs I/O ports $90-$95 are basically mirrors
+          with a subset of the drive related flags.
+          Sounds like a afterthought of having 2HD/2DD separate boards from vanilla class;
+        - Move vanilla FDC 2HD/2DD to a separate (legacy?) bus, and split pc9801f (default: 2DD)
+          from pc9801m (2HD) and vanilla pc9801 (none);
+        - floppy sounds never silences when drive is idle (disabled for the time being);
+        - epdiag throws ID invalid when run with PORT EXC on (DIP-SW 3-1 -> 0);
     - CMT support (-03/-13/-36 i/f or cbus only, supported by i86/V30 fully compatible machines
-	  only);
+      only);
     - SASI/SCSI support (fully supported by now?);
-	- IDE sports an hack to not make 512 to 256 sector byte translations.
-	  Apparently a SDIP setting is responsible for this?
+    - IDE sports an hack to not make 512 to 256 sector byte translations.
+      Apparently a SDIP setting is responsible for this?
     - Remove kludge for POR bit in a20_ctrl_w fn;
-	- I/O:
-		- HW Dip-switches (where applicable) needs a serious clean-up and naming/position 
-		  fixing in some cases;
-		- Export mouse support to an actual PC9871 device;
-		- Implement IF-SEGA/98 support (Sega Saturn peripheral compatibility for Windows,
-		  available DOS C snippet clearly shows reading in direct mode, an actual SMPC
-		  sub-device sounds unlikely but possible);
-	- Incomplete SDIP support:
-		- SDIP never returns a valid state and returns default values even if machine is
-		  soft resetted. By logic should read-back the already existing state, instead
-		  all machines just returns a "set SDIP" warning message at POST no matter what;
-		- SDIP bank hookup is different across machines, either unmapped or diverging 
-		  implementation wise both in port select and behaviour;
-		- In theory SDIP can be initialized via a BIOS menu, callable by holding down
-		  HELP key at POST. This actually doesn't work for any machine, is it expected to
-		  have key repeat support? Later BIOSes actually have strings for an extended menu
-		  with 3 or 4 pages strings, may be also requiring a jump/bankswitch to unmapped area?
-		- Expose SDIP to an actual device_nvram_interface;
-		- Derive defaults off what the model sets up at POST;
-	- clean-up functions/variables naming by actual documentation nomenclature;
+    - I/O:
+        - HW Dip-switches (where applicable) needs a serious clean-up and naming/position
+          fixing in some cases;
+        - Export mouse support to an actual PC9871 device;
+        - Implement IF-SEGA/98 support (Sega Saturn peripheral compatibility for Windows,
+          available DOS C snippet clearly shows reading in direct mode, an actual SMPC
+          sub-device sounds unlikely but possible);
+    - Incomplete SDIP support:
+        - SDIP never returns a valid state and returns default values even if machine is
+          soft resetted. By logic should read-back the already existing state, instead
+          all machines just returns a "set SDIP" warning message at POST no matter what;
+        - SDIP bank hookup is different across machines, either unmapped or diverging
+          implementation wise both in port select and behaviour;
+        - In theory SDIP can be initialized via a BIOS menu, callable by holding down
+          HELP key at POST. This actually doesn't work for any machine, is it expected to
+          have key repeat support? Later BIOSes actually have strings for an extended menu
+          with 3 or 4 pages strings, may be also requiring a jump/bankswitch to unmapped area?
+        - Expose SDIP to an actual device_nvram_interface;
+        - Derive defaults off what the model sets up at POST;
+    - clean-up functions/variables naming by actual documentation nomenclature;
     - derive machine configs & romsets by actual default options, examples:
-		- 3.5 built-in floppy drives vs. default 5.25;
-		- separate pc9801f (2DD) available romset to pc9801 (none) & pc9801m (2HD), and 
-		  remove the correlated machine config option;
-		- cbus available number of slots & built-in or provided boards;
-		- separate machines HDD hooks by SASI/SCSI/IDE;
-		- load actual IDE bioses from IPL romsets where applicable 
-		  (late era 9801 and 9821 class machines);
-		- pinpoint machines that uses GRCG instead of EGC, we are currently too lenient and support
-		  latter on most (use dbuster and hypbingo to checkout);
-		- Improve opacity of video flip/flop registers, consider using an address space instead of
-		  current array format;
+        - 3.5 built-in floppy drives vs. default 5.25;
+        - separate pc9801f (2DD) available romset to pc9801 (none) & pc9801m (2HD), and
+          remove the correlated machine config option;
+        - cbus available number of slots & built-in or provided boards;
+        - separate machines HDD hooks by SASI/SCSI/IDE;
+        - load actual IDE bioses from IPL romsets where applicable
+          (late era 9801 and 9821 class machines);
+        - pinpoint machines that uses GRCG instead of EGC, we are currently too lenient and support
+          latter on most (use dbuster and hypbingo to checkout);
+        - Improve opacity of video flip/flop registers, consider using an address space instead of
+          current array format;
 
     TODO (PC-9801F)
     - it currently hooks up half size kanji ROMs, causing missing text in many games;
@@ -72,19 +72,19 @@
     - Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
     - clean-up duplicate code;
 
-	TODO (PC-9801RX?):
-	- Identify model type, it clearly accesses PCI, the extended 3'5 floppy I/O at 0x4be and
-	  it's not a 286 CPU;
-	- Floppy boot fails;
+    TODO (PC-9801RX?):
+    - Identify model type, it clearly accesses PCI, the extended 3'5 floppy I/O at 0x4be and
+      it's not a 286 CPU;
+    - Floppy boot fails;
 
-	TODO (PC-9801US):
-	- "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
-	- "SYSTEM SHUTDOWN" after BIOS sets up the SDIP values;
+    TODO (PC-9801US):
+    - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
+    - "SYSTEM SHUTDOWN" after BIOS sets up the SDIP values;
 
-	TODO (PC-9801BX2)
-	- "SYSTEM SHUTDOWN" at POST, a soft reset fixes it? 
-	- A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
-	- unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM size;
+    TODO (PC-9801BX2)
+    - "SYSTEM SHUTDOWN" at POST, a soft reset fixes it?
+    - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
+    - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM size;
 
 ===================================================================================================
 
@@ -424,7 +424,7 @@ bool pc9801_state::fdc_drive_ready_r(upd765a_device *fdc)
 {
 	floppy_image_device *floppy0 = fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = fdc->subdevice<floppy_connector>("1")->get_device();
-	
+
 	return (!floppy0->ready_r() || !floppy1->ready_r());
 }
 
@@ -437,7 +437,7 @@ uint8_t pc9801_state::fdc_2dd_ctrl_r()
 	ret |= fdc_drive_ready_r(m_fdc_2dd) << 4;
 
 	//popmessage("%d %d %02x", floppy0->ready_r(), floppy1->ready_r(), ret);
-	
+
 	// TODO: dips et al.
 	return ret | 0x40;
 }
@@ -631,7 +631,7 @@ void pc9801_state::pc9801_map(address_map &map)
 /* first device is even offsets, second one is odd offsets */
 void pc9801_state::pc9801_common_io(address_map &map)
 {
-//	map.unmap_value_high();
+//  map.unmap_value_high();
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
 	map(0x0000, 0x001f).rw(FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask16(0x00ff); // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
@@ -696,7 +696,7 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 	// telenetm defintely needs this for 8x16 romaji title songs, otherwise it blanks them out
 	// (pc9801vm never reads this area btw)
 	pcg_offset|= (offset & m_font_lr) & 1;
-//	pcg_offset|= (m_font_lr);
+//  pcg_offset|= (m_font_lr);
 
 	return m_kanji_rom[pcg_offset];
 }
@@ -880,7 +880,7 @@ void pc9801vm_state::grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 /*
  * FDC MODE control
- * 
+ *
  * ???? ---- <undefined>
  * ---- x--- (r/o) DIP-SW 3-2 built-in FDC spec (1) OFF 2HD (0) ON 2DD
  * ---- -x-- (r) DIP-SW 3-1 FDC FIXed mode (1) ON
@@ -907,7 +907,7 @@ void pc9801vm_state::fdc_set_density_mode(bool is_2hd)
 	floppy1->set_rpm(is_2hd ? 360 : 300);
 
 	m_fdc_2hd->set_rate(is_2hd ? 500000 : 250000);
-//	printf("FDC set new mode %s\n", is_2hd ? "2HD" : "2DD");
+//  printf("FDC set new mode %s\n", is_2hd ? "2HD" : "2DD");
 	logerror("%s: FDC set new mode %s\n", machine().describe_context(), is_2hd ? "2HD" : "2DD");
 }
 
@@ -920,13 +920,13 @@ void pc9801vm_state::fdc_mode_w(uint8_t data)
 		fdc_set_density_mode(new_mode);
 
 	m_fdc_mode = data;
-	
+
 	if(BIT(m_fdc_mode, 2))
 	{
 		m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(CLEAR_LINE);
 		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(CLEAR_LINE);
 	}
-	
+
 	//if(data & 0xfc)
 	//  logerror("FDC ctrl called with %02x\n",data);
 }
@@ -1080,10 +1080,10 @@ void pc9801vm_state::pc9801ux_map(address_map &map)
 
 void pc9801vm_state::pc9801ux_io(address_map &map)
 {
-//	map.unmap_value_high();
+//  map.unmap_value_high();
 	pc9801_common_io(map);
 	map(0x0020, 0x002f).w(FUNC(pc9801vm_state::dmapg8_w)).umask16(0xff00);
-//	map(0x0050, 0x0057).noprw(); // 2dd ppi?
+//  map(0x0050, 0x0057).noprw(); // 2dd ppi?
 	map(0x005c, 0x005f).r(FUNC(pc9801vm_state::timestamp_r)).nopw(); // artic
 	map(0x0068, 0x006b).w(FUNC(pc9801vm_state::pc9801rs_video_ff_w)).umask16(0x00ff); //mode FF / <undefined>
 	map(0x0070, 0x007f).rw(FUNC(pc9801vm_state::grcg_r), FUNC(pc9801vm_state::grcg_w)).umask16(0x00ff); //display registers "GRCG" / i8253 pit
@@ -1112,7 +1112,7 @@ void pc9801vm_state::pc9801rs_map(address_map &map)
 
 void pc9801vm_state::pc9801rs_io(address_map &map)
 {
-//	map.unmap_value_high();
+//  map.unmap_value_high();
 	pc9801ux_io(map);
 	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
 	map(0x0640, 0x064f).rw(FUNC(pc9801vm_state::ide_cs0_r), FUNC(pc9801vm_state::ide_cs0_w));
@@ -1167,13 +1167,13 @@ void pc9801us_state::pc9801us_io(address_map &map)
 void pc9801bx_state::pc9801bx2_map(address_map &map)
 {
 	pc9801rs_map(map);
-//	map(0x000a0000, 0x000a3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
-//	map(0x000a4000, 0x000a4fff).rw(FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
-//	map(0x000a8000, 0x000bffff).rw(FUNC(pc9821_state::pc9821_grcg_gvram_r), FUNC(pc9821_state::pc9821_grcg_gvram_w));
+//  map(0x000a0000, 0x000a3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
+//  map(0x000a4000, 0x000a4fff).rw(FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
+//  map(0x000a8000, 0x000bffff).rw(FUNC(pc9821_state::pc9821_grcg_gvram_r), FUNC(pc9821_state::pc9821_grcg_gvram_w));
 //  map(0x000cc000, 0x000cffff).rom().region("sound_bios", 0); //sound BIOS
 //  map(0x000d8000, 0x000d9fff).rom().region("ide",0)
-//	map(0x000da000, 0x000dbfff).ram(); // ide ram (declared in RS)
-//	map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
+//  map(0x000da000, 0x000dbfff).ram(); // ide ram (declared in RS)
+//  map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xffee8000, 0xffefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
@@ -1210,8 +1210,8 @@ u8 pc9801bx_state::gdc_31kHz_r(offs_t offset)
 void pc9801bx_state::gdc_31kHz_w(offs_t offset, u8 data)
 {
 	// Repeatedly switches 0 to 3 during POST, sync monitor check to guess support?
-//	if (data)
-//		popmessage("31kHz register set %02x, contact MAMEdev", data);
+//  if (data)
+//      popmessage("31kHz register set %02x, contact MAMEdev", data);
 }
 
 void pc9801bx_state::pc9801bx2_io(address_map &map)
@@ -1511,7 +1511,7 @@ uint8_t pc9801_state::dma_read_byte(offs_t offset)
 		}
 	}
 
-//	logerror("%08x %02x\n",addr, m_dma_access_ctrl);
+//  logerror("%08x %02x\n",addr, m_dma_access_ctrl);
 	return program.read_byte(addr);
 }
 
@@ -1520,7 +1520,7 @@ void pc9801_state::dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
-	
+
 	if(offset == 0xffff)
 	{
 		switch(m_dma_autoinc[m_dack])
@@ -1536,7 +1536,7 @@ void pc9801_state::dma_write_byte(offs_t offset, uint8_t data)
 				break;
 		}
 	}
-//	logerror("%08x %02x %02x\n",addr,data, m_dma_access_ctrl);
+//  logerror("%08x %02x %02x\n",addr,data, m_dma_access_ctrl);
 
 	program.write_byte(addr, data);
 }
@@ -1592,7 +1592,7 @@ WRITE_LINE_MEMBER(pc9801_state::dack3_w){ /*logerror("%02x 3\n",state);*/ set_dm
 u8 pc9801_state::ppi_sys_portb_r()
 {
 	u8 res = 0;
-	
+
 	res |= m_rtc->data_out_r();
 	res |= BIT(m_dsw1->read(), 0) << 3;
 
@@ -1638,8 +1638,8 @@ u8 pc9801_state::ppi_prn_portb_r()
 {
 	u8 res = 0;
 
-//	res |= BIT(m_dsw1->read(), 7) << 3; 
-//	res |= BIT(m_dsw1->read(), 2) << 4;
+//  res |= BIT(m_dsw1->read(), 7) << 3;
+//  res |= BIT(m_dsw1->read(), 2) << 4;
 	res |= m_sys_type << 6;
 
 	return res;
@@ -1649,7 +1649,7 @@ u8 pc9801vm_state::ppi_prn_portb_r()
 {
 	u8 res = pc9801_state::ppi_prn_portb_r();
 
-	res |= BIT(m_dsw1->read(), 7) << 3; 
+	res |= BIT(m_dsw1->read(), 7) << 3;
 	res |= BIT(m_dsw1->read(), 2) << 4;
 
 	return res;
@@ -1730,7 +1730,7 @@ void pc9801_state::ppi_mouse_portb_w(uint8_t data)
 
 u8 pc9801vm_state::ppi_mouse_portc_r()
 {
-	return (BIT(m_dsw3->read(), 7) << 2); 
+	return (BIT(m_dsw3->read(), 7) << 2);
 }
 
 void pc9801_state::ppi_mouse_portc_w(uint8_t data)
@@ -1795,12 +1795,12 @@ void pc9801vm_state::mouse_freq_w(offs_t offset, u8 data)
 }
 
 // standard debug catch-all handler
-// I/O mapping is byte smearing party, so logerror can possibly silently hide handler 
+// I/O mapping is byte smearing party, so logerror can possibly silently hide handler
 // accesses if they are partially handled by an umask in the mapping.
 uint8_t pc9801_state::unk_r(offs_t offset)
 {
-//	printf("%04x\n",offset);
-//	logerror("%s: I/O read access %04x\n",offset);
+//  printf("%04x\n",offset);
+//  logerror("%s: I/O read access %04x\n",offset);
 	return 0xff;
 }
 
@@ -1843,7 +1843,7 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
 {
 	logerror("IRQ 2DD %d\n",state);
-	
+
 	// TODO: does this mask applies to the specific timer irq trigger only?
 	// (bit 0 of control)
 	if(m_fdc_2dd_ctrl & 8)
@@ -1922,7 +1922,7 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	m_sys_type = 0x80 >> 6;
 
 	m_fdc_timer = timer_alloc(TIMER_FDC_TRIGGER);
-	
+
 	save_item(NAME(m_dac1bit_disable));
 
 	save_item(NAME(m_dma_access_ctrl));
@@ -2007,7 +2007,7 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 	}
 
 	m_dac1bit_disable = true;
-	
+
 	memset(&m_egc, 0, sizeof(m_egc));
 }
 
@@ -2080,10 +2080,10 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 	m_ppi_mouse->out_pa_callback().set(FUNC(pc9801_state::ppi_mouse_porta_w));
 	// Regular vanilla doesn't have readouts of these
 	// (since mouse isn't built-in but comes from an external board at best)
-//	m_ppi_mouse->in_pb_callback().set_ioport("DSW3");
+//  m_ppi_mouse->in_pb_callback().set_ioport("DSW3");
 	m_ppi_mouse->in_pb_callback().set_constant(0xff);
 	m_ppi_mouse->out_pb_callback().set(FUNC(pc9801_state::ppi_mouse_portb_w));
-//	m_ppi_mouse->in_pc_callback().set_ioport("DSW4");
+//  m_ppi_mouse->in_pc_callback().set_ioport("DSW4");
 	m_ppi_mouse->in_pc_callback().set_constant(0xff);
 	m_ppi_mouse->out_pc_callback().set(FUNC(pc9801_state::ppi_mouse_portc_w));
 
@@ -2348,12 +2348,12 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 void pc9801vm_state::pc9801ux(machine_config &config)
 {
 	pc9801rs(config);
-    i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
-    maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
-    maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
-    maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801vm_state::a20_286, this));
-    maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
+	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
+	maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801vm_state::a20_286, this));
+	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
 	config_floppy_35hd(config);
 //  AM9157A(config, "i8237", 10000000); // unknown clock
 }
@@ -2367,7 +2367,7 @@ void pc9801vm_state::pc9801vx(machine_config &config)
 	// TODO: EGC initial buggy revision
 	// Reportedly has a bug with a RMW op, details TBD
 	// ...
-	
+
 	// minimum RAM: 640 kB
 	// maximum RAM: 8.6 MB
 	// GDC & EGC, DAC1BIT built-in
@@ -2532,7 +2532,7 @@ Dump coming from a dead machine
 */
 
 ROM_START( pc9801vx )
- 	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll01.bin", 0x00000, 0x08000, CRC(1b235313) SHA1(d2c5e2cea3ee0a643d3c5d384d134404b58db793) )
 	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll03.bin", 0x00001, 0x08000, CRC(33605ae3) SHA1(f644ff15c54c8568e643324f38aa3b6211912af0) )
 	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll02.bin", 0x10000, 0x08000, CRC(948f8658) SHA1(674378d4e90fee715ccfdd49378cd5c2fe8d7f62) )
@@ -2573,7 +2573,7 @@ US - i386SX @ 16 MHz
 
 ROM_START( pc9801us )
 	ROM_REGION16_LE( 0x80000, "biosrom", ROMREGION_ERASEFF )
-    ROM_LOAD( "lrh8a00.bin",  0x000000, 0x080000, CRC(a86d8cdb) SHA1(01c805274ca943c1febedda5ad85ba532aac949c) )
+	ROM_LOAD( "lrh8a00.bin",  0x000000, 0x080000, CRC(a86d8cdb) SHA1(01c805274ca943c1febedda5ad85ba532aac949c) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// 0x0c000-0x0ffff sound ROM BIOS
@@ -2807,7 +2807,7 @@ void pc9801vm_state::init_pc9801vm_kanji()
 	}
 }
 
-// We keep track of anything undumped of note that belongs to the "PC-98" family tree here, and try to give a 
+// We keep track of anything undumped of note that belongs to the "PC-98" family tree here, and try to give a
 // sub-tree code in state machine if not obvious from the naming suffix.
 // This is also repeated in SW list reports, i.e. you have to use an "On RS class xxx" format to indicate a bug report
 // specifically happening for PC9801RS. This will be hopefully put into stone with driver splits at some point in future.
@@ -2815,7 +2815,7 @@ void pc9801vm_state::init_pc9801vm_kanji()
 // "vanilla" class (i86, E/F/M)
 COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
 
-// N5200 (started as a vanilla PC-98 business line derivative, 
+// N5200 (started as a vanilla PC-98 business line derivative,
 //        eventually diverged into its own thing and incorporated various Hyper 98 features.
 //        Runs proprietary PTOS)
 // APC III (US version of either vanilla PC9801 or N5200, aimed at business market. Runs MS-DOS 2.11/3.xx or PC-UX)
@@ -2834,7 +2834,7 @@ COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9
 
 // VM class (V30)
 COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
-COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801vm11, pc9801vm_state, init_pc9801_kanji,   "NEC", 
+COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801vm11, pc9801vm_state, init_pc9801_kanji,   "NEC",
   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // UX class (i286)

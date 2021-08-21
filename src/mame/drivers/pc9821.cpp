@@ -1,44 +1,44 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese,Carl
 /**************************************************************************************************
-	
-	NEC PC-9821
-	
-	follow-up to PC-9801 for the consumer market
+
+    NEC PC-9821
+
+    follow-up to PC-9801 for the consumer market
 
     TODO (PC-9821):
     - non-fatal "cache error" at POST for all machines listed here;
     - undumped IDE ROM, kludged to work;
-	- further state machine breakdowns;
+    - further state machine breakdowns;
 
     TODO (PC-9821As):
-	- unimplemented SDIP specific access;
-	- "SYSTEM SHUTDOWN" while accessing above;
-	- Update: it never goes into above after I changed default m_dma_access_ctrl to 0xfe?
+    - unimplemented SDIP specific access;
+    - "SYSTEM SHUTDOWN" while accessing above;
+    - Update: it never goes into above after I changed default m_dma_access_ctrl to 0xfe?
 
-	TODO (PC-9821Cx3):
-	- "MICON ERROR" at POST, we currently return a ready state in remote control register 
-	  to bypass it, is it expected behaviour?
-	- Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
-	  $b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
-	  looping;
-	- 0xfa2c8 contains ITF test routines, to access it's supposedly CTRL+CAPS+KANA,
-	  which currently doesn't work. It also never returns a valid processor or CPU clock,
-	  is it a debug side-effect or supposed to be read somehow?
-	- Expects 0xc0000-0xdffff to be r/w at PC=0x104e8, currently failing for inner C-Bus mappings.
-	  Is PCI supposed to overlay the C-Bus section?
-	- Eventually jump off the weeds by taking an invalid irq in timer test;
-	- Reportedly should display a CanBe logo at POST (always blue with white fg?),
-	  at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
-	  Where this is mapped is currently unknown;
+    TODO (PC-9821Cx3):
+    - "MICON ERROR" at POST, we currently return a ready state in remote control register
+      to bypass it, is it expected behaviour?
+    - Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
+      $b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
+      looping;
+    - 0xfa2c8 contains ITF test routines, to access it's supposedly CTRL+CAPS+KANA,
+      which currently doesn't work. It also never returns a valid processor or CPU clock,
+      is it a debug side-effect or supposed to be read somehow?
+    - Expects 0xc0000-0xdffff to be r/w at PC=0x104e8, currently failing for inner C-Bus mappings.
+      Is PCI supposed to overlay the C-Bus section?
+    - Eventually jump off the weeds by taking an invalid irq in timer test;
+    - Reportedly should display a CanBe logo at POST (always blue with white fg?),
+      at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
+      Where this is mapped is currently unknown;
 
     TODO (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333):
     - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
-	  involved bankswitch with Pentium based machines);
+      involved bankswitch with Pentium based machines);
 
-	TODO: (PC-9821Nr15/PC-9821Nr166)
-	- Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
-	- Skipping that will eventually die with a "MEMORY ERROR" (never reads extended memory);
+    TODO: (PC-9821Nr15/PC-9821Nr166)
+    - Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
+    - Skipping that will eventually die with a "MEMORY ERROR" (never reads extended memory);
 
 **************************************************************************************************/
 
@@ -54,7 +54,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pegc_display_pixels )
 		// Is the DAC really merging two pixels not unlike VGA correlated Mode 13h?
 		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
-		
+
 		for(int xi=0;xi<8;xi+=2)
 		{
 			int res_x = (x >> 1) + xi;
@@ -74,7 +74,7 @@ void pc9821_state::pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if(!m_ex_video_ff[2])
 		return;
-	
+
 	egc_w(offset, data, mem_mask);
 }
 
@@ -292,7 +292,7 @@ void pc9821_state::pc9821_map(address_map &map)
 	map(0x000a8000, 0x000bffff).rw(FUNC(pc9821_state::pc9821_grcg_gvram_r), FUNC(pc9821_state::pc9821_grcg_gvram_w));
 //  map(0x000cc000, 0x000cffff).rom().region("sound_bios", 0); //sound BIOS
 //  map(0x000d8000, 0x000d9fff).rom().region("ide",0)
-//	map(0x000da000, 0x000dbfff).ram(); // ide ram
+//  map(0x000da000, 0x000dbfff).ram(); // ide ram
 	map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
 	map(0x00f00000, 0x00f9ffff).ram().share("ext_gvram");
 	map(0xfff00000, 0xfff9ffff).ram().share("ext_gvram");
@@ -310,36 +310,36 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
 	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask32(0xff00ff00); //i8255 printer port / i8251 keyboard
-//	map(0x0050, 0x0053).w(FUNC(pc9821_state::nmi_ctrl_w)).umask32(0x00ff00ff);
-//	map(0x005c, 0x005f).r(FUNC(pc9821_state::timestamp_r)).nopw(); // artic
-//	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>
-//	map(0x0060, 0x0063).r(FUNC(pc9821_state::unk_r)).umask32(0xff00ff00); // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
-//	map(0x0064, 0x0064).w(FUNC(pc9821_state::vrtc_clear_w));
+//  map(0x0050, 0x0053).w(FUNC(pc9821_state::nmi_ctrl_w)).umask32(0x00ff00ff);
+//  map(0x005c, 0x005f).r(FUNC(pc9821_state::timestamp_r)).nopw(); // artic
+//  map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>
+//  map(0x0060, 0x0063).r(FUNC(pc9821_state::unk_r)).umask32(0xff00ff00); // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
+//  map(0x0064, 0x0064).w(FUNC(pc9821_state::vrtc_clear_w));
 	map(0x0068, 0x006b).w(FUNC(pc9821_state::pc9821_video_ff_w)).umask32(0x00ff00ff); //mode FF / <undefined>
-//	map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00);
-//	map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
+//  map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00);
+//  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
 	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
 	map(0x00a0, 0x00af).rw(FUNC(pc9821_state::pc9821_a0_r), FUNC(pc9821_state::pc9821_a0_w)); //upd7220 bitmap ports / display registers
 //  map(0x00b0, 0x00b3) PC9861k (serial port?)
 //  map(0x00b9, 0x00b9) PC9861k
 //  map(0x00bb, 0x00bb) PC9861k
-//	map(0x00bc, 0x00bf).rw(FUNC(pc9821_state::fdc_mode_ctrl_r), FUNC(pc9821_state::fdc_mode_ctrl_w));
+//  map(0x00bc, 0x00bf).rw(FUNC(pc9821_state::fdc_mode_ctrl_r), FUNC(pc9821_state::fdc_mode_ctrl_w));
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
-//	map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
+//  map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
 	//  map(0x00d8, 0x00df) AMD98 (sound?) board
-//	map(0x00f0, 0x00ff).rw(FUNC(pc9821_state::a20_ctrl_r), FUNC(pc9821_state::a20_ctrl_w)).umask32(0x00ff00ff);
+//  map(0x00f0, 0x00ff).rw(FUNC(pc9821_state::a20_ctrl_r), FUNC(pc9821_state::a20_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x0188, 0x018f).rw(FUNC(pc9821_state::pc9801_opn_r), FUNC(pc9821_state::pc9801_opn_w)); //ym2203 opn / <undefined>
 //  map(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
-//	map(0x0430, 0x0433).rw(FUNC(pc9821_state::ide_ctrl_r), FUNC(pc9821_state::ide_ctrl_w)).umask32(0x00ff00ff);
-//	map(0x0438, 0x043b).rw(FUNC(pc9821_state::access_ctrl_r), FUNC(pc9821_state::access_ctrl_w));
-//	map(0x043c, 0x043f).w(FUNC(pc9821_state::pc9801rs_bank_w)); //ROM/RAM bank (NEC)
+//  map(0x0430, 0x0433).rw(FUNC(pc9821_state::ide_ctrl_r), FUNC(pc9821_state::ide_ctrl_w)).umask32(0x00ff00ff);
+//  map(0x0438, 0x043b).rw(FUNC(pc9821_state::access_ctrl_r), FUNC(pc9821_state::access_ctrl_w));
+//  map(0x043c, 0x043f).w(FUNC(pc9821_state::pc9801rs_bank_w)); //ROM/RAM bank (NEC)
 //  map(0x043c, 0x043f) ROM/RAM bank (EPSON)
 	map(0x0460, 0x0463).rw(FUNC(pc9821_state::window_bank_r), FUNC(pc9821_state::window_bank_w));
 	map(0x04a0, 0x04af).w(FUNC(pc9821_state::pc9821_egc_w));
 //  map(0x04be, 0x04be) FDC "RPM" register
-//	map(0x0640, 0x064f).rw(FUNC(pc9821_state::ide_cs0_r), FUNC(pc9821_state::ide_cs0_w));
-//	map(0x0740, 0x074f).rw(FUNC(pc9821_state::ide_cs1_r), FUNC(pc9821_state::ide_cs1_w));
+//  map(0x0640, 0x064f).rw(FUNC(pc9821_state::ide_cs0_r), FUNC(pc9821_state::ide_cs0_w));
+//  map(0x0740, 0x074f).rw(FUNC(pc9821_state::ide_cs1_r), FUNC(pc9821_state::ide_cs1_w));
 //  map(0x08e0, 0x08ea) <undefined> / EMM SIO registers
 	map(0x09a0, 0x09a0).rw(FUNC(pc9821_state::ext2_video_ff_r), FUNC(pc9821_state::ext2_video_ff_w)); // GDC extended register r/w
 //  map(0x09a8, 0x09a8) GDC 31KHz register r/w
@@ -353,9 +353,9 @@ void pc9821_state::pc9821_io(address_map &map)
 //  map(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
 	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
-//	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
-//	map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
-//	map(0x841c, 0x8f1f).rw(FUNC(pc9821_state::sdip_r<0x0>), FUNC(pc9821_state::sdip_w<0x0>));
+//  map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
+//  map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
+//  map(0x841c, 0x8f1f).rw(FUNC(pc9821_state::sdip_r<0x0>), FUNC(pc9821_state::sdip_w<0x0>));
 //  map(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
 	map(0xbfdb, 0xbfdb).rw(FUNC(pc9821_state::mouse_freq_r), FUNC(pc9821_state::mouse_freq_w));
 //  map(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
@@ -366,7 +366,7 @@ void pc9821_state::pc9821_io(address_map &map)
 //  map(0xd4d0, 0xd4d3) MIDI port, option 5 / <undefined>
 //  map(0xd8d0, 0xd8d3) MIDI port, option 6 / <undefined>
 //  map(0xdcd0, 0xdcd3) MIDI port, option 7 / <undefined>
-//	map(0xe0d0, 0xe0d3).r(FUNC(pc9821_state::midi_r)); // MIDI port, option 8 / <undefined>
+//  map(0xe0d0, 0xe0d3).r(FUNC(pc9821_state::midi_r)); // MIDI port, option 8 / <undefined>
 //  map(0xe4d0, 0xe4d3) MIDI port, option 9 / <undefined>
 //  map(0xe8d0, 0xe8d3) MIDI port, option A / <undefined>
 //  map(0xecd0, 0xecd3) MIDI port, option B / <undefined>
@@ -662,7 +662,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_dmac->set_clock(xtal); // unknown clock
 
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
-	
+
 	m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
 }
 
@@ -722,11 +722,11 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
-//	m_cbus[0]->set_default_option(nullptr);
+//  m_cbus[0]->set_default_option(nullptr);
 	m_cbus[0]->set_default_option("pc9801_118");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
-	
+
 	// VLSI Supercore594 (Wildcat) PCI 2.0
 	// GD5440
 	// built-in 3.5 floppy x 1
@@ -806,7 +806,7 @@ void pc9821_mate_r_state::pc9821ra266(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_r_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	// 512KB CPU cache RAM
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
@@ -855,13 +855,13 @@ void pc9821_note_state::pc9821ne(machine_config &config)
 void pc9821_note_lavie_state::pc9821nr15(machine_config &config)
 {
 	pc9821(config);
-//	const XTAL xtal = XTAL(150'000'000);
+//  const XTAL xtal = XTAL(150'000'000);
 	const double xtal = 150000000;
 	PENTIUM_PRO(config.replace(), m_maincpu, xtal); // unsure if normal or pro, clock and cache size suggests latter
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	// 256KB CPU cache RAM
 	// TFT 12.1 screen with 800x600 max resolution
 	// Trident Cyber9385 Flat Panel Controller (SVGA, PCI?)
@@ -881,7 +881,7 @@ void pc9821_note_lavie_state::pc9821nr166(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	// 256KB CPU cache RAM
 	// TFT 13.3 screen with 1024x768 resolution
 	// Trident Cyber9385 Flat Panel Controller (SVGA, PCI?)
@@ -899,7 +899,7 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	// 256KB CPU cache RAM
 	// TFT 12.1 screen with 800x600 resolution & true color
 	// Trident Cyber9385-1 Flat Panel Controller (SVGA, PCI?)
@@ -1065,7 +1065,7 @@ PCI VLSI Supercore594 (Wildcat), PCI Rev. 2.0
 ROM_START( pc9821cx3 )
 	ROM_REGION16_LE( 0x80000, "biosrom", ROMREGION_ERASEFF )
 	// ROM BIOS rev. 0.13
-    ROM_LOAD( "pc-9821cx3.bin", 0x000000, 0x080000, CRC(0360ed78) SHA1(2e4fe059d001d980add1656816bda97cd11ef331) )
+	ROM_LOAD( "pc-9821cx3.bin", 0x000000, 0x080000, CRC(0360ed78) SHA1(2e4fe059d001d980add1656816bda97cd11ef331) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 512k space seems valid
@@ -1096,7 +1096,7 @@ ROM_START( pc9821cx3 )
 	ROM_LOAD( "bankd.bin",    0x068000, 0x008000, CRC(9bc44372) SHA1(baa917086edd578d88b730ab1dca1899beb0525d) )
 	ROM_LOAD( "banke.bin",    0x070000, 0x008000, CRC(911003f4) SHA1(a35b72130b2c3c3822a1648d1f470a6973262c73) )
 	ROM_LOAD( "bankf.bin",    0x078000, 0x008000, CRC(77f6a5c7) SHA1(b8fbf104dd8a8e00855be18f0c3b71da79b6a841) )
-	
+
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
@@ -1189,8 +1189,8 @@ unknown differences other than having Win98 pre-installed
 
 ROM_START( pc9821ra266 )
 	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
-    ROM_LOAD( "g8ykkw.bin", 0x000000, 0x040000, CRC(d73a2795) SHA1(65d4e1e438e91c1646bcc06a9868aa474faf0ccf) ) // SOP44
-	
+	ROM_LOAD( "g8ykkw.bin", 0x000000, 0x040000, CRC(d73a2795) SHA1(65d4e1e438e91c1646bcc06a9868aa474faf0ccf) ) // SOP44
+
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 256k space seems valid
 	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
@@ -1237,7 +1237,7 @@ ROM_START( pc9821v13 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// "ROM SUM ERROR"
 	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-//	ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, BAD_DUMP CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
+//  ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, BAD_DUMP CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
 	ROM_LOAD( "bios_v13.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -1257,7 +1257,7 @@ ROM_START( pc9821v20 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// Doesn't boot, not an ITF ROM!
 	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-//	ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
+//  ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
 	ROM_LOAD( "bios_v20.rom", 0x18000, 0x18000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -1285,7 +1285,7 @@ FAX
 
 ROM_START( pc9821nr15 )
 	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
-    ROM_LOAD( "g8xwa_xwa00_ab28f200bx-t.bin", 0x000000, 0x040000, CRC(17b91850) SHA1(755eb8767c08980d0f1b6e32638e9fdd616a1b26) ) // SOP44
+	ROM_LOAD( "g8xwa_xwa00_ab28f200bx-t.bin", 0x000000, 0x040000, CRC(17b91850) SHA1(755eb8767c08980d0f1b6e32638e9fdd616a1b26) ) // SOP44
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 256k space seems valid
@@ -1312,7 +1312,7 @@ Optional FAX or LAN (depending on model sub-type)
 
 ROM_START( pc9821nr166 )
 	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
-    ROM_LOAD( "pc-9821nr166.bin", 0x000000, 0x040000, CRC(6a137f51) SHA1(1b8264ff525cfda5b367bf85570ff53a6ad42cd4) )
+	ROM_LOAD( "pc-9821nr166.bin", 0x000000, 0x040000, CRC(6a137f51) SHA1(1b8264ff525cfda5b367bf85570ff53a6ad42cd4) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 256k space seems valid
@@ -1340,7 +1340,7 @@ ROM_END
 
 ROM_START( pc9821nw150 )
 	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
-    ROM_LOAD( "g8yxb_b7a_yxb00_ab28f200bx-t.bin", 0x000000, 0x040000, CRC(75f547f6) SHA1(5ff610f3796a3742b674151e4e5a750ded48c951) ) // SOP44
+	ROM_LOAD( "g8yxb_b7a_yxb00_ab28f200bx-t.bin", 0x000000, 0x040000, CRC(75f547f6) SHA1(5ff610f3796a3742b674151e4e5a750ded48c951) ) // SOP44
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 256k space seems valid

@@ -102,10 +102,10 @@ ioport_constructor pc9801_amd98_device::device_input_ports() const
 
 pc9801_amd98_device::pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_AMD98, tag, owner, clock)
-    , m_bus(*this, DEVICE_SELF_OWNER)
-    , m_ay1(*this, "ay1")
-    , m_ay2(*this, "ay2")
-    , m_ay3(*this, "ay3")
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_ay1(*this, "ay1")
+	, m_ay2(*this, "ay2")
+	, m_ay3(*this, "ay3")
 {
 }
 

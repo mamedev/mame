@@ -2,21 +2,21 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC PC-9801-118 sound card 	"CanBe Sound 2"
+    NEC PC-9801-118 sound card  "CanBe Sound 2"
 
     YMF297 + some extra ports, apparently derived from -86.
-	Introduced around the same time as Windows 95 release, it has various compatibility issues
-	under DOS (especially when PnP is enabled). 
-	Doesn't have a sound ROM, it also cannot be installed with an environment also sporting a -86.
+    Introduced around the same time as Windows 95 release, it has various compatibility issues
+    under DOS (especially when PnP is enabled).
+    Doesn't have a sound ROM, it also cannot be installed with an environment also sporting a -86.
 
     TODO:
     - Fix sound chip type (YMF297-F);
-	- Add CS-4232 support, it's an extended clone of the already emulated AD1848 used on the
-	  Windows Sound System;
-	- Understand what the obfuscated NEC "ANCHOR" and "MAZE" chips really are;
-	- PnP interface (missing BIOS);
+    - Add CS-4232 support, it's an extended clone of the already emulated AD1848 used on the
+      Windows Sound System;
+    - Understand what the obfuscated NEC "ANCHOR" and "MAZE" chips really are;
+    - PnP interface (missing BIOS);
     - verify sound irq;
-	- test if driver can be installed under Windows 95;
+    - test if driver can be installed under Windows 95;
 
 **************************************************************************************************/
 
@@ -51,7 +51,7 @@ void pc9801_118_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: "ANCHOR" & "MAZE" custom NEC chips
 	// sourced by 5D clock
-	
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 

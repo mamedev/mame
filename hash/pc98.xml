@@ -30951,7 +30951,7 @@ TODO:
 	<!-- Black screen while running FS.BAT -->
 	<!-- [Does extensive SVGA checks] -->
 	<!-- Supported CAD cards according to SETUP.COM: -->
-	<!-- I-O Data GA-1024, GA-1280, GB-98NB --> 
+	<!-- I-O Data GA-1024, GA-1280, GB-98NB -->
 	<!-- Melco WAB-S/1000, WAP-2000, WSR-E/G, WAB-2000, WAP-4000 -->
 	<software name="msfsim50" supported="no">
 		<description>Microsoft Flight Simulator Version 5.0</description>
@@ -31951,7 +31951,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<part name="flop1" interface="floppy_5_25">
 			<!--
 			<dataarea name="flop" size="1281968">
-				<rom name="morita.d88" size="1281968" crc="7cce82c7" sha1="73bfd089cff665af607ed8c4d3bbc2c9793318ec" offset="0" />
+			    <rom name="morita.d88" size="1281968" crc="7cce82c7" sha1="73bfd089cff665af607ed8c4d3bbc2c9793318ec" offset="0" />
 			</dataarea>
 			-->
 			<dataarea name="flop" size="4016040">

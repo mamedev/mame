@@ -4,16 +4,16 @@
 
     NEC uPD4991/uPD4991a parallel RTC
 
-	uPD4991 should be very similar but with "30% more power consumption" (cit.)
+    uPD4991 should be very similar but with "30% more power consumption" (cit.)
 
     TODO:
-	- bare minimum to make PC98HA happy;
-	- set clock regs;
-	- alarm & timer pulse;
-	- AM/PM hour mode;
-	- leap year;
-	- busy flag;
-	- adjust/clock stop/clock wait mechanisms;
+    - bare minimum to make PC98HA happy;
+    - set clock regs;
+    - alarm & timer pulse;
+    - AM/PM hour mode;
+    - leap year;
+    - busy flag;
+    - adjust/clock stop/clock wait mechanisms;
 
 **************************************************************************************************/
 
@@ -64,7 +64,7 @@ void upd4991a_device::device_start()
 {
 	m_timer_clock = timer_alloc(TIMER_CLOCK);
 	m_timer_clock->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
-	
+
 	save_item(NAME(m_address));
 }
 
@@ -86,11 +86,11 @@ void upd4991a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 void upd4991a_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
 /*
-[0-1] 
+[0-1]
 xxxx xxxx seconds
 [2-3]
 xxxx xxxx minutes
-[4-5] 
+[4-5]
 xxxx xxxx hour
 [6-7]
 ---- xxxx date digit (weekday?)

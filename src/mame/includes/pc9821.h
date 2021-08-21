@@ -47,13 +47,13 @@ private:
 
 	uint8_t m_pc9821_window_bank;
 	uint8_t m_ext2_ff;
-	
+
 	struct {
 		uint8_t pal_entry;
 		uint8_t r[0x100],g[0x100],b[0x100];
 		uint16_t bank[2];
 	}m_analog256;
-	
+
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
