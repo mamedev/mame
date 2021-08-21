@@ -9,7 +9,7 @@
     TODO:
     - Is PC-9801-55 also running on this except with WD33C93 instead?
       Will see once we obtain a dump of that;
-    - IRQ is never taken (definitely lies at vector 0x2c -> PC=0xdc01e);
+    - DIP is never taken (definitely lies at vector 0x2c -> PC=0xdc01e);
     - DRQ
     - All roms seems to be misdumped (too generous sizes), is it intentional?
 
@@ -58,7 +58,8 @@ const tiny_rom_entry *pc9801_55l_device::device_rom_region() const
 
 WRITE_LINE_MEMBER(pc9801_55_device::scsi_irq_w)
 {
-	m_bus->int_w<3>(state);
+	// TODO: should be INT3, but BIOS configures as INT0 somewhere (unhandled dip reading?)
+	m_bus->int_w<0>(state);
 }
 
 void pc9801_55_device::device_add_mconfig(machine_config &config)
@@ -87,7 +88,47 @@ void pc9801_55_device::device_add_mconfig(machine_config &config)
 }
 
 static INPUT_PORTS_START( pc9801_55 )
-	// TODO: fill me
+	PORT_START("SCSI_DSW1")
+	PORT_DIPNAME( 0x07, 0x07, "PC-9801-55: SCSI board ID") PORT_DIPLOCATION("SCSI_SW1:!1,!2,!3")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPNAME( 0x38, 0x18, "PC-9801-55: Interrupt level") PORT_DIPLOCATION("SCSI_SW1:!4,!5,!6")
+	PORT_DIPSETTING(    0x00, "INT0" )
+	PORT_DIPSETTING(    0x08, "INT1" )
+	PORT_DIPSETTING(    0x10, "INT2" )
+	PORT_DIPSETTING(    0x18, "INT3" )
+	PORT_DIPSETTING(    0x20, "INT5" )
+	PORT_DIPSETTING(    0x28, "INT6" )
+	PORT_DIPSETTING(    0x30, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0xc0, 0x00, "PC-9801-55: DMA channel") PORT_DIPLOCATION("SCSI_SW1:!7,!8")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x40, "1 (prohibited)" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+
+	PORT_START("SCSI_DSW2")
+	// TODO: understand all valid possible settings of this
+	PORT_DIPNAME( 0x7f, 0x66, "PC-9801-55: machine ID and ROM base address") PORT_DIPLOCATION("SCSI_SW2:!1,!2,!3,!4,!5,!6,!7")
+	PORT_DIPSETTING(    0x66, "i386, 0xdc000-0xddfff")
+	// ...
+	PORT_DIPNAME( 0x80, 0x80, "PC-9801-55: ROM accessibility at Power-On") PORT_DIPLOCATION("SCSI_SW2:!8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+
+	PORT_START("SCSI_JP")
+	// SW3 and SW4 Jumper settings
+	PORT_CONFNAME( 0x03, 0x00, "PC-9801-55: I/O base address")
+	PORT_CONFSETTING(    0x00, "0xcc0") // 01-02 01 02
+	PORT_CONFSETTING(    0x01, "0xcd0")
+	PORT_CONFSETTING(    0x02, "0xce0")
+	PORT_CONFSETTING(    0x03, "0xcf0")
 INPUT_PORTS_END
 
 ioport_constructor pc9801_55_device::device_input_ports() const
