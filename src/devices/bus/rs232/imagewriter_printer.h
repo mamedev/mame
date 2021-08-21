@@ -27,7 +27,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 	void optic_handler(uint8_t data) { printf("HANDLE OPTIC %d\n",data);}
-	void rxrdy_handler(uint8_t data) { printf("HANDLE RXRDY %d\n",data);}
+	void rxrdy_handler(uint8_t data) { 
+			printf("HANDLE RXRDY %d\n",data);
+			m_maincpu->set_input_line(I8085_RST55_LINE, data);
+	}
 
 protected:
 	apple_imagewriter_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -109,7 +112,7 @@ private:
 	int m_head_pb_last = 0;
 	u16 m_dotpattern;
 
-	int m_select_led;
+	int m_select_status;
 	int right_offset = 0;
 	int left_offset = 3;
 	int m_left_edge  = 0.25 * dpi;

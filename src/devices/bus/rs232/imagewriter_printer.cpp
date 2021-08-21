@@ -60,14 +60,11 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	cpu.set_addrmap(AS_IO,      &apple_imagewriter_printer_device::io_map);
 	m_maincpu->out_sod_func().set(FUNC(apple_imagewriter_printer_device::maincpu_out_sod_func));
 
-//  m_maincpu->set_clk_out(this, FUNC(apple_imagewriter_printer_device::testing_timerout));  //not how that works, just sets clock rate of device
-
-
 	TTL74163(config, m_count, 0);
 	m_maincpu->set_clk_out(m_count, FUNC(ttl74163_device::set_unscaled_clock_int));
 
 
-	[[maybe_unused]] i8155_device &io_head  (I8155(config, m_8155head,   1E6));   // for the moment, just give a 1mhz setting
+	I8155(config, m_8155head,   1E6);   // for the moment, just give a 1mhz setting
 	m_8155head->in_pa_callback().set(FUNC(apple_imagewriter_printer_device::head_pa_r));
 	m_8155head->in_pb_callback().set(FUNC(apple_imagewriter_printer_device::head_pb_r));
 	m_8155head->in_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_r));
@@ -77,7 +74,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_8155head->out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
 
 
-	[[maybe_unused]] i8155_device &io_switch(I8155(config, m_8155switch, 1E6));  // for the moment, just give a 1 mhz setting
+	I8155(config, m_8155switch, 1E6);  // for the moment, just give a 1 mhz setting
 	m_8155switch->in_pa_callback().set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
 	m_8155switch->in_pb_callback().set(FUNC(apple_imagewriter_printer_device::switch_pb_r));
 	m_8155switch->in_pc_callback().set(FUNC(apple_imagewriter_printer_device::switch_pc_r));
@@ -92,15 +89,12 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT);
 
-
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
 
 	m_pf_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 	m_cr_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 }
-
-
 
 
 void apple_imagewriter_printer_device::mem_map(address_map &map)
@@ -119,7 +113,7 @@ void apple_imagewriter_printer_device::io_map(address_map &map)
 	map(0x61, 0x61).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
 
-	map(0x70, 0x77).rw(m_8155head, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x70, 0x77).rw(m_8155head,   FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x78, 0x7f).rw(m_8155switch, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 }
 
@@ -320,23 +314,18 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 
 uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 {
-	m_select_led = !ioport("SELECT")->read();
+	m_select_status = !ioport("SELECT")->read();
 	u8 data = 0;
 	data =
-//          ((!(m_xpos < -5) ^ ioport("INVERT1")->read()) << 0) | // m4 home detector
-//          (!(x_pixel_coord(m_xpos) < 4)                 << 0) | // m4 home detector
-			(!(x_pixel_coord(m_xpos) <= m_left_edge)   << 0) | // m4 home detector
+			(!(x_pixel_coord(m_xpos) <= m_left_edge)  << 0) | // m4 home detector
 			(ioport("PAPEREND")->read()               << 1) | // simulate a paper out error
 			(ioport("COVER")->read()                  << 2) | //
-//          (!(x_pixel_coord(m_xpos) >  PAPER_WIDTH - 30) << 3) | // return switch
 			(!(x_pixel_coord(m_xpos) >  m_right_edge) << 3) | // return switch
-			(m_select_led                             << 4) | //
-//          (ioport("SELECT")->read()                 << 4) | //
+			(m_select_status                          << 4) | //
 			(ioport("FORMFEED")->read()               << 5) | //
 			(ioport("LINEFEED")->read()               << 6) | //
 			(BIT(ioport("DIPSW2")->read(), 3)         << 7);  // DIP 2-4
-//  m_select_led = ioport("SELECT")->read();
-	m_bitmap_printer->setprintheadcolor( m_select_led ? 0x888888 : 0x00dd00, 0x000000 );
+	m_bitmap_printer->setprintheadcolor( m_select_status ? 0x888888 : 0x00dd00, 0x000000 );
 	printf("8155 SWITCH PORT_A_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 
 	return data;
