@@ -10,7 +10,10 @@
  */
 
 #include "uniflex_dsk.h"
-#include "formats/imageutl.h"
+#include "imageutl.h"
+
+#include "ioprocs.h"
+
 
 uniflex_format::uniflex_format() : wd177x_format(formats)
 {
@@ -31,22 +34,26 @@ const char *uniflex_format::extensions() const
 	return "dsk";
 }
 
-int uniflex_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int uniflex_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor, variants);
+	int const type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 75;
+
 	return 0;
 }
 
-int uniflex_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int uniflex_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
-	uint8_t sir[192];
+	uint64_t size;
+	if (io.length(size))
+		return -1;
 
 	// Look at the SIR sector, the second sector.
-	io_generic_read(io, sir, 1 * 512, sizeof(sir));
+	uint8_t sir[192];
+	size_t actual;
+	io.read_at(1 * 512, sir, sizeof(sir), actual);
 
 	uint16_t fdn_block_count = pick_integer_be(sir, 0x10, 2);
 	uint32_t last_block_number = pick_integer_be(sir, 0x12, 3);

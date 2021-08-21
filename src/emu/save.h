@@ -55,12 +55,12 @@ typedef named_delegate<void ()> save_prepost_delegate;
 // saved; in general, this is intended only to be used for specific enum types
 // defined by your device
 #define ALLOW_SAVE_TYPE(TYPE) \
-	template <> struct save_manager::is_atom<TYPE> { static constexpr bool value = true; };
+	template <> struct save_manager::is_atom<TYPE> : public std::true_type { };
 
 // use this as above, but also to declare that std::vector<TYPE> is safe as well
 #define ALLOW_SAVE_TYPE_AND_VECTOR(TYPE) \
 	ALLOW_SAVE_TYPE(TYPE) \
-	template <> struct save_manager::is_vector_safe<TYPE> { static constexpr bool value = true; };
+	template <> struct save_manager::is_vector_safe<TYPE> : public std::true_type { };
 
 // use this for saving members of structures in arrays
 #define STRUCT_MEMBER(s, m) s, &save_manager::pointer_unwrap<decltype(s)>::underlying_type::m, #s "." #m
@@ -99,8 +99,8 @@ class save_manager
 	};
 
 	// set of templates to identify valid save types
-	template <typename ItemType> struct is_atom { static constexpr bool value = false; };
-	template <typename ItemType> struct is_vector_safe { static constexpr bool value = false; };
+	template <typename ItemType> struct is_atom : public std::false_type { };
+	template <typename ItemType> struct is_vector_safe : public std::false_type { };
 
 	class state_entry
 	{

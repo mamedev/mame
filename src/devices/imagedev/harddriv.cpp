@@ -133,8 +133,6 @@ image_init_result harddisk_image_device::call_load()
 
 image_init_result harddisk_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
-	int err;
-
 	if (!create_args)
 		throw emu_fatalerror("harddisk_image_device::call_create: Expected create_args to not be nullptr");
 
@@ -148,15 +146,15 @@ image_init_result harddisk_image_device::call_create(int create_format, util::op
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	err = m_origchd.create(image_core_file(), (uint64_t)totalsectors * (uint64_t)sectorsize, hunksize, sectorsize, compression);
-	if (err != CHDERR_NONE)
+	std::error_condition err = m_origchd.create(util::core_file_read_write(image_core_file()), (uint64_t)totalsectors * (uint64_t)sectorsize, hunksize, sectorsize, compression);
+	if (err)
 		return image_init_result::FAIL;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
 	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize));
 	m_origchd.close();
 
-	if (err != CHDERR_NONE)
+	if (err)
 		return image_init_result::FAIL;
 
 	return internal_load_hd();
@@ -168,7 +166,7 @@ void harddisk_image_device::call_unload()
 	if (!m_device_image_unload.isnull())
 		m_device_image_unload(*this);
 
-	if (m_hard_disk_handle != nullptr)
+	if (m_hard_disk_handle)
 	{
 		hard_disk_close(m_hard_disk_handle);
 		m_hard_disk_handle = nullptr;
@@ -186,28 +184,28 @@ void harddisk_image_device::call_unload()
     open_disk_diff - open a DISK diff file
 -------------------------------------------------*/
 
-static chd_error open_disk_diff(emu_options &options, const char *name, chd_file &source, chd_file &diff_chd)
+static std::error_condition open_disk_diff(emu_options &options, const char *name, chd_file &source, chd_file &diff_chd)
 {
 	std::string fname = std::string(name).append(".dif");
 
 	/* try to open the diff */
 	//printf("Opening differencing image file: %s\n", fname.c_str());
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	osd_file::error filerr = diff_file.open(fname.c_str());
-	if (filerr == osd_file::error::NONE)
+	std::error_condition filerr = diff_file.open(fname);
+	if (!filerr)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
 		//printf("Opening differencing image file: %s\n", fullpath.c_str());
-		return diff_chd.open(fullpath.c_str(), true, &source);
+		return diff_chd.open(fullpath, true, &source);
 	}
 
 	/* didn't work; try creating it instead */
 	//printf("Creating differencing image: %s\n", fname.c_str());
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	filerr = diff_file.open(fname.c_str());
-	if (filerr == osd_file::error::NONE)
+	filerr = diff_file.open(fname);
+	if (!filerr)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
@@ -215,23 +213,23 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 		/* create the CHD */
 		//printf("Creating differencing image file: %s\n", fupointllpath.c_str());
 		chd_codec_type compression[4] = { CHD_CODEC_NONE };
-		chd_error err = diff_chd.create(fullpath.c_str(), source.logical_bytes(), source.hunk_bytes(), compression, source);
-		if (err != CHDERR_NONE)
+		std::error_condition err = diff_chd.create(fullpath, source.logical_bytes(), source.hunk_bytes(), compression, source);
+		if (err)
 			return err;
 
 		return diff_chd.clone_all_metadata(source);
 	}
 
-	return CHDERR_FILE_NOT_FOUND;
+	return std::errc::no_such_file_or_directory;
 }
 
 image_init_result harddisk_image_device::internal_load_hd()
 {
-	chd_error err = CHDERR_NONE;
+	std::error_condition err;
 	m_chd = nullptr;
 	uint8_t header[64];
 
-	if (m_hard_disk_handle != nullptr)
+	if (m_hard_disk_handle)
 	{
 		hard_disk_close(m_hard_disk_handle);
 		m_hard_disk_handle = nullptr;
@@ -250,19 +248,19 @@ image_init_result harddisk_image_device::internal_load_hd()
 
 		if (!memcmp("MComprHD", header, 8))
 		{
-			err = m_origchd.open(image_core_file(), true);
+			err = m_origchd.open(util::core_file_read_write(image_core_file()), true);
 
-			if (err == CHDERR_NONE)
+			if (!err)
 			{
 				m_chd = &m_origchd;
 			}
-			else if (err == CHDERR_FILE_NOT_WRITEABLE)
+			else if (err == chd_file::error::FILE_NOT_WRITEABLE)
 			{
-				err = m_origchd.open(image_core_file(), false);
-				if (err == CHDERR_NONE)
+				err = m_origchd.open(util::core_file_read_write(image_core_file()), false);
+				if (!err)
 				{
 					err = open_disk_diff(device().machine().options(), basename_noext(), m_origchd, m_diffchd);
-					if (err == CHDERR_NONE)
+					if (!err)
 					{
 						m_chd = &m_diffchd;
 					}
@@ -271,11 +269,11 @@ image_init_result harddisk_image_device::internal_load_hd()
 		}
 	}
 
-	if (m_chd != nullptr)
+	if (m_chd)
 	{
 		/* open the hard disk file */
 		m_hard_disk_handle = hard_disk_open(m_chd);
-		if (m_hard_disk_handle != nullptr)
+		if (m_hard_disk_handle)
 			return image_init_result::PASS;
 	}
 	else
@@ -306,7 +304,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 			}
 
 			m_hard_disk_handle = hard_disk_open(image_core_file(), skip);
-			if (m_hard_disk_handle != nullptr)
+			if (m_hard_disk_handle)
 				return image_init_result::PASS;
 		}
 
@@ -317,7 +315,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 	m_origchd.close();
 	m_diffchd.close();
 	m_chd = nullptr;
-	seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
+	seterror(err, nullptr);
 
 	return image_init_result::FAIL;
 }

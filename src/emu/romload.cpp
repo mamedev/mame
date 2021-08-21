@@ -101,15 +101,15 @@ std::vector<std::string> make_software_searchpath(software_list_device &swlist, 
 }
 
 
-chd_error do_open_disk(const emu_options &options, std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, chd_file &chd, std::function<const rom_entry * ()> next_parent)
+std::error_condition do_open_disk(const emu_options &options, std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, chd_file &chd, std::function<const rom_entry * ()> next_parent)
 {
 	// hashes are fixed, but we might need to try multiple filenames
 	std::set<std::string> tried;
 	const util::hash_collection hashes(romp->hashdata());
 	std::string filename, fullpath;
 	const rom_entry *parent(nullptr);
-	chd_error result(CHDERR_FILE_NOT_FOUND);
-	while (romp && (CHDERR_NONE != result))
+	std::error_condition result(std::errc::no_such_file_or_directory);
+	while (romp && result)
 	{
 		filename = romp->name() + ".chd";
 		if (tried.insert(filename).second)
@@ -120,8 +120,8 @@ chd_error do_open_disk(const emu_options &options, std::initializer_list<std::re
 			{
 				imgfile.reset(new emu_file(options.media_path(), paths, OPEN_FLAG_READ));
 				imgfile->set_restrict_to_mediapath(1);
-				const osd_file::error filerr(imgfile->open(filename, OPEN_FLAG_READ));
-				if (osd_file::error::NONE == filerr)
+				const std::error_condition filerr(imgfile->open(filename, OPEN_FLAG_READ));
+				if (!filerr)
 					break;
 				else
 					imgfile.reset();
@@ -132,12 +132,12 @@ chd_error do_open_disk(const emu_options &options, std::initializer_list<std::re
 			{
 				fullpath = imgfile->fullpath();
 				imgfile.reset();
-				result = chd.open(fullpath.c_str());
+				result = chd.open(fullpath);
 			}
 		}
 
 		// walk the parents looking for a CHD with the same hashes but a different name
-		if (CHDERR_NONE != result)
+		if (result)
 		{
 			while (romp)
 			{
@@ -345,11 +345,11 @@ chd_file *rom_load_manager::get_disk_handle(std::string_view region)
     file associated with the given region
 -------------------------------------------------*/
 
-int rom_load_manager::set_disk_handle(std::string_view region, const char *fullpath)
+std::error_condition rom_load_manager::set_disk_handle(std::string_view region, const char *fullpath)
 {
 	auto chd = std::make_unique<open_chd>(region);
 	auto err = chd->orig_chd().open(fullpath);
-	if (err == CHDERR_NONE)
+	if (!err)
 		m_chd_list.push_back(std::move(chd));
 	return err;
 }
@@ -439,7 +439,7 @@ void rom_load_manager::fill_random(u8 *base, u32 length)
     for missing files
 -------------------------------------------------*/
 
-void rom_load_manager::handle_missing_file(const rom_entry *romp, const std::vector<std::string> &tried_file_names, chd_error chderr)
+void rom_load_manager::handle_missing_file(const rom_entry *romp, const std::vector<std::string> &tried_file_names, std::error_condition chderr)
 {
 	std::string tried;
 	if (!tried_file_names.empty())
@@ -453,12 +453,12 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, const std::vec
 		tried += ')';
 	}
 
-	const bool is_chd(chderr != CHDERR_NONE);
+	const bool is_chd(chderr);
 	const std::string name(is_chd ? romp->name() + ".chd" : romp->name());
 
-	const bool is_chd_error(is_chd && chderr != CHDERR_FILE_NOT_FOUND);
+	const bool is_chd_error(is_chd && chderr != std::errc::no_such_file_or_directory);
 	if (is_chd_error)
-		m_errorstring.append(string_format("%s CHD ERROR: %s\n", name, chd_file::error_string(chderr)));
+		m_errorstring.append(string_format("%s CHD ERROR: %s\n", name, chderr.message()));
 
 	if (ROM_ISOPTIONAL(romp))
 	{
@@ -638,7 +638,7 @@ void rom_load_manager::region_post_process(memory_region *region, bool invert)
 
 std::unique_ptr<emu_file> rom_load_manager::open_rom_file(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, std::vector<std::string> &tried_file_names, bool from_list)
 {
-	osd_file::error filerr = osd_file::error::NOT_FOUND;
+	std::error_condition filerr = std::errc::no_such_file_or_directory;
 	u32 const romsize = rom_file_size(romp);
 	tried_file_names.clear();
 
@@ -664,14 +664,14 @@ std::unique_ptr<emu_file> rom_load_manager::open_rom_file(std::initializer_list<
 	m_romsloadedsize += romsize;
 
 	// return the result
-	if (osd_file::error::NONE != filerr)
+	if (filerr)
 		return nullptr;
 	else
 		return result;
 }
 
 
-std::unique_ptr<emu_file> rom_load_manager::open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, osd_file::error &filerr)
+std::unique_ptr<emu_file> rom_load_manager::open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, std::error_condition &filerr)
 {
 	// record the set names we search
 	tried.insert(tried.end(), paths.begin(), paths.end());
@@ -685,7 +685,7 @@ std::unique_ptr<emu_file> rom_load_manager::open_rom_file(const std::vector<std:
 		filerr = result->open(name);
 
 	// don't return anything if unsuccessful
-	if (osd_file::error::NONE != filerr)
+	if (filerr)
 		return nullptr;
 	else
 		return result;
@@ -939,7 +939,7 @@ void rom_load_manager::process_rom_entries(std::initializer_list<std::reference_
 			{
 				file = open_rom_file(searchpath, romp, tried_file_names, from_list);
 				if (!file)
-					handle_missing_file(romp, tried_file_names, CHDERR_NONE);
+					handle_missing_file(romp, tried_file_names, std::error_condition());
 			}
 
 			// loop until we run out of reloads
@@ -1000,44 +1000,44 @@ void rom_load_manager::process_rom_entries(std::initializer_list<std::reference_
     open_disk_diff - open a DISK diff file
 -------------------------------------------------*/
 
-chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd)
+std::error_condition rom_load_manager::open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd)
 {
 	// TODO: use system name and/or software list name in the path - the current setup doesn't scale
 	std::string fname = romp->name() + ".dif";
 
-	/* try to open the diff */
+	// try to open the diff
 	LOG("Opening differencing image file: %s\n", fname.c_str());
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	osd_file::error filerr = diff_file.open(fname);
-	if (filerr == osd_file::error::NONE)
+	std::error_condition filerr = diff_file.open(fname);
+	if (!filerr)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
 		LOG("Opening differencing image file: %s\n", fullpath.c_str());
-		return diff_chd.open(fullpath.c_str(), true, &source);
+		return diff_chd.open(fullpath, true, &source);
 	}
 
-	/* didn't work; try creating it instead */
+	// didn't work; try creating it instead
 	LOG("Creating differencing image: %s\n", fname.c_str());
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	filerr = diff_file.open(fname);
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
-		/* create the CHD */
+		// create the CHD
 		LOG("Creating differencing image file: %s\n", fullpath.c_str());
 		chd_codec_type compression[4] = { CHD_CODEC_NONE };
-		chd_error err = diff_chd.create(fullpath.c_str(), source.logical_bytes(), source.hunk_bytes(), compression, source);
-		if (err != CHDERR_NONE)
+		std::error_condition err = diff_chd.create(fullpath, source.logical_bytes(), source.hunk_bytes(), compression, source);
+		if (err)
 			return err;
 
 		return diff_chd.clone_all_metadata(source);
 	}
 
-	return CHDERR_FILE_NOT_FOUND;
+	return std::errc::no_such_file_or_directory;
 }
 
 
@@ -1059,7 +1059,7 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 		if (ROMENTRY_ISFILE(romp))
 		{
 			auto chd = std::make_unique<open_chd>(regiontag);
-			chd_error err;
+			std::error_condition err;
 
 			/* make the filename of the source */
 			const std::string filename = romp->name() + ".chd";
@@ -1068,7 +1068,7 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 			// FIXME: we've lost the ability to search parents here
 			LOG("Opening disk image: %s\n", filename.c_str());
 			err = do_open_disk(machine().options(), searchpath, romp, chd->orig_chd(), next_parent);
-			if (err != CHDERR_NONE)
+			if (err)
 			{
 				handle_missing_file(romp, std::vector<std::string>(), err);
 				chd = nullptr;
@@ -1098,9 +1098,9 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 			{
 				/* try to open or create the diff */
 				err = open_disk_diff(machine().options(), romp, chd->orig_chd(), chd->diff_chd());
-				if (err != CHDERR_NONE)
+				if (err)
 				{
-					m_errorstring.append(string_format("%s DIFF CHD ERROR: %s\n", filename, chd_file::error_string(err)));
+					m_errorstring.append(string_format("%s DIFF CHD ERROR: %s\n", filename, err.message()));
 					m_errors++;
 					chd = nullptr;
 					continue;
@@ -1132,7 +1132,7 @@ std::vector<std::string> rom_load_manager::get_software_searchpath(software_list
     device
 -------------------------------------------------*/
 
-chd_error rom_load_manager::open_disk_image(const emu_options &options, const device_t &device, const rom_entry *romp, chd_file &image_chd)
+std::error_condition rom_load_manager::open_disk_image(const emu_options &options, const device_t &device, const rom_entry *romp, chd_file &image_chd)
 {
 	const std::vector<std::string> searchpath(device.searchpath());
 
@@ -1151,7 +1151,7 @@ chd_error rom_load_manager::open_disk_image(const emu_options &options, const de
     software item
 -------------------------------------------------*/
 
-chd_error rom_load_manager::open_disk_image(const emu_options &options, software_list_device &swlist, const software_info &swinfo, const rom_entry *romp, chd_file &image_chd)
+std::error_condition rom_load_manager::open_disk_image(const emu_options &options, software_list_device &swlist, const software_info &swinfo, const rom_entry *romp, chd_file &image_chd)
 {
 	std::vector<software_info const *> parents;
 	std::vector<std::string> searchpath = make_software_searchpath(swlist, swinfo, parents);

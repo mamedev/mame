@@ -18,6 +18,7 @@
 #include <functional>
 #include <initializer_list>
 #include <string>
+#include <system_error>
 #include <type_traits>
 #include <vector>
 
@@ -419,7 +420,7 @@ public:
 	chd_file *get_disk_handle(std::string_view region);
 
 	/* set a pointer to the CHD file associated with the given region */
-	int set_disk_handle(std::string_view region, const char *fullpath);
+	std::error_condition set_disk_handle(std::string_view region, const char *fullpath);
 
 	void load_software_part_region(device_t &device, software_list_device &swlist, std::string_view swname, const rom_entry *start_region);
 
@@ -427,27 +428,27 @@ public:
 	static std::vector<std::string> get_software_searchpath(software_list_device &swlist, const software_info &swinfo);
 
 	/* open a disk image, searching up the parent and loading by checksum */
-	static chd_error open_disk_image(const emu_options &options, const device_t &device, const rom_entry *romp, chd_file &image_chd);
-	static chd_error open_disk_image(const emu_options &options, software_list_device &swlist, const software_info &swinfo, const rom_entry *romp, chd_file &image_chd);
+	static std::error_condition open_disk_image(const emu_options &options, const device_t &device, const rom_entry *romp, chd_file &image_chd);
+	static std::error_condition open_disk_image(const emu_options &options, software_list_device &swlist, const software_info &swinfo, const rom_entry *romp, chd_file &image_chd);
 
 private:
 	void determine_bios_rom(device_t &device, const char *specbios);
 	void count_roms();
 	void fill_random(u8 *base, u32 length);
-	void handle_missing_file(const rom_entry *romp, const std::vector<std::string> &tried_file_names, chd_error chderr);
+	void handle_missing_file(const rom_entry *romp, const std::vector<std::string> &tried_file_names, std::error_condition chderr);
 	void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes);
 	void verify_length_and_hash(emu_file *file, std::string_view name, u32 explength, const util::hash_collection &hashes);
 	void display_loading_rom_message(const char *name, bool from_list);
 	void display_rom_load_results(bool from_list);
 	void region_post_process(memory_region *region, bool invert);
 	std::unique_ptr<emu_file> open_rom_file(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, std::vector<std::string> &tried_file_names, bool from_list);
-	std::unique_ptr<emu_file> open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, osd_file::error &filerr);
+	std::unique_ptr<emu_file> open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, std::error_condition &filerr);
 	int rom_fread(emu_file *file, u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(emu_file *file, const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(const rom_entry *romp);
 	void copy_rom_data(const rom_entry *romp);
 	void process_rom_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, u8 bios, const rom_entry *parent_region, const rom_entry *romp, bool from_list);
-	chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd);
+	std::error_condition open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd);
 	void process_disk_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, std::string_view regiontag, const rom_entry *romp, std::function<const rom_entry * ()> next_parent);
 	void normalize_flags_for_device(std::string_view rgntag, u8 &width, endianness_t &endian);
 	void process_region_list();

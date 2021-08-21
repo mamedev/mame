@@ -1191,10 +1191,10 @@ bool cheat_manager::save_all(std::string const &filename)
 {
 	// open the file with the proper name
 	emu_file cheatfile(machine().options().cheat_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error const filerr(cheatfile.open(filename + ".xml"));
+	std::error_condition const filerr(cheatfile.open(filename + ".xml"));
 
 	// if that failed, return nothing
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 		return false;
 
 	// wrap the rest of catch errors
@@ -1391,7 +1391,7 @@ void cheat_manager::load_cheats(std::string const &filename)
 	try
 	{
 		// loop over all instrances of the files found in our search paths
-		for (osd_file::error filerr = cheatfile.open(filename + ".xml"); filerr == osd_file::error::NONE; filerr = cheatfile.open_next())
+		for (std::error_condition filerr = cheatfile.open(filename + ".xml"); !filerr; filerr = cheatfile.open_next())
 		{
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
 

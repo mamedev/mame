@@ -19,6 +19,7 @@
 #include "cdrom.h"
 
 #include "chdcd.h"
+#include "corefile.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -223,10 +224,10 @@ cdrom_file *cdrom_open(const char *inputfile)
 		return nullptr;
 
 	// set up the CD-ROM module and get the disc info
-	chd_error err = chdcd_parse_toc(inputfile, file->cdtoc, file->track_info);
-	if (err != CHDERR_NONE)
+	std::error_condition err = chdcd_parse_toc(inputfile, file->cdtoc, file->track_info);
+	if (err)
 	{
-		fprintf(stderr, "Error reading input file: %s\n", chd_file::error_string(err));
+		fprintf(stderr, "Error reading input file: %s\n", err.message().c_str());
 		delete file;
 		return nullptr;
 	}
@@ -238,14 +239,15 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 	for (i = 0; i < file->cdtoc.numtrks; i++)
 	{
-		osd_file::error filerr = util::core_file::open(file->track_info.track[i].fname, OPEN_FLAG_READ, file->fhandle[i]);
-		if (filerr != osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::open(file->track_info.track[i].fname, OPEN_FLAG_READ, file->fhandle[i]);
+		if (filerr)
 		{
 			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.c_str());
 			cdrom_close(file);
 			return nullptr;
 		}
 	}
+
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
 	   pads tracks out with extra frames to fit 4-frame size boundries
 	*/
@@ -336,8 +338,8 @@ cdrom_file *cdrom_open(chd_file *chd)
 	file->chd = chd;
 
 	/* read the CD-ROM metadata */
-	chd_error err = cdrom_parse_metadata(chd, &file->cdtoc);
-	if (err != CHDERR_NONE)
+	std::error_condition err = cdrom_parse_metadata(chd, &file->cdtoc);
+	if (err)
 	{
 		delete file;
 		return nullptr;
@@ -446,7 +448,7 @@ void cdrom_close(cdrom_file *file)
 ***************************************************************************/
 
 /**
- * @fn  chd_error read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length)
+ * @fn  std::error_condition read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length)
  *
  * @brief   Reads partial sector.
  *
@@ -461,9 +463,9 @@ void cdrom_close(cdrom_file *file)
  * @return  The partial sector.
  */
 
-chd_error read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length, bool phys=false)
+std::error_condition read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length, bool phys=false)
 {
-	chd_error result = CHDERR_NONE;
+	std::error_condition result;
 	bool needswap = false;
 
 	// if this is pregap info that isn't actually in the file, just return blank data
@@ -570,14 +572,14 @@ uint32_t cdrom_read_data(cdrom_file *file, uint32_t lbasector, void *buffer, uin
 
 	if ((datatype == tracktype) || (datatype == CD_TRACK_RAW_DONTCARE))
 	{
-		return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 0, file->cdtoc.tracks[tracknum].datasize, phys) == CHDERR_NONE);
+		return !read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 0, file->cdtoc.tracks[tracknum].datasize, phys);
 	}
 	else
 	{
 		// return 2048 bytes of mode 1 data from a 2352 byte mode 1 raw sector
 		if ((datatype == CD_TRACK_MODE1) && (tracktype == CD_TRACK_MODE1_RAW))
 		{
-			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2048, phys) == CHDERR_NONE);
+			return !read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2048, phys);
 		}
 
 		// return 2352 byte mode 1 raw sector from 2048 bytes of mode 1 data
@@ -593,25 +595,25 @@ uint32_t cdrom_read_data(cdrom_file *file, uint32_t lbasector, void *buffer, uin
 			bufptr[14] = msf&0xff;
 			bufptr[15] = 1; // mode 1
 			LOG(("CDROM: promotion of mode1/form1 sector to mode1 raw is not complete!\n"));
-			return (read_partial_sector(file, bufptr+16, lbasector, chdsector, tracknum, 0, 2048, phys) == CHDERR_NONE);
+			return !read_partial_sector(file, bufptr+16, lbasector, chdsector, tracknum, 0, 2048, phys);
 		}
 
 		// return 2048 bytes of mode 1 data from a mode2 form1 or raw sector
 		if ((datatype == CD_TRACK_MODE1) && ((tracktype == CD_TRACK_MODE2_FORM1)||(tracktype == CD_TRACK_MODE2_RAW)))
 		{
-			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 24, 2048, phys) == CHDERR_NONE);
+			return !read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 24, 2048, phys);
 		}
 
 		// return 2048 bytes of mode 1 data from a mode2 form2 or XA sector
 		if ((datatype == CD_TRACK_MODE1) && (tracktype == CD_TRACK_MODE2_FORM_MIX))
 		{
-			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 8, 2048, phys) == CHDERR_NONE);
+			return !read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 8, 2048, phys);
 		}
 
 		// return mode 2 2336 byte data from a 2352 byte mode 1 or 2 raw sector (skip the header)
 		if ((datatype == CD_TRACK_MODE2) && ((tracktype == CD_TRACK_MODE1_RAW) || (tracktype == CD_TRACK_MODE2_RAW)))
 		{
-			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2336, phys) == CHDERR_NONE);
+			return !read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2336, phys);
 		}
 
 		LOG(("CDROM: Conversion from type %d to type %d not supported!\n", tracktype, datatype));
@@ -660,8 +662,8 @@ uint32_t cdrom_read_subcode(cdrom_file *file, uint32_t lbasector, void *buffer, 
 		return 0;
 
 	// read the data
-	chd_error err = read_partial_sector(file, buffer, lbasector, chdsector, tracknum, file->cdtoc.tracks[tracknum].datasize, file->cdtoc.tracks[tracknum].subsize);
-	return (err == CHDERR_NONE);
+	std::error_condition err = read_partial_sector(file, buffer, lbasector, chdsector, tracknum, file->cdtoc.tracks[tracknum].datasize, file->cdtoc.tracks[tracknum].subsize);
+	return !err;
 }
 
 
@@ -1139,21 +1141,20 @@ const char *cdrom_get_subtype_string(uint32_t subtype)
 -------------------------------------------------*/
 
 /**
- * @fn  chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
+ * @fn  std::error_condition cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
  *
  * @brief   Cdrom parse metadata.
  *
  * @param [in,out]  chd If non-null, the chd.
  * @param [in,out]  toc If non-null, the TOC.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
+std::error_condition cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 {
 	std::string metadata;
-	chd_error err;
-	int i;
+	std::error_condition err;
 
 	toc->flags = 0;
 
@@ -1168,49 +1169,49 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 
 		/* fetch the metadata for this track */
 		err = chd->read_metadata(CDROM_TRACK_METADATA_TAG, toc->numtrks, metadata);
-		if (err == CHDERR_NONE)
+		if (!err)
 		{
 			/* parse the metadata */
 			type[0] = subtype[0] = 0;
 			pgtype[0] = pgsub[0] = 0;
 			if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
-				return CHDERR_INVALID_DATA;
+				return chd_file::error::INVALID_DATA;
 			if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
-				return CHDERR_INVALID_DATA;
+				return chd_file::error::INVALID_DATA;
 			track = &toc->tracks[tracknum - 1];
 		}
 		else
 		{
 			err = chd->read_metadata(CDROM_TRACK_METADATA2_TAG, toc->numtrks, metadata);
-			if (err == CHDERR_NONE)
+			if (!err)
 			{
 				/* parse the metadata */
 				type[0] = subtype[0] = 0;
 				pregap = postgap = 0;
 				if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA2_FORMAT, &tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
-					return CHDERR_INVALID_DATA;
+					return chd_file::error::INVALID_DATA;
 				if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
-					return CHDERR_INVALID_DATA;
+					return chd_file::error::INVALID_DATA;
 				track = &toc->tracks[tracknum - 1];
 			}
 			else
 			{
 				err = chd->read_metadata(GDROM_OLD_METADATA_TAG, toc->numtrks, metadata);
-				if (err == CHDERR_NONE)
+				if (!err)
 					/* legacy GDROM track was detected */
 					toc->flags |= CD_FLAG_GDROMLE;
 				else
 					err = chd->read_metadata(GDROM_TRACK_METADATA_TAG, toc->numtrks, metadata);
 
-				if (err == CHDERR_NONE)
+				if (!err)
 				{
 					/* parse the metadata */
 					type[0] = subtype[0] = 0;
 					pregap = postgap = 0;
 					if (sscanf(metadata.c_str(), GDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
-						return CHDERR_INVALID_DATA;
+						return chd_file::error::INVALID_DATA;
 					if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
-						return CHDERR_INVALID_DATA;
+						return chd_file::error::INVALID_DATA;
 					track = &toc->tracks[tracknum - 1];
 					toc->flags |= CD_FLAG_GDROM;
 				}
@@ -1226,7 +1227,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 		track->datasize = 0;
 		cdrom_convert_type_string_to_track_info(type, track);
 		if (track->datasize == 0)
-			return CHDERR_INVALID_DATA;
+			return chd_file::error::INVALID_DATA;
 
 		/* extract the subtype and determine the subcode data size */
 		track->subtype = CD_SUB_NONE;
@@ -1261,21 +1262,21 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 
 	/* if we got any tracks this way, we're done */
 	if (toc->numtrks > 0)
-		return CHDERR_NONE;
+		return std::error_condition();
 
 	printf("toc->numtrks = %u?!\n", toc->numtrks);
 
 	/* look for old-style metadata */
 	std::vector<uint8_t> oldmetadata;
 	err = chd->read_metadata(CDROM_OLD_METADATA_TAG, 0, oldmetadata);
-	if (err != CHDERR_NONE)
+	if (err)
 		return err;
 
 	/* reconstruct the TOC from it */
 	auto *mrp = reinterpret_cast<uint32_t *>(&oldmetadata[0]);
 	toc->numtrks = *mrp++;
 
-	for (i = 0; i < CD_MAX_TRACKS; i++)
+	for (int i = 0; i < CD_MAX_TRACKS; i++)
 	{
 		toc->tracks[i].trktype = *mrp++;
 		toc->tracks[i].subtype = *mrp++;
@@ -1295,7 +1296,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 	if (toc->numtrks > CD_MAX_TRACKS)
 	{
 		toc->numtrks = swapendian_int32(toc->numtrks);
-		for (i = 0; i < CD_MAX_TRACKS; i++)
+		for (int i = 0; i < CD_MAX_TRACKS; i++)
 		{
 			toc->tracks[i].trktype = swapendian_int32(toc->tracks[i].trktype);
 			toc->tracks[i].subtype = swapendian_int32(toc->tracks[i].subtype);
@@ -1307,7 +1308,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 		}
 	}
 
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 
@@ -1316,19 +1317,19 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 -------------------------------------------------*/
 
 /**
- * @fn  chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
+ * @fn  std::error_condition cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
  *
  * @brief   Cdrom write metadata.
  *
  * @param [in,out]  chd If non-null, the chd.
  * @param   toc         The TOC.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
+std::error_condition cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 {
-	chd_error err;
+	std::error_condition err;
 
 	/* write the metadata */
 	for (int i = 0; i < toc->numtrks; i++)
@@ -1363,10 +1364,10 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 
 			err = chd->write_metadata(GDROM_TRACK_METADATA_TAG, i, metadata);
 		}
-		if (err != CHDERR_NONE)
+		if (err)
 			return err;
 	}
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /**

@@ -10,6 +10,8 @@
 
 #include "imageutl.h"
 
+#include "ioprocs.h"
+
 
 static constexpr uint32_t OLD_FILE_MAGIC = 0x5441434f;  // Magic value at start of old-format image file: "TACO"
 static constexpr uint32_t FILE_MAGIC_DELTA = 0x48544930;    // Magic value at start of delta-modulation image file: "HTI0"
@@ -47,22 +49,25 @@ hti_format_t::hti_format_t()
 	clear_tape();
 }
 
-bool hti_format_t::load_tape(io_generic *io)
+bool hti_format_t::load_tape(util::random_read &io)
 {
+	if (io.seek(0, SEEK_SET)) {
+		return false;
+	}
+
+	size_t actual;
 	uint8_t tmp[ 4 ];
 
-	io_generic_read(io, tmp, 0, 4);
+	io.read(tmp, 4, actual);
 	auto magic = pick_integer_be(tmp , 0 , 4);
 	if (((m_img_format == HTI_DELTA_MOD_16_BITS || m_img_format == HTI_DELTA_MOD_17_BITS) && magic != FILE_MAGIC_DELTA && magic != OLD_FILE_MAGIC) ||
 		(m_img_format == HTI_MANCHESTER_MOD && magic != FILE_MAGIC_MANCHESTER)) {
 		return false;
 	}
 
-	uint64_t offset = 4;
-
 	for (unsigned i = 0; i < no_of_tracks(); i++) {
 		tape_track_t& track = m_tracks[ i ];
-		if (!load_track(io , offset , track , magic == OLD_FILE_MAGIC)) {
+		if (!load_track(io, track, magic == OLD_FILE_MAGIC)) {
 			clear_tape();
 			return false;
 		}
@@ -71,14 +76,15 @@ bool hti_format_t::load_tape(io_generic *io)
 	return true;
 }
 
-void hti_format_t::save_tape(io_generic *io)
+void hti_format_t::save_tape(util::random_read_write &io)
 {
+	io.seek(0, SEEK_SET);
+
+	size_t actual;
 	uint8_t tmp[ 4 ];
 
 	place_integer_be(tmp, 0, 4, m_img_format == HTI_MANCHESTER_MOD ? FILE_MAGIC_MANCHESTER : FILE_MAGIC_DELTA);
-	io_generic_write(io, tmp, 0, 4);
-
-	uint64_t offset = 4;
+	io.write(tmp, 4, actual);
 
 	for (unsigned i = 0; i < no_of_tracks(); i++) {
 		const tape_track_t& track = m_tracks[ i ];
@@ -87,18 +93,17 @@ void hti_format_t::save_tape(io_generic *io)
 		tape_track_t::const_iterator it_start;
 		for (tape_track_t::const_iterator it = track.cbegin(); it != track.cend(); ++it) {
 			if (it->first != next_pos) {
-				dump_sequence(io , offset , it_start , n_words);
+				dump_sequence(io, it_start, n_words);
 				it_start = it;
 				n_words = 0;
 			}
 			next_pos = it->first + word_length(it->second);
 			n_words++;
 		}
-		dump_sequence(io , offset , it_start , n_words);
+		dump_sequence(io, it_start, n_words);
 		// End of track
 		place_integer_le(tmp, 0, 4, (uint32_t)-1);
-		io_generic_write(io, tmp, offset, 4);
-		offset += 4;
+		io.write(tmp, 4, actual);
 	}
 }
 
@@ -374,8 +379,9 @@ bool hti_format_t::next_gap(unsigned track_no , tape_pos_t& pos , bool forward ,
 	return n_gaps == 0;
 }
 
-bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& track , bool old_format)
+bool hti_format_t::load_track(util::random_read &io , tape_track_t& track , bool old_format)
 {
+	size_t actual;
 	uint8_t tmp[ 4 ];
 	uint32_t tmp32;
 	tape_pos_t delta_pos = 0;
@@ -385,8 +391,7 @@ bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& 
 
 	while (1) {
 		// Read no. of words to follow
-		io_generic_read(io, tmp, offset, 4);
-		offset += 4;
+		io.read(tmp, 4, actual);
 
 		tmp32 = pick_integer_le(tmp, 0, 4);
 
@@ -398,8 +403,7 @@ bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& 
 		unsigned n_words = tmp32;
 
 		// Read tape position of block
-		io_generic_read(io, tmp, offset, 4);
-		offset += 4;
+		io.read(tmp, 4, actual);
 
 		tmp32 = pick_integer_le(tmp, 0, 4);
 
@@ -411,8 +415,7 @@ bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& 
 		for (unsigned i = 0; i < n_words; i++) {
 			uint16_t tmp16;
 
-			io_generic_read(io, tmp, offset, 2);
-			offset += 2;
+			io.read(tmp, 2, actual);
 			tmp16 = pick_integer_le(tmp, 0, 2);
 
 			if (!old_format) {
@@ -469,19 +472,18 @@ bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& 
 	}
 }
 
-void hti_format_t::dump_sequence(io_generic *io , uint64_t& offset , tape_track_t::const_iterator it_start , unsigned n_words)
+void hti_format_t::dump_sequence(util::random_read_write &io , tape_track_t::const_iterator it_start , unsigned n_words)
 {
 	if (n_words) {
+		size_t actual;
 		uint8_t tmp[ 8 ];
 		place_integer_le(tmp, 0, 4, n_words);
 		place_integer_le(tmp, 4, 4, it_start->first);
-		io_generic_write(io, tmp, offset, 8);
-		offset += 8;
+		io.write(tmp, 8, actual);
 
 		for (unsigned i = 0; i < n_words; i++) {
 			place_integer_le(tmp, 0, 2, it_start->second);
-			io_generic_write(io, tmp, offset, 2);
-			offset += 2;
+			io.write(tmp, 2, actual);
 			++it_start;
 		}
 	}

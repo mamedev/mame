@@ -308,7 +308,7 @@ public:
 	}
 
 	/// \brief Dummy tag always treated as not found
-	constexpr static char DUMMY_TAG[17] = "finder_dummy_tag";
+	static constexpr char DUMMY_TAG[17] = "finder_dummy_tag";
 
 protected:
 	/// \brief Designated constructor

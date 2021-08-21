@@ -83,17 +83,16 @@ void cdrom_image_device::device_stop()
 
 image_init_result cdrom_image_device::call_load()
 {
-	chd_error   err = (chd_error)0;
-	chd_file    *chd = nullptr;
+	std::error_condition err;
+	chd_file *chd = nullptr;
 
 	if (m_cdrom_handle)
 		cdrom_close(m_cdrom_handle);
 
-	if (!loaded_through_softlist())
-	{
+	if (!loaded_through_softlist()) {
 		if (is_filetype("chd") && is_loaded()) {
-			err = m_self_chd.open( image_core_file() );    /* CDs are never writeable */
-			if ( err )
+			err = m_self_chd.open(util::core_file_read_write(image_core_file()));    // CDs are never writeable
+			if (err)
 				goto error;
 			chd = &m_self_chd;
 		}
@@ -103,20 +102,20 @@ image_init_result cdrom_image_device::call_load()
 
 	/* open the CHD file */
 	if (chd) {
-		m_cdrom_handle = cdrom_open( chd );
+		m_cdrom_handle = cdrom_open(chd);
 	} else {
 		m_cdrom_handle = cdrom_open(filename());
 	}
-	if ( ! m_cdrom_handle )
+	if (!m_cdrom_handle)
 		goto error;
 
 	return image_init_result::PASS;
 
 error:
-	if ( chd && chd == &m_self_chd )
-		m_self_chd.close( );
-	if ( err )
-		seterror( IMAGE_ERROR_UNSPECIFIED, chd_file::error_string( err ) );
+	if (chd && chd == &m_self_chd)
+		m_self_chd.close();
+	if (err)
+		seterror(err, nullptr);
 	return image_init_result::FAIL;
 }
 

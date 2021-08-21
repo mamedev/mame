@@ -79,12 +79,11 @@ void menu_control_floppy_image::hook_load(const std::string &filename)
 
 	bool can_in_place = input_format->supports_save();
 	if(can_in_place) {
-		osd_file::error filerr;
 		std::string tmp_path;
 		util::core_file::ptr tmp_file;
 		// attempt to open the file for writing but *without* create
-		filerr = util::zippath_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
-		if(filerr == osd_file::error::NONE)
+		std::error_condition const filerr = util::zippath_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
+		if(!filerr)
 			tmp_file.reset();
 		else
 			can_in_place = false;

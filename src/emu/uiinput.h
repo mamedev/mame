@@ -103,7 +103,7 @@ public:
 private:
 
 	// constants
-	constexpr static unsigned EVENT_QUEUE_SIZE = 128;
+	static constexpr unsigned EVENT_QUEUE_SIZE = 128;
 
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine

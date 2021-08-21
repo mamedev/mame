@@ -12,11 +12,13 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "ioprocs.h"
-#include "opresolv.h"
 #include "coretmpl.h"
+#include "opresolv.h"
+#include "utilfwd.h"
 
+#include "osdcore.h"
+
+#include <memory>
 #include <vector>
 
 #ifndef LOG_FORMATS
@@ -166,20 +168,20 @@ LEGACY_FLOPPY_OPTIONS_EXTERN(default);
 OPTION_GUIDE_EXTERN(floppy_option_guide);
 
 /* opening, closing and creating of floppy images */
-floperr_t floppy_open(void *fp, const struct io_procs *procs, const std::string &extension, const struct FloppyFormat *format, int flags, floppy_image_legacy **outfloppy);
-floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const std::string &extension, const struct FloppyFormat *formats, int flags, floppy_image_legacy **outfloppy);
-floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct FloppyFormat *format, util::option_resolution *parameters, floppy_image_legacy **outfloppy);
+floperr_t floppy_open(std::unique_ptr<util::random_read_write> &&io, const std::string &extension, const struct FloppyFormat *format, int flags, floppy_image_legacy **outfloppy);
+floperr_t floppy_open_choices(std::unique_ptr<util::random_read_write> &&io, const std::string &extension, const struct FloppyFormat *formats, int flags, floppy_image_legacy **outfloppy);
+floperr_t floppy_create(std::unique_ptr<util::random_read_write> &&io, const struct FloppyFormat *format, util::option_resolution *parameters, floppy_image_legacy **outfloppy);
 void floppy_close(floppy_image_legacy *floppy);
 
 /* useful for identifying a floppy image */
-floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *extension, const struct FloppyFormat *formats, int *identified_format);
+floperr_t floppy_identify(std::unique_ptr<util::random_read_write> &&io, const char *extension, const struct FloppyFormat *formats, int *identified_format);
 
 /* functions useful within format constructors */
 void *floppy_tag(floppy_image_legacy *floppy);
 void *floppy_create_tag(floppy_image_legacy *floppy, size_t tagsize);
 struct FloppyCallbacks *floppy_callbacks(floppy_image_legacy *floppy);
 uint8_t floppy_get_filler(floppy_image_legacy *floppy);
-void floppy_set_filler(floppy_image_legacy *floppy, uint8_t filler);
+util::random_read_write &floppy_get_io(floppy_image_legacy *floppy);
 
 /* calls for accessing disk image data */
 floperr_t floppy_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset, void *buffer, size_t buffer_len);
@@ -235,7 +237,7 @@ public:
 	  @param variants the variants from floppy_image the drive can handle
 	  @return 1 if image valid, 0 otherwise.
 	*/
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) = 0;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) = 0;
 
 	/*! @brief Load an image.
 	  The load function opens an image file and converts it to the
@@ -247,7 +249,7 @@ public:
 	  @param image output buffer for data in MESS internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) = 0;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) = 0;
 
 	/*! @brief Save an image.
 	  The save function writes back an image from the MESS internal
@@ -257,7 +259,7 @@ public:
 	  @param image source buffer containing data in MESS internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image);
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image);
 
 	//! @returns string containing name of format.
 	virtual const char *name() const = 0;

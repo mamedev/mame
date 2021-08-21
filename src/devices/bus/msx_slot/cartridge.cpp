@@ -165,7 +165,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 
 			if (fread(m_cartridge->get_rom_base(), length) != length)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read file");
+				seterror(image_error::UNSPECIFIED, "Unable to fully read file");
 				return image_init_result::FAIL;
 			}
 

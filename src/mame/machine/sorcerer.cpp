@@ -600,7 +600,7 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 		// check size
 		if (image.length() != 0x1001c)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
+			image.seterror(image_error::INVALIDIMAGE, "Snapshot must be 65564 bytes");
 			image.message("Snapshot must be 65564 bytes");
 			return image_init_result::FAIL;
 		}

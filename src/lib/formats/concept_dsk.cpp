@@ -10,10 +10,10 @@
 
 *********************************************************************/
 
-#include <cassert>
-
-#include "flopimg.h"
 #include "formats/concept_dsk.h"
+
+#include "ioprocs.h"
+
 
 /* 9 sectors / track, 512 bytes per sector */
 const floppy_image_format_t::desc_e cc525dsdd_format::cc_9_desc[] = {
@@ -72,50 +72,50 @@ bool cc525dsdd_format::supports_save() const
 	return true;
 }
 
-void cc525dsdd_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
+void cc525dsdd_format::find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
 {
-	uint64_t size = io_generic_size(io);
-
 	track_count = 77;
 	head_count = 2;
 	sector_count = 9;
 
-	uint32_t expected_size = 512 * track_count*head_count*sector_count;
-	if (size == expected_size)
-	{
+	uint32_t const expected_size = 512 * track_count*head_count*sector_count;
+
+	uint64_t size;
+	if (!io.length(size) && (size == expected_size))
 		return;
-	}
 
 	track_count = head_count = sector_count = 0;
 }
 
-int cc525dsdd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int cc525dsdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
-	if(track_count)
+	if (track_count)
 		return 50;
+
 	return 0;
 }
 
-bool cc525dsdd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool cc525dsdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
 	uint8_t sectdata[10*512];
 	desc_s sectors[10];
-	for(int i=0; i<sector_count; i++) {
+	for (int i=0; i<sector_count; i++) {
 		sectors[i+1].data = sectdata + 512*i;
 		sectors[i+1].size = 512;
 		sectors[i+1].sector_id = i+1;
 	}
 
 	int track_size = sector_count*512;
-	for(int track=0; track < track_count; track++) {
-		for(int head=0; head < head_count; head++) {
-			io_generic_read(io, sectdata, (track*head_count + head)*track_size, track_size);
+	for (int track=0; track < track_count; track++) {
+		for (int head=0; head < head_count; head++) {
+			size_t actual;
+			io.read_at((track*head_count + head) * track_size, sectdata, track_size, actual);
 			generate_track(cc_9_desc, track, head, sectors, sector_count, 100000, image);
 		}
 	}
@@ -125,28 +125,29 @@ bool cc525dsdd_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	return true;
 }
 
-bool cc525dsdd_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool cc525dsdd_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
 
-	if(track_count != 77)
+	if (track_count != 77)
 		track_count = 77;
 
 	// Happens for a fully unformatted floppy
-	if(!head_count)
+	if (!head_count)
 		head_count = 2;
 
-	if(sector_count != 9)
+	if (sector_count != 9)
 		sector_count = 9;
 
 	uint8_t sectdata[9*512];
 	int track_size = sector_count*512;
 
-	for(int track=0; track < track_count; track++) {
-		for(int head=0; head < head_count; head++) {
+	for (int track=0; track < track_count; track++) {
+		for (int head=0; head < head_count; head++) {
 			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			io_generic_write(io, sectdata, (track*head_count + head)*track_size, track_size);
+			size_t actual;
+			io.write_at((track*head_count + head)*track_size, sectdata, track_size, actual);
 		}
 	}
 

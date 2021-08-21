@@ -291,7 +291,7 @@ QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 	int quick_length = image.length();
 	if (quick_length > 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.seterror(image_error::INVALIDIMAGE, "File too long");
 		image.message(" File too long");
 	}
 	else

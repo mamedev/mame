@@ -2391,7 +2391,7 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
 		return image_init_result::FAIL;
 	}
 
@@ -2579,7 +2579,7 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
 		return image_init_result::FAIL;
 	}
 

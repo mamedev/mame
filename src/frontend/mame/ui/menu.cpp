@@ -92,13 +92,13 @@ menu::global_state::global_state(running_machine &machine, ui_options const &opt
 	{
 		m_bgrnd_bitmap = std::make_unique<bitmap_argb32>(0, 0);
 		emu_file backgroundfile(".", OPEN_FLAG_READ);
-		if (backgroundfile.open("background.jpg") == osd_file::error::NONE)
+		if (!backgroundfile.open("background.jpg"))
 		{
 			render_load_jpeg(*m_bgrnd_bitmap, backgroundfile);
 			backgroundfile.close();
 		}
 
-		if (!m_bgrnd_bitmap->valid() && (backgroundfile.open("background.png") == osd_file::error::NONE))
+		if (!m_bgrnd_bitmap->valid() && !backgroundfile.open("background.png"))
 		{
 			render_load_png(*m_bgrnd_bitmap, backgroundfile);
 			backgroundfile.close();

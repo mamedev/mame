@@ -64,16 +64,16 @@ bool configuration_manager::load_settings()
 		type.load(config_type::INIT, config_level::DEFAULT, nullptr);
 
 	// now load the controller file
-	const char *controller = machine().options().ctrlr();
+	char const *const controller = machine().options().ctrlr();
 	if (controller && *controller)
 	{
 		// open the config file
 		emu_file file(machine().options().ctrlr_path(), OPEN_FLAG_READ);
 		osd_printf_verbose("Attempting to parse: %s.cfg\n", controller);
-		osd_file::error filerr = file.open(std::string(controller) + ".cfg");
+		std::error_condition const filerr = file.open(std::string(controller) + ".cfg");
 
-		if (filerr != osd_file::error::NONE)
-			throw emu_fatalerror("Could not open controller file %s.cfg", controller);
+		if (filerr)
+			throw emu_fatalerror("Could not open controller file %s.cfg (%s:%d %s)", controller, filerr.category().name(), filerr.value(), filerr.message());
 
 		// load the XML
 		if (!load_xml(file, config_type::CONTROLLER))
@@ -82,15 +82,15 @@ bool configuration_manager::load_settings()
 
 	// next load the defaults file
 	emu_file file(machine().options().cfg_directory(), OPEN_FLAG_READ);
-	osd_file::error filerr = file.open("default.cfg");
+	std::error_condition filerr = file.open("default.cfg");
 	osd_printf_verbose("Attempting to parse: default.cfg\n");
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 		load_xml(file, config_type::DEFAULT);
 
 	// finally, load the game-specific file
 	filerr = file.open(machine().basename() + ".cfg");
 	osd_printf_verbose("Attempting to parse: %s.cfg\n",machine().basename());
-	const bool loaded = (osd_file::error::NONE == filerr) && load_xml(file, config_type::SYSTEM);
+	const bool loaded = !filerr && load_xml(file, config_type::SYSTEM);
 
 	// loop over all registrants and call their final function
 	for (const auto &type : m_typelist)
@@ -110,13 +110,13 @@ void configuration_manager::save_settings()
 
 	// save the defaults file
 	emu_file file(machine().options().cfg_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr = file.open("default.cfg");
-	if (filerr == osd_file::error::NONE)
+	std::error_condition filerr = file.open("default.cfg");
+	if (!filerr)
 		save_xml(file, config_type::DEFAULT);
 
 	// finally, save the system-specific file
 	filerr = file.open(machine().basename() + ".cfg");
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 		save_xml(file, config_type::SYSTEM);
 
 	// loop over all registrants and call their final function

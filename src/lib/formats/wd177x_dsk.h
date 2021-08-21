@@ -38,9 +38,9 @@ public:
 	// End the array with {}
 	wd177x_format(const format *formats);
 
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
 	virtual bool supports_save() const override;
 
 protected:
@@ -51,7 +51,7 @@ protected:
 	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track);
 	virtual floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
-	virtual int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants);
+	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants);
 	virtual int get_image_offset(const format &f, int head, int track);
 	virtual int get_track_dam_fm(const format &f, int head, int track);
 	virtual int get_track_dam_mfm(const format &f, int head, int track);

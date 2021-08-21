@@ -108,11 +108,16 @@
     these special characters.
 
 *********************************************************************/
+#include "imgtool.h"
+
+#include "formats/hti_tape.h"
+#include "formats/imageutl.h"
+
+#include "corefile.h"
+#include "ioprocs.h"
+
 #include <bitset>
 
-#include "imgtool.h"
-#include "formats/imageutl.h"
-#include "formats/hti_tape.h"
 
 // Constants
 #define SECTOR_LEN          256 // Bytes in a sector
@@ -291,49 +296,16 @@ void tape_image_t::format_img(void)
 	dirty = true;
 }
 
-static int my_seekproc(void *file, int64_t offset, int whence)
-{
-	reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
-	return 0;
-}
-
-static size_t my_readproc(void *file, void *buffer, size_t length)
-{
-	return reinterpret_cast<imgtool::stream *>(file)->read(buffer, length);
-}
-
-static size_t my_writeproc(void *file, const void *buffer, size_t length)
-{
-	reinterpret_cast<imgtool::stream *>(file)->write(buffer, length);
-	return length;
-}
-
-static uint64_t my_filesizeproc(void *file)
-{
-	return reinterpret_cast<imgtool::stream *>(file)->size();
-}
-
-static const struct io_procs my_stream_procs = {
-	nullptr,
-	my_seekproc,
-	my_readproc,
-	my_writeproc,
-	my_filesizeproc
-};
-
 imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 {
 	hti_format_t inp_image;
 	inp_image.set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 
-	io_generic io;
-	io.file = (void *)stream;
-	io.procs = &my_stream_procs;
-	io.filler = 0;
-
-	if (!inp_image.load_tape(&io)) {
+	auto io = imgtool::stream_read(*stream, 0);
+	if (!io || !inp_image.load_tape(*io)) {
 		return IMGTOOLERR_READERROR;
 	}
+	io.reset();
 
 	unsigned exp_sector = 0;
 	unsigned last_sector_on_track = SECTORS_PER_TRACK;
@@ -523,12 +495,7 @@ imgtoolerr_t tape_image_t::save_to_file(imgtool::stream *stream)
 		}
 	}
 
-	io_generic io;
-	io.file = (void *)stream;
-	io.procs = &my_stream_procs;
-	io.filler = 0;
-
-	out_image.save_tape(&io);
+	out_image.save_tape(*imgtool::stream_read_write(*stream, 0));
 
 	return IMGTOOLERR_SUCCESS;
 }
