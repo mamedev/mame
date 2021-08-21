@@ -272,7 +272,7 @@ protected:
     void apbus_cmd_w(offs_t offset, uint32_t data);
 
     // Other platform hardware emulation methods
-    u32 bus_error();
+    uint32_t bus_error();
     uint64_t front_panel_r(offs_t offset);
 
     // Constants
@@ -350,7 +350,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r4k_state::irq_w<KBD>));
 
     // Floppy controller - National Semiconductor PC8477B
-    // TODO: find out the difference between B and A - only A is emulated in MAME ATM - A works so might not be significant
+    // TODO: find out the difference between B and A. Only A is emulated in MAME, but it works so it might not be significant
     PC8477A(config, m_fdc, 24_MHz_XTAL, pc8477a_device::mode_t::PS2);
     FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
     m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>)); // TODO: FIFO IRQ handling
@@ -466,7 +466,8 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // TODO: lp (0x1ed30000)
 
-    // fd controller register mapping
+    // FDC controller register mapping
+    // All of these addresses are within the corresponding FIFO device window (Window 2).
     // TODO: to be hardware accurate, these shouldn't be umasked.
     // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
     // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
@@ -482,8 +483,8 @@ void news_r4k_state::cpu_map(address_map &map)
     // Map FDCAUX interrupt read (still need to implement button interrupt mask from 208-20b)
     map(0x1ed60208, 0x1ed6020f).lr32(NAME([this](offs_t offset) { return (offset == 1) && ((m_intst[0] & irq0_number::FDC) > 0) ? 0x2 : 0x0; }));
 
-    // Map FDC FIFO TODO: is it aligned so CH0 is 1ed00000? Seems likely since that is the `sb` address
-    map(0x1ed00000, 0x1ed8ffff).m(m_fifo0, FUNC(cxd8442q_device::map));
+    // Map FDC and sound FIFO register file
+    map(0x1ed00000, 0x1ed8ffff).m(m_fifo0, FUNC(cxd8442q_device::map)); // TODO: is it aligned so CH0 is 1ed00000? Seems likely since that is the `sb` address
 
     // Assign debug mappings
     cpu_map_debug(map);

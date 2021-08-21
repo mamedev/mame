@@ -50,11 +50,11 @@ public:
 
     // set a channel's DRQ line
     template <FifoChannelNumber channel_number>
-    void drq_w(int state) { fifoChannels[channel_number].drq_w(state); };
+    void drq_w(int state) { fifo_channels[channel_number].drq_w(state); };
     template <FifoChannelNumber channel_number>
-    void bind_dma_r(std::function<uint32_t(void)> dma_r) { fifoChannels[channel_number].set_dma_r_callback(dma_r); };
+    void bind_dma_r(std::function<uint32_t(void)> dma_r) { fifo_channels[channel_number].set_dma_r_callback(dma_r); };
     template <FifoChannelNumber channel_number>
-    void bind_dma_w(std::function<void(uint32_t)> dma_w) { fifoChannels[channel_number].set_dma_w_callback(dma_w); };
+    void bind_dma_w(std::function<void(uint32_t)> dma_w) { fifo_channels[channel_number].set_dma_w_callback(dma_w); };
 
 protected:
     // FIFO RAM (shared, probably)
@@ -139,7 +139,7 @@ protected:
         // TODO: IRQ
     };
 
-    FifoChannel fifoChannels[FIFO_CH_TOTAL];
+    FifoChannel fifo_channels[FIFO_CH_TOTAL];
 };
 
 DECLARE_DEVICE_TYPE(CXD8442Q, cxd8442q_device)

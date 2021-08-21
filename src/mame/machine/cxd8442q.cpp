@@ -25,7 +25,7 @@
 DEFINE_DEVICE_TYPE(CXD8442Q, cxd8442q_device, "cxd8442q", "Sony CXD8442Q WSC-FIFOQ")
 
 cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : device_t(mconfig, CXD8442Q, tag, owner, clock),
-                                                                                                                    fifoChannels{FifoChannel(*this), FifoChannel(*this), FifoChannel(*this), FifoChannel(*this)}
+                                                                                                                    fifo_channels{FifoChannel(*this), FifoChannel(*this), FifoChannel(*this), FifoChannel(*this)}
 {
 }
 
@@ -37,28 +37,28 @@ void cxd8442q_device::map(address_map &map)
     {
         int channel_base = FIFO_REGION_OFFSET * channel; // start of a channel's registers
 
-        map(channel_base + 0x00, channel_base + 0x03).lrw32(NAME(([this, channel]() { return fifoChannels[channel].mask; })), NAME(([this, channel](uint32_t data) {
+        map(channel_base + 0x00, channel_base + 0x03).lrw32(NAME(([this, channel]() { return fifo_channels[channel].mask; })), NAME(([this, channel](uint32_t data) {
                                                                 LOG("FIFO CH%d: Setting mask to 0x%x\n", channel, data);
-                                                                fifoChannels[channel].mask = data;
+                                                                fifo_channels[channel].mask = data;
                                                             })));
 
-        map(channel_base + 0x04, channel_base + 0x07).lrw32(NAME(([this, channel]() { return fifoChannels[channel].address; })), NAME(([this, channel](uint32_t data) { 
+        map(channel_base + 0x04, channel_base + 0x07).lrw32(NAME(([this, channel]() { return fifo_channels[channel].address; })), NAME(([this, channel](uint32_t data) { 
             LOG("FIFO CH%d: Setting address to 0x%x\n", channel, data);
-            fifoChannels[channel].address = data; })));
+            fifo_channels[channel].address = data; })));
 
-        map(channel_base + 0x0c, channel_base + 0x0f).lrw32(NAME(([this, channel]() { return fifoChannels[channel].dma_mode; })), NAME(([this, channel](uint32_t data) {
+        map(channel_base + 0x0c, channel_base + 0x0f).lrw32(NAME(([this, channel]() { return fifo_channels[channel].dma_mode; })), NAME(([this, channel](uint32_t data) {
                                                                 LOG("FIFO CH%d: Setting DMA mode to 0x%x\n", channel, data);
-                                                                fifoChannels[channel].dma_mode = data;
+                                                                fifo_channels[channel].dma_mode = data;
                                                                 if (data & FifoChannel::DMA_EN)
                                                                 {
-                                                                    fifoChannels[channel].reset_for_transaction();
+                                                                    fifo_channels[channel].reset_for_transaction();
                                                                     fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); // actual clock rate? this is a "guess" (read: I tried it and it happened to work)
                                                                 }
                                                             })));
 
-        map(channel_base + 0x30, channel_base + 0x33).lr32(NAME(([this, channel]() { return fifoChannels[channel].valid_count; })));
+        map(channel_base + 0x30, channel_base + 0x33).lr32(NAME(([this, channel]() { return fifo_channels[channel].valid_count; })));
 
-        map(channel_base + 0x34, channel_base + 0x37).lr32(NAME(([this, channel]() { return fifoChannels[channel].read_data_from_fifo(); })));
+        map(channel_base + 0x34, channel_base + 0x37).lr32(NAME(([this, channel]() { return fifo_channels[channel].read_data_from_fifo(); })));
     }
 
     // TODO: experiment to see if this is readable/writeable from the real NWS5000X
@@ -78,7 +78,7 @@ void cxd8442q_device::device_reset()
 {
     for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
     {
-        fifoChannels[channel].reset();
+        fifo_channels[channel].reset();
     }
 }
 
@@ -88,7 +88,7 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
     bool dma_active = false;
     for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
     {
-        FifoChannel &thisChannel = fifoChannels[channel];
+        FifoChannel &thisChannel = fifo_channels[channel];
 
         // Skip this channel if we don't need to do anything
         if (!(thisChannel.dma_mode & FifoChannel::DMA_EN))
@@ -107,7 +107,7 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
         if (thisChannel.mask == thisChannel.valid_count)
         {
             // TODO: do we need to signal something to the CPU? Interrupt, etc?
-            thisChannel.dma_mode = 0x0; // HACK to prevent infinite running of this thread
+            thisChannel.dma_mode = 0x0; // Best-guess, not sure yet how to determine behavior on a real system
         }
     }
 
@@ -122,7 +122,7 @@ void cxd8442q_device::FifoChannel::dma_cycle()
 {
     // Write byte to RAM
     // TODO: mem->dev direction
-    // TODO: how to detect FIFO overrun? Is that even signaled to the CPU?
+    // TODO: Add FIFO overrun detection - how is that signaled to the CPU?
     if (dma_r_callback != nullptr && (dma_mode & DMA_EN) > 0)
     {
         // Grab our next chunk of data (might just be a byte, needs more investigation)
