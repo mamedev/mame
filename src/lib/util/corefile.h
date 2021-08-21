@@ -12,13 +12,11 @@
 
 #pragma once
 
-
 #include "osdfile.h"
 #include "strformat.h"
 
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <string_view>
 #include <system_error>
 
@@ -45,7 +43,7 @@ public:
 	// ----- file open/close -----
 
 	// open a file with the specified filename
-	static std::error_condition open(std::string const &filename, std::uint32_t openflags, ptr &file);
+	static std::error_condition open(std::string_view filename, std::uint32_t openflags, ptr &file);
 
 	// open a RAM-based "file" using the given data and length (read-only)
 	static std::error_condition open_ram(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
@@ -94,8 +92,8 @@ public:
 	virtual const void *buffer() = 0;
 
 	// open a file with the specified filename, read it into memory, and return a pointer
-	static std::error_condition load(std::string const &filename, void **data, std::uint32_t &length);
-	static std::error_condition load(std::string const &filename, std::vector<uint8_t> &data);
+	static std::error_condition load(std::string_view filename, void **data, std::uint32_t &length);
+	static std::error_condition load(std::string_view filename, std::vector<uint8_t> &data);
 
 
 	// ----- file write -----

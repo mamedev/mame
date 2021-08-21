@@ -617,10 +617,10 @@ media_auditor::audit_record &media_auditor::audit_one_disk(const rom_entry *rom,
 
 	// open the disk
 	chd_file source;
-	const chd_error err = rom_load_manager::open_disk_image(m_enumerator.options(), std::forward<T>(args)..., rom, source);
+	const std::error_condition err = rom_load_manager::open_disk_image(m_enumerator.options(), std::forward<T>(args)..., rom, source);
 
 	// if we succeeded, get the hashes
-	if (err == CHDERR_NONE)
+	if (!err)
 	{
 		util::hash_collection hashes;
 
@@ -633,7 +633,7 @@ media_auditor::audit_record &media_auditor::audit_one_disk(const rom_entry *rom,
 	}
 
 	// compute the final status
-	compute_status(record, rom, err == CHDERR_NONE);
+	compute_status(record, rom, !err);
 	return record;
 }
 

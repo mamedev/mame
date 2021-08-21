@@ -205,9 +205,9 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 	{
 		// attempt to open as a CHD; fail if not
 		chd_file chd;
-		chd_error const err = chd.open(path);
+		std::error_condition const err = chd.open(path);
 		m_total++;
-		if (err != CHDERR_NONE)
+		if (err)
 		{
 			osd_printf_info("%-20s NOT A CHD\n", core_filename_extract_base(path));
 			m_nonroms++;

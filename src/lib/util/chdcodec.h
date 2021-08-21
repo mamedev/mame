@@ -26,9 +26,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward references
-class chd_file; // TODO: move to utilfwd.h when I feel like an emu.h rebuild
-
 // base types
 typedef uint32_t chd_codec_type;
 

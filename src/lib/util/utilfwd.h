@@ -10,6 +10,10 @@
 #ifndef MAME_LIB_UTIL_UTILFWD_H
 #define MAME_LIB_UTIL_UTILFWD_H
 
+// chd.h
+class chd_file;
+
+
 namespace util {
 
 // corefile.h

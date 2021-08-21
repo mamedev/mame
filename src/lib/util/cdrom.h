@@ -7,14 +7,14 @@
     Generic MAME cd-rom implementation
 
 ***************************************************************************/
-
-#ifndef MAME_UTIL_CDROM_H
-#define MAME_UTIL_CDROM_H
+#ifndef MAME_LIB_UTIL_CDROM_H
+#define MAME_LIB_UTIL_CDROM_H
 
 #pragma once
 
-#include "osdcore.h"
 #include "chd.h"
+
+#include "osdcore.h"
 
 
 
@@ -137,8 +137,8 @@ void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_tr
 void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_track_info *info);
 const char *cdrom_get_type_string(uint32_t trktype);
 const char *cdrom_get_subtype_string(uint32_t subtype);
-chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
-chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
+std::error_condition cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
+std::error_condition cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
 
 // ECC utilities
 bool ecc_verify(const uint8_t *sector);
@@ -184,4 +184,4 @@ static inline uint32_t lba_to_msf_alt(int lba)
 	return ret;
 }
 
-#endif // MAME_UTIL_CDROM_H
+#endif // MAME_LIB_UTIL_CDROM_H

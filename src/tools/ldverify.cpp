@@ -8,17 +8,18 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstdlib>
-#include <cctype>
-#include <new>
-#include <cassert>
-#include "coretmpl.h"
-#include "aviio.h"
 #include "avhuff.h"
+#include "aviio.h"
 #include "bitmap.h"
 #include "chd.h"
+#include "coretmpl.h"
 #include "vbiparse.h"
+
+#include <cassert>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <new>
 
 
 
@@ -174,10 +175,10 @@ static void *open_chd(const char *filename, movie_info &info)
 	auto chd = new chd_file;
 
 	// open the file
-	chd_error chderr = chd->open(filename);
-	if (chderr != CHDERR_NONE)
+	std::error_condition chderr = chd->open(filename);
+	if (chderr)
 	{
-		fprintf(stderr, "Error opening CHD file: %s\n", chd_file::error_string(chderr));
+		fprintf(stderr, "Error opening CHD file: %s\n", chderr.message().c_str());
 		delete chd;
 		return nullptr;
 	}
@@ -185,9 +186,9 @@ static void *open_chd(const char *filename, movie_info &info)
 	// get the metadata
 	std::string metadata;
 	chderr = chd->read_metadata(AV_METADATA_TAG, 0, metadata);
-	if (chderr != CHDERR_NONE)
+	if (chderr)
 	{
-		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_file::error_string(chderr));
+		fprintf(stderr, "Error getting A/V metadata: %s\n", chderr.message().c_str());
 		delete chd;
 		return nullptr;
 	}
@@ -251,8 +252,8 @@ static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, int16_t *lsound
 		chdfile->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 		// read the frame
-		chd_error chderr = chdfile->read_hunk(frame * interlace_factor + fieldnum, nullptr);
-		if (chderr != CHDERR_NONE)
+		std::error_condition chderr = chdfile->read_hunk(frame * interlace_factor + fieldnum, nullptr);
+		if (chderr)
 			return false;
 
 		// account for samples read

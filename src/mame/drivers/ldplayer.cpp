@@ -193,7 +193,7 @@ chd_file *ldplayer_state::get_disc()
 
 				// try to open the CHD
 
-				if (machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()) == CHDERR_NONE)
+				if (!machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()))
 				{
 					m_filename.assign(dir->name);
 					found = true;
@@ -204,7 +204,8 @@ chd_file *ldplayer_state::get_disc()
 	}
 
 	// if we failed, pop a message and exit
-	if (found == false) {
+	if (!found)
+	{
 		machine().ui().popup_time(10, "No valid image file found!\n");
 		return nullptr;
 	}

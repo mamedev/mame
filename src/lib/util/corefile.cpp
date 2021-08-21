@@ -18,10 +18,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cctype>
 #include <cstring>
 #include <iterator>
-
-#include <cctype>
 
 
 namespace util {
@@ -766,14 +765,14 @@ std::error_condition core_osd_file::flush()
     return an error code
 -------------------------------------------------*/
 
-std::error_condition core_file::open(std::string const &filename, std::uint32_t openflags, ptr &file)
+std::error_condition core_file::open(std::string_view filename, std::uint32_t openflags, ptr &file)
 {
 	try
 	{
 		// attempt to open the file
 		osd_file::ptr f;
 		std::uint64_t length = 0;
-		auto const filerr = osd_file::open(filename, openflags, f, length);
+		auto const filerr = osd_file::open(std::string(filename), openflags, f, length); // FIXME: allow osd_file to accept std::string_view
 		if (filerr)
 			return filerr;
 
@@ -869,7 +868,7 @@ core_file::~core_file()
     pointer
 -------------------------------------------------*/
 
-std::error_condition core_file::load(std::string const &filename, void **data, std::uint32_t &length)
+std::error_condition core_file::load(std::string_view filename, void **data, std::uint32_t &length)
 {
 	ptr file;
 
@@ -900,7 +899,7 @@ std::error_condition core_file::load(std::string const &filename, void **data, s
 	return std::error_condition();
 }
 
-std::error_condition core_file::load(std::string const &filename, std::vector<uint8_t> &data)
+std::error_condition core_file::load(std::string_view filename, std::vector<uint8_t> &data)
 {
 	ptr file;
 

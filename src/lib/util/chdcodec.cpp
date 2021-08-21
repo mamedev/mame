@@ -21,7 +21,6 @@
 
 #include <zlib.h>
 
-#include <cassert>
 #include <new>
 
 
@@ -307,7 +306,7 @@ public:
 	{
 		// make sure the CHD's hunk size is an even multiple of the frame size
 		if (hunkbytes % CD_FRAME_SIZE != 0)
-			throw CHDERR_CODEC_ERROR;
+			throw std::error_condition(chd_file::error::CODEC_ERROR);
 	}
 
 	// core functionality
@@ -341,7 +340,7 @@ public:
 		// encode the base portion
 		uint32_t complen = m_base_compressor.compress(&m_buffer[0], frames * CD_MAX_SECTOR_DATA, &dest[header_bytes]);
 		if (complen >= srclen)
-			throw CHDERR_COMPRESSION_ERROR;
+			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 		// write compressed length
 		dest[ecc_bytes + 0] = complen >> ((complen_bytes - 1) * 8);
@@ -376,7 +375,7 @@ public:
 	{
 		// make sure the CHD's hunk size is an even multiple of the frame size
 		if (hunkbytes % CD_FRAME_SIZE != 0)
-			throw CHDERR_CODEC_ERROR;
+			throw std::error_condition(chd_file::error::CODEC_ERROR);
 	}
 
 	// core functionality
@@ -559,7 +558,7 @@ chd_codec::~chd_codec()
 void chd_codec::configure(int param, void *config)
 {
 	// if not overridden, it is always a failure
-	throw CHDERR_INVALID_PARAMETER;
+	throw std::error_condition(std::errc::invalid_argument);
 }
 
 
@@ -672,11 +671,11 @@ chd_compressor_group::chd_compressor_group(chd_file &chd, uint32_t compressor_li
 		{
 			m_compressor[codecnum] = chd_codec_list::new_compressor(compressor_list[codecnum], chd);
 			if (!m_compressor[codecnum])
-				throw CHDERR_UNKNOWN_COMPRESSION;
+				throw std::error_condition(chd_file::error::UNKNOWN_COMPRESSION);
 #if CHDCODEC_VERIFY_COMPRESSION
 			m_decompressor[codecnum] = chd_codec_list::new_decompressor(compressor_list[codecnum], chd);
 			if (!m_decompressor[codecnum])
-				throw CHDERR_UNKNOWN_COMPRESSION;
+				throw std::error_condition(chd_file::error::UNKNOWN_COMPRESSION);
 #endif
 		}
 	}
@@ -878,7 +877,7 @@ chd_zlib_compressor::chd_zlib_compressor(chd_file &chd, uint32_t hunkbytes, bool
 	if (zerr == Z_MEM_ERROR)
 		throw std::bad_alloc();
 	else if (zerr != Z_OK)
-		throw CHDERR_CODEC_ERROR;
+		throw std::error_condition(chd_file::error::CODEC_ERROR);
 }
 
 
@@ -907,14 +906,14 @@ uint32_t chd_zlib_compressor::compress(const uint8_t *src, uint32_t srclen, uint
 	m_deflater.total_out = 0;
 	int zerr = deflateReset(&m_deflater);
 	if (zerr != Z_OK)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 	// do it
 	zerr = deflate(&m_deflater, Z_FINISH);
 
 	// if we ended up with more data than we started with, return an error
 	if (zerr != Z_STREAM_END || m_deflater.total_out >= srclen)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 	// otherwise, return the length
 	return m_deflater.total_out;
@@ -943,7 +942,7 @@ chd_zlib_decompressor::chd_zlib_decompressor(chd_file &chd, uint32_t hunkbytes, 
 	if (zerr == Z_MEM_ERROR)
 		throw std::bad_alloc();
 	else if (zerr != Z_OK)
-		throw CHDERR_CODEC_ERROR;
+		throw std::error_condition(chd_file::error::CODEC_ERROR);
 }
 
 
@@ -973,14 +972,14 @@ void chd_zlib_decompressor::decompress(const uint8_t *src, uint32_t complen, uin
 	m_inflater.total_out = 0;
 	int zerr = inflateReset(&m_inflater);
 	if (zerr != Z_OK)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// do it
 	zerr = inflate(&m_inflater, Z_FINISH);
 	if (zerr != Z_STREAM_END)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	if (m_inflater.total_out != destlen)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 }
 
 
@@ -1114,20 +1113,20 @@ uint32_t chd_lzma_compressor::compress(const uint8_t *src, uint32_t srclen, uint
 	// allocate the encoder
 	CLzmaEncHandle encoder = LzmaEnc_Create(&m_allocator);
 	if (encoder == nullptr)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 	try
 	{
 		// configure the encoder
 		SRes res = LzmaEnc_SetProps(encoder, &m_props);
 		if (res != SZ_OK)
-			throw CHDERR_COMPRESSION_ERROR;
+			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 		// run it
 		SizeT complen = srclen;
 		res = LzmaEnc_MemEncode(encoder, dest, &complen, src, srclen, 0, nullptr, &m_allocator, &m_allocator);
 		if (res != SZ_OK)
-			throw CHDERR_COMPRESSION_ERROR;
+			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 		// clean up
 		LzmaEnc_Destroy(encoder, &m_allocator, &m_allocator);
@@ -1183,24 +1182,24 @@ chd_lzma_decompressor::chd_lzma_decompressor(chd_file &chd, uint32_t hunkbytes, 
 	// convert to decoder properties
 	CLzmaEncHandle enc = LzmaEnc_Create(&m_allocator);
 	if (!enc)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	if (LzmaEnc_SetProps(enc, &encoder_props) != SZ_OK)
 	{
 		LzmaEnc_Destroy(enc, &m_allocator, &m_allocator);
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	}
 	Byte decoder_props[LZMA_PROPS_SIZE];
 	SizeT props_size = sizeof(decoder_props);
 	if (LzmaEnc_WriteProperties(enc, decoder_props, &props_size) != SZ_OK)
 	{
 		LzmaEnc_Destroy(enc, &m_allocator, &m_allocator);
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	}
 	LzmaEnc_Destroy(enc, &m_allocator, &m_allocator);
 
 	// do memory allocations
 	if (LzmaDec_Allocate(&m_decoder, decoder_props, LZMA_PROPS_SIZE, &m_allocator) != SZ_OK)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 }
 
 
@@ -1231,7 +1230,7 @@ void chd_lzma_decompressor::decompress(const uint8_t *src, uint32_t complen, uin
 	ELzmaStatus status;
 	SRes res = LzmaDec_DecodeToBuf(&m_decoder, dest, &decodedlen, src, &consumedlen, LZMA_FINISH_END, &status);
 	if ((res != SZ_OK && res != LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK) || consumedlen != complen || decodedlen != destlen)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 }
 
 
@@ -1259,7 +1258,7 @@ uint32_t chd_huffman_compressor::compress(const uint8_t *src, uint32_t srclen, u
 {
 	uint32_t complen;
 	if (m_encoder.encode(src, srclen, dest, srclen, complen) != HUFFERR_NONE)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 	return complen;
 }
 
@@ -1287,7 +1286,7 @@ chd_huffman_decompressor::chd_huffman_decompressor(chd_file &chd, uint32_t hunkb
 void chd_huffman_decompressor::decompress(const uint8_t *src, uint32_t complen, uint8_t *dest, uint32_t destlen)
 {
 	if (m_decoder.decode(src, complen, dest, destlen) != HUFFERR_NONE)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 }
 
 
@@ -1325,19 +1324,19 @@ uint32_t chd_flac_compressor::compress(const uint8_t *src, uint32_t srclen, uint
 	// reset and encode big-endian
 	m_encoder.reset(dest + 1, hunkbytes() - 1);
 	if (!m_encoder.encode_interleaved(reinterpret_cast<const int16_t *>(src), srclen / 4, !m_big_endian))
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 	uint32_t complen_be = m_encoder.finish();
 
 	// reset and encode little-endian
 	m_encoder.reset(dest + 1, hunkbytes() - 1);
 	if (!m_encoder.encode_interleaved(reinterpret_cast<const int16_t *>(src), srclen / 4, m_big_endian))
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 	uint32_t complen_le = m_encoder.finish();
 
 	// pick the best one and add a byte
 	uint32_t complen = std::min(complen_le, complen_be);
 	if (complen + 1 >= hunkbytes())
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 	// if big-endian was better, re-do it
 	dest[0] = 'L';
@@ -1346,7 +1345,7 @@ uint32_t chd_flac_compressor::compress(const uint8_t *src, uint32_t srclen, uint
 		dest[0] = 'B';
 		m_encoder.reset(dest + 1, hunkbytes() - 1);
 		if (!m_encoder.encode_interleaved(reinterpret_cast<const int16_t *>(src), srclen / 4, !m_big_endian))
-			throw CHDERR_COMPRESSION_ERROR;
+			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 		m_encoder.finish();
 	}
 	return complen + 1;
@@ -1401,13 +1400,13 @@ void chd_flac_decompressor::decompress(const uint8_t *src, uint32_t complen, uin
 	else if (src[0] == 'B')
 		swap_endian = !m_big_endian;
 	else
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// reset and decode
 	if (!m_decoder.reset(44100, 2, chd_flac_compressor::blocksize(destlen), src + 1, complen - 1))
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	if (!m_decoder.decode_interleaved(reinterpret_cast<int16_t *>(dest), destlen / 4, swap_endian))
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// finish up
 	m_decoder.finish();
@@ -1429,7 +1428,7 @@ chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, uint32_t hunkbytes
 {
 	// make sure the CHD's hunk size is an even multiple of the frame size
 	if (hunkbytes % CD_FRAME_SIZE != 0)
-		throw CHDERR_CODEC_ERROR;
+		throw std::error_condition(chd_file::error::CODEC_ERROR);
 
 	// determine whether we want native or swapped samples
 	uint16_t native_endian = 0;
@@ -1452,7 +1451,7 @@ chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, uint32_t hunkbytes
 	if (zerr == Z_MEM_ERROR)
 		throw std::bad_alloc();
 	else if (zerr != Z_OK)
-		throw CHDERR_CODEC_ERROR;
+		throw std::error_condition(chd_file::error::CODEC_ERROR);
 }
 
 
@@ -1485,7 +1484,7 @@ uint32_t chd_cd_flac_compressor::compress(const uint8_t *src, uint32_t srclen, u
 	m_encoder.reset(dest, hunkbytes());
 	uint8_t *buffer = &m_buffer[0];
 	if (!m_encoder.encode_interleaved(reinterpret_cast<int16_t *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 	// finish up
 	uint32_t complen = m_encoder.finish();
@@ -1499,7 +1498,7 @@ uint32_t chd_cd_flac_compressor::compress(const uint8_t *src, uint32_t srclen, u
 	m_deflater.total_out = 0;
 	int zerr = deflateReset(&m_deflater);
 	if (zerr != Z_OK)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 	// do it
 	zerr = deflate(&m_deflater, Z_FINISH);
@@ -1507,7 +1506,7 @@ uint32_t chd_cd_flac_compressor::compress(const uint8_t *src, uint32_t srclen, u
 	// if we ended up with more data than we started with, return an error
 	complen += m_deflater.total_out;
 	if (zerr != Z_STREAM_END || complen >= srclen)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 	return complen;
 }
 
@@ -1558,7 +1557,7 @@ chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, uint32_t hunkb
 {
 	// make sure the CHD's hunk size is an even multiple of the frame size
 	if (hunkbytes % CD_FRAME_SIZE != 0)
-		throw CHDERR_CODEC_ERROR;
+		throw std::error_condition(chd_file::error::CODEC_ERROR);
 
 	// determine whether we want native or swapped samples
 	uint16_t native_endian = 0;
@@ -1575,7 +1574,7 @@ chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, uint32_t hunkb
 	if (zerr == Z_MEM_ERROR)
 		throw std::bad_alloc();
 	else if (zerr != Z_OK)
-		throw CHDERR_CODEC_ERROR;
+		throw std::error_condition(chd_file::error::CODEC_ERROR);
 }
 
 /**
@@ -1612,10 +1611,10 @@ void chd_cd_flac_decompressor::decompress(const uint8_t *src, uint32_t complen, 
 	// reset and decode
 	uint32_t frames = destlen / CD_FRAME_SIZE;
 	if (!m_decoder.reset(44100, 2, chd_cd_flac_compressor::blocksize(frames * CD_MAX_SECTOR_DATA), src, complen))
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	uint8_t *buffer = &m_buffer[0];
 	if (!m_decoder.decode_interleaved(reinterpret_cast<int16_t *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// inflate the subcode data
 	uint32_t offset = m_decoder.finish();
@@ -1627,14 +1626,14 @@ void chd_cd_flac_decompressor::decompress(const uint8_t *src, uint32_t complen, 
 	m_inflater.total_out = 0;
 	int zerr = inflateReset(&m_inflater);
 	if (zerr != Z_OK)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// do it
 	zerr = inflate(&m_inflater, Z_FINISH);
 	if (zerr != Z_STREAM_END)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	if (m_inflater.total_out != frames * CD_MAX_SUBCODE_DATA)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// reassemble the data
 	for (uint32_t framenum = 0; framenum < frames; framenum++)
@@ -1663,15 +1662,15 @@ void chd_cd_flac_decompressor::decompress(const uint8_t *src, uint32_t complen, 
  */
 
 chd_avhuff_compressor::chd_avhuff_compressor(chd_file &chd, uint32_t hunkbytes, bool lossy)
-	: chd_compressor(chd, hunkbytes, lossy),
-		m_postinit(false)
+	: chd_compressor(chd, hunkbytes, lossy)
+	, m_postinit(false)
 {
 	try
 	{
 		// attempt to do a post-init now
 		postinit();
 	}
-	catch (chd_error &)
+	catch (std::error_condition const &)
 	{
 		// if we're creating a new CHD, it won't work but that's ok
 	}
@@ -1708,14 +1707,14 @@ uint32_t chd_avhuff_compressor::compress(const uint8_t *src, uint32_t srclen, ui
 		int size = avhuff_encoder::raw_data_size(src);
 		while (size < srclen)
 			if (src[size++] != 0)
-				throw CHDERR_INVALID_DATA;
+				throw std::error_condition(chd_file::error::INVALID_DATA);
 	}
 
 	// encode the audio and video
 	uint32_t complen;
 	avhuff_error averr = m_encoder.encode_data(src, dest, complen);
 	if (averr != AVHERR_NONE || complen > srclen)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 	return complen;
 }
 
@@ -1736,21 +1735,21 @@ void chd_avhuff_compressor::postinit()
 {
 	// get the metadata
 	std::string metadata;
-	chd_error err = chd().read_metadata(AV_METADATA_TAG, 0, metadata);
-	if (err != CHDERR_NONE)
+	std::error_condition err = chd().read_metadata(AV_METADATA_TAG, 0, metadata);
+	if (err)
 		throw err;
 
 	// extract the info
 	int fps, fpsfrac, width, height, interlaced, channels, rate;
 	if (sscanf(metadata.c_str(), AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
-		throw CHDERR_INVALID_METADATA;
+		throw std::error_condition(chd_file::error::INVALID_METADATA);
 
 	// compute the bytes per frame
 	uint32_t fps_times_1million = fps * 1000000 + fpsfrac;
 	uint32_t max_samples_per_frame = (uint64_t(rate) * 1000000 + fps_times_1million - 1) / fps_times_1million;
 	uint32_t bytes_per_frame = 12 + channels * max_samples_per_frame * 2 + width * height * 2;
 	if (bytes_per_frame > hunkbytes())
-		throw CHDERR_INVALID_METADATA;
+		throw std::error_condition(chd_file::error::INVALID_METADATA);
 
 	// done with post-init
 	m_postinit = true;
@@ -1800,7 +1799,7 @@ void chd_avhuff_decompressor::decompress(const uint8_t *src, uint32_t complen, u
 	// decode the audio and video
 	avhuff_error averr = m_decoder.decode_data(src, complen, dest);
 	if (averr != AVHERR_NONE)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// pad short frames with 0
 	if (dest != nullptr)
@@ -1833,5 +1832,5 @@ void chd_avhuff_decompressor::configure(int param, void *config)
 
 	// anything else is invalid
 	else
-		throw CHDERR_INVALID_PARAMETER;
+		throw std::error_condition(std::errc::invalid_argument);
 }
