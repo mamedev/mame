@@ -16933,12 +16933,12 @@ license:CC0
 		<info name="release" value="2021-07-01"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or
-        Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a
-        Liron or other compatible drive controller card.
+		Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a
+		Liron or other compatible drive controller card.
 
-        Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or
-        Apple SuperDrive (G7287), will not work due to
-        incompatibilities created by the copy protection. -->
+		Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or
+		Apple SuperDrive (G7287), will not work due to
+		incompatibilities created by the copy protection. -->
 		<!--"Troll Sports Math" is a 1991 educational program developed by Millicent Sabater, Gregory Truex, Thomas Whiting, and Toby Shack, and distributed by Troll Associates. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a Liron or other compatible drive controller card. Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or Apple SuperDrive (G7287), will not work due to incompatibilities created by the copy protection.-->
 
 		<part name="flop1" interface="floppy_3_5">
