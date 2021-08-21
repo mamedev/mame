@@ -145,8 +145,6 @@ void silentype_printer_device::device_start()
 	save_item(NAME(decaytime));
 	save_item(NAME(lastheadbits));
 	save_item(NAME(headtemp));
-	save_item(NAME(hstepperlast));
-	save_item(NAME(vstepperlast));
 	save_item(NAME(xdirection));
 	save_item(NAME(newpageflag));
 	save_item(NAME(page_count));

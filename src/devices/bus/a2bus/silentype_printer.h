@@ -70,8 +70,8 @@ private:
 	int heattime = 3000;   // time in usec to hit max temp  (smaller numbers mean faster)
 	int decaytime = 1000;  // time in usec to cool off
 
-	int hstepperlast = 0;
-	int vstepperlast = 0;
+//	int hstepperlast = 0;
+//	int vstepperlast = 0;
 	int lastheadbits = 0;
 	int xdirection = 0;
 	int newpageflag = 0;
