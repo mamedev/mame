@@ -61,7 +61,7 @@ private:
 	required_ioport m_rs232_parity;
 	required_ioport m_rs232_stopbits;
 
-
+	void maincpu_out_sod_func(uint8_t data);
 
 	uint8_t head_pa_r(offs_t offset);
 	void head_pa_w(uint8_t data);
@@ -94,18 +94,25 @@ private:
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int distfrombottom = 50;
 	
-	int m_xpos = PAPER_WIDTH / 2 * 2;  // middle of paper (position in half steps)
-	int m_ypos = 0;
-	s32 x_pixel_coord(s32 xpos) { return xpos / 2; }  // x position in half steps
-	s32 y_pixel_coord(s32 ypos) { return ypos / 2; }  // y position given in half steps
+	int m_xpos = PAPER_WIDTH / 2;  // middle of paper (paper width in pixels)
+	int m_ypos = 30;
+	s32 x_pixel_coord(s32 xpos) { return xpos / 1; }  // x position in half steps
+	s32 y_pixel_coord(s32 ypos) { return ypos / 1; }  // y position given in half steps
 
-	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern, const char * name);
-	void update_printhead(uint8_t data);
+	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern, const char * name, int direction);
+	void update_printhead();
 	void update_pf_stepper(uint8_t data);
 	void update_cr_stepper(uint8_t data);
 	
 	int m_ic17_flipflop = 0;
 	int m_head_to_last = 0;
+	u16 m_dotpattern;
+
+	int right_offset = 0;
+	int left_offset = 3;
+
+	
+	void darken_pixel(double headtemp, unsigned int& pixel);
 };
 
 DECLARE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device)
