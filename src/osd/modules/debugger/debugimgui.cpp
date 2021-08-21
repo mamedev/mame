@@ -1109,8 +1109,8 @@ void debug_imgui::draw_mount_dialog(const char* label)
 			m_filelist_refresh = true;
 		ImGui::Separator();
 
-    	ImVec2 listbox_size;
-    	listbox_size.x = 0.0f;
+		ImVec2 listbox_size;
+		listbox_size.x = 0.0f;
 		listbox_size.y = ImGui::GetTextLineHeightWithSpacing() * 15.25f;
 
 		if(ImGui::BeginListBox("##filelist",listbox_size))

@@ -166,25 +166,25 @@ public:
 class nes_sgboog_device : public nes_txrom_device
 {
 public:
-	// construction/destruction
-	nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+    // construction/destruction
+    nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
-	virtual void prg_cb(int start, int bank) override;
-	virtual void chr_cb(int start, int bank, int source) override;
+    virtual void write_l(offs_t offset, uint8_t data) override;
+    virtual void write_m(offs_t offset, uint8_t data) override;
+    virtual void write_h(offs_t offset, uint8_t data) override;
+    virtual void prg_cb(int start, int bank) override;
+    virtual void chr_cb(int start, int bank, int source) override;
 
-	virtual void pcb_reset() override;
+    virtual void pcb_reset() override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+    // device-level overrides
+    virtual void device_start() override;
 
 private:
-	virtual void set_prg(int prg_base, int prg_mask) override;
-	uint8_t m_reg[3];
-	uint8_t m_mode;
+    virtual void set_prg(int prg_base, int prg_mask) override;
+    uint8_t m_reg[3];
+    uint8_t m_mode;
 };
 */
 

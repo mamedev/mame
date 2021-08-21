@@ -142,7 +142,7 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="biotek">
 		<description>Biotek</description>
 		<year>1983</year>
@@ -156,7 +156,7 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blckonyx">
 		<description>The Black Onyx</description>
 		<year>1985</year>
@@ -604,7 +604,7 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="elevgame">
 		<description>Elevator Game</description>
 		<year>19??</year>
@@ -616,7 +616,7 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="enterprs">
 		<description>Enterprise</description>
 		<year>1983</year>
@@ -2480,7 +2480,7 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="zaiko">
 		<description>Zaiko Kanri</description>
 		<year>1981</year>

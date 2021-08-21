@@ -5,20 +5,20 @@
     V-Tech V.Smile Baby console emulation
 
     System is currently marked as not-working due to severe audio issues, as
-	narration-related voice clips are all cut off too early in every game.
+    narration-related voice clips are all cut off too early in every game.
 
-	The issue appears to be due to improper handling of the "Fast Rampdown"
-	feature in the SPG2xx audio device, but due to the poor quality of SunPlus
-	developer documentation, it's unclear as to what part of the implementation
-	is wrong.
+    The issue appears to be due to improper handling of the "Fast Rampdown"
+    feature in the SPG2xx audio device, but due to the poor quality of SunPlus
+    developer documentation, it's unclear as to what part of the implementation
+    is wrong.
 
-	If the Fast Rampdown feature is disabled in the audio device entirely,
-	voice clips play out without issue.
+    If the Fast Rampdown feature is disabled in the audio device entirely,
+    voice clips play out without issue.
 
-	Although bad audio is not usually a reason for marking a driver as
-	non-working, due to the nature of the V.Smile Baby and its target users,
-	having properly-narrated voices is critical to the overall experience of
-	the system.
+    Although bad audio is not usually a reason for marking a driver as
+    non-working, due to the nature of the V.Smile Baby and its target users,
+    having properly-narrated voices is critical to the overall experience of
+    the system.
 
 *******************************************************************************/
 

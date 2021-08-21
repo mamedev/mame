@@ -54081,22 +54081,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- Dump not available. Game is also in 9in1cal.
-	<software name="supergun">
-		<description>Super Gun (Asia)</description>
-		<year>1992</year>
-		<publisher>Caltron</publisher>
-		<info name="serial" value="CN-12"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ntdec_n715021" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="prg" size="65536">
-				<rom name="prg.u1" size="65536" crc="" sha1="" status="nodump" />
-			</dataarea>
-			<dataarea name="chr" size="32768">
-				<rom name="chr.u2" size="32768" crc="" sha1="" status="nodump" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="supergun">
+        <description>Super Gun (Asia)</description>
+        <year>1992</year>
+        <publisher>Caltron</publisher>
+        <info name="serial" value="CN-12"/>
+        <part name="cart" interface="nes_cart">
+            <feature name="slot" value="ntdec_n715021" />
+            <feature name="mirroring" value="horizontal" />
+            <dataarea name="prg" size="65536">
+                <rom name="prg.u1" size="65536" crc="" sha1="" status="nodump" />
+            </dataarea>
+            <dataarea name="chr" size="32768">
+                <rom name="chr.u2" size="32768" crc="" sha1="" status="nodump" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="destroyr">

@@ -20,12 +20,12 @@ TODO:
 - clshroad: erratic gameplay/sound speed.
   Being pretty logical that CPUs runs at master clock / 6 then we also need to
   halve the vblank irq rate so that opponents won't pop up in the middle of the
-  screen. Main CPU would also overrun the sound CPU way too much otherwise. 
+  screen. Main CPU would also overrun the sound CPU way too much otherwise.
   We also need to hand tune the sound frequencies compared to the other games
   so that it won't cut off BGMs abruptly during playback.
   TL;DR needs verification of all clocks with a PCB;
 - firebatl: video (https://tmblr.co/ZgJvzv2E2C_z-) shows transparency for the
-  text layer is not correctly emulated, fixed by initializing VRAM to 0xf0? 
+  text layer is not correctly emulated, fixed by initializing VRAM to 0xf0?
   (that layer seems unused by this game);
 - firebatl: bad sprite colors, most notably player ship (should be way darker);
 - firebatl: remove ROM patch;
@@ -35,7 +35,7 @@ TODO:
   - $6100 is actually OR-ed with the coinage work RAM buffer setting at $8022;
   - $6124 is shifted right once at PC=0x5df and stored to $82e6, which is later
     checked at PC=0x187 and must be $01 otherwise game goes into an infinite
-	loop after dying (without ROM patch);
+    loop after dying (without ROM patch);
   - (more ...)
 
 *******************************************************************************/

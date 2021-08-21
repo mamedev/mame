@@ -64,10 +64,10 @@ DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "Nintendo & SGI Reality Signal Proces
 #define ZERO        3
 #define CLIP2       4
 
-#define SLICE_H				3
-#define SLICE_M				2
-#define SLICE_L				1
-#define SLICE_LL			0
+#define SLICE_H             3
+#define SLICE_M             2
+#define SLICE_L             1
+#define SLICE_LL            0
 
 #define WRITEBACK_RESULT() memcpy(m_v[VDREG].s, vres, sizeof(uint16_t) * 8);
 
@@ -2802,25 +2802,25 @@ void rsp_device::update_scalar_op_deduction()
 {
 	/*if (m_paired_busy)
 	{
-		m_scalar_busy = false;
-		m_vector_busy = false;
-		m_paired_busy = false;
-		m_ideduct = 1;
+	    m_scalar_busy = false;
+	    m_vector_busy = false;
+	    m_paired_busy = false;
+	    m_ideduct = 1;
 	}
 	else if (m_vector_busy)
 	{
-		m_scalar_busy = true;
-		m_paired_busy = true;
-		m_ideduct = 0;
+	    m_scalar_busy = true;
+	    m_paired_busy = true;
+	    m_ideduct = 0;
 	}
 	else if (m_scalar_busy)
 	{
-		m_ideduct = 1;
+	    m_ideduct = 1;
 	}
 	else
 	{
-		m_scalar_busy = true;
-		m_ideduct = 0;
+	    m_scalar_busy = true;
+	    m_ideduct = 0;
 	}*/
 }
 
@@ -2828,25 +2828,25 @@ void rsp_device::update_vector_op_deduction()
 {
 	/*if (m_paired_busy)
 	{
-		m_scalar_busy = false;
-		m_vector_busy = false;
-		m_paired_busy = false;
-		m_ideduct = 1;
+	    m_scalar_busy = false;
+	    m_vector_busy = false;
+	    m_paired_busy = false;
+	    m_ideduct = 1;
 	}
 	else if (m_scalar_busy)
 	{
-		m_vector_busy = true;
-		m_paired_busy = true;
-		m_ideduct = 0;
+	    m_vector_busy = true;
+	    m_paired_busy = true;
+	    m_ideduct = 0;
 	}
 	else if (m_vector_busy)
 	{
-		m_ideduct = 1;
+	    m_ideduct = 1;
 	}
 	else
 	{
-		m_vector_busy = true;
-		m_ideduct = 0;
+	    m_vector_busy = true;
+	    m_ideduct = 0;
 	}*/
 }
 

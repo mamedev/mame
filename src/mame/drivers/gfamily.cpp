@@ -106,7 +106,7 @@ ROM_START( gmfamily )
 	ROMX_LOAD("686_amibios_ay36_8897.bin", 0x00000, 0x80000, CRC(e04c5750) SHA1(240ca6b270bdebf129e4ce43e79275aa067b6ada), ROM_BIOS(0))
 
 	/* CPU: Pentium 4 2.40GHz/512/533 SL6DV
-	   RAM: 512MB 
+	   RAM: 512MB
 	   PCB: ECS (Elitegroup) 651-M v2.4. Seems like a later low-cost version of the consumer v2.0 motherboard. */
 	ROM_SYSTEM_BIOS(1, "sy_sis651", "05/13/2005-SiS-651-6A6IXE19C-00")
 	ROMX_LOAD("award_i6a6ixe19.bin",       0x00000, 0x40000, CRC(95fa392c) SHA1(40f557339649c47e6c3d941670604e0559edf8db), ROM_BIOS(1)) // Winbond W49F002UP12N

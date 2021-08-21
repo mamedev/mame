@@ -13,15 +13,15 @@
     - XEN WS (1 MB RAM, no drives)
 
     TODO:
-	- Boot ROM disable, wrap around mode
+    - Boot ROM disable, wrap around mode
     - Floppy
-	- DMA
-	- Harddisk
-	- Keyboard
-	- RS232
-	- Printer
-	- Colour graphics board
-	- Make xen_daisy_device generic?
+    - DMA
+    - Harddisk
+    - Keyboard
+    - RS232
+    - Printer
+    - Colour graphics board
+    - Make xen_daisy_device generic?
 
     Notes:
     - Two graphics cards: Mono and colour boards
@@ -260,15 +260,15 @@ uint16_t apxen_state::mem_r(offs_t offset, uint16_t mem_mask)
 	// pc/xi compatible mode vram
 	if ((offset << 1) < 0x10000 && !m_apvid)
 		m_video->mem_r(offset & (0xffff >> 1), data, mem_mask);
-	
+
 	// pc/xi video pointer mirror
 	else if  ((offset << 1) >= 0xf0000 && (offset << 1) <= 0xf0fff && !m_apvid)
 		m_video->mem_r((offset & (0xffff >> 1)) | (0x0e000 >> 1), data, mem_mask);
-	
+
 	// xen mode vram
 	else if  ((offset << 1) >= 0xe0000 && (offset << 1) <= 0xeffff && m_apvid)
 		m_video->mem_r(offset & (0xffff >> 1), data, mem_mask);
-	
+
 	// normal access
 	else
 		data &= m_mem->read16(offset, mem_mask);
@@ -281,15 +281,15 @@ void apxen_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// pc/xi compatible mode vram
 	if ((offset << 1) < 0x10000 && !m_apvid)
 		m_video->mem_w(offset & (0xffff >> 1), data, mem_mask);
-	
+
 	// pc/xi video pointer mirror
 	else if  ((offset << 1) >= 0xf0000 && (offset << 1) <= 0xf0fff && !m_apvid)
 		m_video->mem_w((offset & (0xffff >> 1)) | (0x0e000 >> 1), data, mem_mask);
-	
+
 	// xen mode vram
 	else if  ((offset << 1) >= 0xe0000 && (offset << 1) <= 0xeffff && m_apvid)
 		m_video->mem_w(offset & (0xffff >> 1), data, mem_mask);
-	
+
 	// normal access
 	else
 		m_mem->write16(offset, data, mem_mask);
@@ -382,7 +382,7 @@ void apxen_state::cpu_control_w(uint8_t data)
 void apxen_state::cpu_reset_w(uint8_t data)
 {
 	logerror("cpu_reset_w: %02x\n", data);
-	
+
 	// data written doesn't matter
 	m_maincpu->reset();
 }

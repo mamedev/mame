@@ -146,7 +146,7 @@ void missbamby_state::igoabasket(machine_config &config)
 	missbamby(config);
 
 	// Two 8155 on the Basket PCB
-	I8155(config, "i8155b", 6_MHz_XTAL/2); // NEC D8155HC, guessed divisor	
+	I8155(config, "i8155b", 6_MHz_XTAL/2); // NEC D8155HC, guessed divisor
 }
 
 
@@ -284,7 +284,7 @@ ROM_END
   | |_____________| |_________________|                 __|
   |  _____________   _________________                  __|
   | | EMPTY       | | NEC D8155HC     |                 __|
-  | |_____________| |_________________|                 __|                
+  | |_____________| |_________________|                 __|
   |  _____________   _______  _________      ________   __|
   | | EPROM       | |DM7417N  SN74LS373N    |ULN2003R|  __|
   | |_____________|  _________________       ________   __|
