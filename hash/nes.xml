@@ -76667,14 +76667,14 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk3ex60" supported="no">
+	<software name="mk3ex60">
 		<description>Mortal Kombat 3 Extra 60 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="M-E3"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="mortal combat 3 extra 60 [m-e3] (pirate original).chr" size="524288" crc="559ec915" sha1="3301376fc480db7383a3ea520be041534426287d" offset="00000" status="baddump" />
 			</dataarea>
@@ -76684,13 +76684,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk3ex60a" cloneof="mk3ex60" supported="no">
+	<software name="mk3ex60a" cloneof="mk3ex60">
 		<description>Mortal Kombat 3 Extra 60 (Asia, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="262144">
 				<rom name="mortal kombat 3 - extra 60 (unl) (supergame).chr" size="262144" crc="0f448984" sha1="58d5dab667a4fcbb17652314a410569bb1d7152f" offset="00000" status="baddump" />
 			</dataarea>
@@ -78570,13 +78570,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_2jm2" supported="no">
+	<software name="mc_2jm2">
 		<description>2 in 1 (J-M2)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="2-in-1 j-m2 (unl).chr" size="524288" crc="5ddcc731" sha1="cc2555380f2dfb46a73b64d9e1e4fec2ab3d3892" offset="00000" status="baddump" />
 			</dataarea>
@@ -78586,13 +78586,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_2kin5" supported="no">
+	<software name="mc_2kin5">
 		<description>2 in 1 (King005)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="2-in-1 king005 (unl).chr" size="524288" crc="559ec915" sha1="3301376fc480db7383a3ea520be041534426287d" offset="00000" status="baddump" />
 			</dataarea>
@@ -78602,13 +78602,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_2s808" supported="no">
+	<software name="mc_2s808">
 		<description>2 in 1 Super 808</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="2-in-1 super 808 (unl)[p1].chr" size="524288" crc="65b3e791" sha1="7f342d5fa4d20649f8e2dfbf062111196a0e4893" offset="00000" status="baddump" />
 			</dataarea>
@@ -80096,13 +80096,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_5spc5" supported="no">
+	<software name="mc_5spc5">
 		<description>5 in 1 (SPC005)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="1048576">
 				<rom name="5-in-1 (spc005)[p1].chr" size="1048576" crc="28197d63" sha1="8d11188e5cde7cb9e604db1525502f1f09ce1f3c" offset="00000" status="baddump" />
 			</dataarea>
@@ -80896,7 +80896,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_9king" supported="no">
+	<software name="mc_9king" supported="partial">
 		<description>9 in 1 King001</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -81727,13 +81727,13 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_s308" supported="no">
+	<software name="mc_s308">
 		<description>Super 308 3 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="super 308 3 in 1 (unl).chr" size="524288" crc="9f5294de" sha1="c1435c9b24668da324363290ecd2bb7734b8eacc" offset="00000" status="baddump" />
 			</dataarea>

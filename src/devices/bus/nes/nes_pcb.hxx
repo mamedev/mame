@@ -226,6 +226,7 @@ static const nes_pcb pcb_list[] =
 	{ "family4646",       BMC_FAMILY_4646 },
 	{ "pikay2k",          BTL_PIKACHUY2K },  // mapper 254
 	{ "8237",             UNL_8237 },
+	{ "8237a",            UNL_8237A },
 	{ "sg_lionk",         SUPERGAME_LIONKING },
 	{ "sg_boog",          SUPERGAME_BOOGERMAN },
 	{ "kasing",           KASING_BOARD },
@@ -361,7 +362,6 @@ static const nes_pcb pcb_list[] =
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
-	{ "8237a",            UNSUPPORTED_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },

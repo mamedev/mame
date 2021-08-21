@@ -35,6 +35,7 @@ DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",   
 DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY04646 PCB")
 DEFINE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device,       "nes_pikay2k",       "NES Cart PIKACHU Y2K PCB")
 DEFINE_DEVICE_TYPE(NES_8237,          nes_8237_device,          "nes_8237",          "NES Cart UNL-8237 PCB")
+DEFINE_DEVICE_TYPE(NES_8237A,         nes_8237a_device,         "nes_8237a",         "NES Cart UNL-8237A PCB")
 DEFINE_DEVICE_TYPE(NES_SG_LIONK,      nes_sglionk_device,       "nes_sglionk",       "NES Cart SuperGame Lion King PCB")
 DEFINE_DEVICE_TYPE(NES_SG_BOOG,       nes_sgboog_device,        "nes_sgbooger",      "NES Cart SuperGame BoogerMan PCB")
 DEFINE_DEVICE_TYPE(NES_KASING,        nes_kasing_device,        "nes_kasing",        "NES Cart Kasing PCB")
@@ -107,23 +108,33 @@ nes_pikay2k_device::nes_pikay2k_device(const machine_config &mconfig, const char
 {
 }
 
-nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_8237, tag, owner, clock), m_cd_enable(0)
+nes_8237_device::nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_board(type == NES_8237A)
 {
 }
 
-nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board)
-	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc3_mode(true), m_board(board)
+nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_8237_device(mconfig, NES_8237, tag, owner, clock)
+{
+}
+
+nes_8237a_device::nes_8237a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_8237_device(mconfig, NES_8237A, tag, owner, clock)
+{
+}
+
+nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc3_mode(true), m_board(type == NES_SG_BOOG)
 {
 }
 
 nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_sglionk_device(mconfig, NES_SG_LIONK, tag, owner, clock, 0)
+	: nes_sglionk_device(mconfig, NES_SG_LIONK, tag, owner, clock)
 {
 }
 
 nes_sgboog_device::nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_sglionk_device(mconfig, NES_SG_BOOG, tag, owner, clock, 1)
+	: nes_sglionk_device(mconfig, NES_SG_BOOG, tag, owner, clock)
 {
 }
 
@@ -349,18 +360,17 @@ void nes_8237_device::device_start()
 {
 	mmc3_start();
 	save_item(NAME(m_reg));
-	save_item(NAME(m_cd_enable));
 }
 
 void nes_8237_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x1f, 0xff, 0);
 
 	m_reg[0] = 0;
-	m_reg[1] = 0;
+	m_reg[1] = 0x0f;
 	m_reg[2] = 0;
-	m_cd_enable = 0;
-	mmc3_common_initialize(0xff, 0xff, 0);
+	update_banks();
 }
 
 void nes_sglionk_device::device_start()
@@ -376,28 +386,6 @@ void nes_sglionk_device::pcb_reset()
 	m_mmc3_mode = true;
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
-
-/*
-void nes_sgboog_device::device_start()
-{
-    mmc3_start();
-    save_item(NAME(m_reg));
-    save_item(NAME(m_mode));
-}
-
-void nes_sgboog_device::pcb_reset()
-{
-    m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-    m_mode = 0x04;
-    m_reg[0] = 0x00;
-    m_reg[1] = 0xff;
-    m_reg[2] = 0;
-    mmc3_common_initialize(0x1f, 0xff, 0);
-    set_prg(m_prg_base, m_prg_mask);
-    set_chr(m_chr_source, m_chr_base, m_chr_mask);
-}
-*/
 
 void nes_kasing_device::device_start()
 {
@@ -957,99 +945,101 @@ uint8_t nes_pikay2k_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
- Board UNL-8237
+ Board UNL-8237, UNL-8237A
 
- Games: Pocahontas 2
+ Games: Pocahontas 2, MK3, various multicarts
 
- MMC3 clone
+ MMC3 clone with register and address scrambling and
+ a few extra banking modes by writing 0x5000-0x5fff.
 
- In MESS: Supported
+ iNES: mapper 215
+
+ In MAME: Preliminary supported.
+
+ TODO: Lion King crashes after the first level in mc_9king.
+ Also in mc_9king Lion King, Somari and Aladdin all reset
+ to Aladdin instead of the menu.
 
  -------------------------------------------------*/
 
+void nes_8237_device::update_banks()
+{
+	int a17 = BIT(m_reg[0], 6);
+	m_chr_base = m_board ? (m_reg[1] & 0x0e) << 7 : (m_reg[1] & 0x0c) << 6;
+	m_chr_base |= (BIT(m_reg[1], 5) & a17) << 7;
+	m_chr_mask = 0xff >> a17;
+	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+
+	m_prg_base = m_board ? bitswap<3>(m_reg[1], 3, 1, 0) : m_reg[1] & 0x03;
+	m_prg_base = m_prg_base << 5 | (m_reg[1] & (a17 << 4));
+	m_prg_mask = 0x1f >> a17;
+
+	if (BIT(m_reg[0], 7))
+	{
+		u8 bank = m_prg_base >> 1 | (m_reg[0] & (m_prg_mask >> 1));
+		u8 mode = BIT(m_reg[0], 5);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+	}
+		set_prg(m_prg_base, m_prg_mask);
+}
+
 void nes_8237_device::prg_cb(int start, int bank)
 {
-	if (!(m_reg[0] & 0x80))
-		prg8_x(start, bank);
+	if (!BIT(m_reg[0], 7))
+		nes_txrom_device::prg_cb(start, bank);
 }
 
-void nes_8237_device::chr_cb(int start, int bank, int source)
-{
-	bank |= ((m_reg[1] << 6) & 0x100);
-	chr1_x(start, bank, source);
-}
-
-void nes_8237_device::write_l(offs_t offset, uint8_t data)
+void nes_8237_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("unl_8237 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 
-	if (offset == 0x1000)
+	switch (offset & 0x1007)
 	{
-		m_reg[0] = data;
-		if (m_reg[0] & 0x80)
-		{
-			if (m_reg[0] & 0x20)
-				prg32((m_reg[0] & 0x0f) >> 1);
-			else
-			{
-				prg16_89ab(m_reg[0] & 0x1f);
-				prg16_cdef(m_reg[0] & 0x1f);
-			}
-		}
-		else
-			set_prg(m_prg_base, m_prg_mask);
-	}
-
-	if (offset == 0x1001)
-	{
-		m_reg[1] = data;
-		set_chr(m_chr_source, m_chr_base, m_chr_mask);
-	}
-
-	if (offset == 0x1007)
-	{
-		m_reg[2] = data & 0x07; // this selects different permutations for addresses and regs (to be implemented)
+		case 0x1000:
+		case 0x1001:
+			m_reg[offset & 1] = data;
+			update_banks();
+			break;
+		case 0x1007:
+			m_reg[2] = data & 0x07;
+			break;
 	}
 }
 
-void nes_8237_device::write_h(offs_t offset, uint8_t data)
+void nes_8237_device::write_h(offs_t offset, u8 data)
 {
-	static const uint8_t conv_table[8] = {0, 2, 6, 1, 7, 3, 4, 5};
 	LOG_MMC(("unl_8237 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7000)
+	static constexpr u8 reg_table[8][8] =
 	{
-		case 0x0000:
-		case 0x1000:
-			set_nt_mirroring((data | (data >> 7)) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
+		{0, 1, 2, 3, 4, 5, 6, 7},
+		{0, 2, 6, 1, 7, 3, 4, 5},
+		{0, 5, 4, 1, 7, 2, 6, 3},
+		{0, 6, 3, 7, 5, 2, 4, 1},
+		{0, 2, 5, 3, 6, 1, 7, 4},
+		{0, 1, 2, 3, 4, 5, 6, 7},
+		{0, 1, 2, 3, 4, 5, 6, 7},
+		{0, 1, 2, 3, 4, 5, 6, 7}
+	};
 
-		case 0x2000:
-		case 0x3000:
-			m_cd_enable = 1;
-			data = (data & 0xc0) | conv_table[data & 0x07];
-			txrom_write(0x0000, data);
-			break;
+	static constexpr u16 addr_table[8][8] =
+	{
+		{0x8000, 0x8001, 0xa000, 0xa001, 0xc000, 0xc001, 0xe000, 0xe001},
+		{0xa001, 0xa000, 0x8000, 0xc000, 0x8001, 0xc001, 0xe000, 0xe001},
+		{0x8000, 0x8001, 0xa000, 0xa001, 0xc000, 0xc001, 0xe000, 0xe001},
+		{0xc001, 0x8000, 0x8001, 0xa000, 0xa001, 0xe001, 0xe000, 0xc000},
+		{0xa001, 0x8001, 0x8000, 0xc000, 0xa000, 0xc001, 0xe000, 0xe001},
+		{0x8000, 0x8001, 0xa000, 0xa001, 0xc000, 0xc001, 0xe000, 0xe001},
+		{0x8000, 0x8001, 0xa000, 0xa001, 0xc000, 0xc001, 0xe000, 0xe001},
+		{0x8000, 0x8001, 0xa000, 0xa001, 0xc000, 0xc001, 0xe000, 0xe001},
+	};
 
-		case 0x4000:
-		case 0x5000:
-			if (m_cd_enable)
-			{
-				m_cd_enable = 0;
-				txrom_write(0x0001, data);
-			}
-			break;
-
-		case 0x6000:
-			break;
-
-		case 0x7000:
-			txrom_write(0x6001, data);
-			txrom_write(0x4000, data);
-			txrom_write(0x4001, data);
-			break;
-	}
+	u16 addr = addr_table[m_reg[2]][bitswap<3>(offset, 14, 13, 0)];
+	if (addr == 0x8000)
+		data = (data & 0xc0) | reg_table[m_reg[2]][data & 0x07];
+	txrom_write(addr & 0x6001, data);
 }
 
 /*-------------------------------------------------
@@ -1120,163 +1110,6 @@ void nes_sglionk_device::write_h(offs_t offset, u8 data)
 		data = (data & 0xc0) | reg_table[m_board][data & 0x07];
 	txrom_write(addr & 0x6001, data);
 }
-
-/*-------------------------------------------------
-
- Bootleg Board by Super Game
-
- Games: Mortal Kombat III
-
- MMC3 clone.
-
- iNES: mapper 215
-
- In MESS: Preliminary support.
-
- FIXME: Set "booger" has moved to sglionk's mapper 114 implementation. We have
- three competing implementations left for mapper 215: 8237_device, gc6in1, and
- this commented out sgboog, plus unimplemented 8237a is a similar variant. None
- of them work for all the mapper 215 games (old sgboog games never worked!)
-
- -------------------------------------------------*/
-/*
-void nes_sgboog_device::prg_cb(int start, int bank)
-{
-    if (!(m_reg[0] & 0x80))  // if this is != 0 we should never even arrive here
-    {
-        if (m_reg[1] & 0x08)
-            bank = (bank & 0x1f) | 0x20;
-        else
-            bank = (bank & 0x0f) | (m_reg[1] & 0x10);
-
-        prg8_x(start, bank);
-    }
-}
-
-void nes_sgboog_device::chr_cb(int start, int bank, int source)
-{
-    if ((m_reg[1] & 0x04))
-        bank |= 0x100;
-    else
-        bank = (bank & 0x7f) | ((m_reg[1] & 0x10) << 3);
-
-    chr1_x(start, bank, source);
-}
-
-void nes_sgboog_device::set_prg(int prg_base, int prg_mask)
-{
-    if (m_reg[0] & 0x80)
-    {
-        prg16_89ab((m_reg[0] & 0xf0) | (m_reg[1] & 0x10));
-        prg16_cdef((m_reg[0] & 0xf0) | (m_reg[1] & 0x10));
-    }
-    else
-    {
-        // here standard MMC3 bankswitch
-        uint8_t prg_flip = (m_latch & 0x40) ? 2 : 0;
-
-        prg_cb(0, prg_base | (m_mmc_prg_bank[0 ^ prg_flip] & prg_mask));
-        prg_cb(1, prg_base | (m_mmc_prg_bank[1] & prg_mask));
-        prg_cb(2, prg_base | (m_mmc_prg_bank[2 ^ prg_flip] & prg_mask));
-        prg_cb(3, prg_base | (m_mmc_prg_bank[3] & prg_mask));
-    }
-}
-
-void nes_sgboog_device::write_l(offs_t offset, uint8_t data)
-{
-    LOG_MMC(("sgboog write_l, offset: %04x, data: %02x\n", offset, data));
-    offset += 0x100;
-
-    if (offset == 0x1000)
-    {
-        m_reg[0] = data;
-        set_prg(m_prg_base, m_prg_mask);
-    }
-    else if (offset == 0x1001)
-    {
-        m_reg[1] = data;
-        set_chr(m_chr_source, m_chr_base, m_chr_mask);
-    }
-    else if (offset == 0x1007)
-    {
-        m_latch = 0;
-        m_mode = data;
-        set_prg(m_prg_base, m_prg_mask);
-        set_chr(m_chr_source, m_chr_base, m_chr_mask);
-    }
-}
-
-void nes_sgboog_device::write_m(offs_t offset, uint8_t data)
-{
-    LOG_MMC(("sgboog write_m, offset: %04x, data: %02x\n", offset, data));
-
-    if (offset == 0x0000)
-    {
-        m_reg[0] = data;
-        set_prg(m_prg_base, m_prg_mask);
-    }
-    else if (offset == 0x0001)
-    {
-        m_reg[1] = data;
-        set_chr(m_chr_source, m_chr_base, m_chr_mask);
-    }
-    else if (offset == 0x0007)
-    {
-        m_latch = 0;
-        m_mode = data;
-        set_prg(m_prg_base, m_prg_mask);
-        set_chr(m_chr_source, m_chr_base, m_chr_mask);
-    }
-}
-
-void nes_sgboog_device::write_h(offs_t offset, uint8_t data)
-{
-    static const uint8_t conv_table[8] = {0,2,5,3,6,1,7,4};
-    LOG_MMC(("sgboog write_h, offset: %04x, data: %02x\n", offset, data));
-
-    if (m_mode)
-    {
-        switch (offset & 0x6001)
-        {
-            case 0x0000:
-                break;
-
-            case 0x0001:
-                if (m_reg[2] && ((m_reg[0] & 0x80) == 0 || (m_latch & 0x07) < 6)) // if we use the prg16 banks and cmd=6,7 DON'T enter!
-                {
-                    m_reg[2] = 0;
-                    txrom_write(0x0001, data);
-                }
-                break;
-
-            case 0x2000:
-                data = (data & 0xc0) | conv_table[data & 0x07];
-                m_reg[2] = 1;
-                txrom_write(0x0000, data);
-                break;
-
-            case 0x4000:
-                set_nt_mirroring(((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-                break;
-
-            case 0x4001:
-                txrom_write(0x6001, data);
-                break;
-
-            case 0x6001:
-                txrom_write(0x4000, data);
-                txrom_write(0x4001, data);
-                break;
-
-            default:
-                txrom_write(offset, data);
-                break;
-        }
-    }
-    else
-        txrom_write(offset, data);
-}
-*/
 
 /*-------------------------------------------------
 
@@ -1574,7 +1407,7 @@ void nes_txc_tw_device::write_l(offs_t offset, uint8_t data)
 	prg32((data >> 4) | data);
 }
 
-/* writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes) */
+// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes)
 void nes_txc_tw_device::prg_cb(int start, int bank)
 {
 	return;
@@ -1601,7 +1434,7 @@ void nes_kof97_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("kof97 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	/* Addresses 0x9000, 0xa000, 0xd000 & 0xf000 behaves differently than MMC3 */
+	// Addresses 0x9000, 0xa000, 0xd000 & 0xf000 behaves differently than MMC3
 	if (offset == 0x1000)
 		txrom_write(0x0001, kof97_unscramble(data));
 	else if (offset == 0x2000)
@@ -1610,7 +1443,7 @@ void nes_kof97_device::write_h(offs_t offset, uint8_t data)
 		txrom_write(0x4001, kof97_unscramble(data));
 	else if (offset == 0x7000)
 		txrom_write(0x6001, kof97_unscramble(data));
-	/* Other addresses behaves like MMC3, up to unscrambling data */
+	// Other addresses behaves like MMC3, up to unscrambling data
 	else
 		txrom_write(offset, kof97_unscramble(data));
 }
@@ -1846,7 +1679,7 @@ uint8_t nes_gouder_device::read_l(offs_t offset)
 	return 0x00;
 }
 
-/* writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes) */
+// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes)
 void nes_gouder_device::prg_cb(int start, int bank)
 {
 	return;
@@ -2267,7 +2100,7 @@ void nes_bmc_sbig7_device::write_h(offs_t offset, uint8_t data)
 
 	switch (offset & 0x6001)
 	{
-		case 0x2001: /* $a001 - Select 128K ROM/VROM base (0..5) or last 256K ROM/VRAM base (6) */
+		case 0x2001: // $a001 - Select 128K ROM/VROM base (0..5) or last 256K ROM/VRAM base (6)
 			page = (data & 0x07);
 			if (page > 6)
 				page = 6;

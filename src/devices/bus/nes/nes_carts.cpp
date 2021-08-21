@@ -336,7 +336,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("family4646",       NES_FAMILY4646);
 	device.option_add_internal("pikay2k",          NES_PIKAY2K); // mapper 254
 	device.option_add_internal("8237",             NES_8237);
-	device.option_add_internal("8237a",            NES_NROM);    // UNSUPPORTED
+	device.option_add_internal("8237a",            NES_8237A);
 	device.option_add_internal("sg_lionk",         NES_SG_LIONK);
 	device.option_add_internal("sg_boog",          NES_SG_BOOG);
 	device.option_add_internal("kasing",           NES_KASING);
