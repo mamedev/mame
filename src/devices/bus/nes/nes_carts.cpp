@@ -423,6 +423,9 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("fk23c",            NES_FK23C);
 	device.option_add_internal("fk23ca",           NES_FK23CA);
 	device.option_add_internal("nt639",            NES_NT639);
+	device.option_add_internal("resettxrom0",      NES_RESETTXROM0);
+	device.option_add_internal("resettxrom1",      NES_RESETTXROM1);
+	device.option_add_internal("resettxrom2",      NES_RESETTXROM2);
 	device.option_add_internal("s24in1c03",        NES_S24IN1SC03);
 	device.option_add_internal("bmc_8in1",         NES_BMC_8IN1);
 	device.option_add_internal("bmc_15in1",        NES_BMC_15IN1);
