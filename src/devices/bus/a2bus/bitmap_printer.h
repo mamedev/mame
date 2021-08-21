@@ -69,10 +69,12 @@ private:
 	int m_paperwidth;
 	int m_paperheight;
 
-
+public:
 void setprintheadcolor(int headcolor, int bordcolor);
 void setprintheadsize(int xsize, int ysize, int bordersize);
 
+
+private:
 void drawprinthead(bitmap_rgb32 &bitmap, int x, int y);
 
 

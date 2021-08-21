@@ -96,7 +96,7 @@ private:
 
 	int m_xpos = PAPER_WIDTH / 2;  // middle of paper (paper width in pixels)
 	int m_ypos = 30;
-	s32 x_pixel_coord(s32 xpos) { return xpos ; }  // x position s
+	s32 x_pixel_coord(s32 xpos) { return xpos / 1; }  // x position
 	s32 y_pixel_coord(s32 ypos) { return ypos / 2; }  // y position given in half steps
 
 	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern, const char * name, int direction);
@@ -109,11 +109,14 @@ private:
 	int m_head_pb_last = 0;
 	u16 m_dotpattern;
 
+	int m_select_led;
 	int right_offset = 0;
 	int left_offset = 3;
+	int m_left_edge  = 0.25 * dpi;
+	int m_right_edge = 8.00 * dpi + m_left_edge - 1;
 
-
-	void darken_pixel(double headtemp, unsigned int& pixel);
+	void darken_pixel(double darkpct, unsigned int& pixel);
+	void update_head_pos();
 };
 
 DECLARE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device)

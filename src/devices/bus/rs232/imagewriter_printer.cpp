@@ -67,38 +67,28 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_maincpu->set_clk_out(m_count, FUNC(ttl74163_device::set_unscaled_clock_int));
 
 
-
 	[[maybe_unused]] i8155_device &io_head  (I8155(config, m_8155head,   1E6));   // for the moment, just give a 1mhz setting
-	io_head.in_pa_callback().set(FUNC(apple_imagewriter_printer_device::head_pa_r));
-	io_head.in_pb_callback().set(FUNC(apple_imagewriter_printer_device::head_pb_r));
-	io_head.in_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_r));
-	io_head.out_pa_callback().set(FUNC(apple_imagewriter_printer_device::head_pa_w));
-	io_head.out_pb_callback().set(FUNC(apple_imagewriter_printer_device::head_pb_w));
-	io_head.out_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_w));
-	io_head.out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
+	m_8155head->in_pa_callback().set(FUNC(apple_imagewriter_printer_device::head_pa_r));
+	m_8155head->in_pb_callback().set(FUNC(apple_imagewriter_printer_device::head_pb_r));
+	m_8155head->in_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_r));
+	m_8155head->out_pa_callback().set(FUNC(apple_imagewriter_printer_device::head_pa_w));
+	m_8155head->out_pb_callback().set(FUNC(apple_imagewriter_printer_device::head_pb_w));
+	m_8155head->out_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_w));
+	m_8155head->out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
 
 
 	[[maybe_unused]] i8155_device &io_switch(I8155(config, m_8155switch, 1E6));  // for the moment, just give a 1 mhz setting
-	io_switch.in_pa_callback().set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
-	io_switch.in_pb_callback().set(FUNC(apple_imagewriter_printer_device::switch_pb_r));
-	io_switch.in_pc_callback().set(FUNC(apple_imagewriter_printer_device::switch_pc_r));
-	io_switch.out_pa_callback().set(FUNC(apple_imagewriter_printer_device::switch_pa_w));
-	io_switch.out_pb_callback().set(FUNC(apple_imagewriter_printer_device::switch_pb_w));
-	io_switch.out_pc_callback().set(FUNC(apple_imagewriter_printer_device::switch_pc_w));
-	io_switch.out_to_callback().set(FUNC(apple_imagewriter_printer_device::switch_to));
+	m_8155switch->in_pa_callback().set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
+	m_8155switch->in_pb_callback().set(FUNC(apple_imagewriter_printer_device::switch_pb_r));
+	m_8155switch->in_pc_callback().set(FUNC(apple_imagewriter_printer_device::switch_pc_r));
+	m_8155switch->out_pa_callback().set(FUNC(apple_imagewriter_printer_device::switch_pa_w));
+	m_8155switch->out_pb_callback().set(FUNC(apple_imagewriter_printer_device::switch_pb_w));
+	m_8155switch->out_pc_callback().set(FUNC(apple_imagewriter_printer_device::switch_pc_w));
+	m_8155switch->out_to_callback().set(FUNC(apple_imagewriter_printer_device::switch_to));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart, 1E6);  // for the moment, just give 1mhz clock
 	m_uart->rxrdy_handler().set(FUNC(apple_imagewriter_printer_device::rxrdy_handler));
 
-/*
-    [[maybe_unused]] i8251_device &uart(I8251(config, m_uart, 0));
-    uart.rxrdy_handler().set(FUNC(apple_imagewriter_printer_device::rxrdy_handler));
-*/
-
-	// auto rxrdy_handler() { return m_rxrdy_handler.bind(); }
-
-
-	//[[maybe_unused]] bitmap_printer_device &bitmap_printer(BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT));
 
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT);
 
@@ -108,14 +98,6 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 
 	m_pf_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 	m_cr_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
-
-/*
-    [[maybe_unused]] stepper_device& pf_step(STEPPER(config, m_pf_stepper, (uint8_t) 0xa));
-    [[maybe_unused]] stepper_device& cr_step(STEPPER(config, m_cr_stepper, (uint8_t) 0xa));
-
-    pf_step.optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
-    cr_step.optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
-*/
 }
 
 
@@ -158,14 +140,13 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", apple_imagewriter_printer_device, update_serial)
 
 
-	PORT_START("INVERT1")
+	PORT_START("INVERT1")  // for testing / inverting various things without having to recompile
 	PORT_CONFNAME(0x1, 0x01, "Invert1")
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
 
-
 	PORT_START("INVERT2")
-	PORT_CONFNAME(0x1, 0x01, "Invert1")
+	PORT_CONFNAME(0x1, 0x01, "Invert2")
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
 
@@ -177,9 +158,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 
 	// Buttons on printer
 	PORT_START("SELECT")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select") PORT_CODE(KEYCODE_0_PAD) PORT_TOGGLE
-// PORT_START("ONLINE")
-// PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, online_sw, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select") PORT_CODE(KEYCODE_0_PAD) PORT_TOGGLE  // input toggles persist
 	PORT_START("FORMFEED")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_7_PAD)
 	PORT_START("LINEFEED")
@@ -263,6 +242,7 @@ ioport_constructor apple_imagewriter_printer_device::device_input_ports() const
 
 void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data)
 {
+	// connects to fault* on serial interface  pin 14
 	printf("MAINCPU OUT SOD FUNCTION VALUE = %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
 
@@ -340,17 +320,23 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 
 uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 {
+	m_select_led = !ioport("SELECT")->read();
 	u8 data = 0;
 	data =
-//          ((!(m_xpos < -5) ^ ioport("INVERT1")->read())  << 0) |  // m4 home detector
-			(!(m_xpos < 4)  << 0)            |  // m4 home detector
-			(ioport("PAPEREND")->read() << 1) |  // simulate a paper out error
-			(ioport("COVER")->read()    << 2) |  //
-			(!(x_pixel_coord(m_xpos) >  PAPER_WIDTH - 30) << 3) | // return switch
-			(!ioport("SELECT")->read()  << 4) |  //
-			(ioport("FORMFEED")->read() << 5) |  //
-			(ioport("LINEFEED")->read() << 6) |  //
-			(BIT(ioport("DIPSW2")->read(),3) << 7); // DIP 2-4
+//          ((!(m_xpos < -5) ^ ioport("INVERT1")->read()) << 0) | // m4 home detector
+//          (!(x_pixel_coord(m_xpos) < 4)                 << 0) | // m4 home detector
+			(!(x_pixel_coord(m_xpos) <= m_left_edge)   << 0) | // m4 home detector
+			(ioport("PAPEREND")->read()               << 1) | // simulate a paper out error
+			(ioport("COVER")->read()                  << 2) | //
+//          (!(x_pixel_coord(m_xpos) >  PAPER_WIDTH - 30) << 3) | // return switch
+			(!(x_pixel_coord(m_xpos) >  m_right_edge) << 3) | // return switch
+			(m_select_led                             << 4) | //
+//          (ioport("SELECT")->read()                 << 4) | //
+			(ioport("FORMFEED")->read()               << 5) | //
+			(ioport("LINEFEED")->read()               << 6) | //
+			(BIT(ioport("DIPSW2")->read(), 3)         << 7);  // DIP 2-4
+//  m_select_led = ioport("SELECT")->read();
+	m_bitmap_printer->setprintheadcolor( m_select_led ? 0x888888 : 0x00dd00, 0x000000 );
 	printf("8155 SWITCH PORT_A_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 
 	return data;
@@ -383,20 +369,17 @@ void apple_imagewriter_printer_device::switch_to(uint8_t data)
 }
 
 
-
-
-
 //-------------------------------------------------
 //    Update Printhead
 //-------------------------------------------------
-void apple_imagewriter_printer_device::darken_pixel(double headtemp, unsigned int& pixel)
+void apple_imagewriter_printer_device::darken_pixel(double darkpct, unsigned int& pixel)
 {
-	if (headtemp > 0.0)
+	if (darkpct > 0.0)
 	{
 		u8 intensity = (
 						ioport("DARKPIXEL")->read() & 0x1 ?
-							std::min(headtemp * 4, 1.0) :
-							headtemp
+							std::min(darkpct * 4, 1.0) :
+							darkpct
 						) * 15.0;
 		u32 pixelval = pixel;
 		u32 darkenval = intensity * 0x111111;
@@ -431,7 +414,6 @@ void apple_imagewriter_printer_device::update_printhead()
 
 	for (int i = 0; i < numdots; i++)
 	{
-
 		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
 		int ypixel = y_pixel_coord(m_ypos) + i; // rightside up for imagewriter
 
@@ -443,8 +425,6 @@ void apple_imagewriter_printer_device::update_printhead()
 		}
 	}
 }
-
-
 
 
 //-------------------------------------------------
@@ -467,6 +447,12 @@ int apple_imagewriter_printer_device::update_stepper_delta(stepper_device * step
 //-------------------------------------------------
 //    Update Paper Feed Stepper
 //-------------------------------------------------
+
+void apple_imagewriter_printer_device::update_head_pos()
+{
+	m_bitmap_printer->setheadpos( std::max(0, x_pixel_coord(m_xpos)), y_pixel_coord(m_ypos));  // keep printhead visible
+}
+
 
 void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 {
@@ -517,8 +503,7 @@ void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 		m_ypos += delta;
 		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
 	}
-
-	m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
+	update_head_pos();
 }
 
 //-------------------------------------------------
@@ -549,8 +534,7 @@ void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
 
 		}
 	}
-
-	m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
+	update_head_pos();
 }
 
 
