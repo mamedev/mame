@@ -195,7 +195,6 @@ void dsp32c_device::device_start()
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_r[15]).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_r[21]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_iotemp).callimport().callexport().formatstr("%6s").noshow();
 	state_add(DSP32_PC,        "PC",        m_r[15]).mask(0xffffff);
 	for (int regnum = 0; regnum <= 14; regnum++)

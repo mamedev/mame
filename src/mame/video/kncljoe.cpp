@@ -2,7 +2,7 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-Knuckle Joe - (c) 1985 Taito Corporation
+  Knuckle Joe
 
 ***************************************************************************/
 
@@ -120,7 +120,6 @@ void kncljoe_state::kncljoe_videoram_w(offs_t offset, uint8_t data)
 
 void kncljoe_state::kncljoe_control_w(uint8_t data)
 {
-	int i;
 	/*
 	        0x01    screen flip
 	        0x02    coin counter#1
@@ -137,27 +136,19 @@ void kncljoe_state::kncljoe_control_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
-	i = (data & 0x10) >> 4;
-	if (m_tile_bank != i)
+	if (m_tile_bank != BIT(data, 4))
 	{
-		m_tile_bank = i;
+		m_tile_bank = BIT(data, 4);
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	i = (data & 0x04) >> 2;
-	if (m_sprite_bank != i)
-	{
-		m_sprite_bank = i;
-		memset(memregion("maincpu")->base() + 0xf100, 0, 0x180);
-	}
+	m_sprite_bank = BIT(data, 2);
 }
 
 void kncljoe_state::kncljoe_scroll_w(offs_t offset, uint8_t data)
 {
-	int scrollx;
-
 	m_scrollregs[offset] = data;
-	scrollx = m_scrollregs[0] | m_scrollregs[1] << 8;
+	int scrollx = m_scrollregs[0] | m_scrollregs[1] << 8;
 	m_bg_tilemap->set_scrollx(0, scrollx);
 	m_bg_tilemap->set_scrollx(1, scrollx);
 	m_bg_tilemap->set_scrollx(2, scrollx);
@@ -174,48 +165,33 @@ void kncljoe_state::kncljoe_scroll_w(offs_t offset, uint8_t data)
 
 void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_spriteram;
-	rectangle clip = cliprect;
 	gfx_element *gfx = m_gfxdecode->gfx(1 + m_sprite_bank);
-	int i, j;
-	static const int pribase[4]={0x0180, 0x0080, 0x0100, 0x0000};
-	const rectangle &visarea = m_screen->visible_area();
 
-	/* score covers sprites */
-	if (m_flipscreen)
+	for (int i = 0; i < 4; i++)
 	{
-		if (clip.max_y > visarea.max_y - 64)
-			clip.max_y = visarea.max_y - 64;
-	}
-	else
-	{
-		if (clip.min_y < visarea.min_y + 64)
-			clip.min_y = visarea.min_y + 64;
-	}
+		// clip vertical strip for each layer
+		rectangle clip = cliprect;
+		clip.min_y = m_flipscreen ? (192 - i * 64) : (i * 64 + 1);
+		clip.max_y = clip.min_y + 64;
+		clip &= cliprect;
 
-	for (i = 0; i < 4; i++)
-		for (j = 0x7c; j >= 0; j -= 4)
+		for (int j = 0x7c; j >= 0; j -= 4)
 		{
-			int offs = pribase[i] + j;
-			int sy = spriteram[offs];
-			int sx = spriteram[offs + 3];
-			int code = spriteram[offs + 2];
-			int attr = spriteram[offs + 1];
+			int offs = bitswap<2>(~i, 0, 1) << 7 | j;
+			int sy = m_spriteram[offs] + 1;
+			int sx = m_spriteram[offs + 3];
+			int attr = m_spriteram[offs + 1];
+			int code = m_spriteram[offs + 2] | ((attr & 0x10) << 5) | ((attr & 0x20) << 3);
 			int flipx = attr & 0x40;
 			int flipy = !(attr & 0x80);
 			int color = attr & 0x0f;
-
-			if (attr & 0x10)
-				code += 512;
-			if (attr & 0x20)
-				code += 256;
 
 			if (m_flipscreen)
 			{
 				flipx = !flipx;
 				flipy = !flipy;
 				sx = 240 - sx;
-				sy = 240 - sy;
+				sy = 241 - sy;
 			}
 
 			if (sx >= 256-8)
@@ -227,6 +203,7 @@ void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipx,flipy,
 				sx,sy,0);
 		}
+	}
 }
 
 uint32_t kncljoe_state::screen_update_kncljoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

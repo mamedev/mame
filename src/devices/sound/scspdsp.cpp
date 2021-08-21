@@ -224,9 +224,9 @@ void SCSPDSP::Step()
 		//Shifter
 		s32 SHIFTED = 0;    //24 bit
 		if (SHIFT == 0)
-			SHIFTED = std::max<s32>(std::min<s32>(ACC, 0x007FFFFF), -0x00800000);
+			SHIFTED = std::clamp<s32>(ACC, -0x00800000, 0x007FFFFF);
 		else if (SHIFT == 1)
-			SHIFTED = std::max<s32>(std::min<s32>(ACC * 2, 0x007FFFFF), -0x00800000);
+			SHIFTED = std::clamp<s32>(ACC * 2, -0x00800000, 0x007FFFFF);
 		else if (SHIFT == 2)
 		{
 			SHIFTED = ACC * 2;

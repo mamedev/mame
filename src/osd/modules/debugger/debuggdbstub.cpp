@@ -647,7 +647,8 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		if ( it == gdb_register_maps.end() )
 			fatalerror("gdbstub: cpuname %s not found in gdb stub descriptions\n", cpuname);
 
-		m_state = &m_maincpu->state();
+		m_maincpu->interface(m_state);
+		assert(m_state != nullptr);
 		m_memory = &m_maincpu->memory();
 		m_address_space = &m_memory->space(AS_PROGRAM);
 		m_debugger_cpu = &m_machine->debugger().cpu();

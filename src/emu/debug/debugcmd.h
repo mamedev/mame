@@ -143,7 +143,6 @@ private:
 	void execute_rpclear(int ref, const std::vector<std::string> &params);
 	void execute_rpdisenable(int ref, const std::vector<std::string> &params);
 	void execute_rplist(int ref, const std::vector<std::string> &params);
-	void execute_hotspot(int ref, const std::vector<std::string> &params);
 	void execute_statesave(int ref, const std::vector<std::string> &params);
 	void execute_stateload(int ref, const std::vector<std::string> &params);
 	void execute_rewind(int ref, const std::vector<std::string> &params);

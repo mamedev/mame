@@ -24,6 +24,15 @@ public:
 		}
 	}
 
+	static inline void copyline_palette16_to_bgra(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			rgb_t srcpixel = palette[*src++];
+			*dst++ = 0xff000000 | (srcpixel.r() << 16) | (srcpixel.g() << 8) | srcpixel.b();
+		}
+	}
+
 	static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
 	{
 		int x;
@@ -49,6 +58,32 @@ public:
 		}
 	}
 
+	static inline void copyline_rgb32_to_bgra(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
+	{
+		int x;
+
+		// palette (really RGB map) case
+		if (palette != nullptr)
+		{
+			for (x = 0; x < width; x++)
+			{
+				rgb_t srcpix = *src++;
+				uint32_t val = 0xff000000 | palette[0x200 + srcpix.b()] | palette[0x100 + srcpix.g()] | palette[srcpix.r()];
+				*dst++ = (val & 0xff00ff00) | ((val & 0x000000ff) << 16) | ((val & 0x00ff0000) >> 16);
+			}
+		}
+
+		// direct case
+		else
+		{
+			for (x = 0; x < width; x++)
+			{
+				rgb_t srcpix = *src++;
+				*dst++ = 0xff000000 | (srcpix.r() << 16) | (srcpix.g() << 8) | srcpix.b();
+			}
+		}
+	}
+
 	static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
 	{
 		int x;
@@ -69,6 +104,31 @@ public:
 			{
 				rgb_t srcpix = *src++;
 				*dst++ = (srcpix.a() << 24) | (srcpix.b() << 16) | (srcpix.g() << 8) | srcpix.r();
+			}
+		}
+	}
+
+	static inline void copyline_argb32_to_bgra(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
+	{
+		int x;
+		// palette (really RGB map) case
+		if (palette != nullptr)
+		{
+			for (x = 0; x < width; x++)
+			{
+				rgb_t srcpix = *src++;
+				uint32_t val = (srcpix & 0xff000000) | palette[0x200 + srcpix.b()] | palette[0x100 + srcpix.g()] | palette[srcpix.r()];
+				*dst++ = (val & 0xff00ff00) | ((val & 0x000000ff) << 16) | ((val & 0x00ff0000) >> 16);
+			}
+		}
+
+		// direct case
+		else
+		{
+			for (x = 0; x < width; x++)
+			{
+				rgb_t srcpix = *src++;
+				*dst++ = (srcpix.a() << 24) | (srcpix.r() << 16) | (srcpix.g() << 8) | srcpix.b();
 			}
 		}
 	}
@@ -116,14 +176,12 @@ public:
 
 	static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xprescale)
 	{
-		int x;
-
 		assert(width % 2 == 0);
 
 		// palette (really RGB map) case
 		if (palette != nullptr)
 		{
-			for (x = 0; x < width / 2; x++)
+			for (int x = 0; x < width / 2; x++)
 			{
 				uint16_t srcpix0 = *src++;
 				uint16_t srcpix1 = *src++;
@@ -139,7 +197,7 @@ public:
 		// direct case
 		else
 		{
-			for (x = 0; x < width; x += 2)
+			for (int x = 0; x < width; x += 2)
 			{
 				uint16_t srcpix0 = *src++;
 				uint16_t srcpix1 = *src++;
@@ -149,6 +207,55 @@ public:
 					*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 				for (int x2 = 0; x2 < xprescale; x2++)
 					*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+			}
+		}
+	}
+
+	static inline void copyline_yuy16_to_bgra(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xprescale)
+	{
+		assert(width % 2 == 0);
+
+		// palette (really RGB map) case
+		if (palette != nullptr)
+		{
+			for (int x = 0; x < width / 2; x++)
+			{
+				uint16_t srcpix0 = *src++;
+				uint16_t srcpix1 = *src++;
+				uint8_t cb = srcpix0 & 0xff;
+				uint8_t cr = srcpix1 & 0xff;
+				for (int x2 = 0; x2 < xprescale; x2++)
+				{
+					uint32_t val = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+					*dst++ = (val & 0xff00ff00) | ((val & 0x000000ff) << 16) | ((val & 0x00ff0000) >> 16);
+				}
+				for (int x2 = 0; x2 < xprescale; x2++)
+				{
+					uint32_t val = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+					*dst++ = (val & 0xff00ff00) | ((val & 0x000000ff) << 16) | ((val & 0x00ff0000) >> 16);
+				}
+			}
+		}
+
+		// direct case
+		else
+		{
+			for (int x = 0; x < width; x += 2)
+			{
+				uint16_t srcpix0 = *src++;
+				uint16_t srcpix1 = *src++;
+				uint8_t cb = srcpix0 & 0xff;
+				uint8_t cr = srcpix1 & 0xff;
+				for (int x2 = 0; x2 < xprescale; x2++)
+				{
+					uint32_t val = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+					*dst++ = (val & 0xff00ff00) | ((val & 0x000000ff) << 16) | ((val & 0x00ff0000) >> 16);
+				}
+				for (int x2 = 0; x2 < xprescale; x2++)
+				{
+					uint32_t val = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+					*dst++ = (val & 0xff00ff00) | ((val & 0x000000ff) << 16) | ((val & 0x00ff0000) >> 16);
+				}
 			}
 		}
 	}

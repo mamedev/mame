@@ -34,6 +34,13 @@ std::unique_ptr<util::disasm_interface> arc_cpu_device::create_disassembler()
 
 /*****************************************************************************/
 
+device_memory_interface::space_config_vector arc_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 /*****************************************************************************/
 
 void arc_cpu_device::unimplemented_opcode(uint16_t op)

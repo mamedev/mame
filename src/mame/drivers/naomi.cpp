@@ -585,7 +585,7 @@ Marvel Vs. Capcom 2 New Age of Heroes (Export, Rev A)       841-0007C-02 23085A 
 Marvel Vs. Capcom 2 New Age of Heroes (Korea, Rev A)        841-0007C-03 23085A  14 (64Mb)*  present  317-5058-COM  *(+2x 32Mb) have factory wire-mod connecting IC13S serial EEPROM CLK pin to IC11 ROM /OE pin
 MushiKing The King of Beetles (2K3 2ND Ver. 1.003-, World)  840-0150C    24217    6 (64Mb)   present  317-0394-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 MushiKing The King of Beetles (2K3 2ND Ver. 1.002-, World)  840-0150C    24217    6 (64Mb)   present  317-0394-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
-MushiKing The King of Beetles (2K3 2ND Ver. 1.000-, Korea)  840-0155C    none     6 (64Mb)   present  317-0???-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
+MushiKing The King of Beetles (2K3 2ND Ver. 1.000-, Korea)  840-0155C    24265    6 (64Mb)   present  317-0394-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 Quiz Ah Megamisama                                          840-0030C    23227   16 (64Mb)   present  317-0280-JPN
 Shootout Pool                                               840-0098C    23844    4 (64Mb)   present  317-0336-COM  requires regular 837-13551 and 837-13938 rotary JVS boards
 /Shootout Pool Prize (Export) /
