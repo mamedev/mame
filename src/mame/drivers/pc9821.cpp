@@ -45,21 +45,25 @@
 #include "emu.h"
 #include "includes/pc9821.h"
 
-UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pc9821_hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pegc_display_pixels )
 {
-	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
-		uint8_t *ext_gvram = (uint8_t *)m_ext_gvram.target();
-		for(int xi=0;xi<16;xi++)
+		// PEGC mode is linear VRAM picked from a specific VRAM buffer.
+		// It still latches addresses from μPD7220, and applies some shuffling around.
+		// Is the DAC really merging two pixels not unlike VGA correlated Mode 13h?
+		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
+		
+		for(int xi=0;xi<8;xi+=2)
 		{
-			int res_x = x + xi;
+			int res_x = (x >> 1) + xi;
 			int res_y = y;
 
-			uint8_t pen = ext_gvram[(address)*16+xi+(m_vram_disp*0x40000)];
+			u16 pen = ext_gvram[(address << 2) + (xi >> 1) + (m_vram_disp*0x20000)];
 
-			bitmap.pix(res_y, res_x) = palette[pen + 0x20];
+			bitmap.pix(res_y, res_x) = palette[(pen & 0xff) + 0x20];
+			bitmap.pix(res_y, res_x+1) = palette[(pen >> 8) + 0x20];
 		}
 	}
 	else
@@ -659,7 +663,7 @@ void pc9821_state::pc9821(machine_config &config)
 
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
 	
-	m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pc9821_hgdc_display_pixels));
+	m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
 }
 
 void pc9821_mate_a_state::pc9821as(machine_config &config)

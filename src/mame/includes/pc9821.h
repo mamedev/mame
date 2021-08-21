@@ -47,8 +47,6 @@ private:
 
 	uint8_t m_pc9821_window_bank;
 	uint8_t m_ext2_ff;
-
-	uint16_t m_pc9821_256vram_bank;
 	
 	struct {
 		uint8_t pal_entry;
@@ -58,7 +56,7 @@ private:
 	
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_hgdc_display_pixels );
+	UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
 };
 
 // MATE A
