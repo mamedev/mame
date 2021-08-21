@@ -7,18 +7,21 @@
     MAME Compressed Hunks of Data file format
 
 ***************************************************************************/
-
-#ifndef MAME_UTIL_CHD_H
-#define MAME_UTIL_CHD_H
+#ifndef MAME_LIB_UTIL_CHD_H
+#define MAME_LIB_UTIL_CHD_H
 
 #pragma once
 
-#include "osdcore.h"
-#include <string>
+#include "chdcodec.h"
 #include "corefile.h"
 #include "hashing.h"
-#include "chdcodec.h"
+#include "ioprocs.h"
+
+#include "osdcore.h"
+
 #include <atomic>
+#include <string>
+
 
 /***************************************************************************
 
@@ -404,36 +407,36 @@ private:
 	bool                    m_allow_writes;     // permit writes to this CHD?
 
 	// core parameters from the header
-	uint32_t                  m_version;          // version of the header
-	uint64_t                  m_logicalbytes;     // logical size of the raw CHD data in bytes
-	uint64_t                  m_mapoffset;        // offset of map
-	uint64_t                  m_metaoffset;       // offset to first metadata bit
-	uint32_t                  m_hunkbytes;        // size of each raw hunk in bytes
-	uint32_t                  m_hunkcount;        // number of hunks represented
-	uint32_t                  m_unitbytes;        // size of each unit in bytes
-	uint64_t                  m_unitcount;        // number of units represented
+	uint32_t                m_version;          // version of the header
+	uint64_t                m_logicalbytes;     // logical size of the raw CHD data in bytes
+	uint64_t                m_mapoffset;        // offset of map
+	uint64_t                m_metaoffset;       // offset to first metadata bit
+	uint32_t                m_hunkbytes;        // size of each raw hunk in bytes
+	uint32_t                m_hunkcount;        // number of hunks represented
+	uint32_t                m_unitbytes;        // size of each unit in bytes
+	uint64_t                m_unitcount;        // number of units represented
 	chd_codec_type          m_compression[4];   // array of compression types used
 	chd_file *              m_parent;           // pointer to parent file, or nullptr if none
 	bool                    m_parent_missing;   // are we missing our parent?
 
 	// key offsets within the header
-	uint64_t                  m_mapoffset_offset; // offset of map offset field
-	uint64_t                  m_metaoffset_offset;// offset of metaoffset field
-	uint64_t                  m_sha1_offset;      // offset of SHA1 field
-	uint64_t                  m_rawsha1_offset;   // offset of raw SHA1 field
-	uint64_t                  m_parentsha1_offset;// offset of paren SHA1 field
+	uint64_t                m_mapoffset_offset; // offset of map offset field
+	uint64_t                m_metaoffset_offset;// offset of metaoffset field
+	uint64_t                m_sha1_offset;      // offset of SHA1 field
+	uint64_t                m_rawsha1_offset;   // offset of raw SHA1 field
+	uint64_t                m_parentsha1_offset;// offset of paren SHA1 field
 
 	// map information
-	uint32_t                  m_mapentrybytes;    // length of each entry in a map
-	std::vector<uint8_t>          m_rawmap;           // raw map data
+	uint32_t                m_mapentrybytes;    // length of each entry in a map
+	std::vector<uint8_t>    m_rawmap;           // raw map data
 
 	// compression management
-	chd_decompressor *      m_decompressor[4];  // array of decompression codecs
-	std::vector<uint8_t>          m_compressed;       // temporary buffer for compressed data
+	chd_decompressor::ptr   m_decompressor[4];  // array of decompression codecs
+	std::vector<uint8_t>    m_compressed;       // temporary buffer for compressed data
 
 	// caching
-	std::vector<uint8_t>          m_cache;            // single-hunk cache for partial reads/writes
-	uint32_t                  m_cachehunk;        // which hunk is in the cache?
+	std::vector<uint8_t>    m_cache;            // single-hunk cache for partial reads/writes
+	uint32_t                m_cachehunk;        // which hunk is in the cache?
 };
 
 
@@ -577,4 +580,4 @@ private:
 	uint32_t                  m_write_hunk;       // next hunk to write
 };
 
-#endif // MAME_UTIL_CHD_H
+#endif // MAME_LIB_UTIL_CHD_H

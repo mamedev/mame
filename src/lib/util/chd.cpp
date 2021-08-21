@@ -288,11 +288,10 @@ inline uint8_t chd_file::bits_for_value(uint64_t value)
  */
 
 chd_file::chd_file()
-	: m_file(nullptr),
-		m_owns_file(false)
+	: m_file(nullptr)
+	, m_owns_file(false)
 {
 	// reset state
-	memset(m_decompressor, 0, sizeof(m_decompressor));
 	close();
 }
 
@@ -836,10 +835,7 @@ void chd_file::close()
 
 	// reset compression management
 	for (auto & elem : m_decompressor)
-	{
-		delete elem;
-		elem = nullptr;
-	}
+		elem.reset();
 	m_compressed.clear();
 
 	// reset caching

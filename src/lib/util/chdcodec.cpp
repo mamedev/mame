@@ -8,24 +8,30 @@
 
 ***************************************************************************/
 
-#include <cassert>
+#include "chdcodec.h"
 
-#include "chd.h"
-#include "hashing.h"
 #include "avhuff.h"
-#include "flac.h"
 #include "cdrom.h"
-#include <zlib.h>
-#include "lzma/C/LzmaEnc.h"
+#include "chd.h"
+#include "flac.h"
+#include "hashing.h"
+
 #include "lzma/C/LzmaDec.h"
+#include "lzma/C/LzmaEnc.h"
+
+#include <zlib.h>
+
+#include <cassert>
 #include <new>
 
+
+namespace {
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static const uint8_t s_cd_sync_header[12] = { 0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00 };
+constexpr uint8_t f_cd_sync_header[12] = { 0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00 };
 
 
 
@@ -35,7 +41,7 @@ static const uint8_t s_cd_sync_header[12] = { 0x00,0xff,0xff,0xff,0xff,0xff,0xff
 
 // ======================> chd_zlib_allocator
 
-// allocation helper clas for zlib
+// allocation helper class for zlib
 class chd_zlib_allocator
 {
 public:
@@ -51,7 +57,8 @@ private:
 	static voidpf fast_alloc(voidpf opaque, uInt items, uInt size);
 	static void fast_free(voidpf opaque, voidpf address);
 
-	static const int MAX_ZLIB_ALLOCS = 64;
+	static constexpr int MAX_ZLIB_ALLOCS = 64;
+
 	uint32_t *                m_allocptr[MAX_ZLIB_ALLOCS];
 };
 
@@ -111,7 +118,7 @@ private:
 	static void *fast_alloc(void *p, size_t size);
 	static void fast_free(void *p, void *address);
 
-	static const int MAX_LZMA_ALLOCS = 64;
+	static constexpr int MAX_LZMA_ALLOCS = 64;
 	uint32_t *                m_allocptr[MAX_LZMA_ALLOCS];
 };
 
@@ -287,7 +294,7 @@ private:
 
 // ======================> chd_cd_compressor
 
-template<class _BaseCompressor, class _SubcodeCompressor>
+template<class BaseCompressor, class SubcodeCompressor>
 class chd_cd_compressor : public chd_compressor
 {
 public:
@@ -323,10 +330,10 @@ public:
 
 			// clear out ECC data if we can
 			uint8_t *sector = &m_buffer[framenum * CD_MAX_SECTOR_DATA];
-			if (memcmp(sector, s_cd_sync_header, sizeof(s_cd_sync_header)) == 0 && ecc_verify(sector))
+			if (memcmp(sector, f_cd_sync_header, sizeof(f_cd_sync_header)) == 0 && ecc_verify(sector))
 			{
 				dest[framenum / 8] |= 1 << (framenum % 8);
-				memset(sector, 0, sizeof(s_cd_sync_header));
+				memset(sector, 0, sizeof(f_cd_sync_header));
 				ecc_clear(sector);
 			}
 		}
@@ -348,15 +355,15 @@ public:
 
 private:
 	// internal state
-	_BaseCompressor     m_base_compressor;
-	_SubcodeCompressor  m_subcode_compressor;
+	BaseCompressor     m_base_compressor;
+	SubcodeCompressor  m_subcode_compressor;
 	std::vector<uint8_t>      m_buffer;
 };
 
 
 // ======================> chd_cd_decompressor
 
-template<class _BaseDecompressor, class _SubcodeDecompressor>
+template<class BaseDecompressor, class SubcodeDecompressor>
 class chd_cd_decompressor : public chd_decompressor
 {
 public:
@@ -400,7 +407,7 @@ public:
 			uint8_t *sector = &dest[framenum * CD_FRAME_SIZE];
 			if ((src[framenum / 8] & (1 << (framenum % 8))) != 0)
 			{
-				memcpy(sector, s_cd_sync_header, sizeof(s_cd_sync_header));
+				memcpy(sector, f_cd_sync_header, sizeof(f_cd_sync_header));
 				ecc_generate(sector);
 			}
 		}
@@ -408,8 +415,8 @@ public:
 
 private:
 	// internal state
-	_BaseDecompressor   m_base_decompressor;
-	_SubcodeDecompressor m_subcode_decompressor;
+	BaseDecompressor   m_base_decompressor;
+	SubcodeDecompressor m_subcode_decompressor;
 	std::vector<uint8_t>      m_buffer;
 };
 
@@ -460,23 +467,63 @@ private:
 //  CODEC LIST
 //**************************************************************************
 
+// an entry in the list
+struct codec_entry
+{
+	chd_codec_type         m_type;
+	bool                   m_lossy;
+	const char *           m_name;
+	chd_compressor::ptr    (*m_construct_compressor)(chd_file &, uint32_t, bool);
+	chd_decompressor::ptr  (*m_construct_decompressor)(chd_file &, uint32_t, bool);
+
+	template <class CompressorClass>
+	static chd_compressor::ptr construct_compressor(chd_file &chd, uint32_t hunkbytes, bool lossy)
+	{
+		return std::make_unique<CompressorClass>(chd, hunkbytes, lossy);
+	}
+
+	template <class DecompressorClass>
+	static chd_decompressor::ptr construct_decompressor(chd_file &chd, uint32_t hunkbytes, bool lossy)
+	{
+		return std::make_unique<DecompressorClass>(chd, hunkbytes, lossy);
+	}
+};
+
+
 // static list of available known codecs
-const chd_codec_list::codec_entry chd_codec_list::s_codec_list[] =
+const codec_entry f_codec_list[] =
 {
 	// general codecs
-	{ CHD_CODEC_ZLIB,       false,  "Deflate",              &chd_codec_list::construct_compressor<chd_zlib_compressor>,     &chd_codec_list::construct_decompressor<chd_zlib_decompressor> },
-	{ CHD_CODEC_LZMA,       false,  "LZMA",                 &chd_codec_list::construct_compressor<chd_lzma_compressor>,     &chd_codec_list::construct_decompressor<chd_lzma_decompressor> },
-	{ CHD_CODEC_HUFFMAN,    false,  "Huffman",              &chd_codec_list::construct_compressor<chd_huffman_compressor>,  &chd_codec_list::construct_decompressor<chd_huffman_decompressor> },
-	{ CHD_CODEC_FLAC,       false,  "FLAC",                 &chd_codec_list::construct_compressor<chd_flac_compressor>,     &chd_codec_list::construct_decompressor<chd_flac_decompressor> },
+	{ CHD_CODEC_ZLIB,       false,  "Deflate",              &codec_entry::construct_compressor<chd_zlib_compressor>,     &codec_entry::construct_decompressor<chd_zlib_decompressor> },
+	{ CHD_CODEC_LZMA,       false,  "LZMA",                 &codec_entry::construct_compressor<chd_lzma_compressor>,     &codec_entry::construct_decompressor<chd_lzma_decompressor> },
+	{ CHD_CODEC_HUFFMAN,    false,  "Huffman",              &codec_entry::construct_compressor<chd_huffman_compressor>,  &codec_entry::construct_decompressor<chd_huffman_decompressor> },
+	{ CHD_CODEC_FLAC,       false,  "FLAC",                 &codec_entry::construct_compressor<chd_flac_compressor>,     &codec_entry::construct_decompressor<chd_flac_decompressor> },
 
 	// general codecs with CD frontend
-	{ CHD_CODEC_CD_ZLIB,    false,  "CD Deflate",           &chd_codec_list::construct_compressor<chd_cd_compressor<chd_zlib_compressor, chd_zlib_compressor> >,        &chd_codec_list::construct_decompressor<chd_cd_decompressor<chd_zlib_decompressor, chd_zlib_decompressor> > },
-	{ CHD_CODEC_CD_LZMA,    false,  "CD LZMA",              &chd_codec_list::construct_compressor<chd_cd_compressor<chd_lzma_compressor, chd_zlib_compressor> >,        &chd_codec_list::construct_decompressor<chd_cd_decompressor<chd_lzma_decompressor, chd_zlib_decompressor> > },
-	{ CHD_CODEC_CD_FLAC,    false,  "CD FLAC",              &chd_codec_list::construct_compressor<chd_cd_flac_compressor>,  &chd_codec_list::construct_decompressor<chd_cd_flac_decompressor> },
+	{ CHD_CODEC_CD_ZLIB,    false,  "CD Deflate",           &codec_entry::construct_compressor<chd_cd_compressor<chd_zlib_compressor, chd_zlib_compressor> >,        &codec_entry::construct_decompressor<chd_cd_decompressor<chd_zlib_decompressor, chd_zlib_decompressor> > },
+	{ CHD_CODEC_CD_LZMA,    false,  "CD LZMA",              &codec_entry::construct_compressor<chd_cd_compressor<chd_lzma_compressor, chd_zlib_compressor> >,        &codec_entry::construct_decompressor<chd_cd_decompressor<chd_lzma_decompressor, chd_zlib_decompressor> > },
+	{ CHD_CODEC_CD_FLAC,    false,  "CD FLAC",              &codec_entry::construct_compressor<chd_cd_flac_compressor>,                                              &codec_entry::construct_decompressor<chd_cd_flac_decompressor> },
 
 	// A/V codecs
-	{ CHD_CODEC_AVHUFF,     false,  "A/V Huffman",          &chd_codec_list::construct_compressor<chd_avhuff_compressor>,   &chd_codec_list::construct_decompressor<chd_avhuff_decompressor> },
+	{ CHD_CODEC_AVHUFF,     false,  "A/V Huffman",          &codec_entry::construct_compressor<chd_avhuff_compressor>,   &codec_entry::construct_decompressor<chd_avhuff_decompressor> },
 };
+
+
+//-------------------------------------------------
+//  find_in_list - create a new compressor
+//  instance of the given type
+//-------------------------------------------------
+
+const codec_entry *find_in_list(chd_codec_type type)
+{
+	// find in the list and construct the class
+	for (auto & elem : f_codec_list)
+		if (elem.m_type == type)
+			return &elem;
+	return nullptr;
+}
+
+} // anonymous namespace
 
 
 
@@ -556,11 +603,11 @@ chd_decompressor::chd_decompressor(chd_file &chd, uint32_t hunkbytes, bool lossy
 //  instance of the given type
 //-------------------------------------------------
 
-chd_compressor *chd_codec_list::new_compressor(chd_codec_type type, chd_file &chd)
+chd_compressor::ptr chd_codec_list::new_compressor(chd_codec_type type, chd_file &chd)
 {
 	// find in the list and construct the class
-	const codec_entry *entry = find_in_list(type);
-	return (entry == nullptr) ? nullptr : (*entry->m_construct_compressor)(chd, chd.hunk_bytes(), entry->m_lossy);
+	codec_entry const *const entry = find_in_list(type);
+	return entry ? (*entry->m_construct_compressor)(chd, chd.hunk_bytes(), entry->m_lossy) : nullptr;
 }
 
 
@@ -569,11 +616,23 @@ chd_compressor *chd_codec_list::new_compressor(chd_codec_type type, chd_file &ch
 //  instance of the given type
 //-------------------------------------------------
 
-chd_decompressor *chd_codec_list::new_decompressor(chd_codec_type type, chd_file &chd)
+chd_decompressor::ptr chd_codec_list::new_decompressor(chd_codec_type type, chd_file &chd)
 {
 	// find in the list and construct the class
 	const codec_entry *entry = find_in_list(type);
-	return (entry == nullptr) ? nullptr : (*entry->m_construct_decompressor)(chd, chd.hunk_bytes(), entry->m_lossy);
+	return entry ? (*entry->m_construct_decompressor)(chd, chd.hunk_bytes(), entry->m_lossy) : nullptr;
+}
+
+
+//-------------------------------------------------
+//  codec_exists - determine whether a codec type
+//  corresponds to a supported codec
+//-------------------------------------------------
+
+bool chd_codec_list::codec_exists(chd_codec_type type)
+{
+	// find in the list and construct the class
+	return bool(find_in_list(type));
 }
 
 
@@ -586,22 +645,7 @@ const char *chd_codec_list::codec_name(chd_codec_type type)
 {
 	// find in the list and construct the class
 	const codec_entry *entry = find_in_list(type);
-	return (entry == nullptr) ? nullptr : entry->m_name;
-}
-
-
-//-------------------------------------------------
-//  find_in_list - create a new compressor
-//  instance of the given type
-//-------------------------------------------------
-
-const chd_codec_list::codec_entry *chd_codec_list::find_in_list(chd_codec_type type)
-{
-	// find in the list and construct the class
-	for (auto & elem : s_codec_list)
-		if (elem.m_type == type)
-			return &elem;
-	return nullptr;
+	return entry ? entry->m_name : nullptr;
 }
 
 
@@ -615,24 +659,23 @@ const chd_codec_list::codec_entry *chd_codec_list::find_in_list(chd_codec_type t
 //-------------------------------------------------
 
 chd_compressor_group::chd_compressor_group(chd_file &chd, uint32_t compressor_list[4])
-	: m_hunkbytes(chd.hunk_bytes()),
-		m_compress_test(m_hunkbytes)
+	: m_hunkbytes(chd.hunk_bytes())
+	, m_compress_test(m_hunkbytes)
 #if CHDCODEC_VERIFY_COMPRESSION
-		,m_decompressed(m_hunkbytes)
+	, m_decompressed(m_hunkbytes)
 #endif
 {
 	// verify the compression types and initialize the codecs
 	for (int codecnum = 0; codecnum < std::size(m_compressor); codecnum++)
 	{
-		m_compressor[codecnum] = nullptr;
 		if (compressor_list[codecnum] != CHD_CODEC_NONE)
 		{
 			m_compressor[codecnum] = chd_codec_list::new_compressor(compressor_list[codecnum], chd);
-			if (m_compressor[codecnum] == nullptr)
+			if (!m_compressor[codecnum])
 				throw CHDERR_UNKNOWN_COMPRESSION;
 #if CHDCODEC_VERIFY_COMPRESSION
 			m_decompressor[codecnum] = chd_codec_list::new_decompressor(compressor_list[codecnum], chd);
-			if (m_decompressor[codecnum] == nullptr)
+			if (!m_decompressor[codecnum])
 				throw CHDERR_UNKNOWN_COMPRESSION;
 #endif
 		}
@@ -646,9 +689,7 @@ chd_compressor_group::chd_compressor_group(chd_file &chd, uint32_t compressor_li
 
 chd_compressor_group::~chd_compressor_group()
 {
-	// delete the codecs and the test buffer
-	for (auto & elem : m_compressor)
-		delete elem;
+	// codecs and test buffer deleted automatically
 }
 
 
@@ -664,7 +705,7 @@ int8_t chd_compressor_group::find_best_compressor(const uint8_t *src, uint8_t *c
 	complen = m_hunkbytes;
 	int8_t compression = -1;
 	for (int codecnum = 0; codecnum < std::size(m_compressor); codecnum++)
-		if (m_compressor[codecnum] != nullptr)
+		if (m_compressor[codecnum])
 		{
 			// attempt to compress, swallowing errors
 			try
@@ -702,7 +743,9 @@ printf("   codec%d=%d bytes            \n", codecnum, compbytes);
 					memcpy(compressed, &m_compress_test[0], compbytes);
 				}
 			}
-			catch (...) { }
+			catch (...)
+			{
+			}
 		}
 
 	// if the best is none, copy it over
