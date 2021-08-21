@@ -139,15 +139,14 @@ public:
 
 protected:
 	// construction/destruction
-	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u8 *reg_table, const u16 *addr_table);
+	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
 	bool m_mmc3_mode;
-	const u8 *m_reg_table;
-	const u16 *m_addr_table;
+	int m_board;
 };
 
 
