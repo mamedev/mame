@@ -51,11 +51,11 @@ private:
 	required_device<i8155_device> m_8155head;
 	required_device<i8155_device> m_8155switch;
 	required_device<ttl74163_device> m_count;
-	
+
 	required_device<bitmap_printer_device> m_bitmap_printer;
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
-	
+
 	required_ioport m_rs232_rxbaud;
 	required_ioport m_rs232_databits;
 	required_ioport m_rs232_parity;
@@ -66,7 +66,7 @@ private:
 	uint8_t head_pa_r(offs_t offset);
 	void head_pa_w(uint8_t data);
 	uint8_t head_pb_r(offs_t offset);
-//	void head_pb_w(offs_t offset, uint8_t data);    <<  not an offset, data  should be just data
+//  void head_pb_w(offs_t offset, uint8_t data);    <<  not an offset, data  should be just data
 	void head_pb_w(uint8_t data);
 	uint8_t head_pc_r(offs_t offset);
 	void head_pc_w(uint8_t data);
@@ -81,7 +81,7 @@ private:
 	void switch_to(uint8_t data);
 
 
-	void testing_timerout(uint8_t data) { 	printf("TESTING TIMEROUT data= %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());}
+	void testing_timerout(uint8_t data) {   printf("TESTING TIMEROUT data= %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());}
 
 	int xdirection = 0;
 	int newpageflag = 0;
@@ -93,25 +93,26 @@ private:
 	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int distfrombottom = 50;
-	
+
 	int m_xpos = PAPER_WIDTH / 2;  // middle of paper (paper width in pixels)
 	int m_ypos = 30;
-	s32 x_pixel_coord(s32 xpos) { return xpos / 1; }  // x position in half steps
-	s32 y_pixel_coord(s32 ypos) { return ypos / 1; }  // y position given in half steps
+	s32 x_pixel_coord(s32 xpos) { return xpos ; }  // x position s
+	s32 y_pixel_coord(s32 ypos) { return ypos / 2; }  // y position given in half steps
 
 	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern, const char * name, int direction);
 	void update_printhead();
 	void update_pf_stepper(uint8_t data);
 	void update_cr_stepper(uint8_t data);
-	
+
 	int m_ic17_flipflop = 0;
 	int m_head_to_last = 0;
+	int m_head_pb_last = 0;
 	u16 m_dotpattern;
 
 	int right_offset = 0;
 	int left_offset = 3;
 
-	
+
 	void darken_pixel(double headtemp, unsigned int& pixel);
 };
 

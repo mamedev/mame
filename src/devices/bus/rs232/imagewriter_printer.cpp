@@ -18,7 +18,7 @@
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
-
+#include <math.h>
 
 DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "apple imagewriter printer")
 
@@ -60,7 +60,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	cpu.set_addrmap(AS_IO,      &apple_imagewriter_printer_device::io_map);
 	m_maincpu->out_sod_func().set(FUNC(apple_imagewriter_printer_device::maincpu_out_sod_func));
 
-//	m_maincpu->set_clk_out(this, FUNC(apple_imagewriter_printer_device::testing_timerout));  //not how that works, just sets clock rate of device
+//  m_maincpu->set_clk_out(this, FUNC(apple_imagewriter_printer_device::testing_timerout));  //not how that works, just sets clock rate of device
 
 
 	TTL74163(config, m_count, 0);
@@ -76,8 +76,8 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	io_head.out_pb_callback().set(FUNC(apple_imagewriter_printer_device::head_pb_w));
 	io_head.out_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_w));
 	io_head.out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
-	
-	
+
+
 	[[maybe_unused]] i8155_device &io_switch(I8155(config, m_8155switch, 1E6));  // for the moment, just give a 1 mhz setting
 	io_switch.in_pa_callback().set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
 	io_switch.in_pb_callback().set(FUNC(apple_imagewriter_printer_device::switch_pb_r));
@@ -91,30 +91,30 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_uart->rxrdy_handler().set(FUNC(apple_imagewriter_printer_device::rxrdy_handler));
 
 /*
-	[[maybe_unused]] i8251_device &uart(I8251(config, m_uart, 0));
-	uart.rxrdy_handler().set(FUNC(apple_imagewriter_printer_device::rxrdy_handler));
+    [[maybe_unused]] i8251_device &uart(I8251(config, m_uart, 0));
+    uart.rxrdy_handler().set(FUNC(apple_imagewriter_printer_device::rxrdy_handler));
 */
-		
+
 	// auto rxrdy_handler() { return m_rxrdy_handler.bind(); }
 
-	
+
 	//[[maybe_unused]] bitmap_printer_device &bitmap_printer(BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT));
 
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT);
-	
-	
+
+
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
 
-	m_pf_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));	
-	m_cr_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));	
+	m_pf_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
+	m_cr_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 
 /*
-	[[maybe_unused]] stepper_device& pf_step(STEPPER(config, m_pf_stepper, (uint8_t) 0xa));
-	[[maybe_unused]] stepper_device& cr_step(STEPPER(config, m_cr_stepper, (uint8_t) 0xa));
+    [[maybe_unused]] stepper_device& pf_step(STEPPER(config, m_pf_stepper, (uint8_t) 0xa));
+    [[maybe_unused]] stepper_device& cr_step(STEPPER(config, m_cr_stepper, (uint8_t) 0xa));
 
-	pf_step.optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));	
-	cr_step.optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
+    pf_step.optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
+    cr_step.optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 */
 }
 
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 
 	// Buttons on printer
 	PORT_START("SELECT")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select") PORT_CODE(KEYCODE_0_PAD) PORT_TOGGLE
 // PORT_START("ONLINE")
 // PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, online_sw, 0)
 	PORT_START("FORMFEED")
@@ -192,64 +192,61 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Carrier Cover") PORT_CODE(KEYCODE_6_PAD)  // ACTIVE HIGH
 
 
-	// DIPSW1 
+	// DIPSW1
 	PORT_START("DIPSW1")
 
-	PORT_DIPNAME(0x01, 0x01, "Character spacing")
-	PORT_DIPLOCATION("DIP:1")
-	PORT_DIPSETTING(0x01, "12 cpi") /* default */
-	PORT_DIPSETTING(0x00, "10 cpi")
-
-	PORT_DIPNAME(0x02, 0x00, "Shape of zero")
-	PORT_DIPLOCATION("DIP:2")
-	PORT_DIPSETTING(0x02, "Slashed")
-	PORT_DIPSETTING(0x00, "Not slashed") /* default */
-
-	PORT_DIPNAME(0x0c, 0x08, "Page length")
-	PORT_DIPLOCATION("DIP:3,4")
-	PORT_DIPSETTING(0x00, "11 inches")
-	PORT_DIPSETTING(0x04, "12 inches")
-	PORT_DIPSETTING(0x08, "8.5 inches") /* default */
-	PORT_DIPSETTING(0x0c, "11.7 inches")
-
-	PORT_DIPNAME(0x10, 0x10, "Character table")
-	PORT_DIPLOCATION("DIP:5")
-	PORT_DIPSETTING(0x10, "Graphics") /* default */
-	PORT_DIPSETTING(0x00, "Italics")
-
-	PORT_DIPNAME(0xe0, 0xe0, "International characters and PC selection")
+	PORT_DIPNAME(0x07, 0x07, "International characters and PC selection")
 	PORT_DIPLOCATION("DIP:6,7,8")
-	PORT_DIPSETTING(0xe0, "United States") /* default */
-	PORT_DIPSETTING(0x60, "France")
-	PORT_DIPSETTING(0xa0, "Germany")
-	PORT_DIPSETTING(0x20, "United Kingdom")
-	PORT_DIPSETTING(0xc0, "Denmark")
-	PORT_DIPSETTING(0x40, "Sweden")
-	PORT_DIPSETTING(0x80, "Italy")
-	PORT_DIPSETTING(0x00, "Spain")
+	PORT_DIPSETTING(0x07, "American") // default
+	PORT_DIPSETTING(0x04, "British")
+	PORT_DIPSETTING(0x03, "German")
+	PORT_DIPSETTING(0x01, "French")
+	PORT_DIPSETTING(0x02, "Swedish")
+	PORT_DIPSETTING(0x06, "Italian")
+	PORT_DIPSETTING(0x00, "Spanish")
+	PORT_DIPSETTING(0x05, "American2")
+
+	PORT_DIPNAME(0x08, 0x08, "Page length")
+	PORT_DIPLOCATION("DIP:4")
+	PORT_DIPSETTING(0x08, "66 lines") // default
+	PORT_DIPSETTING(0x00, "72 lines")
+
+	PORT_DIPNAME(0x10, 0x00, "8th Data Bit")
+	PORT_DIPLOCATION("DIP:5")
+	PORT_DIPSETTING(0x10, "Use 8th Bit")
+	PORT_DIPSETTING(0x00, "Ignore 8th Bit") // default
+
+	PORT_DIPNAME(0x060, 0x60, "Character Set")
+	PORT_DIPLOCATION("DIP:6,7")
+	PORT_DIPSETTING(0x60, "Pica (10 cpi)") // default
+	PORT_DIPSETTING(0x40, "Elite (12 cpi)")
+	PORT_DIPSETTING(0x20, "Ultracondensed (17 cpi)")
+	PORT_DIPSETTING(0x00, "Elite Proportional")
+
+	PORT_DIPNAME(0x80, 0x00, "Line Feed")
+	PORT_DIPLOCATION("DIP:8")
+	PORT_DIPSETTING(0x00, "Add LF after CR")
+	PORT_DIPSETTING(0x80, "No LF after CR") // default
 
 	// DIPSW2
 	PORT_START("DIPSW2")
 
-	PORT_DIPNAME(0x01, 0x01, "Short tear-off")
-	PORT_DIPLOCATION("DIP:1")
-	PORT_DIPSETTING(0x01, "Invalid") /* default */
-	PORT_DIPSETTING(0x00, "Valid")
+	PORT_DIPNAME(0x03, 0x00, "Baud Rate")
+	PORT_DIPLOCATION("DIP:1,2")
+	PORT_DIPSETTING(0x00, "9600") // default
+	PORT_DIPSETTING(0x01, "2400")
+	PORT_DIPSETTING(0x02, "1200")
+	PORT_DIPSETTING(0x03, "300")
 
-	PORT_DIPNAME(0x02, 0x00, "Cut-sheet feeder mode")
-	PORT_DIPLOCATION("DIP:2")
-	PORT_DIPSETTING(0x02, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
-
-	PORT_DIPNAME(0x04, 0x00, "Skip-over-perforation")
+	PORT_DIPNAME(0x04, 0x04, "Flow Control")
 	PORT_DIPLOCATION("DIP:3")
-	PORT_DIPSETTING(0x04, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
+	PORT_DIPSETTING(0x04, "Data Terminal Ready") // default
+	PORT_DIPSETTING(0x00, "XON/XOFF")
 
-	PORT_DIPNAME(0x08, 0x00, "Auto line feed")
+	PORT_DIPNAME(0x08, 0x00, "2-4 Unused")
 	PORT_DIPLOCATION("DIP:4")
 	PORT_DIPSETTING(0x08, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
+	PORT_DIPSETTING(0x00, "OFF") // default
 
 INPUT_PORTS_END
 
@@ -264,7 +261,7 @@ ioport_constructor apple_imagewriter_printer_device::device_input_ports() const
 }
 
 
-void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data) 
+void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data)
 {
 	printf("MAINCPU OUT SOD FUNCTION VALUE = %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
@@ -273,23 +270,23 @@ void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data)
 
 //$70 HEAD
 
-uint8_t apple_imagewriter_printer_device::head_pa_r(offs_t offset) 
-{ 
+uint8_t apple_imagewriter_printer_device::head_pa_r(offs_t offset)
+{
 	// PORT A DOTS
 	u8 data = 0;
 	printf("8155 HEAD PORT_A_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 	return data;
 }
-//void apple_imagewriter_printer_device::head_pa_w(offs_t offset, uint8_t data) 
-void apple_imagewriter_printer_device::head_pa_w(uint8_t data) 
+//void apple_imagewriter_printer_device::head_pa_w(offs_t offset, uint8_t data)
+void apple_imagewriter_printer_device::head_pa_w(uint8_t data)
 {
 	printf("8155 HEAD PORT_A_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 	m_dotpattern &= ~(0xff);
 	m_dotpattern |= (data ^ 0xff);
 	printf("PRINTHEAD DOTPATTERN %x -> %x %s\n",data, m_dotpattern, std::bitset<9>(m_dotpattern).to_string().c_str());
 }
-uint8_t apple_imagewriter_printer_device::head_pb_r(offs_t offset) 
-{ 
+uint8_t apple_imagewriter_printer_device::head_pb_r(offs_t offset)
+{
 	u8 data = 0;
 	printf("8155 HEAD PORT_B_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 	return data;
@@ -299,30 +296,34 @@ void apple_imagewriter_printer_device::head_pb_w(uint8_t data) {
 	printf("8155 HEAD PORT_B_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 	update_cr_stepper(BIT(data ^ 0xff, 1, 4));
 	m_dotpattern &= ~(1 << 8);  // gosh darn missed the ~
-	m_dotpattern |= (!BIT(data,0) << 8);
-	if (!BIT(data,7)) update_printhead();
+	m_dotpattern |= (!BIT(data,0) << 8);  // realized that the dot pattern is inverted!
+
+//  if (!BIT(data,7))
+	if (BIT(data,7) == 1 && BIT(m_head_pb_last,7) == 0)  // transition from 1 to 0
+		update_printhead();
+	m_head_pb_last = data;
 }
 
-uint8_t apple_imagewriter_printer_device::head_pc_r(offs_t offset) 
+uint8_t apple_imagewriter_printer_device::head_pc_r(offs_t offset)
 {
 	u8 data = 0;
 	printf("8155 HEAD PORT_C_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
-	return 0; 
+	return 0;
 }
 
-void apple_imagewriter_printer_device::head_pc_w(uint8_t data) 
+void apple_imagewriter_printer_device::head_pc_w(uint8_t data)
 {
 
 	printf("8155 HEAD PORT_C_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 	update_pf_stepper(BIT(data ^ 0xff, 1, 4));
-	if (!BIT(data,0)) 
+	if (!BIT(data,0))
 	{
 		m_ic17_flipflop = 0;
 		m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop);  // ASSERT_LINE, CLEAR_LINE
 	}
 }
 
-void apple_imagewriter_printer_device::head_to(uint8_t data) 
+void apple_imagewriter_printer_device::head_to(uint8_t data)
 {
 	// model the IC17 flip flop part
 	printf("8155 HEAD_TO %x   TIME = %f\n",data, machine().time().as_double());
@@ -337,16 +338,18 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 
 // $78 SWITCHES
 
-uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset) 
-{ 
+uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
+{
 	u8 data = 0;
-	data = 	((!(m_xpos < 10) ^ ioport("INVERT1")->read())  << 0) |  // m4 home detector
+	data =
+//          ((!(m_xpos < -5) ^ ioport("INVERT1")->read())  << 0) |  // m4 home detector
+			(!(m_xpos < 4)  << 0)            |  // m4 home detector
 			(ioport("PAPEREND")->read() << 1) |  // simulate a paper out error
-			(ioport("COVER")->read()    << 2) |  // 
-			(!(m_xpos >  PAPER_WIDTH) << 3) | // return switch
-			(!ioport("SELECT")->read()   << 4) |  //
-			(ioport("FORMFEED")->read() << 5) |  // 
-			(ioport("LINEFEED")->read() << 6) |  // 
+			(ioport("COVER")->read()    << 2) |  //
+			(!(x_pixel_coord(m_xpos) >  PAPER_WIDTH - 30) << 3) | // return switch
+			(!ioport("SELECT")->read()  << 4) |  //
+			(ioport("FORMFEED")->read() << 5) |  //
+			(ioport("LINEFEED")->read() << 6) |  //
 			(BIT(ioport("DIPSW2")->read(),3) << 7); // DIP 2-4
 	printf("8155 SWITCH PORT_A_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 
@@ -354,23 +357,26 @@ uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 }
 
 
-void apple_imagewriter_printer_device::switch_pa_w(uint8_t data) 
+void apple_imagewriter_printer_device::switch_pa_w(uint8_t data)
 {
 	printf("8155 SWITCH PORT_A_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
-uint8_t apple_imagewriter_printer_device::switch_pb_r(offs_t offset) { return 0; }
-void apple_imagewriter_printer_device::switch_pb_w(uint8_t data) 
+uint8_t apple_imagewriter_printer_device::switch_pb_r(offs_t offset)
+{
+	return ioport("DIPSW1")->read();
+}
+void apple_imagewriter_printer_device::switch_pb_w(uint8_t data)
 {
 	printf("8155 SWTICH PORT_B_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
 uint8_t apple_imagewriter_printer_device::switch_pc_r(offs_t offset) { return 0; }
-void apple_imagewriter_printer_device::switch_pc_w(uint8_t data) 
+void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 
 {
 	printf("8155 SWTICH PORT_C_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
 
-void apple_imagewriter_printer_device::switch_to(uint8_t data) 
+void apple_imagewriter_printer_device::switch_to(uint8_t data)
 {
 	printf("8155 SWITCH_TO TIMER OUT %x   TIME = %f\n",data, machine().time().as_double());
 	m_maincpu->set_input_line(I8085_RST75_LINE, data);  // ASSERT_LINE, CLEAR_LINE
@@ -423,15 +429,17 @@ void apple_imagewriter_printer_device::update_printhead()
 	printf("PRINTHEAD %x %s\n",m_dotpattern, std::bitset<9>(m_dotpattern).to_string().c_str());
 	const auto numdots = 9;
 
-	for (int i=0;i<numdots-1;i++)
+	for (int i = 0; i < numdots; i++)
 	{
 
 		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
-		int ypixel = y_pixel_coord(m_ypos) + ((numdots - 1) - i);
+		int ypixel = y_pixel_coord(m_ypos) + i; // rightside up for imagewriter
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
 			darken_pixel( BIT(m_dotpattern, i) ? 0.25 : 0.0, m_bitmap_printer->pix(ypixel, xpixel) );
+			if (ioport("DARKPIXEL")->read() & 0x1)
+				darken_pixel( BIT(m_dotpattern, i) ? 0.25 : 0.0, m_bitmap_printer->pix(ypixel, xpixel+1) );
 		}
 	}
 }
@@ -447,12 +455,11 @@ void apple_imagewriter_printer_device::update_printhead()
 int apple_imagewriter_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern, const char * name, int direction)
 {
 	printf("UPDATE STEPPER DELTA %x %s\n",pattern, name);
-//	printf("UPDATE STEPPER STEPPER= %p\n",stepper);
 	int lastpos = stepper->get_absolute_position();
-//	stepper->update(bitswap<4>(pattern, 3, 2, 1, 0));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
-	if (direction >= 0)	stepper->update(bitswap<4>(pattern, 0, 2, 1, 3));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
-	else stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // reversed direction stepper	
-//	stepper->update(pattern);
+	if (direction >= 0)
+		stepper->update(bitswap<4>(pattern, 0, 2, 1, 3));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
+	else
+		stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // reversed direction stepper
 	int delta = stepper->get_absolute_position() - lastpos;
 	return delta;
 }
@@ -463,12 +470,12 @@ int apple_imagewriter_printer_device::update_stepper_delta(stepper_device * step
 
 void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 {
-//	printf("UPDATE STEPPER DELTA 0 %x\n",vstepper);
-	
+//  printf("UPDATE STEPPER DELTA 0 %x\n",vstepper);
+
 	int delta = update_stepper_delta(m_pf_stepper, vstepper, "PF", -1);
 
-//	printf("UPDATE STEPPER DELTA 1 %x\n",vstepper);
-	
+//  printf("UPDATE STEPPER DELTA 1 %x\n",vstepper);
+
 	if (delta > 0)
 	{
 		m_ypos += delta; // move down
@@ -487,8 +494,8 @@ void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 
 			// save a snapshot with the slot and page as part of the filename
 			m_bitmap_printer->write_snapshot_to_file(
-						std::string("silentype"),
-						std::string("silentype_") +
+						std::string("imagewriter"),
+						std::string("imagewriter_") +
 //                      m_bitmap_printer->getprintername() +
 						m_bitmap_printer->get_session_time_device()->getprintername() +
 						"_page_" +
@@ -539,7 +546,7 @@ void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
 			m_xpos += delta; xdirection = -1;
 			//if (m_xpos < 0) m_xpos = 0;
 			printf("M_XPOS = %d\n",m_xpos);
-			
+
 		}
 	}
 
@@ -552,9 +559,9 @@ void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
 
 void apple_imagewriter_printer_device::device_start()
 {
-//	update_pf_stepper(0);   // STOPS THE SEGFAULT
-//	update_cr_stepper(0);
-//	update_printhead(0);
+//  update_pf_stepper(0);   // STOPS THE SEGFAULT when I comment this out
+//  update_cr_stepper(0);
+//  update_printhead(0);
 }
 
 WRITE_LINE_MEMBER(apple_imagewriter_printer_device::update_serial)
@@ -591,10 +598,4 @@ void apple_imagewriter_printer_device::rcv_complete()
 	receive_register_extract();
 	m_printer->output(get_received_char());
 }
-
-
-
-
-
-
 
