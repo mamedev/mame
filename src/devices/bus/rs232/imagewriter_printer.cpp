@@ -102,7 +102,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_pf_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 	m_cr_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 
-	TIMER(config, "RX_8251_CLOCK").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz(9600.0 * 64.0 * 2.0));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
+	TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz(9600.0 * 64.0 * 2.0));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
 
 	//rxd_handler.set(m_uart, FUNC(i8251_device::write_rxd));
 }

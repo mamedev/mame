@@ -57,7 +57,7 @@ double min_time = 0.0;
 	}
 
 	void dtr_handler(uint8_t data) {
-		//	write_dtr(data);
+		//  write_dtr(data);
 		output_dsr(data);
 	}
 
@@ -134,7 +134,7 @@ private:
 	const int dpi = 144;
 	const double PAPER_WIDTH_INCHES = 8.5;
 	const double PAPER_HEIGHT_INCHES = 11.0;
-	const double MARGIN_INCHES = 0.5;
+	const double MARGIN_INCHES = 0.0;
 	const int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi;  // 8.5 inches wide
 	const int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;   // 11  inches high
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
