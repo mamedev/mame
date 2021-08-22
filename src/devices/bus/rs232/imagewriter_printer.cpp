@@ -290,11 +290,11 @@ void apple_imagewriter_printer_device::head_pb_w(uint8_t data)
 	// PB7 = PRINTHEAD FIRE
 
 	printf("8155 HEAD PORT_B_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
-	update_cr_stepper(BIT(data ^ 0xff, 1, 4));  // dot pattern inverted
+	update_cr_stepper(BIT(data ^ 0xff, 1, 4));  // motor pattern inverted
 	m_dotpattern &= ~(1 << 8);
 	m_dotpattern |= (!BIT(data,0) << 8);  // dot pattern is inverted
 
-	if (BIT(data,7) == 1 && BIT(m_head_pb_last,7) == 0)  // transition from 1 to 0
+	if (BIT(data,7) == 1 && BIT(m_head_pb_last,7) == 0)  // transition from 0 to 1
 		update_printhead();
 	m_head_pb_last = data;
 }
@@ -312,6 +312,10 @@ uint8_t apple_imagewriter_printer_device::head_pc_r(offs_t offset)
 
 void apple_imagewriter_printer_device::head_pc_w(uint8_t data)
 {
+	// PC0 = connected to IC17 flipflop clear*
+	// PC1..PC4 = PF MOTOR A-D
+	// PC5      = PF MOTOR ENABLE
+
 
 	printf("8155 HEAD PORT_C_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 	update_pf_stepper(BIT(data ^ 0xff, 1, 4));
@@ -329,8 +333,11 @@ void apple_imagewriter_printer_device::head_pc_w(uint8_t data)
 void apple_imagewriter_printer_device::head_to(uint8_t data)
 {
 	// model the IC17 flip flop part
+	// TO = connected to IC17 flipflop preset*
+
 	printf("8155 HEAD_TO %x   TIME = %f\n",data, machine().time().as_double());
-	if (m_head_to_last == 0 && data)
+//  if (m_head_to_last == 0 && data)  // transition to zero
+	if (!data)  // zero clears flipflop
 	{
 		m_ic17_flipflop = 1;
 	}
@@ -408,7 +415,7 @@ void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 void apple_imagewriter_printer_device::switch_to(uint8_t data)
 {
 	printf("8155 SWITCH_TO TIMER OUT %x   TIME = %f\n",data, machine().time().as_double());
-	m_maincpu->set_input_line(I8085_RST75_LINE, data);  // ASSERT_LINE, CLEAR_LINE
+	m_maincpu->set_input_line(I8085_RST75_LINE, data);
 }
 
 //-------------------------------------------------
@@ -462,7 +469,7 @@ void apple_imagewriter_printer_device::update_printhead()
 	for (int i = 0; i < numdots; i++)
 	{
 		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
-		int ypixel = y_pixel_coord(m_ypos) + i; // rightside up for imagewriter
+		int ypixel = y_pixel_coord(m_ypos) + i;
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
@@ -497,17 +504,14 @@ int apple_imagewriter_printer_device::update_stepper_delta(stepper_device * step
 
 void apple_imagewriter_printer_device::update_head_pos()
 {
-	m_bitmap_printer->setheadpos( std::max(0, x_pixel_coord(m_xpos)), y_pixel_coord(m_ypos));  // keep printhead visible
+	m_bitmap_printer->setheadpos( std::max(0, x_pixel_coord(m_xpos)), // keep printhead visible on left of screen
+									y_pixel_coord(m_ypos));
 }
 
 
 void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 {
-//  printf("UPDATE STEPPER DELTA 0 %x\n",vstepper);
-
 	int delta = update_stepper_delta(m_pf_stepper, vstepper, "PF", -1);
-
-//  printf("UPDATE STEPPER DELTA 1 %x\n",vstepper);
 
 	if (delta > 0)
 	{
@@ -561,8 +565,6 @@ void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
 {
 	int delta = update_stepper_delta(m_cr_stepper, hstepper, "CR", 1);
 
-//  printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
-
 	if (delta != 0)
 	{
 		newpageflag = 0;
@@ -574,19 +576,12 @@ void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
 		}
 		else if (delta < 0)
 		{
-
 			m_xpos += delta; xdirection = -1;
-			//if (m_xpos < 0) m_xpos = 0;
 		//  printf("M_XPOS = %d\n",m_xpos);
-
 		}
 	}
 	update_head_pos();
 }
-
-
-
-
 
 void apple_imagewriter_printer_device::device_start()
 {
@@ -594,6 +589,7 @@ void apple_imagewriter_printer_device::device_start()
 //  update_cr_stepper(0);
 //  update_printhead(0);
 }
+
 
 WRITE_LINE_MEMBER(apple_imagewriter_printer_device::update_serial)
 {

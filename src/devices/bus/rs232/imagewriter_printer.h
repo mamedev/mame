@@ -92,8 +92,11 @@ private:
 	int page_count = 0;
 
 	const int dpi = 144;
-	const int PAPER_WIDTH = 8.5 * dpi;  // 8.5 inches wide
-	const int PAPER_HEIGHT = 11 * dpi;   // 11  inches high
+	const double PAPER_WIDTH_INCHES = 8.5;
+	const double PAPER_HEIGHT_INCHES = 11.0;
+	const double MARGIN_INCHES = 0.5;
+	const int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi;  // 8.5 inches wide
+	const int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;   // 11  inches high
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int distfrombottom = 50;
 
@@ -115,8 +118,11 @@ private:
 	int m_select_status;
 	int right_offset = 0;
 	int left_offset = 3;
-	int m_left_edge  = 0.25 * dpi;
-	int m_right_edge = 8.00 * dpi + m_left_edge - 1;
+	int m_left_edge  = MARGIN_INCHES / 2.0 * dpi;
+	int m_right_edge = (PAPER_WIDTH_INCHES - MARGIN_INCHES) * dpi + m_left_edge - 1;
+
+	// (should be trivial to make a 15" wide printer by adjusting PAPER_WIDTH_INCHES to 15.00)
+	// m_right_edge will get adjusted accordingly to set the return switch
 
 	void darken_pixel(double darkpct, unsigned int& pixel);
 	void update_head_pos();
