@@ -73,12 +73,12 @@ util::rpk_reader::rpk_reader(const char **pcb_types, bool supports_ram)
 //  read
 //-------------------------------------------------
 
-util::rpk_file util::rpk_reader::read(const std::string &filename) const
+util::rpk_file util::rpk_reader::read(std::unique_ptr<random_read> &&stream) const
 {
 	// open the RPK (as a zip file)
 	util::archive_file::ptr zipfile;
-	util::archive_file::error ziperr = util::archive_file::open_zip(filename, zipfile);
-	if (ziperr != util::archive_file::error::NONE)
+	std::error_condition ziperr = util::archive_file::open_zip(std::move(stream), zipfile);
+	if (ziperr)
 		throw rpk_exception(error::NOT_ZIP_FORMAT);
 
 	// open the layout XML
@@ -91,7 +91,7 @@ util::rpk_file util::rpk_reader::read(const std::string &filename) const
 
 	// and decompress it
 	ziperr = zipfile->decompress(&layout_xml_text[0], zipfile->current_uncompressed_length());
-	if (ziperr != archive_file::error::NONE)
+	if (ziperr)
 		throw rpk_exception(ziperr);
 	layout_xml_text[zipfile->current_uncompressed_length()] = 0;
 
@@ -346,8 +346,8 @@ std::vector<std::uint8_t> util::rpk_socket::read_file() const
 	result.resize(m_rpk.zipfile().current_uncompressed_length());
 
 	// read the file
-	archive_file::error ziperr = m_rpk.zipfile().decompress(&result[0], m_rpk.zipfile().current_uncompressed_length());
-	if (ziperr != archive_file::error::NONE)
+	std::error_condition const ziperr = m_rpk.zipfile().decompress(&result[0], m_rpk.zipfile().current_uncompressed_length());
+	if (ziperr)
 		throw rpk_exception(ziperr);
 
 	// perform hash checks, if appropriate
@@ -393,7 +393,7 @@ util::rpk_exception::rpk_exception(util::rpk_reader::error error, std::string_vi
 //  ctor
 //-------------------------------------------------
 
-util::rpk_exception::rpk_exception(archive_file::error ziperr)
+util::rpk_exception::rpk_exception(std::error_condition ziperr)
 	: rpk_exception(ziperr == util::archive_file::error::UNSUPPORTED ? rpk_reader::error::ZIP_UNSUPPORTED : rpk_reader::error::ZIP_ERROR)
 {
 }

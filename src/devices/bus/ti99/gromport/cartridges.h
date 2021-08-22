@@ -77,7 +77,7 @@ private:
 	class rpk_socket;
 	class rpk;
 
-	static std::unique_ptr<rpk> rpk_open(emu_options &options, const char *filename, const char *system_name);
+	static std::unique_ptr<rpk> rpk_open(emu_options &options, std::unique_ptr<util::random_read> &&stream, const char *system_name);
 	static std::unique_ptr<rpk_socket> rpk_load_rom_resource(const util::rpk_socket &socket);
 	static std::unique_ptr<rpk_socket> rpk_load_ram_resource(emu_options &options, const util::rpk_socket &socket, const char *system_name);
 

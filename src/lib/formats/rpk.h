@@ -128,7 +128,7 @@ public:
 	rpk_reader(rpk_reader &&) = delete;
 
 	// methods
-	rpk_file read(const std::string &filename) const;
+	rpk_file read(std::unique_ptr<random_read> &&stream) const;
 
 private:
 	const char **	m_pcb_types;
@@ -143,7 +143,7 @@ class rpk_exception : public std::exception
 public:
 	rpk_exception(rpk_reader::error error);
 	rpk_exception(rpk_reader::error error, std::string_view details);
-	rpk_exception(archive_file::error ziperr);
+	rpk_exception(std::error_condition error);
 	virtual const char *what() const noexcept override;
 
 private:

@@ -259,7 +259,7 @@ image_init_result ti99_cartridge_device::call_load()
 	{
 		try
 		{
-			m_rpk = rpk_open(machine().options(), filename(), machine().system().name);
+			m_rpk = rpk_open(machine().options(), util::core_file_read(image_core_file()), machine().system().name);
 			m_pcbtype = m_rpk->get_type();
 		}
 		catch (util::rpk_exception& err)
@@ -1572,9 +1572,9 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_lo
 
 		// try to open the battery file and read it if possible
 		emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
-		osd_file::error filerr = file.open(ram_pname);
+		std::error_condition const filerr = file.open(ram_pname);
 		int bytes_read = 0;
-		if (filerr == osd_file::error::NONE)
+		if (!filerr)
 			bytes_read = file.read(&contents[0], contents.size());
 
 		// fill remaining bytes (if necessary)
@@ -1591,7 +1591,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_lo
     system_name - name of the driver (also just for NVRAM handling)
 -------------------------------------------------*/
 
-std::unique_ptr<ti99_cartridge_device::rpk> ti99_cartridge_device::rpk_open(emu_options &options, const char *filename, const char *system_name)
+std::unique_ptr<ti99_cartridge_device::rpk> ti99_cartridge_device::rpk_open(emu_options &options, std::unique_ptr<util::random_read> &&stream, const char *system_name)
 {
 	std::unique_ptr<rpk> newrpk = std::make_unique<rpk>(options, system_name);
 
@@ -1600,7 +1600,7 @@ std::unique_ptr<ti99_cartridge_device::rpk> ti99_cartridge_device::rpk_open(emu_
 		util::rpk_reader reader(pcbdefs, true);
 
 		// open the RPK
-		util::rpk_file file = reader.read(filename);
+		util::rpk_file file = reader.read(std::move(stream));
 
 		// specify the PCB
 		newrpk->m_type = file.pcb_type() + 1;
