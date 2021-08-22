@@ -27,7 +27,7 @@ macro(osd_cfg _project)
 	endif()
 
 	if(NOT SDL_INI_PATH STREQUAL "")
-		target_compile_definitions(${_project} PRIVATE INI_PATH=${SDL_INI_PATH})
+		target_compile_definitions(${_project} PRIVATE INI_PATH="${SDL_INI_PATH}")
 	endif()
 
 	if(NO_X11)
