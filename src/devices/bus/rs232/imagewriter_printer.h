@@ -14,6 +14,7 @@
 #include "machine/i8251.h"
 #include "machine/steppers.h"
 #include "machine/74161.h"
+#include "machine/timer.h"
 
 class apple_imagewriter_printer_device : public device_t,
 	public device_serial_interface,
@@ -22,16 +23,48 @@ class apple_imagewriter_printer_device : public device_t,
 public:
 	apple_imagewriter_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
+double last_time = 0.0;
+int last_value;
+double min_time = 0.0;
+//  virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override
+	{
+		// pipe the bit state along
+		device_serial_interface::rx_w(state);
+		m_uart-> write_rxd(state);
+
+		double elapsed_time = machine().time().as_double() - last_time;
+		printf("INPUT TXD STATE = %x   %f  elapsed=%f\n", state, machine().time().as_double(), machine().time().as_double()-last_time);
+		if (elapsed_time > 0.0 && min_time == 0.0) min_time = elapsed_time;
+		if (elapsed_time > 0.0) min_time = std::min(elapsed_time, min_time);
+		if (min_time > 0.0)
+		{
+			int block = elapsed_time / min_time;
+			for (int i=0; i< std::min(16,block); i++) {printf("%d",last_value);}
+			printf("\n");
+		}
+		last_time = machine().time().as_double();
+		last_value = state;
+	}
 
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
-	void optic_handler(uint8_t data) { printf("HANDLE OPTIC %d\n",data);}
-	void rxrdy_handler(uint8_t data) {
-			printf("HANDLE RXRDY %d\n",data);
-			m_maincpu->set_input_line(I8085_RST55_LINE, data);
+	void optic_handler(uint8_t data) { //printf("HANDLE OPTIC %d\n",data);
 	}
+	void rxrdy_handler(uint8_t data) {
+			if (data == 1)  printf("HANDLE RXRDY %d\n",data);
+			m_maincpu->set_input_line(I8085_RST65_LINE, data);
+	}
+	u8 m_uart_clock = 0;
 
+	double last_pulse = 0.0;
+	TIMER_DEVICE_CALLBACK_MEMBER (pulse_uart_clock)
+	{ m_uart_clock = !m_uart_clock; m_uart->write_txc(m_uart_clock);m_uart->write_rxc(m_uart_clock);
+		[[maybe_unused]]            double now = machine().time().as_double();
+		[[maybe_unused]]    double elapsed_time = now - last_pulse;
+	//  printf("pulse uart param=%x   %f  elapsed=%.15f\n", param, now, elapsed_time);
+		last_pulse = now;
+	 }
 protected:
 	apple_imagewriter_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -117,7 +150,7 @@ private:
 
 	int m_select_status;
 	int right_offset = 0;
-	int left_offset = 3;
+	int left_offset = 2;  // 2 seems right
 	int m_left_edge  = MARGIN_INCHES / 2.0 * dpi;
 	int m_right_edge = (PAPER_WIDTH_INCHES - MARGIN_INCHES) * dpi + m_left_edge - 1;
 
