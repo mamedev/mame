@@ -1399,7 +1399,6 @@ private:
 
 	// CRTC
 	MC6845_UPDATE_ROW(crtc_update_row);
-	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	void io_72_w(uint8_t data) { io_72 = data; }
 	void io_73_w(uint8_t data) { io_73 = data; }
@@ -1580,10 +1579,6 @@ MC6845_UPDATE_ROW(lw450_state::crtc_update_row)
 	}
 }
 
-MC6845_ON_UPDATE_ADDR_CHANGED(lw450_state::crtc_addr)
-{
-}
-
 // PIN 21 (Character Clock) of CRTC-II: menu: 2.0 MHz; schreibmaschine: 1.8 MHz
 
 // these timings are all at MDA clock
@@ -1636,8 +1631,7 @@ void lw450_state::lw450(machine_config& config) {
 	screen->set_color(rgb_t::white());
 	screen->set_physical_aspect(720, 320);
 	screen->set_screen_update("hd6445", FUNC(hd6345_device::screen_update));
-	screen->set_refresh_hz(50);
-	screen->set_size(720, 320);
+	screen->set_raw(MDA_CLOCK, 882, 0, 729, 370, 0, 320); // based on bootup crtc values
 
 	GFXDECODE(config, "gfxdecode", palette, gfx_lw450);
 	PALETTE(config, palette).set_entries(4);
@@ -1647,7 +1641,6 @@ void lw450_state::lw450(machine_config& config) {
 	m_crtc->set_screen(screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
-	m_crtc->set_on_update_addr_change_callback(FUNC(lw450_state::crtc_addr));
 	m_crtc->set_update_row_callback(FUNC(lw450_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(lw450_state::crtc_vsync));
 
