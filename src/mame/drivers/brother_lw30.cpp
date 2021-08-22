@@ -528,6 +528,7 @@ private:
 	} 
 	// 76
 	uint8_t io_77_r() { // config
+		// TODO: use PORT_CONFNAME, etc
 		uint8_t out = 0x20; // 14 lines
 		out |= 0x00; // german
 		//out |= 0x01; // french
@@ -664,11 +665,8 @@ private:
 	}
 	uint8_t io_b8_r() { // B8 (keyboard)
 		// keyboard matrix
-		if(io_b8 <= 8) {
-			if(m_io_kbrow[io_b8].found()) {
-				return m_io_kbrow[io_b8].read_safe(0);
-			}
-		}
+		if(io_b8 <= 8)
+			return m_io_kbrow[io_b8].read_safe(0);
 		return 0x00;
 	}
 	void io_b8_w(uint8_t data) {
@@ -936,9 +934,6 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 
 	return 0;
 }
-
-// Keyboard
-//////////////////////////////////////////////////////////////////////////
 
 void lw30_state::machine_start()
 {
