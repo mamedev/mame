@@ -880,11 +880,8 @@ private:
 	}
 	uint8_t io_b8_r() {
 		// keyboard matrix
- 		if(io_b8 <= 8) {
-			if(io_kbrow[io_b8].found()) {
-				return io_kbrow[io_b8].read_safe(0);
-			}
- 		}
+ 		if(io_b8 <= 8)
+			return io_kbrow[io_b8].read_safe(0);
 
 		switch(io_b8) {
 		// get language
@@ -1387,11 +1384,8 @@ private:
 	uint8_t io_b0_r() { return ~0x00; }
 	uint8_t io_b8_r() {
 		// keyboard matrix
-		if(io_b8 <= 8) {
-			if(io_kbrow[io_b8].found()) {
-				return io_kbrow[io_b8].read_safe(0);
-			}
-		}
+		if(io_b8 <= 8)
+			return io_kbrow[io_b8].read_safe(0);
 		return 0x00;
 	}
 	void io_b8_w(uint8_t data) {
