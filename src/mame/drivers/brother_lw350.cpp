@@ -835,8 +835,7 @@ public:
 		floppy(*this, "floppy"),
 		fdc(*this, "fdc"),
 		beeper(*this, "beeper"),
-		io_kbrow(*this, "kbrow.%u", 0),
-		rom(*this, "maincpu")
+		io_kbrow(*this, "kbrow.%u", 0)
 	{ }
 
 	void lw350(machine_config& config);
@@ -849,11 +848,9 @@ private:
 	required_device<hd63266f_t> fdc;
 	required_device<beep_device> beeper;
 	optional_ioport_array<9> io_kbrow;
-	required_region_ptr<uint8_t> rom;
 
 	uint8_t vram[80 * 128];
 	uint8_t io_70, io_7a, io_b8, io_90;
-	uint8_t rombank;
 
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -864,18 +861,6 @@ private:
 	}
 	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
 		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
-	}
-
-	// ROM
-	uint8_t rom40000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		if(rombank == 0x02)
-			return rom[0x40000 + offset] & mem_mask;
-		else if(rombank == 0x03)
-			return rom[0x60000 + offset] & mem_mask;
-		else {
-			logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", machine().describe_context(), rombank, offset);
-			return 0x00;
-		}
 	}
 
 	// IO
@@ -918,7 +903,7 @@ private:
 		io_b8 = data;
 	}
 	void rombank_w(uint8_t data) { // E0
-		rombank = data;
+		membank("rom")->set_entry(data & 0x03);
 	}
 	void beeper_w(uint8_t data) { // F0
 		beeper->set_state(data == 0);
@@ -969,7 +954,7 @@ private:
 		map(0x00000, 0x01fff).rom();
 		map(0x02000, 0x05fff).ram();
 		map(0x06000, 0x3ffff).rom();
-		map(0x40000, 0x5ffff).r(FUNC(lw350_state::rom40000_r)); // => ROM 0x40000 or 0x60000 or ??? (bank switching IO E0)
+		map(0x40000, 0x5ffff).bankr("rom");
 		map(0x60000, 0x617ff).ram();
 		map(0x61800, 0x63fff).rw(FUNC(lw350_state::vram_r), FUNC(lw350_state::vram_w));
 		map(0x64000, 0x71fff).ram();
@@ -1145,6 +1130,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw350_state::io_90_timer_callback)
 
 void lw350_state::machine_start()
 {
+	auto rom = memregion("maincpu")->base();
+
+	membank("rom")->configure_entries(0, 4, rom, 0x20000);
 	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
 
 	// ROM patches
