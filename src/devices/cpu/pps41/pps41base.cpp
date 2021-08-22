@@ -44,7 +44,9 @@ TODO:
   but again does not explain why
 - allowed opcode after TAB should be limited
 - add MCU mask options, there's one for inverting interrupts
-- finish MM78LA emulation
+- does MM78LA support interrupts? the sparse documentation available says it does
+- MM78LA mnemonics for changed opcodes is unknown
+- no known documentation exists for MM77LA, mcu name is guessed
 
 */
 
@@ -68,7 +70,8 @@ pps41_base_device::pps41_base_device(const machine_config &mconfig, device_type 
 	m_write_r(*this),
 	m_read_sdi(*this),
 	m_write_sdo(*this),
-	m_write_ssc(*this)
+	m_write_ssc(*this),
+	m_write_spk(*this)
 { }
 
 
@@ -92,6 +95,7 @@ void pps41_base_device::device_start()
 	m_read_sdi.resolve_safe(1);
 	m_write_sdo.resolve_safe();
 	m_write_ssc.resolve_safe();
+	m_write_spk.resolve_safe();
 
 	// init RAM with 0xf
 	for (int i = 0; i <= m_datamask; i++)

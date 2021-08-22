@@ -1,43 +1,30 @@
 // license:BSD-3-Clause
-// copyright-holders:Antoine Mine
-/**********************************************************************
+// copyright-holders:Olivier Galibert
 
-  Copyright (C) Antoine Mine' 2007
-
-  Motorola 6843 Floppy Disk Controller emulation.
-
-**********************************************************************/
+// Motorola 6843 floppy drive controller
+//
+// The Hitachi HD46503S, HD6843 and HD68A43 seem identical
 
 #ifndef MAME_MACHINE_MC6843_H
 #define MAME_MACHINE_MC6843_H
 
 #pragma once
 
-#include "imagedev/flopdrv.h"
-
+#include "imagedev/floppy.h"
+#include "fdc_pll.h"
 
 class mc6843_device : public device_t
 {
 public:
 	mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<int Id, typename T> void set_floppy_drive(T &&tag) { m_floppy[Id].set_tag(std::forward<T>(tag)); }
-	template<typename T, typename U, typename V, typename W> void set_floppy_drives(T &&tag0, U &&tag1, V &&tag2, W &&tag3)
-	{
-		m_floppy[0].set_tag(std::forward<T>(tag0));
-		m_floppy[1].set_tag(std::forward<U>(tag1));
-		m_floppy[2].set_tag(std::forward<V>(tag2));
-		m_floppy[3].set_tag(std::forward<W>(tag3));
-	}
+	void force_ready() { m_force_ready = true; }
 
-	auto irq() { return m_write_irq.bind(); }
+	auto irq() { return m_irq.bind(); }
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	void set_floppy(floppy_image_device *floppy);
 
-	void set_drive(int drive);
-	void set_side(int side);
-	void set_index_pulse(int index_pulse);
+	void map(address_map &map);
 
 protected:
 	// device-level overrides
@@ -46,52 +33,163 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	enum
-	{
-		TIMER_CONT
+	// Status flags
+	enum {
+		SA_BUSY  = 0x80,
+		SA_IDX   = 0x40,
+		SA_TNEQ  = 0x20,
+		SA_WPT   = 0x10,
+		SA_TRK0  = 0x08,
+		SA_RDY   = 0x04,
+		SA_DDM   = 0x02,
+		SA_DTR   = 0x01,
+
+		SB_HERR  = 0x80,
+		SB_WERR  = 0x40,
+		SB_FI    = 0x20,
+		SB_SERR  = 0x10,
+		SB_SAERR = 0x08,
+		SB_DMERR = 0x04,
+		SB_CRC   = 0x02,
+		SB_DTERR = 0x01,
+
+		I_STRB   = 0x08,
+		I_SSR    = 0x04,
+		I_SCE    = 0x02,
+		I_RWCE   = 0x01,
+
+		C_STZ    = 0x2,
+		C_SEK    = 0x3,
+		C_SSR    = 0x4,
+		C_SSW    = 0x5,
+		C_RCR    = 0x6,
+		C_SWD    = 0x7,
+		C_FFR    = 0xa,
+		C_FFW    = 0xb,
+		C_MSR    = 0xc,
+		C_MSW    = 0xd,
 	};
 
-	optional_device_array<legacy_floppy_image_device, 4> m_floppy;
+	enum {
+		S_IDLE,
 
-	devcb_write_line m_write_irq;
+		S_STZ_STEP,
+		S_STZ_STEP_WAIT,
+		S_STZ_HEAD_SETTLING,
 
-	/* registers */
-	uint8_t m_CTAR;       /* current track */
-	uint8_t m_CMR;        /* command */
-	uint8_t m_ISR;        /* interrupt status */
-	uint8_t m_SUR;        /* set-up */
-	uint8_t m_STRA;       /* status */
-	uint8_t m_STRB;       /* status */
-	uint8_t m_SAR;        /* sector address */
-	uint8_t m_GCR;        /* general count */
-	uint8_t m_CCR;        /* CRC control */
-	uint8_t m_LTAR;       /* logical address track (=track destination) */
+		S_SEEK_STEP,
+		S_SEEK_STEP_WAIT,
+		S_SEEK_HEAD_SETTLING,
 
-	/* internal state */
-	uint8_t  m_drive;
-	uint8_t  m_side;
-	uint8_t  m_data[128];   /* sector buffer */
-	uint32_t m_data_size;   /* size of data */
-	uint32_t m_data_idx;    /* current read/write position in data */
-	uint32_t m_data_id;     /* chrd_id for sector write */
-	uint8_t  m_index_pulse;
-	uint8_t  m_crc_wait;
+		S_SRW_WAIT_READY,
+		S_SRW_HEAD_SETTLING,
+		S_SRW_START,
 
-	/* trigger delayed actions (bottom halves) */
-	emu_timer* m_timer_cont;
+		S_FFW_WAIT_READY,
+		S_FFW_HEAD_SETTLING,
+		S_FFW_START,
 
-	legacy_floppy_image_device* floppy_image();
-	void status_update();
-	void cmd_end();
-	void finish_STZ();
-	void finish_SEK();
-	int address_search(chrn_id* id);
-	int address_search_read(chrn_id* id);
-	void finish_RCR();
-	void cont_SR();
-	void finish_SR();
-	void cont_SW();
+		S_IDAM_BAD_TRACK,
+		S_IDAM_BAD_CRC,
+		S_IDAM_FOUND,
+		S_IDAM_NOT_FOUND,
 
+		S_DAM_NOT_FOUND,
+		S_DAM_BAD_CRC,
+		S_DAM_DONE,
+	};
+
+	enum {
+		L_IDLE,
+
+		L_IDAM_SEARCH,
+		L_IDAM_CHECK_TRACK,
+		L_IDAM_CHECK_SECTOR,
+		L_IDAM_CHECK_CRC,
+
+		L_DAM_SEARCH,
+		L_DAM_DELETED,
+		L_DAM_READ,
+		L_DAM_READ_BYTE,
+
+		L_DAM_WAIT,
+		L_DAM_WRITE,
+		L_DAM_WRITE_BYTE,
+
+		L_FFW_BYTE,
+		L_FFW_WRITE,
+	};
+
+	struct live_info {
+		attotime tm;
+		fdc_pll_t pll;
+		int state, next_state;
+		u16 shift_reg;
+		u16 crc;
+		int bit_counter;
+		bool data_separator_phase, data_bit_context;
+		uint8_t data_reg;
+	};
+
+	devcb_write_line m_irq;
+	bool m_force_ready;
+
+	emu_timer *m_timer;
+	floppy_image_device *m_floppy;
+
+	live_info m_cur_live, m_checkpoint_live;
+
+	int m_state;
+
+	bool m_head_loaded, m_dir_loaded, m_dor_loaded, m_dor_needed;
+
+	u8 m_dir;
+	u8 m_dor;
+	u8 m_ctar;
+	u8 m_cmr;
+	u8 m_isr;
+	u8 m_sur;
+	u8 m_stra;
+	u8 m_sar;
+	u8 m_strb;
+	u8 m_gcr;
+	u8 m_ccr;
+	u8 m_ltar;
+
+	u8 m_step_count;
+	u8 m_idam_turns;
+
+	u8 dir_r();
+	void dor_w(u8 data);
+	u8 ctar_r();
+	void ctar_w(u8 data);
+	u8 isr_r();
+	void cmr_w(u8 data);
+	u8 stra_r();
+	void sur_w(u8 data);
+	u8 strb_r();
+	void sar_w(u8 data);
+	void gcr_w(u8 data);
+	void ccr_w(u8 data);
+	void ltar_w(u8 data);
+
+	void index_callback(floppy_image_device *floppy, int state);
+	void ready_callback(floppy_image_device *floppy, int state);
+
+	void command_start();
+	void run(bool timeout, bool ready, bool index);
+	void isr_raise(u8 flag);
+	void delay(int);
+	void live_start(int state, bool start_writing = false);
+	void checkpoint();
+	void rollback();
+	void live_delay(int state);
+	void live_sync();
+	void live_abort();
+	bool read_one_bit(const attotime &limit);
+	bool write_one_bit(const attotime &limit);
+	void live_run(attotime limit = attotime::never);
+	bool is_ready() const;
 };
 
 DECLARE_DEVICE_TYPE(MC6843, mc6843_device)

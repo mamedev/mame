@@ -17,7 +17,7 @@
 #include "screen.h"
 #include "tilemap.h"
 
-/* Discrete Sound Input Nodes */
+// Discrete Sound Input Nodes
 #define SPRINT2_SKIDSND1_EN        NODE_01
 #define SPRINT2_SKIDSND2_EN        NODE_02
 #define SPRINT2_MOTORSND1_DATA     NODE_03
@@ -44,7 +44,12 @@ public:
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_in(*this, { "INA", "INB" }),
+		m_dials(*this, "DIAL_P%u", 1U),
+		m_gears(*this, "GEAR_P%u", 1U),
+		m_dsw(*this, "DSW"),
+		m_gear_sel(*this, "P%ugear", 1U)
 	{ }
 
 	void sprint1(machine_config &config);
@@ -57,43 +62,12 @@ public:
 	void init_dominos();
 	void init_dominos4();
 
-private:
-	int m_steering[2];
-	int m_gear[2];
-	int m_game;
-	uint8_t m_dial[2];
-	required_shared_ptr<uint8_t> m_video_ram;
-	tilemap_t* m_bg_tilemap;
-	bitmap_ind16 m_helper;
-	int m_collision[2];
-	uint8_t sprint2_wram_r(offs_t offset);
-	uint8_t sprint2_dip_r(offs_t offset);
-	uint8_t sprint2_input_A_r(offs_t offset);
-	uint8_t sprint2_input_B_r(offs_t offset);
-	uint8_t sprint2_sync_r();
-	uint8_t sprint2_steering1_r();
-	uint8_t sprint2_steering2_r();
-	void sprint2_steering_reset1_w(uint8_t data);
-	void sprint2_steering_reset2_w(uint8_t data);
-	void sprint2_wram_w(offs_t offset, uint8_t data);
-	void output_latch_w(offs_t offset, uint8_t data);
-	uint8_t sprint2_collision1_r();
-	uint8_t sprint2_collision2_r();
-	void sprint2_collision_reset1_w(uint8_t data);
-	void sprint2_collision_reset2_w(uint8_t data);
-	void sprint2_video_ram_w(offs_t offset, uint8_t data);
-	void sprint2_noise_reset_w(uint8_t data);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
-	void sprint2_palette(palette_device &palette) const;
-	uint32_t screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sprint2);
-	INTERRUPT_GEN_MEMBER(sprint2_irq);
-	uint8_t collision_check(rectangle& rect);
-	inline int get_sprite_code(uint8_t *video_ram, int n);
-	inline int get_sprite_x(uint8_t *video_ram, int n);
-	inline int get_sprite_y(uint8_t *video_ram, int n);
-	int service_mode();
+
+private:
+	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<f9334_device> m_outlatch;
@@ -101,11 +75,45 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport_array<2> m_in;
+	optional_ioport_array<2> m_dials, m_gears;
+	required_ioport m_dsw;
+	output_finder<2> m_gear_sel;
 
-	void sprint2_map(address_map &map);
+	uint8_t m_steering[2];
+	uint8_t m_gear[2];
+	uint8_t m_game;
+	uint8_t m_dial[2];
+	tilemap_t* m_bg_tilemap;
+	bitmap_ind16 m_helper;
+	uint8_t m_collision[2];
+
+	uint8_t wram_r(offs_t offset);
+	uint8_t dip_r(offs_t offset);
+	uint8_t input_A_r(offs_t offset);
+	uint8_t input_B_r(offs_t offset);
+	uint8_t sync_r();
+	template <uint8_t Which> uint8_t steering_r();
+	template <uint8_t Which> void steering_reset_w(uint8_t data);
+	void wram_w(offs_t offset, uint8_t data);
+	void output_latch_w(offs_t offset, uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
+	void noise_reset_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	INTERRUPT_GEN_MEMBER(irq);
+	uint8_t collision_check(rectangle& rect);
+	inline int get_sprite_code(int n);
+	inline int get_sprite_x(int n);
+	inline int get_sprite_y(int n);
+	uint8_t service_mode();
+
+	void main_map(address_map &map);
 };
 
-/*----------- defined in audio/sprint2.c -----------*/
+//----------- defined in audio/sprint2.cpp -----------
 DISCRETE_SOUND_EXTERN( sprint2_discrete );
 DISCRETE_SOUND_EXTERN( sprint1_discrete );
 DISCRETE_SOUND_EXTERN( dominos_discrete );

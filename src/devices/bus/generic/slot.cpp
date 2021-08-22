@@ -18,6 +18,10 @@
    e.g. APF cart slot device for an example of a simple device with multiple
    pcbs supported)
 
+   TODO:
+   - add support for hotswapping (ie. don't force a hard reset), it's doable for
+     generic rom cartridges, but then you still can't swap from empty slot
+
  ***********************************************************************************************************/
 
 

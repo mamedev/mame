@@ -175,7 +175,9 @@ void coco_family_fdc_device_base::floppy_formats(format_registration &fr)
 
 static void coco_fdc_floppies(device_slot_interface &device)
 {
-	device.option_add("qd", FLOPPY_525_QD);
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
 }
 
 void coco_fdc_device_base::device_add_mconfig(machine_config &config)
@@ -184,8 +186,8 @@ void coco_fdc_device_base::device_add_mconfig(machine_config &config)
 	m_wd17xx->intrq_wr_callback().set(FUNC(coco_fdc_device_base::fdc_intrq_w));
 	m_wd17xx->drq_wr_callback().set(FUNC(coco_fdc_device_base::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppies[0], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[1], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[0], coco_fdc_floppies, "525dd", coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], coco_fdc_floppies, "525dd", coco_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[2], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[3], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
 
@@ -272,6 +274,8 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 
 void coco_fdc_device_base::device_start()
 {
+	coco_family_fdc_device_base::device_start();
+
 	install_readwrite_handler(0xFF74, 0xFF76,
 			read8sm_delegate(*this, FUNC(coco_fdc_device_base::ff74_read)),
 			write8sm_delegate(*this, FUNC(coco_fdc_device_base::ff74_write)));

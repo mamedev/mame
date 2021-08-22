@@ -278,7 +278,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/adc0804.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2151.h"
+#include "machine/k007452.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "wecleman.lh"
@@ -608,17 +609,6 @@ void hotchase_state::hotchase_sub_map(address_map &map)
                     WEC Le Mans 24 Sound CPU Handlers
 ***************************************************************************/
 
-/* Protection - an external multiplier connected to the sound CPU */
-uint8_t wecleman_state::multiply_r()
-{
-	return (m_multiply_reg[0] * m_multiply_reg[1]) & 0xFF;
-}
-
-void wecleman_state::multiply_w(offs_t offset, uint8_t data)
-{
-	m_multiply_reg[offset] = data;
-}
-
 /*      K007232 registers reminder:
 
 [Ch A]  [Ch B]  [Meaning]
@@ -651,9 +641,7 @@ void wecleman_state::wecleman_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram();
 	map(0x8500, 0x8500).nopw();            // increased with speed (global volume)?
-	map(0x9000, 0x9000).r(FUNC(wecleman_state::multiply_r));    // 007452: Protection
-	map(0x9000, 0x9001).w(FUNC(wecleman_state::multiply_w));   // 007452: Protection
-	map(0x9006, 0x9006).nopw();            // 007452: ?
+	map(0x9000, 0x9007).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));    // Protection
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU
 	map(0xb000, 0xb00d).rw("k007232_1", FUNC(k007232_device::read), FUNC(k007232_device::write)); // K007232 (Reading offset 5/b triggers the sample)
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -1067,6 +1055,8 @@ void wecleman_state::wecleman(machine_config &config)
 
 	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown "ADCCLK" (generated on video board?)
 	adc.vin_callback().set(FUNC(wecleman_state::selected_ip_r));
+
+	KONAMI_007452_MATH(config, "k007452");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

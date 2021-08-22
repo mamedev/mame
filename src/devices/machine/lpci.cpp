@@ -95,7 +95,7 @@ pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, cons
 	device_t(mconfig, PCI_BUS_LEGACY, tag, owner, clock),
 	m_read_callback(*this),
 	m_write_callback(*this),
-	m_father(nullptr),
+	m_father(*this, finder_base::DUMMY_TAG),
 	m_siblings_count(0)
 {
 	std::fill(std::begin(m_siblings), std::end(m_siblings), nullptr);
@@ -262,11 +262,8 @@ void pci_bus_legacy_device::device_start()
 	m_read_callback.resolve_all();
 	m_write_callback.resolve_all();
 
-	if (m_father) {
-		pci_bus_legacy_device *father = machine().device<pci_bus_legacy_device>(m_father);
-		if (father)
-			father->add_sibling(this, m_busnum);
-	}
+	if (m_father.found())
+		m_father->add_sibling(this, m_busnum);
 
 	/* register pci states */
 	save_item(NAME(m_address));

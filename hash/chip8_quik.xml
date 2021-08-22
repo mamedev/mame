@@ -65,18 +65,6 @@ possible to bundle a list to such software.
 		</part>
 	</software>
 
-	<software name="animalf">
-		<description>Animal Race (fix)</description>
-		<year>????</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Brian Astle"/>
-		<part name="quik" interface="chip8quik">
-			<dataarea name="quik" size="1194">
-				<rom name="Animal Race (fix).c8" size="1194" crc="6465acef" sha1="a27dcf88a931f70c3ccf3c01a5410b263bac48bc"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="astro">
 		<description>Astro Dodge</description>
 		<year>2009</year>

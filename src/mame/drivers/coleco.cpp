@@ -84,6 +84,9 @@ uint8_t coleco_state::paddle_1_r()
 
 uint8_t coleco_state::paddle_2_r()
 {
+	// Tape notes:
+	//     Signal is averaged to set the threshold voltage for a comparator
+	//     Output of the comparator goes to bit 7
 	return m_joy_d7_state[1] | coleco_paddle_read(1, m_joy_mode, m_joy_analog_state[1]);
 }
 
@@ -139,7 +142,10 @@ void bit90_state::u32_w(uint8_t data)
 {
 	// Write to a 74LS174 at u32
 	// Bits 4-7 are connected for keyboard scanning (actually only 4-6 are used)
-	// Bits 0-1 unknown (probably tape?)
+	// Bits 0-1 Tape Write
+	//     Notes: Tape waveform is generated using bits 0 and 1 connected as 2-bit DAC, with four output levels
+	//            The analog output is put through an RC filter to approximate a sine wave
+	//            Tape waveforms appear to be full cycles of one of 2 frequencies
 	m_keyselect = (data >> 4) & 0x0f;
 	uint8_t temp = data & 0x03;
 	if (m_unknown != temp) {
@@ -188,7 +194,7 @@ void bit90_state::bit90_io_map(address_map &map)
 	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
 	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
 	map(0xe0, 0xe0).mirror(0x1b).w(FUNC(bit90_state::u32_w));        // bits7-4 for keyscan, (to bcd decoder) and bits1-0 tape out
-	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));  // also, bit7 is tape read?
+	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));  // also, bit7 is tape in
 	map(0xe4, 0xe4).mirror(0x1b).w("sn76489a", FUNC(sn76489a_device::write));
 
 	// IORQ goes to pin 55 of the Bit90 expansion port,

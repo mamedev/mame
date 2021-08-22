@@ -8,14 +8,14 @@ license:CC0
 
 	<element name="blackb"><rect><color red="0.00" green="0.00" blue="0.00" /></rect></element>
 	<element name="blackd"><disk><color red="0.00" green="0.00" blue="0.00" /></disk></element>
-	<element name="black2b"><rect><color red="0.12" green="0.11" blue="0.11" /></rect></element>
-	<element name="black2d"><disk><color red="0.12" green="0.11" blue="0.11" /></disk></element>
-	<element name="black3b"><rect><color red="0.12" green="0.11" blue="0.10" /></rect></element>
+	<element name="black2b"><rect><color red="0.12" green="0.11" blue="0.10" /></rect></element>
 	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 
+	<element name="ledo">
+		<disk><color red="0.1" green="0.05" blue="0.07" /></disk>
+	</element>
 	<element name="ledr" defstate="0">
-		<disk state="0">    <color red="0.12" green="0.11" blue="0.1" />   </disk>
-		<disk state="1">    <color red="1" green="0.01" blue="0.15" />  </disk>
+		<disk state="1">    <color red="1" green="0" blue="0" />  </disk>
 	</element>
 	<element name="ledg" defstate="0">
 		<disk state="0">    <color red="0.05" green="0.15" blue="0.05" />   </disk>
@@ -193,7 +193,7 @@ license:CC0
 		<bounds x="-3.5" y="-3.5" width="89" height="89" />
 
 		<element ref="cblack"><bounds x="-3.5" y="-3.5" width="89" height="89" /></element>
-		<element ref="black3b"><bounds x="0.5" y="0.5" width="81" height="81" /></element>
+		<element ref="black2b"><bounds x="0.5" y="0.5" width="81" height="81" /></element>
 
 		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="-2.3" y="5"  width="2" height="2" /></element>
@@ -310,20 +310,43 @@ license:CC0
 			<element name="piece_h~i~" ref="piece"><bounds x="71" y="~y~" width="10" height="10" /></element>
 		</repeat>
 
-		<!-- LEDs -->
+		<!-- 81 LEDs from 64 outputs -->
 		<repeat count="9">
+			<param name="x" start="0.5" increment="10" />
+			<repeat count="9">
+				<param name="y" start="0.5" increment="10" />
+				<element ref="ledo"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+		</repeat>
+
+		<repeat count="8">
 			<param name="x" start="80.5" increment="-10" />
 			<param name="i" start="0" increment="1" />
+			<repeat count="8">
+				<param name="y" start="0.5" increment="10" />
+				<param name="j" start="0" increment="1" />
+				<element name="sb30_led_~j~.~i~" ref="ledr" blend="add"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+			<repeat count="8">
+				<param name="y" start="10.5" increment="10" />
+				<param name="j" start="0" increment="1" />
+				<element name="sb30_led_~j~.~i~" ref="ledr" blend="add"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+		</repeat>
 
-			<element name="led_0~i~" ref="ledr"><bounds x="~x~"    y="0.5"    width="1" height="1" /></element>
-			<element name="led_1~i~" ref="ledr"><bounds x="~x~"    y="10.5"   width="1" height="1" /></element>
-			<element name="led_2~i~" ref="ledr"><bounds x="~x~"    y="20.5"   width="1" height="1" /></element>
-			<element name="led_3~i~" ref="ledr"><bounds x="~x~"    y="30.5"   width="1" height="1" /></element>
-			<element name="led_4~i~" ref="ledr"><bounds x="~x~"    y="40.5"   width="1" height="1" /></element>
-			<element name="led_5~i~" ref="ledr"><bounds x="~x~"    y="50.5"   width="1" height="1" /></element>
-			<element name="led_6~i~" ref="ledr"><bounds x="~x~"    y="60.5"   width="1" height="1" /></element>
-			<element name="led_7~i~" ref="ledr"><bounds x="~x~"    y="70.5"   width="1" height="1" /></element>
-			<element name="led_8~i~" ref="ledr"><bounds x="~x~"    y="80.5"   width="1" height="1" /></element>
+		<repeat count="8">
+			<param name="x" start="70.5" increment="-10" />
+			<param name="i" start="0" increment="1" />
+			<repeat count="8">
+				<param name="y" start="0.5" increment="10" />
+				<param name="j" start="0" increment="1" />
+				<element name="sb30_led_~j~.~i~" ref="ledr" blend="add"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+			<repeat count="8">
+				<param name="y" start="10.5" increment="10" />
+				<param name="j" start="0" increment="1" />
+				<element name="sb30_led_~j~.~i~" ref="ledr" blend="add"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
 		</repeat>
 	</group>
 
@@ -495,25 +518,17 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout (Full H)">
-		<bounds left="0" right="191.6" top="0" bottom="88.8" />
+		<bounds left="0" right="161.6" top="0" bottom="88.8" />
 
-		<!-- draw connection wire -->
-		<element ref="black2d"><bounds x="174.5" y="4" width="7" height="7" /></element>
-		<element ref="blackd"><bounds x="176" y="5.5" width="4" height="4" /></element>
-		<element ref="blackb"><bounds x="168" y="5.45" width="10" height="10" /></element>
-		<element ref="blackb"><bounds x="170" y="7.5" width="10.05" height="10" /></element>
-		<element ref="black2b"><bounds x="180" y="8.2" width="1.5" height="50" /></element>
-		<element ref="black2b"><bounds x="28" y="4" width="151" height="1.5" /></element>
-
-		<group ref="control_panel"><bounds x="102.8" y="28.399" width="88.8" height="60.401" /></group>
 		<group ref="sb_board"><bounds x="12" y="0" width="88.8" height="88.8" /></group>
+		<group ref="control_panel"><bounds x="102.8" y="24.6" width="58.8" height="40" /></group>
 		<group ref="sb_ui"><bounds x="1" y="4.4" width="10" height="80" /></group>
 	</view>
 
 	<view name="Internal Layout (Full V)">
-		<bounds left="0" right="100.8" top="0" bottom="151.201" />
+		<bounds left="0" right="100.8" top="0" bottom="131.6" />
 
-		<group ref="control_panel"><bounds x="12" y="90.8" width="88.8" height="60.401" /></group>
+		<group ref="control_panel"><bounds x="26.4" y="90.8" width="60" height="40.8" /></group>
 		<group ref="sb_board"><bounds x="12" y="0" width="88.8" height="88.8" /></group>
 		<group ref="sb_ui"><bounds x="1" y="4.4" width="10" height="80" /></group>
 	</view>

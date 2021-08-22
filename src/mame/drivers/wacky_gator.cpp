@@ -24,7 +24,7 @@
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/msm5205.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 #include "wackygtr.lh"

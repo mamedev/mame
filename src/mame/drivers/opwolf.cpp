@@ -277,7 +277,7 @@ register. So what is controlling priority.
 #include "machine/timer.h"
 #include "machine/taitocchip.h"
 #include "sound/msm5205.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "includes/taitoipt.h"
 #include "video/pc080sn.h"
 #include "video/pc090oj.h"

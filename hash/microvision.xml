@@ -27,6 +27,7 @@ The "clock" feature is used to indicate MCU clock frequency
 The "pla" feature is for TMS1100 output PLA type
 The "paddle" feature is used to indicate if paddle circuitry exists on the PCB
 The "butmask" feature indicates cartridge button restrict mask (active-low)
+
 -->
 
 <softwarelist name="microvision" description="Milton Bradley Microvision cartridges">

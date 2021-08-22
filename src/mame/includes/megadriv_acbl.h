@@ -24,7 +24,9 @@ public:
 	void init_puckpkmn();
 	void init_hshavoc();
 	void init_barek2();
+	void init_barek2ch();
 	void init_barek3();
+	void init_barekch();
 	void init_bk3ssrmb();
 	void init_sonic2mb();
 	void init_twinktmb();

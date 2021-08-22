@@ -38,7 +38,7 @@ NOTE: There is manual for Run Deep which is (c) 1988 by World Games. Is Cream Co
 
 #include "cpu/m6502/r65c02.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

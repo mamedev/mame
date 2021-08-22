@@ -6,7 +6,7 @@
 #pragma once
 
 #include "bus/msx_cart/cartridge.h"
-#include "sound/ymf278b.h"
+#include "sound/ymopl.h"
 
 
 DECLARE_DEVICE_TYPE(MSX_CART_MOONSOUND, msx_cart_moonsound_device)

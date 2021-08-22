@@ -236,7 +236,6 @@ void ssystem3_state::control_w(u8 data)
 		for (int i = 0; i < 4; i++)
 			m_display[0]->write_row(i, m_lcd1_data >> (8*i) & 0xff);
 		m_display[0]->write_row(4, (m_shift ^ xorval) | 0x100);
-		m_display[0]->update();
 	}
 
 	// PB3: device serial out

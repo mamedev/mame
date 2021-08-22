@@ -2,11 +2,10 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-Knuckle Joe - (c) 1985 Seibu Kaihatsu ( Taito License )
+Knuckle Joe - (c) 1985 Seibu Kaihatsu (Taito license)
 
 driver by Ernesto Corvi
 
-Notes:
 This board seems to be an Irem design.
 The sound hardware is modified the 6803-based one used by the classic Irem
 games. There's only one AY 3-8910 chip and no MSM5205. There are also two
@@ -15,15 +14,12 @@ The video hardware is pretty much like Irem games too. The only
 strange thing is that the screen is flipped vertically.
 
 TODO:
-- sprite vs. sprite priority especially on ground level
+- accurate screen timing (raw params), attract mode doesn't 1:1 match PCB
 
-Updates:
-- proper sound hw emulation (TS 070308)
-- you can't play anymore after you die (clock speed too low, check XTAL)
-- scrolling in bike levels (scroll register overflow)
-- sprites disappearing at left screen edge (bad clipping)
-- artifacts in stage 3 and others(clear sprite mem at bank switch?)
-(081503AT)
+BTANB:
+- attract mode demo play stops playing and lets the timer run out
+- player sprite 1-scanline glitch at the lower part of motorcycle level
+- player sprite may briefly turn into garbage after a boss fight
 
 ***************************************************************************/
 
@@ -31,7 +27,6 @@ Updates:
 #include "includes/kncljoe.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/m6800/m6801.h"
 #include "sound/sn76496.h"
 #include "speaker.h"
 
@@ -256,13 +251,13 @@ void kncljoe_state::kncljoe(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kncljoe_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kncljoe_state::irq0_line_hold));
 
-	m6803_cpu_device &soundcpu(M6803(config, "soundcpu", XTAL(3'579'545))); /* verified on pcb */
-	soundcpu.set_addrmap(AS_PROGRAM, &kncljoe_state::sound_map);
-	soundcpu.in_p1_cb().set(FUNC(kncljoe_state::m6803_port1_r));
-	soundcpu.out_p1_cb().set(FUNC(kncljoe_state::m6803_port1_w));
-	soundcpu.in_p2_cb().set(FUNC(kncljoe_state::m6803_port2_r));
-	soundcpu.out_p2_cb().set(FUNC(kncljoe_state::m6803_port2_w));
-	soundcpu.set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz((double)3970)); //measured 3.970 kHz
+	M6803(config, m_soundcpu, XTAL(3'579'545)); /* verified on pcb */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &kncljoe_state::sound_map);
+	m_soundcpu->in_p1_cb().set(FUNC(kncljoe_state::m6803_port1_r));
+	m_soundcpu->out_p1_cb().set(FUNC(kncljoe_state::m6803_port1_w));
+	m_soundcpu->in_p2_cb().set(FUNC(kncljoe_state::m6803_port2_r));
+	m_soundcpu->out_p2_cb().set(FUNC(kncljoe_state::m6803_port2_w));
+	m_soundcpu->set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz(3970)); // measured 3.970 kHz
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

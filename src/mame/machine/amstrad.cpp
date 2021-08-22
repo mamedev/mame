@@ -2245,12 +2245,9 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 
 	RegData = (pSnapshot[0x021] & 0x0ff) | ((pSnapshot[0x022] & 0x0ff)<<8);
 	m_maincpu->set_state_int(Z80_SP, RegData);
-	m_maincpu->set_state_int(STATE_GENSP, RegData);
 
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
-
 	m_maincpu->set_state_int(Z80_PC, RegData);
-//  m_maincpu->set_state_int(REG_SP, RegData);
 
 	RegData = (pSnapshot[0x025] & 0x0ff);
 	m_maincpu->set_state_int(Z80_IM, RegData);
@@ -3318,7 +3315,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 		logerror("IMG: raw CPC+ cartridge file\n");
 		if (size % 0x4000)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Attempt to load a raw binary with some block smaller than 16kB in size");
+			image.seterror(image_error::INVALIDIMAGE, "Attempt to load a raw binary with some block smaller than 16kB in size");
 			return image_init_result::FAIL;
 		}
 		else
@@ -3349,7 +3346,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 		// Is RIFF format (*.cpr)
 		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not an Amstrad CPC cartridge image (despite RIFF header)");
+			image.seterror(image_error::INVALIDIMAGE, "Not an Amstrad CPC cartridge image (despite RIFF header)");
 			return image_init_result::FAIL;
 		}
 

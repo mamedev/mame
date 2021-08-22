@@ -11,14 +11,14 @@ license:CC0
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 	</element>
 	<element name="static_bg2">
-		<rect><color red="0.41" green="0.37" blue="0.39" /></rect>
+		<rect><color red="0.36" green="0.37" blue="0.39" /></rect>
 	</element>
 
 <!-- define lcd indicators -->
 
 	<element name="ind_low" defstate="0">
 		<rect state="0"><color red="0.515" green="0.537" blue="0.548" /></rect>
-		<rect state="1"><color red="0.361" green="0.326" blue="0.346" /></rect>
+		<rect state="1"><color red="0.196" green="0.176" blue="0.235" /></rect>
 		<text string="LOW">
 			<color red="0.5412" green="0.57255" blue="0.5804" />
 		</text>
@@ -26,7 +26,7 @@ license:CC0
 
 	<element name="ind_error" defstate="0">
 		<rect state="0"><color red="0.515" green="0.537" blue="0.548" /></rect>
-		<rect state="1"><color red="0.361" green="0.326" blue="0.346" /></rect>
+		<rect state="1"><color red="0.196" green="0.176" blue="0.235" /></rect>
 		<text string="ERROR">
 			<color red="0.5412" green="0.57255" blue="0.5804" />
 		</text>
@@ -34,7 +34,7 @@ license:CC0
 
 	<element name="ind_p" defstate="0">
 		<rect state="0"><color red="0.515" green="0.537" blue="0.548" /></rect>
-		<rect state="1"><color red="0.361" green="0.326" blue="0.346" /></rect>
+		<rect state="1"><color red="0.196" green="0.176" blue="0.235" /></rect>
 		<text string="P">
 			<color red="0.5412" green="0.57255" blue="0.5804" />
 		</text>
@@ -46,7 +46,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="&#x25c4;" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -56,7 +56,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="2nd" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -66,7 +66,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="INV" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -76,7 +76,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="ALPHA" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -86,7 +86,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="LC" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -96,7 +96,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="INS" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -106,7 +106,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="DE" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -116,7 +116,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="G" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -126,7 +126,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="RAD" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -136,7 +136,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="HEX" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -146,7 +146,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="OCT" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -156,7 +156,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="I/O" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -166,7 +166,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="RUN" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -176,7 +176,7 @@ license:CC0
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="SYS" align="1" state="1">
-			<color red="0.361" green="0.326" blue="0.346" />
+			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
@@ -258,68 +258,68 @@ license:CC0
 
 <!-- left: _p, left -->
 
-		<element name="lamp70" ref="ind_p">
+		<element name="seg70" ref="ind_p">
 			<bounds x="1" y="9" width="5" height="5" />
 		</element>
-		<element name="lamp71" ref="ind_left">
+		<element name="seg71" ref="ind_left">
 			<bounds x="7.5" y="8" width="4" height="6" />
 		</element>
 
 <!-- right: run, sys -->
 
-		<element name="lamp3" ref="ind_run">
+		<element name="seg3" ref="ind_run">
 			<bounds x="115.5" y="6.5" width="20" height="5" />
 		</element>
-		<element name="lamp4" ref="ind_sys">
+		<element name="seg4" ref="ind_sys">
 			<bounds x="115.5" y="12" width="20" height="5" />
 		</element>
 
 <!-- top: _low, _error, 2nd, inv, alpha, lc, ins -->
 
-		<element name="lamp40" ref="ind_low">
+		<element name="seg40" ref="ind_low">
 			<bounds x="1" y="1" width="12" height="5" />
 		</element>
-		<element name="lamp43" ref="ind_error">
+		<element name="seg43" ref="ind_error">
 			<bounds x="16" y="1" width="15" height="5" />
 		</element>
 
-		<element name="lamp41" ref="ind_2nd">
+		<element name="seg41" ref="ind_2nd">
 			<bounds x="32" y="1" width="20" height="5" />
 		</element>
-		<element name="lamp44" ref="ind_inv">
+		<element name="seg44" ref="ind_inv">
 			<bounds x="41" y="1" width="20" height="5" />
 		</element>
-		<element name="lamp42" ref="ind_alpha">
+		<element name="seg42" ref="ind_alpha">
 			<bounds x="50" y="1" width="20" height="5" />
 		</element>
-		<element name="lamp12" ref="ind_lc">
+		<element name="seg12" ref="ind_lc">
 			<bounds x="64.3" y="1" width="20" height="5" />
 		</element>
-		<element name="lamp11" ref="ind_ins">
+		<element name="seg11" ref="ind_ins">
 			<bounds x="71.3" y="1" width="20" height="5" />
 		</element>
 
 <!-- top: deg/rad/grad -->
 
-		<element name="lamp10" ref="ind_de">
+		<element name="seg10" ref="ind_de">
 			<bounds x="80" y="1" width="20" height="5" />
 		</element>
-		<element name="lamp13" ref="ind_g">
+		<element name="seg13" ref="ind_g">
 			<bounds x="85" y="1" width="20" height="5" />
 		</element>
-		<element name="lamp14" ref="ind_rad">
+		<element name="seg14" ref="ind_rad">
 			<bounds x="87.8" y="1" width="20" height="5" />
 		</element>
 
 <!-- top: hex, oct, i/o -->
 
-		<element name="lamp0" ref="ind_hex">
+		<element name="seg0" ref="ind_hex">
 			<bounds x="97.7" y="1" width="20" height="5" />
 		</element>
-		<element name="lamp1" ref="ind_oct">
+		<element name="seg1" ref="ind_oct">
 			<bounds x="107" y="1" width="20" height="5" />
 		</element>
-		<element name="lamp2" ref="ind_io">
+		<element name="seg2" ref="ind_io">
 			<bounds x="117.5" y="1" width="20" height="5" />
 		</element>
 

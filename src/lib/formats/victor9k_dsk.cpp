@@ -99,6 +99,8 @@
 
 #include "formats/victor9k_dsk.h"
 
+#include "ioprocs.h"
+
 
 victor9k_format::victor9k_format()
 {
@@ -119,18 +121,22 @@ const char *victor9k_format::extensions() const
 	return "img";
 }
 
-int victor9k_format::find_size(io_generic *io, uint32_t form_factor)
+int victor9k_format::find_size(util::random_read &io, uint32_t form_factor)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return -1;
+
 	for(int i=0; formats[i].sector_count; i++) {
 		const format &f = formats[i];
 		if(size == (uint32_t) f.sector_count*f.sector_base_size*f.head_count)
 			return i;
 	}
+
 	return -1;
 }
 
-int victor9k_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int victor9k_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -248,19 +254,24 @@ void victor9k_format::build_sector_description(const format &f, uint8_t *sectdat
 	}
 }
 
-bool victor9k_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int type = find_size(io, form_factor);
+	int const type = find_size(io, form_factor);
 	if(type == -1)
 		return false;
 
 	const format &f = formats[type];
 
-	uint64_t size = io_generic_size(io);
-	std::vector<uint8_t> img;
-	img.resize(size);
+	uint64_t size;
+	if(io.length(size))
+		return false;
 
-	io_generic_read(io, &img[0], 0, size);
+	std::vector<uint8_t> img;
+	try { img.resize(size); }
+	catch (...) { return false; }
+
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	log_boot_sector(&img[0]);
 
@@ -392,7 +403,7 @@ const int victor9k_format::rpm[9] =
 	252, 267, 283, 300, 321, 342, 368, 401, 417
 };
 
-bool victor9k_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	const format &f = formats[0];
 
@@ -406,7 +417,8 @@ bool victor9k_format::save(io_generic *io, const std::vector<uint32_t> &variants
 
 			build_sector_description(f, sectdata, 0, sectors, sector_count);
 			extract_sectors(image, f, sectors, track, head, sector_count);
-			io_generic_write(io, sectdata, offset, track_size);
+			size_t actual;
+			io.write_at(offset, sectdata, track_size, actual);
 		}
 	}
 

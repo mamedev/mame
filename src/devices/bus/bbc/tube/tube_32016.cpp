@@ -146,7 +146,7 @@ void bbc_tube_16032_device::device_add_mconfig(machine_config &config)
 {
 	bbc_tube_32016_device::device_add_mconfig(config);
 
-	m_maincpu->set_clock(16_MHz_XTAL / 2);
+	m_maincpu->set_clock(16_MHz_XTAL / 2); // also seen with a 8MHz crystal
 
 	m_ram->set_default_size("256K").set_extra_options("1M").set_default_value(0);
 }

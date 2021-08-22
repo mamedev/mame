@@ -322,48 +322,12 @@ public:
 } // namespace sol
 
 
-int sol_lua_push(sol::types<osd_file::error>, lua_State *L, osd_file::error &&value)
+int sol_lua_push(sol::types<std::error_condition>, lua_State *L, std::error_condition &&value)
 {
-	const char *strerror;
-	switch(value)
-	{
-		case osd_file::error::NONE:
-			return sol::stack::push(L, sol::lua_nil);
-		case osd_file::error::FAILURE:
-			strerror = "failure";
-			break;
-		case osd_file::error::OUT_OF_MEMORY:
-			strerror = "out_of_memory";
-			break;
-		case osd_file::error::NOT_FOUND:
-			strerror = "not_found";
-			break;
-		case osd_file::error::ACCESS_DENIED:
-			strerror = "access_denied";
-			break;
-		case osd_file::error::ALREADY_OPEN:
-			strerror = "already_open";
-			break;
-		case osd_file::error::TOO_MANY_FILES:
-			strerror = "too_many_files";
-			break;
-		case osd_file::error::INVALID_DATA:
-			strerror = "invalid_data";
-			break;
-		case osd_file::error::INVALID_ACCESS:
-			strerror = "invalid_access";
-			break;
-		default:
-			strerror = "unknown_error";
-			break;
-	}
-	return sol::stack::push(L, strerror);
-}
-
-template <typename Handler>
-bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler &&handler, sol::stack::record &tracking)
-{
-	return sol::stack::check<int>(L, index, std::forward<Handler>(handler));
+	if (!value)
+		return sol::stack::push(L, sol::lua_nil);
+	else
+		return sol::stack::push(L, value.message());
 }
 
 
@@ -884,7 +848,7 @@ void lua_engine::initialize()
 				}));
 	file_type.set("read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; });
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
-	file_type.set("open", static_cast<osd_file::error (emu_file::*)(std::string_view)>(&emu_file::open));
+	file_type.set("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
 	file_type.set("open_next", &emu_file::open_next);
 	file_type.set("seek", sol::overload(
 			[](emu_file &file) { return file.tell(); },
@@ -932,7 +896,7 @@ void lua_engine::initialize()
 	auto thread_type = emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>());
 	thread_type.set("start", [](context &ctx, const char *scr) {
 			std::string script(scr);
-			if(ctx.busy)
+			if (ctx.busy)
 				return false;
 			std::thread th([&ctx, script]() {
 					sol::state thstate;
@@ -954,13 +918,24 @@ void lua_engine::initialize()
 								thstate["status"] = ctx.result;
 							};
 						auto ret = func();
-						if (ret.valid()) {
+						if (ret.valid())
+						{
 							const char *tmp = ret.get<const char *>();
 							if (tmp != nullptr)
 								ctx.result = tmp;
 							else
-								exit(0);
+								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
 						}
+						else
+						{
+							sol::error err = ret;
+							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
+						}
+					}
+					else
+					{
+						sol::error err = res;
+						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
 					}
 					ctx.busy = false;
 				});
@@ -970,13 +945,13 @@ void lua_engine::initialize()
 			return true;
 		});
 	thread_type.set("continue", [](context &ctx, const char *val) {
-			if(!ctx.yield)
+			if (!ctx.yield)
 				return;
 			ctx.result = val;
 			ctx.sync.notify_all();
 		});
 	thread_type.set("result", sol::property([](context &ctx) -> std::string {
-			if(ctx.busy && !ctx.yield)
+			if (ctx.busy && !ctx.yield)
 				return "";
 			return ctx.result;
 		}));
@@ -1413,10 +1388,11 @@ void lua_engine::initialize()
 			[this] (device_t &dev)
 			{
 				sol::table st_table = sol().create_table();
-				if(!dynamic_cast<device_state_interface *>(&dev))
+				const device_state_interface *state;
+				if(!dev.interface(state))
 					return st_table;
 				// XXX: refrain from exporting non-visible entries?
-				for(auto &s : dev.state().state_entries())
+				for(auto &s : state->state_entries())
 					st_table[s->symbol()] = s.get();
 				return st_table;
 			});
@@ -1522,12 +1498,12 @@ void lua_engine::initialize()
 
 			// open the file
 			emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr;
+			std::error_condition filerr;
 			if (!snapstr.empty())
 				filerr = file.open(snapstr);
 			else
 				filerr = machine().video().open_next(file, "png");
-			if (filerr != osd_file::error::NONE)
+			if (filerr)
 				return sol::make_object(sol(), filerr);
 
 			// and save the snapshot

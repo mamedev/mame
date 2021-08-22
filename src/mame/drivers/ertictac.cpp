@@ -23,17 +23,24 @@ PCB has a single OSC at 24MHz
 *******************************************************************************************/
 
 #include "emu.h"
-#include "includes/archimds.h"
 #include "cpu/arm/arm.h"
-#include "machine/aakart.h"
+#include "machine/acorn_ioc.h"
+#include "machine/acorn_memc.h"
+#include "machine/acorn_vidc.h"
+#include "machine/pcf8583.h"
 #include "screen.h"
 
 
-class ertictac_state : public archimedes_state
+class ertictac_state : public driver_device
 {
 public:
 	ertictac_state(const machine_config &mconfig, device_type type, const char *tag)
-		: archimedes_state(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ioc(*this, "ioc")
+		, m_memc(*this, "memc")
+		, m_vidc10(*this, "vidc")
+		{ }
 
 	void ertictac(machine_config &config);
 
@@ -44,15 +51,21 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
+	void ertictac_arm_map(address_map &map);
 	void ertictac_map(address_map &map);
+
+	required_device<arm_cpu_device> m_maincpu;
+	required_device<acorn_ioc_device> m_ioc;
+	required_device<acorn_memc_device> m_memc;
+	required_device<acorn_vidc10_device> m_vidc10;
 };
 
 
 uint32_t ertictac_state::ertictac_podule_r(offs_t offset)
 {
-	archimedes_clear_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
+	m_ioc->il5_w(CLEAR_LINE);
 
-	switch(offset)
+	switch(offset & 0x3fff)
 	{
 		case 0x04/4: return ioport("DSW1")->read() & 0xff;
 		case 0x08/4: return ioport("DSW2")->read() & 0xff;
@@ -64,17 +77,22 @@ uint32_t ertictac_state::ertictac_podule_r(offs_t offset)
 	return 0;
 }
 
+
+void ertictac_state::ertictac_arm_map(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).rw(m_memc, FUNC(acorn_memc_device::logical_r), FUNC(acorn_memc_device::logical_w));
+	map(0x02000000, 0x03ffffff).rw(m_memc, FUNC(acorn_memc_device::high_mem_r), FUNC(acorn_memc_device::high_mem_w));
+}
+
 void ertictac_state::ertictac_map(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).rw(FUNC(ertictac_state::archimedes_memc_logical_r), FUNC(ertictac_state::archimedes_memc_logical_w));
+	map(0x00000000, 0x01ffffff).rw(m_memc, FUNC(acorn_memc_device::logical_r), FUNC(acorn_memc_device::logical_w));
 	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
-	map(0x03000000, 0x033fffff).rw(FUNC(ertictac_state::archimedes_ioc_r), FUNC(ertictac_state::archimedes_ioc_w));
-	map(0x03340000, 0x0334001f).r(FUNC(ertictac_state::ertictac_podule_r));
-	map(0x033c0000, 0x033c001f).r(FUNC(ertictac_state::ertictac_podule_r));
-	map(0x03400000, 0x035fffff).w(m_vidc, FUNC(acorn_vidc10_device::write));
-	map(0x03600000, 0x037fffff).w(FUNC(ertictac_state::archimedes_memc_w));
-	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(FUNC(ertictac_state::archimedes_memc_page_w));
+	map(0x03000000, 0x033fffff).m(m_ioc, FUNC(acorn_ioc_device::map));
+	map(0x03400000, 0x035fffff).w(m_vidc10, FUNC(acorn_vidc10_device::write));
+	map(0x03600000, 0x037fffff).w(m_memc, FUNC(acorn_memc_device::registers_w));
+	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(m_memc, FUNC(acorn_memc_device::page_w));
 }
 
 static INPUT_PORTS_START( ertictac )
@@ -200,40 +218,48 @@ INPUT_PORTS_END
 
 void ertictac_state::init_ertictac()
 {
-	archimedes_driver_init();
 }
 
 void ertictac_state::machine_start()
 {
-	archimedes_init();
 }
 
 void ertictac_state::machine_reset()
 {
-	archimedes_reset();
 }
 
 INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 {
-	archimedes_request_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
+	m_ioc->il5_w(ASSERT_LINE);
 }
 
 void ertictac_state::ertictac(machine_config &config)
 {
 	ARM(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_arm_map);
 	m_maincpu->set_periodic_int(FUNC(ertictac_state::ertictac_podule_irq), attotime::from_hz(60)); // FIXME: timing of this
 
 	PCF8583(config, "i2cmem", 32.768_kHz_XTAL); // TODO: Are we sure that this HW have I2C device?
 
-//  AAKART(config, m_kart, 24_MHz_XTAL/3); // TODO: frequency
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
+	screen.screen_vblank().append(m_memc, FUNC(acorn_memc_device::vidrq_w));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	ACORN_MEMC(config, m_memc, 24_MHz_XTAL/3, m_vidc10);
+	m_memc->set_addrmap(0, &ertictac_state::ertictac_map);
+	m_memc->sirq_w().set(m_ioc, FUNC(acorn_ioc_device::il1_w));
 
-	ACORN_VIDC10(config, m_vidc, 24_MHz_XTAL);
-	m_vidc->set_screen("screen");
-	m_vidc->vblank().set(FUNC(ertictac_state::vblank_irq));
-	m_vidc->sound_drq().set(FUNC(ertictac_state::sound_drq));
+	ACORN_IOC(config, m_ioc, 24_MHz_XTAL/3);
+	m_ioc->fiq_w().set_inputline(m_maincpu, ARM_FIRQ_LINE);
+	m_ioc->irq_w().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ioc->peripheral_r<4>().set(FUNC(ertictac_state::ertictac_podule_r));
+	m_ioc->gpio_r<0>().set("i2cmem", FUNC(pcf8583_device::sda_r));
+	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
+	m_ioc->gpio_w<1>().set("i2cmem", FUNC(pcf8583_device::scl_w));
+
+	ACORN_VIDC10(config, m_vidc10, 24_MHz_XTAL);
+	m_vidc10->set_screen("screen");
+	m_vidc10->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
 }
 
 ROM_START( ertictac )

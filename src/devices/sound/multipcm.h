@@ -123,6 +123,7 @@ private:
 	uint32_t value_to_fixed(const uint32_t bits, const float value);
 
 	void init_sample(sample_t *sample, uint32_t index);
+	void retrigger_sample(slot_t &slot);
 
 	// Internal LFO functions
 	void lfo_init();

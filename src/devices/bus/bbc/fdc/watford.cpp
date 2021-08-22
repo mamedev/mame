@@ -77,8 +77,8 @@ void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
 
 void bbc_weddb3_device::device_add_mconfig(machine_config &config)
@@ -87,8 +87,8 @@ void bbc_weddb3_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
 
 const tiny_rom_entry *bbc_weddb2_device::device_rom_region() const
@@ -119,8 +119,7 @@ bbc_watfordfdc_device::bbc_watfordfdc_device(const machine_config &mconfig, devi
 bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_watfordfdc_device(mconfig, BBC_WEDDB2, tag, owner, clock)
 	, m_fdc(*this, "wd1772")
-	, m_floppy0(*this, "wd1772:0")
-	, m_floppy1(*this, "wd1772:1")
+	, m_floppy(*this, "wd1772:%u", 0)
 	, m_drive_control(0)
 {
 }
@@ -128,8 +127,7 @@ bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *
 bbc_weddb3_device::bbc_weddb3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_watfordfdc_device(mconfig, BBC_WEDDB3, tag, owner, clock)
 	, m_fdc(*this, "wd1770")
-	, m_floppy0(*this, "wd1770:0")
-	, m_floppy1(*this, "wd1770:1")
+	, m_floppy(*this, "wd1770:%u", 0)
 	, m_drive_control(0)
 {
 }
@@ -181,8 +179,8 @@ void bbc_weddb2_device::write(offs_t offset, uint8_t data)
 		m_drive_control = data;
 
 		// bit 2: drive select
-		floppy_image_device *floppy0 = m_floppy0->get_device();
-		floppy_image_device *floppy1 = m_floppy1->get_device();
+		floppy_image_device *floppy0 = m_floppy[0]->get_device();
+		floppy_image_device *floppy1 = m_floppy[1]->get_device();
 		floppy = (BIT(data, 2) ? floppy1 : floppy0);
 		m_fdc->set_floppy(floppy);
 
@@ -226,8 +224,8 @@ void bbc_weddb3_device::write(offs_t offset, uint8_t data)
 		m_drive_control = data;
 
 		// bit 0, 1: drive select
-		if (BIT(data, 0)) floppy = m_floppy0->get_device();
-		if (BIT(data, 1)) floppy = m_floppy1->get_device();
+		if (BIT(data, 0)) floppy = m_floppy[0]->get_device();
+		if (BIT(data, 1)) floppy = m_floppy[1]->get_device();
 		m_fdc->set_floppy(floppy);
 
 		// bit 2: side select

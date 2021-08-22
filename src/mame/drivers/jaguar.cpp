@@ -1967,7 +1967,7 @@ image_init_result jaguar_state::quickload_cb(device_image_interface &image)
 
 
 	/* Some programs are too lazy to set a stack pointer */
-	m_maincpu->set_state_int(STATE_GENSP, 0x1000);
+	m_maincpu->set_state_int(M68K_SP, 0x1000);
 	m_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */

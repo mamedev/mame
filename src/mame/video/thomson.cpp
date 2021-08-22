@@ -172,7 +172,7 @@ TIMER_CALLBACK_MEMBER( thomson_state::thom_lightpen_step )
 	int step = param;
 
 	if ( m_thom_lightpen_cb )
-		(this->*m_thom_lightpen_cb)( step );
+		m_thom_lightpen_cb( step );
 
 	if ( step < m_thom_lightpen_nb )
 		m_thom_lightpen_timer->adjust(attotime::from_usec( 64 ), step + 1);
@@ -902,33 +902,11 @@ TIMER_CALLBACK_MEMBER( thomson_state::thom_scanline_start )
 /* -------------- misc --------------- */
 
 
-#define FLOP_STATE (m_thom_floppy_wcount ? 2 : m_thom_floppy_rcount ? 1 : 0)
-
-
-
 void thomson_state::thom_set_mode_point( int point )
 {
 	assert( point >= 0 && point <= 1 );
 	m_thom_mode_point = ( ! point ) * 0x2000;
 	m_vrambank->set_entry( ! point );
-}
-
-
-
-void thomson_state::thom_floppy_active( int write )
-{
-	int fold = FLOP_STATE, fnew;
-
-	/* stays up for a few frames */
-	if ( write )
-		m_thom_floppy_wcount = 25;
-	else
-		m_thom_floppy_rcount = 25;
-
-	/* update icon */
-	fnew = FLOP_STATE;
-	if ( fold != fnew )
-		m_floppy_led = fnew;
 }
 
 
@@ -1065,21 +1043,11 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 	// rising edge
 	if (state)
 	{
-		int fnew, fold = FLOP_STATE;
 		int i;
 		uint16_t b = 0;
 		struct thom_vsignal l = thom_get_lightpen_vsignal( 0, -1, 0 );
 
 		LOG("%f thom: video eof called\n", machine().time().as_double());
-
-		/* floppy indicator count */
-		if ( m_thom_floppy_wcount )
-			m_thom_floppy_wcount--;
-		if ( m_thom_floppy_rcount )
-			m_thom_floppy_rcount--;
-		fnew = FLOP_STATE;
-		if ( fnew != fold )
-			m_floppy_led = fnew;
 
 		/* prepare state for next frame */
 		for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
@@ -1194,12 +1162,6 @@ void thomson_state::video_start()
 	save_item(NAME(m_thom_mode_point));
 	m_vrambank->set_entry( 0 );
 
-	m_thom_floppy_rcount = 0;
-	m_thom_floppy_wcount = 0;
-	save_item(NAME(m_thom_floppy_wcount));
-	save_item(NAME(m_thom_floppy_rcount));
-	m_floppy_led.resolve();
-
 	m_caps_led.resolve();
 
 	m_thom_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
@@ -1258,7 +1220,7 @@ void thomson_state::thom_palette(palette_device &palette)
 	thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
 }
 
-void thomson_state::mo5_palette(palette_device &palette)
+void mo5_state::mo5_palette(palette_device &palette)
 {
 	LOG("thom: MO5 palette init called\n");
 
@@ -1334,7 +1296,7 @@ void thomson_state::to770_vram_w(offs_t offset, uint8_t data)
 
 /* write to video memory through system space (always page 1) */
 
-void thomson_state::to8_sys_lo_w(offs_t offset, uint8_t data)
+void to9_state::to8_sys_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + offset + 0x6000;
 	assert( offset < 0x2000 );
@@ -1347,7 +1309,7 @@ void thomson_state::to8_sys_lo_w(offs_t offset, uint8_t data)
 
 
 
-void thomson_state::to8_sys_hi_w(offs_t offset, uint8_t data)
+void to9_state::to8_sys_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + offset + 0x4000;
 	assert( offset < 0x2000 );
@@ -1361,7 +1323,7 @@ void thomson_state::to8_sys_hi_w(offs_t offset, uint8_t data)
 
 /* write to video memory through data space */
 
-void thomson_state::to8_data_lo_w(offs_t offset, uint8_t data)
+void to9_state::to8_data_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage + 0x2000 ) & m_ram->mask() );
 	assert( offset < 0x2000 );
@@ -1376,7 +1338,7 @@ void thomson_state::to8_data_lo_w(offs_t offset, uint8_t data)
 
 
 
-void thomson_state::to8_data_hi_w(offs_t offset, uint8_t data)
+void to9_state::to8_data_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage ) & m_ram->mask() );
 	assert( offset < 0x2000 );
@@ -1392,7 +1354,7 @@ void thomson_state::to8_data_hi_w(offs_t offset, uint8_t data)
 
 
 /* write to video memory page through cartridge addresses space */
-void thomson_state::to8_vcart_w(offs_t offset, uint8_t data)
+void to9_state::to8_vcart_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x4000 );
@@ -1405,7 +1367,7 @@ void thomson_state::to8_vcart_w(offs_t offset, uint8_t data)
 	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = true;
 }
 
-void thomson_state::mo6_vcart_lo_w(offs_t offset, uint8_t data)
+void mo6_state::mo6_vcart_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x3000 + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x1000 );
@@ -1418,7 +1380,7 @@ void thomson_state::mo6_vcart_lo_w(offs_t offset, uint8_t data)
 	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = true;
 }
 
-void thomson_state::mo6_vcart_hi_w(offs_t offset, uint8_t data)
+void mo6_state::mo6_vcart_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x3000 );

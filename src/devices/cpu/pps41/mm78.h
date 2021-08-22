@@ -39,6 +39,7 @@
    RIO5 20 |           | 23 RIO8       RIO7 20 |___________| 21 RIO8
    RIO6 21 |___________| 22 RIO7
 
+    MM78 also exists as 40-pin DIP and can have the same pinout as MM78L
 */
 
 class mm78_device : public mm76_device

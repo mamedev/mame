@@ -950,9 +950,9 @@ void n64_texture_pipe_t::fetch_i4_tlut0(rgbaint_t& out, int32_t s, int32_t t, in
 
 	const uint8_t byteval = tc[taddr];
 	const uint8_t c = ((s & 1)) ? (byteval & 0xf) : ((byteval >> 4) & 0xf);
-	const uint16_t k = ((uint16_t*)(userdata->m_tmem + 0x800))[((tpal << 4) | c) << 2];
 
 #if USE_64K_LUT
+	const uint16_t k = ((uint16_t*)(userdata->m_tmem + 0x800))[((tpal << 4) | c) << 2];
 	out.set(m_expand_16to32_table[k]);
 #else
 	out.set((c & 1) * 0xff, GET_HI_RGBA16_TMEM(c), GET_MED_RGBA16_TMEM(c), GET_LOW_RGBA16_TMEM(c));
@@ -990,9 +990,9 @@ void n64_texture_pipe_t::fetch_i8_tlut0(rgbaint_t& out, int32_t s, int32_t t, in
 	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 
 	const uint8_t c = tc[taddr];
-	const uint16_t k = ((uint16_t*)(userdata->m_tmem + 0x800))[c << 2];
 
 #if USE_64K_LUT
+	const uint16_t k = ((uint16_t*)(userdata->m_tmem + 0x800))[c << 2];
 	out.set(m_expand_16to32_table[k]);
 #else
 	out.set((c & 1) * 0xff, GET_HI_RGBA16_TMEM(c), GET_MED_RGBA16_TMEM(c), GET_LOW_RGBA16_TMEM(c));

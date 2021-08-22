@@ -398,8 +398,8 @@ static const prom_load_t pl_madr_a65 =
 void alto2_cpu_device::init_hw()
 {
 	memset(&m_hw, 0, sizeof(m_hw));
-	m_madr_a64 = prom_load(machine(), &pl_madr_a64, memregion("madr_a64")->base());
-	m_madr_a65 = prom_load(machine(), &pl_madr_a65, memregion("madr_a65")->base());
+	m_madr_a64 = prom_load<uint8_t>(machine(), &pl_madr_a64, memregion("madr_a64")->base());
+	m_madr_a65 = prom_load<uint8_t>(machine(), &pl_madr_a65, memregion("madr_a65")->base());
 }
 
 void alto2_cpu_device::exit_hw()

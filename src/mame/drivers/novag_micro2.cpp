@@ -30,8 +30,8 @@ Octo (listed differences):
   as 15MHz on the box, but measured ~12MHz (older Octo version is probably ~6MHz?)
 - speaker circuit is a bit different, not sure why
 
-Note that even though the MCUs are different, internal ROM contents is
-identical for Micro II/III, Presto, Octo.
+Note that even though the MCUs are different, internal ROM contents was confirmed
+to be identical for Micro II/III, Presto, Octo.
 
 TODO:
 - controls are too sensitive, is there a bug in the CPU core timer emulation?

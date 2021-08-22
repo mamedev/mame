@@ -320,7 +320,6 @@ void i8085a_cpu_device::device_start()
 		state_add(STATE_GENPC,  "GENPC",  m_PC.w.l).noshow();
 		state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
 		state_add(I8085_SP,     "SP",     m_SP.w.l);
-		state_add(STATE_GENSP,  "GENSP",  m_SP.w.l).noshow();
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_AF.b.l).noshow().formatstr("%8s");
 		state_add(I8085_A,      "A",      m_AF.b.h).noshow();
 		state_add(I8085_B,      "B",      m_BC.b.h).noshow();

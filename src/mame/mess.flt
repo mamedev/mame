@@ -80,6 +80,7 @@ applix.cpp
 apricot.cpp
 apricotf.cpp
 apricotp.cpp
+apxen.cpp
 aquarius.cpp
 arcadia.cpp
 argo.cpp
@@ -108,6 +109,7 @@ b2m.cpp
 babbage.cpp
 banctec.cpp
 bandai_design_master.cpp
+basf7100.cpp
 basic52.cpp
 basssta.cpp
 bbc.cpp
@@ -169,6 +171,7 @@ channelf.cpp
 chaos.cpp
 chessmate.cpp
 chessmst.cpp
+chessmstdm.cpp
 cit101.cpp
 cit101xl.cpp
 cit1500.cpp
@@ -200,6 +203,7 @@ controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
+crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
@@ -223,6 +227,7 @@ dccons.cpp
 dcebridge.cpp
 dct11em.cpp
 debut.cpp
+decmate2.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
@@ -243,6 +248,7 @@ dmv.cpp
 dolphunk.cpp
 dpb7000.cpp
 dps1.cpp
+dpsv55.cpp
 dragon.cpp
 drumsta.cpp
 dsb46.cpp
@@ -267,6 +273,7 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
+elzet80.cpp
 emax.cpp
 emma2.cpp
 emu2.cpp
@@ -314,6 +321,7 @@ fidel_csc.cpp
 fidel_dames.cpp
 fidel_desdis.cpp
 fidel_eag68k.cpp
+fidel_eldorado.cpp
 fidel_elite.cpp
 fidel_excel.cpp
 fidel_msc.cpp
@@ -363,6 +371,7 @@ gimix.cpp
 gizmondo.cpp
 gkidabc.cpp
 glcx.cpp
+gm1000.cpp
 gmaster.cpp
 gnat10.cpp
 goupil.cpp
@@ -396,6 +405,7 @@ hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
 hk68v10.cpp
+hohnadam.cpp
 homelab.cpp
 homez80.cpp
 horizon.cpp
@@ -447,6 +457,7 @@ innotv_innotabmax.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
+intellec8.cpp
 intellect02.cpp
 interpro.cpp
 intv.cpp
@@ -478,6 +489,7 @@ jtc.cpp
 juicebox.cpp
 juku.cpp
 junior.cpp
+junior80.cpp
 juno106.cpp
 juno6.cpp
 jupace.cpp
@@ -495,6 +507,7 @@ kaypro.cpp
 kc.cpp
 kdt6.cpp
 kim1.cpp
+kminus.cpp
 konin.cpp
 korgds8.cpp
 korgdss1.cpp
@@ -516,6 +529,7 @@ lc80.cpp
 lcmate2.cpp
 leapfrog_iquest.cpp
 leapfrog_leappad.cpp
+leapfrog_leapster_explorer.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
@@ -527,9 +541,11 @@ lft_phasor.cpp
 lg-dvd.cpp
 lilith.cpp
 lisa.cpp
+lk3000.cpp
 llc1.cpp
 llc2.cpp
 lms46.cpp
+lnw80.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
@@ -551,6 +567,7 @@ macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
+max80.cpp
 mbc020.cpp
 mbc200.cpp
 mbc55x.cpp
@@ -574,21 +591,27 @@ mekd3.cpp
 mekd4.cpp
 mekd5.cpp
 mephisto_academy.cpp
+mephisto_amsterdam.cpp
 mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp
+mephisto_milano.cpp
 mephisto_mm1.cpp
 mephisto_mm2.cpp
 mephisto_modena.cpp
 mephisto_modular.cpp
 mephisto_modular_tm.cpp
 mephisto_mondial.cpp
+mephisto_mondial2.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
+mephisto_risc.cpp
+mephisto_smondial.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp
+mg1.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
@@ -599,7 +622,6 @@ microkorg.cpp
 micromon.cpp
 micronic.cpp
 microtan.cpp
-microterm.cpp
 microterm_f8.cpp
 microvsn.cpp
 mightyframe.cpp
@@ -642,6 +664,8 @@ ms9540.cpp
 msbc1.cpp
 mstation.cpp
 msx.cpp
+mt420.cpp
+mt5510.cpp
 mt735.cpp
 mtd1256.cpp
 mtx.cpp
@@ -700,6 +724,7 @@ novag_savant.cpp
 novag_sexpert.cpp
 novag_snova.cpp
 ns5652.cpp
+ns32kdb.cpp
 o2.cpp
 ob68k1a.cpp
 octane.cpp
@@ -765,6 +790,7 @@ pes.cpp
 pet.cpp
 pg685.cpp
 phc25.cpp
+philipsbo.cpp
 phunsy.cpp
 picno.cpp
 pimps.cpp
@@ -811,6 +837,7 @@ pv1000.cpp
 pv2000.cpp
 pv9234.cpp
 pve500.cpp
+pwp14.cpp
 pwrview.cpp
 px4.cpp
 px8.cpp
@@ -825,6 +852,7 @@ qvt70.cpp
 qx10.cpp
 r9751.cpp
 radio86.cpp
+radionic.cpp
 rainbow.cpp
 rambo.cpp
 ravens.cpp
@@ -846,6 +874,7 @@ roland_jx3p.cpp
 roland_jx8p.cpp
 roland_mc50.cpp
 roland_mt32.cpp
+roland_pr100.cpp
 roland_r8.cpp
 roland_ra30.cpp
 roland_s10.cpp
@@ -916,7 +945,6 @@ sitcom.cpp
 sk1.cpp
 sk101bl.cpp
 slc1.cpp
-slc1a.cpp
 slicer.cpp
 slsstars.cpp
 sm1800.cpp
@@ -985,6 +1013,7 @@ swtpc.cpp
 swtpc09.cpp
 swtpc8212.cpp
 swyft.cpp
+sx1000.cpp
 sym1.cpp
 symbolics.cpp
 synthex.cpp
@@ -1006,6 +1035,7 @@ tecnbras.cpp
 tek405x.cpp
 tek410x.cpp
 tek440x.cpp
+tekigw.cpp
 tekxp33x.cpp
 teleray10.cpp
 telex1192.cpp
@@ -1131,6 +1161,7 @@ vta2000.cpp
 vtech1.cpp
 vtech2.cpp
 vtech_eu3a12.cpp
+vtech_innotab.cpp
 wangpc.cpp
 wicat.cpp
 wizard.cpp
@@ -1156,12 +1187,19 @@ xbase09.cpp
 xbox.cpp
 xerox820.cpp
 xor100.cpp
+yes.cpp
+yman1x.cpp
+ymdx100.cpp
 ymdx11.cpp
 ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr16.cpp
+ympsr40.cpp
+ympsr60.cpp
 ympsr340.cpp
+ymsy35.cpp
 ymtx81z.cpp
 ymvl70.cpp
 z100.cpp

@@ -9,6 +9,8 @@
     TODO:
     - ADB and PS/2
     - charset ROM is wrong
+    - asma2k reads from nonexistent internal register at 0x0001
+      (probably a bug, since the same code exists in both BIOSes)
 
 ****************************************************************************/
 
@@ -77,17 +79,24 @@ class asma2k_state : public alphasmart_state
 public:
 	asma2k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alphasmart_state(mconfig, type, tag)
+		, m_io_view(*this, "io")
+		, m_dictbank(*this, "dictbank")
 	{
 	}
 
 	void asma2k(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	uint8_t io_r(offs_t offset);
-	void io_w(offs_t offset, uint8_t data);
+	void lcd_ctrl_w(uint8_t data);
 	virtual void port_a_w(uint8_t data) override;
 
 	void asma2k_mem(address_map &map);
+
+	memory_view m_io_view;
+	required_memory_bank m_dictbank;
 
 	uint8_t m_lcd_ctrl;
 };
@@ -178,43 +187,20 @@ void alphasmart_state::alphasmart_mem(address_map &map)
 	map(0xc000, 0xc000).w(FUNC(alphasmart_state::kb_matrixl_w));
 }
 
-uint8_t asma2k_state::io_r(offs_t offset)
+void asma2k_state::lcd_ctrl_w(uint8_t data)
 {
-	if (offset == 0x2000)
-		return kb_r();
-
-	//else printf("unknown r: %x\n", offset);
-
-	return 0;
-}
-
-void asma2k_state::io_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0x2000)
-		kb_matrixh_w(data);
-	else if (offset == 0x4000)
-	{
-		uint8_t changed = (m_lcd_ctrl ^ data) & data;
-		update_lcdc(changed & 0x01, changed & 0x02);
-		m_lcd_ctrl = data;
-	}
-
-	//else printf("unknown w: %x %x\n", offset, data);
+	uint8_t changed = (m_lcd_ctrl ^ data) & data;
+	update_lcdc(changed & 0x01, changed & 0x02);
+	m_dictbank->set_entry((m_port_a & 0x30) >> 3 | (data & 0x80) >> 7);
+	m_lcd_ctrl = data;
 }
 
 void asma2k_state::port_a_w(uint8_t data)
 {
-	if ((m_port_a ^ data) & 0x40)
-	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
-		if (data & 0x40)
-			space.install_readwrite_bank(0x0000, 0x7fff, m_rambank);
-		else
-			space.install_readwrite_handler(0x0000, 0x7fff, read8sm_delegate(*this, FUNC(asma2k_state::io_r)), write8sm_delegate(*this, FUNC(asma2k_state::io_w)));
-	}
+	m_io_view.select(BIT(data, 6));
 
 	m_rambank->set_entry(((data>>4) & 0x03));
+	m_dictbank->set_entry((data & 0x30) >> 3 | (m_lcd_ctrl & 0x80) >> 7);
 	m_port_a = data;
 }
 
@@ -222,7 +208,11 @@ void asma2k_state::port_a_w(uint8_t data)
 void asma2k_state::asma2k_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).bankrw("rambank");
+	map(0x0000, 0x7fff).view(m_io_view);
+	m_io_view[0](0x2000, 0x2000).rw(FUNC(asma2k_state::kb_r), FUNC(asma2k_state::kb_matrixh_w));
+	m_io_view[0](0x4000, 0x4000).w(FUNC(asma2k_state::lcd_ctrl_w));
+	m_io_view[0](0x4000, 0x7fff).bankr("dictbank");
+	m_io_view[1](0x0000, 0x7fff).bankrw("rambank");
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 	map(0x9000, 0x9000).w(FUNC(asma2k_state::kb_matrixl_w));
 }
@@ -230,7 +220,7 @@ void asma2k_state::asma2k_mem(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( alphasmart )
 	PORT_START("COL.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)    PORT_CHAR(UCHAR_MAMEKEY(F1))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)    PORT_CHAR(UCHAR_MAMEKEY(F8))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)    PORT_CHAR(UCHAR_MAMEKEY(F7))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -380,6 +370,158 @@ static INPUT_PORTS_START( alphasmart )
 	PORT_CONFSETTING (0x01, DEF_STR(Normal))
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( asma2k )
+	PORT_START("COL.0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)   PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_NAME("F6 (File 6)") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('k')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)     PORT_CHAR('i') PORT_CHAR('I')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('_') PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)     PORT_CHAR('8') PORT_CHAR('*')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("COL.1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_NAME("Left Alt/Option") PORT_CHAR(UCHAR_MAMEKEY(LALT))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("Right Alt/Option") PORT_CHAR(UCHAR_MAMEKEY(RALT))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("COL.2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)   PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_NAME("F7 (File 7)") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)     PORT_CHAR('o') PORT_CHAR('O')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)   PORT_CHAR(UCHAR_MAMEKEY(F8)) PORT_NAME("F8 (File 8)") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)     PORT_CHAR('9') PORT_CHAR('(')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("COL.3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')    PORT_CHAR('\"') PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)     PORT_CHAR('p') PORT_CHAR('P')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)     PORT_CHAR('0') PORT_CHAR(')')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_START("COL.4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN) PORT_CODE(KEYCODE_PGUP)  PORT_NAME("Command") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)  PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK)) PORT_NAME("Clear File") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(ESC))    PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_START("COL.5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)  PORT_CHAR(UCHAR_MAMEKEY(END))    PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_START("COL.6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_START("COL.7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11)  PORT_CHAR(UCHAR_MAMEKEY(F11)) PORT_NAME("Find") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)   PORT_CHAR(UCHAR_MAMEKEY(UP))     PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_START("COL.8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("COL.9")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Delete") PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE)) PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)   PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_NAME("F5 (File 5)") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)   PORT_CHAR(UCHAR_MAMEKEY(F9)) PORT_NAME("Print") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)  PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_NAME("Spell Check") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)   PORT_NAME("Return") PORT_CHAR(13) PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ') PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_START("COL.10")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)   PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_NAME("F3 (File 3)") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)   PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_NAME("F4 (File 4)") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)    PORT_CHAR('d')  PORT_CHAR('D')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)    PORT_CHAR('e')  PORT_CHAR('E')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)   PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_NAME("F2 (File 2)") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)    PORT_CHAR('3')  PORT_CHAR('#')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)    PORT_CHAR('c')  PORT_CHAR('C')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("COL.11")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)    PORT_CHAR('s')  PORT_CHAR('S')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)    PORT_CHAR('w')  PORT_CHAR('W')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)   PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("F1 (File 1)") PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)    PORT_CHAR('2')  PORT_CHAR('@')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)    PORT_CHAR('x')  PORT_CHAR('X')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("COL.12")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)  PORT_CHAR('\t')   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)    PORT_CHAR('a')  PORT_CHAR('A')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)    PORT_CHAR('q')  PORT_CHAR('Q')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)    PORT_CHAR('1')  PORT_CHAR('!')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)    PORT_CHAR('z')  PORT_CHAR('z')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_START("COL.13")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)    PORT_CHAR('t')  PORT_CHAR('T')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)    PORT_CHAR('g')  PORT_CHAR('G')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)    PORT_CHAR('f')  PORT_CHAR('F')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)    PORT_CHAR('r')  PORT_CHAR('R')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)    PORT_CHAR('5')  PORT_CHAR('%')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)    PORT_CHAR('4')  PORT_CHAR('$')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)    PORT_CHAR('v')  PORT_CHAR('V')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)    PORT_CHAR('b')  PORT_CHAR('B')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_START("COL.14")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_MAMEKEY(RSHIFT)) PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("COL.15")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)    PORT_CHAR('y')  PORT_CHAR('Y')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)    PORT_CHAR('h')  PORT_CHAR('H')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)    PORT_CHAR('j')  PORT_CHAR('J')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)    PORT_CHAR('u')  PORT_CHAR('U')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)    PORT_CHAR('6')  PORT_CHAR('^')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)    PORT_CHAR('7')  PORT_CHAR('&')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)    PORT_CHAR('m')  PORT_CHAR('M')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)    PORT_CHAR('n')  PORT_CHAR('N')  PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
+
+	PORT_START("BATTERY")
+	PORT_CONFNAME(0x01, 0x01, "Battery status")
+	PORT_CONFSETTING (0x00, DEF_STR(Low))
+	PORT_CONFSETTING (0x01, DEF_STR(Normal))
+INPUT_PORTS_END
+
 void alphasmart_state::alphasmart_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
@@ -405,6 +547,14 @@ void alphasmart_state::machine_start()
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(6 * 40, 9 * 4);
 }
 
+void asma2k_state::machine_start()
+{
+	alphasmart_state::machine_start();
+
+	m_dictbank->configure_entries(0, 8, memregion("spellcheck")->base(), 0x4000);
+	m_dictbank->set_entry(0);
+}
+
 void alphasmart_state::machine_reset()
 {
 	m_rambank->set_entry(0);
@@ -416,7 +566,7 @@ void alphasmart_state::machine_reset()
 void alphasmart_state::alphasmart(machine_config &config)
 {
 	/* basic machine hardware */
-	MC68HC11D0(config, m_maincpu, XTAL(8'000'000));  // XTAL is 8 Mhz
+	MC68HC11D0(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
 	m_maincpu->in_pa_callback().set(FUNC(alphasmart_state::port_a_r));
 	m_maincpu->out_pa_callback().set(FUNC(alphasmart_state::port_a_w));
@@ -450,12 +600,20 @@ void asma2k_state::asma2k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &asma2k_state::asma2k_mem);
 }
 
-/* ROM definition */
+// MCU: MC68HC11D0P
+// NVRAM: KM681000ALP-7L (or TC551001BPL-85L) + CR2032 battery
+// XTAL: 8.000MHz
+// LCD: 2x KS0066F05 + 8x HD44100H
 ROM_START( asmapro )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "alphasmartpro212.rom",  0x0000, 0x8000, CRC(896ddf1c) SHA1(c3c6a421c9ced92db97431d04b4a3f09a39de716) )   // Checksum 8D24 on label
 ROM_END
 
+// MCU: MC68HC11D0FN
+// NVRAM: NEC D431000ACW-70LL + battery
+// XTAL: SB8.000
+// LCD: 2x KS0066F05 + 4x KS0063B
+// Optional IrDA sub board
 ROM_START( asma2k )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	/*
@@ -468,11 +626,11 @@ ROM_START( asma2k )
 	ROM_SYSTEM_BIOS( 1, "v308", "v3.08" )
 	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(1) )
 
-	ROM_REGION( 0x8000, "spellcheck", 0 )
-	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x20000, "spellcheck", 0 )
+	ROM_LOAD( "dictrom__v1.stm_m27c1001-1501.plcc32.bin", 0x00000, 0x20000, CRC(a143949c) SHA1(033094bb850c614008b4ecc2eefbcb01b8a2bcda) )
 ROM_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                           FULLNAME           FLAGS
 COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, empty_init, "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     empty_init, "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, asma2k,  0,      0,      asma2k,     asma2k,     asma2k_state,     empty_init, "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

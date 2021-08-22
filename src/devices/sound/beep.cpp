@@ -2,14 +2,12 @@
 // copyright-holders:Kevin Thacker
 /***************************************************************************
 
-    beep.c
+    Simple beeper sound driver
 
     This is used for computers/systems which can only output a constant tone.
     This tone can be turned on and off.
     e.g. PCW and PCW16 computer systems
     KT - 25-Jun-2000
-
-    Sound handler
 
 ****************************************************************************/
 
@@ -21,15 +19,6 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(BEEP, beep_device, "beep", "Beep")
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  beep_device - constructor
-//-------------------------------------------------
 
 beep_device::beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BEEP, tag, owner, clock)

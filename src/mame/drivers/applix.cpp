@@ -787,6 +787,8 @@ void applix_state::applix_palette(palette_device &palette) const
 
 void applix_state::machine_start()
 {
+	std::fill(std::begin(m_palette_latch), std::end(m_palette_latch), 0);
+
 	save_item(NAME(m_video_latch));
 	save_item(NAME(m_pa));
 	save_item(NAME(m_palette_latch));

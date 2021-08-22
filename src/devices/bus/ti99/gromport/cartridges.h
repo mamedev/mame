@@ -8,13 +8,16 @@
 
 #pragma once
 
-#include "emuopts.h"
+#include "gromport.h"
+
 #include "machine/tmc0430.h"
 #include "formats/rpk.h"
+
+#include "emuopts.h"
 #include "softlist_dev.h"
-#include "gromport.h"
-#include "unzip.h"
-#include "xmlfile.h"
+
+#include "utilfwd.h"
+
 
 namespace bus::ti99::gromport {
 

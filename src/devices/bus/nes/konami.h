@@ -7,7 +7,7 @@
 
 #include "nxrom.h"
 #include "sound/vrc6.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 
 
 // ======================> nes_konami_vrc1_device
@@ -157,7 +157,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	required_device<vrc7snd_device> m_vrc7snd;
+	required_device<ds1001_device> m_vrc7snd;
 };
 
 

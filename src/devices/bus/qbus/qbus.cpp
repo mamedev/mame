@@ -11,6 +11,7 @@
 #include "qbus.h"
 
 // Peripheral boards
+#include "dsd4432.h"
 #include "pc11.h"
 #include "qtx.h"
 
@@ -19,6 +20,7 @@ void qbus_cards(device_slot_interface &device)
 {
 	device.option_add("pc11", DEC_PC11); /* Paper tape reader and punch */
 	device.option_add("qts1", TTI_QTS1);
+	device.option_add("dsd4432", DSD4432);
 }
 
 

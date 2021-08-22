@@ -89,10 +89,10 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 	gfx_element *gx1 = m_gfxdecode->gfx(gfx1);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
+	m_blended_data = std::make_unique<u8[]>(gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
-	u8 *dest = srcdata;
+	u8 *dest = m_blended_data.get();
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const u8 *c0base = gx0->get_data(c);
@@ -113,7 +113,7 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 
 //  int newdepth = gx0->depth() * gx1->depth();
 	int granularity = gx0->granularity();
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_raw_layout(m_blended_data.get(), gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(granularity);
 
 	// free the second graphics element

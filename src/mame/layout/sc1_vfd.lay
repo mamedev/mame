@@ -185,38 +185,36 @@ license:CC0
 			<param name="i" start="0" increment="1" />
 			<param name="x" start="0" increment="9" />
 			<element name="vfdblank~i~" ref="vfd0">
-				<color red="0.14" green="0.14" blue="0.14"></color>
-				<bounds x="~x~" y="280" width="9" height="17">
-				</bounds>
+				<color red="0.14" green="0.14" blue="0.14" />
+				<bounds x="~x~" y="280" width="9" height="17" />
 			</element>
 
 			<element name="vfd~i~" ref="vfd0">
 				<animate name="vfdduty0" />
-				<color red="0.00" green="1.00" blue="1.00"></color>
-				<bounds x="~x~" y="280" width="9" height="17">
-				</bounds>
+				<color red="0.00" green="1.00" blue="1.00" />
+				<bounds x="~x~" y="280" width="9" height="17" />
 			</element>
 		</repeat>
 	</group>
 
 	<view name="VFD, Reels and Lamp Matrix">
 		<element name="reel1" ref="Steppers" state="0">
-			<bounds x="10" y="320" width="50" height="50"/>
+			<bounds x="10" y="320" width="50" height="50" />
 		</element>
 		<element name="reel2" ref="Steppers" state="0">
-			<bounds x="60" y="320" width="50" height="50"/>
+			<bounds x="60" y="320" width="50" height="50" />
 		</element>
 		<element name="reel3" ref="Steppers" state="0">
-			<bounds x="110" y="320" width="50" height="50"/>
+			<bounds x="110" y="320" width="50" height="50" />
 		</element>
 		<element name="reel4" ref="Steppers" state="0">
-			<bounds x="160" y="320" width="50" height="50"/>
+			<bounds x="160" y="320" width="50" height="50" />
 		</element>
 		<element name="reel5" ref="Steppers" state="0">
-			<bounds x="220" y="320" width="50" height="50"/>
+			<bounds x="220" y="320" width="50" height="50" />
 		</element>
 		<element name="reel6" ref="Steppers" state="0">
-			<bounds x="280" y="320" width="50" height="50"/>
+			<bounds x="280" y="320" width="50" height="50" />
 		</element>
 
 		<repeat count="16">

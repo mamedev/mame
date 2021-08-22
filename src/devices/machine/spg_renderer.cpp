@@ -653,7 +653,11 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	uint8_t blendlevel = (m_video_regs_2a & 3) << 3;
+
+	// Max blend level (3) should result in 100% opacity on the sprite, per docs
+	// Min blend level (0) should result in 25% opacity on the sprite, per docs
+	static const uint8_t s_blend_levels[4] = { 0x08, 0x10, 0x18, 0x20 };
+	uint8_t blendlevel = s_blend_levels[m_video_regs_2a & 3];
 
 	uint32_t words_per_tile;
 

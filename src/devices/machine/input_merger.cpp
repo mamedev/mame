@@ -2,10 +2,20 @@
 // copyright-holders:Dirk Best, Vas Crabb
 /***************************************************************************
 
-    Input Merger
+Input Merger
 
-    Used to connect multiple lines to a single device input while
-    keeping it pulled high or low
+Used to connect multiple lines to a single device input while keeping it
+pulled high or low.
+
+Default initial input pin(s) state:
+- ANY_HIGH: 0
+- ALL_HIGH: 1
+- ANY_LOW: 1
+- ALL_LOW: 0
+
+TODO:
+- call output handler at reset? eg. a NAND gate whose inputs are low at
+  power-on should output 1.
 
 ***************************************************************************/
 
@@ -23,10 +33,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(INPUT_MERGER_ANY_HIGH, input_merger_any_high_device, "ipt_merge_any_hi", "Input Merger (any high)")
-DEFINE_DEVICE_TYPE(INPUT_MERGER_ALL_HIGH, input_merger_all_high_device, "ipt_merge_all_hi", "Input Merger (all high)")
-DEFINE_DEVICE_TYPE(INPUT_MERGER_ANY_LOW,  input_merger_any_low_device,  "ipt_merge_any_lo", "Input Merger (any low)")
-DEFINE_DEVICE_TYPE(INPUT_MERGER_ALL_LOW,  input_merger_all_low_device,  "ipt_merge_all_lo", "Input Merger (all low)")
+DEFINE_DEVICE_TYPE(INPUT_MERGER_ANY_HIGH, input_merger_any_high_device, "ipt_merge_any_hi", "Input Merger (any high)") // OR
+DEFINE_DEVICE_TYPE(INPUT_MERGER_ALL_HIGH, input_merger_all_high_device, "ipt_merge_all_hi", "Input Merger (all high)") // AND
+DEFINE_DEVICE_TYPE(INPUT_MERGER_ANY_LOW,  input_merger_any_low_device,  "ipt_merge_any_lo", "Input Merger (any low)") // NAND
+DEFINE_DEVICE_TYPE(INPUT_MERGER_ALL_LOW,  input_merger_all_low_device,  "ipt_merge_all_lo", "Input Merger (all low)") // NOR
 
 
 //**************************************************************************
@@ -93,12 +103,12 @@ TIMER_CALLBACK_MEMBER(input_merger_device::update_state)
 //  SPECIALISATIONS
 //**************************************************************************
 
-input_merger_any_high_device::input_merger_any_high_device(machine_config const &mconfig, char const *tag, device_t *owner,   uint32_t clock)
+input_merger_any_high_device::input_merger_any_high_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: input_merger_device(mconfig, INPUT_MERGER_ANY_HIGH, tag, owner, clock, u32(0), u32(0), 1)
 {
 }
 
-input_merger_all_high_device::input_merger_all_high_device(machine_config const &mconfig, char const *tag, device_t *owner,   uint32_t clock)
+input_merger_all_high_device::input_merger_all_high_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: input_merger_device(mconfig, INPUT_MERGER_ALL_HIGH, tag, owner, clock, ~u32(0), ~u32(0), 0)
 {
 }

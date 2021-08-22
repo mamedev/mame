@@ -250,19 +250,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 		icon.second.texture.reset();
 
 	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
-	m_has_empty_start = true;
 	int old_software = -1;
-
-	// FIXME: why does it do this relatively expensive operation every time?
-	machine_config config(m_driver, machine().options());
-	for (device_image_interface &image : image_interface_enumerator(config.root_device()))
-	{
-		if (!image.filename() && image.must_be_loaded())
-		{
-			m_has_empty_start = false;
-			break;
-		}
-	}
 
 	// start with an empty list
 	m_displaylist.clear();
@@ -340,6 +328,17 @@ void menu_select_software::build_software_list()
 	m_swinfo.emplace_back(m_driver);
 
 	machine_config config(m_driver, machine().options());
+
+	// see if any media devices require an image to be loaded
+	m_has_empty_start = true;
+	for (device_image_interface &image : image_interface_enumerator(config.root_device()))
+	{
+		if (!image.filename() && image.must_be_loaded())
+		{
+			m_has_empty_start = false;
+			break;
+		}
+	}
 
 	// iterate through all software lists
 	std::vector<std::size_t> orphans;
@@ -425,7 +424,7 @@ void menu_select_software::build_software_list()
 	}
 
 	std::string searchstr, curpath;
-	for (auto & elem : m_filter_data.list_names())
+	for (auto &elem : m_filter_data.list_names())
 	{
 		path_iterator path(machine().options().media_path());
 		while (path.next(curpath))
@@ -518,7 +517,7 @@ void menu_select_software::load_sw_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open(util::string_format("custom_%s_filter.ini", m_driver.name)) == osd_file::error::NONE)
+	if (!file.open(util::string_format("custom_%s_filter.ini", m_driver.name)))
 	{
 		software_filter::ptr flt(software_filter::create(file, m_filter_data));
 		if (flt)
@@ -594,12 +593,12 @@ render_texture *menu_select_software::get_icon_texture(int linenum, void *select
 
 		bitmap_argb32 tmp;
 		emu_file snapfile(std::string(paths->second), OPEN_FLAG_READ);
-		if (snapfile.open(std::string(swinfo->shortname) + ".ico") == osd_file::error::NONE)
+		if (!snapfile.open(std::string(swinfo->shortname) + ".ico"))
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
 		}
-		if (!tmp.valid() && !swinfo->parentname.empty() && (snapfile.open(std::string(swinfo->parentname) + ".ico") == osd_file::error::NONE))
+		if (!tmp.valid() && !swinfo->parentname.empty() && !snapfile.open(std::string(swinfo->parentname) + ".ico"))
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
@@ -669,7 +668,7 @@ void menu_select_software::filter_selected()
 					if (software_filter::CUSTOM == new_type)
 					{
 						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (file.open(util::string_format("custom_%s_filter.ini", m_driver.name)) == osd_file::error::NONE)
+						if (!file.open(util::string_format("custom_%s_filter.ini", m_driver.name)))
 						{
 							filter.save_ini(file, 0);
 							file.close();

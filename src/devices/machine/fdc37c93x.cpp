@@ -255,13 +255,13 @@ void fdc37c93x_device::device_add_mconfig(machine_config &config)
 	pc_lpt_lptdev->irq_handler().set(FUNC(fdc37c93x_device::irq_parallel_w));
 
 	// serial ports
-	NS16450(config, pc_serial1_comdev, XTAL(1'843'200)); // or NS16550 ?
+	NS16550(config, pc_serial1_comdev, XTAL(1'843'200));
 	pc_serial1_comdev->out_int_callback().set(FUNC(fdc37c93x_device::irq_serial1_w));
 	pc_serial1_comdev->out_tx_callback().set(FUNC(fdc37c93x_device::txd_serial1_w));
 	pc_serial1_comdev->out_dtr_callback().set(FUNC(fdc37c93x_device::dtr_serial1_w));
 	pc_serial1_comdev->out_rts_callback().set(FUNC(fdc37c93x_device::rts_serial1_w));
 
-	NS16450(config, pc_serial2_comdev, XTAL(1'843'200));
+	NS16550(config, pc_serial2_comdev, XTAL(1'843'200));
 	pc_serial2_comdev->out_int_callback().set(FUNC(fdc37c93x_device::irq_serial2_w));
 	pc_serial2_comdev->out_tx_callback().set(FUNC(fdc37c93x_device::txd_serial2_w));
 	pc_serial2_comdev->out_dtr_callback().set(FUNC(fdc37c93x_device::dtr_serial2_w));
@@ -421,6 +421,13 @@ WRITE_LINE_MEMBER(fdc37c93x_device::irq_keyboard_w)
 	request_irq(configuration_registers[LogicalDevice::Keyboard][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER(fdc37c93x_device::irq_mouse_w)
+{
+	if (enabled_logical[LogicalDevice::Keyboard] == false)
+		return;
+	request_irq(configuration_registers[LogicalDevice::Keyboard][0x72], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 WRITE_LINE_MEMBER(fdc37c93x_device::kbdp21_gp25_gatea20_w)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
@@ -500,7 +507,6 @@ void fdc37c93x_device::write(offs_t offset, uint8_t data)
 
 /* Map/unmap internal devices */
 
-#if 1
 uint8_t fdc37c93x_device::disabled_read()
 {
 	return 0xff;
@@ -512,26 +518,14 @@ void fdc37c93x_device::disabled_write(uint8_t data)
 
 void fdc37c93x_device::unmap_fdc(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
-	map(0x1, 0x1).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	//map(0x0, 0x0).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	//map(0x1, 0x1).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x2, 0x2).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x3, 0x3).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x4, 0x4).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x5, 0x5).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x7, 0x7).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 }
-#else
-void fdc37c93x_device::unmap_fdc(address_map &map)
-{
-	map(0x0, 0x0).noprw();
-	map(0x1, 0x1).noprw();
-	map(0x2, 0x2).noprw();
-	map(0x3, 0x3).noprw();
-	map(0x4, 0x4).noprw();
-	map(0x5, 0x5).noprw();
-	map(0x7, 0x7).noprw();
-}
-#endif
 
 void fdc37c93x_device::map_fdc_addresses()
 {
@@ -773,6 +767,8 @@ void fdc37c93x_device::write_fdd_configuration_register(int index, int data)
 	}
 	if (index == 0x74)
 		update_dreq_mapping(configuration_registers[LogicalDevice::FDC][0x74], LogicalDevice::FDC);
+	if (index == 0xF0)
+		logerror("FDD Mode Register changed: Floppy Mode %d FDC DMA Mode %d Interface Mode %d Swap Drives %d\n", (data >> 0) & 1, (data >> 1) & 1, (data >> 2) & 3, (data >> 4) & 1);
 }
 
 void fdc37c93x_device::write_parallel_configuration_register(int index, int data)

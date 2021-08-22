@@ -1685,9 +1685,9 @@ void taito_f3_state::get_spritealphaclip_info()
 		line_t->spri[y] = spri;
 		line_t->sprite_alpha[y] = sprite_alpha;
 		line_t->clip0_l[y] = ((clip0_low & 0xff) | ((clip0_high & 0x1000) >> 4)) - 47;
-		line_t->clip0_r[y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 47;
+		line_t->clip0_r[y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 48;
 		line_t->clip1_l[y] = ((clip1_low & 0xff) | ((clip0_high & 0x4000) >> 6)) - 47;
-		line_t->clip1_r[y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 47;
+		line_t->clip1_r[y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 48;
 		if (line_t->clip0_l[y] < 0) line_t->clip0_l[y] = 0;
 		if (line_t->clip0_r[y] < 0) line_t->clip0_r[y] = 0;
 		if (line_t->clip1_l[y] < 0) line_t->clip1_l[y] = 0;

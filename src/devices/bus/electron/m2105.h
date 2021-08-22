@@ -12,10 +12,11 @@
 #pragma once
 
 #include "exp.h"
-#include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/mc68681.h"
+#include "machine/nvram.h"
 #include "machine/input_merger.h"
+#include "machine/tms6100.h"
 #include "sound/tms5220.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
@@ -35,7 +36,6 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -46,14 +46,11 @@ protected:
 
 private:
 	required_memory_region m_exp_rom;
-	required_device<ram_device> m_ram;
-	required_device<via6522_device> m_via6522_0;
-	required_device<via6522_device> m_via6522_1;
+	required_device<nvram_device> m_nvram;
+	required_device_array<via6522_device, 2> m_via;
 	required_device<scn2681_device> m_duart;
-	required_device<tms5220_device> m_tms;
-	required_device<centronics_device> m_centronics;
-	required_device<input_merger_device> m_irqs;
 
+	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t m_ram_page;
 	uint8_t m_romsel;
 };

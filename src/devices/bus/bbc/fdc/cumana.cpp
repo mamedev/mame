@@ -72,8 +72,8 @@ void bbc_cumana1_device::device_add_mconfig(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
 
 void bbc_cumana2_device::device_add_mconfig(machine_config &config)
@@ -83,8 +83,8 @@ void bbc_cumana2_device::device_add_mconfig(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
 
 const tiny_rom_entry *bbc_cumana1_device::device_rom_region() const
@@ -110,8 +110,7 @@ bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_fdc(*this, "mb8877a"),
-	m_floppy0(*this, "mb8877a:0"),
-	m_floppy1(*this, "mb8877a:1"),
+	m_floppy(*this, "mb8877a:%u", 0),
 	m_drive_control(0)
 {
 }
@@ -173,8 +172,8 @@ void bbc_cumanafdc_device::write(offs_t offset, uint8_t data)
 		// bit 0: drive select
 		switch (BIT(data, 0))
 		{
-		case 0: floppy = m_floppy0->get_device(); break;
-		case 1: floppy = m_floppy1->get_device(); break;
+		case 0: floppy = m_floppy[0]->get_device(); break;
+		case 1: floppy = m_floppy[1]->get_device(); break;
 		}
 		m_fdc->set_floppy(floppy);
 
@@ -219,6 +218,6 @@ WRITE_LINE_MEMBER(bbc_cumanafdc_device::fdc_drq_w)
 
 WRITE_LINE_MEMBER(bbc_cumanafdc_device::motor_w)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
 }

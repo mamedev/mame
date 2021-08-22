@@ -1256,6 +1256,7 @@ Notes:
 */
 
 #include "emu.h"
+#include "cpu/f2mc16/mb9061x.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/mips/mips3.h"
@@ -1266,6 +1267,7 @@ Notes:
 #include "sound/c352.h"
 #include "video/poly.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
@@ -1327,7 +1329,7 @@ struct namcos23_render_data
 
 class namcos23_state;
 
-class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>
+class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4>
 {
 public:
 	namcos23_renderer(namcos23_state &state);
@@ -1444,6 +1446,7 @@ public:
 	void s23(machine_config &config);
 	void gmen(machine_config &config);
 	void timecrs2(machine_config &config);
+	void motoxgo(machine_config &config);
 
 	void init_s23();
 
@@ -1552,6 +1555,7 @@ private:
 	void s23h8rwmap(address_map &map);
 	void s23iobrdiomap(address_map &map);
 	void s23iobrdmap(address_map &map);
+	void motoxgo_exio_map(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
 
 	virtual void machine_start() override;
@@ -1652,7 +1656,7 @@ uint16_t namcos23_state::nthword(const uint32_t *pSource, int offs)
 ***************************************************************************/
 
 namcos23_renderer::namcos23_renderer(namcos23_state &state)
-	: poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>(state.machine()),
+	: poly_manager<float, namcos23_render_data, 4>(state.machine()),
 		m_state(state)
 {
 }
@@ -2222,7 +2226,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 		namcos23_poly_entry *p = render.polys + render.poly_count;
 
 		// Should be unnecessary now that frustum clipping happens, but this still culls polys behind the camera
-		p->vertex_count = render.polymgr->zclip_if_less(ne, pv, p->pv, 4, 0.00001f);
+		p->vertex_count = render.polymgr->zclip_if_less<4>(ne, pv, p->pv, 0.00001f);
 
 		// Project if you don't clip on the near plane
 		if(p->vertex_count >= 3) {
@@ -2316,13 +2320,13 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 
 		// We should probably split the polygons into triangles ourselves to insure everything is being rendered properly
 		if (p->vertex_count == 3)
-			render_triangle(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv[0], p->pv[1], p->pv[2]);
+			render_triangle<4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv[0], p->pv[1], p->pv[2]);
 		else if (p->vertex_count == 4)
-			render_polygon<4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<4, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 		else if (p->vertex_count == 5)
-			render_polygon<5>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<5, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 		else if (p->vertex_count == 6)
-			render_polygon<6>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<6, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 	}
 	render.poly_count = 0;
 }
@@ -3220,6 +3224,17 @@ void namcos23_state::s23iobrdiomap(address_map &map)
 }
 
 
+void namcos23_state::motoxgo_exio_map(address_map &map)
+{
+	map(0x000003, 0x000003).nopr();
+	map(0x000008, 0x000009).noprw();
+	map(0x000036, 0x000037).nopw();
+	map(0x0000c8, 0x0000c8).nopw();
+	map(0xfc0000, 0xfcffff).ram();
+	map(0xfe0000, 0xffffff).rom().region("exioboard", 0);
+}
+
+
 // Time Crisis lightgun
 
 uint8_t namcos23_state::iob_gun_r(offs_t offset)
@@ -3725,6 +3740,14 @@ void namcos23_state::s23(machine_config &config)
 	c352.add_route(1, "lspeaker", 1.00);
 	c352.add_route(2, "rspeaker", 1.00);
 	c352.add_route(3, "lspeaker", 1.00);
+}
+
+void namcos23_state::motoxgo(machine_config &config)
+{
+	s23(config);
+
+	mb90611_device &amccpu(MB90611A(config, "amccpu", 4.9152_MHz_XTAL));
+	amccpu.set_addrmap(AS_PROGRAM, &namcos23_state::motoxgo_exio_map);
 }
 
 void namcos23_state::timecrs2(machine_config &config)
@@ -5370,11 +5393,11 @@ GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, init_
 GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, init_s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
 GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, init_s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov2a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgo,     0,        motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a2, motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov1a,  motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov1a2, motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )

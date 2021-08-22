@@ -1156,7 +1156,7 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-uint32_t gba_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
+uint32_t gba_cons_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *rom = m_region_maincpu;
 	if (m_bios_hack->read())
@@ -1239,7 +1239,6 @@ WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
 void gba_state::gba_map(address_map &map)
 {
 	map.unmap_value_high(); // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(FUNC(gba_state::gba_bios_r));
 	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000);
 	map(0x03000000, 0x03007fff).ram().mirror(0xff8000);
 	map(0x04000000, 0x0400005f).rw("lcd", FUNC(gba_lcd_device::video_r), FUNC(gba_lcd_device::video_w));
@@ -1249,8 +1248,24 @@ void gba_state::gba_map(address_map &map)
 	map(0x06000000, 0x06017fff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
-	//map(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
+
 	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
+}
+
+void gba_cons_state::gba_cons_map(address_map &map)
+{
+	gba_map(map);
+
+	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(FUNC(gba_cons_state::gba_bios_r));
+	//map(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
+}
+
+void gba_robotech_state::gba_robotech_map(address_map &map)
+{
+	gba_map(map);
+
+	map(0x00000000, 0x007fffff).rom().region("maincpu", 0x00000000); // first part of the ROM is a BIOS replacement?
+	map(0x08000000, 0x087fffff).rom().region("maincpu", 0x00800000); // second part is the game?
 }
 
 static INPUT_PORTS_START( gbadv )
@@ -1266,6 +1281,10 @@ static INPUT_PORTS_START( gbadv )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1)    // SELECT
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("B") PORT_PLAYER(1)    // B
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("A") PORT_PLAYER(1)    // A
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gbadv_cons )
+	PORT_INCLUDE( gbadv )
 
 	PORT_START("SKIP_CHECK")
 	PORT_CONFNAME( 0x01, 0x00, "[HACK] Skip BIOS Logo check" )
@@ -1328,6 +1347,26 @@ void gba_state::machine_start()
 	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::handle_irq),this));
 	m_irq_timer->adjust(attotime::never);
 
+	save_item(NAME(m_regs));
+	save_item(NAME(m_dma_src));
+	save_item(NAME(m_dma_dst));
+	save_item(NAME(m_dma_cnt));
+	save_item(NAME(m_timer_regs));
+	save_item(NAME(m_timer_reload));
+	save_item(NAME(m_timer_recalc));
+	save_item(NAME(m_timer_hz));
+	save_item(NAME(m_fifo_a_ptr));
+	save_item(NAME(m_fifo_b_ptr));
+	save_item(NAME(m_fifo_a_in));
+	save_item(NAME(m_fifo_b_in));
+	save_item(NAME(m_fifo_a));
+	save_item(NAME(m_fifo_b));
+}
+
+void gba_cons_state::machine_start()
+{
+	gba_state::machine_start();
+
 	// install the cart ROM & SRAM into the address map, if present
 	if (m_cart->exists())
 	{
@@ -1388,23 +1427,7 @@ void gba_state::machine_start()
 		}
 
 	}
-
-	save_item(NAME(m_regs));
-	save_item(NAME(m_dma_src));
-	save_item(NAME(m_dma_dst));
-	save_item(NAME(m_dma_cnt));
-	save_item(NAME(m_timer_regs));
-	save_item(NAME(m_timer_reload));
-	save_item(NAME(m_timer_recalc));
-	save_item(NAME(m_timer_hz));
-	save_item(NAME(m_fifo_a_ptr));
-	save_item(NAME(m_fifo_b_ptr));
-	save_item(NAME(m_fifo_a_in));
-	save_item(NAME(m_fifo_b_in));
-	save_item(NAME(m_fifo_a));
-	save_item(NAME(m_fifo_b));
 }
-
 
 static void gba_cart(device_slot_interface &device)
 {
@@ -1449,16 +1472,39 @@ void gba_state::gbadv(machine_config &config)
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldacb, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdacb, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 
+}
+
+void gba_cons_state::gbadv_cons(machine_config &config)
+{
+	gbadv(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &gba_cons_state::gba_cons_map);
+
 	GBA_CART_SLOT(config, m_cart, gba_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("gba");
 }
 
+void gba_robotech_state::gbadv_robotech(machine_config &config)
+{
+	gbadv(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &gba_robotech_state::gba_robotech_map);
+}
 
 ROM_START( gba )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) SHA1(300c20df6731a33952ded8c436f7f186d25d3492) )
 ROM_END
 
+ROM_START( robotech )
+	ROM_REGION( 0x1000100, "maincpu", 0 )
+	ROM_LOAD( "coleco_robotech_mx29gl128elt21_00c22273.bin", 0x0000000, 0x1000100, CRC(04beee9c) SHA1(acf07d51c525b055679186cc07c6ac2cd8f45eac) )
+ROM_END
 
-//   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME            FLAGS
-CONS(2001, gba,  0,      0,      gbadv,   gbadv, gba_state, empty_init, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+//   YEAR  NAME       PARENT  COMPAT  MACHINE           INPUT       CLASS               INIT        COMPANY     FULLNAME            FLAGS
+CONS(2001, gba,       0,      0,      gbadv_cons,       gbadv_cons, gba_cons_state,     empty_init, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+
+// this is a single game reissue of "Robotech - The Macross Saga (Euro, USA)" on the GBA but with double
+// sized ROM (BIOS replacement in first half?) and other mods.  It is unclear how compatible this is with
+// standard hardware.
+CONS(2018, robotech,  0,      0,      gbadv_robotech,   gbadv,      gba_robotech_state, empty_init, "Coleco",   "Robotech",         MACHINE_NOT_WORKING)

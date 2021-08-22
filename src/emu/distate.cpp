@@ -65,8 +65,6 @@ device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u
 	// override well-known symbols
 	if (index == STATE_GENPCBASE)
 		m_symbol.assign("CURPC");
-	else if (index == STATE_GENSP)
-		m_symbol.assign("CURSP");
 	else if (index == STATE_GENFLAGS)
 		m_symbol.assign("CURFLAGS");
 }
@@ -491,9 +489,6 @@ device_state_interface::device_state_interface(const machine_config &mconfig, de
 	: device_interface(device, "state")
 {
 	memset(m_fast_state, 0, sizeof(m_fast_state));
-
-	// configure the fast accessor
-	device.interfaces().m_state = this;
 }
 
 

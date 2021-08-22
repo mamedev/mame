@@ -100,12 +100,11 @@ Normal: Store $08 to $C05A (Zip compatible)
 Lock: Store $A5 to $C05A (Zip compatible).
 Unlock: Store $5A 4 times in a row to $C05A (Zip compatible).
 Read state: Cached by the firmware in MIG RAM (see below).
-Write state: Store speaker/slot byte at $C05C (NOT Zip compatible).  Firmware always enables the paddle
+Write state: Store speaker/slot byte at $C05C (Zip compatible).  Firmware always enables the paddle
 delay at $C05F, regardless of what you pass in.
 
-For the $C05C slot/speaker delay, the Zip has bit 0 = speaker, 7-1 = slots 7-1, and 1=normal, 0=fast.
-The IIc+ instead is as documented in the IIc Technical Reference Manual, Second Edition: bit 7=speaker,
-bits 6-0 = slots 7-1, and 1=fast, 0=normal.
+Previous versions of this driver stated that the IIc+ speaker/slot control byte was not Zip compatible; that
+was a misunderstanding.
 
 Accelerator control firmware saves/restores zero page locations 0-7 in MIG RAM page 2 locations $CE10-$CE17.
 MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accelerator bitfield.
@@ -169,15 +168,18 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/a2videoterm.h"
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/a2zipdrive.h"
+#include "bus/a2bus/booti.h"
 #include "bus/a2bus/byte8251.h"
 #include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/computereyes2.h"
 #include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/ezcgi.h"
-#include "bus/a2bus/grapplerplus.h"
+#include "bus/a2bus/grappler.h"
+#include "bus/a2bus/lancegs.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/q68.h"
 #include "bus/a2bus/sider.h"
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/ssprite.h"
@@ -715,46 +717,39 @@ void apple2e_state::sel35_w(int sel35)
 
 void apple2e_state::recalc_active_device()
 {
-//  printf("recalc_active_device: devsel %d 35sel %d intdrive %d\n", m_devsel, m_35sel, m_intdrive);
 	if (m_devsel == 1)
 	{
 		if (!m_35sel)
 		{
-//          printf("5.25 1\n");
 			m_cur_floppy = m_floppy[0]->get_device();
 		}
 		else
 		{
-//          printf("3.5 1\n");
-			m_cur_floppy = m_floppy[2]->get_device();
+			m_cur_floppy = m_floppy[3]->get_device();
 		}
 	}
 	else if (m_devsel == 2)
 	{
-		if (!m_35sel)
+		// as per http://apple2.guidero.us/doku.php/mg_notes/apple_iic/mig_chip intdrive + devsel = 2 enables
+		// the internal drive, no 35sel is necessary.  If intdrive is clear, 35sel and devsel work as normal.
+		if (m_intdrive)
 		{
-//          printf("5.25 2\n");
+			m_cur_floppy = m_floppy[2]->get_device();
+		}
+		else if (!m_35sel)
+		{
 			m_cur_floppy = m_floppy[1]->get_device();
 		}
-		else
+		else    // should be external 3.5 #2, for a 3rd drive
 		{
-			// hookup is a little weird here
-			if (m_intdrive)
-			{
-//              printf("3.5 1\n");
-				m_cur_floppy = m_floppy[2]->get_device();
-			}
-			else
-			{
-//              printf("3.5 2\n");
-				m_cur_floppy = m_floppy[3]->get_device();
-			}
+			m_cur_floppy = nullptr;
 		}
 	}
 	else
 	{
 		m_cur_floppy = nullptr;
 	}
+
 	m_iicpiwm->set_floppy(m_cur_floppy);
 
 	if (m_cur_floppy)
@@ -1299,6 +1294,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		if ((m_kbspecial->read() & 0x88) == 0x88)
 		{
 			m_maincpu->reset();
+
+			// reset intcxrom to default
+			if (m_isiic)
+			{
+				m_intcxrom = true;
+			}
+			else
+			{
+				m_intcxrom = false;
+			}
+			update_slotrom_banks();
 		}
 	}
 }
@@ -1995,18 +2001,22 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x65:  // joy 1 Y axis
 		case 0x6d:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x66: // joy 2 X axis
 		case 0x6e:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // joy 2 Y axis
 		case 0x6f:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x7e:  // read IOUDIS
@@ -2370,9 +2380,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			do_io(offset, true);
 			if ((m_accel_unlocked) && (offset == 0x5c))
 			{
-				u8 temp = (m_accel_slotspk ^ 0xff) >> 2;
-				temp |= (m_accel_slotspk & 1) ? 0 : 1;
-				return temp;
+				return m_accel_slotspk;
 			}
 			break;
 	}
@@ -2504,8 +2512,7 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 		case 0x5c:
 			if (m_accel_unlocked)
 			{
-				u8 temp = data ^ 0xff;
-				m_accel_slotspk = (temp << 1) | ((temp & 0x80) ? 1 : 0);
+				m_accel_slotspk = data;
 			}
 			break;
 
@@ -3375,8 +3382,8 @@ void apple2e_state::r4000bank_map(address_map &map)
 void apple2e_state::c100bank_map(address_map &map)
 {
 	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
-	map(0x0200, 0x03ff).r(FUNC(apple2e_state::c100_int_r)).nopw();
-	map(0x0400, 0x05ff).r(FUNC(apple2e_state::c100_int_bank_r)).nopw();
+	map(0x0200, 0x03ff).rw(FUNC(apple2e_state::c100_int_r), FUNC(apple2e_state::c100_w));
+	map(0x0400, 0x05ff).rw(FUNC(apple2e_state::c100_int_bank_r), FUNC(apple2e_state::c100_w));
 	map(0x0600, 0x07ff).r(FUNC(apple2e_state::c100_cec_r)).nopw();
 	map(0x0800, 0x09ff).r(FUNC(apple2e_state::c100_cec_bank_r)).nopw();
 
@@ -3385,8 +3392,8 @@ void apple2e_state::c100bank_map(address_map &map)
 void apple2e_state::c300bank_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
-	map(0x0100, 0x01ff).r(FUNC(apple2e_state::c300_int_r)).nopw();
-	map(0x0200, 0x02ff).r(FUNC(apple2e_state::c300_int_bank_r)).nopw();
+	map(0x0100, 0x01ff).rw(FUNC(apple2e_state::c300_int_r), FUNC(apple2e_state::c300_w));
+	map(0x0200, 0x02ff).rw(FUNC(apple2e_state::c300_int_bank_r), FUNC(apple2e_state::c300_w));
 	map(0x0300, 0x03ff).r(FUNC(apple2e_state::c300_cec_r)).nopw();
 	map(0x0400, 0x04ff).r(FUNC(apple2e_state::c300_cec_bank_r)).nopw();
 }
@@ -4665,7 +4672,10 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
 	device.option_add("parprn", A2BUS_PARPRN);   /* Apple II Parallel Printer Interface Card */
 	device.option_add("parallel", A2BUS_PIC);   /* Apple II Parallel Interface Card */
-	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
+	device.option_add("grappler", A2BUS_GRAPPLER); /* Orange Micro Grappler Printer Interface card */
+	device.option_add("grapplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
+	device.option_add("bufgrapplus", A2BUS_BUFGRAPPLERPLUS); /* Orange Micro Buffered Grappler+ Printer Interface card */
+	device.option_add("bufgrapplusa", A2BUS_BUFGRAPPLERPLUSA); /* Orange Micro Buffered Grappler+ (rev A) Printer Interface card */
 	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
 	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
@@ -4691,6 +4701,10 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
 	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
+	device.option_add("booti", A2BUS_BOOTI);  /* Booti Card */
+	device.option_add("lancegs", A2BUS_LANCEGS);  /* ///SHH SYSTEME LANceGS Card */
+	device.option_add("q68", A2BUS_Q68);        /* Stellation Q68 68000 card */
+	device.option_add("q68plus", A2BUS_Q68PLUS); /* Stellation Q68 Plus 68000 card */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)
@@ -4823,7 +4837,10 @@ void apple2e_state::apple2e(machine_config &config)
 void apple2e_state::apple2epal(machine_config &config)
 {
 	apple2e(config);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 312, 0, 192);
+	M6502(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::mprof3(machine_config &config)
@@ -4846,7 +4863,11 @@ void apple2e_state::apple2ee(machine_config &config)
 void apple2e_state::apple2eepal(machine_config &config)
 {
 	apple2ee(config);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 312, 0, 192);
+	M65C02(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::spectred(machine_config &config)
@@ -5506,7 +5527,7 @@ ROM_START(cecm)
 
 	ROM_REGION(0x800,"keyboard",0)
 	ROM_LOAD( "u26.9433c-0201.rcl-zh-16.bin", 0x000000, 0x000800, CRC(f3190603) SHA1(7efdf6f4ee0ed01ff06341c601496a43d06afd6b) )
-	// ROM_LOAD( "u10_2732_0081.bin", 0x000000, 0x001000, CRC(505eed67) SHA1(4acbee7c957528d1f9fbfd54464f85fb493175d7) )
+	// ROM_LOAD( "u10_2732_0081.bin", 0x000000, 0x00800, CRC(505eed67) SHA1(4acbee7c957528d1f9fbfd54464f85fb493175d7) )
 ROM_END
 
 ROM_START(cec2000)

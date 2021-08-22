@@ -18,6 +18,7 @@ jobs:
       env:
         MINGW64: "/mingw64"
         ARCHOPTS: "-fuse-ld=lld"
+        OVERRIDE_AR: "llvm-ar"
         TOOLS: 1
       run: make -j2
     - name: Validate

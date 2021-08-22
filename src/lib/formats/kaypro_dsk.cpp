@@ -36,7 +36,7 @@ const char *kayproii_format::description() const
 
 const char *kayproii_format::extensions() const
 {
-	return "kay";
+	return "kay,dsk";
 }
 
 const kayproii_format::format kayproii_format::formats[] = {
@@ -63,7 +63,7 @@ const char *kaypro2x_format::description() const
 
 const char *kaypro2x_format::extensions() const
 {
-	return "kay";
+	return "kay,dsk";
 }
 
 const kaypro2x_format::format kaypro2x_format::formats[] = {

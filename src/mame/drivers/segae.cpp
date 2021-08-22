@@ -374,6 +374,7 @@ private:
 	optional_memory_bank m_bank1d;
 	optional_ioport_array<2> m_analog_ports;
 	output_finder<> m_lamp;
+	std::unique_ptr<uint8_t[]> m_banked_decrypted_opcodes;
 
 	// Analog input related
 	uint8_t m_port_select;
@@ -971,11 +972,11 @@ void systeme_state::systemeb(machine_config &config)
 
 void systeme_state::init_opaopa()
 {
-	uint8_t *banked_decrypted_opcodes = auto_alloc_array(machine(), uint8_t, m_maincpu_region->bytes());
-	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), banked_decrypted_opcodes, m_maincpu_region->bytes());
+	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
+	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 
-	m_bank0d->set_base(banked_decrypted_opcodes);
-	m_bank1d->configure_entries(0, 16, banked_decrypted_opcodes + 0x10000, 0x4000);
+	m_bank0d->set_base(m_banked_decrypted_opcodes.get());
+	m_bank1d->configure_entries(0, 16, &m_banked_decrypted_opcodes[0x10000], 0x4000);
 }
 
 

@@ -130,7 +130,7 @@ void laserbat_state_base::csound2_w(uint8_t data)
 void laserbat_state::csound2_w(uint8_t data)
 {
 	// there are a bunch of edge-triggered things, so grab changes
-	unsigned const diff = data ^ m_csound2;
+	uint8_t const diff = data ^ m_csound2;
 
 	// SN76477 and distortion control
 	if (data & diff & 0x01)
@@ -317,10 +317,10 @@ void catnmous_state::csound1_w(uint8_t data)
 void catnmous_state::csound2_w(uint8_t data)
 {
 	// the bottom bit is used for sprite banking, of all things
-	m_gfx2 = memregion("gfx2")->base() + ((data & 0x01) ? 0x0800 : 0x0000);
+	m_gfx2_base = uint16_t(BIT(data, 0)) << 11;
 
 	// the top bit is called RESET on the wiring diagram
-	m_audiopcb->reset_w((data & 0x80) ? 1 : 0);
+	m_audiopcb->reset_w(BIT(data, 7));
 
 	m_csound2 = data;
 }

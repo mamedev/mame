@@ -24,23 +24,17 @@ public:
 
 	k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_thunderh_hack(bool thunderh) { m_is_thunderh = thunderh; }
-
 	uint32_t lanc_ram_r(offs_t offset, uint32_t mem_mask = ~0);
 	void lanc_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	TIMER_CALLBACK_MEMBER(network_irq_clear);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
-
-	bool m_is_thunderh;
 
 	required_device<cpu_device> m_cpu;
 	uint32_t m_ram[0x2000];

@@ -8,7 +8,7 @@
 #include "machine/rescap.h"
 
 /*
- * FLT_RC_LOWPASS:
+ * FLT_RC_LOWPASS_3R:
  *
  * signal >--R1--+--R2--+
  *               |      |
@@ -18,7 +18,7 @@
  *
  * Set C=0 to disable filter
  *
- * FLT_RC_LOWPASS_@C:
+ * FLT_RC_LOWPASS:
  *
  * signal >--R1--+----> amp
  *               |
@@ -40,14 +40,15 @@
  *
  * FLT_RC_AC:
  *
- * Same as FLT_RC_HIGHPASS, but with standard frequency of 16 HZ
+ * Same as FLT_RC_HIGHPASS, but with a standard cutoff frequency of ~16Hz
+ * (10KOhm R, 1uF C)
  * This filter may be setup just with
  *
  * FILTER_RC(config, "tag", 0).set_ac();
  *
  * Default behaviour:
  *
- * Without set_ac(), a disabled FLT_RC_LOWPASS is created
+ * Without set_ac(), a disabled FLT_RC_LOWPASS_3R is created
  *
  */
 
@@ -62,8 +63,8 @@ class filter_rc_device : public device_t, public device_sound_interface
 public:
 	enum
 	{
-		LOWPASS      = 0,
-		LOWPASS_2C   = 2,
+		LOWPASS_3R   = 0,
+		LOWPASS      = 2,
 		HIGHPASS     = 3,
 		AC           = 4
 	};
@@ -83,7 +84,7 @@ public:
 
 	filter_rc_device &set_lowpass(double R, double C)
 	{
-		m_type = LOWPASS_2C;
+		m_type = LOWPASS;
 		m_R1 = R;
 		m_R2 = 0;
 		m_R3 = 0;
@@ -101,7 +102,7 @@ public:
 
 	filter_rc_device &set_ac()
 	{
-		return set_rc(filter_rc_device::AC, 10000, 0, 0, CAP_U(1));
+		return set_rc(filter_rc_device::AC, RES_K(10), 0, 0, CAP_U(1));
 	}
 
 protected:

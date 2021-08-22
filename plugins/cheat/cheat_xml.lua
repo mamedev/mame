@@ -264,14 +264,12 @@ function xml.conv_cheat(data)
 		if next(spaces) then
 			data["cheat"][count]["space"] = {}
 			for name, space in pairs(spaces) do
-				data["cheat"][count]["space"] = {}
 				data["cheat"][count]["space"][name] = { type = space["type"], tag = space["tag"] }
 			end
 		end
 		if next(regions) then
 			data["cheat"][count]["region"] = {}
 			for name, region in pairs(regions) do
-				data["cheat"][count]["region"] = {}
 				data["cheat"][count]["region"][name] = region
 			end
 		end

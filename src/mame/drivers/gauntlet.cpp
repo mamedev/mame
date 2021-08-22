@@ -128,7 +128,7 @@
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
 

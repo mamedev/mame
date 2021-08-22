@@ -60,6 +60,8 @@ void playch10_state::machine_start()
 
 MACHINE_START_MEMBER(playch10_state,playch10_hboard)
 {
+	m_timedigits.resolve();
+
 	m_vrom = (m_vrom_region != nullptr) ? m_vrom_region->base() : nullptr;
 
 	/* allocate 4K of nametable ram here */

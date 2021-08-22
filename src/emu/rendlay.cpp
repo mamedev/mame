@@ -17,10 +17,11 @@
 #include "rendutil.h"
 #include "video/rgbutil.h"
 
-#include "nanosvg.h"
-#include "unicode.h"
-#include "vecstream.h"
-#include "xmlfile.h"
+#include "util/nanosvg.h"
+#include "util/path.h"
+#include "util/unicode.h"
+#include "util/vecstream.h"
+#include "util/xmlfile.h"
 
 #include <cctype>
 #include <algorithm>
@@ -530,6 +531,7 @@ private:
 					// variable found
 					if (start == 0)
 						m_buffer.seekp(0);
+					assert(start < str.length());
 					m_buffer.write(&str[start], pos - start);
 					m_buffer.write(text.first.data(), text.first.length());
 					start = term - str.begin() + 1;
@@ -550,7 +552,8 @@ private:
 		}
 		else
 		{
-			m_buffer.write(&str[start], str.length() - start);
+			if (start < str.length())
+				m_buffer.write(&str[start], str.length() - start);
 			return util::buf_to_string_view(m_buffer);
 		}
 	}
@@ -1711,12 +1714,10 @@ private:
 			std::string filename;
 			if (!m_searchpath.empty())
 				filename = m_dirname;
-			if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
-				filename.append(PATH_SEPARATOR);
-			filename.append(m_imagefile);
+			util::path_append(filename, m_imagefile);
 			LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s'\n", filename);
-			osd_file::error const imgerr = file.open(filename);
-			if (osd_file::error::NONE == imgerr)
+			std::error_condition const imgerr = file.open(filename);
+			if (!imgerr)
 			{
 				if (!load_bitmap(file))
 				{
@@ -1727,7 +1728,8 @@ private:
 			}
 			else
 			{
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s'\n", filename);
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s' (%s:%d %s)\n",
+						filename, imgerr.category().name(), imgerr.value(), imgerr.message());
 			}
 		}
 		else if (!m_data.empty())
@@ -1743,12 +1745,10 @@ private:
 				std::string filename;
 				if (!m_searchpath.empty())
 					filename = m_dirname;
-				if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
-					filename.append(PATH_SEPARATOR);
-				filename.append(m_alphafile);
+				util::path_append(filename, m_alphafile);
 				LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load alpha channel from file '%s'\n", filename);
-				osd_file::error const alferr = file.open(filename);
-				if (osd_file::error::NONE == alferr)
+				std::error_condition const alferr = file.open(filename);
+				if (!alferr)
 				{
 					// TODO: no way to detect corner case where we had alpha from the image but the alpha PNG makes it entirely opaque
 					if (render_load_png(m_bitmap, file, true))
@@ -1757,7 +1757,8 @@ private:
 				}
 				else
 				{
-					LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open alpha channel file '%s'\n", filename);
+					LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open alpha channel file '%s' (%s:%d %s)\n",
+							filename, alferr.category().name(), alferr.value(), alferr.message());
 				}
 			}
 			else if (m_svg)
@@ -1839,8 +1840,8 @@ private:
 
 		// make a file wrapper for the data and see if it looks like a bitmap
 		util::core_file::ptr file;
-		osd_file::error const filerr(util::core_file::open_ram(m_data.c_str(), m_data.size(), OPEN_FLAG_READ, file));
-		bool const bitmapdata((osd_file::error::NONE == filerr) && file && load_bitmap(*file));
+		std::error_condition const filerr(util::core_file::open_ram(m_data.c_str(), m_data.size(), OPEN_FLAG_READ, file));
+		bool const bitmapdata(!filerr && file && load_bitmap(*file));
 		file.reset();
 
 		// if it didn't look like a bitmap, see if it looks like it might be XML and hence SVG
@@ -3396,12 +3397,10 @@ private:
 		std::string filename;
 		if (!m_searchpath.empty())
 			filename = m_dirname;
-		if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
-			filename.append(PATH_SEPARATOR);
-		filename.append(m_imagefile[number]);
+		util::path_append(filename, m_imagefile[number]);
 
 		// load the basic bitmap
-		if (file.open(filename) == osd_file::error::NONE)
+		if (!file.open(filename))
 			render_load_png(m_bitmap[number], file);
 
 		// if we can't load the bitmap just use text rendering
@@ -4657,7 +4656,7 @@ void layout_view::item::resolve_tags()
 		if (m_input_port)
 		{
 			// if there's a matching unconditional field, cache it
-			for (ioport_field &field : m_input_port->fields())
+			for (ioport_field const &field : m_input_port->fields())
 			{
 				if (field.mask() & m_input_mask)
 				{

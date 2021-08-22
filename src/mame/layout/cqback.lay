@@ -77,8 +77,7 @@ license:CC0
 			<bounds left="-9" right="393" top="-130" bottom="156" />
 		</element>
 
-	<!-- bezel -->
-
+		<!-- bezel -->
 		<element ref="static_white"><bounds left="-9" right="393" top="-130" bottom="-60" /></element>
 		<element ref="static_green"><bounds left="-9" right="393" top="111" bottom="156" /></element>
 
@@ -141,8 +140,7 @@ license:CC0
 		<element ref="static_white"><bounds x="344" y="29" width="4" height="1" /></element>
 		<element ref="static_white"><bounds x="344" y="56" width="4" height="1" /></element>
 
-	<!-- leds -->
-
+		<!-- leds -->
 		<element name="digit0" ref="digit"><bounds x="3" y="-15.5" width="24" height="32" /></element>
 		<element name="0.8" ref="seg"><bounds x="7" y="42.5" width="15" height="3" /></element>
 		<element name="0.9" ref="seg"><bounds x="7" y="71.5" width="15" height="3" /></element>
@@ -179,8 +177,7 @@ license:CC0
 		<element name="8.8" ref="seg"><bounds x="359" y="42.5" width="15" height="3" /></element>
 		<element name="8.9" ref="seg"><bounds x="359" y="71.5" width="15" height="3" /></element>
 
-	<!-- digit masks -->
-
+		<!-- digit masks -->
 		<element name="0.0" ref="mask"><bounds x="8" y="-17" width="17" height="6" /><color alpha="0.5" /></element>
 		<element name="1.0" ref="mask"><bounds x="52" y="-17" width="17" height="6" /><color alpha="0.5" /></element>
 		<element name="2.0" ref="mask"><bounds x="96" y="-17" width="17" height="6" /><color alpha="0.5" /></element>

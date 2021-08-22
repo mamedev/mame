@@ -7,6 +7,7 @@
 
     TODO:
 
+    - proper video timings, seems to be some contention involved
     - floppy support (I/O 0xe6-0xe7 = drive 1, 0xea-0xeb = drive 2)
     - modem
 
@@ -76,7 +77,7 @@ void aquarius_state::cassette_w(uint8_t data)
 */
 uint8_t aquarius_state::vsync_r()
 {
-	return m_screen->vblank() ? 0 : 1;
+	return (m_screen->vpos() < 16 || m_screen->vpos() > 215) ? 0 : 1;
 }
 
 
@@ -87,7 +88,7 @@ uint8_t aquarius_state::vsync_r()
 */
 void aquarius_state::mapper_w(uint8_t data)
 {
-	m_mapper->set_bank(BIT(data, 0));
+	m_mapper.select(BIT(data, 0));
 }
 
 
@@ -178,7 +179,7 @@ void aquarius_state::machine_start()
 void aquarius_state::machine_reset()
 {
 	/* reset memory mapper after power up */
-	m_mapper->set_bank(0);
+	m_mapper.select(0);
 }
 
 
@@ -188,25 +189,21 @@ void aquarius_state::machine_reset()
 
 void aquarius_state::aquarius_mem(address_map &map)
 {
-	map(0x0000, 0xffff).m(m_mapper, FUNC(address_map_bank_device::amap8));
-}
-
-void aquarius_state::aquarius_map(address_map &map)
-{
+	map(0x0000, 0xffff).view(m_mapper);
 	/* Normal mode */
-	map(0x00000, 0x02fff).rom().region("maincpu", 0);
-	map(0x03000, 0x033ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
-	map(0x03400, 0x037ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
-	map(0x03800, 0x03fff).ram();
-	map(0x04000, 0x0bfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
-	map(0x0c000, 0x0ffff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
+	m_mapper[0](0x0000, 0x2fff).rom().region("maincpu", 0);
+	m_mapper[0](0x3000, 0x33ff).ram().w(FUNC(aquarius_state::videoram_w)).share("videoram");
+	m_mapper[0](0x3400, 0x37ff).ram().w(FUNC(aquarius_state::colorram_w)).share("colorram");
+	m_mapper[0](0x3800, 0x3fff).ram();
+	m_mapper[0](0x4000, 0xbfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
+	m_mapper[0](0xc000, 0xffff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
 	/* CP/M mode */
-	map(0x10000, 0x13fff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
-	map(0x14000, 0x1bfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
-	map(0x1c000, 0x1efff).rom().region("maincpu", 0);
-	map(0x1f000, 0x1f3ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
-	map(0x1f400, 0x1f7ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
-	map(0x1f800, 0x1ffff).ram();
+	m_mapper[1](0x0000, 0x3fff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
+	m_mapper[1](0x4000, 0xbfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
+	m_mapper[1](0xc000, 0xefff).rom().region("maincpu", 0);
+	m_mapper[1](0xf000, 0xf3ff).ram().w(FUNC(aquarius_state::videoram_w)).share("videoram");
+	m_mapper[1](0xf400, 0xf7ff).ram().w(FUNC(aquarius_state::colorram_w)).share("colorram");
+	m_mapper[1](0xf800, 0xffff).ram();
 }
 
 void aquarius_state::aquarius_io(address_map &map)
@@ -357,15 +354,14 @@ void aquarius_state::aquarius(machine_config &config)
 	Z80(config, m_maincpu, 7.15909_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &aquarius_state::aquarius_mem);
 	m_maincpu->set_addrmap(AS_IO, &aquarius_state::aquarius_io);
-	m_maincpu->set_vblank_int("screen", FUNC(aquarius_state::irq0_line_hold));
-
-	ADDRESS_MAP_BANK(config, m_mapper).set_map(&aquarius_state::aquarius_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(7.15909_MHz_XTAL, 456, 0, 320, 262, 0, 200);
+	m_screen->set_raw(7.15909_MHz_XTAL, 458, 0, 352, 262, 0, 232);
 	m_screen->set_screen_update(FUNC(aquarius_state::screen_update_aquarius));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	m_screen->set_palette(m_palette);
+	m_screen->scanline().set([this](int scanline) { m_maincpu->adjust_icount(-4); }); // TODO: this tries to compensate for contention, needs a better understanding of video timings
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarius);
 	TEA1002(config, m_tea1002, 7.15909_MHz_XTAL);
@@ -401,7 +397,7 @@ void aquarius_state::aquariusp(machine_config &config)
 {
 	aquarius(config);
 
-	m_screen->set_raw(7.15909_MHz_XTAL, 456, 0, 320, 312, 0, 200);
+	m_screen->set_raw(7.15909_MHz_XTAL, 458, 0, 352, 312, 0, 232);
 
 	m_tea1002->set_unscaled_clock(8.867238_MHz_XTAL);
 }

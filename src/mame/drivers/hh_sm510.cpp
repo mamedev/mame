@@ -17,7 +17,7 @@ Use -autosave to at least make them remember the highscores.
 TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
-- improve/redo SVG of: exospace, auslalom
+- improve/redo SVG of: exospace
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
 - confirm gnw_smb rom (assumed to be the same as gnw_smbn)
@@ -53,7 +53,7 @@ FL-02     s    SM5A    Flagman (aka Flag Man)
 MT-03     s    SM5A    Vermin (aka The Exterminator)
 RC-04     s    SM5A    Fire (aka Fireman Fireman)
 IP-05     s    SM5A    Judge
-MN-06     g    SM5A    Manhole
+MH-06     g    SM5A    Manhole
 CN-07     g    SM5A    Helmet (aka Headache)
 LN-08     g    SM5A    Lion
 PR-21     ws   SM5A    Parachute
@@ -9240,6 +9240,96 @@ ROM_END
 
 /***************************************************************************
 
+  Tronica: Space Mission (model SM-11), Spider (model SG-21)
+  * PCB labels: SPACE MISSION SM-11 250582 (SM-11)
+                SPACE MISSION SM-11 220982 (SG-21)
+  * Sharp SM5A labels (no decap): 0126 228B TRONICA (SM-11)
+                                  0126 22YC TRONICA (SG-21)
+  * lcd screen with custom segments, 1-bit sound
+
+  SM-11 and SG-21 are the exact same MCU, but with different graphics.
+
+  In 1983, Tronica released a second revision of SG-21 with different graphic
+  overlays. This version can be distinguished by having the year 1983 labeled
+  on the backside of the unit.
+
+***************************************************************************/
+
+class trspacmis_state : public hh_sm510_state
+{
+public:
+	trspacmis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trspacmis(machine_config &config);
+	void trspider(machine_config & config);
+};
+
+// config
+
+static INPUT_PORTS_START( trspacmis )
+	PORT_START("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // display test?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // alarm test?
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void trspacmis_state::trspacmis(machine_config &config)
+{
+	sm5a_common(config, 1601, 1080); // R mask option confirmed
+}
+
+void trspacmis_state::trspider(machine_config &config)
+{
+	sm5a_common(config, 1597, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( trspacmis )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0126_228b", 0x0000, 0x0740, CRC(3d319537) SHA1(007d376cfd29574554caa59ed9163178179ae9c5) )
+
+	ROM_REGION( 106675, "screen", 0)
+	ROM_LOAD( "trspacmis.svg", 0, 106675, CRC(45d7b798) SHA1(db08fef21462507a115547ecf8eac38260a0c868) )
+ROM_END
+
+ROM_START( trspider )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0126_22yc", 0x0000, 0x0740, CRC(3d319537) SHA1(007d376cfd29574554caa59ed9163178179ae9c5) )
+
+	ROM_REGION( 130534, "screen", 0)
+	ROM_LOAD( "trspider.svg", 0, 130534, CRC(d3f00245) SHA1(348c47dbe87ce8537c9b1c91d0d8bbf0809546e8) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Elektronika Автослалом (Autoslalom) (model IM-23)
   * KB1013VK1-2 MCU
   * lcd screen with custom segments, 1-bit sound
@@ -9283,7 +9373,7 @@ INPUT_PORTS_END
 
 void auslalom_state::auslalom(machine_config &config)
 {
-	kb1013vk12_common(config, 1780, 1080); // R mask option ?
+	kb1013vk12_common(config, 1732, 1080); // R mask option ?
 }
 
 // roms
@@ -9292,8 +9382,8 @@ ROM_START( auslalom )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
 
-	ROM_REGION( 85857, "screen", 0)
-	ROM_LOAD( "auslalom.svg", 0, 85857, BAD_DUMP CRC(47381b27) SHA1(de0410331669c07c32aaed391b8da469696adbe7) )
+	ROM_REGION( 117520, "screen", 0)
+	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
 ROM_END
 
 
@@ -9548,6 +9638,8 @@ CONS( 1992, tbatmana,     0,           0, tbatmana,     tbatmana,     tbatmana_s
 CONS( 1983, trshutvoy,    0,           0, trshutvoy,    trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, tigarden,     trshutvoy,   0, tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trsrescue,    0,           0, trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
 CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

@@ -266,7 +266,7 @@ image_init_result ti99_cartridge_device::call_load()
 		{
 			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.what());
 			m_rpk.reset();
-			m_err = IMAGE_ERROR_INVALIDIMAGE;
+			m_err = image_error::INVALIDIMAGE;
 			return image_init_result::FAIL;
 		}
 	}
@@ -1511,8 +1511,8 @@ void ti99_cartridge_device::rpk::close()
 				throw emu_fatalerror("ti99_cartridge_device::rpk::close: Buffer is null or length is 0");
 
 			emu_file file(m_options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = file.open(socket.second->get_pathname());
-			if (filerr == osd_file::error::NONE)
+			std::error_condition const filerr = file.open(socket.second->get_pathname());
+			if (!filerr)
 				file.write(socket.second->get_contents(), socket.second->get_content_length());
 
 		}

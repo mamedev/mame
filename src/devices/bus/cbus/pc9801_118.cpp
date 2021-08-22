@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "bus/cbus/pc9801_118.h"
 
-#include "sound/ym2608.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 

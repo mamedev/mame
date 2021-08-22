@@ -393,7 +393,7 @@ void const_state::ssensor4(machine_config &config)
 	config.set_default_layout(layout_novag_ssensor4);
 
 	/* expansion */
-	GENERIC_CARTSLOT(config, "exrom", generic_plain_slot, "novag_ssensor4");
+	GENERIC_SOCKET(config, "exrom", generic_plain_slot, "novag_ssensor4");
 	SOFTWARE_LIST(config, "cart_list").set_original("novag_ssensor4");
 }
 

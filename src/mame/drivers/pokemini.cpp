@@ -1516,14 +1516,14 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 	/* Verify that the image is big enough */
 	if (size <= 0x2100)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too small");
 		return image_init_result::FAIL;
 	}
 
 	/* Verify that the image is not too big */
 	if (size > 0x1fffff)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too big");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too big");
 		return image_init_result::FAIL;
 	}
 

@@ -28,6 +28,7 @@ public:
 		, m_videoregs(*this, "videoregs.%u", 0)
 		, m_spriteram(*this, "spriteram.%u", 0)
 		, m_io_in0(*this, "IN0")
+		, m_io_bet(*this, "BET")
 		, m_touch_x(*this, "TOUCH%u_X", 1U)
 		, m_touch_y(*this, "TOUCH%u_Y", 1U)
 		, m_spriteregion(*this, "sprites%u", 0)
@@ -56,6 +57,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(korokoro_hopper_r);
 	DECLARE_READ_LINE_MEMBER(tjumpman_hopper_r);
+	DECLARE_READ_LINE_MEMBER(paccarn_bet4_r);
+	DECLARE_READ_LINE_MEMBER(paccarn_bet8_r);
 
 	void init_uopoko();
 	void init_donpachi();
@@ -187,6 +190,7 @@ private:
 	optional_shared_ptr_array<u16, 4> m_spriteram;
 
 	optional_ioport m_io_in0;
+	optional_ioport m_io_bet;
 	optional_ioport_array<2> m_touch_x;
 	optional_ioport_array<2> m_touch_y;
 

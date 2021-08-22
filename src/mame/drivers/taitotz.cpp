@@ -178,6 +178,7 @@ Notes:
 #include "cpu/tlcs900/tmp95c063.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
+#include "screen.h"
 
 /*
     Interesting mem areas
@@ -213,6 +214,7 @@ Notes:
         0x7004:            0x4003d554()
         0x7005:            0x4003d168()
         0x8000:            ?                                        Used by vibration (force feedback?) on pwrshovl
+        0x9100:            ?                                        Dendego3 speedometer and brake meter. io_shared[0x1c3c] = speed, io_shared[0x1c3e] = brake
         0xa000:            ?                                        Used by vibration (force feedback?) on pwrshovl
         0xf000:            0x4002f328() TLCS_Init
         0xf010:            0x4002f074()                             Enables TLCS watchdog timer
@@ -637,11 +639,11 @@ private:
 	void tlcs900h_mem(address_map &map);
 };
 
-class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
+class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6>
 {
 public:
 	taitotz_renderer(taitotz_state &state, int width, int height, uint32_t *scrram, uint32_t *texram)
-		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
+		: poly_manager<float, taitotz_polydata, 6>(state.machine()),
 			m_state(state)
 	{
 		m_fb = std::make_unique<bitmap_rgb32>(width, height);
@@ -1343,7 +1345,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), 6, v[0], v[i-1], v[i]);
+			render_triangle<6>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), v[0], v[i-1], v[i]);
 		}
 	}
 	while (!end);
@@ -1433,7 +1435,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), 3, v[0], v[i-1], v[i]);
+			render_triangle<3>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), v[0], v[i-1], v[i]);
 		}
 
 		m_direct_fifo_ptr = 0;
@@ -2025,7 +2027,7 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 				m_io_share_ram[0xfff] == 0x6000 || m_io_share_ram[0xfff] == 0x6010)
 			{
 				//m_maincpu->spin_until_trigger(PPC_TLCS_COMM_TRIGGER);
-				m_maincpu->spin_until_interrupt();
+				//m_maincpu->spin_until_interrupt();
 			}
 
 			// pwrshovl sometimes writes commands during command handling... make sure that doesn't happen
@@ -2546,6 +2548,56 @@ static INPUT_PORTS_START( styphp )
 	PORT_START("ANALOG8")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(dendego3)
+	PORT_START("INPUTS1")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_SERVICE_NO_TOGGLE(0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS2")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_COIN1)                                    // Coin
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS3")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_START1)                                   // Start
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_BUTTON7)                                  // Train Horn
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1)                                  // "NOCH0"
+	PORT_BIT(0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS4")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3)                                  // "NOCH2"
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_BUTTON5)                                  // "NOCH4"
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2)                                  // "NOCH1"
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4)                                  // "NOCH3"
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_BUTTON6)                                  // "NOCH5"
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("ANALOG1")
+	PORT_BIT(0x3ff, 0x000, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
+	PORT_START("ANALOG2")
+	PORT_START("ANALOG3")
+	PORT_START("ANALOG4")
+	PORT_START("ANALOG5")
+	PORT_START("ANALOG6")
+	PORT_START("ANALOG7")
+	PORT_START("ANALOG8")
+INPUT_PORTS_END
+
 void taitotz_state::machine_reset()
 {
 	if (m_hdd_serial_number != nullptr)
@@ -3012,7 +3064,7 @@ GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshov
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 2000, dendego3,  taitotz,  taitotz,  taitotz,  taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (V2.03J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
+GAME( 2000, dendego3,  taitotz,  taitotz,  dendego3, taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (V2.03J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
 GAME( 2000, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -119,8 +119,11 @@ DasmWindow::~DasmWindow()
 
 void DasmWindow::cpuChanged(int index)
 {
-	m_dasmView->view()->set_source(*m_dasmView->view()->source(index));
-	m_dasmView->viewport()->update();
+	if (index < m_dasmView->view()->source_count())
+	{
+		m_dasmView->view()->set_source(*m_dasmView->view()->source(index));
+		m_dasmView->viewport()->update();
+	}
 }
 
 

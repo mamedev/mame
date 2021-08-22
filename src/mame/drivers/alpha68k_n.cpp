@@ -431,10 +431,10 @@ void alpha68k_N_state::sound_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x11).w("ym1", FUNC(ym2203_device::write));
-	map(0x80, 0x80).w("ym2", FUNC(ym2203_device::write_port_w));
-	map(0x81, 0x81).w("ym2", FUNC(ym2203_device::control_port_w));
-	map(0x90, 0x90).w("ym3", FUNC(ym2203_device::write_port_w));
-	map(0x91, 0x91).w("ym3", FUNC(ym2203_device::control_port_w));
+	map(0x80, 0x80).w("ym2", FUNC(ym2203_device::data_w));
+	map(0x81, 0x81).w("ym2", FUNC(ym2203_device::address_w));
+	map(0x90, 0x90).w("ym3", FUNC(ym2203_device::data_w));
+	map(0x91, 0x91).w("ym3", FUNC(ym2203_device::address_w));
 }
 
 void jongbou_state::sound_map(address_map &map)

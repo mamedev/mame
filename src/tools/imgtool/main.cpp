@@ -11,6 +11,8 @@
 #include "imgtool.h"
 #include "main.h"
 #include "modules.h"
+
+#include "corefile.h"
 #include "strformat.h"
 
 #include <cstdio>
@@ -597,7 +599,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 		goto error;
 	}
 
-	if (module->createimage_optguide && module->createimage_optspec)
+	if (module->createimage_optguide && !module->createimage_optspec.empty())
 	{
 		try { resolution.reset(new util::option_resolution(*module->createimage_optguide)); }
 		catch (...)
@@ -605,7 +607,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 			err = IMGTOOLERR_OUTOFMEMORY;
 			goto error;
 		}
-		resolution->set_specification(module->createimage_optspec);
+		resolution->set_specification(module->createimage_optspec.c_str());
 	}
 
 	unnamedargs = parse_options(argc, argv, 2, 3, resolution.get(), nullptr, nullptr);
@@ -831,7 +833,7 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 	if (opt_guide)
 	{
 		util::stream_format(std::wcout, L"Image specific creation options (usable on the 'create' command):\n\n");
-		listoptions(*opt_guide, mod->createimage_optspec);
+		listoptions(*opt_guide, mod->createimage_optspec.c_str());
 		util::stream_format(std::wcout, L"\n");
 	}
 	else

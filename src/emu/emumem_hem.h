@@ -9,12 +9,12 @@
 
 // Accesses fixed memory (non-banked rom or ram)
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read_memory : public handler_entry_read_address<Width, AddrShift, Endian>
+template<int Width, int AddrShift> class handler_entry_read_memory : public handler_entry_read_address<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_read_memory(address_space *space, void *base) : handler_entry_read_address<Width, AddrShift, Endian>(space, 0), m_base(reinterpret_cast<uX *>(base)) {}
+	handler_entry_read_memory(address_space *space, void *base) : handler_entry_read_address<Width, AddrShift>(space, 0), m_base(reinterpret_cast<uX *>(base)) {}
 	~handler_entry_read_memory() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
@@ -26,12 +26,12 @@ private:
 	uX *m_base;
 };
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_write_memory : public handler_entry_write_address<Width, AddrShift, Endian>
+template<int Width, int AddrShift> class handler_entry_write_memory : public handler_entry_write_address<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_write_memory(address_space *space, void *base) : handler_entry_write_address<Width, AddrShift, Endian>(space, 0), m_base(reinterpret_cast<uX *>(base)) {}
+	handler_entry_write_memory(address_space *space, void *base) : handler_entry_write_address<Width, AddrShift>(space, 0), m_base(reinterpret_cast<uX *>(base)) {}
 	~handler_entry_write_memory() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
@@ -48,12 +48,12 @@ private:
 
 // Accesses banked memory, associated to a memory_bank
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read_memory_bank : public handler_entry_read_address<Width, AddrShift, Endian>
+template<int Width, int AddrShift> class handler_entry_read_memory_bank : public handler_entry_read_address<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_read_memory_bank(address_space *space, memory_bank &bank) : handler_entry_read_address<Width, AddrShift, Endian>(space, 0), m_bank(bank) {}
+	handler_entry_read_memory_bank(address_space *space, memory_bank &bank) : handler_entry_read_address<Width, AddrShift>(space, 0), m_bank(bank) {}
 	~handler_entry_read_memory_bank() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
@@ -65,12 +65,12 @@ private:
 	memory_bank &m_bank;
 };
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_write_memory_bank : public handler_entry_write_address<Width, AddrShift, Endian>
+template<int Width, int AddrShift> class handler_entry_write_memory_bank : public handler_entry_write_address<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_write_memory_bank(address_space *space, memory_bank &bank) : handler_entry_write_address<Width, AddrShift, Endian>(space, 0), m_bank(bank) {}
+	handler_entry_write_memory_bank(address_space *space, memory_bank &bank) : handler_entry_write_address<Width, AddrShift>(space, 0), m_bank(bank) {}
 	~handler_entry_write_memory_bank() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;

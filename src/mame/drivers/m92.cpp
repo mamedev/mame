@@ -215,7 +215,7 @@ psoldier dip locations still need verification.
 #include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
 #include "sound/iremga20.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 

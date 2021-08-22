@@ -99,6 +99,8 @@ private:
 	u8               m_latchdata;
 	u8 *             m_shiftreg;
 	emu_timer *      m_timer;
+	std::unique_ptr<u8[]> m_vram_alloc;
+	std::unique_ptr<u8[]> m_latchram_alloc;
 
 	void update_interrupts();
 	TIMER_CALLBACK_MEMBER( interrupt );

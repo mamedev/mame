@@ -157,10 +157,10 @@ Notes:
       Z80      - Zilog Z80B CPU, running at 5.000MHz [10/2]
       YM2151   - Yamaha YM2151 8-channel 4-operator FM sound chip, running at 4.000MHz [8/2]
       D7759    - NEC uPD7759C ADPCM Speech Synthesizer LSI, clock input of 640kHz (DIP40)
-      65256    - Hitachi HM65256 32K x8 SRAM (DIP28)
-      TC5565   - Toshiba TC5565 8K x8 SRAM (DIP28)
-      2015     - Toshiba TMM2015 2K x8 SRAM (DIP24)
-      2018     - Toshiba TMM2018 2K x8 SRAM (DIP24)
+      65256    - Hitachi HM65256 or NEC uPD42832C-12L or Toshiba TC51832-P-85 32K x8 PSRAM (DIP28)
+      TC5565   - Toshiba TC5565 or Sony CXK5864PS-15L or Fujitsu MB8464-12L 8K x8 SRAM (DIP28)
+      2015     - Toshiba TMM2015 or TMM2115BP-10 or UMC UM6116K-2 2K x8 SRAM (DIP24)
+      2018     - Toshiba TMM2018D-45 or TMM2018AP-35 2K x8 SRAM (DIP24)
       D8751H   - Intel D8751H Microcontroller, running at 8.000MHz. Used on some versions of some games.
       315-5213 - National Semiconductor PAL16R6 stamped '315-5213' (DIP20)
       315-5214 - Signetics CK2605 stamped '315-5214' (DIP20)
@@ -1918,13 +1918,8 @@ void dfjail_state::sound_control_w(uint8_t data)
 {
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 
-	// NMI and presumably DAC output clear
-	// TODO: identify which is which
+	// NMI enable in bit 6
 	m_nmi_enable = ((data & 0xc0) == 0);
-	if (m_nmi_enable == false)
-		m_dac->write(0);
-	//m_upd7759->start_w(BIT(data, 7));
-	//m_upd7759->reset_w(BIT(data, 6));
 
 	int bankoffs = 0;
 	bankoffs = ((data & 0x08) >> 3) * 0x20000;
@@ -1934,27 +1929,30 @@ void dfjail_state::sound_control_w(uint8_t data)
 	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
 }
 
-void dfjail_state::dac_data_w(uint8_t data)
+void dfjail_state::dac_data_w(offs_t offset, uint8_t data)
 {
-	// TODO: understand how this is hooked up
-	#if 0
-	switch(offset)
+	/*
+	    Z80 code in the NMI handler at 0x6e:
+	    Sample in A
+	    Copy A to E
+	    Shift A left 2 and AND by 3C
+	    write A to port 0x80
+	    Copy E to A
+	    Shift right 4 times
+	    write A to ports 0x81, 0x82, and 0x83
+
+	    This means port 0x80 gets the bottom 4 bits of the 8-bit sample, offset by 2 bits,
+	    and ports 81/82/83 get the top 4 bits of the sample, shifted right 4 bits.
+	*/
+	if (offset == 0)
 	{
-		case 0:
-			m_dac_data = (data & 0xf) << 0;
-			break;
-		case 1:
-			m_dac_data |= (data & 0xf) << 4;
-			break;
-		case 2:
-			m_dac_data |= (data & 0xf) << 8;
-			break;
-		case 3:
-			m_dac_data |= (data & 0xf) << 12;
-			m_dac->write(m_dac_data);
-			break;
+		m_dac_data = (data>>2) & 0xf;
 	}
-	#endif
+	else if (offset == 1)
+	{
+		m_dac_data |= (data << 4);
+		m_dac->write(m_dac_data);
+	}
 }
 
 void dfjail_state::dfjail_sound_iomap(address_map &map)
@@ -3907,28 +3905,27 @@ static INPUT_PORTS_START( dfjail )
 	PORT_SERVICE_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3") // it's actually BGM in attract mode
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:5") // from here on not used according to the manual
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3974,6 +3971,8 @@ void segas16b_state::system16b(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
+	// see note in segas16a.cpp, also used here for consistency
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -4198,6 +4197,8 @@ void segas16b_state::lockonph(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224); // wrong, other XTAL seems to be 17Mhz?
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
+	// see note in segas16a.cpp, also used here for consistency
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -4270,16 +4271,16 @@ void dfjail_state::dfjail(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dfjail_state::dfjail_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dfjail_state::irq4_line_hold));
 
-	Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/4); // ?
+	Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/2); // ?
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dfjail_state::bootleg_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &dfjail_state::dfjail_sound_iomap);
 	// connected to a 74ls74 clock source
-	m_soundcpu->set_periodic_int(FUNC(dfjail_state::soundirq_cb), attotime::from_hz(4*60)); // TODO: timing
+	m_soundcpu->set_periodic_int(FUNC(dfjail_state::soundirq_cb), attotime::from_hz(8000)); // This sets the sample rate of the DAC samples
 
 	//config.device_remove("ym2151");
 	config.device_remove("upd");
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // AD7533KN
 }
 
 
@@ -5166,8 +5167,8 @@ ROM_START( dfjail )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // z80
 	ROM_LOAD( "29.f3",        0x000000, 0x008000, CRC(7f3ebb6a) SHA1(f265c6215ef457202686b31c9b503a0a371a1139) )
-	ROM_LOAD( "28.g3",        0x010000, 0x020000, CRC(ed96d6b9) SHA1(3ad096e466150d0ca36fec8dd649554e7fb9f654) )
-	ROM_LOAD( "27.g1",        0x030000, 0x020000, CRC(7a88e1c1) SHA1(b238b451522819a5a8c1a9e82058b86d33ac2272) )
+	ROM_LOAD( "28.g3",        0x030000, 0x020000, CRC(ed96d6b9) SHA1(3ad096e466150d0ca36fec8dd649554e7fb9f654) )
+	ROM_LOAD( "27.g1",        0x010000, 0x020000, CRC(7a88e1c1) SHA1(b238b451522819a5a8c1a9e82058b86d33ac2272) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "9.f16",        0x000000, 0x020000, CRC(b2a49d12) SHA1(052b96109abc18c562c09042664738bac68f66b4) )
@@ -7381,6 +7382,56 @@ ROM_END
 ROM_START( hwchamp )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-11239.a7", 0x000000, 0x20000, CRC(e5abfed7) SHA1(1f875dbaf8665c1dbfe336470580361b18a8ed4e) )
+	ROM_LOAD16_BYTE( "epr-11238.a5", 0x000001, 0x20000, CRC(25180124) SHA1(77b414f8cd88270713c57bddadec5d8dca490e86) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "mpr-11241.a14", 0x00000, 0x20000, CRC(fc586a86) SHA1(2c26ef3ab94089940add3be9952804a6e62f5113) ) // all MPR-11xxx here are 28 pin Fujitsu MB831000 mask ROMs
+	ROM_LOAD( "mpr-11166.b14", 0x20000, 0x20000, CRC(aeaaa9d8) SHA1(6b7e5320f515c1c35445d3320b3edaef911191e1) )
+	ROM_LOAD( "mpr-11242.a15", 0x40000, 0x20000, CRC(7715a742) SHA1(e6040ff0e9c68f3f502e5f6d7e7ca04b14059752) )
+	ROM_LOAD( "mpr-11167.b15", 0x60000, 0x20000, CRC(63a82afa) SHA1(a02bbb6dd84cdf7cdab8e738c6927f5b1e3fcad5) )
+	ROM_LOAD( "mpr-11243.a16", 0x80000, 0x20000, CRC(f30cd5fd) SHA1(df6118ca4b724c37b11e18d9f2ea18e9591ae7aa) )
+	ROM_LOAD( "mpr-11168.b16", 0xA0000, 0x20000, CRC(5b8494a8) SHA1(9e3f09f4037a007b6a188dd81ec8f9c635e87650) )
+
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "mpr-11158.b1", 0x000001, 0x010000, CRC(fc098a13) SHA1(b4a6e00d4765265bad170dabf0b2a4a58e063b16) ) // all MPR-111xx here are 28 pin Fujitsu MB831000 mask ROMs
+	ROM_CONTINUE(                    0x020001, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11162.b5", 0x000000, 0x010000, CRC(5db934a8) SHA1(ba7cc93025af71ad2674b1376b61afbb7ae910ff) )
+	ROM_CONTINUE(                    0x020000, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11159.b2", 0x040001, 0x010000, CRC(1f27ee74) SHA1(a60d50a4f501623187c067a3c17bff49151ca3b2) )
+	ROM_CONTINUE(                    0x060001, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11163.b6", 0x040000, 0x010000, CRC(8a6a5cf1) SHA1(28b22aa326682ef3b54891dda7aa9a432da12a4d) )
+	ROM_CONTINUE(                    0x060000, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11160.b3", 0x080001, 0x010000, CRC(c0b2ba82) SHA1(30349c86a99bbe3dfb423027ad534a9333e27679) )
+	ROM_CONTINUE(                    0x0a0001, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11164.b7", 0x080000, 0x010000, CRC(d6c7917b) SHA1(8b313a5634c14f4c90bfa9f9616d600283f72768) )
+	ROM_CONTINUE(                    0x0a0000, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11161.b4", 0x0c0001, 0x010000, CRC(35c9e44b) SHA1(2de32cb684c46d1169d8afcb0d3058d08e452a49) )
+	ROM_CONTINUE(                    0x0e0001, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11165.b8", 0x0c0000, 0x010000, CRC(57e8f9d2) SHA1(1804677820d05a421120660f91e3a5f1df1e6a8d) )
+	ROM_CONTINUE(                    0x0e0000, 0x010000 )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-11240.a10", 0x00000, 0x08000, CRC(96a12d9d) SHA1(f4ba70c3b5d80a1b6a187c940b922d5182d5ab12) )
+	ROM_LOAD( "mpr-11244.a11", 0x10000, 0x20000, CRC(4191c03d) SHA1(40809fb80527980015d3b5c4ca7cf159bc09cf5a) ) // 28 pin Fujitsu MB831000 mask ROM
+	ROM_LOAD( "mpr-11245.a12", 0x30000, 0x20000, CRC(a4d53f7b) SHA1(71123a8ecfa093897c6f2bb7312e6c755be14521) ) // 28 pin Fujitsu MB831000 mask ROM
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "315-5298.b9",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) ) // PLS153
+ROM_END
+
+//*************************************************************************************************************************
+//  Heavyweight Champ, Sega System 16B (set 2)
+//  CPU: 68000
+//  ROM Board type: 171-5521
+//  Sega ID# for ROM board: 834-6397-02
+//  Notes: Only three different bytes from 'hwchamp', two for modifying the checksum so the ingame ROM test won't fail and
+//         the other it's an actual code value (which is actually readed quite frequently during gameplay, when certain
+//         moves are executed).
+//         This was dumped from an original Sega PCB with original Sega 'EPR' stickers on the ROMs.
+//
+ROM_START( hwchampa )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-11239.a7", 0x000000, 0x20000, CRC(42d59e4b) SHA1(c806b7e10519f8885e9b900da9c63fbb74ee19a5) ) // the only different ROM from 'hwchamp' (but same label)
 	ROM_LOAD16_BYTE( "epr-11238.a5", 0x000001, 0x20000, CRC(25180124) SHA1(77b414f8cd88270713c57bddadec5d8dca490e86) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -9883,7 +9934,8 @@ GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,      goldnaxe, segas16b_stat
 GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,       goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
 GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797, goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World) (FD1094 317-0110)", 0 )
 
-GAME( 1987, hwchamp,    0,        system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ", 0 )
+GAME( 1987, hwchamp,    0,        system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (set 1)", 0 )
+GAME( 1987, hwchampa,   hwchamp,  system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (set 2)", 0 )
 GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,      hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan) (FD1094 317-0046)", 0 )
 
 GAME( 1989, mvp,        0,        system16b_fd1094_5797, mvp,      segas16b_state, init_generic_5797,       ROT0,   "Sega", "MVP (set 2, US) (FD1094 317-0143)", 0 )
@@ -9948,7 +10000,7 @@ GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_stat
 GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
 GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
-GAME( 199?, dfjail,   0,          dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // dips, check sound, not extensively tested
+GAME( 1991, dfjail,   0,          dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_NO_COCKTAIL ) // Regulatory approval document dated "1991. 3.28" based on submission of manual and photos
 
 // decrypted bootleg / 'suicide repair' sets
 

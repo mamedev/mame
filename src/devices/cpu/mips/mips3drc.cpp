@@ -2460,6 +2460,11 @@ bool mips3_device::generate_set_cop0_reg(drcuml_block &block, compiler_state &co
 			return true;
 
 		case COP0_Count:
+			// don't count the cycle for this instruction yet; we need a non-zero cycle
+			// count in case we are in a delay slot, otherwise the test for negative cycles
+			// won't be generated (due to compiler.cycles == 0); see the loop during early
+			// boot of gauntdl, @BFC01A24
+			compiler.cycles--;
 			generate_update_cycles(block, compiler, desc->pc, !in_delay_slot);  // <subtract cycles>
 			UML_MOV(block, CPR032(COP0_Count), I0);                             // mov     [Count],i0
 			UML_CALLC(block, cfunc_get_cycles, this);                           // callc   cfunc_get_cycles,mips3
@@ -2468,6 +2473,7 @@ bool mips3_device::generate_set_cop0_reg(drcuml_block &block, compiler_state &co
 			UML_DSUB(block, mem(&m_core->count_zero_time), mem(&m_core->numcycles), I0);
 																				// dsub    [count_zero_time],[m_numcycles],i0
 			UML_CALLC(block, cfunc_mips3com_update_cycle_counting, this);       // callc   mips3com_update_cycle_counting,mips.core
+			compiler.cycles++;
 			return true;
 
 		case COP0_Compare:
@@ -2513,12 +2519,18 @@ bool mips3_device::generate_get_cop0_reg(drcuml_block &block, compiler_state &co
 	switch (reg)
 	{
 		case COP0_Count:
+			// don't count the cycle for this instruction yet; we need a non-zero cycle
+			// count in case we are in a delay slot, otherwise the test for negative cycles
+			// won't be generated (due to compiler.cycles == 0); see the loop during early
+			// boot of gauntdl, @BFC01A24
+			compiler.cycles--;
 			generate_update_cycles(block, compiler, desc->pc, false);           // <subtract cycles>
 			UML_CALLC(block, cfunc_get_cycles, this);                           // callc   cfunc_get_cycles,mips3
 			UML_DSUB(block, I0, mem(&m_core->numcycles), mem(&m_core->count_zero_time));
 																				// dsub    i0,[numcycles],[count_zero_time]
 			UML_DSHR(block, I0, I0, 1);                                         // dshr    i0,i0,1
 			UML_DSEXT(block, I0, I0, SIZE_DWORD);                               // dsext   i0,i0,dword
+			compiler.cycles++;
 			return true;
 
 		case COP0_Random:

@@ -23,21 +23,23 @@
     The Next Space          A8004-1 PIC      SNK 1989
 
 TODO:
-- Super Champion Baseball "ball speed pitch" protection;
 - II & V board: bit 15 of palette RAM isn't hooked up, according to Sky Adventure
   service mode enables "bright", it is actually same as NeoGeo device;
-- II & V board: Fix sound CPU crashes properly (nested NMIs)
-- Sky Soldiers: BGM Fade out before boss battle isn't implemented
+- II & V board: Fix sound CPU crashes properly (nested NMIs);
+- Sky Soldiers: According to various references bosses should really time out after some time (reportedly ~80 secs.).
+  This is actually handled by the MCU, not unlike Gold Medalist;
+- Sky Soldiers: BGM Fade out before boss battle isn't implemented;
 - Sky Adventure, probably others: on a real PCB reference BGM stutters when using
-  30 Hz autofire (not enough sound resources?)
+  30 Hz autofire (not enough sound resources?);
 - Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
 - Gold Medalist: attract mode has missing finger on button 1, may be btanb;
 - Gold Medalist: incorrect blank effect on shooting pistol for dash events (cfr. alpha68k_palette_device);
 - Gold Medalist: dash events timers relies on MCU irq timings.
   Previous emulation of 180 Hz was making it way too hard, and the timer was updating at 0.03 secs (-> 30 Hz refresh rate).
   Using a timer of 100 Hz seems a better approximation compared to a stopwatch, of course fine tuning
-  this approximation needs HW probing and/or a MCU decap.
+  this approximation needs HW probing and/or a MCU decap;
 - Gold Medalist: MCU irq routine has an event driven path that is never taken into account, what is it for?
+- Super Champion Baseball: "ball speed pitch" protection;
 - Super Champion Baseball: enables opacity bit on fix layer, those are transparent on SNK Arcade Classics 0
   but actually opaque on a reference shot, sounds like a btanb;
 - Fix layer tilemap should be a common device between this, snk68.cpp and other Alpha/SNK-based games;
@@ -338,7 +340,18 @@ u16 alpha68k_II_state::alpha_II_trigger_r(offs_t offset)
 					m_microcontroller_data = 0x21;
 				}
 				else
+				{
+					// TODO: Sky Soldiers uses this thread dispatch as well for boss timing out and who knows what else
+					// cfr. PC=0x1d52, possible threads at ROM address $1e7e-$1e89 (in bytes)
+					// 0x34 should be the step counter handling while 0x37 is what actually times out (or even destroys) the boss on expiration.
+					// Notice that there are additional shared RAM checks (i.e. 0x1e6a, 0x1e32, 0x1e3a), which causes the game to soft lock if not satisfied.
+					// Apparently bosses should time out in ~80 seconds.
 					m_microcontroller_data = 0x00;
+
+					// Notice that a similar system is also used by Time Soldiers but most threads are actually NOP-ed out.
+					// (basically anything that is >0x24)
+					// Most likely left-overs that eventually were completed with aforementioned Sky Soldiers.
+				}
 				m_shared_ram[0x29] = (source & 0xff00) | m_microcontroller_data;
 			}
 
@@ -2148,9 +2161,8 @@ GAME( 1987, timesold1, timesold, alpha68k_II,    timesold,  alpha68k_II_state, i
 GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield,  alpha68k_II_state, init_btlfield,  ROT90, "Alpha Denshi Co. (SNK license)",                    "Battle Field (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb, alpha68k_II_state, init_btlfieldb, ROT90, "bootleg",                                           "Battle Field (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
-
+GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // unemulated boss time out behaviour
+GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // unknown if/how bootleggers handled boss time out, seems likely
 
 GAME( 1988, goldmedl,  0,        goldmedal,   goldmedl,  goldmedal_II_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1, Alpha68k II PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 

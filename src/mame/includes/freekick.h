@@ -50,6 +50,7 @@ private:
 	int        m_spinner;
 	int        m_nmi_en;
 	int        m_ff_data;
+	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);

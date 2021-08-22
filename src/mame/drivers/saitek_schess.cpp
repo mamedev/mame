@@ -33,12 +33,14 @@ Expansion modules: (* denotes not dumped)
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -116,7 +118,6 @@ void schess_state::leds2_w(offs_t offset, u8 data)
 {
 	// button panel leds (direct)
 	m_display->write_row(8 + (offset ? 1 : 0), ~data);
-	m_display->update();
 }
 
 void schess_state::control_w(u8 data)

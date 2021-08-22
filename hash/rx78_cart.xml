@@ -6,8 +6,8 @@ license:CC0
 The Bandai RX-78 Gundam has two slots where you can plug in a ROM cart or an additional device, like a
 printer interface. The system was capable of loading software from these ROM carts, or from a cassette
 tape through audio line-in ports to use with tape recorders; these ports were present in the BS Basic,
-Animation Graphics, Creative Graphics, Japanese Word Processor and Z80 Assembler carts. The system could
-use up to two carts or devices at the same time.
+Animation Graphics, Creative Graphics, Japanese Word Processor, Music Master and Z80 Assembler carts.
+The system could use up to two carts or devices at the same time.
 
 There were a total of 20 games released for the system, plus educational and productivity software, and peripheral
 devices. One additional game and three expansion cards were announced but never released. The official translations
@@ -18,11 +18,12 @@ printed in the game carts or tapes are used below where available. Names in brac
 |========+=========+=======+========================================================================================+
 |  N/A   | 0201001 | Other | No      | RX-78 Base Unit
 |  N/A   | 0201003 | Other | No      | Joystick Controller
-|  Cart  | 0201004 | Game  | Yes     | Mobile Suit ガンダム ルナ・ツーの戦い  [Mobile Suit Gundam: Battle of Luna II] (says Mobil on the screen)
+|  Cart  | 0201004 | Game  | Yes     | Mobile Suit ガンダム ルナ・ツーの戦い  [Mobile Suit Gundam: Battle of Luna II]
 |  Cart  | 0201005 | Game  | Yes     | チャンピオン レーサー / Champion Racer
 |  Cart  | 0201006 | Game  | Yes     | チャレンジ ゴルフ / Challenge Golf
 |  Cart  | 0201007 | Game  | No      | エキサイト ベースボール / Excite Baseball
 |  Cart  | 0201008 | Game  | Yes     | パーフェクト マージャン / Perfect Mah-Jongg
+|  Cart  | 0201009 | Tool  | Unknown | クリエイティブ グラフィックス / Creative Graphics
 |  Cart  | 0201010 | Tool  | Yes     | ミュージック マスター / Music Master
 |  Cart  | 0201011 | Game  | No      | ハンバーガー ショップ / Hamburger Shop
 |  Cart  | 0201012 | Game  | Yes     | 戦え！ウルトラマン / Tatakae! Ultraman
@@ -31,6 +32,7 @@ printed in the game carts or tapes are used below where available. Names in brac
 |  Cart  | 0201018 | Game  | Yes     | 連合艦隊 / Rengo Kantai
 |  Cart  | 0201019 | Game  | Yes     | スペースエネミー / Space Enemy
 |  Cart  | 0201020 | Tool  | Unknown | アニメーション グラフィックス / Animation Graphics
+|  Cart  | 0201022 | Tool  | Unknown | ３Ｄグラフィックス / 3-Dimension Graphics
 |  Cart  | 0201023 | Game  | Yes     | エキサイト テニス / Excite Tennis
 |  Cart  | 0201024 | Game  | No      | スーパー モトクロス / Super Motocross
 |  Cart  | 0201026 | Game  | Yes     | 零戦 (ぜろせん) / Reisen (Zerosen) [Zero Fighter]
@@ -39,7 +41,7 @@ printed in the game carts or tapes are used below where available. Names in brac
 |  Tape  | 0201029 | Game  | Unknown | スペース カプセル / Space Capsule
 |  Tape  | 0201030 | Tool  | Yes     | ヘルシーライフ / Healthy Life Plan
 |  Tape  | 0201033 | Tool  | Yes     | 計算演習ドリル / Keisan Ensyu Drill
-|  Tape  | 0201035 | Learn | No      | グラフィック数学 / Graphics Mathematics
+|  Tape  | 0201035 | Learn | No      | グラフィック数学 / Graphics Mathematics [Graphic Sūgaku]
 |  Tape  | 0201038 | Game  | Unknown | イエローキャブ / Yellow Cab
 |  Tape  | 0201041 | Game  | Unknown | ドンジャラ [Donjara] (**)
 |  Cart  | 02010?? | Game  | Yes     | カード・ワールド / Card World
@@ -49,8 +51,6 @@ printed in the game carts or tapes are used below where available. Names in brac
 |  Cart  | 02010?? | Tool  | Yes     | BS-BASIC Version 1.0
 |  Cart  | 02010?? | Tool  | Yes     | 漢字ワープロ / Japanese Word Processor
 |  ?     | 02010?? | Tool  | Unknown | Z-80 アセンブラー (RX-78 Z-80 用アセンブラー)
-|  Cart  | 02010?? | Tool  | Unknown | クリエイティブ グラフィックス / Creative Graphics
-|  ?     | 02010?? | Tool  | Unknown | ３Ｄグラフィックス [3D Graphics]
 |  Cart  | ??????? | Tool  | Unknown | バッテリーバックアップ RAM [Battery Backup RAM] (Announced)
 |  Cart  | ??????? | Tool  | Unknown | ミュージック・インターフェイス [Music Interface] (Announced)
 |  Cart  | ??????? | Tool  | Unknown | 専用フロッピイ・ヂイスクドライブ [Floppy Disk Drive] (Announced)
@@ -102,8 +102,8 @@ The monitor will expect you to load a program from cassette.
 		<publisher>Bandai</publisher>
 		<info name="usage" value="Z and X to start and move; Space to pick up and put down" />
 		<part name="cart" interface="rx78_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="burgershop.bin" size="16384" crc="b5a5ffc5" sha1="3b5fb0e670dce635d5220c0ffcae69da7c55049b" />
+			<dataarea name="rom" size="8192">
+				<rom name="burgershop.bin" size="8192" crc="2428ad88" sha1="a773125aeb85646a6e3d15c4c2f2685d9e5232c9" />
 			</dataarea>
 		</part>
 	</software>
@@ -112,47 +112,50 @@ The monitor will expect you to load a program from cassette.
 		<description>Challenge Golf</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<info name="usage" value="Q1 = Home or Backspace; Q2 = \ or End; ZXCV to rotate player; Arrows to rotate view; Middle row or Ctrl to choose a club; Alt or Space to shoot; Enter to abandon hole." />
+		<info name="usage" value="Q1 = Home or Backspace; Q2 = \ or End; ZXCV to rotate player; Arrows to adjust view; Middle row or Ctrl to choose a club; Alt or Space to shoot; Enter to abandon hole." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="ChallengeGolf.bin" size="0x2000" crc="e4edf5c3" sha1="25322dbf6b8f80604aebe87cc375e5a63b98b6d6" offset="0x2000" />
+				<rom name="3128c62-3g1.ic1.bin" size="0x2000" crc="e4edf5c3" sha1="25322dbf6b8f80604aebe87cc375e5a63b98b6d6" offset="0x2000" />
 				<rom size="0x2000" offset="0x0000" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cracer" supported="partial"><!-- various bugs -->
+	<software name="cracer">
 		<description>Champion Racer</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
 		<info name="usage" value="PgUp = 1 or \ = 2. Space to start; Ctrl to accelerate; Left-Right to move" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="championracer.bin" size="16384" crc="f32aa1ac" sha1="cfd4454f013af20d4c139af7d965d45a253f695b" />
+				<rom name="3128c66-3g1.ic1.bin" size="16384" crc="f32aa1ac" sha1="cfd4454f013af20d4c139af7d965d45a253f695b" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="exbaseb" supported="no"><!-- gfx issues -->
+	<software name="exbaseb">
 		<description>Excite Baseball</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="usage" value="Blue player uses arrows; Red player uses R,D,F,G" /><!-- difficult to hit the ball -->
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="exbaseb1.bin" size="0x2000" crc="6237e902" sha1="0f7c236b9425508b3f22664ce7a5f10fc1b991b3" offset="0x4000" />
-				<rom name="exbaseb2.bin" size="0x2000" crc="06e91723" sha1="b0bff97cd5569dbba7b88aef2914fc6b248a171f" offset="0x6000" />
+				<rom name="73.ic1.bin" size="0x2000" crc="6237e902" sha1="0f7c236b9425508b3f22664ce7a5f10fc1b991b3" offset="0x4000" />
+				<rom name="72.ic2.bin" size="0x2000" crc="06e91723" sha1="b0bff97cd5569dbba7b88aef2914fc6b248a171f" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gundam">
-		<description>Mobile Suit Gundam</description>
+		<description>Mobile Suit Gundam: Lunar 2 no Tatakai</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="Mobile Suit ガンダム ルナ・ツーの戦い" /><!-- used on box art -->
+		<info name="alt_title" value="Mobil Suit ガンダム ルナ・ツーのタタカイ" /><!-- title screen really spells it "MOBIL SUIT" -->
 		<info name="usage" value="Use either Z,X,Space; or Left,Right,Alt" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="gundam.bin" size="16384" crc="4f90b7c7" sha1="c836f02876533dbd92fbef1b2237d47bd914ab50" />
+				<rom name="3128c76-3k1.ic1.bin" size="16384" crc="4f90b7c7" sha1="c836f02876533dbd92fbef1b2237d47bd914ab50" />
 			</dataarea>
 		</part>
 	</software>
@@ -164,7 +167,21 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Home = Yes; Backspace = No;Q4 = - or 9; Q5 = \ or pgDn or PgUp; Space to start" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="perfectmahjongg.bin" size="16384" crc="98335879" sha1="b696bb189e3b812fcbd7b2ab798f6e28c76c0fe0" />
+				<rom name="3128c61-3g1.ic1.bin" size="16384" crc="98335879" sha1="b696bb189e3b812fcbd7b2ab798f6e28c76c0fe0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rengo">
+		<description>Rengo Kantai</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="3256d53-4b3.ic1.bin" size="0x2000" crc="23bd3075" sha1="a58b91d62d2e062130ff974b763ebc28867c629c" offset="0x6000" />
+				<rom size="0x2000" offset="0x0000" loadflag="continue" />
+				<rom size="0x2000" offset="0x2000" loadflag="continue" />
+				<rom size="0x2000" offset="0x4000" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
@@ -176,7 +193,7 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Wait for small beep. Press Space(keyboard) or S(joystick). Press G." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="sekigahara.bin" size="0x2000" crc="a1a1c686" sha1="5c35750fd2bedae5f5d4d8b4d7bb7b13d22dc3b6" offset="0x6000" />
+				<rom name="3256d54-4b1.ic1.bin" size="0x2000" crc="a1a1c686" sha1="5c35750fd2bedae5f5d4d8b4d7bb7b13d22dc3b6" offset="0x6000" />
 				<rom size="0x2000" offset="0x0000" loadflag="continue" />
 				<rom size="0x2000" offset="0x2000" loadflag="continue" />
 				<rom size="0x2000" offset="0x4000" loadflag="continue" />
@@ -204,8 +221,8 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Press Space to begin and fire. QWEADZXC to steer. S toggle guidance system." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="senemy1.bin" size="0x2000" crc="d9ff07dd" sha1="6397ce1a301e1e2a7d30e1fe76621373e3f74ea8" offset="0x4000" />
-				<rom name="senemy2.bin" size="0x2000" crc="2fee4171" sha1="f06a68b1a844f390378a78b363c8a62d6c161073" offset="0x6000" />
+				<rom name="78.ic1.bin" size="0x2000" crc="d9ff07dd" sha1="6397ce1a301e1e2a7d30e1fe76621373e3f74ea8" offset="0x4000" />
+				<rom name="77.ic2.bin" size="0x2000" crc="2fee4171" sha1="f06a68b1a844f390378a78b363c8a62d6c161073" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +234,7 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Ctrl to attack; Arrows to move" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="prowrestling.bin" size="16384" crc="1f1b1b35" sha1="b1efe7cbfb70455d86ff0da1fb3f242593a40ffd" />
+				<rom name="3128d06-3j1.ic1.bin" size="16384" crc="1f1b1b35" sha1="b1efe7cbfb70455d86ff0da1fb3f242593a40ffd" />
 			</dataarea>
 		</part>
 	</software>
@@ -228,8 +245,8 @@ The monitor will expect you to load a program from cassette.
 		<publisher>Bandai</publisher>
 		<info name="usage" value="1 player: Use P[];./ticPGDN to move, Space to fire. 2 players: P1 use Arrows,Ctrl,Alt; P2 use RDFGAS" />
 		<part name="cart" interface="rx78_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="ultraman.bin" size="16384" crc="0ba54dfb" sha1="5ba7eb4779d5c362e4751102b31d8e0083e06310" />
+			<dataarea name="rom" size="8192">
+				<rom name="364_c85-3j1.ic1.bin" size="8192" crc="f7bc2394" sha1="e124c7325044abc615b807c0b670bbaa35d94264" />
 			</dataarea>
 		</part>
 	</software>

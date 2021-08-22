@@ -8,69 +8,55 @@
 #include "video/poly.h"
 #include "cpu/sharc/sharc.h"
 #include "video/k001006.h"
+#include "video/rgbutil.h"
 
 #include <cfloat>
 
 
 struct k001005_polydata
 {
-	uint32_t color;
 	int texture_x, texture_y;
 	int texture_width, texture_height;
 	int texture_page;
 	int texture_palette;
-	int texture_mirror_x;
-	int texture_mirror_y;
-	int light_r, light_g, light_b;
-	int ambient_r, ambient_g, ambient_b;
-	int fog_r, fog_g, fog_b;
-	uint32_t flags;
+	bool texture_mirror;
+	rgb_t poly_color;
+	rgb_t diffuse_light;
+	rgb_t ambient_light;
+	rgb_t fog_color;
+	uint32_t cmd;
+	bool fog_enable;
 };
 
-enum k001005_param
+class k001005_renderer : public poly_manager<float, k001005_polydata, 10>
 {
-	K001005_LIGHT_R,
-	K001005_LIGHT_G,
-	K001005_LIGHT_B,
-	K001005_AMBIENT_R,
-	K001005_AMBIENT_G,
-	K001005_AMBIENT_B,
-	K001005_FOG_R,
-	K001005_FOG_G,
-	K001005_FOG_B,
-	K001005_FAR_Z
-};
+	friend class k001005_device;
 
-
-class k001005_renderer : public poly_manager<float, k001005_polydata, 8, 50000>
-{
 public:
 	k001005_renderer(device_t &parent, screen_device &screen, device_t *k001006);
 
 	void reset();
 	void push_data(uint32_t data);
-	void render_polygons();
 	void swap_buffers();
 	bool fifo_filled();
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void set_param(k001005_param param, uint32_t value);
 
-	void draw_scanline_2d(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
-	void draw_scanline_2d_tex(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
-	void draw_scanline(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
-	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
-	void draw_scanline_gouraud_blend(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
+	int parse_polygon(int index, uint32_t cmd);
+	void render_polygons();
+
+	template<bool UseTexture, bool UseVertexColor>
+	void draw_scanline_generic(int32_t scanline, const extent_t& extent, const k001005_polydata& extradata, int threadid);
 
 	static constexpr int POLY_Z = 0;
 	static constexpr int POLY_FOG = 1;
-	static constexpr int POLY_BRI = 2;
+	static constexpr int POLY_DIFF = 2;
 	static constexpr int POLY_U = 3;
 	static constexpr int POLY_V = 4;
 	static constexpr int POLY_W = 5;
-	static constexpr int POLY_A = 2;
-	static constexpr int POLY_R = 3;
-	static constexpr int POLY_G = 4;
-	static constexpr int POLY_B = 5;
+	static constexpr int POLY_R = 6;
+	static constexpr int POLY_G = 7;
+	static constexpr int POLY_B = 8;
+	static constexpr int POLY_A = 9;
 
 private:
 	std::unique_ptr<bitmap_rgb32> m_fb[2];
@@ -81,7 +67,8 @@ private:
 	std::unique_ptr<uint32_t[]> m_3dfifo;
 	int m_3dfifo_ptr;
 
-	vertex_t m_prev_v[4];
+	vertex_t m_vertexb[4];
+	int m_vertexb_ptr;
 
 	uint32_t m_light_r;
 	uint32_t m_light_g;
@@ -93,6 +80,16 @@ private:
 	uint32_t m_fog_g;
 	uint32_t m_fog_b;
 	float m_far_z;
+	float m_fog_start_z;
+	float m_fog_end_z;
+	uint16_t m_reg_fog_start;
+
+	int16_t m_viewport_min_x;
+	int16_t m_viewport_max_x;
+	int16_t m_viewport_min_y;
+	int16_t m_viewport_max_y;
+	int16_t m_viewport_center_x;
+	int16_t m_viewport_center_y;
 
 	device_t *m_k001006;
 
@@ -130,17 +127,15 @@ private:
 	// internal state
 	optional_device<k001006_device> m_k001006;
 
-	std::unique_ptr<uint16_t[]>    m_ram[2];
-	std::unique_ptr<uint32_t[]>     m_fifo;
+	std::unique_ptr<uint16_t[]> m_ram[2];
+	std::unique_ptr<uint32_t[]> m_fifo;
 	uint32_t m_status;
 
 	int m_ram_ptr;
 	int m_fifo_read_ptr;
 	int m_fifo_write_ptr;
-	uint32_t m_reg_far_z;
 
-
-	k001005_renderer *m_renderer;
+	std::unique_ptr<k001005_renderer> m_renderer;
 };
 
 DECLARE_DEVICE_TYPE(K001005, k001005_device)

@@ -315,6 +315,9 @@ void cham24_state::cham24(machine_config &config)
 ROM_START( cham24 )
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASE00)
 
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "at89c51", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION(0x100000, "user1", 0)
 	ROM_LOAD( "24-2.u2", 0x000000, 0x100000, CRC(686e9d05) SHA1(a55b9850a4b47f1b4495710e71534ca0287b05ee) )
 

@@ -123,7 +123,7 @@ void memory_array::set_endianness(endianness_t endianness)
 
 //-------------------------------------------------
 //  read8_from_*/write8_to_* - entry read/write
-//  heleprs for 1 byte-per-entry
+//  helpers for 1 byte-per-entry
 //-------------------------------------------------
 
 u32 memory_array::read8_from_8(int index) const { return reinterpret_cast<u8 *>(m_base)[index]; }
@@ -147,7 +147,7 @@ void memory_array::write8_to_64be(int index, u32 data) { reinterpret_cast<u8 *>(
 
 //-------------------------------------------------
 //  read16_from_*/write16_to_* - entry read/write
-//  heleprs for 2 bytes-per-entry
+//  helpers for 2 bytes-per-entry
 //-------------------------------------------------
 
 u32 memory_array::read16_from_8le(int index) const { return read8_from_8(index*2) | (read8_from_8(index*2+1) << 8); }
@@ -171,7 +171,7 @@ void memory_array::write16_to_64be(int index, u32 data) { reinterpret_cast<u16 *
 
 //-------------------------------------------------
 //  read32_from_*/write32_to_* - entry read/write
-//  heleprs for 4 bytes-per-entry
+//  helpers for 4 bytes-per-entry
 //-------------------------------------------------
 
 u32 memory_array::read32_from_8le(int index) const { return read16_from_8le(index*2) | (read16_from_8le(index*2+1) << 16); }

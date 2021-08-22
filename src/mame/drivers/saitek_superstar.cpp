@@ -39,13 +39,14 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -228,7 +229,7 @@ void star_state::tstar432(machine_config &config)
 	config.set_default_layout(layout_saitek_tstar432);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_kso");
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_kso");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
 }
 

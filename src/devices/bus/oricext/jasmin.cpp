@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "jasmin.h"
 #include "formats/oric_dsk.h"
+#include "formats/fs_oric_jasmin.h"
 
 DEFINE_DEVICE_TYPE(ORIC_JASMIN, oric_jasmin_device, "oric_jasmin", "Jasmin floppy drive interface")
 
@@ -15,6 +16,9 @@ void oric_jasmin_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_ORIC_DSK_FORMAT);
+	fr.add(FLOPPY_ORIC_JASMIN_FORMAT);
+
+	fr.add(FS_ORIC_JASMIN);
 }
 
 static void jasmin_floppies(device_slot_interface &device)
@@ -24,7 +28,7 @@ static void jasmin_floppies(device_slot_interface &device)
 
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, oric_jasmin_device, boot_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, oric_jasmin_device, boot_pressed, 0)
 INPUT_PORTS_END
 
 void oric_jasmin_device::map(address_map &map)

@@ -51,6 +51,7 @@ public:
 	void raphero(machine_config &config);
 	void tdragon(machine_config &config);
 	void tdragonb(machine_config &config);
+	void tdragonb2(machine_config &config);
 	void gunnail(machine_config &config);
 	void gunnailb(machine_config &config);
 	void hachamf(machine_config &config);
@@ -228,6 +229,7 @@ protected:
 	void tdragon3h_sound_io_map(address_map &map);
 	void tdragon_map(address_map &map);
 	void tdragonb_map(address_map &map);
+	void tdragonb2_map(address_map &map);
 	void tharrier_map(address_map &map);
 	void tharrier_sound_io_map(address_map &map);
 	void tharrier_sound_map(address_map &map);

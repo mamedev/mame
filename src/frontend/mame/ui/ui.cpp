@@ -178,6 +178,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_mouse_show(false)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
+	, m_unthrottle_mute(false)
 	, m_machine_info()
 	, m_unemulated_features()
 	, m_imperfect_features()
@@ -217,8 +218,8 @@ void mame_ui_manager::init()
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mame_ui_manager::exit, this));
 	machine().configuration().config_register(
 			"ui_warnings",
-			config_load_delegate(&mame_ui_manager::config_load, this),
-			config_save_delegate(&mame_ui_manager::config_save, this));
+			configuration_manager::load_delegate(&mame_ui_manager::config_load, this),
+			configuration_manager::save_delegate(&mame_ui_manager::config_save, this));
 
 	// create mouse bitmap
 	uint32_t *dst = &m_mouse_bitmap.pix(0);
@@ -257,10 +258,10 @@ void mame_ui_manager::exit()
 //  config_load - load configuration data
 //-------------------------------------------------
 
-void mame_ui_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void mame_ui_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
 	// make sure it's relevant and there's data available
-	if (config_type::GAME == cfg_type)
+	if (config_type::SYSTEM == cfg_type)
 	{
 		m_unemulated_features.clear();
 		m_imperfect_features.clear();
@@ -301,7 +302,7 @@ void mame_ui_manager::config_load(config_type cfg_type, util::xml::data_node con
 void mame_ui_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// only save system-level configuration when times are valid
-	if ((config_type::GAME == cfg_type) && (std::time_t(-1) != m_last_launch_time) && (std::time_t(-1) != m_last_warning_time))
+	if ((config_type::SYSTEM == cfg_type) && (std::time_t(-1) != m_last_launch_time) && (std::time_t(-1) != m_last_warning_time))
 	{
 		parentnode->set_attribute_int("launched", static_cast<long long>(m_last_launch_time));
 		parentnode->set_attribute_int("warned", static_cast<long long>(m_last_warning_time));
@@ -353,6 +354,13 @@ void mame_ui_manager::initialize(running_machine &machine)
 				if (field.type() == IPT_DIPSWITCH && strcmp(field.name(), service_mode_dipname) == 0)
 					field.set_defseq(machine.ioport().type_seq(IPT_SERVICE));
 	}
+
+	// handle throttle-related options and initial muting state now that the sound manager has been brought up
+	const bool starting_throttle = machine.options().throttle();
+	machine.video().set_throttled(starting_throttle);
+	m_unthrottle_mute = options().unthrottle_mute();
+	if (!starting_throttle && m_unthrottle_mute)
+		machine.sound().ui_mute(true);
 }
 
 
@@ -416,8 +424,9 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	switch_code_poller poller(machine().input());
 	std::string warning_text;
 	rgb_t warning_color;
+	bool config_menu = false;
 	auto handler_messagebox_anykey =
-		[this, &poller, &warning_text, &warning_color] (render_container &container) -> uint32_t
+		[this, &poller, &warning_text, &warning_color, &config_menu] (render_container &container) -> uint32_t
 		{
 			// draw a standard message window
 			draw_text_box(container, warning_text, ui::text_layout::LEFT, 0.5f, 0.5f, warning_color);
@@ -426,6 +435,11 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			{
 				// if the user cancels, exit out completely
 				machine().schedule_exit();
+				return UI_HANDLER_CANCEL;
+			}
+			else if (machine().ui_input().pressed(IPT_UI_CONFIGURE))
+			{
+				config_menu = true;
 				return UI_HANDLER_CANCEL;
 			}
 			else if (poller.poll() != INPUT_CODE_INVALID)
@@ -553,9 +567,14 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		poller.reset();
 		while (poller.poll() != INPUT_CODE_INVALID) { }
 
-		// loop while we have a handler
-		while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
-			machine().video().frame_update();
+		if (m_handler_callback_type == ui_callback_type::MODAL)
+		{
+			config_menu = false;
+
+			// loop while we have a handler
+			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
+				machine().video().frame_update();
+		}
 
 		// clear the handler and force an update
 		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
@@ -569,6 +588,14 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	// if we're the empty driver, force the menus on
 	if (ui::menu::stack_has_special_main_menu(machine()))
 		show_menu();
+	else if (config_menu)
+	{
+		show_menu();
+
+		// loop while we have a handler
+		while (m_handler_callback_type != ui_callback_type::GENERAL && !machine().scheduled_event_pending())
+			machine().video().frame_update();
+	}
 }
 
 
@@ -1362,7 +1389,12 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// toggle throttle?
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
-		machine().video().set_throttled(!machine().video().throttled());
+	{
+		const bool new_throttle_state = !machine().video().throttled();
+		machine().video().set_throttled(new_throttle_state);
+		if (m_unthrottle_mute)
+			machine().sound().ui_mute(!new_throttle_state);
+	}
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))
@@ -2104,7 +2136,7 @@ void mame_ui_manager::load_ui_options()
 	// parse the file
 	// attempt to open the output file
 	emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
-	if (file.open("ui.ini") == osd_file::error::NONE)
+	if (!file.open("ui.ini"))
 	{
 		try
 		{
@@ -2125,7 +2157,7 @@ void mame_ui_manager::save_ui_options()
 {
 	// attempt to open the output file
 	emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open("ui.ini") == osd_file::error::NONE)
+	if (!file.open("ui.ini"))
 	{
 		// generate the updated INI
 		file.puts(options().output_ini());
@@ -2153,13 +2185,13 @@ void mame_ui_manager::save_main_option()
 	// attempt to open the main ini file
 	{
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
-		if (file.open(std::string(emulator_info::get_configname()) + ".ini") == osd_file::error::NONE)
+		if (!file.open(std::string(emulator_info::get_configname()) + ".ini"))
 		{
 			try
 			{
 				options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
 			}
-			catch(options_error_exception &)
+			catch (options_error_exception &)
 			{
 				osd_printf_error("**Error loading %s.ini**\n", emulator_info::get_configname());
 				return;
@@ -2183,13 +2215,14 @@ void mame_ui_manager::save_main_option()
 	// attempt to open the output file
 	{
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(std::string(emulator_info::get_configname()) + ".ini") == osd_file::error::NONE)
+		if (!file.open(std::string(emulator_info::get_configname()) + ".ini"))
 		{
 			// generate the updated INI
 			file.puts(options.output_ini());
 			file.close();
 		}
-		else {
+		else
+		{
 			machine().popmessage(_("**Error saving %s.ini**"), emulator_info::get_configname());
 			return;
 		}

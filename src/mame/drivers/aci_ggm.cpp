@@ -7,7 +7,7 @@ Applied Concepts Great Game Machine (GGM), electronic board game computer.
 2nd source distribution: Modular Game System (MGS), by Chafitz.
 
 Hardware notes:
-- 6502A 2MHz (unknown XTAL, label "5-80"), SYP6522 VIA
+- 6502A 2MHz, SYP6522 VIA
 - 2KB RAM(4*HM472114AP-2), no ROM on main PCB
 - 2*74164 shift register, 3*6118P VFD driver
 - 8-digit 14seg VFD panel (same one as in Speak & Spell)
@@ -19,14 +19,15 @@ There were also some standalone machines, eg. Morphy Encore, Odin Encore.
 Known chess cartridges (*denotes not dumped):
 - Chess/Boris 2.5 (aka Sargon 2.5)
 - *Gruenfeld Edition - Master Chess Openings
-- *Morphy Edition - Master Chess
+- Morphy Edition - Master Chess
 - Capablanca Edition - Master Chess Endgame
 - Sandy Edition - Master Chess (German language version of Morphy)
 - Steinitz Edition-4 - Master Chess
 - *Monitor Edition - Master Kriegspiel
 
-The opening/endgame cartridges are meant to be ejected/inserted while
-playing (put the power switch in "MEM" first).
+The opening/endgame cartridges are meant to be ejected/inserted while playing:
+switch power switch to MEM, swap cartridge, switch power switch back to ON.
+In other words, don't power cycle the machine (or MAME).
 
 Other games:
 - *Borchek Edition - Master Checkers
@@ -36,8 +37,9 @@ Other games:
 - *Lunar Lander (unreleased?)
 
 TODO:
+- it doesn't have nvram, it's a workaround for MAME forcing a hard reset when
+  swapping in a new cartridge
 - what's VIA PB0 for? game toggles it once per irq
-- identify XTAL (2MHz CPU/VIA is correct, compared to video reference)
 - confirm display AP segment, is it used anywhere?
 - verify cartridge pinout, right now assume A0-A15 (max known cart size is 24KB).
   Boris/Sargon cartridge is A0-A11 and 2 CS lines, Steinitz uses the whole range.
@@ -45,14 +47,15 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "video/pwm.h"
 #include "sound/dac.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 #include "softlist.h"
@@ -104,7 +107,8 @@ private:
 	void update_display();
 	TIMER_DEVICE_CALLBACK_MEMBER(ca1_off) { m_via->write_ca1(0); }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_cart);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_cart);
 	u8 cartridge_r(offs_t offset);
 
 	void select_w(u8 data);
@@ -164,10 +168,10 @@ void ggm_state::update_reset(ioport_value state)
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(ggm_state::load_cart)
 {
 	u32 size = m_cart->common_get_size("rom");
-	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0xffff;
+	m_cart_mask = ((1 << (31 - count_leading_zeros_32(size))) - 1) & 0xffff;
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -181,6 +185,16 @@ DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
 		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, m_extram);
 
 	return image_init_result::PASS;
+}
+
+DEVICE_IMAGE_UNLOAD_MEMBER(ggm_state::unload_cart)
+{
+	// unmap extra ram
+	if (image.get_feature("ram"))
+	{
+		m_maincpu->space(AS_PROGRAM).nop_readwrite(0x0800, 0x0fff);
+		memset(m_extram, 0, m_extram.bytes());
+	}
 }
 
 u8 ggm_state::cartridge_r(offs_t offset)
@@ -417,10 +431,10 @@ INPUT_PORTS_END
 void ggm_state::ggm(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000);
+	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ggm_state::main_map);
 
-	MOS6522(config, m_via, 2000000); // DDRA = 0xff, DDRB = 0x81
+	MOS6522(config, m_via, 2_MHz_XTAL); // DDRA = 0xff, DDRB = 0x81
 	m_via->writepa_handler().set(FUNC(ggm_state::select_w));
 	m_via->writepb_handler().set(FUNC(ggm_state::control_w));
 	m_via->readpb_handler().set(FUNC(ggm_state::input_r));
@@ -443,7 +457,8 @@ void ggm_state::ggm(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ggm");
-	m_cart->set_device_load(FUNC(ggm_state::cartridge));
+	m_cart->set_device_load(FUNC(ggm_state::load_cart));
+	m_cart->set_device_unload(FUNC(ggm_state::unload_cart));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ggm");

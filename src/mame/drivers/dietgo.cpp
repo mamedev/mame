@@ -8,6 +8,7 @@
 Hold both START buttons on bootup to display version notice.
 
 Diet Go Go (Japan)   DATA EAST
+DE-0370-2
 
 NAME    LOCATION   TYPE
 -----------------------
@@ -25,7 +26,7 @@ PAL16R6A 11H
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
 #include "machine/gen_latch.h"

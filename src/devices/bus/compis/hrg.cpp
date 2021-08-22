@@ -34,14 +34,14 @@ DEFINE_DEVICE_TYPE(COMPIS_UHRG, compis_uhrg_device, "compis_uhrg", "Compis UHRG"
 
 void compis_hrg_device::hrg_map(address_map &map)
 {
-	map.global_mask(0x7fff);
-	map(0x00000, 0x7fff).ram().share("video_ram");
+	map.global_mask(0x3fff);
+	map(0x00000, 0x3fff).ram().share("video_ram");
 }
 
 void compis_uhrg_device::uhrg_map(address_map &map)
 {
-	map.global_mask(0x1ffff);
-	map(0x00000, 0x1ffff).ram().share("video_ram");
+	map.global_mask(0xffff);
+	map(0x00000, 0xffff).ram().share("video_ram");
 }
 
 
@@ -51,7 +51,7 @@ void compis_uhrg_device::uhrg_map(address_map &map)
 
 UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_device::display_pixels )
 {
-	uint16_t const gfx = m_video_ram[(address & 0x7fff) >> 1];
+	uint16_t const gfx = m_video_ram[(address & 0x3fff)];
 	pen_t const *const pen = m_palette->pens();
 
 	for(uint16_t i=0; i<16; i++)
@@ -65,7 +65,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_device::display_pixels )
 
 UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 {
-	uint16_t const gfx = m_video_ram[(address & 0x1ffff) >> 1];
+	uint16_t const gfx = m_video_ram[(address & 0xffff)];
 	pen_t const *const pen = m_palette->pens();
 
 	for(uint16_t i=0; i<16; i++)

@@ -396,11 +396,11 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 
 		if (r4 & 0x8000)
 		{
-			m_core->m_r[REG_R2] = count_leading_ones(0xffff0000 | r4) - 17;
+			m_core->m_r[REG_R2] = count_leading_ones_32(0xffff0000 | r4) - 17;
 		}
 		else
 		{
-			m_core->m_r[REG_R2] = count_leading_zeros(r4) - 17; // -17 because count_leading_zeros works with 32-bit values
+			m_core->m_r[REG_R2] = count_leading_zeros_32(r4) - 17; // -17 because count_leading_zeros_32 works with 32-bit values
 		}
 
 		return;

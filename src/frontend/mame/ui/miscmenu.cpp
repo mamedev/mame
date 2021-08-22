@@ -87,30 +87,55 @@ menu_bios_selection::~menu_bios_selection()
 
 void menu_bios_selection::handle()
 {
-	/* process the menu */
+	// process the menu
 	const event *menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 			machine().schedule_hard_reset();
-		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+		else
 		{
 			device_t *dev = (device_t *)menu_event->itemref;
-			int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
-			int val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
-			if (val < 1)
-				val = cnt;
-			if (val > cnt)
-				val = 1;
-			dev->set_system_bios(val);
-			if (strcmp(dev->tag(),":")==0) {
-				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE);
-			} else {
-				const char *slot_option_name = dev->owner()->tag() + 1;
-				machine().options().slot_option(slot_option_name).set_bios(string_format("%d", val - 1));
+			int bios_val = 0;
+
+			switch (menu_event->iptkey)
+			{
+				// reset to default
+				case IPT_UI_SELECT:
+					bios_val = dev->default_bios();
+					break;
+
+				// previous/next bios setting
+				case IPT_UI_LEFT: case IPT_UI_RIGHT:
+				{
+					int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
+					bios_val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
+
+					// wrap
+					if (bios_val < 1)
+						bios_val = cnt;
+					if (bios_val > cnt)
+						bios_val = 1;
+
+					break;
+				}
+
+				default:
+					break;
 			}
-			reset(reset_options::REMEMBER_REF);
+
+			if (bios_val > 0)
+			{
+				dev->set_system_bios(bios_val);
+				if (strcmp(dev->tag(),":")==0) {
+					machine().options().set_value("bios", bios_val-1, OPTION_PRIORITY_CMDLINE);
+				} else {
+					const char *slot_option_name = dev->owner()->tag() + 1;
+					machine().options().slot_option(slot_option_name).set_bios(string_format("%d", bios_val - 1));
+				}
+				reset(reset_options::REMEMBER_REF);
+			}
 		}
 	}
 }
@@ -147,6 +172,8 @@ void menu_network_devices::populate(float &customtop, float &custombottom)
 
 		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 /*-------------------------------------------------
@@ -506,6 +533,8 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 			break;
 		}
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 menu_crosshair::~menu_crosshair()
@@ -570,11 +599,11 @@ void menu_export::handle()
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-				if (infile.open(filename + ".xml") == osd_file::error::NONE)
+				if (!infile.open(filename + ".xml"))
 					for (int seq = 0; ; ++seq)
 					{
 						const std::string seqtext = string_format("%s_%04d", filename, seq);
-						if (infile.open(seqtext + ".xml") != osd_file::error::NONE)
+						if (infile.open(seqtext + ".xml"))
 						{
 							filename = seqtext;
 							break;
@@ -583,7 +612,7 @@ void menu_export::handle()
 
 				// attempt to open the output file
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				if (file.open(filename + ".xml") == osd_file::error::NONE)
+				if (!file.open(filename + ".xml"))
 				{
 					const std::string fullpath(file.fullpath());
 					file.close();
@@ -615,11 +644,11 @@ void menu_export::handle()
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-				if (infile.open(filename + ".txt") == osd_file::error::NONE)
+				if (!infile.open(filename + ".txt"))
 					for (int seq = 0; ; ++seq)
 					{
 						const std::string seqtext = string_format("%s_%04d", filename, seq);
-						if (infile.open(seqtext + ".txt") != osd_file::error::NONE)
+						if (infile.open(seqtext + ".txt"))
 						{
 							filename = seqtext;
 							break;
@@ -628,7 +657,7 @@ void menu_export::handle()
 
 				// attempt to open the output file
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				if (file.open(filename + ".txt") == osd_file::error::NONE)
+				if (!file.open(filename + ".txt"))
 				{
 					// print the header
 					std::ostringstream buffer;
@@ -725,8 +754,8 @@ void menu_machine_configure::handle()
 				{
 					const std::string filename(m_drv.name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-					osd_file::error filerr = file.open(filename + ".ini");
-					if (filerr == osd_file::error::NONE)
+					std::error_condition const filerr = file.open(filename + ".ini");
+					if (!filerr)
 					{
 						std::string inistring = m_opts.output_ini();
 						file.puts(inistring);
@@ -744,15 +773,15 @@ void menu_machine_configure::handle()
 				break;
 			case CONTROLLER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::control_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), &m_drv, &m_opts);
 				break;
 			case VIDEO:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::video_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), &m_drv, &m_opts);
 				break;
 			case ADVANCED:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), &m_drv, &m_opts);
 				break;
 			default:
 				break;
@@ -784,9 +813,9 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 		item_append(_("This machine has no BIOS."), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_(submenu::advanced_options[0].description), 0, (void *)(uintptr_t)ADVANCED);
-	item_append(_(submenu::video_options[0].description), 0, (void *)(uintptr_t)VIDEO);
-	item_append(_(submenu::control_options[0].description), 0, (void *)(uintptr_t)CONTROLLER);
+	item_append(_(submenu::advanced_options()[0].description), 0, (void *)(uintptr_t)ADVANCED);
+	item_append(_(submenu::video_options()[0].description), 0, (void *)(uintptr_t)VIDEO);
+	item_append(_(submenu::control_options()[0].description), 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!m_want_favorite)
@@ -795,8 +824,8 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 		item_append(_("Remove From Favorites"), 0, (void *)DELFAV);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save machine configuration"), 0, (void *)(uintptr_t)SAVE);
-	item_append(menu_item_type::SEPARATOR);
+	item_append(_("Save Machine Configuration"), 0, (void *)(uintptr_t)SAVE);
+
 	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
@@ -806,7 +835,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure machine:"), m_drv.type.fullname() };
+	char const *const text[] = { _("Configure Machine:"), m_drv.type.fullname() };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
@@ -862,7 +891,7 @@ menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_cont
 menu_plugins_configure::~menu_plugins_configure()
 {
 	emu_file file_plugin(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
+	if (file_plugin.open("plugin.ini"))
 		// Can't throw in a destructor, so let's ignore silently for
 		// now.  We shouldn't write files in a destructor in any case.
 		//

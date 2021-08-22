@@ -1,835 +1,942 @@
 // license:BSD-3-Clause
-// copyright-holders:Antoine Mine
-/**********************************************************************
+// copyright-holders:Olivier Galibert
 
-  Copyright (C) Antoine Mine' 2007
-
-  Motorola 6843 Floppy Disk Controller emulation.
-
-**********************************************************************/
-
-/*
-  Main MC 6843 features are:
-   - single density floppies
-   - IBM 3740 compatible
-   - DMA-able
-   - high-level commands (including multi-sector read/write)
-
-   CLONES: HD 46503S seems to be a clone of MC 6843
-
-   BUGS
-   The driver was designed with Thomson computer emulation in mind
-   (CD 90-015 5"1/4 floppy controller) and works in this context.
-   It might work in other contexts but has currently shortcomings:
-   - DMA is not emulated
-   - Free-Format Read is not emulated
-   - Free-Format Write only supports track formatting, in a specific
-   format (FWF=1, Thomson-like sector formats)
-   - very rough timing: basically, there is a fixed delay between
-   a command request (CMR write) and its response (first byte
-   available, seek complete, etc.); there is no delay between
-   read / write
- */
-
+// Not implemented for lack of test cases: FFR
 
 #include "emu.h"
 #include "mc6843.h"
-
-//#define VERBOSE 1
-#include "logmacro.h"
-
-
-/******************* parameters ******************/
-
-/* macro-command numbers */
-#define CMD_STZ 0x2 /* seek track zero */
-#define CMD_SEK 0x3 /* seek */
-#define CMD_SSR 0x4 /* single sector read */
-#define CMD_SSW 0x5 /* single sector write */
-#define CMD_RCR 0x6 /* read CRC */
-#define CMD_SWD 0x7 /* single sector write with delete data mark */
-#define CMD_MSW 0xd /* multiple sector write */
-#define CMD_MSR 0xc /* multiple sector read */
-#define CMD_FFW 0xb /* free format write */
-#define CMD_FFR 0xa /* free format read */
-
-/* coarse delays */
-#define DELAY_SEEK   attotime::from_usec( 100 )  /* track seek time */
-#define DELAY_ADDR   attotime::from_usec( 100 )  /* search-address time */
-#define DELAY_CRC    attotime::from_usec(  64 )  /* read crc time */
-
-
-
-static const char *const mc6843_cmd[16] =
-{
-	"---", "---", "STZ", "SEK", "SSR", "SSW", "RCR", "SWD",
-	"---", "---", "FFR", "FFW", "MSR", "MSW", "---", "---",
-};
-
-
-
 
 DEFINE_DEVICE_TYPE(MC6843, mc6843_device, "mc6843", "Motorola MC6843 FDC")
 
 mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC6843, tag, owner, clock),
-	m_floppy(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
-	m_write_irq(*this),
-	m_CTAR(0),
-	m_CMR(0),
-	m_ISR(0),
-	m_SUR(0),
-	m_STRA(0),
-	m_STRB(0),
-	m_SAR(0),
-	m_GCR(0),
-	m_CCR(0),
-	m_LTAR(0),
-	m_drive(0),
-	m_side(0),
-	m_data_size(0),
-	m_data_idx(0),
-	m_data_id(0),
-	m_index_pulse(0),
-	m_crc_wait(0),
-	m_timer_cont(nullptr)
+	  m_irq(*this),
+	  m_force_ready(false)
 {
-	for (auto & elem : m_data)
-	{
-		elem = 0;
-	}
 }
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void mc6843_device::device_start()
 {
-	m_write_irq.resolve_safe();
+	m_irq.resolve_safe();
+	m_timer = timer_alloc(0);
+	m_floppy = nullptr;
 
-	m_timer_cont = timer_alloc(TIMER_CONT);
+	m_dir  = 0x00;
+	m_dor  = 0x00;
+	m_ctar = 0x00;
+	m_sur  = 0x00;
+	m_cmr  = 0x00;
+	m_gcr  = 0x00;
+	m_ccr  = 0x00;
+	m_ltar = 0x00;
 
-	save_item(NAME(m_CTAR));
-	save_item(NAME(m_CMR));
-	save_item(NAME(m_ISR));
-	save_item(NAME(m_SUR));
-	save_item(NAME(m_STRA));
-	save_item(NAME(m_STRB));
-	save_item(NAME(m_SAR));
-	save_item(NAME(m_GCR));
-	save_item(NAME(m_CCR));
-	save_item(NAME(m_LTAR));
-	save_item(NAME(m_drive));
-	save_item(NAME(m_side));
-	save_item(NAME(m_data));
-	save_item(NAME(m_data_size));
-	save_item(NAME(m_data_idx));
-	save_item(NAME(m_data_id));
-	save_item(NAME(m_crc_wait));
+	save_item(NAME(m_dir));
+	save_item(NAME(m_dor));
+	save_item(NAME(m_ctar));
+	save_item(NAME(m_cmr));
+	save_item(NAME(m_isr));
+	save_item(NAME(m_sur));
+	save_item(NAME(m_stra));
+	save_item(NAME(m_sar));
+	save_item(NAME(m_strb));
+	save_item(NAME(m_gcr));
+	save_item(NAME(m_ccr));
+	save_item(NAME(m_ltar));
+	save_item(NAME(m_state));
+	save_item(NAME(m_step_count));
+	save_item(NAME(m_head_loaded));
+	save_item(NAME(m_dir_loaded));
+	save_item(NAME(m_dor_loaded));
+	save_item(NAME(m_dor_needed));
+	save_item(NAME(m_idam_turns));
 }
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void mc6843_device::device_reset()
 {
-	LOG (( "mc6843 reset\n" ));
+	m_state = S_IDLE;
+	m_cur_live.state = L_IDLE;
+	m_cur_live.tm = attotime::never;
 
-	/* setup/reset floppy drive */
-	for (auto &img : m_floppy)
-	{
-		if (img.found())
-		{
-			img->floppy_mon_w(CLEAR_LINE);
-			img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0 );
-			img->floppy_drive_set_rpm( 300. );
+	m_step_count = 0;
+	m_head_loaded = false;
+
+	m_dir_loaded = false;
+	m_dor_loaded = false;
+	m_dor_needed = false;
+
+	m_idam_turns = 0;
+
+	m_cmr &= 0xf0;
+	m_isr  = 0x00;
+	m_stra = 0x00;
+	m_sar  = 0x00;
+	m_strb = 0x00;
+}
+
+void mc6843_device::map(address_map &map)
+{
+	map(0, 0).rw(FUNC(mc6843_device::dir_r),  FUNC(mc6843_device::dor_w));
+	map(1, 1).rw(FUNC(mc6843_device::ctar_r), FUNC(mc6843_device::ctar_w));
+	map(2, 2).rw(FUNC(mc6843_device::isr_r),  FUNC(mc6843_device::cmr_w));
+	map(3, 3).rw(FUNC(mc6843_device::stra_r), FUNC(mc6843_device::sur_w));
+	map(4, 4).rw(FUNC(mc6843_device::strb_r), FUNC(mc6843_device::sar_w));
+	map(5, 5).w (FUNC(mc6843_device::gcr_w));
+	map(6, 6).w (FUNC(mc6843_device::ccr_w));
+	map(7, 7).w (FUNC(mc6843_device::ltar_w));
+}
+
+void mc6843_device::set_floppy(floppy_image_device *floppy)
+{
+	if(m_floppy == floppy)
+		return;
+
+	int prev_ready = m_floppy ? m_floppy->ready_r() : 1;
+
+	if(m_floppy) {
+		m_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		m_floppy->setup_ready_cb(floppy_image_device::ready_cb());
+	}
+
+	m_floppy = floppy;
+
+	logerror("floppy %s\n", m_floppy ? m_floppy->tag() : "-");
+
+	int next_ready = m_floppy ? m_floppy->ready_r() : 1;
+
+	if(m_floppy) {
+		m_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&mc6843_device::index_callback, this));
+		m_floppy->setup_ready_cb(floppy_image_device::ready_cb(&mc6843_device::ready_callback, this));
+	}
+
+	if(prev_ready != next_ready)
+		ready_callback(m_floppy, next_ready);
+}
+
+u8 mc6843_device::dir_r()
+{
+	if(!machine().side_effects_disabled()) {
+		m_dir_loaded = false;
+		logerror("dir_r %02x\n", m_dir);
+	}
+	return m_dir;
+}
+
+void mc6843_device::dor_w(u8 data)
+{
+	m_dor = data;
+	m_dor_loaded = true;
+	logerror("dor_w %02x\n", m_dor);
+}
+
+u8 mc6843_device::ctar_r()
+{
+	if(!machine().side_effects_disabled())
+		logerror("ctar_r %02x\n", m_ctar);
+	return m_ctar;
+}
+
+void mc6843_device::ctar_w(u8 data)
+{
+	m_ctar = data;
+	logerror("ctar_w %02x\n", m_ctar);
+}
+
+void mc6843_device::isr_raise(u8 flag)
+{
+	m_isr |= flag;
+}
+
+u8 mc6843_device::isr_r()
+{
+	u8 res = m_isr;
+	if(!machine().side_effects_disabled()) {
+		logerror("isr_r %02x\n", m_isr);
+		m_isr &= 0x8;
+	}
+	return res;
+}
+
+void mc6843_device::cmr_w(u8 data)
+{
+	static const char *cmds[0x10] = {
+		"nop", "?1",
+		"stz", "sek", "ssr", "ssw", "rcr", "swd",
+		"?8", "?9",
+		"ffr", "ffw", "msr", "msw",
+		"?e", "?f"
+	};
+
+	if(m_stra & SA_BUSY) {
+		if((data & 0xf) == 0 && (m_cmr & 0xf) == C_FFW) {
+			m_stra &= ~SA_BUSY;
+			live_abort();
+			m_state = S_IDLE;
+		} else {
+			logerror("cmr_w %02x - dropped busy\n", data);
+			return;
 		}
 	}
 
-	/* reset registers */
-	m_CMR &= 0xf0; /* zero only command */
-	m_ISR = 0;
-	m_STRA &= 0x5c;
-	m_SAR = 0;
-	m_STRB &= 0x20;
-	status_update( );
-
-	m_data_size = 0;
-	m_data_idx = 0;
-	m_crc_wait = 0;
-	m_timer_cont->adjust( attotime::never );
+	m_cmr = data;
+	logerror("cmr_w %02x - isr=%s isr3=%s %s fwf=%d %s\n", m_cmr,
+			 m_cmr & 0x80 ? "off" : "on",
+			 m_cmr & 0x40 ? "off" : "on",
+			 m_cmr & 0x20 ? "dma" : "pio",
+			 m_cmr & 0x10 ? 1 : 0,
+			 cmds[m_cmr & 0xf]);
+	command_start();
 }
 
-/************************** floppy interface ****************************/
-
-
-
-legacy_floppy_image_device* mc6843_device::floppy_image( )
+u8 mc6843_device::stra_r()
 {
-	assert(m_floppy[m_drive].found());
-	return m_floppy[m_drive].target();
-}
+	u8 res = m_stra;
+	if(m_floppy) {
+		if(m_floppy->idx_r())
+			res |= SA_IDX;
+		if(m_floppy->wpt_r())
+			res |= SA_WPT;
+		if(!m_floppy->trk00_r())
+			res |= SA_TRK0;
+	}
+	if(is_ready())
+		res |= SA_RDY;
 
-
-void mc6843_device::set_drive( int drive )
-{
-	m_drive = drive;
-}
-
-
-
-void mc6843_device::set_side( int side )
-{
-	m_side = side;
-}
-
-
-
-/* called after ISR or STRB has changed */
-void mc6843_device::status_update( )
-{
-	int irq = 0;
-
-	/* ISR3 */
-	if ( (m_CMR & 0x40) || ! m_STRB )
-		m_ISR &= ~8;
-	else
-		m_ISR |=  8;
-
-	/* interrupts */
-	if ( m_ISR & 4 )
-		irq = 1; /* unmaskable */
-	if ( ! (m_CMR & 0x80) )
-	{
-		/* maskable */
-		if ( m_ISR & ~4 )
-			irq = 1;
+	switch(m_cmr & 0xf) {
+	case C_SSR: case C_MSR: case C_FFR:
+		if(m_dir_loaded)
+			res |= SA_DTR;
+		break;
+	case C_SSW: case C_SWD: case C_MSW: case C_FFW:
+		if(!m_dor_loaded && m_dor_needed)
+			res |= SA_DTR;
+		break;
 	}
 
-	m_write_irq( irq );
-	LOG( "status_update: irq=%i (CMR=%02X, ISR=%02X)\n", irq, m_CMR, m_ISR );
-}
-
-
-void mc6843_device::set_index_pulse( int index_pulse )
-{
-	m_index_pulse = index_pulse;
-}
-
-
-/* called at end of command */
-void mc6843_device::cmd_end( )
-{
-	int cmd = m_CMR & 0x0f;
-
-	if ( ( cmd == CMD_STZ ) || ( cmd == CMD_SEK ) )
-	{
-		m_ISR |= 0x02; /* set Settling Time Complete */
-	}
-	else
-	{
-		m_ISR |= 0x01;  /* set Macro Command Complete */
-	}
-	m_STRA &= ~0x80; /* clear Busy */
-	m_CMR  &=  0xf0; /* clear command */
-	status_update( );
-}
-
-
-
-/* Seek Track Zero bottom half */
-void mc6843_device::finish_STZ( )
-{
-	legacy_floppy_image_device* img = floppy_image( );
-	int i;
-
-	/* seek to track zero */
-	for ( i=0; i<83; i++ )
-	{
-		if (img->floppy_tk00_r() == CLEAR_LINE)
-			break;
-		img->floppy_drive_seek( -1 );
-	}
-
-	LOG( "%f mc6843_finish_STZ: actual=%i\n", machine().time().as_double(), img->floppy_drive_get_current_track() );
-
-	/* update state */
-	m_CTAR = 0;
-	m_GCR = 0;
-	m_SAR = 0;
-	m_STRB |= img->floppy_tk00_r() << 4;
-
-	cmd_end( );
-}
-
-
-
-/* Seek bottom half */
-void mc6843_device::finish_SEK( )
-{
-	legacy_floppy_image_device* img = floppy_image( );
-
-	/* seek to track */
-	// TODO: not sure how CTAR bit 7 is handled here, but this is the safest approach for now
-	img->floppy_drive_seek( m_GCR - (m_CTAR & 0x7F) );
-
-	LOG( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", machine().time().as_double(), (m_CTAR & 0x7F), m_GCR, img->floppy_drive_get_current_track() );
-
-	/* update state */
-	m_CTAR = m_GCR;
-	m_SAR = 0;
-	cmd_end( );
-}
-
-
-
-/* preamble to all sector read / write commands, returns 1 if found */
-int mc6843_device::address_search( chrn_id* id )
-{
-	legacy_floppy_image_device* img = floppy_image( );
-	int r = 0;
-
-	while ( 1 )
-	{
-		if ( ( ! img->floppy_drive_get_next_id( m_side, id ) ) || ( id->flags & ID_FLAG_CRC_ERROR_IN_ID_FIELD ) || ( id->N != 0 ) )
-		{
-			/* read address error */
-			LOG( "%f mc6843_address_search: get_next_id failed\n", machine().time().as_double() );
-			m_STRB |= 0x0a; /* set CRC error & Sector Address Undetected */
-			cmd_end( );
-			return 0;
+	if(!machine().side_effects_disabled()) {
+		static int prev = -1;
+		if(prev != res) {
+			logerror("stra_r %02x -%s%s%s%s%s%s%s%s\n", res,
+					 res & SA_BUSY ? " busy" : "",
+					 res & SA_IDX  ? " idx" : "",
+					 res & SA_TNEQ ? " tneq" : "",
+					 res & SA_WPT  ? " wpt" : "",
+					 res & SA_TRK0 ? " trk0" : "",
+					 res & SA_RDY  ? " rdy" : "",
+					 res & SA_DDM  ? " ddm" : "",
+					 res & SA_DTR  ? " dtr" : "");
+			prev = res;
 		}
+	}
+	return res;
+}
 
-		if ( id->C != m_LTAR )
-		{
-			/* track mismatch */
-			LOG( "%f mc6843_address_search: track mismatch: logical=%i real=%i\n", machine().time().as_double(), m_LTAR, id->C );
-			m_data[0] = id->C; /* make the track number available to the CPU */
-			m_STRA |= 0x20;    /* set Track Not Equal */
-			cmd_end( );
-			return 0;
-		}
+void mc6843_device::sur_w(u8 data)
+{
+	m_sur = data;
+	logerror("sur_w %02x\n", m_sur);
+}
 
-		if ( id->R == m_SAR )
-		{
-			/* found! */
-			LOG( "%f mc6843_address_search: sector %i found on track %i\n", machine().time().as_double(), id->R, id->C );
-			if ( ! (m_CMR & 0x20) )
-			{
-				m_ISR |= 0x04; /* if no DMA, set Status Sense */
+u8 mc6843_device::strb_r()
+{
+	if(!machine().side_effects_disabled()) {
+		logerror("strb_r %02x -%s%s%s%s%s%s%s%s\n", m_strb,
+				 m_strb & SB_HERR  ? " herr" : "",
+				 m_strb & SB_WERR  ? " werr" : "",
+				 m_strb & SB_FI    ? " fi" : "",
+				 m_strb & SB_SERR  ? " serr" : "",
+				 m_strb & SB_SAERR ? " saerr" : "",
+				 m_strb & SB_DMERR ? " dmerr" : "",
+				 m_strb & SB_CRC   ? " crc" : "",
+				 m_strb & SB_DTERR ? " dterr" : "");
+	}
+	return m_strb;
+}
+
+void mc6843_device::sar_w(u8 data)
+{
+	m_sar = data & 0x1f;
+	logerror("sar_w %02x\n", m_sar);
+}
+
+void mc6843_device::gcr_w(u8 data)
+{
+	m_gcr = data & 0x7f;
+	logerror("gcr_w %02x\n", m_gcr);
+}
+
+void mc6843_device::ccr_w(u8 data)
+{
+	m_ccr = data & 3;
+	logerror("ccr_w %02x\n", m_ccr);
+}
+
+void mc6843_device::ltar_w(u8 data)
+{
+	m_ltar = data & 0x7f;
+	logerror("ltar_w %02x\n", m_ltar);
+}
+
+void mc6843_device::index_callback(floppy_image_device *floppy, int state)
+{
+	if(state) {
+		live_sync();
+		logerror("idam %d\n", m_idam_turns);
+		if(m_idam_turns) {
+			m_idam_turns --;
+			if(!m_idam_turns) {
+				live_abort();
+				m_state = S_IDAM_NOT_FOUND;
 			}
-			return 1;
 		}
-
-		if ( img->floppy_drive_get_flag_state( FLOPPY_DRIVE_INDEX ) )
-		{
-			r++;
-			if ( r >= 4 )
-			{
-				/* time-out after 3 full revolutions */
-				LOG( "%f mc6843_address_search: no sector %i found after 3 revolutions\n", machine().time().as_double(), m_SAR );
-				m_STRB |= 0x08; /* set Sector Address Undetected */
-				cmd_end( );
-				return 0;
-			}
-		}
+		run(false, false, true);
 	}
-
-	//return 0; /* unreachable */
 }
 
-
-
-/* preamble specific to read commands (adds extra checks) */
-int mc6843_device::address_search_read( chrn_id* id )
+void mc6843_device::ready_callback(floppy_image_device *floppy, int state)
 {
-	if ( ! address_search( id ) )
-		return 0;
-
-	if ( id->flags & ID_FLAG_CRC_ERROR_IN_DATA_FIELD )
-	{
-		LOG( "%f mc6843_address_search_read: data CRC error\n", machine().time().as_double() );
-		m_STRB |= 0x06; /* set CRC error & Data Mark Undetected */
-		cmd_end( );
-		return 0;
+	if(state) {
+		live_sync();
+		run(false, true, false);
 	}
-
-	if ( id->flags & ID_FLAG_DELETED_DATA )
-	{
-		LOG( "%f mc6843_address_search_read: deleted data\n", machine().time().as_double() );
-		m_STRA |= 0x02; /* set Delete Data Mark Detected */
-	}
-
-	return 1;
 }
 
-
-
-
-/* Read CRC bottom half */
-void mc6843_device::finish_RCR( )
-{
-	chrn_id id;
-	if ( ! address_search_read( &id ) )
-		return;
-	cmd_end( );
-}
-
-
-
-/* Single / Multiple Sector Read bottom half */
-void mc6843_device::cont_SR( )
-{
-	chrn_id id;
-	legacy_floppy_image_device* img = floppy_image( );
-
-	/* sector seek */
-	if ( ! address_search_read( &id ) )
-		return;
-
-	/* sector read */
-	img->floppy_drive_read_sector_data( m_side, id.data_id, m_data, 128 );
-	m_data_idx = 0;
-	m_data_size = 128;
-	m_STRA |= 0x01;     /* set Data Transfer Request */
-	status_update( );
-}
-
-void mc6843_device::finish_SR( )
-{
-	m_crc_wait = 0;
-	cmd_end( );
-}
-
-/* Single / Multiple Sector Write bottom half */
-void mc6843_device::cont_SW( )
-{
-	chrn_id id;
-
-	/* sector seek */
-	if ( ! address_search( &id ) )
-		return;
-
-	/* setup sector write buffer */
-	m_data_idx = 0;
-	m_data_size = 128;
-	m_STRA |= 0x01;         /* set Data Transfer Request */
-	m_data_id = id.data_id; /* for subsequent write sector command */
-	status_update( );
-}
-
-
-
-/* bottom halves, called to continue / finish a command after some delay */
 void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch (id)
-	{
-		case TIMER_CONT:
-			{
-				int cmd = m_CMR & 0x0f;
-
-				LOG( "%f mc6843_cont: timer called for cmd=%s(%i)\n", machine().time().as_double(), mc6843_cmd[cmd], cmd );
-
-				m_timer_cont->adjust( attotime::never );
-
-				switch ( cmd )
-				{
-					case CMD_STZ: finish_STZ( ); break;
-					case CMD_SEK: finish_SEK( ); break;
-					case CMD_SSR:
-					case CMD_MSR:
-						if ( m_crc_wait )
-							finish_SR( );
-						else
-							cont_SR( );
-						break;
-					case CMD_SSW: cont_SW( );    break;
-					case CMD_RCR: finish_RCR( ); break;
-					case CMD_SWD: cont_SW( );    break;
-					case CMD_MSW: cont_SW( );    break;
-				}
-			}
-			break;
-
-		default:
-			break;
-	}
+	live_sync();
+	run(true, false, false);
 }
 
-
-
-/************************** CPU interface ****************************/
-
-
-
-uint8_t mc6843_device::read(offs_t offset)
+void mc6843_device::command_start()
 {
-	uint8_t data = 0;
+	assert(m_state == S_IDLE);
+	switch(m_cmr & 0xf) {
 
-	switch ( offset ) {
-	case 0: /* Data Input Register (DIR) */
-	{
-		int cmd = m_CMR & 0x0f;
+	case C_STZ:
+		logerror("Seek to track 0\n");
+		if(m_floppy)
+			m_floppy->dir_w(1);
+		m_stra |= SA_BUSY;
+		m_step_count = 82;
+		m_state = S_STZ_STEP;
+		break;
 
-		if (machine().side_effects_disabled())
-		{
-			data = m_data[0];
-			break;
+	case C_SEK:
+		logerror("Seek from track %d to %d\n", m_ctar, m_gcr);
+		if(m_gcr > m_ctar) {
+			if(m_floppy)
+				m_floppy->dir_w(0);
+			m_step_count = m_gcr - m_ctar;
+		} else {
+			if(m_floppy)
+				m_floppy->dir_w(1);
+			m_step_count = m_ctar - m_gcr;
 		}
-
-		LOG( "%f %s mc6843_r: data input cmd=%s(%i), pos=%i/%i, GCR=%i, ",
-				machine().time().as_double(), machine().describe_context(),
-				mc6843_cmd[cmd], cmd, m_data_idx,
-				m_data_size, m_GCR );
-
-		if ( cmd == CMD_SSR || cmd == CMD_MSR )
-		{
-			/* sector read */
-			assert( m_data_size > 0 );
-			assert( m_data_idx < m_data_size );
-			assert( m_data_idx < sizeof(m_data) );
-			data = m_data[ m_data_idx ];
-			m_data_idx++;
-
-			if ( m_data_idx >= m_data_size )
-			{
-				/* end of sector read */
-
-				m_STRA &= ~0x01; /* clear Data Transfer Request */
-
-				if ( cmd == CMD_MSR )
-				{
-					/* schedule next sector in multiple sector read */
-					m_GCR--;
-					m_SAR++;
-					if ( m_GCR == 0xff )
-					{
-						m_crc_wait = 1;
-						m_timer_cont->adjust( DELAY_CRC );
-					}
-					else if ( m_SAR > 26 )
-
-					{
-						m_STRB |= 0x08; /* set Sector Address Undetected */
-						m_crc_wait = 1;
-						m_timer_cont->adjust( DELAY_CRC );
-					}
-					else
-					{
-						m_timer_cont->adjust( DELAY_ADDR );
-					}
-				}
-				else
-				{
-					m_crc_wait = 1;
-					m_timer_cont->adjust( DELAY_CRC );
-				}
-			}
-		}
-		else if ( cmd == 0 )
-		{
-			data = m_data[0];
-		}
-		else
-		{
-			/* XXX TODO: other read modes */
-			data = m_data[0];
-			logerror( "%s mc6843 read in unsupported command mode %i\n", machine().describe_context(), cmd );
-		}
-
-		LOG( "data=%02X\n", data );
-
-		break;
-	}
-
-	case 1: /* Current-Track Address Register (CTAR) */
-		data = m_CTAR;
-		if (machine().side_effects_disabled())
-			break;
-		LOG( "%f %s mc6843_r: read CTAR %i (actual=%i)\n",
-				machine().time().as_double(), machine().describe_context(), data,
-				floppy_image()->floppy_drive_get_current_track());
+		m_stra |= SA_BUSY;
+		if(!m_step_count) {
+			m_state = S_SEEK_HEAD_SETTLING;
+			delay(4096 * (m_sur & 15));
+		} else
+			m_state = S_SEEK_STEP;
 		break;
 
-	case 2: /* Interrupt Status Register (ISR) */
-		data = m_ISR;
-		if (machine().side_effects_disabled())
-			break;
-		LOG( "%f %s mc6843_r: read ISR %02X: cmd=%scomplete settle=%scomplete sense-rq=%i STRB=%i\n",
-				machine().time().as_double(), machine().describe_context(), data,
-				(data & 1) ? "" : "not-" , (data & 2) ? "" : "not-",
-				(data >> 2) & 1, (data >> 3) & 1 );
-
-		/* reset */
-		m_ISR &= 8; /* keep STRB */
-		status_update( );
+	case C_SSR: case C_RCR: case C_SSW: case C_SWD: case C_MSR: case C_MSW:
+		m_stra |= SA_BUSY;
+		m_stra &= ~(SA_DDM|SA_TNEQ);
+		m_state = S_SRW_WAIT_READY;
 		break;
 
-	case 3: /* Status Register A (STRA) */
-	{
-		/* update */
-		legacy_floppy_image_device* img = floppy_image( );
-		int flag = img->floppy_drive_get_flag_state( FLOPPY_DRIVE_READY);
-		data = m_STRA & 0xa3;
-		if ( flag & FLOPPY_DRIVE_READY )
-			data |= 0x04;
-
-		data |= !img->floppy_tk00_r() << 3;
-		data |= !img->floppy_wpt_r() << 4;
-
-		if ( m_index_pulse )
-			data |= 0x40;
-
-		if (machine().side_effects_disabled())
-			break;
-
-		m_STRA = data;
-		LOG( "%f %s mc6843_r: read STRA %02X: data-rq=%i del-dta=%i ready=%i t0=%i wp=%i trk-dif=%i idx=%i busy=%i\n",
-				machine().time().as_double(), machine().describe_context(), data,
-				data & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1,
-				(data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 );
-		break;
-	}
-
-	case 4: /* Status Register B (STRB) */
-		data = m_STRB;
-		if (machine().side_effects_disabled())
-			break;
-		LOG( "%f %s mc6843_r: read STRB %02X: data-err=%i CRC-err=%i dta--mrk-err=%i sect-mrk-err=%i seek-err=%i fi=%i wr-err=%i hard-err=%i\n",
-				machine().time().as_double(), machine().describe_context(), data,
-				data & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1,
-				(data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 );
-
-		/* (partial) reset */
-		m_STRB &= ~0xfb;
-		status_update( );
+	case C_FFW:
+		m_stra |= SA_BUSY;
+		m_state = S_FFW_WAIT_READY;
+		m_dor_needed = true;
 		break;
 
-	case 7: /* Logical-Track Address Register (LTAR) */
-		data = m_LTAR;
-		if (machine().side_effects_disabled())
-			break;
-		LOG( "%f %s mc6843_r: read LTAR %i (actual=%i)\n",
-				machine().time().as_double(), machine().describe_context(), data,
-				floppy_image()->floppy_drive_get_current_track());
+	case 0x0:
+	case 0x1:
+	case 0x8:
+	case 0x9:
+	case 0xe:
+	case 0xf:
 		break;
 
 	default:
-		logerror( "%s mc6843 invalid read offset %i\n", machine().describe_context(), offset );
+		fatalerror("Unsupported command\n");
 	}
 
-	return data;
+	run(false, false, false);
 }
 
-void mc6843_device::write(offs_t offset, uint8_t data)
+void mc6843_device::delay(int cycles)
 {
-	switch ( offset ) {
-	case 0: /* Data Output Register (DOR) */
-	{
-		int cmd = m_CMR & 0x0f;
-		int FWF = (m_CMR >> 4) & 1;
+	// A delay of zero freezes the fdc, it's expected
+	if(cycles) {
+		m_timer->adjust(attotime::from_ticks(cycles, clock()));
+	}
+}
 
-		LOG( "%f %s mc6843_w: data output cmd=%s(%i), pos=%i/%i, GCR=%i, data=%02X\n",
-				machine().time().as_double(), machine().describe_context(),
-				mc6843_cmd[cmd], cmd, m_data_idx,
-				m_data_size, m_GCR, data );
+bool mc6843_device::is_ready() const
+{
+	return m_force_ready || (m_floppy && !m_floppy->ready_r());
+}
 
-		if ( cmd == CMD_SSW || cmd == CMD_MSW || cmd == CMD_SWD )
-		{
-			/* sector write */
-			assert( m_data_size > 0 );
-			assert( m_data_idx < m_data_size );
-			assert( m_data_idx < sizeof(m_data) );
-			m_data[ m_data_idx ] = data;
-			m_data_idx++;
-			if ( m_data_idx >= m_data_size )
-			{
-				/* end of sector write */
-				legacy_floppy_image_device* img = floppy_image( );
 
-				LOG( "%f %s mc6843_w: write sector %i\n", machine().time().as_double(), machine().describe_context(), m_data_id );
+void mc6843_device::run(bool timeout, bool ready, bool index)
+{
+	for(;;) {
+		if(m_cur_live.state != L_IDLE) {
+			live_run();
+			if(m_cur_live.state != L_IDLE)
+				return;
+		}
 
-				img->floppy_drive_write_sector_data(
-					m_side, m_data_id,
-					m_data, m_data_size,
-					(cmd == CMD_SWD) ? ID_FLAG_DELETED_DATA : 0 );
+		switch(m_state) {
+		case S_IDLE:
+			return;
 
-				m_STRA &= ~0x01; /* clear Data Transfer Request */
+		case S_STZ_STEP:
+			if(m_floppy && !m_floppy->trk00_r()) {
+				m_floppy->stp_w(0);
+				m_floppy->stp_w(1);
+			}
+			m_step_count --;
+			m_state = S_STZ_STEP_WAIT;
+			delay(1024 * (m_sur >> 4));
+			return;
 
-				if ( cmd == CMD_MSW )
-				{
-					m_GCR--;
-					m_SAR++;
-					if ( m_GCR == 0xff )
-					{
-						cmd_end( );
-					}
-					else if ( m_SAR > 26 )
+		case S_STZ_STEP_WAIT:
+			if(!timeout)
+				return;
+			if(m_step_count)
+				m_state = S_STZ_STEP;
+			else {
+				m_ctar = m_gcr = 0;
+				m_state = S_STZ_HEAD_SETTLING;
+				delay(4096 * (m_sur & 15));
+				return;
+			}
+			break;
 
-					{
-						m_STRB |= 0x08; /* set Sector Address Undetected */
-						cmd_end( );
-					}
-					else
-					{
-						m_timer_cont->adjust( DELAY_ADDR );
-					}
+		case S_STZ_HEAD_SETTLING:
+			if(!timeout)
+				return;
+			m_head_loaded = true;
+			m_stra &= ~SA_BUSY;
+			m_state = S_IDLE;
+			isr_raise(I_SCE);
+			return;
+
+		case S_SEEK_STEP:
+			if(m_floppy) {
+				m_floppy->stp_w(0);
+				m_floppy->stp_w(1);
+			}
+			m_step_count --;
+			m_state = S_SEEK_STEP_WAIT;
+			delay(1024 * (m_sur >> 4));
+			return;
+
+		case S_SEEK_STEP_WAIT:
+			if(!timeout)
+				return;
+			if(m_step_count)
+				m_state = S_SEEK_STEP;
+			else {
+				m_ctar = m_gcr;
+				m_state = S_SEEK_HEAD_SETTLING;
+				delay(4096 * (m_sur & 15));
+				return;
+			}
+			break;
+
+		case S_SEEK_HEAD_SETTLING:
+			if(!timeout)
+				return;
+			m_head_loaded = true;
+			m_stra &= ~SA_BUSY;
+			m_state = S_IDLE;
+			isr_raise(I_SCE);
+			return;
+
+		case S_SRW_WAIT_READY:
+			if(!is_ready())
+				return;
+			if(!m_head_loaded) {
+				m_state = S_SRW_HEAD_SETTLING;
+				delay(4096 * (m_sur & 15));
+				return;
+			} else
+				m_state = S_SRW_START;
+			break;
+
+		case S_SRW_HEAD_SETTLING:
+			if(timeout) {
+				m_head_loaded = true;
+				m_state = S_SRW_START;
+			}
+			break;
+
+		case S_SRW_START:
+			m_idam_turns = 3;
+			live_start(L_IDAM_SEARCH);
+			return;
+
+		case S_FFW_WAIT_READY:
+			if(!is_ready())
+				return;
+			if(!m_head_loaded) {
+				m_state = S_FFW_HEAD_SETTLING;
+				delay(4096 * (m_sur & 15));
+				return;
+			} else
+				m_state = S_FFW_START;
+			break;
+
+		case S_FFW_HEAD_SETTLING:
+			if(timeout) {
+				m_head_loaded = true;
+				m_state = S_FFW_START;
+			}
+			break;
+
+		case S_FFW_START:
+			live_start(L_FFW_BYTE);
+			return;
+
+		case S_IDAM_BAD_TRACK:
+			m_dir = m_cur_live.data_reg;
+			m_stra |= SA_TNEQ;
+			m_stra &= ~SA_BUSY;
+			m_state = S_IDLE;
+			isr_raise(I_RWCE);
+			return;
+
+		case S_IDAM_BAD_CRC:
+			m_strb |= SB_CRC | SB_SAERR;
+			m_stra &= ~SA_BUSY;
+			m_state = S_IDLE;
+			isr_raise(I_RWCE | I_STRB);
+			return;
+
+		case S_IDAM_FOUND:
+			if(m_cmr & 0x20)
+				isr_raise(I_SSR);
+			if((m_cmr & 0xf) == C_SSR || (m_cmr & 0xf) == C_MSR || (m_cmr & 0xf) == C_RCR)
+				live_start(L_DAM_SEARCH);
+
+			else {
+				m_dor_needed = true;
+				live_start(L_DAM_WAIT);
+			}
+			return;
+
+		case S_IDAM_NOT_FOUND:
+			m_stra &= ~SA_BUSY;
+			m_strb |= SB_SAERR;
+			m_state = S_IDLE;
+			isr_raise(I_RWCE | I_STRB);
+			logerror("not found\n");
+			return;
+
+		case S_DAM_NOT_FOUND:
+			m_strb |= SB_DMERR;
+			m_stra &= ~SA_BUSY;
+			m_state = S_IDLE;
+			isr_raise(I_RWCE | I_STRB);
+			return;
+
+		case S_DAM_BAD_CRC:
+			m_strb |= SB_CRC;
+			m_stra &= ~SA_BUSY;
+			m_state = S_IDLE;
+			isr_raise(I_RWCE | I_STRB);
+			return;
+
+		case S_DAM_DONE:
+			m_dor_needed = false;
+			if((m_cmr & 0xf) == C_MSR || (m_cmr & 0xf) == C_MSW) {
+				m_sar = (m_sar + 1) & 0x1f;
+				m_gcr = (m_gcr - 1) & 0x7f;
+				if(m_gcr != 0x7f) {
+					m_state = S_SRW_START;
+					break;
 				}
-				else
-				{
-					cmd_end( );
-				}
+			}
+			m_stra &= ~SA_BUSY;
+			m_state = S_IDLE;
+			isr_raise(I_RWCE);
+			return;
+		}
+	}
+}
+
+void mc6843_device::live_start(int state, bool start_writing)
+{
+	m_cur_live.tm = machine().time();
+	m_cur_live.state = state;
+	m_cur_live.next_state = -1;
+	m_cur_live.shift_reg = 0;
+	m_cur_live.crc = 0xffff;
+	m_cur_live.bit_counter = 0;
+	m_cur_live.data_separator_phase = false;
+	m_cur_live.data_reg = 0;
+
+	m_cur_live.pll.reset(m_cur_live.tm);
+	m_cur_live.pll.set_clock(attotime::from_ticks(2, clock()));
+	if(start_writing)
+		m_cur_live.pll.start_writing(machine().time());
+
+	m_checkpoint_live = m_cur_live;
+
+	live_run();
+}
+
+void mc6843_device::checkpoint()
+{
+	m_cur_live.pll.commit(m_floppy, m_cur_live.tm);
+	m_checkpoint_live = m_cur_live;
+}
+
+void mc6843_device::rollback()
+{
+	m_cur_live = m_checkpoint_live;
+}
+
+void mc6843_device::live_delay(int state)
+{
+	m_cur_live.next_state = state;
+	m_timer->adjust(m_cur_live.tm - machine().time());
+}
+
+void mc6843_device::live_sync()
+{
+	if(m_cur_live.state != L_IDLE && !m_cur_live.tm.is_never()) {
+		if(m_cur_live.tm > machine().time()) {
+			if(0)
+				logerror("%s: Rolling back and replaying (%s)\n", machine().time().to_string(), m_cur_live.tm.to_string());
+			rollback();
+			live_run(machine().time());
+			m_cur_live.pll.commit(m_floppy, m_cur_live.tm);
+		} else {
+			if(0)
+				logerror("%s: Committing (%s)\n", machine().time().to_string(), m_cur_live.tm.to_string());
+			m_cur_live.pll.commit(m_floppy, m_cur_live.tm);
+			if(m_cur_live.next_state != -1) {
+				m_cur_live.state = m_cur_live.next_state;
+				m_cur_live.next_state = -1;
+			}
+			if(m_cur_live.state == L_IDLE) {
+				m_cur_live.pll.stop_writing(m_floppy, m_cur_live.tm);
+				m_cur_live.tm = attotime::never;
 			}
 		}
-		else if ( (cmd == CMD_FFW) && FWF )
-		{
-			/* assume we are formatting */
-			uint8_t nibble;
-			nibble =
-				(data & 0x01) |
-				((data & 0x04) >> 1 )|
-				((data & 0x10) >> 2 )|
-				((data & 0x40) >> 3 );
+		m_cur_live.next_state = -1;
+		checkpoint();
+	}
+}
 
-			assert( m_data_idx < sizeof(m_data) );
+void mc6843_device::live_abort()
+{
+	if(!m_cur_live.tm.is_never() && m_cur_live.tm > machine().time()) {
+		rollback();
+		live_run(machine().time());
+	}
 
-			m_data[m_data_idx / 2] =
-				(m_data[m_data_idx / 2] << 4) | nibble;
+	m_cur_live.pll.stop_writing(m_floppy, m_cur_live.tm);
+	m_cur_live.tm = attotime::never;
+	m_cur_live.state = L_IDLE;
+	m_cur_live.next_state = -1;
+}
 
-			if ( (m_data_idx == 0) && (m_data[0] == 0xfe ) )
-			{
-				/* address mark detected */
-				m_data_idx = 2;
-			}
-			else if ( m_data_idx == 9 )
-			{
-				/* address id field complete */
-				if ( (m_data[2] == 0) && (m_data[4] == 0) )
-				{
-					/* valid address id field */
-					legacy_floppy_image_device* img = floppy_image( );
-					uint8_t track  = m_data[1];
-					uint8_t sector = m_data[3];
-					uint8_t filler = 0xe5; /* standard Thomson filler */
-					LOG( "%f %s mc6843_w: address id detected track=%i sector=%i\n", machine().time().as_double(), machine().describe_context(), track, sector);
-					img->floppy_drive_format_sector( m_side, sector, track, 0, sector, 0, filler );
-					m_data_idx = 0;
-				}
-				else
-				{
-					/* abort */
-					m_data_idx = 0;
-				}
-			}
-			else if ( m_data_idx > 0 )
-			{
-				/* accumulate address id field */
-				m_data_idx++;
-			}
-		}
-		else if ( cmd == 0 )
-		{
-			/* nothing */
-		}
+bool mc6843_device::read_one_bit(const attotime &limit)
+{
+	int bit = m_cur_live.pll.get_next_bit(m_cur_live.tm, m_floppy, limit);
+	if(bit < 0)
+		return true;
+	m_cur_live.shift_reg = (m_cur_live.shift_reg << 1) | bit;
+	m_cur_live.bit_counter++;
+	if(m_cur_live.data_separator_phase) {
+		m_cur_live.data_reg = (m_cur_live.data_reg << 1) | bit;
+		if((m_cur_live.crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
+			m_cur_live.crc = (m_cur_live.crc << 1) ^ 0x1021;
 		else
-		{
-			/* XXX TODO: other write modes */
-			logerror( "%s mc6843 write %02X in unsupported command mode %i (FWF=%i)\n", machine().describe_context(), data, cmd, FWF );
+			m_cur_live.crc = m_cur_live.crc << 1;
+	}
+	m_cur_live.data_separator_phase = !m_cur_live.data_separator_phase;
+	return false;
+}
+
+bool mc6843_device::write_one_bit(const attotime &limit)
+{
+	bool bit = m_cur_live.shift_reg & 0x8000;
+	if(m_cur_live.pll.write_next_bit(bit, m_cur_live.tm, m_floppy, limit))
+		return true;
+	if(m_cur_live.bit_counter & 1) {
+		if((m_cur_live.crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
+			m_cur_live.crc = (m_cur_live.crc << 1) ^ 0x1021;
+		else
+			m_cur_live.crc = m_cur_live.crc << 1;
+	}
+	m_cur_live.shift_reg = m_cur_live.shift_reg << 1;
+	m_cur_live.bit_counter--;
+	return false;
+}
+
+void mc6843_device::live_run(attotime limit)
+{
+	if(m_cur_live.state == L_IDLE || m_cur_live.next_state != -1)
+		return;
+
+	if(limit == attotime::never) {
+		if(m_floppy)
+			limit = m_floppy->time_next_index();
+		if(limit == attotime::never) {
+			// Happens when there's no disk or if the wd is not
+			// connected to a drive, hence no index pulse. Force a
+			// sync from time to time in that case, so that the main
+			// cpu timeout isn't too painful.  Avoids looping into
+			// infinity looking for data too.
+
+			limit = machine().time() + attotime::from_msec(1);
+			m_timer->adjust(attotime::from_msec(1));
 		}
-		break;
 	}
 
-	case 1: /* Current-Track Address Register (CTAR) */
-		m_CTAR = data;
-		LOG( "%f %s mc6843_w: set CTAR to %i %02X (actual=%i) \n",
-				machine().time().as_double(), machine().describe_context(), m_CTAR, data,
-				floppy_image()->floppy_drive_get_current_track());
-		break;
+	for(;;) {
+		switch(m_cur_live.state) {
+		case L_IDAM_SEARCH:
+			if(read_one_bit(limit))
+				return;
 
-	case 2: /* Command Register (CMR) */
-	{
-		int cmd = data & 15;
+			if(0)
+			logerror("%s: shift = %04x data=%02x c=%d\n", m_cur_live.tm.to_string(), m_cur_live.shift_reg,
+					(m_cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(m_cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(m_cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(m_cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(m_cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(m_cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(m_cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(m_cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					m_cur_live.bit_counter);
 
-		LOG( "%f %s mc6843_w: set CMR to $%02X: cmd=%s(%i) FWF=%i DMA=%i ISR3-intr=%i fun-intr=%i\n",
-				machine().time().as_double(), machine().describe_context(),
-				data, mc6843_cmd[cmd], cmd, (data >> 4) & 1, (data >> 5) & 1,
-				(data >> 6) & 1, (data >> 7) & 1 );
-
-		/* sanitize state */
-		m_STRA &= ~0x81; /* clear Busy & Data Transfer Request */
-		m_data_idx = 0;
-		m_data_size = 0;
-
-		/* commands are initiated by updating some flags and scheduling
-		   a bottom-half (mc6843_cont) after some delay */
-
-		switch (cmd)
-		{
-		case CMD_SSW:
-		case CMD_SSR:
-		case CMD_SWD:
-		case CMD_RCR:
-		case CMD_MSR:
-		case CMD_MSW:
-			m_STRA |=  0x80; /* set Busy */
-			m_STRA &= ~0x22; /* clear Track Not Equal & Delete Data Mark Detected */
-			m_STRB &= ~0x04; /* clear Data Mark Undetected */
-			m_timer_cont->adjust( DELAY_ADDR );
+			if(m_cur_live.shift_reg == 0xf57e) {
+				m_cur_live.crc = 0xef21;
+				m_cur_live.data_separator_phase = false;
+				m_cur_live.bit_counter = 0;
+				m_cur_live.state = L_IDAM_CHECK_TRACK;
+			}
 			break;
-		case CMD_STZ:
-		case CMD_SEK:
-			m_STRA |= 0x80; /* set Busy */
-			m_timer_cont->adjust( DELAY_SEEK );
+
+		case L_IDAM_CHECK_TRACK:
+			if(read_one_bit(limit))
+				return;
+
+			if(m_cur_live.bit_counter == 16) {
+				logerror("%s IDAM track %d\n", m_cur_live.tm.to_string(), m_cur_live.data_reg);
+				if(m_cur_live.data_reg != m_ltar) {
+					m_state = S_IDAM_BAD_TRACK;
+					live_delay(L_IDLE);
+					return;
+
+				} else
+					m_cur_live.state = L_IDAM_CHECK_SECTOR;
+			}
 			break;
-		case CMD_FFW:
-		case CMD_FFR:
-			m_data_idx = 0;
-			m_STRA |= 0x01; /* set Data Transfer Request */
+
+		case L_IDAM_CHECK_SECTOR:
+			if(read_one_bit(limit))
+				return;
+
+			if(m_cur_live.bit_counter == 48) {
+				logerror("%s IDAM sector %d\n", m_cur_live.tm.to_string(), m_cur_live.data_reg);
+				if(m_cur_live.data_reg != m_sar)
+					m_cur_live.state = L_IDAM_SEARCH;
+				else
+					m_cur_live.state = L_IDAM_CHECK_CRC;
+			}
+			break;
+
+		case L_IDAM_CHECK_CRC:
+			if(read_one_bit(limit))
+				return;
+
+			if(m_cur_live.bit_counter == 96) {
+				logerror("IDAM crc remainder %04x\n", m_cur_live.crc);
+				if(m_cur_live.crc)
+					m_state = S_IDAM_BAD_CRC;
+				else
+					m_state = S_IDAM_FOUND;
+				live_delay(L_IDLE);
+				return;
+			}
+			break;
+
+		case L_DAM_SEARCH:
+			if(read_one_bit(limit))
+				return;
+
+			if(m_cur_live.shift_reg == 0xf56a || m_cur_live.shift_reg == 0xf56f) {
+				m_cur_live.data_separator_phase = false;
+				m_cur_live.bit_counter = 0;
+				logerror("DAM mark %02x\n", m_cur_live.data_reg);
+				if(m_cur_live.shift_reg == 0xf56f) {
+					logerror("DAM found\n");
+					m_cur_live.crc = 0xbf84;
+					m_cur_live.state = L_DAM_READ;
+				} else {
+					logerror("DDAM found\n");
+					m_cur_live.crc = 0x8fe7;
+					live_delay(L_DAM_DELETED);
+					return;
+				}
+			}
+			break;
+
+		case L_DAM_DELETED:
+			m_stra |= SA_DDM;
+			m_cur_live.state = L_DAM_READ;
+			break;
+
+		case L_DAM_READ:
+			if(read_one_bit(limit))
+				return;
+
+			if(!(m_cur_live.bit_counter & 0xf)) {
+				live_delay(L_DAM_READ_BYTE);
+				return;
+			}
+			break;
+
+		case L_DAM_READ_BYTE: {
+			int byte = m_cur_live.bit_counter >> 4;
+			logerror("byte %02x = %02x crc %04x\n", byte, m_cur_live.data_reg, m_cur_live.crc);
+			if(byte <= 128) {
+				if((m_cmr & 0xf) != C_RCR) {
+					if(m_dir_loaded)
+						m_strb |= SB_DTERR;
+					m_dir_loaded = true;
+				}
+				m_dir = m_cur_live.data_reg;
+			} else if(byte == 130) {
+				if(m_cur_live.crc)
+					m_state = S_DAM_BAD_CRC;
+				else
+					m_state = S_DAM_DONE;
+				m_cur_live.state = L_IDLE;
+				return;
+			}
+			m_cur_live.state = L_DAM_READ;
 			break;
 		}
 
-		m_CMR = data;
-		status_update( );
-		break;
-	}
+		case L_DAM_WAIT:
+			if(read_one_bit(limit))
+				return;
 
-	case 3: /* Set-Up Register (SUR) */
-		m_SUR = data;
+			if(m_cur_live.bit_counter == 11*16) {
+				m_cur_live.bit_counter = (6+1+128+2)*16;
+				live_delay(L_DAM_WRITE_BYTE);
+				return;
+			}
+			break;
 
-		/* assume CLK freq = 1MHz (IBM 3740 compatibility) */
-		LOG( "%f %s mc6843_w: set SUR to $%02X: head settling time=%fms, track-to-track seek time=%f\n",
-				machine().time().as_double(), machine().describe_context(),
-				data, 4.096 * (data & 15), 1.024 * ((data >> 4) & 15) );
-		break;
+		case L_DAM_WRITE:
+			if(write_one_bit(limit))
+				return;
+			if(!(m_cur_live.bit_counter & 0xf)) {
+				live_delay(L_DAM_WRITE_BYTE);
+				return;
+			}
+			break;
 
-	case 4: /* Sector Address Register (SAR) */
-		m_SAR = data & 0x1f;
-		LOG( "%f %s mc6843_w: set SAR to %i (%02X)\n", machine().time().as_double(), machine().describe_context(), m_SAR, data );
-		break;
+		case L_DAM_WRITE_BYTE: {
+			int byte = (6+1+128+2) - (m_cur_live.bit_counter >> 4);
+			if(!byte) {
+				m_cur_live.pll.start_writing(m_cur_live.tm);
+				m_cur_live.shift_reg = 0xaaaa;
 
-	case 5: /* General Count Register (GCR) */
-		m_GCR = data & 0x7f;
-		LOG( "%f %s mc6843_w: set GCR to %i (%02X)\n", machine().time().as_double(), machine().describe_context(), m_GCR, data );
-		break;
+			} else if(byte <= 5) {
+				m_cur_live.shift_reg = 0xaaaa;
 
-	case 6: /* CRC Control Register (CCR) */
-		m_CCR = data & 3;
-		LOG( "%f %s mc6843_w: set CCR to %02X: CRC=%s shift=%i\n",
-				machine().time().as_double(), machine().describe_context(), data,
-				(data & 1) ? "enabled" : "disabled", (data >> 1) & 1 );
-		break;
+			} else if(byte <= 6) {
+				m_cur_live.crc = 0xffff;
+				if((m_cmr & 0xf) == C_SWD)
+					m_cur_live.shift_reg = 0xf56a;
+				else
+					m_cur_live.shift_reg = 0xf56f;
 
-	case 7: /* Logical-Track Address Register (LTAR) */
-		m_LTAR = data & 0x7f;
-		LOG( "%f %s mc6843_w: set LTAR to %i %02X (actual=%i)\n",
-				machine().time().as_double(), machine().describe_context(), m_LTAR, data,
-				floppy_image()->floppy_drive_get_current_track());
-		break;
+			} else if(byte <= 134) {
+				if(!m_dor_loaded)
+					m_strb |= SB_DTERR;
+				m_dor_loaded = false;
+				if(byte == 128)
+					m_dor_needed = false;
+				m_cur_live.shift_reg = 0xaaaa |
+					(m_dor & 0x80 ? 1<<14 : 0) |
+					(m_dor & 0x40 ? 1<<12 : 0) |
+					(m_dor & 0x20 ? 1<<10 : 0) |
+					(m_dor & 0x10 ? 1<< 8 : 0) |
+					(m_dor & 0x08 ? 1<< 6 : 0) |
+					(m_dor & 0x04 ? 1<< 4 : 0) |
+					(m_dor & 0x02 ? 1<< 2 : 0) |
+					(m_dor & 0x01 ? 1     : 0);
 
-	default:
-		logerror( "%s mc6843 invalid write offset %i (data=$%02X)\n", machine().describe_context(), offset, data );
+			} else if(byte <= 136) {
+				m_cur_live.shift_reg = 0xaaaa |
+					(m_cur_live.crc & 0x8000 ? 1<<14 : 0) |
+					(m_cur_live.crc & 0x4000 ? 1<<12 : 0) |
+					(m_cur_live.crc & 0x2000 ? 1<<10 : 0) |
+					(m_cur_live.crc & 0x1000 ? 1<< 8 : 0) |
+					(m_cur_live.crc & 0x0800 ? 1<< 6 : 0) |
+					(m_cur_live.crc & 0x0400 ? 1<< 4 : 0) |
+					(m_cur_live.crc & 0x0200 ? 1<< 2 : 0) |
+					(m_cur_live.crc & 0x0100 ? 1     : 0);
+
+			} else if(byte <= 137) {
+				m_cur_live.shift_reg = 0xffff;
+
+			} else {
+				m_state = S_DAM_DONE;
+				m_cur_live.state = L_IDLE;
+				m_cur_live.pll.stop_writing(m_floppy, m_cur_live.tm);
+				return;
+			}
+			m_cur_live.state = L_DAM_WRITE;
+			break;
+		}
+
+		case L_FFW_BYTE:
+			if(!m_dor_loaded)
+				m_strb |= SB_DTERR;
+			m_dor_loaded = false;
+			logerror("write %02x\n", m_dor);
+			if(m_cmr & 0x10) {
+				m_cur_live.shift_reg = m_dor << 8;
+				m_cur_live.bit_counter = 8;
+
+			} else {
+				m_cur_live.shift_reg = 0xaaaa |
+					(m_dor & 0x80 ? 1<<14 : 0) |
+					(m_dor & 0x40 ? 1<<12 : 0) |
+					(m_dor & 0x20 ? 1<<10 : 0) |
+					(m_dor & 0x10 ? 1<< 8 : 0) |
+					(m_dor & 0x08 ? 1<< 6 : 0) |
+					(m_dor & 0x04 ? 1<< 4 : 0) |
+					(m_dor & 0x02 ? 1<< 2 : 0) |
+					(m_dor & 0x01 ? 1     : 0);
+				m_cur_live.bit_counter = 16;
+			}
+			m_cur_live.state = L_FFW_WRITE;
+			break;
+
+		case L_FFW_WRITE:
+			if(write_one_bit(limit))
+				return;
+			if(m_cur_live.bit_counter == 0) {
+				live_delay(L_FFW_BYTE);
+				return;
+			}
+			break;
+		}
 	}
 }

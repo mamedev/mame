@@ -58,7 +58,7 @@ Press one of the start buttons to exit.
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/ym2608.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

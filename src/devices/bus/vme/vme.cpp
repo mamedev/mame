@@ -109,29 +109,11 @@ vme_slot_device::vme_slot_device(const machine_config &mconfig, const char *tag,
 vme_slot_device::vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
-	, m_vme_tag(nullptr)
-	, m_vme_slottag(nullptr)
+	, m_vme(*this, finder_base::DUMMY_TAG)
+	, m_slot_nbr(0)
 	, m_vme_j1_callback(*this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
-}
-
-//-------------------------------------------------
-//  update_vme_chains
-//-------------------------------------------------
-void vme_slot_device::update_vme_chains(uint32_t slot_nbr)
-{
-	LOG("%s %s - %d\n", FUNCNAME, tag(), slot_nbr);
-}
-
-//-------------------------------------------------
-//  set_vme_slot
-//-------------------------------------------------
-void vme_slot_device::set_vme_slot(const char *tag, const char *slottag)
-{
-	LOG("%s %s - %s\n", FUNCNAME, tag, slottag);
-	m_vme_tag = tag;
-	m_vme_slottag = slottag;
 }
 
 //-------------------------------------------------
@@ -139,24 +121,22 @@ void vme_slot_device::set_vme_slot(const char *tag, const char *slottag)
 //-------------------------------------------------
 void vme_slot_device::device_start()
 {
-	device_vme_card_interface *dev = dynamic_cast<device_vme_card_interface *>(get_card_device());
-	LOG("%s %s - %s:%s\n", tag(), FUNCNAME, m_vme_tag, m_vme_slottag);
-	if (dev)
-	{
-		dev->set_vme_tag(m_vme_tag, m_vme_slottag);
-	}
-
 	//  m_card = dynamic_cast<device_vme_card_interface *>(get_card_device());
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
-void vme_slot_device::device_config_complete()
+void vme_slot_device::device_resolve_objects()
 {
-	LOG("%s %s\n", tag(), FUNCNAME);
+	device_vme_card_interface *dev = dynamic_cast<device_vme_card_interface *>(get_card_device());
+	LOG("%s %s - %s\n", tag(), FUNCNAME, m_vme.finder_tag());
+	if (dev)
+	{
+		dev->set_vme_bus(*m_vme, m_slot_nbr);
+	}
 }
 
 //-------------------------------------------------
@@ -457,8 +437,6 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read3
 device_vme_card_interface::device_vme_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "vme")
 	, m_vme(nullptr)
-	, m_vme_tag(nullptr)
-	, m_vme_slottag(nullptr)
 	, m_slot(0)
 	, m_next(nullptr)
 {
@@ -471,17 +449,9 @@ device_vme_card_interface::~device_vme_card_interface()
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);
 }
 
-void device_vme_card_interface::set_vme_tag(const char *tag, const char *slottag)
-{
-	LOG("%s %s\n", tag, FUNCNAME);
-	m_vme_tag = tag;
-	m_vme_slottag = slottag;
-}
-
-void device_vme_card_interface::set_vme_device()
+void device_vme_card_interface::interface_post_start()
 {
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);
-	m_vme = dynamic_cast<vme_device *>(device().machine().device(m_vme_tag));
 	//  printf("*** %s %sfound\n", m_vme_tag, m_vme ? "" : "not ");
 	if (m_vme) m_vme->add_vme_card(this);
 }

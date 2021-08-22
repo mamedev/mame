@@ -13,7 +13,7 @@
 #include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/atarimo.h"
 #include "screen.h"
 

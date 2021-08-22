@@ -91,9 +91,15 @@ private:
 	// timer handlers
 	TIMER_CALLBACK_MEMBER(release_strobe);
 
+	// synchronised inputs
+	void set_ack_in(void *ptr, s32 param);
+	void set_perror_in(void *ptr, s32 param);
+	void set_select_in(void *ptr, s32 param);
+	void set_fault_in(void *ptr, s32 param);
+	void data_write(void *ptr, s32 param);
+
 	// helpers
 	void reset_mode();
-	void start_strobe();
 	void set_ack_latch();
 	void clear_ack_latch();
 	void enable_irq();

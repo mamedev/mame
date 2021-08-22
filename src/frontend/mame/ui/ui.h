@@ -235,6 +235,7 @@ private:
 	ui_colors               m_ui_colors;
 	float                   m_target_font_height;
 	bool                    m_has_warnings;
+	bool                    m_unthrottle_mute;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
 	device_feature_set      m_unemulated_features;
@@ -256,7 +257,7 @@ private:
 
 	// private methods
 	void exit();
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 	template <typename... Params> void slider_alloc(Params &&...args) { m_sliders.push_back(std::make_unique<slider_state>(std::forward<Params>(args)...)); }
 

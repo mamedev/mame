@@ -53,6 +53,13 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 	{
 		m_state = START_OTHER_PART;
 		m_current_directory = m_image.working_directory();
+
+		// check to see if we've never initialized the working directory
+		if (m_current_directory.empty())
+		{
+			m_current_directory = machine().image().setup_working_directory();
+			m_image.set_working_directory(m_current_directory);
+		}
 	}
 	else
 	{
@@ -78,7 +85,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 
 		// check to see if the path exists; if not then set to current directory
 		util::zippath_directory::ptr dir;
-		if (util::zippath_directory::open(m_current_directory, dir) != osd_file::error::NONE)
+		if (util::zippath_directory::open(m_current_directory, dir))
 			osd_get_full_path(m_current_directory, ".");
 	}
 }

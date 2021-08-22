@@ -2508,7 +2508,7 @@ void funcube_state::funcube(machine_config &config)
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
 	m_sub->set_addrmap(AS_IO, &funcube_state::funcube_sub_io);
 
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
 

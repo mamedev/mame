@@ -25,8 +25,12 @@
 debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t &device)
 	: debug_view_source(std::move(name), &device),
 		m_space(device.memory().space(AS_PROGRAM)),
-		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM))
+		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM)),
+		m_pcbase(nullptr)
 {
+	const device_state_interface *state;
+	if (device.interface(state))
+		m_pcbase = state->state_find_entry(STATE_GENPCBASE);
 }
 
 
@@ -164,7 +168,7 @@ void debug_view_disasm::view_char(int chval)
 		case DCH_HOME:              // set the active column to the PC
 		{
 			const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-			offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
+			offs_t pc = source.pcbase();
 
 			// figure out which row the pc is on
 			for(unsigned int curline = 0; curline < m_dasm.size(); curline++)
@@ -230,6 +234,7 @@ void debug_view_disasm::generate_from_address(debug_disasm_buffer &buffer, offs_
 		m_dasm.emplace_back(address, size, dasm);
 		address = next_address;
 	}
+	m_recompute = false;
 }
 
 bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
@@ -247,6 +252,7 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 		backwards_offset = 64 << shift;
 
 	m_dasm.clear();
+	m_recompute = false;
 	offs_t address = (pc - m_backwards_steps*backwards_offset) & source.m_space.logaddrmask();
 	// Handle wrap at 0
 	if(address > pc)
@@ -321,7 +327,7 @@ void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 		return;
 	}
 
-	if(address_position(pc) != -1) {
+	if(!m_recompute && address_position(pc) != -1) {
 		generate_from_address(buffer, m_dasm[0].m_address);
 		int pos = address_position(pc);
 		if(pos != -1) {
@@ -375,7 +381,7 @@ void debug_view_disasm::view_update()
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 	debug_disasm_buffer buffer(*source.device());
-	offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
+	offs_t pc = source.pcbase();
 
 	generate_dasm(buffer, pc);
 
@@ -510,7 +516,7 @@ void debug_view_disasm::set_right_column(disasm_right_column contents)
 {
 	begin_update();
 	m_right_column = contents;
-	m_recompute = m_update_pending = true;
+	m_update_pending = true;
 	end_update();
 }
 
@@ -567,7 +573,7 @@ void debug_view_disasm::set_selected_address(offs_t address)
 void debug_view_disasm::set_source(const debug_view_source &source)
 {
 	if(&source != m_source) {
+		m_recompute = true;
 		debug_view::set_source(source);
-		m_dasm.clear();
 	}
 }

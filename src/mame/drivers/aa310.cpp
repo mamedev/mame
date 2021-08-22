@@ -73,6 +73,24 @@
  *  3400000 - 35FFFFF - VICD10 (write - supervisor only)
  *  3600000 - 3FFFFFF - MEMC (write - supervisor only)
  *
+=======================================================================================
+ *
+ *  Archimedes IOC interrupts:
+ *     IL0    Podule FIQ
+ *     IL1    Sound Empty
+ *     IL2    Serial
+ *     IL3    HDD
+ *     IL4    Disc Change
+ *     IL5    Podule IRQ
+ *     IL6    Printer Busy
+ *     IL7    Serial Ring
+ *     IF     Printer Ack
+ *     IR     VBL
+ *     POR    Reset
+ *     FH0    Floppy DRQ
+ *     FH1    Floppy IRQ
+ *     FL     Econet
+ *
  *****************************************************************************/
 /*
     DASM of code (bios 2 / RISC OS 2)

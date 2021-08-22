@@ -59,7 +59,7 @@ Keep pressed 9 and press reset to enter service mode.
 #include "cpu/mcs51/mcs51.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 #include "emupal.h"
 #include "screen.h"

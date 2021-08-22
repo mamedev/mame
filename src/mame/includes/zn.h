@@ -30,7 +30,7 @@
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
 #include "sound/spu.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
 #include "video/psx.h"

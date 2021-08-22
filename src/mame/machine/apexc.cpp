@@ -1,11 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
 /*
-    machine/apexc.c : APEXC machine
+    machine/apexc.cpp : APEXC machine
 
     By Raphael Nabet
 
-    see cpu/apexc.c for background and tech info
+    see cpu/apexc.cpp for background and tech info
 */
 
 #include "emu.h"

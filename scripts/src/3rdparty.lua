@@ -197,6 +197,7 @@ end
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
+		MAME_DIR .. "3rdparty/softfloat/fpatan.c",
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 	}
 
@@ -1415,7 +1416,6 @@ end
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
-		"IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
 	}
 
 	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
@@ -1452,17 +1452,19 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_nvn.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_webgpu.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/vertexlayout.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_tables.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_widgets.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
@@ -2251,6 +2253,44 @@ project "wdlfft"
 	files {
 		MAME_DIR .. "3rdparty/wdlfft/fft.c",
 		MAME_DIR .. "3rdparty/wdlfft/fft.h"
+	}
+
+
+--------------------------------------------------
+-- ymfm library objects
+--------------------------------------------------
+
+project "ymfm"
+	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
+	kind "StaticLib"
+
+	configuration { }
+		defines {
+			"YMFM_MAME",
+		}
+
+	files {
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_adpcm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_adpcm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_fm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_fm.ipp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_misc.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_misc.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opl.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opl.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opn.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opn.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opq.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opq.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opz.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opz.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_pcm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_pcm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_ssg.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_ssg.h",
 	}
 
 

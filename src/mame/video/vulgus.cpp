@@ -114,6 +114,11 @@ void vulgus_state::video_start()
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 47);
 
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
+
 	save_item(NAME(m_palette_bank));
 }
 
@@ -192,7 +197,7 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (row == 2) row = 3;
 
 		for (; row >= 0; row--)
-			gfx->transpen(bitmap, cliprect, code + row, color, flip, flip, sx, sy + 16 * row * dir, 15);
+			gfx->transpen(bitmap, cliprect, code + row, color, flip, flip, sx+128, sy + 6 + 16 * row * dir, 15);
 	}
 }
 

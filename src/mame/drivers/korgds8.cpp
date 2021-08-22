@@ -12,7 +12,7 @@
 //#include "bus/midi/midi.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"

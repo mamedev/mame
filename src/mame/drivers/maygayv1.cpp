@@ -136,7 +136,7 @@ Find lamps/reels after UPD changes.
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 
 #include "emupal.h"
 #include "screen.h"

@@ -14,7 +14,7 @@
 
 #include "isa.h"
 #include "machine/eepromser.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 
 class asc88_device : public device_t, public device_isa8_card_interface
 {
@@ -40,7 +40,7 @@ private:
 
 	void scsic_config(device_t *device);
 
-	required_device<ncr5380n_device> m_scsic;
+	required_device<ncr5380_device> m_scsic;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_baseaddr;
 

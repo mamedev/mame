@@ -32,6 +32,14 @@
 
 	This should implement device_video_interface, since it generates the vertical
 	and horizontal blanking and sync signals from a master clock.
+
+	understand sprite limits / how sprite 0 sometimes must be skipped, maybe
+	layers being enabled counts against limits? maybe some chip revisions skip
+	the first sprite? see note in device_start
+
+	understand why we need offset kludges for some games, they can even differ
+	from layer to layer
+
 	*/
 
 #include "emu.h"

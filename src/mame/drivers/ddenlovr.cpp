@@ -124,7 +124,7 @@ Notes:
 #include "cpu/z80/tmpz84c015.h"
 #include "cpu/z80/kl5c80a12.h"
 #include "sound/ay8910.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"

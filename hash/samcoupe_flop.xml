@@ -23,7 +23,7 @@ license:CC0
   SAMDOS disks include the official MGT ZX Spectrum emulator.
 -->
 
-<softwarelist name="samcoupe_flop" description="Sam Coupe Floppy Disks">
+<softwarelist name="samcoupe_flop" description="SAM Coupe floppy disks">
 
 	<software name="manic">
 		<description>Manic Miner (2 Level Demo)</description>
@@ -65,6 +65,16 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	<software name="castle">
+		<description>Castle</description>
+		<year>1991</year>
+		<publisher>John Hawkins</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="castle.mgt" size="819200" crc="1a3de955" sha1="a8cad869d31c05a46306973dffc3b289aa366f51"/>
+			</dataarea>
+		</part>
+	</software>
 	<software name="defenders">
 		<description>Defenders Of The Earth</description>
 		<year>1990</year>
@@ -75,6 +85,26 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	<software name="lemmings">
+		<description>Lemmings</description>
+		<year>1993</year>
+		<publisher>FRED Publishing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="961280">
+				<rom name="lemmings.dsk" size="961280" crc="61918f08" sha1="0fa73ae3f07145b21b387e3cb88267226582002d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="ppersia">
+		<description>Prince of Persia</description>
+		<year>1990</year>
+		<publisher>Revelation Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="857856">
+				<rom name="prince of persia.dsk" size="857856" crc="29020c84" sha1="e75292191c9c403bc8422cb490ad189b4b9dc5cc"/>
+			</dataarea>
+		</part>
+	</software>
 	<software name="samstrikes">
 		<description>Sam Strikes Out!</description>
 		<year>1990</year>
@@ -82,6 +112,16 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="sam strikes out.dsk" size="819200" crc="c11bbd22" sha1="6f6bdd9add07e6ce319fa93c83177d0ab9221829"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sophistry">
+		<description>Sophistry</description>
+		<year>1994</year>
+		<publisher>Revelation Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="sophistry.dsk" size="860416" crc="d562c025" sha1="de7dae507b26a1ef80b6ee70bb1e59ce5197b10d"/>
 			</dataarea>
 		</part>
 	</software>

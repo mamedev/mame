@@ -902,7 +902,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	char name_buf[256];
 	snprintf(name_buf, 255, "0x%08x.png", raw_offset);
 	auto const filerr = file.open(name_buf);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		return;
 	}
@@ -1029,7 +1029,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 		snprintf(name_buf, 255, "0x%08x.json", raw_offset);
 		auto const jsonerr = json.open(name_buf);
-		if (jsonerr != osd_file::error::NONE)
+		if (jsonerr)
 		{
 			return;
 		}

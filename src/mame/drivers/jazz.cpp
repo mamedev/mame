@@ -282,8 +282,7 @@ static void jazz_scsi_devices(device_slot_interface &device)
 
 void jazz_state::jazz(machine_config &config)
 {
-	// FIXME: slow the cpu clock to get past session manager bugcheck
-	R4000(config, m_cpu, 50_MHz_XTAL / 5);
+	R4000(config, m_cpu, 50_MHz_XTAL);
 	m_cpu->set_addrmap(0, &jazz_state::cpu_map);
 
 	RAM(config, m_ram);

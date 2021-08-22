@@ -134,13 +134,13 @@ void media_identifier::collect_files(std::vector<file_info> &info, char const *p
 	{
 		// first attempt to examine it as a valid zip/7z file
 		util::archive_file::ptr archive;
-		util::archive_file::error err;
+		std::error_condition err;
 		if (core_filename_ends_with(path, ".7z"))
 			err = util::archive_file::open_7z(path, archive);
 		else
 			err = util::archive_file::open_zip(path, archive);
 
-		if ((util::archive_file::error::NONE == err) && archive)
+		if (!err && archive)
 		{
 			std::vector<std::uint8_t> data;
 
@@ -158,10 +158,10 @@ void media_identifier::collect_files(std::vector<file_info> &info, char const *p
 						{
 							data.resize(std::size_t(length));
 							err = archive->decompress(&data[0], std::uint32_t(length));
-							if (util::archive_file::error::NONE == err)
+							if (!err)
 								digest_data(info, curfile.c_str(), &data[0], length);
 							else
-								osd_printf_error("%s: error decompressing file\n", curfile);
+								osd_printf_error("%s: error decompressing file (%s:%d %s)\n", curfile, err.category().name(), err.value(), err.message());
 						}
 						catch (...)
 						{
@@ -205,16 +205,16 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 	{
 		// attempt to open as a CHD; fail if not
 		chd_file chd;
-		chd_error const err = chd.open(path);
+		std::error_condition const err = chd.open(path);
 		m_total++;
-		if (err != CHDERR_NONE)
+		if (err)
 		{
-			osd_printf_info("%-20sNOT A CHD\n", core_filename_extract_base(path));
+			osd_printf_info("%-20s NOT A CHD\n", core_filename_extract_base(path));
 			m_nonroms++;
 		}
 		else if (!chd.compressed())
 		{
-			osd_printf_info("%-20sis a writeable CHD\n", core_filename_extract_base(path));
+			osd_printf_info("%-20s is a writeable CHD\n", core_filename_extract_base(path));
 		}
 		else
 		{
@@ -233,7 +233,7 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 			// load the file and process if it opens and has a valid length
 			uint32_t length;
 			void *data;
-			if (osd_file::error::NONE == util::core_file::load(path, &data, length))
+			if (!util::core_file::load(path, &data, length))
 			{
 				jed_data jed;
 				if (JEDERR_NONE == jed_parse(data, length, &jed))
@@ -260,7 +260,7 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 
 		// load the file and process if it opens and has a valid length
 		util::core_file::ptr file;
-		if ((osd_file::error::NONE == util::core_file::open(path, OPEN_FLAG_READ, file)) && file)
+		if (!util::core_file::open(path, OPEN_FLAG_READ, file) && file)
 		{
 			util::hash_collection hashes;
 			hashes.begin(util::hash_collection::HASH_TYPES_CRC_SHA1);
@@ -404,7 +404,7 @@ void media_identifier::print_results(std::vector<file_info> const &info)
 {
 	for (file_info const &file : info)
 	{
-		osd_printf_info("%-20s", core_filename_extract_base(file.name()));
+		osd_printf_info("%-20s ", core_filename_extract_base(file.name()));
 		if (file.matches().empty())
 		{
 			osd_printf_info("NO MATCH\n");
@@ -416,10 +416,10 @@ void media_identifier::print_results(std::vector<file_info> const &info)
 			for (match_data const &match : file.matches())
 			{
 				if (!first)
-					osd_printf_info("%-20s", "");
+					osd_printf_info("%-20s ", "");
 				first = false;
 				osd_printf_info(
-						"= %s%-20s  %-10s %s%s\n",
+						"= %s%-20s  %-10s  %s%s\n",
 						match.bad() ? "(BAD) " : "",
 						match.romname().c_str(),
 						match.shortname().c_str(),
