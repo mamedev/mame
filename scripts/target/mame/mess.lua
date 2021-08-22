@@ -4601,7 +4601,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/micromon.cpp",
 	MAME_DIR .. "src/mame/drivers/micronic.cpp",
 	MAME_DIR .. "src/mame/includes/micronic.h",
-	MAME_DIR .. "src/mame/drivers/microterm.cpp",
 	MAME_DIR .. "src/mame/drivers/mightyframe.cpp",
 	MAME_DIR .. "src/mame/drivers/milwaukee.cpp",
 	MAME_DIR .. "src/mame/drivers/mini2440.cpp",
