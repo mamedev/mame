@@ -9,7 +9,6 @@
 		<!ELEMENT description (#PCDATA)>
 		<!ELEMENT year (#PCDATA)>
 		<!ELEMENT publisher (#PCDATA)>
-		<!ELEMENT notes (#PCDATA)>
 		<!ELEMENT info EMPTY>
 			<!ATTLIST info name CDATA #REQUIRED>
 			<!ATTLIST info value CDATA #IMPLIED>
