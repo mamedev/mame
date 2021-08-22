@@ -6,7 +6,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/timer.h"
-#include "cpu/h8/h83002.h"
+#include "cpu/h8/h83003.h"
 #include "debug/debugcpu.h"
 #include "sound/beep.h"
 #include "machine/upd765.h"
@@ -117,7 +117,7 @@ public:
 
 private:
 	// devices
-	required_device<h83002_device> maincpu;
+	required_device<h83003_device> maincpu;
 	required_device<screen_device> screen;
 	required_device<gm82c765b_device> fdc;
 	required_device<beep_device> beeper;
@@ -340,7 +340,7 @@ static void lw840_floppies(device_slot_interface& device) {
 
 void lw840_state::lw840(machine_config& config) {
 	// basic machine hardware
-	H83002(config, maincpu, 14'745'600);
+	H83003(config, maincpu, 14'745'600);
 	maincpu->set_addrmap(AS_PROGRAM, &lw840_state::map_program);
 	maincpu->set_addrmap(AS_IO, &lw840_state::map_io);
 	maincpu->tend0().set("fdc", FUNC(gm82c765b_device::tc_line_w));
