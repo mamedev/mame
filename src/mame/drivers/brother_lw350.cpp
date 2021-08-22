@@ -1590,8 +1590,6 @@ void lw450_state::machine_start()
 {
 	membank("dictionary")->configure_entries(0, 4, memregion("dictionary")->base(), 0x20000);
 
-	screen->set_visible_area(0, 720 - 1, 0, 320 - 1);
-
 	palette->set_pen_color(0, rgb_t(0, 0, 0));
 	palette->set_pen_color(1, rgb_t(0xaa, 0xaa, 0xaa));
 	palette->set_pen_color(2, rgb_t(0xff, 0xff, 0xff));
