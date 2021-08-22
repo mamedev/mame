@@ -19,8 +19,6 @@ target_sources(formats PRIVATE
 	${MAME_DIR}/src/lib/formats/all.cpp
 	${MAME_DIR}/src/lib/formats/all.h
 
-	${MAME_DIR}/src/lib/formats/ioprocs.cpp
-	${MAME_DIR}/src/lib/formats/ioprocs.h
 	${MAME_DIR}/src/lib/formats/imageutl.cpp
 	${MAME_DIR}/src/lib/formats/imageutl.h
 

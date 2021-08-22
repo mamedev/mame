@@ -4164,6 +4164,8 @@ createMESSProjects(_target _subtarget "yamaha"
 	${MAME_DIR}/src/mame/drivers/ymmu50.cpp
 	${MAME_DIR}/src/mame/drivers/ymmu80.cpp
 	${MAME_DIR}/src/mame/drivers/ymmu100.cpp
+	${MAME_DIR}/src/mame/drivers/ympsr16.cpp
+	${MAME_DIR}/src/mame/drivers/ympsr40.cpp
 	${MAME_DIR}/src/mame/drivers/ympsr60.cpp
 	${MAME_DIR}/src/mame/drivers/ympsr340.cpp
 	${MAME_DIR}/src/mame/drivers/ymsy35.cpp
@@ -4297,6 +4299,7 @@ createMESSProjects(_target _subtarget "skeleton"
 	${MAME_DIR}/src/mame/drivers/gem_rp.cpp
 	${MAME_DIR}/src/mame/drivers/gigatron.cpp
 	${MAME_DIR}/src/mame/drivers/gimix.cpp
+	${MAME_DIR}/src/mame/drivers/gm1000.cpp
 	${MAME_DIR}/src/mame/drivers/gnat10.cpp
 	${MAME_DIR}/src/mame/drivers/goupil.cpp
 	${MAME_DIR}/src/mame/drivers/grfd2301.cpp

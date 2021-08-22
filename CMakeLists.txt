@@ -268,7 +268,7 @@ endif()
 # define MAME_DEBUG if we are a debugging build
 add_compile_definitions($<$<CONFIG:DEBUG>:MAME_DEBUG>)
 add_compile_definitions($<$<CONFIG:DEBUG>:MAME_PROFILER>)
-add_compile_definitions($<$<CONFIG:DEBUG>:BGFX_CONFIG_DEBUG=1>)
+#add_compile_definitions($<$<CONFIG:DEBUG>:BGFX_CONFIG_DEBUG=1>)
 
 if(PROFILER)
 	add_compile_definitions(MAME_PROFILER) # define MAME_PROFILER if we are a profiling build
@@ -694,7 +694,9 @@ if (TOOLS)
 		${MAME_DIR}/src/*.mm
 		${MAME_DIR}/hash/*.hsi
 		${MAME_DIR}/hash/*.xml
+		${MAME_DIR}/bgfx/*.json
 		${MAME_DIR}/plugins/*.lua
+		${MAME_DIR}/plugins/*.json
 		${MAME_DIR}/scripts/*.cmake
 	)
 	list(APPEND CLEARSRC_FILES ${MAME_DIR}/CMakeLists.txt)

@@ -4953,6 +4953,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/includes/oneshot.h
 	${MAME_DIR}/src/mame/video/oneshot.cpp
 	${MAME_DIR}/src/mame/drivers/onetwo.cpp
+	${MAME_DIR}/src/mame/drivers/opercoin.cpp
 	${MAME_DIR}/src/mame/drivers/othello.cpp
 	${MAME_DIR}/src/mame/drivers/pachifev.cpp
 	${MAME_DIR}/src/mame/drivers/pasha2.cpp

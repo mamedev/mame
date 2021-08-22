@@ -128,7 +128,6 @@ target_sources(ocore_${OSD} PRIVATE
 	${MAME_DIR}/src/osd/modules/lib/osdlib_macosx.cpp
 	${MAME_DIR}/src/osd/modules/lib/osdlib.h
 	${MAME_DIR}/src/osd/modules/file/posixdir.cpp
-	${MAME_DIR}/src/osd/modules/file/posixdomain.cpp
 	${MAME_DIR}/src/osd/modules/file/posixfile.cpp
 	${MAME_DIR}/src/osd/modules/file/posixfile.h
 	${MAME_DIR}/src/osd/modules/file/posixptty.cpp
