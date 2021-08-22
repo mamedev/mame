@@ -178,52 +178,52 @@ public:
 	void execute();
 	void abort();
 
-	uint8_t status_r() { return STR; }
+	uint8_t status_r() { return str; }
 	void abort_w(uint8_t data) { if(data == 0xff) abort(); else logerror("fdc:abort_w %02x is ignored %s\n", data, machine().describe_context()); }
 	void data_w(uint8_t data) { write(data); }
 	uint8_t data_r() { return read(); }
 
 protected:
-	uint8_t STR; // status register
-	uint8_t DTR; // data register
-	uint8_t CMD; // current command
+	uint8_t str; // status register
+	uint8_t dtr; // data register
+	uint8_t cmd; // current command
 	uint8_t parameter_cnt;
-	uint16_t DMA_cnt; // active DMA transfer; number of bytes left
-	off_t DMA_src; // current offset in floppy image for DMA transfer
+	uint16_t dma_cnt; // active DMA transfer; number of bytes left
+	off_t dma_src; // current offset in floppy image for DMA transfer
 
 	// command parameters
-	uint8_t HSL_US; // Head Select-Unit Select
-	uint8_t CA; // Cylinder Address (0-255)
-	uint8_t HA; // Head Address (0-1)
-	uint8_t SA; // Sector Address (1-255)
-	uint8_t RL; // Record Length (0-6) (p. 20)
-	uint8_t ESN; // End Sector Number (1-255; compare: 1-253)
-	uint8_t GSL; // Gap Skip Length
-	uint8_t MNL; // Meaning Length
+	uint8_t hsl_us; // Head Select-Unit Select
+	uint8_t ca; // Cylinder Address (0-255)
+	uint8_t ha; // Head Address (0-1)
+	uint8_t sa; // Sector Address (1-255)
+	uint8_t rl; // Record Length (0-6) (p. 20)
+	uint8_t esn; // End Sector Number (1-255; compare: 1-253)
+	uint8_t gsl; // Gap Skip Length
+	uint8_t mnl; // Meaning Length
 
 	// WRITE FORMAT
-	uint8_t SCNT; // Sector Count (1-255)
-	uint8_t GP3L; // Gap 3 Length (1-255)
-	uint8_t DUD; // Dummy Data (0-255)
+	uint8_t scnt; // Sector Count (1-255)
+	uint8_t gp3l; // Gap 3 Length (1-255)
+	uint8_t dud; // Dummy Data (0-255)
 
 	// SEEK
-	uint8_t NCN; // New Cylinder Number (0-255)
+	uint8_t ncn; // New Cylinder Number (0-255)
 
 	// COMPARE
-	uint8_t STEP; // Step (p. 23)
+	uint8_t step; // Step (p. 23)
 
 	// SPECIFY 1
-	uint8_t STR_HDUT; // Stepping Rate-Head Unload Time (p. 23)
-	uint8_t HDLT_NDM; // Head Load-Time-Non-DMA Mode (p. 25)
+	uint8_t str_hdut; // Stepping Rate-Head Unload Time (p. 23)
+	uint8_t hdlt_ndm; // Head Load-Time-Non-DMA Mode (p. 25)
 
 	// SPECIFY 2
-	uint8_t LCTK; // Low Current Track
-	uint8_t PC1_PC0; // Precompensation Delay 1, 0
-	uint8_t PCDCT; // Precompensation Delay Change Track
+	uint8_t lctk; // Low Current Track
+	uint8_t pc1_pc0; // Precompensation Delay 1, 0
+	uint8_t pcdct; // Precompensation Delay Change Track
 
 	// result parameters
-	uint8_t SSB0, SSB1, SSB2, SSB3; // (p. 28ff)
-	uint8_t PCN; // physical cylinder number
+	uint8_t ssb0, ssb1, ssb2, ssb3; // (p. 28ff)
+	uint8_t pcn; // physical cylinder number
 
 	devcb_write_line irq_cb, dreq_cb;
 	devcb_read_line dend_cb;
@@ -374,48 +374,48 @@ void hd63266f_t::device_start()
 
 void hd63266f_t::reset()
 {
-	STR = FDC_STATUSM_TXR;
-	CMD = 0x00;
+	str = FDC_STATUSM_TXR;
+	cmd = 0x00;
 	parameter_cnt = 0;
-	DMA_cnt = 0;
-	HSL_US = CA = HA = SA = RL = ESN = GSL = MNL = 0;
-	SCNT = GP3L = DUD = 0;
-	NCN = 0;
-	STEP = 0;
-	STR_HDUT = 0; HDLT_NDM = 0;
-	LCTK = PC1_PC0 = PCDCT = 0;
-	SSB0 = SSB1 = SSB2 = SSB3 = 0;
-	PCN = 0;
+	dma_cnt = 0;
+	hsl_us = ca = ha = sa = rl = esn = gsl = mnl = 0;
+	scnt = gp3l = dud = 0;
+	ncn = 0;
+	step = 0;
+	str_hdut = 0; hdlt_ndm = 0;
+	lctk = pc1_pc0 = pcdct = 0;
+	ssb0 = ssb1 = ssb2 = ssb3 = 0;
+	pcn = 0;
 }
 
 void hd63266f_t::write(uint8_t data)
 {
 	bool input_done = false;
-	auto oldSTR = STR;
+	auto oldSTR = str;
 
-	if(DMA_cnt) {
+	if(dma_cnt) {
 		auto length = floppy && floppy->is_open() ? floppy->length() : 0;
 		auto buffer = static_cast<uint8_t*>(floppy && floppy->is_open() ? floppy->image.get() : nullptr);
 
-		if(buffer && DMA_src < length) {
-			switch(CMD & 0x1f) {
+		if(buffer && dma_src < length) {
+			switch(cmd & 0x1f) {
 			case FDC_COMMAND_WRITE_DATA:
 			case FDC_COMMAND_WRITE_DELETED_DATA:
-				DMA_cnt--;
+				dma_cnt--;
 				if(dend_cb()) {
-					logerror("fdc: ~TEND0 asserted; stopping DMA; DMA_cnt=%04x %s\n", DMA_cnt, machine().describe_context());
-					DMA_cnt = 0;
+					logerror("fdc: ~TEND0 asserted; stopping DMA; DMA_cnt=%04x %s\n", dma_cnt, machine().describe_context());
+					dma_cnt = 0;
 				}
-				logerror("fdc: read DMA; DMA_cnt=%04x DMA_src=%08x %s\n", DMA_cnt, DMA_src, machine().describe_context());
-				if(DMA_cnt == 0) {
+				logerror("fdc: read DMA; DMA_cnt=%04x DMA_src=%08x %s\n", dma_cnt, dma_src, machine().describe_context());
+				if(dma_cnt == 0) {
 					// indicate result is ready
-					STR = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
+					str = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
 					if(!irq_cb.isnull()) irq_cb(true);
 				} else {
 					// notify DMA to write the next byte
 					dreq_cb(true);
 				}
-				buffer[DMA_src++] = data;
+				buffer[dma_src++] = data;
 				floppy->dirty = true;
 				break;
 			default:
@@ -427,13 +427,13 @@ void hd63266f_t::write(uint8_t data)
 			return;
 		}
 	} else {
-		if(!(STR & FDC_STATUSM_BSY)) {
+		if(!(str & FDC_STATUSM_BSY)) {
 			// write command code
-			CMD = data;
-			STR |= FDC_STATUSM_BSY;
-			STR &= ~FDC_STATUSM_TXR;
+			cmd = data;
+			str |= FDC_STATUSM_BSY;
+			str &= ~FDC_STATUSM_TXR;
 
-			switch(CMD & 0x1f) {
+			switch(cmd & 0x1f) {
 			case FDC_COMMAND_CHECK_INTERRUPT_STATUS:
 			case FDC_COMMAND_SLEEP:
 			case FDC_COMMAND_ABORT:
@@ -442,13 +442,13 @@ void hd63266f_t::write(uint8_t data)
 			default:
 				// ready to receive command parameters
 				parameter_cnt = 0;
-				STR |= FDC_STATUSM_TXR;
+				str |= FDC_STATUSM_TXR;
 				break;
 			}
-			logerror("fdc:write_cmd(%02x) STR=%02x => %02x %s\n", data, oldSTR, STR, machine().describe_context());
+			logerror("fdc:write_cmd(%02x) STR=%02x => %02x %s\n", data, oldSTR, str, machine().describe_context());
 		} else {
 			// write command parameter
-			switch(CMD & 0x1f) {
+			switch(cmd & 0x1f) {
 			case FDC_COMMAND_READ_DATA:
 			case FDC_COMMAND_READ_DELETED_DATA:
 			case FDC_COMMAND_READ_ERRONEOUS_DATA:
@@ -457,14 +457,14 @@ void hd63266f_t::write(uint8_t data)
 			case FDC_COMMAND_READ_LONG:
 			case FDC_COMMAND_WRITE_LONG:
 				switch(parameter_cnt) {
-				case 0: HSL_US = data; break;
-				case 1: CA = data; break;
-				case 2: HA = data; break;
-				case 3: SA = data; break;
-				case 4: RL = data; break;
-				case 5: ESN = data; break;
-				case 6: GSL = data; break;
-				case 7: MNL = data; input_done = true; break;
+				case 0: hsl_us = data; break;
+				case 1: ca = data; break;
+				case 2: ha = data; break;
+				case 3: sa = data; break;
+				case 4: rl = data; break;
+				case 5: esn = data; break;
+				case 6: gsl = data; break;
+				case 7: mnl = data; input_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
@@ -472,24 +472,24 @@ void hd63266f_t::write(uint8_t data)
 			case FDC_COMMAND_RECALIBRATE:
 			case FDC_COMMAND_CHECK_DEVICE_STATUS:
 				switch(parameter_cnt) {
-				case 0: HSL_US = data; input_done = true; break;
+				case 0: hsl_us = data; input_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_WRITE_FORMAT:
 				switch(parameter_cnt) {
-				case 0: HSL_US = data; break;
-				case 1: RL = data; break;
-				case 2: SCNT = data; break;
-				case 3: GP3L = data; break;
-				case 4: DUD = data; input_done = true; break;
+				case 0: hsl_us = data; break;
+				case 1: rl = data; break;
+				case 2: scnt = data; break;
+				case 3: gp3l = data; break;
+				case 4: dud = data; input_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_SEEK:
 				switch(parameter_cnt) {
-				case 0: HSL_US = data; break;
-				case 1: NCN = data; input_done = true; break;
+				case 0: hsl_us = data; break;
+				case 1: ncn = data; input_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
@@ -497,14 +497,14 @@ void hd63266f_t::write(uint8_t data)
 			case FDC_COMMAND_COMPARE_LOW_OR_EQUAL:
 			case FDC_COMMAND_COMPARE_HIGH_OR_EQUAL:
 				switch(parameter_cnt) {
-				case 0: HSL_US = data; break;
-				case 1: CA = data; break;
-				case 2: HA = data; break;
-				case 3: SA = data; break;
-				case 4: RL = data; break;
-				case 5: ESN = data; break;
-				case 6: GSL = data; break;
-				case 7: STEP = data; input_done = true; break;
+				case 0: hsl_us = data; break;
+				case 1: ca = data; break;
+				case 2: ha = data; break;
+				case 3: sa = data; break;
+				case 4: rl = data; break;
+				case 5: esn = data; break;
+				case 6: gsl = data; break;
+				case 7: step = data; input_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
@@ -516,18 +516,18 @@ void hd63266f_t::write(uint8_t data)
 				break;
 			case FDC_COMMAND_SPECIFY_1:
 				switch(parameter_cnt) {
-				case 0: STR_HDUT = data; break;
-				case 1: HDLT_NDM = data; input_done = true; break;
+				case 0: str_hdut = data; break;
+				case 1: hdlt_ndm = data; input_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_SPECIFY_2:
 				switch(parameter_cnt) {
-				case 0: STR_HDUT = data; break;
-				case 1: HDLT_NDM = data; break;
-				case 2: LCTK = data; break;
-				case 3: PC1_PC0 = data; break;
-				case 4: PCDCT = data; input_done = true; break;
+				case 0: str_hdut = data; break;
+				case 1: hdlt_ndm = data; break;
+				case 2: lctk = data; break;
+				case 3: pc1_pc0 = data; break;
+				case 4: pcdct = data; input_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
@@ -536,9 +536,9 @@ void hd63266f_t::write(uint8_t data)
 			// ready to receive command parameters
 			parameter_cnt++;
 			if(!input_done)
-				STR |= FDC_STATUSM_TXR;
+				str |= FDC_STATUSM_TXR;
 
-			logerror("fdc:write_param(%02x) STR=%02x => %02x %s\n", data, oldSTR, STR, machine().describe_context());
+			logerror("fdc:write_param(%02x) STR=%02x => %02x %s\n", data, oldSTR, str, machine().describe_context());
 		}
 		if(input_done)
 			execute();
@@ -549,32 +549,32 @@ uint8_t hd63266f_t::read()
 {
 	bool output_done = false;
 
-	auto oldSTR = STR;
+	auto oldSTR = str;
 
-	if(DMA_cnt) {
+	if(dma_cnt) {
 		auto length = floppy && floppy->is_open() ? floppy->length() : 0;
 		auto buffer = static_cast<uint8_t*>(floppy && floppy->is_open() ? floppy->image.get() : nullptr);
 
-		if(buffer && DMA_src < length) {
-			switch(CMD & 0x1f) {
+		if(buffer && dma_src < length) {
+			switch(cmd & 0x1f) {
 			case FDC_COMMAND_READ_DATA:
 			case FDC_COMMAND_READ_DELETED_DATA:
 			case FDC_COMMAND_READ_ERRONEOUS_DATA:
-				DMA_cnt--;
+				dma_cnt--;
 				if(dend_cb()) {
-					logerror("fdc: ~TEND0 asserted; stopping DMA; DMA_cnt=%04x %s\n", DMA_cnt, machine().describe_context());
-					DMA_cnt = 0;
+					logerror("fdc: ~TEND0 asserted; stopping DMA; DMA_cnt=%04x %s\n", dma_cnt, machine().describe_context());
+					dma_cnt = 0;
 				}
 				//logerror("fdc: read DMA; DMA_cnt=%04x DMA_src=%08x %s\n", DMA_cnt, DMA_src, machine().describe_context());
-				if(DMA_cnt == 0) {
+				if(dma_cnt == 0) {
 					// indicate result is ready
-					STR = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
+					str = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
 					if(!irq_cb.isnull()) irq_cb(true);
 				} else {
 					// notify DMA that next byte is ready
 					dreq_cb(true);
 				}
-				return buffer[DMA_src++];
+				return buffer[dma_src++];
 				break;
 			default:
 				logerror("fdc: DMA active for unknown command %s\n", machine().describe_context());
@@ -586,8 +586,8 @@ uint8_t hd63266f_t::read()
 		}
 	} else {
 		// read result parameters
-		if((STR & (FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY)) == (FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY)) {
-			switch(CMD & 0x1f) {
+		if((str & (FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY)) == (FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY)) {
+			switch(cmd & 0x1f) {
 			case FDC_COMMAND_READ_DATA:
 			case FDC_COMMAND_READ_DELETED_DATA:
 			case FDC_COMMAND_READ_ERRONEOUS_DATA:
@@ -601,13 +601,13 @@ uint8_t hd63266f_t::read()
 			case FDC_COMMAND_READ_LONG:
 			case FDC_COMMAND_WRITE_LONG:
 				switch(parameter_cnt) {
-				case 0: DTR = SSB0; break;
-				case 1: DTR = SSB1; break;
-				case 2: DTR = SSB2; break;
-				case 3: DTR = CA; break;
-				case 4: DTR = HA; break;
-				case 5: DTR = SA; break;
-				case 6: DTR = RL; output_done = true; break;
+				case 0: dtr = ssb0; break;
+				case 1: dtr = ssb1; break;
+				case 2: dtr = ssb2; break;
+				case 3: dtr = ca; break;
+				case 4: dtr = ha; break;
+				case 5: dtr = sa; break;
+				case 6: dtr = rl; output_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
@@ -622,66 +622,66 @@ uint8_t hd63266f_t::read()
 			case FDC_COMMAND_CHECK_DEVICE_STATUS:
 			default: // INVALID
 				switch(parameter_cnt) {
-				case 0: DTR = SSB3; output_done = true; break;
+				case 0: dtr = ssb3; output_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_CHECK_INTERRUPT_STATUS:
 				switch(parameter_cnt) {
-				case 0: DTR = SSB0; break;
-				case 1: DTR = PCN; output_done = true; break;
+				case 0: dtr = ssb0; break;
+				case 1: dtr = pcn; output_done = true; break;
 				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			}
 			parameter_cnt++;
 
-			STR &= ~FDC_STATUSM_TXR;
-			STR &= ~FDC_STATUSM_DIR;
+			str &= ~FDC_STATUSM_TXR;
+			str &= ~FDC_STATUSM_DIR;
 			if(!irq_cb.isnull()) irq_cb(false);
 
 			if(output_done) {
 				// enter command waiting state
-				STR |= FDC_STATUSM_TXR;
-				STR &= ~FDC_STATUSM_BSY;
+				str |= FDC_STATUSM_TXR;
+				str &= ~FDC_STATUSM_BSY;
 			} else {
 				// signal next result parameter is ready
-				STR |= FDC_STATUSM_TXR;
-				STR |= FDC_STATUSM_DIR;
+				str |= FDC_STATUSM_TXR;
+				str |= FDC_STATUSM_DIR;
 			}
 		}
 	}
 
-	logerror("fdc:read STR=%02x => %02x %s\n", oldSTR, STR, machine().describe_context());
+	logerror("fdc:read STR=%02x => %02x %s\n", oldSTR, str, machine().describe_context());
 
-	return DTR;
+	return dtr;
 }
 
 void hd63266f_t::execute()
 {
-	SSB0 = SSB1 = SSB2 = SSB3 = 0;
+	ssb0 = ssb1 = ssb2 = ssb3 = 0;
 
-	auto oldSTR = STR;
+	auto oldSTR = str;
 
 	auto readwrite_params = [this] {
-		return string_format("HSL_US=%02x CA=%02x HA=%02x SA=%02x RL=%02x ESN=%02x GSL=%02x MNL=%02x", HSL_US, CA, HA, SA, RL, ESN, GSL, MNL);
+		return string_format("HSL_US=%02x CA=%02x HA=%02x SA=%02x RL=%02x ESN=%02x GSL=%02x MNL=%02x", hsl_us, ca, ha, sa, rl, esn, gsl, mnl);
 	};
 
 	auto length = floppy && floppy->is_open() ? floppy->length() : 0;
 	auto buffer = floppy && floppy->is_open() ? floppy->image.get() : nullptr;
 
 	// do something
-	switch(CMD & 0x1f) {
+	switch(cmd & 0x1f) {
 	case FDC_COMMAND_READ_DATA: {
 		// 720kb  floppy: 80 cylinders, 2 heads,  9 each 512b sectors per track
 		// 1.44mb floppy: 80 cylinders, 2 heads, 18 each 512b sectors per track
-		auto sector_length = 128 << (RL & 0b111);
-		auto sectors_per_track = (STR_HDUT >> 4) == 0xa ? 18 : 9; // detect 1.44mb/720kb mode; based on LW-350 code
-		DMA_src = (((CA << 1) | (HA & 1)) * sectors_per_track + SA - 1) * sector_length;
-		DMA_cnt = (ESN - SA - 1 + 1) * sector_length;
-		STR = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
+		auto sector_length = 128 << (rl & 0b111);
+		auto sectors_per_track = (str_hdut >> 4) == 0xa ? 18 : 9; // detect 1.44mb/720kb mode; based on LW-350 code
+		dma_src = (((ca << 1) | (ha & 1)) * sectors_per_track + sa - 1) * sector_length;
+		dma_cnt = (esn - sa - 1 + 1) * sector_length;
+		str = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
 		dreq_cb(true);
-		logerror("%s: fdc: execute: READ DATA; %s DMA_cnt=%04x DMC_src=%08x\n", machine().describe_context(), readwrite_params(), DMA_cnt, DMA_src);
+		logerror("%s: fdc: execute: READ DATA; %s DMA_cnt=%04x DMC_src=%08x\n", machine().describe_context(), readwrite_params(), dma_cnt, dma_src);
 		break;
 	}
 	case FDC_COMMAND_READ_DELETED_DATA:
@@ -694,44 +694,44 @@ void hd63266f_t::execute()
 		logerror("%s: fdc: execute: READ ID\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_WRITE_DATA: {
-		auto sector_length = 128 << (RL & 0b111);
-		auto sectors_per_track = (STR_HDUT >> 4) == 0xa ? 18 : 9; // detect 1.44mb/720kb mode; based on LW-350 code
-		DMA_src = (((CA << 1) | (HA & 1)) * sectors_per_track + SA - 1) * sector_length;
-		DMA_cnt = (ESN - SA - 1 + 1) * sector_length;
-		STR = FDC_STATUSM_TXR | FDC_STATUSM_BSY;
+		auto sector_length = 128 << (rl & 0b111);
+		auto sectors_per_track = (str_hdut >> 4) == 0xa ? 18 : 9; // detect 1.44mb/720kb mode; based on LW-350 code
+		dma_src = (((ca << 1) | (ha & 1)) * sectors_per_track + sa - 1) * sector_length;
+		dma_cnt = (esn - sa - 1 + 1) * sector_length;
+		str = FDC_STATUSM_TXR | FDC_STATUSM_BSY;
 		dreq_cb(true);
-		logerror("%s: fdc: execute: WRITE DATA; %s DMA_cnt=%04x DMC_src=%08x\n", machine().describe_context(), readwrite_params(), DMA_cnt, DMA_src);
+		logerror("%s: fdc: execute: WRITE DATA; %s DMA_cnt=%04x DMC_src=%08x\n", machine().describe_context(), readwrite_params(), dma_cnt, dma_src);
 		break;
 	}
 	case FDC_COMMAND_WRITE_DELETED_DATA:
 		logerror("%s: fdc: execute: WRITE DELETED DATA; %s\n", machine().describe_context(), readwrite_params());
 		break;
 	case FDC_COMMAND_WRITE_FORMAT: {
-		auto sector_length = 128 << (RL & 0b111);
-		auto sectors_per_track = (STR_HDUT >> 4) == 0xa ? 18 : 9; // detect 1.44mb/720kb mode; based on LW-350 code
-		auto dst = ((PCN << 1) | ((HSL_US & 0b100) >> 2)) * sectors_per_track * sector_length;
-		auto cnt = SCNT * sector_length >> 1; // not sure why >> 1, but matches how it's called
-		logerror("%s: fdc: execute: WRITE FORMAT; HSL_US=%02x PCN=%02x SCNT=%02x RL=%02x DUD=%02x cnt=%04x ofs=%08x\n", machine().describe_context(), HSL_US, PCN, SCNT, RL, DUD, cnt, dst);
+		auto sector_length = 128 << (rl & 0b111);
+		auto sectors_per_track = (str_hdut >> 4) == 0xa ? 18 : 9; // detect 1.44mb/720kb mode; based on LW-350 code
+		auto dst = ((pcn << 1) | ((hsl_us & 0b100) >> 2)) * sectors_per_track * sector_length;
+		auto cnt = scnt * sector_length >> 1; // not sure why >> 1, but matches how it's called
+		logerror("%s: fdc: execute: WRITE FORMAT; HSL_US=%02x PCN=%02x SCNT=%02x RL=%02x DUD=%02x cnt=%04x ofs=%08x\n", machine().describe_context(), hsl_us, pcn, scnt, rl, dud, cnt, dst);
 		while(cnt--) {
 			if(dst < length)
-				buffer[dst++] = DUD;
+				buffer[dst++] = dud;
 		}
 		break;
 	}
 	case FDC_COMMAND_SEEK:
-		logerror("%s: fdc: execute: SEEK NCN=%d\n", machine().describe_context(), NCN);
-		SSB0 |= FDC_SSB0M_SED;
-		PCN = NCN;
-		if(NCN == 0)
-			SSB3 |= FDC_SSB3M_TRZ;
+		logerror("%s: fdc: execute: SEEK NCN=%d\n", machine().describe_context(), ncn);
+		ssb0 |= FDC_SSB0M_SED;
+		pcn = ncn;
+		if(ncn == 0)
+			ssb3 |= FDC_SSB3M_TRZ;
 		else
-			SSB3 &= ~FDC_SSB3M_TRZ;
+			ssb3 &= ~FDC_SSB3M_TRZ;
 		break;
 	case FDC_COMMAND_RECALIBRATE:
 		logerror("%s: fdc: execute: RECALIBRATE\n", machine().describe_context());
-		SSB0 |= FDC_SSB0M_SED;
-		SSB3 |= FDC_SSB3M_TRZ;
-		PCN = 0;
+		ssb0 |= FDC_SSB0M_SED;
+		ssb3 |= FDC_SSB3M_TRZ;
+		pcn = 0;
 		break;
 	case FDC_COMMAND_COMPARE_EQUAL:
 		logerror("%s: fdc: execute: COMPARE EQUAL\n", machine().describe_context());
@@ -747,7 +747,7 @@ void hd63266f_t::execute()
 		break;
 	case FDC_COMMAND_CHECK_INTERRUPT_STATUS:
 		logerror("%s: fdc: execute: CHECK INTERRUPT STATUS\n", machine().describe_context());
-		SSB0 &= ~FDC_SSB0M_HSL;
+		ssb0 &= ~FDC_SSB0M_HSL;
 		break;
 	case FDC_COMMAND_SPECIFY_1:
 		logerror("%s: fdc: execute: SPECIFY 1\n", machine().describe_context());
@@ -769,20 +769,20 @@ void hd63266f_t::execute()
 		break;
 	}
 
-	SSB0 = FDC_SSB0M_INC_NOR;
-	SSB0 |= HSL_US & 0b11; // mirror US1, US0 from command parameters
-	SSB3 |= HSL_US & 0b111; // mirror HSL, US1, US0 from command parameters
+	ssb0 = FDC_SSB0M_INC_NOR;
+	ssb0 |= hsl_us & 0b11; // mirror US1, US0 from command parameters
+	ssb3 |= hsl_us & 0b111; // mirror HSL, US1, US0 from command parameters
 	if(floppy && floppy->loaded)
-		SSB3 |= FDC_SSB3M_RDY;
+		ssb3 |= FDC_SSB3M_RDY;
 	else {
-		SSB0 |= FDC_SSB0M_DNR;
-		SSB3 &= ~FDC_SSB3M_RDY;
+		ssb0 |= FDC_SSB0M_DNR;
+		ssb3 &= ~FDC_SSB3M_RDY;
 	}
 
 	parameter_cnt = 0;
 
-	if(!DMA_cnt) {
-		switch(CMD & 0x1f) {
+	if(!dma_cnt) {
+		switch(cmd & 0x1f) {
 		case FDC_COMMAND_SEEK:
 		case FDC_COMMAND_RECALIBRATE:
 		case FDC_COMMAND_SPECIFY_1:
@@ -790,7 +790,7 @@ void hd63266f_t::execute()
 		case FDC_COMMAND_SLEEP:
 		case FDC_COMMAND_ABORT:
 			// no result
-			STR = FDC_STATUSM_TXR;
+			str = FDC_STATUSM_TXR;
 			break;
 			//[[fallthrough]]
 			// no IRQ
@@ -798,12 +798,12 @@ void hd63266f_t::execute()
 		case FDC_COMMAND_CHECK_INTERRUPT_STATUS:
 		default: // INVALID
 			// indicate result is ready
-			STR = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
+			str = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
 			break;
 		}
 
 		// set IRQ to indicate result is ready
-		switch(CMD & 0x1f) {
+		switch(cmd & 0x1f) {
 		case FDC_COMMAND_CHECK_DEVICE_STATUS:
 		case FDC_COMMAND_CHECK_INTERRUPT_STATUS:
 			break;
@@ -814,15 +814,15 @@ void hd63266f_t::execute()
 		}
 	}
 
-	logerror("fdc:execute STR=%02x => %02x %s\n", oldSTR, STR, machine().describe_context());
+	logerror("fdc:execute STR=%02x => %02x %s\n", oldSTR, str, machine().describe_context());
 }
 
 void hd63266f_t::abort()
 {
-	auto oldSTR = STR;
+	auto oldSTR = str;
 	reset();
 
-	logerror("fdc:abort STR=%02x => %02x %s\n", oldSTR, STR, machine().describe_context());
+	logerror("fdc:abort STR=%02x => %02x %s\n", oldSTR, str, machine().describe_context());
 }
 
 class lw350_state : public driver_device
