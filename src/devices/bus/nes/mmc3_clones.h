@@ -569,6 +569,28 @@ private:
 };
 
 
+// ======================> nes_tech9in1_device
+
+class nes_tech9in1_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_tech9in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_l(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	void update_banks();
+	u8 m_reg[3];
+};
+
+
 // ======================> nes_bmc_8in1_device
 
 class nes_bmc_8in1_device : public nes_txrom_device
@@ -914,6 +936,7 @@ DECLARE_DEVICE_TYPE(NES_RESETTXROM0,   nes_resettxrom0_device)
 DECLARE_DEVICE_TYPE(NES_RESETTXROM1,   nes_resettxrom1_device)
 DECLARE_DEVICE_TYPE(NES_RESETTXROM2,   nes_resettxrom2_device)
 DECLARE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device)
+DECLARE_DEVICE_TYPE(NES_TECHLINE9IN1,  nes_tech9in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device)

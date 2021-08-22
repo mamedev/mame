@@ -305,6 +305,7 @@ static const nes_pcb pcb_list[] =
 	{ "resettxrom1",      BMC_RESETTXROM1 },
 	{ "resettxrom2",      BMC_RESETTXROM2 },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "tech9in1",         BMC_TECHLINE9IN1 },
 	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },

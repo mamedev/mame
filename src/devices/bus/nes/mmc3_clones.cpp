@@ -59,6 +59,7 @@ DEFINE_DEVICE_TYPE(NES_RESETTXROM0,   nes_resettxrom0_device,   "nes_resettxrom0
 DEFINE_DEVICE_TYPE(NES_RESETTXROM1,   nes_resettxrom1_device,   "nes_resettxrom1",   "NES Cart BMC RESET-TXROM 256K/128K PCB")
 DEFINE_DEVICE_TYPE(NES_RESETTXROM2,   nes_resettxrom2_device,   "nes_resettxrom2",   "NES Cart BMC RESET-TXROM 128K/256K PCB")
 DEFINE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device,    "nes_s24in1c03",     "NES Cart Super 24 in 1 SC-03 PCB")
+DEFINE_DEVICE_TYPE(NES_TECHLINE9IN1,  nes_tech9in1_device,      "nes_tech9in1",      "NES Cart Techline 9 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device,      "nes_bmc_8in1",      "NES Cart BMC GRM070 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device,     "nes_bmc_15in1",     "NES Cart BMC 15 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device,     "nes_bmc_sbig7",     "NES Cart BMC Super BIG 7 in 1 PCB")
@@ -245,6 +246,11 @@ nes_resettxrom2_device::nes_resettxrom2_device(const machine_config &mconfig, co
 
 nes_s24in1sc03_device::nes_s24in1sc03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_S24IN1SC03, tag, owner, clock)
+{
+}
+
+nes_tech9in1_device::nes_tech9in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_TECHLINE9IN1, tag, owner, clock)
 {
 }
 
@@ -582,6 +588,20 @@ void nes_s24in1sc03_device::pcb_reset()
 	m_reg[1] = 0x9f;
 	m_reg[2] = 0;
 	mmc3_common_initialize(0xff, 0xff, 0);
+}
+
+void nes_tech9in1_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_tech9in1_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_reg[0] = m_reg[1] = m_reg[2] = 0;
+	mmc3_common_initialize(0x1f, 0xff, 0);
 }
 
 void nes_bmc_8in1_device::pcb_reset()
@@ -2016,6 +2036,54 @@ void nes_s24in1sc03_device::write_l(offs_t offset, uint8_t data)
 	{
 		m_reg[2] = data;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+/*-------------------------------------------------
+
+ BMC-TECHLINE9IN1
+
+ Unknown Bootleg Multigame Board
+ Games: 9 in 1
+
+ NES 2.0: mapper 351
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_tech9in1_device::update_banks()
+{
+	if (BIT(m_reg[2], 7))    // NROM mode
+	{
+		u8 bank = m_reg[1] >> 2;
+		u8 mode = !BIT(m_reg[2], 6);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+	}
+	else                     // MMC3 mode
+	{
+		m_prg_base = (m_reg[1] & 0xfc) >> 1;
+		m_prg_mask = 0x1f >> BIT(m_reg[2], 5);
+		set_prg(m_prg_base, m_prg_mask);
+	}
+
+	m_chr_base = (m_reg[0] & 0xfc) << 1;
+	m_chr_mask = BIT(m_reg[2], 7) ? 0x1f : 0xff >> BIT(m_reg[2], 5);
+	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+}
+
+void nes_tech9in1_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("tech9in1 write_l, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+
+	switch (offset & 0x1003)    // writes $5000-$5002, mask is a best guess
+	{
+		case 0x1000: case 0x1001: case 0x1002:
+			m_reg[offset & 3] = data;
+			update_banks();
+			break;
 	}
 }
 
