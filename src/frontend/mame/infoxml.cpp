@@ -1214,6 +1214,8 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		CTRL_DIGITAL_MAHJONG,
 		CTRL_DIGITAL_HANAFUDA,
 		CTRL_DIGITAL_GAMBLING,
+		CTRL_DIGITAL_COIN,
+		CTRL_DIGITAL_SERVICE,
 		CTRL_COUNT
 	};
 
@@ -1238,6 +1240,9 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	const uint8_t DIR_LEFT = 0x04;
 	const uint8_t DIR_RIGHT = 0x08;
 
+	// TODO: Can we intelligently gauge max btn counts for devices? interpro.cpp seems to max us out with 145.
+	const int arraysize = 200;
+
 	// initialize the list of control types
 	struct
 	{
@@ -1254,6 +1259,51 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		int32_t           sensitivity;    // default analog sensitivity
 		int32_t           keydelta;       // default analog keydelta
 		bool            reverse;        // default analog reverse setting
+
+		const char * 	tag;
+		int32_t 		defvalue;
+		int32_t 		mask;
+
+		int32_t 		mask_x;
+		int32_t 		mask_y;
+		int32_t 		mask_z;
+		int32_t 		mask_up;
+		int32_t 		mask_down;
+		int32_t 		mask_left;
+		int32_t 		mask_right;
+
+		int32_t 		defvalue_x;
+		int32_t 		defvalue_y;
+		int32_t 		defvalue_z;
+		int32_t 		defvalue_left;
+		int32_t 		defvalue_right;
+		int32_t 		defvalue_up;
+		int32_t 		defvalue_down;
+
+		const char * 	tag_x;
+		const char * 	tag_y;
+		const char * 	tag_z;			
+		const char * 	tag_left;
+		const char * 	tag_right;
+		const char * 	tag_up;
+		const char * 	tag_down;
+
+		const char * 	name;
+		const char * 	name_x;
+		const char * 	name_y;
+		const char * 	name_z;
+		const char * 	name_up;
+		const char * 	name_down;
+		const char * 	name_left;
+		const char * 	name_right;
+
+		const char * 	button_tags[arraysize];
+		const char * 	button_names[arraysize];
+		int32_t 		button_masks[arraysize];
+		int32_t 		button_defvalues[arraysize];
+		bool 			button_requires[arraysize];
+		int32_t 		button_indexes[arraysize];
+		int32_t 		button_index = 0;
 	} control_info[CTRL_COUNT * CTRL_PCOUNT];
 
 	memset(&control_info, 0, sizeof(control_info));
@@ -1268,6 +1318,8 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	for (auto &port : portlist)
 	{
 		int ctrl_type = CTRL_DIGITAL_BUTTONS;
+		int last_ctrl_type = CTRL_DIGITAL_BUTTONS;
+											
 		bool ctrl_analog = false;
 		for (ioport_field const &field : port.second->fields())
 		{
@@ -1285,6 +1337,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_UP;
+				
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_up = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_up = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_up = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_up = field.specific_name();
 				break;
 			case IPT_JOYSTICK_DOWN:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
@@ -1292,6 +1349,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_DOWN;
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_down = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_down = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_down = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_down = field.specific_name();
 				break;
 			case IPT_JOYSTICK_LEFT:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
@@ -1299,6 +1361,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_LEFT;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_left = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_left = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_left = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_left = field.specific_name();
 				break;
 			case IPT_JOYSTICK_RIGHT:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
@@ -1306,6 +1373,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_RIGHT;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_right = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_right = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_right = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_right = field.specific_name();
 				break;
 
 			case IPT_JOYSTICKLEFT_UP:
@@ -1314,27 +1386,50 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_UP;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_up = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_up = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_up = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_up = field.specific_name();
 				break;
+
 			case IPT_JOYSTICKLEFT_DOWN:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_DOWN;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_down = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_down = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_down = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_down = field.specific_name();
 				break;
+
 			case IPT_JOYSTICKLEFT_LEFT:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_LEFT;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_left = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_left = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_left = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_left = field.specific_name();
 				break;
+
 			case IPT_JOYSTICKLEFT_RIGHT:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_RIGHT;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_right = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_right = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_right = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_right = field.specific_name();
 				break;
 
 			case IPT_JOYSTICKRIGHT_UP:
@@ -1343,27 +1438,50 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_UP;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_up = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_up = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_up = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_up = field.specific_name();
 				break;
+
 			case IPT_JOYSTICKRIGHT_DOWN:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_DOWN;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_down = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_down = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_down = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_down = field.specific_name();
 				break;
+
 			case IPT_JOYSTICKRIGHT_LEFT:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_LEFT;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_left = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_left = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_left = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_left = field.specific_name();
 				break;
+
 			case IPT_JOYSTICKRIGHT_RIGHT:
 				ctrl_type = CTRL_DIGITAL_JOYSTICK;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
 				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_RIGHT;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag_right = port.second->tag();
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask_right = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_right = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name_right = field.specific_name();
 				break;
 
 			// map analog inputs
@@ -1375,6 +1493,25 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "stick";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+				
+				if (field.type() == IPT_AD_STICK_X) {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_x = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_x = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_x = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_x = field.specific_name();
+				}
+				else if (field.type() == IPT_AD_STICK_Y) {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_y = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_y = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_y = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_y = field.specific_name();
+				}
+				else {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_z = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_z = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_z = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_z = field.specific_name();
+				}
 				break;
 
 			case IPT_PADDLE:
@@ -1384,6 +1521,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "paddle";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
 				break;
 
 			case IPT_PEDAL:
@@ -1394,6 +1536,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "pedal";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
 				break;
 
 			case IPT_LIGHTGUN_X:
@@ -1403,6 +1550,19 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "lightgun";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+				if (field.type() == IPT_LIGHTGUN_X) {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_x = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_x = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_x = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_x = field.specific_name();
+				}
+				else {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_y = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_y = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_y = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_y = field.specific_name();
+				}
 				break;
 
 			case IPT_POSITIONAL:
@@ -1412,6 +1572,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "positional";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
 				break;
 
 			case IPT_DIAL:
@@ -1421,6 +1586,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "dial";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
 				break;
 
 			case IPT_TRACKBALL_X:
@@ -1430,6 +1600,19 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "trackball";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+				if (field.type() == IPT_TRACKBALL_X) {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_x = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_x = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_x = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_x = field.specific_name();
+				}
+				else {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_y = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_y = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_y = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_y = field.specific_name();
+				}
 				break;
 
 			case IPT_MOUSE_X:
@@ -1439,6 +1622,19 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mouse";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+				if (field.type() == IPT_MOUSE_X) {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_x = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_x = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_x = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_x = field.specific_name();
+				}
+				else {
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_y = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_y = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_y = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_y = field.specific_name();
+				}
 				break;
 
 			// map buttons
@@ -1467,8 +1663,18 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				}
 				control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = std::max(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+				
 				if (!field.optional())
 					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+				
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_indexes[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.type() - IPT_BUTTON1 + 1;
+				
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
 				break;
 
 			// track maximum coin index
@@ -1485,6 +1691,15 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 			case IPT_COIN11:
 			case IPT_COIN12:
 				ncoin = std::max(ncoin, field.type() - IPT_COIN1 + 1);
+
+				ctrl_type = CTRL_DIGITAL_COIN;
+				control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].type = "coin";
+				control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].player = (field.type() - IPT_COIN1 + 1);
+				control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].analog = false;
+				control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+				control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].mask = field.mask();
+				control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+				control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].name = field.specific_name();
 				break;
 
 			// track presence of keypads and keyboards
@@ -1495,6 +1710,13 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
 				if (!field.optional())
 					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
 				break;
 
 			case IPT_KEYBOARD:
@@ -1504,11 +1726,27 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
 				if (!field.optional())
 					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
 				break;
 
 			// additional types
 			case IPT_SERVICE:
 				service = true;
+
+				ctrl_type = CTRL_DIGITAL_SERVICE;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "service";
+				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = false;
+				control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+				control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
 				break;
 
 			case IPT_TILT:
@@ -1524,6 +1762,13 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
 					if (!field.optional())
 						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
 				}
 				else if (field.type() > IPT_HANAFUDA_FIRST && field.type() < IPT_HANAFUDA_LAST)
 				{
@@ -1533,6 +1778,13 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
 					if (!field.optional())
 						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
 				}
 				else if (field.type() > IPT_GAMBLING_FIRST && field.type() < IPT_GAMBLING_LAST)
 				{
@@ -1542,6 +1794,13 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
 					if (!field.optional())
 						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
 				}
 				break;
 			}
@@ -1560,6 +1819,12 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (field.analog_reverse() != 0)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].reverse = true;
 			}
+
+			if (ctrl_type == CTRL_DIGITAL_COIN || ctrl_type == CTRL_DIGITAL_SERVICE)
+				ctrl_type = last_ctrl_type;
+			else
+				last_ctrl_type = ctrl_type;
+
 		}
 	}
 
@@ -1578,6 +1843,19 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[i * CTRL_COUNT + j].reqbuttons += control_info[i * CTRL_COUNT].reqbuttons;
 				control_info[i * CTRL_COUNT + j].maxbuttons = std::max(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
 
+				for (size_t k = 0; k < control_info[i * CTRL_COUNT].button_index; k++)
+				{
+					size_t inc = k + control_info[i * CTRL_COUNT + j].button_index;
+
+					control_info[i * CTRL_COUNT + j].button_masks[inc] = control_info[i * CTRL_COUNT].button_masks[k];
+					control_info[i * CTRL_COUNT + j].button_defvalues[inc] = control_info[i * CTRL_COUNT].button_defvalues[k];
+					control_info[i * CTRL_COUNT + j].button_names[inc] = control_info[i * CTRL_COUNT].button_names[k];
+					control_info[i * CTRL_COUNT + j].button_tags[inc] = control_info[i * CTRL_COUNT].button_tags[k];
+					control_info[i * CTRL_COUNT + j].button_requires[inc] = control_info[i * CTRL_COUNT].button_requires[k];
+					control_info[i * CTRL_COUNT + j].button_indexes[inc] = control_info[i * CTRL_COUNT].button_indexes[k];
+				}
+				control_info[i * CTRL_COUNT + j].button_index += control_info[i * CTRL_COUNT].button_index;
+	
 				memset(&control_info[i * CTRL_COUNT], 0, sizeof(control_info[0]));
 				fix_done = true;
 			}
@@ -1603,7 +1881,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 			if (elem.analog)
 			{
 				out << util::string_format("\t\t\t<control type=\"%s\"", normalize_string(elem.type));
-				if (nplayer > 1)
+				if (nplayer > 1 && normalize_string(elem.type).compare("service") != 0)
 					out << util::string_format(" player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
 				{
@@ -1611,6 +1889,134 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					if (elem.reqbuttons < elem.nbuttons)
 						out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
 				}
+				
+				bool manytags = false;
+
+				if (elem.tag_x != nullptr) {
+					std::string newtag(elem.tag_x), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_x=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_y != nullptr) {
+					std::string newtag(elem.tag_y), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_y=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_z != nullptr) {
+					std::string newtag(elem.tag_z), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_z=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_up != nullptr) {
+					std::string newtag(elem.tag_up), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_up=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_down != nullptr) {
+					std::string newtag(elem.tag_down), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_down=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_left != nullptr) {
+					std::string newtag(elem.tag_left), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_left=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_right != nullptr) {
+					std::string newtag(elem.tag_right), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_right=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (!manytags) {
+					if (elem.tag != nullptr) {
+						std::string newtag(elem.tag), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag=\"%s\"", newtag);
+					}
+				}
+				// Useful for debug:
+				//if (!manytags && elem.tag == nullptr && elem.tag_button == nullptr) {
+				//	out << util::string_format(" tag=\"TAG_NOT_FOUND\"");
+				//}
+
+				bool manynames = false;
+
+				if (elem.name_up != nullptr) {
+					out << util::string_format(" name_up=\"%s\"", normalize_string(elem.name_up));
+					manynames = true;
+				}
+				if (elem.name_down != nullptr) {
+					out << util::string_format(" name_down=\"%s\"", normalize_string(elem.name_down));
+					manynames = true;
+				}
+				if (elem.name_left != nullptr) {
+					out << util::string_format(" name_left=\"%s\"", normalize_string(elem.name_left));
+					manynames = true;
+				}
+				if (elem.name_x != nullptr) {
+					out << util::string_format(" name_x=\"%s\"", normalize_string(elem.name_x));
+					manynames = true;
+				}
+				if (elem.name_y != nullptr) {
+					out << util::string_format(" name_y=\"%s\"", normalize_string(elem.name_y));
+					manynames = true;
+				}
+				if (elem.name_z != nullptr) {
+					out << util::string_format(" name_z=\"%s\"", normalize_string(elem.name_z));
+					manynames = true;
+				}
+				if (!manynames && elem.name != nullptr)
+					out << util::string_format(" name=\"%s\"", normalize_string(elem.name));
+
+				bool manymasks = false;
+
+				if (elem.mask_up > 0) {
+					out << util::string_format(" mask_up=\"%d\"", elem.mask_up);
+					out << util::string_format(" value_up=\"%d\"", elem.defvalue_up);
+					manymasks = true;
+				}
+				if (elem.mask_left > 0) {
+					out << util::string_format(" mask_left=\"%d\"", elem.mask_left);
+					out << util::string_format(" value_left=\"%d\"", elem.defvalue_left);
+					manymasks = true;
+				}
+				if (elem.mask_right > 0) {
+					out << util::string_format(" mask_right=\"%d\"", elem.mask_right);
+					out << util::string_format(" value_right=\"%d\"", elem.defvalue_right);
+					manymasks = true;
+				}
+				if (elem.mask_down > 0) {
+					out << util::string_format(" mask_down=\"%d\"", elem.mask_down);
+					out << util::string_format(" value_down=\"%d\"", elem.defvalue_down);
+					manymasks = true;
+				}
+				if (elem.mask_x > 0) {
+					out << util::string_format(" mask_x=\"%d\"", elem.mask_x);
+					out << util::string_format(" value_x=\"%d\"", elem.defvalue_x);
+					manymasks = true;
+				}
+				if (elem.mask_y > 0) {
+					out << util::string_format(" mask_y=\"%d\"", elem.mask_y);
+					out << util::string_format(" value_y=\"%d\"", elem.defvalue_y);
+					manymasks = true;
+				}
+				if (elem.mask_z > 0) {
+					out << util::string_format(" mask_z=\"%d\"", elem.mask_z);
+					out << util::string_format(" value_z=\"%d\"", elem.defvalue_z);
+					manymasks = true;
+				}
+				if (!manymasks && elem.mask != 0) {
+					out << util::string_format(" mask=\"%d\"", elem.mask);
+					out << util::string_format(" value=\"%d\"", elem.defvalue);
+				}
+
 				if (elem.min != 0 || elem.max != 0)
 					out << util::string_format(" minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
 				if (elem.sensitivity != 0)
@@ -1620,7 +2026,41 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (elem.reverse)
 					out << " reverse=\"yes\"";
 
-				out << "/>\n";
+				if (elem.button_index == 0) {
+					out << "/>\n";
+				}
+				else {
+					out << ">\n";
+					
+					for (size_t i = 0; i < elem.button_index; i++)
+					{
+						out << "\t\t\t\t<button";
+
+						if (elem.button_indexes[i] != 0)
+							out << util::string_format(" number=\"%d\"", elem.button_indexes[i]);
+
+						if (elem.button_names[i] != nullptr)
+							out << util::string_format(" name=\"%d\"", elem.button_names[i]);
+
+						if (!elem.button_requires[i]) {
+							out << util::string_format(" optional=\"%d\"", "yes");
+						}
+
+						if (elem.button_tags[i] == nullptr) {
+							out << util::string_format(" tag=\"%d\"", "TAG_NOT_FOUND");
+						}
+						else {
+							std::string newtag(elem.button_tags[i]), oldtag(":");
+							newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+							out << util::string_format(" tag=\"%d\"", newtag);
+						}
+
+						out << util::string_format(" mask=\"%d\"", elem.button_masks[i]);
+						out << util::string_format(" value=\"%d\"", elem.button_defvalues[i]);
+						out << "/>\n";
+					}
+					out << "\t\t\t</control>\n";
+				}
 			}
 			else
 			{
@@ -1629,7 +2069,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (elem.helper[1] == 0 && elem.helper[2] != 0) { elem.helper[1] = elem.helper[2]; elem.helper[2] = 0; }
 				const char *joys = (elem.helper[2] != 0) ? "triple" : (elem.helper[1] != 0) ? "double" : "";
 				out << util::string_format("\t\t\t<control type=\"%s%s\"", joys, normalize_string(elem.type));
-				if (nplayer > 1)
+				if (nplayer > 1 && normalize_string(elem.type).compare("service") != 0)
 					out << util::string_format(" player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
 				{
@@ -1672,7 +2112,168 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					}
 					out << util::string_format(" ways%s=\"%s\"", plural, ways);
 				}
-				out << "/>\n";
+				
+				bool manytags = false;
+
+				if (elem.tag_x != nullptr) {
+					std::string newtag(elem.tag_x), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_x=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_y != nullptr) {
+					std::string newtag(elem.tag_y), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_y=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_z != nullptr) {
+					std::string newtag(elem.tag_z), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_z=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_up != nullptr) {
+					std::string newtag(elem.tag_up), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_up=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_down != nullptr) {
+					std::string newtag(elem.tag_down), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_down=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_left != nullptr) {
+					std::string newtag(elem.tag_left), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_left=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (elem.tag_right != nullptr) {
+					std::string newtag(elem.tag_right), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+					out << util::string_format(" tag_right=\"%s\"", newtag);
+					manytags = true;
+				}
+				if (!manytags) {
+					if (elem.tag != nullptr) {
+						std::string newtag(elem.tag), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag=\"%s\"", newtag);
+					}
+				}
+				// Useful for debug:
+				//if (!manytags && elem.mask != 0) {
+				//	out << util::string_format(" tag=\"TAG_NOT_FOUND\"");
+				//}
+
+				bool manynames = false;
+
+				if (elem.name_up != nullptr) {
+					out << util::string_format(" name_up=\"%s\"", normalize_string(elem.name_up));
+					manynames = true;
+				}
+				if (elem.name_down != nullptr) {
+					out << util::string_format(" name_down=\"%s\"", normalize_string(elem.name_down));
+					manynames = true;
+				}
+				if (elem.name_left != nullptr) {
+					out << util::string_format(" name_left=\"%s\"", normalize_string(elem.name_left));
+					manynames = true;
+				}
+				if (elem.name_x != nullptr) {
+					out << util::string_format(" name_x=\"%s\"", normalize_string(elem.name_x));
+					manynames = true;
+				}
+				if (elem.name_y != nullptr) {
+					out << util::string_format(" name_y=\"%s\"", normalize_string(elem.name_y));
+					manynames = true;
+				}
+				if (elem.name_z != nullptr) {
+					out << util::string_format(" name_z=\"%s\"", normalize_string(elem.name_z));
+					manynames = true;
+				}
+				if (!manynames && elem.name != nullptr)
+					out << util::string_format(" name=\"%s\"", normalize_string(elem.name));
+
+				bool manymasks = false;
+
+				if (elem.mask_up > 0) {
+					out << util::string_format(" mask_up=\"%d\"", elem.mask_up);
+					out << util::string_format(" value_up=\"%d\"", elem.defvalue_up);
+					manymasks = true;
+				}
+				if (elem.mask_left > 0) {
+					out << util::string_format(" mask_left=\"%d\"", elem.mask_left);
+					out << util::string_format(" value_left=\"%d\"", elem.defvalue_left);
+					manymasks = true;
+				}
+				if (elem.mask_right > 0) {
+					out << util::string_format(" mask_right=\"%d\"", elem.mask_right);
+					out << util::string_format(" value_right=\"%d\"", elem.defvalue_right);
+					manymasks = true;
+				}
+				if (elem.mask_down > 0) {
+					out << util::string_format(" mask_down=\"%d\"", elem.mask_down);
+					out << util::string_format(" value_down=\"%d\"", elem.defvalue_down);
+					manymasks = true;
+				}
+				if (elem.mask_x > 0) {
+					out << util::string_format(" mask_x=\"%d\"", elem.mask_x);
+					out << util::string_format(" value_x=\"%d\"", elem.defvalue_x);
+					manymasks = true;
+				}
+				if (elem.mask_y > 0) {
+					out << util::string_format(" mask_y=\"%d\"", elem.mask_y);
+					out << util::string_format(" value_y=\"%d\"", elem.defvalue_y);
+					manymasks = true;
+				}
+				if (elem.mask_z > 0) {
+					out << util::string_format(" mask_z=\"%d\"", elem.mask_z);
+					out << util::string_format(" value_z=\"%d\"", elem.defvalue_z);
+					manymasks = true;
+				}
+				if (!manymasks && elem.mask != 0) {
+					out << util::string_format(" mask=\"%d\"", elem.mask);
+					out << util::string_format(" value=\"%d\"", elem.defvalue);
+				}
+				
+				if (elem.button_index == 0) {
+					out << "/>\n";
+				}
+				else {
+					out << ">\n";
+					for (size_t i = 0; i < elem.button_index; i++)
+					{
+						out << "\t\t\t\t<button";
+
+						if (elem.button_indexes[i] != 0)
+							out << util::string_format(" number=\"%d\"", elem.button_indexes[i]);
+
+						if (elem.button_names[i] != nullptr)
+							out << util::string_format(" name=\"%d\"", elem.button_names[i]);
+
+						if (!elem.button_requires[i]) {
+							out << util::string_format(" optional=\"%d\"", "yes");
+						}
+
+						if (elem.button_tags[i] == nullptr) {
+							out << util::string_format(" tag=\"%d\"", "TAG_NOT_FOUND");
+						}
+						else {
+							std::string newtag(elem.button_tags[i]), oldtag(":");
+							newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+							out << util::string_format(" tag=\"%d\"", newtag);
+						}
+
+						out << util::string_format(" mask=\"%d\"", elem.button_masks[i]);
+						out << util::string_format(" value=\"%d\"", elem.button_defvalues[i]);
+						out << "/>\n";
+					}
+					out << "\t\t\t</control>\n";
+				}
 			}
 		}
 
