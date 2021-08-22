@@ -196,6 +196,7 @@ public:
 			std::string_view filename,
 			std::string &listname,
 			std::string &description,
+			std::string &notes,
 			std::list<software_info> &infolist,
 			std::ostream &errors);
 
@@ -236,6 +237,7 @@ private:
 	void parse_soft_start(const char *tagname, const char **attributes);
 	void parse_part_start(const char *tagname, const char **attributes);
 	void parse_data_start(const char *tagname, const char **attributes);
+	void parse_main_end(const char *tagname);
 	void parse_soft_end(const char *name);
 
 	// internal parsing state
@@ -247,6 +249,7 @@ private:
 	bool                        m_done;
 	std::string &               m_listname;
 	std::string &               m_description;
+	std::string &               m_notes;
 	bool                        m_data_accum_expected;
 	std::string                 m_data_accum;
 	software_info *             m_current_info;
@@ -264,6 +267,7 @@ softlist_parser::softlist_parser(
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
+		std::string &notes,
 		std::list<software_info> &infolist,
 		std::ostream &errors) :
 	m_file(file),
@@ -273,6 +277,7 @@ softlist_parser::softlist_parser(
 	m_done(false),
 	m_listname(listname),
 	m_description(description),
+	m_notes(notes),
 	m_data_accum_expected(false),
 	m_current_info(nullptr),
 	m_current_part(nullptr),
@@ -474,6 +479,7 @@ void softlist_parser::end_handler(void *data, const char *name)
 			break;
 
 		case POS_MAIN:
+			state->parse_main_end(name);
 			state->m_current_info = nullptr;
 			break;
 
@@ -565,13 +571,25 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 		else
 			parse_error("No name defined for item");
 	}
+	// <notes>
+	else if (strcmp(tagname, "notes") == 0)
+	{
+		m_data_accum_expected = true;
+	}
 	else
 		unknown_tag(tagname);
 }
 
 
+void softlist_parser::parse_main_end(const char *tagname)
+{
+	if (strcmp(tagname, "notes") == 0)
+		m_notes = m_data_accum;
+}
+
+
 //-------------------------------------------------
-//  parse_main_start - handle tag start within
+//  parse_soft_start - handle tag start within
 //  a software tag
 //-------------------------------------------------
 
@@ -594,6 +612,10 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 
 	// <publisher>
 	else if (strcmp(tagname, "publisher") == 0)
+		m_data_accum_expected = true;
+
+	// <notes>
+	else if (strcmp(tagname, "notes") == 0)
 		m_data_accum_expected = true;
 
 	// <info name='' value=''>
@@ -861,6 +883,10 @@ void softlist_parser::parse_soft_end(const char *tagname)
 	else if (strcmp(tagname, "publisher") == 0)
 		m_current_info->m_publisher = m_data_accum;
 
+	// <notes>
+	else if (strcmp(tagname, "notes") == 0)
+		m_current_info->m_notes = m_data_accum;
+
 	// </part>
 	else if (strcmp(tagname, "part") == 0)
 	{
@@ -889,10 +915,11 @@ void parse_software_list(
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
+		std::string &notes,
 		std::list<software_info> &infolist,
 		std::ostream &errors)
 {
-	detail::softlist_parser(file, filename, listname, description, infolist, errors);
+	detail::softlist_parser(file, filename, listname, description, notes, infolist, errors);
 }
 
 

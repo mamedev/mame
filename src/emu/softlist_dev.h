@@ -118,6 +118,7 @@ public:
 
 	// getters that may trigger a parse
 	const std::string &description() { if (!m_parsed) parse(); return m_description; }
+	const std::string &notes() { if (!m_parsed) parse(); return m_notes; }
 	bool valid() { if (!m_parsed) parse(); return !m_infolist.empty(); }
 	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
 	const std::list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
@@ -154,6 +155,7 @@ private:
 	std::string                 m_filename;
 	std::string                 m_shortname;
 	std::string                 m_description;
+	std::string                 m_notes;
 	std::string                 m_errors;
 	std::list<software_info>    m_infolist;
 };
