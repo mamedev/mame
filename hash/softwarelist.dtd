@@ -1,7 +1,7 @@
 <!ELEMENT softwarelist (notes?, software+)>
 	<!ATTLIST softwarelist name CDATA #REQUIRED>
 	<!ATTLIST softwarelist description CDATA #IMPLIED>
-	<!ELEMENT notes (#PCATA)>
+	<!ELEMENT notes (#PCDATA)>
 	<!ELEMENT software (description, year, publisher, notes?, info*, sharedfeat*, part*)>
 		<!ATTLIST software name CDATA #REQUIRED>
 		<!ATTLIST software cloneof CDATA #IMPLIED>
