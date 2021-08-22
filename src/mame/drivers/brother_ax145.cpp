@@ -100,8 +100,7 @@ public:
 		maincpu(*this, "maincpu"),
 		lcdc(*this, "hd44780"),
 		ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE),
-		rom(*this, "maincpu"),
-		dict_rom(*this, "dictionary")
+		rom(*this, "maincpu")
 	{ }
 
 	void ax145(machine_config& config);
@@ -111,7 +110,7 @@ private:
 	required_device<hd64180rp_device> maincpu;
 	required_device<hd44780_device> lcdc;
 	memory_share_creator<uint8_t> ram;
-	required_region_ptr<uint8_t> rom, dict_rom;
+	required_region_ptr<uint8_t> rom;
 
 	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
 	static constexpr uint8_t id = 1;
@@ -124,9 +123,6 @@ private:
 	// bit 0: E (Enable)
 	uint8_t lcd_signal{};
 
-	// dictionary ROM banking
-	uint8_t dict_bank{};
-
 	// driver_device overrides
 	void machine_start() override;
 	void machine_reset() override;
@@ -135,7 +131,7 @@ private:
 	void map_program(address_map& map) {
 		map(0x00000, 0x01fff).rom();
 		map(0x04000, 0x1ffff).rom();
-		map(0x40000, 0x5ffff).r(FUNC(ax145_state::dict_r));
+		map(0x40000, 0x5ffff).bankr("dictionary");
 		// RAM is installed in machine_start()
 	}
 
@@ -148,7 +144,7 @@ private:
 		map(0x3000, 0x3000).w(FUNC(ax145_state::io_3000_w));
 		map(0x3800, 0x3800).r(FUNC(ax145_state::io_3800_r)); // config lower 4 bits
 		map(0x4000, 0x4000).r(FUNC(ax145_state::io_4000_r)); // config upper 4 bits
-		map(0x5000, 0x5000).w(FUNC(ax145_state::io_5000_w)); // dictionary banking
+		map(0x5000, 0x5000).w(FUNC(ax145_state::dictionary_bank_w));
 		map(0x5800, 0x5800).w(FUNC(ax145_state::lcd_signal_w));
 		map(0x6000, 0x6000).rw(FUNC(ax145_state::lcd_data_r), FUNC(ax145_state::lcd_data_w));
 		//map(0x6800, 0x6800).w(TODO);
@@ -204,16 +200,8 @@ private:
 		}
 	}
 
-	void io_5000_w(uint8_t data) {
-		dict_bank = data;
-	}
-
-	uint8_t dict_r(offs_t offset, uint8_t mem_mask = ~0) {
-		if(dict_bank >= 4) {
-			logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", machine().describe_context(), dict_bank, offset);
-			return 0x00;
-		}
-		return dict_rom[offset + dict_bank * 0x20000] & mem_mask;
+	void dictionary_bank_w(uint8_t data) {
+		membank("dictionary")->set_entry(data & 0x03);
 	}
 
 	// int2
@@ -235,6 +223,7 @@ void ax145_state::machine_start()
 {
 	maincpu->space(AS_PROGRAM).install_ram(0x02000, 0x03fff, ram); // first 0x2000 bytes of RAM
 	maincpu->space(AS_PROGRAM).install_ram(0x62000, 0x69fff, ram); // complete 0x8000 bytes of RAM
+	membank("dictionary")->configure_entries(0, 4, memregion("dictionary")->base(), 0x20000);
 
 	// ROM patch
 }
