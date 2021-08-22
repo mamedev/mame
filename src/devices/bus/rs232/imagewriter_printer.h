@@ -55,6 +55,13 @@ double min_time = 0.0;
 			if (data == 1)  printf("HANDLE RXRDY %d\n",data);
 			m_maincpu->set_input_line(I8085_RST65_LINE, data);
 	}
+
+	void dtr_handler(uint8_t data) {
+		//	write_dtr(data);
+		output_dsr(data);
+	}
+
+
 	u8 m_uart_clock = 0;
 
 	double last_pulse = 0.0;

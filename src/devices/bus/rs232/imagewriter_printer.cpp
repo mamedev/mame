@@ -11,6 +11,12 @@
 
 **************************************************************************/
 
+// A9M0303 is a standard size printer that will accept paper from 3 inch to 10 inches.
+//
+// A9M0305 is a Wide Carriage Imagewriter printer that will accept paper up to 15″ wide.
+
+
+
 #include "emu.h"
 #include "printer.h"
 #include "imagewriter_printer.h"
@@ -20,7 +26,7 @@
 #include "logmacro.h"
 #include <math.h>
 
-DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "apple imagewriter printer")
+DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "Apple ImageWriter Printer")
 
 apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: apple_imagewriter_printer_device(mconfig, APPLE_IMAGEWRITER_PRINTER, tag, owner, clock)
@@ -85,6 +91,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 
 	I8251(config, m_uart, 1e5);  // for the moment, just give 1mhz clock
 	m_uart->rxrdy_handler().set(FUNC(apple_imagewriter_printer_device::rxrdy_handler));
+	m_uart->dtr_handler().set(FUNC(apple_imagewriter_printer_device::dtr_handler));
 
 
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT);
