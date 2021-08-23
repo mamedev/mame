@@ -132,7 +132,7 @@ private:
 	int page_count = 0;
 
 	const int dpi = 144;
-	const double PAPER_WIDTH_INCHES = 8.5;
+	const double PAPER_WIDTH_INCHES = 8.5 + 0.5;  // extra width paper to avoid centering problems
 	const double PAPER_HEIGHT_INCHES = 11.0;
 	const double MARGIN_INCHES = 0.0;
 	const int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi;  // 8.5 inches wide
@@ -140,10 +140,14 @@ private:
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int distfrombottom = 50;
 
+	int yposratio0 = 18;
+	int yposratio1 = 18;
+
 	int m_xpos = PAPER_WIDTH / 2;  // middle of paper (paper width in pixels)
 	int m_ypos = 30;
 	s32 x_pixel_coord(s32 xpos) { return xpos / 1; }  // x position
-	s32 y_pixel_coord(s32 ypos) { return ypos / 2; }  // y position given in half steps
+//  s32 y_pixel_coord(s32 ypos) { return ypos / 1; }  // y position given in half steps
+	s32 y_pixel_coord(s32 ypos) { return ypos * yposratio0 / yposratio1; }  // y position given in half steps
 
 	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern, const char * name, int direction);
 	void update_printhead();
@@ -158,7 +162,7 @@ private:
 	int m_select_status;
 	int right_offset = 0;
 	int left_offset = 2;  // 2 seems right
-	int m_left_edge  = MARGIN_INCHES / 2.0 * dpi;
+	int m_left_edge  = (MARGIN_INCHES / 2.0) * dpi;    // 0 FOR starting at left edge, print shop seems to like -32 for centered print
 	int m_right_edge = (PAPER_WIDTH_INCHES - MARGIN_INCHES) * dpi + m_left_edge - 1;
 
 	// (should be trivial to make a 15" wide printer by adjusting PAPER_WIDTH_INCHES to 15.00)

@@ -26,7 +26,7 @@
 #include "logmacro.h"
 #include <math.h>
 
-DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "Apple ImageWriter Printer")
+DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "Apple ImageWriter Printer A9M0303")
 
 apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: apple_imagewriter_printer_device(mconfig, APPLE_IMAGEWRITER_PRINTER, tag, owner, clock)
@@ -157,7 +157,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_START("DARKPIXEL")
 	PORT_CONFNAME(0x1, 0x01, "Print Darkness")
 	PORT_CONFSETTING(0x0, "Normal (grey)")
-	PORT_CONFSETTING(0x1, "Dark   (b/w)")
+	PORT_CONFSETTING(0x1, "Dark   (b/w)")  // default to printing dark pixels (2x2)
 
 
 	// Buttons on printer
@@ -476,16 +476,22 @@ void apple_imagewriter_printer_device::update_printhead()
 //  printf("PRINTHEAD %x %s\n",m_dotpattern, std::bitset<9>(m_dotpattern).to_string().c_str());
 	const auto numdots = 9;
 
+	const double greypixelarray[][2] = { { 1.0, 0.75 } , { 0.75, 0.50} };
+
 	for (int i = 0; i < numdots; i++)
 	{
-		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
-		int ypixel = y_pixel_coord(m_ypos) + i;
+		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset); // offset to correct alignment when changing direction
+		int ypixel = y_pixel_coord(m_ypos) + 2 * i; // gap of 1/72 between printhead dots so multiply by 2
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
-			darken_pixel( BIT(m_dotpattern, i) ? 0.25 : 0.0, m_bitmap_printer->pix(ypixel, xpixel) );
-			if (ioport("DARKPIXEL")->read() & 0x1)
-				darken_pixel( BIT(m_dotpattern, i) ? 0.25 : 0.0, m_bitmap_printer->pix(ypixel, xpixel+1) );
+			int darkpixelmode = (ioport("DARKPIXEL")->read() & 0x1);
+			int dotsizex = 2;
+			int dotsizey = 2;
+			for (int xo = 0; xo < dotsizex; xo++ )
+			for (int yo = 0; yo < dotsizey; yo++ )
+				darken_pixel( BIT(m_dotpattern, i) ?
+					(darkpixelmode ? 1.0 : greypixelarray[yo][xo] ) : 0.0, m_bitmap_printer->pix(ypixel + yo, xpixel + xo) );
 		}
 	}
 }
@@ -600,6 +606,9 @@ void apple_imagewriter_printer_device::device_start()
 //  update_printhead(0);
 	save_item(NAME(left_offset));
 	save_item(NAME(right_offset));
+	save_item(NAME(m_left_edge));
+	save_item(NAME(yposratio0));
+	save_item(NAME(yposratio1));
 }
 
 
