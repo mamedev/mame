@@ -23,9 +23,7 @@ uint32_t kikikai_state::screen_update_kicknrun(screen_device &screen, bitmap_ind
 	int gfx_num, gfx_attr, gfx_offs;
 
 
-	/* Bubble Bobble doesn't have a real video RAM. All graphics (characters */
-	/* and sprites) are stored in the same memory region, and information on */
-	/* the background character columns is stored inthe area dd00-dd3f */
+	/* similar as bublbobl.cpp, sprite strips only. */
 	bitmap.fill(255, cliprect);
 
 	sx = 0;
