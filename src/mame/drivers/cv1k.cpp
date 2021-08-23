@@ -131,6 +131,8 @@ Misc:
 
 Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
       * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
+      * There are two known CV1000-B PCB revisions. The newer one uses an updated FPGA firmware
+        and has some minor hardware differences.
       * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
         The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
 
@@ -569,7 +571,7 @@ ROM_START( mushisamb )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(e3d05c9f) SHA1(130c3d62317da1729c85bd178bd51500edd73ada) )
 ROM_END
 
-ROM_START( espgal2 ) // newer PCB revision (still called rev B), updated FPGA firmware, no changes in game code or data
+ROM_START( espgal2 ) // newer CV1000-B PCB revision, updated FPGA firmware, no changes in game code or data
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "espgal2_u4", 0x000000, 0x200000, CRC(843608b8) SHA1(2f5fcd38e76df531a923cd9956104cef5185aaa9) ) // (2005/11/14 MASTER VER)
 	ROM_RELOAD(0x200000,0x200000)
@@ -971,8 +973,8 @@ GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT27
 GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                 MACHINE_IMPERFECT_TIMING )
 
 // CA013  Espgaluda II
-GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER)",                            MACHINE_IMPERFECT_TIMING )
-GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER, older FPGA microcode)",      MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER, newer CV1000-B PCB)",        MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER, original CV1000-B PCB)",     MACHINE_IMPERFECT_TIMING )
 
 // CA???  Puzzle! Mushihime-Tama
 GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)", "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                  MACHINE_IMPERFECT_TIMING )
