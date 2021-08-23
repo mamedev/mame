@@ -187,8 +187,8 @@ Common game codes:
 class cv1k_state : public driver_device
 {
 public:
-	cv1k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cv1k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_blitter(*this, "blitter"),
 		m_serflash(*this, "game"),
@@ -199,7 +199,7 @@ public:
 		m_eepromout(*this, "EEPROMOUT"),
 		m_idleramoffs(0),
 		m_idlepc(0)
-		{ }
+	{ }
 
 	required_device<sh34_base_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
@@ -448,7 +448,7 @@ INPUT_PORTS_END
 
 void cv1k_state::machine_reset()
 {
-	m_blitter->set_rambase (reinterpret_cast<uint16_t *>(m_ram.target()));
+	m_blitter->set_rambase(reinterpret_cast<uint16_t *>(m_ram.target()));
 	m_blitter->set_is_unsafe(machine().root_device().ioport(":BLITCFG")->read());
 	m_blitter->install_handlers( 0x18000000, 0x18000057 );
 	m_blitter->reset();
@@ -569,9 +569,9 @@ ROM_START( mushisamb )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(e3d05c9f) SHA1(130c3d62317da1729c85bd178bd51500edd73ada) )
 ROM_END
 
-ROM_START( espgal2 )
+ROM_START( espgal2 ) // newer PCB revision (still called rev B), updated FPGA firmware, no changes in game code or data
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "espgal2_u4", 0x000000, 0x200000, CRC(843608b8) SHA1(2f5fcd38e76df531a923cd9956104cef5185aaa9) ) // (2005/11/14 MASTER VER) - newer PCB revision, updated FPGA firmware, no changes in game code or data
+	ROM_LOAD16_WORD_SWAP( "espgal2_u4", 0x000000, 0x200000, CRC(843608b8) SHA1(2f5fcd38e76df531a923cd9956104cef5185aaa9) ) // (2005/11/14 MASTER VER)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
