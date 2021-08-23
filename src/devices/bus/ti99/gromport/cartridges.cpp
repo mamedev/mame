@@ -257,18 +257,15 @@ image_init_result ti99_cartridge_device::call_load()
 	}
 	else
 	{
-		try
+		std::error_condition err = rpk_open(machine().options(), util::core_file_read(image_core_file()), machine().system().name, m_rpk);
+		if (err)
 		{
-			m_rpk = rpk_open(machine().options(), util::core_file_read(image_core_file()), machine().system().name);
-			m_pcbtype = m_rpk->get_type();
-		}
-		catch (util::rpk_exception& err)
-		{
-			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.what());
+			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.message().c_str());
 			m_rpk.reset();
 			m_err = image_error::INVALIDIMAGE;
 			return image_init_result::FAIL;
 		}
+		m_pcbtype = m_rpk->get_type();
 	}
 
 	switch (m_pcbtype)
@@ -1538,14 +1535,18 @@ ti99_cartridge_device::rpk_socket::rpk_socket(const char* id, int length, std::v
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_load_rom_resource(const util::rpk_socket &socket)
+std::error_condition ti99_cartridge_device::rpk_load_rom_resource(const util::rpk_socket &socket, std::unique_ptr<rpk_socket> &result)
 {
 	LOGMASKED(LOG_RPK, "[RPK handler] Loading ROM contents for socket '%s' from file %s\n", socket.id(), socket.filename());
 
-	std::vector<uint8_t> contents = socket.read_file();
+	std::vector<uint8_t> contents;
+	std::error_condition err =  socket.read_file(contents);
+	if (err)
+		return err;
 
 	// Create a socket instance
-	return std::make_unique<rpk_socket>(socket.id().c_str(), contents.size(), std::move(contents));
+	result = std::make_unique<rpk_socket>(socket.id().c_str(), contents.size(), std::move(contents));
+	return std::error_condition();
 }
 
 /*
@@ -1591,48 +1592,47 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_lo
     system_name - name of the driver (also just for NVRAM handling)
 -------------------------------------------------*/
 
-std::unique_ptr<ti99_cartridge_device::rpk> ti99_cartridge_device::rpk_open(emu_options &options, std::unique_ptr<util::random_read> &&stream, const char *system_name)
+std::error_condition ti99_cartridge_device::rpk_open(emu_options &options, std::unique_ptr<util::random_read> &&stream, const char *system_name, std::unique_ptr<rpk> &result)
 {
 	std::unique_ptr<rpk> newrpk = std::make_unique<rpk>(options, system_name);
 
-	try
+	util::rpk_reader reader(pcbdefs, true);
+
+	// open the RPK
+	util::rpk_file::ptr file;
+	std::error_condition err = reader.read(std::move(stream), file);
+	if (err)
+		return err;
+
+	// specify the PCB
+	newrpk->m_type = file->pcb_type() + 1;
+	LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", pcbdefs[file->pcb_type()]);
+
+	for (const util::rpk_socket &socket : file->sockets())
 	{
-		util::rpk_reader reader(pcbdefs, true);
+		std::unique_ptr<rpk_socket> ti99_socket;
 
-		// open the RPK
-		util::rpk_file file = reader.read(std::move(stream));
-
-		// specify the PCB
-		newrpk->m_type = file.pcb_type() + 1;
-		LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", pcbdefs[file.pcb_type()]);
-
-		for (const util::rpk_socket &socket : file.sockets())
+		switch (socket.type())
 		{
-			switch (socket.type())
-			{
-			case util::rpk_socket::socket_type::ROM:
-				newrpk->add_socket(socket.id().c_str(), rpk_load_rom_resource(socket));
-				break;
+		case util::rpk_socket::socket_type::ROM:
+			err = rpk_load_rom_resource(socket, ti99_socket);
+			if (err)
+				return err;
+			newrpk->add_socket(socket.id().c_str(), std::move(ti99_socket));
+			break;
 
-			case util::rpk_socket::socket_type::RAM:
-			case util::rpk_socket::socket_type::PERSISTENT_RAM:
-				newrpk->add_socket(socket.id().c_str(), rpk_load_ram_resource(options, socket, system_name));
-				break;
+		case util::rpk_socket::socket_type::RAM:
+		case util::rpk_socket::socket_type::PERSISTENT_RAM:
+			newrpk->add_socket(socket.id().c_str(), rpk_load_ram_resource(options, socket, system_name));
+			break;
 
-			default:
-				throw false;
-			}
+		default:
+			throw false;
 		}
 	}
-	catch (util::rpk_exception &)
-	{
-		newrpk->close();
 
-		// rethrow the exception
-		throw;
-	}
-
-	return newrpk;
+	result = std::move(newrpk);
+	return std::error_condition();
 }
 
 } // end namespace bus::ti99::gromport

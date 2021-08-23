@@ -55,7 +55,7 @@ public:
 	std::uint32_t length() const { return m_length.value(); }
 
 	// methods
-	std::vector<std::uint8_t> read_file() const;
+	std::error_condition read_file(std::vector<std::uint8_t> &result) const;
 
 private:
 	rpk_file &						m_rpk;
@@ -75,9 +75,12 @@ class rpk_file
 	friend class rpk_socket;
 
 public:
+	typedef std::unique_ptr<rpk_file> ptr;
+
 	// ctor/dtor
+	rpk_file(archive_file::ptr &&zipfile, int pcb_type);
 	rpk_file(const rpk_file &) = delete;
-	rpk_file(rpk_file &&) = default;
+	rpk_file(rpk_file &&) = delete;
 	~rpk_file();
 
 	// accessors
@@ -89,15 +92,12 @@ private:
 	int						m_pcb_type;
 	std::list<rpk_socket>	m_sockets;
 
-	// ctor
-	rpk_file(archive_file::ptr &&zipfile, int pcb_type);
-
 	// accesors
 	archive_file &zipfile() { return *m_zipfile; }
 
 	// methods
-	void add_rom_socket(std::string &&id, const util::xml::data_node &rom_resource_node);
-	void add_ram_socket(std::string &&id, const util::xml::data_node &ram_resource_node);
+	std::error_condition add_rom_socket(std::string &&id, const util::xml::data_node &rom_resource_node);
+	std::error_condition add_ram_socket(std::string &&id, const util::xml::data_node &ram_resource_node);
 };
 
 
@@ -128,7 +128,7 @@ public:
 	rpk_reader(rpk_reader &&) = delete;
 
 	// methods
-	rpk_file read(std::unique_ptr<random_read> &&stream) const;
+	std::error_condition read(std::unique_ptr<random_read> &&stream, rpk_file::ptr &result) const;
 
 private:
 	const char **	m_pcb_types;
@@ -136,23 +136,14 @@ private:
 };
 
 
-// ======================> rpk_exception
-
-class rpk_exception : public std::exception
-{
-public:
-	rpk_exception(rpk_reader::error error);
-	rpk_exception(rpk_reader::error error, std::string_view details);
-	rpk_exception(std::error_condition error);
-	virtual const char *what() const noexcept override;
-
-private:
-	std::string m_what;
-
-	static const char *error_message(rpk_reader::error error);
-};
-
+// error category for RPK errors
+std::error_category const &rpk_category() noexcept;
+inline std::error_condition make_error_condition(rpk_reader::error err) noexcept { return std::error_condition(int(err), rpk_category()); }
 
 };
+
+namespace std {
+	template <> struct is_error_condition_enum<util::rpk_reader::error> : public std::true_type { };
+} // namespace std
 
 #endif // MAME_FORMATS_RPK_H
