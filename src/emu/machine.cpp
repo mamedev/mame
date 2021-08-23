@@ -360,11 +360,12 @@ int running_machine::run(bool quiet)
 		manager().ui_initialize(*this);
 
 		// perform a soft reset -- this takes us to the running phase
+		bool load = (m_event_timer.param() == EVENT_LOAD);
 		scheduled_event(EVENT_SOFT_RESET);
 
 		// handle initial load
-		if (m_saveload_schedule != saveload_schedule::NONE)
-			handle_saveload();
+		if (load)
+			immediate_load();
 
 		export_http_api();
 
