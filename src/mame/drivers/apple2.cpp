@@ -646,15 +646,19 @@ u8 apple2_state::flags_r(offs_t offset)
 		return (m_gameio->sw2_r() ? 0x80 : 0) | (read_floatingbus() & 0x7f);
 
 	case 4:  // joy 1 X axis
+		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 		return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 5:  // joy 1 Y axis
+		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 		return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 6: // joy 2 X axis
+		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 		return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 7: // joy 2 Y axis
+		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 		return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 	}
 

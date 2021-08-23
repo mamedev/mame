@@ -274,7 +274,7 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			{
 				const u32 color  = (word3 >> 4) & 0x000f;
 				const int ypos   = (0x1ff - (word0 & 0x01ff)) - 0x50 + 0x02;
-				const int xpos   = (offset4 & 0x03ff) - 0x50 + 0x07;
+				const int xpos   = (offset4 & 0x07ff) - 0x50 + 0x07;
 				const bool flipy = word1 & 0x8000;
 				const bool flipx = word1 & 0x4000;
 				const int scalex = (sizex << 16) / (is_32 ? 0x20 : 0x10);

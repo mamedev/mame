@@ -121,6 +121,10 @@ protected:
 		address_map_constructor delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);
 	}
+	template <typename T> void add_map(uint64_t size, int flags, T &device, void (T::*map)(address_map &map), const char *name) {
+		address_map_constructor delegate(map, name, &device);
+		add_map(size, flags, delegate, &device);
+	}
 
 	void add_rom(const uint8_t *data, uint32_t size);
 	void add_rom_from_region();

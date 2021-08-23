@@ -8,6 +8,7 @@
 Hold both START buttons on bootup to display version notice.
 
 Diet Go Go (Japan)   DATA EAST
+DE-0370-2
 
 NAME    LOCATION   TYPE
 -----------------------

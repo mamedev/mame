@@ -216,11 +216,8 @@ void channelf_state::channelf(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(128, 64);
-	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
-	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_raw(3.579545_MHz_XTAL * 8 / 7, 256, 8, 212, 264, 16, 248);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_ntsc));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
@@ -241,11 +238,8 @@ void channelf_state::sabavdpl(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4623)); /* approximate */
-	screen.set_size(128, 64);
-	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
-	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_raw(4_MHz_XTAL, 256, 8, 212, 312, 20, 310);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_pal));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
@@ -267,11 +261,8 @@ void channelf_state::channlf2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(128, 64);
-	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
-	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_raw(3.579545_MHz_XTAL * 8 / 7, 256, 8, 212, 264, 16, 248);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_ntsc));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
@@ -293,11 +284,8 @@ void channelf_state::sabavpl2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4623)); /* approximate */
-	screen.set_size(128, 64);
-	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
-	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_raw(4_MHz_XTAL, 256, 8, 212, 312, 20, 310);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_pal));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);

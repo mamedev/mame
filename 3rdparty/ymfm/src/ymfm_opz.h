@@ -49,11 +49,7 @@ namespace ymfm
 // OPZ register map:
 //
 //      System-wide registers:
-//           08 -x------ Key on/off operator 4
-//              --x----- Key on/off operator 3
-//              ---x---- Key on/off operator 2
-//              ----x--- Key on/off operator 1
-//              -----xxx Channel select
+//           08 -----xxx Load preset (not sure how it gets saved)
 //           0F x------- Noise enable
 //              ---xxxxx Noise frequency
 //           10 xxxxxxxx Timer A value (upper 8 bits)
@@ -117,10 +113,14 @@ namespace ymfm
 //              ----xxxx Fine? (0-15)
 //      120-13F xx------ Envelope generator shift (0-3)
 //              -----xxx Reverb rate (0-7)
-//      140-147 -xxx---- LFO #2 PM sensitivity
+//      140-15F xxxx---- Preset sustain level (0-15)
+//              ----xxxx Preset release rate (0-15)
+//      160-17F xx------ Envelope generator shift (0-3)
+//              -----xxx Reverb rate (0-7)
+//      180-187 -xxx---- LFO #2 PM sensitivity
 //              ---- xxx LFO #2 AM shift
-//          148 -xxxxxxx LFO #2 PM depth
-//          149 -xxxxxxx LFO PM depth
+//          188 -xxxxxxx LFO #2 PM depth
+//          189 -xxxxxxx LFO PM depth
 //
 
 class opz_registers : public fm_registers_base
@@ -135,9 +135,10 @@ public:
 	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr uint32_t OPERATORS = CHANNELS * 4;
 	static constexpr uint32_t WAVEFORMS = 8;
-	static constexpr uint32_t REGISTERS = 0x150;
+	static constexpr uint32_t REGISTERS = 0x190;
 	static constexpr uint32_t DEFAULT_PRESCALE = 2;
 	static constexpr uint32_t EG_CLOCK_DIVIDER = 3;
+	static constexpr bool EG_HAS_REVERB = true;
 	static constexpr uint32_t CSM_TRIGGER_MASK = ALL_CHANNELS;
 	static constexpr uint32_t REG_MODE = 0x14;
 	static constexpr uint8_t STATUS_TIMERA = 0x01;
@@ -205,12 +206,12 @@ public:
 	uint32_t enable_timer_a() const                  { return byte(0x14, 2, 1); }
 	uint32_t load_timer_b() const                    { return byte(0x14, 1, 1); }
 	uint32_t load_timer_a() const                    { return byte(0x14, 0, 1); }
-	uint32_t lfo2_pm_depth() const                   { return byte(0x148, 0, 7); } // fake
+	uint32_t lfo2_pm_depth() const                   { return byte(0x188, 0, 7); } // fake
 	uint32_t lfo2_rate() const                       { return byte(0x16, 0, 8); }
 	uint32_t lfo2_am_depth() const                   { return byte(0x17, 0, 7); }
 	uint32_t lfo_rate() const                        { return byte(0x18, 0, 8); }
 	uint32_t lfo_am_depth() const                    { return byte(0x19, 0, 7); }
-	uint32_t lfo_pm_depth() const                    { return byte(0x149, 0, 7); } // fake
+	uint32_t lfo_pm_depth() const                    { return byte(0x189, 0, 7); } // fake
 	uint32_t output_bits() const                     { return byte(0x1b, 6, 2); }
 	uint32_t lfo2_sync() const                       { return byte(0x1b, 5, 1); }
 	uint32_t lfo_sync() const                        { return byte(0x1b, 4, 1); }
@@ -230,8 +231,8 @@ public:
 	uint32_t ch_block_freq(uint32_t choffs) const    { return word(0x28, 0, 7, 0x30, 2, 6, choffs); }
 	uint32_t ch_lfo_pm_sens(uint32_t choffs) const   { return byte(0x38, 4, 3, choffs); }
 	uint32_t ch_lfo_am_sens(uint32_t choffs) const   { return byte(0x38, 0, 2, choffs); }
-	uint32_t ch_lfo2_pm_sens(uint32_t choffs) const  { return byte(0x140, 4, 3, choffs); } // fake
-	uint32_t ch_lfo2_am_sens(uint32_t choffs) const  { return byte(0x140, 0, 2, choffs); } // fake
+	uint32_t ch_lfo2_pm_sens(uint32_t choffs) const  { return byte(0x180, 4, 3, choffs); } // fake
+	uint32_t ch_lfo2_am_sens(uint32_t choffs) const  { return byte(0x180, 0, 2, choffs); } // fake
 
 	// per-operator registers
 	uint32_t op_detune(uint32_t opoffs) const        { return byte(0x40, 4, 3, opoffs); }

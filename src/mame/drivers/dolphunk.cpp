@@ -36,11 +36,12 @@ CRT interface: (512 characters on a separate bus)
     74LS175 holds the upper bits for the 74LS472
     74LS472 Character Generator
 
-NOTE: a rom is missing, when the ADR button (- key) is pressed,
+NOTE: The cassette rom is missing, when the ADR button (- key) is pressed,
       it causes a freeze in nodebug mode, and a crash in debug mode.
       To see it, start in debug mode. g 6c. In the emulation, press the
       minus key. The debugger will stop and you can see an instruction
       referencing location 0100, which is in the missing rom.
+      The machine is marked MNW because it is not possible to save/load programs.
 
 Keys:
     0-9,A-F hexadecimal numbers
@@ -75,9 +76,9 @@ Test Paste:
     Now press up-arrow to review the data that was entered.
 
 TODO:
-    - Find missing roms
+    - Find missing roms. Once the cassette rom is found, need to work out
+      how to use it, and find out if the cassette interface works.
     - Add optional hardware listed above
-    - Cassette is added, but no idea how to operate it.
 
 Thanks to Amigan site for various documents.
 
@@ -266,11 +267,12 @@ void dauphin_state::dauphin(machine_config &config)
 
 /* ROM definition */
 ROM_START( dauphin )
-	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, CRC(a8811f48) SHA1(233c629dc20fac286c8c1559e461bb0b742a675e) )
 	// This one is used in winarcadia but it is a bad dump, we use the corrected one above
 	//ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, BAD_DUMP CRC(1ac4ac18) SHA1(62a63de6fcd6cd5fcee930d31c73fe603647f06c) )
 
+	// Cassette rom
 	ROM_LOAD( "dolphin_moni.rom", 0x0100, 0x0100, NO_DUMP )
 
 	//ROM_LOAD_OPTIONAL( "dolphin_mona.rom", 0x0c00, 0x0400, NO_DUMP )
@@ -283,4 +285,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME   FLAGS
-COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

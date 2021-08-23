@@ -31,16 +31,23 @@ enum {
 	NANO_REG_FLAGS
 };
 
-#define BIT_MASK(n) (1U << (n))
+// Bit manipulation
+namespace {
+	template<typename T> constexpr T BIT_MASK(unsigned n)
+	{
+		return (T)1U << n;
+	}
 
-// Macros to clear/set single bits
-#define BIT_CLR(w, n)  ((w) &= ~BIT_MASK(n))
-#define BIT_SET(w, n)  ((w) |= BIT_MASK(n))
+	template<typename T> void BIT_CLR(T& w , unsigned n)
+	{
+		w &= ~BIT_MASK<T>(n);
+	}
 
-// Bits in m_flags
-#define NANO_DC0_BIT    0   // DC0
-#define NANO_E_BIT  (NANO_DC0_BIT + HP_NANO_DC_NO)  // Extend flag
-#define NANO_I_BIT  (NANO_E_BIT + 1)    // Interrupt flag
+	template<typename T> void BIT_SET(T& w , unsigned n)
+	{
+		w |= BIT_MASK<T>(n);
+	}
+}
 
 DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "Hewlett Packard HP-Nanoprocessor")
 
@@ -100,6 +107,10 @@ void hp_nanoprocessor_device::device_start()
 
 void hp_nanoprocessor_device::device_reset()
 {
+	// IRL reset signal only sets the following things:
+	// DC7 (int. enable) = 0
+	// DC6..0 = 1
+	// PA = 0
 	m_reg_A = 0;
 	for (auto& reg : m_reg_R) {
 		reg = 0;
@@ -107,7 +118,7 @@ void hp_nanoprocessor_device::device_reset()
 	m_reg_PA = 0;
 	m_reg_SSR = 0;
 	m_reg_ISR = 0;
-	m_flags = 0;
+	m_flags = ((1U << (HP_NANO_DC_NO - 1)) - 1) << NANO_DC0_BIT;
 	dc_update();
 }
 
@@ -180,6 +191,14 @@ std::unique_ptr<util::disasm_interface> hp_nanoprocessor_device::create_disassem
 
 void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 {
+	// Apply indexing
+	if ((opcode & 0xe0) == 0xe0 ||
+		(opcode & 0xf0) == 0x90) {
+		// This is how the real hw does indexing. Altering the opcode in this way explains
+		// why a JAI instruction is turned into a JAS when R0:b3 = 1 (opcode 90..97 -> 98..9f)
+		opcode |= (m_reg_R[ 0 ] & 0x0f);
+	}
+
 	// Instructions without mask
 	switch (opcode) {
 	case 0x00:
@@ -200,27 +219,45 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 	case 0x02:
 		// IND
-		// Handling of non-decimal digits is entirely arbitrary
-		m_reg_A++;
-		if ((m_reg_A & 0x0f) >= 10) {
-			m_reg_A += 6;
-			if (m_reg_A >= 0xa0) {
-				m_reg_A += 0x60;
-				BIT_SET(m_flags, NANO_E_BIT);
+		// Handling of non-decimal digits comes from chip RE
+		{
+			uint8_t nibble_lo = m_reg_A & 0x0f;
+			uint8_t nibble_hi = m_reg_A & 0xf0;
+
+			if ((nibble_lo & 0x09) != 0x09) {
+				nibble_lo++;
+			} else {
+				nibble_lo = (nibble_lo + 1) & 0x05;
+				if ((nibble_hi & 0x90) != 0x90) {
+					nibble_hi += 0x10;
+				} else {
+					nibble_hi = (nibble_hi + 0x10) & 0x50;
+					BIT_SET(m_flags, NANO_E_BIT);
+				}
 			}
+			m_reg_A = nibble_hi | nibble_lo;
 		}
 		break;
 
 	case 0x03:
 		// DED
-		// Handling of non-decimal digits is entirely arbitrary
-		m_reg_A--;
-		if ((m_reg_A & 0x0f) >= 10) {
-			m_reg_A -= 6;
-			if (m_reg_A >= 0xa0) {
-				m_reg_A -= 0x60;
-				BIT_SET(m_flags, NANO_E_BIT);
+		// Handling of non-decimal digits comes from chip RE
+		{
+			uint8_t nibble_lo = m_reg_A & 0x0f;
+			uint8_t nibble_hi = m_reg_A & 0xf0;
+
+			if (nibble_lo) {
+				nibble_lo--;
+			} else {
+				nibble_lo = 9;
+				if (nibble_hi) {
+					nibble_hi -= 0x10;
+				} else {
+					nibble_hi = 0x90;
+					BIT_SET(m_flags, NANO_E_BIT);
+				}
 			}
+			m_reg_A = nibble_hi | nibble_lo;
 		}
 		break;
 
@@ -340,6 +377,8 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 	case 0xb9:
 		// RSE
+		// This op is implemented in the released NP mask set exactly as RTS (i.e.
+		// IE is not set). I'm implementing it here as described in the manual.
 		dc_set(HP_NANO_IE_DC);
 		// Intentional fall-through to RTS!
 		[[fallthrough]];
@@ -427,17 +466,8 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 			[[fallthrough]];
 		case 0x90:
 			// JAI
-			// On HP doc there's a mysterious warning about JAI:
-			// "Due to the indexing structure, a JAI instruction executed with
-			//  R03 set will be executed as a JAS instruction"
-			// My idea on the meaning: NP recycles the instruction register to form
-			// the bitwise OR of bits 3-0 of R0 and of opcode (see LDI/STI
-			// instructions). Presumably this was done to save on flip-flop count.
-			// So, if bit 3 of R0 (R03) is set when executing JAI the instruction
-			// register turns JAI into JAS.
-			// This effect is not simulated here at the moment.
 			{
-				uint16_t tmp = (uint16_t)((m_reg_R[ 0 ] | opcode) & 7) << 8;
+				uint16_t tmp = (uint16_t)(opcode & 7) << 8;
 				m_reg_PA = tmp | m_reg_A;
 			}
 			break;
@@ -487,12 +517,12 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 			case 0xe0:
 				// LDI
-				m_reg_A = m_reg_R[ (m_reg_R[ 0 ] | opcode) & 0xf ];
+				m_reg_A = m_reg_R[ opcode & 0xf ];
 				break;
 
 			case 0xf0:
 				// STI
-				m_reg_R[ (m_reg_R[ 0 ] | opcode) & 0xf ] = m_reg_A;
+				m_reg_R[ opcode & 0xf ] = m_reg_A;
 				break;
 
 			default:

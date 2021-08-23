@@ -7,16 +7,19 @@
 ****************************************************************************/
 
 #include "emu.h"
-//#include "bus/midi/midi.h"
+
+#include "bus/midi/midi.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "sound/ymopz.h"
 #include "video/hd44780.h"
-#include "bus/midi/midi.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "tx81z.lh"
 
 class ymtx81z_state : public driver_device
 {
@@ -58,8 +61,8 @@ HD44780_PIXEL_UPDATE(ymtx81z_state::lcd_pixel_update)
 void ymtx81z_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // background
-	palette.set_pen_color(1, rgb_t(0xd8, 0xff, 0x18)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(0xd8/10, 0xff/10, 0x18/10)); // lcd pixel off
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0x18, 0x18, 0x18)); // lcd pixel off
 }
 
 void ymtx81z_state::machine_start()
@@ -148,6 +151,8 @@ void ymtx81z_state::tx81z(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ymtx81z_state::palette_init), 3);
 
+	config.set_default_layout(layout_tx81z);
+
 	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(ymtx81z_state::lcd_pixel_update));
@@ -181,4 +186,4 @@ ROM_START(tx81z)
 	ROMX_LOAD("tx81z-27512-image-first-version-1_0.ic15", 0x00000, 0x10000, CRC(2f9628fa) SHA1(ce62dfb9a86da092c469fd25328b5447375f5bb2), ROM_BIOS(7))
 ROM_END
 
-SYST(1987, tx81z, 0, 0, tx81z, tx81z, ymtx81z_state, empty_init, "Yamaha", "TX81Z FM Tone Generator", MACHINE_IS_SKELETON)
+SYST(1987, tx81z, 0, 0, tx81z, tx81z, ymtx81z_state, empty_init, "Yamaha", "TX81Z FM Tone Generator", MACHINE_IMPERFECT_SOUND)

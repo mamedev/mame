@@ -87,30 +87,55 @@ menu_bios_selection::~menu_bios_selection()
 
 void menu_bios_selection::handle()
 {
-	/* process the menu */
+	// process the menu
 	const event *menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 			machine().schedule_hard_reset();
-		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+		else
 		{
 			device_t *dev = (device_t *)menu_event->itemref;
-			int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
-			int val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
-			if (val < 1)
-				val = cnt;
-			if (val > cnt)
-				val = 1;
-			dev->set_system_bios(val);
-			if (strcmp(dev->tag(),":")==0) {
-				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE);
-			} else {
-				const char *slot_option_name = dev->owner()->tag() + 1;
-				machine().options().slot_option(slot_option_name).set_bios(string_format("%d", val - 1));
+			int bios_val = 0;
+
+			switch (menu_event->iptkey)
+			{
+				// reset to default
+				case IPT_UI_SELECT:
+					bios_val = dev->default_bios();
+					break;
+
+				// previous/next bios setting
+				case IPT_UI_LEFT: case IPT_UI_RIGHT:
+				{
+					int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
+					bios_val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
+
+					// wrap
+					if (bios_val < 1)
+						bios_val = cnt;
+					if (bios_val > cnt)
+						bios_val = 1;
+
+					break;
+				}
+
+				default:
+					break;
 			}
-			reset(reset_options::REMEMBER_REF);
+
+			if (bios_val > 0)
+			{
+				dev->set_system_bios(bios_val);
+				if (strcmp(dev->tag(),":")==0) {
+					machine().options().set_value("bios", bios_val-1, OPTION_PRIORITY_CMDLINE);
+				} else {
+					const char *slot_option_name = dev->owner()->tag() + 1;
+					machine().options().slot_option(slot_option_name).set_bios(string_format("%d", bios_val - 1));
+				}
+				reset(reset_options::REMEMBER_REF);
+			}
 		}
 	}
 }

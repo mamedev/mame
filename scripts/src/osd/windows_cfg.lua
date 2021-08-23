@@ -37,7 +37,7 @@ else
 	}
 end
 
-if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]==1 then
+if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" then
 	defines {
 		"USE_NETWORK",
 	}

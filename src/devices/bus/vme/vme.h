@@ -55,12 +55,11 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define VME_BUS_TAG        "vme"
-
 //void vme_slot1(device_slot_interface &device); // Disabled until we know how to combine a board driver and a slot device.
 void vme_slots(device_slot_interface &device);
 
 class device_vme_card_interface; // This interface is standardized
+class vme_device;
 
 class vme_slot_device : public device_t,
 	public device_slot_interface
@@ -85,16 +84,15 @@ public:
 	};
 
 	// construction/destruction
-	template <typename T>
-	vme_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, uint32_t slot_nbr, char const *bus_tag)
+	template <typename T, typename U>
+	vme_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, uint32_t slot_nbr, U &&bus_tag)
 		: vme_slot_device(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
-		set_vme_slot(bus_tag, tag);
-		update_vme_chains(slot_nbr);
+		set_vme_slot(std::forward<U>(bus_tag), slot_nbr);
 	}
 
 	vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -102,8 +100,7 @@ public:
 	// Callbacks to the board from the VME bus comes through here
 	auto vme_j1_callback()  { return m_vme_j1_callback.bind(); }
 
-	void set_vme_slot(const char *tag, const char *slottag);
-	void update_vme_chains(uint32_t slot_nbr);
+	template <typename T> void set_vme_slot(T &&tag, uint32_t slot_nbr) { m_vme.set_tag(std::forward<T>(tag)); m_slot_nbr = slot_nbr; }
 
 	virtual uint8_t read8(offs_t offset);
 	virtual void write8(offs_t offset, uint8_t data);
@@ -113,10 +110,11 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
+	virtual void device_resolve_objects() override;
 
 	// configuration
-	const char *m_vme_tag, *m_vme_slottag;
+	required_device<vme_device> m_vme;
+	uint32_t m_slot_nbr;
 
 	// callbacks
 	devcb_write_line        m_vme_j1_callback;
@@ -138,8 +136,6 @@ public:
 	// inline configuration
 	void set_cputag(const char *tag) { m_cputag = tag; }
 	void use_owner_spaces();
-
-	virtual space_config_vector memory_space_config() const override;
 
 	const address_space_config m_a32_config;
 
@@ -196,6 +192,8 @@ protected:
 	virtual void device_reset() override;
 	simple_list<device_vme_card_interface> m_device_list;
 
+	virtual space_config_vector memory_space_config() const override;
+
 	// internal state
 	cpu_device   *m_maincpu;
 
@@ -218,22 +216,22 @@ class device_vme_card_interface : public device_interface
 	template <class ElementType> friend class simple_list;
 public:
 	// inline configuration
-	void set_vme_tag(const char *tag, const char *slottag);
+	void set_vme_bus(vme_device &vme, int slot) { m_vme = &vme; m_slot = slot; }
 
 	// construction/destruction
 	virtual ~device_vme_card_interface();
-	void set_vme_device();
 
 	virtual uint8_t read8(offs_t offset);
 	virtual void write8(offs_t offset, uint8_t data);
 
+protected:
 	device_vme_card_interface(const machine_config &mconfig, device_t &device);
 
-protected:
+	virtual void interface_post_start() override;
+
 	device_t *m_device;
 
 	vme_device  *m_vme;
-	const char *m_vme_tag, *m_vme_slottag;
 	int m_slot;
 
 private:

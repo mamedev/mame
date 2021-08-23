@@ -2,7 +2,7 @@
 // copyright-holders:Mirko Buffoni
 /***************************************************************************
 
-  ironhors.c
+  ironhors.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-void ironhors_state::ironhors_palette(palette_device &palette) const
+void ironhors_base_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static constexpr int resistances[4] = { 2000, 1000, 470, 220 };
@@ -73,19 +73,19 @@ void ironhors_state::ironhors_palette(palette_device &palette) const
 	}
 }
 
-void ironhors_state::videoram_w(offs_t offset, uint8_t data)
+void ironhors_base_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void ironhors_state::colorram_w(offs_t offset, uint8_t data)
+void ironhors_base_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void ironhors_state::charbank_w(uint8_t data)
+void ironhors_base_state::charbank_w(uint8_t data)
 {
 	if (m_charbank != (data & 0x03))
 	{
@@ -95,10 +95,10 @@ void ironhors_state::charbank_w(uint8_t data)
 
 	m_spriterambank = data & 0x08;
 
-	/* other bits unknown */
+	// other bits unknown
 }
 
-void ironhors_state::palettebank_w(uint8_t data)
+void ironhors_base_state::palettebank_w(uint8_t data)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -109,13 +109,13 @@ void ironhors_state::palettebank_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
-	/* bit 6 unknown - set after game over */
+	// bit 6 unknown - set after game over
 
 	if (data & 0x88)
 		popmessage("palettebank_w %02x",data);
 }
 
-void ironhors_state::flipscreen_w(uint8_t data)
+void ironhors_base_state::flipscreen_w(uint8_t data)
 {
 	if (flip_screen() != (~data & 0x08))
 	{
@@ -123,7 +123,7 @@ void ironhors_state::flipscreen_w(uint8_t data)
 		machine().tilemap().mark_all_dirty();
 	}
 
-	/* other bits are used too, but unknown */
+	// other bits are used too, but unknown
 }
 
 TILE_GET_INFO_MEMBER(ironhors_state::get_bg_tile_info)
@@ -144,17 +144,16 @@ void ironhors_state::video_start()
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
-void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
 	uint8_t *sr;
 
 	if (m_spriterambank != 0)
-		sr = m_spriteram;
+		sr = m_spriteram[0];
 	else
-		sr = m_spriteram2;
+		sr = m_spriteram[1];
 
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 5)
+	for (int offs = 0; offs < m_spriteram[0].bytes(); offs += 5)
 	{
 		int sx = sr[offs + 3];
 		int sy = sr[offs + 2];
@@ -174,7 +173,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		switch (sr[offs + 4] & 0x0c)
 		{
-			case 0x00:  /* 16x16 */
+			case 0x00:  // 16x16
 				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code/4,
 						color,
@@ -182,7 +181,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 						sx,sy,0);
 				break;
 
-			case 0x04:  /* 16x8 */
+			case 0x04:  // 16x8
 				{
 					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
@@ -199,7 +198,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				}
 				break;
 
-			case 0x08:  /* 8x16 */
+			case 0x08:  // 8x16
 				{
 					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code & ~2,
@@ -214,7 +213,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				}
 				break;
 
-			case 0x0c:  /* 8x8 */
+			case 0x0c:  // 8x8
 				{
 					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code,
@@ -229,9 +228,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 uint32_t ironhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int row;
-
-	for (row = 0; row < 32; row++)
+	for (int row = 0; row < 32; row++)
 		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -239,7 +236,7 @@ uint32_t ironhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
+TILE_GET_INFO_MEMBER(farwest_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
 		((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
@@ -249,20 +246,19 @@ TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
 	tileinfo.set(0, code, color, flags);
 }
 
-VIDEO_START_MEMBER(ironhors_state,farwest)
+void farwest_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ironhors_state::farwest_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(farwest_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
-void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void farwest_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-	uint8_t *sr = m_spriteram2;
-	uint8_t *sr2 = m_spriteram;
+	uint8_t *sr = m_spriteram[1];
+	uint8_t *sr2 = m_spriteram[0];
 
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram[0].bytes(); offs += 4)
 	{
 		int sx = sr[offs + 2];
 		int sy = sr[offs + 1];
@@ -283,7 +279,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 
 		switch (sr[offs + 3] & 0x0c)
 		{
-			case 0x00:  /* 16x16 */
+			case 0x00:  // 16x16
 				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code/4,
 						color,
@@ -291,7 +287,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 						sx,sy,0);
 				break;
 
-			case 0x04:  /* 16x8 */
+			case 0x04:  // 16x8
 				{
 					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
@@ -308,7 +304,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 				}
 				break;
 
-			case 0x08:  /* 8x16 */
+			case 0x08:  // 8x16
 				{
 					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code & ~2,
@@ -323,7 +319,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 				}
 				break;
 
-			case 0x0c:  /* 8x8 */
+			case 0x0c:  // 8x8
 				{
 					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code,
@@ -336,14 +332,12 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-uint32_t ironhors_state::screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t farwest_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int row;
-
-	for (row = 0; row < 32; row++)
+	for (int row = 0; row < 32; row++)
 		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	farwest_draw_sprites(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

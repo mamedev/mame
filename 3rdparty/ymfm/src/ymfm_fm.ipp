@@ -91,7 +91,7 @@ inline uint32_t attenuation_to_volume(uint32_t input)
 	// as a nod to performance, the implicit 0x400 bit is pre-incorporated, and
 	// the values are left-shifted by 2 so that a simple right shift is all that
 	// is needed; also the order is reversed to save a NOT on the input
-#define X(a) ((a | 0x400) << 2)
+#define X(a) (((a) | 0x400) << 2)
 	static uint16_t const s_power_table[256] =
 	{
 		X(0x3fa),X(0x3f5),X(0x3ef),X(0x3ea),X(0x3e4),X(0x3df),X(0x3da),X(0x3d4),
@@ -500,7 +500,7 @@ int32_t fm_operator<RegisterType>::compute_noise_volume(uint32_t am_offset) cons
 	// application manual says the logarithmic transform is not applied here, so we
 	// just use the raw envelope attenuation, inverted (since 0 attenuation should be
 	// maximum), and shift it up from a 10-bit value to an 11-bit value
-	uint32_t result = (envelope_attenuation(am_offset) ^ 0x3ff) << 1;
+	int32_t result = (envelope_attenuation(am_offset) ^ 0x3ff) << 1;
 
 	// QUESTION: is AM applied still?
 
@@ -706,11 +706,8 @@ void fm_operator<RegisterType>::clock_envelope(uint32_t env_counter)
 	{
 		// glitch means that attack rates of 62/63 don't increment if
 		// changed after the initial key on (where they are handled
-		// specially)
-
-		// QUESTION: this check affects one of the operators on the gng credit sound
-		//   is it correct?
-		// QUESTION: does this apply only to YM2612?
+		// specially); nukeykt confirms this happens on OPM, OPN, OPL/OPLL
+		// at least so assuming it is true for everyone
 		if (rate < 62)
 			m_env_attenuation += (~m_env_attenuation * increment) >> 4;
 	}
@@ -768,7 +765,7 @@ void fm_operator<RegisterType>::clock_phase(int32_t lfo_raw_pm)
 template<class RegisterType>
 uint32_t fm_operator<RegisterType>::envelope_attenuation(uint32_t am_offset) const
 {
-	uint32_t result = m_env_attenuation;
+	uint32_t result = m_env_attenuation >> m_cache.eg_shift;
 
 	// invert if necessary due to SSG-EG
 	if (RegisterType::EG_HAS_SSG && m_ssg_inverted)
@@ -782,7 +779,7 @@ uint32_t fm_operator<RegisterType>::envelope_attenuation(uint32_t am_offset) con
 	result += m_cache.total_level;
 
 	// clamp to max, apply shift, and return
-	return std::min<uint32_t>(result, 0x3ff) >> m_cache.eg_shift;
+	return std::min<uint32_t>(result, 0x3ff);
 }
 
 
@@ -998,7 +995,7 @@ void fm_channel<RegisterType>::output_4op(output_data &output, uint32_t rshift, 
 	//      -x-------- include opout[2] in final sum
 	//      x--------- include opout[3] in final sum
 	#define ALGORITHM(op2in, op3in, op4in, op1out, op2out, op3out) \
-		(op2in | (op3in << 1) | (op4in << 4) | (op1out << 7) | (op2out << 8) | (op3out << 9))
+		((op2in) | ((op3in) << 1) | ((op4in) << 4) | ((op1out) << 7) | ((op2out) << 8) | ((op3out) << 9))
 	static uint16_t const s_algorithm_ops[8+4] =
 	{
 		ALGORITHM(1,2,3, 0,0,0),    //  0: O1 -> O2 -> O3 -> O4 -> out (O4)

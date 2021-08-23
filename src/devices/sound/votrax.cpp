@@ -98,6 +98,7 @@ void votrax_sc01_device::write(uint8_t data)
 		logerror("phone %02x.%d %s\n", m_phone, m_inflection, s_phone_table[m_phone]);
 
 	m_ar_state = CLEAR_LINE;
+	m_ar_cb(m_ar_state);
 
 	// Schedule a commit/ar reset at roughly 0.1ms in the future (one
 	// phi1 transition followed by the rom extra state in practice),

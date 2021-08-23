@@ -100,7 +100,7 @@ example, use the manufacturer’s version number, regional licensee’s
 name, or terse description of hardware differences in preference to
 arbitrary set numbers.  Surround the disambiguation text with
 parentheses, preserve original case for names and version text, but
-use lowercase for anything else besides proper nouns.
+use lowercase for anything else besides proper nouns and initialisms.
 
 
 .. _naming-cplusplus:

@@ -12,14 +12,15 @@
 
 #pragma once
 
+#include "softlist.h"
+#include "unicode.h"
+
 #include <algorithm>
 #include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include "unicode.h"
 
 
 class mame_ui_manager;
@@ -79,7 +80,7 @@ struct ui_software_info
 	std::string parentname;
 	std::string year;
 	std::string publisher;
-	uint8_t supported = 0;
+	software_support supported = software_support::SUPPORTED;
 	std::string part;
 	game_driver const *driver = nullptr;
 	std::string listname;

@@ -479,11 +479,13 @@ void gime_device::reset_timer(void)
 
 		if (timer_type() == GIME_TIMER_63USEC)
 		{
-			m_gime_clock_timer->adjust(attotime::from_usec(63.695) * m_timer_value);
+			// master clock divided by 8, divided by 228, divided by 2
+			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 3648 * m_timer_value);
 		}
 		else
 		{
-			m_gime_clock_timer->adjust(attotime::from_nsec(279.365) * m_timer_value);
+			// master clock divided by 8, divided by 2
+			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 16 * m_timer_value);
 		}
 	}
 	else

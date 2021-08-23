@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "emumem_hep.h"
 
-template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_passthrough<Width, AddrShift, Endian>::~handler_entry_read_passthrough()
+template<int Width, int AddrShift> handler_entry_read_passthrough<Width, AddrShift>::~handler_entry_read_passthrough()
 {
 	if(m_next) {
 		m_mph.remove_handler(this);
@@ -12,11 +12,11 @@ template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_passt
 	}
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read_passthrough<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int Width, int AddrShift> void handler_entry_read_passthrough<Width, AddrShift>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	if(!m_next->is_passthrough())
 		return;
-	auto np = static_cast<handler_entry_read_passthrough<Width, AddrShift, Endian> *>(m_next);
+	auto np = static_cast<handler_entry_read_passthrough<Width, AddrShift> *>(m_next);
 
 	if(handlers.find(np) != handlers.end()) {
 		m_next = np->get_subhandler();
@@ -27,7 +27,7 @@ template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read_
 		np->detach(handlers);
 }
 
-template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_passthrough<Width, AddrShift, Endian>::~handler_entry_write_passthrough()
+template<int Width, int AddrShift> handler_entry_write_passthrough<Width, AddrShift>::~handler_entry_write_passthrough()
 {
 	if(m_next) {
 		m_mph.remove_handler(this);
@@ -35,11 +35,11 @@ template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_pass
 	}
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_passthrough<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int Width, int AddrShift> void handler_entry_write_passthrough<Width, AddrShift>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	if(!m_next->is_passthrough())
 		return;
-	auto np = static_cast<handler_entry_write_passthrough<Width, AddrShift, Endian> *>(m_next);
+	auto np = static_cast<handler_entry_write_passthrough<Width, AddrShift> *>(m_next);
 
 	if(handlers.find(np) != handlers.end()) {
 		m_next = np->get_subhandler();
@@ -50,56 +50,30 @@ template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write
 		np->detach(handlers);
 }
 
-template class handler_entry_read_passthrough<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<0,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<0,  0, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<1,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<1,  3, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<1,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<1,  0, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<1, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<1, -1, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<2,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<2,  3, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<2,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<2,  0, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<2, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<2, -1, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<2, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<2, -2, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<3,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<3,  0, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<3, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<3, -1, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<3, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<3, -2, ENDIANNESS_BIG>;
-template class handler_entry_read_passthrough<3, -3, ENDIANNESS_LITTLE>;
-template class handler_entry_read_passthrough<3, -3, ENDIANNESS_BIG>;
+template class handler_entry_read_passthrough<0,  1>;
+template class handler_entry_read_passthrough<0,  0>;
+template class handler_entry_read_passthrough<1,  3>;
+template class handler_entry_read_passthrough<1,  0>;
+template class handler_entry_read_passthrough<1, -1>;
+template class handler_entry_read_passthrough<2,  3>;
+template class handler_entry_read_passthrough<2,  0>;
+template class handler_entry_read_passthrough<2, -1>;
+template class handler_entry_read_passthrough<2, -2>;
+template class handler_entry_read_passthrough<3,  0>;
+template class handler_entry_read_passthrough<3, -1>;
+template class handler_entry_read_passthrough<3, -2>;
+template class handler_entry_read_passthrough<3, -3>;
 
-template class handler_entry_write_passthrough<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<0,  1, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<0,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<0,  0, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<1,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<1,  3, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<1,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<1,  0, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<1, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<1, -1, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<2,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<2,  3, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<2,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<2,  0, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<2, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<2, -1, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<2, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<2, -2, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<3,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<3,  0, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<3, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<3, -1, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<3, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<3, -2, ENDIANNESS_BIG>;
-template class handler_entry_write_passthrough<3, -3, ENDIANNESS_LITTLE>;
-template class handler_entry_write_passthrough<3, -3, ENDIANNESS_BIG>;
+template class handler_entry_write_passthrough<0,  1>;
+template class handler_entry_write_passthrough<0,  0>;
+template class handler_entry_write_passthrough<1,  3>;
+template class handler_entry_write_passthrough<1,  0>;
+template class handler_entry_write_passthrough<1, -1>;
+template class handler_entry_write_passthrough<2,  3>;
+template class handler_entry_write_passthrough<2,  0>;
+template class handler_entry_write_passthrough<2, -1>;
+template class handler_entry_write_passthrough<2, -2>;
+template class handler_entry_write_passthrough<3,  0>;
+template class handler_entry_write_passthrough<3, -1>;
+template class handler_entry_write_passthrough<3, -2>;
+template class handler_entry_write_passthrough<3, -3>;

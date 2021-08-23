@@ -24,7 +24,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_scanline_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::scanline_tick)
 {
 	int scanline = param;
 
@@ -40,12 +40,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_scanline_tick)
 	}
 }
 
-void ironhors_state::sh_irqtrigger_w(uint8_t data)
+void ironhors_base_state::sh_irqtrigger_w(uint8_t data)
 {
 	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-void ironhors_state::filter_w(uint8_t data)
+void ironhors_base_state::filter_w(uint8_t data)
 {
 	m_disc_ih->write(NODE_11, (data & 0x04) >> 2);
 	m_disc_ih->write(NODE_12, (data & 0x02) >> 1);
@@ -62,9 +62,9 @@ void ironhors_state::master_map(address_map &map)
 {
 	map(0x0000, 0x0002).ram();
 	map(0x0003, 0x0003).ram().w(FUNC(ironhors_state::charbank_w));
-	map(0x0004, 0x0004).ram().share("int_enable");
+	map(0x0004, 0x0004).ram().share(m_interrupt_enable);
 	map(0x0005, 0x001f).ram();
-	map(0x0020, 0x003f).ram().share("scroll");
+	map(0x0020, 0x003f).ram().share(m_scroll);
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00df).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -77,12 +77,12 @@ void ironhors_state::master_map(address_map &map)
 	map(0x1800, 0x1800).nopw(); // ???
 	map(0x1a00, 0x1a01).nopw(); // ???
 	map(0x1c00, 0x1dff).nopw(); // ???
-	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share(m_colorram);
+	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram();
-	map(0x3000, 0x30ff).ram().share("spriteram2");
+	map(0x3000, 0x30ff).ram().share(m_spriteram[1]);
 	map(0x3100, 0x37ff).ram();
-	map(0x3800, 0x38ff).ram().share("spriteram");
+	map(0x3800, 0x38ff).ram().share(m_spriteram[0]);
 	map(0x3900, 0x3fff).ram();
 	map(0x4000, 0xffff).rom();
 }
@@ -100,7 +100,7 @@ void ironhors_state::slave_io_map(address_map &map)
 	map(0x00, 0x01).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
-void ironhors_state::farwest_master_map(address_map &map)
+void farwest_state::master_map(address_map &map)
 {
 	map(0x0000, 0x1bff).rom();
 
@@ -111,31 +111,31 @@ void ironhors_state::farwest_master_map(address_map &map)
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00ff).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
-	map(0x0b01, 0x0b01).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
+	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(FUNC(farwest_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2"); //.w(FUNC(farwest_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(farwest_state::flipscreen_w));
+	map(0x0b01, 0x0b01).portr("DSW2"); //.w(FUNC(farwest_state::palettebank_w));
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 
 
 
-	map(0x1800, 0x1800).w(FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x1a00, 0x1a00).ram().share("int_enable");
-	map(0x1a01, 0x1a01).ram().w(FUNC(ironhors_state::charbank_w));
-	map(0x1a02, 0x1a02).w(FUNC(ironhors_state::palettebank_w));
-	map(0x1e00, 0x1eff).ram().share("spriteram");
-	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x1800, 0x1800).w(FUNC(farwest_state::sh_irqtrigger_w));
+	map(0x1a00, 0x1a00).ram().share(m_interrupt_enable);
+	map(0x1a01, 0x1a01).ram().w(FUNC(farwest_state::charbank_w));
+	map(0x1a02, 0x1a02).w(FUNC(farwest_state::palettebank_w));
+	map(0x1e00, 0x1eff).ram().share(m_spriteram[0]);
+	map(0x2000, 0x23ff).ram().w(FUNC(farwest_state::colorram_w)).share(m_colorram);
+	map(0x2400, 0x27ff).ram().w(FUNC(farwest_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram();
-	map(0x1c00, 0x1dff).ram().share("spriteram2");
+	map(0x1c00, 0x1dff).ram().share(m_spriteram[1]);
 	map(0x3000, 0x31da).ram();
-	map(0x31db, 0x31fa).ram().share("scroll");
+	map(0x31db, 0x31fa).ram().share(m_scroll);
 	map(0x31fb, 0x3fff).ram();
 	map(0x4000, 0xffff).rom();
 }
 
-void ironhors_state::farwest_slave_map(address_map &map)
+void farwest_state::slave_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
@@ -161,7 +161,7 @@ static INPUT_PORTS_START( dairesya )
 
 	PORT_START("DSW1")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
-	/* "No Coin B" = coins produce sound, but no effect on coin counter */
+	// "No Coin B" = coins produce sound, but no effect on coin counter
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
@@ -202,7 +202,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ironhors )
 	PORT_INCLUDE( dairesya )
 
-	/* here button 3 for player 1 and 2 are exchanged */
+	// here button 3 for player 1 and 2 are exchanged
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 
@@ -245,49 +245,49 @@ static const gfx_layout ironhors_spritelayout =
 static GFXDECODE_START( gfx_ironhors )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_spritelayout, 16*8*16, 16*8 )
-	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,   16*8*16, 16*8 )  /* to handle 8x8 sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,   16*8*16, 16*8 )  // to handle 8x8 sprites
 GFXDECODE_END
 
 
 static const gfx_layout farwest_charlayout =
 {
-	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
-	4,  /* 4 bits per pixel */
-	{ 0, 2, 4, 6 }, /* the four bitplanes are packed in one byte */
+	8,8,    // 8*8 characters
+	2048,   // 2048 characters
+	4,  // 4 bits per pixel
+	{ 0, 2, 4, 6 }, // the four bitplanes are packed in one byte
 	{ 3*8+1, 3*8+0, 0*8+1, 0*8+0, 1*8+1, 1*8+0, 2*8+1, 2*8+0 },
 	{ 0*4*8, 1*4*8, 2*4*8, 3*4*8, 4*4*8, 5*4*8, 6*4*8, 7*4*8 },
-	32*8    /* every char takes 32 consecutive bytes */
+	32*8    // every char takes 32 consecutive bytes
 };
 
 static const gfx_layout farwest_spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	512,    /* 512 sprites */
-	4,  /* 4 bits per pixel */
-	{ 0, 512*32*8, 2*512*32*8, 3*512*32*8 },    /* the four bitplanes are separated */
+	16,16,  // 16*16 sprites
+	512,    // 512 sprites
+	4,  // 4 bits per pixel
+	{ 0, 512*32*8, 2*512*32*8, 3*512*32*8 },    // the four bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8    // every sprite takes 32 consecutive bytes
 };
 
 static const gfx_layout farwest_spritelayout2 =
 {
-	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
-	4,  /* 4 bits per pixel */
-	{ 0, 2048*8*8, 2*2048*8*8, 3*2048*8*8 },    /* the four bitplanes are separated */
+	8,8,    // 8*8 characters
+	2048,   // 2048 characters
+	4,  // 4 bits per pixel
+	{ 0, 2048*8*8, 2*2048*8*8, 3*2048*8*8 },    // the four bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_farwest )
 	GFXDECODE_ENTRY( "gfx1", 0, farwest_charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout, 16*8*16, 16*8 )
-	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout2,16*8*16, 16*8 )  /* to handle 8x8 sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout2,16*8*16, 16*8 )  // to handle 8x8 sprites
 GFXDECODE_END
 
 
@@ -300,9 +300,9 @@ GFXDECODE_END
 static const discrete_mixer_desc ironhors_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(2.2), RES_K(2.2), RES_K(2.2)},
-		{0,0,0,0,0,0},  /* no variable resistors   */
-		{0,0,0,0,0,0},  /* no node capacitors      */
-		0, RES_K(1),   /* RF */
+		{0,0,0,0,0,0},  // no variable resistors
+		{0,0,0,0,0,0},  // no node capacitors
+		0, RES_K(1),   // RF
 		0,
 		0,
 		0, 1};
@@ -310,9 +310,9 @@ static const discrete_mixer_desc ironhors_mixer_desc =
 static const discrete_mixer_desc ironhors_mixer_desc_final =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(0.5), RES_K(1)},
-		{0,0,0,0,0,0},  /* no variable resistors   */
-		{CAP_U(4.7), CAP_U(4.7)},  /* node capacitors         */
-		0, RES_K(1),   /* RF */
+		{0,0,0,0,0,0},  // no variable resistors
+		{CAP_U(4.7), CAP_U(4.7)},  // node capacitors
+		0, RES_K(1),   // RF
 		0,
 		0,
 		0, 1};
@@ -348,14 +348,14 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-void ironhors_state::machine_start()
+void ironhors_base_state::machine_start()
 {
 	save_item(NAME(m_palettebank));
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_spriterambank));
 }
 
-void ironhors_state::machine_reset()
+void ironhors_base_state::machine_reset()
 {
 	m_palettebank = 0;
 	m_charbank = 0;
@@ -377,32 +377,23 @@ Hsync is 15,56khz
 These clocks make the emulation run too fast.
 */
 
-void ironhors_state::ironhors(machine_config &config)
+void ironhors_base_state::base(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 18432000/6);        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::master_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::ironhors_scanline_tick), "screen", 0, 1);
+	// basic machine hardware
+	MC6809E(config, m_maincpu, 18432000/6);        // 3.072 MHz??? mod by Shingo Suzuki 1999/10/15
 
-	Z80(config, m_soundcpu, 18432000/6);      /* 3.072 MHz */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::slave_map);
-	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::slave_io_map);
-
-
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(61);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
 	m_screen->set_raw(18432000/4,296,8,256-8,255,16,240); // pixel clock is a guesswork
-	m_screen->set_screen_update(FUNC(ironhors_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ironhors);
-	PALETTE(config, m_palette, FUNC(ironhors_state::ironhors_palette), 16*8*16+16*8*16, 256);
+	PALETTE(config, m_palette, FUNC(ironhors_state::palette), 16*8*16+16*8*16, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -417,7 +408,23 @@ void ironhors_state::ironhors(machine_config &config)
 	DISCRETE(config, m_disc_ih, ironhors_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
+void ironhors_state::ironhors(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::master_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::scanline_tick), "screen", 0, 1);
+
+	Z80(config, m_soundcpu, 18432000/6);      // 3.072 MHz
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::slave_map);
+	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::slave_io_map);
+
+	m_screen->set_screen_update(FUNC(ironhors_state::screen_update));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ironhors);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(farwest_state::scanline_tick)
 {
 	int scanline = param;
 
@@ -433,20 +440,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
 	}
 }
 
-void ironhors_state::farwest(machine_config &config)
+void farwest_state::farwest(machine_config &config)
 {
-	ironhors(config);
+	base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::farwest_master_map);
-	subdevice<timer_device>("scantimer")->set_callback(FUNC(ironhors_state::farwest_scanline_tick));
+	m_maincpu->set_addrmap(AS_PROGRAM, &farwest_state::master_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(farwest_state::scanline_tick), "screen", 0, 1);
 
-	Z80(config.replace(), m_soundcpu, 18432000/6);      /* 3.072 MHz */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::farwest_slave_map);
+	Z80(config, m_soundcpu, 18432000/6);      // 3.072 MHz
+	m_soundcpu->set_addrmap(AS_PROGRAM, &farwest_state::slave_map);
 
-	m_gfxdecode->set_info(gfx_farwest);
-	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_farwest);
 
-	m_screen->set_screen_update(FUNC(ironhors_state::screen_update_farwest));
+	m_screen->set_screen_update(FUNC(farwest_state::screen_update));
 
 	subdevice<ym2203_device>("ym2203")->port_b_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -474,11 +480,11 @@ ROM_START( ironhors )
 	ROM_LOAD16_BYTE( "560_h04.06f",  0x10001, 0x8000, CRC(c1486f61) SHA1(4b96aebe5d35fd1d73bde8576689addbb1ff66ed) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "03f_h08.bin",  0x0000, 0x0100, CRC(9f6ddf83) SHA1(08a37182a974c5448156637f10fe60bfe5f225ad) ) /* palette red */
-	ROM_LOAD( "04f_h09.bin",  0x0100, 0x0100, CRC(e6773825) SHA1(7523e7fa090d850fe79ff0069d3260c76645d65a) ) /* palette green */
-	ROM_LOAD( "05f_h10.bin",  0x0200, 0x0100, CRC(30a57860) SHA1(3ec7535286c8bc65e203320f47e4ed6f1d3d61c9) ) /* palette blue */
-	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) /* character lookup table */
-	ROM_LOAD( "10f_h11.bin",  0x0400, 0x0100, CRC(a63e37d8) SHA1(1a0a76ecd14310125bdf41a8431d562ed498eb27) ) /* sprite lookup table */
+	ROM_LOAD( "03f_h08.bin",  0x0000, 0x0100, CRC(9f6ddf83) SHA1(08a37182a974c5448156637f10fe60bfe5f225ad) ) // palette red
+	ROM_LOAD( "04f_h09.bin",  0x0100, 0x0100, CRC(e6773825) SHA1(7523e7fa090d850fe79ff0069d3260c76645d65a) ) // palette green
+	ROM_LOAD( "05f_h10.bin",  0x0200, 0x0100, CRC(30a57860) SHA1(3ec7535286c8bc65e203320f47e4ed6f1d3d61c9) ) // palette blue
+	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) // character lookup table
+	ROM_LOAD( "10f_h11.bin",  0x0400, 0x0100, CRC(a63e37d8) SHA1(1a0a76ecd14310125bdf41a8431d562ed498eb27) ) // sprite lookup table
 ROM_END
 
 ROM_START( ironhorsh )
@@ -496,11 +502,11 @@ ROM_START( ironhorsh )
 	ROM_LOAD16_BYTE( "06f_h04.bin",  0x10001, 0x8000, CRC(c1486f61) SHA1(4b96aebe5d35fd1d73bde8576689addbb1ff66ed) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "03f_h08.bin",  0x0000, 0x0100, CRC(9f6ddf83) SHA1(08a37182a974c5448156637f10fe60bfe5f225ad) ) /* palette red */
-	ROM_LOAD( "04f_h09.bin",  0x0100, 0x0100, CRC(e6773825) SHA1(7523e7fa090d850fe79ff0069d3260c76645d65a) ) /* palette green */
-	ROM_LOAD( "05f_h10.bin",  0x0200, 0x0100, CRC(30a57860) SHA1(3ec7535286c8bc65e203320f47e4ed6f1d3d61c9) ) /* palette blue */
-	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) /* character lookup table */
-	ROM_LOAD( "10f_h11.bin",  0x0400, 0x0100, CRC(a63e37d8) SHA1(1a0a76ecd14310125bdf41a8431d562ed498eb27) ) /* sprite lookup table */
+	ROM_LOAD( "03f_h08.bin",  0x0000, 0x0100, CRC(9f6ddf83) SHA1(08a37182a974c5448156637f10fe60bfe5f225ad) ) // palette red
+	ROM_LOAD( "04f_h09.bin",  0x0100, 0x0100, CRC(e6773825) SHA1(7523e7fa090d850fe79ff0069d3260c76645d65a) ) // palette green
+	ROM_LOAD( "05f_h10.bin",  0x0200, 0x0100, CRC(30a57860) SHA1(3ec7535286c8bc65e203320f47e4ed6f1d3d61c9) ) // palette blue
+	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) // character lookup table
+	ROM_LOAD( "10f_h11.bin",  0x0400, 0x0100, CRC(a63e37d8) SHA1(1a0a76ecd14310125bdf41a8431d562ed498eb27) ) // sprite lookup table
 ROM_END
 
 ROM_START( dairesya )
@@ -518,18 +524,18 @@ ROM_START( dairesya )
 	ROM_LOAD16_BYTE( "560-k04.6f",   0x10001, 0x8000, CRC(c883d856) SHA1(4c4f91b72dab841ec15ca62121ed0c0878dfff23) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "03f_h08.bin",  0x0000, 0x0100, CRC(9f6ddf83) SHA1(08a37182a974c5448156637f10fe60bfe5f225ad) ) /* palette red */
-	ROM_LOAD( "04f_h09.bin",  0x0100, 0x0100, CRC(e6773825) SHA1(7523e7fa090d850fe79ff0069d3260c76645d65a) ) /* palette green */
-	ROM_LOAD( "05f_h10.bin",  0x0200, 0x0100, CRC(30a57860) SHA1(3ec7535286c8bc65e203320f47e4ed6f1d3d61c9) ) /* palette blue */
-	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) /* character lookup table */
-	ROM_LOAD( "10f_h11.bin",  0x0400, 0x0100, CRC(a63e37d8) SHA1(1a0a76ecd14310125bdf41a8431d562ed498eb27) ) /* sprite lookup table */
+	ROM_LOAD( "03f_h08.bin",  0x0000, 0x0100, CRC(9f6ddf83) SHA1(08a37182a974c5448156637f10fe60bfe5f225ad) ) // palette red
+	ROM_LOAD( "04f_h09.bin",  0x0100, 0x0100, CRC(e6773825) SHA1(7523e7fa090d850fe79ff0069d3260c76645d65a) ) // palette green
+	ROM_LOAD( "05f_h10.bin",  0x0200, 0x0100, CRC(30a57860) SHA1(3ec7535286c8bc65e203320f47e4ed6f1d3d61c9) ) // palette blue
+	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) // character lookup table
+	ROM_LOAD( "10f_h11.bin",  0x0400, 0x0100, CRC(a63e37d8) SHA1(1a0a76ecd14310125bdf41a8431d562ed498eb27) ) // sprite lookup table
 ROM_END
 
 ROM_START( farwest )
-	ROM_REGION( 0x12000, "maincpu", 0 ) /* 64k for code + 8k for extra ROM */
+	ROM_REGION( 0x12000, "maincpu", 0 ) // 64k for code + 8k for extra ROM
 	ROM_LOAD( "ironhors.008", 0x04000, 0x4000, CRC(b1c8246c) SHA1(4ceb098bb0b4efcbe50bb4b23bd27a60dabf2b3e) )
 	ROM_LOAD( "ironhors.009", 0x08000, 0x8000, CRC(ea34ecfc) SHA1(8c7f12e76d2b9eb592ebf1bfd3e16a6b130da8e5) )
-	ROM_LOAD( "ironhors.007", 0x00000, 0x2000, CRC(471182b7) SHA1(48ff58cbbf971b257e8099ec331397cf73dc8325) )   /* don't know what this is for */
+	ROM_LOAD( "ironhors.007", 0x00000, 0x2000, CRC(471182b7) SHA1(48ff58cbbf971b257e8099ec331397cf73dc8325) )   // don't know what this is for
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ironhors.010", 0x0000, 0x4000, CRC(a28231a6) SHA1(617e8fdf8129081c6a1bbbf140837a375a51da72) )
@@ -545,11 +551,11 @@ ROM_START( farwest )
 	ROM_LOAD( "ironhors.004", 0x0c000, 0x4000, CRC(1fab18a3) SHA1(cc7ddf60b719e7c5a689f716ebee9bc04ade406a) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "ironcol.003",  0x0000, 0x0100, CRC(3e3fca11) SHA1(c92737659f063889a2b210cfe5c294b8a4864489) ) /* palette red */
-	ROM_LOAD( "ironcol.001",  0x0100, 0x0100, CRC(dfb13014) SHA1(d9f9a5bed1300faf7c3864d5c5ae07087de25824) ) /* palette green */
-	ROM_LOAD( "ironcol.002",  0x0200, 0x0100, CRC(77c88430) SHA1(e3041945b14955de109a505d9aa9f79046bed6a8) ) /* palette blue */
-	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) /* character lookup table */
-	ROM_LOAD( "ironcol.005",  0x0400, 0x0100, CRC(15077b9c) SHA1(c7fe24e3d481150452ff774f3908510db9e28367) ) /* sprite lookup table */
+	ROM_LOAD( "ironcol.003",  0x0000, 0x0100, CRC(3e3fca11) SHA1(c92737659f063889a2b210cfe5c294b8a4864489) ) // palette red
+	ROM_LOAD( "ironcol.001",  0x0100, 0x0100, CRC(dfb13014) SHA1(d9f9a5bed1300faf7c3864d5c5ae07087de25824) ) // palette green
+	ROM_LOAD( "ironcol.002",  0x0200, 0x0100, CRC(77c88430) SHA1(e3041945b14955de109a505d9aa9f79046bed6a8) ) // palette blue
+	ROM_LOAD( "10f_h12.bin",  0x0300, 0x0100, CRC(5eb33e73) SHA1(f34916dc4617b0c48e0a7ac6ace97b35dfcf1c40) ) // character lookup table
+	ROM_LOAD( "ironcol.005",  0x0400, 0x0100, CRC(15077b9c) SHA1(c7fe24e3d481150452ff774f3908510db9e28367) ) // sprite lookup table
 ROM_END
 
 
@@ -562,4 +568,4 @@ ROM_END
 GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, empty_init, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, farwest,   ironhors, farwest,  ironhors, ironhors_state, empty_init, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, farwest,   ironhors, farwest,  ironhors, farwest_state,  empty_init, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

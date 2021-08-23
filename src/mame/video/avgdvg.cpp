@@ -885,6 +885,9 @@ void avg_mhavoc_device::vgrst() // mhavoc_vgrst
 
 void avg_starwars_device::update_databus() // starwars_data
 {
+	// Avoid interfering with the slapstic
+	auto dis = machine().disable_side_effects();
+
 	m_data = m_memspace->read_byte(m_membase + m_pc);
 }
 

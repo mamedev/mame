@@ -77,14 +77,10 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_txt_tilemap;
-	int *m_spr_idx_list;
-	int *m_spr_pri_list;
-	int *m_t32x32pm;
 	int m_gameid;
 	int m_spr_offsx;
 	int m_spr_offsy;
 	int m_spr_count;
-	uint16_t *m_rgb_half;
 	int m_cloud_blend;
 	int m_cloud_ds;
 	int m_cloud_visible;
@@ -135,6 +131,7 @@ protected:
 	void wecleman_sound_map(address_map &map);
 	void wecleman_sub_map(address_map &map);
 
+	static constexpr int NUM_SPRITES = 256;
 	struct sprite_t
 	{
 		sprite_t() { }
@@ -155,8 +152,10 @@ protected:
 	template<class BitmapClass> void do_blit_zoom32(BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite);
 	template<class BitmapClass> void sprite_draw(BitmapClass &bitmap, const rectangle &cliprect);
 
-	std::unique_ptr<sprite_t []> m_sprite_list;
-	sprite_t **m_spr_ptr_list;
+	sprite_t *m_spr_ptr_list[NUM_SPRITES];
+	int m_spr_idx_list[NUM_SPRITES];
+	int m_spr_pri_list[NUM_SPRITES];
+	sprite_t m_sprite_list[NUM_SPRITES];
 };
 
 class hotchase_state : public wecleman_state

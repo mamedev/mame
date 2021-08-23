@@ -394,6 +394,304 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<!--
+	    To get the installer to recognize the disks, it's necessary to press enter with an empty drive before inserting the next disk.
+	    256-color mode is heavily glitched, 16-color has minor glitches but it's usable.
+	-->
+	<software name="os2_211" supported="partial">
+		<description>OS/2 J2.11</description>
+		<year>1994</year>
+		<publisher>NEC / IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Install Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_install_disk.hdm" size="1261568" crc="c89f68dd" sha1="997276c169940b98dcc81c4cf8f506e56e5fc00c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_1.hdm" size="1261568" crc="e0102b22" sha1="b55752133bee88e968b11185911f702f440a35d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_2.hdm" size="1261568" crc="1b128900" sha1="8704adde6e5eeaaf829a50cca0dca66fb28c2c46" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_3.hdm" size="1261568" crc="190f0496" sha1="6733640ac18d918f0faf560fdc6e9a2de7360a32" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_4.hdm" size="1261568" crc="34d8e6e3" sha1="a19aa914fdac77b68b6a0853e89395acf945f97b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_5.hdm" size="1261568" crc="5bbe2b37" sha1="19e23d6651a7a9c3b07e7f743fc79ee3049ee29d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_6.hdm" size="1261568" crc="cd534751" sha1="2de9a1f750b2501665295b1aa39d6d2e2076a0b6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_7.hdm" size="1261568" crc="1501f297" sha1="6a9f2642ff249dcd919cf5ce93b171812c8b2182" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_8.hdm" size="1261568" crc="3e313865" sha1="610d57b529e6a5fc3cf86b9c28e15d1926fea454" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_9.hdm" size="1261568" crc="b4cf018e" sha1="8914a2ab5c18f83fdc04a8bacf55304a52e591f9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_10.hdm" size="1261568" crc="86866c5a" sha1="da66efac5bfeb9da97b15e00f4949d68a9cb82e4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 11"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_11.hdm" size="1261568" crc="df55e8e8" sha1="7b6aad90fc5c64126dc3ff707efc6d65c6055329" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 12"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_12.hdm" size="1261568" crc="f3e01952" sha1="4144569005d2a53e8bbf9f5ac433b0c3484032f3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 13"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_13.hdm" size="1261568" crc="a290bdad" sha1="f7abf234bd27d459f252b76bf72c283651eb3e9e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 14"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_14.hdm" size="1261568" crc="bcd5f40b" sha1="33cddddeb18d7a86e1e4b7779f6ad9ea923a302e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 15"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_15.hdm" size="1261568" crc="cb5883ba" sha1="aabc395f8494617f417da69fd6ee99b02872ca2c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 16"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_16.hdm" size="1261568" crc="37cdd558" sha1="ac72da609df57ecda24897bb4c6ba95c6c248119" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 17"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_17.hdm" size="1261568" crc="8e0df33d" sha1="342cb5f1d7e8f034abcf1e25c70200309eee1f76" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 18"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_18.hdm" size="1261568" crc="2c91fe47" sha1="1c534c06732c95bfcc45175836a2f69fde8110cd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 19"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_19.hdm" size="1261568" crc="0857de88" sha1="f61aa1c5047cd3bb019017ac41d6750fd0e8895f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 20"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_20.hdm" size="1261568" crc="090d26cd" sha1="f79a3fadc1a6e8fb70537fa4593e78ae320e13c3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 21"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_21.hdm" size="1261568" crc="a81a1fbd" sha1="d16749961c59b68e4a56c600348eca76c1706648" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 22"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_22.hdm" size="1261568" crc="4663203e" sha1="8fe411682f109e34212709aea4b83ce2ec331329" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 23"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_23.hdm" size="1261568" crc="6f3bc235" sha1="162b36304bb68ab946ecdec2c72c454bd62c527f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 24"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_24.hdm" size="1261568" crc="2213b4b7" sha1="4e8bb501caff8155aaf141975b34c7b6df56df1b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 25"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_25.hdm" size="1261568" crc="49b02718" sha1="578dd1bbf5130c5332b8812ecdb19a3a8b6ed463" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 26"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_26.hdm" size="1261568" crc="574bce3a" sha1="d91367f2306bb1e9f3c80da876d977264c4162d7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 27"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_27.hdm" size="1261568" crc="fc52abb6" sha1="9ff363967b64b11afe889a520af9795f99f066d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 28"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_28.hdm" size="1261568" crc="0fe6c3e7" sha1="26673f5c9a0e486ad6cc3b75ad333cd47a173315" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop30" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 29"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_29.hdm" size="1261568" crc="e54095dc" sha1="2bb68ab3202092f464182cd4dd9e6fb4166040a2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop31" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 30"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_disk_30.hdm" size="1261568" crc="93807ace" sha1="372c830197319329d5d1561f5e7e166293bdbc65" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop32" interface="floppy_5_25">
+			<feature name="part_id" value="Device Support Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_device_support_disk.hdm" size="1261568" crc="b43dd820" sha1="1e51bc9ef9c284c9e4f41e6afe4f3cf94a66c274" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop33" interface="floppy_5_25">
+			<feature name="part_id" value="Printer Driver Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_printer_driver_disk.hdm" size="1261568" crc="e99ecaa0" sha1="99be35483bf8b35a4fb1756b13abefc695de52f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop34" interface="floppy_5_25">
+			<feature name="part_id" value="Display Driver Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_display_driver_disk_1.hdm" size="1261568" crc="b946f2c2" sha1="e5802f24e43c8fbfcc5551fdcda999dc3eafb394" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop35" interface="floppy_5_25">
+			<feature name="part_id" value="Display Driver Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_display_driver_disk_2.hdm" size="1261568" crc="e2ce71b2" sha1="833d880634d86d4341e28034d73a5e83517e3584" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop36" interface="floppy_5_25">
+			<feature name="part_id" value="Window Accelerator Driver Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_window_accelerator_driver_disk_1.hdm" size="1261568" crc="59f92f79" sha1="17a20f334e6e3c47a748699259f4c8ca97fd69dd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop37" interface="floppy_5_25">
+			<feature name="part_id" value="Window Accelerator Driver Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_window_accelerator_driver_disk_2.hdm" size="1261568" crc="fcd7fb85" sha1="6079d91517faef9bacbb1ec353be067717e594fc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop38" interface="floppy_5_25">
+			<feature name="part_id" value="ESC/P Emulation Function Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_escp.hdm" size="1261568" crc="0d2b3fbb" sha1="e89241de59d6133dea01a56e0d989d4eedbcfa75" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop39" interface="floppy_5_25">
+			<feature name="part_id" value="RS-232C Card Library Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_rs232c.hdm" size="1261568" crc="61070bfa" sha1="a3ab6471813f105ab10b71f0432d2c10b2069ebb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop40" interface="floppy_5_25">
+			<feature name="part_id" value="CSD (MJC002) Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_csd_mjc002_disk_1.hdm" size="1261568" crc="0afc44bf" sha1="78efd6f93d5b6567e7f386d9d10b183b7c0b2c0d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop41" interface="floppy_5_25">
+			<feature name="part_id" value="CSD (MJC002) Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_csd_mjc002_disk_2.hdm" size="1261568" crc="809abcc5" sha1="1460664fb52be3be12237965a432e8ad95d852f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop42" interface="floppy_5_25">
+			<feature name="part_id" value="CSD (MJC002) Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_csd_mjc002_disk_3.hdm" size="1261568" crc="f0ad04bd" sha1="1e7d8373eba49b0f12a9cba00e32ca8eb07790e8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop43" interface="floppy_5_25">
+			<feature name="part_id" value="CSD (MJC002) Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_csd_mjc002_disk_4.hdm" size="1261568" crc="b9f98dbd" sha1="0e88d52ae09575448d8e894ed6546a05fdb476a9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop44" interface="floppy_5_25">
+			<feature name="part_id" value="CSD (MJC002) Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_csd_mjc002_disk_5.hdm" size="1261568" crc="daf1c0cc" sha1="596c849dbd6a6c0fa52626c34aba5291a3c8db4f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop45" interface="floppy_5_25">
+			<feature name="part_id" value="PTF (NTT-P001)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_ptf_ntt-p001.hdm" size="1261568" crc="7606a03f" sha1="99f1c8674820b80a4941d8f97f05338a9d302fe3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop46" interface="floppy_5_25">
+			<feature name="part_id" value="Single PTF (1)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_single_ptf_1.hdm" size="1261568" crc="4371b64b" sha1="a333b2d0ef276c3049ef5fbd73d76ced9e501b4d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop47" interface="floppy_5_25">
+			<feature name="part_id" value="Single PTF (2)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_single_ptf_2.hdm" size="1261568" crc="81496d1a" sha1="90fd2101cc4447869d8ea0568940ee12dd763191" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop48" interface="floppy_5_25">
+			<feature name="part_id" value="Single PTF (3)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="os2_j211_single_ptf_3.hdm" size="1261568" crc="33d3f3e0" sha1="147f14356df9bfd589a8a2569ed3829aa80f69c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Has kanji drawing issues, cfr. win31 notes ("EGC byte wide writes?") -->
 	<!-- not extensively tested -->
 	<software name="win211" supported="partial">

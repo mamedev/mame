@@ -17,6 +17,18 @@
 DEFINE_DEVICE_TYPE(VTECH_RS232_INTERFACE, vtech_rs232_interface_device, "vtech_rs232", "DSE VZ-200/300 RS-232 Interface")
 
 //-------------------------------------------------
+//  mem_map - memory space address map
+//-------------------------------------------------
+
+void vtech_rs232_interface_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x4000, 0x47ff).rom().region("software", 0);
+	map(0x5000, 0x5000).mirror(0x7ff).r(FUNC(vtech_rs232_interface_device::receive_data_r));
+	map(0x5800, 0x5800).mirror(0x7ff).w(FUNC(vtech_rs232_interface_device::transmit_data_w));
+}
+
+//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
@@ -40,8 +52,10 @@ const tiny_rom_entry *vtech_rs232_interface_device::device_rom_region() const
 
 void vtech_rs232_interface_device::device_add_mconfig(machine_config &config)
 {
+	vtech_memexp_device::device_add_mconfig(config);
+
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(FUNC(vtech_rs232_interface_device::rs232_rx_w));
+	m_rs232->rxd_handler().set([this](int state) { m_rx = state; });
 }
 
 
@@ -54,8 +68,7 @@ void vtech_rs232_interface_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 vtech_rs232_interface_device::vtech_rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VTECH_RS232_INTERFACE, tag, owner, clock),
-	device_vtech_memexp_interface(mconfig, *this),
+	vtech_memexp_device(mconfig, VTECH_RS232_INTERFACE, tag, owner, clock),
 	m_rs232(*this, "rs232"),
 	m_rx(1)
 {
@@ -67,31 +80,16 @@ vtech_rs232_interface_device::vtech_rs232_interface_device(const machine_config 
 
 void vtech_rs232_interface_device::device_start()
 {
-}
+	vtech_memexp_device::device_start();
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_rs232_interface_device::device_reset()
-{
-	// program
-	program_space().install_rom(0x4000, 0x47ff, 0x800, memregion("software")->base());
-
-	// data
-	program_space().install_read_handler(0x5000, 0x57ff, read8smo_delegate(*this, FUNC(vtech_rs232_interface_device::receive_data_r)));
-	program_space().install_write_handler(0x5800, 0x5fff, write8smo_delegate(*this, FUNC(vtech_rs232_interface_device::transmit_data_w)));
+	// register for save states
+	save_item(NAME(m_rx));
 }
 
 
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
-
-WRITE_LINE_MEMBER( vtech_rs232_interface_device::rs232_rx_w )
-{
-	m_rx = state;
-}
 
 uint8_t vtech_rs232_interface_device::receive_data_r()
 {

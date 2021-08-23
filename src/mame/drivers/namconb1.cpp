@@ -311,7 +311,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 
 	if (scanline == posirq_scanline)
 	{
-		m_screen->update_partial(posirq_scanline);
+		m_screen->update_partial(m_update_to_line_before_posirq ? posirq_scanline-1 : posirq_scanline);
 
 		if (m_pos_irq_level != 0)
 			m_maincpu->set_input_line(m_pos_irq_level, ASSERT_LINE);
@@ -894,6 +894,7 @@ INPUT_PORTS_END
 void namconb1_state::init_nebulray()
 {
 	m_gametype = NAMCONB1_NEBULRAY;
+	m_update_to_line_before_posirq = true; // needed or there is a bad line on the right of the screen, and some stars don't scroll correctly
 } /* nebulray */
 
 void namconb1_state::init_gslgr94u()

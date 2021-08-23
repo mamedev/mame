@@ -800,6 +800,7 @@ address_map::address_map(device_t &device, address_map_entry *entry)
 	: m_spacenum(AS_PROGRAM),
 		m_device(&device),
 		m_view(nullptr),
+		m_config(entry->m_map.m_config),
 		m_unmapval(0),
 		m_globalmask(0)
 {
@@ -818,6 +819,7 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, u
 	: m_spacenum(space.spacenum()),
 		m_device(&device),
 		m_view(nullptr),
+		m_config(&space.space_config()),
 		m_unmapval(space.unmap()),
 		m_globalmask(space.addrmask())
 {

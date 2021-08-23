@@ -308,7 +308,7 @@ ROM_START( concept )
 #if 0
 	// version 1 lvl 7 release
 	ROM_LOAD16_BYTE("bootl17h", 0x010000, 0x1000, CRC(6dd9718f))    // where does this come from?
-	ROM_LOAD16_BYTE("bootl17l", 0x010001, 0x1000, CRC(107a3830))
+	ROM_LOAD16_BYTE("bootl17l", 0x010001, 0x1000, CRC(107a3830) SHA1(0ea12ef13b0d11fcd83b306b3a1bb8014ba910c0))
 #elif 0
 	// version $F lvl 8 (development version found on a floppy disk along with
 	// the source code)

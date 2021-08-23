@@ -493,6 +493,23 @@ ROM_START( comport )
 	ROM_LOAD("compaq_portable_video_cpqvid.bin", 0x0000, 0x1ffe, BAD_DUMP CRC(3ae64565) SHA1(6eeb06620e588a2f7bfab72eb4fadbd70503ea94))
 ROM_END
 
+/*********************************************************** Compaq Deskpro ***
+Links: https://www.atarimagazines.com/creative/v11n5/32_Compaq_Deskpro_versus_IBM.php
+Info: Four equipment levels from factory
+Form Factor: Desktop
+CPU: 8086 @ 7.16 MHz
+RAM: 128KB (models 1-3), 384KB (model 4), all expandable to 640KB on the motherboard
+Bus: 8x ISA
+Video: on board
+Display: green or amber 12" CGA monitor
+Mass storage: 1x5.25" 360K (model 1), 2x 5.25" 360K (model 2), 1x5.25" floppy and 1x10MB hard disk (model 3), model 4 adds a 10MB streamer unit
+Ports: serial, parallel, ext. floppy, RTC (from model 3 up)
+
+******************************************************************************/
+ROM_START( comdesk ) // set to juko16 specs, changed those to EGA ... period correct and gets comdesk running while the original CGA isn't emulated yet
+	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_LOAD("compaq_bios_revision_j_106265-002.bin", 0xe000, 0x2000, CRC(d861c857) SHA1(62b8f15e5eddc035b51196e79bbca7bb26d73d1f))
+ROM_END
 
 /************************************************** Data General One / DG-1 ***
 
@@ -1168,6 +1185,8 @@ Options: 8087 FPU
 OSC: 24MHz, 1843.200KHz
 
 Two blocks of dip switches, 8 switches each
+The same BIOS version is found in a Multitech Popular 500 PC
+
 ******************************************************************************/
 
 static DEVICE_INPUT_DEFAULTS_START( siemens )
@@ -1539,7 +1558,7 @@ void pc_state::juko16(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "ega", false); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
@@ -2290,6 +2309,7 @@ COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state,
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
 COMP( 198?, coppc21,        ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Corona PPC-21",         MACHINE_NOT_WORKING )
 COMP( 198?, coppc400,       ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Cordata PPC-400",       MACHINE_NOT_WORKING )
+COMP( 1984, comdesk,        ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "Compaq",                          "Deskpro",               MACHINE_NOT_WORKING )
 COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
 COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
 COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,     MACHINE_NOT_WORKING )

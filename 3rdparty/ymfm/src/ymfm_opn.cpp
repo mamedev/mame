@@ -207,7 +207,12 @@ int32_t opn_registers_base<IsOpnA>::clock_noise_and_lfo()
 	// when we cross the divider count, add enough to zero it and cause an
 	// increment at bit 8; the 7-bit value lives from bits 8-14
 	if (subcount >= lfo_max_count[lfo_rate()])
-		m_lfo_counter += subcount ^ 0xff;
+	{
+		// note: to match the published values this should be 0x100 - subcount;
+		// however, tests on the hardware and nuked bear out an off-by-one
+		// error exists that causes the max LFO rate to be faster than published
+		m_lfo_counter += 0x101 - subcount;
+	}
 
 	// AM value is 7 bits, staring at bit 8; grab the low 6 directly
 	m_lfo_am = bitfield(m_lfo_counter, 8, 6);
@@ -391,7 +396,7 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d freq=%04X dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X",
+	end += sprintf(end, "%u.%02u freq=%04X dt=%u fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X",
 		chnum, opnum,
 		block_freq,
 		op_detune(opoffs),
@@ -414,10 +419,10 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 		end += sprintf(end, " ssg=%X", op_ssg_eg_mode(opoffs));
 	bool am = (lfo_enable() && op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%d", ch_lfo_am_sens(choffs));
+		end += sprintf(end, " am=%u", ch_lfo_am_sens(choffs));
 	bool pm = (lfo_enable() && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%d", ch_lfo_pm_sens(choffs));
+		end += sprintf(end, " pm=%u", ch_lfo_pm_sens(choffs));
 	if (am || pm)
 		end += sprintf(end, " lfo=%02X", lfo_rate());
 	if (multi_freq() && choffs == 2)
@@ -661,160 +666,6 @@ void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_nop(OutputType *ou
 {
 	// nothing to do except increment the sample index
 	m_sampindex += numsamples;
-}
-
-
-
-//*********************************************************
-//  YM2149
-//*********************************************************
-
-//-------------------------------------------------
-//  ym2149 - constructor
-//-------------------------------------------------
-
-ym2149::ym2149(ymfm_interface &intf) :
-	m_address(0),
-	m_ssg(intf)
-{
-}
-
-
-//-------------------------------------------------
-//  reset - reset the system
-//-------------------------------------------------
-
-void ym2149::reset()
-{
-	// reset the engines
-	m_ssg.reset();
-}
-
-
-//-------------------------------------------------
-//  save_restore - save or restore the data
-//-------------------------------------------------
-
-void ym2149::save_restore(ymfm_saved_state &state)
-{
-	state.save_restore(m_address);
-	m_ssg.save_restore(state);
-}
-
-
-//-------------------------------------------------
-//  read_data - read the data register
-//-------------------------------------------------
-
-uint8_t ym2149::read_data()
-{
-	return m_ssg.read(m_address & 0x0f);
-}
-
-
-//-------------------------------------------------
-//  read - handle a read from the device
-//-------------------------------------------------
-
-uint8_t ym2149::read(uint32_t offset)
-{
-	uint8_t result = 0xff;
-	switch (offset & 3)	// BC2,BC1
-	{
-		case 0: // inactive
-			break;
-
-		case 1: // address
-			break;
-
-		case 2: // inactive
-			break;
-
-		case 3: // read
-			result = read_data();
-			break;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  write_address - handle a write to the address
-//  register
-//-------------------------------------------------
-
-void ym2149::write_address(uint8_t data)
-{
-	// just set the address
-	m_address = data;
-}
-
-
-//-------------------------------------------------
-//  write - handle a write to the register
-//  interface
-//-------------------------------------------------
-
-void ym2149::write_data(uint8_t data)
-{
-	m_ssg.write(m_address & 0x0f, data);
-}
-
-
-//-------------------------------------------------
-//  write - handle a write to the register
-//  interface
-//-------------------------------------------------
-
-void ym2149::write(uint32_t offset, uint8_t data)
-{
-	switch (offset & 3)	// BC2,BC1
-	{
-		case 0: // address
-			write_address(data);
-			break;
-
-		case 1: // inactive
-			break;
-
-		case 2: // write
-			write_data(data);
-			break;
-
-		case 3: // address
-			write_address(data);
-			break;
-	}
-}
-
-
-//-------------------------------------------------
-//  generate - generate one sample of FM sound
-//-------------------------------------------------
-
-void ym2149::generate(output_data *output, uint32_t numsamples)
-{
-	// no FM output, just clear
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
-		output->clear();
-}
-
-
-//-------------------------------------------------
-//  generate_ssg - generate one sample of SSG
-//  sound
-//-------------------------------------------------
-
-void ym2149::generate_ssg(output_data_ssg *output, uint32_t numsamples)
-{
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
-	{
-		// clock the SSG
-		m_ssg.clock();
-
-		// YM2149 keeps the three SSG outputs independent
-		m_ssg.output(*output);
-	}
 }
 
 
@@ -1980,7 +1831,7 @@ ym2610::ym2610(ymfm_interface &intf, uint8_t channel_mask) :
 	m_address(0),
 	m_fm_mask(channel_mask),
 	m_eos_status(0x00),
-	m_flag_mask(0xbf),
+	m_flag_mask(EOS_FLAGS_MASK),
 	m_fm(intf),
 	m_ssg(intf),
 	m_ssg_resampler(m_ssg),
@@ -2005,7 +1856,7 @@ void ym2610::reset()
 
 	// initialize our special interrupt states
 	m_eos_status = 0x00;
-	m_flag_mask = 0xbf;
+	m_flag_mask = EOS_FLAGS_MASK;
 }
 
 
@@ -2159,8 +2010,8 @@ void ym2610::write_data(uint8_t data)
 	else if (m_address == 0x1c)
 	{
 		// 1C: EOS flag reset
-		m_flag_mask = ~data;
-		m_eos_status &= ~data;
+		m_flag_mask = ~data & EOS_FLAGS_MASK;
+		m_eos_status &= ~(data & EOS_FLAGS_MASK);
 	}
 	else
 	{
@@ -2307,8 +2158,12 @@ void ym2610::clock_fm_and_adpcm()
 
 	// clock the ADPCM-B engine every cycle
 	m_adpcm_b.clock();
-	if ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0)
-		m_eos_status |= 0x80;
+
+	// we track the last ADPCM-B EOS value in bit 6 (which is hidden from callers);
+	// if it changed since the last sample, update the visible EOS state in bit 7
+	uint8_t live_eos = ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0) ? 0x40 : 0x00;
+	if (((live_eos ^ m_eos_status) & 0x40) != 0)
+		m_eos_status = (m_eos_status & ~0xc0) | live_eos | (live_eos << 1);
 
 	// update the FM content; OPNB is 13-bit with no intermediate clipping
 	m_fm.output(m_last_fm.clear(), 1, 32767, m_fm_mask);

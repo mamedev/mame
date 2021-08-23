@@ -66,34 +66,34 @@ void gaelco_state::oki_bankswitch_w(uint8_t data)
 
 /*********** Squash Encryption Related Code ******************/
 
-void gaelco_state::vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
-	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
+	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0f, 0x4228);
 	vram_w(offset, data, mem_mask);
 }
 
 
-void gaelco_state::encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void gaelco_state::encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
-	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
+	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&m_screenram[offset]);
 }
 
 /*********** Thunder Hoop Encryption Related Code ******************/
 
-void gaelco_state::thoop_vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void gaelco_state::thoop_vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
-	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
+	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0e, 0x4228);
 	vram_w(offset, data, mem_mask);
 }
 
-void gaelco_state::thoop_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void gaelco_state::thoop_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
-	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
+	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&m_screenram[offset]);
 }
 

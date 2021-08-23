@@ -14,7 +14,6 @@
 
 #include "imgtool.h"
 #include "library.h"
-#include "pool.h"
 
 namespace imgtool {
 
@@ -145,9 +144,6 @@ time_t datetime::to_time_t() const
 
 library::library()
 {
-	m_pool = pool_alloc_lib(nullptr);
-	if (!m_pool)
-		throw std::bad_alloc();
 }
 
 
@@ -157,7 +153,6 @@ library::library()
 
 library::~library()
 {
-	pool_free_lib(m_pool);
 }
 
 
@@ -167,28 +162,23 @@ library::~library()
 
 void library::add_class(const imgtool_class *imgclass)
 {
-	char *s1, *s2;
+	char const *temp;
 
 	// allocate the module and place it in the chain
 	m_modules.emplace_back(std::make_unique<imgtool_module>());
 	imgtool_module *module = m_modules.back().get();
-	memset(module, 0, sizeof(*module));
-
-	// extensions have a weird format
-	s1 = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_FILE_EXTENSIONS);
-	s2 = (char*)imgtool_library_malloc(strlen(s1) + 1);
-	strcpy(s2, s1);
-	module->extensions = s2;
 
 	module->imgclass                    = *imgclass;
-	module->name                        = imgtool_library_strdup(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME));
-	module->description                 = imgtool_library_strdup(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_DESCRIPTION));
-	module->eoln                        = imgtool_library_strdup_allow_null(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_EOLN));
-	module->initial_path_separator      = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR) ? 1 : 0;
-	module->open_is_strict              = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_OPEN_IS_STRICT) ? 1 : 0;
-	module->tracks_are_called_cylinders = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? 1 : 0;
-	module->writing_untested            = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_WRITING_UNTESTED) ? 1 : 0;
-	module->creation_untested           = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_CREATION_UNTESTED) ? 1 : 0;
+	module->name                        = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME);
+	module->description                 = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_DESCRIPTION);
+	module->extensions                  = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_FILE_EXTENSIONS);
+	temp = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_EOLN);
+	module->eoln                        = (temp != nullptr) ? temp : "";
+	module->initial_path_separator      = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR) ? true : false;
+	module->open_is_strict              = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_OPEN_IS_STRICT) ? true : false;
+	module->tracks_are_called_cylinders = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? true : false;
+	module->writing_untested            = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_WRITING_UNTESTED) ? true : false;
+	module->creation_untested           = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_CREATION_UNTESTED) ? true : false;
 	module->open                        = (imgtoolerr_t (*)(imgtool::image &, imgtool::stream::ptr &&)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
 	module->create                      = (imgtoolerr_t (*)(imgtool::image &, imgtool::stream::ptr &&, util::option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
 	module->close                       = (void (*)(imgtool::image &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CLOSE);
@@ -201,7 +191,8 @@ void library::add_class(const imgtool_class *imgclass)
 	module->list_partitions             = (imgtoolerr_t (*)(imgtool::image &, std::vector<imgtool::partition_info> &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
 	module->block_size                  = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_BLOCK_SIZE);
 	module->createimage_optguide        = (const util::option_guide *) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE);
-	module->createimage_optspec         = imgtool_library_strdup_allow_null((const char*)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
+	temp = (char const *)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC);
+	module->createimage_optspec         = (temp != nullptr) ? temp : "";
 	module->image_extra_bytes           += imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES);
 }
 
@@ -269,10 +260,10 @@ int library::module_compare(const imgtool_module *m1, const imgtool_module *m2, 
 	switch(sort)
 	{
 	case sort_type::NAME:
-		rc = strcmp(m1->name, m2->name);
+		rc = strcmp(m1->name.c_str(), m2->name.c_str());
 		break;
 	case sort_type::DESCRIPTION:
-		rc = core_stricmp(m1->description, m2->description);
+		rc = core_stricmp(m1->description.c_str(), m2->description.c_str());
 		break;
 	}
 	return rc;
@@ -316,36 +307,6 @@ const imgtool_module *library::findmodule(const std::string &module_name)
 	return iter != m_modules.end()
 		? iter->get()
 		: nullptr;
-}
-
-
-//-------------------------------------------------
-//  imgtool_library_malloc
-//-------------------------------------------------
-
-void *library::imgtool_library_malloc(size_t mem)
-{
-	return pool_malloc_lib(m_pool, mem);
-}
-
-
-//-------------------------------------------------
-//  imgtool_library_malloc
-//-------------------------------------------------
-
-char *library::imgtool_library_strdup(const char *s)
-{
-	return pool_strdup_lib(m_pool, s);
-}
-
-
-//-------------------------------------------------
-//  imgtool_library_strdup_allow_null
-//-------------------------------------------------
-
-char *library::imgtool_library_strdup_allow_null(const char *s)
-{
-	return s ? imgtool_library_strdup(s) : nullptr;
 }
 
 

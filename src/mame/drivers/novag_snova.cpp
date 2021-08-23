@@ -31,7 +31,7 @@ Older versions had a bug in the opening moves, always playing B5 after D4.
 ===============================================================================
 
 Novag Supremo (model 881)
-----------------------------
+-------------------------
 
 Hardware notes:
 - Hitachi HD63A03YP MCU @ 8MHz (2MHz internal)

@@ -5,15 +5,15 @@
 //
 // Compile with:
 //
-//   g++ --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
+//   g++ --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_misc.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
 //
 // or:
 //
-//   clang --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
+//   clang --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_misc.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
 //
 // or:
 //
-//   cl -I..\..\src vgmrender.cpp em_inflate.cpp ..\..\src\ymfm_opl.cpp ..\..\src\ymfm_opm.cpp ..\..\src\ymfm_opn.cpp ..\..\src\ymfm_adpcm.cpp ..\..\src\ymfm_pcm.cpp ..\..\src\ymfm_ssg.cpp /Od /Zi /std:c++14 /EHsc
+//   cl -I..\..\src vgmrender.cpp em_inflate.cpp ..\..\src\ymfm_misc.cpp ..\..\src\ymfm_opl.cpp ..\..\src\ymfm_opm.cpp ..\..\src\ymfm_opn.cpp ..\..\src\ymfm_adpcm.cpp ..\..\src\ymfm_pcm.cpp ..\..\src\ymfm_ssg.cpp /Od /Zi /std:c++14 /EHsc
 //
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -26,6 +26,7 @@
 #include <string>
 
 #include "em_inflate.h"
+#include "ymfm_misc.h"
 #include "ymfm_opl.h"
 #include "ymfm_opm.h"
 #include "ymfm_opn.h"
@@ -328,7 +329,7 @@ void add_chips(uint32_t clock, chip_type type, char const *chipname)
 	{
 		char name[100];
 		sprintf(name, "%s #%d", chipname, index);
-		active_chips.push_back(new vgm_chip<ChipType>(clockval, type, chipname));
+		active_chips.push_back(new vgm_chip<ChipType>(clockval, type, (numchips == 2) ? name : chipname));
 	}
 
 	if (type == CHIP_YM2608)
@@ -909,7 +910,6 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 					break;
 				uint8_t type = buffer[offset++];
 				uint32_t size = parse_uint32(buffer, offset);
-				uint32_t start, length;
 				uint32_t localoffset = offset;
 
 				switch (type)
@@ -1113,15 +1113,22 @@ int write_wav(char const *filename, uint32_t output_rate, std::vector<int32_t> &
 {
 	// determine normalization parameters
 	int32_t max_scale = 0;
-	for (int index = 0; index < wav_buffer_src.size(); index++)
+	for (size_t index = 0; index < wav_buffer_src.size(); index++)
 	{
 		int32_t absval = std::abs(wav_buffer_src[index]);
 		max_scale = std::max(max_scale, absval);
 	}
 
+	// warn if only silence was detected (and also avoid divide by zero)
+	if (max_scale == 0)
+	{
+		fprintf(stderr, "The WAV file data will only contain silence.\n");
+		max_scale = 1;
+	}
+
 	// now convert
 	std::vector<int16_t> wav_buffer(wav_buffer_src.size());
-	for (int index = 0; index < wav_buffer_src.size(); index++)
+	for (size_t index = 0; index < wav_buffer_src.size(); index++)
 		wav_buffer[index] = wav_buffer_src[index] * 26000 / max_scale;
 
 	// write the WAV file

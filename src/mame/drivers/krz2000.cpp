@@ -23,7 +23,7 @@
 #include "machine/tmp68301.h"
 #include "machine/bankdev.h"
 #include "machine/upd765.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "video/t6963c.h"

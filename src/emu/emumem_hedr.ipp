@@ -12,12 +12,12 @@
 #include "emumem_hep.h"
 #include "emumem_hedr.h"
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> const handler_entry_read<Width, AddrShift, Endian> *const *handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::get_dispatch() const
+template<int HighBits, int Width, int AddrShift> const handler_entry_read<Width, AddrShift> *const *handler_entry_read_dispatch<HighBits, Width, AddrShift>::get_dispatch() const
 {
 	return m_a_dispatch;
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::handler_entry_read_dispatch(address_space *space, const handler_entry::range &init, handler_entry_read<Width, AddrShift, Endian> *handler) : handler_entry_read<Width, AddrShift, Endian>(space, handler_entry::F_DISPATCH), m_view(nullptr)
+template<int HighBits, int Width, int AddrShift> handler_entry_read_dispatch<HighBits, Width, AddrShift>::handler_entry_read_dispatch(address_space *space, const handler_entry::range &init, handler_entry_read<Width, AddrShift> *handler) : handler_entry_read<Width, AddrShift>(space, handler_entry::F_DISPATCH), m_view(nullptr)
 {
 	m_ranges_array.resize(1);
 	m_dispatch_array.resize(1);
@@ -27,7 +27,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_en
 	m_u_dispatch = m_dispatch_array[0].data();
 
 	if (!handler)
-		handler = space->get_unmap_r<Width, AddrShift, Endian>();
+		handler = space->get_unmap_r<Width, AddrShift>();
 	handler->ref(COUNT);
 	for(unsigned int i=0; i != COUNT; i++) {
 		m_u_dispatch[i] = handler;
@@ -35,11 +35,11 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_en
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::handler_entry_read_dispatch(address_space *space, memory_view &view) : handler_entry_read<Width, AddrShift, Endian>(space, handler_entry::F_VIEW), m_view(&view), m_a_dispatch(nullptr), m_a_ranges(nullptr), m_u_dispatch(nullptr), m_u_ranges(nullptr)
+template<int HighBits, int Width, int AddrShift> handler_entry_read_dispatch<HighBits, Width, AddrShift>::handler_entry_read_dispatch(address_space *space, memory_view &view) : handler_entry_read<Width, AddrShift>(space, handler_entry::F_VIEW), m_view(&view), m_a_dispatch(nullptr), m_a_ranges(nullptr), m_u_dispatch(nullptr), m_u_ranges(nullptr)
 {
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::handler_entry_read_dispatch(handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian> *src) : handler_entry_read<Width, AddrShift, Endian>(src->m_space, handler_entry::F_DISPATCH), m_view(nullptr)
+template<int HighBits, int Width, int AddrShift> handler_entry_read_dispatch<HighBits, Width, AddrShift>::handler_entry_read_dispatch(handler_entry_read_dispatch<HighBits, Width, AddrShift> *src) : handler_entry_read<Width, AddrShift>(src->m_space, handler_entry::F_DISPATCH), m_view(nullptr)
 {
 	m_ranges_array.resize(1);
 	m_dispatch_array.resize(1);
@@ -55,7 +55,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_en
 }
 
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::~handler_entry_read_dispatch()
+template<int HighBits, int Width, int AddrShift> handler_entry_read_dispatch<HighBits, Width, AddrShift>::~handler_entry_read_dispatch()
 {
 	for(auto &d : m_dispatch_array)
 		for(auto p : d)
@@ -63,7 +63,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_en
 				p->unref();
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::enumerate_references(handler_entry::reflist &refs) const
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::enumerate_references(handler_entry::reflist &refs) const
 {
 	for(auto &d : m_dispatch_array)
 		for(auto p : d)
@@ -71,7 +71,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 				refs.add(p);
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::dump_map(std::vector<memory_entry> &map) const
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::dump_map(std::vector<memory_entry> &map) const
 {
 	if(m_view) {
 		for(u32 i = 0; i != m_dispatch_array.size(); i++) {
@@ -109,22 +109,22 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask) const
+template<int HighBits, int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_dispatch<HighBits, Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
-	return dispatch_read<Level, Width, AddrShift, Endian>(HIGHMASK, offset, mem_mask, m_a_dispatch);
+	return dispatch_read<Level, Width, AddrShift>(HIGHMASK, offset, mem_mask, m_a_dispatch);
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void *handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::get_ptr(offs_t offset) const
+template<int HighBits, int Width, int AddrShift> void *handler_entry_read_dispatch<HighBits, Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return m_a_dispatch[(offset & HIGHMASK) >> LowBits]->get_ptr(offset);
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> std::string handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::name() const
+template<int HighBits, int Width, int AddrShift> std::string handler_entry_read_dispatch<HighBits, Width, AddrShift>::name() const
 {
 	return m_view ? "view" : "dispatch";
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift, Endian> *&handler) const
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift> *&handler) const
 {
 	offs_t slot = (address >> LowBits) & BITMASK;
 	auto h = m_a_dispatch[slot];
@@ -137,11 +137,11 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::range_cut_before(offs_t address, int start)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::range_cut_before(offs_t address, int start)
 {
 	while(--start >= 0 && m_u_dispatch[start]) {
 		if(int(LowBits) > -AddrShift && m_u_dispatch[start]->is_dispatch()) {
-			static_cast<handler_entry_read_dispatch<LowBits, Width, AddrShift, Endian> *>(m_u_dispatch[start])->range_cut_before(address);
+			static_cast<handler_entry_read_dispatch<LowBits, Width, AddrShift> *>(m_u_dispatch[start])->range_cut_before(address);
 			break;
 		}
 		if(m_u_ranges[start].end <= address)
@@ -150,11 +150,11 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::range_cut_after(offs_t address, int start)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::range_cut_after(offs_t address, int start)
 {
 	while(++start < COUNT && m_u_dispatch[start]) {
 		if(int(LowBits) > -AddrShift && m_u_dispatch[start]->is_dispatch()) {
-			static_cast<handler_entry_read_dispatch<LowBits, Width, AddrShift, Endian> *>(m_u_dispatch[start])->range_cut_after(address);
+			static_cast<handler_entry_read_dispatch<LowBits, Width, AddrShift> *>(m_u_dispatch[start])->range_cut_after(address);
 			break;
 		}
 		if(m_u_ranges[start].start >= address)
@@ -163,27 +163,27 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift> *handler)
 {
 	auto cur = m_u_dispatch[entry];
 	if(cur->is_dispatch())
 		cur->populate_nomirror(start, end, ostart, oend, handler);
 	else {
-		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_nomirror(start, end, ostart, oend, handler);
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift> *handler)
 {
 	offs_t start_entry = (start & HIGHMASK) >> LowBits;
 	offs_t end_entry = (end & HIGHMASK) >> LowBits;
 	range_cut_before(ostart-1, start_entry);
 	range_cut_after(oend+1, end_entry);
 
-	if(LowBits <= Width + AddrShift) {
+	if constexpr(LowBits <= Width + AddrShift) {
 		if(handler->is_view())
 			handler->init_handlers(start_entry, end_entry, LowBits, m_u_dispatch, m_u_ranges);
 		handler->ref(end_entry - start_entry);
@@ -229,13 +229,13 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 		}
 	}
 }
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift> *handler)
 {
 	auto cur = m_u_dispatch[entry];
 	if(cur->is_dispatch())
 		cur->populate_mirror(start, end, ostart, oend, mirror, handler);
 	else {
-		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_mirror(start, end, ostart, oend, mirror, handler);
@@ -243,7 +243,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 }
 
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift> *handler)
 {
 	offs_t hmirror = mirror & HIGHMASK;
 	offs_t lmirror = mirror & LOWMASK;
@@ -274,11 +274,11 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::mismatched_patch(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings, handler_entry_read<Width, AddrShift, Endian> *&target)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::mismatched_patch(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings, handler_entry_read<Width, AddrShift> *&target)
 {
 	u8 ukey = descriptor.rkey_to_ukey(rkey);
-	handler_entry_read<Width, AddrShift, Endian> *original = target->is_units() ? target : nullptr;
-	handler_entry_read<Width, AddrShift, Endian> *replacement = nullptr;
+	handler_entry_read<Width, AddrShift> *original = target->is_units() ? target : nullptr;
+	handler_entry_read<Width, AddrShift> *replacement = nullptr;
 	for(const auto &p : mappings)
 		if(p.ukey == ukey && p.original == original) {
 			replacement = p.patched;
@@ -286,9 +286,9 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 		}
 	if(!replacement) {
 		if(original)
-			replacement = new handler_entry_read_units<Width, AddrShift, Endian>(descriptor, ukey, static_cast<handler_entry_read_units<Width, AddrShift, Endian> *>(original));
+			replacement = new handler_entry_read_units<Width, AddrShift>(descriptor, ukey, static_cast<handler_entry_read_units<Width, AddrShift> *>(original));
 		else
-			replacement = new handler_entry_read_units<Width, AddrShift, Endian>(descriptor, ukey, this->m_space);
+			replacement = new handler_entry_read_units<Width, AddrShift>(descriptor, ukey, this->m_space);
 
 		mappings.emplace_back(mapping{ original, replacement, ukey });
 	} else
@@ -297,27 +297,27 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	target = replacement;
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_mismatched_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_mismatched_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings)
 {
 	auto cur = m_u_dispatch[entry];
 	if(cur->is_dispatch())
 		cur->populate_mismatched_nomirror(start, end, ostart, oend, descriptor, rkey, mappings);
 	else {
-		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_mismatched_nomirror(start, end, ostart, oend, descriptor, rkey, mappings);
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings)
 {
 	offs_t start_entry = start >> LowBits;
 	offs_t end_entry = end >> LowBits;
 	range_cut_before(ostart-1, start_entry);
 	range_cut_after(oend+1, end_entry);
 
-	if(LowBits <= Width + AddrShift) {
+	if constexpr(LowBits <= Width + AddrShift) {
 		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
 			u8 rkey1 = rkey;
 			if(ent != start_entry)
@@ -331,7 +331,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	} else if(start_entry == end_entry) {
 		if(!(start & LOWMASK) && (end & LOWMASK) == LOWMASK) {
 			if(m_u_dispatch[start_entry]->is_dispatch())
-				m_u_dispatch[start_entry]->populate_mismatched_nomirror(start & LOWMASK, end & LOWMASK, ostart, oend, descriptor, rkey, mappings);
+				m_u_dispatch[start_entry]->populate_mismatched_nomirror(0, LOWMASK, ostart, oend, descriptor, rkey, mappings);
 			else {
 				mismatched_patch(descriptor, rkey, mappings, m_u_dispatch[start_entry]);
 				m_u_ranges[start_entry].set(ostart, oend);
@@ -351,38 +351,36 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 			rkey &= ~handler_entry::END;
 		}
 
-		if(start_entry <= end_entry) {
-			for(offs_t ent = start_entry; ent <= end_entry; ent++) {
-				u8 rkey1 = rkey;
-				if(ent != start_entry)
-					rkey1 &= ~handler_entry::START;
-				if(ent != end_entry)
-					rkey1 &= ~handler_entry::END;
-				if(m_u_dispatch[ent]->is_dispatch())
-					m_u_dispatch[ent]->populate_mismatched_nomirror(start & LOWMASK, end & LOWMASK, ostart, oend, descriptor, rkey1, mappings);
-				else {
-					mismatched_patch(descriptor, rkey1, mappings, m_u_dispatch[ent]);
-					m_u_ranges[ent].set(ostart, oend);
-				}
+		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
+			u8 rkey1 = rkey;
+			if(ent != start_entry)
+				rkey1 &= ~handler_entry::START;
+			if(ent != end_entry)
+				rkey1 &= ~handler_entry::END;
+			if(m_u_dispatch[ent]->is_dispatch())
+				m_u_dispatch[ent]->populate_mismatched_nomirror(0, LOWMASK, ostart, oend, descriptor, rkey1, mappings);
+			else {
+				mismatched_patch(descriptor, rkey1, mappings, m_u_dispatch[ent]);
+				m_u_ranges[ent].set(ostart, oend);
 			}
 		}
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_mismatched_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_mismatched_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor, std::vector<mapping> &mappings)
 {
 	auto cur = m_u_dispatch[entry];
 	if(cur->is_dispatch())
 		cur->populate_mismatched_mirror(start, end, ostart, oend, mirror, descriptor, mappings);
 	else {
-		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_mismatched_mirror(start, end, ostart, oend, mirror, descriptor, mappings);
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor, std::vector<mapping> &mappings)
 {
 	offs_t hmirror = mirror & HIGHMASK;
 	offs_t lmirror = mirror & LOWMASK;
@@ -410,10 +408,10 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 }
 
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::passthrough_patch(handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings, handler_entry_read<Width, AddrShift, Endian> *&target)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::passthrough_patch(handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings, handler_entry_read<Width, AddrShift> *&target)
 {
-	handler_entry_read<Width, AddrShift, Endian> *original = target;
-	handler_entry_read<Width, AddrShift, Endian> *replacement = nullptr;
+	handler_entry_read<Width, AddrShift> *original = target;
+	handler_entry_read<Width, AddrShift> *replacement = nullptr;
 	for(const auto &p : mappings)
 		if(p.original == original) {
 			replacement = p.patched;
@@ -428,27 +426,27 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	target = replacement;
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_passthrough_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_passthrough_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)
 {
 	auto cur = m_u_dispatch[entry];
 	if(cur->is_dispatch())
 		cur->populate_passthrough_nomirror(start, end, ostart, oend, handler, mappings);
 	else {
-		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_passthrough_nomirror(start, end, ostart, oend, handler, mappings);
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)
 {
 	offs_t start_entry = (start & HIGHMASK) >> LowBits;
 	offs_t end_entry = (end & HIGHMASK) >> LowBits;
 	range_cut_before(ostart-1, start_entry);
 	range_cut_after(oend+1, end_entry);
 
-	if(LowBits <= Width + AddrShift) {
+	if constexpr(LowBits <= Width + AddrShift) {
 		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
 			passthrough_patch(handler, mappings, m_u_dispatch[ent]);
 			m_u_ranges[ent].intersect(ostart, oend);
@@ -456,8 +454,12 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 
 	} else if(start_entry == end_entry) {
 		if(!(start & LOWMASK) && (end & LOWMASK) == LOWMASK) {
-			passthrough_patch(handler, mappings, m_u_dispatch[start_entry]);
-			m_u_ranges[start_entry].intersect(ostart, oend);
+			if(m_u_dispatch[start_entry]->is_dispatch())
+				m_u_dispatch[start_entry]->populate_passthrough_nomirror(0, LOWMASK, ostart, oend, handler, mappings);
+			else {
+				passthrough_patch(handler, mappings, m_u_dispatch[start_entry]);
+				m_u_ranges[start_entry].intersect(ostart, oend);
+			}
 		} else
 			populate_passthrough_nomirror_subdispatch(start_entry, start & LOWMASK, end & LOWMASK, ostart, oend, handler, mappings);
 
@@ -471,33 +473,31 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 			end_entry--;
 		}
 
-		if(start_entry <= end_entry) {
-			for(offs_t ent = start_entry; ent <= end_entry; ent++) {
-				if(m_u_dispatch[ent]->is_dispatch())
-					m_u_dispatch[ent]->populate_passthrough_nomirror(start & LOWMASK, end & LOWMASK, ostart, oend, handler, mappings);
-				else {
-					passthrough_patch(handler, mappings, m_u_dispatch[ent]);
-					m_u_ranges[ent].intersect(ostart, oend);
-				}
+		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
+			if(m_u_dispatch[ent]->is_dispatch())
+				m_u_dispatch[ent]->populate_passthrough_nomirror(0, LOWMASK, ostart, oend, handler, mappings);
+			else {
+				passthrough_patch(handler, mappings, m_u_dispatch[ent]);
+				m_u_ranges[ent].intersect(ostart, oend);
 			}
 		}
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_passthrough_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_passthrough_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)
 {
 	auto cur = m_u_dispatch[entry];
 	if(cur->is_dispatch())
 		cur->populate_passthrough_mirror(start, end, ostart, oend, mirror, handler, mappings);
 	else {
-		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_read_dispatch<LowBits, Width, AddrShift>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_passthrough_mirror(start, end, ostart, oend, mirror, handler, mappings);
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)
 {
 	offs_t hmirror = mirror & HIGHMASK;
 	offs_t lmirror = mirror & LOWMASK;
@@ -524,7 +524,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	for(unsigned int i=0; i != COUNT; i++) {
 		if(m_u_dispatch[i]->is_dispatch()) {
@@ -535,7 +535,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 		if(!m_u_dispatch[i]->is_passthrough())
 			continue;
 
-		auto np = static_cast<handler_entry_read_passthrough<Width, AddrShift, Endian> *>(m_u_dispatch[i]);
+		auto np = static_cast<handler_entry_read_passthrough<Width, AddrShift> *>(m_u_dispatch[i]);
 
 		if(handlers.find(np) != handlers.end()) {
 			m_u_dispatch[i] = np->get_subhandler();
@@ -547,7 +547,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift, Endian> **dispatch, handler_entry::range *ranges)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges)
 {
 	if(!m_view)
 		fatalerror("init_handlers called on non-view handler_entry_read_dispatch.");
@@ -587,7 +587,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::select_a(int id)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::select_a(int id)
 {
 	u32 i = id+1;
 	if(i >= m_dispatch_array.size())
@@ -597,7 +597,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	m_a_dispatch = m_dispatch_array[i].data();
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::select_u(int id)
+template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::select_u(int id)
 {
 	u32 i = id+1;
 	if(i > m_dispatch_array.size())
@@ -624,14 +624,14 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	}
 }
 
-template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_entry_read<Width, AddrShift, Endian> *handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::dup()
+template<int HighBits, int Width, int AddrShift> handler_entry_read<Width, AddrShift> *handler_entry_read_dispatch<HighBits, Width, AddrShift>::dup()
 {
 	if(m_view) {
 		handler_entry::ref();
 		return this;
 	}
 
-	return new handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>(this);
+	return new handler_entry_read_dispatch<HighBits, Width, AddrShift>(this);
 }
 
 #endif // MAME_EMU_EMUMEM_HEDR_IPP

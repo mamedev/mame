@@ -302,7 +302,7 @@ public:
 
 protected:
 	void sound_control_w(uint8_t data);
-	void dac_data_w(uint8_t data);
+	void dac_data_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER( soundirq_cb );
 	bool m_nmi_enable;
 	uint16_t m_dac_data;

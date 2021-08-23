@@ -5,13 +5,13 @@ license:CC0
 -->
 <softwarelist name="fmtowns_flop_cracked" description="Fujitsu FM Towns cracked floppy disk images">
 
-	<!-- Some graphics issues -->
-	<software name="asuka120" supported="partial">
+	<software name="asuka120">
 		<description>Asuka 120% Burning Fest. (cracked)</description>
 		<year>1994</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="あすか 120% BURNING Fest." />
 		<info name="release" value="199403xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -39,6 +39,7 @@ license:CC0
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="キャメルトライ" />
 		<info name="release" value="199411xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="cameltry_fixed.bin" size="1261568" crc="8d98efc1" sha1="1537ea0addb4398b846a7582b54895533a984dd1"/>
@@ -53,6 +54,7 @@ license:CC0
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="コラムス" />
 		<info name="release" value="199012xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="columns.hdm" size="1261568" crc="312d2c79" sha1="1c60aaa0028eb6570ecd2303e63e86598362226e" />
@@ -66,6 +68,7 @@ license:CC0
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ダイナソア" />
 		<info name="release" value="199110xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1261568">
@@ -93,6 +96,7 @@ license:CC0
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="スーパー大戦略" />
 		<info name="release" value="199003xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">

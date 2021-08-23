@@ -117,7 +117,7 @@ void ct486_state::ct486(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ct486_state::ct486_io);
 	m_maincpu->set_irq_acknowledge_callback("cs4031", FUNC(cs4031_device::int_ack_r));
 
-	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc");
+	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc", RAM_TAG);
 	// cpu connections
 	m_cs4031->hold().set(FUNC(ct486_state::cs4031_hold));
 	m_cs4031->nmi().set_inputline("maincpu", INPUT_LINE_NMI);

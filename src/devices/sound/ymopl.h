@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#ifndef MAME_SOUND_YM3526_H
-#define MAME_SOUND_YM3526_H
+#ifndef MAME_SOUND_YMOPL_H
+#define MAME_SOUND_YMOPL_H
 
 #pragma once
 
@@ -205,4 +205,4 @@ protected:
 	required_region_ptr<u8> m_internal; // internal memory region
 };
 
-#endif // MAME_SOUND_YM3526_H
+#endif // MAME_SOUND_YMOPL_H

@@ -177,6 +177,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(TE7750, te7750_device, "te7750", "TE7750 Super I/O Expander")
+DEFINE_DEVICE_TYPE(TE7751, te7751_device, "te7751", "TE7751 Super I/O Expander")
 DEFINE_DEVICE_TYPE(TE7752, te7752_device, "te7752", "TE7752 Super I/O Expander")
 
 //**************************************************************************
@@ -198,6 +199,15 @@ te7750_device::te7750_device(const machine_config &mconfig, device_type type, co
 
 te7750_device::te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: te7750_device(mconfig, TE7750, tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  te7751_device - constructor
+//-------------------------------------------------
+
+te7751_device::te7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: te7750_device(mconfig, TE7751, tag, owner, clock)
 {
 }
 

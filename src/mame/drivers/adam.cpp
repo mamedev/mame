@@ -458,9 +458,9 @@ uint8_t adam_state::mreq_r(offs_t offset)
 	}
 
 	data = m_cart->bd_r(offset & 0x7fff, data, cs1, cs2, cs3, cs4);
-	data = m_slot1->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
-	data = m_slot2->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	data = m_slot3->bd_r(offset, data, 1, 1, 1, cas1, cas2);
+	data = m_slot[0]->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot[1]->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot[2]->bd_r(offset, data, 1, 1, 1, cas1, cas2);
 
 	return data;
 }
@@ -516,9 +516,9 @@ void adam_state::mreq_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_slot1->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
-	m_slot2->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	m_slot3->bd_w(offset, data, 1, 1, 1, cas1, cas2);
+	m_slot[0]->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot[1]->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot[2]->bd_w(offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -557,9 +557,9 @@ uint8_t adam_state::iorq_r(offs_t offset)
 		break;
 	}
 
-	data = m_slot1->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
-	data = m_slot2->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	data = m_slot3->bd_r(offset, data, 1, 1, 1, cas1, cas2);
+	data = m_slot[0]->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot[1]->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot[2]->bd_r(offset, data, 1, 1, 1, cas1, cas2);
 
 	return data;
 }
@@ -609,9 +609,9 @@ void adam_state::iorq_w(offs_t offset, uint8_t data)
 		break;
 	}
 
-	m_slot1->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
-	m_slot2->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	m_slot3->bd_w(offset, data, 1, 1, 1, cas1, cas2);
+	m_slot[0]->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot[1]->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot[2]->bd_w(offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -1076,11 +1076,11 @@ void adam_state::adam(machine_config &config)
 	ADAMNET_SLOT(config, "net15", m_adamnet, adamnet_devices, nullptr);
 
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
-	ADAM_EXPANSION_SLOT(config, m_slot1, XTAL(7'159'090)/2, adam_slot1_devices, "adamlink");
-	m_slot1->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ADAM_EXPANSION_SLOT(config, m_slot2, XTAL(7'159'090)/2, adam_slot2_devices, nullptr);
-	m_slot2->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ADAM_EXPANSION_SLOT(config, m_slot3, XTAL(7'159'090)/2, adam_slot3_devices, "ram");
+	ADAM_EXPANSION_SLOT(config, m_slot[0], XTAL(7'159'090)/2, adam_slot1_devices, "adamlink"); // left
+	m_slot[0]->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ADAM_EXPANSION_SLOT(config, m_slot[1], XTAL(7'159'090)/2, adam_slot2_devices, nullptr); // center
+	m_slot[1]->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ADAM_EXPANSION_SLOT(config, m_slot[2], XTAL(7'159'090)/2, adam_slot3_devices, "ram"); // right
 
 	COLECOVISION_CONTROL_PORT(config, m_joy1, colecovision_control_port_devices, "hand");
 	m_joy1->irq().set(FUNC(adam_state::joy1_irq_w));

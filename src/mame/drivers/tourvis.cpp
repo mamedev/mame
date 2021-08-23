@@ -2,10 +2,10 @@
 // copyright-holders:Mariusz Wojcieszek
 /****************************************************************************
 
-    TourVision
+    TourVisión
     Driver by Mariusz Wojcieszek and Stephh
 
-    Bootleg PC-Engine based arcade board from the Spanish company TourVision.
+    Bootleg PC-Engine based arcade board from the Spanish company TourVisión.
     Two known hardware revisions, one with a sub-board with the PC-Engine chipset
     and the other as an integrated PCB.
 
@@ -191,6 +191,8 @@ http://blog.system11.org/?p=1943
 #include "softlist.h"
 #include "speaker.h"
 
+namespace
+{
 
 class tourvision_state : public pce_common_state
 {
@@ -266,9 +268,9 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
 	return image_init_result::PASS;
 }
 
-/* note from system11 - this system actually supports 2 players */
+// Note from system11: This system actually supports 2 players
 
-static INPUT_PORTS_START( tourvision )
+INPUT_PORTS_START( tourvision )
 	PCE_STANDARD_INPUT_PORT_P1
 
 	PORT_START( "DSW1" )
@@ -393,7 +395,7 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 
 void tourvision_state::tourvision(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tourvision_state::pce_mem);
 	m_maincpu->set_addrmap(AS_IO, &tourvision_state::pce_io);
@@ -407,7 +409,7 @@ void tourvision_state::tourvision(machine_config &config)
 	I8085A(config, m_subcpu, 18000000/3 /*?*/);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tourvision_state::tourvision_8085_map);
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(FUNC(pce_common_state::screen_update));
@@ -470,4 +472,6 @@ ROM_START(tourvis)
 	TOURVISION_BIOS // BIOS rom type is 27C256
 ROM_END
 
-GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, init_pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+} // anonymous namespace
+
+GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, init_pce_common, ROT0, u8"bootleg (TourVisión)", u8"TourVisión (PC Engine bootleg)", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

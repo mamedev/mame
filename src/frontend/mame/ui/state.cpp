@@ -87,7 +87,9 @@ menu_load_save_state_base::menu_load_save_state_base(mame_ui_manager &mui, rende
 	, m_switch_poller(machine().input())
 	, m_header(header)
 	, m_footer(footer)
+	, m_confirm_delete(nullptr)
 	, m_must_exist(must_exist)
+	, m_first_time(true)
 	, m_was_paused(false)
 	, m_keys_released(false)
 {
@@ -216,16 +218,20 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	// set up custom render proc
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
-	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
+	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
+	custombottom = (2.0f * ui().get_line_height()) + (3.0f * ui().box_tb_border());
 
 	// pause if appropriate
-	m_was_paused = machine().paused();
-	if (!m_was_paused)
-		machine().pause();
+	if (m_first_time)
+	{
+		m_was_paused = machine().paused();
+		if (!m_was_paused)
+			machine().pause();
+	}
 
 	// get ready to poll inputs
 	m_switch_poller.reset();
+	m_first_time = false;
 	m_keys_released = false;
 }
 
@@ -249,7 +255,20 @@ void menu_load_save_state_base::handle()
 			slot_selected(std::string(entry.file_name()));
 		}
 	}
-	else
+	else if (event && (event->iptkey == IPT_UI_CLEAR))
+	{
+		if (event->itemref)
+		{
+			// prompt to confirm delete
+			m_confirm_delete = &file_entry_from_itemref(event->itemref);
+			m_confirm_prompt = util::string_format(
+					_("Delete saved state %1$s?\nPress %2$s to delete\nPress %3$s to cancel"),
+					m_confirm_delete->visible_name(),
+					machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT)),
+					machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CANCEL)));
+		}
+	}
+	else if (!m_confirm_delete)
 	{
 		// poll inputs
 		std::string name = poll_inputs();
@@ -330,21 +349,93 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 
 
 //-------------------------------------------------
+//  handle_keys - override key handling
+//-------------------------------------------------
+
+void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
+{
+	if (m_confirm_delete)
+	{
+		if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
+		{
+			// try to remove the file
+			std::string const filename(util::string_format(
+						"%2$s%1$s%3$s%1$s%4$s.sta",
+						PATH_SEPARATOR,
+						machine().options().state_directory(),
+						machine().get_statename(machine().options().state_name()),
+						m_confirm_delete->file_name()));
+			osd_file::error const err(osd_file::remove(filename));
+			if (osd_file::error::NONE != err)
+			{
+				osd_printf_error(
+						"Error removing file %s for state %s (%d)\n",
+						filename,
+						m_confirm_delete->visible_name(),
+						std::underlying_type_t<osd_file::error>(err));
+				machine().popmessage(_("Error removing saved state file %1$s"), filename);
+			}
+
+			// repopulate the menu
+			// reset switch poller here to avoid bogus save/load if confirmed with joystick button
+			m_switch_poller.reset();
+			m_confirm_prompt.clear();
+			m_confirm_delete = nullptr;
+			m_keys_released = false;
+			reset(reset_options::REMEMBER_POSITION);
+		}
+		else if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
+		{
+			// don't delete it - dismiss the prompt
+			m_switch_poller.reset();
+			m_confirm_prompt.clear();
+			m_confirm_delete = nullptr;
+			m_keys_released = false;
+		}
+		iptkey = IPT_INVALID;
+	}
+	else
+	{
+		menu::handle_keys(flags, iptkey);
+	}
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
 void menu_load_save_state_base::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, m_header, std::string_view());
+	std::string_view text[2];
+	unsigned count(0U);
+
+	// add fixed footer if supplied
 	if (!m_footer.empty())
+		text[count++] = m_footer;
+
+	// provide a prompt to delete if a state is selected
+	if (selected_item().ref)
 	{
-		std::string_view const text[] = { m_footer };
+		if (m_delete_prompt.empty())
+			m_delete_prompt = util::string_format(_("Press %1$s to delete"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CLEAR)));
+		text[count++] = m_delete_prompt;
+	}
+
+	// draw the footer box if necessary
+	if (count)
+	{
 		draw_text_box(
-				std::begin(text), std::end(text),
-				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+				std::begin(text), std::next(std::begin(text), count),
+				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + (count * ui().get_line_height()) + (3.0f * ui().box_tb_border()),
 				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
 				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 	}
+
+	// draw the confirmation prompt if necessary
+	if (!m_confirm_prompt.empty())
+		ui().draw_text_box(container(), m_confirm_prompt, ui::text_layout::CENTER, 0.5f, 0.5f, ui().colors().background_color());
 }
 
 

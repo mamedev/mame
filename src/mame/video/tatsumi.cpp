@@ -1105,13 +1105,13 @@ void cyclwarr_state::tile_expand()
 	*/
 	gfx_element *gx0 = m_gfxdecode->gfx(1);
 	m_mask.resize(gx0->elements() << 3,0);
-	uint8_t *srcdata, *dest;
+	uint8_t *dest;
 
 	// allocate memory for the assembled data
-	srcdata = auto_alloc_array(machine(), uint8_t, gx0->elements() * gx0->width() * gx0->height());
+	m_decoded_gfx = std::make_unique<uint8_t[]>(gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
-	dest = srcdata;
+	dest = m_decoded_gfx.get();
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const uint8_t *c0base = gx0->get_data(c);
@@ -1133,7 +1133,7 @@ void cyclwarr_state::tile_expand()
 		}
 	}
 
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_raw_layout(m_decoded_gfx.get(), gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(256);
 }
 

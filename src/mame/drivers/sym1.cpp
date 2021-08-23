@@ -1,20 +1,33 @@
 // license:GPL-2.0+
 // copyright-holders:Dirk Best
-/***************************************************************************
+/**********************************************************************************************
 
-    Synertek Systems Corp. SYM-1
+Synertek Systems Corp. SYM-1
 
-***************************************************************************/
+Using the cassette (bios 0 only)
+- To save: set tape to record, press F2, type id-start-end (e.g. 3-200-210), press enter.
+- To load: press F1, type the id, press enter.
+
+TODO:
+- Digits should go blank during cassette save
+- How to use cassette with -bios 1 ??
+- TTY/CRT interfaces not working
+- You can't show the TTY/CRT terminal screen and the SYM-1 screen at the same time
+- Need software (SW-list is set up, but there's nothing for it)
+
+***********************************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/cassette.h"
 #include "machine/6522via.h"
 #include "machine/74145.h"
 #include "machine/input_merger.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 #include "speaker.h"
@@ -45,8 +58,10 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_banks(*this, "bank%u", 0U)
 		, m_ttl74145(*this, "ttl74145")
+		, m_via1(*this, "via1")
 		, m_crt(*this, "crt")
 		, m_tty(*this, "tty")
+		, m_cass(*this, "cassette")
 		, m_row(*this, "ROW-%u", 0U)
 		, m_wp(*this, "WP")
 		, m_digits(*this, "digit%u", 0U)
@@ -63,13 +78,16 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
+	TIMER_DEVICE_CALLBACK_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_1_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_2_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_3_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_4_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_5_w);
+	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_7_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
 	uint8_t riot_a_r();
 	uint8_t riot_b_r();
 	void riot_a_w(uint8_t data);
@@ -78,14 +96,17 @@ private:
 
 	std::unique_ptr<u8[]> m_riot_ram;
 	std::unique_ptr<u8[]> m_dummy_ram;
+	bool m_cb2 = false;
 	void sym1_map(address_map &map);
 
 	required_device<m6502_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_bank_array<10> m_banks;
 	required_device<ttl74145_device> m_ttl74145;
+	required_device<via6522_device> m_via1;
 	required_device<rs232_port_device> m_crt;
 	required_device<rs232_port_device> m_tty;
+	required_device<cassette_image_device> m_cass;
 	required_ioport_array<4> m_row;
 	required_ioport m_wp;
 	output_finder<6> m_digits;
@@ -102,10 +123,25 @@ WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_2_w ) { if (state) m_led_update
 WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_3_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 3); }
 WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_4_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 4); }
 WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 5); }
+WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_7_w ) { m_cass->output( state ? -1.0 : +1.0); }
+
+WRITE_LINE_MEMBER( sym1_state::via1_cb2_w )
+{
+	m_cb2 = state;
+	m_cass->change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+}
 
 TIMER_CALLBACK_MEMBER(sym1_state::led_refresh)
 {
 	m_digits[param] = m_riot_port_a;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(sym1_state::cass_r)
+{
+	if (!m_cb2)
+		return;
+	bool cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	m_via1->write_pb6(cass_ws);
 }
 
 uint8_t sym1_state::riot_a_r()
@@ -394,11 +430,13 @@ void sym1_state::sym1(machine_config &config)
 	m_ttl74145->output_line_callback<4>().set(FUNC(sym1_state::sym1_74145_output_4_w));
 	m_ttl74145->output_line_callback<5>().set(FUNC(sym1_state::sym1_74145_output_5_w));
 	m_ttl74145->output_line_callback<6>().set("speaker", FUNC(speaker_sound_device::level_w));
+	m_ttl74145->output_line_callback<7>().set(FUNC(sym1_state::sym1_74145_output_7_w));
 	// lines 7-9 not connected
 
-	via6522_device &via1(MOS6522(config, "via1", SYM1_CLOCK));
-	via1.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
-	via1.ca2_handler().set(FUNC(sym1_state::via1_ca2_w));
+	MOS6522(config, m_via1, SYM1_CLOCK);
+	m_via1->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_via1->ca2_handler().set(FUNC(sym1_state::via1_ca2_w));
+	m_via1->cb2_handler().set(FUNC(sym1_state::via1_cb2_w));
 
 	MOS6522(config, "via2", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
@@ -412,10 +450,19 @@ void sym1_state::sym1(machine_config &config)
 	RS232_PORT(config, "crt", default_rs232_devices, nullptr);
 	RS232_PORT(config, "tty", default_rs232_devices, nullptr); // actually a 20 mA current loop; 110 bps assumed
 
+	/* cassette */
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_interface("sym1_cass");
+	TIMER(config, "cass_r").configure_periodic(FUNC(sym1_state::cass_r), attotime::from_hz(40000));
+
 	// internal ram
 	RAM(config, m_ram);
 	m_ram->set_default_size("4K");
 	m_ram->set_extra_options("1K,2K,3K");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("sym1_cass");
 }
 
 

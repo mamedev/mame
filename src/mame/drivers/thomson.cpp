@@ -115,7 +115,7 @@
 /* ------------- game port ------------- */
 
 /*
-  Two generations of game port extensions were developped
+  Two generations of game port extensions were developed
 
   - CM 90-112 (model 1)
     connect up to two 8-position 1-button game pads

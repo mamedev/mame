@@ -338,7 +338,7 @@ void bfm_sc5_state::bfm_sc5(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc5_state::sc5_map);
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

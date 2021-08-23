@@ -15,6 +15,7 @@
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "sound/ay8910.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
 #include "machine/wd_fdc.h"

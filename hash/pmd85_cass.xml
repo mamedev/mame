@@ -851,7 +851,7 @@ If the Usage shows a filename of xx, it's because it hasn't been possible to ide
  12 - ZOFKA 2  - korytnaèka Žofka v BASICu (staršia verzia) (v2/v2A/v3)
  11 - ZOFKA2T  - korytnaèka Žofka v BASICu s prikazom pre tlac (v2/v2A/v3)
  42 - Zofka 3  - korytnaèka Žofka v strojovom kóde (v2/v2A/v3). Po nahratí sa spúšta JUMP 0003
-                 (pri PMD 85-3 je treba najprv prejs do režimu kompatibility zadanim JUMP FFF0 v monitore).
+                 (pri PMD 85-3 je treba najprv prejsť do režimu kompatibility zadanim JUMP FFF0 v monitore).
  34 - MRAVEC   - jednoduchý logický jazyk Mravec (v2/v2A/v3)
  52 - T.MRAVEC - jednoduchý logický jazyk Toèi-Mravec (v2/v2A/v3)
 -->

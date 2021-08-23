@@ -38,6 +38,9 @@ public:
 
 	fs_unformatted() : filesystem_manager_t() {}
 
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+
 	static void format(u32 key, floppy_image *image);
 
 	virtual void enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
@@ -49,6 +52,6 @@ public:
 	virtual bool has_rsrc() const override;
 };
 
-extern const filesystem_manager_type FS_UNFORMATTED;
+extern const fs_unformatted FS_UNFORMATTED;
 
 #endif

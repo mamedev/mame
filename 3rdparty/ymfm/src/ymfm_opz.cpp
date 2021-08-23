@@ -31,6 +31,8 @@
 #include "ymfm_opz.h"
 #include "ymfm_fm.ipp"
 
+#define TEMPORARY_DEBUG_PRINTS (0)
+
 //
 // OPZ (aka YM2414)
 //
@@ -102,10 +104,15 @@ opz_registers::opz_registers() :
 	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
 
+	// we only have the diagrams to judge from, but suspecting waveform 1 (and
+	// derived waveforms) are sin^2, based on OPX description of similar wave-
+	// forms; since our sin table is logarithmic, this ends up just being
+	// 2*existing value
 	uint16_t zeroval = m_waveform[0][0];
 	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
-		m_waveform[1][index] = (zeroval - m_waveform[0][(index & 0x1ff) ^ 0x100]) | (bitfield(index, 9) << 15);
+		m_waveform[1][index] = std::min<uint16_t>(2 * (m_waveform[0][index] & 0x7fff), zeroval) | (bitfield(index, 9) << 15);
 
+	// remaining waveforms are just derivations of the 2 main ones
 	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 	{
 		m_waveform[2][index] = bitfield(index, 9) ? zeroval : m_waveform[0][index];
@@ -209,17 +216,17 @@ bool opz_registers::write(uint16_t index, uint8_t data, uint32_t &channel, uint3
 	assert(index < REGISTERS);
 
 	// special mappings:
-	//   0x16 -> 0x148 if bit 7 is set
-	//   0x19 -> 0x149 if bit 7 is set
-	//   0x38..0x3F -> 0x140..0x147 if bit 7 is set
+	//   0x16 -> 0x188 if bit 7 is set
+	//   0x19 -> 0x189 if bit 7 is set
+	//   0x38..0x3F -> 0x180..0x187 if bit 7 is set
 	//   0x40..0x5F -> 0x100..0x11F if bit 7 is set
 	//   0xC0..0xDF -> 0x120..0x13F if bit 5 is set
 	if (index == 0x17 && bitfield(data, 7) != 0)
-		m_regdata[0x148] = data;
+		m_regdata[0x188] = data;
 	else if (index == 0x19 && bitfield(data, 7) != 0)
-		m_regdata[0x149] = data;
+		m_regdata[0x189] = data;
 	else if ((index & 0xf8) == 0x38 && bitfield(data, 7) != 0)
-		m_regdata[0x140 + (index & 7)] = data;
+		m_regdata[0x180 + (index & 7)] = data;
 	else if ((index & 0xe0) == 0x40 && bitfield(data, 7) != 0)
 		m_regdata[0x100 + (index & 0x1f)] = data;
 	else if ((index & 0xe0) == 0xc0 && bitfield(data, 5) != 0)
@@ -227,16 +234,60 @@ bool opz_registers::write(uint16_t index, uint8_t data, uint32_t &channel, uint3
 	else if (index < 0x100)
 		m_regdata[index] = data;
 
+	// preset writes restore some values from a preset memory; not sure
+	// how this really works but the TX81Z will overwrite the sustain level/
+	// release rate register and the envelope shift/reverb rate register to
+	// dampen sound, then write the preset number to register 8 to restore them
+	if (index == 0x08)
+	{
+		int chan = bitfield(data, 0, 3);
+		if (TEMPORARY_DEBUG_PRINTS)
+			printf("Loading preset %d\n", chan);
+		m_regdata[0xe0 + chan + 0] = m_regdata[0x140 + chan + 0];
+		m_regdata[0xe0 + chan + 8] = m_regdata[0x140 + chan + 8];
+		m_regdata[0xe0 + chan + 16] = m_regdata[0x140 + chan + 16];
+		m_regdata[0xe0 + chan + 24] = m_regdata[0x140 + chan + 24];
+		m_regdata[0x120 + chan + 0] = m_regdata[0x160 + chan + 0];
+		m_regdata[0x120 + chan + 8] = m_regdata[0x160 + chan + 8];
+		m_regdata[0x120 + chan + 16] = m_regdata[0x160 + chan + 16];
+		m_regdata[0x120 + chan + 24] = m_regdata[0x160 + chan + 24];
+	}
+
+	// store the presets under some unknown condition; the pattern of writes
+	// when setting a new preset is:
+	//
+	//   08 (0-7), 80-9F, A0-BF, C0-DF, C0-DF (alt), 20-27, 40-5F, 40-5F (alt),
+	//   C0-DF (alt -- again?), 38-3F, 1B, 18, E0-FF
+	//
+	// So it writes 0-7 to 08 to either reset all presets or to indicate
+	// that we're going to be loading them. Immediately after all the writes
+	// above, the very next write will be temporary values to blow away the
+	// values loaded into E0-FF, so somehow it also knows that anything after
+	// that point is not part of the preset.
+	//
+	// For now, try using the 40-5F (alt) writes as flags that presets are
+	// being loaded until the E0-FF writes happen.
+	bool is_setting_preset = (bitfield(m_regdata[0x100 + (index & 0x1f)], 7) != 0);
+	if (is_setting_preset)
+	{
+		if ((index & 0xe0) == 0xe0)
+		{
+			m_regdata[0x140 + (index & 0x1f)] = data;
+			m_regdata[0x100 + (index & 0x1f)] &= 0x7f;
+		}
+		else if ((index & 0xe0) == 0xc0 && bitfield(data, 5) != 0)
+			m_regdata[0x160 + (index & 0x1f)] = data;
+	}
+
 	// handle writes to the key on index
 	if ((index & 0xf8) == 0x20 && bitfield(index, 0, 3) == bitfield(m_regdata[0x08], 0, 3))
 	{
 		channel = bitfield(index, 0, 3);
-		opmask = ch_key_on(channel) ? 0xf : 0; //bitfield(data, 3, 4);
+		opmask = ch_key_on(channel) ? 0xf : 0;
 
 		// according to the TX81Z manual, the sync option causes the LFOs
-		// to reset at each note on; assume that's when operator 4 gets
-		// a note on signal
-		if (bitfield(opmask, 3) != 0)
+		// to reset at each note on
+		if (opmask != 0)
 		{
 			if (lfo_sync())
 				m_lfo_counter[0] = 0;
@@ -372,10 +423,12 @@ void opz_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	// detune adjustment
 	cache.detune = detune_adjustment(op_detune(opoffs), keycode);
 
-	// multiple value, as an x.1 value (0 means 0.5)
-	cache.multiple = op_multiple(opoffs) * 2;
+	// multiple value, as an x.4 value (0 means 0.5)
+	// the "fine" control provides the fractional bits
+	cache.multiple = op_multiple(opoffs) << 4;
 	if (cache.multiple == 0)
-		cache.multiple = 1;
+		cache.multiple = 0x08;
+	cache.multiple |= op_fine(opoffs);
 
 	// phase step, or PHASE_STEP_DYNAMIC if PM is active; this depends on
 	// block_freq, detune, and multiple, so compute it after we've done those;
@@ -439,6 +492,10 @@ uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		substep += 75 * freq;
 		phase_step = substep >> 12;
 		m_phase_substep[opoffs] = substep & 0xfff;
+
+		// detune/multiple occupy the same space as fix_range/fix_frequency so
+		// don't apply them in addition
+		return phase_step;
 	}
 	else
 	{
@@ -446,9 +503,6 @@ uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		// manual, converted into 1/64ths
 		static const int16_t s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
 		int32_t delta = s_detune2_delta[op_detune2(opoffs)];
-
-		// the fine parameter seems to add 1/16th of an octave per unit
-		delta += op_fine(opoffs) * (12*64)/16;
 
 		// add in the PM deltas
 		uint32_t pm_sensitivity = ch_lfo_pm_sens(choffs);
@@ -481,13 +535,13 @@ uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		// apply delta and convert to a frequency number; this translation is
 		// the same as OPM so just re-use that helper
 		phase_step = opm_key_code_to_phase_step(cache.block_freq, delta);
+
+		// apply detune based on the keycode
+		phase_step += cache.detune;
+
+		// apply frequency multiplier (which is cached as an x.4 value)
+		return (phase_step * cache.multiple) >> 4;
 	}
-
-	// apply detune based on the keycode
-	phase_step += cache.detune;
-
-	// apply frequency multiplier (which is cached as an x.1 value)
-	return (phase_step * cache.multiple) >> 1;
 }
 
 
@@ -503,14 +557,14 @@ std::string opz_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d", chnum, opnum);
+	end += sprintf(end, "%u.%02u", chnum, opnum);
 
 	if (op_fix_mode(opoffs))
 		end += sprintf(end, " fixfreq=%X fine=%X shift=%X", op_fix_frequency(opoffs), op_fine(opoffs), op_fix_range(opoffs));
 	else
-		end += sprintf(end, " freq=%04X dt2=%d fine=%X", ch_block_freq(choffs), op_detune2(opoffs), op_fine(opoffs));
+		end += sprintf(end, " freq=%04X dt2=%u fine=%X", ch_block_freq(choffs), op_detune2(opoffs), op_fine(opoffs));
 
-	end += sprintf(end, " dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
+	end += sprintf(end, " dt=%u fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		op_detune(opoffs),
 		ch_feedback(choffs),
 		ch_algorithm(choffs),
@@ -526,30 +580,30 @@ std::string opz_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 		ch_output_1(choffs) ? 'R' : '-');
 
 	if (op_eg_shift(opoffs) != 0)
-		end += sprintf(end, " egshift=%d", op_eg_shift(opoffs));
+		end += sprintf(end, " egshift=%u", op_eg_shift(opoffs));
 
 	bool am = (lfo_am_depth() != 0 && ch_lfo_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%d/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
+		end += sprintf(end, " am=%u/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
 	bool pm = (lfo_pm_depth() != 0 && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%d/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
+		end += sprintf(end, " pm=%u/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
 	if (am || pm)
 		end += sprintf(end, " lfo=%02X/%c", lfo_rate(), "WQTN"[lfo_waveform()]);
 
 	bool am2 = (lfo2_am_depth() != 0 && ch_lfo2_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
 	if (am2)
-		end += sprintf(end, " am2=%d/%02X", ch_lfo2_am_sens(choffs), lfo2_am_depth());
+		end += sprintf(end, " am2=%u/%02X", ch_lfo2_am_sens(choffs), lfo2_am_depth());
 	bool pm2 = (lfo2_pm_depth() != 0 && ch_lfo2_pm_sens(choffs) != 0);
 	if (pm2)
-		end += sprintf(end, " pm2=%d/%02X", ch_lfo2_pm_sens(choffs), lfo2_pm_depth());
+		end += sprintf(end, " pm2=%u/%02X", ch_lfo2_pm_sens(choffs), lfo2_pm_depth());
 	if (am2 || pm2)
 		end += sprintf(end, " lfo2=%02X/%c", lfo2_rate(), "WQTN"[lfo2_waveform()]);
 
 	if (op_reverb_rate(opoffs) != 0)
-		end += sprintf(end, " rev=%d", op_reverb_rate(opoffs));
+		end += sprintf(end, " rev=%u", op_reverb_rate(opoffs));
 	if (op_waveform(opoffs) != 0)
-		end += sprintf(end, " wf=%d", op_waveform(opoffs));
+		end += sprintf(end, " wf=%u", op_waveform(opoffs));
 	if (noise_enable() && opoffs == 31)
 		end += sprintf(end, " noise=1");
 
@@ -650,51 +704,54 @@ void ym2414::write_data(uint8_t data)
 {
 	// write the FM register
 	m_fm.write(m_address, data);
-	switch (m_address & 0xe0)
+	if (TEMPORARY_DEBUG_PRINTS)
 	{
-		case 0x00:
-			printf("CTL %02X = %02X\n", m_address, data);
-			break;
+		switch (m_address & 0xe0)
+		{
+			case 0x00:
+				printf("CTL %02X = %02X\n", m_address, data);
+				break;
 
-		case 0x20:
-			switch (m_address & 0xf8)
-			{
-				case 0x20:	printf("R/FBL/ALG %d = %02X\n", m_address & 7, data);	break;
-				case 0x28:	printf("KC %d = %02X\n", m_address & 7, data);	break;
-				case 0x30:	printf("KF/M %d = %02X\n", m_address & 7, data);	break;
-				case 0x38:	printf("PMS/AMS %d = %02X\n", m_address & 7, data); break;
-			}
-			break;
+			case 0x20:
+				switch (m_address & 0xf8)
+				{
+					case 0x20:	printf("R/FBL/ALG %d = %02X\n", m_address & 7, data);	break;
+					case 0x28:	printf("KC %d = %02X\n", m_address & 7, data);	break;
+					case 0x30:	printf("KF/M %d = %02X\n", m_address & 7, data);	break;
+					case 0x38:	printf("PMS/AMS %d = %02X\n", m_address & 7, data); break;
+				}
+				break;
 
-		case 0x40:
-			if (bitfield(data, 7) == 0)
-				printf("DT1/MUL %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
-			else
-				printf("OW/FINE %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
-			break;
+			case 0x40:
+				if (bitfield(data, 7) == 0)
+					printf("DT1/MUL %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+				else
+					printf("OW/FINE %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+				break;
 
-		case 0x60:
-			printf("TL %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
-			break;
+			case 0x60:
+				printf("TL %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+				break;
 
-		case 0x80:
-			printf("KRS/FIX/AR %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
-			break;
+			case 0x80:
+				printf("KRS/FIX/AR %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+				break;
 
-		case 0xa0:
-			printf("A/D1R %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
-			break;
+			case 0xa0:
+				printf("A/D1R %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+				break;
 
-		case 0xc0:
-			if (bitfield(data, 5) == 0)
-				printf("DT2/D2R %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
-			else
-				printf("EGS/REV %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
-			break;
+			case 0xc0:
+				if (bitfield(data, 5) == 0)
+					printf("DT2/D2R %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+				else
+					printf("EGS/REV %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+				break;
 
-		case 0xf0:
-			printf("D1L/RR %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
-			break;
+			case 0xe0:
+				printf("D1L/RR %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+				break;
+		}
 	}
 
 	// special cases
