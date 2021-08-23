@@ -252,6 +252,10 @@ SOFTWARE_PROLOGUE = string.Template(
         '    <tr><th>Year:</th><td>${year}</td></tr>\n' \
         '    <tr><th>Publisher:</th><td>${publisher}</td></tr>\n');
 
+SOFTWARE_EPILOGUE = string.Template(
+        '<h2>Notes</h2>\n' \
+        '<p><pre>${notes}<p></pre>\n');
+
 SOFTWARE_CLONES_PROLOGUE = string.Template(
         '<h2>Clones</h2>\n' \
         '<table id="tbl-clones">\n' \
@@ -321,6 +325,10 @@ SOFTWARELIST_PROLOGUE = string.Template(
         '        <td style="text-align: right">(${unsupportedpc}%)</td>\n' \
         '    </tr>\n' \
         '</table>\n')
+
+SOFTWARELIST_EPILOGUE = string.Template(
+        '<h2>Notes</h2>\n' \
+        '<p><pre>${notes}<p></pre>\n')
 
 SOFTWARELIST_MACHINE_TABLE_HEADER = string.Template(
         '<h2>Machines</h2>\n' \

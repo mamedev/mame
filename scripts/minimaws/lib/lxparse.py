@@ -352,6 +352,7 @@ class SoftwareHandler(ElementHandler):
             'description':      TextAccumulator,
             'year':             TextAccumulator,
             'publisher':        TextAccumulator,
+            'notes':            TextAccumulator,
             'part':             SoftwarePartHandler }
 
     def __init__(self, parent, **kwargs):
@@ -389,6 +390,9 @@ class SoftwareHandler(ElementHandler):
             self.id = self.dbcurs.add_software(self.softwarelist, self.shortname, self.supported, self.description, self.year, self.publisher)
             if self.cloneof is not None:
                 self.dbcurs.add_softwarecloneof(self.id, self.cloneof)
+        elif name == 'notes':
+            self.notes = handler.text
+            self.dbcurs.update_software_notes(self.id, self.notes)
 
 
 class SoftwareListHandler(ElementHandler):
@@ -410,24 +414,34 @@ class SoftwareListHandler(ElementHandler):
                     locator=self.locator)
         self.shortname = attrs['name']
         self.description = attrs['description']
+        self.notes = None
         self.entries = 0
         dbcurs = self.dbconn.cursor()
         self.id = dbcurs.add_softwarelist(self.shortname, self.description)
         dbcurs.close()
 
     def endMainElement(self, name):
+        if self.notes:
+            dbcurs = self.dbconn.cursor()
+            dbcurs.update_softwarelist_notes(self.id, self.notes)
+            dbcurs.close()
         self.dbconn.commit()
 
     def startChildElement(self, name, attrs):
-        if name != 'software':
+        if name == 'notes':
+            self.setChildHandler(name, attrs, TextAccumulator(self))
+        elif name == 'software':
+            self.setChildHandler(name, attrs, SoftwareHandler(self))
+        else:
             raise xml.sax.SAXParseException(
                     msg=('Expected "software" element but found "%s"' % (name, )),
                     exception=None,
                     locator=self.locator)
-        self.setChildHandler(name, attrs, SoftwareHandler(self))
 
     def endChildHandler(self, name, handler):
-        if name == 'software':
+        if name == 'notes':
+            self.notes = handler.text
+        elif name == 'software':
             if self.entries >= 1023:
                 self.dbconn.commit()
                 self.entries = 0
