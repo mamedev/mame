@@ -248,7 +248,7 @@ static const nes_mmc mmc_list[] =
 	{ 212, BMC_SUPERHIK_300IN1 },
 	{ 213, BMC_NOVEL2 },
 	{ 214, BMC_SUPERGUN_20IN1 },
-	{ 215, SUPERGAME_BOOGERMAN },
+	{ 215, UNL_8237 },          // and UNL_8237A
 	{ 216, RCM_GS2015 },
 	{ 217, BMC_500IN1 },
 	{ 218, NOCASH_NOCHR },
@@ -386,7 +386,7 @@ static const nes_mmc mmc_list[] =
 	{ 348, BMC_830118C },
 	{ 349, BMC_G146 },
 	// { 350, BMC_891227 }, not in nes.xml
-	// 351 JY/Techline 9-in-1
+	{ 351, BMC_TECHLINE9IN1 },
 	{ 352, KAISER_KS106C },        // 4-in-1
 	// 353 Super Mario Family multicart
 	// 354 250-in-1 multicart with FDS Bubble Bobble
@@ -896,6 +896,11 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = UNL_DH08;
 			break;
 
+		case UNL_8237:
+			if (submapper == 1)
+				m_pcb_id = UNL_8237A;
+			break;
+
 		case RCM_GS2004:
 			if (prg_size >= 0x50000)
 				m_pcb_id = RCM_GS2013;
@@ -1227,6 +1232,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 				pcb_id = (ROM[5] == 2) ? UNL_LE05 : UNL_LH31;
 			else if (!BIT(ROM[6], 0))
 				pcb_id = UNL_DH08;
+			break;
+
+		case UNL_8237:                                 // Mapper 215 is used for 2 diff boards
+			if (submapper == 1)
+				pcb_id = UNL_8237A;
 			break;
 
 		case RCM_GS2004:                               // Mapper 283 is used for 2 diff boards

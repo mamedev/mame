@@ -61839,6 +61839,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Bomber Boy has two levels, 2-4 and 5-3, that are not completable due to programming errors. -->
+	<software name="2lkbb">
+		<description>2 in 1 - The Lion King &amp; Bomber Boy</description>
+		<year>199?</year>
+		<publisher>Super Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8237" />
+			<dataarea name="prg" size="524288">
+				<rom name="2-in-1 - the lion king, bomber boy.prg" size="524288" crc="5039aca5" sha1="f0162e3788b6be5d46cd47af6f6ce0cd6c6514d0" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="2-in-1 - the lion king, bomber boy.chr" size="524288" crc="789c0478" sha1="deb9f0b9d3e3b57809be4044e1dbda31f0e24d9d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2mk67" supported="partial">
 		<description>2 in 1 - Mortal Kombat 6 &amp; Mortal Kombat 7</description>
 		<year>199?</year>
@@ -80956,6 +80972,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="9-in-1 (860824 pcb)[p1].prg" size="524288" crc="9ccd7a04" sha1="a4e133664461082101cd2981460823b0a023c476" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_9tech">
+		<description>9 in 1</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="tech9in1" />
+			<dataarea name="prg" size="524288">
+				<rom name="9-in-1.prg" size="524288" crc="cff59dab" sha1="ca74c4f097703813e1fce6e56e12a77f4b031e81" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="9-in-1.chr" size="524288" crc="46cfa6fa" sha1="ed79cc1ad7696d73a197dd179dbe104918587ade" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
