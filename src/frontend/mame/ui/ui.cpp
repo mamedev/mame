@@ -43,6 +43,8 @@
 #include <chrono>
 #include <type_traits>
 
+#define VISIBLE_SOUND_OVERDRIVE (1)
+
 
 /***************************************************************************
     CONSTANTS
@@ -641,6 +643,20 @@ void mame_ui_manager::update_and_render(render_container &container)
 			alpha = 255;
 		if (alpha >= 0)
 			container.add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	}
+
+	// show red if overdriving sound
+	if (VISIBLE_SOUND_OVERDRIVE && machine().phase() == machine_phase::RUNNING)
+	{
+		auto compressor = machine().sound().compressor_scale();
+		if (compressor < 1.0)
+		{
+			float width = 0.05f + std::min(0.15f, (1.0f - compressor) * 0.4f);
+			container.add_rect(0.0f, 0.0f, 1.0f, width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_rect(0.0f, 1.0f - width, 1.0f, 1.0f, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_rect(0.0f, width, width, 1.0f - width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_rect(1.0f - width, width, 1.0f, 1.0f - width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		}
 	}
 
 	// render any cheat stuff at the bottom
