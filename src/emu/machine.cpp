@@ -939,7 +939,7 @@ void running_machine::scheduled_event(int event)
 			m_event_timer.set_param(EVENT_NONE);
 			break;
 
-		// load just does an immediate save
+		// load just does an immediate load
 		case EVENT_LOAD:
 			immediate_load();
 			m_event_timer.set_param(EVENT_NONE);

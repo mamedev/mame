@@ -357,7 +357,7 @@ public:
 	device_scheduler &scheduler() const noexcept { return m_callback->scheduler(); }
 	timer_instance *prev() const { return m_prev; }
 	timer_instance *next() const { return m_next; }
-	u64 param(int index = 0) const { scheduler_assert(index < (is_device_timer() ? 2 : 3)); return m_param[index]; }
+	u64 param(int index = 0) const { scheduler_assert(m_callback == nullptr || index < (is_device_timer() ? 2 : 3)); return m_param[index]; }
 	void *ptr() const { return m_callback->ptr(); }
 	bool active() const { return m_active; }
 
@@ -377,7 +377,6 @@ public:
 		save.save_item(nullptr, "timer_instance", m_callback->unique_id(), m_callback->save_index(), NAME(m_start));
 		save.save_item(nullptr, "timer_instance", m_callback->unique_id(), m_callback->save_index(), NAME(m_expire));
 		save.save_item(nullptr, "timer_instance", m_callback->unique_id(), m_callback->save_index(), NAME(m_param));
-		save.save_item(nullptr, "timer_instance", m_callback->unique_id(), m_callback->save_index(), NAME(m_active));
 	}
 
 private:
@@ -389,7 +388,7 @@ private:
 
 	// internal helpers
 	timer_instance &save(timer_instance_save &dst);
-	timer_instance &restore(timer_instance_save const &src, timer_callback &callback, bool enabled = true);
+	timer_instance &restore(timer_instance_save const &src, timer_callback &callback);
 	timer_instance &insert(attotime const &start, attotime const &expire);
 	timer_instance &remove();
 	void dump() const;
@@ -489,7 +488,7 @@ public:
 	persistent_timer &set_param(u64 param) { return set_param(0, param); }
 	persistent_timer &set_params(u64 param0, u64 param1) { return set_param(0, param0).set_param(1, param1); }
 	persistent_timer &set_params(u64 param0, u64 param1, u64 param2) { return set_param(0, param0).set_param(1, param1).set_param(2, param2); }
-	persistent_timer &set_ptr(void *ptr) { m_callback.set_ptr(ptr); return *this; }
+	persistent_timer &set_ptr(void *ptr) { m_callback.set_ptr(ptr); m_periodic_callback.set_ptr(ptr); return *this; }
 
 	// control
 	bool enable(bool enable = true);
@@ -503,10 +502,8 @@ public:
 	{
 		save.save_item(nullptr, "persistent_timer", m_callback.unique_id(), m_callback.save_index(), NAME(m_period));
 		save.save_item(nullptr, "persistent_timer", m_callback.unique_id(), m_callback.save_index(), NAME(m_enabled));
-		save.save_item(nullptr, "persistent_timer", m_callback.unique_id(), m_callback.save_index(), NAME(m_modified));
 		m_instance.register_save(save);
 	}
-	void post_restore();
 
 protected:
 	// internal helpers
@@ -600,7 +597,7 @@ public:
 	bool can_save() const;
 
 	// execution
-	void timeslice(subseconds minslice);
+	void timeslice(subseconds minslice) { timeslice_core<false>(minslice); }
 	void abort_timeslice();
 	void trigger(int trigid, attotime const &after = attotime::zero);
 	void boost_interleave(subseconds timeslice, attotime const &boost_duration) { add_scheduling_quantum(timeslice, boost_duration); }
@@ -620,8 +617,9 @@ public:
 	// debugging
 	void dump_timers() const;
 
-	// force immediate exit from the scheduling loop -- for emergencies only!
-	void hard_stop();
+	// force immediate exit from the scheduling loop -- used for major state
+	// transitions like hard reset or save state restore
+	void hard_stop() { m_exit_timeslice = true; }
 
 	// save state registration
 	void register_save(save_manager &save);
@@ -632,13 +630,14 @@ private:
 	void postload();
 
 	// execution helpers
+	template<bool MidSliceRestore = false> void timeslice_core(subseconds minslice);
 	void execute_timers(attotime const &basetime);
 	void update_first_timer_expire() { m_first_timer_expire.set(m_active_timers_head->m_expire); }
 	void update_basetime();
 
 	// scheduling helpers
 	void compute_perfect_interleave();
-	void apply_suspend_changes();
+	void apply_suspend_changes(bool advance);
 	void add_scheduling_quantum(subseconds quantum, attotime const &duration);
 
 	// timer instance management
@@ -674,6 +673,7 @@ private:
 	timer_instance *            m_callback_timer;           // pointer to the current callback timer
 	attotime                    m_callback_timer_expire_time; // the original expiration time
 	bool                        m_suspend_changes_pending;  // suspend/resume changes are pending
+	bool                        m_exit_timeslice;           // true to exit the scheduling loop ASAP
 
 	// statistics
 #if (COLLECT_SCHEDULER_STATS)
@@ -720,7 +720,10 @@ private:
 	u32                         m_quantum_count;            // number of currently active quanta
 	quantum_slot                m_quantum_slot[MAX_ACTIVE_QUANTA]; // array of active quanta
 
-	// put this at the end since it's big
+	// save data; put this at the end since it's big
+	bool                        m_midslice_restore;         // true if we're in a mid-timeslice restore
+	s32                         m_save_executing;           // index of executing device at save
+	subseconds                  m_save_target;              // target subseconds of current slice
 	timer_instance_save         m_timer_save[TIMER_SAVE_SLOTS]; // state saving area
 };
 

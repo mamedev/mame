@@ -1362,8 +1362,9 @@ public:
 		sprintf(tempstr, "%d", id);
 
 		// call through to the base class to register this
-		persistent_timer::init(device, FUNC(device_t::device_timer), tempstr).set_param(2, id);
-		m_callback.set_ptr(ptr).set_device(device);
+		persistent_timer::init(device, FUNC(device_t::device_timer), tempstr).set_param(2, id).set_ptr(ptr);
+		m_callback.set_device(device);
+		m_periodic_callback.set_device(device);
 		return *this;
 	}
 

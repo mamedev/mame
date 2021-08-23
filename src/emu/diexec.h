@@ -260,7 +260,7 @@ protected:
 
 	// device_scheduler helpers
 	subseconds run_for(subseconds subs);
-	bool update_suspend();
+	bool update_suspend(bool advance);
 
 	// for use by devcpu for now...
 	int current_input_state(unsigned linenum) const { return input_from_line(linenum).m_live_state; }
@@ -447,17 +447,21 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 //  suspend is active
 //-------------------------------------------------
 
-inline bool device_execute_interface::update_suspend()
+inline bool device_execute_interface::update_suspend(bool advance)
 {
-	// update suspend state
 	u32 delta = m_suspend ^ m_nextsuspend;
-	m_suspend = m_nextsuspend;
 
-	// clear the timeslice reasons always for the next round
-	m_nextsuspend &= ~SUSPEND_SLICE_REASONS;
+	// if advancing the state, shift nextsuspend into the current state
+	if (advance)
+	{
+		m_suspend = m_nextsuspend;
+
+		// clear the timeslice reasons always for the next round
+		m_nextsuspend &= ~SUSPEND_SLICE_REASONS;
+	}
 
 	// update the execution delegate
-	if (delta != 0)
+	if (delta != 0 || !advance)
 	{
 		if (m_suspend != 0)
 			m_run_delegate = m_suspend_delegate;
