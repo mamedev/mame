@@ -23,7 +23,7 @@ uint32_t kikikai_state::screen_update_kicknrun(screen_device &screen, bitmap_ind
 	int gfx_num, gfx_attr, gfx_offs;
 
 
-	/* similar as bublbobl.cpp, sprite strips only. */
+	// Similar as bublbobl.cpp, Video hardware generates sprite only.
 	bitmap.fill(255, cliprect);
 
 	sx = 0;
