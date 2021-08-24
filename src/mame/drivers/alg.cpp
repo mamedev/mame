@@ -28,14 +28,14 @@
 
         Game                   System     ROM dumped  LD dumped
         ---------------------  ---------  ----------  ---------
-        Marbella Vice          PAL 50Hz   YES         NO
-        Marbella Vice          PAL 100Hz  YES         NO
+        Marbella Vice          PAL 50Hz   YES         YES (but not added yet)
+        Marbella Vice          PAL 100Hz  YES         YES (but not added yet)
         Marbella Vice          NTSC 60Hz  NO          NO
         Tierras Salvajes       PAL 50Hz   NO          NO
         Tierras Salvajes       PAL 100Hz  YES         NO
-        Zorton Brothers v1.00  PAL 50Hz   YES         NO
-        Zorton Brothers v1.01  PAL 50Hz   YES         NO
-        Zorton Brothers v1.01  PAL 100Hz  NO          NO
+        Zorton Brothers v1.00  PAL 50Hz   YES         YES (but not added yet)
+        Zorton Brothers v1.01  PAL 50Hz   YES         YES (but not added yet)
+        Zorton Brothers v1.01  PAL 100Hz  NO          YES (but not added yet)
 
 **************************************************************************************/
 
@@ -953,9 +953,9 @@ GAME( 1995, fastdraw_130, fastdraw, alg_r2,   alg_2p, alg_state, init_palr6,    
 // NOVA games on ALG hardware with own address scramble
 GAME( 1995, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// Web Picmatic games NTSC or PAL (50 or 100Hz) TV standard, own ROM board
-GAME( 1993, zortonbr_100, zortonbr, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, marvice,      alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice",                           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, marvice100hz, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice (100Hz display)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tierras100hz, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Tierras Salvajes (100Hz display)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// Picmatic games NTSC or PAL (50 or 100Hz) TV standard, own ROM board
+GAME( 1993, zortonbr_100, zortonbr, picmatic, alg,    alg_state, init_pal,      ROT0,  "Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, marvice,      alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Picmatic", "Marbella Vice",                           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, marvice100hz, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Picmatic", "Marbella Vice (100Hz display)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tierras100hz, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Picmatic", "Tierras Salvajes (100Hz display)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     VTech Laser/VZ Memory Expansion Slot
@@ -36,8 +36,11 @@
 
 #pragma once
 
+#include "machine/bankdev.h"
+
 // include here so drivers don't need to
 #include "carts.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -61,8 +64,8 @@ public:
 	vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vtech_memexp_slot_device();
 
-	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
-	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 
 	// callbacks
 	auto int_handler() { return m_int_handler.bind(); }
@@ -76,16 +79,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
-	required_address_space m_program;
-	required_address_space m_io;
-
 private:
+	required_address_space m_memspace;
+	required_address_space m_iospace;
+
 	devcb_write_line m_int_handler;
 	devcb_write_line m_nmi_handler;
 	devcb_write_line m_reset_handler;
+
+	device_vtech_memexp_interface *m_module;
 };
 
 // class representing interface-specific live memexp device
@@ -96,11 +100,37 @@ public:
 	device_vtech_memexp_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vtech_memexp_interface();
 
-protected:
-	address_space &program_space() { return *m_slot->m_program; }
-	address_space &io_space() { return *m_slot->m_io; }
+	virtual uint8_t mreq_r(offs_t offset) { return 0xff; }
+	virtual void mreq_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t iorq_r(offs_t offset) { return 0xff; }
+	virtual void iorq_w(offs_t offset, uint8_t data) { }
 
+protected:
 	vtech_memexp_slot_device *m_slot;
+};
+
+// base memory expansion device
+class vtech_memexp_device : public device_t, public device_vtech_memexp_interface
+{
+public:
+	// construction/destruction
+	vtech_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// from host
+	virtual uint8_t mreq_r(offs_t offset) override;
+	virtual void mreq_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t iorq_r(offs_t offset) override;
+	virtual void iorq_w(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+	virtual void mem_map(address_map &map) { };
+	virtual void io_map(address_map &map) { };
+
+	required_device<address_map_bank_device> m_mem;
+	required_device<address_map_bank_device> m_io;
 };
 
 // device type definition

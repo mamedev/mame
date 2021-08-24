@@ -44,7 +44,7 @@
 #define LOG_INTERNAL    (1U <<  2)
 #define VERBOSE (0)
 // #define VERBOSE (LOG_INTERFACE)
-// #define VERBOSE (LOG_INTERFACE | LOG_INTERNAL)
+// #define VERBOSE (LOG_INTERFACE|LOG_INTERNAL)
 
 #include "logmacro.h"
 
@@ -141,7 +141,7 @@ namespace
 		static constexpr int BUFFER_SIZE = 4;
 	private:
 		sound_stream*  m_stream;
-		double m_rms[BUFFER_SIZE];
+		float m_rms[BUFFER_SIZE];
 		int m_index;
 	};
 };
@@ -237,7 +237,7 @@ void coco_ssc_device::device_start()
 
 void coco_ssc_device::device_reset()
 {
-	m_reset_line = 0;
+	m_reset_line = 1;
 	m_tms7000_busy = false;
 }
 
@@ -314,7 +314,6 @@ u8 coco_ssc_device::ff7d_read(offs_t offset)
 					data & 0x02 ? '1' : '0',
 					data & 0x01 ? '1' : '0',
 					data );
-
 			break;
 	}
 
@@ -338,14 +337,11 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 				m_spo->reset();
 			}
 
-			if( (m_reset_line & 1) == 1 )
+			if( ((m_reset_line & 1) == 1) && ((data & 1) == 0) )
 			{
-				if( (data & 1) == 0 )
-				{
-					m_tms7040->reset();
-					m_ay->reset();
-					m_tms7000_busy = false;
-				}
+				m_tms7040->reset();
+				m_ay->reset();
+				m_tms7000_busy = false;
 			}
 
 			m_reset_line = data;
@@ -369,7 +365,7 @@ u8 coco_ssc_device::ssc_port_a_r()
 {
 	LOGINTERNAL( "[%s] port a read: %02x\n", machine().describe_context(), m_tms7000_porta );
 
-	if (!machine().side_effects_disabled())
+	if( !machine().side_effects_disabled() )
 	{
 		m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
 	}
@@ -393,7 +389,7 @@ u8 coco_ssc_device::ssc_port_c_r()
 
 void coco_ssc_device::ssc_port_c_w(u8 data)
 {
-	if( (data & C_RCS) == 0 && (data & C_RRW) == 0) /* static RAM write */
+	if( (data & C_RCS) == 0 && (data & C_RRW) == 0 ) /* static RAM write */
 	{
 		u16 address = u16(data) << 8;
 		address += m_tms7000_portb;
@@ -415,9 +411,9 @@ void coco_ssc_device::ssc_port_c_w(u8 data)
 		}
 	}
 
-	if( (data & C_ALD) == 0 )
+	if( ((m_tms7000_portc & C_ALD) == C_ALD) && ((data & C_ALD) == 0) && (m_tms7000_portd < 64) )
 	{
-		m_spo->ald_w(m_tms7000_portd);
+		m_spo->ald_w(m_tms7000_portd); /* load allophone */
 	}
 
 	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
@@ -442,7 +438,7 @@ void coco_ssc_device::ssc_port_c_w(u8 data)
 
 u8 coco_ssc_device::ssc_port_d_r()
 {
-	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0))
+	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0) )
 		logerror( "[%s] Warning: Reading RAM and PSG at the same time!\n", machine().describe_context() );
 
 	if( ((m_tms7000_portc & C_RCS) == 0)  && ((m_tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
@@ -485,7 +481,7 @@ cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char
 		m_stream(nullptr),
 		m_index(0)
 {
-	std::fill(std::begin(m_rms), std::end(m_rms), 0);
+	std::fill(std::begin(m_rms), std::end(m_rms), 0.0f);
 }
 
 
@@ -513,12 +509,11 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 	if( count > 0 )
 	{
-		for (int sampindex = 0; sampindex < count; sampindex++)
+		for( int sampindex = 0; sampindex < count; sampindex++ )
 		{
-			// sum the squares
-			m_rms[m_index] += src.get(sampindex) * src.get(sampindex);
-			// copy from source to destination
-			dst.put(sampindex, src.get(sampindex));
+			auto source_sample = src.get(sampindex);
+			m_rms[m_index] += source_sample * source_sample;
+			dst.put(sampindex, source_sample);
 		}
 
 		m_rms[m_index] = m_rms[m_index] / count;
@@ -526,7 +521,7 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 	}
 
 	m_index++;
-	m_index &= BUFFER_SIZE;
+	m_index &= (BUFFER_SIZE-1);
 }
 
 
@@ -536,8 +531,8 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 bool cocossc_sac_device::sound_activity_circuit_output()
 {
-	double sum = std::accumulate(std::begin(m_rms), std::end(m_rms), 0.0);
-	double average = (sum / BUFFER_SIZE);
+	float sum = std::accumulate(std::begin(m_rms), std::end(m_rms), 0.0f);
+	float average = (sum / BUFFER_SIZE);
 
-	return average < 0.08;
+	return average < 0.317f;
 }

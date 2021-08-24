@@ -22,18 +22,19 @@
 
 namespace ui {
 
-// ======================> menu_load_save_state_base
-
 class menu_load_save_state_base : public menu
 {
 public:
 	virtual ~menu_load_save_state_base() override;
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 protected:
 	menu_load_save_state_base(mame_ui_manager &mui, render_container &container, std::string_view header, std::string_view footer, bool must_exist);
+
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void handle_keys(uint32_t flags, int &iptkey) override;
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
 	virtual void process_file(std::string &&file_name) = 0;
 
 private:
@@ -62,7 +63,11 @@ private:
 	std::unordered_map<std::string, std::string>    m_filename_to_code_map;
 	std::string_view const                          m_header;
 	std::string_view const                          m_footer;
+	std::string                                     m_delete_prompt;
+	std::string                                     m_confirm_prompt;
+	file_entry const *                              m_confirm_delete;
 	bool const                                      m_must_exist;
+	bool                                            m_first_time;
 	bool                                            m_was_paused;
 	bool                                            m_keys_released;
 
@@ -77,7 +82,6 @@ private:
 	std::string get_visible_name(const std::string &file_name);
 };
 
-// ======================> menu_load_state
 
 class menu_load_state : public menu_load_save_state_base
 {
@@ -88,7 +92,6 @@ protected:
 	virtual void process_file(std::string &&file_name) override;
 };
 
-// ======================> menu_save_state
 
 class menu_save_state : public menu_load_save_state_base
 {

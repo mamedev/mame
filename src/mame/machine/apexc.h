@@ -1,17 +1,18 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
 /*
-    machine/apexc.c : APEXC machine
+    machine/apexc.h : APEXC machine
 
     By Raphael Nabet
 
-    see cpu/apexc.c for background and tech info
+    see cpu/apexc.cpp for background and tech info
 */
 
 #ifndef MAME_MACHINE_APEXC
 #define MAME_MACHINE_APEXC
 
 #pragma once
+#include "softlist_dev.h"
 
 
 /*
@@ -43,6 +44,8 @@ public:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+	virtual const char *image_interface() const noexcept override { return "apexc_cyl"; }
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 private:
 	virtual void device_start() override { }

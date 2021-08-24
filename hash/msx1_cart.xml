@@ -13007,6 +13007,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="espeech" supported="no">
+		<description>Easi-Speech</description>
+		<year>1987</year>
+		<publisher>R.Amy</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="easispeech" />
+			<dataarea name="rom" size="8192">
+				<rom name="easi-speech.rom" size="8192" crc="7b00670c" sha1="5a1a91cbba1790461def230d22503ec2c4719cc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="falc">
 		<description>Family Automation Language Community (Jpn)</description>
 		<year>1984</year>

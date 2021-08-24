@@ -21,7 +21,6 @@
 
 #define SPRITE_FLIPX    0x01
 #define SPRITE_FLIPY    0x02
-#define NUM_SPRITES     256
 
 
 /***************************************************************************
@@ -66,7 +65,7 @@ void wecleman_state::get_sprite_info()
 
 	uint16_t *source = m_spriteram;
 
-	sprite_t *sprite = m_sprite_list.get();
+	sprite_t *sprite = &m_sprite_list[0];
 	sprite_t *const finish = sprite + NUM_SPRITES;
 
 	int bank, code, gfx, zoom;
@@ -653,8 +652,6 @@ void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 
 	pen_t const *const pal_base = m_palette->pens() + pal_offset * gfx->granularity();
 
-	alpha <<= 6;
-
 	dst_base += 8;
 	for (int i = 0; i < ycount; i++)
 	{
@@ -694,9 +691,9 @@ void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 						int dg = (dstrgb >> 11) & 0x1f;
 						int db = (dstrgb >> 19) & 0x1f;
 
-						dr = (m_t32x32pm[dr - sr + alpha] >> 5) + dr;
-						dg = (m_t32x32pm[dg - sg + alpha] >> 5) + dg;
-						db = (m_t32x32pm[db - sb + alpha] >> 5) + db;
+						dr = (((dr - sr) * alpha) >> 5) + dr;
+						dg = (((dg - sg) * alpha) >> 5) + dg;
+						db = (((db - sb) * alpha) >> 5) + db;
 
 						dst_ptr[tx] = rgb_t(pal5bit(db), pal5bit(dg), pal5bit(dr));
 					}
@@ -852,11 +849,7 @@ void wecleman_state::video_start()
 		8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15
 	};
 
-	uint8_t *buffer;
-	int i, j;
-
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
-	buffer = auto_alloc_array(machine(), uint8_t, 0x12c00);   // working buffer for sprite operations
 
 	m_gameid = WECLEMAN_ID;
 	m_gfx_bank = bank;
@@ -868,28 +861,6 @@ void wecleman_state::video_start()
 	m_black_pen = m_palette->black_pen();
 	std::fill(std::begin(m_bgpage), std::end(m_bgpage), 0);
 	std::fill(std::begin(m_fgpage), std::end(m_fgpage), 0);
-
-	m_rgb_half     =   (uint16_t*)(buffer + 0x00000);
-	m_t32x32pm     =        (int*)(buffer + 0x10020);
-	m_spr_ptr_list = (sprite_t **)(buffer + 0x12000);
-	m_spr_idx_list =       (int *)(buffer + 0x12400);
-	m_spr_pri_list =       (int *)(buffer + 0x12800);
-
-	for (i=0; i<0x8000; i++)
-	{
-		j = i>>1;
-		m_rgb_half[i] = (j&0xf) | (j&0x1e0) | (j&0x3c00);
-	}
-
-	for (j=0; j<0x20; j++)
-	{
-		for (i=-0x1f; i<0x20; i++)
-		{
-			*(m_t32x32pm + (j<<6) + i) = i * j;
-		}
-	}
-
-	m_sprite_list = std::make_unique<sprite_t []>(NUM_SPRITES);
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wecleman_state::wecleman_get_bg_tile_info)),
 								TILEMAP_SCAN_ROWS,
@@ -956,10 +927,6 @@ void hotchase_state::video_start()
 		0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 	};
 
-	uint8_t *buffer;
-
-	buffer = auto_alloc_array(machine(), uint8_t, 0x400); // reserve 1k for sprite list
-
 	m_gameid = HOTCHASE_ID;
 	m_gfx_bank = bank;
 	m_spr_offsx = -0xc0;
@@ -967,10 +934,6 @@ void hotchase_state::video_start()
 	m_black_pen = m_palette->black_pen();
 	std::fill(std::begin(m_bgpage), std::end(m_bgpage), 0);
 	std::fill(std::begin(m_fgpage), std::end(m_fgpage), 0);
-
-	m_spr_ptr_list = (sprite_t **)buffer;
-
-	m_sprite_list = std::make_unique<sprite_t []>(NUM_SPRITES);
 }
 
 

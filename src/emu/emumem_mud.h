@@ -3,7 +3,7 @@
 
 // Descriptors for subunit support
 
-template<int Width, int AddrShift, endianness_t Endian> class memory_units_descriptor {
+template<int Width, int AddrShift> class memory_units_descriptor {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 

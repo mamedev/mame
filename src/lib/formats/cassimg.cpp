@@ -221,7 +221,7 @@ cassette_image::error cassette_image::open(void *file, const io_procs *procs,
 	const Format *format, int flags, ptr &outcassette)
 {
 	const Format *const formats[2] = { format, nullptr };
-	return open_choices(file, procs, nullptr, formats, flags, outcassette);
+	return open_choices(file, procs, {}, formats, flags, outcassette);
 }
 
 

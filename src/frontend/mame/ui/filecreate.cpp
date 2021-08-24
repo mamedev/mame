@@ -238,12 +238,11 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_format::menu_select_format(mame_ui_manager &mui, render_container &container, floppy_image_format_t **formats, int ext_match, int total_usable, int *result)
+menu_select_format::menu_select_format(mame_ui_manager &mui, render_container &container, const std::vector<floppy_image_format_t *> &formats, int ext_match, floppy_image_format_t **result)
 	: menu(mui, container)
 {
 	m_formats = formats;
 	m_ext_match = ext_match;
-	m_total_usable = total_usable;
 	m_result = result;
 }
 
@@ -264,13 +263,13 @@ menu_select_format::~menu_select_format()
 void menu_select_format::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Select image format"), FLAG_DISABLE, nullptr);
-	for (int i = 0; i < m_total_usable; i++)
+	for (unsigned int i = 0; i != m_formats.size(); i++)
 	{
-		const floppy_image_format_t *fmt = m_formats[i];
+		floppy_image_format_t *fmt = m_formats[i];
 
 		if (i && i == m_ext_match)
 			item_append(menu_item_type::SEPARATOR);
-		item_append(fmt->description(), fmt->name(), 0, (void *)(uintptr_t)i);
+		item_append(fmt->description(), fmt->name(), 0, fmt);
 	}
 }
 
@@ -285,7 +284,7 @@ void menu_select_format::handle()
 	const event *event = process(0);
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
-		*m_result = int(uintptr_t(event->itemref));
+		*m_result = (floppy_image_format_t *)event->itemref;
 		stack_pop();
 	}
 }

@@ -229,7 +229,7 @@ private:
 //-------------------------------------------------
 
 template<int _NumBits>
-inline uint8_t palexpand(uint8_t bits)
+constexpr uint8_t palexpand(uint8_t bits)
 {
 	if (_NumBits == 1) { return (bits & 1) ? 0xff : 0x00; }
 	if (_NumBits == 2) { bits &= 3; return (bits << 6) | (bits << 4) | (bits << 2) | bits; }
@@ -246,13 +246,13 @@ inline uint8_t palexpand(uint8_t bits)
 //  palxbit - convert an x-bit value to 8 bits
 //-------------------------------------------------
 
-inline uint8_t pal1bit(uint8_t bits) { return palexpand<1>(bits); }
-inline uint8_t pal2bit(uint8_t bits) { return palexpand<2>(bits); }
-inline uint8_t pal3bit(uint8_t bits) { return palexpand<3>(bits); }
-inline uint8_t pal4bit(uint8_t bits) { return palexpand<4>(bits); }
-inline uint8_t pal5bit(uint8_t bits) { return palexpand<5>(bits); }
-inline uint8_t pal6bit(uint8_t bits) { return palexpand<6>(bits); }
-inline uint8_t pal7bit(uint8_t bits) { return palexpand<7>(bits); }
+constexpr uint8_t pal1bit(uint8_t bits) { return palexpand<1>(bits); }
+constexpr uint8_t pal2bit(uint8_t bits) { return palexpand<2>(bits); }
+constexpr uint8_t pal3bit(uint8_t bits) { return palexpand<3>(bits); }
+constexpr uint8_t pal4bit(uint8_t bits) { return palexpand<4>(bits); }
+constexpr uint8_t pal5bit(uint8_t bits) { return palexpand<5>(bits); }
+constexpr uint8_t pal6bit(uint8_t bits) { return palexpand<6>(bits); }
+constexpr uint8_t pal7bit(uint8_t bits) { return palexpand<7>(bits); }
 
 
 //-------------------------------------------------
@@ -261,9 +261,15 @@ inline uint8_t pal7bit(uint8_t bits) { return palexpand<7>(bits); }
 //-------------------------------------------------
 
 template<int _RBits, int _GBits, int _BBits>
-inline rgb_t rgbexpand(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift)
+constexpr rgb_t rgbexpand(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift)
 {
 	return rgb_t(palexpand<_RBits>(data >> rshift), palexpand<_GBits>(data >> gshift), palexpand<_BBits>(data >> bshift));
+}
+
+template<int _ABits, int _RBits, int _GBits, int _BBits>
+constexpr rgb_t argbexpand(uint32_t data, uint8_t ashift, uint8_t rshift, uint8_t gshift, uint8_t bshift)
+{
+	return rgb_t(palexpand<_ABits>(data >> ashift), palexpand<_RBits>(data >> rshift), palexpand<_GBits>(data >> gshift), palexpand<_BBits>(data >> bshift));
 }
 
 
@@ -272,10 +278,10 @@ inline rgb_t rgbexpand(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bs
 //  bits from a uint32_t
 //-------------------------------------------------
 
-inline rgb_t pal332(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<3,3,2>(data, rshift, gshift, bshift); }
-inline rgb_t pal444(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<4,4,4>(data, rshift, gshift, bshift); }
-inline rgb_t pal555(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<5,5,5>(data, rshift, gshift, bshift); }
-inline rgb_t pal565(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<5,6,5>(data, rshift, gshift, bshift); }
-inline rgb_t pal888(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<8,8,8>(data, rshift, gshift, bshift); }
+constexpr rgb_t pal332(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<3,3,2>(data, rshift, gshift, bshift); }
+constexpr rgb_t pal444(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<4,4,4>(data, rshift, gshift, bshift); }
+constexpr rgb_t pal555(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<5,5,5>(data, rshift, gshift, bshift); }
+constexpr rgb_t pal565(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<5,6,5>(data, rshift, gshift, bshift); }
+constexpr rgb_t pal888(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<8,8,8>(data, rshift, gshift, bshift); }
 
 #endif // MAME_UTIL_PALETTE_H

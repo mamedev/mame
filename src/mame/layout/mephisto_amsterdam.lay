@@ -493,41 +493,41 @@ license:CC0
 		<element ref="gray"><bounds x="89.7" y="105.3" width="0.9" height="0.9" /></element>
 		<element ref="white"><bounds x="94.5" y="105.1" width="1.3" height="1.3" /></element>
 
-		<element ref="keys" inputtag="KEY.1" inputmask="0x01">    <!-- INFO -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x01">    <!-- INFO -->
 			<bounds x="69"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x02">    <!-- POS -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x02">    <!-- POS -->
 			<bounds x="74"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x04">    <!-- LEV -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x04">    <!-- LEV -->
 			<bounds x="79"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x08">    <!-- MEM -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x08">    <!-- MEM -->
 			<bounds x="84"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x10">    <!-- CL -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x10">    <!-- CL -->
 			<bounds x="89"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x20">    <!-- ENT -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x20">    <!-- ENT -->
 			<bounds x="94"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
 
-		<element ref="keys" inputtag="KEY.0" inputmask="0x01">    <!-- A1 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x01">    <!-- A1 -->
 			<bounds x="69"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x02">    <!-- B2 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x02">    <!-- B2 -->
 			<bounds x="74"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x04">    <!-- C3 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x04">    <!-- C3 -->
 			<bounds x="79"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x08">    <!-- D4 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x08">    <!-- D4 -->
 			<bounds x="84"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x10">    <!-- E5 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x10">    <!-- E5 -->
 			<bounds x="89"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x20">    <!-- F6 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x20">    <!-- F6 -->
 			<bounds x="94"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
 
@@ -537,16 +537,16 @@ license:CC0
 		<element ref="keys" inputtag="RESET" inputmask="0x02">    <!-- RES -->
 			<bounds x="74"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x40">    <!-- G7 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x40">    <!-- G7 -->
 			<bounds x="79"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x80">    <!-- H8 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x80">    <!-- H8 -->
 			<bounds x="84"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x40">    <!-- 9 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x40">    <!-- 9 -->
 			<bounds x="89"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x80">    <!-- 0 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x80">    <!-- 0 -->
 			<bounds x="94"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
 	</group>

@@ -818,6 +818,29 @@ ROM_START(bushidoa)
 	ROM_LOAD("f-musica.bin", 0x80000, 0x80000, CRC(80f3a6df) SHA1(e09ad4660e511779c6e55559fa0c2c0b0c6600c8))
 ROM_END
 
+ROM_START(bushidob)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("inder_sa_m-17_pb-in_a-1954-93_b4_cpu rom_0_06-a.bin", 0x0000, 0x2000, CRC(7c8561f7) SHA1(d81338160f6eb8898a7b779f57e327d2db3f7dab))
+	ROM_LOAD("inder_sa_m-17_pb-in_a-1954-93_b4_cpu rom_1_06-a.bin", 0x2000, 0x2000, CRC(4a41865c) SHA1(f597d5dd42b804ab637408b90d05bdb234559a48))
+
+	ROM_REGION(0x10000, "dmdcpu", 0)
+	ROM_LOAD("g-disply.bin", 0x00000, 0x10000, CRC(9a1df82f) SHA1(4ad6a12ae36ec898b8ac5243da6dec3abcd9dc33))
+
+	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_LOAD("a-sonido.bin", 0x0000, 0x2000, CRC(cf7d5399) SHA1(c79145826cfa6be2487e3add477d9b452c553762))
+
+	ROM_REGION(0x180000, "audiorom", 0)
+	ROM_LOAD("b-sonido.bin", 0x00000, 0x80000, CRC(cb4fc885) SHA1(569f389fa8f91f886b58f44f701d2752ef01f3fa))
+	ROM_LOAD("c-sonido.bin", 0x80000, 0x80000, CRC(35a43dd8) SHA1(f2b1994f67f749c65a88c95d970b655990d85b96))
+
+	ROM_REGION(0x2000, "musiccpu", 0)
+	ROM_LOAD("d-musica.bin", 0x0000, 0x2000, CRC(2cb9697c) SHA1(d5c66d616ccd5e299832704e494743429dafd569))
+
+	ROM_REGION(0x180000, "musicrom", 0)
+	ROM_LOAD("e-musica.bin", 0x00000, 0x80000, CRC(1414b921) SHA1(5df9e538ee109df28953ec8f162c60cb8c6e4d96))
+	ROM_LOAD("f-musica.bin", 0x80000, 0x80000, CRC(80f3a6df) SHA1(e09ad4660e511779c6e55559fa0c2c0b0c6600c8))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Mach 2 (1995)
 /-------------------------------------------------------------------*/
@@ -921,9 +944,10 @@ ROM_START(vrnwrld)
 	ROM_LOAD("vws7ic27.rom", 0x100000, 0x80000, CRC(7335b29c) SHA1(4de6de09f069feecbad2e5ef50032e8d381ff9b1))
 ROM_END
 
-GAME(1993, bushido,   0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993, bushidoa,  bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2 (set 1)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2a,    mach2,   spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2 (set 2)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, jolypark,  0,       jolypark, spinb, spinb_state, init_game1, ROT0, "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, vrnwrld,   0,       vrnwrld,  spinb, spinb_state, init_game2, ROT0, "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushido,  0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidoa, bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidob, bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2,    0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2 (set 1)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2a,   mach2,   spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2 (set 2)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, jolypark, 0,       jolypark, spinb, spinb_state, init_game1, ROT0, "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, vrnwrld,  0,       vrnwrld,  spinb, spinb_state, init_game2, ROT0, "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)

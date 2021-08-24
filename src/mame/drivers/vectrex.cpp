@@ -150,7 +150,7 @@ ROM_START(vectrex)
 
 //  The following fastboots are listed here for reference and documentation
 //  ROM_SYSTEM_BIOS(2, "bios2", "us-fastboot hack")
-//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(2) )
+//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRC(a6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(2) )
 //  ROM_SYSTEM_BIOS(3, "bios3", "intl-fastboot hack")
 //  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(3) )
 

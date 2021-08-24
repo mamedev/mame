@@ -224,8 +224,7 @@ class floppy_image;
 class floppy_image_format_t
 {
 public:
-	floppy_image_format_t();
-	virtual ~floppy_image_format_t();
+	virtual ~floppy_image_format_t() = default;
 
 	/*! @brief Identify an image.
 	  The identify function tests if the image is valid
@@ -270,10 +269,6 @@ public:
 	//! @returns true if format supports saving.
 	virtual bool supports_save() const = 0;
 
-	//! Used if a linked list of formats is needed
-	floppy_image_format_t *next;
-	//! This appends a format to the linked list of formats, needed for floppy_image_device().
-	void append(floppy_image_format_t *_next);
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
 	//! @returns true if file matches the extension.
@@ -396,7 +391,7 @@ protected:
 	    @param track_size in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm.
 	    @param image
 	*/
-	void generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
+	static void generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
 
 	/*! @brief Generate a track from cell binary values, MSB-first.
 	    @param track
@@ -407,7 +402,7 @@ protected:
 	    @param subtrack subtrack index, 0-3
 	    @param splice write splice position
 	*/
-	void generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack = 0, int splice = 0);
+	static void generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack = 0, int splice = 0);
 
 	//! @brief Generate a track from cell level values (0/1/W/D/N).
 
@@ -424,10 +419,10 @@ protected:
 	    know. trackbuf may be modified at that position or after.
 	    @param image
 	*/
-	void generate_track_from_levels(int track, int head, std::vector<uint32_t> &trackbuf, int splice_pos, floppy_image *image);
+	static void generate_track_from_levels(int track, int head, std::vector<uint32_t> &trackbuf, int splice_pos, floppy_image *image);
 
 	//! Normalize the times in a cell buffer to sum up to 200000000
-	void normalize_times(std::vector<uint32_t> &buffer);
+	static void normalize_times(std::vector<uint32_t> &buffer);
 
 	// Some conversion tables for gcr
 	static const uint8_t gcr5fw_tb[0x10], gcr5bw_tb[0x20];
@@ -504,8 +499,8 @@ protected:
 	 @endverbatim
 	 */
 
-	std::vector<bool> generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack = 0);
-	std::vector<uint8_t> generate_nibbles_from_bitstream(const std::vector<bool> &bitstream);
+	static std::vector<bool> generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack = 0);
+	static std::vector<uint8_t> generate_nibbles_from_bitstream(const std::vector<bool> &bitstream);
 
 	struct desc_pc_sector
 	{
@@ -523,84 +518,84 @@ protected:
 		uint8_t *data;
 	};
 
-	int calc_default_pc_gap3_size(uint32_t form_factor, int sector_size);
-	void build_wd_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2);
-	void build_wd_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
-	void build_pc_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
-	void build_pc_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=80, int gap_1=50, int gap_2=22);
-	void build_mac_track_gcr(int track, int head, floppy_image *image, const desc_gcr_sector *sects);
+	static int calc_default_pc_gap3_size(uint32_t form_factor, int sector_size);
+	static void build_wd_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2);
+	static void build_wd_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
+	static void build_pc_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
+	static void build_pc_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=80, int gap_1=50, int gap_2=22);
+	static void build_mac_track_gcr(int track, int head, floppy_image *image, const desc_gcr_sector *sects);
 
 	//! @brief Extract standard sectors from a regenerated bitstream.
 	//! Returns a vector of the vector contents, indexed by the sector id.  Missing sectors have size zero.
 
 	//! PC-type sectors with MFM encoding, sector size can go from 128 bytes to 16K.
-	std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_mfm_pc(const std::vector<bool> &bitstream);
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_mfm_pc(const std::vector<bool> &bitstream);
 
 	//! PC-type sectors with FM encoding
-	std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_fm_pc(const std::vector<bool> &bitstream);
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_fm_pc(const std::vector<bool> &bitstream);
 
 	//! Commodore type sectors with GCR5 encoding
-	std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_gcr5(const std::vector<bool> &bitstream, int head, int tracks);
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_gcr5(const std::vector<bool> &bitstream, int head, int tracks);
 
 	//! Victor 9000 type sectors with GCR5 encoding
-	std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_victor_gcr5(const std::vector<bool> &bitstream);
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_victor_gcr5(const std::vector<bool> &bitstream);
 
 	//! Mac type sectors with GCR6 encoding
-	std::vector<std::vector<uint8_t>> extract_sectors_from_track_mac_gcr6(int head, int track, floppy_image *image);
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_mac_gcr6(int head, int track, floppy_image *image);
 
 
 	//! @brief Get a geometry (including sectors) from an image.
 
 	//!   PC-type sectors with MFM encoding
-	void get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
+	static void get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
 	//!   PC-type sectors with FM encoding
-	void get_geometry_fm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
+	static void get_geometry_fm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
 
 
 	//!  Regenerate the data for a full track.
 	//!  PC-type sectors with MFM encoding and fixed-size.
-	void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
+	static void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
 	//!  Regenerate the data for a full track.
 	//!  PC-type sectors with FM encoding and fixed-size.
-	void get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
+	static void get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
 	//! Look up a bit in a level-type stream.
-	bool bit_r(const std::vector<uint32_t> &buffer, int offset);
+	static bool bit_r(const std::vector<uint32_t> &buffer, int offset);
 	//! Look up multiple bits
-	uint32_t bitn_r(const std::vector<uint32_t> &buffer, int offset, int count);
+	static uint32_t bitn_r(const std::vector<uint32_t> &buffer, int offset, int count);
 	//! Write a bit with a given size.
-	void bit_w(std::vector<uint32_t> &buffer, bool val, uint32_t size = 1000);
-	void bit_w(std::vector<uint32_t> &buffer, bool val, uint32_t size, int offset);
+	static void bit_w(std::vector<uint32_t> &buffer, bool val, uint32_t size = 1000);
+	static void bit_w(std::vector<uint32_t> &buffer, bool val, uint32_t size, int offset);
 	//! Calculate a CCITT-type CRC.
-	uint16_t calc_crc_ccitt(const std::vector<uint32_t> &buffer, int start, int end);
+	static uint16_t calc_crc_ccitt(const std::vector<uint32_t> &buffer, int start, int end);
 	//! Write a series of (raw) bits
-	void raw_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
-	void raw_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
+	static void raw_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
+	static void raw_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
 	//! FM-encode and write a series of bits
-	void fm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
-	void fm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
+	static void fm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
+	static void fm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
 	//! MFM-encode and write a series of bits
-	void mfm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
-	void mfm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
+	static void mfm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
+	static void mfm_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size, int offset);
 	//! MFM-encode every two bits and write
-	void mfm_half_w(std::vector<uint32_t> &buffer, int start_bit, uint32_t val, uint32_t size = 1000);
+	static void mfm_half_w(std::vector<uint32_t> &buffer, int start_bit, uint32_t val, uint32_t size = 1000);
 	//! GCR5-encode and write a series of bits
-	void gcr5_w(std::vector<uint32_t> &buffer, uint8_t val, uint32_t size = 1000);
-	void gcr5_w(std::vector<uint32_t> &buffer, uint8_t val, uint32_t size, int offset);
+	static void gcr5_w(std::vector<uint32_t> &buffer, uint8_t val, uint32_t size = 1000);
+	static void gcr5_w(std::vector<uint32_t> &buffer, uint8_t val, uint32_t size, int offset);
 	//! 8N1-encode and write a series of bits
-	void _8n1_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
+	static void _8n1_w(std::vector<uint32_t> &buffer, int n, uint32_t val, uint32_t size = 1000);
 	//! GCR4 encode (Apple II sector header)
-	uint16_t gcr4_encode(uint8_t va);
+	static uint16_t gcr4_encode(uint8_t va);
 	//! GCR4 decode
-	uint8_t gcr4_decode(uint8_t e0, uint8_t e1);
+	static uint8_t gcr4_decode(uint8_t e0, uint8_t e1);
 	//! GCR6 encode (Apple II 16-sector and Mac-style GCR)
-	uint32_t gcr6_encode(uint8_t va, uint8_t vb, uint8_t vc);
+	static uint32_t gcr6_encode(uint8_t va, uint8_t vb, uint8_t vc);
 	//! GCR6 decode
-	void gcr6_decode(uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3, uint8_t &va, uint8_t &vb, uint8_t &vc);
+	static void gcr6_decode(uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3, uint8_t &va, uint8_t &vb, uint8_t &vc);
 
-	uint8_t sbyte_mfm_r(const std::vector<bool> &bitstream, uint32_t &pos);
-	uint8_t sbyte_gcr5_r(const std::vector<bool> &bitstream, uint32_t &pos);
+	static uint8_t sbyte_mfm_r(const std::vector<bool> &bitstream, uint32_t &pos);
+	static uint8_t sbyte_gcr5_r(const std::vector<bool> &bitstream, uint32_t &pos);
 
 	//! Max number of excess tracks to be discarded from disk image to fit floppy drive
 	enum { DUMP_THRESHOLD = 2 };
@@ -619,24 +614,24 @@ private:
 		bool fixup_mfm_clock; //!< would the MFM clock bit after the CRC need to be fixed?
 	};
 
-	bool type_no_data(int type) const;
-	bool type_data_mfm(int type, int p1, const gen_crc_info *crcs) const;
+	static bool type_no_data(int type);
+	static bool type_data_mfm(int type, int p1, const gen_crc_info *crcs);
 
-	int crc_cells_size(int type) const;
-	void fixup_crc_amiga(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
-	void fixup_crc_cbm(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
-	void fixup_crc_ccitt(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
-	void fixup_crc_ccitt_fm(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
-	void fixup_crc_machead(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
-	void fixup_crc_fcs(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
-	void fixup_crc_victor_header(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
-	void fixup_crc_victor_data(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
-	void fixup_crcs(std::vector<uint32_t> &buffer, gen_crc_info *crcs);
-	void collect_crcs(const desc_e *desc, gen_crc_info *crcs) const;
+	static int crc_cells_size(int type);
+	static void fixup_crc_amiga(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	static void fixup_crc_cbm(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	static void fixup_crc_ccitt(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	static void fixup_crc_ccitt_fm(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	static void fixup_crc_machead(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	static void fixup_crc_fcs(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	static void fixup_crc_victor_header(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	static void fixup_crc_victor_data(std::vector<uint32_t> &buffer, const gen_crc_info *crc);
+	static void fixup_crcs(std::vector<uint32_t> &buffer, gen_crc_info *crcs);
+	static void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
 
-	int sbit_rp(const std::vector<bool> &bitstream, uint32_t &pos);
+	static int sbit_rp(const std::vector<bool> &bitstream, uint32_t &pos);
 
-	int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);
+	static int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);
 };
 
 // a dce_type is simply a pointer to its alloc function

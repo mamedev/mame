@@ -20,7 +20,7 @@ std::string pic1670_disassembler::freg(u16 opcode) const
 {
 	static const char *const fnames[0x10] = {
 		"(fsr)", "w", "pc", "asr", "fsr", "isr", "rtcca", "rtccb",
-		"riopa", "iopa", "riopb" "iopb", "riorpc", "iopc", "riopd", "iopd"
+		"riopa", "iopa", "riopb", "iopb", "riorpc", "iopc", "riopd", "iopd"
 	};
 	u16 reg = opcode & 0x3f;
 	if(reg < 0x10)

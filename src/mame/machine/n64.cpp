@@ -4,6 +4,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "screen.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips3com.h"
 #include "includes/n64.h"

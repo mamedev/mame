@@ -1365,7 +1365,7 @@ Compiled by K1W1
 		<description>Turbo Blizzard</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1379,7 +1379,7 @@ Compiled by K1W1
 		<year>199?</year>
 		<publisher>Info-Cell</publisher>
 		<info name="developer" value="Pawel Mironczuk" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1393,7 +1393,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1407,7 +1407,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1421,7 +1421,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1435,7 +1435,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1449,7 +1449,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>JK Soft</publisher>
 		<info name="developer" value="Bartek Selinger" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1462,7 +1462,7 @@ Compiled by K1W1
 		<description>Cartridge System Turbo 2000</description>
 		<year>1991</year>
 		<publisher>Bartek Selinger</publisher>
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">

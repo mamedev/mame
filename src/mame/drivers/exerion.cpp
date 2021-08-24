@@ -488,17 +488,17 @@ ROM_START( exerionb )
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
 	ROM_REGION( 0x02000, "fgchars", 0 )
-	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) )
+	ROM_LOAD( "exerion.06",   0x0000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) )
 
 	ROM_REGION( 0x04000, "sprites", 0 )
-	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
-	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
+	ROM_LOAD( "exerion.11",   0x0000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
+	ROM_LOAD( "exerion.10",   0x2000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
 	ROM_REGION( 0x08000, "bgdata", 0 )
-	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) )
-	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
-	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
-	ROM_LOAD( "exerion.02",   0x06000, 0x2000, CRC(a7ecbb70) SHA1(3c359d5bb21290a45d3eb18fea2b1f9439b931be) )
+	ROM_LOAD( "exerion.03",   0x0000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) )
+	ROM_LOAD( "exerion.04",   0x2000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
+	ROM_LOAD( "exerion.01",   0x4000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
+	ROM_LOAD( "exerion.02",   0x6000, 0x2000, CRC(a7ecbb70) SHA1(3c359d5bb21290a45d3eb18fea2b1f9439b931be) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
 	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
@@ -513,19 +513,19 @@ ROM_END
 
 ROM_START( exerionb2 )
 	ROM_REGION( 0x6000, "maincpu", 0 ) // slight differences compared to the original, not only the usual copyright removal but also some routines modified / added
-	ROM_LOAD( "e7.bin",      0x0000, 0x2000, CRC(349fc44e) SHA1(f0f60528366c860f532e8580310c4fb4eae9e8d6) )
-	ROM_LOAD( "e8.bin",      0x2000, 0x2000, CRC(b7b5eb9b) SHA1(6980ba29ac9178adf93f6b89dff52d9aa8db17ae) )
-	ROM_LOAD( "e9.bin",      0x4000, 0x2000, CRC(11a30c5a) SHA1(1fa512af5771939d54cea76c7d9c09a6ab39aca9) )
+	ROM_LOAD( "e7.bin",   0x0000, 0x2000, CRC(349fc44e) SHA1(f0f60528366c860f532e8580310c4fb4eae9e8d6) )
+	ROM_LOAD( "e8.bin",   0x2000, 0x2000, CRC(b7b5eb9b) SHA1(6980ba29ac9178adf93f6b89dff52d9aa8db17ae) )
+	ROM_LOAD( "e9.bin",   0x4000, 0x2000, CRC(11a30c5a) SHA1(1fa512af5771939d54cea76c7d9c09a6ab39aca9) )
 
 	ROM_REGION( 0x2000, "sub", 0 ) // same as the original
 	ROM_LOAD( "e5.bin",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
 	ROM_REGION( 0x02000, "fgchars", 0 ) // slight differences compared to the original
-	ROM_LOAD( "e6.bin",   0x00000, 0x2000, CRC(24a2ceb5) SHA1(77fa649e75fe549091cf401307c583e9b6acfdce) )
+	ROM_LOAD( "e6.bin",  0x00000, 0x2000, CRC(24a2ceb5) SHA1(77fa649e75fe549091cf401307c583e9b6acfdce) )
 
 	ROM_REGION( 0x04000, "sprites", 0 ) // same as the original
-	ROM_LOAD( "e11.bin",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
-	ROM_LOAD( "e10.bin",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
+	ROM_LOAD( "e11.bin", 0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
+	ROM_LOAD( "e10.bin", 0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
 	ROM_REGION( 0x08000, "bgdata", ROMREGION_ERASE00 ) // smaller ROMs, but same contents but for 3.bin
 	ROM_LOAD( "6.bin",   0x00000, 0x1000, CRC(e0dceacc) SHA1(ac1c08c71878dc10d762da811dbc565248006941) )
@@ -547,29 +547,65 @@ ROM_START( exerionb2 )
 ROM_END
 
 
-ROM_START( irion )
+ROM_START( exerionba )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "2.bin",        0x0000, 0x2000, CRC(bf55324e) SHA1(a310e953cc80d09111ba104f21461420ae3abcd5) )
-	ROM_LOAD( "3.bin",        0x2000, 0x2000, CRC(0625bb49) SHA1(111edb1da2153c853d89e56a89ef813cee559730) )
-	ROM_LOAD( "4.bin",        0x4000, 0x2000, CRC(918a9b1d) SHA1(e515f1b9c5ddda8115e68e8a499b252b09774bb6) )
+	ROM_LOAD( "2_7.bin",  0x0000, 0x2000, CRC(349fc44e) SHA1(f0f60528366c860f532e8580310c4fb4eae9e8d6) )
+	ROM_LOAD( "2_8.bin",  0x2000, 0x2000, CRC(b7b5eb9b) SHA1(6980ba29ac9178adf93f6b89dff52d9aa8db17ae) )
+	ROM_LOAD( "2_9.bin",  0x4000, 0x2000, CRC(11a30c5a) SHA1(1fa512af5771939d54cea76c7d9c09a6ab39aca9) )
+
+	ROM_REGION( 0x2000, "sub", 0 )
+	ROM_LOAD( "8.bin",    0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
 	ROM_REGION( 0x02000, "fgchars", 0 )
-	ROM_LOAD( "1.bin",        0x0000, 0x2000, CRC(56cd5ebf) SHA1(58d84c2dc3b3bac7371da5b9a230fa581ead31dc) )
+	ROM_LOAD( "2_6.bin",  0x0000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) )
 
 	ROM_REGION( 0x04000, "sprites", 0 )
-	ROM_LOAD( "5.bin",        0x0000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
-	ROM_LOAD( "6.bin",        0x2000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
+	ROM_LOAD( "2_11.bin", 0x0000, 0x2000, CRC(101628ce) SHA1(f555dfcf142bd92e362054f573803e31d8db94ff) )
+	ROM_LOAD( "2_10.bin", 0x2000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
+
+	ROM_REGION( 0x08000, "bgdata", ROMREGION_ERASE00 )
+	ROM_LOAD( "6.bin",   0x00000, 0x1000, CRC(e0dceacc) SHA1(ac1c08c71878dc10d762da811dbc565248006941) )
+	ROM_LOAD( "7.bin",   0x01000, 0x1000, CRC(544d4194) SHA1(a37c69b74c09f60e91a12894b595adcddcb475d9) )
+	ROM_LOAD( "5.bin",   0x02000, 0x1000, CRC(7cf28a3c) SHA1(064d05461320d4cd9c0d172551a85aae1ee29f02) )
+	ROM_LOAD( "4.bin",   0x03000, 0x1000, CRC(c7e8a4eb) SHA1(5852ff31c0350a1d66b0c7781b3d3f3e0b003f9b) )
+	ROM_LOAD( "2.bin",   0x04000, 0x1000, CRC(bda08550) SHA1(74528cdb30cee079647201f6e6227425d8a0a947) )
+	ROM_LOAD( "3.bin",   0x05000, 0x1000, CRC(de30698d) SHA1(33eddae3aa5d4eea1e522d654fb86f505a4b99ac) )
+	ROM_LOAD( "1.bin",   0x06000, 0x1000, CRC(33c73949) SHA1(fac662bd9c0ed769a3574074aba9ab4e0d7aaf33) )
+
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "82s123.1", 0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
+	ROM_LOAD( "82s129.4", 0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) // fg char lookup table
+	ROM_LOAD( "82s129.5", 0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) // sprite lookup table
+	ROM_LOAD( "82s129.2", 0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) // bg char lookup table
+
+	ROM_REGION( 0x0100, "bg_char_mixer_prom", 0 )
+	ROM_LOAD( "82s129.3", 0x0000, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) )
+ROM_END
+
+
+ROM_START( irion )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "2.bin",    0x0000, 0x2000, CRC(bf55324e) SHA1(a310e953cc80d09111ba104f21461420ae3abcd5) )
+	ROM_LOAD( "3.bin",    0x2000, 0x2000, CRC(0625bb49) SHA1(111edb1da2153c853d89e56a89ef813cee559730) )
+	ROM_LOAD( "4.bin",    0x4000, 0x2000, CRC(918a9b1d) SHA1(e515f1b9c5ddda8115e68e8a499b252b09774bb6) )
+
+	ROM_REGION( 0x02000, "fgchars", 0 )
+	ROM_LOAD( "1.bin",    0x0000, 0x2000, CRC(56cd5ebf) SHA1(58d84c2dc3b3bac7371da5b9a230fa581ead31dc) )
+
+	ROM_REGION( 0x04000, "sprites", 0 )
+	ROM_LOAD( "5.bin",    0x0000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
+	ROM_LOAD( "6.bin",    0x2000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
 
 	ROM_REGION( 0x08000, "bgdata", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0320, "proms", 0 ) // these are assumed to be on the board - the game won't run without them
-	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
-	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) // fg char lookup table
-	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) // sprite lookup table
-	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) // bg char lookup table
+	ROM_LOAD( "exerion.e1",  0x000, 0x020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
+	ROM_LOAD( "exerion.i8",  0x020, 0x100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) // fg char lookup table
+	ROM_LOAD( "exerion.h10", 0x120, 0x100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) // sprite lookup table
+	ROM_LOAD( "exerion.i3",  0x220, 0x100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) // bg char lookup table
 
 	ROM_REGION( 0x0100, "bg_char_mixer_prom", 0 )
-	ROM_LOAD( "exerion.k4",   0x0000, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) )
+	ROM_LOAD( "exerion.k4",  0x000, 0x100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) )
 ROM_END
 
 
@@ -661,8 +697,9 @@ void exerion_state::init_irion()
  *
  *************************************/
 
-GAME( 1983, exerion,   0,       exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco", "Exerion", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exeriont,  exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exerionb,  exerion, exerion, exerion, exerion_state, init_exerionb, ROT90, "bootleg", "Exerion (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exerionb2, exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "bootleg", "Exerion (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, irion,     exerion, irion,   exerion, exerion_state, init_irion,    ROT90, "bootleg", "Irion", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerion,   0,       exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco",                         "Exerion",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exeriont,  exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerionb,  exerion, exerion, exerion, exerion_state, init_exerionb, ROT90, "bootleg",                        "Exerion (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerionb2, exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "bootleg",                        "Exerion (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerionba, exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "bootleg (Assa)",                 "Exerion (Assa, bootleg)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, irion,     exerion, irion,   exerion, exerion_state, init_irion,    ROT90, "bootleg",                        "Irion",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

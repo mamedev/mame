@@ -224,7 +224,6 @@ vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, 
 void vme_mvme350_card_device::device_start()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	set_vme_device();
 
 	/* Setup r/w handlers for shared memory area */
 #if 0

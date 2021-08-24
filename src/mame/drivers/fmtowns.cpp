@@ -464,6 +464,9 @@ void towns_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_CDDA:
 		towns_delay_cdda((cdrom_image_device*)ptr);
 		break;
+	case TIMER_SPRITES:
+		draw_sprites();
+		break;
 	}
 }
 void towns_state::freerun_inc()
@@ -939,6 +942,7 @@ uint8_t towns_state::towns_padport_r(offs_t offset)
 	uint8_t extra2;
 	uint32_t state;
 
+	offset >>= 1;
 	if(offset == 0)
 	{
 		if((porttype & 0x0f) == 0x01)
@@ -960,7 +964,7 @@ uint8_t towns_state::towns_padport_r(offs_t offset)
 			if((extra1 & 0x20) && (m_towns_pad_mask & 0x02))
 				ret &= ~0x20;
 		}
-		if((porttype & 0x0f) == 0x04)  // 6-button joystick
+		else if((porttype & 0x0f) == 0x04)  // 6-button joystick
 		{
 			extra1 = m_6b_joy1_ex->read();
 
@@ -992,7 +996,7 @@ uint8_t towns_state::towns_padport_r(offs_t offset)
 					ret &= ~0x01;
 			}
 		}
-		if((porttype & 0x0f) == 0x02)  // mouse
+		else if((porttype & 0x0f) == 0x02)  // mouse
 		{
 			switch(m_towns_mouse_output)
 			{
@@ -1025,9 +1029,9 @@ uint8_t towns_state::towns_padport_r(offs_t offset)
 			if(m_towns_pad_mask & 0x10)
 				ret |= 0x40;
 		}
-
+		else ret = 0x7f;
 	}
-	if(offset == 1)  // second joystick port
+	else if(offset == 1)  // second joystick port
 	{
 		if((porttype & 0xf0) == 0x10)
 		{
@@ -1048,7 +1052,7 @@ uint8_t towns_state::towns_padport_r(offs_t offset)
 			if((extra2 & 0x20) && (m_towns_pad_mask & 0x08))
 				ret &= ~0x20;
 		}
-		if((porttype & 0xf0) == 0x40)  // 6-button joystick
+		else if((porttype & 0xf0) == 0x40)  // 6-button joystick
 		{
 			extra2 = m_6b_joy2_ex->read();
 
@@ -1080,7 +1084,7 @@ uint8_t towns_state::towns_padport_r(offs_t offset)
 					ret &= ~0x01;
 			}
 		}
-		if((porttype & 0xf0) == 0x20)  // mouse
+		else if((porttype & 0xf0) == 0x20)  // mouse
 		{
 			switch(m_towns_mouse_output)
 			{
@@ -1113,6 +1117,7 @@ uint8_t towns_state::towns_padport_r(offs_t offset)
 			if(m_towns_pad_mask & 0x20)
 				ret |= 0x40;
 		}
+		else ret = 0x7f;
 	}
 
 	return ret;
@@ -1788,7 +1793,10 @@ uint8_t towns_state::towns_cdrom_r(offs_t offset)
 							m_towns_cd.extra_status = 0;
 							break;
 						case 0x04:  // play cdda
-							towns_cd_set_status(0x07,0x00,0x00,0x00);
+							if(m_cdda->audio_ended())
+								towns_cd_set_status(0x07,0x00,0x00,0x00);
+							else
+								towns_cd_set_status(0x00,0x00,0x03,0x00);
 							m_towns_cd.status &= ~2;
 							m_towns_cd.extra_status = 0;
 							break;
@@ -2355,7 +2363,7 @@ void towns_state::towns_io(address_map &map)
 	// CD-ROM
 	map(0x04c0, 0x04cf).rw(FUNC(towns_state::towns_cdrom_r), FUNC(towns_state::towns_cdrom_w)).umask32(0x00ff00ff);
 	// Joystick / Mouse ports
-	map(0x04d0, 0x04d3).r(FUNC(towns_state::towns_padport_r)).umask32(0x00ff00ff);
+	map(0x04d0, 0x04d3).r(FUNC(towns_state::towns_padport_r));
 	map(0x04d6, 0x04d6).w(FUNC(towns_state::towns_pad_mask_w));
 	// Sound (YM3438 [FM], RF5c68 [PCM])
 	map(0x04d8, 0x04df).rw("fm", FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask32(0x00ff00ff);
@@ -2426,7 +2434,7 @@ void towns_state::towns16_io(address_map &map)
 	// CD-ROM
 	map(0x04c0, 0x04cf).rw(FUNC(towns_state::towns_cdrom_r), FUNC(towns_state::towns_cdrom_w)).umask16(0x00ff);
 	// Joystick / Mouse ports
-	map(0x04d0, 0x04d3).r(FUNC(towns_state::towns_padport_r)).umask16(0x00ff);
+	map(0x04d0, 0x04d3).r(FUNC(towns_state::towns_padport_r));
 	map(0x04d6, 0x04d6).w(FUNC(towns_state::towns_pad_mask_w));
 	// Sound (YM3438 [FM], RF5c68 [PCM])
 	map(0x04d8, 0x04df).rw("fm", FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0x00ff);

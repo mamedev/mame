@@ -51,7 +51,7 @@ protected:
 		uint16_t *screen_ram;
 	};
 
-	class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, 8192>
+	class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, POLY_FLAG_NO_WORK_QUEUE>
 	{
 	public:
 		atarisy4_renderer(atarisy4_state &state, screen_device &screen);
@@ -214,7 +214,7 @@ private:
  *************************************/
 
 atarisy4_state::atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &screen) :
-	poly_manager<float, atarisy4_polydata, 2, 8192>(screen, FLAG_NO_WORK_QUEUE),
+	poly_manager<float, atarisy4_polydata, 2, POLY_FLAG_NO_WORK_QUEUE>(screen.machine()),
 	m_state(state)
 {
 }
@@ -359,7 +359,7 @@ void atarisy4_state::atarisy4_renderer::draw_polygon(uint16_t color)
 		v3.x = m_state.m_gpu.points[i].x;
 		v3.y = m_state.m_gpu.points[i].y;
 
-		render_triangle(clip, rd_scan, 1, v1, v2, v3);
+		render_triangle<1>(clip, rd_scan, v1, v2, v3);
 		v2 = v3;
 	}
 }

@@ -14,7 +14,7 @@
 #include <cmath>
 #include "imgtool.h"
 #include "formats/imageutl.h"
-#include "formats/vt_dsk.h"
+#include "formats/vt_dsk_legacy.h"
 #include "iflopimg.h"
 
 /*

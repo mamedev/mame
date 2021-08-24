@@ -21,13 +21,10 @@ First, you will need to *cd* to the directory where you installed MAME into.
 If, for instance, you have MAME installed in ``C:\Users\Public\MAME`` you will
 need to type ``cd C:\Users\Public\MAME`` into the command prompt.
 
-Then you have MAME create the config file by typing ``mame64 -createconfig``
-or ``mame -createconfig`` depending on if you are using the 64-bit version of
-MAME or the 32-bit version.
-
-MAME will then create the ``mame.ini`` file in the MAME installation folder.
-This file contains the default configuration settings for a new MAME
-installation.
+Then you have MAME create the config file by typing ``mame
+-createconfig``.  MAME will then create the ``mame.ini`` file in the
+MAME installation folder.  This file contains the default
+configuration settings for a new MAME installation.
 
 
 Initial Setup: Creating mame.ini From Command Line on Linux or MacOS
@@ -35,18 +32,15 @@ Initial Setup: Creating mame.ini From Command Line on Linux or MacOS
 
 The steps for Linux and MacOS are similar to those of Windows. If you
 installed MAME using the package manager that came from a Linux distro, you will
-type ``mame64 -createconfig`` or ``mame -createconfig`` into your terminal
-of choice, depending on if you have a 64-bit version of MAME or a 32-bit
-one.
+type ``mame -createconfig`` into your terminal of choice.
 
 If you have compiled from source or downloaded a binary package of MAME,
 you will ``cd`` into the directory you put the MAME files into.
 
 For instance, ``cd /home/myusername/mame``
 
-Then you will type ``./mame64 -createconfig`` or ``./mame -createconfig`` into
-your terminal of choice, depending on if you have a 64-bit version of MAME or a
-32-bit one.
+Then you will type ``./mame -createconfig`` into
+your terminal of choice.
 
 You can then need to edit the ``mame.ini`` file in your favorite text editor,
 e.g. *Notepad* on Windows or *vi* on Linux/MacOS, or you can change settings
@@ -56,9 +50,9 @@ from inside of MAME.
 Initial Setup: Graphical Setup
 ------------------------------
 
-This is the easiest way to get started. Start MAME by opening the MAME icon
-in the location where you installed it. This will be ``mame64.exe`` or
-``mame.exe`` on Windows, ``mame64`` or ``mame`` on Linux and macOS.
+This is the easiest way to get started. Start MAME by opening the MAME
+icon in the location where you installed it. This will be ``mame.exe``
+on Windows, ``mame`` on Linux and macOS.
 
 Once MAME has started, you can either use your mouse to click on the
 **Configure Options** menu selection at the bottom center of your screen,

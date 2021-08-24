@@ -678,7 +678,7 @@ void _8080bw_state::cosmo(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_cosmo));
 
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	invaders_samples_audio(config);

@@ -410,7 +410,6 @@ class tilemap_t
 	friend class tilemap_device;
 	friend class tilemap_manager;
 	friend class simple_list<tilemap_t>;
-	friend resource_pool_object<tilemap_t>::~resource_pool_object();
 
 	// logical index
 	typedef u32 logical_index;

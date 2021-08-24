@@ -101,6 +101,8 @@ namespace
 		INPUT_CHANGED_MEMBER( switch_changed );
 
 	protected:
+		coco_multipak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 		// device-level overrides
 		virtual void device_start() override;
 		virtual void device_reset() override;
@@ -119,10 +121,12 @@ namespace
 		virtual address_space &cartridge_space() override;
 		virtual ioport_constructor device_input_ports() const override;
 
-	private:
 		// device references
 		required_device_array<cococart_slot_device, 4> m_slots;
 
+		void update_line(int slot_number, line ln);
+
+	private:
 		// internal state
 		u8 m_select;
 		u8 m_block;
@@ -138,21 +142,21 @@ namespace
 		void set_select(u8 new_select);
 		u8 ff7f_read();
 		void ff7f_write(u8 data);
-		void update_line(int slot_number, line ln);
-
-		DECLARE_WRITE_LINE_MEMBER(multi_slot1_cart_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot1_nmi_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot1_halt_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot2_cart_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot2_nmi_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot2_halt_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot3_cart_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot3_nmi_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot3_halt_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot4_cart_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot4_nmi_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot4_halt_w);
 	};
+};
+
+
+// ======================> dragon_multipak_device
+
+class dragon_multipak_device : public coco_multipak_device
+{
+public:
+	// construction/destruction
+	dragon_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -175,21 +179,54 @@ static void coco_cart_slot4(device_slot_interface &device)
 void coco_multipak_device::device_add_mconfig(machine_config &config)
 {
 	COCOCART_SLOT(config, m_slots[0], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
-	m_slots[0]->cart_callback().set(FUNC(coco_multipak_device::multi_slot1_cart_w));
-	m_slots[0]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot1_nmi_w));
-	m_slots[0]->halt_callback().set(FUNC(coco_multipak_device::multi_slot1_halt_w));
+	m_slots[0]->cart_callback().set([this](int state) { update_line(1, line::CART); });
+	m_slots[0]->nmi_callback().set([this](int state) { update_line(1, line::NMI); });
+	m_slots[0]->halt_callback().set([this](int state) { update_line(1, line::HALT); });
 	COCOCART_SLOT(config, m_slots[1], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
-	m_slots[1]->cart_callback().set(FUNC(coco_multipak_device::multi_slot2_cart_w));
-	m_slots[1]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot2_nmi_w));
-	m_slots[1]->halt_callback().set(FUNC(coco_multipak_device::multi_slot2_halt_w));
+	m_slots[1]->cart_callback().set([this](int state) { update_line(2, line::CART); });
+	m_slots[1]->nmi_callback().set([this](int state) { update_line(2, line::NMI); });
+	m_slots[1]->halt_callback().set([this](int state) { update_line(2, line::HALT); });
 	COCOCART_SLOT(config, m_slots[2], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
-	m_slots[2]->cart_callback().set(FUNC(coco_multipak_device::multi_slot3_cart_w));
-	m_slots[2]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot3_nmi_w));
-	m_slots[2]->halt_callback().set(FUNC(coco_multipak_device::multi_slot3_halt_w));
+	m_slots[2]->cart_callback().set([this](int state) { update_line(3, line::CART); });
+	m_slots[2]->nmi_callback().set([this](int state) { update_line(3, line::NMI); });
+	m_slots[2]->halt_callback().set([this](int state) { update_line(3, line::HALT); });
 	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), coco_cart_slot4, "fdcv11");
-	m_slots[3]->cart_callback().set(FUNC(coco_multipak_device::multi_slot4_cart_w));
-	m_slots[3]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot4_nmi_w));
-	m_slots[3]->halt_callback().set(FUNC(coco_multipak_device::multi_slot4_halt_w));
+	m_slots[3]->cart_callback().set([this](int state) { update_line(4, line::CART); });
+	m_slots[3]->nmi_callback().set([this](int state) { update_line(4, line::NMI); });
+	m_slots[3]->halt_callback().set([this](int state) { update_line(4, line::HALT); });
+}
+
+
+static void dragon_cart_slot1_3(device_slot_interface &device)
+{
+	dragon_cart_add_basic_devices(device);
+}
+
+static void dragon_cart_slot4(device_slot_interface &device)
+{
+	dragon_cart_add_basic_devices(device);
+	dragon_cart_add_fdcs(device);
+}
+
+
+void dragon_multipak_device::device_add_mconfig(machine_config &config)
+{
+	COCOCART_SLOT(config, m_slots[0], DERIVED_CLOCK(1, 1), dragon_cart_slot1_3, nullptr);
+	m_slots[0]->cart_callback().set([this](int state) { update_line(1, line::CART); });
+	m_slots[0]->nmi_callback().set([this](int state) { update_line(1, line::NMI); });
+	m_slots[0]->halt_callback().set([this](int state) { update_line(1, line::HALT); });
+	COCOCART_SLOT(config, m_slots[1], DERIVED_CLOCK(1, 1), dragon_cart_slot1_3, nullptr);
+	m_slots[1]->cart_callback().set([this](int state) { update_line(2, line::CART); });
+	m_slots[1]->nmi_callback().set([this](int state) { update_line(2, line::NMI); });
+	m_slots[1]->halt_callback().set([this](int state) { update_line(2, line::HALT); });
+	COCOCART_SLOT(config, m_slots[2], DERIVED_CLOCK(1, 1), dragon_cart_slot1_3, nullptr);
+	m_slots[2]->cart_callback().set([this](int state) { update_line(3, line::CART); });
+	m_slots[2]->nmi_callback().set([this](int state) { update_line(3, line::NMI); });
+	m_slots[2]->halt_callback().set([this](int state) { update_line(3, line::HALT); });
+	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), dragon_cart_slot4, "dragon_fdc");
+	m_slots[3]->cart_callback().set([this](int state) { update_line(4, line::CART); });
+	m_slots[3]->nmi_callback().set([this](int state) { update_line(4, line::NMI); });
+	m_slots[3]->halt_callback().set([this](int state) { update_line(4, line::HALT); });
 }
 
 INPUT_PORTS_START( coco_multipack )
@@ -206,6 +243,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_MULTIPAK, device_cococart_interface, coco_multipak_device, "coco_multipack", "CoCo Multi-Pak Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_MULTIPAK, device_cococart_interface, dragon_multipak_device, "dragon_multipack", "Dragon Multi-Pak Interface")
 
 
 
@@ -226,13 +264,22 @@ ioport_constructor coco_multipak_device::device_input_ports() const
 //  coco_multipak_device - constructor
 //-------------------------------------------------
 
-coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, COCO_MULTIPAK, tag, owner, clock)
+coco_multipak_device::coco_multipak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_slots(*this, "slot%u", 1), m_select(0), m_block(0)
 {
 }
 
+coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: coco_multipak_device(mconfig, COCO_MULTIPAK, tag, owner, clock)
+{
+}
+
+dragon_multipak_device::dragon_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: coco_multipak_device(mconfig, DRAGON_MULTIPAK, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -483,24 +530,6 @@ void coco_multipak_device::scs_write(offs_t offset, u8 data)
 {
 	active_scs_slot().scs_write(offset, data);
 }
-
-
-//-------------------------------------------------
-//  multiX_slotX_[cart|nmi|halt] trampolines
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_cart_w) { update_line(1, line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_nmi_w)  { update_line(1, line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_halt_w) { update_line(1, line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_cart_w) { update_line(2, line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_nmi_w)  { update_line(2, line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_halt_w) { update_line(2, line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_cart_w) { update_line(3, line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_nmi_w)  { update_line(3, line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_halt_w) { update_line(3, line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_cart_w) { update_line(4, line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_nmi_w)  { update_line(4, line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_halt_w) { update_line(4, line::HALT); }
 
 
 //-------------------------------------------------

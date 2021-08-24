@@ -83,7 +83,6 @@ private:
 	void game_w(uint8_t data);
 	uint8_t vdp1_count_r(offs_t offset);
 
-	DECLARE_VIDEO_START(megplay);
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void megaplay_bios_io_map(address_map &map);

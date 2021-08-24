@@ -186,6 +186,7 @@ private:
 	uint32_t    m_Bank;
 	uint32_t    m_maxbank;
 	uint32_t    m_FlashCmd;
+	std::unique_ptr<uint8_t[]> m_dummy_region;
 
 	uint32_t system_input_r();
 	void Banksw_w(uint32_t data);
@@ -365,15 +366,15 @@ void crystal_state::machine_start()
 	if (m_mainbank)
 	{
 		m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
-		uint8_t *dummy_region = auto_alloc_array(machine(), uint8_t, 0x1000000);
-		std::fill_n(&dummy_region[0], 0x1000000, 0xff); // 0xff Filled at Unmapped area
-		uint8_t *ROM = (m_flash) ? (uint8_t *)&m_flash[0] : dummy_region;
+		m_dummy_region = std::make_unique<uint8_t[]>(0x1000000);
+		std::fill_n(&m_dummy_region[0], 0x1000000, 0xff); // 0xff Filled at Unmapped area
+		uint8_t *ROM = (m_flash) ? (uint8_t *)&m_flash[0] : &m_dummy_region[0];
 		for (int i = 0; i < 8; i++)
 		{
 			if ((i < m_maxbank))
 				m_mainbank->configure_entry(i, ROM + i * 0x1000000);
 			else
-				m_mainbank->configure_entry(i, dummy_region);
+				m_mainbank->configure_entry(i, m_dummy_region.get());
 		}
 	}
 }

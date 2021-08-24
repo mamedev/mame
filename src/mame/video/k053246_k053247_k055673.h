@@ -462,7 +462,7 @@ protected:
 	virtual void device_start() override;
 //  virtual void device_reset();
 private:
-
+	std::unique_ptr<u16[]> m_combined_gfx;
 };
 
 DECLARE_DEVICE_TYPE(K055673, k055673_device)

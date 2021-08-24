@@ -29,7 +29,7 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device,         "nes_nitra",         "NES Cart Nitra PCB")
-DEFINE_DEVICE_TYPE(NES_KS7057,        nes_ks7057_device,        "nes_ks7057",        "NES Cart KS-7057 PCB")
+DEFINE_DEVICE_TYPE(NES_FS6,           nes_fs6_device,           "nes_fs6",           "NES Cart Fight Street VI PCB")
 DEFINE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device,       "nes_smb11",         "NES Cart SMB 11 PCB")
 DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Spash Bomb PCB")
 DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY04646 PCB")
@@ -71,8 +71,8 @@ nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_ks7057_device::nes_ks7057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_KS7057, tag, owner, clock)
+nes_fs6_device::nes_fs6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_txrom_device(mconfig, NES_FS6, tag, owner, clock)
 {
 }
 
@@ -646,19 +646,21 @@ void nes_nitra_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
- Board UNL-KS7057
+ Board UNL-FS6
 
  Games: Street Fighter VI / Fight Street VI
 
  MMC3 clone (identical, but for switched address lines)
 
- In MESS: Supported
+ iNES: mapper 196 alt?
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_ks7057_device::write_h(offs_t offset, uint8_t data)
+void nes_fs6_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("ks7057 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("fs6 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	offset = (BIT(offset, 0) << 1) | BIT(offset, 1) | (offset & ~0x03);
 	txrom_write(offset, data);

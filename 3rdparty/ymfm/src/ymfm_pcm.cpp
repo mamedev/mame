@@ -81,16 +81,16 @@ void pcm_registers::cache_channel_data(uint32_t choffs, pcm_cache &cache)
 	int32_t panpot = int8_t(ch_panpot(choffs) << 4) >> 4;
 	if (panpot >= 0)
 	{
-		cache.pan_left = (panpot == 7) ? 96 : 3 * panpot;
+		cache.pan_left = (panpot == 7) ? 0x3ff : 0x20 * panpot;
 		cache.pan_right = 0;
 	}
 	else if (panpot >= -7)
 	{
 		cache.pan_left = 0;
-		cache.pan_right = (panpot == -7) ? 96 : -3 * panpot;
+		cache.pan_right = (panpot == -7) ? 0x3ff : -0x20 * panpot;
 	}
 	else
-		cache.pan_left = cache.pan_right = 96;
+		cache.pan_left = cache.pan_right = 0x3ff;
 
 	// determine the LFO stepping value; this how much to add to a running
 	// x.18 value for the LFO; steps were derived from frequencies in the
@@ -425,7 +425,7 @@ void pcm_channel::load_wavetable()
 	// for some reason that is unclear
 	m_endpos = read_pcm(wavheader + 5) << 8;
 	m_endpos |= read_pcm(wavheader + 6);
-	m_endpos = -m_endpos << 16;
+	m_endpos = -int32_t(m_endpos) << 16;
 
 	// remaining data values set registers
 	m_owner.write(0x80 + m_choffs, read_pcm(wavheader + 7));
@@ -560,9 +560,9 @@ int16_t pcm_channel::fetch_sample() const
 	// 12-bit PCM: assemble out of half of 3 bytes
 	addr += (pos / 2) * 3;
 	if ((pos & 1) == 0)
-		return (read_pcm(addr + 0) << 8) | ((read_pcm(addr + 1) << 0) & 0xf0);
+		return (read_pcm(addr + 0) << 8) | ((read_pcm(addr + 1) << 4) & 0xf0);
 	else
-		return (read_pcm(addr + 2) << 8) | ((read_pcm(addr + 1) << 4) & 0xf0);
+		return (read_pcm(addr + 2) << 8) | ((read_pcm(addr + 1) << 0) & 0xf0);
 }
 
 

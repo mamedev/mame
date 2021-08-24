@@ -8,6 +8,7 @@
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
+#include "video/n64.h"
 
 /*----------- driver state -----------*/
 
@@ -38,7 +39,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_n64);
 
 	// Getters
-	n64_rdp* rdp() { return m_rdp; }
+	n64_rdp* rdp() { return m_rdp.get(); }
 	uint32_t* rdram() { return m_rdram; }
 	uint32_t* sram() { return m_sram; }
 	uint32_t* rsp_imem() { return m_rsp_imem; }
@@ -56,7 +57,7 @@ protected:
 	required_device<n64_periphs> m_rcp_periphs;
 
 	/* video-related */
-	n64_rdp *m_rdp;
+	std::unique_ptr<n64_rdp> m_rdp;
 };
 
 /*----------- devices -----------*/

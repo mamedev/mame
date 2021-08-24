@@ -28,7 +28,7 @@ void o2_rom_device::device_start()
 
 void o2_rom_device::cart_init()
 {
-	m_cart_mask = (1 << (31 - count_leading_zeros(m_rom_size))) - 1;
+	m_cart_mask = (1 << (31 - count_leading_zeros_32(m_rom_size))) - 1;
 }
 
 

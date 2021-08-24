@@ -10,7 +10,7 @@
   JVS Support by R. Belmont
 
   Notes:
-    - technodr: Calibrate controls by turning on the service mode switch (F2) while holdign service coin (9).
+    - technodr: Calibrate controls by turning on the service mode switch (F2) while holding service coin (9).
 
   Issues:
     not all games work due to either banking, dma or protection issues.

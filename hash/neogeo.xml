@@ -6924,7 +6924,37 @@ license:CC0
 	. ??M-2360
 	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
 	-->
-	<!-- Irritating Maze requires a Custom BIOS and controller -->
+
+	<software name="irrmaze">
+		<description>The Irritating Maze / Ultra Denryu Iraira Bou</description>
+		<year>1997</year>
+		<publisher>SNK / Saurus</publisher>
+		<info name="serial" value="??M-2360"/>
+		<info name="alt_title" value="ウルトラ電流イライラ棒"/>
+		<info name="usage" value="Universe BIOS 2.2 and later support joystick play as a cheat." />
+		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->
+		<sharedfeat name="compatibility" value="MVS" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="236-p1.p1" offset="0x100000" size="0x100000" crc="4c2ff660" sha1="4a0cbd09044648ff9ec67723729f16d422c34bda" /> <!-- TC5316200 -->
+				<rom loadflag="continue" offset="0x000000" size="0x100000" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="236-s1.s1" crc="5d1ca640" sha1="40a9668a1742a44597a07ce72273d17119815637" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="236-m1.m1" crc="880a1abd" sha1="905afa157aba700e798243b842792e50729b19a0" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x300000">
+				<rom offset="0x000000" size="0x200000" name="236-v1.v1" crc="5f89c3b4" sha1="dc8fd561cf8dfdd41696dcf14ea8d2d0ac4eec4b" />   <!-- TC5316200 -->
+				<rom offset="0x200000" size="0x100000" name="236-v2.v2" crc="72e3add7" sha1="dc49f05274693255416d2e41ecc088027b798eb9" />   <!-- TC538200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x800000">
+				<rom loadflag="load16_byte" offset="0x000000" size="0x400000" name="236-c1.c1" crc="c1d47902" sha1="727001c34f979226fc8f581113ce2aaac4fc0d42" /> <!-- Plane 0,1 --> <!-- TC5332205 -->
+				<rom loadflag="load16_byte" offset="0x000001" size="0x400000" name="236-c2.c2" crc="e15f972e" sha1="6a329559c57a67be73a6733513b59e9e6c8d61cc" /> <!-- Plane 2,3 --> <!-- TC5332205 -->
+			</dataarea>
+		</part>
+	</software>
 
 
 	<!--
@@ -7710,8 +7740,9 @@ license:CC0
 		<description>Bang Bang Busters</description>
 		<year>2001</year>
 		<publisher>Visco</publisher>
-		<sharedfeat name="release" value="MVS, AES" />
-		<sharedfeat name="compatibility" value="MVS, AES" />
+		<info name="alt_title" value="バンバン バスターズ"/>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="071.p1" offset="0x000000" size="0x080000" crc="7687197d" sha1="4bb9cb7819807f7a7e1f85f1c4faac4a2f8761e8" />
@@ -8918,7 +8949,7 @@ license:CC0
 	<software name="mslug4">
 		<description>Metal Slug 4 (NGM-2630)</description>
 		<year>2002</year>
-		<publisher>Mega / Playmore</publisher>
+		<publisher>Mega / Noise Factory / Playmore</publisher>
 		<info name="serial" value="NGM-2630"/>
 		<info name="release" value="20020327"/>
 		<info name="alt_title" value="メタルスラッグ4"/>
@@ -8959,7 +8990,7 @@ license:CC0
 	<software name="mslug4h" cloneof="mslug4">
 		<description>Metal Slug 4 (NGH-2630)</description>
 		<year>2002</year>
-		<publisher>Mega / Playmore</publisher>
+		<publisher>Mega / Noise Factory / Playmore</publisher>
 		<info name="serial" value="NGH-2630"/>
 		<info name="release" value="20020613"/>
 		<info name="alt_title" value="メタルスラッグ4"/>

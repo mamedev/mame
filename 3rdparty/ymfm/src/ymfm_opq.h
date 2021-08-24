@@ -63,7 +63,7 @@ namespace ymfm
 //              -x------ Pan left
 //              --xxx--- Feedback level for operator 1 (0-7)
 //              -----xxx Operator connection algorithm (0-7)
-//        18-1F x------- Echo
+//        18-1F x------- Reverb
 //              -xxx---- PM sensitivity
 //              ------xx AM shift
 //        20-27 -xxx---- Block (0-7), Operator 2 & 4
@@ -77,7 +77,7 @@ namespace ymfm
 //        40-5F 0-xxxxxx Detune value (0-63)
 //              1---xxxx Multiple value (0-15)
 //        60-7F -xxxxxxx Total level (0-127)
-//        80-9F xxx----- Key scale rate (0-7)
+//        80-9F xx------ Key scale rate (0-3)
 //              ---xxxxx Attack rate (0-31)
 //        A0-BF x------- LFO AM enable, retrigger disable
 //               x------ Waveform select
@@ -88,11 +88,10 @@ namespace ymfm
 //
 // Diffs from OPM:
 //  - 2 frequencies/channel
-//  - KSR is 3 bits?
 //  - retrigger disable
 //  - 2 waveforms
 //  - uses FNUM
-//  - echo behavior
+//  - reverb behavior
 //  - larger detune range
 //
 // Questions:
@@ -108,14 +107,12 @@ public:
 	static constexpr uint32_t CHANNELS = 8;
 	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr uint32_t OPERATORS = CHANNELS * 4;
-	static constexpr bool DYNAMIC_OPS = false;
 	static constexpr uint32_t WAVEFORMS = 2;
 	static constexpr uint32_t REGISTERS = 0x120;
 	static constexpr uint32_t REG_MODE = 0x03;
 	static constexpr uint32_t DEFAULT_PRESCALE = 2;
 	static constexpr uint32_t EG_CLOCK_DIVIDER = 3;
-	static constexpr bool EG_HAS_DEPRESS = false;
-	static constexpr bool EG_HAS_SSG = false;
+	static constexpr bool EG_HAS_REVERB = true;
 	static constexpr bool MODULATOR_DELAY = false;
 	static constexpr uint32_t CSM_TRIGGER_MASK = ALL_CHANNELS;
 	static constexpr uint8_t STATUS_TIMERA = 0;
@@ -175,17 +172,17 @@ public:
 	std::string log_keyon(uint32_t choffs, uint32_t opoffs);
 
 	// system-wide registers
-	uint32_t timer_a_value() const              { return 0; }
-	uint32_t timer_b_value() const              { return byte(0x03, 0, 8); }
-	uint32_t csm() const                        { return 0; }
-	uint32_t reset_timer_b() const              { return byte(0x14, 5, 1); }
-	uint32_t reset_timer_a() const              { return 0; }
-	uint32_t enable_timer_b() const             { return byte(0x14, 3, 1); }
-	uint32_t enable_timer_a() const             { return 0; }
-	uint32_t load_timer_b() const               { return byte(0x14, 1, 1); }
-	uint32_t load_timer_a() const               { return 0; }
-	uint32_t lfo_enable() const                 { return byte(0x04, 4, 1) ^ 1; }
-	uint32_t lfo_rate() const                   { return byte(0x04, 0, 3); }
+	uint32_t timer_a_value() const                   { return 0; }
+	uint32_t timer_b_value() const                   { return byte(0x03, 2, 6) | 0xc0; } // ???
+	uint32_t csm() const                             { return 0; }
+	uint32_t reset_timer_b() const                   { return byte(0x03, 0, 1); } // ???
+	uint32_t reset_timer_a() const                   { return 0; }
+	uint32_t enable_timer_b() const                  { return byte(0x03, 0, 1); } // ???
+	uint32_t enable_timer_a() const                  { return 0; }
+	uint32_t load_timer_b() const                    { return byte(0x03, 0, 1); } // ???
+	uint32_t load_timer_a() const                    { return 0; }
+	uint32_t lfo_enable() const                      { return byte(0x04, 3, 1) ^ 1; }
+	uint32_t lfo_rate() const                        { return byte(0x04, 0, 3); }
 
 	// per-channel registers
 	uint32_t ch_output_any(uint32_t choffs) const    { return byte(0x10, 6, 2, choffs); }
@@ -195,17 +192,17 @@ public:
 	uint32_t ch_output_3(uint32_t choffs) const      { return 0; }
 	uint32_t ch_feedback(uint32_t choffs) const      { return byte(0x10, 3, 3, choffs); }
 	uint32_t ch_algorithm(uint32_t choffs) const     { return byte(0x10, 0, 3, choffs); }
-	uint32_t ch_echo(uint32_t choffs) const          { return byte(0x18, 7, 1, choffs); }
+	uint32_t ch_reverb(uint32_t choffs) const        { return byte(0x18, 7, 1, choffs); }
 	uint32_t ch_lfo_pm_sens(uint32_t choffs) const   { return byte(0x18, 4, 3, choffs); }
 	uint32_t ch_lfo_am_sens(uint32_t choffs) const   { return byte(0x18, 0, 2, choffs); }
-	uint32_t ch_block_freq_24(uint32_t choffs) const { return word(0x20, 0, 6, 0x30, 0, 8, choffs); }
-	uint32_t ch_block_freq_13(uint32_t choffs) const { return word(0x28, 0, 6, 0x30, 0, 8, choffs); }
+	uint32_t ch_block_freq_24(uint32_t choffs) const { return word(0x20, 0, 7, 0x30, 0, 8, choffs); }
+	uint32_t ch_block_freq_13(uint32_t choffs) const { return word(0x28, 0, 7, 0x38, 0, 8, choffs); }
 
 	// per-operator registers
 	uint32_t op_detune(uint32_t opoffs) const        { return byte(0x40, 0, 6, opoffs); }
 	uint32_t op_multiple(uint32_t opoffs) const      { return byte(0x100, 0, 4, opoffs); }
 	uint32_t op_total_level(uint32_t opoffs) const   { return byte(0x60, 0, 7, opoffs); }
-	uint32_t op_ksr(uint32_t opoffs) const           { return byte(0x80, 5, 3, opoffs); }
+	uint32_t op_ksr(uint32_t opoffs) const           { return byte(0x80, 6, 2, opoffs); }
 	uint32_t op_attack_rate(uint32_t opoffs) const   { return byte(0x80, 0, 5, opoffs); }
 	uint32_t op_lfo_am_enable(uint32_t opoffs) const { return byte(0xa0, 7, 1, opoffs); }
 	uint32_t op_waveform(uint32_t opoffs) const      { return byte(0xa0, 6, 1, opoffs); }
@@ -277,6 +274,17 @@ public:
 protected:
 	// internal state
 	fm_engine m_fm;                  // core FM engine
+};
+
+
+// ======================> ym3533
+
+class ym3533 : public ym3806
+{
+public:
+	// constructor
+	ym3533(ymfm_interface &intf) :
+		ym3806(intf) { }
 };
 
 }

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+These Hello World tests are the only known software. It is thought
+that they were written by Raphael Nabet while developing the driver.
+
+-->
+<softwarelist name="apexc_cyl" description="APEXC Cylinder images">
+
+	<software name="hello1">
+		<description>Hello World 1</description>
+		<year>2001</year>
+		<publisher>Raphael Nabet</publisher>
+		<info name="usage" value="Hit Enter" />
+		<part name="cyl" interface="apexc_cyl">
+			<dataarea name="cyl" size="0x01c0">
+				<rom name="helloworld1.apc" size="0x01c0" crc="6ae5de89" sha1="80ae963a5a4018e8f726a2bdbfdaf7d7252980da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hello2">
+		<description>Hello World 2</description>
+		<year>2001</year>
+		<publisher>Raphael Nabet</publisher>
+		<info name="usage" value="Hit Enter" />
+		<part name="cyl" interface="apexc_cyl">
+			<dataarea name="cyl" size="0x01c0">
+				<rom name="helloworld2.apc" size="0x01c0" crc="3cea42e3" sha1="60d40af565d21a0c7b1a3557e99efa2b6f5b4e8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hello3">
+		<description>Hello World 3</description>
+		<year>2001</year>
+		<publisher>Raphael Nabet</publisher>
+		<info name="usage" value="Hit Enter" />
+		<part name="cyl" interface="apexc_cyl">
+			<dataarea name="cyl" size="0x1000">
+				<rom name="helloworld3.apc" size="0x1000" crc="389ad9d6" sha1="fb5eac01dfb0e372d3dced082f68a318bf14a6e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

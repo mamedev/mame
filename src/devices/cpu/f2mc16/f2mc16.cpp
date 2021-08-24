@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "f2mc16.h"
-#include "f2mc16dasm.h"
+#include "f2mc16d.h"
 
 // device type definitions
 DEFINE_DEVICE_TYPE(F2MC16, f2mc16_device, "f2mc16", "Fujitsu Micro F2MC-16")
@@ -2034,7 +2034,7 @@ void f2mc16_device::opcodes_ea70(u8 operand)
 		// ADDL A, RLx
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 			m_acc = doADD_32(m_acc, read_rlX((operand>>1) & 3));
-			m_pc += 3;
+			m_pc += 2;
 			m_icount -= 7;
 			break;
 

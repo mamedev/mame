@@ -45,7 +45,6 @@ public:
 	{ }
 
 	void vtech_storio(machine_config &config);
-	void vtech_innotab(machine_config &config);
 
 private:
 	virtual void machine_start() override;
@@ -122,12 +121,6 @@ void vtech_storio_state::vtech_storio(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_storio_cart");
 }
 
-void vtech_storio_state::vtech_innotab(machine_config &config)
-{
-	vtech_storio_base(config);
-	SOFTWARE_LIST(config, "cart_list").set_original("vtech_innotab_cart");
-}
-
 // BIOS is 1 GBIT (128M × 8 BIT) CMOS NAND EEPROM (Toshiba TC58NVG0S3ETA00)
 
 // ROM image from VTech, not padded to the real ROM size
@@ -185,11 +178,6 @@ ROM_START( storionl )
 	ROM_LOAD( "nldut-pack_20111017.bin", 0x000000, 0x03af81c6, CRC(6cfac599) SHA1(d16b45fd287c9d823bde13b88eb6c8158ac2b475) )
 ROM_END
 
-ROM_START( innotab2 )
-	ROM_REGION( 0x08400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "innotab2.bin", 0x000000, 0x08400000, NO_DUMP )
-ROM_END
-
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
 CONS( 2011, vreader,      0,       0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (US, English, 2011-10-17)", MACHINE_IS_SKELETON )
 CONS( 2011, vreadercaen,  vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (CA, English, 2011-10-17)", MACHINE_IS_SKELETON )
@@ -200,5 +188,3 @@ CONS( 2011, storioes,     vreader, 0,      vtech_storio, vtech_storio, vtech_sto
 CONS( 2011, storioesa,    vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-06-17?)",  MACHINE_IS_SKELETON )
 CONS( 2011, storiofr,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (FR, French, 2011-10-17)",    MACHINE_IS_SKELETON )
 CONS( 2011, storionl,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (NL, Dutch, 2011-10-17)",     MACHINE_IS_SKELETON )
-// the InnoTAB 1/2/3 seem closely related?
-CONS( 2011, innotab2,     0,       0,      vtech_innotab, vtech_storio, vtech_storio_state, empty_init, "VTech", "InnoTAB 2 (UK)",   MACHINE_IS_SKELETON )

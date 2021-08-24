@@ -30,11 +30,6 @@ menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, rende
 	input_filename(),
 	output_filename()
 {
-	int fcnt = 0;
-	for(const floppy_image_format_t *i = fd.get_formats(); i; i = i->next)
-		fcnt++;
-
-	format_array = std::make_unique<floppy_image_format_t * []>(fcnt);
 }
 
 menu_control_floppy_image::~menu_control_floppy_image()
@@ -103,37 +98,34 @@ void menu_control_floppy_image::handle()
 {
 	switch (m_state) {
 	case DO_CREATE: {
-		floppy_image_format_t *fif_list = fd.get_formats();
-			int ext_match;
-			int total_usable = 0;
-			for(floppy_image_format_t *i = fif_list; i; i = i->next) {
+		std::vector<floppy_image_format_t *> format_array;
+		for(floppy_image_format_t *i : fd.get_formats()) {
 			if(!i->supports_save())
 				continue;
 			if (i->extension_matches(m_current_file.c_str()))
-				format_array[total_usable++] = i;
+				format_array.push_back(i);
 		}
-		ext_match = total_usable;
-		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
+		int ext_match = format_array.size();
+		for(floppy_image_format_t *i : fd.get_formats()) {
 			if(!i->supports_save())
 				continue;
 			if (!i->extension_matches(m_current_file.c_str()))
-				format_array[total_usable++] = i;
+				format_array.push_back(i);
 		}
-		m_submenu_result.i = -1;
-		menu::stack_push<menu_select_format>(ui(), container(), format_array.get(), ext_match, total_usable, &m_submenu_result.i);
+		output_format = nullptr;
+		menu::stack_push<menu_select_format>(ui(), container(), format_array, ext_match, &output_format);
 
 		m_state = SELECT_FORMAT;
 		break;
 	}
 
 	case SELECT_FORMAT:
-		if(m_submenu_result.i == -1) {
+		if(!output_format) {
 			m_state = START_FILE;
 			handle();
 		} else {
 			const auto &fs = fd.get_create_fs();
 			output_filename = util::zippath_combine(m_current_directory, m_current_file);
-			output_format = format_array[m_submenu_result.i];
 			if(fs.size() == 1) {
 				create_fs = &fs[0];
 				do_load_create();

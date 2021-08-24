@@ -31,6 +31,8 @@
 #include "ymfm_opq.h"
 #include "ymfm_fm.ipp"
 
+#define TEMPORARY_DEBUG_PRINTS (0)
+
 //
 // OPQ (aka YM3806/YM3533)
 //
@@ -126,8 +128,10 @@ bool opq_registers::write(uint16_t index, uint8_t data, uint32_t &channel, uint3
 
 	// detune/multiple share a register based on the MSB of what is written
 	// remap the multiple values to 100-11F
-	if ((index & 0xe0) == 0x40 && bitfield(data, 7))
+	if ((index & 0xe0) == 0x40 && bitfield(data, 7) != 0)
 		index += 0xc0;
+
+	m_regdata[index] = data;
 
 	// handle writes to the key on index
 	if (index == 0x05)
@@ -167,7 +171,7 @@ int32_t opq_registers::clock_noise_and_lfo()
 	// when we cross the divider count, add enough to zero it and cause an
 	// increment at bit 8; the 7-bit value lives from bits 8-14
 	if (subcount >= lfo_max_count[lfo_rate()])
-		m_lfo_counter += subcount ^ 0xff;
+		m_lfo_counter += 0x101 - subcount;
 
 	// AM value is 7 bits, staring at bit 8; grab the low 6 directly
 	m_lfo_am = bitfield(m_lfo_counter, 8, 6);
@@ -224,7 +228,7 @@ void opq_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	cache.waveform = &m_waveform[op_waveform(opoffs)][0];
 
 	// get frequency from the appropriate registers
-	uint32_t block_freq = cache.block_freq = (opoffs & 1) ? ch_block_freq_24(choffs) : ch_block_freq_13(choffs);
+	uint32_t block_freq = cache.block_freq = (opoffs & 8) ? ch_block_freq_24(choffs) : ch_block_freq_13(choffs);
 
 	// compute the keycode: block_freq is:
 	//
@@ -244,11 +248,16 @@ void opq_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	// for speed, we just look it up in a 16-bit constant
 	keycode |= bitfield(0xfe80, bitfield(block_freq, 8, 4));
 
-	// detune adjustment; detune isn't really understood except that it is a
-	// 6-bit value where the middle value (0x20) means no detune; range is +/-20 cents
-	// this calculation gives a bit more, but shifting by 12 gives a bit less
-	// also, the real calculation is probably something to do with keycodes
-	cache.detune = ((op_detune(opoffs) - 0x20) * block_freq) >> 11;
+	// detune adjustment: the detune values supported by the OPQ are
+	// a much larger range (6 bits vs 3 bits) compared to any other
+	// known FM chip; based on experiments, it seems that the extra
+	// bits provide a bigger detune range rather than finer control,
+	// so until we get true measurements just assemble a net detune
+	// value by summing smaller detunes
+	int32_t detune = int32_t(op_detune(opoffs)) - 0x20;
+	int32_t abs_detune = std::abs(detune);
+	int32_t adjust = (abs_detune / 3) * detune_adjustment(3, keycode) + detune_adjustment(abs_detune % 3, keycode);
+	cache.detune = (detune >= 0) ? adjust : -adjust;
 
 	// multiple value, as an x.1 value (0 means 0.5)
 	static const uint8_t s_multiple_map[16] = { 1,2,4,6,8,10,12,14,16,18,20,24,30,32,34,36 };
@@ -269,15 +278,13 @@ void opq_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
 	cache.eg_sustain <<= 5;
 
-	// determine KSR adjustment for enevlope rates; KSR is supposedly 3 bits
-	// not 2 like all other implementations, so unsure how this would work.
-	// Maybe keycode is a larger range? For now, we'll just take the upper 2
-	// bits and use that.
-	uint32_t ksrval = keycode >> ((op_ksr(opoffs) >> 1) ^ 3);
+	// determine KSR adjustment for enevlope rates
+	uint32_t ksrval = keycode >> (op_ksr(opoffs) ^ 3);
 	cache.eg_rate[EG_ATTACK] = effective_rate(op_attack_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
+	cache.eg_rate[EG_REVERB] = (ch_reverb(choffs) != 0) ? 5*4 : cache.eg_rate[EG_RELEASE];
 	cache.eg_shift = 0;
 }
 
@@ -306,15 +313,12 @@ uint32_t opq_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		fnum &= 0xfff;
 	}
 
-	// this is likely not right, but should given the right approximate result
-	fnum += cache.detune;
-
 	// apply block shift to compute phase step
 	uint32_t block = bitfield(cache.block_freq, 12, 3);
 	uint32_t phase_step = (fnum << block) >> 2;
 
-	// apply detune based on the keycode -- this is probably where the real chip does it
-//	phase_step += cache.detune;
+	// apply detune based on the keycode
+	phase_step += cache.detune;
 
 	// clamp to 17 bits in case detune overflows
 	// QUESTION: is this specific to the YM2612/3438?
@@ -337,10 +341,10 @@ std::string opq_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d freq=%04X dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
+	end += sprintf(end, "%u.%02u freq=%04X dt=%+2d fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		chnum, opnum,
 		(opoffs & 1) ? ch_block_freq_24(choffs) : ch_block_freq_13(choffs),
-		op_detune(opoffs),
+		int32_t(op_detune(opoffs)) - 0x20,
 		ch_feedback(choffs),
 		ch_algorithm(choffs),
 		op_multiple(opoffs),
@@ -356,14 +360,14 @@ std::string opq_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 
 	bool am = (lfo_enable() && op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%d", ch_lfo_am_sens(choffs));
+		end += sprintf(end, " am=%u", ch_lfo_am_sens(choffs));
 	bool pm = (lfo_enable() && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%d", ch_lfo_pm_sens(choffs));
+		end += sprintf(end, " pm=%u", ch_lfo_pm_sens(choffs));
 	if (am || pm)
 		end += sprintf(end, " lfo=%02X", lfo_rate());
-	if (ch_echo(choffs))
-		end += sprintf(end, " echo");
+	if (ch_reverb(choffs))
+		end += sprintf(end, " reverb");
 
 	return buffer;
 }
@@ -425,16 +429,17 @@ uint8_t ym3806::read_status()
 uint8_t ym3806::read(uint32_t offset)
 {
 	uint8_t result = 0xff;
-	switch (offset & 1)
+	switch (offset)
 	{
-		case 0: // data port (unused)
-			debug::log_unexpected_read_write("Unexpected read from YM3806 offset %d\n", offset & 3);
-			break;
-
-		case 1: // status port, YM2203 compatible
+		case 0: // status port
 			result = read_status();
 			break;
+
+		default: // unknown
+			debug::log_unexpected_read_write("Unexpected read from YM3806 offset %02X\n", offset);
+			break;
 	}
+if (TEMPORARY_DEBUG_PRINTS && offset != 0) printf("Read %02X = %02X\n", offset, result);
 	return result;
 }
 
@@ -446,6 +451,7 @@ uint8_t ym3806::read(uint32_t offset)
 
 void ym3806::write(uint32_t offset, uint8_t data)
 {
+if (TEMPORARY_DEBUG_PRINTS && (offset != 3 || data != 0x71)) printf("Write %02X = %02X\n", offset, data);
 	// write the FM register
 	m_fm.write(offset, data);
 }

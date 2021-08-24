@@ -59,7 +59,7 @@ int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count);
 int uchar_from_utf8(char32_t *uchar, std::string_view utf8str);
 int uchar_from_utf16(char32_t *uchar, const char16_t *utf16char, size_t count);
 int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count);
-std::u32string ustr_from_utf8(const std::string &utf8str);
+std::u32string ustr_from_utf8(std::string_view utf8str);
 
 // converting 32-bit Unicode chars to strings
 int utf8_from_uchar(char *utf8string, size_t count, char32_t uchar);
@@ -72,7 +72,6 @@ std::wstring wstring_from_utf8(const std::string &utf8string);
 std::string utf8_from_wstring(const std::wstring &string);
 
 // unicode normalization
-std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form, bool fold_case = false);
 std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form, bool fold_case = false);
 std::string normalize_unicode(std::string_view s, unicode_normalization_form normalization_form, bool fold_case = false);
 

@@ -526,7 +526,7 @@ public:
 	void seq_from_tokens(input_seq &seq, std::string_view _token);
 
 	// misc
-	bool map_device_to_controller(const devicemap_table_type *devicemap_table = nullptr);
+	bool map_device_to_controller(const devicemap_table_type &devicemap_table);
 
 private:
 	// internal helpers

@@ -583,4 +583,222 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="alun">
+		<description>Alunissage</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+		<info name="usage" value="CLOAD, start tape. A to start, D left, G right" />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x0007fc">
+				<rom name="alunissage.k7" size="0x0007fc" crc="dea9620a" sha1="81954ebb23b0aa8595c9bd6d3ea0ea2cb793a8e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blitz">
+		<description>Blitz</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN to start, Space to drop a bomb." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x000625">
+				<rom name="blitz.k7" size="0x000625" crc="9025aa23" sha1="0eaefe400754a32a97fd1a1a8a41e7357f8c27d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="21games">
+		<description>21 Games Compilation</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="CLOAD &quot;x&quot;, where x = BOMBAR, STOCK-, CAVALI, ENVAHI, SURVIE, FANTOM, FACE A,
+			HELICO, PUZZLE, COURSE, POKER, MASTRE, CIRCUI, 21, HASARD, CHENIL, MILLE3, CHASSE, BLITZ, COLLIM, ORAN, KRANTZ" />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x0142d9">
+				<rom name="compilation.k7" size="0x0142d9" crc="5218beff" sha1="519205c58b380a30787dab5c92b49cd5176a6fc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dca">
+		<description>DCA</description>
+		<year>1986</year>
+		<publisher>Carl Hervier</publisher>
+		<info name="usage" value="CLOAD, start tape. A to fire" />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x001060">
+				<rom name="dca.k7" size="0x001060" crc="4f85237a" sha1="66618b61224c9785ba75c1cf84b07216b4e6f9df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dames">
+		<description>Jeu de Dames</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+		<info name="usage" value="CLOAD, start tape." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x000571">
+				<rom name="dames.k7" size="0x000571" crc="2e12fd04" sha1="8650d203437a4cbd175d5ae9eb466899630cf306"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loderun">
+		<description>Lode Runner</description>
+		<year>1986</year>
+		<publisher>Gillaume Ramey</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN to start, arrows to move." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x002188">
+				<rom name="loderun.k7" size="0x002188" crc="f4ae6382" sha1="51beef45d0945dda95873069389c48d4b8c6ffcd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="machaon">
+		<description>Machaon</description>
+		<year>2012</year>
+		<publisher>Herve Monchatre</publisher>
+		<info name="usage" value="CLOAD, start tape. Arrows to move, S to start over." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x002b3d">
+				<rom name="machaon.k7" size="0x002b3d" crc="daeb4070" sha1="1c79f6b5249b0113ae7479689a887d09e7994bfa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memory">
+		<description>Memory</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+		<info name="usage" value="CLOAD, start tape. A to fire" />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x0007ed">
+				<rom name="memory.k7" size="0x0007ed" crc="9bfd8dc3" sha1="0228184035cee94f44102f71aaabc08a6cbf9c6a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penalty">
+		<description>Penalty</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+		<info name="usage" value="CLOAD, start tape. Enter to start, arrows to move." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x00099a">
+				<rom name="penalty.k7" size="0x00099a" crc="1ad3f84f" sha1="f63e43a8463ecac82559a873f815c5124db3ea9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spinv">
+		<description>Space Invaders</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+		<info name="usage" value="CLOAD, start tape. Enter to start. A to fire, D left, G right." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x0009bd">
+				<rom name="spinv.k7" size="0x0009bd" crc="d94a5204" sha1="f749b39ddbd2663c46a5cc23ff74184ade44ecbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprite">
+		<description>Sprite Creator</description>
+		<year>1986</year>
+		<publisher>Gillaume Ramey</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN" />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x000bcc">
+				<rom name="sprite.k7" size="0x000bcc" crc="c91a5436" sha1="112d8bcaeca6af4f58b9df945d8e2622daa378a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squash">
+		<description>Squash</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN. Arrows to move." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x000547">
+				<rom name="squash.k7" size="0x000547" crc="e059ba4c" sha1="30698d4a617f459cb8454fda992efb3e06da85dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stricker">
+		<description>Stricker</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+		<info name="usage" value="CLOAD, start tape. Enter to start. D left, G right." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x00069a">
+				<rom name="stricker.k7" size="0x00069a" crc="fa13eb3a" sha1="0daeee9ab7fa097c7f73b4da90fef4b851032590"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="submarine">
+		<description>Submarine</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+		<info name="usage" value="CLOAD, start tape. Enter to start. A to fire, D left, G right. R up, F down." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x001535">
+				<rom name="submarine.k7" size="0x001535" crc="8dfe50ad" sha1="b8245c86db44c9ee76840f4b161ecc0cb04d8fc1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telerama1">
+		<description>Isola / Mor-Quatre</description>
+		<year>1984</year>
+		<publisher>Fivi International</publisher>
+		<info name="usage" value="CLOAD &quot;ISOLA&quot; or CLOAD &quot;MOR4&quot;, start tape." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x001d58">
+				<rom name="telerama1.k7" size="0x001d58" crc="e6b50aa7" sha1="a2e1e9ecb334129657fa0c974be511839c305590"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telerama2">
+		<description>Strategie-Flore / Gyracolor</description>
+		<year>1984</year>
+		<publisher>Fivi International</publisher>
+		<info name="usage" value="For Gyracolor only, set counter to 0070. CLOAD and start tape." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x003a46">
+				<rom name="telerama2.k7" size="0x003a46" crc="fdd761f9" sha1="86224300d6e1d176cc0f26697111ab0b19fec5e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>????</year>
+		<publisher>D Adam</publisher>
+		<info name="usage" value="CLOAD, start tape." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x001f74">
+				<rom name="tetris.k7" size="0x001f74" crc="cc96b457" sha1="db4444c29fb599899b0732895876cafbb52cda84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vgsargon">
+		<description>Sargon Chess</description>
+		<year>2014</year>
+		<publisher>Joaopa</publisher>
+		<info name="usage" value="CLOAD, start tape." />
+		<part name="cass" interface="vg5k_cass">
+			<dataarea name="cass" size="0x0046fe">
+				<rom name="vgsargon.k7" size="0x0046fe" crc="92591add" sha1="137e39f4f7a77217aa79646761a9327a4aa41ca9"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

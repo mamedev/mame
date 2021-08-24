@@ -65,6 +65,7 @@ public:
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, "chargen"),
 		m_video_ram(*this, "video_ram"),
+		m_view(*this, "view"),
 		m_fdc_irq(0),
 		m_fdc_drq(0),
 		m_8n5(0),
@@ -104,7 +105,7 @@ protected:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio_device> m_sio;
 	required_device<wd_fdc_device_base> m_fdc;
-	required_device<ram_device> m_ram;
+	optional_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -112,8 +113,8 @@ protected:
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
+	memory_view m_view;
 
-	virtual void bankswitch(int bank);
 	void update_nmi();
 
 	/* video state */
@@ -180,8 +181,6 @@ public:
 	void xerox820ii_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
-
-	void bankswitch(int bank) override;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_device<scsi_port_device> m_sasibus;

@@ -56,6 +56,7 @@ For Model III:
 
 #include "emu.h"
 #include "includes/trs80.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -68,6 +69,8 @@ public:
 	meritum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: trs80_state(mconfig, type, tag)
 		, m_screen(*this, "screen")
+		, m_centronics(*this, "centronics")
+		, m_nmigate(*this, "nmigate")
 	{ }
 
 	void meritum1(machine_config &config);
@@ -83,9 +86,31 @@ private:
 	void io_map(address_map &map);
 	void mem_map2(address_map &map);
 	void io_map2(address_map &map);
+	void mainppi_portb_w(u8);
+	void mainppi_portc_w(u8);
 
 	required_device<screen_device> m_screen;
+	optional_device<centronics_device> m_centronics;
+	required_device<input_merger_device> m_nmigate;
 };
+
+void meritum_state::mainppi_portc_w(u8 data)
+{
+	m_nmigate->in_w<0>(!BIT(data, 7)); // negated PC7 => NMI
+	m_centronics->write_strobe(BIT(data, 1)); // PC1 = STROBE (centronics)
+}
+
+void meritum_state::mainppi_portb_w(u8 data)
+{
+	m_centronics->write_data0(BIT(data, 0));
+	m_centronics->write_data1(BIT(data, 1));
+	m_centronics->write_data2(BIT(data, 2));
+	m_centronics->write_data3(BIT(data, 3));
+	m_centronics->write_data4(BIT(data, 4));
+	m_centronics->write_data5(BIT(data, 5));
+	m_centronics->write_data6(BIT(data, 6));
+	m_centronics->write_data7(BIT(data, 7));
+}
 
 void meritum_state::mem_map(address_map &map)
 {
@@ -332,7 +357,17 @@ void meritum_state::meritum1(machine_config &config)
 	pit.out_handler<2>().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	i8255_device &mainppi(I8255(config, "mainppi")); // parallel interface
-	mainppi.out_pc_callback().set("nmigate", FUNC(input_merger_device::in_w<0>)).bit(7).invert();
+	mainppi.out_pc_callback().set(FUNC(meritum_state::mainppi_portc_w));
+	mainppi.out_pb_callback().set(FUNC(meritum_state::mainppi_portb_w));
+
+	// printer
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
+	m_centronics->ack_handler().set("mainppi", FUNC(i8255_device::pc2_w));
+
+	INPUT_BUFFER(config, "cent_data_in");
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	PIT8253(config, "audiopit", 0); // optional audio interface
 

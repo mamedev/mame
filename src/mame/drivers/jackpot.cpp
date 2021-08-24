@@ -31,29 +31,50 @@ NOTE: the PCB from which Version 16 was dumped has the following components remo
 and some resistors and caps. Strangely, the sound ROMs are unchanged.
 
 In the same period Electronic Projects also released games on different platforms (see jackpool.cpp and spool99.cpp)
+
+TODO:
+- everything, there are only stubbed functions to see the text tilemap on screen
+- boot stops at 'test collegamento......master' (link test......master).
 */
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
 #include "video/mc6845.h"
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
 
 class jackpot_state : public driver_device
 {
 public:
 	jackpot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_tx_videoram(*this, "tx_videoram")
 	{
 	}
 
 	void jackpot(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint8_t> m_tx_videoram;
+
+	tilemap_t *m_tx_tilemap;
+
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void tx_videoram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void prg_map(address_map &map);
@@ -62,8 +83,27 @@ private:
 };
 
 
+void jackpot_state:: video_start()
+{
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackpot_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+TILE_GET_INFO_MEMBER(jackpot_state::get_tx_tile_info)
+{
+	uint8_t code = m_tx_videoram[tile_index];
+	tileinfo.set(0, code, 0, 0);
+}
+
+void jackpot_state::tx_videoram_w(offs_t offset, uint8_t data)
+{
+	m_tx_videoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
 uint32_t jackpot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_tx_tilemap->draw(screen, bitmap, cliprect);
+
 	return 0;
 }
 
@@ -71,8 +111,10 @@ uint32_t jackpot_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 void jackpot_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // after this, ROM is 0xff filled but in the range 0x1e000 - 0x1efff. Where does it get mapped?
-	map(0xd800, 0xdfff).ram(); // MK48Z02B?
-	map(0xe000, 0xffff).ram();
+	map(0xd702, 0xd702).lr8(NAME([] () -> uint8_t { return 0xff; })); // 'attendere prego test hardware' (please wait hardware test), returning this is enough to progress. TODO: what's actually being tested?
+	map(0xd800, 0xdfff).ram().share("nvram"); // MK48Z02B?
+	map(0xe000, 0xe3ff).ram().share(m_tx_videoram).w(FUNC(jackpot_state::tx_videoram_w));
+	map(0xe400, 0xffff).ram(); // 0xf000-0xf3ff seems to be color RAM for the text tilemap
 }
 
 void jackpot_state::sound_prg_map(address_map &map)
@@ -85,7 +127,6 @@ void jackpot_state::sound_prg_map(address_map &map)
 void jackpot_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map.unmap_value_high();
 }
 
 
@@ -140,17 +181,18 @@ void jackpot_state::jackpot(machine_config &config) // clocks not verified
 	audiocpu.set_addrmap(AS_IO, &jackpot_state::sound_io_map);
 
 	EEPROM_93C66_8BIT(config, "eeprom");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// all wrong
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
+	screen.set_size(32*8, 32*8);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(jackpot_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_jackpot);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_jackpot);
 	PALETTE(config, "palette").set_entries(0x100);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 13_MHz_XTAL / 8)); // divisor guessed
@@ -227,6 +269,8 @@ ROM_START( jackpota )
 	ROM_LOAD( "yp20v8e-25pc",  0x200, 0x157, NO_DUMP )
 	ROM_LOAD( "hy18cv8s-25",   0x400, 0x117, NO_DUMP )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1988, jackpot,        0, jackpot, jackpot, jackpot_state, empty_init, ROT0, "Electronic Projects", "Jackpot (Ver 16.16L)", MACHINE_IS_SKELETON ) // 08.09.98

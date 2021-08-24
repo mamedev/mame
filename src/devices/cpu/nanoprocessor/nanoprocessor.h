@@ -50,6 +50,17 @@
 // The HP manual of Nanoprocessor is available here:
 // http://www.hp9845.net/9845/downloads/manuals/Nanoprocessor.pdf
 // Thanks to anyone who made the manual available.
+//
+// My reverse engineering of Nanoprocessor from mask set
+// https://github.com/fulivi/nanoprocessor_re
+//
+// Mask set is published here
+// http://cpushack.com/2020/08/20/hp-nanoprocessor-mask-set/
+//
+// Ken Shirriff's articles
+// http://www.righto.com/2020/09/inside-hp-nanoprocessor-high-speed.html
+// http://www.righto.com/2020/09/hp-nanoprocessor-part-ii-reverse.html
+//
 #ifndef MAME_CPU_NANOPROCESSOR_NANOPROCESSOR_H
 #define MAME_CPU_NANOPROCESSOR_NANOPROCESSOR_H
 
@@ -109,6 +120,11 @@ private:
 	uint16_t m_reg_SSR; // Subroutine stack register
 	uint16_t m_reg_ISR; // Interrupt stack register
 	uint16_t m_flags;   // Flags: extend flag (E) & direct control lines (DC0-7)
+
+	// Bits in m_flags
+	static constexpr unsigned NANO_DC0_BIT  = 0;    // DC0
+	static constexpr unsigned NANO_E_BIT    = NANO_DC0_BIT + HP_NANO_DC_NO; // Extend flag
+	static constexpr unsigned NANO_I_BIT    = NANO_E_BIT + 1;   // Interrupt flag
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;

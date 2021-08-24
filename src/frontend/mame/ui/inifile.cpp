@@ -237,7 +237,7 @@ favorite_manager::favorite_manager(ui_options &options)
 			file.gets(readbuf, 1024);
 			tmpmatches.publisher = chartrimcarriage(readbuf);
 			file.gets(readbuf, 1024);
-			tmpmatches.supported = atoi(readbuf);
+			tmpmatches.supported = software_support(atoi(readbuf));
 			file.gets(readbuf, 1024);
 			tmpmatches.part = chartrimcarriage(readbuf);
 			file.gets(readbuf, 1024);
@@ -559,7 +559,7 @@ void favorite_manager::save_favorites()
 				buf << info.parentname << '\n';
 				buf << info.year << '\n';
 				buf << info.publisher << '\n';
-				util::stream_format(buf, "%d\n", info.supported);
+				util::stream_format(buf, "%d\n", int(info.supported));
 				buf << info.part << '\n';
 				util::stream_format(buf, "%s\n", info.driver->name);
 				buf << info.listname << '\n';

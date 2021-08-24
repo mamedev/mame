@@ -30,19 +30,21 @@
 #include "machine/pit8253.h"
 #include "machine/ds128x.h"
 #include "machine/at_keybc.h"
+#include "machine/ram.h"
 
 class cs4031_device : public device_t
 {
 public:
 	// construction/destruction
-	template <typename T, typename U, typename V, typename W>
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag, U &&isatag, V &&biostag, W &&keybctag)
+	template <typename T, typename U, typename V, typename W, typename X>
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag, U &&isatag, V &&biostag, W &&keybctag, X &&ramtag)
 		: cs4031_device(mconfig, tag, owner, clock)
 	{
 		set_cputag(std::forward<T>(cputag));
 		set_isatag(std::forward<U>(isatag));
 		set_biostag(std::forward<V>(biostag));
 		set_keybctag(std::forward<W>(keybctag));
+		set_ramtag(std::forward<X>(ramtag));
 	}
 
 	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -110,6 +112,7 @@ public:
 	template <typename T> void set_isatag(T &&tag) { m_isa.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_biostag(T &&tag) { m_bios.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_keybctag(T &&tag) { m_keybc.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_ramtag(T &&tag) { m_ram_dev.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// device-level overrides
@@ -164,6 +167,7 @@ private:
 	required_device<pic8259_device> m_intc2;
 	required_device<pit8254_device> m_ctc;
 	required_device<ds12885_device> m_rtc;
+	required_device<ram_device> m_ram_dev;
 
 	int m_dma_eop;
 	uint8_t m_dma_page[0x10];

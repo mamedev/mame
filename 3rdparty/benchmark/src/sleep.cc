@@ -20,7 +20,7 @@
 #include "internal_macros.h"
 
 #ifdef BENCHMARK_OS_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 namespace benchmark {

@@ -10,12 +10,16 @@
 ----------------------------------------------------------------------------
 
 files {
+	MAME_DIR .. "src/devices/sound/bbd.cpp",
+	MAME_DIR .. "src/devices/sound/bbd.h",
 	MAME_DIR .. "src/devices/sound/flt_biquad.cpp",
 	MAME_DIR .. "src/devices/sound/flt_biquad.h",
 	MAME_DIR .. "src/devices/sound/flt_vol.cpp",
 	MAME_DIR .. "src/devices/sound/flt_vol.h",
 	MAME_DIR .. "src/devices/sound/flt_rc.cpp",
 	MAME_DIR .. "src/devices/sound/flt_rc.h",
+	MAME_DIR .. "src/devices/sound/mixer.cpp",
+	MAME_DIR .. "src/devices/sound/mixer.h",
 	MAME_DIR .. "src/devices/sound/samples.cpp",
 	MAME_DIR .. "src/devices/sound/samples.h",
 }
@@ -1169,9 +1173,10 @@ end
 
 ---------------------------------------------------
 -- Yamaha FM synthesizers
+--@src/devices/sound/ym2154.h,SOUNDS["YM2154"] = true
 --@src/devices/sound/ymopm.h,SOUNDS["YM2151"] = true
---@src/devices/sound/ymopm.h,SOUNDS["YM2414"] = true
---@src/devices/sound/ymopm.h,SOUNDS["YM3806"] = true
+--@src/devices/sound/ymopz.h,SOUNDS["YM2414"] = true
+--@src/devices/sound/ymopq.h,SOUNDS["YM3806"] = true
 --@src/devices/sound/ymopn.h,SOUNDS["YM2203"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["YM2413"] = true
 --@src/devices/sound/ymopn.h,SOUNDS["YM2608"] = true
@@ -1184,6 +1189,13 @@ end
 --@src/devices/sound/ymf271.h,SOUNDS["YMF271"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["Y8950"] = true
 ---------------------------------------------------
+
+if (SOUNDS["YM2154"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ym2154.cpp",
+		MAME_DIR .. "src/devices/sound/ym2154.h",
+	}
+end
 
 if (SOUNDS["YM2151"]~=null or SOUNDS["YM2164"]~=null) then
 	files {

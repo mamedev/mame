@@ -281,18 +281,21 @@ int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count)
 //  into a Unicode string
 //-------------------------------------------------
 
-std::u32string ustr_from_utf8(const std::string &utf8str)
+std::u32string ustr_from_utf8(std::string_view utf8str)
 {
 	std::u32string result;
-	char const *utf8char(utf8str.c_str());
-	size_t remaining(utf8str.length());
-	while (remaining)
+	if (!utf8str.empty())
 	{
-		char32_t ch;
-		int const consumed(uchar_from_utf8(&ch, utf8char, remaining));
-		result.append(1, (consumed > 0) ? ch : char32_t(0x00fffdU));
-		utf8char += (consumed > 0) ? consumed : 1;
-		remaining -= (consumed > 0) ? consumed : 1;
+		char const *utf8char(&utf8str[0]);
+		auto remaining(utf8str.length());
+		while (remaining)
+		{
+			char32_t ch;
+			int const consumed(uchar_from_utf8(&ch, utf8char, remaining));
+			result.append(1, (consumed > 0) ? ch : char32_t(0x00fffdU));
+			utf8char += (consumed > 0) ? consumed : 1;
+			remaining -= (consumed > 0) ? consumed : 1;
+		}
 	}
 	return result;
 }
@@ -477,17 +480,6 @@ std::string utf8_from_wstring(const std::wstring &string)
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 	return converter.to_bytes(string);
 #endif
-}
-
-
-//-------------------------------------------------
-//  normalize_unicode - uses utf8proc to normalize
-//  unicode
-//-------------------------------------------------
-
-std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form, bool fold_case)
-{
-	return internal_normalize_unicode(s.c_str(), s.length(), normalization_form, fold_case, false);
 }
 
 

@@ -401,7 +401,7 @@ u8 odyssey2_state::p2_read()
 	{
 		// P12: 74156 keyboard decoder enable, 74156 inputs from P20-P22
 		// 74148 priority encoder, GS to P24, outputs to P25-P27
-		u8 inp = count_leading_zeros(m_keyboard[m_p2 & 0x07]->read()) - 24;
+		u8 inp = count_leading_zeros_32(m_keyboard[m_p2 & 0x07]->read()) - 24;
 		if (inp < 8)
 			data &= inp << 5 | 0xf;
 	}

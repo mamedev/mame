@@ -137,6 +137,7 @@ protected:
 private:
 	// decoding info
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_6bpp);
+	std::unique_ptr<u8[]> m_decoded_gfx;
 };
 
 DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)

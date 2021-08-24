@@ -53,7 +53,7 @@ class chd_file;
 namespace util { class archive_file; }
 
 // declared in xmlfile.h
-namespace util::xml { class data_node; }
+namespace util::xml { class data_node; class file; }
 
 
 
@@ -69,7 +69,8 @@ class address_map_entry;
 class bookkeeping_manager;
 
 // declared in config.h
-enum class config_type;
+enum class config_type : int;
+enum class config_level : int;
 class configuration_manager;
 
 // declared in crsshair.h

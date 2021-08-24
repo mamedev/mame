@@ -49,6 +49,9 @@ Gambit(v3) hardware notes:
 
 MCU ports I/O again identical to SC6.
 The same MCU+ROM was also used in Designer 1500(PCB label 510.1131A01).
+And also in The Classic(PCB label 510-1095A01), 100-1020B02 MCU.
+
+100-1020B02 ROM contents is confirmed to be identical to 100-1020B01.
 
 Gambit Voice hardware notes:
 - TMP80C50AP-6-9311 MCU, 4KB internal ROM, 6MHz XTAL

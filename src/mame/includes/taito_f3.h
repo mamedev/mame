@@ -167,6 +167,8 @@ protected:
 
 	emu_timer *m_interrupt3_timer;
 	u32 m_coin_word[2];
+	std::unique_ptr<u8[]> m_decoded_gfx4;
+	std::unique_ptr<u8[]> m_decoded_gfx5;
 
 	struct tempsprite
 	{

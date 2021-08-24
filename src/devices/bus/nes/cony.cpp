@@ -152,7 +152,7 @@ void nes_yoko_device::pcb_reset()
 
  iNES: mapper 83
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -305,10 +305,11 @@ void nes_cony_device::write_h(offs_t offset, uint8_t data)
 
  Games: Mortal Kombat II, Master Figther VI'
 
-
  Very similar to Cony board
 
- In MESS: Supported.
+ NES 2.0: mapper 264
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 

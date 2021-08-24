@@ -38,7 +38,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same game:
+ROM source notes when dumped from another publisher, but confident it's the same:
 - drdunk: Tandy Electronic Basketball
 - flash: Radio Shack Sound Effects Chassis
 - hccbaskb: Sears Electronic Basketball
