@@ -376,18 +376,16 @@ int running_machine::run(bool quiet)
 
 		// run the CPUs until a reset or exit
 		constexpr subseconds minslice = subseconds::from_hz(100);
+		g_profiler.start(PROFILER_EXTRA);
 		while (!exit_or_hard_reset_pending())
 		{
-			g_profiler.start(PROFILER_EXTRA);
-
 			// execute CPUs if not paused; otherwise, just pump video updates through
 			if (!m_paused)
 				m_scheduler.timeslice(minslice);
 			else
 				m_video->frame_update();
-
-			g_profiler.stop();
 		}
+		g_profiler.stop();
 		m_manager.http()->clear();
 
 		// and out via the exit phase
@@ -604,8 +602,11 @@ void running_machine::immediate_load(const char *filename)
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::LOAD;
 
-	// jump right into the load, anonymous timers can't hurt us
-	handle_saveload();
+	// if currently within a timeslice, we have to get out before loading
+	if (m_scheduler.in_timeslice())
+		m_scheduler.hard_stop(true);
+	else
+		handle_saveload();
 }
 
 
@@ -826,71 +827,61 @@ void running_machine::handle_saveload()
 	if (!m_saveload_pending_file.empty())
 	{
 		const char *const opname = (m_saveload_schedule == saveload_schedule::LOAD) ? "load" : "save";
+		u32 const openflags = (m_saveload_schedule == saveload_schedule::LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-		// if there are anonymous timers, we can't save just yet, and we can't load yet either
-		// because the timers might overwrite data we have loaded
-		if (!m_scheduler.can_save())
+		// open the file
+		emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
+		auto const filerr = file.open(m_saveload_pending_file);
+		if (filerr == osd_file::error::NONE)
 		{
-			return; // return without cancelling the operation
+			const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
+
+			// read/write the save state
+			save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.read_file(file) : m_save.write_file(file);
+
+			// handle the result
+			switch (saverr)
+			{
+			case STATERR_ILLEGAL_REGISTRATIONS:
+				popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
+				break;
+
+			case STATERR_INVALID_HEADER:
+				popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
+				break;
+
+			case STATERR_READ_ERROR:
+				popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
+				break;
+
+			case STATERR_WRITE_ERROR:
+				popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
+				break;
+
+			case STATERR_NONE:
+				if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
+					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
+				else
+					popmessage("State successfully %s.", opnamed);
+				break;
+
+			default:
+				popmessage("Error: Unknown error during state %s.", opnamed);
+				break;
+			}
+
+			// close and perhaps delete the file
+			if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
+				file.remove_on_close();
+		}
+		else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+		{
+			// attempt to load a non-existent savestate, report empty slot
+			popmessage("Error: No savestate file to load.", opname);
 		}
 		else
 		{
-			u32 const openflags = (m_saveload_schedule == saveload_schedule::LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
-			// open the file
-			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
-			auto const filerr = file.open(m_saveload_pending_file);
-			if (filerr == osd_file::error::NONE)
-			{
-				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
-
-				// read/write the save state
-				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.read_file(file) : m_save.write_file(file);
-
-				// handle the result
-				switch (saverr)
-				{
-				case STATERR_ILLEGAL_REGISTRATIONS:
-					popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
-					break;
-
-				case STATERR_INVALID_HEADER:
-					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
-					break;
-
-				case STATERR_READ_ERROR:
-					popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
-					break;
-
-				case STATERR_WRITE_ERROR:
-					popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
-					break;
-
-				case STATERR_NONE:
-					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
-					else
-						popmessage("State successfully %s.", opnamed);
-					break;
-
-				default:
-					popmessage("Error: Unknown error during state %s.", opnamed);
-					break;
-				}
-
-				// close and perhaps delete the file
-				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
-					file.remove_on_close();
-			}
-			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
-			{
-				// attempt to load a non-existent savestate, report empty slot
-				popmessage("Error: No savestate file to load.", opname);
-			}
-			else
-			{
-				popmessage("Error: Failed to open file for %s operation.", opname);
-			}
+			popmessage("Error: Failed to open file for %s operation.", opname);
 		}
 	}
 
@@ -916,13 +907,13 @@ void running_machine::scheduled_event(int event)
 				immediate_save("auto");
 			if (options().seconds_to_run() != 0)
 				m_video->save_final_snapshot();
-			m_scheduler.hard_stop();
+			m_scheduler.hard_stop(false);
 			m_event_timer.set_param(EVENT_EXIT);
 			break;
 
 		// just force an immediate stop
 		case EVENT_HARD_RESET:
-			m_scheduler.hard_stop();
+			m_scheduler.hard_stop(false);
 			m_event_timer.set_param(EVENT_HARD_RESET);
 			break;
 

@@ -560,11 +560,14 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_callback_timer(nullptr),
 	m_callback_timer_expire_time(attotime::zero),
 	m_suspend_changes_pending(true),
-	m_exit_timeslice(false),
+	m_in_timeslice(false),
+	m_hard_stopping(false),
+	m_load_after_stop(false),
 	m_quantum_minimum(subseconds::from_nsec(1) / 1000),
 	m_quantum_count(0),
 	m_midslice_restore(false),
 	m_save_executing(-1),
+	m_save_icount(0),
 	m_save_target(subseconds::zero())
 {
 	// create a factory for empty timers
@@ -645,14 +648,7 @@ void device_scheduler::finalize()
 	min_quantum = std::min(min_quantum, MAX_QUANTUM);
 
 	// create a fast list of executing devices
-	device_execute_interface **tailptr = &m_execute_list;
-	*tailptr = nullptr;
-	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
-	{
-		exec.m_nextexec = nullptr;
-		*tailptr = &exec;
-		tailptr = &exec.m_nextexec;
-	}
+	rebuild_execute_list();
 
 	// if the configuration specifies a device to make perfect, pick that as the minimum
 	device_execute_interface *const exec(machine().config().perfect_quantum_device());
@@ -667,6 +663,55 @@ void device_scheduler::finalize()
 
 	// save states
 	register_save(machine().save());
+}
+
+
+//-------------------------------------------------
+//  hard_stop - aggressively force an exit
+//-------------------------------------------------
+
+void device_scheduler::hard_stop(bool load_after_stop)
+{
+	// doesn't matter if we're not within a timeslice
+	if (!m_in_timeslice)
+	{
+		if (load_after_stop)
+			return machine().immediate_load();
+		return;
+	}
+
+	// set the flag for some early outs
+	m_hard_stopping = true;
+	m_load_after_stop = load_after_stop;
+
+	// set the first timer expiration to immediate; this saves us checking
+	// the flag in the time-sensitive innermost loop
+	m_first_timer_expire.set(time());
+
+	// if currently executing, go even further to get us out ASAP
+	if (m_executing_device != nullptr)
+	{
+		// force the icount to 0 immediately so it will exit its loop
+		*m_executing_device->m_icountptr = 0;
+
+		// also set the nextexec pointer to null so we don't execute other
+		// devices
+		m_executing_device->m_nextexec = nullptr;
+	}
+}
+
+
+//-------------------------------------------------
+//  dump_timers - dump the current timer state
+//-------------------------------------------------
+
+void device_scheduler::dump_timers() const
+{
+	osd_printf_info("=============================================\n");
+	osd_printf_info("Timer Dump: Time = %15s\n", time().as_string(PRECISION));
+	for (timer_instance *timer = m_active_timers_head; timer != &m_active_timers_tail; timer = timer->next())
+		timer->dump();
+	osd_printf_info("=============================================\n");
 }
 
 
@@ -693,6 +738,7 @@ void device_scheduler::register_save(save_manager &save)
 
 	// save executing state
 	save.save_item(NAME(m_save_executing));
+	save.save_item(NAME(m_save_icount));
 	save.save_item(NAME(m_save_target));
 
 	// and register the quantum slots
@@ -715,21 +761,6 @@ attotime device_scheduler::time() const noexcept
 	// if we're executing as a particular CPU, use its local time as a base
 	// otherwise, return the global base time
 	return (m_executing_device != nullptr) ? m_executing_device->local_time() : m_basetime.absolute_no_update();
-}
-
-
-//-------------------------------------------------
-//  can_save - return true if it's safe to save
-//  (i.e., no transient timers outstanding)
-//-------------------------------------------------
-
-bool device_scheduler::can_save() const
-{
-	// count the total number of active timers
-	int index = 0;
-	for (timer_instance *timer = m_active_timers_head; timer != &m_active_timers_tail; timer = timer->next())
-		index++;
-	return (index <= TIMER_SAVE_SLOTS);
 }
 
 
@@ -816,10 +847,12 @@ void device_scheduler::presave()
 		m_save_executing = 0;
 		for (device_execute_interface *exec = m_execute_list; exec != m_executing_device; exec = exec->m_nextexec)
 			m_save_executing++;
+		m_save_icount = *m_executing_device->m_icountptr;
 	}
 	else
 	{
 		m_save_executing = -1;
+		m_save_icount = 0;
 		m_save_target = subseconds::zero();
 	}
 
@@ -851,10 +884,6 @@ void device_scheduler::presave()
 
 void device_scheduler::postload()
 {
-	// clear the executing timer and device states
-	m_callback_timer = nullptr;
-	m_executing_device = nullptr;
-
 	// empty the list of any active timer instances
 	while (m_active_timers_head != &m_active_timers_tail)
 	{
@@ -903,9 +932,6 @@ void device_scheduler::postload()
 	// if we're restoring mid-timeslice, flag it
 	m_midslice_restore = (m_save_executing != -1);
 
-	// issue a hard stop to exit the current timeslice
-	hard_stop();
-
 	// report the timer state after a log
 	LOG("After resetting/reordering timers:\n");
 //#if VERBOSE
@@ -919,19 +945,21 @@ void device_scheduler::postload()
 //  single timeslice
 //-------------------------------------------------
 
-template<bool MidSliceRestore>
 void device_scheduler::timeslice_core(subseconds minslice)
 {
-	// if we're in the middle of restoring from a timeslice, call ourself
-	// to do the first timeslice in the slower form
-	if (!MidSliceRestore && m_midslice_restore)
+	// if we're in the middle of restoring from a timeslice, handle the
+	// first timeslice as a partial special case
+	if (m_midslice_restore)
 	{
-		timeslice_core<true>(minslice);
+		timeslice_partial();
 		m_midslice_restore = false;
-		if (m_exit_timeslice)
-			return;
+		if (m_hard_stopping)
+			return hard_stop_complete();
 	}
-	m_exit_timeslice = false;
+
+	// officially within a timeslice now; clear any hard stopping state
+	m_in_timeslice = true;
+	m_hard_stopping = false;
 
 	INCREMENT_SCHEDULER_STAT(m_timeslice);
 
@@ -956,7 +984,7 @@ void device_scheduler::timeslice_core(subseconds minslice)
 		}
 
 		// loop until we hit the next timer
-		while (MidSliceRestore || basetime < m_first_timer_expire.relative())
+		while (basetime < m_first_timer_expire.relative())
 		{
 			INCREMENT_SCHEDULER_STAT(m_timeslice_inner2);
 
@@ -972,28 +1000,10 @@ void device_scheduler::timeslice_core(subseconds minslice)
 
 			// do we have pending suspension changes?
 			if (m_suspend_changes_pending)
-				apply_suspend_changes(!MidSliceRestore);
-
-			// determine the starting device to execute (normally the first one unless
-			// restoring from a mid-timeslice save state)
-			device_execute_interface *exec = m_execute_list;
-			if (MidSliceRestore)
-			{
-				scheduler_assert(m_save_executing != -1);
-
-				// find the indexed device
-				while (m_save_executing-- != 0 && exec != nullptr)
-					exec = exec->m_nextexec;
-				if (exec == nullptr)
-					throw emu_fatalerror("Attempted mid-timeslice restore but ran out of devices");
-				scheduler_assert(m_save_executing == -1);
-
-				// override the computed target with the saved one
-				target = m_save_target;
-			}
+				apply_suspend_changes(true);
 
 			// loop over all executing devices
-			for ( ; exec != nullptr; exec = exec->m_nextexec)
+			for (device_execute_interface *exec = m_execute_list ; exec != nullptr; exec = exec->m_nextexec)
 			{
 				// compute how many subseconds to execute this device
 				subseconds delta = target - exec->m_localtime.relative() - subseconds::unit();
@@ -1041,14 +1051,6 @@ void device_scheduler::timeslice_core(subseconds minslice)
 
 			// our final target becomes our new base time
 			basetime = target;
-
-			// if restoring mid-slice, exit out now that the coast is clear; the
-			// caller (our other self) will fall through and execute normally
-			if (MidSliceRestore)
-			{
-				m_basetime.set_relative(basetime);
-				return;
-			}
 		}
 
 		// set the new basetime globally so that timers see it
@@ -1058,10 +1060,131 @@ void device_scheduler::timeslice_core(subseconds minslice)
 		// queue, execute pending ones
 		execute_timers(m_basetime.absolute());
 
-	} while (basetime < endslice && !m_exit_timeslice);
+	} while (basetime < endslice && !m_hard_stopping);
+
+	// at this point we'll say we're out of the timeslice
+	m_in_timeslice = false;
+
+	// if we are hard stopping, undo some of the damage on the way out
+	if (m_hard_stopping)
+		hard_stop_complete();
 }
 
-template void device_scheduler::timeslice_core<false>(subseconds minslice);
+
+//-------------------------------------------------
+//  timeslice_partial -- execute a partial
+//  timeslice after a mid-slice restore
+//-------------------------------------------------
+
+void device_scheduler::timeslice_partial()
+{
+	// should only get here if we have a target device to advance to
+	scheduler_assert(m_save_executing != -1);
+
+	// officially within a timeslice now; clear any hard stopping state
+	m_in_timeslice = true;
+	m_hard_stopping = false;
+
+	INCREMENT_SCHEDULER_STAT(m_timeslice);
+
+	// don't mess with basetime; it was just restored and should be in good shape
+
+	// run at least the given number of subseconds
+	subseconds basetime = m_basetime.relative();
+
+	// no need to compute endslice, since the timing comes from the save state
+	INCREMENT_SCHEDULER_STAT(m_timeslice_inner1);
+
+	LOG("------------------\n");
+
+	// do not check quantum expiration here
+	INCREMENT_SCHEDULER_STAT(m_timeslice_inner2);
+
+	// target time comes from the save state
+	subseconds target = m_save_target;
+
+	// don't check timers; this was already done before saving
+	LOG("timeslice: target = %sas\n", attotime(target).as_string(18));
+
+	// do we have pending suspension changes? (just refresh; don't advance)
+	apply_suspend_changes(false);
+
+	// determine the starting device to execute (normally the first one unless
+	// restoring from a mid-timeslice save state)
+	device_execute_interface *exec = m_execute_list;
+
+	// find the indexed device
+	while (m_save_executing-- != 0 && exec != nullptr)
+		exec = exec->m_nextexec;
+	if (exec == nullptr)
+		throw emu_fatalerror("Attempted mid-timeslice restore but ran out of devices");
+	scheduler_assert(m_save_executing == -1);
+
+	// if the debugger is enabled, halt on the first instruction
+	if (exec->debugger_enabled())
+		machine().debugger().cpu().set_execution_stopped();
+
+	// loop over all executing devices
+	bool first = true;
+	for ( ; exec != nullptr; exec = exec->m_nextexec)
+	{
+		// compute how many subseconds to execute this device
+		subseconds delta = target - exec->m_localtime.relative() - subseconds::unit();
+
+		// if we're the first device, backwards compute delta from the icount remaining
+		if (first)
+		{
+			delta = exec->cycles_to_attotime(m_save_icount - 1).as_subseconds() - subseconds::unit();
+			first = false;
+		}
+
+		// if we're already ahead, do nothing; in theory we should do this 0 as
+		// well, but it's a rare case and the compiler tends to be able to
+		// optimize a strict < 0 check better than <= 0
+		if (delta < subseconds::zero())
+			continue;
+
+		INCREMENT_SCHEDULER_STAT(m_timeslice_inner3);
+
+#if VERBOSE
+		u64 start_cycles = exec->total_cycles();
+		LOG("  %12.12s: t=%018I64das %018I64das = %dc; ", exec->device().tag(), exec->m_localtime.relative().raw(), delta.raw(), delta / exec->m_subseconds_per_cycle + 1);
+#endif
+
+		// store a pointer to the executing device so that we know the
+		// relevant active context
+		m_executing_device = exec;
+
+		// execute for the given number of subseconds
+		subseconds localtime = exec->run_for(delta);
+
+#if VERBOSE
+		m_executing_device = nullptr;
+		u64 end_cycles = exec->total_cycles();
+		LOG(" ran %dc, %1I64dc total", s32(end_cycles - start_cycles), end_cycles);
+#endif
+
+		// if the new local device time is less than our target, move the
+		// target up, but not before the base
+		if (UNEXPECTED(localtime < target))
+		{
+			m_save_target = target = std::max(localtime, basetime);
+			LOG(" (new target)");
+		}
+		LOG("\n");
+	}
+
+	// set the executing device to null, which indicates that there is
+	// no active context; this is used by machine.time() to return the
+	// context-appropriate value
+	m_executing_device = nullptr;
+
+	// our final target becomes our new base time
+	m_basetime.set_relative(target);
+
+	// no longer in a timeslice
+	m_in_timeslice = false;
+}
 
 
 //-------------------------------------------------
@@ -1076,7 +1199,7 @@ inline void device_scheduler::execute_timers(attotime const &basetime)
 
 	// now process any timers that are overdue; due to our never-expiring dummy
 	// instance, we don't need to check for nullptr on the head
-	while (m_active_timers_head->m_expire <= basetime && !m_exit_timeslice)
+	while (m_active_timers_head->m_expire <= basetime && !m_hard_stopping)
 	{
 		INCREMENT_SCHEDULER_STAT(m_execute_timers_average);
 
@@ -1138,6 +1261,49 @@ void device_scheduler::update_basetime()
 
 	// move timers from future list into current list
 	m_first_timer_expire.set_base(basetime);
+}
+
+
+//-------------------------------------------------
+//  hard_stop_complete - complete a hard stop
+//  request by putting things back in order and
+//  potentially initiating a state load
+//-------------------------------------------------
+
+void device_scheduler::hard_stop_complete()
+{
+	// reset the state
+	scheduler_assert(m_hard_stopping);
+	m_hard_stopping = false;
+
+	// hard stopping can trash the execute list; rebuild it
+	rebuild_execute_list();
+
+	// also compute the true first time expiraton
+	update_first_timer_expire();
+
+	// perform the load if that's what we're to do
+	if (m_load_after_stop)
+		machine().immediate_load();
+}
+
+
+//-------------------------------------------------
+//  rebuild_execute_list - create a fast list of
+//  executing devices
+//-------------------------------------------------
+
+void device_scheduler::rebuild_execute_list()
+{
+	//
+	device_execute_interface **tailptr = &m_execute_list;
+	*tailptr = nullptr;
+	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
+	{
+		exec.m_nextexec = nullptr;
+		*tailptr = &exec;
+		tailptr = &exec.m_nextexec;
+	}
 }
 
 
@@ -1417,18 +1583,4 @@ void device_scheduler::timed_trigger(timer_instance const &timer)
 {
 	INCREMENT_SCHEDULER_STAT(m_timed_trigger_calls);
 	trigger(timer.param());
-}
-
-
-//-------------------------------------------------
-//  dump_timers - dump the current timer state
-//-------------------------------------------------
-
-void device_scheduler::dump_timers() const
-{
-	osd_printf_info("=============================================\n");
-	osd_printf_info("Timer Dump: Time = %15s\n", time().as_string(PRECISION));
-	for (timer_instance *timer = m_active_timers_head; timer != &m_active_timers_tail; timer = timer->next())
-		timer->dump();
-	osd_printf_info("=============================================\n");
 }

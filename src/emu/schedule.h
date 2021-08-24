@@ -594,10 +594,11 @@ public:
 	running_machine &machine() const noexcept { return m_machine; }
 	attotime time() const noexcept;
 	device_execute_interface *currently_executing() const noexcept { return m_executing_device; }
-	bool can_save() const;
+	bool in_timeslice() const { return m_in_timeslice; }
+	bool hard_stopping() const { return m_hard_stopping; }
 
 	// execution
-	void timeslice(subseconds minslice) { timeslice_core<false>(minslice); }
+	void timeslice(subseconds minslice) { timeslice_core(minslice); }
 	void abort_timeslice();
 	void trigger(int trigid, attotime const &after = attotime::zero);
 	void boost_interleave(subseconds timeslice, attotime const &boost_duration) { add_scheduling_quantum(timeslice, boost_duration); }
@@ -619,7 +620,7 @@ public:
 
 	// force immediate exit from the scheduling loop -- used for major state
 	// transitions like hard reset or save state restore
-	void hard_stop() { m_exit_timeslice = true; }
+	void hard_stop(bool load_after_stop);
 
 	// save state registration
 	void register_save(save_manager &save);
@@ -630,10 +631,13 @@ private:
 	void postload();
 
 	// execution helpers
-	template<bool MidSliceRestore = false> void timeslice_core(subseconds minslice);
+	void timeslice_core(subseconds minslice);
+	void timeslice_partial();
 	void execute_timers(attotime const &basetime);
-	void update_first_timer_expire() { m_first_timer_expire.set(m_active_timers_head->m_expire); }
+	void update_first_timer_expire() { if (!m_hard_stopping) m_first_timer_expire.set(m_active_timers_head->m_expire); }
 	void update_basetime();
+	void hard_stop_complete();
+	void rebuild_execute_list();
 
 	// scheduling helpers
 	void compute_perfect_interleave();
@@ -673,7 +677,9 @@ private:
 	timer_instance *            m_callback_timer;           // pointer to the current callback timer
 	attotime                    m_callback_timer_expire_time; // the original expiration time
 	bool                        m_suspend_changes_pending;  // suspend/resume changes are pending
-	bool                        m_exit_timeslice;           // true to exit the scheduling loop ASAP
+	bool                        m_in_timeslice;             // true if we're in a timeslice call
+	bool                        m_hard_stopping;            // true if we're trying to exit ASAP
+	bool                        m_load_after_stop;          // true if we should load after stopping
 
 	// statistics
 #if (COLLECT_SCHEDULER_STATS)
@@ -723,6 +729,7 @@ private:
 	// save data; put this at the end since it's big
 	bool                        m_midslice_restore;         // true if we're in a mid-timeslice restore
 	s32                         m_save_executing;           // index of executing device at save
+	s32                         m_save_icount;              // icount of executing device at save
 	subseconds                  m_save_target;              // target subseconds of current slice
 	timer_instance_save         m_timer_save[TIMER_SAVE_SLOTS]; // state saving area
 };
