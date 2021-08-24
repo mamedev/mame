@@ -16,10 +16,13 @@
     - PCG1000
     - Intel 8251
     - cassette
-    - floppy
+    - floppy (it never r/w from the PC80S31K comms?)
+	- dip-switches;
     - PC-8011
     - PC-8021
     - PC-8031
+	- pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
+	  (Has 3 bitplane GVRAM like PC-8801 V1 mode);
 
 */
 
@@ -487,8 +490,9 @@ void pc8001_state::pc8001(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
 	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+	// TODO: remove me (should be derived from CRTC instead)
+	screen.set_refresh_hz(60);
 	screen.set_size(640, 220);
 	screen.set_visarea(0, 640-1, 0, 200-1);
 
@@ -526,8 +530,11 @@ void pc8001_state::pc8001(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
+
+	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
 }
 
+// TODO: merge with above
 void pc8001mk2_state::pc8001mk2(machine_config &config)
 {
 	/* basic machine hardware */
@@ -574,18 +581,30 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
+	
+	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
+	SOFTWARE_LIST(config, "disk_n80_list").set_original("pc8001mk2_flop");
+}
+
+void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
+{
+	pc8001mk2(config);
+	// TODO: mods for SR mode support
+
+	SOFTWARE_LIST(config, "disk_n80sr_list").set_original("pc8001mk2sr_flop");
 }
 
 /* ROMs */
 
 ROM_START( pc8001 )
 	ROM_REGION( 0x6000, Z80_TAG, 0 )
+	// PCB pictures shows divided by 3 ROMs (and 4th socket unpopulated)
 	ROM_SYSTEM_BIOS( 0, "v101", "N-BASIC v1.01" )
-	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(0) )
+	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, BAD_DUMP CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v102", "N-BASIC v1.02" )
-	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(1) )
+	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, BAD_DUMP CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v110", "N-BASIC v1.10" )
-	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
+	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, BAD_DUMP CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, UPD3301_TAG, 0)
 	ROM_LOAD( "font.rom", 0x000, 0x800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
@@ -602,8 +621,27 @@ ROM_START( pc8001mk2 )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 ROM_END
 
+ROM_START( pc8001mk2sr )
+	ROM_REGION( 0x8000, Z80_TAG, 0 )
+	ROM_LOAD( "n80_2sr.rom",    0x000000, 0x008000, CRC(dcb71282) SHA1(e8db5dc5eae11da14e48656d324874e59f2e3844) )
+
+	ROM_REGION (0x10000, "n80sr", ROMREGION_ERASEFF )
+	ROM_LOAD( "n80_3.rom",    0x000000, 0x00a000, BAD_DUMP CRC(d99ef247) SHA1(9bfa5009d703cd31caa734d932d2a847d74cbfa6) )
+
+	ROM_REGION( 0x2000, UPD3301_TAG, 0)
+	ROM_LOAD( "font80sr.rom", 0x000000, 0x001000, CRC(784c0b17) SHA1(565dc8e5e46b1633cb434d12b4d8b3a662546b33) )
+	ROM_LOAD( "fonthira.rom", 0x001000, 0x000800, CRC(fe7059d5) SHA1(10c5f85adcce540cbd0a11352e2c38a84c989a26) )
+	ROM_LOAD( "fontkata.rom", 0x001800, 0x000800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
+
+	ROM_REGION( 0x20000, "kanji", 0)
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+ROM_END
+
 /* System Drivers */
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT   CLASS            INIT        COMPANY  FULLNAME       FLAGS
-COMP( 1979, pc8001,    0,      0,      pc8001,    pc8001, pc8001_state,    empty_init, "NEC",   "PC-8001",     MACHINE_NOT_WORKING )
-COMP( 1983, pc8001mk2, pc8001, 0,      pc8001mk2, pc8001, pc8001mk2_state, empty_init, "NEC",   "PC-8001mkII", MACHINE_NOT_WORKING )
+// 1978?, pc8001g, Wirewrapped prototype version
+COMP( 1979, pc8001,      0,      0,      pc8001,    pc8001, pc8001_state,      empty_init, "NEC",   "PC-8001",     MACHINE_NOT_WORKING )
+// 1981 pc8001a, US version of PC-8001 with Greek alphabet instead of Kana
+COMP( 1983, pc8001mk2,   pc8001, 0,      pc8001mk2, pc8001, pc8001mk2_state,   empty_init, "NEC",   "PC-8001mkII", MACHINE_NOT_WORKING )
+COMP( 1985, pc8001mk2sr, pc8001, 0,      pc8001mk2, pc8001, pc8001mk2sr_state, empty_init, "NEC",   "PC-8001mkIISR", MACHINE_NOT_WORKING )

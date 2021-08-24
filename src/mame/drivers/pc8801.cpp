@@ -2388,7 +2388,8 @@ void pc8801_state::pc8801(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pc88_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pc88_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
-	SOFTWARE_LIST(config, "disk_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

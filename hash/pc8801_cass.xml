@@ -4,6 +4,11 @@
 license:CC0
 
 NOTE: This list is here only to document available dumps and it's not used (yet) by MAME!
+
+TODO:
+- Verify which games actually needs to be moved to separate pc8001[mk2[sr]]_cass.xml lists
+  once cassette support works for either system;
+
 -->
 <softwarelist name="pc8801_cass" description="NEC PC-8801 cassettes">
 
@@ -39,7 +44,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 <!-- these might be 2-sided cassettes (i.e. we should merge some parts) -->
 <!-- for 8001SR? -->
-	<software name="blckonyx">
+	<software name="blckonyxmk2">
 		<description>The Black Onyx</description>
 		<year>1984</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
@@ -72,7 +77,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="alphos">
+	<software name="alphost">
 		<description>Alphos</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -86,7 +91,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="alphosa" cloneof="alphos">
+	<software name="alphosta" cloneof="alphost">
 		<description>Alphos (Alt?)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -100,7 +105,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="apploon">
+	<software name="apploont">
 		<description>Apploon</description>
 		<year>1984</year>
 		<publisher>タカラ (Takara)</publisher>
@@ -152,7 +157,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="bokosuka">
+	<software name="bokosukat">
 		<description>Bokosuka Wars</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -191,7 +196,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="combat">
+	<software name="combatt">
 		<description>Combat</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -260,7 +265,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<!-- or is it the PC8001 version? -->
-	<software name="digdug">
+	<software name="digdugt">
 		<description>Dig Dug</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -298,7 +303,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="doordoor">
+	<software name="doordoort">
 		<description>Door Door</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -337,7 +342,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="dualaln">
+	<software name="dualalnt">
 		<description>Dual Alien</description>
 		<year>1984</year>
 		<publisher>セントラル教育 (Central Kyoku)</publisher>
@@ -351,7 +356,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="dungeon">
+	<software name="dungeont">
 		<description>Dungeon</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -376,7 +381,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="eggy">
+	<software name="eggyt">
 		<description>Eggy</description>
 		<year>1985</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -390,7 +395,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="fanfun">
+	<software name="fanfunt">
 		<description>Fan Fun</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -404,7 +409,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="fanfuna" cloneof="fanfun">
+	<software name="fanfunta" cloneof="fanfunt">
 		<description>Fan Fun (alt maybe)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -418,7 +423,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="flappy">
+	<software name="flappyt">
 		<description>Flappy</description>
 		<year>1983</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -458,7 +463,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="galaxian">
+	<software name="galaxiant">
 		<description>Galaxian</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -500,7 +505,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="hitsuji">
+	<software name="hitsujit">
 		<description>Hitsuji Yaai</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -514,7 +519,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="holein1">
+	<software name="holein1t">
 		<description>Hole in One</description>
 		<year>1985</year>
 		<publisher>HAL研究所 (HAL Kenkyuujo)</publisher>
@@ -695,7 +700,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="lunarbal">
+	<software name="lunarbalt">
 		<description>Lunar Ball</description>
 		<year>1985</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
@@ -709,7 +714,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="mariosp">
+	<software name="mariospt">
 		<description>Mario Bros. Special</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -762,7 +767,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="midmagic">
+	<software name="midmagict">
 		<description>David's Midnight Magic</description>
 		<year>1984</year>
 		<publisher>システムソフト (System Software)</publisher>
@@ -837,7 +842,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="newtron">
+	<software name="newtront">
 		<description>Newtron</description>
 		<year>1984</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -865,7 +870,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="pacman">
+	<software name="pacmant">
 		<description>Pacman</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -907,7 +912,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="plazmali">
+	<software name="plazmalit">
 		<description>Plazma Line</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -935,7 +940,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="ponkotsu">
+	<software name="ponkotsut">
 		<description>Ponkotsu-sen Survival</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -1039,7 +1044,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="sokoban">
+	<software name="sokobant">
 		<description>Sokouban</description>
 		<year>1983</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
@@ -1263,7 +1268,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="4dhouse">
+	<software name="4dhouset">
 		<description>Yojigen no Ie - 4 Dimension House</description>
 		<year>1983</year>
 		<publisher>プロシューマー (Prosumer)</publisher>
@@ -1304,7 +1309,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="zoom">
+	<software name="zoomt">
 		<description>Zoom in Space</description>
 		<year>1983</year>
 		<publisher>ユニオンプランニング (Union Planning)</publisher>

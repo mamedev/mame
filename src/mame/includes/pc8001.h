@@ -85,16 +85,29 @@ class pc8001mk2_state : public pc8001_state
 {
 public:
 	pc8001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc8001_state(mconfig, type, tag),
-			m_kanji_rom(*this, "kanji")
+		: pc8001_state(mconfig, type, tag)
+		, m_kanji_rom(*this, "kanji")
 	{ }
 
-	required_memory_region m_kanji_rom;
-
-	void port31_w(uint8_t data);
 	void pc8001mk2(machine_config &config);
+
+protected:
 	void pc8001mk2_io(address_map &map);
 	void pc8001mk2_mem(address_map &map);
+
+	required_memory_region m_kanji_rom;
+private:
+	void port31_w(uint8_t data);
+};
+
+class pc8001mk2sr_state : public pc8001mk2_state
+{
+public:
+	pc8001mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc8001mk2_state(mconfig, type, tag)
+	{ }
+	
+	void pc8001mk2sr(machine_config &config);
 };
 
 #endif
