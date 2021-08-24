@@ -592,7 +592,7 @@ void atarig42_state::atarig42(machine_config &config)
 	ATARI_JSA_III(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
-	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.8);
 }
 
 void atarig42_0x200_state::atarig42_0x200(machine_config &config)
