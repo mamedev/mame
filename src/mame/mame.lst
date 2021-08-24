@@ -33849,28 +33849,43 @@ pc8801mk2sr                     //
 pc88va                          //
 pc88va2                         //
 
+@source:pc98ha.cpp
+pc98lt                          // 1989
+pc98ha                          // 1990
+
 @source:pc9801.cpp
-pc386m                          //
-pc486mu                         //
-pc486se                         // 1993
 pc9801bx2                       // 1993
 pc9801f                         // 1983
 pc9801rs                        // 1989
 pc9801rx                        // 1988
+pc9801us                        // 1992
 pc9801ux                        // 1987
 pc9801vm                        // 1985
-pc9801vm11                      //
-pc9821                          //
-pc9821ap2                       //
-pc9821as                        //
-pc9821ce2                       //
-pc9821ne                        //
-pc9821ra20                      //
-pc9821ra333                     //
-pc9821v13                       //
-pc9821v20                       //
-pc9821xa16                      //
-pc9821xs                        //
+pc9801vm11                      // 1985
+pc9801vx                        // 1986
+
+@source:pc9801_epson.cpp
+pc386m                          // 1990
+pc486se                         // 1993
+pc486mu                         // 1994
+
+@source:pc9821.cpp
+pc9821                          // 1992
+pc9821ap2                       // 1993
+pc9821as                        // 1993
+pc9821ce2                       // 1994
+pc9821cx3                       // 1995
+pc9821ne                        // 1994
+pc9821nr15                      // 1996
+pc9821nr166                     // 1997
+pc9821nw150                     // 1997
+pc9821ra20                      // 1996
+pc9821ra266                     // 1997
+pc9821ra333                     // 1998
+pc9821v13                       // 1998
+pc9821v20                       // 1998
+pc9821xa16                      // 1996
+pc9821xs                        // 1994
 
 @source:pcat_dyn.cpp
 toursol                         // (c) 1995 Dynamo

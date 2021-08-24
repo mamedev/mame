@@ -4366,6 +4366,8 @@ if (BUSES["CBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.h",	
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",

@@ -253,6 +253,7 @@ private:
 	void fdc_8255_c_w(uint8_t data);
 	uint8_t opn_porta_r();
 	uint8_t opn_portb_r();
+	void opna_map(address_map &map);
 	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
 };

@@ -729,6 +729,7 @@ MACHINES["TTL7474"] = true
 MACHINES["TUBE"] = true
 MACHINES["UCB1200"] = true
 MACHINES["UPD1990A"] = true
+MACHINES["UPD4991A"] = true
 --MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
 MACHINES["UPD7001"] = true
@@ -3123,6 +3124,12 @@ files {
 	MAME_DIR .. "src/mame/machine/pc9801_cd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.h",
+	MAME_DIR .. "src/mame/drivers/pc98ha.cpp",
+	MAME_DIR .. "src/mame/includes/pc98ha.h",
+	MAME_DIR .. "src/mame/drivers/pc9801_epson.cpp",
+	MAME_DIR .. "src/mame/includes/pc9801_epson.h",
+	MAME_DIR .. "src/mame/drivers/pc9821.cpp",
+	MAME_DIR .. "src/mame/includes/pc9821.h",
 	MAME_DIR .. "src/mame/drivers/tk80bs.cpp",
 }
 
