@@ -16488,7 +16488,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="highway" cloneof="radracer">
+	<software name="highway" cloneof="radracer" supported="partial">
 		<description>Highway Star (Jpn)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
@@ -30442,7 +30442,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="radraceru" cloneof="radracer">
+	<software name="radraceru" cloneof="radracer" supported="partial">
 		<description>Rad Racer (USA)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -30462,7 +30462,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="radracer">
+	<software name="radracer" supported="partial">
 		<description>Rad Racer (Euro)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -63266,6 +63266,38 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="highwayk" cloneof="radracer" supported="partial">
+		<description>Highway Star (Kaiser bootleg)</description>
+		<year>19??</year>
+		<publisher>Kaiser</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks7013b" />
+			<feature name="pcb" value="UNL-KS7013B" />
+			<dataarea name="prg" size="131072">
+				<rom name="ks114" size="131072" crc="95ce148a" sha1="eabaefb8ef07c701f7c2d8df6b132a7974c1e9b4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="highwayw" cloneof="radracer" supported="partial">
+		<description>Highway Star (Whirlwind Manu bootleg)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH42"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_lh42" />
+			<dataarea name="prg" size="131072">
+				<rom name="highway star (whirlwind manu).prg" size="131072" crc="8f4ae8aa" sha1="ce4851d8f89cacb212ef645f20201c2634f7253a" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hstar2" cloneof="f1hero2">
 		<description>High Way Star II (Ripped from F-646 HIGH K Power Sports 4-in-1)</description>
 		<year>19??</year>
@@ -67406,22 +67438,6 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="hstarfds">
-		<description>Highway Star (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>Kaiser</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ks7013b" />
-			<feature name="pcb" value="UNL-KS7013B" />
-			<dataarea name="prg" size="131072">
-				<rom name="highway star (kaiser) (fds conversion) (unl).prg" size="131072" crc="95ce148a" sha1="eabaefb8ef07c701f7c2d8df6b132a7974c1e9b4" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hikaris">
 		<description>Hikari Shinwa - Palthena no Kagami (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -69250,7 +69266,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 <!-- is this correct?!? -->
-	<software name="highwayh" cloneof="radracer" supported="partial">
+	<software name="highwayh" cloneof="radracer" supported="no">
 		<description>Highway Star (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
