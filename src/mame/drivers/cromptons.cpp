@@ -11,6 +11,8 @@
     Dips: 2 x 8 dips banks
 
     Video: https://www.youtube.com/watch?v=89XJpor9dSQ
+
+    Disco Fever (coin pusher) runs on the same PCB.
 */
 
 #include "emu.h"
