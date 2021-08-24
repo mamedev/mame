@@ -32,6 +32,10 @@ std::error_condition win_open_socket(std::string const &path, std::uint32_t open
 bool win_check_ptty_path(std::string const &path) noexcept;
 std::error_condition win_open_ptty(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
 
+
+bool win_check_tty_path(std::string const &path) noexcept;
+std::error_condition win_open_tty(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
+
 std::error_condition win_error_to_file_error(DWORD error) noexcept;
 
 #endif // MAME_OSD_MODULES_FILE_WINFILE_H

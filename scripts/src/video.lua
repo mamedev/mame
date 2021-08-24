@@ -15,6 +15,12 @@ files {
 	MAME_DIR .. "src/devices/video/sprite.h",
 	MAME_DIR .. "src/devices/video/vector.cpp",
 	MAME_DIR .. "src/devices/video/vector.h",
+	MAME_DIR .. "src/devices/video/alt_vector.cpp",
+	MAME_DIR .. "src/devices/video/alt_vector.h",    
+	MAME_DIR .. "src/devices/video/alt_vector_usb_dvg.cpp",
+}
+includedirs {
+    ext_includedir("rapidjson")
 }
 
 --------------------------------------------------
