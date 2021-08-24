@@ -9,7 +9,6 @@
     Use tab size = 4 for your viewing pleasure.
 
     TODO:
-    - Implement Panning, Chip has support stereo
     - Verify BYTE/ROMEN pin behaviors
     - DRAM, DMA, MIDI interface is unimplemented
     - Verify interrupt, envelope, timer period
@@ -19,6 +18,11 @@
 
     25th july 2020 [cam900]:
     - Improve envelope behavior, Improve debugging registers, Fix ramping
+
+	24th agust 2021 [nabetse00]
+	- Implemented next-state logic in update_volume_envelope()
+	- Implemented pan with pan log based pan law needs confirmation from real hardware owners 
+
 */
 
 #include "emu.h"
@@ -28,6 +32,8 @@
 
 //#define ICS2115_DEBUG
 //#define ICS2115_ISOLATE 6
+const static int PAN_LEVEL = 16;
+const static int RAMP_SHIFT = 6;
 
 // device type definition
 DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthesizer")
@@ -91,7 +97,15 @@ void ics2115_device::device_start()
 		u8 mantissa = ~i & 0x0f;
 		s16 value = lut[exponent] + (mantissa << (exponent + 3));
 		m_ulaw[i] = (i & 0x80) ? -value : value;
+
+		// TODO better algo (only calculated once so it may not be truly needed)
+		// log pan lut reminder log2(256*128) = 15 for -3db + 1 = 16 must be confirmed by real hardware owners
+		int ti = i;
+		u16 val = 0;
+		while (ti >>= 1) val++; // log2(i) is val 
+		m_panlaw[i] = PAN_LEVEL - val;
 	}
+	m_panlaw[0] = 0xfff; // for safety all bits to one when no pan
 
 	save_item(NAME(m_timer[0].period));
 	save_item(NAME(m_timer[0].scale));
@@ -426,10 +440,15 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
-		const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
-		const u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
-		const u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
-		const u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
+		//const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
+		//const u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
+
+		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
+		const u16 vlefti = volacc - m_panlaw[(255 - voice.vol.pan)]; // left index from acc - pan law 
+		const u16 vrighti = volacc - m_panlaw[(voice.vol.pan)]; // right index from acc - pan law
+		//check negative values so no cracks, is it a hardware feature ?
+		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0; 
+		const u16 vright = vrighti > 0 ? (m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT) : 0;
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
