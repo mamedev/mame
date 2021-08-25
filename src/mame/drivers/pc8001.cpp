@@ -139,12 +139,13 @@ uint8_t pc8001_state::port40_r()
 
 	*/
 
-	uint8_t data = 0x08;
+	uint8_t data = 0x00;
 
 	data |= m_centronics_busy;
 	data |= m_centronics_ack << 1;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
+	// TODO: enable line from pc80s31k (bit 3, active_low)
 
 	return data;
 }
@@ -227,7 +228,7 @@ void pc8001_state::pc8001_io(address_map &map)
 //  map(0xe6, 0xe6).w(FUNC(pc8001_state::irq_mask_w));
 //  map(0xe7, 0xe7).w(FUNC(pc8001_state::pc8012_memory_mode_w));
 //  map(0xe8, 0xfb) unused
-	map(0xfc, 0xff).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfc, 0xff).m(m_pc80s31k, FUNC(pc80s31k_device::host_map));
 }
 
 void pc8001mk2_state::pc8001mk2_mem(address_map &map)
@@ -628,6 +629,10 @@ void pc8001_state::pc8001(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
 
+	PC80S31K(config, m_pc80s31k, MASTER_CLOCK);
+	config.set_perfect_quantum(m_maincpu);
+	config.set_perfect_quantum("pc80s31k:fdc_cpu");
+
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
@@ -635,8 +640,6 @@ void pc8001_state::pc8001(machine_config &config)
 
 	/* devices */
 	I8251(config, I8251_TAG, 0);
-
-	I8255A(config, I8255A_TAG, 0);
 
 	I8257(config, m_dma, MASTER_CLOCK);
 	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
@@ -669,7 +672,7 @@ void pc8001_state::pc8001(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
     // TODO: unknown clock, is it really a beeper?
-	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beep, 2400).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void pc8001mk2_state::pc8001mk2(machine_config &config)

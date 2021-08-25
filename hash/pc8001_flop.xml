@@ -2433,7 +2433,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 
 <!-- Operating Systems -->
 
-	<software name="cpm">
+	<software name="cpm22n">
 		<description>CP-M for the PC-8001 (v2.2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2444,7 +2444,18 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 		</part>
 	</software>
 
-	<software name="cpma" cloneof="cpm">
+	<software name="cpm22na" cloneof="cpm22n">
+		<description>CP/M for PC-8001 (v2.2, Alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 58491 -->
+				<rom name="cpm2.2 for pc-8001.d88" size="348848" crc="21e2663f" sha1="824fcfdfa07caa4ce91cc4faad436dbdcc9bfde1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22nb" cloneof="cpm22n">
 		<description>CP-M for the PC-8001 (v2.2, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2455,7 +2466,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 		</part>
 	</software>
 
-	<software name="cpmb" cloneof="cpm">
+	<software name="cpm22nc" cloneof="cpm22n">
 		<description>CP-M for the PC-8001 (v2.2B)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

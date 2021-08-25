@@ -587,17 +587,6 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<software name="cpm22a" cloneof="cpm22">
-		<description>CP/M for PC-8001 (v2.2)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">    <!-- Data CRC16: 58491 -->
-				<rom name="cpm2.2 for pc-8001.d88" size="348848" crc="21e2663f" sha1="824fcfdfa07caa4ce91cc4faad436dbdcc9bfde1"/>
-			</dataarea>
-		</part>
-	</software>
-
 <!-- GAMES -->
 
 	<software name="1000ouko">

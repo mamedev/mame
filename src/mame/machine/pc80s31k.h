@@ -1,0 +1,70 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
+/***************************************************************************
+
+NEC PC-80S31K
+
+***************************************************************************/
+
+#ifndef MAME_MACHINE_PC80S31K_H
+#define MAME_MACHINE_PC80S31K_H
+
+#pragma once
+
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/upd765.h"
+#include "imagedev/floppy.h"
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class pc80s31k_device : public device_t
+{
+public:
+	// construction/destruction
+	pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void host_map(address_map &map);
+
+protected:
+	// device-level overrides
+	//virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	required_device<z80_device> m_fdc_cpu;
+	required_memory_region m_fdc_rom;
+	required_device<i8255_device> m_ppi_host;
+	required_device<i8255_device> m_ppi_fdc;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+
+	void fdc_map(address_map &map);
+	void fdc_io(address_map &map);
+
+	u8 host_portc_r();
+	void host_portc_w(u8 data);
+	u8 fdc_portc_r();
+	void fdc_portc_w(u8 data);
+	
+	u8 terminal_count_r();
+	void motor_control_w(u8 data);
+	
+	u8 m_host_latch, m_fdc_latch;
+	emu_timer *m_tc_zero_timer;
+	
+	IRQ_CALLBACK_MEMBER(irq_cb);
+
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(PC80S31K, pc80s31k_device)
+
+#endif // MAME_MACHINE_PC80S31K_H
