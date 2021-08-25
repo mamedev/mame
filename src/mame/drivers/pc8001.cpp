@@ -483,14 +483,17 @@ void pc8001_state::machine_start()
 
 void pc8001_state::pc8001(machine_config &config)
 {
+    constexpr XTAL MASTER_CLOCK = XTAL(4'000'000);
+    constexpr XTAL VIDEO_CLOCK = XTAL(14'318'181);
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
+	Z80(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(14'318'181),896,0,640,260,0,200);
+	screen.set_raw(VIDEO_CLOCK,896,0,640,260,0,200);
 	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
 
 	/* devices */
@@ -498,14 +501,14 @@ void pc8001_state::pc8001(machine_config &config)
 
 	I8255A(config, I8255A_TAG, 0);
 
-	I8257(config, m_dma, XTAL(4'000'000));
+	I8257(config, m_dma, MASTER_CLOCK);
 	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
 	UPD1990A(config, m_rtc);
 
-	UPD3301(config, m_crtc, XTAL(14'318'181));
+	UPD3301(config, m_crtc, VIDEO_CLOCK);
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
