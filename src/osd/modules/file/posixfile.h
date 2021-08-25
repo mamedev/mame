@@ -35,6 +35,4 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 bool posix_check_tty_path(std::string const &path) noexcept;
 std::error_condition posix_open_tty(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
 
-
-
-osd_file::error errno_to_file_error(int error);
+#endif // MAME_OSD_MODULES_FILE_POSIXFILE_H
