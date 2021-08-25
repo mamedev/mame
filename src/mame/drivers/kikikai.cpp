@@ -100,7 +100,7 @@ Notes:
                Each of the pins 3 and 4 connect to the JAMMA 12V pins separately (JAMMA 12V is not tied together on the PCB).
                On the 'H' plug, pins 1-2 are tied with a wire and pin 3-4 are tied with a wire.
       MB3731 - Fujitsu MB3731 18W BTL mono power amplifier
-      MB3771 - Fujitsu MB3771 power supply monitotr IC. This is used to provide the power-on reset.
+      MB3771 - Fujitsu MB3771 power supply monitor IC. This is used to provide the power-on reset.
      SWA/SWB - 8-position DIP switch
      TMM2064 - Toshiba TMM2064 8kx8-bit static RAM
      MCM2016 - Motorola MCM2016 2kx8-bit static RAM
