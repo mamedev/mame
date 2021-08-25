@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Alex Marshall,nimitz,austere
+// copyright-holders:Alex Marshall, nimitz, austere
 /*
     ICS2115 by Raiden II team (c) 2010
     members: austere, nimitz, Alex Marshal
@@ -9,19 +9,10 @@
     Use tab size = 4 for your viewing pleasure.
 
     TODO:
-    - Verify BYTE/ROMEN pin behaviors
+    - Verify BYTE/ROMEN pin behavior
     - DRAM, DMA, MIDI interface is unimplemented
     - Verify interrupt, envelope, timer period
     - Verify unemulated registers
-
-    Changelog:
-
-    25th july 2020 [cam900]:
-    - Improve envelope behavior, Improve debugging registers, Fix ramping
-
-	24th agust 2021 [nabetse00]
-	- Implemented next-state logic in update_volume_envelope()
-	- Implemented pan with pan log based pan law needs confirmation from real hardware owners 
 
 */
 
@@ -224,9 +215,9 @@ device_memory_interface::space_config_vector ics2115_device::memory_space_config
 // LEN loop enable 
 // UVOL  LEN   BLEN    DIR     BC      Next VOL(L)
 //  0      x     x       x       x       VOL(L) // no change no vol envelope
-//  1      x     x       0       0       VOL(L) + VINC // foward dir no bc 
+//  1      x     x       0       0       VOL(L) + VINC // forward dir no bc 
 //  1      x     x       1       0       VOL(L) - VINC // invert no bc 
-//  1      0     x       x       1       VOL(L) // no env len no vel envelope
+//  1      0     x       x       1       VOL(L) // no env len no vol envelope
 // ----------------------------------------------------------------------------
 //  1      1     0       0       1       start - ( end - (VOL(L)  + VINC) ) 
 //  1      1     0       1       1       end + ( (VOL(L) - VINC) - start) 
@@ -440,9 +431,6 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
-		//const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
-		//const u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
-
 		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
 		const u16 vlefti = volacc - m_panlaw[(255 - voice.vol.pan)]; // left index from acc - pan law 
 		const u16 vrighti = volacc - m_panlaw[(voice.vol.pan)]; // right index from acc - pan law
