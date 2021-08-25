@@ -384,8 +384,8 @@ nes_bmc_820720c_device::nes_bmc_820720c_device(const machine_config &mconfig, co
 {
 }
 
-nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_830118C, tag, owner, clock), m_reg(0)
+nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_830118C, tag, owner, clock)
 {
 }
 
@@ -911,18 +911,10 @@ void nes_bmc_820720c_device::pcb_reset()
 	mmc3_common_initialize(0x0f, 0xff, 0);
 }
 
-void nes_bmc_830118c_device::device_start()
-{
-	mmc3_start();
-	save_item(NAME(m_reg));
-}
-
 void nes_bmc_830118c_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_reg = 0;
-	mmc3_common_initialize(0x7f, 0x7f, 0);
+	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
 void nes_bmc_830832c_device::pcb_reset()
@@ -3212,46 +3204,44 @@ void nes_bmc_820720c_device::write_h(offs_t offset, u8 data)
 
  BMC-830118C
 
+ Games: 7 in 1 (EW-002, M-022, M-026, M-027)
 
- MMC3 clone
+ MMC3 clone with banking for multigame menu.
 
+ NES 2.0: mapper 348
 
- In MESS: Very Preliminary Support
+ In MAME: Preliminary supported.
+
+ TODO: Only M-022 seems to reliably soft reset to the
+ menu for all games. The other three carts are hit or
+ miss. MMC3 games in particular are not likely to
+ reset to the menu. Investigate further...
 
  -------------------------------------------------*/
 
 void nes_bmc_830118c_device::prg_cb(int start, int bank)
 {
-	if ((m_reg & 0x0c) != 0x0c)
-		prg8_x(start, (bank & 0x0f) | ((m_reg & 0x0c) << 2));
-	else
+	if (m_prg_base == 0x30)
 	{
-		if (start == 0)
+		if (start <= 1)
 		{
-			prg8_89((bank & 0x0f) | ((m_reg & 0x0c) << 2));
-			prg8_ab((bank & 0x0f) | 0x20);
-		}
-		else if (start == 2)
-		{
-			prg8_cd((bank & 0x0f) | ((m_reg & 0x0c) << 2));
-			prg8_ef((bank & 0x0f) | 0x20);
+			prg8_x(start, bank & ~2);
+			prg8_x(start + 2, bank | 2);
 		}
 	}
+	else
+		nes_txrom_device::prg_cb(start, bank);
 }
 
-void nes_bmc_830118c_device::chr_cb(int start, int bank, int source)
-{
-	chr1_x(start, (bank & 0x7f) | ((m_reg & 0x0c) << 5), source);
-}
-
-void nes_bmc_830118c_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_830118c_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_830118c write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset >= 0x800 && offset < 0x900)
+	if ((m_wram_protect & 0xc0) == 0x80)
 	{
-		m_reg = data;
+		m_prg_base = (data & 0x0c) << 2;
 		set_prg(m_prg_base, m_prg_mask);
+		m_chr_base = m_prg_base << 3;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }

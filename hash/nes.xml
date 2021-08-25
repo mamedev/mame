@@ -81386,6 +81386,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_7ew2">
+		<description>1994 New Series Red Pig 7 in 1 (EW-002)</description>
+		<year>1994</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830118c" />
+			<feature name="pcb" value="BMC-830118C" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 new series red pig 7-in-1 (ew-002).prg" size="524288" crc="31620c48" sha1="92b4fa687e69dcc2cd75e458ec38c5ed6ff623cf" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 new series red pig 7-in-1 (ew-002).chr" size="524288" crc="b6d9b8e7" sha1="28bde7b0ef3d7aeb8cb6f02dbdab89a7b8554a51" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_7k603">
 		<description>7 in 1 (K7603)</description>
 		<year>19??</year>
@@ -81402,7 +81418,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_7m22" supported="no">
+<!-- Guevara crashes after beating the first boss. Bad dump or bug on cartridge? -->
+	<software name="mc_7m22">
 		<description>7 in 1 (M-022)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -81414,6 +81431,38 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="7-in-1 (m-022) [p1][u].prg" size="524288" crc="b9e0e671" sha1="36eba88646c520fa0ff8f2cfd778f2e7b391e842" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7m26">
+		<description>1994 Super HiK 7 in 1 (M-026)</description>
+		<year>1994</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830118c" />
+			<feature name="pcb" value="BMC-830118C" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 super hik 7-in-1 (m-026).prg" size="524288" crc="53588417" sha1="bb8354c11e7d3110bd95d1e149bb11c0f35ed455" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 super hik 7-in-1 (m-026).chr" size="524288" crc="186291b1" sha1="26b70492774419f51d55c2d23cf9f84bc0fbf7b5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7m27">
+		<description>1994 Super HiK 7 in 1 (M-027)</description>
+		<year>1994</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830118c" />
+			<feature name="pcb" value="BMC-830118C" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 super hik 7-in-1 (m-027).prg" size="524288" crc="8c1523d8" sha1="884b3b675612136fcc5e0fcff0274812d2015566" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 super hik 7-in-1 (m-027).chr" size="524288" crc="70f633d3" sha1="8ce05af67cd35062b2039c16f90b4f1e3cef8716" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
