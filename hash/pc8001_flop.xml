@@ -430,7 +430,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
-				<rom name="dasshutsu! shi no aokigahara.d88" size="31424" crc="3bb3fa40" sha1="67dcbca00c7e5c14c288c07975744531bf111bed"/>
+				<rom name="dasshutsu shi no aokigahara.d88" size="31424" crc="3bb3fa40" sha1="67dcbca00c7e5c14c288c07975744531bf111bed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -518,7 +518,7 @@ TODO:
 	</software>
 
 	<software name="dualalna" cloneof="dualaln">
-		<description>Dual Alien</description>
+		<description>Dual Alien (Alt)</description>
 		<year>1984</year>
 		<publisher>セントラル教育 (Central Kyoku)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -859,7 +859,7 @@ TODO:
 		<info name="alt_title" value="激戦!南太平洋"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="gekisen! minami taiheiyou (tank submarine).d88" size="348848" crc="decdc011" sha1="d13c8473a6b03c82998073ea672ff308403b2c6d"/>
+				<rom name="gekise minami taiheiyou (tank submarine).d88" size="348848" crc="decdc011" sha1="d13c8473a6b03c82998073ea672ff308403b2c6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -871,7 +871,7 @@ TODO:
 		<info name="alt_title" value="激戦!南太平洋"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
-				<rom name="gekisen! minami taiheiyou (tank submarine) [set 1].d88" size="31424" crc="829f535b" sha1="05ec3f3d93e82b5feade3439ac66465c85458e13"/>
+				<rom name="gekisen minami taiheiyou (tank submarine) [set 1].d88" size="31424" crc="829f535b" sha1="05ec3f3d93e82b5feade3439ac66465c85458e13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -966,7 +966,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
-				<rom name="hashire! skyline.d88" size="31424" crc="a732bfdb" sha1="672762966770ac7c24ed6d5711d4b35f6eb1609e"/>
+				<rom name="hashire skyline (b).d88" size="31424" crc="a732bfdb" sha1="672762966770ac7c24ed6d5711d4b35f6eb1609e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -977,7 +977,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
-				<rom name="hashire! skyline [alt 1].d88" size="31424" crc="a57810af" sha1="f6720927d2035621ea139575caa31f1afed0fd96"/>
+				<rom name="hashire skyline [alt 1].d88" size="31424" crc="a57810af" sha1="f6720927d2035621ea139575caa31f1afed0fd96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1060,7 +1060,7 @@ TODO:
 	</software>
 
 	<software name="iwasanjua" cloneof="iwasanju">
-		<description>I wa Sanjutsu Nari</description>
+		<description>I wa Sanjutsu Nari (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1512,7 +1512,7 @@ TODO:
 	</software>
 
 	<software name="riverresa" cloneof="riverres">
-		<description>River Rescue</description>
+		<description>River Rescue (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1726,7 +1726,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="stop! harumi-chan.d88" size="348848" crc="f62fad05" sha1="fcd671d13c995d9422ef59cd52c294626ab6b3ee"/>
+				<rom name="stop harumi-chan.d88" size="348848" crc="f62fad05" sha1="fcd671d13c995d9422ef59cd52c294626ab6b3ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1765,7 +1765,7 @@ TODO:
 	</software>
 
 	<software name="superbala" cloneof="superbal">
-		<description>Super Balloon</description>
+		<description>Super Balloon (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1835,7 +1835,7 @@ TODO:
 	</software>
 
 	<software name="tengokuta" cloneof="tengokut">
-		<description>Tengoku to Jigoku</description>
+		<description>Tengoku to Jigoku (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2038,7 +2038,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
-				<rom name="toriaezu tinyan da yo!.d88" size="31424" crc="57776daf" sha1="2e8a9dfbee0c75ac424dcbb5907b2b1161567771"/>
+				<rom name="toriaezu tinyan da yo.d88" size="31424" crc="57776daf" sha1="2e8a9dfbee0c75ac424dcbb5907b2b1161567771"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2049,7 +2049,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="toriaezu tinyan da yo! [alt 1].d88" size="348848" crc="d2158d3d" sha1="2b198bc2598c7515db3305bce7e11d1c7860463c"/>
+				<rom name="toriaezu tinyan da yo [alt 1].d88" size="348848" crc="d2158d3d" sha1="2b198bc2598c7515db3305bce7e11d1c7860463c"/>
 			</dataarea>
 		</part>
 	</software>

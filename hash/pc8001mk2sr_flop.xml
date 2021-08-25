@@ -38,7 +38,7 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 				<rom name="xanadu (mkiisr) (disk a).d88" size="418960" crc="00e5127b" sha1="bbc366072a338deb48da8b460912bf9241689e3e"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="xanadu (mkiisr) (disk b).d88" size="415840" crc="b64f896a" sha1="2138091d56e3d9f6f3ff20df57eebf8552f488d8"/>
 			</dataarea>

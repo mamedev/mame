@@ -114,7 +114,10 @@ void pc80s31k_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_fdc_cpu, INPUT_LINE_IRQ0);
 
 	for (auto &floppy : m_floppy)
+	{
 		FLOPPY_CONNECTOR(config, floppy, pc88_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
+		floppy->enable_sound(true);
+	}
 
 	// TODO: 8255 or 8255A?
 	I8255A(config, m_ppi_host);
@@ -210,4 +213,6 @@ void pc80s31k_device::motor_control_w(uint8_t data)
 {
 	m_floppy[0]->get_device()->mon_w(!(data & 1));
 	m_floppy[1]->get_device()->mon_w(!(data & 2));
+	
+	// TODO: according to docs a value of 0x07 enables precompensation to tracks 0-19, 0xf enables it on 20-39
 }

@@ -477,7 +477,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="galaxiana" cloneof="galaxian">
+	<software name="galaxianta" cloneof="galaxiant">
 		<description>Galaxian (Alt?)</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>

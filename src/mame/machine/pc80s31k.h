@@ -60,7 +60,6 @@ private:
 	emu_timer *m_tc_zero_timer;
 	
 	IRQ_CALLBACK_MEMBER(irq_cb);
-
 };
 
 
