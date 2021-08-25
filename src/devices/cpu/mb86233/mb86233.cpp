@@ -96,7 +96,7 @@ void mb86233_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC", m_pc);
 	state_add(STATE_GENPCBASE, "PC",    m_ppc).noshow();
-	state_add(STATE_GENSP,     "SP",    m_sp);
+	state_add(REG_SP,          "SP",    m_sp);
 	state_add(STATE_GENFLAGS,  "ST",    m_st);
 
 	state_add(REG_A,           "A",     m_a);

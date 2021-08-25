@@ -113,7 +113,7 @@ TODO:
   games may manipulate VFD plate brightness by strobing it longer/shorter,
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
-- improve/redo SVGs of: bzaxxon, bpengo, bbtime
+- improve/redo SVGs of: bzaxxon, bbtime
 
 ***************************************************************************/
 
@@ -1165,8 +1165,8 @@ ROM_START( bpengo )
 	ROM_LOAD( "hd38820a63", 0x0000, 0x1000, CRC(ebd6bc64) SHA1(0a322c47b9553a2739a85908ce64b9650cf93d49) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 744461, "screen", 0)
-	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
+	ROM_REGION( 565069, "screen", 0)
+	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(fb25ffeb) SHA1(fb4db5120f1e35e39c7fb2da4af3aa63417efaf1) )
 ROM_END
 
 

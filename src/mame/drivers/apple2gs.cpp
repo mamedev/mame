@@ -2619,6 +2619,14 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			// todo: does reading these on the IIgs also trigger the joysticks?
 			if (!machine().side_effects_disabled())
 			{
+				// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
+				if ((m_accel_present) && !BIT(m_accel_gsxsettings, 6))
+				{
+					m_accel_temp_slowdown = true;
+					m_acceltimer->adjust(attotime::from_msec(5));
+					accel_normal_speed();
+				}
+
 				m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
 				m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
 				m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();

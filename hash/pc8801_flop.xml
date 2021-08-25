@@ -10988,7 +10988,9 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="emeraldd">
+	<!-- Displays Glodia transition then logo keeps scrolling left -->
+	<!-- Same as Vain Dream? -->
+	<software name="emeraldd" supported="no">
 		<description>Emerald Dragon</description>
 		<year>1989</year>
 		<publisher>バショウハウス (Bashou House)</publisher>
@@ -23448,7 +23450,10 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="valis2">
+	<!-- boot OK -->
+	<!-- Omake: press F5 during opening for music test, alternatively just boot disk G from drive 1 -->
+	<!-- TODO: checkout if there are other hidden hotkeys like PC98 version -->
+	<software name="valis2" supported="yes">
 		<description>Mugen Senshi Valis II</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -23686,12 +23691,12 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="navitune">
-		<description>Navitune</description>
+		<description>Navitune - Dragon Koukaiki</description>
 		<year>1989</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198911xx"/>
-		<info name="alt_title" value="ナビチューン"/>
+		<info name="alt_title" value="ナビチューン ドラゴン航海記"/>
 		<!--combined image-->
 		<!--rom name="navitune.d88" size="1662512" crc="b9540b35" sha1="8d937c8acfb62a12d24596114e7168db1087eaf0"/-->
 
@@ -36112,7 +36117,9 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<software name="vaindrea">
+	<!-- Displays Glodia transition then logo keeps scrolling left with wrong colors -->
+	<!-- Known to be related to write protect flag on System disk that must be ON (PC=0xB0A4) -->
+	<software name="vaindrea" supported="no">
 		<description>Vain Dream</description>
 		<year>1991</year>
 		<publisher>グローディア (Global Media)</publisher>

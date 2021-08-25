@@ -66,7 +66,7 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 	void *splitbuffer = nullptr;
 	int index, partnum;
 	uint64_t totallength;
-	osd_file::error filerr;
+	std::error_condition filerr;
 	int error = 1;
 
 	// convert split size to MB
@@ -79,7 +79,7 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 
 	// open the file for read
 	filerr = util::core_file::open(filename, OPEN_FLAG_READ, infile);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		fprintf(stderr, "Fatal error: unable to open file '%s'\n", filename);
 		goto cleanup;
@@ -117,7 +117,7 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 
 	// create the split file
 	filerr = util::core_file::open(splitfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, splitfile);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		fprintf(stderr, "Fatal error: unable to create split file '%s'\n", splitfilename.c_str());
 		goto cleanup;
@@ -153,7 +153,7 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 
 		// create it
 		filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
-		if (filerr != osd_file::error::NONE)
+		if (filerr)
 		{
 			printf("\n");
 			fprintf(stderr, "Fatal error: unable to create output file '%s'\n", outfilename.c_str());
@@ -216,7 +216,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 	std::string basepath;
 	util::core_file::ptr outfile, infile, splitfile;
 	void *splitbuffer = nullptr;
-	osd_file::error filerr;
+	std::error_condition filerr;
 	uint32_t splitsize;
 	char buffer[256];
 	int error = 1;
@@ -224,7 +224,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 
 	// open the file for read
 	filerr = util::core_file::open(filename, OPEN_FLAG_READ, splitfile);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		fprintf(stderr, "Fatal error: unable to open file '%s'\n", filename);
 		goto cleanup;
@@ -264,7 +264,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 	{
 		// don't overwrite the original!
 		filerr = util::core_file::open(outfilename, OPEN_FLAG_READ, outfile);
-		if (filerr == osd_file::error::NONE)
+		if (!filerr)
 		{
 			outfile.reset();
 			fprintf(stderr, "Fatal error: output file '%s' already exists\n", outfilename.c_str());
@@ -273,7 +273,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 
 		// open the output for write
 		filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
-		if (filerr != osd_file::error::NONE)
+		if (filerr)
 		{
 			fprintf(stderr, "Fatal error: unable to create file '%s'\n", outfilename.c_str());
 			goto cleanup;
@@ -301,7 +301,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		// read the file's contents
 		infilename.insert(0, basepath);
 		filerr = util::core_file::load(infilename.c_str(), &splitbuffer, length);
-		if (filerr != osd_file::error::NONE)
+		if (filerr)
 		{
 			printf("\n");
 			fprintf(stderr, "Fatal error: unable to load file '%s'\n", infilename.c_str());

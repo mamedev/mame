@@ -8,12 +8,15 @@
 
 #pragma once
 
-#include "emuopts.h"
-#include "machine/tmc0430.h"
-#include "softlist_dev.h"
 #include "gromport.h"
-#include "unzip.h"
-#include "xmlfile.h"
+
+#include "machine/tmc0430.h"
+
+#include "emuopts.h"
+#include "softlist_dev.h"
+
+#include "utilfwd.h"
+
 
 namespace bus::ti99::gromport {
 
@@ -137,7 +140,7 @@ private:
 	public:
 		rpk_reader(const pcb_type *types) : m_types(types) { }
 
-		rpk *open(emu_options &options, const char *filename, const char *system_name);
+		rpk *open(emu_options &options, util::core_file &file, const char *system_name);
 
 	private:
 		int find_file(util::archive_file &zip, const char *filename, uint32_t crc);

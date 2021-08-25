@@ -50,7 +50,11 @@
  */
 
 #include "flex_dsk.h"
-#include "formats/imageutl.h"
+
+#include "imageutl.h"
+
+#include "ioprocs.h"
+
 
 flex_format::flex_format() : wd177x_format(formats)
 {
@@ -71,7 +75,7 @@ const char *flex_format::extensions() const
 	return "dsk";
 }
 
-int flex_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int flex_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor, variants);
 
@@ -80,17 +84,21 @@ int flex_format::identify(io_generic *io, uint32_t form_factor, const std::vecto
 	return 0;
 }
 
-int flex_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int flex_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return -1;
+
 	uint8_t boot0[256], boot1[256];
+	size_t actual;
 
 	// Look at the boot sector.
 	// Density, sides, link??
-	io_generic_read(io, &boot0, 256 * 0, sizeof(boot0));
-	io_generic_read(io, &boot1, 256 * 1, sizeof(boot1));
+	io.read_at(256 * 0, &boot0, sizeof(boot0), actual);
+	io.read_at(256 * 1, &boot1, sizeof(boot1), actual);
 	// Look at the system information sector.
-	io_generic_read(io, &info, 256 * 2, sizeof(struct sysinfo_sector));
+	io.read_at(256 * 2, &info, sizeof(struct sysinfo_sector), actual);
 
 	LOG_FORMATS("FLEX floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / 256, (uint32_t)size % 256, form_factor);
 

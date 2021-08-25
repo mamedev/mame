@@ -207,6 +207,7 @@ public:
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);
 	void cm97_portmap(address_map &map);
+	void super7_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
 	void ss2001_portmap(address_map &map);
 

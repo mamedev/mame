@@ -275,7 +275,7 @@ uint32_t taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_in
 
 	m_tilemap[0]->set_scrollx(m_scroll_x);
 	m_tilemap[0]->set_scrolly(m_scroll_y);
-	
+
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0);
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0);
 
@@ -311,7 +311,7 @@ void taitopjc_state::videochip_w(offs_t address, uint32_t data)
 		m_screen_ram[addr] = data;
 
 		if (address >= 0x1003f000 && address < 0x1003f800)
-		{			
+		{
 			uint32_t a = address - 0x1003f000;
 			m_tilemap[0]->mark_tile_dirty((a * 2));
 			m_tilemap[0]->mark_tile_dirty((a * 2) + 1);
@@ -563,7 +563,7 @@ void taitopjc_state::dsp_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 void taitopjc_state::ppc603e_mem(address_map &map)
 {
-	map(0x00000000, 0x003fffff).ram().share(m_main_ram);	// Work RAM
+	map(0x00000000, 0x003fffff).ram().share(m_main_ram);    // Work RAM
 	map(0x40000000, 0x4000000f).rw(FUNC(taitopjc_state::video_r), FUNC(taitopjc_state::video_w));
 	map(0x80000000, 0x80003fff).rw(FUNC(taitopjc_state::dsp_r), FUNC(taitopjc_state::dsp_w));
 	map(0xc0000000, 0xc0003fff).rw(FUNC(taitopjc_state::ppc_common_r), FUNC(taitopjc_state::ppc_common_w));
@@ -748,7 +748,7 @@ void taitopjc_state::tms_io_map(address_map &map)
 	map(0x0058, 0x0058).w(m_tc0780fpa, FUNC(tc0780fpa_device::poly_fifo_w));
 	map(0x005a, 0x005a).w(m_tc0780fpa, FUNC(tc0780fpa_device::tex_w));
 	map(0x005b, 0x005b).rw(m_tc0780fpa, FUNC(tc0780fpa_device::tex_addr_r), FUNC(tc0780fpa_device::tex_addr_w));
-	map(0x005e, 0x005e).noprw();		// ?? 0x0001 written every frame
+	map(0x005e, 0x005e).noprw();        // ?? 0x0001 written every frame
 	map(0x005f, 0x005f).r(FUNC(taitopjc_state::dsp_rom_r));
 }
 

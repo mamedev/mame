@@ -849,6 +849,16 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
 
+void cmaster_state::super7_portmap(address_map &map)
+{
+	cm_portmap(map);
+
+	map(0x02, 0x03).unmaprw();
+	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x82, 0x82).w("aysnd", FUNC(ay8910_device::data_w));
+}
+
 void cmaster_state::cm97_portmap(address_map &map) // TODO: other reads/writes
 {
 	map.global_mask(0xff);
@@ -9057,6 +9067,7 @@ void cmaster_state::chryangl(machine_config &config)
 {
 	cm(config);
 
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::super7_portmap);
 	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
 }
 
@@ -10562,21 +10573,42 @@ PCB with a New Impeuropex sticker
 
 ROM_START( super7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "27c512_1", 0x00000, 0x10000, CRC(ddfa6fe7) SHA1(0d86ec5029afd565e039fe84f7001b2dc77c919c) ) // first 0x8000 encrypted
+	ROM_LOAD( "27c512_1", 0x00000, 0x10000, CRC(ddfa6fe7) SHA1(0d86ec5029afd565e039fe84f7001b2dc77c919c) ) // first 0x8000 opcodes & data encrypted, 0x8000 - 0x93ff only opcodes encrypted, 0x9400 onwards unencrypted?
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // very similar to most cmv4 sets, but differently arranged
-	ROM_LOAD( "27c010_2", 0x00000, 0x20000, CRC(9636d785) SHA1(8f851aae0b05ad909c48cf94142ab927145da464) )
+	ROM_REGION( 0x40000, "gfx1", 0 ) // very similar to most cmv4 sets, but differently arranged
+	ROM_LOAD( "27c010_2",      0x20000, 0x8000, CRC(9636d785) SHA1(8f851aae0b05ad909c48cf94142ab927145da464) )
+	ROM_CONTINUE(              0x10000, 0x8000 )
+	ROM_CONTINUE(              0x30000, 0x8000 )
+	ROM_CONTINUE(              0x00000, 0x8000 )
+	ROM_COPY( "gfx1", 0x20000, 0x28000, 0x8000)
+	ROM_COPY( "gfx1", 0x10000, 0x18000, 0x8000)
+	ROM_COPY( "gfx1", 0x30000, 0x38000, 0x8000)
+	ROM_COPY( "gfx1", 0x00000, 0x08000, 0x8000)
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "27c010_3", 0x00000, 0x20000, CRC(a6db1162) SHA1(05019166526b0797e3eca8b72d90c325573b3d74) )
+	ROM_REGION( 0x40000, "graphics", 0 )
+	ROM_LOAD( "27c010_3",          0x18000, 0x8000, CRC(a6db1162) SHA1(05019166526b0797e3eca8b72d90c325573b3d74) )
+	ROM_CONTINUE(                  0x08000, 0x8000 )
+	ROM_CONTINUE(                  0x38000, 0x8000 )
+	ROM_CONTINUE(                  0x28000, 0x8000 )
+	ROM_COPY( "graphics", 0x28000, 0x20000, 0x8000)
+	ROM_COPY( "graphics", 0x18000, 0x10000, 0x8000)
+	ROM_COPY( "graphics", 0x38000, 0x30000, 0x8000)
+	ROM_COPY( "graphics", 0x08000, 0x00000, 0x8000)
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x0e000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x1e000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x2e000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x3e000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF ) // no girls ROM
 
 	ROM_REGION( 0x800, "proms", 0 ) // RGB generation
 	ROM_LOAD( "82s191an.bin",  0x000, 0x800, CRC(ec546abe) SHA1(1bd92c0715ec1821fa977a67499dc8971deec9c7) )
 
-	ROM_REGION( 0x400, "proms2", 0 )
-	ROM_LOAD( "82s137an.bin",  0x000, 0x400, CRC(92975789) SHA1(4a85d169db5e298ee201fe7d4b9964b1df16992e) )
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s137an.bin",  0x000, 0x100, CRC(92975789) SHA1(4a85d169db5e298ee201fe7d4b9964b1df16992e) )
+	ROM_IGNORE(0x300)
 
 	ROM_REGION( 0xa00, "plds", 0 )
 	ROM_LOAD( "palce16v8.bin", 0x000, 0x114, NO_DUMP )
@@ -19439,13 +19471,42 @@ void cmaster_state::init_tcl()
 	}
 }
 
-void cmaster_state::init_super7()
+void cmaster_state::init_super7() // possibly incomplete decryption. Game appears to work with clean NVRAM, but stops with 'scheda da inizializzare" (PCB to be initialized) message with NVRAM present
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int a = 0; a < 0x8000; a++)
 	{
 		rom[a] = (rom[a] << 1) | BIT(rom[a], 7);
+		m_decrypted_opcodes[a] = rom[a];
+	}
+
+	for (int a = 0x8000; a < 0x9000; a++)
+	{
+		switch (a & 0xc00)
+		{
+			case 0x000: m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0x6e, 6, 7, 0, 1, 2, 3, 4, 5); break;
+			case 0x400: m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0x1e, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x800: m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0x1e, 0, 1, 7, 2, 6, 4, 5, 3); break;
+			case 0xc00: m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0x7d, 2, 0, 1, 3, 4, 5, 6, 7); break;
+		}
+	}
+
+	for (int a = 0x9000; a < 0x9400; a++)
+		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0x62, 4, 5, 3, 6, 7, 0, 2, 1); // TODO: bit 5 and 4 might be swapped
+
+	for (int a = 0x9400; a < 0xf000; a++)
+		m_decrypted_opcodes[a] = rom[a];
+
+	// try to rearrange PROM contents to what MAME expects. TODO: still doesn't work
+	uint8_t *proms = memregion("proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t bits74 = proms[i] >> 4;
+		uint8_t bits30 = proms[i] & 0x0f;
+		proms[i] = bits74;
+		proms[i + 0x100] = bits30;
 	}
 }
 
@@ -19513,7 +19574,7 @@ GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,
 GAMEL( 1991, cmasteri,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 9)",           0,                 layout_cmasterb ) // NMC27CP128Q being 32k x8 instead of 16k x8...
 GAMEL( 1991, cmasterj,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 10, BET stops all)",  0,          layout_cmasterb )
 GAMEL( 1991, cmasterk,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 11, TAKE stops all)", 0,          layout_cmasterb )
-GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
+GAMEL( 199?, super7,    cmaster,  chryangl, cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb ) // bad palette, no reels, decryption might be missing something, too
 GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )

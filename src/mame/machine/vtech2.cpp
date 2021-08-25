@@ -54,7 +54,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vtech2_state::cart_load )
 
 	if (m_cart_size > 0x10000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge bigger than 64k");
+		image.seterror(image_error::INVALIDIMAGE, "Cartridge bigger than 64k");
 		m_cart_size = 0;
 		return image_init_result::FAIL;
 	}

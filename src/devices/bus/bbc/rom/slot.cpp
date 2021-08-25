@@ -122,7 +122,7 @@ image_init_result bbc_romslot_device::call_load()
 
 		if (size % 0x2000)
 		{
-			seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid ROM size");
+			seterror(image_error::INVALIDIMAGE, "Invalid ROM size");
 			return image_init_result::FAIL;
 		}
 

@@ -727,7 +727,6 @@ void tms340x0_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
 		state_add(TMS34010_SP,     "SP",        m_regs[15].reg);
-		state_add(STATE_GENSP,     "GENSP",     m_regs[15].reg).noshow();
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 

@@ -676,6 +676,7 @@ MACHINES["TSB12LV01A"] = true
 --MACHINES["TTL7474"] = true
 --MACHINES["UCB1200"] = true
 MACHINES["UPD1990A"] = true
+--MACHINES["UPD4991A"] = true
 MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
 MACHINES["UPD7001"] = true
@@ -5061,6 +5062,7 @@ files {
 	MAME_DIR .. "src/mame/includes/oneshot.h",
 	MAME_DIR .. "src/mame/video/oneshot.cpp",
 	MAME_DIR .. "src/mame/drivers/onetwo.cpp",
+	MAME_DIR .. "src/mame/drivers/opercoin.cpp",
 	MAME_DIR .. "src/mame/drivers/othello.cpp",
 	MAME_DIR .. "src/mame/drivers/pachifev.cpp",
 	MAME_DIR .. "src/mame/drivers/pasha2.cpp",

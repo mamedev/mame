@@ -363,7 +363,7 @@ void beathead_state::beathead(machine_config &config)
 
 	ATARI_JSA_III(config, m_jsa, 0);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
-	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.6);
 }
 
 

@@ -3730,6 +3730,35 @@ ROM_START( carnivalc )
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    /* control PROM */
 ROM_END
 
+ROM_START( carnivalca ) // S-97095-P + 97093-P-B
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-479.u33", 0x0000, 0x0400, CRC(620bff59) SHA1(87d3b4991cacb0a8cd7eeef652eb3f1c1eaadb17) )
+	ROM_LOAD( "epr-480.u32", 0x0400, 0x0400, CRC(90768717) SHA1(a34e6c28d486614b0a084a088d75feb8ecb6ef15) )
+	ROM_LOAD( "epr-481.u31", 0x0800, 0x0400, CRC(5c903af9) SHA1(5f11c6c800cfb012ba592b890d9849cc03192aaa) )
+	ROM_LOAD( "epr-482.u30", 0x0c00, 0x0400, CRC(fb2398a1) SHA1(abab2cd43054b719b0bee0f7452908df062e34bc) )
+	ROM_LOAD( "epr-483.u29", 0x1000, 0x0400, CRC(306f50d2) SHA1(93faa3e2a8e49f3afb591a2fe7bb401278a354e2) )
+	ROM_LOAD( "epr-484.u28", 0x1400, 0x0400, CRC(e80a6ebc) SHA1(5ef94a2ee7040b56951ef68ee4198f64af1449b0) )
+	ROM_LOAD( "epr-485.u27", 0x1800, 0x0400, CRC(993e2885) SHA1(82a04258d5c25bddb6556a73f0e85a9af9d510d2) )
+	ROM_LOAD( "epr-486.u26", 0x1c00, 0x0400, CRC(e6b7eb05) SHA1(1b998cdf39d38437b5d32958dbde80b29c1b2736) )
+	ROM_LOAD( "epr-487.u8",  0x2000, 0x0400, CRC(41abf6f8) SHA1(1a02c268368ea761113c831d4a6dfc0a1853ebc7) )
+	ROM_LOAD( "epr-488.u7",  0x2400, 0x0400, CRC(b0288f2a) SHA1(c02311f4f640a17b68cc10ca01ab3e919a9355b0) )
+	ROM_LOAD( "epr-489.u6",  0x2800, 0x0400, CRC(c9c529ab) SHA1(98bb99afc1e23dff13ab73c051beec44750eb1b3) )
+	ROM_LOAD( "epr-490.u5",  0x2c00, 0x0400, CRC(9d4ffe25) SHA1(b0dec556f16d505190b8703c367ecb4d07147156) )
+	ROM_LOAD( "epr-491.u4",  0x3000, 0x0400, CRC(5d086aec) SHA1(d7b9125b0f9dd71d5ffcac321ec2c0f3f7953031) )
+	ROM_LOAD( "epr-492.u3",  0x3400, 0x0400, CRC(0e20e4a5) SHA1(82c8ad21a72c8dff81eb4bb97e64faff33a8b46f) )
+	ROM_LOAD( "epr-493.u2",  0x3800, 0x0400, CRC(b4a7c5c9) SHA1(832597a2b586bffebaf2d67be8dff316d8120974) )
+	ROM_LOAD( "epr-494.u1",  0x3c00, 0x0400, NO_DUMP ) // missing on PCB, but listed on the ROM sheet it came with
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-62.u49",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+
+	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_LOAD( "epr-412.u5",   0x0000, 0x0400, BAD_DUMP CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) ) // not dumped for this set (sound PCB wasn't available), so taken from carnivalc
+
+	ROM_REGION( 0x0020, "user1", 0 )
+	ROM_LOAD( "bin.u14", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    // control PROM, possibly pr-34 but unreadable
+ROM_END
+
 ROM_START( carnivalh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-155.u48",   0x0000, 0x0800, CRC(0a5f1f65) SHA1(7830157ad378f92a8069debf78d50b9deafb4d40) )
@@ -4188,6 +4217,7 @@ GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, vicdual_state,   empty_i
 GAME( 1980, carnival,   0,        carnival,  carnival,  carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (upright, AY8912 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, carnivalb,  carnival, carnivalb, carnival,  carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (upright, PIT8253 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, carnivalc,  carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalca, carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail, earlier)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // one missing ROM
 GAME( 1980, carnivalh,  carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, carnivalha, carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, verbena,    carnival, carnival,  carnival,  carnival_state,  empty_init, ROT270, "bootleg (Cocamatic)",     "Verbena (bootleg of Carnival)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

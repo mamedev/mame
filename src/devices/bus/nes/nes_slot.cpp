@@ -887,7 +887,7 @@ image_init_result nes_cart_slot_device::call_load()
 			else
 			{
 				logerror("%s is NOT a file in either iNES or UNIF format.\n", filename());
-				seterror(IMAGE_ERROR_UNSPECIFIED, "File is neither iNES or UNIF format");
+				seterror(image_error::INVALIDIMAGE, "File is neither iNES or UNIF format");
 				return image_init_result::FAIL;
 			}
 		}

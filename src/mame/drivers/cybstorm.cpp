@@ -266,8 +266,8 @@ void cybstorm_state::cybstorm(machine_config &config)
 	ATARI_JSA_IIIS(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("9F0010").bit(22);
-	m_jsa->add_route(0, "lspeaker", 1.0);
-	m_jsa->add_route(1, "rspeaker", 1.0);
+	m_jsa->add_route(0, "lspeaker", 0.9);
+	m_jsa->add_route(1, "rspeaker", 0.9);
 }
 
 

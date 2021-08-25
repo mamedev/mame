@@ -4,13 +4,13 @@
 
     Wiping sound driver
 
-	Nichibutsu / Woodplace Inc. custom part?
-	
+    Nichibutsu / Woodplace Inc. custom part?
+
     used by wiping.cpp and clshroad.cpp
 
-	TODO:
-	- Identify actual part, sound device was originally based off
-	  Namco customs (on which involvement seems pretty thin here);
+    TODO:
+    - Identify actual part, sound device was originally based off
+      Namco customs (on which involvement seems pretty thin here);
 
 ***************************************************************************/
 

@@ -10,6 +10,9 @@
 
 #include "poly_dsk.h"
 
+#include "ioprocs.h"
+
+
 poly_cpm_format::poly_cpm_format()
 {
 }
@@ -34,30 +37,35 @@ bool poly_cpm_format::supports_save() const
 	return true;
 }
 
-int poly_cpm_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint8_t boot[16];
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return 0;
 
 	// check for valid sizes
 	if (size == 630784 || size == 622592 || size == 256256)
 	{
 		// check for Poly CP/M boot sector
-		io_generic_read(io, boot, 0, 16);
+		uint8_t boot[16];
+		size_t actual;
+		io.read_at(0, boot, 16, actual);
 		if (memcmp(boot, "\x86\xc3\xb7\x00\x00\x8e\x10\xc0\xbf\x00\x01\xbf\xe0\x60\x00\x00", 16) == 0)
 		{
 			return 100;
 		}
 	}
+
 	return 0;
 }
 
-bool poly_cpm_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	uint64_t size;
+	if (io.length(size) || io.seek(0, SEEK_SET))
+		return false;
+
 	int total_tracks, spt, bps, head_num;
-
-	uint64_t size = io_generic_size(io);
-
 	switch (size)
 	{
 	case 622592:
@@ -83,8 +91,7 @@ bool poly_cpm_format::load(io_generic *io, uint32_t form_factor, const std::vect
 		break;
 	}
 
-	int cell_count = (form_factor == floppy_image::FF_525) ? 50000 : 100000;
-	int offset = 0;
+	int const cell_count = (form_factor == floppy_image::FF_525) ? 50000 : 100000;
 
 	for (int track = 0; track < total_tracks; track++)
 		for (int head = 0; head < head_num; head++)
@@ -105,8 +112,8 @@ bool poly_cpm_format::load(io_generic *io, uint32_t form_factor, const std::vect
 				sects[i].deleted = false;
 				sects[i].bad_crc = false;
 				sects[i].data = &sect_data[sdatapos];
-				io_generic_read(io, sects[i].data, offset, bps);
-				offset += bps;
+				size_t actual;
+				io.read(sects[i].data, bps, actual);
 				sdatapos += bps;
 			}
 			// gap sizes unverified

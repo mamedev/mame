@@ -8,14 +8,14 @@
 
  Here we emulate the following PCBs
 
+ * RCM GS2004 [mapper 283]
+ * RCM GS2013 [mapper 283 also]
  * RCM GS2015 [mapper 216]
- * RCM GS2004
- * RCM GS2013
  * RCM Tetris Family 9in1 [mapper 61]
- * RCM 3D Block
+ * RCM 3D Block [mapper 355]
 
  TODO:
- - investigate why 3D Block does not work
+ - implement PIC16C54 protection for 3D Block
 
  ***********************************************************************************************************/
 
@@ -38,9 +38,9 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_GS2015,  nes_gs2015_device,  "nes_g2015",     "NES Cart RCM GS-2015 PCB")
-DEFINE_DEVICE_TYPE(NES_GS2004,  nes_gs2004_device,  "nes_g2004",     "NES Cart RCM GS-2004 PCB")
-DEFINE_DEVICE_TYPE(NES_GS2013,  nes_gs2013_device,  "nes_g2013",     "NES Cart RCM GS-2013 PCB")
+DEFINE_DEVICE_TYPE(NES_GS2004,  nes_gs2004_device,  "nes_gs2004",    "NES Cart RCM GS-2004 PCB")
+DEFINE_DEVICE_TYPE(NES_GS2013,  nes_gs2013_device,  "nes_gs2013",    "NES Cart RCM GS-2013 PCB")
+DEFINE_DEVICE_TYPE(NES_GS2015,  nes_gs2015_device,  "nes_gs2015",    "NES Cart RCM GS-2015 PCB")
 DEFINE_DEVICE_TYPE(NES_TF9IN1,  nes_tf9_device,     "nes_tetrisfam", "NES Cart RCM Tetris Family 9 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_3DBLOCK, nes_3dblock_device, "nes_3dblock",   "NES Cart RCM 3D Block PCB")
 
@@ -50,17 +50,22 @@ nes_gs2015_device::nes_gs2015_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_gs2004_device::nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_GS2004, tag, owner, clock)
+nes_gs2004_device::nes_gs2004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int bank)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_base(bank * 0x2000)
 {
 }
 
-nes_gs2013_device::nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_GS2013, tag, owner, clock)
+nes_gs2004_device::nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_gs2004_device(mconfig, NES_GS2004, tag, owner, clock, 0x20)
 {
 }
 
-nes_tf9_device::nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_gs2013_device::nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_gs2004_device(mconfig, NES_GS2013, tag, owner, clock, 0x1f)
+{
+}
+
+nes_tf9_device::nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_TF9IN1, tag, owner, clock)
 {
 }
@@ -79,42 +84,6 @@ void nes_gs2015_device::device_start()
 }
 
 void nes_gs2015_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_gs2004_device::device_start()
-{
-	common_start();
-}
-
-void nes_gs2004_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0xff);
-	chr8(0, m_chr_source);
-}
-
-void nes_gs2013_device::device_start()
-{
-	common_start();
-}
-
-void nes_gs2013_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0xff);
-	chr8(0, m_chr_source);
-}
-
-void nes_tf9_device::device_start()
-{
-	common_start();
-}
-
-void nes_tf9_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
@@ -157,7 +126,8 @@ void nes_3dblock_device::pcb_reset()
 
  iNES: mapper 216
 
- In MESS: Supported.
+ In MAME: Partially supported. Bonza games have some
+ sort of card inputs for gambling purposes.
 
  -------------------------------------------------*/
 
@@ -177,41 +147,26 @@ uint8_t nes_gs2015_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
- Board BMC-GS2004
+ Boards BMC-GS2004, BMC-GS2013
 
- Games: Tetris Family 6-in-1
+ Games: Tetris Family 6-in-1, 5-in-1, 12-in-1
 
- In MESS: Preliminary Support. It also misses WRAM handling
- (we need reads from 0x6000-0x7fff)
+ NES 2.0: mapper 283
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_gs2004_device::write_h(offs_t offset, uint8_t data)
+u8 nes_gs2004_device::read_m(offs_t offset)
 {
-	LOG_MMC(("gs2004 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	prg32(data);
+	LOG_MMC(("gs2004 read_m, offset: %04x\n", offset));
+	return m_prg[m_base + offset];    // fixed base differs per device
 }
 
-/*-------------------------------------------------
-
- Board BMC-GS2013
-
- Games: Tetris Family 12-in-1
-
- In MESS: Preliminary Support. It also misses WRAM handling
- (we need reads from 0x6000-0x7fff)
-
- -------------------------------------------------*/
-
-void nes_gs2013_device::write_h(offs_t offset, uint8_t data)
+void nes_gs2004_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("gs2013 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if (data & 0x08)
-		prg32(data & 0x09);
-	else
-		prg32(data & 0x07);
+	LOG_MMC(("gs2004 write_h, offset: %04x, data: %02x\n", offset, data));
+	prg32(data);
 }
 
 /*-------------------------------------------------
@@ -220,35 +175,22 @@ void nes_gs2013_device::write_h(offs_t offset, uint8_t data)
 
  Games: Tetris Family 9 in 1, 20 in 1
 
- Simple Mapper: prg/chr/nt are swapped depending on the offset
- of writes in 0x8000-0xffff. offset&0x80 set NT mirroring,
- when (offset&0x30) is 0,3 prg32 is set; when it is 1,2
- two 16k prg banks are set. See below for the values used in
- these banks.
-
  iNES: mapper 61
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_tf9_device::write_h(offs_t offset, uint8_t data)
+void nes_tf9_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("tetrisfam write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x30)
-	{
-		case 0x00:
-		case 0x30:
-			prg32(offset & 0x0f);
-			break;
-		case 0x10:
-		case 0x20:
-			prg16_89ab(((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
-			prg16_cdef(((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
-			break;
-	}
-	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	u8 bank = (offset & 0x0f) << 1 | BIT(offset, 5);
+	u8 mode = !BIT(offset, 4);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
+
+	set_nt_mirroring(BIT(offset, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------
@@ -257,7 +199,7 @@ void nes_tf9_device::write_h(offs_t offset, uint8_t data)
 
  Games: 3-D Block Hwang Shinwei version
 
- iNES:
+ NES 2.0: mapper 355
 
  In MESS: Very Preliminary Support. What is the purpose
  of the writes to $4800-$4900-$4a00? These writes

@@ -157,7 +157,7 @@ image_init_result scv_cart_slot_device::call_load()
 
 		if (len > 0x20000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 			return image_init_result::FAIL;
 		}
 
