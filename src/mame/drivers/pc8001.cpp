@@ -490,15 +490,8 @@ void pc8001_state::pc8001(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181),896,0,640,260,0,200);
 	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
-	// TODO: remove me (should be derived from CRTC instead)
-	screen.set_refresh_hz(60);
-	screen.set_size(640, 220);
-	screen.set_visarea(0, 640-1, 0, 200-1);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	I8251(config, I8251_TAG, 0);
@@ -532,57 +525,22 @@ void pc8001_state::pc8001(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
 
 	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
-}
-
-// TODO: merge with above
-void pc8001mk2_state::pc8001mk2(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_mem);
-	m_maincpu->set_addrmap(AS_IO, &pc8001mk2_state::pc8001mk2_io);
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
-	screen.set_size(640, 220);
-	screen.set_visarea(0, 640-1, 0, 200-1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-	/* devices */
-	I8251(config, I8251_TAG, 0);
+void pc8001mk2_state::pc8001mk2(machine_config &config)
+{
+	pc8001(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8001mk2_state::pc8001mk2_io);
 
-	I8255A(config, I8255A_TAG, 0);
+	// TODO: video HW has extra GVRAM setup
 
-	I8257(config, m_dma, XTAL(4'000'000));
-	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
-	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
-	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
+	RAM(config.replace(), RAM_TAG).set_default_size("64K");
 
-	UPD1990A(config, m_rtc);
-
-	UPD3301(config, m_crtc, XTAL(14'318'181));
-	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels));
-	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
-	m_crtc->set_screen(SCREEN_TAG);
-
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-
-	OUTPUT_LATCH(config, m_cent_data_out);
-	m_centronics->set_output_latch(*m_cent_data_out);
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-
-	RAM(config, RAM_TAG).set_default_size("64K");
-	
-	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
 	SOFTWARE_LIST(config, "disk_n80_list").set_original("pc8001mk2_flop");
 }
 
@@ -641,7 +599,7 @@ ROM_END
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT   CLASS            INIT        COMPANY  FULLNAME       FLAGS
 // 1978?, pc8001g, Wirewrapped prototype version
-COMP( 1979, pc8001,      0,      0,      pc8001,    pc8001, pc8001_state,      empty_init, "NEC",   "PC-8001",     MACHINE_NOT_WORKING )
+COMP( 1979, pc8001,      0,      0,      pc8001,      pc8001, pc8001_state,      empty_init, "NEC",   "PC-8001",     MACHINE_NOT_WORKING )
 // 1981 pc8001a, US version of PC-8001 with Greek alphabet instead of Kana
-COMP( 1983, pc8001mk2,   pc8001, 0,      pc8001mk2, pc8001, pc8001mk2_state,   empty_init, "NEC",   "PC-8001mkII", MACHINE_NOT_WORKING )
-COMP( 1985, pc8001mk2sr, pc8001, 0,      pc8001mk2, pc8001, pc8001mk2sr_state, empty_init, "NEC",   "PC-8001mkIISR", MACHINE_NOT_WORKING )
+COMP( 1983, pc8001mk2,   pc8001, 0,      pc8001mk2,   pc8001, pc8001mk2_state,   empty_init, "NEC",   "PC-8001mkII", MACHINE_NOT_WORKING )
+COMP( 1985, pc8001mk2sr, pc8001, 0,      pc8001mk2sr, pc8001, pc8001mk2sr_state, empty_init, "NEC",   "PC-8001mkIISR", MACHINE_NOT_WORKING )
