@@ -191,40 +191,68 @@ void upd3301_device::device_clock_changed()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
+// this snipped was inside screen_update fn
+// bad idea: it causes all sort of desync glitches when emulation unthrottles
+// TODO: verify if FIFO clear-out happens on vblank-in or -out
+inline void upd3301_device::reset_fifo_vrtc()
+{
+	m_y = 0;
+	m_data_fifo_pos = 0;
+	m_attr_fifo_pos = 0;
+
+	m_cursor_frame++;
+
+	if (m_cursor_frame == m_b)
+	{
+		m_cursor_frame = 0;
+		m_cursor_blink = !m_cursor_blink;
+	}
+
+	m_attr_frame++;
+	if (m_attr_frame == (m_b << 1))
+	{
+		m_attr_frame = 0;
+		m_attr_blink = !m_attr_blink;
+	}
+}
+
 void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-	case TIMER_HRTC:
-		LOG("UPD3301 HRTC: %u\n", param);
+		case TIMER_HRTC:
+			LOG("UPD3301 HRTC: %u\n", param);
 
-		m_write_hrtc(param);
-		m_hrtc = param;
+			m_write_hrtc(param);
+			m_hrtc = param;
 
-		update_hrtc_timer(param);
-		break;
-
-	case TIMER_VRTC:
-		LOG("UPD3301 VRTC: %u\n", param);
-
-		m_write_vrtc(param);
-		m_vrtc = param;
-
-		update_vrtc_timer(param);
-		if(!(m_status & STATUS_VE))
+			update_hrtc_timer(param);
 			break;
 
-		if (param && !m_me)
-		{
-			m_status |= STATUS_E;
-			set_interrupt(1);
-		}
-		else if(!param)
-			set_drq(1);
-		break;
+		case TIMER_VRTC:
+			LOG("UPD3301 VRTC: %u\n", param);
 
-	case TIMER_DRQ:
-		break;
+			m_write_vrtc(param);
+			m_vrtc = param;
+
+			update_vrtc_timer(param);
+			if(!(m_status & STATUS_VE))
+				break;
+
+			if(!param)
+				reset_fifo_vrtc();
+
+			if (param && !m_me)
+			{
+				m_status |= STATUS_E;
+				set_interrupt(1);
+			}
+			else if(!param)
+				set_drq(1);
+			break;
+
+		case TIMER_DRQ:
+			break;
 	}
 }
 
@@ -239,13 +267,14 @@ uint8_t upd3301_device::read(offs_t offset)
 
 	switch (offset & 0x01)
 	{
-	case 0: // data
-		break;
+		case 0: // data
+			// TODO: light pen
+			break;
 
-	case 1: // status
-		data = m_status;
-		m_status &= ~(STATUS_LP | STATUS_E |STATUS_N | STATUS_U);
-		break;
+		case 1: // status
+			data = m_status;
+			m_status &= ~(STATUS_LP | STATUS_E |STATUS_N | STATUS_U);
+			break;
 	}
 
 	return data;
@@ -260,135 +289,135 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x01)
 	{
-	case 0: // data
-		switch (m_mode)
-		{
-		case MODE_RESET:
-			switch (m_param_count)
+		case 0: // data
+			switch (m_mode)
 			{
-			case 0:
-				m_dma_mode = BIT(data, 7);
-				m_h = (data & 0x7f) + 2;
-				LOG("UPD3301 DMA Mode: %s\n", m_dma_mode ? "character" : "burst");
-				LOG("UPD3301 H: %u\n", m_h);
+			case MODE_RESET:
+				switch (m_param_count)
+				{
+				case 0:
+					m_dma_mode = BIT(data, 7);
+					m_h = (data & 0x7f) + 2;
+					LOG("UPD3301 DMA Mode: %s\n", m_dma_mode ? "character" : "burst");
+					LOG("UPD3301 H: %u\n", m_h);
+					break;
+
+				case 1:
+					m_b = ((data >> 6) + 1) * 16;
+					m_l = (data & 0x3f) + 1;
+					LOG("UPD3301 B: %u\n", m_b);
+					LOG("UPD3301 L: %u\n", m_l);
+					break;
+
+				case 2:
+					m_s = BIT(data, 7);
+					m_c = (data >> 4) & 0x03;
+					m_r = (data & 0x1f) + 1;
+					LOG("UPD3301 S: %u\n", m_s);
+					LOG("UPD3301 C: %u\n", m_c);
+					LOG("UPD3301 R: %u\n", m_r);
+					break;
+
+				case 3:
+					m_v = (data >> 5) + 1;
+					m_z = (data & 0x1f) + 2;
+					LOG("UPD3301 V: %u\n", m_v);
+					LOG("UPD3301 Z: %u\n", m_z);
+					recompute_parameters();
+					break;
+
+				case 4:
+					m_at1 = BIT(data, 7);
+					m_at0 = BIT(data, 6);
+					m_sc = BIT(data, 5);
+					m_attr = (data & 0x1f) + 1;
+					LOG("UPD3301 AT1: %u\n", m_at1);
+					LOG("UPD3301 AT0: %u\n", m_at0);
+					LOG("UPD3301 SC: %u\n", m_sc);
+					LOG("UPD3301 ATTR: %u\n", m_attr);
+
+					m_mode = MODE_NONE;
+					break;
+				}
+
+				m_param_count++;
 				break;
 
-			case 1:
-				m_b = ((data >> 6) + 1) * 16;
-				m_l = (data & 0x3f) + 1;
-				LOG("UPD3301 B: %u\n", m_b);
-				LOG("UPD3301 L: %u\n", m_l);
+			case MODE_LOAD_CURSOR_POSITION:
+				switch (m_param_count)
+				{
+				case 0:
+					m_cx = data & 0x7f;
+					LOG("UPD3301 CX: %u\n", m_cx);
+					break;
+
+				case 1:
+					m_cy = data & 0x3f;
+					LOG("UPD3301 CY: %u\n", m_cy);
+
+					m_mode = MODE_NONE;
+					break;
+				}
+
+				m_param_count++;
 				break;
 
-			case 2:
-				m_s = BIT(data, 7);
-				m_c = (data >> 4) & 0x03;
-				m_r = (data & 0x1f) + 1;
-				LOG("UPD3301 S: %u\n", m_s);
-				LOG("UPD3301 C: %u\n", m_c);
-				LOG("UPD3301 R: %u\n", m_r);
+			default:
+				LOG("UPD3301 Invalid Parameter Byte %02x!\n", data);
+			}
+			break;
+
+		case 1: // command
+			m_mode = MODE_NONE;
+			m_param_count = 0;
+
+			switch (data & 0xe0)
+			{
+			case COMMAND_RESET:
+				LOG("UPD3301 Reset\n");
+				m_mode = MODE_RESET;
+				set_display(0);
+				set_interrupt(0);
 				break;
 
-			case 3:
-				m_v = (data >> 5) + 1;
-				m_z = (data & 0x1f) + 2;
-				LOG("UPD3301 V: %u\n", m_v);
-				LOG("UPD3301 Z: %u\n", m_z);
-				recompute_parameters();
+			case COMMAND_START_DISPLAY:
+				LOG("UPD3301 Start Display\n");
+				set_display(1);
+				reset_counters();
 				break;
 
-			case 4:
-				m_at1 = BIT(data, 7);
-				m_at0 = BIT(data, 6);
-				m_sc = BIT(data, 5);
-				m_attr = (data & 0x1f) + 1;
-				LOG("UPD3301 AT1: %u\n", m_at1);
-				LOG("UPD3301 AT0: %u\n", m_at0);
-				LOG("UPD3301 SC: %u\n", m_sc);
-				LOG("UPD3301 ATTR: %u\n", m_attr);
+			case COMMAND_SET_INTERRUPT_MASK:
+				LOG("UPD3301 Set Interrupt Mask\n");
+				m_me = BIT(data, 0);
+				m_mn = BIT(data, 1);
+				LOG("UPD3301 ME: %u\n", m_me);
+				LOG("UPD3301 MN: %u\n", m_mn);
+				break;
 
-				m_mode = MODE_NONE;
+			case COMMAND_READ_LIGHT_PEN:
+				LOG("UPD3301 Read Light Pen\n");
+				m_mode = MODE_READ_LIGHT_PEN;
+				break;
+
+			case COMMAND_LOAD_CURSOR_POSITION:
+				LOG("UPD3301 Load Cursor Position\n");
+				m_mode = MODE_LOAD_CURSOR_POSITION;
+				m_cm = BIT(data, 0);
+				LOG("UPD3301 CM: %u\n", m_cm);
+				break;
+
+			case COMMAND_RESET_INTERRUPT:
+				LOG("UPD3301 Reset Interrupt\n");
+				set_interrupt(0);
+				break;
+
+			case COMMAND_RESET_COUNTERS:
+				LOG("UPD3301 Reset Counters\n");
+				m_mode = MODE_RESET_COUNTERS;
+				reset_counters();
 				break;
 			}
-
-			m_param_count++;
 			break;
-
-		case MODE_LOAD_CURSOR_POSITION:
-			switch (m_param_count)
-			{
-			case 0:
-				m_cx = data & 0x7f;
-				LOG("UPD3301 CX: %u\n", m_cx);
-				break;
-
-			case 1:
-				m_cy = data & 0x3f;
-				LOG("UPD3301 CY: %u\n", m_cy);
-
-				m_mode = MODE_NONE;
-				break;
-			}
-
-			m_param_count++;
-			break;
-
-		default:
-			LOG("UPD3301 Invalid Parameter Byte %02x!\n", data);
-		}
-		break;
-
-	case 1: // command
-		m_mode = MODE_NONE;
-		m_param_count = 0;
-
-		switch (data & 0xe0)
-		{
-		case COMMAND_RESET:
-			LOG("UPD3301 Reset\n");
-			m_mode = MODE_RESET;
-			set_display(0);
-			set_interrupt(0);
-			break;
-
-		case COMMAND_START_DISPLAY:
-			LOG("UPD3301 Start Display\n");
-			set_display(1);
-			reset_counters();
-			break;
-
-		case COMMAND_SET_INTERRUPT_MASK:
-			LOG("UPD3301 Set Interrupt Mask\n");
-			m_me = BIT(data, 0);
-			m_mn = BIT(data, 1);
-			LOG("UPD3301 ME: %u\n", m_me);
-			LOG("UPD3301 MN: %u\n", m_mn);
-			break;
-
-		case COMMAND_READ_LIGHT_PEN:
-			LOG("UPD3301 Read Light Pen\n");
-			m_mode = MODE_READ_LIGHT_PEN;
-			break;
-
-		case COMMAND_LOAD_CURSOR_POSITION:
-			LOG("UPD3301 Load Cursor Position\n");
-			m_mode = MODE_LOAD_CURSOR_POSITION;
-			m_cm = BIT(data, 0);
-			LOG("UPD3301 CM: %u\n", m_cm);
-			break;
-
-		case COMMAND_RESET_INTERRUPT:
-			LOG("UPD3301 Reset Interrupt\n");
-			set_interrupt(0);
-			break;
-
-		case COMMAND_RESET_COUNTERS:
-			LOG("UPD3301 Reset Counters\n");
-			m_mode = MODE_RESET_COUNTERS;
-			reset_counters();
-			break;
-		}
-		break;
 	}
 }
 
@@ -496,33 +525,13 @@ void upd3301_device::draw_scanline()
 
 uint32_t upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_status & STATUS_VE)
-	{
-		m_y = 0;
-		m_data_fifo_pos = 0;
-		m_attr_fifo_pos = 0;
+	bitmap.fill(rgb_t(0x00,0x00,0x00), cliprect);
 
-		m_cursor_frame++;
+	if (!(m_status & STATUS_VE))
+		return 0;
 
-		if (m_cursor_frame == m_b)
-		{
-			m_cursor_frame = 0;
-			m_cursor_blink = !m_cursor_blink;
-		}
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
-		m_attr_frame++;
-
-		if (m_attr_frame == (m_b << 1))
-		{
-			m_attr_frame = 0;
-			m_attr_blink = !m_attr_blink;
-		}
-		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	}
-	else
-	{
-		bitmap.fill(rgb_t(0x00,0x00,0x00), cliprect);
-	}
 	return 0;
 }
 

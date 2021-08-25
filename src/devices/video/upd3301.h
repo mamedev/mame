@@ -100,6 +100,7 @@ private:
 	void recompute_parameters();
 
 	void draw_scanline();
+	inline void reset_fifo_vrtc();
 
 	devcb_write_line   m_write_int;
 	devcb_write_line   m_write_drq;
