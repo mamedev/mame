@@ -24,6 +24,12 @@
 	- pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
 	  (Has 3 bitplane GVRAM like PC-8801 V1 mode);
 
+    Notes:
+    - pc8001 v1.01 / v1.02 sports a buggy readout of the expansion ROM at PC=17a1:
+      It expects an header read of 0x41-0x42 at offset $6000-6001, but second read at
+      PC=0x17aa is just a comparison to $6000 == 0x42, which is impossible at that point
+      unless external aid is given. This has been fixed in v1.10;
+
 */
 
 #include "emu.h"
@@ -103,6 +109,7 @@ void pc8001mk2_state::port31_w(uint8_t data)
 	    7       background color
 
 	*/
+    membank("bank2")->set_entry(data & 1);
 }
 
 WRITE_LINE_MEMBER( pc8001_state::write_centronics_busy )
@@ -234,8 +241,8 @@ void pc8001mk2_state::pc8001mk2_mem(address_map &map)
 void pc8001mk2_state::pc8001mk2_io(address_map &map)
 {
 	pc8001_io(map);
-	map(0x30, 0x30).w(FUNC(pc8001mk2_state::port30_w));
-	map(0x31, 0x31).w(FUNC(pc8001mk2_state::port31_w));
+	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8001mk2_state::port30_w));
+	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8001mk2_state::port31_w));
 //  map(0x5c, 0x5c).w(FUNC(pc8001mk2_state::gram_on_w));
 //  map(0x5f, 0x5f).w(FUNC(pc8001mk2_state::gram_off_w));
 //  map(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
@@ -251,6 +258,40 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 //  map(0xf9, 0xf9) DMA type 5 inch margin control
 //  map(0xfa, 0xfa) DMA type 5 inch FDC status
 //  map(0xfb, 0xfb) DMA type 5 inch FDC data register
+}
+
+void pc8001mk2sr_state::port33_w(u8 data)
+{
+	// TODO: needs progressive flush
+#ifdef UNUSED_FUNCTION
+	if (data & 0x80)
+	{
+		membank("bank1")->set_entry(2);
+		membank("bank2")->set_entry(2 | (m_n80sr_bank & 1));
+	}
+	else
+	{
+		membank("bank1")->set_entry(0);
+		membank("bank2")->set_entry(0);
+	}
+#endif
+}
+
+u8 pc8001mk2sr_state::port71_r()
+{
+	return m_n80sr_bank;
+}
+
+void pc8001mk2sr_state::port71_w(u8 data)
+{
+	m_n80sr_bank = data;
+}
+
+void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
+{
+    pc8001mk2_io(map);
+    map(0x33, 0x33).w(FUNC(pc8001mk2sr_state::port33_w));
+	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
 }
 
 /* Input Ports */
@@ -356,7 +397,79 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)                          PORT_CHAR(' ')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)                            PORT_CHAR(27)
 
-	PORT_START("DSW1")
+//	PORT_START("DSW1")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8001mk2 )
+    PORT_INCLUDE( pc8001 )
+
+    PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Boot Mode" )
+	PORT_DIPSETTING(    0x00, "N-BASIC" )
+	PORT_DIPSETTING(    0x01, "N80-BASIC" )
+	PORT_DIPNAME( 0x02, 0x02, "DSW1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8001mk2sr )
+    PORT_INCLUDE( pc8001mk2 )
+
+	PORT_MODIFY("DSW1")
+	// This is really a tri-state dip on front panel
+	// BIOS just expects bit 1 to be off for SR mode
+	PORT_DIPNAME( 0x03, 0x02, "Boot Mode" )
+	PORT_DIPSETTING(    0x00, "N80SR-BASIC (duplicate)")
+	PORT_DIPSETTING(    0x01, "N80SR-BASIC" )
+	PORT_DIPSETTING(    0x02, "N-BASIC" )
+	PORT_DIPSETTING(    0x03, "N80-BASIC" )
+	PORT_DIPNAME( 0x04, 0x04, "DSW1" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /* uPD3301 Interface */
@@ -373,7 +486,7 @@ static const rgb_t PALETTE_PC8001[] =
 	rgb_t::white()
 };
 
-UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::pc8001_display_pixels )
+UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 {
 	uint8_t data = m_char_rom->base()[(cc << 3) | lc];
 
@@ -444,6 +557,7 @@ void pc8001_state::machine_start()
 	membank("bank1")->configure_entry(1, m_rom->base());
 	program.install_read_bank(0x0000, 0x5fff, membank("bank1"));
 	program.unmap_write(0x0000, 0x5fff);
+	membank("bank2")->configure_entry(1, m_rom->base() + 0x6000);
 
 	switch (m_ram->size())
 	{
@@ -467,16 +581,39 @@ void pc8001_state::machine_start()
 		program.install_readwrite_bank(0x0000, 0x5fff, membank("bank1"));
 		program.install_readwrite_bank(0x6000, 0xbfff, membank("bank2"));
 		program.install_readwrite_bank(0x8000, 0xffff, membank("bank3"));
-		membank("bank2")->set_entry(0);
+//		membank("bank2")->set_entry(0);
 		break;
 	}
-
-	membank("bank1")->set_entry(1);
-	membank("bank3")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_width80));
 	save_item(NAME(m_color));
+}
+
+void pc8001_state::machine_reset()
+{
+	membank("bank1")->set_entry(1);
+	membank("bank2")->set_entry(1);
+	membank("bank3")->set_entry(0);
+}
+
+void pc8001mk2sr_state::machine_start()
+{
+    pc8001_state::machine_start();
+
+	membank("bank1")->configure_entry(2, m_n80sr_rom->base());
+	membank("bank2")->configure_entry(2, m_n80sr_rom->base() + 0x6000);
+	membank("bank2")->configure_entry(3, m_n80sr_rom->base() + 0x8000);
+	
+	save_item(NAME(m_n80sr_bank));
+}
+
+void pc8001mk2sr_state::machine_reset()
+{
+    pc8001_state::machine_reset();
+
+	//membank("bank1")->set_entry(2);
+	//membank("bank2")->set_entry(2);
 }
 
 /* Machine Drivers */
@@ -493,7 +630,7 @@ void pc8001_state::pc8001(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(VIDEO_CLOCK,896,0,640,260,0,200);
+	screen.set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
 	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
 
 	/* devices */
@@ -510,7 +647,7 @@ void pc8001_state::pc8001(machine_config &config)
 
 	UPD3301(config, m_crtc, VIDEO_CLOCK);
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels));
+	m_crtc->set_display_callback(FUNC(pc8001_state::draw_text));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->set_screen(SCREEN_TAG);
 
@@ -531,6 +668,7 @@ void pc8001_state::pc8001(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+    // TODO: unknown clock, is it really a beeper?
 	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -550,6 +688,8 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 {
 	pc8001mk2(config);
+	m_maincpu->set_addrmap(AS_IO, &pc8001mk2sr_state::pc8001mk2sr_io);
+
 	// TODO: mods for SR mode support
 
 	SOFTWARE_LIST(config, "disk_n80sr_list").set_original("pc8001mk2sr_flop");
@@ -558,7 +698,7 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 /* ROMs */
 
 ROM_START( pc8001 )
-	ROM_REGION( 0x6000, Z80_TAG, 0 )
+	ROM_REGION( 0x8000, Z80_TAG, ROMREGION_ERASEFF )
 	// PCB pictures shows divided by 3 ROMs (and 4th socket unpopulated)
 	ROM_SYSTEM_BIOS( 0, "v101", "N-BASIC v1.01" )
 	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, BAD_DUMP CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(0) )
@@ -573,7 +713,9 @@ ROM_END
 
 ROM_START( pc8001mk2 )
 	ROM_REGION( 0x8000, Z80_TAG, 0 )
-	ROM_LOAD( "n80_2.rom", 0x00000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
+	// N-BASIC v1.3
+	// N80-BASIC v1.0
+	ROM_LOAD( "n80_2.rom", 0x0000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
 
 	ROM_REGION( 0x800, UPD3301_TAG, 0)
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
@@ -584,10 +726,13 @@ ROM_END
 
 ROM_START( pc8001mk2sr )
 	ROM_REGION( 0x8000, Z80_TAG, 0 )
-	ROM_LOAD( "n80_2sr.rom",    0x000000, 0x008000, CRC(dcb71282) SHA1(e8db5dc5eae11da14e48656d324874e59f2e3844) )
+	// N-BASIC v1.6
+	// N80-BASIC v1.2
+	ROM_LOAD( "n80_2sr.rom", 0x0000, 0x8000, CRC(dcb71282) SHA1(e8db5dc5eae11da14e48656d324874e59f2e3844) )
 
-	ROM_REGION (0x10000, "n80sr", ROMREGION_ERASEFF )
-	ROM_LOAD( "n80_3.rom",    0x000000, 0x00a000, BAD_DUMP CRC(d99ef247) SHA1(9bfa5009d703cd31caa734d932d2a847d74cbfa6) )
+	ROM_REGION (0x10000, N80SR_ROM_TAG, ROMREGION_ERASEFF )
+	// N80SR-BASIC v1.0
+	ROM_LOAD( "n80_3.rom",    0x0000, 0xa000, BAD_DUMP CRC(d99ef247) SHA1(9bfa5009d703cd31caa734d932d2a847d74cbfa6) )
 
 	ROM_REGION( 0x2000, UPD3301_TAG, 0)
 	ROM_LOAD( "font80sr.rom", 0x000000, 0x001000, CRC(784c0b17) SHA1(565dc8e5e46b1633cb434d12b4d8b3a662546b33) )
@@ -602,7 +747,7 @@ ROM_END
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT   CLASS            INIT        COMPANY  FULLNAME       FLAGS
 // 1978?, pc8001g, Wirewrapped prototype version
-COMP( 1979, pc8001,      0,      0,      pc8001,      pc8001, pc8001_state,      empty_init, "NEC",   "PC-8001",     MACHINE_NOT_WORKING )
+COMP( 1979, pc8001,      0,      0,      pc8001,      pc8001,      pc8001_state,      empty_init, "NEC",   "PC-8001",     MACHINE_NOT_WORKING )
 // 1981 pc8001a, US version of PC-8001 with Greek alphabet instead of Kana
-COMP( 1983, pc8001mk2,   pc8001, 0,      pc8001mk2,   pc8001, pc8001mk2_state,   empty_init, "NEC",   "PC-8001mkII", MACHINE_NOT_WORKING )
-COMP( 1985, pc8001mk2sr, pc8001, 0,      pc8001mk2sr, pc8001, pc8001mk2sr_state, empty_init, "NEC",   "PC-8001mkIISR", MACHINE_NOT_WORKING )
+COMP( 1983, pc8001mk2,   pc8001, 0,      pc8001mk2,   pc8001mk2,   pc8001mk2_state,   empty_init, "NEC",   "PC-8001mkII", MACHINE_NOT_WORKING )
+COMP( 1985, pc8001mk2sr, pc8001, 0,      pc8001mk2sr, pc8001mk2sr, pc8001mk2sr_state, empty_init, "NEC",   "PC-8001mkIISR", MACHINE_NOT_WORKING )

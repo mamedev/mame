@@ -19,6 +19,7 @@
 #include "video/upd3301.h"
 
 #define Z80_TAG         "z80"
+#define N80SR_ROM_TAG   "n80sr_rom"
 #define I8251_TAG       "i8251"
 #define I8255A_TAG      "i8255"
 #define I8257_TAG       "i8257"
@@ -58,6 +59,7 @@ public:
 	required_memory_region m_char_rom;
 
 	virtual void machine_start() override;
+    virtual void machine_reset() override;
 
 	void port10_w(uint8_t data);
 	void port30_w(uint8_t data);
@@ -75,7 +77,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	UPD3301_DRAW_CHARACTER_MEMBER( pc8001_display_pixels );
+	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
 	void pc8001(machine_config &config);
 	void pc8001_io(address_map &map);
 	void pc8001_mem(address_map &map);
@@ -87,6 +89,7 @@ public:
 	pc8001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8001_state(mconfig, type, tag)
 		, m_kanji_rom(*this, "kanji")
+        , m_dsw(*this, "DSW%d", 1U)
 	{ }
 
 	void pc8001mk2(machine_config &config);
@@ -96,6 +99,7 @@ protected:
 	void pc8001mk2_mem(address_map &map);
 
 	required_memory_region m_kanji_rom;
+    required_ioport_array<2> m_dsw;
 private:
 	void port31_w(uint8_t data);
 };
@@ -105,9 +109,23 @@ class pc8001mk2sr_state : public pc8001mk2_state
 public:
 	pc8001mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8001mk2_state(mconfig, type, tag)
+		, m_n80sr_rom(*this, N80SR_ROM_TAG)
 	{ }
-	
+
 	void pc8001mk2sr(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+    virtual void machine_reset() override;
+    void pc8001mk2sr_io(address_map &map);
+
+   	required_memory_region m_n80sr_rom;
+
+	void port33_w(u8 data);
+	u8 port71_r();
+	void port71_w(u8 data);
+
+	u8 m_n80sr_bank;
 };
 
 #endif
