@@ -83,7 +83,7 @@ vector_device::vector_device(const machine_config &mconfig, const char *tag, dev
 
 void vector_device::device_add_mconfig(machine_config &config)
 {
-	const char *driver_str = config.options().alt_vector_driver();
+	const char *driver_str = config.options().vector_driver();
 	ALT_VECTOR_DRIVER_INSTANTIATE(driver_str, config, m_alt_vector);
 }
 

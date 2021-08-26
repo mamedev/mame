@@ -580,7 +580,7 @@ alt_vector_device_usb_dvg::alt_vector_device_usb_dvg(const machine_config &mconf
 	m_in_vec_last_y(0),
 	m_out_vec_cnt(0),
 	m_vertical_display(0),
-	m_dual(false),
+	m_mirror(false),
 	m_json_length(0)
 {
 }
@@ -589,11 +589,12 @@ alt_vector_device_usb_dvg::alt_vector_device_usb_dvg(const machine_config &mconf
 
 void alt_vector_device_usb_dvg::device_start()
 {
-	m_dual = machine().config().options().alt_vector_dual();
+
+    m_mirror = machine().config().options().vector_screen_mirror();
 
 	int i;
 	uint64_t size = 0;
-	std::error_condition filerr = osd_file::open(machine().config().options().alt_vector_port(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, m_serial, size);
+	std::error_condition filerr = osd_file::open(machine().config().options().vector_port(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, m_serial, size);
 	if (filerr)
 	{
 		fprintf(stderr, "alt_vector_device_usb_dvg: error: osd_file::open failed.\n");
@@ -651,7 +652,7 @@ int alt_vector_device_usb_dvg::add_point(int x, int y, rgb_t color, int intensit
 		color.set_b(cscale * color.b());
 	}
 	cmd_add_vec(x, y, color, true);    
-	return m_dual ? 0 : 1;
+	return m_mirror ? 0 : 1;
 }
 
 void alt_vector_device_usb_dvg::get_dvg_info()
@@ -710,7 +711,6 @@ int alt_vector_device_usb_dvg::update(screen_device &screen, const rectangle &cl
 	x1 = (cliprect.right() - cliprect.left()) * m_xscale;
 	y1 = (cliprect.bottom() - cliprect.top()) * m_yscale;
 
-	// printf("clip: (%d,%d)-(%d,%d)\n", x0, y0, x1, y1);
 	// Make sure the clip coordinates fall within the display coordinates.
 	x0 = std::clamp(x0, 0, DVG_RES_MAX);
 	y0 = std::clamp(y0, 0, DVG_RES_MAX);	

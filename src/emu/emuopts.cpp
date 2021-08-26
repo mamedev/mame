@@ -135,12 +135,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_BEAM_DOT_SIZE,                              "1.0",       OPTION_FLOAT,      "set vector beam size for dots" },
 	{ OPTION_BEAM_INTENSITY_WEIGHT,                      "0",         OPTION_FLOAT,      "set vector beam intensity weight " },
 	{ OPTION_FLICKER,                                    "0",         OPTION_FLOAT,      "set vector flicker effect" },
-
-    // alternate vector options
-	{ nullptr,                                           nullptr,        OPTION_HEADER,  "ALTERNATE VECTOR OPTIONS" },
-	{ OPTION_ALT_VECTOR_DRIVER,                          "none",         OPTION_STRING,  "alternate vector driver (none | usb_dvg)" },
-	{ OPTION_ALT_VECTOR_PORT,                            "/dev/ttyACM0", OPTION_STRING,  "alternate vector serial port"},
-	{ OPTION_ALT_VECTOR_DUAL,                            "0",            OPTION_BOOLEAN, "allow dual display"},
+	{ OPTION_VECTOR_DRIVER,                              "screen",    OPTION_STRING,     "set vector driver (screen | usb_dvg)" },
+	{ OPTION_VECTOR_PORT,                            "/dev/ttyACM0",  OPTION_STRING,     "set vector serial port"},
+	{ OPTION_VECTOR_SCREEN_MIRROR,                        "0",        OPTION_BOOLEAN,    "enable screen mirror"},
 
 	// sound options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE SOUND OPTIONS" },

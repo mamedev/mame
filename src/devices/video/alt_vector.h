@@ -105,11 +105,11 @@ private:
 	std::unique_ptr<vector_t[]> m_out_vec_list;
 	uint32_t                    m_out_vec_cnt;
 	uint32_t                    m_vertical_display;
-	bool                        m_dual;
+	bool                        m_mirror;
 	osd_file::ptr               m_serial; 
 	int                         m_json_length;
 	std::unique_ptr<uint8_t[]>  m_json_buf;
-	std::unique_ptr<float[]>  m_gamma_table;
+	std::unique_ptr<float[]>    m_gamma_table;
 };
 
 
