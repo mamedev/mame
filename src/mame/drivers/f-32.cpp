@@ -45,6 +45,10 @@
  29: Light 4 lamp
  30: Light 5 lamp
 
+ TODO: royalpk2 is marked non-working, as the machine will soft-lock
+ when attempting to use either settings-save options in the service
+ menu.
+
 *********************************************************************/
 
 #include "emu.h"
