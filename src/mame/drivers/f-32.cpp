@@ -58,6 +58,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class fe132_state : public driver_device
 {
@@ -574,6 +575,7 @@ ROM_START( royalpk2 )
 	ROM_LOAD( "snd2",             0x000000, 0x080000, CRC(f25e3315) SHA1(ce5350ecba6769b17bb01d82b55f26ded4d51773) )
 ROM_END
 
+} // anonymous namespace
 
 GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, empty_init, ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, royalpk2, 0, royalpk2, royalpk2, royalpk2_state, empty_init, ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )
