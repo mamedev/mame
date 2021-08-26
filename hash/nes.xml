@@ -76197,8 +76197,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="kof96" />
-			<feature name="pcb" value="UNL-KOF96" />
+			<feature name="slot" value="txrom" />
 			<dataarea name="chr" size="262144">
 				<rom name="sonic 3d blast 6 [h1] [decrypted].chr" size="262144" crc="32c4a5d0" sha1="1e1f07a41283b869fc5cc198bb48256c702e561e" offset="00000" status="baddump" />
 			</dataarea>
@@ -76356,13 +76355,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="garousp1" cloneof="garousp" supported="no">
-		<description>Garou Densetsu Special (Asia, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="garousp1" cloneof="garousp">
+		<description>Garou Densetsu Special (Asia, alt)</description>
+		<year>1995</year>
+		<publisher>Kasheng</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="kof96" />
-			<feature name="pcb" value="UNL-KOF96" />
+			<feature name="slot" value="kasing" />
 			<dataarea name="chr" size="262144">
 				<rom name="garou densetsu special (unl)[a1].chr" size="262144" crc="09817b25" sha1="a07c8754b8a3017d2544527a12b6683969e2de62" offset="00000" status="baddump" />
 			</dataarea>
