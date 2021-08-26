@@ -988,7 +988,7 @@ uint8_t atari_jsa_iii_device::rdio_r()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-	// Fully populated JSA-III
+// Fully populated JSA-III
 void atari_jsa_iii_device::device_add_mconfig(machine_config &config)
 {
 	// basic machine hardware
