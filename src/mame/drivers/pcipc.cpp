@@ -538,7 +538,7 @@ void pcipc_state::pcipc(machine_config &config)
 	ide.irq_pri().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 //  MGA2064W(config, ":pci:12.0", 0);
-	VIRGEDX_PCI(config, ":pci:12.0", 0);   // use VIRGEDX_PCI for its VESA 2.0 BIOS
+	VIRGE_PCI(config, ":pci:12.0", 0);   // use VIRGEDX_PCI for its VESA 2.0 BIOS
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -547,7 +547,7 @@ void pcipc_state::pcipc(machine_config &config)
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
 	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
