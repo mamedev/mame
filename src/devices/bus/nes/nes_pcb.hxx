@@ -162,7 +162,6 @@ static const nes_pcb pcb_list[] =
 	{ "hengg_xhzs",       HENGG_XHZS },
 	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
 	{ "hes",              HES_BOARD },
-	{ "hosenkan",         HOSENKAN_BOARD },
 	{ "ks106c",           KAISER_KS106C },  // mapper 352
 	{ "ks202",            KAISER_KS202 },   // mapper 56
 	{ "ks7010",           KAISER_KS7010 },  // used in Akumajo Dracula (FDS Conversion)

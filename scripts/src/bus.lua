@@ -2812,8 +2812,6 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/henggedianzi.h",
 		MAME_DIR .. "src/devices/bus/nes/hes.cpp",
 		MAME_DIR .. "src/devices/bus/nes/hes.h",
-		MAME_DIR .. "src/devices/bus/nes/hosenkan.cpp",
-		MAME_DIR .. "src/devices/bus/nes/hosenkan.h",
 		MAME_DIR .. "src/devices/bus/nes/irem.cpp",
 		MAME_DIR .. "src/devices/bus/nes/irem.h",
 		MAME_DIR .. "src/devices/bus/nes/jaleco.cpp",

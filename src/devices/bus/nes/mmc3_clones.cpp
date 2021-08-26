@@ -124,8 +124,18 @@ nes_8237a_device::nes_8237a_device(const machine_config &mconfig, const char *ta
 {
 }
 
+nes_kasing_device::nes_kasing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc3_mode(true)
+{
+}
+
+nes_kasing_device::nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_kasing_device(mconfig, NES_KASING, tag, owner, clock)
+{
+}
+
 nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc3_mode(true), m_board(type == NES_SG_BOOG)
+	: nes_kasing_device(mconfig, type, tag, owner, clock), m_board(type == NES_SG_BOOG)
 {
 }
 
@@ -136,11 +146,6 @@ nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, const char
 
 nes_sgboog_device::nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_sglionk_device(mconfig, NES_SG_BOOG, tag, owner, clock)
-{
-}
-
-nes_kasing_device::nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_KASING, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -379,34 +384,19 @@ void nes_8237_device::pcb_reset()
 	update_banks();
 }
 
-void nes_sglionk_device::device_start()
-{
-	mmc3_start();
-	save_item(NAME(m_mmc3_mode));
-}
-
-void nes_sglionk_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_mmc3_mode = true;
-	mmc3_common_initialize(0xff, 0xff, 0);
-}
-
 void nes_kasing_device::device_start()
 {
 	mmc3_start();
-	save_item(NAME(m_reg));
+	save_item(NAME(m_mmc3_mode));
 }
 
 void nes_kasing_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
-	m_reg = 0;
+	m_mmc3_mode = true;
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
-
 
 void nes_kay_device::device_start()
 {
@@ -1064,30 +1054,28 @@ void nes_8237_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- Bootleg Board by Super Game
+ Bootleg Board by Kasing
 
- Games: The Lion King, Aladdin, Boogerman
+ Games: AV Jiu Ji Mahjong, Bao Qing Tian, Thunderbolt 2,
+ Shisen Mahjong 2, Garou Densetsu Special
 
- MMC3 clone with register and address scrambling and
- a few extra banking modes by writing 0x6000-0x7fff.
+ MMC3 clone with extra banking modes at 0x6000-0x7fff.
 
- iNES: mapper 114
+ iNES: mapper 115
 
  In MAME: Supported.
 
- TODO: pocohon and sdkong should also work on this device.
-
  -------------------------------------------------*/
 
-void nes_sglionk_device::prg_cb(int start, int bank)
+void nes_kasing_device::prg_cb(int start, int bank)
 {
 	if (m_mmc3_mode)
 		nes_txrom_device::prg_cb(start, bank);
 }
 
-void nes_sglionk_device::write_m(offs_t offset, u8 data)
+void nes_kasing_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("sglionk write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("kasing write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (BIT(offset, 0))
 	{
@@ -1109,6 +1097,23 @@ void nes_sglionk_device::write_m(offs_t offset, u8 data)
 	}
 }
 
+/*-------------------------------------------------
+
+ Bootleg Boards by Super Game and Hosenkan
+
+ Games: The Lion King, Aladdin, Boogerman, Pocohon,
+ Super Donkey Kong
+
+ MMC3 clone with register and address scrambling and
+ a few extra banking modes by writing 0x6000-0x7fff.
+ This is the same as mapper 115 with scrambling.
+
+ iNES: mapper 114 (and 182)
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
 void nes_sglionk_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("sglionk write_h, offset: %04x, data: %02x\n", offset, data));
@@ -1129,46 +1134,6 @@ void nes_sglionk_device::write_h(offs_t offset, u8 data)
 	if (addr == 0x8000)
 		data = (data & 0xc0) | reg_table[m_board][data & 0x07];
 	txrom_write(addr & 0x6001, data);
-}
-
-/*-------------------------------------------------
-
- Bootleg Board by Kasing
-
- Games: AV Jiu Ji Mahjong, Bao Qing Tian, Thunderbolt 2,
- Shisen Mahjong 2
-
- MMC3 clone
-
- iNES: mapper 115
-
- In MESS: Supported
-
- -------------------------------------------------*/
-
-void nes_kasing_device::prg_cb(int start, int bank)
-{
-	if (BIT(m_reg, 7))
-		prg32(m_reg >> 1);
-	else
-		prg8_x(start, bank);
-}
-
-void nes_kasing_device::write_m(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("kasing write_m, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x01)
-	{
-		case 0x00:
-			m_reg = data;
-			set_prg(m_prg_base, m_prg_mask);
-			break;
-		case 0x01:
-			m_chr_base = (data & 0x01) ? 0x100 : 0x000;
-			set_chr(m_chr_source, m_chr_base, m_chr_mask);
-			break;
-	}
 }
 
 /*-------------------------------------------------
