@@ -12,6 +12,39 @@
 
  driver by Pierpaolo Prazzoli
 
+ Outputs for Royal Poker 2 (royalpk2):
+  0: High button
+  1: Stop button
+  2: Double Up button
+  3: Low button *and* Bet button
+  4: Max Bet button
+  5: Change button
+  6: Gift button
+  7: Hold 1 button
+  8: Hold 2 button
+  9: Hold 3 button
+ 10: Hold 4 button
+ 11: Hold 5 button
+ 12: Hold Clear button
+ 13: Staff Call button
+ 14: Start / Deal / Draw button
+ 15: Half Double button
+ 16: 2x Double button
+ 17: Gift 1 lamp
+ 18: Gift 2 lamp
+ 19: Gift 3 lamp
+ 20: 'Medal' (coin output) lamp
+ 21: Counter 1 lamp
+ 22: Counter 2 lamp
+ 23: Counter 3 lamp
+ 24: Counter 4 lamp
+ 25: Counter 5 lamp
+ 26: Light 1 lamp
+ 27: Light 2 lamp
+ 28: Light 3 lamp
+ 29: Light 4 lamp
+ 30: Light 5 lamp
+
 *********************************************************************/
 
 #include "emu.h"
@@ -70,23 +103,7 @@ public:
 		fe132_state(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_hopper(*this, "hopper"),
-		m_lamp_high(*this, "high"),
-		m_lamp_stop(*this, "stop"),
-		m_lamp_double_up(*this, "double_up"),
-		m_lamp_low_bet(*this, "low_bet"),
-		m_lamp_max_bet(*this, "max_bet"),
-		m_lamp_change(*this, "change"),
-		m_lamp_oper_gift(*this, "oper_gift"),
-		m_lamp_hold(*this, "hold%u", 1U),
-		m_lamp_hold_clear(*this, "hold_clear"),
-		m_lamp_staff_call(*this, "staff_call"),
-		m_lamp_deal(*this, "deal"),
-		m_lamp_half_double(*this, "half_double"),
-		m_lamp_2x_double(*this, "2x_doube"),
-		m_lamp_gift(*this, "gift%u", 1U),
-		m_lamp_medal(*this, "medal"),
-		m_lamp_counter(*this, "counter%u", 1U),
-		m_lamp_light(*this, "light%u", 1U)
+		m_lamps(*this, "lamps%u", 0U)
 	{ }
 
 	void royalpk2(machine_config &config);
@@ -107,23 +124,7 @@ protected:
 
 	required_device<nvram_device> m_nvram;
 	required_device<hopper_device> m_hopper;
-	output_finder<> m_lamp_high;
-	output_finder<> m_lamp_stop;
-	output_finder<> m_lamp_double_up;
-	output_finder<> m_lamp_low_bet;
-	output_finder<> m_lamp_max_bet;
-	output_finder<> m_lamp_change;
-	output_finder<> m_lamp_oper_gift;
-	output_finder<5> m_lamp_hold;
-	output_finder<> m_lamp_hold_clear;
-	output_finder<> m_lamp_staff_call;
-	output_finder<> m_lamp_deal;
-	output_finder<> m_lamp_half_double;
-	output_finder<> m_lamp_2x_double;
-	output_finder<3> m_lamp_gift;
-	output_finder<> m_lamp_medal;
-	output_finder<5> m_lamp_counter;
-	output_finder<5> m_lamp_light;
+	output_finder<31> m_lamps;
 
 	uint16_t m_protection_index;
 	uint8_t m_protection_response_byte;
@@ -365,45 +366,10 @@ void royalpk2_state::machine_start()
 	save_item(NAME(m_protection_response_byte));
 	save_item(NAME(m_protection_response_bit));
 
-	m_lamp_high.resolve();
-	m_lamp_stop.resolve();
-	m_lamp_double_up.resolve();
-	m_lamp_low_bet.resolve();
-	m_lamp_max_bet.resolve();
-	m_lamp_change.resolve();
-	m_lamp_oper_gift.resolve();
-	m_lamp_hold.resolve();
-	m_lamp_hold_clear.resolve();
-	m_lamp_staff_call.resolve();
-	m_lamp_deal.resolve();
-	m_lamp_half_double.resolve();
-	m_lamp_2x_double.resolve();
-	m_lamp_gift.resolve();
-	m_lamp_medal.resolve();
-	m_lamp_counter.resolve();
-	m_lamp_light.resolve();
+	m_lamps.resolve();
 
-	m_lamp_high = 0;
-	m_lamp_stop = 0;
-	m_lamp_double_up = 0;
-	m_lamp_low_bet = 0;
-	m_lamp_max_bet = 0;
-	m_lamp_change = 0;
-	m_lamp_oper_gift = 0;
-	m_lamp_hold_clear = 0;
-	m_lamp_staff_call = 0;
-	m_lamp_deal = 0;
-	m_lamp_half_double = 0;
-	m_lamp_2x_double = 0;
-	for (int i = 0; i < 3; i++)
-		m_lamp_gift[i] = 0;
-	m_lamp_medal = 0;
-	for (int i = 0; i < 5; i++)
-	{
-		m_lamp_hold[i] = 0;
-		m_lamp_counter[i] = 0;
-		m_lamp_light[i] = 0;
-	}
+	for (int i = 0; i < 31; i++)
+		m_lamps[i] = 0;
 }
 
 void royalpk2_state::machine_reset()
@@ -441,43 +407,33 @@ uint32_t royalpk2_state::protection_response_r()
 template <int Bank>
 void royalpk2_state::outputs_w(uint32_t data)
 {
+	// TODO: Lamps 26 to 30 occupy multiple bits of a given output port. Find out if it's due to brightness control or something else.
+
 	switch (Bank)
 	{
 		case 0:
-			m_lamp_high = BIT(data, 8);
-			m_lamp_stop = BIT(data, 10);
-			m_lamp_double_up = BIT(data, 11);
-			m_lamp_low_bet = BIT(data, 12);
-			m_lamp_max_bet = BIT(data, 13);
-			m_lamp_change = BIT(data, 14);
-			m_lamp_oper_gift = BIT(data, 15);
+			m_lamps[0] = BIT(data, 8);
+			for (int i = 0; i < 6; i++)
+				m_lamps[1 + i] = BIT(data, 10 + i);
 			break;
 		case 1:
-			for (int i = 0; i < 5; i++)
-				m_lamp_hold[i] = BIT(data, 8 + i);
-			m_lamp_hold_clear = BIT(data, 13);
-			m_lamp_staff_call = BIT(data, 14);
-			m_lamp_deal = BIT(data, 15);
+			for (int i = 0; i < 8; i++)
+				m_lamps[7 + i] = BIT(data, 8 + i);
 			break;
 		case 2:
-			m_lamp_half_double = BIT(data, 8);
-			m_lamp_2x_double = BIT(data, 9);
-			for (int i = 0; i < 3; i++)
-				m_lamp_gift[i] = BIT(data, 10 + i);
-			m_lamp_medal = BIT(data, 13);
-			m_lamp_counter[0] = BIT(data, 14);
-			m_lamp_counter[1] = BIT(data, 15);
+			for (int i = 0; i < 8; i++)
+				m_lamps[15 + i] = BIT(data, 8 + i);
 			break;
 		case 3:
 			for (int i = 0; i < 3; i++)
-				m_lamp_gift[2 + i] = BIT(data, 8 + i);
-			m_lamp_light[0] = (data & 0x3000) ? 1 : 0;
-			m_lamp_light[1] = (data & 0xc000) ? 1 : 0;
+				m_lamps[23 + i] = BIT(data, 8 + i);
+			m_lamps[26] = (data & 0x3000) ? 1 : 0;
+			m_lamps[27] = (data & 0xc000) ? 1 : 0;
 			break;
 		case 4:
-			m_lamp_light[2] = (data & 0x0f00) ? 1 : 0;
-			m_lamp_light[3] = (data & 0x3000) ? 1 : 0;
-			m_lamp_light[4] = (data & 0xc000) ? 1 : 0;
+			m_lamps[28] = (data & 0x0f00) ? 1 : 0;
+			m_lamps[29] = (data & 0x3000) ? 1 : 0;
+			m_lamps[30] = (data & 0xc000) ? 1 : 0;
 			break;
 	}
 }
