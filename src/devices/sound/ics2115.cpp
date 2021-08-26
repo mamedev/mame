@@ -84,7 +84,8 @@ void ics2115_device::device_start()
 	for (int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
 
-	// pan law level 
+	//pan law level
+	//log2(256*128) = 15 for -3db + 1 must be confirmed by real hardware owners
 	constexpr int PAN_LEVEL = 16;
 
 	for (int i = 0; i < 256; i++)
@@ -93,15 +94,9 @@ void ics2115_device::device_start()
 		u8 mantissa = ~i & 0x0f;
 		s16 value = lut[exponent] + (mantissa << (exponent + 3));
 		m_ulaw[i] = (i & 0x80) ? -value : value;
-
-		// TODO better algo (only calculated once so it may not be truly needed)
-		// log pan lut reminder log2(256*128) = 15 for -3db + 1 = 16 must be confirmed by real hardware owners
-		int ti = i;
-		u16 val = 0;
-		while (ti >>= 1) val++; // log2(i) is val 
-		m_panlaw[i] = PAN_LEVEL - val;
+		m_panlaw[i] = PAN_LEVEL - (31 - count_leading_zeros_32(i)); //m_panlaw[i] = PAN_LEVEL - log2(i)
 	}
-	m_panlaw[0] = 0xfff; // for safety all bits to one when no pan
+	m_panlaw[0] = 0xfff; //all bits to one when no pan
 
 	save_item(NAME(m_timer[0].period));
 	save_item(NAME(m_timer[0].scale));
@@ -437,13 +432,13 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
-		#define RAMP_SHIFT 6
+		constexpr int RAMP_SHIFT = 6;
 		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
 		const u16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law 
 		const u16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
 		//check negative values so no cracks, is it a hardware feature ?
-		const u16 vleft = vlefti > 0 ? ( m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT ) : 0; 
-		const u16 vright = vrighti > 0 ? ( m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT ) : 0;
+		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0;
+		const u16 vright = vrighti > 0 ? (m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT) : 0;
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
