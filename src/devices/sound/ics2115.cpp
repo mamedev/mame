@@ -25,8 +25,7 @@
 
 //#define ICS2115_DEBUG
 //#define ICS2115_ISOLATE 6
-const static int PAN_LEVEL = 16;
-const static int RAMP_SHIFT = 6;
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthesizer")
@@ -84,6 +83,10 @@ void ics2115_device::device_start()
 	const u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
 	for (int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
+
+	// pan law level 
+	constexpr int PAN_LEVEL = 16;
+
 	for (int i = 0; i < 256; i++)
 	{
 		u8 exponent = (~i >> 4) & 0x07;
@@ -434,12 +437,13 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
+		#define RAMP_SHIFT 6
 		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
-		const u16 vlefti = volacc - m_panlaw[(255 - voice.vol.pan)]; // left index from acc - pan law 
-		const u16 vrighti = volacc - m_panlaw[(voice.vol.pan)]; // right index from acc - pan law
+		const u16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law 
+		const u16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
 		//check negative values so no cracks, is it a hardware feature ?
-		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0; 
-		const u16 vright = vrighti > 0 ? (m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT) : 0;
+		const u16 vleft = vlefti > 0 ? ( m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT ) : 0; 
+		const u16 vright = vrighti > 0 ? ( m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT ) : 0;
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
