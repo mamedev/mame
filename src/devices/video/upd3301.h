@@ -68,7 +68,7 @@ public:
 	auto int_wr_callback() { return m_write_int.bind(); }
 	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }
 	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
-	// TODO: reverse video signal write (rvv)
+	auto rvv_wr_callback() { return m_write_rvv.bind(); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -109,6 +109,7 @@ private:
 	devcb_write_line   m_write_drq;
 	devcb_write_line   m_write_hrtc;
 	devcb_write_line   m_write_vrtc;
+	devcb_write_line   m_write_rvv;
 
 	draw_character_delegate m_display_cb;
 	int m_width;

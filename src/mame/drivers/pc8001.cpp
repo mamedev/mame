@@ -40,17 +40,22 @@
 #include "screen.h"
 #include "speaker.h"
 
-static const rgb_t PALETTE_PC8001[] =
+void pc8001_state::palette_init(palette_device &palette)
 {
-	rgb_t::black(),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0x00, 0x00),
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0x00, 0xff, 0xff),
-	rgb_t(0xff, 0xff, 0x00),
-	rgb_t::white()
-};
+	crtc_reverse_w(0);
+}
+
+WRITE_LINE_MEMBER( pc8001_state::crtc_reverse_w )
+{
+	// TODO: confirm implementation
+	// TODO: what happens if RVV changes mid-frame?
+	// I suspect monitor resync more likely than rasters.
+	for (int i = 0; i < 8; i++)
+	{
+		u8 idx = state ? 7 - i : i;
+		m_palette->set_pen_color(idx, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	}
+}
 
 UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 {
@@ -134,7 +139,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 			}
 			
 			for (int di = 0; di < dot_width; di++)
-				bitmap.pix(y, res_x + di) = PALETTE_PC8001[pen ? color : 0];
+				bitmap.pix(y, res_x + di) = m_palette->pen(pen ? color : 0);
 		}
 	}
 }
@@ -288,7 +293,7 @@ void pc8001_state::port40_w(uint8_t data)
 
 /* Memory Maps */
 
-void pc8001_state::pc8001_mem(address_map &map)
+void pc8001_state::pc8001_map(address_map &map)
 {
 	map(0x0000, 0x5fff).bankrw("bank1");
 	map(0x6000, 0x7fff).bankrw("bank2");
@@ -342,7 +347,7 @@ void pc8001_state::pc8001_io(address_map &map)
 	map(0xfc, 0xff).m(m_pc80s31k, FUNC(pc80s31k_device::host_map));
 }
 
-void pc8001mk2_state::pc8001mk2_mem(address_map &map)
+void pc8001mk2_state::pc8001mk2_map(address_map &map)
 {
 	map(0x0000, 0x5fff).bankrw("bank1");
 	map(0x6000, 0x7fff).bankrw("bank2");
@@ -689,7 +694,7 @@ void pc8001_state::pc8001(machine_config &config)
 
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
 
 	PC80S31K(config, m_pc80s31k, MASTER_CLOCK);
@@ -697,10 +702,12 @@ void pc8001_state::pc8001(machine_config &config)
 	config.set_perfect_quantum("pc80s31k:fdc_cpu");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
-//	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
-	screen.set_screen_update(FUNC(pc8001_state::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
+	m_screen->set_screen_update(FUNC(pc8001_state::screen_update));
+//	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette, FUNC(pc8001_state::palette_init), 8);
 
 	/* devices */
 	I8251(config, I8251_TAG, 0);
@@ -716,7 +723,8 @@ void pc8001_state::pc8001(machine_config &config)
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(pc8001_state::draw_text));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
-	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->rvv_wr_callback().set(FUNC(pc8001_state::crtc_reverse_w));
+	m_crtc->set_screen(m_screen);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(FUNC(pc8001_state::write_centronics_ack));
@@ -742,7 +750,7 @@ void pc8001_state::pc8001(machine_config &config)
 void pc8001mk2_state::pc8001mk2(machine_config &config)
 {
 	pc8001(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001mk2_state::pc8001mk2_io);
 
 	// TODO: video HW has extra GVRAM setup

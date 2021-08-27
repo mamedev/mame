@@ -83,33 +83,34 @@ DEFINE_DEVICE_TYPE(UPD3301, upd3301_device, "upd3301", "NEC uPD3301")
 //  upd3301_device - constructor
 //-------------------------------------------------
 
-upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, UPD3301, tag, owner, clock),
-	device_video_interface(mconfig, *this),
-	m_write_int(*this),
-	m_write_drq(*this),
-	m_write_hrtc(*this),
-	m_write_vrtc(*this),
-	m_display_cb(*this),
-	m_width(0),
-	m_status(0),
-	m_param_count(0),
-	m_data_fifo_pos(0),
-	m_attr_fifo_pos(0),
-	m_input_fifo(0),
-	m_me(0),
-	m_h(80),
-	m_l(20),
-	m_r(10),
-	m_v(6),
-	m_z(32),
-	m_attr_blink(0),
-	m_attr_frame(0),
-	m_cm(0),
-	m_cx(0),
-	m_cy(0),
-	m_cursor_blink(0),
-	m_cursor_frame(0)
+upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, UPD3301, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_write_int(*this)
+	, m_write_drq(*this)
+	, m_write_hrtc(*this)
+	, m_write_vrtc(*this)
+	, m_write_rvv(*this)
+	, m_display_cb(*this)
+	, m_width(0)
+	, m_status(0)
+	, m_param_count(0)
+	, m_data_fifo_pos(0)
+	, m_attr_fifo_pos(0)
+	, m_input_fifo(0)
+	, m_me(0)
+	, m_h(80)
+	, m_l(20)
+	, m_r(10)
+	, m_v(6)
+	, m_z(32)
+	, m_attr_blink(0)
+	, m_attr_frame(0)
+	, m_cm(0)
+	, m_cx(0)
+	, m_cy(0)
+	, m_cursor_blink(0)
+	, m_cursor_frame(0)
 {
 }
 
@@ -126,6 +127,7 @@ void upd3301_device::device_start()
 	m_write_int.resolve_safe();
 	m_write_hrtc.resolve_safe();
 	m_write_vrtc.resolve_safe();
+	m_write_rvv.resolve();
 	m_display_cb.resolve();
 
 	// allocate timers
@@ -167,6 +169,7 @@ void upd3301_device::device_start()
 	save_item(NAME(m_cursor_frame));
 	save_item(NAME(m_data_fifo));
 	save_item(NAME(m_attr_fifo));
+	save_item(NAME(m_reverse_display));
 }
 
 
@@ -181,6 +184,7 @@ void upd3301_device::device_reset()
 
 	m_cm = 0;
 	m_b = 48;
+	m_reverse_display = false;
 	
 	recompute_parameters();
 }
@@ -309,6 +313,8 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					// number of characters per line -2
 					// TODO: doesn't seem to like anything beyond 80
 					m_h = (data & 0x7f) + 2;
+					if (m_h > 80)
+						popmessage("Illegal width set %d", m_h);
 					LOG("UPD3301 DMA Mode: %s\n", m_dma_mode ? "character" : "burst");
 					LOG("UPD3301 H: %u\n", m_h);
 					break;
@@ -420,13 +426,22 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				break;
 
 			case COMMAND_START_DISPLAY:
+			{
 				LOG("UPD3301 Start Display\n");
-				// TODO: enabled by misscmd on instruction screen
-				// (needs callback)
-				m_reverse_display = bool(BIT(data, 0));
+				bool new_rvv = bool(BIT(data, 0));
+				// misscmd (pc8001) enables this
+				if (m_reverse_display != new_rvv)
+				{
+					m_reverse_display = new_rvv;
+					if (!m_write_rvv.isnull())
+						m_write_rvv(m_reverse_display);
+					else if (m_reverse_display == true)
+						logerror("%s: reverse display enabled (warning)\n", machine().describe_context());
+				}
 				set_display(1);
 				reset_counters();
 				break;
+			}
 
 			case COMMAND_SET_INTERRUPT_MASK:
 				LOG("UPD3301 Set Interrupt Mask\n");
@@ -546,17 +561,21 @@ int upd3301_device::vrtc_r()
 void upd3301_device::draw_scanline()
 {
 	bool is_color_mode = !m_at1 && m_at0 && !m_sc;
+	// Olympia Boss never bothers in writing a correct attribute table for rows on resident OS,
+	// it just extends the full attribute RAM with a start: 0 end: 0xff value: 0.
+	// According to doc notes anything beyond width 80 is puked by the CRTC, therefore we clamp.
+	const u8 attr_size = 80;
 	int ex;
 
-	u16 extend_attr[80];
-	// first attribute start is always 0
+	u16 extend_attr[attr_size];
+	// first attribute start is always overwritten with a 0
 	m_attr_fifo[0][!m_input_fifo] = 0;
 
 	for (ex = 0; ex < m_attr << 1; ex+=2)
 	{
-		u8 attr_start = m_attr_fifo[ex][!m_input_fifo];
+		u8 attr_start = std::min(m_attr_fifo[ex][!m_input_fifo], attr_size);
 		u8 attr_value = m_attr_fifo[ex+1][!m_input_fifo];
-		u8 attr_end = m_attr_fifo[ex+2][!m_input_fifo];
+		u8 attr_end = std::min(m_attr_fifo[ex+2][!m_input_fifo], attr_size);
 		for (int i = attr_start; i < attr_end; i++)
 			extend_attr[i] = attr_value;
 	}

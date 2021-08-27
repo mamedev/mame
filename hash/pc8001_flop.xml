@@ -55,7 +55,8 @@ TODO:
 	</software>
 
 	<software name="2001spc">
-		<description>2001 A Space Odyssey</description>
+		<description>2001 A Space Odyssey (v1.2)</description>
+		<!-- basic list prints '81, later release? -->
 		<year>1980</year>
 		<publisher>Tecno Soft</publisher>
 		<info name="alt_title" value="2001年宇宙の旅"/>

@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
 
 #ifndef MAME_INCLUDES_PC8001_H
 #define MAME_INCLUDES_PC8001_H
 
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -18,6 +18,8 @@
 #include "machine/pc80s31k.h"
 #include "sound/beep.h"
 #include "video/upd3301.h"
+#include "emupal.h"
+#include "screen.h"
 
 #define Z80_TAG         "z80"
 #define N80SR_ROM_TAG   "n80sr_rom"
@@ -26,32 +28,49 @@
 #define UPD1990A_TAG    "upd1990a"
 #define UPD3301_TAG     "upd3301"
 #define CENTRONICS_TAG  "centronics"
-#define SCREEN_TAG      "screen"
 
 class pc8001_state : public driver_device
 {
 public:
 	pc8001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_pc80s31k(*this, "pc80s31k"),
-			m_rtc(*this, UPD1990A_TAG),
-			m_dma(*this, I8257_TAG),
-			m_crtc(*this, UPD3301_TAG),
-			m_cassette(*this, "cassette"),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_cent_data_out(*this, "cent_data_out"),
-			m_beep(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_rom(*this, Z80_TAG),
-			m_char_rom(*this, UPD3301_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_pc80s31k(*this, "pc80s31k")
+		, m_rtc(*this, UPD1990A_TAG)
+		, m_dma(*this, I8257_TAG)
+		, m_crtc(*this, UPD3301_TAG)
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_cassette(*this, "cassette")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_cent_data_out(*this, "cent_data_out")
+		, m_beep(*this, "beeper")
+		, m_ram(*this, RAM_TAG)
+		, m_rom(*this, Z80_TAG)
+		, m_char_rom(*this, UPD3301_TAG)
 	{ }
+
+	void pc8001(machine_config &config);
+
+protected:
+	void pc8001_io(address_map &map);
+	void pc8001_map(address_map &map);
+
+	virtual void machine_start() override;
+    virtual void machine_reset() override;
+	void palette_init(palette_device &palette);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void port30_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pc80s31k_device> m_pc80s31k;
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8257_device> m_dma;
 	required_device<upd3301_device> m_crtc;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
@@ -60,13 +79,8 @@ public:
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 
-	virtual void machine_start() override;
-    virtual void machine_reset() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
+private:
 	void port10_w(uint8_t data);
-	void port30_w(uint8_t data);
 	uint8_t port40_r();
 	void port40_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
@@ -81,10 +95,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(crtc_reverse_w);
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
-	void pc8001(machine_config &config);
-	void pc8001_io(address_map &map);
-	void pc8001_mem(address_map &map);
+
 };
 
 class pc8001mk2_state : public pc8001_state
@@ -100,7 +113,7 @@ public:
 
 protected:
 	void pc8001mk2_io(address_map &map);
-	void pc8001mk2_mem(address_map &map);
+	void pc8001mk2_map(address_map &map);
 
 	required_memory_region m_kanji_rom;
     required_ioport_array<2> m_dsw;
