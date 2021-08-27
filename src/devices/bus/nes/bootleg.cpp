@@ -62,6 +62,7 @@ DEFINE_DEVICE_TYPE(NES_LH10,           nes_lh10_device,      "nes_lh10",      "N
 DEFINE_DEVICE_TYPE(NES_LH28_LH54,      nes_lh28_lh54_device, "nes_lh28_lh54", "NES Cart LH28/LH54 Pirate PCBs")
 DEFINE_DEVICE_TYPE(NES_LH31,           nes_lh31_device,      "nes_lh31",      "NES Cart LH31 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH32,           nes_lh32_device,      "nes_lh32",      "NES Cart LH32 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH42,           nes_lh42_device,      "nes_lh42",      "NES Cart LH42 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH51,           nes_lh51_device,      "nes_lh51",      "NES Cart LH51 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH53,           nes_lh53_device,      "nes_lh53",      "NES Cart LH53 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_2708,           nes_2708_device,      "nes_2708",      "NES Cart BTL-2708 Pirate PCB")
@@ -174,6 +175,11 @@ nes_lh31_device::nes_lh31_device(const machine_config &mconfig, const char *tag,
 
 nes_lh32_device::nes_lh32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_LH32, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_lh42_device::nes_lh42_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_LH42, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -532,6 +538,21 @@ void nes_lh32_device::pcb_reset()
 	m_latch = 0xf;
 }
 
+void nes_lh42_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_lh42_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);    // Last 16K is fixed
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
+}
+
 void nes_lg25_device::device_start()
 {
 	common_start();
@@ -565,11 +586,6 @@ void nes_lh10_device::pcb_reset()
 
 	m_latch = 0;
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
-}
-
-void nes_lh51_device::device_start()
-{
-	common_start();
 }
 
 void nes_lh51_device::pcb_reset()
@@ -1672,6 +1688,42 @@ void nes_lh32_device::write_h(offs_t offset, uint8_t data)
 
 	if (offset >= 0x4000 && offset < 0x6000)
 		m_prgram[offset & 0x1fff] = data;
+}
+
+/*-------------------------------------------------
+
+ UNL-LH42
+
+ Games: Highway Star (Whirlwind Manu bootleg)
+
+ NES 2.0: mapper 418
+
+ In MAME: Preliminary supported.
+
+ TODO: Investigate garbage tiles on bottom half of
+ course map screens. This should be car dashboard?
+
+ -------------------------------------------------*/
+
+void nes_lh42_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("lh42 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 0))
+	{
+		switch (m_latch)
+		{
+			case 1:
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				break;
+			case 2:
+			case 3:
+				prg8_x(m_latch & 1, data & 0x0f);
+				break;
+		}
+	}
+	else
+		m_latch = data & 0x03;
 }
 
 /*-------------------------------------------------
