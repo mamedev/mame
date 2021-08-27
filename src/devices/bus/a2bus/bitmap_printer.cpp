@@ -141,6 +141,7 @@ void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_lin
 void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
 {
 	printf("write snapshot\n");
+	machine().popmessage("snapshot written to " + directory + "/" + name);
 	emu_file file(machine().options().snapshot_directory() + std::string("/") + directory,
 		  OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 

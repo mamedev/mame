@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(SESSION_TIME, session_time_device, "session_time", "Session T
 
 INPUT_PORTS_START(session_time)
 	PORT_START("CNF")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Session Time") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, session_time_device, reset_session_time, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Session Time") PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, session_time_device, reset_session_time, 0)
 INPUT_PORTS_END
 
 

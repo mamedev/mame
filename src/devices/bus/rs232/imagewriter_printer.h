@@ -25,8 +25,13 @@ public:
 
 double last_time = 0.0;
 int last_value;
-double min_time = 0.0;
+//double min_time = 0.0;
+//double min_time = 1.0 / 9601.0;  // if I make it 1.0 / 9600.0 the division tends to round down
+double min_time = 1.0 / 11202.0;  // if I make it 1.0 / 9600.0 the division tends to round down
 //  virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
+
+std::string buildstring = "";
+
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override
 	{
 		// pipe the bit state along
@@ -35,12 +40,17 @@ double min_time = 0.0;
 
 		double elapsed_time = machine().time().as_double() - last_time;
 		printf("INPUT TXD STATE = %x   %f  elapsed=%f\n", state, machine().time().as_double(), machine().time().as_double()-last_time);
-		if (elapsed_time > 0.0 && min_time == 0.0) min_time = elapsed_time;
-		if (elapsed_time > 0.0) min_time = std::min(elapsed_time, min_time);
+	//	if (elapsed_time > 0.0 && min_time == 0.0) min_time = elapsed_time;
+	//	if (elapsed_time > 0.0) min_time = std::min(elapsed_time, min_time);
 		if (min_time > 0.0)
 		{
 			int block = elapsed_time / min_time;
-			for (int i=0; i< std::min(16,block); i++) {printf("%d",last_value);}
+			printf("BLOCK = %d\n",block);
+			for (int i=0; i< std::min(16,block); i++) 
+			{
+				buildstring = std::to_string(last_value) + buildstring;
+				printf("%d",last_value);
+			}
 			printf("\n");
 		}
 		last_time = machine().time().as_double();
@@ -49,6 +59,14 @@ double min_time = 0.0;
 
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
+	INPUT_CHANGED_MEMBER(reset_sw)
+	{
+	// neither one of these can reliably reset the printer
+	//	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	//	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+		if (newval == 0) m_maincpu->reset();  // resets the printer every time
+	}
+
 	void optic_handler(uint8_t data) { //printf("HANDLE OPTIC %d\n",data);
 	}
 	void rxrdy_handler(uint8_t data) {
@@ -56,9 +74,29 @@ double min_time = 0.0;
 			m_maincpu->set_input_line(I8085_RST65_LINE, data);
 	}
 
+
+// y position adjustment to eliminate gaps from win95 driver	
+//emu.item(manager.machine.devices[":board2:comat:serport1:imagewriter"].items["0/yposratio0"]):write(0,16)
+//emu.item(manager.machine.devices[":board2:comat:serport1:imagewriter"].items["0/yposratio1"]):write(0,18)
+
+	// experiment with ct486, dtr -> dsr and cts, or just dtr -> cts both seems to work
+	
+	// I think it should be dtr -> dsr and rts -> cts, but ct486 and win95 corrupts printout
+
 	void dtr_handler(uint8_t data) {
-		//  write_dtr(data);
-		output_dsr(data);
+		if (ioport("DTR")->read() & 0x1) output_dsr(data);
+		if (ioport("DTR")->read() & 0x2) output_cts(data);
+//		output_dsr(data);
+	}
+	void rts_handler(uint8_t data) {
+		if (ioport("RTS")->read() & 0x1) output_dsr(data);
+		if (ioport("RTS")->read() & 0x2) output_cts(data);
+
+
+//		output_dsr(data);
+	}
+	void txd_handler(uint8_t data) {
+		output_rxd(data);
 	}
 
 
@@ -66,7 +104,7 @@ double min_time = 0.0;
 
 	double last_pulse = 0.0;
 	TIMER_DEVICE_CALLBACK_MEMBER (pulse_uart_clock)
-	{ m_uart_clock = !m_uart_clock; m_uart->write_txc(m_uart_clock);m_uart->write_rxc(m_uart_clock);
+	{ m_uart_clock = !m_uart_clock; m_uart->write_txc(m_uart_clock); m_uart->write_rxc(m_uart_clock);
 		[[maybe_unused]]            double now = machine().time().as_double();
 		[[maybe_unused]]    double elapsed_time = now - last_pulse;
 	//  printf("pulse uart param=%x   %f  elapsed=%.15f\n", param, now, elapsed_time);
@@ -78,6 +116,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;  // gotta be const and const!
 	virtual void rcv_complete() override;
 	int m_initial_rx_state;
@@ -98,6 +137,8 @@ private:
 	required_device<bitmap_printer_device> m_bitmap_printer;
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
+
+	required_device<timer_device> m_timer_rxclock;
 
 	required_ioport m_rs232_rxbaud;
 	required_ioport m_rs232_databits;
@@ -132,7 +173,9 @@ private:
 	int page_count = 0;
 
 	const int dpi = 144;
-	const double PAPER_WIDTH_INCHES = 8.5 + 0.5;  // extra width paper to avoid centering problems
+//	const double PAPER_WIDTH_INCHES = 8.5 + 0.5;  // extra width paper to avoid centering problems
+//	const double PAPER_WIDTH_INCHES = 15.0;  // extra width paper to avoid centering problems
+	const double PAPER_WIDTH_INCHES = 8.5;  // extra width paper to avoid centering problems
 	const double PAPER_HEIGHT_INCHES = 11.0;
 	const double MARGIN_INCHES = 0.0;
 	const int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi;  // 8.5 inches wide
@@ -157,6 +200,8 @@ private:
 	int m_ic17_flipflop = 0;
 	int m_head_to_last = 0;
 	int m_head_pb_last = 0;
+	int m_switches_pc_last = 0;
+	int m_switches_to_last = 0;
 	u16 m_dotpattern;
 
 	int m_select_status;
