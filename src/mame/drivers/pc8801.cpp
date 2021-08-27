@@ -360,6 +360,8 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 
 void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
+	// TODO: jettermi really masks the color attribute from 3301
+	// (we currently draw it in b&w, should be colorized)
 	uint32_t count = 0;
 	uint8_t color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
 	uint8_t is_cursor = 0;
@@ -1117,6 +1119,20 @@ void pc8801_state::pc8801_window_bank_inc_w(uint8_t data)
 	m_window_offset_bank&=0xff;
 }
 
+/*
+ * I/O Port $32 (R/W)
+ *
+ * x--- ---- sound irq mask (0) irq enabled (1) irq masked
+ * -x-- ---- Graphic VRAM access mode (0) independent access mode (1) ALU mode
+ * --x- ---- analog (1) / digital (0) palette select
+ * ---x ---- high speed RAM select (for TVRAM) (1) main RAM bank (0) dedicated Text RAM
+ * ---- xx-- Screen output mode
+ * ---- 00-- TV / video mode
+ * ---- 01-- None (as in disabling the screen entirely?)
+ * ---- 10-- Analog RGB mode
+ * ---- 11-- Optional mode
+ * ---- --xx internal EROM selection
+ */
 uint8_t pc8801_state::pc8801_misc_ctrl_r()
 {
 	return m_misc_ctrl;
@@ -1124,11 +1140,6 @@ uint8_t pc8801_state::pc8801_misc_ctrl_r()
 
 void pc8801_state::pc8801_misc_ctrl_w(uint8_t data)
 {
-	/*
-	x--- ---- sound irq mask, active low
-	--x- ---- analog (1) / digital (0) palette select
-	*/
-
 	m_misc_ctrl = data;
 
 	#if USE_PROPER_I8214
@@ -1182,6 +1193,7 @@ void pc8801_state::pc8801_palram_w(offs_t offset, uint8_t data)
 	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
 	// Preserve content? Translation? Undefined?
 	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
+	// TODO: at least analog mode can do rasters
 }
 
 void pc8801_state::pc8801_layer_masking_w(uint8_t data)

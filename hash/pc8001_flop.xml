@@ -105,7 +105,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="300m.d88" size="348848" crc="b435686a" sha1="d0cd5f3df1078a9cfb1ecc158c6608bdffb57e91"/>
+				<rom name="300m [alt].d88" size="348848" crc="b435686a" sha1="d0cd5f3df1078a9cfb1ecc158c6608bdffb57e91"/>
 			</dataarea>
 		</part>
 	</software>
@@ -375,7 +375,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
-				<rom name="combat.d88" size="31424" crc="e3ead92d" sha1="db62e573c17bc4bc4e5c8fd8f903a7074fcee38b"/>
+				<rom name="combat [alt].d88" size="31424" crc="e3ead92d" sha1="db62e573c17bc4bc4e5c8fd8f903a7074fcee38b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -865,7 +865,7 @@ TODO:
 	</software>
 
 	<software name="gekisenmb" cloneof="gekisenm">
-		<description>Gekisen! Minami Taiheiyou (Alt 2)</description>
+		<description>Gekisen! Minami Taihei-yo (Alt 2)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="alt_title" value="激戦!南太平洋"/>
@@ -960,7 +960,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="hashiresc" cloneof="hashires">
+	<software name="hashiresb" cloneof="hashires">
 		<description>Hashire! Skyline (Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -971,7 +971,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="hashiresd" cloneof="hashires">
+	<software name="hashiresc" cloneof="hashires">
 		<description>Hashire! Skyline (Alt 3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1517,7 +1517,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
-				<rom name="river rescue.d88" size="31424" crc="5cd28dff" sha1="1cd582ed0b333880f42b7c5864df164d4051d1e6"/>
+				<rom name="river rescue [alt].d88" size="31424" crc="5cd28dff" sha1="1cd582ed0b333880f42b7c5864df164d4051d1e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1539,7 +1539,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="scramble.d88" size="348848" crc="ccc60815" sha1="dc6823e6d6cde73c171e8858c18e079f9cf91d65"/>
+				<rom name="scramble [alt].d88" size="348848" crc="ccc60815" sha1="dc6823e6d6cde73c171e8858c18e079f9cf91d65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1770,7 +1770,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="super balloon.d88" size="348848" crc="8f9631bf" sha1="f37d6f9e9da233024d663ddea3d4beb43452d8c4"/>
+				<rom name="super balloon [alt].d88" size="348848" crc="8f9631bf" sha1="f37d6f9e9da233024d663ddea3d4beb43452d8c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1840,7 +1840,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
-				<rom name="tengoku to jigoku.d88" size="31424" crc="764bbcbb" sha1="0781eb93a468c9a1262c5dc0f792824e9cc05023"/>
+				<rom name="tengoku to jigoku [alt].d88" size="31424" crc="764bbcbb" sha1="0781eb93a468c9a1262c5dc0f792824e9cc05023"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2215,7 +2215,7 @@ TODO:
 		<info name="alt_title" value="ザクサス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="40128">
-				<rom name="zaxus.d88" size="40128" crc="e4c70eaa" sha1="9889a3ec48e2722446e3a59bafa1ffe547ebff92"/>
+				<rom name="zaxus [alt].d88" size="40128" crc="e4c70eaa" sha1="9889a3ec48e2722446e3a59bafa1ffe547ebff92"/>
 			</dataarea>
 		</part>
 	</software>
