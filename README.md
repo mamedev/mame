@@ -1,3 +1,4 @@
+[![pipeline status](https://git.libretro.com/libretro/mame/badges/master/pipeline.svg)](https://git.libretro.com/libretro/mame/-/commits/master)
 # **Libretro notice** #
 
 Before sending bug reports to the upstream bug tracker, make sure the bugs are reproducible in the latest standalone release.
