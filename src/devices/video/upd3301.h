@@ -40,7 +40,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
+//#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
+#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int csr, bool attr_blink_on, u16 attr, bool is_color_mode, bool is_lowestline)
 
 
 //**************************************************************************
@@ -54,7 +55,8 @@ class upd3301_device :  public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> draw_character_delegate;
+//	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> draw_character_delegate;
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int csr, bool attr_blink_on, u16 attr, bool is_color_mode, bool is_lowerline)> draw_character_delegate;
 
 	// construction/destruction
 	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -66,6 +68,7 @@ public:
 	auto int_wr_callback() { return m_write_int.bind(); }
 	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }
 	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
+	// TODO: reverse video signal write (rvv)
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -157,6 +160,9 @@ private:
 	int m_cy;                       // cursor row
 	int m_cursor_blink;             // cursor blink
 	int m_cursor_frame;             // cursor blink frame counter
+
+	// misc
+	bool m_reverse_display;
 
 	// timers
 	emu_timer *m_hrtc_timer;

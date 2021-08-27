@@ -1247,7 +1247,7 @@ TODO:
 	</software>
 
 	<software name="newrally">
-		<description>New Rally-X</description>
+		<description>New Rally-X (Komaj)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1259,8 +1259,8 @@ TODO:
 
 	<software name="ninjayas">
 		<description>Ninja Yashiki</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="ninja yashiki.d88" size="31424" crc="86c1b86d" sha1="285b1695a1aecb46ad4bdb361bf7379012e54a47"/>

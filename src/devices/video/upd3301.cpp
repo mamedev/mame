@@ -10,12 +10,18 @@
 
     TODO:
 
-    - attributes
-    - N interrupt
+    - pinpoint how much of pc8001/pc8801 drawing functions should actually be inherited
+   	  here;
+    - N interrupt (special control character)
     - light pen
     - reset counters
     - proper DMA timing (now the whole screen is transferred at the end of the frame,
         accurate timing requires CCLK timer which kills performance)
+	- DMA burst mode;
+	- sorcerml (pc8801) has buggy DMA burst mode, causing an underrun (hence a status U interrupt);
+	- jettermi (pc8801) expects to colorize its underlying 400 b&w mode by masking with the
+	  text color attributes here;
+	- xak2 (pc8801) throws text garbage on legacy renderer (verify);
 
 */
 
@@ -173,6 +179,9 @@ void upd3301_device::device_reset()
 	set_interrupt(0);
 	set_drq(0);
 
+	m_cm = 0;
+	m_b = 48;
+	
 	recompute_parameters();
 }
 
@@ -297,21 +306,38 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				{
 				case 0:
 					m_dma_mode = BIT(data, 7);
+					// number of characters per line -2
+					// TODO: doesn't seem to like anything beyond 80
 					m_h = (data & 0x7f) + 2;
 					LOG("UPD3301 DMA Mode: %s\n", m_dma_mode ? "character" : "burst");
 					LOG("UPD3301 H: %u\n", m_h);
 					break;
 
 				case 1:
+					// cursor/attribute blink rate
 					m_b = ((data >> 6) + 1) * 16;
+					// number of lines displayed -1
+					// (or in other words, tilemap y size)
 					m_l = (data & 0x3f) + 1;
 					LOG("UPD3301 B: %u\n", m_b);
 					LOG("UPD3301 L: %u\n", m_l);
 					break;
 
 				case 2:
+					// skip line (pseudo-interlace?)
 					m_s = BIT(data, 7);
-					m_c = (data >> 4) & 0x03;
+					if (m_s)
+						popmessage("skip line enable");
+					// cursor mode
+					// (00) not blinking underline cursor
+					// (01) blinking underline cursor
+					// (10) not blinking solid cursor
+					// (11) blinking solid cursor
+					// NB: there must be at least 14 lines per char to make underline valid
+					m_c = (data >> 5) & 0x03;
+					if (m_c != 3)
+						popmessage("cursor mode %02x", m_c);
+					// Number of lines per character -1
 					m_r = (data & 0x1f) + 1;
 					LOG("UPD3301 S: %u\n", m_s);
 					LOG("UPD3301 C: %u\n", m_c);
@@ -319,7 +345,9 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					break;
 
 				case 3:
+					// vblank lines -1 (1 to 8)
 					m_v = (data >> 5) + 1;
+					// hblank width -2 (6 to 33)
 					m_z = (data & 0x1f) + 2;
 					LOG("UPD3301 V: %u\n", m_v);
 					LOG("UPD3301 Z: %u\n", m_z);
@@ -327,10 +355,20 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					break;
 
 				case 4:
+					// (00|0) transparent b&w with special control character
+					// (00|1) no attributes, no special control
+					// (01|0) transparent color
+					// (10|0) non-transparent b&w, special control
+					// (10|1) non-transparent b&w, no special control
+					// any other setting are invalid
 					m_at1 = BIT(data, 7);
 					m_at0 = BIT(data, 6);
 					m_sc = BIT(data, 5);
-					m_attr = (data & 0x1f) + 1;
+					if (m_at1 || m_sc)
+						popmessage("attr mode %01x%01x", m_at1, m_sc);
+					// Max number of attributes per line -1
+					// can't be higher than 20
+					m_attr = std::min((data & 0x1f) + 1, 20);
 					LOG("UPD3301 AT1: %u\n", m_at1);
 					LOG("UPD3301 AT0: %u\n", m_at0);
 					LOG("UPD3301 SC: %u\n", m_sc);
@@ -376,32 +414,42 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 			case COMMAND_RESET:
 				LOG("UPD3301 Reset\n");
 				m_mode = MODE_RESET;
+				// TODO: this also disables external display such as Graphic VRAM in PC-8801
 				set_display(0);
 				set_interrupt(0);
 				break;
 
 			case COMMAND_START_DISPLAY:
 				LOG("UPD3301 Start Display\n");
+				// TODO: enabled by misscmd on instruction screen
+				// (needs callback)
+				m_reverse_display = bool(BIT(data, 0));
 				set_display(1);
 				reset_counters();
 				break;
 
 			case COMMAND_SET_INTERRUPT_MASK:
 				LOG("UPD3301 Set Interrupt Mask\n");
+				// vblank irq mask
 				m_me = BIT(data, 0);
+				// special control character irq mask
 				m_mn = BIT(data, 1);
+				// TODO: writing a negated bit 0 makes status bit 7 to be held high?
 				LOG("UPD3301 ME: %u\n", m_me);
 				LOG("UPD3301 MN: %u\n", m_mn);
 				break;
 
 			case COMMAND_READ_LIGHT_PEN:
 				LOG("UPD3301 Read Light Pen\n");
+				// TODO: similar to cursor parameters except on read
+				// (plus an HR to bit 7 param [0])
 				m_mode = MODE_READ_LIGHT_PEN;
 				break;
 
 			case COMMAND_LOAD_CURSOR_POSITION:
 				LOG("UPD3301 Load Cursor Position\n");
 				m_mode = MODE_LOAD_CURSOR_POSITION;
+				// (1) show cursor (0) disable cursor
 				m_cm = BIT(data, 0);
 				LOG("UPD3301 CM: %u\n", m_cm);
 				break;
@@ -497,21 +545,64 @@ int upd3301_device::vrtc_r()
 
 void upd3301_device::draw_scanline()
 {
+	bool is_color_mode = !m_at1 && m_at0 && !m_sc;
+	int ex;
+
+	u16 extend_attr[80];
+	// first attribute start is always 0
+	m_attr_fifo[0][!m_input_fifo] = 0;
+
+	for (ex = 0; ex < m_attr << 1; ex+=2)
+	{
+		u8 attr_start = m_attr_fifo[ex][!m_input_fifo];
+		u8 attr_value = m_attr_fifo[ex+1][!m_input_fifo];
+		u8 attr_end = m_attr_fifo[ex+2][!m_input_fifo];
+		for (int i = attr_start; i < attr_end; i++)
+			extend_attr[i] = attr_value;
+	}
+	
+	// further extend the attributes if we are in color mode
+	// TODO: is this a PC-8001 specification or uPD3301?
+	if (is_color_mode)
+	{
+		// TODO: defaults
+		u8 attr_color = 0;
+		u8 attr_decoration = 0;
+		for (int ex = 0; ex < m_h; ex++)
+		{
+			u16 cur_attr = extend_attr[ex];
+			if (cur_attr & 8)
+				attr_color = cur_attr;
+			else
+				attr_decoration = cur_attr;
+			extend_attr[ex] = (attr_color << 8) | attr_decoration;
+		}
+	}
+
+//	popmessage("%01x%01x|%01x %d", m_at1, m_at0, m_sc, m_h);
+
 	for (int lc = 0; lc < m_r; lc++)
 	{
+		bool is_lowestline = lc == m_r - 1;
 		for (int sx = 0; sx < m_h; sx++)
 		{
 			int y = m_y + lc;
 			uint8_t cc = m_data_fifo[sx][!m_input_fifo];
-			int hlgt = 0; // TODO
-			int rvv = 0; // TODO
-			int vsp = 0; // TODO
-			int sl0 = 0; // TODO
-			int sl12 = 0; // TODO
 			int csr = m_cm && m_cursor_blink && ((y / m_r) == m_cy) && (sx == m_cx);
-			int gpa = 0; // TODO
 
-			m_display_cb(m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
+			// datasheet mentions these but I find zero unambiguous information for PC-8001/PC-8801, i.e.:
+			// - is "highlight" for a 16 color system? 
+			// - is "gpa" actually NEC name for attr bus?
+			// - is sl0 / sl12 NEC names for upper/lower line?
+//			int hlgt = 0;
+//			int rvv = 0;
+//			int vsp = 0;
+//			int sl0 = 0;
+//			int sl12 = 0;
+//			int gpa = 0;
+			
+//			m_display_cb(m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
+			m_display_cb(m_bitmap, y, sx, cc, lc, csr, m_attr_blink, extend_attr[sx], is_color_mode, is_lowestline);
 		}
 	}
 

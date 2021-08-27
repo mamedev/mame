@@ -12,15 +12,14 @@
 
     TODO:
 
-    - uPD3301 attributes
-    - PCG1000
-    - Intel 8251
-    - cassette
-    - floppy (it never r/w from the PC80S31K comms?)
+    - uPD3301 attributes;
+    - PCG-1000;
+    - Intel 8251;
+    - cassette;
 	- dip-switches;
-    - PC-8011
-    - PC-8021
-    - PC-8031
+    - PC-8011 (expansion unit)
+    - PC-8021;
+    - PC-8031 (mini disk unit, in progress)
 	- pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
 	  (Has 3 bitplane GVRAM like PC-8801 V1 mode);
 
@@ -29,6 +28,10 @@
       It expects an header read of 0x41-0x42 at offset $6000-6001, but second read at
       PC=0x17aa is just a comparison to $6000 == 0x42, which is impossible at that point
       unless external aid is given. This has been fixed in v1.10;
+	- Color Magical (pc8001gp:flop5 option 7) transfers two 8 color screens at
+	  even/odd frame intervals, effectively boosting the number of available colors to 27.
+	  This trick is kinda flickery even on real HW, no wonder it looks ugly in MAME, 
+	  can it be improved?
 
 */
 
@@ -36,6 +39,114 @@
 #include "includes/pc8001.h"
 #include "screen.h"
 #include "speaker.h"
+
+static const rgb_t PALETTE_PC8001[] =
+{
+	rgb_t::black(),
+	rgb_t(0x00, 0x00, 0xff),
+	rgb_t(0xff, 0x00, 0x00),
+	rgb_t(0xff, 0x00, 0xff),
+	rgb_t(0x00, 0xff, 0x00),
+	rgb_t(0x00, 0xff, 0xff),
+	rgb_t(0xff, 0xff, 0x00),
+	rgb_t::white()
+};
+
+UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
+{
+	// punt if we are in width 40 (discarded on this end)
+	if (sx % 2 && !m_width80)
+		return;
+
+	u8 tile;
+	const u8 tile_width = m_width80 ? 8 : 16;
+	const u8 dot_width = (m_width80 ^ 1) + 1;
+
+	bool gfx_mode, reverse, attr_blink, secret;
+	bool upperline, lowerline;
+	u8 color;
+
+	if (is_color_mode)
+	{
+		color = (attr & 0xe000) >> 13;
+		gfx_mode = bool(BIT(attr, 12));
+		// bit 7 is used by 2001spc and many others, no effect?
+	}
+	else
+	{
+		color = 7;
+		gfx_mode = bool(BIT(attr, 7));
+	}
+
+	lowerline = bool(BIT(attr, 5));
+	upperline = bool(BIT(attr, 4));
+	reverse = bool(BIT(attr, 2));
+	attr_blink = bool(BIT(attr, 1));
+	secret = bool(BIT(attr, 0));
+
+	if (gfx_mode)
+		tile = cc;
+	else
+	{
+		if (lc > 7)
+			tile = 0;
+		else
+			tile = m_char_rom->base()[(cc << 3) | lc];
+	}
+
+	// secret paints black all chars, 
+	if (secret)
+		tile = 0;
+
+	if (csr)
+		tile ^= 0xff;
+	else if (attr_blink_on && attr_blink)
+		tile = 0;
+
+	// upper/lower line aren't affected by secret and blinking, only reverse
+	// TODO: should downshift chars by one
+	if (lc == 0 && upperline)
+		tile = 0xff;
+
+	if (is_lowestline && lowerline)
+		tile = 0xff;
+
+	if (reverse)
+		tile ^= 0xff;
+
+//	if (m_width80)
+	{
+		u8 pen;
+
+		for (int xi = 0; xi < tile_width; xi += dot_width)
+		{
+			int res_x = (sx * 8) + xi;
+			if (gfx_mode)
+			{
+				u8 mask = xi & 4 ? 0x10 : 0x01;
+				mask <<= (lc & 0x6) >> 1;
+				pen = tile & mask;
+			}
+			else
+			{
+				pen = tile;
+				pen = (pen >> (7 - (xi >> (dot_width - 1)))) & 1;
+			}
+			
+			for (int di = 0; di < dot_width; di++)
+				bitmap.pix(y, res_x + di) = PALETTE_PC8001[pen ? color : 0];
+		}
+	}
+}
+
+uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	// TODO: superimposing
+	// TODO: merging with previous frame for Color Magical (is it driver area?)
+	m_crtc->screen_update(screen, bitmap, cliprect);
+	return 0;
+}
 
 /* Read/Write Handlers */
 
@@ -473,54 +584,6 @@ static INPUT_PORTS_START( pc8001mk2sr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* uPD3301 Interface */
-
-static const rgb_t PALETTE_PC8001[] =
-{
-	rgb_t::black(),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0x00, 0x00),
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0x00, 0xff, 0xff),
-	rgb_t(0xff, 0xff, 0x00),
-	rgb_t::white()
-};
-
-UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
-{
-	uint8_t data = m_char_rom->base()[(cc << 3) | lc];
-
-	if (lc >= 8) return;
-	if (csr) data = 0xff;
-
-	if (m_width80)
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			int color = BIT(data, 7) ^ rvv;
-
-			bitmap.pix(y, (sx * 8) + i) = PALETTE_PC8001[color ? 7 : 0];
-
-			data <<= 1;
-		}
-	}
-	else
-	{
-		if (sx % 2) return;
-
-		for (int i = 0; i < 8; i++)
-		{
-			int color = BIT(data, 7) ^ rvv;
-
-			bitmap.pix(y, (sx/2 * 16) + (i * 2)) = PALETTE_PC8001[color ? 7 : 0];
-			bitmap.pix(y, (sx/2 * 16) + (i * 2) + 1) = PALETTE_PC8001[color ? 7 : 0];
-
-			data <<= 1;
-		}
-	}
-}
-
 /* 8257 Interface */
 
 WRITE_LINE_MEMBER( pc8001_state::hrq_w )
@@ -636,7 +699,8 @@ void pc8001_state::pc8001(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
-	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+//	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+	screen.set_screen_update(FUNC(pc8001_state::screen_update));
 
 	/* devices */
 	I8251(config, I8251_TAG, 0);

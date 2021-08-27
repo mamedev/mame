@@ -63,6 +63,8 @@ public:
 	virtual void machine_start() override;
     virtual void machine_reset() override;
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void port10_w(uint8_t data);
 	void port30_w(uint8_t data);
 	uint8_t port40_r();
