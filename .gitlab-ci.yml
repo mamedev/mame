@@ -87,6 +87,8 @@ libretro-build-windows-x64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-windows-x64"
+  only:
+    - master
 
 # Windows 32-bit
 libretro-build-windows-i686:
@@ -96,6 +98,8 @@ libretro-build-windows-i686:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-windows-i686"
+  only:
+    - master
 
 # Linux 64-bit
 libretro-build-linux-x64:
@@ -105,6 +109,8 @@ libretro-build-linux-x64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-linux-x64"
+  only:
+    - master
 
 # Linux 32-bit
 libretro-build-linux-i686:
@@ -114,6 +120,8 @@ libretro-build-linux-i686:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-linux-i686"
+  only:
+    - master
     
 # MacOS 64-bit
 libretro-build-osx-x64:
@@ -125,6 +133,8 @@ libretro-build-osx-x64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-osx-x64"
+  only:
+    - master
 
 ################################### CELLULAR #################################
 # Android ARMv7a
@@ -139,6 +149,8 @@ android-armeabi-v7a:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-android-armeabi-v7a"
+  only:
+    - master
 
 # Android ARMv8a
 android-arm64-v8a:
@@ -152,6 +164,8 @@ android-arm64-v8a:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-android-arm64-v8a"
+  only:
+    - master
 
 # Android 64-bit x86
 android-x86_64:
@@ -165,6 +179,8 @@ android-x86_64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-android-x86_64"
+  only:
+    - master
     
 # # Android 32-bit x86
 # android-x86:
@@ -182,6 +198,8 @@ libretro-build-ios-arm64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-ios-arm64"
+  only:
+    - master
 
 # tvOS
 libretro-build-tvos-arm64:
@@ -193,6 +211,8 @@ libretro-build-tvos-arm64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-tvos-arm64"
+  only:
+    - master
     
 ################################### CONSOLES #################################
 # # Nintendo 3DS
