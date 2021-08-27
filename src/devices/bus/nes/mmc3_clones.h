@@ -138,29 +138,46 @@ public:
 };
 
 
-// ======================> nes_sglionk_device
+// ======================> nes_kasing_device
 
-class nes_sglionk_device : public nes_txrom_device
+class nes_kasing_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void write_m(offs_t offset, u8 data) override;
-	virtual void write_h(offs_t offset, u8 data) override;
 	virtual void prg_cb(int start, int bank) override;
 
 	virtual void pcb_reset() override;
 
 protected:
 	// construction/destruction
-	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_kasing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
 	bool m_mmc3_mode;
+};
+
+
+// ======================> nes_sglionk_device
+
+class nes_sglionk_device : public nes_kasing_device
+{
+public:
+	// construction/destruction
+	nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+protected:
+	// construction/destruction
+	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+private:
 	int m_board;
 };
 
@@ -172,28 +189,6 @@ class nes_sgboog_device : public nes_sglionk_device
 public:
 	// construction/destruction
 	nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-
-// ======================> nes_kasing_device
-
-class nes_kasing_device : public nes_txrom_device
-{
-public:
-	// construction/destruction
-	nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	virtual void prg_cb(int start, int bank) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-private:
-	uint8_t m_reg;
 };
 
 

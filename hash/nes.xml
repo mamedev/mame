@@ -63970,10 +63970,10 @@ We don't include these hacks because they were not burned into real carts nor so
 
 	<software name="pocohon">
 		<description>Pocohontos (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Hosenkan</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="hosenkan" />
+			<feature name="slot" value="sg_lionk" />
 			<feature name="pcb" value="UNL-HOSENKAN" />
 			<dataarea name="chr" size="262144">
 				<rom name="pocohontos (199x)(-)(as)[p].chr" size="262144" crc="f995a526" sha1="3829b9da7a1a55e4b8d3f89e91d535ffa6004224" offset="00000" status="baddump" />
@@ -66665,10 +66665,10 @@ All musics were removed in this game.
 
 	<software name="sdkong">
 		<description>Super Donkey Kong (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997?</year>
+		<publisher>Hosenkan</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="hosenkan" />
+			<feature name="slot" value="sg_lionk" />
 			<feature name="pcb" value="UNL-HOSENKAN" />
 			<dataarea name="chr" size="131072">
 				<rom name="super donkey kong (unl).chr" size="131072" crc="d0883ac5" sha1="63a66b7f17e8520cb88916893c0a4200caa06365" offset="00000" status="baddump" />

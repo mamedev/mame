@@ -215,7 +215,7 @@ static const nes_mmc mmc_list[] =
 	{ 179, HENGG_XHZS },
 	{ 180, UXROM_CC },
 	// 181 Unused
-	{ 182, HOSENKAN_BOARD },
+	{ 182, SUPERGAME_LIONKING },    // duplicate of mapper 114
 	{ 183, BTL_SHUIGUAN },
 	{ 184, SUNSOFT_1 },
 	{ 185, STD_CNROM },
