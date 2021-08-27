@@ -533,8 +533,6 @@ void gts1_state::gts1_display_w(offs_t offset, u8 data) // WORKS
 		 * segments b and c to display the 7-seg "1". */
 		if (a & _h)
 			a = _b | _c;
-		if (b & _h)
-			b = _b | _c;
 
 		m_digit7[offset] = a;
 	}
