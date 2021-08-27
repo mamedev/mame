@@ -387,7 +387,7 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 								   m_index,
 								   size * unit_size / 4,
 								   data,
-								   m_space.addr_width() / 4,
+								   (m_space.addr_width() + 3) / 4,
 								   address);
 
 		const device_state_interface *state;
