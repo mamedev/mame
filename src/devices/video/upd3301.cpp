@@ -596,12 +596,18 @@ void upd3301_device::draw_scanline()
 	if (is_color_mode)
 	{
 		// TODO: defaults
-		u8 attr_color = 0;
-		u8 attr_decoration = 0;
+		// flgworld (pc8001) gameplay sets up:
+		// - 0x00 0x00 0x02 0x88 on playfield
+		// \- (wanting the default from the first defined color)
+		// - 0x00 0x00 0x00 0x48 0x12 0x88 for first row
+		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green wtf)
+		u8 attr_color = 0xe8;
+		u8 attr_decoration = 0x00;
+
 		for (int ex = 0; ex < m_h; ex++)
 		{
 			u16 cur_attr = extend_attr[ex];
-			if (cur_attr & 8)
+			if (BIT(cur_attr, 3))
 				attr_color = cur_attr;
 			else
 				attr_decoration = cur_attr;

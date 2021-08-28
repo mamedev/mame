@@ -44,19 +44,19 @@
 
 void pc8001_state::palette_init(palette_device &palette)
 {
-	crtc_reverse_w(0);
+	for (int i = 0; i < 8; i++)
+	{
+		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	}
 }
 
 WRITE_LINE_MEMBER( pc8001_state::crtc_reverse_w )
 {
-	// TODO: confirm implementation
+	// rvv acts as a global flip for reverse attribute meaning
+	// (does not act on underlying palette)
 	// TODO: what happens if RVV changes mid-frame?
 	// I suspect monitor resync more likely than rasters.
-	for (int i = 0; i < 8; i++)
-	{
-		u8 idx = state ? 7 - i : i;
-		m_palette->set_pen_color(idx, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	}
+	m_screen_reverse = state;
 }
 
 UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
@@ -118,7 +118,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 	if (is_lowestline && lowerline)
 		tile = 0xff;
 
-	if (reverse)
+	if (reverse ^ m_screen_reverse)
 		tile ^= 0xff;
 
 //	if (m_width80)
@@ -660,6 +660,7 @@ void pc8001_state::machine_start()
 	/* register for state saving */
 	save_item(NAME(m_width80));
 	save_item(NAME(m_color));
+	save_item(NAME(m_screen_reverse));
 }
 
 void pc8001_state::machine_reset()

@@ -97,7 +97,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(crtc_reverse_w);
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
-
+	bool m_screen_reverse;
 };
 
 class pc8001mk2_state : public pc8001_state
