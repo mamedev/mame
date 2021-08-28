@@ -56796,19 +56796,18 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 
-<!-- Shenzen Jincota -->
+<!-- Shenzhen Jncota -->
 <!-- Some of these partially work with mapper 4, 74, 227 or 240, but we need to figure out the proper behavior! -->
 
-<!-- any relation with jkxz ?? -->
-	<software name="jingkxz" supported="no">
-		<description>Jing Ke Xin Zhuan (Chi, Shenzen Jincota)</description>
+<!-- This is a later re-release of the Supertone game -->
+	<software name="jingkxz" cloneof="jkxz">
+		<description>Jing Ke Xin Zhuan (Chi, Shenzhen Jncota)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1001"/>
 		<info name="alt_title" value="荆轲新传"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1001] jing ke xin zhuan (c).chr" size="131072" crc="0024a801" sha1="ba7a408c852c5ec611851f3f1ae75ce6056837f2" offset="00000" status="baddump" />
 			</dataarea>
@@ -56822,16 +56821,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- any relation with shenghlz ?? -->
-	<software name="shenghuo" supported="no">
+<!-- This is a later re-release of the C&E game -->
+	<software name="shenghuo" cloneof="shenghlz">
 		<description>Sheng Huo Lie Zhuan (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1002"/>
 		<info name="alt_title" value="圣火列传"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1002] sheng huo lie zhuan (c).chr" size="131072" crc="7c6f37fc" sha1="3a4da287653ec929adac7362c38687f14ca42080" offset="00000" status="baddump" />
 			</dataarea>
@@ -56848,7 +56846,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="dierciji" supported="no">
 		<description>Di Er Ci Ji Qi Ren Da Zhan (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1003"/>
 		<info name="alt_title" value="第二次机器人大战"/>
 		<part name="cart" interface="nes_cart">
@@ -56870,7 +56868,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="fankfb" supported="no">
 		<description>Fan Kong Feng Bao (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1004"/>
 		<info name="alt_title" value="反恐风暴"/>
 		<part name="cart" interface="nes_cart">
@@ -56892,7 +56890,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="fengshnb" supported="no">
 		<description>Feng Shen Bang (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1005"/>
 		<info name="alt_title" value="封神榜"/>
 		<part name="cart" interface="nes_cart">
@@ -56912,9 +56910,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="xianscq" supported="no">
-		<description>Xiang Shuai Chuan Qi (Chi, Shenzen Jincota)</description>
+		<description>Xiang Shuai Chuan Qi (Chi, Shenzhen Jncota)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1007"/>
 		<info name="alt_title" value="香帅传奇"/>
 		<part name="cart" interface="nes_cart">
@@ -56936,7 +56934,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="jjzs3" supported="no">
 		<description>Ji Jia Zhan Shi III (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1010"/>
 		<info name="alt_title" value="机甲战士III"/>
 		<part name="cart" interface="nes_cart">
@@ -56955,15 +56953,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zgfyun" supported="no">
+<!-- This seems to be a later re-release of the Supertone game with an altered title -->
+	<software name="zgfyun" cloneof="jkxz">
 		<description>Zhan Guo Feng Yun (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1013"/>
 		<info name="alt_title" value="战国风云"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1013] zhan guo feng yun (c).chr" size="131072" crc="4026c277" sha1="31bca971eab6f2c3d9a3e58fd2441730d8e666e1" offset="00000" status="baddump" />
 			</dataarea>
@@ -56977,15 +56975,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="xiakecq" supported="no">
+<!-- This seems to be a later re-release of the C&E game with an altered title -->
+	<software name="xiakecq" cloneof="shenghlz">
 		<description>Xia Ke Chuan Qi (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1014"/>
 		<info name="alt_title" value="侠客传奇"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1014] xia ke chuan qi (c).chr" size="131072" crc="f6d312af" sha1="3261d2f7f8cf9bb366a9d0361251161dbce81033" offset="00000" status="baddump" />
 			</dataarea>
@@ -57002,7 +57000,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="chuliuxx" supported="no">
 		<description>Chu Liu Xiang Xin Zhuan (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1015"/>
 		<info name="alt_title" value="楚留香新传"/>
 		<part name="cart" interface="nes_cart">
@@ -57024,7 +57022,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="zhanssj" supported="no">
 		<description>Zhan Shen Shi Jie (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1019"/>
 		<info name="alt_title" value="战神世界"/>
 		<part name="cart" interface="nes_cart">
@@ -57046,7 +57044,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="jianxqy" supported="no">
 		<description>Jian Xia Qing Yuan (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1020"/>
 		<info name="alt_title" value="剑侠情缘"/>
 		<part name="cart" interface="nes_cart">
@@ -57068,7 +57066,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="shenmoda" supported="no">
 		<description>Shen Mo Da Lu (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1052"/>
 		<info name="alt_title" value="神魔大陆"/>
 		<part name="cart" interface="nes_cart">
@@ -57090,7 +57088,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="kdgsfc" supported="no">
 		<description>Kou Dai Guai Shou - Fei Cui Ban (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1063"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -57111,7 +57109,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="hundunds" supported="no">
 		<description>Yong Zhe Hei An Shi Jie - Hun Dun De Shi Jie (Chi)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1066"/>
 		<info name="alt_title" value="勇者黑暗世界-混沌的世界"/>
 		<part name="cart" interface="nes_cart">
@@ -57133,7 +57131,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="kdgszs" supported="partial">
 		<description>Kou Dai Guai Shou - Zuan Shi Ban (KT-008 PCB)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 钻石版 ~ Pokemon Diamond"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -57154,7 +57152,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="kdgszz" cloneof="kdgszs" supported="partial">
 		<description>Kou Dai Guai Shou - Zhen Zhu Ban (KT-008 PCB, Alt)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 珍珠版 ~ Pokemon Pearl"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -57175,7 +57173,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="kdgsbj" cloneof="kdgszs" supported="partial">
 		<description>Kou Dai Guai Shou - Bai jin Ban (KT-008 PCB, Alt 2)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 白金版 ~ Pokemon Platinum"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -83207,7 +83205,7 @@ that the real dumps might surface -->
 	<software name="pokehg" supported="partial">
 		<description>Pokemon HeartGold (KT-008 PCB)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
