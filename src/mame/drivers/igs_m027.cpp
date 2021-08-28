@@ -29,6 +29,9 @@
 #include "video/igs017_igs031.h"
 #include "screen.h"
 
+
+namespace {
+
 class igs_m027_state : public driver_device
 {
 public:
@@ -39,7 +42,7 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
-	void igs_majhong(machine_config &config);
+	void igs_mahjong(machine_config &config);
 	void amazonia(machine_config &config);
 
 	void init_sdwx();
@@ -56,6 +59,7 @@ public:
 	void init_fruitpar();
 	void init_amazonia();
 	void init_amazoni2();
+	void init_qlgs();
 
 private:
 	optional_shared_ptr<u32> m_igs_mainram;
@@ -67,7 +71,7 @@ private:
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
-	void igs_majhong_map(address_map &map);
+	void igs_mahjong_map(address_map &map);
 };
 
 
@@ -76,7 +80,7 @@ private:
 
     Video
 
-    0x38001000, 0x380017ff          CG_CONTROL,8 byte per object, 0x100 in total
+    0x38001000, 0x380017ff      CG_CONTROL,8 byte per object, 0x100 in total
     0x38001800, 0x380019ff      PALETTE RAM,2 byte per color, 0x100 in total
     0x38004000, 0x38005FFF      TX Video RAM????????1E00??????512x240??????
     0x38006000, 0x38007FFF      BG Video RAM????????1E00??????512x240??????
@@ -134,7 +138,7 @@ void igs_m027_state::video_start()
 
 ***************************************************************************/
 
-void igs_m027_state::igs_majhong_map(address_map &map)
+void igs_m027_state::igs_mahjong_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom(); /* Internal ROM */
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0);/* Game ROM */
@@ -317,10 +321,10 @@ WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 }
 
 
-void igs_m027_state::igs_majhong(machine_config &config)
+void igs_m027_state::igs_mahjong(machine_config &config)
 {
 	ARM7(config, m_maincpu, 20000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -348,7 +352,7 @@ void igs_m027_state::igs_majhong(machine_config &config)
 void igs_m027_state::amazonia(machine_config &config)
 {
 	ARM7(config, m_maincpu, 20000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -962,7 +966,24 @@ ROM_START( lhzb4 )
 	ROM_LOAD( "w05502.u5", 0x00000, 0x200000, CRC(467f677e) SHA1(63927c0d606176c0e22db89ea3a9777ed702abbd) )
 ROM_END
 
+// Que Long Gao Shou (Master on Mahjong Dragon) (IGS, 1999) - PCB-0489-17-FM-1 (IGS027A, M6295, IGS031, 8255, Battery)
+ROM_START( qlgs )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal rom of IGS027A type G ARM based MCU
+	ROM_LOAD( "qlgs_igs027a", 0x00000, 0x4000, NO_DUMP )
 
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "s-501cn.u17", 0x000000, 0x200000, CRC(c80b61c0) SHA1(4e9920beb85fd559620f3136ea52ab6532657b1f) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text_u26.u26", 0x000000, 0x200000, CRC(4cd44ba8) SHA1(49f73233d466f196ee62bfca0c3e1042f38ee340) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cg_u28.u28", 0x000000, 0x400000, CRC(b34e22a0) SHA1(60c7efb9a0112745c5f9934a04578f6ce5071976) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp_u5.u5", 0x00000, 0x200000, CRC(6049b892) SHA1(f87285a288bd3fd169080045f70ff15181661582) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
 
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
@@ -1097,24 +1118,36 @@ void igs_m027_state::init_amazoni2()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027_state::init_qlgs()
+{
+	//qlgs_decrypt(machine());
+	//qlgs_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
+
+} // Anonymous namespace
+
+
 /***************************************************************************
 
     Game Drivers
 
 ***************************************************************************/
 
-GAME( 1999, slqz3,     0,        igs_majhong, sdwx, igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
+GAME( 1999, slqz3,     0,        igs_mahjong, sdwx, igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
+GAME( 1999, qlgs,      0,        igs_mahjong, sdwx, igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gao Shou", MACHINE_IS_SKELETON )
 GAME( 1999, amazonia,  0,        amazonia,amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
 GAME( 1999, amazonkp,  amazonia, amazonia,amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_IS_SKELETON )
-GAME( 200?, fruitpar,  0,        igs_majhong, sdwx, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
-GAME( 2002, sdwx,      0,        igs_majhong, sdwx, igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME( 2002, amazoni2,  0,        igs_majhong, sdwx, igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
-GAME( 200?, sddz,      0,        igs_majhong, sdwx, igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
-GAME( 2000, zhongguo,  0,        igs_majhong, sdwx, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
-GAME( 200?, lhzb3,     0,        igs_majhong, sdwx, igs_m027_state, init_lhzb3,    ROT0, "IGS", "Long Hu Zheng Ba 3", MACHINE_IS_SKELETON )
-GAME( 200?, lhzb4,     0,        igs_majhong, sdwx, igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zheng Ba 4", MACHINE_IS_SKELETON )
-GAME( 200?, klxyj,     0,        igs_majhong, sdwx, igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
-GAME( 2000, mgfx,      0,        igs_majhong, sdwx, igs_m027_state, init_mgfx,     ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
-GAME( 200?, gonefsh2,  0,        igs_majhong, sdwx, igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
-GAME( 2002, chessc2,   0,        igs_majhong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II",   MACHINE_IS_SKELETON )
-GAME( 200?, haunthig,  0,        igs_majhong, sdwx, igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
+GAME( 200?, fruitpar,  0,        igs_mahjong, sdwx, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
+GAME( 2002, sdwx,      0,        igs_mahjong, sdwx, igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
+GAME( 2002, amazoni2,  0,        igs_mahjong, sdwx, igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
+GAME( 200?, sddz,      0,        igs_mahjong, sdwx, igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
+GAME( 2000, zhongguo,  0,        igs_mahjong, sdwx, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
+GAME( 200?, lhzb3,     0,        igs_mahjong, sdwx, igs_m027_state, init_lhzb3,    ROT0, "IGS", "Long Hu Zheng Ba 3", MACHINE_IS_SKELETON )
+GAME( 200?, lhzb4,     0,        igs_mahjong, sdwx, igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zheng Ba 4", MACHINE_IS_SKELETON )
+GAME( 200?, klxyj,     0,        igs_mahjong, sdwx, igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
+GAME( 2000, mgfx,      0,        igs_mahjong, sdwx, igs_m027_state, init_mgfx,     ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
+GAME( 200?, gonefsh2,  0,        igs_mahjong, sdwx, igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
+GAME( 2002, chessc2,   0,        igs_mahjong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II",   MACHINE_IS_SKELETON )
+GAME( 200?, haunthig,  0,        igs_mahjong, sdwx, igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
