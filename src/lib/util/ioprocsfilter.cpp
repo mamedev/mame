@@ -107,6 +107,11 @@ class inflate_data : private zlib_data
 protected:
 	using zlib_data::zlib_data;
 
+	inflate_data(std::size_t buffer_size)
+		: zlib_data(buffer_size)
+	{
+	}
+
 	~inflate_data()
 	{
 		if (m_inflate_initialized)
