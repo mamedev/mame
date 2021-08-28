@@ -15,12 +15,14 @@
 //
 // A9M0305 is a Wide Carriage Imagewriter printer that will accept paper up to 15″ wide.
 //
-// ImageWriter Schematics: 
-// 	 Apple_Schematics_Imagewriter/APPLE_050-0089-A-1of2.pdf
+// ImageWriter Schematics:
+//   Apple_Schematics_Imagewriter/APPLE_050-0089-A-1of2.pdf
 //   Apple_Schematics_Imagewriter/APPLE_050-0089-A-2of2.pdf
 //   "Sams Apple Printer A9M0303.pdf"
-
-
+//
+// Apple Schematic shows J1 jumper that selects between 15" and 8" imagewriter connected to 8085 SID pin 5.
+//  8" imagewriter connected to R42 4.7k resistor connected to 5v. (J1 jumper open)
+// 15" imagewriter connected to ground. (J1 jumper closed)
 
 #include "emu.h"
 #include "printer.h"
@@ -49,6 +51,8 @@ apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine
 	m_8155head(*this, "8155head"),
 	m_8155switch(*this, "8155switch"),
 	m_count(*this, "74163count"),
+	m_pulse1(*this, "pulse1"),
+	m_pulse2(*this, "pulse2"),
 	m_bitmap_printer(*this, "bitmap_printer"),
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
@@ -72,10 +76,25 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	cpu.set_addrmap(AS_IO,      &apple_imagewriter_printer_device::io_map);
 
 // ct486 picking up error fault, see if commenting this out fixed this
-//	m_maincpu->out_sod_func().set(FUNC(apple_imagewriter_printer_device::maincpu_out_sod_func));
+//  m_maincpu->out_sod_func().set(FUNC(apple_imagewriter_printer_device::maincpu_out_sod_func));
 
 	TTL74163(config, m_count, 0);
 	m_maincpu->set_clk_out(m_count, FUNC(ttl74163_device::set_unscaled_clock_int));
+
+
+// try setting up 74123 for the printhead pulse generation
+
+	TTL74123(config, m_pulse1, 10000, 1000e-12);     // second stage (hooked up to 1 section of 74123)
+	m_pulse1->set_connection_type(TTL74123_GROUNDED);
+	m_pulse1->set_clear_pin_value(1);  // not clear
+	m_pulse1->set_b_pin_value(1);
+	m_pulse1->out_cb().set(FUNC(apple_imagewriter_printer_device::pulse1_out_handler));
+	TTL74123(config, m_pulse2, 18000, .022E-6);  // first stage  (hooked up to 2 section of 74123)
+	m_pulse2->set_connection_type(TTL74123_GROUNDED);
+	m_pulse2->out_cb().set(FUNC(apple_imagewriter_printer_device::pulse2_out_handler));
+	m_pulse2->set_clear_pin_value(1);
+
+
 
 
 	I8155(config, m_8155head,   1E6);   // for the moment, just give a 1mhz setting
@@ -88,7 +107,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_8155head->out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
 
 
-//	I8155(config, m_8155switch, 1E6);  // for the moment, just give a 1 mhz setting
+//  I8155(config, m_8155switch, 1E6);  // for the moment, just give a 1 mhz setting
 	I8155(config, m_8155switch, 9.8304_MHz_XTAL / 2 / 4);  // for the moment, just give a 1 mhz setting
 	m_8155switch->in_pa_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
 	m_8155switch->in_pb_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pb_r));
@@ -113,37 +132,37 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_pf_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 	m_cr_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
 
-//	TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz(9600.0 * 64.0 * 2.0));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
+//  TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz(9600.0 * 64.0 * 2.0));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
 
 //const int hz[] = { 9600, 2400, 1200, 300 };
 
 // can't read ioport here without segfault
 
-//	TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( hz[ioport("DIPSW2")->read() & 0x3] * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
+//  TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( hz[ioport("DIPSW2")->read() & 0x3] * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
 
-//	TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
+//  TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
 
-//	TIMER(config, m_timer_rxclock, 9600 * 64 * 2).configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  segfault
+//  TIMER(config, m_timer_rxclock, 9600 * 64 * 2).configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  segfault
 	TIMER(config, m_timer_rxclock, 0);
-	
-//	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));
-//	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 11400 * 64 * 2));
 
-// works with cpc
-//	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 10400 * 64 * 2));
+//  m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));
+//  m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 11400 * 64 * 2));
+
+// works with cpc at 10400 baud rate
+//  m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 10400 * 64 * 2));
 	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));
 
 
 	//rxd_handler.set(m_uart, FUNC(i8251_device::write_rxd));
 /*
-	PORT_START("DIPSW2")
+    PORT_START("DIPSW2")
 
-	PORT_DIPNAME(0x03, 0x00, "Baud Rate")
-	PORT_DIPLOCATION("DIP:1,2")
-	PORT_DIPSETTING(0x00, "9600") // default
-	PORT_DIPSETTING(0x01, "2400")
-	PORT_DIPSETTING(0x02, "1200")
-	PORT_DIPSETTING(0x03, "300")
+    PORT_DIPNAME(0x03, 0x00, "Baud Rate")
+    PORT_DIPLOCATION("DIP:1,2")
+    PORT_DIPSETTING(0x00, "9600") // default
+    PORT_DIPSETTING(0x01, "2400")
+    PORT_DIPSETTING(0x02, "1200")
+    PORT_DIPSETTING(0x03, "300")
 */
 }
 
@@ -215,19 +234,15 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_CONFSETTING(0x1, "Invert")
 
 	PORT_START("DARKPIXEL")
-	PORT_CONFNAME(0x1, 0x01, "Print Darkness")
-	PORT_CONFSETTING(0x0, "Normal (grey)")
-	PORT_CONFSETTING(0x1, "Dark   (b/w)")  // default to printing dark pixels (2x2)
-
-
-
-	PORT_START("PINFIRE")
-	PORT_CONFNAME(0x3, 0x02, "Print Fire Mode")
-	PORT_CONFSETTING(0x0, "FIRE WHEN 1")
-	PORT_CONFSETTING(0x1, "FIRE WHEN 0")  
-	PORT_CONFSETTING(0x2, "FIRE WHEN 0 -> 1")
-	PORT_CONFSETTING(0x3, "FIRE WHEN 1 -> 0")
-
+	PORT_CONFNAME(0x7, 0x00, "Print Darkness")
+	PORT_CONFSETTING(0x0, "Dark")  // default to printing dark pixels (2x2)
+	PORT_CONFSETTING(0x1, "Medium Dark")
+	PORT_CONFSETTING(0x2, "Medium")
+	PORT_CONFSETTING(0x3, "Medium Light")
+	PORT_CONFSETTING(0x4, "Light")
+	PORT_CONFSETTING(0x5, "Very Light")
+	PORT_CONFSETTING(0x6, "Single Dot")
+	PORT_CONFSETTING(0x7, "Narrow Vertical")
 
 
 	// Buttons on printer
@@ -242,7 +257,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_START("PAPEREND")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD)
 	PORT_START("COVER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Carrier Cover") PORT_CODE(KEYCODE_6_PAD)  // ACTIVE HIGH
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Carrier Cover") PORT_CODE(KEYCODE_3_PAD)  // ACTIVE HIGH
 
 
 	// DIPSW1
@@ -374,16 +389,7 @@ void apple_imagewriter_printer_device::head_pb_w(uint8_t data)
 	m_dotpattern &= ~(1 << 8);
 	m_dotpattern |= (!BIT(data,0) << 8);  // dot pattern is inverted
 
-/*
-
-	if (BIT(data,7) == 1 && BIT(m_head_pb_last,7) == 0)  // transition from 0 to 1
-		update_printhead();
-*/		
-
-	if ((ioport("PINFIRE")->read() == 0) && (BIT(data,7) == 0)) update_printhead();
-	if ((ioport("PINFIRE")->read() == 1) && (BIT(data,7) == 1)) update_printhead();
-	if ((ioport("PINFIRE")->read() == 2) && (BIT(data,7) == 1 && BIT(m_head_pb_last,7) == 0)) update_printhead();
-	if ((ioport("PINFIRE")->read() == 3) && (BIT(data,7) == 0 && BIT(m_head_pb_last,7) == 1)) update_printhead();
+	m_pulse2->b_w(!BIT(data,7));  // hook up to 74123 section 2
 
 	m_head_pb_last = data;
 }
@@ -475,10 +481,11 @@ void apple_imagewriter_printer_device::switch_pa_w(uint8_t data)
 
 uint8_t apple_imagewriter_printer_device::switch_pb_r(offs_t offset)
 {
-	return  !BIT(m_switches_pc_last, 0) ^ ioport("INVERT1")->read() ? // PC0 controls the multiplexer
-			ioport("DIPSW1")->read() : 
-			(ioport("DIPSW1")->read() & 0xf8) | 
-			(ioport("DIPSW2")->read() & 0x07);
+//  return  !BIT(m_switches_pc_last, 0) ^ ioport("INVERT1")->read() ? // PC0 controls the multiplexer
+	return  BIT(m_switches_pc_last, 0) ? // PC0 controls the multiplexer
+				ioport("DIPSW1")->read() :            // dip sw1-1 through sw1-8
+				(ioport("DIPSW1")->read() & 0xf8) |   // dip sw1-4 through sw1-8
+				(ioport("DIPSW2")->read() & 0x07);    // dip sw2-1 through sw2-3
 }
 
 void apple_imagewriter_printer_device::switch_pb_w(uint8_t data)
@@ -508,8 +515,8 @@ void apple_imagewriter_printer_device::switch_to(uint8_t data)
 {
 //  printf("8155 SWITCH_TO TIMER OUT %x   TIME = %f\n",data, machine().time().as_double());
 	m_maincpu->set_input_line(I8085_RST75_LINE, data);
-//	if (m_switches_to_last == 0 && data == 1) update_printhead();
-//	if (m_switches_to_last == 1 && data == 0) update_printhead();
+	m_pulse2->a_w(data);  // send data to pulse generator 74123 section 2
+
 	m_switches_to_last = data;
 }
 
@@ -521,11 +528,8 @@ void apple_imagewriter_printer_device::darken_pixel(double darkpct, unsigned int
 {
 	if (darkpct > 0.0)
 	{
-		u8 intensity = (
-						ioport("DARKPIXEL")->read() & 0x1 ?
-							std::min(darkpct * 4, 1.0) :
-							darkpct
-						) * 15.0;
+		u8 intensity = darkpct * 15.0;
+
 		u32 pixelval = pixel;
 		u32 darkenval = intensity * 0x111111;
 
@@ -561,10 +565,43 @@ void apple_imagewriter_printer_device::update_printhead()
 //  printf("PRINTHEAD %x %s\n",m_dotpattern, std::bitset<9>(m_dotpattern).to_string().c_str());
 	const auto numdots = 9;
 
-	const double greypixelarray[][2] =
+	const double darkenpixelarray[][2][2] =  // array of 2x2 dot patterns
 	{
-		{ 1.0, 0.75 },
-		{ 0.75, 0.50 }
+		{
+			{ 1.0, 1.0 }, // very dark 0
+			{ 1.0, 1.0 }
+		},
+		{
+			{ 1.0, 0.75 }, // medium dark 1
+			{ 0.75, 0.50 }
+		},
+		{
+			{ 1.0, 0.5 }, // medium 2
+			{ 0.5, 0.25 }
+		},
+		{
+			{ 0.80, 0.35 }, // medium light 3
+			{ 0.35, 0.0 }
+		},
+
+		{
+			{ 0.70, 0.25 }, // light 4
+			{ 0.25, 0.0 }
+		},
+
+		{
+			{ 0.50, 0.15 }, // very light 5
+			{ 0.15, 0.0 }
+		},
+		{
+			{ 1.0, 0.0 },  // single dot 6
+			{ 0.0, 0.0 }
+		},
+		{
+			{ 1.0, 0.0 },  // narrow vertical 7
+			{ 1.0, 0.0 }
+		},
+
 	};
 
 	for (int i = 0; i < numdots; i++)
@@ -574,13 +611,13 @@ void apple_imagewriter_printer_device::update_printhead()
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
-			int darkpixelmode = (ioport("DARKPIXEL")->read() & 0x1);
+			int darklevel = (ioport("DARKPIXEL")->read() & 0x7);
 			int dotsizex = 2;
 			int dotsizey = 2;
 			for (int xo = 0; xo < dotsizex; xo++ )
 			for (int yo = 0; yo < dotsizey; yo++ )
 				darken_pixel( BIT(m_dotpattern, i) ?
-					(darkpixelmode ? 1.0 : greypixelarray[yo][xo] ) : 0.0, m_bitmap_printer->pix(ypixel + yo, xpixel + xo) );
+					darkenpixelarray[darklevel][yo][xo] : 0.0, m_bitmap_printer->pix(ypixel + yo, xpixel + xo) );
 		}
 	}
 }
@@ -595,12 +632,13 @@ int apple_imagewriter_printer_device::update_stepper_delta(stepper_device * step
 {
 //  printf("UPDATE STEPPER DELTA %x %s\n",pattern, name);
 	int lastpos = stepper->get_absolute_position();
-	if (direction >= 0)
+//  if (direction >= 0)
 		stepper->update(bitswap<4>(pattern, 0, 2, 1, 3));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
-	else
-		stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // reversed direction stepper
+//  else
+//      stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // reversed direction stepper
 	int delta = stepper->get_absolute_position() - lastpos;
-	return delta;
+//  return delta;
+	return delta * direction;
 }
 
 //-------------------------------------------------
@@ -727,15 +765,15 @@ WRITE_LINE_MEMBER(apple_imagewriter_printer_device::update_serial)
 void apple_imagewriter_printer_device::device_reset()
 {
 	update_serial(0);
-	
+
 	[[maybe_unused]] const int hertzarray[] = { 9600, 2400, 1200, 300 };
 
 
 // aargh causes segfaults to adjust the timer here
-//	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( hertzarray[ioport("DIPSW2")->read() & 0x03] * 64 * 2));
-//	TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
+//  m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( hertzarray[ioport("DIPSW2")->read() & 0x03] * 64 * 2));
+//  TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
 
-	
+
 }
 
 
@@ -748,15 +786,15 @@ void apple_imagewriter_printer_device::device_reset_after_children()
 // aargh causes segfaults to adjust the timer here
 
 // mame exception cannot adjust a non generic timer
-//	m_timer_rxclock->reset();
+//  m_timer_rxclock->reset();
 
-/*	m_timer_rxclock->configure_periodic(
-		FUNC(apple_imagewriter_printer_device::pulse_uart_clock), 
-		attotime::from_hz( hertzarray[ioport("DIPSW2")->read() & 0x03] * 64 * 2));
+/*  m_timer_rxclock->configure_periodic(
+        FUNC(apple_imagewriter_printer_device::pulse_uart_clock),
+        attotime::from_hz( hertzarray[ioport("DIPSW2")->read() & 0x03] * 64 * 2));
 */
-//	TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
+//  TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
 
-	
+
 }
 
 

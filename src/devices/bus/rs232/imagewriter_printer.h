@@ -13,6 +13,7 @@
 #include "machine/i8155.h"
 #include "machine/i8251.h"
 #include "machine/steppers.h"
+#include "machine/74123.h"
 #include "machine/74161.h"
 #include "machine/timer.h"
 
@@ -27,7 +28,8 @@ double last_time = 0.0;
 int last_value;
 //double min_time = 0.0;
 //double min_time = 1.0 / 9601.0;  // if I make it 1.0 / 9600.0 the division tends to round down
-double min_time = 1.0 / 11202.0;  // if I make it 1.0 / 9600.0 the division tends to round down
+//double min_time = 1.0 / 11202.0;  // if I make it 1.0 / 9600.0 the division tends to round down
+double min_time = 1.0 / 9601.0;  // if I make it 1.0 / 9600.0 the division tends to round down
 //  virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
 
 std::string buildstring = "";
@@ -40,13 +42,13 @@ std::string buildstring = "";
 
 		double elapsed_time = machine().time().as_double() - last_time;
 		printf("INPUT TXD STATE = %x   %f  elapsed=%f\n", state, machine().time().as_double(), machine().time().as_double()-last_time);
-	//	if (elapsed_time > 0.0 && min_time == 0.0) min_time = elapsed_time;
-	//	if (elapsed_time > 0.0) min_time = std::min(elapsed_time, min_time);
+	//  if (elapsed_time > 0.0 && min_time == 0.0) min_time = elapsed_time;
+	//  if (elapsed_time > 0.0) min_time = std::min(elapsed_time, min_time);
 		if (min_time > 0.0)
 		{
 			int block = elapsed_time / min_time;
 			printf("BLOCK = %d\n",block);
-			for (int i=0; i< std::min(16,block); i++) 
+			for (int i=0; i< std::min(16,block); i++)
 			{
 				buildstring = std::to_string(last_value) + buildstring;
 				printf("%d",last_value);
@@ -62,8 +64,8 @@ std::string buildstring = "";
 	INPUT_CHANGED_MEMBER(reset_sw)
 	{
 	// neither one of these can reliably reset the printer
-	//	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-	//	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	//  m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	//  m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 		if (newval == 0) m_maincpu->reset();  // resets the printer every time
 	}
 
@@ -74,26 +76,41 @@ std::string buildstring = "";
 			m_maincpu->set_input_line(I8085_RST65_LINE, data);
 	}
 
+	int m_pulse1_out_last = 1;
 
-// y position adjustment to eliminate gaps from win95 driver	
+	void pulse1_out_handler(uint8_t data) {
+		if (m_pulse1_out_last == 1 && data == 0) update_printhead();
+		m_pulse1_out_last = data;
+//      printf("PULSE1OUT %x\n",data);
+	}
+	void pulse2_out_handler(uint8_t data) {
+		m_pulse1->a_w(data);
+//      m_pulse1->b_w(1);  // always 1
+//      printf("PULSE2OUT %x\n",data);
+	}
+
+
+
+
+// y position adjustment to eliminate gaps from win95 driver
 //emu.item(manager.machine.devices[":board2:comat:serport1:imagewriter"].items["0/yposratio0"]):write(0,16)
 //emu.item(manager.machine.devices[":board2:comat:serport1:imagewriter"].items["0/yposratio1"]):write(0,18)
 
 	// experiment with ct486, dtr -> dsr and cts, or just dtr -> cts both seems to work
-	
+
 	// I think it should be dtr -> dsr and rts -> cts, but ct486 and win95 corrupts printout
 
 	void dtr_handler(uint8_t data) {
 		if (ioport("DTR")->read() & 0x1) output_dsr(data);
 		if (ioport("DTR")->read() & 0x2) output_cts(data);
-//		output_dsr(data);
+//      output_dsr(data);
 	}
 	void rts_handler(uint8_t data) {
 		if (ioport("RTS")->read() & 0x1) output_dsr(data);
 		if (ioport("RTS")->read() & 0x2) output_cts(data);
 
 
-//		output_dsr(data);
+//      output_dsr(data);
 	}
 	void txd_handler(uint8_t data) {
 		output_rxd(data);
@@ -133,6 +150,8 @@ private:
 	required_device<i8155_device> m_8155head;
 	required_device<i8155_device> m_8155switch;
 	required_device<ttl74163_device> m_count;
+	required_device<ttl74123_device> m_pulse1;
+	required_device<ttl74123_device> m_pulse2;
 
 	required_device<bitmap_printer_device> m_bitmap_printer;
 	required_device<stepper_device> m_pf_stepper;
@@ -173,8 +192,8 @@ private:
 	int page_count = 0;
 
 	const int dpi = 144;
-//	const double PAPER_WIDTH_INCHES = 8.5 + 0.5;  // extra width paper to avoid centering problems
-//	const double PAPER_WIDTH_INCHES = 15.0;  // extra width paper to avoid centering problems
+//  const double PAPER_WIDTH_INCHES = 8.5 + 0.5;  // extra width paper to avoid centering problems
+//  const double PAPER_WIDTH_INCHES = 15.0;  // extra width paper to avoid centering problems
 	const double PAPER_WIDTH_INCHES = 8.5;  // extra width paper to avoid centering problems
 	const double PAPER_HEIGHT_INCHES = 11.0;
 	const double MARGIN_INCHES = 0.0;
