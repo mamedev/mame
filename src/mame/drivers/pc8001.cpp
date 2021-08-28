@@ -128,7 +128,8 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 			int res_x = (sx * 8) + xi;
 			if (gfx_mode)
 			{
-				u8 mask = xi & 4 ? 0x10 : 0x01;
+				u8 mask = (xi & (4 << (dot_width - 1))) ? 0x10 : 0x01;
+				// TODO: honor y height
 				mask <<= (lc & 0x6) >> 1;
 				pen = tile & mask;
 			}
@@ -285,8 +286,8 @@ void pc8001_state::port40_w(uint8_t data)
 
 	m_centronics->write_strobe(BIT(data, 0));
 
-	m_rtc->clk_w(BIT(data, 2));
 	m_rtc->stb_w(BIT(data, 1));
+	m_rtc->clk_w(BIT(data, 2));
 
 	m_beep->set_state(BIT(data, 5));
 }

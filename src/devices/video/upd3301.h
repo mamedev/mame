@@ -127,7 +127,7 @@ private:
 
 	// FIFOs
 	uint8_t m_data_fifo[80][2];       // row data FIFO
-	uint8_t m_attr_fifo[40][2];       // attribute FIFO
+	uint8_t m_attr_fifo[40+1][2];     // attribute FIFO (+1 for extending to end of row)
 	int m_data_fifo_pos;            // row data FIFO position
 	int m_attr_fifo_pos;            // attribute FIFO position
 	int m_input_fifo;               // which FIFO is in input mode

@@ -34,7 +34,9 @@ TODO:
 
 	<software name="15puzzle">
 		<description>15 Puzzle</description>
-		<year>19??</year>
+		<!-- 1999.11.23 -->
+		<year>1999</year>
+		<!-- hal_8999@geocities.co.jp (doujinshi) -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424"> <!-- Data CRC16: 57187 -->
@@ -45,7 +47,9 @@ TODO:
 
 	<software name="15puzzlea" cloneof="15puzzle">
 		<description>15 Puzzle (Alt)</description>
-		<year>19??</year>
+		<!-- 1999.11.23 -->
+		<year>1999</year>
+		<!-- hal_8999@geocities.co.jp (doujinshi) -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
@@ -60,6 +64,7 @@ TODO:
 		<year>1980</year>
 		<publisher>Tecno Soft</publisher>
 		<info name="alt_title" value="2001年宇宙の旅"/>
+		<info name="usage" value="Requires 32K RAM"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="2001 a space odyssey.d88" size="31424" crc="c98945b1" sha1="1f3bd896104d50af32d0d1bca85b1766e5689b8b"/>
@@ -67,9 +72,13 @@ TODO:
 		</part>
 	</software>
 
-	<software name="3by4">
+	<!-- boot OK -->
+	<!-- "I-SCORE" on title screen is a typo (btanb) -->
+	<software name="3by4" supported="yes">
 		<description>3 by 4</description>
-		<year>19??</year>
+		<!-- 1982.8 -->
+		<year>1982</year>
+		<!-- I.O -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 9706 -->
@@ -78,9 +87,9 @@ TODO:
 		</part>
 	</software>
 
-	<software name="3by4a" cloneof="3by4">
+	<software name="3by4a" cloneof="3by4" supported="yes">
 		<description>3 by 4 (Alt)</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -88,10 +97,13 @@ TODO:
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="300m">
+	
+	<!-- Locks up at "BASIC LODGE" screen, blinks player after too much time, never start gameplay -->
+	<!-- [Does extensive reads of the RTC, keeps looping at 340-350 basic lines] -->
+	<software name="300m" supported="no">
 		<description>300m</description>
 		<year>19??</year>
+		<!-- I.O -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 64846 -->
@@ -100,7 +112,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="300ma" cloneof="300m">
+	<software name="300ma" cloneof="300m" supported="no">
 		<description>300m (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2234,6 +2246,17 @@ TODO:
 		</part>
 	</software>
 
+	<software name="nbasicgp">
+		<description>N-Basic Game Pack (Compilation, NS-DOS CATS EYE)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="n-basic game pack (dungeon etc).d88" size="348848" crc="d3dcd2ec" sha1="72ba2282b532036dbfdc5f511d7fb82d331a55f9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- seems based off above -->
 	<software name="nbasicgaa" cloneof="nbasicga">
 		<description>N-BASIC Games (Compilation)</description>
@@ -2435,7 +2458,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 <!-- Operating Systems -->
 
 	<software name="cpm22n">
-		<description>CP-M for the PC-8001 (v2.2)</description>
+		<description>CP/M for PC-8001 (v2.2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2457,7 +2480,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="cpm22nb" cloneof="cpm22n">
-		<description>CP-M for the PC-8001 (v2.2, Alt)</description>
+		<description>CP/M for PC-8001 (v2.2, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2468,7 +2491,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="cpm22nc" cloneof="cpm22n">
-		<description>CP-M for the PC-8001 (v2.2B)</description>
+		<description>CP/M for PC-8001 (v2.2B)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2507,6 +2530,17 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="[os] n basic system disk (pc-8034-2w) (pc-8001) [alt 2].d88" size="348848" crc="7f722a16" sha1="b707b1cdec531d23e31a26c25645bae49a6de633"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndiskb">
+		<description>N Disk BASIC</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 60189 -->
+				<rom name="n80-basic.d88" size="348848" crc="93746147" sha1="24d8b5b74d8a340d9afbbdc532395a3ded888fc5"/>
 			</dataarea>
 		</part>
 	</software>

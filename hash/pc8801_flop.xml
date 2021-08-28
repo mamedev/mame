@@ -301,40 +301,6 @@ INVESTIGATE
 
 <!-- BASIC Disks &amp; System Disks -->
 
-	<!-- TODO: this is N80 not N-Basic -->
-	<software name="nbasic">
-		<description>N-BASIC</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">    <!-- Data CRC16: 18249 -->
-				<rom name="n-basic.d88" size="348848" crc="0ed0a4c8" sha1="2e80b0b4fc38eb1f81fd27f6828249c764091a55"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="n80basic">
-		<description>N80 BASIC v1.8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">    <!-- Data CRC16: 60189 -->
-				<rom name="n80-basic.d88" size="348848" crc="93746147" sha1="24d8b5b74d8a340d9afbbdc532395a3ded888fc5"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="n80basica" cloneof="n80basic">
-		<description>N80 BASIC (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34301 -->
-				<rom name="n80 basic (1983)(microsoft - nec).d88" size="348848" crc="ff9416a4" sha1="3321c6a723545ef7f413a372683a1e40ef7ea4ef"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="n88basfe">
 		<description>N88-BASIC FE (v2.3)</description>
 		<year>19??</year>
@@ -26595,6 +26561,7 @@ ExtractDisk  [07]"DiskD        " -> "psy-o-blade_07.d88"
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
+		<!-- TODO: it actually seems to require N88 BASIC -->
 		<info name="usage" value="Needs N-BASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53214,17 +53181,6 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gpac06.d88" size="348848" crc="9784f03d" sha1="5645ca5295495f377ce0027679611687225a857e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nbasicgp">
-		<description>N-Basic Game Pack (Dungeon etc)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="n-basic game pack (dungeon etc).d88" size="348848" crc="d3dcd2ec" sha1="72ba2282b532036dbfdc5f511d7fb82d331a55f9"/>
 			</dataarea>
 		</part>
 	</software>

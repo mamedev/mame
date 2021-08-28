@@ -70,6 +70,28 @@ Bon Bon, Bon Bon, Compaq, Aug 83, Aug 83,
 
 <!-- Operating Systems -->
 
+	<software name="n80diskb">
+		<description>N80 Disk BASIC</description>
+		<year>1983</year>
+		<publisher>NEC / Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 18249 -->
+				<rom name="n-basic.d88" size="348848" crc="0ed0a4c8" sha1="2e80b0b4fc38eb1f81fd27f6828249c764091a55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n80diska" cloneof="n80diskb">
+		<description>N80 Disk BASIC (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34301 -->
+				<rom name="n80 basic (1983)(microsoft - nec).d88" size="348848" crc="ff9416a4" sha1="3321c6a723545ef7f413a372683a1e40ef7ea4ef"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pc80sys">
 		<description>PC-8001mkII System Disk</description>
 		<year>19??</year>

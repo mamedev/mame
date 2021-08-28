@@ -565,13 +565,16 @@ void upd3301_device::draw_scanline()
 	// it just extends the full attribute RAM with a start: 0 end: 0xff value: 0.
 	// According to doc notes anything beyond width 80 is puked by the CRTC, therefore we clamp.
 	const u8 attr_size = 80;
-	int ex;
-
 	u16 extend_attr[attr_size];
+	
 	// first attribute start is always overwritten with a 0
 	m_attr_fifo[0][!m_input_fifo] = 0;
+	// last parameter always extends up to the end of the row
+	// (7narabe fills last row value with white when exausting available slots)
+	m_attr_fifo[40][!m_input_fifo] = attr_size;
 
-	for (ex = 0; ex < m_attr << 1; ex+=2)
+	// TODO: verify if we need to sort as well (doesn't seem the case?)
+	for (int ex = 0; ex < m_attr << 1; ex+=2)
 	{
 		u8 attr_start = std::min(m_attr_fifo[ex][!m_input_fifo], attr_size);
 		u8 attr_value = m_attr_fifo[ex+1][!m_input_fifo];
@@ -610,8 +613,8 @@ void upd3301_device::draw_scanline()
 			int csr = m_cm && m_cursor_blink && ((y / m_r) == m_cy) && (sx == m_cx);
 
 			// datasheet mentions these but I find zero unambiguous information for PC-8001/PC-8801, i.e.:
-			// - is "highlight" for a 16 color system? 
-			// - is "gpa" actually NEC name for attr bus?
+			// - "highlight" should be attribute blinking?
+			// - is "gpa" actually NEC-ese for attr bus?
 			// - is sl0 / sl12 NEC names for upper/lower line?
 //			int hlgt = 0;
 //			int rvv = 0;
