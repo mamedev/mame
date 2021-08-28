@@ -14,10 +14,13 @@ The video hardware is pretty much like Irem games too. The only
 strange thing is that the screen is flipped vertically.
 
 TODO:
+- sprite-sprite priorities are imperfect (simply reversing them won't fix it,
+  motorcycle level will get much worse)
 - accurate screen timing (raw params), attract mode doesn't 1:1 match PCB
 
 BTANB:
 - attract mode demo play stops playing and lets the timer run out
+- heads of baddies clip off when you defeat them on the lowest floor
 - player sprite 1-scanline glitch at the lower part of motorcycle level
 - player sprite may briefly turn into garbage after a boss fight
 
@@ -67,10 +70,10 @@ void kncljoe_state::m6803_port1_w(uint8_t data)
 
 void kncljoe_state::m6803_port2_w(uint8_t data)
 {
-	/* write latch */
+	// write latch
 	if ((m_port2 & 0x01) && !(data & 0x01))
 	{
-		/* control or data port? */
+		// control or data port?
 		if (m_port2 & 0x08)
 			m_ay8910->data_address_w(m_port2 >> 2, m_port1);
 	}
@@ -96,7 +99,7 @@ void kncljoe_state::sound_irq_ack_w(uint8_t data)
 
 void kncljoe_state::unused_w(uint8_t data)
 {
-	//unused - no MSM on the pcb
+	// unused - no MSM on the pcb
 }
 
 void kncljoe_state::sound_map(address_map &map)

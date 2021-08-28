@@ -397,7 +397,7 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state::extrom_load )
 
 	if (size > 0x80000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported rom size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported rom size");
 		return image_init_result::FAIL;
 	}
 
@@ -417,7 +417,7 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state::rompak_load )
 
 	if (size > 0x2000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -441,7 +441,7 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 	// verify first byte
 	if (data[0] != 0xff)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, nullptr);
+		image.seterror(image_error::INVALIDIMAGE, nullptr);
 		return image_init_result::FAIL;
 	}
 
@@ -488,7 +488,7 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 
 	if (image.length() < 4)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.seterror(image_error::INVALIDIMAGE, "File too short");
 		return image_init_result::FAIL;
 	}
 
@@ -497,13 +497,13 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 
 	if (image.length() < code_length)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.seterror(image_error::INVALIDIMAGE, "File too short");
 		return image_init_result::FAIL;
 	}
 
 	if (code_base < 0x4000 || (code_base + code_length) >= 0x10000)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid code base and length");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid code base and length");
 		return image_init_result::FAIL;
 	}
 

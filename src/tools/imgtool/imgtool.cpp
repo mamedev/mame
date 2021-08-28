@@ -8,14 +8,18 @@
 
 ***************************************************************************/
 
+#include "imgtool.h"
+#include "library.h"
+#include "modules.h"
+
+#include "formats/imageutl.h"
+
+#include "corefile.h"
+
 #include <cstring>
 #include <cctype>
 #include <iostream>
 
-#include "imgtool.h"
-#include "formats/imageutl.h"
-#include "library.h"
-#include "modules.h"
 
 
 /***************************************************************************

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Alex Marshall,nimitz,austere
+// copyright-holders:Alex Marshall, nimitz, austere
 /*
     ICS2115 by Raiden II team (c) 2010
     members: austere, nimitz, Alex Marshal
@@ -9,16 +9,11 @@
     Use tab size = 4 for your viewing pleasure.
 
     TODO:
-    - Implement Panning, Chip has support stereo
-    - Verify BYTE/ROMEN pin behaviors
+    - Verify BYTE/ROMEN pin behavior
     - DRAM, DMA, MIDI interface is unimplemented
     - Verify interrupt, envelope, timer period
     - Verify unemulated registers
 
-    Changelog:
-
-    25th july 2020 [cam900]:
-    - Improve envelope behavior, Improve debugging registers, Fix ramping
 */
 
 #include "emu.h"
@@ -30,6 +25,7 @@
 
 //#define ICS2115_DEBUG
 //#define ICS2115_ISOLATE 6
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthesizer")
@@ -87,13 +83,20 @@ void ics2115_device::device_start()
 	const u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
 	for (int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
+
+	//pan law level
+	//log2(256*128) = 15 for -3db + 1 must be confirmed by real hardware owners
+	constexpr int PAN_LEVEL = 16;
+
 	for (int i = 0; i < 256; i++)
 	{
 		u8 exponent = (~i >> 4) & 0x07;
 		u8 mantissa = ~i & 0x0f;
 		s16 value = lut[exponent] + (mantissa << (exponent + 3));
 		m_ulaw[i] = (i & 0x80) ? -value : value;
+		m_panlaw[i] = PAN_LEVEL - (31 - count_leading_zeros_32(i)); //m_panlaw[i] = PAN_LEVEL - log2(i)
 	}
+	m_panlaw[0] = 0xfff; //all bits to one when no pan
 
 	save_item(NAME(m_timer[0].period));
 	save_item(NAME(m_timer[0].scale));
@@ -204,23 +207,23 @@ device_memory_interface::space_config_vector ics2115_device::memory_space_config
 
 
 /*
-  Using next-state logic from column 126 of patent 5809466.
-  VOL(L) = vol.acc
-  VINC = vol.inc
-  DIR = invert
-  BC = boundary cross (start or end )
-  BLEN = bi directional loop enable
-  LEN loop enable
-  UVOL  LEN   BLEN    DIR     BC      Next VOL(L)
-   0      x     x       x       x       VOL(L) // no change no vol envelope
-   1      x     x       0       0       VOL(L) + VINC // foward dir no bc
-   1      x     x       1       0       VOL(L) - VINC // invert no bc
-   1      0     x       x       1       VOL(L) // no env len no vel envelope
-  ----------------------------------------------------------------------------
-   1      1     0       0       1       start - ( end - (VOL(L)  + VINC) )
-   1      1     0       1       1       end + ( (VOL(L) - VINC) - start)
-   1      1     1       0       1       end + (end - (VOL(L) + VINC) ) // here
-   1      1     1       1       1       start - ( (VOL(L) - VINC)- start)
+    Using next-state logic from column 126 of patent 5809466.
+    VOL(L) = vol.acc
+    VINC = vol.inc
+    DIR = invert
+    BC = boundary cross (start or end )
+    BLEN = bi directional loop enable
+    LEN loop enable
+    UVOL   LEN   BLEN    DIR     BC      Next VOL(L)
+    0      x     x       x       x       VOL(L) // no change no vol envelope
+    1      x     x       0       0       VOL(L) + VINC // forward dir no bc
+    1      x     x       1       0       VOL(L) - VINC // invert no bc
+    1      0     x       x       1       VOL(L) // no env len no vol envelope
+   ----------------------------------------------------------------------------
+    1      1     0       0       1       start - ( end - (VOL(L)  + VINC) )
+    1      1     0       1       1       end + ( (VOL(L) - VINC) - start)
+    1      1     1       0       1       end + (end - (VOL(L) + VINC) ) // here
+    1      1     1       1       1       start - ( (VOL(L) - VINC)- start)
 */
 int ics2115_device::ics2115_voice::update_volume_envelope()
 {
@@ -429,10 +432,13 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
-		const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
-		const u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
-		const u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
-		const u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
+		constexpr int RAMP_SHIFT = 6;
+		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
+		const u16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law 
+		const u16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
+		//check negative values so no cracks, is it a hardware feature ?
+		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0;
+		const u16 vright = vrighti > 0 ? (m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT) : 0;
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the

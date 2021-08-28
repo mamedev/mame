@@ -805,7 +805,7 @@ void nes_ks7012_device::write_h(offs_t offset, uint8_t data)
 
  Kaiser Board KS7013B
 
- Games: Highway Star FDS Conversion
+ Games: Highway Star bootleg
 
  NES 2.0: mapper 312
 

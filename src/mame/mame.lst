@@ -110,6 +110,8 @@ sprtdart                        // (c) 1993 Compumatic / Desarrollos y Recambios
 4enraya                         // (c) 1990 IDSA
 4enrayaa                        //
 unkpacg                         // (c) 19?? ???
+unkpacga                        //
+unkpacgb                        //
 unksig                          // 1998?
 unksiga                         // 1998?
 
@@ -2924,6 +2926,7 @@ pitfightb                       // bootleg
 pitfightj                       // Japan
 
 @source:atarig42.cpp
+dangerex                        // (proto)          (c) 1992
 guardian                        // 136092           (c) 1992
 roadriot                        // 136089           (c) 1991
 roadriota                       // 136089           (c) 1991
@@ -11591,6 +11594,7 @@ deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MAST
 dfkbl                           // (c) 2010 Cave (AMI license) - 2010/1/18 BLACK LABEL
 dsmbl                           // (c) 2008 Cave (AMI license) - 2008/10/06 MEGABLACK LABEL VER
 espgal2                         // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
+espgal2a                        // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
 futari10                        // (c) 2006 Cave (AMI license) - 2006/10/23 MASTER VER.
 futari15                        // (c) 2006 Cave (AMI license) - 2006/12/8.MASTER VER. 1.54.
 futari15a                       // (c) 2006 Cave (AMI license) - 2006/12/8 MASTER VER 1.54
@@ -15525,6 +15529,7 @@ cb3b                            // (c) 199? Dyna Electronics
 cb3c                            // (c) 199? Dyna Electronics
 cb3d                            // (c) 199? Dyna Electronics
 cb3e                            // 199? bootleg
+cb3f                            // 199? bootleg
 cherry96                        // bootleg
 chry10                          // bootleg
 chryangl                        // (c) 199? Dyna Electronics
@@ -16966,6 +16971,7 @@ klxyj                           // (c) 200?
 lhzb3                           // (c) 200?
 lhzb4                           // (c) 200?
 mgfx                            // (c) 200?
+qlgs                            // (c) 1999
 sddz                            // (c) 200?
 sdwx                            // (c) 2002
 slqz3                           // (c) 1999
@@ -33847,28 +33853,43 @@ pc8801mk2sr                     //
 pc88va                          //
 pc88va2                         //
 
+@source:pc98ha.cpp
+pc98lt                          // 1989
+pc98ha                          // 1990
+
 @source:pc9801.cpp
-pc386m                          //
-pc486mu                         //
-pc486se                         // 1993
 pc9801bx2                       // 1993
 pc9801f                         // 1983
 pc9801rs                        // 1989
 pc9801rx                        // 1988
+pc9801us                        // 1992
 pc9801ux                        // 1987
 pc9801vm                        // 1985
-pc9801vm11                      //
-pc9821                          //
-pc9821ap2                       //
-pc9821as                        //
-pc9821ce2                       //
-pc9821ne                        //
-pc9821ra20                      //
-pc9821ra333                     //
-pc9821v13                       //
-pc9821v20                       //
-pc9821xa16                      //
-pc9821xs                        //
+pc9801vm11                      // 1985
+pc9801vx                        // 1986
+
+@source:pc9801_epson.cpp
+pc386m                          // 1990
+pc486se                         // 1993
+pc486mu                         // 1994
+
+@source:pc9821.cpp
+pc9821                          // 1992
+pc9821ap2                       // 1993
+pc9821as                        // 1993
+pc9821ce2                       // 1994
+pc9821cx3                       // 1995
+pc9821ne                        // 1994
+pc9821nr15                      // 1996
+pc9821nr166                     // 1997
+pc9821nw150                     // 1997
+pc9821ra20                      // 1996
+pc9821ra266                     // 1997
+pc9821ra333                     // 1998
+pc9821v13                       // 1998
+pc9821v20                       // 1998
+pc9821xa16                      // 1996
+pc9821xs                        // 1994
 
 @source:pcat_dyn.cpp
 toursol                         // (c) 1995 Dynamo
@@ -38423,6 +38444,7 @@ bdream97                        // Bootleg?
 butrfly                         // (c) 1995 Bordun International
 gallag50                        // Bootleg?
 leader                          // Bootleg?
+leadera                         // Bootleg?
 madzoo                          // (c) 1995 Bordun International
 mbutrfly                        // (c) 1999 (Bordun International?)
 miaction                        // (c) Vegas
@@ -41966,6 +41988,7 @@ vic20p                          // Commodore VIC 20 (PAL)
 
 @source:vicdual.cpp
 alphaho                         // Data East
+alphahob                        // bootleg
 brdrlinb                        // Karateco bootleg
 brdrline                        // (c) 1980 Sega
 brdrlinet                       // (c) 1981 Sega
@@ -41975,6 +41998,7 @@ carhntds                        //
 carnival                        // 651-666 (c) 1980 Sega
 carnivalb                       //
 carnivalc                       // 501-516 (c) 1980 Sega
+carnivalca                      // 479-494 (c) 1980 Sega
 carnivalh                       //
 carnivalha                      //
 depthch                         // 50-55 [1977 Gremlin?]

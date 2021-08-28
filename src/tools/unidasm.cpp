@@ -1219,9 +1219,9 @@ int main(int argc, char *argv[])
 	void *data = nullptr;
 	u32 length = 0;
 	if(std::strcmp(opts.filename, "-") != 0) {
-		osd_file::error filerr = util::core_file::load(opts.filename, &data, length);
-		if(filerr != osd_file::error::NONE) {
-			std::fprintf(stderr, "Error opening file '%s'\n", opts.filename);
+		std::error_condition filerr = util::core_file::load(opts.filename, &data, length);
+		if(filerr) {
+			std::fprintf(stderr, "Error opening file '%s' (%s)\n", opts.filename, filerr.message().c_str());
 			return 1;
 		}
 	}

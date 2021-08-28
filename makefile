@@ -1755,14 +1755,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.234"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.235"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.234" > $@
+	@echo #define BARE_BUILD_VERSION "0.235" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1816,6 +1816,7 @@ ifeq (posix,$(SHELLTYPE))
 	$(SILENT) find hash -name \*.xml -exec ./srcclean {} \; >&2
 	$(SILENT) find bgfx -name \*.json -exec ./srcclean {} \; >&2
 	$(SILENT) find plugins -name \*.lua -exec ./srcclean {} \; >&2
+	$(SILENT) find plugins -name \*.json -exec ./srcclean {} \; >&2
 	$(SILENT) find scripts -name \*.lua -exec ./srcclean {} \; >&2
 else
 	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
@@ -1832,6 +1833,7 @@ else
 	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
 	$(shell for /r bgfx %%i in (*.json) do srcclean %%i >&2 )
 	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
+	$(shell for /r plugins %%i in (*.json) do srcclean %%i >&2 )
 	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
 endif
 

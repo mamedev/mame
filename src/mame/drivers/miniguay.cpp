@@ -61,7 +61,7 @@
 
     The dumped version (Mini Guay VD) uses plastic displays with light bulbs, but there's a different
     one (undumped) called "Mini Guay VR" (VR stands for "Version Rodillos") or just "Mini Guay" with
-    reels instead, with an additional PCB for reels control (8031 + 2764 EPROM). 
+    reels instead, with an additional PCB for reels control (8031 + 2764 EPROM).
 */
 
 #include "emu.h"

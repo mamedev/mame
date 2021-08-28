@@ -145,7 +145,7 @@ image_init_result vectrex_cart_slot_device::call_load()
 
 		if (size > 0x10000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 			return image_init_result::FAIL;
 		}
 
@@ -160,7 +160,7 @@ image_init_result vectrex_cart_slot_device::call_load()
 		// Verify the file is accepted by the Vectrex bios
 		if (memcmp(ROM, "g GCE", 5))
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid image");
+			seterror(image_error::INVALIDIMAGE, "Invalid image");
 			return image_init_result::FAIL;
 		}
 

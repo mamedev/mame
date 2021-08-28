@@ -171,8 +171,8 @@ void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		// clip vertical strip for each layer
 		rectangle clip = cliprect;
-		clip.min_y = m_flipscreen ? (192 - i * 64) : (i * 64 + 1);
-		clip.max_y = clip.min_y + 64;
+		clip.min_y = m_flipscreen ? (191 - i * 64) : (i * 64 + 1);
+		clip.max_y = clip.min_y + 63;
 		clip &= cliprect;
 
 		for (int j = 0x7c; j >= 0; j -= 4)
@@ -191,7 +191,7 @@ void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipx = !flipx;
 				flipy = !flipy;
 				sx = 240 - sx;
-				sy = 241 - sy;
+				sy = 240 - sy;
 			}
 
 			if (sx >= 256-8)

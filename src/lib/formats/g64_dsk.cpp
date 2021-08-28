@@ -12,6 +12,8 @@
 
 #include "formats/g64_dsk.h"
 
+#include "ioprocs.h"
+
 
 #define G64_FORMAT_HEADER   "GCR-1541"
 
@@ -27,22 +29,27 @@ const uint32_t g64_format::c1541_cell_size[] =
 	3250  // 16MHz/13/4
 };
 
-int g64_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int g64_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char h[8];
 
-	io_generic_read(io, h, 0, 8);
+	size_t actual;
+	io.read_at(0, h, 8, actual);
 	if (!memcmp(h, G64_FORMAT_HEADER, 8))
 		return 100;
 
 	return 0;
 }
 
-bool g64_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return false;
+
 	std::vector<uint8_t> img(size);
-	io_generic_read(io, &img[0], 0, size);
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	if (img[POS_VERSION])
 	{
@@ -109,15 +116,19 @@ int g64_format::generate_bitstream(int track, int head, int speed_zone, std::vec
 	return ((actual_cell_size >= cell_size-10) && (actual_cell_size <= cell_size+10)) ? speed_zone : -1;
 }
 
-bool g64_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	uint8_t const zerofill[] = { 0x00, 0x00, 0x00, 0x00 };
+	std::vector<uint8_t> const prefill(TRACK_LENGTH, 0xff);
+	size_t actual;
+
 	int tracks, heads;
 	image->get_actual_geometry(tracks, heads);
 	tracks = TRACK_COUNT * heads;
 
 	// write header
 	uint8_t header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, static_cast<uint8_t>(tracks), TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
-	io_generic_write(io, header, POS_SIGNATURE, sizeof(header));
+	io.write_at(POS_SIGNATURE, header, sizeof(header), actual);
 
 	// write tracks
 	for (int head = 0; head < heads; head++) {
@@ -126,12 +137,12 @@ bool g64_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 		std::vector<bool> trackbuf;
 
 		for (int track = 0; track < TRACK_COUNT; track++) {
-			uint32_t tpos = POS_TRACK_OFFSET + (track * 4);
-			uint32_t spos = tpos + (tracks * 4);
-			uint32_t dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * TRACK_LENGTH);
+			uint32_t const tpos = POS_TRACK_OFFSET + (track * 4);
+			uint32_t const spos = tpos + (tracks * 4);
+			uint32_t const dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * TRACK_LENGTH);
 
-			io_generic_write_filler(io, 0x00, tpos, 4);
-			io_generic_write_filler(io, 0x00, spos, 4);
+			io.write_at(tpos, zerofill, 4, actual);
+			io.write_at(spos, zerofill, 4, actual);
 
 			if (image->get_buffer(track, head).size() <= 1)
 				continue;
@@ -163,11 +174,11 @@ bool g64_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 			place_integer_le(speed_offset, 0, 4, speed_zone);
 			place_integer_le(track_length, 0, 2, packed.size());
 
-			io_generic_write(io, track_offset, tpos, 4);
-			io_generic_write(io, speed_offset, spos, 4);
-			io_generic_write_filler(io, 0xff, dpos, TRACK_LENGTH);
-			io_generic_write(io, track_length, dpos, 2);
-			io_generic_write(io, packed.data(), dpos + 2, packed.size());
+			io.write_at(tpos, track_offset, 4, actual);
+			io.write_at(spos, speed_offset, 4, actual);
+			io.write_at(dpos, prefill.data(), TRACK_LENGTH, actual);
+			io.write_at(dpos, track_length, 2, actual);
+			io.write_at(dpos + 2, packed.data(), packed.size(), actual);
 
 			tracks_written++;
 		}

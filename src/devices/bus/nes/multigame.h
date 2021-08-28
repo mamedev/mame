@@ -893,7 +893,7 @@ public:
 	virtual void write_l(offs_t offset, u8 data) override;
 	virtual void write_h(offs_t offset, u8 data) override;
 
-//	virtual void pcb_reset() override;
+//  virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides

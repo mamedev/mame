@@ -125,7 +125,7 @@ u8 pps4_device::M()
 {
 	u8 ret = m_data.read_byte(m_B & ~m_SAG);
 	m_SAG = 0;
-	return ret;
+	return ret & 15;
 }
 
 
@@ -211,9 +211,9 @@ inline u8 pps4_device::ARG()
  */
 void pps4_device::iAD()
 {
-	m_A = m_A + M();
-	m_C = (m_A >> 4) & 1;
-	m_A = m_A & 15;
+	m_A += M();
+	m_C = (m_A > 15) ? 1 : 0;
+	m_A &= 15;
 }
 
 /**
@@ -232,8 +232,8 @@ void pps4_device::iAD()
 void pps4_device::iADC()
 {
 	m_A = m_A + M() + m_C;
-	m_C = m_A >> 4;
-	m_A = m_A & 15;
+	m_C = (m_A > 15) ? 1 : 0;
+	m_A &= 15;
 }
 
 /**
@@ -252,10 +252,11 @@ void pps4_device::iADC()
  */
 void pps4_device::iADSK()
 {
-	m_A = m_A + M();
-	m_C = m_A >> 4;
+	m_A = m_A + M() + m_C;   // This fixes the diagnostic test button, same as pinmame. It means ADSK and ADCSK are the same.
+	//m_A += M();
+	m_C = (m_A > 15) ? 1 : 0;
 	m_Skip = m_C;
-	m_A = m_A & 15;
+	m_A &= 15;
 }
 
 /**
@@ -275,9 +276,9 @@ void pps4_device::iADSK()
 void pps4_device::iADCSK()
 {
 	m_A = m_A + M() + m_C;
-	m_C = m_A >> 4;
+	m_C = (m_A > 15) ? 1 : 0;
 	m_Skip = m_C;
-	m_A = m_A & 15;
+	m_A &= 15;
 }
 
 /**
@@ -304,9 +305,9 @@ void pps4_device::iADCSK()
 void pps4_device::iADI()
 {
 	const u8 imm = ~m_I1 & 15;
-	m_A = m_A + imm;
-	m_Skip = (m_A >> 4) & 1;
-	m_A = m_A & 15;
+	m_A += imm;
+	m_Skip = (m_A > 15) ? 1 : 0;
+	m_A &= 15;
 }
 
 /**
@@ -326,7 +327,7 @@ void pps4_device::iADI()
  */
 void pps4_device::iDC()
 {
-	m_A = m_A + 10;
+	m_A = (m_A + 10) & 15;
 }
 
 /**
@@ -345,7 +346,7 @@ void pps4_device::iDC()
  */
 void pps4_device::iAND()
 {
-	m_A = m_A & M();
+	m_A &= M();
 }
 
 /**
@@ -364,7 +365,7 @@ void pps4_device::iAND()
  */
 void pps4_device::iOR()
 {
-	m_A = m_A | M();
+	m_A |= M();
 }
 
 /**
@@ -384,7 +385,7 @@ void pps4_device::iOR()
  */
 void pps4_device::iEOR()
 {
-	m_A = m_A ^ M();
+	m_A ^= M();
 }
 
 /**
@@ -402,7 +403,7 @@ void pps4_device::iEOR()
  */
 void pps4_device::iCOMP()
 {
-	m_A = m_A ^ 15;
+	m_A ^= 15;
 }
 
 /**
@@ -522,7 +523,7 @@ void pps4_device::iRF2()
  * by B register are placed in the accumulator.
  * The RAM address in the B register is then
  * modified by the result of an exclusive-OR of
- * the 3-b it immediate field I(3:1) and B(7:5)
+ * the 3-b immediate field I(3:1) and B(7:5)
  *
  * See %Note3
  */
@@ -530,7 +531,7 @@ void pps4_device::iLD()
 {
 	const u16 i3c = ~m_I1 & 7;
 	m_A = M();
-	m_B = m_B ^ (i3c << 4);
+	m_B ^= (i3c << 4);
 }
 
 /**
@@ -555,7 +556,7 @@ void pps4_device::iEX()
 	const u8 mem = M();
 	W(m_A);
 	m_A = mem;
-	m_B = m_B ^ (i3c << 4);
+	m_B ^= (i3c << 4);
 }
 
 /**
@@ -585,14 +586,10 @@ void pps4_device::iEXD()
 	u8 bl = m_B & 15;
 	W(m_A);
 	m_A = mem;
-	m_B = m_B ^ (i3c << 4);
+	m_B ^= (i3c << 4);
 	// if decrement BL wraps to 1111b
-	if (0 == bl) {
-		bl = 15;
-		m_Skip = 1;
-	} else {
-		bl = bl - 1;
-	}
+	bl = (bl - 1) & 15;
+	m_Skip = (bl == 15);
 	m_B = (m_B & ~15) | bl;
 }
 
@@ -640,7 +637,7 @@ void pps4_device::iLDI()
  */
 void pps4_device::iLAX()
 {
-	m_A = m_X;
+	m_A = m_X & 15;
 }
 
 /**
@@ -654,11 +651,11 @@ void pps4_device::iLAX()
  * X <- A
  *
  * The contents of the accumulator are
- * tansferred to the X register.
+ * transferred to the X register.
  */
 void pps4_device::iLXA()
 {
-	m_X = m_A;
+	m_X = m_A & 15;
 }
 
 /**
@@ -672,7 +669,7 @@ void pps4_device::iLXA()
  * A <- BL
  *
  * The contents of BL register are
- * tansferred to the accumulator.
+ * transferred to the accumulator.
  */
 void pps4_device::iLABL()
 {
@@ -690,7 +687,7 @@ void pps4_device::iLABL()
  * BM <- X
  *
  * The contents of X register are
- * tansferred to BM register.
+ * transferred to the BM register.
  */
 void pps4_device::iLBMX()
 {
@@ -708,7 +705,7 @@ void pps4_device::iLBMX()
  * BU <- A
  * A <- M
  *
- * The contents of accumulator are tansferred to
+ * The contents of accumulator are transferred to
  * BU register. Also, the contents of the currently
  * addressed RAM are transferred to accumulator.
  */
@@ -776,9 +773,7 @@ void pps4_device::iXBMX()
 void pps4_device::iXAX()
 {
 	// swap A and X
-	m_A ^= m_X;
-	m_X ^= m_A;
-	m_A ^= m_X;
+	std::swap(m_A, m_X);
 }
 
 /**
@@ -797,9 +792,7 @@ void pps4_device::iXAX()
 void pps4_device::iXS()
 {
 	// swap SA and SB
-	m_SA ^= m_SB;
-	m_SB ^= m_SA;
-	m_SA ^= m_SB;
+	std::swap(m_SA, m_SB);
 }
 
 /**
@@ -875,9 +868,7 @@ void pps4_device::iLB()
 	m_B = ~ARG() & 255;
 	m_P = m_SA;
 	// swap SA and SB
-	m_SA ^= m_SB;
-	m_SB ^= m_SA;
-	m_SA ^= m_SB;
+	std::swap(m_SA, m_SB);
 }
 
 /**
@@ -1103,7 +1094,7 @@ void pps4_device::iSKC()
  */
 void pps4_device::iSKZ()
 {
-	m_Skip = (0 == m_A) ? 1 : 0;
+	m_Skip = m_A ? 0 : 1;
 }
 
 /**
@@ -1175,9 +1166,7 @@ void pps4_device::iRTN()
 {
 	m_P = m_SA & 0xFFF;
 	// swap SA and SB
-	m_SA ^= m_SB;
-	m_SB ^= m_SA;
-	m_SA ^= m_SB;
+	std::swap(m_SA, m_SB);
 }
 
 /**
@@ -1198,9 +1187,7 @@ void pps4_device::iRTNSK()
 {
 	m_P = m_SA & 0xFFF;
 	// swap SA and SB
-	m_SA ^= m_SB;
-	m_SB ^= m_SA;
-	m_SA ^= m_SB;
+	std::swap(m_SA, m_SB);
 	m_Skip = 1; // next opcode is ignored
 }
 
@@ -1235,7 +1222,7 @@ void pps4_device::iRTNSK()
  */
 void pps4_device::iIOL()
 {
-	u8 ac = (~m_A & 15);
+	u8 ac = ~m_A & 15;
 	m_I2 = ARG();
 	m_io.write_byte(m_I2, ac);
 	LOG("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac);
@@ -1283,7 +1270,7 @@ void pps4_device::iDIB()
 void pps4_2_device::iDIB()
 {
 	// PPS-4/2 can write zeros onto bidirectional DIO pins to mask open-drain inputs
-	m_A = m_dib_cb() & m_DIO;
+	m_A = m_dib_cb() & m_DIO & 15;
 }
 
 /**
@@ -1307,7 +1294,7 @@ void pps4_device::iDOA()
 void pps4_2_device::iDOA()
 {
 	// DOA also transfers contents of X to DIO on PPS-4/2
-	m_DIO = m_X;
+	m_DIO = m_X & 15;
 	m_do_cb(m_A | (m_X << 4));
 }
 

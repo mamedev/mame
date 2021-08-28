@@ -267,7 +267,7 @@ image_init_result gb_cart_slot_device_base::call_load()
 			/* Verify that the file contains 16kb blocks */
 			if ((len == 0) || ((len % 0x4000) != 0))
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size\n");
+				seterror(image_error::INVALIDIMAGE, "Invalid ROM file size\n");
 				return image_init_result::FAIL;
 			}
 		}

@@ -162,12 +162,11 @@ static const nes_pcb pcb_list[] =
 	{ "hengg_xhzs",       HENGG_XHZS },
 	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
 	{ "hes",              HES_BOARD },
-	{ "hosenkan",         HOSENKAN_BOARD },
 	{ "ks106c",           KAISER_KS106C },  // mapper 352
 	{ "ks202",            KAISER_KS202 },   // mapper 56
 	{ "ks7010",           KAISER_KS7010 },  // used in Akumajo Dracula (FDS Conversion)
 	{ "ks7012",           KAISER_KS7012 },  // used in Zanac (FDS Conversion)
-	{ "ks7013b",          KAISER_KS7013B }, // used in Highway Star (FDS Conversion)
+	{ "ks7013b",          KAISER_KS7013B }, // used in Highway Star Kaiser bootleg
 	{ "ks7016",           KAISER_KS7016 },  // used in Exciting Basketball (FDS Conversion)
 	{ "ks7016b",          KAISER_KS7016B }, // used in Meikyuu Jiin Dababa alt (FDS Conversion)
 	{ "ks7017",           KAISER_KS7017 },
@@ -226,6 +225,7 @@ static const nes_pcb pcb_list[] =
 	{ "family4646",       BMC_FAMILY_4646 },
 	{ "pikay2k",          BTL_PIKACHUY2K },  // mapper 254
 	{ "8237",             UNL_8237 },
+	{ "8237a",            UNL_8237A },
 	{ "sg_lionk",         SUPERGAME_LIONKING },
 	{ "sg_boog",          SUPERGAME_BOOGERMAN },
 	{ "kasing",           KASING_BOARD },
@@ -304,6 +304,7 @@ static const nes_pcb pcb_list[] =
 	{ "resettxrom1",      BMC_RESETTXROM1 },
 	{ "resettxrom2",      BMC_RESETTXROM2 },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "tech9in1",         BMC_TECHLINE9IN1 },
 	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
@@ -341,6 +342,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_lh28_lh54",    UNL_LH28_LH54 },
 	{ "unl_lh31",         UNL_LH31 },
 	{ "unl_lh32",         UNL_LH32 },
+	{ "unl_lh42",         UNL_LH42 },
 	{ "unl_lh51",         UNL_LH51 },
 	{ "unl_lh53",         UNL_LH53 },
 	{ "unl_ac08",         UNL_AC08 },
@@ -361,7 +363,6 @@ static const nes_pcb pcb_list[] =
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
-	{ "8237a",            UNSUPPORTED_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },

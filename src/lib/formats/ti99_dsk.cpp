@@ -43,6 +43,8 @@
 #include "ti99_dsk.h"
 #include "imageutl.h"
 
+#include "ioprocs.h"
+
 #include "osdcore.h" // osd_printf_* (in osdcore.h)
 
 #include <cstring>
@@ -80,13 +82,16 @@ int ti99_floppy_format::get_encoding(int cell_size)
 /*
     Load the image from disk and convert it into a sequence of flux levels.
 */
-bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	uint64_t file_size;
+	if (io.length(file_size))
+		return false;
+
 	int cell_size = 0;
 	int sector_count = 0;
 	int heads = 0;
 	int log_track_count = 0;
-	int file_size = io_generic_size(io);
 
 	bool img_high_tpi = false;
 	bool drive_high_tpi = false;
@@ -211,7 +216,7 @@ bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, const std::v
 /*
     Save all tracks to the image file.
 */
-bool ti99_floppy_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t sectordata[9216];   // max size (36*256)
 
@@ -916,9 +921,12 @@ const char *ti99_sdf_format::extensions() const
 	return "dsk";
 }
 
-int ti99_sdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ti99_sdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t file_size = io_generic_size(io);
+	uint64_t file_size;
+	if (io.length(file_size))
+		return 0;
+
 	int vote = 0;
 
 	// Adding support for another sector image format which adds 768 bytes
@@ -947,7 +955,8 @@ int ti99_sdf_format::identify(io_generic *io, uint32_t form_factor, const std::v
 	{
 		// Read first sector (Volume Information Block)
 		ti99vib vib;
-		io_generic_read(io, &vib, 0, sizeof(ti99vib));
+		size_t actual;
+		io.read_at(0, &vib, sizeof(ti99vib), actual);
 
 		// Check from contents
 		if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
@@ -964,10 +973,14 @@ int ti99_sdf_format::identify(io_generic *io, uint32_t form_factor, const std::v
 	return vote;
 }
 
-void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
+void ti99_sdf_format::determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
-	uint64_t file_size = io_generic_size(io);
-	ti99vib vib;
+	uint64_t file_size;
+	if (io.length(file_size))
+	{
+		cell_size = sector_count = heads = tracks = 0;
+		return;
+	}
 
 	cell_size = 0;
 	sector_count = 0;
@@ -980,7 +993,9 @@ void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 		file_size -= 768;
 
 	// Read first sector
-	io_generic_read(io, &vib, 0, sizeof(ti99vib));
+	ti99vib vib;
+	size_t actual;
+	io.read_at(0, &vib, sizeof(ti99vib), actual);
 
 	// Check from contents
 	if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
@@ -1059,13 +1074,14 @@ int ti99_sdf_format::get_track_size(int sector_count)
 	return sector_count * SECTOR_SIZE;
 }
 
-void ti99_sdf_format::load_track(io_generic *io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount)
+void ti99_sdf_format::load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount)
 {
 	// Calculate the track offset from the beginning of the image file
 	int logicaltrack = (head==0)? track : (2*trackcount - track - 1);
 	int position = logicaltrack * get_track_size(sectorcount);
 
-	io_generic_read(io, sectordata, position, sectorcount*SECTOR_SIZE);
+	size_t actual;
+	io.read_at(position, sectordata, sectorcount*SECTOR_SIZE, actual);
 
 	// Interleave and skew
 	int interleave = 7;
@@ -1133,19 +1149,18 @@ std::string ti99_floppy_format::dumpline(uint8_t* line, int address) const
     Write the data to the disk. We have a list of sector positions, so we
     just need to go through that list and save each sector in the sector data.
 */
-void ti99_sdf_format::write_track(io_generic *io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count)
+void ti99_sdf_format::write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count)
 {
-	uint8_t* buf;
-
 	int logicaltrack = head * track_count;
 	logicaltrack += ((head&1)==0)?  track : (track_count - 1 - track);
 	int trackoffset = logicaltrack * sector_count * SECTOR_SIZE;
 
 	for (int i=0; i < sector_count; i++)
 	{
-		buf = sectordata + i * SECTOR_SIZE;
+		uint8_t const *const buf = sectordata + i * SECTOR_SIZE;
 		LOGMASKED(LOG_DETAIL, "[ti99_dsk] Writing sector %d (offset %06x)\n", sector[i], sector[i] * SECTOR_SIZE);
-		io_generic_write(io, buf, trackoffset + sector[i] * SECTOR_SIZE, SECTOR_SIZE);
+		size_t actual;
+		io.write_at(trackoffset + sector[i] * SECTOR_SIZE, buf, SECTOR_SIZE, actual);
 	}
 }
 
@@ -1209,7 +1224,7 @@ const char *ti99_tdf_format::extensions() const
 /*
     Determine whether the image file can be interpreted as a track dump
 */
-int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ti99_tdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int vote = 0;
 	uint8_t fulltrack[6872];
@@ -1232,7 +1247,8 @@ int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor, const std::v
 		LOGMASKED(LOG_INFO, "[ti99_dsk] Image file length matches TDF\n");
 
 		// Fetch track 0
-		io_generic_read(io, fulltrack, 0, get_track_size(sector_count));
+		size_t actual;
+		io.read_at(0, fulltrack, get_track_size(sector_count), actual);
 
 		if (sector_count == 9)
 		{
@@ -1279,9 +1295,14 @@ int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor, const std::v
     Find the proper format for a given image file. Tracks are counted per side.
     Note that only two formats are actually compatible with the PC99 emulator.
 */
-void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
+void ti99_tdf_format::determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
-	uint64_t file_size = io_generic_size(io);
+	uint64_t file_size;
+	if (io.length(file_size))
+	{
+		cell_size = sector_count = heads = tracks = 0;
+		return;
+	}
 
 	// LOGMASKED(LOG_INFO, "[ti99_dsk] Image size = %ld\n", file_size);   // doesn't compile
 	switch (file_size)
@@ -1336,13 +1357,14 @@ void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
     track from scratch. TDF is not as flexible as it suggests, it does not
     allow different gap lengths and so on.
 */
-void ti99_tdf_format::load_track(io_generic *io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount)
+void ti99_tdf_format::load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount)
 {
+	size_t actual;
 	uint8_t fulltrack[12544]; // space for a full TDF track
 
 	// Read beginning of track 0. We need this to get the first gap, according
 	// to the format
-	io_generic_read(io, fulltrack, 0, 100);
+	io.read_at(0, fulltrack, 100, actual);
 
 	int offset = 0;
 	int tracksize = get_track_size(sectorcount);
@@ -1383,7 +1405,7 @@ void ti99_tdf_format::load_track(io_generic *io, uint8_t *sectordata, int *secto
 
 	int base = (head * trackcount + track) * tracksize;
 	int position = 0;
-	io_generic_read(io, fulltrack, base, tracksize);
+	io.read_at(base, fulltrack, tracksize, actual);
 
 	for (int i=0; i < sectorcount; i++)
 	{
@@ -1431,7 +1453,7 @@ void ti99_tdf_format::load_track(io_generic *io, uint8_t *sectordata, int *secto
     need the sector contents and the sector sequence, which are passed via
     sectordata, sector, and sector_count.
 */
-void ti99_tdf_format::write_track(io_generic *io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count)
+void ti99_tdf_format::write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count)
 {
 	uint8_t trackdata[12544];
 	int offset = ((track_count * head) + track) * get_track_size(sector_count);
@@ -1485,7 +1507,8 @@ void ti99_tdf_format::write_track(io_generic *io, uint8_t *sectordata, int *sect
 		for (int i=0; i < param[WGAP3]; i++) trackdata[pos++] = param[WGAPBYTE];
 	}
 	for (int i=0; i < param[WGAP4]; i++) trackdata[pos++] = param[WGAPBYTE];
-	io_generic_write(io, trackdata, offset, get_track_size(sector_count));
+	size_t actual;
+	io.write_at(offset, trackdata, get_track_size(sector_count), actual);
 }
 
 int ti99_tdf_format::get_track_size(int sector_count)

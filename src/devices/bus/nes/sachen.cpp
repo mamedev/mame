@@ -503,7 +503,7 @@ uint8_t nes_sachen_tcu02_device::read_l(offs_t offset)
 
 u8 nes_sachen_3013_device::read_h(offs_t offset)
 {
-     return (offset < 0x4000) ? 0x3a : hi_access_rom(offset);
+	 return (offset < 0x4000) ? 0x3a : hi_access_rom(offset);
 }
 
 /*-------------------------------------------------

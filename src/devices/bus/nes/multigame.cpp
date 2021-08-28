@@ -418,7 +418,7 @@ nes_bmc_lc160_device::nes_bmc_lc160_device(const machine_config &mconfig, const 
 }
 
 nes_vram_protect_device::nes_vram_protect_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-     : nes_nrom_device(mconfig, type, tag, owner, clock), m_vram_protect(false)
+	 : nes_nrom_device(mconfig, type, tag, owner, clock), m_vram_protect(false)
 {
 }
 

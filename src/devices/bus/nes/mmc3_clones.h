@@ -106,32 +106,9 @@ class nes_8237_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_8237_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_8237_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
-	virtual void prg_cb(int start, int bank) override;
-	virtual void chr_cb(int start, int bank, int source) override;
-
-	virtual void pcb_reset() override;
-
-private:
-	uint8_t m_reg[3];
-	int m_cd_enable;
-};
-
-
-// ======================> nes_sglionk_device
-
-class nes_sglionk_device : public nes_txrom_device
-{
-public:
-	// construction/destruction
-	nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_l(offs_t offset, u8 data) override;
 	virtual void write_h(offs_t offset, u8 data) override;
 	virtual void prg_cb(int start, int bank) override;
 
@@ -139,15 +116,69 @@ public:
 
 protected:
 	// construction/destruction
-	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u8 *reg_table, const u16 *addr_table);
+	nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	void update_banks();
+	u8 m_reg[3];
+	int m_board;
+};
+
+
+// ======================> nes_8237a_device
+
+class nes_8237a_device : public nes_8237_device
+{
+public:
+	// construction/destruction
+	nes_8237a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+// ======================> nes_kasing_device
+
+class nes_kasing_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void prg_cb(int start, int bank) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// construction/destruction
+	nes_kasing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
 	bool m_mmc3_mode;
-	const u8 *m_reg_table;
-	const u16 *m_addr_table;
+};
+
+
+// ======================> nes_sglionk_device
+
+class nes_sglionk_device : public nes_kasing_device
+{
+public:
+	// construction/destruction
+	nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+protected:
+	// construction/destruction
+	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+private:
+	int m_board;
 };
 
 
@@ -158,57 +189,6 @@ class nes_sgboog_device : public nes_sglionk_device
 public:
 	// construction/destruction
 	nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-
-/*
-// ======================> nes_sgboog_device
-
-class nes_sgboog_device : public nes_txrom_device
-{
-public:
-	// construction/destruction
-	nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
-	virtual void prg_cb(int start, int bank) override;
-	virtual void chr_cb(int start, int bank, int source) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-private:
-	virtual void set_prg(int prg_base, int prg_mask) override;
-	uint8_t m_reg[3];
-	uint8_t m_mode;
-};
-*/
-
-
-// ======================> nes_kasing_device
-
-class nes_kasing_device : public nes_txrom_device
-{
-public:
-	// construction/destruction
-	nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	virtual void prg_cb(int start, int bank) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-private:
-	uint8_t m_reg;
 };
 
 
@@ -584,6 +564,28 @@ private:
 };
 
 
+// ======================> nes_tech9in1_device
+
+class nes_tech9in1_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_tech9in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_l(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	void update_banks();
+	u8 m_reg[3];
+};
+
+
 // ======================> nes_bmc_8in1_device
 
 class nes_bmc_8in1_device : public nes_txrom_device
@@ -903,6 +905,7 @@ DECLARE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device)
 DECLARE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device)
 DECLARE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device)
 DECLARE_DEVICE_TYPE(NES_8237,          nes_8237_device)
+DECLARE_DEVICE_TYPE(NES_8237A,         nes_8237a_device)
 DECLARE_DEVICE_TYPE(NES_SG_LIONK,      nes_sglionk_device)
 DECLARE_DEVICE_TYPE(NES_SG_BOOG,       nes_sgboog_device)
 DECLARE_DEVICE_TYPE(NES_KASING,        nes_kasing_device)
@@ -928,6 +931,7 @@ DECLARE_DEVICE_TYPE(NES_RESETTXROM0,   nes_resettxrom0_device)
 DECLARE_DEVICE_TYPE(NES_RESETTXROM1,   nes_resettxrom1_device)
 DECLARE_DEVICE_TYPE(NES_RESETTXROM2,   nes_resettxrom2_device)
 DECLARE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device)
+DECLARE_DEVICE_TYPE(NES_TECHLINE9IN1,  nes_tech9in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device)

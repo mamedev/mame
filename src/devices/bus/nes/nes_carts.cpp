@@ -41,7 +41,6 @@
 #include "ggenie.h"
 #include "hes.h"
 #include "henggedianzi.h"
-#include "hosenkan.h"
 #include "jy.h"
 #include "kaiser.h"
 #include "legacy.h"
@@ -250,12 +249,11 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("hengg_xhzs",       NES_HENGG_XHZS);
 	device.option_add_internal("hengg_shjy3",      NES_HENGG_SHJY3); // mapper 253
 	device.option_add_internal("hes",              NES_HES);
-	device.option_add_internal("hosenkan",         NES_HOSENKAN);
 	device.option_add_internal("ks106c",           NES_KS106C);     // mapper 352
 	device.option_add_internal("ks202",            NES_KS202);      // mapper 56
 	device.option_add_internal("ks7010",           NES_KS7010);     // used in Akumajo Dracula (FDS Conversion)
 	device.option_add_internal("ks7012",           NES_KS7012);     // used in Zanac (FDS Conversion)
-	device.option_add_internal("ks7013b",          NES_KS7013B);    // used in Highway Star (FDS Conversion)
+	device.option_add_internal("ks7013b",          NES_KS7013B);    // used in Highway Star Kaiser bootleg
 	device.option_add_internal("ks7016",           NES_KS7016);     // used in Exciting Basket (FDS Conversion)
 	device.option_add_internal("ks7016b",          NES_KS7016B);    // used in Meikyu Jiin Dababa alt (FDS Conversion)
 	device.option_add_internal("ks7017",           NES_KS7017);
@@ -320,6 +318,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("unl_lh28_lh54",    NES_LH28_LH54);  // used in Falsion, Meikyuu Jiin Dababa FDS conversions
 	device.option_add_internal("unl_lh31",         NES_LH31);       // used in Bubble Bobble alt FDS conversion
 	device.option_add_internal("unl_lh32",         NES_LH32);       // used by Monty no Doki Doki Daidassou FDS conversion
+	device.option_add_internal("unl_lh42",         NES_LH42);       // used by Highway Star Whirlwind Manu bootleg
 	device.option_add_internal("unl_lh51",         NES_LH51);       // used in Ai Senshi Nicol alt FDS conversion
 	device.option_add_internal("unl_lh53",         NES_LH53);       // used in Nazo no Murasamejou (FDS Conversion);
 	device.option_add_internal("unl_ac08",         NES_AC08);       // used by Green Beret FDS conversion
@@ -336,7 +335,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("family4646",       NES_FAMILY4646);
 	device.option_add_internal("pikay2k",          NES_PIKAY2K); // mapper 254
 	device.option_add_internal("8237",             NES_8237);
-	device.option_add_internal("8237a",            NES_NROM);    // UNSUPPORTED
+	device.option_add_internal("8237a",            NES_8237A);
 	device.option_add_internal("sg_lionk",         NES_SG_LIONK);
 	device.option_add_internal("sg_boog",          NES_SG_BOOG);
 	device.option_add_internal("kasing",           NES_KASING);
@@ -427,6 +426,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("resettxrom1",      NES_RESETTXROM1);
 	device.option_add_internal("resettxrom2",      NES_RESETTXROM2);
 	device.option_add_internal("s24in1c03",        NES_S24IN1SC03);
+	device.option_add_internal("tech9in1",         NES_TECHLINE9IN1);
 	device.option_add_internal("bmc_8in1",         NES_BMC_8IN1);
 	device.option_add_internal("bmc_15in1",        NES_BMC_15IN1);
 	device.option_add_internal("bmc_sbig7in1",     NES_BMC_SBIG7);

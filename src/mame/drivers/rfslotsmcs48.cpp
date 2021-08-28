@@ -158,4 +158,4 @@ ROM_END
 //    YEAR  NAME        PARENT    MACHINE   INPUT    CLASS               INIT        ROT   COMPANY               FULLNAME                         FLAGS
 GAME( 1981, ajofrin,    0,        ajofrin,  ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Ajofrin City",                  MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, babyfrts,   0,        babyfrts, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Baby Fruits (100 pts version)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?, babyfrts25, babyfrts, babyfrts, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Baby Fruits (25 pts version)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, babyfrts25, babyfrts, babyfrts, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Baby Fruits (25 pts version)",  MACHINE_IS_SKELETON_MECHANICAL )

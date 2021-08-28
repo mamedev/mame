@@ -179,7 +179,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 
 	if (m_ram->size() < 16*1024)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
+		image.seterror(image_error::INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");
 		return image_init_result::FAIL;
 	}
@@ -216,7 +216,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 
 	if (!done)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "EOF marker not found");
+		image.seterror(image_error::INVALIDIMAGE, "EOF marker not found");
 		image.message("EOF marker not found");
 		return image_init_result::FAIL;
 	}

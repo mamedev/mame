@@ -166,7 +166,7 @@ image_init_result m5_cart_slot_device::call_load()
 
 			if (size > 0x5000 && m_type == M5_STD)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for an M5 cart");
+				seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an M5 cart");
 				return image_init_result::FAIL;
 			}
 

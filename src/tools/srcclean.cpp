@@ -2254,13 +2254,13 @@ int main(int argc, char *argv[])
 	{
 		// open the file
 		util::core_file::ptr infile;
-		osd_file::error const err(util::core_file::open(argv[i], OPEN_FLAG_READ, infile));
-		if (osd_file::error::NONE != err)
+		std::error_condition const err(util::core_file::open(argv[i], OPEN_FLAG_READ, infile));
+		if (err)
 		{
 			if (affected)
 				std::cerr << std::endl;
 			affected = true;
-			util::stream_format(std::cerr, "Can't open %1$s\n", argv[i]);
+			util::stream_format(std::cerr, "Can't open %1$s (%2$s)\n", argv[i], err.message());
 			++failures;
 			continue;
 		}

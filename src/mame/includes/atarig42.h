@@ -93,6 +93,7 @@ class atarig42_0x400_state : public atarig42_state
 {
 public:
 	using atarig42_state::atarig42_state;
+	void init_dangerex();
 	void init_guardian();
 	void atarig42_0x400(machine_config &config);
 

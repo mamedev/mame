@@ -16488,7 +16488,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="highway" cloneof="radracer">
+	<software name="highway" cloneof="radracer" supported="partial">
 		<description>Highway Star (Jpn)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
@@ -30442,7 +30442,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="radraceru" cloneof="radracer">
+	<software name="radraceru" cloneof="radracer" supported="partial">
 		<description>Rad Racer (USA)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -30462,7 +30462,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="radracer">
+	<software name="radracer" supported="partial">
 		<description>Rad Racer (Euro)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -54081,22 +54081,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- Dump not available. Game is also in 9in1cal.
-	<software name="supergun">
-		<description>Super Gun (Asia)</description>
-		<year>1992</year>
-		<publisher>Caltron</publisher>
-		<info name="serial" value="CN-12"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ntdec_n715021" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="prg" size="65536">
-				<rom name="prg.u1" size="65536" crc="" sha1="" status="nodump" />
-			</dataarea>
-			<dataarea name="chr" size="32768">
-				<rom name="chr.u2" size="32768" crc="" sha1="" status="nodump" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="supergun">
+        <description>Super Gun (Asia)</description>
+        <year>1992</year>
+        <publisher>Caltron</publisher>
+        <info name="serial" value="CN-12"/>
+        <part name="cart" interface="nes_cart">
+            <feature name="slot" value="ntdec_n715021" />
+            <feature name="mirroring" value="horizontal" />
+            <dataarea name="prg" size="65536">
+                <rom name="prg.u1" size="65536" crc="" sha1="" status="nodump" />
+            </dataarea>
+            <dataarea name="chr" size="32768">
+                <rom name="chr.u2" size="32768" crc="" sha1="" status="nodump" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="destroyr">
@@ -61839,6 +61839,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Bomber Boy has two levels, 2-4 and 5-3, that are not completable due to programming errors. -->
+	<software name="2lkbb">
+		<description>2 in 1 - The Lion King &amp; Bomber Boy</description>
+		<year>199?</year>
+		<publisher>Super Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8237" />
+			<dataarea name="prg" size="524288">
+				<rom name="2-in-1 - the lion king, bomber boy.prg" size="524288" crc="5039aca5" sha1="f0162e3788b6be5d46cd47af6f6ce0cd6c6514d0" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="2-in-1 - the lion king, bomber boy.chr" size="524288" crc="789c0478" sha1="deb9f0b9d3e3b57809be4044e1dbda31f0e24d9d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2mk67" supported="partial">
 		<description>2 in 1 - Mortal Kombat 6 &amp; Mortal Kombat 7</description>
 		<year>199?</year>
@@ -63250,6 +63266,38 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="highwayk" cloneof="radracer" supported="partial">
+		<description>Highway Star (Kaiser bootleg)</description>
+		<year>19??</year>
+		<publisher>Kaiser</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks7013b" />
+			<feature name="pcb" value="UNL-KS7013B" />
+			<dataarea name="prg" size="131072">
+				<rom name="ks114" size="131072" crc="95ce148a" sha1="eabaefb8ef07c701f7c2d8df6b132a7974c1e9b4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="highwayw" cloneof="radracer" supported="partial">
+		<description>Highway Star (Whirlwind Manu bootleg)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH42"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_lh42" />
+			<dataarea name="prg" size="131072">
+				<rom name="highway star (whirlwind manu).prg" size="131072" crc="8f4ae8aa" sha1="ce4851d8f89cacb212ef645f20201c2634f7253a" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hstar2" cloneof="f1hero2">
 		<description>High Way Star II (Ripped from F-646 HIGH K Power Sports 4-in-1)</description>
 		<year>19??</year>
@@ -63954,10 +64002,10 @@ We don't include these hacks because they were not burned into real carts nor so
 
 	<software name="pocohon">
 		<description>Pocohontos (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Hosenkan</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="hosenkan" />
+			<feature name="slot" value="sg_lionk" />
 			<feature name="pcb" value="UNL-HOSENKAN" />
 			<dataarea name="chr" size="262144">
 				<rom name="pocohontos (199x)(-)(as)[p].chr" size="262144" crc="f995a526" sha1="3829b9da7a1a55e4b8d3f89e91d535ffa6004224" offset="00000" status="baddump" />
@@ -66649,10 +66697,10 @@ All musics were removed in this game.
 
 	<software name="sdkong">
 		<description>Super Donkey Kong (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997?</year>
+		<publisher>Hosenkan</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="hosenkan" />
+			<feature name="slot" value="sg_lionk" />
 			<feature name="pcb" value="UNL-HOSENKAN" />
 			<dataarea name="chr" size="131072">
 				<rom name="super donkey kong (unl).chr" size="131072" crc="d0883ac5" sha1="63a66b7f17e8520cb88916893c0a4200caa06365" offset="00000" status="baddump" />
@@ -67383,22 +67431,6 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="pcb" value="KAISER-KS7057" />
 			<dataarea name="prg" size="131072">
 				<rom name="gyruss (kaiser)(fds conversion) (unl)[u].prg" size="131072" crc="d0fd4140" sha1="45dba74fdb7f666d82bed159511ed5019acae82d" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hstarfds">
-		<description>Highway Star (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>Kaiser</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ks7013b" />
-			<feature name="pcb" value="UNL-KS7013B" />
-			<dataarea name="prg" size="131072">
-				<rom name="highway star (kaiser) (fds conversion) (unl).prg" size="131072" crc="95ce148a" sha1="eabaefb8ef07c701f7c2d8df6b132a7974c1e9b4" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -69234,7 +69266,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 <!-- is this correct?!? -->
-	<software name="highwayh" cloneof="radracer" supported="partial">
+	<software name="highwayh" cloneof="radracer" supported="no">
 		<description>Highway Star (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -76181,8 +76213,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="kof96" />
-			<feature name="pcb" value="UNL-KOF96" />
+			<feature name="slot" value="txrom" />
 			<dataarea name="chr" size="262144">
 				<rom name="sonic 3d blast 6 [h1] [decrypted].chr" size="262144" crc="32c4a5d0" sha1="1e1f07a41283b869fc5cc198bb48256c702e561e" offset="00000" status="baddump" />
 			</dataarea>
@@ -76340,13 +76371,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="garousp1" cloneof="garousp" supported="no">
-		<description>Garou Densetsu Special (Asia, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="garousp1" cloneof="garousp">
+		<description>Garou Densetsu Special (Asia, alt)</description>
+		<year>1995</year>
+		<publisher>Kasheng</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="kof96" />
-			<feature name="pcb" value="UNL-KOF96" />
+			<feature name="slot" value="kasing" />
 			<dataarea name="chr" size="262144">
 				<rom name="garou densetsu special (unl)[a1].chr" size="262144" crc="09817b25" sha1="a07c8754b8a3017d2544527a12b6683969e2de62" offset="00000" status="baddump" />
 			</dataarea>
@@ -76667,14 +76697,14 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk3ex60" supported="no">
+	<software name="mk3ex60">
 		<description>Mortal Kombat 3 Extra 60 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="M-E3"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="mortal combat 3 extra 60 [m-e3] (pirate original).chr" size="524288" crc="559ec915" sha1="3301376fc480db7383a3ea520be041534426287d" offset="00000" status="baddump" />
 			</dataarea>
@@ -76684,13 +76714,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk3ex60a" cloneof="mk3ex60" supported="no">
+	<software name="mk3ex60a" cloneof="mk3ex60">
 		<description>Mortal Kombat 3 Extra 60 (Asia, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="262144">
 				<rom name="mortal kombat 3 - extra 60 (unl) (supergame).chr" size="262144" crc="0f448984" sha1="58d5dab667a4fcbb17652314a410569bb1d7152f" offset="00000" status="baddump" />
 			</dataarea>
@@ -78570,13 +78600,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_2jm2" supported="no">
+	<software name="mc_2jm2">
 		<description>2 in 1 (J-M2)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="2-in-1 j-m2 (unl).chr" size="524288" crc="5ddcc731" sha1="cc2555380f2dfb46a73b64d9e1e4fec2ab3d3892" offset="00000" status="baddump" />
 			</dataarea>
@@ -78586,13 +78616,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_2kin5" supported="no">
+	<software name="mc_2kin5">
 		<description>2 in 1 (King005)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="2-in-1 king005 (unl).chr" size="524288" crc="559ec915" sha1="3301376fc480db7383a3ea520be041534426287d" offset="00000" status="baddump" />
 			</dataarea>
@@ -78602,13 +78632,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_2s808" supported="no">
+	<software name="mc_2s808">
 		<description>2 in 1 Super 808</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="2-in-1 super 808 (unl)[p1].chr" size="524288" crc="65b3e791" sha1="7f342d5fa4d20649f8e2dfbf062111196a0e4893" offset="00000" status="baddump" />
 			</dataarea>
@@ -80096,13 +80126,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_5spc5" supported="no">
+	<software name="mc_5spc5">
 		<description>5 in 1 (SPC005)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="1048576">
 				<rom name="5-in-1 (spc005)[p1].chr" size="1048576" crc="28197d63" sha1="8d11188e5cde7cb9e604db1525502f1f09ce1f3c" offset="00000" status="baddump" />
 			</dataarea>
@@ -80896,7 +80926,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_9king" supported="no">
+	<software name="mc_9king" supported="partial">
 		<description>9 in 1 King001</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -80956,6 +80986,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="9-in-1 (860824 pcb)[p1].prg" size="524288" crc="9ccd7a04" sha1="a4e133664461082101cd2981460823b0a023c476" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_9tech">
+		<description>9 in 1</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="tech9in1" />
+			<dataarea name="prg" size="524288">
+				<rom name="9-in-1.prg" size="524288" crc="cff59dab" sha1="ca74c4f097703813e1fce6e56e12a77f4b031e81" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="9-in-1.chr" size="524288" crc="46cfa6fa" sha1="ed79cc1ad7696d73a197dd179dbe104918587ade" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -81727,13 +81772,13 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_s308" supported="no">
+	<software name="mc_s308">
 		<description>Super 308 3 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sg_boog" />
-			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<feature name="slot" value="8237" />
+			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
 				<rom name="super 308 3 in 1 (unl).chr" size="524288" crc="9f5294de" sha1="c1435c9b24668da324363290ecd2bb7734b8eacc" offset="00000" status="baddump" />
 			</dataarea>

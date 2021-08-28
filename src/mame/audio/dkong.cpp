@@ -1349,7 +1349,7 @@ void dkong_state::dkong2b_audio(machine_config &config)
 	m_soundcpu->t1_in_cb().set(m_dev_6h, FUNC(latch8_device::bit4_q_r));
 
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, "discrete", dkong2b_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	DISCRETE(config, "discrete", dkong2b_discrete).add_route(ALL_OUTPUTS, "mono", 0.9);
 }
 
 void dkong_state::radarscp_audio(machine_config &config)
@@ -1421,7 +1421,7 @@ void dkong_state::dkongjr_audio(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, "discrete", dkongjr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	DISCRETE(config, "discrete", dkongjr_discrete).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void dkong_state::dkong3_audio(machine_config &config)

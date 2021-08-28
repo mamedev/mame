@@ -295,8 +295,9 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 			std::string fullpath(filectx.curdir);
 			fullpath += PATH_SEPARATOR;
 			fullpath.append(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
-			if (osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE)
-				osd_printf_error("Error opening %s\n", fullpath);
+			std::error_condition const filerr = osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen);
+			if (filerr)
+				osd_printf_error("%s: Error opening %s (%s:%d %s)\n", tag(), fullpath, filerr.category().name(), filerr.value(), filerr.message());
 			filectx.bytecount = 0;
 		}
 		break;
@@ -306,8 +307,9 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 			fullpath += PATH_SEPARATOR;
 			fullpath.append(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
 			uint64_t filesize; // unused, but it's an output from the open call
-			if (osd_file::open(fullpath, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE)
-				osd_printf_error("Error opening %s\n", fullpath);
+			std::error_condition const filerr = osd_file::open(fullpath, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, filectx.fd, filesize);
+			if (filerr)
+				osd_printf_error("%s: Error opening %s (%s:%d %s)\n", tag(), fullpath, filerr.category().name(), filerr.value(), filerr.message());
 			filectx.bytecount = 0;
 		}
 		break;

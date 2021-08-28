@@ -191,7 +191,7 @@ image_init_result c64_expansion_slot_device::call_load()
 
 		if ((m_card->m_roml_size & (m_card->m_roml_size - 1)) || (m_card->m_romh_size & (m_card->m_romh_size - 1)))
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "ROM size must be power of 2");
+			seterror(image_error::INVALIDIMAGE, "ROM size must be power of 2");
 			return image_init_result::FAIL;
 		}
 	}

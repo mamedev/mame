@@ -66,6 +66,21 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
+	<software name="joust" supported ="partial">
+		<description>Joust (6809 Transcoded - v1.10) (512kb)</description>
+		<year>2021</year>
+		<publisher>Glen Hewlett</publisher>
+		<info name="author" value="Glen Hewlett" />
+		<info name="usage" value="RUN&quot;JOUST&quot;" />
+		<sharedfeat name="compatibility" value="COCO3" />
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="joust.dsk" size="161280" crc="5a2437c0" sha1="72b3b88eef1f61cba8d43ed6a828a773c4c703f8"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- This begins the Rainbow On Disk archives. Rainbow Magazine was a TRS-80
 	Color Computer-focused magazine published in the USA that received
 	worldwide distribution. For an additional fee, you could receive a

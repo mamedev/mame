@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include <cassert>
-
 #include "mfi_dsk.h"
+
+#include "ioprocs.h"
+
 #include <zlib.h>
+
 
 /*
   Mess floppy image structure:
@@ -94,11 +96,12 @@ bool mfi_format::supports_save() const
 	return true;
 }
 
-int mfi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int mfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	header h;
 
-	io_generic_read(io, &h, 0, sizeof(header));
+	size_t actual;
+	io.read_at(0, &h, sizeof(header), actual);
 	if(memcmp( h.sign, sign, 16 ) == 0 &&
 		(h.cyl_count & CYLINDER_MASK) <= 84 &&
 		(h.cyl_count >> RESOLUTION_SHIFT) < 3 &&
@@ -108,15 +111,16 @@ int mfi_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 	return 0;
 }
 
-bool mfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	header h;
 	entry entries[84*2*4];
-	io_generic_read(io, &h, 0, sizeof(header));
+	io.read_at(0, &h, sizeof(header), actual);
 	int resolution = h.cyl_count >> RESOLUTION_SHIFT;
 	h.cyl_count &= CYLINDER_MASK;
 
-	io_generic_read(io, &entries, sizeof(header), (h.cyl_count << resolution)*h.head_count*sizeof(entry));
+	io.read_at(sizeof(header), &entries, (h.cyl_count << resolution)*h.head_count*sizeof(entry), actual);
 
 	image->set_form_variant(h.form_factor, h.variant);
 
@@ -139,7 +143,7 @@ bool mfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 
 			compressed.resize(ent->compressed_size);
 
-			io_generic_read(io, &compressed[0], ent->offset, ent->compressed_size);
+			io.read_at(ent->offset, &compressed[0], ent->compressed_size, actual);
 
 			unsigned int cell_count = ent->uncompressed_size/4;
 			std::vector<uint32_t> &trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);;
@@ -169,8 +173,9 @@ bool mfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	return true;
 }
 
-bool mfi_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	int tracks, heads;
 	image->get_actual_geometry(tracks, heads);
 	int resolution = image->get_resolution();
@@ -190,7 +195,7 @@ bool mfi_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 	h.form_factor = image->get_form_factor();
 	h.variant = image->get_variant();
 
-	io_generic_write(io, &h, 0, sizeof(header));
+	io.write_at(0, &h, sizeof(header), actual);
 
 	memset(entries, 0, sizeof(entries));
 
@@ -226,11 +231,11 @@ bool mfi_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 			entries[epos].write_splice = image->get_write_splice_position(track >> 2, head, track & 3);
 			epos++;
 
-			io_generic_write(io, postcomp.get(), pos, csize);
+			io.write_at(pos, postcomp.get(), csize, actual);
 			pos += csize;
 		}
 
-	io_generic_write(io, entries, sizeof(header), (tracks << resolution)*heads*sizeof(entry));
+	io.write_at(sizeof(header), entries, (tracks << resolution)*heads*sizeof(entry), actual);
 	return true;
 }
 

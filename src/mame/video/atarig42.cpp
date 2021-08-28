@@ -92,8 +92,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarig42_state::scanline_update)
 {
 	int scanline = param;
 
-	if (scanline == 0) logerror("-------\n");
-
 	/* keep in range */
 	int offset = (scanline / 8) * 64 + 48;
 	if (offset >= 0x800)

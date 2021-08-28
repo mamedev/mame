@@ -1,24 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/*************************************************************************************************************************************
+/**************************************************************************************************
 
     PC-8801 (c) 1981 NEC
 
     driver by Angelo Salese, original MESS PC-88SR driver by ???
 
     TODO:
-    - implement proper i8214 routing, also add irq latch mechanism;
-    - Fix up Floppy Terminal Count 0 / 1 writes properly, Castle Excellent (and presumably other games) is very picky about it.
-
-    - add differences between various models;
-    - implement proper upd3301 / i8257 support;
-    - fix "jumps" in mouse support pointer (noticeable in Balance of Power);
+    - implement proper i8214 routing, and add irq latch mechanism;
+    - Fix up Floppy Terminal Count 0 / 1 writes properly, Castle Excellent (and presumably other
+      games) is very picky about it.
+    - implement proper upd3301 / i8257 text support (currently hacked around);
     - Add limits for extend work RAM;
-    - What happens to the palette contents when the analog/digital palette mode changes?
     - waitstates;
-    - dipswitches needs to be controlled;
-    - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
-    - clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
+    - clean-ups:
+      - better state machine isolation of features between various models (currently pretty cheaty);
+      - refactor memory banking to use address maps;
+      - video;
+      - double check dipswitches;
+      - move PC80S31K to device, needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801.
+        Also notice that there are common points with SPC-1000 and TF-20 FDDs;
+      - backport/merge what is portable to PC-8001;
+    - implement bus slot mechanism for NEC boards ("PC-8800-**"), HAL PCG-8100 & GSX8800,
+      probably others (does bus have an actual codename or just "PC-8801 bus"?);
+    - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks
+      the floppy ports. Wrong info or check for external board anyway?
+    - fix "jumps" in mouse support pointer (noticeable in Balance of Power);
 
     per-game specific TODO:
     - 100yen Soft 8 Revival Special: tight loop with vblank bit, but vblank irq takes too much time to execute its code;
@@ -334,6 +341,8 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 					if(cliprect.contains(x+xi, y+0))
 						bitmap.pix(y+0, x+xi) = m_palette->pen(pen & 7);
 
+					// TODO: real HW seems to actually just output to either even or odd line when in 3bpp mode
+					// investigate which is right
 					if(cliprect.contains(x+xi, y+1))
 						bitmap.pix(y+1, x+xi) = m_palette->pen(pen & 7);
 				}
@@ -1170,6 +1179,8 @@ void pc8801_state::pc8801_palram_w(offs_t offset, uint8_t data)
 		m_palram[offset].g = data & 4 ? 7 : 0;
 	}
 
+	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
+	// Preserve content? Translation? Undefined?
 	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
 }
 
@@ -1294,6 +1305,7 @@ void pc8801_state::pc8801_dmac_mode_w(uint8_t data)
 	m_dmac_mode = data;
 	m_dmac_ff = 0;
 
+	// Valis II sets 0x20
 	if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80 && data != 0x00)
 		printf("%02x DMAC mode\n",data);
 }
@@ -1333,10 +1345,13 @@ void pc8801_state::pc8801_alu_ctrl2_w(uint8_t data)
 	m_alu_ctrl2 = data;
 }
 
+// TODO: Implement PCG-8100 as a bus option
+// It's an HAL Laboratory custom board with PCG (maps to chars $80-$ff),
+// dual AY-3-891x & PIT, I/O $b0-$b2 is the I/O ID for it?
+// Find a supported SW (only HAL seems to support it) & investigate
 void pc8801_state::pc8801_pcg8100_w(offs_t offset, uint8_t data)
 {
-	if(data)
-		printf("Write to PCG-8100 %02x %02x\n",offset,data);
+	logerror("%s: Possible write to PCG-8100 %02x %02x\n", machine().describe_context(), offset, data);
 }
 
 void pc8801_state::pc8801_txt_cmt_ctrl_w(uint8_t data)
@@ -1615,7 +1630,8 @@ void pc8801_state::pc8801fdc_mem(address_map &map)
 
 TIMER_CALLBACK_MEMBER(pc8801_state::pc8801fd_upd765_tc_to_zero)
 {
-	//printf("0\n");
+	// TODO: holein1 explictly reads TC port at PC=504e followed by an HALT opcode, failing to boot
+	// is this gonna unbreak HALT state too?
 	m_fdc->tc_w(false);
 }
 
@@ -1629,10 +1645,13 @@ uint8_t pc8801_state::upd765_tc_r()
 {
 	//printf("%04x 1\n",m_fdccpu->pc());
 
-	m_fdc->tc_w(true);
-	//TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-	//OTOH, 50 seems more than enough for the new upd...
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
+	if (!machine().side_effects_disabled())
+	{
+		m_fdc->tc_w(true);
+		//TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
+		//OTOH, 50 seems more than enough for the new upd...
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
+	}
 	return 0xff; // value is meaningless
 }
 
@@ -1660,6 +1679,13 @@ void pc8801_state::pc8801fdc_io(address_map &map)
 	map(0xf8, 0xf8).rw(FUNC(pc8801_state::upd765_tc_r), FUNC(pc8801_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xfc, 0xff).rw("d8255_slave", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+void pc8801_state::opna_map(address_map &map)
+{
+	// TODO: confirm it really is ROMless
+	// TODO: confirm size
+	map(0x000000, 0x1fffff).ram();
 }
 
 /* Input Ports */
@@ -2378,17 +2404,27 @@ void pc8801_state::pc8801(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	// TODO: sound irqs goes different routes when both boards are installed
 	YM2203(config, m_opn, MASTER_CLOCK);
 	m_opn->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
 	m_opn->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
 	m_opn->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
-	m_opn->add_route(ALL_OUTPUTS, "mono", 1.00);
+	// TODO: handtune mixing
+	m_opn->add_route(0, "mono", 0.25);
+	m_opn->add_route(1, "mono", 0.25);
+	m_opn->add_route(2, "mono", 0.25);
+	m_opn->add_route(3, "mono", 0.25);
 
 	YM2608(config, m_opna, MASTER_CLOCK*2);
+	m_opna->set_addrmap(0, &pc8801_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
 	m_opna->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
 	m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
-	m_opna->add_route(ALL_OUTPUTS, "mono", 1.00);
+	// TODO: handtune mixing
+	m_opna->add_route(0, "mono", 0.25);
+	m_opna->add_route(1, "mono", 0.25);
+	m_opna->add_route(2, "mono", 0.25);
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.10);
 
@@ -2413,15 +2449,7 @@ void pc8801_state::pc8801mc(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
 }
 
-
-/* TODO: clean this up */
-#define PC8801_MEM_LOAD \
-	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
-
-
 ROM_START( pc8801 )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.2
 	ROM_LOAD( "n80.rom",   0x0000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
 
@@ -2442,8 +2470,6 @@ ROM_END
 /* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be
 at least 1 Kanji ROM). */
 ROM_START( pc8801mk2 )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.4
 	ROM_LOAD( "m2_n80.rom",   0x0000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
 
@@ -2462,8 +2488,6 @@ ROM_START( pc8801mk2 )
 ROM_END
 
 ROM_START( pc8801mk2sr )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.5
 	ROM_LOAD( "mk2sr_n80.rom",   0x0000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
 
@@ -2490,8 +2514,6 @@ ROM_START( pc8801mk2sr )
 ROM_END
 
 ROM_START( pc8801mk2fr )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.5
 	ROM_LOAD( "m2fr_n80.rom",   0x0000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
 
@@ -2517,8 +2539,6 @@ ROM_START( pc8801mk2fr )
 ROM_END
 
 ROM_START( pc8801mk2mr )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "m2mr_n80.rom",   0x0000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
 
@@ -2545,8 +2565,6 @@ ROM_START( pc8801mk2mr )
 ROM_END
 
 ROM_START( pc8801mh )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "mh_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2573,8 +2591,6 @@ ROM_START( pc8801mh )
 ROM_END
 
 ROM_START( pc8801fa )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "fa_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2601,8 +2617,6 @@ ROM_START( pc8801fa )
 ROM_END
 
 ROM_START( pc8801ma ) // newer floppy BIOS and Jisyo (dictionary) ROM
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "ma_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2633,8 +2647,6 @@ ROM_START( pc8801ma ) // newer floppy BIOS and Jisyo (dictionary) ROM
 ROM_END
 
 ROM_START( pc8801ma2 )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "ma2_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2664,8 +2676,6 @@ ROM_START( pc8801ma2 )
 ROM_END
 
 ROM_START( pc8801mc )
-	PC8801_MEM_LOAD
-
 	ROM_REGION( 0x08000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 

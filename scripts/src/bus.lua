@@ -2812,8 +2812,6 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/henggedianzi.h",
 		MAME_DIR .. "src/devices/bus/nes/hes.cpp",
 		MAME_DIR .. "src/devices/bus/nes/hes.h",
-		MAME_DIR .. "src/devices/bus/nes/hosenkan.cpp",
-		MAME_DIR .. "src/devices/bus/nes/hosenkan.h",
 		MAME_DIR .. "src/devices/bus/nes/irem.cpp",
 		MAME_DIR .. "src/devices/bus/nes/irem.h",
 		MAME_DIR .. "src/devices/bus/nes/jaleco.cpp",
@@ -4366,6 +4364,8 @@ if (BUSES["CBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.h",	
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
