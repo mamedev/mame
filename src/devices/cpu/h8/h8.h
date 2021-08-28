@@ -115,6 +115,7 @@ protected:
 	address_space_config program_config, io_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache cache;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific program;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache opcodes;
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific io;
 	h8_dma_device *dma_device;
 	h8_dtc_device *dtc_device;
@@ -154,6 +155,8 @@ protected:
 	virtual int trapa_setup();
 	virtual void irq_setup() = 0;
 
+	uint16_t read16op(uint32_t adr);
+	uint16_t fetch_op();
 	uint16_t read16i(uint32_t adr);
 	uint16_t fetch();
 	inline void fetch(int slot) { IR[slot] = fetch(); }
@@ -165,7 +168,7 @@ protected:
 	inline void prefetch() { prefetch_start(); prefetch_done(); }
 	inline void prefetch_noirq() { prefetch_start(); prefetch_done_noirq(); }
 	inline void prefetch_noirq_notrace() { prefetch_start(); prefetch_done_noirq_notrace(); }
-	void prefetch_start() { NPC = PC & 0xffffff; PIR = fetch(); }
+	void prefetch_start() { NPC = PC & 0xffffff; PIR = fetch_op(); }
 	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc & 0xffffff; PC = pc+2; PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();
@@ -334,7 +337,7 @@ protected:
 	O(divxu_b_r8h_r16l);
 	O(eepmov_b);
 	O(inc_b_one_r8l);
-	O(jmp_abs8i); O(jmp_abs16e);
+	O(jmp_abs8i); O(jmp_abs16e); O(jmp_r16h);
 	O(jsr_abs8i); O(jsr_abs16e); O(jsr_r16h);
 	O(ldc_imm8_ccr); O(ldc_r8l_ccr);
 	O(mov_b_abs16_r8l); O(mov_b_abs8_r8u); O(mov_b_imm8_r8u); O(mov_b_r8h_r8l); O(mov_b_r8l_abs16); O(mov_b_r8u_abs8); O(mov_b_r16ih_r8l); O(mov_b_r8l_r16ih); O(mov_b_r16d16h_r8l); O(mov_b_r8l_r16d16h); O(mov_b_r16ph_r8l); O(mov_b_r8l_pr16h);

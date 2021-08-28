@@ -2,7 +2,7 @@
 # copyright-holders:Olivier Galibert
 macro bxx_any %cond
 	prefetch_start();
-	TMP2 = read16i(TMP1);
+	TMP2 = read16op(TMP1);
 	if(%cond)
 		prefetch_switch(TMP1, TMP2);
 	prefetch_done();
@@ -1646,6 +1646,11 @@ macro jsr32 %opc %spreg
 
 58f0         ffff         0 ble      rel16    -        h
 	bxx_16 (CCR & F_Z) || (CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V
+
+5900         ff8f         0 jmp      r16h     -        o
+	fetch();
+	PC = r16_r(IR[0] >> 4);
+	prefetch();
 
 5900         ff8f         0 jmp      r32h     -        h
 	fetch();

@@ -261,7 +261,7 @@ class DispatchStep:
         end = start + self.skip
         s = []
         for i in range(start, end+1):
-            s.append("\tIR[%d] = fetch();" % i)
+            s.append("\tIR[%d] = fetch_op();" % i)
         s.append("\tinst_state = 0x%x0000 | IR[%d];" % (self.id, end))
         return s
 

@@ -40,6 +40,7 @@ void h8_device::device_start()
 {
 	space(AS_PROGRAM).cache(cache);
 	space(AS_PROGRAM).specific(program);
+	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(opcodes);
 	space(AS_IO).specific(io);
 
 	uint32_t pcmask = mode_advanced ? 0xffffff : 0xffff;
@@ -342,6 +343,19 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 		break;
 	}
 	}
+}
+
+uint16_t h8_device::read16op(uint32_t adr)
+{
+	icount--;
+	return opcodes.read_word(adr & ~1);
+}
+
+uint16_t h8_device::fetch_op()
+{
+	uint16_t res = read16op(PC);
+	PC += 2;
+	return res;
 }
 
 uint16_t h8_device::read16i(uint32_t adr)
