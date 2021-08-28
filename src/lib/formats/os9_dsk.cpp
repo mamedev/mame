@@ -48,6 +48,7 @@
 #include "imageutl.h"
 
 #include "coretmpl.h" // BIT
+#include "ioprocs.h"
 
 
 os9_format::os9_format() : wd177x_format(formats)
@@ -69,21 +70,25 @@ const char *os9_format::extensions() const
 	return "dsk,os9";
 }
 
-int os9_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int os9_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor, variants);
+	int const type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 75;
+
 	return 0;
 }
 
-int os9_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int os9_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return -1;
 
 	uint8_t os9_header[0x60];
-	io_generic_read(io, os9_header, 0, sizeof(os9_header));
+	size_t actual;
+	io.read_at(0, os9_header, sizeof(os9_header), actual);
 
 	int os9_total_sectors = pick_integer_be(os9_header, 0x00, 3);
 	int os9_heads = util::BIT(os9_header[0x10], 0) ? 2 : 1;

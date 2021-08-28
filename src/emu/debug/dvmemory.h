@@ -55,10 +55,24 @@ class debug_view_memory : public debug_view
 	// construction/destruction
 	debug_view_memory(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate);
 
+	struct memory_view_pos;
+
 public:
+	enum class data_format
+	{
+		HEX_8BIT = 1,
+		HEX_16BIT = 2,
+		HEX_32BIT = 4,
+		HEX_64BIT = 8,
+		FLOAT_32BIT = 9,
+		FLOAT_64BIT = 10,
+		FLOAT_80BIT = 11
+	};
+	static bool is_valid_format(data_format format) { return int(format) >= 0 && int(format) < std::size(s_memory_pos_table) && get_posdata(format).m_bytes != 0; }
+
 	// getters
 	const char *expression() const { return m_expression.string(); }
-	int get_data_format() { flush_updates(); return m_data_format; }
+	data_format get_data_format() { flush_updates(); return m_data_format; }
 	u32 chunks_per_row() { flush_updates(); return m_chunks_per_row; }
 	bool reverse() const { return m_reverse_view; }
 	bool ascii() const { return m_ascii_view; }
@@ -68,7 +82,7 @@ public:
 	// setters
 	void set_expression(const std::string &expression);
 	void set_chunks_per_row(u32 rowchunks);
-	void set_data_format(int format); // 1-8 current values 9 32bit floating point
+	void set_data_format(data_format format);
 	void set_reverse(bool reverse);
 	void set_ascii(bool reverse);
 	void set_physical(bool physical);
@@ -87,6 +101,10 @@ private:
 		offs_t m_address;
 		u8 m_shift;
 	};
+
+	// data format helpers
+	static bool is_hex_format(data_format format) { return int(format) <= 8; }
+	static const memory_view_pos &get_posdata(data_format format) { return s_memory_pos_table[int(format)]; }
 
 	// internal helpers
 	void enumerate_sources();
@@ -111,7 +129,7 @@ private:
 	u32                 m_chunks_per_row;       // number of chunks displayed per line
 	u8                  m_bytes_per_chunk;      // bytes per chunk
 	u8                  m_steps_per_chunk;      // bytes per chunk
-	int                 m_data_format;          // 1-8 current values 9 32bit floating point
+	data_format         m_data_format;          // 1-8 current values 9 32bit floating point
 	bool                m_reverse_view;         // reverse-endian view?
 	bool                m_ascii_view;           // display ASCII characters?
 	bool                m_no_translation;       // don't run addresses through the cpu translation hook
@@ -131,8 +149,9 @@ private:
 
 	struct memory_view_pos
 	{
-		u8           m_spacing;              /* spacing between each entry */
-		u8           m_shift[24];            /* shift for each character */
+		u8           m_bytes;                // bytes per entry
+		u8           m_spacing;              // spacing between each entry
+		u8           m_shift[24];            // shift for each character
 	};
 	static const memory_view_pos s_memory_pos_table[12]; // table for rendering at different data formats
 

@@ -148,7 +148,7 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 {
 	int16_t ox = static_cast<int16_t>(oldval);
 	int16_t nx = static_cast<int16_t>(newval);
-	m_mouse.dx = std::min(std::max(0, m_mouse.dx + (nx - ox)), 639);
+	m_mouse.dx = std::clamp(m_mouse.dx + (nx - ox), 0, 639);
 }
 
 /**
@@ -162,7 +162,7 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
 {
 	int16_t oy = static_cast<int16_t>(oldval);
 	int16_t ny = static_cast<int16_t>(newval);
-	m_mouse.dy = std::min(std::max(0, m_mouse.dy + (ny - oy)), 824);
+	m_mouse.dy = std::clamp(m_mouse.dy + (ny - oy), 0, 824);
 }
 
 /**

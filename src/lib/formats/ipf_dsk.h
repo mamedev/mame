@@ -12,8 +12,8 @@
 class ipf_format : public floppy_image_format_t
 {
 public:
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;

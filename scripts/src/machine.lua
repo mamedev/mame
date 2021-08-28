@@ -3450,6 +3450,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/upd4991a.h,MACHINES["UPD4991A"] = true
+---------------------------------------------------
+
+if (MACHINES["UPD4991A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upd4991a.cpp",
+		MAME_DIR .. "src/devices/machine/upd4991a.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upd4992.h,MACHINES["UPD4992"] = true
 ---------------------------------------------------
 

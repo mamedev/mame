@@ -10,7 +10,8 @@
 
 #include "imd_dsk.h"
 
-#include <cassert>
+#include "ioprocs.h"
+
 #include <cstring>
 
 
@@ -409,25 +410,29 @@ void imd_format::fixnum(char *start, char *end) const
 	};
 }
 
-int imd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int imd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char h[4];
 
-	io_generic_read(io, h, 0, 4);
+	size_t actual;
+	io.read_at(0, h, 4, actual);
 	if(!memcmp(h, "IMD ", 4))
 		return 100;
 
 	return 0;
 }
 
-bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return false;
 	std::vector<uint8_t> img(size);
-	io_generic_read(io, &img[0], 0, size);
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	uint64_t pos, savepos;
-	for(pos=0; pos < size && img[pos] != 0x1a; pos++) {};
+	for(pos=0; pos < size && img[pos] != 0x1a; pos++) { }
 	pos++;
 
 	m_comment.resize(pos);
@@ -627,39 +632,34 @@ bool can_compress(const uint8_t* buffer, uint8_t ptrn, uint64_t size)
 	return true;
 }
 
-bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool imd_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint64_t pos = 0;
-	io_generic_write(io, &m_comment[0], pos, m_comment.size());
-	pos += m_comment.size();
+	if(io.seek(0, SEEK_SET))
+		return false;
+
+	size_t written;
+	io.write(&m_comment[0], m_comment.size(), written);
 
 	for (int i = 0; i < m_mode.size(); i++)
 	{
-		io_generic_write(io, &m_mode[i], pos++, 1);
-		io_generic_write(io, &m_track[i], pos++, 1);
-		io_generic_write(io, &m_head[i], pos++, 1);
-		io_generic_write(io, &m_sector_count[i], pos++, 1);
-		io_generic_write(io, &m_ssize[i], pos++, 1);
+		io.write(&m_mode[i], 1, written);
+		io.write(&m_track[i], 1, written);
+		io.write(&m_head[i], 1, written);
+		io.write(&m_sector_count[i], 1, written);
+		io.write(&m_ssize[i], 1, written);
 
-		io_generic_write(io, &m_snum[i][0], pos, m_sector_count[i]);
-		pos += m_sector_count[i];
+		io.write(&m_snum[i][0], m_sector_count[i], written);
 
 		if (m_tnum[i].size())
-		{
-			io_generic_write(io, &m_tnum[i][0], pos, m_sector_count[i]);
-			pos += m_sector_count[i];
-		}
+			io.write(&m_tnum[i][0], m_sector_count[i], written);
 
 		if (m_hnum[i].size())
-		{
-			io_generic_write(io, &m_hnum[i][0], pos, m_sector_count[i]);
-			pos += m_sector_count[i];
-		}
+			io.write(&m_hnum[i][0], m_sector_count[i], written);
 
-		uint32_t actual_size = m_ssize[i] < 7 ? 128 << m_ssize[i] : 8192;
-		uint8_t head = m_head[i] & 0x3f;
+		uint32_t const actual_size = m_ssize[i] < 7 ? 128 << m_ssize[i] : 8192;
+		uint8_t const head = m_head[i] & 0x3f;
 
-		bool fm = m_mode[i]< 3;
+		bool const fm = m_mode[i]< 3;
 
 		auto bitstream = generate_bitstream_from_track(m_track[i]*m_trackmult, head, fm ? 4000 : 2000, image);
 		std::vector<std::vector<uint8_t>> sectors;
@@ -674,11 +674,10 @@ bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 
 			const auto &data = sectors[m_snum[i][j]];
 
-			uint8_t mode;
 			if (data.empty())
 			{
-				mode = 0;
-				io_generic_write(io, &mode, pos++, 1);
+				uint8_t const mode = 0;
+				io.write(&mode, 1, written);
 				continue;
 			}
 			else if (data.size() < actual_size) {
@@ -690,16 +689,15 @@ bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 
 			if (can_compress(sdata, sdata[0], actual_size))
 			{
-				mode = 2;
-				io_generic_write(io, &mode, pos++, 1);
-				io_generic_write(io, &sdata[0], pos++, 1);
+				uint8_t const mode = 2;
+				io.write(&mode, 1, written);
+				io.write(&sdata[0], 1, written);
 			}
 			else
 			{
-				mode = 1;
-				io_generic_write(io, &mode, pos++, 1);
-				io_generic_write(io, &sdata, pos, actual_size);
-				pos += actual_size;
+				uint8_t const mode = 1;
+				io.write(&mode, 1, written);
+				io.write(&sdata, actual_size, written);
 			}
 		}
 	}

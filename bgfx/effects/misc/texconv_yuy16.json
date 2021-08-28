@@ -7,21 +7,21 @@
 //
 //===============================================================
 {
-    "blend": {
-    	"equation": "add",
-    	"srcColor": "srcalpha",
-    	"dstColor": "1-srcalpha",
-    	"srcAlpha": "srcalpha",
-    	"dstAlpha": "1-srcalpha"
-    },
-    "depth": { "function": "always", "writeenable": false },
-    "cull": { "mode": "none" },    
-    "write": { "rgb": true, "alpha": true },
-    "vertex": "chains/misc/vs_blit",
-    "fragment": "chains/misc/fs_blit_yuy16",
-    "uniforms": [    	
-    	{ "name": "s_tex", "type": "int", "values": [ 1.0 ] },
-    	{ "name": "u_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-    	{ "name": "u_inv_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "srcalpha",
+		"dstColor": "1-srcalpha",
+		"srcAlpha": "srcalpha",
+		"dstAlpha": "1-srcalpha"
+	},
+	"depth": { "function": "always", "writeenable": false },
+	"cull": { "mode": "none" },
+	"write": { "rgb": true, "alpha": true },
+	"vertex": "chains/misc/vs_blit",
+	"fragment": "chains/misc/fs_blit_yuy16",
+	"uniforms": [
+		{ "name": "s_tex", "type": "int", "values": [ 1.0 ] },
+		{ "name": "u_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+	]
 }

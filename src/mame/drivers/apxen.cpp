@@ -13,15 +13,18 @@
     - XEN WS (1 MB RAM, no drives)
 
     TODO:
-	- Boot ROM disable, wrap around mode
+    - Boot ROM disable, wrap around mode
     - Floppy
-	- DMA
-	- Harddisk
-	- Keyboard
-	- RS232
-	- Printer
-	- Colour graphics board
-	- Make xen_daisy_device generic?
+      * FDC is slightly too slow (or CPU too fast), causing Error 28 on boot
+        can be fixed by setting delay_register_commit to 12 in wd_fdc.cpp
+      * Issues accessing the second drive
+    - DMA (verify, seems to fast)
+    - Harddisk
+    - XEN keyboard (currently using the Apricot Xi keyboard)
+    - RS232
+    - Printer
+    - Colour graphics board
+    - Make xen_daisy_device generic?
 
     Notes:
     - Two graphics cards: Mono and colour boards
@@ -260,15 +263,15 @@ uint16_t apxen_state::mem_r(offs_t offset, uint16_t mem_mask)
 	// pc/xi compatible mode vram
 	if ((offset << 1) < 0x10000 && !m_apvid)
 		m_video->mem_r(offset & (0xffff >> 1), data, mem_mask);
-	
+
 	// pc/xi video pointer mirror
 	else if  ((offset << 1) >= 0xf0000 && (offset << 1) <= 0xf0fff && !m_apvid)
 		m_video->mem_r((offset & (0xffff >> 1)) | (0x0e000 >> 1), data, mem_mask);
-	
+
 	// xen mode vram
 	else if  ((offset << 1) >= 0xe0000 && (offset << 1) <= 0xeffff && m_apvid)
 		m_video->mem_r(offset & (0xffff >> 1), data, mem_mask);
-	
+
 	// normal access
 	else
 		data &= m_mem->read16(offset, mem_mask);
@@ -281,15 +284,15 @@ void apxen_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// pc/xi compatible mode vram
 	if ((offset << 1) < 0x10000 && !m_apvid)
 		m_video->mem_w(offset & (0xffff >> 1), data, mem_mask);
-	
+
 	// pc/xi video pointer mirror
 	else if  ((offset << 1) >= 0xf0000 && (offset << 1) <= 0xf0fff && !m_apvid)
 		m_video->mem_w((offset & (0xffff >> 1)) | (0x0e000 >> 1), data, mem_mask);
-	
+
 	// xen mode vram
 	else if  ((offset << 1) >= 0xe0000 && (offset << 1) <= 0xeffff && m_apvid)
 		m_video->mem_w(offset & (0xffff >> 1), data, mem_mask);
-	
+
 	// normal access
 	else
 		m_mem->write16(offset, data, mem_mask);
@@ -382,7 +385,7 @@ void apxen_state::cpu_control_w(uint8_t data)
 void apxen_state::cpu_reset_w(uint8_t data)
 {
 	logerror("cpu_reset_w: %02x\n", data);
-	
+
 	// data written doesn't matter
 	m_maincpu->reset();
 }
@@ -391,7 +394,7 @@ uint8_t apxen_state::cio_porta_r()
 {
 	uint8_t data = 0x00;
 
-	data |= m_cur_floppy ? m_cur_floppy->dskchg_r() : 0;
+	data |= m_cur_floppy ? (m_cur_floppy->dskchg_r() << 3) : 0;
 
 	logerror("cio_porta_r: %02x\n", data);
 
@@ -530,6 +533,8 @@ void apxen_state::apxen(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", apricot_floppies, "d32w", apxen_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", apricot_floppies, "d32w", apxen_state::floppy_formats);
 
+	SOFTWARE_LIST(config, "flop_list").set_original("apxen_flop");
+
 	// video hardware
 	APRICOT_VIDEO_SLOT(config, m_video, apricot_video_cards, "mono");
 	m_video->apvid_handler().set(FUNC(apxen_state::apvid_w));
@@ -553,6 +558,10 @@ ROM_START( apxen )
 	ROM_LOAD16_BYTE("lo-xen_313.ic80", 0x0000, 0x8000, CRC(c2a1fd6e) SHA1(8dfc711dd910bc3d43c1120978ba199a13463068))
 	// HI-XEN  3.1.3 9BF0 (checksum matches)
 	ROM_LOAD16_BYTE("hi-xen_313.ic37", 0x0001, 0x8000, CRC(72ee2f09) SHA1(da11043d40a694802f6d3d27a4359067dd19c8e6))
+
+	// default eeprom configured with 2 floppy drives and serial no. 123456
+	ROM_REGION16_LE(0x20, "eeprom", 0)
+	ROM_LOAD("eeprom.nv", 0x00, 0x20, CRC(c26d455e) SHA1(ff2d7af6ca21b2fba4c5a9e90926b5049a9fdc86))
 
 	// should probably be moved elsewhere
 	ROM_REGION(0x2000, "hdd", 0)

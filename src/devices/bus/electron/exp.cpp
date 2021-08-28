@@ -101,6 +101,7 @@ void electron_expansion_slot_device::expbus_w(offs_t offset, uint8_t data)
 // slot devices
 #include "fbjoy.h"
 #include "fbprint.h"
+#include "mc68k.h"
 #include "mode7.h"
 //#include "lebox.h"
 #include "plus1.h"
@@ -120,6 +121,7 @@ void electron_expansion_devices(device_slot_interface &device)
 	device.option_add("ap6", ELECTRON_AP6);
 	device.option_add("fbjoy", ELECTRON_FBJOY);
 	device.option_add("fbprint", ELECTRON_FBPRINT);
+	device.option_add("mc68k", ELECTRON_MC68K);
 	device.option_add("mode7", ELECTRON_MODE7);
 	//device.option_add("lebox", ELECTRON_LEBOX);
 	device.option_add("plus1", ELECTRON_PLUS1);

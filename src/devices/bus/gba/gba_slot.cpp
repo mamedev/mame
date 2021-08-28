@@ -625,7 +625,7 @@ image_init_result gba_cart_slot_device::call_load()
 		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (size > 0x4000000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 64MB");
+			seterror(image_error::INVALIDIMAGE, "Attempted loading a cart larger than 64MB");
 			return image_init_result::FAIL;
 		}
 

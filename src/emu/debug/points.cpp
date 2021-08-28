@@ -371,19 +371,29 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 	{
 		std::string buffer;
 
-		buffer = string_format(type == read_or_write::READ ?
-							   "Stopped at watchpoint %X reading %0*X from %08X" :
-							   "Stopped at watchpoint %X writing %0*X to %08X",
-							   m_index,
-							   size * unit_size / 4,
-							   data,
-							   address);
+		if (m_space.is_octal())
+			buffer = string_format(type == read_or_write::READ ?
+								   "Stopped at watchpoint %X reading %0*o from %0*o" :
+								   "Stopped at watchpoint %X writing %0*o to %0*o",
+								   m_index,
+								   (size * unit_size + 2) / 3,
+								   data,
+								   (m_space.addr_width() + 2) / 3,
+								   address);
+		else
+			buffer = string_format(type == read_or_write::READ ?
+								   "Stopped at watchpoint %X reading %0*X from %0*X" :
+								   "Stopped at watchpoint %X writing %0*X to %0*X",
+								   m_index,
+								   size * unit_size / 4,
+								   data,
+								   (m_space.addr_width() + 3) / 4,
+								   address);
 
 		const device_state_interface *state;
 		if (debug.cpu().live_cpu() == &m_debugInterface->device() && m_debugInterface->device().interface(state))
 		{
-			offs_t pc = state->pcbase();
-			debug.console().printf("%s (PC=%X)\n", buffer, pc);
+			debug.console().printf("%s (PC=%s)\n", buffer, state->state_string(STATE_GENPCBASE));
 			m_debugInterface->compute_debug_flags();
 		}
 		else if (!was_stopped)

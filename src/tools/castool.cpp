@@ -53,6 +53,7 @@
 #include "formats/zx81_p.h"
 
 #include "corestr.h"
+#include "ioprocs.h"
 
 #include <cassert>
 #include <cctype>
@@ -162,7 +163,6 @@ int CLIB_DECL main(int argc, char *argv[])
 	int found =0;
 	const cassette_image::Format * const *selected_formats = nullptr;
 	cassette_image::ptr cassette;
-	FILE *f;
 
 	if (argc > 1)
 	{
@@ -188,21 +188,26 @@ int CLIB_DECL main(int argc, char *argv[])
 					return -1;
 				}
 
-				f = fopen(argv[3], "rb");
+				FILE *f = fopen(argv[3], "rb");
 				if (!f) {
 					fprintf(stderr, "File %s not found.\n",argv[3]);
 					return -1;
 				}
 
-				if (cassette_image::open_choices(f, &stdio_ioprocs, get_extension(argv[3]), selected_formats, cassette_image::FLAG_READONLY, cassette) != cassette_image::error::SUCCESS)  {
+				auto io = util::stdio_read_write(f, 0x00);
+				f = nullptr;
+				if (!io) {
+					fprintf(stderr, "Out of memory.\n");
+					return -1;
+				}
+
+				if (cassette_image::open_choices(std::move(io), get_extension(argv[3]), selected_formats, cassette_image::FLAG_READONLY, cassette) != cassette_image::error::SUCCESS)  {
 					fprintf(stderr, "Invalid format of input file.\n");
-					fclose(f);
 					return -1;
 				}
 
 				cassette->dump(argv[4]);
 				cassette.reset();
-				fclose(f);
 				goto theend;
 			}
 		}

@@ -35,8 +35,8 @@ CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
 CA021  Akai Katana
 
 CMDL01 Medal Mahjong Moukari Bancho
-       Pirates of Gappori http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
-       Oooku http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
+?????? Pirates of Gappori: http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
+?????? Uhauha Ooku: http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
 
 Note: CA018 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
       CA020 - Do-Don-Pachi Dai-ou-jou Tamashii on PGM2 platform
@@ -131,6 +131,8 @@ Misc:
 
 Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
       * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
+      * There are two known CV1000-B PCB revisions. The newer one uses an updated FPGA firmware
+        and has some minor hardware differences.
       * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
         The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
 
@@ -182,13 +184,13 @@ Common game codes:
 #include "screen.h"
 #include "speaker.h"
 
-
+namespace {
 
 class cv1k_state : public driver_device
 {
 public:
-	cv1k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cv1k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_blitter(*this, "blitter"),
 		m_serflash(*this, "game"),
@@ -199,8 +201,23 @@ public:
 		m_eepromout(*this, "EEPROMOUT"),
 		m_idleramoffs(0),
 		m_idlepc(0)
-		{ }
+	{ }
 
+	void cv1k(machine_config &config);
+	void cv1k_d(machine_config &config);
+
+	void init_mushisam();
+	void init_ibara();
+	void init_espgal2();
+	void init_mushitam();
+	void init_pinkswts();
+	void init_deathsml();
+	void init_ddpdfk();
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	required_device<sh34_base_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
 	required_device<serflash_device> m_serflash;
@@ -217,26 +234,15 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset() override;
-
-	/* game specific */
-	uint64_t speedup_r();
-	void init_mushisam();
-	void init_ibara();
-	void init_espgal2();
-	void init_mushitam();
-	void init_pinkswts();
-	void init_deathsml();
-	void init_dpddfk();
-
 	required_ioport m_blitrate;
 	required_ioport m_eepromout;
 
 	uint32_t m_idleramoffs;
 	uint32_t m_idlepc;
+
+	uint64_t speedup_r();
 	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
-	void cv1k_d(machine_config &config);
-	void cv1k(machine_config &config);
+
 	void cv1k_d_map(address_map &map);
 	void cv1k_map(address_map &map);
 	void cv1k_port(address_map &map);
@@ -274,8 +280,7 @@ uint8_t cv1k_state::flash_io_r(offs_t offset)
 		case 0x05:
 		case 0x06:
 		case 0x07:
-
-		//  logerror("flash_io_r offset %04x\n", offset);
+			// logerror("flash_io_r offset %04x\n", offset);
 			return 0xff;
 
 		case 0x00:
@@ -448,7 +453,7 @@ INPUT_PORTS_END
 
 void cv1k_state::machine_reset()
 {
-	m_blitter->set_rambase (reinterpret_cast<uint16_t *>(m_ram.target()));
+	m_blitter->set_rambase(reinterpret_cast<uint16_t *>(m_ram.target()));
 	m_blitter->set_is_unsafe(machine().root_device().ioport(":BLITCFG")->read());
 	m_blitter->install_handlers( 0x18000000, 0x18000057 );
 	m_blitter->reset();
@@ -532,11 +537,11 @@ All roms are flash roms with no labels, so keep the
 
 ROM_START( mushisam )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("mushisam_u4", 0x000000, 0x200000, CRC(15321b30) SHA1(d2cd714ff2299eeab6f9a7c219dfb559c8f98b45) ) /* (2004/10/12.MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP("mushisam_u4", 0x000000, 0x200000, CRC(15321b30) SHA1(d2cd714ff2299eeab6f9a7c219dfb559c8f98b45) ) // (2004/10/12.MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("mushisam_u2", 0x000000, 0x8400000, CRC(4f0a842a) SHA1(33f3550ec676a7088b6348cd72c16cc6594afb84) ) /* (2004/10/12.MASTER VER.) */
+	ROM_LOAD("mushisam_u2", 0x000000, 0x8400000, CRC(4f0a842a) SHA1(33f3550ec676a7088b6348cd72c16cc6594afb84) ) // (2004/10/12.MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(138e2050) SHA1(9e86489a4e65af5efb5495adf6d4b3e01d5b2816) )
@@ -545,11 +550,11 @@ ROM_END
 
 ROM_START( mushisama )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("mushisama_u4", 0x000000, 0x200000, CRC(0b5b30b2) SHA1(35fd1bb1561c30b311b4325bc8f4628f2fccd20b) ) /* (2004/10/12 MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP("mushisama_u4", 0x000000, 0x200000, CRC(0b5b30b2) SHA1(35fd1bb1561c30b311b4325bc8f4628f2fccd20b) ) // (2004/10/12 MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("mushisam_u2", 0x000000, 0x8400000, CRC(4f0a842a) SHA1(33f3550ec676a7088b6348cd72c16cc6594afb84) ) /* (2004/10/12.MASTER VER.) */
+	ROM_LOAD("mushisam_u2", 0x000000, 0x8400000, CRC(4f0a842a) SHA1(33f3550ec676a7088b6348cd72c16cc6594afb84) ) // (2004/10/12.MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(138e2050) SHA1(9e86489a4e65af5efb5495adf6d4b3e01d5b2816) )
@@ -558,24 +563,37 @@ ROM_END
 
 ROM_START( mushisamb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("mushisamb_u4", 0x000000, 0x200000, CRC(9f1c7f51) SHA1(f82ae72ec03687904ca7516887080be92365a5f3) ) /* (2004/10/12 MASTER VER) */
+	ROM_LOAD16_WORD_SWAP("mushisamb_u4", 0x000000, 0x200000, CRC(9f1c7f51) SHA1(f82ae72ec03687904ca7516887080be92365a5f3) ) // (2004/10/12 MASTER VER)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("mushisam_u2", 0x000000, 0x8400000, CRC(4f0a842a) SHA1(33f3550ec676a7088b6348cd72c16cc6594afb84) ) /* (2004/10/12.MASTER VER.) */
+	ROM_LOAD("mushisam_u2", 0x000000, 0x8400000, CRC(4f0a842a) SHA1(33f3550ec676a7088b6348cd72c16cc6594afb84) ) // (2004/10/12.MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(138e2050) SHA1(9e86489a4e65af5efb5495adf6d4b3e01d5b2816) )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(e3d05c9f) SHA1(130c3d62317da1729c85bd178bd51500edd73ada) )
 ROM_END
 
-ROM_START( espgal2 )
+ROM_START( espgal2 ) // newer CV1000-B PCB revision, updated FPGA firmware, no changes in game code or data
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(09c908bb) SHA1(7d6031fd3542b3e1d296ff218feb40502fd78694) ) /* (2005/11/14 MASTER VER) */
+	ROM_LOAD16_WORD_SWAP( "espgal2_u4", 0x000000, 0x200000, CRC(843608b8) SHA1(2f5fcd38e76df531a923cd9956104cef5185aaa9) ) // (2005/11/14 MASTER VER)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(222f58c7) SHA1(d47a5085a1debd9cb8c61d88cd39e4f5036d1797) ) /* (2005/11/14 MASTER VER) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(222f58c7) SHA1(d47a5085a1debd9cb8c61d88cd39e4f5036d1797) ) // (2005/11/14 MASTER VER)
+
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(b9a10c22) SHA1(4561f95c6018c9716077224bfe9660e61fb84681) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(c76b1ec4) SHA1(b98a53d41a995d968e0432ed824b0b06d93dcea8) )
+ROM_END
+
+ROM_START( espgal2a )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "espgal2a_u4", 0x000000, 0x200000, CRC(09c908bb) SHA1(7d6031fd3542b3e1d296ff218feb40502fd78694) ) // (2005/11/14 MASTER VER)
+	ROM_RELOAD(0x200000,0x200000)
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(222f58c7) SHA1(d47a5085a1debd9cb8c61d88cd39e4f5036d1797) ) // (2005/11/14 MASTER VER)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(b9a10c22) SHA1(4561f95c6018c9716077224bfe9660e61fb84681) )
@@ -584,11 +602,11 @@ ROM_END
 
 ROM_START( mushitam )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("mushitam_u4", 0x000000, 0x200000, CRC(c49eb6b1) SHA1(c40ee5de89e3f1cb49ac19687657dd2b42a88d81) ) /* (2005/09/09.MASTER VER) */
+	ROM_LOAD16_WORD_SWAP("mushitam_u4", 0x000000, 0x200000, CRC(c49eb6b1) SHA1(c40ee5de89e3f1cb49ac19687657dd2b42a88d81) ) // (2005/09/09.MASTER VER)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("mushitam_u2", 0x000000, 0x8400000, CRC(8ba498ab) SHA1(459c0b4ab831bbe019bdd5b0ac56955948b9e3a6) ) /* (2005/09/09.MASTER VER) */
+	ROM_LOAD("mushitam_u2", 0x000000, 0x8400000, CRC(8ba498ab) SHA1(459c0b4ab831bbe019bdd5b0ac56955948b9e3a6) ) // (2005/09/09.MASTER VER)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(701a912a) SHA1(85c198946fb693d99928ea2595c84ba4d9dc8157) )
@@ -597,12 +615,12 @@ ROM_END
 
 ROM_START( mushitama )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("mushitama_u4", 0x000000, 0x200000, CRC(4a23e6c8) SHA1(d44c287bb88e6d413a8d35d75bc1b4928ad52cdf) ) /* (2005/09/09 MASTER VER) */
+	ROM_LOAD16_WORD_SWAP("mushitama_u4", 0x000000, 0x200000, CRC(4a23e6c8) SHA1(d44c287bb88e6d413a8d35d75bc1b4928ad52cdf) ) // (2005/09/09 MASTER VER)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 //  ROM_LOAD("mushitama_u2", 0x000000, 0x8400000, CRC(3f93ff82) SHA1(6f6c250aa7134016ffb288d056bc937ea311f538) ) // recycled ROM - only unused areas differ
-	ROM_LOAD("mushitam_u2", 0x000000, 0x8400000, CRC(8ba498ab) SHA1(459c0b4ab831bbe019bdd5b0ac56955948b9e3a6) ) /* (2005/09/09.MASTER VER) */
+	ROM_LOAD("mushitam_u2", 0x000000, 0x8400000, CRC(8ba498ab) SHA1(459c0b4ab831bbe019bdd5b0ac56955948b9e3a6) ) // (2005/09/09.MASTER VER)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(701a912a) SHA1(85c198946fb693d99928ea2595c84ba4d9dc8157) )
@@ -611,11 +629,11 @@ ROM_END
 
 ROM_START( futari15 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("futari15_u4", 0x000000, 0x200000, CRC(e8c5f128) SHA1(45fb8066fdbecb83fdc2e14555c460d0c652cd5f) ) /* (2006/12/8.MAST VER. 1.54.) */
+	ROM_LOAD16_WORD_SWAP("futari15_u4", 0x000000, 0x200000, CRC(e8c5f128) SHA1(45fb8066fdbecb83fdc2e14555c460d0c652cd5f) ) // (2006/12/8.MAST VER. 1.54.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("futari15_u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) /* (2006/12/8.MAST VER. 1.54.) */
+	ROM_LOAD("futari15_u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) // (2006/12/8.MAST VER. 1.54.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
@@ -624,12 +642,12 @@ ROM_END
 
 ROM_START( futari15a )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("futari15a_u4", 0x000000, 0x200000, CRC(a609cf89) SHA1(56752fae9f42fa852af8ee2eae79e25ec7f17953) ) /* (2006/12/8 MAST VER 1.54) */
+	ROM_LOAD16_WORD_SWAP("futari15a_u4", 0x000000, 0x200000, CRC(a609cf89) SHA1(56752fae9f42fa852af8ee2eae79e25ec7f17953) ) // (2006/12/8 MAST VER 1.54)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 //  ROM_LOAD("futari15a_u2", 0x000000, 0x8400000, CRC(b9d815f9) SHA1(6b6f668b0bbb087ffac65e4f0d8bd9d5b28eeb28) )  // recycled ROM - only unused areas differ
-	ROM_LOAD("futari15_u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) /* (2006/12/8.MAST VER. 1.54.) */
+	ROM_LOAD("futari15_u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) // (2006/12/8.MAST VER. 1.54.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
@@ -638,20 +656,20 @@ ROM_END
 
 ROM_START( futari10 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "futari10_u4", 0x000000, 0x200000, CRC(b127dca7) SHA1(e1f518bc72fc1cdf69aefa89eafa4edaf4e84778) ) /* (2006/10/23 MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP( "futari10_u4", 0x000000, 0x200000, CRC(b127dca7) SHA1(e1f518bc72fc1cdf69aefa89eafa4edaf4e84778) ) // (2006/10/23 MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "futari10_u2", 0x000000, 0x8400000, CRC(78ffcd0c) SHA1(0e2937edec15ce3f5741b72ebd3bbaaefffb556e) ) /* (2006/10/23 MASTER VER.) */
+	ROM_LOAD( "futari10_u2", 0x000000, 0x8400000, CRC(78ffcd0c) SHA1(0e2937edec15ce3f5741b72ebd3bbaaefffb556e) ) // (2006/10/23 MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
 ROM_END
 
-ROM_START( futaribl ) /* Title screen shows (c) 2007 despite the 2009 "master" date - Also prints "Another Ver" to the title screen - reworked & re-released for the Chinese market */
+ROM_START( futaribl ) // Title screen shows (c) 2007 despite the 2009 "master" date - Also prints "Another Ver" to the title screen - reworked & re-released for the Chinese market
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "futaribli_u4", 0x000000, 0x200000, CRC(1971dd16) SHA1(e75993f2978cbaaf925b4b8bb33d094a5a7cebf0) ) /* (2009/11/27 INTERNATIONAL BL) */
+	ROM_LOAD16_WORD_SWAP( "futaribli_u4", 0x000000, 0x200000, CRC(1971dd16) SHA1(e75993f2978cbaaf925b4b8bb33d094a5a7cebf0) ) // (2009/11/27 INTERNATIONAL BL)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
@@ -664,11 +682,11 @@ ROM_END
 
 ROM_START( futariblj )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "futariblk_u4", 0x000000, 0x200000, CRC(b9467b6d) SHA1(64782807fe69acb4ae028e36c5c689d8bd9b7857) ) /* (2007/12/11 BLACK LABEL VER) */
+	ROM_LOAD16_WORD_SWAP( "futariblk_u4", 0x000000, 0x200000, CRC(b9467b6d) SHA1(64782807fe69acb4ae028e36c5c689d8bd9b7857) ) // (2007/12/11 BLACK LABEL VER)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "futariblk_u2", 0x000000, 0x8400000, CRC(08c6fd62) SHA1(e1fc386b2b0e41906c724287cbf82304297e0150) ) /* (2007/12/11 BLACK LABEL VER) */
+	ROM_LOAD( "futariblk_u2", 0x000000, 0x8400000, CRC(08c6fd62) SHA1(e1fc386b2b0e41906c724287cbf82304297e0150) ) // (2007/12/11 BLACK LABEL VER)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
@@ -677,50 +695,50 @@ ROM_END
 
 ROM_START( ibara )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) ) /* (2005/03/22 MASTER VER..) */
+	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) ) // (2005/03/22 MASTER VER..)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) /* (2005/03/22 MASTER VER..) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) // (2005/03/22 MASTER VER..)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(ee5e585d) SHA1(7eeba4ee693060e927f8c46b16e39227c6a62392) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(f0aa3cb6) SHA1(f9d137cd879e718811b2d21a0af2a9c6b7dca2f9) )
 ROM_END
 
-ROM_START( ibarablk ) /* Title screen shows (c) 2005 despite the 2006 "master" date */
+ROM_START( ibarablk ) // Title screen shows (c) 2005 despite the 2006 "master" date
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "ibarablk_u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP( "ibarablk_u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) // (2006/02/06. MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "ibarablk_u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) /* (2006/02/06. MASTER VER.) */
+	ROM_LOAD( "ibarablk_u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) // (2006/02/06. MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) /* (2006/02/06 MASTER VER.) */
-	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) // (2006/02/06 MASTER VER.)
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) // (2006/02/06 MASTER VER.)
 ROM_END
 
-ROM_START( ibarablka ) /* Title screen shows (c) 2005 despite the 2006 "master" date */
+ROM_START( ibarablka ) // Title screen shows (c) 2005 despite the 2006 "master" date
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "ibarablka_u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP( "ibarablka_u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) // (2006/02/06 MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "ibarablka_u2", 0x000000, 0x8400000, CRC(33400d96) SHA1(09c22b5431ac3726bf88c56efd970f56793f825a) ) /* (2006/02/06 MASTER VER.) */
+	ROM_LOAD( "ibarablka_u2", 0x000000, 0x8400000, CRC(33400d96) SHA1(09c22b5431ac3726bf88c56efd970f56793f825a) ) // (2006/02/06 MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) /* (2006/02/06 MASTER VER.) */
-	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) // (2006/02/06 MASTER VER.)
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) // (2006/02/06 MASTER VER.)
 ROM_END
 
 ROM_START( deathsml )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(1a7b98bf) SHA1(07798a4a846e5802756396b34df47d106895c1f1) ) /* (2007/10/09 MASTER VER) */
+	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(1a7b98bf) SHA1(07798a4a846e5802756396b34df47d106895c1f1) ) // (2007/10/09 MASTER VER)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(59ef5d78) SHA1(426e506b6d88948aa55aec71c0db6e91da3d490d) ) /* (2007/10/09 MASTER VER) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(59ef5d78) SHA1(426e506b6d88948aa55aec71c0db6e91da3d490d) ) // (2007/10/09 MASTER VER)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(aab718c8) SHA1(0e636c46d06151abd6f73232bc479dafcafe5327) )
@@ -729,11 +747,11 @@ ROM_END
 
 ROM_START( mmpork )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(d06cfa42) SHA1(5707feb4b3e5265daf5926f38c38612b24106f1f) ) /* (2007/ 4/17 MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(d06cfa42) SHA1(5707feb4b3e5265daf5926f38c38612b24106f1f) ) // (2007/ 4/17 MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(1ee961b8) SHA1(81a2eba704ac1cf7fc44fa7c6a3f50e3570c104f) ) /* (2007/ 4/17 MASTER VER.) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(1ee961b8) SHA1(81a2eba704ac1cf7fc44fa7c6a3f50e3570c104f) ) // (2007/ 4/17 MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4a4b36df) SHA1(5db5ce6fa47e5ca3263d4bd19315890c6d29df66) )
@@ -742,11 +760,11 @@ ROM_END
 
 ROM_START( mmmbanc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x0000, 0x200000, CRC(5589d8c6) SHA1(43fbdb0effe2bc0e7135698757b6ee50200aecde) ) /* (2007/06/05 MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP( "u4", 0x0000, 0x200000, CRC(5589d8c6) SHA1(43fbdb0effe2bc0e7135698757b6ee50200aecde) ) // (2007/06/05 MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(2e38965a) SHA1(2b58d1cd1a3dbc261d4a46805d2ea015fe22c444) ) /* (2007/06/05 MASTER VER.) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(2e38965a) SHA1(2b58d1cd1a3dbc261d4a46805d2ea015fe22c444) ) // (2007/06/05 MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4caaa1bf) SHA1(9b92c13eac05601da4d9bb3eb727c156974e9f0c) )
@@ -755,11 +773,11 @@ ROM_END
 
 ROM_START( pinkswts )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "pinkswts_u4", 0x0000, 0x200000, CRC(5d812c9e) SHA1(db821ec3892fd150513749d64a8b60bf147f3275) ) /* (2006/04/06 MASTER VER....) */
+	ROM_LOAD16_WORD_SWAP( "pinkswts_u4", 0x0000, 0x200000, CRC(5d812c9e) SHA1(db821ec3892fd150513749d64a8b60bf147f3275) ) // (2006/04/06 MASTER VER....)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "pinkswts_u2", 0x000000, 0x8400000, CRC(a2fa5363) SHA1(5be327534840871592df523ac82ee1927bd79d67) ) /* (2006/04/06 MASTER VER....) */
+	ROM_LOAD( "pinkswts_u2", 0x000000, 0x8400000, CRC(a2fa5363) SHA1(5be327534840871592df523ac82ee1927bd79d67) ) // (2006/04/06 MASTER VER....)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
@@ -768,11 +786,11 @@ ROM_END
 
 ROM_START( pinkswtsa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "pnkswtsa_u4", 0x0000, 0x200000, CRC(ee3339b2) SHA1(995988d370731a7074b49ce8752525dadf06a954) ) /* (2006/04/06 MASTER VER...) */
+	ROM_LOAD16_WORD_SWAP( "pnkswtsa_u4", 0x0000, 0x200000, CRC(ee3339b2) SHA1(995988d370731a7074b49ce8752525dadf06a954) ) // (2006/04/06 MASTER VER...)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "pnkswtsa_u2", 0x000000, 0x8400000, CRC(829a862e) SHA1(8c0ee2a0eb33b68869252fd68aed74820a904287) ) /* (2006/04/06 MASTER VER...) */
+	ROM_LOAD( "pnkswtsa_u2", 0x000000, 0x8400000, CRC(829a862e) SHA1(8c0ee2a0eb33b68869252fd68aed74820a904287) ) // (2006/04/06 MASTER VER...)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
@@ -781,11 +799,11 @@ ROM_END
 
 ROM_START( pinkswtsb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "pnkswtsb_u4", 0x0000, 0x200000, CRC(68bcc009) SHA1(2fef544b93c61161a37365f868b431d8262e4b21) ) /* (2006/04/06 MASTER VER.) */
+	ROM_LOAD16_WORD_SWAP( "pnkswtsb_u4", 0x0000, 0x200000, CRC(68bcc009) SHA1(2fef544b93c61161a37365f868b431d8262e4b21) ) // (2006/04/06 MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-//  ROM_LOAD( "pnkswtsb_u2", 0x000000, 0x8400000, BAD_DUMP CRC(a5666ed9) SHA1(682e06c84990225bc6bb0c9f38b5f46c4e36b430) ) /* (2006/04/06 MASTER VER.) */
+//  ROM_LOAD( "pnkswtsb_u2", 0x000000, 0x8400000, BAD_DUMP CRC(a5666ed9) SHA1(682e06c84990225bc6bb0c9f38b5f46c4e36b430) ) // (2006/04/06 MASTER VER.)
 	ROM_LOAD( "pnkswtsx_u2", 0x000000, 0x8400000, CRC(91e4deb2) SHA1(893cb10d6f805df7cb4a1bb709a3ea6de147b7e9) ) // (2006/xx/xx MASTER VER.) and (2006/04/06 MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
@@ -822,10 +840,10 @@ ROM_END
 
 ROM_START( ddpdfk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "ddpdfk_u4", 0x0000, 0x400000, CRC(9976d699) SHA1(9dfe9d1daf6f638cafce8cdc5230209e2bcb7522) ) /* (2008/06/23  MASTER VER 1.5) */
+	ROM_LOAD16_WORD_SWAP( "ddpdfk_u4", 0x0000, 0x400000, CRC(9976d699) SHA1(9dfe9d1daf6f638cafce8cdc5230209e2bcb7522) ) // (2008/06/23  MASTER VER 1.5)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "ddpdfk_u2", 0x000000, 0x8400000, CRC(84a51a4f) SHA1(291a6279c0746d2eb8630e7d6d886043f0cfdd94) ) /* (2008/06/23  MASTER VER 1.5) */
+	ROM_LOAD( "ddpdfk_u2", 0x000000, 0x8400000, CRC(84a51a4f) SHA1(291a6279c0746d2eb8630e7d6d886043f0cfdd94) ) // (2008/06/23  MASTER VER 1.5)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(27032cde) SHA1(5b58d0140d72b91db4e763ca4af93060d36ac74d) )
@@ -834,10 +852,10 @@ ROM_END
 
 ROM_START( ddpdfk10 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "ddpdfk10_u4", 0x0000, 0x400000, CRC(a3d650b2) SHA1(46a7551760e18c2cecd372c3f4be16f6600efc2c) ) /* (2008/05/16  MASTER VER) */
+	ROM_LOAD16_WORD_SWAP( "ddpdfk10_u4", 0x0000, 0x400000, CRC(a3d650b2) SHA1(46a7551760e18c2cecd372c3f4be16f6600efc2c) ) // (2008/05/16  MASTER VER)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "ddpdfk10_u2", 0x000000, 0x8400000, CRC(d349cb2a) SHA1(c364c36b69b93f8f62390f185d044f51056669ff) ) /* (2008/05/16  MASTER VER) */
+	ROM_LOAD( "ddpdfk10_u2", 0x000000, 0x8400000, CRC(d349cb2a) SHA1(c364c36b69b93f8f62390f185d044f51056669ff) ) // (2008/05/16  MASTER VER)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(27032cde) SHA1(5b58d0140d72b91db4e763ca4af93060d36ac74d) )
@@ -846,10 +864,10 @@ ROM_END
 
 ROM_START( dsmbl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(77fc5ad1) SHA1(afe044fc16e9494143c876879b033caccd08cf22) ) /* (2008/10/06 MEGABLACK LABEL VER) */
+	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(77fc5ad1) SHA1(afe044fc16e9494143c876879b033caccd08cf22) ) // (2008/10/06 MEGABLACK LABEL VER)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(d6b85b7a) SHA1(4674f6ad07f6a03904ca3d05060816b8fe061add) ) /* (2008/10/06 MEGABLACK LABEL VER) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(d6b85b7a) SHA1(4674f6ad07f6a03904ca3d05060816b8fe061add) ) // (2008/10/06 MEGABLACK LABEL VER)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a9536a6a) SHA1(4b9dcaf6803b1fcfdf73ae9daabc4508fec71631) )
@@ -858,7 +876,7 @@ ROM_END
 
 ROM_START( dfkbl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(8092ca9d) SHA1(75e16cd7c8d0f9c715115ce12da5c245fbcd2416) ) /* (2010/1/18 BLACK LABEL) */
+	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(8092ca9d) SHA1(75e16cd7c8d0f9c715115ce12da5c245fbcd2416) ) // (2010/1/18 BLACK LABEL)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(29f9d73a) SHA1(ed978ab5e3ad8c05e7778a91bfb5aaa17b0f72d9) )
@@ -900,10 +918,10 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64smo_delegate(*this, FUNC(cv1k_state::speedup_r)));
 
-	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true, m_rombase);
 
-	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false,  m_ram);
-	m_maincpu->sh2drc_add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false,  m_ram + ((m_idleramoffs+8)/8));
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false, m_ram);
+	m_maincpu->sh2drc_add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false, m_ram + ((m_idleramoffs+8)/8));
 }
 
 
@@ -937,68 +955,71 @@ void cv1k_state::init_deathsml()
 	install_speedups(0x02310, 0xc0519a2, false);
 }
 
-void cv1k_state::init_dpddfk()
+void cv1k_state::init_ddpdfk()
 {
 	install_speedups(0x02310, 0xc1d1346, true);
 }
 
-#define GAME_FLAGS (MACHINE_IMPERFECT_TIMING)
+
+} // anonymous namespace
+
 
 // The black label versions are intentionally not set as clones, they were re-releases with different game codes, not bugfixes.
 
 // CA011  Mushihime-Sama
-GAME( 2004, mushisam,   0,        cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12.MASTER VER.)",                         GAME_FLAGS )
-GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, init_ibara,    ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12 MASTER VER.)",                         GAME_FLAGS )
-GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12 MASTER VER)",                          GAME_FLAGS )
+GAME( 2004, mushisam,   0,        cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12.MASTER VER.)",                         MACHINE_IMPERFECT_TIMING )
+GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, init_ibara,    ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12 MASTER VER.)",                         MACHINE_IMPERFECT_TIMING )
+GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12 MASTER VER)",                          MACHINE_IMPERFECT_TIMING )
 
 // CA012  Ibara
-GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)", "Ibara (2005/03/22 MASTER VER..)",                                 GAME_FLAGS )
+GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)", "Ibara (2005/03/22 MASTER VER..)",                                 MACHINE_IMPERFECT_TIMING )
 
 // CA012B Ibara Kuro Black Label
-GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                GAME_FLAGS )
-GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                 GAME_FLAGS )
+GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                MACHINE_IMPERFECT_TIMING )
+GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                 MACHINE_IMPERFECT_TIMING )
 
 // CA013  Espgaluda II
-GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER)",                            GAME_FLAGS )
+GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER, newer CV1000-B PCB)",        MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER, original CV1000-B PCB)",     MACHINE_IMPERFECT_TIMING )
 
 // CA???  Puzzle! Mushihime-Tama
-GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)", "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                  GAME_FLAGS )
-GAME( 2005, mushitama,  mushitam, cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)", "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                  GAME_FLAGS )
+GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)", "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                  MACHINE_IMPERFECT_TIMING )
+GAME( 2005, mushitama,  mushitam, cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)", "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                  MACHINE_IMPERFECT_TIMING )
 
 // CA014  Pink Sweets: Ibara Sorekara
-GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",         GAME_FLAGS )
-GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",          GAME_FLAGS )
-GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",            GAME_FLAGS )
-GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",            GAME_FLAGS ) // defaults to freeplay, possibly bootlegged from show/dev version?
-GAME( 2006, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg",            "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",GAME_FLAGS )
+GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",         MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",          MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",            MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",            MACHINE_IMPERFECT_TIMING ) // defaults to freeplay, possibly bootlegged from show/dev version?
+GAME( 2006, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg",            "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",MACHINE_IMPERFECT_TIMING )
 
 // CA015  Mushihime-Sama Futari
-GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",     GAME_FLAGS )
-GAME( 2006, futari15a,  futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",       GAME_FLAGS )
-GAME( 2006, futari10,   futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",          GAME_FLAGS )
+GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",     MACHINE_IMPERFECT_TIMING )
+GAME( 2006, futari15a,  futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",       MACHINE_IMPERFECT_TIMING )
+GAME( 2006, futari10,   futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",          MACHINE_IMPERFECT_TIMING )
 
 // CA015B Mushihime-Sama Futari Black Label
-GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label - Another Ver (2009/11/27 INTERNATIONAL BL)", GAME_FLAGS ) // re-released for Chinese market
-GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",  GAME_FLAGS )
+GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label - Another Ver (2009/11/27 INTERNATIONAL BL)", MACHINE_IMPERFECT_TIMING ) // re-released for Chinese market
+GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",  MACHINE_IMPERFECT_TIMING )
 
 // CA016  Muchi Muchi Pork!
-GAME( 2007, mmpork,     0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                      GAME_FLAGS )
+GAME( 2007, mmpork,     0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                      MACHINE_IMPERFECT_TIMING )
 
 // CA017  Deathsmiles
-GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, init_deathsml, ROT0,   "Cave (AMI license)", "Deathsmiles (2007/10/09 MASTER VER)",                             GAME_FLAGS )
+GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, init_deathsml, ROT0,   "Cave (AMI license)", "Deathsmiles (2007/10/09 MASTER VER)",                             MACHINE_IMPERFECT_TIMING )
 
 // CA017B Deathsmiles Black Label
-GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT0,   "Cave (AMI license)", "Deathsmiles MegaBlack Label (2008/10/06 MEGABLACK LABEL VER)",    GAME_FLAGS )
+GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave (AMI license)", "Deathsmiles MegaBlack Label (2008/10/06 MEGABLACK LABEL VER)",    MACHINE_IMPERFECT_TIMING )
 
 // CA019  Do-Don-Pachi Dai-Fukkatsu
-GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.5 (2008/06/23 MASTER VER 1.5)",     GAME_FLAGS )
-GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16 MASTER VER)",         GAME_FLAGS )
+GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.5 (2008/06/23 MASTER VER 1.5)",     MACHINE_IMPERFECT_TIMING )
+GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16 MASTER VER)",         MACHINE_IMPERFECT_TIMING )
 
 // CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
-GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",     GAME_FLAGS )
+GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",     MACHINE_IMPERFECT_TIMING )
 
 // CA021  Akai Katana
-GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT0,   "Cave (AMI license)", "Akai Katana (2010/ 8/13 MASTER VER.)",                            GAME_FLAGS )
+GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
 GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",           MACHINE_NOT_WORKING )

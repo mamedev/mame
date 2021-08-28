@@ -397,7 +397,7 @@ image_init_result sega8_cart_slot_device::call_load()
 
 		if (m_is_card && len > 0x8000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a card larger than 32KB");
+			seterror(image_error::INVALIDIMAGE, "Attempted loading a card larger than 32KB");
 			return image_init_result::FAIL;
 		}
 

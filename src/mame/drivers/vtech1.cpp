@@ -184,7 +184,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 		// verify
 		if (space.read_byte(addr) != to_write)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Insufficient RAM to load snapshot");
+			image.seterror(image_error::INVALIDIMAGE, "Insufficient RAM to load snapshot");
 			image.message("Insufficient RAM to load snapshot (%d bytes needed) [%s]", size, pgmname);
 
 			return image_init_result::FAIL;
@@ -214,7 +214,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 		break;
 
 	default:
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
+		image.seterror(image_error::INVALIDIMAGE, "Snapshot format not supported.");
 		image.message("Snapshot format not supported.");
 		return image_init_result::FAIL;
 	}

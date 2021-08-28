@@ -25,13 +25,17 @@ Switch at G6 (sw1-4 = free game scores, sw5-8 = config), at G8 (coin chute setti
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
+#include "spirit76.lh"
 
 class spirit76_state : public genpin_class
 {
 public:
 	spirit76_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") { }
+		, m_maincpu(*this, "maincpu")
+		, m_digit(*this, "digit%u", 0U)
+		, m_led(*this, "led%u", 0U)
+		{ }
 
 	void spirit76(machine_config &config);
 
@@ -45,9 +49,14 @@ private:
 	u8 unk_r();
 	void maincpu_map(address_map &map);
 
-	u8 m_t_c;
+	u8 m_t_c = 0;
+	bool m_op_sw = 0;
+	u8 m_segments = 0;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	output_finder<16> m_digit;
+	output_finder<7> m_led;
 };
 
 void spirit76_state::maincpu_map(address_map &map)
@@ -64,10 +73,56 @@ void spirit76_state::maincpu_map(address_map &map)
 
 
 static INPUT_PORTS_START( spirit76 )
-	PORT_START("DSW0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_START("DSW1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("G6")
+	PORT_DIPNAME( 0x80, 0x00, "SW 1")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x00, "SW 2")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x40, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x00, "SW 3")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x20, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x00, "SW 4")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x10, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x00, "SW 5")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x00, "SW 6")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x04, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "SW 7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x02, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x00, "SW 8")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x01, DEF_STR(On))
+	PORT_START("G8")
+	PORT_DIPNAME( 0x80, 0x00, "SW 9")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x00, "SW 10")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x40, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x00, "SW 11")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x20, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x00, "SW 12")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x10, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x00, "SW 13")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x00, "SW 14")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x04, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "SW 15")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x02, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x00, "SW 16")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x01, DEF_STR(On))
 INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER( spirit76_state::irq )
@@ -78,16 +133,25 @@ TIMER_DEVICE_CALLBACK_MEMBER( spirit76_state::irq )
 		m_t_c++;
 }
 
+
 // continual write in irq routine
 void spirit76_state::porta_w(u8 data)
 {
-	printf("PORT A=%X\n",data);
+	static constexpr uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // unknown decoder that blanks out 10-15
+	printf("PORT A=%02X  ",data);
+	m_op_sw = true;
+	m_segments = patterns[~data & 15];
 }
 
 // continual write in irq routine
 void spirit76_state::portb_w(u8 data)
 {
-	printf("PORT B=%X\n",data);
+	printf("PORT B=%02X  ",data);
+	if (m_op_sw)
+	{
+		m_digit[data & 15] = m_segments;
+		m_op_sw = false;
+	}
 }
 
 // continual read in irq routine
@@ -107,13 +171,19 @@ u8 spirit76_state::portb_r()
 // writes here once at start
 void spirit76_state::unk_w(u8 data)
 {
-	printf("UNK PORT=%X\n",data);
+	printf("UNK PORT=%02X\n",data);
 }
 
 // continual read in irq routine
 u8 spirit76_state::unk_r()
 {
 	return 0;
+}
+
+void spirit76_state::machine_start()
+{
+	m_digit.resolve();
+	m_led.resolve();
 }
 
 void spirit76_state::machine_reset()
@@ -130,7 +200,7 @@ void spirit76_state::spirit76(machine_config &config)
 	TIMER(config, "irq").configure_periodic(FUNC(spirit76_state::irq), attotime::from_hz(120));
 
 	/* video hardware */
-	//config.set_default_layout();
+	config.set_default_layout(layout_spirit76);
 
 	//6821pia
 	pia6821_device &pia(PIA6821(config, "pia", 0));

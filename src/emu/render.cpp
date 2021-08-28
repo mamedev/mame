@@ -50,7 +50,8 @@
 
 #include "ui/uimain.h"
 
-#include "xmlfile.h"
+#include "util/path.h"
+#include "util/xmlfile.h"
 
 #include <zlib.h>
 
@@ -2186,7 +2187,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
 	layoutfile.set_restrict_to_mediapath(1);
 	bool result(false);
-	for (osd_file::error filerr = layoutfile.open(fname); osd_file::error::NONE == filerr; filerr = layoutfile.open_next())
+	for (std::error_condition filerr = layoutfile.open(fname); !filerr; filerr = layoutfile.open_next())
 	{
 		// read the file and parse as XML
 		util::xml::file::ptr const rootnode(util::xml::file::read(layoutfile, &parseopt));

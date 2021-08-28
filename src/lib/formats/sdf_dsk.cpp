@@ -12,7 +12,9 @@
 *********************************************************************/
 
 #include "sdf_dsk.h"
-#include <cassert>
+
+#include "ioprocs.h"
+
 
 sdf_format::sdf_format()
 {
@@ -37,18 +39,18 @@ const char *sdf_format::extensions() const
 }
 
 
-int sdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t header[HEADER_SIZE];
 
-	uint64_t size = io_generic_size(io);
-
-	if (size < HEADER_SIZE)
+	uint64_t size;
+	if (io.length(size) || (size < HEADER_SIZE))
 	{
 		return 0;
 	}
 
-	io_generic_read(io, header, 0, HEADER_SIZE);
+	size_t actual;
+	io.read_at(0, header, HEADER_SIZE, actual);
 
 	int tracks = header[4];
 	int heads = header[5];
@@ -74,13 +76,14 @@ int sdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 }
 
 
-bool sdf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	uint8_t header[HEADER_SIZE];
 	std::vector<uint8_t> track_data(TOTAL_TRACK_SIZE);
 	std::vector<uint32_t> raw_track_data;
 
-	io_generic_read(io, header, 0, HEADER_SIZE);
+	io.read_at(0, header, HEADER_SIZE, actual);
 
 	const int tracks = header[4];
 	const int heads = header[5];
@@ -104,7 +107,7 @@ bool sdf_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 			raw_track_data.clear();
 
 			// Read track
-			io_generic_read(io, &track_data[0], HEADER_SIZE + ( heads * track + head ) * TOTAL_TRACK_SIZE, TOTAL_TRACK_SIZE);
+			io.read_at(HEADER_SIZE + (heads * track + head) * TOTAL_TRACK_SIZE, &track_data[0], TOTAL_TRACK_SIZE, actual);
 
 			int sector_count = track_data[0];
 
@@ -181,7 +184,7 @@ bool sdf_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 }
 
 
-bool sdf_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool sdf_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

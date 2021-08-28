@@ -362,6 +362,9 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 		{
 			uint8_t tile_data = m_chargen->base()[(tile*16+yi) & 0x7ff];
 
+			if((attr & 2) && (m_screen->frame_number() & 0x10)) // FIXME: blink freq
+				tile_data = 0;
+
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
 

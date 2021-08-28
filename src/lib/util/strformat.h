@@ -578,16 +578,16 @@ template <typename Stream, typename T>
 class format_output
 {
 private:
-	template <typename U> struct string_semantics
-	{ static constexpr bool value = false; };
-	template <typename CharT, typename Traits, typename Allocator> struct string_semantics<std::basic_string<CharT, Traits, Allocator> >
-	{ static constexpr bool value = true; };
-	template <typename CharT, typename Traits> struct string_semantics<std::basic_string_view<CharT, Traits> >
-	{ static constexpr bool value = true; };
-	template <typename U> struct signed_integer_semantics
-	{ static constexpr bool value = std::is_integral_v<U>&& std::is_signed_v<U>; };
-	template <typename U> struct unsigned_integer_semantics
-	{ static constexpr bool value = std::is_integral_v<U>&& !std::is_signed_v<U>; };
+	template <typename U>
+	struct string_semantics : public std::false_type { };
+	template <typename CharT, typename Traits, typename Allocator>
+	struct string_semantics<std::basic_string<CharT, Traits, Allocator> > : public std::true_type { };
+	template <typename CharT, typename Traits>
+	struct string_semantics<std::basic_string_view<CharT, Traits> > : public std::true_type { };
+	template <typename U>
+	using signed_integer_semantics = std::bool_constant<std::is_integral_v<U> && std::is_signed_v<U> >;
+	template <typename U>
+	using unsigned_integer_semantics = std::bool_constant<std::is_integral_v<U> && !std::is_signed_v<U> >;
 
 	static void apply_signed(Stream &str, char16_t const &value)
 	{
@@ -865,8 +865,8 @@ template <typename Stream, typename T>
 class format_output<Stream, T *>
 {
 protected:
-	template <typename U> struct string_semantics
-	{ static constexpr bool value = std::is_same<std::remove_const_t<U>, typename Stream::char_type>::value; };
+	template <typename U>
+	using string_semantics = std::bool_constant<std::is_same_v<std::remove_const_t<U>, typename Stream::char_type> >;
 
 public:
 	template <typename U>
@@ -940,10 +940,10 @@ template <typename T>
 class format_make_integer
 {
 private:
-	template <typename U> struct use_unsigned_cast
-	{ static constexpr bool value = std::is_convertible<U const, unsigned>::value && std::is_unsigned<U>::value; };
-	template <typename U> struct use_signed_cast
-	{ static constexpr bool value = !use_unsigned_cast<U>::value && std::is_convertible<U const, int>::value; };
+	template <typename U>
+	using use_unsigned_cast = std::bool_constant<std::is_convertible_v<U const, unsigned> && std::is_unsigned_v<U> >;
+	template <typename U>
+	using use_signed_cast = std::bool_constant<!use_unsigned_cast<U>::value && std::is_convertible_v<U const, int> >;
 
 public:
 	template <typename U> static bool apply(U const &value, int &result)
@@ -974,14 +974,14 @@ template <typename T>
 class format_store_integer
 {
 private:
-	template <typename U> struct is_non_const_ptr
-	{ static constexpr bool value = std::is_pointer<U>::value && !std::is_const<std::remove_pointer_t<U> >::value; };
-	template <typename U> struct is_unsigned_ptr
-	{ static constexpr bool value = std::is_pointer<U>::value && std::is_unsigned<std::remove_pointer_t<U> >::value; };
-	template <typename U> struct use_unsigned_cast
-	{ static constexpr bool value = is_non_const_ptr<U>::value && is_unsigned_ptr<U>::value && std::is_convertible<std::make_unsigned_t<std::streamoff>, std::remove_pointer_t<U> >::value; };
-	template <typename U> struct use_signed_cast
-	{ static constexpr bool value = is_non_const_ptr<U>::value && !use_unsigned_cast<U>::value && std::is_convertible<std::streamoff, std::remove_pointer_t<U> >::value; };
+	template <typename U>
+	using is_non_const_ptr = std::bool_constant<std::is_pointer_v<U> && !std::is_const_v<std::remove_pointer_t<U> > >;
+	template <typename U>
+	using is_unsigned_ptr = std::bool_constant<std::is_pointer_v<U> && std::is_unsigned_v<std::remove_pointer_t<U> > >;
+	template <typename U>
+	using use_unsigned_cast = std::bool_constant<is_non_const_ptr<U>::value && is_unsigned_ptr<U>::value && std::is_convertible_v<std::make_unsigned_t<std::streamoff>, std::remove_pointer_t<U> > >;
+	template <typename U>
+	using use_signed_cast = std::bool_constant<is_non_const_ptr<U>::value && !use_unsigned_cast<U>::value && std::is_convertible_v<std::streamoff, std::remove_pointer_t<U> > >;
 
 public:
 	template <typename U> static bool apply(U const &value, std::streamoff data)
@@ -1091,11 +1091,11 @@ public:
 
 protected:
 	template <typename T>
-	struct handle_char_ptr { static constexpr bool value = std::is_pointer<T>::value && std::is_same<std::remove_cv_t<std::remove_pointer_t<T> >, char_type>::value; };
+	using handle_char_ptr = std::bool_constant<std::is_pointer_v<T> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<T> >, char_type> >;
 	template <typename T>
-	struct handle_char_array { static constexpr bool value = std::is_array<T>::value && std::is_same<std::remove_cv_t<std::remove_extent_t<T> >, char_type>::value; };
+	using handle_char_array = std::bool_constant<std::is_array_v<T> && std::is_same_v<std::remove_cv_t<std::remove_extent_t<T> >, char_type> >;
 	template <typename T>
-	struct handle_container { static constexpr bool value = !handle_char_ptr<T>::value && !handle_char_array<T>::value; };
+	using handle_container = std::bool_constant<!handle_char_ptr<T>::value && !handle_char_array<T>::value>;
 
 	template <typename Format>
 	format_argument_pack(

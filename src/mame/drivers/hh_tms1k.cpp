@@ -53,6 +53,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
  @MP1211   TMS1100   1980, Entex Space Invader (6012)
+ *MP1215   TMS1100   1980, Tiger Playmaker
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
@@ -122,6 +123,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
+ *MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
@@ -158,6 +160,7 @@ ROM source notes when dumped from another publisher, but confident it's the same
 - palmf31: Toshiba BC-8018B
 - ti1250: Texas Instruments TI-1200
 - ti25503: Texas Instruments TI-1265
+- ti5100: loose 1979 TMS1073NL chip
 
 TODO:
 - verify output PLA and microinstructions PLA for MCUs that have been dumped
@@ -274,6 +277,7 @@ TODO:
 #include "ti1680.lh"
 #include "ti25503.lh"
 #include "ti30.lh"
+#include "ti5100.lh"
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
@@ -2387,7 +2391,7 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
 		return image_init_result::FAIL;
 	}
 
@@ -2575,7 +2579,7 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
 		return image_init_result::FAIL;
 	}
 
@@ -10472,6 +10476,158 @@ ROM_END
 
 /***************************************************************************
 
+  TI-5100, more (see below)
+  * TMS1070 MCU label TMS1073NL or TMC1073NL (die label 1070B, 1073)
+  * 11-digit 7seg VFD (1 custom digit)
+
+  This chip was also used in 3rd-party calculators, such as Toshiba BC-1015,
+  Panasonic JE1601U, Radio Shack EC2001, Triumph-Adler D100. The original
+  TI version did not have the 3 buttons at R4.
+
+***************************************************************************/
+
+class ti5100_state : public hh_tms1k_state
+{
+public:
+	ti5100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti5100(machine_config &config);
+
+private:
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void ti5100_state::update_display()
+{
+	// extra segment on R10
+	m_display->matrix(m_r, (m_r >> 2 & 0x100) | m_o);
+}
+
+void ti5100_state::write_r(u16 data)
+{
+	// R0-R10: input mux, select digit
+	m_r = m_inp_mux = data;
+	update_display();
+}
+
+void ti5100_state::write_o(u16 data)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	update_display();
+}
+
+u8 ti5100_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(11);
+}
+
+// config
+
+static INPUT_PORTS_START( ti5100 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "K" ) // constant mode
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "DP" ) // display point
+	PORT_CONFSETTING(    0x00, "F" )
+	PORT_CONFSETTING(    0x08, "2" )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // clear all?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("EX")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("GPM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME(UTF8_CAPITAL_DELTA"%")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("N")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // duplicate of R8 0x01
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // duplicate of R9 0x02
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.10") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("RM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+INPUT_PORTS_END
+
+void ti5100_state::ti5100(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1070(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(ti5100_state::read_k));
+	m_maincpu->o().set(FUNC(ti5100_state::write_o));
+	m_maincpu->r().set(FUNC(ti5100_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 9);
+	m_display->set_segmask(0x7ff, 0xff);
+	config.set_default_layout(layout_ti5100);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( ti5100 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1073nl", 0x0000, 0x0400, CRC(94185933) SHA1(d2d9432f857b8530ac399f5097c6d412f06d8814) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti5100_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ti5100_output.pla", 0, 365, CRC(11f6f0f4) SHA1(f25cf6bd284ab4614746b2e3f98d42d2585e425a) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   TMC098x series Majestic-line calculators
 
   TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
@@ -13113,6 +13269,7 @@ COMP( 1975, ti1250,     0,         0, ti1250,    ti1250,    ti1250_state,    emp
 COMP( 1976, ti125076,   ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti1270,     0,         0, ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti25503,    0,         0, ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti5100,     0,         0, ti5100,    ti5100,    ti5100_state,    empty_init, "Texas Instruments", "TI-5100", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti30,       0,         0, ti30,      ti30,      ti30_state,      empty_init, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, tibusan,    0,         0, ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, tiprog,     0,         0, ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

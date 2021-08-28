@@ -323,7 +323,7 @@ static const char *const alphamc07_sample_names[] =
 };
 
 
-#define MSM5232_BASE_VOLUME 1.0
+#define MSM5232_BASE_VOLUME 0.7
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -358,22 +358,22 @@ void ad_59mc07_device::device_add_mconfig(machine_config &config)
 	m_msm->add_route(5, "speaker", MSM5232_BASE_VOLUME/1.5);   // pin 35  4'-2 : 15k resistor
 	m_msm->add_route(6, "speaker", MSM5232_BASE_VOLUME);       // pin 34  8'-2 : 10k resistor
 	m_msm->add_route(7, "speaker", MSM5232_BASE_VOLUME);       // pin 33 16'-2 : 10k resistor
-	m_msm->add_route(8, "speaker", 1.0);       // pin 1 SOLO  8' (this actually feeds an analog section)
-	m_msm->add_route(9, "speaker", 1.0);       // pin 2 SOLO 16' (this actually feeds an analog section)
-	m_msm->add_route(10,"speaker", 0.12);      // pin 22 Noise Output (this actually feeds an analog section)
+	m_msm->add_route(8, "speaker", 0.7);       // pin 1 SOLO  8' (this actually feeds an analog section)
+	m_msm->add_route(9, "speaker", 0.7);       // pin 2 SOLO 16' (this actually feeds an analog section)
+	m_msm->add_route(10,"speaker", 0.084);     // pin 22 Noise Output (this actually feeds an analog section)
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 6.144_MHz_XTAL/4)); // verified on pcb
 	aysnd.port_a_write_callback().set(FUNC(ad_59mc07_device::ay8910_porta_w));
 	aysnd.port_b_write_callback().set(FUNC(ad_59mc07_device::ay8910_portb_w));
-	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.15);
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.105);
 
-	DAC_6BIT_R2R(config, m_dac_1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_6BIT_R2R(config, m_dac_2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_6BIT_R2R(config, m_dac_1, 0).add_route(ALL_OUTPUTS, "speaker", 0.35); // unknown DAC
+	DAC_6BIT_R2R(config, m_dac_2, 0).add_route(ALL_OUTPUTS, "speaker", 0.35); // unknown DAC
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(3);
 	m_samples->set_samples_names(alphamc07_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.3);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.21);
 }
 
 

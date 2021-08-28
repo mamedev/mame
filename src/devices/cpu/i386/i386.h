@@ -386,6 +386,8 @@ protected:
 	uint8_t m_opcode_bytes[16];
 	uint32_t m_opcode_pc;
 	int m_opcode_bytes_length;
+	offs_t m_opcode_addrs[16];
+	uint32_t m_opcode_addrs_index;
 
 	uint64_t m_debugger_temp;
 

@@ -23,8 +23,8 @@ class ti99_floppy_format : public floppy_image_format_t
 {
 public:
 	bool supports_save() const override { return true; }
-	bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
 
 protected:
 	uint8_t get_data_from_encoding(uint16_t raw);
@@ -32,10 +32,10 @@ protected:
 
 	virtual int min_heads() =0;
 
-	virtual void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks) =0;
+	virtual void determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks) =0;
 	virtual int get_track_size(int sector_count) =0;
-	virtual void load_track(io_generic *io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount) =0;
-	virtual void write_track(io_generic *io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count) =0;
+	virtual void load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount) =0;
+	virtual void write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count) =0;
 
 	int get_encoding(int cell_size);
 
@@ -53,16 +53,16 @@ protected:
 class ti99_sdf_format : public ti99_floppy_format
 {
 public:
-	int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	const char *name() const override;
 	const char *description() const override;
 	const char *extensions() const override;
 
 private:
-	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks) override;
+	void determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks) override;
 	int get_track_size(int sector_count) override;
-	void write_track(io_generic *io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count) override;
-	void load_track(io_generic *io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sector_count, int track_count) override;
+	void write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count) override;
+	void load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sector_count, int track_count) override;
 
 	// This format supports single-sided images
 	int min_heads() override { return 1; }
@@ -92,15 +92,15 @@ extern const floppy_format_type FLOPPY_TI99_SDF_FORMAT;
 class ti99_tdf_format : public ti99_floppy_format
 {
 public:
-	int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	const char *name() const override;
 	const char *description() const override;
 	const char *extensions() const override;
 
 private:
-	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks) override;
-	void load_track(io_generic *io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount) override;
-	void write_track(io_generic *io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count) override;
+	void determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks) override;
+	void load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount) override;
+	void write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count) override;
 	int get_track_size(int sector_count) override;
 
 	// This format only supports double-sided images

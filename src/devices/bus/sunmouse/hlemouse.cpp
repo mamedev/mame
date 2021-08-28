@@ -53,7 +53,7 @@ INPUT_PORTS_END
 
 uint8_t extract_delta_byte(int32_t &delta)
 {
-	int32_t const result(std::min<int32_t>(std::max<int32_t>(delta, -120), 127));
+	int32_t const result(std::clamp<int32_t>(delta, -120, 127));
 	delta -= result;
 	return uint8_t(int8_t(result));
 }

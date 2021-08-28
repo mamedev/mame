@@ -4,6 +4,80 @@
 
     MIT TX-0 disassembler
 
+    Mnemonics and relative timing of operate class micro-instructions
+    until mid-1960 (as given in M-5001-27):
+
+    0.8 | 700000 (CLL) Clear left 9 bits of AC
+    0.8 | 640000 (CLR) Clear right 9 bits of AC
+    ----+--------------------------------------------------------
+    IOS | 610000 (EX0) Operate external equipment 0
+    IOS | 611000 (EX1) Operate external equipment 1
+    IOS | 612000 (EX2) Operate external equipment 2
+    IOS | 613000 (EX3) Operate external equipment 3
+    IOS | 614000 (EX4) Operate external equipment 4
+    IOS | 615000 (EX5) Operate external equipment 5
+    IOS | 616000 (EX6) Operate external equipment 6
+    IOS | 617000 (EX7) Operate external equipment 7
+    IOS | 621000 (R1L) Read one line of tape from PETR into AC
+    IOS | 622000 (DIS) Display point on scope (coordinates in AC)
+    IOS | 623000 (R3L) Read three lines of tape from PETR into AC
+    IOS | 624000 (PRT) Print character on Flexowriter
+    IOS | 626000 (P6H) Punch six holes (as specified by AC)
+    IOS | 627000 (P7H) Punch seven holes (as specified by AC)
+    ----+--------------------------------------------------------
+    1.1 |              Clear MBR
+    1.1 | 600100 (PEN) Set AC bits 0 and 1 from LP0 and LP1
+    1.1 | 600004 (TAC) Transfer (inclusive or) TAC to AC
+    1.2 | 600001 (AMB) Transfer AC to MBR (executed before COM)
+    1.2 | 600040 (COM) Complement AC
+    1.2 | 600003 (TBR) Transfer (inclusive or) TBR to MBR
+    1.3 | 600200 (MLR) Transfer MBR to LR
+    1.3 | 600002 (LMB) Transfer LR to MBR
+    1.3 | 600104 (ORL) Inclusive or MBR into LR
+    1.3 | 600304 (ANL) And MBR into LR
+    1.4 | 600020 (PAD) Partial add (exclusive or) MBR to AC
+    1.4 | 600400 (SHR) Shift AC right once
+    1.4 | 600600 (CYR) Cycle AC right once
+    1.7 | 600010 (CRY) Add carry digits to AC (according to LR)
+    1.8 | 603000 (HLT) Halt computer
+
+    ANL and ORL were added in the first half of 1959 (M-5001-6).
+
+    Mnemonics and relative timing of operate class micro-instructions
+    after 1960 (as given in M-5001-27-3 and M-5001-27-4):
+
+    0.6 | 631000 (CLL) Clear left 9 bits of AC
+    0.6 | 632000 (CLR) Clear right 9 bits of AC
+    0.7 | 640000 (AMB) Transfer AC to MBR
+    0.8 | 700000 (CLA) Clear AC
+    ----+------------------------------------------------------------
+    **  | 604000 (SEL) Select magnetic tape device
+        | 6x4x00       Backspace tape
+        | 6x4x04       Read select tape
+        | 6x4x10       Rewind tape
+        | 6x4x14       Write select tape
+    **  | 620000 (CPY) Synchronize with copy (transfer to or from LR)
+    ----+------------------------------------------------------------
+    1.1 | 601000 (TAC) Transfer (inclusive or) TAC to AC
+    1.1 | 603000 (PEN) Set AC bits 0 and 1 from LP0 and LP1
+    1.2 | 600100 (XMB) Transfer XR to MBR (with sign extension)
+    1.2 | 600040 (COM) Complement AC
+    1.2 | 602000 (TBR) Transfer (inclusive or) TBR to MBR
+    1.2 | 606000 (RPF) Read (inclusive or) PFR into MBR
+    1.3 | 600005 (ORB) Inclusive or LR into MBR
+    1.3 | 600007 (ANB) And LR into MBR
+    1.4 | 600200 (MBL) Transfer MBR to LR
+    1.4 | 600002 (LMB) Transfer LR to MBR
+    1.5 | 600020 (PAD) Partial add (exclusive or) MBR to AC
+    1.6 | 600400 (SHR) Shift AC right once
+    1.6 | 600600 (CYR) Cycle AC right once
+    1.6 | 607000 (SPF) Set PFR from MBR
+    1.7 | 600010 (CRY) Add carry digits to AC (according to LR)
+    1.8 | 600001 (MBX) Transfer MBR to XR
+    1.8 | 603000 (HLT) Halt computer
+
+    Previously supported Input-Output Stop group codes were unchanged.
+
 ***************************************************************************/
 
 #include "emu.h"

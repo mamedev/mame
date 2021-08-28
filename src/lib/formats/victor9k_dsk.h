@@ -34,9 +34,9 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
 	virtual bool supports_save() const override { return true; }
 
 	static int get_rpm(int head, int track);
@@ -49,7 +49,7 @@ protected:
 	static const int speed_zone[2][80];
 	static const int rpm[9];
 
-	int find_size(io_generic *io, uint32_t form_factor);
+	int find_size(util::random_read &io, uint32_t form_factor);
 	void log_boot_sector(uint8_t *data);
 	floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count);
 	void build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, desc_s *sectors, int sector_count) const;

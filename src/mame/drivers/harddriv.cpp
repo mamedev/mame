@@ -1867,7 +1867,7 @@ void stunrun_board_device_state::device_add_mconfig(machine_config &config)
 	ATARI_JSA_II(config, m_jsa, 0);
 	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
 	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
-	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 /* Steel Talons */

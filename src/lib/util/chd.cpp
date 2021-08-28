@@ -8,20 +8,24 @@
 
 ***************************************************************************/
 
-#include <cassert>
-
 #include "chd.h"
+
 #include "avhuff.h"
-#include "hashing.h"
-#include "flac.h"
 #include "cdrom.h"
+#include "corefile.h"
 #include "coretmpl.h"
+#include "flac.h"
+#include "hashing.h"
+
+#include "eminline.h"
+
 #include <zlib.h>
-#include <ctime>
+
+#include <cassert>
 #include <cstddef>
 #include <cstdlib>
+#include <ctime>
 #include <new>
-#include "eminline.h"
 
 
 //**************************************************************************
@@ -186,14 +190,17 @@ inline void chd_file::be_write_sha1(uint8_t *base, util::sha1_t value)
 inline void chd_file::file_read(uint64_t offset, void *dest, uint32_t length)
 {
 	// no file = failure
-	if (m_file == nullptr)
-		throw CHDERR_NOT_OPEN;
+	if (!m_file)
+		throw std::error_condition(error::NOT_OPEN);
 
 	// seek and read
 	m_file->seek(offset, SEEK_SET);
-	uint32_t count = m_file->read(dest, length);
-	if (count != length)
-		throw CHDERR_READ_ERROR;
+	size_t count;
+	std::error_condition err = m_file->read(dest, length, count);
+	if (err)
+		throw err;
+	else if (count != length)
+		throw std::error_condition(std::errc::io_error); // TODO: revisit this error code (happens if file is cut off)
 }
 
 
@@ -205,14 +212,17 @@ inline void chd_file::file_read(uint64_t offset, void *dest, uint32_t length)
 inline void chd_file::file_write(uint64_t offset, const void *source, uint32_t length)
 {
 	// no file = failure
-	if (m_file == nullptr)
-		throw CHDERR_NOT_OPEN;
+	if (!m_file)
+		throw std::error_condition(error::NOT_OPEN);
 
 	// seek and write
 	m_file->seek(offset, SEEK_SET);
-	uint32_t count = m_file->write(source, length);
-	if (count != length)
-		throw CHDERR_WRITE_ERROR;
+	size_t count;
+	std::error_condition err = m_file->write(source, length, count);
+	if (err)
+		throw err;
+	else if (count != length)
+		throw std::error_condition(std::errc::interrupted); // can theoretically happen if write is inuterrupted by a signal
 }
 
 
@@ -224,15 +234,22 @@ inline void chd_file::file_write(uint64_t offset, const void *source, uint32_t l
 
 inline uint64_t chd_file::file_append(const void *source, uint32_t length, uint32_t alignment)
 {
+	std::error_condition err;
+
 	// no file = failure
-	if (m_file == nullptr)
-		throw CHDERR_NOT_OPEN;
+	if (!m_file)
+		throw std::error_condition(error::NOT_OPEN);
 
 	// seek to the end and align if necessary
-	m_file->seek(0, SEEK_END);
+	err = m_file->seek(0, SEEK_END);
+	if (err)
+		throw err;
 	if (alignment != 0)
 	{
-		uint64_t offset = m_file->tell();
+		uint64_t offset;
+		err = m_file->tell(offset);
+		if (err)
+			throw err;
 		uint32_t delta = offset % alignment;
 		if (delta != 0)
 		{
@@ -242,20 +259,27 @@ inline uint64_t chd_file::file_append(const void *source, uint32_t length, uint3
 			delta = alignment - delta;
 			while (delta != 0)
 			{
-				uint32_t bytes_to_write = (std::min<std::size_t>)(sizeof(buffer), delta);
-				uint32_t count = m_file->write(buffer, bytes_to_write);
-				if (count != bytes_to_write)
-					throw CHDERR_WRITE_ERROR;
-				delta -= bytes_to_write;
+				uint32_t bytes_to_write = std::min<std::size_t>(sizeof(buffer), delta);
+				size_t count;
+				err = m_file->write(buffer, bytes_to_write, count);
+				if (err)
+					throw err;
+				delta -= count;
 			}
 		}
 	}
 
 	// write the real data
-	uint64_t offset = m_file->tell();
-	uint32_t count = m_file->write(source, length);
-	if (count != length)
-		throw CHDERR_READ_ERROR;
+	uint64_t offset;
+	err = m_file->tell(offset);
+	if (err)
+		throw err;
+	size_t count;
+	err = m_file->write(source, length, count);
+	if (err)
+		throw err;
+	else if (count != length)
+		throw std::error_condition(std::errc::interrupted); // can theoretically happen if write is interrupted by a signal
 	return offset;
 }
 
@@ -288,11 +312,8 @@ inline uint8_t chd_file::bits_for_value(uint64_t value)
  */
 
 chd_file::chd_file()
-	: m_file(nullptr),
-		m_owns_file(false)
 {
 	// reset state
-	memset(m_decompressor, 0, sizeof(m_decompressor));
 	close();
 }
 
@@ -308,6 +329,22 @@ chd_file::~chd_file()
 {
 	// close any open files
 	close();
+}
+
+/**
+ * @fn  util::random_read chd_file::file()
+ *
+ * @brief   -------------------------------------------------
+ *            file - return our underlying file
+ *          -------------------------------------------------.
+ *
+ * @return  A random_read.
+ */
+
+util::random_read &chd_file::file()
+{
+	assert(m_file);
+	return *m_file;
 }
 
 /**
@@ -329,7 +366,7 @@ util::sha1_t chd_file::sha1()
 		file_read(m_sha1_offset, rawbuf, sizeof(rawbuf));
 		return be_read_sha1(rawbuf);
 	}
-	catch (chd_error &)
+	catch (std::error_condition const &)
 	{
 		// on failure, return nullptr
 		return util::sha1_t::null;
@@ -354,15 +391,15 @@ util::sha1_t chd_file::raw_sha1()
 	try
 	{
 		// determine offset within the file for data-only
-		if (m_rawsha1_offset == 0)
-			throw CHDERR_UNSUPPORTED_VERSION;
+		if (!m_rawsha1_offset)
+			throw std::error_condition(error::UNSUPPORTED_VERSION);
 
 		// read the big-endian version
 		uint8_t rawbuf[sizeof(util::sha1_t)];
 		file_read(m_rawsha1_offset, rawbuf, sizeof(rawbuf));
 		return be_read_sha1(rawbuf);
 	}
-	catch (chd_error &)
+	catch (std::error_condition const &)
 	{
 		// on failure, return nullptr
 		return util::sha1_t::null;
@@ -387,15 +424,15 @@ util::sha1_t chd_file::parent_sha1()
 	try
 	{
 		// determine offset within the file
-		if (m_parentsha1_offset == 0)
-			throw CHDERR_UNSUPPORTED_VERSION;
+		if (!m_parentsha1_offset)
+			throw std::error_condition(error::UNSUPPORTED_VERSION);
 
 		// read the big-endian version
 		uint8_t rawbuf[sizeof(util::sha1_t)];
 		file_read(m_parentsha1_offset, rawbuf, sizeof(rawbuf));
 		return be_read_sha1(rawbuf);
 	}
-	catch (chd_error &)
+	catch (std::error_condition const &)
 	{
 		// on failure, return nullptr
 		return util::sha1_t::null;
@@ -403,7 +440,7 @@ util::sha1_t chd_file::parent_sha1()
 }
 
 /**
- * @fn  chd_error chd_file::hunk_info(uint32_t hunknum, chd_codec_type &compressor, uint32_t &compbytes)
+ * @fn  std::error_condition chd_file::hunk_info(uint32_t hunknum, chd_codec_type &compressor, uint32_t &compbytes)
  *
  * @brief   -------------------------------------------------
  *            hunk_info - return information about this hunk
@@ -413,14 +450,14 @@ util::sha1_t chd_file::parent_sha1()
  * @param [in,out]  compressor  The compressor.
  * @param [in,out]  compbytes   The compbytes.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::hunk_info(uint32_t hunknum, chd_codec_type &compressor, uint32_t &compbytes)
+std::error_condition chd_file::hunk_info(uint32_t hunknum, chd_codec_type &compressor, uint32_t &compbytes)
 {
 	// error if invalid
 	if (hunknum >= m_hunkcount)
-		return CHDERR_HUNK_OUT_OF_RANGE;
+		return std::error_condition(error::HUNK_OUT_OF_RANGE);
 
 	// get the map pointer
 	uint8_t *rawmap;
@@ -506,11 +543,11 @@ chd_error chd_file::hunk_info(uint32_t hunknum, chd_codec_type &compressor, uint
 					break;
 
 				default:
-					return CHDERR_UNKNOWN_COMPRESSION;
+					return error::UNKNOWN_COMPRESSION;
 			}
 			break;
 	}
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /**
@@ -554,8 +591,8 @@ void chd_file::set_raw_sha1(util::sha1_t rawdata)
 void chd_file::set_parent_sha1(util::sha1_t parent)
 {
 	// if no file, fail
-	if (m_file == nullptr)
-		throw CHDERR_INVALID_FILE;
+	if (!m_file)
+		throw std::error_condition(error::INVALID_FILE);
 
 	// create a big-endian version
 	uint8_t rawbuf[sizeof(util::sha1_t)];
@@ -567,7 +604,7 @@ void chd_file::set_parent_sha1(util::sha1_t parent)
 }
 
 /**
- * @fn  chd_error chd_file::create(util::core_file &file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
+ * @fn  std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with no parent using an existing opened file handle
@@ -579,14 +616,16 @@ void chd_file::set_parent_sha1(util::sha1_t parent)
  * @param   unitbytes       The unitbytes.
  * @param   compression     The compression.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::create(util::core_file &file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
+std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
 {
 	// make sure we don't already have a file open
-	if (m_file != nullptr)
-		return CHDERR_ALREADY_OPEN;
+	if (m_file)
+		return error::ALREADY_OPEN;
+	else if (!file)
+		return std::errc::invalid_argument;
 
 	// set the header parameters
 	m_logicalbytes = logicalbytes;
@@ -596,13 +635,12 @@ chd_error chd_file::create(util::core_file &file, uint64_t logicalbytes, uint32_
 	m_parent = nullptr;
 
 	// take ownership of the file
-	m_file = &file;
-	m_owns_file = false;
+	m_file = std::move(file);
 	return create_common();
 }
 
 /**
- * @fn  chd_error chd_file::create(util::core_file &file, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
+ * @fn  std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with a parent using an existing opened file handle
@@ -614,14 +652,16 @@ chd_error chd_file::create(util::core_file &file, uint64_t logicalbytes, uint32_
  * @param   compression     The compression.
  * @param [in,out]  parent  The parent.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::create(util::core_file &file, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
+std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
 {
 	// make sure we don't already have a file open
-	if (m_file != nullptr)
-		return CHDERR_ALREADY_OPEN;
+	if (m_file)
+		return error::ALREADY_OPEN;
+	else if (!file)
+		return std::errc::invalid_argument;
 
 	// set the header parameters
 	m_logicalbytes = logicalbytes;
@@ -631,13 +671,12 @@ chd_error chd_file::create(util::core_file &file, uint64_t logicalbytes, uint32_
 	m_parent = &parent;
 
 	// take ownership of the file
-	m_file = &file;
-	m_owns_file = false;
+	m_file = std::move(file);
 	return create_common();
 }
 
 /**
- * @fn  chd_error chd_file::create(const char *filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
+ * @fn  std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with no parent using a filename
@@ -649,40 +688,38 @@ chd_error chd_file::create(util::core_file &file, uint64_t logicalbytes, uint32_
  * @param   unitbytes       The unitbytes.
  * @param   compression     The compression.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::create(const char *filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
+std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
 {
 	// make sure we don't already have a file open
-	if (m_file != nullptr)
-		return CHDERR_ALREADY_OPEN;
+	if (m_file)
+		return error::ALREADY_OPEN;
 
 	// create the new file
 	util::core_file::ptr file;
-	const osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-	if (filerr != osd_file::error::NONE)
-		return CHDERR_FILE_NOT_FOUND;
+	std::error_condition filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr)
+		return filerr;
+	util::random_read_write::ptr io = util::core_file_read_write(std::move(file));
+	if (!io)
+		return std::errc::not_enough_memory;
 
 	// create the file normally, then claim the file
-	const chd_error chderr = create(*file, logicalbytes, hunkbytes, unitbytes, compression);
-	m_owns_file = true;
+	std::error_condition chderr = create(std::move(io), logicalbytes, hunkbytes, unitbytes, compression);
 
 	// if an error happened, close and delete the file
-	if (chderr != CHDERR_NONE)
+	if (chderr)
 	{
-		file.reset();
-		osd_file::remove(filename);
-	}
-	else
-	{
-		file.release();
+		io.reset();
+		osd_file::remove(std::string(filename)); // FIXME: allow osd_file to use std::string_view
 	}
 	return chderr;
 }
 
 /**
- * @fn  chd_error chd_file::create(const char *filename, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
+ * @fn  std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with a parent using a filename
@@ -694,40 +731,38 @@ chd_error chd_file::create(const char *filename, uint64_t logicalbytes, uint32_t
  * @param   compression     The compression.
  * @param [in,out]  parent  The parent.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::create(const char *filename, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
+std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
 {
 	// make sure we don't already have a file open
-	if (m_file != nullptr)
-		return CHDERR_ALREADY_OPEN;
+	if (m_file)
+		return error::ALREADY_OPEN;
 
 	// create the new file
 	util::core_file::ptr file;
-	const osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-	if (filerr != osd_file::error::NONE)
-		return CHDERR_FILE_NOT_FOUND;
+	std::error_condition filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr)
+		return filerr;
+	util::random_read_write::ptr io = util::core_file_read_write(std::move(file));
+	if (!io)
+		return std::errc::not_enough_memory;
 
 	// create the file normally, then claim the file
-	const chd_error chderr = create(*file, logicalbytes, hunkbytes, compression, parent);
-	m_owns_file = true;
+	std::error_condition chderr = create(std::move(io), logicalbytes, hunkbytes, compression, parent);
 
 	// if an error happened, close and delete the file
-	if (chderr != CHDERR_NONE)
+	if (chderr)
 	{
-		file.reset();
-		osd_file::remove(filename);
-	}
-	else
-	{
-		file.release();
+		io.reset();
+		osd_file::remove(std::string(filename)); // FIXME: allow osd_file to use std::string_view
 	}
 	return chderr;
 }
 
 /**
- * @fn  chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
+ * @fn  std::error_condition chd_file::open(std::string_view filename, bool writeable, chd_file *parent)
  *
  * @brief   -------------------------------------------------
  *            open - open an existing file for read or read/write
@@ -737,35 +772,36 @@ chd_error chd_file::create(const char *filename, uint64_t logicalbytes, uint32_t
  * @param   writeable       true if writeable.
  * @param [in,out]  parent  If non-null, the parent.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
+std::error_condition chd_file::open(std::string_view filename, bool writeable, chd_file *parent)
 {
 	// make sure we don't already have a file open
-	if (m_file != nullptr)
-		return CHDERR_ALREADY_OPEN;
+	if (m_file)
+		return error::ALREADY_OPEN;
 
 	// open the file
 	const uint32_t openflags = writeable ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_READ;
 	util::core_file::ptr file;
-	const osd_file::error filerr = util::core_file::open(filename, openflags, file);
-	if (filerr != osd_file::error::NONE)
-		return CHDERR_FILE_NOT_FOUND;
+	std::error_condition filerr = util::core_file::open(filename, openflags, file);
+	if (filerr)
+		return filerr;
+	util::random_read_write::ptr io = util::core_file_read_write(std::move(file));
+	if (!io)
+		return std::errc::not_enough_memory;
 
 	// now open the CHD
-	chd_error err = open(*file, writeable, parent);
-	if (err != CHDERR_NONE)
+	std::error_condition err = open(std::move(io), writeable, parent);
+	if (err)
 		return err;
 
 	// we now own this file
-	file.release();
-	m_owns_file = true;
 	return err;
 }
 
 /**
- * @fn  chd_error chd_file::open(util::core_file &file, bool writeable, chd_file *parent)
+ * @fn  std::error_condition chd_file::open(util::random_read_write::ptr &&file, bool writeable, chd_file *parent)
  *
  * @brief   -------------------------------------------------
  *            open - open an existing file for read or read/write
@@ -775,18 +811,19 @@ chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
  * @param   writeable       true if writeable.
  * @param [in,out]  parent  If non-null, the parent.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::open(util::core_file &file, bool writeable, chd_file *parent)
+std::error_condition chd_file::open(util::random_read_write::ptr &&file, bool writeable, chd_file *parent)
 {
 	// make sure we don't already have a file open
-	if (m_file != nullptr)
-		return CHDERR_ALREADY_OPEN;
+	if (m_file)
+		return error::ALREADY_OPEN;
+	else if (!file)
+		return std::errc::invalid_argument;
 
 	// open the file
-	m_file = &file;
-	m_owns_file = false;
+	m_file = std::move(file);
 	m_parent = parent;
 	m_cachehunk = ~0;
 	return open_common(writeable);
@@ -803,10 +840,7 @@ chd_error chd_file::open(util::core_file &file, bool writeable, chd_file *parent
 void chd_file::close()
 {
 	// reset file characteristics
-	if (m_owns_file && m_file)
-		delete m_file;
-	m_file = nullptr;
-	m_owns_file = false;
+	m_file.reset();
 	m_allow_reads = false;
 	m_allow_writes = false;
 
@@ -836,10 +870,7 @@ void chd_file::close()
 
 	// reset compression management
 	for (auto & elem : m_decompressor)
-	{
-		delete elem;
-		elem = nullptr;
-	}
+		elem.reset();
 	m_compressed.clear();
 
 	// reset caching
@@ -848,7 +879,7 @@ void chd_file::close()
 }
 
 /**
- * @fn  chd_error chd_file::read_hunk(uint32_t hunknum, void *buffer)
+ * @fn  std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
  *
  * @brief   -------------------------------------------------
  *            read - read a single hunk from the CHD file
@@ -870,18 +901,18 @@ void chd_file::close()
  * @return  The hunk.
  */
 
-chd_error chd_file::read_hunk(uint32_t hunknum, void *buffer)
+std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 {
 	// wrap this for clean reporting
 	try
 	{
 		// punt if no file
-		if (m_file == nullptr)
-			throw CHDERR_NOT_OPEN;
+		if (!m_file)
+			throw std::error_condition(error::NOT_OPEN);
 
 		// return an error if out of range
 		if (hunknum >= m_hunkcount)
-			throw CHDERR_HUNK_OUT_OF_RANGE;
+			throw std::error_condition(error::HUNK_OUT_OF_RANGE);
 
 		// get a pointer to the map entry
 		uint64_t blockoffs;
@@ -904,29 +935,29 @@ chd_error chd_file::read_hunk(uint32_t hunknum, void *buffer)
 						file_read(blockoffs, &m_compressed[0], blocklen);
 						m_decompressor[0]->decompress(&m_compressed[0], blocklen, dest, m_hunkbytes);
 						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && dest != nullptr && util::crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
-							throw CHDERR_DECOMPRESSION_ERROR;
-						return CHDERR_NONE;
+							throw std::error_condition(error::DECOMPRESSION_ERROR);
+						return std::error_condition();
 
 					case V34_MAP_ENTRY_TYPE_UNCOMPRESSED:
 						file_read(blockoffs, dest, m_hunkbytes);
 						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && util::crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
-							throw CHDERR_DECOMPRESSION_ERROR;
-						return CHDERR_NONE;
+							throw std::error_condition(error::DECOMPRESSION_ERROR);
+						return std::error_condition();
 
 					case V34_MAP_ENTRY_TYPE_MINI:
 						be_write(dest, blockoffs, 8);
 						for (uint32_t bytes = 8; bytes < m_hunkbytes; bytes++)
 							dest[bytes] = dest[bytes - 8];
 						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && util::crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
-							throw CHDERR_DECOMPRESSION_ERROR;
-						return CHDERR_NONE;
+							throw std::error_condition(error::DECOMPRESSION_ERROR);
+						return std::error_condition();
 
 					case V34_MAP_ENTRY_TYPE_SELF_HUNK:
 						return read_hunk(blockoffs, dest);
 
 					case V34_MAP_ENTRY_TYPE_PARENT_HUNK:
 						if (m_parent_missing)
-							throw CHDERR_REQUIRES_PARENT;
+							throw std::error_condition(error::REQUIRES_PARENT);
 						return m_parent->read_hunk(blockoffs, dest);
 				}
 				break;
@@ -942,12 +973,12 @@ chd_error chd_file::read_hunk(uint32_t hunknum, void *buffer)
 					if (blockoffs != 0)
 						file_read(blockoffs, dest, m_hunkbytes);
 					else if (m_parent_missing)
-						throw CHDERR_REQUIRES_PARENT;
+						throw std::error_condition(error::REQUIRES_PARENT);
 					else if (m_parent != nullptr)
 						m_parent->read_hunk(hunknum, dest);
 					else
 						memset(dest, 0, m_hunkbytes);
-					return CHDERR_NONE;
+					return std::error_condition();
 				}
 
 				// compressed case
@@ -963,41 +994,40 @@ chd_error chd_file::read_hunk(uint32_t hunknum, void *buffer)
 						file_read(blockoffs, &m_compressed[0], blocklen);
 						m_decompressor[rawmap[0]]->decompress(&m_compressed[0], blocklen, dest, m_hunkbytes);
 						if (!m_decompressor[rawmap[0]]->lossy() && dest != nullptr && util::crc16_creator::simple(dest, m_hunkbytes) != blockcrc)
-							throw CHDERR_DECOMPRESSION_ERROR;
+							throw std::error_condition(error::DECOMPRESSION_ERROR);
 						if (m_decompressor[rawmap[0]]->lossy() && util::crc16_creator::simple(&m_compressed[0], blocklen) != blockcrc)
-							throw CHDERR_DECOMPRESSION_ERROR;
-						return CHDERR_NONE;
+							throw std::error_condition(error::DECOMPRESSION_ERROR);
+						return std::error_condition();
 
 					case COMPRESSION_NONE:
 						file_read(blockoffs, dest, m_hunkbytes);
 						if (util::crc16_creator::simple(dest, m_hunkbytes) != blockcrc)
-							throw CHDERR_DECOMPRESSION_ERROR;
-						return CHDERR_NONE;
+							throw std::error_condition(error::DECOMPRESSION_ERROR);
+						return std::error_condition();
 
 					case COMPRESSION_SELF:
 						return read_hunk(blockoffs, dest);
 
 					case COMPRESSION_PARENT:
 						if (m_parent_missing)
-							throw CHDERR_REQUIRES_PARENT;
+							throw std::error_condition(error::REQUIRES_PARENT);
 						return m_parent->read_bytes(uint64_t(blockoffs) * uint64_t(m_parent->unit_bytes()), dest, m_hunkbytes);
 				}
 				break;
 		}
 
 		// if we get here, something was wrong
-		throw CHDERR_READ_ERROR;
+		throw std::error_condition(std::errc::io_error);
 	}
-
-	// just return errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// just return errors
 		return err;
 	}
 }
 
 /**
- * @fn  chd_error chd_file::write_hunk(uint32_t hunknum, const void *buffer)
+ * @fn  std::error_condition chd_file::write_hunk(uint32_t hunknum, const void *buffer)
  *
  * @brief   -------------------------------------------------
  *            write - write a single hunk to the CHD file
@@ -1012,29 +1042,29 @@ chd_error chd_file::read_hunk(uint32_t hunknum, void *buffer)
  * @param   hunknum The hunknum.
  * @param   buffer  The buffer.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::write_hunk(uint32_t hunknum, const void *buffer)
+std::error_condition chd_file::write_hunk(uint32_t hunknum, const void *buffer)
 {
 	// wrap this for clean reporting
 	try
 	{
 		// punt if no file
-		if (m_file == nullptr)
-			throw CHDERR_NOT_OPEN;
+		if (!m_file)
+			throw std::error_condition(error::NOT_OPEN);
 
 		// return an error if out of range
 		if (hunknum >= m_hunkcount)
-			throw CHDERR_HUNK_OUT_OF_RANGE;
+			throw std::error_condition(error::HUNK_OUT_OF_RANGE);
 
 		// if not writeable, fail
 		if (!m_allow_writes)
-			throw CHDERR_FILE_NOT_WRITEABLE;
+			throw std::error_condition(error::FILE_NOT_WRITEABLE);
 
 		// uncompressed writes only via this interface
 		if (compressed())
-			throw CHDERR_FILE_NOT_WRITEABLE;
+			throw std::error_condition(error::FILE_NOT_WRITEABLE);
 
 		// see if we have allocated the space on disk for this hunk
 		uint8_t *rawmap = &m_rawmap[hunknum * 4];
@@ -1055,7 +1085,7 @@ chd_error chd_file::write_hunk(uint32_t hunknum, const void *buffer)
 
 			// if it's all zeros, do nothing more
 			if (all_zeros)
-				return CHDERR_NONE;
+				return std::error_condition();
 
 			// append new data to the end of the file, aligning the first chunk
 			rawentry = file_append(buffer, m_hunkbytes, m_hunkbytes) / m_hunkbytes;
@@ -1068,22 +1098,22 @@ chd_error chd_file::write_hunk(uint32_t hunknum, const void *buffer)
 			if (hunknum == m_cachehunk && buffer != &m_cache[0])
 				memcpy(&m_cache[0], buffer, m_hunkbytes);
 		}
-
-		// otherwise, just overwrite
 		else
+		{
+			// otherwise, just overwrite
 			file_write(uint64_t(rawentry) * uint64_t(m_hunkbytes), buffer, m_hunkbytes);
-		return CHDERR_NONE;
+		}
+		return std::error_condition();
 	}
-
-	// just return errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// just return errors
 		return err;
 	}
 }
 
 /**
- * @fn  chd_error chd_file::read_units(uint64_t unitnum, void *buffer, uint32_t count)
+ * @fn  std::error_condition chd_file::read_units(uint64_t unitnum, void *buffer, uint32_t count)
  *
  * @brief   -------------------------------------------------
  *            read_units - read the given number of units from the CHD
@@ -1096,13 +1126,13 @@ chd_error chd_file::write_hunk(uint32_t hunknum, const void *buffer)
  * @return  The units.
  */
 
-chd_error chd_file::read_units(uint64_t unitnum, void *buffer, uint32_t count)
+std::error_condition chd_file::read_units(uint64_t unitnum, void *buffer, uint32_t count)
 {
 	return read_bytes(unitnum * uint64_t(m_unitbytes), buffer, count * m_unitbytes);
 }
 
 /**
- * @fn  chd_error chd_file::write_units(uint64_t unitnum, const void *buffer, uint32_t count)
+ * @fn  std::error_condition chd_file::write_units(uint64_t unitnum, const void *buffer, uint32_t count)
  *
  * @brief   -------------------------------------------------
  *            write_units - write the given number of units to the CHD
@@ -1112,16 +1142,16 @@ chd_error chd_file::read_units(uint64_t unitnum, void *buffer, uint32_t count)
  * @param   buffer  The buffer.
  * @param   count   Number of.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::write_units(uint64_t unitnum, const void *buffer, uint32_t count)
+std::error_condition chd_file::write_units(uint64_t unitnum, const void *buffer, uint32_t count)
 {
 	return write_bytes(unitnum * uint64_t(m_unitbytes), buffer, count * m_unitbytes);
 }
 
 /**
- * @fn  chd_error chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
+ * @fn  std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
  *
  * @brief   -------------------------------------------------
  *            read_bytes - read from the CHD at a byte level, using the cache to handle partial
@@ -1135,7 +1165,7 @@ chd_error chd_file::write_units(uint64_t unitnum, const void *buffer, uint32_t c
  * @return  The bytes.
  */
 
-chd_error chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
+std::error_condition chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
 {
 	// iterate over hunks
 	uint32_t first_hunk = offset / m_hunkbytes;
@@ -1148,7 +1178,7 @@ chd_error chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
 		uint32_t endoffs = (curhunk == last_hunk) ? ((offset + bytes - 1) % m_hunkbytes) : (m_hunkbytes - 1);
 
 		// if it's a full block, just read directly from disk unless it's the cached hunk
-		chd_error err = CHDERR_NONE;
+		std::error_condition err;
 		if (startoffs == 0 && endoffs == m_hunkbytes - 1 && curhunk != m_cachehunk)
 			err = read_hunk(curhunk, dest);
 
@@ -1158,7 +1188,7 @@ chd_error chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
 			if (curhunk != m_cachehunk)
 			{
 				err = read_hunk(curhunk, &m_cache[0]);
-				if (err != CHDERR_NONE)
+				if (err)
 					return err;
 				m_cachehunk = curhunk;
 			}
@@ -1166,15 +1196,15 @@ chd_error chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
 		}
 
 		// handle errors and advance
-		if (err != CHDERR_NONE)
+		if (err)
 			return err;
 		dest += endoffs + 1 - startoffs;
 	}
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /**
- * @fn  chd_error chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t bytes)
+ * @fn  std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t bytes)
  *
  * @brief   -------------------------------------------------
  *            write_bytes - write to the CHD at a byte level, using the cache to handle partial
@@ -1185,10 +1215,10 @@ chd_error chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
  * @param   buffer  The buffer.
  * @param   bytes   The bytes.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t bytes)
+std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t bytes)
 {
 	// iterate over hunks
 	uint32_t first_hunk = offset / m_hunkbytes;
@@ -1201,7 +1231,7 @@ chd_error chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t by
 		uint32_t endoffs = (curhunk == last_hunk) ? ((offset + bytes - 1) % m_hunkbytes) : (m_hunkbytes - 1);
 
 		// if it's a full block, just write directly to disk unless it's the cached hunk
-		chd_error err = CHDERR_NONE;
+		std::error_condition err;
 		if (startoffs == 0 && endoffs == m_hunkbytes - 1 && curhunk != m_cachehunk)
 			err = write_hunk(curhunk, source);
 
@@ -1211,7 +1241,7 @@ chd_error chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t by
 			if (curhunk != m_cachehunk)
 			{
 				err = read_hunk(curhunk, &m_cache[0]);
-				if (err != CHDERR_NONE)
+				if (err)
 					return err;
 				m_cachehunk = curhunk;
 			}
@@ -1220,15 +1250,15 @@ chd_error chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t by
 		}
 
 		// handle errors and advance
-		if (err != CHDERR_NONE)
+		if (err)
 			return err;
 		source += endoffs + 1 - startoffs;
 	}
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /**
- * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output)
+ * @fn  std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output)
  *
  * @brief   -------------------------------------------------
  *            read_metadata - read the indexed metadata of the given type
@@ -1244,7 +1274,7 @@ chd_error chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t by
  * @return  The metadata.
  */
 
-chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output)
+std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output)
 {
 	// wrap this for clean reporting
 	try
@@ -1252,23 +1282,22 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
 		// if we didn't find it, just return
 		metadata_entry metaentry;
 		if (!metadata_find(searchtag, searchindex, metaentry))
-			throw CHDERR_METADATA_NOT_FOUND;
+			throw std::error_condition(error::METADATA_NOT_FOUND);
 
 		// read the metadata
 		output.assign(metaentry.length, '\0');
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-
-	// just return errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// just return errors
 		return err;
 	}
 }
 
 /**
- * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output)
+ * @fn  std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output)
  *
  * @brief   Reads a metadata.
  *
@@ -1282,7 +1311,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
  * @return  The metadata.
  */
 
-chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output)
+std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output)
 {
 	// wrap this for clean reporting
 	try
@@ -1290,23 +1319,22 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
 		// if we didn't find it, just return
 		metadata_entry metaentry;
 		if (!metadata_find(searchtag, searchindex, metaentry))
-			throw CHDERR_METADATA_NOT_FOUND;
+			throw std::error_condition(error::METADATA_NOT_FOUND);
 
 		// read the metadata
 		output.resize(metaentry.length);
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-
-	// just return errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// just return errors
 		return err;
 	}
 }
 
 /**
- * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, void *output, uint32_t outputlen, uint32_t &resultlen)
+ * @fn  std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, void *output, uint32_t outputlen, uint32_t &resultlen)
  *
  * @brief   Reads a metadata.
  *
@@ -1322,7 +1350,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
  * @return  The metadata.
  */
 
-chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, void *output, uint32_t outputlen, uint32_t &resultlen)
+std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, void *output, uint32_t outputlen, uint32_t &resultlen)
 {
 	// wrap this for clean reporting
 	try
@@ -1330,23 +1358,22 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
 		// if we didn't find it, just return
 		metadata_entry metaentry;
 		if (!metadata_find(searchtag, searchindex, metaentry))
-			throw CHDERR_METADATA_NOT_FOUND;
+			throw std::error_condition(error::METADATA_NOT_FOUND);
 
 		// read the metadata
 		resultlen = metaentry.length;
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, output, std::min(outputlen, resultlen));
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-
-	// just return errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// just return errors
 		return err;
 	}
 }
 
 /**
- * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output, chd_metadata_tag &resulttag, uint8_t &resultflags)
+ * @fn  std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output, chd_metadata_tag &resulttag, uint8_t &resultflags)
  *
  * @brief   Reads a metadata.
  *
@@ -1362,7 +1389,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
  * @return  The metadata.
  */
 
-chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output, chd_metadata_tag &resulttag, uint8_t &resultflags)
+std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output, chd_metadata_tag &resulttag, uint8_t &resultflags)
 {
 	// wrap this for clean reporting
 	try
@@ -1370,25 +1397,24 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
 		// if we didn't find it, just return
 		metadata_entry metaentry;
 		if (!metadata_find(searchtag, searchindex, metaentry))
-			throw CHDERR_METADATA_NOT_FOUND;
+			throw std::error_condition(error::METADATA_NOT_FOUND);
 
 		// read the metadata
 		output.resize(metaentry.length);
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
 		resulttag = metaentry.metatag;
 		resultflags = metaentry.flags;
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-
-	// just return errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// just return errors
 		return err;
 	}
 }
 
 /**
- * @fn  chd_error chd_file::write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const void *inputbuf, uint32_t inputlen, uint8_t flags)
+ * @fn  std::error_condition chd_file::write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const void *inputbuf, uint32_t inputlen, uint8_t flags)
  *
  * @brief   -------------------------------------------------
  *            write_metadata - write the indexed metadata of the given type
@@ -1400,17 +1426,17 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
  * @param   inputlen    The inputlen.
  * @param   flags       The flags.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const void *inputbuf, uint32_t inputlen, uint8_t flags)
+std::error_condition chd_file::write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const void *inputbuf, uint32_t inputlen, uint8_t flags)
 {
 	// wrap this for clean reporting
 	try
 	{
 		// must write at least 1 byte and no more than 16MB
 		if (inputlen < 1 || inputlen >= 16 * 1024 * 1024)
-			return CHDERR_INVALID_PARAMETER;
+			return std::error_condition(std::errc::invalid_argument);
 
 		// find the entry if it already exists
 		metadata_entry metaentry;
@@ -1459,18 +1485,17 @@ chd_error chd_file::write_metadata(chd_metadata_tag metatag, uint32_t metaindex,
 
 		// update the hash
 		metadata_update_hash();
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-
-	// return any errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// return any errors
 		return err;
 	}
 }
 
 /**
- * @fn  chd_error chd_file::delete_metadata(chd_metadata_tag metatag, uint32_t metaindex)
+ * @fn  std::error_condition chd_file::delete_metadata(chd_metadata_tag metatag, uint32_t metaindex)
  *
  * @brief   -------------------------------------------------
  *            delete_metadata - remove the given metadata from the list
@@ -1482,10 +1507,10 @@ chd_error chd_file::write_metadata(chd_metadata_tag metatag, uint32_t metaindex,
  * @param   metatag     The metatag.
  * @param   metaindex   The metaindex.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::delete_metadata(chd_metadata_tag metatag, uint32_t metaindex)
+std::error_condition chd_file::delete_metadata(chd_metadata_tag metatag, uint32_t metaindex)
 {
 	// wrap this for clean reporting
 	try
@@ -1493,22 +1518,21 @@ chd_error chd_file::delete_metadata(chd_metadata_tag metatag, uint32_t metaindex
 		// find the entry
 		metadata_entry metaentry;
 		if (!metadata_find(metatag, metaindex, metaentry))
-			throw CHDERR_METADATA_NOT_FOUND;
+			throw std::error_condition(error::METADATA_NOT_FOUND);
 
 		// point the previous to the next, unlinking us
 		metadata_set_previous_next(metaentry.prev, metaentry.next);
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-
-	// return any errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// return any errors
 		return err;
 	}
 }
 
 /**
- * @fn  chd_error chd_file::clone_all_metadata(chd_file &source)
+ * @fn  std::error_condition chd_file::clone_all_metadata(chd_file &source)
  *
  * @brief   -------------------------------------------------
  *            clone_all_metadata - clone the metadata from one CHD to a second
@@ -1518,10 +1542,10 @@ chd_error chd_file::delete_metadata(chd_metadata_tag metatag, uint32_t metaindex
  *
  * @param [in,out]  source  Another instance to copy.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::clone_all_metadata(chd_file &source)
+std::error_condition chd_file::clone_all_metadata(chd_file &source)
 {
 	// wrap this for clean reporting
 	try
@@ -1540,16 +1564,15 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
 			source.file_read(metaentry.offset + METADATA_HEADER_SIZE, &filedata[0], metaentry.length);
 
 			// write it to the destination
-			chd_error err = write_metadata(metaentry.metatag, (uint32_t)-1, &filedata[0], metaentry.length, metaentry.flags);
-			if (err != CHDERR_NONE)
+			std::error_condition err = write_metadata(metaentry.metatag, (uint32_t)-1, &filedata[0], metaentry.length, metaentry.flags);
+			if (err)
 				throw err;
 		}
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-
-	// return any errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// return any errors
 		return err;
 	}
 }
@@ -1607,7 +1630,7 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 }
 
 /**
- * @fn  chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *config)
+ * @fn  std::error_condition chd_file::codec_configure(chd_codec_type codec, int param, void *config)
  *
  * @brief   -------------------------------------------------
  *            codec_config - set internal codec parameters
@@ -1617,10 +1640,10 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
  * @param   param           The parameter.
  * @param [in,out]  config  If non-null, the configuration.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *config)
+std::error_condition chd_file::codec_configure(chd_codec_type codec, int param, void *config)
 {
 	// wrap this for clean reporting
 	try
@@ -1630,14 +1653,13 @@ chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *confi
 			if (m_compression[codecnum] == codec)
 			{
 				m_decompressor[codecnum]->configure(param, config);
-				return CHDERR_NONE;
+				return std::error_condition();
 			}
-		return CHDERR_INVALID_PARAMETER;
+		return std::errc::invalid_argument;
 	}
-
-	// return any errors
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// return any errors
 		return err;
 	}
 }
@@ -1654,44 +1676,49 @@ chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *confi
  * @return  null if it fails, else a char*.
  */
 
-const char *chd_file::error_string(chd_error err)
+std::error_category const &chd_category() noexcept
 {
-	switch (err)
+	class chd_category_impl : public std::error_category
 	{
-		case CHDERR_NONE:                       return "no error";
-		case CHDERR_NO_INTERFACE:               return "no drive interface";
-		case CHDERR_OUT_OF_MEMORY:              return "out of memory";
-		case CHDERR_NOT_OPEN:                   return "file not open";
-		case CHDERR_ALREADY_OPEN:               return "file already open";
-		case CHDERR_INVALID_FILE:               return "invalid file";
-		case CHDERR_INVALID_PARAMETER:          return "invalid parameter";
-		case CHDERR_INVALID_DATA:               return "invalid data";
-		case CHDERR_FILE_NOT_FOUND:             return "file not found";
-		case CHDERR_REQUIRES_PARENT:            return "requires parent";
-		case CHDERR_FILE_NOT_WRITEABLE:         return "file not writeable";
-		case CHDERR_READ_ERROR:                 return "read error";
-		case CHDERR_WRITE_ERROR:                return "write error";
-		case CHDERR_CODEC_ERROR:                return "codec error";
-		case CHDERR_INVALID_PARENT:             return "invalid parent";
-		case CHDERR_HUNK_OUT_OF_RANGE:          return "hunk out of range";
-		case CHDERR_DECOMPRESSION_ERROR:        return "decompression error";
-		case CHDERR_COMPRESSION_ERROR:          return "compression error";
-		case CHDERR_CANT_CREATE_FILE:           return "can't create file";
-		case CHDERR_CANT_VERIFY:                return "can't verify file";
-		case CHDERR_NOT_SUPPORTED:              return "operation not supported";
-		case CHDERR_METADATA_NOT_FOUND:         return "can't find metadata";
-		case CHDERR_INVALID_METADATA_SIZE:      return "invalid metadata size";
-		case CHDERR_UNSUPPORTED_VERSION:        return "mismatched DIFF and CHD or unsupported CHD version";
-		case CHDERR_VERIFY_INCOMPLETE:          return "incomplete verify";
-		case CHDERR_INVALID_METADATA:           return "invalid metadata";
-		case CHDERR_INVALID_STATE:              return "invalid state";
-		case CHDERR_OPERATION_PENDING:          return "operation pending";
-		case CHDERR_UNSUPPORTED_FORMAT:         return "unsupported format";
-		case CHDERR_UNKNOWN_COMPRESSION:        return "unknown compression type";
-		case CHDERR_WALKING_PARENT:             return "currently examining parent";
-		case CHDERR_COMPRESSING:                return "currently compressing";
-		default:                                return "undocumented error";
-	}
+		virtual char const *name() const noexcept override { return "chd"; }
+
+		virtual std::string message(int condition) const override
+		{
+			using namespace std::literals;
+			static std::string_view const s_messages[] = {
+					"No error"sv,
+					"No drive interface"sv,
+					"File not open"sv,
+					"File already open"sv,
+					"Invalid file"sv,
+					"Invalid data"sv,
+					"Requires parent"sv,
+					"File not writeable"sv,
+					"Codec error"sv,
+					"Invalid parent"sv,
+					"Hunk out of range"sv,
+					"Decompression error"sv,
+					"Compression error"sv,
+					"Can't verify file"sv,
+					"Can't find metadata"sv,
+					"Invalid metadata size"sv,
+					"Mismatched DIFF and CHD or unsupported CHD version"sv,
+					"Incomplete verify"sv,
+					"Invalid metadata"sv,
+					"Invalid state"sv,
+					"Operation pending"sv,
+					"Unsupported format"sv,
+					"Unknown compression type"sv,
+					"Currently examining parent"sv,
+					"Currently compressing"sv };
+			if ((0 <= condition) && (std::size(s_messages) > condition))
+				return std::string(s_messages[condition]);
+			else
+				return "Unknown error"s;
+		}
+	};
+	static chd_category_impl const s_chd_category_instance;
+	return s_chd_category_instance;
 }
 
 
@@ -1716,15 +1743,15 @@ uint32_t chd_file::guess_unitbytes()
 	// look for hard disk metadata; if found, then the unit size == sector size
 	std::string metadata;
 	int i0, i1, i2, i3;
-	if (read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE && sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &i0, &i1, &i2, &i3) == 4)
+	if (!read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) && sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &i0, &i1, &i2, &i3) == 4)
 		return i3;
 
 	// look for CD-ROM metadata; if found, then the unit size == CD frame size
-	if (read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-		read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-		read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE ||
-		read_metadata(GDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-		read_metadata(GDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
+	if (!read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) ||
+		!read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) ||
+		!read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) ||
+		!read_metadata(GDROM_OLD_METADATA_TAG, 0, metadata) ||
+		!read_metadata(GDROM_TRACK_METADATA_TAG, 0, metadata))
 		return CD_FRAME_SIZE;
 
 	// otherwise, just map 1:1 with the hunk size
@@ -1751,7 +1778,7 @@ void chd_file::parse_v3_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 {
 	// verify header length
 	if (be_read(&rawheader[8], 4) != V3_HEADER_SIZE)
-		throw CHDERR_INVALID_FILE;
+		throw std::error_condition(error::INVALID_FILE);
 
 	// extract core info
 	m_logicalbytes = be_read(&rawheader[28], 8);
@@ -1771,7 +1798,7 @@ void chd_file::parse_v3_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 		case 1: m_compression[0] = CHD_CODEC_ZLIB;      break;
 		case 2: m_compression[0] = CHD_CODEC_ZLIB;      break;
 		case 3: m_compression[0] = CHD_CODEC_AVHUFF;    break;
-		default: throw CHDERR_UNKNOWN_COMPRESSION;
+		default: throw std::error_condition(error::UNKNOWN_COMPRESSION);
 	}
 	m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC_NONE;
 
@@ -1814,7 +1841,7 @@ void chd_file::parse_v4_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 {
 	// verify header length
 	if (be_read(&rawheader[8], 4) != V4_HEADER_SIZE)
-		throw CHDERR_INVALID_FILE;
+		throw std::error_condition(error::INVALID_FILE);
 
 	// extract core info
 	m_logicalbytes = be_read(&rawheader[28], 8);
@@ -1834,7 +1861,7 @@ void chd_file::parse_v4_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 		case 1: m_compression[0] = CHD_CODEC_ZLIB;      break;
 		case 2: m_compression[0] = CHD_CODEC_ZLIB;      break;
 		case 3: m_compression[0] = CHD_CODEC_AVHUFF;    break;
-		default: throw CHDERR_UNKNOWN_COMPRESSION;
+		default: throw std::error_condition(error::UNKNOWN_COMPRESSION);
 	}
 	m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC_NONE;
 
@@ -1874,7 +1901,7 @@ void chd_file::parse_v5_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 {
 	// verify header length
 	if (be_read(&rawheader[8], 4) != V5_HEADER_SIZE)
-		throw CHDERR_INVALID_FILE;
+		throw std::error_condition(error::INVALID_FILE);
 
 	// extract core info
 	m_logicalbytes = be_read(&rawheader[32], 8);
@@ -1908,7 +1935,7 @@ void chd_file::parse_v5_header(uint8_t *rawheader, util::sha1_t &parentsha1)
 }
 
 /**
- * @fn  chd_error chd_file::compress_v5_map()
+ * @fn  std::error_condition chd_file::compress_v5_map()
  *
  * @brief   -------------------------------------------------
  *            compress_v5_map - compress the v5 map and write it to the end of the file
@@ -1917,10 +1944,10 @@ void chd_file::parse_v5_header(uint8_t *rawheader, util::sha1_t &parentsha1)
  * @exception   CHDERR_COMPRESSION_ERROR    Thrown when a chderr compression error error
  *                                          condition occurs.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::compress_v5_map()
+std::error_condition chd_file::compress_v5_map()
 {
 	try
 	{
@@ -2015,10 +2042,10 @@ chd_error chd_file::compress_v5_map()
 		bitstream_out bitbuf(&compressed[16], compressed.size() - 16);
 		huffman_error err = encoder.compute_tree_from_histo();
 		if (err != HUFFERR_NONE)
-			throw CHDERR_COMPRESSION_ERROR;
+			throw std::error_condition(error::COMPRESSION_ERROR);
 		err = encoder.export_tree_rle(bitbuf);
 		if (err != HUFFERR_NONE)
-			throw CHDERR_COMPRESSION_ERROR;
+			throw std::error_condition(error::COMPRESSION_ERROR);
 
 		// encode the data
 		for (uint8_t *src = &compression_rle[0]; src < dest; src++)
@@ -2113,9 +2140,9 @@ chd_error chd_file::compress_v5_map()
 		uint8_t rawbuf[sizeof(uint64_t)];
 		be_write(rawbuf, m_mapoffset, 8);
 		file_write(m_mapoffset_offset, rawbuf, sizeof(rawbuf));
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
 		return err;
 	}
@@ -2160,7 +2187,7 @@ void chd_file::decompress_v5_map()
 	huffman_decoder<16, 8> decoder;
 	huffman_error err = decoder.import_tree_rle(bitbuf);
 	if (err != HUFFERR_NONE)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(error::DECOMPRESSION_ERROR);
 	uint8_t lastcomp = 0;
 	int repcount = 0;
 	for (int hunknum = 0; hunknum < m_hunkcount; hunknum++)
@@ -2244,11 +2271,11 @@ void chd_file::decompress_v5_map()
 
 	// verify the final CRC
 	if (util::crc16_creator::simple(&m_rawmap[0], m_hunkcount * 12) != mapcrc)
-		throw CHDERR_DECOMPRESSION_ERROR;
+		throw std::error_condition(error::DECOMPRESSION_ERROR);
 }
 
 /**
- * @fn  chd_error chd_file::create_common()
+ * @fn  std::error_condition chd_file::create_common()
  *
  * @brief   -------------------------------------------------
  *            create_common - command path when creating a new CHD file
@@ -2264,7 +2291,7 @@ void chd_file::decompress_v5_map()
  * @return  The new common.
  */
 
-chd_error chd_file::create_common()
+std::error_condition chd_file::create_common()
 {
 	// wrap in try for proper error handling
 	try
@@ -2273,14 +2300,14 @@ chd_error chd_file::create_common()
 		m_metaoffset = 0;
 
 		// if we have a parent, it must be V3 or later
-		if (m_parent != nullptr && m_parent->version() < 3)
-			throw CHDERR_UNSUPPORTED_VERSION;
+		if (m_parent && m_parent->version() < 3)
+			throw std::error_condition(error::UNSUPPORTED_VERSION);
 
 		// must be an even number of units per hunk
 		if (m_hunkbytes % m_unitbytes != 0)
-			throw CHDERR_INVALID_PARAMETER;
-		if (m_parent != nullptr && m_unitbytes != m_parent->unit_bytes())
-			throw CHDERR_INVALID_PARAMETER;
+			throw std::error_condition(std::errc::invalid_argument);
+		if (m_parent && m_unitbytes != m_parent->unit_bytes())
+			throw std::error_condition(std::errc::invalid_argument);
 
 		// verify the compression types
 		bool found_zero = false;
@@ -2290,9 +2317,9 @@ chd_error chd_file::create_common()
 			if (elem == CHD_CODEC_NONE)
 				found_zero = true;
 			else if (found_zero)
-				throw CHDERR_INVALID_PARAMETER;
+				throw std::error_condition(std::errc::invalid_argument);
 			else if (!chd_codec_list::codec_exists(elem))
-				throw CHDERR_UNKNOWN_COMPRESSION;
+				throw std::error_condition(error::UNKNOWN_COMPRESSION);
 		}
 
 		// create our V5 header
@@ -2342,10 +2369,9 @@ chd_error chd_file::create_common()
 		// finish opening the file
 		create_open_common();
 	}
-
-	// handle errors by closing ourself
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// handle errors by closing ourself
 		close();
 		return err;
 	}
@@ -2354,11 +2380,11 @@ chd_error chd_file::create_common()
 		close();
 		throw;
 	}
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /**
- * @fn  chd_error chd_file::open_common(bool writeable)
+ * @fn  std::error_condition chd_file::open_common(bool writeable)
  *
  * @brief   -------------------------------------------------
  *            open_common - common path when opening an existing CHD file for input
@@ -2377,10 +2403,10 @@ chd_error chd_file::create_common()
  *
  * @param   writeable   true if writeable.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file::open_common(bool writeable)
+std::error_condition chd_file::open_common(bool writeable)
 {
 	// wrap in try for proper error handling
 	try
@@ -2394,7 +2420,7 @@ chd_error chd_file::open_common(bool writeable)
 
 		// verify the signature
 		if (memcmp(rawheader, "MComprHD", 8) != 0)
-			throw CHDERR_INVALID_FILE;
+			throw std::error_condition(error::INVALID_FILE);
 
 		m_version = be_read(&rawheader[12], 4);
 
@@ -2405,7 +2431,7 @@ chd_error chd_file::open_common(bool writeable)
 			case 3:     parse_v3_header(rawheader, parentsha1); break;
 			case 4:     parse_v4_header(rawheader, parentsha1); break;
 			case 5:     parse_v5_header(rawheader, parentsha1); break;
-			default:    throw CHDERR_UNSUPPORTED_VERSION;
+			default:    throw std::error_condition(error::UNSUPPORTED_VERSION);
 		}
 
 		// only allow writes to the most recent version
@@ -2413,27 +2439,26 @@ chd_error chd_file::open_common(bool writeable)
 			m_allow_writes = false;
 
 		if (writeable && !m_allow_writes)
-			throw CHDERR_FILE_NOT_WRITEABLE;
+			throw std::error_condition(error::FILE_NOT_WRITEABLE);
 
 		// make sure we have a parent if we need one (and don't if we don't)
 		if (parentsha1 != util::sha1_t::null)
 		{
-			if (m_parent == nullptr)
+			if (!m_parent)
 				m_parent_missing = true;
 			else if (m_parent->sha1() != parentsha1)
-				throw CHDERR_INVALID_PARENT;
+				throw std::error_condition(error::INVALID_PARENT);
 		}
-		else if (m_parent != nullptr)
-			throw CHDERR_INVALID_PARAMETER;
+		else if (m_parent)
+			throw std::error_condition(std::errc::invalid_argument);
 
 		// finish opening the file
 		create_open_common();
-		return CHDERR_NONE;
+		return std::error_condition();
 	}
-
-	// handle errors by closing ourself
-	catch (chd_error &err)
+	catch (std::error_condition const &err)
 	{
+		// handle errors by closing ourself
 		close();
 		return err;
 	}
@@ -2457,7 +2482,7 @@ void chd_file::create_open_common()
 	{
 		m_decompressor[decompnum] = chd_codec_list::new_decompressor(m_compression[decompnum], *this);
 		if (m_decompressor[decompnum] == nullptr && m_compression[decompnum] != 0)
-			throw CHDERR_UNKNOWN_COMPRESSION;
+			throw std::error_condition(error::UNKNOWN_COMPRESSION);
 	}
 
 	// read the map; v5+ compressed drives need to read and decompress their map
@@ -2494,30 +2519,30 @@ void chd_file::create_open_common()
 void chd_file::verify_proper_compression_append(uint32_t hunknum)
 {
 	// punt if no file
-	if (m_file == nullptr)
-		throw CHDERR_NOT_OPEN;
+	if (!m_file)
+		throw std::error_condition(error::NOT_OPEN);
 
 	// return an error if out of range
 	if (hunknum >= m_hunkcount)
-		throw CHDERR_HUNK_OUT_OF_RANGE;
+		throw std::error_condition(error::HUNK_OUT_OF_RANGE);
 
 	// if not writeable, fail
 	if (!m_allow_writes)
-		throw CHDERR_FILE_NOT_WRITEABLE;
+		throw std::error_condition(error::FILE_NOT_WRITEABLE);
 
 	// compressed writes only via this interface
 	if (!compressed())
-		throw CHDERR_FILE_NOT_WRITEABLE;
+		throw std::error_condition(error::FILE_NOT_WRITEABLE);
 
 	// only permitted to write new blocks
 	uint8_t *rawmap = &m_rawmap[hunknum * 12];
 	if (rawmap[0] != 0xff)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(error::COMPRESSION_ERROR);
 
 	// if this isn't the first block, only permitted to write immediately
 	// after the previous one
 	if (hunknum != 0 && rawmap[-12] == 0xff)
-		throw CHDERR_COMPRESSION_ERROR;
+		throw std::error_condition(error::COMPRESSION_ERROR);
 }
 
 /**
@@ -2572,7 +2597,7 @@ void chd_file::hunk_copy_from_self(uint32_t hunknum, uint32_t otherhunk)
 
 	// only permitted to reference prior hunks
 	if (otherhunk >= hunknum)
-		throw CHDERR_INVALID_PARAMETER;
+		throw std::error_condition(std::errc::invalid_argument);
 
 	// update the map entry
 	uint8_t *rawmap = &m_rawmap[hunknum * 12];
@@ -2841,7 +2866,7 @@ void chd_file_compressor::compress_begin()
 }
 
 /**
- * @fn  chd_error chd_file_compressor::compress_continue(double &progress, double &ratio)
+ * @fn  std::error_condition chd_file_compressor::compress_continue(double &progress, double &ratio)
  *
  * @brief   -------------------------------------------------
  *            compress_continue - continue compression
@@ -2850,14 +2875,14 @@ void chd_file_compressor::compress_begin()
  * @param [in,out]  progress    The progress.
  * @param [in,out]  ratio       The ratio.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chd_file_compressor::compress_continue(double &progress, double &ratio)
+std::error_condition chd_file_compressor::compress_continue(double &progress, double &ratio)
 {
 	// if we got an error, return an error
 	if (m_read_error)
-		return CHDERR_READ_ERROR;
+		return std::errc::io_error;
 
 	// if done reading, queue some more
 	while (m_read_queue_offset < m_logicalbytes && osd_work_queue_items(m_read_queue) < 2)
@@ -2911,8 +2936,8 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 		// if we're uncompressed, use regular writes
 		else if (!compressed())
 		{
-			chd_error err = write_hunk(item.m_hunknum, item.m_data);
-			if (err != CHDERR_NONE)
+			std::error_condition err = write_hunk(item.m_hunknum, item.m_data);
+			if (err)
 				return err;
 
 			// writes of all-0 data don't actually take space, so see if we count this
@@ -2973,7 +2998,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 			{
 				osd_work_queue_wait(m_read_queue, 30 * osd_ticks_per_second());
 				if (!compressed())
-					return CHDERR_NONE;
+					return std::error_condition();
 				set_raw_sha1(m_compsha1.finish());
 				return compress_v5_map();
 			}
@@ -2994,7 +3019,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 		m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_osd != nullptr)
 		osd_work_item_wait(m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_osd, osd_ticks_per_second());
 
-	return m_walking_parent ? CHDERR_WALKING_PARENT : CHDERR_COMPRESSING;
+	return m_walking_parent ? error::WALKING_PARENT : error::COMPRESSING;
 }
 
 /**
@@ -3171,12 +3196,12 @@ void chd_file_compressor::async_read()
 		// advance the read pointer
 		m_read_done_offset += numbytes;
 	}
-	catch (chd_error& err)
+	catch (std::error_condition const &err)
 	{
-		fprintf(stderr, "CHD error occurred: %s\n", chd_file::error_string(err));
+		fprintf(stderr, "CHD error occurred: %s\n", err.message().c_str());
 		m_read_error = true;
 	}
-	catch (std::exception& ex)
+	catch (std::exception const &ex)
 	{
 		fprintf(stderr, "exception occurred: %s\n", ex.what());
 		m_read_error = true;

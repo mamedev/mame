@@ -33,8 +33,8 @@ TODO:
 #include <algorithm>
 
 #define LOG_RDP_EXECUTION       0
-#define DEBUG_RDP_PIXEL			0
-#define DRAW_FRAME_COUNTER		0
+#define DEBUG_RDP_PIXEL         0
+#define DRAW_FRAME_COUNTER      0
 
 #if DEBUG_RDP_PIXEL
 static bool s_debug_drawing = false;
@@ -2549,16 +2549,16 @@ void n64_rdp::cmd_load_block(uint64_t *cmd_buf)
 	/*uint16_t tl_masked = tl & 0x3ff;
 
 	int32_t load_edge_walker_data[10] = {
-		((cmd_buf[0] >> 32) & 0xff000000) | (0x10 << 19) | (tilenum << 16) | ((tl_masked << 2) | 3),
-		(((tl_masked << 2) | 3) << 16) | (tl_masked << 2),
-		sh << 16,
-		sl << 16,
-		sh << 16,
-		((sl << 3) << 16) | (tl << 3),
-		(dxt & 0xff) << 8,
-		((0x80 >> wstate->ti_size) << 16) | (dxt >> 8),
-		0x20,
-		0x20
+	    ((cmd_buf[0] >> 32) & 0xff000000) | (0x10 << 19) | (tilenum << 16) | ((tl_masked << 2) | 3),
+	    (((tl_masked << 2) | 3) << 16) | (tl_masked << 2),
+	    sh << 16,
+	    sl << 16,
+	    sh << 16,
+	    ((sl << 3) << 16) | (tl << 3),
+	    (dxt & 0xff) << 8,
+	    ((0x80 >> wstate->ti_size) << 16) | (dxt >> 8),
+	    0x20,
+	    0x20
 	};
 
 	do_load_edge_walker(load_edge_walker_data);*/
@@ -3016,7 +3016,7 @@ void n64_rdp::cmd_set_combine(uint64_t *cmd_buf)
 	/*static const char *s_suba_rgb[16] = { "Combined", "TEX0C", "TEX1C", "PRIMC", "SHADEC", "ENVC", "ONE", "NOISE", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO" };
 	static const char *s_subb_rgb[16] = { "Combined", "TEX0C", "TEX1C", "PRIMC", "SHADEC", "ENVC", "KEYC", "K4", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO" };
 	static const char *s_mul_rgb[32] = { "Combined", "TEX0C", "TEX1C", "PRIMC", "SHADEC", "ENVC", "KEYS", "CombinedA", "TEX0A", "TEX1A", "PRIMA", "SHADEA", "ENVA", "LODF", "PLODF", "K5",
-		"ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO" };
+	    "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO", "ZERO" };
 	static const char *s_add_rgb[8] = { "Combined", "TEX0C", "TEX1C", "PRIMC", "SHADEC", "ENVC", "ONE", "ZERO" };
 	static const char *s_sub_a[16] = { "CombinedA", "TEX0A", "TEX1A", "PRIMA", "SHADEA", "ENVA", "ONE", "ZERO" };
 	static const char *s_mul_a[16] = { "LODF", "TEX0A", "TEX1A", "PRIMA", "SHADEA", "ENVA", "PLODF", "ZERO" };

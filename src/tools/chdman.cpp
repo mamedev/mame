@@ -294,8 +294,8 @@ public:
 			return 0;
 		if (offset + length > m_maxoffset)
 			length = m_maxoffset - offset;
-		chd_error err = m_file.read_bytes(offset, dest, length);
-		if (err != CHDERR_NONE)
+		std::error_condition err = m_file.read_bytes(offset, dest, length);
+		if (err)
 			throw err;
 
 		// if we have TOC - detect audio sectors and swap data
@@ -385,9 +385,9 @@ public:
 				{
 					m_file.reset();
 					m_lastfile = m_info.track[tracknum].fname;
-					osd_file::error filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
-					if (filerr != osd_file::error::NONE)
-						report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
+					std::error_condition const filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
+					if (filerr)
+						report_error(1, "Error opening input file (%s): %s", m_lastfile, filerr.message());
 				}
 
 				// iterate over frames
@@ -411,9 +411,9 @@ public:
 					{
 						m_file.reset();
 						m_lastfile = m_info.track[tracknum+1].fname;
-						osd_file::error filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
-						if (filerr != osd_file::error::NONE)
-							report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
+						std::error_condition const filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
+						if (filerr)
+							report_error(1, "Error opening input file (%s): %s", m_lastfile, filerr.message());
 					}
 
 					if (src_frame_start < src_track_end)
@@ -430,7 +430,7 @@ public:
 								: src_frame_start, SEEK_SET);
 							uint32_t count = m_file->read(dest, bytesperframe);
 							if (count != bytesperframe)
-								report_error(1, "Error reading input file (%s)'", m_lastfile.c_str());
+								report_error(1, "Error reading input file (%s)'", m_lastfile);
 						}
 
 						// swap if appropriate
@@ -1035,18 +1035,18 @@ static void parse_input_chd_parameters(const parameters_map &params, chd_file &i
 	auto input_chd_parent_str = params.find(OPTION_INPUT_PARENT);
 	if (input_chd_parent_str != params.end())
 	{
-		chd_error err = input_parent_chd.open(input_chd_parent_str->second->c_str());
-		if (err != CHDERR_NONE)
-			report_error(1, "Error opening parent CHD file (%s): %s", input_chd_parent_str->second->c_str(), chd_file::error_string(err));
+		std::error_condition err = input_parent_chd.open(*input_chd_parent_str->second);
+		if (err)
+			report_error(1, "Error opening parent CHD file (%s): %s", *input_chd_parent_str->second, err.message());
 	}
 
 	// process input file
 	auto input_chd_str = params.find(OPTION_INPUT);
 	if (input_chd_str != params.end())
 	{
-		chd_error err = input_chd.open(input_chd_str->second->c_str(), writeable, input_parent_chd.opened() ? &input_parent_chd : nullptr);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error opening CHD file (%s): %s", input_chd_str->second->c_str(), chd_file::error_string(err));
+		std::error_condition err = input_chd.open(*input_chd_str->second, writeable, input_parent_chd.opened() ? &input_parent_chd : nullptr);
+		if (err)
+			report_error(1, "Error opening CHD file (%s): %s", *input_chd_str->second, err.message());
 	}
 }
 
@@ -1102,8 +1102,8 @@ static void check_existing_output_file(const parameters_map &params, const char 
 	if (params.find(OPTION_OUTPUT_FORCE) == params.end())
 	{
 		util::core_file::ptr file;
-		osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ, file);
-		if (filerr == osd_file::error::NONE)
+		std::error_condition const filerr = util::core_file::open(filename, OPEN_FLAG_READ, file);
+		if (!filerr)
 		{
 			file.reset();
 			report_error(1, "Error: file already exists (%s)\nUse --force (or -f) to force overwriting", filename);
@@ -1123,9 +1123,9 @@ static std::string *parse_output_chd_parameters(const parameters_map &params, ch
 	auto output_chd_parent_str = params.find(OPTION_OUTPUT_PARENT);
 	if (output_chd_parent_str != params.end())
 	{
-		chd_error err = output_parent_chd.open(output_chd_parent_str->second->c_str());
-		if (err != CHDERR_NONE)
-			report_error(1, "Error opening parent CHD file (%s): %s", output_chd_parent_str->second->c_str(), chd_file::error_string(err));
+		std::error_condition err = output_parent_chd.open(*output_chd_parent_str->second);
+		if (err)
+			report_error(1, "Error opening parent CHD file (%s): %s", *output_chd_parent_str->second, err.message());
 	}
 
 	// process output file
@@ -1180,10 +1180,10 @@ static void parse_compression(const parameters_map &params, chd_codec_type compr
 	{
 		std::string name(*compression_str->second, start, (end == -1) ? -1 : end - start);
 		if (name.length() != 4)
-			report_error(1, "Invalid compressor '%s' specified", name.c_str());
+			report_error(1, "Invalid compressor '%s' specified", name);
 		chd_codec_type type = CHD_MAKE_TAG(name[0], name[1], name[2], name[3]);
 		if (!chd_codec_list::codec_exists(type))
-			report_error(1, "Invalid compressor '%s' specified", name.c_str());
+			report_error(1, "Invalid compressor '%s' specified", name);
 		compression[index++] = type;
 		if (end == -1)
 			break;
@@ -1257,16 +1257,16 @@ static void compress_common(chd_file_compressor &chd)
 
 	// loop until done
 	double complete, ratio;
-	chd_error err;
-	while ((err = chd.compress_continue(complete, ratio)) == CHDERR_WALKING_PARENT || err == CHDERR_COMPRESSING)
-		if (err == CHDERR_WALKING_PARENT)
+	std::error_condition err;
+	while ((err = chd.compress_continue(complete, ratio)) == chd_file::error::WALKING_PARENT || err == chd_file::error::COMPRESSING)
+		if (err == chd_file::error::WALKING_PARENT)
 			progress(false, "Examining parent, %.1f%% complete...  \r", 100.0 * complete);
 		else
 			progress(false, "Compressing, %.1f%% complete... (ratio=%.1f%%)  \r", 100.0 * complete, 100.0 * ratio);
 
 	// handle errors
-	if (err != CHDERR_NONE)
-		report_error(1, "Error during compression: %-40s", chd_file::error_string(err));
+	if (err)
+		report_error(1, "Error during compression: %-40s", err.message());
 
 	// final progress update
 	progress(true, "Compression complete ... final ratio = %.1f%%            \n", 100.0 * ratio);
@@ -1447,15 +1447,17 @@ static void do_info(parameters_map &params)
 
 	// output cmpression and size information
 	chd_codec_type compression[4] = { input_chd.compression(0), input_chd.compression(1), input_chd.compression(2), input_chd.compression(3) };
+	uint64_t filesize = 0;
+	input_chd.file().length(filesize);
 	printf("Logical size: %s bytes\n", big_int_string(input_chd.logical_bytes()).c_str());
 	printf("Hunk Size:    %s bytes\n", big_int_string(input_chd.hunk_bytes()).c_str());
 	printf("Total Hunks:  %s\n", big_int_string(input_chd.hunk_count()).c_str());
 	printf("Unit Size:    %s bytes\n", big_int_string(input_chd.unit_bytes()).c_str());
 	printf("Total Units:  %s\n", big_int_string(input_chd.unit_count()).c_str());
 	printf("Compression:  %s\n", compression_string(compression).c_str());
-	printf("CHD size:     %s bytes\n", big_int_string(static_cast<util::core_file &>(input_chd).size()).c_str());
+	printf("CHD size:     %s bytes\n", big_int_string(filesize).c_str());
 	if (compression[0] != CHD_CODEC_NONE)
-		printf("Ratio:        %.1f%%\n", 100.0 * double(static_cast<util::core_file &>(input_chd).size()) / double(input_chd.logical_bytes()));
+		printf("Ratio:        %.1f%%\n", 100.0 * double(filesize) / double(input_chd.logical_bytes()));
 
 	// add SHA1 output
 	util::sha1_t overall = input_chd.sha1();
@@ -1477,8 +1479,8 @@ static void do_info(parameters_map &params)
 		// get the indexed metadata item; stop when we hit an error
 		chd_metadata_tag metatag;
 		uint8_t metaflags;
-		chd_error err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index, buffer, metatag, metaflags);
-		if (err != CHDERR_NONE)
+		std::error_condition err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index, buffer, metatag, metaflags);
+		if (err)
 			break;
 
 		// determine our index
@@ -1523,9 +1525,9 @@ static void do_info(parameters_map &params)
 			// get info on this hunk
 			chd_codec_type codec;
 			uint32_t compbytes;
-			chd_error err = input_chd.hunk_info(hunknum, codec, compbytes);
-			if (err != CHDERR_NONE)
-				report_error(1, "Error getting info on hunk %d: %s", hunknum, chd_file::error_string(err));
+			std::error_condition err = input_chd.hunk_info(hunknum, codec, compbytes);
+			if (err)
+				report_error(1, "Error getting info on hunk %d: %s", hunknum, err.message());
 
 			// decode into our data
 			if (codec > CHD_CODEC_MINI)
@@ -1603,9 +1605,9 @@ static void do_verify(parameters_map &params)
 
 		// determine how much to read
 		uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_chd.logical_bytes() - offset);
-		chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
+		std::error_condition err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
+		if (err)
+			report_error(1, "Error reading CHD file (%s): %s", *params.find(OPTION_INPUT)->second, err.message());
 
 		// add to the checksum
 		rawsha1.append(&buffer[0], bytes_to_read);
@@ -1665,9 +1667,9 @@ static void do_create_raw(parameters_map &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
-		if (filerr != osd_file::error::NONE)
-			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
+		std::error_condition const filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr)
+			report_error(1, "Unable to open file (%s): %s", *input_file_str->second, filerr.message());
 	}
 
 	// process output CHD
@@ -1720,13 +1722,13 @@ static void do_create_raw(parameters_map &params)
 	{
 		// create the new CHD
 		std::unique_ptr<chd_file_compressor> chd(new chd_rawfile_compressor(*input_file, input_start, input_end));
-		chd_error err;
+		std::error_condition err;
 		if (output_parent.opened())
 			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, compression, output_parent);
 		else
 			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, unit_size, compression);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
+		if (err)
+			report_error(1, "Error creating CHD file (%s): %s", output_chd_str, err.message());
 
 		// if we have a parent, copy forward all the metadata
 		if (output_parent.opened())
@@ -1758,9 +1760,9 @@ static void do_create_hd(parameters_map &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
-		if (filerr != osd_file::error::NONE)
-			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
+		std::error_condition const filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr)
+			report_error(1, "Unable to open file (%s): %s", *input_file_str->second, filerr.message());
 	}
 
 	// process output CHD
@@ -1833,13 +1835,13 @@ static void do_create_hd(parameters_map &params)
 	if (ident_str != params.end())
 	{
 		// load the file
-		osd_file::error filerr = util::core_file::load(ident_str->second->c_str(), identdata);
-		if (filerr != osd_file::error::NONE)
-			report_error(1, "Error reading ident file (%s)", ident_str->second->c_str());
+		std::error_condition const filerr = util::core_file::load(*ident_str->second, identdata);
+		if (filerr)
+			report_error(1, "Error reading ident file (%s): %s", *ident_str->second, filerr.message());
 
 		// must be at least 14 bytes; extract CHS data from there
 		if (identdata.size() < 14)
-			report_error(1, "Ident file '%s' is invalid (too short)", ident_str->second->c_str());
+			report_error(1, "Ident file '%s' is invalid (too short)", *ident_str->second);
 		cylinders = (identdata[3] << 8) | identdata[2];
 		heads = (identdata[7] << 8) | identdata[6];
 		sectors = (identdata[13] << 8) | identdata[12];
@@ -1870,7 +1872,7 @@ static void do_create_hd(parameters_map &params)
 	if (output_parent.opened() && cylinders == 0)
 	{
 		std::string metadata;
-		if (output_parent.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) != CHDERR_NONE)
+		if (output_parent.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata))
 			report_error(1, "Unable to find hard disk metadata in parent CHD");
 		if (sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sector_size) != 4)
 			report_error(1, "Error parsing hard disk metadata in parent CHD");
@@ -1917,26 +1919,26 @@ static void do_create_hd(parameters_map &params)
 		std::unique_ptr<chd_file_compressor> chd;
 		if (input_file) chd.reset(new chd_rawfile_compressor(*input_file, input_start, input_end));
 		else chd.reset(new chd_zero_compressor(input_start, input_end));
-		chd_error err;
+		std::error_condition err;
 		if (output_parent.opened())
 			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * uint64_t(sector_size), hunk_size, compression, output_parent);
 		else
 			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * uint64_t(sector_size), hunk_size, sector_size, compression);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
+		if (err)
+			report_error(1, "Error creating CHD file (%s): %s", output_chd_str, err.message());
 
 		// add the standard hard disk metadata
 		std::string  metadata = string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sector_size);
 		err = chd->write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
+		if (err)
+			report_error(1, "Error adding hard disk metadata: %s", err.message());
 
 		// write the ident if present
 		if (!identdata.empty())
 		{
 			err = chd->write_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
-			if (err != CHDERR_NONE)
-				report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
+			if (err)
+				report_error(1, "Error adding hard disk metadata: %s", err.message());
 		}
 
 		// compress it generically
@@ -1967,9 +1969,9 @@ static void do_create_cd(parameters_map &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		chd_error err = chdcd_parse_toc(input_file_str->second->c_str(), toc, track_info);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error parsing input file (%s: %s)\n", input_file_str->second->c_str(), chd_file::error_string(err));
+		std::error_condition err = chdcd_parse_toc(input_file_str->second->c_str(), toc, track_info);
+		if (err)
+			report_error(1, "Error parsing input file (%s: %s)\n", *input_file_str->second, err.message());
 	}
 
 	// process output CHD
@@ -2016,18 +2018,18 @@ static void do_create_cd(parameters_map &params)
 	{
 		// create the new CD
 		chd = new chd_cd_compressor(toc, track_info);
-		chd_error err;
+		std::error_condition err;
 		if (output_parent.opened())
 			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * uint64_t(CD_FRAME_SIZE), hunk_size, compression, output_parent);
 		else
 			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * uint64_t(CD_FRAME_SIZE), hunk_size, CD_FRAME_SIZE, compression);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
+		if (err)
+			report_error(1, "Error creating CHD file (%s): %s", *output_chd_str, err.message());
 
 		// add the standard CD metadata; we do this even if we have a parent because it might be different
 		err = cdrom_write_metadata(chd, &toc);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error adding CD metadata: %s", chd_file::error_string(err));
+		if (err)
+			report_error(1, "Error adding CD metadata: %s", err.message());
 
 		// compress it generically
 		compress_common(*chd);
@@ -2059,7 +2061,7 @@ static void do_create_ld(parameters_map &params)
 	{
 		avi_file::error avierr = avi_file::open(*input_file_str->second, input_file);
 		if (avierr != avi_file::error::NONE)
-			report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->second->c_str(), avi_file::error_string(avierr));
+			report_error(1, "Error opening AVI file (%s): %s\n", *input_file_str->second, avi_file::error_string(avierr));
 	}
 	const avi_file::movie_info &aviinfo = input_file->get_movie_info();
 
@@ -2133,19 +2135,19 @@ static void do_create_ld(parameters_map &params)
 	{
 		// create the new CHD
 		chd = new chd_avi_compressor(*input_file, info, input_start, input_end);
-		chd_error err;
+		std::error_condition err;
 		if (output_parent.opened())
 			err = chd->create(output_chd_str->c_str(), uint64_t(input_end - input_start) * hunk_size, hunk_size, compression, output_parent);
 		else
 			err = chd->create(output_chd_str->c_str(), uint64_t(input_end - input_start) * hunk_size, hunk_size, info.bytes_per_frame, compression);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
+		if (err)
+			report_error(1, "Error creating CHD file (%s): %s", *output_chd_str, err.message());
 
 		// write the core A/V metadata
 		std::string metadata = string_format(AV_METADATA_FORMAT, info.fps_times_1million / 1000000, info.fps_times_1million % 1000000, info.width, info.height, info.interlaced, info.channels, info.rate);
 		err = chd->write_metadata(AV_METADATA_TAG, 0, metadata);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error adding AV metadata: %s\n", chd_file::error_string(err));
+		if (err)
+			report_error(1, "Error adding AV metadata: %s\n", err.message());
 
 		// create the compressor and then run it generically
 		compress_common(*chd);
@@ -2154,8 +2156,8 @@ static void do_create_ld(parameters_map &params)
 		if (info.height == 524/2 || info.height == 624/2)
 		{
 			err = chd->write_metadata(AV_LD_METADATA_TAG, 0, chd->ldframedata(), 0);
-			if (err != CHDERR_NONE)
-				report_error(1, "Error adding AVLD metadata: %s\n", chd_file::error_string(err));
+			if (err)
+				report_error(1, "Error adding AVLD metadata: %s\n", err.message());
 		}
 		delete chd;
 	}
@@ -2202,15 +2204,15 @@ static void do_copy(parameters_map &params)
 	chd_codec_type compression[4];
 	{
 		std::vector<uint8_t> metadata;
-		if (input_chd.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
+		if (!input_chd.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata))
 			memcpy(compression, s_default_hd_compression, sizeof(compression));
-		else if (input_chd.read_metadata(AV_METADATA_TAG, 0, metadata) == CHDERR_NONE)
+		else if (!input_chd.read_metadata(AV_METADATA_TAG, 0, metadata))
 			memcpy(compression, s_default_ld_compression, sizeof(compression));
-		else if (input_chd.read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-					input_chd.read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-					input_chd.read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE ||
-					input_chd.read_metadata(GDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-					input_chd.read_metadata(GDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
+		else if (!input_chd.read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) ||
+					!input_chd.read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) ||
+					!input_chd.read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) ||
+					!input_chd.read_metadata(GDROM_OLD_METADATA_TAG, 0, metadata) ||
+					!input_chd.read_metadata(GDROM_TRACK_METADATA_TAG, 0, metadata))
 					memcpy(compression, s_default_cd_compression, sizeof(compression));
 		else
 			memcpy(compression, s_default_raw_compression, sizeof(compression));
@@ -2240,13 +2242,13 @@ static void do_copy(parameters_map &params)
 	{
 		// create the new CHD
 		chd = new chd_chdfile_compressor(input_chd, input_start, input_end);
-		chd_error err;
+		std::error_condition err;
 		if (output_parent.opened())
 			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, compression, output_parent);
 		else
 			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, input_chd.unit_bytes(), compression);
-		if (err != CHDERR_NONE)
-			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
+		if (err)
+			report_error(1, "Error creating CHD file (%s): %s", *output_chd_str, err.message());
 
 		// clone all the metadata, upgrading where appropriate
 		std::vector<uint8_t> metadata;
@@ -2255,7 +2257,7 @@ static void do_copy(parameters_map &params)
 		uint32_t index = 0;
 		bool redo_cd = false;
 		bool cdda_swap = false;
-		for (err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index++, metadata, metatag, metaflags); err == CHDERR_NONE; err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index++, metadata, metatag, metaflags))
+		for (err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index++, metadata, metatag, metaflags); !err; err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index++, metadata, metatag, metaflags))
 		{
 			// if this is an old CD-CHD tag, note that we want to re-do it
 			if (metatag == CDROM_OLD_METADATA_TAG || metatag == CDROM_TRACK_METADATA_TAG)
@@ -2272,8 +2274,8 @@ static void do_copy(parameters_map &params)
 
 			// otherwise, clone it
 			err = chd->write_metadata(metatag, CHDMETAINDEX_APPEND, metadata, metaflags);
-			if (err != CHDERR_NONE)
-				report_error(1, "Error writing cloned metadata: %s", chd_file::error_string(err));
+			if (err)
+				report_error(1, "Error writing cloned metadata: %s", err.message());
 		}
 
 		// if we need to re-do the CD metadata, do it now
@@ -2284,8 +2286,8 @@ static void do_copy(parameters_map &params)
 				report_error(1, "Error upgrading CD metadata");
 			const cdrom_toc *toc = cdrom_get_toc(cdrom);
 			err = cdrom_write_metadata(chd, toc);
-			if (err != CHDERR_NONE)
-				report_error(1, "Error writing upgraded CD metadata: %s", chd_file::error_string(err));
+			if (err)
+				report_error(1, "Error writing upgraded CD metadata: %s", err.message());
 			if (cdda_swap)
 				chd->m_toc = toc;
 		}
@@ -2342,9 +2344,9 @@ static void do_extract_raw(parameters_map &params)
 	try
 	{
 		// process output file
-		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
-		if (filerr != osd_file::error::NONE)
-			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
+		std::error_condition const filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+		if (filerr)
+			report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
 
 		// copy all data
 		std::vector<uint8_t> buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
@@ -2354,14 +2356,14 @@ static void do_extract_raw(parameters_map &params)
 
 			// determine how much to read
 			uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_end - offset);
-			chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
-			if (err != CHDERR_NONE)
-				report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
+			std::error_condition err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
+			if (err)
+				report_error(1, "Error reading CHD file (%s): %s", *params.find(OPTION_INPUT)->second, err.message());
 
 			// write to the output
 			uint32_t count = output_file->write(&buffer[0], bytes_to_read);
 			if (count != bytes_to_read)
-				report_error(1, "Error writing to file; check disk space (%s)", output_file_str->second->c_str());
+				report_error(1, "Error writing to file; check disk space (%s)", *output_file_str->second);
 
 			// advance
 			offset += bytes_to_read;
@@ -2446,16 +2448,16 @@ static void do_extract_cd(parameters_map &params)
 		}
 
 		// process output file
-		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
-		if (filerr != osd_file::error::NONE)
-			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
+		std::error_condition filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
+		if (filerr)
+			report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
 
 		// process output BIN file
 		if (mode != MODE_GDI)
 		{
 			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
-			if (filerr != osd_file::error::NONE)
-				report_error(1, "Unable to open file (%s)", output_bin_file_str->c_str());
+			if (filerr)
+				report_error(1, "Unable to open file (%s): %s", *output_bin_file_str, filerr.message());
 		}
 
 		// determine total frames
@@ -2490,8 +2492,8 @@ static void do_extract_cd(parameters_map &params)
 				output_bin_file.reset();
 
 				filerr = util::core_file::open(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
-				if (filerr != osd_file::error::NONE)
-					report_error(1, "Unable to open file (%s)", trackbin_name.c_str());
+				if (filerr)
+					report_error(1, "Unable to open file (%s): %s", trackbin_name, filerr.message());
 
 				outputoffs = 0;
 			}
@@ -2555,7 +2557,7 @@ static void do_extract_cd(parameters_map &params)
 					output_bin_file->seek(outputoffs, SEEK_SET);
 					uint32_t byteswritten = output_bin_file->write(&buffer[0], bufferoffs);
 					if (byteswritten != bufferoffs)
-						report_error(1, "Error writing frame %d to file (%s): %s\n", frame, output_file_str->second->c_str(), chd_file::error_string(CHDERR_WRITE_ERROR));
+						report_error(1, "Error writing frame %d to file (%s): %s\n", frame, *output_file_str->second, "Write error");
 					outputoffs += bufferoffs;
 					bufferoffs = 0;
 				}
@@ -2595,8 +2597,8 @@ static void do_extract_ld(parameters_map &params)
 
 	// read core metadata
 	std::string metadata;
-	chd_error err = input_chd.read_metadata(AV_METADATA_TAG, 0, metadata);
-	if (err != CHDERR_NONE)
+	std::error_condition err = input_chd.read_metadata(AV_METADATA_TAG, 0, metadata);
+	if (err)
 		report_error(1, "Unable to find A/V metadata in the input CHD");
 
 	// parse the metadata
@@ -2666,7 +2668,7 @@ static void do_extract_ld(parameters_map &params)
 		// process output file
 		avi_file::error avierr = avi_file::create(*output_file_str->second, info, output_file);
 		if (avierr != avi_file::error::NONE)
-			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
+			report_error(1, "Unable to open file (%s)", *output_file_str->second);
 
 		// create the codec configuration
 		avhuff_decoder::config avconfig;
@@ -2693,11 +2695,12 @@ static void do_extract_ld(parameters_map &params)
 			input_chd.codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 			// read the hunk into the buffers
-			chd_error err = input_chd.read_hunk(framenum, nullptr);
-			if (err != CHDERR_NONE)
+			std::error_condition err = input_chd.read_hunk(framenum, nullptr);
+			if (err)
 			{
-				uint64_t filepos = static_cast<util::core_file &>(input_chd).tell();
-				report_error(1, "Error reading hunk %d at offset %d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
+				uint64_t filepos = ~uint64_t(0);
+				input_chd.file().tell(filepos);
+				report_error(1, "Error reading hunk %d at offset %d from CHD file (%s): %s\n", framenum, filepos, *params.find(OPTION_INPUT)->second, err.message());
 			}
 
 			// write audio
@@ -2705,7 +2708,7 @@ static void do_extract_ld(parameters_map &params)
 			{
 				avi_file::error avierr = output_file->append_sound_samples(chnum, avconfig.audio[chnum], actsamples, 0);
 				if (avierr != avi_file::error::NONE)
-					report_error(1, "Error writing samples for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_file::error_string(avierr));
+					report_error(1, "Error writing samples for hunk %d to file (%s): %s\n", framenum, *output_file_str->second, avi_file::error_string(avierr));
 			}
 
 			// write video
@@ -2713,7 +2716,7 @@ static void do_extract_ld(parameters_map &params)
 			{
 				avi_file::error avierr = output_file->append_video_frame(fullbitmap);
 				if (avierr != avi_file::error::NONE)
-					report_error(1, "Error writing video for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_file::error_string(avierr));
+					report_error(1, "Error writing video for hunk %d to file (%s): %s\n", framenum, *output_file_str->second, avi_file::error_string(avierr));
 			}
 		}
 
@@ -2773,9 +2776,9 @@ static void do_add_metadata(parameters_map &params)
 	std::vector<uint8_t> file;
 	if (file_str != params.end())
 	{
-		osd_file::error filerr = util::core_file::load(file_str->second->c_str(), file);
-		if (filerr != osd_file::error::NONE)
-			report_error(1, "Error reading metadata file (%s)", file_str->second->c_str());
+		std::error_condition const filerr = util::core_file::load(*file_str->second, file);
+		if (filerr)
+			report_error(1, "Error reading metadata file (%s): %s", *file_str->second, filerr.message());
 	}
 
 	// make sure we have one or the other
@@ -2799,13 +2802,13 @@ static void do_add_metadata(parameters_map &params)
 		printf("Data:         %s (%d bytes)\n", file_str->second->c_str(), int(file.size()));
 
 	// write the metadata
-	chd_error err;
+	std::error_condition err;
 	if (text_str != params.end())
 		err = input_chd.write_metadata(tag, index, text, flags);
 	else
 		err = input_chd.write_metadata(tag, index, file, flags);
-	if (err != CHDERR_NONE)
-		report_error(1, "Error adding metadata: %s", chd_file::error_string(err));
+	if (err)
+		report_error(1, "Error adding metadata: %s", err.message());
 	else
 		printf("Metadata added\n");
 }
@@ -2843,9 +2846,9 @@ static void do_del_metadata(parameters_map &params)
 	printf("Index:        %d\n", index);
 
 	// write the metadata
-	chd_error err = input_chd.delete_metadata(tag, index);
-	if (err != CHDERR_NONE)
-		report_error(1, "Error removing metadata: %s", chd_file::error_string(err));
+	std::error_condition err = input_chd.delete_metadata(tag, index);
+	if (err)
+		report_error(1, "Error removing metadata: %s", err.message());
 	else
 		printf("Metadata removed\n");
 }
@@ -2884,9 +2887,9 @@ static void do_dump_metadata(parameters_map &params)
 
 	// write the metadata
 	std::vector<uint8_t> buffer;
-	chd_error err = input_chd.read_metadata(tag, index, buffer);
-	if (err != CHDERR_NONE)
-		report_error(1, "Error reading metadata: %s", chd_file::error_string(err));
+	std::error_condition err = input_chd.read_metadata(tag, index, buffer);
+	if (err)
+		report_error(1, "Error reading metadata: %s", err.message());
 
 	// catch errors so we can close & delete the output file
 	util::core_file::ptr output_file;
@@ -2895,14 +2898,14 @@ static void do_dump_metadata(parameters_map &params)
 		// create the file
 		if (output_file_str != params.end())
 		{
-			osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
-			if (filerr != osd_file::error::NONE)
-				report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
+			std::error_condition const filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+			if (filerr)
+				report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
 
 			// output the metadata
 			uint32_t count = output_file->write(&buffer[0], buffer.size());
 			if (count != buffer.size())
-				report_error(1, "Error writing file (%s)", output_file_str->second->c_str());
+				report_error(1, "Error writing file (%s)", *output_file_str->second);
 			output_file.reset();
 
 			// provide some feedback
@@ -3056,9 +3059,9 @@ int CLIB_DECL main(int argc, char *argv[])
 				(*s_command.handler)(parameters);
 				return 0;
 			}
-			catch (chd_error &err)
+			catch (std::error_condition const &err)
 			{
-				fprintf(stderr, "CHD error occurred (main): %s\n", chd_file::error_string(err));
+				fprintf(stderr, "CHD error occurred (main): %s\n", err.message().c_str());
 				return 1;
 			}
 			catch (fatal_error &err)

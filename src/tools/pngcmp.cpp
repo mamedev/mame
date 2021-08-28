@@ -73,15 +73,15 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	bitmap_argb32 finalbitmap;
 	int width, height, maxwidth;
 	util::core_file::ptr file;
-	osd_file::error filerr;
+	std::error_condition filerr;
 	util::png_error pngerr;
 	int error = 100;
 
 	/* open the source image */
 	filerr = util::core_file::open(imgfile1, OPEN_FLAG_READ, file);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
-		printf("Could not open %s (%d)\n", imgfile1.c_str(), int(filerr));
+		printf("Could not open %s (%s)\n", imgfile1.c_str(), filerr.message().c_str());
 		goto error;
 	}
 
@@ -96,9 +96,9 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 
 	/* open the source image */
 	filerr = util::core_file::open(imgfile2, OPEN_FLAG_READ, file);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
-		printf("Could not open %s (%d)\n", imgfile2.c_str(), int(filerr));
+		printf("Could not open %s (%s)\n", imgfile2.c_str(), filerr.message().c_str());
 		goto error;
 	}
 
@@ -171,9 +171,9 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 
 		/* write the final PNG */
 		filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-		if (filerr != osd_file::error::NONE)
+		if (filerr)
 		{
-			printf("Could not open %s (%d)\n", outfilename.c_str(), int(filerr));
+			printf("Could not open %s (%s)\n", outfilename.c_str(), filerr.message().c_str());
 			goto error;
 		}
 		pngerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);

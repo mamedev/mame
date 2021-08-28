@@ -4,9 +4,15 @@
 // Image generic handler class and helpers
 
 #include "image_handler.h"
+
 #include "formats/all.h"
 #include "formats/fsblk_vec.h"
 #include "formats/fs_unformatted.h"
+
+#include "ioprocs.h"
+#include "ioprocsfill.h"
+#include "ioprocsvec.h"
+
 
 // Fatalerror implementation
 
@@ -19,70 +25,6 @@ emu_fatalerror::emu_fatalerror(int _exitcode, util::format_argument_pack<std::os
 	: m_text(util::string_format(args))
 	, m_code(_exitcode)
 {
-}
-
-// io_generic from vector<u8>
-
-static void ram_closeproc(void *file)
-{
-	auto f = (iofile_ram *)file;
-	delete f;
-}
-
-static int ram_seekproc(void *file, int64_t offset, int whence)
-{
-	auto f = (iofile_ram *)file;
-	switch(whence) {
-	case SEEK_SET: f->pos = offset; break;
-	case SEEK_CUR: f->pos += offset; break;
-	case SEEK_END: f->pos = f->data->size() + offset; break;
-	}
-
-	if(whence == SEEK_CUR)
-		f->pos = std::max<int64_t>(f->pos, 0);
-	else
-		f->pos = std::clamp<int64_t>(f->pos, 0, f->data->size());
-	return 0;
-}
-
-static size_t ram_readproc(void *file, void *buffer, size_t length)
-{
-	auto f = (iofile_ram *)file;
-	size_t l = std::min<std::common_type_t<size_t, int64_t> >(length, f->data->size() - f->pos);
-	memcpy(buffer, f->data->data() + f->pos, l);
-	return l;
-}
-
-static size_t ram_writeproc(void *file, const void *buffer, size_t length)
-{
-	auto f = (iofile_ram *)file;
-	size_t l = std::max<std::common_type_t<size_t, int64_t> >(f->pos + length, f->data->size());
-	f->data->resize(l);
-	memcpy(f->data->data() + f->pos, buffer, length);
-	return length;
-}
-
-static uint64_t ram_filesizeproc(void *file)
-{
-	auto f = (iofile_ram *)file;
-	return f->data->size();
-}
-
-
-static const io_procs iop_ram = {
-	ram_closeproc,
-	ram_seekproc,
-	ram_readproc,
-	ram_writeproc,
-	ram_filesizeproc
-};
-
-io_generic *ram_open(std::vector<u8> &data)
-{
-	iofile_ram *f = new iofile_ram;
-	f->data = &data;
-	f->pos = 0;
-	return new io_generic({ &iop_ram, f });
 }
 
 
@@ -304,25 +246,20 @@ std::vector<std::pair<u8, const floppy_format_info *>> image_handler::identify(c
 	std::vector<std::pair<u8, const floppy_format_info *>> res;
 	std::vector<uint32_t> variants;
 
-	std::string msg = util::string_format("Error opening %s for reading", m_on_disk_path);
 	FILE *f = fopen(m_on_disk_path.c_str(), "rb");
 	if (!f) {
+		std::string msg = util::string_format("Error opening %s for reading", m_on_disk_path);
 		perror(msg.c_str());
 		return res;
 	}
 
-	io_generic io;
-	io.file = f;
-	io.procs = &stdio_ioprocs_noclose;
-	io.filler = 0xff;
+	auto io = util::stdio_read(f, 0xff);
 
 	for(const auto &e : formats.floppy_format_info_by_key) {
-		u8 score = e.second->m_format->identify(&io, floppy_image::FF_UNKNOWN, variants);
+		u8 score = e.second->m_format->identify(*io, floppy_image::FF_UNKNOWN, variants);
 		if(score)
 			res.emplace_back(std::make_pair(score, e.second));
 	}
-
-	fclose(f);
 
 	return res;
 }
@@ -330,19 +267,16 @@ std::vector<std::pair<u8, const floppy_format_info *>> image_handler::identify(c
 bool image_handler::floppy_load(const floppy_format_info *format)
 {
 	std::vector<uint32_t> variants;
-	std::string msg = util::string_format("Error opening %s for reading", m_on_disk_path);
 	FILE *f = fopen(m_on_disk_path.c_str(), "rb");
 	if (!f) {
+		std::string msg = util::string_format("Error opening %s for reading", m_on_disk_path);
 		perror(msg.c_str());
 		return true;
 	}
 
-	io_generic io;
-	io.file = f;
-	io.procs = &stdio_ioprocs_noclose;
-	io.filler = 0xff;
+	auto io = util::stdio_read(f, 0xff);
 
-	return !format->m_format->load(&io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
+	return !format->m_format->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
 }
 
 bool image_handler::floppy_save(const floppy_format_info *format)
@@ -355,12 +289,9 @@ bool image_handler::floppy_save(const floppy_format_info *format)
 		return true;
 	}
 
-	io_generic io;
-	io.file = f;
-	io.procs = &stdio_ioprocs_noclose;
-	io.filler = 0xff;
+	auto io = util::stdio_read_write(f, 0xff);
 
-	return !format->m_format->save(&io, variants, &m_floppy_image);
+	return !format->m_format->save(*io, variants, &m_floppy_image);
 }
 
 void image_handler::floppy_create(const floppy_create_info *format, fs_meta_data meta)
@@ -372,14 +303,13 @@ void image_handler::floppy_create(const floppy_create_info *format, fs_meta_data
 		auto fs = format->m_manager->mount(blockdev);
 		fs->format(meta);
 
-		auto iog = ram_open(img);
 		auto source_format = format->m_type();
-		source_format->load(iog, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
+		auto io = util::ram_read(img.data(), img.size(), 0xff);
+		source_format->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
 		delete source_format;
-		delete iog;
-
-	} else
+	} else {
 		fs_unformatted::format(format->m_key, &m_floppy_image);
+	}
 }
 
 bool image_handler::floppy_mount_fs(const filesystem_format *format)
@@ -390,11 +320,10 @@ bool image_handler::floppy_mount_fs(const filesystem_format *format)
 			std::vector<uint32_t> variants;
 			m_floppy_fs_converter = ci->m_type;
 			m_sector_image.clear();
-			auto iog = ram_open(m_sector_image);
 			auto load_format = m_floppy_fs_converter();
-			load_format->save(iog, variants, &m_floppy_image);
+			util::random_read_write_fill_wrapper<util::vector_read_write_adapter<u8>, 0xff> io(m_sector_image);
+			load_format->save(io, variants, &m_floppy_image);
 			delete load_format;
-			delete iog;
 		}
 
 		if(ci->m_image_size == m_sector_image.size())
@@ -425,11 +354,10 @@ bool image_handler::hd_mount_fs(const filesystem_format *format)
 void image_handler::fs_to_floppy()
 {
 	std::vector<uint32_t> variants;
-	auto iog = ram_open(m_sector_image);
+	auto io = util::ram_read(m_sector_image.data(), m_sector_image.size(), 0xff);
 	auto format = m_floppy_fs_converter();
-	format->load(iog, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
+	format->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
 	delete format;
-	delete iog;
 }
 
 std::vector<std::string> image_handler::path_split(std::string path) const
