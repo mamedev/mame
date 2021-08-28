@@ -570,7 +570,7 @@ void upd3301_device::draw_scanline()
 	// first attribute start is always overwritten with a 0
 	m_attr_fifo[0][!m_input_fifo] = 0;
 	// last parameter always extends up to the end of the row
-	// (7narabe fills last row value with white when exausting available slots)
+	// (7narabe (pc8001) fills last row value with white when exausting available slots)
 	m_attr_fifo[40][!m_input_fifo] = attr_size;
 
 	// TODO: verify if we need to sort as well (doesn't seem the case?)
@@ -579,8 +579,16 @@ void upd3301_device::draw_scanline()
 		u8 attr_start = std::min(m_attr_fifo[ex][!m_input_fifo], attr_size);
 		u8 attr_value = m_attr_fifo[ex+1][!m_input_fifo];
 		u8 attr_end = std::min(m_attr_fifo[ex+2][!m_input_fifo], attr_size);
+		// if the target is == 0 then just consider max size instead
+		// (starfire (pc8001) wants this otherwise will black screen on gameplay)
+ 		if (attr_end == 0)
+			attr_end = attr_size;
+
 		for (int i = attr_start; i < attr_end; i++)
 			extend_attr[i] = attr_value;
+
+		if (attr_end == attr_size)
+			break;
 	}
 	
 	// further extend the attributes if we are in color mode
