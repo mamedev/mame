@@ -8,6 +8,8 @@
 	
 	"Mini" as compared to the PC-8881 8-inch floppy I/F
 
+	Design is decidedly derived from Epson TF-20, cfr. devices/bus/epson_sio/tf20.cpp
+
 	|--------------------------------------|
 	|      P1 P2 P3         X1             |
 	|                                      |
@@ -23,16 +25,17 @@
 	
 	PCB is marked PC-80S31KFDC NEC-14T
 	P1, P2, P3 are power supplies (+5V, +12V, -5V for P1, lacks -5V for the other two)
-	μPD2364EC is at position IC13
+	μPD2364EC is at position IC13, it's a 8192 size ROM. (***)
 	(*) are μPD41416C
 	(**) marked as JP, unpopulated x 3;
 	μPB6101/2 are bipolar TTL gate arrays, presumably
 	Cannot read marking of X1 (8 MHz?)
 
+	(***) Given this, we guess that PC80S31 is the 2D version while the 'K
+	variant is the 2D/2DD/2HD version.
+
 	TODO:
-	- Support for the "2HD/2DD/2D variant" (the "K" board?)
-	  The μPD2364 is a 8192 size, matching the later PC88 FDC BIOS we have.
-	  There's also PC-80S32, which I don't know how much related to this is;
+	- What's PC-80S32? Is it the 88VA version or a different beast?
 	- PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn), 
 	  expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
 	  Are those incorrectly identified as 2DD? Hacked to work for now;
@@ -40,6 +43,7 @@
 	  we currently just implement the irq_callback instead;
 	- Bus option;
 	- Cascade mode, i.e. the CN2 connector used to accept a second disk unit for drive 2 & 3;
+	- pc80s31k: verify that irq vector write (I/O port $f0) belongs here or whatever PC88VA uses.
 
 **************************************************************************************************/
 
@@ -53,7 +57,8 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC80S31K, pc80s31k_device, "pc80s31k", "NEC PC-80S31(K) Mini Disk Unit I/F")
+DEFINE_DEVICE_TYPE(PC80S31, pc80s31_device,   "pc80s31",  "NEC PC-80S31 Mini Disk Unit I/F")
+DEFINE_DEVICE_TYPE(PC80S31K, pc80s31k_device, "pc80s31k", "NEC PC-80S31K Mini Disk Unit I/F")
 
 
 //**************************************************************************
@@ -62,58 +67,69 @@ DEFINE_DEVICE_TYPE(PC80S31K, pc80s31k_device, "pc80s31k", "NEC PC-80S31(K) Mini 
 
 
 //-------------------------------------------------
-//  pc80s31k_device - constructor
+//  pc80s31_device - constructor
 //-------------------------------------------------
 
 
-pc80s31k_device::pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC80S31K, tag, owner, clock)
+pc80s31_device::pc80s31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_fdc(*this, "fdc")
+	, m_floppy(*this, "fdc:%u", 0U)
 	, m_fdc_cpu(*this, "fdc_cpu")
 	, m_fdc_rom(*this, "fdc_rom")
 	, m_ppi_host(*this, "ppi_host")
 	, m_ppi_fdc(*this, "ppi_fdc")
-	, m_fdc(*this, "fdc")
-	, m_floppy(*this, "fdc:%u", 0U)
 {
 }
 
-ROM_START( pc80s31k )
+
+pc80s31_device::pc80s31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc80s31_device(mconfig, PC80S31, tag, owner, clock)
+{
+
+}
+
+ROM_START( pc80s31 )
+	// TODO: exact identification of these
 	ROM_REGION( 0x2000, "fdc_rom", ROMREGION_ERASEFF )
-	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
+	ROM_SYSTEM_BIOS( 0,  "disk",    "disk BIOS" )
+	ROMX_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1,  "mk2fr",   "mkIIFR disk BIOS" )
+	ROMX_LOAD( "mk2fr_disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321), ROM_BIOS(1) )
+
 	ROM_FILL( 0x7df, 1, 0x00 )
 	ROM_FILL( 0x7e0, 1, 0x00 )
 ROM_END
 
-const tiny_rom_entry *pc80s31k_device::device_rom_region() const
+const tiny_rom_entry *pc80s31_device::device_rom_region() const
 {
-	return ROM_NAME( pc80s31k );
+	return ROM_NAME( pc80s31 );
 }
-
 
 //-------------------------------------------------
 //  device_add_mconfig - device-specific machine
 //  configuration addiitons
 //-------------------------------------------------
 
-void pc80s31k_device::host_map(address_map &map)
+void pc80s31_device::host_map(address_map &map)
 {
 	map(0, 3).rw(m_ppi_host, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void pc80s31k_device::fdc_map(address_map &map)
+void pc80s31_device::fdc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("fdc_rom", 0);
 	map(0x4000, 0x7fff).ram();
 }
 
-void pc80s31k_device::fdc_io(address_map &map)
+void pc80s31_device::fdc_io(address_map &map)
 {
 	map.global_mask(0xff);
 //	map(0xf0, 0xf0).w(FUNC(pc8801_state::fdc_irq_vector_w)); // Interrupt Opcode Port
 //	map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
 //	map(0xf6, 0xf6).nopw(); // 
 	map(0xf7, 0xf7).nopw(); // printer port output
-	map(0xf8, 0xf8).rw(FUNC(pc80s31k_device::terminal_count_r), FUNC(pc80s31k_device::motor_control_w));
+	map(0xf8, 0xf8).rw(FUNC(pc80s31_device::terminal_count_r), FUNC(pc80s31_device::motor_control_w));
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xfc, 0xff).rw(m_ppi_fdc, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -123,18 +139,18 @@ static void pc88_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
-IRQ_CALLBACK_MEMBER(pc80s31k_device::irq_cb)
+IRQ_CALLBACK_MEMBER(pc80s31_device::irq_cb)
 {
-	return 0;
+	return m_irq_vector;
 }
 
-void pc80s31k_device::device_add_mconfig(machine_config &config)
+void pc80s31_device::device_add_mconfig(machine_config &config)
 {
 	constexpr XTAL fdc_xtal = XTAL(4'000'000);
 	Z80(config, m_fdc_cpu, fdc_xtal);
-	m_fdc_cpu->set_addrmap(AS_PROGRAM, &pc80s31k_device::fdc_map);
-	m_fdc_cpu->set_addrmap(AS_IO, &pc80s31k_device::fdc_io);
-	m_fdc_cpu->set_irq_acknowledge_callback(FUNC(pc80s31k_device::irq_cb));
+	m_fdc_cpu->set_addrmap(AS_PROGRAM, &pc80s31_device::fdc_map);
+	m_fdc_cpu->set_addrmap(AS_IO, &pc80s31_device::fdc_io);
+	m_fdc_cpu->set_irq_acknowledge_callback(FUNC(pc80s31_device::irq_cb));
 
 	UPD765A(config, m_fdc, XTAL(4'000'000), true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_fdc_cpu, INPUT_LINE_IRQ0);
@@ -148,22 +164,22 @@ void pc80s31k_device::device_add_mconfig(machine_config &config)
 	I8255A(config, m_ppi_host);
 	m_ppi_host->in_pa_callback().set(m_ppi_fdc, FUNC(i8255_device::pb_r));
 	m_ppi_host->in_pb_callback().set(m_ppi_fdc, FUNC(i8255_device::pa_r));
-	m_ppi_host->in_pc_callback().set(FUNC(pc80s31k_device::host_portc_r));
-	m_ppi_host->out_pc_callback().set(FUNC(pc80s31k_device::host_portc_w));
+	m_ppi_host->in_pc_callback().set(FUNC(pc80s31_device::host_portc_r));
+	m_ppi_host->out_pc_callback().set(FUNC(pc80s31_device::host_portc_w));
 
 	// 8255AC-2
 	I8255A(config, m_ppi_fdc);
 	m_ppi_fdc->in_pa_callback().set(m_ppi_host, FUNC(i8255_device::pb_r));
 	m_ppi_fdc->in_pb_callback().set(m_ppi_host, FUNC(i8255_device::pa_r));
-	m_ppi_fdc->in_pc_callback().set(FUNC(pc80s31k_device::fdc_portc_r));
-	m_ppi_fdc->out_pc_callback().set(FUNC(pc80s31k_device::fdc_portc_w));
+	m_ppi_fdc->in_pc_callback().set(FUNC(pc80s31_device::fdc_portc_r));
+	m_ppi_fdc->out_pc_callback().set(FUNC(pc80s31_device::fdc_portc_w));
 }
 
 //-------------------------------------------------
 //  device_timer - device-specific timers
 //-------------------------------------------------
 
-void pc80s31k_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id == 0);
 
@@ -174,9 +190,13 @@ void pc80s31k_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc80s31k_device::device_start()
+void pc80s31_device::device_start()
 {
 	m_tc_zero_timer = timer_alloc(0);
+	
+	save_item(NAME(m_host_latch));
+	save_item(NAME(m_fdc_latch));
+	save_item(NAME(m_irq_vector));
 }
 
 //-------------------------------------------------
@@ -184,13 +204,15 @@ void pc80s31k_device::device_start()
 //-------------------------------------------------
 
 
-void pc80s31k_device::device_reset()
+void pc80s31_device::device_reset()
 {
 	m_floppy[0]->get_device()->set_rpm(300);
 	m_floppy[1]->get_device()->set_rpm(300);
 	m_fdc->set_rate(250000);
-	
-	m_fdc_cpu->set_input_line_vector(0, 0); // Z80
+
+	// TODO: doesn't seem to work for devices?
+	m_fdc_cpu->set_input_line_vector(0, 0);
+	m_irq_vector = 0;
 
 	m_tc_zero_timer->adjust(attotime::never);
 }
@@ -200,31 +222,68 @@ void pc80s31k_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-u8 pc80s31k_device::host_portc_r()
+/*
+ * port C is used as a communication protocol flags
+ *
+ * Host side
+ * (swap 4-bit nibbles and r/w direction for FDC side, all bits are active high):
+ * x--- ---- (w) ATN AtenTioN: 
+ *               host sends a command to FDC, interrupts current one
+ *           	 (looks unconnected the other way around?)
+ * -x-- ---- (w) DAC DAta aCcepted:
+ *               host just picked up data from FDC
+ * --x- ---- (w) RFD Ready For Data:
+ *               host requests data from FDC
+ * ---x ---- (w) DAV DAta Valid:
+ *               host outputs data to port B
+ * ---- -x-- (r) DAC DAta aCcepted:
+ *               FDC has accepted data from port B
+ * ---- --x- (r) RFD Ready For Data:
+ *               FDC requests data from host
+ * ---- ---x (r) DAV DAta Valid:
+ *               FDC has output data to port A
+ *
+ */
+u8 pc80s31_device::host_portc_r()
 {
 	machine().scheduler().synchronize();
 	return m_fdc_latch >> 4;
 }
 
-void pc80s31k_device::host_portc_w(u8 data)
+void pc80s31_device::host_portc_w(u8 data)
 {
 	machine().scheduler().synchronize();
+	logerror("%s: host port C write %02x  (ATN=%d DAC=%d RFD=%d DAV=%d)\n",
+		machine().describe_context(),
+		data,
+		BIT(data, 7),
+		BIT(data, 6),
+		BIT(data, 5),
+		BIT(data, 4)
+	);
 	m_host_latch = data;
 }
 
-u8 pc80s31k_device::fdc_portc_r()
+u8 pc80s31_device::fdc_portc_r()
 {
 	machine().scheduler().synchronize();
 	return m_host_latch >> 4; 
 }
 
-void pc80s31k_device::fdc_portc_w(u8 data)
+void pc80s31_device::fdc_portc_w(u8 data)
 {
 	machine().scheduler().synchronize();
+	logerror("%s: FDC port C write %02x  (DAC=%d RFD=%d DAV=%d)\n",
+		machine().describe_context(),
+		data,
+		BIT(data, 6),
+		BIT(data, 5),
+		BIT(data, 4)
+	);
 	m_fdc_latch = data;
 }
 
-u8 pc80s31k_device::terminal_count_r()
+u8 pc80s31_device::terminal_count_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -235,10 +294,59 @@ u8 pc80s31k_device::terminal_count_r()
 	return 0xff;
 }
 
-void pc80s31k_device::motor_control_w(uint8_t data)
+void pc80s31_device::motor_control_w(uint8_t data)
 {
 	m_floppy[0]->get_device()->mon_w(!(data & 1));
 	m_floppy[1]->get_device()->mon_w(!(data & 2));
 	
 	// TODO: according to docs a value of 0x07 enables precompensation to tracks 0-19, 0xf enables it on 20-39
+}
+
+//**************************************************************************
+//
+//  PC80S31K device overrides
+//
+//**************************************************************************
+
+pc80s31k_device::pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc80s31_device(mconfig, PC80S31K, tag, owner, clock)
+{
+
+}
+
+ROM_START( pc80s31k )
+	// TODO: exact identification of these
+	ROM_REGION( 0x2000, "fdc_rom", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "ma",       "MA disk BIOS")
+	ROMX_LOAD( "ma_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "mk2mr",    "mkIIMR disk BIOS" )
+	ROMX_LOAD( "m2mr_disk.rom", 0x0000, 0x2000, CRC(2447516b) SHA1(1492116f15c426f9796dc2bb6fcccf2656c0ca75), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "mh",       "MH disk BIOS" )
+	ROMX_LOAD( "mh_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004), ROM_BIOS(2) )
+	// TODO: this may belong to PC80S32
+	ROM_SYSTEM_BIOS( 3, "88va",     "PC88VA disk BIOS")
+	ROMX_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0), ROM_BIOS(3) )
+ROM_END
+
+const tiny_rom_entry *pc80s31k_device::device_rom_region() const
+{
+	return ROM_NAME( pc80s31k );
+}
+
+void pc80s31k_device::drive_mode_w(uint8_t data)
+{
+	// TODO: verify implementation
+	logerror("FDC drive mode %02x\n", data);
+	m_floppy[0]->get_device()->set_rpm(BIT(data, 0) ? 360 : 300);
+	m_floppy[1]->get_device()->set_rpm(BIT(data, 1) ? 360 : 300);
+
+	m_fdc->set_rate(BIT(data, 5) ? 500000 : 250000);
+}
+
+void pc80s31k_device::fdc_io(address_map &map)
+{
+	pc80s31_device::fdc_io(map);
+
+	map(0xf0, 0xf0).lw8(NAME([this] (u8 data) { m_irq_vector = data; }));
+	map(0xf4, 0xf4).w(FUNC(pc80s31k_device::drive_mode_w));
 }

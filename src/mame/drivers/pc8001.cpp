@@ -347,7 +347,7 @@ void pc8001_state::pc8001_io(address_map &map)
 //  map(0xe6, 0xe6).w(FUNC(pc8001_state::irq_mask_w));
 //  map(0xe7, 0xe7).w(FUNC(pc8001_state::pc8012_memory_mode_w));
 //  map(0xe8, 0xfb) unused
-	map(0xfc, 0xff).m(m_pc80s31k, FUNC(pc80s31k_device::host_map));
+	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
 void pc8001mk2_state::pc8001mk2_map(address_map &map)
@@ -701,9 +701,9 @@ void pc8001_state::pc8001(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
 
-	PC80S31K(config, m_pc80s31k, MASTER_CLOCK);
+	PC80S31(config, m_pc80s31, MASTER_CLOCK);
 	config.set_perfect_quantum(m_maincpu);
-	config.set_perfect_quantum("pc80s31k:fdc_cpu");
+	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

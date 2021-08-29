@@ -1095,7 +1095,8 @@ References:
 		</part>
 	</software>
 
-	<software name="hashires" supported="yes">
+	<!-- Engine sound is output to optional PCG-8100 -->
+	<software name="hashires" supported="partial">
 		<description>Hashire! Skyline</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -1109,21 +1110,8 @@ References:
 		</part>
 	</software>
 
-	<software name="hashiresa" cloneof="hashires" supported="yes">
-		<description>Hashire! Skyline (Alt)</description>
-		<year>1985</year>
-		<publisher>コムパック (Compaq)</publisher>
-		<info name="release" value="198512xx"/>
-		<info name="alt_title" value="走れ!スカイライン"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="349104">
-				<rom name="hashire skyline (a).d88" size="349104" crc="f24ae2bc" sha1="460d1f7a382572598d4939c5599750ff23c723ca"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hashiresb" cloneof="hashires" supported="yes">
+	<!-- Engine sound is output to optional PCG-8100 -->
+	<software name="hashiresb" cloneof="hashires" supported="partial">
 		<description>Hashire! Skyline (Alt 2)</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -1137,7 +1125,8 @@ References:
 		</part>
 	</software>
 
-	<software name="hashiresc" cloneof="hashires" supported="yes">
+	<!-- Engine sound is output to optional PCG-8100 -->
+	<software name="hashiresc" cloneof="hashires" supported="partial">
 		<description>Hashire! Skyline (Alt 3)</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>

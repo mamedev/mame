@@ -2286,13 +2286,14 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		</part>
 	</software>
 
+	<!-- bad allocation table, "illegal function call at 100" [disk is bad] -->
 	<software name="alphad" cloneof="alpha" supported="no">
 		<description>Alpha (Demo)</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="287920">    <!-- Data CRC16: 4039 -->
-				<rom name="alpha demo.d88" size="287920" crc="55b31c70" sha1="629bd3253462a22455f853ba90565bc2fe7fb710"/>
+				<rom name="alpha demo.d88" size="287920" crc="55b31c70" sha1="629bd3253462a22455f853ba90565bc2fe7fb710" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14834,15 +14835,31 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 	
 	<software name="hashiressr">
 		<!-- boots in N88 Basic as Hashire! 7th Skyline -->
-		<description>Hashire! Skyline (SR?)</description>
+		<description>Hashire! 7th Skyline</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="走れ!7thスカイライン"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349104">
 				<rom name="hashire skyline sr.d88" size="349104" crc="ee7eb00f" sha1="4f5a47e3e4950f3fb572feac98e786380b815d2f"/>
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="hashiressra" cloneof="hashiressr">
+		<description>Hashire! 7th Skyline (Alt)</description>
+		<year>19??</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="走れ!7thスカイライン"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349104">
+				<rom name="hashire skyline (a).d88" size="349104" crc="f24ae2bc" sha1="460d1f7a382572598d4939c5599750ff23c723ca"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="snakecmp">
 		<description>Hayakawa Manami no Snake Camp</description>

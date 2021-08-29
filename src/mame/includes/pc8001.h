@@ -35,7 +35,7 @@ public:
 	pc8001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
-		, m_pc80s31k(*this, "pc80s31k")
+		, m_pc80s31(*this, "pc80s31")
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_dma(*this, I8257_TAG)
 		, m_crtc(*this, UPD3301_TAG)
@@ -65,7 +65,7 @@ protected:
 	void port30_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<pc80s31k_device> m_pc80s31k;
+	required_device<pc80s31_device> m_pc80s31;
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8257_device> m_dma;
 	required_device<upd3301_device> m_crtc;
