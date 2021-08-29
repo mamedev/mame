@@ -197,7 +197,7 @@ void ch376_device::write(offs_t offset, u8 data)
 				break;
 
 			case CMD_DISK_MOUNT:
-				m_int_status = STATUS_USB_INT_SUCCESS;
+				m_int_status = STATUS_USB_INT_CONNECT;
 				break;
 
 			case CMD_FILE_OPEN:
@@ -471,8 +471,6 @@ bool ch376_device::generateNextDirEntry()
 			return generateNextDirEntry();
 		}
 
-		std::fill_n(&m_dataBuffer[1], 11, 0x20);
-
 		int baseLen = std::min(8, dotIdx);
 		for (int idx = 0; idx < baseLen; idx++)
 		{
@@ -490,7 +488,7 @@ bool ch376_device::generateNextDirEntry()
 			dotIdx++;
 			for (int idx = 0; idx < 3; idx++)
 			{
-				if ((idx + dotIdx) >= strlen(ourEntry->name))
+				if ((idx + dotIdx) > strlen(ourEntry->name))
 				{
 					break;
 				}

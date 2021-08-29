@@ -22,6 +22,17 @@ function maintargetosdoptions(_target,_subtarget)
 
 	configuration { }
 
+	if _OPTIONS["DIRECTINPUT"] == "8" then
+		links {
+			"dinput8",
+		}
+	else
+		links {
+			"dinput",
+		}
+	end
+
+
 	if _OPTIONS["USE_SDL"] == "1" then
 		links {
 			"SDL.dll",
@@ -29,7 +40,6 @@ function maintargetosdoptions(_target,_subtarget)
 	end
 
 	links {
-		"dinput8",
 		"comctl32",
 		"comdlg32",
 		"psapi",
@@ -38,6 +48,19 @@ function maintargetosdoptions(_target,_subtarget)
 	}
 end
 
+
+newoption {
+	trigger = "DIRECTINPUT",
+	description = "Minimum DirectInput version to support",
+	allowed = {
+		{ "7",  "Support DirectInput 7 or later"  },
+		{ "8",  "Support DirectInput 8 or later"  },
+	},
+}
+
+if not _OPTIONS["DIRECTINPUT"] then
+	_OPTIONS["DIRECTINPUT"] = "8"
+end
 
 newoption {
 	trigger = "USE_SDL",
@@ -101,8 +124,17 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	defines {
 		"DIRECT3D_VERSION=0x0900",
-		"DIRECTINPUT_VERSION=0x0800",
 	}
+
+	if _OPTIONS["DIRECTINPUT"] == "8" then
+		defines {
+			"DIRECTINPUT_VERSION=0x0800",
+		}
+	else
+		defines {
+			"DIRECTINPUT_VERSION=0x0700",
+		}
+	end
 
 	includedirs {
 		MAME_DIR .. "src/emu",

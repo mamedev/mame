@@ -379,10 +379,9 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 							   data,
 							   address);
 
-		const device_state_interface *state;
-		if (debug.cpu().live_cpu() == &m_debugInterface->device() && m_debugInterface->device().interface(state))
+		if (debug.cpu().live_cpu() == &m_debugInterface->device())
 		{
-			offs_t pc = state->pcbase();
+			offs_t pc = m_debugInterface->device().state().pcbase();
 			debug.console().printf("%s (PC=%X)\n", buffer, pc);
 			m_debugInterface->compute_debug_flags();
 		}

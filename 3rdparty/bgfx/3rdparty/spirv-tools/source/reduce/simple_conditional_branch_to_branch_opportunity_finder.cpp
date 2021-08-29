@@ -20,17 +20,20 @@
 namespace spvtools {
 namespace reduce {
 
+using opt::IRContext;
+using opt::Instruction;
+
 std::vector<std::unique_ptr<ReductionOpportunity>>
 SimpleConditionalBranchToBranchOpportunityFinder::GetAvailableOpportunities(
-    opt::IRContext* context, uint32_t target_function) const {
+    IRContext* context) const {
   std::vector<std::unique_ptr<ReductionOpportunity>> result;
 
   // Consider every function.
-  for (auto* function : GetTargetFunctions(context, target_function)) {
+  for (auto& function : *context->module()) {
     // Consider every block in the function.
-    for (auto& block : *function) {
+    for (auto& block : function) {
       // The terminator must be SpvOpBranchConditional.
-      opt::Instruction* terminator = block.terminator();
+      Instruction* terminator = block.terminator();
       if (terminator->opcode() != SpvOpBranchConditional) {
         continue;
       }

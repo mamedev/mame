@@ -422,10 +422,10 @@ int TPpContext::eval(int token, int precedence, bool shortCircuit, int& res, boo
             if (! parseContext.isReadingHLSL() && isMacroInput()) {
                 if (parseContext.relaxedErrors())
                     parseContext.ppWarn(ppToken->loc, "nonportable when expanded from macros for preprocessor expression",
-                        "defined", "");
+                                                      "defined", "");
                 else
                     parseContext.ppError(ppToken->loc, "cannot use in preprocessor expression when expanded from macros",
-                        "defined", "");
+                                                       "defined", "");
             }
             bool needclose = 0;
             token = scanToken(ppToken);
@@ -455,7 +455,6 @@ int TPpContext::eval(int token, int precedence, bool shortCircuit, int& res, boo
                 token = scanToken(ppToken);
             }
         } else {
-            token = tokenPaste(token, *ppToken);
             token = evalToToken(token, shortCircuit, res, err, ppToken);
             return eval(token, precedence, shortCircuit, res, err, ppToken);
         }
@@ -622,25 +621,14 @@ int TPpContext::CPPinclude(TPpToken* ppToken)
 {
     const TSourceLoc directiveLoc = ppToken->loc;
     bool startWithLocalSearch = true; // to additionally include the extra "" paths
-    int token;
+    int token = scanToken(ppToken);
 
-    // Find the first non-whitespace char after #include
-    int ch = getChar();
-    while (ch == ' ' || ch == '\t') {
-        ch = getChar();
-    }
-    if (ch == '<') {
-        // <header-name> style
+    // handle <header-name>-style #include
+    if (token == '<') {
         startWithLocalSearch = false;
         token = scanHeaderName(ppToken, '>');
-    } else if (ch == '"') {
-        // "header-name" style
-        token = scanHeaderName(ppToken, '"');
-    } else {
-        // unexpected, get the full token to generate the error
-        ungetChar();
-        token = scanToken(ppToken);
     }
+    // otherwise ppToken already has the header name and it was "header-name" style
 
     if (token != PpAtomConstString) {
         parseContext.ppError(directiveLoc, "must be followed by a header name", "#include", "");
@@ -723,9 +711,7 @@ int TPpContext::CPPline(TPpToken* ppToken)
     const char* sourceName = nullptr; // Optional source file name.
     bool lineErr = false;
     bool fileErr = false;
-    disableEscapeSequences = true;
     token = eval(token, MIN_PRECEDENCE, false, lineRes, lineErr, ppToken);
-    disableEscapeSequences = false;
     if (! lineErr) {
         lineToken = lineRes;
         if (token == '\n')
@@ -768,9 +754,7 @@ int TPpContext::CPPline(TPpToken* ppToken)
 // Handle #error
 int TPpContext::CPPerror(TPpToken* ppToken)
 {
-    disableEscapeSequences = true;
     int token = scanToken(ppToken);
-    disableEscapeSequences = false;
     std::string message;
     TSourceLoc loc = ppToken->loc;
 
@@ -1185,9 +1169,7 @@ MacroExpandResult TPpContext::MacroExpand(TPpToken* ppToken, bool expandUndef, b
     int macroAtom = atomStrings.getAtom(ppToken->name);
     switch (macroAtom) {
     case PpAtomLineMacro:
-        // Arguments which are macro have been replaced in the first stage.
-        if (ppToken->ival == 0)
-            ppToken->ival = parseContext.getCurrentLoc().line;
+        ppToken->ival = parseContext.getCurrentLoc().line;
         snprintf(ppToken->name, sizeof(ppToken->name), "%d", ppToken->ival);
         UngetToken(PpAtomConstInt, ppToken);
         return MacroExpandStarted;
@@ -1288,11 +1270,6 @@ MacroExpandResult TPpContext::MacroExpand(TPpToken* ppToken, bool expandUndef, b
                     nestStack.push_back('}');
                 else if (nestStack.size() > 0 && token == nestStack.back())
                     nestStack.pop_back();
-
-                //Macro replacement list is expanded in the last stage.
-                if (atomStrings.getAtom(ppToken->name) == PpAtomLineMacro)
-                    ppToken->ival = parseContext.getCurrentLoc().line;
-
                 in->args[arg]->putToken(token, ppToken);
                 tokenRecorded = true;
             }

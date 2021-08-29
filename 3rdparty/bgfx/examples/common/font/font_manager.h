@@ -20,13 +20,6 @@ class Atlas;
 // #define FONT_TYPE_RGBA              UINT32_C(0x00000300) // BGRA8
 #define FONT_TYPE_DISTANCE          UINT32_C(0x00000400) // L8
 #define FONT_TYPE_DISTANCE_SUBPIXEL UINT32_C(0x00000500) // L8
-#define FONT_TYPE_DISTANCE_OUTLINE  UINT32_C(0x00000600) // L8
-#define FONT_TYPE_DISTANCE_OUTLINE_IMAGE  UINT32_C(0x00001600) // L8 + BGRA8
-#define FONT_TYPE_DISTANCE_DROP_SHADOW  UINT32_C(0x00002700) // L8
-#define FONT_TYPE_DISTANCE_DROP_SHADOW_IMAGE  UINT32_C(0x00003800) // L8 + BGRA8
-#define FONT_TYPE_DISTANCE_OUTLINE_DROP_SHADOW_IMAGE  UINT32_C(0x00003900) // L8 + BGRA8
-#define FONT_TYPE_MASK_DISTANCE_IMAGE UINT32_C(0x00001000)
-#define FONT_TYPE_MASK_DISTANCE_DROP_SHADOW UINT32_C(0x00002000)
 
 struct FontInfo
 {
@@ -117,15 +110,12 @@ struct GlyphInfo
 	/// drawn as part of a string of text.
 	float advance_y;
 
-	/// Amount to scale a bitmap image glyph.
-	float bitmapScale;
-
 	/// Region index in the atlas storing textures.
 	uint16_t regionIndex;
 };
 
-BGFX_HANDLE(TrueTypeHandle)
-BGFX_HANDLE(FontHandle)
+BGFX_HANDLE(TrueTypeHandle);
+BGFX_HANDLE(FontHandle);
 
 class FontManager
 {
@@ -156,8 +146,7 @@ public:
 	void destroyTtf(TrueTypeHandle _handle);
 
 	/// Return a font whose height is a fixed pixel size.
-	FontHandle createFontByPixelSize(TrueTypeHandle _handle, uint32_t _typefaceIndex, uint32_t _pixelSize, uint32_t _fontType = FONT_TYPE_ALPHA,
-		uint16_t _glyphWidthPadding = 6, uint16_t glyphHeightPadding = 6);
+	FontHandle createFontByPixelSize(TrueTypeHandle _handle, uint32_t _typefaceIndex, uint32_t _pixelSize, uint32_t _fontType = FONT_TYPE_ALPHA);
 
 	/// Return a scaled child font whose height is a fixed pixel size.
 	FontHandle createScaledFontToPixelSize(FontHandle _baseFontHandle, uint32_t _pixelSize);
@@ -174,8 +163,6 @@ public:
 	/// Preload a single glyph, return true on success.
 	bool preloadGlyph(FontHandle _handle, CodePoint _character);
 
-	bool addGlyphBitmap(FontHandle _handle, CodePoint _character, uint16_t _width, uint16_t height, uint16_t _pitch, float extraScale, const uint8_t* _bitmapBuffer, float glyphOffsetX, float glyphOffsetY);
-
 	/// Return the font descriptor of a font.
 	///
 	/// @remark the handle is required to be valid
@@ -185,8 +172,6 @@ public:
 	/// glyph from a TrueType font if possible
 	///
 	const GlyphInfo* getGlyphInfo(FontHandle _handle, CodePoint _codePoint);
-
-	float getKerning(FontHandle _handle, CodePoint _prevCodePoint, CodePoint _codePoint);
 
 	const GlyphInfo& getBlackGlyph() const
 	{

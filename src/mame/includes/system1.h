@@ -93,6 +93,7 @@ public:
 	void sys1piox_315_5155(machine_config &config);
 	void sys2rowxb(machine_config &config);
 
+	void init_bank00();
 	void init_bank0c();
 	void init_bank44();
 

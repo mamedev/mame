@@ -1,9 +1,7 @@
 --
--- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2019 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
-
-MODULE_DIR = path.getabsolute("../")
 
 newoption {
 	trigger = "with-amalgamated",
@@ -50,11 +48,6 @@ newoption {
 	description = "Enable building examples.",
 }
 
-newoption {
-	trigger = "with-webgpu",
-	description = "Enable webgpu experimental renderer.",
-}
-
 newaction {
 	trigger = "idl",
 	description = "Generate bgfx interface source code",
@@ -76,46 +69,11 @@ newaction {
 		do
 			local csgen = require "bindings-cs"
 			csgen.write(csgen.gen(), "../bindings/cs/bgfx.cs")
-			csgen.write(csgen.gen_dllname(), "../bindings/cs/bgfx_dllname.cs")
-
+			
 			local dgen = require "bindings-d"
 			dgen.write(dgen.gen_types(), "../bindings/d/types.d")
 			dgen.write(dgen.gen_funcs(), "../bindings/d/funcs.d")
-
-			local csgen = require "bindings-bf"
-			csgen.write(csgen.gen(), "../bindings/bf/bgfx.bf")
 		end
-
-		os.exit()
-	end
-}
-
-newaction {
-	trigger = "version",
-	description = "Generate bgfx version.h",
-	execute = function ()
-
-		local f = io.popen("git rev-list --count HEAD")
-		local rev = string.match(f:read("*a"), ".*%S")
-		f:close()
-		f = io.popen("git log --format=format:%H -1")
-		local sha1 = f:read("*a")
-		f:close()
-		io.output(path.join(MODULE_DIR, "src/version.h"))
-		io.write("/*\n")
-		io.write(" * Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n")
-		io.write(" * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n")
-		io.write(" */\n")
-		io.write("\n")
-		io.write("/*\n")
-		io.write(" *\n")
-		io.write(" * AUTO GENERATED! DO NOT EDIT!\n")
-		io.write(" *\n")
-		io.write(" */\n")
-		io.write("\n")
-		io.write("#define BGFX_REV_NUMBER " .. rev .. "\n")
-		io.write("#define BGFX_REV_SHA1   \"" .. sha1 .. "\"\n")
-		io.close()
 
 		os.exit()
 	end
@@ -127,9 +85,9 @@ solution "bgfx"
 		"Release",
 	}
 
-	if _ACTION ~= nil and _ACTION:match "^xcode" then
+	if _ACTION:match "xcode*" then
 		platforms {
-			"Native", -- let xcode decide based on the target output
+			"Universal",
 		}
 	else
 		platforms {
@@ -143,6 +101,7 @@ solution "bgfx"
 	language "C++"
 	startproject "example-00-helloworld"
 
+MODULE_DIR = path.getabsolute("../")
 BGFX_DIR   = path.getabsolute("..")
 BX_DIR     = os.getenv("BX_DIR")
 BIMG_DIR   = os.getenv("BIMG_DIR")
@@ -160,32 +119,15 @@ end
 if not os.isdir(BX_DIR) or not os.isdir(BIMG_DIR) then
 
 	if not os.isdir(BX_DIR) then
-		print("bx not found at \"" .. BX_DIR .. "\". git clone https://github.com/bkaradzic/bx?")
+		print("bx not found at " .. BX_DIR)
 	end
 
 	if not os.isdir(BIMG_DIR) then
-		print("bimg not found at \"" .. BIMG_DIR .. "\". git clone https://github.com/bkaradzic/bimg?")
+		print("bimg not found at " .. BIMG_DIR)
 	end
 
 	print("For more info see: https://bkaradzic.github.io/bgfx/build.html")
 	os.exit()
-end
-
-if _OPTIONS["with-webgpu"] then
-	DAWN_DIR = os.getenv("DAWN_DIR")
-
-	if not DAWN_DIR then
-		DAWN_DIR = path.getabsolute(path.join(BGFX_DIR, "../dawn"))
-	end
-
-	if not os.isdir(DAWN_DIR) and "wasm*" ~= _OPTIONS["gcc"] then
-		print("Dawn not found at \"" .. DAWN_DIR .. "\". git clone https://dawn.googlesource.com/dawn?")
-
-		print("For more info see: https://bkaradzic.github.io/bgfx/build.html")
-		os.exit()
-	end
-
-	_OPTIONS["with-windows"] = "10.0"
 end
 
 dofile (path.join(BX_DIR, "scripts/toolchain.lua"))
@@ -240,10 +182,6 @@ function exampleProjectDefaults()
 		"bx",
 	}
 
-	if _OPTIONS["with-webgpu"] then
-		usesWebGPU()
-	end
-
 	if _OPTIONS["with-sdl"] then
 		defines { "ENTRY_CONFIG_USE_SDL=1" }
 		links   { "SDL2" }
@@ -255,7 +193,7 @@ function exampleProjectDefaults()
 				}
 			end
 
-		configuration { "osx*" }
+		configuration { "osx" }
 			libdirs { "$(SDL2_DIR)/lib" }
 
 		configuration {}
@@ -280,7 +218,7 @@ function exampleProjectDefaults()
 				}
 			end
 
-		configuration { "osx*" }
+		configuration { "osx" }
 			linkoptions {
 				"-framework CoreVideo",
 				"-framework IOKit",
@@ -366,27 +304,22 @@ function exampleProjectDefaults()
 			"GLESv2",
 		}
 
-	configuration { "wasm*" }
+	configuration { "asmjs" }
 		kind "ConsoleApp"
+		targetextension ".bc"
 
-		linkoptions {
-			"-s TOTAL_MEMORY=32MB",
-			"-s ALLOW_MEMORY_GROWTH=1",
-			"--preload-file ../../../examples/runtime@/"
-		}
-
-		removeflags {
-			"OptimizeSpeed",
-		}
-
-		flags {
-			"Optimize"
-		}
-
-	configuration { "linux-* or freebsd" }
+	configuration { "linux-* or freebsd", "not linux-steamlink" }
 		links {
 			"X11",
 			"GL",
+			"pthread",
+		}
+
+	configuration { "linux-steamlink" }
+		links {
+			"EGL",
+			"GLESv2",
+			"SDL2",
 			"pthread",
 		}
 
@@ -401,7 +334,7 @@ function exampleProjectDefaults()
 			"pthread",
 		}
 
-	configuration { "osx*" }
+	configuration { "osx" }
 		linkoptions {
 			"-framework Cocoa",
 			"-framework QuartzCore",
@@ -503,22 +436,7 @@ end
 dofile "bgfx.lua"
 
 group "libs"
-
-local function userdefines()
-	local defines = {}
-	local BGFX_CONFIG = os.getenv("BGFX_CONFIG")
-	if BGFX_CONFIG then
-		for def in BGFX_CONFIG:gmatch "[^%s:]+" do
-			table.insert(defines, "BGFX_CONFIG_" .. def)
-		end
-	end
-
-	return defines
-end
-
-BGFX_CONFIG = userdefines()
-
-bgfxProject("", "StaticLib", BGFX_CONFIG)
+bgfxProject("", "StaticLib", {})
 
 dofile(path.join(BX_DIR,   "scripts/bx.lua"))
 dofile(path.join(BIMG_DIR, "scripts/bimg.lua"))
@@ -557,6 +475,7 @@ or _OPTIONS["with-combined-examples"] then
 		, "14-shadowvolumes"
 		, "15-shadowmaps-simple"
 		, "16-shadowmaps"
+		, "17-drawstress"
 		, "18-ibl"
 		, "19-oit"
 		, "20-nanovg"
@@ -580,16 +499,7 @@ or _OPTIONS["with-combined-examples"] then
 		, "39-assao"
 		, "40-svt"
 		, "41-tess"
-		, "42-bunnylod"
-		, "43-denoise"
-		, "44-sss"
-		, "45-bokeh"
 		)
-
-	-- 17-drawstress requires multithreading, does not compile for singlethreaded wasm
---	if platform is not single-threaded then
-		exampleProject(false, "17-drawstress")
---	end
 
 	-- C99 source doesn't compile under WinRT settings
 	if not premake.vstudio.iswinrt() then
@@ -599,7 +509,7 @@ end
 
 if _OPTIONS["with-shared-lib"] then
 	group "libs"
-	bgfxProject("-shared-lib", "SharedLib", BGFX_CONFIG)
+	bgfxProject("-shared-lib", "SharedLib", {})
 end
 
 if _OPTIONS["with-tools"] then

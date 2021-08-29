@@ -142,7 +142,6 @@ struct TBuiltInResource {
     int maxTaskWorkGroupSizeY_NV;
     int maxTaskWorkGroupSizeZ_NV;
     int maxMeshViewCountNV;
-    int maxDualSourceDrawBuffersEXT;
 
     TLimits limits;
 };

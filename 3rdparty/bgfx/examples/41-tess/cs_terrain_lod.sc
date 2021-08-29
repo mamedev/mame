@@ -54,7 +54,7 @@ void main()
 	}
 	else
 	{
-		targetLod = parentLod = findMSB_(key);
+		targetLod = parentLod = findMSB(key);
 	}
 
 	updateSubdBuffer(primID, key, targetLod, parentLod);

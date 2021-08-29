@@ -20,10 +20,12 @@
 namespace spvtools {
 namespace reduce {
 
+using opt::IRContext;
+using opt::Instruction;
+
 std::vector<std::unique_ptr<ReductionOpportunity>>
 ConditionalBranchToSimpleConditionalBranchOpportunityFinder::
-    GetAvailableOpportunities(opt::IRContext* context,
-                              uint32_t target_function) const {
+    GetAvailableOpportunities(IRContext* context) const {
   std::vector<std::unique_ptr<ReductionOpportunity>> result;
 
   // Find the opportunities for redirecting all false targets before the
@@ -32,12 +34,12 @@ ConditionalBranchToSimpleConditionalBranchOpportunityFinder::
   // reducer is improved by avoiding contiguous opportunities that disable one
   // another.
   for (bool redirect_to_true : {true, false}) {
-    // Consider every relevant function.
-    for (auto* function : GetTargetFunctions(context, target_function)) {
+    // Consider every function.
+    for (auto& function : *context->module()) {
       // Consider every block in the function.
-      for (auto& block : *function) {
+      for (auto& block : function) {
         // The terminator must be SpvOpBranchConditional.
-        opt::Instruction* terminator = block.terminator();
+        Instruction* terminator = block.terminator();
         if (terminator->opcode() != SpvOpBranchConditional) {
           continue;
         }

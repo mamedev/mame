@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -9,25 +9,21 @@
 
 namespace bx
 {
-	namespace radix_sort_detail
-	{
-		constexpr uint32_t kBits          = 11;
-		constexpr uint32_t kHistogramSize = 1<<kBits;
-		constexpr uint32_t kBitMask       = kHistogramSize-1;
-
-	} // namespace radix_sort_detail
+#define BX_RADIXSORT_BITS 11
+#define BX_RADIXSORT_HISTOGRAM_SIZE (1<<BX_RADIXSORT_BITS)
+#define BX_RADIXSORT_BIT_MASK (BX_RADIXSORT_HISTOGRAM_SIZE-1)
 
 	inline void radixSort(uint32_t* _keys, uint32_t* _tempKeys, uint32_t _size)
 	{
 		uint32_t* keys = _keys;
 		uint32_t* tempKeys = _tempKeys;
 
-		uint32_t histogram[radix_sort_detail::kHistogramSize];
+		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 3; ++pass)
 		{
-			memSet(histogram, 0, sizeof(uint32_t)*radix_sort_detail::kHistogramSize);
+			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -36,7 +32,7 @@ namespace bx
 				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 				{
 					key = keys[ii];
-					uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
+					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
 					++histogram[index];
 					sorted &= prevKey <= key;
 				}
@@ -48,7 +44,7 @@ namespace bx
 			}
 
 			uint32_t offset = 0;
-			for (uint32_t ii = 0; ii < radix_sort_detail::kHistogramSize; ++ii)
+			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
 			{
 				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
@@ -58,7 +54,7 @@ namespace bx
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				uint32_t key = keys[ii];
-				uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
+				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
 				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 			}
@@ -67,7 +63,7 @@ namespace bx
 			tempKeys = keys;
 			keys = swapKeys;
 
-			shift += radix_sort_detail::kBits;
+			shift += BX_RADIXSORT_BITS;
 		}
 
 done:
@@ -86,12 +82,12 @@ done:
 		Ty* values = _values;
 		Ty* tempValues = _tempValues;
 
-		uint32_t histogram[radix_sort_detail::kHistogramSize];
+		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 3; ++pass)
 		{
-			memSet(histogram, 0, sizeof(uint32_t)*radix_sort_detail::kHistogramSize);
+			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -100,7 +96,7 @@ done:
 				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 				{
 					key = keys[ii];
-					uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
+					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
 					++histogram[index];
 					sorted &= prevKey <= key;
 				}
@@ -112,7 +108,7 @@ done:
 			}
 
 			uint32_t offset = 0;
-			for (uint32_t ii = 0; ii < radix_sort_detail::kHistogramSize; ++ii)
+			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
 			{
 				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
@@ -122,7 +118,7 @@ done:
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				uint32_t key = keys[ii];
-				uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
+				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
 				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 				tempValues[dest] = values[ii];
@@ -136,7 +132,7 @@ done:
 			tempValues = values;
 			values = swapValues;
 
-			shift += radix_sort_detail::kBits;
+			shift += BX_RADIXSORT_BITS;
 		}
 
 done:
@@ -156,12 +152,12 @@ done:
 		uint64_t* keys = _keys;
 		uint64_t* tempKeys = _tempKeys;
 
-		uint32_t histogram[radix_sort_detail::kHistogramSize];
+		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 6; ++pass)
 		{
-			memSet(histogram, 0, sizeof(uint32_t)*radix_sort_detail::kHistogramSize);
+			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -170,7 +166,7 @@ done:
 				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 				{
 					key = keys[ii];
-					uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
+					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
 					++histogram[index];
 					sorted &= prevKey <= key;
 				}
@@ -182,7 +178,7 @@ done:
 			}
 
 			uint32_t offset = 0;
-			for (uint32_t ii = 0; ii < radix_sort_detail::kHistogramSize; ++ii)
+			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
 			{
 				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
@@ -192,7 +188,7 @@ done:
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				uint64_t key = keys[ii];
-				uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
+				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
 				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 			}
@@ -201,7 +197,7 @@ done:
 			tempKeys = keys;
 			keys = swapKeys;
 
-			shift += radix_sort_detail::kBits;
+			shift += BX_RADIXSORT_BITS;
 		}
 
 done:
@@ -220,12 +216,12 @@ done:
 		Ty* values = _values;
 		Ty* tempValues = _tempValues;
 
-		uint32_t histogram[radix_sort_detail::kHistogramSize];
+		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 6; ++pass)
 		{
-			memSet(histogram, 0, sizeof(uint32_t)*radix_sort_detail::kHistogramSize);
+			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -234,7 +230,7 @@ done:
 				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 				{
 					key = keys[ii];
-					uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
+					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
 					++histogram[index];
 					sorted &= prevKey <= key;
 				}
@@ -246,7 +242,7 @@ done:
 			}
 
 			uint32_t offset = 0;
-			for (uint32_t ii = 0; ii < radix_sort_detail::kHistogramSize; ++ii)
+			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
 			{
 				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
@@ -256,7 +252,7 @@ done:
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				uint64_t key = keys[ii];
-				uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
+				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
 				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 				tempValues[dest] = values[ii];
@@ -270,7 +266,7 @@ done:
 			tempValues = values;
 			values = swapValues;
 
-			shift += radix_sort_detail::kBits;
+			shift += BX_RADIXSORT_BITS;
 		}
 
 done:
@@ -284,5 +280,9 @@ done:
 			}
 		}
 	}
+
+#undef BX_RADIXSORT_BITS
+#undef BX_RADIXSORT_HISTOGRAM_SIZE
+#undef BX_RADIXSORT_BIT_MASK
 
 } // namespace bx

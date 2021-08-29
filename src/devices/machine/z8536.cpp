@@ -919,32 +919,6 @@ void cio_base_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 int z8536_device::z80daisy_irq_state()
 {
-	static const int prio[] =
-	{
-		COUNTER_TIMER_3_COMMAND_AND_STATUS,
-		PORT_A_COMMAND_AND_STATUS,
-		COUNTER_TIMER_2_COMMAND_AND_STATUS,
-		PORT_B_COMMAND_AND_STATUS,
-		COUNTER_TIMER_1_COMMAND_AND_STATUS
-	};
-
-	if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_MIE)
-	{
-		for (int i = 0; i < 5; i++)
-		{
-			if (m_register[prio[i]] & PCS_IUS)
-			{
-				// we are currently servicing an interrupt request
-				return Z80_DAISY_IEO;
-			}
-			else if ((m_register[prio[i]] & PCS_IE) && (m_register[prio[i]] & PCS_IP))
-			{
-				// indicate that we have an interrupt request waiting
-				return Z80_DAISY_INT;
-			}
-		}
-	}
-
 	return 0;
 }
 
@@ -1041,19 +1015,19 @@ u8 z8536_device::read(offs_t offset)
 	{
 		switch (offset & 0x03)
 		{
-		case EXT_PORT_C:
+		case 0:
 			data = read_register(PORT_C_DATA);
 			break;
 
-		case EXT_PORT_B:
+		case 1:
 			data = read_register(PORT_B_DATA);
 			break;
 
-		case EXT_PORT_A:
+		case 2:
 			data = read_register(PORT_A_DATA);
 			break;
 
-		case EXT_CONTROL:
+		case 3:
 			// state 0 or state 1: read data
 			data = read_register(m_pointer);
 
@@ -1107,19 +1081,19 @@ void z8536_device::write(offs_t offset, u8 data)
 	{
 		switch (offset & 0x03)
 		{
-		case EXT_PORT_C:
+		case PORT_C:
 			write_register(PORT_C_DATA, data);
 			break;
 
-		case EXT_PORT_B:
+		case PORT_B:
 			write_register(PORT_B_DATA, data);
 			break;
 
-		case EXT_PORT_A:
+		case PORT_A:
 			write_register(PORT_A_DATA, data);
 			break;
 
-		case EXT_CONTROL:
+		case CONTROL:
 			if (m_state0)
 			{
 				// state 0: write pointer

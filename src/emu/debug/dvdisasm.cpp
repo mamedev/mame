@@ -25,12 +25,8 @@
 debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t &device)
 	: debug_view_source(std::move(name), &device),
 		m_space(device.memory().space(AS_PROGRAM)),
-		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM)),
-		m_pcbase(nullptr)
+		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM))
 {
-	const device_state_interface *state;
-	if (device.interface(state))
-		m_pcbase = state->state_find_entry(STATE_GENPCBASE);
 }
 
 
@@ -168,7 +164,7 @@ void debug_view_disasm::view_char(int chval)
 		case DCH_HOME:              // set the active column to the PC
 		{
 			const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-			offs_t pc = source.pcbase();
+			offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
 
 			// figure out which row the pc is on
 			for(unsigned int curline = 0; curline < m_dasm.size(); curline++)
@@ -381,7 +377,7 @@ void debug_view_disasm::view_update()
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 	debug_disasm_buffer buffer(*source.device());
-	offs_t pc = source.pcbase();
+	offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
 
 	generate_dasm(buffer, pc);
 

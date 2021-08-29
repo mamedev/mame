@@ -52,8 +52,7 @@ applefdintf_device::applefdintf_device(const machine_config &mconfig, device_typ
 	m_phases_cb(*this),
 	m_devsel_cb(*this),
 	m_sel35_cb(*this),
-	m_hdsel_cb(*this),
-	m_dat1byte_cb(*this)
+	m_hdsel_cb(*this)
 {
 }
 
@@ -63,7 +62,6 @@ void applefdintf_device::device_start()
 	m_devsel_cb.resolve_safe();
 	m_sel35_cb.resolve_safe();
 	m_hdsel_cb.resolve_safe();
-	m_dat1byte_cb.resolve_safe();
 	save_item(NAME(m_phases));
 	save_item(NAME(m_phases_input));
 }

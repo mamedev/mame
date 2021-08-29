@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -208,7 +208,7 @@ namespace entry
 	static void initTranslateKey(uint16_t _xk, Key::Enum _key)
 	{
 		_xk += 256;
-		BX_ASSERT(_xk < BX_COUNTOF(s_translateKey), "Out of bounds %d.", _xk);
+		BX_CHECK(_xk < BX_COUNTOF(s_translateKey), "Out of bounds %d.", _xk);
 		s_translateKey[_xk&0x1ff] = (uint8_t)_key;
 	}
 
@@ -354,9 +354,8 @@ namespace entry
 			m_root   = RootWindow(m_display, screen);
 
 			bx::memSet(&m_windowAttrs, 0, sizeof(m_windowAttrs) );
-			m_windowAttrs.background_pixel = 0;
+			m_windowAttrs.background_pixmap = 0;
 			m_windowAttrs.border_pixel = 0;
-			m_windowAttrs.bit_gravity = StaticGravity;
 			m_windowAttrs.event_mask = 0
 					| ButtonPressMask
 					| ButtonReleaseMask
@@ -375,9 +374,14 @@ namespace entry
 									, m_depth
 									, InputOutput
 									, m_visual
-									, CWBorderPixel|CWEventMask|CWBackPixel|CWBitGravity
+									, CWBorderPixel|CWEventMask
 									, &m_windowAttrs
 									);
+
+			// Clear window to black.
+			XSetWindowAttributes attr;
+			bx::memSet(&attr, 0, sizeof(attr) );
+			XChangeWindowAttributes(m_display, m_window[0], CWBackPixel, &attr);
 
 			const char* wmDeleteWindowName = "WM_DELETE_WINDOW";
 			Atom wmDeleteWindow;
@@ -595,10 +599,15 @@ namespace entry
 									, m_depth
 									, InputOutput
 									, m_visual
-									, CWBorderPixel|CWEventMask|CWBackPixel|CWBitGravity
+									, CWBorderPixel|CWEventMask
 									, &m_windowAttrs
 									);
 			m_window[_handle.idx] = window;
+
+			// Clear window to black.
+			XSetWindowAttributes attr;
+			bx::memSet(&attr, 0, sizeof(attr) );
+			XChangeWindowAttributes(m_display, window, CWBackPixel, &attr);
 
 			const char* wmDeleteWindowName = "WM_DELETE_WINDOW";
 			Atom wmDeleteWindow;
@@ -746,10 +755,7 @@ namespace entry
 	{
 		Display* display = s_ctx.m_display;
 		Window   window  = s_ctx.m_window[_handle.idx];
-
-		XTextProperty tp;
-		Xutf8TextListToTextProperty(display, (char**)&_title, 1, XUTF8StringStyle, &tp);
-		XSetWMName(display, window, &tp);
+		XStoreName(display, window, _title);
 	}
 
 	void setWindowFlags(WindowHandle _handle, uint32_t _flags, bool _enabled)

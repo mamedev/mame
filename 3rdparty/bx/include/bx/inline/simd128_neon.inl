@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -9,15 +9,6 @@
 
 namespace bx
 {
-
-#if BX_COMPILER_CLANG
-#	define SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)     __builtin_shufflevector(_a, _a, _i0, _i1, _i2, _i3 )
-#	define SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3) __builtin_shufflevector(_a, _b, _i0, _i1, _i2, _i3 )
-#else
-#	define SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)     __builtin_shuffle(_a, (uint32x4_t){ _i0, _i1, _i2, _i3 })
-#	define SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3) __builtin_shuffle(_a, _b, (uint32x4_t){ _i0, _i1, _i2, _i3 })
-#endif
-
 #define ELEMx 0
 #define ELEMy 1
 #define ELEMz 2
@@ -26,7 +17,7 @@ namespace bx
 			template<>                                                                                \
 			BX_SIMD_FORCE_INLINE simd128_neon_t simd_swiz_##_x##_y##_z##_w(simd128_neon_t _a)         \
 			{                                                                                         \
-				return SHUFFLE_A(_a, ELEM##_x, ELEM##_y, ELEM##_z, ELEM##_w ); \
+				return __builtin_shuffle(_a, (uint32x4_t){ ELEM##_x, ELEM##_y, ELEM##_z, ELEM##_w }); \
 			}
 
 #include "simd128_swizzle.inl"
@@ -83,52 +74,50 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_shuf_xyAB(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		return SHUFFLE_AB(_a, _b, 0, 1, 4, 5 );
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 0, 1, 4, 5 });
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_shuf_ABxy(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		return SHUFFLE_AB(_a, _b, 4, 5, 0, 1 );
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 4, 5, 0, 1 });
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_shuf_CDzw(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		return SHUFFLE_AB(_a, _b, 6, 7, 2, 3 );
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 6, 7, 2, 3 });
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_shuf_zwCD(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		return SHUFFLE_AB(_a, _b, 2, 3, 6, 7 );
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 2, 3, 6, 7 });
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_shuf_xAyB(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		return SHUFFLE_AB(_a, _b, 0, 4, 1, 5 );
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 0, 4, 1, 5 });
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_shuf_AxBy(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		return SHUFFLE_AB(_a, _b, 4, 0, 5, 1 );
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 1, 5, 0, 4 });
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_shuf_zCwD(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		return SHUFFLE_AB(_a, _b, 2, 6, 3, 7 );
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 2, 6, 3, 7 });
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_shuf_CzDw(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		return SHUFFLE_AB(_a, _b, 6, 2, 7, 3 );
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 6, 2, 7, 3 });
 	}
-#undef SHUFFLE_A
-#undef SHUFFLE_AB
 
 	template<>
 	BX_SIMD_FORCE_INLINE float simd_x(simd128_neon_t _a)
@@ -284,16 +273,10 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmpneq(simd128_neon_t _a, simd128_neon_t _b)
-	{
-		return simd_cmpneq_ni(_a, _b);
-	}
-
-	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmplt(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		const uint32x4_t tmp        = vcltq_f32(_a, _b);
-		const simd128_neon_t result = vreinterpretq_f32_u32(tmp);
+		const uint32x4_t tmp    = vcltq_f32(_a, _b);
+		const simd128_neon_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -301,8 +284,8 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmple(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		const uint32x4_t tmp        = vcleq_f32(_a, _b);
-		const simd128_neon_t result = vreinterpretq_f32_u32(tmp);
+		const uint32x4_t tmp    = vcleq_f32(_a, _b);
+		const simd128_neon_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -310,8 +293,8 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmpgt(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		const uint32x4_t tmp        = vcgtq_f32(_a, _b);
-		const simd128_neon_t result = vreinterpretq_f32_u32(tmp);
+		const uint32x4_t tmp    = vcgtq_f32(_a, _b);
+		const simd128_neon_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -319,8 +302,8 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmpge(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		const uint32x4_t tmp        = vcgeq_f32(_a, _b);
-		const simd128_neon_t result = vreinterpretq_f32_u32(tmp);
+		const uint32x4_t tmp    = vcgeq_f32(_a, _b);
+		const simd128_neon_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -384,7 +367,6 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sll(simd128_neon_t _a, int _count)
 	{
-#if !BX_COMPILER_CLANG
 		if (__builtin_constant_p(_count) )
 		{
 			const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
@@ -393,7 +375,7 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 
 			return result;
 		}
-#endif
+
 		const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
 		const int32x4_t  shift  = vdupq_n_s32(_count);
 		const uint32x4_t tmp1   = vshlq_u32(tmp0, shift);
@@ -405,7 +387,6 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_srl(simd128_neon_t _a, int _count)
 	{
-#if !BX_COMPILER_CLANG
 		if (__builtin_constant_p(_count) )
 		{
 			const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
@@ -414,7 +395,7 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 
 			return result;
 		}
-#endif
+
 		const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
 		const int32x4_t  shift  = vdupq_n_s32(-_count);
 		const uint32x4_t tmp1   = vshlq_u32(tmp0, shift);
@@ -426,7 +407,6 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sra(simd128_neon_t _a, int _count)
 	{
-#if !BX_COMPILER_CLANG
 		if (__builtin_constant_p(_count) )
 		{
 			const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
@@ -435,7 +415,7 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 
 			return result;
 		}
-#endif
+
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t shift  = vdupq_n_s32(-_count);
 		const int32x4_t tmp1   = vshlq_s32(tmp0, shift);
