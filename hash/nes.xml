@@ -56801,11 +56801,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- This is a later re-release of the Supertone game -->
 	<software name="jingkxz" cloneof="jkxz">
-		<description>Jing Ke Xin Zhuan (Chi, Shenzhen Jncota)</description>
+		<description>Jīng Kē Xīnzhuàn (China, Shenzhen Jncota)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1001"/>
-		<info name="alt_title" value="荆轲新传"/>
+		<info name="alt_title" value="荊軻新傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
@@ -56823,11 +56823,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- This is a later re-release of the C&E game -->
 	<software name="shenghuo" cloneof="shenghlz">
-		<description>Sheng Huo Lie Zhuan (Chi)</description>
+		<description>Shènghuǒ Lièzhuàn (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1002"/>
-		<info name="alt_title" value="圣火列传"/>
+		<info name="alt_title" value="聖火列傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
@@ -56844,11 +56844,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dierciji" supported="no">
-		<description>Di Er Ci Ji Qi Ren Da Zhan (Chi)</description>
+		<description>Dì-èr Cì Chāojí Jīqìrén Dàzhàn (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1003"/>
-		<info name="alt_title" value="第二次机器人大战"/>
+		<info name="alt_title" value="第二次超級机器人大战"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
@@ -56866,7 +56866,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="fankfb" supported="no">
-		<description>Fan Kong Feng Bao (Chi)</description>
+		<description>Fǎnkǒng Fēngbào (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1004"/>
@@ -56888,7 +56888,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="fengshnb" supported="no">
-		<description>Feng Shen Bang (Chi)</description>
+		<description>Fēngshén Bǎng (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1005"/>
@@ -56910,7 +56910,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="xianscq" supported="no">
-		<description>Xiang Shuai Chuan Qi (Chi, Shenzhen Jncota)</description>
+		<description>Xiāngshuài Chuánqí (China, Shenzhen Jncota)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1007"/>
@@ -56932,7 +56932,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="jjzs3" supported="no">
-		<description>Ji Jia Zhan Shi III (Chi)</description>
+		<description>Jījiǎ Zhànshì III (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1010"/>
@@ -56955,7 +56955,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- This seems to be a later re-release of the Supertone game with an altered title -->
 	<software name="zgfyun" cloneof="jkxz">
-		<description>Zhan Guo Feng Yun (Chi)</description>
+		<description>Zhànguó Fēngyún (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1013"/>
@@ -56977,7 +56977,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- This seems to be a later re-release of the C&E game with an altered title -->
 	<software name="xiakecq" cloneof="shenghlz">
-		<description>Xia Ke Chuan Qi (Chi)</description>
+		<description>Xiákè Chuánqí (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1014"/>
@@ -56998,7 +56998,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="chuliuxx" supported="no">
-		<description>Chu Liu Xiang Xin Zhuan (Chi)</description>
+		<description>Chǔ Liúxiāng Xīnzhuàn (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1015"/>
@@ -57020,7 +57020,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="zhanssj" supported="no">
-		<description>Zhan Shen Shi Jie (Chi)</description>
+		<description>Zhànshén Shìjiè (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1019"/>
@@ -57042,7 +57042,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="jianxqy" supported="no">
-		<description>Jian Xia Qing Yuan (Chi)</description>
+		<description>Jiànxiá Qíngyuán (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1020"/>
@@ -57064,7 +57064,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="shenmoda" supported="no">
-		<description>Shen Mo Da Lu (Chi)</description>
+		<description>Shénmó Dàlù (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1052"/>
@@ -57086,7 +57086,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kdgsfc" supported="no">
-		<description>Kou Dai Guai Shou - Fei Cui Ban (Chi)</description>
+		<description>Kǒudài Guàishòu - Fěicuì Bǎn (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1063"/>
@@ -57107,7 +57107,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hundunds" supported="no">
-		<description>Yong Zhe Hei An Shi Jie - Hun Dun De Shi Jie (Chi)</description>
+		<description>Yǒngzhě Hēi'àn Shìjiè - Hùndùn De Shìjiè (China)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1066"/>
@@ -57129,7 +57129,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kdgszs" supported="partial">
-		<description>Kou Dai Guai Shou - Zuan Shi Ban (KT-008 PCB)</description>
+		<description>Kǒudài Guàishòu - Zuànshí Bǎn (KT-008 PCB)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 钻石版 ~ Pokemon Diamond"/>
@@ -57150,7 +57150,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kdgszz" cloneof="kdgszs" supported="partial">
-		<description>Kou Dai Guai Shou - Zhen Zhu Ban (KT-008 PCB, Alt)</description>
+		<description>Kǒudài Guàishòu - Zhēnzhū Bǎn (KT-008 PCB, alt)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 珍珠版 ~ Pokemon Pearl"/>
@@ -57171,7 +57171,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kdgsbj" cloneof="kdgszs" supported="partial">
-		<description>Kou Dai Guai Shou - Bai jin Ban (KT-008 PCB, Alt 2)</description>
+		<description>Kǒudài Guàishòu - Báijīn Bǎn (KT-008 PCB, alt 2)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 白金版 ~ Pokemon Platinum"/>
@@ -64414,7 +64414,7 @@ We don't include these hacks because they were not burned into real carts nor so
 
 <!-- nointro -->
 	<software name="shenghlz">
-		<description>Sheng Huo Lie Zhuan (Asia)</description>
+		<description>Shènghuǒ Lièzhuàn (Asia)</description>
 		<year>1991</year>
 		<publisher>Computer &amp; Entertainment</publisher>
 		<info name="serial" value="A-1061"/>
@@ -66002,7 +66002,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="jkxz1" cloneof="jkxz">
-		<description>Jing Ke Xin Zhuan (Chi, Alt)</description>
+		<description>Jīng Kē Xīnzhuàn (China, alt)</description>
 		<year>1992</year>
 		<publisher>Supertone</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66023,7 +66023,7 @@ All musics were removed in this game.
 
 <!-- Comment from Cah4e3: other dumps are patched lately with come portions of code to seems handle another PAL modes, which original game doesn't... so this might be the original version of the game -->
 	<software name="jkxz2" cloneof="jkxz">
-		<description>Jing Ke Xin Zhuan (Chi, Alt 2)</description>
+		<description>Jīng Kē Xīnzhuàn (China, alt 2)</description>
 		<year>1992</year>
 		<publisher>Supertone</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66043,7 +66043,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="jkxz">
-		<description>Jing Ke Xin Zhuan (Chi)</description>
+		<description>Jīng Kē Xīnzhuàn (China)</description>
 		<year>1992</year>
 		<publisher>Supertone</publisher>
 		<part name="cart" interface="nes_cart">
