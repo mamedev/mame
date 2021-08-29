@@ -36,9 +36,8 @@ class DecorationManager {
   }
   DecorationManager() = delete;
 
-  // Removes all decorations (direct and through groups) where |pred| is
-  // true and that apply to |id| so that they no longer apply to |id|.  Returns
-  // true if something changed.
+  // Changes all of the decorations (direct and through groups) where |pred| is
+  // true and that apply to |id| so that they no longer apply to |id|.
   //
   // If |id| is part of a group, it will be removed from the group if it
   // does not use all of the group's decorations, or, if there are no
@@ -53,9 +52,9 @@ class DecorationManager {
   // removed, then the |OpGroupDecorate| and
   // |OpGroupMemberDecorate| for the group will be killed, but not the defining
   // |OpDecorationGroup| instruction.
-  bool RemoveDecorationsFrom(
-      uint32_t id, std::function<bool(const Instruction&)> pred =
-                       [](const Instruction&) { return true; });
+  void RemoveDecorationsFrom(uint32_t id,
+                             std::function<bool(const Instruction&)> pred =
+                                 [](const Instruction&) { return true; });
 
   // Removes all decorations from the result id of |inst|.
   //
@@ -102,13 +101,6 @@ class DecorationManager {
   // terminated and this function returns false.
   bool WhileEachDecoration(uint32_t id, uint32_t decoration,
                            std::function<bool(const Instruction&)> f);
-
-  // |f| is run on each decoration instruction for |id| with decoration
-  // |decoration|. Processes all decoration which target |id| either directly or
-  // indirectly through decoration groups. If |f| returns true, iteration is
-  // terminated and this function returns true. Otherwise returns false.
-  bool FindDecoration(uint32_t id, uint32_t decoration,
-                      std::function<bool(const Instruction&)> f);
 
   // Clone all decorations from one id |from|.
   // The cloned decorations are assigned to the given id |to| and are

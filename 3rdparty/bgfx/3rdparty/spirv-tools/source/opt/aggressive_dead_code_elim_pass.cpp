@@ -22,7 +22,6 @@
 
 #include "source/cfa.h"
 #include "source/latest_version_glsl_std_450_header.h"
-#include "source/opt/eliminate_dead_functions_util.h"
 #include "source/opt/iterator.h"
 #include "source/opt/reflect.h"
 #include "source/spirv_constant.h"
@@ -39,8 +38,6 @@ const uint32_t kLoopMergeMergeBlockIdInIdx = 0;
 const uint32_t kLoopMergeContinueBlockIdInIdx = 1;
 const uint32_t kCopyMemoryTargetAddrInIdx = 0;
 const uint32_t kCopyMemorySourceAddrInIdx = 1;
-const uint32_t kDebugDeclareOperandVariableIndex = 5;
-const uint32_t kGlobalVariableVariableIndex = 12;
 
 // Sorting functor to present annotation instructions in an easy-to-process
 // order. The functor orders by opcode first and falls back on unique id
@@ -108,17 +105,13 @@ bool AggressiveDCEPass::IsLocalVar(uint32_t varId) {
          IsVarOfStorage(varId, SpvStorageClassWorkgroup);
 }
 
-void AggressiveDCEPass::AddStores(Function* func, uint32_t ptrId) {
-  get_def_use_mgr()->ForEachUser(ptrId, [this, ptrId, func](Instruction* user) {
-    // If the user is not a part of |func|, skip it.
-    BasicBlock* blk = context()->get_instr_block(user);
-    if (blk && blk->GetParent() != func) return;
-
+void AggressiveDCEPass::AddStores(uint32_t ptrId) {
+  get_def_use_mgr()->ForEachUser(ptrId, [this, ptrId](Instruction* user) {
     switch (user->opcode()) {
       case SpvOpAccessChain:
       case SpvOpInBoundsAccessChain:
       case SpvOpCopyObject:
-        this->AddStores(func, user->result_id());
+        this->AddStores(user->result_id());
         break;
       case SpvOpLoad:
         break;
@@ -138,11 +131,11 @@ void AggressiveDCEPass::AddStores(Function* func, uint32_t ptrId) {
 }
 
 bool AggressiveDCEPass::AllExtensionsSupported() const {
-  // If any extension not in allowlist, return false
+  // If any extension not in whitelist, return false
   for (auto& ei : get_module()->extensions()) {
     const char* extName =
         reinterpret_cast<const char*>(&ei.GetInOperand(0).words[0]);
-    if (extensions_allowlist_.find(extName) == extensions_allowlist_.end())
+    if (extensions_whitelist_.find(extName) == extensions_whitelist_.end())
       return false;
   }
   return true;
@@ -176,13 +169,13 @@ bool AggressiveDCEPass::IsTargetDead(Instruction* inst) {
   return IsDead(tInst);
 }
 
-void AggressiveDCEPass::ProcessLoad(Function* func, uint32_t varId) {
+void AggressiveDCEPass::ProcessLoad(uint32_t varId) {
   // Only process locals
   if (!IsLocalVar(varId)) return;
   // Return if already processed
   if (live_local_vars_.find(varId) != live_local_vars_.end()) return;
   // Mark all stores to varId as live
-  AddStores(func, varId);
+  AddStores(varId);
   // Cache varId as processed
   live_local_vars_.insert(varId);
 }
@@ -339,7 +332,6 @@ bool AggressiveDCEPass::AggressiveDCE(Function* func) {
   call_in_func_ = false;
   func_is_entry_point_ = false;
   private_stores_.clear();
-  live_local_vars_.clear();
   // Stacks to keep track of when we are inside an if- or loop-construct.
   // When immediately inside an if- or loop-construct, we do not initially
   // mark branches live. All other branches must be marked live.
@@ -462,7 +454,7 @@ bool AggressiveDCEPass::AggressiveDCE(Function* func) {
       uint32_t varId;
       (void)GetPtr(liveInst, &varId);
       if (varId != 0) {
-        ProcessLoad(func, varId);
+        ProcessLoad(varId);
       }
       // Process memory copies like loads
     } else if (liveInst->opcode() == SpvOpCopyMemory ||
@@ -471,43 +463,31 @@ bool AggressiveDCEPass::AggressiveDCE(Function* func) {
       (void)GetPtr(liveInst->GetSingleWordInOperand(kCopyMemorySourceAddrInIdx),
                    &varId);
       if (varId != 0) {
-        ProcessLoad(func, varId);
+        ProcessLoad(varId);
       }
-      // If DebugDeclare, process as load of variable
-    } else if (liveInst->GetCommonDebugOpcode() ==
-               CommonDebugInfoDebugDeclare) {
-      uint32_t varId =
-          liveInst->GetSingleWordOperand(kDebugDeclareOperandVariableIndex);
-      ProcessLoad(func, varId);
-      // If DebugValue with Deref, process as load of variable
-    } else if (liveInst->GetCommonDebugOpcode() == CommonDebugInfoDebugValue) {
-      uint32_t varId = context()
-                           ->get_debug_info_mgr()
-                           ->GetVariableIdOfDebugValueUsedForDeclare(liveInst);
-      if (varId != 0) ProcessLoad(func, varId);
       // If merge, add other branches that are part of its control structure
     } else if (liveInst->opcode() == SpvOpLoopMerge ||
                liveInst->opcode() == SpvOpSelectionMerge) {
       AddBreaksAndContinuesToWorklist(liveInst);
       // If function call, treat as if it loads from all pointer arguments
     } else if (liveInst->opcode() == SpvOpFunctionCall) {
-      liveInst->ForEachInId([this, func](const uint32_t* iid) {
+      liveInst->ForEachInId([this](const uint32_t* iid) {
         // Skip non-ptr args
         if (!IsPtr(*iid)) return;
         uint32_t varId;
         (void)GetPtr(*iid, &varId);
-        ProcessLoad(func, varId);
+        ProcessLoad(varId);
       });
       // If function parameter, treat as if it's result id is loaded from
     } else if (liveInst->opcode() == SpvOpFunctionParameter) {
-      ProcessLoad(func, liveInst->result_id());
+      ProcessLoad(liveInst->result_id());
       // We treat an OpImageTexelPointer as a load of the pointer, and
       // that value is manipulated to get the result.
     } else if (liveInst->opcode() == SpvOpImageTexelPointer) {
       uint32_t varId;
       (void)GetPtr(liveInst, &varId);
       if (varId != 0) {
-        ProcessLoad(func, varId);
+        ProcessLoad(varId);
       }
     }
 
@@ -532,17 +512,6 @@ bool AggressiveDCEPass::AggressiveDCE(Function* func) {
       AddToWorklist(dec);
     }
 
-    // Add DebugScope and DebugInlinedAt for |liveInst| to the work list.
-    if (liveInst->GetDebugScope().GetLexicalScope() != kNoDebugScope) {
-      auto* scope = get_def_use_mgr()->GetDef(
-          liveInst->GetDebugScope().GetLexicalScope());
-      AddToWorklist(scope);
-    }
-    if (liveInst->GetDebugInlinedAt() != kNoInlinedAt) {
-      auto* inlined_at =
-          get_def_use_mgr()->GetDef(liveInst->GetDebugInlinedAt());
-      AddToWorklist(inlined_at);
-    }
     worklist_.pop();
   }
 
@@ -647,18 +616,6 @@ void AggressiveDCEPass::InitializeModuleScopeLiveInstructions() {
       }
     }
   }
-
-  // For each DebugInfo GlobalVariable keep all operands except the Variable.
-  // Later, if the variable is dead, we will set the operand to DebugInfoNone.
-  for (auto& dbg : get_module()->ext_inst_debuginfo()) {
-    if (dbg.GetCommonDebugOpcode() != CommonDebugInfoDebugGlobalVariable)
-      continue;
-    dbg.ForEachInId([this](const uint32_t* iid) {
-      Instruction* inInst = get_def_use_mgr()->GetDef(*iid);
-      if (inInst->opcode() == SpvOpVariable) return;
-      AddToWorklist(inInst);
-    });
-  }
 }
 
 Pass::Status AggressiveDCEPass::ProcessImpl() {
@@ -707,8 +664,8 @@ Pass::Status AggressiveDCEPass::ProcessImpl() {
   // been marked, it is safe to remove dead global values.
   modified |= ProcessGlobalValues();
 
-  assert((to_kill_.empty() || modified) &&
-         "A dead instruction was identified, but no change recorded.");
+  // Sanity check.
+  assert(to_kill_.size() == 0 || modified);
 
   // Kill all dead instructions.
   for (auto inst : to_kill_) {
@@ -738,14 +695,20 @@ bool AggressiveDCEPass::EliminateDeadFunctions() {
        funcIter != get_module()->end();) {
     if (live_function_set.count(&*funcIter) == 0) {
       modified = true;
-      funcIter =
-          eliminatedeadfunctionsutil::EliminateFunction(context(), &funcIter);
+      EliminateFunction(&*funcIter);
+      funcIter = funcIter.Erase();
     } else {
       ++funcIter;
     }
   }
 
   return modified;
+}
+
+void AggressiveDCEPass::EliminateFunction(Function* func) {
+  // Remove all of the instruction in the function body
+  func->ForEachInst([this](Instruction* inst) { context()->KillInst(inst); },
+                    true);
 }
 
 bool AggressiveDCEPass::ProcessGlobalValues() {
@@ -872,25 +835,6 @@ bool AggressiveDCEPass::ProcessGlobalValues() {
     }
   }
 
-  for (auto& dbg : get_module()->ext_inst_debuginfo()) {
-    if (!IsDead(&dbg)) continue;
-    // Save GlobalVariable if its variable is live, otherwise null out variable
-    // index
-    if (dbg.GetCommonDebugOpcode() == CommonDebugInfoDebugGlobalVariable) {
-      auto var_id = dbg.GetSingleWordOperand(kGlobalVariableVariableIndex);
-      Instruction* var_inst = get_def_use_mgr()->GetDef(var_id);
-      if (!IsDead(var_inst)) continue;
-      context()->ForgetUses(&dbg);
-      dbg.SetOperand(
-          kGlobalVariableVariableIndex,
-          {context()->get_debug_info_mgr()->GetDebugInfoNone()->result_id()});
-      context()->AnalyzeUses(&dbg);
-      continue;
-    }
-    to_kill_.push_back(&dbg);
-    modified = true;
-  }
-
   // Since ADCE is disabled for non-shaders, we don't check for export linkage
   // attributes here.
   for (auto& val : get_module()->types_values()) {
@@ -938,14 +882,14 @@ bool AggressiveDCEPass::ProcessGlobalValues() {
 AggressiveDCEPass::AggressiveDCEPass() = default;
 
 Pass::Status AggressiveDCEPass::Process() {
-  // Initialize extensions allowlist
+  // Initialize extensions whitelist
   InitExtensions();
   return ProcessImpl();
 }
 
 void AggressiveDCEPass::InitExtensions() {
-  extensions_allowlist_.clear();
-  extensions_allowlist_.insert({
+  extensions_whitelist_.clear();
+  extensions_whitelist_.insert({
       "SPV_AMD_shader_explicit_vertex_parameter",
       "SPV_AMD_shader_trinary_minmax",
       "SPV_AMD_gcn_shader",
@@ -954,7 +898,6 @@ void AggressiveDCEPass::InitExtensions() {
       "SPV_AMD_gpu_shader_half_float",
       "SPV_KHR_shader_draw_parameters",
       "SPV_KHR_subgroup_vote",
-      "SPV_KHR_8bit_storage",
       "SPV_KHR_16bit_storage",
       "SPV_KHR_device_group",
       "SPV_KHR_multiview",
@@ -980,7 +923,6 @@ void AggressiveDCEPass::InitExtensions() {
       "SPV_GOOGLE_hlsl_functionality1",
       "SPV_GOOGLE_user_type",
       "SPV_NV_shader_subgroup_partitioned",
-      "SPV_EXT_demote_to_helper_invocation",
       "SPV_EXT_descriptor_indexing",
       "SPV_NV_fragment_shader_barycentric",
       "SPV_NV_compute_shader_derivatives",
@@ -988,16 +930,8 @@ void AggressiveDCEPass::InitExtensions() {
       "SPV_NV_shading_rate",
       "SPV_NV_mesh_shader",
       "SPV_NV_ray_tracing",
-      "SPV_KHR_ray_tracing",
-      "SPV_KHR_ray_query",
       "SPV_EXT_fragment_invocation_density",
       "SPV_EXT_physical_storage_buffer",
-      "SPV_KHR_terminate_invocation",
-      "SPV_KHR_shader_clock",
-      "SPV_KHR_vulkan_memory_model",
-      "SPV_KHR_subgroup_uniform_control_flow",
-      "SPV_KHR_integer_dot_product",
-      "SPV_EXT_shader_image_int64",
   });
 }
 

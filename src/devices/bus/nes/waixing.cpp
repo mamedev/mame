@@ -1208,12 +1208,9 @@ void nes_waixing_dq8_device::write_h(offs_t offset, uint8_t data)
  Games: Wai Xing Zhan Shi 2 (aka Phantasy Star 2),
  Bao Xiao Tien Guo, Bio Hazard, Pokemon Gold, Subor (R)
 
- FIXME: This used to be mapper 15. NesDev research says the
- only two games found on board K-1029 (now in multigame.cpp)
- are the two Contra multicarts. All other Waixing games
- appear to be ROM hacks to work with mapper 15. Games on
- this device need to be reassigned to correct device and/or
- replaced with original dumps that match the original boards.
+ iNES: mapper 15
+
+ In MESS: Supported
 
  -------------------------------------------------*/
 

@@ -3,7 +3,7 @@
 // thanks-to:John Whitworth
 /***************************************************************************
 
-    SuperSprite FM+ by DragonPlus Electronics (formerly Dragon MSX 2+)
+    Dragon MSX 2+ by DragonPlus Electronics
 
 ***************************************************************************/
 
@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DRAGON_MSX2, dragon_msx2_device, "dragon_msx2", "6x09 SuperSprite FM+")
+DEFINE_DEVICE_TYPE(DRAGON_MSX2, dragon_msx2_device, "dragon_msx2", "Dragon MSX 2+")
 
 
 //-------------------------------------------------

@@ -24,7 +24,6 @@ enum
 {
 	MCS48_PC,
 	MCS48_PSW,
-	MCS48_SP,
 	MCS48_A,
 	MCS48_TC,
 	MCS48_TPRE,

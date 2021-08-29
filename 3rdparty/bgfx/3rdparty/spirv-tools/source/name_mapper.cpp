@@ -153,7 +153,6 @@ void FriendlyNameMapper::SaveBuiltInName(uint32_t target_id,
     CASE(SubgroupLocalInvocationId)
     GLCASE(VertexIndex)
     GLCASE(InstanceIndex)
-    GLCASE(BaseInstance)
     CASE(SubgroupEqMaskKHR)
     CASE(SubgroupGeMaskKHR)
     CASE(SubgroupGtMaskKHR)
@@ -324,7 +323,7 @@ std::string FriendlyNameMapper::NameForEnumOperand(spv_operand_type_t type,
   if (SPV_SUCCESS == grammar_.lookupOperand(type, word, &desc)) {
     return desc->name;
   } else {
-    // Invalid input.  Just give something.
+    // Invalid input.  Just give something sane.
     return std::string("StorageClass") + to_string(word);
   }
 }

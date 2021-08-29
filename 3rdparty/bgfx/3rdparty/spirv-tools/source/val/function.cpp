@@ -14,8 +14,9 @@
 
 #include "source/val/function.h"
 
-#include <algorithm>
 #include <cassert>
+
+#include <algorithm>
 #include <sstream>
 #include <unordered_map>
 #include <unordered_set>
@@ -98,7 +99,7 @@ spv_result_t Function::RegisterLoopMerge(uint32_t merge_id,
 spv_result_t Function::RegisterSelectionMerge(uint32_t merge_id) {
   RegisterBlock(merge_id, false);
   BasicBlock& merge_block = blocks_.at(merge_id);
-  current_block_->set_type(kBlockTypeSelection);
+  current_block_->set_type(kBlockTypeHeader);
   merge_block.set_type(kBlockTypeMerge);
   merge_block_header_[&merge_block] = current_block_;
 
@@ -130,6 +131,7 @@ spv_result_t Function::RegisterBlock(uint32_t block_id, bool is_definition) {
     undefined_blocks_.erase(block_id);
     current_block_ = &inserted_block->second;
     ordered_blocks_.push_back(current_block_);
+    if (IsFirstBlock(block_id)) current_block_->set_reachable(true);
   } else if (success) {  // Block doesn't exsist but this is not a definition
     undefined_blocks_.insert(block_id);
   }
@@ -137,7 +139,8 @@ spv_result_t Function::RegisterBlock(uint32_t block_id, bool is_definition) {
   return SPV_SUCCESS;
 }
 
-void Function::RegisterBlockEnd(std::vector<uint32_t> next_list) {
+void Function::RegisterBlockEnd(std::vector<uint32_t> next_list,
+                                SpvOp branch_instruction) {
   assert(
       current_block_ &&
       "RegisterBlockEnd can only be called when parsing a binary in a block");
@@ -172,6 +175,7 @@ void Function::RegisterBlockEnd(std::vector<uint32_t> next_list) {
     }
   }
 
+  current_block_->RegisterBranchInstruction(branch_instruction);
   current_block_->RegisterSuccessors(next_blocks);
   current_block_ = nullptr;
   return;
@@ -340,7 +344,7 @@ int Function::GetBlockDepth(BasicBlock* bb) {
     BasicBlock* header = merge_block_header_[bb];
     assert(header);
     block_depth_[bb] = GetBlockDepth(header);
-  } else if (bb_dom->is_type(kBlockTypeSelection) ||
+  } else if (bb_dom->is_type(kBlockTypeHeader) ||
              bb_dom->is_type(kBlockTypeLoop)) {
     // The dominator of the given block is a header block. So, the nesting
     // depth of this block is: 1 + nesting depth of the header.

@@ -84,7 +84,7 @@ protected:
 	bool ready_trap_active();
 
 	// Deliver the current state of the address bus
-	offs_t get_address();
+	uint16_t get_address();
 
 	// Wait state logic
 	void operate_ready_line();

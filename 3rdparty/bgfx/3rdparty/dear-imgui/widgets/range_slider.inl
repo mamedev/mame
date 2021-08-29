@@ -183,7 +183,7 @@ bool RangeSliderFloat(const char* label, float* v1, float* v2, float v_min, floa
 
     // Tabbing or CTRL-clicking on Slider turns it into an input box
     bool start_text_input = false;
-    const bool tab_focus_requested = (GetItemStatusFlags() & ImGuiItemStatusFlags_Focused) != 0;
+    const bool tab_focus_requested = FocusableItemRegister(window, g.ActiveId == id);
     if (tab_focus_requested || (hovered && g.IO.MouseClicked[0]))
     {
         SetActiveID(id, window);
@@ -192,15 +192,15 @@ bool RangeSliderFloat(const char* label, float* v1, float* v2, float v_min, floa
         if (tab_focus_requested || g.IO.KeyCtrl)
         {
             start_text_input = true;
-            g.TempInputId = 0;
+            g.TempInputTextId = 0;
         }
     }
 
-    if (start_text_input || (g.ActiveId == id && g.TempInputId == id))
+    if (start_text_input || (g.ActiveId == id && g.TempInputTextId == id))
     {
         char fmt[64];
         snprintf(fmt, 64, "%%.%df", decimal_precision);
-        return TempInputScalar(frame_bb, id, label, ImGuiDataType_Float, v1, fmt);
+        return TempInputTextScalar(frame_bb, id, label, ImGuiDataType_Float, v1, fmt);
     }
 
     ItemSize(total_bb, style.FramePadding.y);

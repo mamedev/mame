@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -13,11 +13,10 @@ namespace
 {
 
 constexpr bgfx::ViewId kRenderPassGeometry     = 0;
-constexpr bgfx::ViewId kRenderPassClearUav     = 1;
-constexpr bgfx::ViewId kRenderPassLight        = 2;
-constexpr bgfx::ViewId kRenderPassCombine      = 3;
-constexpr bgfx::ViewId kRenderPassDebugLights  = 4;
-constexpr bgfx::ViewId kRenderPassDebugGBuffer = 5;
+constexpr bgfx::ViewId kRenderPassLight        = 1;
+constexpr bgfx::ViewId kRenderPassCombine      = 2;
+constexpr bgfx::ViewId kRenderPassDebugLights  = 3;
+constexpr bgfx::ViewId kRenderPassDebugGBuffer = 4;
 
 static float s_texelHalf = 0.0f;
 
@@ -231,7 +230,6 @@ public:
 				, 1.0f
 				, 0
 				, 1
-				, 0
 				);
 
 		// Set light pass view clear state.
@@ -295,12 +293,10 @@ public:
 			m_lightTaProgram = BGFX_INVALID_HANDLE;
 		}
 
-		if (0 != (BGFX_CAPS_IMAGE_RW & bgfx::getCaps()->supported)
-		&&  0 != (BGFX_CAPS_FORMAT_TEXTURE_IMAGE_READ & bgfx::getCaps()->formats[bgfx::TextureFormat::RGBA8])
-		&&  0 != (BGFX_CAPS_FORMAT_TEXTURE_IMAGE_WRITE & bgfx::getCaps()->formats[bgfx::TextureFormat::RGBA8]) )
+		if (0 != (BGFX_CAPS_FRAMEBUFFER_RW & bgfx::getCaps()->supported) )
 		{
-			m_clearUavProgram = loadProgram("vs_deferred_light", "fs_deferred_clear_uav");
 			m_lightUavProgram = loadProgram("vs_deferred_light", "fs_deferred_light_uav");
+			m_clearUavProgram = loadProgram("vs_deferred_light", "fs_deferred_clear_uav");
 		}
 		else
 		{
@@ -313,8 +309,6 @@ public:
 
 		// Load normal texture.
 		m_textureNormal = loadTexture("textures/fieldstone-n.dds");
-
-		m_lightBufferTex.idx = bgfx::kInvalidHandle;
 
 		m_gbufferTex[0].idx = bgfx::kInvalidHandle;
 		m_gbufferTex[1].idx = bgfx::kInvalidHandle;
@@ -358,16 +352,7 @@ public:
 		if (bgfx::isValid(m_gbuffer) )
 		{
 			bgfx::destroy(m_gbuffer);
-		}
-
-		if (bgfx::isValid(m_lightBuffer) )
-		{
 			bgfx::destroy(m_lightBuffer);
-		}
-
-		if (bgfx::isValid(m_lightBufferTex) )
-		{
-			bgfx::destroy(m_lightBufferTex);
 		}
 
 		bgfx::destroy(m_ibh);
@@ -416,14 +401,14 @@ public:
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
 			imguiBeginFrame(m_mouseState.m_mx
-				, m_mouseState.m_my
-				, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
-				| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
-				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
-				, m_mouseState.m_mz
-				, uint16_t(m_width)
-				, uint16_t(m_height)
-				);
+					, m_mouseState.m_my
+					, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
+					| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
+					| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
+					, m_mouseState.m_mz
+					, uint16_t(m_width)
+					, uint16_t(m_height)
+					);
 
 			showExampleDialog(this);
 
@@ -435,43 +420,6 @@ public:
 			const float deltaTime = float(frameTime/freq);
 
 			float time = (float)( (now-m_timeOffset)/freq);
-
-			ImGui::SetNextWindowPos(
-				  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_width / 5.0f, m_height / 3.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::Begin("Settings", NULL, 0);
-
-			ImGui::SliderInt("Num lights", &m_numLights, 1, 2048);
-			ImGui::Checkbox("Show G-Buffer.", &m_showGBuffer);
-			ImGui::Checkbox("Show light scissor.", &m_showScissorRects);
-
-			if (bgfx::isValid(m_lightTaProgram))
-			{
-				ImGui::Checkbox("Use texture array frame buffer.", &m_useTArray);
-			}
-			else
-			{
-				ImGui::Text("Texture array frame buffer is not supported.");
-			}
-
-			if (bgfx::isValid(m_lightUavProgram))
-			{
-				ImGui::Checkbox("Use UAV.", &m_useUav);
-			}
-			else
-			{
-				ImGui::Text("UAV is not supported.");
-			}
-
-			ImGui::Checkbox("Animate mesh.", &m_animateMesh);
-			ImGui::SliderFloat("Anim.speed", &m_lightAnimationSpeed, 0.0f, 0.4f);
-
-			ImGui::End();
 
 			if (2 > m_caps->limits.maxFBAttachments)
 			{
@@ -535,13 +483,7 @@ public:
 						gbufferAt[1].init(m_gbufferTex[1]);
 					}
 
-					bgfx::TextureFormat::Enum depthFormat =
-						  bgfx::isTextureValid(0, false, 1, bgfx::TextureFormat::D32F, BGFX_TEXTURE_RT | tsFlags)
-						? bgfx::TextureFormat::D32F
-						: bgfx::TextureFormat::D24
-						;
-
-					m_gbufferTex[2] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, depthFormat, BGFX_TEXTURE_RT | tsFlags);
+					m_gbufferTex[2] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT | tsFlags);
 					gbufferAt[2].init(m_gbufferTex[2]);
 
 					m_gbuffer = bgfx::createFrameBuffer(BX_COUNTOF(gbufferAt), gbufferAt, true);
@@ -549,18 +491,18 @@ public:
 					if (bgfx::isValid(m_lightBuffer) )
 					{
 						bgfx::destroy(m_lightBuffer);
-						m_lightBuffer.idx = bgfx::kInvalidHandle;
-					}
-
-					if (bgfx::isValid(m_lightBufferTex))
-					{
-						bgfx::destroy(m_lightBufferTex);
-						m_lightBufferTex.idx = bgfx::kInvalidHandle;
 					}
 
 					if (m_useUav)
 					{
-						m_lightBufferTex = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_COMPUTE_WRITE | tsFlags);
+						bgfx::Attachment lightAt[2];
+
+						bgfx::TextureHandle target = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT | tsFlags);
+						m_lightBufferTex = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_COMPUTE_WRITE | tsFlags);
+						lightAt[0].init(target);
+						lightAt[1].init(m_lightBufferTex, bgfx::Access::ReadWrite);
+
+						m_lightBuffer = bgfx::createFrameBuffer(BX_COUNTOF(lightAt), lightAt, true);
 					}
 					else
 					{
@@ -569,8 +511,48 @@ public:
 					}
 				}
 
+				ImGui::SetNextWindowPos(
+					  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
+					, ImGuiCond_FirstUseEver
+					);
+				ImGui::SetNextWindowSize(
+					  ImVec2(m_width / 5.0f, m_height / 3.0f)
+					, ImGuiCond_FirstUseEver
+					);
+				ImGui::Begin("Settings"
+					, NULL
+					, 0
+					);
+
+				ImGui::SliderInt("Num lights", &m_numLights, 1, 2048);
+				ImGui::Checkbox("Show G-Buffer.", &m_showGBuffer);
+				ImGui::Checkbox("Show light scissor.", &m_showScissorRects);
+
+				if (bgfx::isValid(m_lightTaProgram) )
+				{
+					ImGui::Checkbox("Use texture array frame buffer.", &m_useTArray);
+				}
+				else
+				{
+					ImGui::Text("Texture array frame buffer is not supported.");
+				}
+
+				if (bgfx::isValid(m_lightUavProgram) )
+				{
+					ImGui::Checkbox("Use UAV frame buffer attachment.", &m_useUav);
+				}
+				else
+				{
+					ImGui::Text("UAV frame buffer attachment is not supported.");
+				}
+
+				ImGui::Checkbox("Animate mesh.", &m_animateMesh);
+				ImGui::SliderFloat("Anim.speed", &m_lightAnimationSpeed, 0.0f, 0.4f);
+
+				ImGui::End();
+
 				// Update camera.
-				cameraUpdate(deltaTime, m_mouseState, ImGui::MouseOverArea() );
+				cameraUpdate(deltaTime, m_mouseState);
 
 				float view[16];
 				cameraGetViewMtx(view);
@@ -579,21 +561,13 @@ public:
 				float vp[16];
 				float invMvp[16];
 				{
-					bgfx::setViewRect(kRenderPassGeometry,     0, 0, uint16_t(m_width), uint16_t(m_height) );
-					bgfx::setViewRect(kRenderPassClearUav,     0, 0, uint16_t(m_width), uint16_t(m_height) );
-					bgfx::setViewRect(kRenderPassLight,        0, 0, uint16_t(m_width), uint16_t(m_height) );
-					bgfx::setViewRect(kRenderPassCombine,      0, 0, uint16_t(m_width), uint16_t(m_height) );
+					bgfx::setViewRect(kRenderPassGeometry,      0, 0, uint16_t(m_width), uint16_t(m_height) );
+					bgfx::setViewRect(kRenderPassLight,         0, 0, uint16_t(m_width), uint16_t(m_height) );
+					bgfx::setViewRect(kRenderPassCombine,       0, 0, uint16_t(m_width), uint16_t(m_height) );
 					bgfx::setViewRect(kRenderPassDebugLights,  0, 0, uint16_t(m_width), uint16_t(m_height) );
 					bgfx::setViewRect(kRenderPassDebugGBuffer, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 
-					if (!m_useUav)
-					{
-						bgfx::setViewFrameBuffer(kRenderPassLight, m_lightBuffer);
-					}
-					else
-					{
-						bgfx::setViewFrameBuffer(kRenderPassLight, BGFX_INVALID_HANDLE);
-					}
+					bgfx::setViewFrameBuffer(kRenderPassLight, m_lightBuffer);
 
 					float proj[16];
 					bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, m_caps->homogeneousDepth);
@@ -607,9 +581,8 @@ public:
 					const bgfx::Caps* caps = bgfx::getCaps();
 
 					bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
-					bgfx::setViewTransform(kRenderPassClearUav, NULL, proj);
-					bgfx::setViewTransform(kRenderPassLight,    NULL, proj);
-					bgfx::setViewTransform(kRenderPassCombine,  NULL, proj);
+					bgfx::setViewTransform(kRenderPassLight,   NULL, proj);
+					bgfx::setViewTransform(kRenderPassCombine, NULL, proj);
 
 					const float aspectRatio = float(m_height)/float(m_width);
 					const float size = 10.0f;
@@ -670,10 +643,11 @@ public:
 				if (m_useUav)
 				{
 					screenSpaceQuad( (float)m_width, (float)m_height, s_texelHalf, m_caps->originBottomLeft);
-					bgfx::setViewFrameBuffer(kRenderPassClearUav, BGFX_INVALID_HANDLE);
-					bgfx::setState(0);
-					bgfx::setImage(2, m_lightBufferTex, 0, bgfx::Access::ReadWrite, bgfx::TextureFormat::RGBA8);
-					bgfx::submit(kRenderPassClearUav, m_clearUavProgram);
+					bgfx::setState(0
+						| BGFX_STATE_WRITE_RGB
+						| BGFX_STATE_WRITE_A
+						);
+					bgfx::submit(kRenderPassLight, m_clearUavProgram);
 				}
 
 				// Draw lights into light buffer.
@@ -806,9 +780,6 @@ public:
 						else if (bgfx::isValid(m_lightUavProgram)
 							 &&  m_useUav)
 						{
-							bgfx::setViewFrameBuffer(kRenderPassLight, BGFX_INVALID_HANDLE);
-							bgfx::setState(0);
-							bgfx::setImage(3, m_lightBufferTex, 0, bgfx::Access::ReadWrite, bgfx::TextureFormat::RGBA8);
 							bgfx::submit(kRenderPassLight, m_lightUavProgram);
 						}
 						else

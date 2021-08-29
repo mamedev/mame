@@ -1424,11 +1424,10 @@ void lua_engine::initialize()
 			[this] (device_t &dev)
 			{
 				sol::table st_table = sol().create_table();
-				const device_state_interface *state;
-				if(!dev.interface(state))
+				if(!dynamic_cast<device_state_interface *>(&dev))
 					return st_table;
 				// XXX: refrain from exporting non-visible entries?
-				for(auto &s : state->state_entries())
+				for(auto &s : dev.state().state_entries())
 					st_table[s->symbol()] = s.get();
 				return st_table;
 			});

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl, Brian Johnson
+// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl
 /**********************************************************************
 
     Intel 82720 Graphics Display Controller emulation
@@ -28,6 +28,8 @@
     - honor visible area
     - wide mode (32-bit access)
     - light pen
+    - dad and mask are the same, in figd dad is shifted every step and when msb or lsb are 1 ead is advanced in x dir
+
 */
 
 #include "emu.h"
@@ -187,6 +189,25 @@ const tiny_rom_entry *upd7220_device::device_rom_region() const
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
+
+//-------------------------------------------------
+//  readbyte - read a byte at the given address
+//-------------------------------------------------
+
+inline uint8_t upd7220_device::readbyte(offs_t address)
+{
+	return space().read_byte(address);
+}
+
+
+//-------------------------------------------------
+//  writebyte - write a byte at the given address
+//-------------------------------------------------
+
+inline void upd7220_device::writebyte(offs_t address, uint8_t data)
+{
+	space().write_byte(address, data);
+}
 
 inline uint16_t upd7220_device::readword(offs_t address)
 {
@@ -422,9 +443,9 @@ inline void upd7220_device::reset_figs_param()
 {
 	m_figs.m_dc = 0x0000;
 	m_figs.m_d = 0x0008;
-	m_figs.m_d1 = 0xffff;
-	m_figs.m_d2 = 0x0008;
-	m_figs.m_dm = 0xffff;
+	m_figs.m_d1 = 0x0008;
+	m_figs.m_d2 = 0x0000;
+	m_figs.m_dm = 0x0000;
 	m_figs.m_gd = 0;
 }
 
@@ -434,7 +455,7 @@ inline void upd7220_device::reset_figs_param()
 //-------------------------------------------------
 inline uint16_t upd7220_device::read_vram()
 {
-	uint16_t const data = readword(m_ead);
+	uint16_t const data = readword(m_ead*2);
 	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
 	m_ead &= 0x3ffff;
 
@@ -479,46 +500,46 @@ inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
 //-------------------------------------------------
 //  write_vram -
 //-------------------------------------------------
-inline void upd7220_device::write_vram(uint8_t type, uint8_t mod, uint16_t data, uint16_t mask)
+inline void upd7220_device::write_vram(uint8_t type, uint8_t mod, uint16_t data)
 {
-	uint16_t current = readword(m_ead);
-
 	switch(mod & 3)
 	{
 		case 0x00: //replace
 			if(type == 0)
-				current = (current & (~mask)) | (data & mask);
+				writeword(m_ead*2+0, data);
 			if(type == 2)
-				current = (current & ~(mask & 0xff)) | (data & (mask & 0xff));
+				writebyte(m_ead*2+0, data & 0xff);
 			if(type == 3)
-				current = (current & ~(mask & 0xff00)) | (data & (mask & 0xff00));
+				writebyte(m_ead*2+1, data >> 8);
 			break;
 		case 0x01: //complement
 			if(type == 0)
-				current = current ^ (data & mask);
+				writeword(m_ead*2+0, readword(m_ead*2+0) ^ data);
 			if(type == 2)
-				current = current ^ (data & (mask & 0xff));
+				writebyte(m_ead*2+0, readbyte(m_ead*2+0) ^ (data & 0xff));
 			if(type == 3)
-				current = current ^ (data & (mask & 0xff00));
+				writebyte(m_ead*2+1, readbyte(m_ead*2+1) ^ (data >> 8));
 			break;
 		case 0x02: //reset to zero
 			if(type == 0)
-				current = current & ~(data & mask);
+				writeword(m_ead*2+0, readword(m_ead*2+0) & ~data);
 			if(type == 2)
-				current = current & ~(data & (mask & 0xff));
+				writebyte(m_ead*2+0, readbyte(m_ead*2+0) & ~(data & 0xff));
 			if(type == 3)
-				current = current & ~(data & (mask & 0xff00));
+				writebyte(m_ead*2+1, readbyte(m_ead*2+1) & ~(data >> 8));
 			break;
 		case 0x03: //set to one
 			if(type == 0)
-				current = current | (data & mask);
+				writeword(m_ead*2+0, readword(m_ead*2+0) | data);
 			if(type == 2)
-				current = current | (data & (mask & 0xff));
+				writebyte(m_ead*2+0, readbyte(m_ead*2+0) | (data & 0xff));
 			if(type == 3)
-				current = current | (data & (mask & 0xff00));
+				writebyte(m_ead*2+1, readbyte(m_ead*2+1) | (data >> 8));
 			break;
 	}
-	writeword(m_ead, current);
+
+	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+	m_ead &= 0x3ffff;
 }
 
 inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
@@ -555,8 +576,6 @@ inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 	for(int i = 0; i < m_figs.m_dc + 1; i++)
 	{
 		write_vram(type, mod, result);
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
-		m_ead &= 0x3ffff;
 	}
 }
 
@@ -606,10 +625,10 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_write_hsync(*this),
 	m_write_vsync(*this),
 	m_write_blank(*this),
-	m_pattern(0),
 	m_mask(0),
 	m_pitch(0),
 	m_ead(0),
+	m_dad(0),
 	m_lad(0),
 	m_ra_addr(0),
 	m_sr(UPD7220_SR_FIFO_EMPTY),
@@ -637,7 +656,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, -1, address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -697,10 +716,10 @@ void upd7220_device::device_start()
 	save_item(NAME(m_ctop));
 	save_item(NAME(m_cbot));
 	save_item(NAME(m_ead));
+	save_item(NAME(m_dad));
 	save_item(NAME(m_lad));
 	save_item(NAME(m_disp));
 	save_item(NAME(m_gchr));
-	save_item(NAME(m_pattern));
 	save_item(NAME(m_mask));
 	save_item(NAME(m_pitch));
 	save_item(NAME(m_ra_addr));
@@ -793,15 +812,26 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  draw_pixel -
 //-------------------------------------------------
 
-void upd7220_device::draw_pixel()
+void upd7220_device::draw_pixel(int x, int y, int xi, uint16_t tile_data)
 {
-	LOG("uPD7220 dot check: %08x %04x %02x %02x %d\n", m_ead, m_mask, m_bitmap_mod, m_figs.m_dir, m_figs.m_dc);
+	uint32_t addr = ((y * (m_pitch << (m_figs.m_gd ? 0 : 1))) + (x >> 3)) & 0x3ffff;
+	uint16_t data = readword(addr);
+	uint16_t new_pixel = (tile_data & (1 << (xi & 0xf))) ? (1 << (x & 0xf)) : 0;
 
-	for(int i = 0; i <= m_figs.m_dc; ++i)
+	switch(m_bitmap_mod)
 	{
-		const uint16_t pattern = get_pattern(i & 0xf);
-		write_vram(0, m_bitmap_mod, pattern, m_mask);
-		next_pixel(m_figs.m_dir);
+		case 0: //replace
+			writeword(addr, (data & ~(1 << (x & 0xf))) | new_pixel);
+			break;
+		case 1: //complement
+			writeword(addr, data ^ new_pixel);
+			break;
+		case 2: //reset
+			writeword(addr, data & ~new_pixel);
+			break;
+		case 3: //set
+			writeword(addr, data | new_pixel);
+			break;
 	}
 }
 
@@ -810,89 +840,158 @@ void upd7220_device::draw_pixel()
 //  draw_line -
 //-------------------------------------------------
 
-void upd7220_device::draw_line()
+void upd7220_device::draw_line(int x, int y)
 {
+	int xi, yi;
 	int d = (m_figs.m_d & 0x2000) ? (int16_t)(m_figs.m_d | 0xe000) : m_figs.m_d;
 	int d1 = (m_figs.m_d1 & 0x2000) ? (int16_t)(m_figs.m_d1 | 0xe000) : m_figs.m_d1;
 	int d2 = (m_figs.m_d2 & 0x2000) ? (int16_t)(m_figs.m_d2 | 0xe000) : m_figs.m_d2;
-	const uint8_t octant = m_figs.m_dir;
+	uint16_t pattern = (m_ra[8]) | (m_ra[9]<<8);
+	const int dot_dir[4] = {1, -1, -1, 1};
 
-	LOG("uPD7220 line check: %08x %04x %02x %02x %d %d %d %d\n", m_ead, m_mask, m_bitmap_mod, m_figs.m_dir, m_figs.m_dc, d, d1, d2);
+	LOG("uPD7220 line check: %d %d %02x %08x %d %d %d\n",x,y,m_figs.m_dir,m_ead,d1,m_figs.m_dc,m_bitmap_mod);
 
-	for(int i = 0; i <= m_figs.m_dc; ++i)
+	for(yi = xi = 0; yi <= m_figs.m_dc; yi++)
 	{
-		const uint16_t pattern = get_pattern(i & 0xf);
-		write_vram(0, m_bitmap_mod, pattern, m_mask);
-		if (octant & 1)
+		switch(m_figs.m_dir & 3)
 		{
-			m_figs.m_dir = (d < 0) ? (octant + 1) & 7 : octant;
+			case 1:
+			case 2:
+				draw_pixel(yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, xi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
+				break;
+			default:
+				draw_pixel(xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, yi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
+				break;
+		}
+		if(d > 0)
+		{
+			xi++;
+			d += d2;
 		}
 		else
-		{
-			m_figs.m_dir = (d < 0) ? octant : (octant + 1) & 7;
-		}
-		d += ((d < 0 ) ? d1 : d2);
-		next_pixel(m_figs.m_dir);
+			d += d1;
 	}
-}
 
+	switch(m_figs.m_dir & 3)
+	{
+		case 1:
+		case 2:
+			x += yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
+			y += xi * dot_dir[m_figs.m_dir >> 1];
+			break;
+		default:
+			x += xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
+			y += yi * dot_dir[m_figs.m_dir >> 1];
+			break;
+	}
+
+	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
+	m_dad = x & 0x0f;
+}
 
 //-------------------------------------------------
 //  draw_arc -
 //-------------------------------------------------
 
-void upd7220_device::draw_arc()
+void upd7220_device::draw_arc(int x, int y)
 {
-	int err = -m_figs.m_d, d = m_figs.m_d + 1;
+	int xi = 0, err = -m_figs.m_d, d = m_figs.m_d + 1;
+	uint16_t pattern = (m_ra[8]) | (m_ra[9]<<8);
+	const int dot_dir[4] = {1, -1, -1, 1};
 
-	const uint16_t octant = m_figs.m_dir;
+	LOG("uPD7220 arc check: %d %d %02x %08x %d %d %d\n",x,y,m_figs.m_dir,m_ead,m_figs.m_dm,m_figs.m_dc,m_figs.m_d);
 
-	LOG("uPD7220 arc check: %08x %04x %02x %02x %d %d %d %d\n", m_ead, m_mask, m_bitmap_mod, m_figs.m_dir, m_figs.m_dc, m_figs.m_d, m_figs.m_d2, m_figs.m_dm);
-
-	for (int i = 0; i <= m_figs.m_dc; ++i)
+	for(int yi = 0; yi <= m_figs.m_dc; yi++)
 	{
-		const uint16_t pattern = get_pattern(i % 0xf);
-		if (i >= m_figs.m_dm)
+		if(yi >= m_figs.m_dm)
 		{
-			write_vram(0, m_bitmap_mod, pattern, m_mask);
+			switch(m_figs.m_dir & 3)
+			{
+				case 1:
+				case 2:
+					draw_pixel(yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, xi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
+					break;
+				default:
+					draw_pixel(xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, yi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
+					break;
+			}
 		}
-		if (err < 0)
-		{
-			m_figs.m_dir = (octant & 1) ? (octant + 1) & 7 : octant;
-		}
+		if(err < 0)
+			err += (yi + 1) << 1;
 		else
 		{
-			m_figs.m_dir = (octant & 1) ? octant : (octant + 1) & 7;
+			xi++;
+			d--;
+			err += (yi - d + 1) << 1;
 		}
-		err += (err < 0) ? ((i + 1) << 1) : ((i - --d + 1) << 1);
-		next_pixel(m_figs.m_dir);
 	}
-}
+	switch(m_figs.m_dir & 3)
+	{
+		case 1:
+		case 2:
+			x += (m_figs.m_dc + 1) * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
+			break;
+		default:
+			y += (m_figs.m_dc + 1) * dot_dir[m_figs.m_dir >> 1];
+			break;
+	}
 
+	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
+	m_dad = x & 0x0f;
+}
 
 //-------------------------------------------------
 //  draw_rectangle -
 //-------------------------------------------------
 
-void upd7220_device::draw_rectangle()
+void upd7220_device::draw_rectangle(int x, int y)
 {
-	assert(m_figs.m_dc == 3);
+	const int rect_x_dir[8] = { 0, 1, 0,-1, 1, 1,-1,-1 };
+	const int rect_y_dir[8] = { 1, 0,-1, 0, 1,-1,-1, 1 };
+	uint8_t rect_type,rect_dir;
+	uint16_t pattern = (m_ra[8]) | (m_ra[9]<<8);
 
-	LOG("uPD7220 rectangle check: %08x %04x %02x %02x %d %d %d\n",m_ead, m_mask, m_bitmap_mod, m_figs.m_dir, m_figs.m_dc, m_figs.m_d, m_figs.m_d2);
+	LOG("uPD7220 rectangle check: %d %d %02x %08x\n",x,y,m_figs.m_dir,m_ead);
 
-	for (int i = 0; i <= m_figs.m_dc; ++i)
+	rect_type = (m_figs.m_dir & 1) << 2;
+	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 0) & 3);
+
+	for(int i = 0; i < m_figs.m_d; i++)
 	{
-		const uint16_t dist = (i & 1 ? m_figs.m_d2 : m_figs.m_d);
-		for (int j = 0; j < dist; ++j)
-		{
-			const uint16_t pattern = get_pattern(j & 0xf);
-			write_vram(0, m_bitmap_mod, pattern, m_mask);
-			if (i > 0 && j == 0)
-				m_figs.m_dir = (m_figs.m_dir + 2) & 7;
-			next_pixel(m_figs.m_dir);
-		}
-
+		draw_pixel(x,y,i,pattern);
+		x+=rect_x_dir[rect_dir];
+		y+=rect_y_dir[rect_dir];
 	}
+
+	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 1) & 3);
+
+	for(int i = 0; i < m_figs.m_d2; i++)
+	{
+		draw_pixel(x,y,i,pattern);
+		x+=rect_x_dir[rect_dir];
+		y+=rect_y_dir[rect_dir];
+	}
+
+	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 2) & 3);
+
+	for(int i = 0; i < m_figs.m_d; i++)
+	{
+		draw_pixel(x,y,i,pattern);
+		x+=rect_x_dir[rect_dir];
+		y+=rect_y_dir[rect_dir];
+	}
+
+	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 3) & 3);
+
+	for(int i = 0; i < m_figs.m_d2; i++)
+	{
+		draw_pixel(x,y,i,pattern);
+		x+=rect_x_dir[rect_dir];
+		y+=rect_y_dir[rect_dir];
+	}
+
+	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
+	m_dad = x & 0x0f;
 }
 
 
@@ -900,150 +999,58 @@ void upd7220_device::draw_rectangle()
 //  draw_char -
 //-------------------------------------------------
 
-void upd7220_device::draw_char()
+void upd7220_device::draw_char(int x, int y)
 {
-	const int8_t dir_change[2][4] = {
-		{2, 2, -2, -2},
-		{1, 3, -3, -1}
-	};
-	const uint8_t type = (m_figs.m_figure_type & 0x10) >> 4;
+	int isize,psize;
+	uint16_t tile_data;
 
+	LOG("uPD7220 char check: %d %d %02x %08x %d %d %02x\n",x,y,m_figs.m_dir,m_ead,m_figs.m_d,m_figs.m_dc,m_figs.m_figure_type);
 
-	LOG("uPD7220 char check: %08x %04x %02x %02x %d %d %02x\n",m_ead,m_mask,m_bitmap_mod,m_figs.m_dir,m_figs.m_d,m_figs.m_dc,m_figs.m_figure_type);
+	/* QX10 may require upper bits for psize, VT240 requires the opposite */
+	isize = m_figs.m_d;
+	psize = m_figs.m_dc + 1;
 
-	for (int i = 0, di = 0; i < (m_figs.m_dc + 1); ++i)
+	for(int pi = 0; pi < psize; pi++)
 	{
-		m_pattern = (m_ra[15 - (i & 7)] << 8) | m_ra[15 - (i & 7)];
-		for (int zdc = 0; zdc <= m_gchr; ++zdc, ++di)
+		tile_data = (m_ra[15-(pi & 7)] << 8) | m_ra[15-(pi & 7)];
+		for(int pz = 0; pz <= m_gchr; pz++)
 		{
-			for (int j = 0; j < m_figs.m_d; ++j)
+			int ii = 0, curpixel = 0;
+			if(pi & 1)
 			{
-				const uint16_t pattern = (di % 2) ? get_pattern(15-(j & 0xf)) : get_pattern((j & 0xf));
-				for (int zd = 0; zd <= m_gchr; ++zd)
-				{
-					write_vram(0, m_bitmap_mod, pattern, m_mask);
-
-					if (j != (m_figs.m_d - 1) || zd != m_gchr)
-						next_pixel(m_figs.m_dir);
-				}
+				ii = isize - 1;
+				curpixel = (isize * (m_gchr + 1)) - 1;
 			}
-			m_figs.m_dir = (((uint16_t)m_figs.m_dir + dir_change[type][(di % 2) << 1]) & 7);
-			next_pixel(m_figs.m_dir);
-			m_figs.m_dir = (((uint16_t)m_figs.m_dir + dir_change[type][((di % 2) << 1)+1]) & 7);
+			while(pi & 1 ? ii >= 0 : ii < isize)
+			{
+				for(int iz = 0; iz <= m_gchr; iz++)
+				{
+					draw_pixel(x + (curpixel * x_dir[m_figs.m_dir]), y + (curpixel * y_dir[m_figs.m_dir]), ii, tile_data);
+					if(pi & 1)
+						curpixel--;
+					else
+						curpixel++;
+				}
+				if(pi & 1)
+					ii--;
+				else
+					ii++;
+			}
+			if(m_figs.m_figure_type == 2)
+			{
+				x += x_dir[(m_figs.m_dir + 2) & 7];
+				y += y_dir[(m_figs.m_dir + 2) & 7];
+			}
+			else
+			{
+				x += x_dir[(m_figs.m_dir + 1) & 7];
+				y += y_dir[(m_figs.m_dir + 1) & 7];
+			}
 		}
 	}
-}
 
-
-//-------------------------------------------------
-//  helper functions used to rotate a uint16_t
-//-------------------------------------------------
-
-static constexpr uint16_t rotate_right(uint16_t value)
-{
-	return (value>>1) | (value<<( (-1) & 0x0f ));
-}
-
-static constexpr uint16_t rotate_left(uint16_t value)
-{
-	return (value<<1) | (value>>( (-1) & 0x0f ));
-}
-
-
-//-------------------------------------------------
-//  get_pitch -
-//-------------------------------------------------
-
-uint16_t upd7220_device::get_pitch()
-{
-	bool mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
-
-	if (mixed)
-		return m_pitch >> m_figs.m_gd;
-
-	return m_pitch;
-}
-
-
-//-------------------------------------------------
-//  get_pattern -
-//-------------------------------------------------
-
-uint16_t upd7220_device::get_pattern(uint8_t cycle)
-{
-	bool mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
-	bool graphics = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS);
-
-	if ((mixed && m_figs.m_gd) || graphics)
-	{
-		return ((m_pattern >> (cycle & 0xf)) & 1) * 0xffff;
-	}
-	return m_pattern;
-}
-
-
-//-------------------------------------------------
-//  next_pixel -
-//-------------------------------------------------
-
-void upd7220_device::next_pixel(int direction)
-{
-	switch(direction & 7)
-	{
-		case 0:
-			m_ead += get_pitch();
-			break;
-		case 1:
-			m_ead += get_pitch();
-			if (m_mask & 0x8000)
-			{
-				m_ead += 1;
-			}
-			m_mask = rotate_left(m_mask);
-			break;
-		case 2:
-			if (m_mask & 0x8000)
-			{
-				m_ead += 1;
-			}
-			m_mask = rotate_left(m_mask);
-			break;
-		case 3:
-			m_ead -= get_pitch();
-			if (m_mask & 0x8000)
-			{
-				m_ead += 1;
-			}
-			m_mask = rotate_left(m_mask);
-			break;
-		case 4:
-			m_ead -= get_pitch();
-			break;
-		case 5:
-			m_ead -= get_pitch();
-			if (m_mask & 0x1)
-			{
-				m_ead -= 1;
-			}
-			m_mask = rotate_right(m_mask);
-			break;
-		case 6:
-			if (m_mask & 0x1)
-			{
-				m_ead -= 1;
-			}
-			m_mask = rotate_right(m_mask);
-			break;
-		case 7:
-			m_ead += get_pitch();
-			if (m_mask & 0x1)
-			{
-				m_ead -= 1;
-			}
-			m_mask = rotate_right(m_mask);
-			break;
-	}
-	m_ead &= 0x3ffff;
+	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
+	m_dad = (x & 0xf);
 }
 
 
@@ -1105,6 +1112,7 @@ void upd7220_device::process_fifo()
 {
 	uint8_t data;
 	int flag;
+	uint16_t eff_pitch = m_pitch >> m_figs.m_gd;
 	int cr;
 
 	dequeue(&data, &flag);
@@ -1146,6 +1154,7 @@ void upd7220_device::process_fifo()
 			m_ra[0] = m_ra[1] = m_ra[2] = 0;
 			m_ra[3] = 0x19;
 			m_ead = 0;
+			m_dad = 0;
 			m_mask = 0;
 			break;
 
@@ -1284,8 +1293,8 @@ void upd7220_device::process_fifo()
 
 			if(m_param_ptr == 4)
 			{
-				m_mask = 1 << ((m_pr[3] >> 4) & 0x0f);
-				LOG("uPD7220 MASK: %04x\n", m_mask);
+				m_dad = m_pr[3] >> 4;
+				LOG("uPD7220 DAD: %01x\n", m_dad);
 			}
 		}
 		break;
@@ -1377,15 +1386,14 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		m_pattern = (m_ra[8]) | (m_ra[9]<<8);
 		if(m_figs.m_figure_type == 0)
-			draw_pixel();
+			draw_pixel(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch),m_dad,(m_ra[8]) | (m_ra[9]<<8));
 		else if(m_figs.m_figure_type == 1)
-			draw_line();
+			draw_line(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
 		else if(m_figs.m_figure_type == 4)
-			draw_arc();
+			draw_arc(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
 		else if(m_figs.m_figure_type == 8)
-			draw_rectangle();
+			draw_rectangle(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
 		else
 			logerror("uPD7220 Unimplemented command FIGD %02x\n", m_figs.m_figure_type);
 
@@ -1395,7 +1403,7 @@ void upd7220_device::process_fifo()
 
 	case COMMAND_GCHRD: /* graphics character draw and area filling start */
 		if((m_figs.m_figure_type & 0xf) == 2)
-			draw_char();
+			draw_char(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
 		else
 			logerror("uPD7220 Unimplemented command GCHRD %02x\n", m_figs.m_figure_type);
 
@@ -1413,13 +1421,14 @@ void upd7220_device::process_fifo()
 
 	case COMMAND_CURD: /* cursor address read */
 	{
+		uint16_t dad = 1 << m_dad;
 		fifo_set_direction(FIFO_READ);
 
 		queue(m_ead & 0xff, 0);
 		queue((m_ead >> 8) & 0xff, 0);
 		queue(m_ead >> 16, 0);
-		queue(m_mask & 0xff, 0);
-		queue(m_mask >> 8, 0);
+		queue(dad & 0xff, 0);
+		queue(dad >> 8, 0);
 
 		m_sr |= UPD7220_SR_DATA_READY;
 		break;
@@ -1573,8 +1582,6 @@ void upd7220_device::dack_w(uint8_t data)
 			{
 				m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
 				write_vram(m_dma_type, m_dma_mod, m_dma_data);
-				m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
-				m_ead &= 0x3ffff;
 			}
 			else
 			{
@@ -1584,14 +1591,10 @@ void upd7220_device::dack_w(uint8_t data)
 		case 2:
 			m_dma_data = data & (m_mask & 0xff);
 			write_vram(m_dma_type, m_dma_mod, m_dma_data);
-			m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
-			m_ead &= 0x3ffff;
 			break;
 		case 3:
 			m_dma_data = (data << 8) & (m_mask & 0xff00);
 			write_vram(m_dma_type, m_dma_mod, m_dma_data);
-			m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
-			m_ead &= 0x3ffff;
 			break;
 		default:
 			logerror("uPD7220 Invalid DMA Transfer Type\n");
@@ -1703,7 +1706,7 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int
 		if((sx << 4) < m_aw * 16 && y < al)
 			m_display_cb(bitmap, y, sx << 4, addr);
 
-		addr+= (wd + 1);
+		addr+= (wd + 1) * 2;
 	}
 }
 
@@ -1751,12 +1754,12 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				// pc98 quarth doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
 				// pc98 xevious wants the pitch to be fixed at 80, and wants bsy to be /1
 				// pc98 dbuster contradicts with Xevious with regards of the pitch tho ...
-				uint32_t const addr = (sad & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch >> (mixed ? 1 : 0)));
+				uint32_t const addr = ((sad << 1) & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch << (im ? 0 : 1)));
 				for(int z = 0; z <= m_disp; ++z)
 				{
 					int yval = (y*zoom)+z + (bsy + m_vbp);
 					if(!m_display_cb.isnull() && yval <= cliprect.bottom())
-						draw_graphics_line(bitmap, addr, yval, wd, (m_pitch >> (mixed ? 1 : 0)));
+						draw_graphics_line(bitmap, addr, yval, wd, (m_pitch << interlace));
 				}
 			}
 		}

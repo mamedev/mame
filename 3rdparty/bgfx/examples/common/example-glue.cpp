@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -150,7 +150,9 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 		}
 		else if (ImGui::IsItemHovered() )
 		{
-			ImGui::SetTooltip("Documentation: %.*s", url.getLength(), url.getPtr() );
+			char tmp[1024];
+			bx::snprintf(tmp, BX_COUNTOF(tmp), "Documentation: %.*s", url.getLength(), url.getPtr() );
+			ImGui::SetTooltip(tmp);
 		}
 	}
 
@@ -391,10 +393,9 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 						const double toGpuMs = 1000.0/double(stats->gpuTimerFreq);
 						const float  scale   = 3.0f;
 
-						if (ImGui::BeginListBox("Encoders", ImVec2(ImGui::GetWindowWidth(), stats->numEncoders*itemHeightWithSpacing) ) )
+						if (ImGui::ListBoxHeader("Encoders", ImVec2(ImGui::GetWindowWidth(), stats->numEncoders*itemHeightWithSpacing) ) )
 						{
-							ImGuiListClipper clipper;
-							clipper.Begin(stats->numEncoders, itemHeight);
+							ImGuiListClipper clipper(stats->numEncoders, itemHeight);
 
 							while (clipper.Step() )
 							{
@@ -419,15 +420,14 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 								}
 							}
 
-							ImGui::EndListBox();
+							ImGui::ListBoxFooter();
 						}
 
 						ImGui::Separator();
 
-						if (ImGui::BeginListBox("Views", ImVec2(ImGui::GetWindowWidth(), stats->numViews*itemHeightWithSpacing) ) )
+						if (ImGui::ListBoxHeader("Views", ImVec2(ImGui::GetWindowWidth(), stats->numViews*itemHeightWithSpacing) ) )
 						{
-							ImGuiListClipper clipper;
-							clipper.Begin(stats->numViews, itemHeight);
+							ImGuiListClipper clipper(stats->numViews, itemHeight);
 
 							while (clipper.Step() )
 							{
@@ -466,7 +466,7 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 								}
 							}
 
-							ImGui::EndListBox();
+							ImGui::ListBoxFooter();
 						}
 
 						ImGui::PopFont();

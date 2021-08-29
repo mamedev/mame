@@ -20,9 +20,6 @@
 namespace spvtools {
 namespace val {
 
-spv_result_t ValidateScope(ValidationState_t& _, const Instruction* inst,
-                           uint32_t scope);
-
 spv_result_t ValidateExecutionScope(ValidationState_t& _,
                                     const Instruction* inst, uint32_t scope);
 

@@ -1264,8 +1264,7 @@ std::string &cheat_manager::get_output_string(int row, ui::text_layout::text_jus
 	row = (row < 0) ? (m_numlines + row) : (row - 1);
 
 	// clamp within range
-	assert(m_numlines > 0);
-	row = std::clamp(row, 0, m_numlines - 1);
+	row = std::min(std::max(row, 0), m_numlines - 1);
 
 	// return the appropriate string
 	m_justify[row] = justify;

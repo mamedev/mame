@@ -5,10 +5,9 @@
 //  input_windows.h - Common code used by Windows input modules
 //
 //============================================================
-#ifndef MAME_OSD_INPUT_INPUT_WINDOWS_H
-#define MAME_OSD_INPUT_INPUT_WINDOWS_H
 
-#pragma once
+#ifndef INPUT_WIN_H_
+#define INPUT_WIN_H_
 
 // standard windows headers
 #include <windows.h>
@@ -81,4 +80,4 @@ protected:
 	}
 };
 
-#endif // MAME_OSD_INPUT_INPUT_WINDOWS_H
+#endif

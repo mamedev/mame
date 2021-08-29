@@ -85,9 +85,9 @@ class AggressiveDCEPass : public MemPass {
 
   // Add all store instruction which use |ptrId|, directly or indirectly,
   // to the live instruction worklist.
-  void AddStores(Function* func, uint32_t ptrId);
+  void AddStores(uint32_t ptrId);
 
-  // Initialize extensions allowlist
+  // Initialize extensions whitelist
   void InitExtensions();
 
   // Return true if all extensions in this module are supported by this pass.
@@ -99,7 +99,7 @@ class AggressiveDCEPass : public MemPass {
   bool IsTargetDead(Instruction* inst);
 
   // If |varId| is local, mark all stores of varId as live.
-  void ProcessLoad(Function* func, uint32_t varId);
+  void ProcessLoad(uint32_t varId);
 
   // If |bp| is structured header block, returns true and sets |mergeInst| to
   // the merge instruction, |branchInst| to the branch and |mergeBlockId| to the
@@ -126,6 +126,9 @@ class AggressiveDCEPass : public MemPass {
 
   // Erases functions that are unreachable from the entry points of the module.
   bool EliminateDeadFunctions();
+
+  // Removes |func| from the module and deletes all its instructions.
+  void EliminateFunction(Function* func);
 
   // For function |func|, mark all Stores to non-function-scope variables
   // and block terminating instructions as live. Recursively mark the values
@@ -188,7 +191,7 @@ class AggressiveDCEPass : public MemPass {
   std::vector<Instruction*> to_kill_;
 
   // Extensions supported by this pass.
-  std::unordered_set<std::string> extensions_allowlist_;
+  std::unordered_set<std::string> extensions_whitelist_;
 };
 
 }  // namespace opt

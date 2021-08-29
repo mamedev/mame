@@ -33,7 +33,7 @@ class RemoveSelectionReductionOpportunityFinder
   std::string GetName() const final;
 
   std::vector<std::unique_ptr<ReductionOpportunity>> GetAvailableOpportunities(
-      opt::IRContext* context, uint32_t target_function) const final;
+      opt::IRContext* context) const final;
 
   // Returns true if the OpSelectionMerge instruction |merge_instruction| in
   // block |header_block| can be removed.

@@ -34,14 +34,15 @@ class WrapOpKill : public Pass {
            IRContext::kAnalysisInstrToBlockMapping |
            IRContext::kAnalysisDecorations | IRContext::kAnalysisCombinators |
            IRContext::kAnalysisNameMap | IRContext::kAnalysisBuiltinVarId |
-           IRContext::kAnalysisConstants | IRContext::kAnalysisTypes;
+           IRContext::kAnalysisIdToFuncMapping | IRContext::kAnalysisConstants |
+           IRContext::kAnalysisTypes;
   }
 
  private:
-  // Replaces the OpKill or OpTerminateInvocation instruction |inst| with a
-  // function call to a function that contains a single instruction, a clone of
-  // |inst|.  An OpUnreachable instruction will be placed after the function
-  // call. Return true if successful.
+  // Replaces the OpKill instruction |inst| with a function call to a function
+  // that contains a single instruction, which is OpKill.  An OpUnreachable
+  // instruction will be placed after the function call.  Return true if
+  // successful.
   bool ReplaceWithFunctionCall(Instruction* inst);
 
   // Returns the id of the void type.
@@ -51,9 +52,9 @@ class WrapOpKill : public Pass {
   uint32_t GetVoidFunctionTypeId();
 
   // Return the id of a function that has return type void, has no parameters,
-  // and contains a single instruction, which is |opcode|, either OpKill or
-  // OpTerminateInvocation.  Returns 0 if the function could not be generated.
-  uint32_t GetKillingFuncId(SpvOp opcode);
+  // and contains a single instruction, which is an OpKill.  Returns 0 if the
+  // function could not be generated.
+  uint32_t GetOpKillFuncId();
 
   // Returns the id of the return type for the function that contains |inst|.
   // Returns 0 if |inst| is not in a function.
@@ -67,11 +68,6 @@ class WrapOpKill : public Pass {
   // function has a void return type and takes no parameters. If the function is
   // |nullptr|, then the function has not been generated.
   std::unique_ptr<Function> opkill_function_;
-  // The function that is a single instruction, which is an
-  // OpTerminateInvocation. The function has a void return type and takes no
-  // parameters. If the function is |nullptr|, then the function has not been
-  // generated.
-  std::unique_ptr<Function> opterminateinvocation_function_;
 };
 
 }  // namespace opt

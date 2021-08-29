@@ -87,10 +87,6 @@ public:
 						   , 0
 						   );
 
-		// Initialize Imgui
-		// This initializes the same allocator used by stb_truetype, so must do that before creating the font manager
-		imguiCreate();
-
 		// Init the text rendering system.
 		m_fontManager = new FontManager(512);
 		m_textBufferManager = new TextBufferManager(m_fontManager);
@@ -190,6 +186,8 @@ public:
 
 		// Create a transient buffer for real-time data.
 		m_transientText = m_textBufferManager->createTextBuffer(FONT_TYPE_ALPHA, BufferType::Transient);
+
+		imguiCreate();
 	}
 
 	virtual int shutdown() override

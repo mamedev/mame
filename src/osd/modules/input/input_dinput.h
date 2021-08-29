@@ -1,7 +1,5 @@
-#ifndef MAME_OSD_INPUT_INPUT_DINPUT_H
-#define MAME_OSD_INPUT_INPUT_DINPUT_H
-
-#pragma once
+#ifndef INPUT_DINPUT_H_
+#define INPUT_DINPUT_H_
 
 #include "input_common.h"
 #include "modules/lib/osdlib.h"
@@ -9,6 +7,19 @@
 //============================================================
 //  dinput_device - base directinput device
 //============================================================
+
+// DirectInput-specific information about a device
+struct dinput_api_state
+{
+#if DIRECTINPUT_VERSION >= 0x0800
+	Microsoft::WRL::ComPtr<IDirectInputDevice8>  device;
+#else
+	Microsoft::WRL::ComPtr<IDirectInputDevice>   device;
+	Microsoft::WRL::ComPtr<IDirectInputDevice2>  device2;
+#endif
+	DIDEVCAPS                                    caps;
+	LPCDIDATAFORMAT                              format;
+};
 
 class device_enum_interface
 {
@@ -33,7 +44,11 @@ public:
 };
 
 // Typedef for dynamically loaded function
+#if DIRECTINPUT_VERSION >= 0x0800
 typedef HRESULT (WINAPI *dinput_create_fn)(HINSTANCE, DWORD, LPDIRECTINPUT8 *, LPUNKNOWN);
+#else
+typedef HRESULT (WINAPI *dinput_create_fn)(HINSTANCE, DWORD, LPDIRECTINPUT *, LPUNKNOWN);
+#endif
 
 enum class dinput_cooperative_level
 {
@@ -44,12 +59,17 @@ enum class dinput_cooperative_level
 class dinput_api_helper
 {
 private:
+#if DIRECTINPUT_VERSION >= 0x0800
 	Microsoft::WRL::ComPtr<IDirectInput8> m_dinput;
+#else
+	Microsoft::WRL::ComPtr<IDirectInput>  m_dinput;
+#endif
+	int                                   m_dinput_version;
 	osd::dynamic_module::ptr              m_dinput_dll;
 	dinput_create_fn                      m_dinput_create_prt;
 
 public:
-	dinput_api_helper();
+	dinput_api_helper(int version);
 	virtual ~dinput_api_helper();
 	int initialize();
 
@@ -73,29 +93,36 @@ public:
 		std::string utf8_instance_id = utf8_instance_name + " product_" + guid_to_string(instance->guidProduct) + " instance_" + guid_to_string(instance->guidInstance);
 
 		// allocate memory for the device object
-		TDevice &devinfo = module.devicelist()->create_device<TDevice>(machine, std::move(utf8_instance_name), std::move(utf8_instance_id), module);
+		TDevice* devinfo = module.devicelist()->create_device<TDevice>(machine, utf8_instance_name.c_str(), utf8_instance_id.c_str(), module);
 
 		// attempt to create a device
-		result = m_dinput->CreateDevice(instance->guidInstance, devinfo.dinput.device.GetAddressOf(), nullptr);
+		result = m_dinput->CreateDevice(instance->guidInstance, devinfo->dinput.device.GetAddressOf(), nullptr);
 		if (result != DI_OK)
 			goto error;
 
+#if DIRECTINPUT_VERSION < 0x0800
+		// try to get a version 2 device for it so we can use the poll method
+		result = devinfo->dinput.device.CopyTo(IID_IDirectInputDevice2, reinterpret_cast<void**>(devinfo->dinput.device2.GetAddressOf()));
+		if (result != DI_OK)
+			devinfo->dinput.device2 = nullptr;
+#endif
+
 		// get the caps
-		devinfo.dinput.caps.dwSize = sizeof(devinfo.dinput.caps);
-		result = devinfo.dinput.device->GetCapabilities(&devinfo.dinput.caps);
+		devinfo->dinput.caps.dwSize = sizeof(devinfo->dinput.caps);
+		result = devinfo->dinput.device->GetCapabilities(&devinfo->dinput.caps);
 		if (result != DI_OK)
 			goto error;
 
 		// attempt to set the data format
-		devinfo.dinput.format = format1;
-		result = devinfo.dinput.device->SetDataFormat(devinfo.dinput.format);
+		devinfo->dinput.format = format1;
+		result = devinfo->dinput.device->SetDataFormat(devinfo->dinput.format);
 		if (result != DI_OK)
 		{
 			// use the secondary format if available
-			if (format2)
+			if (format2 != nullptr)
 			{
-				devinfo.dinput.format = format2;
-				result = devinfo.dinput.device->SetDataFormat(devinfo.dinput.format);
+				devinfo->dinput.format = format2;
+				result = devinfo->dinput.device->SetDataFormat(devinfo->dinput.format);
 			}
 			if (result != DI_OK)
 				goto error;
@@ -127,11 +154,11 @@ public:
 		}
 
 		// set the cooperative level
-		result = devinfo.dinput.device->SetCooperativeLevel(hwnd, di_cooperative_level);
+		result = devinfo->dinput.device->SetCooperativeLevel(hwnd, di_cooperative_level);
 		if (result != DI_OK)
 			goto error;
 
-		return &devinfo;
+		return devinfo;
 
 	error:
 		module.devicelist()->free_device(devinfo);
@@ -160,17 +187,9 @@ public:
 class dinput_device : public device_info
 {
 public:
-	// DirectInput-specific information about a device
-	struct dinput_api_state
-	{
-		Microsoft::WRL::ComPtr<IDirectInputDevice8>  device;
-		DIDEVCAPS                                    caps;
-		LPCDIDATAFORMAT                              format;
-	};
-
 	dinput_api_state dinput;
 
-	dinput_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module);
+	dinput_device(running_machine &machine, const char *name, const char *id, input_device_class deviceclass, input_module &module);
 	virtual ~dinput_device();
 
 protected:
@@ -185,7 +204,7 @@ private:
 public:
 	keyboard_state  keyboard;
 
-	dinput_keyboard_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module);
+	dinput_keyboard_device(running_machine &machine, const char *name, const char *id, input_module &module);
 
 	void poll() override;
 	void reset() override;
@@ -197,7 +216,7 @@ public:
 	mouse_state mouse;
 
 public:
-	dinput_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module);
+	dinput_mouse_device(running_machine &machine, const char *name, const char *id, input_module &module);
 	void poll() override;
 	void reset() override;
 };
@@ -215,10 +234,11 @@ class dinput_joystick_device : public dinput_device
 public:
 	dinput_joystick_state   joystick;
 public:
-	dinput_joystick_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module);
+	dinput_joystick_device(running_machine &machine, const char *name, const char *id, input_module &module);
 	void reset() override;
 	void poll() override;
 	int configure();
 };
 
-#endif // MAME_OSD_INPUT_INPUT_DINPUT_H
+
+#endif

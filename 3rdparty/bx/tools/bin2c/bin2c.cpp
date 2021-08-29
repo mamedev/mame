@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -27,20 +27,19 @@ public:
 
 	virtual int32_t write(const void* _data, int32_t _size, bx::Error* _err) override
 	{
-		bool asCStr = true;
+		m_outputAsCStr = true;
 
 		const char* data = (const char*)_data;
-		for (int32_t ii = 0; ii < _size && asCStr; ++ii)
+		for (int32_t ii = 0; ii < _size; ++ii)
 		{
 			char ch = data[ii];
-
-			asCStr &= false
-				| bx::isPrint(ch)
-				| bx::isSpace(ch)
-				;
+			if (!bx::isPrint(ch)
+			&&  !bx::isSpace(ch) )
+			{
+				m_outputAsCStr = false;
+				break;
+			}
 		}
-
-		m_outputAsCStr = asCStr;
 
 		return bx::write(&m_mw, _data, _size, _err);
 	}
@@ -59,7 +58,7 @@ public:
 
 	void outputString(bx::WriterI* _writer)
 	{
-		const uint8_t* data = (const uint8_t*)m_mb.more(0);
+		const char* data = (const char*)m_mb.more(0);
 		uint32_t size = uint32_t(bx::seek(&m_mw) );
 
 		bx::Error err;
@@ -78,7 +77,7 @@ public:
 
 			for (uint32_t ii = 0; ii < size; ++ii)
 			{
-				const char ch = char(data[ii]);
+				char ch = data[ii];
 
 				if (!escaped)
 				{
@@ -114,7 +113,7 @@ public:
 #define HEX_DUMP_WIDTH 16
 #define HEX_DUMP_SPACE_WIDTH 96
 #define HEX_DUMP_FORMAT "%-" BX_STRINGIZE(HEX_DUMP_SPACE_WIDTH) "." BX_STRINGIZE(HEX_DUMP_SPACE_WIDTH) "s"
-		const uint8_t* data = (const uint8_t*)m_mb.more(0);
+		const char* data = (const char*)m_mb.more(0);
 		uint32_t size = uint32_t(bx::seek(&m_mw) );
 
 		bx::Error err;
@@ -171,19 +170,6 @@ public:
 	bool             m_outputAsCStr;
 };
 
-void error(const char* _format, ...)
-{
-	bx::WriterI* stdOut = bx::getStdOut();
-	bx::Error err;
-
-	va_list argList;
-	va_start(argList, _format);
-	bx::write(stdOut, &err, "Error:\n");
-	bx::write(stdOut, _format, argList, &err);
-	bx::write(stdOut, &err, "\n\n");
-	va_end(argList);
-}
-
 void help(const char* _error = NULL)
 {
 	bx::WriterI* stdOut = bx::getStdOut();
@@ -191,12 +177,12 @@ void help(const char* _error = NULL)
 
 	if (NULL != _error)
 	{
-		error(_error);
+		bx::write(stdOut, &err, "Error:\n%s\n\n", _error);
 	}
 
 	bx::write(stdOut, &err
 		, "bin2c, binary to C\n"
-		  "Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2019 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bx#license-bsd-2-clause\n\n"
 		);
 
@@ -264,18 +250,8 @@ int main(int _argc, const char* _argv[])
 			writer.output(&fw);
 			bx::close(&fw);
 		}
-		else
-		{
-			bx::StringView path = outFilePath;
-			error("Failed to open output file '%.*s'.\n", path.getLength(), path.getPtr() );
-		}
 
 		BX_FREE(&allocator, data);
-	}
-	else
-	{
-		bx::StringView path = filePath;
-		error("Failed to open input file '%.*s'.\n", path.getLength(), path.getPtr() );
 	}
 
 	return 0;

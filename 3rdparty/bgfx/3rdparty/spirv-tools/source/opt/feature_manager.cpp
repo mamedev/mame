@@ -47,11 +47,6 @@ void FeatureManager::AddExtension(Instruction* ext) {
   }
 }
 
-void FeatureManager::RemoveExtension(Extension ext) {
-  if (!extensions_.Contains(ext)) return;
-  extensions_.Remove(ext);
-}
-
 void FeatureManager::AddCapability(SpvCapability cap) {
   if (capabilities_.Contains(cap)) return;
 
@@ -65,11 +60,6 @@ void FeatureManager::AddCapability(SpvCapability cap) {
   }
 }
 
-void FeatureManager::RemoveCapability(SpvCapability cap) {
-  if (!capabilities_.Contains(cap)) return;
-  capabilities_.Remove(cap);
-}
-
 void FeatureManager::AddCapabilities(Module* module) {
   for (Instruction& inst : module->capabilities()) {
     AddCapability(static_cast<SpvCapability>(inst.GetSingleWordInOperand(0)));
@@ -78,10 +68,6 @@ void FeatureManager::AddCapabilities(Module* module) {
 
 void FeatureManager::AddExtInstImportIds(Module* module) {
   extinst_importid_GLSLstd450_ = module->GetExtInstImportId("GLSL.std.450");
-  extinst_importid_OpenCL100DebugInfo_ =
-      module->GetExtInstImportId("OpenCL.DebugInfo.100");
-  extinst_importid_Vulkan100DebugInfo_ =
-      module->GetExtInstImportId("NonSemantic.Vulkan.DebugInfo.100");
 }
 
 bool operator==(const FeatureManager& a, const FeatureManager& b) {
@@ -101,16 +87,6 @@ bool operator==(const FeatureManager& a, const FeatureManager& b) {
   }
 
   if (a.extinst_importid_GLSLstd450_ != b.extinst_importid_GLSLstd450_) {
-    return false;
-  }
-
-  if (a.extinst_importid_OpenCL100DebugInfo_ !=
-      b.extinst_importid_OpenCL100DebugInfo_) {
-    return false;
-  }
-
-  if (a.extinst_importid_Vulkan100DebugInfo_ !=
-      b.extinst_importid_Vulkan100DebugInfo_) {
     return false;
   }
 

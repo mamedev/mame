@@ -19,9 +19,11 @@
 namespace spvtools {
 namespace reduce {
 
+using namespace opt;
+
 SimpleConditionalBranchToBranchReductionOpportunity::
     SimpleConditionalBranchToBranchReductionOpportunity(
-        opt::Instruction* conditional_branch_instruction)
+        Instruction* conditional_branch_instruction)
     : conditional_branch_instruction_(conditional_branch_instruction) {}
 
 bool SimpleConditionalBranchToBranchReductionOpportunity::PreconditionHolds() {
@@ -51,8 +53,6 @@ void SimpleConditionalBranchToBranchReductionOpportunity::Apply() {
       {{SPV_OPERAND_TYPE_ID,
         {conditional_branch_instruction_->GetSingleWordInOperand(
             kTrueBranchOperandIndex)}}});
-  conditional_branch_instruction_->context()->InvalidateAnalysesExceptFor(
-      opt::IRContext::kAnalysisNone);
 }
 
 }  // namespace reduce
