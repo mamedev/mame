@@ -9,6 +9,10 @@
             Allard van der Bas (allard@mindless.com)
 
 1 x Z80 CPU main game, 1 x Z80 with ???? sound hardware.
+
+Given the similarities with clshroad.cpp this was probably developed by
+Masao Suzuki, who later left Nichibutsu to form Woodplace Inc.
+
 ----------------------------------------------------------------------------
 Main processor :
 
@@ -45,6 +49,7 @@ dip: 6.7 7.7
 #include "screen.h"
 #include "speaker.h"
 
+#define MASTER_CLOCK XTAL(18'432'000)
 
 void wiping_state::machine_start()
 {
@@ -287,13 +292,15 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 void wiping_state::wiping(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/6); /* 3.072 MHz */
+	Z80(config, m_maincpu, MASTER_CLOCK / 6); /* 3.072 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &wiping_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wiping_state::vblank_irq));
 
-	Z80(config, m_audiocpu, 18432000/6);    /* 3.072 MHz */
+	Z80(config, m_audiocpu, MASTER_CLOCK / 6);    /* 3.072 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wiping_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(wiping_state::sound_timer_irq), attotime::from_hz(120));    /* periodic interrupt, don't know about the frequency */
+
+	config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK / 6 / 512)); // 6000 Hz
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5A
 	mainlatch.q_out_cb<0>().set(FUNC(wiping_state::main_irq_mask_w)); // INT1
@@ -305,10 +312,7 @@ void wiping_state::wiping(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(36*8, 28*8);
-	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	screen.set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 0, 224); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
 	screen.set_screen_update(FUNC(wiping_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -318,7 +322,7 @@ void wiping_state::wiping(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	WIPING_CUSTOM(config, "wiping", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WIPING_CUSTOM(config, "wiping", 96000 / 2).add_route(ALL_OUTPUTS, "mono", 1.0); // 48000 Hz?
 }
 
 

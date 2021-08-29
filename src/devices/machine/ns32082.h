@@ -23,7 +23,7 @@ public:
 	virtual void write_id(u16 data) override;
 	virtual void write_op(u16 data) override;
 
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool debug = false) override;
+	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs = false, bool debug = false) override;
 
 protected:
 	// device_t overrides
@@ -38,6 +38,8 @@ protected:
 private:
 	// registers
 	u32 m_bpr[2];
+	u32 m_pf[2];
+	u32 m_sc;
 	u32 m_msr;
 	u32 m_bcnt;
 	u32 m_ptb[2];

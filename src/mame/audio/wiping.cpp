@@ -2,9 +2,15 @@
 // copyright-holders:Allard van der Bas
 /***************************************************************************
 
-    Wiping sound driver (quick hack of the Namco sound driver)
+    Wiping sound driver
+
+    Nichibutsu / Woodplace Inc. custom part?
 
     used by wiping.cpp and clshroad.cpp
+
+    TODO:
+    - Identify actual part, sound device was originally based off
+      Namco customs (on which involvement seems pretty thin here);
 
 ***************************************************************************/
 
@@ -37,10 +43,10 @@ void wiping_sound_device::device_start()
 	wp_sound_channel *voice;
 
 	/* get stream channels */
-	m_stream = stream_alloc(0, 1, clock()/2);
+	m_stream = stream_alloc(0, 1, clock()); // 48000 Hz
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer.resize(clock()/2);
+	m_mixer_buffer.resize(clock());
 
 	/* extract globals from the interface */
 	m_num_voices = 8;

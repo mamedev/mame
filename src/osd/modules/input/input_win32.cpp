@@ -27,6 +27,8 @@
 #include "input_common.h"
 #include "input_windows.h"
 
+namespace {
+
 //============================================================
 //  win32_keyboard_device
 //============================================================
@@ -37,8 +39,8 @@ class win32_keyboard_device : public event_based_device<KeyPressEventArgs>
 public:
 	keyboard_state keyboard;
 
-	win32_keyboard_device(running_machine& machine, const char *name, const char *id, input_module &module)
-		: event_based_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
+	win32_keyboard_device(running_machine& machine, std::string &&name, std::string &&id, input_module &module)
+		: event_based_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
 			keyboard({{0}})
 	{
 	}
@@ -72,7 +74,7 @@ public:
 	virtual void input_init(running_machine &machine) override
 	{
 		// Add a single win32 keyboard device that we'll monitor using Win32
-		auto *devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", "Win32 Keyboard 1", *this);
+		auto &devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", "Win32 Keyboard 1", *this);
 
 		keyboard_trans_table &table = keyboard_trans_table::instance();
 
@@ -88,7 +90,7 @@ public:
 			std::string name = osd::text::from_tstring(keyname);
 
 			// add the item to the device
-			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
+			devinfo.device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo.keyboard.state[keynum]);
 		}
 	}
 
@@ -134,8 +136,8 @@ public:
 	mouse_state         mouse;
 	win32_mouse_state   win32_mouse;
 
-	win32_mouse_device(running_machine& machine, const char *name, const char *id, input_module &module)
-		: event_based_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
+	win32_mouse_device(running_machine& machine, std::string &&name, std::string &&id, input_module &module)
+		: event_based_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module),
 			mouse({0}),
 			win32_mouse({{0}})
 	{
@@ -200,35 +202,30 @@ public:
 
 	virtual void input_init(running_machine &machine) override
 	{
-		win32_mouse_device *devinfo;
-		int axisnum, butnum;
-
 		if (!input_enabled() || !mouse_enabled())
 			return;
 
 		// allocate a device
-		devinfo = devicelist()->create_device<win32_mouse_device>(machine, "Win32 Mouse 1", "Win32 Mouse 1", *this);
-		if (devinfo == nullptr)
-			return;
+		auto &devinfo = devicelist()->create_device<win32_mouse_device>(machine, "Win32 Mouse 1", "Win32 Mouse 1", *this);
 
 		// populate the axes
-		for (axisnum = 0; axisnum < 2; axisnum++)
+		for (int axisnum = 0; axisnum < 2; axisnum++)
 		{
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				default_axis_name[axisnum],
 				static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
 				generic_axis_get_state<LONG>,
-				&devinfo->mouse.lX + axisnum);
+				&devinfo.mouse.lX + axisnum);
 		}
 
 		// populate the buttons
-		for (butnum = 0; butnum < 2; butnum++)
+		for (int butnum = 0; butnum < 2; butnum++)
 		{
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				default_button_name(butnum),
 				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
 				generic_button_get_state<BYTE>,
-				&devinfo->mouse.rgbButtons[butnum]);
+				&devinfo.mouse.rgbButtons[butnum]);
 		}
 	}
 
@@ -262,8 +259,8 @@ private:
 public:
 	mouse_state     mouse;
 
-	win32_lightgun_device(running_machine& machine, const char *name, const char *id, input_module &module)
-		: event_based_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module),
+	win32_lightgun_device(running_machine& machine, std::string &&name, std::string &&id, input_module &module)
+		: event_based_device(machine, std::move(name), std::move(id), DEVICE_CLASS_LIGHTGUN, module),
 			m_lightgun_shared_axis_mode(FALSE),
 			m_gun_index(0),
 			mouse({0})
@@ -392,32 +389,28 @@ public:
 		for (int gunnum = 0; gunnum < max_guns; gunnum++)
 		{
 			static const char *const gun_names[] = { "Win32 Gun 1", "Win32 Gun 2" };
-			win32_lightgun_device *devinfo;
-			int axisnum, butnum;
 
 			// allocate a device
-			devinfo = devicelist()->create_device<win32_lightgun_device>(machine, gun_names[gunnum], gun_names[gunnum], *this);
-			if (devinfo == nullptr)
-				break;
+			auto &devinfo = devicelist()->create_device<win32_lightgun_device>(machine, gun_names[gunnum], gun_names[gunnum], *this);
 
 			// populate the axes
-			for (axisnum = 0; axisnum < 2; axisnum++)
+			for (int axisnum = 0; axisnum < 2; axisnum++)
 			{
-				devinfo->device()->add_item(
+				devinfo.device()->add_item(
 					default_axis_name[axisnum],
 					static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
 					generic_axis_get_state<LONG>,
-					&devinfo->mouse.lX + axisnum);
+					&devinfo.mouse.lX + axisnum);
 			}
 
 			// populate the buttons
-			for (butnum = 0; butnum < 2; butnum++)
+			for (int butnum = 0; butnum < 2; butnum++)
 			{
-				devinfo->device()->add_item(
+				devinfo.device()->add_item(
 					default_button_name(butnum),
 					static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
 					generic_button_get_state<BYTE>,
-					&devinfo->mouse.rgbButtons[butnum]);
+					&devinfo.mouse.rgbButtons[butnum]);
 			}
 		}
 	}
@@ -439,11 +432,15 @@ public:
 	}
 };
 
-#else
+} // anonymous namespace
+
+#else // defined(OSD_WINDOWS)
+
 MODULE_NOT_SUPPORTED(keyboard_input_win32, OSD_KEYBOARDINPUT_PROVIDER, "win32")
 MODULE_NOT_SUPPORTED(mouse_input_win32, OSD_MOUSEINPUT_PROVIDER, "win32")
 MODULE_NOT_SUPPORTED(lightgun_input_win32, OSD_LIGHTGUNINPUT_PROVIDER, "win32")
-#endif
+
+#endif // defined(OSD_WINDOWS)
 
 MODULE_DEFINITION(KEYBOARDINPUT_WIN32, keyboard_input_win32)
 MODULE_DEFINITION(MOUSEINPUT_WIN32, mouse_input_win32)

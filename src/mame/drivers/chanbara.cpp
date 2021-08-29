@@ -46,8 +46,8 @@ Notes:
 TODO:
  - Support screen flipping for sprites
  - If you force-scroll an enemy off the screen rather than fight them, you'll get graphical
-   corruption (bad sprites) before  a new enemy appears, does this happen on the PCB?
- - BGM tempo is incorrect, but clocks are verfied above? ( see https://www.youtube.com/watch?v=pW9nhx1hcLM )
+   corruption (bad sprites) before a new enemy appears, does this happen on the PCB?
+ - BGM tempo is incorrect, but clocks are verified above? ( see https://www.youtube.com/watch?v=pW9nhx1hcLM )
 
 ****************************************************************************************/
 
@@ -60,16 +60,26 @@ TODO:
 #include "tilemap.h"
 
 
+// configurable logging
+#define LOG_AYOUTS (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_AYOUTS)
+
+#include "logmacro.h"
+
+#define LOGAYOUTS(...) LOGMASKED(LOG_AYOUTS, __VA_ARGS__)
+
+namespace {
+
 class chanbara_state : public driver_device
 {
 public:
 	chanbara_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram%u", 1U),
+		m_colorram(*this, "colorram%u", 1U),
 		m_spriteram(*this, "spriteram"),
-		m_videoram2(*this, "videoram2"),
-		m_colorram2(*this, "colorram2"),
+		m_rombank(*this, "rombank"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -85,40 +95,36 @@ protected:
 	virtual void video_start() override;
 
 private:
-	void chanbara_videoram_w(offs_t offset, uint8_t data);
-	void chanbara_colorram_w(offs_t offset, uint8_t data);
-	void chanbara_videoram2_w(offs_t offset, uint8_t data);
-	void chanbara_colorram2_w(offs_t offset, uint8_t data);
-	void chanbara_ay_out_0_w(uint8_t data);
-	void chanbara_ay_out_1_w(uint8_t data);
+	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
+	void ay_out_0_w(uint8_t data);
+	void ay_out_1_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	void chanbara_palette(palette_device &palette) const;
-	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void chanbara_map(address_map &map);
+	void prg_map(address_map &map);
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
+	// memory pointers
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_videoram2;
-	required_shared_ptr<uint8_t> m_colorram2;
+	required_memory_bank m_rombank;
 
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_bg2_tilemap;
+	// video-related
+	tilemap_t  *m_bg_tilemap[2];
 	uint8_t    m_scroll;
 	uint8_t    m_scrollhi;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
 
-void chanbara_state::chanbara_palette(palette_device &palette) const
+void chanbara_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 
@@ -132,55 +138,45 @@ void chanbara_state::chanbara_palette(palette_device &palette) const
 	}
 }
 
-void chanbara_state::chanbara_videoram_w(offs_t offset, uint8_t data)
+template <uint8_t Which>
+void chanbara_state::videoram_w(offs_t offset, uint8_t data)
 {
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[Which][offset] = data;
+	m_bg_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-void chanbara_state::chanbara_colorram_w(offs_t offset, uint8_t data)
+template <uint8_t Which>
+void chanbara_state::colorram_w(offs_t offset, uint8_t data)
 {
-	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-void chanbara_state::chanbara_videoram2_w(offs_t offset, uint8_t data)
-{
-	m_videoram2[offset] = data;
-	m_bg2_tilemap->mark_tile_dirty(offset);
-}
-
-void chanbara_state::chanbara_colorram2_w(offs_t offset, uint8_t data)
-{
-	m_colorram2[offset] = data;
-	m_bg2_tilemap->mark_tile_dirty(offset);
+	m_colorram[Which][offset] = data;
+	m_bg_tilemap[Which]->mark_tile_dirty(offset);
 }
 
 
 TILE_GET_INFO_MEMBER(chanbara_state::get_bg_tile_info)
 {
-	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 1) << 8);
-	int color = (m_colorram[tile_index] >> 1) & 0x1f;
-	//int flipy = (m_colorram[tile_index]) & 0x01; // not on this layer (although bit is used)
+	int code = m_videoram[0][tile_index] + ((m_colorram[0][tile_index] & 1) << 8);
+	int color = (m_colorram[0][tile_index] >> 1) & 0x1f;
+	//int flipy = (m_colorram[0][tile_index]) & 0x01; // not on this layer (although bit is used)
 
 	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
 {
-	int code = m_videoram2[tile_index];
-	int color = (m_colorram2[tile_index] >> 1) & 0x1f;
-	int flipy = (m_colorram2[tile_index]) & 0x01;
+	int code = m_videoram[1][tile_index];
+	int color = (m_colorram[1][tile_index] >> 1) & 0x1f;
+	int flipy = (m_colorram[1][tile_index]) & 0x01;
 
 	tileinfo.set(2, code, color, TILE_FLIPXY(flipy));
 }
 
 void chanbara_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chanbara_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,8, 8, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chanbara_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS,16, 16, 16, 32);
-	m_bg_tilemap->set_transparent_pen(0);
-	m_bg2_tilemap->set_transparent_pen(0);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chanbara_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chanbara_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
 }
 
 void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16& bitmap, const rectangle& cliprect)
@@ -223,14 +219,14 @@ void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16& bitmap, c
 	}
 }
 
-uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chanbara_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
-	m_bg2_tilemap->set_scrolly(0, m_scroll | (m_scrollhi << 8));
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // ensure bg pen for each tile gets drawn behind sprites
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg_tilemap[1]->set_scrolly(0, m_scroll | (m_scrollhi << 8));
+	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // ensure bg pen for each tile gets drawn behind sprites
+	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 2);
 
 	draw_sprites(screen, bitmap, cliprect);
 
@@ -239,26 +235,26 @@ uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_in
 
 /***************************************************************************/
 
-void chanbara_state::chanbara_map(address_map &map)
+void chanbara_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0bff).ram().w(FUNC(chanbara_state::chanbara_videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(FUNC(chanbara_state::chanbara_colorram_w)).share("colorram");
-	map(0x1000, 0x10ff).ram().share("spriteram");
-	map(0x1800, 0x19ff).ram().w(FUNC(chanbara_state::chanbara_videoram2_w)).share("videoram2");
-	map(0x1a00, 0x1bff).ram().w(FUNC(chanbara_state::chanbara_colorram2_w)).share("colorram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(chanbara_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x0c00, 0x0fff).ram().w(FUNC(chanbara_state::colorram_w<0>)).share(m_colorram[0]);
+	map(0x1000, 0x10ff).ram().share(m_spriteram);
+	map(0x1800, 0x19ff).ram().w(FUNC(chanbara_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x1a00, 0x1bff).ram().w(FUNC(chanbara_state::colorram_w<1>)).share(m_colorram[1]);
 	map(0x2000, 0x2000).portr("DSW1");
 	map(0x2001, 0x2001).portr("SYSTEM");
 	map(0x2002, 0x2002).portr("P2");
 	map(0x2003, 0x2003).portr("P1");
 	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0xffff).rom();
 }
 
 /***************************************************************************/
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( chanbara )
 	PORT_START ("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:1,2")
@@ -271,13 +267,13 @@ static INPUT_PORTS_START( chanbara )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:5")       /* code at 0xedc0 */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:5")       // code at 0xedc0
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:7")       /* table at 0xc249 (2 * 2 words) */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:7")       // table at 0xc249 (2 * 2 words)
 	PORT_DIPSETTING(    0x40, "50k and 70k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
@@ -291,7 +287,7 @@ static INPUT_PORTS_START( chanbara )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* same coinage as COIN1 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )           // same coinage as COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START ("P1")
@@ -319,29 +315,29 @@ INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
 {
-	8,8,    /* tile size */
-	RGN_FRAC(1,2),  /* number of tiles */
-	2,  /* bits per pixel */
-	{ 0, 4 }, /* plane offsets */
-	{ RGN_FRAC(1,2)+0,  RGN_FRAC(1,2)+1, RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+3, 0,1,2,3 }, /* x offsets */
-	{ 0*8,1*8,2*8,3*8, 4*8, 5*8, 6*8, 7*8 }, /* y offsets */
-	8*8 /* offset to next tile */
+	8,8,    // tile size
+	RGN_FRAC(1,2),  // number of tiles
+	2,  // bits per pixel
+	{ 0, 4 }, // plane offsets
+	{ RGN_FRAC(1,2)+0,  RGN_FRAC(1,2)+1, RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+3, 0,1,2,3 }, // x offsets
+	{ 0*8,1*8,2*8,3*8, 4*8, 5*8, 6*8, 7*8 }, // y offsets
+	8*8 // offset to next tile
 };
 
 static const gfx_layout tile16layout =
 {
-	16,16,  /* tile size */
-	RGN_FRAC(1,4),  /* number of tiles */
-	3,  /* bits per pixel */
-	{ RGN_FRAC(1,2),0,4 }, /* plane offsets */
+	16,16,  // tile size
+	RGN_FRAC(1,4),  // number of tiles
+	3,  // bits per pixel
+	{ RGN_FRAC(1,2),0,4 }, // plane offsets
 	{ 16*8+RGN_FRAC(1,4)+0,16*8+ RGN_FRAC(1,4)+1,16*8+ RGN_FRAC(1,4)+2,16*8+ RGN_FRAC(1,4)+3,
 		0,1,2,3,
 		RGN_FRAC(1,4)+0,  RGN_FRAC(1,4)+1, RGN_FRAC(1,4)+2, RGN_FRAC(1,4)+3,
 		16*8+0, 16*8+1, 16*8+2, 16*8+3,
 
-	}, /* x offsets */
-	{ 0*8,1*8,2*8,3*8, 4*8, 5*8, 6*8, 7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 }, /* y offsets */
-	32*8    /* offset to next tile */
+	}, // x offsets
+	{ 0*8,1*8,2*8,3*8, 4*8, 5*8, 6*8, 7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 }, // y offsets
+	32*8    // offset to next tile
 };
 
 
@@ -367,24 +363,25 @@ GFXDECODE_END
 /***************************************************************************/
 
 
-void chanbara_state::chanbara_ay_out_0_w(uint8_t data)
+void chanbara_state::ay_out_0_w(uint8_t data)
 {
-	//printf("chanbara_ay_out_0_w %02x\n",data);
+	LOGAYOUTS("ay_out_0_w %02x\n", data);
 
 	m_scroll = data;
 }
 
-void chanbara_state::chanbara_ay_out_1_w(uint8_t data)
+void chanbara_state::ay_out_1_w(uint8_t data)
 {
-	//printf("chanbara_ay_out_1_w %02x\n",data);
+	LOGAYOUTS("ay_out_1_w %02x\n", data);
 
 	m_scrollhi = data & 0x01;
 
 	flip_screen_set(data & 0x02);
 
-	membank("bank1")->set_entry((data & 0x04) >> 2);
+	m_rombank->set_entry((data & 0x04) >> 2);
 
-	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
+	if (data & 0xf8)
+		LOGAYOUTS("ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
 
 void chanbara_state::machine_start()
@@ -402,7 +399,7 @@ void chanbara_state::machine_reset()
 void chanbara_state::chanbara(machine_config &config)
 {
 	MC6809E(config, m_maincpu, XTAL(12'000'000)/8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &chanbara_state::chanbara_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chanbara_state::prg_map);
 
 
 	/* video hardware */
@@ -413,19 +410,19 @@ void chanbara_state::chanbara(machine_config &config)
 //  screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
 	// DECO video CRTC
 	screen.set_raw(XTAL(12'000'000)/2,384,0,256,272,16,240);
-	screen.set_screen_update(FUNC(chanbara_state::screen_update_chanbara));
+	screen.set_screen_update(FUNC(chanbara_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chanbara);
 
-	PALETTE(config, m_palette, FUNC(chanbara_state::chanbara_palette), 256);
+	PALETTE(config, m_palette, FUNC(chanbara_state::palette), 256);
 
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12000000/8));
 	ymsnd.irq_handler().set_inputline(m_maincpu, 0);
-	ymsnd.port_a_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_0_w));
-	ymsnd.port_b_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_1_w));
+	ymsnd.port_a_write_callback().set(FUNC(chanbara_state::ay_out_0_w));
+	ymsnd.port_b_write_callback().set(FUNC(chanbara_state::ay_out_1_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -443,7 +440,7 @@ ROM_START( chanbara )
 
 	ROM_REGION( 0x08000, "gfx3", 0 ) // bg layer
 	ROM_LOAD( "cp13.15h",       0x00000, 0x4000, CRC(2dc38c3d) SHA1(4bb1335b8285e91b51c28e74d8de11a8d6df0486) )
-	/* rom cp14.13h is expanded at 0x4000 - 0x8000 */
+	// ROM cp14.13h is expanded at 0x4000 - 0x8000
 
 	ROM_REGION( 0x08000, "gfx4", 0 )
 	ROM_LOAD( "cp14.13h",       0x00000, 0x2000, CRC(d31db368) SHA1(b62834137bfe4ac2013d2d16b0ead10bf2a2df83) )
@@ -462,9 +459,9 @@ ROM_START( chanbara )
 	ROM_LOAD( "cp09.4c",     0x28000, 0x4000, CRC(3f58b647) SHA1(4eb212667aedd7c397a4911ac7f1b542c5c0a70d) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "cp17.4k", 0x0000, 0x0100, CRC(cf03706e) SHA1(2dd2b29067f418ec590c56a38cc64d09d8dc8e09) ) /* red */
-	ROM_LOAD( "cp16.5k", 0x0100, 0x0100, CRC(5fedc8ba) SHA1(8b685ce71d833fefb3e4502d1dd0cca96ba9162a) ) /* green */
-	ROM_LOAD( "cp15.6k", 0x0200, 0x0100, CRC(655936eb) SHA1(762b419c0571fafd8e1c5e96d0d94999768ba325) ) /* blue */
+	ROM_LOAD( "cp17.4k", 0x0000, 0x0100, CRC(cf03706e) SHA1(2dd2b29067f418ec590c56a38cc64d09d8dc8e09) ) // red
+	ROM_LOAD( "cp16.5k", 0x0100, 0x0100, CRC(5fedc8ba) SHA1(8b685ce71d833fefb3e4502d1dd0cca96ba9162a) ) // green
+	ROM_LOAD( "cp15.6k", 0x0200, 0x0100, CRC(655936eb) SHA1(762b419c0571fafd8e1c5e96d0d94999768ba325) ) // blue
 ROM_END
 
 
@@ -482,7 +479,10 @@ void chanbara_state::init_chanbara()
 		dst[i + 0x2000] = (src[i + 0x1000] & 0x0f) << 4;
 	}
 
-	membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
+	m_rombank->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
+
+} // Anonymous namespace
+
 
 GAME( 1985, chanbara, 0, chanbara, chanbara, chanbara_state, init_chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

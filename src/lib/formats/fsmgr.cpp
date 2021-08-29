@@ -371,10 +371,8 @@ uint32_t filesystem_t::r32l(const uint8_t *p)
 
 std::string filesystem_t::trim_end_spaces(const std::string &str)
 {
-	auto i = str.end();
-	while(i != str.begin() && i[-1] == ' ')
-		i--;
-	return std::string(str.begin(), i);
+	const auto i = str.find_last_not_of(' ');
+	return str.substr(0, (std::string::npos != i) ? (i + 1) : 0);
 }
 
 filesystem_t::file_t filesystem_t::idir_t::file_create(const fs_meta_data &info)

@@ -2,7 +2,7 @@
 // Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
 // Copyright (C) 2012-2013 LunarG, Inc.
 // Copyright (C) 2017 ARM Limited.
-// Copyright (C) 2018 Google, Inc.
+// Copyright (C) 2018-2020 Google, Inc.
 //
 // All rights reserved.
 //
@@ -529,7 +529,12 @@ TIntermTyped* TIntermConstantUnion::fold(TOperator op, const TType& returnType) 
             case EbtDouble:
             case EbtFloat16:
             case EbtFloat: newConstArray[i].setDConst(-unionArray[i].getDConst()); break;
-            case EbtInt:   newConstArray[i].setIConst(-unionArray[i].getIConst()); break;
+            // Note: avoid UBSAN error regarding negating 0x80000000
+            case EbtInt:   newConstArray[i].setIConst(
+                                unionArray[i].getIConst() == 0x80000000
+                                    ? -0x7FFFFFFF - 1
+                                    : -unionArray[i].getIConst());
+                           break;
             case EbtUint:  newConstArray[i].setUConst(static_cast<unsigned int>(-static_cast<int>(unionArray[i].getUConst())));  break;
 #ifndef GLSLANG_WEB
             case EbtInt8:  newConstArray[i].setI8Const(-unionArray[i].getI8Const()); break;
@@ -599,17 +604,11 @@ TIntermTyped* TIntermConstantUnion::fold(TOperator op, const TType& returnType) 
             newConstArray[i].setDConst(log(unionArray[i].getDConst()));
             break;
         case EOpExp2:
-            {
-                const double inv_log2_e = 0.69314718055994530941723212145818;
-                newConstArray[i].setDConst(exp(unionArray[i].getDConst() * inv_log2_e));
-                break;
-            }
+            newConstArray[i].setDConst(exp2(unionArray[i].getDConst()));
+            break;
         case EOpLog2:
-            {
-                const double log2_e = 1.4426950408889634073599246810019;
-                newConstArray[i].setDConst(log2_e * log(unionArray[i].getDConst()));
-                break;
-            }
+            newConstArray[i].setDConst(log2(unionArray[i].getDConst()));
+            break;
         case EOpSqrt:
             newConstArray[i].setDConst(sqrt(unionArray[i].getDConst()));
             break;
@@ -1012,6 +1011,7 @@ TIntermTyped* TIntermediate::fold(TIntermAggregate* aggrNode)
     case EOpMin:
     case EOpMax:
     case EOpMix:
+    case EOpMod:
     case EOpClamp:
     case EOpLessThan:
     case EOpGreaterThan:
@@ -1074,6 +1074,14 @@ TIntermTyped* TIntermediate::fold(TIntermAggregate* aggrNode)
             case EOpPow:
                 newConstArray[comp].setDConst(pow(childConstUnions[0][arg0comp].getDConst(), childConstUnions[1][arg1comp].getDConst()));
                 break;
+            case EOpMod:
+            {
+                double arg0 = childConstUnions[0][arg0comp].getDConst();
+                double arg1 = childConstUnions[1][arg1comp].getDConst();
+                double result = arg0 - arg1 * floor(arg0 / arg1);
+                newConstArray[comp].setDConst(result);
+                break;
+            }
             case EOpMin:
                 switch(children[0]->getAsTyped()->getBasicType()) {
                 case EbtFloat16:

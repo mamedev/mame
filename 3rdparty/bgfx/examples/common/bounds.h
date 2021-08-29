@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -444,5 +444,7 @@ bool overlap(const Triangle& _triangle, const Disk& _disk);
 
 ///
 bool overlap(const Triangle& _triangle, const Obb& _obb);
+
+#include "bounds.inl"
 
 #endif // BOUNDS_H_HEADER_GUARD

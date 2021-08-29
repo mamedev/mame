@@ -178,13 +178,13 @@ void MemoryWindow::memoryRegionChanged(int index)
 		debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
 		switch (memView->get_data_format())
 		{
-		case 1: dataFormatMenuItem("formatActOne")->setChecked(true); break;
-		case 2: dataFormatMenuItem("formatActTwo")->setChecked(true); break;
-		case 4: dataFormatMenuItem("formatActFour")->setChecked(true); break;
-		case 8: dataFormatMenuItem("formatActEight")->setChecked(true); break;
-		case 9: dataFormatMenuItem("formatAct32bitFloat")->setChecked(true); break;
-		case 10: dataFormatMenuItem("formatAct64bitFloat")->setChecked(true); break;
-		case 11: dataFormatMenuItem("formatAct80bitFloat")->setChecked(true); break;
+		case debug_view_memory::data_format::HEX_8BIT: dataFormatMenuItem("formatActOne")->setChecked(true); break;
+		case debug_view_memory::data_format::HEX_16BIT: dataFormatMenuItem("formatActTwo")->setChecked(true); break;
+		case debug_view_memory::data_format::HEX_32BIT: dataFormatMenuItem("formatActFour")->setChecked(true); break;
+		case debug_view_memory::data_format::HEX_64BIT: dataFormatMenuItem("formatActEight")->setChecked(true); break;
+		case debug_view_memory::data_format::FLOAT_32BIT: dataFormatMenuItem("formatAct32bitFloat")->setChecked(true); break;
+		case debug_view_memory::data_format::FLOAT_64BIT: dataFormatMenuItem("formatAct64bitFloat")->setChecked(true); break;
+		case debug_view_memory::data_format::FLOAT_80BIT: dataFormatMenuItem("formatAct80bitFloat")->setChecked(true); break;
 		default: break;
 		}
 	}
@@ -214,19 +214,19 @@ void MemoryWindow::formatChanged(QAction* changedTo)
 	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
 
 	if (changedTo->text() == "1-byte chunks")
-		memView->set_data_format(1);
+		memView->set_data_format(debug_view_memory::data_format::HEX_8BIT);
 	else if (changedTo->text() == "2-byte chunks")
-		memView->set_data_format(2);
+		memView->set_data_format(debug_view_memory::data_format::HEX_16BIT);
 	else if (changedTo->text() == "4-byte chunks")
-		memView->set_data_format(4);
+		memView->set_data_format(debug_view_memory::data_format::HEX_32BIT);
 	else if (changedTo->text() == "8-byte chunks")
-		memView->set_data_format(8);
+		memView->set_data_format(debug_view_memory::data_format::HEX_64BIT);
 	else if (changedTo->text() == "32 bit floating point")
-		memView->set_data_format(9);
+		memView->set_data_format(debug_view_memory::data_format::FLOAT_32BIT);
 	else if (changedTo->text() == "64 bit floating point")
-		memView->set_data_format(10);
+		memView->set_data_format(debug_view_memory::data_format::FLOAT_64BIT);
 	else if (changedTo->text() == "80 bit floating point")
-		memView->set_data_format(11);
+		memView->set_data_format(debug_view_memory::data_format::FLOAT_80BIT);
 
 	m_memTable->viewport()->update();
 }

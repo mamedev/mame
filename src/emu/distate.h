@@ -27,8 +27,7 @@ enum
 {
 	STATE_GENPC = -1,               // generic program counter (live)
 	STATE_GENPCBASE = -2,           // generic program counter (base of current instruction)
-	STATE_GENSP = -3,               // generic stack pointer
-	STATE_GENFLAGS = -4             // generic flags
+	STATE_GENFLAGS = -3             // generic flags
 };
 
 
@@ -295,12 +294,11 @@ public:
 	const std::vector<std::unique_ptr<device_state_entry>> &state_entries() const { return m_state_list; }
 
 	// state getters
-	u64 state_int(int index) { const device_state_entry *entry = state_find_entry(index); return (entry == nullptr) ? 0 : entry->value(); }
+	u64 state_int(int index) const { const device_state_entry *entry = state_find_entry(index); return (entry == nullptr) ? 0 : entry->value(); }
 	std::string state_string(int index) const { const device_state_entry *entry = state_find_entry(index); return (entry == nullptr) ? std::string("???") : entry->to_string(); }
-	offs_t pc() { return state_int(STATE_GENPC); }
-	offs_t pcbase() { return state_int(STATE_GENPCBASE); }
-	offs_t sp() { return state_int(STATE_GENSP); }
-	u64 flags() { return state_int(STATE_GENFLAGS); }
+	offs_t pc() const { return state_int(STATE_GENPC); }
+	offs_t pcbase() const { return state_int(STATE_GENPCBASE); }
+	u64 flags() const { return state_int(STATE_GENFLAGS); }
 
 	// state setters
 	void set_state_int(int index, u64 value) { const device_state_entry *entry = state_find_entry(index); if (entry != nullptr) entry->set_value(value); }
@@ -308,10 +306,6 @@ public:
 
 	// find the entry for a given index
 	const device_state_entry *state_find_entry(int index) const;
-
-	// deliberately ambiguous functions; if you have the state interface
-	// just use it directly
-	device_state_interface &state() { return *this; }
 
 public: // protected eventually
 

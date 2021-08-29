@@ -177,7 +177,7 @@ bool CodeSinkingPass::ReferencesMutableMemory(Instruction* inst) {
     return true;
   }
 
-  if (base_ptr->IsReadOnlyVariable()) {
+  if (base_ptr->IsReadOnlyPointer()) {
     return false;
   }
 
@@ -214,11 +214,14 @@ bool CodeSinkingPass::HasUniformMemorySync() {
       case SpvOpAtomicIIncrement:
       case SpvOpAtomicIDecrement:
       case SpvOpAtomicIAdd:
+      case SpvOpAtomicFAddEXT:
       case SpvOpAtomicISub:
       case SpvOpAtomicSMin:
       case SpvOpAtomicUMin:
+      case SpvOpAtomicFMinEXT:
       case SpvOpAtomicSMax:
       case SpvOpAtomicUMax:
+      case SpvOpAtomicFMaxEXT:
       case SpvOpAtomicAnd:
       case SpvOpAtomicOr:
       case SpvOpAtomicXor:

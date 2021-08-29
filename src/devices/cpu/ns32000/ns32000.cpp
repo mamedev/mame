@@ -240,11 +240,11 @@ template <int Width> void ns32000_device<Width>::state_string_export(device_stat
  *
  * Underlying handlers further subdivide accesses by device bus width.
  */
-template <int Width> template<typename T> T ns32000_device<Width>::mem_read(unsigned st, u32 address, bool user)
+template <int Width> template<typename T> T ns32000_device<Width>::mem_read(unsigned st, u32 address, bool user, bool pfs)
 {
 	u32 physical = address;
 	ns32000_mmu_interface::translate_result tr = m_mmu ?
-		m_mmu->translate(m_bus[st].space(), st, physical, (m_psr & PSR_U) || user, false) : ns32000_mmu_interface::COMPLETE;
+		m_mmu->translate(m_bus[st].space(), st, physical, (m_psr & PSR_U) || user, false, pfs) : ns32000_mmu_interface::COMPLETE;
 
 	if (tr == ns32000_mmu_interface::COMPLETE)
 	{
@@ -404,7 +404,7 @@ template <int Width> template<typename T> void ns32000_device<Width>::mem_write(
  */
 template <int Width> template<typename T> T ns32000_device<Width>::fetch(unsigned &bytes)
 {
-	T const data = mem_read<T>(m_sequential ? ST_SIF : ST_NIF, m_pc + bytes);
+	T const data = mem_read<T>(m_sequential ? ST_SIF : ST_NIF, m_pc + bytes, false, bytes == 0);
 
 	bytes += sizeof(T);
 	m_sequential = true;
@@ -2073,7 +2073,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						//       gen,gen
 						//       read.i,regaddr
 					case 0x7:
-						// SBITI offset,base
+						// SBITIi offset,base
 						//       gen,gen
 						//       read.i,regaddr
 						{
@@ -3250,7 +3250,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							mode[0].write_i(size);
 							decode(mode, bytes);
 
-							if (slave(m_mmu, mode[0], mode[1]))
+							if (slave(m_mmu, mode[1], mode[0]))
 								interrupt(SLV, m_pc);
 
 							tex = mode[0].tea + top(size);
@@ -3341,7 +3341,7 @@ template <int Width> device_memory_interface::space_config_vector ns32000_device
 
 template <int Width> bool ns32000_device<Width>::memory_translate(int spacenum, int intention, offs_t &address)
 {
-	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, intention & TRANSLATE_USER_MASK, intention & TRANSLATE_WRITE, intention & TRANSLATE_DEBUG_MASK) == ns32000_mmu_interface::COMPLETE;
+	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, intention & TRANSLATE_USER_MASK, intention & TRANSLATE_WRITE, false, intention & TRANSLATE_DEBUG_MASK) == ns32000_mmu_interface::COMPLETE;
 }
 
 template <int Width> std::unique_ptr<util::disasm_interface> ns32000_device<Width>::create_disassembler()

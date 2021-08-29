@@ -128,8 +128,8 @@ uint8_t sns_rom21_srtc_device::srtc_weekday( uint32_t year, uint32_t month, uint
 	uint32_t sum = 0;         // Number of days passed since epoch
 
 	year = std::max(1900U, year);
-	month = std::max(1U, std::min(12U, month));
-	day = std::max(1U, std::min(31U, day));
+	month = std::clamp(month, 1U, 12U);
+	day = std::clamp(day, 1U, 31U);
 
 	while (y < year)
 	{

@@ -3,6 +3,7 @@
 <!--
 license:CC0
 -->
+
 <softwarelist name="squale_cart" description="Squale cartridges">
 
 	<software name="sqintro">
@@ -12,7 +13,19 @@ license:CC0
 		<info name="developer" value="Jean-François DEL NERO / HxC2001" />
 		<part name="cart" interface="squale_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="TheSqualeIntro.bin" size="65536" crc="18d1c188" sha1="63a1e1910967b7e083e9d2d1232445a8fd66daf3" offset="0" />
+				<rom name="TheSqualeIntro.bin" size="65536" crc="18d1c188" sha1="63a1e1910967b7e083e9d2d1232445a8fd66daf3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sqtech">
+		<description>Squale Technical Demo</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Jean-François DEL NERO / HxC2001" />
+		<part name="cart" interface="squale_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Squale_Technical_Demo.rom" size="32768" crc="d3f3115a" sha1="531e03d3f5626f76f9d501acbd96578f5928c77b" />
 			</dataarea>
 		</part>
 	</software>

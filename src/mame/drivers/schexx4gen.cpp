@@ -25,8 +25,15 @@ public:
 	void schexx(machine_config &config);
 
 private:
+	void mem_map(address_map &map);
+
 	required_device<mc68hc11_cpu_device> m_maincpu;
 };
+
+void schexx_state::mem_map(address_map &map)
+{
+	map(0xe000, 0xffff).rom().region("program", 0x7e000);
+}
 
 INPUT_PORTS_START(schexx)
 INPUT_PORTS_END
@@ -34,6 +41,7 @@ INPUT_PORTS_END
 void schexx_state::schexx(machine_config &config)
 {
 	MC68HC11A1(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &schexx_state::mem_map);
 }
 
 ROM_START(schexx)

@@ -1867,7 +1867,6 @@ TABLE_FUNCTION(unsigned, get_reg, (int regnum))
 		case G65816_A: return REGISTER_B | REGISTER_A;
 		case G65816_X: return REGISTER_X;
 		case G65816_Y: return REGISTER_Y;
-		case STATE_GENSP: return REGISTER_S;
 		case G65816_S: return REGISTER_S;
 		case STATE_GENPC: return REGISTER_PC;
 		case G65816_PC: return REGISTER_PC;
@@ -1891,9 +1890,9 @@ TABLE_FUNCTION(void, set_reg, (int regnum, unsigned val))
 	{
 		case STATE_GENPC: case G65816_PC: REGISTER_PC = MAKE_UINT_16(val); break;
 #if FLAG_SET_E
-		case STATE_GENSP: case G65816_S: REGISTER_S = MAKE_UINT_8(val) | 0x100; break;
+		case G65816_S: REGISTER_S = MAKE_UINT_8(val) | 0x100; break;
 #else
-		case STATE_GENSP: case G65816_S: REGISTER_S = MAKE_UINT_16(val); break;
+		case G65816_S: REGISTER_S = MAKE_UINT_16(val); break;
 #endif
 		case G65816_P: g65816i_set_reg_p(val); break;
 #if FLAG_SET_M
