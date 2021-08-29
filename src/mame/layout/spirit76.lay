@@ -73,14 +73,12 @@ copyright-holders:Robbbert
 		<!-- Credits -->
 		<param name="s" value="8" />
 		<param name="t" value="20" />
-		<group ref="2x7">
-		</group>
+		<group ref="2x7"></group>
 
 		<!-- Match -->
 		<param name="s" value="6" />
 		<param name="t" value="55" />
-		<group ref="2x7">
-		</group>
+		<group ref="2x7"></group>
 
 		<!-- Text Labels -->
 		<element ref="T1"><bounds left="30" right="150" top="10" bottom="20" /></element>
