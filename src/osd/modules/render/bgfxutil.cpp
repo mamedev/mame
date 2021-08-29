@@ -22,6 +22,7 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 	switch (src_format)
 	{
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
 			dst_format = bgfx::TextureFormat::BGRA8;
 			convert_stride = 2;
 			out_pitch = rowpixels * 2;
@@ -29,26 +30,6 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 
 			data = bgfx::copy(base, info.storageSize);
 			break;
-		case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
-		{
-			dst_format = bgfx::TextureFormat::BGRA8;
-			convert_stride = 1;
-			out_pitch = rowpixels * 4;
-			bgfx::calcTextureSize(info, rowpixels / convert_stride, height, 1, false, false, 1, dst_format);
-
-			uint16_t *src = (uint16_t *)base;
-			uint16_t *dst_data = new uint16_t[rowpixels * 2 * height];
-			uint16_t *dst = dst_data;
-			for (int i = 0; i < rowpixels * height; i++, src++)
-			{
-				*dst++ = *src;
-				*dst++ = 0;
-			}
-
-			data = bgfx::copy(dst_data, info.storageSize);
-			delete [] dst_data;
-			break;
-		}
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
 			dst_format = bgfx::TextureFormat::BGRA8;
