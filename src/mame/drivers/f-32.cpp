@@ -248,7 +248,6 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 	m_eeprom->erase_time(attotime::from_usec(1));
 	m_eeprom->write_time(attotime::from_usec(1));
-	m_eeprom->enable_output_on_falling_clock(true);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
