@@ -127,7 +127,7 @@ void pc80s31_device::fdc_io(address_map &map)
 	map.global_mask(0xff);
 //	map(0xf0, 0xf0).w(FUNC(pc8801_state::fdc_irq_vector_w)); // Interrupt Opcode Port
 //	map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
-//	map(0xf6, 0xf6).nopw(); // 
+//	map(0xf6, 0xf6).nopw(); // printer related
 	map(0xf7, 0xf7).nopw(); // printer port output
 	map(0xf8, 0xf8).rw(FUNC(pc80s31_device::terminal_count_r), FUNC(pc80s31_device::motor_control_w));
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
@@ -136,6 +136,7 @@ void pc80s31_device::fdc_io(address_map &map)
 
 static void pc88_floppies(device_slot_interface &device)
 {
+	// TODO: definitely not correct for base device
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
@@ -296,6 +297,7 @@ u8 pc80s31_device::terminal_count_r()
 
 void pc80s31_device::motor_control_w(uint8_t data)
 {
+	// FIXME: on pc80s31k device (particularly on later releases) this stays always on 
 	m_floppy[0]->get_device()->mon_w(!(data & 1));
 	m_floppy[1]->get_device()->mon_w(!(data & 2));
 	

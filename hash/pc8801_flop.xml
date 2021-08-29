@@ -280,7 +280,6 @@ To investigate:
  - is there ウルティマ3 (198512xx) by Starcraft among the ultima3 Pony Canyon sets below?
  - is there ウルティマ2 (198509xx) by Starcraft among the ultima2 Pony Canyon sets below?
  - is デゼニワールド (198512xx) by Hudson the same as the SR version below??
- - check 走れスカイライン (198512xx) by Compaq 8801/SR versions...
  - is アメリカントラック (198505xx) same as original american truck below?
  - is ロードランナー オリジナル追加面 (198504xx) among the add-on disks for Lode Runner below?
  - is Lode Data (198502xx) among the add-on disks for Lode Runner below?
@@ -1216,6 +1215,7 @@ INVESTIGATE
 		</part>
 	</software>
 
+	<!-- FDC fails [never clears HALT state] -->
 	<software name="acrojet" supported="no">
 		<description>AcroJet</description>
 		<year>1988</year>
@@ -42985,7 +42985,9 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="karetofu">
+	<!-- fails detection of disk b -->
+	<!-- ["Incorrect layout on track 3 head 1, expected_size=100000, current_size=129536"] -->
+	<software name="karetofu" supported="no">
 		<description>Kare to Futari no Skyline</description>
 		<year>1990?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43016,7 +43018,9 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="keyon">
+	<!-- FDC fails [never clears HALT state] -->
+	<!-- [Eventually has copy protection too?] -->
+	<software name="keyon" supported="no">
 		<description>Key On</description>
 		<year>1990?</year>
 		<publisher>&lt;doujin&gt;</publisher>
