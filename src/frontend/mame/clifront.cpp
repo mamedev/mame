@@ -132,12 +132,7 @@ void print_summary(
 		unsigned &correct, unsigned &incorrect, unsigned &notfound,
 		util::ovectorstream &buffer)
 {
-	if (summary == media_auditor::NOTFOUND)
-	{
-		// if not found, count that and leave it at that
-		++notfound;
-	}
-	else if (record_none_needed || (summary != media_auditor::NONE_NEEDED))
+	if (record_none_needed || (summary != media_auditor::NONE_NEEDED))
 	{
 		// output the summary of the audit
 		buffer.clear();
@@ -172,6 +167,7 @@ void print_summary(
 
 		case media_auditor::NOTFOUND:
 			osd_printf_info("not found\n");
+			++notfound;
 			return;
 		}
 		assert(false);
@@ -988,9 +984,9 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	{
 		// otherwise, print a summary
 		if (incorrect > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found, %u were OK.\n", correct + incorrect, correct);
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets not found, %u romsets found, %u were OK.\n", notfound, correct + incorrect, correct);
 		else
-			osd_printf_info("%u romsets found, %u were OK.\n", correct, correct);
+			osd_printf_info("%u romsets not found, %u romsets found, %u were OK.\n", notfound, correct, correct);
 	}
 }
 
