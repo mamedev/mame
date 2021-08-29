@@ -8,8 +8,6 @@ $input v_color0, v_texcoord0
 // Samplers
 SAMPLER2D(s_tex, 0);
 
-#define round(X) floor((X)+0.5)
-
 uniform vec4 u_tex_size0;
 uniform vec4 u_inv_tex_size0;
 
@@ -23,17 +21,17 @@ vec3 ycc_to_rgb(float y, float cb, float cr)
 
 void main()
 {
-	vec2 size_minus_one = u_tex_size0.xy - vec2(1.0, 1.0);
-	vec2 original_uv = round(v_texcoord0.xy * size_minus_one);
+	vec2 half_texel = u_inv_tex_size0.xy * vec2(0.5, 0.5);
+
+	vec2 original_uv = v_texcoord0.xy * u_tex_size0.xy;
 	float mod_val = mod(original_uv.x, 2.0);
-	vec2 rounded_uv = round(vec2(original_uv.x - mod_val, original_uv.y));
-	vec2 next_uv = rounded_uv + vec2(1.0, 0.0);
-	vec2 srcpix0 = texture2D(s_tex, rounded_uv / size_minus_one).rg;
-	vec2 srcpix1 = texture2D(s_tex, next_uv / size_minus_one).rg;
-	float cr = srcpix1.r;
-	float cb = srcpix0.r;
+	vec2 rounded_uv = vec2(original_uv.x - mod_val, original_uv.y);
+	vec4 srcpix = texture2D(s_tex, rounded_uv * u_inv_tex_size0.xy + half_texel.x);
+	
+	float cr = srcpix.r;
+	float cb = srcpix.b;
 	if (mod_val < 1.0)
-		gl_FragColor = vec4(ycc_to_rgb(srcpix0.g, cb, cr), 1.0) * v_color0;
+		gl_FragColor = vec4(ycc_to_rgb(srcpix.g, cb, cr), 1.0) * v_color0;
 	else
-		gl_FragColor = vec4(ycc_to_rgb(srcpix1.g, cb, cr), 1.0) * v_color0;
+		gl_FragColor = vec4(ycc_to_rgb(srcpix.a, cb, cr), 1.0) * v_color0;
 }

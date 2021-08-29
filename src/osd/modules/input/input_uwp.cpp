@@ -26,6 +26,9 @@
 #include "input_common.h"
 #include "input_windows.h"
 
+
+namespace {
+
 #define UWP_BUTTON_COUNT 32
 
 using namespace concurrency;
@@ -54,10 +57,10 @@ private:
 	input_device *m_inputdevice;
 
 internal:
-	UwpInputDevice(running_machine &machine, const char *name, const char *id, input_device_class deviceclass, input_module &module)
-		: m_machine(machine),
-		m_name(name),
-		m_id(id),
+	UwpInputDevice(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module) :
+		m_machine(machine),
+		m_name(std::move(name)),
+		m_id(std::move(id)),
 		m_devclass(deviceclass),
 		m_module(module),
 		m_inputdevice(nullptr)
@@ -115,8 +118,8 @@ private:
 	UwpInputDevice ^m_wrapped_device;
 
 public:
-	uwp_input_device(UwpInputDevice ^device)
-		: device_info(device->Machine, device->Name.c_str(), device->Id.c_str(), device->DeviceClass, device->Module),
+	uwp_input_device(UwpInputDevice ^device) :
+		device_info(device->Machine, std::string(device->Name), std::string(device->Id), device->DeviceClass, device->Module),
 		m_wrapped_device(device)
 	{
 	}
@@ -148,9 +151,9 @@ private:
 	uwp_input_module *m_module;
 
 internal:
-	UwpInputModule(const char *type, const char *name)
-		: m_type(type),
-		m_name(name),
+	UwpInputModule(std::string &&type, std::string &&name) :
+		m_type(std::move(type)),
+		m_name(std::move(name)),
 		m_module(nullptr)
 	{
 	}
@@ -187,8 +190,8 @@ private:
 	UwpInputModule^ m_refmodule;
 
 public:
-	uwp_input_module(UwpInputModule^ refmodule)
-		: wininput_module(refmodule->Type.c_str(), refmodule->Name.c_str()),
+	uwp_input_module(UwpInputModule^ refmodule) :
+		wininput_module(refmodule->Type.c_str(), refmodule->Name.c_str()),
 		m_refmodule(refmodule)
 	{
 		refmodule->NativeModule = this;
@@ -216,8 +219,8 @@ private:
 	std::mutex m_state_lock;
 
 internal:
-	UwpKeyboardDevice(Platform::Agile<CoreWindow> coreWindow, running_machine& machine, char *name, const char *id, input_module &module)
-		: UwpInputDevice(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
+	UwpKeyboardDevice(Platform::Agile<CoreWindow> coreWindow, running_machine& machine, std::string &&name, std::string &&id, input_module &module) :
+		UwpInputDevice(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
 		keyboard({{0}}),
 		m_coreWindow(coreWindow)
 	{
@@ -244,7 +247,7 @@ internal:
 			const char *keyname = table.ui_label_for_mame_key(itemid);
 
 			char temp[256];
-			if (keyname == nullptr)
+			if (!keyname)
 			{
 				snprintf(temp, std::size(temp), "Scan%03d", keynum);
 				keyname = temp;
@@ -301,8 +304,7 @@ private:
 	running_machine *m_machine;
 
 internal:
-	UwpKeyboardModule()
-		: UwpInputModule(OSD_KEYBOARDINPUT_PROVIDER, "uwp")
+	UwpKeyboardModule() : UwpInputModule(OSD_KEYBOARDINPUT_PROVIDER, "uwp")
 	{
 	}
 
@@ -316,10 +318,10 @@ internal:
 
 		// Allocate the wrapper and add it to the list
 		auto created_devinfo = std::make_unique<uwp_input_device>(refdevice);
-		uwp_input_device *devinfo = NativeModule->devicelist()->add_device<uwp_input_device>(machine, std::move(created_devinfo));
+		uwp_input_device &devinfo = NativeModule->devicelist()->add_device<uwp_input_device>(machine, std::move(created_devinfo));
 
 		// Give the UWP implementation a handle to the input_device
-		refdevice->InputDevice = devinfo->device();
+		refdevice->InputDevice = devinfo.device();
 
 		// Configure the device
 		refdevice->Configure();
@@ -577,8 +579,6 @@ internal:
 		int padindex = 0;
 		std::for_each(begin(pads), end(pads), [&](Gamepad^ pad)
 		{
-			uwp_input_device *devinfo;
-
 			std::ostringstream namestream;
 			namestream << "UWP Gamepad " << (padindex + 1);
 
@@ -589,7 +589,7 @@ internal:
 
 			// Allocate the wrapper and add it to the list
 			auto created_devinfo = std::make_unique<uwp_input_device>(refdevice);
-			devinfo = NativeModule->devicelist()->add_device<uwp_input_device>(machine, std::move(created_devinfo));
+			auto &devinfo = NativeModule->devicelist()->add_device<uwp_input_device>(machine, std::move(created_devinfo));
 
 			// Give the UWP implementation a handle to the input_device
 			refdevice->InputDevice = devinfo->device();
@@ -634,16 +634,19 @@ private:
 class uwp_joystick_module : public uwp_input_module
 {
 public:
-	uwp_joystick_module()
-		: uwp_input_module(ref new UwpJoystickModule())
+	uwp_joystick_module() : uwp_input_module(ref new UwpJoystickModule())
 	{
 	}
 };
 
-#else
+} // anonymous namespace
+
+#else // defined(OSD_UWP)
+
 MODULE_NOT_SUPPORTED(uwp_keyboard_module, OSD_KEYBOARDINPUT_PROVIDER, "uwp")
 MODULE_NOT_SUPPORTED(uwp_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "uwp")
-#endif
+
+#endif // defined(OSD_UWP)
 
 MODULE_DEFINITION(KEYBOARDINPUT_UWP, uwp_keyboard_module)
 MODULE_DEFINITION(JOYSTICKINPUT_UWP, uwp_joystick_module)

@@ -2067,18 +2067,18 @@ void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, u
 		// iterate over all the remap nodes
 		load_remap_table(*parentnode);
 
-		devicemap_table_type devicemap_table;
+		input_manager::devicemap_table devicemap;
 		for (util::xml::data_node const *mapdevice_node = parentnode->get_child("mapdevice"); mapdevice_node != nullptr; mapdevice_node = mapdevice_node->get_next_sibling("mapdevice"))
 		{
 			char const *const devicename = mapdevice_node->get_attribute_string("device", nullptr);
 			char const *const controllername = mapdevice_node->get_attribute_string("controller", nullptr);
 			if (devicename && controllername)
-				devicemap_table.emplace(devicename, controllername);
+				devicemap.emplace(devicename, controllername);
 		}
 
 		// map device to controller if we have a device map
-		if (!devicemap_table.empty())
-			machine().input().map_device_to_controller(devicemap_table);
+		if (!devicemap.empty())
+			machine().input().map_device_to_controller(devicemap);
 	}
 
 	// iterate over all the port nodes

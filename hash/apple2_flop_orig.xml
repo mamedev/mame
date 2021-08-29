@@ -17147,7 +17147,7 @@ license:CC0
 		<info name="release" value="2021-07-15"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
-		<!--"Alge-Blaster Plus!" is a 1989 educational program developed by Julie Baumgartner, Anne Hertz, David Ely, and Louis X. Savain, and distributed by Davidson &amp; Associates. This is version 1.0, distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+		<!--"Alge-Blaster Plus!" is a 1989 educational program developed by Julie Baumgartner, Anne Hertz, David Ely, and Louis X. Savain, and distributed by Davidson and Associates. This is version 1.0, distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296215">
@@ -17168,6 +17168,301 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1312716">
 				<rom name="mickey's crossword puzzle maker 800k.woz" size="1312716" crc="f5fc7370" sha1="471126107352b52ec5643a97f2893b951d40309d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retdino">
+		<description>Return of the Dinosaurs (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>American Educational Computer</publisher>
+		<info name="release" value="2021-07-20"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Return of the Dinosaurs" is a 1988 educational game developed by Intentional Educations and distributed by American Educational Computer. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328970">
+				<rom name="return of the dinosaurs 800k.woz" size="1328970" crc="43773390" sha1="b6a6257cb9988576f0eb89daa523cc54258c4280"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswrtrpl">
+		<description>Bank Street Writer Plus (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Bank Street Writer Plus" is a 1989 productivity program developed by Gordon Riggs and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296171">
+				<rom name="bank street writer plus 800k.woz" size="1296171" crc="f0e20be8" sha1="d0cf9e33a4606728c297440a314a560ecff40b7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsgnrail">
+		<description>Design Your Own Railroad (Version 1.1C) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Abracadata</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with 48K and a compatible drive controller card. -->
+		<!--"Design Your Own Railroad" is a 1990 educational program developed by Don Fudge and distributed by Abracadata. This is version 1.1C. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with 48K and a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296197">
+				<rom name="design your own railroad 800k.woz" size="1296197" crc="b17c981e" sha1="9394d710e3b55e767e2022353ab4ceb7d126887d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="35grmrgm">
+		<description>Grammar Gremlins (Version 05.01.87) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card. -->
+		<!--"Grammar Gremlins" is a 1987 educational program developed by Santa Barbara Softworks and distributed by Davidson and Associates. This version is dated 05.01.87. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296190">
+				<rom name="grammar gremlins 800k.woz" size="1296190" crc="c7a3fa58" sha1="51c2184e0995f880ed7fa272224deb75959ae570"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bglwrt32">
+		<description>BeagleWrite (Version 3.2) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"Beagle Write" is a 1989 productivity program developed by Kevin Harvey, Alex Perelberg, and Mark Munz, and distributed by Beagle Bros. This is version 3.2. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296192">
+				<rom name="beaglewrite 800k.woz" size="1296192" crc="a9910ae5" sha1="8f8e054eef1eaddc7a38b642de0933835fb18297"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dyohint35">
+		<description>Design Your Own Home: Interior Design (Version 2) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>Abracadata</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card. -->
+		<!--"Design Your Own Home: Interior Design" is a 1986 productivity program developed by Don Fudge and distributed by Abracadata. This is version 2. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328959">
+				<rom name="design your own home- interior design 800k.woz" size="1328959" crc="f7439230" sha1="fdd1d5d537f5a54ffa49a5a2e9364722af8df346"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wllybyte">
+		<description>Willy Byte in the Digital Dimension</description>
+		<year>1984</year>
+		<publisher>Data Trek</publisher>
+		<info name="release" value="2021-07-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Willy Byte in the Digital Dimension" is a 1984 arcade game developed by Murray Krehbiel, with graphics by Greg Hammond, and distributed by Data Trek. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="228163">
+				<rom name="willy byte in the digital dimension side a.woz" size="228163" crc="2c59a3a6" sha1="ec6cfdf85cb5496020d6b9ee918850b0cdd37c2f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk"/>
+			<dataarea name="flop" size="234819">
+				<rom name="willy byte in the digital dimension side b - boot.woz" size="234819" crc="95305acc" sha1="9fb6d5b6f6595a1b7764ca4b2a7ee92d269455ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcaricr35v1">
+		<description>Arithmetic Critters (Version 1.0) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Arithmetic Critters" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345309">
+				<rom name="arithmetic critters 800k.woz" size="1345309" crc="c0d3ee81" sha1="e5eeb26b7695df448cfc007631dcabd948e49205"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clckwrks">
+		<description>Clock Works (Version 1.0) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Clock Works" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345301">
+				<rom name="clock works 800k.woz" size="1345301" crc="f96310d8" sha1="22a4dc3e58b2b2af8ef3d255bfc5f9cb8b68a373"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bckydbrd35">
+		<description>Backyard Birds (Version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Backyard Birds" is a 1989 educational program developed by Hassan Kaganda, John Persoon, Larry Phenow, Diane Portner, and James L. Thompson, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345385">
+				<rom name="backyard birds 800k.woz" size="1345385" crc="983f4369" sha1="1a96d62aa167fe3193dbe4be2b1461e3ec23c750"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcchembe35">
+		<description>Chemistry: Balancing Equations (Version 1.0) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Chemistry: Balancing Equations" is a 1990 educational program developed by Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296232">
+				<rom name="chemistry- balancing equations 800k.woz" size="1296232" crc="741bcaa4" sha1="93f7dc5c6b6b9737628bcbd540918aee4ec7e746"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clnwtdet35">
+		<description>Cleanwater Detectives (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Cleanwater Detectives" is a 1991 educational program developed by Vincent J. Erickson, John Ojanen, and Diane Portner, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345366">
+				<rom name="cleanwater detectives 800k.woz" size="1345366" crc="051bbdd2" sha1="64306906c5ea53e08c80f86d56eb1840e15f0277"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cirmth35">
+		<description>Circus Math (Version 1.0) (800K 3.5")</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Circus Math" is a 1984 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345309">
+				<rom name="circus math 800k.woz" size="1345309" crc="e676033e" sha1="f12e92bd54cbfb5bfb37181b8106031fb1a43feb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vcrc1135">
+		<description>VCR Companion (Version 1.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-08-10"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"VCR Companion" is a 1988 graphics program developed by Louis Ewens and Lauren Elliott, and distributed by Broderbund Software. This is version 1.1. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296708">
+				<rom name="vcr companion 800k.woz" size="1296708" crc="ec3956f8" sha1="8be36dcbaa81da0ecf10c1234abc9e803d6d2fa2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carbld35">
+		<description>Car Builder (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-08-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Car Builder" is a 1985 educational program developed by Richard Hefter and David Cunningham, and distributed by Optimum Resource. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297213">
+				<rom name="car builder 800k.woz" size="1297213" crc="8d78c9a0" sha1="05a0f9e0e3d0d7be1c0a978e1314cc604b3d52cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algbl058735">
+		<description>Alge-Blaster! (Version 050187) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-08-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Alge-Blaster!" is a 1985 educational program developed by Jan Davidson, Ph.D., Anders Beitnes, Wendy Barels, Cathy Johnson, and distributed by Davidson and Associates. This version is dated 050187. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328988">
+				<rom name="alge-blaster 800k.woz" size="1328988" crc="62bffa5f" sha1="ccb4c3c43d3b7ad13cd3c7e5f2b59434af0b1e08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmprstmpr">
+		<description>Whomper Stomper</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2021-08-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Whomper Stomper" is a 1984 action game developed by Mike Wall and Marty Inchiosa, ported to the Apple II by Steve Waldo, and distributed by Adventure International. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234853">
+				<rom name="whomper stomper.woz" size="234853" crc="99f67210" sha1="1ae2f9c644191954cbe586beb476b4bc19866d8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdmn1435">
+		<description>Word Munchers (Version 1.4) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Word Munchers" is a 1985 educational program developed and distributed by MECC. This is version 1.4. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345282">
+				<rom name="word munchers 800k.woz" size="1345282" crc="fead6f7a" sha1="056730809f1e90b8159e8582eb2709a20bb46509"/>
 			</dataarea>
 		</part>
 	</software>

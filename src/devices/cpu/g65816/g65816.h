@@ -140,8 +140,10 @@ protected:
 	int bus_5A22_cycle_burst(unsigned addr);
 	unsigned g65816_get_pc();
 	void g65816_set_pc(unsigned val);
+#ifdef UNUSED_FUNCTION
 	unsigned g65816_get_sp();
 	void g65816_set_sp(unsigned val);
+#endif
 public:
 	unsigned g65816_get_reg(int regnum);
 	void g65816_set_reg(int regnum, unsigned value);

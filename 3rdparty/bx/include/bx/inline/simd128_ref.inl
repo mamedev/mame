@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -59,21 +59,21 @@ namespace bx
 				return (_mask) == (tmp&(_mask) );                                \
 			}
 
-BX_SIMD128_IMPLEMENT_TEST(x    , 0x1);
-BX_SIMD128_IMPLEMENT_TEST(y    , 0x2);
-BX_SIMD128_IMPLEMENT_TEST(xy   , 0x3);
-BX_SIMD128_IMPLEMENT_TEST(z    , 0x4);
-BX_SIMD128_IMPLEMENT_TEST(xz   , 0x5);
-BX_SIMD128_IMPLEMENT_TEST(yz   , 0x6);
-BX_SIMD128_IMPLEMENT_TEST(xyz  , 0x7);
-BX_SIMD128_IMPLEMENT_TEST(w    , 0x8);
-BX_SIMD128_IMPLEMENT_TEST(xw   , 0x9);
-BX_SIMD128_IMPLEMENT_TEST(yw   , 0xa);
-BX_SIMD128_IMPLEMENT_TEST(xyw  , 0xb);
-BX_SIMD128_IMPLEMENT_TEST(zw   , 0xc);
-BX_SIMD128_IMPLEMENT_TEST(xzw  , 0xd);
-BX_SIMD128_IMPLEMENT_TEST(yzw  , 0xe);
-BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
+BX_SIMD128_IMPLEMENT_TEST(x    , 0x1)
+BX_SIMD128_IMPLEMENT_TEST(y    , 0x2)
+BX_SIMD128_IMPLEMENT_TEST(xy   , 0x3)
+BX_SIMD128_IMPLEMENT_TEST(z    , 0x4)
+BX_SIMD128_IMPLEMENT_TEST(xz   , 0x5)
+BX_SIMD128_IMPLEMENT_TEST(yz   , 0x6)
+BX_SIMD128_IMPLEMENT_TEST(xyz  , 0x7)
+BX_SIMD128_IMPLEMENT_TEST(w    , 0x8)
+BX_SIMD128_IMPLEMENT_TEST(xw   , 0x9)
+BX_SIMD128_IMPLEMENT_TEST(yw   , 0xa)
+BX_SIMD128_IMPLEMENT_TEST(xyw  , 0xb)
+BX_SIMD128_IMPLEMENT_TEST(zw   , 0xc)
+BX_SIMD128_IMPLEMENT_TEST(xzw  , 0xd)
+BX_SIMD128_IMPLEMENT_TEST(yzw  , 0xe)
+BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf)
 
 #undef BX_SIMD128_IMPLEMENT_TEST
 
@@ -393,6 +393,17 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 		result.ixyzw[1] = _a.fxyzw[1] == _b.fxyzw[1] ? 0xffffffff : 0x0;
 		result.ixyzw[2] = _a.fxyzw[2] == _b.fxyzw[2] ? 0xffffffff : 0x0;
 		result.ixyzw[3] = _a.fxyzw[3] == _b.fxyzw[3] ? 0xffffffff : 0x0;
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd_cmpneq(simd128_ref_t _a, simd128_ref_t _b)
+	{
+		simd128_ref_t result;
+		result.ixyzw[0] = _a.fxyzw[0] != _b.fxyzw[0] ? 0xffffffff : 0x0;
+		result.ixyzw[1] = _a.fxyzw[1] != _b.fxyzw[1] ? 0xffffffff : 0x0;
+		result.ixyzw[2] = _a.fxyzw[2] != _b.fxyzw[2] ? 0xffffffff : 0x0;
+		result.ixyzw[3] = _a.fxyzw[3] != _b.fxyzw[3] ? 0xffffffff : 0x0;
 		return result;
 	}
 

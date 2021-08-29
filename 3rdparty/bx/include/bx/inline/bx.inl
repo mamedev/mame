@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -15,10 +15,16 @@ namespace bx
 	template<typename Ty, size_t Num>
 	char(&CountOfRequireArrayArgumentT(const Ty(&)[Num]))[Num];
 
-	template<bool>
-	inline constexpr bool isEnabled()
+	template<bool B>
+	struct isEnabled
 	{
-		return true;
+		// Template for avoiding MSVC: C4127: conditional expression is constant
+		static constexpr bool value = B;
+	};
+
+	inline constexpr bool ignoreC4127(bool _x)
+	{
+		return _x;
 	}
 
 	template<class Ty>
@@ -27,15 +33,14 @@ namespace bx
 		return __is_trivially_copyable(Ty);
 	}
 
-	template<>
-	inline constexpr bool isEnabled<false>()
+	template<class Ty>
+	inline Ty* addressOf(Ty& _a)
 	{
-		return false;
-	}
-
-	inline constexpr bool ignoreC4127(bool _x)
-	{
-		return _x;
+		return reinterpret_cast<Ty*>(
+				&const_cast<char&>(
+					reinterpret_cast<const volatile char&>(_a)
+				)
+			);
 	}
 
 	template<typename Ty>

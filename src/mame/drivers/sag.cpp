@@ -14,7 +14,7 @@ Hardware notes:
 
 Games released, MCU: (*denotes undumped)
 - Baseball 4       - HD38800
-- *Basketball 3    - HD38800
+- Basketball 3     - HD38800
 - Football 4       - TMS1670
 - *Pac-Man 2       - HD38800
 - Pinball          - HD38800

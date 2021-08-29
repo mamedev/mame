@@ -771,6 +771,7 @@ void g65816_device::g65816_set_pc(unsigned val)
 	g65816_jumping(REGISTER_PB | REGISTER_PC);
 }
 
+#ifdef UNUSED_FUNCTION
 /* Get the current Stack Pointer */
 unsigned g65816_device::g65816_get_sp()
 {
@@ -782,6 +783,7 @@ void g65816_device::g65816_set_sp(unsigned val)
 {
 	REGISTER_S = FLAG_E ? MAKE_UINT_8(val) | 0x100 : MAKE_UINT_16(val);
 }
+#endif
 
 /* Get a register */
 unsigned g65816_device::g65816_get_reg(int regnum)
@@ -922,7 +924,6 @@ void g65816_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
-	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 
 	set_icountptr(m_ICount);
@@ -935,9 +936,6 @@ void g65816_device::state_import(const device_state_entry &entry)
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
 			g65816_set_pc(m_debugger_temp);
-			break;
-		case STATE_GENSP:
-			g65816_set_sp(m_debugger_temp);
 			break;
 		case G65816_PC:
 		case G65816_PB:
@@ -982,9 +980,6 @@ void g65816_device::state_export(const device_state_entry &entry)
 		case STATE_GENPCBASE:
 		case G65816_PC:
 			m_debugger_temp = g65816_get_pc();
-			break;
-		case STATE_GENSP:
-			m_debugger_temp = g65816_get_sp();
 			break;
 		case G65816_PB:
 			m_debugger_temp = m_pb>>16;

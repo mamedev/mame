@@ -332,8 +332,6 @@ Keyboard TX commands:
 #include "includes/pc9801.h"
 #include "machine/input_merger.h"
 
-
-
 void pc9801_state::rtc_w(uint8_t data)
 {
 	m_rtc->c0_w((data & 0x01) >> 0);
@@ -788,30 +786,6 @@ void pc9801_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		COMBINE_DATA(&m_egc.regs[offset]);
 	switch(offset)
 	{
-		case 1:
-		case 3:
-		case 5:
-		{
-			uint8_t color = 0;
-			switch((m_egc.regs[1] >> 13) & 3)
-			{
-				case 1:
-					//back color
-					color = m_egc.regs[5];
-					break;
-				case 2:
-					//fore color
-					color = m_egc.regs[3];
-					break;
-				default:
-					return;
-			}
-			m_egc.pat[0] = (color & 1) ? 0xffff : 0;
-			m_egc.pat[1] = (color & 2) ? 0xffff : 0;
-			m_egc.pat[2] = (color & 4) ? 0xffff : 0;
-			m_egc.pat[3] = (color & 8) ? 0xffff : 0;
-			break;
-		}
 		case 6:
 		case 7:
 			m_egc.count = (m_egc.regs[7] & 0xfff) + 1;
@@ -2074,7 +2048,13 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	save_item(NAME(m_sasi_data));
 	save_item(NAME(m_sasi_data_enable));
 	save_item(NAME(m_sasi_ctrl));
-	save_pointer(NAME(m_egc.regs), 8);
+	save_item(NAME(m_egc.regs));
+	save_item(NAME(m_egc.pat));
+	save_item(NAME(m_egc.src));
+	save_item(NAME(m_egc.count));
+	save_item(NAME(m_egc.leftover));
+	save_item(NAME(m_egc.first));
+	save_item(NAME(m_egc.init));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)

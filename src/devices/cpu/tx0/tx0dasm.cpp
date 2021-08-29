@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Raphael Nabet
+// copyright-holders:AJR
+/***************************************************************************
+
+    MIT TX-0 disassembler
+
+***************************************************************************/
+
 #include "emu.h"
 #include "tx0dasm.h"
 
@@ -8,126 +14,689 @@ u32 tx0_64kw_disassembler::opcode_alignment() const
 	return 1;
 }
 
-offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
-{
-	int md;
-	int x;
-
-	md = opcodes.r32(pc);
-
-	x = md & 0177777;
-	switch (md >> 16)
-	{
-	case 0:
-		util::stream_format(stream, "sto 0%06o", x);
-		break;
-	case 1:
-		util::stream_format(stream, "add 0%06o", x);
-		break;
-	case 2:
-		util::stream_format(stream, "trn 0%06o", x);
-		break;
-	case 3:
-		util::stream_format(stream, "opr 0%06o", x);
-		break;
-	}
-	return 1;
-}
-
 u32 tx0_8kw_disassembler::opcode_alignment() const
 {
 	return 1;
 }
 
-offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+namespace {
+
+const std::string_view s_addressable_insts[24] =
 {
-	int md;
-	int x;
+	"sto", "stx", "sxa", "ado", "slr", "slx", "stz", {},
+	"add", "adx", "ldx", "aux", "llr", "llx", "lda", "lax",
+	"trn", "tze", "tsx", "tix", "tra", "trx", "tlv", {}
+};
 
-	md = opcodes.r32(pc);
+const std::string_view s_tape_insts[8] =
+{
+	"bsr", "rtb", "rew", "wtb",
+	"bsr", "rtd", "rew", "wtd"
+};
 
-	x = md & 0017777;
-	switch (md >> 13)
+} // anonymous namespace
+
+offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const tx0_64kw_disassembler::data_buffer &opcodes, const tx0_64kw_disassembler::data_buffer &params)
+{
+	u32 inst = opcodes.r32(pc) & 0777777;
+
+	if (inst < 0600000)
 	{
-	case 0:
-		util::stream_format(stream, "sto 0%05o", x);
+		// Addressable instructions (only 3 in this version)
+		util::stream_format(stream, "%s %06o", s_addressable_insts[(inst & 0600000) >> 13], inst & 0177777);
+	}
+	else switch (inst)
+	{
+	case 0600012:
+		stream << "cry";
 		break;
-	case 1:
-		util::stream_format(stream, "stx 0%05o", x);
+
+	case 0600022:
+		stream << "lpd";
 		break;
-	case 2:
-		util::stream_format(stream, "sxa 0%05o", x);
+
+	case 0600031:
+		stream << "cyl";
 		break;
-	case 3:
-		util::stream_format(stream, "ado 0%05o", x);
+
+	case 0600032:
+		stream << "lad";
 		break;
-	case 4:
-		util::stream_format(stream, "slr 0%05o", x);
+
+	case 0600040:
+		stream << "com";
 		break;
-	case 5:
-		util::stream_format(stream, "slx 0%05o", x);
+
+	case 0600051:
+		stream << "amz";
 		break;
-	case 6:
-		util::stream_format(stream, "stz 0%05o", x);
+
+	case 0600100:
+		stream << "pen";
 		break;
-	case 8:
-		util::stream_format(stream, "add 0%05o", x);
+
+	case 0600200:
+		stream << "lro";
 		break;
-	case 9:
-		util::stream_format(stream, "adx 0%05o", x);
+
+	case 0600201:
+		stream << "alr";
 		break;
-	case 10:
-		util::stream_format(stream, "ldx 0%05o", x);
+
+	case 0600221:
+		stream << "ala";
 		break;
-	case 11:
-		util::stream_format(stream, "aux 0%05o", x);
+
+	case 0600261:
+		stream << "alc";
 		break;
-	case 12:
-		util::stream_format(stream, "llr 0%05o", x);
+
+	case 0600400:
+		stream << "shr";
 		break;
-	case 13:
-		util::stream_format(stream, "llx 0%05o", x);
+
+	case 0600600:
+		stream << "cyr";
 		break;
-	case 14:
-		util::stream_format(stream, "lda 0%05o", x);
+
+	case 0622000:
+		stream << "dis";
 		break;
-	case 15:
-		util::stream_format(stream, "lax 0%05o", x);
+
+	case 0622021:
+		stream << "dsa";
 		break;
-	case 16:
-		util::stream_format(stream, "trn 0%05o", x);
+
+	case 0622061:
+		stream << "dsc";
 		break;
-	case 17:
-		util::stream_format(stream, "tze 0%05o", x);
+
+	case 0624000:
+		stream << "prt";
 		break;
-	case 18:
-		util::stream_format(stream, "tsx 0%05o", x);
+
+	case 0624021:
+		stream << "pna";
 		break;
-	case 19:
-		util::stream_format(stream, "tix 0%05o", x);
+
+	case 0624061:
+		stream << "pnc";
 		break;
-	case 20:
-		util::stream_format(stream, "tra 0%05o", x);
+
+	case 0624600:
+		stream << "pnt";
 		break;
-	case 21:
-		util::stream_format(stream, "trx 0%05o", x);
+
+	case 0626021: case 0627021:
+		util::stream_format(stream, "p%da", BIT(inst, 9) ? 7 : 6);
 		break;
-	case 22:
-		util::stream_format(stream, "tlv 0%05o", x);
+
+	case 0626600: case 0627600:
+		util::stream_format(stream, "p%dh", BIT(inst, 9) ? 7 : 6);
 		break;
-	case 24:
-	case 25:
-	case 26:
-	case 27:
-	case 28:
-	case 29:
-	case 30:
-	case 31:
-		util::stream_format(stream, "opr 0%06o", md & 0177777);
+
+	case 0630000:
+		stream << "hlt";
 		break;
+
+	case 0640000:
+		stream << "clr";
+		break;
+
+	case 0666020: case 0667020:
+		util::stream_format(stream, "p%do", BIT(inst, 9) ? 7 : 6);
+		break;
+
+	case 0700000:
+		stream << "cll";
+		break;
+
+	case 0740000:
+		stream << "cla";
+		break;
+
+	case 0740004:
+		stream << "tac";
+		break;
+
+	case 0740022:
+		stream << "lac";
+		break;
+
+	case 0740023:
+		stream << "tbr";
+		break;
+
+	case 0740040:
+		stream << "clc";
+		break;
+
+	case 0740200:
+		stream << "cal";
+		break;
+
+	case 0761000:
+		stream << "r1c";
+		break;
+
+	case 0761031:
+		stream << "r1l";
+		break;
+
+	case 0761600:
+		stream << "r1r";
+		break;
+
+	case 0763000:
+		stream << "r3c";
+		break;
+
+	case 0766000:
+		stream << "p6s";
+		break;
+
 	default:
-		util::stream_format(stream, "illegal");
+		if (inst >= 0760000)
+			util::stream_format(stream, "ios %o", inst & 017777);
+		else
+			util::stream_format(stream, "opr %o", inst & 0177777);
 		break;
 	}
-	return 1;
+
+	return 1 | SUPPORTED;
+}
+
+offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const tx0_8kw_disassembler::data_buffer &opcodes, const tx0_8kw_disassembler::data_buffer &params)
+{
+	u32 inst = opcodes.r32(pc) & 0777777;
+
+	if (inst < 0600000)
+	{
+		// Addressable instructions
+		std::string_view str = s_addressable_insts[(inst & 0760000) >> 13];
+		if (str.empty())
+			util::stream_format(stream, "%06o", inst);
+		else
+		{
+			util::stream_format(stream, "%s %05o", str, inst & 017777);
+
+			if ((inst & 0760000) == 0440000) // tsx
+				return 1 | STEP_OVER | SUPPORTED;
+			else if ((inst & 0760000) == 0520000) // trx
+				return 1 | STEP_OUT | SUPPORTED;
+		}
+	}
+	else if ((inst & 037000) == 004000)
+	{
+		// Select class
+		if (BIT(inst, 15))
+			stream << "claU";
+		util::stream_format(stream, "%s %d", s_tape_insts[BIT(inst, 2, 3)], inst & 3);
+	}
+	else
+	{
+		if ((inst & 037000) == 02000)
+		{
+			stream << "tbr";
+			if ((inst & 0100757) == 0)
+				return 1 | SUPPORTED;
+			stream << 'U';
+		}
+		else if (inst == 0706020)
+		{
+			stream << "rpf";
+			return 1 | SUPPORTED;
+		}
+		else if ((inst & 037000) == 07000)
+		{
+			if (BIT(inst, 14))
+				stream << "spf";
+			else
+				stream << "cpf";
+			if ((inst & 0100777) == 0)
+				return 1 | SUPPORTED;
+			stream << 'U';
+		}
+		else if ((inst & 037000) == 020000)
+		{
+			stream << "cpy";
+			if ((inst & 0100777) == 0)
+				return 1 | SUPPORTED;
+			stream << 'U';
+		}
+		else if ((inst & 037000) == 025000)
+		{
+			stream << "typ";
+			if ((inst & 0100777) == 0)
+				return 1 | SUPPORTED;
+			stream << 'U';
+		}
+		else if ((inst & 036777) == 026600)
+		{
+			util::stream_format(stream, "p%dh", BIT(inst, 9) ? 7 : 6);
+			return 1 | SUPPORTED;
+		}
+		else if ((inst & 076777) == 066020)
+		{
+			util::stream_format(stream, "p%do", BIT(inst, 9) ? 7 : 6);
+			return 1 | SUPPORTED;
+		}
+		else if ((inst & 037000) == 030000)
+		{
+			// HLT is actually executed last, but normally written first
+			stream << "hlt";
+			if ((inst & 0100777) == 0)
+				return 1 | SUPPORTED;
+			stream << 'U';
+		}
+		else if ((inst & 037000) == 031000)
+		{
+			stream << "cll";
+			if ((inst & 0100777) == 0)
+				return 1 | SUPPORTED;
+			stream << 'U';
+		}
+		else if ((inst & 037000) == 032000)
+		{
+			stream << "clr";
+			if ((inst & 0100777) == 0)
+				return 1 | SUPPORTED;
+			stream << 'U';
+		}
+		else if ((inst & 037000) != 0)
+		{
+			if (BIT(inst, 15))
+			{
+				switch (inst & 037000)
+				{
+				case 01000:
+					stream << "tac";
+					break;
+
+				case 03000:
+					stream << "claUpen";
+					break;
+
+				case 010000: case 011000: case 012000: case 013000: case 014000: case 015000: case 016000: case 017000:
+					util::stream_format(stream, "claUex%d", BIT(inst, 9, 3));
+					break;
+
+				case 021000:
+					if ((inst & 0777) == 0600)
+					{
+						stream << "r1r";
+						return 1 | SUPPORTED;
+					}
+					stream << "r1c";
+					break;
+
+				case 022000:
+					stream << "claUdis";
+					break;
+
+				case 023000:
+					stream << "r3c";
+					break;
+
+				case 024000:
+					stream << "claUprt";
+					break;
+
+				case 026000:
+					if ((inst & 040777) == 040020)
+					{
+						stream << "p6b";
+						return 1 | SUPPORTED;
+					}
+					stream << "p6s";
+					break;
+
+				default:
+					util::stream_format(stream, "opr %o", inst & 0177777);
+					return 1 | SUPPORTED;
+				}
+				if ((inst & 0777) == 0)
+					return 1 | SUPPORTED;
+				inst &= 040777;
+				stream << 'U';
+			}
+			else
+			{
+				switch (inst & 037000)
+				{
+				case 03000:
+					stream << "pen";
+					break;
+
+				case 010000: case 011000: case 012000: case 013000: case 014000: case 015000: case 016000: case 017000:
+					util::stream_format(stream, "ex%d", BIT(inst, 9, 3));
+					break;
+
+				case 021000:
+					stream << "r1l";
+					break;
+
+				case 022000:
+					if ((inst & 040777) == 040020)
+					{
+						stream << "dso";
+						return 1 | SUPPORTED;
+					}
+					stream << "dis";
+					break;
+
+				case 023000:
+					stream << "r3l";
+					break;
+
+				case 024000:
+					if ((inst & 040777) == 040020)
+					{
+						stream << "pno";
+						return 1 | SUPPORTED;
+					}
+					else if ((inst & 040777) == 040060)
+					{
+						stream << "pnc";
+						return 1 | SUPPORTED;
+					}
+					else if ((inst & 0777) == 0600)
+					{
+						stream << "pnt";
+						return 1 | SUPPORTED;
+					}
+					stream << "prt";
+					break;
+
+				default:
+					util::stream_format(stream, "opr %o", inst & 0177777);
+					return 1 | SUPPORTED;
+				}
+				if ((inst & 0777) == 0)
+					return 1 | SUPPORTED;
+				stream << 'U';
+			}
+		}
+		else if (inst == 0600000)
+		{
+			stream << "nop";
+			return 1 | SUPPORTED;
+		}
+
+		switch (inst & 0140777)
+		{
+		case 0:
+			break;
+
+		case 000001:
+			stream << "xro";
+			break;
+
+		case 000003:
+			stream << "lxr";
+			break;
+
+		case 000012:
+			stream << "cry";
+			break;
+
+		case 000022:
+			stream << "lpd";
+			break;
+
+		case 000031:
+			stream << "alx";
+			break;
+
+		case 000032:
+			stream << "lad";
+			break;
+
+		case 000033:
+			stream << "ladUxro";
+			break;
+
+		case 000040: case 040040:
+			stream << "com";
+			break;
+
+		case 000041:
+			stream << "comUxro";
+			break;
+
+		case 000043:
+			stream << "comUlxr";
+			break;
+
+		case 000062:
+			stream << "lpdUcom";
+			break;
+
+		case 000072:
+			stream << "lcd";
+			break;
+
+		case 000130:
+			stream << "xad";
+			break;
+
+		case 000170:
+			stream << "xcd";
+			break;
+
+		case 000200:
+			stream << "lro";
+			break;
+
+		case 000240:
+			stream << "comUlro";
+			break;
+
+		case 000272:
+			stream << "lcdUlro";
+			break;
+
+		case 000300:
+			stream << "xlr";
+			break;
+
+		case 000303:
+			stream << "ixl";
+			break;
+
+		case 000400:
+			stream << "shr";
+			break;
+
+		case 000600:
+			stream << "cyr";
+			break;
+
+		case 000612:
+			stream << "cyrUcry"; // M-5001-19 names this 'ran' (random number generator)
+			break;
+
+		case 000640:
+			stream << "comUcyr";
+			break;
+
+		case 040001:
+			stream << "axr";
+			break;
+
+		case 040021:
+			stream << "axo";
+			break;
+
+		case 040030:
+			stream << "cyl";
+			break;
+
+		case 040031:
+			stream << "axrUcyl";
+			break;
+
+		case 040050:
+			stream << "amz";
+			break;
+
+		case 040061:
+			stream << "axc";
+			break;
+
+		case 040200:
+			stream << "alr";
+			break;
+
+		case 040201:
+			stream << "alrUaxr";
+			break;
+
+		case 040203:
+			stream << "rax";
+			break;
+
+		case 040205:
+			stream << "orl";
+			break;
+
+		case 040207:
+			stream << "anl";
+			break;
+
+		case 040220:
+			stream << "alo";
+			break;
+
+		case 040230:
+			stream << "all";
+			break;
+
+		case 040231:
+			stream << "alrUalx";
+			break;
+
+		case 040232:
+			stream << "iad";
+			break;
+
+		case 040240:
+			stream << "alrUcom";
+			break;
+
+		case 040247:
+			stream << "anlUcom";
+			break;
+
+		case 040260:
+			stream << "alc";
+			break;
+
+		case 040601:
+			stream << "arx";
+			break;
+
+		case 0100000: case 0140000:
+			stream << "cla";
+			break;
+
+		case 0100001:
+			stream << "cax";
+			break;
+
+		case 0100012:
+			stream << "lal";
+			break;
+
+		case 0100022: case 0140022:
+			stream << "lac";
+			break;
+
+		case 0100023:
+			stream << "lacUlxr";
+			break;
+
+		case 0100040: case 0140040:
+			stream << "clc";
+			break;
+
+		case 0100062:
+			stream << "lcc";
+			break;
+
+		case 0100072:
+			stream << "laz";
+			break;
+
+		case 0100110:
+			stream << "xal";
+			break;
+
+		case 0100120:
+			stream << "xac";
+			break;
+
+		case 0100160:
+			stream << "xcc";
+			break;
+
+		case 0100200:
+			stream << "cal";
+			break;
+
+		case 0100240:
+			stream << "calUcom";
+			break;
+
+		case 0100322:
+			stream << "rxa";
+			break;
+
+		case 0100622:
+			stream << "lar";
+			break;
+
+		case 0140025:
+			stream << "ora";
+			break;
+
+		case 0140027:
+			stream << "ana";
+			break;
+
+		case 0140065:
+			stream << "oraUcom";  // M-5001-19-1 names this 'orc'
+			break;
+
+		case 0140067:
+			stream << "anaUcom";  // M-5001-19-1 names this 'anc'
+			break;
+
+		case 0140205:
+			stream << "oro";
+			break;
+
+		case 0140207:
+			stream << "ano";
+			break;
+
+		case 0140212:
+			stream << "lalUalr"; // M-5001-19-1 names this 'ill'
+			break;
+
+		case 0140222:
+			stream << "ial";
+			break;
+
+		case 0140262:
+			stream << "ialUcom";
+			break;
+
+		default:
+			util::stream_format(stream, "opr %o", inst & 0140777);
+			break;
+		}
+	}
+
+	return 1 | SUPPORTED;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -118,7 +118,7 @@ namespace bx
 
 	inline int32_t SizerWriter::write(const void* /*_data*/, int32_t _size, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		int32_t morecore = int32_t(m_pos - m_top) + _size;
 
@@ -132,7 +132,7 @@ namespace bx
 		m_pos += size;
 		if (size != _size)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "SizerWriter: write truncated.");
+			BX_ERROR_SET(_err, kErrorReaderWriterWrite, "SizerWriter: write truncated.");
 		}
 		return size;
 	}
@@ -170,7 +170,7 @@ namespace bx
 
 	inline int32_t MemoryReader::read(void* _data, int32_t _size, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		int64_t remainder = m_top-m_pos;
 		int32_t size = uint32_min(_size, uint32_t(min<int64_t>(remainder, INT32_MAX) ) );
@@ -178,7 +178,7 @@ namespace bx
 		m_pos += size;
 		if (size != _size)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "MemoryReader: read truncated.");
+			BX_ERROR_SET(_err, kErrorReaderWriterRead, "MemoryReader: read truncated.");
 		}
 		return size;
 	}
@@ -233,13 +233,13 @@ namespace bx
 
 	inline int32_t MemoryWriter::write(const void* _data, int32_t _size, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		int32_t morecore = int32_t(m_pos - m_size) + _size;
 
 		if (0 < morecore)
 		{
-			morecore = BX_ALIGN_MASK(morecore, 0xfff);
+			morecore = alignUp(morecore, 0x1000);
 			m_data = (uint8_t*)m_memBlock->more(morecore);
 			m_size = m_memBlock->getSize();
 		}
@@ -251,7 +251,7 @@ namespace bx
 		m_top = max(m_top, m_pos);
 		if (size != _size)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "MemoryWriter: write truncated.");
+			BX_ERROR_SET(_err, kErrorReaderWriterWrite, "MemoryWriter: write truncated.");
 		}
 		return size;
 	}
@@ -422,7 +422,7 @@ namespace bx
 			const int64_t offset  = bx::seek(_reader, size);
 			if (offset != aligned)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "Align: read truncated.");
+				BX_ERROR_SET(_err, kErrorReaderWriterWrite, "Align: read truncated.");
 			}
 			return int32_t(offset - current);
 		}

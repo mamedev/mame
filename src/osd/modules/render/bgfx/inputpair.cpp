@@ -42,6 +42,7 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 
 bgfx_input_pair::~bgfx_input_pair()
 {
+	m_slider_state.reset();
 }
 
 void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
@@ -58,14 +59,14 @@ void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
 	bgfx_uniform *tex_size = effect->uniform("u_tex_size" + std::to_string(m_index));
 	if (tex_size && provider)
 	{
-		float values[2] = { float(provider->width()), float(provider->height()) };
+		float values[2] = { float(provider->rowpixels()), float(provider->height()) };
 		tex_size->set(values, sizeof(float) * 2);
 	}
 
 	bgfx_uniform *inv_tex_size = effect->uniform("u_inv_tex_size" + std::to_string(m_index));
 	if (inv_tex_size && provider)
 	{
-		float values[2] = { 1.0f / float(provider->width()), 1.0f / float(provider->height()) };
+		float values[2] = { 1.0f / float(provider->rowpixels()), 1.0f / float(provider->height()) };
 		inv_tex_size->set(values, sizeof(float) * 2);
 	}
 

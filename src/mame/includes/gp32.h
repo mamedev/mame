@@ -105,7 +105,12 @@ public:
 		m_io_in0(*this, "IN0"),
 		m_io_in1(*this, "IN1"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+		{
+			std::fill(std::begin(m_s3c240x_lcd_regs), std::end(m_s3c240x_lcd_regs), 0);
+			std::fill(std::begin(m_s3c240x_uart_0_regs), std::end(m_s3c240x_uart_0_regs), 0);
+			std::fill(std::begin(m_s3c240x_uart_1_regs), std::end(m_s3c240x_uart_1_regs), 0);
+		}
 
 	void gp32(machine_config &config);
 

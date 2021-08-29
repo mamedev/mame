@@ -87,7 +87,7 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 	{
 		texture_name += std::to_string(screen);
 	}
-	bgfx_texture* texture = create_texture(texture_name, bgfx::TextureFormat::RGBA8, width, height, data, flags);
+	bgfx_texture* texture = create_texture(texture_name, bgfx::TextureFormat::BGRA8, width, height, data, flags);
 
 	delete [] data;
 
@@ -122,8 +122,9 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 				{
 					bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 					uint16_t pitch = width;
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, &pitch);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
+					int convert_stride = 1;
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, convert_stride);
+					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)(rowpixels / convert_stride), (uint16_t)height, mem, pitch);
 					return handle;
 				}
 			}
@@ -150,8 +151,9 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 				{
 					bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 					uint16_t pitch = width;
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, &pitch);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
+					int convert_stride = 1;
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, convert_stride);
+					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)(rowpixels / convert_stride), (uint16_t)height, mem, pitch);
 					return handle;
 				}
 			}
@@ -161,9 +163,10 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 
 	bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 	uint16_t pitch = width;
-	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, &pitch);
+	int convert_stride = 1;
+	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, convert_stride);
 	handle = bgfx::createTexture2D(width, height, false, 1, dst_format, flags, nullptr);
-	bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
+	bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)(rowpixels / convert_stride), (uint16_t)height, mem, pitch);
 
 	m_mame_textures[key] = { handle, seqid, width, height };
 	return handle;
@@ -201,6 +204,6 @@ void texture_manager::remove_provider(std::string name, bool delete_provider)
 		{
 			delete m_textures[name];
 		}
-		m_textures[name] = nullptr;
+		m_textures.erase(name);
 	}
 }

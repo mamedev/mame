@@ -306,7 +306,7 @@ protected:
 		// try to load filters from a file
 		if (value && file)
 		{
-			unsigned const cnt(unsigned((std::max)(std::min(int(MAX), std::atoi(value)), 0)));
+			unsigned const cnt(std::clamp<int>(std::atoi(value), 0, MAX));
 			for (unsigned i = 0; cnt > i; ++i)
 			{
 				typename Base::ptr flt(static_cast<Impl &>(*this).create(*file, indent + 1));

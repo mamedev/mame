@@ -225,8 +225,6 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("rpenable",  CMDFLAG_NONE, 1, 0, 1, std::bind(&debugger_commands::execute_rpdisenable, this, _1, _2));
 	m_console.register_command("rplist",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rplist, this, _1, _2));
 
-	m_console.register_command("hotspot",   CMDFLAG_NONE, 0, 0, 3, std::bind(&debugger_commands::execute_hotspot, this, _1, _2));
-
 	m_console.register_command("statesave", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1, _2));
 	m_console.register_command("ss",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1, _2));
 	m_console.register_command("stateload", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
@@ -1342,7 +1340,7 @@ void debugger_commands::execute_cpulist(int ref, const std::vector<std::string> 
 	int index = 0;
 	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 	{
-		device_state_interface *state;
+		const device_state_interface *state;
 		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr)
 			m_console.printf("[%s%d] %s\n", &exec.device() == m_console.get_visible_cpu() ? "*" : "", index++, exec.device().tag());
 	}
@@ -1888,49 +1886,6 @@ void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &
 
 	if (printed == 0)
 		m_console.printf("No registerpoints currently installed\n");
-}
-
-
-/*-------------------------------------------------
-    execute_hotspot - execute the hotspot
-    command
--------------------------------------------------*/
-
-void debugger_commands::execute_hotspot(int ref, const std::vector<std::string> &params)
-{
-	/* if no params, and there are live hotspots, clear them */
-	if (params.empty())
-	{
-		bool cleared = false;
-
-		/* loop over CPUs and find live spots */
-		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->hotspot_tracking_enabled())
-			{
-				device.debug()->hotspot_track(0, 0);
-				m_console.printf("Cleared hotspot tracking on CPU '%s'\n", device.tag());
-				cleared = true;
-			}
-
-		/* if we cleared, we're done */
-		if (cleared)
-			return;
-	}
-
-	/* extract parameters */
-	device_t *device = nullptr;
-	if (!validate_cpu_parameter(!params.empty() ? params[0].c_str() : nullptr, device))
-		return;
-	u64 count = 64;
-	if (params.size() > 1 && !validate_number_parameter(params[1], count))
-		return;
-	u64 threshhold = 250;
-	if (params.size() > 2 && !validate_number_parameter(params[2], threshhold))
-		return;
-
-	/* attempt to install */
-	device->debug()->hotspot_track(count, threshhold);
-	m_console.printf("Now tracking hotspots on CPU '%s' using %d slots with a threshold of %d\n", device->tag(), (int)count, (int)threshhold);
 }
 
 
@@ -3555,6 +3510,13 @@ void debugger_commands::execute_trackpc(int ref, const std::vector<std::string> 
 	if (!validate_cpu_parameter((params.size() > 1) ? params[1].c_str() : nullptr, cpu))
 		return;
 
+	const device_state_interface *state;
+	if (!cpu->interface(state))
+	{
+		m_console.printf("Device has no PC to be tracked\n");
+		return;
+	}
+
 	// Should we clear the existing data?
 	bool clear = false;
 	if (params.size() > 2 && !validate_boolean_parameter(params[2], clear))
@@ -3566,7 +3528,7 @@ void debugger_commands::execute_trackpc(int ref, const std::vector<std::string> 
 		// Insert current pc
 		if (m_console.get_visible_cpu() == cpu)
 		{
-			const offs_t pc = cpu->state().pcbase();
+			const offs_t pc = state->pcbase();
 			cpu->debug()->set_track_pc_visited(pc);
 		}
 		m_console.printf("PC tracking enabled\n");

@@ -86,6 +86,7 @@ chopliftu   3x32k 1x32k 3x32k 4x32k  yes      7154
 chopliftbl  3x32k 1x32k 3x32k 4x32k  yes      bootleg
 
 raflesia    3x16k 1x8k  6x8k  4x16k  no  pio  7413    7408
+raflesiau   6x8k  1x8k  6x8k  4x16k  no  ppi  ????    ????
 
 wboy2       6x8k  1x8k  6x8k  4x16k  no  ppi  7592    7485
 wboy2u      6x8k  1x8k  6x8k  4x16k  no  ppi  ????
@@ -206,7 +207,7 @@ Flicky sets version notes:
 
 flicky, flickyo
 ---------------
-The both seem to be very similar programs.  Difficulty is easier than the S1,S2 sets.
+They both seem to be very similar programs.  Difficulty is easier than the S1,S2 sets.
 DIPs are also shared 100% with each other.
 
 flickys1, flickys2
@@ -294,14 +295,14 @@ static const u8 cc_ed[0x100] = {
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
-12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 9*5+2*2,12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 9*5+2*2,
-12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 9*5+2*2,12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 9*5+2*2,
-12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2,18*5+2*2,12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2,18*5+2*2,
-12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 8*5+2*2,12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 8*5+2*2,
+	12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2,8*5+2*2,14*5+2*2, 8*5+2*2, 9*5+2*2,12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 9*5+2*2,
+	12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2,8*5+2*2,14*5+2*2, 8*5+2*2, 9*5+2*2,12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 9*5+2*2,
+	12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2,8*5+2*2,14*5+2*2, 8*5+2*2,18*5+2*2,12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2,18*5+2*2,
+	12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2,8*5+2*2,14*5+2*2, 8*5+2*2, 8*5+2*2,12*5+2*2,12*5+2*2,15*5+2*2,20*5+4*2, 8*5+2*2,14*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
-16*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
-16*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
+	16*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2,8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
+	16*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2,8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2,16*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
@@ -309,41 +310,41 @@ static const u8 cc_ed[0x100] = {
 };
 
 static const u8 cc_xy[0x100] = {
-( 4+4)*5+2*2,(10+4)*5+4*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(11+4)*5+2*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
-( 8+4)*5+3*2,(10+4)*5+4*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,(12+4)*5+3*2,(11+4)*5+2*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
-( 7+4)*5+3*2,(10+4)*5+4*2,(16+4)*5+4*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,(16+4)*5+4*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
-( 7+4)*5+3*2,(10+4)*5+4*2,(13+4)*5+4*2,( 6+4)*5+2*2,(23  )*5+3*2,(23  )*5+3*2,(19  )*5+4*2,( 4+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,(13+4)*5+4*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
-( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
-( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
-( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
-(19  )*5+3*2,(19  )*5+3*2,(19  )*5+3*2,(19  )*5+3*2,(19  )*5+3*2,(19  )*5+3*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
-( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
-( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
-( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
-( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
-( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,(10+4)*5+4*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,( 0  )*5    ,(10+4)*5+4*2,(17+4)*5+4*2,( 7+4)*5+3*2,(11+4)*5+2*2,
-( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+3*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,( 4+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+3*2,(10+4)*5+4*2,( 4  )*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,
-( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,(19+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,( 4+4)*5+2*2,(10+4)*5+4*2,( 4+4)*5+2*2,(10+4)*5+4*2,( 4  )*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,
-( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,( 4+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,( 6+4)*5+2*2,(10+4)*5+4*2,( 4+4)*5+2*2,(10+4)*5+4*2,( 4  )*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2
+	( 4+4)*5+2*2,(10+4)*5+4*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(11+4)*5+2*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
+	( 8+4)*5+3*2,(10+4)*5+4*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,(12+4)*5+3*2,(11+4)*5+2*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
+	( 7+4)*5+3*2,(10+4)*5+4*2,(16+4)*5+4*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,(16+4)*5+4*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
+	( 7+4)*5+3*2,(10+4)*5+4*2,(13+4)*5+4*2,( 6+4)*5+2*2,(23  )*5+3*2,(23  )*5+3*2,(19  )*5+4*2,( 4+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,(13+4)*5+4*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
+	( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
+	( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
+	( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
+	(19  )*5+3*2,(19  )*5+3*2,(19  )*5+3*2,(19  )*5+3*2,(19  )*5+3*2,(19  )*5+3*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
+	( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
+	( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
+	( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
+	( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(19  )*5+3*2,( 4+4)*5+2*2,
+	( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,(10+4)*5+4*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,( 0  )*5    ,(10+4)*5+4*2,(17+4)*5+4*2,( 7+4)*5+3*2,(11+4)*5+2*2,
+	( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+3*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,( 4+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+3*2,(10+4)*5+4*2,( 4  )*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,
+	( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,(19+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,( 4+4)*5+2*2,(10+4)*5+4*2,( 4+4)*5+2*2,(10+4)*5+4*2,( 4  )*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,
+	( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,( 4+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,( 6+4)*5+2*2,(10+4)*5+4*2,( 4+4)*5+2*2,(10+4)*5+4*2,( 4  )*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2
 };
 
 static const u8 cc_xycb[0x100] = {
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,
-20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,
-20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,
-20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
-23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,
+	20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,
+	20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,
+	20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,20*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
+	23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2
 };
 
 /* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
@@ -3044,7 +3045,7 @@ ROM_START( flickyo )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
-// Coverted from and running on a Up n' Down board.
+// Converted from and running on a Up n' Down board.
 ROM_START( flickyup )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2764-ic29",  0x0000, 0x2000, CRC(59ba3107) SHA1(2d37f00b8a81b97e45aa78ae75449663c35acece) ) /* encrypted */
@@ -4139,8 +4140,38 @@ ROM_START( raflesia )
 
 	ROM_REGION( 0x0100, "lookup_proms", 0 )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
-	ROM_END
+ROM_END
 
+// Sega 834-5191 + 834-5540 + 834-5541. This set isn't exactly the same as the encrypted version (calls and jumps are moved around)
+ROM_START( raflesiau )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic129", 0x0000, 0x2000, CRC(6f4931b0) SHA1(4c02e052c01099478adb5bb595c035aff862dd45) )
+	ROM_LOAD( "ic130", 0x2000, 0x2000, CRC(ec46e21b) SHA1(7bba493c8493611952e029dc8782916cc25db82a) )
+	ROM_LOAD( "ic131", 0x4000, 0x2000, CRC(e035ff6b) SHA1(5bffdcdf543f47ccf2ed0cabf1ef9e42857d59f9) )
+	ROM_LOAD( "ic132", 0x6000, 0x2000, CRC(6527aae7) SHA1(aecf33c777e8f4a7323d72dd3f2ca5d12cc798e7) )
+	ROM_LOAD( "ic133", 0x8000, 0x2000, CRC(e13dd5e4) SHA1(a97654ff82ffa051ee14359733c2b9a952134d4e) )
+	ROM_LOAD( "ic134", 0xa000, 0x2000, CRC(a0aa4729) SHA1(c353ed4d21661ea0721d8b85d6bfefe502373d7b) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "ic3", 0x0000, 0x2000, CRC(7353cc2e) SHA1(c9246f156ecb1a266669cc9c1c900eece7e8c0d8) )
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "epr-7419.82", 0x0000, 0x2000, CRC(bfd5f34c) SHA1(78c4d380d5558212e535c3262223137447d64818) )
+	ROM_LOAD( "epr-7418.65", 0x2000, 0x2000, CRC(f8cbc9b6) SHA1(48be9337f704a11ac1fdeb64a3b3518c796bcdd0) )
+	ROM_LOAD( "epr-7417.81", 0x4000, 0x2000, CRC(e63501bc) SHA1(5cfd19241c54782c262bbb23c6f682534e77feb7) )
+	ROM_LOAD( "epr-7416.64", 0x6000, 0x2000, CRC(093e5693) SHA1(78bb1c4651bd63a9f776766d2eac4f1c09242ed5) )
+	ROM_LOAD( "epr-7415.80", 0x8000, 0x2000, CRC(1a8d6bd6) SHA1(b04ee35f603c6c9923ba888914eb43a8b7753d92) )
+	ROM_LOAD( "epr-7414.63", 0xa000, 0x2000, CRC(5d20f218) SHA1(bdc0185d133f7bbe287106882bacde846634ffa4) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "epr-7407.3", 0x0000, 0x4000, CRC(f09fc057) SHA1(c6f06144b708055b31fbcba9f38b63736db789d8) )
+	ROM_LOAD( "epr-7409.1", 0x4000, 0x4000, CRC(819fedb8) SHA1(e63f0422814423be91d8e1937a13d19693a1a5fc) )
+	ROM_LOAD( "epr-7408.4", 0x8000, 0x4000, CRC(3189f33c) SHA1(8476c2c01920f0492cf643929d4f023f3afe0164) )
+	ROM_LOAD( "epr-7410.2", 0xc000, 0x4000, CRC(ced74789) SHA1(d0ad845bfe83412ac8d43125e1c50d0581a5b47e) )
+
+	ROM_REGION( 0x0100, "lookup_proms", 0 )
+	ROM_LOAD( "pr-5317.76", 0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
 
 ROM_START( wboy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5303,7 +5334,7 @@ ROM_START( nob )
 ROM_END
 
 /* the bootleg has different protection.. */
-	ROM_START( nobb )
+ROM_START( nobb )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "nobo-t.bin", 0x00000, 0x8000, CRC(176fd168) SHA1(f262521f07e5340f175019e2a06a54120a4aa3b7) )
 	ROM_LOAD( "nobo-r.bin", 0x10000, 0x8000, CRC(d61cf3c9) SHA1(0f80011d713c51e67853810813ebba579ade0303) )
@@ -5339,10 +5370,6 @@ ROM_END
  *  Generic driver initialization
  *
  *************************************/
-
-void system1_state::init_bank00()
-{
-}
 
 void system1_state::init_bank44()
 {
@@ -5400,15 +5427,12 @@ void system1_state::init_myherok()
 			rom[A1] = temp;
 		}
 	}
-
-	init_bank00();
 }
 
 
 
 void system1_state::init_blockgal()
 {
-	init_bank00();
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
 }
 
@@ -5493,7 +5517,6 @@ void system1_state::init_nobb()
 
 void system1_state::init_bootleg()
 {
-	init_bank00();
 	memcpy(m_decrypted_opcodes, m_maincpu_region->base() + 0x10000, 0x8000);
 }
 
@@ -5531,65 +5554,66 @@ void system1_state::init_shtngmst()
  *************************************/
 
 /* PPI-based System 1 */
-GAME( 1983, starjack,   0,        sys1ppis,          starjack,  system1_state, init_bank00,       ROT270, "Sega", "Star Jacker (Sega)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, starjacks,  starjack, sys1ppis,          starjacks, system1_state, init_bank00,       ROT270, "Sega (Stern Electronics license)", "Star Jacker (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, upndown,    0,        sys1ppix_315_5098, upndown,   system1_state, init_bank00,       ROT270, "Sega", "Up'n Down (315-5030)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, upndownu,   upndown,  sys1ppi,           upndown,   system1_state, init_bank00,       ROT270, "Sega", "Up'n Down (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, regulus,    0,        sys1ppix_315_5033, regulus,   system1_state, init_bank00,       ROT270, "Sega", "Regulus (315-5033, Rev A.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, reguluso,   regulus,  sys1ppix_315_5033, reguluso,  system1_state, init_bank00,       ROT270, "Sega", "Regulus (315-5033)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, regulusu,   regulus,  sys1ppi,           regulus,   system1_state, init_bank00,       ROT270, "Sega", "Regulus (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrviking,   0,        sys1ppisx_315_5041,mrviking,  system1_state, init_bank00,       ROT270, "Sega", "Mister Viking (315-5041)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrvikingj,  mrviking, sys1ppisx_315_5041,mrvikingj, system1_state, init_bank00,       ROT270, "Sega", "Mister Viking (315-5041, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, init_bank00,       ROT270, "Coreland / Sega", "SWAT (315-5048)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickyup,   flicky,   sys1ppix_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, on Up'n Down boardset)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, init_bank00,       ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, init_bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja Princess (64k Ver. not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "hack (Vision Electronics)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, starjack,   0,        sys1ppis,          starjack,  system1_state, empty_init,        ROT270, "Sega", "Star Jacker (Sega)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, starjacks,  starjack, sys1ppis,          starjacks, system1_state, empty_init,        ROT270, "Sega (Stern Electronics license)", "Star Jacker (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, upndown,    0,        sys1ppix_315_5098, upndown,   system1_state, empty_init,        ROT270, "Sega", "Up'n Down (315-5030)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, upndownu,   upndown,  sys1ppi,           upndown,   system1_state, empty_init,        ROT270, "Sega", "Up'n Down (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, regulus,    0,        sys1ppix_315_5033, regulus,   system1_state, empty_init,        ROT270, "Sega", "Regulus (315-5033, Rev A.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, reguluso,   regulus,  sys1ppix_315_5033, reguluso,  system1_state, empty_init,        ROT270, "Sega", "Regulus (315-5033)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, regulusu,   regulus,  sys1ppi,           regulus,   system1_state, empty_init,        ROT270, "Sega", "Regulus (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrviking,   0,        sys1ppisx_315_5041,mrviking,  system1_state, empty_init,        ROT270, "Sega", "Mister Viking (315-5041)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrvikingj,  mrviking, sys1ppisx_315_5041,mrvikingj, system1_state, empty_init,        ROT270, "Sega", "Mister Viking (315-5041, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, empty_init,        ROT270, "Coreland / Sega", "SWAT (315-5048)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, empty_init,        ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickyup,   flicky,   sys1ppix_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (64k Version, on Up'n Down boardset)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, empty_init,        ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, empty_init,        ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, empty_init,        ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, empty_init,        ROT0,   "Sega", "Ninja Princess (64k Ver. not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, empty_init,        ROT0,   "hack (Vision Electronics)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nob,        0,        nobm,              nob,       system1_state, init_nob,          ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, init_nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, raflesiau,  raflesia, sys1ppi,           raflesia,  system1_state, empty_init,        ROT270, "Coreland / Sega", "Rafflesia (not encrypted)", MACHINE_SUPPORTS_SAVE )
 
 /* PIO-based System 1 */
-GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-5xxx)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Sanrin San Chan (Japan, 315-5xxx)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2,   0,        sys1piox_315_5093, pitfall2,  system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (315-5093)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2a,  pitfall2, sys1piox_315_5093, pitfall2,  system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2u,  pitfall2, sys1pio,           pitfall2u, system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinj,   0,        sys1piox_315_5102, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinju,  seganinj, sys1pio,           seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinja,  seganinj, sys1piox_315_5133, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (315-5113)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ninja,      seganinj, sys1piox_315_5102, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprinceso,  seganinj, sys1piox_315_5098, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja Princess (315-5098, 128k Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprincesb,  seganinj, sys1piox_315_5051, seganinj,  system1_state, init_bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051?, 128k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, imsorry,    0,        sys1piox_315_5110, imsorry,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "I'm Sorry (315-5110, US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, imsorryj,   imsorry,  sys1piox_315_5110, imsorry,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybb,    0,        sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybbo,   teddybb,  sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybbobl, teddybb,  sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, myhero,     0,        sys1pio,           myhero,    system1_state, init_bank00,       ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sscandal,   myhero,   sys1piox_315_5132, myhero,    system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, myherobl,   myhero,   sys1piox_315_5132, myhero,    system1_state, init_bank00,       ROT0,   "bootleg",         "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
+GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, 315-5051)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, empty_init,        ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Spatter (315-5xxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Sanrin San Chan (Japan, 315-5xxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2,   0,        sys1piox_315_5093, pitfall2,  system1_state, empty_init,        ROT0,   "Sega", "Pitfall II (315-5093)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2a,  pitfall2, sys1piox_315_5093, pitfall2,  system1_state, empty_init,        ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2u,  pitfall2, sys1pio,           pitfall2u, system1_state, empty_init,        ROT0,   "Sega", "Pitfall II (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinj,   0,        sys1piox_315_5102, seganinj,  system1_state, empty_init,        ROT0,   "Sega", "Sega Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinju,  seganinj, sys1pio,           seganinj,  system1_state, empty_init,        ROT0,   "Sega", "Sega Ninja (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinja,  seganinj, sys1piox_315_5133, seganinj,  system1_state, empty_init,        ROT0,   "Sega", "Sega Ninja (315-5113)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ninja,      seganinj, sys1piox_315_5102, seganinj,  system1_state, empty_init,        ROT0,   "Sega", "Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprinceso,  seganinj, sys1piox_315_5098, seganinj,  system1_state, empty_init,        ROT0,   "Sega", "Ninja Princess (315-5098, 128k Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprincesb,  seganinj, sys1piox_315_5051, seganinj,  system1_state, empty_init,        ROT0,   "bootleg?", "Ninja Princess (315-5051?, 128k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, imsorry,    0,        sys1piox_315_5110, imsorry,   system1_state, empty_init,        ROT0,   "Coreland / Sega", "I'm Sorry (315-5110, US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, imsorryj,   imsorry,  sys1piox_315_5110, imsorry,   system1_state, empty_init,        ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybb,    0,        sys1piox_315_5155, teddybb,   system1_state, empty_init,        ROT0,   "Sega", "TeddyBoy Blues (315-5115, New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybbo,   teddybb,  sys1piox_315_5155, teddybb,   system1_state, empty_init,        ROT0,   "Sega", "TeddyBoy Blues (315-5115, Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybbobl, teddybb,  sys1piox_315_5155, teddybb,   system1_state, empty_init,        ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, myhero,     0,        sys1pio,           myhero,    system1_state, empty_init,        ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sscandal,   myhero,   sys1piox_315_5132, myhero,    system1_state, empty_init,        ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, myherobl,   myhero,   sys1piox_315_5132, myhero,    system1_state, empty_init,        ROT0,   "bootleg",         "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
 GAME( 1985, myherok,    myhero,   sys1piox_315_5132, myhero,    system1_state, init_myherok,      ROT0,   "Coreland / Sega", "Cheongchun Ilbeonji (Korea)", MACHINE_SUPPORTS_SAVE ) // possible bootleg, has extra encryption
-GAME( 1985, 4dwarrio,   0,        sys1piox_315_5162, 4dwarrio,  system1_state, init_bank00,       ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, raflesia,   0,        sys1piox_315_5162, raflesia,  system1_state, init_bank00,       ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy,       0,        sys1piox_315_5177, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyo,      wboy,     sys1piox_315_5135, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5135)", MACHINE_SUPPORTS_SAVE ) // aka 317-0003
-GAME( 1986, wboy3,      wboy,     sys1piox_315_5135, wboy3,     system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
-GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, init_bank00,       ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, init_bank00,       ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, 4dwarrio,   0,        sys1piox_315_5162, 4dwarrio,  system1_state, empty_init,        ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, raflesia,   0,        sys1piox_315_5162, raflesia,  system1_state, empty_init,        ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy,       0,        sys1piox_315_5177, wboy,      system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyo,      wboy,     sys1piox_315_5135, wboy,      system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5135)", MACHINE_SUPPORTS_SAVE ) // aka 317-0003
+GAME( 1986, wboy3,      wboy,     sys1piox_315_5135, wboy3,     system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
+GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, empty_init,        ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, empty_init,        ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blockgal,   0,        blockgal,          blockgal,  system1_state, init_blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */

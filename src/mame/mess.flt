@@ -80,6 +80,7 @@ applix.cpp
 apricot.cpp
 apricotf.cpp
 apricotp.cpp
+apxen.cpp
 aquarius.cpp
 arcadia.cpp
 argo.cpp
@@ -247,6 +248,7 @@ dmv.cpp
 dolphunk.cpp
 dpb7000.cpp
 dps1.cpp
+dpsv55.cpp
 dragon.cpp
 drumsta.cpp
 dsb46.cpp
@@ -369,6 +371,7 @@ gimix.cpp
 gizmondo.cpp
 gkidabc.cpp
 glcx.cpp
+gm1000.cpp
 gmaster.cpp
 gnat10.cpp
 goupil.cpp
@@ -834,6 +837,7 @@ pv1000.cpp
 pv2000.cpp
 pv9234.cpp
 pve500.cpp
+pwp14.cpp
 pwrview.cpp
 px4.cpp
 px8.cpp
@@ -1191,6 +1195,8 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr16.cpp
+ympsr40.cpp
 ympsr60.cpp
 ympsr340.cpp
 ymsy35.cpp

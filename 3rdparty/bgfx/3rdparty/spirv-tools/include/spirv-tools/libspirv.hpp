@@ -36,6 +36,9 @@ class Context {
  public:
   // Constructs a context targeting the given environment |env|.
   //
+  // See specific API calls for how the target environment is interpeted
+  // (particularly assembly and validation).
+  //
   // The constructed instance will have an empty message consumer, which just
   // ignores all messages from the library. Use SetMessageConsumer() to supply
   // one if messages are of concern.
@@ -101,6 +104,12 @@ class ValidatorOptions {
     spvValidatorOptionsSetScalarBlockLayout(options_, val);
   }
 
+  // Enables scalar layout when validating Workgroup blocks.  See
+  // VK_KHR_workgroup_memory_explicit_layout.
+  void SetWorkgroupScalarBlockLayout(bool val) {
+    spvValidatorOptionsSetWorkgroupScalarBlockLayout(options_, val);
+  }
+
   // Skips validating standard uniform/storage buffer/push-constant layout.
   void SetSkipBlockLayout(bool val) {
     spvValidatorOptionsSetSkipBlockLayout(options_, val);
@@ -127,6 +136,8 @@ class ValidatorOptions {
   // 3) Pointers that are actaul parameters on function calls do not have to
   //    point to the same type pointed as the formal parameter.  The types just
   //    need to logically match.
+  // 4) GLSLstd450 Interpolate* instructions can have a load of an interpolant
+  //    for a first argument.
   void SetBeforeHlslLegalization(bool val) {
     spvValidatorOptionsSetBeforeHlslLegalization(options_, val);
   }
@@ -199,6 +210,11 @@ class ReducerOptions {
                                               fail_on_validation_error);
   }
 
+  // See spvReducerOptionsSetTargetFunction.
+  void set_target_function(uint32_t target_function) {
+    spvReducerOptionsSetTargetFunction(options_, target_function);
+  }
+
  private:
   spv_reducer_options options_;
 };
@@ -224,10 +240,23 @@ class FuzzerOptions {
     spvFuzzerOptionsSetRandomSeed(options_, seed);
   }
 
+  // See spvFuzzerOptionsSetReplayRange.
+  void set_replay_range(int32_t replay_range) {
+    spvFuzzerOptionsSetReplayRange(options_, replay_range);
+  }
+
   // See spvFuzzerOptionsSetShrinkerStepLimit.
   void set_shrinker_step_limit(uint32_t shrinker_step_limit) {
     spvFuzzerOptionsSetShrinkerStepLimit(options_, shrinker_step_limit);
   }
+
+  // See spvFuzzerOptionsEnableFuzzerPassValidation.
+  void enable_fuzzer_pass_validation() {
+    spvFuzzerOptionsEnableFuzzerPassValidation(options_);
+  }
+
+  // See spvFuzzerOptionsEnableAllPasses.
+  void enable_all_passes() { spvFuzzerOptionsEnableAllPasses(options_); }
 
  private:
   spv_fuzzer_options options_;
@@ -274,16 +303,20 @@ class SpirvTools {
   // Assembles the given assembly |text| and writes the result to |binary|.
   // Returns true on successful assembling. |binary| will be kept untouched if
   // assembling is unsuccessful.
+  // The SPIR-V binary version is set to the highest version of SPIR-V supported
+  // by the target environment with which this SpirvTools object was created.
   bool Assemble(const std::string& text, std::vector<uint32_t>* binary,
                 uint32_t options = kDefaultAssembleOption) const;
   // |text_size| specifies the number of bytes in |text|. A terminating null
   // character is not required to present in |text| as long as |text| is valid.
+  // The SPIR-V binary version is set to the highest version of SPIR-V supported
+  // by the target environment with which this SpirvTools object was created.
   bool Assemble(const char* text, size_t text_size,
                 std::vector<uint32_t>* binary,
                 uint32_t options = kDefaultAssembleOption) const;
 
   // Disassembles the given SPIR-V |binary| with the given |options| and writes
-  // the assembly to |text|. Returns ture on successful disassembling. |text|
+  // the assembly to |text|. Returns true on successful disassembling. |text|
   // will be kept untouched if diassembling is unsuccessful.
   bool Disassemble(const std::vector<uint32_t>& binary, std::string* text,
                    uint32_t options = kDefaultDisassembleOption) const;
@@ -295,10 +328,26 @@ class SpirvTools {
   // Validates the given SPIR-V |binary|. Returns true if no issues are found.
   // Otherwise, returns false and communicates issues via the message consumer
   // registered.
+  // Validates for SPIR-V spec rules for the SPIR-V version named in the
+  // binary's header (at word offset 1).  Additionally, if the target
+  // environment is a client API (such as Vulkan 1.1), then validate for that
+  // client API version, to the extent that it is verifiable from data in the
+  // binary itself.
   bool Validate(const std::vector<uint32_t>& binary) const;
+  // Like the previous overload, but provides the binary as a pointer and size:
   // |binary_size| specifies the number of words in |binary|.
+  // Validates for SPIR-V spec rules for the SPIR-V version named in the
+  // binary's header (at word offset 1).  Additionally, if the target
+  // environment is a client API (such as Vulkan 1.1), then validate for that
+  // client API version, to the extent that it is verifiable from data in the
+  // binary itself.
   bool Validate(const uint32_t* binary, size_t binary_size) const;
   // Like the previous overload, but takes an options object.
+  // Validates for SPIR-V spec rules for the SPIR-V version named in the
+  // binary's header (at word offset 1).  Additionally, if the target
+  // environment is a client API (such as Vulkan 1.1), then validate for that
+  // client API version, to the extent that it is verifiable from data in the
+  // binary itself, or in the validator options.
   bool Validate(const uint32_t* binary, size_t binary_size,
                 spv_validator_options options) const;
 

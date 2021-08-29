@@ -18,8 +18,6 @@
 #include "emu.h"
 #include "huc6230.h"
 
-constexpr int clamp(int val, int min, int max) { return std::min(max, std::max(min, val)); }
-
 
 void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
@@ -35,8 +33,8 @@ void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			if (!channel->m_playing)
 				continue;
 
-			samp0 = clamp(samp0 + ((channel->m_output * channel->m_lvol) >> 3), -32768, 32767);
-			samp1 = clamp(samp1 + ((channel->m_output * channel->m_rvol) >> 3), -32768, 32767);
+			samp0 = std::clamp(samp0 + ((channel->m_output * channel->m_lvol) >> 3), -32768, 32767);
+			samp1 = std::clamp(samp1 + ((channel->m_output * channel->m_rvol) >> 3), -32768, 32767);
 		}
 
 		outputs[0].put_int(i, samp0, 32768);

@@ -36,6 +36,127 @@
 #define XINPUT_LIBRARIES { "xinput1_4.dll" }
 #endif
 
+#define XINPUT_AXIS_MINVALUE -32767
+#define XINPUT_AXIS_MAXVALUE 32767
+
+namespace {
+
+// default axis names
+const char *const xinput_axis_name[] =
+{
+	"LSX",
+	"LSY",
+	"RSX",
+	"RSY"
+};
+
+const input_item_id xinput_axis_ids[] =
+{
+	ITEM_ID_XAXIS,
+	ITEM_ID_YAXIS,
+	ITEM_ID_RXAXIS,
+	ITEM_ID_RYAXIS
+};
+
+const USHORT xinput_pov_dir[] = {
+	XINPUT_GAMEPAD_DPAD_UP,
+	XINPUT_GAMEPAD_DPAD_DOWN,
+	XINPUT_GAMEPAD_DPAD_LEFT,
+	XINPUT_GAMEPAD_DPAD_RIGHT
+};
+
+const char *const xinput_pov_names[] = {
+	"DPAD Up",
+	"DPAD Down",
+	"DPAD Left",
+	"DPAD Right"
+};
+
+const USHORT xinput_buttons[] = {
+	XINPUT_GAMEPAD_A,
+	XINPUT_GAMEPAD_B,
+	XINPUT_GAMEPAD_X,
+	XINPUT_GAMEPAD_Y,
+	XINPUT_GAMEPAD_LEFT_SHOULDER,
+	XINPUT_GAMEPAD_RIGHT_SHOULDER,
+	XINPUT_GAMEPAD_START,
+	XINPUT_GAMEPAD_BACK,
+	XINPUT_GAMEPAD_LEFT_THUMB,
+	XINPUT_GAMEPAD_RIGHT_THUMB,
+};
+
+const char *const xinput_button_names[] = {
+	"A",
+	"B",
+	"X",
+	"Y",
+	"LB",
+	"RB",
+	"Start",
+	"Back",
+	"LS",
+	"RS"
+};
+
+
+//============================================================
+//  xinput_joystick_module
+//============================================================
+
+class xinput_joystick_module : public wininput_module
+{
+public:
+	xinput_joystick_module() : wininput_module(OSD_JOYSTICKINPUT_PROVIDER, "xinput")
+	{
+	}
+
+	int init(const osd_options &options) override
+	{
+		// Call the base
+		int status = wininput_module::init(options);
+		if (status != 0)
+			return status;
+
+		// Create and initialize our helper
+		m_xinput_helper = std::make_shared<xinput_api_helper>();
+		status = m_xinput_helper->initialize();
+		if (status != 0)
+		{
+			osd_printf_error("xinput_joystick_module failed to get XInput interface! Error: %u\n", static_cast<unsigned int>(status));
+			return -1;
+		}
+
+		return 0;
+	}
+
+protected:
+	virtual void input_init(running_machine &machine) override
+	{
+		// Loop through each gamepad to determine if they are connected
+		for (UINT i = 0; i < XUSER_MAX_COUNT; i++)
+		{
+			XINPUT_STATE state = {0};
+
+			if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
+			{
+				// allocate and link in a new device
+				auto *devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
+				if (!devinfo)
+					continue;
+
+				// Configure each gamepad to add buttons and Axes, etc.
+				devinfo->configure();
+			}
+		}
+	}
+
+private:
+	std::shared_ptr<xinput_api_helper> m_xinput_helper;
+};
+
+} // anonymous namespace
+
+
 int xinput_api_helper::initialize()
 {
 	m_xinput_dll = osd::dynamic_module::open(XINPUT_LIBRARIES);
@@ -58,8 +179,6 @@ int xinput_api_helper::initialize()
 
 xinput_joystick_device * xinput_api_helper::create_xinput_device(running_machine &machine, UINT index, wininput_module &module)
 {
-	xinput_joystick_device *devinfo;
-
 	XINPUT_CAPABILITIES caps = { 0 };
 	if (FAILED(xinput_get_capabilities(index, 0, &caps)))
 	{
@@ -71,23 +190,23 @@ xinput_joystick_device * xinput_api_helper::create_xinput_device(running_machine
 	snprintf(device_name, sizeof(device_name), "XInput Player %u", index + 1);
 
 	// allocate the device object
-	devinfo = module.devicelist()->create_device<xinput_joystick_device>(machine, device_name, device_name, module, shared_from_this());
+	auto &devinfo = module.devicelist()->create_device<xinput_joystick_device>(machine, device_name, device_name, module, shared_from_this());
 
 	// Set the player ID
-	devinfo->xinput_state.player_index = index;
+	devinfo.xinput_state.player_index = index;
 
 	// Assign the caps we captured earlier
-	devinfo->xinput_state.caps = caps;
+	devinfo.xinput_state.caps = caps;
 
-	return devinfo;
+	return &devinfo;
 }
 
 //============================================================
 //  xinput_joystick_device
 //============================================================
 
-xinput_joystick_device::xinput_joystick_device(running_machine &machine, const char *name, char const *id, input_module &module, std::shared_ptr<xinput_api_helper> helper)
-	: device_info(machine, name, id, DEVICE_CLASS_JOYSTICK, module),
+xinput_joystick_device::xinput_joystick_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module, std::shared_ptr<xinput_api_helper> helper)
+	: device_info(machine, std::string(name), std::string(id), DEVICE_CLASS_JOYSTICK, module),
 		gamepad({{0}}),
 		xinput_state({0}),
 		m_xinput_helper(helper),
@@ -193,67 +312,10 @@ void xinput_joystick_device::configure()
 	m_configured = true;
 }
 
-//============================================================
-//  xinput_joystick_module
-//============================================================
+#else // defined(OSD_WINDOWS)
 
-class xinput_joystick_module : public wininput_module
-{
-private:
-	std::shared_ptr<xinput_api_helper> m_xinput_helper;
-
-public:
-	xinput_joystick_module()
-		: wininput_module(OSD_JOYSTICKINPUT_PROVIDER, "xinput"),
-		m_xinput_helper(nullptr)
-	{
-	}
-
-	int init(const osd_options &options) override
-	{
-		// Call the base
-		int status = wininput_module::init(options);
-		if (status != 0)
-			return status;
-
-		// Create and initialize our helper
-		m_xinput_helper = std::make_shared<xinput_api_helper>();
-		status = m_xinput_helper->initialize();
-		if (status != 0)
-		{
-			osd_printf_error("xinput_joystick_module failed to get XInput interface! Error: %u\n", static_cast<unsigned int>(status));
-			return -1;
-		}
-
-		return 0;
-	}
-
-protected:
-	virtual void input_init(running_machine &machine) override
-	{
-		xinput_joystick_device *devinfo;
-
-		// Loop through each gamepad to determine if they are connected
-		for (UINT i = 0; i < XUSER_MAX_COUNT; i++)
-		{
-			XINPUT_STATE state = {0};
-
-			if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
-			{
-				// allocate and link in a new device
-				devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
-				if (devinfo == nullptr)
-					continue;
-
-				// Configure each gamepad to add buttons and Axes, etc.
-				devinfo->configure();
-			}
-		}
-	}
-};
-
-#else
 MODULE_NOT_SUPPORTED(xinput_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "xinput")
-#endif
+
+#endif // defined(OSD_WINDOWS)
 
 MODULE_DEFINITION(JOYSTICKINPUT_XINPUT, xinput_joystick_module)

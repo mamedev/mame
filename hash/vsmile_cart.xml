@@ -55,7 +55,7 @@ Addons (w/ yellow Smartridges)
 |        | 80-067057(SP)     | V.Smile Estudio de Arte (pink)                                             |
 |        | 80-067058(CN)     | 智乐学习通小画室                                                            |
 +========+===================+============================================================================+
-|        | 80-091320(US)     | V.Smile Jamming Gym Class                                                  |
+|   XX   | 80-091320(US)     | V.Smile Jammin' Gym Class (52-91320(US) on back label)                     |
 |        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |
 |        | 80-091323(UK)     | V.Smile Dance'n'Learn                                                      |
 |   XX   | 80-091324(GE)     | V.Smile Tanz Mit Center (cart labeled as "Lern- und Tanzmatte")            |
@@ -580,7 +580,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 +========+===================+================================================================================================+
 | Dumped |      Serial       |                                    Name                                                        |
 +========+===================+================================================================================================+
-|        | 80-089000(US)     | Spider-Man &amp; Friends - Where is Hulk?                                                      |
+|   XX   | 80-089000(US)     | Spider-Man & Friends - Where is Hulk?                                                          |
 +========+===================+================================================================================================+
 |   XX   | 80-089020(US)     | Toy Story 2                                                                                    |
 +========+===================+================================================================================================+
@@ -2096,7 +2096,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="jamgymge" supported="yes"> <!-- Will be clone of "jamgym" once found and dumped. -->
+	<software name="jamgym" supported="yes">
+		<description>V.Smile Jammin' Gym Class (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091320(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="V.Smile Jammin' Gym Class 91320(US).bin" size="8388608" crc="6d8683b0" sha1="d125996a9d27532f71a99501e136f7e5cc3b59e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jamgymge" cloneof="jamgym" supported="yes">
 		<description>V.Smile Tanz Mit Center (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2113,7 +2128,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="jamgymfr" cloneof="jamgymge" supported="yes"> <!-- Will be clone of "jamgym" once found and dumped. -->
+	<software name="jamgymfr" cloneof="jamgym" supported="yes">
 		<description>V.Smile Défi Gym (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2128,7 +2143,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="jamgymsp" cloneof="jamgymge" supported="yes">
+	<software name="jamgymsp" cloneof="jamgym" supported="yes">
 		<description>Gimnasio Interactivo V.Smile (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4675,7 +4690,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<description>V.Smile Smart Keyboard (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-091444(GE)" />
+		<info name="serial" value="80-091440(US)" />
 		<sharedfeat name="ctrl1_default" value="smartkb_us" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
@@ -5041,6 +5056,20 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="red" />
 			<dataarea name="rom" size="8388608">
 				<rom name="80-089060 - Scooby-Doo - A Night Of Fright Is No Delight (US).bin" size="8388608" crc="4bf757be" sha1="8436b8e1e0cf20c93dbc9d0e887d4a3f28612aac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermansb" supported="no">
+		<description>Marvel Spider-Man &amp; Friends - Where is Hulk (Smartbook) (USA)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-089000(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="red" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Spider-Man and Friends - Where is Hulk 089000(US).bin" size="8388608" crc="5294d9ac" sha1="2b64cd58aab4474747b2bea0d75d180f9765ec4e" />
 			</dataarea>
 		</part>
 	</software>

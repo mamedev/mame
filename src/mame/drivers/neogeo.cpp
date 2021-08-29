@@ -2924,7 +2924,7 @@ void mvs_led_state::sbp(machine_config &config)
 
     MULTI PLAY MODE:
     ================
-    The NeoGeo has three games which support MULTI PLAY MODE (Riding Hero / League Bowling / Trash Rally).
+    The NeoGeo has three games which support MULTI PLAY MODE (Riding Hero / League Bowling / Thrash Rally).
     This allows you to 'link' 4 games (MVS) / 2 games (AES) using in game 'Multi-Play' option. To establish
     a link between the carts you have to connect the carts to each other by a communicator cable. The communicator
     cable is a regular headphone cable with stereo pin jack. It has been reported that you can also 'link' MVS <-> AES.
@@ -2932,7 +2932,7 @@ void mvs_led_state::sbp(machine_config &config)
     All three games use a special PROG board for MULTI PLAY MODE support:
     . Riding Hero    (AES - NEO-AEG PROG-HERO   / MVS NEO-MVS PROG-HERO)
     . League Bowling (AES - NEO-AEG PROG-HERO   / MVS NEO-MVS PROG-HERO)
-    . Trash Rally    (AES - NEO-AEG PROG42G-COM / NEO-MVS PROG42G-COM)
+    . Thrash Rally   (AES - NEO-AEG PROG42G-COM / NEO-MVS PROG42G-COM)
 
     A HD6301V1P MCU on the above boards is used for establishing the 'link'. The MCU has a 4kb internal ROM which
     is not dumped.
