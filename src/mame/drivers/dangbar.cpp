@@ -125,7 +125,7 @@ ROM_END
 
 ROM_START( sspanic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jp1_mpr0.2c.", 0x00000, 0x10000, CRC(04e16a89) SHA1(6211d901cf723ed03a583b38813ee77329e15eea) ) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "jp1_mpr0.2c", 0x00000, 0x10000, CRC(04e16a89) SHA1(6211d901cf723ed03a583b38813ee77329e15eea) ) // 0xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "jp1_snd.8a", 0x00000, 0x20000, CRC(46e2401c) SHA1(0edddd42e17da67c57f9c778c5fbf7a76ed287f5) ) // x11xxxxxxxxxxxxxx = 0xFF

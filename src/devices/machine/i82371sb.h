@@ -29,6 +29,8 @@ public:
 	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto smi() { return m_smi_callback.bind(); }
+	auto nmi() { return m_nmi_callback.bind(); }
+	auto stpclk() { return m_stpclk_callback.bind(); }
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(pc_pirqa_w);
@@ -38,6 +40,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_mirq0_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_mirq1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_ferr_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_extsmi_w);
 
 	DECLARE_WRITE_LINE_MEMBER(pc_irq1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_irq3_w);
@@ -106,6 +109,7 @@ private:
 	void boot_state_w(uint8_t data);
 	void nop_w(uint8_t data);
 
+	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint8_t iort_r();
 	void iort_w(uint8_t data);
 	uint16_t xbcs_r();
@@ -120,6 +124,8 @@ private:
 	void mbirq01_w(offs_t offset, uint8_t data);
 	uint8_t mbdma_r(offs_t offset);
 	void mbdma_w(offs_t offset, uint8_t data);
+	uint16_t pcsc_r();
+	void pcsc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t apicbase_r();
 	void apicbase_w(uint8_t data);
 	uint8_t dlc_r();
@@ -151,10 +157,14 @@ private:
 	void eisa_irq_write(offs_t offset, uint8_t data);
 	uint8_t read_apmcapms(offs_t offset);
 	void write_apmcapms(offs_t offset, uint8_t data);
+	uint8_t reset_control_r(offs_t offset);
+	void reset_control_w(offs_t offset, uint8_t data);
 
 	void update_smireq_line();
 
 	devcb_write_line m_smi_callback;
+	devcb_write_line m_nmi_callback;
+	devcb_write_line m_stpclk_callback;
 	devcb_write8 m_boot_state_hook;
 
 	uint32_t see;
@@ -162,6 +172,7 @@ private:
 	uint8_t apmc, apms;
 	uint8_t iort, pirqrc[4], tom, mbirq0, mbirq1, mbdma[2], apicbase;
 	uint8_t dlc, smicntl, ftmr, ctlmtr, cthmtr;
+	uint8_t reset_control;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 
@@ -220,14 +231,15 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(secondary_int);
 
 private:
-	uint16_t command_r();
-	void command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	virtual uint8_t latency_timer_r() override;
+	void latency_timer_w(uint8_t data);
 	uint32_t bmiba_r();
 	void bmiba_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint16_t idetim_primary_r();
-	void idetim_primary_w(uint16_t data);
+	void idetim_primary_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t idetim_secondary_r();
-	void idetim_secondary_w(uint16_t data);
+	void idetim_secondary_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint8_t sidetim_r();
 	void sidetim_w(uint8_t data);
 
@@ -242,7 +254,7 @@ private:
 
 	void internal_io_map(address_map &map);
 
-	uint16_t command;
+	uint8_t latency_timer;
 	uint32_t bmiba;
 	int idetim_primary, idetim_secondary;
 	int sidetim;

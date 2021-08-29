@@ -5,7 +5,8 @@ license:CC0
 -->
 <softwarelist name="adam_cart" description="Coleco Adam cartridges">
 
-	<!--software name="adamdev" supported="no">
+	<!--
+	software name="adamdev" supported="no">
 	    <description>ADAM Dev (Prototype)</description>
 	    <year>198?</year>
 	    <publisher>Coleco?</publisher>
@@ -17,7 +18,8 @@ license:CC0
 	            <rom name="51c9-chip4-12-6-84.bin" size="8192" crc="653ff925" sha1="0df057b7b1dcd969411abb1f084cb8354013103a" offset="0x6000" />
 	        </dataarea>
 	    </part>
-	</software-->
+	</software>
+	-->
 
 	<software name="ard" supported="no">
 		<description>ADAM Resident Debugger (Prototype Rev20)</description>

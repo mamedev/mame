@@ -267,7 +267,7 @@ Color Ball - [GH034] Al Alamiah
 Confused? - [GA016] Al Alamiah
 Fire Rescue - [GH033] Al Alamiah
 H.E.R.O. - [GV025] Al Alamiah
-Hitsuji Yai - [GH032] Al Alamiah
+Hitsuji Yaai - [GH032] Al Alamiah
 Hopper - [GA012] Al Alamiah
 Ice - Al Alamiah
 Kick It! - [GA008] Al Alamiah
@@ -1012,7 +1012,7 @@ kept for now until finding out what those bytes affect...
             <feature name="slot" value="ascii8" />
             <feature name="mapper" value="M60002-0125SP" />
             <dataarea name="rom" size="262144">
-                <rom name="lh532045" size="262144" crc="" sha1="" offset="0" />
+                <rom name="lh532045" size="262144" crc="" sha1="" offset="0" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -1045,7 +1045,7 @@ kept for now until finding out what those bytes affect...
             <feature name="slot" value="ascii8" />
             <feature name="mapper" value="LZ93A13" />
             <dataarea name="rom" size="131072">
-                <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
+                <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -1062,8 +1062,8 @@ kept for now until finding out what those bytes affect...
             <feature name="slot" value="ascii8" />
             <feature name="mapper" value="LZ93A13" />
             <dataarea name="rom" size="262144">
-                <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
-                <rom name="a27512zb" size="65536" crc="" sha1="" offset="0x20000" />
+                <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" status="nodump" />
+                <rom name="a27512zb" size="65536" crc="" sha1="" offset="0x20000" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -5996,7 +5996,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="hitsuji">
-		<description>Hitsuji-Ya (Jpn)</description>
+		<description>Hitsuji Yaai (Jpn)</description>
 		<year>1984</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="MX-1001" />

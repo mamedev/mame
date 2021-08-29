@@ -1,5 +1,6 @@
 /*
- * Copyright 2015-2019 Arm Limited
+ * Copyright 2015-2021 Arm Limited
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +13,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+/*
+ * At your option, you may choose to accept this material under either:
+ *  1. The Apache License, Version 2.0, found at <http://www.apache.org/licenses/LICENSE-2.0>, or
+ *  2. The MIT License, found at <http://opensource.org/licenses/MIT>.
  */
 
 #ifndef SPIRV_CROSS_HPP
@@ -52,6 +59,27 @@ struct Resource
 	std::string name;
 };
 
+struct BuiltInResource
+{
+	// This is mostly here to support reflection of builtins such as Position/PointSize/CullDistance/ClipDistance.
+	// This needs to be different from Resource since we can collect builtins from blocks.
+	// A builtin present here does not necessarily mean it's considered an active builtin,
+	// since variable ID "activeness" is only tracked on OpVariable level, not Block members.
+	// For that, update_active_builtins() -> has_active_builtin() can be used to further refine the reflection.
+	spv::BuiltIn builtin;
+
+	// This is the actual value type of the builtin.
+	// Typically float4, float, array<float, N> for the gl_PerVertex builtins.
+	// If the builtin is a control point, the control point array type will be stripped away here as appropriate.
+	TypeID value_type_id;
+
+	// This refers to the base resource which contains the builtin.
+	// If resource is a Block, it can hold multiple builtins, or it might not be a block.
+	// For advanced reflection scenarios, all information in builtin/value_type_id can be deduced,
+	// it's just more convenient this way.
+	Resource resource;
+};
+
 struct ShaderResources
 {
 	SmallVector<Resource> uniform_buffers;
@@ -72,6 +100,9 @@ struct ShaderResources
 	// these correspond to separate texture2D and samplers respectively.
 	SmallVector<Resource> separate_images;
 	SmallVector<Resource> separate_samplers;
+
+	SmallVector<BuiltInResource> builtin_inputs;
+	SmallVector<BuiltInResource> builtin_outputs;
 };
 
 struct CombinedImageSampler
@@ -315,6 +346,10 @@ public:
 	const std::string &get_cleansed_entry_point_name(const std::string &name,
 	                                                 spv::ExecutionModel execution_model) const;
 
+	// Traverses all reachable opcodes and sets active_builtins to a bitmask of all builtin variables which are accessed in the shader.
+	void update_active_builtins();
+	bool has_active_builtin(spv::BuiltIn builtin, spv::StorageClass storage) const;
+
 	// Query and modify OpExecutionMode.
 	const Bitset &get_execution_mode_bitset() const;
 
@@ -487,6 +522,12 @@ public:
 	// The most common use here is to check if a buffer is readonly or writeonly.
 	Bitset get_buffer_block_flags(VariableID id) const;
 
+	// Returns whether the position output is invariant
+	bool is_position_invariant() const
+	{
+		return position_invariant;
+	}
+
 protected:
 	const uint32_t *stream(const Instruction &instr) const
 	{
@@ -496,9 +537,18 @@ protected:
 		if (!instr.length)
 			return nullptr;
 
-		if (instr.offset + instr.length > ir.spirv.size())
-			SPIRV_CROSS_THROW("Compiler::stream() out of range.");
-		return &ir.spirv[instr.offset];
+		if (instr.is_embedded())
+		{
+			auto &embedded = static_cast<const EmbeddedInstruction &>(instr);
+			assert(embedded.ops.size() == instr.length);
+			return embedded.ops.data();
+		}
+		else
+		{
+			if (instr.offset + instr.length > ir.spirv.size())
+				SPIRV_CROSS_THROW("Compiler::stream() out of range.");
+			return &ir.spirv[instr.offset];
+		}
 	}
 
 	ParsedIR ir;
@@ -509,8 +559,21 @@ protected:
 
 	SPIRFunction *current_function = nullptr;
 	SPIRBlock *current_block = nullptr;
+	uint32_t current_loop_level = 0;
 	std::unordered_set<VariableID> active_interface_variables;
 	bool check_active_interface_variables = false;
+
+	void add_loop_level();
+
+	void set_initializers(SPIRExpression &e)
+	{
+		e.emitted_loop_level = current_loop_level;
+	}
+
+	template <typename T>
+	void set_initializers(const T &)
+	{
+	}
 
 	// If our IDs are out of range here as part of opcodes, throw instead of
 	// undefined behavior.
@@ -520,6 +583,7 @@ protected:
 		ir.add_typed_id(static_cast<Types>(T::type), id);
 		auto &var = variant_set<T>(ir.ids[id], std::forward<P>(args)...);
 		var.self = id;
+		set_initializers(var);
 		return var;
 	}
 
@@ -607,7 +671,6 @@ protected:
 	bool expression_is_lvalue(uint32_t id) const;
 	bool variable_storage_is_aliased(const SPIRVariable &var);
 	SPIRVariable *maybe_get_backing_variable(uint32_t chain);
-	spv::StorageClass get_backing_variable_storage(uint32_t ptr);
 
 	void register_read(uint32_t expr, uint32_t chain, bool forwarded);
 	void register_write(uint32_t chain);
@@ -702,6 +765,10 @@ protected:
 		// Return true if traversal should continue.
 		// If false, traversal will end immediately.
 		virtual bool handle(spv::Op opcode, const uint32_t *args, uint32_t length) = 0;
+		virtual bool handle_terminator(const SPIRBlock &)
+		{
+			return true;
+		}
 
 		virtual bool follow_function_call(const SPIRFunction &)
 		{
@@ -808,6 +875,9 @@ protected:
 		Compiler &compiler;
 
 		void handle_builtin(const SPIRType &type, spv::BuiltIn builtin, const Bitset &decoration_flags);
+		void add_if_builtin(uint32_t id);
+		void add_if_builtin_or_block(uint32_t id);
+		void add_if_builtin(uint32_t id, bool allow_blocks);
 	};
 
 	bool traverse_all_reachable_opcodes(const SPIRBlock &block, OpcodeHandler &handler) const;
@@ -832,10 +902,6 @@ protected:
 	uint32_t clip_distance_count = 0;
 	uint32_t cull_distance_count = 0;
 	bool position_invariant = false;
-
-	// Traverses all reachable opcodes and sets active_builtins to a bitmask of all builtin variables which are accessed in the shader.
-	void update_active_builtins();
-	bool has_active_builtin(spv::BuiltIn builtin, spv::StorageClass storage);
 
 	void analyze_parameter_preservation(
 	    SPIRFunction &entry, const CFG &cfg,
@@ -917,6 +983,7 @@ protected:
 		bool id_is_phi_variable(uint32_t id) const;
 		bool id_is_potential_temporary(uint32_t id) const;
 		bool handle(spv::Op op, const uint32_t *args, uint32_t length) override;
+		bool handle_terminator(const SPIRBlock &block) override;
 
 		Compiler &compiler;
 		SPIRFunction &entry;
@@ -1037,6 +1104,7 @@ protected:
 	void unset_extended_member_decoration(uint32_t type, uint32_t index, ExtendedDecorations decoration);
 
 	bool type_is_array_of_pointers(const SPIRType &type) const;
+	bool type_is_top_level_physical_pointer(const SPIRType &type) const;
 	bool type_is_block_like(const SPIRType &type) const;
 	bool type_is_opaque_value(const SPIRType &type) const;
 
@@ -1044,6 +1112,11 @@ protected:
 	std::string get_remapped_declared_block_name(uint32_t id, bool fallback_prefer_instance_name) const;
 
 	bool flush_phi_required(BlockID from, BlockID to) const;
+
+	uint32_t evaluate_spec_constant_u32(const SPIRConstantOp &spec) const;
+	uint32_t evaluate_constant_u32(uint32_t id) const;
+
+	bool is_vertex_like_shader() const;
 
 private:
 	// Used only to implement the old deprecated get_entry_point() interface.

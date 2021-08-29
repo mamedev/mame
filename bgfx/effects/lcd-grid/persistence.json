@@ -1,27 +1,27 @@
 {
-    "blend": {
-    	"equation": "add",
-    	"srcColor": "1",
-    	"dstColor": "0",
-    	"srcAlpha": "1",
-    	"dstAlpha": "0"
-    },
-    "depth": {
-    	"function": "always",
-    	"writeenable": false
-    },
-    "cull": {
-    	"mode": "none"
-    },
-    "write": {
-    	"rgb": true,
-    	"alpha": true
-    },
-    "vertex": "chains/lcd-grid/vs_persistence",
-    "fragment": "chains/lcd-grid/fs_persistence",
-    "uniforms": [
-	{ "name": "s_screen",    "type": "int",  "values": [ 0 ] },
-	{ "name": "s_motionblur","type": "int",  "values": [ 1 ] },
-	{ "name": "u_persistence","type":"vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+	"vertex": "chains/lcd-grid/vs_persistence",
+	"fragment": "chains/lcd-grid/fs_persistence",
+	"uniforms": [
+		{ "name": "s_screen",     "type": "int",  "values": [ 0 ] },
+		{ "name": "s_motionblur", "type": "int",  "values": [ 1 ] },
+		{ "name": "u_persistence","type":"vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
+	]
 }

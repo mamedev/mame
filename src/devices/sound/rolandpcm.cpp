@@ -24,9 +24,6 @@
 #include "rolandpcm.h"
 
 
-constexpr int clamp16(int16_t val, int16_t min, int16_t max) { return std::min(max, std::max(min, val)); }
-
-
 DEFINE_DEVICE_TYPE(MB87419_MB87420, mb87419_mb87420_device, "mb87419_mb87420", "Roland MB87419/MB87420 PCM")
 
 mb87419_mb87420_device::mb87419_mb87420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -307,7 +304,7 @@ void mb87419_mb87420_device::sound_stream_update(sound_stream &stream, std::vect
 				chn.smpl_nxt += decode_sample((int8_t)read_byte(addr)); // This was verified to be independent from play_dir.
 
 				// until the decoding is fixed, we prevent overflow bugs (due to DC offsets when looping) this way
-				chn.smpl_nxt = clamp16(chn.smpl_nxt, -0x7FF, +0x7FF);
+				chn.smpl_nxt = std::clamp<int16_t>(chn.smpl_nxt, -0x7FF, +0x7FF);
 			}
 
 			bool reachedEnd = false;

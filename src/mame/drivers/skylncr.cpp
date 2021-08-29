@@ -166,6 +166,7 @@ public:
 	void init_miaction();
 	void init_olymp();
 	void init_sonikfig();
+	void init_speedway();
 	void init_superb2k();
 
 	READ_LINE_MEMBER(mbutrfly_prot_r);
@@ -2168,6 +2169,23 @@ ROM_START( olymp )
 	ROM_LOAD16_BYTE( "u58", 0x40001, 0x20000, CRC(f939f3f0) SHA1(0a089f78ca66d1e660cb854bbf5b0eb38e317a19) )
 ROM_END
 
+ROM_START( speedway ) // runs on a Rolla PCB with small sub board with main CPU, ROM and Altera EPM. Hack of Leader, extremely similar and still has Leader strings.
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "v3.bin", 0x00000, 0x10000, CRC(ef777180) SHA1(f1a554677543082eb7df2e204d0d4c987b7c6bbb) ) //TMS 27C512
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // all HN27C301AG
+	ROM_LOAD16_BYTE( "1.u29", 0x00000, 0x20000, CRC(3b360aac) SHA1(a6f31deea53deb8a7da2804c979390ed91ee9f50) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "2.u31", 0x00001, 0x20000, CRC(a491bdcf) SHA1(793faa829de50f67a44541136b66407ee9744971) )
+	ROM_LOAD16_BYTE( "3.u33", 0x40000, 0x20000, CRC(935fc941) SHA1(12e5f7fea932a86298928b70b342e0825a3caca1) )
+	ROM_LOAD16_BYTE( "4.u35", 0x40001, 0x20000, CRC(aa8164ce) SHA1(027fa9743ad9d80bd86e59d684180f75dc6d60a0) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // all HN27C301AG. Still has Bordun and Butterfly GFX in here.
+	ROM_LOAD16_BYTE( "5.u52", 0x00000, 0x20000, CRC(df984dbc) SHA1(7ea27465f9fd537fbdc1e13ca5842f656cbc2897) )
+	ROM_LOAD16_BYTE( "6.u54", 0x00001, 0x20000, CRC(37fbdc4d) SHA1(8db83c43e7c43c2da5a39b86edff416c35fa275e) )
+	ROM_LOAD16_BYTE( "7.u56", 0x40000, 0x20000, CRC(328f7912) SHA1(7f05217a18cfb316972cf96711276205e8098ee6) )
+	ROM_LOAD16_BYTE( "8.u58", 0x40001, 0x20000, CRC(b93b221f) SHA1(efd6962a0f5e150c60d258fea116d726228dc39c) )
+ROM_END
+
 /**********************************
 *           Driver Init           *
 **********************************/
@@ -2267,7 +2285,7 @@ void skylncr_state::init_superb2k() // TODO: very preliminary, just enough to re
 
 	// descramble addresses. At a first glance, swaps seem to change if address line bits 13 or 14 are set (possibly 15 too, but not verified yet)
 	// the scrambled address line bits appear to be 1, 3, 6, 9 and 12
-	// it's possible XORs and are data lines swaps are involved, too, at least for opcodes
+	// it's possible XORs and data lines swaps are involved, too, at least for opcodes
 	for (int i = 0x00000; i < 0x10000; i++)
 	{
 		switch (i & 0x6000)
@@ -2277,6 +2295,47 @@ void skylncr_state::init_superb2k() // TODO: very preliminary, just enough to re
 			case 0x4000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,  1, 11, 10, 3, 8, 7, 6, 5, 4,  9, 2, 12, 0)]; break; // TODO: 0x40 blocks are good, there's still at least a wrong swap (see 0x5200-0x52ff)
 			case 0x6000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,  3, 11, 10, 1, 8, 7, 9, 5, 4, 12, 2,  6, 0)]; break; // TODO: 0x20 blocks are good (see 0x7fa0-0x7fbf)
 		}
+	}
+}
+
+void skylncr_state::init_speedway() // TODO: complete this. These XORs and ranges have been derived by comparing this dump with leader, of which it's clearly a hack.
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+
+	for (int x = 0x0000; x < 0x10000; x++)
+		m_decrypted_opcodes[x] = ROM[x];
+
+	for (int x = 0x000d; x < 0x5000; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x41;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+
+	for (int x = 0x5000; x < 0x53c2; x++)
+		m_decrypted_opcodes[x] = ROM[x] ^ 0x12;
+
+	for (int x = 0x5400; x < 0x8000; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x41;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+
+	for (int x = 0xc000; x < 0xc300; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x08;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+
+	for (int x = 0xc300; x < 0xc368; x++)
+		m_decrypted_opcodes[x] = ROM[x] ^ 0x12;
+
+	for (int x = 0xf690; x < 0xf74f; x++)
+		m_decrypted_opcodes[x] = ROM[x] ^ 0x12;
+
+	for (int x = 0xf74f; x < 0x10000; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x08;
+		m_decrypted_opcodes[x] = ROM[x];
 	}
 }
 
@@ -2293,6 +2352,7 @@ GAME( 1995, butrfly,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,
 GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  init_mbutrfly, ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Mad Zoo (version U450C)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  empty_init,    ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 199?, speedway,  0,        olymp,    leader,   skylncr_state,  init_speedway, ROT0, "hack (Drivers)",       "Speedway",                                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Incomplete decryption (?)
 GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  empty_init,    ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  empty_init,    ROT0, "bootleg",              "Neraidoula",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

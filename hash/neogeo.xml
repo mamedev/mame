@@ -1123,7 +1123,7 @@ license:CC0
 				<rom loadflag="load16_word_swap" name="019-p1.p1" offset="0x000000" size="0x080000" crc="a2de8445" sha1="893d7ae72b4644123469de143fa35fac1cbcd61e" />   <!-- TC534200 -->
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
-				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP /> -->  <!-- Hitachi HD6301V1 MCU -->
+				<!-- <rom name="hd6301v1p.com" offset="0x0000" size="0x1000" crc="" sha1="" status="nodump" /> -->  <!-- Hitachi HD6301V1 MCU -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="019-s1.s1" crc="5fcdc0ed" sha1="86415077e7adc3ba6153eeb4fb0c62cf36e903fa" />   <!-- TC531000 -->
@@ -2107,7 +2107,7 @@ license:CC0
 				<rom loadflag="load16_word_swap" name="038-p2.p2" offset="0x080000" size="0x080000" crc="a5193e2f" sha1="96803480439e90da23cdca70d59ff519ee85beeb" />   <!-- TC534200 -->
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
-				<!-- <rom name="hd6301v1p.hd6301v1", 0x0000, 0x1000, NO_DUMP /> --> <!-- Hitachi HD6301V1 MCU -->
+				<!-- <rom name="hd6301v1p.hd8301v1" offset="0x0000" size="0x1000" crc="" sha1="" status="nodump" /> -->  <!-- Hitachi HD6301V1 MCU -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="038-s1.s1" crc="fff62ae3" sha1="6510a762ea41557a8938cbfc0557cd5921306061" />   <!-- TC531000 -->

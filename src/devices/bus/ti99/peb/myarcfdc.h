@@ -61,7 +61,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( drivesel_w );
 
 	// Deliver the current state of the address bus
-	uint16_t get_address();
+	offs_t get_address();
 
 	// Polled from the PAL
 	bool card_selected();

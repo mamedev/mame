@@ -5,6 +5,146 @@ license:CC0
 -->
 <softwarelist name="ibm5150_hdd" description="IBM PC hard disk images">
 
+	<software name="msdos211">
+		<description>AT&amp;T Personal Computer 6300 DOS Release 2.0 (MS-DOS 2.11)</description>
+		<year>1984</year>
+		<publisher>AT&amp;T</publisher>
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos211" sha1="6ae44f33d3fea5c9c6bd66e60c00d2c7a299c5ae" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msdos33a">
+		<description>MS-DOS (Version 3.30A)</description>
+		<year>1987</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="3.30A" />
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos33a" sha1="b38260e4eef8d3aedf0bc2e03f7aed4e08b79930" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msdos4">
+		<description>MS-DOS (Version 4.00)</description>
+		<year>1988</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos4" sha1="0bf16065e45f1f066ae4299e2a6ae4e2dd9f98fb" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msdos5">
+		<description>MS-DOS (Version 5.00)</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos5" sha1="f0ac216f86c164144e900270a93e1ccf2989a082" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mmsdos4">
+		<description>Multitasking MS-DOS (Version 4.00)</description>
+		<year>1985</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="4.00" />
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="mmsdos4" sha1="74c3c57047cb6384f054023d71f44a4e9d438671" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos2">
+		<description>IBM Personal Computer DOS (Version 2.00)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.00" />
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos2" sha1="301d2d19d9a4973bfd869187c8fe06abb6b9ea09" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos21">
+		<description>IBM Personal Computer DOS (Version 2.10)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.10" />
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos21" sha1="85ef075a4326123b587dd5ed7f6a9a97d45ecd18" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos3">
+		<description>IBM Personal Computer DOS (Version 3.00)</description>
+		<year>1984</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.00" />
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos3" sha1="05ab046cb9f83e15a53283da2a5dc032b0b22e36" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos31">
+		<description>IBM Personal Computer DOS (Version 3.10)</description>
+		<year>1985</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.10" />
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos31" sha1="95c354f87f77e17891277747504c985d8dbecf8a" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos32">
+		<description>IBM Personal Computer DOS (Version 3.20)</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.20" />
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos32" sha1="3f99409132bed32256d240e27f04f37585cdf685" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30)</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos33" sha1="906c5afa3df6c9488bdacfb01485980784888188" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="windows">
+		<description>Microsoft Windows Version 1.0</description>
+		<year>1985</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="windows" sha1="b2f214e9942a0d00e9c14ae24d050303e9c6429f" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="xenix86">
 		<description>SCO XENIX System V release 2.1.3 for i8086</description>
 		<year>1986</year>

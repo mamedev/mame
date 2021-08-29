@@ -16,9 +16,9 @@
 #include <tchar.h>
 #undef interface
 
-#include <mutex>
-#include <functional>
 #include <algorithm>
+#include <functional>
+#include <mutex>
 
 // MAME headers
 #include "emu.h"
@@ -274,8 +274,8 @@ private:
 	HANDLE  m_handle = nullptr;
 
 public:
-	rawinput_device(running_machine &machine, const char *name, const char *id, input_device_class deviceclass, input_module &module) :
-		event_based_device(machine, name, id, deviceclass, module)
+	rawinput_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module) :
+		event_based_device(machine, std::move(name), std::move(id), deviceclass, module)
 	{
 	}
 
@@ -292,8 +292,8 @@ class rawinput_keyboard_device : public rawinput_device
 public:
 	keyboard_state keyboard;
 
-	rawinput_keyboard_device(running_machine &machine, const char *name, const char *id, input_module &module) :
-		rawinput_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
+	rawinput_keyboard_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+		rawinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
 		keyboard({{0}})
 	{
 	}
@@ -328,8 +328,8 @@ private:
 public:
 	mouse_state          mouse;
 
-	rawinput_mouse_device(running_machine &machine, const char *name, const char *id, input_module &module) :
-		rawinput_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
+	rawinput_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+		rawinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module),
 		mouse({0})
 	{
 	}
@@ -388,8 +388,8 @@ private:
 public:
 	mouse_state          lightgun;
 
-	rawinput_lightgun_device(running_machine &machine, const char *name, const char *id, input_module &module) :
-		rawinput_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module),
+	rawinput_lightgun_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+		rawinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_LIGHTGUN, module),
 		lightgun({0})
 	{
 	}
@@ -545,17 +545,17 @@ protected:
 		std::wstring name = rawinput_device_improve_name(tname.get());
 
 		// convert name to utf8
-		std::string utf8_name = osd::text::from_wstring(name.c_str());
+		std::string utf8_name = osd::text::from_wstring(name);
 
 		// set device id to raw input name
 		std::string utf8_id = osd::text::from_wstring(tname.get());
 
-		TDevice *devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.c_str(), utf8_id.c_str(), *this);
+		TDevice &devinfo = devicelist()->create_device<TDevice>(machine, std::move(utf8_name), std::move(utf8_id), *this);
 
 		// Add the handle
-		devinfo->set_handle(rawinputdevice->hDevice);
+		devinfo.set_handle(rawinputdevice->hDevice);
 
-		return devinfo;
+		return &devinfo;
 	}
 
 	bool handle_input_event(input_event eventid, void *eventdata) override
@@ -658,7 +658,7 @@ protected:
 			std::string name = osd::text::from_wstring(keyname);
 
 			// add the item to the device
-			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
+			devinfo->device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 		}
 	}
 };
@@ -764,11 +764,13 @@ protected:
 
 } // anonymous namespace
 
-#else
+#else // defined(OSD_WINDOWS)
+
 MODULE_NOT_SUPPORTED(keyboard_input_rawinput, OSD_KEYBOARDINPUT_PROVIDER, "rawinput")
 MODULE_NOT_SUPPORTED(mouse_input_rawinput, OSD_MOUSEINPUT_PROVIDER, "rawinput")
 MODULE_NOT_SUPPORTED(lightgun_input_rawinput, OSD_LIGHTGUNINPUT_PROVIDER, "rawinput")
-#endif
+
+#endif // defined(OSD_WINDOWS)
 
 MODULE_DEFINITION(KEYBOARDINPUT_RAWINPUT, keyboard_input_rawinput)
 MODULE_DEFINITION(MOUSEINPUT_RAWINPUT, mouse_input_rawinput)

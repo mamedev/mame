@@ -3,6 +3,7 @@
 // Copyright (C) 2012-2013 LunarG, Inc.
 // Copyright (C) 2017 ARM Limited.
 // Copyright (C) 2015-2018 Google, Inc.
+// Modifications Copyright (C) 2020 Advanced Micro Devices, Inc. All rights reserved.
 //
 // All rights reserved.
 //
@@ -74,7 +75,9 @@ void TType::buildMangledName(TString& mangledName) const
     case EbtInt64:              mangledName += "i64";    break;
     case EbtUint64:             mangledName += "u64";    break;
     case EbtAtomicUint:         mangledName += "au";     break;
-    case EbtAccStructNV:        mangledName += "asnv";   break;
+    case EbtAccStruct:          mangledName += "as";     break;
+    case EbtRayQuery:           mangledName += "rq";     break;
+    case EbtSpirvType:          mangledName += "spv-t";  break;
 #endif
     case EbtSampler:
         switch (sampler.type) {
@@ -83,6 +86,8 @@ void TType::buildMangledName(TString& mangledName) const
 #endif
         case EbtInt:   mangledName += "i"; break;
         case EbtUint:  mangledName += "u"; break;
+        case EbtInt64:   mangledName += "i64"; break;
+        case EbtUint64:  mangledName += "u64"; break;
         default: break; // some compilers want this
         }
         if (sampler.isImageClass())
@@ -114,12 +119,13 @@ void TType::buildMangledName(TString& mangledName) const
         default: break; // some compilers want this
         }
 
+#ifdef ENABLE_HLSL
         if (sampler.hasReturnStruct()) {
             // Name mangle for sampler return struct uses struct table index.
             mangledName += "-tx-struct";
 
             char text[16]; // plenty enough space for the small integers.
-            snprintf(text, sizeof(text), "%d-", sampler.getStructReturnIndex());
+            snprintf(text, sizeof(text), "%u-", sampler.getStructReturnIndex());
             mangledName += text;
         } else {
             switch (sampler.getVectorSize()) {
@@ -129,6 +135,7 @@ void TType::buildMangledName(TString& mangledName) const
             case 4: break; // default to prior name mangle behavior
             }
         }
+#endif
 
         if (sampler.isMultiSample())
             mangledName += "M";
@@ -142,6 +149,8 @@ void TType::buildMangledName(TString& mangledName) const
         if (typeName)
             mangledName += *typeName;
         for (unsigned int i = 0; i < structure->size(); ++i) {
+            if ((*structure)[i].type->getBasicType() == EbtVoid)
+                continue;
             mangledName += '-';
             (*structure)[i].type->buildMangledName(mangledName);
         }
@@ -162,7 +171,7 @@ void TType::buildMangledName(TString& mangledName) const
         for (int i = 0; i < arraySizes->getNumDims(); ++i) {
             if (arraySizes->getDimNode(i)) {
                 if (arraySizes->getDimNode(i)->getAsSymbolNode())
-                    snprintf(buf, maxSize, "s%d", arraySizes->getDimNode(i)->getAsSymbolNode()->getId());
+                    snprintf(buf, maxSize, "s%lld", arraySizes->getDimNode(i)->getAsSymbolNode()->getId());
                 else
                     snprintf(buf, maxSize, "s%p", arraySizes->getDimNode(i));
             } else
@@ -174,7 +183,7 @@ void TType::buildMangledName(TString& mangledName) const
     }
 }
 
-#ifndef GLSLANG_WEB
+#if !defined(GLSLANG_WEB) && !defined(GLSLANG_ANGLE)
 
 //
 // Dump functions.
@@ -382,6 +391,9 @@ TFunction::TFunction(const TFunction& copyOf) : TSymbol(copyOf)
     implicitThis = copyOf.implicitThis;
     illegalImplicitThis = copyOf.illegalImplicitThis;
     defaultParamCount = copyOf.defaultParamCount;
+#ifndef GLSLANG_WEB
+    spirvInst = copyOf.spirvInst;
+#endif
 }
 
 TFunction* TFunction::clone() const

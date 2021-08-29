@@ -66,7 +66,7 @@ PCB Layout
 +---------------------------------------------------------+
 
   CPU: MC68000P12
-Sound: OKI M6295 & YM3012/YM2151 rebaged as 7105/BS901
+Sound: OKI M6295 & YM3012/YM2151 rebadged as 7105/BS901
   OSC: 14.31818MHz, 20.000MHz & 32.000MHz
   DSW: 8-switch dipswitch x 2
   VOL: Volume pot

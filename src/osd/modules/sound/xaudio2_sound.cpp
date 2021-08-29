@@ -419,7 +419,7 @@ void sound_xaudio2::set_mastervolume(int attenuation)
 	HRESULT result;
 
 	// clamp the attenuation to 0-32 range
-	attenuation = std::max(std::min(attenuation, 0), -32);
+	attenuation = std::clamp(attenuation, -32, 0);
 
 	// Ranges from 1.0 to XAUDIO2_MAX_VOLUME_LEVEL indicate additional gain
 	// Ranges from 0 to 1.0 indicate a reduced volume level

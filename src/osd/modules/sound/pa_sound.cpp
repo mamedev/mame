@@ -192,7 +192,7 @@ int sound_pa::init(osd_options const &options)
 	m_skip_threshold_ticks  = 0;
 	m_osd_tps               = osd_ticks_per_second();
 	m_buffer_min_ct         = INT_MAX;
-	m_audio_latency         = std::min<int>(std::max<int>(m_audio_latency, LATENCY_MIN), LATENCY_MAX);
+	m_audio_latency         = std::clamp<int>(m_audio_latency, LATENCY_MIN, LATENCY_MAX);
 
 	try {
 		m_ab = new audio_buffer<s16>(m_sample_rate, 2);

@@ -48,7 +48,8 @@ int is_path_separator(char c)
 
 bool is_root(std::string_view path)
 {
-	// FIXME: get rid of the assumption that paths are DOS-like
+#if defined(WIN32)
+	// FIXME: don't assume paths are DOS-like - UNC paths, \\?\ long path prefix, etc. complicate this
 
 	// skip drive letter
 	if (path.length() >= 2 && isalpha(path[0]) && (path[1] == ':'))
@@ -56,6 +57,10 @@ bool is_root(std::string_view path)
 
 	// skip path separators
 	return path.find_first_not_of(PATH_SEPARATOR) == std::string_view::npos;
+#else
+	// FIXME: handle multiple successive path separators, current directory references, parent directory references
+	return (path.length() == 1) && (path[0] == '/');
+#endif
 }
 
 
@@ -203,11 +208,15 @@ osd_file::error zippath_resolve(std::string_view path, osd::directory::entry::en
 	bool went_up = false;
 	do
 	{
-		// trim the path of trailing path separators
-		auto i = apath.find_last_not_of(PATH_SEPARATOR);
-		if (i == std::string::npos)
-			break;
-		apath = apath.substr(0, i + 1);
+		if (!is_root(apath))
+		{
+			// trim the path of trailing path separators
+			auto i = apath.find_last_not_of(PATH_SEPARATOR);
+			if (i == std::string::npos)
+				break;
+			apath = apath.substr(0, i + 1);
+		}
+
 		apath_trimmed = apath;
 
 		// stat the path

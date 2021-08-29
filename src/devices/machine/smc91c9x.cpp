@@ -153,7 +153,7 @@ void smc91c9x_device::device_reset()
 	m_rx_active = 0;
 	m_tx_retry_count = 0;
 
-	m_reg[B0_TCR]          = 0x0000;   m_regmask[B0_TCR]          = 0x3d87;
+	m_reg[B0_TCR]          = 0x0000;   m_regmask[B0_TCR]          = 0xbd87;
 	m_reg[B0_EPH_STATUS]   = 0x4000;   m_regmask[B0_EPH_STATUS]   = 0x0000;
 	m_reg[B0_RCR]          = 0x0000;   m_regmask[B0_RCR]          = 0xc307;
 	m_reg[B0_COUNTER]      = 0x0000;   m_regmask[B0_COUNTER]      = 0x0000;
@@ -406,7 +406,7 @@ int smc91c9x_device::recv_start_cb(u8 *buf, int length)
 	}
 
 	// Check for active transmission
-	if (m_tx_active)
+	if (m_tx_active && !(m_reg[B0_TCR] & FDSE))
 	{
 		// TODO: Update collision counters
 		LOGMASKED(LOG_RX, "transmit active COLLISION, rx packet length %d discarded\n", length);
@@ -527,7 +527,7 @@ void smc91c9x_device::recv_complete_cb(int result)
 TIMER_CALLBACK_MEMBER(smc91c9x_device::tx_poll)
 {
 	// Check for active RX and delay if necessary
-	if (m_rx_active)
+	if (m_rx_active && !(m_reg[B0_TCR] & FDSE))
 	{
 		// TODO: Implement correct CSMA/CD algorithm
 		m_tx_poll->adjust(attotime::from_usec(40));
@@ -659,11 +659,19 @@ void smc91c9x_device::send_complete_cb(int result)
 		m_reg[B2_INTERRUPT] |= EINT_EPH;
 	}
 
-	// Update status in the transmit word
-	*(u16*)&tx_buffer[0] = m_reg[B0_EPH_STATUS];
+	if (m_reg[B1_CONTROL] & AUTO_RELEASE)
+	{
+		alloc_release(packet_num);
+	}
+	else
+	{
+		// Update status in the transmit word
+		*(u16*)&tx_buffer[0] = m_reg[B0_EPH_STATUS];
 
-	// Push the packet number onto the tx completion fifo
-	push_completed_tx(packet_num);
+		// Push the packet number onto the tx completion fifo
+		push_completed_tx(packet_num);
+	}
+
 
 	update_ethernet_irq();
 

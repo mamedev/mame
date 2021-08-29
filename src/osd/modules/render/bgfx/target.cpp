@@ -30,16 +30,24 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 	{
 		m_width *= m_scale;
 		m_height *= m_scale;
+
 		uint32_t wrap_mode = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
 		uint32_t filter_mode = filter ? (BGFX_SAMPLER_MIN_ANISOTROPIC | BGFX_SAMPLER_MAG_ANISOTROPIC) : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
+		uint32_t depth_flags = wrap_mode | (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
 
-		m_textures = new bgfx::TextureHandle[m_page_count];
+		m_textures = new bgfx::TextureHandle[m_page_count * 2];
 		m_targets = new bgfx::FrameBufferHandle[m_page_count];
 		for (int page = 0; page < m_page_count; page++)
 		{
 			m_textures[page] = bgfx::createTexture2D(m_width, m_height, false, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
 			assert(m_textures[page].idx != 0xffff);
-			m_targets[page] = bgfx::createFrameBuffer(1, &m_textures[page], false);
+
+			m_textures[m_page_count + page] = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D24, depth_flags | BGFX_TEXTURE_RT);
+			assert(m_textures[m_page_count + page].idx != 0xffff);
+
+			bgfx::TextureHandle handles[2] = { m_textures[page], m_textures[m_page_count + page] };
+			m_targets[page] = bgfx::createFrameBuffer(2, handles, false);
+
 			assert(m_targets[page].idx != 0xffff);
 		}
 
@@ -64,7 +72,7 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 	, m_page_count(0)
 {
 	m_targets = new bgfx::FrameBufferHandle[1];
-	m_targets[0] = bgfx::createFrameBuffer(handle, width, height);
+	m_targets[0] = bgfx::createFrameBuffer(handle, width, height, bgfx::TextureFormat::Count, bgfx::TextureFormat::D24);
 
 	// No backing texture
 }
@@ -81,6 +89,7 @@ bgfx_target::~bgfx_target()
 		for (int page = 0; page < m_page_count; page++)
 		{
 			bgfx::destroy(m_targets[page]);
+			bgfx::destroy(m_textures[m_page_count + page]);
 			bgfx::destroy(m_textures[page]);
 		}
 		delete [] m_textures;
