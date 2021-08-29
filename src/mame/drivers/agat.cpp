@@ -585,10 +585,24 @@ uint8_t agat_base_state::controller_strobe_r()
 
 void agat_base_state::controller_strobe_w(uint8_t data)
 {
-	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
-	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
-	m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
-	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
+	// 555 monostable one-shot timers; a running timer cannot be restarted
+	if (machine().time().as_double() >= m_joystick_x1_time) 
+	{
+		m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
+	}
+	if (machine().time().as_double() >= m_joystick_y1_time) 
+	{
+		m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
+	}
+	if (machine().time().as_double() >= m_joystick_x2_time) 
+	{
+		m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
+	}
+	if (machine().time().as_double() >= m_joystick_y2_time) 
+	{
+		m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
+	}
+
 }
 
 uint8_t agat_base_state::c080_r(offs_t offset)
