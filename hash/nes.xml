@@ -62562,13 +62562,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="bloodjur" supported="no">
+	<software name="bloodjur" supported="partial">
 		<description>Blood of Jurassic (GD-98)</description>
 		<year>1997</year>
 		<publisher>Paradise Science &amp; Technology</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_158b" />
 			<feature name="pcb" value="UNL-158B" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="131072">
 				<rom name="blood of jurassic (gd-98)(unl)[u].chr" size="131072" crc="d05443b2" sha1="ed915af0444e1a51071ef4e20b2ec2c51b23f9df" offset="00000" status="baddump" />
 			</dataarea>
@@ -64681,38 +64682,18 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="shangona" cloneof="shangon">
-		<description>97 Hui Gui Gang Jing La Li Sai - Super Hang-On (Chi)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>97 Hui Gui Gang Jing La Li Sai - Super Hang-On (China)</description>
+		<year>1997</year>
+		<publisher>Paradise Science &amp; Technology</publisher>
 		<info name="serial" value="GD-97"/>
 		<info name="alt_title" value="97回归港京拉力赛"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="unl_158b" />
 			<dataarea name="chr" size="131072">
-				<rom name="[gd-97] 97 hui gui gang jing la li sai (c).chr" size="131072" crc="b82a3a45" sha1="d65520e1d0728c723d00f69618ca9b3d0638ea20" offset="00000" status="baddump" />
+				<rom name="[gd-97] 97 hui gui gang jing la li sai (c).chr" size="131072" crc="b82a3a45" sha1="d65520e1d0728c723d00f69618ca9b3d0638ea20" offset="00000" status="baddump" /> <!-- Is this an overdump? Second 64K is all 0s. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="[gd-97] 97 hui gui gang jing la li sai (c).prg" size="131072" crc="c8252bd3" sha1="6429301ecf65f629a17e4ac6085cfbad636e2179" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Only included until we fix the real dump -->
-	<software name="shangonah" cloneof="shangon">
-		<description>97 Hui Gui Gang Jing La Li Sai - Super Hang-On (Chi, Hacked)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="GD-97"/>
-		<info name="alt_title" value="97回归港京拉力赛"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="[gd-97] 97 hui gui gang jing la li sai (c).chr" size="131072" crc="b82a3a45" sha1="d65520e1d0728c723d00f69618ca9b3d0638ea20" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="[gd-97] 97 hui gui gang jing la li sai (c)_fix.prg" size="131072" crc="c6fb765c" sha1="ffc295dcb75634c89f448642080a0f1fcd680561" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
