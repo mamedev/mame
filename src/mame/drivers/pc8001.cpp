@@ -22,8 +22,8 @@
     - PC-8031 (mini disk unit, in progress)
 	- pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
 	  (Has 3 bitplane GVRAM like PC-8801 V1 mode);
-	- waitstates & DMA penalty
-	- buzzer has pretty ugly aliasing in places (do we need to DAC1BIT?)
+	- waitstates & DMA penalty (some games are suspciously fast);
+	- buzzer has pretty ugly aliasing in places;
 
     Notes:
     - pc8001 v1.01 / v1.02 sports a buggy readout of the expansion ROM at PC=17a1:

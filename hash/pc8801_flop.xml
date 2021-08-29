@@ -4025,8 +4025,8 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<!-- TODO: hacked to work on PC-8801 V1? Recheck when pc8001 has floppy support -->
-	<software name="baltic">
+	<!-- Hangs at N88 Basic loading -->
+	<software name="baltic" supported="no">
 		<description>Baltic Kantai wo Oe</description>
 		<year>1982</year>
 		<publisher>CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
@@ -6059,8 +6059,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- TODO: hacked to work on PC-8801 V1? Recheck when pc8001 has floppy support -->
-	<software name="chiteita">
+	<software name="chiteita" supported="yes">
 		<description>Chitei Tanken</description>
 		<year>1982</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -49109,10 +49108,14 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="spydais1">
+	<software name="spydais1" supported="yes">
 		<description>Spy Daisakusen (N88)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- 1982.12. -->
+		<year>1982</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<info name="alt_title" value="スパイ大作戦"/>
+		<!-- Ｙ．Ｔ氏 / Yoshinobu Takahashi -->
+		
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
 				<rom name="spy daisakusen(8801 version).d88" size="66240" crc="b8a764e8" sha1="2104b26bf5f636d57a870d23c1615d9b3fd9c990"/>
@@ -53975,17 +53978,6 @@ ExtractDisk  [02]"DATA_DISK    " -> "ncs music art v.2_02.d88"
 		</part>
 	</software>
 
-	<software name="ndisk5d8">
-		<description>NDisk5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="350720">
-				<rom name="ndisk5.d88" size="350720" crc="be55acf4" sha1="5bc1679d56ca2dc3651178ca8b8a8269d06cfe54"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gamemus1">
 		<description>Game Music Collection Vol. 1 - Sega &amp; Draque ][</description>
 		<year>19??</year>
@@ -55896,9 +55888,10 @@ ExtractDisk  [06]"COLOR        " -> "p1 ver.1.00_06.d88"        dd58383c
 	</software>
 
 	<software name="pc8801te">
-		<description>PC8801 Technical Know-how</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- comes from the correlated book by SystemSoft -->
+		<description>PC-Techknow PC8801mk2</description>
+		<year>1985</year>
+		<publisher>システムソフト (System Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="pc8801 technical know-how.d88" size="348832" crc="1746fa37" sha1="5579ad52296a47197125f55fc2c2bfe71a76e7aa"/>

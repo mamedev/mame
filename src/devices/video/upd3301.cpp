@@ -601,6 +601,9 @@ void upd3301_device::draw_scanline()
 		// \- (wanting the default from the first defined color)
 		// - 0x00 0x00 0x00 0x48 0x12 0x88 for first row
 		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green wtf)
+		// undermon (pc8001) instruction screen sets up:
+		// - 0x00 0x00 0x06 0xb8
+		// \- (expecting blue fill up to 0x06)
 		u8 attr_color = 0xe8;
 		u8 attr_decoration = 0x00;
 
