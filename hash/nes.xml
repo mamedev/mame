@@ -51523,7 +51523,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="maxi15ua" cloneof="maxi15" supported="no">
+	<software name="maxi15ua" cloneof="maxi15">
 		<description>Maxi 15 (USA)</description>
 		<year>1992</year>
 		<publisher>American Video Entertainment</publisher>
@@ -51540,7 +51540,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="maxi15u" cloneof="maxi15" supported="no">
+	<software name="maxi15u" cloneof="maxi15">
 		<description>Maxi 15 (USA, v2.0)</description>
 		<year>1992</year>
 		<publisher>American Video Entertainment</publisher>
@@ -51557,7 +51557,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="maxi15" supported="no">
+	<software name="maxi15">
 		<description>Maxi 15 (Aus)</description>
 		<year>1992</year>
 		<publisher>HES</publisher>
