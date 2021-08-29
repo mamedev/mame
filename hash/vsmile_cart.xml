@@ -2451,7 +2451,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="mannyfr">
+	<software name="mannyfr" cloneof="mannyge">
 		<description>Disney Manny et ses outils (France)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
