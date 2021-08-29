@@ -2261,7 +2261,7 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 {
 	std::vector<bool> trackbuf;
 	std::vector<uint32_t> &tbuf = image->get_buffer(track, head, subtrack);
-	if(tbuf.size() <= 1) {
+	if((int)tbuf.size() <= 1) {
 		// Unformatted track
 		int track_size = 200000000/cell_size;
 		trackbuf.resize(track_size, false);
