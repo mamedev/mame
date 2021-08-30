@@ -26,7 +26,7 @@
 #ifdef MAME_DEBUG
 #define SCHEDULER_DEBUG (1)
 #else
-#define SCHEDULER_DEBUG (1)
+#define SCHEDULER_DEBUG (0)
 #endif
 
 // if SCHEDULER_DEBUG is on, make assertions fire regardless of MAME_DEBUG
@@ -36,7 +36,7 @@
 #define scheduler_assert assert
 #endif
 
-#define COLLECT_SCHEDULER_STATS (1)
+#define COLLECT_SCHEDULER_STATS (0)
 #if (COLLECT_SCHEDULER_STATS)
 #define INCREMENT_SCHEDULER_STAT(x) do { x += 1; } while (0)
 #define SET_SCHEDULER_STAT(x, y) do { x = y; } while (0)
@@ -84,6 +84,17 @@ using timer_expired_delegate_form4 = delegate<void (IntType, IntType2)>;
 // alternate form #5 takes three integer parameters of any type; maps to some write handlers
 template<typename IntType, typename IntType2, typename IntType3>
 using timer_expired_delegate_form5 = delegate<void (IntType, IntType2, IntType3)>;
+
+// special exception type to throw to force immediate exit from timeslice
+class timeslice_exit_exception : public emu_exception
+{
+public:
+	timeslice_exit_exception(bool restore_after = false) : m_restore_after(restore_after) { }
+	bool restore_after() const { return m_restore_after; }
+
+private:
+	bool m_restore_after;
+};
 
 
 // ======================> timer_expired_delegate
@@ -595,7 +606,6 @@ public:
 	attotime time() const noexcept;
 	device_execute_interface *currently_executing() const noexcept { return m_executing_device; }
 	bool in_timeslice() const { return m_in_timeslice; }
-	bool hard_stopping() const { return m_hard_stopping; }
 
 	// execution
 	void timeslice(subseconds minslice) { timeslice_core(minslice); }
@@ -618,10 +628,6 @@ public:
 	// debugging
 	void dump_timers() const;
 
-	// force immediate exit from the scheduling loop -- used for major state
-	// transitions like hard reset or save state restore
-	void hard_stop(bool load_after_stop);
-
 	// save state registration
 	void register_save(save_manager &save);
 
@@ -634,9 +640,8 @@ private:
 	void timeslice_core(subseconds minslice);
 	void timeslice_partial();
 	void execute_timers(attotime const &basetime);
-	void update_first_timer_expire() { if (!m_hard_stopping) m_first_timer_expire.set(m_active_timers_head->m_expire); }
+	void update_first_timer_expire() { m_first_timer_expire.set(m_active_timers_head->m_expire); }
 	void update_basetime();
-	void hard_stop_complete();
 	void rebuild_execute_list();
 
 	// scheduling helpers
@@ -678,8 +683,6 @@ private:
 	attotime                    m_callback_timer_expire_time; // the original expiration time
 	bool                        m_suspend_changes_pending;  // suspend/resume changes are pending
 	bool                        m_in_timeslice;             // true if we're in a timeslice call
-	bool                        m_hard_stopping;            // true if we're trying to exit ASAP
-	bool                        m_load_after_stop;          // true if we should load after stopping
 
 	// statistics
 #if (COLLECT_SCHEDULER_STATS)

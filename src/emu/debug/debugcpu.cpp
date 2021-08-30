@@ -40,7 +40,10 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_livecpu(nullptr)
 	, m_breakcpu(nullptr)
 	, m_symtable(nullptr)
+	, m_within_instruction_hook(false)
+	, m_restore_pending(false)
 	, m_vblank_occurred(false)
+	, m_memory_modified(false)
 	, m_execution_state(exec_state::STOPPED)
 	, m_stop_when_not_device(nullptr)
 	, m_bpindex(1)
@@ -835,7 +838,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			machine.debugger().console().process_source_file();
 
 			// if an event got scheduled, resume
-			if (machine.exit_or_hard_reset_pending() || machine.scheduler().hard_stopping())
+			if (machine.exit_or_hard_reset_pending() || debugcpu.restore_pending())
 				debugcpu.set_execution_running();
 		}
 		machine.sound().debugger_mute(false);
@@ -850,6 +853,13 @@ void device_debug::instruction_hook(offs_t curpc)
 
 	// no longer in debugger code
 	debugcpu.set_within_instruction(false);
+
+	// if a restore is pending, process it on the way out
+	if (debugcpu.restore_pending())
+	{
+		debugcpu.set_restore_pending(false);
+		machine.immediate_load();
+	}
 }
 
 

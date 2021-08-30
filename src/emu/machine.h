@@ -266,7 +266,7 @@ private:
 	template <typename T> struct is_null<T *> { template <typename U> static bool value(U &&x) { return !x; } };
 	void start();
 	void set_saveload_filename(std::string &&filename);
-	void handle_saveload();
+	void handle_saveload(bool load);
 	void schedule_event(u32 event) { m_event_timer.adjust(attotime::zero, event); resume(); }
 	void scheduled_event(int event);
 	std::string nvram_filename(device_t &device) const;
@@ -326,14 +326,6 @@ private:
 	std::unique_ptr<emu_file> m_debuglogfile;       // pointer to the active debug.log file
 
 	// load/save management
-	enum class saveload_schedule
-	{
-		NONE,
-		SAVE,
-		LOAD
-	};
-	saveload_schedule       m_saveload_schedule;
-	attotime                m_saveload_schedule_time;
 	std::string             m_saveload_pending_file;
 	const char *            m_saveload_searchpath;
 

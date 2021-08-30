@@ -122,7 +122,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_ui_active(_config.options().ui_active()),
 		m_basename(_config.gamedrv().name),
 		m_sample_rate(_config.options().sample_rate()),
-		m_saveload_schedule(saveload_schedule::NONE),
 		m_saveload_searchpath(nullptr),
 
 		m_save(*this),
@@ -581,11 +580,8 @@ void running_machine::immediate_save(const char *filename)
 	if (filename != nullptr)
 		set_saveload_filename(filename);
 
-	// set up some parameters for handle_saveload()
-	m_saveload_schedule = saveload_schedule::SAVE;
-
 	// jump right into the save, anonymous timers can't hurt us!
-	handle_saveload();
+	handle_saveload(false);
 }
 
 
@@ -599,14 +595,18 @@ void running_machine::immediate_load(const char *filename)
 	if (filename != nullptr)
 		set_saveload_filename(filename);
 
-	// set up some parameters for handle_saveload()
-	m_saveload_schedule = saveload_schedule::LOAD;
-
 	// if currently within a timeslice, we have to get out before loading
 	if (m_scheduler.in_timeslice())
-		m_scheduler.hard_stop(true);
+	{
+		// if within the instruction hook, we need to wait until we exit out of any
+		// user interface before we can throw an exception
+		if (debug_enabled() && debugger().within_instruction_hook())
+			debugger().cpu().set_restore_pending(true);
+		else
+			throw timeslice_exit_exception(true);
+	}
 	else
-		handle_saveload();
+		handle_saveload(true);
 }
 
 
@@ -821,74 +821,72 @@ void running_machine::call_notifiers(machine_notification which)
 //  or load
 //-------------------------------------------------
 
-void running_machine::handle_saveload()
+void running_machine::handle_saveload(bool load)
 {
 	// if no name, bail
-	if (!m_saveload_pending_file.empty())
+	if (m_saveload_pending_file.empty())
+		return;
+
+	const char *const opname = load ? "load" : "save";
+	const char *const opnamed = load ? "loaded" : "saved";
+	u32 const openflags = load ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+
+	// open the file
+	emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
+	auto const filerr = file.open(m_saveload_pending_file);
+	if (filerr == osd_file::error::NONE)
 	{
-		const char *const opname = (m_saveload_schedule == saveload_schedule::LOAD) ? "load" : "save";
-		u32 const openflags = (m_saveload_schedule == saveload_schedule::LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		// read/write the save state
+		save_error saverr = load ? m_save.read_file(file) : m_save.write_file(file);
 
-		// open the file
-		emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
-		auto const filerr = file.open(m_saveload_pending_file);
-		if (filerr == osd_file::error::NONE)
+		// handle the result
+		switch (saverr)
 		{
-			const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
+		case STATERR_ILLEGAL_REGISTRATIONS:
+			popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
+			break;
 
-			// read/write the save state
-			save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.read_file(file) : m_save.write_file(file);
+		case STATERR_INVALID_HEADER:
+			popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
+			break;
 
-			// handle the result
-			switch (saverr)
-			{
-			case STATERR_ILLEGAL_REGISTRATIONS:
-				popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
-				break;
+		case STATERR_READ_ERROR:
+			popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
+			break;
 
-			case STATERR_INVALID_HEADER:
-				popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
-				break;
+		case STATERR_WRITE_ERROR:
+			popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
+			break;
 
-			case STATERR_READ_ERROR:
-				popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
-				break;
+		case STATERR_NONE:
+			if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
+				popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
+			else
+				popmessage("State successfully %s.", opnamed);
+			break;
 
-			case STATERR_WRITE_ERROR:
-				popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
-				break;
-
-			case STATERR_NONE:
-				if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
-				else
-					popmessage("State successfully %s.", opnamed);
-				break;
-
-			default:
-				popmessage("Error: Unknown error during state %s.", opnamed);
-				break;
-			}
-
-			// close and perhaps delete the file
-			if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
-				file.remove_on_close();
+		default:
+			popmessage("Error: Unknown error during state %s.", opnamed);
+			break;
 		}
-		else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
-		{
-			// attempt to load a non-existent savestate, report empty slot
-			popmessage("Error: No savestate file to load.", opname);
-		}
-		else
-		{
-			popmessage("Error: Failed to open file for %s operation.", opname);
-		}
+
+		// on failure to save, mark the file for removal
+		if (saverr != STATERR_NONE && !load)
+			file.remove_on_close();
+	}
+	else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+	{
+		// attempt to load a non-existent savestate, report empty slot
+		popmessage("Error: No savestate file to load.", opname);
+	}
+	else
+	{
+		popmessage("Error: Failed to open file for %s operation.", opname);
 	}
 
 	// unschedule the operation
 	m_saveload_pending_file.clear();
 	m_saveload_searchpath = nullptr;
-	m_saveload_schedule = saveload_schedule::NONE;
 }
 
 
@@ -907,14 +905,14 @@ void running_machine::scheduled_event(int event)
 				immediate_save("auto");
 			if (options().seconds_to_run() != 0)
 				m_video->save_final_snapshot();
-			m_scheduler.hard_stop(false);
 			m_event_timer.set_param(EVENT_EXIT);
+			throw timeslice_exit_exception();
 			break;
 
 		// just force an immediate stop
 		case EVENT_HARD_RESET:
-			m_scheduler.hard_stop(false);
 			m_event_timer.set_param(EVENT_HARD_RESET);
+			throw timeslice_exit_exception();
 			break;
 
 		// soft reset just runs reset on all the devices and then resumes
@@ -1280,12 +1278,6 @@ void running_machine::emscripten_main_loop()
 		const subseconds end = ((start / frametime) + 1) * frametime;
 
 		scheduler->timeslice(end - start);
-		// handle save/load
-		if (machine->m_saveload_schedule != saveload_schedule::NONE)
-		{
-			machine->handle_saveload();
-			break;
-		}
 	}
 	// otherwise, just pump video updates through
 	else

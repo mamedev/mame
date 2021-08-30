@@ -386,6 +386,7 @@ public:
 
 	// getters
 	bool within_instruction_hook() const { return m_within_instruction_hook; }
+	bool restore_pending() const { return m_restore_pending; }
 	bool memory_modified() const { return m_memory_modified; }
 	exec_state execution_state() const { return m_execution_state; }
 	device_t *live_cpu() { return m_livecpu; }
@@ -396,6 +397,7 @@ public:
 	// setters
 	void set_break_cpu(device_t * breakcpu) { m_breakcpu = breakcpu; }
 	void set_within_instruction(bool within_instruction) { m_within_instruction_hook = within_instruction; }
+	void set_restore_pending(bool pending) { m_restore_pending = pending; }
 	void set_memory_modified(bool memory_modified) { m_memory_modified = memory_modified; }
 	void set_execution_stopped() { m_execution_state = exec_state::STOPPED; }
 	void set_execution_running() { m_execution_state = exec_state::RUNNING; }
@@ -425,6 +427,7 @@ private:
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 
 	bool        m_within_instruction_hook;
+	bool        m_restore_pending;
 	bool        m_vblank_occurred;
 	bool        m_memory_modified;
 
