@@ -15416,6 +15416,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
+	<!-- copy protection repaired by hand -->
 	<software name="holein1">
 		<description>Hole in One</description>
 		<year>1985</year>
@@ -15424,8 +15425,13 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="ホールインワン"/>
 		<part name="flop1" interface="floppy_5_25">
+			<!--
 			<dataarea name="flop" size="348832">
 				<rom name="hole in one.d88" size="348832" crc="fdc86c72" sha1="12a1424aced7a859fccb5f00b9fbe314495b46b0"/>
+			</dataarea>
+			-->
+			<dataarea name="flop" size="349120">
+				<rom name="hole in one_repair.d88" size="349120" crc="aaff0df9" sha1="03179fed67c9addc8323d0c99322ccd6fcc86f44" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
