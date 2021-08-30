@@ -1242,6 +1242,16 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 
 /*****************************************************************************/
 
+// JP1 is for SXX2C only
+static INPUT_PORTS_START( sxx2c )
+	PORT_START("JUMPERS")
+	PORT_DIPNAME( 0x03, 0x03, "JP1" ) // "Only used when game-board is changed with a new game" in manual
+	PORT_DIPSETTING(    0x03, "Update" ) // "Changing game" in manual
+	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sxx2e )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -1286,13 +1296,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_3button )
 	PORT_INCLUDE( sxx2e )
-
-	PORT_START("JUMPERS")
-	PORT_DIPNAME( 0x03, 0x03, "JP1" )
-	PORT_DIPSETTING(    0x03, "Update" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( sxx2c )
 INPUT_PORTS_END
 
 
@@ -1380,6 +1384,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_ejanhs )
 	PORT_INCLUDE( spi_mahjong_keyboard )
+	PORT_INCLUDE( sxx2c )
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<3>)
@@ -1405,13 +1410,6 @@ static INPUT_PORTS_START( spi_ejanhs )
 
 	PORT_START("EXCH") // Another set of mahjong inputs is decoded from here but not used
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("JUMPERS")
-	PORT_DIPNAME( 0x03, 0x03, "JP1" )
-	PORT_DIPSETTING(    0x03, "Update" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )

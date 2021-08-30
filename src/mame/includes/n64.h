@@ -42,8 +42,6 @@ public:
 	n64_rdp* rdp() { return m_rdp.get(); }
 	uint32_t* rdram() { return m_rdram; }
 	uint32_t* sram() { return m_sram; }
-	uint32_t* rsp_imem() { return m_rsp_imem; }
-	uint32_t* rsp_dmem() { return m_rsp_dmem; }
 
 protected:
 	required_device<mips3_device> m_vr4300;
@@ -174,11 +172,11 @@ private:
 	address_space *m_mem_map;
 	required_device<mips3_device> m_vr4300;
 	required_device<rsp_device> m_rsp;
+	required_shared_ptr<uint32_t> m_rsp_imem;
+	required_shared_ptr<uint32_t> m_rsp_dmem;
 
 	uint32_t *m_rdram;
 	uint32_t *m_sram;
-	uint32_t *m_rsp_imem;
-	uint32_t *m_rsp_dmem;
 
 	void clear_rcp_interrupt(int interrupt);
 
@@ -228,6 +226,8 @@ private:
 
 	uint32_t sp_mem_addr;
 	uint32_t sp_dram_addr;
+	uint32_t sp_mem_addr_start;
+	uint32_t sp_dram_addr_start;
 	int sp_dma_length;
 	int sp_dma_count;
 	int sp_dma_skip;

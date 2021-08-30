@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -113,7 +113,7 @@ EGL_IMPORT
 			BGFX_FATAL(m_surface != EGL_NO_SURFACE, Fatal::UnableToInitialize, "Failed to create surface.");
 
 			m_context = eglCreateContext(m_display, _config, _context, s_contextAttrs);
-			BX_CHECK(NULL != m_context, "Create swap chain failed: %x", eglGetError() );
+			BX_ASSERT(NULL != m_context, "Create swap chain failed: %x", eglGetError() );
 
 			makeCurrent();
 			GL_CHECK(glClearColor(0.0f, 0.0f, 0.0f, 0.0f) );
@@ -205,9 +205,16 @@ EGL_IMPORT
 			// https://www.khronos.org/registry/EGL/extensions/ANDROID/EGL_ANDROID_recordable.txt
 			const bool hasEglAndroidRecordable = !bx::findIdentifierMatch(extensions, "EGL_ANDROID_recordable").isEmpty();
 
+			const uint32_t gles = BGFX_CONFIG_RENDERER_OPENGLES;
+
 			EGLint attrs[] =
 			{
-				EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+				EGL_RENDERABLE_TYPE, (gles >= 30) ? EGL_OPENGL_ES3_BIT_KHR : EGL_OPENGL_ES2_BIT,
+
+				EGL_BLUE_SIZE, 8,
+				EGL_GREEN_SIZE, 8,
+				EGL_RED_SIZE, 8,
+				EGL_ALPHA_SIZE, 8,
 
 #	if BX_PLATFORM_ANDROID
 				EGL_DEPTH_SIZE, 16,
@@ -266,8 +273,6 @@ EGL_IMPORT
 			const bool hasEglKhrCreateContext = !bx::findIdentifierMatch(extensions, "EGL_KHR_create_context").isEmpty();
 			const bool hasEglKhrNoError       = !bx::findIdentifierMatch(extensions, "EGL_KHR_create_context_no_error").isEmpty();
 
-			const uint32_t gles = BGFX_CONFIG_RENDERER_OPENGLES;
-
 			for (uint32_t ii = 0; ii < 2; ++ii)
 			{
 				bx::StaticMemoryBlockWriter writer(s_contextAttrs, sizeof(s_contextAttrs) );
@@ -306,7 +311,7 @@ EGL_IMPORT
 #	endif // BX_PLATFORM_RPI
 				{
 					bx::write(&writer, EGLint(EGL_CONTEXT_CLIENT_VERSION) );
-					bx::write(&writer, 2);
+					bx::write(&writer, EGLint(gles / 10));
 				}
 
 				bx::write(&writer, EGLint(EGL_NONE) );
@@ -370,7 +375,7 @@ EGL_IMPORT
 			ANativeWindow_setBuffersGeometry( (ANativeWindow*)g_platformData.nwh, _width, _height, format);
 		}
 #	elif BX_PLATFORM_EMSCRIPTEN
-		emscripten_set_canvas_size(_width, _height);
+		EMSCRIPTEN_CHECK(emscripten_set_canvas_element_size(HTML5_TARGET_CANVAS_SELECTOR, _width, _height) );
 #	else
 		BX_UNUSED(_width, _height);
 #	endif // BX_PLATFORM_*
@@ -444,30 +449,41 @@ EGL_IMPORT
 	void GlContext::import()
 	{
 		BX_TRACE("Import:");
+
 #	if BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX
 		void* glesv2 = bx::dlopen("libGLESv2." BX_DL_EXT);
-#		define GL_EXTENSION(_optional, _proto, _func, _import)                                                                                                   \
-			{                                                                                                                                                    \
-				if (NULL == _func)                                                                                                                               \
-				{                                                                                                                                                \
-					_func = (_proto)bx::dlsym(glesv2, #_import);                                                                                                 \
-					BX_TRACE("\t%p " #_func " (" #_import ")", _func);                                                                                           \
-					BGFX_FATAL(_optional || NULL != _func, Fatal::UnableToInitialize, "Failed to create OpenGLES context. eglGetProcAddress(\"%s\")", #_import); \
-				}                                                                                                                                                \
+
+#		define GL_EXTENSION(_optional, _proto, _func, _import)                           \
+			{                                                                            \
+				if (NULL == _func)                                                       \
+				{                                                                        \
+					_func = bx::dlsym<_proto>(glesv2, #_import);                         \
+					BX_TRACE("\t%p " #_func " (" #_import ")", _func);                   \
+					BGFX_FATAL(_optional || NULL != _func                                \
+						, Fatal::UnableToInitialize                                      \
+						, "Failed to create OpenGLES context. eglGetProcAddress(\"%s\")" \
+						, #_import);                                                     \
+				}                                                                        \
 			}
 #	else
-#		define GL_EXTENSION(_optional, _proto, _func, _import)                                                                                                   \
-			{                                                                                                                                                    \
-				if (NULL == _func)                                                                                                                               \
-				{                                                                                                                                                \
-					_func = (_proto)eglGetProcAddress(#_import);                                                                                                 \
-					BX_TRACE("\t%p " #_func " (" #_import ")", _func);                                                                                           \
-					BGFX_FATAL(_optional || NULL != _func, Fatal::UnableToInitialize, "Failed to create OpenGLES context. eglGetProcAddress(\"%s\")", #_import); \
-				}                                                                                                                                                \
+#		define GL_EXTENSION(_optional, _proto, _func, _import)                           \
+			{                                                                            \
+				if (NULL == _func)                                                       \
+				{                                                                        \
+					_func = reinterpret_cast<_proto>(eglGetProcAddress(#_import) );      \
+					BX_TRACE("\t%p " #_func " (" #_import ")", _func);                   \
+					BGFX_FATAL(_optional || NULL != _func                                \
+						, Fatal::UnableToInitialize                                      \
+						, "Failed to create OpenGLES context. eglGetProcAddress(\"%s\")" \
+						, #_import);                                                     \
+				}                                                                        \
 			}
+
 #	endif // BX_PLATFORM_
 
 #	include "glimports.h"
+
+#	undef GL_EXTENSION
 	}
 
 } /* namespace gl */ } // namespace bgfx

@@ -638,10 +638,10 @@ void pdp8_disassembler::dasm_opr_group2(std::ostream &stream, u16 opr)
 	{
 		if (BIT(opr, 7))
 			stream << "CLA";
-		else if (opr == 07400)
+		else if (opr == 0400)
 			stream << "NOP";
-		if ((opr & 0176) == 0)
-			stream << "!200";
+		if ((opr & 0170) == 0)
+			stream << "!400";
 	}
 }
 

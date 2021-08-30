@@ -181,13 +181,10 @@ private:
 
 	static int clamp_or_throw(int value, int minimum, int maximum, bool clamp, const char *out_of_range_message)
 	{
-		if (value < minimum || value > maximum)
-		{
-			if (clamp)
-				value = std::min(std::max(value, minimum), maximum);
-			else
-				throw std::out_of_range(out_of_range_message);
-		}
+		if (clamp)
+			value = std::clamp(value, minimum, maximum);
+		else if (value < minimum || value > maximum)
+			throw std::out_of_range(out_of_range_message);
 		return value;
 	}
 

@@ -47,6 +47,7 @@ chain_manager::chain_manager(running_machine& machine, osd_options& options, tex
 	, m_slider_notifier(slider_notifier)
 	, m_screen_count(0)
 {
+	m_converters.clear();
 	refresh_available_chains();
 	parse_chain_selections(options.bgfx_screen_chains());
 	init_texture_converters();
@@ -462,14 +463,15 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 			}
 		}
 
-		bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::RGBA8;
+		bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 		uint16_t pitch = prim.m_rowpixels;
+		int convert_stride = 1;
 		const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, prim.m_flags & PRIMFLAG_TEXFORMAT_MASK,
-			prim.m_rowpixels, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, &pitch);
+			prim.m_rowpixels, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, pitch, convert_stride);
 
 		if (texture == nullptr)
 		{
-			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, pitch, prim.m_rowpixels);
+			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, pitch, prim.m_rowpixels, convert_stride);
 			m_textures.add_provider(full_name, texture);
 
 			if (prim.m_prim->texture.palette)

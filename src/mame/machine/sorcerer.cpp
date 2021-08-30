@@ -655,7 +655,7 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 			m_maincpu->set_state_int(Z80_IFF2, header[19]&4 ? 1 : 0);
 			m_maincpu->set_state_int(Z80_R, header[20]);
 			m_maincpu->set_state_int(Z80_AF, header[21] | (header[22] << 8));
-			m_maincpu->set_state_int(STATE_GENSP, header[23] | (header[24] << 8));
+			m_maincpu->set_state_int(Z80_SP, header[23] | (header[24] << 8));
 			m_maincpu->set_state_int(Z80_IM, header[25]);
 			m_maincpu->set_pc(header[26] | (header[27] << 8));
 		}

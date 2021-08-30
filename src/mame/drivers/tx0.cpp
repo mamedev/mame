@@ -406,6 +406,7 @@ public:
 
 	// image-level overrides
 	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
@@ -764,7 +765,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_prt )
 	/* read current AC */
 	ac = m_maincpu->state_int(TX0_AC);
 	/* shuffle and print 6-bit word */
-	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
+	ch = bitswap<6>(ac, 15, 12, 9, 6, 3, 0);
 	typewriter_out(ch);
 
 	m_typewriter.prt_timer->adjust(attotime::from_msec(100));

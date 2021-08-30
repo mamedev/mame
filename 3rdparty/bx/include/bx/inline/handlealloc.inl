@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -186,7 +186,7 @@ namespace bx
 	template <uint16_t MaxHandlesT>
 	inline uint16_t HandleListT<MaxHandlesT>::getNext(uint16_t _handle) const
 	{
-		BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
+		BX_ASSERT(isValid(_handle), "Invalid handle %d!", _handle);
 		const Link& curr = m_links[_handle];
 		return curr.m_next;
 	}
@@ -194,7 +194,7 @@ namespace bx
 	template <uint16_t MaxHandlesT>
 	inline uint16_t HandleListT<MaxHandlesT>::getPrev(uint16_t _handle) const
 	{
-		BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
+		BX_ASSERT(isValid(_handle), "Invalid handle %d!", _handle);
 		const Link& curr = m_links[_handle];
 		return curr.m_prev;
 	}
@@ -202,7 +202,7 @@ namespace bx
 	template <uint16_t MaxHandlesT>
 	inline void HandleListT<MaxHandlesT>::remove(uint16_t _handle)
 	{
-		BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
+		BX_ASSERT(isValid(_handle), "Invalid handle %d!", _handle);
 		Link& curr = m_links[_handle];
 
 		if (kInvalidHandle != curr.m_prev)
@@ -358,7 +358,7 @@ namespace bx
 	template <uint16_t MaxHandlesT>
 	inline void HandleAllocLruT<MaxHandlesT>::free(uint16_t _handle)
 	{
-		BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
+		BX_ASSERT(isValid(_handle), "Invalid handle %d!", _handle);
 		m_list.remove(_handle);
 		m_alloc.free(_handle);
 	}
@@ -366,7 +366,7 @@ namespace bx
 	template <uint16_t MaxHandlesT>
 	inline void HandleAllocLruT<MaxHandlesT>::touch(uint16_t _handle)
 	{
-		BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
+		BX_ASSERT(isValid(_handle), "Invalid handle %d!", _handle);
 		m_list.remove(_handle);
 		m_list.pushFront(_handle);
 	}

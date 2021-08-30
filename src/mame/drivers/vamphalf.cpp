@@ -173,6 +173,9 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
+	u32 finalgdr_prot_r();
+	void finalgdr_prot_w(u32 data);
+
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -247,12 +250,12 @@ public:
 	}
 
 	void misncrft(machine_config &config);
-	void yorijori(machine_config &config);
 	void wyvernwg(machine_config &config);
+	void yorijori(machine_config &config);
 
 	void init_misncrft();
-	void init_yorijori();
 	void init_wyvernwg();
+	void init_yorijori();
 
 private:
 	required_device<i8052_device> m_qdsp_cpu;
@@ -266,10 +269,12 @@ private:
 	u32 wyvernwg_prot_r();
 	void wyvernwg_prot_w(u32 data);
 
-	void yorijori_32bit_map(address_map &map);
-	void yorijori_io(address_map &map);
+	void yorijori_eeprom_w(u32 data);
+
 	void misncrft_io(address_map &map);
 	void wyvernwg_io(address_map &map);
+	void yorijori_32bit_map(address_map &map);
+	void yorijori_io(address_map &map);
 };
 
 class vamphalf_nvram_state : public vamphalf_state
@@ -299,9 +304,6 @@ private:
 	void finalgdr_backupram_bank_w(u32 data);
 	u32 finalgdr_backupram_r(offs_t offset);
 	void finalgdr_backupram_w(offs_t offset, u32 data);
-
-	u32 finalgdr_prot_r();
-	void finalgdr_prot_w(u32 data);
 
 	u32 finalgdr_speedup_r();
 	u32 mrkickera_speedup_r();
@@ -351,6 +353,13 @@ void vamphalf_nvram_state::finalgdr_eeprom_w(u32 data)
 	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 }
 
+void vamphalf_qdsp_state::yorijori_eeprom_w(u32 data)
+{
+	m_eeprom->di_write((data & 0x1000) >> 12);
+	m_eeprom->cs_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+}
+
 void vamphalf_state::flipscreen_w(offs_t offset, u16 data)
 {
 	if (offset)
@@ -383,14 +392,14 @@ void vamphalf_qdsp_state::wyvernwg_prot_w(u32 data)
 	m_semicom_prot_idx = 8;
 }
 
-u32 vamphalf_nvram_state::finalgdr_prot_r()
+u32 vamphalf_state::finalgdr_prot_r()
 {
 	if (!machine().side_effects_disabled())
 		m_semicom_prot_idx--;
 	return (m_semicom_prot_data[m_semicom_prot_which] & (1 << m_semicom_prot_idx)) ? 0x8000 : 0;
 }
 
-void vamphalf_nvram_state::finalgdr_prot_w(u32 data)
+void vamphalf_state::finalgdr_prot_w(u32 data)
 {
 	/*
 	41C6
@@ -398,6 +407,7 @@ void vamphalf_nvram_state::finalgdr_prot_w(u32 data)
 	446B
 	F94B
 	*/
+
 	if (data == 0x41c6 || data == 0x446b)
 		m_semicom_prot_which = 0;
 	else
@@ -604,15 +614,15 @@ void vamphalf_nvram_state::finalgdr_io(address_map &map)
 	map(0x2800, 0x2803).w(FUNC(vamphalf_nvram_state::finalgdr_backupram_bank_w));
 	map(0x2c00, 0x2dff).rw(FUNC(vamphalf_nvram_state::finalgdr_backupram_r), FUNC(vamphalf_nvram_state::finalgdr_backupram_w));
 	map(0x3000, 0x3007).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x0000ff00);
-	map(0x3800, 0x3803).portr("P1_P2");
 	map(0x3402, 0x3402).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3800, 0x3803).portr("P1_P2");
 	map(0x3c00, 0x3c03).portr("SYSTEM");
 	map(0x4400, 0x4403).r(FUNC(vamphalf_state::eeprom32_r));
 	map(0x6000, 0x6003).nopr(); //?
 	map(0x6000, 0x6003).w(FUNC(vamphalf_nvram_state::finalgdr_eeprom_w));
 	map(0x6040, 0x6043).w(FUNC(vamphalf_nvram_state::finalgdr_prot_w));
-	//map(0x6080, 0x6083).w(FUNC(vamphalf_nvram_state::flipscreen32_w)); //?
 	map(0x6060, 0x6063).w(FUNC(vamphalf_nvram_state::finalgdr_prize_w));
+	//map(0x6080, 0x6083).w(FUNC(vamphalf_nvram_state::flipscreen32_w)); //?
 	map(0x60a0, 0x60a3).w(FUNC(vamphalf_nvram_state::finalgdr_oki_bank_w));
 }
 
@@ -707,6 +717,14 @@ void vamphalf_state::boonggab_io(address_map &map)
 
 void vamphalf_qdsp_state::yorijori_io(address_map &map)
 {
+	map(0x2400, 0x2403).r(FUNC(vamphalf_qdsp_state::finalgdr_prot_r));
+	map(0x3400, 0x3403).portr("P1_P2");
+	map(0x3800, 0x3803).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x0000ff00).cswidth(32);
+	map(0x3c00, 0x3c03).portr("SYSTEM");
+	map(0x4400, 0x4403).r(FUNC(vamphalf_state::eeprom32_r));
+	map(0x6000, 0x6003).nopr(); //?
+	map(0x6000, 0x6003).w(FUNC(vamphalf_qdsp_state::yorijori_eeprom_w));
+	map(0x6040, 0x6043).w(FUNC(vamphalf_qdsp_state::finalgdr_prot_w));
 }
 
 void vamphalf_state::banked_oki_map(address_map &map)
@@ -1084,6 +1102,38 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( yorijori )
+// TODO: test mode shows the two start buttons always stuck high, but maybe leftover from other games given button1 also acts as start?
+// Test mode also shows button 5 and 6 for both players but where are they? Also leftover?
+	PORT_START("P1_P2")
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Also seems to act as start button
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // Also seems to act as start button
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x00800000, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
 static GFXDECODE_START( gfx_vamphalf )
 	GFXDECODE_ENTRY( "gfx", 0, gfx_16x16x8_raw, 0, 0x80 )
 GFXDECODE_END
@@ -1331,7 +1381,7 @@ void vamphalf_qdsp_state::yorijori(machine_config &config)
 	E132T(config.replace(), m_maincpu, XTAL(50'000'000));   /* 50 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::yorijori_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::yorijori_io);
-	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq2_line_hold));
 
 	// 27MHz instead 28MHz
 	sound_qs1000(config);
@@ -1364,8 +1414,8 @@ Later DANBI PCB:
 
      CPU: Hyperstone E1-16T
 Graphics: QuickLogic QL2003-XPL84
-   Sound: Oki M6295 rebaged as AD-65
-          YM3012/YM2151 rebaged as KA12/BS901
+   Sound: Oki M6295 rebadged as AD-65
+          YM3012/YM2151 rebadged as KA12/BS901
     ROMs: ROML00/01, ROMU00/01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
    DRAM1: TM T2316162A 1M x16 EDO DRAM (SOJ44)
 
@@ -1393,8 +1443,8 @@ Ealier DANBI PCB:
 
      CPU: HYUNDAI GMS30C2116
 Graphics: Actel A40MX04-F PL84
-   Sound: Oki M6295 rebaged as U6295
-          YM3012/YM2151 rebaged as KA3002/KA51
+   Sound: Oki M6295 rebadged as U6295
+          YM3012/YM2151 rebadged as KA3002/KA51
     ROMs: ROML01, ROMU01 - SOP44 32MBit mask ROM for ELC & EVI
           ROML00, ROMU00 - unpopulated
    DRAM1: LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
@@ -1631,8 +1681,8 @@ CPU: Hyperstone E1-16T @ 50.000MHz
 MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
       GAL1 - PALCE22V10H
 
-Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as KA12/BS901
+Oki M6295 rebadged as AD-65
+YM3012/YM2151 rebadged as KA12/BS901
 
  P1 - Setup push button
  P2 - Reset push button
@@ -1739,8 +1789,8 @@ CPU: Hyperstone E1-16T @ 50.000MHz
 MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
       GAL1 - PALCE22V10H
 
-Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as KA12/KA51
+Oki M6295 rebadged as AD-65
+YM3012/YM2151 rebadged as KA12/KA51
 
  P1 - Setup push button
  P2 - Reset push button
@@ -1810,7 +1860,7 @@ CPU: Hyperstone E1-16T @ 50.000MHz
 MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
       GAL1 - PALCE22V10H
 
-Oki M6295 rebaged as AD-65
+Oki M6295 rebadged as AD-65
 YM3012/YM2151
 
  P1 - Setup push button
@@ -1881,8 +1931,8 @@ CPU: HYUNDAI GMS30C2116 (Hyperstone E1-16T compatible) @ 50.000MHz
      DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
 
-Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as KA12/KB2001
+Oki M6295 rebadged as AD-65
+YM3012/YM2151 rebadged as KA12/KB2001
 
  P1 - Setup push button
  P2 - Reset push button
@@ -1943,8 +1993,8 @@ Also known to be found on the F-E1-16-010 PCB
 Notes:
 CPU: Hyperstone E1-16T @ 50.000MHz
 
-Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as BS902/KA51
+Oki M6295 rebadged as AD-65
+YM3012/YM2151 rebadged as BS902/KA51
 
 ROMs:
     ROML00 & ROMH00 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
@@ -2030,8 +2080,8 @@ DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
 MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
 
-Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as BS902/KA51
+Oki M6295 rebadged as AD-65
+YM3012/YM2151 rebadged as BS902/KA51
 
  P1 - Reset push button
  P2 - Setup push button
@@ -2099,8 +2149,8 @@ DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
 MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
 
-Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as BS902/KA51
+Oki M6295 rebadged as AD-65
+YM3012/YM2151 rebadged as BS902/KA51
 
  P1 - Reset push button
  P2 - Setup push button
@@ -2170,8 +2220,8 @@ DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
 MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
 
-Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as BS902/KA51
+Oki M6295 rebadged as AD-65
+YM3012/YM2151 rebadged as BS902/KA51
 
  P1 - Reset push button
  P2 - Setup push button
@@ -2475,7 +2525,7 @@ OSC - 50MHz, 27MHz, 24MHz & 7.3728MHz (unpopulated)
 QDSP QS1000 @ 24MHz (silkscreened as SND1)
      QS1001A Sample ROM (silkscreened as SND3)
      SND2 Additional sound samples
-     SND5 8052 CPU code for QS1000?
+     SND5 8052 CPU code for QS1000
 
 EEPROM - Atmel 93C46 at U6
 
@@ -2487,7 +2537,7 @@ MEMx  - M61C256J-15 32K x8 SRAM (SOJ28)
  P2 - Setup push button
 VR1 - Volume adjust pot
 
-16C550 - Asynchronous Comm Element with Autoflow Conrol (all components related to the 16C500 are unpopulated)
+16C550 - Asynchronous Comm Element with Autoflow Control (all components related to the 16C500 are unpopulated)
          7.3728MHz OSC connected to XIN & XOUT of 16C550
          CON6 & CON7 connected to 16C550
 
@@ -2514,9 +2564,9 @@ ROM_START( yorijori )
 
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
 	ROM_LOAD( "snd5", 0x00000, 0x20000, CRC(79067367) SHA1(a8f0c02dd616ff8c5fb49dea1a116fea2aced19c) )
-	ROM_RELOAD(      0x20000, 0x20000 )
-	ROM_RELOAD(      0x40000, 0x20000 )
-	ROM_RELOAD(      0x60000, 0x20000 )
+	ROM_RELOAD(       0x20000, 0x20000 )
+	ROM_RELOAD(       0x40000, 0x20000 )
+	ROM_RELOAD(       0x60000, 0x20000 )
 
 	ROM_REGION( 0x800000, "gfx", 0 )
 	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(9299ce36) SHA1(cd8a9e2619da93e2015704230e8189a6ae52de69) )
@@ -2525,8 +2575,8 @@ ROM_START( yorijori )
 	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fe0485ef) SHA1(bd1a26aa386803df8e8e137ea5d5a2cdd6ad1197) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 )
-	ROM_LOAD( "snd2", 0x000000, 0x200000, CRC(8d9a8795) SHA1(482acb3beafc9baa43284c54ac36086c57098465) )
-	ROM_LOAD( "qs1001a.snd3",  0x200000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+	ROM_LOAD( "snd2",         0x000000, 0x200000, CRC(8d9a8795) SHA1(482acb3beafc9baa43284c54ac36086c57098465) )
+	ROM_LOAD( "qs1001a.snd3", 0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
 /*
@@ -2666,8 +2716,8 @@ DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
 MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
 
-Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as BS902/KA51
+Oki M6295 rebadged as AD-65
+YM3012/YM2151 rebadged as BS902/KA51
 
  P1 - Reset push button
  P2 - Setup push button
@@ -2830,7 +2880,7 @@ CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
 MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
 GAL1  - GAL22V10B
 
-Oki M6295 rebaged as AD-65
+Oki M6295 rebadged as AD-65
 YM3012/YM2151
 
  P1 - Reset push button
@@ -3424,19 +3474,19 @@ void vamphalf_qdsp_state::init_wyvernwg()
 
 void vamphalf_qdsp_state::init_yorijori()
 {
-	// seems close to Final Godori in terms of port mappings, possibly a SemiCom game?
+	// it's close to Final Godori in terms of port mappings, possibly a SemiCom game?
 
 	m_palshift = 0;
 	m_flip_bit = 1;
 
 	m_semicom_prot_idx = 8;
 	m_semicom_prot_data[0] = 2;
-	m_semicom_prot_data[1] = 1;
+	m_semicom_prot_data[1] = 3;
 
-//  u8 *romx = (u8 *)memregion("maincpu")->base();
+	u8 *romx = (u8 *)memregion("maincpu")->base();
 	// prevent code dying after a trap 33 by patching it out, why?
-//  romx[BYTE4_XOR_BE(0x8ff0)] = 3;
-//  romx[BYTE4_XOR_BE(0x8ff1)] = 0;
+	romx[BYTE4_XOR_BE(0x8ff0)] = 3;
+	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
@@ -3627,4 +3677,4 @@ GAME( 2001, aoh,        0,        aoh,       aoh,      vamphalf_state,      init
 
 GAME( 2001, boonggab,   0,        boonggab,  boonggab, vamphalf_state,      init_boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, yorijori,   0,        yorijori,  common,   vamphalf_qdsp_state, init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, yorijori,   0,        yorijori,  yorijori, vamphalf_qdsp_state, init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM patch needed to boot

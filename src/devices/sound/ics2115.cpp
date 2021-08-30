@@ -23,8 +23,10 @@
 
 #include "emu.h"
 #include "ics2115.h"
+
 #include <algorithm>
 #include <cmath>
+
 
 //#define ICS2115_DEBUG
 //#define ICS2115_ISOLATE 6
@@ -201,9 +203,33 @@ device_memory_interface::space_config_vector ics2115_device::memory_space_config
 }
 
 
-//TODO: improve using next-state logic from column 126 of patent 5809466
+/*
+  Using next-state logic from column 126 of patent 5809466.
+  VOL(L) = vol.acc
+  VINC = vol.inc
+  DIR = invert
+  BC = boundary cross (start or end )
+  BLEN = bi directional loop enable
+  LEN loop enable
+  UVOL  LEN   BLEN    DIR     BC      Next VOL(L)
+   0      x     x       x       x       VOL(L) // no change no vol envelope
+   1      x     x       0       0       VOL(L) + VINC // foward dir no bc
+   1      x     x       1       0       VOL(L) - VINC // invert no bc
+   1      0     x       x       1       VOL(L) // no env len no vel envelope
+  ----------------------------------------------------------------------------
+   1      1     0       0       1       start - ( end - (VOL(L)  + VINC) )
+   1      1     0       1       1       end + ( (VOL(L) - VINC) - start)
+   1      1     1       0       1       end + (end - (VOL(L) + VINC) ) // here
+   1      1     1       1       1       start - ( (VOL(L) - VINC)- start)
+*/
 int ics2115_device::ics2115_voice::update_volume_envelope()
 {
+
+	// test for boundary cross
+	bool bc = false;
+	if (vol.acc >= vol.end || vol.acc <= vol.end)
+		bc = true;
+
 	int ret = 0;
 	if (vol_ctrl.bitflags.done || vol_ctrl.bitflags.stop)
 		return ret;
@@ -233,13 +259,23 @@ int ics2115_device::ics2115_voice::update_volume_envelope()
 
 	if (vol_ctrl.bitflags.loop)
 	{
-		if (vol_ctrl.bitflags.loop_bidir)
-			vol_ctrl.bitflags.invert = !vol_ctrl.bitflags.invert;
-
-		if (vol_ctrl.bitflags.invert)
-			vol.acc = vol.end + vol.left;
-		else
-			vol.acc = vol.start - vol.left;
+		if (bc)
+		{
+			if (!vol_ctrl.bitflags.loop_bidir)
+			{
+				if (!vol_ctrl.bitflags.invert)
+					vol.acc = vol.start - (vol.end - (vol.acc + vol.incr));   //  uvol = 1*     len = 1*   blen =  0     dir =  0     bc =  1*      start - ( end - (VOL(L)  + VINC) )
+				else
+					vol.acc = vol.end + ((vol.acc - vol.incr) - vol.start);   //         1            1    blen =  0     dir =  1           1       end + ( (VOL(L) - VINC) - start)
+			}
+			else
+			{
+				if (!vol_ctrl.bitflags.invert)
+					vol.acc = vol.end + (vol.end - (vol.acc + vol.incr));     //         1            1     blen = 1      dir = 0           1       end + (end - (VOL(L) + VINC) )
+				else
+					vol.acc = vol.start - ((vol.acc - vol.incr) - vol.start); //         1            1     beln = 1      dir = 1           1       start - ( (VOL(L) - VINC)- start)
+			}
+		}
 	}
 	else
 		vol_ctrl.bitflags.done = true;

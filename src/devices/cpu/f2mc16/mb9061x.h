@@ -15,12 +15,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> m5074x_device
+// ======================> mb9061x_device
 
 class mb9061x_device :  public f2mc16_device
 {
 	friend class mb90610_device;
 	friend class mb90611_device;
+	friend class mb90641_device;
 
 public:
 	const address_space_config m_program_config;
@@ -97,7 +98,18 @@ protected:
 	mb90611_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class mb90641_device : public mb9061x_device
+{
+public:
+	mb90641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void mb90641_map(address_map &map);
+protected:
+	mb90641_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(MB90610A, mb90610_device)
 DECLARE_DEVICE_TYPE(MB90611A, mb90611_device)
+DECLARE_DEVICE_TYPE(MB90641A, mb90641_device)
 
 #endif // MAME_CPU_F2MC16_MB9061X_H

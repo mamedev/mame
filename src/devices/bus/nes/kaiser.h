@@ -8,6 +8,25 @@
 #include "nxrom.h"
 
 
+// ======================> nes_ks106c_device
+
+class nes_ks106c_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_ks106c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch;
+};
+
+
 // ======================> nes_ks7058_device
 
 class nes_ks7058_device : public nes_nrom_device
@@ -335,6 +354,7 @@ private:
 
 
 // device type definition
+DECLARE_DEVICE_TYPE(NES_KS106C,  nes_ks106c_device)
 DECLARE_DEVICE_TYPE(NES_KS202,   nes_ks202_device)
 DECLARE_DEVICE_TYPE(NES_KS7010,  nes_ks7010_device)
 DECLARE_DEVICE_TYPE(NES_KS7012,  nes_ks7012_device)

@@ -446,6 +446,7 @@ private:
 	void m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data);
 	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const;
 	uint16_t egc_shift(int plane, uint16_t val);
+	uint16_t egc_color_pat(int plane) const;
 };
 
 #endif // MAME_INCLUDES_PC9801_H

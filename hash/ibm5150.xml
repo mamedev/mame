@@ -4753,6 +4753,209 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="windows">
+		<description>Microsoft Windows Version 1.0</description>
+		<year>1985</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="42e3e1d1" sha1="ec097b138ea90fb1e9afa558b85043298be35dc4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Build Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="da00b43b" sha1="02194b2cdd64ccf273e94d3b91c537061cc9318a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="5e454255" sha1="4c42818628fc7ae5e982b5544c4b4bede5dbd05c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Desktop Applications Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk4.img" size="368640" crc="1ebe759d" sha1="09b19e84099eedac0c9d656379501b6ef3e5cb1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win101">
+		<description>Microsoft Windows Version 1.01</description>
+		<year>1985</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="86301c98" sha1="bfce997cf65d64f5f02892dc0016605154a510f4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Build Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="d7369d63" sha1="e029f4e21de9dd4a00c412926595279d5a9e4d46"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="93775fb7" sha1="b5e66fc326ed4ea4372431a942543343e76903ec"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Desktop Applications Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk4.img" size="368640" crc="eeb6c6ee" sha1="a4083288075138cfc7c340ed7f347d4b0c49805c"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Write Program Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk5.img" size="368640" crc="7218a165" sha1="c46473ea1c4b4b1f2fdf434466db501dc1a0d01a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win102">
+		<description>Microsoft Windows Version 1.02</description>
+		<year>1986</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="86fb1541" sha1="bf834bfde9cea6bbfc79219ac08a977576f7ec17"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Build Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="5539a34a" sha1="4ada39e7d1a93404e533f119042e7e005bfed1ee"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="1375d396" sha1="680abad3f8fa5c4a7ecc7985db2c47cabdc5a397"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Font Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk4.img" size="368640" crc="e09ec318" sha1="4f5d84e2515925f303df7c18bea0ea55e0fbb693"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Desktop Applications Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk5.img" size="368640" crc="fb9a070a" sha1="f3c3f6ce12f99a0e0c2c2b7e69a22bf2a38f7d6d"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Write Program Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk6.img" size="368640" crc="e2d9649b" sha1="1066fff6fb6e1173d7433d52be8dfd15740f4815"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win103">
+		<description>Microsoft Windows Version 1.03</description>
+		<year>1986</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="049c89c7" sha1="f68ca9aa0d18eb4cc332d0f63df47ccc32d2b062"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Build Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="03c90e1c" sha1="8bb4011cf764745e59b79e607b25cdef670ae60c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="a0693b97" sha1="92e420b5d34edd52c260ae0c601dda021e41c977"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Font Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk4.img" size="368640" crc="6001af5d" sha1="c207e666db24eb423face3f448dc53c456cfbfa5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Desktop Applications Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk5.img" size="368640" crc="9c3da657" sha1="edd64bf7eb6c1951e1bb4b2460924c91b805890a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Write Program Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk6.img" size="368640" crc="36c61936" sha1="1516f0233fc55d1542bc85afe8a2fb23705a7c85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win104">
+		<description>Microsoft Windows Version 1.04</description>
+		<year>1987</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="543002fa" sha1="262b7ec211667fb906e8e28a2d37a251ae585f0c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Build Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="69c9754f" sha1="216a5b85473757a974677042debbf1c291e7abd4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="09742c32" sha1="43223c6a018bec0931ac827f98defbaa93201d25"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Font Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk4.img" size="368640" crc="7eb3dc00" sha1="cae0315a5f20aa875a97ebdcb10f1bb71dabf915"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Desktop Applications Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk5.img" size="368640" crc="740b5158" sha1="d92b17b233ec090b88fd76bdafd2c1f8f8da533a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Write Program Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk6.img" size="368640" crc="26f3b21b" sha1="71ed3a707bb0636196f20e001c4628b088a360ba"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Printer Disk"/>
+			<dataarea name="flop" size="368640">
+				<rom name="disk7.img" size="368640" crc="d9265486" sha1="7ef9ef830be23d34022d26dbe01c8394eada8c57"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- SDK -->
 
 	<software name="win13sdk">
@@ -6294,6 +6497,8 @@ has been replaced with an all-zero block. -->
 			<dataarea name="flop1" size="368640">
 				<rom name="6322635.img" size="368640" crc="20a3dc1c" sha1="1e7430c57109960fd89d281d24e85a086a8284e4"/>
 			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop2" size="368640">
 				<rom name="6322640.img" size="368640" crc="eb75a4c0" sha1="bdb8528a71ea35cb1d9a0a0f13f8f0b745ca8eb6"/>
 			</dataarea>

@@ -14715,6 +14715,20 @@ clips onto the player's ear.
 		</part>
 	</software>
 
+	<!-- Unlicensed cart that allows playing Game Boy games on a Nintendo 64.
+	     Two cart female sockets, one for the Game Boy game and the other for a genuine N64 game cart for bypassing the protection.
+	     Hardware on the cart PCB: Two 29LE010 EEPROMs and a Datel custom LZ9FC17 GAL labeled as "Action Replay" -->
+	<software name="pwrflashe" supported="no">
+		<description>PowerFlash (Europe)</description>
+		<year>19??</year>
+		<publisher>Datel</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="PowerFlash (Europe) (Unl).bin" size="262144" crc="0e15b8a4" sha1="22169ccc5be0d3bf481056f4a004ee6959e0409b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xplor64" supported="no">
 		<description>Xplorer 64 (Germany, v1.067)</description>
 		<year>19??</year>

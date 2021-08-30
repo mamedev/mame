@@ -1001,7 +1001,13 @@ public:
 	static constexpr u32 reg_nccTable =        0x324/4;   //  W  F
 
 	// constructor
-	voodoo_regs()
+	voodoo_regs() :
+		m_starts(0), m_startt(0),
+		m_startw(0),
+		m_dsdx(0), m_dtdx(0),
+		m_dwdx(0),
+		m_dsdy(0), m_dtdy(0),
+		m_dwdy(0)
 	{
 		for (int index = 0; index < std::size(m_regs); index++)
 			m_regs[index].u = 0;

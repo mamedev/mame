@@ -72,15 +72,15 @@ g65816_disassembler::opcode_struct::opcode_struct(op n, u8 f, u8 e) : m_name(n),
 
 const char *const g65816_disassembler::s_opnames[] =
 {
-	"ADC", "AND", "ASL", "BCC", "BCS", "BEQ", "BIT", "BMI", "BNE", "BPL", "BRA",
-	"BRK", "BRL", "BVC", "BVS", "CLC", "CLD", "CLI", "CLV", "CMP", "COP", "CPX",
-	"CPY", "DEA", "DEC", "DEX", "DEY", "EOR", "INA", "INC", "INX", "INY", "JML",
-	"JMP", "JSL", "JSR", "LDA", "LDX", "LDY", "LSR", "MVN", "MVP", "NOP", "ORA",
-	"PEA", "PEI", "PER", "PHA", "PHB", "PHD", "PHK", "PHP", "PHX", "PHY", "PLA",
-	"PLB", "PLD", "PLP", "PLX", "PLY", "REP", "ROL", "ROR", "RTI", "RTL", "RTS",
-	"SBC", "SEC", "SED", "SEI", "SEP", "STA", "STP", "STX", "STY", "STZ", "TAX",
-	"TAY", "TCS", "TCD", "TDC", "TRB", "TSB", "TSC", "TSX", "TXA", "TXS", "TXY",
-	"TYA", "TYX", "WAI", "WDM", "XBA", "XCE"
+	"adc", "and", "asl", "bcc", "bcs", "beq", "bit", "bmi", "bne", "bpl", "bra",
+	"brk", "brl", "bvc", "bvs", "clc", "cld", "cli", "clv", "cmp", "cop", "cpx",
+	"cpy", "dea", "dec", "dex", "dey", "eor", "ina", "inc", "inx", "iny", "jml",
+	"jmp", "jsl", "jsr", "lda", "ldx", "ldy", "lsr", "mvn", "mvp", "nop", "ora",
+	"pea", "pei", "per", "pha", "phb", "phd", "phk", "php", "phx", "phy", "pla",
+	"plb", "pld", "plp", "plx", "ply", "rep", "rol", "ror", "rti", "rtl", "rts",
+	"sbc", "sec", "sed", "sei", "sep", "sta", "stp", "stx", "sty", "stz", "tax",
+	"tay", "tcs", "tcd", "tdc", "trb", "tsb", "tsc", "tsx", "txa", "txs", "txy",
+	"tya", "tyx", "wai", "wdm", "xba", "xce"
 };
 
 const g65816_disassembler::opcode_struct g65816_disassembler::s_opcodes[256] =
@@ -191,7 +191,7 @@ offs_t g65816_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case IMP :
 			break;
 		case ACC :
-			util::stream_format(stream, "A");
+			util::stream_format(stream, "a");
 			break;
 		case RELB:
 			var = (int8_t) opcodes.r8((pc+1) & 0xffffff);
@@ -230,19 +230,19 @@ offs_t g65816_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			length += 3;
 			break;
 		case ALX :
-			util::stream_format(stream, " $%06x,X", opcodes.r32((pc+1) & 0xffffff) & 0xffffff);
+			util::stream_format(stream, " $%06x,x", opcodes.r32((pc+1) & 0xffffff) & 0xffffff);
 			length += 3;
 			break;
 		case AX  :
-			util::stream_format(stream, " $%04x,X", opcodes.r16((pc+1) & 0xffffff));
+			util::stream_format(stream, " $%04x,x", opcodes.r16((pc+1) & 0xffffff));
 			length += 2;
 			break;
 		case AXI :
-			util::stream_format(stream, " ($%04x,X)", opcodes.r16((pc+1) & 0xffffff));
+			util::stream_format(stream, " ($%04x,x)", opcodes.r16((pc+1) & 0xffffff));
 			length += 2;
 			break;
 		case AY  :
-			util::stream_format(stream, " $%04x,Y", opcodes.r16((pc+1) & 0xffffff));
+			util::stream_format(stream, " $%04x,y", opcodes.r16((pc+1) & 0xffffff));
 			length += 2;
 			break;
 		case D   :
@@ -255,7 +255,7 @@ offs_t g65816_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			length++;
 			break;
 		case DIY :
-			util::stream_format(stream, " ($%02x),Y", opcodes.r8((pc+1) & 0xffffff));
+			util::stream_format(stream, " ($%02x),y", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DLI :
@@ -263,27 +263,27 @@ offs_t g65816_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			length++;
 			break;
 		case DLIY:
-			util::stream_format(stream, " [$%02x],Y", opcodes.r8((pc+1) & 0xffffff));
+			util::stream_format(stream, " [$%02x],y", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DX  :
-			util::stream_format(stream, " $%02x,X", opcodes.r8((pc+1) & 0xffffff));
+			util::stream_format(stream, " $%02x,x", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DXI :
-			util::stream_format(stream, " ($%02x,X)", opcodes.r8((pc+1) & 0xffffff));
+			util::stream_format(stream, " ($%02x,x)", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DY  :
-			util::stream_format(stream, " $%02x,Y", opcodes.r8((pc+1) & 0xffffff));
+			util::stream_format(stream, " $%02x,y", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case S   :
-			util::stream_format(stream, " %s,S", int_8_str(opcodes.r8((pc+1) & 0xffffff)));
+			util::stream_format(stream, " %s,s", int_8_str(opcodes.r8((pc+1) & 0xffffff)));
 			length++;
 			break;
 		case SIY :
-			util::stream_format(stream, " (%s,S),Y", int_8_str(opcodes.r8((pc+1) & 0xffffff)));
+			util::stream_format(stream, " (%s,s),y", int_8_str(opcodes.r8((pc+1) & 0xffffff)));
 			length++;
 			break;
 		case SIG :

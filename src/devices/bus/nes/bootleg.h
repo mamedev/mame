@@ -128,6 +128,19 @@ private:
 };
 
 
+// ======================> nes_btl_cj_device
+
+class nes_btl_cj_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_btl_cj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_btl_dn_device
 
 class nes_btl_dn_device : public nes_nrom_device
@@ -155,13 +168,13 @@ class nes_smb2j_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_smb2j_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_smb2j_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_l(offs_t offset) override;
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_ex(offs_t offset, uint8_t data) override;
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual u8 read_l(offs_t offset) override;
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_ex(offs_t offset, u8 data) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -171,7 +184,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	uint16_t m_irq_count;
+	void update_irq(u8 data);
+	void write_45(offs_t offset, u8 data);
+	u16 m_irq_count;
 	int m_irq_enable;
 
 	static const device_timer_id TIMER_IRQ = 0;
@@ -185,9 +200,10 @@ class nes_smb2ja_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_smb2ja_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	nes_smb2ja_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -197,7 +213,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	uint16_t m_irq_count;
+	u16 m_irq_count;
 	int m_irq_enable;
 
 	static const device_timer_id TIMER_IRQ = 0;
@@ -211,10 +227,11 @@ class nes_smb2jb_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_ex(offs_t offset, uint8_t data) override;
+	nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_ex(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -224,7 +241,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	uint16_t m_irq_count;
+	void write_45(offs_t offset, u8 data);
+	u16 m_irq_count;
 	int m_irq_enable;
 
 	static const device_timer_id TIMER_IRQ = 0;
@@ -260,19 +278,26 @@ class nes_09034a_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_ex(offs_t offset, uint8_t data) override;
-	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_ex(offs_t offset, u8 data) override;
+	virtual u8 read_ex(offs_t offset) override;
+	virtual u8 read_m(offs_t offset) override;
 
 	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	uint8_t m_reg;
+	u16 m_irq_count;
+	int m_irq_enable;
+	u8 m_reg;
+
+	static const device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
 };
 
 
@@ -645,6 +670,36 @@ protected:
 };
 
 
+// ======================> nes_yung08_device
+
+class nes_yung08_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_yung08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_l(offs_t offset) override;
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_ex(offs_t offset, u8 data) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	void write_45(offs_t offset, u8 data);
+	u16 m_irq_count;
+	int m_irq_latch;
+
+	static const device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
+};
+
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_AX5705,         nes_ax5705_device)
@@ -652,6 +707,7 @@ DECLARE_DEVICE_TYPE(NES_SC127,          nes_sc127_device)
 DECLARE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device)
 DECLARE_DEVICE_TYPE(NES_ASN,            nes_asn_device)
 DECLARE_DEVICE_TYPE(NES_SMB3PIRATE,     nes_smb3p_device)
+DECLARE_DEVICE_TYPE(NES_BTL_CONTRAJ,    nes_btl_cj_device)
 DECLARE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device)
 DECLARE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device)
 DECLARE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device)
@@ -675,5 +731,6 @@ DECLARE_DEVICE_TYPE(NES_AC08,           nes_ac08_device)
 DECLARE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device)
 DECLARE_DEVICE_TYPE(NES_SHUIGUAN,       nes_shuiguan_device)
 DECLARE_DEVICE_TYPE(NES_RT01,           nes_rt01_device)
+DECLARE_DEVICE_TYPE(NES_YUNG08,         nes_yung08_device)
 
 #endif // MAME_BUS_NES_BOOTLEG_H

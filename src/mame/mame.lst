@@ -203,6 +203,7 @@ polarisa                        // PS  (c) 1980 Taito
 polarisb                        // PS  (c) 1980 Taito
 polarisbr                       // PS  (c) 1981 Taito do Brasil
 polariso                        // PS  (c) 1980 Taito
+resclunar                       // bootleg (Niemer)
 rollingc                        // Nichibutsu
 schaser                         // RT  Taito
 schasera                        // RT  Taito
@@ -1483,6 +1484,9 @@ f2                              //
 
 @source:apricotp.cpp
 fp                              //
+
+@source:apxen.cpp
+apxen                           // 1985 ACT
 
 @source:aquarium.cpp
 aquarium                        // (c) 1996 Excellent System
@@ -10230,13 +10234,15 @@ minijook                        //
 
 @source:cedar_magnet.cpp
 cedmag
-mag_time
-mag_exzi
-mag_xain
-mag_war
-mag_wara
 mag_burn
 mag_day
+mag_drac
+mag_exzi
+mag_pdak
+mag_time
+mag_war
+mag_wara
+mag_xain
 
 @source:centiped.cpp
 bullsdrt                        // (c) 1985 Shinkai
@@ -11585,6 +11591,7 @@ deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MAST
 dfkbl                           // (c) 2010 Cave (AMI license) - 2010/1/18 BLACK LABEL
 dsmbl                           // (c) 2008 Cave (AMI license) - 2008/10/06 MEGABLACK LABEL VER
 espgal2                         // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
+espgal2a                        // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
 futari10                        // (c) 2006 Cave (AMI license) - 2006/10/23 MASTER VER.
 futari15                        // (c) 2006 Cave (AMI license) - 2006/12/8.MASTER VER. 1.54.
 futari15a                       // (c) 2006 Cave (AMI license) - 2006/12/8 MASTER VER 1.54
@@ -12557,6 +12564,9 @@ dpb7000                         //
 
 @source:dps1.cpp
 dps1                            //
+
+@source:dpsv55.cpp
+dpsv55                          //
 
 @source:dragon.cpp
 d64plus                         // Dragon 64 + Compusense Plus addon
@@ -15188,6 +15198,7 @@ gln                             // Genius Leader Notebook
 pitagor                         // Pitagorin
 gls                             // Genius Leader Select
 pitagjr                         // Pitagorin Junior
+scientus                        // Scientus (France, from C.Q.F.D)
 
 @source:genpc.cpp
 pc                              // 1987 PC with CGA
@@ -15314,6 +15325,9 @@ nfsug                           // Need For Speed: Underground Install (2 Discs)
 
 @source:gluck2.cpp
 gluck2                          // 1992 Yung Yu / CYE
+
+@source:gm1000.cpp
+gm1000                          //
 
 @source:gmaster.cpp
 gmaster                         // Hartung Gamemaster
@@ -16252,6 +16266,7 @@ vidchal                         // Select Merchandise
 cambrp                          // Sinclair
 mbaskb                          // Mattel
 mhockey                         // Mattel
+mhockeya                        // Mattel
 msoccer                         // Mattel
 qkracerm                        // National Semiconductor
 qkspeller                       // National Semiconductor
@@ -16280,6 +16295,7 @@ eturtles                        // Entex
 gckong                          // Gakken
 gdigdug                         // Gakken
 ghalien                         // Gakken
+gscobra                         // Gakken
 kingman                         // Tomy
 machiman                        // Bandai
 msthawk                         // Mattel
@@ -16545,6 +16561,7 @@ ti1270                          // Texas Instruments
 ti1680                          // Texas Instruments
 ti25503                         // Texas Instruments
 ti30                            // Texas Instruments
+ti5100                          // Texas Instruments
 tibusan                         // Texas Instruments
 timaze                          // Texas Instruments
 tiprog                          // Texas Instruments
@@ -19128,6 +19145,7 @@ fnkyfish                        // (c) 1981 Sun Electronics
 kangaroo                        // (c) 1982 Sun Electronics
 kangarooa                       // 136008           (c) 1982 Atari
 kangaroob                       // (bootleg)
+kangarool                       // (c) 1982 Sun Electronics (Loewen Automaten license)
 
 @source:karnov.cpp
 chelnov                         // (c) 1988 Data East USA (World)
@@ -19560,6 +19578,13 @@ gtfrk11m                        // 2004 - Guitar Freaks 11th Mix (G*D39 VER. JAA
 gtfrk3ma                        // 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAB)
 gtfrk3mb                        // 2000 - Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)
 gtrfrk2m                        // 1999 - Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD)
+gtrfrk2ma                       // 1999 - Guitar Freaks 2nd Mix (GQ883 VER. EAA)
+gtrfrk2mua                      // 1999 - Guitar Freaks 2nd Mix (GQ883 VER. UAA)
+gtrfrk2mja                      // 1999 - Guitar Freaks 2nd Mix (GQ883 VER. JAA)
+gtrfrk2mka                      // 1999 - Guitar Freaks 2nd Mix (GQ883 VER. KAA)
+gtrfrk2maa                      // 1999 - Guitar Freaks 2nd Mix (GQ883 VER. AAA)
+gtrfrk2ml1                      // 1999 - Guitar Freaks Link Kit 1 (GE929 VER. JAA)
+gtrfrk2ml2                      // 1999 - Guitar Freaks Link Kit 2 (GC929 VER. JBB)
 gtrfrk3m                        // 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAC)
 gtrfrk4m                        // 2000 - Guitar Freaks 4th Mix (G*A24 VER. JAA)
 gtrfrk5m                        // 2001 - Guitar Freaks 5th Mix (G*A26 VER. JAA)
@@ -19568,10 +19593,14 @@ gtrfrk7m                        // 2001 - Guitar Freaks 7th Mix (G*B17 VER. JAA)
 gtrfrk8m                        // 2002 - Guitar Freaks 8th Mix power-up ver. (G*C08 VER. JBA)
 gtrfrk8ma                       // 2002 - Guitar Freaks 8th Mix (G*C08 VER. JAA)
 gtrfrk9m                        // 2003 - Guitar Freaks 9th Mix (G*C39 VER. JAA)
-gtrfrks                         // 1999 - Guitar Freaks (GQ886 VER. EAC)
-gtrfrksa                        // 1999 - Guitar Freaks (GQ886 VER. AAC)
-gtrfrksj                        // 1999 - Guitar Freaks (GQ886 VER. JAC)
-gtrfrksu                        // 1999 - Guitar Freaks (GQ886 VER. UAC)
+gtrfrks                         // 1999 - Guitar Freaks Ver 1.01 (GQ886 VER. EAD)
+gtrfrksa                        // 1999 - Guitar Freaks Ver 1.01 (GQ886 VER. AAD)
+gtrfrksj                        // 1999 - Guitar Freaks Ver 1.01 (GQ886 VER. JAD)
+gtrfrksu                        // 1999 - Guitar Freaks Ver 1.01 (GQ886 VER. UAD)
+gtrfrksc                        // 1999 - Guitar Freaks (GQ886 VER. EAC)
+gtrfrksac                       // 1999 - Guitar Freaks (GQ886 VER. AAC)
+gtrfrksjc                       // 1999 - Guitar Freaks (GQ886 VER. JAC)
+gtrfrksuc                       // 1999 - Guitar Freaks (GQ886 VER. UAC)
 gunmania                        // 2000 - GunMania (GL906 VER. JAA)
 strgchmp                        // 1997 - Steering Champ (GQ710 97/12/18 VER. UAA)
 hndlchmp                        // 1997 - Handle Champ (GQ710 97/12/18 VER. SAA)
@@ -20092,6 +20121,8 @@ trojanr                         // 4/1986 (c) 1986 + Romstar
 
 @source:lwriter.cpp
 lwriter                         // Apple LaserWriter
+lwriterplus                     // Apple LaserWriter Plus
+lwriter2nt                      // Apple LaserWriter II NT
 
 @source:lynx.cpp
 lynx                            // Atari Lynx Handheld
@@ -20442,6 +20473,7 @@ magictga                        // (c) 199? Acclaim
 
 @source:magmax.cpp
 magmax                          // (c) 1985
+magmaxa                         // (c) 1985
 
 @source:magnum.cpp
 magnum                          //
@@ -23543,6 +23575,7 @@ bublpong                        // bootleg on enhanced hardware
 missb2                          // bootleg on enhanced hardware
 
 @source:missbamby.cpp
+basket                          // (c) 198? IGOA S.A.
 goldfrts                        //
 gwinner                         // (c) 1983 Reben
 luckyplr                        // (c) 1981 Cirsa
@@ -31432,6 +31465,7 @@ swcourtb                        // bootleg (Playmark?)
 swcourtj                        // (c) 1992 (Japan)
 tinklpit                        // (c) 1993 (Japan)
 xday2                           // (c) 1995 (Japan)
+zelos                           // (c) 199? (Japan)
 
 @source:namconb1.cpp
 gslgr94j                        // (c) 1994 (Japan)
@@ -31507,6 +31541,7 @@ tekken51b                       //
 tekken5d                        //
 timecrs3                        //
 timecrs3e                       //
+timecrs3u                       //
 timecrs4                        //
 timecrs4j                       //
 vnight                          //
@@ -31851,6 +31886,7 @@ alpilotj                        // 1999.03 Airline Pilots (Japan, Rev A)
 alpilot                         // 1999.?? Airline Pilots (World, Rev B)
 anmlbskt                        // 2005.01 Animal Basket (date is inside of ROM, probably earlier than release)
 anmlbskta                       // 2005.01 Animal Basket (date is inside of ROM, probably earlier than release)
+anpanman2                       // 2003.09 Soreike! Anpanman Popcorn Koujou 2 (Rev C)
 asndynmt                        // 2007.07 Dynamite Deka EX - Asian dynamite
 asndynmto                       // 2007.07 Dynamite Deka EX - Asian dynamite (older)
 ausfache                        // 2008.02.20 Akatsuki Blitzkampf Ausf. Achse
@@ -33354,6 +33390,9 @@ onetwoe                         // (c) 1997 Barko
 c5000                           // 1981
 c8002                           //
 
+@source:opercoin.cpp
+multibaby                       // (c) 1990 oper Coin
+
 @source:opwolf.cpp
 opwolf                          // B20 (c) 1987 Taito Corporation Japan (World)
 opwolfa                         // B20 (c) 1987 Taito Corporation Japan (World)
@@ -34637,6 +34676,7 @@ ketarrs151                      // hack
 ketb                            //
 ketbl                           //
 killbld                         // (c) 1998 The Killing Blade
+killbld100                      //
 killbld104                      //
 killbld106                      //
 killbldp                        // (c) 2004 Killing Blade Plus
@@ -34709,6 +34749,7 @@ puzzli2s                        // (c) 2001 Puzzli 2 Super
 py2k2                           // (c) 2001 Photo Y2K2 (M101XX)
 py2k2100                        // (c) 2000 Photo Y2K2 (ver. 100)
 svg                             // (c) 2003 Spectral vs Generation
+svghk                           //
 svgpcb                          //
 svgtw                           //
 theglad                         // (c) 2003 The Gladiator
@@ -35660,6 +35701,9 @@ pv9234                          //
 @source:pve500.cpp
 pve500                          // SONY PVE-500
 
+@source:pwp14.cpp
+pwp14                           // Smith Corona PWP System 14
+
 @source:pwrview.cpp
 pwrview                         // Compugraphic MCS PowerView 10
 
@@ -35792,6 +35836,9 @@ rabbit                          // (c) 1997 Electronic Arts
 rabbita                         // (c) 1996 Electronic Arts
 rabbitj                         // (c) 1997 Electronic Arts
 rabbitjt                        // (c) 1996 Electronic Arts
+
+@source:radikaldarts.cpp
+radikaldrt                      // (c) 2011? Gaelco Darts
 
 @source:radio86.cpp
 impuls03                        //
@@ -36015,7 +36062,9 @@ rf51w14cg                       // (c) 2003 Recreativos Franco
 unkrfslt                        //
 
 @source:rfslotsmcs48.cpp
-ajofrin                         // (c) 198? Recreativos Franco
+ajofrin                         // (c) 1981 Recreativos Franco
+babyfrts                        // (c) 198? Recreativos Franco
+babyfrts25                      // (c) 198? recreativos Franco
 
 @source:rfslotspcpent.cpp
 rfsantafeg                      // (c) 2014 Recreativos Franco
@@ -36866,6 +36915,7 @@ sauroa                          // (c) 1987
 saurob                          // (c) 1987 bootleg
 saurop                          // (c) 1987
 saurorr                         // (c) 1987
+seawolft                        // (c) 1987 Tecfri
 trckydoc                        // (c) 1987
 trckydoca                       // (c) 1987
 
@@ -38383,6 +38433,7 @@ rolla                           //
 score5                          // Z Games
 skylncr                         // (c) 1995 Bordun International
 sonikfig                        // Z Games
+speedway                        //
 sstar97                         // (c) 199? Bordun International
 superb2k                        // Random Games
 tigerslt                        // Bootleg?
@@ -39852,7 +39903,8 @@ nprincesu                       // 834-5677 (c) 1985 (S1)
 pitfall2                        // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
 pitfall2a                       // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
 pitfall2u                       // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
-raflesia                        // 834-5753 (c) 1985 Coreland / Sega (S1)
+raflesia                        // 834-5753 (c) 1986 Coreland / Sega (S1)
+raflesiau                       // 834-5191 (c) 1986 Coreland / Sega (S1)
 regulus                         // 834-5328?(c) 1983 (S1)
 reguluso                        // 834-5328?(c) 1983 (S1)
 regulusu                        // 834-5328?(c) 1983 (S1)
@@ -39986,6 +40038,7 @@ zarza1                          //
 ashura                          // C43 (c) 1990 Taito Corporation Japan (World)
 ashuraj                         // C43 (c) 1990 Taito Corporation (Japan)
 ashurau                         // C43 (c) 1990 Taito America Corporation (US)
+bublbust                        // ??? (c) 1994 Taito America Corporation (US)
 crimec                          // B99 (c) 1989 Taito Corporation Japan (World)
 crimecj                         // B99 (c) 1989 Taito Corporation (Japan)
 crimecu                         // B99 (c) 1989 Taito America Corporation (US)
@@ -40105,6 +40158,7 @@ bublbob2                        // 1994.?? D90 (c) 1994 Taito Corporation Japan 
 bublbob2o                       // 1994.?? D90 (c) 1994 Taito Corporation Japan (World)
 bublbob2p                       // prototype
 bubsymphb                       // bootleg
+bubsymphba                      // bootleg
 bubsymphe                       // 1994.?? D90 (c) 1994 Taito Corporation Japan (Europe)
 bubsymphj                       // 1994.10 D90 (c) 1994 Taito Corporation (Japan)
 bubsymphu                       // 1994.10 D90 (c) 1994 Taito America Corporation (US)
@@ -40292,8 +40346,9 @@ spacegunj                       // C57 (c) 1990 Taito Corporation (Japan)
 spacegunu                       // C57 (c) 1990 Taito America Corporation (US)
 
 @source:taitoair.cpp
-ainferno                        // C45 (c) 1990 Taito America Corporation (US)
+ainferno                        // C45 (c) 1990 Taito Corporation Japan (World)
 ainfernoj                       // C45 (c) 1990 Taito Corporation (Japan)
+ainfernou                       // C45 (c) 1990 Taito America Corporation (US)
 topland                         // B62 (c) 1988 Taito Corporation Japan (World)
 toplandj                        // B62 (c) 1988 Taito Corporation (Japan)
 
@@ -42056,11 +42111,13 @@ mocapbj                         // 2001
 mocapglf                        // 2001
 p911                            // 2001
 p9112                           // 2001
-p911e                           // 2001
+p911ac                          // 2001
 p911ea                          // 2001
+p911ed                          // 2001
 p911j                           // 2001
+p911k                           // 2001
 p911kc                          // 2001
-p911uc                          // 2001
+p911ud                          // 2001
 ppp2nd                          // 2001
 ppp2nda                         // 2001
 sogeki                          // 2001
@@ -43404,6 +43461,14 @@ mu100                           // 1997 MU-100
 mu100r                          // 1997 MU-100 Rackable version
 mu100b                          // 1998 MU-100B
 
+@source:ympsr16.cpp
+psr16                           // 1988 PSR-16
+psr36                           // 1988 PSR-36
+pss680                          // 1988 PSS-680
+
+@source:ympsr40.cpp
+psr40                           // 1985 PSR-40
+
 @source:ympsr60.cpp
 psr60                           // 1985 PSR-60
 psr70                           // 1985 PSR-70
@@ -43792,16 +43857,16 @@ simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
 
 @source:gsz80.cpp
-gsz80
+gsz80                           // Grant Searle's Simple Z-80 Machine
 
 @source:gscpm.cpp
-gscpm
+gscpm                           // Grant Searle's Simple CP/M Machine
 
 @source:gs6502.cpp
-gs6502
+gs6502                          // Grant Searle's Simple 6502 Machine
 
 @source:gs6809.cpp
-gs6809
+gs6809                          // Grant Searle's Simple 6809 Machine
 
 @source:ultim809.cpp
 ultim809
