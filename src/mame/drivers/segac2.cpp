@@ -61,6 +61,7 @@
     TODO:   - Puyo Puyo ends up with a black screen after doing memory tests
             - Battery-backed RAM needs to be figured out
             - Correct ROM labels for: ssonicbr, ooparts, headonch
+            - Does ooparts have a sample ROM?
 
     Thanks: (in no particular order) to any MameDev that helped me out .. (OG, Mish etc.)
             Charles MacDonald for his C2Emu .. without it working out what were bugs in my code
@@ -2159,7 +2160,7 @@ ROM_START( tantrbl4 ) // extremely similar to tantrbl, but in this one the card 
 ROM_END
 
 
-ROM_START( ooparts )
+ROM_START( ooparts ) // hack: modified to be playable with digital joystick
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ooparts.ic32", 0x000000, 0x080000, CRC(8dcf2940) SHA1(f72630e8a26e7f2089da56878a1599268c355246) )
 	ROM_LOAD16_BYTE( "ooparts.ic31", 0x000001, 0x080000, CRC(35381899) SHA1(524f6e1b1292542079589275e20f45c2eb68605c) )
@@ -2167,7 +2168,7 @@ ROM_START( ooparts )
 	ROM_LOAD16_BYTE( "ooparts.ic33", 0x100001, 0x080000, CRC(42755dc2) SHA1(cd0aa79418b922266c5d41bf24b9136f9f105dc5) )
 
 	ROM_REGION( 0x040000, "upd", 0 )
-	ROM_LOAD( "ooparts.ic4", 0x000000, 0x040000, CRC(e09961f6) SHA1(e109b5f41502b765d191f22e3bbcff97d6defaa1) )
+	ROM_LOAD( "ooparts.ic4", 0x000000, 0x040000, NO_DUMP )
 ROM_END
 
 
@@ -2854,7 +2855,7 @@ GAME( 1991, soniccar,   0,        segac2,     soniccar, segac2_state,    init_no
 
 GAME( 1992, ssonicbr,   0,        segac2,     ssonicbr, segac2_state,    init_noprot,   ROT0,   "hack", "SegaSonic Bros. (prototype, hack)", 0 )
 
-GAME( 1992, ooparts,    0,        segac2,     ooparts,  segac2_state,    init_noprot,   ROT270, "Success", "OOPArts (prototype, joystick version)", 0 )
+GAME( 1992, ooparts,    0,        segac2,     ooparts,  segac2_state,    init_noprot,   ROT270, "hack", "OOPArts (prototype, joystick hack)", 0 )
 
 GAME( 1992, puyo,       0,        segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (World)", 0 )
 GAME( 1992, puyobl,     puyo,     segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "bootleg", "Puyo Puyo (World, bootleg)", 0 )
