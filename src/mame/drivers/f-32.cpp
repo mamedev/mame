@@ -108,7 +108,7 @@ public:
 		fe132_state(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_hopper(*this, "hopper"),
-		m_lamps(*this, "lamps%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void royalpk2(machine_config &config);
