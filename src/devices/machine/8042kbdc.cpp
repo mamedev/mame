@@ -407,9 +407,17 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 					m_mouse.from_transmit = 0;
 					m_mouse.to_transmit = 0;
 					m_mouse.reporting = false;
-					mouse_enqueue(0xfa);
-					mouse_enqueue(0xaa);
-					mouse_enqueue(0x00);
+					if (m_mouse.on)
+					{
+						mouse_enqueue(0xfa);
+						mouse_enqueue(0xaa);
+						mouse_enqueue(0x00);
+					}
+					else
+					{
+						m_mouse.received = 1;
+						m_data = 0xfa;
+					}
 					break;
 				case 0xf6:
 					mouse_enqueue(0xfa);
