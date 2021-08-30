@@ -42,7 +42,7 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 			m_textures[page] = bgfx::createTexture2D(m_width, m_height, false, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
 			assert(m_textures[page].idx != 0xffff);
 
-			m_textures[m_page_count + page] = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D24, depth_flags | BGFX_TEXTURE_RT);
+			m_textures[m_page_count + page] = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D32F, depth_flags | BGFX_TEXTURE_RT);
 			assert(m_textures[m_page_count + page].idx != 0xffff);
 
 			bgfx::TextureHandle handles[2] = { m_textures[page], m_textures[m_page_count + page] };
@@ -72,7 +72,7 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 	, m_page_count(0)
 {
 	m_targets = new bgfx::FrameBufferHandle[1];
-	m_targets[0] = bgfx::createFrameBuffer(handle, width, height, bgfx::TextureFormat::Count, bgfx::TextureFormat::D24);
+	m_targets[0] = bgfx::createFrameBuffer(handle, width, height, bgfx::TextureFormat::Count, bgfx::TextureFormat::D32F);
 
 	// No backing texture
 }
