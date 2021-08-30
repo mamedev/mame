@@ -10763,7 +10763,7 @@ ROM_START( komemokos ) // Hack of the Cirsa bootleg (pacmanblci) titled Komemoko
 	ROM_COPY( "tempgfx", 0x1000, 0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "nmi6331.bin ", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "nmi6331.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( ghostmun )
