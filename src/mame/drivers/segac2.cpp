@@ -70,24 +70,24 @@
             Razoola & Antiriad .. for helping teach me some 68k ASM needed to work out just why
                 the games were crashing :)
             Sega for producing some Fantastic Games...
-            The Japanese magazine that proudly previewed OOParts as "FARTS"
+            The Japanese magazine that proudly previewed OOPArts as "FARTS"
             and anyone else who knows they've contributed :)
 
 ***********************************************************************************************/
 
-
 #include "emu.h"
-#include "includes/megadriv.h"
 #include "includes/segaipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
-#include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/upd7759.h"
 #include "sound/ymopn.h"
+#include "video/315_5313.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -103,20 +103,21 @@ namespace {
 
 typedef device_delegate<int (int in)> segac2_prot_delegate;
 
-// does this need to inherit from md_base? really we only need the VDP and some basics like the maincpu
-class segac2_state : public md_base_state
+class segac2_state : public driver_device
 {
 public:
 	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: md_base_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_paletteram(*this, "paletteram")
-		, m_upd_region(*this, "upd")
-		, m_prot_func(*this)
-		, m_sound_banks(0)
-		, m_upd7759(*this, "upd")
+		, m_vdp(*this, "gen_vdp")
 		, m_screen(*this, "screen")
+		, m_upd_region(*this, "upd")
+		, m_upd7759(*this, "upd")
+		, m_ymsnd(*this, "ymsnd")
 		, m_palette(*this, "palette")
 		, m_io(*this, "io")
+		, m_prot_func(*this)
 	{ }
 
 	void segac2(machine_config &config);
@@ -152,8 +153,15 @@ protected:
 
 	int m_segac2_enable_display;
 
+	required_device<m68000_base_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_paletteram;
+	required_device<sega315_5313_device> m_vdp;
+	required_device<screen_device> m_screen;
 	optional_memory_region m_upd_region;
+	optional_device<upd7759_device> m_upd7759;
+	required_device<ym3438_device> m_ymsnd;
+	required_device<palette_device> m_palette;
+	required_device<sega_315_5296_device> m_io;
 
 	/* protection-related tracking */
 	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
@@ -169,7 +177,7 @@ protected:
 	/* sound-related variables */
 	uint8_t       m_sound_banks;      /* number of sound banks */
 
-	void segac2_common_init(segac2_prot_delegate prot_func);
+	void set_prot_func(segac2_prot_delegate prot_func) { m_prot_func = prot_func; }
 
 	uint32_t screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_segac2_bg_pal_lookup[4];
@@ -179,12 +187,13 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
+	IRQ_CALLBACK_MEMBER(int_callback);
 
 	uint8_t io_portc_r();
 	void io_portd_w(uint8_t data);
 	void io_porth_w(uint8_t data);
 
-	void segac2_upd7759_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void segac2_upd7759_w(uint8_t data);
 	uint16_t palette_r(offs_t offset);
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void control_w(uint8_t data);
@@ -193,10 +202,6 @@ protected:
 	void counter_timer_w(uint8_t data);
 	uint16_t ichirjbl_prot_r();
 	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
-	optional_device<upd7759_device> m_upd7759;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<sega_315_5296_device> m_io;
 
 	int prot_func_dummy(int in);
 	int prot_func_columns(int in);
@@ -217,7 +222,8 @@ protected:
 	int prot_func_puyopuy2(int in);
 	int prot_func_zunkyou(int in);
 
-	void main_map(address_map &map);
+	void segac_map(address_map &map);
+	void segac2_map(address_map &map);
 };
 
 
@@ -265,12 +271,7 @@ private:
 
 
 /******************************************************************************
-    Machine init
-*******************************************************************************
-
-    This is called at init time, when it's safe to create a timer. We use
-    it to prime the scanline interrupt timer.
-
+    Machine start/reset
 ******************************************************************************/
 
 void segac2_state::machine_start()
@@ -278,14 +279,23 @@ void segac2_state::machine_start()
 	save_item(NAME(m_prot_write_buf));
 	save_item(NAME(m_prot_read_buf));
 
+	// determine how many sound banks
+	if (m_upd_region != nullptr)
+		m_sound_banks = m_upd_region->bytes() / 0x20000;
+	else
+		m_sound_banks = 0;
+
+	// init the VDP
+	m_vdp->set_use_cram(0); // C2 uses its own palette ram
+	m_vdp->set_vdp_pal(false);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(262);
 	m_vdp->stop_timers();
 }
 
 
 void segac2_state::machine_reset()
 {
-//  megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
-//  megadriv_scanline_timer->adjust(attotime::zero);
 	m_segac2_bg_pal_lookup[0] = 0x00;
 	m_segac2_bg_pal_lookup[1] = 0x10;
 	m_segac2_bg_pal_lookup[2] = 0x20;
@@ -297,13 +307,6 @@ void segac2_state::machine_reset()
 	m_segac2_sp_pal_lookup[3] = 0x30;
 
 	m_vdp->device_reset_old();
-
-	/* determine how many sound banks */
-	m_sound_banks = 0;
-	if (m_upd_region != nullptr)
-	{
-		m_sound_banks = m_upd_region->bytes() / 0x20000;
-	}
 
 	/* reset the protection */
 	m_prot_write_buf = 0;
@@ -332,19 +335,11 @@ void segac2_state::machine_reset()
 ******************************************************************************/
 
 /* handle writes to the UPD7759 */
-void segac2_state::segac2_upd7759_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void segac2_state::segac2_upd7759_w(uint8_t data)
 {
-	/* make sure we have a UPD chip */
-	if (m_upd7759 == nullptr)
-		return;
-
-	/* only works if we're accessing the low byte */
-	if (ACCESSING_BITS_0_7)
-	{
-		m_upd7759->port_w(data & 0xff);
-		m_upd7759->start_w(0);
-		m_upd7759->start_w(1);
-	}
+	m_upd7759->port_w(data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
 }
 
 
@@ -676,7 +671,7 @@ void pclub_state::print_club_camera_w(uint16_t data)
 
 ******************************************************************************/
 
-void segac2_state::main_map(address_map &map)
+void segac2_state::segac_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x800001, 0x800001).mirror(0x13fdfe).rw(FUNC(segac2_state::prot_r), FUNC(segac2_state::prot_w));
@@ -687,6 +682,12 @@ void segac2_state::main_map(address_map &map)
 	map(0x8c0000, 0x8c0fff).mirror(0x13f000).rw(FUNC(segac2_state::palette_r), FUNC(segac2_state::palette_w)).share("paletteram");
 	map(0xc00000, 0xc0001f).mirror(0x18ff00).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xe00000, 0xe0ffff).mirror(0x1f0000).ram().share("nvram");
+}
+
+void segac2_state::segac2_map(address_map &map)
+{
+	segac_map(map);
+	map(0x880000, 0x880001).mirror(0x13fefe).w(FUNC(segac2_state::segac2_upd7759_w)).umask16(0x00ff);
 }
 
 
@@ -1647,30 +1648,14 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Sound interfaces
-******************************************************************************/
-
-WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
-{
-	//printf("sound irq %d\n", state);
-	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-/******************************************************************************
-    Machine Drivers
+    Screen update
 *******************************************************************************
 
-    General Overview
-        M68000 @ 10MHz (Main Processor)
-        YM3438 (Fm Sound)
-        SN76489 (PSG, Noise, Part of the VDP)
-        UPD7759 (Sample Playback, C-2 Only)
+    C2 doesn't use the internal VDP CRAM, instead it uses the digital
+    output of the chip and applies it's own external colour circuity.
 
 ******************************************************************************/
 
-// C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
-//  and applies it's own external colour circuity
 uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
@@ -1728,6 +1713,16 @@ uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rg
 }
 
 
+/******************************************************************************
+    Interrupt handling
+******************************************************************************/
+
+WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
+{
+	//printf("sound irq %d\n", state);
+	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
 WRITE_LINE_MEMBER(segac2_state::vdp_sndirqline_callback_c2)
 {
@@ -1750,18 +1745,39 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-/*
+/* Callback when the 68k takes an IRQ */
+IRQ_CALLBACK_MEMBER(segac2_state::int_callback)
+{
+	if (irqline == 4)
+		m_vdp->vdp_clear_irq4_pending();
+
+	return (0x60 + irqline * 4) / 4; // vector address
+}
+
+
+/******************************************************************************
+    Machine Drivers
+*******************************************************************************
+
+    General Overview
+        M68000 @ 10MHz (Main Processor)
+        YM3438 (Fm Sound)
+        SN76489 (PSG, Noise, Part of the VDP)
+        UPD7759 (Sample Playback, C-2 Only)
+
     sound output balance (tfrceac)
     reference 1: https://youtu.be/AOmeWp9qe5E
     reference 2: https://youtu.be/Tq8VkJYmij8
     reference 3: https://youtu.be/VId_HWdNuyA
-*/
+
+******************************************************************************/
+
 void segac2_state::segac(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XL2_CLOCK/6);
-	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::main_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::segac_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(segac2_state::int_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
@@ -1794,16 +1810,15 @@ void segac2_state::segac(machine_config &config)
 	m_screen->set_size(512, 262);
 	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
 	m_screen->set_screen_update(FUNC(segac2_state::screen_update_segac2_new));
-	m_screen->screen_vblank().set(FUNC(segac2_state::screen_vblank_megadriv));
 
 	PALETTE(config, m_palette).set_entries(2048*3);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym3438_device &ymsnd(YM3438(config, "ymsnd", XL2_CLOCK/7));
-	ymsnd.irq_handler().set(FUNC(segac2_state::segac2_irq2_interrupt));
-	ymsnd.add_route(0, "mono", 0.50);
+	YM3438(config, m_ymsnd, XL2_CLOCK/7);
+	m_ymsnd->irq_handler().set(FUNC(segac2_state::segac2_irq2_interrupt));
+	m_ymsnd->add_route(0, "mono", 0.50);
 	/* right channel not connected */
 }
 
@@ -1812,6 +1827,7 @@ void segac2_state::segac2(machine_config &config)
 	segac(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::segac2_map);
 	subdevice<sega_315_5296_device>("io")->out_cnt1_callback().set(m_upd7759, FUNC(upd7759_device::reset_w));
 
 	/* sound hardware */
@@ -2435,15 +2451,6 @@ it should be, otherwise I don't see how the formula could be computed.
 
 ******************************************************************************/
 
-void segac2_state::segac2_common_init(segac2_prot_delegate prot_func)
-{
-	init_megadriv_c2();
-	m_prot_func = prot_func;
-
-	if (m_upd7759 != nullptr)
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, 0, write16s_delegate(*this, FUNC(segac2_state::segac2_upd7759_w)));
-}
-
 int segac2_state::prot_func_dummy(int in)
 {
 	return 0x0;
@@ -2671,25 +2678,24 @@ int pclub_state::prot_func_pclubjv5(int in)
 }
 
 
-
 void segac2_state::init_noprot()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_dummy)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_dummy)));
 }
 
 void segac2_state::init_columns()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_columns)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_columns)));
 }
 
 void segac2_state::init_columns2()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_columns2)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_columns2)));
 }
 
 void segac2_state::init_tfrceac()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_tfrceac)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_tfrceac)));
 }
 
 void segac2_state::init_tfrceacb()
@@ -2702,62 +2708,62 @@ void segac2_state::init_tfrceacb()
 
 void segac2_state::init_borench()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_borench)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_borench)));
 }
 
 void segac2_state::init_twinsqua()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_twinsqua)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_twinsqua)));
 }
 
 void segac2_state::init_ribbit()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ribbit)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ribbit)));
 }
 
 void segac2_state::init_puyo()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_puyo)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_puyo)));
 }
 
 void segac2_state::init_tantr()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_tantr)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_tantr)));
 }
 
 void segac2_state::init_tantrkor()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_tantrkor)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_tantrkor)));
 }
 
 void segac2_state::init_potopoto()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_potopoto)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_potopoto)));
 }
 
 void segac2_state::init_stkclmns()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_stkclmns)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_stkclmns)));
 }
 
 void segac2_state::init_stkclmnj()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_stkclmnj)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_stkclmnj)));
 }
 
 void segac2_state::init_ichir()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ichir)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ichir)));
 }
 
 void segac2_state::init_ichirk()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ichirk)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ichirk)));
 }
 
 void segac2_state::init_ichirj()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ichirj)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ichirj)));
 }
 
 uint16_t segac2_state::ichirjbl_prot_r()
@@ -2774,12 +2780,12 @@ void segac2_state::init_ichirjbl()
 
 void segac2_state::init_puyopuy2()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_puyopuy2)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_puyopuy2)));
 }
 
 void segac2_state::init_zunkyou()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_zunkyou)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_zunkyou)));
 }
 
 void pclub_state::init_pclub()
@@ -2791,25 +2797,25 @@ void pclub_state::init_pclub()
 
 void pclub_state::init_pclubj()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(pclub_state::prot_func_pclub)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(pclub_state::prot_func_pclub)));
 	init_pclub();
 }
 
 void pclub_state::init_pclubjv2()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(pclub_state::prot_func_pclubjv2)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(pclub_state::prot_func_pclubjv2)));
 	init_pclub();
 }
 
 void pclub_state::init_pclubjv4()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(pclub_state::prot_func_pclubjv4)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(pclub_state::prot_func_pclubjv4)));
 	init_pclub();
 }
 
 void pclub_state::init_pclubjv5()
 {
-	segac2_common_init(segac2_prot_delegate(*this, FUNC(pclub_state::prot_func_pclubjv5)));
+	set_prot_func(segac2_prot_delegate(*this, FUNC(pclub_state::prot_func_pclubjv5)));
 	init_pclub();
 }
 
