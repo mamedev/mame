@@ -39,7 +39,7 @@ enum class endianness
 //  MACROS AND INLINE FUNCTIONS
 //**************************************************************************
 
-constexpr std::string_view endian_to_string_view(endianness e) { return e == endianness::little ? "little" : "big"; }
+constexpr std::string_view endian_to_string_view(endianness e) { using namespace std::literals; return e == endianness::little ? "little"sv : "big"sv; }
 
 // endian-based value: first value is if native endianness is little-endian, second is if native is big-endian
 #define NATIVE_ENDIAN_VALUE_LE_BE(leval,beval)  ((util::endianness::native == util::endianness::little) ? (leval) : (beval))
