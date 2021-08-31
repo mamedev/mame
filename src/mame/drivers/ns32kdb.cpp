@@ -9,7 +9,6 @@
  *
  * TODO:
  *   - clock/timer routing
- *   - cassette interface
  *   - nmi/reset switches, layout
  *   - multibus interface
  */
@@ -33,6 +32,8 @@
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
+#include "speaker.h"
+#include "imagedev/cassette.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -52,6 +53,7 @@ public:
 		, m_ppi(*this, "ppi")
 		, m_pit(*this, "pit")
 		, m_sdm(*this, "sdm%u", 0U)
+		, m_cass(*this, "cassette")
 		, m_cfg(*this, "S3")
 		, m_led(*this, "DS%u", 0U)
 	{
@@ -81,9 +83,13 @@ protected:
 
 	// serial port diagnostic multiplexers
 	required_device_array<ls157_device, 2> m_sdm;
+	required_device<cassette_image_device> m_cass;
 
 	required_ioport m_cfg;
 	output_finder<4> m_led;
+private:
+	u8 pa_r();
+	void pb_w(u8);
 };
 
 void ns32kdb_state::machine_start()
@@ -160,6 +166,16 @@ static INPUT_PORTS_START(db32016)
 	PORT_DIPSETTING(0x0f, "50")
 INPUT_PORTS_END
 
+void ns32kdb_state::pb_w(u8 data)
+{
+	m_cass->output(BIT(data, 0) ? 1.0 : -1.0);
+}
+
+u8 ns32kdb_state::pa_r()
+{
+	return (m_cass->input() > 0.03) ? 0xfe : 0xff;
+}
+
 void ns32kdb_state::db32016(machine_config &config)
 {
 	NS32016(config, m_cpu, 10_MHz_XTAL);
@@ -176,6 +192,8 @@ void ns32kdb_state::db32016(machine_config &config)
 	m_icu->out_int().set_inputline(m_cpu, INPUT_LINE_IRQ0).invert();
 
 	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(ns32kdb_state::pa_r));
+	m_ppi->out_pb_callback().set(FUNC(ns32kdb_state::pb_w));
 
 	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(18.432_MHz_XTAL / 150);
@@ -225,6 +243,12 @@ void ns32kdb_state::db32016(machine_config &config)
 	m_sdm[1]->out_callback().append(m_pci[1], FUNC(i8251_device::write_rxd)).bit(1);
 	//m_sdm[1]->out_callback().append(m_pci[1], FUNC(i8251_device::write_txc)).bit(2);
 	//m_sdm[1]->out_callback().append(m_pci[1], FUNC(i8251_device::write_rxc)).bit(3);
+
+	/* Cassette */
+	SPEAKER(config, "mono").front_center();
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 ROM_START(db32016)
