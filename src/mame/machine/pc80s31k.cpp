@@ -8,7 +8,27 @@
 	
 	"Mini" as compared to the PC-8881 8-inch floppy I/F
 
-	Design is decidedly derived from Epson TF-20, cfr. devices/bus/epson_sio/tf20.cpp
+	Design is decidedly derived from Epson TF-20 and friends,
+	cfr. devices/bus/epson_sio/tf20.cpp
+
+	TODO:
+	- What's PC-80S32? Is it the 88VA version or a different beast?
+	- PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn), 
+	  expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
+	  Are those incorrectly identified as 2DD? Hacked to work for now;
+	- set_input_line_vector fn doesn't work properly when issued from a device_reset, 
+	  we currently just implement the irq_callback instead;
+	- Bus option;
+	- Cascade mode, i.e. the CN2 connector used to accept a second disk unit for drive 2 & 3;
+	- pc80s31k: verify that irq vector write (I/O port $f0) belongs here or just
+	  whatever PC88VA uses.
+	- printer interface (used for debugging? 4-bit serial?)
+
+===================================================================================================
+
+PCB (PC-80S31K)
+
+===================================================================================================
 
 	|--------------------------------------|
 	|      P1 P2 P3         X1             |
@@ -34,22 +54,74 @@
 	(***) Given this, we guess that PC80S31 is the 2D version while the 'K
 	variant is the 2D/2DD/2HD version.
 
-	TODO:
-	- What's PC-80S32? Is it the 88VA version or a different beast?
-	- PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn), 
-	  expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
-	  Are those incorrectly identified as 2DD? Hacked to work for now;
-	- set_input_line_vector fn doesn't work properly when issued from a device_reset, 
-	  we currently just implement the irq_callback instead;
-	- Bus option;
-	- Cascade mode, i.e. the CN2 connector used to accept a second disk unit for drive 2 & 3;
-	- pc80s31k: verify that irq vector write (I/O port $f0) belongs here or whatever PC88VA uses.
+===================================================================================================
+
+Command Protocol
+
+===================================================================================================
+
+Command & parameters are normally communicated from Host via port B 
+(read on port A on FDC side)
+An RPi implementation can be seen at https://github.com/MinatsuT/RPi_PC-80S31
+
+[0x00] Initialize
+[0x01] Write to disk
+   %1  number of sectors
+   %2  drive number
+   %3  track number
+   %4  sector number +1
+[0x02] Read from disk
+   %1  number of sectors
+   %2  drive number
+   %3  track number
+   %4  sector number +1
+[0x03] Send data to host
+[0x04] Copy data in-place
+   %1  number of sectors
+   %2  source drive
+   %3  source track
+   %4  source sector number +1
+   %5  destination drive
+   %6  destination track
+   %7  destination sector number +1
+[0x05] Format
+   %1  drive number
+[0x06] Send result status to Host 
+       x--- ---- I/O complete
+	   -x-- ---- has unread buffer
+	   ---- ---x error occurred
+[0x07] Drive status
+[0x0b] Send memory data
+%1-%2  address start
+%3-%4  length
+[0x11] Fast write to disk
+   %1  number of sectors
+   %2  drive number
+   %3  track number
+   %4  sector number +1
+[0x12] Fast send data
+       (picks up number of sector etc. from previous issued commands?)
+[0x14] Device status
+       x--- ---- ESIG: error
+	   -x-- ---- WPDR: write protected
+	   --x- ---- RDY:  ready
+	   ---x ---- TRK0: track 0
+	   ---- x--- DSDR: double sided drive
+	   ---- -x-- HDDR: head
+	   ---- --xx DS1, DS2: drive select
+       (same as 765 ST3?)
+[0x17] Mode change
+   %1  ---- xxxx mode select
+
+FDC normally puts ST0-1-2 to RAM buffers $7f0d-f, CHRN data in $7f10-13
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "pc80s31k.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -180,11 +252,26 @@ void pc80s31_device::device_add_mconfig(machine_config &config)
 //  device_timer - device-specific timers
 //-------------------------------------------------
 
+
+
 void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id == 0);
 
 	m_fdc->tc_w(false);
+
+	// several games tries to scan invalid IDs from their structures, if this hits then 
+	// it's most likely an attempt to scan a missing sector from the floppy structure.
+	// cfr. acrojet: the third read data command issued tries to access a CHRN of (0, 0, 16, 256)
+	// and checks at PC=500B if any of these status flags are satisfied:
+	// ST0 & 0xdf
+	// ST1 & 0xff
+	// ST2 & 0x73
+	// Data doesn't matter, it also seems to have some activity to the printer port
+	// (debugging left on?)
+	if ((u8)m_fdc_cpu->state_int(Z80_HALT) == 1)
+		logerror("%s: attempt to trigger TC while in HALT state (read ID copy protection warning)", machine().describe_context());
+//		throw emu_fatalerror("copy protection hit");
 }
 
 //-------------------------------------------------
@@ -254,7 +341,7 @@ u8 pc80s31_device::host_portc_r()
 void pc80s31_device::host_portc_w(u8 data)
 {
 	machine().scheduler().synchronize();
-	logerror("%s: host port C write %02x  (ATN=%d DAC=%d RFD=%d DAV=%d)\n",
+	LOG("%s: host port C write %02x  (ATN=%d DAC=%d RFD=%d DAV=%d)\n",
 		machine().describe_context(),
 		data,
 		BIT(data, 7),
@@ -274,7 +361,7 @@ u8 pc80s31_device::fdc_portc_r()
 void pc80s31_device::fdc_portc_w(u8 data)
 {
 	machine().scheduler().synchronize();
-	logerror("%s: FDC port C write %02x  (DAC=%d RFD=%d DAV=%d)\n",
+	LOG("%s: FDC port C write %02x  (DAC=%d RFD=%d DAV=%d)\n",
 		machine().describe_context(),
 		data,
 		BIT(data, 6),
@@ -289,6 +376,7 @@ u8 pc80s31_device::terminal_count_r()
 	if (!machine().side_effects_disabled())
 	{
 		m_fdc->tc_w(true);
+		// TODO: accurate time of this going off
 		m_tc_zero_timer->adjust(attotime::from_usec(50));
 	}
 	// value is meaningless
@@ -297,7 +385,13 @@ u8 pc80s31_device::terminal_count_r()
 
 void pc80s31_device::motor_control_w(uint8_t data)
 {
-	// FIXME: on pc80s31k device (particularly on later releases) this stays always on 
+	// FIXME: on pc80s31k device (particularly on later releases) this stays always on
+	// babylon: just spins indefinitely at PC=6d8 (using the internal routines),
+	//			waiting for DAV or ATN being on. Never hits the port until a flag is issued.
+	// prajator: on idle times it spins at PC=7060, waiting for ATN and keep issuing a 0xff here.
+	// valis2: calls PC=7009 subroutine for idle, waits for ATN on.
+	//         It eventually writes a 0 here, not before an extremely long time
+	//         (~10000 frames!)
 	m_floppy[0]->get_device()->mon_w(!(data & 1));
 	m_floppy[1]->get_device()->mon_w(!(data & 2));
 	
@@ -325,7 +419,7 @@ ROM_START( pc80s31k )
 	ROMX_LOAD( "m2mr_disk.rom", 0x0000, 0x2000, CRC(2447516b) SHA1(1492116f15c426f9796dc2bb6fcccf2656c0ca75), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "mh",       "MH disk BIOS" )
 	ROMX_LOAD( "mh_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004), ROM_BIOS(2) )
-	// TODO: this may belong to PC80S32
+	// TODO: this may belong to PC-80S32
 	ROM_SYSTEM_BIOS( 3, "88va",     "PC88VA disk BIOS")
 	ROMX_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0), ROM_BIOS(3) )
 ROM_END
