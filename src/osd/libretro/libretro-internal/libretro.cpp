@@ -672,9 +672,14 @@ void retro_run (void)
       mfirst++;
       int res=mmain2(1,RPATH);
       if (log_cb)log_cb(RETRO_LOG_INFO,"RES:%d\n",res);
-      if(res==0 || res==-2)exit(0);
+      if (res !=0)
+      {
+         retro_pause=-1;
+         retro_load_ok=false;
+      } else {
+         retro_load_ok=true;
+      }
       if (log_cb)log_cb(RETRO_LOG_INFO,"MAIN FIRST\n");
-      retro_load_ok=true;
       update_runtime_variables();
       return;
    }

@@ -12,6 +12,7 @@ TARGET ?= mame
 PYTHON_EXECUTABLE ?= python
 REGENIE ?= 1
 GITHUB_REPO ?= https://github.com/libretro/mame/
+DEBUG ?= 0
 
 ###########################################################################
 #
@@ -75,10 +76,10 @@ ifneq ($(PYTHON_EXECUTABLE),)
 endif
 ifeq ($(DEBUG),1)
 	BUILDFLAGS += CONFIG=libretrodbg
+	BUILDFLAGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
 else
 	BUILDFLAGS += CONFIG=libretro
 endif
-
 
 ###########################################################################
 #

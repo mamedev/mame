@@ -27,6 +27,45 @@
 #include "modules/diagnostics/diagnostics_module.h"
 
 //============================================================
+// retro_output
+//============================================================
+static struct retro_message frontend_message;
+class retro_output : public osd_output
+{
+public:
+	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args) override
+	{
+		std::ostringstream buffer;
+		retro_log_level lvl;
+
+		util::stream_format(buffer, args);
+		
+		switch(channel) {
+			case OSD_OUTPUT_CHANNEL_ERROR:
+				frontend_message.msg    = buffer.str().c_str();
+  				frontend_message.frames = 60*5;
+  				environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &frontend_message);
+				lvl = RETRO_LOG_ERROR;
+				break;
+			case OSD_OUTPUT_CHANNEL_INFO:
+			case OSD_OUTPUT_CHANNEL_LOG:
+			case OSD_OUTPUT_CHANNEL_COUNT:
+				lvl = RETRO_LOG_INFO;
+				break;
+			case OSD_OUTPUT_CHANNEL_WARNING:
+				lvl = RETRO_LOG_WARN;
+				break;
+			case OSD_OUTPUT_CHANNEL_DEBUG:
+			case OSD_OUTPUT_CHANNEL_VERBOSE:
+				lvl = RETRO_LOG_DEBUG;
+				break;	
+		}
+		
+		log_cb(lvl, buffer.str().c_str());
+	}
+};
+
+//============================================================
 //  OPTIONS
 //============================================================
 
@@ -172,8 +211,16 @@ int mmain(int argc, char *argv[])
 
 	{
 		retro_global_osd =  new retro_osd_interface(retro_global_options);
+
+		retro_output retrooutput;
+		osd_output::push(&retrooutput);
+
 		retro_global_osd->register_options();
+
 		res =  emulator_info::start_frontend(retro_global_options, *retro_global_osd,args);
+		
+		osd_output::pop(&retrooutput);
+		
 		return res;
 	}
 
