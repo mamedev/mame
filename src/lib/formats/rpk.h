@@ -16,7 +16,6 @@
 #include "hash.h"
 #include "unzip.h"
 
-#include <exception>
 #include <list>
 #include <optional>
 

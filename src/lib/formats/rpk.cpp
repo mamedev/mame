@@ -48,10 +48,7 @@ DTD:
 ***************************************************************************/
 
 #include "rpk.h"
-#include "unzip.h"
 #include "xmlfile.h"
-
-#include <vector>
 
 
 namespace
