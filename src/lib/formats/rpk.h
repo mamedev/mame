@@ -13,11 +13,11 @@
 
 #pragma once
 
-#include "unzip.h"
 #include "hash.h"
-#include "xmlfile.h"
+#include "unzip.h"
 
 #include <exception>
+#include <list>
 #include <optional>
 
 namespace util {
@@ -25,7 +25,6 @@ namespace util {
 	TYPE DEFINITIONS
 ***************************************************************************/
 
-class archive_file;
 class rpk_reader;
 class rpk_file;
 
@@ -49,10 +48,10 @@ public:
 	~rpk_socket();
 
 	// accessors
-	const std::string &id() const { return m_id; }
-	socket_type type() const { return m_type; }
-	const std::string &filename() const { return m_filename; }
-	std::uint32_t length() const { return m_length.value(); }
+	const std::string &id() const noexcept { return m_id; }
+	socket_type type() const noexcept { return m_type; }
+	const std::string &filename() const noexcept { return m_filename; }
+	std::uint32_t length() const noexcept { return m_length.value(); }
 
 	// methods
 	std::error_condition read_file(std::vector<std::uint8_t> &result) const;
@@ -108,11 +107,9 @@ class rpk_reader
 public:
 	enum class error
 	{
-		NOT_ZIP_FORMAT = 1,
+		NO_ERROR = 0,
 		XML_ERROR,
 		INVALID_FILE_REF,
-		ZIP_ERROR,
-		ZIP_UNSUPPORTED,
 		MISSING_RAM_LENGTH,
 		INVALID_RAM_SPEC,
 		INVALID_RESOURCE_REF,
@@ -123,7 +120,7 @@ public:
 	};
 
 	// ctor/dtor
-	rpk_reader(const char **pcb_types, bool supports_ram);
+	rpk_reader(char const *const *pcb_types, bool supports_ram);
 	rpk_reader(const rpk_reader &) = delete;
 	rpk_reader(rpk_reader &&) = delete;
 
@@ -131,8 +128,8 @@ public:
 	std::error_condition read(std::unique_ptr<random_read> &&stream, rpk_file::ptr &result) const;
 
 private:
-	const char **	m_pcb_types;
-	bool			m_supports_ram;
+	char const *const *	m_pcb_types;
+	bool				m_supports_ram;
 };
 
 

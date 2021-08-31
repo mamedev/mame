@@ -54,18 +54,18 @@ DTD:
 #include <vector>
 
 
+namespace
+{
+
 /***************************************************************************
 	TYPE DEFINITIONS
 ***************************************************************************/
 
-namespace
+class rpk_category_impl : public std::error_category
 {
-	class rpk_category_impl : public std::error_category
-	{
-	public:
-		virtual char const *name() const noexcept override { return "rpk"; }
-		virtual std::string message(int condition) const override;
-	};
+public:
+	virtual char const *name() const noexcept override { return "rpk"; }
+	virtual std::string message(int condition) const override;
 };
 
 
@@ -73,9 +73,7 @@ namespace
 	GLOBAL VARIABLES
 ***************************************************************************/
 
-namespace
-{
-	rpk_category_impl const f_rpk_category_instance;
+rpk_category_impl const f_rpk_category_instance;
 };
 
 
@@ -87,7 +85,7 @@ namespace
 //  ctor
 //-------------------------------------------------
 
-util::rpk_reader::rpk_reader(const char **pcb_types, bool supports_ram)
+util::rpk_reader::rpk_reader(char const *const *pcb_types, bool supports_ram)
 	: m_pcb_types(pcb_types)
 	, m_supports_ram(supports_ram)
 {
@@ -104,21 +102,28 @@ std::error_condition util::rpk_reader::read(std::unique_ptr<random_read> &&strea
 	util::archive_file::ptr zipfile;
 	std::error_condition ziperr = util::archive_file::open_zip(std::move(stream), zipfile);
 	if (ziperr)
-		return error::NOT_ZIP_FORMAT;
+		return ziperr;
 
 	// open the layout XML
 	if (zipfile->search("layout.xml", false) < 0)
 		return error::MISSING_LAYOUT;
 
+	// determine the uncompressed length
+	uint64_t uncompressed_length_uint64 = zipfile->current_uncompressed_length();
+	size_t uncompressed_length = (size_t)uncompressed_length_uint64;
+	if (uncompressed_length != uncompressed_length_uint64)
+		return std::errc::not_enough_memory;
+
 	// prepare a buffer for the layout XML
-	std::vector<char> layout_xml_text;
-	layout_xml_text.resize(zipfile->current_uncompressed_length() + 1);
+	std::unique_ptr<char[]> layout_xml_text(new (std::nothrow) char[uncompressed_length + 1]);
+	if (!layout_xml_text)
+		return std::errc::not_enough_memory;
 
 	// and decompress it
-	ziperr = zipfile->decompress(&layout_xml_text[0], zipfile->current_uncompressed_length());
+	ziperr = zipfile->decompress(&layout_xml_text[0], uncompressed_length);
 	if (ziperr)
 		return ziperr;
-	layout_xml_text[zipfile->current_uncompressed_length()] = 0;
+	layout_xml_text[uncompressed_length] = 0;
 
 	// parse the layout text
 	util::xml::file::ptr const layout_xml = util::xml::file::string_read(&layout_xml_text[0], nullptr);
@@ -253,11 +258,11 @@ std::error_condition util::rpk_file::add_rom_socket(std::string &&id, const util
 		return rpk_reader::error::INVALID_LAYOUT; // <rom> must have a 'file' attribute
 
 	// check for crc (optional)
-	std::optional<hash_collection> hashes = { };
+	std::optional<hash_collection> hashes;
 	std::string const *const crcstr = rom_resource_node.get_attribute_string_ptr("crc");
 	if (crcstr)
 	{
-		if (!hashes.has_value())
+		if (!hashes)
 			hashes.emplace();
 		hashes->add_from_string(hash_collection::HASH_CRC, *crcstr);
 	}
@@ -290,24 +295,32 @@ std::error_condition util::rpk_file::add_ram_socket(std::string &&id, const util
 
 	// parse it
 	unsigned int length;
-	char suffix = '\0';
-	sscanf(length_string->c_str(), "%u%c", &length, &suffix);
-	switch (tolower(suffix))
+	char suffix;
+	switch (sscanf(length_string->c_str(), "%u%c", &length, &suffix))
 	{
-	case 'k':
-		// kilobytes
-		length *= 1024;
+	case 1:
+		// fall through
 		break;
 
-	case 'm':
-		// megabytes
-		length *= 1024 * 1024;
+	case 2:
+		switch (tolower(suffix))
+		{
+		case 'k':
+			// kilobytes
+			length *= 1024;
+			break;
+
+		case 'm':
+			// megabytes
+			length *= 1024 * 1024;
+			break;
+
+		default:  // failed
+			return rpk_reader::error::INVALID_RAM_SPEC;
+		}
 		break;
 
-	case '\0':
-		break;
-
-	default:  // failed
+	default:
 		return rpk_reader::error::INVALID_RAM_SPEC;
 	}
 
@@ -374,7 +387,15 @@ std::error_condition util::rpk_socket::read_file(std::vector<std::uint8_t> &resu
 		return rpk_reader::error::INVALID_FILE_REF;
 
 	// prepare a buffer
-	result.resize(m_rpk.zipfile().current_uncompressed_length());
+	result.clear();
+	try
+	{
+		result.resize(m_rpk.zipfile().current_uncompressed_length());
+	}
+	catch (std::bad_alloc const &)
+	{
+		return std::errc::not_enough_memory;
+	}
 
 	// read the file
 	std::error_condition const ziperr = m_rpk.zipfile().decompress(&result[0], m_rpk.zipfile().current_uncompressed_length());
@@ -415,44 +436,40 @@ std::error_category const &util::rpk_category() noexcept
 
 std::string rpk_category_impl::message(int condition) const
 {
-	const char *result;
+	using namespace std::literals;
+
+	std::string result;
 	switch ((util::rpk_reader::error) condition)
 	{
-	case util::rpk_reader::error::NOT_ZIP_FORMAT:
-		result = "Not a RPK (zip) file";
+	case util::rpk_reader::error::NO_ERROR:
+		result = "No error"s;
 		break;
 	case util::rpk_reader::error::XML_ERROR:
-		result = "XML format error";
-		break;
-	case util::rpk_reader::error::ZIP_ERROR:
-		result = "Zip file error";
-		break;
-	case util::rpk_reader::error::ZIP_UNSUPPORTED:
-		result = "Unsupported zip version";
+		result = "XML format error"s;
 		break;
 	case util::rpk_reader::error::MISSING_RAM_LENGTH:
-		result = "Missing RAM length";
+		result = "Missing RAM length"s;
 		break;
 	case util::rpk_reader::error::INVALID_RAM_SPEC:
-		result = "Invalid RAM specification";
+		result = "Invalid RAM specification"s;
 		break;
 	case util::rpk_reader::error::INVALID_RESOURCE_REF:
-		result = "Invalid resource reference";
+		result = "Invalid resource reference"s;
 		break;
 	case util::rpk_reader::error::INVALID_LAYOUT:
-		result = "layout.xml not valid";
+		result = "layout.xml not valid"s;
 		break;
 	case util::rpk_reader::error::MISSING_LAYOUT:
-		result = "Missing layout";
+		result = "Missing layout"s;
 		break;
 	case util::rpk_reader::error::UNKNOWN_PCB_TYPE:
-		result = "Unknown pcb type";
+		result = "Unknown pcb type"s;
 		break;
 	case util::rpk_reader::error::UNSUPPORTED_RPK_FEATURE:
-		result = "RPK feature not supported";
+		result = "RPK feature not supported"s;
 		break;
 	default:
-		result = "Unknown error";
+		result = "Unknown error"s;
 		break;
 	}
 	return result;

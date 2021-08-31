@@ -60,7 +60,7 @@ enum
 	PCB_PAGED7
 };
 
-static const char *pcbdefs[] =
+static char const *const pcbdefs[] =
 {
 	"standard",		// PCB_STANDARD
 	"paged12k",		// PCB_PAGED12K
@@ -1569,7 +1569,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_lo
 	{
 		ram_pname = std::string(system_name).append(PATH_SEPARATOR).append(socket.filename());
 		// load, and fill rest with 00
-		LOGMASKED(LOG_RPK, "[RPK handler] Loading NVRAM contents from '%s'\n", ram_pname.c_str());
+		LOGMASKED(LOG_RPK, "[RPK handler] Loading NVRAM contents from '%s'\n", ram_pname);
 
 		// try to open the battery file and read it if possible
 		emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
