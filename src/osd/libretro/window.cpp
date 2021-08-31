@@ -138,7 +138,7 @@ void retro_osd_interface::build_slider_list()
 
 void retro_osd_interface::window_exit()
 {
-	osd_printf_verbose("Enter sdlwindow_exit\n");
+	osd_printf_verbose("Enter window_exit\n");
 
 	// free all the windows
 	while (!osd_common_t::s_window_list.empty())
@@ -159,7 +159,7 @@ void retro_osd_interface::window_exit()
 		default:
 			break;
 	}
-	osd_printf_verbose("Leave sdlwindow_exit\n");
+	osd_printf_verbose("Leave window_exit\n");
 }
 
 
