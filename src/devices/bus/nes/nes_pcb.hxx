@@ -264,6 +264,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
 	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
+	{ "bmc_hp898f",       BMC_HP898F },
 	{ "bmc_k1029",        BMC_K1029 },
 	{ "bmc_k3006",        BMC_K3006 },
 	{ "bmc_k3036",        BMC_K3036 },
@@ -369,7 +370,6 @@ static const nes_pcb pcb_list[] =
 	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
 	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },

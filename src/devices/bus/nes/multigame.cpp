@@ -53,6 +53,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63"
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device,    "nes_bmc_gkcxin1",    "NES Cart BMC GKCXIN1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_HP898F,     nes_bmc_hp898f_device,     "nes_bmc_hp898f",     "NES Cart BMC HP-898F PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K1029,      nes_bmc_k1029_device,      "nes_bmc_k1029",      "NES Cart BMC K-1029 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device,      "nes_bmc_k3036",      "NES Cart BMC K-3036 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device,      "nes_bmc_k3046",      "NES Cart BMC K-3046 PCB")
@@ -237,6 +238,11 @@ nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, const char
 
 nes_bmc_gkcxin1_device::nes_bmc_gkcxin1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_GKCXIN1, tag, owner, clock)
+{
+}
+
+nes_bmc_hp898f_device::nes_bmc_hp898f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_HP898F, tag, owner, clock)
 {
 }
 
@@ -1903,6 +1909,49 @@ void nes_bmc_gkcxin1_device::write_h(offs_t offset, u8 data)
 
 	prg32((offset >> 3) & 0x03);
 	chr8(offset & 0x07, CHRROM);
+}
+
+/*-------------------------------------------------
+
+ Board HP-898F
+
+ Games: Prima soft 9999999 in 1 and others
+
+ NES 2.0: mapper 319
+
+ In MAME: Supported.
+
+ TODO: Mirroring is clearly incorrect for Ninja-kun
+ on 4 in 1 (0207). Is this an error on the original
+ cart or should there really be a variant device?
+
+ -------------------------------------------------*/
+
+u8 nes_bmc_hp898f_device::read_l(offs_t offset)
+{
+	LOG_MMC(("bmc_hp898f read_l, offset: %04x\n", offset));
+
+	offset += 0x100;
+	if (offset & 0x1000)
+		return 0;    // FIXME: some carts read jumpers that change menu
+
+	return get_open_bus();
+}
+
+void nes_bmc_hp898f_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_hp898f write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset & 0x04)
+	{
+		u8 bank = bitswap<3>(data, 4, 3, 5);
+		u8 mode = BIT(data, 6);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+		set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+	}
+	else
+		chr8(data >> 4, CHRROM);
 }
 
 /*-------------------------------------------------
