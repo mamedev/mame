@@ -62,6 +62,7 @@
             - Battery-backed RAM needs to be figured out
             - Correct ROM labels for: ssonicbr, ooparts, headonch
             - Does ooparts actually use upd samples? PCB has the same rom as tfrceac
+            - Is the joystick hack for ooparts unofficial, or done by Sega for location test?
 
     Thanks: (in no particular order) to any MameDev that helped me out .. (OG, Mish etc.)
             Charles MacDonald for his C2Emu .. without it working out what were bugs in my code
@@ -1444,6 +1445,10 @@ static INPUT_PORTS_START( ooparts ) // testmode expects controls similar to twin
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+
+	PORT_MODIFY("SERVICE") // "shot" button in testmode (needed for sound test)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
