@@ -108,7 +108,8 @@ public:
 		fe132_state(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_hopper(*this, "hopper"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamps%u", 0U),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void royalpk2(machine_config &config);
@@ -121,6 +122,7 @@ protected:
 
 	void royalpk2_io(address_map &map);
 	void royalpk2_map(address_map &map);
+	void oki_map(address_map &map);
 
 	void protection_seed_w(offs_t offset, uint32_t data);
 	uint32_t protection_response_r();
@@ -130,6 +132,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_device<hopper_device> m_hopper;
 	output_finder<31> m_lamps;
+	required_memory_bank m_okibank;
 
 	uint16_t m_protection_index;
 	uint8_t m_protection_response_byte;
@@ -342,6 +345,10 @@ int royalpk2_state::hopper_r()
 
 void royalpk2_state::royalpk2_io(address_map &map)
 {
+	// map(0x4000, 0x41ff).readonly().share("nvram"); // seems to expect to read NVRAM from here
+
+	map(0x4603, 0x4603).r("oki", FUNC(okim6295_device::read));
+
 	map(0x4800, 0x4803).portr("P1");
 	map(0x4900, 0x4903).portr("SYSTEM_P2");
 
@@ -351,9 +358,15 @@ void royalpk2_state::royalpk2_io(address_map &map)
 
 	map(0x6000, 0x61ff).ram().share("nvram");
 
+	map(0x6603, 0x6603).w("oki", FUNC(okim6295_device::write));
+
 	map(0x6800, 0x6803).portw("EEPROMCLK");
 	map(0x6900, 0x6903).portw("EEPROMCS");
 	map(0x6a00, 0x6a03).portw("EEPROMOUT");
+
+	// map(0x6b00, 0x6b03).nopw(); // bits 8, 9, 10 and 13, 14 used
+
+	map(0x6c03, 0x6c03).lw8(NAME([this] (uint8_t data) { m_okibank->set_entry(data & 0x03); })); // TODO: double check this
 
 	map(0x6d00, 0x6d03).w(FUNC(royalpk2_state::protection_seed_w));
 
@@ -362,6 +375,12 @@ void royalpk2_state::royalpk2_io(address_map &map)
 	map(0x7200, 0x7203).w(FUNC(royalpk2_state::outputs_w<2>));
 	map(0x7300, 0x7303).w(FUNC(royalpk2_state::outputs_w<3>));
 	map(0x7400, 0x7403).w(FUNC(royalpk2_state::outputs_w<4>));
+}
+
+void royalpk2_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 void royalpk2_state::machine_start()
@@ -374,6 +393,8 @@ void royalpk2_state::machine_start()
 
 	for (int i = 0; i < 31; i++)
 		m_lamps[i] = 0;
+
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
 }
 
 void royalpk2_state::machine_reset()
@@ -478,6 +499,7 @@ void royalpk2_state::royalpk2(machine_config &config)
 //  ymsnd.add_route(1, "rspeaker", 1.0);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH)); /* 1.7897725 MHz */
+	oki.set_addrmap(0, &royalpk2_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
@@ -537,7 +559,7 @@ S1 is the setup button
 VRAML & VRAMU are KM6161002CJ-12
 DRAML & DRAMU are GM71C18163CJ6
 
-ROM1 & SND are stardard 27C040 and/or 27C020 eproms
+ROM1 & SND are standard 27C040 and/or 27C020 eproms
 L00-L03 & U00-U03 are 29F1610ML Flash roms
 
 

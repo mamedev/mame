@@ -18,6 +18,7 @@
 #include "tilemap.h"
 #include "ui/viewgfx.h"
 
+#include <cmath>
 
 
 /***************************************************************************
@@ -31,7 +32,9 @@ enum ui_gfx_modes
 	UI_GFX_TILEMAP
 };
 
-const uint8_t MAX_GFX_DECODERS = 8;
+static const uint8_t MAX_GFX_DECODERS = 8;
+static const int MAX_ZOOM_LEVEL = 8;
+static const int MIN_ZOOM_LEVEL = 8;
 
 
 
@@ -87,11 +90,13 @@ struct ui_gfx_state
 	// tilemap-specific data
 	struct
 	{
-		int   which;                // which tilemap are we viewing?
-		int   xoffs;                // current X offset
-		int   yoffs;                // current Y offset
-		int   zoom;                 // zoom factor
-		uint8_t rotate;               // current rotation (orientation) value
+		int      which;             // which tilemap are we viewing?
+		int      xoffs;             // current X offset
+		int      yoffs;             // current Y offset
+		int      zoom;              // zoom factor, either x or 1/x
+		bool     zoom_frac;         // zoom via reciprocal fractions
+		bool     auto_zoom;			// auto-zoom toggle
+		uint8_t  rotate;            // current rotation (orientation) value
 		uint32_t flags;             // render flags
 	} tilemap;
 };
@@ -184,7 +189,9 @@ void ui_gfx_init(running_machine &machine)
 	state.tilemap.which = 0;
 	state.tilemap.xoffs = 0;
 	state.tilemap.yoffs = 0;
-	state.tilemap.zoom = 0;
+	state.tilemap.zoom = 1;
+	state.tilemap.zoom_frac = false;
+	state.tilemap.auto_zoom = true;
 	state.tilemap.rotate = rotate;
 	state.tilemap.flags = TILEMAP_DRAW_ALL_CATEGORIES;
 }
@@ -473,7 +480,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 	skip = int(chwidth / cellwidth);
 	for (int x = 0; x < state.palette.columns; x += 1 + skip)
 	{
-		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
+		x0 = boxbounds.x0 + 6.0f * chwidth + float(x) * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
 		container.add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, aspect, rgb_t::white(), *ui_font, "0123456789ABCDEF"[x & 0xf]);
 
@@ -495,7 +502,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 			// if we're skipping, draw a point between the character and the box to indicate which
 			// one it's referring to
 			x0 = boxbounds.x0 + 5.5f * chwidth;
-			y0 = boxbounds.y0 + 3.5f * chheight + (float)y * cellheight;
+			y0 = boxbounds.y0 + 3.5f * chheight + float(y) * cellheight;
 			if (skip != 0)
 				container.add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
@@ -626,12 +633,12 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	float x0, y0;
 	render_bounds cellboxbounds;
 	render_bounds boxbounds;
-	int cellboxwidth, cellboxheight;
+	float cellboxwidth, cellboxheight;
 	int targwidth = mui.machine().render().ui_target().width();
 	int targheight = mui.machine().render().ui_target().height();
 	int cellxpix, cellypix;
 	int xcells;
-	int pixelscale = 0;
+	float pixelscale = 0.0f;
 	int skip;
 
 	// add a half character padding for the box
@@ -675,24 +682,23 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	}
 	info.columns[set] = xcells;
 
-	// worst case, we need a pixel scale of 1
-	pixelscale = std::max(1, pixelscale);
+	if (pixelscale <= 0.0f)
+		pixelscale = 1.0f;
 
 	// in the Y direction, we just display as many as we can
-	const int ycells = cellboxheight / (pixelscale * cellypix);
+	const int ycells = int(cellboxheight / (pixelscale * cellypix));
 
 	// now determine the actual cellbox size
 	cellboxwidth = std::min(cellboxwidth, xcells * pixelscale * cellxpix);
 	cellboxheight = std::min(cellboxheight, ycells * pixelscale * cellypix);
 
-	// compute the size of a single cell at this pixel scale factor, as well as the aspect ratio
-	const float cellwidth = (cellboxwidth / float(xcells)) / float(targwidth);
-	const float cellheight = (cellboxheight / float(ycells)) / float(targheight);
-	//cellaspect = cellwidth / cellheight;
+	// compute the size of a single cell at this pixel scale factor
+	const float cellwidth = (cellboxwidth / xcells) / targwidth;
+	const float cellheight = (cellboxheight / ycells) / targheight;
 
 	// working from the new width/height, recompute the boxbounds
-	const float fullwidth = float(cellboxwidth) / float(targwidth) + 6.5f * chwidth;
-	const float fullheight = float(cellboxheight) / float(targheight) + 4.0f * chheight;
+	const float fullwidth = cellboxwidth / targwidth + 6.5f * chwidth;
+	const float fullheight = cellboxheight / targheight + 4.0f * chheight;
 
 	// recompute boxbounds from this
 	boxbounds.x0 = (1.0f - fullwidth) * 0.5f;
@@ -702,9 +708,9 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 
 	// recompute cellboxbounds
 	cellboxbounds.x0 = boxbounds.x0 + 6.0f * chwidth;
-	cellboxbounds.x1 = cellboxbounds.x0 + float(cellboxwidth) / float(targwidth);
+	cellboxbounds.x1 = cellboxbounds.x0 + cellboxwidth / float(targwidth);
 	cellboxbounds.y0 = boxbounds.y0 + 3.5f * chheight;
-	cellboxbounds.y1 = cellboxbounds.y0 + float(cellboxheight) / float(targheight);
+	cellboxbounds.y1 = cellboxbounds.y0 + cellboxheight / float(targheight);
 
 	// figure out the title
 	std::ostringstream title_buf;
@@ -764,7 +770,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	skip = int(chwidth / cellwidth);
 	for (int x = 0; x < xcells; x += 1 + skip)
 	{
-		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
+		x0 = boxbounds.x0 + 6.0f * chwidth + float(x) * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
 		container.add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, aspect, rgb_t::white(), *ui_font, "0123456789ABCDEF"[x & 0xf]);
 
@@ -786,7 +792,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 			// if we're skipping, draw a point between the character and the box to indicate which
 			// one it's referring to
 			x0 = boxbounds.x0 + 5.5f * chwidth;
-			y0 = boxbounds.y0 + 3.5f * chheight + (float)y * cellheight;
+			y0 = boxbounds.y0 + 3.5f * chheight + float(y) * cellheight;
 			if (skip != 0)
 				container.add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
@@ -1081,28 +1087,28 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	mapboxbounds.y0 += 1.5f * chheight;
 
 	// convert back to pixels
-	mapboxwidth = (mapboxbounds.x1 - mapboxbounds.x0) * (float)targwidth;
-	mapboxheight = (mapboxbounds.y1 - mapboxbounds.y0) * (float)targheight;
+	mapboxwidth = (mapboxbounds.x1 - mapboxbounds.x0) * float(targwidth);
+	mapboxheight = (mapboxbounds.y1 - mapboxbounds.y0) * float(targheight);
 
 	// determine the maximum integral scaling factor
-	int pixelscale = state.tilemap.zoom;
-	if (pixelscale == 0)
+	float pixelscale = state.tilemap.zoom_frac ? (1.0f / state.tilemap.zoom) : float(state.tilemap.zoom);
+	if (state.tilemap.auto_zoom)
 	{
-		int maxxscale, maxyscale;
+		uint32_t maxxscale, maxyscale;
 		for (maxxscale = 1; mapwidth * (maxxscale + 1) < mapboxwidth; maxxscale++) { }
 		for (maxyscale = 1; mapheight * (maxyscale + 1) < mapboxheight; maxyscale++) { }
-		pixelscale = std::min(maxxscale, maxyscale);
+		pixelscale = float(std::min(maxxscale, maxyscale));
 	}
 
 	// recompute the final box size
-	mapboxwidth = std::min(mapboxwidth, int(mapwidth * pixelscale));
-	mapboxheight = std::min(mapboxheight, int(mapheight * pixelscale));
+	mapboxwidth = std::min(mapboxwidth, int(std::round(mapwidth * pixelscale)));
+	mapboxheight = std::min(mapboxheight, int(std::round(mapheight * pixelscale)));
 
 	// recompute the bounds, centered within the existing bounds
-	mapboxbounds.x0 += 0.5f * ((mapboxbounds.x1 - mapboxbounds.x0) - (float)mapboxwidth / (float)targwidth);
-	mapboxbounds.x1 = mapboxbounds.x0 + (float)mapboxwidth / (float)targwidth;
-	mapboxbounds.y0 += 0.5f * ((mapboxbounds.y1 - mapboxbounds.y0) - (float)mapboxheight / (float)targheight);
-	mapboxbounds.y1 = mapboxbounds.y0 + (float)mapboxheight / (float)targheight;
+	mapboxbounds.x0 += 0.5f * ((mapboxbounds.x1 - mapboxbounds.x0) - float(mapboxwidth) / targwidth);
+	mapboxbounds.x1 = mapboxbounds.x0 + float(mapboxwidth) / targwidth;
+	mapboxbounds.y0 += 0.5f * ((mapboxbounds.y1 - mapboxbounds.y0) - float(mapboxheight) / targheight);
+	mapboxbounds.y1 = mapboxbounds.y0 + float(mapboxheight) / targheight;
 
 	// now recompute the outer box against this new info
 	boxbounds.x0 = mapboxbounds.x0 - 0.5f * chwidth;
@@ -1131,8 +1137,8 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 			ypixel = (mapboxheight - 1) - ypixel;
 		if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
 			std::swap(xpixel, ypixel);
-		uint32_t col = ((xpixel / pixelscale + state.tilemap.xoffs) / tilemap->tilewidth()) % tilemap->cols();
-		uint32_t row = ((ypixel / pixelscale + state.tilemap.yoffs) / tilemap->tileheight()) % tilemap->rows();
+		uint32_t col = ((int(std::round(xpixel / pixelscale)) + state.tilemap.xoffs) / tilemap->tilewidth()) % tilemap->cols();
+		uint32_t row = ((int(std::round(ypixel / pixelscale)) + state.tilemap.yoffs) / tilemap->tileheight()) % tilemap->rows();
 		uint8_t gfxnum;
 		uint32_t code, color;
 		tilemap->get_info_debug(col, row, gfxnum, code, color);
@@ -1168,7 +1174,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	}
 
 	// update the bitmap
-	tilemap_update_bitmap(mui.machine(), state, mapboxwidth / pixelscale, mapboxheight / pixelscale);
+	tilemap_update_bitmap(mui.machine(), state, int(std::round(mapboxwidth / pixelscale)), int(std::round(mapboxheight / pixelscale)));
 
 	// add the final quad
 	container.add_quad(mapboxbounds.x0, mapboxbounds.y0,
@@ -1199,21 +1205,70 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 	uint32_t mapwidth = tilemap->width();
 	uint32_t mapheight = tilemap->height();
 
+	const bool at_max_zoom = !state.tilemap.auto_zoom && !state.tilemap.zoom_frac && state.tilemap.zoom == MAX_ZOOM_LEVEL;
+	const bool at_min_zoom = !state.tilemap.auto_zoom && state.tilemap.zoom_frac && state.tilemap.zoom == MIN_ZOOM_LEVEL;
+
 	// handle zoom (minus,plus)
-	if (machine.ui_input().pressed(IPT_UI_ZOOM_OUT) && state.tilemap.zoom > 0)
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_OUT) && !at_min_zoom)
 	{
-		state.tilemap.zoom--;
-		state.bitmap_dirty = true;
-		if (state.tilemap.zoom != 0)
-			machine.popmessage("Zoom = %d", state.tilemap.zoom);
+		state.tilemap.auto_zoom = false;
+
+		if (state.tilemap.zoom_frac)
+		{
+			// remaining in fractional zoom range
+			state.tilemap.zoom++;
+		}
+		else if (state.tilemap.zoom == 1)
+		{
+			// entering fractional zoom range
+			state.tilemap.zoom++;
+			state.tilemap.zoom_frac = true;
+		}
 		else
-			machine.popmessage("Zoom Auto");
-	}
-	if (machine.ui_input().pressed(IPT_UI_ZOOM_IN) && state.tilemap.zoom < 8)
-	{
-		state.tilemap.zoom++;
+		{
+			// remaining in integer zoom range
+			state.tilemap.zoom--;
+		}
+
 		state.bitmap_dirty = true;
-		machine.popmessage("Zoom = %d", state.tilemap.zoom);
+
+		machine.popmessage(state.tilemap.zoom_frac ? "Zoom = 1/%d" : "Zoom = %d", state.tilemap.zoom);
+	}
+
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_IN) && !at_max_zoom)
+	{
+		state.tilemap.auto_zoom = false;
+
+		if (!state.tilemap.zoom_frac)
+		{
+			// remaining in integer zoom range
+			state.tilemap.zoom++;
+		}
+		else if (state.tilemap.zoom == 2)
+		{
+			// entering integer zoom range
+			state.tilemap.zoom--;
+			state.tilemap.zoom_frac = false;
+		}
+		else
+		{
+			// remaining in fractional zoom range
+			state.tilemap.zoom--;
+		}
+
+		state.bitmap_dirty = true;
+
+		machine.popmessage(state.tilemap.zoom_frac ? "Zoom = 1/%d" : "Zoom = %d", state.tilemap.zoom);
+	}
+
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_AUTO))
+	{
+		state.tilemap.auto_zoom = !state.tilemap.auto_zoom;
+
+		if (state.tilemap.auto_zoom)
+			machine.popmessage("Auto Zoom");
+		else
+			machine.popmessage(state.tilemap.zoom_frac ? "Zoom = 1/%d" : "Zoom = %d", state.tilemap.zoom);
 	}
 
 	// handle rotation (R)

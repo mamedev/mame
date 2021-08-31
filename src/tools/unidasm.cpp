@@ -197,6 +197,7 @@ using util::BIT;
 #include "corefile.h"
 #include "corestr.h"
 #include "eminline.h"
+#include "endianness.h"
 
 #include <algorithm>
 #include <cctype>
@@ -334,12 +335,13 @@ struct nec_unidasm_t : nec_disassembler::config
 } nec_unidasm;
 
 
-enum endianness { le, be };
+static constexpr auto le = util::endianness::little;
+static constexpr auto be = util::endianness::big;
 
 struct dasm_table_entry
 {
 	const char *            name;
-	endianness              endian;
+	util::endianness        endian;
 	int8_t                  pcshift;
 	std::function<util::disasm_interface *()> alloc;
 };

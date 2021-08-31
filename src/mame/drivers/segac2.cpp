@@ -61,7 +61,8 @@
     TODO:   - Puyo Puyo ends up with a black screen after doing memory tests
             - Battery-backed RAM needs to be figured out
             - Correct ROM labels for: ssonicbr, ooparts, headonch
-            - Does ooparts have a sample ROM?
+            - Does ooparts actually use upd samples? PCB has the same rom as tfrceac
+            - Is the joystick hack for ooparts unofficial, or done by Sega for location test?
 
     Thanks: (in no particular order) to any MameDev that helped me out .. (OG, Mish etc.)
             Charles MacDonald for his C2Emu .. without it working out what were bugs in my code
@@ -1423,8 +1424,11 @@ static INPUT_PORTS_START( ssonicbr )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	//"SW2:2" unused
-	//"SW2:3" unused
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	//"SW2:4" unused
 	//"SW2:5" unused
 	//"SW2:6" unused
@@ -1441,6 +1445,10 @@ static INPUT_PORTS_START( ooparts ) // testmode expects controls similar to twin
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+
+	PORT_MODIFY("SERVICE") // "shot" button in testmode (needed for sound test)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
@@ -2168,7 +2176,7 @@ ROM_START( ooparts ) // hack: modified to be playable with digital joystick
 	ROM_LOAD16_BYTE( "ooparts.ic33", 0x100001, 0x080000, CRC(42755dc2) SHA1(cd0aa79418b922266c5d41bf24b9136f9f105dc5) )
 
 	ROM_REGION( 0x040000, "upd", 0 )
-	ROM_LOAD( "ooparts.ic4", 0x000000, 0x040000, NO_DUMP )
+	ROM_LOAD( "epr-13655.ic4", 0x000000, 0x040000, CRC(e09961f6) SHA1(e109b5f41502b765d191f22e3bbcff97d6defaa1) )
 ROM_END
 
 
