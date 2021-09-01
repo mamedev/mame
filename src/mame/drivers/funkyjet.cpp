@@ -475,6 +475,25 @@ ROM_START( sotsugyo )
 	ROM_LOAD( "sb030.15h",    0x00000, 0x20000, CRC(1ea43f48) SHA1(74cc8c740f1c7fa94c2cb460ea4ee7aa0c490ed7) )
 ROM_END
 
+ROM_START( sotsugyok ) // only ROMs that match the parent are the audio CPU and Oki ones
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "27c020.12f", 0x00000, 0x40000, CRC(147a794d) SHA1(d2a87e6f59cb13707137ef8cd6b63c0ca87c77b0) )
+	ROM_LOAD16_BYTE( "27c020.13f", 0x00001, 0x40000, CRC(d59f270e) SHA1(de3736e1b818cf0ab976824c4e67a394e46f13af) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "27c512.16f",    0x00000, 0x10000, CRC(baf5ec93) SHA1(82b22a0b565e51cd40733f21fa876dd7064eb604) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "27c4000.2f", 0x000000, 0x80000, CRC(8a76a083) SHA1(f5cccb3a7834225af0c6118af33362efeff66999) ) /* chars */
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "27c4000.4a", 0x000000, 0x80000, CRC(69de4049) SHA1(2f4f45108c27ae164a0b5323ee37a331e784cef5) ) /* sprites */
+	ROM_LOAD( "27c4000.2a", 0x080000, 0x80000, CRC(9092cc83) SHA1(208391058ab74f2651457644544bbe77c1f5dcb8) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c010.15h",    0x00000, 0x20000, CRC(1ea43f48) SHA1(74cc8c740f1c7fa94c2cb460ea4ee7aa0c490ed7) )
+ROM_END
+
 void funkyjet_state::init_funkyjet()
 {
 	deco74_decrypt_gfx(machine(), "gfx1");
@@ -489,4 +508,5 @@ GAME( 1992, funkyjeta, funkyjet, funkyjet, funkyjet,  funkyjet_state, init_funky
 GAME( 1992, funkyjeta2,funkyjet, funkyjet, funkyjeta2,funkyjet_state, init_funkyjet, ROT0, "Mitchell", "Funky Jet (Korea, prototype?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, funkyjetj, funkyjet, funkyjet, funkyjetj, funkyjet_state, init_funkyjet, ROT0, "Mitchell (Data East Corporation license)", "Funky Jet (Japan, rev 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, sotsugyo,  0,        funkyjet, sotsugyo,  funkyjet_state, init_funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sotsugyo,  0,        funkyjet, sotsugyo,  funkyjet_state, init_funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sotsugyok, sotsugyo, funkyjet, sotsugyo,  funkyjet_state, init_funkyjet, ROT0, "Mitchell", "Jor-eop Jeungmyeongseo (Korea)", MACHINE_SUPPORTS_SAVE )
