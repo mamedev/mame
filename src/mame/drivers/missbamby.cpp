@@ -342,7 +342,7 @@ GAME( 1981,  minisupf, 0, missbamby,  c_810601a, missbamby_state, empty_init, RO
 GAME( 1981,  luckyplr, 0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?,  msbamby,  0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?,  goldfrts, 0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?,  multy,    0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Deta",               "Multy",             MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1983,  gwinner,  0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985,  trebol,   0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",            MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987?, basket,   0, igoabasket, missbamby, missbamby_state, empty_init, ROT0, "Igoa S.A.",          "Basket",            MACHINE_IS_SKELETON_MECHANICAL ) // v2.0 on ROM string, v2.81 on EPROM label
+GAME( 1987,  multy,    0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Deta",               "Multy",             MACHINE_IS_SKELETON_MECHANICAL )
