@@ -550,4 +550,3 @@ COMP( 1985, d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,
 COMP( 1983, tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC)",          0 )
 COMP( 19??, tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC; HD6309E)", MACHINE_UNOFFICIAL )
 COMP( 1984, dgnalpha,   dragon32, 0,      dgnalpha,   dragon,     dragon_alpha_state, empty_init, "Dragon Data Ltd",              "Dragon Professional (Alpha)",    0 )
-	
