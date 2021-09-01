@@ -707,6 +707,7 @@ newbrain.cpp
 news_38xx.cpp
 news_68k.cpp
 news_r3k.cpp
+news_r4k.cpp
 newton.cpp
 next.cpp
 nforcepc.cpp

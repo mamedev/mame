@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Brice Onken
-// thanks-to:Patrick Mackinlay
+// thanks-to:Patrick Mackinlay,Olivier Galibert,Tsubai Masanari
 
 /*
  * Sony NEWS R4000/4400 APbus workstations.
@@ -57,12 +57,12 @@
  *   - National Semi PC8477B Floppy Controller: emulated (uses the -A version currently, but it seems to work)
  *   - Zilog Z8523010VSC ESCC serial interface: emulated (see following)
  *   - Sony CXD8421Q WSC-ESCC1 serial APbus interface controller: skeleton (ESCC connections, probably DMA, APbus interface, etc. handled by this chip)
- *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and probably DMA for sound, floppy, etc.)
+ *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and DMA for sound, floppy, etc.)
  *   - National Semi DP83932B-VF SONIC Ethernet controller: Not fully working yet (also, is using -C rather than -B version)
  *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: partially emulated
  *   - Sony CXD8418Q WSC-PARK3: not fully emulated, but some of the general platform functions may come from this chip (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
- *   - Sony CXD8403Q DMAC3Q DMA controller: skeleton
- *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: skeleton
+ *   - Sony CXD8403Q DMAC3Q DMA controller: WIP
+ *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: WIP
  *   - ST Micro M58T02-150PC1 Timekeeper RAM: emulated
  *  DSC-39 XB Framebuffer/video card:
  *   - Sony CXD8486Q XB: not emulated (most likely APbus interface)
@@ -358,9 +358,10 @@ void news_r4k_state::machine_common(machine_config &config)
     m_fifo0->bind_dma_r<cxd8442q_device::FifoChannelNumber::CH2>([this]() { return (uint32_t)(m_fdc->dma_r()); });
 
     // DMA controller
-    // TODO: interrupts, join bus, etc.
     DMAC3(config, m_dmac, 0);
-    // m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
+    m_dmac->set_base_map_address(0x14c20000);
+    m_dmac->set_bus(m_cpu, 0);
+    m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
 
     // Create SCSI buses
     NSCSI_BUS(config, m_scsibus0);
@@ -385,9 +386,17 @@ void news_r4k_state::machine_common(machine_config &config)
     NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
     // Connect SPIFI3s to the buses
-    // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
-    NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {});
+    // TODO: Actual clock frequency
+    NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device)
+    { 
+        spifi3_device &adapter = downcast<spifi3_device &>(*device);
+        adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL0>));
+        adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL0>));
+    });
     NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {});
+
+    m_dmac->dma_r_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_r));
+    m_dmac->dma_w_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_w));
 }
 
 void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); }
@@ -735,7 +744,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
+    // LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
     return value;
 }
 
@@ -758,7 +767,7 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
     // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
     if(data != 0x424f4d42) // mask out reset noise
     {
-        LOG("APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
+        // LOG("APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
     }
 }
 
@@ -876,13 +885,13 @@ void news_r4k_state::int_check()
     // This has been tested with a few different devices and seems OK so far, but there might be some things missing.
     for (int i = 0; i < 6; i++)
     {
-        int state = m_intst[i] & m_inten[i];
-        //LOG("int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
-        if (m_int_state[i] != (state > 0)) // Interrupt changed state
+        bool state = (m_intst[i] & m_inten[i]) > 0;
+        // LOG("int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
+        if (m_int_state[i] != state) // Interrupt changed state
         {
-            //LOG("Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
-            m_int_state[i] = state > 0;
-            m_cpu->set_input_line(interrupt_map[i], state > 0 ? 1 : 0);
+            // LOG("Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
+            m_int_state[i] = state;
+            m_cpu->set_input_line(interrupt_map[i], state ? 1 : 0);
         }
     }
 }
@@ -952,10 +961,10 @@ ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA
 // idrom and macrom dumps include unmapped space that would ideally be umasked, but this is functionally the same.
 // Additionally, there is machine-specific information contained within each of these, so there are no "golden" full-chip hashes.
 ROM_REGION64_BE(0x400, "idrom", 0)
-ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
+ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(28ff30c9) SHA1(288fd7d9133ac5e40d90a9b6e24db057cd6b05ad) BAD_DUMP)
 
 ROM_REGION64_BE(0x400, "macrom", 0)
-ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(c3c9f79c) SHA1(a430787b77604d72eb99773817e2405ba414d306) BAD_DUMP)
+ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(22d384d2) SHA1(b78a2861310929e92f16deab989ac51f9da3131a) BAD_DUMP)
 ROM_END
 
 // Machine definitions
