@@ -1486,7 +1486,7 @@ int ti99_cartridge_device::rpk::get_resource_length(const char *socket_name)
 	return socket->second->get_content_length();
 }
 
-void ti99_cartridge_device::rpk::add_socket(const char* id, std::unique_ptr<rpk_socket> newsock)
+void ti99_cartridge_device::rpk::add_socket(const char* id, std::unique_ptr<ti99_rpk_socket> &&newsock)
 {
 	m_sockets.emplace(id, std::move(newsock));
 }
@@ -1522,20 +1522,20 @@ void ti99_cartridge_device::rpk::close()
     not a network socket)
 ***************************************************************/
 
-ti99_cartridge_device::rpk_socket::rpk_socket(const char* id, int length, std::vector<uint8_t> &&contents, std::string &&pathname)
+ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, int length, std::vector<uint8_t> &&contents, std::string &&pathname)
 	: m_id(id), m_length(length), m_contents(std::move(contents)), m_pathname(std::move(pathname))
 {
 }
 
-ti99_cartridge_device::rpk_socket::rpk_socket(const char* id, int length, std::vector<uint8_t> &&contents)
-	: rpk_socket(id, length, std::move(contents), "")
+ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, int length, std::vector<uint8_t> &&contents)
+	: ti99_rpk_socket(id, length, std::move(contents), "")
 {
 }
 
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-std::error_condition ti99_cartridge_device::rpk_load_rom_resource(const util::rpk_socket &socket, std::unique_ptr<rpk_socket> &result)
+std::error_condition ti99_cartridge_device::rpk_load_rom_resource(const rpk_socket &socket, std::unique_ptr<ti99_rpk_socket> &result)
 {
 	LOGMASKED(LOG_RPK, "[RPK handler] Loading ROM contents for socket '%s' from file %s\n", socket.id(), socket.filename());
 
@@ -1545,14 +1545,14 @@ std::error_condition ti99_cartridge_device::rpk_load_rom_resource(const util::rp
 		return err;
 
 	// Create a socket instance
-	result = std::make_unique<rpk_socket>(socket.id().c_str(), contents.size(), std::move(contents));
+	result = std::make_unique<ti99_rpk_socket>(socket.id().c_str(), contents.size(), std::move(contents));
 	return std::error_condition();
 }
 
 /*
     Load a ram resource and put it in a pcb socket instance.
 */
-std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_load_ram_resource(emu_options &options, const util::rpk_socket &socket, const char *system_name)
+std::unique_ptr<ti99_cartridge_device::ti99_rpk_socket> ti99_cartridge_device::rpk_load_ram_resource(emu_options &options, const rpk_socket &socket, const char *system_name)
 {
 	// Allocate memory for this resource
 	std::vector<uint8_t> contents;
@@ -1565,7 +1565,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_lo
 	// In that case we must load it from the NVRAM directory.
 	// The file name is given in the RPK file; the subdirectory is the system name.
 	std::string ram_pname;
-	if (socket.type() == util::rpk_socket::socket_type::PERSISTENT_RAM)
+	if (socket.type() == rpk_socket::socket_type::PERSISTENT_RAM)
 	{
 		ram_pname = std::string(system_name).append(PATH_SEPARATOR).append(socket.filename());
 		// load, and fill rest with 00
@@ -1583,7 +1583,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_lo
 	}
 
 	// Create a socket instance
-	return std::make_unique<rpk_socket>(socket.id().c_str(), socket.length(), std::move(contents), std::move(ram_pname));
+	return std::make_unique<ti99_rpk_socket>(socket.id().c_str(), socket.length(), std::move(contents), std::move(ram_pname));
 }
 
 /*-------------------------------------------------
@@ -1596,10 +1596,10 @@ std::error_condition ti99_cartridge_device::rpk_open(emu_options &options, std::
 {
 	std::unique_ptr<rpk> newrpk = std::make_unique<rpk>(options, system_name);
 
-	util::rpk_reader reader(pcbdefs, true);
+	rpk_reader reader(pcbdefs, true);
 
 	// open the RPK
-	util::rpk_file::ptr file;
+	rpk_file::ptr file;
 	std::error_condition err = reader.read(std::move(stream), file);
 	if (err)
 		return err;
@@ -1608,21 +1608,21 @@ std::error_condition ti99_cartridge_device::rpk_open(emu_options &options, std::
 	newrpk->m_type = file->pcb_type() + 1;
 	LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", pcbdefs[file->pcb_type()]);
 
-	for (const util::rpk_socket &socket : file->sockets())
+	for (const rpk_socket &socket : file->sockets())
 	{
-		std::unique_ptr<rpk_socket> ti99_socket;
+		std::unique_ptr<ti99_rpk_socket> ti99_socket;
 
 		switch (socket.type())
 		{
-		case util::rpk_socket::socket_type::ROM:
+		case rpk_socket::socket_type::ROM:
 			err = rpk_load_rom_resource(socket, ti99_socket);
 			if (err)
 				return err;
 			newrpk->add_socket(socket.id().c_str(), std::move(ti99_socket));
 			break;
 
-		case util::rpk_socket::socket_type::RAM:
-		case util::rpk_socket::socket_type::PERSISTENT_RAM:
+		case rpk_socket::socket_type::RAM:
+		case rpk_socket::socket_type::PERSISTENT_RAM:
 			newrpk->add_socket(socket.id().c_str(), rpk_load_ram_resource(options, socket, system_name));
 			break;
 

@@ -82,7 +82,7 @@ rpk_category_impl const f_rpk_category_instance;
 //  ctor
 //-------------------------------------------------
 
-util::rpk_reader::rpk_reader(char const *const *pcb_types, bool supports_ram)
+rpk_reader::rpk_reader(char const *const *pcb_types, bool supports_ram)
 	: m_pcb_types(pcb_types)
 	, m_supports_ram(supports_ram)
 {
@@ -93,7 +93,7 @@ util::rpk_reader::rpk_reader(char const *const *pcb_types, bool supports_ram)
 //  read
 //-------------------------------------------------
 
-std::error_condition util::rpk_reader::read(std::unique_ptr<random_read> &&stream, rpk_file::ptr &result) const
+std::error_condition rpk_reader::read(std::unique_ptr<util::random_read> &&stream, rpk_file::ptr &result) const
 {
 	// open the RPK (as a zip file)
 	util::archive_file::ptr zipfile;
@@ -126,6 +126,7 @@ std::error_condition util::rpk_reader::read(std::unique_ptr<random_read> &&strea
 	util::xml::file::ptr const layout_xml = util::xml::file::string_read(&layout_xml_text[0], nullptr);
 	if (!layout_xml)
 		return error::XML_ERROR;
+	layout_xml_text.reset();
 
 	// now we work within the XML tree
 
@@ -226,7 +227,7 @@ std::error_condition util::rpk_reader::read(std::unique_ptr<random_read> &&strea
 //  ctor
 //-------------------------------------------------
 
-util::rpk_file::rpk_file(archive_file::ptr &&zipfile, int pcb_type)
+rpk_file::rpk_file(util::archive_file::ptr &&zipfile, int pcb_type)
 	: m_zipfile(std::move(zipfile))
 	, m_pcb_type(pcb_type)
 {
@@ -238,7 +239,7 @@ util::rpk_file::rpk_file(archive_file::ptr &&zipfile, int pcb_type)
 //  dtor
 //-------------------------------------------------
 
-util::rpk_file::~rpk_file()
+rpk_file::~rpk_file()
 {
 }
 
@@ -247,7 +248,7 @@ util::rpk_file::~rpk_file()
 //  add_rom_socket
 //-------------------------------------------------
 
-std::error_condition util::rpk_file::add_rom_socket(std::string &&id, const util::xml::data_node &rom_resource_node)
+std::error_condition rpk_file::add_rom_socket(std::string &&id, const util::xml::data_node &rom_resource_node)
 {
 	// find the file attribute (required)
 	std::string const *const file = rom_resource_node.get_attribute_string_ptr("file");
@@ -255,13 +256,13 @@ std::error_condition util::rpk_file::add_rom_socket(std::string &&id, const util
 		return rpk_reader::error::INVALID_LAYOUT; // <rom> must have a 'file' attribute
 
 	// check for crc (optional)
-	std::optional<hash_collection> hashes;
+	std::optional<util::hash_collection> hashes;
 	std::string const *const crcstr = rom_resource_node.get_attribute_string_ptr("crc");
 	if (crcstr)
 	{
 		if (!hashes)
 			hashes.emplace();
-		hashes->add_from_string(hash_collection::HASH_CRC, *crcstr);
+		hashes->add_from_string(util::hash_collection::HASH_CRC, *crcstr);
 	}
 
 	// check for sha1 (optional)
@@ -270,7 +271,7 @@ std::error_condition util::rpk_file::add_rom_socket(std::string &&id, const util
 	{
 		if (!hashes.has_value())
 			hashes.emplace();
-		hashes->add_from_string(hash_collection::HASH_SHA1, *sha1);
+		hashes->add_from_string(util::hash_collection::HASH_SHA1, *sha1);
 	}
 
 	// finally add the socket
@@ -283,7 +284,7 @@ std::error_condition util::rpk_file::add_rom_socket(std::string &&id, const util
 //  add_ram_socket
 //-------------------------------------------------
 
-std::error_condition util::rpk_file::add_ram_socket(std::string &&id, const util::xml::data_node &ram_resource_node)
+std::error_condition rpk_file::add_ram_socket(std::string &&id, const util::xml::data_node &ram_resource_node)
 {
 	// find the length attribute
 	std::string const *const length_string = ram_resource_node.get_attribute_string_ptr("length");
@@ -353,7 +354,7 @@ std::error_condition util::rpk_file::add_ram_socket(std::string &&id, const util
 //  ctor
 //-------------------------------------------------
 
-util::rpk_socket::rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, std::string &&filename, std::optional<hash_collection> &&hashes, std::optional<std::uint32_t> length)
+rpk_socket::rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, std::string &&filename, std::optional<util::hash_collection> &&hashes, std::optional<std::uint32_t> length)
 	: m_rpk(rpk)
 	, m_id(id)
 	, m_type(type)
@@ -368,7 +369,7 @@ util::rpk_socket::rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, 
 //  dtor
 //-------------------------------------------------
 
-util::rpk_socket::~rpk_socket()
+rpk_socket::~rpk_socket()
 {
 }
 
@@ -377,7 +378,7 @@ util::rpk_socket::~rpk_socket()
 //  read_file
 //-------------------------------------------------
 
-std::error_condition util::rpk_socket::read_file(std::vector<std::uint8_t> &result) const
+std::error_condition rpk_socket::read_file(std::vector<std::uint8_t> &result) const
 {
 	// find the file
 	if (m_rpk.zipfile().search(m_filename, false) < 0)
@@ -422,7 +423,7 @@ std::error_condition util::rpk_socket::read_file(std::vector<std::uint8_t> &resu
 //  rpk_category - gets the RPK error category instance
 //-------------------------------------------------
 
-std::error_category const &util::rpk_category() noexcept
+std::error_category const &rpk_category() noexcept
 {
 	return f_rpk_category_instance;
 }
@@ -436,33 +437,33 @@ std::string rpk_category_impl::message(int condition) const
 	using namespace std::literals;
 
 	std::string result;
-	switch ((util::rpk_reader::error) condition)
+	switch ( condition)
 	{
-	case util::rpk_reader::error::NO_ERROR:
+	case 0:
 		result = "No error"s;
 		break;
-	case util::rpk_reader::error::XML_ERROR:
+	case (int)rpk_reader::error::XML_ERROR:
 		result = "XML format error"s;
 		break;
-	case util::rpk_reader::error::MISSING_RAM_LENGTH:
+	case (int)rpk_reader::error::MISSING_RAM_LENGTH:
 		result = "Missing RAM length"s;
 		break;
-	case util::rpk_reader::error::INVALID_RAM_SPEC:
+	case (int)rpk_reader::error::INVALID_RAM_SPEC:
 		result = "Invalid RAM specification"s;
 		break;
-	case util::rpk_reader::error::INVALID_RESOURCE_REF:
+	case (int)rpk_reader::error::INVALID_RESOURCE_REF:
 		result = "Invalid resource reference"s;
 		break;
-	case util::rpk_reader::error::INVALID_LAYOUT:
+	case (int)rpk_reader::error::INVALID_LAYOUT:
 		result = "layout.xml not valid"s;
 		break;
-	case util::rpk_reader::error::MISSING_LAYOUT:
+	case (int)rpk_reader::error::MISSING_LAYOUT:
 		result = "Missing layout"s;
 		break;
-	case util::rpk_reader::error::UNKNOWN_PCB_TYPE:
+	case (int)rpk_reader::error::UNKNOWN_PCB_TYPE:
 		result = "Unknown pcb type"s;
 		break;
-	case util::rpk_reader::error::UNSUPPORTED_RPK_FEATURE:
+	case (int)rpk_reader::error::UNSUPPORTED_RPK_FEATURE:
 		result = "RPK feature not supported"s;
 		break;
 	default:

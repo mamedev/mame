@@ -69,12 +69,12 @@ protected:
 
 private:
 
-	class rpk_socket;
+	class ti99_rpk_socket;
 	class rpk;
 
 	static std::error_condition rpk_open(emu_options &options, std::unique_ptr<util::random_read> &&stream, const char *system_name, std::unique_ptr<rpk> &result);
-	static std::error_condition rpk_load_rom_resource(const util::rpk_socket &socket, std::unique_ptr<rpk_socket> &result);
-	static std::unique_ptr<rpk_socket> rpk_load_ram_resource(emu_options &options, const util::rpk_socket &socket, const char *system_name);
+	static std::error_condition rpk_load_rom_resource(const rpk_socket &socket, std::unique_ptr<ti99_rpk_socket> &result);
+	static std::unique_ptr<ti99_rpk_socket> rpk_load_ram_resource(emu_options &options, const rpk_socket &socket, const char *system_name);
 
 	class rpk
 	{
@@ -92,17 +92,17 @@ private:
 		emu_options&            m_options;      // need this to find the path to the nvram files
 		int                     m_type;
 		//const char*             m_system_name;  // need this to find the path to the nvram files
-		std::unordered_map<std::string,std::unique_ptr<rpk_socket>> m_sockets;
+		std::unordered_map<std::string,std::unique_ptr<ti99_rpk_socket>> m_sockets;
 
-		void add_socket(const char* id, std::unique_ptr<rpk_socket> newsock);
+		void add_socket(const char* id, std::unique_ptr<ti99_rpk_socket> &&newsock);
 	};
 
-	class rpk_socket
+	class ti99_rpk_socket
 	{
 	public:
-		rpk_socket(const char *id, int length, std::vector<uint8_t> &&contents);
-		rpk_socket(const char *id, int length, std::vector<uint8_t> &&contents, std::string &&pathname);
-		~rpk_socket() {}
+		ti99_rpk_socket(const char *id, int length, std::vector<uint8_t> &&contents);
+		ti99_rpk_socket(const char *id, int length, std::vector<uint8_t> &&contents, std::string &&pathname);
+		~ti99_rpk_socket() {}
 
 		const char*     id() { return m_id; }
 		int             get_content_length() { return m_length; }

@@ -19,7 +19,7 @@
 #include <list>
 #include <optional>
 
-namespace util {
+
 /***************************************************************************
 	TYPE DEFINITIONS
 ***************************************************************************/
@@ -41,7 +41,7 @@ public:
 	};
 
 	// ctor/dtor
-	rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, std::string &&filename, std::optional<hash_collection> &&hashes, std::optional<std::uint32_t> length);
+	rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, std::string &&filename, std::optional<util::hash_collection> &&hashes, std::optional<std::uint32_t> length);
 	rpk_socket(const rpk_socket &) = delete;
 	rpk_socket(rpk_socket &&) = delete;
 	~rpk_socket();
@@ -56,12 +56,12 @@ public:
 	std::error_condition read_file(std::vector<std::uint8_t> &result) const;
 
 private:
-	rpk_file &						m_rpk;
-	std::string						m_id;
-	socket_type						m_type;
-	std::string						m_filename;
-	std::optional<hash_collection>	m_hashes;
-	std::optional<std::uint32_t>	m_length;
+	rpk_file &								m_rpk;
+	std::string								m_id;
+	socket_type								m_type;
+	std::string								m_filename;
+	std::optional<util::hash_collection>	m_hashes;
+	std::optional<std::uint32_t>			m_length;
 };
 
 
@@ -76,7 +76,7 @@ public:
 	typedef std::unique_ptr<rpk_file> ptr;
 
 	// ctor/dtor
-	rpk_file(archive_file::ptr &&zipfile, int pcb_type);
+	rpk_file(util::archive_file::ptr &&zipfile, int pcb_type);
 	rpk_file(const rpk_file &) = delete;
 	rpk_file(rpk_file &&) = delete;
 	~rpk_file();
@@ -86,12 +86,12 @@ public:
 	const std::list<rpk_socket> &sockets() const { return m_sockets; }
 
 private:
-	archive_file::ptr		m_zipfile;
-	int						m_pcb_type;
-	std::list<rpk_socket>	m_sockets;
+	util::archive_file::ptr		m_zipfile;
+	int							m_pcb_type;
+	std::list<rpk_socket>		m_sockets;
 
 	// accesors
-	archive_file &zipfile() { return *m_zipfile; }
+	util::archive_file &zipfile() { return *m_zipfile; }
 
 	// methods
 	std::error_condition add_rom_socket(std::string &&id, const util::xml::data_node &rom_resource_node);
@@ -106,8 +106,7 @@ class rpk_reader
 public:
 	enum class error
 	{
-		NO_ERROR = 0,
-		XML_ERROR,
+		XML_ERROR = 1,
 		INVALID_FILE_REF,
 		MISSING_RAM_LENGTH,
 		INVALID_RAM_SPEC,
@@ -124,7 +123,7 @@ public:
 	rpk_reader(rpk_reader &&) = delete;
 
 	// methods
-	std::error_condition read(std::unique_ptr<random_read> &&stream, rpk_file::ptr &result) const;
+	std::error_condition read(std::unique_ptr<util::random_read> &&stream, rpk_file::ptr &result) const;
 
 private:
 	char const *const *	m_pcb_types;
@@ -136,10 +135,8 @@ private:
 std::error_category const &rpk_category() noexcept;
 inline std::error_condition make_error_condition(rpk_reader::error err) noexcept { return std::error_condition(int(err), rpk_category()); }
 
-};
-
 namespace std {
-	template <> struct is_error_condition_enum<util::rpk_reader::error> : public std::true_type { };
+	template <> struct is_error_condition_enum<rpk_reader::error> : public std::true_type { };
 } // namespace std
 
 #endif // MAME_FORMATS_RPK_H
