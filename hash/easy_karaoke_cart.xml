@@ -33,4 +33,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ekmh2" supported="no">
+		<description>Mega Hits Vol.2</description>
+		<year>2004</year>
+		<publisher>IVL Technologies</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="29lv040.u4" size="0x80000" crc="3affd9b1" sha1="658f35d664779041d445e085f8bbcf2301dac3e8" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000"> <!-- XTAL: 24DBBJK3 -->
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
