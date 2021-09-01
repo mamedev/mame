@@ -78,8 +78,6 @@ void twincobr_state::twincobr_create_tilemaps()
 
 void twincobr_state::video_start()
 {
-	m_spritegen->alloc_sprite_bitmap(*m_screen);
-
 	/* the video RAM is accessed via ports, it's not memory mapped */
 	m_txvideoram_size = 0x0800;
 	m_bgvideoram_size = 0x2000; /* banked two times 0x1000 */
@@ -364,22 +362,21 @@ void twincobr_state::log_vram()
 }
 
 
+void twincobr_state::pri_cb(u8 priority, u32 &pri_mask)
+{
+	switch (priority)
+	{
+		case 0: pri_mask = GFX_PMASK_1|GFX_PMASK_2|GFX_PMASK_4; break; // disable?
+		case 1: pri_mask = GFX_PMASK_2|GFX_PMASK_4;             break; // over background, under foreground/text
+		case 2: pri_mask = GFX_PMASK_4;                         break; // over background/foreground, under text
+		case 3: pri_mask = 0;                                   break; // over everything
+	}
+}
+
+
 u32 twincobr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	log_vram();
-
-	u16 *buffered_spriteram16;
-	u32 bytes;
-	if (m_spriteram16 != nullptr)
-	{
-		buffered_spriteram16 = m_spriteram16->buffer();
-		bytes = m_spriteram16->bytes();
-	}
-	else
-	{
-		buffered_spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->buffer());
-		bytes = m_spriteram8->bytes();
-	}
 
 	if (!m_display_on)
 	{
@@ -387,14 +384,25 @@ u32 twincobr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 	else
 	{
-		m_spritegen->draw_sprites_to_tempbitmap(cliprect, buffered_spriteram16, bytes);
+		screen.priority().fill(0, cliprect);
 
-		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
-		m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
+		u16 *buffered_spriteram16;
+		u32 bytes;
+		if (m_spriteram16 != nullptr)
+		{
+			buffered_spriteram16 = m_spriteram16->buffer();
+			bytes = m_spriteram16->bytes();
+		}
+		else
+		{
+			buffered_spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->buffer());
+			bytes = m_spriteram8->bytes();
+		}
+
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,2);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
+		m_spritegen->draw_sprites(bitmap, cliprect, buffered_spriteram16, bytes);
 	}
 
 	return 0;
