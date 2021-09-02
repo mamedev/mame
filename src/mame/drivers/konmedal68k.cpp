@@ -421,7 +421,7 @@ static INPUT_PORTS_START( kzaurus )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( konslot )
+static INPUT_PORTS_START( crossmg2 )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN0")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -776,7 +776,7 @@ ROM_END
 
 // GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM (palette RAM?), possible have no video output or have it implemented in some unusual way.
 // at 1st boot press Service1 to initialise NVRAM
-ROM_START( konslot ) // Possibly Cross Magic Mark 2 (1996)
+ROM_START( crossmg2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "669-a05-2n.bin", 0x000000, 0x080000, CRC(3330848e) SHA1(24c2ac03fe5d099659081d1f9611c707c746c768) )
 
@@ -787,7 +787,7 @@ ROM_START( konslot ) // Possibly Cross Magic Mark 2 (1996)
 	ROM_LOAD( "669-a01-2d.bin", 0x000000, 0x080000, CRC(08438dad) SHA1(b4ef8fc37deca5b6537cc581fc99968c86e6ec2c) )
 ROM_END
 
-ROM_START( konslot2 ) // Possibly Fruit Magic (1996)
+ROM_START( fruitsmg )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "660-a05.2n", 0x000000, 0x080000, CRC(d7460250) SHA1(490588181b3b558e03752f4c6cbdadb807b990b3) )
 
@@ -811,6 +811,6 @@ GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0,
 GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, spcpokan, 0, spcpokan, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 
-// higher resolution
-GAME( 199?, konslot,  0, slot,     konslot, konmedal68k_slot_state, empty_init, ROT0, "Konami", "unknown Konami slot medal game (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, konslot2, 0, slot,     konslot, konmedal68k_slot_state, empty_init, ROT0, "Konami", "unknown Konami slot medal game (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// Higher resolution display.  These are Pachinko / Pachislot machines, will require simulation of mechanical parts / ball sensors. 
+GAME( 1996, crossmg2,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Cross Magic Mark 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )
+GAME( 1996, fruitsmg,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Fruits Magic - The Magic Party", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )
