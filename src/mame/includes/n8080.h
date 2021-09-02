@@ -19,6 +19,7 @@ public:
 	n8080_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
+		m_prom(*this, "proms"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_n8080_dac(*this, "n8080_dac"),
@@ -36,9 +37,9 @@ protected:
 	virtual void delayed_sound_1(int data);
 	virtual void delayed_sound_2(int data);
 
-//private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
+	optional_memory_region m_prom;
 
 	/* video-related */
 	int m_sheriff_color_mode;
@@ -155,7 +156,8 @@ public:
 	helifire_state(const machine_config &mconfig, device_type type, const char *tag) :
 		n8080_state(mconfig, type, tag),
 		m_dac(*this, "helifire_dac"),
-		m_colorram(*this, "colorram")
+		m_colorram(*this, "colorram"),
+		m_pot(*this, "POT%u", 0)
 	{ }
 
 	void helifire(machine_config &config);
@@ -188,6 +190,7 @@ private:
 
 	required_device<dac_8bit_r2r_device> m_dac;
 	required_shared_ptr<uint8_t> m_colorram;
+	required_ioport_array<2> m_pot;
 
 	int m_dac_phase;
 	double m_dac_volume;
