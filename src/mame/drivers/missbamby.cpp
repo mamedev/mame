@@ -293,8 +293,8 @@ ROM_START( trebol )
 ROM_END
 
 /*  "Basket" electromechanical machine from the Spanish company IGOA S.A.
-    Similar hardware, with two 8155.
-    Two empty EPROM sockets on the dumped PCB
+    Similar hardware, with two 8155. PCB silkscreened as "CPU 687-1".
+    Two empty EPROM sockets on the dumped PCB.
    ____________________________________________________
   |                          _________                 |
   |                         | 8xDips  |                |__
@@ -329,7 +329,7 @@ ROM_START( basket )
 	ROM_LOAD( "igoa_sa_ba2.81_chk_69d2_mod_basket.bin", 0x0000, 0x8000, CRC(3d52419d) SHA1(5f097391bcad72c8d0f029ef21ca38d903cef140) )
 
 	ROM_REGION(0x20, "prom", 0)
-	ROM_LOAD( "82s123an.bin", 0x00, 0x20, NO_DUMP )
+	ROM_LOAD( "n82s123an.bin", 0x00, 0x20, CRC(1ad9b60b) SHA1(936b9f7a6d8f2dde71e86205f6c37634e4119cde) )
 
 	ROM_REGION(0x104, "plds", 0)
 	ROM_LOAD( "pal16r4acn.bin", 0x000, 0x104, NO_DUMP )
