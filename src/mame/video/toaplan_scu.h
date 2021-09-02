@@ -21,7 +21,6 @@ public:
 	}
 	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
 
-	template<class BitmapClass> void draw_sprites_common(BitmapClass &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes);
 
@@ -30,6 +29,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	template<class BitmapClass> void draw_sprites_common(BitmapClass &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes);
+
 	static const gfx_layout spritelayout;
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
