@@ -17,7 +17,7 @@ Known games on this hardware:
  | NO     | Gold Mini II      | Video Game         |                    |
  +--------+-------------------+--------------------+--------------------+
 
-Two unrelated games with similar hardware also on this driver:
+Unrelated games with similar hardware also on this driver:
  _________________________________________________________
  |Name   |Company | Description                          |
  +-------+--------+--------------------------------------|
