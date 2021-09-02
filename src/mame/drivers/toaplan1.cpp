@@ -1969,8 +1969,10 @@ void toaplan1_rallybik_state::rallybik(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(toaplan1_rallybik_state::screen_vblank));
 
 	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_screen(m_screen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(31, 15);
+	m_spritegen->set_pri_callback(FUNC(toaplan1_rallybik_state::pri_cb));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rallybik);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
