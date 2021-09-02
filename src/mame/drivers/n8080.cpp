@@ -4,19 +4,136 @@
 
   Nintendo 8080 hardware
 
-    - Space Fever
-    - Space Fever High Splitter (aka SF-Hisplitter)
-    - Space Launcher
-    - Sheriff / Bandido / Western Gun 2
-    - Helifire
+- Space Fever
+- Space Fever High Splitter (aka SF-Hisplitter)
+- Space Launcher
+- Sheriff / Bandido / Western Gun 2
+- Helifire
+
+TODO:
+- space fever original hw is monochrome
+
+----------------------------------------------------------------------------
+
+Space Fever (3 sets, Space Fever?, High Splitter?, Space Launcher?)
+Nintendo, 1979
+
+Note: These are all simple ROM swaps on a standard b/w Space Fever PCB.
+
+
+PCB Layouts
+-----------
+
+Top Board (Sound PCB)
+
+TSF-SOU
+|----------------------------------------------------|
+|                                 VR3    VR2    VR1  |
+|  8035                    74123                     |
+|                 74275                              |
+|  6MHz                                              |
+|                          74123         SN76477     |
+|  SF_SOUND.IC2   74275                              |
+|                                                    |
+|                          7405                      |
+|                                                    |
+|----------------------------------------------------|
+Notes:
+      All IC's shown.
+      There is no AMP on the PCB, sound amplification is done via a small external AMP board.
+      ROM IC2 is a 2708 EPROM.
+      VR1: master volume
+      VR2: shoot volume
+      VR3: music volume
+      8035 clocks: pins 2 and 3 measure 6.000MHz
+                   pin 9 measures 399.256kHz
+                   pin 12 measures 200.0kHz
+                   pin 13 measures 105.0kHz
+                   pin 21 measures 399.4Khz
+                   pin 22 measures 400.0kHz
+                   pin 23 measures 399.3kHz
+                   pin 24 measures 399.3kHz
+                   pin 39 measures 61.5627Hz
+
+
+Middle board
+------------
+
+TSF-I/O  PI-500803
+|----------------------------------------------------|
+|                                                    |
+|     VR1                                            |
+|                     20.160MHz                      |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                     DSW1(8)                        |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|----------------------------------------------------|
+Notes:
+      VR1: adjusts brightness
+      Board contains mostly logic ICs (not shown)
+      Video output is b/w, the harness is wired to a JAMMA fingerboard but only blue is used.
+
+
+Bottom board
+------------
+
+TSF-CPU  PI-500802
+|----------------------------------------------------|
+|                                                    |
+|                                                    |
+|                                                    |
+|             SF_F1.F1  SF_G1.G1  SF_H1.H1  SF_I1.I1 |
+|                                                    |
+|   8080                                             |
+|                                                    |
+|             SF_F2.F2  SF_G2.G2  SF_H2.H2  SF_I2.I2 |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|     4116  4116  4116  4116  4116  4116  4116  4116 |
+|----------------------------------------------------|
+Notes:
+      All ROMs are 2708, 1K x8
+      4116: 2K x8 DRAM
+      8080 clock: 2.0160MHz (20.160 / 10)
+      Sync: no V reading, H is 15.57kHz
+
+      Set 1 is on the PCB and is complete.
+      Some ROMs in set1 match the current sfeverbw set.
+
+      The other two sets were supplied as just EPROMs.
+      Set2 (maybe High Splitter) is missing the ROM at location I2. Might be missing, or maybe
+      just the program is smaller and the extra ROM was not required.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/n8080.h"
 
-#define MASTER_CLOCK    XTAL(20'160'000)
 
+// Shifter circuit done with TTL
 
 void n8080_state::n8080_shift_bits_w(uint8_t data)
 {
@@ -28,11 +145,11 @@ void n8080_state::n8080_shift_data_w(uint8_t data)
 	m_shift_data = (m_shift_data >> 8) | (data << 8);
 }
 
-
 uint8_t n8080_state::n8080_shift_r()
 {
 	return m_shift_data >> (8 - m_shift_bits);
 }
+
 
 void n8080_state::main_cpu_map(address_map &map)
 {
@@ -40,7 +157,6 @@ void n8080_state::main_cpu_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).ram().share("videoram");
 }
-
 
 void helifire_state::main_cpu_map(address_map &map)
 {
@@ -66,7 +182,7 @@ void n8080_state::main_io_map(address_map &map)
 }
 
 
-/* Input ports */
+// Input ports
 
 static INPUT_PORTS_START( spacefev )
 	PORT_START("IN0")
@@ -431,13 +547,13 @@ static INPUT_PORTS_START( helifire )
 INPUT_PORTS_END
 
 
-/* Interrupts */
+// Interrupts
 
 TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
 {
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
-	/* V7 = 1, V6 = 0 */
+	// V7 = 1, V6 = 0
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf); // I8080
 }
 
@@ -445,7 +561,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 {
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
-	/* vblank */
+	// vblank
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7); // I8080
 }
 
@@ -458,10 +574,13 @@ void n8080_state::n8080_status_callback(uint8_t data)
 {
 	if (data & i8080_cpu_device::STATUS_INTA)
 	{
-		/* interrupt acknowledge */
+		// interrupt acknowledge
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
+
+
+// Machine start/reset
 
 void n8080_state::machine_start()
 {
@@ -503,10 +622,12 @@ void helifire_state::machine_reset()
 }
 
 
+// Machine configs
+
 void spacefev_state::spacefev(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, MASTER_CLOCK / 10);
+	I8080(config, m_maincpu, XTAL(20'160'000) / 10);
 	m_maincpu->out_status_func().set(FUNC(spacefev_state::n8080_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(spacefev_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &spacefev_state::main_cpu_map);
@@ -529,11 +650,10 @@ void spacefev_state::spacefev(machine_config &config)
 	spacefev_sound(config);
 }
 
-
 void sheriff_state::sheriff(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, MASTER_CLOCK / 10);
+	I8080(config, m_maincpu, XTAL(20'160'000) / 10);
 	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
@@ -571,7 +691,7 @@ void sheriff_state::westgun2(machine_config &config)
 void helifire_state::helifire(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, MASTER_CLOCK / 10);
+	I8080(config, m_maincpu, XTAL(20'160'000) / 10);
 	m_maincpu->out_status_func().set(FUNC(helifire_state::n8080_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(helifire_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &helifire_state::main_cpu_map);
@@ -596,119 +716,7 @@ void helifire_state::helifire(machine_config &config)
 }
 
 
-/*
-Space Fever (3 sets, Space Fever?, High Splitter?, Space Launcher?)
-Nintendo, 1979
-
-Note: These are all simple ROM swaps on a standard b/w Space Fever PCB.
-
-
-PCB Layouts
------------
-
-Top Board (Sound PCB)
-
-TSF-SOU
-|----------------------------------------------------|
-|                                 VR3    VR2    VR1  |
-|  8035                    74123                     |
-|                 74275                              |
-|  6MHz                                              |
-|                          74123         SN76477     |
-|  SF_SOUND.IC2   74275                              |
-|                                                    |
-|                          7405                      |
-|                                                    |
-|----------------------------------------------------|
-Notes:
-      All IC's shown.
-      There is no AMP on the PCB, sound amplification is done via a small external AMP board.
-      ROM IC2 is a 2708 EPROM.
-      VR1: master volume
-      VR2: shoot volume
-      VR3: music volume
-      8035 clocks: pins 2 and 3 measure 6.000MHz
-                   pin 9 measures 399.256kHz
-                   pin 12 measures 200.0kHz
-                   pin 13 measures 105.0kHz
-                   pin 21 measures 399.4Khz
-                   pin 22 measures 400.0kHz
-                   pin 23 measures 399.3kHz
-                   pin 24 measures 399.3kHz
-                   pin 39 measures 61.5627Hz
-
-
-Middle board
-------------
-
-TSF-I/O  PI-500803
-|----------------------------------------------------|
-|                                                    |
-|     VR1                                            |
-|                     20.160MHz                      |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                     DSW1(8)                        |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|----------------------------------------------------|
-Notes:
-      VR1: adjusts brightness
-      Board contains mostly logic ICs (not shown)
-      Video output is b/w, the harness is wired to a JAMMA fingerboard but only blue is used.
-
-
-Bottom board
-------------
-
-TSF-CPU  PI-500802
-|----------------------------------------------------|
-|                                                    |
-|                                                    |
-|                                                    |
-|             SF_F1.F1  SF_G1.G1  SF_H1.H1  SF_I1.I1 |
-|                                                    |
-|   8080                                             |
-|                                                    |
-|             SF_F2.F2  SF_G2.G2  SF_H2.H2  SF_I2.I2 |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|                                                    |
-|     4116  4116  4116  4116  4116  4116  4116  4116 |
-|----------------------------------------------------|
-Notes:
-      All ROMs are 2708, 1K x8
-      4116: 2K x8 DRAM
-      8080 clock: 2.0160MHz (20.160 / 10)
-      Sync: no V reading, H is 15.57kHz
-
-      Set 1 is on the PCB and is complete.
-      Some ROMs in set1 match the current sfeverbw set.
-
-      The other two sets were supplied as just EPROMs.
-      Set2 (maybe High Splitter) is missing the ROM at location I2. Might be missing, or maybe
-      just the program is smaller and the extra ROM was not required.
-*/
+// ROM definitions
 
 ROM_START( spacefev )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -922,15 +930,18 @@ ROM_START( helifirea )
 ROM_END
 
 
-GAME( 1979, spacefev,   0,        spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (Older Ver.)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       MONITOR, COMPANY, FULLNAME, FLAGS
+GAME( 1979, spacefev,   0,        spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (older version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, highsplt,   0,        spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, highsplta,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, highspltb,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
+GAME( 1979, highsplta,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1979, highspltb,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (alt sound)", MACHINE_SUPPORTS_SAVE ) // "
 GAME( 1979, spacelnc,   0,        spacefev, spacelnc, spacefev_state, empty_init, ROT270, "Nintendo", "Space Launcher", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1979, sheriff,    0,        sheriff,  sheriff,  sheriff_state,  empty_init, ROT270, "Nintendo", "Sheriff", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  sheriff_state,  empty_init, ROT270, "Nintendo (Exidy license)", "Bandido", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, sheriff_state,  empty_init, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", MACHINE_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
+
 GAME( 1980, helifire,   0,        helifire, helifire, helifire_state, empty_init, ROT270, "Nintendo", "HeliFire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, helifirea,  helifire, helifire, helifire, helifire_state, empty_init, ROT270, "Nintendo", "HeliFire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
