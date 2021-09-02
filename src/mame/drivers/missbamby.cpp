@@ -17,12 +17,13 @@ Known games on this hardware:
  | NO     | Gold Mini II      | Video Game         |                    |
  +--------+-------------------+--------------------+--------------------+
 
-Two unrelated games with similar hardware also on this driver:
+Unrelated games with similar hardware also on this driver:
  _________________________________________________________
  |Name   |Company | Description                          |
  +-------+--------+--------------------------------------|
  |Trebol | Regama | Pinball                              |
  |Basket | Igoa   | Electromechanical basketball machine |
+ |Multy  | Deta   | Slot / bingo                         |
  +-------+--------+--------------------------------------+
 
 */
@@ -254,7 +255,25 @@ ROM_START( gwinner )
 	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, CRC(27ed5f29) SHA1(2d5f190fac6be15d3c5b344647333bbf47a04fc3) )
 ROM_END
 
-ROM_START( unkslot )
+/* Multy - Deta. The CPU was missing on the dumped PCB (so the exact type is unknown).
+   _______________________________________________________________________
+  |            _______                                                   |
+  |  ________  | BATT |  ________        ___     ________     ________   |
+  |MCM51L01P45 |______| |N82S23N|       |__|     CD4001BE    |_EMPTY_|   |
+  |            ____________  ____________                                |
+  |  ________  | EPROM     || EPROM      |  ________  ________  ________ |
+  |MCM51L01P45 |___________||____________|  74LS74PC  74LS393N |_______| |
+  |            ________________    ________________    ________________  |
+  |  ________  | GI AY-3-8910 |   | Intel P8155H  |   | CPU            | |
+  | 74LS373PC  |______________|   |_______________|   |________________| |
+  |                     ________   ________              (_) <- Switch   |
+  |                     |8xDIPS | |_7417N_|                              |
+  |                                  ________  ________                  |
+  |                                  ULN2003A  ULN2003A                  |
+  |                ____                               ____               |
+  |_______________|    |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|    |______________|
+*/
+ROM_START( multy )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "tms2564jl.bin", 0x0000, 0x2000, CRC(43fa54fb) SHA1(2e0d0883deb20d68e46d3c5c5c98508c9b5d5411) )
 	ROM_LOAD( "d2764d.bin",    0x2000, 0x1000, CRC(b7c55fc2) SHA1(2dfcc35821971c27178522afe9db1d18e12b3a42) ) // 1xxxxxxxxxxx = 0xFF
@@ -274,8 +293,8 @@ ROM_START( trebol )
 ROM_END
 
 /*  "Basket" electromechanical machine from the Spanish company IGOA S.A.
-    Similar hardware, with two 8155.
-    Two empty EPROM sockets on the dumped PCB
+    Similar hardware, with two 8155. PCB silkscreened as "CPU 687-1".
+    Two empty EPROM sockets on the dumped PCB.
    ____________________________________________________
   |                          _________                 |
   |                         | 8xDips  |                |__
@@ -310,7 +329,7 @@ ROM_START( basket )
 	ROM_LOAD( "igoa_sa_ba2.81_chk_69d2_mod_basket.bin", 0x0000, 0x8000, CRC(3d52419d) SHA1(5f097391bcad72c8d0f029ef21ca38d903cef140) )
 
 	ROM_REGION(0x20, "prom", 0)
-	ROM_LOAD( "82s123an.bin", 0x00, 0x20, NO_DUMP )
+	ROM_LOAD( "n82s123an.bin", 0x00, 0x20, CRC(1ad9b60b) SHA1(936b9f7a6d8f2dde71e86205f6c37634e4119cde) )
 
 	ROM_REGION(0x104, "plds", 0)
 	ROM_LOAD( "pal16r4acn.bin", 0x000, 0x104, NO_DUMP )
@@ -319,11 +338,11 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1981,  minisupf, 0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981,  luckyplr, 0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",                          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?,  msbamby,  0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",                            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?,  goldfrts, 0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",                         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?,  unkslot,  0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983,  gwinner,  0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",                         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985,  trebol,   0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",                                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987?, basket,   0, igoabasket, missbamby, missbamby_state, empty_init, ROT0, "Igoa S.A.",          "Basket",                                MACHINE_IS_SKELETON_MECHANICAL ) // v2.0 on ROM string, v2.81 on EPROM label
+GAME( 1981,  minisupf, 0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981,  luckyplr, 0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?,  msbamby,  0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?,  goldfrts, 0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983,  gwinner,  0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985,  trebol,   0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987?, basket,   0, igoabasket, missbamby, missbamby_state, empty_init, ROT0, "Igoa S.A.",          "Basket",            MACHINE_IS_SKELETON_MECHANICAL ) // v2.0 on ROM string, v2.81 on EPROM label
+GAME( 1987,  multy,    0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Deta",               "Multy",             MACHINE_IS_SKELETON_MECHANICAL )
