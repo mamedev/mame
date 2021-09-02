@@ -95,7 +95,8 @@ class spacefev_state : public n8080_state
 {
 public:
 	spacefev_state(const machine_config &mconfig, device_type type, const char *tag) :
-		n8080_state(mconfig, type, tag)
+		n8080_state(mconfig, type, tag),
+		m_video_conf(*this, "VIDEO")
 	{ }
 
 	void spacefev(machine_config &config);
@@ -112,6 +113,8 @@ protected:
 	virtual void delayed_sound_2(int data) override;
 
 private:
+	required_ioport m_video_conf;
+
 	void spacefev_sound(machine_config &config);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vco_voltage_timer);

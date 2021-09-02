@@ -126,6 +126,7 @@ void helifire_state::video_start()
 
 uint32_t spacefev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const bool mono = bool(m_video_conf->read());
 	uint8_t mask = flip_screen() ? 0xff : 0x00;
 
 	uint8_t const *pRAM = m_videoram;
@@ -175,6 +176,9 @@ uint32_t spacefev_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					}
 				}
 			}
+
+			if (mono)
+				color = 7; // force B&W here
 
 			for (int n = 0; n < 8; n++)
 			{

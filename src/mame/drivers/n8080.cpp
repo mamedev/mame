@@ -10,9 +10,6 @@
 - Sheriff / Bandido / Western Gun 2
 - Helifire
 
-TODO:
-- space fever original hw is monochrome
-
 ----------------------------------------------------------------------------
 
 Space Fever (3 sets, Space Fever?, High Splitter?, Space Launcher?)
@@ -232,6 +229,11 @@ static INPUT_PORTS_START( spacefev )
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("VIDEO") // spacefev video hardware is originally monochrome, also exists with color video hardware
+	PORT_CONFNAME( 0x01, 0x00, "Video Output" )
+	PORT_CONFSETTING(    0x01, "Monochrome" )
+	PORT_CONFSETTING(    0x00, "Color" )
 INPUT_PORTS_END
 
 
@@ -261,6 +263,9 @@ static INPUT_PORTS_START( highsplt )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ))
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+
+	PORT_MODIFY("VIDEO") // only exists with color video hardware
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
