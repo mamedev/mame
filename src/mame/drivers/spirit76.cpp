@@ -24,7 +24,6 @@ Switch at G6 (sw1-4 = free game scores, sw5-8 = config), at G8 (coin chute setti
 TODO:
 - Outputs (lamps)
 - After starting a 2-player game, the credit button will let you waste away your remaining credits.
-- The knocker only works when a coin is inserted - not when you get a free game
 - The 240k/280k preset high score free games are actually 200k.
 - The settings for the right-hand coin slot are ignored; both slots use the left-hand slot's settings.
 - Find tilt input
@@ -176,7 +175,7 @@ static INPUT_PORTS_START( spirit76 )
 
 	PORT_START("X13")
 	PORT_DIPNAME( 0x0f, 0x0f, "Preset score")
-	PORT_DIPSETTING(    0x0f, "40k")
+	PORT_DIPSETTING(    0x0f, "40k") // more free games at 70k, 100k - undocumented
 	PORT_DIPSETTING(    0x0e, "50k")
 	PORT_DIPSETTING(    0x0d, "60k")
 	PORT_DIPSETTING(    0x0c, "70k")
@@ -293,15 +292,15 @@ void spirit76_state::portb_w(u8 data)
 				m_solenoids[data] = 1;
 				switch (data)
 				{
-					case 1: m_samples->start(1, 3); break; // 10 chime
-					case 2: m_samples->start(1, 2); break; // 100 chime
+					case 1: m_samples->start(3, 3); break; // 10 chime
+					case 2: m_samples->start(2, 2); break; // 100 chime
 					case 3: m_samples->start(1, 1); break; // 1000 chime
+					case 4: case 14: m_samples->start(0, 6); break; // knocker
 					//case 5: m_samples->start(x, 6); break;  // Right flipper
 					//case 7: m_samples->start(x, 6); break;  // Left flipper
-					case 8: case 9: case 10: m_samples->start(2, 0); break; // 3 bumpers
-					case 11: case 12: m_samples->start(2, 7); break; // 2 slings
+					case 8: case 9: case 10: m_samples->start(4, 0); break; // 3 bumpers
+					case 11: case 12: m_samples->start(4, 7); break; // 2 slings
 					case 13: m_samples->start(5, 5); break; // outhole
-					case 14: m_samples->start(0, 6); break; // knocker
 					default: break;
 				}
 			}
