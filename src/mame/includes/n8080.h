@@ -58,7 +58,7 @@ protected:
 	int m_inte;
 
 	/* devices */
-	required_device<i8080_cpu_device> m_maincpu;
+	required_device<i8080a_cpu_device> m_maincpu;
 	required_device<i8035_device> m_audiocpu;
 	optional_device<dac_bit_interface> m_n8080_dac;
 	optional_device<sn76477_device> m_sn;
