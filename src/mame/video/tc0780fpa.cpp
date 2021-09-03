@@ -254,7 +254,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x12: Vertex 3 X
 			// 0x13: Vertex 3 Z
 
-			tc0780fpa_polydata &extra = object_data_alloc();
+			tc0780fpa_polydata &extra = object_data().next();
 			uint16_t texbase = polygon_fifo[ptr++];
 
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
@@ -356,7 +356,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x18: Vertex 4 X
 			// 0x19: Vertex 4 Z
 
-			tc0780fpa_polydata &extra = object_data_alloc();
+			tc0780fpa_polydata &extra = object_data().next();
 			uint16_t texbase = polygon_fifo[ptr++];
 
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
