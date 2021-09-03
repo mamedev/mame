@@ -27,27 +27,15 @@
       the floppy ports. Wrong info or check for external board anyway?
     - fix "jumps" in mouse support pointer (noticeable in Balance of Power);
 
-    per-game specific TODO:
-    - 100yen Soft 8 Revival Special: tight loop with vblank bit, but vblank irq takes too much time to execute its code;
-    - 177: gameplay is too fast (parent pc8801 only);
-    - 1942: missing sound, enables a masked irq;
-    - Acro Jet: hangs waiting for an irq (floppy issue);
-    - Arcus: doesn't surpass Wolf Team logo;
-    - Advanced Fantasian: garbage during gameplay (floppy?)
-    - American Success: reads the light pen?
-    - Attacker: resets after a bunch of animation frames;
-    - Balance of Power: uses the SIO port for something ...
+    per-game specific TODO (move to XML):
     - Belloncho Shintai Kensa: hangs
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "sono kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
-    - Boukenshatachi: dies after the intro.
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
-    - Carigraph: inputs doesn't work?
     - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
     - Can Can Bunny: no sound (regression);
     - Can Can Bunny Superior: black screen during the intro
     - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
-    - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Cranston Manor (actually N88-Basic demo): no sound
     - Datenshi Kyouko: gfx garbage on the right edge?
     - Final Crisis: sound stuck with OPNA?
@@ -56,10 +44,7 @@
     - Gaudi - Barcelona no Kaze: fails PCM loading
     - GeGeGe no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
     - Grobda: palette is ugly (parent pc8801 only);
-    - Makaimura: after losing a life the game doesn't work properly anymore, copy protection?
     - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
-    - N-BASIC: cursor doesn't show up;
-    - The Return of Ishtar: z80 exception after entering the name.
     - Star Cruiser: bad kanji data?
     - Star Cruiser: reads at i/o 0x8e?
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
@@ -120,11 +105,6 @@
     - Fruit Panic
     - FSD Sample Ongaku Shuu Vol. 1-7
     - Gaia no Kiba (Disk I/O error at 150)
-    - Gaiflame
-    - Gambler Jiko Chuushin ha
-    - Gambler Jiko Chuushin ha 2
-    - Gambler Jiko Chuushin ha 3
-    - Gambler Jiko Chuushin ha 3 (demo)
     - Gambler Jiko Chuushin ha Mahjong Puzzle Collection
     - Gambler Jiko Chuushin ha Mahjong Puzzle Collection (demo)
     * Game Music Library
@@ -142,14 +122,12 @@
     * MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     * Mugen Senshi Valis (at Telenet logo, it also appears to have a nasty copy protection when taking a specific item (untested))
     - Mr. Pro Yakyuu
-    - Panorama Toh
     - PC-8034 (app)
     - PC-8037SR (app)
     - P1 (app)
     - Pattern Editor 88 (app)
     - Super Shunbo II (app) (Load error)
     - Super TII (app)
-    * The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
     list of games that doesn't like i8214_irq_level == 5 in sound irq
@@ -677,7 +655,7 @@ void pc8801_state::pc8801_alu_w(offs_t offset, uint8_t data)
 			for(i=0;i<3;i++)
 			{
 				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
-
+				
 				switch(logic_op)
 				{
 					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
@@ -805,9 +783,7 @@ uint8_t pc8801_state::pc8801_mem_r(offs_t offset)
 
 		window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
-		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-			printf("Read from 0xf000 - 0xffff window offset\n"); //accessed by Castle Excellent, no noticeable quirk
-
+		// castlex and imenes accesses this
 		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 			return pc8801_high_wram_r(window_offset & 0xfff);
 
@@ -866,9 +842,9 @@ void pc8801_state::pc8801_mem_w(offs_t offset, uint8_t data)
 
 			window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
-			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-				printf("Write to 0xf000 - 0xffff window offset\n"); //accessed by Castle Excellent, no noticeable quirk
-
+			// castlex and imenes accesses this
+			// TODO: high TVRAM even 
+			// (uPD3301 reads from this instead of the regular work RAM)
 			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				pc8801_high_wram_w(window_offset & 0xfff,data);
 			else
@@ -1484,7 +1460,7 @@ uint8_t pc8801_state::pc8801_sound_board_r(offs_t offset)
 void pc8801_state::pc8801_sound_board_w(offs_t offset, uint8_t data)
 {
 	if(m_has_opna)
-		m_opna->write(offset,data);
+		m_opna->write(offset, data);
 	else if((offset & 2) == 0)
 		m_opn->write(offset, data);
 }
