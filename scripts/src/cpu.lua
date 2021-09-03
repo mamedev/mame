@@ -3252,6 +3252,16 @@ if opt_tool(CPUS, "DSP56000") then
 end
 
 --------------------------------------------------
+-- DEC VAX, disassembler only
+--@src/devices/cpu/vax/vax.h,CPUS["VAX"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "VAX") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vax/vaxdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vax/vaxdasm.h")
+end
+
+--------------------------------------------------
 -- DEC VT50/VT52
 --@src/devices/cpu/vt50/vt50.h,CPUS["VT50"] = true
 --------------------------------------------------

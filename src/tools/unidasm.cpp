@@ -185,6 +185,7 @@ using util::BIT;
 #include "cpu/v60/v60d.h"
 #include "cpu/v810/v810dasm.h"
 #include "cpu/v850/v850dasm.h"
+#include "cpu/vax/vaxdasm.h"
 #include "cpu/vt50/vt50dasm.h"
 #include "cpu/vt61/vt61dasm.h"
 #include "cpu/we32000/we32100d.h"
@@ -638,6 +639,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "v850",            le,  0, []() -> util::disasm_interface * { return new v850_disassembler; } },
 	{ "v850es",          le,  0, []() -> util::disasm_interface * { return new v850es_disassembler; } },
 	{ "v850e2",          le,  0, []() -> util::disasm_interface * { return new v850e2_disassembler; } },
+	{ "vax",             le,  0, []() -> util::disasm_interface * { return new vax_disassembler; } },
 	{ "vt50",            le,  0, []() -> util::disasm_interface * { return new vt50_disassembler; } },
 	{ "vt52",            le,  0, []() -> util::disasm_interface * { return new vt52_disassembler; } },
 	{ "vt61",            le, -1, []() -> util::disasm_interface * { return new vt61_disassembler; } },
