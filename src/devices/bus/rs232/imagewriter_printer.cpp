@@ -75,8 +75,8 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	cpu.set_addrmap(AS_PROGRAM, &apple_imagewriter_printer_device::mem_map);
 	cpu.set_addrmap(AS_IO,      &apple_imagewriter_printer_device::io_map);
 
-// ct486 picking up error fault, see if commenting this out fixed this
-//  m_maincpu->out_sod_func().set(FUNC(apple_imagewriter_printer_device::maincpu_out_sod_func));
+	m_maincpu->out_sod_func().set(FUNC(apple_imagewriter_printer_device::maincpu_out_sod_func));
+	m_maincpu->in_sid_func().set(FUNC(apple_imagewriter_printer_device::maincpu_in_sid_func));
 
 	TTL74163(config, m_count, 0);
 	m_maincpu->set_clk_out(m_count, FUNC(ttl74163_device::set_unscaled_clock_int));
@@ -217,6 +217,10 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_CONFSETTING(0x0, "Off")
 	PORT_CONFSETTING(0x1, "On")
 
+	PORT_START("WIDTH")
+	PORT_CONFNAME(0x1, 0x01, "Printer Width")
+	PORT_CONFSETTING(0x0, "15 Inches")
+	PORT_CONFSETTING(0x1, "8 Inches")
 
 	PORT_START("DARKPIXEL")
 	PORT_CONFNAME(0x7, 0x00, "Print Darkness")
@@ -257,7 +261,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_DIPSETTING(0x02, "Swedish")
 	PORT_DIPSETTING(0x06, "Italian")
 	PORT_DIPSETTING(0x00, "Spanish")
-	PORT_DIPSETTING(0x05, "American2")
+	PORT_DIPSETTING(0x05, "American")  // duplicate american setting
 
 	PORT_DIPNAME(0x08, 0x08, "Page length")
 	PORT_DIPLOCATION("SW1:4")
@@ -401,8 +405,8 @@ void apple_imagewriter_printer_device::head_pc_w(uint8_t data)
 	update_pf_stepper(BIT(data ^ 0xff, 1, 4));
 	if (!BIT(data,0))
 	{
-		m_ic17_flipflop = 0;
-		m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop);
+		m_ic17_flipflop_head = 0;
+		m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop_head);
 	}
 }
 
@@ -418,9 +422,9 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 //  printf("8155 HEAD_TO %x   TIME = %f\n",data, machine().time().as_double());
 	if (!data)  // zero clears flipflop
 	{
-		m_ic17_flipflop = 1;
+		m_ic17_flipflop_head = 1;
 	}
-	m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop);
+	m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop_head);
 	m_head_to_last = data;
 }
 

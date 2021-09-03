@@ -24,17 +24,22 @@ class apple_imagewriter_printer_device : public device_t,
 public:
 	apple_imagewriter_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-double last_time = 0.0;
-int last_value;
+	double last_time = 0.0;
+	int last_value;
 
-double min_time = 1.0 / 9601.0;  // if I make it 1.0 / 9600.0 the division tends to round down
+	double min_time = 1.0 / 9601.0;  // if I make it 1.0 / 9600.0 the division tends to round down
 
+	std::string buildstring = "";
 
-std::string buildstring = "";
-
-int ioportsaferead(const char * name) { if (ioport(name)->manager().safe_to_read()) return ioport(name)->read(); else return 0; }
-
-
+	int ioportsaferead(const char * name) 
+	{ 
+		// Safe read of ioport (mame does not allow ioport read at init time)
+		// Avoids the following error:
+		//   Ignoring MAME exception: Input ports cannot be read at init time!
+		//   Fatal error: Input ports cannot be read at init time!
+		if (ioport(name)->manager().safe_to_read()) return ioport(name)->read(); 
+		else return 0; 
+	}
 
 //  virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override
@@ -52,7 +57,8 @@ int ioportsaferead(const char * name) { if (ioport(name)->manager().safe_to_read
 			if (ioportsaferead("DEBUGMSG"))printf("BLOCK = %d\n",block);
 			for (int i=0; i< std::min(16,block); i++)
 			{
-				buildstring = std::to_string(last_value) + buildstring;
+				if (buildstring.length() < 32)
+					buildstring = std::to_string(last_value) + buildstring;
 				if (ioportsaferead("DEBUGMSG")) printf("%d",last_value);
 			}
 			if (ioportsaferead("DEBUGMSG")) printf("\n");
@@ -88,7 +94,11 @@ int ioportsaferead(const char * name) { if (ioport(name)->manager().safe_to_read
 //      printf("PULSE2OUT %x\n",data);
 	}
 
-
+	uint8_t maincpu_in_sid_func() 
+	{
+		printf("CALLING IN SID FUNCTION  value to return = %x\n", ioportsaferead("WIDTH"));
+		return ioportsaferead("WIDTH"); 
+	}
 
 
 // y position adjustment to eliminate gaps from win95 driver
@@ -221,7 +231,8 @@ private:
 	void update_pf_stepper(uint8_t data);
 	void update_cr_stepper(uint8_t data);
 
-	int m_ic17_flipflop = 0;
+	int m_ic17_flipflop_head = 0;      // connected to 8155 head     (ic17 7474 part 1/2)
+	int m_ic17_flipflop_switches = 0;  // connected to 8155 switches (ic17 7474 part 2/2)
 	int m_head_to_last = 0;
 	int m_head_pb_last = 0;
 	int m_switches_pc_last = 0;
