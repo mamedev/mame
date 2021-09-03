@@ -465,13 +465,14 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 		bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 		uint16_t pitch = prim.m_rowpixels;
-		int convert_stride = 1;
+		int width_div_factor = 1;
+		int width_mul_factor = 1;
 		const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, prim.m_flags & PRIMFLAG_TEXFORMAT_MASK,
-			prim.m_rowpixels, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, pitch, convert_stride);
+			prim.m_rowpixels, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, pitch, width_div_factor, width_mul_factor);
 
 		if (texture == nullptr)
 		{
-			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, pitch, prim.m_rowpixels, convert_stride);
+			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
 			m_textures.add_provider(full_name, texture);
 
 			if (prim.m_prim->texture.palette)
