@@ -6,6 +6,11 @@ license:CC0
 <softwarelist name="pc8001mk2sr_flop" description="NEC PC-8001mkIISR (N80SR BASIC) disk images">
 <!-- 
 
+TODO:
+- PC8001mk2SR was known running on the equivalent V1(L) BASIC of the bigger PC88 brother.
+  It's pretty much assured that anything marked as "needs V1 BASIC" in pc8801_flop.xml
+  actually belongs here (needs verification once we can boot this).
+
 Known list of SW released for the system:
 kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
