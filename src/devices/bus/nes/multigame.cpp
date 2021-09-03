@@ -145,11 +145,6 @@ nes_kn42_device::nes_kn42_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-nes_n625092_device::nes_n625092_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_N625092, tag, owner, clock), m_latch1(0), m_latch2(0)
-{
-}
-
 nes_a65as_device::nes_a65as_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_A65AS, tag, owner, clock)
 {
@@ -432,6 +427,11 @@ nes_bmc_k1029_device::nes_bmc_k1029_device(const machine_config &mconfig, const 
 {
 }
 
+nes_n625092_device::nes_n625092_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_vram_protect_device(mconfig, NES_N625092, tag, owner, clock)
+{
+}
+
 nes_bmc_th22913_device::nes_bmc_th22913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_vram_protect_device(mconfig, NES_BMC_TH22913, tag, owner, clock)
 {
@@ -528,24 +528,6 @@ void nes_kn42_device::pcb_reset()
 	prg16_89ab(m_latch);
 	prg16_cdef(m_latch | 0x0f);    // fixed to last bank for either game
 	chr8(0, CHRRAM);
-}
-
-void nes_n625092_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
-}
-
-void nes_n625092_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(0);
-	chr8(0, m_chr_source);
-
-	m_latch1 = 0;
-	m_latch2 = 0;
 }
 
 void nes_a65as_device::device_start()
@@ -1180,6 +1162,21 @@ void nes_bmc_60311c_device::pcb_reset()
 	update_banks();
 }
 
+void nes_n625092_device::device_start()
+{
+	nes_vram_protect_device::device_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_n625092_device::pcb_reset()
+{
+	nes_vram_protect_device::pcb_reset();
+	prg16_89ab(0);
+	prg16_cdef(0);
+
+	m_latch[0] = m_latch[1] = 0;
+}
+
 void nes_bmc_th22913_device::pcb_reset()
 {
 	nes_vram_protect_device::pcb_reset();
@@ -1414,56 +1411,6 @@ void nes_kn42_device::write_h(offs_t offset, u8 data)
 	data = account_bus_conflict(offset, data);
 
 	prg16_89ab(m_latch | (data & 0x07) << 1 | BIT(data, 4));
-}
-
-/*-------------------------------------------------
-
- Bootleg Board N625092
-
- Games: 400 in 1, 700 in 1, 1000 in 1
-
- iNES: mapper 221
-
- In MESS: Supported.
-
- -------------------------------------------------*/
-
-void nes_n625092_device::set_prg(uint8_t reg1, uint8_t reg2)
-{
-	uint8_t helper1, helper2;
-
-	helper1 = !(reg1 & 0x01) ? reg2 : (reg1 & 0x80) ? reg2 : (reg2 & 0x06) | 0x00;
-	helper2 = !(reg1 & 0x01) ? reg2 : (reg1 & 0x80) ? 0x07 : (reg2 & 0x06) | 0x01;
-
-	prg16_89ab(helper1 | ((reg1 & 0x70) >> 1));
-	prg16_cdef(helper2 | ((reg1 & 0x70) >> 1));
-}
-
-void nes_n625092_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("n625092 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if (offset < 0x4000)
-	{
-		set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-		offset = (offset >> 1) & 0xff;
-
-		if (m_latch1 != offset)
-		{
-			m_latch1 = offset;
-			set_prg(m_latch1, m_latch2);
-		}
-	}
-	else
-	{
-		offset &= 0x07;
-
-		if (m_latch2 != offset)
-		{
-			m_latch2 = offset;
-			set_prg(m_latch1, m_latch2);
-		}
-	}
 }
 
 /*-------------------------------------------------
@@ -3155,6 +3102,42 @@ void nes_bmc_k1029_device::write_h(offs_t offset, u8 data)
 
 	set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_vram_protect = BIT(offset, 0) == BIT(offset, 1);
+}
+
+/*-------------------------------------------------
+
+ Bootleg Board N625092
+
+ Games: 320 in 1, 400 in 1, 700 in 1, 800 in 1,
+ 1000 in 1, 2000 in 1, 5000000 in 1
+
+ iNES: mapper 221
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_n625092_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("n625092 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	m_latch[BIT(offset, 14)] = offset;
+
+	u8 bank = (m_latch[0] & 0x200) >> 3 | (m_latch[0] & 0xe0) >> 2 | (m_latch[1] & 0x07);    // NesDev shows the high bit here, but is it correct? So far no cart is large enough to use this.
+	u8 mode = BIT(m_latch[0], 1);
+	if (mode && BIT(m_latch[0], 8))    // UNROM mode
+	{
+		prg16_89ab(bank);
+		prg16_cdef(bank | 7);
+	}
+	else                               // NROM mode
+	{
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+	}
+
+	set_nt_mirroring(BIT(m_latch[0], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	m_vram_protect = BIT(m_latch[1], 3);
 }
 
 /*-------------------------------------------------
