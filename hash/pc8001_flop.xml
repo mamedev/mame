@@ -151,6 +151,20 @@ References:
 		</part>
 	</software>
 
+	<software name="4dhouse" cloneof="4dimensi">
+		<description>Yojigen no Ie - 4 Dimension House (Alt)</description>
+		<year>1983</year>
+		<publisher>プロシューマー (Prosumer)</publisher>
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="四次元の家"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34880 -->
+				<rom name="4 dimension house.d88" size="348848" crc="90e85539" sha1="450867c78915238f9de40bb98cd9d03f63eb01b6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="7narabe" supported="yes">
 		<description>7 Narabe</description>
 		<year>19??</year>
@@ -264,9 +278,23 @@ References:
 		<year>1983</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ay-1 (hack) {pass=123}.d88" size="348848" crc="b6d490f0" sha1="0c6619a4cc01b843a43f7e0695602a09e8560cf4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="80ay1d88" cloneof="ay1h" supported="yes">
+		<description>AY-1 Fortress Solomon (bootleg, Alt)</description>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="80ay1.d88" size="348848" crc="fd62ea35" sha1="77a4c69588a8b3b0fb0c2e0a7ccaeb37890cdf62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2880,6 +2908,229 @@ ExtractDisk  [02]"users 1        " -> "sdos_02.d88"
 	</software>
 
 <!-- Utilities -->
+
+<!--
+ExtractDisk  [01]"MagicCopy2.8  " -> "magic copy 2 ver2.8-3.7_01.d88"   7107161b
+ExtractDisk  [02]"MagicCopy2.9  " -> "magic copy 2 ver2.8-3.7_02.d88"   291c31c8
+ExtractDisk  [03]"MagicCopy3.0  " -> "magic copy 2 ver2.8-3.7_03.d88"   58cc307c
+ExtractDisk  [04]"MagicCopy3.1  " -> "magic copy 2 ver2.8-3.7_04.d88"   2c426feb
+ExtractDisk  [05]"MagicCopy3.2  " -> "magic copy 2 ver2.8-3.7_05.d88"   a3d865b6
+ExtractDisk  [06]"MagicCopy3.2_08 " -> "magic copy 2 ver2.8-3.7_06.d88" c1af57f2
+ExtractDisk  [07]"MagicCopy3.3  " -> "magic copy 2 ver2.8-3.7_07.d88"   351b34a5
+ExtractDisk  [08]"MagicCopy3.4  " -> "magic copy 2 ver2.8-3.7_08.d88"   08d61d54
+ExtractDisk  [09]"MagicCopy3.5  " -> "magic copy 2 ver2.8-3.7_09.d88"   ad2a8493
+ExtractDisk  [10]"MagicCopy3.6  " -> "magic copy 2 ver2.8-3.7_10.d88"   785646af
+ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
+-->
+<!--combined image-->
+<!--rom name="magic copy 2 ver2.8-3.7.d88" size="3837328" crc="0340eba4" sha1="d5854b4001f716849b5bb78b220bf2420dee2704"/-->
+
+	<software name="magicopy26" cloneof="magicopy">
+		<description>Magic Copy II ver 2.6</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 65296 -->
+				<rom name="magic copy 2 ver2.6.d88" size="348848" crc="d7057780" sha1="56bc07856ae99a0eedbe89271f3f2bb3b1f4a273"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy27" cloneof="magicopy">
+		<description>Magic Copy II ver 2.7</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 49084 -->
+				<rom name="magic copy 2 ver2.7.d88" size="348848" crc="8f1d66e8" sha1="fe54f5f1f5650a4bf5bfe798820e9cf9de86ee73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy28" cloneof="magicopy">
+		<description>Magic Copy II ver 2.8</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 30010 -->
+				<rom name="magic copy v28.d88" size="348848" crc="7107161b" sha1="36b74f278d9262097e4cc337542d6b8598c1c727"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy29" cloneof="magicopy">
+		<description>Magic Copy II ver 2.9</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 68 -->
+				<rom name="magic copy v29.d88" size="348848" crc="291c31c8" sha1="4e6cee799eafa15665ab5b1dab187ad564a4693f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy29a" cloneof="magicopy">
+		<description>Magic Copy II ver 2.9 (Alt)</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<!--combined image-->
+		<!--rom name="magic copy v2.9.d88" size="697696" crc="fe0c4db3" sha1="3b278e82ff1b434b6c22219a17c7d952f87969c4"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 40440 -->
+				<rom name="magic copy v2.9 (v29).d88" size="348848" crc="186221c1" sha1="b90096d683eba6ca7473c1d9d53a0afc55dbc066"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 28431 -->
+				<rom name="magic copy v2.9 (filer).d88" size="348848" crc="df137903" sha1="fc0a892e40e0218475ebde15023b7d8932538d82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy30" cloneof="magicopy">
+		<description>Magic Copy II ver 3.0</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 8469 -->
+				<rom name="magic copy v30.d88" size="348848" crc="58cc307c" sha1="577fd14b187050a02a75923feacd22c58ca32f43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy31" cloneof="magicopy">
+		<description>Magic Copy II ver 3.1</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 31791 -->
+				<rom name="magic copy v31.d88" size="348848" crc="2c426feb" sha1="ca84ae8b6d9a803b48f141ec4f52ba5a00174557"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy31a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.1 (Alt)</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 48935 -->
+				<rom name="magic copy v3.1.d88" size="348848" crc="caa19e11" sha1="fc0e6b577956b598f46719f750750e93ef8baaba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy32" cloneof="magicopy">
+		<description>Magic Copy II ver 3.2</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 42591 -->
+				<rom name="magic copy v32.d88" size="348848" crc="a3d865b6" sha1="b60b88ffde821f35872c1be565fcec1b56b3828a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy32a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.2 (Alt)</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 49300 -->
+				<rom name="magic copy v32-8.d88" size="348848" crc="c1af57f2" sha1="b1efce9b9bb1c7a1d8438182e0a3689658562ccd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy33" cloneof="magicopy">
+		<description>Magic Copy II ver 3.3</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 33634 -->
+				<rom name="magic copy v33.d88" size="348848" crc="351b34a5" sha1="7434089206aaea56b200883e337df3ed97b72bd8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy33a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.3 (Alt)</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="magic copy2 ver.3.3.d88" size="348848" crc="94034787" sha1="3f489a6d311ad1aab9fb9399136f2f0d1d6cff24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy34" cloneof="magicopy">
+		<description>Magic Copy II ver 3.4</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 55536 -->
+				<rom name="magic copy v34.d88" size="348848" crc="08d61d54" sha1="5ec7f8430f0e9ecb56dcd7575bec7d1e802224af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy34a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.4 (Alt)</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="magic copy2 ver.3.4.d88" size="348848" crc="a9ce6e76" sha1="72aa6ad87f3ff211208004ee602175a0bcc18fae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy35" cloneof="magicopy">
+		<description>Magic Copy II ver 3.5</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 23206 -->
+				<rom name="magic copy v35.d88" size="348848" crc="ad2a8493" sha1="752c868b99da1420bd757f3477aa4dd746b8a49a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy35a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.5 (Alt)</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 12497 -->
+				<rom name="magic copy v3.5.d88" size="348848" crc="357c895c" sha1="06e5bfa417a582ade8541bd9e01141e8e6701f8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy36" cloneof="magicopy">
+		<description>Magic Copy II ver 3.6</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 39768 -->
+				<rom name="magic copy v36.d88" size="348848" crc="785646af" sha1="98ed9e8f73102562402823fc18782c403f83e114"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy">
+		<description>Magic Copy II ver 3.7</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 22644 -->
+				<rom name="magic copy v37.d88" size="348848" crc="79b4c6af" sha1="c72e9761e3f13af6bbe6295a87298873d76a5b15"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="bdsc">
 		<description>BDS C (v1.50)</description>
