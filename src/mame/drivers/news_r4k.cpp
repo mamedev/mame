@@ -78,7 +78,7 @@
 // The default one has DRC and is faster, but the other one has some different features
 // Uncomment the following line and rebuild to switch implementations. This driver supports
 // both, as long as the #define is used to select which implementation to use.
-// #define NO_MIPS3
+#define NO_MIPS3
 #ifndef NO_MIPS3
 #include "cpu/mips/mips3.h"
 #else
@@ -744,7 +744,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    // LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
+    LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
     return value;
 }
 
@@ -767,7 +767,7 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
     // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
     if(data != 0x424f4d42) // mask out reset noise
     {
-        // LOG("APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
+        LOG("APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
     }
 }
 
@@ -837,6 +837,7 @@ uint32_t news_r4k_state::inten_r(offs_t offset)
  */
 uint32_t news_r4k_state::intst_r(offs_t offset)
 {
+    LOG("intst_r: INTEN%d = 0x%x\n", offset, m_intst[offset]);
     return m_intst[offset];
 }
 
@@ -847,7 +848,7 @@ uint32_t news_r4k_state::intst_r(offs_t offset)
  */
 void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
 {
-    // LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
+    LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
     if (state)
     {
         m_intst[irq] |= mask;

@@ -1587,7 +1587,15 @@ void r4000_base_device::cp0_update_timer(bool start)
 
 TIMER_CALLBACK_MEMBER(r4000_base_device::cp0_timer_callback)
 {
-	m_cp0[CP0_Cause] |= CAUSE_IPEX5;
+	// TEMPORARY HACK
+	// Sony NEWS-OS expects this to be disabled
+	// The NWS-5000X appears to set bit 19 of the R4400's Boot-Mode settings
+	// which is TimIntDis, and forces IP7 to ignore the timer. With this timer
+	// firing, the NEWS-OS 4.2.1 kernel gets lost in the weeds as soon as it
+	// tries to enable interrupts because it continuously calls the level 5
+	// interrupt handler (normally reserved for kernel debugging, ECC errors,
+	// and a few other rare conditions).
+	// m_cp0[CP0_Cause] |= CAUSE_IPEX5;
 }
 
 bool r4000_base_device::cp0_64() const
