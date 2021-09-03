@@ -1777,8 +1777,6 @@ files {
 	MAME_DIR .. "src/mame/includes/firetrap.h",
 	MAME_DIR .. "src/mame/video/firetrap.cpp",
 	MAME_DIR .. "src/mame/drivers/funkyjet.cpp",
-	MAME_DIR .. "src/mame/includes/funkyjet.h",
-	MAME_DIR .. "src/mame/video/funkyjet.cpp",
 	MAME_DIR .. "src/mame/drivers/karnov.cpp",
 	MAME_DIR .. "src/mame/includes/karnov.h",
 	MAME_DIR .. "src/mame/video/karnov.cpp",
