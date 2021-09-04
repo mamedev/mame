@@ -2977,7 +2977,7 @@ ExtractDisk  [10]"#9 不思議の国   " -> "Apple Club 10.d88" [27a01516]
 ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 -->
 	<software name="applecl1a" cloneof="applecl1">
-		<description>Apple Club 1</description>
+		<description>Apple Club 1 (Alt)</description>
 		<year>19??</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!--combined image-->
