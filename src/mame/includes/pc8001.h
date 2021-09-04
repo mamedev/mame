@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Angelo Salese
 
 #ifndef MAME_INCLUDES_PC8001_H
 #define MAME_INCLUDES_PC8001_H
@@ -97,6 +97,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(crtc_reverse_w);
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
+	UPD3301_FETCH_ATTRIBUTE( attr_fetch );
 	bool m_screen_reverse;
 };
 

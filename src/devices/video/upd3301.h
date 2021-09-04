@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Angelo Salese
 /**********************************************************************
 
     NEC uPD3301 Programmable CRT Controller emulation
@@ -41,8 +41,9 @@
 //**************************************************************************
 
 //#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
-#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int csr, bool attr_blink_on, u16 attr, bool is_color_mode, bool is_lowestline)
+#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int csr, bool attr_blink_on, u16 attr, u8 gfx_mode, bool is_lowestline)
 
+#define UPD3301_FETCH_ATTRIBUTE(_name) std::array<u16, 80> _name(const std::array<u8, 41> attr_row, u8 gfx_mode, int y, u8 attr_fifo_size, u8 row_size)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -56,13 +57,17 @@ class upd3301_device :  public device_t,
 {
 public:
 //	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> draw_character_delegate;
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int csr, bool attr_blink_on, u16 attr, bool is_color_mode, bool is_lowerline)> draw_character_delegate;
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int csr, bool attr_blink_on, u16 attr, u8 gfx_mode, bool is_lowerline)> draw_character_delegate;
+	typedef device_delegate<std::array<u16, 80> (const std::array<u8, 41> attr_row, u8 gfx_mode, int y, u8 attr_fifo_size, u8 row_size)> fetch_attribute_delegate;
 
 	// construction/destruction
 	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_character_width(int value) { m_width = value; }
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_attribute_fetch_callback(T &&... args) { m_attr_fetch_cb.set(std::forward<T>(args)...); }
+	
+	UPD3301_FETCH_ATTRIBUTE( default_attr_fetch );
 
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto int_wr_callback() { return m_write_int.bind(); }
@@ -112,6 +117,7 @@ private:
 	devcb_write_line   m_write_rvv;
 
 	draw_character_delegate m_display_cb;
+	fetch_attribute_delegate m_attr_fetch_cb;
 	int m_width;
 
 	// screen drawing
@@ -126,8 +132,8 @@ private:
 	int m_param_count;              // parameter count
 
 	// FIFOs
-	uint8_t m_data_fifo[80][2];       // row data FIFO
-	uint8_t m_attr_fifo[40+1][2];     // attribute FIFO (+1 for extending to end of row)
+	u8 m_data_fifo[2][80];       // row data FIFO
+	std::array<std::array<u8, 40+1>, 2> m_attr_fifo;     // attribute FIFO (+1 for extending to end of row)
 	int m_data_fifo_pos;            // row data FIFO position
 	int m_attr_fifo_pos;            // attribute FIFO position
 	int m_input_fifo;               // which FIFO is in input mode

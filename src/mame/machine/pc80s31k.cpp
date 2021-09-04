@@ -357,14 +357,14 @@ void pc80s31_device::device_reset()
 template <unsigned N> u8 pc80s31_device::latch_r()
 {
 	const int port_mask = N & 4 ? 0x0f : 0xff;
-	machine().scheduler().synchronize();
+//	machine().scheduler().synchronize();
 	return m_latch[N]->read() & port_mask;
 }
 
 template <unsigned N> void pc80s31_device::latch_w(u8 data)
 {
 	const int lower_nibble = N & 4;
-	machine().scheduler().synchronize();
+//	machine().scheduler().synchronize();
 	if (lower_nibble)
 	{
 		LOG("%s: %s port C write %02x  (ATN=%d DAC=%d RFD=%d DAV=%d)\n"

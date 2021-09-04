@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Angelo Salese
 /*
 
     http://www2.odn.ne.jp/~haf09260/Pc80/EnrPc.htm
@@ -59,30 +59,67 @@ WRITE_LINE_MEMBER( pc8001_state::crtc_reverse_w )
 	m_screen_reverse = state;
 }
 
+UPD3301_FETCH_ATTRIBUTE( pc8001_state::attr_fetch )
+{
+	const u8 attr_max_size = 80;
+	const bool is_color_mode = gfx_mode == 0x2;
+	std::array<u16, attr_max_size> attr_extend_info = m_crtc->default_attr_fetch(attr_row, gfx_mode, y, attr_fifo_size, row_size);
+
+	// further extend the attributes if we are in color mode
+	// TODO: is this a PC-8001 specification or uPD3301?
+	if (is_color_mode)
+	{
+		// TODO: defaults
+		// flgworld (pc8001) gameplay sets up:
+		// - 0x00 0x00 0x02 0x88 on playfield
+		// \- (wanting the default from the first defined color)
+		// - 0x00 0x00 0x00 0x48 0x12 0x88 for first row
+		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green wtf)
+		// undermon (pc8001) instruction screen sets up:
+		// - 0x00 0x00 0x06 0xb8
+		// \- (expecting blue fill up to 0x06)
+		u8 attr_color = 0xe8;
+		u8 attr_decoration = 0x00;
+
+		for (int ex = 0; ex < row_size; ex++)
+		{
+			u16 cur_attr = attr_extend_info[ex];
+			if (BIT(cur_attr, 3))
+				attr_color = cur_attr;
+			else
+				attr_decoration = cur_attr;
+			attr_extend_info[ex] = (attr_color << 8) | attr_decoration;
+		}
+	}
+
+	return attr_extend_info;
+}
+
 UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 {
 	// punt if we are in width 40 (discarded on this end)
 	if (sx % 2 && !m_width80)
 		return;
 
+	const bool is_color_mode = gfx_mode == 0x2;
 	u8 tile;
 	const u8 tile_width = m_width80 ? 8 : 16;
 	const u8 dot_width = (m_width80 ^ 1) + 1;
 
-	bool gfx_mode, reverse, attr_blink, secret;
+	bool semigfx_tile, reverse, attr_blink, secret;
 	bool upperline, lowerline;
 	u8 color;
 
 	if (is_color_mode)
 	{
 		color = (attr & 0xe000) >> 13;
-		gfx_mode = bool(BIT(attr, 12));
+		semigfx_tile = bool(BIT(attr, 12));
 		// bit 7 is used by 2001spc and many others, no effect?
 	}
 	else
 	{
 		color = 7;
-		gfx_mode = bool(BIT(attr, 7));
+		semigfx_tile = bool(BIT(attr, 7));
 	}
 
 	lowerline = bool(BIT(attr, 5));
@@ -91,7 +128,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 	attr_blink = bool(BIT(attr, 1));
 	secret = bool(BIT(attr, 0));
 
-	if (gfx_mode)
+	if (semigfx_tile)
 		tile = cc;
 	else
 	{
@@ -128,7 +165,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 		for (int xi = 0; xi < tile_width; xi += dot_width)
 		{
 			int res_x = (sx * 8) + xi;
-			if (gfx_mode)
+			if (semigfx_tile)
 			{
 				u8 mask = (xi & (4 << (dot_width - 1))) ? 0x10 : 0x01;
 				// TODO: honor y height
@@ -726,6 +763,7 @@ void pc8001_state::pc8001(machine_config &config)
 	UPD3301(config, m_crtc, VIDEO_CLOCK);
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(pc8001_state::draw_text));
+	m_crtc->set_attribute_fetch_callback(FUNC(pc8001_state::attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->rvv_wr_callback().set(FUNC(pc8001_state::crtc_reverse_w));
 	m_crtc->set_screen(m_screen);

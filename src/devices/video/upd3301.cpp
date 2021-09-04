@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Angelo Salese
 /**********************************************************************
 
     NEC uPD3301 Programmable CRT Controller emulation
@@ -18,6 +18,8 @@
     - proper DMA timing (now the whole screen is transferred at the end of the frame,
         accurate timing requires CCLK timer which kills performance)
 	- DMA burst mode;
+	- cleanup: variable namings should be more verbose
+	  (i.e. not be a single letter like m_y, m_z, m_b ...);
 	- sorcerml (pc8801) has buggy DMA burst mode, causing an underrun (hence a status U interrupt);
 	- jettermi (pc8801) expects to colorize its underlying 400 b&w mode by masking with the
 	  text color attributes here;
@@ -92,6 +94,7 @@ upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, d
 	, m_write_vrtc(*this)
 	, m_write_rvv(*this)
 	, m_display_cb(*this)
+	, m_attr_fetch_cb(*this)
 	, m_width(0)
 	, m_status(0)
 	, m_param_count(0)
@@ -129,6 +132,7 @@ void upd3301_device::device_start()
 	m_write_vrtc.resolve_safe();
 	m_write_rvv.resolve();
 	m_display_cb.resolve();
+	m_attr_fetch_cb.resolve();
 
 	// allocate timers
 	m_hrtc_timer = timer_alloc(TIMER_HRTC);
@@ -498,17 +502,23 @@ void upd3301_device::dack_w(uint8_t data)
 
 	if (m_data_fifo_pos < m_h)
 	{
-		m_data_fifo[m_data_fifo_pos][m_input_fifo] = data;
+		m_data_fifo[m_input_fifo][m_data_fifo_pos] = data;
 		m_data_fifo_pos++;
 	}
 	else
 	{
-		m_attr_fifo[m_attr_fifo_pos][m_input_fifo] = data;
+		m_attr_fifo[m_input_fifo][m_attr_fifo_pos] = data;
 		m_attr_fifo_pos++;
 	}
 
 	if ((m_data_fifo_pos == m_h) && (m_attr_fifo_pos == (m_attr << 1)))
 	{
+		const u8 attr_max_size = 80;
+		// first attribute start is always overwritten with a 0
+		m_attr_fifo[m_input_fifo][0] = 0;
+		// last parameter always extends up to the end of the row
+		// (7narabe (pc8001) fills last row value with white when exausting available slots)
+		m_attr_fifo[m_input_fifo][40] = attr_max_size;
 		m_input_fifo = !m_input_fifo;
 
 		m_data_fifo_pos = 0;
@@ -558,66 +568,47 @@ int upd3301_device::vrtc_r()
 //  draw_scanline -
 //-------------------------------------------------
 
-void upd3301_device::draw_scanline()
+UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 {
-	// 01|0
-	bool is_color_mode = m_gfx_mode == 0x2;
-	// Olympia Boss never bothers in writing a correct attribute table for rows on resident OS,
-	// it just extends the full attribute RAM with a start: 0 end: 0xff value: 0.
-	// According to doc notes anything beyond width 80 is puked by the CRTC, therefore we clamp.
-	const u8 attr_size = 80;
-	u16 extend_attr[attr_size];
-	
-	// first attribute start is always overwritten with a 0
-	m_attr_fifo[0][!m_input_fifo] = 0;
-	// last parameter always extends up to the end of the row
-	// (7narabe (pc8001) fills last row value with white when exausting available slots)
-	m_attr_fifo[40][!m_input_fifo] = attr_size;
+	const u8 attr_max_size = 80;
+	std::array<u16, attr_max_size> attr_extend_info;
 
-	// TODO: verify if we need to sort as well (doesn't seem the case?)
-	for (int ex = 0; ex < m_attr << 1; ex+=2)
+	// TODO: uPD3301 may actually fetch in LIFO order
+	for (int ex = 0; ex < attr_fifo_size; ex+=2)
 	{
-		u8 attr_start = std::min(m_attr_fifo[ex][!m_input_fifo], attr_size);
-		u8 attr_value = m_attr_fifo[ex+1][!m_input_fifo];
-		u8 attr_end = std::min(m_attr_fifo[ex+2][!m_input_fifo], attr_size);
+		u8 attr_start = std::min(attr_row[ex], attr_max_size);
+		u8 attr_value = attr_row[ex+1];
+		u8 attr_end = std::min(attr_row[ex+2], attr_max_size);
 		// if the target is == 0 then just consider max size instead
 		// (starfire (pc8001) wants this otherwise will black screen on gameplay)
  		if (attr_end == 0)
-			attr_end = attr_size;
+			attr_end = attr_max_size;
+
+		//printf("%04x %d %d [%02x]\n", ex, attr_start, attr_end, attr_value);
 
 		for (int i = attr_start; i < attr_end; i++)
-			extend_attr[i] = attr_value;
+			attr_extend_info[i] = attr_value;
 
-		if (attr_end == attr_size)
+		if (attr_end == attr_max_size)
 			break;
 	}
 	
-	// further extend the attributes if we are in color mode
-	// TODO: is this a PC-8001 specification or uPD3301?
-	if (is_color_mode)
-	{
-		// TODO: defaults
-		// flgworld (pc8001) gameplay sets up:
-		// - 0x00 0x00 0x02 0x88 on playfield
-		// \- (wanting the default from the first defined color)
-		// - 0x00 0x00 0x00 0x48 0x12 0x88 for first row
-		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green wtf)
-		// undermon (pc8001) instruction screen sets up:
-		// - 0x00 0x00 0x06 0xb8
-		// \- (expecting blue fill up to 0x06)
-		u8 attr_color = 0xe8;
-		u8 attr_decoration = 0x00;
+	return attr_extend_info;
+}
 
-		for (int ex = 0; ex < m_h; ex++)
-		{
-			u16 cur_attr = extend_attr[ex];
-			if (BIT(cur_attr, 3))
-				attr_color = cur_attr;
-			else
-				attr_decoration = cur_attr;
-			extend_attr[ex] = (attr_color << 8) | attr_decoration;
-		}
-	}
+void upd3301_device::draw_scanline()
+{
+	// Olympia Boss never bothers in writing a correct attribute table for rows on resident OS,
+	// it just extends the full attribute RAM with a start: 0 end: 0xff value: 0.
+	// According to doc notes anything beyond width 80 is puked by the CRTC, therefore we clamp.
+	const u8 attr_max_size = 80;
+	const std::array<u8, 41> attr_fifo = m_attr_fifo[!m_input_fifo];
+
+	// expose attribute handling to our client
+	// PC-8801 schematics definitely shows extra TTL connections for handling its "8 to 16-bit" attribute conversion.
+	// It also practically needs to read the attribute mapping for various extra side-effects such as colorized 400 line 1bpp
+	// cfr. "その他 / other" section at http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
+	std::array<u16, attr_max_size> extend_attr = m_attr_fetch_cb(attr_fifo, m_gfx_mode, m_y, m_attr << 1, m_h);
 
 	for (int lc = 0; lc < m_r; lc++)
 	{
@@ -625,7 +616,7 @@ void upd3301_device::draw_scanline()
 		for (int sx = 0; sx < m_h; sx++)
 		{
 			int y = m_y + lc;
-			uint8_t cc = m_data_fifo[sx][!m_input_fifo];
+			uint8_t cc = m_data_fifo[!m_input_fifo][sx];
 			int csr = m_cm && m_cursor_blink && ((y / m_r) == m_cy) && (sx == m_cx);
 
 			// datasheet mentions these but I find zero unambiguous information for PC-8001/PC-8801, i.e.:
@@ -640,7 +631,7 @@ void upd3301_device::draw_scanline()
 //			int gpa = 0;
 			
 //			m_display_cb(m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
-			m_display_cb(m_bitmap, y, sx, cc, lc, csr, m_attr_blink, extend_attr[sx], is_color_mode, is_lowestline);
+			m_display_cb(m_bitmap, y, sx, cc, lc, csr, m_attr_blink, extend_attr[sx], m_gfx_mode, is_lowestline);
 		}
 	}
 
