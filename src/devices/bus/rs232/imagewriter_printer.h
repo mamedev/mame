@@ -31,14 +31,14 @@ public:
 
 	std::string buildstring = "";
 
-	int ioportsaferead(const char * name) 
-	{ 
+	int ioportsaferead(const char * name)
+	{
 		// Safe read of ioport (mame does not allow ioport read at init time)
 		// Avoids the following error:
 		//   Ignoring MAME exception: Input ports cannot be read at init time!
 		//   Fatal error: Input ports cannot be read at init time!
-		if (ioport(name)->manager().safe_to_read()) return ioport(name)->read(); 
-		else return 0; 
+		if (ioport(name)->manager().safe_to_read()) return ioport(name)->read();
+		else return 0;
 	}
 
 //  virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
@@ -74,11 +74,22 @@ public:
 		if (newval == 0) m_maincpu->reset();
 	}
 
+	INPUT_CHANGED_MEMBER(select_sw)
+	{   // output from comparator is 5v if switch open, 260mv if switch closed so on press goes from 1 to 0,
+		// transition from 1 to 0 clocks the flipflop
+		if (oldval == 1 && newval == 0)
+		{
+			printf("oldval,newval = %x,%x  flip = %x\n",oldval,newval,m_ic17_flipflop_select_status);
+			m_ic17_flipflop_select_status = !m_ic17_flipflop_select_status;
+		}
+	}
+
 	void optic_handler(uint8_t data) { //printf("HANDLE OPTIC %d\n",data);
 	}
-	void rxrdy_handler(uint8_t data) {
-			if (data == 1)  printf("HANDLE RXRDY %d\n",data);
-			m_maincpu->set_input_line(I8085_RST65_LINE, data);
+	void rxrdy_handler(uint8_t data)
+	{
+//      if (data == 1) printf("HANDLE RXRDY %d\n",data);
+		m_maincpu->set_input_line(I8085_RST65_LINE, data);
 	}
 
 	int m_pulse1_out_last = 1;
@@ -94,10 +105,10 @@ public:
 //      printf("PULSE2OUT %x\n",data);
 	}
 
-	uint8_t maincpu_in_sid_func() 
+	uint8_t maincpu_in_sid_func()
 	{
-		printf("CALLING IN SID FUNCTION  value to return = %x\n", ioportsaferead("WIDTH"));
-		return ioportsaferead("WIDTH"); 
+//      printf("CALLING IN SID FUNCTION  value to return = %x\n", ioportsaferead("WIDTH"));
+		return ioportsaferead("WIDTH");
 	}
 
 
@@ -231,8 +242,8 @@ private:
 	void update_pf_stepper(uint8_t data);
 	void update_cr_stepper(uint8_t data);
 
-	int m_ic17_flipflop_head = 0;      // connected to 8155 head     (ic17 7474 part 1/2)
-	int m_ic17_flipflop_switches = 0;  // connected to 8155 switches (ic17 7474 part 2/2)
+	int m_ic17_flipflop_head = 0;           // connected to 8155 head     (ic17 7474 part 1/2)
+	int m_ic17_flipflop_select_status = 0;  // connected to 8155 switches (ic17 7474 part 2/2)
 	int m_head_to_last = 0;
 	int m_head_pb_last = 0;
 	int m_switches_pc_last = 0;

@@ -9,6 +9,16 @@
 
     This allows capturing the byte stream to a file.
 
+
+Notes:
+
+    Select switch doesn't seem to stop printing unless you also press the "LF button" momentarily while the printer is printing.
+    Cover switch button will go immediately into select off mode.
+
+    Paper end switch will stop printing after printing approx 8 lines.
+
+    Can run two imagewriters with ./mame mac512k -rs232b imagewriter -rs232a imagewriter
+
 **************************************************************************/
 
 // A9M0303 is a standard size printer that will accept paper from 3 inch to 10 inches.
@@ -103,9 +113,12 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_8155head->out_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_w));
 	m_8155head->out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
 
-
-//  I8155(config, m_8155switch, 1E6);  // for the moment, just give a 1 mhz setting
 	I8155(config, m_8155switch, 9.8304_MHz_XTAL / 2 / 4);  // for the moment, just give a 1 mhz setting
+// divide by 4 is very fast
+// divide by 8 is slower
+// divide by 16 really slows it down
+// faster the 8155switch clock is, the faster the printhead moves
+
 	m_8155switch->in_pa_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
 	m_8155switch->in_pb_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pb_r));
 	m_8155switch->in_pc_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pc_r));
@@ -206,6 +219,11 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
 
+	PORT_START("INVERT3")
+	PORT_CONFNAME(0x1, 0x01, "Invert3")
+	PORT_CONFSETTING(0x0, "Normal")
+	PORT_CONFSETTING(0x1, "Invert")
+
 
 	PORT_START("DEBUGMSG")
 	PORT_CONFNAME(0x1, 0x00, "Debug Messages")
@@ -236,7 +254,9 @@ static INPUT_PORTS_START( apple_imagewriter )
 
 	// Buttons on printer
 	PORT_START("SELECT")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select") PORT_CODE(KEYCODE_0_PAD) PORT_TOGGLE  // input toggles persist
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select Printer") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, select_sw, 0)
+//  PORT_START("SELECT")
+//  PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select") PORT_CODE(KEYCODE_0_PAD) PORT_TOGGLE  // input toggles persist
 	PORT_START("FORMFEED")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_7_PAD)
 	PORT_START("LINEFEED")
@@ -244,7 +264,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_START("LOADEJECT")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load/Eject") PORT_CODE(KEYCODE_1_PAD)
 	PORT_START("PAPEREND")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 	PORT_START("COVER")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Carrier Cover") PORT_CODE(KEYCODE_3_PAD)  // ACTIVE HIGH WHEN COVER OPEN
 
@@ -300,7 +320,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_DIPSETTING(0x04, "Data Terminal Ready") // default
 	PORT_DIPSETTING(0x00, "XON/XOFF")
 
-	PORT_DIPNAME(0x08, 0x00, "2-4 Unused")
+	PORT_DIPNAME(0x08, 0x08, "2-4 Unused")
 	PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(0x08, "ON")
 	PORT_DIPSETTING(0x00, "OFF") // default
@@ -441,22 +461,24 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 
 uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 {
-	m_select_status = !ioport("SELECT")->read();
-	int m_paperend_status = !ioport("PAPEREND")->read();
+//  m_select_status = !ioport("SELECT")->read();
+//  int m_paperend_status = !ioport("PAPEREND")->read();
 
 	u8 data =
 			(!(x_pixel_coord(m_xpos) <= m_left_edge)  << 0) | // m4 home detector
 			(ioport("PAPEREND")->read()               << 1) | // simulate a paper out error
 			(ioport("COVER")->read()                  << 2) | //
 			(!(x_pixel_coord(m_xpos) >  m_right_edge) << 3) | // return switch
-			(m_select_status                          << 4) | //
+//          (m_select_status                          << 4) | //
+			(m_ic17_flipflop_select_status            << 4) | // select status flip flop
 			(ioport("FORMFEED")->read()               << 5) | //
 			(ioport("LINEFEED")->read()               << 6) | //
 			(BIT(ioport("DIPSW2")->read(), 3)         << 7);  // DIP 2-4 (unused)
 
 	m_bitmap_printer->setprintheadcolor(
-			m_select_status   ? 0x888888 : 0x00dd00,    // select led
-			m_paperend_status ? 0xff0000 : 0x000000 );  // paperend led
+//          m_select_status   ? 0x888888 : 0x00dd00,    // select led
+			m_ic17_flipflop_select_status   ? 0x888888 : 0x00dd00,    // select led
+			ioport("PAPEREND")->read() ? 0xff0000 : 0x000000 );  // paperend led
 
 //  printf("8155 SWITCH PORT_A_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 
@@ -474,9 +496,10 @@ void apple_imagewriter_printer_device::switch_pa_w(uint8_t data)
 
 uint8_t apple_imagewriter_printer_device::switch_pb_r(offs_t offset)
 {
-	return (!BIT(m_switches_pc_last, 0) ?          // PC0 controls the multiplexer  A*/B
+	return  ( !BIT(m_switches_pc_last, 0) ?          // PC0 controls the multiplexer  A*/B
 				(ioport("DIPSW1")->read() & 0x07) :  // dip sw1-1,2,3     A
-				(ioport("DIPSW2")->read() & 0x07))   // dip sw2-1,2,3     B
+				(ioport("DIPSW2")->read() & 0x07)    // dip sw2-1,2,3     B
+			)
 			|   (ioport("DIPSW1")->read() & 0xf8);   // dip sw1-4,5,6,7,8
 }
 
@@ -489,13 +512,30 @@ void apple_imagewriter_printer_device::switch_pb_w(uint8_t data)
 //    8155 Switches Functions Port C
 //-------------------------------------------------
 
-uint8_t apple_imagewriter_printer_device::switch_pc_r(offs_t offset) { return 0; }
-
+uint8_t apple_imagewriter_printer_device::switch_pc_r(offs_t offset)
+{
+	return 0;
+}
 
 void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 {
 //  printf("8155 SWTICH PORT_C_WRITE %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
+
 	m_switches_pc_last = data;
+
+	int CLEARBIT = 1;
+	int PRESETBIT = 2;
+
+	if (!BIT(m_switches_pc_last, CLEARBIT))
+	{
+//      printf("data = %x Clear flipflop  %s\n",data,machine().describe_context().c_str());
+		m_ic17_flipflop_select_status = 0;  // *CLR
+	}
+	if (!BIT(m_switches_pc_last, PRESETBIT))
+	{
+//      printf("data = %x Set flipflop %s\n",data,machine().describe_context().c_str());
+		m_ic17_flipflop_select_status = 1;  // *PRE
+	}
 }
 
 //-------------------------------------------------
