@@ -463,6 +463,27 @@ private:
 };
 
 
+// ======================> nes_lh42_device
+
+class nes_lh42_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_lh42_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch;
+};
+
+
 // ======================> nes_lg25_device
 
 class nes_lg25_device : public nes_nrom_device
@@ -520,10 +541,6 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -724,6 +741,7 @@ DECLARE_DEVICE_TYPE(NES_LH10,           nes_lh10_device)
 DECLARE_DEVICE_TYPE(NES_LH28_LH54,      nes_lh28_lh54_device)
 DECLARE_DEVICE_TYPE(NES_LH31,           nes_lh31_device)
 DECLARE_DEVICE_TYPE(NES_LH32,           nes_lh32_device)
+DECLARE_DEVICE_TYPE(NES_LH42,           nes_lh42_device)
 DECLARE_DEVICE_TYPE(NES_LH51,           nes_lh51_device)
 DECLARE_DEVICE_TYPE(NES_LH53,           nes_lh53_device)
 DECLARE_DEVICE_TYPE(NES_2708,           nes_2708_device)

@@ -767,6 +767,9 @@ pc8401a.cpp
 pc8801.cpp
 pc88va.cpp
 pc9801.cpp
+pc9801_epson.cpp
+pc9821.cpp
+pc98ha.cpp
 pcd.cpp
 pce.cpp
 pce220.cpp

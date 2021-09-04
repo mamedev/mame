@@ -14,26 +14,44 @@
 #include "render.h"
 
 
-const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::TextureFormat::Enum &dst_format, uint32_t src_format, int rowpixels, int height, const rgb_t *palette, void *base, uint16_t &out_pitch, int &convert_stride)
+const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::TextureFormat::Enum &dst_format, uint32_t src_format, int rowpixels, int height, const rgb_t *palette, void *base, uint16_t &out_pitch, int &width_div_factor, int &width_mul_factor)
 {
 	bgfx::TextureInfo info;
+	const bgfx::Memory *data = nullptr;
+
 	switch (src_format)
 	{
-		case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
 			dst_format = bgfx::TextureFormat::BGRA8;
-			convert_stride = 2;
+			width_div_factor = 2;
+			width_mul_factor = 1;
 			out_pitch = rowpixels * 2;
+			bgfx::calcTextureSize(info, rowpixels / width_div_factor, height, 1, false, false, 1, dst_format);
+
+			data = bgfx::copy(base, info.storageSize);
+			break;
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
+			dst_format = bgfx::TextureFormat::R8;
+			width_div_factor = 1;
+			width_mul_factor = 2;
+			out_pitch = rowpixels * 2;
+			bgfx::calcTextureSize(info, rowpixels * width_mul_factor, height, 1, false, false, 1, dst_format);
+
+			data = bgfx::copy(base, info.storageSize);
 			break;
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
 			dst_format = bgfx::TextureFormat::BGRA8;
-			convert_stride = 1;
+			width_div_factor = 1;
+			width_mul_factor = 1;
 			out_pitch = rowpixels * 4;
+			bgfx::calcTextureSize(info, rowpixels, height, 1, false, false, 1, dst_format);
+
+			data = bgfx::copy(base, info.storageSize);
 			break;
 	}
-	bgfx::calcTextureSize(info, rowpixels / convert_stride, height, 1, false, false, 1, dst_format);
-	return bgfx::copy(base, info.storageSize);
+
+	return data;
 }
 
 const bgfx::Memory* bgfx_util::mame_texture_data_to_bgra32(uint32_t src_format, int width, int height, int rowpixels, const rgb_t *palette, void *base)

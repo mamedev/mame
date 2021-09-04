@@ -441,8 +441,8 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 		int max_tracks, max_heads;
 		image->get_maximal_geometry(max_tracks, max_heads);
 
-		// Fail if floppy drive can't handle track count
-		if(f.track_count > max_tracks) {
+		// Fail if floppy drive can't handle track or head count
+		if(f.track_count > max_tracks || f.head_count > max_heads) {
 			goto fail;
 		}
 

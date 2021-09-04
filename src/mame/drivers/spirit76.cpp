@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista
+// copyright-holders:Ivan Vangelista, Robbbert
 // PINBALL
 /*********************************************************************************************************************
 Skeleton driver for Mirco's Spirit of 76, one of the first if not the first commercial solid-state pinball game.
 Hardware listing and ROM definitions from PinMAME.
 
-No schematic has been located as yet.
+No schematic of the CPU or sound boards has been located, so this is largely guesswork.
 
    Hardware:
 CPU:   1 x M6800
@@ -18,6 +18,19 @@ OTHER INDICATORS:  5 red leds for the ball in play
   5x lights for Drum Bonus, 13 lights for the Cannon
 Settings are done with 2x 8 dipswitches
 Switch at G6 (sw1-4 = free game scores, sw5-8 = config), at G8 (coin chute settings)
+
+2021-08-29 Game mostly working [Robbbert]
+
+TODO:
+- Outputs (lamps)
+- After starting a 2-player game, the credit button will let you waste away your remaining credits.
+- The 240k/280k preset high score free games are actually 200k.
+- The settings for the right-hand coin slot are ignored; both slots use the left-hand slot's settings.
+- Find tilt input
+- There's supposed to be a boom box and sound card in the cabinet to make various noisy effects, but
+  no examples have been found.
+
+
 *********************************************************************************************************************/
 
 #include "emu.h"
@@ -25,13 +38,19 @@ Switch at G6 (sw1-4 = free game scores, sw5-8 = config), at G8 (coin chute setti
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
+#include "spirit76.lh"
 
 class spirit76_state : public genpin_class
 {
 public:
 	spirit76_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") { }
+		, m_maincpu(*this, "maincpu")
+		, m_switches(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_leds(*this, "led%d", 0U)
+		, m_solenoids(*this, "sol%d", 0U)
+		{ }
 
 	void spirit76(machine_config &config);
 
@@ -40,85 +59,283 @@ private:
 	void porta_w(u8 data);
 	void portb_w(u8 data);
 	u8 porta_r();
-	u8 portb_r();
-	void unk_w(u8 data);
-	u8 unk_r();
+	u8 sw_r();
 	void maincpu_map(address_map &map);
 
-	u8 m_t_c;
+	u8 m_t_c = 0;
+	u8 m_strobe = 0;
+	u8 m_segment = 0;
+	u8 m_last_solenoid[2] = { 0, 0 };
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<16> m_switches;
+	output_finder<16> m_digits;
+	output_finder<8> m_leds;
+	output_finder<16> m_solenoids;
 };
 
 void spirit76_state::maincpu_map(address_map &map)
 {
 	map.unmap_value_high();
-//  map.global_mask(0xfff); // this could most likely go in once the memory map is sorted
+	map.global_mask(0xfff);
 	map(0x0000, 0x00ff).ram(); // 2x 2112
-	map(0x2200, 0x2203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
-	map(0x2400, 0x2400).r(FUNC(spirit76_state::unk_r));
-	map(0x2401, 0x2401).w(FUNC(spirit76_state::unk_w));
+	map(0x0200, 0x0203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
+	map(0x0400, 0x0400).r(FUNC(spirit76_state::sw_r));
 	map(0x0600, 0x0fff).rom().region("roms", 0);
-	map(0xfe00, 0xffff).rom().region("roms", 0x800);
 }
 
 
 static INPUT_PORTS_START( spirit76 )
-	PORT_START("DSW0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_START("DSW1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Upper right advance bonus")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Middle right advance bonus")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Lower right collect bonus")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Right 50pt wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Right sling")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Lower right advance bonus")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("6 rollover")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Upper right target")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Lower right target")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("Right 100pt wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("Right bumper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("2nd 7 rollover")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Upper eagle targets")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Lower right switch")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("Right 500 wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("Left 1000pt target")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Left 500pt wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("Centre bumper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START )
+
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("1st 7 rollover")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Mystery 1000pt")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Left Flipper")
+
+	PORT_START("X8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Left 100pt wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Left bumper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Lower left switch")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Right Flipper")
+
+	PORT_START("X9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("1 rollover")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Left sling")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Lower left target")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X10")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Left 50pt wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Upper left target")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Lower left advance bonus")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("X11")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Upper left advance bonus")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Middle left advance bonus")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("Lower left collect bonus")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("X12")
+	PORT_DIPNAME( 0x08, 0x00, "Preset score award allowed")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
+	PORT_DIPNAME( 0x04, 0x00, "Match")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPNAME( 0x02, 0x02, "Add-a-ball")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPNAME( 0x01, 0x01, "Balls")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPSETTING(    0x01, "3")
+
+	PORT_START("X13")
+	PORT_DIPNAME( 0x0f, 0x0f, "Preset score")
+	PORT_DIPSETTING(    0x0f, "40k") // more free games at 70k, 100k - undocumented
+	PORT_DIPSETTING(    0x0e, "50k")
+	PORT_DIPSETTING(    0x0d, "60k")
+	PORT_DIPSETTING(    0x0c, "70k")
+	PORT_DIPSETTING(    0x0b, "80k")
+	PORT_DIPSETTING(    0x0a, "90k")
+	PORT_DIPSETTING(    0x09, "100k")
+	PORT_DIPSETTING(    0x08, "120k")
+	PORT_DIPSETTING(    0x07, "140k")
+	PORT_DIPSETTING(    0x06, "160k")
+	PORT_DIPSETTING(    0x05, "180k")
+	PORT_DIPSETTING(    0x04, "200k")
+	PORT_DIPSETTING(    0x03, "240k") // actually 200k
+	PORT_DIPSETTING(    0x02, "280k") // actually 200k
+	PORT_DIPSETTING(    0x01, "320k")
+	PORT_DIPSETTING(    0x00, "400k")
+
+	PORT_START("X14")
+	PORT_DIPNAME( 0x0f, 0x0f, "Coinage Left Slot")
+	PORT_DIPSETTING(    0x0f, "1C_1C")
+	PORT_DIPSETTING(    0x0e, "1C_2C")
+	PORT_DIPSETTING(    0x0d, "1C_3C")
+	PORT_DIPSETTING(    0x0c, "1C_4C")
+
+	PORT_START("X15")
+	PORT_DIPNAME( 0x0f, 0x0f, "Coinage Right Slot")   // has no effect - it does what slot 1 does
+	PORT_DIPSETTING(    0x0f, "1C_1C")
+	PORT_DIPSETTING(    0x0e, "1C_2C")
+	PORT_DIPSETTING(    0x0d, "1C_3C")
+	PORT_DIPSETTING(    0x0c, "1C_4C")
 INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER( spirit76_state::irq )
 {
-	if (m_t_c > 0x70)
-		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
-	else
-		m_t_c++;
+	m_t_c++;
+	if (m_t_c > 0x13)
+		m_t_c = 0x10;
+	if (m_t_c > 0x10)
+	{
+		if (m_t_c < 0x12)
+			m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
+		else
+			m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
+	}
 }
 
-// continual write in irq routine
+
 void spirit76_state::porta_w(u8 data)
 {
-	printf("PORT A=%X\n",data);
+	m_segment = data & 15;
 }
 
-// continual write in irq routine
 void spirit76_state::portb_w(u8 data)
 {
-	printf("PORT B=%X\n",data);
+	static constexpr uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // unknown decoder that blanks out 10-15
+	// DISPLAYS
+	if (BIT(data, 7))
+	{
+		m_strobe = data & 15;
+		if (m_strobe == 7) // indicate player-up
+		{
+			if (BIT(m_segment, 0))
+			{
+				m_leds[5] = BIT(m_segment, 2);
+				m_leds[6] = !BIT(m_segment, 2);
+				m_segment = 15;  // blank the match
+			}
+			else
+			{
+				m_leds[5] = 0;
+				m_leds[6] = 0;
+				m_segment = 0;
+			}
+		}
+		else
+		if (m_strobe == 5) // indicate ball in play
+		{
+			u8 ball = 15;
+			switch (m_segment)
+			{
+				case 1: ball = 0; break;
+				case 7: ball = 1; break;
+				case 3: ball = 2; break;
+				case 2: ball = 3; break;
+				case 8: ball = 4; break;
+				default:
+					break;
+			}
+			for (u8 i = 0; i < 5; i++)
+				m_leds[i] = (ball == i);
+			m_segment = 0;
+		}
+
+		m_digits[m_strobe] = patterns[m_segment & 15];
+	}
+
+	// SOLENOIDS
+	// Some solenoids get continuously pulsed, which is absorbed by the real thing, but
+	// causes issues for us. So we need to use only the first occurrence of a particular sound.
+	if (BIT(data, 5))
+	{
+		data &= 15;
+		if (data == 0)
+		{
+			if (m_last_solenoid[0])
+				m_solenoids[m_last_solenoid[0]] = 0;   // turn off last solenoid
+			m_last_solenoid[1] = m_last_solenoid[0];   // store it away
+			m_last_solenoid[0] = 0;
+		}
+		else
+		{
+			m_last_solenoid[0] = data;
+			if (m_last_solenoid[1] != data)
+			{
+				m_solenoids[data] = 1;
+				switch (data)
+				{
+					case 1: m_samples->start(3, 3); break; // 10 chime
+					case 2: m_samples->start(2, 2); break; // 100 chime
+					case 3: m_samples->start(1, 1); break; // 1000 chime
+					case 4: case 14: m_samples->start(0, 6); break; // knocker
+					//case 5: m_samples->start(x, 6); break;  // Right flipper
+					//case 7: m_samples->start(x, 6); break;  // Left flipper
+					case 8: case 9: case 10: m_samples->start(4, 0); break; // 3 bumpers
+					case 11: case 12: m_samples->start(4, 7); break; // 2 slings
+					case 13: m_samples->start(5, 5); break; // outhole
+					default: break;
+				}
+			}
+		}
+	}
 }
 
-// continual read in irq routine
 u8 spirit76_state::porta_r()
 {
-	printf("Read PORT A\n");
 	return 0xff;
 }
 
-// might not be used?
-u8 spirit76_state::portb_r()
+u8 spirit76_state::sw_r()
 {
-	printf("Read PORT B\n");
-	return 0xff;
+	return ~m_switches[m_strobe]->read();
 }
 
-// writes here once at start
-void spirit76_state::unk_w(u8 data)
+void spirit76_state::machine_start()
 {
-	printf("UNK PORT=%X\n",data);
-}
-
-// continual read in irq routine
-u8 spirit76_state::unk_r()
-{
-	return 0;
+	m_digits.resolve();
+	m_leds.resolve();
+	m_solenoids.resolve();
+	save_item(NAME(m_t_c));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_last_solenoid));
 }
 
 void spirit76_state::machine_reset()
 {
 	m_t_c = 0;
+	m_strobe = 0;
+	m_segment = 0;
+	m_last_solenoid[0] = 0;
+	m_last_solenoid[1] = 0;
 }
 
 void spirit76_state::spirit76(machine_config &config)
@@ -127,21 +344,16 @@ void spirit76_state::spirit76(machine_config &config)
 	M6800(config, m_maincpu, 500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spirit76_state::maincpu_map);
 
-	TIMER(config, "irq").configure_periodic(FUNC(spirit76_state::irq), attotime::from_hz(120));
+	TIMER(config, "irq").configure_periodic(FUNC(spirit76_state::irq), attotime::from_hz(1200));
 
 	/* video hardware */
-	//config.set_default_layout();
+	config.set_default_layout(layout_spirit76);
 
 	//6821pia
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set(FUNC(spirit76_state::porta_w));
 	pia.writepb_handler().set(FUNC(spirit76_state::portb_w));
 	pia.readpa_handler().set(FUNC(spirit76_state::porta_r));
-	pia.readpb_handler().set(FUNC(spirit76_state::portb_r));
-//  pia.ca2_handler().set(FUNC(spirit76_state::pia22_ca2_w));
-//  pia.cb2_handler().set(FUNC(spirit76_state::pia22_cb2_w));
-//  pia.irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-//  pia.irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* sound hardware */
 	genpin_audio(config);

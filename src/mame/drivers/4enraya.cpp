@@ -274,6 +274,14 @@ void unk_gambl_state::unkpacg_main_map(address_map &map)
 	map(0x8000, 0x9fff).rom();
 }
 
+void unk_gambl_state::unkpacga_main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("maincpu", 0x6000);
+	map(0x6000, 0x67ff).ram().share("nvram");
+	map(0x7000, 0x7fff).w(FUNC(_4enraya_state::fenraya_videoram_w));
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
+}
+
 void unk_gambl_state::unkpacg_main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
@@ -512,6 +520,13 @@ void unk_gambl_state::unkpacg(machine_config &config)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void unk_gambl_state::unkpacga(machine_config &config)
+{
+	unkpacg(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::unkpacga_main_map);
+}
 
 /***********************************
 *             Rom Load             *
@@ -551,13 +566,47 @@ ROM_END
 */
 ROM_START(unkpacg)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("1.u14",    0x0000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2))
-	ROM_LOAD("2.u46",    0x8000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291))
+	ROM_LOAD( "1.u14",   0x0000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2) )
+	ROM_LOAD( "2.u46",   0x8000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "3.u20",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
 	ROM_LOAD( "4.u19",   0x4000, 0x2000, CRC(4a123a3d) SHA1(26300b8af0d0df0023a153a212699727311d1b74) )
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
+ROM_END
+
+ROM_START(unkpacga)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "p1.bin",  0x0000, 0x8000, CRC(386bd2da) SHA1(fa786c25dd5ec1a26ebe021ca701dccebfcbb64f) )  // first 0x5fff are 0xff filled
+	ROM_LOAD( "p2.bin",  0x8000, 0x8000, CRC(7878d7f3) SHA1(cacdd4b8e33a93e2913d0f5d740195ef0f439031) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "r.bin",   0x0000, 0x2000, CRC(b0d7b67a) SHA1(87bd150ed46d1346a363dc45c226e72967426f2a) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x0000, 0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "b.bin",   0x2000, 0x2000, CRC(5b26dce5) SHA1(d00434ab352169eca3c458917d5d1a04d0d2c2df) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x2000, 0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "g.bin",   0x4000, 0x2000, CRC(e12d34e0) SHA1(96790eec9032ca6f513cf0f6a1962d91a21ce2ae) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x4000, 0x2000)
+	ROM_IGNORE(0x4000)
+ROM_END
+
+ROM_START(unkpacgb)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "p1.bin",  0x0000, 0x8000, CRC(5cc6b5e1) SHA1(80325eef389f7d6a8c78531fdc6e5b73721eb0b1) )
+	ROM_LOAD( "p2.bin",  0x8000, 0x8000, CRC(06b42740) SHA1(0639ec2e31bd81e85a45689929bb67a61599497c) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "r.bin",   0x0000, 0x2000, CRC(b0d7b67a) SHA1(87bd150ed46d1346a363dc45c226e72967426f2a) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x0000, 0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "b.bin",   0x2000, 0x2000, CRC(5b26dce5) SHA1(d00434ab352169eca3c458917d5d1a04d0d2c2df) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x2000, 0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "g.bin",   0x4000, 0x2000, CRC(e12d34e0) SHA1(96790eec9032ca6f513cf0f6a1962d91a21ce2ae) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x4000, 0x2000)
+	ROM_IGNORE(0x4000)
 ROM_END
 
 /*
@@ -640,7 +689,7 @@ void unk_gambl_state::driver_init()
 
 	// descramble rom
 	uint8_t *rom = memregion("maincpu")->base();
-	for (int i = 0x8000; i < 0xa000; i++)
+	for (int i = 0x8000; i < 0x10000; i++)
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
 }
 
@@ -649,9 +698,11 @@ void unk_gambl_state::driver_init()
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS            INIT        ROT   COMPANY      FULLNAME                                         FLAGS  */
+/*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS            INIT        ROT   COMPANY      FULLNAME                                          FLAGS  */
 GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacgb, unkpacg, unkpacg,  unkpacg, unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacga, unkpacg, unkpacga, unkpacg, unk_gambl_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksig,   0,       unkpacg,  unkfr,   unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )

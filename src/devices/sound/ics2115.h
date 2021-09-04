@@ -132,6 +132,7 @@ private:
 
 	s16 m_ulaw[256];
 	u16 m_volume[4096];
+	u16 m_panlaw[256];
 	static const int volume_bits = 15;
 
 	ics2115_voice m_voice[32];

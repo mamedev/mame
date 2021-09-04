@@ -110,6 +110,8 @@ sprtdart                        // (c) 1993 Compumatic / Desarrollos y Recambios
 4enraya                         // (c) 1990 IDSA
 4enrayaa                        //
 unkpacg                         // (c) 19?? ???
+unkpacga                        //
+unkpacgb                        //
 unksig                          // 1998?
 unksiga                         // 1998?
 
@@ -1885,6 +1887,7 @@ deepfrz                         // (c) 2009
 deepfrzu                        // (c) 2009
 deltabel                        // (c) 2005
 deltaqn                         // (c) 2004
+diamhrts                        // (c) 2007
 dimeye                          // (c) 2004
 dimeyece                        // (c) 2004
 di4ever                         // (c) 2002
@@ -14123,6 +14126,7 @@ funkyjeta                       // MAT (c) 1992 Data East (Mitchell license) (Wo
 funkyjeta2                      // MAT (c) 1992 Data East (Mitchell license) (World) - Rev unverified - alternative demo
 funkyjetj                       // MAT (c) 1992 Data East (Mitchell license) (Japan, Rev 2)
 sotsugyo                        // (c) 1995 Mitchell (Atlus license)
+sotsugyok                       // (c) 1996 Mitchell (Korea)
 
 @source:funtech.cpp
 fts2in1
@@ -15527,6 +15531,7 @@ cb3b                            // (c) 199? Dyna Electronics
 cb3c                            // (c) 199? Dyna Electronics
 cb3d                            // (c) 199? Dyna Electronics
 cb3e                            // 199? bootleg
+cb3f                            // 199? bootleg
 cherry96                        // bootleg
 chry10                          // bootleg
 chryangl                        // (c) 199? Dyna Electronics
@@ -16968,6 +16973,7 @@ klxyj                           // (c) 200?
 lhzb3                           // (c) 200?
 lhzb4                           // (c) 200?
 mgfx                            // (c) 200?
+qlgs                            // (c) 1999
 sddz                            // (c) 200?
 sdwx                            // (c) 2002
 slqz3                           // (c) 1999
@@ -23029,6 +23035,7 @@ sport2k                         //
 bigappg                         // (c) 1986 Merit / Big Apple Games
 casino5                         // (c) 1989 Merit
 casino5a                        // (c) 1984 Merit
+casino5b                        // (c) 1984 Merit
 chkndraw                        // (c) 1984 Merit
 chkndrawa                       // (c) 1984 Merit
 couple                          // (c) 1988 Merit
@@ -23582,8 +23589,8 @@ gwinner                         // (c) 1983 Reben
 luckyplr                        // (c) 1981 Cirsa
 minisupf                        // (c) 1981 Cirsa
 msbamby                         // (c) 198? Automatics Pasqual
-trebol                          // 1985 Regama
-unkslot                         // (c) 198? MGA or Costa Net?
+multy                           // (c) 1987 Deta
+trebol                          // (c) 1985 Regama
 
 @source:missile.cpp
 mcombat                         // bootleg
@@ -31466,7 +31473,8 @@ swcourtb                        // bootleg (Playmark?)
 swcourtj                        // (c) 1992 (Japan)
 tinklpit                        // (c) 1993 (Japan)
 xday2                           // (c) 1995 (Japan)
-zelos                           // (c) 199? (Japan)
+zelos                           // (c) 1994 (Japan)
+zelost                          // (c) 1994 (Japan)
 
 @source:namconb1.cpp
 gslgr94j                        // (c) 1994 (Japan)
@@ -37150,10 +37158,12 @@ columns                         // (c) 1990 Sega
 columns2                        // (c) 1990 Sega
 columnsj                        // (c) 1990 Sega
 columnsu                        // (c) 1990 Sega
+headonch                        // (c) 1994 Sega
 ichir                           // (c) 1994 Sega
 ichirj                          // (c) 1994 Sega
 ichirjbl                        // bootleg
 ichirk                          // (c) 1994 Sega
+ooparts                         // (c) 1992 Success
 pclubj                          //
 pclubjv2                        //
 pclub                           //
@@ -37170,6 +37180,7 @@ ribbitj                         // (c) 1991 Sega
 soniccar                        // (c) 1991 Sega
 sonicpop                        // (c) 1993 Sega
 sonicfgt                        // (c) 1993 Sega
+ssonicbr                        // (c) 1992 Sega
 stkclmns                        // (c) 1994 Sega
 stkclmnsj                       // (c) 1994 Sega
 tantr                           // (c) 1992 Sega
@@ -41985,6 +41996,7 @@ vic20p                          // Commodore VIC 20 (PAL)
 
 @source:vicdual.cpp
 alphaho                         // Data East
+alphahob                        // bootleg
 brdrlinb                        // Karateco bootleg
 brdrline                        // (c) 1980 Sega
 brdrlinet                       // (c) 1981 Sega

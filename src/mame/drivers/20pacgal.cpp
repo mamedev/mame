@@ -89,7 +89,6 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 #include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
 #include "speaker.h"
 
 
@@ -375,6 +374,9 @@ void _20pacgal_state::machine_start()
 	common_save_state();
 
 	m_game_selected = 0;
+
+	// center the DAC; not all revisions do this
+	m_dac->data_w(0x80);
 
 	// membank currently used only by 20pacgal
 	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0x08000);

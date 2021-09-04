@@ -7,6 +7,7 @@
 
 #include "cpu/m6800/m6800.h"
 #include "machine/gen_latch.h"
+#include "machine/74157.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"
@@ -21,7 +22,6 @@ public:
 		m_slave(*this, "slave"),
 		m_mcu(*this, "mcu"),
 		m_soundlatch(*this, "soundlatch"),
-		m_msm(*this, "msm"),
 		m_screen(*this, "screen"),
 		m_textram(*this, "textram"),
 		m_backgroundram(*this, "backgroundram"),
@@ -47,14 +47,11 @@ protected:
 	required_device<cpu_device> m_slave;
 	required_device<m6802_cpu_device> m_mcu;
 	required_device<generic_latch_8_device> m_soundlatch;
-	optional_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_textram;
 	optional_shared_ptr<uint8_t> m_backgroundram;
 	required_shared_ptr<uint8_t> m_sprite_colorsharedram;
 
-	uint8_t m_ls74;
-	uint8_t m_ls377;
 	emu_timer *m_interrupt_timer;
 	emu_timer *m_sprite_timer;
 	int m_curr_scanline;
@@ -128,6 +125,8 @@ class rjammer_state : public tubep_state
 public:
 	rjammer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		tubep_state(mconfig, type, tag),
+		m_msm(*this, "msm"),
+		m_adpcm_mux(*this, "adpcm_mux"),
 		m_rjammer_backgroundram(*this, "rjammer_bgram")
 	{ }
 
@@ -138,6 +137,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void soundlatch_nmi_w(uint8_t data);
 
 	void rjammer_background_LS377_w(uint8_t data);
 	void rjammer_background_page_w(uint8_t data);
@@ -147,7 +147,7 @@ private:
 	void rjammer_voice_input_w(uint8_t data);
 	void rjammer_voice_intensity_control_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(rjammer_adpcm_vck);
+	DECLARE_WRITE_LINE_MEMBER(rjammer_adpcm_vck_w);
 
 	uint32_t screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -160,7 +160,11 @@ private:
 	void rjammer_sound_map(address_map &map);
 	void rjammer_sound_portmap(address_map &map);
 
-	optional_shared_ptr<uint8_t> m_rjammer_backgroundram;
+	required_device<msm5205_device> m_msm;
+	required_device<ls157_device> m_adpcm_mux;
+	required_shared_ptr<uint8_t> m_rjammer_backgroundram;
+
+	bool m_msm5205_toggle;
 };
 
 #endif // MAME_INCLUDES_TUBEP_H
