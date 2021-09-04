@@ -227,6 +227,8 @@ private:
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
 	emu_timer *m_irq0_stop_timer;
+	
+	uint8_t prot_sel, prot_cnt, prot_rega, prot_regb;
 
 	enum
 	{
@@ -305,6 +307,12 @@ void kinst_state::machine_reset()
 
 	/* set a safe base location for video */
 	m_video_base = &m_rambase[0x30000/4];
+	
+	/* initialize kinst2uk protection registers */
+	prot_sel=0;
+	prot_cnt=0;
+	prot_rega=0;
+	prot_regb=0;
 }
 
 
@@ -374,12 +382,31 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 
 uint32_t kinst_state::ide_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_ata->cs0_r(offset / 2, mem_mask);
+  if ((offset==0x0c)&&(prot_sel)) /* read register from kinst2uk protection CPLD */
+    return (prot_sel<<4)|(prot_cnt^prot_rega^prot_regb); /* return last upper bits written with xor of counter and registers in lower 4 bits */
+  else
+    return m_ata->cs0_r(offset / 2, mem_mask);
 }
 
 
 void kinst_state::ide_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+  if ((offset==0x0c)&&(data&0x10)) /* write to IDE slave (kinst2uk protection CPLD) */
+  {
+    if (data&0x40) /* D6 high */
+    {
+      prot_sel=0x05; /* select IDE slave (D6 high) */
+      prot_rega=data&0x0F; /* store lower 4 bits in register a */
+    }
+    else /* D6 low */
+    {
+      prot_sel=0x01; /* select IDE slave (D6 low) */
+      prot_regb=data&0x0F; /* store lower 4 bits in register b */
+      prot_cnt=(prot_cnt+1)&0x0F; /* every write here increments counter */
+    }
+  }
+  else if ((offset==0x0c)&&(!(data&0x10))) /* write to IDE master */
+    prot_sel=0; /* deselect IDE slave */
 	m_ata->cs0_w(offset / 2, data, mem_mask);
 }
 
@@ -881,4 +908,4 @@ void kinst_state::init_kinst2()
 
 GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, init_kinst,  ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, kinst2,   0,      kinst, kinst2, kinst_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst2uk, kinst2, kinst, kinst2, kinst_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kinst2uk, kinst2, kinst, kinst2, kinst_state, init_kinst, ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_SUPPORTS_SAVE )
