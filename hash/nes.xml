@@ -62885,12 +62885,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- This seems to be a slightly modified extract from Golden Card 6 in 1. -->
-	<software name="ejim2d" cloneof="ejim2" supported="partial">
+	<software name="ejim2d" cloneof="ejim2">
 		<description>Earthworm Jim 2 (Asia, Hacked?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gc6in1" />
+			<feature name="slot" value="8237" />
 			<dataarea name="chr" size="262144">
 				<rom name="earth worm jim 2 (unl)[no memu by maxzhou88].chr" size="262144" crc="66c57a10" sha1="0f6a5f2c75037a2213629ea45d79dcd0acacf48f" offset="00000" status="baddump" />
 			</dataarea>
@@ -62921,8 +62921,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>SuperGame</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gc6in1" />
-			<feature name="pcb" value="BMC-GOLDENCARD-6IN1" />
+			<feature name="slot" value="8237" />
 			<dataarea name="chr" size="262144">
 				<rom name="earthworm jim 2 (unl) (supergame).chr" size="262144" crc="66c57a10" sha1="0f6a5f2c75037a2213629ea45d79dcd0acacf48f" offset="00000" status="baddump" />
 			</dataarea>
@@ -76686,8 +76685,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>Super Games</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gc6in1" />
-			<feature name="pcb" value="BMC-GOLDENCARD-6IN1" />
+			<feature name="slot" value="8237" />
 			<dataarea name="chr" size="262144">
 				<rom name="mortal kombat 3 (unl) (supergame).chr" size="262144" crc="a9dfc575" sha1="d6f89cd05070dff0ed6efbe824798a760a87fa15" offset="00000" status="baddump" />
 			</dataarea>
@@ -81347,8 +81345,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gc6in1" />
-			<feature name="pcb" value="BMC-GOLDENCARD-6IN1" />
+			<feature name="slot" value="8237" />
 			<dataarea name="chr" size="1048576">
 				<rom name="golden card 6 in 1 (unl).chr" size="1048576" crc="8ddf8be7" sha1="24614a448d7da088844239ea57b68283694cc984" offset="00000" status="baddump" />
 			</dataarea>

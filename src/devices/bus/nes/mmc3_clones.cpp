@@ -69,7 +69,6 @@ DEFINE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device, "nes_bmc_mario7i
 DEFINE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device,       "nes_bmc_f15",       "NES Cart BMC F-15 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45",      "NES Cart BMC GN-45 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
-DEFINE_DEVICE_TYPE(NES_BMC_GC6IN1,    nes_bmc_gc6in1_device,    "nes_bmc_gc6in1",    "NES Cart BMC Golden Card 6 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device,     "nes_bmc_k3006",     "NES Cart BMC K-3006 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device,   "nes_bmc_411120c",   "NES Cart BMC 411120C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830118C,   nes_bmc_830118c_device,   "nes_bmc_830118c",   "NES Cart BMC 830118C PCB")
@@ -301,11 +300,6 @@ nes_bmc_gn45_device::nes_bmc_gn45_device(const machine_config &mconfig, const ch
 
 nes_bmc_gold7in1_device::nes_bmc_gold7in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_BMC_GOLD7IN1, tag, owner, clock), m_reg_written(0)
-{
-}
-
-nes_bmc_gc6in1_device::nes_bmc_gc6in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_GC6IN1, tag, owner, clock)
 {
 }
 
@@ -686,25 +680,6 @@ void nes_bmc_gold7in1_device::pcb_reset()
 
 	m_reg_written = 0;
 	mmc3_common_initialize(0x1f, 0xff, 0);
-}
-
-void nes_bmc_gc6in1_device::device_start()
-{
-	mmc3_start();
-	save_item(NAME(m_reg));
-}
-
-void nes_bmc_gc6in1_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_reg[0] = 0x00;
-	m_reg[1] = 0xff;
-	m_reg[2] = 0x03;
-	m_reg[3] = 0;
-	mmc3_common_initialize(0xff, 0xff, 0);
-	set_prg(m_prg_base, m_prg_mask);
-	set_chr(m_chr_source, m_chr_base, m_chr_mask);
 }
 
 void nes_bmc_k3006_device::pcb_reset()
@@ -2405,131 +2380,6 @@ void nes_bmc_gold7in1_device::write_m(offs_t offset, uint8_t data)
 	}
 	else
 		m_prgram[offset] = data;
-}
-
-/*-------------------------------------------------
-
- BMC-GOLDENCARD-6IN1
-
- Known Boards: Unknown Bootleg Multigame Board
- Games: Golden Card 6 in 1
-
- MMC3 clone
-
- iNES: mapper 217
-
- In MESS: Supported.
-
- -------------------------------------------------*/
-
-void nes_bmc_gc6in1_device::prg_cb(int start, int bank)
-{
-	if (m_reg[1] & 0x08)
-		bank &= 0x1f;
-	else
-	{
-		bank &= 0x0f;
-		bank |= m_reg[1] & 0x10;
-	}
-
-	prg8_x(start, bank | ((m_reg[1] & 0x03) << 5));
-}
-
-void nes_bmc_gc6in1_device::chr_cb(int start, int bank, int source)
-{
-	if (!(m_reg[1] & 0x08))
-		bank = ((m_reg[1] & 0x10) << 3) | (bank & 0x7f);
-
-
-	bank |= ((m_reg[1] << 6) & 0x100);
-	chr1_x(start, ((m_reg[1] & 0x03) << 8) | bank, source);
-}
-
-void nes_bmc_gc6in1_device::write_l(offs_t offset, uint8_t data)
-{
-	uint8_t bank;
-	LOG_MMC(("bmc_gc6in1 write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
-
-	if (offset == 0x1000)
-	{
-		m_reg[0] = data;
-		if (data & 0x80)
-		{
-			bank = (data & 0x0f) | ((m_reg[1] & 0x03) << 4);
-			prg16_89ab(bank);
-			prg16_cdef(bank);
-		}
-		else
-			set_prg(m_prg_base, m_prg_mask);
-	}
-	else if (offset == 0x1001)
-	{
-		m_reg[1] = data;
-		set_prg(m_prg_base, m_prg_mask);
-	}
-	else if (offset == 0x1007)
-	{
-		m_reg[2] = data;
-	}
-}
-
-void nes_bmc_gc6in1_device::write_h(offs_t offset, uint8_t data)
-{
-	uint8_t cmd;
-	static const uint8_t conv_table[8] = {0, 6, 3, 7, 5, 2, 4, 1};
-	LOG_MMC(("bmc_gc6in1 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if (!m_reg[2])
-	{
-		// in this case we act like MMC3, only with alt prg/chr handlers
-		txrom_write(offset, data);
-	}
-	else
-	{
-		switch (offset & 0x6001)
-		{
-			case 0x0000:
-				txrom_write(0x4000, data);
-				break;
-
-			case 0x0001:
-				data = (data & 0xc0) | conv_table[data & 0x07];
-				m_reg[3] = 1;
-				txrom_write(0x0000, data);
-				break;
-
-			case 0x2000:
-				cmd = m_latch & 0x07;
-				if (m_reg[3])
-				{
-					m_reg[3] = 0;
-					switch (cmd)
-					{
-						case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
-						case 2: case 3: case 4: case 5:
-							m_mmc_vrom_bank[cmd] = data;
-							set_chr(m_chr_source, m_chr_base, m_chr_mask);
-							break;
-						case 6:
-						case 7:
-							m_mmc_prg_bank[cmd - 6] = data;
-							set_prg(m_prg_base, m_prg_mask);
-							break;
-					}
-				}
-				break;
-
-
-			case 0x2001:
-				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-				break;
-
-			default:
-				txrom_write(offset, data);
-				break;
-		}
-	}
 }
 
 /*-------------------------------------------------
