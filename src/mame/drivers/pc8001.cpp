@@ -42,15 +42,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-void pc8001_state::palette_init(palette_device &palette)
-{
-	for (int i = 0; i < 8; i++)
-	{
-		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	}
-}
-
-WRITE_LINE_MEMBER( pc8001_state::crtc_reverse_w )
+WRITE_LINE_MEMBER( pc8001_base_state::crtc_reverse_w )
 {
 	// rvv acts as a global flip for reverse attribute meaning
 	// (does not act on underlying palette)
@@ -59,7 +51,7 @@ WRITE_LINE_MEMBER( pc8001_state::crtc_reverse_w )
 	m_screen_reverse = state;
 }
 
-UPD3301_FETCH_ATTRIBUTE( pc8001_state::attr_fetch )
+UPD3301_FETCH_ATTRIBUTE( pc8001_base_state::attr_fetch )
 {
 	const u8 attr_max_size = 80;
 	const bool is_color_mode = gfx_mode == 0x2;
@@ -95,7 +87,7 @@ UPD3301_FETCH_ATTRIBUTE( pc8001_state::attr_fetch )
 	return attr_extend_info;
 }
 
-UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
+UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 {
 	// punt if we are in width 40 (discarded on this end)
 	if (sx % 2 && !m_width80)
@@ -179,7 +171,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::draw_text )
 			}
 			
 			for (int di = 0; di < dot_width; di++)
-				bitmap.pix(y, res_x + di) = m_palette->pen(pen ? color : 0);
+				bitmap.pix(y, res_x + di) = m_crtc_palette->pen(pen ? color : 0);
 		}
 	}
 }
@@ -222,7 +214,7 @@ void pc8001_state::port10_w(uint8_t data)
 	m_cent_data_out->write(data);
 }
 
-void pc8001_state::port30_w(uint8_t data)
+void pc8001_base_state::port30_w(uint8_t data)
 {
 	/*
 
@@ -244,9 +236,8 @@ void pc8001_state::port30_w(uint8_t data)
 
 	/* color mode */
 	m_color = BIT(data, 1);
-
-	/* cassette motor */
-	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	
+	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 void pc8001mk2_state::port31_w(uint8_t data)
@@ -649,6 +640,13 @@ uint8_t pc8001_state::dma_mem_r(offs_t offset)
 
 /* Machine Initialization */
 
+void pc8001_base_state::machine_start()
+{
+	save_item(NAME(m_width80));
+	save_item(NAME(m_color));
+	save_item(NAME(m_screen_reverse));
+}
+
 void pc8001_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -693,11 +691,6 @@ void pc8001_state::machine_start()
 //		membank("bank2")->set_entry(0);
 		break;
 	}
-
-	/* register for state saving */
-	save_item(NAME(m_width80));
-	save_item(NAME(m_color));
-	save_item(NAME(m_screen_reverse));
 }
 
 void pc8001_state::machine_reset()
@@ -746,9 +739,9 @@ void pc8001_state::pc8001(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
 	m_screen->set_screen_update(FUNC(pc8001_state::screen_update));
-//	m_screen->set_palette(m_palette);
+//	m_screen->set_palette(m_crtc_palette);
 
-	PALETTE(config, m_palette, FUNC(pc8001_state::palette_init), 8);
+	PALETTE(config, m_crtc_palette, palette_device::BRG_3BIT);
 
 	/* devices */
 	I8251(config, I8251_TAG, 0);

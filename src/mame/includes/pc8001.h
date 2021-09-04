@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Angelo Salese
 
+#pragma once
+
 #ifndef MAME_INCLUDES_PC8001_H
 #define MAME_INCLUDES_PC8001_H
-
-#pragma once
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -29,25 +29,55 @@
 #define UPD3301_TAG     "upd3301"
 #define CENTRONICS_TAG  "centronics"
 
-class pc8001_state : public driver_device
+class pc8001_base_state : public driver_device
+{
+public:
+	pc8001_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_crtc(*this, UPD3301_TAG)
+		, m_crtc_palette(*this, "crtc_palette")
+		, m_dma(*this, I8257_TAG)
+		, m_cassette(*this, "cassette")
+		, m_char_rom(*this, UPD3301_TAG)
+	{}
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<upd3301_device> m_crtc;
+	required_device<palette_device> m_crtc_palette;
+	required_device<i8257_device> m_dma;
+	required_device<cassette_image_device> m_cassette;
+	required_memory_region m_char_rom;
+
+	DECLARE_WRITE_LINE_MEMBER( crtc_reverse_w );
+	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
+	UPD3301_FETCH_ATTRIBUTE( attr_fetch );
+	
+	void port30_w(u8 data);
+	virtual void machine_start() override;
+
+private:
+	bool m_screen_reverse;
+
+	/* video state */
+	int m_width80;
+	int m_color;
+};
+
+class pc8001_state : public pc8001_base_state
 {
 public:
 	pc8001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, Z80_TAG)
+		: pc8001_base_state(mconfig, type, tag)
 		, m_pc80s31(*this, "pc80s31")
 		, m_rtc(*this, UPD1990A_TAG)
-		, m_dma(*this, I8257_TAG)
-		, m_crtc(*this, UPD3301_TAG)
 		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
-		, m_cassette(*this, "cassette")
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_beep(*this, "beeper")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, Z80_TAG)
-		, m_char_rom(*this, UPD3301_TAG)
 	{ }
 
 	void pc8001(machine_config &config);
@@ -58,26 +88,17 @@ protected:
 
 	virtual void machine_start() override;
     virtual void machine_reset() override;
-	void palette_init(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void port30_w(uint8_t data);
-
-	required_device<cpu_device> m_maincpu;
 	required_device<pc80s31_device> m_pc80s31;
 	required_device<upd1990a_device> m_rtc;
-	required_device<i8257_device> m_dma;
-	required_device<upd3301_device> m_crtc;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	required_memory_region m_char_rom;
 
 private:
 	void port10_w(uint8_t data);
@@ -86,19 +107,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	uint8_t dma_mem_r(offs_t offset);
 
-	/* video state */
-	int m_width80;
-	int m_color;
-
 	int m_centronics_busy;
 	int m_centronics_ack;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(crtc_reverse_w);
-	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
-	UPD3301_FETCH_ATTRIBUTE( attr_fetch );
-	bool m_screen_reverse;
 };
 
 class pc8001mk2_state : public pc8001_state
