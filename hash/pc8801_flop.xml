@@ -4749,7 +4749,7 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 	</software>
 
 	<!-- Hangs after loading N88 Basic -->
-	<!-- FDC stalls [scans an existing CHRN=(10 00 10 01) at boot but still fails?] --> -->
+	<!-- FDC stalls [scans an existing CHRN=(10 00 10 01) at boot but still fails?] -->
 	<software name="blckonyxa" cloneof="blckonyx" supported="no">
 		<description>The Black Onyx (Alt)</description>
 		<year>1984</year>
