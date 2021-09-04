@@ -111,6 +111,26 @@ public:
 		return m_bitmap->pix(y,x);
 	};
 
+
+	int calc_scroll_y(bitmap_rgb32& bitmap)
+	{
+		return bitmap.height() - m_distfrombottom - m_ypos;
+	}
+
+	void draw_inch_marks(bitmap_rgb32& bitmap)
+	{
+		int vdpi = 144;
+		for (int i = 0; i < vdpi * 11; i += vdpi / 4)
+		{
+			int adj_i = i + calc_scroll_y(bitmap) % bitmap.height();
+			int barbase = vdpi / 6;
+			int barwidth = ((i % vdpi) == 0) ? barbase * 2 : barbase;
+			int barcolor = ((i % vdpi) == 0) ? 0x202020 : 0xc0c0c0;
+			if (adj_i < bitmap.height()) bitmap.plot_box(bitmap.width() - 1 - barwidth, adj_i, barwidth, 1, barcolor);
+			else break;
+		}
+	}
+
 	void setheadpos(int x, int y){m_xpos = x; m_ypos=y;}
 
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);

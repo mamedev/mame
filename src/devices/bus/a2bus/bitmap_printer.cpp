@@ -36,7 +36,10 @@ DEFINE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device, "bitmap_printer", "Bit
 //**************************************************************************
 
 INPUT_PORTS_START(bitmap_printer)
-	PORT_START("CNF")
+	PORT_START("DRAWINCHMARKS")
+	PORT_CONFNAME(0x1, 0x01, "Draw Inch Marks")
+	PORT_CONFSETTING(0x0, "Off")
+	PORT_CONFSETTING(0x1, "On")
 INPUT_PORTS_END
 
 
@@ -115,13 +118,16 @@ void bitmap_printer_device::device_reset()
 uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 							 bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scrolly = bitmap.height() - m_distfrombottom - m_ypos;
+//  int scrolly = bitmap.height() - m_distfrombottom - m_ypos;
+	int scrolly = calc_scroll_y(bitmap);
 
 	copyscrollbitmap(bitmap, *m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
 	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paperwidth, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
 	drawprinthead(bitmap, m_xpos, bitmap.height() - m_distfrombottom);
+
+	if (ioport("DRAWINCHMARKS")->read()) draw_inch_marks(bitmap);
 
 	return 0;
 }
