@@ -122,9 +122,10 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 				{
 					bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 					uint16_t pitch = width;
-					int convert_stride = 1;
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, convert_stride);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)(rowpixels / convert_stride), (uint16_t)height, mem, pitch);
+					int width_div_factor = 1;
+					int width_mul_factor = 1;
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, width_div_factor, width_mul_factor);
+					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)((rowpixels * width_mul_factor) / width_div_factor), (uint16_t)height, mem, pitch);
 					return handle;
 				}
 			}
@@ -151,9 +152,10 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 				{
 					bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 					uint16_t pitch = width;
-					int convert_stride = 1;
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, convert_stride);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)(rowpixels / convert_stride), (uint16_t)height, mem, pitch);
+					int width_div_factor = 1;
+					int width_mul_factor = 1;
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, width_div_factor, width_mul_factor);
+					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)((rowpixels * width_mul_factor) / width_div_factor), (uint16_t)height, mem, pitch);
 					return handle;
 				}
 			}
@@ -163,10 +165,12 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 
 	bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
 	uint16_t pitch = width;
-	int convert_stride = 1;
-	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, convert_stride);
-	handle = bgfx::createTexture2D(width, height, false, 1, dst_format, flags, nullptr);
-	bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)(rowpixels / convert_stride), (uint16_t)height, mem, pitch);
+	int width_div_factor = 1;
+	int width_mul_factor = 1;
+	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, width_div_factor, width_mul_factor);
+	const uint16_t adjusted_width = (uint16_t)((rowpixels * width_mul_factor) / width_div_factor);
+	handle = bgfx::createTexture2D(adjusted_width, height, false, 1, dst_format, flags, nullptr);
+	bgfx::updateTexture2D(handle, 0, 0, 0, 0, adjusted_width, (uint16_t)height, mem, pitch);
 
 	m_mame_textures[key] = { handle, seqid, width, height };
 	return handle;
