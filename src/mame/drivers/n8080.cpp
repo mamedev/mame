@@ -13,8 +13,12 @@
 Space Fever was initially produced with B&W video hardware. It was later sold
 (maybe upgraded too) featuring color graphics, known as "Color Space Fever".
 The other Space Fever hardware games were only sold with color graphics, but
-in theory it should still be possible to run them on the older hardware.
-For example, doing a ROM swap on the older Space Fever.
+they run fine on the older B&W video hardware. For example, doing a ROM swap
+on the older Space Fever.
+
+TODO:
+- spacefev sound pitch for laser fire and enemy explosion is wrong, see:
+  https://www.youtube.com/watch?v=mGMUPNqlyuw
 
 ----------------------------------------------------------------------------
 
