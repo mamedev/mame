@@ -124,7 +124,7 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 	float voz_base = tms3203x_device::fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
 	float ooz_base = tms3203x_device::fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
 	float uoz_base = tms3203x_device::fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
-	gaelco3d_object_data &object = object_data_alloc();
+	gaelco3d_object_data &object = object_data().next();
 	int color = (polydata[10] & 0x7f) << 8;
 	vertex_t vert[MAX_VERTICES];
 	uint32_t data;

@@ -142,6 +142,8 @@ Dip locations added based on the notes above.
 #include "tilemap.h"
 
 
+namespace {
+
 class ppmast93_state : public driver_device
 {
 public:
@@ -150,10 +152,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_bgram(*this, "bgram"),
-		m_fgram(*this, "fgram")
+		m_fgram(*this, "fgram"),
+		m_cpubank(*this, "cpubank")
 	{ }
 
 	void ppmast93(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -161,6 +168,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_fgram;
+	required_memory_bank m_cpubank;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -172,32 +180,29 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ppmast93_cpu1_io(address_map &map);
-	void ppmast93_cpu1_map(address_map &map);
-	void ppmast93_cpu2_io(address_map &map);
-	void ppmast93_cpu2_map(address_map &map);
+	void cpu1_io(address_map &map);
+	void cpu1_map(address_map &map);
+	void cpu2_io(address_map &map);
+	void cpu2_map(address_map &map);
 };
 
 
 void ppmast93_state::machine_start()
 {
-	membank("cpubank")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+	m_cpubank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
 void ppmast93_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset/2);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 void ppmast93_state::bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 void ppmast93_state::port4_w(uint8_t data)
@@ -205,20 +210,20 @@ void ppmast93_state::port4_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x08);
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
-	membank("cpubank")->set_entry(data & 0x07);
+	m_cpubank->set_entry(data & 0x07);
 }
 
-void ppmast93_state::ppmast93_cpu1_map(address_map &map)
+void ppmast93_state::cpu1_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().nopw();
-	map(0x8000, 0xbfff).bankr("cpubank");
-	map(0xd000, 0xd7ff).ram().w(FUNC(ppmast93_state::bgram_w)).share("bgram");
+	map(0x8000, 0xbfff).bankr(m_cpubank);
+	map(0xd000, 0xd7ff).ram().w(FUNC(ppmast93_state::bgram_w)).share(m_bgram);
 	map(0xd800, 0xdfff).nopw();
-	map(0xf000, 0xf7ff).ram().w(FUNC(ppmast93_state::fgram_w)).share("fgram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(ppmast93_state::fgram_w)).share(m_fgram);
 	map(0xf800, 0xffff).ram();
 }
 
-void ppmast93_state::ppmast93_cpu1_io(address_map &map)
+void ppmast93_state::cpu1_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("P1").w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -228,16 +233,16 @@ void ppmast93_state::ppmast93_cpu1_io(address_map &map)
 	map(0x08, 0x08).portr("DSW2");
 }
 
-void ppmast93_state::ppmast93_cpu2_map(address_map &map)
+void ppmast93_state::cpu2_map(address_map &map)
 {
-	map(0x0000, 0xfbff).rom().region("sub", 0x10000);
+	map(0x0000, 0xfbff).rom().region("sub", 0x00000);
 	map(0xfc00, 0xfc00).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xfd00, 0xffff).ram();
 }
 
-void ppmast93_state::ppmast93_cpu2_io(address_map &map)
+void ppmast93_state::cpu2_io(address_map &map)
 {
-	map(0x0000, 0xffff).rom().region("sub", 0x20000);
+	map(0x0000, 0xffff).rom().region("sub", 0x10000);
 	map(0x0000, 0x0001).mirror(0xff00).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x0002, 0x0002).mirror(0xff00).w("dac", FUNC(dac_byte_interface::data_w));
 }
@@ -337,12 +342,12 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( gfx_ppmast93 )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(ppmast93_state::get_bg_tile_info)
 {
-	int code = (m_bgram[tile_index*2+1] << 8) | m_bgram[tile_index*2];
+	int code = (m_bgram[tile_index * 2 + 1] << 8) | m_bgram[tile_index * 2];
 	tileinfo.set(0,
 			code & 0x0fff,
 			(code & 0xf000) >> 12,
@@ -351,9 +356,9 @@ TILE_GET_INFO_MEMBER(ppmast93_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(ppmast93_state::get_fg_tile_info)
 {
-	int code = (m_fgram[tile_index*2+1] << 8) | m_fgram[tile_index*2];
+	int code = (m_fgram[tile_index * 2 + 1] << 8) | m_fgram[tile_index * 2];
 	tileinfo.set(0,
-			(code & 0x0fff)+0x1000,
+			(code & 0x0fff) + 0x1000,
 			(code & 0xf000) >> 12,
 			0);
 }
@@ -375,23 +380,23 @@ uint32_t ppmast93_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void ppmast93_state::ppmast93(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);         /* 5 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ppmast93_state::ppmast93_cpu1_map);
-	m_maincpu->set_addrmap(AS_IO, &ppmast93_state::ppmast93_cpu1_io);
+	// basic machine hardware
+	Z80(config, m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ppmast93_state::cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &ppmast93_state::cpu1_io);
 	m_maincpu->set_vblank_int("screen", FUNC(ppmast93_state::irq0_line_hold));
 
-	z80_device &sub(Z80(config, "sub", 5000000));         /* 5 MHz */
-	sub.set_addrmap(AS_PROGRAM, &ppmast93_state::ppmast93_cpu2_map);
-	sub.set_addrmap(AS_IO, &ppmast93_state::ppmast93_cpu2_io);
+	z80_device &sub(Z80(config, "sub", 5_MHz_XTAL));
+	sub.set_addrmap(AS_PROGRAM, &ppmast93_state::cpu2_map);
+	sub.set_addrmap(AS_IO, &ppmast93_state::cpu2_io);
 	sub.set_periodic_int(FUNC(ppmast93_state::irq0_line_hold), attotime::from_hz(8000));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(55);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(ppmast93_state::screen_update));
 	screen.set_palette("palette");
 
@@ -399,12 +404,12 @@ void ppmast93_state::ppmast93(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 0x100);
 
-
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2413(config, "ymsnd", 5000000/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	YM2413(config, "ymsnd", 5_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 }
@@ -413,10 +418,10 @@ ROM_START( ppmast93 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "2.up7", 0x00000, 0x20000, CRC(8854d8db) SHA1(9d93ddfb44d533772af6519747a6cb50b42065cd) )
 
-	ROM_REGION( 0x30000, "sub", 0 )
-	ROM_LOAD( "1.ue7", 0x10000, 0x20000, CRC(8e26939e) SHA1(e62441e523f5be6a3889064cc5e0f44545260e93) )
+	ROM_REGION( 0x20000, "sub", 0 )
+	ROM_LOAD( "1.ue7", 0x00000, 0x20000, CRC(8e26939e) SHA1(e62441e523f5be6a3889064cc5e0f44545260e93) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "3.ug16", 0x00000, 0x20000, CRC(8ab24641) SHA1(c0ebee90bf3fe208947ae5ea56f31469ed24d198) )
 	ROM_LOAD( "4.ug15", 0x20000, 0x20000, CRC(b16e9fb6) SHA1(53aa962c63319cd649e0c8cf0c26e2308598e1aa) )
 
@@ -425,5 +430,8 @@ ROM_START( ppmast93 )
 	ROM_LOAD( "prom2.ug25", 0x100, 0x100, CRC(4b5055ba) SHA1(6213e79492d35593c643ef5c01ce6a58a77866aa) )
 	ROM_LOAD( "prom1.ug26", 0x200, 0x100, CRC(d979c64e) SHA1(172c9579013d58e35a5b4f732e360811ac36295e) )
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 1993, ppmast93, 0, ppmast93, ppmast93, ppmast93_state, empty_init, ROT0, "Electronic Devices S.R.L.", "Ping Pong Masters '93", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

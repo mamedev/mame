@@ -19,6 +19,7 @@ public:
 	n8080_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
+		m_prom(*this, "proms"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_n8080_dac(*this, "n8080_dac"),
@@ -36,9 +37,9 @@ protected:
 	virtual void delayed_sound_1(int data);
 	virtual void delayed_sound_2(int data);
 
-//private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
+	optional_memory_region m_prom;
 
 	/* video-related */
 	int m_sheriff_color_mode;
@@ -57,7 +58,7 @@ protected:
 	int m_inte;
 
 	/* devices */
-	required_device<i8080_cpu_device> m_maincpu;
+	required_device<i8080a_cpu_device> m_maincpu;
 	required_device<i8035_device> m_audiocpu;
 	optional_device<dac_bit_interface> m_n8080_dac;
 	optional_device<sn76477_device> m_sn;
@@ -94,7 +95,8 @@ class spacefev_state : public n8080_state
 {
 public:
 	spacefev_state(const machine_config &mconfig, device_type type, const char *tag) :
-		n8080_state(mconfig, type, tag)
+		n8080_state(mconfig, type, tag),
+		m_video_conf(*this, "VIDEO")
 	{ }
 
 	void spacefev(machine_config &config);
@@ -111,6 +113,8 @@ protected:
 	virtual void delayed_sound_2(int data) override;
 
 private:
+	required_ioport m_video_conf;
+
 	void spacefev_sound(machine_config &config);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vco_voltage_timer);
@@ -155,7 +159,8 @@ public:
 	helifire_state(const machine_config &mconfig, device_type type, const char *tag) :
 		n8080_state(mconfig, type, tag),
 		m_dac(*this, "helifire_dac"),
-		m_colorram(*this, "colorram")
+		m_colorram(*this, "colorram"),
+		m_pot(*this, "POT%u", 0)
 	{ }
 
 	void helifire(machine_config &config);
@@ -188,6 +193,7 @@ private:
 
 	required_device<dac_8bit_r2r_device> m_dac;
 	required_shared_ptr<uint8_t> m_colorram;
+	required_ioport_array<2> m_pot;
 
 	int m_dac_phase;
 	double m_dac_volume;

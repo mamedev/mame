@@ -109,8 +109,8 @@ ROM_END
 
 /* It's an upgrade from "babyfrts25" for accepting 100 pts coins instead of just 25 pts ones.
    Standard RF-3115 PCB but:
-   -Two S5101 static RAM chips (instead of 4, one empty socket in the middle)
-   -Four NEC D8243C (instead of 5, two empty sockets).
+   -Two S5101 static RAM chips (instead of 4, two empty sockets)
+   -Four NEC D8243C (instead of 5, one empty socket in the middle).
    -No D8748 (the socket is empty), uses an external PCB (RF 53/3131) for sound with this layout:
       ___________________________________
      |     __________________________   |

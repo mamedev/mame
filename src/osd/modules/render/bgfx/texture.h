@@ -21,7 +21,7 @@ class bgfx_texture : public bgfx_texture_handle_provider
 {
 public:
 	bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t flags, void* data);
-	bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, const bgfx::Memory* data, uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP, uint16_t pitch = UINT16_MAX, uint16_t rowpixels = 0, int convert_stride = 1);
+	bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, const bgfx::Memory* data, uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP, uint16_t pitch = UINT16_MAX, uint16_t rowpixels = 0, int width_div_factor = 1, int width_mul_factor = 1);
 	virtual ~bgfx_texture();
 
 	// Getters
@@ -34,7 +34,8 @@ public:
 	virtual uint16_t width() const override { return m_width; }
 	virtual uint16_t height() const override { return m_height; }
 	virtual uint16_t rowpixels() const override { return m_rowpixels; }
-	virtual int convert_stride() const override { return m_convert_stride; }
+	virtual int width_div_factor() const override { return m_width_div_factor; }
+	virtual int width_mul_factor() const override { return m_width_mul_factor; }
 
 	void update(const bgfx::Memory *data, uint16_t pitch = UINT16_MAX);
 
@@ -44,7 +45,8 @@ protected:
 	uint16_t                    m_width;
 	uint16_t                    m_height;
 	uint16_t                    m_rowpixels;
-	int                         m_convert_stride;
+	int                         m_width_div_factor;
+	int                         m_width_mul_factor;
 	bgfx::TextureHandle         m_texture;
 };
 

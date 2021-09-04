@@ -22,6 +22,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="avelan">
+		<description>Avelan</description>
+		<year>198?</year>
+		<publisher>AVE Micro Systems</publisher>
+		<part name="cart" interface="arb">
+			<feature name="altboard" value="1" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="avelan.bin" offset="0x4000" size="0x1000" crc="01e713d1" sha1="a32e22de4d32fd0a97f8be6b5bc33d0c558aa323" />
+				<rom                   offset="0x5000" size="0x1000" loadflag="reload" />
+				<rom                   offset="0x6000" size="0x1000" loadflag="reload" />
+				<rom                   offset="0x7000" size="0x1000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gms40">
 		<description>Grand Master Series 4.0</description>
 		<year>1984</year>

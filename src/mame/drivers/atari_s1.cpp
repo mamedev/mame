@@ -75,6 +75,7 @@ public:
 		, m_dac(*this, "dac")
 		, m_switch(*this, "SWITCH.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
+		, m_player_lamps(*this, "text%u", 0U)
 	{ }
 
 	void midearth(machine_config &config);
@@ -82,8 +83,8 @@ public:
 	void atarians(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 
 private:
 	uint8_t m1080_r();
@@ -121,6 +122,7 @@ private:
 	required_device<dac_4bit_r2r_device> m_dac;
 	required_ioport_array<10> m_switch;
 	output_finder<78> m_digits;
+	output_finder<8> m_player_lamps;
 };
 
 void atari_s1_state::atari_s1_map(address_map &map)
@@ -384,26 +386,25 @@ uint8_t atari_s1_state::switch_r(offs_t offset)
 TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+
 	m_bit6++;
 	if (m_t_c > 0x40)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_t_c++;
 
-	m_out_offs++;
-	m_out_offs &= 0x1f;
-	if ((m_out_offs & 3) == 3)
+	m_out_offs = (m_out_offs + 1) & 0x1f;
+	uint8_t const p_val = m_p_ram[m_out_offs];
+	if ((m_out_offs & 0x03) == 0x03)
 	{
 		// Player number
-		char wordnum[8];
-		sprintf(wordnum,"text%d",m_out_offs>>2);
-		output().set_value(wordnum, !BIT(patterns[m_p_ram[m_out_offs]&15], 6)); // uses 'g' segment
+		m_player_lamps[m_out_offs >> 2] = !BIT(patterns[p_val & 0x0f], 6); // uses 'g' segment
 	}
 	else
 	{
 		// Digits
-		m_digits[m_out_offs << 1] = patterns[m_p_ram[m_out_offs]>>4];
-		m_digits[(m_out_offs << 1)+1] = patterns[m_p_ram[m_out_offs]&15];
+		m_digits[(m_out_offs << 1) + 0] = patterns[p_val >> 4];
+		m_digits[(m_out_offs << 1) + 1] = patterns[p_val & 0x0f];
 	}
 }
 
@@ -444,6 +445,12 @@ void atari_s1_state::audiores_w(uint8_t data)
 	m_audiores = (data) ? 0 : 1;
 }
 
+
+void atari_s1_state::machine_start()
+{
+	m_digits.resolve();
+	m_player_lamps.resolve();
+}
 
 void atari_s1_state::machine_reset()
 {

@@ -31,6 +31,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <mutex>
+#include <optional>
 #include <ratio>
 #include <utility>
 #include <vector>
@@ -210,12 +211,9 @@ public:
 
 	std::chrono::system_clock::time_point current_last_modified() const noexcept
 	{
-		if (!m_header.modified_cached)
-		{
+		if (!m_header.modified)
 			m_header.modified = decode_dos_time(m_header.modified_date, m_header.modified_time);
-			m_header.modified_cached = true;
-		}
-		return m_header.modified;
+		return *m_header.modified;
 	}
 
 	std::uint32_t current_crc() const noexcept { return m_header.crc; }
@@ -293,26 +291,29 @@ private:
 
 	struct file_header
 	{
+	private:
+		using optional_time_point = std::optional<std::chrono::system_clock::time_point>;
+
+	public:
 		file_header() noexcept { }
 		file_header(file_header const &) = default;
 		file_header(file_header &&) noexcept = default;
 		file_header &operator=(file_header const &) = default;
 		file_header &operator=(file_header &&) noexcept = default;
 
-		std::uint16_t                                   version_created;        // version made by
-		std::uint16_t                                   version_needed;         // version needed to extract
-		std::uint16_t                                   bit_flag;               // general purpose bit flag
-		std::uint16_t                                   compression;            // compression method
-		mutable std::chrono::system_clock::time_point   modified;               // last mod file date/time
-		std::uint32_t                                   crc;                    // crc-32
-		std::uint64_t                                   compressed_length;      // compressed size
-		std::uint64_t                                   uncompressed_length;    // uncompressed size
-		std::uint32_t                                   start_disk_number;      // disk number start
-		std::uint64_t                                   local_header_offset;    // relative offset of local header
-		std::string                                     file_name;              // file name
+		std::uint16_t               version_created;        // version made by
+		std::uint16_t               version_needed;         // version needed to extract
+		std::uint16_t               bit_flag;               // general purpose bit flag
+		std::uint16_t               compression;            // compression method
+		mutable optional_time_point modified;               // last mod file date/time
+		std::uint32_t               crc;                    // crc-32
+		std::uint64_t               compressed_length;      // compressed size
+		std::uint64_t               uncompressed_length;    // uncompressed size
+		std::uint32_t               start_disk_number;      // disk number start
+		std::uint64_t               local_header_offset;    // relative offset of local header
+		std::string                 file_name;              // file name
 
-		std::uint16_t                                   modified_date, modified_time;
-		mutable bool                                    modified_cached;
+		std::uint16_t               modified_date, modified_time;
 	};
 
 	// contains extracted end of central directory information
@@ -798,7 +799,7 @@ int zip_file_impl::search(std::uint32_t search_crc, std::string_view search_file
 			// don't immediately decode DOS timestamp - it's expensive
 			header.modified_date       = reader.modified_date();
 			header.modified_time       = reader.modified_time();
-			header.modified_cached     = false;
+			header.modified            = std::nullopt;
 
 			// copy the filename
 			bool is_utf8(general_flag_reader(header.bit_flag).utf8_encoding());
@@ -850,7 +851,6 @@ int zip_file_impl::search(std::uint32_t search_crc, std::string_view search_file
 							try
 							{
 								header.modified = system_clock_time_point_from_ntfs_duration(ticks);
-								header.modified_cached = true;
 							}
 							catch (...)
 							{

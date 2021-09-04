@@ -1567,7 +1567,7 @@ public:
 			fatalerror("Requesting cache() with data width %d while the config says %d\n", 8 << Width, m_config.data_width());
 		if(Endian != m_config.endianness())
 			fatalerror("Requesting cache() with endianness %s while the config says %s\n",
-					   endianness_names[Endian], endianness_names[m_config.endianness()]);
+					   util::endian_to_string_view(Endian), util::endian_to_string_view(m_config.endianness()));
 
 		v.set(this, get_cache_info());
 	}
@@ -1581,7 +1581,7 @@ public:
 			fatalerror("Requesting specific() with data width %d while the config says %d\n", 8 << Width, m_config.data_width());
 		if(Endian != m_config.endianness())
 			fatalerror("Requesting spefific() with endianness %s while the config says %s\n",
-					   endianness_names[Endian], endianness_names[m_config.endianness()]);
+					   util::endian_to_string_view(Endian), util::endian_to_string_view(m_config.endianness()));
 
 		v.set(this, get_specific_info());
 	}
@@ -1964,33 +1964,6 @@ private:
 
 #define ACCESSING_BITS_0_31             ((mem_mask & 0xffffffffU) != 0)
 #define ACCESSING_BITS_32_63            ((mem_mask & 0xffffffff00000000U) != 0)
-
-
-// macros for accessing bytes and words within larger chunks
-
-// read/write a byte to a 16-bit space
-#define BYTE_XOR_BE(a)                  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0))
-#define BYTE_XOR_LE(a)                  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,1))
-
-// read/write a byte to a 32-bit space
-#define BYTE4_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0))
-#define BYTE4_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,3))
-
-// read/write a word to a 32-bit space
-#define WORD_XOR_BE(a)                  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
-#define WORD_XOR_LE(a)                  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,2))
-
-// read/write a byte to a 64-bit space
-#define BYTE8_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(7,0))
-#define BYTE8_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,7))
-
-// read/write a word to a 64-bit space
-#define WORD2_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0))
-#define WORD2_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6))
-
-// read/write a dword to a 64-bit space
-#define DWORD_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
-#define DWORD_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
 
 
 // helpers for checking address alignment
