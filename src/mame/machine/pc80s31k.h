@@ -14,6 +14,7 @@ NEC PC-80S31K
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/upd765.h"
+#include "machine/gen_latch.h"
 #include "imagedev/floppy.h"
 
 //**************************************************************************
@@ -49,18 +50,16 @@ private:
 	required_memory_region m_fdc_rom;
 	required_device<i8255_device> m_ppi_host;
 	required_device<i8255_device> m_ppi_fdc;
+	required_device_array<generic_latch_8_device, 6> m_latch;
 
 	void fdc_map(address_map &map);
 
-	u8 host_portc_r();
-	void host_portc_w(u8 data);
-	u8 fdc_portc_r();
-	void fdc_portc_w(u8 data);
-	
+	template <unsigned N> u8 latch_r();
+	template <unsigned N> void latch_w(u8 data);
+
 	u8 terminal_count_r();
 	void motor_control_w(u8 data);
 	
-	u8 m_host_latch, m_fdc_latch;
 	emu_timer *m_tc_zero_timer;
 
 	IRQ_CALLBACK_MEMBER(irq_cb);

@@ -23,6 +23,13 @@
 	- pc80s31k: verify that irq vector write (I/O port $f0) belongs here or just
 	  whatever PC88VA uses.
 	- printer interface (used for debugging? 4-bit serial?)
+	- Pinpoint what host I/O ports $f6, $f7 truly are 
+      (direct FDC access from this device or a different beast? cfr. play6lim with pc8001mk2)
+    - filemst tries to access undocumented I/O port $09 at PC=5000:
+	  \- If that's 0 then it tries to read a vector at [0x8000];
+	  \- It then tries to read at memory [0xc0ff], set the value read in [0xf012];
+	  \- Expects that ROM [0x0000] is not equal to 0xc3;
+	  Bottom line: Is it trying to access some custom HW?
 
 ===================================================================================================
 
@@ -115,6 +122,31 @@ An RPi implementation can be seen at https://github.com/MinatsuT/RPi_PC-80S31
 
 FDC normally puts ST0-1-2 to RAM buffers $7f0d-f, CHRN data in $7f10-13
 
+===================================================================================================
+
+Port C
+Used as a communication protocol flags
+
+===================================================================================================
+
+ Host side
+ (swap 4-bit nibbles and r/w direction for FDC side, all bits are active high):
+ x--- ---- (w) ATN AtenTioN:
+               host sends a command to FDC, interrupts current one
+          	   (looks unconnected the other way around?)
+ -x-- ---- (w) DAC DAta aCcepted:
+               host just picked up data from FDC
+ --x- ---- (w) RFD Ready For Data:
+               host requests data from FDC
+ ---x ---- (w) DAV DAta Valid:
+               host outputs data to port B
+ ---- -x-- (r) DAC DAta aCcepted:
+               FDC has accepted data from port B
+ ---- --x- (r) RFD Ready For Data:
+               FDC requests data from host
+ ---- ---x (r) DAV DAta Valid:
+               FDC has output data to port A
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -151,6 +183,7 @@ pc80s31_device::pc80s31_device(const machine_config &mconfig, device_type type, 
 	, m_fdc_rom(*this, "fdc_rom")
 	, m_ppi_host(*this, "ppi_host")
 	, m_ppi_fdc(*this, "ppi_fdc")
+	, m_latch(*this, "latch_%u", 0U)
 {
 }
 
@@ -196,7 +229,10 @@ void pc80s31_device::fdc_map(address_map &map)
 
 void pc80s31_device::fdc_io(address_map &map)
 {
+	map.unmap_value_high();
 	map.global_mask(0xff);
+//	map(0x09, 0x09).r accessed by filemst (pc8801), cfr. notes
+
 //	map(0xf0, 0xf0).w(FUNC(pc8801_state::fdc_irq_vector_w)); // Interrupt Opcode Port
 //	map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
 //	map(0xf6, 0xf6).nopw(); // printer related
@@ -234,25 +270,30 @@ void pc80s31_device::device_add_mconfig(machine_config &config)
 		floppy->enable_sound(true);
 	}
 
+	for (auto &latch : m_latch)
+		GENERIC_LATCH_8(config, latch);
+
 	I8255A(config, m_ppi_host);
-	m_ppi_host->in_pa_callback().set(m_ppi_fdc, FUNC(i8255_device::pb_r));
-	m_ppi_host->in_pb_callback().set(m_ppi_fdc, FUNC(i8255_device::pa_r));
-	m_ppi_host->in_pc_callback().set(FUNC(pc80s31_device::host_portc_r));
-	m_ppi_host->out_pc_callback().set(FUNC(pc80s31_device::host_portc_w));
+	m_ppi_host->in_pa_callback().set(FUNC(pc80s31_device::latch_r<0>));
+	m_ppi_host->out_pa_callback().set(FUNC(pc80s31_device::latch_w<1>));
+	m_ppi_host->in_pb_callback().set(FUNC(pc80s31_device::latch_r<2>));
+	m_ppi_host->out_pb_callback().set(FUNC(pc80s31_device::latch_w<3>));
+	m_ppi_host->in_pc_callback().set(FUNC(pc80s31_device::latch_r<4>));
+	m_ppi_host->out_pc_callback().set(FUNC(pc80s31_device::latch_w<5>));
 
 	// 8255AC-2
 	I8255A(config, m_ppi_fdc);
-	m_ppi_fdc->in_pa_callback().set(m_ppi_host, FUNC(i8255_device::pb_r));
-	m_ppi_fdc->in_pb_callback().set(m_ppi_host, FUNC(i8255_device::pa_r));
-	m_ppi_fdc->in_pc_callback().set(FUNC(pc80s31_device::fdc_portc_r));
-	m_ppi_fdc->out_pc_callback().set(FUNC(pc80s31_device::fdc_portc_w));
+	m_ppi_fdc->in_pa_callback().set(FUNC(pc80s31_device::latch_r<3>));
+	m_ppi_fdc->out_pa_callback().set(FUNC(pc80s31_device::latch_w<2>));
+	m_ppi_fdc->in_pb_callback().set(FUNC(pc80s31_device::latch_r<1>));
+	m_ppi_fdc->out_pb_callback().set(FUNC(pc80s31_device::latch_w<0>));
+	m_ppi_fdc->in_pc_callback().set(FUNC(pc80s31_device::latch_r<5>));
+	m_ppi_fdc->out_pc_callback().set(FUNC(pc80s31_device::latch_w<4>));
 }
 
 //-------------------------------------------------
 //  device_timer - device-specific timers
 //-------------------------------------------------
-
-
 
 void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -261,7 +302,7 @@ void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_fdc->tc_w(false);
 
 	// several games tries to scan invalid IDs from their structures, if this hits then 
-	// it's most likely an attempt to scan a missing sector from the floppy structure.
+	// it's possibly an attempt to scan a missing sector from the floppy structure.
 	// cfr. acrojet: the third read data command issued tries to access a CHRN of (0, 0, 16, 256)
 	// and checks at PC=500B if any of these status flags are satisfied:
 	// ST0 & 0xdf
@@ -270,8 +311,10 @@ void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	// Data doesn't matter, it also seems to have some activity to the printer port
 	// (debugging left on?)
 	if ((u8)m_fdc_cpu->state_int(Z80_HALT) == 1)
-		logerror("%s: attempt to trigger TC while in HALT state (read ID copy protection warning)", machine().describe_context());
+	{
+		logerror("%s: attempt to trigger TC while in HALT state (read ID copy protection warning)\n", machine().describe_context());
 //		throw emu_fatalerror("copy protection hit");
+	}
 }
 
 //-------------------------------------------------
@@ -282,8 +325,6 @@ void pc80s31_device::device_start()
 {
 	m_tc_zero_timer = timer_alloc(0);
 	
-	save_item(NAME(m_host_latch));
-	save_item(NAME(m_fdc_latch));
 	save_item(NAME(m_irq_vector));
 }
 
@@ -310,65 +351,33 @@ void pc80s31_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-/*
- * port C is used as a communication protocol flags
- *
- * Host side
- * (swap 4-bit nibbles and r/w direction for FDC side, all bits are active high):
- * x--- ---- (w) ATN AtenTioN: 
- *               host sends a command to FDC, interrupts current one
- *           	 (looks unconnected the other way around?)
- * -x-- ---- (w) DAC DAta aCcepted:
- *               host just picked up data from FDC
- * --x- ---- (w) RFD Ready For Data:
- *               host requests data from FDC
- * ---x ---- (w) DAV DAta Valid:
- *               host outputs data to port B
- * ---- -x-- (r) DAC DAta aCcepted:
- *               FDC has accepted data from port B
- * ---- --x- (r) RFD Ready For Data:
- *               FDC requests data from host
- * ---- ---x (r) DAV DAta Valid:
- *               FDC has output data to port A
- *
- */
-u8 pc80s31_device::host_portc_r()
+// Comms are simple dual port connected in cross fashion.
+// Even at "perfect" interleave tho we need to mailbox the connections.
+// - barbatus will hang at Artec logo the first time around (works if you soft reset);
+template <unsigned N> u8 pc80s31_device::latch_r()
 {
+	const int port_mask = N & 4 ? 0x0f : 0xff;
 	machine().scheduler().synchronize();
-	return m_fdc_latch >> 4;
+	return m_latch[N]->read() & port_mask;
 }
 
-void pc80s31_device::host_portc_w(u8 data)
+template <unsigned N> void pc80s31_device::latch_w(u8 data)
 {
+	const int lower_nibble = N & 4;
 	machine().scheduler().synchronize();
-	LOG("%s: host port C write %02x  (ATN=%d DAC=%d RFD=%d DAV=%d)\n",
-		machine().describe_context(),
-		data,
-		BIT(data, 7),
-		BIT(data, 6),
-		BIT(data, 5),
-		BIT(data, 4)
-	);
-	m_host_latch = data;
-}
-
-u8 pc80s31_device::fdc_portc_r()
-{
-	machine().scheduler().synchronize();
-	return m_host_latch >> 4; 
-}
-
-void pc80s31_device::fdc_portc_w(u8 data)
-{
-	machine().scheduler().synchronize();
-	LOG("%s: FDC port C write %02x  (DAC=%d RFD=%d DAV=%d)\n",
-		machine().describe_context(),
-		data,
-		BIT(data, 6),
-		BIT(data, 5),
-		BIT(data, 4)
-	);
-	m_fdc_latch = data;
+	if (lower_nibble)
+	{
+		LOG("%s: %s port C write %02x  (ATN=%d DAC=%d RFD=%d DAV=%d)\n"
+			, N & 1 ? "host" : "fdc"
+			, machine().describe_context()
+			, data
+			, BIT(data, 7)
+			, BIT(data, 6)
+			, BIT(data, 5)
+			, BIT(data, 4)
+		);
+	}
+	return m_latch[N]->write(data >> lower_nibble);
 }
 
 u8 pc80s31_device::terminal_count_r()
@@ -377,6 +386,7 @@ u8 pc80s31_device::terminal_count_r()
 	{
 		m_fdc->tc_w(true);
 		// TODO: accurate time of this going off
+		m_tc_zero_timer->reset();
 		m_tc_zero_timer->adjust(attotime::from_usec(50));
 	}
 	// value is meaningless

@@ -35807,7 +35807,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 		</part>
 	</software>
 
-	<!-- [Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872 -->
+	<!-- [Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872] -->
 	<software name="ultima1" supported="no">
 		<description>Ultima I - The First Age of Darkness</description>
 		<year>1988</year>
@@ -35840,7 +35840,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 		</part>
 	</software>
 
-	<!-- [Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872 -->
+	<!-- [Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872] -->
 	<software name="ultima1a" cloneof="ultima1" supported="no">
 		<description>Ultima I - The First Age of Darkness (Alt)</description>
 		<year>1988</year>

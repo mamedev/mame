@@ -2240,8 +2240,7 @@ void pc8801_state::pc8801(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
-	//config.set_maximum_quantum(attotime::from_hz(300000));
-	config.set_perfect_quantum(m_maincpu);
+//	config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
 
 	#if USE_PROPER_I8214
 	I8214(config, I8214_TAG, MASTER_CLOCK);
