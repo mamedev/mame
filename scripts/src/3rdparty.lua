@@ -1390,6 +1390,7 @@ end
 				"-Wno-unknown-attributes",
 				"-Wno-missing-braces",
 				"-Wno-int-to-pointer-cast",
+				"-Wno-ignored-attributes", -- many instances in ImGui
 			}
 		end
 	end
