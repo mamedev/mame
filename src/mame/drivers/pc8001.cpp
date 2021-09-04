@@ -622,7 +622,7 @@ INPUT_PORTS_END
 
 /* 8257 Interface */
 
-WRITE_LINE_MEMBER( pc8001_state::hrq_w )
+WRITE_LINE_MEMBER( pc8001_base_state::hrq_w )
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
@@ -631,7 +631,7 @@ WRITE_LINE_MEMBER( pc8001_state::hrq_w )
 	m_dma->hlda_w(state);
 }
 
-uint8_t pc8001_state::dma_mem_r(offs_t offset)
+uint8_t pc8001_base_state::dma_mem_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

@@ -50,12 +50,14 @@ protected:
 	required_device<cassette_image_device> m_cassette;
 	required_memory_region m_char_rom;
 
+	void port30_w(u8 data);
+	virtual void machine_start() override;
+
 	DECLARE_WRITE_LINE_MEMBER( crtc_reverse_w );
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
 	UPD3301_FETCH_ATTRIBUTE( attr_fetch );
-	
-	void port30_w(u8 data);
-	virtual void machine_start() override;
+	DECLARE_WRITE_LINE_MEMBER( hrq_w );
+	uint8_t dma_mem_r(offs_t offset);
 
 private:
 	bool m_screen_reverse;
@@ -104,8 +106,6 @@ private:
 	void port10_w(uint8_t data);
 	uint8_t port40_r();
 	void port40_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	uint8_t dma_mem_r(offs_t offset);
 
 	int m_centronics_busy;
 	int m_centronics_ack;
