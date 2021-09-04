@@ -148,9 +148,10 @@ private:
 	int m_z;                        // horizontal blanking width
 
 	// attributes
-	int m_at1;                      //
-	int m_at0;                      //
-	int m_sc;                       //
+//	int m_at1;                      //
+//	int m_at0;                      //
+//	int m_sc;                       //
+	u8  m_gfx_mode;					// AT1 + AT0 + SC
 	int m_attr;                     // attributes per row
 	int m_attr_blink;               // attribute blink
 	int m_attr_frame;               // attribute blink frame counter

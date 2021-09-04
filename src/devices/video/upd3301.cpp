@@ -156,9 +156,7 @@ void upd3301_device::device_start()
 	save_item(NAME(m_r));
 	save_item(NAME(m_v));
 	save_item(NAME(m_z));
-	save_item(NAME(m_at1));
-	save_item(NAME(m_at0));
-	save_item(NAME(m_sc));
+	save_item(NAME(m_gfx_mode));
 	save_item(NAME(m_attr));
 	save_item(NAME(m_attr_blink));
 	save_item(NAME(m_attr_frame));
@@ -282,6 +280,8 @@ uint8_t upd3301_device::read(offs_t offset)
 	{
 		case 0: // data
 			// TODO: light pen
+			if (!machine().side_effects_disabled())
+				popmessage("light pen reading");
 			break;
 
 		case 1: // status
@@ -361,23 +361,23 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					break;
 
 				case 4:
+					//  AT|SC
 					// (00|0) transparent b&w with special control character
 					// (00|1) no attributes, no special control
 					// (01|0) transparent color
 					// (10|0) non-transparent b&w, special control
 					// (10|1) non-transparent b&w, no special control
 					// any other setting are invalid
-					m_at1 = BIT(data, 7);
-					m_at0 = BIT(data, 6);
-					m_sc = BIT(data, 5);
-					if (m_at1 || m_sc)
-						popmessage("attr mode %01x%01x", m_at1, m_sc);
+					//m_at1 = BIT(data, 7);
+					//m_at0 = BIT(data, 6);
+					//m_sc = BIT(data, 5);
+					m_gfx_mode = (data & 0xe0) >> 5;
+					if (m_gfx_mode & 0x5)
+						popmessage("attr mode %02x", m_gfx_mode);
 					// Max number of attributes per line -1
 					// can't be higher than 20
 					m_attr = std::min((data & 0x1f) + 1, 20);
-					LOG("UPD3301 AT1: %u\n", m_at1);
-					LOG("UPD3301 AT0: %u\n", m_at0);
-					LOG("UPD3301 SC: %u\n", m_sc);
+					LOG("UPD3301 AT1: %u AT0: %u SC: %u\n", BIT(data, 7), BIT(data, 6), BIT(data, 5));
 					LOG("UPD3301 ATTR: %u\n", m_attr);
 
 					m_mode = MODE_NONE;
@@ -560,7 +560,8 @@ int upd3301_device::vrtc_r()
 
 void upd3301_device::draw_scanline()
 {
-	bool is_color_mode = !m_at1 && m_at0 && !m_sc;
+	// 01|0
+	bool is_color_mode = m_gfx_mode == 0x2;
 	// Olympia Boss never bothers in writing a correct attribute table for rows on resident OS,
 	// it just extends the full attribute RAM with a start: 0 end: 0xff value: 0.
 	// According to doc notes anything beyond width 80 is puked by the CRTC, therefore we clamp.
@@ -617,8 +618,6 @@ void upd3301_device::draw_scanline()
 			extend_attr[ex] = (attr_color << 8) | attr_decoration;
 		}
 	}
-
-//	popmessage("%01x%01x|%01x %d", m_at1, m_at0, m_sc, m_h);
 
 	for (int lc = 0; lc < m_r; lc++)
 	{
