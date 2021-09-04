@@ -27,6 +27,7 @@
 #define I8257_TAG       "i8257"
 #define UPD1990A_TAG    "upd1990a"
 #define UPD3301_TAG     "upd3301"
+#define CGROM_TAG       "cgrom"
 #define CENTRONICS_TAG  "centronics"
 
 class pc8001_base_state : public driver_device
@@ -39,7 +40,7 @@ public:
 		, m_crtc_palette(*this, "crtc_palette")
 		, m_dma(*this, I8257_TAG)
 		, m_cassette(*this, "cassette")
-		, m_char_rom(*this, UPD3301_TAG)
+		, m_cgrom(*this, CGROM_TAG)
 	{}
 
 protected:
@@ -48,10 +49,11 @@ protected:
 	required_device<palette_device> m_crtc_palette;
 	required_device<i8257_device> m_dma;
 	required_device<cassette_image_device> m_cassette;
-	required_memory_region m_char_rom;
+	required_memory_region m_cgrom;
 
 	void port30_w(u8 data);
 	virtual void machine_start() override;
+	void set_screen_frequency(bool is_24KHz) { m_screen_is_24KHz = is_24KHz; };
 
 	DECLARE_WRITE_LINE_MEMBER( crtc_reverse_w );
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
@@ -61,6 +63,7 @@ protected:
 
 private:
 	bool m_screen_reverse;
+	bool m_screen_is_24KHz;
 
 	/* video state */
 	int m_width80;

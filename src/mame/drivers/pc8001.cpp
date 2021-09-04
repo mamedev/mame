@@ -97,6 +97,8 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 	u8 tile;
 	const u8 tile_width = m_width80 ? 8 : 16;
 	const u8 dot_width = (m_width80 ^ 1) + 1;
+	const u8 y_double = m_screen_is_24KHz ? 2 : 1;
+	const u8 y_height = y_double * 8;
 
 	bool semigfx_tile, reverse, attr_blink, secret;
 	bool upperline, lowerline;
@@ -124,13 +126,14 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 		tile = cc;
 	else
 	{
-		if (lc > 7)
+		if (lc > y_height - 1)
 			tile = 0;
 		else
-			tile = m_char_rom->base()[(cc << 3) | lc];
+			tile = m_cgrom->base()[(cc << 3) | (lc >> (y_double-1))];
 	}
 
-	// secret paints black all chars, 
+	// secret blacks out every tile connections,
+	// has lower priority over blinking and other attribute decorations
 	if (secret)
 		tile = 0;
 
@@ -160,8 +163,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 			if (semigfx_tile)
 			{
 				u8 mask = (xi & (4 << (dot_width - 1))) ? 0x10 : 0x01;
-				// TODO: honor y height
-				mask <<= (lc & 0x6) >> 1;
+				mask <<= (lc & (0x3 << y_double)) >> y_double;
 				pen = tile & mask;
 			}
 			else
@@ -645,6 +647,7 @@ void pc8001_base_state::machine_start()
 	save_item(NAME(m_width80));
 	save_item(NAME(m_color));
 	save_item(NAME(m_screen_reverse));
+	save_item(NAME(m_screen_is_24KHz));
 }
 
 void pc8001_state::machine_start()
@@ -691,6 +694,9 @@ void pc8001_state::machine_start()
 //		membank("bank2")->set_entry(0);
 		break;
 	}
+	
+	// PC8001 is 15KHz only
+	set_screen_frequency(false);
 }
 
 void pc8001_state::machine_reset()
@@ -743,16 +749,6 @@ void pc8001_state::pc8001(machine_config &config)
 
 	PALETTE(config, m_crtc_palette, palette_device::BRG_3BIT);
 
-	/* devices */
-	I8251(config, I8251_TAG, 0);
-
-	I8257(config, m_dma, MASTER_CLOCK);
-	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
-	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
-	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
-
-	UPD1990A(config, m_rtc);
-
 	UPD3301(config, m_crtc, VIDEO_CLOCK);
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(pc8001_state::draw_text));
@@ -760,6 +756,16 @@ void pc8001_state::pc8001(machine_config &config)
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->rvv_wr_callback().set(FUNC(pc8001_state::crtc_reverse_w));
 	m_crtc->set_screen(m_screen);
+
+	I8257(config, m_dma, MASTER_CLOCK);
+	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
+	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
+
+	/* devices */
+	I8251(config, I8251_TAG, 0);
+
+	UPD1990A(config, m_rtc);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(FUNC(pc8001_state::write_centronics_ack));
@@ -817,7 +823,7 @@ ROM_START( pc8001 )
 	ROM_SYSTEM_BIOS( 2, "v110", "N-BASIC v1.10" )
 	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, BAD_DUMP CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
 
-	ROM_REGION( 0x800, UPD3301_TAG, 0)
+	ROM_REGION( 0x800, CGROM_TAG, 0)
 	ROM_LOAD( "font.rom", 0x000, 0x800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 ROM_END
 
@@ -827,7 +833,7 @@ ROM_START( pc8001mk2 )
 	// N80-BASIC v1.0
 	ROM_LOAD( "n80_2.rom", 0x0000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
 
-	ROM_REGION( 0x800, UPD3301_TAG, 0)
+	ROM_REGION( 0x800, CGROM_TAG, 0)
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 
 	ROM_REGION( 0x20000, "kanji", 0)
@@ -844,7 +850,7 @@ ROM_START( pc8001mk2sr )
 	// N80SR-BASIC v1.0
 	ROM_LOAD( "n80_3.rom",    0x0000, 0xa000, BAD_DUMP CRC(d99ef247) SHA1(9bfa5009d703cd31caa734d932d2a847d74cbfa6) )
 
-	ROM_REGION( 0x2000, UPD3301_TAG, 0)
+	ROM_REGION( 0x2000, CGROM_TAG, 0)
 	ROM_LOAD( "font80sr.rom", 0x000000, 0x001000, CRC(784c0b17) SHA1(565dc8e5e46b1633cb434d12b4d8b3a662546b33) )
 	ROM_LOAD( "fonthira.rom", 0x001000, 0x000800, CRC(fe7059d5) SHA1(10c5f85adcce540cbd0a11352e2c38a84c989a26) )
 	ROM_LOAD( "fontkata.rom", 0x001800, 0x000800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
