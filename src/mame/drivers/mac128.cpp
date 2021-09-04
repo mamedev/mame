@@ -105,6 +105,7 @@ Scanline 0 is the start of vblank.
 #include "sound/dac.h"
 #include "sound/flt_biquad.h"
 #include "bus/macpds/pds_tpdfpd.h"
+#include "bus/rs232/rs232.h"
 
 #include "formats/ap_dsk35.h"
 
@@ -1156,9 +1157,35 @@ void mac128_state::mac512ke(machine_config &config)
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35(config, m_floppy[1]);
 
+	SCC85C30(config, m_scc, 3672000);
+	m_scc->configure_channels(3672000, 0, 3672000, 0);
+	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
+
+/*
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
 	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
+*/
+
+
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));  // connects to modem port
+	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+	m_scc->out_txda_callback().set(rs232a, FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtra_callback().set(rs232a, FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsa_callback().set(rs232a, FUNC(rs232_port_device::write_rts));
+
+
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));  // connects to printer port
+	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
+	m_scc->out_txdb_callback().set(rs232b, FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtrb_callback().set(rs232b, FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsb_callback().set(rs232b, FUNC(rs232_port_device::write_rts));
+
+// from byte8251.cpp
+//	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+//	rs232.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
 
 	MOS6522(config, m_via, C7M/10);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
