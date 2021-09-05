@@ -159,7 +159,6 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 
 	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 16 * 2));
 
-
 }
 
 
@@ -265,8 +264,6 @@ static INPUT_PORTS_START( apple_imagewriter )
 	// Buttons on printer
 	PORT_START("SELECT")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select Printer") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, select_sw, 0)
-//  PORT_START("SELECT")
-//  PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select") PORT_CODE(KEYCODE_0_PAD) PORT_TOGGLE  // input toggles persist
 	PORT_START("FORMFEED")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_7_PAD)
 	PORT_START("LINEFEED")
@@ -276,7 +273,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_START("PAPEREND")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 	PORT_START("COVER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Carrier Cover") PORT_CODE(KEYCODE_3_PAD)  // ACTIVE HIGH WHEN COVER OPEN
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Carrier Cover") PORT_CODE(KEYCODE_3_PAD)  // Active high when cover open
 
 
 	// DIPSW1
@@ -481,24 +478,19 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 
 uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 {
-//  m_select_status = !ioport("SELECT")->read();
-//  int m_paperend_status = !ioport("PAPEREND")->read();
-
 	u8 data =
 			(!(x_pixel_coord(m_xpos) <= m_left_edge)  << 0) | // m4 home detector
 			(ioport("PAPEREND")->read()               << 1) | // simulate a paper out error
 			(ioport("COVER")->read()                  << 2) | //
 			(!(x_pixel_coord(m_xpos) >  m_right_edge) << 3) | // return switch
-//          (m_select_status                          << 4) | //
 			(m_ic17_flipflop_select_status            << 4) | // select status flip flop
 			(ioport("FORMFEED")->read()               << 5) | //
 			(ioport("LINEFEED")->read()               << 6) | //
 			(BIT(ioport("DIPSW2")->read(), 3)         << 7);  // DIP 2-4 (unused)
 
 	m_bitmap_printer->setprintheadcolor(
-//          m_select_status   ? 0x888888 : 0x00dd00,    // select led
 			m_ic17_flipflop_select_status   ? 0x888888 : 0x00dd00,    // select led
-			ioport("PAPEREND")->read() ? 0xff0000 : 0x000000 );  // paperend led
+			ioport("PAPEREND")->read()      ? 0xff0000 : 0x000000 );  // paperend led
 
 //  printf("8155 SWITCH PORT_A_READ %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 
