@@ -380,7 +380,7 @@ template <unsigned N> void pc80s31_device::latch_w(u8 data)
 	return m_latch[N]->write(data >> lower_nibble);
 }
 
-u8 pc80s31_device::terminal_count_r()
+u8 pc80s31_device::terminal_count_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -389,8 +389,9 @@ u8 pc80s31_device::terminal_count_r()
 		m_tc_zero_timer->reset();
 		m_tc_zero_timer->adjust(attotime::from_usec(50));
 	}
-	// value is meaningless
-	return 0xff;
+	// value is meaningless (never readback)
+	// TODO: verify this being 0xff or open bus
+	return space.unmap();
 }
 
 void pc80s31_device::motor_control_w(uint8_t data)
@@ -441,7 +442,8 @@ const tiny_rom_entry *pc80s31k_device::device_rom_region() const
 
 void pc80s31k_device::drive_mode_w(uint8_t data)
 {
-	// TODO: verify implementation
+	// TODO: fix implementation
+	// anything that isn't a 2D doesn't really set proper parameters in here
 	logerror("FDC drive mode %02x\n", data);
 	m_floppy[0]->get_device()->set_rpm(BIT(data, 0) ? 360 : 300);
 	m_floppy[1]->get_device()->set_rpm(BIT(data, 1) ? 360 : 300);

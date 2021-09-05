@@ -12,10 +12,10 @@ NEC PC-80S31K
 #pragma once
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/upd765.h"
-#include "machine/gen_latch.h"
-#include "imagedev/floppy.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,11 +26,12 @@ class pc80s31_device : public device_t
 public:
 	// construction/destruction
 	pc80s31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	pc80s31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void host_map(address_map &map);
 
 protected:
+	pc80s31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -57,7 +58,7 @@ private:
 	template <unsigned N> u8 latch_r();
 	template <unsigned N> void latch_w(u8 data);
 
-	u8 terminal_count_r();
+	u8 terminal_count_r(address_space &space);
 	void motor_control_w(u8 data);
 	
 	emu_timer *m_tc_zero_timer;
