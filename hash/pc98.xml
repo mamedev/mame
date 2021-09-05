@@ -13216,7 +13216,7 @@ TODO:
 
 	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
 	<software name="daivacal" cloneof="daiva" supported="no">
-		<description>Daiva98 - Kari-Yuga no Kouki (Alt 2)</description>
+		<description>Daiva - Kari-Yuga no Kouki (Alt 2)</description>
 		<year>1987</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="alt_title" value="ディーヴァ カリ・ユガの光輝" />

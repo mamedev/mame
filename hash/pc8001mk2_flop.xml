@@ -82,7 +82,7 @@ Bon Bon, Bon Bon, Compaq, Aug 83, Aug 83,
 	</software>
 
 	<software name="n80diska" cloneof="n80diskb">
-		<description>N80 Disk BASIC (Alt)</description>
+		<description>N80 Disk BASIC (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -116,7 +116,7 @@ Bon Bon, Bon Bon, Compaq, Aug 83, Aug 83,
 	</software>
 
 	<software name="n80mkiia" cloneof="n80mkii">
-		<description>N80 BASIC system disk (Alt)</description>
+		<description>N80 BASIC system disk (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

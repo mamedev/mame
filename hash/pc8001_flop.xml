@@ -50,7 +50,7 @@ References:
 	</software>
 
 	<software name="15puzzlea" cloneof="15puzzle" supported="yes">
-		<description>15 Puzzle (Alt)</description>
+		<description>15 Puzzle (alt)</description>
 		<!-- 1999.11.23 -->
 		<year>1999</year>
 		<!-- hal_8999@geocities.co.jp (doujinshi) -->
@@ -94,7 +94,7 @@ References:
 	</software>
 
 	<software name="3by4a" cloneof="3by4" supported="yes">
-		<description>3 by 4 (Alt)</description>
+		<description>3 by 4 (alt)</description>
 		<!-- 1982.8 -->
 		<year>1982</year>
 		<!-- Published on I/O 1982.08 -->
@@ -126,7 +126,7 @@ References:
 	<!-- Locks up at "BASIC LODGE" screen, blinks player after too much time, never start gameplay -->
 	<!-- [Does extensive reads of the RTC, keeps looping at 340-350 basic lines] -->
 	<software name="300ma" cloneof="300m" supported="no">
-		<description>300m (Alt)</description>
+		<description>300m (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!-- I.O -->
@@ -152,7 +152,7 @@ References:
 	</software>
 
 	<software name="4dhouse" cloneof="4dimensi">
-		<description>Yojigen no Ie - 4 Dimension House (Alt)</description>
+		<description>Yojigen no Ie - 4 Dimension House (alt)</description>
 		<year>1983</year>
 		<publisher>プロシューマー (Prosumer)</publisher>
 		<info name="release" value="198308xx"/>
@@ -221,7 +221,7 @@ References:
 
 	<software name="alienfala" cloneof="alienfal" supported="yes">
 		<!-- uses anonymous "LOADING" -->
-		<description>Alien Fall (Alt)</description>
+		<description>Alien Fall (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -248,7 +248,7 @@ References:
 
 	<software name="alien2a" cloneof="alien2" supported="yes">
 		<!-- uses anonymous "LOADING" -->
-		<description>Alien Part 2 (Alt)</description>
+		<description>Alien Part 2 (alt)</description>
 		<!-- no in-game year, published on I/O 1981.05 -->
 		<year>1981</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -313,7 +313,7 @@ References:
 	</software>
 
 	<software name="ay2a" cloneof="ay2" supported="yes">
-		<description>AY-2 Orion80 (Alt)</description>
+		<description>AY-2 Orion80 (alt)</description>
 		<year>1983</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="AY-2 オリオン80"/>
@@ -449,7 +449,7 @@ References:
 	<!-- TODO: both smells as btanb, verify on real HW -->
 	<software name="bugfirea" cloneof="bugfire" supported="partial">
 		<!-- uses anonymous "LOADING" -->
-		<description>Bug Fire! (Alt)</description>
+		<description>Bug Fire! (alt)</description>
 		<!-- 1980.12.13 -->
 		<year>1980</year>
 		<!-- Y.OGI / Ｋ．Ｏ氏 -->
@@ -530,7 +530,7 @@ References:
 	</software>
 
 	<software name="cosmomisa" cloneof="cosmomis">
-		<description>Cosmo Missile (Alt)</description>
+		<description>Cosmo Missile (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -577,7 +577,7 @@ References:
 	</software>
 
 	<software name="desthelia" cloneof="destheli">
-		<description>Destroy Helicopter (Alt)</description>
+		<description>Destroy Helicopter (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -648,7 +648,7 @@ References:
 	</software>
 
 	<software name="dualalna" cloneof="dualaln">
-		<description>Dual Alien (Alt)</description>
+		<description>Dual Alien (alt)</description>
 		<year>1984</year>
 		<publisher>セントラル教育 (Central Kyoku)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -686,7 +686,7 @@ References:
 	</software>
 
 	<software name="emmyna" cloneof="emmyn" supported="yes">
-		<description>Emmy (Alt)</description>
+		<description>Emmy (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -697,7 +697,7 @@ References:
 	</software>
 
 	<software name="emmynb" cloneof="emmyn" supported="yes">
-		<description>Emmy (Alt 2)</description>
+		<description>Emmy (alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -708,7 +708,7 @@ References:
 	</software>
 
 	<software name="emmync" cloneof="emmyn" supported="yes">
-		<description>Emmy (Alt 3)</description>
+		<description>Emmy (alt 3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -719,7 +719,7 @@ References:
 	</software>
 
 	<software name="emmynd" cloneof="emmyn" supported="yes">
-		<description>Emmy (Alt 4)</description>
+		<description>Emmy (alt 4)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -758,7 +758,7 @@ References:
 	</software>
 
 	<software name="fanfuna" cloneof="fanfun" supported="yes">
-		<description>Fan Fun (Alt)</description>
+		<description>Fan Fun (alt)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="release" value="198310xx"/>
@@ -797,7 +797,7 @@ References:
 	</software>
 
 	<software name="fenix2a" cloneof="fenix2">
-		<description>Fenix Part 2 (Alt)</description>
+		<description>Fenix Part 2 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -823,7 +823,7 @@ References:
 	</software>
 
 	<software name="flgworlda" cloneof="flgworld" supported="partial">
-		<description>Flag World (Alt)</description>
+		<description>Flag World (alt)</description>
 		<!-- published on PiO 1984.06 -->
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1018,7 +1018,7 @@ References:
 
 	<software name="gekisenma" cloneof="gekisenm">
 		<!-- uses Micro Disk Basic loader -->
-		<description>Gekisen! Minami Taihei-yo (Alt)</description>
+		<description>Gekisen! Minami Taihei-yo (alt)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="release" value="198306xx"/>
@@ -1033,7 +1033,7 @@ References:
 
 	<software name="gekisenmb" cloneof="gekisenm">
 		<!-- uses anonymous "LOADING" -->
-		<description>Gekisen! Minami Taihei-yo (Alt 2)</description>
+		<description>Gekisen! Minami Taihei-yo (alt 2)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="release" value="198306xx"/>
@@ -1091,7 +1091,7 @@ References:
 
 	<software name="hammerbra" cloneof="hammerbr" supported="yes">
 		<!-- uses Dash-80 1.0b loader -->
-		<description>Hammer Break (Alt)</description>
+		<description>Hammer Break (alt)</description>
 		<!-- 1982/8 -->
 		<year>1982</year>
 		<!-- J&P -->
@@ -1109,7 +1109,7 @@ References:
 	<!-- TODO: default hi-score is 16160 (dump issue?) -->
 	<software name="hammerbrb" cloneof="hammerbr" supported="yes">
 		<!-- uses anonymous "LOADING" -->
-		<description>Hammer Break (Alt 2)</description>
+		<description>Hammer Break (alt 2)</description>
 		<!-- earlier rev or erased copyright -->
 		<year>1982</year>
 		<publisher>アポロテクニカ (Apollo Technica)</publisher>
@@ -1140,7 +1140,7 @@ References:
 
 	<!-- Engine sound is output to optional PCG-8100 -->
 	<software name="hashiresb" cloneof="hashires" supported="partial">
-		<description>Hashire! Skyline (Alt 2)</description>
+		<description>Hashire! Skyline (alt 2)</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<info name="release" value="198512xx"/>
@@ -1155,7 +1155,7 @@ References:
 
 	<!-- Engine sound is output to optional PCG-8100 -->
 	<software name="hashiresc" cloneof="hashires" supported="partial">
-		<description>Hashire! Skyline (Alt 3)</description>
+		<description>Hashire! Skyline (alt 3)</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<info name="release" value="198512xx"/>
@@ -1252,7 +1252,7 @@ References:
 	</software>
 
 	<software name="iwasanjua" cloneof="iwasanju">
-		<description>I wa Sanjutsu Nari (Alt)</description>
+		<description>I wa Sanjutsu Nari (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1274,7 +1274,7 @@ References:
 	</software>
 
 	<software name="iceworld2a" cloneof="iceworld2">
-		<description>Ice World II (Alt)</description>
+		<description>Ice World II (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1321,7 +1321,7 @@ References:
 	</software>
 
 	<software name="kentomaha" cloneof="kentomah">
-		<description>Ken to Mahou (Alt)</description>
+		<description>Ken to Mahou (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1346,7 +1346,7 @@ References:
 	</software>
 
 	<software name="manbikiga" cloneof="manbikig" supported="yes">
-		<description>Manbiki Game (Alt)</description>
+		<description>Manbiki Game (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="マンビキゲーム"/>
@@ -1371,7 +1371,7 @@ References:
 	</software>
 
 	<software name="misscmda" cloneof="misscmd">
-		<description>Missile Commander (Alt)</description>
+		<description>Missile Commander (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1382,7 +1382,7 @@ References:
 	</software>
 
 	<software name="misscmdb" cloneof="misscmd">
-		<description>Missile Commander (Alt 2)</description>
+		<description>Missile Commander (alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1516,7 +1516,7 @@ References:
 	</software>
 
 	<software name="normandya" cloneof="normandy">
-		<description>Normandy Jouriku Sakusen (Alt)</description>
+		<description>Normandy Jouriku Sakusen (alt)</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1527,7 +1527,7 @@ References:
 	</software>
 
 	<software name="normandyb" cloneof="normandy">
-		<description>Normandy Jouriku Sakusen (Alt 2)</description>
+		<description>Normandy Jouriku Sakusen (alt 2)</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1563,7 +1563,7 @@ References:
 	</software>
 
 	<software name="othelloa" cloneof="othello">
-		<description>Computer Othello (Alt)</description>
+		<description>Computer Othello (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="コンピューターオセロ"/>
@@ -1587,7 +1587,7 @@ References:
 	</software>
 
 	<software name="pacworlda" cloneof="pacworld">
-		<description>Pac-World (Alt)</description>
+		<description>Pac-World (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1666,7 +1666,7 @@ References:
 
 	<!-- Requires PCG-8100 -->
 	<software name="planettaa" cloneof="planetta" supported="no">
-		<description>Planet Taizer (Alt)</description>
+		<description>Planet Taizer (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires PCG-8100"/>
@@ -1710,7 +1710,7 @@ References:
 
 	<software name="puckmana" cloneof="puckman">
 		<!-- uses anonymous "LOADING" -->
-		<description>Puck Man (Alt)</description>
+		<description>Puck Man (alt)</description>
 		<!-- Published on I/O Apr 1981 -->
 		<year>1981</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -1749,7 +1749,7 @@ References:
 	</software>
 
 	<software name="riverresa" cloneof="riverres" supported="yes">
-		<description>River Rescue (Alt)</description>
+		<description>River Rescue (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!-- Koichi -->
@@ -1779,7 +1779,7 @@ References:
 
 	<software name="scramblea" cloneof="scramble" supported="yes">
 		<!-- uses Micro Disk Basic loader -->
-		<description>Scramble (Alt)</description>
+		<description>Scramble (alt)</description>
 		<!-- Sports title screen of 1981, published on I/O 1982.01 -->
 		<year>1982</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -1795,7 +1795,7 @@ References:
 
 	<software name="scrambleb" cloneof="scramble">
 		<!-- uses anonymous "LOADING" -->
-		<description>Scramble (Alt 2)</description>
+		<description>Scramble (alt 2)</description>
 		<!-- Sports title screen of 1981, published on I/O 1982.01 -->
 		<year>1982</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -2061,7 +2061,7 @@ References:
 	</software>
 
 	<software name="superbala" cloneof="superbal">
-		<description>Super Balloon (Alt)</description>
+		<description>Super Balloon (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2137,7 +2137,7 @@ References:
 	</software>
 
 	<software name="tengokuta" cloneof="tengokut">
-		<description>Tengoku to Jigoku (Alt)</description>
+		<description>Tengoku to Jigoku (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2172,7 +2172,7 @@ References:
 
 	<software name="tetris80a" cloneof="tetris80" supported="yes">
 		<!-- uses Micro Disk Basic loader -->
-		<description>Tetris-8001 (Alt)</description>
+		<description>Tetris-8001 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2184,7 +2184,7 @@ References:
 
 	<software name="tetris80b" cloneof="tetris80" supported="yes">
 		<!-- uses anonymous "LOADING" -->
-		<description>Tetris-8001 (Alt 2)</description>
+		<description>Tetris-8001 (alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2206,7 +2206,7 @@ References:
 	</software>
 
 	<software name="akunin2a" cloneof="akunin2">
-		<description>The Akunin 2 (Alt)</description>
+		<description>The Akunin 2 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2228,7 +2228,7 @@ References:
 	</software>
 
 	<software name="akunin3a" cloneof="akunin3">
-		<description>The Akunin 3 (Alt)</description>
+		<description>The Akunin 3 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2250,7 +2250,7 @@ References:
 	</software>
 
 	<software name="akunina" cloneof="akunin">
-		<description>The Akunin (Alt)</description>
+		<description>The Akunin (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2353,7 +2353,7 @@ References:
 	</software>
 
 	<software name="toriaezua" cloneof="toriaezu">
-		<description>Toriaezu Tinyan da yo! (Alt)</description>
+		<description>Toriaezu Tinyan da yo! (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2436,7 +2436,7 @@ References:
 	</software>
 
 	<software name="various2a" cloneof="various2">
-		<description>Various 2 (Alt)</description>
+		<description>Various 2 (alt)</description>
 		<!-- Feb 1988 according to gameplay status bar -->
 		<year>1988</year>
 		<!-- Isis (doujin? official?) -->
@@ -2463,7 +2463,7 @@ References:
 	</software>
 
 	<software name="variousa" cloneof="various" supported="yes">
-		<description>Various (Alt)</description>
+		<description>Various (alt)</description>
 		<!-- published on I/O 1984.03 -->
 		<year>1984</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -2527,7 +2527,7 @@ References:
 	</software>
 
 	<software name="zaxusa" cloneof="zaxus">
-		<description>Zaxus (Alt)</description>
+		<description>Zaxus (alt)</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 	
@@ -2970,7 +2970,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 	</software>
 
 	<software name="magicopy29a" cloneof="magicopy">
-		<description>Magic Copy II ver 2.9 (Alt)</description>
+		<description>Magic Copy II ver 2.9 (alt)</description>
 		<year>1984</year>
 		<publisher>Westside Softhouse</publisher>
 		<!--combined image-->
@@ -3012,7 +3012,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 	</software>
 
 	<software name="magicopy31a" cloneof="magicopy">
-		<description>Magic Copy II ver 3.1 (Alt)</description>
+		<description>Magic Copy II ver 3.1 (alt)</description>
 		<year>1985</year>
 		<publisher>Westside Softhouse</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3034,7 +3034,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 	</software>
 
 	<software name="magicopy32a" cloneof="magicopy">
-		<description>Magic Copy II ver 3.2 (Alt)</description>
+		<description>Magic Copy II ver 3.2 (alt)</description>
 		<year>1985</year>
 		<publisher>Westside Softhouse</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3056,7 +3056,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 	</software>
 
 	<software name="magicopy33a" cloneof="magicopy">
-		<description>Magic Copy II ver 3.3 (Alt)</description>
+		<description>Magic Copy II ver 3.3 (alt)</description>
 		<year>1985</year>
 		<publisher>Westside Softhouse</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3078,7 +3078,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 	</software>
 
 	<software name="magicopy34a" cloneof="magicopy">
-		<description>Magic Copy II ver 3.4 (Alt)</description>
+		<description>Magic Copy II ver 3.4 (alt)</description>
 		<year>1986</year>
 		<publisher>Westside Softhouse</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3100,7 +3100,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 	</software>
 
 	<software name="magicopy35a" cloneof="magicopy">
-		<description>Magic Copy II ver 3.5 (Alt)</description>
+		<description>Magic Copy II ver 3.5 (alt)</description>
 		<year>1986</year>
 		<publisher>Westside Softhouse</publisher>
 		<part name="flop1" interface="floppy_5_25">
