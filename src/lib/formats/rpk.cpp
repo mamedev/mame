@@ -275,7 +275,7 @@ std::error_condition rpk_file::add_rom_socket(std::string &&id, const util::xml:
 	}
 
 	// finally add the socket
-	m_sockets.emplace_back(*this, std::move(id), rpk_socket::socket_type::ROM, std::string(*file), std::move(hashes), std::nullopt);
+	m_sockets.emplace_back(*this, std::move(id), rpk_socket::socket_type::ROM, std::string(*file), std::move(hashes));
 	return std::error_condition();
 }
 
@@ -354,7 +354,7 @@ std::error_condition rpk_file::add_ram_socket(std::string &&id, const util::xml:
 //  ctor
 //-------------------------------------------------
 
-rpk_socket::rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, std::string &&filename, std::optional<util::hash_collection> &&hashes, std::optional<std::uint32_t> length)
+rpk_socket::rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, std::string &&filename, std::optional<util::hash_collection> &&hashes, std::uint32_t length)
 	: m_rpk(rpk)
 	, m_id(id)
 	, m_type(type)

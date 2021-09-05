@@ -16,6 +16,7 @@
 #include "hash.h"
 #include "unzip.h"
 
+#include <assert.h>
 #include <list>
 #include <optional>
 
@@ -41,7 +42,7 @@ public:
 	};
 
 	// ctor/dtor
-	rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, std::string &&filename, std::optional<util::hash_collection> &&hashes, std::optional<std::uint32_t> length);
+	rpk_socket(rpk_file &rpk, std::string &&id, socket_type type, std::string &&filename, std::optional<util::hash_collection> &&hashes, std::uint32_t length = ~0);
 	rpk_socket(const rpk_socket &) = delete;
 	rpk_socket(rpk_socket &&) = delete;
 	~rpk_socket();
@@ -50,7 +51,7 @@ public:
 	const std::string &id() const noexcept { return m_id; }
 	socket_type type() const noexcept { return m_type; }
 	const std::string &filename() const noexcept { return m_filename; }
-	std::uint32_t length() const noexcept { return m_length.value(); }
+	std::uint32_t length() const noexcept { assert(m_type == socket_type::RAM || m_type == socket_type::PERSISTENT_RAM); return m_length; }
 
 	// methods
 	std::error_condition read_file(std::vector<std::uint8_t> &result) const;
@@ -61,7 +62,7 @@ private:
 	socket_type								m_type;
 	std::string								m_filename;
 	std::optional<util::hash_collection>	m_hashes;
-	std::optional<std::uint32_t>			m_length;
+	std::uint32_t							m_length;
 };
 
 
