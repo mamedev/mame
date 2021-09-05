@@ -627,7 +627,7 @@ template <typename T, typename U, typename V> constexpr T BIT(T x, U n, V w)
 /// \return The extracted bits packed into a right-aligned field.
 template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b, V... c) noexcept
 {
-	if constexpr (sizeof...(c))
+	if constexpr (sizeof...(c) > 0U)
 		return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
 	else
 		return BIT(val, b);
