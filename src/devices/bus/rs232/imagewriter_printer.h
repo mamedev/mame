@@ -215,14 +215,12 @@ private:
 	int page_count = 0;
 
 	const int dpi = 144;
-	const double xscale = 9.0 / 8.0; // 1.125
-//  const double PAPER_WIDTH_INCHES = 8.5 + 0.5;  // extra width paper to avoid centering problems
-//  const double PAPER_WIDTH_INCHES = 15.0;  // extra width paper to avoid centering problems
+	const double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 160 dpi, not 144 dpi)
 	const double PAPER_WIDTH_INCHES = 8.5;  // extra width paper to avoid centering problems
 	const double PAPER_HEIGHT_INCHES = 11.0;
 	const double MARGIN_INCHES = 0.0;
 	const int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi * xscale;  // 8.5 inches wide
-	const int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;   // 11  inches high
+	const int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;          // 11  inches high
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int distfrombottom = 50;
 
