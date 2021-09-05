@@ -79,7 +79,7 @@ public:
 		// transition from 1 to 0 clocks the flipflop
 		if (oldval == 1 && newval == 0)
 		{
-//			printf("oldval,newval = %x,%x  flip = %x\n",oldval,newval,m_ic17_flipflop_select_status);
+//          printf("oldval,newval = %x,%x  flip = %x\n",oldval,newval,m_ic17_flipflop_select_status);
 			m_ic17_flipflop_select_status = !m_ic17_flipflop_select_status;
 		}
 	}
@@ -196,7 +196,7 @@ private:
 	required_device<i8251_device> m_uart;
 	required_device<i8155_device> m_8155head;
 	required_device<i8155_device> m_8155switch;
-	required_device<ttl74163_device> m_count;
+//	required_device<ttl74163_device> m_count;
 	required_device<ttl74123_device> m_pulse1;
 	required_device<ttl74123_device> m_pulse2;
 
@@ -230,7 +230,7 @@ private:
 	void switch_to(uint8_t data);
 
 
-	void testing_timerout(uint8_t data) {   printf("TESTING TIMEROUT data= %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());}
+//	void testing_timerout(uint8_t data) {   printf("TESTING TIMEROUT data= %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());}
 
 	int xdirection = 0;
 	int newpageflag = 0;
@@ -239,9 +239,9 @@ private:
 
 	const int dpi = 144;
 	const double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 160 dpi, not 144 dpi)
-	const double PAPER_WIDTH_INCHES = 8.5;  // extra width paper to avoid centering problems
+	const double PAPER_WIDTH_INCHES = 8.5;
 	const double PAPER_HEIGHT_INCHES = 11.0;
-	const double MARGIN_INCHES = 0.0;
+	const double MARGIN_INCHES = 0.25;
 	const int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi * xscale;  // 8.5 inches wide
 	const int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;          // 11  inches high
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
@@ -278,7 +278,7 @@ private:
 	int right_offset = 0;
 	int left_offset = 2;  // 2 seems right
 	int m_left_edge  = (MARGIN_INCHES / 2.0) * dpi;    // 0 for starting at left edge, print shop seems to like -32 for centered print
-	int m_right_edge = (PAPER_WIDTH_INCHES - MARGIN_INCHES) * dpi * xscale + m_left_edge - 1;
+	int m_right_edge = (PAPER_WIDTH_INCHES) * dpi * xscale + m_left_edge - 1;  // when it hits the right edge, will return to the left edge and go deselected (so subtracting margin_inches is enough to stop the self test)
 
 	// (should be trivial to make a 15" wide printer by adjusting PAPER_WIDTH_INCHES to 15.00)
 	// m_right_edge will get adjusted accordingly to set the return switch
