@@ -123,7 +123,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_8155head->out_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_w));
 	m_8155head->out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
 
-	I8155(config, m_8155switch, 9.8304_MHz_XTAL / 2 / 4);  // for the moment, just give a 1 mhz setting
+	I8155(config, m_8155switch, 9.8304_MHz_XTAL / 2 / 4);
 	// divide by 4 is very fast
 	// divide by 8 is slower
 	// divide by 16 really slows it down
@@ -149,13 +149,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
 
-	m_pf_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
-	m_cr_stepper->optic_handler().set(FUNC(apple_imagewriter_printer_device::optic_handler));
-
 	TIMER(config, m_timer_rxclock, 0);
-
-	// okay, the m_br_factor for 9600 is 0x10 which is 16
-	// m_br_factor for 300 is 0x40 which is 64
 
 	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 16 * 2));
 
@@ -232,6 +226,18 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_CONFNAME(0x1, 0x01, "Invert3")
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
+
+
+	PORT_START("8155DIVIDER")  // setting persists between invocations
+	PORT_CONFNAME(0x7, 0x02, "8155 Switch Clock Divider")
+	PORT_CONFSETTING(0x0, "by 1  (doesn't work)")
+	PORT_CONFSETTING(0x1, "by 2  (doesn't work)")
+	PORT_CONFSETTING(0x2, "by 4  (fast)")  // anything less than 4 and printer will not work properly
+	PORT_CONFSETTING(0x3, "by 8  (medium)")
+	PORT_CONFSETTING(0x4, "by 16 (slow)")
+	PORT_CONFSETTING(0x5, "by 32 (super slow motion)")
+	PORT_CONFSETTING(0x6, "by 64 (paint drying, dorito speed)")
+	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, switches_8155_divider_changed, 0)
 
 
 	PORT_START("DEBUGMSG")
@@ -321,6 +327,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_DIPSETTING(0x01, "2400")
 	PORT_DIPSETTING(0x02, "1200")
 	PORT_DIPSETTING(0x03, "300")
+	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, baud_rate_changed, 0)
 
 	PORT_DIPNAME(0x04, 0x04, "Flow Control")
 	PORT_DIPLOCATION("SW2:3")
@@ -347,8 +354,8 @@ ioport_constructor apple_imagewriter_printer_device::device_input_ports() const
 
 void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data)
 {
-	// connects to fault* on serial interface  pin 14
-	printf("MAINCPU OUT SOD FUNCTION VALUE = %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
+	// connects to fault* on serial interface  pin 14  (secondary cts)
+	//	printf("MAINCPU OUT SOD FUNCTION VALUE = %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
 }
 
 
@@ -364,6 +371,7 @@ void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data)
 //  $73 port C
 //  $74 low timer
 //  $75 high timer
+//
 //-------------------------------------------------
 //    8155 Head/Motor Port A
 //-------------------------------------------------
@@ -472,6 +480,7 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 //  $7b port C
 //  $7c low timer
 //  $7d high timer
+//
 //-------------------------------------------------
 //    8155 Switches Functions Port A
 //-------------------------------------------------
@@ -508,7 +517,7 @@ void apple_imagewriter_printer_device::switch_pa_w(uint8_t data)
 
 uint8_t apple_imagewriter_printer_device::switch_pb_r(offs_t offset)
 {
-	return  ( !BIT(m_switches_pc_last, 0) ?          // PC0 controls the multiplexer  A*/B
+	return  (   !BIT(m_switches_pc_last, 0) ?        // PC0 controls the multiplexer  A*/B
 				(ioport("DIPSW1")->read() & 0x07) :  // dip sw1-1,2,3     A
 				(ioport("DIPSW2")->read() & 0x07)    // dip sw2-1,2,3     B
 			)
@@ -816,20 +825,10 @@ WRITE_LINE_MEMBER(apple_imagewriter_printer_device::update_serial)
 void apple_imagewriter_printer_device::device_reset()
 {
 	update_serial(0);
-
-	[[maybe_unused]] const int hertzarray[] = { 9600, 2400, 1200, 300 };
-
-
-// aargh causes segfaults to adjust the timer here
-//  m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( hertzarray[ioport("DIPSW2")->read() & 0x03] * 64 * 2));
-//  TIMER(config, "rx_8251_clock").configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 64 * 2));  // for now, connect a clock to drive 9600 baud  (x2 for pulse toggle)
-
-
 }
 
 void apple_imagewriter_printer_device::device_reset_after_children()
 {
-
 }
 
 

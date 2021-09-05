@@ -84,6 +84,18 @@ public:
 		}
 	}
 
+	INPUT_CHANGED_MEMBER(switches_8155_divider_changed)
+	{
+		m_8155switch->set_unscaled_clock_int( ( 9.8304_MHz_XTAL ).value() / 2 / (1 << ioport("8155DIVIDER")->read()) );
+//      I8155(config, m_8155switch, 9.8304_MHz_XTAL / 2 / 4);  // for the moment, just give a 1 mhz setting
+	}
+
+	INPUT_CHANGED_MEMBER(baud_rate_changed)
+	{
+		int baudbits = ioport("DIPSW2")->read() & 0x03;
+		m_baud_clock_divisor = (baudbits < 2) ? 1 : 8;
+	}
+
 	void optic_handler(uint8_t data) { //printf("HANDLE OPTIC %d\n",data);
 	}
 	void rxrdy_handler(uint8_t data)
@@ -145,11 +157,22 @@ public:
 
 	double last_pulse = 0.0;
 	TIMER_DEVICE_CALLBACK_MEMBER (pulse_uart_clock)
-	{ m_uart_clock = !m_uart_clock; m_uart->write_txc(m_uart_clock); m_uart->write_rxc(m_uart_clock);
-		[[maybe_unused]] double now = machine().time().as_double();
-		[[maybe_unused]] double elapsed_time = now - last_pulse;
+	{
+
+	// 9600   8251 m_br_factor 16  /1 of 9600 clock
+	// 2400   8251 m_br_factor 64  /1 of 9600 clock  same clock as 9600
+	// 1200   8251 m_br_factor 16  /8 of 9600 clock
+	// 300    8251 m_br_factor 64  /8 of 9600 clock  same clock as 1200
+
+		++ m_baud_clock_divisor_delay %= m_baud_clock_divisor;  // increment divisor delay and wrap around
+		if (m_baud_clock_divisor_delay == 0)
+		{
+			m_uart_clock = !m_uart_clock; m_uart->write_txc(m_uart_clock); m_uart->write_rxc(m_uart_clock);
+			[[maybe_unused]] double now = machine().time().as_double();
+			[[maybe_unused]] double elapsed_time = now - last_pulse;
 	//  printf("pulse uart param=%x   %f  elapsed=%.15f\n", param, now, elapsed_time);
-		last_pulse = now;
+			last_pulse = now;
+		}
 	 }
 protected:
 	apple_imagewriter_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -240,6 +263,10 @@ private:
 	void update_pf_stepper(uint8_t data);
 	void update_cr_stepper(uint8_t data);
 
+
+	int m_baud_clock_divisor = 1;
+	int m_baud_clock_divisor_delay = 0;
+
 	int m_ic17_flipflop_head = 0;           // connected to 8155 head     (ic17 7474 part 1/2)
 	int m_ic17_flipflop_select_status = 0;  // connected to 8155 switches (ic17 7474 part 2/2)
 	int m_head_to_last = 0;
@@ -251,7 +278,7 @@ private:
 	int m_select_status;
 	int right_offset = 0;
 	int left_offset = 2;  // 2 seems right
-	int m_left_edge  = (MARGIN_INCHES / 2.0) * dpi;    // 0 FOR starting at left edge, print shop seems to like -32 for centered print
+	int m_left_edge  = (MARGIN_INCHES / 2.0) * dpi;    // 0 for starting at left edge, print shop seems to like -32 for centered print
 	int m_right_edge = (PAPER_WIDTH_INCHES - MARGIN_INCHES) * dpi * xscale + m_left_edge - 1;
 
 	// (should be trivial to make a 15" wide printer by adjusting PAPER_WIDTH_INCHES to 15.00)
