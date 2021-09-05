@@ -16,7 +16,7 @@
 #include "hash.h"
 #include "unzip.h"
 
-#include <assert.h>
+#include <cassert>
 #include <list>
 #include <optional>
 
