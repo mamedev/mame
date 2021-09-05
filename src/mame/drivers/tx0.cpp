@@ -1427,9 +1427,7 @@ void tx0_state::tx0_keyboard()
 				;
 			charcode = (i << 4) + j;
 			/* shuffle and insert data into LR */
-			/* BTW, I am not sure how the char code is combined with the
-			previous LR */
-			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
+			lr = (1 << 17) | (charcode << 11) | m_maincpu->state_int(TX0_LR);
 			/* write modified LR */
 			m_maincpu->set_state_int(TX0_LR, lr);
 			tx0_typewriter_drawchar(charcode); /* we want to echo input */
