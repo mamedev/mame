@@ -79,7 +79,7 @@ public:
 		// transition from 1 to 0 clocks the flipflop
 		if (oldval == 1 && newval == 0)
 		{
-			printf("oldval,newval = %x,%x  flip = %x\n",oldval,newval,m_ic17_flipflop_select_status);
+//			printf("oldval,newval = %x,%x  flip = %x\n",oldval,newval,m_ic17_flipflop_select_status);
 			m_ic17_flipflop_select_status = !m_ic17_flipflop_select_status;
 		}
 	}
@@ -275,7 +275,6 @@ private:
 	int m_switches_to_last = 0;
 	u16 m_dotpattern = 0;  // got to initialize it or get junk on startup
 
-	int m_select_status;
 	int right_offset = 0;
 	int left_offset = 2;  // 2 seems right
 	int m_left_edge  = (MARGIN_INCHES / 2.0) * dpi;    // 0 for starting at left edge, print shop seems to like -32 for centered print

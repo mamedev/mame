@@ -12,6 +12,13 @@
 
 Notes:
 
+	To get it to work, you can experiment with connecting DTR to DSR, CTS, or DSR + CTS.
+	The same goes for RTS, you can connect to DSR, CTS or DSR + CTS.
+	By default, DTR should connect to DSR and RTS should connect to CTS.
+
+	Also Invert1 will invert the DTR and Invert2 will invert CTS.
+
+
     Running the self test:
     You probably won't be able to press keypad 7 quickly enough at the start of mame in order to
     activate the self test.  However, you can reset the printer with keypad 8 while holding down keypad 7
@@ -213,12 +220,12 @@ static INPUT_PORTS_START( apple_imagewriter )
 
 
 	PORT_START("INVERT1")  // for testing / inverting various things without having to recompile
-	PORT_CONFNAME(0x1, 0x01, "Invert1")
+	PORT_CONFNAME(0x1, 0x01, "Invert1 DTR")
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
 
 	PORT_START("INVERT2")
-	PORT_CONFNAME(0x1, 0x01, "Invert2")
+	PORT_CONFNAME(0x1, 0x01, "Invert2 RTS")
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
 
