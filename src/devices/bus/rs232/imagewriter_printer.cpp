@@ -12,12 +12,22 @@
 
 Notes:
 
-    Select switch doesn't seem to stop printing unless you also press the "LF button" momentarily while the printer is printing.
-    Cover switch button will go immediately into select off mode.
+    Running the self test:
+    You probably won't be able to press keypad 7 quickly enough at the start of mame in order to
+    activate the self test.  However, you can reset the printer with keypad 8 while holding down keypad 7
+    in order to run the self test.  The self test can be exited by resetting the printer with keypad 8.
 
-    Paper end switch will stop printing after printing approx 8 lines.
+    Changes to dip switch settings don't come into effect until resetting the printer (keypad 8) since
+    the dip switches are read upon startup.
 
-    Can run two imagewriters with ./mame mac512k -rs232b imagewriter -rs232a imagewriter
+    Select switch (keypad 0) doesn't seem to stop printing unless you also press the "LF button" (keypad 9)
+    momentarily while the printer is printing.
+
+    Pressing the cover switch button (keypad 3) will go immediately into select off mode.
+
+    Activating the Paper end switch (keypad 6 toggle) will stop printing after printing approx 8 lines.
+
+    Can run two imagewriters on the mac512k with ./mame mac512k -rs232b imagewriter -rs232a imagewriter
 
 **************************************************************************/
 
@@ -114,10 +124,10 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_8155head->out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
 
 	I8155(config, m_8155switch, 9.8304_MHz_XTAL / 2 / 4);  // for the moment, just give a 1 mhz setting
-// divide by 4 is very fast
-// divide by 8 is slower
-// divide by 16 really slows it down
-// faster the 8155switch clock is, the faster the printhead moves
+	// divide by 4 is very fast
+	// divide by 8 is slower
+	// divide by 16 really slows it down
+	// faster the 8155switch clock is, the faster the printhead moves
 
 	m_8155switch->in_pa_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
 	m_8155switch->in_pb_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pb_r));
@@ -351,7 +361,12 @@ void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data)
 //-------------------------------------------------
 //
 //  $70 base address for 8155 HEAD/MOTOR
-//
+//  $70 command/status
+//  $71 port A
+//  $72 port B
+//  $73 port C
+//  $74 low timer
+//  $75 high timer
 //-------------------------------------------------
 //    8155 Head/Motor Port A
 //-------------------------------------------------
@@ -454,7 +469,12 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 //-------------------------------------------------
 //
 //  $78 base address for 8155 SWITCHES
-//
+//  $78 command/status
+//  $79 port A
+//  $7a port B
+//  $7b port C
+//  $7c low timer
+//  $7d high timer
 //-------------------------------------------------
 //    8155 Switches Functions Port A
 //-------------------------------------------------
