@@ -718,8 +718,8 @@ void atarisy1_state::add_speech(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy1_state::sound_ext_map);
 
 	TMS5220C(config, m_tms, 14.318181_MHz_XTAL/2/11);
-	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.6);
+	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.6);
 
 	MOS6522(config, m_via, 14.318181_MHz_XTAL/8);
 	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
@@ -784,12 +784,12 @@ void atarisy1_state::atarisy1(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14.318181_MHz_XTAL/4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	ymsnd.add_route(0, "lspeaker", 0.48);
+	ymsnd.add_route(1, "rspeaker", 0.48);
 
 	pokey_device &pokey(POKEY(config, "pokey", 14.318181_MHz_XTAL/8));
-	pokey.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	pokey.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	pokey.add_route(ALL_OUTPUTS, "lspeaker", 0.24);
+	pokey.add_route(ALL_OUTPUTS, "rspeaker", 0.24);
 }
 
 void atarisy1_state::marble(machine_config &config)
