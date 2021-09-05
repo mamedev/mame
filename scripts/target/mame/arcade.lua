@@ -5139,8 +5139,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/tapatune.cpp",
 	MAME_DIR .. "src/mame/drivers/tattack.cpp",
 	MAME_DIR .. "src/mame/drivers/taxidriv.cpp",
-	MAME_DIR .. "src/mame/includes/taxidriv.h",
-	MAME_DIR .. "src/mame/video/taxidriv.cpp",
 	MAME_DIR .. "src/mame/drivers/teamjocs.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnodar.cpp",
 	MAME_DIR .. "src/mame/drivers/thayers.cpp",

@@ -734,9 +734,9 @@ public:
 
 	//! floppy_image constructor
 	/*!
-	  @param _tracks number of tracks.
-	  @param _heads number of heads.
-	  @param _form_factor form factor of drive (from enum)
+	  @param tracks number of tracks.
+	  @param heads number of heads.
+	  @param form_factor form factor of drive (from enum)
 	*/
 	floppy_image(int tracks, int heads, uint32_t form_factor);
 	virtual ~floppy_image();
@@ -788,7 +788,7 @@ public:
 	//! Returns the variant name for the particular disk form factor/variant
 	//! @param form_factor
 	//! @param variant
-	//! @param returns a string containing the variant name.
+	//! @return a string containing the variant name.
 	static const char *get_variant_name(uint32_t form_factor, uint32_t variant);
 
 private:

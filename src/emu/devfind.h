@@ -350,8 +350,6 @@ protected:
 	/// report_missing to print an error message if the region is
 	/// not found.  Returns true if the region is required but no
 	/// matching region is found, or false otherwise.
-	/// \param [in] bytes Desired region length in bytes, or 0U to match
-	///   any length.
 	/// \param [in] required True if the region is required, or false if
 	///   it is optional.
 	/// \return True if the region is optional, or if the region is
@@ -1059,8 +1057,6 @@ public:
 	/// \param [in] tag Memory region tag to search for.  This is not
 	///   copied, it is the caller's responsibility to ensure this
 	///   pointer remains valid until resolution time.
-	/// \param [in] length Desired memory region length in units of the
-	///   size of the element type, or zero to match any region length.
 	region_ptr_finder(device_t &base, char const *tag)
 		: object_finder_base<PointerType, Required>(base, tag)
 		, m_length(0)

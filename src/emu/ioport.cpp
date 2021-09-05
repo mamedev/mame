@@ -1659,9 +1659,10 @@ ioport_manager::ioport_manager(running_machine &machine)
 	, m_timecode_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)
 	, m_timecode_count(0)
 	, m_timecode_last_time(attotime::zero)
-	, m_deselected_card_config(nullptr)
+	, m_deselected_card_config()
 {
-	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
+	for (auto &entries : m_type_to_entry)
+		std::fill(std::begin(entries), std::end(entries), nullptr);
 }
 
 
@@ -1837,7 +1838,6 @@ void ioport_manager::exit()
 
 ioport_manager::~ioport_manager()
 {
-	delete m_deselected_card_config;
 }
 
 
@@ -2429,7 +2429,7 @@ void ioport_manager::load_system_config(util::xml::data_node const &portnode, in
 						if (parent_device->interface(slot) && (slot->option_list().find(std::string(child_tag)) != slot->option_list().end()))
 						{
 							if (!m_deselected_card_config)
-								m_deselected_card_config = util::xml::file::create().release();
+								m_deselected_card_config = util::xml::file::create();
 							portnode.copy_into(*m_deselected_card_config);
 						}
 						break;

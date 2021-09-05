@@ -44,15 +44,19 @@ packed into a single address-byte (CRU 0 = bit 0, etc). So the address is
 
 ****************************************************************************/
 
-
 #include "emu.h"
+
 #include "cpu/tms9900/tms9995.h"
 #include "machine/74259.h"
-#include "video/tms9928a.h"
-//#include "machine/tms9902.h"
 #include "machine/keyboard.h"
+//#include "machine/tms9902.h"
+#include "video/tms9928a.h"
 #include "sound/beep.h"
+
 #include "speaker.h"
+
+
+namespace {
 
 class cortex_state : public driver_device
 {
@@ -69,6 +73,10 @@ public:
 
 	void cortex(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
@@ -76,13 +84,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
 	u8 pio_r(offs_t offset);
 	u8 keyboard_r(offs_t offset);
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+
 	bool m_kbd_ack;
 	bool m_vdp_int;
 	u8 m_term_data;
-	void machine_reset() override;
-	void machine_start() override;
 	required_device<tms9995_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -93,7 +101,7 @@ private:
 
 void cortex_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram().share("mainram").bankr("bank1");
+	map(0x0000, 0x7fff).ram().share(m_ram).bankr(m_bank1);
 	map(0x8000, 0xefff).ram();
 	map(0xf100, 0xf11f).ram(); // memory mapping unit
 	map(0xf120, 0xf121).rw("crtc", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
@@ -244,6 +252,9 @@ ROM_START( cortex )
 	ROMX_LOAD( "forth.ic47",  0x0000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(1))
 	ROMX_LOAD( "forth.ic46",  0x2000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

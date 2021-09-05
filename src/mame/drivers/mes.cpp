@@ -9,14 +9,18 @@ Schleicher MES
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/keyboard.h"
+
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class mes_state : public driver_device
 {
@@ -30,9 +34,11 @@ public:
 
 	void mes(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	void machine_reset() override;
-	void machine_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 	u8 port00_r();
@@ -99,7 +105,7 @@ void mes_state::machine_reset()
     Also the screen dimensions are a guess. */
 uint32_t mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u16 sy=0,ma=0;
+	u16 sy = 0, ma = 0;
 
 	for (u8 y = 0; y < 25; y++)
 	{
@@ -112,7 +118,7 @@ uint32_t mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				u8 gfx = 0;
 				if (ra < 9)
 				{
-					u8 chr = m_p_videoram[x];
+					const u8 chr = m_p_videoram[x];
 					gfx = m_p_chargen[(chr<<4) | ra ];
 				}
 
@@ -127,7 +133,7 @@ uint32_t mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				*p++ = BIT(gfx, 0);
 			}
 		}
-		ma+=80;
+		ma += 80;
 	}
 	return 0;
 }
@@ -176,6 +182,9 @@ ROM_START( mes )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

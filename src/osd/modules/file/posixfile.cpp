@@ -22,7 +22,7 @@
 #endif
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #define _FILE_OFFSET_BITS 64
 #endif
 
@@ -69,7 +69,7 @@ namespace {
 //  CONSTANTS
 //============================================================
 
-#if defined(WIN32)
+#if defined(_WIN32)
 constexpr char PATHSEPCH = '\\';
 constexpr char INVPATHSEPCH = '/';
 #else
@@ -102,7 +102,7 @@ public:
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__EMSCRIPTEN__) || defined(__ANDROID__)
 		result = ::pread(m_fd, buffer, size_t(count), off_t(std::make_unsigned_t<off_t>(offset)));
-#elif defined(WIN32) || defined(SDLMAME_NO64BITIO)
+#elif defined(_WIN32) || defined(SDLMAME_NO64BITIO)
 		if (lseek(m_fd, off_t(std::make_unsigned_t<off_t>(offset)), SEEK_SET) < 0)
 			return std::error_condition(errno, std::generic_category());
 		result = ::read(m_fd, buffer, size_t(count));
@@ -123,7 +123,7 @@ public:
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__EMSCRIPTEN__) || defined(__ANDROID__)
 		result = ::pwrite(m_fd, buffer, size_t(count), off_t(std::make_unsigned_t<off_t>(offset)));
-#elif defined(WIN32) || defined(SDLMAME_NO64BITIO)
+#elif defined(_WIN32) || defined(SDLMAME_NO64BITIO)
 		if (lseek(m_fd, off_t(std::make_unsigned_t<off_t>(offset)), SEEK_SET) < 0)
 			return std::error_condition(errno, std::generic_category());
 		result = ::write(m_fd, buffer, size_t(count));
@@ -142,7 +142,7 @@ public:
 	{
 		int result;
 
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__EMSCRIPTEN__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__EMSCRIPTEN__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 		result = ::ftruncate(m_fd, off_t(std::make_unsigned_t<off_t>(offset)));
 #else
 		result = ::ftruncate64(m_fd, off64_t(offset));
@@ -171,7 +171,7 @@ private:
 
 bool is_path_separator(char c) noexcept
 {
-#if defined(WIN32)
+#if defined(_WIN32)
 	return (c == PATHSEPCH) || (c == INVPATHSEPCH);
 #else
 	return c == PATHSEPCH;
@@ -205,7 +205,7 @@ std::error_condition create_path_recursive(std::string_view path) noexcept
 		return std::error_condition();
 
 	// create the path
-#ifdef WIN32
+#ifdef _WIN32
 	if (mkdir(p.c_str()) < 0)
 #else
 	if (mkdir(p.c_str(), 0777) < 0)
@@ -247,13 +247,13 @@ std::error_condition osd_file::open(std::string const &path, std::uint32_t openf
 	{
 		return std::errc::invalid_argument;
 	}
-#if defined(WIN32)
+#if defined(_WIN32)
 	access |= O_BINARY;
 #endif
 
 	// convert the path into something compatible
 	dst = path;
-#if defined(WIN32)
+#if defined(_WIN32)
 	for (auto it = dst.begin(); it != dst.end(); ++it)
 		*it = (INVPATHSEPCH == *it) ? PATHSEPCH : *it;
 #endif
@@ -262,7 +262,7 @@ std::error_condition osd_file::open(std::string const &path, std::uint32_t openf
 
 	// attempt to open the file
 	int fd = -1;
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 	fd = ::open(dst.c_str(), access, 0666);
 #else
 	fd = ::open64(dst.c_str(), access, 0666);
@@ -285,7 +285,7 @@ std::error_condition osd_file::open(std::string const &path, std::uint32_t openf
 				// attempt to reopen the file
 				if (!createrr)
 				{
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 					fd = ::open(dst.c_str(), access, 0666);
 #else
 					fd = ::open64(dst.c_str(), access, 0666);
@@ -306,7 +306,7 @@ std::error_condition osd_file::open(std::string const &path, std::uint32_t openf
 	}
 
 	// get the file size
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 	struct stat st;
 	if (::fstat(fd, &st) < 0)
 #else
@@ -371,7 +371,7 @@ bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, 
 
 std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 {
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 	struct stat st;
 	int const err = ::stat(path.c_str(), &st);
 #else
@@ -405,7 +405,7 @@ std::error_condition osd_get_full_path(std::string &dst, std::string const &path
 {
 	try
 	{
-#if defined(WIN32)
+#if defined(_WIN32)
 		std::vector<char> path_buffer(MAX_PATH);
 		if (::_fullpath(&path_buffer[0], path.c_str(), MAX_PATH))
 		{
@@ -465,7 +465,7 @@ bool osd_is_absolute_path(std::string const &path) noexcept
 {
 	if (!path.empty() && is_path_separator(path[0]))
 		return true;
-#if !defined(WIN32)
+#if !defined(_WIN32)
 	else if (!path.empty() && (path[0] == '.') && (!path[1] || is_path_separator(path[1]))) // FIXME: why is this even here? foo/./bar is a valid way to refer to foo/bar
 		return true;
 #elif !defined(UNDER_CE)
@@ -509,7 +509,7 @@ bool osd_is_valid_filename_char(char32_t uchar) noexcept
 	// The only one that's actually invalid is the slash
 	// The other two are just problematic because they're the escape character and path separator
 	return osd_is_valid_filepath_char(uchar)
-#if defined(WIN32)
+#if defined(_WIN32)
 		&& uchar != PATHSEPCH
 		&& uchar != INVPATHSEPCH
 #else
@@ -529,7 +529,7 @@ bool osd_is_valid_filepath_char(char32_t uchar) noexcept
 	// One could argue that colon should be in here too because it functions as path separator
 	return uchar >= 0x20
 		&& !(uchar >= '\x7F' && uchar <= '\x9F')
-#if defined(WIN32)
+#if defined(_WIN32)
 		&& uchar != '<'
 		&& uchar != '>'
 		&& uchar != '\"'

@@ -693,9 +693,9 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_channels(0),
 	m_size(0),
 	m_incs(0),
-	m_reg_timer(nullptr),
-	m_sport0_timer(nullptr),
-	m_internal_timer(nullptr),
+	m_reg_timer(*this, "dcs_reg_timer"),
+	m_sport0_timer(*this, "dcs_sport0_timer"),
+	m_internal_timer(*this, "dcs_int_timer"),
 	m_ireg(0),
 	m_ireg_base(0),
 	m_bootrom(nullptr),
@@ -790,10 +790,6 @@ void dcs_audio_device::device_start()
 		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, 0x800*2);
 	}
 
-	/* create the timers */
-	m_internal_timer = subdevice<timer_device>("dcs_int_timer");
-	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
-
 	/* non-RAM based automatically acks */
 	m_auto_ack = true;
 	/* register for save states */
@@ -882,11 +878,6 @@ void dcs2_audio_device::device_start()
 	/* allocate memory for the SRAM */
 	m_sram = std::make_unique<uint16_t[]>(0x8000*4/2);
 
-	/* create the timers */
-	m_internal_timer = subdevice<timer_device>("dcs_int_timer");
-	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
-	m_sport0_timer = subdevice<timer_device>("dcs_sport0_timer");
-
 	/* we don't do auto-ack by default */
 	m_auto_ack = false;
 
@@ -906,14 +897,17 @@ void dcs2_audio_device::device_start()
 }
 
 
-void dcs_audio_device::install_speedup(void)
+void dcs_audio_device::install_speedup()
 {
-	if (m_polling_offset) {
-		if (m_rev < REV_DSIO) {
+	if (m_polling_offset)
+	{
+		if (m_rev < REV_DSIO)
+		{
 			m_cpu->space(AS_DATA).install_read_handler(m_polling_offset, m_polling_offset, read16mo_delegate(*this, FUNC(dcs_audio_device::dcs_polling_r)));
 			m_cpu->space(AS_DATA).install_write_handler(m_polling_offset, m_polling_offset, write16s_delegate(*this, FUNC(dcs_audio_device::dcs_polling_w)));
 		}
-		else {
+		else
+		{
 			// ADSP 2181 (DSIO and DENVER) use program memory
 			m_cpu->space(AS_PROGRAM).install_read_handler(m_polling_offset, m_polling_offset, read32mo_delegate(*this, FUNC(dcs_audio_device::dcs_polling32_r)));
 			m_cpu->space(AS_PROGRAM).install_write_handler(m_polling_offset, m_polling_offset, write32s_delegate(*this, FUNC(dcs_audio_device::dcs_polling32_w)));
@@ -1560,7 +1554,7 @@ void dcs_audio_device::data_w(uint16_t data)
 		return;
 
 	/* if we are DCS1, set a timer to latch the data */
-	if (m_sport0_timer == nullptr)
+	if (!m_sport0_timer)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_delayed_data_w_callback),this), data);
 	else
 		dcs_delayed_data_w(data);
@@ -1916,15 +1910,18 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 			}
 
 			// Check SPORT0 enabled
-			if (m_sport0_timer != nullptr) {
-				if (data & 0x1000) {
+			if (m_sport0_timer)
+			{
+				if (data & 0x1000)
+				{
 					// Start the SPORT0 timer
 					// SPORT0 is used as a 1kHz timer
 					m_sport0_timer->adjust(attotime::from_usec(10), 0, attotime::from_hz(1000));
 					if (LOG_DCS_IO)
 						logerror("adsp_control_w: Setting SPORT0 freqency to 1kHz\n");
 				}
-				else {
+				else
+				{
 					// Stop the SPORT0 timer
 					m_sport0_timer->reset();
 				}
@@ -2476,7 +2473,7 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 	int result;
 
 	/* if we're not DCS2, skip */
-	if (m_sport0_timer == nullptr)
+	if (!m_sport0_timer)
 		return 0;
 
 	/* state 0 - initialization phase */
@@ -2506,8 +2503,8 @@ void dcs_audio_device::add_mconfig_dcs(machine_config &config)
 	dcs.set_addrmap(AS_PROGRAM, &dcs_audio_device::dcs_2k_program_map);
 	dcs.set_addrmap(AS_DATA, &dcs_audio_device::dcs_2k_data_map);
 
-	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
-	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
+	TIMER(config, m_reg_timer).configure_generic(FUNC(dcs_audio_device::dcs_irq));
+	TIMER(config, m_internal_timer).configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -2677,9 +2674,9 @@ void dcs2_audio_dsio_device::device_add_mconfig(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_dsio_device::dsio_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 14, 0x2000);
 
-	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
-	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
-	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs_audio_device::sport0_irq)); // roadburn needs this to pass hardware test
+	TIMER(config, m_reg_timer).configure_generic(FUNC(dcs_audio_device::dcs_irq));
+	TIMER(config, m_internal_timer).configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
+	TIMER(config, m_sport0_timer).configure_generic(FUNC(dcs_audio_device::sport0_irq)); // roadburn needs this to pass hardware test
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2707,11 +2704,11 @@ void dcs2_audio_denver_device::device_add_mconfig(machine_config &config)
 	denver.set_addrmap(AS_DATA, &dcs2_audio_denver_device::denver_data_map);
 	denver.set_addrmap(AS_IO, &dcs2_audio_denver_device::denver_io_map);
 
-	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_denver_device::denver_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000*2);
+	ADDRESS_MAP_BANK(config, m_ram_map).set_map(&dcs2_audio_denver_device::denver_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000*2);
 
-	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
-	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
-	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs_audio_device::sport0_irq)); // Atlantis driver waits for sport0 rx interrupts
+	TIMER(config, m_reg_timer).configure_generic(FUNC(dcs_audio_device::dcs_irq));
+	TIMER(config, m_internal_timer).configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
+	TIMER(config, m_sport0_timer).configure_generic(FUNC(dcs_audio_device::sport0_irq)); // Atlantis driver waits for sport0 rx interrupts
 }
 
 dcs2_audio_denver_5ch_device::dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
