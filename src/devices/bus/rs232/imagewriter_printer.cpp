@@ -421,15 +421,15 @@ uint8_t apple_imagewriter_printer_device::head_pc_r(offs_t offset)
 
 void apple_imagewriter_printer_device::head_pc_w(uint8_t data)
 {
-	// PC0 = connected to IC17 flipflop clear*
+	// PC0 = connected to IC17 flipflop PRESET*
 	// PC1..PC4 = PF MOTOR A-D
 	// PC5      = PF MOTOR ENABLE
 
 	update_pf_stepper(BIT(data ^ 0xff, 1, 4));
 	if (!BIT(data,0))
 	{
-		m_ic17_flipflop_head = 0;
-		m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop_head);
+		m_ic17_flipflop_head = 1;
+		m_maincpu->set_input_line(I8085_RST55_LINE, !m_ic17_flipflop_head);
 	}
 }
 
@@ -440,13 +440,14 @@ void apple_imagewriter_printer_device::head_pc_w(uint8_t data)
 void apple_imagewriter_printer_device::head_to(uint8_t data)
 {
 	// model the IC17 flip flop part
-	// TO = connected to IC17 flipflop preset*
+	// TO = connected to IC17 flipflop CLK  (clocks in a zero)
 
-	if (!data)  // zero clears flipflop
+	if ((!m_head_to_last) && data)  // clock in a zero on rising clock
 	{
-		m_ic17_flipflop_head = 1;
+		m_ic17_flipflop_head = 0;
+		m_maincpu->set_input_line(I8085_RST55_LINE, !m_ic17_flipflop_head);
 	}
-	m_maincpu->set_input_line(I8085_RST55_LINE, m_ic17_flipflop_head);
+
 	m_head_to_last = data;
 }
 
@@ -553,7 +554,8 @@ void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 
 void apple_imagewriter_printer_device::switch_to(uint8_t data)
 {
-	m_maincpu->set_input_line(I8085_RST75_LINE, data);
+	// is timerout* inverted yes
+	m_maincpu->set_input_line(I8085_RST75_LINE, data);  // is it !data for TIMEROUT*
 	m_pulse2->a_w(data);  // send data to pulse generator 74123 section 2
 
 	m_switches_to_last = data;

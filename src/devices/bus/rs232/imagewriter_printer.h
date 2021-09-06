@@ -258,7 +258,13 @@ private:
 	int m_switches_to_last = 0;
 	u16 m_dotpattern = 0;  // got to initialize it or get junk on startup
 
-	int m_left_edge_adjust = -6;  // to get perfect centering
+	int m_left_edge_adjust = -6;  // to get perfect centering with macpaint
+
+	// Centering is kind of tricky because it seems that the printer actually does 162 steps horizontally instead
+	// of 160 when printing at 144 dpi, but when it is set to print at 160 dpi it actually does 160 dpi
+	// so exact width means 1296 for macpaint 144dpi 8" but 1280 for amiga 160 dpi 0-80 margin.  (8*2 step difference)
+	// It's minor, but if you want exact centering it makes a difference.
+
 	int right_offset = 0;
 	int left_offset  = 0;
 	int m_left_edge  = (MARGIN_INCHES) * dpi * xscale + m_left_edge_adjust;    // 0 for starting at left edge, print shop seems to like -32 for centered print
