@@ -287,7 +287,7 @@ References:
 	</software>
 
 	<software name="80ay1d88" cloneof="ay1h" supported="yes">
-		<description>AY-1 Fortress Solomon (bootleg, Alt)</description>
+		<description>AY-1 Fortress Solomon (bootleg, alt)</description>
 		<year>1983</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
@@ -490,7 +490,7 @@ References:
 	</software>
 
 	<software name="combata" cloneof="combat" supported="yes">
-		<description>Combat (v1.2, Alt)</description>
+		<description>Combat (v1.2, alt)</description>
 		<!-- 1982,4,25 -->
 		<year>1982</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -807,6 +807,7 @@ References:
 		</part>
 	</software>
 
+	<!-- Has left column text attribute GFX glitches -->
 	<software name="flgworld" supported="partial">
 		<description>Flag World</description>
 		<!-- published on PiO 1984.06 -->
@@ -822,6 +823,7 @@ References:
 		</part>
 	</software>
 
+	<!-- Has left column text attribute GFX glitches -->
 	<software name="flgworlda" cloneof="flgworld" supported="partial">
 		<description>Flag World (alt)</description>
 		<!-- published on PiO 1984.06 -->
@@ -965,7 +967,7 @@ References:
 	</software>
 
 	<software name="galaxiangka" cloneof="galaxiangk" supported="yes">
-		<description>Galaxian (Geimu Kyoujin, Alt)</description>
+		<description>Galaxian (alt Geimu Kyoujin)</description>
 		<year>19??</year>
 		<publisher>Geimu Kyoujin</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1430,7 +1432,7 @@ References:
 	</software>
 
 	<software name="moritaota" cloneof="moritaot">
-		<description>Morita Othello (v2.7, Alt)</description>
+		<description>Morita Othello (v2.7, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1441,7 +1443,7 @@ References:
 	</software>
 
 	<software name="moritaotb" cloneof="moritaot">
-		<description>Morita Othello (v2.7, Alt 2)</description>
+		<description>Morita Othello (v2.7, alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1977,7 +1979,7 @@ References:
 	</software>
 
 	<software name="spydaisna" cloneof="spydaisn" supported="yes">
-		<description>Spy Daisakusen (N Basic, Alt)</description>
+		<description>Spy Daisakusen (N Basic, alt)</description>
 		<!-- 1982.10.28. -->
 		<year>1982</year>
 		<publisher>ポニカ (PonyCa)</publisher>
@@ -2735,7 +2737,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="sdosgamea" cloneof="sdosgame">
-		<description>S-DOS Game Pack (Compilation, Alt)</description>
+		<description>S-DOS Game Pack (Compilation, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2751,7 +2753,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="sdosgameb" cloneof="sdosgame">
-		<description>S-DOS Game Pack (Compilation, Alt 2)</description>
+		<description>S-DOS Game Pack (Compilation, alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2794,7 +2796,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 
 	<!-- Hangs on PC8001, boot on PC8801 in N Basic compatible mode -->
 	<software name="cpm22na" cloneof="cpm22n" supported="partial">
-		<description>CP/M for PC-8001 (v2.2, Alt 2)</description>
+		<description>CP/M for PC-8001 (v2.2, alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2806,7 +2808,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 
 	<!-- Hangs on PC8001, boot on PC8801 in N Basic compatible mode -->
 	<software name="cpm22nb" cloneof="cpm22n" supported="partial">
-		<description>CP/M for PC-8001 (v2.2, Alt)</description>
+		<description>CP/M for PC-8001 (v2.2, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2840,7 +2842,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="nbasicsya" cloneof="nbasicsy">
-		<description>N BASIC system disk (PC-8034-2W, Alt)</description>
+		<description>N BASIC system disk (PC-8034-2W, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2851,7 +2853,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="nbasicsyb" cloneof="nbasicsy">
-		<description>N BASIC system disk (PC-8034-2W, Alt 2)</description>
+		<description>N BASIC system disk (PC-8034-2W, alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

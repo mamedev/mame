@@ -47927,8 +47927,8 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<description>Donkey Gorilla</description>
 		<year>1983</year>
 		<publisher>ツクモ (Tsukumo)</publisher>
-		
 		<info name="alt_title" value="ドンキーゴリラ"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
 				<rom name="donkey.d88" size="66240" crc="fabcf409" sha1="26c6c335b9b4e5ed04a2703190de1bcc0ce8f96d"/>
@@ -47937,9 +47937,10 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<software name="dota">
-		<description>Dota</description>
+		<description>Bouken Roman - Dota</description>
 		<year>19??</year>
 		<publisher>システムソフト (System Soft)</publisher>
+		<info name="alt_title" value="冒険浪漫" />
 		<!--combined image-->
 		<!--rom name="dota.d88" size="693344" crc="f70cc28a" sha1="af9d7f78ef678306059ea59b24c4dbcfb10f3f1b"/-->
 

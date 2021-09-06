@@ -127,7 +127,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="alphost">
+	<software name="alphos">
 		<description>Alphos</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -141,7 +141,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="alphosta" cloneof="alphost">
+	<software name="alphosa" cloneof="alphos">
 		<description>Alphos (Alt?)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -155,7 +155,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="apploont">
+	<software name="apploon">
 		<description>Apploon</description>
 		<year>1984</year>
 		<publisher>タカラ (Takara)</publisher>
@@ -207,7 +207,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="bokosukat">
+	<software name="bokosuka">
 		<description>Bokosuka Wars</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -246,7 +246,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="combatt">
+	<software name="combat">
 		<description>Combat</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -268,7 +268,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="cosmomut">
+	<software name="cosmomu">
 		<description>Cosmo Mutar</description>
 		<year>1984</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -315,7 +315,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 	</software>
 
 	<!-- or is it the PC8001 version? -->
-	<software name="digdugt">
+	<software name="digdug">
 		<description>Dig Dug</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -353,7 +353,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="doordoort">
+	<software name="doordoor">
 		<description>Door Door</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -392,7 +392,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="dualalnt">
+	<software name="dualaln">
 		<description>Dual Alien</description>
 		<year>1984</year>
 		<publisher>セントラル教育 (Central Kyoku)</publisher>
@@ -406,7 +406,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="dungeont">
+	<software name="dungeon">
 		<description>Dungeon</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -431,7 +431,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="eggyt">
+	<software name="eggy">
 		<description>Eggy</description>
 		<year>1985</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -445,7 +445,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="fanfunt">
+	<software name="fanfun">
 		<description>Fan Fun</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -459,7 +459,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="fanfunta" cloneof="fanfunt">
+	<software name="fanfuna" cloneof="fanfun">
 		<description>Fan Fun (alt maybe)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -473,7 +473,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="flappyt">
+	<software name="flappy">
 		<description>Flappy</description>
 		<year>1983</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -513,7 +513,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="galaxiant">
+	<software name="galaxian">
 		<description>Galaxian</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -527,7 +527,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="galaxianta" cloneof="galaxiant">
+	<software name="galaxiana" cloneof="galaxian">
 		<description>Galaxian (Alt?)</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -555,7 +555,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="hitsujit">
+	<software name="hitsuji">
 		<description>Hitsuji Yaai</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -750,7 +750,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="lunarbalt">
+	<software name="lunarbal">
 		<description>Lunar Ball</description>
 		<year>1985</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
@@ -764,7 +764,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="mariospt">
+	<software name="mariosp">
 		<description>Mario Bros. Special</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -817,7 +817,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="midmagict">
+	<software name="midmagic">
 		<description>David's Midnight Magic</description>
 		<year>1984</year>
 		<publisher>システムソフト (System Software)</publisher>
@@ -892,7 +892,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="newtront">
+	<software name="newtron">
 		<description>Newtron</description>
 		<year>1984</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -962,7 +962,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="plazmalit">
+	<software name="plazmali">
 		<description>Plazma Line</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -990,7 +990,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="ponkotsut">
+	<software name="ponkotsu">
 		<description>Ponkotsu-sen Survival</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -1094,7 +1094,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="sokobant">
+	<software name="sokoban">
 		<description>Sokouban</description>
 		<year>1983</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
@@ -1359,7 +1359,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="zoomt">
+	<software name="zoom">
 		<description>Zoom in Space</description>
 		<year>1983</year>
 		<publisher>ユニオンプランニング (Union Planning)</publisher>
