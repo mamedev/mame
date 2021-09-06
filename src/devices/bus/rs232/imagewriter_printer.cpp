@@ -77,7 +77,6 @@ apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine
 	m_uart(*this, "uart"),
 	m_8155head(*this, "8155head"),
 	m_8155switch(*this, "8155switch"),
-//	m_count(*this, "74163count"),
 	m_pulse1(*this, "pulse1"),
 	m_pulse2(*this, "pulse2"),
 	m_bitmap_printer(*this, "bitmap_printer"),
@@ -105,11 +104,6 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_maincpu->out_sod_func().set(FUNC(apple_imagewriter_printer_device::maincpu_out_sod_func));
 	m_maincpu->in_sid_func().set(FUNC(apple_imagewriter_printer_device::maincpu_in_sid_func));
 
-
-//	TTL74163(config, m_count, 0);
-//	m_maincpu->set_clk_out(m_count, FUNC(ttl74163_device::set_unscaled_clock_int));
-
-
 	// 74123 for the printhead pulse generation
 
 	TTL74123(config, m_pulse1, 10000, 1000e-12);     // second stage (hooked up to 1 section of 74123)
@@ -132,9 +126,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_8155head->out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
 
 	I8155(config, m_8155switch, 9.8304_MHz_XTAL / 2 / 4);
-	// divide by 4 is very fast
-	// divide by 8 is slower
-	// divide by 16 really slows it down
+	// input clock gets adjusted by PB6 line
 	// faster the 8155switch clock is, the faster the printhead moves
 
 	m_8155switch->in_pa_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
@@ -160,6 +152,12 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	TIMER(config, m_timer_rxclock, 0);
 
 	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 16 * 2));
+	// output from 74393 is either 1/16 input clock of (9.8304mhz / 2 / 2 (aka CLK1))  or 1/128 input clock (CLK1)
+	// multiplexed by IC5 / 74LS157
+	// 9600 baud: 9.8304e6 / 2 / 2 (=CLK1) / 16 (=output from 74393) / (16=m_br_factor 8251) = 9600
+	// 2400 baud: 9.8304e6 / 2 / 2 (=CLK1) / 16 (=output from 74393) / (64=m_br_factor 8251) = 2400
+	// 1200 baud: 9.8304e6 / 2 / 2 (=CLK1) / 128 (=output from 74393) / (16=m_br_factor 8251) = 1200
+	// 300  baud: 9.8304e6 / 2 / 2 (=CLK1) / 128 (=output from 74393) / (64=m_br_factor 8251) = 300
 
 }
 
@@ -229,24 +227,6 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_CONFNAME(0x1, 0x01, "Invert2 RTS")
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
-
-	PORT_START("INVERT3")
-	PORT_CONFNAME(0x1, 0x01, "Invert3")
-	PORT_CONFSETTING(0x0, "Normal")
-	PORT_CONFSETTING(0x1, "Invert")
-
-
-	PORT_START("8155DIVIDER")  // setting persists between invocations
-	PORT_CONFNAME(0x7, 0x02, "8155 Switch Clock Divider")
-	PORT_CONFSETTING(0x0, "by 1  (doesn't work)")
-	PORT_CONFSETTING(0x1, "by 2  (doesn't work)")
-	PORT_CONFSETTING(0x2, "by 4  (fast)")  // anything less than 4 and printer will not work properly
-	PORT_CONFSETTING(0x3, "by 8  (medium)")
-	PORT_CONFSETTING(0x4, "by 16 (slow)")
-	PORT_CONFSETTING(0x5, "by 32 (super slow motion)")
-	PORT_CONFSETTING(0x6, "by 64 (paint drying, dorito speed)")
-	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, switches_8155_divider_changed, 0)
-
 
 	PORT_START("DEBUGMSG")
 	PORT_CONFNAME(0x1, 0x00, "Debug Messages")
@@ -333,7 +313,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_DIPSETTING(0x01, "2400")
 	PORT_DIPSETTING(0x02, "1200")
 	PORT_DIPSETTING(0x03, "300")
-	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, baud_rate_changed, 0)
+//  PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, baud_rate_changed, 0)
 
 	PORT_DIPNAME(0x04, 0x04, "Flow Control")
 	PORT_DIPLOCATION("SW2:3")
@@ -409,7 +389,12 @@ void apple_imagewriter_printer_device::head_pb_w(uint8_t data)
 	// PB0 = PRINTHEAD DOT 9 (active low)
 	// PB1..PB4 = CR MOTOR A-D
 	// PB5      = CR MOTOR ENABLE
-	// PB6
+	// PB6 = connected to 74163 to adjust counter inputs pin 4 and pin 5 (not emulated)
+	//       74163 will reload either 1110 (e) or 1000 (8) depending on PB6 (pin 3 is gnd and pin 6 is 5v)
+	//       and then count to 16, the carry out from the 74163 is connected through a NOT gate
+	//       to the 8155 switches pin 3 (timer in).
+	//       So what PB6 essentially selects is to either do a count of 2 clocks of CLK2 or a count of 8 clocks of CLK2.
+	//       This selects between (Normal or 1/4 printhead speed)
 	// PB7 = PRINTHEAD FIRE
 
 	update_cr_stepper(BIT(data ^ 0xff, 1, 4));  // motor pattern inverted
@@ -417,6 +402,10 @@ void apple_imagewriter_printer_device::head_pb_w(uint8_t data)
 	m_dotpattern |= (!BIT(data,0) << 8);  // dot pattern is inverted
 
 	m_pulse2->b_w(!BIT(data,7));  // hook up to 74123 section 2
+
+	// depending on pb6, get a rate that's either (9.8304 / 2 / 2) divided by 2 or 8 =  1.2288 mhz or 0.3072 mhz
+	if (BIT(6, data) != BIT (6, m_head_pb_last))
+		m_8155switch->set_unscaled_clock_int( ( 9.8304_MHz_XTAL ).value() / 2 / 2 / (BIT(6, data) ? 2 : 8) );
 
 	m_head_pb_last = data;
 }
@@ -530,6 +519,7 @@ void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 {
 	m_switches_pc_last = data;
 
+	int MULTIPLEX = 0; // PC0
 	int CLEARBIT  = 1; // PC1
 	int PRESETBIT = 2; // PC2
 
@@ -541,6 +531,19 @@ void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 	{
 		m_ic17_flipflop_select_status = 1;  // *PRE
 	}
+
+	// base clock is (9600 hz * 16)
+	// so our divisor will be 1 or 8 for either (9600 hz / 1 * 16) or (9600 hz / 8 (=1200hz) * 16)
+
+	m_baud_clock_divisor = (BIT(m_switches_pc_last, MULTIPLEX)) ? 1 : 8;
+
+	//m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 16 * 2));
+	// output from 74393 is either 1/16 input clock of (9.8304mhz / 2 / 2 (aka CLK1))  or 1/128 input clock (CLK1)
+	// multiplexed by IC5 / 74LS157
+	// 9600 baud: 9.8304e6 / 2 / 2 (=CLK1) / 16 (=output from 74393) / (16=m_brf 8251) = 9600
+	// 2400 baud: 9.8304e6 / 2 / 2 (=CLK1) / 16 (=output from 74393) / (64=m_brf 8251) = 2400
+	// 1200 baud: 9.8304e6 / 2 / 2 (=CLK1) / 128 (=output from 74393) / (16=m_brf 8251) = 1200
+	// 300  baud: 9.8304e6 / 2 / 2 (=CLK1) / 128 (=output from 74393) / (64=m_brf 8251) = 300
 }
 
 //-------------------------------------------------
