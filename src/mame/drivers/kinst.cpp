@@ -184,23 +184,27 @@ Notes:
 #include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
+
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class kinst_state : public driver_device
 {
 public:
 	kinst_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ata(*this, "ata"),
+		m_dcs(*this, "dcs"),
+		m_palette(*this, "palette"),
 		m_rambase(*this, "rambase"),
 		m_rambase2(*this, "rambase2"),
 		m_control(*this, "control"),
 		m_rombase(*this, "user1"),
-		m_maincpu(*this, "maincpu"),
-		m_ata(*this, "ata"),
-		m_dcs(*this, "dcs"),
-		m_palette(*this, "palette")
+		m_ports(*this, { "P1", "P2", "VOLUME", "UNUSED", "DSW" })
 	{
 	}
 
@@ -210,45 +214,67 @@ public:
 	void kinst(machine_config &config);
 
 protected:
+	enum
+	{
+		TIMER_IRQ0_STOP
+	};
+
+	required_device<mips3_device> m_maincpu;
+	required_device<ata_interface_device> m_ata;
+	required_device<dcs_audio_2k_device> m_dcs;
+	required_device<palette_device> m_palette;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	void kinst_map(address_map &map);
+
+	uint32_t ide_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ide_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 private:
 	required_shared_ptr<uint32_t> m_rambase;
 	required_shared_ptr<uint32_t> m_rambase2;
 	required_shared_ptr<uint32_t> m_control;
 	required_region_ptr<uint32_t> m_rombase;
-	required_device<mips3_device> m_maincpu;
-	required_device<ata_interface_device> m_ata;
-	required_device<dcs_audio_2k_device> m_dcs;
-	required_device<palette_device> m_palette;
+	required_ioport_array<5> m_ports;
 
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
 	emu_timer *m_irq0_stop_timer;
 
-	enum
-	{
-		TIMER_IRQ0_STOP
-	};
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	uint32_t control_r(offs_t offset);
 	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t ide_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ide_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ide_extra_r();
 	void ide_extra_w(uint32_t data);
-
-	void main_map(address_map &map);
 };
 
 
+class kinst2uk_state : public kinst_state
+{
+public:
+	using kinst_state::kinst_state;
 
-/* constants */
-#define MASTER_CLOCK    XTAL(50'000'000)
+	void kinst2uk(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void kinst2uk_map(address_map &map);
+
+	uint32_t cpld_r(offs_t offset, uint32_t mem_mask);
+	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+private:
+	uint8_t m_prot_sel;
+	uint8_t m_prot_cnt;
+	uint8_t m_prot_rega;
+	uint8_t m_prot_regb;
+};
 
 
 
@@ -260,15 +286,26 @@ private:
 
 void kinst_state::machine_start()
 {
-	/* set the fastest DRC options */
+	// set the fastest DRC options
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
-	/* configure fast RAM regions */
+	// configure fast RAM regions
 	m_maincpu->add_fastram(0x08000000, 0x087fffff, false, m_rambase2);
 	m_maincpu->add_fastram(0x00000000, 0x0007ffff, false, m_rambase);
 	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 
 	m_irq0_stop_timer = timer_alloc(TIMER_IRQ0_STOP);
+}
+
+
+void kinst2uk_state::machine_start()
+{
+	kinst_state::machine_start();
+
+	save_item(NAME(m_prot_sel));
+	save_item(NAME(m_prot_cnt));
+	save_item(NAME(m_prot_rega));
+	save_item(NAME(m_prot_regb));
 }
 
 
@@ -305,6 +342,17 @@ void kinst_state::machine_reset()
 
 	/* set a safe base location for video */
 	m_video_base = &m_rambase[0x30000/4];
+}
+
+
+void kinst2uk_state::machine_reset()
+{
+	kinst_state::machine_reset();
+
+	m_prot_sel = 0;
+	m_prot_cnt = 0;
+	m_prot_rega = 0;
+	m_prot_regb = 0;
 }
 
 
@@ -366,6 +414,7 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 }
 
 
+
 /*************************************
  *
  *  IDE controller access
@@ -399,6 +448,48 @@ void kinst_state::ide_extra_w(uint32_t data)
 
 /*************************************
  *
+ *  Upgrade kit CPLD simulation
+ *
+ *************************************/
+
+uint32_t kinst2uk_state::cpld_r(offs_t offset, uint32_t mem_mask)
+{
+	// returns last upper bits written with xor of counter and registers in lower 4 bits
+	if (m_prot_sel)
+		return (m_prot_sel << 4) | (m_prot_cnt ^ m_prot_rega ^ m_prot_regb);
+	else
+		return ide_r(0x0c, mem_mask);
+}
+
+
+void kinst2uk_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (BIT(data, 4)) // write to IDE slave (protection CPLD)
+	{
+		if (BIT(data, 6))
+		{
+			m_prot_sel = 0x05; // select IDE slave (D6 high)
+			m_prot_rega = data & 0x0f; // store lower 4 bits in register A
+		}
+		else
+		{
+			m_prot_sel = 0x01; // select IDE slave (D6 low)
+			m_prot_regb = data & 0x0f; // store lower 4 bits in register B
+			m_prot_cnt = (m_prot_cnt + 1) & 0x0f; // every write increments the counter
+		}
+	}
+	else // write to IDE master
+	{
+		m_prot_sel = 0; // deselect IDE slave
+	}
+
+	ide_w(0x0c, data, mem_mask);
+}
+
+
+
+/*************************************
+ *
  *  Control handling
  *
  *************************************/
@@ -406,32 +497,31 @@ void kinst_state::ide_extra_w(uint32_t data)
 uint32_t kinst_state::control_r(offs_t offset)
 {
 	uint32_t result;
-	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
 
-	/* apply shuffling */
+	// apply shuffling
 	offset = m_control_map[offset / 2];
 	result = m_control[offset];
 
 	switch (offset)
 	{
-		case 2:     /* $90 -- sound return */
-			result = ioport(portnames[offset])->read();
-			result &= ~0x0002;
-			if (m_dcs->control_r() & 0x800)
-				result |= 0x0002;
-			break;
+	case 2:     // $90 -- sound return
+		result = m_ports[offset]->read();
+		result &= ~0x0002;
+		if (m_dcs->control_r() & 0x800)
+			result |= 0x0002;
+		break;
 
-		case 0:     /* $80 */
-		case 1:     /* $88 */
-		case 3:     /* $98 */
-			result = ioport(portnames[offset])->read();
-			break;
+	case 0:     // $80
+	case 1:     // $88
+	case 3:     // $98
+		result = m_ports[offset]->read();
+		break;
 
-		case 4:     /* $a0 */
-			result = ioport(portnames[offset])->read();
-			if (m_maincpu->pc() == 0x802d428)
-				m_maincpu->spin_until_interrupt();
-			break;
+	case 4:     // $a0
+		result = m_ports[offset]->read();
+		if (m_maincpu->pc() == 0x802d428)
+			m_maincpu->spin_until_interrupt();
+		break;
 	}
 
 	return result;
@@ -440,31 +530,31 @@ uint32_t kinst_state::control_r(offs_t offset)
 
 void kinst_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	/* apply shuffling */
+	// apply shuffling
 	offset = m_control_map[offset / 2];
 	uint32_t olddata = m_control[offset];
 	COMBINE_DATA(&m_control[offset]);
 
 	switch (offset)
 	{
-		case 0:     /* $80 - VRAM buffer control */
-			if (data & 4)
-				m_video_base = &m_rambase[0x58000/4];
-			else
-				m_video_base = &m_rambase[0x30000/4];
-			break;
+	case 0:     // $80 - VRAM buffer control
+		if (data & 4)
+			m_video_base = &m_rambase[0x58000/4];
+		else
+			m_video_base = &m_rambase[0x30000/4];
+		break;
 
-		case 1:     /* $88 - sound reset */
-			m_dcs->reset_w(data & 0x01);
-			break;
+	case 1:     // $88 - sound reset
+		m_dcs->reset_w(data & 0x01);
+		break;
 
-		case 2:     /* $90 - sound control */
-			if (!(olddata & 0x02) && (m_control[offset] & 0x02))
-				m_dcs->data_w(m_control[3]);
-			break;
+	case 2:     // $90 - sound control
+		if (!(olddata & 0x02) && (m_control[offset] & 0x02))
+			m_dcs->data_w(m_control[3]);
+		break;
 
-		case 3:     /* $98 - sound data */
-			break;
+	case 3:     // $98 - sound data
+		break;
 	}
 }
 
@@ -476,17 +566,24 @@ void kinst_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
  *
  *************************************/
 
-void kinst_state::main_map(address_map &map)
+void kinst_state::kinst_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x0007ffff).ram().share("rambase");
-	map(0x08000000, 0x087fffff).ram().share("rambase2");
+	map(0x00000000, 0x0007ffff).ram().share(m_rambase);
+	map(0x08000000, 0x087fffff).ram().share(m_rambase2);
 	map(0x10000080, 0x100000ff).rw(FUNC(kinst_state::control_r), FUNC(kinst_state::control_w)).share("control");
 	map(0x10000100, 0x1000013f).rw(FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
 	map(0x10000170, 0x10000173).rw(FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
 }
 
+
+void kinst2uk_state::kinst2uk_map(address_map &map)
+{
+	kinst_map(map);
+
+	map(0x10000130, 0x10000133).rw(FUNC(kinst2uk_state::cpld_r), FUNC(kinst2uk_state::cpld_w));
+}
 
 
 
@@ -724,29 +821,38 @@ INPUT_PORTS_END
 
 void kinst_state::kinst(machine_config &config)
 {
-	/* basic machine hardware */
-	R4600LE(config, m_maincpu, MASTER_CLOCK*2);
+	// basic machine hardware
+	R4600LE(config, m_maincpu, 50_MHz_XTAL*2);
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kinst_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kinst_state::kinst_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kinst_state::irq0_start));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set_inputline("maincpu", 1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 319, 0, 239);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BGR_555);
 
-	/* sound hardware */
+	// sound hardware
 	DCS_AUDIO_2K(config, m_dcs, 0);
+}
+
+
+void kinst2uk_state::kinst2uk(machine_config &config)
+{
+	kinst(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &kinst2uk_state::kinst2uk_map);
 }
 
 
@@ -839,6 +945,8 @@ ROM_START( kinst2uk )
 	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
 ROM_END
 
+
+
 /*************************************
  *
  *  Driver initialization
@@ -849,7 +957,7 @@ void kinst_state::init_kinst()
 {
 	static const uint8_t kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
-	/* set up the control register mapping */
+	// set up the control register mapping
 	m_control_map = kinst_control_map;
 }
 
@@ -865,9 +973,11 @@ void kinst_state::init_kinst2()
 	// write: $98 on ki2 = $80 on ki
 	// write: $a0 on ki2 = $98 on ki
 
-	/* set up the control register mapping */
+	// set up the control register mapping
 	m_control_map = kinst2_control_map;
 }
+
+} // anonymous namespace
 
 
 
@@ -879,6 +989,6 @@ void kinst_state::init_kinst2()
 
  // versions selectable by changing bioses
 
-GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, init_kinst,  ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst2,   0,      kinst, kinst2, kinst_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst2uk, kinst2, kinst, kinst2, kinst_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kinst,    0,      kinst,    kinst,  kinst_state,    init_kinst,  ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kinst2,   0,      kinst,    kinst2, kinst_state,    init_kinst2, ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kinst2uk, kinst2, kinst2uk, kinst2, kinst2uk_state, init_kinst,  ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_SUPPORTS_SAVE )
