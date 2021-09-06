@@ -6,28 +6,28 @@
 //
 //============================================================
 {
-    "blend": {
-    	"equation": "add",
-    	"srcColor": "srcalpha",
-    	"dstColor": "1-srcalpha",
-    	"srcAlpha": "srcalpha",
-    	"dstAlpha": "1-srcalpha"
-    },
-    "depth": {
-    	"function": "always"
-    },
-    "cull": { "mode": "none" },
-    "write": {
-    	"rgb": true,
-    	"alpha": true
-    },
-    "vertex": "chains/hlsl/vs_chroma",
-    "fragment": "chains/hlsl/fs_chroma",
-    "uniforms": [
-    	{ "name": "s_tex",      "type": "int",  "values": [ 0.0 ] },
-	{ "name": "u_y_gain",   "type": "vec4", "values": [ 0.2124, 0.7011, 0.0866, 0.0 ] },
-	{ "name": "u_chroma_a", "type": "vec4", "values": [ 0.630, 0.340, 0.0, 0.0 ] },
-	{ "name": "u_chroma_b", "type": "vec4", "values": [ 0.310, 0.595, 0.0, 0.0 ] },
-	{ "name": "u_chroma_c", "type": "vec4", "values": [ 0.155, 0.070, 0.0, 0.0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "srcalpha",
+		"dstColor": "1-srcalpha",
+		"srcAlpha": "srcalpha",
+		"dstAlpha": "1-srcalpha"
+	},
+	"depth": {
+		"function": "always"
+	},
+	"cull": { "mode": "none" },
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+	"vertex": "chains/hlsl/vs_chroma",
+	"fragment": "chains/hlsl/fs_chroma",
+	"uniforms": [
+		{ "name": "s_tex",      "type": "int",  "values": [ 0.0 ] },
+		{ "name": "u_y_gain",   "type": "vec4", "values": [ 0.2124, 0.7011, 0.0866, 0.0 ] },
+		{ "name": "u_chroma_a", "type": "vec4", "values": [ 0.630, 0.340, 0.0, 0.0 ] },
+		{ "name": "u_chroma_b", "type": "vec4", "values": [ 0.310, 0.595, 0.0, 0.0 ] },
+		{ "name": "u_chroma_c", "type": "vec4", "values": [ 0.155, 0.070, 0.0, 0.0 ] }
+	]
 }

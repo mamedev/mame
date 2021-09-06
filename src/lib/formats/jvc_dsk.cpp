@@ -106,6 +106,8 @@
 
 #include "jvc_dsk.h"
 
+#include "ioprocs.h"
+
 
 jvc_format::jvc_format()
 {
@@ -126,19 +128,22 @@ const char *jvc_format::extensions() const
 	return "jvc,dsk";
 }
 
-bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id)
+bool jvc_format::parse_header(util::random_read &io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id)
 {
 	// The JVC format has a header whose size is the size of the image modulo 256.  Currently, we only
 	// handle up to five header bytes
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return false;
 	header_size = size % 256;
 	uint8_t header[5];
 
 	// if we know that this is a header of a bad size, we can fail immediately; otherwise read the header
+	size_t actual;
 	if (header_size >= sizeof(header))
 		return false;
 	if (header_size > 0)
-		io_generic_read(io, header, 0, header_size);
+		io.read_at(0, header, header_size, actual);
 
 	// default values
 	heads = 1;
@@ -168,13 +173,13 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 	return tracks * heads * sectors * sector_size == (size - header_size);
 }
 
-int jvc_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int jvc_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int header_size, tracks, heads, sectors, sector_size, sector_base_id;
 	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? 50 : 0;
 }
 
-bool jvc_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int header_size, track_count, head_count, sector_count, sector_size, sector_base_id;
 
@@ -210,7 +215,8 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 				sectors[interleave[i]].bad_crc = false;
 				sectors[interleave[i]].data = &sector_data[sector_offset];
 
-				io_generic_read(io, sectors[interleave[i]].data, file_offset, sector_size);
+				size_t actual;
+				io.read_at(file_offset, sectors[interleave[i]].data, sector_size, actual);
 
 				sector_offset += sector_size;
 				file_offset += sector_size;
@@ -223,7 +229,7 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	return true;
 }
 
-bool jvc_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool jvc_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t file_offset = 0;
 
@@ -236,7 +242,8 @@ bool jvc_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 		uint8_t header[2];
 		header[0] = 18;
 		header[1] = 2;
-		io_generic_write(io, header, file_offset, sizeof(header));
+		size_t actual;
+		io.write_at(file_offset, header, sizeof(header), actual);
 		file_offset += sizeof(header);
 	}
 
@@ -256,7 +263,8 @@ bool jvc_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 					return false;
 				}
 
-				io_generic_write(io, sectors[1 + i].data(), file_offset, 256);
+				size_t actual;
+				io.write_at(file_offset, sectors[1 + i].data(), 256, actual);
 				file_offset += 256;
 			}
 		}

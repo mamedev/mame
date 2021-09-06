@@ -270,16 +270,19 @@ disabled). Perhaps power on/off related??
 
 ******************************************************************************/
 
-
 #include "emu.h"
+
 #include "cpu/nec/nec.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define LOG     0
 
@@ -315,17 +318,9 @@ private:
 	uint8_t unk_a0_r();
 	void lcd_memory_start_w(uint8_t data);
 	uint8_t keyboard_r();
-	void banking_w(offs_t offset, uint8_t data) ;
+	void banking_w(offs_t offset, uint8_t data);
 	void update_banks();
-	void bank_w(uint8_t banknr, offs_t offset, uint8_t data);
-	void bank0_w(offs_t offset, uint8_t data) ;
-	void bank1_w(offs_t offset, uint8_t data) ;
-	void bank2_w(offs_t offset, uint8_t data) ;
-	void bank3_w(offs_t offset, uint8_t data) ;
-	void bank4_w(offs_t offset, uint8_t data) ;
-	void bank5_w(offs_t offset, uint8_t data) ;
-	void bank6_w(offs_t offset, uint8_t data) ;
-	void bank7_w(offs_t offset, uint8_t data) ;
+	template <unsigned N> void bank_w(offs_t offset, uint8_t data);
 
 	void nakajies_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
@@ -376,44 +371,36 @@ void nakajies_state::update_banks()
 			m_bank_base[i] = &m_rom_base[(((m_bank[i] & 0x0f) ^ 0xf) << 17) % m_rom_size];
 		}
 	}
-	membank( "bank0" )->set_base( m_bank_base[0] );
-	membank( "bank1" )->set_base( m_bank_base[1] );
-	membank( "bank2" )->set_base( m_bank_base[2] );
-	membank( "bank3" )->set_base( m_bank_base[3] );
-	membank( "bank4" )->set_base( m_bank_base[4] );
-	membank( "bank5" )->set_base( m_bank_base[5] );
-	membank( "bank6" )->set_base( m_bank_base[6] );
-	membank( "bank7" )->set_base( m_bank_base[7] );
+	membank( "bank0" )->set_base(m_bank_base[0]);
+	membank( "bank1" )->set_base(m_bank_base[1]);
+	membank( "bank2" )->set_base(m_bank_base[2]);
+	membank( "bank3" )->set_base(m_bank_base[3]);
+	membank( "bank4" )->set_base(m_bank_base[4]);
+	membank( "bank5" )->set_base(m_bank_base[5]);
+	membank( "bank6" )->set_base(m_bank_base[6]);
+	membank( "bank7" )->set_base(m_bank_base[7]);
 }
 
-void nakajies_state::bank_w( uint8_t banknr, offs_t offset, uint8_t data )
+template <unsigned N>
+void nakajies_state::bank_w(offs_t offset, uint8_t data)
 {
-	if ( m_bank[banknr] & 0x10 )
+	if (m_bank[N] & 0x10)
 	{
-		m_bank_base[banknr][offset] = data;
+		m_bank_base[N][offset] = data;
 	}
 }
-
-void nakajies_state::bank0_w(offs_t offset, uint8_t data) { bank_w( 0, offset, data ); }
-void nakajies_state::bank1_w(offs_t offset, uint8_t data) { bank_w( 1, offset, data ); }
-void nakajies_state::bank2_w(offs_t offset, uint8_t data) { bank_w( 2, offset, data ); }
-void nakajies_state::bank3_w(offs_t offset, uint8_t data) { bank_w( 3, offset, data ); }
-void nakajies_state::bank4_w(offs_t offset, uint8_t data) { bank_w( 4, offset, data ); }
-void nakajies_state::bank5_w(offs_t offset, uint8_t data) { bank_w( 5, offset, data ); }
-void nakajies_state::bank6_w(offs_t offset, uint8_t data) { bank_w( 6, offset, data ); }
-void nakajies_state::bank7_w(offs_t offset, uint8_t data) { bank_w( 7, offset, data ); }
 
 
 void nakajies_state::nakajies_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).bankr("bank0").w(FUNC(nakajies_state::bank0_w));
-	map(0x20000, 0x3ffff).bankr("bank1").w(FUNC(nakajies_state::bank1_w));
-	map(0x40000, 0x5ffff).bankr("bank2").w(FUNC(nakajies_state::bank2_w));
-	map(0x60000, 0x7ffff).bankr("bank3").w(FUNC(nakajies_state::bank3_w));
-	map(0x80000, 0x9ffff).bankr("bank4").w(FUNC(nakajies_state::bank4_w));
-	map(0xa0000, 0xbffff).bankr("bank5").w(FUNC(nakajies_state::bank5_w));
-	map(0xc0000, 0xdffff).bankr("bank6").w(FUNC(nakajies_state::bank6_w));
-	map(0xe0000, 0xfffff).bankr("bank7").w(FUNC(nakajies_state::bank7_w));
+	map(0x00000, 0x1ffff).bankr("bank0").w(FUNC(nakajies_state::bank_w<0>));
+	map(0x20000, 0x3ffff).bankr("bank1").w(FUNC(nakajies_state::bank_w<1>));
+	map(0x40000, 0x5ffff).bankr("bank2").w(FUNC(nakajies_state::bank_w<2>));
+	map(0x60000, 0x7ffff).bankr("bank3").w(FUNC(nakajies_state::bank_w<3>));
+	map(0x80000, 0x9ffff).bankr("bank4").w(FUNC(nakajies_state::bank_w<4>));
+	map(0xa0000, 0xbffff).bankr("bank5").w(FUNC(nakajies_state::bank_w<5>));
+	map(0xc0000, 0xdffff).bankr("bank6").w(FUNC(nakajies_state::bank_w<6>));
+	map(0xe0000, 0xfffff).bankr("bank7").w(FUNC(nakajies_state::bank_w<7>));
 }
 
 
@@ -842,6 +829,8 @@ ROM_START( es210_es )
 	ROM_REGION( 0x80000, "bios", 0 )
 	ROM_LOAD("nakajima_es.ic303", 0x00000, 0x80000, CRC(214d73ce) SHA1(ce9967c5b2d122ebebe9401278d8ea374e8fb289))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     CLASS           INIT        COMPANY     FULLNAME            FLAGS

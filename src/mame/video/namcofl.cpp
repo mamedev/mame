@@ -5,46 +5,6 @@
 #include "emu.h"
 #include "includes/namcofl.h"
 
-/* nth_word32 is a general-purpose utility function, which allows us to
- * read from 32-bit aligned memory as if it were an array of 16 bit words.
- */
-#ifdef UNUSED_FUNCTION
-static inline uint16_t
-nth_word32( const uint32_t *source, int which )
-{
-	source += which/2;
-	which ^= 1; /* i960 is little-endian */
-	if( which&1 )
-	{
-		return (*source)&0xffff;
-	}
-	else
-	{
-		return (*source)>>16;
-	}
-}
-#endif
-
-/* nth_byte32 is a general-purpose utility function, which allows us to
- * read from 32-bit aligned memory as if it were an array of bytes.
- */
-#ifdef UNUSED_FUNCTION
-static inline uint8_t
-nth_byte32( const uint32_t *pSource, int which )
-{
-		uint32_t data = pSource[which/4];
-
-		which ^= 3; /* i960 is little-endian */
-		switch( which&3 )
-		{
-		case 0: return data>>24;
-		case 1: return (data>>16)&0xff;
-		case 2: return (data>>8)&0xff;
-		default: return data&0xff;
-		}
-} /* nth_byte32 */
-#endif
-
 void namcofl_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {
 	*tile = code;
@@ -70,11 +30,10 @@ uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	clip.max_y = m_c116->get_reg(3) - 0x21 - 1;
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
-	int pri;
 
 	bitmap.fill(m_c116->black_pen(), cliprect );
 
-	for( pri=0; pri<16; pri++ )
+	for( int pri=0; pri<16; pri++ )
 	{
 		m_c169roz->draw(screen, bitmap, clip, pri);
 		if ((pri & 1) == 0)

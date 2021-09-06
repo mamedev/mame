@@ -69,15 +69,11 @@ namespace emu::detail {
 class device_type_impl_base;
 
 
-template <typename T> struct is_device_implementation
-{
-	static constexpr bool value = std::is_base_of<device_t, T>::value;
-};
+template <typename T>
+using is_device_implementation = std::bool_constant<std::is_base_of_v<device_t, T> >;
 
-template <typename T> struct is_device_interface
-{
-	static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value;
-};
+template <typename T>
+using is_device_interface = std::bool_constant<std::is_base_of_v<device_interface, T> && !is_device_implementation<T>::value>;
 
 
 struct device_feature
@@ -434,7 +430,6 @@ class device_t : public delegate_late_bind
 		friend class device_t;
 		friend class device_interface;
 		friend class device_memory_interface;
-		friend class device_state_interface;
 		friend class device_execute_interface;
 
 	public:
@@ -464,7 +459,7 @@ class device_t : public delegate_late_bind
 		};
 
 		// construction/destruction
-		interface_list() : m_head(nullptr), m_execute(nullptr), m_memory(nullptr), m_state(nullptr) { }
+		interface_list() : m_head(nullptr), m_execute(nullptr), m_memory(nullptr) { }
 
 		// getters
 		device_interface *first() const { return m_head; }
@@ -477,7 +472,6 @@ class device_t : public delegate_late_bind
 		device_interface *m_head;               // head of interface list
 		device_execute_interface *m_execute;    // pre-cached pointer to execute interface
 		device_memory_interface *m_memory;      // pre-cached pointer to memory interface
-		device_state_interface *m_state;        // pre-cached pointer to state interface
 	};
 
 protected:
@@ -558,11 +552,8 @@ public:
 	bool interface(device_execute_interface *&intf) const { intf = m_interfaces.m_execute; return (intf != nullptr); }
 	bool interface(device_memory_interface *&intf) { intf = m_interfaces.m_memory; return (intf != nullptr); }
 	bool interface(device_memory_interface *&intf) const { intf = m_interfaces.m_memory; return (intf != nullptr); }
-	bool interface(device_state_interface *&intf) { intf = m_interfaces.m_state; return (intf != nullptr); }
-	bool interface(device_state_interface *&intf) const { intf = m_interfaces.m_state; return (intf != nullptr); }
 	device_execute_interface &execute() const { assert(m_interfaces.m_execute != nullptr); return *m_interfaces.m_execute; }
 	device_memory_interface &memory() const { assert(m_interfaces.m_memory != nullptr); return *m_interfaces.m_memory; }
-	device_state_interface &state() const { assert(m_interfaces.m_state != nullptr); return *m_interfaces.m_state; }
 
 	// owned object helpers
 	subdevice_list &subdevices() { return m_subdevices; }

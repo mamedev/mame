@@ -91,7 +91,7 @@ image_init_result aquarius_cartridge_slot_device::call_load()
 
 		if (size % 0x1000)
 		{
-			seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid ROM size");
+			seterror(image_error::INVALIDIMAGE, "Invalid ROM size");
 			return image_init_result::FAIL;
 		}
 

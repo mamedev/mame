@@ -259,6 +259,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/apricot/video/video.h,BUSES["APRICOT_VIDEO"] = true
+---------------------------------------------------
+
+if (BUSES["APRICOT_VIDEO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/apricot/video/video.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/video/video.h",
+		MAME_DIR .. "src/devices/bus/apricot/video/cards.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/video/cards.h",
+		MAME_DIR .. "src/devices/bus/apricot/video/mono.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/video/mono.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/aquarius/slot.h,BUSES["AQUARIUS"] = true
 ---------------------------------------------------
 
@@ -1087,6 +1104,8 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/fbjoy.h",
 		MAME_DIR .. "src/devices/bus/electron/fbprint.cpp",
 		MAME_DIR .. "src/devices/bus/electron/fbprint.h",
+		MAME_DIR .. "src/devices/bus/electron/mc68k.cpp",
+		MAME_DIR .. "src/devices/bus/electron/mc68k.h",
 		MAME_DIR .. "src/devices/bus/electron/mode7.cpp",
 		MAME_DIR .. "src/devices/bus/electron/mode7.h",
 		MAME_DIR .. "src/devices/bus/electron/plus1.cpp",
@@ -2472,6 +2491,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.h",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
+		MAME_DIR .. "src/devices/bus/a2bus/q68.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/q68.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard128k.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard128k.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard16k.cpp",
@@ -2791,8 +2812,6 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/henggedianzi.h",
 		MAME_DIR .. "src/devices/bus/nes/hes.cpp",
 		MAME_DIR .. "src/devices/bus/nes/hes.h",
-		MAME_DIR .. "src/devices/bus/nes/hosenkan.cpp",
-		MAME_DIR .. "src/devices/bus/nes/hosenkan.h",
 		MAME_DIR .. "src/devices/bus/nes/irem.cpp",
 		MAME_DIR .. "src/devices/bus/nes/irem.h",
 		MAME_DIR .. "src/devices/bus/nes/jaleco.cpp",
@@ -4345,6 +4364,8 @@ if (BUSES["CBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.h",	
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",

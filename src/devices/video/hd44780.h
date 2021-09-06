@@ -33,6 +33,7 @@ public:
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
 	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 	void set_busy_factor(float f) { m_busy_factor = f; } // it's a workaround for inaccurate busy flag emulation
+	void set_function_set_at_any_time(bool v = true) { m_function_set_at_any_time = v; }
 
 	// device interface
 	void write(offs_t offset, u8 data);
@@ -135,6 +136,7 @@ private:
 	bool        m_nibble;
 	int         m_charset_type;
 	u8          m_render_buf[80 * 16];
+	bool        m_function_set_at_any_time;
 
 	enum        { DDRAM, CGRAM };
 };

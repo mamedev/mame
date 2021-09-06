@@ -152,7 +152,7 @@ image_init_result apf_cart_slot_device::call_load()
 
 		if (size > 0x3800)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for an APF cart");
+			seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an APF cart");
 			return image_init_result::FAIL;
 		}
 

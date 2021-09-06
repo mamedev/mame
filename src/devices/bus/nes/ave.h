@@ -50,9 +50,9 @@ class nes_maxi15_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_h(offs_t offset) override;
+	virtual u8 read_h(offs_t offset) override;
 
 	virtual void pcb_reset() override;
 
@@ -61,9 +61,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	void update_banks();
-
-	uint8_t m_reg, m_bank;
+	u8 m_reg[2];
 };
 
 

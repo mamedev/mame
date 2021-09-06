@@ -100,6 +100,8 @@
 
 #include "ap_dsk35.h"
 
+#include "ioprocs.h"
+
 #include <cassert>
 #include <cstdio>
 
@@ -1233,14 +1235,15 @@ bool dc42_format::supports_save() const
 	return true;
 }
 
-int dc42_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint8_t h[0x54];
-	uint64_t size = io_generic_size(io);
-	if(size < 0x54)
+	uint64_t size;
+	if(io.length(size) || (size < 0x54))
 		return 0;
 
-	io_generic_read(io, h, 0, 0x54);
+	uint8_t h[0x54];
+	size_t actual;
+	io.read_at(0, h, 0x54, actual);
 	uint32_t dsize = (h[0x40] << 24) | (h[0x41] << 16) | (h[0x42] << 8) | h[0x43];
 	uint32_t tsize = (h[0x44] << 24) | (h[0x45] << 16) | (h[0x46] << 8) | h[0x47];
 
@@ -1252,13 +1255,14 @@ int dc42_format::identify(io_generic *io, uint32_t form_factor, const std::vecto
 		return 0;
 	}
 
-	return size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0 ? 100 : 0;
+	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? 100 : 0;
 }
 
-bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	uint8_t h[0x54];
-	io_generic_read(io, h, 0, 0x54);
+	io.read_at(0, h, 0x54, actual);
 	int dsize = (h[0x40] << 24) | (h[0x41] << 16) | (h[0x42] << 8) | h[0x43];
 	int tsize = (h[0x44] << 24) | (h[0x45] << 16) | (h[0x46] << 8) | h[0x47];
 
@@ -1270,8 +1274,7 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<u
 		return false;
 	}
 
-	switch (dsize)
-	{
+	switch(dsize) {
 		case 409600:    // Mac 400K
 			image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
 			break;
@@ -1315,13 +1318,14 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<u
 				sectors[si].sector = i;
 				sectors[si].info = format;
 				if(tsize) {
-					io_generic_read(io, data, pos_tag, 12);
+					io.read_at(pos_tag, data, 12, actual);
 					sectors[si].tag = data;
 					pos_tag += 12;
-				} else
+				} else {
 					sectors[si].tag = nullptr;
+				}
 				sectors[si].data = data+12;
-				io_generic_read(io, data+12, pos_data, 512);
+				io.read_at(pos_data, data+12, 512, actual);
 				pos_data += 512;
 				si = (si + 2) % ns;
 				if(si == 0)
@@ -1341,7 +1345,7 @@ void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 	}
 }
 
-bool dc42_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int g_tracks, g_heads;
 	image->get_actual_geometry(g_tracks, g_heads);
@@ -1381,8 +1385,9 @@ bool dc42_format::save(io_generic *io, const std::vector<uint32_t> &variants, fl
 			for(unsigned int i=0; i < sectors.size(); i++) {
 				auto &sdata = sectors[i];
 				sdata.resize(512+12);
-				io_generic_write(io, &sdata[0], pos_tag, 12);
-				io_generic_write(io, &sdata[12], pos_data, 512);
+				size_t actual;
+				io.write_at(pos_tag, &sdata[0], 12, actual);
+				io.write_at(pos_data, &sdata[12], 512, actual);
 				pos_tag += 12;
 				pos_data += 512;
 				if(track || head || i)
@@ -1401,7 +1406,8 @@ bool dc42_format::save(io_generic *io, const std::vector<uint32_t> &variants, fl
 	h[0x4e] = tchk >> 8;
 	h[0x4f] = tchk;
 
-	io_generic_write(io, h, 0, 0x54);
+	size_t actual;
+	io.write_at(0, h, 0x54, actual);
 	return true;
 }
 
@@ -1432,26 +1438,32 @@ bool apple_gcr_format::supports_save() const
 	return true;
 }
 
-int apple_gcr_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apple_gcr_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return 0;
+
 	if(size == 409600 || (size == 819200 && (variants.empty() || has_variant(variants, floppy_image::DSDD))))
 		return 50;
 
 	return 0;
 }
 
-bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	desc_gcr_sector sectors[12];
 	uint8_t sdata[512*12];
 
 	int pos_data = 0;
 
 	uint8_t header[64];
-	io_generic_read(io, header, 0, 64);
+	io.read_at(0, header, 64, actual);
 
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return false;
 	int head_count = size == 409600 ? 1 : size == 819200 ? 2 : 0;
 
 	image->set_form_variant(floppy_image::FF_35, head_count == 2 ? floppy_image::DSDD : floppy_image::SSDD);
@@ -1461,7 +1473,7 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < head_count; head++) {
 			int ns = 12 - (track/16);
-			io_generic_read(io, sdata, pos_data, 512*ns);
+			io.read_at(pos_data, sdata, 512*ns, actual);
 			pos_data += 512*ns;
 
 			int si = 0;
@@ -1482,7 +1494,7 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	return true;
 }
 
-bool apple_gcr_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int g_tracks, g_heads;
 	image->get_actual_geometry(g_tracks, g_heads);
@@ -1498,7 +1510,8 @@ bool apple_gcr_format::save(io_generic *io, const std::vector<uint32_t> &variant
 			for(unsigned int i=0; i < sectors.size(); i++) {
 				auto &sdata = sectors[i];
 				sdata.resize(512+12);
-				io_generic_write(io, &sdata[12], pos_data, 512);
+				size_t actual;
+				io.write_at(pos_data, &sdata[12], 512, actual);
 				pos_data += 512;
 			}
 		}
@@ -1534,10 +1547,11 @@ bool apple_2mg_format::supports_save() const
 	return true;
 }
 
-int apple_2mg_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t signature[4];
-	io_generic_read(io, signature, 0, 4);
+	size_t actual;
+	io.read_at(0, signature, 4, actual);
 	if (!strncmp(reinterpret_cast<char *>(signature), "2IMG", 4))
 	{
 		return 100;
@@ -1552,11 +1566,12 @@ int apple_2mg_format::identify(io_generic *io, uint32_t form_factor, const std::
 	return 0;
 }
 
-bool apple_2mg_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	desc_gcr_sector sectors[12];
 	uint8_t sdata[512*12], header[64];
-	io_generic_read(io, header, 0, 64);
+	io.read_at(0, header, 64, actual);
 	uint32_t blocks = header[0x14] | (header[0x15] << 8) | (header[0x16] << 16) | (header[0x17] << 24);
 	uint32_t pos_data = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
 
@@ -1568,7 +1583,7 @@ bool apple_2mg_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < 2; head++) {
 			int ns = 12 - (track/16);
-			io_generic_read(io, sdata, pos_data, 512*ns);
+			io.read_at(pos_data, sdata, 512*ns, actual);
 			pos_data += 512*ns;
 
 			int si = 0;
@@ -1589,8 +1604,10 @@ bool apple_2mg_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	return true;
 }
 
-bool apple_2mg_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
+
 	uint8_t header[0x40];
 	int pos_data = 0x40;
 
@@ -1611,7 +1628,7 @@ bool apple_2mg_format::save(io_generic *io, const std::vector<uint32_t> &variant
 	header[0x18] = 0x40;
 	// bytes of disk data
 	header[0x1c] = 0x00; header[0x1d] = 0x80; header[0x1e] = 0x0c;  // 0xC8000 (819200)
-	io_generic_write(io, header, 0, 0x40);
+	io.write_at(0, header, 0x40, actual);
 
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < 2; head++) {
@@ -1619,7 +1636,7 @@ bool apple_2mg_format::save(io_generic *io, const std::vector<uint32_t> &variant
 			for(unsigned int i=0; i < sectors.size(); i++) {
 				auto &sdata = sectors[i];
 				sdata.resize(512+12);
-				io_generic_write(io, &sdata[12], pos_data, 512);
+				io.write_at(pos_data, &sdata[12], 512, actual);
 				pos_data += 512;
 			}
 		}

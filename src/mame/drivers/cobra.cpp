@@ -2517,7 +2517,7 @@ void cobra_renderer::gfx_fifo_exec()
 				}
 
 
-				cobra_polydata &extra = object_data_alloc();
+				cobra_polydata &extra = object_data().next();
 
 				int texture = (m_gfx_gram[0x400f4/4] >> 29);
 

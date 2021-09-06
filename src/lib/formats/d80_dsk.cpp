@@ -8,9 +8,10 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/d80_dsk.h"
+
+#include "ioprocs.h"
+
 
 d80_format::d80_format() : d64_format(file_formats), formats(nullptr)
 {

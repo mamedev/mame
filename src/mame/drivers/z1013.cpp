@@ -380,7 +380,7 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 	{ }
 	else
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Not a Z1013 image");
+		image.seterror(image_error::INVALIDIMAGE, "Not a Z1013 image");
 		image.message(" Not a Z1013 image");
 		return image_init_result::FAIL;
 	}
@@ -392,7 +392,7 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 		m_maincpu->set_state_int(Z80_PC, runaddr);
 	else
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Loaded but cannot run");
+		image.seterror(image_error::INVALIDIMAGE, "Loaded but cannot run");
 		image.message(" Loaded but cannot run");
 	}
 

@@ -1710,8 +1710,8 @@ avi_file::error avi_file_impl::read_uncompressed_video_frame(std::uint32_t frame
 
 	/* read in the data */
 	std::uint32_t bytes_read;
-	osd_file::error const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(framenum).offset, stream->chunk(framenum).length, bytes_read);
-	if (filerr != osd_file::error::NONE || bytes_read != stream->chunk(framenum).length)
+	std::error_condition const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(framenum).offset, stream->chunk(framenum).length, bytes_read);
+	if (filerr || bytes_read != stream->chunk(framenum).length)
 		return error::READ_ERROR;
 
 	/* validate this is good data */
@@ -1765,8 +1765,8 @@ avi_file::error avi_file_impl::read_video_frame(std::uint32_t framenum, bitmap_y
 
 	/* read in the data */
 	std::uint32_t bytes_read;
-	osd_file::error const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(framenum).offset, stream->chunk(framenum).length, bytes_read);
-	if (filerr != osd_file::error::NONE || bytes_read != stream->chunk(framenum).length)
+	std::error_condition const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(framenum).offset, stream->chunk(framenum).length, bytes_read);
+	if (filerr || bytes_read != stream->chunk(framenum).length)
 		return error::READ_ERROR;
 
 	/* validate this is good data */
@@ -1857,8 +1857,8 @@ avi_file::error avi_file_impl::read_sound_samples(int channel, std::uint32_t fir
 			return avierr;
 
 		/* read in the data */
-		auto const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(chunknum).offset, stream->chunk(chunknum).length, bytes_read);
-		if (filerr != osd_file::error::NONE || bytes_read != stream->chunk(chunknum).length)
+		std::error_condition const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(chunknum).offset, stream->chunk(chunknum).length, bytes_read);
+		if (filerr || bytes_read != stream->chunk(chunknum).length)
 			return error::READ_ERROR;
 
 		/* validate this is good data */
@@ -2085,14 +2085,15 @@ avi_file::error avi_file_impl::append_sound_samples(int channel, const std::int1
 
 avi_file::error avi_file_impl::read_chunk_data(avi_chunk const &chunk, std::unique_ptr<std::uint8_t []> &buffer)
 {
-	/* allocate memory for the data */
-	try { buffer.reset(new std::uint8_t[chunk.size]); }
-	catch (...) { return error::NO_MEMORY; }
+	// allocate memory for the data
+	buffer.reset(new (std::nothrow) std::uint8_t[chunk.size]);
+	if (!buffer)
+		return error::NO_MEMORY;
 
-	/* read from the file */
+	// read from the file
 	std::uint32_t bytes_read;
-	osd_file::error const filerr = m_file->read(&buffer[0], chunk.offset + 8, chunk.size, bytes_read);
-	if (filerr != osd_file::error::NONE || bytes_read != chunk.size)
+	std::error_condition const filerr = m_file->read(&buffer[0], chunk.offset + 8, chunk.size, bytes_read);
+	if (filerr || bytes_read != chunk.size)
 	{
 		buffer.reset();
 		return error::READ_ERROR;
@@ -2292,35 +2293,33 @@ avi_file::error avi_file_impl::find_next_list(std::uint32_t findme, const avi_ch
 
 avi_file::error avi_file_impl::get_next_chunk_internal(const avi_chunk *parent, avi_chunk &newchunk, std::uint64_t offset)
 {
-	osd_file::error filerr;
-	std::uint8_t buffer[12];
-	std::uint32_t bytesread;
-
-	/* nullptr parent implies the root */
-	if (parent == nullptr)
+	// nullptr parent implies the root
+	if (!parent)
 		parent = &m_rootchunk;
 
-	/* start at the current offset */
+	// start at the current offset
 	newchunk.offset = offset;
 
-	/* if we're past the bounds of the parent, bail */
+	// if we're past the bounds of the parent, bail
 	if (newchunk.offset + 8 >= parent->offset + 8 + parent->size)
 		return error::END;
 
-	/* read the header */
-	filerr = m_file->read(buffer, newchunk.offset, 8, bytesread);
-	if (filerr != osd_file::error::NONE || bytesread != 8)
+	// read the header
+	std::uint8_t buffer[12];
+	std::uint32_t bytesread;
+	std::error_condition filerr = m_file->read(buffer, newchunk.offset, 8, bytesread);
+	if (filerr || bytesread != 8)
 		return error::INVALID_DATA;
 
-	/* fill in the new chunk */
+	// fill in the new chunk
 	newchunk.type = fetch_32bits(&buffer[0]);
 	newchunk.size = fetch_32bits(&buffer[4]);
 
-	/* if we are a list, fetch the list type */
+	// if we are a list, fetch the list type
 	if (newchunk.type == CHUNKTYPE_LIST || newchunk.type == CHUNKTYPE_RIFF)
 	{
 		filerr = m_file->read(&buffer[8], newchunk.offset + 8, 4, bytesread);
-		if (filerr != osd_file::error::NONE || bytesread != 4)
+		if (filerr || bytesread != 4)
 			return error::INVALID_DATA;
 		newchunk.listtype = fetch_32bits(&buffer[8]);
 	}
@@ -2643,16 +2642,15 @@ avi_file::error avi_file_impl::parse_indx_chunk(avi_stream &stream, avi_chunk co
 		/* loop over entries and create subchunks for each */
 		for (std::uint32_t entry = 0; entry < entries; entry++)
 		{
-			const std::uint8_t *base = &chunkdata[24 + entry * 16];
-			osd_file::error filerr;
+			std::uint8_t const *const base = &chunkdata[24 + entry * 16];
 			avi_chunk subchunk;
-			std::uint32_t bytes_read;
-			std::uint8_t buffer[8];
 
 			/* go read the subchunk */
 			subchunk.offset = fetch_64bits(&base[0]);
-			filerr = m_file->read(buffer, subchunk.offset, sizeof(buffer), bytes_read);
-			if (filerr != osd_file::error::NONE || bytes_read != sizeof(buffer))
+			std::uint32_t bytes_read;
+			std::uint8_t buffer[8];
+			std::error_condition const filerr = m_file->read(buffer, subchunk.offset, sizeof(buffer), bytes_read);
+			if (filerr || bytes_read != sizeof(buffer))
 			{
 				avierr = error::READ_ERROR;
 				break;
@@ -2788,8 +2786,8 @@ avi_file::error avi_file_impl::chunk_open(std::uint32_t type, std::uint32_t list
 
 		/* write the header */
 		std::uint32_t written;
-		osd_file::error const filerr = m_file->write(buffer, m_writeoffs, sizeof(buffer), written);
-		if (filerr != osd_file::error::NONE || written != sizeof(buffer))
+		std::error_condition const filerr = m_file->write(buffer, m_writeoffs, sizeof(buffer), written);
+		if (filerr || written != sizeof(buffer))
 			return error::WRITE_ERROR;
 		m_writeoffs += written;
 	}
@@ -2806,8 +2804,8 @@ avi_file::error avi_file_impl::chunk_open(std::uint32_t type, std::uint32_t list
 
 		/* write the header */
 		std::uint32_t written;
-		osd_file::error const filerr = m_file->write(buffer, m_writeoffs, sizeof(buffer), written);
-		if (filerr != osd_file::error::NONE || written != sizeof(buffer))
+		std::error_condition const filerr = m_file->write(buffer, m_writeoffs, sizeof(buffer), written);
+		if (filerr || written != sizeof(buffer))
 			return error::WRITE_ERROR;
 		m_writeoffs += written;
 	}
@@ -2846,8 +2844,8 @@ avi_file::error avi_file_impl::chunk_close()
 
 		put_32bits(&buffer[0], std::uint32_t(chunksize));
 		std::uint32_t written;
-		osd_file::error const filerr = m_file->write(buffer, chunk.offset + 4, sizeof(buffer), written);
-		if (filerr != osd_file::error::NONE || written != sizeof(buffer))
+		std::error_condition const filerr = m_file->write(buffer, chunk.offset + 4, sizeof(buffer), written);
+		if (filerr || written != sizeof(buffer))
 			return error::WRITE_ERROR;
 	}
 
@@ -2925,8 +2923,8 @@ avi_file::error avi_file_impl::chunk_write(std::uint32_t type, const void *data,
 
 	/* write the data */
 	std::uint32_t written;
-	osd_file::error const filerr = m_file->write(data, m_writeoffs, length, written);
-	if (filerr != osd_file::error::NONE || written != length)
+	std::error_condition const filerr = m_file->write(data, m_writeoffs, length, written);
+	if (filerr || written != length)
 		return error::WRITE_ERROR;
 	m_writeoffs += written;
 
@@ -3678,7 +3676,7 @@ avi_file::error avi_file::open(std::string const &filename, ptr &file)
 	/* open the file */
 	osd_file::ptr f;
 	std::uint64_t length;
-	if (osd_file::open(filename, OPEN_FLAG_READ, f, length) != osd_file::error::NONE)
+	if (osd_file::open(filename, OPEN_FLAG_READ, f, length))
 		return error::CANT_OPEN_FILE;
 
 	/* allocate the file */
@@ -3731,8 +3729,8 @@ avi_file::error avi_file::create(std::string const &filename, movie_info const &
 	/* open the file */
 	osd_file::ptr f;
 	std::uint64_t length;
-	osd_file::error const filerr = osd_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, f, length);
-	if (filerr != osd_file::error::NONE)
+	std::error_condition const filerr = osd_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, f, length);
+	if (filerr)
 		return error::CANT_OPEN_FILE;
 
 	/* allocate the file */

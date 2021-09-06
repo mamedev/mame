@@ -112,7 +112,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 
 	if (size != 0x1000 && size != 0x1100 && size != 0x2000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file size");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file size");
 		return image_init_result::FAIL;
 	}
 
@@ -125,7 +125,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		// TMS1670 MCU
 		if (!image.loaded_through_softlist())
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load TMS1670 type through softwarelist");
+			image.seterror(image_error::INVALIDIMAGE, "Can only load TMS1670 type through softwarelist");
 			return image_init_result::FAIL;
 		}
 
@@ -136,7 +136,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		size = image.get_software_region_length("rom:mpla");
 		if (size != 867)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid MPLA file size");
+			image.seterror(image_error::INVALIDIMAGE, "Invalid MPLA file size");
 			return image_init_result::FAIL;
 		}
 		memcpy(memregion("tms1k_cpu:mpla")->base(), image.get_software_region("rom:mpla"), size);
@@ -144,7 +144,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		size = image.get_software_region_length("rom:opla");
 		if (size != 557)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid OPLA file size");
+			image.seterror(image_error::INVALIDIMAGE, "Invalid OPLA file size");
 			return image_init_result::FAIL;
 		}
 		memcpy(memregion("tms1k_cpu:opla")->base(), image.get_software_region("rom:opla"), size);

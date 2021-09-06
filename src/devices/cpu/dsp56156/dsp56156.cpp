@@ -345,7 +345,6 @@ void dsp56156_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_core.PCU.pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_core.ppc).noshow();
-	state_add(STATE_GENSP, "GENSP", m_core.PCU.sp).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_core.PCU.sr).formatstr("%14s").noshow();
 
 	set_icountptr(m_core.icount);

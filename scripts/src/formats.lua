@@ -33,8 +33,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/all.cpp",
 		MAME_DIR .. "src/lib/formats/all.h",
 
-		MAME_DIR .. "src/lib/formats/ioprocs.cpp",
-		MAME_DIR .. "src/lib/formats/ioprocs.h",
 		MAME_DIR .. "src/lib/formats/imageutl.cpp",
 		MAME_DIR .. "src/lib/formats/imageutl.h",
 
@@ -71,6 +69,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/dfi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/dfi_dsk.h",
 		MAME_DIR .. "src/lib/formats/fdi_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/rpk.cpp",
+		MAME_DIR .. "src/lib/formats/rpk.h",
 
 		MAME_DIR .. "src/lib/formats/fsmgr.h",
 		MAME_DIR .. "src/lib/formats/fsmgr.cpp",

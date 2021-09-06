@@ -113,6 +113,8 @@ public:
 	template<int I> void int_w(bool state) { m_int_callback[I](state); }
 	template<typename R, typename W> void install_io(offs_t start, offs_t end, R rhandler, W whandler);
 
+	void flush_install_io(const char *client_tag, u16 old_io, u16 new_io, u16 size, read8sm_delegate rhandler, write8sm_delegate whandler);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

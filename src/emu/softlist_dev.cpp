@@ -288,9 +288,9 @@ void software_list_device::parse()
 
 	// attempt to open the file
 	emu_file file(mconfig().options().hash_path(), OPEN_FLAG_READ);
-	const osd_file::error filerr = file.open(m_list_name + ".xml");
+	const std::error_condition filerr = file.open(m_list_name + ".xml");
 	m_filename = file.filename();
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 	{
 		// parse if no error
 		std::ostringstream errs;
@@ -298,7 +298,7 @@ void software_list_device::parse()
 		file.close();
 		m_errors = errs.str();
 	}
-	else if (filerr == osd_file::error::NOT_FOUND)
+	else if (std::errc::no_such_file_or_directory == filerr)
 	{
 		osd_printf_verbose("%s: Software list %s not found\n", tag(), m_filename);
 	}

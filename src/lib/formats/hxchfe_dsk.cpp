@@ -101,6 +101,9 @@
 
 #include "hxchfe_dsk.h"
 
+#include "ioprocs.h"
+
+
 #define HFE_FORMAT_HEADER   "HXCPICFE"
 
 #define HEADER_LENGTH 512
@@ -144,19 +147,21 @@ bool hfe_format::supports_save() const
 	return true;
 }
 
-int hfe_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t header[8];
 
-	io_generic_read(io, &header, 0, sizeof(header));
+	size_t actual;
+	io.read_at(0, &header, sizeof(header), actual);
 	if ( memcmp( header, HFE_FORMAT_HEADER, 8 ) ==0) {
 		return 100;
 	}
 	return 0;
 }
 
-bool hfe_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	uint8_t header[HEADER_LENGTH];
 	uint8_t track_table[TRACK_TABLE_LENGTH];
 
@@ -164,7 +169,7 @@ bool hfe_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	image->get_maximal_geometry(drivecyl, driveheads);
 
 	// read header
-	io_generic_read(io, header, 0, HEADER_LENGTH);
+	io.read_at(0, header, HEADER_LENGTH, actual);
 
 	// get values
 	// Format revision must be 0
@@ -236,7 +241,7 @@ bool hfe_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	// read track lookup table (multiple of 512)
 	int table_offset = (header[18] & 0xff) | ((header[19] & 0xff)<<8);
 
-	io_generic_read(io, track_table, table_offset<<9, TRACK_TABLE_LENGTH);
+	io.read_at(table_offset<<9, track_table, TRACK_TABLE_LENGTH, actual);
 
 	for (int i=0; i < m_cylinders; i++)
 	{
@@ -252,7 +257,7 @@ bool hfe_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		// The HFE format defines an interleave of the two sides per cylinder
 		// at every 256 bytes
 		cylinder_buffer.resize(m_cyl_length[cyl]);
-		io_generic_read(io, &cylinder_buffer[0], m_cyl_offset[cyl]<<9, m_cyl_length[cyl]);
+		io.read_at(m_cyl_offset[cyl]<<9, &cylinder_buffer[0], m_cyl_length[cyl], actual);
 
 		generate_track_from_hfe_bitstream(cyl, 0, samplelength, &cylinder_buffer[0], m_cyl_length[cyl], image);
 		if (m_heads == 2)
@@ -412,8 +417,9 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	image->set_write_splice_position(cyl, head, 0, 0);
 }
 
-bool hfe_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool hfe_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	std::vector<uint8_t> cylbuf;
 
 	// Create a buffer that is big enough to handle HD formats. We don't
@@ -484,7 +490,7 @@ bool hfe_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 			header[13] = (m_bit_rate >> 8) & 0xff;
 
 			// Now write the header
-			io_generic_write(io, header, 0, HEADER_LENGTH);
+			io.write_at(0, header, HEADER_LENGTH, actual);
 
 			// Set up the track lookup table
 			// We need the encoding value to be sure about the track length
@@ -505,10 +511,10 @@ bool hfe_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 			for (int i=m_cylinders*4; i < TRACK_TABLE_LENGTH; i++)
 				track_table[i] = 0xff;
 
-			io_generic_write(io, track_table, 0x200, TRACK_TABLE_LENGTH);
+			io.write_at(0x200, track_table, TRACK_TABLE_LENGTH, actual);
 		}
 		// Write the current cylinder
-		io_generic_write(io, &cylbuf[0], m_cyl_offset[cyl]<<9, (m_cyl_length[cyl] + 0x1ff) & 0xfe00);
+		io.write_at(m_cyl_offset[cyl]<<9, &cylbuf[0], (m_cyl_length[cyl] + 0x1ff) & 0xfe00, actual);
 	}
 	return true;
 }

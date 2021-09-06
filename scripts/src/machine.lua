@@ -826,6 +826,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/applepic.h,MACHINES["APPLEPIC"] = true
+---------------------------------------------------
+
+if (MACHINES["APPLEPIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/applepic.cpp",
+		MAME_DIR .. "src/devices/machine/applepic.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/at28c16.h,MACHINES["AT28C16"] = true
 ---------------------------------------------------
 
@@ -3433,6 +3445,18 @@ if (MACHINES["UPD1990A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/upd1990a.cpp",
 		MAME_DIR .. "src/devices/machine/upd1990a.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/upd4991a.h,MACHINES["UPD4991A"] = true
+---------------------------------------------------
+
+if (MACHINES["UPD4991A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upd4991a.cpp",
+		MAME_DIR .. "src/devices/machine/upd4991a.h",
 	}
 end
 

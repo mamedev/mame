@@ -205,12 +205,12 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 
 	if(!BIT(m_reg0, 7))
 	{
-		vram_w(address >> 1, 0);
-		vram_w((0x20000 + address) >> 1, 0);
+		vram_w(address, 0);
+		vram_w((0x10000 + address), 0);
 	}
 
-	int const gfx1 = m_video_ram[(address & 0x7fff) >> 1];
-	int const gfx2 = m_video_ram[((address & 0x7fff) + 0x8000) >> 1];
+	int const gfx1 = m_video_ram[(address & 0x3fff)];
+	int const gfx2 = m_video_ram[((address & 0x3fff) + 0x4000)];
 
 	bool const color = m_monitor->read() ? true : false;
 	for(int xi=0;xi<16;xi++)

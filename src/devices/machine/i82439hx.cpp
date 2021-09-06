@@ -8,7 +8,11 @@ DEFINE_DEVICE_TYPE(I82439HX, i82439hx_host_device, "i82439hx", "Intel 82439HX no
 void i82439hx_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
+	map(0x06, 0x07).rw(FUNC(i82439hx_host_device::status_r), FUNC(i82439hx_host_device::status_w));
+	map(0x0d, 0x0d).rw(FUNC(i82439hx_host_device::latency_timer_r), FUNC(i82439hx_host_device::latency_timer_w));
+	map(0x0f, 0x0f).rw(FUNC(i82439hx_host_device::bist_r), FUNC(i82439hx_host_device::bist_w));
 	map(0x10, 0x4f).noprw();
+	map(0x4f, 0x4f).rw(FUNC(i82439hx_host_device::acon_r), FUNC(i82439hx_host_device::acon_w));
 	map(0x50, 0x50).rw(FUNC(i82439hx_host_device::pcon_r), FUNC(i82439hx_host_device::pcon_w));
 	map(0x52, 0x52).rw(FUNC(i82439hx_host_device::cc_r), FUNC(i82439hx_host_device::cc_w));
 	map(0x56, 0x56).rw(FUNC(i82439hx_host_device::dramec_r), FUNC(i82439hx_host_device::dramec_w));
@@ -48,7 +52,7 @@ void i82439hx_host_device::device_start()
 	io_window_end   = 0xffff;
 	io_offset       = 0;
 	command = 0x0006;
-	command_mask = 0x0106;
+	command_mask = 0x0102;
 	status = 0x0200;
 
 	ram.resize(ram_size/4);
@@ -63,6 +67,9 @@ void i82439hx_host_device::device_reset()
 {
 	pci_host_device::device_reset();
 
+	latency_timer = 0x00;
+	bist = 0x00;
+	acon = 0x00;
 	pcon = 0x00;
 	cc = 0xa2;
 	dramec = 0x00;
@@ -168,6 +175,45 @@ uint8_t i82439hx_host_device::header_type_r()
 	return 0x00; // from datasheet
 }
 
+void i82439hx_host_device::status_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// bits 12-14 are clear on write
+	status = status & ~(data & (0x7000 & mem_mask));
+}
+
+uint8_t i82439hx_host_device::latency_timer_r()
+{
+	return latency_timer;
+}
+
+void i82439hx_host_device::latency_timer_w(uint8_t data)
+{
+	latency_timer = data;
+	logerror("latency_timer = %02x\n", latency_timer);
+}
+
+uint8_t i82439hx_host_device::bist_r()
+{
+	return bist;
+}
+
+void i82439hx_host_device::bist_w(uint8_t data)
+{
+	bist = data;
+	logerror("bist = %02x\n", bist);
+}
+
+uint8_t i82439hx_host_device::acon_r()
+{
+	return acon;
+}
+
+void i82439hx_host_device::acon_w(uint8_t data)
+{
+	acon = data;
+	logerror("acon = %02x\n", acon);
+}
+
 uint8_t i82439hx_host_device::pcon_r()
 {
 	return pcon;
@@ -233,6 +279,36 @@ void i82439hx_host_device::pam_w(offs_t offset, uint8_t data)
 {
 	pam[offset - 1] = data;
 	logerror("pam[%d] = %02x\n", offset - 1, pam[offset - 1]);
+	switch (offset - 1)
+	{
+	case 0:
+		logerror("  F0000-FFFFF BIOS Area RE:%d WE:%d CE:%d R:%d\n", (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
+		break;
+	case 1:
+		logerror("  C0000-C3FFF Add-On BIOS RE:%d WE:%d CE:%d R:%d\n", (data >> 0) & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1);
+		logerror("  C4000-C7FFF Add-On BIOS RE:%d WE:%d CE:%d R:%d\n", (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
+		break;
+	case 2:
+		logerror("  C8000-CBFFF Add-On BIOS RE:%d WE:%d CE:%d R:%d\n", (data >> 0) & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1);
+		logerror("  CC000-CFFFF Add-On BIOS RE:%d WE:%d CE:%d R:%d\n", (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
+		break;
+	case 3:
+		logerror("  D0000-D3FFF Add-On BIOS RE:%d WE:%d CE:%d R:%d\n", (data >> 0) & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1);
+		logerror("  D4000-D7FFF Add-On BIOS RE:%d WE:%d CE:%d R:%d\n", (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
+		break;
+	case 4:
+		logerror("  D8000-DBFFF Add-On BIOS RE:%d WE:%d CE:%d R:%d\n", (data >> 0) & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1);
+		logerror("  DC000-DFFFF Add-On BIOS RE:%d WE:%d CE:%d R:%d\n", (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
+		break;
+	case 5:
+		logerror("  E0000-E3FFF BIOS Extension RE:%d WE:%d CE:%d R:%d\n", (data >> 0) & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1);
+		logerror("  E4000-E7FFF BIOS Extension RE:%d WE:%d CE:%d R:%d\n", (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
+		break;
+	case 6:
+		logerror("  E8000-EBFFF BIOS Extension RE:%d WE:%d CE:%d R:%d\n", (data >> 0) & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1);
+		logerror("  EC000-EFFFF BIOS Extension RE:%d WE:%d CE:%d R:%d\n", (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);
+		break;
+	}
 	remap_cb();
 }
 

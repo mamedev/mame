@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  video.c
+  video\zaccaria.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -35,7 +35,7 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 
 
 ***************************************************************************/
-void zaccaria_state::zaccaria_palette(palette_device &palette) const
+void zaccaria_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 	static constexpr int resistances_rg[] = { 1200, 1000, 820 };
@@ -152,12 +152,8 @@ void zaccaria_state::attributes_w(offs_t offset, uint8_t data)
 	if (offset & 1)
 	{
 		if (m_attributesram[offset] != data)
-		{
-			int i;
-
-			for (i = offset / 2;i < 0x400;i += 32)
+			for (int i = offset / 2; i < 0x400; i += 32)
 				m_bg_tilemap->mark_tile_dirty(i);
-		}
 	}
 	else
 		m_bg_tilemap->set_scrolly(offset / 2,data);
@@ -198,9 +194,9 @@ WRITE_LINE_MEMBER(zaccaria_state::flip_screen_y_w)
 offsets 1 and 2 are swapped if accessed from spriteram2
 
 */
-void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,uint8_t *spriteram,int color,int section)
+void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, int color, int section)
 {
-	int offs,o1 = 1,o2 = 2;
+	int o1 = 1,o2 = 2;
 
 	if (section)
 	{
@@ -208,7 +204,7 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		o2 = 1;
 	}
 
-	for (offs = 0;offs < 0x20;offs += 4)
+	for (int offs = 0;offs < 0x20;offs += 4)
 	{
 		int sx = spriteram[offs + 3] + 1;
 		int sy = 242 - spriteram[offs];
@@ -228,10 +224,10 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 				(spriteram[offs + o1] & 0x3f) + (spriteram[offs + o2] & 0xc0),
 				((spriteram[offs + o2] & 0x07) << 2) | color,
-				flipx,flipy,sx,sy,0);
+				flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -241,9 +237,9 @@ uint32_t zaccaria_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// 3 layers of sprites, each with their own palette and priorities
 	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?
-	draw_sprites(bitmap,cliprect,m_spriteram2,2,1);
-	draw_sprites(bitmap,cliprect,m_spriteram,1,0);
-	draw_sprites(bitmap,cliprect,m_spriteram2+0x20,0,1);
+	draw_sprites(bitmap, cliprect, m_spriteram[1], 2, 1);
+	draw_sprites(bitmap, cliprect, m_spriteram[0], 1, 0);
+	draw_sprites(bitmap, cliprect, m_spriteram[1] + 0x20, 0, 1);
 
 	return 0;
 }

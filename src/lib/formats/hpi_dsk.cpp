@@ -48,6 +48,7 @@
 #include "hpi_dsk.h"
 
 #include "coretmpl.h" // BIT
+#include "ioprocs.h"
 
 
 // Debugging
@@ -78,9 +79,12 @@ hpi_format::hpi_format()
 	(void)HPI_RED_IMAGE_SIZE;
 }
 
-int hpi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int hpi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size)) {
+		return 0;
+	}
 
 	// we try to stay back and give only 50 points, since another image
 	// format may also have images of the same size (there is no header and no
@@ -142,12 +146,15 @@ bool hpi_format::geometry_from_size(uint64_t image_size , unsigned& heads , unsi
 	}
 }
 
-bool hpi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	unsigned heads;
 	unsigned cylinders;
 
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size)) {
+		return false;
+	}
 	if (!geometry_from_size(size, heads, cylinders)) {
 		return false;
 	}
@@ -161,7 +168,8 @@ bool hpi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 
 	// Suck in the whole image
 	std::vector<uint8_t> image_data(size);
-	io_generic_read(io, (void *)image_data.data(), 0, size);
+	size_t actual;
+	io.read_at(0, image_data.data(), size, actual);
 
 	// Get interleave factor from image
 	unsigned il = (unsigned)image_data[ IL_OFFSET ] * 256 + image_data[ IL_OFFSET + 1 ];
@@ -191,7 +199,7 @@ bool hpi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	return true;
 }
 
-bool hpi_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int tracks;
 	int heads;
@@ -206,7 +214,8 @@ bool hpi_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 			while (get_next_sector(bitstream , pos , track_no , head_no , sector_no , sector_data)) {
 				if (track_no == cyl && head_no == head && sector_no < HPI_SECTORS) {
 					unsigned offset_in_image = chs_to_lba(cyl, head, sector_no, heads) * HPI_SECTOR_SIZE;
-					io_generic_write(io, sector_data, offset_in_image, HPI_SECTOR_SIZE);
+					size_t actual;
+					io.write_at(offset_in_image, sector_data, HPI_SECTOR_SIZE, actual);
 				}
 			}
 		}

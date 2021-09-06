@@ -151,10 +151,10 @@ public:
 	virtual ~mfmhd_image_format_t() {};
 
 	// Load the image.
-	virtual chd_error load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) = 0;
+	virtual std::error_condition load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) = 0;
 
 	// Save the image.
-	virtual chd_error save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) = 0;
+	virtual std::error_condition save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) = 0;
 
 	// Return the original parameters of the image
 	mfmhd_layout_params* get_initial_params() { return &m_param_old; }
@@ -196,8 +196,8 @@ class mfmhd_generic_format : public mfmhd_image_format_t
 {
 public:
 	mfmhd_generic_format() { m_devtag = std::string("mfmhd_generic_format"); };
-	chd_error load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
-	chd_error save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
+	std::error_condition load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
+	std::error_condition save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
 
 	// Yes, we want to save all parameters
 	virtual bool save_param(mfmhd_param_t type) override { return true; }

@@ -158,6 +158,18 @@ private:
 };
 
 
+// ======================> nes_sachen_3013_device
+
+class nes_sachen_3013_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_sachen_3013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_h(offs_t offset) override;
+};
+
+
 // ======================> nes_sachen_74x374_device
 
 class nes_sachen_74x374_device : public nes_nrom_device
@@ -270,6 +282,7 @@ DECLARE_DEVICE_TYPE(NES_SACHEN_SA72008,    nes_sachen_sa72008_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_TCA01,      nes_sachen_tca01_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_TCU01,      nes_sachen_tcu01_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_TCU02,      nes_sachen_tcu02_device)
+DECLARE_DEVICE_TYPE(NES_SACHEN_3013,       nes_sachen_3013_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_74X374,     nes_sachen_74x374_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_74X374_ALT, nes_sachen_74x374_alt_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_8259A,      nes_sachen_8259a_device)

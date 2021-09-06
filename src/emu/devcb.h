@@ -82,16 +82,16 @@ protected:
 	template <typename T, typename U> using mask_t = std::make_unsigned_t<intermediate_t<T, U> >;
 
 	// Detecting candidates for transform functions
-	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form1 { static constexpr bool value = false; };
-	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form2 { static constexpr bool value = false; };
-	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form3 { static constexpr bool value = false; };
-	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form4 { static constexpr bool value = false; };
-	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form5 { static constexpr bool value = false; };
-	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form6 { static constexpr bool value = false; };
-	template <typename Input, typename Result, typename Func> struct is_transform_form3<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t &, Input, std::make_unsigned_t<Input> &>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Input, typename Result, typename Func> struct is_transform_form4<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t &, Input>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Input, typename Result, typename Func> struct is_transform_form6<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, Input>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Input, typename Result, typename Func> struct is_transform { static constexpr bool value = is_transform_form1<Input, Result, Func>::value || is_transform_form2<Input, Result, Func>::value || is_transform_form3<Input, Result, Func>::value || is_transform_form4<Input, Result, Func>::value || is_transform_form5<Input, Result, Func>::value || is_transform_form6<Input, Result, Func>::value; };
+	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form1 : public std::false_type { };
+	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form2 : public std::false_type { };
+	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form3 : public std::false_type { };
+	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form4 : public std::false_type { };
+	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form5 : public std::false_type { };
+	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form6 : public std::false_type { };
+	template <typename Input, typename Result, typename Func> struct is_transform_form3<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t &, Input, std::make_unsigned_t<Input> &>, Result>::value> > : public std::true_type { };
+	template <typename Input, typename Result, typename Func> struct is_transform_form4<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t &, Input>, Result>::value> > : public std::true_type { };
+	template <typename Input, typename Result, typename Func> struct is_transform_form6<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, Input>, Result>::value> > : public std::true_type { };
+	template <typename Input, typename Result, typename Func> struct is_transform : public std::bool_constant<is_transform_form1<Input, Result, Func>::value || is_transform_form2<Input, Result, Func>::value || is_transform_form3<Input, Result, Func>::value || is_transform_form4<Input, Result, Func>::value || is_transform_form5<Input, Result, Func>::value || is_transform_form6<Input, Result, Func>::value> { };
 
 	// Determining the result type of a transform function
 	template <typename Input, typename Result, typename Func, typename Enable = void> struct transform_result;
@@ -211,13 +211,13 @@ class devcb_read_base : public devcb_base
 {
 protected:
 	// Detecting candidates for read functions
-	template <typename Result, typename Func, typename Enable = void> struct is_read_form1 { static constexpr bool value = false; };
-	template <typename Result, typename Func, typename Enable = void> struct is_read_form2 { static constexpr bool value = false; };
-	template <typename Result, typename Func, typename Enable = void> struct is_read_form3 { static constexpr bool value = false; };
-	template <typename Result, typename Func> struct is_read_form1<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t, Result>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Result, typename Func> struct is_read_form2<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Result, typename Func> struct is_read_form3<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Result, typename Func> struct is_read { static constexpr bool value = is_read_form1<Result, Func>::value || is_read_form2<Result, Func>::value || is_read_form3<Result, Func>::value; };
+	template <typename Result, typename Func, typename Enable = void> struct is_read_form1 : public std::false_type { };
+	template <typename Result, typename Func, typename Enable = void> struct is_read_form2 : public std::false_type { };
+	template <typename Result, typename Func, typename Enable = void> struct is_read_form3 : public std::false_type { };
+	template <typename Result, typename Func> struct is_read_form1<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t, Result>, Result>::value> > : public std::true_type { };
+	template <typename Result, typename Func> struct is_read_form2<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t>, Result>::value> > : public std::true_type { };
+	template <typename Result, typename Func> struct is_read_form3<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func>, Result>::value> > : public std::true_type { };
+	template <typename Result, typename Func> struct is_read : public std::bool_constant<is_read_form1<Result, Func>::value || is_read_form2<Result, Func>::value || is_read_form3<Result, Func>::value> { };
 
 	// Determining the result type of a read function
 	template <typename Result, typename Func, typename Enable = void> struct read_result;
@@ -227,20 +227,20 @@ protected:
 	template <typename Result, typename Func> using read_result_t = typename read_result<Result, Func>::type;
 
 	// Detecting candidates for read delegates
-	template <typename T, typename Enable = void> struct is_read_method { static constexpr bool value = false; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T, typename Enable = void> struct is_read_method : public std::false_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
 
 	// Invoking read callbacks
 	template <typename Result, typename T> static std::enable_if_t<is_read_form1<Result, T>::value, mask_t<read_result_t<Result, T>, Result> > invoke_read(T const &cb, offs_t offset, std::make_unsigned_t<Result> mem_mask) { return std::make_unsigned_t<read_result_t<Result, T> >(cb(offset, mem_mask)); }
@@ -275,29 +275,29 @@ class devcb_write_base : public devcb_base
 {
 protected:
 	// Detecting candidates for write functions
-	template <typename Input, typename Func, typename Enable = void> struct is_write_form1 { static constexpr bool value = false; };
-	template <typename Input, typename Func, typename Enable = void> struct is_write_form2 { static constexpr bool value = false; };
-	template <typename Input, typename Func, typename Enable = void> struct is_write_form3 { static constexpr bool value = false; };
-	template <typename Input, typename Func> struct is_write_form1<Input, Func, void_t<std::invoke_result_t<Func, offs_t, Input, std::make_unsigned_t<Input>> > > { static constexpr bool value = true; };
-	template <typename Input, typename Func> struct is_write_form2<Input, Func, void_t<std::invoke_result_t<Func, offs_t, Input> > > { static constexpr bool value = true; };
-	template <typename Input, typename Func> struct is_write_form3<Input, Func, void_t<std::invoke_result_t<Func, Input> > > { static constexpr bool value = true; };
-	template <typename Input, typename Func> struct is_write { static constexpr bool value = is_write_form1<Input, Func>::value || is_write_form2<Input, Func>::value || is_write_form3<Input, Func>::value; };
+	template <typename Input, typename Func, typename Enable = void> struct is_write_form1 : public std::false_type { };
+	template <typename Input, typename Func, typename Enable = void> struct is_write_form2 : public std::false_type { };
+	template <typename Input, typename Func, typename Enable = void> struct is_write_form3 : public std::false_type { };
+	template <typename Input, typename Func> struct is_write_form1<Input, Func, void_t<std::invoke_result_t<Func, offs_t, Input, std::make_unsigned_t<Input>> > > : public std::true_type { };
+	template <typename Input, typename Func> struct is_write_form2<Input, Func, void_t<std::invoke_result_t<Func, offs_t, Input> > > : public std::true_type { };
+	template <typename Input, typename Func> struct is_write_form3<Input, Func, void_t<std::invoke_result_t<Func, Input> > > : public std::true_type { };
+	template <typename Input, typename Func> struct is_write : public std::bool_constant<is_write_form1<Input, Func>::value || is_write_form2<Input, Func>::value || is_write_form3<Input, Func>::value> { };
 
 	// Detecting candidates for write delegates
-	template <typename T, typename Enable = void> struct is_write_method { static constexpr bool value = false; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T, typename Enable = void> struct is_write_method : public std::false_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
 
 	// Invoking write callbacks
 	template <typename Input, typename T> static std::enable_if_t<is_write_form1<Input, T>::value> invoke_write(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(offset, data, mem_mask); }

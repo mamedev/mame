@@ -574,10 +574,6 @@ public:
 	// dump rasterizer statistics if enabled
 	void dump_rasterizer_stats();
 
-protected:
-	// overrides
-	virtual void reset_after_wait() override;
-
 private:
 	// pipeline stages, in order
 	bool stipple_test(thread_stats_block &threadstats, voodoo::reg_fbz_mode const fbzmode, s32 x, s32 y, u32 &stipple);

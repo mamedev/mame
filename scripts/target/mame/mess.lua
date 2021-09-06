@@ -479,6 +479,7 @@ MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AM9519"] = true
 MACHINES["AMIGAFDC"] = true
+MACHINES["APPLEPIC"] = true
 MACHINES["ARM_IOMD"] = true
 MACHINES["AT_KEYBC"] = true
 MACHINES["AT28C16"] = true
@@ -728,6 +729,7 @@ MACHINES["TTL7474"] = true
 MACHINES["TUBE"] = true
 MACHINES["UCB1200"] = true
 MACHINES["UPD1990A"] = true
+MACHINES["UPD4991A"] = true
 --MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
 MACHINES["UPD7001"] = true
@@ -837,6 +839,7 @@ BUSES["AMIGA_KEYBOARD"] = true
 BUSES["APF"] = true
 BUSES["APRICOT_EXPANSION"] = true
 BUSES["APRICOT_KEYBOARD"] = true
+BUSES["APRICOT_VIDEO"] = true
 BUSES["AQUARIUS"] = true
 BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
@@ -3121,6 +3124,12 @@ files {
 	MAME_DIR .. "src/mame/machine/pc9801_cd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.h",
+	MAME_DIR .. "src/mame/drivers/pc98ha.cpp",
+	MAME_DIR .. "src/mame/includes/pc98ha.h",
+	MAME_DIR .. "src/mame/drivers/pc9801_epson.cpp",
+	MAME_DIR .. "src/mame/includes/pc9801_epson.h",
+	MAME_DIR .. "src/mame/drivers/pc9821.cpp",
+	MAME_DIR .. "src/mame/includes/pc9821.h",
 	MAME_DIR .. "src/mame/drivers/tk80bs.cpp",
 }
 
@@ -4424,6 +4433,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/ymmu50.cpp",
 	MAME_DIR .. "src/mame/drivers/ymmu80.cpp",
 	MAME_DIR .. "src/mame/drivers/ymmu100.cpp",
+	MAME_DIR .. "src/mame/drivers/ympsr16.cpp",
+	MAME_DIR .. "src/mame/drivers/ympsr40.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr60.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr340.cpp",
 	MAME_DIR .. "src/mame/drivers/ymsy35.cpp",
@@ -4561,6 +4572,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gem_rp.cpp",
 	MAME_DIR .. "src/mame/drivers/gigatron.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
+	MAME_DIR .. "src/mame/drivers/gm1000.cpp",
 	MAME_DIR .. "src/mame/drivers/gnat10.cpp",
 	MAME_DIR .. "src/mame/drivers/goupil.cpp",
 	MAME_DIR .. "src/mame/drivers/grfd2301.cpp",
@@ -4657,6 +4669,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ptcsol.cpp",
 	MAME_DIR .. "src/mame/drivers/pulsar.cpp",
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
+	MAME_DIR .. "src/mame/drivers/pwp14.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",

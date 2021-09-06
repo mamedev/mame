@@ -313,8 +313,8 @@ int running_machine::run(bool quiet)
 		if (options().log() && !quiet)
 		{
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = m_logfile->open("error.log");
-			if (filerr != osd_file::error::NONE)
+			std::error_condition const filerr = m_logfile->open("error.log");
+			if (filerr)
 				throw emu_fatalerror("running_machine::run: unable to open error.log file");
 
 			using namespace std::placeholders;
@@ -324,8 +324,8 @@ int running_machine::run(bool quiet)
 		if (options().debug() && options().debuglog())
 		{
 			m_debuglogfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = m_debuglogfile->open("debug.log");
-			if (filerr != osd_file::error::NONE)
+			std::error_condition const filerr = m_debuglogfile->open("debug.log");
+			if (filerr)
 				throw emu_fatalerror("running_machine::run: unable to open debug.log file");
 		}
 
@@ -931,7 +931,7 @@ void running_machine::handle_saveload()
 			// open the file
 			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
 			auto const filerr = file.open(m_saveload_pending_file);
-			if (filerr == osd_file::error::NONE)
+			if (!filerr)
 			{
 				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
 
@@ -973,7 +973,7 @@ void running_machine::handle_saveload()
 				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
 					file.remove_on_close();
 			}
-			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+			else if ((openflags == OPEN_FLAG_READ) && (std::errc::no_such_file_or_directory == filerr))
 			{
 				// attempt to load a non-existent savestate, report empty slot
 				popmessage("Error: No savestate file to load.", opname);
@@ -1174,7 +1174,7 @@ void running_machine::nvram_load()
 	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+		if (!file.open(nvram_filename(nvram.device())))
 		{
 			nvram.nvram_load(file);
 			file.close();
@@ -1196,7 +1196,7 @@ void running_machine::nvram_save()
 		if (nvram.nvram_can_save())
 		{
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+			if (!file.open(nvram_filename(nvram.device())))
 			{
 				nvram.nvram_save(file);
 				file.close();

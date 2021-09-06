@@ -1390,6 +1390,7 @@ end
 				"-Wno-unknown-attributes",
 				"-Wno-missing-braces",
 				"-Wno-int-to-pointer-cast",
+				"-Wno-ignored-attributes", -- many instances in ImGui
 			}
 		end
 	end
@@ -1416,7 +1417,6 @@ end
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
-		"IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
 	}
 
 	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
@@ -1453,17 +1453,19 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_nvn.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_webgpu.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/vertexlayout.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_tables.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_widgets.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then

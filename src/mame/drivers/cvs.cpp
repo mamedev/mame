@@ -1010,13 +1010,13 @@ void cvs_state::cvs(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	TMS5100(config, m_tms5110, XTAL(640'000));
 	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));
-	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

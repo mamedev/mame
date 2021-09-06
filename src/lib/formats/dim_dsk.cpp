@@ -8,11 +8,13 @@
 
 *********************************************************************/
 
-#include <cstring>
-#include <cassert>
-
 #include "dim_dsk.h"
 #include "basicdsk.h"
+
+#include "ioprocs.h"
+
+#include <cstring>
+
 
 FLOPPY_IDENTIFY(dim_dsk_identify)
 {
@@ -132,11 +134,12 @@ const char *dim_format::extensions() const
 	return "dim";
 }
 
-int dim_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dim_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[16];
 
-	io_generic_read(io, h, 0xab, 16);
+	size_t actual;
+	io.read_at(0xab, h, 16, actual);
 
 	if(strncmp((const char *)h, "DIFC HEADER", 11) == 0)
 		return 100;
@@ -144,14 +147,15 @@ int dim_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 	return 0;
 }
 
-bool dim_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	int offset = 0x100;
 	uint8_t h;
 	uint8_t track_total = 77;
 	int cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
 
-	io_generic_read(io, &h, 0, 1);
+	io.read_at(0, &h, 1, actual);
 
 	int spt, gap3, bps, size;
 	switch(h) {
@@ -211,7 +215,7 @@ bool dim_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 				sects[i].deleted     = false;
 				sects[i].bad_crc     = false;
 				sects[i].data        = &sect_data[sdatapos];
-				io_generic_read(io, sects[i].data, offset, bps);
+				io.read_at(offset, sects[i].data, bps, actual);
 				offset += bps;
 				sdatapos += bps;
 			}
@@ -223,7 +227,7 @@ bool dim_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 }
 
 
-bool dim_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dim_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

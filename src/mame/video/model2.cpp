@@ -771,7 +771,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 {
 	model2_renderer *poly = m_state.m_poly.get();
-	m2_poly_extra_data& extra = poly->object_data_alloc();
+	m2_poly_extra_data& extra = poly->object_data().next();
 	u8 renderer;
 
 	/* select renderer based on attributes (bit15 = checker, bit14 = textured, bit13 = transparent */

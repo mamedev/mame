@@ -17,11 +17,14 @@
 #ifndef MAME_EMU_IOPORT_H
 #define MAME_EMU_IOPORT_H
 
+#include "ioprocs.h"
+
 #include <array>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <list>
+#include <memory>
 #include <vector>
 
 
@@ -354,6 +357,7 @@ enum ioport_type
 		IPT_UI_CLEAR,
 		IPT_UI_ZOOM_IN,
 		IPT_UI_ZOOM_OUT,
+		IPT_UI_ZOOM_DEFAULT,
 		IPT_UI_PREV_GROUP,
 		IPT_UI_NEXT_GROUP,
 		IPT_UI_ROTATE,
@@ -1447,8 +1451,10 @@ private:
 	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
-	emu_file                m_record_file;          // recording file (nullptr if not recording)
-	emu_file                m_playback_file;        // playback file (nullptr if not recording)
+	emu_file                m_record_file;          // recording file (closed if not recording)
+	emu_file                m_playback_file;        // playback file (closed if not recording)
+	util::write_stream::ptr m_record_stream;        // recording stream (nullptr if not recording)
+	util::read_stream::ptr  m_playback_stream;      // playback stream (nullptr if not recording)
 	u64                     m_playback_accumulated_speed; // accumulated speed during playback
 	u32                     m_playback_accumulated_frames; // accumulated frames during playback
 	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
@@ -1456,7 +1462,7 @@ private:
 	attotime                m_timecode_last_time;
 
 	// storage for inactive configuration
-	util::xml::file *       m_deselected_card_config; // using smart pointer would pull xmlfile.h into emu.h
+	std::unique_ptr<util::xml::file> m_deselected_card_config;
 };
 
 

@@ -52,12 +52,11 @@ class view_environment;
 
 /// \brief A description of a piece of visible artwork
 ///
-/// Most view_items (except for those in the screen layer) have exactly
+/// Most view items (except for those referencing screens) have exactly
 /// one layout_element which describes the contents of the item.
 /// Elements are separate from items because they can be re-used
 /// multiple times within a layout.  Even though an element can contain
-/// a number of components, they are treated as if they were a single
-/// bitmap.
+/// a number of components, they are drawn as a single textured quad.
 class layout_element
 {
 public:
@@ -76,13 +75,14 @@ public:
 	void preload();
 
 private:
-	/// \brief An image, rectangle, or disk in an element
+	/// \brief A drawing component within a layout element
 	///
-	/// Each layout_element contains one or more components. Each
+	/// Each #layout_element contains one or more components. Each
 	/// component can describe either an image or a rectangle/disk
-	/// primitive. Each component also has a "state" associated with it,
-	/// which controls whether or not the component is visible (if the
-	/// owning item has the same state, it is visible).
+	/// primitive.  A component can also have a state mask and value
+	/// for controlling visibility.  If the state of the item
+	/// instantiating the element matches the component's state value
+	/// for the bits that are set in the mask, the component is visible.
 	class component
 	{
 	public:
@@ -188,14 +188,14 @@ private:
 };
 
 
-/// \brief A reusable group of elements
+/// \brief A reusable group of items
 ///
 /// Views expand/flatten groups into their component elements applying
-/// an optional coordinate transform.  This is mainly useful duplicating
-/// the same sublayout in multiple views.  It would be more useful
-/// within a view if it could be parameterised.  Groups only exist while
-/// parsing a layout file - no information about element grouping is
-/// preserved.
+/// an optional coordinate transform.  This is useful for duplicating
+/// the same sublayout in multiple views, or grouping related items to
+/// simplify overall view arrangement.  Groups only exist while parsing
+/// a layout file - no information about element grouping is preserved
+/// after the views have been built.
 class layout_group
 {
 public:
@@ -233,7 +233,7 @@ private:
 };
 
 
-/// \brief A single view within a layout_file
+/// \brief A single view within a #layout_file
 ///
 /// The view is described using arbitrary coordinates that are scaled to
 /// fit within the render target.  Pixels within a view are assumed to

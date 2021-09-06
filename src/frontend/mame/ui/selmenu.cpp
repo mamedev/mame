@@ -36,6 +36,8 @@
 #include "uiinput.h"
 #include "luaengine.h"
 
+#include "util/path.h"
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -99,19 +101,19 @@ char const *const hover_msg[] = {
 
 void load_image(bitmap_argb32 &bitmap, emu_file &file, std::string const &base)
 {
-	if (file.open(base + ".png") == osd_file::error::NONE)
+	if (!file.open(base + ".png"))
 	{
 		render_load_png(bitmap, file);
 		file.close();
 	}
 
-	if (!bitmap.valid() && (file.open(base + ".jpg") == osd_file::error::NONE))
+	if (!bitmap.valid() && !file.open(base + ".jpg"))
 	{
 		render_load_jpeg(bitmap, file);
 		file.close();
 	}
 
-	if (!bitmap.valid() && (file.open(base + ".bmp") == osd_file::error::NONE))
+	if (!bitmap.valid() && !file.open(base + ".bmp"))
 	{
 		render_load_msdib(bitmap, file);
 		file.close();
@@ -123,7 +125,7 @@ void load_driver_image(bitmap_argb32 &bitmap, emu_file &file, game_driver const 
 {
 	// try to load snapshot first from saved "0000.png" file
 	std::string fullname = driver.name;
-	load_image(bitmap, file, fullname + PATH_SEPARATOR + "0000");
+	load_image(bitmap, file, util::path_concat(fullname, "0000"));
 
 	// if fail, attempt to load from standard file
 	if (!bitmap.valid())
@@ -144,7 +146,7 @@ void load_driver_image(bitmap_argb32 &bitmap, emu_file &file, game_driver const 
 		if (isclone)
 		{
 			fullname = driver.parent;
-			load_image(bitmap, file, fullname + PATH_SEPARATOR + "0000");
+			load_image(bitmap, file, util::path_concat(fullname, "0000"));
 
 			if (!bitmap.valid())
 				load_image(bitmap, file, fullname);
@@ -621,7 +623,7 @@ void menu_select_launch::launch_system(mame_ui_manager &mui, game_driver const &
 			else
 				moptions.set_value(OPTION_SOFTWARENAME, util::string_format("%s:%s", swinfo->listname, swinfo->shortname), OPTION_PRIORITY_CMDLINE);
 
-			moptions.set_value(OPTION_SNAPNAME, util::string_format("%s%s%s", swinfo->listname, PATH_SEPARATOR, swinfo->shortname), OPTION_PRIORITY_CMDLINE);
+			moptions.set_value(OPTION_SNAPNAME, util::path_concat(swinfo->listname, swinfo->shortname), OPTION_PRIORITY_CMDLINE);
 		}
 		reselect_last::set_software(driver, *swinfo);
 	}
@@ -1087,11 +1089,7 @@ void menu_select_launch::check_for_icons(char const *listname)
 	{
 		// if we're doing a software list, append it to the configured path
 		if (listname)
-		{
-			if (!current.empty() && !util::is_directory_separator(current.back()))
-				current.append(PATH_SEPARATOR);
-			current.append(listname);
-		}
+			util::path_append(current, listname);
 		osd_printf_verbose("Checking for icons in directory %s\n", current);
 
 		// open and walk the directory
@@ -1136,11 +1134,7 @@ std::string menu_select_launch::make_icon_paths(char const *listname) const
 	{
 		// if we're doing a software list, append it to the configured path
 		if (listname)
-		{
-			if (!current.empty() && !util::is_directory_separator(current.back()))
-				current.append(PATH_SEPARATOR);
-			current.append(listname);
-		}
+			util::path_append(current, listname);
 
 		// append the configured path
 		if (!result.empty())
@@ -2286,11 +2280,11 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 			else
 			{
 				// First attempt from name list
-				load_image(tmp_bitmap, snapfile, software->listname + PATH_SEPARATOR + software->shortname);
+				load_image(tmp_bitmap, snapfile, util::path_concat(software->listname, software->shortname));
 
 				// Second attempt from driver name + part name
 				if (!tmp_bitmap.valid())
-					load_image(tmp_bitmap, snapfile, software->driver->name + software->part + PATH_SEPARATOR + software->shortname);
+					load_image(tmp_bitmap, snapfile, util::path_concat(software->driver->name + software->part, software->shortname));
 			}
 
 			m_cache->set_snapx_software(software);

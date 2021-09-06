@@ -113,7 +113,7 @@ TODO:
   games may manipulate VFD plate brightness by strobing it longer/shorter,
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
-- improve/redo SVGs of: bzaxxon, bpengo, bbtime, gscobra
+- improve/redo SVGs of: bzaxxon, bbtime
 
 ***************************************************************************/
 
@@ -139,7 +139,7 @@ TODO:
 #include "msthawk.lh"
 #include "packmon.lh"
 
-#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -1165,8 +1165,8 @@ ROM_START( bpengo )
 	ROM_LOAD( "hd38820a63", 0x0000, 0x1000, CRC(ebd6bc64) SHA1(0a322c47b9553a2739a85908ce64b9650cf93d49) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 744461, "screen", 0)
-	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
+	ROM_REGION( 565069, "screen", 0)
+	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(fb25ffeb) SHA1(fb4db5120f1e35e39c7fb2da4af3aa63417efaf1) )
 ROM_END
 
 
@@ -2219,7 +2219,7 @@ ROM_END
   - P1 Up:    Eat & Run
   - P1 Down:  Demo
 
-  BTANB note: 1st version doesn't show the whole maze on power-on
+  BTANB: 1st version doesn't show the whole maze on power-on
 
 ***************************************************************************/
 
@@ -2355,7 +2355,7 @@ ROM_END
   - P1 Down:  Head-to-Head Ms. Pac-Man (2-player mode)
   - P1 Up:    Demo
 
-  BTANB note: in demo-mode, she hardly ever walks to the upper two rows
+  BTANB: in demo-mode, she hardly ever walks to the upper two rows
 
 ***************************************************************************/
 
@@ -3411,8 +3411,14 @@ ROM_END
   * Hitachi QFP HD38820A32 MCU
   * cyan/red/green VFD display
 
-  There are 2 versions, a green one and a white one. They are assumed to have
-  the same MCU, the VFD has color differences though.
+  known releases:
+  - World: Super Cobra, published by Gakken
+  - USA: Cobra Super Copter, published by Tandy
+
+  There are 2 versions, a green one and a white one. They have the same MCU,
+  though the VFD has color differences and is more compact.
+
+  BTANB(green version): 1 rocket seems out of place at the top-right area
 
 ***************************************************************************/
 
@@ -3456,8 +3462,8 @@ void gscobra_state::grid_w(u16 data)
 		update_int0();
 	}
 
-	// D4-D15: vfd grid
-	m_grid = data >> 4 & 0xfff;
+	// D7-D15: vfd grid
+	m_grid = data >> 7 & 0x1ff;
 
 	// D1-D3: more plates (update display there)
 	plate_w(7, data >> 1 & 7);
@@ -3505,11 +3511,12 @@ void gscobra_state::gscobra(machine_config &config)
 	m_maincpu->write_d().set(FUNC(gscobra_state::grid_w));
 
 	/* video hardware */
-	//screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	//screen.set_refresh_hz(60);
-	config.set_default_layout(layout_hh_hmcs40_test);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 852);
+	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(12, 31);
+	PWM_DISPLAY(config, m_display).set_size(9, 31);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3523,8 +3530,8 @@ ROM_START( gscobra )
 	ROM_LOAD( "hd38820a32", 0x0000, 0x1000, CRC(7bbd130f) SHA1(91dd280e4108fad7ba99191355364bd3217b9d17) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "gscobra.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 232919, "screen", 0)
+	ROM_LOAD( "gscobra.svg", 0, 232919, CRC(5ceb4bfc) SHA1(77c9a45569d780838ebe75818acb2d2ced4bda00) )
 ROM_END
 
 
@@ -4465,7 +4472,7 @@ CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_in
 
 CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )

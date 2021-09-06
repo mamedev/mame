@@ -9,34 +9,21 @@
     Raphael Nabet 2003
 */
 
+#include "imghd.h"
 #include "imgtool.h"
 #include "harddisk.h"
-#include "imghd.h"
 
 
-static imgtoolerr_t map_chd_error(chd_error chderr)
+static imgtoolerr_t map_chd_error(std::error_condition chderr)
 {
-	imgtoolerr_t err;
-
-	switch(chderr)
-	{
-		case CHDERR_NONE:
-			err = IMGTOOLERR_SUCCESS;
-			break;
-		case CHDERR_OUT_OF_MEMORY:
-			err = IMGTOOLERR_OUTOFMEMORY;
-			break;
-		case CHDERR_FILE_NOT_WRITEABLE:
-			err = IMGTOOLERR_READONLY;
-			break;
-		case CHDERR_NOT_SUPPORTED:
-			err = IMGTOOLERR_UNIMPLEMENTED;
-			break;
-		default:
-			err = IMGTOOLERR_UNEXPECTED;
-			break;
-	}
-	return err;
+	if (!chderr)
+		return IMGTOOLERR_SUCCESS;
+	else if (std::errc::not_enough_memory == chderr)
+		return IMGTOOLERR_OUTOFMEMORY;
+	else if (chd_file::error::FILE_NOT_WRITEABLE == chderr)
+		return IMGTOOLERR_READONLY;
+	else
+		return IMGTOOLERR_UNEXPECTED;
 }
 
 
@@ -50,7 +37,7 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t c
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	chd_file chd;
-	chd_error rc;
+	std::error_condition rc;
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
 
 	/* sanity check args -- see parse_hunk_size() in src/lib/util/chd.cpp */
@@ -73,8 +60,8 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t c
 	const uint64_t logicalbytes = (uint64_t)cylinders * heads * sectors * seclen;
 
 	/* create the new hard drive */
-	rc = chd.create(*stream.core_file(), logicalbytes, hunksize, seclen, compression);
-	if (rc != CHDERR_NONE)
+	rc = chd.create(stream_read_write(stream, 0), logicalbytes, hunksize, seclen, compression);
+	if (rc)
 	{
 		err = map_chd_error(rc);
 		return err;
@@ -82,8 +69,8 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t c
 
 	/* write the metadata */
 	const std::string metadata = util::string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
-	err = (imgtoolerr_t)chd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
-	if (rc != CHDERR_NONE)
+	rc = chd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
+	if (rc)
 	{
 		err = map_chd_error(rc);
 		return err;
@@ -118,12 +105,12 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t c
 */
 imgtoolerr_t imghd_open(imgtool::stream &stream, struct mess_hard_disk_file *hard_disk)
 {
-	chd_error chderr;
+	std::error_condition chderr;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 
 	hard_disk->hard_disk = nullptr;
 
-	chderr = hard_disk->chd.open(*stream.core_file(), !stream.is_read_only());
+	chderr = hard_disk->chd.open(stream_read_write(stream, 0), !stream.is_read_only());
 	if (chderr)
 	{
 		err = map_chd_error(chderr);
@@ -174,9 +161,8 @@ void imghd_close(struct mess_hard_disk_file *disk)
 */
 imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, uint32_t lbasector, void *buffer)
 {
-	uint32_t reply;
-	reply = hard_disk_read(disk->hard_disk, lbasector, buffer);
-	return (imgtoolerr_t)(reply ? IMGTOOLERR_SUCCESS : map_chd_error((chd_error)reply));
+	uint32_t reply = hard_disk_read(disk->hard_disk, lbasector, buffer);
+	return reply ? IMGTOOLERR_SUCCESS : IMGTOOLERR_READERROR;
 }
 
 
@@ -188,9 +174,8 @@ imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, uint32_t lbasector, vo
 */
 imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, uint32_t lbasector, const void *buffer)
 {
-	uint32_t reply;
-	reply = hard_disk_write(disk->hard_disk, lbasector, buffer);
-	return (imgtoolerr_t)(reply ? IMGTOOLERR_SUCCESS : map_chd_error((chd_error)reply));
+	uint32_t reply = hard_disk_write(disk->hard_disk, lbasector, buffer);
+	return reply ? IMGTOOLERR_SUCCESS : IMGTOOLERR_WRITEERROR;
 }
 
 

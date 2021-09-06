@@ -14,9 +14,9 @@
 
 ************************************************************************/
 
-#include <cassert>
-
 #include "formats/ds9_dsk.h"
+
+#include "ioprocs.h"
 
 
 static FLOPPY_IDENTIFY(ds9_dsk_identify)
@@ -97,33 +97,32 @@ const char *ds9_format::extensions() const
 	return "ds9";
 }
 
-void ds9_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
+void ds9_format::find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
 {
-	uint32_t expected_size = 0;
-	uint64_t size = io_generic_size(io);
-
 	head_count = 2;
 	track_count = 80;
 	sector_count = 21;
-	expected_size = 256 * track_count * head_count * sector_count;
+	uint32_t const expected_size = 256 * track_count * head_count * sector_count;
 
-	if (size >= expected_size) // standard format has 860160 bytes
+	uint64_t size;
+	if (!io.length(size) && (size >= expected_size)) // standard format has 860160 bytes
 		return;
 
 	track_count = head_count = sector_count = 0;
 }
 
-int ds9_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ds9_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
-	if (track_count) return 50;
+	if (track_count)
+		return 50;
 
 	return 0;
 }
 
-bool ds9_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -143,7 +142,8 @@ bool ds9_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	{
 		for (int head = 0; head < head_count; head++)
 		{
-			io_generic_read(io, sectdata, (track * head_count + head) * track_size, track_size);
+			size_t actual;
+			io.read_at((track * head_count + head) * track_size, sectdata, track_size, actual);
 			generate_track(ds9_desc, track, head, sectors, sector_count, 104000, image);
 		}
 	}

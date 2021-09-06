@@ -359,7 +359,7 @@ void sound_direct_sound::update_audio_stream(
 void sound_direct_sound::set_mastervolume(int attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	attenuation = std::max(std::min(attenuation, 0), -32);
+	attenuation = std::clamp(attenuation, -32, 0);
 
 	// set the master volume
 	if (m_stream_buffer)

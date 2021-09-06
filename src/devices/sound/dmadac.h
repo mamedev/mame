@@ -18,9 +18,35 @@ class dmadac_sound_device : public device_t, public device_sound_interface
 public:
 	dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	void initialize_state();
 	void flush();
-	void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int16_t *data);
-	void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, stream_buffer::sample_t *data);
+
+	template <typename T> void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, T* data) {
+		int j;
+
+		constexpr stream_buffer::sample_t sample_scale = 1.0 / double(std::numeric_limits<T>::max());
+
+		if (m_enabled)
+		{
+			int maxin = (m_bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
+			T* src = data + channel * channel_spacing;
+			int curin = m_bufin;
+
+			/* copy the data */
+			for (j = 0; j < total_frames && curin != maxin; j++)
+			{
+				m_buffer[curin] = stream_buffer::sample_t(*src) * sample_scale;
+				curin = (curin + 1) % BUFFER_SIZE;
+				src += frame_spacing;
+			}
+			m_bufin = curin;
+
+			/* log overruns */
+			if (j != total_frames)
+				logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
+		}
+	}
+
 	void enable(uint8_t enable);
 	void set_frequency(double frequency);
 	void set_volume(uint16_t volume);
@@ -43,7 +69,8 @@ private:
 	/* per-channel parameters */
 	stream_buffer::sample_t m_volume;
 	uint8_t           m_enabled;
-	double          m_frequency;
+
+	static constexpr int BUFFER_SIZE = 32768;
 };
 
 DECLARE_DEVICE_TYPE(DMADAC, dmadac_sound_device)

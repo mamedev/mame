@@ -39,9 +39,9 @@ public:
 	// End the array with {}
 	upd765_format(const format *formats);
 
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
 	virtual bool supports_save() const override;
 
 protected:
@@ -50,7 +50,7 @@ protected:
 
 	floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
-	int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
+	int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
 	int compute_track_size(const format &f) const;
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const;
 	void check_compatibility(floppy_image *image, std::vector<int> &candidates);

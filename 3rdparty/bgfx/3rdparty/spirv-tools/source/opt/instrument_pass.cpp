@@ -88,12 +88,36 @@ std::unique_ptr<Instruction> InstrumentPass::NewLabel(uint32_t label_id) {
   return newLabel;
 }
 
+uint32_t InstrumentPass::Gen32BitCvtCode(uint32_t val_id,
+                                         InstructionBuilder* builder) {
+  // Convert integer value to 32-bit if necessary
+  analysis::TypeManager* type_mgr = context()->get_type_mgr();
+  uint32_t val_ty_id = get_def_use_mgr()->GetDef(val_id)->type_id();
+  analysis::Integer* val_ty = type_mgr->GetType(val_ty_id)->AsInteger();
+  if (val_ty->width() == 32) return val_id;
+  bool is_signed = val_ty->IsSigned();
+  analysis::Integer val_32b_ty(32, is_signed);
+  analysis::Type* val_32b_reg_ty = type_mgr->GetRegisteredType(&val_32b_ty);
+  uint32_t val_32b_reg_ty_id = type_mgr->GetId(val_32b_reg_ty);
+  if (is_signed)
+    return builder->AddUnaryOp(val_32b_reg_ty_id, SpvOpSConvert, val_id)
+        ->result_id();
+  else
+    return builder->AddUnaryOp(val_32b_reg_ty_id, SpvOpUConvert, val_id)
+        ->result_id();
+}
+
 uint32_t InstrumentPass::GenUintCastCode(uint32_t val_id,
                                          InstructionBuilder* builder) {
-  // Cast value to 32-bit unsigned if necessary
-  if (get_def_use_mgr()->GetDef(val_id)->type_id() == GetUintId())
-    return val_id;
-  return builder->AddUnaryOp(GetUintId(), SpvOpBitcast, val_id)->result_id();
+  // Convert value to 32-bit if necessary
+  uint32_t val_32b_id = Gen32BitCvtCode(val_id, builder);
+  // Cast value to unsigned if necessary
+  analysis::TypeManager* type_mgr = context()->get_type_mgr();
+  uint32_t val_ty_id = get_def_use_mgr()->GetDef(val_32b_id)->type_id();
+  analysis::Integer* val_ty = type_mgr->GetType(val_ty_id)->AsInteger();
+  if (!val_ty->IsSigned()) return val_32b_id;
+  return builder->AddUnaryOp(GetUintId(), SpvOpBitcast, val_32b_id)
+      ->result_id();
 }
 
 void InstrumentPass::GenDebugOutputFieldCode(uint32_t base_offset_id,
@@ -174,7 +198,9 @@ void InstrumentPass::GenStageStreamWriteCode(uint32_t stage_idx,
           context()->GetBuiltinInputVarId(SpvBuiltInInstanceIndex),
           kInstVertOutInstanceIndex, base_offset_id, builder);
     } break;
-    case SpvExecutionModelGLCompute: {
+    case SpvExecutionModelGLCompute:
+    case SpvExecutionModelTaskNV:
+    case SpvExecutionModelMeshNV: {
       // Load and store GlobalInvocationId.
       uint32_t load_id = GenVarLoad(
           context()->GetBuiltinInputVarId(SpvBuiltInGlobalInvocationId),
@@ -185,32 +211,12 @@ void InstrumentPass::GenStageStreamWriteCode(uint32_t stage_idx,
           GetUintId(), SpvOpCompositeExtract, load_id, 1);
       Instruction* z_inst = builder->AddIdLiteralOp(
           GetUintId(), SpvOpCompositeExtract, load_id, 2);
-      if (version_ == 1) {
-        // For version 1 format, as a stopgap, pack uvec3 into first word:
-        // x << 21 | y << 10 | z. Second word is unused. (DEPRECATED)
-        Instruction* x_shft_inst = builder->AddBinaryOp(
-            GetUintId(), SpvOpShiftLeftLogical, x_inst->result_id(),
-            builder->GetUintConstantId(21));
-        Instruction* y_shft_inst = builder->AddBinaryOp(
-            GetUintId(), SpvOpShiftLeftLogical, y_inst->result_id(),
-            builder->GetUintConstantId(10));
-        Instruction* x_or_y_inst = builder->AddBinaryOp(
-            GetUintId(), SpvOpBitwiseOr, x_shft_inst->result_id(),
-            y_shft_inst->result_id());
-        Instruction* x_or_y_or_z_inst =
-            builder->AddBinaryOp(GetUintId(), SpvOpBitwiseOr,
-                                 x_or_y_inst->result_id(), z_inst->result_id());
-        GenDebugOutputFieldCode(base_offset_id, kInstCompOutGlobalInvocationId,
-                                x_or_y_or_z_inst->result_id(), builder);
-      } else {
-        // For version 2 format, write all three words
-        GenDebugOutputFieldCode(base_offset_id, kInstCompOutGlobalInvocationIdX,
-                                x_inst->result_id(), builder);
-        GenDebugOutputFieldCode(base_offset_id, kInstCompOutGlobalInvocationIdY,
-                                y_inst->result_id(), builder);
-        GenDebugOutputFieldCode(base_offset_id, kInstCompOutGlobalInvocationIdZ,
-                                z_inst->result_id(), builder);
-      }
+      GenDebugOutputFieldCode(base_offset_id, kInstCompOutGlobalInvocationIdX,
+                              x_inst->result_id(), builder);
+      GenDebugOutputFieldCode(base_offset_id, kInstCompOutGlobalInvocationIdY,
+                              y_inst->result_id(), builder);
+      GenDebugOutputFieldCode(base_offset_id, kInstCompOutGlobalInvocationIdZ,
+                              z_inst->result_id(), builder);
     } break;
     case SpvExecutionModelGeometry: {
       // Load and store PrimitiveId and InvocationId.
@@ -231,30 +237,23 @@ void InstrumentPass::GenStageStreamWriteCode(uint32_t stage_idx,
           kInstTessCtlOutPrimitiveId, base_offset_id, builder);
     } break;
     case SpvExecutionModelTessellationEvaluation: {
-      if (version_ == 1) {
-        // For format version 1, load and store InvocationId.
-        GenBuiltinOutputCode(
-            context()->GetBuiltinInputVarId(SpvBuiltInInvocationId),
-            kInstTessOutInvocationId, base_offset_id, builder);
-      } else {
-        // For format version 2, load and store PrimitiveId and TessCoord.uv
-        GenBuiltinOutputCode(
-            context()->GetBuiltinInputVarId(SpvBuiltInPrimitiveId),
-            kInstTessEvalOutPrimitiveId, base_offset_id, builder);
-        uint32_t load_id = GenVarLoad(
-            context()->GetBuiltinInputVarId(SpvBuiltInTessCoord), builder);
-        Instruction* uvec3_cast_inst =
-            builder->AddUnaryOp(GetVec3UintId(), SpvOpBitcast, load_id);
-        uint32_t uvec3_cast_id = uvec3_cast_inst->result_id();
-        Instruction* u_inst = builder->AddIdLiteralOp(
-            GetUintId(), SpvOpCompositeExtract, uvec3_cast_id, 0);
-        Instruction* v_inst = builder->AddIdLiteralOp(
-            GetUintId(), SpvOpCompositeExtract, uvec3_cast_id, 1);
-        GenDebugOutputFieldCode(base_offset_id, kInstTessEvalOutTessCoordU,
-                                u_inst->result_id(), builder);
-        GenDebugOutputFieldCode(base_offset_id, kInstTessEvalOutTessCoordV,
-                                v_inst->result_id(), builder);
-      }
+      // Load and store PrimitiveId and TessCoord.uv
+      GenBuiltinOutputCode(
+          context()->GetBuiltinInputVarId(SpvBuiltInPrimitiveId),
+          kInstTessEvalOutPrimitiveId, base_offset_id, builder);
+      uint32_t load_id = GenVarLoad(
+          context()->GetBuiltinInputVarId(SpvBuiltInTessCoord), builder);
+      Instruction* uvec3_cast_inst =
+          builder->AddUnaryOp(GetVec3UintId(), SpvOpBitcast, load_id);
+      uint32_t uvec3_cast_id = uvec3_cast_inst->result_id();
+      Instruction* u_inst = builder->AddIdLiteralOp(
+          GetUintId(), SpvOpCompositeExtract, uvec3_cast_id, 0);
+      Instruction* v_inst = builder->AddIdLiteralOp(
+          GetUintId(), SpvOpCompositeExtract, uvec3_cast_id, 1);
+      GenDebugOutputFieldCode(base_offset_id, kInstTessEvalOutTessCoordU,
+                              u_inst->result_id(), builder);
+      GenDebugOutputFieldCode(base_offset_id, kInstTessEvalOutTessCoordV,
+                              v_inst->result_id(), builder);
     } break;
     case SpvExecutionModelFragment: {
       // Load FragCoord and convert to Uint
@@ -306,14 +305,42 @@ void InstrumentPass::GenDebugStreamWrite(
   (void)builder->AddNaryOp(GetVoidId(), SpvOpFunctionCall, args);
 }
 
+bool InstrumentPass::AllConstant(const std::vector<uint32_t>& ids) {
+  for (auto& id : ids) {
+    Instruction* id_inst = context()->get_def_use_mgr()->GetDef(id);
+    if (!spvOpcodeIsConstant(id_inst->opcode())) return false;
+  }
+  return true;
+}
+
 uint32_t InstrumentPass::GenDebugDirectRead(
-    const std::vector<uint32_t>& offset_ids, InstructionBuilder* builder) {
+    const std::vector<uint32_t>& offset_ids, InstructionBuilder* ref_builder) {
   // Call debug input function. Pass func_idx and offset ids as args.
   uint32_t off_id_cnt = static_cast<uint32_t>(offset_ids.size());
   uint32_t input_func_id = GetDirectReadFunctionId(off_id_cnt);
   std::vector<uint32_t> args = {input_func_id};
   (void)args.insert(args.end(), offset_ids.begin(), offset_ids.end());
-  return builder->AddNaryOp(GetUintId(), SpvOpFunctionCall, args)->result_id();
+  // If optimizing direct reads and the call has already been generated,
+  // use its result
+  if (opt_direct_reads_) {
+    uint32_t res_id = call2id_[args];
+    if (res_id != 0) return res_id;
+  }
+  // If the offsets are all constants, the call can be moved to the first block
+  // of the function where its result can be reused. One example where this is
+  // profitable is for uniform buffer references, of which there are often many.
+  InstructionBuilder builder(ref_builder->GetContext(),
+                             &*ref_builder->GetInsertPoint(),
+                             ref_builder->GetPreservedAnalysis());
+  bool insert_in_first_block = opt_direct_reads_ && AllConstant(offset_ids);
+  if (insert_in_first_block) {
+    Instruction* insert_before = &*curr_func_->begin()->tail();
+    builder.SetInsertPoint(insert_before);
+  }
+  uint32_t res_id =
+      builder.AddNaryOp(GetUintId(), SpvOpFunctionCall, args)->result_id();
+  if (insert_in_first_block) call2id_[args] = res_id;
+  return res_id;
 }
 
 bool InstrumentPass::IsSameBlockOp(const Instruction* inst) const {
@@ -407,6 +434,8 @@ uint32_t InstrumentPass::GetOutputBufferBinding() {
       return kDebugOutputBindingStream;
     case kInstValidationIdBuffAddr:
       return kDebugOutputBindingStream;
+    case kInstValidationIdDebugPrintf:
+      return kDebugOutputPrintfStream;
     default:
       assert(false && "unexpected validation id");
   }
@@ -556,6 +585,16 @@ uint32_t InstrumentPass::GetInputBufferId() {
   return input_buffer_id_;
 }
 
+uint32_t InstrumentPass::GetFloatId() {
+  if (float_id_ == 0) {
+    analysis::TypeManager* type_mgr = context()->get_type_mgr();
+    analysis::Float float_ty(32);
+    analysis::Type* reg_float_ty = type_mgr->GetRegisteredType(&float_ty);
+    float_id_ = type_mgr->GetTypeInstruction(reg_float_ty);
+  }
+  return float_id_;
+}
+
 uint32_t InstrumentPass::GetVec4FloatId() {
   if (v4float_id_ == 0) {
     analysis::TypeManager* type_mgr = context()->get_type_mgr();
@@ -586,6 +625,16 @@ uint32_t InstrumentPass::GetUint64Id() {
     uint64_id_ = type_mgr->GetTypeInstruction(reg_uint64_ty);
   }
   return uint64_id_;
+}
+
+uint32_t InstrumentPass::GetUint8Id() {
+  if (uint8_id_ == 0) {
+    analysis::TypeManager* type_mgr = context()->get_type_mgr();
+    analysis::Integer uint8_ty(8, false);
+    analysis::Type* reg_uint8_ty = type_mgr->GetRegisteredType(&uint8_ty);
+    uint8_id_ = type_mgr->GetTypeInstruction(reg_uint8_ty);
+  }
+  return uint8_id_;
 }
 
 uint32_t InstrumentPass::GetVecUintId(uint32_t len) {
@@ -633,21 +682,22 @@ uint32_t InstrumentPass::GetStreamWriteFunctionId(uint32_t stage_idx,
   // Total param count is common params plus validation-specific
   // params
   uint32_t param_cnt = kInstCommonParamCnt + val_spec_param_cnt;
-  if (output_func_id_ == 0) {
+  if (param2output_func_id_[param_cnt] == 0) {
     // Create function
-    output_func_id_ = TakeNextId();
+    param2output_func_id_[param_cnt] = TakeNextId();
     analysis::TypeManager* type_mgr = context()->get_type_mgr();
     std::vector<const analysis::Type*> param_types;
     for (uint32_t c = 0; c < param_cnt; ++c)
       param_types.push_back(type_mgr->GetType(GetUintId()));
     analysis::Function func_ty(type_mgr->GetType(GetVoidId()), param_types);
     analysis::Type* reg_func_ty = type_mgr->GetRegisteredType(&func_ty);
-    std::unique_ptr<Instruction> func_inst(new Instruction(
-        get_module()->context(), SpvOpFunction, GetVoidId(), output_func_id_,
-        {{spv_operand_type_t::SPV_OPERAND_TYPE_LITERAL_INTEGER,
-          {SpvFunctionControlMaskNone}},
-         {spv_operand_type_t::SPV_OPERAND_TYPE_ID,
-          {type_mgr->GetTypeInstruction(reg_func_ty)}}}));
+    std::unique_ptr<Instruction> func_inst(
+        new Instruction(get_module()->context(), SpvOpFunction, GetVoidId(),
+                        param2output_func_id_[param_cnt],
+                        {{spv_operand_type_t::SPV_OPERAND_TYPE_LITERAL_INTEGER,
+                          {SpvFunctionControlMaskNone}},
+                         {spv_operand_type_t::SPV_OPERAND_TYPE_ID,
+                          {type_mgr->GetTypeInstruction(reg_func_ty)}}}));
     get_def_use_mgr()->AnalyzeInstDefUse(&*func_inst);
     std::unique_ptr<Function> output_func =
         MakeUnique<Function>(std::move(func_inst));
@@ -671,8 +721,7 @@ uint32_t InstrumentPass::GetStreamWriteFunctionId(uint32_t stage_idx,
         context(), &*new_blk_ptr,
         IRContext::kAnalysisDefUse | IRContext::kAnalysisInstrToBlockMapping);
     // Gen test if debug output buffer size will not be exceeded.
-    uint32_t val_spec_offset =
-        (version_ == 1) ? kInstStageOutCnt : kInst2StageOutCnt;
+    uint32_t val_spec_offset = kInstStageOutCnt;
     uint32_t obuf_record_sz = val_spec_offset + val_spec_param_cnt;
     uint32_t buf_id = GetOutputBufferId();
     uint32_t buf_uint_ptr_id = GetOutputBufferPtrId();
@@ -709,7 +758,6 @@ uint32_t InstrumentPass::GetStreamWriteFunctionId(uint32_t stage_idx,
                                        write_blk_id, merge_blk_id, merge_blk_id,
                                        SpvSelectionControlMaskNone);
     // Close safety test block and gen write block
-    new_blk_ptr->SetParent(&*output_func);
     output_func->AddBasicBlock(std::move(new_blk_ptr));
     new_blk_ptr = MakeUnique<BasicBlock>(std::move(write_label));
     builder.SetInsertPoint(&*new_blk_ptr);
@@ -724,23 +772,19 @@ uint32_t InstrumentPass::GetStreamWriteFunctionId(uint32_t stage_idx,
     }
     // Close write block and gen merge block
     (void)builder.AddBranch(merge_blk_id);
-    new_blk_ptr->SetParent(&*output_func);
     output_func->AddBasicBlock(std::move(new_blk_ptr));
     new_blk_ptr = MakeUnique<BasicBlock>(std::move(merge_label));
     builder.SetInsertPoint(&*new_blk_ptr);
     // Close merge block and function and add function to module
     (void)builder.AddNullaryOp(0, SpvOpReturn);
-    new_blk_ptr->SetParent(&*output_func);
     output_func->AddBasicBlock(std::move(new_blk_ptr));
     std::unique_ptr<Instruction> func_end_inst(
         new Instruction(get_module()->context(), SpvOpFunctionEnd, 0, 0, {}));
     get_def_use_mgr()->AnalyzeInstDefUse(&*func_end_inst);
     output_func->SetFunctionEnd(std::move(func_end_inst));
     context()->AddFunction(std::move(output_func));
-    output_func_param_cnt_ = param_cnt;
   }
-  assert(param_cnt == output_func_param_cnt_ && "bad arg count");
-  return output_func_id_;
+  return param2output_func_id_[param_cnt];
 }
 
 uint32_t InstrumentPass::GetDirectReadFunctionId(uint32_t param_cnt) {
@@ -813,7 +857,6 @@ uint32_t InstrumentPass::GetDirectReadFunctionId(uint32_t param_cnt) {
       context(), SpvOpReturnValue, 0, 0,
       std::initializer_list<Operand>{{SPV_OPERAND_TYPE_ID, {last_value_id}}}));
   // Close block and function and add function to module
-  new_blk_ptr->SetParent(&*input_func);
   input_func->AddBasicBlock(std::move(new_blk_ptr));
   std::unique_ptr<Instruction> func_end_inst(
       new Instruction(get_module()->context(), SpvOpFunctionEnd, 0, 0, {}));
@@ -824,21 +867,52 @@ uint32_t InstrumentPass::GetDirectReadFunctionId(uint32_t param_cnt) {
   return func_id;
 }
 
+void InstrumentPass::SplitBlock(
+    BasicBlock::iterator inst_itr, UptrVectorIterator<BasicBlock> block_itr,
+    std::vector<std::unique_ptr<BasicBlock>>* new_blocks) {
+  // Make sure def/use analysis is done before we start moving instructions
+  // out of function
+  (void)get_def_use_mgr();
+  // Move original block's preceding instructions into first new block
+  std::unique_ptr<BasicBlock> first_blk_ptr;
+  MovePreludeCode(inst_itr, block_itr, &first_blk_ptr);
+  InstructionBuilder builder(
+      context(), &*first_blk_ptr,
+      IRContext::kAnalysisDefUse | IRContext::kAnalysisInstrToBlockMapping);
+  uint32_t split_blk_id = TakeNextId();
+  std::unique_ptr<Instruction> split_label(NewLabel(split_blk_id));
+  (void)builder.AddBranch(split_blk_id);
+  new_blocks->push_back(std::move(first_blk_ptr));
+  // Move remaining instructions into split block and add to new blocks
+  std::unique_ptr<BasicBlock> split_blk_ptr(
+      new BasicBlock(std::move(split_label)));
+  MovePostludeCode(block_itr, &*split_blk_ptr);
+  new_blocks->push_back(std::move(split_blk_ptr));
+}
+
 bool InstrumentPass::InstrumentFunction(Function* func, uint32_t stage_idx,
                                         InstProcessFunction& pfn) {
+  curr_func_ = func;
+  call2id_.clear();
+  bool first_block_split = false;
   bool modified = false;
-  // Compute function index
-  uint32_t function_idx = 0;
-  for (auto fii = get_module()->begin(); fii != get_module()->end(); ++fii) {
-    if (&*fii == func) break;
-    ++function_idx;
-  }
-  std::vector<std::unique_ptr<BasicBlock>> new_blks;
+  // Apply instrumentation function to each instruction.
   // Using block iterators here because of block erasures and insertions.
+  std::vector<std::unique_ptr<BasicBlock>> new_blks;
   for (auto bi = func->begin(); bi != func->end(); ++bi) {
     for (auto ii = bi->begin(); ii != bi->end();) {
-      // Generate instrumentation if warranted
-      pfn(ii, bi, stage_idx, &new_blks);
+      // Split all executable instructions out of first block into a following
+      // block. This will allow function calls to be inserted into the first
+      // block without interfering with the instrumentation algorithm.
+      if (opt_direct_reads_ && !first_block_split) {
+        if (ii->opcode() != SpvOpVariable) {
+          SplitBlock(ii, bi, &new_blks);
+          first_block_split = true;
+        }
+      } else {
+        pfn(ii, bi, stage_idx, &new_blks);
+      }
+      // If no new code, continue
       if (new_blks.size() == 0) {
         ++ii;
         continue;
@@ -876,7 +950,7 @@ bool InstrumentPass::InstProcessCallTreeFromRoots(InstProcessFunction& pfn,
   std::unordered_set<uint32_t> done;
   // Don't process input and output functions
   for (auto& ifn : param2input_func_id_) done.insert(ifn.second);
-  if (output_func_id_ != 0) done.insert(output_func_id_);
+  for (auto& ofn : param2output_func_id_) done.insert(ofn.second);
   // Process all functions from roots
   while (!roots->empty()) {
     const uint32_t fi = roots->front();
@@ -905,23 +979,35 @@ bool InstrumentPass::InstProcessEntryPointCallTree(InstProcessFunction& pfn) {
   for (auto& e : get_module()->entry_points()) {
     if (ecnt == 0)
       stage = e.GetSingleWordInOperand(kEntryPointExecutionModelInIdx);
-    else if (e.GetSingleWordInOperand(kEntryPointExecutionModelInIdx) != stage)
+    else if (e.GetSingleWordInOperand(kEntryPointExecutionModelInIdx) !=
+             stage) {
+      if (consumer()) {
+        std::string message = "Mixed stage shader module not supported";
+        consumer()(SPV_MSG_ERROR, 0, {0, 0, 0}, message.c_str());
+      }
       return false;
+    }
     ++ecnt;
   }
-  // Only supporting vertex, fragment and compute shaders at the moment.
-  // TODO(greg-lunarg): Handle all stages.
+  // Check for supported stages
   if (stage != SpvExecutionModelVertex && stage != SpvExecutionModelFragment &&
       stage != SpvExecutionModelGeometry &&
       stage != SpvExecutionModelGLCompute &&
       stage != SpvExecutionModelTessellationControl &&
       stage != SpvExecutionModelTessellationEvaluation &&
+      stage != SpvExecutionModelTaskNV && stage != SpvExecutionModelMeshNV &&
       stage != SpvExecutionModelRayGenerationNV &&
       stage != SpvExecutionModelIntersectionNV &&
       stage != SpvExecutionModelAnyHitNV &&
       stage != SpvExecutionModelClosestHitNV &&
-      stage != SpvExecutionModelMissNV && stage != SpvExecutionModelCallableNV)
+      stage != SpvExecutionModelMissNV &&
+      stage != SpvExecutionModelCallableNV) {
+    if (consumer()) {
+      std::string message = "Stage not supported by instrumentation";
+      consumer()(SPV_MSG_ERROR, 0, {0, 0, 0}, message.c_str());
+    }
     return false;
+  }
   // Add together the roots of all entry points
   std::queue<uint32_t> roots;
   for (auto& e : get_module()->entry_points()) {
@@ -935,12 +1021,12 @@ void InstrumentPass::InitializeInstrument() {
   output_buffer_id_ = 0;
   output_buffer_ptr_id_ = 0;
   input_buffer_ptr_id_ = 0;
-  output_func_id_ = 0;
-  output_func_param_cnt_ = 0;
   input_buffer_id_ = 0;
+  float_id_ = 0;
   v4float_id_ = 0;
   uint_id_ = 0;
   uint64_id_ = 0;
+  uint8_id_ = 0;
   v4uint_id_ = 0;
   v3uint_id_ = 0;
   bool_id_ = 0;
@@ -952,6 +1038,10 @@ void InstrumentPass::InitializeInstrument() {
   // clear collections
   id2function_.clear();
   id2block_.clear();
+
+  // clear maps
+  param2input_func_id_.clear();
+  param2output_func_id_.clear();
 
   // Initialize function and block maps.
   for (auto& fn : *get_module()) {
@@ -994,6 +1084,10 @@ void InstrumentPass::InitializeInstrument() {
     ++module_offset;
   }
   for (auto& i : module->debugs3()) {
+    (void)i;
+    ++module_offset;
+  }
+  for (auto& i : module->ext_inst_debuginfo()) {
     (void)i;
     ++module_offset;
   }

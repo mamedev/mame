@@ -82,6 +82,8 @@ ToDo:
 #include "by35_playboy.lh"
 
 
+namespace {
+
 class by35_state : public genpin_class
 {
 public:
@@ -157,7 +159,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
 	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
 	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -1066,11 +1067,6 @@ WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u11_ca2_w )
-{
-	output().set_value("led0", state);
-}
-
 READ_LINE_MEMBER( by35_state::u11_ca1_r )
 {
 	return m_u11_ca1;
@@ -1473,8 +1469,8 @@ void by35_state::by35(machine_config &config)
 	m_pia_u10->readcb1_handler().set(FUNC(by35_state::u10_cb1_r));
 	m_pia_u10->ca2_handler().set(FUNC(by35_state::u10_ca2_w));
 	m_pia_u10->cb2_handler().set(FUNC(by35_state::u10_cb2_w));
-	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u10->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
+	m_pia_u10->irqb_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by35_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
 	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by35_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
@@ -1484,10 +1480,10 @@ void by35_state::by35(machine_config &config)
 	m_pia_u11->writepb_handler().set(FUNC(by35_state::u11_b_w));
 	m_pia_u11->readca1_handler().set(FUNC(by35_state::u11_ca1_r));
 	m_pia_u11->readcb1_handler().set(FUNC(by35_state::u11_cb1_r));
-	m_pia_u11->ca2_handler().set(FUNC(by35_state::u11_ca2_w));
+	m_pia_u11->ca2_handler().set_output("led0");
 	m_pia_u11->cb2_handler().set(FUNC(by35_state::u11_cb2_w));
-	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u11->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
+	m_pia_u11->irqb_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 	TIMER(config, "timer_d_freq").configure_periodic(FUNC(by35_state::u11_timer), attotime::from_hz(317)); // 555 timer
 	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by35_state::timer_d_pulse));   // 555 Active pulse length
 }
@@ -2789,6 +2785,9 @@ ROM_START(suprbowl)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("suprbowl.snd", 0xf000, 0x1000, CRC(97fc0f7a) SHA1(595aa080a6d2c1ab7e718974c4d01e846e142cc1))
 ROM_END
+
+} // anonymous namespace
+
 
 // AS-2888 sound
 GAME( 1979, sst,      0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
