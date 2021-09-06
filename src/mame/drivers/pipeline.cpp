@@ -89,10 +89,14 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mcu(*this, "mcu")
+		, m_ctc(*this, "ctc")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_vram1(*this, "vram1")
 		, m_vram2(*this, "vram2")
+		, m_vidctrl(0)
+		, m_from_mcu(0)
+		, m_sound_data(0)
 	{
 	}
 
@@ -109,6 +113,8 @@ private:
 	void vidctrl_w(uint8_t data);
 	uint8_t protection_r();
 	void protection_w(uint8_t data);
+	uint8_t sound_data_r();
+	void sound_data_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
@@ -117,6 +123,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	TIMER_CALLBACK_MEMBER(vidctrl_deferred_w);
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 
 	void cpu0_mem(address_map &map);
@@ -125,6 +132,7 @@ private:
 
 	required_device<cpu_device>         m_maincpu;
 	required_device<m68705r_device>     m_mcu;
+	required_device<z80ctc_device>      m_ctc;
 	required_device<gfxdecode_device>   m_gfxdecode;
 	required_device<palette_device>     m_palette;
 
@@ -137,12 +145,16 @@ private:
 	u8                      m_vidctrl;
 	std::unique_ptr<u8[]>   m_palram;
 	u8                      m_from_mcu;
+	u8                      m_sound_data;
 };
 
 
 void pipeline_state::machine_start()
 {
+	membank("soundbank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
+
 	save_item(NAME(m_from_mcu));
+	save_item(NAME(m_sound_data));
 }
 
 TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
@@ -179,7 +191,14 @@ u32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void pipeline_state::vidctrl_w(uint8_t data)
 {
-	m_vidctrl = data;
+	// synchronization is needed to avoid spurious CTC interrupts
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipeline_state::vidctrl_deferred_w),this), data);
+}
+
+TIMER_CALLBACK_MEMBER(pipeline_state::vidctrl_deferred_w)
+{
+	m_vidctrl = u8(param);
+	m_ctc->trg2(BIT(param, 1));
 }
 
 void pipeline_state::vram2_w(offs_t offset, uint8_t data)
@@ -222,6 +241,16 @@ void pipeline_state::protection_w(uint8_t data)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
+uint8_t pipeline_state::sound_data_r()
+{
+	return m_sound_data;
+}
+
+void pipeline_state::sound_data_w(uint8_t data)
+{
+	m_sound_data = data;
+}
+
 void pipeline_state::cpu0_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -237,15 +266,16 @@ void pipeline_state::cpu0_mem(address_map &map)
 void pipeline_state::cpu1_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
 	map(0xc000, 0xc7ff).ram();
-	map(0xe000, 0xe003).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xe001).mirror(2).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
 void pipeline_state::sound_port(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x06, 0x07).noprw();
+	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x04, 0x07).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void pipeline_state::mcu_porta_w(uint8_t data)
@@ -355,23 +385,24 @@ void pipeline_state::pipeline_palette(palette_device &palette) const
 void pipeline_state::pipeline(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 7372800/2);
+	Z80(config, m_maincpu, 7.3728_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pipeline_state::cpu0_mem);
 
-	z80_device& audiocpu(Z80(config, "audiocpu", 7372800/2));
+	z80_device& audiocpu(Z80(config, "audiocpu", 7.3728_MHz_XTAL / 2));
 	audiocpu.set_daisy_config(daisy_chain_sound);
 	audiocpu.set_addrmap(AS_PROGRAM, &pipeline_state::cpu1_mem);
 	audiocpu.set_addrmap(AS_IO, &pipeline_state::sound_port);
 
-	M68705R3(config, m_mcu, 7372800/2);
+	M68705R3(config, m_mcu, 7.3728_MHz_XTAL / 2);
 	m_mcu->porta_w().set(FUNC(pipeline_state::mcu_porta_w));
 
-	z80ctc_device& ctc(Z80CTC(config, "ctc", 7372800/2 /* same as "audiocpu" */));
-	ctc.intr_callback().set_inputline("audiocpu", INPUT_LINE_IRQ0);
+	Z80CTC(config, m_ctc, 7.3728_MHz_XTAL / 2 /* same as "audiocpu" */);
+	// TODO: external clock needed for channel 1 (DAC-related)?
+	m_ctc->intr_callback().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set_ioport("P1");
-	// PORT B Write - related to sound/music : check code at 0x1c0a
+	ppi0.out_pb_callback().set(FUNC(pipeline_state::sound_data_w)); // related to sound/music : check code at 0x1c0a
 	ppi0.out_pc_callback().set(FUNC(pipeline_state::vidctrl_w));
 
 	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
@@ -380,7 +411,9 @@ void pipeline_state::pipeline(machine_config &config)
 	ppi1.in_pc_callback().set(FUNC(pipeline_state::protection_r));
 	ppi1.out_pc_callback().set(FUNC(pipeline_state::protection_w));
 
-	I8255A(config, "ppi8255_2", 0);
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.in_pb_callback().set(FUNC(pipeline_state::sound_data_r));
+	ppi2.out_pc_callback().set_membank("soundbank").bit(7);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -397,7 +430,7 @@ void pipeline_state::pipeline(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	YM2203(config, "ymsnd", 7372800/4).add_route(ALL_OUTPUTS, "mono", 0.60);
+	YM2203(config, "ymsnd", 7.3728_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 
@@ -432,4 +465,4 @@ ROM_START( pipeline )
 	ROM_LOAD( "82s123.u79", 0x00200, 0x00020,CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
-GAME( 1990, pipeline, 0, pipeline, pipeline, pipeline_state, empty_init, ROT0, "Daehyun Electronics", "Pipeline", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipeline, 0, pipeline, pipeline, pipeline_state, empty_init, ROT0, "Daehyun Electronics", "Pipeline", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
