@@ -17,7 +17,6 @@
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "machine/nvram.h"
-#include "machine/ram.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -28,10 +27,9 @@ public:
 	alphasmart_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_lcdc0(*this, "ks0066_0")
-		, m_lcdc1(*this, "ks0066_1")
+		, m_lcdc(*this, "ks0066_%u", 0U)
 		, m_nvram(*this, "nvram")
-		, m_ram(*this, RAM_TAG)
+		, m_nvram_base(*this, "nvram", 0x20000, ENDIANNESS_BIG)
 		, m_rambank(*this, "rambank")
 		, m_keyboard(*this, "COL.%u", 0)
 		, m_battery_status(*this, "BATTERY")
@@ -44,10 +42,9 @@ public:
 
 protected:
 	required_device<mc68hc11_cpu_device> m_maincpu;
-	required_device<hd44780_device> m_lcdc0;
-	required_device<hd44780_device> m_lcdc1;
+	required_device_array<hd44780_device, 2> m_lcdc;
 	required_device<nvram_device> m_nvram;
-	required_device<ram_device> m_ram;
+	memory_share_creator<uint8_t> m_nvram_base;
 	required_memory_bank m_rambank;
 	required_ioport_array<16> m_keyboard;
 	required_ioport m_battery_status;
@@ -140,10 +137,10 @@ void alphasmart_state::update_lcdc(bool lcdc0, bool lcdc1)
 		uint8_t lcdc_data = 0;
 
 		if (lcdc0)
-			lcdc_data |= m_lcdc0->read(BIT(m_matrix[1], 1));
+			lcdc_data |= m_lcdc[0]->read(BIT(m_matrix[1], 1));
 
 		if (lcdc1)
-			lcdc_data |= m_lcdc1->read(BIT(m_matrix[1], 1));
+			lcdc_data |= m_lcdc[1]->read(BIT(m_matrix[1], 1));
 
 		m_port_d = (m_port_d & 0xc3) | (lcdc_data>>2);
 	}
@@ -152,10 +149,10 @@ void alphasmart_state::update_lcdc(bool lcdc0, bool lcdc1)
 		uint8_t lcdc_data = (m_port_d<<2) & 0xf0;
 
 		if (lcdc0)
-			m_lcdc0->write(BIT(m_matrix[1], 1), lcdc_data);
+			m_lcdc[0]->write(BIT(m_matrix[1], 1), lcdc_data);
 
 		if (lcdc1)
-			m_lcdc1->write(BIT(m_matrix[1], 1), lcdc_data);
+			m_lcdc[1]->write(BIT(m_matrix[1], 1), lcdc_data);
 	}
 }
 
@@ -530,19 +527,16 @@ void alphasmart_state::alphasmart_palette(palette_device &palette) const
 
 uint32_t alphasmart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_lcdc0->screen_update(screen, *m_tmp_bitmap, cliprect);
+	m_lcdc[0]->screen_update(screen, *m_tmp_bitmap, cliprect);
 	copybitmap(bitmap, *m_tmp_bitmap, 0, 0, 0, 0, cliprect);
-	m_lcdc1->screen_update(screen, *m_tmp_bitmap, cliprect);
+	m_lcdc[1]->screen_update(screen, *m_tmp_bitmap, cliprect);
 	copybitmap(bitmap, *m_tmp_bitmap, 0, 0, 0, 18,cliprect);
 	return 0;
 }
 
 void alphasmart_state::machine_start()
 {
-	uint8_t* ram = m_ram->pointer();
-
-	m_rambank->configure_entries(0, 4, ram, 0x8000);
-	m_nvram->set_base(ram, 0x8000*4);
+	m_rambank->configure_entries(0, 4, &m_nvram_base[0], 0x8000);
 
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(6 * 40, 9 * 4);
 }
@@ -573,12 +567,10 @@ void alphasmart_state::alphasmart(machine_config &config)
 	m_maincpu->in_pd_callback().set(FUNC(alphasmart_state::port_d_r));
 	m_maincpu->out_pd_callback().set(FUNC(alphasmart_state::port_d_w));
 
-	KS0066_F05(config, m_lcdc0, 0);
-	m_lcdc0->set_lcd_size(2, 40);
-	KS0066_F05(config, m_lcdc1, 0);
-	m_lcdc1->set_lcd_size(2, 40);
-
-	RAM(config, RAM_TAG).set_default_size("128K");
+	KS0066_F05(config, m_lcdc[0], 0);
+	m_lcdc[0]->set_lcd_size(2, 40);
+	KS0066_F05(config, m_lcdc[1], 0);
+	m_lcdc[1]->set_lcd_size(2, 40);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
