@@ -7867,12 +7867,12 @@ license:CC0
 	</software>
 
 	<software name="daiva">
-		<description>Daiva - Imperial of Nirsartia (Jpn)</description>
+		<description>Daiva Story 6: Imperial of Nirsartia (Jpn)</description>
 		<year>1986</year>
 		<publisher>Toemiland</publisher>
 		<info name="serial" value="TFS-DV"/>
 		<info name="release" value="19861205"/>
-		<info name="alt_title" value="ディーヴァ ナーサティアの玉座"/>
+		<info name="alt_title" value="ディーヴァ ストーリー6·ナーサティアの玉座"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
@@ -68740,9 +68740,10 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<software name="daivah" cloneof="daiva">
-		<description>Daiva - Imperial of Nirsartia (FMG pirate)</description>
+		<description>Daiva Story 6: Imperial of Nirsartia (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー6·ナーサティアの玉座"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />

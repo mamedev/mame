@@ -13174,10 +13174,10 @@ TODO:
 
 	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
 	<software name="daiva" supported="no">
-		<description>Daiva - Kari-Yuga no Kouki</description>
+		<description>Daiva Story 7: Light of Kari Yuga</description>
 		<year>1987</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
-		<info name="alt_title" value="ディーヴァ カリ・ユガの光輝" />
+		<info name="alt_title" value="ディーヴァ ストーリー7·カリ・ユガの光輝" />
 		<info name="release" value="198706xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
@@ -13195,10 +13195,10 @@ TODO:
 
 	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
 	<software name="daivaa" cloneof="daiva" supported="no">
-		<description>Daiva - Kari-Yuga no Kouki (Alt)</description>
+		<description>Daiva Story 7: Light of Kari Yuga (Alt)</description>
 		<year>1987</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
-		<info name="alt_title" value="ディーヴァ カリ・ユガの光輝" />
+		<info name="alt_title" value="ディーヴァ ストーリー7·カリ・ユガの光輝" />
 		<info name="release" value="198706xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -13216,10 +13216,10 @@ TODO:
 
 	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
 	<software name="daivacal" cloneof="daiva" supported="no">
-		<description>Daiva - Kari-Yuga no Kouki (Alt 2)</description>
+		<description>Daiva Story 7: Light of Kari Yuga (Alt 2)</description>
 		<year>1987</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
-		<info name="alt_title" value="ディーヴァ カリ・ユガの光輝" />
+		<info name="alt_title" value="ディーヴァ ストーリー7·カリ・ユガの光輝" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A?" />
