@@ -45,6 +45,12 @@ public:
 
 	void bus_error() { m_bus_error = true; }
 
+	// This method allows bit 19 of the Boot-Mode Settings to be flipped. See Chapter 9, page 223 of the R4000 User Manual.
+	// When this bit is 0 (enabled = true), then the CP0 timer will set interrupt 5 whenever it expires.
+	// When this bit is 1 (enabled = false), the CP0 timer interrupt is disabled.
+	// When the timer interrupt is disabled, interrupt 5 becomes a standard general-purpose interrupt.
+	void set_timintdis(bool enabled) { m_timer_interrupt_enabled = enabled; }
+
 protected:
 	enum cache_size
 	{
@@ -349,6 +355,7 @@ protected:
 	void cp0_tlbwi(u8 const index);
 	void cp0_tlbwr();
 	void cp0_tlbp();
+	bool m_timer_interrupt_enabled = true;
 
 	// cp0 helpers
 	TIMER_CALLBACK_MEMBER(cp0_timer_callback);

@@ -211,7 +211,10 @@ void mips3_device::mips3com_tlbp()
 TIMER_CALLBACK_MEMBER( mips3_device::compare_int_callback )
 {
 	m_compare_int_timer->adjust(attotime::never);
-	// set_input_line(MIPS3_IRQ5, ASSERT_LINE);
+	if(m_timer_interrupt_enabled)
+	{
+		set_input_line(MIPS3_IRQ5, ASSERT_LINE);
+	}
 }
 
 

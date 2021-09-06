@@ -304,6 +304,12 @@ public:
 	void set_secondary_cache_line_size(uint8_t secondary_cache_line_size) { c_secondary_cache_line_size = secondary_cache_line_size; }
 	void set_system_clock(uint32_t system_clock) { c_system_clock = system_clock; }
 
+	// This method allows bit 19 of the Boot-Mode Settings to be flipped. See Chapter 9, page 223 of the R4000 User Manual.
+	// When this bit is 0 (enabled = true), then the CP0 timer will set interrupt 5 whenever it expires.
+	// When this bit is 1 (enabled = false), the CP0 timer interrupt is disabled.
+	// When the timer interrupt is disabled, interrupt 5 becomes a standard general-purpose interrupt.
+	void set_timintdis(bool enabled) { m_timer_interrupt_enabled = enabled; }
+
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
 
 	void add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
@@ -417,6 +423,7 @@ protected:
 	uint32_t        m_ll_value;
 	uint64_t        m_lld_value;
 	uint32_t        m_badcop_value;
+	bool            m_timer_interrupt_enabled = true;
 
 	/* endian-dependent load/store */
 	typedef void (mips3_device::*loadstore_func)(uint32_t op);

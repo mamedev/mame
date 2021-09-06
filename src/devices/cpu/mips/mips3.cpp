@@ -1753,7 +1753,10 @@ void mips3_device::set_cop0_reg(int idx, uint64_t val)
 
 		case COP0_Compare:
 			m_core->compare_armed = 1;
-			CAUSE &= ~0x8000;
+			if(m_timer_interrupt_enabled)
+			{
+				CAUSE &= ~0x8000;
+			}
 			m_core->cpr[0][idx] = val & 0xffffffff;
 			mips3com_update_cycle_counting();
 			break;
