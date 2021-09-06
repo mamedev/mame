@@ -220,6 +220,7 @@ private:
 	char const *const m_source;
 	device_feature::type const m_unemulated_features;
 	device_feature::type const m_imperfect_features;
+	device_type_impl_base const *const m_parent_rom;
 
 	device_type_impl_base *m_next;
 
@@ -234,6 +235,7 @@ public:
 		, m_source(nullptr)
 		, m_unemulated_features(device_feature::NONE)
 		, m_imperfect_features(device_feature::NONE)
+		, m_parent_rom(nullptr)
 		, m_next(nullptr)
 	{
 	}
@@ -247,6 +249,7 @@ public:
 		, m_source(Source)
 		, m_unemulated_features(DeviceClass::unemulated_features())
 		, m_imperfect_features(DeviceClass::imperfect_features())
+		, m_parent_rom(DeviceClass::parent_rom_device_type())
 		, m_next(device_registrar::register_device(*this))
 	{
 	}
@@ -260,6 +263,7 @@ public:
 		, m_source(Source)
 		, m_unemulated_features(DriverClass::unemulated_features() | Unemulated)
 		, m_imperfect_features((DriverClass::imperfect_features() & ~Unemulated) | Imperfect)
+		, m_parent_rom(DriverClass::parent_rom_device_type())
 		, m_next(nullptr)
 	{
 	}
@@ -270,6 +274,7 @@ public:
 	char const *source() const { return m_source; }
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
+	device_type_impl_base const *parent_rom_device_type() const { return m_parent_rom; }
 
 	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
 	{
@@ -516,6 +521,15 @@ public:
 	///   emulated features of the device.
 	/// \sa unemulated_features
 	static constexpr feature_type imperfect_features() { return feature::NONE; }
+
+	/// \brief Get parent device type for ROM search
+	///
+	/// Impement this member in a derived class to declare the parent
+	/// device type for the purpose of searching for ROMs.  Only one
+	/// level is allowed.  It is an error the parent device type itself
+	/// declares a parent device type.
+	/// \return Pointer to parent device type, or nullptr.
+	static auto parent_rom_device_type() { return nullptr; }
 
 	virtual ~device_t();
 

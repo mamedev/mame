@@ -14,6 +14,17 @@
 #include "keyboard.h"
 
 
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_US, bus::amiga::keyboard, a2000_kbd_g80_us_device)
+DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_DE, bus::amiga::keyboard, a2000_kbd_g80_de_device)
+DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_SE, bus::amiga::keyboard, a2000_kbd_g80_se_device)
+DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_DK, bus::amiga::keyboard, a2000_kbd_g80_dk_device)
+DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_GB, bus::amiga::keyboard, a2000_kbd_g80_gb_device)
+
+
 namespace bus::amiga::keyboard {
 
 //**************************************************************************
@@ -73,6 +84,8 @@ class a2000_kbd_g80_de_device : public a2000_kbd_g80_device
 public:
 	a2000_kbd_g80_de_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
+	static auto parent_rom_device_type() { return &A2000_KBD_G80_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -83,6 +96,8 @@ class a2000_kbd_g80_se_device : public a2000_kbd_g80_device
 {
 public:
 	a2000_kbd_g80_se_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &A2000_KBD_G80_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -95,6 +110,8 @@ class a2000_kbd_g80_dk_device : public a2000_kbd_g80_device
 public:
 	a2000_kbd_g80_dk_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
+	static auto parent_rom_device_type() { return &A2000_KBD_G80_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -106,21 +123,12 @@ class a2000_kbd_g80_gb_device : public a2000_kbd_g80_device
 public:
 	a2000_kbd_g80_gb_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
+	static auto parent_rom_device_type() { return &A2000_KBD_G80_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
 } // namespace bus::amiga::keyboard
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_US, bus::amiga::keyboard, a2000_kbd_g80_us_device)
-DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_DE, bus::amiga::keyboard, a2000_kbd_g80_de_device)
-DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_SE, bus::amiga::keyboard, a2000_kbd_g80_se_device)
-DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_DK, bus::amiga::keyboard, a2000_kbd_g80_dk_device)
-DECLARE_DEVICE_TYPE_NS(A2000_KBD_G80_GB, bus::amiga::keyboard, a2000_kbd_g80_gb_device)
 
 #endif // MAME_BUS_AMIGA_KEYBOARD_A2000_H

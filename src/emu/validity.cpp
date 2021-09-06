@@ -1493,6 +1493,10 @@ void validity_checker::validate_driver(device_t &root)
 	if (clone_of != -1 && (clone_of = driver_list::non_bios_clone(clone_of)) != -1)
 		osd_printf_error("Driver is a clone of a clone\n");
 
+	// look for drivers specifying a parent ROM device type
+	if (root.type().parent_rom_device_type())
+		osd_printf_error("Driver has parent ROM device type '%s'\n", root.type().parent_rom_device_type()->shortname());
+
 	// make sure the driver name is not too long
 	if (!is_clone && strlen(m_current_driver->name) > 16)
 		osd_printf_error("Parent driver name must be 16 characters or less\n");
@@ -1548,11 +1552,11 @@ void validity_checker::validate_driver(device_t &root)
 
 	// catch invalid flag combinations
 	if (unemulated & ~device_t::feature::ALL)
-		osd_printf_error("Driver has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+		osd_printf_error("Driver has invalid unemulated feature flags (0x%08X)\n", util::underlying_value(unemulated & ~device_t::feature::ALL));
 	if (imperfect & ~device_t::feature::ALL)
-		osd_printf_error("Driver has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+		osd_printf_error("Driver has invalid imperfect feature flags (0x%08X)\n", util::underlying_value(imperfect & ~device_t::feature::ALL));
 	if (unemulated & imperfect)
-		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
+		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08X)\n", util::underlying_value(unemulated & imperfect));
 	if ((m_current_driver->flags & machine_flags::NO_SOUND_HW) && ((unemulated | imperfect) & device_t::feature::SOUND))
 		osd_printf_error("Machine without sound hardware cannot have unemulated/imperfect sound\n");
 }
@@ -2203,11 +2207,22 @@ void validity_checker::validate_device_types()
 		device_t::feature_type const unemulated(dev->type().unemulated_features());
 		device_t::feature_type const imperfect(dev->type().imperfect_features());
 		if (unemulated & ~device_t::feature::ALL)
-			osd_printf_error("Device has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+			osd_printf_error("Device has invalid unemulated feature flags (0x%08X)\n", util::underlying_value(unemulated & ~device_t::feature::ALL));
 		if (imperfect & ~device_t::feature::ALL)
-			osd_printf_error("Device has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+			osd_printf_error("Device has invalid imperfect feature flags (0x%08X)\n", util::underlying_value(imperfect & ~device_t::feature::ALL));
 		if (unemulated & imperfect)
-			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
+			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08X)\n", util::underlying_value(unemulated & imperfect));
+
+		// check that parents are only ever one generation deep
+		auto const parent(dev->type().parent_rom_device_type());
+		if (parent)
+		{
+			auto const grandparent(parent->parent_rom_device_type());
+			if ((dev->type() == *parent) || !strcmp(parent->shortname(), name))
+				osd_printf_error("Device has parent ROM set that identical to its type\n");
+			if (grandparent)
+				osd_printf_error("Device has parent ROM set '%s' which has parent ROM set '%s'\n", parent->shortname(), grandparent->shortname());
+		}
 
 		// give devices some of the same scrutiny that drivers get - necessary for cards not default for any slots
 		validate_roms(*dev);

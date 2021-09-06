@@ -58,6 +58,12 @@
 #include "cpu/mcs48/mcs48.h"
 
 
+DECLARE_DEVICE_TYPE(A2BUS_GRAPPLER, a2bus_grappler_device)
+DECLARE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, a2bus_grapplerplus_device)
+DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUS, a2bus_buf_grapplerplus_device)
+DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUSA, a2bus_buf_grapplerplus_reva_device)
+
+
 class a2bus_grappler_device_base : public device_t, public device_a2bus_card_interface
 {
 public:
@@ -270,15 +276,11 @@ class a2bus_buf_grapplerplus_reva_device : public a2bus_buf_grapplerplus_device
 public:
 	a2bus_buf_grapplerplus_reva_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
+	static auto parent_rom_device_type() { return &A2BUS_BUFGRAPPLERPLUS; }
+
 protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 };
-
-
-DECLARE_DEVICE_TYPE(A2BUS_GRAPPLER, a2bus_grappler_device)
-DECLARE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, a2bus_grapplerplus_device)
-DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUS, a2bus_buf_grapplerplus_device)
-DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUSA, a2bus_buf_grapplerplus_reva_device)
 
 #endif // MAME_BUS_A2BUS_GRAPPLERPLUS_H
