@@ -154,6 +154,7 @@ class calchase_state : public pcat_base_state
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
+		, m_iocard(*this, "IOCARD%u", 1U)
 	{
 	}
 
@@ -167,6 +168,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	required_ioport_array<5> m_iocard;
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
@@ -178,6 +180,7 @@ private:
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
+	template <unsigned N> uint16_t iocard_r();
 	uint32_t calchase_idle_skip_r();
 	void calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -377,6 +380,12 @@ void calchase_state::nvram_w(offs_t offset, uint8_t data)
 	m_nvram_data[offset] = data;
 }
 
+template <unsigned N>
+uint16_t calchase_state::iocard_r()
+{
+	return m_iocard[N]->read();
+}
+
 
 void calchase_state::calchase_map(address_map &map)
 {
@@ -385,11 +394,11 @@ void calchase_state::calchase_map(address_map &map)
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000c8000, 0x000cffff).noprw();
 	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
-	map(0x000d0004, 0x000d0005).portr("IOCARD1");
-	map(0x000d000c, 0x000d000d).portr("IOCARD2");
-	map(0x000d0032, 0x000d0033).portr("IOCARD3");
-	map(0x000d0030, 0x000d0031).portr("IOCARD4"); // These two controls wheel pot or whatever this game uses ...
-	map(0x000d0034, 0x000d0035).portr("IOCARD5");
+	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::iocard_r<0>));
+	map(0x000d000c, 0x000d000d).r(FUNC(calchase_state::iocard_r<1>));
+	map(0x000d0032, 0x000d0033).r(FUNC(calchase_state::iocard_r<2>));
+	map(0x000d0030, 0x000d0031).r(FUNC(calchase_state::iocard_r<3>)); // These two controls wheel pot or whatever this game uses ...
+	map(0x000d0034, 0x000d0035).r(FUNC(calchase_state::iocard_r<4>));
 	map(0x000d0008, 0x000d000b).nopw(); // ???
 	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::data_w));
 	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::data_w));
