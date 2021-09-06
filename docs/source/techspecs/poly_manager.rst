@@ -531,6 +531,7 @@ Here is a complete example of how to create a software 3D renderer using **poly_
 Our example renderer will only handle flat and Gouraud-shaded triangles with depth (Z)
 buffering.
 
+
 Types
 ~~~~~
 
@@ -797,6 +798,7 @@ the current depth buffer value, and only store the pixel/depth value if it’s l
 
 At the end of each iteration, we advance the 1/Z value by the X-delta in preparation for the
 next pixel.
+
 
 draw_triangle_gouraud
 ~~~~~~~~~~~~~~~~~~~~~
