@@ -125,6 +125,7 @@ void spifi3_device::map(address_map &map)
                           NAME([this](uint32_t data)
                                {
                                    LOG("write spifi_reg.count_hi = 0x%x\n", data);
+                                   spifi_reg.icond &= ~ICOND_CNTZERO;
                                    tcounter &= ~0xff0000;
                                    tcounter |= (data & 0xff) << 16;
                                }));
@@ -138,6 +139,7 @@ void spifi3_device::map(address_map &map)
                           NAME([this](uint32_t data)
                                {
                                    LOG("write spifi_reg.count_mid = 0x%x\n", data);
+                                   spifi_reg.icond &= ~ICOND_CNTZERO;
                                    tcounter &= ~0xff00;
                                    tcounter |= (data & 0xff) << 8;
                                }));
@@ -152,6 +154,7 @@ void spifi3_device::map(address_map &map)
                           NAME([this](uint32_t data)
                                {
                                    LOG("write spifi_reg.count_low = 0x%x\n", data);
+                                   spifi_reg.icond &= ~ICOND_CNTZERO;
                                    tcounter &= ~0xff;
                                    tcounter |= data & 0xff;
                                }));
@@ -1367,12 +1370,19 @@ void spifi3_device::step(bool timeout)
             }
 
             // check for command complete
-            if (xfrDataSource == FIFO && // Done transferring data
-            ((dma_command && transfer_count_zero() && (dma_dir == DMA_IN || m_even_fifo.empty())) // dma in/out: transfer count == 0
-            || (!dma_command && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()) // non-dma out: fifo empty
-            || (!dma_command && (xfr_phase & S_INP) == S_INP && m_even_fifo.size() == 1))) // non-dma in: every byte
+            if (xfrDataSource == FIFO && ((dma_command && transfer_count_zero() && (dma_dir == DMA_IN || m_even_fifo.empty()))))
             {
-                LOG("Data transfer complete\n");
+                LOG("DMA Data transfer complete\n");
+                state = INIT_XFR_BUS_COMPLETE;
+            }
+            else if (xfrDataSource == FIFO && (!dma_command && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()))
+            {
+                LOG("Non-DMA transfer out complete, FIFO drained!\n");
+                state = INIT_XFR_BUS_COMPLETE;
+            }
+            else if (xfrDataSource == FIFO && (!dma_command && (xfr_phase & S_INP) == S_INP && m_even_fifo.size() == 1))
+            {
+                LOG("Non-DMA transfer in complete!\n");
                 state = INIT_XFR_BUS_COMPLETE;
             }
             else if(xfrDataSource == COMMAND_BUFFER && (command_pos >= (spifi_reg.cmlen & CML_LENMASK))) // Done transferring message or command

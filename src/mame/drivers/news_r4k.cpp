@@ -61,8 +61,8 @@
  *   - National Semi DP83932B-VF SONIC Ethernet controller: Not fully working yet (also, is using -C rather than -B version)
  *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: partially emulated
  *   - Sony CXD8418Q WSC-PARK3: not fully emulated, but some of the general platform functions may come from this chip (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
- *   - Sony CXD8403Q DMAC3Q DMA controller: WIP
- *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: WIP
+ *   - Sony CXD8403Q DMAC3Q DMA controller: Partially emulated
+ *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: Partially emulated
  *   - ST Micro M58T02-150PC1 Timekeeper RAM: emulated
  *  DSC-39 XB Framebuffer/video card:
  *   - Sony CXD8486Q XB: not emulated (most likely APbus interface)
@@ -78,7 +78,7 @@
 // The default one has DRC and is faster, but the other one has some different features
 // Uncomment the following line and rebuild to switch implementations. This driver supports
 // both, as long as the #define is used to select which implementation to use.
-#define NO_MIPS3
+// #define NO_MIPS3
 #ifndef NO_MIPS3
 #include "cpu/mips/mips3.h"
 #else
@@ -525,18 +525,21 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // or, this only works due to coincidence. Also possible.
     map(0x14400000, 0x14400003).lr32(NAME([this](offs_t offset) { return 0x0; }));
     map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
-    map(0x1440003c, 0x1440003f).lw32(NAME([this](offs_t offset, uint32_t data) {
-        if (data == 0x10001)
-        {
-            LOG("Enabling map shift!\n");
-            m_map_shift = true;
-        }
-        else
-        {
-            LOG("Disabling map shift!\n");
-            m_map_shift = false;
-        }
-    }));
+    map(0x14400024, 0x14400027).lr32(NAME([this](offs_t offset) { return 0x600a4; }));
+    map(0x1440003c, 0x1440003f)
+        .lw32(NAME([this](offs_t offset, uint32_t data)
+                   {
+                       if (data == 0x10001)
+                       {
+                           LOG("Enabling map shift!\n");
+                           m_map_shift = true;
+                       }
+                       else
+                       {
+                           LOG("Disabling map shift!\n");
+                           m_map_shift = false;
+                       }
+                   }));
 
     // APbus region
     // WSC-PARK3 gate array
@@ -571,10 +574,13 @@ void news_r4k_state::cpu_map_debug(address_map &map)
 uint8_t news_r4k_state::debug_ram_r(offs_t offset)
 {
     uint8_t result = 0xff;
-    if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff) || (!m_map_shift && offset >= 0x7f00000))
+    if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff))
     {
-        // TODO: need to check bigger offsets?
         result = m_ram->read(offset);
+    }
+    else if (!m_map_shift && offset >= 0x7f00000) // upper 32MB before it is mapped into contiguous space
+    {
+        result = m_ram->read(offset - 0x5f00000);
     }
     else
     {
@@ -591,9 +597,13 @@ uint8_t news_r4k_state::debug_ram_r(offs_t offset)
  */
 void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data)
 {
-    if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff) || (!m_map_shift && offset >= 0x7f00000))
+    if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff))
     {
         m_ram->write(offset, data);
+    }
+    else if (!m_map_shift && offset >= 0x7f00000) // upper 32MB before it is mapped into contiguous space
+    {
+        m_ram->write(offset - 0x5f00000, data);
     }
     else
     {
