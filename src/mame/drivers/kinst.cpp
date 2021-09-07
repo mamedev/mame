@@ -202,9 +202,7 @@ public:
 		m_palette(*this, "palette"),
 		m_rambase(*this, "rambase"),
 		m_rambase2(*this, "rambase2"),
-		m_control(*this, "control"),
-		m_rombase(*this, "user1"),
-		m_ports(*this, { "P1", "P2", "VOLUME", "UNUSED", "DSW" })
+		m_rombase(*this, "user1")
 	{
 	}
 
@@ -212,13 +210,11 @@ public:
 	void init_kinst2();
 
 	void kinst(machine_config &config);
+	void kinst2(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r) { return BIT(m_dcs->control_r(), 11); }
 
 protected:
-	enum
-	{
-		TIMER_IRQ0_STOP
-	};
-
 	required_device<mips3_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<dcs_audio_2k_device> m_dcs;
@@ -226,9 +222,9 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void kinst_map(address_map &map);
+	void kinst2_map(address_map &map);
 
 	uint32_t ide_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ide_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -236,20 +232,27 @@ protected:
 private:
 	required_shared_ptr<uint32_t> m_rambase;
 	required_shared_ptr<uint32_t> m_rambase2;
-	required_shared_ptr<uint32_t> m_control;
 	required_region_ptr<uint32_t> m_rombase;
-	required_ioport_array<5> m_ports;
-
-	uint32_t *m_video_base;
-	const uint8_t *m_control_map;
-	emu_timer *m_irq0_stop_timer;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
-	uint32_t control_r(offs_t offset);
-	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ide_extra_r();
 	void ide_extra_w(uint32_t data);
+
+	void vram_control_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void sound_reset_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void sound_control_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void coin_control_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t m_hdd_serial_offset;
+	uint32_t *m_video_base;
+
+	uint32_t m_vram_control = 0;
+	uint32_t m_sound_reset = 0;
+	uint32_t m_sound_control = 0;
+	uint32_t m_sound_data = 0;
+	uint32_t m_coin_control = 0;
 };
 
 
@@ -262,7 +265,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void kinst2uk_map(address_map &map);
 
@@ -270,10 +272,10 @@ protected:
 	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 private:
-	uint8_t m_prot_sel;
-	uint8_t m_prot_cnt;
-	uint8_t m_prot_rega;
-	uint8_t m_prot_regb;
+	uint8_t m_prot_sel = 0;
+	uint8_t m_prot_cnt = 0;
+	uint8_t m_prot_rega = 0;
+	uint8_t m_prot_regb = 0;
 };
 
 
@@ -294,7 +296,12 @@ void kinst_state::machine_start()
 	m_maincpu->add_fastram(0x00000000, 0x0007ffff, false, m_rambase);
 	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 
-	m_irq0_stop_timer = timer_alloc(TIMER_IRQ0_STOP);
+	// register for savestates
+	save_item(NAME(m_vram_control));
+	save_item(NAME(m_sound_reset));
+	save_item(NAME(m_sound_control));
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_coin_control));
 }
 
 
@@ -302,6 +309,7 @@ void kinst2uk_state::machine_start()
 {
 	kinst_state::machine_start();
 
+	// register for savestates
 	save_item(NAME(m_prot_sel));
 	save_item(NAME(m_prot_cnt));
 	save_item(NAME(m_prot_rega));
@@ -321,38 +329,19 @@ void kinst_state::machine_reset()
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
 	uint16_t *identify_device = hdd->identify_device_buffer();
 
-	if (strncmp(machine().system().name, "kinst2", 6) != 0)
-	{
-		/* kinst: tweak the model number so we pass the check */
-		identify_device[27] = ('S' << 8) | 'T';
-		identify_device[28] = ('9' << 8) | '1';
-		identify_device[29] = ('5' << 8) | '0';
-		identify_device[30] = ('A' << 8) | 'G';
-		identify_device[31] = (' ' << 8) | ' ';
-	}
-	else
-	{
-		/* kinst2: tweak the model number so we pass the check */
-		identify_device[10] = ('0' << 8) | '0';
-		identify_device[11] = ('S' << 8) | 'T';
-		identify_device[12] = ('9' << 8) | '1';
-		identify_device[13] = ('5' << 8) | '0';
-		identify_device[14] = ('A' << 8) | 'G';
-	}
+	// insert harddisk model number so we pass the check
+	for (int i = 10; i < 20; i++)
+		identify_device[i] = ('0' << 8) | '0';
+	for (int i = 27; i < 47; i++)
+		identify_device[i] = (' ' << 8) | ' ';
 
-	/* set a safe base location for video */
+	static const char serial[9] = "ST9150AG";
+
+	for (int i = 0; i < 4; i++)
+		identify_device[m_hdd_serial_offset + i] = serial[i * 2] << 8 | serial[i * 2 + 1];
+
+	// set a safe base location for video
 	m_video_base = &m_rambase[0x30000/4];
-}
-
-
-void kinst2uk_state::machine_reset()
-{
-	kinst_state::machine_reset();
-
-	m_prot_sel = 0;
-	m_prot_cnt = 0;
-	m_prot_rega = 0;
-	m_prot_regb = 0;
 }
 
 
@@ -394,23 +383,9 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
  *
  *************************************/
 
-void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_IRQ0_STOP:
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in kinst_state::device_timer");
-	}
-}
-
-
 INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 {
-	device.execute().set_input_line(0, ASSERT_LINE);
-	m_irq0_stop_timer->adjust(attotime::from_usec(50));
+	m_maincpu->pulse_input_line(0, attotime::from_usec(50));
 }
 
 
@@ -494,68 +469,43 @@ void kinst2uk_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
  *
  *************************************/
 
-uint32_t kinst_state::control_r(offs_t offset)
+void kinst_state::vram_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t result;
-
-	// apply shuffling
-	offset = m_control_map[offset / 2];
-	result = m_control[offset];
-
-	switch (offset)
-	{
-	case 2:     // $90 -- sound return
-		result = m_ports[offset]->read();
-		result &= ~0x0002;
-		if (m_dcs->control_r() & 0x800)
-			result |= 0x0002;
-		break;
-
-	case 0:     // $80
-	case 1:     // $88
-	case 3:     // $98
-		result = m_ports[offset]->read();
-		break;
-
-	case 4:     // $a0
-		result = m_ports[offset]->read();
-		if (m_maincpu->pc() == 0x802d428)
-			m_maincpu->spin_until_interrupt();
-		break;
-	}
-
-	return result;
+	COMBINE_DATA(&m_vram_control);
+	if (m_vram_control & 4)
+		m_video_base = &m_rambase[0x58000/4];
+	else
+		m_video_base = &m_rambase[0x30000/4];
 }
 
 
-void kinst_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void kinst_state::sound_reset_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	// apply shuffling
-	offset = m_control_map[offset / 2];
-	uint32_t olddata = m_control[offset];
-	COMBINE_DATA(&m_control[offset]);
+	COMBINE_DATA(&m_sound_reset);
+	m_dcs->reset_w(m_sound_reset & 0x01);
+}
 
-	switch (offset)
-	{
-	case 0:     // $80 - VRAM buffer control
-		if (data & 4)
-			m_video_base = &m_rambase[0x58000/4];
-		else
-			m_video_base = &m_rambase[0x30000/4];
-		break;
 
-	case 1:     // $88 - sound reset
-		m_dcs->reset_w(data & 0x01);
-		break;
+void kinst_state::sound_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	uint32_t prev = m_sound_control;
+	COMBINE_DATA(&m_sound_control);
 
-	case 2:     // $90 - sound control
-		if (!(olddata & 0x02) && (m_control[offset] & 0x02))
-			m_dcs->data_w(m_control[3]);
-		break;
+	if (!(prev & 0x02) && (m_sound_control & 0x02))
+		m_dcs->data_w(m_sound_data);
+}
 
-	case 3:     // $98 - sound data
-		break;
-	}
+
+void kinst_state::sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_sound_data);
+}
+
+
+void kinst_state::coin_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_coin_control);
+	// d0: coincounter? (only on coin slot 1,2)
 }
 
 
@@ -571,10 +521,32 @@ void kinst_state::kinst_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share(m_rambase);
 	map(0x08000000, 0x087fffff).ram().share(m_rambase2);
-	map(0x10000080, 0x100000ff).rw(FUNC(kinst_state::control_r), FUNC(kinst_state::control_w)).share("control");
+
+	map(0x10000080, 0x10000083).portr("P1").w(FUNC(kinst_state::vram_control_w));
+	map(0x10000088, 0x1000008b).portr("P2").w(FUNC(kinst_state::sound_reset_w));
+	map(0x10000090, 0x10000093).portr("VOLUME").w(FUNC(kinst_state::sound_control_w));
+	map(0x10000098, 0x1000009b).portr("UNUSED").w(FUNC(kinst_state::sound_data_w));
+	map(0x100000a0, 0x100000a3).portr("DSW").nopw();
+	map(0x100000b0, 0x100000b3).w(FUNC(kinst_state::coin_control_w));
+
 	map(0x10000100, 0x1000013f).rw(FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
 	map(0x10000170, 0x10000173).rw(FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
+}
+
+
+void kinst_state::kinst2_map(address_map &map)
+{
+	kinst_map(map);
+
+	// control mapping is shuffled around
+	map(0x10000080, 0x10000083).portr("VOLUME").w(FUNC(kinst_state::sound_control_w));
+	map(0x10000088, 0x1000008b).portr("DSW").nopw();
+	map(0x10000090, 0x10000093).portr("P2").w(FUNC(kinst_state::sound_reset_w));
+	map(0x10000098, 0x1000009b).portr("P1").w(FUNC(kinst_state::vram_control_w));
+	map(0x100000a0, 0x100000a3).portr("UNUSED").w(FUNC(kinst_state::sound_data_w));
+	map(0x100000b0, 0x100000b3).nopw();
+	map(0x100000b8, 0x100000bb).w(FUNC(kinst_state::coin_control_w));
 }
 
 
@@ -610,7 +582,7 @@ static INPUT_PORTS_START( kinst )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* door */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM ) // door
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -628,20 +600,20 @@ static INPUT_PORTS_START( kinst )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 )    /* bill */
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* coin door */
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 ) // bill
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM ) // coin door
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("VOLUME")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_CUSTOM )  /* sound status */
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kinst_state, sound_status_r)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0000fff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )   /* verify */
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED ) // verify
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -703,111 +675,12 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kinst2 )
-	PORT_START("P1")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 High Attack - Quick")
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 High Attack - Medium")
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 High Attack - Fierce")
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Low Attack - Quick")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Low Attack - Medium")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Low Attack - Fierce")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* door */
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( kinst )
 
-	PORT_START("P2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 High Attack - Quick")
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 High Attack - Medium")
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 High Attack - Fierce")
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Low Attack - Quick")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Low Attack - Medium")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Low Attack - Fierce")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 )    /* bill */
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* coin door */
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("VOLUME")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_CUSTOM )  /* sound status */
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
-	PORT_BIT( 0x0000fff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("UNUSED")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )   /* verify */
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x00000003, 0x00000003, "Blood Level" )
-	PORT_DIPSETTING(          0x00000003, DEF_STR( High ))
-	PORT_DIPSETTING(          0x00000002, DEF_STR( Medium ))
-	PORT_DIPSETTING(          0x00000001, DEF_STR( Low ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( None ))
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Demo_Sounds ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000004, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000008, 0x00000008, "Finishing Moves" )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000008, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000010, 0x00000010, "Display Warning" )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000010, DEF_STR( On ))
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unused ))
 	PORT_DIPSETTING(          0x00000020, DEF_STR( Off ))
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unused ))
-	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unused ))
-	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00000100, 0x00000100, "Coinage Source" )
-	PORT_DIPSETTING(          0x00000100, "Dipswitch" )
-	PORT_DIPSETTING(          0x00000000, "Disk" )
-	PORT_DIPNAME( 0x00003e00, 0x00003e00, DEF_STR( Coinage ))
-	PORT_DIPSETTING(          0x00003e00, "USA-1" )
-	PORT_DIPSETTING(          0x00003c00, "USA-2" )
-	PORT_DIPSETTING(          0x00003a00, "USA-3" )
-	PORT_DIPSETTING(          0x00003800, "USA-4" )
-	PORT_DIPSETTING(          0x00003400, "USA-9" )
-	PORT_DIPSETTING(          0x00003200, "USA-10" )
-	PORT_DIPSETTING(          0x00003600, "USA-ECA" )
-	PORT_DIPSETTING(          0x00003000, "USA-Free Play" )
-	PORT_DIPSETTING(          0x00002e00, "German-1" )
-	PORT_DIPSETTING(          0x00002c00, "German-2" )
-	PORT_DIPSETTING(          0x00002a00, "German-3" )
-	PORT_DIPSETTING(          0x00002800, "German-4" )
-	PORT_DIPSETTING(          0x00002600, "German-ECA" )
-	PORT_DIPSETTING(          0x00002000, "German-Free Play" )
-	PORT_DIPSETTING(          0x00001e00, "French-1" )
-	PORT_DIPSETTING(          0x00001c00, "French-2" )
-	PORT_DIPSETTING(          0x00001a00, "French-3" )
-	PORT_DIPSETTING(          0x00001800, "French-4" )
-	PORT_DIPSETTING(          0x00001600, "French-ECA" )
-	PORT_DIPSETTING(          0x00001000, "French-Free Play" )
-	PORT_DIPNAME( 0x00004000, 0x00004000, "Coin Counters" )
-	PORT_DIPSETTING(          0x00004000, "1" )
-	PORT_DIPSETTING(          0x00000000, "2" )
-	PORT_DIPNAME( 0x00008000, 0x00008000, "Test Switch" )
-	PORT_DIPSETTING(          0x00008000, DEF_STR( Off ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ))
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -844,6 +717,15 @@ void kinst_state::kinst(machine_config &config)
 
 	// sound hardware
 	DCS_AUDIO_2K(config, m_dcs, 0);
+}
+
+
+void kinst_state::kinst2(machine_config &config)
+{
+	kinst(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &kinst_state::kinst2_map);
 }
 
 
@@ -955,26 +837,13 @@ ROM_END
 
 void kinst_state::init_kinst()
 {
-	static const uint8_t kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
-
-	// set up the control register mapping
-	m_control_map = kinst_control_map;
+	m_hdd_serial_offset = 27;
 }
 
 
 void kinst_state::init_kinst2()
 {
-	static const uint8_t kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
-
-	// read: $80 on ki2 = $90 on ki
-	// read: $88 on ki2 = $a0 on ki
-	// write: $80 on ki2 = $90 on ki
-	// write: $90 on ki2 = $88 on ki
-	// write: $98 on ki2 = $80 on ki
-	// write: $a0 on ki2 = $98 on ki
-
-	// set up the control register mapping
-	m_control_map = kinst2_control_map;
+	m_hdd_serial_offset = 11;
 }
 
 } // anonymous namespace
@@ -987,8 +856,8 @@ void kinst_state::init_kinst2()
  *
  *************************************/
 
- // versions selectable by changing bioses
+// versions selectable by changing bioses
 
 GAME( 1994, kinst,    0,      kinst,    kinst,  kinst_state,    init_kinst,  ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst2,   0,      kinst,    kinst2, kinst_state,    init_kinst2, ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kinst2uk, kinst2, kinst2uk, kinst2, kinst2uk_state, init_kinst,  ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kinst2,   0,      kinst2,   kinst2, kinst_state,    init_kinst2, ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kinst2uk, kinst2, kinst2uk, kinst2, kinst2uk_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2 (upgrade kit)", MACHINE_SUPPORTS_SAVE )
