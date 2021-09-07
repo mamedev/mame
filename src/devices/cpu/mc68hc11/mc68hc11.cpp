@@ -245,6 +245,26 @@ void mc68hc11_cpu_device::toc_w(offs_t offset, uint8_t data)
 		toc = (data << 8) | (toc & 0xff);
 }
 
+uint8_t mc68hc11_cpu_device::tctl1_r()
+{
+	return m_tctl1;
+}
+
+void mc68hc11_cpu_device::tctl1_w(uint8_t data)
+{
+	m_tctl1 = data;
+}
+
+uint8_t mc68hc11_cpu_device::tctl2_r()
+{
+	return m_tctl2;
+}
+
+void mc68hc11_cpu_device::tctl2_w(uint8_t data)
+{
+	m_tctl2 = data;
+}
+
 uint8_t mc68hc11_cpu_device::tmsk1_r()
 {
 	return m_tmsk1;
@@ -418,6 +438,12 @@ uint8_t mc68hc11_cpu_device::opt4_r()
 	return 0;
 }
 
+uint8_t mc68hc11d0_device::reg01_r()
+{
+	// "Reserved" according to datasheet; asma2k reads from here due to a programming error and writes value back to TFLG1
+	return 0xff;
+}
+
 void mc68hc11a1_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base)
 {
 	block(base + 0x00, base + 0x00).rw(FUNC(mc68hc11a1_device::port_r<0>), FUNC(mc68hc11a1_device::port_w<0>)); // PORTA
@@ -431,6 +457,8 @@ void mc68hc11a1_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, 
 	block(base + 0x0a, base + 0x0a).r(FUNC(mc68hc11a1_device::port_r<4>)); // PORTE
 	block(base + 0x0e, base + 0x0f).rw(FUNC(mc68hc11a1_device::tcnt_r), FUNC(mc68hc11a1_device::tcnt_w)); // TCNT
 	block(base + 0x16, base + 0x1f).rw(FUNC(mc68hc11a1_device::toc_r), FUNC(mc68hc11a1_device::toc_w)); // TOC1-TOC5
+	block(base + 0x20, base + 0x20).rw(FUNC(mc68hc11a1_device::tctl1_r), FUNC(mc68hc11a1_device::tctl1_w)); // TCTL1
+	block(base + 0x21, base + 0x21).rw(FUNC(mc68hc11a1_device::tctl2_r), FUNC(mc68hc11a1_device::tctl2_w)); // TCTL2
 	block(base + 0x22, base + 0x22).rw(FUNC(mc68hc11a1_device::tmsk1_r), FUNC(mc68hc11a1_device::tmsk1_w)); // TMSK1
 	block(base + 0x23, base + 0x23).rw(FUNC(mc68hc11a1_device::tflg1_r), FUNC(mc68hc11a1_device::tflg1_w)); // TFLG1
 	block(base + 0x24, base + 0x24).rw(FUNC(mc68hc11a1_device::tmsk2_r), FUNC(mc68hc11a1_device::tmsk2_w)); // TMSK2
@@ -453,6 +481,7 @@ void mc68hc11a1_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, 
 void mc68hc11d0_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base)
 {
 	block(base + 0x00, base + 0x00).rw(FUNC(mc68hc11d0_device::port_r<0>), FUNC(mc68hc11d0_device::port_w<0>)); // PORTA
+	block(base + 0x01, base + 0x01).r(FUNC(mc68hc11d0_device::reg01_r));
 	block(base + 0x02, base + 0x02).r(FUNC(mc68hc11d0_device::pioc_r)); // PIOC
 	block(base + 0x03, base + 0x03).rw(FUNC(mc68hc11d0_device::port_r<2>), FUNC(mc68hc11d0_device::port_w<2>)); // PORTC
 	block(base + 0x04, base + 0x04).rw(FUNC(mc68hc11d0_device::port_r<1>), FUNC(mc68hc11d0_device::port_w<1>)); // PORTB
@@ -462,6 +491,8 @@ void mc68hc11d0_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, 
 	block(base + 0x09, base + 0x09).rw(FUNC(mc68hc11d0_device::ddr_r<3>), FUNC(mc68hc11d0_device::ddr_w<3>)); // DDRD
 	block(base + 0x0e, base + 0x0f).rw(FUNC(mc68hc11d0_device::tcnt_r), FUNC(mc68hc11d0_device::tcnt_w)); // TCNT
 	block(base + 0x16, base + 0x1f).rw(FUNC(mc68hc11d0_device::toc_r), FUNC(mc68hc11d0_device::toc_w)); // TOC1-TOC4, TI4/O5
+	block(base + 0x20, base + 0x20).rw(FUNC(mc68hc11d0_device::tctl1_r), FUNC(mc68hc11d0_device::tctl1_w)); // TCTL1
+	block(base + 0x21, base + 0x21).rw(FUNC(mc68hc11d0_device::tctl2_r), FUNC(mc68hc11d0_device::tctl2_w)); // TCTL2
 	block(base + 0x22, base + 0x22).rw(FUNC(mc68hc11d0_device::tmsk1_r), FUNC(mc68hc11d0_device::tmsk1_w)); // TMSK1
 	block(base + 0x23, base + 0x23).rw(FUNC(mc68hc11d0_device::tflg1_r), FUNC(mc68hc11d0_device::tflg1_w)); // TFLG1
 	block(base + 0x24, base + 0x24).rw(FUNC(mc68hc11d0_device::tmsk2_r), FUNC(mc68hc11d0_device::tmsk2_w)); // TMSK2
@@ -493,6 +524,8 @@ void mc68hc811e2_device::mc68hc11_reg_map(memory_view::memory_view_entry &block,
 	block(base + 0x0a, base + 0x0a).r(FUNC(mc68hc811e2_device::port_r<4>)); // PORTE
 	block(base + 0x0e, base + 0x0f).rw(FUNC(mc68hc811e2_device::tcnt_r), FUNC(mc68hc811e2_device::tcnt_w)); // TCNT
 	block(base + 0x16, base + 0x1f).rw(FUNC(mc68hc811e2_device::toc_r), FUNC(mc68hc811e2_device::toc_w)); // TOC1-TOC4, TI4/O5
+	block(base + 0x20, base + 0x20).rw(FUNC(mc68hc811e2_device::tctl1_r), FUNC(mc68hc811e2_device::tctl1_w)); // TCTL1
+	block(base + 0x21, base + 0x21).rw(FUNC(mc68hc811e2_device::tctl2_r), FUNC(mc68hc811e2_device::tctl2_w)); // TCTL2
 	block(base + 0x22, base + 0x22).rw(FUNC(mc68hc811e2_device::tmsk1_r), FUNC(mc68hc811e2_device::tmsk1_w)); // TMSK1
 	block(base + 0x23, base + 0x23).rw(FUNC(mc68hc811e2_device::tflg1_r), FUNC(mc68hc811e2_device::tflg1_w)); // TFLG1
 	block(base + 0x24, base + 0x24).rw(FUNC(mc68hc811e2_device::tmsk2_r), FUNC(mc68hc811e2_device::tmsk2_w)); // TMSK2
@@ -533,6 +566,8 @@ void mc68hc11f1_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, 
 	block(base + 0x12, base + 0x13).nopr(); // TIC2
 	block(base + 0x14, base + 0x15).nopr(); // TIC3
 	block(base + 0x16, base + 0x1f).rw(FUNC(mc68hc11f1_device::toc_r), FUNC(mc68hc11f1_device::toc_w)); // TOC1-TOC4, TI4/O5
+	block(base + 0x20, base + 0x20).rw(FUNC(mc68hc11f1_device::tctl1_r), FUNC(mc68hc11f1_device::tctl1_w)); // TCTL1
+	block(base + 0x21, base + 0x21).rw(FUNC(mc68hc11f1_device::tctl2_r), FUNC(mc68hc11f1_device::tctl2_w)); // TCTL2
 	block(base + 0x22, base + 0x22).rw(FUNC(mc68hc11f1_device::tmsk1_r), FUNC(mc68hc11f1_device::tmsk1_w)); // TMSK1
 	block(base + 0x23, base + 0x23).rw(FUNC(mc68hc11f1_device::tflg1_r), FUNC(mc68hc11f1_device::tflg1_w)); // TFLG1
 	block(base + 0x24, base + 0x24).rw(FUNC(mc68hc11f1_device::tmsk2_r), FUNC(mc68hc11f1_device::tmsk2_w)); // TMSK2
@@ -579,6 +614,8 @@ void mc68hc11k1_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, 
 	block(base + 0x0a, base + 0x0a).r(FUNC(mc68hc11k1_device::port_r<4>)); // PORTE
 	block(base + 0x0e, base + 0x0f).rw(FUNC(mc68hc11k1_device::tcnt_r), FUNC(mc68hc11k1_device::tcnt_w)); // TCNT
 	block(base + 0x16, base + 0x1f).rw(FUNC(mc68hc11k1_device::toc_r), FUNC(mc68hc11k1_device::toc_w)); // TOC1-TOC4, TI4/O5
+	block(base + 0x20, base + 0x20).rw(FUNC(mc68hc11k1_device::tctl1_r), FUNC(mc68hc11k1_device::tctl1_w)); // TCTL1
+	block(base + 0x21, base + 0x21).rw(FUNC(mc68hc11k1_device::tctl2_r), FUNC(mc68hc11k1_device::tctl2_w)); // TCTL2
 	block(base + 0x22, base + 0x22).rw(FUNC(mc68hc11k1_device::tmsk1_r), FUNC(mc68hc11k1_device::tmsk1_w)); // TMSK1
 	block(base + 0x23, base + 0x23).rw(FUNC(mc68hc11k1_device::tflg1_r), FUNC(mc68hc11k1_device::tflg1_w)); // TFLG1
 	block(base + 0x24, base + 0x24).rw(FUNC(mc68hc11k1_device::tmsk2_r), FUNC(mc68hc11k1_device::tmsk2_w)); // TMSK2
@@ -621,6 +658,8 @@ void mc68hc11m0_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, 
 	block(base + 0x0a, base + 0x0a).r(FUNC(mc68hc11m0_device::port_r<4>)); // PORTE
 	block(base + 0x0e, base + 0x0f).rw(FUNC(mc68hc11m0_device::tcnt_r), FUNC(mc68hc11m0_device::tcnt_w)); // TCNT
 	block(base + 0x16, base + 0x1f).rw(FUNC(mc68hc11m0_device::toc_r), FUNC(mc68hc11m0_device::toc_w)); // TOC1-TOC4, TI4/O5
+	block(base + 0x20, base + 0x20).rw(FUNC(mc68hc11m0_device::tctl1_r), FUNC(mc68hc11m0_device::tctl1_w)); // TCTL1
+	block(base + 0x21, base + 0x21).rw(FUNC(mc68hc11m0_device::tctl2_r), FUNC(mc68hc11m0_device::tctl2_w)); // TCTL2
 	block(base + 0x22, base + 0x22).rw(FUNC(mc68hc11m0_device::tmsk1_r), FUNC(mc68hc11m0_device::tmsk1_w)); // TMSK1
 	block(base + 0x23, base + 0x23).rw(FUNC(mc68hc11m0_device::tflg1_r), FUNC(mc68hc11m0_device::tflg1_w)); // TFLG1
 	block(base + 0x24, base + 0x24).rw(FUNC(mc68hc11m0_device::tmsk2_r), FUNC(mc68hc11m0_device::tmsk2_w)); // TMSK2
@@ -741,6 +780,8 @@ void mc68hc11_cpu_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_stop_state));
+	save_item(NAME(m_tctl1));
+	save_item(NAME(m_tctl2));
 	save_item(NAME(m_tflg1));
 	save_item(NAME(m_tmsk1));
 	save_item(NAME(m_toc));
@@ -823,6 +864,8 @@ void mc68hc11_cpu_device::device_reset()
 	std::fill(std::begin(m_toc), std::end(m_toc), 0xffff);
 	m_tcnt = 0xffff;
 //  m_por = 1; // for first timer overflow / compare stuff
+	m_tctl1 = 0;
+	m_tctl2 = 0;
 	m_tflg1 = 0;
 	m_tflg2 = 0;
 	m_tmsk2 = 3; // timer prescale
