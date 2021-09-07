@@ -118,9 +118,9 @@
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_RS232,     bus::ti99::peb, ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
-DEFINE_DEVICE_TYPE_NS(TI99_RS232_DEV, bus::ti99::peb, ti_rs232_attached_device, "ti99_rs232_atttached", "TI-99 Serial attached device")
-DEFINE_DEVICE_TYPE_NS(TI99_PIO_DEV,   bus::ti99::peb, ti_pio_attached_device,   "ti99_pio_attached",    "TI-99 Parallel attached device")
+DEFINE_DEVICE_TYPE(TI99_RS232,     bus::ti99::peb::ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
+DEFINE_DEVICE_TYPE(TI99_RS232_DEV, bus::ti99::peb::ti_rs232_attached_device, "ti99_rs232_atttached", "TI-99 Serial attached device")
+DEFINE_DEVICE_TYPE(TI99_PIO_DEV,   bus::ti99::peb::ti_pio_attached_device,   "ti99_pio_attached",    "TI-99 Parallel attached device")
 
 namespace bus::ti99::peb {
 

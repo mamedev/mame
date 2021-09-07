@@ -5,7 +5,7 @@
 #include "insdatastor.h"
 
 
-DEFINE_DEVICE_TYPE_NS(INTELLEC4_INST_DATA_STORAGE, bus::intellec4, imm4_22_device, "intlc4_imm4_22", "Intel imm4-22 Instruction/Data Storage Module")
+DEFINE_DEVICE_TYPE(INTELLEC4_INST_DATA_STORAGE, bus::intellec4::imm4_22_device, "intlc4_imm4_22", "Intel imm4-22 Instruction/Data Storage Module")
 
 
 namespace bus::intellec4 {

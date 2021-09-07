@@ -5,7 +5,7 @@
 #include "bitsocket.h"
 
 
-DEFINE_DEVICE_TYPE_NS(TI8X_BIT_SOCKET, bus::ti8x, bit_socket_device, "ti8x_bitsock", "TI-8x Bit Socket")
+DEFINE_DEVICE_TYPE(TI8X_BIT_SOCKET, bus::ti8x::bit_socket_device, "ti8x_bitsock", "TI-8x Bit Socket")
 
 
 namespace bus::ti8x {

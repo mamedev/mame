@@ -7,8 +7,8 @@
 #include "speaker.h"
 
 
-DEFINE_DEVICE_TYPE_NS(TI8X_SPEAKER_STEREO, bus::ti8x, stereo_speaker_device, "ti8x_stspkr", "TI-8x Speaker (Stereo)")
-DEFINE_DEVICE_TYPE_NS(TI8X_SPEAKER_MONO,   bus::ti8x, mono_speaker_device,   "ti8x_mspkr",  "TI-8x Speaker (Mono)")
+DEFINE_DEVICE_TYPE(TI8X_SPEAKER_STEREO, bus::ti8x::stereo_speaker_device, "ti8x_stspkr", "TI-8x Speaker (Stereo)")
+DEFINE_DEVICE_TYPE(TI8X_SPEAKER_MONO,   bus::ti8x::mono_speaker_device,   "ti8x_mspkr",  "TI-8x Speaker (Mono)")
 
 
 namespace bus::ti8x {

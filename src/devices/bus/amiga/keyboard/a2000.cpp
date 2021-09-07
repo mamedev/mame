@@ -74,11 +74,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_US, bus::amiga::keyboard, a2000_kbd_g80_us_device, "a2000kbd_g80_us", "Amiga 2000 Keyboard (Cherry - U.S./Canada)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_DE, bus::amiga::keyboard, a2000_kbd_g80_de_device, "a2000kbd_g80_de", "Amiga 2000 Keyboard (Cherry - Germany/Austria)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_SE, bus::amiga::keyboard, a2000_kbd_g80_se_device, "a2000kbd_g80_se", "Amiga 2000 Keyboard (Cherry - Sweden/Finland)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_DK, bus::amiga::keyboard, a2000_kbd_g80_dk_device, "a2000kbd_g80_dk", "Amiga 2000 Keyboard (Cherry - Denmark)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_GB, bus::amiga::keyboard, a2000_kbd_g80_gb_device, "a2000kbd_g80_gb", "Amiga 2000 Keyboard (Cherry - UK)")
+DEFINE_DEVICE_TYPE(A2000_KBD_G80_US, bus::amiga::keyboard::a2000_kbd_g80_us_device, "a2000kbd_g80_us", "Amiga 2000 Keyboard (Cherry - U.S./Canada)")
+DEFINE_DEVICE_TYPE(A2000_KBD_G80_DE, bus::amiga::keyboard::a2000_kbd_g80_de_device, "a2000kbd_g80_de", "Amiga 2000 Keyboard (Cherry - Germany/Austria)")
+DEFINE_DEVICE_TYPE(A2000_KBD_G80_SE, bus::amiga::keyboard::a2000_kbd_g80_se_device, "a2000kbd_g80_se", "Amiga 2000 Keyboard (Cherry - Sweden/Finland)")
+DEFINE_DEVICE_TYPE(A2000_KBD_G80_DK, bus::amiga::keyboard::a2000_kbd_g80_dk_device, "a2000kbd_g80_dk", "Amiga 2000 Keyboard (Cherry - Denmark)")
+DEFINE_DEVICE_TYPE(A2000_KBD_G80_GB, bus::amiga::keyboard::a2000_kbd_g80_gb_device, "a2000kbd_g80_gb", "Amiga 2000 Keyboard (Cherry - UK)")
 
 
 

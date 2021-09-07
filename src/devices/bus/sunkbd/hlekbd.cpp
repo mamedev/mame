@@ -136,12 +136,12 @@
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd, hle_type3_device,    "kbd_type3_hle",    "Sun Type 3 Keyboard (HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd, hle_type4_device,    "kbd_type4_hle",    "Sun Type 4 Keyboard (HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd, hle_type5_device,    "kbd_type5_hle_us", "Sun Type 5 Keyboard (U.S.A. - HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_GB_HLE_KEYBOARD, bus::sunkbd, hle_type5_gb_device, "kbd_type5_hle_gb", "Sun Type 5 Keyboard (Great Britain - HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_SE_HLE_KEYBOARD, bus::sunkbd, hle_type5_se_device, "kbd_type5_hle_se", "Sun Type 5 Keyboard (Sweden - HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_device, "kbd_type5_hle_jp", "Sun Type 5 Keyboard (Japan - HLE)")
+DEFINE_DEVICE_TYPE(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd::hle_type3_device,    "kbd_type3_hle",    "Sun Type 3 Keyboard (HLE)")
+DEFINE_DEVICE_TYPE(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd::hle_type4_device,    "kbd_type4_hle",    "Sun Type 4 Keyboard (HLE)")
+DEFINE_DEVICE_TYPE(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd::hle_type5_device,    "kbd_type5_hle_us", "Sun Type 5 Keyboard (U.S.A. - HLE)")
+DEFINE_DEVICE_TYPE(SUN_TYPE5_GB_HLE_KEYBOARD, bus::sunkbd::hle_type5_gb_device, "kbd_type5_hle_gb", "Sun Type 5 Keyboard (Great Britain - HLE)")
+DEFINE_DEVICE_TYPE(SUN_TYPE5_SE_HLE_KEYBOARD, bus::sunkbd::hle_type5_se_device, "kbd_type5_hle_se", "Sun Type 5 Keyboard (Sweden - HLE)")
+DEFINE_DEVICE_TYPE(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd::hle_type5_jp_device, "kbd_type5_hle_jp", "Sun Type 5 Keyboard (Japan - HLE)")
 
 
 
