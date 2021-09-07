@@ -451,7 +451,7 @@ static const nes_mmc mmc_list[] =
 	// 413 homebrew game Super Russian Roulette
 	// 414 9999999-in-1 multicart
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
-	// 416 4-in-1 that includes mapper 50 SMB2j pirate
+	{ 416, BMC_N32_4IN1 },
 	{ 417, BTL_BATMANFS },         // "Fine Studio" Batman bootleg
 	{ 418, UNL_LH42 },             // Highway Star Whirlwind Manu bootleg
 	// 419 VT03 PnPs
