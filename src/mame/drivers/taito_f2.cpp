@@ -2162,8 +2162,11 @@ static INPUT_PORTS_START( deadconx )
 	TAITO_COINAGE_WORLD_LOC(SW1)
 
 	PORT_START("DSWB") /* DSW B, missing a timer speed maybe? */
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )        /* Listed as "NOT USE" */
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )        /* Listed as "NOT USE" */
+	PORT_DIPNAME( 0x03, 0x03, "Number of Enemies 1/2 Player" )  PORT_DIPLOCATION("SW2:1,2") // see MT08059
+	PORT_DIPSETTING(    0x01, "25/45" )
+	PORT_DIPSETTING(    0x03, "30/50" )
+	PORT_DIPSETTING(    0x02, "40/60" )
+	PORT_DIPSETTING(    0x00, "50/70" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as "NOT USE" */
 	PORT_DIPNAME( 0x18, 0x18, "Life Meter") PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2171,11 +2174,10 @@ static INPUT_PORTS_START( deadconx )
 	PORT_DIPSETTING(    0x18, "10" )
 	PORT_DIPSETTING(    0x08, "12" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "NOT USE" */
-	PORT_DIPNAME( 0xc0, 0xc0, "Number of Enemies 1/2 Player" )  PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(    0xc0, "30/50" )
-	PORT_DIPSETTING(    0x80, "40/60" )
-	PORT_DIPSETTING(    0x40, "25/45" )
-	PORT_DIPSETTING(    0x00, "50/70" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "NOT USE" */
+	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )  PORT_DIPLOCATION("SW2:8")   // single or two players at once
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( deadconxj ) /* Matches PDF of Dip Sheet but not matching current taito coin macros */
