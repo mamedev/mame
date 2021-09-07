@@ -3830,8 +3830,6 @@ files {
 	MAME_DIR .. "src/mame/video/pin64.cpp",
 	MAME_DIR .. "src/mame/video/pin64.h",
 	MAME_DIR .. "src/mame/drivers/hanaawas.cpp",
-	MAME_DIR .. "src/mame/includes/hanaawas.h",
-	MAME_DIR .. "src/mame/video/hanaawas.cpp",
 	MAME_DIR .. "src/mame/drivers/jclub2.cpp",
 	MAME_DIR .. "src/mame/drivers/macs.cpp",
 	MAME_DIR .. "src/mame/drivers/seta.cpp",
