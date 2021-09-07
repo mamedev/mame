@@ -58,7 +58,6 @@ UPD3301_FETCH_ATTRIBUTE( pc8001_base_state::attr_fetch )
 	std::array<u16, attr_max_size> attr_extend_info = m_crtc->default_attr_fetch(attr_row, gfx_mode, y, attr_fifo_size, row_size);
 
 	// further extend the attributes if we are in color mode
-	// TODO: is this a PC-8001 specification or uPD3301?
 	if (is_color_mode)
 	{
 		// TODO: defaults

@@ -25,7 +25,7 @@
       probably others (does bus have an actual codename or just "PC-8801 bus"?);
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks
       the floppy ports. Wrong info or check for external board anyway?
-    - fix "jumps" in mouse support pointer (noticeable in Balance of Power);
+    - fix "jumps" in PC-8872 mouse pointer (noticeable in balpower);
 
     per-game specific TODO (move to XML):
     - Belloncho Shintai Kensa: hangs

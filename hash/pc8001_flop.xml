@@ -462,6 +462,19 @@ References:
 		</part>
 	</software>
 
+	<software name="chikyuso">
+		<!-- Terra S.O.S. -->
+		<description>Chikyu SOS!</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="chikyu sos.d88" size="348832" crc="bb349e36" sha1="dc2c7758659632723e43687fc9796af8fbd8d613"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cityline" supported="yes">
 		<description>City Line</description>
 		<!-- 1982:2:1 -->
@@ -929,7 +942,7 @@ References:
 		</part>
 	</software>
 
-	<software name="fruitfldn">
+	<software name="fruitfld">
 		<description>Fruits Fields (N-BASIC version)</description>
 		<!-- Compaq like N88 version? -->
 		<year>19??</year>
@@ -937,6 +950,18 @@ References:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="fruits fields.d88" size="31424" crc="bf320b73" sha1="d19033d520b221aa9976512f2061857337bcb9f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitflda" cloneof="fruitfld">
+		<!-- TODO: doesn't really boot in N80 BASIC? -->
+		<description>Fruits Fields (N80-BASIC version)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="fruits fields(n80).d88" size="31424" crc="cff5e18e" sha1="8fcdac58e3dff1c348031b62581d81079ae47301"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1394,6 +1419,17 @@ References:
 		</part>
 	</software>
 
+	<software name="missilec" cloneof="misscmd">
+		<description>Missile Commander (alt 3)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="missile commander.d88" size="348832" crc="05fdc754" sha1="4519345cad8c60383508e9b6b444ab4909462990"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="monstbal">
 		<description>Monster and Ball</description>
 		<year>19??</year>
@@ -2273,6 +2309,19 @@ References:
 		</part>
 	</software>
 
+<!-- Was this from tape? was it for PC8001? -->
+<!-- According to http://www.onon.jp/~onon/game/PC8001/ it comes from ASCII 1985/2 -->
+	<software name="thealien" cloneof="alienisl">
+		<description>The Alien Island 3D-Version (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 4401 -->
+				<rom name="the alien island 3d ver.d88" size="348832" crc="35d6d983" sha1="ae5619d8d5d9e192dbe02edcc3aa3cb33acefc16"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="farway">
 		<description>The Farway</description>
 		<year>19??</year>
@@ -2556,7 +2605,7 @@ References:
 	</software>
 
 	<software name="nbasicgp">
-		<description>N-Basic Game Pack (Compilation, NS-DOS CATS EYE)</description>
+		<description>N-Basic Game Pack (compilation, NS-DOS CATS EYE)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2568,7 +2617,7 @@ References:
 
 	<!-- seems based off above -->
 	<software name="nbasicgaa" cloneof="nbasicga">
-		<description>N-BASIC Games (Compilation)</description>
+		<description>N-BASIC Games (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2579,7 +2628,7 @@ References:
 	</software>
 
 	<software name="ndisk">
-		<description>Ndisk (Compilation)</description>
+		<description>Ndisk (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Press Up arrow or LSHIFT to break from the initial listing"/>
@@ -2610,7 +2659,7 @@ References:
 	</software>
 
 	<software name="newpc">
-		<description>Newpc (Compilation)</description>
+		<description>Newpc (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2630,8 +2679,52 @@ References:
 		</part>
 	</software>
 
+	<software name="newpcdos">
+		<description>New PC-DOS1 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="new pc-dos1.d88" size="348848" crc="b2650f8e" sha1="8bb8828433c0bbaf902ac739586e0d2604d24c0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newpcdo1">
+		<description>New PC-DOS2 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="new pc-dos2.d88" size="348848" crc="051e6412" sha1="07d144d301dc2d6a01d9b48f0877b0e3482aa138"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newpcdo2">
+		<description>New PC-DOS3 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="new pc-dos3.d88" size="348848" crc="a3a9fdbb" sha1="a0b84d2ec02219709115ca73320c020e7584be1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newpcdo3">
+		<description>New PC-DOS4 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="new pc-dos4.d88" size="348848" crc="920b40b0" sha1="b94064a04278d3dbfc11939a9998538e368b5e4e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nsdospac">
-		<description>NS-DOS Pack (Compilation)</description>
+		<description>NS-DOS Pack (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2647,7 +2740,7 @@ References:
 	</software>
 
 	<software name="pc8001ba">
-		<description>PC-8001 BASIC Game Book (Compilation)</description>
+		<description>PC-8001 BASIC Game Book (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2658,7 +2751,7 @@ References:
 	</software>
 
 	<software name="pc8001gp">
-		<description>PC-8001 Game Pack (Compilation)</description>
+		<description>PC-8001 Game Pack (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2696,7 +2789,7 @@ References:
 	</software>
 
 	<software name="pc8001ga">
-		<description>PC-8001 Games (Compilation)</description>
+		<description>PC-8001 Games (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
@@ -2712,12 +2805,38 @@ References:
 		</part>
 	</software>
 	
+	<software name="pc801pac">
+		<description>PC80 1 (collection)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="pc80 1(pack password 123).d88" size="348832" crc="c2425df4" sha1="18cd05e45bd01e521cdae51da58c7486fdb4b81a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc802pac">
+		<description>PC80 2 (collection)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="pc80 2(pack password 123).d88" size="348576" crc="6fd841ce" sha1="cacde068c7db176ec273c844afdbe4318b56523a"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 ExtractDisk  [01]"S-DOS A        " -> "s-dos_01.d88"
 ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 -->
 	<software name="sdosgame">
-		<description>S-DOS Game Pack (Compilation)</description>
+		<description>S-DOS Game Pack (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!--combined image-->
@@ -2737,7 +2856,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="sdosgamea" cloneof="sdosgame">
-		<description>S-DOS Game Pack (Compilation, alt)</description>
+		<description>S-DOS Game Pack (compilation, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2753,7 +2872,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="sdosgameb" cloneof="sdosgame">
-		<description>S-DOS Game Pack (Compilation, alt 2)</description>
+		<description>S-DOS Game Pack (compilation, alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2769,7 +2888,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 	</software>
 
 	<software name="finalwp">
-		<description>The Final Weapon V-001 (Compilation)</description>
+		<description>The Final Weapon V-001 (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2881,6 +3000,17 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="[os] pc-8001 micro disk basic 2w.d88" size="348848" crc="b8d73f39" sha1="025112d7eec8e9c35a19ab9bc0bf8a3d1e15a1c5"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pc8034d8">
+		<description>PC-8034</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="pc-8034.d88" size="348848" crc="0a4dab65" sha1="cd6a093643fa9f162a5be94ba830ba4b8d90099a"/>
 			</dataarea>
 		</part>
 	</software>
