@@ -31755,8 +31755,8 @@ kyukaidk                        // (c) 1990 (Japan, new version)
 kyukaidko                       // (c) 1990 (Japan, old version)
 luckywld                        // (c) 1992
 luckywldj                       // (c) 1992
-marvland                        // (c) 1989 (US)
-marvlandj                       // (c) 1989 (Japan)
+marvland                        // (c) 1989 (Japan)
+marvlandup                      // (c) 1989 (US)
 metlhawk                        // (c) 1988
 metlhawkj                       // (c) 1988
 mirninja                        // (c) 1988 (Japan)
@@ -38934,6 +38934,7 @@ comil                           //
 decathln
 decathlna
 doraglob                        // (c) 2007 VTech
+doraglobg
 doraphon                        // (c) 2006 VTech
 dreamlss
 fordrace
@@ -38979,9 +38980,10 @@ icanpian                        //
 
 @source:spg2xx_jakks.cpp
 jak_batm                        // The Batman, 2004
-jak_wall                        //
 jak_mk
 jak_mpacw
+jak_sbjd
+jak_wall
 
 @source:spg2xx_jakks_gkr.cpp
 jak_capc                        //
