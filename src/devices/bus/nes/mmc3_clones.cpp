@@ -2311,7 +2311,7 @@ void nes_a88s1_device::update_banks()
 	}
 	else                     // MMC3 mode
 	{
-		m_prg_base = (outer & ~!size_128k) << 4;
+		m_prg_base = (outer & (0xfe | size_128k)) << 4;
 		m_prg_mask = 0x1f >> size_128k;
 		set_prg(m_prg_base, m_prg_mask);
 	}
