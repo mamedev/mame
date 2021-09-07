@@ -36,17 +36,15 @@ DEFINE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device, "bitmap_printer", "Bit
 //**************************************************************************
 
 INPUT_PORTS_START(bitmap_printer)
-	PORT_START("DRAWINCHMARKS")
+	PORT_START("DRAWMARKS")
 	PORT_CONFNAME(0x3, 0x01, "Draw Inch Marks")
 	PORT_CONFSETTING(0x0, "Off")
 	PORT_CONFSETTING(0x1, "On")
 	PORT_CONFSETTING(0x2, "with position mark")
 	PORT_CONFSETTING(0x3, "with position bar")
-
-	PORT_START("DRAWNUMBERS")
-	PORT_CONFNAME(0x1, 0x01, "Draw Numbers")
+	PORT_CONFNAME(0x4, 0x04, "Draw Numbers")
 	PORT_CONFSETTING(0x0, "Off")
-	PORT_CONFSETTING(0x1, "On")
+	PORT_CONFSETTING(0x4, "On")
 
 INPUT_PORTS_END
 
@@ -135,7 +133,7 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 	drawprinthead(bitmap, m_xpos, bitmap.height() - m_distfrombottom);
 
-	if (ioport("DRAWINCHMARKS")->read()) draw_inch_marks(bitmap);
+	draw_inch_marks(bitmap);
 
 	return 0;
 }
