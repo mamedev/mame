@@ -524,9 +524,9 @@ public:
 
 	/// \brief Get parent device type for ROM search
 	///
-	/// Impement this member in a derived class to declare the parent
+	/// Implement this member in a derived class to declare the parent
 	/// device type for the purpose of searching for ROMs.  Only one
-	/// level is allowed.  It is an error the parent device type itself
+	/// level is allowed.  It is an error if the parent device type itself
 	/// declares a parent device type.
 	/// \return Pointer to parent device type, or nullptr.
 	static auto parent_rom_device_type() { return nullptr; }
