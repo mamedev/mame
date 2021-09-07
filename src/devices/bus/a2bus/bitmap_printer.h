@@ -117,17 +117,83 @@ public:
 		return bitmap.height() - m_distfrombottom - m_ypos;
 	}
 
+
+
+
+
+
+
+
+
+
+
+void draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor)
+{
+	// pass nonzero erasecolor to erase blank segments
+	const u8 pat[] = { 0x3f, 0x06,  0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
+	u8 seg = is_digit ? pat[data & 0xf] : data;
+
+	if (BIT(seg,0) || erasecolor) bitmap.plot_box(x0,       y0,                  width, thick,       BIT(seg,0) ? color : erasecolor);
+	if (BIT(seg,1) || erasecolor) bitmap.plot_box(x0+width, y0+thick,            thick, height,      BIT(seg,1) ? color : erasecolor);
+	if (BIT(seg,2) || erasecolor) bitmap.plot_box(x0+width, y0+2*thick+height,   thick, height,      BIT(seg,2) ? color : erasecolor);
+	if (BIT(seg,3) || erasecolor) bitmap.plot_box(x0,       y0+2*thick+2*height, width, thick,       BIT(seg,3) ? color : erasecolor);
+	if (BIT(seg,4) || erasecolor) bitmap.plot_box(x0-thick, y0+2*thick+height,   thick, height,      BIT(seg,4) ? color : erasecolor);
+	if (BIT(seg,5) || erasecolor) bitmap.plot_box(x0-thick, y0+thick,            thick, height,      BIT(seg,5) ? color : erasecolor);
+	if (BIT(seg,6) || erasecolor) bitmap.plot_box(x0,       y0+thick+height,     width, thick,       BIT(seg,6) ? color : erasecolor);
+	if (BIT(seg,7) || erasecolor) bitmap.plot_box(x0+width+thick, y0+2*thick+2*height, thick, thick, BIT(seg,7) ? color : erasecolor); // draw dot
+}
+
+void draw_number(int number, int x, int y, bitmap_rgb32& bitmap)
+{
+	std::string s(std::to_string(number));
+
+	int width = 8;
+	int height = 6;
+	int thick = 2;
+
+	for (int i = s.length()-1; i>=0; i--)
+		draw7seg( s.at(i)-0x30, true, x + ( + i - s.length()) * (3 * width) - (width), y + height * 3 / 2, width, height, thick, bitmap, 0x000000, 0);
+
+}
+
+
 	void draw_inch_marks(bitmap_rgb32& bitmap)
 	{
 		int vdpi = 144;
 		for (int i = 0; i < vdpi * 11; i += vdpi / 4)
 		{
-			int adj_i = i + calc_scroll_y(bitmap) % bitmap.height();
+			int adj_i = i + calc_scroll_y(bitmap) % m_paperheight;  // modding the bitmap height, not the paper height
 			int barbase = vdpi / 6;
 			int barwidth = ((i % vdpi) == 0) ? barbase * 2 : barbase;
 			int barcolor = ((i % vdpi) == 0) ? 0x202020 : 0xc0c0c0;
-			if (adj_i < bitmap.height()) bitmap.plot_box(bitmap.width() - 1 - barwidth, adj_i, barwidth, 1, barcolor);
-			else break;
+			if (adj_i < bitmap.height())
+			{
+				bitmap.plot_box(bitmap.width() - 1 - barwidth, adj_i, barwidth, 1, barcolor);
+				if ((i % vdpi) == 0)
+				{
+
+					double pct = (double) i / (vdpi * 11.0);
+//                  printf("i=%d   pct=%f\n",i,pct);
+					if (ioport("DRAWINCHMARKS")->read() == 3)  // draw position bar
+					{
+						int barheight = 3;
+						if (adj_i < bitmap.height() - 1 - barheight)
+							bitmap.plot_box( bitmap.width() - 1 - barwidth , adj_i, pct * barwidth, barheight, 0x000000); // little dot to show bar position
+					}
+					if (ioport("DRAWINCHMARKS")->read() == 2)  // draw position mark
+					{
+						int marksize = 3;
+						int barheight = 4;
+						if (adj_i < bitmap.height() - 1 - barheight)
+							bitmap.plot_box( bitmap.width() - 1 - barwidth +  pct * barwidth - marksize, adj_i, marksize, barheight, 0x000000); // little dot to show bar position
+					}
+					if (ioport("DRAWNUMBERS")->read())
+						draw_number(i / vdpi, bitmap.width(), adj_i, bitmap);
+
+				}
+
+			}
+//          else break;
 		}
 	}
 
