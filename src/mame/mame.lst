@@ -22574,6 +22574,7 @@ mc8030                          // MC 80.3x
 @source:mcatadv.cpp
 catt                            // (c) 1993 Wintechno
 mcatadv                         // (c) 1993 Wintechno
+mcatadvz                        // hack
 mcatadvj                        // (c) 1993 Wintechno
 nost                            // (c) 1993 Face
 nostj                           // (c) 1993 Face
