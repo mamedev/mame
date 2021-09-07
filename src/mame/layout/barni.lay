@@ -18,11 +18,6 @@ copyright-holders:Robbbert
 		</disk>
 	</element>
 
-	<element name="T1"><text string="FIRST   PLAYER"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="T2"><text string="SECOND  PLAYER"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="T3"><text string="BALL"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="T4"><text string="CREDIT"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-
 	<group name="7x7">
 		<repeat count="7">
 			<param name="n" start="~s~" increment="1" />
@@ -87,6 +82,7 @@ copyright-holders:Robbbert
 		<param name="t" value="290" />
 		<group ref="2x7"></group>
 
+		<!-- From here is incomplete -->
 		<!-- Player-up LED -->
 		<element name="led5" ref="red_led"><!-- Player 1's turn -->
 			<bounds x="40" y="12" width="7" height="7" />

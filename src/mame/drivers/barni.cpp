@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista
+// copyright-holders:Robbbert
 // PINBALL
 // Skeleton driver for Barni pinballs.
 // Known pinballs to be dumped: Shield (1985) - different electronics

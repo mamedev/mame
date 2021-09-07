@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista, Robbbert
+// copyright-holders:Robbbert
 // PINBALL
 /*********************************************************************************************************************
 Skeleton driver for Mirco's Spirit of 76, one of the first if not the first commercial solid-state pinball game.
