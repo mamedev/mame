@@ -9024,11 +9024,14 @@ license:CC0
 		<year>1992</year>
 		<publisher>Critical Thinking Press</publisher>
 		<info name="release" value="2016-04-07"/>
+		<!-- Disks re-cracked in September 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
-				<rom name="five in a row - addition and subtraction (4am crack) side a.dsk" size="143360" crc="af3f48de" sha1="c3983bacbcc518d49de8c9315c96ae67e9197d7b" />
+				<rom name="five in a row - addition and subtraction (4am crack) side a.dsk" size="143360" crc="49c8350b" sha1="aa8945060d61c8871f3e20e6ae12bdca3ba9a103" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -25406,10 +25409,13 @@ license:CC0
 		<year>1985</year>
 		<publisher>The Learning Company</publisher>
 		<info name="release" value="2016-04-01"/>
+		<!-- Disks re-cracked in September 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="rocky's boots 4.0 (4am crack).dsk" size="143360" crc="fdf32263" sha1="d1ee264209ad6b497a9c0415954c32f3df788f52" />
+				<rom name="rocky's boots 4.0 (4am crack).dsk" size="143360" crc="2fcb648a" sha1="e6dffa75930aba8c4d97a5929be444c3ef8beee6" />
 			</dataarea>
 		</part>
 	</software>
@@ -25602,11 +25608,14 @@ license:CC0
 		<year>1990</year>
 		<publisher>Critical Thinking Press</publisher>
 		<info name="release" value="2016-04-27"/>
+		<!-- Disks re-cracked in September 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
-				<rom name="the hangtown trilogy (4am crack) side a.dsk" size="143360" crc="8154e335" sha1="be65913a0c61c8c1cd5ecb72b016ce1fb2f17301" />
+				<rom name="the hangtown trilogy (4am crack) side a.dsk" size="143360" crc="3382adcc" sha1="5261b408e845ff54e0304040677bcc5388f336ff" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -36332,10 +36341,13 @@ license:CC0
 		<year>1984</year>
 		<publisher>Scott, Foresman and Company</publisher>
 		<info name="release" value="2020-06-28"/>
+		<!-- Disks re-cracked in September 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="space journey (4am crack).dsk" size="143360" crc="963043ba" sha1="9d2b4f9caeef9b02df9f1bda17a42763c642e98a"/>
+				<rom name="space journey (4am crack).dsk" size="143360" crc="23643a39" sha1="2864b8753fdb1258ca9200619fbd01c65e88eb25" />
 			</dataarea>
 		</part>
 	</software>
