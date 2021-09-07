@@ -430,6 +430,29 @@ private:
 #endif
 
 
+// ======================> nes_a88s1_device
+
+class nes_a88s1_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_a88s1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void prg_cb(int start, int bank) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	void update_banks();
+	u8 m_reg[2];
+};
+
+
 // ======================> nes_fcgj8in1_device
 
 class nes_fcgj8in1_device : public nes_txrom_device
@@ -899,6 +922,7 @@ DECLARE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device)
 DECLARE_DEVICE_TYPE(NES_A9746,         nes_a9746_device)
 #endif
 
+DECLARE_DEVICE_TYPE(NES_A88S1,         nes_a88s1_device)
 DECLARE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device)
 DECLARE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device)
 DECLARE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device)

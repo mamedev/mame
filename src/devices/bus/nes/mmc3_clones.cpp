@@ -51,6 +51,7 @@ DEFINE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device,       "nes_sa9602b",  
 DEFINE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device,  "nes_shero",         "NES Cart Street Hero PCB")
 //DEFINE_DEVICE_TYPE(NES_A9746,         nes_a9746_device,         "nes_bmc_a9746",     "NES Cart A-9746 PCB")
 
+DEFINE_DEVICE_TYPE(NES_A88S1,         nes_a88s1_device,         "nes_a88s1",         "NES Cart BMC A88S-1 PCB")
 DEFINE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device,      "nes_fcgj8in1",      "NES Cart BMC FC Genjin 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device,         "nes_fk23c",         "NES Cart FK23C PCB")
 DEFINE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device,        "nes_fk23ca",        "NES Cart FK23CA PCB")
@@ -202,6 +203,11 @@ nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, 
 //    : nes_txrom_device(mconfig, NES_A9746, tag, owner, clock)
 //{
 //}
+
+nes_a88s1_device::nes_a88s1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_A88S1, tag, owner, clock)
+{
+}
 
 nes_fcgj8in1_device::nes_fcgj8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_FCGJ8IN1, tag, owner, clock)
@@ -492,6 +498,23 @@ void nes_sachen_shero_device::pcb_reset()
 
 	m_reg = 0;
 	mmc3_common_initialize(0xff, 0x1ff, 0);
+}
+
+void nes_a88s1_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+
+	// power-on values for registers; they don't seem to change with soft reset
+	m_reg[0] = 0x80;
+	m_reg[1] = 0x82;
+}
+
+void nes_a88s1_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x1f, 0xff, 0);
+	update_banks();
 }
 
 void nes_fcgj8in1_device::pcb_reset()
@@ -2250,6 +2273,70 @@ void nes_bmc_mario7in1_device::write_m(offs_t offset, uint8_t data)
 	}
 	else
 		m_prgram[offset] = data;
+}
+
+/*-------------------------------------------------
+
+ BMC-A88S-1
+
+ Games: 1997 Super 7 in 1, 6 in 1 (JY-201 to JY-206)
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 411
+
+ In MAME: Preliminary supported.
+
+ TODO: Investigate...
+ - Hokuto no Ken has broken sound on each cart it's on.
+ - Bird Fighter boss fights have corrupt graphics.
+ - whether not being able to reset from within certain
+   games is correct. Examples are Samurai (title scroll
+   only) and Bomber Man (in game only) on JY-202, or
+   SD Gunman in JY-204.
+
+ -------------------------------------------------*/
+
+void nes_a88s1_device::update_banks()
+{
+	u8 outer = bitswap<2>(m_reg[1], 6, 3);
+	u8 size_128k = !BIT(m_reg[1], 1);
+
+	if (BIT(m_reg[0], 6))    // NROM mode
+	{
+		u8 bank = outer << 3 | bitswap<3>(m_reg[0], 2, 3, 0);
+		u8 mode = BIT(m_reg[0], 1);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+	}
+	else                     // MMC3 mode
+	{
+		m_prg_base = (outer & (0xfe | size_128k)) << 4;
+		m_prg_mask = 0x1f >> size_128k;
+		set_prg(m_prg_base, m_prg_mask);
+	}
+
+	m_chr_base = (m_reg[0] & 0x10) << 4 | (BIT(m_reg[1], 2) & size_128k) << 7;
+	m_chr_mask = 0xff >> size_128k;
+	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+}
+
+void nes_a88s1_device::prg_cb(int start, int bank)
+{
+	if (!BIT(m_reg[0], 6))
+		nes_txrom_device::prg_cb(start, bank);
+}
+
+void nes_a88s1_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("a88s1 write_l, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+	if (offset >= 0x1000)
+	{
+		m_reg[offset & 1] = data;
+		update_banks();
+	}
 }
 
 /*-------------------------------------------------
