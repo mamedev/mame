@@ -36,7 +36,7 @@
 
 static constexpr u8 C0N1_ECE        = 0x04; // external clock: toggles between 500 kHz internal clock and 1/2 of the 7M A2 bus clock
 static constexpr u8 C0N1_FRX        = 0x10; // fast recieve: when enabled, both reads and writes of the SPI data register start a shift cycle
-[[unused]] static constexpr u8 C0N1_BSY     = 0x20;
+[[maybe_unused]] static constexpr u8 C0N1_BSY     = 0x20;
 static constexpr u8 C0N1_TC         = 0x80; // SPI transfer complete
 
 static constexpr u8 C0N3_CD         = 0x40; // card detect
