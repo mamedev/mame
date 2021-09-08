@@ -2,19 +2,31 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    Killer Instinct hardware
+Killer Instinct hardware
 
-    driver by Aaron Giles and Bryan McPhail
+driver by Aaron Giles and Bryan McPhail
 
-    Games supported:
-        * Killer Instinct
-        * Killer Instinct 2
+Games supported:
+- Killer Instinct
+- Killer Instinct 2
 
-    Known bugs:
-        * the SRAM test fails in diagnostics; this is due to the fact that
-          the test relies on executing out of the cache while it tromps
-          over (and eventually restores) the instructions it is executing;
-          this will likely never be fixed
+Game by Rare, manufacturing/publishing by Midway.
+Nintendo was just the owner of the Killer Instinct trademark, and licensor
+of the "Ultra 64" arcade games.
+
+TODO:
+- The SRAM test fails in diagnostics; this is due to the fact that the test
+  relies on executing out of the cache while it tromps over (and eventually
+  restores) the instructions it is executing; this will likely never be fixed.
+- Bootup sequence (the blue color fill) is too fast, which in turn causes
+  attract mode music not to play. Maybe the main CPU is running at a lower
+  clockspeed at boot (50MHz/4 seems plausible), but then, what toggles it?
+- Screen timing (not just H and V freq). 261 lines should be good, but pixel
+  clock is unknown. The only one that comes close to sensible values is 6MHz,
+  yet there is no (multiple of) 6MHz XTAL.
+  15384.6 / 58.9634 = 260.9178 (261 lines? howcome it's off by 0.1?)
+  15384.6 * 325 = 4999995 (nope, 5 clocks hblank/hsync is too short)
+  15384.6 * 390 = 5999994
 
 ****************************************************************************
 
@@ -235,7 +247,6 @@ private:
 	required_region_ptr<uint32_t> m_rombase;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(irq0_start);
 	uint32_t ide_extra_r();
 	void ide_extra_w(uint32_t data);
 
@@ -373,19 +384,6 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 	}
 	return 0;
-}
-
-
-
-/*************************************
- *
- *  Interrupt handling
- *
- *************************************/
-
-INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
-{
-	m_maincpu->pulse_input_line(0, attotime::from_usec(50));
 }
 
 
@@ -699,18 +697,14 @@ void kinst_state::kinst(machine_config &config)
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kinst_state::kinst_map);
-	m_maincpu->set_vblank_int("screen", FUNC(kinst_state::irq0_start));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
-	m_ata->irq_handler().set_inputline("maincpu", 1);
+	m_ata->irq_handler().set_inputline(m_maincpu, 1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(320, 240);
-	screen.set_visarea(0, 319, 0, 239);
+	screen.set_raw(6000000, 390, 0, 320, 261, 0, 240); // preliminary
+	screen.screen_vblank().set_inputline(m_maincpu, 0);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BGR_555);
@@ -858,7 +852,7 @@ void kinst_state::init_kinst2()
 
 // versions selectable by changing bioses
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT   CLASS           INIT         SCREEN  COMPANY  FULLNAME           FLAGS
-GAME( 1994, kinst,    0,      kinst,    kinst,  kinst_state,    init_kinst,  ROT0,   "Rare",  "Killer Instinct", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kinst2,   0,      kinst2,   kinst2, kinst_state,    init_kinst2, ROT0,   "Rare",  "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kinst2uk, kinst2, kinst2uk, kinst2, kinst2uk_state, init_kinst2, ROT0,   "Rare",  "Killer Instinct 2 (upgrade kit)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT   CLASS           INIT         SCREEN  COMPANY                  FULLNAME           FLAGS
+GAME( 1994, kinst,    0,      kinst,    kinst,  kinst_state,    init_kinst,  ROT0,   "Rare (Midway license)", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kinst2,   0,      kinst2,   kinst2, kinst_state,    init_kinst2, ROT0,   "Rare (Midway license)", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kinst2uk, kinst2, kinst2uk, kinst2, kinst2uk_state, init_kinst2, ROT0,   "Rare (Midway license)", "Killer Instinct 2 (upgrade kit)", MACHINE_SUPPORTS_SAVE )
