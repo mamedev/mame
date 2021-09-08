@@ -220,6 +220,15 @@ private:
 
 	int page_count = 0;
 
+//error: non-static data member declared with placeholder ‘auto’
+//223 |  auto baseCLK = 9.8304_Mhz_XTAL;
+
+
+	XTAL baseCLK = 9.8304_MHz_XTAL;
+	XTAL CLK2 = baseCLK / 2;
+	XTAL CLK1 = CLK2 / 2;
+
+
 	const int dpi = 144;
 	const double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 162 dpi, not 144 dpi)
 	const double PAPER_WIDTH_INCHES = 8.5;

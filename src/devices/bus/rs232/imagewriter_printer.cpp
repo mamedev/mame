@@ -97,7 +97,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_printer->online_callback().set(FUNC(apple_imagewriter_printer_device::printer_online));
 
 	// basic machine hardware
-	i8085a_cpu_device &cpu(I8085A(config, m_maincpu, 9.8304_MHz_XTAL / 2));  // aka 4.9152_MHz_XTAL
+	i8085a_cpu_device &cpu(I8085A(config, m_maincpu, CLK2 ));  // 9.8304_MHz_XTAL / 2 aka 4.9152_MHz_XTAL
 	cpu.set_addrmap(AS_PROGRAM, &apple_imagewriter_printer_device::mem_map);
 	cpu.set_addrmap(AS_IO,      &apple_imagewriter_printer_device::io_map);
 
@@ -116,7 +116,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_pulse2->out_cb().set(FUNC(apple_imagewriter_printer_device::pulse2_out_handler));
 	m_pulse2->set_clear_pin_value(1);
 
-	I8155(config, m_8155head,   1E6);   // for the moment, just give a 1mhz setting
+	I8155(config, m_8155head,  CLK1 );
 	m_8155head->in_pa_callback() .set(FUNC(apple_imagewriter_printer_device::head_pa_r));
 	m_8155head->in_pb_callback() .set(FUNC(apple_imagewriter_printer_device::head_pb_r));
 	m_8155head->in_pc_callback() .set(FUNC(apple_imagewriter_printer_device::head_pc_r));
@@ -125,9 +125,9 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_8155head->out_pc_callback().set(FUNC(apple_imagewriter_printer_device::head_pc_w));
 	m_8155head->out_to_callback().set(FUNC(apple_imagewriter_printer_device::head_to));
 
-	I8155(config, m_8155switch, 9.8304_MHz_XTAL / 2 / 4);
+	I8155(config, m_8155switch, CLK1 / 2 );
 	// input clock gets adjusted by PB6 line
-	// faster the 8155switch clock is, the faster the printhead moves
+	// faster the 8155switch clock is, the faster the printhead moves, either CLK1 / 2 or CLK1 / 8
 
 	m_8155switch->in_pa_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pa_r));
 	m_8155switch->in_pb_callback() .set(FUNC(apple_imagewriter_printer_device::switch_pb_r));
@@ -137,7 +137,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_8155switch->out_pc_callback().set(FUNC(apple_imagewriter_printer_device::switch_pc_w));
 	m_8155switch->out_to_callback().set(FUNC(apple_imagewriter_printer_device::switch_to));
 
-	I8251(config, m_uart, 1e5);  // for the moment, just give 1mhz clock
+	I8251(config, m_uart, CLK1 );
 	m_uart->rxrdy_handler().set(FUNC(apple_imagewriter_printer_device::rxrdy_handler));
 	m_uart->dtr_handler().set(FUNC(apple_imagewriter_printer_device::dtr_handler));
 	m_uart->rts_handler().set(FUNC(apple_imagewriter_printer_device::rts_handler));
@@ -399,13 +399,15 @@ void apple_imagewriter_printer_device::head_pb_w(uint8_t data)
 
 	update_cr_stepper(BIT(data ^ 0xff, 1, 4));  // motor pattern inverted
 	m_dotpattern &= ~(1 << 8);
-	m_dotpattern |= (!BIT(data,0) << 8);  // dot pattern is inverted
+	m_dotpattern |= (!BIT(data, 0) << 8);  // dot pattern is inverted
 
-	m_pulse2->b_w(!BIT(data,7));  // hook up to 74123 section 2
+	m_pulse2->b_w(!BIT(data, 7));  // hook up to 74123 section 2
 
 	// depending on pb6, get a rate that's either (9.8304 / 2 / 2) divided by 2 or 8 =  1.2288 mhz or 0.3072 mhz
-	if (BIT(6, data) != BIT (6, m_head_pb_last))
-		m_8155switch->set_unscaled_clock_int( ( 9.8304_MHz_XTAL ).value() / 2 / 2 / (BIT(6, data) ? 2 : 8) );
+	if (BIT(data, 6) != BIT (m_head_pb_last, 6))
+	{
+		m_8155switch->set_unscaled_clock_int(  CLK2.value() / 2 / (BIT(data, 6) ? 2 : 8) );
+	}
 
 	m_head_pb_last = data;
 }
