@@ -66,7 +66,18 @@ k054000_device::k054000_device(const machine_config &mconfig, const char *tag, d
 
 void k054000_device::device_start()
 {
-	save_item(NAME(m_regs));
+	save_item(NAME(m_Acx));
+	save_item(NAME(m_Acy));
+	save_item(NAME(m_Aax));
+	save_item(NAME(m_Aay));
+	save_item(NAME(m_Bcx));
+	save_item(NAME(m_Bcy));
+	save_item(NAME(m_Bax));
+	save_item(NAME(m_Bay));
+	save_pointer(NAME(m_raw_Acx), 4);
+	save_pointer(NAME(m_raw_Acy), 4);
+	save_pointer(NAME(m_raw_Bcx), 4);
+	save_pointer(NAME(m_raw_Bcy), 4);
 }
 
 //-------------------------------------------------
@@ -75,22 +86,87 @@ void k054000_device::device_start()
 
 void k054000_device::device_reset()
 {
-	int i;
-
-	for (i = 0; i < 0x20; i++)
-		m_regs[i] = 0;
+	// TODO: initial state (very unlikely to be all zeroes)
+	// ...
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k054000_device::write(offs_t offset, u8 data)
+void k054000_device::map(address_map &map)
 {
-	//logerror("%s: write %02x to 054000 address %02x\n",m_maincpu->pc(),data,offset);
-	m_regs[offset] = data;
+	map.unmap_value_low();
+	map(0x01, 0x04).w(FUNC(k054000_device::acx_w));
+	map(0x06, 0x06).lw8(NAME([this] (u8 data) { m_Aax = data + 1; }));
+	map(0x07, 0x07).lw8(NAME([this] (u8 data) { m_Aay = data + 1; }));
+	map(0x09, 0x0c).w(FUNC(k054000_device::acy_w));
+
+	map(0x0e, 0x0e).lw8(NAME([this] (u8 data) { m_Bax = data + 1; }));
+	map(0x0f, 0x0f).lw8(NAME([this] (u8 data) { m_Bay = data + 1; }));
+	map(0x11, 0x13).w(FUNC(k054000_device::bcy_w));
+	map(0x15, 0x17).w(FUNC(k054000_device::bcx_w));
+
+	map(0x18, 0x18).r(FUNC(k054000_device::status_r));
 }
 
+inline int k054000_device::convert_raw_to_result(u8 *buf)
+{
+	int res = (buf[0] << 16) | (buf[1] << 8) | buf[2];
+	// last value in the buffer is used as OTG correction in Vendetta
+	if (buf[3] & 0x80)
+		res -= (0x100 - buf[3]);
+	else
+		res += buf[3];
+	return res;
+}
+
+void k054000_device::acx_w(offs_t offset, u8 data)
+{
+	m_raw_Acx[offset] = data;
+	m_Acx = convert_raw_to_result(m_raw_Acx);
+}
+
+void k054000_device::acy_w(offs_t offset, u8 data)
+{
+	m_raw_Acy[offset] = data;
+	m_Acy = convert_raw_to_result(m_raw_Acy);
+}
+
+void k054000_device::bcx_w(offs_t offset, u8 data)
+{
+	m_raw_Bcx[offset] = data;
+	m_Bcx = convert_raw_to_result(m_raw_Bcx);
+}
+
+void k054000_device::bcy_w(offs_t offset, u8 data)
+{
+	m_raw_Bcy[offset] = data;
+	m_Bcy = convert_raw_to_result(m_raw_Bcy);
+}
+
+u8 k054000_device::status_r()
+{
+	u8 res = 0;
+	
+	if (m_Acx + m_Aax < m_Bcx - m_Bax)
+		res |= 1;
+
+	if (m_Bcx + m_Bax < m_Acx - m_Aax)
+		res |= 1;
+
+	if (m_Acy + m_Aay < m_Bcy - m_Bay)
+		res |= 1;
+
+	if (m_Bcy + m_Bay < m_Acy - m_Aay)
+		res |= 1;
+
+	printf("%d %d %d %d (%d|%d)|%d %d %d %d == %d\n", m_Acx, m_Acy, m_Aax, m_Aay, m_raw_Acx[3], m_raw_Acy[3], m_Bcx, m_Bcy, m_Bax, m_Bay, res);
+
+	return res;
+}
+
+#ifdef UNUSED_FUNCTION
 u8 k054000_device::read(offs_t offset)
 {
 	int Acx, Acy, Aax, Aay;
@@ -128,8 +204,8 @@ u8 k054000_device::read(offs_t offset)
 	Bax = m_regs[0x0e] + 1;
 	Bay = m_regs[0x0f] + 1;
 
-	if (m_regs[0x04] || m_regs[0x0c])
-		printf("%d %d %d %d (%d|%d)|%d %d %d %d\n", Acx, Acy, Aax, Aay, m_regs[0x04], m_regs[0x0c], Bcx, Bcy, Bax, Bay);
+	//if (m_regs[0x04] || m_regs[0x0c])
+	printf("%d %d %d %d (%d|%d)|%d %d %d %d\n", Acx, Acy, Aax, Aay, m_regs[0x04], m_regs[0x0c], Bcx, Bcy, Bax, Bay);
 
 	if (Acx + Aax < Bcx - Bax)
 		return 1;
@@ -145,3 +221,4 @@ u8 k054000_device::read(offs_t offset)
 
 	return 0;
 }
+#endif
