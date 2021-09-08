@@ -74628,8 +74628,8 @@ Other
 		</part>
 	</software>
 
-	<software name="smb3h1" cloneof="smb3" supported="partial">
-		<description>Super Mario Bros. 3 (Pirate, Alt)</description>
+	<software name="smb3h1" cloneof="smb3">
+		<description>Super Mario Bros. 3 (pirate, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">

@@ -78,17 +78,17 @@ nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
-nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_ks7032_device(mconfig, NES_KS7032, tag, owner, clock)
 {
 }
 
-nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_ks7032_device(mconfig, NES_KS202, tag, owner, clock)
 {
 }
@@ -207,21 +207,22 @@ void nes_ks7032_device::device_start()
 	save_item(NAME(m_latch));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_count_latch));
 	save_item(NAME(m_reg));
 }
 
 void nes_ks7032_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 
 	m_latch = 0;
 	m_irq_enable = 0;
 	m_irq_count = 0;
-	memset(m_reg, 0, sizeof(m_reg));
+	m_irq_count_latch = 0;
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	prg_update();
+	prg8_ef((m_prg_chunks << 1) - 1);
 }
 
 void nes_ks7016_device::device_start()
@@ -479,15 +480,15 @@ uint8_t nes_ks7022_device::read_h(offs_t offset)
 
  Kaiser Board KS7032
 
- Games: A few FDS conversions like Bubble Bobble
-        or SMB2
+ Games: FDS conversions of Bubble Bobble, SMB2,
+ and Exciting Soccer
 
- TODO: available dumps do not seem to use WRAM...
- yet m_reg[4] should switch WRAM bank... investigate!
+ These boards have a KS202 ASIC that provide both
+ banking and a cycle-based IRQ similar to the VRC3.
 
  iNES: mapper 142
 
- In MAME: Supported?
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -497,14 +498,12 @@ void nes_ks7032_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	{
 		if (m_irq_enable)
 		{
-			if (m_irq_count == 0xffff)
+			if (++m_irq_count == 0)
 			{
+				set_irq_line(ASSERT_LINE);
 				m_irq_enable = 0;
-				m_irq_count = 0;
-				hold_irq_line();
+				m_irq_count = m_irq_count_latch;
 			}
-			else
-				m_irq_count++;
 		}
 	}
 }
@@ -516,84 +515,100 @@ void nes_ks7032_device::prg_update()
 	prg8_cd(m_reg[3]);
 }
 
-void nes_ks7032_device::ks7032_write(offs_t offset, uint8_t data)
+void nes_ks7032_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7032_write, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			m_irq_count = (m_irq_count & 0xfff0) | (data & 0x0f);
-			break;
 		case 0x1000:
-			m_irq_count = (m_irq_count & 0xff0f) | ((data & 0x0f) << 4);
-			break;
 		case 0x2000:
-			m_irq_count = (m_irq_count & 0xf0ff) | ((data & 0x0f) << 8);
-			break;
 		case 0x3000:
-			m_irq_count = (m_irq_count & 0x0fff) | ((data & 0x0f) << 12);
+		{
+			int shift = (offset >> 10);
+			m_irq_count_latch &= ~(0x000f << shift);
+			m_irq_count_latch |= (data & 0x0f) << shift;
 			break;
+		}
 		case 0x4000:
-			m_irq_enable = 1;
+			m_irq_enable = BIT(data, 1);
+			if (m_irq_enable)
+				m_irq_count = m_irq_count_latch;
+			set_irq_line(CLEAR_LINE);
+			break;
+		case 0x5000:
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x6000:
 			m_latch = data & 0x07;
 			break;
 		case 0x7000:
-			m_reg[m_latch] = data;
+			m_reg[m_latch] = (m_reg[m_latch] & 0xf0) | (data & 0x0f);
 			prg_update();
 			break;
 	}
 }
 
-uint8_t nes_ks7032_device::read_m(offs_t offset)
+u8 nes_ks7032_device::read_m(offs_t offset)
 {
 	LOG_MMC(("ks7032 read_m, offset: %04x\n", offset));
-	return m_prg[((m_reg[4] * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
+	return m_prg[(m_reg[4] * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
 /*-------------------------------------------------
 
- Kaiser Board KS202
+ Kaiser SMB3 Board with KS202
 
  Games: Super Mario Bros. 3 (Pirate, Alt)
 
+ A chip, PAL16L8ANC, provides the extra bits overlaid
+ at 0xf000-0xffff. Writes go to both it and the KS202.
+
  iNES: mapper 56
 
- In MAME: Supported?
+ In MAME: Supported.
+
+ TODO: This device needs renaming of some sort. KS202
+ is a chip found on some Kaiser PCBs that actually
+ provides the functionality implemented above in the
+ KS7032 PCB. It's not clear what SMB3's PCB is.
 
  -------------------------------------------------*/
 
-void nes_ks202_device::write_h(offs_t offset, uint8_t data)
+void nes_ks202_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks202 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7000)
+	if (offset >= 0x7000)
 	{
-		case 0x7000:
-			m_reg[m_latch] = data;
-			prg_update();
-			switch (offset & 0xc00)
-			{
-				case 0x800:
-					set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-					break;
-				case 0xc00:
-					chr1_x(offset & 0x07, data, CHRROM);
-					break;
-			}
-			break;
-		default:
-			ks7032_write(offset, data);
-			break;
+		switch (offset & 0xc00)
+		{
+			case 0x000:
+				if ((offset & 3) == 3)
+					prg8_ef((data & 0x10) | 0x0f);
+				else
+				{
+					int reg = (offset & 3) + 1;
+					m_reg[reg] = (m_reg[reg] & 0x0f) | (data & 0x10);
+				}
+				break;
+			case 0x800:
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+				break;
+			case 0xc00:
+				chr1_x(offset & 0x07, data & 0x7f, CHRROM);
+				break;
+		}
 	}
+
+	nes_ks7032_device::write_h(offset, data);
 }
 
-uint8_t nes_ks202_device::read_m(offs_t offset)
+u8 nes_ks202_device::read_m(offs_t offset)
 {
 	LOG_MMC(("ks202 read_m, offset: %04x\n", offset));
-	return m_prgram[offset & 0x1fff];
+	return m_prgram[offset];
 }
 
 /*-------------------------------------------------
