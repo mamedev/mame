@@ -2840,7 +2840,7 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
 			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
-			m_tmpea = getRWbank(operand & 7, m_tmp16);		
+			m_tmpea = getRWbank(operand & 7, m_tmp16);
 			m_tmp16 = doDEC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
 			m_pc += 3;

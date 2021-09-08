@@ -16,6 +16,10 @@
 #include "cartridges.h"
 
 #include "corestr.h"
+#include "ioprocs.h"
+#include "unzip.h"
+#include "xmlfile.h"
+
 
 #define LOG_WARN         (1U<<1)   // Warnings
 #define LOG_CONFIG       (1U<<2)   // Configuration
@@ -260,14 +264,14 @@ image_init_result ti99_cartridge_device::call_load()
 		auto reader = std::make_unique<rpk_reader>(pcbdefs);
 		try
 		{
-			m_rpk = reader->open(machine().options(), filename(), machine().system().name);
+			m_rpk = reader->open(machine().options(), image_core_file(), machine().system().name);
 			m_pcbtype = m_rpk->get_type();
 		}
 		catch (rpk_exception& err)
 		{
 			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.to_string().c_str());
 			m_rpk = nullptr;
-			m_err = IMAGE_ERROR_INVALIDIMAGE;
+			m_err = image_error::INVALIDIMAGE;
 			return image_init_result::FAIL;
 		}
 	}
@@ -1553,8 +1557,8 @@ void ti99_cartridge_device::rpk::close()
 				throw emu_fatalerror("ti99_cartridge_device::rpk::close: Buffer is null or length is 0");
 
 			emu_file file(m_options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = file.open(socket.second->get_pathname());
-			if (filerr == osd_file::error::NONE)
+			std::error_condition const filerr = file.open(socket.second->get_pathname());
+			if (!filerr)
 				file.write(socket.second->get_contents(), socket.second->get_content_length());
 
 		}
@@ -1641,8 +1645,8 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	catch (std::bad_alloc const &) { throw rpk_exception(RPK_OUT_OF_MEMORY); }
 
 	// and unzip file from the zip file
-	util::archive_file::error ziperr = zip.decompress(contents.get(), length);
-	if (ziperr != util::archive_file::error::NONE)
+	std::error_condition const ziperr = zip.decompress(contents.get(), length);
+	if (ziperr)
 	{
 		if (ziperr == util::archive_file::error::UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
 		else throw rpk_exception(RPK_ZIP_ERROR);
@@ -1727,9 +1731,9 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 
 			// try to open the battery file and read it if possible
 			emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
-			osd_file::error filerr = file.open(ram_pname);
+			std::error_condition const filerr = file.open(ram_pname);
 			int bytes_read = 0;
-			if (filerr == osd_file::error::NONE)
+			if (!filerr)
 				bytes_read = file.read(contents.get(), length);
 
 			// fill remaining bytes (if necessary)
@@ -1747,33 +1751,30 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
     system_name - name of the driver (also just for NVRAM handling)
 -------------------------------------------------*/
 
-ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options &options, const char *filename, const char *system_name)
+ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options &options, util::core_file &file, const char *system_name)
 {
-	util::archive_file::error ziperr;
-
-	util::archive_file::ptr zipfile;
-
-	std::vector<char> layout_text;
-
-	int i;
-
 	auto newrpk = new rpk(options, system_name);
 
 	try
 	{
-		/* open the ZIP file */
-		ziperr = util::archive_file::open_zip(filename, zipfile);
-		if (ziperr != util::archive_file::error::NONE) throw rpk_exception(RPK_NOT_ZIP_FORMAT);
+		// open the ZIP file
+		auto reader = util::core_file_read(file);
+		if (!reader) throw rpk_exception(RPK_OUT_OF_MEMORY);
 
-		/* find the layout.xml file */
+		std::error_condition ziperr;
+		util::archive_file::ptr zipfile;
+		ziperr = util::archive_file::open_zip(std::move(reader), zipfile);
+		if (ziperr) throw rpk_exception(RPK_NOT_ZIP_FORMAT);
+
+		// find the layout.xml file
 		if (find_file(*zipfile, "layout.xml", 0) < 0) throw rpk_exception(RPK_MISSING_LAYOUT);
 
-		/* reserve space for the layout file contents (+1 for the termination) */
-		layout_text.resize(zipfile->current_uncompressed_length() + 1);
+		// reserve space for the layout file contents (+1 for the termination)
+		std::vector<char> layout_text(zipfile->current_uncompressed_length() + 1);
 
-		/* uncompress the layout text */
+		// uncompress the layout text
 		ziperr = zipfile->decompress(&layout_text[0], zipfile->current_uncompressed_length());
-		if (ziperr != util::archive_file::error::NONE)
+		if (ziperr)
 		{
 			if (ziperr == util::archive_file::error::UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
 			else throw rpk_exception(RPK_ZIP_ERROR);
@@ -1781,7 +1782,7 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 
 		layout_text[zipfile->current_uncompressed_length()] = '\0';  // Null-terminate
 
-		/* parse the layout text */
+		// parse the layout text
 		util::xml::file::ptr const layout_xml = util::xml::file::string_read(&layout_text[0], nullptr);
 		if (!layout_xml) throw rpk_exception(RPK_XML_ERROR);
 
@@ -1808,7 +1809,7 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 		if (!pcb_type) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> must have a 'type' attribute");
 		LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", *pcb_type);
 
-		i=0;
+		int i=0;
 		do
 		{
 			if (*pcb_type == m_types[i].name)

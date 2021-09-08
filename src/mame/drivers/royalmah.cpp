@@ -5519,7 +5519,7 @@ void royalmah_state::init_mjsenka()
 		rom[i] = bitswap<8>(rom[i], 0, 6, 5, 4, 3, 1, 2, 7);
 	}
 
-	m_mainopbank->configure_entries(0, 8, m_decrypted_opcodes + 0x8000, 0x400);
+	m_mainopbank->configure_entries(0, 8, &m_decrypted_opcodes[0x8000], 0x400);
 
 	init_chalgirl();
 }

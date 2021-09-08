@@ -18,8 +18,10 @@
 #include "vbiparse.h"
 #include "avhuff.h"
 
-#include <type_traits>
+#include <algorithm>
+#include <system_error>
 #include <utility>
+#include <vector>
 
 
 //**************************************************************************
@@ -244,8 +246,8 @@ private:
 	{
 		bitmap_yuy16        m_bitmap;               // cached bitmap
 		bitmap_yuy16        m_visbitmap;            // wrapper around bitmap with only visible lines
-		uint8_t               m_numfields;            // number of fields in this frame
-		int32_t               m_lastfield;            // last absolute field number
+		uint8_t             m_numfields;            // number of fields in this frame
+		int32_t             m_lastfield;            // last absolute field number
 	};
 
 	// internal helpers
@@ -267,19 +269,19 @@ private:
 	get_disc_delegate m_getdisc_callback;
 	audio_delegate m_audio_callback;  // audio streaming callback
 	laserdisc_overlay_config m_orig_config;     // original overlay configuration
-	uint32_t              m_overwidth;            // overlay screen width
-	uint32_t              m_overheight;           // overlay screen height
+	uint32_t            m_overwidth;            // overlay screen width
+	uint32_t            m_overheight;           // overlay screen height
 	rectangle           m_overclip;             // overlay visarea
 	screen_update_rgb32_delegate m_overupdate_rgb32; // overlay update delegate
 
 	// disc parameters
 	chd_file *          m_disc;                 // handle to the disc itself
-	std::vector<uint8_t>      m_vbidata;              // pointer to precomputed VBI data
+	std::vector<uint8_t> m_vbidata;             // pointer to precomputed VBI data
 	int                 m_width;                // width of video
 	int                 m_height;               // height of video
 	uint32_t            m_fps_times_1million;   // frame rate of video
 	int                 m_samplerate;           // audio samplerate
-	int                 m_readresult;           // result of the most recent read
+	std::error_condition m_readresult;          // result of the most recent read
 	uint32_t            m_chdtracks;            // number of tracks in the CHD
 	bitmap_yuy16        m_avhuff_video;         // decompresed frame buffer
 	avhuff_decoder::config m_avhuff_config;     // decompression configuration
@@ -305,11 +307,11 @@ private:
 	// audio data
 	sound_stream *      m_stream;
 	std::vector<int16_t>       m_audiobuffer[2];       // buffer for audio samples
-	uint32_t              m_audiobufsize;         // size of buffer
-	uint32_t              m_audiobufin;           // input index
-	uint32_t              m_audiobufout;          // output index
-	uint32_t              m_audiocursamples;      // current samples this track
-	uint32_t              m_audiomaxsamples;      // maximum samples per track
+	uint32_t            m_audiobufsize;         // size of buffer
+	uint32_t            m_audiobufin;           // input index
+	uint32_t            m_audiobufout;          // output index
+	uint32_t            m_audiocursamples;      // current samples this track
+	uint32_t            m_audiomaxsamples;      // maximum samples per track
 
 	// metadata
 	vbi_metadata        m_metadata[2];          // metadata parsed from the stream, for each field

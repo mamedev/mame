@@ -179,6 +179,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/q68.h"
 #include "bus/a2bus/sider.h"
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/ssprite.h"
@@ -1902,10 +1903,23 @@ void apple2e_state::do_io(int offset, bool is_iic)
 				accel_normal_speed();
 			}
 
-			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
-			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
-			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
-			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+			// 558 monostable one-shot timers; a running timer cannot be restarted
+			if (machine().time().as_double() >= m_joystick_x1_time) 
+			{
+				m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
+			}
+			if (machine().time().as_double() >= m_joystick_y1_time) 
+			{
+				m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
+			}
+			if (machine().time().as_double() >= m_joystick_x2_time) 
+			{
+				m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
+			}
+			if (machine().time().as_double() >= m_joystick_y2_time) 
+			{
+				m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+			}
 			break;
 
 		default:
@@ -4702,6 +4716,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 	device.option_add("booti", A2BUS_BOOTI);  /* Booti Card */
 	device.option_add("lancegs", A2BUS_LANCEGS);  /* ///SHH SYSTEME LANceGS Card */
+	device.option_add("q68", A2BUS_Q68);        /* Stellation Q68 68000 card */
+	device.option_add("q68plus", A2BUS_Q68PLUS); /* Stellation Q68 Plus 68000 card */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)

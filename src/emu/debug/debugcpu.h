@@ -118,10 +118,6 @@ public:
 	bool registerpoint_enable(int index, bool enable = true);
 	void registerpoint_enable_all(bool enable = true );
 
-	// hotspots
-	bool hotspot_tracking_enabled() const { return !m_hotspots.empty(); }
-	void hotspot_track(int numspots, int threshhold);
-
 	// comments
 	void comment_add(offs_t address, const char *comment, rgb_t color);
 	bool comment_remove(offs_t addr);
@@ -170,7 +166,6 @@ private:
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
 	void breakpoint_check(offs_t pc);
-	void hotspot_check(address_space &space, offs_t address);
 	void reinstall_all(read_or_write mode);
 	void reinstall(address_space &space, read_or_write mode);
 	void write_tracking(address_space &space, offs_t address, u64 data);
@@ -244,18 +239,6 @@ private:
 	};
 	std::unique_ptr<tracer>                m_trace;                    // tracer state
 
-	// hotspots
-	struct hotspot_entry
-	{
-		offs_t              m_access;                   // access address
-		offs_t              m_pc;                       // PC of the access
-		address_space *     m_space;                    // space where the access occurred
-		u32                 m_count;                    // number of hits
-	};
-	std::vector<hotspot_entry> m_hotspots;              // hotspot list
-	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
-
-	std::vector<memory_passthrough_handler *> m_phr;    // passthrough handler reference for each space, read mode
 	std::vector<memory_passthrough_handler *> m_phw;    // passthrough handler reference for each space, write mode
 	std::vector<int>        m_notifiers;                // notifiers for each space
 

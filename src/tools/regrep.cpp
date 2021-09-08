@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
 
 	/* read the template file into an astring */
 	std::string tempheader;
-	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == osd_file::error::NONE)
+	if (!util::core_file::load(tempfilename.c_str(), &buffer, bufsize))
 	{
 		tempheader.assign((const char *)buffer, bufsize);
 		free(buffer);
@@ -569,7 +569,7 @@ static util::core_file::ptr create_file_and_output_header(std::string &filename,
 	util::core_file::ptr file;
 
 	/* create the indexfile */
-	if (util::core_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file) != osd_file::error::NONE)
+	if (util::core_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file))
 		return util::core_file::ptr();
 
 	/* print a header */
@@ -730,7 +730,7 @@ static int compare_screenshots(summary_file *curfile)
 		if (curfile->status[listnum] == STATUS_SUCCESS)
 		{
 			std::string fullname;
-			osd_file::error filerr;
+			std::error_condition filerr;
 			util::core_file::ptr file;
 
 			/* get the filename for the image */
@@ -740,7 +740,7 @@ static int compare_screenshots(summary_file *curfile)
 			filerr = util::core_file::open(fullname, OPEN_FLAG_READ, file);
 
 			/* if that failed, look in the old location */
-			if (filerr != osd_file::error::NONE)
+			if (filerr)
 			{
 				/* get the filename for the image */
 				fullname = string_format("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
@@ -750,7 +750,7 @@ static int compare_screenshots(summary_file *curfile)
 			}
 
 			/* if that worked, load the file */
-			if (filerr == osd_file::error::NONE)
+			if (!filerr)
 			{
 				util::png_read_bitmap(*file, bitmaps[listnum]);
 				file.reset();
@@ -838,7 +838,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	int width, height, maxwidth;
 	int bitmapcount = 0;
 	util::core_file::ptr file;
-	osd_file::error filerr;
+	std::error_condition filerr;
 	util::png_error pngerr;
 	int error = -1;
 	int starty;
@@ -855,7 +855,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 
 			/* open the source image */
 			filerr = util::core_file::open(tempname, OPEN_FLAG_READ, file);
-			if (filerr != osd_file::error::NONE)
+			if (filerr)
 				goto error;
 
 			/* load the source image */
@@ -926,7 +926,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 
 	/* write the final PNG */
 	filerr = util::core_file::open(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 		goto error;
 	pngerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
 	file.reset();

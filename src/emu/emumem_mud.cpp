@@ -35,7 +35,7 @@ template<> u8 mask_to_ukey<u64>(u64 mask)
 		(mask & 0x00000000000000ff ? 0x01 : 0x00);
 }
 
-template<int Width, int AddrShift> memory_units_descriptor<Width, AddrShift>::memory_units_descriptor(u8 access_width, u8 access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, typename emu::detail::handler_entry_size<Width>::uX unitmask, int cswidth) : m_handler(handler), m_access_width(access_width), m_access_endian(access_endian)
+template<int Width, int AddrShift> memory_units_descriptor<Width, AddrShift>::memory_units_descriptor(u8 access_width, endianness_t access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, typename emu::detail::handler_entry_size<Width>::uX unitmask, int cswidth) : m_handler(handler), m_access_width(access_width), m_access_endian(access_endian)
 {
 	u32 bits_per_access = 8 << access_width;
 	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;

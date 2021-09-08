@@ -225,8 +225,6 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("rpenable",  CMDFLAG_NONE, 1, 0, 1, std::bind(&debugger_commands::execute_rpdisenable, this, _1, _2));
 	m_console.register_command("rplist",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rplist, this, _1, _2));
 
-	m_console.register_command("hotspot",   CMDFLAG_NONE, 0, 0, 3, std::bind(&debugger_commands::execute_hotspot, this, _1, _2));
-
 	m_console.register_command("statesave", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1, _2));
 	m_console.register_command("ss",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1, _2));
 	m_console.register_command("stateload", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
@@ -1342,7 +1340,7 @@ void debugger_commands::execute_cpulist(int ref, const std::vector<std::string> 
 	int index = 0;
 	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 	{
-		device_state_interface *state;
+		const device_state_interface *state;
 		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr)
 			m_console.printf("[%s%d] %s\n", &exec.device() == m_console.get_visible_cpu() ? "*" : "", index++, exec.device().tag());
 	}
@@ -1463,23 +1461,22 @@ void debugger_commands::execute_bpset(int ref, const std::vector<std::string> &p
 	u64 address;
 	int bpnum;
 	const char *action = nullptr;
-	int p = 0;
 
-	/* CPU defaults to the active cpu */
-	if (!validate_cpu_parameter((params[p][0] == '#') ? &params[p++][1] : nullptr, cpu))
+	/* CPU is implicit */
+	if (!validate_cpu_parameter(nullptr, cpu))
 		return;
 
 	/* param 1 is the address */
-	if (!validate_number_parameter(params[p++], address))
+	if (!validate_number_parameter(params[0], address))
 		return;
 
 	/* param 2 is the condition */
 	parsed_expression condition(cpu->debug()->symtable());
-	if (params.size() > p && !debug_command_parameter_expression(params[p++], condition))
+	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
 		return;
 
 	/* param 3 is the action */
-	if (params.size() > p && !debug_command_parameter_command(action = params[p++].c_str()))
+	if (params.size() > 2 && !debug_command_parameter_command(action = params[2].c_str()))
 		return;
 
 	/* set the breakpoint */
@@ -1606,41 +1603,39 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 	u64 address, length;
 	read_or_write type;
 	int wpnum;
-	int p = 0;
 
-	/* CPU defaults to the active cpu */
-	if (!validate_cpu_space_parameter((params[p][0] == '#') ? &params[p++][1] : nullptr, ref, space))
+	/* CPU is implicit */
+	if (!validate_cpu_space_parameter(nullptr, ref, space))
 		return;
 
 	/* param 1 is the address */
-	if (!validate_number_parameter(params[p++], address))
+	if (!validate_number_parameter(params[0], address))
 		return;
 
 	/* param 2 is the length */
-	if (!validate_number_parameter(params[p++], length))
+	if (!validate_number_parameter(params[1], length))
 		return;
 
 	/* param 3 is the type */
-	if (!core_stricmp(params[p].c_str(), "r"))
+	if (!core_stricmp(params[2].c_str(), "r"))
 		type = read_or_write::READ;
-	else if (!core_stricmp(params[p].c_str(), "w"))
+	else if (!core_stricmp(params[2].c_str(), "w"))
 		type = read_or_write::WRITE;
-	else if (!core_stricmp(params[p].c_str(), "rw") || !core_stricmp(params[p].c_str(), "wr"))
+	else if (!core_stricmp(params[2].c_str(), "rw") || !core_stricmp(params[2].c_str(), "wr"))
 		type = read_or_write::READWRITE;
 	else
 	{
 		m_console.printf("Invalid watchpoint type: expected r, w, or rw\n");
 		return;
 	}
-	p++;
 
 	/* param 4 is the condition */
 	parsed_expression condition(space->device().debug()->symtable());
-	if (params.size() > p && !debug_command_parameter_expression(params[p++], condition))
+	if (params.size() > 3 && !debug_command_parameter_expression(params[3], condition))
 		return;
 
 	/* param 5 is the action */
-	if (params.size() > p && !debug_command_parameter_command(action = params[p++].c_str()))
+	if (params.size() > 4 && !debug_command_parameter_command(action = params[4].c_str()))
 		return;
 
 	/* set the watchpoint */
@@ -1771,19 +1766,18 @@ void debugger_commands::execute_rpset(int ref, const std::vector<std::string> &p
 	device_t *cpu;
 	const char *action = nullptr;
 	int bpnum;
-	int p = 0;
 
-	/* CPU defaults to the active cpu */
-	if (!validate_cpu_parameter((params[p][0] == '#') ? &params[p++][1] : nullptr, cpu))
+	/* CPU is implicit */
+	if (!validate_cpu_parameter(nullptr, cpu))
 		return;
 
 	/* param 1 is the condition */
 	parsed_expression condition(cpu->debug()->symtable());
-	if (params.size() > p && !debug_command_parameter_expression(params[p], condition))
+	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
 		return;
 
 	/* param 2 is the action */
-	if (params.size() > p && !debug_command_parameter_command(action = params[p].c_str()))
+	if (params.size() > 1 && !debug_command_parameter_command(action = params[1].c_str()))
 		return;
 
 	/* set the breakpoint */
@@ -1892,49 +1886,6 @@ void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &
 
 	if (printed == 0)
 		m_console.printf("No registerpoints currently installed\n");
-}
-
-
-/*-------------------------------------------------
-    execute_hotspot - execute the hotspot
-    command
--------------------------------------------------*/
-
-void debugger_commands::execute_hotspot(int ref, const std::vector<std::string> &params)
-{
-	/* if no params, and there are live hotspots, clear them */
-	if (params.empty())
-	{
-		bool cleared = false;
-
-		/* loop over CPUs and find live spots */
-		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->hotspot_tracking_enabled())
-			{
-				device.debug()->hotspot_track(0, 0);
-				m_console.printf("Cleared hotspot tracking on CPU '%s'\n", device.tag());
-				cleared = true;
-			}
-
-		/* if we cleared, we're done */
-		if (cleared)
-			return;
-	}
-
-	/* extract parameters */
-	device_t *device = nullptr;
-	if (!validate_cpu_parameter(!params.empty() ? params[0].c_str() : nullptr, device))
-		return;
-	u64 count = 64;
-	if (params.size() > 1 && !validate_number_parameter(params[1], count))
-		return;
-	u64 threshhold = 250;
-	if (params.size() > 2 && !validate_number_parameter(params[2], threshhold))
-		return;
-
-	/* attempt to install */
-	device->debug()->hotspot_track(count, threshhold);
-	m_console.printf("Now tracking hotspots on CPU '%s' using %d slots with a threshold of %d\n", device->tag(), (int)count, (int)threshhold);
 }
 
 
@@ -3559,6 +3510,13 @@ void debugger_commands::execute_trackpc(int ref, const std::vector<std::string> 
 	if (!validate_cpu_parameter((params.size() > 1) ? params[1].c_str() : nullptr, cpu))
 		return;
 
+	const device_state_interface *state;
+	if (!cpu->interface(state))
+	{
+		m_console.printf("Device has no PC to be tracked\n");
+		return;
+	}
+
 	// Should we clear the existing data?
 	bool clear = false;
 	if (params.size() > 2 && !validate_boolean_parameter(params[2], clear))
@@ -3570,7 +3528,7 @@ void debugger_commands::execute_trackpc(int ref, const std::vector<std::string> 
 		// Insert current pc
 		if (m_console.get_visible_cpu() == cpu)
 		{
-			const offs_t pc = cpu->state().pcbase();
+			const offs_t pc = state->pcbase();
 			cpu->debug()->set_track_pc_visited(pc);
 		}
 		m_console.printf("PC tracking enabled\n");
@@ -3713,11 +3671,11 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 		if (fname.find(".png") == -1)
 			fname.append(".png");
 		emu_file file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		osd_file::error filerr = file.open(std::move(fname));
+		std::error_condition filerr = file.open(std::move(fname));
 
-		if (filerr != osd_file::error::NONE)
+		if (filerr)
 		{
-			m_console.printf("Error creating file '%s'\n", filename);
+			m_console.printf("Error creating file '%s' (%s:%d %s)\n", filename, filerr.category().name(), filerr.value(), filerr.message());
 			return;
 		}
 
@@ -3747,14 +3705,13 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 	offs_t taddress;
 	u64 address;
 	int intention;
-	int p = 0;
-
-	/* CPU defaults to the active cpu */
-	if (!validate_cpu_space_parameter((params[p][0] == '#') ? &params[p++][1] : nullptr, ref, space))
-		return;
 
 	/* validate parameters */
-	if (!validate_number_parameter(params[p++], address))
+	if (!validate_number_parameter(params[0], address))
+		return;
+
+	/* CPU is implicit */
+	if (!validate_cpu_space_parameter(nullptr, ref, space))
 		return;
 
 	/* do the translation first */

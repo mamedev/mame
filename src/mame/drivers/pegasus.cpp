@@ -427,7 +427,7 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -443,7 +443,7 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 			std::string errmsg = string_format(
 					"Attempted to load a file that does not work in this socket.\n"
 					"Please check \"Usage\" field in the software list for the correct socket(s) to use.");
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
+			image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
 			return image_init_result::FAIL;
 		}
 	}

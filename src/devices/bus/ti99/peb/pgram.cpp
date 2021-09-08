@@ -248,8 +248,8 @@ void pgram_device::dsr_ram_read(offs_t offset, uint8_t *value)
 	m_bankff->clear_w(m_crulatch->q3_r());
 	m_bankff->preset_w(m_crulatch->q4_r());
 
-	uint16_t base = (offset & 0x2000)<<1;   // DSR:0000, RAM:4000
-	uint16_t address = base | (offset & 0x1fff) | (m_bankff->output_r()? 0x2000 : 0);
+	offs_t base = (offset & 0x2000)<<1;   // DSR:0000, RAM:4000
+	offs_t address = base | (offset & 0x1fff) | (m_bankff->output_r()? 0x2000 : 0);
 
 	if ((dsr && m_crulatch->q0_r()) || (!dsr && m_crulatch->q1_r()))
 	{
@@ -294,8 +294,8 @@ void pgram_device::dsr_ram_write(offs_t offset, uint8_t data)
 
 		if (m_crulatch->q2_r()==0)  // not write-protected
 		{
-			uint16_t base = (offset & 0x2000)<<1;
-			uint16_t address = base | (offset & 0x1fff) | (m_bankff->output_r()? 0x2000 : 0);
+			offs_t base = (offset & 0x2000)<<1;
+			offs_t address = base | (offset & 0x1fff) | (m_bankff->output_r()? 0x2000 : 0);
 
 			m_dsrram->write(address, data);
 			if (base==0)

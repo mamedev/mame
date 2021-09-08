@@ -10,6 +10,8 @@
 
 #include "formats/wd177x_dsk.h"
 
+#include "ioprocs.h"
+
 
 wd177x_format::wd177x_format(const format *_formats)
 {
@@ -29,9 +31,12 @@ const wd177x_format::format &wd177x_format::get_track_format(const format &f, in
 /*
     Default implementation for find_size. May be overwritten by subclasses.
 */
-int wd177x_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int wd177x_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return -1;
+
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
@@ -49,15 +54,17 @@ int wd177x_format::find_size(io_generic *io, uint32_t form_factor, const std::ve
 		if(size == format_size)
 			return i;
 	}
+
 	return -1;
 }
 
-int wd177x_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int wd177x_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor, variants);
+	int const type = find_size(io, form_factor, variants);
 
 	if(type != -1)
 		return 50;
+
 	return 0;
 }
 
@@ -197,9 +204,9 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int 
 	return desc;
 }
 
-bool wd177x_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool wd177x_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int type = find_size(io, form_factor, variants);
+	int const type = find_size(io, form_factor, variants);
 	if(type == -1)
 		return false;
 
@@ -251,7 +258,8 @@ bool wd177x_format::load(io_generic *io, uint32_t form_factor, const std::vector
 
 			build_sector_description(tf, sectdata, sectors, track, head);
 			int track_size = compute_track_size(tf);
-			io_generic_read(io, sectdata, get_image_offset(f, head, track), track_size);
+			size_t actual;
+			io.read_at(get_image_offset(f, head, track), sectdata, track_size, actual);
 			generate_track(desc, track, head, sectors, tf.sector_count, total_size, image);
 		}
 
@@ -265,7 +273,7 @@ bool wd177x_format::supports_save() const
 	return true;
 }
 
-bool wd177x_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	// Count the number of formats
 	int formats_count;
@@ -377,7 +385,8 @@ bool wd177x_format::save(io_generic *io, const std::vector<uint32_t> &variants, 
 			build_sector_description(tf, sectdata, sectors, track, head);
 			extract_sectors(image, tf, sectors, track, head);
 			int track_size = compute_track_size(tf);
-			io_generic_write(io, sectdata, get_image_offset(f, head, track), track_size);
+			size_t actual;
+			io.write_at(get_image_offset(f, head, track), sectdata, track_size, actual);
 		}
 	}
 
@@ -432,8 +441,8 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 		int max_tracks, max_heads;
 		image->get_maximal_geometry(max_tracks, max_heads);
 
-		// Fail if floppy drive can't handle track count
-		if(f.track_count > max_tracks) {
+		// Fail if floppy drive can't handle track or head count
+		if(f.track_count > max_tracks || f.head_count > max_heads) {
 			goto fail;
 		}
 

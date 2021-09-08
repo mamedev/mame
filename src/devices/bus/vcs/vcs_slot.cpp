@@ -200,7 +200,7 @@ image_init_result vcs_cart_slot_device::call_load()
 				break;
 
 			default:
-				seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
+				seterror(image_error::INVALIDIMAGE, "Invalid ROM file size" );
 				return image_init_result::FAIL;
 		}
 

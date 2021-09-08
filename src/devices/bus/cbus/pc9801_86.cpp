@@ -1,25 +1,35 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     NEC PC-9801-86 sound card
     NEC PC-9801-SpeakBoard sound card
+    Mad Factory Otomi-chan Kai sound card
 
     Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
     additional DAC port
+
     SpeakBoard sound card seems to be derived design from -86, with an additional
     OPNA mapped at 0x58*
 
+    Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
+    It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
+    expects this to be installed as default (cfr. datsumj).
+    To fallback to a regular -26/-86 board user needs to add parameter switches "-2" or "-3"
+    respectively, cfr. "nax -?" for additional details.
+
     TODO:
-    - Test all pcm modes
-    - Make volume work
-    - Recording
+    - Test all pcm modes;
+    - Make volume work;
+    - Recording;
     - SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
-      "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM"
-      Sounds like a sound core flaw since OPNA requires a rom region in any case;
+      "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM";
+    - Otomi-chan Kai: find a manual (マニュアル), it's mentioned with nax usage.
+      Very low-res scan of the PCB sports a 4-bit dip-sw bank at very least;
+    - Otomi-chan Kai: unknown ID port readback;
     - verify sound irq;
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "bus/cbus/pc9801_86.h"
@@ -32,15 +42,22 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "pc9801_86")
+DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86")
 
 WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 {
 	m_fmirq = state ? true : false;
-	/* TODO: seems to die very often */
+	// TODO: sometimes misfired irq causes sound or even host hang
 	m_bus->int_w<5>(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
 }
 
+// only for derived designs?
+void pc9801_86_device::opna_map(address_map &map)
+{
+	// TODO: confirm it really is ROMless
+	// TODO: confirm size
+	map(0x000000, 0x1fffff).ram();
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -60,6 +77,8 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B
+	// shouldn't have one
+//  m_opna->set_addrmap(0, &pc9801_86_device::opna_map);
 	m_opna->irq_handler().set(FUNC(pc9801_86_device::sound_irq));
 	m_opna->port_a_read_callback().set(FUNC(pc9801_86_device::opn_porta_r));
 	//m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
@@ -79,6 +98,16 @@ void pc9801_86_device::device_add_mconfig(machine_config &config)
 	pc9801_86_config(config);
 }
 
+// helper for derived devices to account for the different master OPNA sound mixing
+void pc9801_86_device::opna_reset_routes_config(machine_config &config)
+{
+	m_opna->reset_routes();
+	m_opna->add_route(0, "lspeaker", 0.50);
+	m_opna->add_route(0, "rspeaker", 0.50);
+	m_opna->add_route(1, "lspeaker", 0.50);
+	m_opna->add_route(2, "rspeaker", 0.50);
+}
+
 // to load a different bios for slots:
 // -cbusX pc9801_86,bios=N
 ROM_START( pc9801_86 )
@@ -87,13 +116,12 @@ ROM_START( pc9801_86 )
 	// we currently mark bios names based off where they originally belonged to, lacking of a better info
 	// supposedly these are -86 roms according to eikanwa2 sound card detection,
 	// loading a -26 rom in a -86 environment causes an hang there.
+	// TODO: several later machines (i.e. CanBe) really has an internal -86 with sound BIOS data coming directly from the machine ROM
+	// it also sports different ID mapping at $a460
 	ROM_SYSTEM_BIOS( 0,  "86rx",    "nec86rx" )
 	ROMX_LOAD( "sound_rx.rom",    0x0000, 0x4000, BAD_DUMP CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1,  "86mu",    "nec86mu" )
+	ROM_SYSTEM_BIOS( 1,  "86mu",    "epson86mu" )
 	ROMX_LOAD( "sound_486mu.rom", 0x0000, 0x4000, BAD_DUMP CRC(6cdfa793) SHA1(4b8250f9b9db66548b79f961d61010558d6d6e1c), ROM_BIOS(1) )
-
-	// RAM
-	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
 ROM_END
 
 const tiny_rom_entry *pc9801_86_device::device_rom_region() const
@@ -109,10 +137,32 @@ const tiny_rom_entry *pc9801_86_device::device_rom_region() const
 static INPUT_PORTS_START( pc9801_86 )
 	PORT_INCLUDE( pc9801_joy_port )
 
+	// Single 8-bit DSW bank
+	// TODO: how HW really reads these?
 	PORT_START("OPNA_DSW")
-	PORT_CONFNAME( 0x01, 0x01, "PC-9801-86: Port Base" )
-	PORT_CONFSETTING(    0x00, "0x088" )
-	PORT_CONFSETTING(    0x01, "0x188" )
+	PORT_DIPNAME( 0x01, 0x00, "PC-9801-86: Port Base" ) PORT_DIPLOCATION("OPNA_SW:!1")
+	PORT_DIPSETTING(    0x00, "0x188" )
+	PORT_DIPSETTING(    0x01, "0x288" )
+	PORT_DIPNAME( 0x02, 0x00, "PC-9801-86: Enable sound ROM") PORT_DIPLOCATION("OPNA_SW:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) ) // hardwired at 0xcc000
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPNAME( 0x0c, 0x00, "PC-9801-86: Interrupt level") PORT_DIPLOCATION("OPNA_SW:!3,!4")
+	PORT_DIPSETTING(    0x0c, "IRQ 0" )
+	PORT_DIPSETTING(    0x08, "IRQ 4" )
+	PORT_DIPSETTING(    0x00, "IRQ 5" )
+	PORT_DIPSETTING(    0x04, "IRQ 6" )
+	PORT_DIPNAME( 0x10, 0x00, "PC-9801-86: Interrupt enable") PORT_DIPLOCATION("OPNA_SW:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPNAME( 0xe0, 0x80, "PC-9801-86: ID number") PORT_DIPLOCATION("OPNA_SW:!6,!7,!8")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x60, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0xa0, "5" )
+	PORT_DIPSETTING(    0xc0, "6" )
+	PORT_DIPSETTING(    0xe0, "7" )
 INPUT_PORTS_END
 
 ioport_constructor pc9801_86_device::device_input_ports() const
@@ -129,12 +179,12 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_snd_device(mconfig, type, tag, owner, clock),
-		m_bus(*this, DEVICE_SELF_OWNER),
-		m_opna(*this, "opna"),
-		m_ldac(*this, "ldac"),
-		m_rdac(*this, "rdac"),
-		m_queue(QUEUE_SIZE)
+	: pc9801_snd_device(mconfig, type, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_opna(*this, "opna")
+	, m_ldac(*this, "ldac")
+	, m_rdac(*this, "rdac")
+	, m_queue(QUEUE_SIZE)
 {
 }
 
@@ -154,6 +204,11 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 {
 }
 
+u16 pc9801_86_device::read_io_base()
+{
+	return ((ioport("OPNA_DSW")->read() & 1) << 8) + 0x188;
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -161,11 +216,18 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_86_device::device_start()
 {
-	m_bus->program_space().install_rom(0xcc000,0xcffff,memregion(this->subtag("sound_bios").c_str())->base());
+	// TODO: uninstall option from dip
+	m_bus->program_space().install_rom(
+		0xcc000,
+		0xcffff,
+		memregion(this->subtag("sound_bios").c_str())->base()
+	);
 	m_bus->install_io(0xa460, 0xa463, read8smo_delegate(*this, FUNC(pc9801_86_device::id_r)), write8smo_delegate(*this, FUNC(pc9801_86_device::mask_w)));
 	m_bus->install_io(0xa464, 0xa46f, read8sm_delegate(*this, FUNC(pc9801_86_device::pcm_r)), write8sm_delegate(*this, FUNC(pc9801_86_device::pcm_w)));
 	m_bus->install_io(0xa66c, 0xa66f, read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
 								   write8sm_delegate(*this, [this](offs_t o, u8 d){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
+
+	m_io_base = 0;
 
 	m_dac_timer = timer_alloc();
 	save_item(NAME(m_count));
@@ -180,9 +242,16 @@ void pc9801_86_device::device_start()
 
 void pc9801_86_device::device_reset()
 {
-	uint16_t port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
-	m_bus->io_space().unmap_readwrite(0x0088, 0x008f, 0x100);
-	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8sm_delegate(*this, FUNC(pc9801_86_device::opna_r)), write8sm_delegate(*this, FUNC(pc9801_86_device::opna_w)));
+	u16 current_io = read_io_base();
+	m_bus->flush_install_io(
+		this->tag(),
+		m_io_base,
+		current_io,
+		7,
+		read8sm_delegate(*this, FUNC(pc9801_86_device::opna_r)),
+		write8sm_delegate(*this, FUNC(pc9801_86_device::opna_w))
+	);
+	m_io_base = current_io;
 
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
@@ -200,36 +269,40 @@ void pc9801_86_device::device_reset()
 //**************************************************************************
 
 
-uint8_t pc9801_86_device::opna_r(offs_t offset)
+u8 pc9801_86_device::opna_r(offs_t offset)
 {
 	if((offset & 1) == 0)
 		return m_opna->read(offset >> 1);
 	else // odd
 	{
-		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0x188);
+		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + m_io_base);
 		return 0xff;
 	}
 }
 
-void pc9801_86_device::opna_w(offs_t offset, uint8_t data)
+void pc9801_86_device::opna_w(offs_t offset, u8 data)
 {
 	if((offset & 1) == 0)
 		m_opna->write(offset >> 1,data);
 	else // odd
-		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
+		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + m_io_base, data);
 }
 
-uint8_t pc9801_86_device::id_r()
+u8 pc9801_86_device::id_r()
 {
-	return 0x40 | m_mask;
+	// either a -86 or 9821 MATE A uses this id (built-in)
+	const u8 id_port = ((ioport("OPNA_DSW")->read() & 1) << 4) | 0x40;
+	return id_port | m_mask;
 }
 
-void pc9801_86_device::mask_w(uint8_t data)
+void pc9801_86_device::mask_w(u8 data)
 {
 	m_mask = data & 1;
+	// TODO: bit 1 totally cuts off OPNA output
+	logerror("%s: OPNA mask setting %02x\n", machine().describe_context(), data);
 }
 
-uint8_t pc9801_86_device::pcm_r(offs_t offset)
+u8 pc9801_86_device::pcm_r(offs_t offset)
 {
 	if((offset & 1) == 0)
 	{
@@ -251,7 +324,7 @@ uint8_t pc9801_86_device::pcm_r(offs_t offset)
 	return 0xff;
 }
 
-void pc9801_86_device::pcm_w(offs_t offset, uint8_t data)
+void pc9801_86_device::pcm_w(offs_t offset, u8 data)
 {
 	const u32 rate = (25.4_MHz_XTAL).value() / 16;
 	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
@@ -301,9 +374,9 @@ int pc9801_86_device::queue_count()
 	return m_count;
 }
 
-uint8_t pc9801_86_device::queue_pop()
+u8 pc9801_86_device::queue_pop()
 {
-	uint8_t ret = m_queue[m_tail++];
+	u8 ret = m_queue[m_tail++];
 	m_tail %= QUEUE_SIZE;
 	m_count = (m_count - 1) % QUEUE_SIZE; // dangel resets the fifo after filling it completely so maybe it expects an underflow
 	return ret;
@@ -356,7 +429,9 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 }
 
 //**************************************************************************
+//
 //  SpeakBoard device section
+//
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC9801 SpeakBoard")
@@ -365,11 +440,6 @@ ROM_START( pc9801_spb )
 	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "spb lh5764 ic21_pink.bin",    0x0001, 0x2000, CRC(5bcefa1f) SHA1(ae88e45d411bf5de1cb42689b12b6fca0146c586) )
 	ROM_LOAD16_BYTE( "spb lh5764 ic22_green.bin",   0x0000, 0x2000, CRC(a7925ced) SHA1(3def9ee386ab6c31436888261bded042cd64a0eb) )
-
-	// RAM
-	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x100000, "opna_slave", ROMREGION_ERASE00 )
 ROM_END
 
 const tiny_rom_entry *pc9801_speakboard_device::device_rom_region() const
@@ -377,32 +447,21 @@ const tiny_rom_entry *pc9801_speakboard_device::device_rom_region() const
 	return ROM_NAME( pc9801_spb );
 }
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  pc9801_speakboard_device - constructor
-//-------------------------------------------------
-
 pc9801_speakboard_device::pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_86_device(mconfig, PC9801_SPEAKBOARD, tag, owner, clock),
-	m_opna_slave(*this, "opna_slave")
+	: pc9801_86_device(mconfig, PC9801_SPEAKBOARD, tag, owner, clock)
+	, m_opna_slave(*this, "opna_slave")
 {
 }
 
 void pc9801_speakboard_device::device_add_mconfig(machine_config &config)
 {
 	pc9801_86_config(config);
-
-	m_opna->reset_routes();
-	m_opna->add_route(0, "lspeaker", 0.50);
-	m_opna->add_route(0, "rspeaker", 0.50);
-	m_opna->add_route(1, "lspeaker", 0.50);
-	m_opna->add_route(2, "rspeaker", 0.50);
+	opna_reset_routes_config(config);
+	// TODO: confirm RAM mapping configuration (shared? not present on either chip? misc?)
+	m_opna->set_addrmap(0, &pc9801_speakboard_device::opna_map);
 
 	YM2608(config, m_opna_slave, 7.987_MHz_XTAL);
+	m_opna_slave->set_addrmap(0, &pc9801_speakboard_device::opna_map);
 	m_opna_slave->add_route(0, "lspeaker", 0.50);
 	m_opna_slave->add_route(0, "rspeaker", 0.50);
 	m_opna_slave->add_route(1, "lspeaker", 0.50);
@@ -421,22 +480,96 @@ void pc9801_speakboard_device::device_reset()
 	pc9801_86_device::device_reset();
 }
 
-uint8_t pc9801_speakboard_device::opna_slave_r(offs_t offset)
+u8 pc9801_speakboard_device::opna_slave_r(offs_t offset)
 {
 	if((offset & 1) == 0)
 		return m_opna_slave->read(offset >> 1);
 	else // odd
 	{
-		logerror("PC9801-SPB: Read to undefined port [%02x]\n",offset+0x588);
+		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + 0x588);
 		return 0xff;
 	}
 }
 
-void pc9801_speakboard_device::opna_slave_w(offs_t offset, uint8_t data)
+void pc9801_speakboard_device::opna_slave_w(offs_t offset, u8 data)
 {
 	if((offset & 1) == 0)
 		m_opna_slave->write(offset >> 1,data);
 	else // odd
-		logerror("PC9801-SPB: Write to undefined port [%02x] %02x\n",offset+0x588,data);
+		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + 0x588, data);
 }
 
+//**************************************************************************
+//
+//  Otomi-chan Kai device section
+//
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device, "pc98_otomichan_kai", "MAD Factory Otomi-chan Kai") // 音美(おとみ)ちゃん改
+
+otomichan_kai_device::otomichan_kai_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_86_device(mconfig, OTOMICHAN_KAI, tag, owner, clock)
+	, m_opn2c(*this, "opn2c")
+{
+}
+
+ROM_START( pc98_otomichan_kai )
+	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	// TODO: "compatible" with SpeakBoard, does it even uses a ROM altogether? low-res PCB pic doesn't help at all.
+	ROM_LOAD16_BYTE( "spb lh5764 ic21_pink.bin",    0x0001, 0x2000, BAD_DUMP CRC(5bcefa1f) SHA1(ae88e45d411bf5de1cb42689b12b6fca0146c586) )
+	ROM_LOAD16_BYTE( "spb lh5764 ic22_green.bin",   0x0000, 0x2000, BAD_DUMP CRC(a7925ced) SHA1(3def9ee386ab6c31436888261bded042cd64a0eb) )
+ROM_END
+
+const tiny_rom_entry *otomichan_kai_device::device_rom_region() const
+{
+	return ROM_NAME( pc98_otomichan_kai );
+}
+
+void otomichan_kai_device::device_add_mconfig(machine_config &config)
+{
+	pc9801_86_config(config);
+	opna_reset_routes_config(config);
+	// TODO: confirm if this has OPNA RAM
+	m_opna->set_addrmap(0, &otomichan_kai_device::opna_map);
+
+	YM3438(config, m_opn2c, 7.987_MHz_XTAL);
+	m_opn2c->add_route(0, "lspeaker", 0.50);
+	m_opn2c->add_route(1, "rspeaker", 0.50);
+}
+
+u8 otomichan_kai_device::id_r()
+{
+	// no ID, unconfirmed if it has mask
+	return 0xf0 | m_mask;
+}
+
+void otomichan_kai_device::device_start()
+{
+	pc9801_86_device::device_start();
+
+	m_bus->install_io(0x0788, 0x078f, read8sm_delegate(*this, FUNC(otomichan_kai_device::opn2c_r)), write8sm_delegate(*this, FUNC(otomichan_kai_device::opn2c_w)));
+}
+
+void otomichan_kai_device::device_reset()
+{
+	pc9801_86_device::device_reset();
+}
+
+u8 otomichan_kai_device::opn2c_r(offs_t offset)
+{
+	if((offset & 1) == 0)
+		return m_opn2c->read(offset >> 1);
+	else // odd
+	{
+		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + 0x788);
+		return 0xff;
+	}
+}
+
+void otomichan_kai_device::opn2c_w(offs_t offset, u8 data)
+{
+	if((offset & 1) == 0)
+		m_opn2c->write(offset >> 1, data);
+	else // odd
+		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + 0x788, data);
+}

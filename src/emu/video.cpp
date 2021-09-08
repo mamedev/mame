@@ -359,8 +359,8 @@ void video_manager::save_active_screen_snapshots()
 			if (machine().render().is_live(screen))
 			{
 				emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				osd_file::error filerr = open_next(file, "png");
-				if (filerr == osd_file::error::NONE)
+				std::error_condition const filerr = open_next(file, "png");
+				if (!filerr)
 					save_snapshot(&screen, file);
 			}
 	}
@@ -368,8 +368,8 @@ void video_manager::save_active_screen_snapshots()
 	{
 		// otherwise, just write a single snapshot
 		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		osd_file::error filerr = open_next(file, "png");
-		if (filerr == osd_file::error::NONE)
+		std::error_condition const filerr = open_next(file, "png");
+		if (!filerr)
 			save_snapshot(nullptr, file);
 	}
 }
@@ -431,12 +431,12 @@ void video_manager::begin_recording_screen(const std::string &filename, uint32_t
 			OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	// and open the actual file
-	osd_file::error filerr = filename.empty()
+	std::error_condition filerr = filename.empty()
 			? open_next(*movie_file, extension)
 			: movie_file->open(filename);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
-		osd_printf_error("Error creating movie, osd_file::error=%d\n", int(filerr));
+		osd_printf_error("Error creating movie, %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 		return;
 	}
 
@@ -1007,8 +1007,8 @@ void video_manager::recompute_speed(const attotime &emutime)
 	{
 		// create a final screenshot
 		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		osd_file::error filerr = file.open(machine().basename() + PATH_SEPARATOR "final.png");
-		if (filerr == osd_file::error::NONE)
+		std::error_condition filerr = file.open(machine().basename() + PATH_SEPARATOR "final.png");
+		if (!filerr)
 			save_snapshot(nullptr, file);
 
 		//printf("Scheduled exit at %f\n", emutime.as_double());
@@ -1096,7 +1096,7 @@ void video_manager::pixels(u32 *buffer)
 //  scheme
 //-------------------------------------------------
 
-osd_file::error video_manager::open_next(emu_file &file, const char *extension, uint32_t added_index)
+std::error_condition video_manager::open_next(emu_file &file, const char *extension, uint32_t added_index)
 {
 	u32 origflags = file.openflags();
 
@@ -1205,11 +1205,9 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 			strreplace(fname, "%i", string_format("%04d", seq));
 
 			// try to open the file; stop when we fail
-			osd_file::error filerr = file.open(fname);
-			if (filerr == osd_file::error::NOT_FOUND)
-			{
+			std::error_condition const filerr = file.open(fname);
+			if (std::errc::no_such_file_or_directory == filerr)
 				break;
-			}
 		}
 	}
 

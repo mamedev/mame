@@ -99,9 +99,11 @@
 #include "inputdev.h"
 #include "natkeyboard.h"
 
-#include "corestr.h"
+#include "util/corestr.h"
+#include "util/ioprocsfilter.h"
+#include "util/unicode.h"
+
 #include "osdepend.h"
-#include "unicode.h"
 
 #include <cctype>
 #include <ctime>
@@ -2652,23 +2654,26 @@ template<typename Type>
 Type ioport_manager::playback_read(Type &result)
 {
 	// protect against nullptr handles if previous reads fail
-	if (!m_playback_file.is_open())
-		result = 0;
+	if (!m_playback_stream)
+		return result = Type(0);
 
 	// read the value; if we fail, end playback
-	else if (m_playback_file.read(&result, sizeof(result)) != sizeof(result))
+	size_t read;
+	m_playback_stream->read(&result, sizeof(result), read);
+	if (sizeof(result) != read)
 	{
 		playback_end("End of file");
-		result = 0;
+		return result = Type(0);
 	}
 
-	// return the appropriate value
-	else if (sizeof(result) == 8)
+	// normalize byte order
+	if (sizeof(result) == 8)
 		result = little_endianize_int64(result);
 	else if (sizeof(result) == 4)
 		result = little_endianize_int32(result);
 	else if (sizeof(result) == 2)
 		result = little_endianize_int16(result);
+
 	return result;
 }
 
@@ -2693,15 +2698,15 @@ time_t ioport_manager::playback_init()
 		return 0;
 
 	// open the playback file
-	osd_file::error filerr = m_playback_file.open(filename);
+	std::error_condition const filerr = m_playback_file.open(filename);
 
 	// return an explicit error if file isn't found in given path
-	if(filerr == osd_file::error::NOT_FOUND)
+	if (filerr == std::errc::no_such_file_or_directory)
 		fatalerror("Input file %s not found\n",filename);
 
 	// TODO: bail out any other error laconically for now
-	if(filerr != osd_file::error::NONE)
-		fatalerror("Failed to open file %s for playback (code error=%d)\n",filename,int(filerr));
+	if (filerr)
+		fatalerror("Failed to open file %s for playback (%s:%d %s)\n", filename, filerr.category().name(), filerr.value(), filerr.message());
 
 	// read the header and verify that it is a modern version; if not, print an error
 	inp_header header;
@@ -2725,7 +2730,7 @@ time_t ioport_manager::playback_init()
 		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname, machine().system().name);
 
 	// enable compression
-	m_playback_file.compress(FCOMPRESS_MEDIUM);
+	m_playback_stream = util::zlib_read(util::core_file_read(m_playback_file), 16386);
 	return basetime;
 }
 
@@ -2737,9 +2742,10 @@ time_t ioport_manager::playback_init()
 void ioport_manager::playback_end(const char *message)
 {
 	// only applies if we have a live file
-	if (m_playback_file.is_open())
+	if (m_playback_stream)
 	{
 		// close the file
+		m_playback_stream.reset();
 		m_playback_file.close();
 
 		// pop a message
@@ -2753,7 +2759,8 @@ void ioport_manager::playback_end(const char *message)
 		osd_printf_info("Average recorded speed: %d%%\n", u32((m_playback_accumulated_speed * 200 + 1) >> 21));
 
 		// close the program at the end of inp file playback
-		if (machine().options().exit_after_playback()) {
+		if (machine().options().exit_after_playback())
+		{
 			osd_printf_info("Exiting MAME now...\n");
 			machine().schedule_exit();
 		}
@@ -2769,7 +2776,7 @@ void ioport_manager::playback_end(const char *message)
 void ioport_manager::playback_frame(const attotime &curtime)
 {
 	// if playing back, fetch the information and verify
-	if (m_playback_file.is_open())
+	if (m_playback_stream)
 	{
 		// first the absolute time
 		seconds_t seconds_temp;
@@ -2795,7 +2802,7 @@ void ioport_manager::playback_frame(const attotime &curtime)
 void ioport_manager::playback_port(ioport_port &port)
 {
 	// if playing back, fetch information about this port
-	if (m_playback_file.is_open())
+	if (m_playback_stream)
 	{
 		// read the default value and the digital state
 		playback_read(port.live().defvalue);
@@ -2824,11 +2831,20 @@ template<typename Type>
 void ioport_manager::record_write(Type value)
 {
 	// protect against nullptr handles if previous reads fail
-	if (!m_record_file.is_open())
+	if (!m_record_stream)
 		return;
 
-	// read the value; if we fail, end playback
-	if (m_record_file.write(&value, sizeof(value)) != sizeof(value))
+	// normalize byte order
+	if (sizeof(value) == 8)
+		value = little_endianize_int64(value);
+	else if (sizeof(value) == 4)
+		value = little_endianize_int32(value);
+	else if (sizeof(value) == 2)
+		value = little_endianize_int16(value);
+
+	// write the value; if we fail, end recording
+	size_t written;
+	if (m_record_stream->write(&value, sizeof(value), written) || (sizeof(value) != written))
 		record_end("Out of space");
 }
 
@@ -2875,9 +2891,9 @@ void ioport_manager::record_init()
 		return;
 
 	// open the record file
-	osd_file::error filerr = m_record_file.open(filename);
-	if (filerr != osd_file::error::NONE)
-		throw emu_fatalerror("ioport_manager::record_init: Failed to open file for recording");
+	std::error_condition const filerr = m_record_file.open(filename);
+	if (filerr)
+		throw emu_fatalerror("ioport_manager::record_init: Failed to open file for recording (%s:%d %s)", filerr.category().name(), filerr.value(), filerr.message());
 
 	// get the base time
 	system_time systime;
@@ -2895,7 +2911,7 @@ void ioport_manager::record_init()
 	header.write(m_record_file);
 
 	// enable compression
-	m_record_file.compress(FCOMPRESS_MEDIUM);
+	m_record_stream = util::zlib_write(util::core_file_read_write(m_record_file), 6, 16384);
 }
 
 
@@ -2922,9 +2938,9 @@ void ioport_manager::timecode_init()
 	filename.append(record_filename).append(".timecode");
 	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
-	osd_file::error filerr = m_timecode_file.open(filename);
-	if (filerr != osd_file::error::NONE)
-		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording");
+	std::error_condition const filerr = m_timecode_file.open(filename);
+	if (filerr)
+		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording (%s:%d %s)", filerr.category().name(), filerr.value(), filerr.message());
 
 	m_timecode_file.puts("# ==========================================\n");
 	m_timecode_file.puts("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n");
@@ -2948,9 +2964,10 @@ void ioport_manager::timecode_init()
 void ioport_manager::record_end(const char *message)
 {
 	// only applies if we have a live file
-	if (m_record_file.is_open())
+	if (m_record_stream)
 	{
 		// close the file
+		m_record_stream.reset(); // TODO: check for errors flushing the last compressed block before doing this
 		m_record_file.close();
 
 		// pop a message
@@ -2981,7 +2998,7 @@ void ioport_manager::timecode_end(const char *message)
 void ioport_manager::record_frame(const attotime &curtime)
 {
 	// if recording, record information about the current frame
-	if (m_record_file.is_open())
+	if (m_record_stream)
 	{
 		// first the absolute time
 		record_write(curtime.seconds());
@@ -3091,7 +3108,7 @@ void ioport_manager::record_frame(const attotime &curtime)
 void ioport_manager::record_port(ioport_port &port)
 {
 	// if recording, store information about this port
-	if (m_record_file.is_open())
+	if (m_record_stream)
 	{
 		// store the default value and digital state
 		record_write(port.live().defvalue);

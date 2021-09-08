@@ -179,7 +179,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 
 	if (m_ram->size() < 16*1024)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
+		image.seterror(image_error::INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");
 		return image_init_result::FAIL;
 	}
@@ -216,7 +216,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 
 	if (!done)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "EOF marker not found");
+		image.seterror(image_error::INVALIDIMAGE, "EOF marker not found");
 		image.message("EOF marker not found");
 		return image_init_result::FAIL;
 	}
@@ -249,7 +249,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 		cpu->set_state_int(Z80_R, RAM[0x2140]);
 
 		if ((RAM[0x2119] < 0x80) || !ace_index)
-			cpu->set_state_int(STATE_GENSP, RAM[0x2118] | (RAM[0x2119] << 8));
+			cpu->set_state_int(Z80_SP, RAM[0x2118] | (RAM[0x2119] << 8));
 	}
 
 	/* Copy data to the address space */

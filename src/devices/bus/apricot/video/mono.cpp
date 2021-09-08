@@ -4,8 +4,8 @@
 
     ACT Apricot XEN Monochrome Display Option
 
-	TODO:
-	- Support monitor selection
+    TODO:
+    - Support monitor selection
 
 ***************************************************************************/
 
@@ -203,7 +203,7 @@ void apricot_mono_display_device::portb_w(uint8_t data)
 	// -------0  crtc reset
 
 	m_portb = data;
-	
+
 	if (BIT(m_portb, 0) == 0)
 		m_crtc->reset();
 }
@@ -217,7 +217,7 @@ void apricot_mono_display_device::portx_w(uint8_t data)
 	// -------0  mode (compatible or xen)
 
 	m_portx = data;
-	
+
 	// forward mode to host
 	m_slot->apvid_w(BIT(m_portx, 0));
 }

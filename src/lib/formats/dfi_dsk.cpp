@@ -13,7 +13,8 @@
 
 #include "dfi_dsk.h"
 
-#include <zlib.h>
+#include "ioprocs.h"
+
 
 #define NUMBER_OF_MULTIREADS 3
 // thresholds for brickwall windowing
@@ -56,24 +57,28 @@ bool dfi_format::supports_save() const
 	return false;
 }
 
-int dfi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char sign[4];
-	io_generic_read(io, sign, 0, 4);
+	size_t actual;
+	io.read_at(0, sign, 4, actual);
 	return memcmp(sign, "DFE2", 4) ? 0 : 100;
 }
 
-bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	char sign[4];
-	io_generic_read(io, sign, 0, 4);
-	if (memcmp(sign, "DFER", 4) == 0)
-	{
+	io.read_at(0, sign, 4, actual);
+	if(memcmp(sign, "DFER", 4) == 0) {
 		osd_printf_error("dfi_dsk: Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
 		return false;
 	}
 
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return false;
+
 	uint64_t pos = 4;
 	std::vector<uint8_t> data;
 	int onerev_time = 0; // time for one revolution, used to guess clock and rpm for DFE2 files
@@ -81,7 +86,7 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	int rpm=360; // drive rpm
 	while(pos < size) {
 		uint8_t h[10];
-		io_generic_read(io, h, pos, 10);
+		io.read_at(pos, h, 10, actual);
 		uint16_t track = (h[0] << 8) | h[1];
 		uint16_t head  = (h[2] << 8) | h[3];
 		// Ignore sector
@@ -97,7 +102,7 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		data.resize(tsize);
 
 		pos += 10; // skip the header, we already read it
-		io_generic_read(io, &data[0], pos, tsize);
+		io.read_at(pos, &data[0], tsize, actual);
 		pos += tsize; // for next time we read, increment to the beginning of next header
 
 		int index_time = 0; // what point the last index happened

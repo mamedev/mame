@@ -594,8 +594,8 @@ render_font::render_font(render_manager &manager, const char *filename)
 
 	// load the compiled in data instead
 	emu_file ramfile(OPEN_FLAG_READ);
-	osd_file::error const filerr(ramfile.open_ram(font_uismall, sizeof(font_uismall)));
-	if (osd_file::error::NONE == filerr)
+	std::error_condition const filerr(ramfile.open_ram(font_uismall, sizeof(font_uismall)));
+	if (!filerr)
 		load_cached(ramfile, 0, 0);
 	render_font_command_glyph();
 }
@@ -908,14 +908,14 @@ float render_font::utf8string_width(float height, float aspect, std::string_view
 
 bool render_font::load_cached_bdf(const char *filename)
 {
-	osd_file::error filerr;
+	std::error_condition filerr;
 	u32 chunk;
 	u64 bytes;
 
 	// first try to open the BDF itself
 	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
 	filerr = file.open(filename);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 		return false;
 
 	// determine the file size and allocate memory
@@ -952,7 +952,7 @@ bool render_font::load_cached_bdf(const char *filename)
 	{
 		emu_file cachefile(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
 		filerr = cachefile.open(cachedname);
-		if (filerr == osd_file::error::NONE)
+		if (!filerr)
 		{
 			// if we have a cached version, load it
 			bool const result = load_cached(cachefile, m_rawsize, hash);
@@ -1456,8 +1456,8 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 
 	// attempt to open the file
 	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	osd_file::error const filerr = file.open(filename);
-	if (osd_file::error::NONE != filerr)
+	std::error_condition const filerr = file.open(filename);
+	if (filerr)
 		return false;
 
 	// count glyphs
@@ -1596,7 +1596,7 @@ void render_font::render_font_command_glyph()
 {
 	// FIXME: this is copy/pasta from the BDC loading, and it shouldn't be injected into every font
 	emu_file file(OPEN_FLAG_READ);
-	if (file.open_ram(font_uicmd14, sizeof(font_uicmd14)) == osd_file::error::NONE)
+	if (!file.open_ram(font_uicmd14, sizeof(font_uicmd14)))
 	{
 		// get the file size, read the header, and check that it looks good
 		u64 const filesize(file.size());

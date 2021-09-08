@@ -617,8 +617,8 @@ INPUT_PORTS_END
 void dc_cons_state::gdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^aica", 1.0);
-	cdda->add_route(1, "^^aica", 1.0);
+	cdda->add_route(0, "^^aica", 0.4);
+	cdda->add_route(1, "^^aica", 0.4);
 }
 
 void dc_cons_state::dc_base(machine_config &config)
@@ -665,8 +665,8 @@ void dc_cons_state::dc_base(machine_config &config)
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
 	m_aica->set_addrmap(0, &dc_cons_state::aica_map);
-	m_aica->add_route(0, "lspeaker", 1.0);
-	m_aica->add_route(1, "rspeaker", 1.0);
+	m_aica->add_route(0, "lspeaker", 0.4);
+	m_aica->add_route(1, "rspeaker", 0.4);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 

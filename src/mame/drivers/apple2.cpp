@@ -97,6 +97,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/transwarp.h"
 #include "bus/a2bus/uniprint.h"
 #include "bus/a2bus/booti.h"
+#include "bus/a2bus/q68.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -676,10 +677,24 @@ u8 apple2_state::controller_strobe_r()
 
 void apple2_state::controller_strobe_w(u8 data)
 {
-	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
-	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
-	m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
-	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+	// 558 monostable one-shot timers; a running timer cannot be restarted
+	if (machine().time().as_double() >= m_joystick_x1_time) 
+	{
+		m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
+	}
+	if (machine().time().as_double() >= m_joystick_y1_time) 
+	{
+		m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
+	}
+	if (machine().time().as_double() >= m_joystick_x2_time) 
+	{
+		m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
+	}
+	if (machine().time().as_double() >= m_joystick_y2_time) 
+	{
+		m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+	}
+
 }
 
 u8 apple2_state::c080_r(offs_t offset)
@@ -1345,6 +1360,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uniprint", A2BUS_UNIPRINT);     /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 	device.option_add("booti", A2BUS_BOOTI);  /* Booti Card */
+	device.option_add("q68", A2BUS_Q68);      /* Stellation Q68 68000 card */
+	device.option_add("q68plus", A2BUS_Q68PLUS); /* Stellation Q68 Plus 68000 card */
 }
 
 void apple2_state::apple2_common(machine_config &config)

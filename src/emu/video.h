@@ -19,6 +19,8 @@
 
 #include "recording.h"
 
+#include <system_error>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -61,7 +63,7 @@ public:
 
 	// misc
 	void toggle_record_movie(movie_recording::format format);
-	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
+	std::error_condition open_next(emu_file &file, const char *extension, uint32_t index = 0);
 	void compute_snapshot_size(s32 &width, s32 &height);
 	void pixels(u32 *buffer);
 

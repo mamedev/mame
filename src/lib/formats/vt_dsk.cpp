@@ -10,6 +10,9 @@
 
 #include "formats/vt_dsk.h"
 
+#include "ioprocs.h"
+
+
 // Zero = |    9187     |
 // One  = | 2237 | 6950 |
 // 0.5us ~= 143
@@ -213,9 +216,11 @@ const char *vtech_dsk_format::extensions() const
 	return "dsk";
 }
 
-int vtech_bin_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int vtech_bin_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return 0;
 
 	if(size == 40*16*256)
 		return 50;
@@ -223,14 +228,18 @@ int vtech_bin_format::identify(io_generic *io, uint32_t form_factor, const std::
 	return 0;
 }
 
-int vtech_dsk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int vtech_dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return 0;
+
 	if(size < 256)
 		return 0;
 
 	std::vector<uint8_t> bdata(size);
-	io_generic_read(io, bdata.data(), 0, size);
+	size_t actual;
+	io.read_at(0, bdata.data(), size, actual);
 
 	// Structurally validate the presence of sector headers and data
 	int count_sh = 0, count_sd = 0;
@@ -246,25 +255,29 @@ int vtech_dsk_format::identify(io_generic *io, uint32_t form_factor, const std::
 	return count_sh >= 30*16 && count_sd >= 30*16 ? 100 : 0;
 }
 
-bool vtech_bin_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vtech_bin_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int size = io_generic_size(io);
-	if(size != 40*16*256)
+	uint64_t size;
+	if(io.length(size) || (size != 40*16*256))
 		return false;
 
 	std::vector<uint8_t> bdata(size);
-	io_generic_read(io, bdata.data(), 0, size);
+	size_t actual;
+	io.read_at(0, bdata.data(), size, actual);
 
 	image_to_flux(bdata, image);
 	image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 	return true;
 }
 
-bool vtech_dsk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return false;
 	std::vector<uint8_t> bdata(size);
-	io_generic_read(io, bdata.data(), 0, size);
+	size_t actual;
+	io.read_at(0, bdata.data(), size, actual);
 
 	std::vector<uint8_t> bdatax(128*16*40, 0);
 
@@ -327,7 +340,7 @@ bool vtech_dsk_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	return true;
 }
 
-bool vtech_bin_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vtech_bin_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int tracks, heads;
 	image->get_maximal_geometry(tracks, heads);
@@ -335,11 +348,12 @@ bool vtech_bin_format::save(io_generic *io, const std::vector<uint32_t> &variant
 		return false;
 
 	auto bdata = flux_to_image(image);
-	io_generic_write(io, bdata.data(), 0, bdata.size());
+	size_t actual;
+	io.write_at(0, bdata.data(), bdata.size(), actual);
 	return true;
 }
 
-bool vtech_dsk_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vtech_dsk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int tracks, heads;
 	image->get_maximal_geometry(tracks, heads);
@@ -387,7 +401,8 @@ bool vtech_dsk_format::save(io_generic *io, const std::vector<uint32_t> &variant
 		}
 	}
 
-	io_generic_write(io, bdatax.data(), 0, bdatax.size());
+	size_t actual;
+	io.write_at(0, bdatax.data(), bdatax.size(), actual);
 	return true;
 }
 

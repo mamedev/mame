@@ -676,6 +676,7 @@ MACHINES["TSB12LV01A"] = true
 --MACHINES["TTL7474"] = true
 --MACHINES["UCB1200"] = true
 MACHINES["UPD1990A"] = true
+--MACHINES["UPD4991A"] = true
 MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
 MACHINES["UPD7001"] = true
@@ -1776,8 +1777,6 @@ files {
 	MAME_DIR .. "src/mame/includes/firetrap.h",
 	MAME_DIR .. "src/mame/video/firetrap.cpp",
 	MAME_DIR .. "src/mame/drivers/funkyjet.cpp",
-	MAME_DIR .. "src/mame/includes/funkyjet.h",
-	MAME_DIR .. "src/mame/video/funkyjet.cpp",
 	MAME_DIR .. "src/mame/drivers/karnov.cpp",
 	MAME_DIR .. "src/mame/includes/karnov.h",
 	MAME_DIR .. "src/mame/video/karnov.cpp",
@@ -1972,10 +1971,8 @@ files {
 	MAME_DIR .. "src/mame/audio/circus.cpp",
 	MAME_DIR .. "src/mame/video/circus.cpp",
 	MAME_DIR .. "src/mame/drivers/exidy.cpp",
-	MAME_DIR .. "src/mame/includes/exidy.h",
 	MAME_DIR .. "src/mame/audio/exidy.cpp",
 	MAME_DIR .. "src/mame/audio/exidy.h",
-	MAME_DIR .. "src/mame/video/exidy.cpp",
 	MAME_DIR .. "src/mame/drivers/exidy440.cpp",
 	MAME_DIR .. "src/mame/includes/exidy440.h",
 	MAME_DIR .. "src/mame/audio/exidy440.cpp",
@@ -5061,6 +5058,7 @@ files {
 	MAME_DIR .. "src/mame/includes/oneshot.h",
 	MAME_DIR .. "src/mame/video/oneshot.cpp",
 	MAME_DIR .. "src/mame/drivers/onetwo.cpp",
+	MAME_DIR .. "src/mame/drivers/opercoin.cpp",
 	MAME_DIR .. "src/mame/drivers/othello.cpp",
 	MAME_DIR .. "src/mame/drivers/pachifev.cpp",
 	MAME_DIR .. "src/mame/drivers/pasha2.cpp",
@@ -5090,6 +5088,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pse.cpp",
 	MAME_DIR .. "src/mame/drivers/quizo.cpp",
 	MAME_DIR .. "src/mame/drivers/quizpun2.cpp",
+	MAME_DIR .. "src/mame/drivers/radikaldarts.cpp",
 	MAME_DIR .. "src/mame/drivers/rbmk.cpp",
 	MAME_DIR .. "src/mame/drivers/rcorsair.cpp",
 	MAME_DIR .. "src/mame/drivers/re900.cpp",

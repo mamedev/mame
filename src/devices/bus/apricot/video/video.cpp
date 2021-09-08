@@ -86,7 +86,7 @@ bool apricot_video_slot_device::io_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	if (m_card)
 		return m_card->io_w(offset, data, mem_mask);
-	
+
 	return false;
 }
 

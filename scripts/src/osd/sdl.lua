@@ -482,7 +482,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 	if BASE_TARGETOS=="unix" then
 		files {
 			MAME_DIR .. "src/osd/modules/file/posixdir.cpp",
-			MAME_DIR .. "src/osd/modules/file/posixdomain.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.h",
 			MAME_DIR .. "src/osd/modules/file/posixptty.cpp",

@@ -16,6 +16,7 @@
  * Sachen TCA-01 [mapper 143]
  * Sachen TCU-01 [mapper 147]
  * Sachen TCU-02 [mapper 136]
+ * Sachen 3013 [mapper 553]
  * Sachen Discrete PCBs [mapper 150 & 243]
  * Sachen 8259 [mapper 141 (A), 138 (B), 139 (C), 137 (D)]
 
@@ -52,6 +53,7 @@ DEFINE_DEVICE_TYPE(NES_SACHEN_SA72008,    nes_sachen_sa72008_device,    "nes_sa7
 DEFINE_DEVICE_TYPE(NES_SACHEN_TCA01,      nes_sachen_tca01_device,      "nes_tca01",    "NES Cart Sachen TCA-01 PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_TCU01,      nes_sachen_tcu01_device,      "nes_tcu01",    "NES Cart Sachen TCU-01 PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_TCU02,      nes_sachen_tcu02_device,      "nes_tcu02",    "NES Cart Sachen TCU-02 PCB")
+DEFINE_DEVICE_TYPE(NES_SACHEN_3013,       nes_sachen_3013_device,       "nes_3013",     "NES Cart Sachen 3013 PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_74X374,     nes_sachen_74x374_device,     "nes_s74x374",  "NES Cart Sachen 74*374 PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_74X374_ALT, nes_sachen_74x374_alt_device, "nes_s74x374a", "NES Cart Sachen 74*374 Alt PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_8259A,      nes_sachen_8259a_device,      "nes_s8259a",   "NES Cart Sachen 8259A PCB")
@@ -97,6 +99,11 @@ nes_sachen_tcu01_device::nes_sachen_tcu01_device(const machine_config &mconfig, 
 
 nes_sachen_tcu02_device::nes_sachen_tcu02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_TCU02, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_sachen_3013_device::nes_sachen_3013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_SACHEN_3013, tag, owner, clock)
 {
 }
 
@@ -402,11 +409,11 @@ void nes_sachen_sa72008_device::write_l(offs_t offset, uint8_t data)
 
  Sachen TCA-01 bootleg boards
 
- iNES: mapper 143
-
  Games: Dancing Blocks, Magic Mathematic
 
- In MESS: Supported.
+ iNES: mapper 143
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -475,6 +482,28 @@ uint8_t nes_sachen_tcu02_device::read_l(offs_t offset)
 		return m_latch | 0x40;
 	else
 		return 0x00;
+}
+
+/*-------------------------------------------------
+
+ Sachen 3013 board
+
+ Games: Dong Dong Nao 1
+
+ This discrete board basically behaves like standard
+ NROM-128 (mapper 0) but has circuitry so that the
+ lower half of PRG reads as a constant instead of as
+ a mirror of the upper half.
+
+ NES 2.0: mapper 553
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_sachen_3013_device::read_h(offs_t offset)
+{
+	 return (offset < 0x4000) ? 0x3a : hi_access_rom(offset);
 }
 
 /*-------------------------------------------------

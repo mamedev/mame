@@ -11,7 +11,10 @@
 #ifndef IMGHD_H
 #define IMGHD_H
 
+#include "stream.h"
+
 #include "harddisk.h"
+
 
 struct mess_hard_disk_file
 {

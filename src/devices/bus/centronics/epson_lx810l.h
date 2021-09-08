@@ -42,9 +42,13 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { m_e05a30->centronics_input_data5(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { m_e05a30->centronics_input_data6(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { m_e05a30->centronics_input_data7(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_init ) override { m_e05a30->centronics_input_init(state); }
 
 	/* Panel buttons */
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);
+
+	/* Reset Printer (equivalent to turning power off and back on) */
+	DECLARE_INPUT_CHANGED_MEMBER(reset_printer);
 
 protected:
 	epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -98,6 +102,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_perror) { output_perror(state); }
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_fault) { output_fault(state); }
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_select) { output_select(state); }
+
+	DECLARE_WRITE_LINE_MEMBER(e05a30_cpu_reset) { if (!state) m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); } // reset cpu
 
 	void lx810l_mem(address_map &map);
 

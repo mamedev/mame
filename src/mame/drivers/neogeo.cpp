@@ -1082,7 +1082,7 @@ void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	if (ACCESSING_BITS_0_7)
 	{
 		if (m_memcard->present())
-				m_memcard->write(offset, data);
+			m_memcard->write(offset, data);
 	}
 }
 
