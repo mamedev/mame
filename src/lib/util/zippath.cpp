@@ -211,7 +211,7 @@ std::error_condition zippath_resolve(std::string_view path, osd::directory::entr
 		auto i = apath.find_last_not_of(PATH_SEPARATOR);
 		if (i == std::string::npos)
 			break;
-		apath = apath.erase(std::min<decltype(i)>(i + 1, 2));
+		apath = apath.erase(std::max<decltype(i)>(i + 1, 2)); // don't erase drive letter
 
 		apath_trimmed = apath;
 
