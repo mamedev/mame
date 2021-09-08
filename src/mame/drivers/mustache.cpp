@@ -190,8 +190,8 @@ void mustache_state::mustache(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14.318181_MHz_XTAL/4));
 	ymsnd.irq_handler().set("t5182", FUNC(t5182_device::ym2151_irq_handler));
-	ymsnd.add_route(0, "mono", 1.0);
-	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(0, "mono", 0.5);
+	ymsnd.add_route(1, "mono", 0.5);
 }
 
 ROM_START( mustache )
