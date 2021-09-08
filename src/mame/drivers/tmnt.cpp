@@ -2590,14 +2590,15 @@ void tmnt_state::thndrx2(machine_config &config)
 	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
+	// NB: game defaults in mono
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.25).add_route(1, "rspeaker", 0.25);
 
 	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "lspeaker", 0.75);
-	m_k053260->add_route(1, "rspeaker", 0.75);
+	m_k053260->add_route(0, "lspeaker", 0.50);
+	m_k053260->add_route(1, "rspeaker", 0.50);
 }
 
 
