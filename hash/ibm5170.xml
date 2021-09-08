@@ -11506,6 +11506,52 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Branded as "Imagineer DOS/V Series", but the game is identical to the English release and doesn't actually require DOS/V -->
+	<software name="doom11j" cloneof="doom">
+		<description>DOOM (Japan, v1.1)</description>
+		<year>1993</year>
+		<publisher>Imagineer</publisher>
+		<info name="developer" value="id Software" />
+		<info name="version" value="v1.1" />
+		<info name="usage" value="Disks 1-2 contain the shareware version, disks 3-6 contain the full version" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="doomj_disk1.img" size="1474560" crc="7d32733e" sha1="dde21bf088e004d0508e1c15274fb6fade8471f1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="doomj_disk2.img" size="1474560" crc="1b633ba8" sha1="3e57740be7d554f2d351d183c39d19c59c05f5f0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="doomj_disk3.img" size="1474560" crc="97fbbb5f" sha1="3e43c1e5a4472f03c164f52ea627c55bf2813e0a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="doomj_disk4.img" size="1474560" crc="0fcedc1d" sha1="082dfd25dd7419806a755f861ac9efb57236c3be"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="doomj_disk5.img" size="1474560" crc="2ce35519" sha1="1cd6d209fadfff711d2ca4b7f7198df952f5cf69"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="doomj_disk6.img" size="1474560" crc="47ba8df5" sha1="093b7d842978e0acdfbdb29e0ea24893c5030018"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Bad Dump Status: Modified OEM ID and modified root -->
 	<software name="doombbs" cloneof="doom">
 		<description>DOOM (v1.2, shareware for BBS SysOps)</description>
@@ -11649,6 +11695,118 @@ license:CC0
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Doom 2 1.666 #5.img" size="1474560" crc="77d3b177" sha1="4c2fc8dc362074d730e414b992cc8dba2eb7a1e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokyusei">
+		<description>Doukyuusei</description>
+		<year>1994</year>
+		<publisher>Elf</publisher>
+		<info name="alt_title" value="同級生" />
+		<info name="usage" value="Requires DOS/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei_disk_a.img" size="1474560" crc="11717719" sha1="029c2a978cadbe551a63e55d85fa0c6da8d407d0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei_disk_b.img" size="1474560" crc="85a6afd5" sha1="fb81ee88c2a2b0d9f48a5b310ab3fa6c05de748d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei_disk_c.img" size="1474560" crc="93a240a9" sha1="7880e65ca4dfb04919e7854caace4773856fc48f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei_disk_d.img" size="1474560" crc="c7af2856" sha1="ecd02ca81196d78db766e4f44f8c47dc77e99780"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei_disk_e.img" size="1474560" crc="4654adf0" sha1="bbfeab3c3c538614aa0024cee1530f7fdcb02f24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokyusei2">
+		<description>Doukyuusei 2</description>
+		<year>1995</year>
+		<publisher>Elf</publisher>
+		<info name="alt_title" value="同級生２" />
+		<info name="usage" value="Requires DOS/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_a.img" size="1474560" crc="ff0acf9b" sha1="752fcf0f57ac239f477f5e779e2e40d39aa2af72"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_b.img" size="1474560" crc="7c77dfa1" sha1="60f61ef2d40c2f8b9330109cbcb8c1049f25e11f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_c.img" size="1474560" crc="5c8588b0" sha1="e30ee71e83ce41e6cd86bcbedc6ae0ce236cd4e7"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_d.img" size="1474560" crc="f02de570" sha1="a40edf12e6c6915e00eb6e5fd378f9ec41555370"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_e.img" size="1474560" crc="30b0bd66" sha1="a5548accadf67edd20051f3bb79f46a4c1180b47"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_f.img" size="1474560" crc="3bdf0ab7" sha1="aa15dab472e67268c13f5f57c8003d56021542de"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk G"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_g.img" size="1474560" crc="e6c2bab4" sha1="405a4b8cf4246debf96243e184c368fbfe4a912e"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk H"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_h.img" size="1474560" crc="509f8776" sha1="aa203cbe2467f3feb0fb29d1880cb0d0ebc86fad"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk I"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_i.img" size="1474560" crc="a2a7862a" sha1="6087e3ce6ff2e584c55a037914684cb2cc07e42a"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disk J"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_j.img" size="1474560" crc="43e091ae" sha1="bc3c6244aaf0106131ecc62ab366244ac26b563b"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disk K"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="doukyuusei2_disk_k.img" size="1474560" crc="9f53c9cc" sha1="af23d1d61a09e2f34709d34b27f2cb1d0174a462"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13855,6 +14013,32 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="jurassic park disk3.img" size="1474560" crc="50f4b8d2" sha1="e9c8f71eb40bf4b1792e513689083353fb5df026"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kairakuo">
+		<description>Kairaku no Okite - Aoi Taiken</description>
+		<year>1995</year>
+		<publisher>Moonchild</publisher>
+		<info name="alt_title" value="快楽の掟　‐蒼い体験‐" />
+		<info name="usage" value="Requires DOS/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="kairaku_no_okite_disk_1.img" size="1474560" crc="43694b35" sha1="6d31d83ef6a4d8587280bb917758722da25e45e7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="kairaku_no_okite_disk_2.img" size="1474560" crc="b944a50b" sha1="dcd6c4b9dfe50a14c727e9e5610ada318e61785a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="kairaku_no_okite_disk_3.img" size="1474560" crc="0e137ac2" sha1="9ab6972d99220415a6e3a9319e587dbc4592b8e1"/>
 			</dataarea>
 		</part>
 	</software>
