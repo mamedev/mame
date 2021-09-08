@@ -86,8 +86,15 @@ void k054000_device::device_start()
 
 void k054000_device::device_reset()
 {
-	// TODO: initial state (very unlikely to be all zeroes)
-	// ...
+	// TODO: verify initial state (very unlikely to be all zeroes)
+	std::fill(std::begin(m_raw_Acx), std::end(m_raw_Acx), 0);
+	std::fill(std::begin(m_raw_Acy), std::end(m_raw_Acy), 0);
+	std::fill(std::begin(m_raw_Bcx), std::end(m_raw_Bcx), 0);
+	std::fill(std::begin(m_raw_Bcy), std::end(m_raw_Bcy), 0);
+	m_Aax = 1;
+	m_Aay = 1;
+	m_Bax = 1;
+	m_Bay = 1;
 }
 
 /*****************************************************************************
@@ -113,6 +120,8 @@ void k054000_device::map(address_map &map)
 inline int k054000_device::convert_raw_to_result(u8 *buf)
 {
 	int res = (buf[0] << 16) | (buf[1] << 8) | buf[2];
+	//if (buf[0] & 0x80)
+	//	res = (0x1000000 - res);
 	// last value in the buffer is used as OTG correction in Vendetta
 	if (buf[3] & 0x80)
 		res -= (0x100 - buf[3]);
@@ -161,7 +170,14 @@ u8 k054000_device::status_r()
 	if (m_Bcy + m_Bay < m_Acy - m_Aay)
 		res |= 1;
 
-	printf("%d %d %d %d (%d|%d)|%d %d %d %d == %d\n", m_Acx, m_Acy, m_Aax, m_Aay, m_raw_Acx[3], m_raw_Acy[3], m_Bcx, m_Bcy, m_Bax, m_Bay, res);
+//	printf("%d %d %d %d (%d|%d)|%d %d %d %d == %d\n", m_Acx, m_Acy, m_Aax, m_Aay, m_raw_Acx[3], m_raw_Acy[3], m_Bcx, m_Bcy, m_Bax, m_Bay, res);
+	printf("ACX %02x%02x%02x%02x|", m_raw_Acx[0], m_raw_Acx[1], m_raw_Acx[2], m_raw_Acx[3]);
+	printf("ACY %02x%02x%02x%02x|", m_raw_Acy[0], m_raw_Acy[1], m_raw_Acy[2], m_raw_Acy[3]);
+	printf("AAX %02x AAY %02x\n", m_Aax, m_Aay);
+	printf("BCX %02x%02x%02x%02x|", m_raw_Bcx[0], m_raw_Bcx[1], m_raw_Bcx[2], m_raw_Bcx[3]);
+	printf("BCY %02x%02x%02x%02x|", m_raw_Bcy[0], m_raw_Bcy[1], m_raw_Bcy[2], m_raw_Bcy[3]);
+	printf("BAX %02x BAY %02x\n", m_Bax, m_Bay);
+	printf("%d\n===\n", res);
 
 	return res;
 }
