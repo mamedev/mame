@@ -610,9 +610,6 @@ void unk_gambl_state::tourpgum(machine_config &config)
 	AY8910(config, m_ay, XTAL(18'000'000)/4/4).add_route(ALL_OUTPUTS, "mono", 1.0); /* guess */
 	m_ay->port_a_read_callback().set_ioport("DSW2");
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::tourpgum_main_map);
 }
 
 /***********************************
