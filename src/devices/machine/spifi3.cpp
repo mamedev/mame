@@ -85,7 +85,6 @@ void spifi3_device::map(address_map &map)
 
     map(0x04, 0x07).lrw32(NAME([this]() { LOG("read spifi_reg.cmlen = 0x%x\n", spifi_reg.cmlen); return spifi_reg.cmlen; }), NAME([this](uint32_t data) { LOG("write spifi_reg.cmlen = 0x%x\n", data); spifi_reg.cmlen = data; }));
     map(0x08, 0x0b).lrw32(NAME([this]() { LOG("read spifi_reg.cmdpage = 0x%x\n", spifi_reg.cmdpage); return spifi_reg.cmdpage; }), NAME([this](uint32_t data) { LOG("write spifi_reg.cmdpage = 0x%x\n", data); spifi_reg.cmdpage = data; }));
-
     map(0x18, 0x1b).lrw32(NAME([this]() { LOG("read spifi_reg.svptr_hi = 0x%x\n", spifi_reg.svptr_hi); return spifi_reg.svptr_hi; }), NAME([this](uint32_t data) { LOG("write spifi_reg.svptr_hi = 0x%x\n", data); spifi_reg.svptr_hi = data; }));
     map(0x1c, 0x1f).lrw32(NAME([this]() { LOG("read spifi_reg.svptr_mid = 0x%x\n", spifi_reg.svptr_mid); return spifi_reg.svptr_mid; }), NAME([this](uint32_t data) { LOG("write spifi_reg.svptr_mid = 0x%x\n", data); spifi_reg.svptr_mid = data; }));
     map(0x20, 0x23).lrw32(NAME([this]() { LOG("read spifi_reg.svptr_low = 0x%x\n", spifi_reg.svptr_low); return spifi_reg.svptr_low; }), NAME([this](uint32_t data) { LOG("write spifi_reg.svptr_low = 0x%x\n", data); spifi_reg.svptr_low = data; }));
@@ -112,13 +111,12 @@ void spifi3_device::map(address_map &map)
     map(0x98, 0x9b).lrw32(NAME([this]() { LOG("read spifi_reg.quetag = 0x%x\n", spifi_reg.quetag); return spifi_reg.quetag; }), NAME([this](uint32_t data) { LOG("write spifi_reg.quetag = 0x%x\n", data); spifi_reg.quetag = data; }));
     map(0x9c, 0x9f).lrw32(NAME([this]() { LOG("read spifi_reg.quepage = 0x%x\n", spifi_reg.quepage); return spifi_reg.quepage; }), NAME([this](uint32_t data) { LOG("write spifi_reg.quepage = 0x%x\n", data); spifi_reg.quepage = data; }));
     // mirror of above values goes here
-    map(0x200, 0x3ff).rw(FUNC(spifi3_device::cmd_buf_r), FUNC(spifi3_device::cmd_buf_w)).umask32(0xff);
 
     // stuff I'm actively working on
     map(0x0c, 0x0f).lrw32(NAME([this]()
                                {
                                    uint8_t count_hi = (tcounter >> 16) & 0xff;
-                                   spifi_reg.icond &= ~ICOND_CNTZERO;
+                                   spifi_reg.icond &= ~ICOND_CNTZERO; // Does a read clear this?
                                    LOG("read spifi_reg.count_hi = 0x%x\n", count_hi);
                                    return count_hi;
                                }),
@@ -132,7 +130,7 @@ void spifi3_device::map(address_map &map)
     map(0x10, 0x13).lrw32(NAME([this]()
                                {
                                    uint8_t count_mid = (tcounter >> 8) & 0xff;
-                                   spifi_reg.icond &= ~ICOND_CNTZERO;
+                                   spifi_reg.icond &= ~ICOND_CNTZERO; // Does a read clear this?
                                    LOG("read spifi_reg.count_mid = 0x%x\n", count_mid);
                                    return count_mid;
                                }),
@@ -147,7 +145,7 @@ void spifi3_device::map(address_map &map)
     map(0x14, 0x17).lrw32(NAME([this]()
                                {
                                    uint8_t count_lo = tcounter & 0xff;
-                                   spifi_reg.icond &= ~ICOND_CNTZERO;
+                                   spifi_reg.icond &= ~ICOND_CNTZERO; // Does a read clear this?
                                    LOG("read spifi_reg.count_low = 0x%x\n", count_lo);
                                    return count_lo;
                                }),
@@ -194,6 +192,9 @@ void spifi3_device::map(address_map &map)
     map(0x5c, 0x5f).rw(FUNC(spifi3_device::auxctrl_r), FUNC(spifi3_device::auxctrl_w));
     map(0x60, 0x63).w(FUNC(spifi3_device::autodata_w));
     map(0x60, 0x63).lr32(NAME([this]() { LOG("read spifi_reg.autodata = 0x%x\n", spifi_reg.autodata); return spifi_reg.autodata; }));
+
+    // Map command buffer
+    map(0x200, 0x3ff).rw(FUNC(spifi3_device::cmd_buf_r), FUNC(spifi3_device::cmd_buf_w)).umask32(0xff);
 }
 
 uint8_t spifi3_device::cmd_buf_r(offs_t offset)
@@ -389,7 +390,6 @@ uint32_t spifi3_device::prstat_r()
     return prstat;
 }
 
-// rw32(NAME([this]() {  }), NAME([this](uint32_t data) { }));
 uint32_t spifi3_device::prcmd_r()
 {
     LOG("read spifi_reg.prcmd = 0x%x\n", spifi_reg.prcmd);

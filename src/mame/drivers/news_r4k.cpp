@@ -468,6 +468,11 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e380000, 0x1e3803ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
 
     // TODO: DSC-39 xb framebuffer/video card (0x14900000)
+    map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset)
+                                         {
+                                             LOG("xb read attempted, offset 0x%x\n", offset);
+                                             return 0xff;
+                                         }));
 
     // TODO: sb sound subsystem (0x1ed00000)
 
@@ -545,6 +550,7 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // APbus region
     // WSC-PARK3 gate array
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
+    map(0x14c00004, 0x14c00007).lr32(NAME([this](offs_t offset) { return 0x4; }));
     // 0x14c00000-0x14c40000 also has APbus stuff
     // map(0x14c00000, 0x14c0000f).lr8(NAME([this](offs_t offset) {return 0x0;}));
 
@@ -563,7 +569,7 @@ void news_r4k_state::cpu_map_debug(address_map &map)
         {
             return 0x0;
         }
-    })); // monitor ROM doesn't boot without this
+    }));
 }
 
 /*
