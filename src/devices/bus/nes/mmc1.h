@@ -31,8 +31,11 @@ protected:
 	TIMER_CALLBACK_MEMBER(resync_callback);
 
 	virtual void update_regs(int reg);      // this is needed to simplify NES-EVENT pcb implementation, which handle differently some regs!
+	void set_prg(int prg_base, int prg_mask);
+	void set_chr(int chr_base, int chr_mask);
 	virtual void set_prg();
-	virtual void set_chr();
+//	virtual void set_prg() { set_prg(0x00, 0x0f); }
+	virtual void set_chr() { set_chr(0x00, 0x1f); }
 
 	uint8_t m_reg[4];
 	int m_reg_write_enable;

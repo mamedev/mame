@@ -27662,7 +27662,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="opwolfj" cloneof="opwolf">
+<!-- Playable with joypad but zapper does not work -->
+	<software name="opwolfj" cloneof="opwolf" supported="partial">
 		<description>Operation Wolf (Jpn)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -27683,7 +27684,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="opwolfu" cloneof="opwolf">
+<!-- Playable with joypad but zapper does not work -->
+	<software name="opwolfu" cloneof="opwolf" supported="partial">
 		<description>Operation Wolf - Take no Prisoners (USA, Rev. 0A)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -27703,7 +27705,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="opwolf">
+<!-- Playable with joypad but zapper does not work -->
+	<software name="opwolf" supported="partial">
 		<description>Operation Wolf - Take no Prisoners (Euro)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -49948,7 +49951,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="spaceshd">
+<!-- The Bandai Hyper Shot controller/zapper for Space Shadow is not emulated -->
+	<software name="spaceshd" supported="no">
 		<description>Space Shadow (Jpn)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
@@ -51850,6 +51854,38 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_4jy21">
+		<description>1997 Super HiK 4 in 1 (JY-021)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resetsxrom" />
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super hik 4-in-1 (jy-021).prg" size="524288" crc="a609e2f0" sha1="27bfcd42d267cfa9a1d0bcbca1a6b0065a9352d9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super hik 4-in-1 (jy-021).chr" size="524288" crc="4a797d16" sha1="e7cf3951f727913aa94dd702e1d5c48e19976bb9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy22">
+		<description>1995 Super HiK 4 in 1 (JY-022)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resetsxrom" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-022).prg" size="524288" crc="22536920" sha1="64697df47dccdfc66609dc501c27ef321fcae9d5" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-022).chr" size="524288" crc="7e83958f" sha1="ce0d958db917d8fb648db34e85e79dbad515d9f2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4jy23">
 		<description>1995 Super HiK 4 in 1 (JY-023)</description>
 		<year>1995</year>
@@ -52015,6 +52051,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Helicopter sprite in Cobra Command is corrupt in one of its two frames of animation. This is in CHR data. Either it's a bad dump or an error introduced by bootleggers. -->
+	<software name="mc_4jy51">
+		<description>1996 Super HiK 4 in 1 (JY-051)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resetsxrom" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-051).prg" size="524288" crc="c936c92b" sha1="f0f66c30b06e980659dd757724ffe4fad5e01494" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-051).chr" size="524288" crc="20303ae8" sha1="3a7fa6feb1b2083987357db9fdf0222d76e2b964" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -54484,6 +54537,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="qi wang - chinese chess (asia) (unl).prg" size="65536" crc="0744648c" sha1="d293232ddbdeecd0d999652f02cb3ae2576cf251" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- The Bandai Hyper Shot controller/zapper for Space Shadow is not emulated. Operation Wolf currently only works with joypad but not zapper. -->
+	<software name="2uzilght" supported="partial">
+		<description>2 in 1 Uzi Lightgun</description>
+		<year>199?</year>
+		<publisher>Micro Genius</publisher>
+		<info name="serial" value="MGC-002"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_22110" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 uzi lightgun (mgc-002).prg" size="262144" crc="7349c91a" sha1="00d0c7a423b9c8c18974022c619d9f3084c4fd8d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="2-in-1 uzi lightgun (mgc-002).chr" size="262144" crc="609035fd" sha1="309fddfd18f55d9d73fabfd0788bb8b92065c607" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
