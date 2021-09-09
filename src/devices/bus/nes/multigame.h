@@ -161,9 +161,9 @@ class nes_t262_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_t262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_t262_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -172,7 +172,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch1, m_latch2;
+	u16 m_latch;
 };
 
 
