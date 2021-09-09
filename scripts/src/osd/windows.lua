@@ -119,9 +119,11 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/windows",
 	}
 
-	buildoptions_cpp {
-		"-Wno-ignored-attributes",-- many instances in ImGui
-	}
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions_cpp {
+			"-Wno-ignored-attributes",-- many instances in ImGui
+		}
+	end
 
 	files {
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.cpp",
