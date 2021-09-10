@@ -28,9 +28,15 @@
 //  constructor
 //-------------------------------------------------
 
+DEFINE_DEVICE_TYPE(NES_NINJARYU,   nes_ninjaryu_device,   "nes_ninjaryu",   "NES Cart Ninja Ryukenden Chinese PCB")
 DEFINE_DEVICE_TYPE(NES_RESETSXROM, nes_resetsxrom_device, "nes_resetsxrom", "NES Cart BMC RESET-SXROM PCB")
 DEFINE_DEVICE_TYPE(NES_TXC_22110,  nes_txc_22110_device,  "nes_txc_22110",  "NES Cart TXC 01-22110-000 PCB")
 
+
+nes_ninjaryu_device::nes_ninjaryu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_sxrom_device(mconfig, NES_NINJARYU, tag, owner, clock)
+{
+}
 
 nes_resetsxrom_device::nes_resetsxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_sxrom_device(mconfig, NES_RESETSXROM, tag, owner, clock), m_reset_count(-1)
@@ -78,6 +84,30 @@ void nes_txc_22110_device::pcb_reset()
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
+
+/*-------------------------------------------------
+
+ UNL-NINJARYU
+
+ Games: Ninja Ryukenden Chinese
+
+ This board was previously assigned to mapper 111. It has
+ registers akin to MMC1 but without the need to write to
+ them serially. The one existing game has 256K CHR, so this
+ must have at least 1 more bit for CHR banking. Other differences?
+
+ In MAME: Preliminary supported.
+
+ -------------------------------------------------*/
+
+void nes_ninjaryu_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("unl_ninjaryu write_h, offset: %04x, data: %02x\n", offset, data));
+	u8 reg = (offset >> 13) & 0x03;
+	m_reg[reg] = data;
+	update_regs(reg);
+}
+
 
 /*-------------------------------------------------
 

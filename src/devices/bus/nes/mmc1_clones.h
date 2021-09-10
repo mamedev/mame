@@ -8,6 +8,22 @@
 #include "mmc1.h"
 
 
+// ======================> nes_ninjaryu_device
+
+class nes_ninjaryu_device : public nes_sxrom_device
+{
+public:
+	// construction/destruction
+	nes_ninjaryu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+protected:
+	virtual void set_prg() override { nes_sxrom_device::set_prg(0x00, 0x0f); }
+	virtual void set_chr() override { nes_sxrom_device::set_chr(0x00, 0x3f); }
+};
+
+
 // ======================> nes_resetsxrom_device
 
 class nes_resetsxrom_device : public nes_sxrom_device
@@ -57,6 +73,7 @@ private:
 
 
 // device type definition
+DECLARE_DEVICE_TYPE(NES_NINJARYU,   nes_ninjaryu_device)
 DECLARE_DEVICE_TYPE(NES_RESETSXROM, nes_resetsxrom_device)
 DECLARE_DEVICE_TYPE(NES_TXC_22110,  nes_txc_22110_device)
 

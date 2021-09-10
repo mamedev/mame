@@ -49,7 +49,6 @@ DEFINE_DEVICE_TYPE(NES_WHERO,       nes_whero_device,       "nes_whero",       "
 DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "NES Cart UNL-43272 PCB")
 DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
 DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
-DEFINE_DEVICE_TYPE(NES_NINJARYU,    nes_ninjaryu_device,    "nes_ninjaryu",    "NES Cart Ninja Ryukenden Chinese PCB")
 DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",     "NES Cart UNL-EH8813A PCB")
 
 
@@ -125,11 +124,6 @@ nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *
 
 nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_CITYFIGHT, tag, owner, clock), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-{
-}
-
-nes_ninjaryu_device::nes_ninjaryu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_NINJARYU, tag, owner, clock)
 {
 }
 
@@ -403,22 +397,6 @@ void nes_cityfight_device::pcb_reset()
 	m_prg_mode = 0;
 	m_irq_enable = 0;
 	m_irq_count = 0;
-}
-
-void nes_ninjaryu_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_reg));
-}
-
-void nes_ninjaryu_device::pcb_reset()
-{
-	m_reg[0] = 0x0f;
-	m_reg[1] = m_reg[2] = m_reg[3] = 0;
-
-	set_nt_mirroring(PPU_MIRROR_HORZ);
-	update_prg();
-	update_chr();
 }
 
 void nes_eh8813a_device::device_start()
@@ -1255,80 +1233,6 @@ void nes_cityfight_device::write_h(offs_t offset, uint8_t data)
 			break;
 	}
 }
-
-
-/*-------------------------------------------------
-
- UNL-NINJARYU
-
- Games: Ninja Ryukenden Chinese
-
- This board is mentioned on the NesDev page describing
- mapper 111, which used to be assigned to this. It has
- registers similar to MMC1 but without the need to write to
- them serially. The one existing game has 256K CHR, so this
- must have at least 1 more bit for CHR banking. Other differences?
-
- In MAME: Preliminary supported.
-
- -------------------------------------------------*/
-
-void nes_ninjaryu_device::update_prg()
-{
-	if (!BIT(m_reg[0], 3))
-		prg32((m_reg[3] >> 1) & 0x07); // 32K mode
-	else if (BIT(m_reg[0], 2))
-	{
-		prg16_89ab(m_reg[3] & 0x0f);
-		prg16_cdef(m_prg_chunks - 1);  // 16K mode fixed last bank
-	}
-	else
-	{
-		prg16_89ab(0);                 // 16K mode fixed first bank
-		prg16_cdef(m_reg[3] & 0x0f);
-	}
-}
-
-void nes_ninjaryu_device::update_chr()
-{
-	if (BIT(m_reg[0], 4))
-	{
-		chr4_0(m_reg[1], CHRROM);
-		chr4_4(m_reg[2], CHRROM);
-	}
-	else
-		chr8(m_reg[1] >> 1, CHRROM);
-}
-
-void nes_ninjaryu_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("unl_ninjaryu write_h, offset: %04x, data: %02x\n", offset, data));
-
-	m_reg[(offset >> 13) & 0x03] = data & 0x3f;
-
-	switch (offset & 0x6000)
-	{
-		case 0x0000:
-			switch (data & 0x03)
-			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-				case 0x02: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x03: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-			}
-			update_prg();
-			update_chr();
-			break;
-		case 0x2000:
-		case 0x4000:
-			update_chr();
-			break;
-		case 0x6000:
-			update_prg();
-			break;
-	}
-}
-
 
 /*-------------------------------------------------
 
