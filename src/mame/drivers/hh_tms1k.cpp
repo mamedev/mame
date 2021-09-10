@@ -11962,7 +11962,7 @@ void tithermos_state::tithermos(machine_config &config)
 	m_maincpu->r().set(FUNC(tithermos_state::write_r));
 	m_maincpu->o().set(FUNC(tithermos_state::write_o));
 
-	CLOCK(config, "ac_line", 60).signal_handler().set_nop();
+	CLOCK(config, "ac_line", 60);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
