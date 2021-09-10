@@ -346,7 +346,7 @@ QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 	u32 quick_length = image.length();
 	if (quick_length > 0xe00)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File exceeds 3584 bytes");
+		image.seterror(image_error::INVALIDIMAGE, "File exceeds 3584 bytes");
 		image.message(" File exceeds 3584 bytes");
 		return image_init_result::FAIL;
 	}

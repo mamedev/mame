@@ -1725,15 +1725,15 @@ void kaneko16_berlwall_state::berlwall(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	YM2149(config, m_ym2149[0], 1000000);
-	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[0]->port_a_read_callback().set_ioport("DSW1");
 	m_ym2149[0]->port_b_read_callback().set_ioport("DSW2");
 
 	YM2149(config, m_ym2149[1], 1000000);
-	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki[0], 12000000/6, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -1791,17 +1791,17 @@ void kaneko16_state::bakubrkr(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
-	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[0]->port_b_write_callback().set(FUNC(kaneko16_state::oki_bank0_w<7>)); /* outputs B:  OKI bank Switch */
 
 	YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
-	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[1]->port_a_read_callback().set(FUNC(kaneko16_state::eeprom_r));    /* inputs  A:  0,EEPROM bit read */
 	m_ym2149[1]->port_b_write_callback().set(FUNC(kaneko16_state::eeprom_cs_w)); /* outputs B:  0,EEPROM reset */
 
 	OKIM6295(config, m_oki[0], XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH); /* verified on pcb */
 	m_oki[0]->set_addrmap(0, &kaneko16_state::bakubrkr_oki1_map);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -1917,10 +1917,10 @@ void kaneko16_state::wingforc(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YM2151(config, m_ymsnd, XTAL(16'000'000)/4);
-	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.4);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	OKIM6295(config, m_oki[0], XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_oki[0]->set_addrmap(0, &kaneko16_state::bakubrkr_oki1_map);
 }
 
@@ -2107,15 +2107,15 @@ void kaneko16_state::mgcrystl(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
-	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
-	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[1]->port_a_read_callback().set(FUNC(kaneko16_state::eeprom_r));    /* inputs  A:  0,EEPROM bit read */
 	m_ym2149[1]->port_b_write_callback().set(FUNC(kaneko16_state::eeprom_cs_w)); /* outputs B:  0,EEPROM reset */
 
 	OKIM6295(config, m_oki[0], XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH); /* verified on pcb */
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -2228,11 +2228,11 @@ void kaneko16_shogwarr_state::shogwarr(machine_config &config)
 
 	OKIM6295(config, m_oki[0], XTAL(16'000'000)/8, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &kaneko16_shogwarr_state::gtmr_oki1_map);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki[1], XTAL(16'000'000)/8, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &kaneko16_shogwarr_state::gtmr_oki2_map);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 

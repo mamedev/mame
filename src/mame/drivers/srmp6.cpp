@@ -164,7 +164,7 @@ static inline u8 get_fade(int c, int f) // same as CPS3?
 	{
 		f &= 0x3f;
 		c = (f & 0x20) ? (c + (((0x1f - c) * (f & 0x1f)) / 0x1f)) : ((c * f) / 0x1f);
-		c = std::max(0, std::min(0x1f, c));
+		c = std::clamp(c, 0, 0x1f);
 	}
 	return c;
 }

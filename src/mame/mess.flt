@@ -371,6 +371,7 @@ gimix.cpp
 gizmondo.cpp
 gkidabc.cpp
 glcx.cpp
+gm1000.cpp
 gmaster.cpp
 gnat10.cpp
 goupil.cpp
@@ -766,6 +767,9 @@ pc8401a.cpp
 pc8801.cpp
 pc88va.cpp
 pc9801.cpp
+pc9801_epson.cpp
+pc9821.cpp
+pc98ha.cpp
 pcd.cpp
 pce.cpp
 pce220.cpp
@@ -1194,6 +1198,8 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr16.cpp
+ympsr40.cpp
 ympsr60.cpp
 ympsr340.cpp
 ymsy35.cpp

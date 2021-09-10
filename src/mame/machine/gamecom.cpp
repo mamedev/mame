@@ -627,7 +627,7 @@ image_init_result gamecom_state::common_load(device_image_interface &image, gene
 	if (size != 0x008000 && size != 0x040000 && size != 0x080000
 			&& size != 0x100000 && size != 0x1c0000 && size != 0x200000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

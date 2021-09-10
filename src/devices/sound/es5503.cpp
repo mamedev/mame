@@ -230,12 +230,11 @@ void es5503_device::device_start()
 	save_pointer(STRUCT_MEMBER(oscillators, accumulator), 32);
 	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
 
+	oscsenabled = 1;
 	output_rate = (clock() / 8) / (2 + oscsenabled);
 	m_stream = stream_alloc(0, output_channels, output_rate);
 
 	m_timer = timer_alloc(0, nullptr);
-	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
-	m_timer->adjust(update_rate, 0, update_rate);
 }
 
 void es5503_device::device_clock_changed()
@@ -268,10 +267,9 @@ void es5503_device::device_reset()
 	}
 
 	oscsenabled = 1;
+	notify_clock_changed();
 
 	m_channel_strobe = 0;
-
-	output_rate = (clock()/8)/34;   // (input clock / 8) / # of oscs. enabled + 2
 }
 
 u8 es5503_device::read(offs_t offset)
@@ -429,18 +427,9 @@ void es5503_device::write(offs_t offset, u8 data)
 				break;
 
 			case 0xe1:  // oscillator enable
-			{
 				oscsenabled = (data>>1) & 0x1f;
-
-				output_rate = (clock()/8)/(2+oscsenabled);
-				m_stream->set_sample_rate(output_rate);
-
-				m_mix_buffer.resize((output_rate/50)*8);
-
-				attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
-				m_timer->adjust(update_rate, 0, update_rate);
+				notify_clock_changed();
 				break;
-			}
 
 			case 0xe2:  // A/D converter
 				break;

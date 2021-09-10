@@ -8,9 +8,10 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/st_dsk.h"
+
+#include "ioprocs.h"
+
 
 st_format::st_format()
 {
@@ -36,18 +37,20 @@ bool st_format::supports_save() const
 	return true;
 }
 
-void st_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
+void st_format::find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
 {
-	uint64_t size = io_generic_size(io);
-	for(track_count=80; track_count <= 82; track_count++)
-		for(head_count=1; head_count <= 2; head_count++)
-			for(sector_count=9; sector_count <= 11; sector_count++)
-				if(size == (uint32_t)512*track_count*head_count*sector_count)
-					return;
+	uint64_t size;
+	if(!io.length(size)) {
+		for(track_count=80; track_count <= 82; track_count++)
+			for(head_count=1; head_count <= 2; head_count++)
+				for(sector_count=9; sector_count <= 11; sector_count++)
+					if(size == (uint32_t)512*track_count*head_count*sector_count)
+						return;
+	}
 	track_count = head_count = sector_count = 0;
 }
 
-int st_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int st_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -57,7 +60,7 @@ int st_format::identify(io_generic *io, uint32_t form_factor, const std::vector<
 	return 0;
 }
 
-bool st_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool st_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -73,7 +76,8 @@ bool st_format::load(io_generic *io, uint32_t form_factor, const std::vector<uin
 	int track_size = sector_count*512;
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
-			io_generic_read(io, sectdata, (track*head_count + head)*track_size, track_size);
+			size_t actual;
+			io.read_at((track*head_count + head)*track_size, sectdata, track_size, actual);
 			generate_track(atari_st_fcp_get_desc(track, head, head_count, sector_count),
 							track, head, sectors, sector_count, 100000, image);
 		}
@@ -84,7 +88,7 @@ bool st_format::load(io_generic *io, uint32_t form_factor, const std::vector<uin
 	return true;
 }
 
-bool st_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool st_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -109,7 +113,8 @@ bool st_format::save(io_generic *io, const std::vector<uint32_t> &variants, flop
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
 			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			io_generic_write(io, sectdata, (track*head_count + head)*track_size, track_size);
+			size_t actual;
+			io.write_at((track*head_count + head)*track_size, sectdata, track_size, actual);
 		}
 	}
 
@@ -141,10 +146,11 @@ bool msa_format::supports_save() const
 	return true;
 }
 
-void msa_format::read_header(io_generic *io, uint16_t &sign, uint16_t &sect, uint16_t &head, uint16_t &strack, uint16_t &etrack)
+void msa_format::read_header(util::random_read &io, uint16_t &sign, uint16_t &sect, uint16_t &head, uint16_t &strack, uint16_t &etrack)
 {
 	uint8_t h[10];
-	io_generic_read(io, h, 0, 10);
+	size_t actual;
+	io.read_at(0, h, 10, actual);
 	sign = (h[0] << 8) | h[1];
 	sect = (h[2] << 8) | h[3];
 	head = (h[4] << 8) | h[5];
@@ -206,7 +212,7 @@ bool msa_format::compress(const uint8_t *buffer, int usize, uint8_t *dest, int &
 	return dst < usize;
 }
 
-int msa_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int msa_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint16_t sign, sect, head, strack, etrack;
 	read_header(io, sign, sect, head, strack, etrack);
@@ -220,7 +226,7 @@ int msa_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 	return 0;
 }
 
-bool msa_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint16_t sign, sect, heads, strack, etrack;
 	read_header(io, sign, sect, heads, strack, etrack);
@@ -238,11 +244,12 @@ bool msa_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 
 	for(int track=strack; track <= etrack; track++) {
 		for(int head=0; head <= heads; head++) {
+			size_t actual;
 			uint8_t th[2];
-			io_generic_read(io, th, pos, 2);
+			io.read_at(pos, th, 2, actual);
 			pos += 2;
 			int tsize = (th[0] << 8) | th[1];
-			io_generic_read(io, sectdata, pos, tsize);
+			io.read_at(pos, sectdata, tsize, actual);
 			pos += tsize;
 			if(tsize < track_size) {
 				if(!uncompress(sectdata, tsize, track_size))
@@ -258,7 +265,7 @@ bool msa_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 }
 
 
-bool msa_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -289,9 +296,10 @@ bool msa_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 	header[8] = 0;
 	header[9] = track_count-1;
 
-	io_generic_write(io, header, 0, 10);
-
-	int pos = 10;
+	if(io.seek(0, SEEK_SET))
+		return false;
+	size_t actual;
+	io.write(header, 10, actual);
 
 	uint8_t sectdata[11*512];
 	uint8_t compdata[11*512];
@@ -305,16 +313,14 @@ bool msa_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 				uint8_t th[2];
 				th[0] = csize >> 8;
 				th[1] = csize;
-				io_generic_write(io, th, pos, 2);
-				io_generic_write(io, compdata, pos+2, csize);
-				pos += 2+csize;
+				io.write(th, 2, actual);
+				io.write(compdata, csize, actual);
 			} else {
 				uint8_t th[2];
 				th[0] = track_size >> 8;
 				th[1] = track_size;
-				io_generic_write(io, th, pos, 2);
-				io_generic_write(io, sectdata, pos+2, track_size);
-				pos += 2+track_size;
+				io.write(th, 2, actual);
+				io.write(sectdata, track_size, actual);
 			}
 		}
 	}

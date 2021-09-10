@@ -74,7 +74,7 @@
 #define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
+DEFINE_DEVICE_TYPE(TI99_HFDC, bus::ti99::peb::myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
 
 namespace bus::ti99::peb {
 

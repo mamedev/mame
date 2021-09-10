@@ -134,7 +134,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_card_device, "ti99_ide", "Nouspikel IDE interface card")
+DEFINE_DEVICE_TYPE(TI99_IDE, bus::ti99::peb::nouspikel_ide_card_device, "ti99_ide", "Nouspikel IDE interface card")
 
 #define CLOCK65_TAG "rtc65271"
 #define CLOCK47_TAG "bq4847"

@@ -47,7 +47,7 @@ static const nes_mmc mmc_list[] =
 	{ 12, REXSOFT_DBZ5 },
 	{ 13, STD_CPROM },
 	{ 14, REXSOFT_SL1632 },
-	{ 15, WAIXING_WXZS2 },
+	{ 15, BMC_K1029 },
 	{ 16, BANDAI_LZ93EX2 },  // with 24c02
 	{ 17, FFE8_BOARD },
 	{ 18, JALECO_SS88006 },
@@ -215,7 +215,7 @@ static const nes_mmc mmc_list[] =
 	{ 179, HENGG_XHZS },
 	{ 180, UXROM_CC },
 	// 181 Unused
-	{ 182, HOSENKAN_BOARD },
+	{ 182, SUPERGAME_LIONKING },    // duplicate of mapper 114
 	{ 183, BTL_SHUIGUAN },
 	{ 184, SUNSOFT_1 },
 	{ 185, STD_CNROM },
@@ -248,7 +248,7 @@ static const nes_mmc mmc_list[] =
 	{ 212, BMC_SUPERHIK_300IN1 },
 	{ 213, BMC_NOVEL2 },
 	{ 214, BMC_SUPERGUN_20IN1 },
-	{ 215, SUPERGAME_BOOGERMAN },
+	{ 215, UNL_8237 },          // and UNL_8237A
 	{ 216, RCM_GS2015 },
 	{ 217, BMC_500IN1 },
 	{ 218, NOCASH_NOCHR },
@@ -288,7 +288,7 @@ static const nes_mmc mmc_list[] =
 	{ 252, WAIXING_SGZ },
 	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
 	{ 254, BTL_PIKACHUY2K },
-	{ 255, BMC_110IN1 },
+	{ 255, BMC_72IN1 },
 
 	// NES 2.0
 	// 256 OneBus Famiclones
@@ -318,7 +318,7 @@ static const nes_mmc mmc_list[] =
 	// 280 Unused
 	// 281 seems to be mc_sh4b and many other JY multicarts not in nes.xml?
 	// 282 more JY multicarts not in nes.xml?
-	// 283 RCM_GS2004 and RCM_GS2013 (why are these RCM?), these are in nes.xml
+	{ 283, RCM_GS2004 },           // and RCM_GS2013
 	// 284 UNL_DRIPGAME, not in nes.xml
 	{ 285, BMC_A65AS },
 	{ 286, BMC_BENSHIENG },
@@ -326,7 +326,7 @@ static const nes_mmc mmc_list[] =
 	{ 288, BMC_GKCXIN1 },
 	{ 289, BMC_60311C },
 	{ 290, BMC_NTD_03 },
-	// 291 Kasheng 2-in-1 multicarts not yet in nes.xml?
+	{ 291, BMC_NT639 },
 	// { 292, UNL_DRAGONFIGHTER }, in nes.xml, not emulated yet
 	// 293 NewStar multicarts, do we have these in nes.xml?
 	// 294 variant of mapper 134?
@@ -347,8 +347,8 @@ static const nes_mmc mmc_list[] =
 	{ 309, UNL_LH51 },             // Ai Senshi Nicol alt FDS conversion
 	// 310 variant of mapper 125?
 	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
-	{ 312, KAISER_KS7013B },       // Highway Star FDS conversion
-	// { 313, BMC_RESETTXROM }, various multicarts, not in nes.xml?
+	{ 312, KAISER_KS7013B },       // Highway Star Kaiser bootleg
+	{ 313, BMC_RESETTXROM0 },
 	{ 314, BMC_64IN1NR },
 	// 315 820732C and 830134C multicarts, not in nes.xml?
 	// 316 Unused
@@ -386,7 +386,7 @@ static const nes_mmc mmc_list[] =
 	{ 348, BMC_830118C },
 	{ 349, BMC_G146 },
 	// { 350, BMC_891227 }, not in nes.xml
-	// 351 JY/Techline 9-in-1
+	{ 351, BMC_TECHLINE9IN1 },
 	{ 352, KAISER_KS106C },        // 4-in-1
 	// 353 Super Mario Family multicart
 	// 354 250-in-1 multicart with FDS Bubble Bobble
@@ -399,9 +399,9 @@ static const nes_mmc mmc_list[] =
 	{ 361, BMC_841101C },
 	// 362 JY-005 multicart
 	// 363 variant of mapper 358?
-	// 364 JY-007, is this ttoons6 in nes.xml?
+	{ 364, BMC_830832C },
 	// 365 is this asderp95 in nes.xml?
-	// 366 K-3131GS and K-3131SS 4-in-1 carts
+	{ 366, BMC_GN45 },
 	// 367 7-in-1 cart that is a close variant of mapper 205
 	{ 368, BTL_YUNG08 },            // SMB2 FDS conversion
 	// 369 Super Mario Bros Party multicart
@@ -431,7 +431,7 @@ static const nes_mmc mmc_list[] =
 	// 393 820720C multicart
 	// 394 Realtec HSK007 multicart
 	// 395 Realtec 8210 multicarts
-	// 396 various JY multicarts
+	{ 396, BMC_850437C },
 	// 397 JY-082 multicart, not in nes.xml?
 	// 398 JY-048 multicart, not in nes.xml?
 	// 399 homebrew game Star Versus
@@ -446,14 +446,14 @@ static const nes_mmc mmc_list[] =
 	// 408 Konami PnP
 	// 409 (Sealie) homebrew game A Winner is You, 64MB music cart, easy to support if dump is available
 	// 410 Unused or JY?
-	// 411 various JY multicarts
+	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
 	// 413 homebrew game Super Russian Roulette
 	// 414 9999999-in-1 multicart
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
-	// 416 4-in-1 that includes mapper 50 SMB2j pirate
+	{ 416, BMC_N32_4IN1 },
 	{ 417, BTL_BATMANFS },         // "Fine Studio" Batman bootleg
-	// { 418, UNL_LH42 }              // Highway Star alt FDS conversion
+	{ 418, UNL_LH42 },             // Highway Star Whirlwind Manu bootleg
 	// 419 VT03 PnPs
 	// 420 Kasheng A971210 board
 	// 421 JY SC871115C board
@@ -513,7 +513,7 @@ static const nes_mmc mmc_list[] =
 	// 550 JY-015 multicart
 	// 551 variant of mapper 178, likely shenghuo, jingkzx, xiaokecq, zgfyun in nes.xml
 	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
-	// { 553, SACHEN_3013 },          // Dong Dong Nao 1
+	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
 	// 555 retroUSB re-release of 1991 Nintendo Campus Challenge
 	// 556 JY-215 multicart
@@ -896,6 +896,25 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = UNL_DH08;
 			break;
 
+		case UNL_8237:
+			if (submapper == 1)
+				m_pcb_id = UNL_8237A;
+			break;
+
+		case RCM_GS2004:
+			if (prg_size >= 0x50000)
+				m_pcb_id = RCM_GS2013;
+			break;
+
+		case BMC_RESETTXROM0:
+			if (submapper == 1)
+				m_pcb_id = BMC_RESETTXROM1;
+			else if (submapper == 2)
+				m_pcb_id = BMC_RESETTXROM2;
+			else if (submapper > 2)
+				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
+			break;
+
 		case HES_BOARD:
 			if (crc_hack)
 				m_cart->set_pcb_ctrl_mirror(true);    // Mapper 113 is used for 2 diff boards
@@ -1207,6 +1226,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 			if (crc_hack)
 				pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
 			break;
+
 		case UNL_LH28_LH54:                            // Mapper 108 is used for 4 diff boards
 			if (ROM[5])
 				pcb_id = (ROM[5] == 2) ? UNL_LE05 : UNL_LH31;
@@ -1214,6 +1234,22 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 				pcb_id = UNL_DH08;
 			break;
 
+		case UNL_8237:                                 // Mapper 215 is used for 2 diff boards
+			if (submapper == 1)
+				pcb_id = UNL_8237A;
+			break;
+
+		case RCM_GS2004:                               // Mapper 283 is used for 2 diff boards
+			if (ROM[4] >= 20)
+				pcb_id = RCM_GS2013;
+			break;
+
+		case BMC_RESETTXROM0:                          // Mapper 313 is used for 3 diff boards
+			if (submapper == 1)
+				pcb_id = BMC_RESETTXROM1;
+			if (submapper == 2)
+				pcb_id = BMC_RESETTXROM2;
+			break;
 	}
 
 	return nes_get_slot(pcb_id);

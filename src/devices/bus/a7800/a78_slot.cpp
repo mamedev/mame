@@ -491,7 +491,7 @@ image_verify_result a78_cart_slot_device::verify_header(char *header)
 	if (strncmp(magic, header + 1, 9))
 	{
 		logerror("Not a valid A7800 image\n");
-		seterror(IMAGE_ERROR_UNSPECIFIED, "File is not a valid A7800 image");
+		seterror(image_error::INVALIDIMAGE, "File is not a valid A7800 image");
 		return image_verify_result::FAIL;
 	}
 

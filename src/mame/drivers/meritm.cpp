@@ -1151,7 +1151,7 @@ void meritm_state::crt250(machine_config &config)
 	ay8930_device &aysnd(AY8930(config, "aysnd", SYSTEM_CLK/12));
 	aysnd.port_a_read_callback().set_ioport("DSW");
 	aysnd.port_b_write_callback().set(FUNC(meritm_state::ay8930_port_b_w));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
 }
 
 void meritm_state::crt250_questions(machine_config &config)

@@ -35,7 +35,7 @@ TODO:
   - $6100 is actually OR-ed with the coinage work RAM buffer setting at $8022;
   - $6124 is shifted right once at PC=0x5df and stored to $82e6, which is later
     checked at PC=0x187 and must be $01 otherwise game goes into an infinite
-	loop after dying (without ROM patch);
+    loop after dying (without ROM patch);
   - (more ...)
 
 *******************************************************************************/

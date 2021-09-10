@@ -1843,18 +1843,18 @@ void dec0_state::dec0(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8));
-	ym1.add_route(0, "mono", 0.90);
-	ym1.add_route(1, "mono", 0.90);
-	ym1.add_route(2, "mono", 0.90);
-	ym1.add_route(3, "mono", 0.35);
+	ym1.add_route(0, "mono", 0.81);
+	ym1.add_route(1, "mono", 0.81);
+	ym1.add_route(2, "mono", 0.81);
+	ym1.add_route(3, "mono", 0.32);
 	ym1.irq_handler().set_inputline(m_audiocpu, 0); // Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is only game to program 2203 to do so
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4));
 	ym2.irq_handler().set_inputline(m_audiocpu, 0);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.72);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(20'000'000) / 2 / 10, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.80);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.72);
 }
 
 

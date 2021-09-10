@@ -297,7 +297,7 @@ DEVICE_IMAGE_LOAD_MEMBER(beta_state::load_beta_eprom)
 
 	if (size != 0x800)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

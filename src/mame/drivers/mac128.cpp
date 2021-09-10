@@ -1132,6 +1132,7 @@ void mac128_state::mac512ke(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
+	m_screen->set_native_aspect();
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
 	m_screen->screen_vblank().set(FUNC(mac128_state::vblank_w));
 	m_screen->set_palette("palette");

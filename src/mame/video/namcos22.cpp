@@ -293,7 +293,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	namcos22_object_data &extra = object_data_alloc();
+	namcos22_object_data &extra = object_data().next();
 	int flags = node->data.quad.flags;
 	int color = node->data.quad.color;
 	int cz_adjust = node->data.quad.cz_adjust;
@@ -420,7 +420,7 @@ void namcos22_renderer::poly3d_drawsprite(
 		float fsw = sprite_screen_width;
 		float fsh = sprite_screen_height;
 
-		namcos22_object_data &extra = object_data_alloc();
+		namcos22_object_data &extra = object_data().next();
 		vertex_t vert[4];
 
 		extra.fadefactor = 0;

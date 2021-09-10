@@ -467,7 +467,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 				header_size = 0x200;
 				break;
 			default:
-				image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
+				image.seterror(image_error::INVALIDIMAGE, "Invalid header size");
 				return image_init_result::FAIL;
 		}
 		if (size - header_size == 0xa000)

@@ -188,11 +188,19 @@ public:
 
 	void c70(machine_config &config);
 	void namcona2(machine_config &config);
+	void zelos(machine_config &config);
 
 	void init_knckhead();
 	void init_emeralda();
 	void init_numanath();
 	void init_quiztou();
+	void init_zelos();
+
+private:
+	u16 m_zelos_ctrl;
+
+	void zelos_ctrl_w(u16 data);
+	void zelos_main_map(address_map &map);
 };
 
 class xday2_namcona2_state : public namcona2_state

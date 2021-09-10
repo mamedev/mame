@@ -970,10 +970,10 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: front mono
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: left rear
-	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: right rear
-	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: seat speaker
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: front mono
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: left rear
+	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: right rear
+	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: seat speaker
 }
 
 

@@ -436,13 +436,13 @@ TIMER_CALLBACK_MEMBER(scsp_device::timerC_cb)
 int scsp_device::Get_AR(int base, int R)
 {
 	int Rate = base + (R << 1);
-	return m_ARTABLE[std::min(63, std::max(0, Rate))];
+	return m_ARTABLE[std::clamp(Rate, 0, 63)];
 }
 
 int scsp_device::Get_DR(int base, int R)
 {
 	int Rate = base + (R << 1);
-	return m_DRTABLE[std::min(63, std::max(0, Rate))];
+	return m_DRTABLE[std::clamp(Rate, 0, 63)];
 }
 
 void scsp_device::Compute_EG(SCSP_SLOT *slot)

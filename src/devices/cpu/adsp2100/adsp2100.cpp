@@ -570,7 +570,6 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_MSTAT,   "MSTAT",     m_mstat).mask((m_chip_type == CHIP_TYPE_ADSP2100) ? 0x0f : 0x7f).callimport();
 
 	state_add(ADSP2100_PCSP,    "PCSP",      m_pc_sp).mask(0xff);
-	state_add(STATE_GENSP,      "CURSP",     m_pc_sp).mask(0xff).noshow();
 	state_add(ADSP2100_CNTRSP,  "CNTRSP",    m_cntr_sp).mask(0xf);
 	state_add(ADSP2100_STATSP,  "STATSP",    m_stat_sp).mask(0xf);
 	state_add(ADSP2100_LOOPSP,  "LOOPSP",    m_loop_sp).mask(0xf);

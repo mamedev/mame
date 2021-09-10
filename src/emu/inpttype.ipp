@@ -838,6 +838,7 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_CLEAR,            "UI Clear",               input_seq(KEYCODE_DEL) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ZOOM_IN,          "UI Zoom In",             input_seq(KEYCODE_EQUALS) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ZOOM_OUT,         "UI Zoom Out",            input_seq(KEYCODE_MINUS) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ZOOM_DEFAULT,     "UI Default Zoom",        input_seq(KEYCODE_0) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_PREV_GROUP,       "UI Previous Group",      input_seq(KEYCODE_OPENBRACE) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_NEXT_GROUP,       "UI Next Group",          input_seq(KEYCODE_CLOSEBRACE) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ROTATE,           "UI Rotate",              input_seq(KEYCODE_R) ) \

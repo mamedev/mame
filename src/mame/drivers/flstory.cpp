@@ -855,6 +855,7 @@ void flstory_state::rumba(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &flstory_state::rumba_map);
+	m_maincpu->set_clock(XTAL(8'000'000) / 2); // verified on PCB
 
 	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6); /* ? */
 

@@ -791,15 +791,15 @@ void sstingray_state::sstingry(machine_config &config)
 	/* sound hardware */
 
 	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
 	ym2203_device &ym2(YM2203(config, "ym2", 3000000));
-	ym2.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ym2.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
 	ym2203_device &ym3(YM2203(config, "ym3", 3000000));
-	ym3.add_route(ALL_OUTPUTS, "speaker", 0.5);
+	ym3.add_route(ALL_OUTPUTS, "speaker", 0.45);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
 }
 
 void kyros_state::kyros(machine_config &config)
@@ -824,15 +824,15 @@ void kyros_state::kyros(machine_config &config)
 
 	/* sound hardware */
 	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
 	ym2203_device &ym2(YM2203(config, "ym2", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym2.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ym2.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
 	ym2203_device &ym3(YM2203(config, "ym3", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym3.add_route(ALL_OUTPUTS, "speaker", 0.9);
+	ym3.add_route(ALL_OUTPUTS, "speaker", 0.6);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
 }
 
 void jongbou_state::jongbou(machine_config &config)

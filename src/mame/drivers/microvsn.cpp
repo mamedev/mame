@@ -188,7 +188,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 
 	if (size != 0x400 && size != 0x800)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file size");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file size");
 		return image_init_result::FAIL;
 	}
 

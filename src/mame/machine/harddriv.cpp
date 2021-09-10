@@ -37,6 +37,8 @@
 void harddriv_state::device_start()
 {
 	m_lamps.resolve();
+	m_sel.resolve();
+	m_wheel.resolve();
 
 	m_xsdp_sport1_irq_off_callback.init(*this, FUNC(harddriv_state::xsdp_sport1_irq_off_callback));
 	m_deferred_adsp_bank_switch.init(*this, FUNC(harddriv_state::deferred_adsp_bank_switch));
@@ -363,24 +365,24 @@ void harddriv_state::hd68k_wr1_write(offs_t offset, uint16_t data)
 		data = data >> 8;
 		switch (m_sel_select)
 		{
-			case 1: /* SEL1 */
-				m_sel1_data = data;
-				machine().output().set_value("SEL1", m_sel1_data);
+		case 1: /* SEL1 */
+			m_sel1_data = data;
+			m_sel[0] = m_sel1_data;
 			break;
 
-			case 2: /* SEL2 */
-				m_sel2_data = data;
-				machine().output().set_value("SEL2", m_sel2_data);
+		case 2: /* SEL2 */
+			m_sel2_data = data;
+			m_sel[1] = m_sel2_data;
 			break;
 
-			case 3: /* SEL3 */
-				m_sel3_data = data;
-				machine().output().set_value("SEL3", m_sel3_data);
+		case 3: /* SEL3 */
+			m_sel3_data = data;
+			m_sel[2] = m_sel3_data;
 			break;
 
-			case 4: /* SEL4 */
-				m_sel4_data = data;
-				machine().output().set_value("SEL4", m_sel4_data);
+		case 4: /* SEL4 */
+			m_sel4_data = data;
+			m_sel[3] = m_sel4_data;
 			break;
 		}
 	} else {
@@ -393,7 +395,7 @@ void harddriv_state::hd68k_wr2_write(offs_t offset, uint16_t data)
 {
 	if (offset == 0) {
 		// logerror("Steering Wheel Latch = %02X\n", data);
-		machine().output().set_value("wheel", data >> 8);
+		m_wheel = data >> 8;
 	} else {
 		logerror("/WR2(%04X)=%02X\n", offset, data);
 	}

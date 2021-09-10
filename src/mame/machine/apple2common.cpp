@@ -809,7 +809,7 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 							return 10 | util::disasm_interface::SUPPORTED | util::disasm_interface::STEP_OVER;
 						}
 						item++;
-					}					
+					}
 				}
 				offs_t rv = com_long_op(stream, pc, opcodes, "jsl");
 

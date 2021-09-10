@@ -44,6 +44,7 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/i8251.h"
@@ -53,10 +54,14 @@ TODO:
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+
+
+namespace {
 
 class mbc200_state : public driver_device
 {
@@ -79,6 +84,10 @@ public:
 
 	void mbc200(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	u8 p2_porta_r();
 	void p1_portc_w(u8 data);
@@ -89,13 +98,11 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
-	void main_io(address_map &map);
 	void main_mem(address_map &map);
-	void sub_io(address_map &map);
+	void main_io(address_map &map);
 	void sub_mem(address_map &map);
+	void sub_io(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	u8 m_comm_latch;
 	u8 m_term_data;
 	required_device<mc6845_device> m_crtc;
@@ -366,8 +373,10 @@ ROM_START( mbc200 )
 	ROM_LOAD( "m5l2764.bin", 0x0000, 0x2000, CRC(377300a2) SHA1(8563172f9e7f84330378a8d179f4138be5fda099))
 ROM_END
 
+} // anonymous namespace
+
+
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
 COMP( 1982, mbc200, 0,      0,      mbc200,  mbc200, mbc200_state, empty_init, "Sanyo", "MBC-200", MACHINE_SUPPORTS_SAVE )
-

@@ -111,12 +111,12 @@ class device_delegate<ReturnType (Params...)> : protected named_delegate<ReturnT
 private:
 	using basetype = named_delegate<ReturnType (Params...)>;
 
-	template <class T, class U> struct is_related_device_implementation
-	{ static constexpr bool value = std::is_base_of<T, U>::value && std::is_base_of<device_t, U>::value; };
-	template <class T, class U> struct is_related_device_interface
-	{ static constexpr bool value = std::is_base_of<T, U>::value && std::is_base_of<device_interface, U>::value && !std::is_base_of<device_t, U>::value; };
-	template <class T, class U> struct is_related_device
-	{ static constexpr bool value = is_related_device_implementation<T, U>::value || is_related_device_interface<T, U>::value; };
+	template <class T, class U>
+	using is_related_device_implementation = std::bool_constant<std::is_base_of_v<T, U> && std::is_base_of_v<device_t, U> >;
+	template <class T, class U>
+	using is_related_device_interface = std::bool_constant<std::is_base_of_v<T, U> && std::is_base_of_v<device_interface, U> && !std::is_base_of_v<device_t, U> >;
+	template <class T, class U>
+	using is_related_device = std::bool_constant<is_related_device_implementation<T, U>::value || is_related_device_interface<T, U>::value>;
 
 	template <class T> static std::enable_if_t<is_related_device_implementation<T, T>::value, device_t &> get_device(T &object) { return object; }
 	template <class T> static std::enable_if_t<is_related_device_interface<T, T>::value, device_t &> get_device(T &object) { return object.device(); }
@@ -124,8 +124,8 @@ private:
 public:
 	template <unsigned Count> using array = device_delegate_array<ReturnType (Params...), Count>;
 
-	template <typename T> struct supports_callback
-	{ static constexpr bool value = std::is_constructible<device_delegate, device_t &, char const *, T, char const *>::value; };
+	template <typename T>
+	using supports_callback = std::bool_constant<std::is_constructible_v<device_delegate, device_t &, char const *, T, char const *> >;
 
 	// construct/assign
 	explicit device_delegate(device_t &owner) : basetype(), detail::device_delegate_helper(owner) { }

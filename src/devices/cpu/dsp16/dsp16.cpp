@@ -1778,7 +1778,7 @@ s64 dsp16_device_base::dau_saturate(u16 a) const
 	if (m_core->dau_auc_sat(a))
 		return m_core->dau_a[a];
 	else
-		return std::min<s64>(std::max<s64>(m_core->dau_a[a], std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
+		return std::clamp<s64>(m_core->dau_a[a], std::numeric_limits<s32>::min(), std::numeric_limits<s32>::max());
 }
 
 inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)

@@ -16848,6 +16848,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sinkswim">
+		<description>Sink or Swim</description>
+		<year>1993</year>
+		<publisher>Zeppelin Games</publisher>
+		<info name="developer" value="Adventuresoft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sink or Swim [Zeppelin] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="c7e68995" sha1="cd16f38c42dfb952f75990293f565a561d7c228f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sink or Swim [Zeppelin] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="1d58b046" sha1="a35ad9ddd11b149e0c36b664cbc90ab949a77ab7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sleepwalker">
 		<description>Sleepwalker</description>
 		<year>1993</year>
@@ -17348,35 +17365,69 @@ license:CC0
 		<description>Star Wars - X-Wing - Space Combat Simulator</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk1.img" size="1474560" crc="8e8f9d0b" sha1="c98d3d8560f9d6ef9f8052f75928b4e2a93164e7"/>
+				<rom name="X-wing [LucasArts] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="74b332c7" sha1="84f7d9934516350d10ff395d2521332681f9f673"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk2.img" size="1474560" crc="adb091f3" sha1="5b6be2f738b21aea59a089c8e7d5bda852d6f5af"/>
+				<rom name="X-wing [LucasArts] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="dcea06c0" sha1="ee0ca56f0971840011ebb9dfc49d215cbda36cec"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk3.img" size="1474560" crc="9d516d11" sha1="c7c1cf18af49153aec0f14cbb8df32db33c150db"/>
+				<rom name="X-wing [LucasArts] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="6e07ebc1" sha1="2282d5b478b28181cbfe88223301076fcfcfa3e6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk4.img" size="1474560" crc="5981f879" sha1="85dc83fecdb8b754c8d10c8579e0e644435eb7be"/>
+				<rom name="X-wing [LucasArts] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="5aeca402" sha1="bd2269f36cebc89c59901a56ed3ec32695aae6ca"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk5.img" size="1474560" crc="3af204de" sha1="8984ca008b4948b1c9066c9314f6c0e80c085fe4"/>
+				<rom name="X-wing [LucasArts] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="bd2d8f46" sha1="80e364378c191600ba05beff6ae73a4c90465de6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The game is the same as the parent, only the readme file is translated to german -->
+	<software name="swxwingde" cloneof="swxwing">
+		<description>Star Wars - X-Wing - Space Combat Simulator (Germany)</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<info name="version" value="Version 1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="X-wing (Germany) [LucasArts] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="9d74e6c4" sha1="e6c010aad3c90efe009b2a98b5651689d9e35e58"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="X-wing (Germany) [LucasArts] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="dcea06c0" sha1="ee0ca56f0971840011ebb9dfc49d215cbda36cec"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="X-wing (Germany) [LucasArts] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="6e07ebc1" sha1="2282d5b478b28181cbfe88223301076fcfcfa3e6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="X-wing (Germany) [LucasArts] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="5aeca402" sha1="bd2269f36cebc89c59901a56ed3ec32695aae6ca"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="X-wing (Germany) [LucasArts] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="bd2d8f46" sha1="80e364378c191600ba05beff6ae73a4c90465de6"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="swxwingbw" cloneof="swxwing">
-		<description>Star Wars - X-Wing B-Wing Expansion</description>
+		<description>Star Wars - X-Wing: B-Wing Expansion</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -17387,13 +17438,13 @@ license:CC0
 	</software>
 
 	<software name="swxwingip" cloneof="swxwing">
-	<!-- Was once Virus Infected -->
-		<description>Star Wars - X-Wing Imperial Pursuit</description>
+		<description>Star Wars - X-Wing: Imperial Pursuit</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="version" value="Version 1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="xwing.img" size="1474560" crc="34eebdb6" sha1="fcee862c9b2460aed9cbf3b46657ad4e4eff5dcd" status="baddump" />
+				<rom name="X-Wing Imperial Pursuit [LucasArts] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8ac9c001" sha1="31a7ad14658f78e11b331831cc6c0c32fc2bce96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17919,6 +17970,29 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Wacky Wheels (Upgrade Disk) [Apogee] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="15ed5285" sha1="f5db12f9354fb7e3e2c4af6a8fbea152d73201dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallrome">
+		<description>Walls of Rome</description>
+		<year>1993</year>
+		<publisher>Mindcraft</publisher>
+		<info name="developer" value="Mindcraft" />
+		<info name="version" value="v1.00 Nov 02 1993" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Walls of Rome [Mindcraft] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="38d8b24b" sha1="4e92e80951791eb2ef41ff7312cc0e883dd54b24"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Walls of Rome [Mindcraft] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="a55b7d3f" sha1="26d6282640ff4341458a1a176f5f04bec4c169cd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Walls of Rome [Mindcraft] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="def7ebcd" sha1="571297248e7ba6f13c33b74ddab33b3849df3020"/>
 			</dataarea>
 		</part>
 	</software>

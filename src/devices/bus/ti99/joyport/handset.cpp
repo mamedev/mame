@@ -49,8 +49,8 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_JOYSTICK, bus::ti99::joyport, ti99_twin_joystick_device, "ti99_twinjoy", "TI-99/4(A) Twin Joysticks")
-DEFINE_DEVICE_TYPE_NS(TI99_HANDSET, bus::ti99::joyport, ti99_handset_device, "ti99_handset", "TI-99/4 IR handset")
+DEFINE_DEVICE_TYPE(TI99_JOYSTICK, bus::ti99::joyport::ti99_twin_joystick_device, "ti99_twinjoy", "TI-99/4(A) Twin Joysticks")
+DEFINE_DEVICE_TYPE(TI99_HANDSET, bus::ti99::joyport::ti99_handset_device, "ti99_handset", "TI-99/4 IR handset")
 
 namespace bus::ti99::joyport {
 

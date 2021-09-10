@@ -13,7 +13,7 @@ license:CC0
 
 	    <part name="hdd" interface="scsi_hdd">
 	        <diskarea name="harddriv">
-	            <disk name="jazz_winnt31" sha1="5d556b4df2dccdc681095fedcf836a5b0a7782a0" writeable="yes" />
+	            <disk name="jazz_winnt31" sha1="" writeable="yes" status="nodump" />
 	        </diskarea>
 	    </part>
 	</software>

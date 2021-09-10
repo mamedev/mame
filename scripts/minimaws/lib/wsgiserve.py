@@ -275,7 +275,7 @@ class MachineHandler(QueryPageHandler):
                         (self.machine_href(machine_info['romof']), htmlescape(parent[1]), htmlescape(machine_info['romof']))).encode('utf-8')
             else:
                 yield (
-                        '    <tr><th>Parent machine:</th><td><a href="%s">%s</a></td></tr>\n' %
+                        '    <tr><th>Parent ROM set:</th><td><a href="%s">%s</a></td></tr>\n' %
                         (self.machine_href(machine_info['romof']), htmlescape(machine_info['romof']))).encode('utf-8')
         unemulated = []
         imperfect = []

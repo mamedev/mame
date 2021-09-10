@@ -1219,7 +1219,6 @@ void z8_device::device_start()
 		state_add(STATE_GENPC,   "GENPC",     m_pc).callimport().noshow();
 		state_add(STATE_GENPCBASE, "CURPC",   m_ppc).callimport().noshow();
 		state_add(Z8_SP,         "SP",        m_sp.w);
-		state_add(STATE_GENSP,   "GENSP",     m_sp.w).noshow();
 		state_add(Z8_RP,         "RP",        m_rp);
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%6s");
 		state_add(Z8_IMR,        "IMR",       m_imr);

@@ -7,17 +7,17 @@
 
     08/08/2021 Skeleton driver.
 
-	https://twitter.com/FozzTexx/status/1424043157264617478
+    https://twitter.com/FozzTexx/status/1424043157264617478
 
-	XTAL :  7.938 MHz
+    XTAL :  7.938 MHz
            14.364 MHz
-		    6.000 MHz
-	
-	FDC - WD2793A
-	2 * AM9128 (2048x8 SRAM)
-	NEC D4364 (8192x8 SRAM)
-	2 * MT4067-12 (64Kx4 DRAM)
-	CRT5037 - SMC 8621
+            6.000 MHz
+
+    FDC - WD2793A
+    2 * AM9128 (2048x8 SRAM)
+    NEC D4364 (8192x8 SRAM)
+    2 * MT4067-12 (64Kx4 DRAM)
+    CRT5037 - SMC 8621
 
 ****************************************************************************/
 
@@ -57,7 +57,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	uint32_t screen_update_pwp14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	void pwp14_io(address_map &map);
 	void pwp14_mem(address_map &map);
 	void bankswitch_w(offs_t offset, uint8_t data);
@@ -74,7 +74,7 @@ private:
 	required_region_ptr<u8> m_rom;
 	required_device<crt5037_device> m_crtc;
 	required_device<palette_device> m_palette;
-	required_region_ptr<uint8_t> m_chargen;	
+	required_region_ptr<uint8_t> m_chargen;
 	required_device<wd2793_device> m_fdc;
 	uint8_t m_bank_reg;
 };
@@ -183,7 +183,7 @@ uint32_t pwp14_state::screen_update_pwp14(screen_device &screen, bitmap_ind16 &b
 				uint8_t data = m_chargen[(chr << 3) | ra];
 
 				//if (cursor.contains(x * 8, y * 8))
-				//	data ^= 0xff;
+				//  data ^= 0xff;
 
 				// draw 8 pixels of the char
 				for (int i = 0; i < 8; i++)

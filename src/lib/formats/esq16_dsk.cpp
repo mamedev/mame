@@ -10,10 +10,10 @@
 
 *********************************************************************/
 
-#include <cassert>
+#include "esq16_dsk.h"
 
-#include "flopimg.h"
-#include "formats/esq16_dsk.h"
+#include "ioprocs.h"
+
 
 const floppy_image_format_t::desc_e esqimg_format::esq_10_desc[] = {
 	{ MFM, 0x4e, 80 },
@@ -71,23 +71,23 @@ bool esqimg_format::supports_save() const
 	return true;
 }
 
-void esqimg_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
+void esqimg_format::find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
 {
-	uint64_t size = io_generic_size(io);
-	track_count = 80;
-	head_count = 2;
-	sector_count = 10;
+	uint64_t size;
+	if(!io.length(size)) {
+		track_count = 80;
+		head_count = 2;
+		sector_count = 10;
 
-	uint32_t expected_size = 512 * track_count*head_count*sector_count;
-	if (size == expected_size)
-	{
-		return;
+		uint32_t expected_size = 512 * track_count*head_count*sector_count;
+		if(size == expected_size) {
+			return;
+		}
 	}
-
 	track_count = head_count = sector_count = 0;
 }
 
-int esqimg_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int esqimg_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -97,7 +97,7 @@ int esqimg_format::identify(io_generic *io, uint32_t form_factor, const std::vec
 	return 0;
 }
 
-bool esqimg_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool esqimg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -113,7 +113,8 @@ bool esqimg_format::load(io_generic *io, uint32_t form_factor, const std::vector
 	int track_size = sector_count*512;
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
-			io_generic_read(io, sectdata, (track*head_count + head)*track_size, track_size);
+			size_t actual;
+			io.read_at((track*head_count + head)*track_size, sectdata, track_size, actual);
 			generate_track(esq_10_desc, track, head, sectors, sector_count, 110528, image);
 		}
 	}
@@ -123,7 +124,7 @@ bool esqimg_format::load(io_generic *io, uint32_t form_factor, const std::vector
 	return true;
 }
 
-bool esqimg_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool esqimg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -144,7 +145,8 @@ bool esqimg_format::save(io_generic *io, const std::vector<uint32_t> &variants, 
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
 			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			io_generic_write(io, sectdata, (track*head_count + head)*track_size, track_size);
+			size_t actual;
+			io.write_at((track*head_count + head)*track_size, sectdata, track_size, actual);
 		}
 	}
 

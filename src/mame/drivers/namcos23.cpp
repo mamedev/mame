@@ -2314,7 +2314,7 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 
 	for(int i=0; i<render.poly_count; i++) {
 		const namcos23_poly_entry *p = render.poly_order[i];
-		namcos23_render_data& extra = render.polymgr->object_data_alloc();
+		namcos23_render_data& extra = render.polymgr->object_data().next();
 		extra = p->rd;
 		extra.bitmap = &bitmap;
 

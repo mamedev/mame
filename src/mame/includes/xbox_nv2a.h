@@ -576,7 +576,7 @@ public:
 		memset(pgraph, 0, sizeof(pgraph));
 		memset(ramin, 0, sizeof(ramin));
 		computedilated();
-		objectdata = &(rasterizer.object_data_alloc());
+		objectdata = &(rasterizer.object_data().next());
 		objectdata->data = this;
 		combiner.used = 0;
 		primitives_total_count = 0;

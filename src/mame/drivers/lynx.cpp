@@ -170,7 +170,7 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 	/* Check the image */
 	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) != image_verify_result::PASS)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a valid Lynx file");
+		image.seterror(image_error::INVALIDIMAGE, "Not a valid Lynx file");
 		return image_init_result::FAIL;
 	}
 
@@ -182,7 +182,7 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 
 	if (image.fread( &data[0], length) != length)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid length in file header");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid length in file header");
 		return image_init_result::FAIL;
 	}
 

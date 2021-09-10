@@ -108,6 +108,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(HD61830, hd61830_device)
-DECLARE_DEVICE_TYPE(HD61830B, hd61830_device)
+static auto &HD61830B = HD61830;
 
 #endif // MAME_VIDEO_HD61830_H

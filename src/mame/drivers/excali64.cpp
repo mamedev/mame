@@ -64,6 +64,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
+		, m_bankr(*this, "bankr%u", 1U)
+		, m_bankw(*this, "bankw%u", 1U)
 		, m_cass(*this, "cassette")
 		, m_crtc(*this, "crtc")
 		, m_io_keyboard(*this, "KEY.%u", 0)
@@ -119,6 +121,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
+	required_memory_bank_array<4> m_bankr;
+	required_memory_bank_array<4> m_bankw;
 	required_device<cassette_image_device> m_cass;
 	required_device<mc6845_device> m_crtc;
 	required_ioport_array<8> m_io_keyboard;
@@ -132,11 +136,11 @@ private:
 
 void excali64_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x1FFF).bankr("bankr1").bankw("bankw1");
-	map(0x2000, 0x2FFF).bankr("bankr2").bankw("bankw2");
-	map(0x3000, 0x3FFF).bankr("bankr3").bankw("bankw3");
-	map(0x4000, 0xBFFF).bankr("bankr4").bankw("bankw4");
-	map(0xC000, 0xFFFF).ram();
+	map(0x0000, 0x1fff).bankr(m_bankr[0]).bankw(m_bankw[0]);
+	map(0x2000, 0x2fff).bankr(m_bankr[1]).bankw(m_bankw[1]);
+	map(0x3000, 0x3fff).bankr(m_bankr[2]).bankw(m_bankw[2]);
+	map(0x4000, 0xbfff).bankr(m_bankr[3]).bankw(m_bankw[3]);
+	map(0xc000, 0xffff).ram();
 }
 
 void excali64_state::io_map(address_map &map)
@@ -386,52 +390,57 @@ void excali64_state::port70_w(u8 data)
 	if (BIT(data, 1))
 	{
 		// select 64k ram
-		membank("bankr1")->set_entry(0);
-		membank("bankr2")->set_entry(0);
-		membank("bankr3")->set_entry(0);
-		membank("bankr4")->set_entry(0);
-		membank("bankw2")->set_entry(0);
-		membank("bankw3")->set_entry(0);
-		membank("bankw4")->set_entry(0);
+		m_bankr[0]->set_entry(0);
+		m_bankr[1]->set_entry(0);
+		m_bankr[2]->set_entry(0);
+		m_bankr[3]->set_entry(0);
+
+		m_bankw[1]->set_entry(0);
+		m_bankw[2]->set_entry(0);
+		m_bankw[3]->set_entry(0);
 	}
 	else if (BIT(data, 0))
 	{
 		// select videoram and hiresram
-		membank("bankr1")->set_entry(1);
-		membank("bankr2")->set_entry(2);
-		membank("bankr3")->set_entry(2);
-		membank("bankw2")->set_entry(2);
-		membank("bankw3")->set_entry(2);
-		membank("bankr4")->set_entry(2);
-		membank("bankw4")->set_entry(2);
+		m_bankr[0]->set_entry(1);
+		m_bankr[1]->set_entry(2);
+		m_bankr[2]->set_entry(2);
+		m_bankr[3]->set_entry(2);
+
+		m_bankw[1]->set_entry(2);
+		m_bankw[2]->set_entry(2);
+		m_bankw[3]->set_entry(2);
 	}
 	else
 	{
 		// select rom, videoram, and main ram
-		membank("bankr1")->set_entry(1);
-		membank("bankr2")->set_entry(1);
-		membank("bankr3")->set_entry(1);
-		membank("bankw2")->set_entry(2);
-		membank("bankw3")->set_entry(2);
-		membank("bankr4")->set_entry(0);
-		membank("bankw4")->set_entry(0);
+		m_bankr[0]->set_entry(1);
+		m_bankr[1]->set_entry(1);
+		m_bankr[2]->set_entry(1);
+		m_bankr[3]->set_entry(0);
+
+		m_bankw[1]->set_entry(2);
+		m_bankw[2]->set_entry(2);
+		m_bankw[3]->set_entry(0);
 	}
 
 	// other half of ROM_1
 	if ((data & 0x22) == 0x20)
-		membank("bankr1")->set_entry(2);
+		m_bankr[0]->set_entry(2);
 }
 
 void excali64_state::machine_reset()
 {
-	membank("bankr1")->set_entry(1); // read from ROM
-	membank("bankr2")->set_entry(1); // read from ROM
-	membank("bankr3")->set_entry(1); // read from ROM
-	membank("bankr4")->set_entry(0); // read from RAM
-	membank("bankw1")->set_entry(0); // write to RAM
-	membank("bankw2")->set_entry(2); // write to videoram
-	membank("bankw3")->set_entry(2); // write to videoram hires pointers
-	membank("bankw4")->set_entry(0); // write to RAM
+	m_bankr[0]->set_entry(1); // read from ROM
+	m_bankr[1]->set_entry(1); // read from ROM
+	m_bankr[2]->set_entry(1); // read from ROM
+	m_bankr[3]->set_entry(0); // read from RAM
+
+	m_bankw[0]->set_entry(0); // write to RAM
+	m_bankw[1]->set_entry(2); // write to videoram
+	m_bankw[2]->set_entry(2); // write to videoram hires pointers
+	m_bankw[3]->set_entry(0); // write to RAM
+
 	m_maincpu->reset();
 }
 
@@ -492,28 +501,28 @@ void excali64_state::excali64_palette(palette_device &palette)
 	u8 *main = memregion("roms")->base();
 
 	// main ram (cp/m mode)
-	membank("bankr1")->configure_entry(0, r);
-	membank("bankr2")->configure_entry(0, r+0x2000);
-	membank("bankr3")->configure_entry(0, r+0x3000);
-	membank("bankr4")->configure_entry(0, r+0x4000);//boot
-	membank("bankw1")->configure_entry(0, r);//boot
-	membank("bankw2")->configure_entry(0, r+0x2000);
-	membank("bankw3")->configure_entry(0, r+0x3000);
-	membank("bankw4")->configure_entry(0, r+0x4000);//boot
+	m_bankr[0]->configure_entry(0, r);
+	m_bankr[1]->configure_entry(0, r+0x2000);
+	m_bankr[2]->configure_entry(0, r+0x3000);
+	m_bankr[3]->configure_entry(0, r+0x4000);//boot
+	m_bankw[0]->configure_entry(0, r);//boot
+	m_bankw[1]->configure_entry(0, r+0x2000);
+	m_bankw[2]->configure_entry(0, r+0x3000);
+	m_bankw[3]->configure_entry(0, r+0x4000);//boot
 	// rom_1
-	membank("bankr1")->configure_entry(1, &main[0x0000]);//boot
-	membank("bankr1")->configure_entry(2, &main[0x2000]);
+	m_bankr[0]->configure_entry(1, &main[0x0000]);//boot
+	m_bankr[0]->configure_entry(2, &main[0x2000]);
 	// rom_2
-	membank("bankr2")->configure_entry(1, &main[0x4000]);//boot
-	membank("bankr3")->configure_entry(1, &main[0x5000]);//boot
+	m_bankr[1]->configure_entry(1, &main[0x4000]);//boot
+	m_bankr[2]->configure_entry(1, &main[0x5000]);//boot
 	// videoram
-	membank("bankr2")->configure_entry(2, v);
-	membank("bankw2")->configure_entry(2, v);//boot
+	m_bankr[1]->configure_entry(2, v);
+	m_bankw[1]->configure_entry(2, v);//boot
 	// hiresram
-	membank("bankr3")->configure_entry(2, v+0x1000);
-	membank("bankw3")->configure_entry(2, v+0x1000);//boot
-	membank("bankr4")->configure_entry(2, h);
-	membank("bankw4")->configure_entry(2, h);
+	m_bankr[2]->configure_entry(2, v+0x1000);
+	m_bankw[2]->configure_entry(2, v+0x1000);//boot
+	m_bankr[3]->configure_entry(2, h);
+	m_bankw[3]->configure_entry(2, h);
 
 	// Set up foreground colours
 	for (u8 i = 0; i < 32; i++)

@@ -33,7 +33,7 @@
 #include "qt/deviceinformationwindow.h"
 
 class debug_qt : public osd_module, public debug_module
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 , public QAbstractNativeEventFilter
 #endif
 {
@@ -50,7 +50,7 @@ public:
 	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE;
 #endif
 private:
@@ -230,7 +230,7 @@ void bring_main_window_to_front()
 //  Core functionality
 //============================================================
 
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 bool winwindow_qt_filter(void *message);
 
 bool debug_qt::nativeEventFilter(const QByteArray &eventType, void *message, long *)
@@ -246,7 +246,7 @@ void debug_qt::init_debugger(running_machine &machine)
 	{
 		// If you're starting from scratch, create a new qApp
 		new QApplication(qtArgc, qtArgv);
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 		QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
 #endif
 	}
@@ -276,7 +276,7 @@ void debug_qt::init_debugger(running_machine &machine)
 
 #if defined(SDLMAME_UNIX) || defined(SDLMAME_WIN32)
 extern int sdl_entered_debugger;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 void winwindow_update_cursor_state(running_machine &machine);
 #endif
 
@@ -343,7 +343,7 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 		// all the QT windows are already gone.
 		gather_save_configurations();
 	}
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 	winwindow_update_cursor_state(*m_machine); // make sure the cursor isn't hidden while in debugger
 #endif
 }

@@ -26,23 +26,22 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 
 
 TODO:
-- printer or hopper emulation
+- fix printer or hopper emulation (passes check at start but then fails when giving out tickets at game end for marioun,
+  when coining up for tvdenwad)
 - the GFX emulation was adapted from other drivers using the Seibu customs, it might need more adjustments
 - verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
 - lamps
 - controls / dips need to be completed and better arranged
-- currently stuck at the call assistant screen due to vendor test failing (printer / hopper?), but can enter test mode.
-  To test the games, it's possible to get the attract mode running by enabling the hack in the memory map at 0xe0004-0xe0005.
-  tvdenwad will go back to the call assistant screen shortly after starting (believed to be because of missing printer or hopper emulation)
 */
 
 #include "emu.h"
 
+#include "video/seibu_crtc.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
-
-#include "video/seibu_crtc.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -60,6 +59,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_ticket(*this, "ticket"),
 		m_vram(*this, "vram%u", 0U),
 		m_spriteram(*this, "sprite_ram"),
 		m_okibank(*this, "okibank")
@@ -77,6 +77,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_ticket;
 
 	required_shared_ptr_array<uint16_t, 4> m_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -114,6 +115,8 @@ void banprestoms_state::machine_start()
 void banprestoms_state::okibank_w(uint16_t data)
 {
 	m_okibank->set_entry(data & 0x03);
+
+	m_ticket->motor_w(BIT(data, 4)); // bit 3 is suspect, too
 	// TODO: what do the other bits do?
 }
 
@@ -254,7 +257,7 @@ void banprestoms_state::prg_map(address_map &map)
 	//map(0xc0140, 0xc0141).nopw(); // in marioun bit 3 is lamp according to test mode
 	map(0xe0000, 0xe0001).portr("DSW1");
 	map(0xe0002, 0xe0003).portr("IN1");
-	map(0xe0004, 0xe0005).portr("IN2"); //.lr16(NAME([this] () -> uint16_t { return (machine().rand() & 0x0004) | (ioport("IN2")->read() & 0xfffb); }));
+	map(0xe0004, 0xe0005).portr("IN2");
 }
 
 void banprestoms_state::oki_map(address_map &map)
@@ -285,7 +288,7 @@ static INPUT_PORTS_START( tvdenwad )
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON13 ) // Card Emp in switch test
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON14 ) // Card Pos in switch test
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Card Pay in switch test
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // Card Pay in switch test
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) // ?
 	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
@@ -302,12 +305,11 @@ static INPUT_PORTS_START( tvdenwad )
 
 
 	PORT_START("DSW1") // marked SW0913 on PCB
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -320,12 +322,11 @@ static INPUT_PORTS_START( tvdenwad )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, "Every 3rd cycle" ) // 1st 2 cycles mute, then sound, then 2 cycles mute and so on
+	PORT_DIPSETTING(    0x80, "Every 2nd cycle" ) // 1st cycle mute, then sound, then 1 cycle mute and so on
+	PORT_DIPSETTING(    0xc0, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -351,7 +352,7 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) // Card Emp
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON8 ) // Card Pos
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON9 ) // Card Pay
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // Card Pay
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -368,13 +369,12 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 
 
 	PORT_START("DSW1") // marked SW0913 on PCB
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3") // some of these are difficulty (i.e. see Bowser being quicker or slower in the 100m dash)
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
@@ -386,12 +386,11 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, "Every 4th cycle" ) // 1st cycle sound, then 3 cycles mute, then 1 cycle sound and so on
+	PORT_DIPSETTING(    0x80, "Every 2nd cycle" ) // 1st cycle sound, then 1 cycle mute, then 1 cycle sound and so on
+	PORT_DIPSETTING(    0xc0, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -437,6 +436,8 @@ void banprestoms_state::banprestoms(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(banprestoms_state::irq4_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH); // TODO: period is guessed
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: copied from other drivers using the same CRTC

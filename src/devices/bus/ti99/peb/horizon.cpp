@@ -139,7 +139,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device, "ti99_horizon", "Horizon 4000B RAMdisk")
+DEFINE_DEVICE_TYPE(TI99_HORIZON, bus::ti99::peb::horizon_ramdisk_device, "ti99_horizon", "Horizon 4000B RAMdisk")
 
 namespace bus::ti99::peb {
 

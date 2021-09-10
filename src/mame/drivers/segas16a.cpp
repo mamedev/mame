@@ -1996,9 +1996,6 @@ void segas16a_state::system16a(machine_config &config)
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas16a_state::screen_update));
 	m_screen->set_palette(m_palette);
-	// see MT1852 (glitch in fantzone after stage intro text vanishes)
-	// this is a hack, but the scroll values must be latched at some point, when is unknown
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	SEGA_SYS16A_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
@@ -2075,7 +2072,7 @@ void segas16a_state::system16a_no7751(machine_config &config)
 	config.device_remove("dac");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void segas16a_state::system16a_no7751p(machine_config &config)
@@ -2094,9 +2091,8 @@ void segas16a_state::system16a_i8751_no7751(machine_config &config)
     system16a_i8751(config);
     config.device_remove("n7751");
     config.device_remove("dac");
-    config.device_remove("vref");
 
-    YM2151(config.replace(), "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+    YM2151(config.replace(), "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 */
 
@@ -2109,7 +2105,7 @@ void segas16a_state::system16a_fd1089a_no7751(machine_config &config)
 	config.device_remove("dac");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void segas16a_state::system16a_fd1089b_no7751(machine_config &config)
@@ -2121,7 +2117,7 @@ void segas16a_state::system16a_fd1089b_no7751(machine_config &config)
 	config.device_remove("dac");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void segas16a_state::system16a_fd1094_no7751(machine_config &config)
@@ -2133,7 +2129,7 @@ void segas16a_state::system16a_fd1094_no7751(machine_config &config)
 	config.device_remove("dac");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

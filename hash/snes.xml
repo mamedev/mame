@@ -385,8 +385,8 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="cart_back_label" value="920214" />
             <dataarea name="rom" size="1572864">
                 <rom name="dai-3-ji super robot taisen (japan) (rev 3).sfc" size="1572864" crc="C2941881" offset="0x000000" />
-                <rom name="shvc-rt-3 p0.u1" size="1048576" crc="" sha1="" offset="0x000000" />
-                <rom name="shvc-rt-3 p1.u2" size="524288"  crc="" sha1="" offset="0x100000" />
+                <rom name="shvc-rt-3 p0.u1" size="1048576" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="shvc-rt-3 p1.u2" size="524288"  crc="" sha1="" offset="0x100000" status="nodump" />
             </dataarea>
             <dataarea name="nvram" size="8192">
             </dataarea>
@@ -699,8 +699,8 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="1048576">
-                <rom name="bio-metal 7-16 0.u1" size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="bio-metal 7-16 1.u2" size="524288" crc="" sha1="" offset="0x080000" />
+                <rom name="bio-metal 7-16 0.u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="bio-metal 7-16 1.u2" size="524288" crc="" sha1="" offset="0x080000" status="nodump" />
             </dataarea>
             <dataarea name="nvram" size="8192">
             </dataarea>
@@ -721,7 +721,7 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="lockout" value="" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="524288">
-                <rom name="brainy v0.0 5-22-93 ce76.u1" size="524288" crc="" sha1="" offset="0x000000" />
+                <rom name="brainy v0.0 5-22-93 ce76.u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -912,10 +912,10 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT CR2032" />
             <feature name="cart_model" value="SHVC-006" />
             <dataarea name="rom" size="2097152">
-                <rom name="u1" size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="u2" size="524288" crc="" sha1="" offset="0x080000" />
-                <rom name="u3" size="524288" crc="" sha1="" offset="0x100000" />
-                <rom name="u4" size="524288" crc="" sha1="" offset="0x180000" />
+                <rom name="u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="u2" size="524288" crc="" sha1="" offset="0x080000" status="nodump" />
+                <rom name="u3" size="524288" crc="" sha1="" offset="0x100000" status="nodump" />
+                <rom name="u4" size="524288" crc="" sha1="" offset="0x180000" status="nodump" />
             </dataarea>
             <dataarea name="nvram" size="8192">
             </dataarea>
@@ -1112,12 +1112,12 @@ Beyond that last category are the roms waiting to be classified.
 			<dataarea name="rom" size="3145728">
 				<rom name="earthbound (prototype 19950327).sfc" size="3145728" crc="d3fa35aa" sha1="0686c4d339657489890e43fd39797c893cb992e9" offset="0x000000" />
 <!-- released as binary blob above, these are the eventual label/socket names
-                <rom name="earth bound 3-27-95 e.7 e 0.u1" size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="earth bound 3-27-95 e.7 e 1.u2" size="524288" crc="" sha1="" offset="0x080000" />
-                <rom name="earth bound 3-27-95 e.7 e 2.u3" size="524288" crc="" sha1="" offset="0x100000" />
-                <rom name="earth bound 3-27-95 e.7 e 3.u4" size="524288" crc="" sha1="" offset="0x180000" />
-                <rom name="earth bound 3-27-95 e.7 e 4.u5" size="524288" crc="" sha1="" offset="0x200000" />
-                <rom name="earth bound 3-27-95 e.7 e 5.u6" size="524288" crc="" sha1="" offset="0x280000" />
+                <rom name="earth bound 3-27-95 e.7 e 0.u1" size="524288" crc="ea6e34d3" sha1="f1adacaa247dd78f7509ac630fb3890d2ccd562b" offset="0x000000" />
+                <rom name="earth bound 3-27-95 e.7 e 1.u2" size="524288" crc="caf42319" sha1="89a26789e5673b35295bcf2abaa6ae1619f6513a" offset="0x080000" />
+                <rom name="earth bound 3-27-95 e.7 e 2.u3" size="524288" crc="5f01f45c" sha1="7f40e9d00c64d7692a52bce00bc6750c8f545d82" offset="0x100000" />
+                <rom name="earth bound 3-27-95 e.7 e 3.u4" size="524288" crc="6d0a7e82" sha1="2208ab837d6ab3fcfd9381af11cefac8fb024381" offset="0x180000" />
+                <rom name="earth bound 3-27-95 e.7 e 4.u5" size="524288" crc="9775520f" sha1="40b6e1f22836ebc0672e24d2963b78466856c518" offset="0x200000" />
+                <rom name="earth bound 3-27-95 e.7 e 5.u6" size="524288" crc="ecb9cf89" sha1="d62d917e373ab50dc3ced5d3d721d37995cbfd6b" offset="0x280000" />
 -->
 			</dataarea>
 			<dataarea name="nvram" size="65536">
@@ -1703,10 +1703,10 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="2097152">
-                <rom name="u1"                  size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="u2"                  size="524288" crc="" sha1="" offset="0x080000" />
-                <rom name="jammit u3 0301 1.u3" size="524288" crc="" sha1="" offset="0x100000" />
-                <rom name="u4"                  size="524288" crc="" sha1="" offset="0x180000" />
+                <rom name="u1"                  size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="u2"                  size="524288" crc="" sha1="" offset="0x080000" status="nodump" />
+                <rom name="jammit u3 0301 1.u3" size="524288" crc="" sha1="" offset="0x100000" status="nodump" />
+                <rom name="u4"                  size="524288" crc="" sha1="" offset="0x180000" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -1951,8 +1951,8 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="1048576">
-                <rom name="mpso-0.bin snes mickey's ultimate challenge 11-3-93 lo.u1" size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="mpso-0.bin snes mickey's ultimate challenge 11-3-93 hi.u2" size="524288" crc="" sha1="" offset="0x080000" />
+                <rom name="mpso-0.bin snes mickey's ultimate challenge 11-3-93 lo.u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="mpso-0.bin snes mickey's ultimate challenge 11-3-93 hi.u2" size="524288" crc="" sha1="" offset="0x080000" status="nodump" />
             </dataarea>
             <dataarea name="nvram" size="8192">
             </dataarea>
@@ -2191,10 +2191,10 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT1 CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="2097152">
-                <rom name="0.u1"     size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="1.u2"     size="524288" crc="" sha1="" offset="0x080000" />
-                <rom name="ncw 2.u3" size="524288" crc="" sha1="" offset="0x100000" />
-                <rom name="3.u4"     size="524288" crc="" sha1="" offset="0x180000" />
+                <rom name="0.u1"     size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="1.u2"     size="524288" crc="" sha1="" offset="0x080000" status="nodump" />
+                <rom name="ncw 2.u3" size="524288" crc="" sha1="" offset="0x100000" status="nodump" />
+                <rom name="3.u4"     size="524288" crc="" sha1="" offset="0x180000" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -2285,12 +2285,12 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT1 CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="3145728">
-                <rom name="nfl 0.u1"         size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="u2"               size="524288" crc="" sha1="" offset="0x080000" />
-                <rom name="u3"               size="524288" crc="" sha1="" offset="0x100000" />
-                <rom name="quarterback 3.u4" size="524288" crc="" sha1="" offset="0x180000" />
-                <rom name="u5"               size="524288" crc="" sha1="" offset="0x200000" />
-                <rom name="u6"               size="524288" crc="" sha1="" offset="0x280000" />
+                <rom name="nfl 0.u1"         size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="u2"               size="524288" crc="" sha1="" offset="0x080000" status="nodump" />
+                <rom name="u3"               size="524288" crc="" sha1="" offset="0x100000" status="nodump" />
+                <rom name="quarterback 3.u4" size="524288" crc="" sha1="" offset="0x180000" status="nodump" />
+                <rom name="u5"               size="524288" crc="" sha1="" offset="0x200000" status="nodump" />
+                <rom name="u6"               size="524288" crc="" sha1="" offset="0x280000" status="nodump" />
             </dataarea>
             <!- - memory capacity to be confirmed - ->
             <dataarea name="nvram" size="131072">
@@ -2375,7 +2375,7 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="cart_back_label" value="n/a" />
             <feature name="slot" value="lorom_dsp" />
             <dataarea name="rom" size="524288">
-                <rom name="90-10-25 nes pw" size="524288" crc="" sha1="" offset="0x000000" />
+                <rom name="90-10-25 nes pw" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
             </dataarea>
             <dataarea name="addon" size="10240">
                 <rom name="dsp1.u5" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />
@@ -2757,8 +2757,8 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="1048576">
-                <rom name="u1" size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="u2" size="524288" crc="" sha1="" offset="0x080000" />
+                <rom name="u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="u2" size="524288" crc="" sha1="" offset="0x080000" status="nodump" />
             </dataarea>
             <!- - memory capacity to be confirmed - ->
             <dataarea name="nvram" size="131072">
@@ -2928,8 +2928,8 @@ Beyond that last category are the roms waiting to be classified.
 				<rom name="snsp p-cq.u1" size="1048576" crc="24935769" sha1="de21be64fde447d9c6a2f1b063d2f2e0d4034ca0" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="73728">
-				<!--rom name="u2" size="65536" offset="0x000000" /-->
-				<!--rom name="u3" size="8192"  offset="0x010000" /-->
+				<!--rom name="u2" size="65536" crc="" sha1="" offset="0x000000" status="nodump" /-->
+				<!--rom name="u3" size="8192"  crc="" sha1="" offset="0x010000" status="nodump" /-->
 			</dataarea>
 		</part>
 	</software>
@@ -2955,8 +2955,8 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="2097152">
-                <rom name="u1" size="524288" crc="" sha1="" offset="0x000000" />
-                <rom name="u2" size="524288" crc="" sha1="" offset="0x080000" />
+                <rom name="u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="u2" size="524288" crc="" sha1="" offset="0x080000" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -3191,7 +3191,7 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="cart_back_label" value="n/a" />
             <feature name="slot" value="hirom_dsp" />
             <dataarea name="rom" size="524288">
-                <rom name="kart.u1" size="524288" crc="" sha1="" offset="0x000000" />
+                <rom name="kart.u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
             </dataarea>
             <dataarea name="addon" size="10240">
                 <rom name="dsp1.bin" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />
@@ -3275,8 +3275,8 @@ Beyond that last category are the roms waiting to be classified.
 				<rom name="sns-p yi 3.u4" size="524288" crc="6ff20708" sha1="5858fd056c33b656367b894f77f1b112260e494d" offset="0x180000" />
 			</dataarea>
 			<dataarea name="nvram" size="139264">
-				<!--rom name="u5" size="131072" offset="0x000000" /-->
-				<!--rom name="u6" size="8192"   offset="0x020000" /-->
+				<!--rom name="u5" size="131072" crc="" sha1="" offset="0x000000" status="nodump" /-->
+				<!--rom name="u6" size="8192"   crc="" sha1="" offset="0x020000" status="nodump" /-->
 			</dataarea>
 		</part>
 	</software>
@@ -3323,7 +3323,7 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="1048576">
-                <rom name="pinball rom 0 6265h.u1" size="524288" crc="" sha1="" offset="0x000000" />
+                <rom name="pinball rom 0 6265h.u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
                 <rom name="pinball rom 1 a3c8h.u2" size="524288" crc="4bc93ff7" sha1="168ae8ab16bd9cf6a63e41ee948f29fe5f175316" offset="0x080000" />
             </dataarea>
             <dataarea name="nvram" size="8192">
@@ -3377,7 +3377,7 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="524288">
               <!- - sticker: sôkoban - ->
-                <rom name="sfx super sokoban pack-in-video.u1" size="524288" crc="" sha1="" offset="0x000000" />
+                <rom name="sfx super sokoban pack-in-video.u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
             </dataarea>
             <dataarea name="nvram" size="8192">
             </dataarea>
@@ -3573,7 +3573,7 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="battery" value="BATT CR2032" />
             <feature name="cart_model" value="no shell" />
             <dataarea name="rom" size="524288">
-                <rom name="bandai ultra-man.u1" size="524288" crc="" sha1="" offset="0x000000" />
+                <rom name="bandai ultra-man.u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" />
             </dataarea>
             <dataarea name="nvram" size="8192">
             </dataarea>
@@ -4239,8 +4239,8 @@ Beyond that last category are the roms waiting to be classified.
 				<rom name="powerslide sfx 12-4-94 rn 0010.u1" size="524288" crc="65ce3729" sha1="30115db2558060d9293684f3d5810d063a0c710e" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="73728">
-				<!--rom name="u2" size="65536" offset="0x000000" /-->
-				<!--rom name="u3" size="8192"  offset="0x010000" /-->
+				<!--rom name="u2" size="65536" crc="" sha1="" offset="0x000000" status="nodump" /-->
+				<!--rom name="u3" size="8192"  crc="" sha1="" offset="0x010000" status="nodump" /-->
 			</dataarea>
 		</part>
 	</software>
@@ -5447,8 +5447,8 @@ more investigation needed...
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="131072">
 				<rom name="binary" size="131072" crc="ee4fca82" sha1="839f9fbb0d84bd0d43fda3c92bb1abf3e4ec0615" offset="0x000000" status="baddump" />
-				<!-- rom name="syndicat rom 0 ntsc.u1" size="524288" crc="" sha1="" offset="0x000000" /-->
-				<!-- rom name="u2"                     size="524288" crc="" sha1="" offset="0x080000" /-->
+				<!-- rom name="syndicat rom 0 ntsc.u1" size="524288" crc="" sha1="" offset="0x000000" status="nodump" /-->
+				<!-- rom name="u2"                     size="524288" crc="" sha1="" offset="0x080000" status="nodump" /-->
 			</dataarea>
 		</part>
 	</software>
@@ -11402,7 +11402,7 @@ more investigation needed...
             <feature name="cart_back_label" value="SNSP-ESP" />
             <feature name="slot" value="hirom" />
             <dataarea name="rom" size="4194304">
-                <rom name="spal-adnd-0.u1" size="4194304" crc="" sha1="" offset="0x000000" />
+                <rom name="spal-adnd-0.u1" size="4194304" crc="" sha1="" offset="0x000000" status="nodump" />
             </dataarea>
             <dataarea name="nvram" size="2048">
             </dataarea>
@@ -40128,8 +40128,8 @@ List of unclassified roms
 			<dataarea name="rom" size="3145728">
 			<!--dataarea name="rom" size="4194304"-->
 				<rom name="fire emblem - monshou no nazo (japan) (rev 1).sfc" size="3145728" crc="a427b7e6" sha1="b0b03831d9104e3c5df551d50ebc275a1692149e" offset="0x000000" />
-				<!--rom name="u3" size="2097152" crc="" sha1="" offset="0x000000" /-->
-				<!--rom name="u4" size="2097152" crc="" sha1="" offset="0x200000" /-->
+				<!--rom name="u3" size="2097152" crc="" sha1="" offset="0x000000" status="nodump" /-->
+				<!--rom name="u4" size="2097152" crc="" sha1="" offset="0x200000" status="nodump" /-->
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			<!--dataarea name="sram" size="32768"-->
@@ -53056,8 +53056,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
             <feature name="cart_back_label" value="SNSP-UKV" />
             <feature name="slot" value="hirom" />
             <dataarea name="rom" size="4194304">
-                <rom name="spal-r2-0 p0.u1" size="" crc="" sha1="" offset="0x000000" />
-                <rom name="spal-r2-0 p1.u1" size="" crc="" sha1="" offset="0x200000" />
+                <rom name="spal-r2-0 p0.u1" size="" crc="" sha1="" offset="0x000000" status="nodump" />
+                <rom name="spal-r2-0 p1.u1" size="" crc="" sha1="" offset="0x200000" status="nodump" />
             </dataarea>
             <dataarea name="nvram" size="2048">
             </dataarea>
@@ -58167,8 +58167,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="4194304">
 				<rom name="super fire pro wrestling x premium (japan).sfc" size="4194304" crc="82de1380" sha1="1d3b397ce08f88b6787df63d1914bdaeb2c3999c" offset="0x000000" />
-				<!--rom name="u3" size="2097152" crc="" sha1="" offset="0x000000" /-->
-				<!--rom name="u4" size="2097152" crc="" sha1="" offset="0x200000" /-->
+				<!--rom name="u3" size="2097152" crc="" sha1="" offset="0x000000" status="nodump" /-->
+				<!--rom name="u4" size="2097152" crc="" sha1="" offset="0x200000" status="nodump" /-->
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>

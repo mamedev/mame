@@ -233,7 +233,7 @@ void rollext_renderer::process_display_list(screen_device &screen, uint32_t* dis
 		vert[2].p[0] = 1.0f;        vert[2].p[1] = 0.0f;
 		vert[3].p[0] = 1.0f;        vert[3].p[1] = 1.0f;
 
-		rollext_polydata &extra = object_data_alloc();
+		rollext_polydata &extra = object_data().next();
 
 		extra.tex_bottom = (disp_ram[(ii + 8) / 4] >> 19) & 0x1fff;
 		extra.tex_left = (disp_ram[(ii + 8) / 4] >> 8) & 0x7ff;

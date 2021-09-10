@@ -16,8 +16,10 @@
 
 #include "flopimg.h"
 
-#include <cassert>
+#include "ioprocs.h"
+
 #include <cstring>
+
 
 #define BUFSZ           512     // new input buffer
 
@@ -59,7 +61,16 @@ struct tdlzhuf {
 
 struct td0dsk_t
 {
-	io_generic *floppy_file;
+public:
+	td0dsk_t(util::random_read &f) : floppy_file(f) { }
+
+	void set_floppy_file_offset(uint64_t o) { floppy_file_offset = o; }
+
+	void init_Decode();
+	int Decode(uint8_t *buf, int len);
+
+private:
+	util::random_read &floppy_file;
 	uint64_t floppy_file_offset;
 
 	struct tdlzhuf tdctl;
@@ -87,28 +98,9 @@ struct td0dsk_t
 	void update(int c);
 	int16_t DecodeChar();
 	int16_t DecodePosition();
-	void init_Decode();
-	int Decode(uint8_t *buf, int len);
 };
 
 //static td0dsk_t td0dsk;
-
-struct floppy_image_legacy
-{
-	struct io_generic io;
-
-	const struct FloppyFormat *floppy_option;
-	struct FloppyCallbacks format;
-
-	/* loaded track stuff */
-	int loaded_track_head;
-	int loaded_track_index;
-	uint32_t loaded_track_size;
-	void *loaded_track_data;
-	uint8_t loaded_track_status;
-	uint8_t flags;
-};
-
 
 static struct td0dsk_tag *get_tag(floppy_image_legacy *floppy)
 {
@@ -332,11 +324,13 @@ static floperr_t td0_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 
 int td0dsk_t::data_read(uint8_t *buf, uint16_t size)
 {
-	uint64_t image_size = io_generic_size(floppy_file);
+	uint64_t image_size = 0;
+	floppy_file.length(image_size);
 	if (size > image_size - floppy_file_offset) {
 		size = image_size - floppy_file_offset;
 	}
-	io_generic_read(floppy_file,buf,floppy_file_offset,size);
+	size_t actual;
+	floppy_file.read_at(floppy_file_offset, buf, size, actual);
 	floppy_file_offset += size;
 	return size;
 }
@@ -675,7 +669,6 @@ int td0dsk_t::Decode(uint8_t *buf, int len)  /* Decoding/Uncompressing */
 
 FLOPPY_CONSTRUCT( td0_dsk_construct )
 {
-	td0dsk_t state;
 	struct FloppyCallbacks *callbacks;
 	struct td0dsk_tag *tag;
 	uint8_t *header;
@@ -706,9 +699,9 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		int rd;
 		int off = 12;
 		int size = 0;
-		state.floppy_file = &(floppy->io);
+		td0dsk_t state(floppy_get_io(floppy));
 		state.init_Decode();
-		state.floppy_file_offset = 12;
+		state.set_floppy_file_offset(12);
 		do
 		{
 			if((rd = state.Decode(obuf, BUFSZ)) > 0) size += rd;
@@ -720,7 +713,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 			return FLOPPY_ERROR_OUTOFMEMORY;
 		}
 		memcpy(tag->data,obuf,12);
-		state.floppy_file_offset = 12;
+		state.set_floppy_file_offset(12);
 		state.init_Decode();
 		do
 		{
@@ -815,20 +808,22 @@ const char *td0_format::extensions() const
 	return "td0";
 }
 
-int td0_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int td0_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
+	size_t actual;
 	uint8_t h[7];
 
-	io_generic_read(io, h, 0, 7);
+	io.read_at(0, h, 7, actual);
 	if(((h[0] == 'T') && (h[1] == 'D')) || ((h[0] == 't') && (h[1] == 'd')))
 	{
-			return 100;
+		return 100;
 	}
 	return 0;
 }
 
-bool td0_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
 	int track_count = 0;
 	int head_count = 0;
 	int track_spt;
@@ -837,20 +832,24 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	std::vector<uint8_t> imagebuf(max_size);
 	uint8_t header[12];
 
-	io_generic_read(io, header, 0, 12);
+	io.read_at(0, header, 12, actual);
 	head_count = header[9];
 
 	if(header[0] == 't')
 	{
-		td0dsk_t disk_decode;
+		td0dsk_t disk_decode(io);
 
-		disk_decode.floppy_file = io;
 		disk_decode.init_Decode();
-		disk_decode.floppy_file_offset = 12;
+		disk_decode.set_floppy_file_offset(12);
 		disk_decode.Decode(&imagebuf[0], max_size);
 	}
 	else
-		io_generic_read(io, &imagebuf[0], 12, io_generic_size(io));
+	{
+		uint64_t image_size;
+		if(io.length(image_size))
+			return false;
+		io.read_at(12, &imagebuf[0], image_size, actual);
+	}
 
 	if(header[7] & 0x80)
 		offset = 10 + imagebuf[2] + (imagebuf[3] << 8);
@@ -1024,7 +1023,7 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 }
 
 
-bool td0_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool td0_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

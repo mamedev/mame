@@ -63,7 +63,7 @@ void output_footer(std::ostream &out);
 void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes);
 void output_sampleof(std::ostream &out, device_t &device);
 void output_bios(std::ostream &out, device_t const &device);
-void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device);
+void output_rom(std::ostream &out, machine_config &config, driver_enumerator *drivlist, const game_driver *driver, device_t &device);
 void output_device_refs(std::ostream &out, device_t &root);
 void output_sample(std::ostream &out, device_t &device);
 void output_chips(std::ostream &out, device_t &device, const char *root_tag);
@@ -84,7 +84,9 @@ void output_ramoptions(std::ostream &out, device_t &root);
 void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag);
 void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter);
 
-const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes);
+char const *get_merge_name(driver_enumerator &drivlist, game_driver const &driver, util::hash_collection const &romhashes);
+char const *get_merge_name(machine_config &config, device_t const &device, util::hash_collection const &romhashes);
+char const *get_merge_name(tiny_rom_entry const *roms, util::hash_collection const &romhashes);
 
 
 //**************************************************************************
@@ -658,7 +660,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 
 	// now print various additional information
 	output_bios(out, config.root_device());
-	output_rom(out, &drivlist, &driver, config.root_device());
+	output_rom(out, config, &drivlist, &driver, config.root_device());
 	output_device_refs(out, config.root_device());
 	output_sample(out, config.root_device());
 	output_chips(out, config.root_device(), "");
@@ -720,11 +722,14 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 	std::string src(device.source());
 	strreplace(src,"../", "");
 	out << util::string_format(" sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src.c_str()));
+	auto const parent(device.type().parent_rom_device_type());
+	if (parent)
+		out << util::string_format(" romof=\"%s\"", normalize_string(parent->shortname()));
 	output_sampleof(out, device);
 	out << ">\n" << util::string_format("\t\t<description>%s</description>\n", normalize_string(device.name()));
 
 	output_bios(out, device);
-	output_rom(out, nullptr, nullptr, device);
+	output_rom(out, config, nullptr, nullptr, device);
 	output_device_refs(out, device);
 
 	if (device.type().type() != typeid(samples_device)) // ignore samples_device itself
@@ -857,7 +862,7 @@ void output_bios(std::ostream &out, device_t const &device)
 //  the XML output
 //-------------------------------------------------
 
-void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device)
+void output_rom(std::ostream &out, machine_config &config, driver_enumerator *drivlist, const game_driver *driver, device_t &device)
 {
 	enum class type { BIOS, NORMAL, DISK };
 	std::map<u32, char const *> biosnames;
@@ -895,7 +900,7 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 				// loop until we run out of reloads
 				do
 				{
-					// loop until we run out of continues/ignores */
+					// loop until we run out of continues/ignores
 					u32 curlength(ROM_GETLENGTH(romp++));
 					while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp))
 						curlength += ROM_GETLENGTH(romp++);
@@ -909,7 +914,7 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 			};
 
 	// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
-	bool const do_merge_name = drivlist && dynamic_cast<driver_device *>(&device);
+	bool const driver_merge = drivlist && dynamic_cast<driver_device *>(&device);
 	for (type pass : { type::BIOS, type::NORMAL, type::DISK })
 	{
 		tiny_rom_entry const *region(nullptr);
@@ -937,7 +942,10 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 
 			// if we have a valid ROM and we are a clone, see if we can find the parent ROM
 			util::hash_collection const hashes(rom->hashdata);
-			char const *const merge_name((do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP)) ? get_merge_name(*drivlist, *driver, hashes) : nullptr);
+			char const *const merge_name(
+					hashes.flag(util::hash_collection::FLAG_NO_DUMP) ? nullptr :
+					driver_merge ? get_merge_name(*drivlist, *driver, hashes) :
+					get_merge_name(config, device, hashes));
 
 			// opening tag
 			if (is_disk)
@@ -945,7 +953,7 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 			else
 				out << "\t\t<rom";
 
-			// add name, merge, bios, and size tags */
+			// add name, merge, bios, and size tags
 			char const *const name(rom->name);
 			if (name && name[0])
 				out << util::string_format(" name=\"%s\"", normalize_string(name));
@@ -2041,21 +2049,51 @@ void output_ramoptions(std::ostream &out, device_t &root)
 //  parent set
 //-------------------------------------------------
 
-const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes)
+char const *get_merge_name(driver_enumerator &drivlist, game_driver const &driver, util::hash_collection const &romhashes)
 {
+	char const *result = nullptr;
+
 	// walk the parent chain
-	for (int clone_of = drivlist.find(driver.parent); 0 <= clone_of; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
+	for (int clone_of = drivlist.find(driver.parent); !result && (0 <= clone_of); clone_of = drivlist.find(drivlist.driver(clone_of).parent))
+		result = get_merge_name(drivlist.driver(clone_of).rom, romhashes);
+
+	return result;
+}
+
+
+char const *get_merge_name(machine_config &config, device_t const &device, util::hash_collection const &romhashes)
+{
+	char const *result = nullptr;
+
+	// check for a parent type
+	auto const parenttype(device.type().parent_rom_device_type());
+	if (parenttype)
 	{
+		// instantiate the parent device
+		machine_config::token const tok(config.begin_configuration(config.root_device()));
+		device_t *const parent = config.device_add("_parent", *parenttype, 0);
+
 		// look in the parent's ROMs
-		for (romload::region const &pregion : romload::entries(drivlist.driver(clone_of).rom).get_regions())
+		result = get_merge_name(parent->rom_region(), romhashes);
+
+		// remember to remove the device
+		config.device_remove("_parent");
+	}
+
+	return result;
+}
+
+
+char const *get_merge_name(tiny_rom_entry const *roms, util::hash_collection const &romhashes)
+{
+	for (romload::region const &pregion : romload::entries(roms).get_regions())
+	{
+		for (romload::file const &prom : pregion.get_files())
 		{
-			for (romload::file const &prom : pregion.get_files())
-			{
-				// stop when we find a match
-				util::hash_collection const phashes(prom.get_hashdata());
-				if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && (romhashes == phashes))
-					return prom.get_name();
-			}
+			// stop when we find a match
+			util::hash_collection const phashes(prom.get_hashdata());
+			if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && (romhashes == phashes))
+				return prom.get_name();
 		}
 	}
 

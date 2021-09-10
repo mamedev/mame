@@ -203,7 +203,7 @@ void taito_f3_state::f3_map(address_map &map)
 	map(0xc80100, 0xc80103).w(FUNC(taito_f3_state::sound_reset_1_w));
 }
 
-void taito_f3_state::bubsympb_oki_w(u8 data)
+void taito_f3_state::bubsympb_oki_w(u8 data) // TODO: this is wrong. PCB reference: https://www.youtube.com/watch?v=UbgPg8qUDig
 {
 	//printf("write %08x %08x\n",data,mem_mask);
 	const u8 bank = data & 0xf;
@@ -213,7 +213,7 @@ void taito_f3_state::bubsympb_oki_w(u8 data)
 	}
 	else
 	{
-		logerror("unknown oki bank write %02x at %08x", bank, m_maincpu->pc());
+		logerror("unknown oki bank write %02x at %08x\n", bank, m_maincpu->pc());
 	}
 	//printf("oki bank w %08x\n",data);
 }
@@ -2413,8 +2413,36 @@ ROM_START( bubsymphb )
 	ROM_LOAD       ("bsb_d11b.bin", 0x000000, 0x080000, CRC(d0607829) SHA1(546c629ec22bb98202c7127ccb77df0b8f3a1966) )
 
 	ROM_REGION( 0x100000, "oki" , ROMREGION_ERASE00 ) // OKI6295 samples
-	ROM_LOAD("bsb_d11.bin", 0x000000, 0x080000, CRC(26bdc617) SHA1(993e7a52128fdd58f22d95521a629beb71ca7b91) ) // I haven't verified this dump.. but given how bad the rest is I'm not confident
+	ROM_LOAD("bsb_d11.bin", 0x000000, 0x080000, CRC(26bdc617) SHA1(993e7a52128fdd58f22d95521a629beb71ca7b91) )
 	ROM_RELOAD(0x80000,0x80000)
+ROM_END
+
+ROM_START( bubsymphba ) // extremely similar to bubsymphb (i.e. the only differences in the program ROMs are copyright removals). 2 PCB set: 70121 MAIN + ROM board
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "2-27c2000.bin", 0x000000, 0x40000, CRC(b26728fa) SHA1(accd2530a5d0aa8baa4598a8312e8c8fd283008f) )
+	ROM_LOAD32_BYTE( "3-27c2000.bin", 0x000001, 0x40000, CRC(d7406de1) SHA1(7d064b249ff576058b762bf2b8dd6dc55bb88ec6) )
+	ROM_LOAD32_BYTE( "4-27c2000.bin", 0x000002, 0x40000, CRC(5a45a291) SHA1(54a53b3c1c057dabbca5e72b289a4f0f96048311) )
+	ROM_LOAD32_BYTE( "5-27c2000.bin", 0x000003, 0x40000, CRC(aad3806b) SHA1(5999c0dd78374b3adc2223ff76478eb2604fc8b8) )
+
+	ROM_REGION( 0x300000, "sprites" , ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "8-27c4000.bin",  0x080000, 0x080000, CRC(22d7eeb5) SHA1(30aa4493c5bc98d9256817b9e3341b20d2b76f1f) )
+	ROM_LOAD16_WORD_SWAP( "9-27c4000.bin",  0x100000, 0x080000, CRC(b8f7b1c6) SHA1(c51aa9168eab4083b5ce0e6c0da6ad6416bd17bd) )
+	ROM_LOAD16_WORD_SWAP( "10-27c4000.bin", 0x180000, 0x080000, CRC(d4981f73) SHA1(25c574aae85e185e01ba451dd15a4b4e14314f78) )
+	ROM_LOAD16_WORD_SWAP( "7-27c4000.bin",  0x200000, 0x080000, CRC(c1c35f7b) SHA1(9e7c821d9f717c56f9cc32f724046a40cc5e336e) )
+	ROM_LOAD16_WORD_SWAP( "6-27c4000.bin",  0x280000, 0x080000, CRC(35a60e28) SHA1(29504c9c2308443aa0b2cd1cd489fcb95737821a) )
+
+	ROM_REGION( 0x200000, "tilemap" , 0)
+	ROM_LOAD32_BYTE( "11-27c4000.bin", 0x000000, 0x080000, CRC(69f814b1) SHA1(9daaaff3652798006fa5432890bdc7c64fbb84c4) )
+	ROM_LOAD32_BYTE( "12-27c4000.bin", 0x000001, 0x080000, CRC(95add6ec) SHA1(5e33624921438bbf785313bd04b1860bd91097d3) )
+	ROM_LOAD32_BYTE( "13-27c4000.bin", 0x000002, 0x080000, CRC(5d87b202) SHA1(1625be0d8222388066694cd56c69b5768edd9513) )
+	ROM_LOAD32_BYTE( "14-27c4000.bin", 0x000003, 0x080000, CRC(8be51e5a) SHA1(69ea6c778eaea246bd763c93f087b6ae1ebf2e1e) )
+
+	ROM_REGION( 0x080000, "tilemap_hi", 0 )
+	ROM_LOAD( "15-27c4000.bin", 0x000000, 0x080000, CRC(45b3cf43) SHA1(f97684b69a56717b1e712dac1f8ff924d3775de0) )
+
+	ROM_REGION( 0x100000, "oki" , ROMREGION_ERASE00 )
+	ROM_LOAD( "1-27c4000.bin", 0x000000, 0x080000, CRC(26bdc617) SHA1(993e7a52128fdd58f22d95521a629beb71ca7b91) )
+	ROM_RELOAD( 0x80000, 0x80000 )
 ROM_END
 
 ROM_START( bubsymphu )
@@ -4686,7 +4714,8 @@ GAME( 1994, bublbob2p,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, RO
 GAME( 1994, bubsymphe,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Symphony (Ver 2.5O 1994/10/05)", 0 )
 GAME( 1994, bubsymphu,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito America Corporation", "Bubble Symphony (Ver 2.5A 1994/10/05)", 0 )
 GAME( 1994, bubsymphj,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation",         "Bubble Symphony (Ver 2.5J 1994/10/05)", 0 )
-GAME( 1994, bubsymphb,  bublbob2, bubsympb,f3, taito_f3_state, init_bubsympb, ROT0,   "bootleg",                   "Bubble Symphony (bootleg with OKI6295)", MACHINE_NOT_WORKING ) // backgrounds don't display
+GAME( 1994, bubsymphb,  bublbob2, bubsympb,f3, taito_f3_state, init_bubsympb, ROT0,   "bootleg",                   "Bubble Symphony (bootleg with OKI6295)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // backgrounds don't display, OKI banking is wrong
+GAME( 1994, bubsymphba, bublbob2, bubsympb,f3, taito_f3_state, init_bubsympb, ROT0,   "bootleg (SOFTV)",           "Seoul Symphony (Bubble Symphony bootleg with OKI6295)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // backgrounds don't display, OKI banking is wrong
 GAME( 1994, spcinvdj,   spacedx,  f3,      f3, taito_f3_state, init_spcinvdj, ROT0,   "Taito Corporation",         "Space Invaders DX (Ver 2.6J 1994/09/14) (F3 Version)", 0 )
 GAME( 1994, pwrgoal,    0,        f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito Corporation Japan",   "Taito Power Goal (Ver 2.5O 1994/11/03)", 0 )
 GAME( 1994, hthero95,   pwrgoal,  f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito Corporation",         "Hat Trick Hero '95 (Ver 2.5J 1994/11/03)", 0 )

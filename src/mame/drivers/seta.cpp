@@ -7953,7 +7953,7 @@ void downtown_state::tndrcade(machine_config &config)
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	ym3812_device &ym2(YM3812(config, "ym2", 16000000/4));   /* 4 MHz */
-	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -8009,7 +8009,7 @@ void downtown_state::twineagl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -8152,7 +8152,7 @@ void usclssic_state::usclssic(machine_config &config)
 	m_soundlatch[0]->set_separate_acknowledge(true);
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -8271,7 +8271,7 @@ void downtown_state::metafox(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void downtown_state::arbalest(machine_config &config)
@@ -8318,7 +8318,7 @@ void seta_state::atehate(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -8367,7 +8367,7 @@ void seta_state::blandia(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
 }
 
@@ -8406,7 +8406,7 @@ void seta_state::blandiap(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
 }
 
@@ -8446,7 +8446,7 @@ void seta_state::blockcar(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -8524,7 +8524,7 @@ void seta_state::daioh(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, XTAL(16'000'000));   /* 16 MHz, Verified from PCB audio */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -8583,7 +8583,7 @@ void seta_state::drgnunit(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void seta_state::stg(machine_config &config)
@@ -8722,7 +8722,7 @@ void seta_state::eightfrc(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
 }
 
@@ -8839,7 +8839,7 @@ void seta_state::gundhara(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -8915,7 +8915,7 @@ void seta_state::jjsquawk(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void seta_state::jjsquawb(machine_config &config)
@@ -8951,7 +8951,7 @@ void seta_state::jjsquawb(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -8999,7 +8999,7 @@ void seta_state::kamenrid(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9132,7 +9132,7 @@ void seta_state::krzybowl(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9180,7 +9180,7 @@ void seta_state::madshark(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9232,7 +9232,7 @@ void seta_state::magspeed(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9280,7 +9280,7 @@ void seta_state::msgundam(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void seta_state::msgundamb(machine_config &config)
@@ -9469,7 +9469,7 @@ void seta_state::rezon(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9510,7 +9510,7 @@ void seta_state::thunderl(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9628,7 +9628,7 @@ void seta_state::wits(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9667,7 +9667,7 @@ void seta_state::umanclub(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9774,7 +9774,7 @@ void seta_state::wrofaero(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9822,7 +9822,7 @@ void seta_state::zingzip(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9878,7 +9878,7 @@ void seta_state::pairlove(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
-	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -9930,10 +9930,10 @@ void seta_state::crazyfgt(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 16_MHz_XTAL / 4));
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 4.433619_MHz_XTAL / 4, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 

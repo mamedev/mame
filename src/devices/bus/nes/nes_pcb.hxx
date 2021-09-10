@@ -162,12 +162,11 @@ static const nes_pcb pcb_list[] =
 	{ "hengg_xhzs",       HENGG_XHZS },
 	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
 	{ "hes",              HES_BOARD },
-	{ "hosenkan",         HOSENKAN_BOARD },
 	{ "ks106c",           KAISER_KS106C },  // mapper 352
 	{ "ks202",            KAISER_KS202 },   // mapper 56
 	{ "ks7010",           KAISER_KS7010 },  // used in Akumajo Dracula (FDS Conversion)
 	{ "ks7012",           KAISER_KS7012 },  // used in Zanac (FDS Conversion)
-	{ "ks7013b",          KAISER_KS7013B }, // used in Highway Star (FDS Conversion)
+	{ "ks7013b",          KAISER_KS7013B }, // used in Highway Star Kaiser bootleg
 	{ "ks7016",           KAISER_KS7016 },  // used in Exciting Basketball (FDS Conversion)
 	{ "ks7016b",          KAISER_KS7016B }, // used in Meikyuu Jiin Dababa alt (FDS Conversion)
 	{ "ks7017",           KAISER_KS7017 },
@@ -226,6 +225,7 @@ static const nes_pcb pcb_list[] =
 	{ "family4646",       BMC_FAMILY_4646 },
 	{ "pikay2k",          BTL_PIKACHUY2K },  // mapper 254
 	{ "8237",             UNL_8237 },
+	{ "8237a",            UNL_8237A },
 	{ "sg_lionk",         SUPERGAME_LIONKING },
 	{ "sg_boog",          SUPERGAME_BOOGERMAN },
 	{ "kasing",           KASING_BOARD },
@@ -257,12 +257,15 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_80013b",       BMC_80013B },
 	{ "bmc_810544c",      BMC_810544C },
 	{ "bmc_830425c",      BMC_830425C },
+	{ "bmc_850437c",      BMC_850437C },
+	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
 	{ "bmc_gb63",         BMC_G63IN1 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
 	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
+	{ "bmc_k1029",        BMC_K1029 },
 	{ "bmc_k3006",        BMC_K3006 },
 	{ "bmc_k3036",        BMC_K3036 },
 	{ "bmc_k3046",        BMC_K3046 },
@@ -285,7 +288,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_72in1",        BMC_72IN1 },
 	{ "bmc_76in1",        BMC_76IN1 },
 	{ "bmc_s42in1",       BMC_76IN1 },
-	{ "bmc_110in1",       BMC_110IN1 },
 	{ "bmc_150in1",       BMC_150IN1 },
 	{ "bmc_190in1",       BMC_190IN1 },
 	{ "bmc_500in1",       BMC_500IN1 },
@@ -295,10 +297,16 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_8157",         BMC_8157 },
 	{ "bmc_g146",         BMC_G146 },
 	{ "bmc_11160",        BMC_11160 },
+	{ "a88s1",            BMC_A88S1 },
 	{ "fcgj8in1",         BMC_FCGENJIN_8IN1 },
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
+	{ "nt639",            BMC_NT639 },
+	{ "resettxrom0",      BMC_RESETTXROM0 },
+	{ "resettxrom1",      BMC_RESETTXROM1 },
+	{ "resettxrom2",      BMC_RESETTXROM2 },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "tech9in1",         BMC_TECHLINE9IN1 },
 	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
@@ -306,10 +314,11 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
 	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
 	{ "bmc_f15",          BMC_F15 },
+	{ "bmc_gn45",         BMC_GN45 },
 	{ "bmc_gold7in1",     BMC_GOLD_7IN1 },
-	{ "bmc_gc6in1",       BMC_GOLDENCARD_6IN1 },
 	{ "bmc_411120c",      BMC_411120C },
 	{ "bmc_830118c",      BMC_830118C },
+	{ "bmc_830832c",      BMC_830832C },
 	{ "bmc_841101c",      BMC_841101C },
 	{ "pjoy84",           BMC_PJOY84 },
 	{ "bmc_gold150",      BMC_GOLD150 },
@@ -334,6 +343,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_lh28_lh54",    UNL_LH28_LH54 },
 	{ "unl_lh31",         UNL_LH31 },
 	{ "unl_lh32",         UNL_LH32 },
+	{ "unl_lh42",         UNL_LH42 },
 	{ "unl_lh51",         UNL_LH51 },
 	{ "unl_lh53",         UNL_LH53 },
 	{ "unl_ac08",         UNL_AC08 },
@@ -354,7 +364,6 @@ static const nes_pcb pcb_list[] =
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
-	{ "8237a",            UNSUPPORTED_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },

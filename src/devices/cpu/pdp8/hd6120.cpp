@@ -606,9 +606,7 @@ void hd6120_device::execute_run()
 		case minor_state::TAD_4:
 			m_temp += m_ac;
 			if (m_temp >= 010000)
-				m_flags |= 4;
-			else
-				m_flags &= 3;
+				m_flags ^= 4; // LINK is complemented upon carry out
 			next_instruction();
 			break;
 

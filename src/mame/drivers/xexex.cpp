@@ -524,17 +524,17 @@ void xexex_state::xexex(machine_config &config)
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'000'000)/8)); // 4MHz
-	ymsnd.add_route(0, "filter1_l", 0.50);
-	ymsnd.add_route(0, "filter1_r", 0.50);
-	ymsnd.add_route(1, "filter2_l", 0.50);
-	ymsnd.add_route(1, "filter2_r", 0.50);
+	ymsnd.add_route(0, "filter1_l", 0.2);
+	ymsnd.add_route(0, "filter1_r", 0.2);
+	ymsnd.add_route(1, "filter2_l", 0.2);
+	ymsnd.add_route(1, "filter2_r", 0.2);
 
 	K054539(config, m_k054539, XTAL(18'432'000));
 	m_k054539->set_analog_callback(FUNC(xexex_state::ym_set_mixing));
-	m_k054539->add_route(0, "lspeaker", 1.0);
-	m_k054539->add_route(0, "rspeaker", 1.0);
-	m_k054539->add_route(1, "lspeaker", 1.0);
-	m_k054539->add_route(1, "rspeaker", 1.0);
+	m_k054539->add_route(0, "lspeaker", 0.4);
+	m_k054539->add_route(0, "rspeaker", 0.4);
+	m_k054539->add_route(1, "lspeaker", 0.4);
+	m_k054539->add_route(1, "rspeaker", 0.4);
 
 	FILTER_VOLUME(config, "filter1_l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "filter1_r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);

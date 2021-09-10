@@ -272,16 +272,19 @@ register. So what is controlling priority.
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "audio/taitosnd.h"
+#include "includes/taitoipt.h"
+#include "machine/taitocchip.h"
+#include "video/pc080sn.h"
+#include "video/pc090oj.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
-#include "machine/taitocchip.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
-#include "includes/taitoipt.h"
-#include "video/pc080sn.h"
-#include "video/pc090oj.h"
-#include "audio/taitosnd.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -312,7 +315,9 @@ public:
 		m_pc090oj(*this, "pc090oj"),
 		m_msm(*this, "msm%u", 0),
 		m_lspeaker(*this, "lspeaker"),
-		m_rspeaker(*this, "rspeaker")
+		m_rspeaker(*this, "rspeaker"),
+		m_z80bank(*this, "z80bank"),
+		m_recoil(*this, "Player%u_Recoil_Piston", 1U)
 	{ }
 
 	void opwolf(machine_config &config);
@@ -336,7 +341,6 @@ private:
 	void opwolf_adpcm_d_w(uint8_t data);
 	void opwolf_adpcm_e_w(uint8_t data);
 	void opwolf_spritectrl_w(offs_t offset, uint16_t data);
-	void sound_bankswitch_w(uint8_t data);
 	void opwolf_adpcm_b_w(offs_t offset, uint8_t data);
 	void opwolf_adpcm_c_w(offs_t offset, uint8_t data);
 	void counters_w(uint8_t data);
@@ -382,6 +386,8 @@ private:
 	required_device_array<msm5205_device, 2> m_msm;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
+	required_memory_bank m_z80bank;
+	output_finder<1> m_recoil;
 };
 
 
@@ -461,7 +467,7 @@ void opwolf_state::opwolfp_map(address_map &map)
 void opwolf_state::opwolf_sound_z80_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0x4000, 0x7fff).bankr(m_z80bank);
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x9002, 0x9100).nopr();
@@ -644,31 +650,24 @@ void opwolf_state::opwolf_spritectrl_w(offs_t offset, uint16_t data)
 	// popmessage("opwolf_spritectrl_w ctrl = %4x", data);
 	if (offset == 0)
 	{
-		/* bit 0 -> MOTOR1 transistor */
-		/* bit 1 -> MOTOR2 transistor */
-		/* bit 2 -> Reset c-chip and coin custom PC050CM (active low) */
-		/* bit 3 -> Not connected */
-		/* bit 4 -> LATCH - used to signal light gun position can be latched to inputs on v-blank */
-		/* bits 5-7 are the sprite palette bank */
+		// bit 0 -> MOTOR1 transistor
+		// bit 1 -> MOTOR2 transistor
+		// bit 2 -> Reset c-chip and coin custom PC050CM (active low)
+		// bit 3 -> Not connected
+		// bit 4 -> LATCH - used to signal light gun position can be latched to inputs on v-blank
+		// bits 5-7 are the sprite palette bank
 
 		m_pc090oj->sprite_ctrl_w(data);
 
-		/* If data & 3, the Piston Motor is activated via M-1/M-2 connector */
-		if (data & 3)
-		{
-			output().set_value("Player1_Recoil_Piston", 1);
-		}
-		else
-		{
-			output().set_value("Player1_Recoil_Piston", 0);
-		}
+		// If data & 3, the Piston Motor is activated via M-1/M-2 connector
+		m_recoil[0] = (data & 3) ? 1 : 0;
 	}
 }
 
 void opwolf_state::opwolf_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)
 {
 	sprite_colbank = (sprite_ctrl & 0xe0) >> 1;
-	pri_mask = 0xfc; /* sprites under top bg layer */
+	pri_mask = 0xfc; // sprites under top bg layer
 }
 
 uint32_t opwolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -708,11 +707,6 @@ GFXDECODE_END
 //**************************************************************************
 //  SOUND
 //**************************************************************************
-
-void opwolf_state::sound_bankswitch_w(uint8_t data)
-{
-	membank("z80bank")->set_entry(data & 0x03);
-}
 
 //0 - start ROM offset LSB
 //1 - start ROM offset MSB
@@ -817,8 +811,6 @@ void opwolf_state::init_opwolf()
 	// World & US version have different gun offsets, presumably slightly different gun hardware
 	m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
-
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 void opwolf_state::init_opwolfb()
@@ -826,20 +818,20 @@ void opwolf_state::init_opwolfb()
 	/* bootleg needs different range of raw gun coords */
 	m_opwolf_gun_xoffs = -2;
 	m_opwolf_gun_yoffs = 17;
-
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 void opwolf_state::init_opwolfp()
 {
 	m_opwolf_gun_xoffs = 5;
 	m_opwolf_gun_yoffs = 30;
-
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 void opwolf_state::machine_start()
 {
+	m_recoil.resolve();
+
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
 
@@ -938,7 +930,7 @@ void opwolf_state::opwolf(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));  /* 4 MHz */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.port_write_handler().set(FUNC(opwolf_state::sound_bankswitch_w));
+	ymsnd.port_write_handler().set_membank(m_z80bank).mask(0x03);
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
 
@@ -1012,7 +1004,7 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.port_write_handler().set(FUNC(opwolf_state::sound_bankswitch_w));
+	ymsnd.port_write_handler().set_membank(m_z80bank).mask(0x03);
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
 

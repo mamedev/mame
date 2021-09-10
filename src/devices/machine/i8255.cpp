@@ -64,7 +64,6 @@ enum
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(I8255, i8255_device, "i8255", "Intel 8255 PPI")
-decltype(I8255) I8255A = I8255;
 
 DEFINE_DEVICE_TYPE(AMS40489_PPI, ams40489_ppi_device, "ams40489_ppi", "Amstrad AMS40489 PPI")
 

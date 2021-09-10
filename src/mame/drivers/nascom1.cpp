@@ -367,7 +367,7 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 		}
 		else
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file format");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported file format");
 			return image_init_result::FAIL;
 		}
 		dummy = 0x00;
@@ -392,7 +392,7 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 	{
 		if (slot->length() > 0x1000)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file size");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported file size");
 			return image_init_result::FAIL;
 		}
 

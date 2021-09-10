@@ -597,22 +597,22 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 	{
 		if (quick_length < 0x0088)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+			image.seterror(image_error::INVALIDIMAGE, "File too short");
 			image.message(" File too short");
 		}
 		else
 		if (quick_length > 0x8000)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.seterror(image_error::INVALIDIMAGE, "File too long");
 			image.message(" File too long");
 		}
 		else
 		{
 			quick_data.resize(quick_length+1);
-			u16 read_ = image.fread( &quick_data[0], quick_length);
+			u16 read_ = image.fread(&quick_data[0], quick_length);
 			if (read_ != quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 				image.message(" Cannot read the file");
 			}
 			else
@@ -621,7 +621,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 				quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
 				if (image.length() != quick_length)
 				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid file header");
+					image.seterror(image_error::INVALIDIMAGE, "Invalid file header");
 					image.message(" Invalid file header");
 				}
 				else
@@ -643,7 +643,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 		quick_addr = 0xe000;
 		if (quick_length > 0x8000)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.seterror(image_error::INVALIDIMAGE, "File too long");
 			image.message(" File too long");
 		}
 		else
@@ -652,7 +652,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 			u16 read_ = image.fread( &quick_data[0], quick_length);
 			if (read_ != quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 				image.message(" Cannot read the file");
 			}
 			else

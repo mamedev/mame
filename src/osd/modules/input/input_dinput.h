@@ -46,7 +46,6 @@ class dinput_api_helper
 private:
 	Microsoft::WRL::ComPtr<IDirectInput8> m_dinput;
 	osd::dynamic_module::ptr              m_dinput_dll;
-	dinput_create_fn                      m_dinput_create_prt;
 
 public:
 	dinput_api_helper();

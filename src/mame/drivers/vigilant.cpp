@@ -161,9 +161,9 @@ static INPUT_PORTS_START( vigilant )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -171,9 +171,9 @@ static INPUT_PORTS_START( vigilant )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
@@ -521,12 +521,12 @@ void vigilant_state::vigilant(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
-	ymsnd.add_route(0, "lspeaker", 0.55);
-	ymsnd.add_route(1, "rspeaker", 0.55);
+	ymsnd.add_route(0, "lspeaker", 0.28);
+	ymsnd.add_route(1, "rspeaker", 0.28);
 
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
-	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
 
 void vigilant_state::buccanrs(machine_config &config)
@@ -637,12 +637,12 @@ void vigilant_state::kikcubic(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
-	ymsnd.add_route(0, "lspeaker", 0.55);
-	ymsnd.add_route(1, "rspeaker", 0.55);
+	ymsnd.add_route(0, "lspeaker", 0.28);
+	ymsnd.add_route(1, "rspeaker", 0.28);
 
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
-	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
 
 

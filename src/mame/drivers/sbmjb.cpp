@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/*
 
-    Sonic Blast Man's Janken Battle (c) 1998 Taito
+/*
+    Sonic Blast Man's Janken Battle (ソニックブラストマンのジャンケンバトル) (c) 1998 Taito
 
     Redemption game based on Janken, a Japanese game similar to Rock Paper Scissors
     Video: https://www.youtube.com/watch?v=AFWLMHbpQz8
 
-    A (possibly) one-off PCB design with the following main components:
+    Other undumped games believed to use the same hardware:
+    Bubblen Roulette (バブルンるーれっと) (c) 1997 Taito - video: https://www.youtube.com/watch?v=AaugRz3cqv0
+    Harikiri Junior Baseball (はりきりジュニアベースボール) (c) 1998 Taito - video: https://www.youtube.com/watch?v=eRZctnd8whE
+    Packy's Treasure Slot (パッキイのトレジャースロット) (c) 1997 Taito - video: https://www.youtube.com/watch?v=IPse14eGiqM
+
+    Main components:
     2 x Z0840004PSC
     1 x TC0091LVC (marked as TC0090LVC on PCB)
     1 x YM2203C
@@ -30,8 +35,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/te7750.h"
 #include "machine/tc009xlvc.h"
+#include "machine/te7750.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
@@ -181,7 +187,7 @@ void sbmjb_state::sbmjb(machine_config &config)
 	opn.irq_handler().set_inputline("audiocpu", 0);
 	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // pin not verified
+	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // pin not verified
 }
 
 
@@ -210,4 +216,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1998, sbmjb, 0, sbmjb, sbmjb, sbmjb_state, empty_init, ROT0, "Taito", "Sonic Blast Man's Janken Battle (main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING )
+GAME( 1998, sbmjb, 0, sbmjb, sbmjb, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING )

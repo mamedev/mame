@@ -19,14 +19,13 @@
 
 #include <memory>
 #include <string>
+#include <system_error>
 #include <vector>
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-extern struct io_procs image_ioprocs;
 
 enum iodevice_t
 {
@@ -55,17 +54,18 @@ enum iodevice_t
 	IO_COUNT        /* 21 - Total Number of IO_devices for searching */
 };
 
-enum image_error_t
+enum class image_error : int
 {
-	IMAGE_ERROR_SUCCESS,
-	IMAGE_ERROR_INTERNAL,
-	IMAGE_ERROR_UNSUPPORTED,
-	IMAGE_ERROR_OUTOFMEMORY,
-	IMAGE_ERROR_FILENOTFOUND,
-	IMAGE_ERROR_INVALIDIMAGE,
-	IMAGE_ERROR_ALREADYOPEN,
-	IMAGE_ERROR_UNSPECIFIED
+	INTERNAL = 1,
+	UNSUPPORTED,
+	INVALIDIMAGE,
+	ALREADYOPEN,
+	UNSPECIFIED
 };
+
+const std::error_category &image_category() noexcept;
+inline std::error_condition make_error_condition(image_error e) noexcept { return std::error_condition(int(e), image_category()); }
+namespace std { template <> struct is_error_condition_enum<image_error> : public std::true_type { }; }
 
 struct image_device_type_info
 {
@@ -150,7 +150,7 @@ public:
 	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
 
 	std::string_view error();
-	void seterror(image_error_t err, const char *message);
+	void seterror(std::error_condition err, const char *message);
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
 	bool exists() const noexcept { return !m_image_name.empty(); }
@@ -172,7 +172,7 @@ public:
 	int fgetc() { char ch; if (fread(&ch, 1) != 1) ch = '\0'; return ch; }
 	char *fgets(char *buffer, u32 length) { check_for_file(); return m_file->gets(buffer, length); }
 	int image_feof() { check_for_file(); return m_file->eof(); }
-	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
+	void *ptr() { check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
 
 	const software_info *software_entry() const noexcept;
@@ -217,7 +217,7 @@ public:
 	image_init_result create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args);
 	image_init_result create(std::string_view path);
 	bool load_software(software_list_device &swlist, std::string_view swname, const rom_entry *entry);
-	int reopen_for_write(std::string_view path);
+	std::error_condition reopen_for_write(std::string_view path);
 
 	void set_user_loadable(bool user_loadable) { m_user_loadable = user_loadable; }
 
@@ -233,7 +233,7 @@ protected:
 	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
 
 	image_init_result load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
-	image_error_t load_image_by_path(u32 open_flags, std::string_view path);
+	std::error_condition load_image_by_path(u32 open_flags, std::string_view path);
 	void clear();
 	bool is_loaded() const { return m_file != nullptr; }
 
@@ -260,7 +260,7 @@ protected:
 	static const image_device_type_info m_device_info_array[];
 
 	// error related info
-	image_error_t m_err;
+	std::error_condition m_err;
 	std::string m_err_message;
 
 private:
@@ -277,7 +277,6 @@ private:
 	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
-	static image_error_t image_error_from_file_error(osd_file::error filerr);
 	std::vector<u32> determine_open_plan(bool is_create);
 	void update_names();
 	bool load_software_part(std::string_view identifier);

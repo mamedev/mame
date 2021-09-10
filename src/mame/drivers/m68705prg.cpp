@@ -67,7 +67,7 @@ protected:
 		auto const actual(m_eprom_image->common_get_size("rom"));
 		if (desired > actual)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported EPROM size");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported EPROM size");
 			return image_init_result::FAIL;
 		}
 		else
@@ -84,7 +84,7 @@ protected:
 		auto const actual(m_mcu_image->common_get_size("rom"));
 		if (desired != actual)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect internal MCU EPROM size");
+			image.seterror(image_error::INVALIDIMAGE, "Incorrect internal MCU EPROM size");
 			return image_init_result::FAIL;
 		}
 		else

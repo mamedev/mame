@@ -544,7 +544,6 @@ void nec_common_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
-	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
 	set_icountptr(m_icount);
@@ -612,10 +611,6 @@ void nec_common_device::state_export(const device_state_entry &entry)
 
 		case STATE_GENPCBASE:
 			m_debugger_temp = (Sreg(PS)<<4) + m_prev_ip;
-			break;
-
-		case STATE_GENSP:
-			m_debugger_temp = (Sreg(SS)<<4) + Wreg(SP);
 			break;
 
 		case NEC_PSW:

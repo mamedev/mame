@@ -12,14 +12,13 @@
 
 #pragma once
 
-
 #include "osdfile.h"
 #include "strformat.h"
 
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <string_view>
+#include <system_error>
 
 
 namespace util {
@@ -29,11 +28,6 @@ namespace util {
 ***************************************************************************/
 
 #define OPEN_FLAG_NO_BOM        0x0100      /* don't output BOM */
-
-#define FCOMPRESS_NONE          0           /* no compression */
-#define FCOMPRESS_MIN           1           /* minimal compression */
-#define FCOMPRESS_MEDIUM        6           /* standard compression */
-#define FCOMPRESS_MAX           9           /* maximum compression */
 
 
 /***************************************************************************
@@ -49,22 +43,19 @@ public:
 	// ----- file open/close -----
 
 	// open a file with the specified filename
-	static osd_file::error open(std::string const &filename, std::uint32_t openflags, ptr &file);
+	static std::error_condition open(std::string_view filename, std::uint32_t openflags, ptr &file);
 
 	// open a RAM-based "file" using the given data and length (read-only)
-	static osd_file::error open_ram(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
+	static std::error_condition open_ram(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
 
 	// open a RAM-based "file" using the given data and length (read-only), copying the data
-	static osd_file::error open_ram_copy(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
+	static std::error_condition open_ram_copy(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
 
 	// open a proxy "file" that forwards requests to another file object
-	static osd_file::error open_proxy(core_file &file, ptr &proxy);
+	static std::error_condition open_proxy(core_file &file, ptr &proxy);
 
 	// close an open file
 	virtual ~core_file();
-
-	// enable/disable streaming file compression via zlib; level is 0 to disable compression, or up to 9 for max compression
-	virtual osd_file::error compress(int level) = 0;
 
 
 	// ----- file positioning -----
@@ -101,8 +92,8 @@ public:
 	virtual const void *buffer() = 0;
 
 	// open a file with the specified filename, read it into memory, and return a pointer
-	static osd_file::error load(std::string const &filename, void **data, std::uint32_t &length);
-	static osd_file::error load(std::string const &filename, std::vector<uint8_t> &data);
+	static std::error_condition load(std::string_view filename, void **data, std::uint32_t &length);
+	static std::error_condition load(std::string_view filename, std::vector<uint8_t> &data);
 
 
 	// ----- file write -----
@@ -121,31 +112,15 @@ public:
 	}
 
 	// file truncation
-	virtual osd_file::error truncate(std::uint64_t offset) = 0;
+	virtual std::error_condition truncate(std::uint64_t offset) = 0;
 
 	// flush file buffers
-	virtual osd_file::error flush() = 0;
+	virtual std::error_condition flush() = 0;
 
 
 protected:
 	core_file();
 };
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-// is a given character a directory separator?
-
-constexpr bool is_directory_separator(char c)
-{
-#if defined(WIN32)
-	return ('\\' == c) || ('/' == c) || (':' == c);
-#else
-	return '/' == c;
-#endif
-}
 
 } // namespace util
 
@@ -157,13 +132,13 @@ constexpr bool is_directory_separator(char c)
 /* ----- filename utilities ----- */
 
 // extract the base part of a filename (remove extensions and paths)
-std::string_view core_filename_extract_base(std::string_view name, bool strip_extension = false);
+std::string_view core_filename_extract_base(std::string_view name, bool strip_extension = false) noexcept;
 
 // extracts the file extension from a filename
-std::string_view core_filename_extract_extension(std::string_view filename, bool strip_period = false);
+std::string_view core_filename_extract_extension(std::string_view filename, bool strip_period = false) noexcept;
 
 // true if the given filename ends with a particular extension
-bool core_filename_ends_with(std::string_view filename, std::string_view extension);
+bool core_filename_ends_with(std::string_view filename, std::string_view extension) noexcept;
 
 
 #endif // MAME_LIB_UTIL_COREFILE_H

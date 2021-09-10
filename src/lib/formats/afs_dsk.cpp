@@ -30,12 +30,13 @@ const char *afs_format::extensions() const
 	return "adl,img";
 }
 
-int afs_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int afs_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 50;
+
 	return 0;
 }
 

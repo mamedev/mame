@@ -202,8 +202,8 @@ uint8_t nb1413m3_device::sndrom_r(address_space &space, offs_t offset)
 {
 	int rombank;
 
-	/* get top 8 bits of the I/O port address */
-	offset = (offset << 8) | (space.device().state().state_int(Z80_BC) >> 8);
+	// get top 8 bits of the I/O port address (FIXME: do this the correct way with 16-bit addressing)
+	offset = (offset << 8) | (downcast<z80_device &>(space.device()).state_int(Z80_BC) >> 8);
 
 	switch (m_nb1413m3_type)
 	{

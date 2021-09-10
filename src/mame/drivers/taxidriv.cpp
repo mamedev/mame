@@ -12,13 +12,76 @@ OTHER: 5 * M5L8255AP
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/taxidriv.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
+
+class taxidriv_state : public driver_device
+{
+public:
+	taxidriv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram%u", 0U),
+		m_scroll(*this, "scroll"),
+		m_servcoin(*this, "SERVCOIN")
+	{ }
+
+	void taxidriv(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr_array<uint8_t, 8> m_vram;
+	required_shared_ptr<uint8_t> m_scroll;
+
+	required_ioport m_servcoin;
+
+	int m_s1;
+	int m_s2;
+	int m_s3;
+	int m_s4;
+	int m_latchA;
+	int m_latchB;
+	int m_bghide;
+	int m_spritectrl[9];
+
+	uint8_t p0a_r();
+	uint8_t p0c_r();
+	void p0b_w(uint8_t data);
+	void p0c_w(uint8_t data);
+	uint8_t p1b_r();
+	uint8_t p1c_r();
+	void p1a_w(uint8_t data);
+	void p1c_w(uint8_t data);
+	uint8_t p8910_0a_r();
+	uint8_t p8910_1a_r();
+	void p8910_0b_w(uint8_t data);
+	template <unsigned Offset> void spritectrl_w(uint8_t data);
+
+	void taxidriv_palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cpu2_map(address_map &map);
+	void cpu3_map(address_map &map);
+	void cpu3_port_map(address_map &map);
+	void main_map(address_map &map);
+};
 
 
 void taxidriv_state::machine_start()
@@ -33,16 +96,6 @@ void taxidriv_state::machine_start()
 	save_item(NAME(m_spritectrl));
 }
 
-void taxidriv_state::p2a_w(uint8_t data) { spritectrl_w(0,data); }
-void taxidriv_state::p2b_w(uint8_t data) { spritectrl_w(1,data); }
-void taxidriv_state::p2c_w(uint8_t data) { spritectrl_w(2,data); }
-void taxidriv_state::p3a_w(uint8_t data) { spritectrl_w(3,data); }
-void taxidriv_state::p3b_w(uint8_t data) { spritectrl_w(4,data); }
-void taxidriv_state::p3c_w(uint8_t data) { spritectrl_w(5,data); }
-void taxidriv_state::p4a_w(uint8_t data) { spritectrl_w(6,data); }
-void taxidriv_state::p4b_w(uint8_t data) { spritectrl_w(7,data); }
-void taxidriv_state::p4c_w(uint8_t data) { spritectrl_w(8,data); }
-
 
 uint8_t taxidriv_state::p0a_r()
 {
@@ -51,7 +104,7 @@ uint8_t taxidriv_state::p0a_r()
 
 uint8_t taxidriv_state::p0c_r()
 {
-	return (m_s1 << 7);
+	return m_s1 << 7;
 }
 
 void taxidriv_state::p0b_w(uint8_t data)
@@ -79,7 +132,7 @@ uint8_t taxidriv_state::p1b_r()
 
 uint8_t taxidriv_state::p1c_r()
 {
-	return (m_s2 << 7) | (m_s4 << 6) | ((ioport("SERVCOIN")->read() & 1) << 4);
+	return (m_s2 << 7) | (m_s4 << 6) | ((m_servcoin->read() & 1) << 4);
 }
 
 void taxidriv_state::p1a_w(uint8_t data)
@@ -110,27 +163,159 @@ void taxidriv_state::p8910_0b_w(uint8_t data)
 	m_s4 = data & 1;
 }
 
+
+template <unsigned Offset>
+void taxidriv_state::spritectrl_w(uint8_t data)
+{
+	m_spritectrl[Offset] = data;
+}
+
+
+uint32_t taxidriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_bghide)
+	{
+		bitmap.fill(0, cliprect);
+
+
+		/* kludge to fix scroll after death */
+		m_scroll[0] = m_scroll[1] = m_scroll[2] = m_scroll[3] = 0;
+		m_spritectrl[2] = m_spritectrl[5] = m_spritectrl[8] = 0;
+	}
+	else
+	{
+		for (int offs = 0;offs < 0x400;offs++)
+		{
+			int sx = offs % 32;
+			int sy = offs / 32;
+
+			m_gfxdecode->gfx(3)->opaque(bitmap,cliprect,
+					m_vram[3][offs],
+					0,
+					0,0,
+					(sx*8-m_scroll[0])&0xff,(sy*8-m_scroll[1])&0xff);
+		}
+
+		for (int offs = 0;offs < 0x400;offs++)
+		{
+			int sx = offs % 32;
+			int sy = offs / 32;
+
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+					m_vram[2][offs]+256*m_vram[2][offs+0x400],
+					0,
+					0,0,
+					(sx*8-m_scroll[2])&0xff,(sy*8-m_scroll[3])&0xff,0);
+		}
+
+		if (m_spritectrl[2] & 4)
+		{
+			for (int offs = 0;offs < 0x1000;offs++)
+			{
+				int sx = ((offs/2) % 64-m_spritectrl[0]-256*(m_spritectrl[2]&1))&0x1ff;
+				int sy = ((offs/2) / 64-m_spritectrl[1]-128*(m_spritectrl[2]&2))&0x1ff;
+
+				int color = (m_vram[5][offs/4]>>(2*(offs&3)))&0x03;
+				if (color)
+				{
+					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
+						bitmap.pix(sy, sx) = color;
+				}
+			}
+		}
+
+		if (m_spritectrl[5] & 4)
+		{
+			for (int offs = 0;offs < 0x1000;offs++)
+			{
+				int sx = ((offs/2) % 64-m_spritectrl[3]-256*(m_spritectrl[5]&1))&0x1ff;
+				int sy = ((offs/2) / 64-m_spritectrl[4]-128*(m_spritectrl[5]&2))&0x1ff;
+
+				int color = (m_vram[6][offs/4]>>(2*(offs&3)))&0x03;
+				if (color)
+				{
+					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
+						bitmap.pix(sy, sx) = color;
+				}
+			}
+		}
+
+		if (m_spritectrl[8] & 4)
+		{
+			for (int offs = 0;offs < 0x1000;offs++)
+			{
+				int sx = ((offs/2) % 64-m_spritectrl[6]-256*(m_spritectrl[8]&1))&0x1ff;
+				int sy = ((offs/2) / 64-m_spritectrl[7]-128*(m_spritectrl[8]&2))&0x1ff;
+
+				int color = (m_vram[7][offs/4]>>(2*(offs&3)))&0x03;
+				if (color)
+				{
+					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
+						bitmap.pix(sy, sx) = color;
+				}
+			}
+		}
+
+		for (int offs = 0;offs < 0x400;offs++)
+		{
+			int sx = offs % 32;
+			int sy = offs / 32;
+
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					m_vram[1][offs],
+					0,
+					0,0,
+					sx*8,sy*8,0);
+		}
+
+		for (int offs = 0;offs < 0x2000;offs++)
+		{
+			int sx = (offs/2) % 64;
+			int sy = (offs/2) / 64;
+
+			int color = (m_vram[4][offs/4]>>(2*(offs&3)))&0x03;
+			if (color)
+			{
+				bitmap.pix(sy, sx) = 2 * color;
+			}
+		}
+	}
+
+	for (int offs = 0;offs < 0x400;offs++)
+	{
+		int sx = offs % 32;
+		int sy = offs / 32;
+
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_vram[0][offs],
+				0,
+				0,0,
+				sx*8,sy*8,0);
+	}
+	return 0;
+}
+
 void taxidriv_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram(); /* ??? */
-	map(0x9000, 0x9fff).ram(); /* ??? */
-	map(0xa000, 0xafff).ram(); /* ??? */
-	map(0xb000, 0xbfff).ram(); /* ??? */
-	map(0xc000, 0xc7ff).ram().share("vram4");           /* radar bitmap */
-	map(0xc800, 0xcfff).writeonly().share("vram5"); /* "sprite1" bitmap */
-	map(0xd000, 0xd7ff).writeonly().share("vram6"); /* "sprite2" bitmap */
-	map(0xd800, 0xdfff).ram().share("vram7"); /* "sprite3" bitmap */
-	map(0xe000, 0xe3ff).ram().share("vram1"); /* car tilemap */
-	map(0xe400, 0xebff).ram().share("vram2"); /* bg1 tilemap */
-	map(0xec00, 0xefff).ram().share("vram0"); /* fg tilemap */
-	map(0xf000, 0xf3ff).ram().share("vram3"); /* bg2 tilemap */
+	map(0x8000, 0x8fff).ram(); // ???
+	map(0x9000, 0x9fff).ram(); // ???
+	map(0xa000, 0xafff).ram(); // ???
+	map(0xb000, 0xbfff).ram(); // ???
+	map(0xc000, 0xc7ff).ram().share(m_vram[4]);       // radar bitmap
+	map(0xc800, 0xcfff).writeonly().share(m_vram[5]); // "sprite1" bitmap
+	map(0xd000, 0xd7ff).writeonly().share(m_vram[6]); // "sprite2" bitmap
+	map(0xd800, 0xdfff).ram().share(m_vram[7]);       // "sprite3" bitmap
+	map(0xe000, 0xe3ff).ram().share(m_vram[1]);       // car tilemap
+	map(0xe400, 0xebff).ram().share(m_vram[2]);       // bg1 tilemap
+	map(0xec00, 0xefff).ram().share(m_vram[0]);       // fg tilemap
+	map(0xf000, 0xf3ff).ram().share(m_vram[3]);       // bg2 tilemap
 	map(0xf400, 0xf403).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf480, 0xf483).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite1" placement */
-	map(0xf500, 0xf503).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite2" placement */
-	map(0xf580, 0xf583).rw("ppi8255_4", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite3" placement */
-	//map(0xf780, 0xf781).writeonly();    /* more scroll registers? */
-	map(0xf782, 0xf787).writeonly().share("scroll");    /* bg scroll (three copies always identical) */
+	map(0xf480, 0xf483).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    // "sprite1" placement
+	map(0xf500, 0xf503).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));    // "sprite2" placement
+	map(0xf580, 0xf583).rw("ppi8255_4", FUNC(i8255_device::read), FUNC(i8255_device::write));    // "sprite3" placement
+	//map(0xf780, 0xf781).writeonly();    // more scroll registers?
+	map(0xf782, 0xf787).writeonly().share("scroll");    // bg scroll (three copies always identical)
 	map(0xf800, 0xffff).ram();
 }
 
@@ -363,19 +548,19 @@ void taxidriv_state::taxidriv(machine_config &config)
 	ppi1.out_pc_callback().set(FUNC(taxidriv_state::p1c_w));
 
 	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
-	ppi2.out_pa_callback().set(FUNC(taxidriv_state::p2a_w));
-	ppi2.out_pb_callback().set(FUNC(taxidriv_state::p2b_w));
-	ppi2.out_pc_callback().set(FUNC(taxidriv_state::p2c_w));
+	ppi2.out_pa_callback().set(FUNC(taxidriv_state::spritectrl_w<0>));
+	ppi2.out_pb_callback().set(FUNC(taxidriv_state::spritectrl_w<1>));
+	ppi2.out_pc_callback().set(FUNC(taxidriv_state::spritectrl_w<2>));
 
 	i8255_device &ppi3(I8255A(config, "ppi8255_3"));
-	ppi3.out_pa_callback().set(FUNC(taxidriv_state::p3a_w));
-	ppi3.out_pb_callback().set(FUNC(taxidriv_state::p3b_w));
-	ppi3.out_pc_callback().set(FUNC(taxidriv_state::p3c_w));
+	ppi3.out_pa_callback().set(FUNC(taxidriv_state::spritectrl_w<3>));
+	ppi3.out_pb_callback().set(FUNC(taxidriv_state::spritectrl_w<4>));
+	ppi3.out_pc_callback().set(FUNC(taxidriv_state::spritectrl_w<5>));
 
 	i8255_device &ppi4(I8255A(config, "ppi8255_4"));
-	ppi4.out_pa_callback().set(FUNC(taxidriv_state::p4a_w));
-	ppi4.out_pb_callback().set(FUNC(taxidriv_state::p4b_w));
-	ppi4.out_pc_callback().set(FUNC(taxidriv_state::p4c_w));
+	ppi4.out_pa_callback().set(FUNC(taxidriv_state::spritectrl_w<6>));
+	ppi4.out_pb_callback().set(FUNC(taxidriv_state::spritectrl_w<7>));
+	ppi4.out_pc_callback().set(FUNC(taxidriv_state::spritectrl_w<8>));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -446,6 +631,8 @@ ROM_START( taxidriv )
 	ROM_REGION( 0x020, "proms", 0 )
 	ROM_LOAD( "tbp18s030.ic2",  0x0000, 0x020, CRC(c366a9c5) SHA1(d38581e5c425cab4a4f216d99651e86d8034a7d2) ) // color prom located at edge of pcb
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, taxidriv_state, empty_init, ROT90, "Graphic Techno", "Taxi Driver", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

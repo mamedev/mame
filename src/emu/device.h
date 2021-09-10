@@ -69,15 +69,11 @@ namespace emu::detail {
 class device_type_impl_base;
 
 
-template <typename T> struct is_device_implementation
-{
-	static constexpr bool value = std::is_base_of<device_t, T>::value;
-};
+template <typename T>
+using is_device_implementation = std::bool_constant<std::is_base_of_v<device_t, T> >;
 
-template <typename T> struct is_device_interface
-{
-	static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value;
-};
+template <typename T>
+using is_device_interface = std::bool_constant<std::is_base_of_v<device_interface, T> && !is_device_implementation<T>::value>;
 
 
 struct device_feature
@@ -224,6 +220,7 @@ private:
 	char const *const m_source;
 	device_feature::type const m_unemulated_features;
 	device_feature::type const m_imperfect_features;
+	device_type_impl_base const *const m_parent_rom;
 
 	device_type_impl_base *m_next;
 
@@ -238,6 +235,7 @@ public:
 		, m_source(nullptr)
 		, m_unemulated_features(device_feature::NONE)
 		, m_imperfect_features(device_feature::NONE)
+		, m_parent_rom(nullptr)
 		, m_next(nullptr)
 	{
 	}
@@ -251,6 +249,7 @@ public:
 		, m_source(Source)
 		, m_unemulated_features(DeviceClass::unemulated_features())
 		, m_imperfect_features(DeviceClass::imperfect_features())
+		, m_parent_rom(DeviceClass::parent_rom_device_type())
 		, m_next(device_registrar::register_device(*this))
 	{
 	}
@@ -264,6 +263,7 @@ public:
 		, m_source(Source)
 		, m_unemulated_features(DriverClass::unemulated_features() | Unemulated)
 		, m_imperfect_features((DriverClass::imperfect_features() & ~Unemulated) | Imperfect)
+		, m_parent_rom(DriverClass::parent_rom_device_type())
 		, m_next(nullptr)
 	{
 	}
@@ -274,6 +274,7 @@ public:
 	char const *source() const { return m_source; }
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
+	device_type_impl_base const *parent_rom_device_type() const { return m_parent_rom; }
 
 	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
 	{
@@ -334,42 +335,126 @@ template <
 		emu::detail::device_feature::type Imperfect>
 constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>;
 
+
+/// \addtogroup machinedef
+/// \{
+
+/// \brief Declare a device type
+///
+/// Declares a device type where the exposed device class is in the
+/// global namespace.  Must be used in the global namespace.
+///
+/// In addition to declaring the device type itself, a forward
+/// declaration for the exposed device class is generated, and automatic
+/// instantiation of device finder templates for the exposed device
+/// class is suppressed.
+/// \param Type The device type name (an identifier).  By convention,
+///   these start with an uppercase letter and consist only of uppercase
+///   letters and underscores.
+/// \param Class The exposed device class name.  Must be the device
+///   implementation class, or a public base of it, and must be derived
+///   from #device_t.
+/// \sa DECLARE_DEVICE_TYPE_NS DEFINE_DEVICE_TYPE
+///   DEFINE_DEVICE_TYPE_PRIVATE
 #define DECLARE_DEVICE_TYPE(Type, Class) \
 		class Class; \
-		extern emu::detail::device_type_impl<Class> const &Type; \
+		extern emu::detail::device_type_impl<Class> const Type; \
 		extern template class device_finder<Class, false>; \
 		extern template class device_finder<Class, true>;
 
+
+/// \brief Declare a device type for a class in a namespace
+///
+/// Declares a device type where the exposed device class is not in the
+/// global namespace.  Must be used in the global namespace.
+///
+/// In addition to declaring the device type itself, a forward
+/// declaration for the exposed device class is generated, and automatic
+/// instantiation of device finder templates for the exposed device
+/// class is suppressed.
+/// \param Type The device type name (an identifier).  By convention,
+///   these start with an uppercase letter and consist only of uppercase
+///   letters and underscores.
+/// \param Namespace The fully qualified name of the namespace
+///   containing the exposed device class.
+/// \param Class The exposed device class name, without namespace
+///   qualifiers.  Must be the device implementation class, or a public
+///   base of it, and must be derived from #device_t.
+/// \sa DECLARE_DEVICE_TYPE DEFINE_DEVICE_TYPE
+///   DEFINE_DEVICE_TYPE_PRIVATE
 #define DECLARE_DEVICE_TYPE_NS(Type, Namespace, Class) \
 		namespace Namespace { class Class; } \
-		extern emu::detail::device_type_impl<Namespace::Class> const &Type; \
+		extern emu::detail::device_type_impl<Namespace::Class> const Type; \
 		extern template class device_finder<Namespace::Class, false>; \
 		extern template class device_finder<Namespace::Class, true>;
 
+
+/// \brief Define a device type
+///
+/// Defines a device type where the exposed device class is the same as
+/// the device implementation class.  Must be used in the global
+/// namespace.
+///
+/// As well as defining the device type, device finder templates are
+/// instantiated for the device class.
+/// \param Type The device type name (an identifier).  By convention,
+///   these start with an uppercase letter and consist only of uppercase
+///   letters and underscores.
+/// \param Class The device implementation class name.  Must be the same
+///   as the exposed device class, and must be derived from #device_t.
+/// \param ShortName The short name of the device, used for
+///   identification, and in filesystem paths for assets and data.  Must
+///   be a string no longer than thirty-two characters, containing only
+///   ASCII lowercase letters, digits and underscores.  Must be globally
+///   unique across systems and devices.
+/// \param FullName Display name for the device.  Must be a string, and
+///   must be globally unique across systems and devices.
+/// \sa DECLARE_DEVICE_TYPE DECLARE_DEVICE_TYPE_NS
+///   DEFINE_DEVICE_TYPE_PRIVATE
 #define DEFINE_DEVICE_TYPE(Type, Class, ShortName, FullName) \
 		namespace { \
-			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
-			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
 		} \
-		emu::detail::device_type_impl<Class> const &Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		emu::detail::device_type_impl<Class> const Type = device_creator<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>; \
 		template class device_finder<Class, false>; \
 		template class device_finder<Class, true>;
 
+
+/// \brief Define a device type with a private implementation class
+///
+/// Defines a device type where the exposed device class is a base of
+/// the device implementation class.  Must be used in the global
+/// namespace.
+///
+/// Device finder templates are not instantiated for the exposed device
+/// class.  This must be done explicitly in a single location for the
+/// project.
+/// \param Type The device type name (an identifier).  By convention,
+///   these start with an uppercase letter and consist only of uppercase
+///   letters and underscores.
+/// \param Base The fully-qualified exposed device class name.  Must be
+///   a public base of the device implementation class, and must be
+///   derived from #device_t.
+/// \param Class The fully-qualified device implementation class name.
+///   Must be derived from the exposed device class, and indirectly from
+///   #device_t.
+/// \param ShortName The short name of the device, used for
+///   identification, and in filesystem paths for assets and data.  Must
+///   be a string no longer than thirty-two characters, containing only
+///   ASCII lowercase letters, digits and underscores.  Must be globally
+///   unique across systems and devices.
+/// \param FullName Display name for the device.  Must be a string, and
+///   must be globally unique across systems and devices.
+/// \sa DECLARE_DEVICE_TYPE DECLARE_DEVICE_TYPE_NS DEFINE_DEVICE_TYPE
 #define DEFINE_DEVICE_TYPE_PRIVATE(Type, Base, Class, ShortName, FullName) \
 		namespace { \
-			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
-			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
 		} \
-		emu::detail::device_type_impl<Base> const &Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>;
+		emu::detail::device_type_impl<Base> const Type = device_creator<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>;
 
-#define DEFINE_DEVICE_TYPE_NS(Type, Namespace, Class, ShortName, FullName) \
-		namespace { \
-			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
-			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
-		} \
-		emu::detail::device_type_impl<Namespace::Class> const &Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
-		template class device_finder<Namespace::Class, false>; \
-		template class device_finder<Namespace::Class, true>;
+/// \}
 
 
 // exception classes
@@ -432,7 +517,6 @@ class device_t : public delegate_late_bind
 		friend class device_t;
 		friend class device_interface;
 		friend class device_memory_interface;
-		friend class device_state_interface;
 		friend class device_execute_interface;
 
 	public:
@@ -462,7 +546,7 @@ class device_t : public delegate_late_bind
 		};
 
 		// construction/destruction
-		interface_list() : m_head(nullptr), m_execute(nullptr), m_memory(nullptr), m_state(nullptr) { }
+		interface_list() : m_head(nullptr), m_execute(nullptr), m_memory(nullptr) { }
 
 		// getters
 		device_interface *first() const { return m_head; }
@@ -475,7 +559,6 @@ class device_t : public delegate_late_bind
 		device_interface *m_head;               // head of interface list
 		device_execute_interface *m_execute;    // pre-cached pointer to execute interface
 		device_memory_interface *m_memory;      // pre-cached pointer to memory interface
-		device_state_interface *m_state;        // pre-cached pointer to state interface
 	};
 
 protected:
@@ -521,6 +604,15 @@ public:
 	/// \sa unemulated_features
 	static constexpr feature_type imperfect_features() { return feature::NONE; }
 
+	/// \brief Get parent device type for ROM search
+	///
+	/// Implement this member in a derived class to declare the parent
+	/// device type for the purpose of searching for ROMs.  Only one
+	/// level is allowed.  It is an error if the parent device type
+	/// itself declares a parent device type.
+	/// \return Pointer to parent device type, or nullptr.
+	static auto parent_rom_device_type() { return nullptr; }
+
 	virtual ~device_t();
 
 	// getters
@@ -557,11 +649,8 @@ public:
 	bool interface(device_execute_interface *&intf) const { intf = m_interfaces.m_execute; return (intf != nullptr); }
 	bool interface(device_memory_interface *&intf) { intf = m_interfaces.m_memory; return (intf != nullptr); }
 	bool interface(device_memory_interface *&intf) const { intf = m_interfaces.m_memory; return (intf != nullptr); }
-	bool interface(device_state_interface *&intf) { intf = m_interfaces.m_state; return (intf != nullptr); }
-	bool interface(device_state_interface *&intf) const { intf = m_interfaces.m_state; return (intf != nullptr); }
 	device_execute_interface &execute() const { assert(m_interfaces.m_execute != nullptr); return *m_interfaces.m_execute; }
 	device_memory_interface &memory() const { assert(m_interfaces.m_memory != nullptr); return *m_interfaces.m_memory; }
-	device_state_interface &state() const { assert(m_interfaces.m_state != nullptr); return *m_interfaces.m_state; }
 
 	// owned object helpers
 	subdevice_list &subdevices() { return m_subdevices; }

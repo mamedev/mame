@@ -35,6 +35,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class konmedal68k_state : public driver_device
 {
 public:
@@ -564,7 +567,7 @@ ROM_END
 
 // GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM (palette RAM?), possible have no video output or have it implemented in some unusual way.
 // at 1st boot press Service1 to initialise NVRAM
-ROM_START( konslot )
+ROM_START( konslot ) // Possibly Cross Magic Mark 2 (1996)
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "669-a05-2n.bin", 0x000000, 0x080000, CRC(3330848e) SHA1(24c2ac03fe5d099659081d1f9611c707c746c768) )
 
@@ -575,7 +578,7 @@ ROM_START( konslot )
 	ROM_LOAD( "669-a01-2d.bin", 0x000000, 0x080000, CRC(08438dad) SHA1(b4ef8fc37deca5b6537cc581fc99968c86e6ec2c) )
 ROM_END
 
-ROM_START( konslot2 )
+ROM_START( konslot2 ) // Possibly Fruit Magic (1996)
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "660-a05.2n", 0x000000, 0x080000, CRC(d7460250) SHA1(490588181b3b558e03752f4c6cbdadb807b990b3) )
 
@@ -586,6 +589,8 @@ ROM_START( konslot2 )
 	ROM_LOAD( "660-a01.2f", 0x000000, 0x080000, CRC(b350de2f) SHA1(56d6054b5b9fbabc12cfa3979c8b563c66f687c9) )
 	ROM_LOAD( "660-a02.1f", 0x080000, 0x080000, CRC(e3199b0d) SHA1(8805be14388c73c5a8e0b2eb98fb8efb5def1714) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1995, kzaurus,  0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )

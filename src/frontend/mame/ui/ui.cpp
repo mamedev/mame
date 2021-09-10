@@ -43,6 +43,8 @@
 #include <chrono>
 #include <type_traits>
 
+#define VISIBLE_SOUND_OVERDRIVE (1)
+
 
 /***************************************************************************
     CONSTANTS
@@ -641,6 +643,20 @@ void mame_ui_manager::update_and_render(render_container &container)
 			alpha = 255;
 		if (alpha >= 0)
 			container.add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	}
+
+	// show red if overdriving sound
+	if (VISIBLE_SOUND_OVERDRIVE && machine().phase() == machine_phase::RUNNING)
+	{
+		auto compressor = machine().sound().compressor_scale();
+		if (compressor < 1.0)
+		{
+			float width = 0.05f + std::min(0.15f, (1.0f - compressor) * 0.4f);
+			container.add_rect(0.0f, 0.0f, 1.0f, width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_rect(0.0f, 1.0f - width, 1.0f, 1.0f, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_rect(0.0f, width, width, 1.0f - width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_rect(1.0f - width, width, 1.0f, 1.0f - width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		}
 	}
 
 	// render any cheat stuff at the bottom
@@ -2136,7 +2152,7 @@ void mame_ui_manager::load_ui_options()
 	// parse the file
 	// attempt to open the output file
 	emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
-	if (file.open("ui.ini") == osd_file::error::NONE)
+	if (!file.open("ui.ini"))
 	{
 		try
 		{
@@ -2157,7 +2173,7 @@ void mame_ui_manager::save_ui_options()
 {
 	// attempt to open the output file
 	emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open("ui.ini") == osd_file::error::NONE)
+	if (!file.open("ui.ini"))
 	{
 		// generate the updated INI
 		file.puts(options().output_ini());
@@ -2185,13 +2201,13 @@ void mame_ui_manager::save_main_option()
 	// attempt to open the main ini file
 	{
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
-		if (file.open(std::string(emulator_info::get_configname()) + ".ini") == osd_file::error::NONE)
+		if (!file.open(std::string(emulator_info::get_configname()) + ".ini"))
 		{
 			try
 			{
 				options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
 			}
-			catch(options_error_exception &)
+			catch (options_error_exception &)
 			{
 				osd_printf_error("**Error loading %s.ini**\n", emulator_info::get_configname());
 				return;
@@ -2215,13 +2231,14 @@ void mame_ui_manager::save_main_option()
 	// attempt to open the output file
 	{
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(std::string(emulator_info::get_configname()) + ".ini") == osd_file::error::NONE)
+		if (!file.open(std::string(emulator_info::get_configname()) + ".ini"))
 		{
 			// generate the updated INI
 			file.puts(options.output_ini());
 			file.close();
 		}
-		else {
+		else
+		{
 			machine().popmessage(_("**Error saving %s.ini**"), emulator_info::get_configname());
 			return;
 		}

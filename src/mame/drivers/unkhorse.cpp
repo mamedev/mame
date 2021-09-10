@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Tomasz Slanina
-/***************************************************************************
+/*******************************************************************************
 
   unknown Japanese horse gambling game
   probably early 80s, manufacturer unknown
@@ -17,16 +17,20 @@ TODO:
   * 6-pos dipswitch on the pcb, only 4 are known at the moment
 - confirm colors and sound pitch
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class horse_state : public driver_device
 {
@@ -48,7 +52,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 
 	std::unique_ptr<uint8_t[]> m_colorram;
-	uint8_t m_output;
+	uint8_t m_output = 0;
 
 	uint8_t colorram_r(offs_t offset) { return m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] | 0x0f; }
 	void colorram_w(offs_t offset, uint8_t data) { m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] = data & 0xf0; }
@@ -70,11 +74,9 @@ void horse_state::machine_start()
 
 
 
-/***************************************************************************
-
-  Video
-
-***************************************************************************/
+/*******************************************************************************
+    Video
+*******************************************************************************/
 
 uint32_t horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -95,11 +97,9 @@ uint32_t horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 
 
-/***************************************************************************
-
-  I/O
-
-***************************************************************************/
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 void horse_state::horse_map(address_map &map)
 {
@@ -131,11 +131,9 @@ void horse_state::output_w(uint8_t data)
 
 
 
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( horse )
 	PORT_START("IN.0")
@@ -186,11 +184,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void horse_state::horse(machine_config &config)
 {
@@ -222,11 +218,9 @@ void horse_state::horse(machine_config &config)
 
 
 
-/***************************************************************************
-
-  Game drivers
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( unkhorse )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -239,5 +233,13 @@ ROM_START( unkhorse )
 	ROM_LOAD( "h7.bin", 0x3000, 0x0800, CRC(db21fc82) SHA1(38cf58c4d33da3e919d058abb482566c8f70d276) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1981?, unkhorse, 0, horse, horse, horse_state, empty_init, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981
+
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
+
+//    YEAR   NAME      PARENT  MACHINE  INPUT  CLASS        INIT        SCREEN  COMPANY      FULLNAME                                FLAGS
+GAME( 1981?, unkhorse, 0,      horse,   horse, horse_state, empty_init, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981
