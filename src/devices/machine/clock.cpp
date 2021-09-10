@@ -72,7 +72,7 @@ void clock_device::output()
 
 void clock_device::device_timer(timer_instance const &timer)
 {
-	switch (id)
+	switch (timer.id())
 	{
 		case TID_CLOCK_INIT:
 		{

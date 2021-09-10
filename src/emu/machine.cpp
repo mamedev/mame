@@ -834,7 +834,7 @@ void running_machine::handle_saveload(bool load)
 	// open the file
 	emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
 	auto const filerr = file.open(m_saveload_pending_file);
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 	{
 		// read/write the save state
 		save_error saverr = load ? m_save.read_file(file) : m_save.write_file(file);

@@ -1018,12 +1018,7 @@ inline constexpr bool operator>=(const attotime &left, const attotime &right) no
 //  string describing a subseconds value
 //-------------------------------------------------
 
-<<<<<<< HEAD
 inline const char *subseconds::as_string(int precision, bool dividers) const noexcept
-=======
-/** Create an attotime from a tick count @p ticks at the given frequency @p frequency  */
-inline attotime attotime::from_ticks(u64 ticks, u32 frequency)
->>>>>>> master
 {
 	// just leverage the full attotime logic to do this
 	return attotime(*this).as_string(precision, dividers);

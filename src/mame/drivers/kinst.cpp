@@ -224,14 +224,7 @@ public:
 	void kinst(machine_config &config);
 	void kinst2(machine_config &config);
 
-<<<<<<< HEAD
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(timer_instance const &timer) override;
-=======
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r) { return BIT(m_dcs->control_r(), 11); }
->>>>>>> master
 
 protected:
 	required_device<mips3_device> m_maincpu;
@@ -397,35 +390,6 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 /*************************************
  *
-<<<<<<< HEAD
- *  Interrupt handling
- *
- *************************************/
-
-void kinst_state::device_timer(timer_instance const &timer)
-{
-	switch (timer.id())
-	{
-	case TIMER_IRQ0_STOP:
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in kinst_state::device_timer");
-	}
-}
-
-
-INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
-{
-	device.execute().set_input_line(0, ASSERT_LINE);
-	m_irq0_stop_timer->adjust(attotime::from_usec(50));
-}
-
-
-/*************************************
- *
-=======
->>>>>>> master
  *  IDE controller access
  *
  *************************************/
@@ -739,16 +703,8 @@ void kinst_state::kinst(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-<<<<<<< HEAD
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
-	screen.set_size(320, 240);
-	screen.set_visarea(0, 319, 0, 239);
-=======
 	screen.set_raw(6000000, 390, 0, 320, 261, 0, 240); // preliminary
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
->>>>>>> master
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BGR_555);

@@ -127,6 +127,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(vidctrl_deferred_w);
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
+	transient_timer_factory m_vidctrl_deferred_w;
 	transient_timer_factory m_protection_deferred_w;
 
 	void cpu0_mem(address_map &map);
@@ -157,6 +158,7 @@ void pipeline_state::machine_start()
 	save_item(NAME(m_from_mcu));
 	save_item(NAME(m_sound_data));
 
+	m_vidctrl_deferred_w.init(*this, FUNC(pipeline_state::vidctrl_deferred_w));
 	m_protection_deferred_w.init(*this, FUNC(pipeline_state::protection_deferred_w));
 }
 
@@ -193,7 +195,7 @@ u32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 void pipeline_state::vidctrl_w(u8 data)
 {
 	// synchronization is needed to avoid spurious CTC interrupts
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipeline_state::vidctrl_deferred_w),this), data);
+	m_vidctrl_deferred_w.synchronize(data);
 }
 
 TIMER_CALLBACK_MEMBER(pipeline_state::vidctrl_deferred_w)
