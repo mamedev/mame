@@ -22,13 +22,13 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/sensorboard.h"
+#include "machine/clock.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
+#include "machine/sensorboard.h"
 #include "sound/beep.h"
-#include "video/pwm.h"
 #include "video/hd44780.h"
+#include "video/pwm.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -47,7 +47,6 @@ public:
 	diablo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_screen(*this, "screen"),
 		m_display(*this, "display"),
 		m_lcd(*this, "hd44780"),
@@ -68,7 +67,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<m68000_base_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<screen_device> m_screen;
 	required_device<pwm_display_device> m_display;
 	required_device<hd44780_device> m_lcd;
@@ -81,10 +79,6 @@ private:
 	// address maps
 	void diablo68k_map(address_map &map);
 	void scorpio68k_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -285,10 +279,9 @@ void diablo_state::diablo68k(machine_config &config)
 	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::diablo68k_map);
 
-	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(diablo_state::irq_on<M68K_IRQ_IPL1>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1380)); // active for 1.38us
-	TIMER(config, "irq_off").configure_periodic(FUNC(diablo_state::irq_off<M68K_IRQ_IPL1>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 32.768_kHz_XTAL/128)); // 256Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(1380)); // active for 1.38us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M68K_IRQ_IPL1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
