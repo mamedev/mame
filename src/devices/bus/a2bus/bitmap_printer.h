@@ -134,6 +134,8 @@ public:
 		if (BIT(seg,7) || erasecolor) bitmap.plot_box(x0+width+thick, y0+2*thick+2*height, thick, thick, BIT(seg,7) ? color : erasecolor); // draw dot
 	}
 
+// could generalize this routine to draw a number right or left align
+
 	void draw_number(int number, int x, int y, bitmap_rgb32& bitmap)
 	{
 		std::string s(std::to_string(number));
@@ -166,14 +168,8 @@ public:
 				if ((i % vdpi) == 0)
 				{
 					double pct = (double) i / (vdpi * 11.0);
-					if (drawmarks == 3)  // draw position bar
-					{
-						int barheight = 3;
-						if (adj_i < bitmap.height() - 1 - barheight)
-							// little dot to show paper position
-							bitmap.plot_box( bitmap.width() - 1 - barwidth , adj_i, pct * barwidth, barheight, 0x000000);
-					}
-					if (drawmarks == 2)  // draw position mark
+/*
+					if (drawmarks & 2)  // draw position tick
 					{
 						int marksize = 3;
 						int barheight = 4;
@@ -181,7 +177,15 @@ public:
 							// little bar to show paper position
 							bitmap.plot_box( bitmap.width() - 1 - barwidth +  pct * barwidth - marksize, adj_i, marksize, barheight, 0x000000);
 					}
-					if (drawmarks & 4)
+*/
+					if (drawmarks & 4)  // draw position bar
+					{
+						int barheight = 3;
+						if (adj_i < bitmap.height() - 1 - barheight)
+							// little dot to show paper position
+							bitmap.plot_box( bitmap.width() - 1 - barwidth , adj_i, pct * barwidth, barheight, 0x000000);
+					}
+					if (drawmarks & 8)
 						draw_number(i / vdpi, bitmap.width(), adj_i, bitmap);
 				}
 
