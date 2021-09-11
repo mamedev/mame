@@ -97,7 +97,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_printer->online_callback().set(FUNC(apple_imagewriter_printer_device::printer_online));
 
 	// basic machine hardware
-	i8085a_cpu_device &cpu(I8085A(config, m_maincpu, CLK2 ));  // 9.8304_MHz_XTAL / 2 aka 4.9152_MHz_XTAL
+	i8085a_cpu_device &cpu(I8085A(config, m_maincpu, baseCLK ));  // 9.8304_MHz_XTAL effectively 4.9152_MHz_XTAL
 	cpu.set_addrmap(AS_PROGRAM, &apple_imagewriter_printer_device::mem_map);
 	cpu.set_addrmap(AS_IO,      &apple_imagewriter_printer_device::io_map);
 
