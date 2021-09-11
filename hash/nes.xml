@@ -82283,9 +82283,9 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_sh4" supported="partial">
-		<description>Super HIK 4 in 1</description>
-		<year>19??</year>
+	<software name="mc_sh4">
+		<description>Super HiK 4 in 1</description>
+		<year>199?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_hik4in1" />
