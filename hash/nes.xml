@@ -78150,6 +78150,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_11a42">
+		<description>11 in 1 (A-042)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="t262" />
+			<dataarea name="prg" size="1048576">
+				<rom name="11-in-1 (a-042).prg" size="1048576" crc="77e9ee96" sha1="e4b61c2da62d2854e3ab3ac4e27edc4af68e646c" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_11bal">
 		<description>11 in 1 Ball Series</description>
 		<year>19??</year>
@@ -79268,6 +79283,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Jackal and Rush'n Attack are swapped in menu. Is this a cartridge bug or due to bad dump? -->
 	<software name="mc_4d10">
 		<description>4 in 1 (D-010)</description>
 		<year>19??</year>
@@ -80306,6 +80322,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_6a17">
+		<description>1994 Super HiK 6 in 1 (A-017)</description>
+		<year>1994</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="t262" />
+			<dataarea name="prg" size="655360">
+				<rom name="1994 super hik 6-in-1 (a-017).prg" size="655360" crc="d7c794d9" sha1="1ec64b3162a75a12f33a3e2b88c345e18121290b" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_6a30">
 		<description>Super HiK 6 in 1 (A-030)</description>
 		<year>199?</year>
@@ -80321,7 +80352,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_6et40" supported="partial">
+	<software name="mc_6et40">
 		<description>6 in 1 (ET40, 840726c, 43-203)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -80869,8 +80900,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- Issues with Side Pocket gfx -->
-	<software name="mc_8et40" supported="partial">
+	<software name="mc_8et40">
 		<description>8 in 1 (ET40, 821242c)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
