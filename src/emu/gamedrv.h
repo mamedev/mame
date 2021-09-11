@@ -116,7 +116,7 @@ constexpr u64 MACHINE_IS_SKELETON_MECHANICAL    = MACHINE_IS_SKELETON | MACHINE_
 
 /// \brief Static system description
 ///
-/// A plain data structure providing static information about an system.
+/// A plain data structure providing static information about a system.
 /// Used to allow multiple systems to be implemented using a single
 /// system device class (an implementation of #driver_device).
 class game_driver
@@ -128,7 +128,7 @@ public:
 	/// \brief Get unemulated system features
 	///
 	/// Converts system flags corresponding to unemulated device
-	/// features to the a device feature type bit field.
+	/// features to a device feature type bit field.
 	/// \param [in] flags A system flags bit field.
 	/// \return A device feature type bit field corresponding to
 	///   unemulated features declared in the \p flags argument.
@@ -145,7 +145,7 @@ public:
 	/// \brief Get imperfectly emulated system features
 	///
 	/// Converts system flags corresponding to imperfectly emulated
-	/// device features to the a device feature type bit field.
+	/// device features to a device feature type bit field.
 	/// \param [in] flags A system flags bit field.
 	/// \return A device feature type bit field corresponding to
 	///   imperfectly emulated features declared in the \p flags
