@@ -372,6 +372,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_810544c",      NES_BMC_810544C);
 	device.option_add_internal("bmc_830425c",      NES_BMC_830425C);
 	device.option_add_internal("bmc_850437c",      NES_BMC_850437C);
+	device.option_add_internal("n32_4in1",         NES_N32_4IN1);
 	device.option_add_internal("ntd03",            NES_NTD03);
 	device.option_add_internal("bmc_ctc09",        NES_BMC_CTC09);
 	device.option_add_internal("bmc_gb63",         NES_BMC_GB63);
@@ -418,6 +419,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 226? or 233?
 	device.option_add_internal("bmc_lc160",        NES_BMC_LC160);
 // misc multigame cart MMC3 clone boards
+	device.option_add_internal("a88s1",            NES_A88S1);
 	device.option_add_internal("fcgj8in1",         NES_FCGJ8IN1);
 	device.option_add_internal("fk23c",            NES_FK23C);
 	device.option_add_internal("fk23ca",           NES_FK23CA);

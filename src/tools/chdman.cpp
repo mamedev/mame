@@ -39,7 +39,7 @@ using util::string_format;
 //  CONSTANTS & DEFINES
 //**************************************************************************
 // MINGW has adopted the MSVC formatting for 64-bit ints as of GCC 4.4 and deprecated it as of GCC 9.3
-#if defined(WIN32) && defined(__GNUC__) && ((__GNUC__ < 9) || ((__GNUC__ == 9) && (__GNUC_MINOR__ < 3)))
+#if defined(_WIN32) && defined(__GNUC__) && ((__GNUC__ < 9) || ((__GNUC__ == 9) && (__GNUC_MINOR__ < 3)))
 #define I64FMT   "I64"
 #elif !defined(__APPLE__) && defined(__LP64__)
 #define I64FMT   "l"

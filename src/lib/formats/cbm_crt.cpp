@@ -41,6 +41,8 @@
 
 #include "cbm_crt.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 //**************************************************************************
 //  MACROS/CONSTANTS

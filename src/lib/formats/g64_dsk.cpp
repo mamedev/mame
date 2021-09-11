@@ -14,6 +14,8 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 #define G64_FORMAT_HEADER   "GCR-1541"
 

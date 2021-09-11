@@ -393,7 +393,6 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 {
 	const file_selector_entry *selected_entry = nullptr;
 
-
 	// clear out the menu entries
 	m_entrylist.clear();
 
@@ -406,7 +405,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
 
 	// add the "[create]" entry
-	if (m_has_create && !directory->is_archive())
+	if (m_has_create && directory && !directory->is_archive())
 		append_entry(SELECTOR_ENTRY_TYPE_CREATE, "", "");
 
 	// add and select the "[software list]" entry if available
@@ -447,17 +446,20 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	}
 	directory.reset();
 
-	// sort the menu entries
-	const std::collate<wchar_t> &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
-	std::sort(
-			m_entrylist.begin() + first,
-			m_entrylist.end(),
-			[&coll] (file_selector_entry const &x, file_selector_entry const &y)
-			{
-				std::wstring const xstr = wstring_from_utf8(x.basename);
-				std::wstring const ystr = wstring_from_utf8(y.basename);
-				return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
-			});
+	if (m_entrylist.size() > first)
+	{
+		// sort the menu entries
+		const std::collate<wchar_t> &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::sort(
+				m_entrylist.begin() + first,
+				m_entrylist.end(),
+				[&coll] (file_selector_entry const &x, file_selector_entry const &y)
+				{
+					std::wstring const xstr = wstring_from_utf8(x.basename);
+					std::wstring const ystr = wstring_from_utf8(y.basename);
+					return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
+				});
+	}
 
 	// append all of the menu entries
 	for (file_selector_entry const &entry : m_entrylist)

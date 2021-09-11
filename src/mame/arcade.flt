@@ -1045,6 +1045,7 @@ rbmk.cpp
 rcorsair.cpp
 re900.cpp
 realbrk.cpp
+recel.cpp
 redalert.cpp
 redclash.cpp
 relief.cpp

@@ -136,6 +136,8 @@ std::vector<std::string> device_t::searchpath() const
 		system = system->owner();
 	if (system)
 		result = system->searchpath();
+	if (type().parent_rom_device_type())
+		result.emplace(result.begin(), type().parent_rom_device_type()->shortname());
 	result.emplace(result.begin(), shortname());
 	return result;
 }

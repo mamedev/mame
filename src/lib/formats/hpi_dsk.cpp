@@ -50,6 +50,8 @@
 #include "coretmpl.h" // BIT
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 // Debugging
 #define VERBOSE 0

@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/smx_dsk.h"
 
 smx_format::smx_format() : wd177x_format(formats)

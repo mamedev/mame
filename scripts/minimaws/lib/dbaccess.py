@@ -587,13 +587,13 @@ class QueryCursor(object):
         if pattern is not None:
             return self.dbcurs.execute(
                     'SELECT shortname, description ' \
-                    'FROM machine WHERE isdevice = 0 AND shortname GLOB ? ' \
+                    'FROM machine WHERE shortname GLOB ? ' \
                     'ORDER BY shortname ASC',
                     (pattern, ))
         else:
             return self.dbcurs.execute(
                     'SELECT shortname, description ' \
-                    'FROM machine WHERE isdevice = 0 ' \
+                    'FROM machine ' \
                     'ORDER BY shortname ASC')
 
     def listsource(self, pattern):
@@ -601,14 +601,14 @@ class QueryCursor(object):
             return self.dbcurs.execute(
                     'SELECT machine.shortname, sourcefile.filename ' \
                     'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id ' \
-                    'WHERE machine.isdevice = 0 AND machine.shortname GLOB ? ' \
+                    'WHERE machine.shortname GLOB ? ' \
                     'ORDER BY machine.shortname ASC',
                     (pattern, ))
         else:
             return self.dbcurs.execute(
                     'SELECT machine.shortname, sourcefile.filename ' \
                     'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id ' \
-                    'WHERE machine.isdevice = 0 ORDER BY machine.shortname ASC')
+                    'ORDER BY machine.shortname ASC')
 
     def listclones(self, pattern):
         if pattern is not None:
@@ -668,7 +668,7 @@ class QueryCursor(object):
     def get_machine_details(self, machine):
         return self.dbcurs.execute(
                 'SELECT machine.id AS id, machine.description AS description, machine.isdevice AS isdevice, machine.runnable AS runnable, sourcefile.filename AS sourcefile, system.year AS year, system.manufacturer AS manufacturer, cloneof.parent AS cloneof, romof.parent AS romof ' \
-                'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id LEFT JOIN system ON machine.id = system.id LEFT JOIN cloneof ON system.id = cloneof.id LEFT JOIN romof ON system.id = romof.id ' \
+                'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id LEFT JOIN system ON machine.id = system.id LEFT JOIN cloneof ON machine.id = cloneof.id LEFT JOIN romof ON machine.id = romof.id ' \
                 'WHERE machine.shortname = ?',
                 (machine, ))
 
@@ -707,7 +707,7 @@ class QueryCursor(object):
     def get_sourcefile_machines(self, id):
         return self.dbcurs.execute(
                 'SELECT machine.shortname AS shortname, machine.description AS description, machine.isdevice AS isdevice, machine.runnable AS runnable, sourcefile.filename AS sourcefile, system.year AS year, system.manufacturer AS manufacturer, cloneof.parent AS cloneof, romof.parent AS romof ' \
-                'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id LEFT JOIN system ON machine.id = system.id LEFT JOIN cloneof ON system.id = cloneof.id LEFT JOIN romof ON system.id = romof.id ' \
+                'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id LEFT JOIN system ON machine.id = system.id LEFT JOIN cloneof ON machine.id = cloneof.id LEFT JOIN romof ON machine.id = romof.id ' \
                 'WHERE machine.sourcefile = ?',
                 (id, ))
 

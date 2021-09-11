@@ -36,13 +36,15 @@ Designer Mach IV Master 2325 (model 6129) overview:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -61,7 +63,6 @@ public:
 	desdis_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -80,7 +81,6 @@ protected:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	optional_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
@@ -89,10 +89,6 @@ protected:
 
 	// address maps
 	void fdes2100d_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_lcd();
@@ -293,10 +289,9 @@ void desdis_state::fdes2100d(machine_config &config)
 	M65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
 	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
 
-	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(desdis_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(desdis_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -329,10 +324,9 @@ void desmas_state::fdes2265(machine_config &config)
 	M68000(config.replace(), m_maincpu, 16_MHz_XTAL); // MC68HC000P12F
 	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2265_map);
 
-	const attotime irq_period = attotime::from_hz(600); // from 555 timer, ideal frequency is 600Hz (measured 597Hz)
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(desmas_state::irq_on<M68K_IRQ_4>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(6)); // active for 6us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(desmas_state::irq_off<M68K_IRQ_4>), irq_period);
+	auto &irq_clock(CLOCK(config.replace(), "irq_clock", 600)); // from 555 timer, ideal frequency is 600Hz (measured 597Hz)
+	irq_clock.set_pulse_width(attotime::from_usec(6)); // active for 6us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	config.set_default_layout(layout_fidel_desdis_68kr);
 }

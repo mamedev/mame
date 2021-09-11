@@ -31,12 +31,14 @@
 
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "sound/sn76496.h"
-#include "machine/msm6242.h"
 #include "machine/ldp1450.h"
 #include "machine/mos6551.h"
+#include "machine/msm6242.h"
+#include "sound/sn76496.h"
+
 #include "speaker.h"
 
 #include "cops.lh"
@@ -60,6 +62,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_sn(*this, "snsnd")
 		, m_ld(*this, "laserdisc")
+		, m_switches(*this, "SW%u", 0U)
+		, m_steer(*this, "STEER")
+		, m_digits(*this, "digit%u", 0U)
 		, m_irq(0)
 	{ }
 
@@ -83,6 +88,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76489_device> m_sn;
 	required_device<sony_ldp1450_device> m_ld;
+	required_ioport_array<3> m_switches;
+	optional_ioport m_steer;
+	output_finder<16> m_digits;
 
 	// screen updates
 	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -581,11 +589,11 @@ uint8_t cops_state::io1_r(offs_t offset)
 	switch( offset & 0x0f )
 	{
 		case 0x08:  /* SW0 */
-			return ioport("SW0")->read();
+			return m_switches[0]->read();
 		case 0x09:  /* SW1 */
-			return ioport("SW1")->read();
+			return m_switches[1]->read();
 		case 0x0a:  /* SW2 */
-			return ioport("SW2")->read();
+			return m_switches[2]->read();
 		default:
 			logerror("Unknown io1_r, offset = %03x\n", offset);
 			return 0;
@@ -599,11 +607,11 @@ uint8_t cops_state::io1_lm_r(offs_t offset)
 		case 0x07:  /* WDI */
 			return 1;
 		case 0x08:  /* SW0 */
-			return ioport("SW0")->read();
+			return m_switches[0]->read();
 		case 0x09:  /* SW1 */
-			return ioport("SW1")->read();
+			return m_switches[1]->read();
 		case 0x0a:  /* SW2 */
-			return ioport("SW2")->read();
+			return m_switches[2]->read();
 		default:
 			logerror("Unknown io1_r, offset = %03x\n", offset);
 			return 0;
@@ -612,11 +620,7 @@ uint8_t cops_state::io1_lm_r(offs_t offset)
 
 void cops_state::io1_w(offs_t offset, uint8_t data)
 {
-	int i;
-	char output_name[16];
-	uint16_t display_data;
-
-	switch( offset & 0x0f )
+	switch (offset & 0x0f)
 	{
 		case 0x00: /* WOP0 Alpha display*/
 			m_lcd_addr_l = data;
@@ -625,23 +629,18 @@ void cops_state::io1_w(offs_t offset, uint8_t data)
 			m_lcd_addr_h = data;
 			{
 				// update display
-				const uint16_t addrs_table[] = { 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0002, 0x0001, 0x0080,
-												0x1000, 0x0800, 0x0400, 0x2000, 0x4000, 0x0200, 0x0100, 0x8000 };
-				uint16_t addr = m_lcd_addr_l | (m_lcd_addr_h << 8);
-				for (i = 0; i < 16; i++ )
+				constexpr uint16_t addrs_table[] = {
+						0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0002, 0x0001, 0x0080,
+						0x1000, 0x0800, 0x0400, 0x2000, 0x4000, 0x0200, 0x0100, 0x8000 };
+				const uint16_t addr = m_lcd_addr_l | (m_lcd_addr_h << 8);
+				for (int i = 0; i < 16; i++)
 				{
 					if (addr == addrs_table[i])
 					{
+						const uint16_t display_data = m_lcd_data_l | (m_lcd_data_h << 8);
+						m_digits[i] = bitswap<16>(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
 						break;
 					}
-				}
-
-				if (i < 16)
-				{
-					sprintf(output_name, "digit%d", i);
-					display_data = m_lcd_data_l | (m_lcd_data_h << 8);
-					display_data = bitswap<16>(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
-					output().set_value(output_name, display_data);
 				}
 			}
 			break;
@@ -690,7 +689,7 @@ uint8_t cops_state::io2_r(offs_t offset)
 	switch( offset & 0x0f )
 	{
 		case 0x03:
-			return ioport("STEER")->read();
+			return m_steer->read();
 		default:
 			logerror("Unknown io2_r, offset = %02x\n", offset);
 			return 0;
@@ -871,11 +870,12 @@ static INPUT_PORTS_START( revlatns )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
-
 INPUT_PORTS_END
 
 void cops_state::machine_start()
 {
+	m_digits.resolve();
+
 	m_ld_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cops_state::ld_timer_callback),this));
 
 	m_ld_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
@@ -941,6 +941,7 @@ void cops_state::base(machine_config &config)
 void cops_state::cops(machine_config &config)
 {
 	base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::cops_map);
 
 	via6522_device &via2(MOS6522(config, "via6522_2", MAIN_CLOCK/2));
@@ -955,6 +956,7 @@ void cops_state::cops(machine_config &config)
 void cops_state::revlatns(machine_config &config)
 {
 	base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::revlatns_map);
 
 	MSM6242(config, "rtc", XTAL(32'768));

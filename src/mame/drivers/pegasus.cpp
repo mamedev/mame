@@ -38,17 +38,21 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
+
+namespace {
 
 class pegasus_state : public driver_device
 {
@@ -73,6 +77,10 @@ public:
 	void pegasus(machine_config &config);
 
 	void init_pegasus();
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	u8 pegasus_keyboard_r();
@@ -100,8 +108,6 @@ private:
 	u8 m_kbd_row;
 	bool m_kbd_irq;
 	u8 m_control_bits;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	std::unique_ptr<u8[]> m_pcg;
 	void pegasus_decrypt_rom(u8 *ROM);
 	required_device<cpu_device> m_maincpu;
@@ -130,13 +136,13 @@ WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 
 u8 pegasus_state::pegasus_keyboard_r()
 {
-	u8 i,data = 0xff;
-	for (i = 0; i < 8; i++)
+	u8 data = 0xff;
+	for (unsigned i = 0; i < 8; i++)
 		if (!BIT(m_kbd_row, i)) data &= m_io_keyboard[i]->read();
 
 	m_kbd_irq = (data == 0xff) ? 1 : 0;
 	if (BIT(m_control_bits, 3))
-		data<<=4;
+		data <<= 4;
 	return data;
 }
 
@@ -314,16 +320,16 @@ static const u8 mcm6571a_shift[] =
 
 u32 pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u16 sy=0,ma=0;
-	bool pcg_mode = BIT(m_control_bits, 1);
+	u16 sy=0, ma=0;
+	const bool pcg_mode = BIT(m_control_bits, 1);
 
-	for(u8 y = 0; y < 16; y++ )
+	for (u8 y = 0; y < 16; y++)
 	{
-		for(u8 ra = 0; ra < 16; ra++ )
+		for (u8 ra = 0; ra < 16; ra++)
 		{
 			u16 *p = &bitmap.pix(sy++);
 
-			for(u16 x = ma; x < ma + 32; x++ )
+			for (u16 x = ma; x < ma + 32; x++)
 			{
 				u8 inv = 0xff;
 				u8 chr = m_vram[x];
@@ -373,15 +379,15 @@ u32 pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 /* F4 Character Displayer */
 static const gfx_layout pegasus_charlayout =
 {
-	8, 16,                  /* text = 7 x 9, pcg = 8 x 16 */
-	128,                    /* 128 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
+	8, 16,                  // text = 7 x 9, pcg = 8 x 16
+	128,                    // 128 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
+	// y offsets
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16                    /* every char takes 16 bytes */
+	8*16                    // every char takes 16 bytes
 };
 
 static GFXDECODE_START( gfx_pegasus )
@@ -396,10 +402,6 @@ GFXDECODE_END
 void pegasus_state::pegasus_decrypt_rom(u8 *ROM)
 {
 	bool doit = false;
-	u8 b;
-	u16 j;
-	std::vector<u8> temp_copy;
-	temp_copy.resize(0x1000);
 
 	if (ROM[0] == 0x02) doit = true;
 	if (ROM[0] == 0x1e && ROM[1] == 0xfa && ROM[2] == 0x60 && ROM[3] == 0x71) doit = true; // xbasic 2nd rom
@@ -409,11 +411,12 @@ void pegasus_state::pegasus_decrypt_rom(u8 *ROM)
 
 	if (doit)
 	{
+		std::vector<u8> temp_copy;
+		temp_copy.resize(0x1000);
 		for (int i = 0; i < 0x1000; i++)
 		{
-			b = ROM[i];
-			j = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
-			b = bitswap<8>(b, 3, 2, 1, 0, 7, 6, 5, 4);
+			const u16 j = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
+			const u8 b = bitswap<8>(ROM[i], 3, 2, 1, 0, 7, 6, 5, 4);
 			temp_copy[j & 0xfff] = b;
 		}
 		memcpy(ROM, &temp_copy[0], 0x1000);
@@ -574,6 +577,9 @@ ROM_START( pegasus )
 ROM_END
 
 #define rom_pegasusm rom_pegasus
+
+} // anonymous namespace
+
 
 /* Driver */
 

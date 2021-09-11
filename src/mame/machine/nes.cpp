@@ -106,6 +106,7 @@ void nes_state::machine_start()
 
 		static const int w_ex_pcbs[] =
 		{
+			BMC_N32_4IN1,
 			BTL_SMB2JB,
 			BTL_YUNG08,
 			UNL_AC08,

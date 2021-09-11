@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/d71_dsk.h"
 
 d71_format::d71_format() : d64_format(formats)

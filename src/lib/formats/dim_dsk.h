@@ -16,10 +16,6 @@
 
 /**************************************************************************/
 
-FLOPPY_IDENTIFY(dim_dsk_identify);
-FLOPPY_CONSTRUCT(dim_dsk_construct);
-
-
 class dim_format : public floppy_image_format_t
 {
 public:

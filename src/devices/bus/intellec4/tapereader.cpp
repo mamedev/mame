@@ -5,7 +5,7 @@
 #include "tapereader.h"
 
 
-DEFINE_DEVICE_TYPE_NS(INTELLEC4_TAPE_READER, bus::intellec4, imm4_90_device, "intlc4_imm4_90", "Intel imm4-90 High-Speed Paper Tape Reader")
+DEFINE_DEVICE_TYPE(INTELLEC4_TAPE_READER, bus::intellec4::imm4_90_device, "intlc4_imm4_90", "Intel imm4-90 High-Speed Paper Tape Reader")
 
 
 namespace bus::intellec4 {

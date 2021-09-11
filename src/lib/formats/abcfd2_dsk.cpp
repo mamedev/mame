@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/abcfd2_dsk.h"
 
 abc_fd2_format::abc_fd2_format() : wd177x_format(formats)

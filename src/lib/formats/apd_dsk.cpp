@@ -64,7 +64,11 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*, little_endianize_int32
+
 #include <zlib.h>
+
+#include <cstring>
 
 
 static const uint8_t APD_HEADER[8] = { 'A', 'P', 'D', 'X', '0', '0', '0', '1' };

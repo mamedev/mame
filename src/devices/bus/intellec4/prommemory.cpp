@@ -5,7 +5,7 @@
 #include "prommemory.h"
 
 
-DEFINE_DEVICE_TYPE_NS(INTELLEC4_PROM_MEMORY, bus::intellec4, imm6_26_device, "intlc4_imm6_26", "Intel imm6-26 PROM Memory Module")
+DEFINE_DEVICE_TYPE(INTELLEC4_PROM_MEMORY, bus::intellec4::imm6_26_device, "intlc4_imm6_26", "Intel imm6-26 PROM Memory Module")
 
 
 namespace bus::intellec4 {

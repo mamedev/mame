@@ -15,6 +15,8 @@
 
 #include "cpu/sparc/sparc.h"
 
+DECLARE_DEVICE_TYPE(OSA_SPARC, saitekosa_sparc_device)
+
 
 class saitekosa_sparc_device : public device_t, public device_saitekosa_expansion_interface
 {
@@ -38,8 +40,5 @@ private:
 
 	void main_map(address_map &map);
 };
-
-
-DECLARE_DEVICE_TYPE(OSA_SPARC, saitekosa_sparc_device)
 
 #endif // MAME_BUS_SAITEKOSA_SPARC_H

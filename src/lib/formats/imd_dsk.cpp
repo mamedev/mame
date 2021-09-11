@@ -9,8 +9,11 @@
 *********************************************************************/
 
 #include "imd_dsk.h"
+#include "flopimg_legacy.h"
 
 #include "ioprocs.h"
+
+#include "osdcore.h" // osd_printf_*
 
 #include <cstring>
 

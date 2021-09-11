@@ -159,6 +159,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/a2pic.h"
 #include "bus/a2bus/a2sam.h"
 #include "bus/a2bus/a2scsi.h"
+#include "bus/a2bus/a2sd.h"
 #include "bus/a2bus/a2softcard.h"
 #include "bus/a2bus/a2ssc.h"
 #include "bus/a2bus/a2swyft.h"
@@ -1904,19 +1905,19 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			}
 
 			// 558 monostable one-shot timers; a running timer cannot be restarted
-			if (machine().time().as_double() >= m_joystick_x1_time) 
+			if (machine().time().as_double() >= m_joystick_x1_time)
 			{
 				m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
 			}
-			if (machine().time().as_double() >= m_joystick_y1_time) 
+			if (machine().time().as_double() >= m_joystick_y1_time)
 			{
 				m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
 			}
-			if (machine().time().as_double() >= m_joystick_x2_time) 
+			if (machine().time().as_double() >= m_joystick_x2_time)
 			{
 				m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
 			}
-			if (machine().time().as_double() >= m_joystick_y2_time) 
+			if (machine().time().as_double() >= m_joystick_y2_time)
 			{
 				m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
 			}
@@ -3222,19 +3223,20 @@ u8 apple2e_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-u8 apple2e_state::ram0000_r(offs_t offset)  { return m_ram_ptr[offset]; }
+u8   apple2e_state::ram0000_r(offs_t offset)          { return m_ram_ptr[offset]; }
 void apple2e_state::ram0000_w(offs_t offset, u8 data) { m_ram_ptr[offset] = data; }
-u8 apple2e_state::ram0200_r(offs_t offset)  { return m_ram_ptr[offset+0x200]; }
+u8   apple2e_state::ram0200_r(offs_t offset)          { return m_ram_ptr[offset+0x200]; }
 void apple2e_state::ram0200_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x200] = data; }
-u8 apple2e_state::ram0400_r(offs_t offset)  { return m_ram_ptr[offset+0x400]; }
+u8   apple2e_state::ram0400_r(offs_t offset)          { return m_ram_ptr[offset+0x400]; }
 void apple2e_state::ram0400_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x400] = data; }
-u8 apple2e_state::ram0800_r(offs_t offset)  { return m_ram_ptr[offset+0x800]; }
+u8   apple2e_state::ram0800_r(offs_t offset)          { return m_ram_ptr[offset+0x800]; }
 void apple2e_state::ram0800_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x800] = data; }
-u8 apple2e_state::ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x2000]; }
+u8   apple2e_state::ram2000_r(offs_t offset)          { return m_ram_ptr[offset+0x2000]; }
 void apple2e_state::ram2000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x2000] = data; }
-u8 apple2e_state::ram4000_r(offs_t offset)  { return m_ram_ptr[offset+0x4000]; }
+u8   apple2e_state::ram4000_r(offs_t offset)          { return m_ram_ptr[offset+0x4000]; }
 void apple2e_state::ram4000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x4000] = data; }
 void apple2e_state::ram8000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x8000] = data; }
+
 u8 apple2e_state::cec4000_r(offs_t offset)
 {
 	//printf("cec4000_r: ofs %x\n", offset);
@@ -3254,17 +3256,17 @@ u8 apple2e_state::cec8000_r(offs_t offset)
 	}
 }
 
-u8 apple2e_state::auxram0000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram0000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram0000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
-u8 apple2e_state::auxram0200_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram0200_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram0200_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
-u8 apple2e_state::auxram0400_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram0400_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram0400_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
-u8 apple2e_state::auxram0800_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram0800_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram0800_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
-u8 apple2e_state::auxram2000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram2000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram2000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
-u8 apple2e_state::auxram4000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram4000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram4000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
 
 void apple2e_state::apple2e_map(address_map &map)
@@ -4718,6 +4720,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("lancegs", A2BUS_LANCEGS);  /* ///SHH SYSTEME LANceGS Card */
 	device.option_add("q68", A2BUS_Q68);        /* Stellation Q68 68000 card */
 	device.option_add("q68plus", A2BUS_Q68PLUS); /* Stellation Q68 Plus 68000 card */
+	device.option_add("a2sd", A2BUS_A2SD);  /* Florian Reitz AppleIISD */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)
