@@ -5,6 +5,8 @@
 
 #include "ioprocs.h"
 
+#include <cstring>
+
 
 #define MFM_FORMAT_HEADER   "HXCMFM"
 

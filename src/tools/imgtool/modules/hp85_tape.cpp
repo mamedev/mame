@@ -13,7 +13,9 @@
 #include "formats/imageutl.h"
 
 #include "ioprocs.h"
+#include "opresolv.h"
 
+#include <cstdio>
 #include <iostream>
 
 

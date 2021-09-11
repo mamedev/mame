@@ -11,7 +11,8 @@
 #include "charconv.h"
 
 #include "corestr.h"
-#include "coretmpl.h"
+
+#include <algorithm>
 
 imgtool::simple_charconverter imgtool::charconverter_iso_8859_1(nullptr, nullptr);
 

@@ -43,6 +43,8 @@ project "formats"
 
 		MAME_DIR .. "src/lib/formats/flopimg.cpp",
 		MAME_DIR .. "src/lib/formats/flopimg.h",
+		MAME_DIR .. "src/lib/formats/flopimg_legacy.cpp",
+		MAME_DIR .. "src/lib/formats/flopimg_legacy.h",
 
 		MAME_DIR .. "src/lib/formats/cqm_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/cqm_dsk.h",

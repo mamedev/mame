@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "cqm_dsk.h"
+#include "flopimg_legacy.h"
 
 #include "ioprocs.h"
 

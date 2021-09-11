@@ -99,7 +99,12 @@
 
 #include "formats/victor9k_dsk.h"
 
+#include "coretmpl.h" // util::BIT
 #include "ioprocs.h"
+
+#include "osdcore.h" // osd_printf_*
+
+#include <cstring>
 
 
 victor9k_format::victor9k_format()

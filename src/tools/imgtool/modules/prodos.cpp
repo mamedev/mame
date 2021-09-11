@@ -128,7 +128,10 @@
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
 #include "iflopimg.h"
+
 #include "macutil.h"
+
+#include "opresolv.h"
 
 #define ROOTDIR_BLOCK           2
 #define BLOCK_SIZE              512

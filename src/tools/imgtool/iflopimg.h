@@ -14,7 +14,7 @@
 
 #include "library.h"
 
-#include "formats/flopimg.h"
+#include "formats/flopimg_legacy.h"
 
 
 /***************************************************************************

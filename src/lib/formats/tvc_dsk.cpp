@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/tvc_dsk.h"
 
 tvc_format::tvc_format() : wd177x_format(formats)

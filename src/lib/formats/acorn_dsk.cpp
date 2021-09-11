@@ -9,8 +9,11 @@
 ***************************************************************************/
 
 #include "acorn_dsk.h"
+#include "imageutl.h"
 
 #include "ioprocs.h"
+
+#include <cstring>
 
 
 acorn_ssd_format::acorn_ssd_format() : wd177x_format(formats)

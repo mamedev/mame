@@ -28,6 +28,10 @@ class random_read;
 class random_write;
 class random_read_write;
 
+// opresolv.h
+class option_guide;
+class option_resolution;
+
 // unzip.h
 class archive_file;
 

@@ -5,9 +5,8 @@
     Support for VG-5000 .k7 cassette images
 
 ********************************************************************/
-#include "vg5k_cas.h"
 
-#include <cassert>
+#include "vg5k_cas.h"
 
 
 #define SMPLO   -32768

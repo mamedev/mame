@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#include "adam_cas.h"
 
-#include <cassert>
+#include "adam_cas.h"
 
 
 // This code will reproduce the timing of an adam tape played back on a standard tape deck with a 1 7/8ips speed.

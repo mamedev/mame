@@ -13,6 +13,7 @@
 #pragma once
 
 #include "flopimg.h"
+#include "flopimg_legacy.h"
 
 void sony_filltrack(uint8_t *buffer, size_t buffer_len, size_t *pos, uint8_t data);
 uint8_t sony_fetchtrack(const uint8_t *buffer, size_t buffer_len, size_t *pos);

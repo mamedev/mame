@@ -12,8 +12,6 @@
 
 #include "coretmpl.h" // BIT
 
-#include <cassert>
-
 
 /*-------------------------------------------------
     CassetteModulation aquarius_caq_modulation

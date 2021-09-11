@@ -99,11 +99,14 @@
 *********************************************************************/
 
 #include "ap_dsk35.h"
+#include "imageutl.h"
 
 #include "ioprocs.h"
+#include "opresolv.h"
 
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 
 
 struct apple35_tag

@@ -35,6 +35,10 @@
 
 #include "ioprocs.h"
 
+#include "osdcomm.h" // little_endianize_int32
+
+#include <cstring>
+
 
 fdd_format::fdd_format()
 {

@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_DIIMAGE_H
 #define MAME_EMU_DIIMAGE_H
 
+#include "utilfwd.h"
+
 #include <memory>
 #include <string>
 #include <system_error>

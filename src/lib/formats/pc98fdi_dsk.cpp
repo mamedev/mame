@@ -12,6 +12,8 @@
 
 #include "ioprocs.h"
 
+#include "osdcomm.h" // little_endianize_int32
+
 
 pc98fdi_format::pc98fdi_format()
 {
