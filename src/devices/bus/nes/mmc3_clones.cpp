@@ -284,8 +284,8 @@ nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_bmc_hik4_device::nes_bmc_hik4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_HIK4, tag, owner, clock)
+nes_bmc_hik4_device::nes_bmc_hik4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_HIK4, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
@@ -649,9 +649,16 @@ void nes_bmc_hik8_device::pcb_reset()
 	mmc3_common_initialize(0x3f, 0xff, 0);
 }
 
+void nes_bmc_hik4_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_mmc3_mode));
+}
+
 void nes_bmc_hik4_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	m_mmc3_mode = true;
 	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
@@ -2206,30 +2213,33 @@ void nes_bmc_hik8_device::write_m(offs_t offset, uint8_t data)
 
  iNES: mapper 49
 
- In MESS: Supported. It also uses mmc3_irq.
+ In MAME: Supported. It also uses mmc3_irq.
 
  -------------------------------------------------*/
 
-void nes_bmc_hik4_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_hik4_device::prg_cb(int start, int bank)
+{
+	if (m_mmc3_mode)    // all games use MMC3 PRG banking except Master Fighter III
+		nes_txrom_device::prg_cb(start, bank);
+}
+
+void nes_bmc_hik4_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_hik4 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	/* mid writes only work when WRAM is enabled. not sure if I should
-	 change the condition to m_mmc_latch2==0x80 (i.e. what is the effect of
-	 the read-only bit?) */
-	if (m_wram_protect & 0x80)
+	// mid writes only work when WRAM is enabled and writable
+	if ((m_wram_protect & 0xc0) == 0x80)
 	{
-		if (data & 0x01)    /* if this is 0, then we have 32k PRG blocks */
+		m_mmc3_mode = data & 0x01;
+		if (m_mmc3_mode)
 		{
 			m_prg_base = (data & 0xc0) >> 2;
-			m_prg_mask = 0x0f;
 			set_prg(m_prg_base, m_prg_mask);
 		}
-		else
+		else                // Master Fighter III only
 			prg32((data & 0x30) >> 4);
 
 		m_chr_base = (data & 0xc0) << 1;
-		m_chr_mask = 0x7f;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }
