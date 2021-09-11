@@ -43,6 +43,11 @@ template <typename Format, typename... Params> static void VPRINTF(Format &&, Pa
 
 #define VALIDATE_REFCOUNTS 0
 
+offs_t handler_entry::dispatch_entry(offs_t address) const
+{
+	fatalerror("dispatch_entry called on non-dispatching class\n");
+}
+
 void handler_entry::dump_map(std::vector<memory_entry> &map) const
 {
 	fatalerror("dump_map called on non-dispatching class\n");
@@ -153,7 +158,7 @@ template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::de
 	fatalerror("detach called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges)
+template<int Width, int AddrShift> void handler_entry_read<Width, AddrShift>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges)
 {
 	fatalerror("init_handlers called on non-view class\n");
 }
@@ -215,7 +220,7 @@ template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::d
 	fatalerror("detach called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges)
+template<int Width, int AddrShift> void handler_entry_write<Width, AddrShift>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges)
 {
 	fatalerror("init_handlers called on non-view class\n");
 }
