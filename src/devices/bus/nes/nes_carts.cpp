@@ -61,6 +61,7 @@
 #include "bootleg.h"
 #include "multigame.h"
 #include "pirate.h"
+#include "mmc1_clones.h"
 #include "mmc3_clones.h"
 
 
@@ -217,6 +218,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("tengen_800008",    NES_TENGEN_800008);   // FIXME: Is this the same as CNROM?
 	device.option_add_internal("tengen_800032",    NES_TENGEN_800032);
 	device.option_add_internal("tengen_800037",    NES_TENGEN_800037);
+	device.option_add_internal("txc_22110",        NES_TXC_22110);
 	device.option_add_internal("txc_22211",        NES_TXC_22211);
 	device.option_add_internal("txc_dumarc",       NES_TXC_DUMARACING);
 	device.option_add_internal("txc_mjblock",      NES_TXC_MJBLOCK);
@@ -418,6 +420,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_reset4",       NES_BMC_4IN1RESET);  // mapper 60 with 64k prg and 32k chr
 	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 226? or 233?
 	device.option_add_internal("bmc_lc160",        NES_BMC_LC160);
+	device.option_add_internal("resetsxrom",       NES_RESETSXROM);
 // misc multigame cart MMC3 clone boards
 	device.option_add_internal("a88s1",            NES_A88S1);
 	device.option_add_internal("fcgj8in1",         NES_FCGJ8IN1);

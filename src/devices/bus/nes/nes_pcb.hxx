@@ -130,6 +130,7 @@ static const nes_pcb pcb_list[] =
 	{ "tengen_800008",    TENGEN_800008 },  /* FIXME: Is this the same as mapper 3? */
 	{ "tengen_800032",    TENGEN_800032 },
 	{ "tengen_800037",    TENGEN_800037 },
+	{ "txc_22110",        TXC_22110 },
 	{ "txc_22211",        TXC_22211 },
 	{ "txc_dumarc",       TXC_DUMARACING },
 	{ "txc_mjblock",      TXC_MJBLOCK },
@@ -302,6 +303,7 @@ static const nes_pcb pcb_list[] =
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
 	{ "nt639",            BMC_NT639 },
+	{ "resetsxrom",       BMC_RESETSXROM },
 	{ "resettxrom0",      BMC_RESETTXROM0 },
 	{ "resettxrom1",      BMC_RESETTXROM1 },
 	{ "resettxrom2",      BMC_RESETTXROM2 },

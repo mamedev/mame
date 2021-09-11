@@ -175,7 +175,7 @@ static const nes_mmc mmc_list[] =
 	{ 139, SACHEN_8259C },
 	{ 140, JALECO_JF11 },
 	{ 141, SACHEN_8259A },
-	{ 142, KAISER_KS7032},
+	{ 142, KAISER_KS7032 },
 	{ 143, SACHEN_TCA01 },
 	{ 144, AGCI_50282 },
 	{ 145, SACHEN_SA72007 },
@@ -195,8 +195,8 @@ static const nes_mmc mmc_list[] =
 	{ 159, BANDAI_LZ93EX1 }, // with 24c01
 	{ 160, SACHEN_SA009 },
 	// 161 Unused
-	{ 162, WAIXING_FS304},  // not confirmed, but a lot of chinese releases use it like this...
-	{ 163, NANJING_BOARD},
+	{ 162, WAIXING_FS304 },  // not confirmed, but a lot of chinese releases use it like this...
+	{ 163, NANJING_BOARD },
 	{ 164, WAIXING_FFV },
 	{ 165, WAIXING_SH2 },
 	{ 166, SUBOR_TYPE1 },
@@ -208,7 +208,7 @@ static const nes_mmc mmc_list[] =
 	{ 172, TXC_DUMARACING },
 	{ 173, TXC_MJBLOCK },
 	{ 174, BMC_2751 },
-	{ 175, KAISER_KS7022},
+	{ 175, KAISER_KS7022 },
 	{ 176, UNL_XIAOZY },
 	{ 177, HENGG_SRICH },
 	{ 178, WAIXING_SGZLZ },
@@ -332,7 +332,7 @@ static const nes_mmc mmc_list[] =
 	// 294 variant of mapper 134?
 	// 295 JY multicarts not yet in nes.xml
 	// 296 VT3x handhelds
-	// 297 2-in-1 Uzi Lightgun not in nes.xml
+	{ 297, TXC_22110 },            // 2-in-1 Uzi Lightgun
 	{ 298, UNL_TF1201 },           // Lethal Weapon (Enforcers) pirate
 	{ 299, BMC_11160 },
 	{ 300, BMC_190IN1 },
@@ -409,7 +409,7 @@ static const nes_mmc mmc_list[] =
 	// 371 Spanish PEC-586 computer main cart
 	// 372 Rockman 1-6 multicart very close to mapper 45
 	// 373 Super 4-in-1, not in nes.xml?
-	// 374 various JY multicarts
+	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
 	// 376 JY-041 multicart
 	// 377 JY-111 multicart, similar to mapper 367
