@@ -36035,6 +36035,23 @@ realbrkj                        // "523" Billiard Academy Real Break 1998 (Japan
 realbrkk                        // "600" Billiard Academy Real Break 1998 (Korea)
 realbrko                        // "600" Billiard Academy Real Break 1998 (Europe)
 
+@source:recel.cpp
+recel                           //
+r_alaska                        //
+r_blackm4                       //
+r_cavalier                      //
+r_crzyrace                      //
+r_fairfght                      //
+r_flipper                       //
+r_hotcold                       //
+r_mrdoom                        //
+r_mrevil                        //
+r_pokrplus                      //
+r_quijote                       //
+r_screech                       //
+r_swash                         //
+r_torneo                        //
+
 @source:redalert.cpp
 demoneye                        // M27 (c) 1981
 panther                         // M27 no copyright notice
