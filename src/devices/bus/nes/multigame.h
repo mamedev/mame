@@ -265,10 +265,10 @@ class nes_vt5201_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_vt5201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_vt5201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_h(offs_t offset) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -277,7 +277,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch, m_dipsetting;
+	u8 m_latch, m_jumper;
 };
 
 
@@ -645,15 +645,9 @@ class nes_bmc_s700_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_s700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_s700_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -753,15 +747,9 @@ class nes_bmc_20in1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_20in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_20in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -771,15 +759,9 @@ class nes_bmc_21in1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_21in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_21in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
