@@ -1785,8 +1785,8 @@ MACHINE_START_MEMBER(fm7_state,fm16)
 
 void fm7_state::machine_reset()
 {
-	m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
-	m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
+	m_timer->adjust_periodic(attotime::from_nsec(2034500));
+	m_subtimer->adjust_periodic(attotime::from_msec(20));
 	m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 
 	m_irq_mask = 0x00;

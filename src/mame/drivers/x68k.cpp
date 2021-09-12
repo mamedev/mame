@@ -321,7 +321,7 @@ void x68k_state::set_adpcm()
 {
 	uint32_t rate = adpcm_div[m_adpcm.rate];
 	uint32_t res_clock = adpcm_clock[m_adpcm.clock]/2;
-	m_adpcm_timer->adjust(attotime::from_ticks(rate, res_clock), 0, attotime::from_ticks(rate, res_clock));
+	m_adpcm_timer->adjust_periodic(attotime::from_ticks(rate, res_clock));
 }
 
 // Megadrive 3 button gamepad
@@ -1011,7 +1011,7 @@ void x68k_state::dma_end(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
-		m_fdc_tc->adjust(attotime::from_usec(1), 0, attotime::never);
+		m_fdc_tc->adjust(attotime::from_usec(1));
 	}
 }
 

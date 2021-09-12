@@ -346,7 +346,7 @@ void msm5205_device::device_clock_changed()
 		logerror("/%d prescaler selected\n", prescaler);
 
 		attotime half_period = clocks_to_attotime(prescaler / 2);
-		m_vck_timer->adjust(half_period, 0, half_period);
+		m_vck_timer->adjust_periodic(half_period);
 	}
 	else
 	{

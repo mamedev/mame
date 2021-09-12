@@ -336,7 +336,7 @@ void remote488_device::bus_reset()
 	m_sh_state = REM_SH_SIDS;
 	m_ah_state = REM_AH_ACRS;
 	m_rx_state = REM_RX_WAIT_CH;
-	m_poll_timer->adjust(attotime::from_usec(POLL_PERIOD_US) , 0 , attotime::from_usec(POLL_PERIOD_US));
+	m_poll_timer->adjust_periodic(attotime::from_usec(POLL_PERIOD_US));
 	m_pp_data = 0;
 	m_pp_requested = false;
 	update_ah_fsm();
@@ -399,7 +399,7 @@ void remote488_device::process_input_msgs()
 		}
 	}
 	if (!m_poll_timer->enabled()) {
-		m_poll_timer->adjust(attotime::from_usec(POLL_PERIOD_US) , 0 , attotime::from_usec(POLL_PERIOD_US));
+		m_poll_timer->adjust_periodic(attotime::from_usec(POLL_PERIOD_US));
 	}
 }
 
@@ -446,7 +446,7 @@ void remote488_device::set_connection(bool state)
 				send_update(MSG_SIGNAL_CLEAR , tmp);
 			}
 		}
-		m_hb_timer->adjust(attotime::from_msec(HEARTBEAT_MS) , 0 , attotime::from_msec(HEARTBEAT_MS));
+		m_hb_timer->adjust_periodic(attotime::from_msec(HEARTBEAT_MS));
 		m_connect_cnt = MAX_MISSED_HB;
 	} else {
 		if (m_connected) {
@@ -454,7 +454,7 @@ void remote488_device::set_connection(bool state)
 			m_connected = false;
 			LOG("Connection lost!\n");
 			update_ah_fsm();
-			m_hb_timer->adjust(attotime::from_msec(HEARTBEAT_MS) , 0 , attotime::from_msec(HEARTBEAT_MS));
+			m_hb_timer->adjust_periodic(attotime::from_msec(HEARTBEAT_MS));
 		}
 	}
 }

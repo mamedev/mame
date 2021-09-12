@@ -270,7 +270,7 @@ void tandy2k_state::clkmouse_w(offs_t offset, uint8_t data)
 					break;
 				case 0x20:
 					if(m_clkmouse_cmd[1] > 0)
-						m_mouse_timer->adjust(attotime::from_hz(40), 0, attotime::from_hz(40));
+						m_mouse_timer->adjust_periodic(attotime::from_hz(40));
 					else
 						m_mouse_timer->adjust(attotime::never);
 					break;
@@ -338,7 +338,7 @@ void tandy2k_state::addr_ctrl_w(uint8_t data)
 
 		m_vac->set_unscaled_clock(busdotclk);
 
-		m_timer_vidldsh->adjust(attotime::from_hz(vidcclk), 0, attotime::from_hz(vidcclk));
+		m_timer_vidldsh.adjust_periodic(attotime::from_hz(vidcclk));
 
 		m_clkspd = clkspd;
 		m_clkcnt = clkcnt;
@@ -649,7 +649,7 @@ CRT9021_DRAW_CHARACTER_MEMBER( tandy2k_state::vac_draw_character )
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( tandy2k_state::vidldsh_tick )
+void tandy2k_state::vidldsh_tick()
 {
 	m_drb0->rclk_w(0);
 	m_drb0->wclk_w(0);
@@ -923,6 +923,7 @@ void tandy2k_state::machine_start()
 
 	m_mouse_timer = timer_alloc(MOUS_TIMER);
 	m_mcu_delay = timer_alloc(MCU_DELAY);
+	m_timer_vidldsh.init(*this, FUNC(tandy2k_state::vidldsh_tick));
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));
@@ -1038,8 +1039,6 @@ void tandy2k_state::tandy2k(machine_config &config)
 	m_vac->set_screen(SCREEN_TAG);
 
 	ADDRESS_MAP_BANK(config, m_vrambank).set_map(&tandy2k_state::vrambank_mem).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
-
-	TIMER(config, "vidldsh").configure_generic(FUNC(tandy2k_state::vidldsh_tick));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

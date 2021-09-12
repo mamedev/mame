@@ -280,7 +280,7 @@ void famibox_state::famicombox_reset()
 
 TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 {
-	m_attract_timer->adjust(attotime::never, 0, attotime::never);
+	m_attract_timer->adjust(attotime::never);
 	if ( BIT(m_exception_mask,1) )
 	{
 		m_exception_cause &= ~0x02;
@@ -295,7 +295,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 
 	if (m_coins == 0)
 	{
-		m_gameplay_timer->adjust(attotime::never, 0, attotime::never);
+		m_gameplay_timer->adjust(attotime::never);
 		if ( BIT(m_exception_mask,4) )
 		{
 			m_exception_cause &= ~0x10;
@@ -344,7 +344,7 @@ void famibox_state::famibox_system_w(offs_t offset, uint8_t data)
 			{
 				if (m_attract_timer->start() != attotime::never)
 				{
-					m_attract_timer->adjust(attotime::from_seconds((int32_t)((double)1.0/6.8274*m_attract_timer_period)), 0, attotime::never);
+					m_attract_timer->adjust(attotime::from_seconds((int32_t)((double)1.0/6.8274*m_attract_timer_period)));
 				}
 			}
 			break;
@@ -360,7 +360,7 @@ void famibox_state::famibox_system_w(offs_t offset, uint8_t data)
 			m_attract_timer_period = data;
 			if ( BIT(m_exception_mask,1) && ( data != 0 ) )
 			{
-				m_attract_timer->adjust(attotime::from_hz(6.8274/m_attract_timer_period), 0, attotime::never);
+				m_attract_timer->adjust(attotime::from_hz(6.8274/m_attract_timer_period));
 			}
 			break;
 		case 4:
@@ -421,7 +421,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 		m_coins++;
 		if (m_attract_timer->start() != attotime::never)
 		{
-			m_gameplay_timer->adjust(attotime::from_seconds(60*(m_money_reg == 0x22 ? 20 : 10)), 0, attotime::never);
+			m_gameplay_timer->adjust(attotime::from_seconds(60*(m_money_reg == 0x22 ? 20 : 10)));
 		}
 
 		if ( BIT(m_exception_mask,4) && (m_coins == 1) )

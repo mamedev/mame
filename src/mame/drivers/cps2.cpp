@@ -10170,7 +10170,7 @@ void cps2_state::init_digital_volume()
 
 	// create a timer to update our volume state from the fake switches - read it every 6 frames or so to enable some granularity
 	m_digital_volume_timer = timer_alloc(*this, FUNC(cps2_state::cps2_update_digital_volume));
-	m_digital_volume_timer->adjust(attotime::from_msec(100), 0, attotime::from_msec(100));
+	m_digital_volume_timer->adjust_periodic(attotime::from_msec(100));
 }
 
 
@@ -10225,7 +10225,7 @@ void cps2_state::init_singbrd()
 
 	// The single board games don't have a digital volume switch
 	m_cps2disabledigitalvolume = 1;
-	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
+	m_digital_volume_timer->adjust(attotime::never);
 }
 
 uint16_t cps2_state::gigaman2_dummyqsound_r(offs_t offset)
@@ -10269,7 +10269,7 @@ void cps2_state::init_gigaman2()
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base()+0x200000, 0x200000);
 
 	// No digital volume switches on this?
-	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
+	m_digital_volume_timer->adjust(attotime::never);
 }
 
 void cps2_state::init_ecofghtr()

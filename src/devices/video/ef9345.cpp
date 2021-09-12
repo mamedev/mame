@@ -139,7 +139,7 @@ void ef9345_device::device_start()
 
 	m_screen_out.allocate(496, screen().height());
 
-	m_blink_timer->adjust(attotime::from_msec(500), 0, attotime::from_msec(500));
+	m_blink_timer->adjust_periodic(attotime::from_msec(500));
 
 	init_accented_chars();
 

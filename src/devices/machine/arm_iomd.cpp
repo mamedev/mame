@@ -502,7 +502,7 @@ inline void arm_iomd_device::trigger_timer(unsigned Which)
 	if(val==0)
 		m_timer[Which]->adjust(attotime::never);
 	else
-		m_timer[Which]->adjust(attotime::from_usec(val), 0, attotime::from_usec(val));
+		m_timer[Which]->adjust_periodic(attotime::from_usec(val));
 }
 
 // TODO: live updates aren't really supported here

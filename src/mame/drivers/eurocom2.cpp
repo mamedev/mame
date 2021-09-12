@@ -411,9 +411,9 @@ void eurocom2_state::machine_reset()
 	m_floppy = nullptr;
 
 	if (ioport("S1")->read() & 0x80)
-		m_sst->adjust(attotime::from_usec(12200), 0, attotime::from_usec(12200));
+		m_sst->adjust_periodic(attotime::from_usec(12200));
 	else
-		m_sst->adjust(attotime::never, 0, attotime::never);
+		m_sst->adjust(attotime::never);
 }
 
 void eurocom2_state::machine_start()

@@ -227,7 +227,7 @@ void mm1_keyboard_device::device_start()
 
 	// allocate timers
 	m_scan_timer = timer_alloc(SCAN_TIMER);
-	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_scan_timer->adjust_periodic(attotime::from_hz(clock()));
 
 	// add notification request for system shut down (to play back the power switch sound once more)
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mm1_keyboard_device::shut_down_mm1, this));

@@ -674,13 +674,13 @@ void pit68230_device::wr_pitreg_tcr(uint8_t data)
 		if (clk == 1)
 		{
 			int rate = clock() / (psc == 1 ? 32 : 1);
-			pit_timer->adjust(attotime::from_hz(rate), TIMER_ID_PIT, attotime::from_hz(rate));
+			pit_timer->adjust_periodic(attotime::from_hz(rate), TIMER_ID_PIT);
 			LOG("PIT timer started @ rate: %d and CLK: %d,\n", rate, clock());
 		}
 	}
 	else
 	{
-		pit_timer->adjust(attotime::never, TIMER_ID_PIT, attotime::never);
+		pit_timer->adjust(attotime::never, TIMER_ID_PIT);
 	}
 }
 

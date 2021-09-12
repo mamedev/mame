@@ -868,7 +868,7 @@ void thomson_state::to7_game_init()
 {
 	LOG (( "to7_game_init called\n" ));
 	m_to7_game_timer = timer_alloc(*this, FUNC(thomson_state::to7_game_update_cb));
-	m_to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
+	m_to7_game_timer->adjust_periodic(TO7_GAME_POLL_PERIOD);
 	save_item(NAME(m_to7_game_sound));
 	save_item(NAME(m_to7_game_mute));
 }
@@ -4002,7 +4002,7 @@ void mo6_state::mo6_game_init()
 {
 	LOG (( "mo6_game_init called\n" ));
 	m_to7_game_timer = timer_alloc(*this, FUNC(mo6_state::mo6_game_update_cb));
-	m_to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
+	m_to7_game_timer->adjust_periodic(TO7_GAME_POLL_PERIOD);
 	save_item(NAME(m_to7_game_sound));
 	save_item(NAME(m_to7_game_mute));
 }
@@ -4424,7 +4424,7 @@ void mo5nr_state::mo5nr_game_init()
 {
 	LOG (( "mo5nr_game_init called\n" ));
 	m_to7_game_timer = timer_alloc(*this, FUNC(mo5nr_state::mo6_game_update_cb));
-	m_to7_game_timer->adjust( TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
+	m_to7_game_timer->adjust_periodic( TO7_GAME_POLL_PERIOD );
 	save_item(NAME(m_to7_game_sound));
 	save_item(NAME(m_to7_game_mute));
 }

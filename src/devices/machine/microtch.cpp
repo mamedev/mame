@@ -228,7 +228,7 @@ void microtouch_device::device_start()
 	m_last_touch_state = -1;
 
 	m_timer = timer_alloc();
-	m_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
+	m_timer->adjust_periodic(attotime::from_hz(167*5));
 
 	m_format = FORMAT_UNKNOWN;
 	m_mode = MODE_INACTIVE;

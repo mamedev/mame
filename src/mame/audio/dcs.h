@@ -14,7 +14,6 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "sound/dmadac.h"
 #include "machine/bankdev.h"
-#include "machine/timer.h"
 
 
 class dcs_audio_device : public device_t
@@ -81,20 +80,20 @@ public:
 	void output_control_w(uint16_t data);
 	uint16_t output_control_r();
 	void update_timer_count();
-	TIMER_DEVICE_CALLBACK_MEMBER( internal_timer_callback );
+	void internal_timer_callback();
 	void reset_timer();
 	DECLARE_WRITE_LINE_MEMBER(timer_enable_callback);
 	uint16_t adsp_control_r(offs_t offset);
 	void adsp_control_w(offs_t offset, uint16_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER( dcs_irq );
-	TIMER_DEVICE_CALLBACK_MEMBER( sport0_irq );
+	void dcs_irq();
+	void sport0_irq();
 	void recompute_sample_rate();
 	void sound_tx_callback(offs_t offset, uint32_t data);
 	uint16_t dcs_polling_r(address_space &space);
 	void dcs_polling_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t dcs_polling32_r(address_space &space);
 	void dcs_polling32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	TIMER_DEVICE_CALLBACK_MEMBER( transfer_watchdog_callback );
+	void transfer_watchdog_callback(int param);
 	void s1_ack_callback2();
 	void s1_ack_callback1(uint16_t param);
 	int preprocess_stage_1(uint16_t data);
@@ -165,7 +164,7 @@ protected:
 		int32_t       writes_left;
 		uint16_t      sum;
 		int32_t       fifo_entries;
-		timer_device *watchdog;
+		persistent_timer watchdog;
 	};
 
 	adsp21xx_device *m_cpu;
@@ -179,9 +178,6 @@ protected:
 	uint16_t      m_size;
 	uint16_t      m_incs;
 	dmadac_sound_device *m_dmadac[6];
-	required_device<timer_device> m_reg_timer;
-	optional_device<timer_device> m_sport0_timer;
-	required_device<timer_device> m_internal_timer;
 	int32_t       m_ireg;
 	uint16_t      m_ireg_base;
 	uint16_t      m_control_regs[32];
@@ -236,6 +232,10 @@ protected:
 	transient_timer_factory m_s1_ack_callback2;
 	transient_timer_factory m_s1_ack_callback1;
 	transient_timer_factory m_s2_ack_callback;
+
+	persistent_timer m_reg_timer;
+	persistent_timer m_sport0_timer;
+	persistent_timer m_internal_timer;
 
 	std::unique_ptr<uint16_t[]> m_sram;
 	uint16_t m_polling_value;

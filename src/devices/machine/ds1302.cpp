@@ -102,7 +102,7 @@ void ds1302_device::device_start()
 {
 	// allocate timers
 	m_clock_timer = timer_alloc();
-	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+	m_clock_timer->adjust_periodic(attotime::from_hz(clock() / 32768));
 
 	m_clk = 0;
 	m_ce = 0;

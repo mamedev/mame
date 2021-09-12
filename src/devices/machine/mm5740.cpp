@@ -80,7 +80,7 @@ void mm5740_device::device_start()
 
 	// allocate timers
 	m_scan_timer = timer_alloc();
-	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_scan_timer->adjust_periodic(attotime::from_hz(clock()));
 
 	// state saving
 	save_item(NAME(m_b));

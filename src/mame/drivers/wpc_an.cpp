@@ -394,9 +394,9 @@ void wpc_an_state::init_wpc_an()
 	m_cpubank->set_entry(0);
 
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
-	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60));
+	m_vblank_timer->adjust_periodic(attotime::from_hz(60));
 	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_hz(976),0,attotime::from_hz(976));
+	m_irq_timer->adjust_periodic(attotime::from_hz(976));
 
 	m_bankmask = ((memregion("maincpu")->bytes()-0x10000) >> 14) - 1;
 

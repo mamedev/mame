@@ -552,7 +552,7 @@ INPUT_CHANGED_MEMBER(jpmsys5v_state::touchscreen_press)
 		/* Start sending the data to the 68000 serially */
 		m_touch_data_count = 0;
 		m_touch_state = START;
-		m_touch_timer->adjust(rx_period, 0, rx_period);
+		m_touch_timer->adjust_periodic(rx_period);
 	}
 }
 

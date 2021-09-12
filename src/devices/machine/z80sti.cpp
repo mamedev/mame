@@ -462,12 +462,12 @@ void z80sti_device::write(offs_t offset, uint8_t data)
 			LOG("Z80STI Timer D Prescaler: %u\n", tdc);
 
 			if (tcc)
-				m_timer[TIMER_C]->adjust(attotime::from_hz(clock() / tcc), TIMER_C, attotime::from_hz(clock() / tcc));
+				m_timer[TIMER_C]->adjust_periodic(attotime::from_hz(clock() / tcc), TIMER_C);
 			else
 				m_timer[TIMER_C]->enable(false);
 
 			if (tdc)
-				m_timer[TIMER_D]->adjust(attotime::from_hz(clock() / tdc), TIMER_D, attotime::from_hz(clock() / tdc));
+				m_timer[TIMER_D]->adjust_periodic(attotime::from_hz(clock() / tdc), TIMER_D);
 			else
 				m_timer[TIMER_D]->enable(false);
 
@@ -568,12 +568,12 @@ void z80sti_device::write(offs_t offset, uint8_t data)
 		LOG("Z80STI Timer B Prescaler: %u\n", tbc);
 
 		if (tac)
-			m_timer[TIMER_A]->adjust(attotime::from_hz(clock() / tac), TIMER_A, attotime::from_hz(clock() / tac));
+			m_timer[TIMER_A]->adjust_periodic(attotime::from_hz(clock() / tac), TIMER_A);
 		else
 			m_timer[TIMER_A]->enable(false);
 
 		if (tbc)
-			m_timer[TIMER_B]->adjust(attotime::from_hz(clock() / tbc), TIMER_B, attotime::from_hz(clock() / tbc));
+			m_timer[TIMER_B]->adjust_periodic(attotime::from_hz(clock() / tbc), TIMER_B);
 		else
 			m_timer[TIMER_B]->enable(false);
 		}

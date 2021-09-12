@@ -137,7 +137,7 @@ void k053260_device::device_start()
 void k053260_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / CLOCKS_PER_SAMPLE);
-	m_timer->adjust(attotime::from_ticks(16, clock()), 0, attotime::from_ticks(16, clock()));
+	m_timer->adjust_periodic(attotime::from_ticks(16, clock()));
 }
 
 
@@ -147,7 +147,7 @@ void k053260_device::device_clock_changed()
 
 void k053260_device::device_reset()
 {
-	m_timer->adjust(attotime::from_ticks(16, clock()), 0, attotime::from_ticks(16, clock()));
+	m_timer->adjust_periodic(attotime::from_ticks(16, clock()));
 
 	for (auto & elem : m_voice)
 		elem.voice_reset();

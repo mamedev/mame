@@ -200,9 +200,9 @@ void spg2xx_io_device::device_reset()
 
 	std::fill_n(&m_extint[0], 2, false);
 
-	m_4khz_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+	m_4khz_timer->adjust_periodic(attotime::from_hz(4096));
 
-	m_rng_timer->adjust(attotime::from_hz(1234), 0, attotime::from_hz(1234)); // timer value is arbitrary, maybe should match system clock, but that would result in heavy switching
+	m_rng_timer->adjust_periodic(attotime::from_hz(1234)); // timer value is arbitrary, maybe should match system clock, but that would result in heavy switching
 
 	m_tmb1->adjust(attotime::never);
 	m_tmb2->adjust(attotime::never);
@@ -688,13 +688,13 @@ void spg2xx_io_device::update_timer_b_rate()
 			m_timer_src_c->adjust(attotime::never);
 			break;
 		case 2:
-			m_timer_src_c->adjust(attotime::from_hz(32768), 0, attotime::from_hz(32768));
+			m_timer_src_c->adjust_periodic(attotime::from_hz(32768));
 			break;
 		case 3:
-			m_timer_src_c->adjust(attotime::from_hz(8192), 0, attotime::from_hz(8192));
+			m_timer_src_c->adjust_periodic(attotime::from_hz(8192));
 			break;
 		case 4:
-			m_timer_src_c->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+			m_timer_src_c->adjust_periodic(attotime::from_hz(4096));
 			break;
 	}
 }
@@ -843,9 +843,9 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 		m_io_regs[REG_TIMEBASE_SETUP] = data;
 		const uint8_t hifreq = BIT(data, 4);
 		const uint32_t tmb1freq = s_tmb1_freq[hifreq][data & 3];
-		m_tmb1->adjust(attotime::from_hz(tmb1freq), 0, attotime::from_hz(tmb1freq));
+		m_tmb1->adjust_periodic(attotime::from_hz(tmb1freq));
 		const uint32_t tmb2freq = s_tmb2_freq[hifreq][(data >> 2) & 3];
-		m_tmb2->adjust(attotime::from_hz(tmb2freq), 0, attotime::from_hz(tmb2freq));
+		m_tmb2->adjust_periodic(attotime::from_hz(tmb2freq));
 		break;
 	}
 
@@ -880,15 +880,15 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 				m_timer_src_ab->adjust(attotime::never);
 				break;
 			case 2:
-				m_timer_src_ab->adjust(attotime::from_hz(32768), 0, attotime::from_hz(32768));
+				m_timer_src_ab->adjust_periodic(attotime::from_hz(32768));
 				timer_a_rate = 32768;
 				break;
 			case 3:
-				m_timer_src_ab->adjust(attotime::from_hz(8192), 0, attotime::from_hz(8192));
+				m_timer_src_ab->adjust_periodic(attotime::from_hz(8192));
 				timer_a_rate = 8192;
 				break;
 			case 4:
-				m_timer_src_ab->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+				m_timer_src_ab->adjust_periodic(attotime::from_hz(4096));
 				timer_a_rate = 4096;
 				break;
 		}
@@ -1099,7 +1099,7 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 			if (BIT(data, 10))
 			{
 				m_io_regs[REG_ADC_DATA] &= ~0x8000;
-				m_adc_timer[adc_channel]->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
+				m_adc_timer[adc_channel]->adjust_periodic(attotime::from_hz(8000));
 			}
 		}
 		else
@@ -1334,7 +1334,7 @@ void spg2xx_io_device::io_extended_w(offs_t offset, uint16_t data)
 				m_spi_tx_fifo_count++;
 
 				attotime rate = attotime::from_ticks(m_spi_rate, clock());
-				m_spi_tx_timer->adjust(rate, 0, rate);
+				m_spi_tx_timer->adjust_periodic(rate);
 			}
 			else
 			{

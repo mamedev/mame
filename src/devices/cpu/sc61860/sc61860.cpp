@@ -107,7 +107,7 @@ void sc61860_device::device_reset()
 void sc61860_device::device_start()
 {
 	m_2ms_tick_timer = timer_alloc(*this, FUNC(sc61860_device::sc61860_2ms_tick));
-	m_2ms_tick_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
+	m_2ms_tick_timer->adjust_periodic(attotime::from_hz(500));
 
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);

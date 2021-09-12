@@ -61,7 +61,7 @@ void pcf2100_device::device_start()
 	// timer
 	m_lcd_timer = timer_alloc();
 	attotime period = attotime::from_hz(clock());
-	m_lcd_timer->adjust(period, 0, period);
+	m_lcd_timer->adjust_periodic(period);
 
 	// register for savestates
 	save_item(NAME(m_shift));

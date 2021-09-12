@@ -692,7 +692,7 @@ void m6801_cpu_device::set_rmcr(uint8_t data)
 			int divisor = M6801_RMCR_SS[m_rmcr & M6801_RMCR_SS_MASK];
 			attotime period = cycles_to_attotime(divisor);
 			LOGSER("SCI: Setting serial rate, Divisor: %d Hz: %d\n", divisor, period.as_hz());
-			m_sci_timer->adjust(period, 0, period);
+			m_sci_timer->adjust_periodic(period);
 			m_use_ext_serclock = false;
 		}
 		break;
@@ -730,7 +730,7 @@ void hd6301x_cpu_device::set_rmcr(uint8_t data)
 			int divisor = M6801_RMCR_SS[m_rmcr & M6801_RMCR_SS_MASK];
 			attotime period = cycles_to_attotime(divisor);
 			LOGSER("SCI: Setting serial rate, Divisor: %d Hz: %d\n", divisor, period.as_hz());
-			m_sci_timer->adjust(period, 0, period);
+			m_sci_timer->adjust_periodic(period);
 		}
 		m_use_ext_serclock = false;
 		break;

@@ -154,7 +154,7 @@ void hh_sm510_state::machine_start()
 
 	// 1kHz display decay ticks
 	m_display_decay_timer = timer_alloc(*this, FUNC(hh_sm510_state::display_decay_tick));
-	m_display_decay_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
+	m_display_decay_timer->adjust_periodic(attotime::from_hz(1024));
 
 	// zerofill
 	m_inp_mux = 0;

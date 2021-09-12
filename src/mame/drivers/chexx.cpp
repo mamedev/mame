@@ -393,7 +393,7 @@ void chexx_state::machine_reset()
 {
 	m_bank = -1;
 	digitalker_set_bank(0);
-	m_update_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_update_timer->adjust_periodic(attotime::from_hz(60));
 }
 
 void chexx_state::update()

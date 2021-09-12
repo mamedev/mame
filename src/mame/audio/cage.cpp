@@ -122,8 +122,6 @@ atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type 
 	m_cpu(*this, "cpu"),
 	m_cageram(*this, "cageram"),
 	m_soundlatch(*this, "soundlatch"),
-	m_dma_timer(*this, "cage_dma_timer"),
-	m_timer(*this, "cage_timer%u", 0U),
 	m_dmadac(*this, "dac%u", 1U),
 	m_bootbank(*this, "bootbank"),
 	m_mainbank(*this, "mainbank"),
@@ -139,7 +137,9 @@ atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type 
 
 void atari_cage_device::device_start()
 {
-	attotime cage_cpu_clock_period;
+	m_dma_timer.init(*this, FUNC(atari_cage_device::dma_timer_callback));
+	m_timer[0].init(*this, FUNC(atari_cage_device::cage_timer_callback));
+	m_timer[1].init(*this, FUNC(atari_cage_device::cage_timer_callback));
 
 	// resolve callbacks
 	m_irqhandler.resolve_safe();
@@ -147,7 +147,7 @@ void atari_cage_device::device_start()
 	m_bootbank->set_base(m_bootrom->base());
 	m_mainbank->set_base(m_mainrom->base());
 
-	cage_cpu_clock_period = attotime::from_hz(m_cpu->clock());
+	attotime cage_cpu_clock_period = attotime::from_hz(m_cpu->clock());
 	m_cpu_h1_clock_period = cage_cpu_clock_period * 2;
 
 	m_cage_deferred_w.init(*this, FUNC(atari_cage_device::cage_deferred_w));
@@ -184,14 +184,14 @@ void atari_cage_device::reset_w(int state)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::dma_timer_callback )
+void atari_cage_device::dma_timer_callback(int param)
 {
 	/* if we weren't enabled, don't do anything, just shut ourself off */
 	if (!m_dma_enabled)
 	{
 		if (m_dma_timer_enabled)
 		{
-			m_dma_timer->adjust(attotime::never);
+			m_dma_timer.adjust(attotime::never);
 			m_dma_timer_enabled = 0;
 		}
 		return;
@@ -244,7 +244,7 @@ void atari_cage_device::update_dma_state()
 		if (!m_dma_timer_enabled)
 		{
 			attotime period = m_serial_period_per_word * m_tms32031_io_regs[DMA_TRANSFER_COUNT];
-			m_dma_timer->adjust(period, addr, period);
+			m_dma_timer.adjust_periodic(period, addr);
 			m_dma_timer_enabled = 1;
 		}
 	}
@@ -252,7 +252,7 @@ void atari_cage_device::update_dma_state()
 	/* see if we turned off */
 	else if (!enabled && m_dma_enabled)
 	{
-		m_dma_timer->reset();
+		m_dma_timer.reset();
 		m_dma_timer_enabled = 0;
 	}
 
@@ -268,9 +268,8 @@ void atari_cage_device::update_dma_state()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::cage_timer_callback )
+void atari_cage_device::cage_timer_callback(int which)
 {
-	int which = param;
 	/* set the interrupt */
 	m_cpu->set_input_line(TMS3203X_TINT0 + which, ASSERT_LINE);
 	m_timer_enabled[which] = 0;
@@ -293,13 +292,13 @@ void atari_cage_device::update_timer(int which)
 		if (m_tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
 			logerror("CAGE TIMER%d: unexpected timer config %08X!\n", which, m_tms32031_io_regs[base + TIMER0_GLOBAL_CTL]);
 
-		m_timer[which]->adjust(period, which);
+		m_timer[which].adjust(period, which);
 	}
 
 	/* see if we turned off */
 	else if (!enabled && m_timer_enabled[which])
 	{
-		m_timer[which]->adjust(attotime::never, which);
+		m_timer[which].adjust(attotime::never, which);
 	}
 
 	/* set the new state */
@@ -544,12 +543,12 @@ void atari_cage_device::control_w(uint16_t data)
 
 		m_dma_enabled = 0;
 		m_dma_timer_enabled = 0;
-		m_dma_timer->reset();
+		m_dma_timer.reset();
 
 		m_timer_enabled[0] = 0;
 		m_timer_enabled[1] = 0;
-		m_timer[0]->reset();
-		m_timer[1]->reset();
+		m_timer[0].reset();
+		m_timer[1].reset();
 
 		memset(m_tms32031_io_regs, 0, 0x60 * 4);
 
@@ -622,10 +621,6 @@ void atari_cage_device::device_add_mconfig(machine_config &config)
 	TMS32031(config, m_cpu, 33868800);
 	m_cpu->set_addrmap(AS_PROGRAM, &atari_cage_device::cage_map);
 	m_cpu->set_mcbl_mode(true);
-
-	TIMER(config, m_dma_timer).configure_generic(DEVICE_SELF, FUNC(atari_cage_device::dma_timer_callback));
-	TIMER(config, m_timer[0]).configure_generic(DEVICE_SELF, FUNC(atari_cage_device::cage_timer_callback));
-	TIMER(config, m_timer[1]).configure_generic(DEVICE_SELF, FUNC(atari_cage_device::cage_timer_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

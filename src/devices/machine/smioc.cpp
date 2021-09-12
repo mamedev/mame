@@ -221,7 +221,7 @@ void smioc_device::device_start()
 	m_m68k_r_cb.resolve_safe(0);
 	m_m68k_w_cb.resolve_safe();
 
-	m_451_timer->adjust(attotime::from_msec(200), 0, attotime::from_msec(200));
+	m_451_timer->adjust_periodic(attotime::from_msec(200));
 }
 
 //-------------------------------------------------

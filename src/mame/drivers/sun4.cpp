@@ -839,8 +839,8 @@ void sun4_base_state::machine_start()
 	// allocate timers for the built-in two channel timer
 	m_c0_timer = timer_alloc(TIMER_0);
 	m_c1_timer = timer_alloc(TIMER_1);
-	m_c0_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
-	m_c1_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
+	m_c0_timer->adjust_periodic(attotime::from_usec(1));
+	m_c1_timer->adjust_periodic(attotime::from_usec(1));
 
 	save_item(NAME(m_auxio));
 	save_item(NAME(m_counter));

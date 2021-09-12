@@ -708,7 +708,7 @@ void v99x8_device::device_reset()
 	m_stat_reg[6] = 0xfc;
 
 	// Start the timer
-	m_line_timer->adjust(attotime::from_ticks(HTOTAL*2, m_clock), 0, attotime::from_ticks(HTOTAL*2, m_clock));
+	m_line_timer->adjust_periodic(attotime::from_ticks(HTOTAL*2, m_clock));
 
 	configure_pal_ntsc();
 	set_screen_parameters();

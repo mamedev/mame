@@ -85,7 +85,7 @@ void c2n_device::device_start()
 {
 	// allocate timers
 	m_read_timer = timer_alloc();
-	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+	m_read_timer->adjust_periodic(attotime::from_hz(44100));
 }
 
 

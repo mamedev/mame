@@ -289,7 +289,7 @@ void spg2xx_game_guitrbus_state::portb_w(offs_t offset, uint16_t data, uint16_t 
 		if ((data & 0x0002))
 		{
 			logerror("ext timer reset\n");
-			m_pulse_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
+			m_pulse_timer->adjust_periodic(attotime::from_hz(32));
 		}
 	}
 
@@ -331,7 +331,7 @@ void spg2xx_game_marc101_state::porta_w(offs_t offset, uint16_t data, uint16_t m
 		if (!(data & 0x0400))
 		{
 			//logerror("pulse / timer reset\n");
-			m_pulse_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
+			m_pulse_timer->adjust_periodic(attotime::from_hz(32));
 		}
 	}
 
@@ -392,8 +392,8 @@ void spg2xx_game_marc250_state::porta_w(offs_t offset, uint16_t data, uint16_t m
 		{
 			// these values stop the marc250 menu from failing, but not the games
 			//printf("pulse / timer reset\n");
-			m_pulse_timer->adjust(attotime::from_hz(6), 0, attotime::from_hz(6));
-			m_pulse_timer2->adjust(attotime::from_hz(12), 0, attotime::from_hz(12));
+			m_pulse_timer->adjust_periodic(attotime::from_hz(6));
+			m_pulse_timer2->adjust_periodic(attotime::from_hz(12));
 		}
 	}
 
@@ -422,7 +422,7 @@ void spg2xx_game_ddmsup_state::porta_w(offs_t offset, uint16_t data, uint16_t me
 
 	if (data & 0x4000)
 	{
-		m_pulse_timer->adjust(attotime::from_hz(6), 0, attotime::from_hz(6));
+		m_pulse_timer->adjust_periodic(attotime::from_hz(6));
 	}
 
 	m_prev_porta = data;

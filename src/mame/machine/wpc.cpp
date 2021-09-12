@@ -43,7 +43,7 @@ void wpc_device::device_start()
 	m_dmdbank_w.resolve_safe();
 
 	m_zc_timer = timer_alloc(TIMER_ZEROCROSS);
-	m_zc_timer->adjust(attotime::from_hz(120),0,attotime::from_hz(120));
+	m_zc_timer->adjust_periodic(attotime::from_hz(120));
 }
 
 void wpc_device::device_reset()

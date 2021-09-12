@@ -78,7 +78,7 @@ void fidel_clockdiv_state::div_refresh(ioport_value val)
 
 	// stop high frequency background timer if cpu divider is disabled
 	attotime period = (val) ? attotime::from_hz(m_maincpu->clock()) : attotime::never;
-	m_div_timer->adjust(period, 0, period);
+	m_div_timer->adjust_periodic(period);
 
 	// set up memory passthroughs
 	if (m_read_tap)

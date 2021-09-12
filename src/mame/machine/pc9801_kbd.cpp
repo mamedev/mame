@@ -241,7 +241,7 @@ void pc9801_kbd_device::device_start()
 	m_write_irq.resolve_safe();
 
 	m_rxtimer = timer_alloc(RX_TIMER);
-	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_rxtimer->adjust_periodic(attotime::from_hz(clock()));
 }
 
 

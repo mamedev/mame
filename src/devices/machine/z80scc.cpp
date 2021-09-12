@@ -1199,7 +1199,7 @@ void z80scc_channel::device_timer(timer_instance const &timer)
 			{
 				//  int rate = owner()->clock() / brconst;
 				//  attotime attorate = attotime::from_hz(rate);
-				//  baudtimer->adjust(attorate, id, attorate);
+				//  baudtimer->adjust_periodic(attorate, id);
 				txc_w(m_brg_counter & 1);
 				rxc_w(m_brg_counter & 1);
 				m_brg_counter++; // Will just keep track of state in timer mode, not hardware counter value.
@@ -1207,7 +1207,7 @@ void z80scc_channel::device_timer(timer_instance const &timer)
 			else
 			{
 				LOG(" - turning off Baudrate timer\n");
-				baudtimer->adjust(attotime::never, 0, attotime::never);
+				baudtimer->adjust(attotime::never);
 			}
 		}
 		break;
@@ -2287,7 +2287,7 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 		if (data & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
 		{
 #if Z80SCC_USE_LOCAL_BRG
-			baudtimer->adjust(attotime::from_hz(rate), TIMER_ID_BAUD, attotime::from_hz(rate)); // Start the baudrate generator
+			baudtimer->adjust_periodic(attotime::from_hz(rate), TIMER_ID_BAUD); // Start the baudrate generator
 #if START_BIT_HUNT
 			m_rcv_mode = RCV_SEEKING;
 #endif
@@ -2297,7 +2297,7 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	else if ( (m_wr14 & WR14_BRG_ENABLE) && !(data & WR14_BRG_ENABLE) ) // baud rate generator being disabled?
 	{
 #if Z80SCC_USE_LOCAL_BRG
-		baudtimer->adjust(attotime::never, TIMER_ID_BAUD, attotime::never); // Stop the baudrate generator
+		baudtimer->adjust(attotime::never, TIMER_ID_BAUD); // Stop the baudrate generator
 		m_brg_counter = 0;
 #endif
 	}

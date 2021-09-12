@@ -83,7 +83,7 @@ void ay3600_device::device_start()
 
 	// allocate timers
 	m_scan_timer = timer_alloc();
-	m_scan_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_scan_timer->adjust_periodic(attotime::from_hz(60));
 
 	m_ako = 0;
 

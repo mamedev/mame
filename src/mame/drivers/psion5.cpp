@@ -109,9 +109,9 @@ void psion5mx_state::machine_reset()
 
 	std::fill(std::begin(m_ports), std::end(m_ports), 0);
 
-	m_periodic->adjust(attotime::from_hz(64), 0, attotime::from_hz(64));
+	m_periodic->adjust_periodic(attotime::from_hz(64));
 
-	m_rtc_ticker->adjust(attotime::from_hz(64), 0, attotime::from_hz(64));
+	m_rtc_ticker->adjust_periodic(attotime::from_hz(64));
 }
 
 void psion5mx_state::check_interrupts()
@@ -189,7 +189,7 @@ void psion5mx_state::set_timer_ctrl(int timer, uint32_t value)
 		}
 		else if (BIT(value, 7))
 		{
-			m_timers[timer]->adjust(interval, 0, interval);
+			m_timers[timer]->adjust_periodic(interval);
 		}
 		else
 		{

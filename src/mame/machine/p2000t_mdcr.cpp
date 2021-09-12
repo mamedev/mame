@@ -102,7 +102,7 @@ mdcr_device::mdcr_device(machine_config const &mconfig, char const *tag, device_
 void mdcr_device::device_start()
 {
 	m_read_timer = timer_alloc();
-	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+	m_read_timer->adjust_periodic(attotime::from_hz(44100));
 
 	save_item(NAME(m_fwd));
 	save_item(NAME(m_rev));

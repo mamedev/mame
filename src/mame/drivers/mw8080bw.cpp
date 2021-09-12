@@ -887,7 +887,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 
 	/* create astable timer for IC B1 */
 	m_maze_tone_timer = timer_alloc(*this, FUNC(mw8080bw_state::maze_tone_timing_timer_callback));
-	m_maze_tone_timer->adjust(MAZE_555_B1_PERIOD, 0, MAZE_555_B1_PERIOD);
+	m_maze_tone_timer->adjust_periodic(MAZE_555_B1_PERIOD);
 
 	/* initialize state of Tone Timing FF, IC C1 */
 	m_maze_tone_timing_state = 0;

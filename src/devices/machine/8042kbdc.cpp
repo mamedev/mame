@@ -100,7 +100,7 @@ void kbdc8042_device::device_reset()
 	m_mouse_y = 0;
 	m_mouse_btn = 0;
 
-	m_update_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+	m_update_timer->adjust_periodic(attotime::from_hz(100));
 }
 
 void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)

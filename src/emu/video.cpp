@@ -171,7 +171,7 @@ video_manager::video_manager(running_machine &machine)
 	if (no_screens)
 	{
 		m_screenless_frame_timer.init(machine.scheduler(), *this, FUNC(video_manager::screenless_update_callback));
-		m_screenless_frame_timer.adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
+		m_screenless_frame_timer.adjust_periodic(screen_device::DEFAULT_FRAME_PERIOD);
 		machine.output().set_global_notifier(video_notifier_callback, this);
 	}
 }

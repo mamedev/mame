@@ -208,7 +208,7 @@ void lc8670_cpu_device::device_start()
 
 	// setup timers
 	m_basetimer = timer_alloc(BASE_TIMER);
-	m_basetimer->adjust(attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]), 0, attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]));
+	m_basetimer->adjust_periodic(attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]));
 	m_clocktimer = timer_alloc(CLOCK_TIMER);
 
 	// register state for debugger
@@ -1185,7 +1185,7 @@ inline void lc8670_cpu_device::change_clock_source()
 
 	set_unscaled_clock(new_clock);
 	set_clock_scale(1.0 / (REG_OCR & 0x80 ? 6.0 : 12.0));
-	m_clocktimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_clocktimer->adjust_periodic(attotime::from_hz(clock()));
 	m_clock_changed = false;
 }
 

@@ -404,7 +404,7 @@ void z80ctc_channel_device::write(u8 data)
 		if ((m_mode & MODE) == MODE_COUNTER || (m_mode & TRIGGER) == TRIGGER_AUTO)
 		{
 			attotime curperiod = period();
-			m_timer->adjust(curperiod, 0, curperiod);
+			m_timer->adjust_periodic(curperiod);
 		}
 
 		// else set the bit indicating that we're waiting for the appropriate trigger
@@ -513,7 +513,7 @@ TIMER_CALLBACK_MEMBER(z80ctc_channel_device::timer_callback)
 	{
 		attotime curperiod = period();
 		LOG("Period = %s\n", curperiod.as_string());
-		m_timer->adjust(curperiod, 0, curperiod);
+		m_timer->adjust_periodic(curperiod);
 
 		// we're no longer waiting
 		m_mode &= ~WAITING_FOR_TRIG;

@@ -228,8 +228,8 @@ void upd65031_device::device_start()
 	m_rtc_timer = timer_alloc(TIMER_RTC);
 	m_flash_timer = timer_alloc(TIMER_FLASH);
 	m_speaker_timer = timer_alloc(TIMER_SPEAKER);
-	m_rtc_timer->adjust(attotime::from_msec(5), 0, attotime::from_msec(5));
-	m_flash_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+	m_rtc_timer->adjust_periodic(attotime::from_msec(5));
+	m_flash_timer->adjust_periodic(attotime::from_hz(2));
 	m_speaker_timer->reset();
 
 	// state saving
@@ -494,7 +494,7 @@ void upd65031_device::write(offs_t offset, uint8_t data)
 			if ((data & COM_SRUN) && !(data & COM_SBIT))
 			{
 				// constant tone used for keyclick and alarm
-				m_speaker_timer->adjust(SPEAKER_ALARM_FREQ, 0, SPEAKER_ALARM_FREQ);
+				m_speaker_timer->adjust_periodic(SPEAKER_ALARM_FREQ);
 			}
 			else
 			{

@@ -424,7 +424,7 @@ void oric_state::machine_start()
 
 void oric_state::machine_reset()
 {
-	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
+	m_tape_timer->adjust_periodic(attotime::from_hz(4800));
 }
 
 void telestrat_state::machine_start()
@@ -456,7 +456,7 @@ void telestrat_state::machine_start()
 
 void telestrat_state::machine_reset()
 {
-	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
+	m_tape_timer->adjust_periodic(attotime::from_hz(4800));
 	m_port_314 = 0x00;
 	m_via2_a = 0xff;
 	remap();

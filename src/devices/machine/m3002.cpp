@@ -102,7 +102,7 @@ void m3002_device::device_start()
 void m3002_device::device_clock_changed()
 {
 	attotime second = clocks_to_attotime(32768);
-	m_second_timer->adjust(second, 0, second);
+	m_second_timer->adjust_periodic(second);
 }
 
 

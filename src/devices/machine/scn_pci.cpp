@@ -1284,7 +1284,7 @@ void scn_pci_device::write_mode(u8 data)
 			else
 			{
 				attotime brg_period = clocks_to_attotime(m_br_div[data & 0x0f]);
-				m_brg_timer->adjust(brg_period / 2, 0, brg_period / 2);
+				m_brg_timer->adjust_periodic(brg_period / 2);
 			}
 		}
 

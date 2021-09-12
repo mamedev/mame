@@ -58,7 +58,7 @@ void dpc_device::device_reset()
 		elem.flag = 0;
 		elem.music_mode = 0;
 	}
-	m_oscillator->adjust(attotime::from_hz(18400), 0, attotime::from_hz(18400));
+	m_oscillator->adjust_periodic(attotime::from_hz(18400));
 
 }
 

@@ -268,7 +268,7 @@ void archimedes_keyboard_device::device_reset()
 	transmit_register_reset();
 	receive_register_reset();
 
-	m_mouse_timer->adjust(attotime::from_hz(1000 * 4), 0, attotime::from_hz(1000 * 4));
+	m_mouse_timer->adjust_periodic(attotime::from_hz(1000 * 4));
 }
 
 //-------------------------------------------------

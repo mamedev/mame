@@ -174,7 +174,7 @@ void pcjr_state::device_timer(timer_instance const &timer)
 
 			if ( m_signal_count <= 0 )
 			{
-				m_keyb_signal_timer->adjust( attotime::never, 0, attotime::never );
+				m_keyb_signal_timer->adjust( attotime::never );
 				m_transferring = 0;
 			}
 			break;
@@ -304,7 +304,7 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 		m_transferring = 1;
 
 		/* Set timer */
-		m_keyb_signal_timer->adjust( attotime::from_usec(220), 0, attotime::from_usec(220) );
+		m_keyb_signal_timer->adjust_periodic( attotime::from_usec(220) );
 		m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
 	}
 }

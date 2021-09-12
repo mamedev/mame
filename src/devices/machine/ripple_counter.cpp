@@ -111,7 +111,7 @@ void ripple_counter_device::device_start()
 void ripple_counter_device::device_clock_changed()
 {
 	attotime freq = m_reset ? attotime::never : clocks_to_attotime(1);
-	m_count_timer->adjust(freq, 0, freq);
+	m_count_timer->adjust_periodic(freq, 0);
 }
 
 

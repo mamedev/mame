@@ -76,6 +76,8 @@
 
 void exterm_state::machine_start()
 {
+	m_nmi_timer.init(*this, FUNC(exterm_state::master_sound_nmi_callback));
+
 	save_item(NAME(m_aimpos));
 	save_item(NAME(m_trackball_old));
 	save_item(NAME(m_sound_control));
@@ -185,7 +187,7 @@ void exterm_state::sound_latch_w(uint8_t data)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
+void exterm_state::master_sound_nmi_callback()
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (m_sound_control & 0x01)
@@ -206,7 +208,7 @@ void exterm_state::sound_nmi_rate_w(uint8_t data)
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
 	attotime nmi_rate = attotime::from_hz(4000000) * (4096 * (256 - data));
-	m_nmi_timer->adjust(nmi_rate, 0, nmi_rate);
+	m_nmi_timer.adjust_periodic(nmi_rate);
 }
 
 
@@ -397,8 +399,6 @@ void exterm_state::exterm(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	TIMER(config, m_nmi_timer).configure_generic(FUNC(exterm_state::master_sound_nmi_callback));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

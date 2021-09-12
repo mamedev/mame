@@ -159,7 +159,7 @@ void a2bus_agat_fdc_device::device_reset()
 
 	// Just a timer to be sure that the lss is updated from time to
 	// time, so that there's no hiccup when it's talked to again.
-	m_timer_lss->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+	m_timer_lss->adjust_periodic(attotime::from_msec(10));
 }
 
 void a2bus_agat_fdc_device::device_timer(timer_instance const &timer)

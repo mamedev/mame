@@ -356,7 +356,7 @@ void jaguar_state::serial_w(offs_t offset, uint32_t data)
 			if ((data & 0x3f) == 0x15)
 			{
 				attotime rate = attotime::from_hz(m_dsp->clock()) * (32 * 2 * (m_serial_frequency + 1));
-				m_serial_timer->adjust(rate, 0, rate);
+				m_serial_timer->adjust_periodic(rate);
 			}
 			break;
 

@@ -1207,7 +1207,7 @@ int tms5110_device::romclk_hack_r()
 	if (!m_romclk_hack_timer_started)
 	{
 		m_romclk_hack_timer_started = true;
-		m_romclk_hack_timer->adjust(attotime::from_hz(clock() / 40), 0, attotime::from_hz(clock() / 40));
+		m_romclk_hack_timer->adjust_periodic(attotime::from_hz(clock() / 40));
 	}
 	return m_romclk_hack_state;
 }

@@ -1153,7 +1153,7 @@ void opwolf_state::opwolf_cchip_init(  )
 	m_cchip_credits_for_coin[1] = 1;
 
 	m_cchip_timer = timer_alloc(TIMER_CCHIP);
-	m_cchip_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_cchip_timer->adjust_periodic(attotime::from_hz(60));
 }
 
 

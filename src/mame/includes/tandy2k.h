@@ -17,7 +17,6 @@
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/tandy2kb.h"
-#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
 #include "sound/spkrdev.h"
@@ -61,7 +60,6 @@ public:
 		m_vac(*this, CRT9021B_TAG),
 		m_colpal(*this, "colpal"),
 		m_vrambank(*this, "vrambank"),
-		m_timer_vidldsh(*this, "vidldsh"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
@@ -129,7 +127,6 @@ private:
 	required_device<crt9021_device> m_vac;
 	required_device<palette_device> m_colpal;
 	required_device<address_map_bank_device> m_vrambank;
-	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
@@ -192,7 +189,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
-	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
+	void vidldsh_tick();
 	static void floppy_formats(format_registration &fr);
 	static rgb_t IRGB(uint32_t raw);
 
@@ -273,6 +270,7 @@ private:
 	void vrambank_mem(address_map &map);
 
 	required_ioport m_buttons, m_x_axis, m_y_axis;
+	persistent_timer m_timer_vidldsh;
 };
 
 #endif // MAME_INCLUDES_TANDY2K_H

@@ -143,7 +143,7 @@ void com8116_device::device_start()
 	if (!m_fx4_handler.isnull())
 	{
 		m_fx4_timer = timer_alloc(TIMER_FX4);
-		m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
+		m_fx4_timer->adjust_periodic(attotime::from_hz((clock() / 4) * 2));
 	}
 	m_fr_timer = timer_alloc(TIMER_FR);
 	m_ft_timer = timer_alloc(TIMER_FT);

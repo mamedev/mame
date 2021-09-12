@@ -40,7 +40,7 @@ void bit_socket_device::device_start()
 
 	m_tip_in = m_ring_in = true;
 
-	m_poll_timer->adjust(attotime::from_hz(200000), 0, attotime::from_hz(200000));
+	m_poll_timer->adjust_periodic(attotime::from_hz(200000));
 }
 
 

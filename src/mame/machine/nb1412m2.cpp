@@ -220,8 +220,7 @@ void nb1412m2_device::rom_op_w(uint8_t data)
 	if(data == 2)
 	{
 		m_dac_current_address = m_dac_start_address;
-		m_dac_timer->adjust(attotime::never);
-		m_dac_timer->adjust(attotime::from_hz(m_dac_frequency), 0, attotime::from_hz(m_dac_frequency));
+		m_dac_timer->adjust_periodic(attotime::from_hz(m_dac_frequency));
 		m_dac_playback = true;
 	}
 //  TODO: data == 5 probably loads the result into 0x37

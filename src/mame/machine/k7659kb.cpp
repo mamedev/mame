@@ -221,7 +221,7 @@ void k7659_keyboard_device::device_reset()
 {
 	m_lookup = 0;
 	m_p_rom = memregion("k7659")->base();
-	m_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
+	m_timer->adjust_periodic(attotime::from_hz(200));
 }
 
 void k7659_keyboard_device::device_timer(timer_instance const &timer)

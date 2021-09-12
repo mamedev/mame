@@ -747,7 +747,7 @@ void st2xxx_device::lfr_recalculate_period()
 		assert(clocks != 0);
 		attotime period = cycles_to_attotime(clocks);
 		LOGMASKED(LOG_LCDC, "LCD frame rate = %f Hz (PC = $%04X)\n", period.as_hz(), PPC);
-		m_lcd_timer->adjust(period, 0, period);
+		m_lcd_timer->adjust_periodic(period);
 	}
 	else
 		m_lcd_timer->adjust(attotime::never);

@@ -122,7 +122,7 @@ void a2bus_agat840k_hle_device::index_callback(int unit, int state)
 		m_count_write = 0;
 		m_d15->pc4_w(0); // latch data into port A
 		m_d15->pc4_w(1);
-		m_timer_wait->adjust(attotime::from_usec(m_waittime), 0, attotime::from_usec(m_waittime));
+		m_timer_wait->adjust_periodic(attotime::from_usec(m_waittime));
 	}
 #endif
 }
@@ -386,7 +386,7 @@ void a2bus_agat840k_hle_device::d14_o_c(uint8_t data)
 	{
 		m_d15->pc4_w(0);
 		m_d15->pc4_w(1);
-		m_timer_wait->adjust(attotime::from_usec(m_waittime), 0, attotime::from_usec(m_waittime));
+		m_timer_wait->adjust_periodic(attotime::from_usec(m_waittime));
 	}
 
 	LOG("D14 C <- %02X (unit %d side %d drtn %d wtg %d mon %d)\n",

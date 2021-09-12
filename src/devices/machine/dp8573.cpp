@@ -46,7 +46,7 @@ void dp8573_device::device_start()
 
 	m_tscr = 0;
 
-	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_timer->adjust_periodic(attotime::from_msec(1));
 }
 
 void dp8573_device::sync_time()

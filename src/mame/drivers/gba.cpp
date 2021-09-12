@@ -411,7 +411,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 		final = clocksel / rate;
 		m_timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
-		m_tmr_timer[tmr]->adjust(time, tmr, time);
+		m_tmr_timer[tmr]->adjust_periodic(time, tmr);
 	}
 
 	// check if timers 0 or 1 are feeding directsound
@@ -1092,7 +1092,7 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
 						attotime time = attotime::from_hz(final);
-						m_tmr_timer[timer]->adjust(time, timer, time);
+						m_tmr_timer[timer]->adjust_periodic(time, timer);
 					}
 				}
 			}

@@ -116,8 +116,6 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	uartclock.signal_handler().append(m_uart, FUNC(acia6850_device::write_txc));
 	uartclock.signal_handler().append(m_uart, FUNC(acia6850_device::write_rxc));
 
-	TIMER(config, m_counter_0_timer, 0).configure_generic(FUNC(sente6vb_device::clock_counter_0_ff));
-
 	PIT8253(config, m_pit, 0);
 	m_pit->out_handler<0>().set(FUNC(sente6vb_device::counter_0_set_out));
 	m_pit->out_handler<2>().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
@@ -168,7 +166,6 @@ const tiny_rom_entry *sente6vb_device::device_rom_region() const
 sente6vb_device::sente6vb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SENTE6VB, tag, owner, clock),
 	m_pit(*this, "pit"),
-	m_counter_0_timer(*this, "8253_0_timer"),
 	m_cem_device(*this, "cem%u", 1U),
 	m_audiocpu(*this, "audiocpu"),
 	m_uart(*this, "uart"),
@@ -184,6 +181,8 @@ void sente6vb_device::device_start()
 	m_clock_out_cb.resolve_safe();
 	m_uart->write_cts(0);
 	m_uart->write_dcd(0);
+
+	m_counter_0_timer.init(*this, FUNC(sente6vb_device::clock_counter_0_ff));
 
 	save_item(NAME(m_counter_control));
 	save_item(NAME(m_counter_0_ff));
@@ -263,7 +262,7 @@ WRITE_LINE_MEMBER(sente6vb_device::set_counter_0_ff)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(sente6vb_device::clock_counter_0_ff)
+void sente6vb_device::clock_counter_0_ff()
 {
 	// clock the D value through the flip-flop
 	set_counter_0_ff(BIT(m_counter_control, 3));
@@ -277,7 +276,7 @@ void sente6vb_device::update_counter_0_timer()
 
 	// if there's already a timer, remove it
 	if (m_counter_0_timer_active)
-		m_counter_0_timer->reset();
+		m_counter_0_timer.reset();
 	m_counter_0_timer_active = false;
 
 	// find the counter with the maximum frequency
@@ -302,7 +301,7 @@ void sente6vb_device::update_counter_0_timer()
 	if (maxfreq > 0.0)
 	{
 		m_counter_0_timer_active = true;
-		m_counter_0_timer->adjust(attotime::from_hz(maxfreq), 0, attotime::from_hz(maxfreq));
+		m_counter_0_timer.adjust_periodic(attotime::from_hz(maxfreq));
 	}
 }
 
@@ -352,7 +351,7 @@ void sente6vb_device::counter_control_w(uint8_t data)
 		// if we gate off, remove the timer
 		else if (!BIT(data, 1) && m_counter_0_timer_active)
 		{
-			m_counter_0_timer->reset();
+			m_counter_0_timer.reset();
 			m_counter_0_timer_active = false;
 		}
 	}

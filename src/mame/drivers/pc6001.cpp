@@ -650,7 +650,7 @@ inline void pc6001_state::set_timer_divider(uint8_t data)
 {
 	m_timer_hz_div = data;
 	attotime period = attotime::from_hz((487.5*4)/(m_timer_hz_div+1));
-	m_timer_irq_timer->adjust(period,  0, period);
+	m_timer_irq_timer->adjust_periodic(period);
 }
 
 void pc6001mk2_state::mk2_timer_adj_w(uint8_t data)

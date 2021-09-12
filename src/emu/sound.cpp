@@ -1105,7 +1105,7 @@ sound_manager::sound_manager(running_machine &machine) :
 
 	// start the periodic update flushing timer
 	m_update_timer.init(machine.scheduler(), *this, FUNC(sound_manager::update));
-	m_update_timer.adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
+	m_update_timer.adjust_periodic(STREAMS_UPDATE_ATTOTIME);
 }
 
 

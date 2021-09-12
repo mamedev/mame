@@ -725,7 +725,7 @@ void x07_state::cassette_load()
 			logerror("Invalid data: %d %f\n", (m_cass_clk & 0x7f), m_cassette->get_position());
 		}
 
-		m_cass_tick->adjust(attotime::from_hz(12000), 0, attotime::from_hz(12000));
+		m_cass_tick->adjust_periodic(attotime::from_hz(12000));
 	}
 
 	m_cass_state = cass;
@@ -1182,7 +1182,7 @@ void x07_state::x07_io_w(offs_t offset, uint8_t data)
 		if (m_cass_motor)
 		{
 			m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-			m_cass_poll->adjust(attotime::from_hz(48000), 0, attotime::from_hz(48000));
+			m_cass_poll->adjust_periodic(attotime::from_hz(48000));
 		}
 		else
 		{

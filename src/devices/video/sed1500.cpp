@@ -71,7 +71,7 @@ void sed1500_device::device_start()
 	// timer
 	m_lcd_timer = timer_alloc();
 	attotime period = attotime::from_hz(clock() / 64);
-	m_lcd_timer->adjust(period, 0, period);
+	m_lcd_timer->adjust_periodic(period);
 
 	// register for savestates
 	save_item(NAME(m_mode));

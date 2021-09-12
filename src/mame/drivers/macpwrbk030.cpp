@@ -415,7 +415,7 @@ void macpb030_state::machine_reset()
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 
 	// start 60.15 Hz timer
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+	m_6015_timer->adjust_periodic(attotime::from_hz(60.15));
 }
 
 void macpb030_state::init_macpb140()

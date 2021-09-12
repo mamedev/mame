@@ -595,7 +595,7 @@ void dcs_audio_device::dcs_reset()
 	m_timer_ignore = false;
 	m_timer_enable = 0;
 	m_timer_scale = 1;
-	m_internal_timer->reset();
+	m_internal_timer.reset();
 
 	/* reset the HLE transfer states */
 	m_transfer.dcs_state = m_transfer.state = 0;
@@ -693,9 +693,6 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_channels(0),
 	m_size(0),
 	m_incs(0),
-	m_reg_timer(*this, "dcs_reg_timer"),
-	m_sport0_timer(*this, "dcs_sport0_timer"),
-	m_internal_timer(*this, "dcs_int_timer"),
 	m_ireg(0),
 	m_ireg_base(0),
 	m_bootrom(nullptr),
@@ -799,6 +796,9 @@ void dcs_audio_device::device_start()
 	m_s1_ack_callback1.init(*this, FUNC(dcs_audio_device::s1_ack_callback1));
 	m_s2_ack_callback.init(*this, FUNC(dcs_audio_device::s2_ack_callback));
 
+	m_reg_timer.init(*this, FUNC(dcs_audio_device::dcs_irq));
+	m_internal_timer.init(*this, FUNC(dcs_audio_device::internal_timer_callback));
+
 	/* non-RAM based automatically acks */
 	m_auto_ack = true;
 	/* register for save states */
@@ -899,13 +899,17 @@ void dcs2_audio_device::device_start()
 	m_s1_ack_callback1.init(*this, FUNC(dcs_audio_device::s1_ack_callback1));
 	m_s2_ack_callback.init(*this, FUNC(dcs_audio_device::s2_ack_callback));
 
+	m_reg_timer.init(*this, FUNC(dcs_audio_device::dcs_irq));
+	m_sport0_timer.init(*this, FUNC(dcs_audio_device::sport0_irq));
+	m_internal_timer.init(*this, FUNC(dcs_audio_device::internal_timer_callback));
+
 	/* install the speedup handler */
 	install_speedup();
 
 	/* allocate a watchdog timer for HLE transfers */
 	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0 && m_rev < REV_DSIO);
 	if (m_transfer.hle_enabled)
-		m_transfer.watchdog = subdevice<timer_device>("dcs_hle_timer");
+		m_transfer.watchdog.init(*this, FUNC(dcs_audio_device::transfer_watchdog_callback));
 
 	/* register for save states */
 	dcs_register_state();
@@ -1284,8 +1288,8 @@ void dcs_audio_device::denver_reset()
 	m_dmovlay_val = 0;
 	dmovlay_remap_memory();
 	dmadac_enable(&m_dmadac[0], m_channels, 0);
-	m_reg_timer->reset();
-	m_sport0_timer->reset();
+	m_reg_timer.reset();
+	m_sport0_timer.reset();
 }
 
 void dcs_audio_device::denver_alloc_dmadac()
@@ -1566,7 +1570,7 @@ void dcs_audio_device::data_w(uint16_t data)
 		return;
 
 	/* if we are DCS1, set a timer to latch the data */
-	if (m_sport0_timer == nullptr)
+	if (m_rev < REV_DCS2)
 		m_dcs_delayed_data_w.synchronize(data);
 	else
 		dcs_delayed_data_w(data);
@@ -1747,7 +1751,7 @@ void dcs_audio_device::update_timer_count()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::internal_timer_callback )
+void dcs_audio_device::internal_timer_callback()
 {
 	int64_t target_cycles;
 
@@ -1759,7 +1763,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::internal_timer_callback )
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!m_timer_ignore && (m_timer_period > 10 || m_timer_scale > 1))
-		m_internal_timer->adjust(m_cpu->cycles_to_attotime(target_cycles));
+		m_internal_timer.adjust(m_cpu->cycles_to_attotime(target_cycles));
 
 	/* the IRQ line is edge triggered */
 	m_cpu->set_input_line(ADSP2105_TIMER, ASSERT_LINE);
@@ -1811,7 +1815,7 @@ void dcs_audio_device::reset_timer()
 
 	/* adjust the timer if not optimized */
 	if (!m_timer_ignore)
-		m_internal_timer->adjust(m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_start_count + 1)));
+		m_internal_timer.adjust(m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_start_count + 1)));
 }
 
 
@@ -1829,7 +1833,7 @@ WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
 		// Update the timer so the start count is correct the next time the timer is enabled
 		update_timer_count();
 		m_timer_enable = state;
-		m_internal_timer->reset();
+		m_internal_timer.reset();
 	}
 }
 
@@ -1912,24 +1916,24 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(&m_dmadac[0], m_channels, 0);
-				m_reg_timer->reset();
+				m_reg_timer.reset();
 			}
 
 			// Check SPORT0 enabled
-			if (m_sport0_timer)
+			if (m_rev >= REV_DCS2)
 			{
 				if (data & 0x1000)
 				{
 					// Start the SPORT0 timer
 					// SPORT0 is used as a 1kHz timer
-					m_sport0_timer->adjust(attotime::from_usec(10), 0, attotime::from_hz(1000));
+					m_sport0_timer.adjust(attotime::from_usec(10), 0, attotime::from_hz(1000));
 					if (LOG_DCS_IO)
 						logerror("adsp_control_w: Setting SPORT0 freqency to 1kHz\n");
 				}
 				else
 				{
 					// Stop the SPORT0 timer
-					m_sport0_timer->reset();
+					m_sport0_timer.reset();
 				}
 			}
 			break;
@@ -1939,7 +1943,7 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(&m_dmadac[0], m_channels, 0);
-				m_reg_timer->reset();
+				m_reg_timer.reset();
 			}
 			break;
 
@@ -1988,7 +1992,7 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
     DCS IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
+void dcs_audio_device::dcs_irq()
 {
 	/* get the index register */
 	int reg = m_cpu->state_int(ADSP2100_I0 + m_ireg);
@@ -2031,9 +2035,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 		logerror("dcs_irq end: m_size: %x m_incs: %x m_channels: %d m_ireg_base: %x reg: %06x\n", m_size, m_incs, m_channels, m_ireg_base, reg);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
+void dcs_audio_device::sport0_irq()
 {
-
 	/* this latches internally, so we just pulse */
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
@@ -2073,7 +2076,7 @@ void dcs_audio_device::recompute_sample_rate()
 	if (m_incs)
 	{
 		attotime period = (sample_period * m_size) / (2 * m_channels * m_incs);
-		m_reg_timer->adjust(period, 0, period);
+		m_reg_timer.adjust_periodic(period);
 	}
 }
 
@@ -2131,7 +2134,7 @@ void dcs_audio_device::sound_tx_callback(offs_t offset, uint32_t data)
 	dmadac_enable(&m_dmadac[0], m_channels, 0);
 
 	/* remove timer */
-	m_reg_timer->reset();
+	m_reg_timer.reset();
 }
 
 
@@ -2193,7 +2196,7 @@ void dcs_audio_device::fifo_notify(int count, int max)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
+void dcs_audio_device::transfer_watchdog_callback(int param)
 {
 	hle_transfer_state &transfer = m_transfer;
 	int starting_writes_left = param;
@@ -2203,8 +2206,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
 			preprocess_write(m_fifo_data_r());
 	}
-	if (transfer.watchdog != nullptr)
-		transfer.watchdog->adjust(attotime::from_msec(1), transfer.writes_left);
+	transfer.watchdog.adjust(attotime::from_msec(1), transfer.writes_left);
 }
 
 
@@ -2436,7 +2438,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 			transfer.sum = 0;
 			if (transfer.hle_enabled)
 			{
-				transfer.watchdog->adjust(attotime::from_msec(1), transfer.writes_left);
+				transfer.watchdog.adjust(attotime::from_msec(1), transfer.writes_left);
 				return 1;
 			}
 			break;
@@ -2463,7 +2465,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 				if (transfer.state == 0)
 				{
 					m_s2_ack_callback.call_after(attotime::from_usec(1), transfer.sum);
-					transfer.watchdog->reset();
+					transfer.watchdog.reset();
 				}
 				return 1;
 			}
@@ -2479,7 +2481,7 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 	int result;
 
 	/* if we're not DCS2, skip */
-	if (!m_sport0_timer)
+	if (m_rev < REV_DCS2)
 		return 0;
 
 	/* state 0 - initialization phase */
@@ -2508,9 +2510,6 @@ void dcs_audio_device::add_mconfig_dcs(machine_config &config)
 	dcs.timer_fired().set(FUNC(dcs_audio_device::timer_enable_callback)); /* callback for timer fired */
 	dcs.set_addrmap(AS_PROGRAM, &dcs_audio_device::dcs_2k_program_map);
 	dcs.set_addrmap(AS_DATA, &dcs_audio_device::dcs_2k_data_map);
-
-	TIMER(config, m_reg_timer).configure_generic(FUNC(dcs_audio_device::dcs_irq));
-	TIMER(config, m_internal_timer).configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -2606,11 +2605,6 @@ void dcs2_audio_device::add_mconfig_dcs2(machine_config &config)
 	dcs2.set_addrmap(AS_PROGRAM, &dcs2_audio_device::dcs2_2115_program_map);
 	dcs2.set_addrmap(AS_DATA, &dcs2_audio_device::dcs2_2115_data_map);
 
-	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
-	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs_audio_device::sport0_irq));
-	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
-	TIMER(config, "dcs_hle_timer").configure_generic(FUNC(dcs_audio_device::transfer_watchdog_callback));
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -2680,10 +2674,6 @@ void dcs2_audio_dsio_device::device_add_mconfig(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_dsio_device::dsio_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 14, 0x2000);
 
-	TIMER(config, m_reg_timer).configure_generic(FUNC(dcs_audio_device::dcs_irq));
-	TIMER(config, m_internal_timer).configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
-	TIMER(config, m_sport0_timer).configure_generic(FUNC(dcs_audio_device::sport0_irq)); // roadburn needs this to pass hardware test
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -2711,10 +2701,6 @@ void dcs2_audio_denver_device::device_add_mconfig(machine_config &config)
 	denver.set_addrmap(AS_IO, &dcs2_audio_denver_device::denver_io_map);
 
 	ADDRESS_MAP_BANK(config, m_ram_map).set_map(&dcs2_audio_denver_device::denver_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000*2);
-
-	TIMER(config, m_reg_timer).configure_generic(FUNC(dcs_audio_device::dcs_irq));
-	TIMER(config, m_internal_timer).configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
-	TIMER(config, m_sport0_timer).configure_generic(FUNC(dcs_audio_device::sport0_irq)); // Atlantis driver waits for sport0 rx interrupts
 }
 
 dcs2_audio_denver_5ch_device::dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

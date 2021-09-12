@@ -20,7 +20,7 @@
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(battles_state::nmi_generate)
+void battles_state::nmi_generate()
 {
 	m_customio_prev_command = m_customio_command;
 
@@ -81,10 +81,10 @@ void battles_state::customio0_w(uint8_t data)
 	switch (data)
 	{
 		case 0x10:
-			m_nmi_timer->reset();
+			m_nmi_timer.reset();
 			return; /* nop */
 	}
-	m_nmi_timer->adjust(attotime::from_usec(166), 0, attotime::from_usec(166));
+	m_nmi_timer.adjust_periodic(attotime::from_usec(166));
 
 }
 

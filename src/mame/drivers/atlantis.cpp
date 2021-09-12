@@ -54,6 +54,7 @@
 #include "machine/timekpr.h"
 #include "coreutil.h"
 #include "emupal.h"
+#include "screen.h"
 
 
 namespace {

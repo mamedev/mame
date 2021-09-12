@@ -59,7 +59,7 @@ void upd4992_device::device_validity_check(validity_checker &valid) const
 void upd4992_device::device_start()
 {
 	m_timer_clock = timer_alloc(TIMER_CLOCK);
-	m_timer_clock->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+	m_timer_clock->adjust_periodic(attotime::from_hz(clock() / 32768));
 }
 
 

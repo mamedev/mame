@@ -58,7 +58,7 @@ void hd44352_device::device_start()
 	m_on_cb.resolve_safe();
 
 	m_on_timer = timer_alloc(ON_TIMER);
-	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
+	m_on_timer->adjust_periodic(attotime::from_hz(m_clock/16384));
 
 	save_item( NAME(m_control_lines));
 	save_item( NAME(m_data_bus));
@@ -334,7 +334,7 @@ void hd44352_device::data_write(uint8_t data)
 							default:        on_timer_rate = 8192;       break;
 						}
 
-						m_on_timer->adjust(attotime::from_hz(m_clock/on_timer_rate), 0, attotime::from_hz(m_clock/on_timer_rate));
+						m_on_timer->adjust_periodic(attotime::from_hz(m_clock/on_timer_rate));
 					}
 					m_data_bus = 0xff;
 					m_state = 0;

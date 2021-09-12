@@ -216,7 +216,7 @@ void jr100_state::machine_start()
 void jr100_state::machine_reset()
 {
 	attotime timer_period = attotime::from_hz(XTAL(14'318'181) / 16);
-	m_sound_timer->adjust(timer_period, 0, timer_period);
+	m_sound_timer->adjust_periodic(timer_period);
 }
 
 uint32_t jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

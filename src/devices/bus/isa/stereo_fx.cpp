@@ -216,7 +216,7 @@ void stereo_fx_device::device_start()
 	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(ym3812, FUNC(ym3812_device::read)), write8sm_delegate(ym3812, FUNC(ym3812_device::write)));
 	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ym3812, FUNC(ym3812_device::read)), write8sm_delegate(ym3812, FUNC(ym3812_device::write)));
 	m_timer = timer_alloc();
-	m_timer->adjust(attotime::from_hz(2000000), 0, attotime::from_hz(2000000));
+	m_timer->adjust_periodic(attotime::from_hz(2000000));
 	m_isa->set_dma_channel(1, this, false);
 }
 

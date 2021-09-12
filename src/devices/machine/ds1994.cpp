@@ -119,7 +119,7 @@ void ds1994_device::device_start()
 	m_timer_reset = timer_alloc(TIMER_RESET);
 	m_timer_clock = timer_alloc(TIMER_CLOCK);
 
-	m_timer_clock->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_timer_clock->adjust_periodic(attotime::from_hz(256));
 }
 
 void ds1994_device::device_reset()

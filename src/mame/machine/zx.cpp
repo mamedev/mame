@@ -38,7 +38,7 @@ void zx_state::machine_reset()
 
 	m_cassette_cur_level = 0;
 
-	m_tape_input->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+	m_tape_input->adjust_periodic(attotime::from_hz(44100));
 }
 
 void zx_state::zx_tape_input()

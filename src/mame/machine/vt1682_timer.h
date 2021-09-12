@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "machine/timer.h"
-
 DECLARE_DEVICE_TYPE(VT_VT1682_TIMER, vrt_vt1682_timer_device)
 
 class vrt_vt1682_timer_device : public device_t
@@ -37,11 +35,9 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	bool m_is_sound_timer;
-	required_device<timer_device> m_timer;
 
 	void update_timer(void);
 
@@ -49,9 +45,10 @@ private:
 	uint8_t m_timer_preload_15_8;
 	uint8_t m_timer_enable;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_expired);
+	void timer_expired();
 
 	devcb_write_line m_irq_cb;
+	persistent_timer m_timer;
 };
 
 #endif // MAME_MACHINE_VT1682_TIMER_H

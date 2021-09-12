@@ -1155,7 +1155,7 @@ void s3c44b0_device::pwm_start(int timer)
 	{
 		if (auto_reload)
 		{
-			m_pwm.timer[timer]->adjust(attotime::from_hz(hz), timer, attotime::from_hz(hz));
+			m_pwm.timer[timer]->adjust_periodic(attotime::from_hz(hz), timer);
 		}
 		else
 		{
@@ -1609,7 +1609,7 @@ void s3c44b0_device::uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 			mclk = get_mclk();
 			hz = (mclk / (m_uart->regs.ubrdiv + 1)) / 16;
 			verboselog( *this, 5, "UART %d - mclk %08X hz %08X\n", ch, mclk, hz);
-			m_uart->timer->adjust(attotime::from_hz(hz), ch, attotime::from_hz(hz));
+			m_uart->timer->adjust_periodic(attotime::from_hz(hz), ch);
 		}
 		break;
 	}
@@ -1696,7 +1696,7 @@ void s3c44b0_device::wdt_start()
 	freq = (double)mclk / (prescaler + 1) / clock;
 	hz = freq / m_wdt.regs.wtcnt;
 	verboselog( *this, 5, "WDT mclk %d prescaler %d clock %d freq %f hz %f\n", mclk, prescaler, clock, freq, hz);
-	m_wdt.timer->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
+	m_wdt.timer->adjust_periodic(attotime::from_hz(hz));
 }
 
 void s3c44b0_device::wdt_stop()
@@ -1912,7 +1912,7 @@ void s3c44b0_device::iis_start()
 	freq = (double)mclk / div[prescaler];
 	hz = freq / 256 * 2;
 	verboselog( *this, 5, "IIS mclk %d prescaler %d freq %f hz %f\n", mclk, prescaler, freq, hz);
-	m_iis.timer->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
+	m_iis.timer->adjust_periodic(attotime::from_hz(hz));
 }
 
 void s3c44b0_device::iis_stop()

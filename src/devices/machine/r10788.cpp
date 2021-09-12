@@ -82,7 +82,7 @@ void r10788_device::device_start()
 
 	m_timer = timer_alloc(TIMER_DISPLAY);
 	// recurring timer every 36 cycles
-	m_timer->adjust(clocks_to_attotime(36), 0, clocks_to_attotime(36));
+	m_timer->adjust_periodic(clocks_to_attotime(36));
 }
 
 /**

@@ -236,13 +236,13 @@ void m5074x_device::recalc_timer(int timer)
 		case 0:
 			hz = clock() / 16;
 			hz /= (m_tmr12pre + 2);
-			m_timers[TIMER_1]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
+			m_timers[TIMER_1]->adjust_periodic(attotime::from_hz(hz));
 			break;
 
 		case 1:
 			hz = clock() / 16;
 			hz /= (m_tmr12pre + 2);
-			m_timers[TIMER_2]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
+			m_timers[TIMER_2]->adjust_periodic(attotime::from_hz(hz));
 			break;
 
 		case 2:
@@ -253,13 +253,13 @@ void m5074x_device::recalc_timer(int timer)
 				// stop bit?
 				if (m_tmrctrl & TMRC_TMRXHLT)
 				{
-					m_timers[TIMER_X]->adjust(attotime::never, 0, attotime::never);
+					m_timers[TIMER_X]->adjust(attotime::never);
 				}
 				else
 				{
 					hz = clock() / 16;
 					hz /= (m_tmrxpre + 2);
-					m_timers[TIMER_X]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
+					m_timers[TIMER_X]->adjust_periodic(attotime::from_hz(hz));
 				}
 			}
 			else

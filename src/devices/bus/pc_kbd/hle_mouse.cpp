@@ -151,7 +151,7 @@ void hle_ps2_mouse_device::resume()
 
 		// start serial communication
 		if (!m_serial->enabled())
-			m_serial->adjust(serial_cycle, 0, serial_cycle);
+			m_serial->adjust_periodic(serial_cycle);
 	}
 }
 
@@ -442,7 +442,7 @@ void hle_ps2_mouse_device::command(u8 const command)
 	case 0xf4: // enable data reporting
 		LOGMASKED(LOG_COMMAND, "enable data reporting\n");
 		m_mode |= ENABLE;
-		m_sample->adjust(attotime::from_hz(m_sample_rate), 0, attotime::from_hz(m_sample_rate));
+		m_sample->adjust_periodic(attotime::from_hz(m_sample_rate));
 		m_tx_buf[m_tx_len++] = 0xfa;
 		break;
 

@@ -1425,7 +1425,7 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_start(int timer)
 	m_pwm.freq[timer] = freq;
 	if (auto_reload)
 	{
-		m_pwm.timer[timer]->adjust(attotime::from_hz(hz), timer, attotime::from_hz(hz));
+		m_pwm.timer[timer]->adjust_periodic(attotime::from_hz(hz), timer);
 	}
 	else
 	{
@@ -2160,7 +2160,7 @@ void S3C24_CLASS_NAME::s3c24xx_wdt_start()
 	freq = (double)pclk / (prescaler + 1) / clock;
 	hz = freq / m_wdt.regs.wtcnt;
 	LOGMASKED(LOG_WDT, "watchdog start: pclk %d prescaler %d clock %d freq %f hz %f\n", pclk, prescaler, clock, freq, hz);
-	m_wdt.timer->adjust( attotime::from_hz( hz), 0, attotime::from_hz( hz));
+	m_wdt.timer->adjust_periodic( attotime::from_hz( hz));
 #if defined(DEVICE_S3C2410)
 	m_wdt.freq = freq;
 	m_wdt.cnt = m_wdt.regs.wtcnt;
@@ -2468,7 +2468,7 @@ void S3C24_CLASS_NAME::s3c24xx_iis_start()
 	int pclk = s3c24xx_get_pclk();
 	double freq = ((double)pclk / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
 	LOGMASKED(LOG_I2S, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", pclk, prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
-	m_iis.timer->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
+	m_iis.timer->adjust_periodic( attotime::from_hz( freq));
 }
 
 void S3C24_CLASS_NAME::s3c24xx_iis_stop()

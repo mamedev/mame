@@ -408,7 +408,7 @@ void ad_59mc07_device::device_start()
 	save_item(NAME(m_hihatvol));
 
 	m_adjuster_timer = timer_alloc(*this, FUNC(ad_59mc07_device::frq_adjuster_callback));
-	m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_adjuster_timer->adjust_periodic(attotime::from_hz(60));
 }
 
 

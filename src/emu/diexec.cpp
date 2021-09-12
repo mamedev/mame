@@ -497,7 +497,7 @@ void device_execute_interface::interface_post_reset()
 
 	// reconfigure periodic interrupts
 	if (!m_periodic_interrupt_period.is_zero())
-		m_periodic_interrupt_timer.adjust(m_periodic_interrupt_period, 0, m_periodic_interrupt_period);
+		m_periodic_interrupt_timer.adjust_periodic(m_periodic_interrupt_period);
 }
 
 

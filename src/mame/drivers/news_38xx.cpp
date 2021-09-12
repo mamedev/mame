@@ -175,7 +175,7 @@ void news_38xx_state::machine_reset()
 	// eprom is mapped at 0 after reset
 	m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
 
-	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+	m_timer->adjust_periodic(attotime::from_hz(100));
 }
 
 void news_38xx_state::init_common()

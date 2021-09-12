@@ -482,7 +482,7 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 				}
 				if (LOG_DACIA) logerror("DACIA TIME %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
 
-//              m_ld_timer->adjust(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1), 0, attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1));
+//              m_ld_timer->adjust_periodic(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1));
 
 				if (LOG_DACIA) logerror("DACIA Ctrl Register: %02x\n", data);
 
@@ -547,7 +547,7 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 				}
 				if (LOG_DACIA) logerror("DACIA TIME 2 %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
 
-				m_ld_timer->adjust(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2), 0, attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2));
+				m_ld_timer->adjust_periodic(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2));
 
 				if (LOG_DACIA) logerror("DACIA Ctrl Register 2: %02x\n", data);
 
@@ -877,7 +877,7 @@ void cops_state::machine_start()
 	m_digits.resolve();
 
 	m_ld_timer = timer_alloc(*this, FUNC(cops_state::ld_timer_callback));
-	m_ld_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
+	m_ld_timer->adjust_periodic(attotime::from_hz(167*5));
 
 	m_dacia_cmpval1 = m_dacia_cmpval2 = 0;
 	m_ld_command_current_byte = 0;

@@ -413,7 +413,7 @@ void v25_common_device::tmc0_w(uint8_t d)
 		{
 			unsigned tmp = m_PCK * m_MD0 * (BIT(d, 6) ? 128 : 6);
 			attotime time = clocks_to_attotime(tmp);
-			m_timers[0]->adjust(time, INTTU0, time);
+			m_timers[0]->adjust_periodic(time, INTTU0);
 			m_timers[1]->adjust(attotime::never);
 			m_TM0 = m_MD0;
 		}
@@ -432,7 +432,7 @@ void v25_common_device::tmc1_w(uint8_t d)
 	{
 		unsigned tmp = m_PCK * m_MD1 * (BIT(d, 6) ? 128 : 6);
 		attotime time = clocks_to_attotime(tmp);
-		m_timers[2]->adjust(time, INTTU2, time);
+		m_timers[2]->adjust_periodic(time, INTTU2);
 		m_TM1 = m_MD1;
 	}
 	else
@@ -563,7 +563,7 @@ void v25_common_device::prc_w(uint8_t d)
 
 	unsigned tmp = m_PCK << m_TB;
 	attotime time = clocks_to_attotime(tmp);
-	m_timers[3]->adjust(time, INTTB, time);
+	m_timers[3]->adjust_periodic(time, INTTB);
 	notify_clock_changed(); // make device_execute_interface pick up the new clocks_to_cycles()
 
 	logerror("        Internal RAM %sabled\n", (m_RAMEN ? "en" : "dis"));

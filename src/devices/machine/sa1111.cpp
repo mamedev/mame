@@ -634,7 +634,7 @@ void sa1111_device::audio_start_tx_dma(const uint32_t buf)
 	const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
 	const uint32_t pll_clock = clock() * 39;
 	attotime clock_period = attotime::from_ticks(divisor * 128, pll_clock);
-	m_audio_regs.tx_dma_timer->adjust(clock_period, 0, clock_period);
+	m_audio_regs.tx_dma_timer->adjust_periodic(clock_period);
 
 	LOGMASKED(LOG_AUDIO_DMA, "audio_start_tx_dma, setting start address to %08x, Tx clock to %d / %d\n", m_audio_regs.sadta, pll_clock, divisor);
 }
@@ -649,7 +649,7 @@ void sa1111_device::audio_start_rx_dma(const uint32_t buf)
 	const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
 	const uint32_t pll_clock = clock() * 39;
 	attotime clock_period = attotime::from_ticks(divisor * 256, pll_clock);
-	m_audio_regs.rx_dma_timer->adjust(clock_period, 0, clock_period);
+	m_audio_regs.rx_dma_timer->adjust_periodic(clock_period);
 }
 
 void sa1111_device::audio_update_tx_fifo_levels()
@@ -724,7 +724,7 @@ void sa1111_device::audio_tx_fifo_push(uint32_t data)
 			const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
 			const uint32_t pll_clock = clock() * 39;
 			attotime clock_period = attotime::from_ticks(divisor * 256, pll_clock);
-			m_audio_regs.tx_timer->adjust(clock_period, 0, clock_period);
+			m_audio_regs.tx_timer->adjust_periodic(clock_period);
 		}
 	}
 }
@@ -1293,8 +1293,8 @@ void sa1111_device::ssp_update_enable_state()
 		uint64_t bit_count = (m_ssp_regs.sspcr0 & SSPCR0_DSS_MASK) >> SSPCR0_DSS_BIT;
 		uint32_t clock_rate = 2 * (((m_ssp_regs.sspcr0 & SSPCR0_SCR_MASK) >> SSPCR0_SCR_BIT) + 1);
 		attotime packet_rate = attotime::from_ticks(bit_count * clock_rate, 3686400);
-		m_ssp_regs.rx_timer->adjust(packet_rate, 0, packet_rate);
-		m_ssp_regs.tx_timer->adjust(packet_rate, 0, packet_rate);
+		m_ssp_regs.rx_timer->adjust_periodic(packet_rate);
+		m_ssp_regs.tx_timer->adjust_periodic(packet_rate);
 	}
 	else
 	{

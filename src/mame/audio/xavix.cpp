@@ -497,7 +497,7 @@ void xavix_state::sound_irqstatus_w(uint8_t data)
 				   the usual clock divided by 2 would be 10.738636 but that's too high
 				*/
 				attotime period = attotime::from_hz(10.3f * (m_sndtimer[t]));
-				m_sound_timer[t]->adjust(period, t, period);
+				m_sound_timer[t]->adjust_periodic(period, t);
 			}
 			else
 			{

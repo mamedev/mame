@@ -107,7 +107,7 @@ protected:
 		m_addr = 0x0000;
 		m_pb_val = 0xff;
 
-		m_input_poll_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
+		m_input_poll_timer->adjust_periodic(attotime::from_hz(120));
 	}
 
 	virtual void machine_reset() override

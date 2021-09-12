@@ -827,7 +827,7 @@ void cio_base_device::device_start()
 
 	// allocate timer
 	m_timer = timer_alloc();
-	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
+	m_timer->adjust_periodic(attotime::from_hz(clock() / 2));
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();

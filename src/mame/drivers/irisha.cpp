@@ -356,7 +356,7 @@ uint8_t irisha_state::keyboard_r()
 void irisha_state::machine_start()
 {
 	m_key_timer = timer_alloc(*this, FUNC(irisha_state::irisha_key));
-	m_key_timer->adjust(attotime::from_msec(30), 0, attotime::from_msec(30));
+	m_key_timer->adjust_periodic(attotime::from_msec(30));
 	save_item(NAME(m_sg1_line));
 	save_item(NAME(m_keypressed));
 	save_item(NAME(m_keyboard_cnt));

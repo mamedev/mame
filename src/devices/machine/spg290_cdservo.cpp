@@ -335,7 +335,7 @@ void spg290_cdservo_device::change_status()
 	if (m_speed == 0 || !m_cdrom.found() || !m_cdrom->get_cdrom_file())
 		m_cdtimer->adjust(attotime::never);
 	else
-		m_cdtimer->adjust(attotime::from_hz(75 * m_speed), 0, attotime::from_hz(75 * m_speed));
+		m_cdtimer->adjust_periodic(attotime::from_hz(75 * m_speed));
 }
 
 void spg290_cdservo_device::add_qsub(int sector, uint8_t addrctrl, uint8_t track, uint8_t index, uint32_t rel_msf, uint32_t abs_msf, uint16_t crc16)

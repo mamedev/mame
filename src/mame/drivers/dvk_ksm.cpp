@@ -289,27 +289,27 @@ void ksm_state::update_brg(bool a, bool b, int c)
 	switch ((a << 3) + (b << 2) + c)
 	{
 	case 0xa:
-		m_brg->adjust(attotime::from_hz(9600*16*2), 0, attotime::from_hz(9600*16*2));
+		m_brg->adjust_periodic(attotime::from_hz(9600*16*2));
 		break;
 
 	case 0x8:
-		m_brg->adjust(attotime::from_hz(4800*16*2), 0, attotime::from_hz(4800*16*2));
+		m_brg->adjust_periodic(attotime::from_hz(4800*16*2));
 		break;
 
 	case 0x4:
-		m_brg->adjust(attotime::from_hz(2400*16*2), 0, attotime::from_hz(2400*16*2));
+		m_brg->adjust_periodic(attotime::from_hz(2400*16*2));
 		break;
 
 	case 0x5:
-		m_brg->adjust(attotime::from_hz(1200*16*2), 0, attotime::from_hz(1200*16*2));
+		m_brg->adjust_periodic(attotime::from_hz(1200*16*2));
 		break;
 
 	case 0x6:
-		m_brg->adjust(attotime::from_hz(600*16*2), 0, attotime::from_hz(600*16*2));
+		m_brg->adjust_periodic(attotime::from_hz(600*16*2));
 		break;
 
 	case 0x7:
-		m_brg->adjust(attotime::from_hz(300*16*2), 0, attotime::from_hz(300*16*2));
+		m_brg->adjust_periodic(attotime::from_hz(300*16*2));
 		break;
 	}
 }

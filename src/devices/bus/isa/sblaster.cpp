@@ -1476,7 +1476,7 @@ void sb16_device::dack16_w(int line, uint16_t data)
 	// set the transfer timer on the 1st byte
 	if (!m_dsp.dma_timer_started)
 	{
-		m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
+		m_timer->adjust_periodic(attotime::from_hz((double)m_dsp.frequency));
 		m_dsp.d_rptr = m_dsp.d_wptr = 0;
 		m_dsp.dma_timer_started = true;
 	}
@@ -1523,7 +1523,7 @@ void sb_device::dack_w(int line, uint8_t data)
 	// set the transfer timer on the 1st byte
 	if (!m_dsp.dma_timer_started)
 	{
-		m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
+		m_timer->adjust_periodic(attotime::from_hz((double)m_dsp.frequency));
 		m_dsp.d_rptr = m_dsp.d_wptr = 0;
 		m_dsp.dma_timer_started = true;
 	}

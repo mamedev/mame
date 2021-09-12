@@ -220,7 +220,7 @@ void vis_audio_device::pcm_w(offs_t offset, uint8_t data)
 		m_sample_byte = 0;
 		m_isa->drq7_w(ASSERT_LINE);
 		attotime rate = attotime::from_ticks(1 << ((m_mode >> 5) & 3), 44100); // TODO : Unknown clock
-		m_pcm->adjust(rate, 0, rate);
+		m_pcm->adjust_periodic(rate);
 	}
 	else if(!(m_mode & 0x10))
 		m_pcm->adjust(attotime::never);

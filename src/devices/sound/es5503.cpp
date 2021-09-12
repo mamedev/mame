@@ -245,7 +245,7 @@ void es5503_device::device_clock_changed()
 	m_mix_buffer.resize((output_rate/50)*8);
 
 	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
-	m_timer->adjust(update_rate, 0, update_rate);
+	m_timer->adjust_periodic(update_rate);
 }
 
 void es5503_device::device_reset()

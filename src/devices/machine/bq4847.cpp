@@ -410,7 +410,7 @@ void bq4847_device::set_periodic_timer()
 	if (rateval == 0)
 		m_periodic_timer->reset();
 	else
-		m_periodic_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+		m_periodic_timer->adjust_periodic(attotime::from_hz(rate));
 }
 
 void bq4847_device::set_watchdog_timer(bool on)
@@ -488,7 +488,7 @@ void bq4847_device::connect_osc(bool conn)
 	if (conn)
 	{
 		// The internal update cycle is 1 sec
-		m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+		m_clock_timer->adjust_periodic(attotime::from_seconds(1));
 		set_periodic_timer();
 	}
 	else

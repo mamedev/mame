@@ -97,7 +97,7 @@ image_init_result avivideo_image_device::call_load()
 	const avi_file::movie_info &aviinfo = m_avi->get_movie_info();
 	float frame_rate = (float)aviinfo.video_timescale / (float)aviinfo.video_sampletime;
 	attotime frame_time = attotime::from_hz((int)round(frame_rate));
-	m_frame_timer->adjust(frame_time, 0, frame_time);
+	m_frame_timer->adjust_periodic(frame_time);
 	m_frame_count = aviinfo.video_numsamples;
 	m_frame_num = 0;
 	return image_init_result::PASS;

@@ -210,7 +210,7 @@ void msm58321_device::device_start()
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
-	m_clock_timer->adjust(clocks_to_attotime(32768/1024), 0, clocks_to_attotime(32768/1024));
+	m_clock_timer->adjust_periodic(clocks_to_attotime(32768/1024));
 
 	// busy signal active period is approximately 427 µs
 	m_busy_timer = timer_alloc(TIMER_BUSY);

@@ -256,7 +256,7 @@ void ti85_state::machine_start()
 	m_ti81_port_7_data = 0;
 
 	m_ti85_timer = timer_alloc(*this, FUNC(ti85_state::ti85_timer_callback));
-	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_ti85_timer->adjust_periodic(attotime::from_hz(256));
 
 	space.unmap_write(0x0000, 0x3fff);
 	space.unmap_write(0x4000, 0x7fff);
@@ -361,9 +361,9 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	ti85_state::update_ti83p_memory();
 
 	m_ti83_1st_timer = timer_alloc(*this, FUNC(ti85_state::ti83_timer1_callback));
-	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_ti83_1st_timer->adjust_periodic(attotime::from_hz(256));
 	m_ti83_2nd_timer = timer_alloc(*this, FUNC(ti85_state::ti83_timer2_callback));
-	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
+	m_ti83_2nd_timer->adjust_periodic(attotime::from_hz(512));
 
 	/* save states and debugging */
 	save_item(NAME(m_timer_interrupt_status));
@@ -401,9 +401,9 @@ void ti85_state::ti8xpse_init_common()
 	ti85_state::update_ti83pse_memory();
 
 	m_ti83_1st_timer = timer_alloc(*this, FUNC(ti85_state::ti83_timer1_callback));
-	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_ti83_1st_timer->adjust_periodic(attotime::from_hz(256));
 	m_ti83_2nd_timer = timer_alloc(*this, FUNC(ti85_state::ti83_timer2_callback));
-	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
+	m_ti83_2nd_timer->adjust_periodic(attotime::from_hz(512));
 
 	m_crystal_timer1 = timer_alloc(CRYSTAL_TIMER1);
 	m_crystal_timer2 = timer_alloc(CRYSTAL_TIMER2);
@@ -473,7 +473,7 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	subdevice<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
 
 	m_ti85_timer = timer_alloc(*this, FUNC(ti85_state::ti85_timer_callback));
-	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_ti85_timer->adjust_periodic(attotime::from_hz(256));
 }
 
 

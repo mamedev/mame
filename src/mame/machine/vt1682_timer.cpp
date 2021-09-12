@@ -21,7 +21,6 @@ DEFINE_DEVICE_TYPE(VT_VT1682_TIMER, vrt_vt1682_timer_device, "vt1682timer", "VRT
 
 vrt_vt1682_timer_device::vrt_vt1682_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VT_VT1682_TIMER, tag, owner, clock),
-	m_timer(*this, "snd_timera"),
 	m_irq_cb(*this)
 {
 }
@@ -31,6 +30,8 @@ void vrt_vt1682_timer_device::device_start()
 	save_item(NAME(m_timer_preload_7_0));
 	save_item(NAME(m_timer_preload_15_8));
 	save_item(NAME(m_timer_enable));
+
+	m_timer.init(*this, FUNC(vrt_vt1682_timer_device::timer_expired));
 
 	m_irq_cb.resolve();
 }
@@ -103,7 +104,7 @@ void vrt_vt1682_timer_device::update_timer()
 	{
 		uint16_t preload = (m_timer_preload_15_8 << 8) | m_timer_preload_7_0;
 		int realpreload = 65536 - preload;
-		m_timer->adjust(attotime::from_hz(clock()) * realpreload, 0, attotime::from_hz(clock()) * realpreload);
+		m_timer.adjust_periodic(attotime::from_hz(clock()) * realpreload);
 	}
 }
 
@@ -162,11 +163,11 @@ void vrt_vt1682_timer_device::vt1682_timer_enable_w(uint8_t data)
 	}
 	else
 	{
-		m_timer->adjust(attotime::never);
+		m_timer.adjust(attotime::never);
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vrt_vt1682_timer_device::timer_expired)
+void vrt_vt1682_timer_device::timer_expired()
 {
 	if (m_timer_enable & 0x02)
 	{
@@ -195,11 +196,6 @@ void vrt_vt1682_timer_device::vt1682_timer_irqclear_w(uint8_t data)
 {
 	//if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_irqclear_w writing: %02x\n", machine().describe_context(), data);
 	m_irq_cb(false);
-}
-
-void vrt_vt1682_timer_device::device_add_mconfig(machine_config& config)
-{
-	TIMER(config, m_timer).configure_generic(FUNC(vrt_vt1682_timer_device::timer_expired));
 }
 
 void vrt_vt1682_timer_device::change_clock()

@@ -594,7 +594,7 @@ void rastersp_state::tms32031_control_w(offs_t offset, uint32_t data)
 
 			period *= m_tms_io_regs[TIMER1_PERIOD];
 
-			m_tms_timer1->adjust(period, 0, period);
+			m_tms_timer1->adjust_periodic(period);
 
 			break;
 		}
@@ -617,7 +617,7 @@ void rastersp_state::tms32031_control_w(offs_t offset, uint32_t data)
 				m_tms_io_regs[SPORT_GLOBAL_CTL] &= ~(1 << 3);
 
 				// Run transmitter
-				m_tms_tx_timer->adjust(period, 0, period);
+				m_tms_tx_timer->adjust_periodic(period);
 			}
 
 			break;

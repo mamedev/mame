@@ -74,7 +74,7 @@ void ds2404_device::device_start()
 		elem = STATE_IDLE;
 
 	m_tick_timer = timer_alloc(0);
-	m_tick_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_tick_timer->adjust_periodic(attotime::from_hz(256));
 }
 
 

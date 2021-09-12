@@ -426,7 +426,7 @@ void k054539_device::write(offs_t offset, u8 data)
 		{
 			attotime period = attotime::from_hz((float)(38 + data) * (clock()/384.0f/14400.0f)) / 2;
 
-			m_timer->adjust(period, 0, period);
+			m_timer->adjust_periodic(period);
 
 			m_timer_state = 0;
 			m_timer_handler(m_timer_state);

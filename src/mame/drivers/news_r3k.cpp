@@ -357,7 +357,7 @@ void news_r3k_state::itimer_w(u8 data)
 	// TODO: assume 0xff stops the timer
 	u8 const ticks = data + 1;
 
-	m_itimer->adjust(attotime::from_ticks(ticks, 800), 0, attotime::from_ticks(ticks, 800));
+	m_itimer->adjust_periodic(attotime::from_ticks(ticks, 800));
 }
 
 void news_r3k_state::itimer(void *ptr, s32 param)

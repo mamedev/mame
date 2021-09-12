@@ -303,7 +303,7 @@ void alto2_state::init_alto2()
 {
 	// Create a timer which fires twice per frame, once for each field
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
-	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
+	m_vblank_timer->adjust_periodic(attotime::from_hz(2*30));
 }
 
 void alto2_state::device_timer(timer_instance const &timer)

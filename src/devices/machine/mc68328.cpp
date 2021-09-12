@@ -583,7 +583,7 @@ void mc68328_device::device_reset()
 	m_regs.rtcienr = 0x00;
 	m_regs.stpwtch = 0x00;
 
-	m_rtc->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
+	m_rtc->adjust_periodic(attotime::from_hz(1));
 }
 
 

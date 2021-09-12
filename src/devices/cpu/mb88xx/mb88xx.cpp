@@ -385,7 +385,7 @@ void mb88_cpu_device::update_pio_enable( uint8_t newpio )
 		if ((newpio & 0x30) == 0)
 			m_serial->adjust(attotime::never);
 		else if ((newpio & 0x30) == 0x20)
-			m_serial->adjust(attotime::from_hz(clock() / SERIAL_PRESCALE), 0, attotime::from_hz(clock() / SERIAL_PRESCALE));
+			m_serial->adjust_periodic(attotime::from_hz(clock() / SERIAL_PRESCALE));
 		else
 			fatalerror("mb88xx: update_pio_enable set serial enable to unsupported value %02X\n", newpio & 0x30);
 	}
@@ -744,7 +744,7 @@ void mb88_cpu_device::execute_run()
 				{
 					/* re-enable the timer if we disabled it previously */
 					if (m_SBcount >= SERIAL_DISABLE_THRESH)
-						m_serial->adjust(attotime::from_hz(clock() / SERIAL_PRESCALE), 0, attotime::from_hz(clock() / SERIAL_PRESCALE));
+						m_serial->adjust_periodic(attotime::from_hz(clock() / SERIAL_PRESCALE));
 					m_SBcount = 0;
 				}
 				m_sf = 0;

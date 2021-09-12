@@ -114,7 +114,7 @@ void wozfdc_device::device_reset()
 
 	// Just a timer to be sure that the lss is updated from time to
 	// time, so that there's no hiccup when it's talked to again.
-	timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+	timer->adjust_periodic(attotime::from_msec(10));
 }
 
 void wozfdc_device::a3_update_drive_sel()

@@ -366,6 +366,6 @@ void decocass_tape_device::change_speed(int8_t newspeed)
 		newperiod = attotime::from_hz(TAPE_CLOCKRATE * absnewspeed);
 
 	/* set the new speed */
-	m_tape_timer->adjust(newperiod, 0, newperiod);
+	m_tape_timer->adjust_periodic(newperiod);
 	m_speed = newspeed;
 }

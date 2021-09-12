@@ -110,7 +110,7 @@ void tvc_sound_device::write(offs_t offset, uint8_t data)
 			m_freq = (pitch == 0x0fff) ? 0 : (int)(195312.5 / (4096 - pitch));
 
 			if ((m_ports[1] & 0x20) && m_freq != 0)
-				m_sndint_timer->adjust(attotime::from_hz(m_freq), 0, attotime::from_hz(m_freq));
+				m_sndint_timer->adjust_periodic(attotime::from_hz(m_freq));
 			else
 				m_sndint_timer->reset();
 
@@ -136,7 +136,7 @@ void tvc_sound_device::reset_divider()
 	m_signal = 1;
 
 	if (m_ports[1] & 0x20 && m_freq != 0)
-		m_sndint_timer->adjust(attotime::from_hz(m_freq), 0, attotime::from_hz(m_freq));
+		m_sndint_timer->adjust_periodic(attotime::from_hz(m_freq));
 	else
 		m_sndint_timer->reset();
 }

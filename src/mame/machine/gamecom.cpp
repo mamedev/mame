@@ -22,7 +22,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
 	{
 		if (m_sound.sg0t > 0)
 		{
-			m_sound0_timer->adjust(attotime::from_hz(2764800/m_sound.sg0t), 0, attotime::from_hz(2764800/m_sound.sg0t));
+			m_sound0_timer->adjust_periodic(attotime::from_hz(2764800/m_sound.sg0t));
 			if ((m_sound.sgc & 0x81) == 0x81)
 				m_sound0_cnt = 0;
 		}
@@ -40,7 +40,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
 	{
 		if (m_sound.sg1t > 0)
 		{
-			m_sound1_timer->adjust(attotime::from_hz(2764800/m_sound.sg1t), 0, attotime::from_hz(2764800/m_sound.sg1t));
+			m_sound1_timer->adjust_periodic(attotime::from_hz(2764800/m_sound.sg1t));
 			if ((m_sound.sgc & 0x82) == 0x82)
 				m_sound1_cnt = 0;
 		}
@@ -317,12 +317,12 @@ void gamecom_state::gamecom_internal_w(offs_t offset, uint8_t data)
 			if ( data & 0x40 )
 			{
 				/* timer resolution 1 minute */
-				m_clock_timer->adjust(attotime::from_seconds(60), 0, attotime::from_seconds(60));
+				m_clock_timer->adjust_periodic(attotime::from_seconds(60));
 			}
 			else
 			{
 				/* TImer resolution 1 second */
-				m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+				m_clock_timer->adjust_periodic(attotime::from_seconds(1));
 			}
 		}
 		else
@@ -614,8 +614,8 @@ void gamecom_state::init_gamecom()
 	m_clock_timer = timer_alloc(*this, FUNC(gamecom_state::gamecom_clock_timer_callback));
 	m_sound0_timer = timer_alloc(*this, FUNC(gamecom_state::gamecom_sound0_timer_callback));
 	m_sound1_timer = timer_alloc(*this, FUNC(gamecom_state::gamecom_sound1_timer_callback));
-	m_sound0_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-	m_sound1_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_sound0_timer->adjust_periodic(attotime::from_seconds(1));
+	m_sound1_timer->adjust_periodic(attotime::from_seconds(1));
 	m_p_ram = m_share_maincpu; // required here because pio_w gets called before machine_reset
 }
 

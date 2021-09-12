@@ -84,10 +84,10 @@ void dave_device::device_start()
 
 	// allocate timers
 	m_timer_1hz = timer_alloc(TIMER_1HZ);
-	m_timer_1hz->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+	m_timer_1hz->adjust_periodic(attotime::from_hz(2));
 
 	m_timer_50hz = timer_alloc(TIMER_50HZ);
-	m_timer_50hz->adjust(attotime::from_hz(2000), 0, attotime::from_hz(2000));
+	m_timer_50hz->adjust_periodic(attotime::from_hz(2000));
 
 	// state saving
 	save_item(NAME(m_segment));
@@ -480,14 +480,14 @@ void dave_device::io_w(offs_t offset, uint8_t data)
 				case 0:
 				{
 					//logerror("1kHz\n");
-					m_timer_50hz->adjust(attotime::from_hz(2000), 0, attotime::from_hz(2000));
+					m_timer_50hz->adjust_periodic(attotime::from_hz(2000));
 				}
 				break;
 
 				case 1:
 				{
 					//logerror("50Hz\n");
-					m_timer_50hz->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+					m_timer_50hz->adjust_periodic(attotime::from_hz(100));
 				}
 				break;
 

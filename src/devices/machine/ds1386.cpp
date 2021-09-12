@@ -111,7 +111,7 @@ void ds1386_device::device_start()
 
 	// allocate timers
 	m_clock_timer = timer_alloc(CLOCK_TIMER);
-	m_clock_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+	m_clock_timer->adjust_periodic(attotime::from_hz(100));
 	m_square_timer = timer_alloc(SQUAREWAVE_TIMER);
 	m_square_timer->adjust(attotime::never);
 	m_watchdog_timer = timer_alloc(WATCHDOG_TIMER);

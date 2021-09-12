@@ -1315,7 +1315,7 @@ TIMER_CALLBACK_MEMBER(pdp1_cylinder_image_device::il_timer_callback)
 void pdp1_cylinder_image_device::parallel_drum_init(pdp1_state *state)
 {
 	m_rotation_timer = machine().scheduler().timer_alloc();
-	m_rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
+	m_rotation_timer->adjust_periodic(PARALLEL_DRUM_ROTATION_TIME);
 
 	m_il_timer = timer_alloc(*this, FUNC(pdp1_cylinder_image_device::il_timer_callback));
 	set_il(0);

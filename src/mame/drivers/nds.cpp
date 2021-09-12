@@ -247,7 +247,7 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
 						attotime time = attotime::from_hz(final);
-						m_tmr_timer[timer]->adjust(time, timer, time);
+						m_tmr_timer[timer]->adjust_periodic(time, timer);
 					}
 				}
 			}
@@ -877,7 +877,7 @@ TIMER_CALLBACK_MEMBER(nds_state::timer_expire)
 		final = clocksel / rate;
 		m_timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
-		m_tmr_timer[tmr]->adjust(time, tmr, time);
+		m_tmr_timer[tmr]->adjust_periodic(time, tmr);
 	}
 
 	// Handle count-up timing

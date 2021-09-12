@@ -915,7 +915,7 @@ void jangou_state::machine_start()
 
 	/* Create a timer to feed the CVSD DAC with sample bits */
 	m_cvsd_bit_timer = timer_alloc(*this, FUNC(jangou_state::cvsd_bit_timer_callback));
-	m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
+	m_cvsd_bit_timer->adjust_periodic(attotime::from_hz(MASTER_CLOCK / 1024));
 }
 
 MACHINE_START_MEMBER(jangou_state,jngolady)

@@ -938,7 +938,7 @@ void lisa_state::machine_start()
 
 	/* read command every ms (don't know the real value) */
 	m_cops_ready_timer = timer_alloc(*this, FUNC(lisa_state::set_COPS_ready));
-	m_cops_ready_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_cops_ready_timer->adjust_periodic(attotime::from_msec(1));
 
 	m_read_COPS_command.init(*this, FUNC(lisa_state::read_COPS_command));
 

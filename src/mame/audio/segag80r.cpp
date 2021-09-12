@@ -234,7 +234,7 @@ inline void segag80r_state::sega005_update_sound_data()
 	if ((diff & 0x20) && (newval & 0x20))
 	{
 		//osd_printf_debug("Starting timer\n");
-		m_005snd->m_sega005_sound_timer->adjust(attotime::from_hz(SEGA005_555_TIMER_FREQ), 0, attotime::from_hz(SEGA005_555_TIMER_FREQ));
+		m_005snd->m_sega005_sound_timer->adjust_periodic(attotime::from_hz(SEGA005_555_TIMER_FREQ));
 	}
 }
 

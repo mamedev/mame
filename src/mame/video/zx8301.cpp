@@ -142,7 +142,7 @@ void zx8301_device::device_start()
 
 	// adjust timer periods
 	m_vsync_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
-	m_flash_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+	m_flash_timer->adjust_periodic(attotime::from_hz(2));
 
 	// register for state saving
 	save_item(NAME(m_dispoff));

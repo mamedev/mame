@@ -930,7 +930,7 @@ void dpb7000_state::machine_reset()
 		m_acia[i]->write_dcd(0);
 	}
 
-	m_field_in_clk->adjust(attotime::from_hz(59.94), 0, attotime::from_hz(59.94));
+	m_field_in_clk->adjust_periodic(attotime::from_hz(59.94));
 	m_field_out_clk->adjust(attotime::from_hz(59.94) + attotime::from_hz(15734.0 / 1.0), 0, attotime::from_hz(59.94));
 
 	// Disc Sequencer Card
@@ -1055,7 +1055,7 @@ void dpb7000_state::machine_reset()
 	m_tablet_mux = 0;
 	m_tablet_drq = 0;
 	m_tablet_counter_latch = 0;
-	m_tablet_tx_timer->adjust(attotime::from_hz(9600), 0, attotime::from_hz(9600));
+	m_tablet_tx_timer->adjust_periodic(attotime::from_hz(9600));
 	m_tablet_irq_timer->adjust(attotime::never);
 	m_tablet_tx_bit = 1;
 	m_tablet_pen_in_proximity = false;
@@ -2277,7 +2277,7 @@ void dpb7000_state::tds_p1_w(uint8_t data)
 	if (BIT(old & ~data, 0))
 	{
 		m_tds_duart->reset();
-		m_tablet_tx_timer->adjust(attotime::from_hz(9600), 0, attotime::from_hz(9600));
+		m_tablet_tx_timer->adjust_periodic(attotime::from_hz(9600));
 	}
 }
 

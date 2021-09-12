@@ -349,7 +349,7 @@ uint8_t cuda_device::onesec_r()
 
 void cuda_device::onesec_w(uint8_t data)
 {
-	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_timer->adjust_periodic(attotime::from_seconds(1));
 
 	if ((onesec & 0x40) && !(data & 0x40))
 	{

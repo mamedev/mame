@@ -343,7 +343,7 @@ void bq48x2_device::write(offs_t address, uint8_t data)
 		case reg_days:
 			if (data & FLAG_FTE)
 				// Test mode
-				m_periodic_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
+				m_periodic_timer->adjust_periodic(attotime::from_hz(1024));
 			else
 			{
 				// reset to periodic timing
@@ -401,14 +401,14 @@ void bq48x2_device::set_periodic_timer()
 		m_periodic_timer->reset();
 		break;
 	case 1:
-		m_periodic_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+		m_periodic_timer->adjust_periodic(attotime::from_msec(10));
 		break;
 	case 2:
-		m_periodic_timer->adjust(attotime::from_msec(100), 0, attotime::from_msec(100));
+		m_periodic_timer->adjust_periodic(attotime::from_msec(100));
 		break;
 	default:
 		rate = 1 << (16-rateval);
-		m_periodic_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+		m_periodic_timer->adjust_periodic(attotime::from_hz(rate));
 		break;
 	}
 }

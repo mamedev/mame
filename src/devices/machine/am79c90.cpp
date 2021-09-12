@@ -88,7 +88,7 @@ void am7990_device_base::device_start()
 	m_dma_out_cb.resolve_safe();
 
 	m_transmit_poll = timer_alloc(*this, FUNC(am7990_device_base::transmit_poll));
-	m_transmit_poll->adjust(TX_POLL_PERIOD, 0, TX_POLL_PERIOD);
+	m_transmit_poll->adjust_periodic(TX_POLL_PERIOD);
 
 	save_item(NAME(m_rap));
 	save_item(NAME(m_csr));

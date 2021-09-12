@@ -181,7 +181,7 @@ void i8279_device::timer_adjust()
 
 	if (m_scanclock != new_clock)
 	{
-		m_timer->adjust(attotime::from_ticks(64, new_clock), 0, attotime::from_ticks(64, new_clock));
+		m_timer->adjust_periodic(attotime::from_ticks(64, new_clock));
 
 		m_scanclock = new_clock;
 	}

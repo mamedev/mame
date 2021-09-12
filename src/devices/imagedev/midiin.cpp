@@ -152,7 +152,7 @@ image_init_result midiin_device::call_load()
 			return image_init_result::FAIL;
 		}
 
-		m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
+		m_timer->adjust_periodic(attotime::from_hz(1500));
 		return image_init_result::PASS;
 	}
 }

@@ -146,11 +146,11 @@ void scc8530_legacy_device::device_timer(timer_instance const &timer)
 	if (rate)
 	{
 		attotime attorate = attotime::from_hz(rate);
-		pChan->baudtimer->adjust(attorate, 0, attorate);
+		pChan->baudtimer->adjust_periodic(attorate);
 	}
 	else
 	{
-		pChan->baudtimer->adjust(attotime::never, 0, attotime::never);
+		pChan->baudtimer->adjust(attotime::never);
 	}
 }
 
@@ -401,7 +401,7 @@ void scc8530_legacy_device::putreg(int ch, uint8_t data)
 				int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
 				int rate = clock() / brconst;
 
-				pChan->baudtimer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+				pChan->baudtimer->adjust_periodic(attotime::from_hz(rate));
 			}
 			break;
 

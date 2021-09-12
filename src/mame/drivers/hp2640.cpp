@@ -105,11 +105,11 @@
 #include "emu.h"
 #include "screen.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/timer.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/hp2640_tape.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "emupal.h"
 #include "speaker.h"
@@ -195,7 +195,7 @@ protected:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void mode_byte_w(uint8_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_10ms_exp);
+	void timer_10ms_exp();
 
 	uint8_t kb_r(offs_t offset);
 	void kb_prev_w(uint8_t data);
@@ -210,14 +210,14 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	void cx_w(uint8_t data);
 	void cy_w(uint8_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_cursor_blink_inh);
+	void timer_cursor_blink_inh();
 
 	uint8_t async_status_r();
 	void async_control_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(async_dav_w);
 	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
+	void timer_beep_exp();
 
 	DECLARE_WRITE_LINE_MEMBER(tape_irq_w);
 
@@ -227,7 +227,6 @@ protected:
 	void cpu_io_map(address_map &map);
 
 	required_device<i8080a_cpu_device> m_cpu;
-	required_device<timer_device> m_timer_10ms;
 	required_ioport_array<4> m_io_key;
 	required_ioport m_io_comm;
 	required_ioport m_io_sw_ah;
@@ -235,14 +234,15 @@ protected:
 	required_ioport m_io_sw_sz;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<timer_device> m_timer_cursor_blink_inh;
 	required_device<rs232_port_device> m_rs232;
 	required_device<ay51013_device> m_uart;
 	required_device<clock_device> m_uart_clock;
 	required_device<beep_device> m_beep;
-	required_device<timer_device> m_timer_beep;
 	required_device<hp2640_tape_device> m_tapes;
 	memory_view m_io_view;
+	persistent_timer m_timer_10ms;
+	persistent_timer m_timer_cursor_blink_inh;
+	persistent_timer m_timer_beep;
 
 	uint8_t m_mode_byte;
 	bool m_timer_irq;
@@ -294,7 +294,6 @@ protected:
 hp2640_base_state::hp2640_base_state(const machine_config &mconfig, device_type type, const char *tag , uint8_t m_cg_0 , uint8_t m_cg_1 , uint8_t m_cg_2 , uint8_t m_cg_3)
 	: driver_device(mconfig , type , tag),
 	  m_cpu(*this , "cpu"),
-	  m_timer_10ms(*this , "timer_10ms"),
 	  m_io_key(*this , "KEY%u" , 0),
 	  m_io_comm(*this , "comm"),
 	  m_io_sw_ah(*this , "sw_ah"),
@@ -302,12 +301,10 @@ hp2640_base_state::hp2640_base_state(const machine_config &mconfig, device_type 
 	  m_io_sw_sz(*this , "sw_sz"),
 	  m_screen(*this , "screen"),
 	  m_palette(*this , "palette"),
-	  m_timer_cursor_blink_inh(*this , "timer_cursor_blink_inh"),
 	  m_rs232(*this , "rs232"),
 	  m_uart(*this , "uart"),
 	  m_uart_clock(*this , "uart_clock"),
 	  m_beep(*this , "beep"),
-	  m_timer_beep(*this , "timer_beep"),
 	  m_tapes(*this , "tapes"),
 	  m_io_view(*this , "io_view"),
 	  m_chargen(*this , "chargen%u" , 0),
@@ -317,6 +314,10 @@ hp2640_base_state::hp2640_base_state(const machine_config &mconfig, device_type 
 
 void hp2640_base_state::machine_start()
 {
+	m_timer_10ms.init(*this, FUNC(hp2640_base_state::timer_10ms_exp));
+	m_timer_cursor_blink_inh.init(*this, FUNC(hp2640_base_state::timer_cursor_blink_inh));
+	m_timer_beep.init(*this, FUNC(hp2640_base_state::timer_beep_exp));
+
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// TODO: save more state
@@ -332,7 +333,7 @@ void hp2640_base_state::machine_reset()
 	m_timer_irq = false;
 	m_datacom_irq = false;
 	m_tape_irq = false;
-	m_timer_10ms->reset();
+	m_timer_10ms.reset();
 	update_irq();
 	m_blanking = true;
 	m_dma_on = true;
@@ -374,9 +375,9 @@ IRQ_CALLBACK_MEMBER(hp2640_base_state::irq_callback)
 void hp2640_base_state::mode_byte_w(uint8_t data)
 {
 	if (BIT(m_mode_byte , 0) && !BIT(data , 0)) {
-		m_timer_10ms->reset();
+		m_timer_10ms.reset();
 	} else if (!BIT(m_mode_byte , 0) && BIT(data , 0)) {
-		m_timer_10ms->adjust(attotime::from_msec(10) , 0 , attotime::from_msec(10));
+		m_timer_10ms.adjust_periodic(attotime::from_msec(10));
 	}
 	m_mode_byte = data;
 
@@ -388,7 +389,7 @@ void hp2640_base_state::mode_byte_w(uint8_t data)
 	m_io_view.select(BIT(m_mode_byte , 6));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_10ms_exp)
+void hp2640_base_state::timer_10ms_exp()
 {
 	if (BIT(m_mode_byte , 1)) {
 		m_timer_irq = true;
@@ -446,7 +447,7 @@ void hp2640_base_state::kb_led_w(uint8_t data)
 {
 	if (BIT(data , 7)) {
 		m_beep->set_state(1);
-		m_timer_beep->adjust(attotime::from_msec(BEEP_DURATION_MS));
+		m_timer_beep.adjust(attotime::from_msec(BEEP_DURATION_MS));
 	}
 	// TODO:
 	LOG("LED = %02x\n" , data);
@@ -488,7 +489,7 @@ void hp2640_base_state::cx_w(uint8_t data)
 {
 	m_cursor_x = data & 0x7f;
 	m_cursor_blink_inh = true;
-	m_timer_cursor_blink_inh->adjust(attotime::from_msec(CURSOR_BLINK_INH_MS));
+	m_timer_cursor_blink_inh.adjust(attotime::from_msec(CURSOR_BLINK_INH_MS));
 }
 
 void hp2640_base_state::cy_w(uint8_t data)
@@ -513,10 +514,10 @@ void hp2640_base_state::cy_w(uint8_t data)
 		video_fill_buffer(m_even , MAX_DMA_CYCLES);
 	}
 	m_cursor_blink_inh = true;
-	m_timer_cursor_blink_inh->adjust(attotime::from_msec(CURSOR_BLINK_INH_MS));
+	m_timer_cursor_blink_inh.adjust(attotime::from_msec(CURSOR_BLINK_INH_MS));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_cursor_blink_inh)
+void hp2640_base_state::timer_cursor_blink_inh()
 {
 	m_cursor_blink_inh = false;
 }
@@ -564,7 +565,7 @@ WRITE_LINE_MEMBER(hp2640_base_state::async_txd_w)
 	m_rs232->write_txd(!BIT(m_async_control , 6) && m_uart->so_r());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_beep_exp)
+void hp2640_base_state::timer_beep_exp()
 {
 	m_beep->set_state(0);
 }
@@ -1097,9 +1098,6 @@ void hp2640_base_state::hp2640_base(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &hp2640_base_state::cpu_io_map);
 	m_cpu->set_irq_acknowledge_callback(FUNC(hp2640_base_state::irq_callback));
 
-	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2640_base_state::timer_10ms_exp));
-	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2640_base_state::timer_cursor_blink_inh));
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::white());
 	// Actual pixel clock is half this value: 21.06 MHz
 	// We use the doubled value to be able to emulate the half-pixel shifting of the real hw
@@ -1129,7 +1127,6 @@ void hp2640_base_state::hp2640_base(machine_config &config)
 	// Beep
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, BEEP_FREQUENCY).add_route(ALL_OUTPUTS, "mono", 1.00);
-	TIMER(config, m_timer_beep).configure_generic(FUNC(hp2640_base_state::timer_beep_exp));
 
 	// Tape drives
 	HP2640_TAPE(config , m_tapes , SYS_CLOCK);

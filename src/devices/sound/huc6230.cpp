@@ -206,5 +206,5 @@ void huc6230_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / 6);
 	attotime adpcm_period = clocks_to_attotime(682);
-	m_adpcm_timer->adjust(adpcm_period, 0, adpcm_period);
+	m_adpcm_timer->adjust_periodic(adpcm_period);
 }

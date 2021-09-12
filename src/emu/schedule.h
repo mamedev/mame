@@ -505,7 +505,8 @@ public:
 	bool enable(bool enable = true);
 	bool disable() { return enable(false); }
 	persistent_timer &reset(attotime const &duration = attotime::never) { return adjust(duration, m_instance.param(), m_period); }
-	persistent_timer &adjust(attotime const &start_delay, s32 param = 0, attotime const &periodicity = attotime::never) { return adjust_internal(start_delay, param, periodicity, false); }
+	persistent_timer &adjust(attotime const &start_delay, s32 param = 0, attotime const &period = attotime::never) { return adjust_internal(start_delay, param, period, false); }
+	persistent_timer &adjust_periodic(attotime const &period, s32 param = 0) { return adjust_internal(period, param, period, false); }
 	persistent_timer &adjust_absolute(attotime const &start_time, s32 param = 0, attotime const &periodicity = attotime::never) { return adjust_internal(start_time, param, periodicity, true); }
 
 	// save state

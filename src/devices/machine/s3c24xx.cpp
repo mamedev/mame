@@ -97,8 +97,7 @@ void s3c24xx_peripheral_types::rtc_t::reset()
 	std::memset(&regs, 0, sizeof(regs));
 	regs.almday = 1;
 	regs.almmon = 1;
-	timer_update->adjust(attotime::never);
-	timer_update->adjust(attotime::from_msec(1000), 0, attotime::from_msec(1000));
+	timer_update->adjust_periodic(attotime::from_msec(1000));
 }
 
 void s3c24xx_peripheral_types::rtc_t::recalc()
@@ -108,7 +107,7 @@ void s3c24xx_peripheral_types::rtc_t::recalc()
 		uint32_t const ttc = BITS(regs.ticnt, 6, 0);
 		double const freq = 128.0 / (ttc + 1);
 		LOG("ttc %u freq %f\n", ttc, freq);
-		timer_tick_count->adjust(attotime::from_hz(freq), 0, attotime::from_hz(freq));
+		timer_tick_count->adjust_periodic(attotime::from_hz(freq));
 	}
 	else
 	{

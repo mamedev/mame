@@ -46,7 +46,7 @@ void ym2148_device::device_start()
 	// Start a timer to trigger at clock / 8 / 16
 	const attotime rate = clocks_to_attotime(8 * 16);
 	m_timer = timer_alloc(0);
-	m_timer->adjust(rate, 0, rate);
+	m_timer->adjust_periodic(rate);
 }
 
 

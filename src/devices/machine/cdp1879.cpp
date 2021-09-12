@@ -37,7 +37,7 @@ void cdp1879_device::device_start()
 {
 	// allocate timers
 	m_clock_timer = timer_alloc();
-	m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_clock_timer->adjust_periodic(attotime::from_seconds(1));
 
 	m_irq_w.resolve_safe();
 

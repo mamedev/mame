@@ -552,7 +552,7 @@ void sc499_device::device_timer(timer_instance const &timer)
 			if (++m_underrun_counter >= 5000)
 			{
 				// stop tape (after 30 seconds) - probably the DMA handshake failed.
-				m_timer1->adjust(attotime::never, param, attotime::never);
+				m_timer1->adjust(attotime::never, param);
 				m_status &= ~SC499_STAT_EXC;
 				m_status &= ~SC499_STAT_DIR;
 				tape_status_clear(SC499_ST_CLEAR_ALL);
@@ -572,7 +572,7 @@ void sc499_device::device_timer(timer_instance const &timer)
 		{
 			LOG1(("timer_func param=%d status=%x tape_pos=%d - end-of-tape or not ready",
 								param, m_status, m_tape_pos));
-			m_timer1->adjust(attotime::never, param, attotime::never);
+			m_timer1->adjust(attotime::never, param);
 			m_status &= ~SC499_STAT_EXC;
 			m_status &= ~SC499_STAT_DIR;
 			tape_status_clear(SC499_ST_CLEAR_ALL);
@@ -594,7 +594,7 @@ void sc499_device::device_timer(timer_instance const &timer)
 			m_underrun_counter = 0;
 			if (block_is_filemark())
 			{
-				m_timer1->adjust(attotime::never, param, attotime::never);
+				m_timer1->adjust(attotime::never, param);
 			}
 			else if (m_current_command == SC499_CMD_READ_DATA)
 			{
@@ -801,7 +801,7 @@ void sc499_device::do_command(uint8_t data)
 
 		set_interrupt(CLEAR_LINE);
 		set_dma_drq(CLEAR_LINE);
-		m_timer1->adjust( attotime::never, SC499_TIMER_6, attotime::never);
+		m_timer1->adjust( attotime::never, SC499_TIMER_6);
 
 		m_data_index = 0;
 		m_timer->adjust( attotime::from_usec(100), SC499_TIMER_4);
@@ -845,7 +845,7 @@ void sc499_device::do_reset()
 	set_interrupt(CLEAR_LINE);
 	set_dma_drq(CLEAR_LINE);
 
-	m_timer1->adjust( attotime::never, SC499_TIMER_6, attotime::never);
+	m_timer1->adjust( attotime::never, SC499_TIMER_6 );
 }
 
 // -------------------------------------

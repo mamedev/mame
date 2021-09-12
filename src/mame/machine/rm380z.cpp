@@ -227,7 +227,7 @@ void rm380z_state::disk_0_control(uint8_t data)
 void rm380z_state::machine_start()
 {
 	m_static_vblank_timer = timer_alloc(*this, FUNC(rm380z_state::static_vblank_timer));
-	m_static_vblank_timer->adjust(attotime::from_hz(TIMER_SPEED), 0, attotime::from_hz(TIMER_SPEED));
+	m_static_vblank_timer->adjust_periodic(attotime::from_hz(TIMER_SPEED));
 }
 
 void rm380z_state::init_rm380z()

@@ -129,7 +129,7 @@ void wpc_out_device::device_reset()
 	gi = 0x00;
 	previous_gi_update = attotime::zero;
 	memset(gi_time, 0, sizeof(gi_time));
-	timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
+	timer->adjust_periodic(attotime::from_hz(10));
 }
 
 void wpc_out_device::device_timer(timer_instance const &timer)

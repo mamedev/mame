@@ -18,7 +18,6 @@
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 #include "machine/gen_latch.h"
-#include "machine/timer.h"
 #include "sound/dmadac.h"
 #include "video/poly.h"
 #include "screen.h"
@@ -46,7 +45,6 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_mainlatch(*this, "mainlatch")
 		, m_outlatch(*this, "outlatch")
-		, m_adsp_autobuffer_timer(*this, "adsp_timer")
 		, m_paletteram16(*this, "paletteram16")
 		, m_paletteram32(*this, "paletteram32")
 		, m_analog(*this, "ANALOG%u", 0U)
@@ -117,7 +115,6 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<ls259_device> m_mainlatch;
 	required_device<ls259_device> m_outlatch;
-	required_device<timer_device> m_adsp_autobuffer_timer;
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	optional_shared_ptr<uint32_t> m_paletteram32;
@@ -141,6 +138,7 @@ private:
 	int m_lastscan;
 	int m_video_changed;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
+	persistent_timer m_adsp_autobuffer_timer;
 
 	void irq_ack_w(uint16_t data);
 	uint16_t sound_status_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -168,7 +166,7 @@ private:
 	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
+	void adsp_autobuffer_irq();
 	void gaelco3d_render(screen_device &screen);
 	void adsp_tx_callback(offs_t offset, uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(fp_analog_clock_w);

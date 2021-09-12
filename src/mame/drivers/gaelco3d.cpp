@@ -176,6 +176,8 @@ WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
 
 void gaelco3d_state::machine_start()
 {
+	m_adsp_autobuffer_timer.init(*this, FUNC(gaelco3d_state::adsp_autobuffer_irq));
+
 	// Save state support
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_analog_ports));
@@ -491,7 +493,7 @@ void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 				for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
 					m_dmadac[i]->enable(0);
 
-				m_adsp_autobuffer_timer->reset();
+				m_adsp_autobuffer_timer.reset();
 			}
 			break;
 
@@ -502,7 +504,7 @@ void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 				for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
 					m_dmadac[i]->enable(0);
 
-				m_adsp_autobuffer_timer->reset();
+				m_adsp_autobuffer_timer.reset();
 			}
 			break;
 
@@ -531,7 +533,7 @@ void gaelco3d_state::adsp_rombank_w(offs_t offset, uint16_t data)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
+void gaelco3d_state::adsp_autobuffer_irq()
 {
 	// Get the index register
 	int reg = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
@@ -615,7 +617,7 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 			// Fire off a timer which will hit every half-buffer
 			sample_period = (sample_period * m_adsp_size) / (SOUND_CHANNELS * m_adsp_incs);
 
-			m_adsp_autobuffer_timer->adjust(sample_period, 0, sample_period);
+			m_adsp_autobuffer_timer.adjust_periodic(sample_period);
 
 			return;
 		}
@@ -628,7 +630,7 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 		m_dmadac[i]->enable(0);
 
 	// Remove timer
-	m_adsp_autobuffer_timer->reset();
+	m_adsp_autobuffer_timer.reset();
 }
 
 
@@ -929,8 +931,6 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	EEPROM_93C66_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
-
-	TIMER(config, "adsp_timer").configure_generic(FUNC(gaelco3d_state::adsp_autobuffer_irq));
 
 	GAELCO_SERIAL(config, m_serial, 0);
 	m_serial->irq_handler().set(FUNC(gaelco3d_state::ser_irq));

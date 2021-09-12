@@ -64,7 +64,7 @@ void bk_state::machine_start()
 	m_maincpu->set_input_line(t11_device::VEC_LINE, ASSERT_LINE);
 
 	m_kbd_timer = timer_alloc(*this, FUNC(bk_state::keyboard_callback));
-	m_kbd_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
+	m_kbd_timer->adjust_periodic(attotime::from_hz(2400));
 }
 
 uint8_t bk_state::irq_callback(offs_t offset)

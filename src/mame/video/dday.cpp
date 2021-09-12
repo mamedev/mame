@@ -37,7 +37,7 @@ void dday_state::start_countdown_timer()
 {
 	m_timer_value = 0;
 
-	m_countdown_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_countdown_timer->adjust_periodic(attotime::from_seconds(1));
 }
 
 

@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "machine/timer.h"
 #include "tilemap.h"
 
 class xevious_state : public galaga_state
@@ -65,8 +64,7 @@ class battles_state : public xevious_state
 {
 public:
 	battles_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xevious_state(mconfig, type, tag),
-		m_nmi_timer(*this, "nmi")
+		: xevious_state(mconfig, type, tag)
 	{
 	}
 
@@ -75,11 +73,12 @@ public:
 	void battles(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(interrupt_4);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_generate);
+	void nmi_generate();
 
 	void battles_mem4(address_map &map);
 
@@ -97,14 +96,14 @@ private:
 	void cpu4_coin_w(uint8_t data);
 	void noise_sound_w(offs_t offset, uint8_t data);
 
-	required_device<timer_device> m_nmi_timer;
-
 	uint8_t m_customio[16];
 	char m_customio_command;
 	char m_customio_prev_command;
 	char m_customio_command_count;
 	char m_customio_data;
 	char m_sound_played;
+
+	persistent_timer m_nmi_timer;
 };
 
 #endif // MAME_INCLUDES_XEVIOUS

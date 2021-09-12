@@ -54,7 +54,7 @@ void wpc_lamp_device::device_start()
 void wpc_lamp_device::device_reset()
 {
 	memset(state, 0x00, 64);
-	timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	timer->adjust_periodic(attotime::from_hz(60));
 }
 
 void wpc_lamp_device::device_timer(timer_instance const &timer)

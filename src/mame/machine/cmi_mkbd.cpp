@@ -75,7 +75,7 @@ void cmi_music_keyboard_device::device_start()
 {
 	m_cmi10_scnd_timer = timer_alloc(TIMER_CMI10_SCND);
 
-	m_cmi10_scnd_timer->adjust(attotime::from_hz(4000000 / 4 / 2048 / 2), 0, attotime::from_hz(4000000 / 4 / 2048 / 2));
+	m_cmi10_scnd_timer->adjust_periodic(attotime::from_hz(4000000 / 4 / 2048 / 2));
 	m_scnd = 0;
 }
 

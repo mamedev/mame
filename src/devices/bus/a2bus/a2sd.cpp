@@ -172,11 +172,11 @@ u8 a2bus_a2sd_device::read_c0nx(u8 offset)
 
 				if (m_c0n1 & C0N1_ECE)
 				{
-					m_shift_timer->adjust(attotime::from_hz(14.318181_MHz_XTAL / 4), 0, attotime::from_hz(14.318181_MHz_XTAL / 4));
+					m_shift_timer->adjust_periodic(attotime::from_hz(14.318181_MHz_XTAL / 4));
 				}
 				else
 				{
-					m_shift_timer->adjust(attotime::from_hz(500_kHz_XTAL), 0, attotime::from_hz(500_kHz_XTAL));
+					m_shift_timer->adjust_periodic(attotime::from_hz(500_kHz_XTAL));
 				}
 			}
 			return m_datain;
@@ -217,11 +217,11 @@ void a2bus_a2sd_device::write_c0nx(u8 offset, u8 data)
 			// if ECE is set, clock is 3.58 MHz from the A2 bus, otherwise internally generated 500 kHz
 			if (m_c0n1 & C0N1_ECE)
 			{
-				m_shift_timer->adjust(attotime::from_hz(14.318181_MHz_XTAL / 4), 0, attotime::from_hz(14.318181_MHz_XTAL/4));
+				m_shift_timer->adjust_periodic(attotime::from_hz(14.318181_MHz_XTAL / 4));
 			}
 			else
 			{
-				m_shift_timer->adjust(attotime::from_hz(500_kHz_XTAL), 0, attotime::from_hz(500_kHz_XTAL));
+				m_shift_timer->adjust_periodic(attotime::from_hz(500_kHz_XTAL));
 			}
 			break;
 

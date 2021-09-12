@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER(tv955kb_device::bell_w)
 	{
 		// Speaker driven through 2N4401 from Q8 output of MC14040 clocked by ALE
 		attotime period = m_mcu->cycles_to_attotime(128);
-		m_bell_timer->adjust(period, 0, period);
+		m_bell_timer->adjust_periodic(period);
 	}
 }
 

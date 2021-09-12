@@ -69,7 +69,7 @@ void nextkbd_device::device_reset()
 	prev_mousey = 0;
 	prev_mousebtn = 0;
 	km_address = 0;
-	poll_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
+	poll_timer->adjust_periodic(attotime::from_hz(200));
 }
 
 void nextkbd_device::send()

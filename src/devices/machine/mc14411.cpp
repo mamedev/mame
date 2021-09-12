@@ -181,7 +181,7 @@ void mc14411_device::arm_timer(int i)
 	if (i < TIMER_F15)
 		divider *= s_divider_select[m_divider];
 	attotime half_cycle = clocks_to_attotime(divider) / 2; // 2 flanks per cycle
-	m_fx_timer[i]->adjust(half_cycle, i, half_cycle);
+	m_fx_timer[i]->adjust_periodic(half_cycle, i);
 	LOGSETUP(" - arming timer for F%d at %fHz (/%d)\n", i + 1, double(clock()) / divider, divider);
 }
 
@@ -206,7 +206,7 @@ void mc14411_device::device_reset()
 
 	if (m_reset == ASSERT_LINE)
 	{
-		m_reset_timer->adjust(attotime::from_nsec((double)900), TIMER_ID_RESET, attotime::from_nsec((double)900));
+		m_reset_timer->adjust_periodic(attotime::from_nsec((double)900), TIMER_ID_RESET);
 	}
 }
 

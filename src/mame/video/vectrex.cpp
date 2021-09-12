@@ -94,7 +94,7 @@ void vectrex_base_state::vectrex_via_w(offs_t offset, uint8_t data)
 		period = m_maincpu->cycles_to_attotime(m_via_timer2);
 
 		if (m_reset_refresh)
-			m_refresh->adjust(period, 0, period);
+			m_refresh->adjust_periodic(period);
 		else
 			m_refresh->adjust(
 									std::min(period, m_refresh->remaining()),
@@ -261,7 +261,7 @@ void vectrex_state::video_start()
 	m_imager_freq = 1;
 
 	m_imager_timer = timer_alloc(TIMER_VECTREX_IMAGER_EYE);
-	m_imager_timer->adjust(attotime::from_hz(m_imager_freq), 2, attotime::from_hz(m_imager_freq));
+	m_imager_timer->adjust_periodic(attotime::from_hz(m_imager_freq), 2);
 
 	m_lp_t = timer_alloc(TIMER_LIGHTPEN_TRIGGER);
 }

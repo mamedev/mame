@@ -338,7 +338,7 @@ void abc800_keyboard_device::device_start()
 {
 	// allocate timers
 	m_serial_timer = timer_alloc();
-	m_serial_timer->adjust(attotime::from_hz(XTAL(5'990'400)/(3*5)/20), 0, attotime::from_hz(XTAL(5'990'400)/(3*5)/20)); // ???
+	m_serial_timer->adjust_periodic(attotime::from_hz(XTAL(5'990'400)/(3*5)/20)); // ???
 
 	// state saving
 	save_item(NAME(m_row));

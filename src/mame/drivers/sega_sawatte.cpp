@@ -164,7 +164,7 @@ void sawatte_state::irq3_timer_w(u8 data)
 	else
 	{
 		attotime period = attotime::from_hz(10'000); // probably incorrect
-		m_irq3_timer->adjust(period, 0, period);
+		m_irq3_timer->adjust_periodic(period);
 	}
 }
 
@@ -175,7 +175,7 @@ void sawatte_state::irq4_timer_w(u8 data)
 	else
 	{
 		attotime period = attotime::from_hz(8'000); // probably incorrect
-		m_irq4_timer->adjust(period, 0, period);
+		m_irq4_timer->adjust_periodic(period);
 	}
 }
 

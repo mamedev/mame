@@ -175,7 +175,7 @@ void kcgd_state::video_start()
     m_vsync_off_timer->adjust(m_screen->time_until_pos(16, 0), 0, m_screen->frame_period());
 */
 	m_500hz_timer = timer_alloc(TIMER_ID_500HZ);
-	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
+	m_500hz_timer->adjust_periodic(attotime::from_hz(500));
 }
 
 void kcgd_state::kcgd_palette(palette_device &palette) const

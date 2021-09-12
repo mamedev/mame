@@ -173,7 +173,7 @@ void sgi_mc_device::device_reset()
 	m_dma_run = 0;
 	m_eeprom_ctrl = 0;
 	memset(m_semaphore, 0, sizeof(uint32_t) * 16);
-	m_rpss_timer->adjust(attotime::from_hz(10000000), 0, attotime::from_hz(10000000));
+	m_rpss_timer->adjust_periodic(attotime::from_hz(10000000));
 	m_rpss_divide_counter = 4;
 	m_rpss_divide_count = 4;
 	m_rpss_increment = 1;
@@ -680,7 +680,7 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		if (data & 1)
 		{
 			m_dma_run |= 0x40;
-			m_dma_timer->adjust(attotime::from_hz(33333333), 0, attotime::from_hz(33333333));
+			m_dma_timer->adjust_periodic(attotime::from_hz(33333333));
 		}
 		break;
 	case 0x2070/4:
@@ -691,7 +691,7 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_dma_count = 0x0001000c;
 		m_dma_mode = 0x00000028;
 		m_dma_run |= 0x40;
-		m_dma_timer->adjust(attotime::from_hz(33333333), 0, attotime::from_hz(33333333));
+		m_dma_timer->adjust_periodic(attotime::from_hz(33333333));
 		break;
 	case 0x10000/4:
 	case 0x11000/4:

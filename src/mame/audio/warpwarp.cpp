@@ -110,7 +110,7 @@ void warpwarp_sound_device::sound_w(u8 data)
 		 * 0.639 * 15k * 1uF -> 0.9585s
 		 */
 		attotime period = attotime::from_hz(32768) * 95850 / 100000;
-		m_sound_volume_timer->adjust(period, 0, period);
+		m_sound_volume_timer->adjust_periodic(period);
 	}
 	else
 	{
@@ -123,7 +123,7 @@ void warpwarp_sound_device::sound_w(u8 data)
 		 */
 		//attotime period = attotime::from_hz(32768) * 702900 / 100000;
 		attotime period = attotime::from_hz(32768) * 191700 / 100000;
-		m_sound_volume_timer->adjust(period, 0, period);
+		m_sound_volume_timer->adjust_periodic(period);
 	}
 }
 
@@ -152,7 +152,7 @@ void warpwarp_sound_device::music2_w(u8 data)
 		 * ...I'm sure this is off by one number of magnitude :/
 		 */
 		attotime period = attotime::from_hz(32768) * 95850 / 100000;
-		m_music_volume_timer->adjust(period, 0, period);
+		m_music_volume_timer->adjust_periodic(period);
 	}
 	else
 	{
@@ -163,7 +163,7 @@ void warpwarp_sound_device::music2_w(u8 data)
 		 */
 		//attotime period = attotime::from_hz(32768) * 3003300 / 100000;
 		attotime period = attotime::from_hz(32768) * 300330 / 100000;
-		m_music_volume_timer->adjust(period, 0, period);
+		m_music_volume_timer->adjust_periodic(period);
 	}
 
 }

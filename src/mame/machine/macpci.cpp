@@ -113,7 +113,7 @@ void macpci_state::machine_start()
 
 void macpci_state::machine_reset()
 {
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+	m_6015_timer->adjust_periodic(attotime::from_hz(60.15));
 
 	m_via_cycles = -256;    // for a 66 MHz PowerMac
 

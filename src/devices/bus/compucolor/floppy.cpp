@@ -128,7 +128,7 @@ void compucolor_floppy_device::device_start()
 {
 	// allocate timer
 	m_timer = timer_alloc();
-	m_timer->adjust(attotime::from_hz(9600*8), 0, attotime::from_hz(9600*8));
+	m_timer->adjust_periodic(attotime::from_hz(9600*8));
 
 	// state saving
 	save_item(NAME(m_rw));

@@ -187,7 +187,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 
 	m_timer_irq_flag = 1;
 	pcw_update_irqs();
-	m_pulse_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(100));
+	m_pulse_timer->adjust_periodic(attotime::from_usec(100));
 }
 
 /* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or

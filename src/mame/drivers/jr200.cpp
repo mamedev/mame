@@ -365,7 +365,7 @@ void jr200_state::mn1271_io_w(offs_t offset, uint8_t data)
 		case 0xc816: if (data!=0) {
 					m_timer_d->adjust(attotime::zero, 0, attotime::from_hz(XTAL(14'318'181)) * (m_mn1271_ram[0x17]*0x100 + m_mn1271_ram[0x18]));
 				} else {
-					m_timer_d->adjust(attotime::zero, 0,  attotime::zero);
+					m_timer_d->adjust(attotime::zero);
 				}
 				break;
 		case 0xc819: jr200_beep_w(data); break;

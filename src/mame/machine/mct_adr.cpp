@@ -117,7 +117,7 @@ void mct_adr_device::map(address_map &map)
 
 				attotime interval = attotime::from_ticks((data + 1) & 0x1ff, 1000);
 
-				m_interval_timer->adjust(interval, 0, interval);
+				m_interval_timer->adjust_periodic(interval);
 			}, "interrupt_interval");
 	map(0x230, 0x237).lr32([this] () { if (m_out_int_timer_asserted) { m_out_int_timer_asserted = false; m_out_int_timer(0); } return m_interval_timer->remaining().as_ticks(1000); }, "interval_timer");
 	map(0x238, 0x23b).lr32(NAME([this] () { return m_eisa_iack(); }));
@@ -183,7 +183,7 @@ void mct_adr_device::device_reset()
 	m_isr = 0;
 	m_imr = 0x10; // firmware diagnostic expects network interrupts to be unmasked at boot
 
-	m_interval_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_interval_timer->adjust_periodic(attotime::from_msec(1));
 
 	irq_check(nullptr, 0);
 }

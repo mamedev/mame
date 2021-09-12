@@ -12,7 +12,6 @@
 
 #include "cpu/tms34010/tms34010.h"
 #include "machine/gen_latch.h"
-#include "machine/timer.h"
 #include "sound/ymopm.h"
 #include "emupal.h"
 
@@ -27,7 +26,6 @@ public:
 		m_soundlatch(*this, "soundlatch%u", 1),
 		m_slave(*this, "slave"),
 		m_ym2151(*this, "ymsnd"),
-		m_nmi_timer(*this, "snd_nmi_timer"),
 		m_master_videoram(*this, "master_videoram"),
 		m_slave_videoram(*this, "slave_videoram"),
 		m_dial(*this, "DIAL%u", 0U),
@@ -46,7 +44,6 @@ private:
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_device<tms34010_device> m_slave;
 	required_device<ym2151_device> m_ym2151;
-	required_device<timer_device> m_nmi_timer;
 
 	required_shared_ptr<uint16_t> m_master_videoram;
 	required_shared_ptr<uint16_t> m_slave_videoram;
@@ -58,6 +55,7 @@ private:
 	uint8_t m_trackball_old[2];
 	uint8_t m_sound_control;
 	uint16_t m_last;
+	persistent_timer m_nmi_timer;
 
 	void host_data_w(offs_t offset, uint16_t data);
 	uint16_t host_data_r(offs_t offset);
@@ -69,7 +67,7 @@ private:
 	void sound_control_w(uint8_t data);
 	void ym2151_data_latch_w(uint8_t data);
 	void exterm_palette(palette_device &palette) const;
-	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
+	void master_sound_nmi_callback();
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_master);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_master);

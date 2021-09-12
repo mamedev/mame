@@ -175,7 +175,7 @@ void hd64610_device::device_start()
 
 	// allocate timers
 	m_counter_timer = timer_alloc(TIMER_UPDATE_COUNTER);
-	m_counter_timer->adjust(attotime::from_hz(clock() / 256), 0, attotime::from_hz(clock() / 256));
+	m_counter_timer->adjust_periodic(attotime::from_hz(clock() / 256));
 
 	// state saving
 	save_item(NAME(m_regs));

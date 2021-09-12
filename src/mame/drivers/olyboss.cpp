@@ -146,7 +146,7 @@ void olyboss_state::machine_reset()
 	m_fdcctrl = 0;
 	m_vchrmap = 0;
 	m_vchrpage = 0;
-	m_timer->adjust(attotime::from_hz(30), 0, attotime::from_hz(30)); // unknown timer freq, possibly com2651 BRCLK
+	m_timer->adjust_periodic(attotime::from_hz(30)); // unknown timer freq, possibly com2651 BRCLK
 }
 
 void olyboss_state::device_timer(timer_instance const &timer)

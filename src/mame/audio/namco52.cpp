@@ -168,7 +168,7 @@ void namco_52xx_device::device_start()
 	if (!m_extclock.is_zero())
 	{
 		m_extclock_pulse_timer = timer_alloc(*this, FUNC(namco_52xx_device::external_clock_pulse));
-		m_extclock_pulse_timer->adjust(attotime(m_extclock), 0, attotime(m_extclock));
+		m_extclock_pulse_timer->adjust_periodic(attotime(m_extclock));
 	}
 
 	save_item(NAME(m_latched_cmd));

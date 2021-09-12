@@ -707,7 +707,7 @@ void ngp_state::machine_start()
 	}
 
 	m_seconds_timer = timer_alloc(*this, FUNC(ngp_state::ngp_seconds_callback));
-	m_seconds_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_seconds_timer->adjust_periodic(attotime::from_seconds(1));
 
 	save_item(NAME(m_io_reg));
 	save_item(NAME(m_old_to3));

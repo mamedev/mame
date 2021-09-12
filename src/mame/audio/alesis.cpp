@@ -64,7 +64,7 @@ void alesis_dm3ag_device::device_start()
 
 void alesis_dm3ag_device::device_reset()
 {
-	m_dac_update_timer->adjust(attotime::from_hz(48000), 0, attotime::from_hz(48000));
+	m_dac_update_timer->adjust_periodic(attotime::from_hz(48000));
 
 	m_output_active = false;
 	m_count = 0;

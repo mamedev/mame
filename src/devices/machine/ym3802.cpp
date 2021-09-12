@@ -162,7 +162,7 @@ void ym3802_device::reset_midi_timer()
 	}
 
 	if(rate != m_prev_rate)
-		m_midi_timer->adjust(attotime::from_hz(rate),0,attotime::from_hz(rate));
+		m_midi_timer->adjust_periodic(attotime::from_hz(rate));
 	m_prev_rate = rate;
 	logerror("MIDI Timer rate set to %iHz\n",rate);
 }
@@ -263,12 +263,12 @@ void ym3802_device::write(offs_t offset, uint8_t data)
 						const double rate = (m_reg[REG_CCR] & 0x02) ? m_clkm_rate / 4 : m_clkm_rate / 8;
 
 						// start message to click counter
-						m_midi_counter_timer->adjust(attotime::from_hz(rate),0,attotime::from_hz(rate));
+						m_midi_counter_timer->adjust_periodic(attotime::from_hz(rate));
 					}
 					if((data & 0x07) == 3)
 					{
 						// stop message to click counter
-						m_midi_counter_timer->adjust(attotime::zero,0,attotime::never);
+						m_midi_counter_timer->adjust(attotime::zero);
 					}
 				}
 				break;

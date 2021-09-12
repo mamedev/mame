@@ -604,7 +604,7 @@ void tms9901_device::device_start()
 	if (clock() != 0)
 	{
 		m_decrementer = timer_alloc(DECREMENTER);
-		m_decrementer->adjust(attotime::from_hz(clock() / 64.), 0, attotime::from_hz(clock() / 64.));
+		m_decrementer->adjust_periodic(attotime::from_hz(clock() / 64.));
 	}
 
 	m_read_port.resolve();

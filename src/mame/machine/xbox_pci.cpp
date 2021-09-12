@@ -938,7 +938,7 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		apust.gpdsp_sgblocks = data;
 		apust.gpdsp_address = apust.space->read_dword(apust.gpdsp_sgaddress); // memory address of first block
 		apust.timer->enable();
-		apust.timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+		apust.timer->adjust_periodic(attotime::from_msec(1));
 	}
 	if (offset == 0x02048 / 4) // (epdsp scratch dma)
 		apust.epdsp_sgaddress = data;

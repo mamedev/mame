@@ -844,6 +844,12 @@ void galaga_state::machine_reset()
 	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 }
 
+void battles_state::machine_start()
+{
+	xevious_state::machine_start();
+	m_nmi_timer.init(*this, FUNC(battles_state::nmi_generate));
+}
+
 void battles_state::machine_reset()
 {
 	galaga_state::machine_reset();
@@ -1881,8 +1887,6 @@ void battles_state::battles(machine_config &config)
 	m_subcpu3->set_addrmap(AS_PROGRAM, &battles_state::battles_mem4);
 
 	m_screen->screen_vblank().append(FUNC(battles_state::interrupt_4));
-
-	TIMER(config, "nmi").configure_generic(FUNC(battles_state::nmi_generate));
 
 	/* sound hardware */
 	config.device_remove("discrete");

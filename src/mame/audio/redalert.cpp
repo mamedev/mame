@@ -222,7 +222,7 @@ void irem_m37b_audio_device::device_start()
 	m_audio_irq_on_timer = timer_alloc(*this, FUNC(irem_m37b_audio_device::audio_irq_on));
 	m_audio_irq_off_timer = timer_alloc(*this, FUNC(irem_m37b_audio_device::audio_irq_off));
 
-	m_audio_irq_on_timer->adjust(REDALERT_AUDIO_CPU_IRQ_FREQ, 0, REDALERT_AUDIO_CPU_IRQ_FREQ);
+	m_audio_irq_on_timer->adjust_periodic(REDALERT_AUDIO_CPU_IRQ_FREQ);
 
 	save_item(NAME(m_sound_hs));
 	save_item(NAME(m_ay8910_latch_1));
@@ -321,7 +321,7 @@ void demoneye_audio_device::device_start()
 	m_audio_irq_on_timer = timer_alloc(*this, FUNC(demoneye_audio_device::audio_irq_on));
 	m_audio_irq_off_timer = timer_alloc(*this, FUNC(demoneye_audio_device::audio_irq_off));
 
-	m_audio_irq_on_timer->adjust(REDALERT_AUDIO_CPU_IRQ_FREQ, 0, REDALERT_AUDIO_CPU_IRQ_FREQ);
+	m_audio_irq_on_timer->adjust_periodic(REDALERT_AUDIO_CPU_IRQ_FREQ);
 
 	save_item(NAME(m_ay8910_latch_1));
 	save_item(NAME(m_ay8910_latch_2));

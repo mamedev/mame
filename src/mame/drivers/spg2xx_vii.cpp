@@ -115,7 +115,7 @@ void vii_state::machine_reset()
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
 
-	m_ctrl_poll_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_ctrl_poll_timer->adjust_periodic(attotime::from_hz(60));
 }
 
 

@@ -297,7 +297,7 @@ TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
 void cvs_state::start_393hz_timer()
 {
 	m_cvs_393hz_timer = timer_alloc(*this, FUNC(cvs_state::cvs_393hz_timer_cb));
-	m_cvs_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
+	m_cvs_393hz_timer->adjust_periodic(attotime::from_hz(30*393));
 }
 
 

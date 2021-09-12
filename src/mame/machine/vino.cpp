@@ -1028,7 +1028,7 @@ void vino_device::control_w(uint32_t data)
 				LOGMASKED(LOG_DMA, "Enabling DMA on channel %c\n", channel ? 'B' : 'A');
 				chan.m_field_counter = 0;
 				attotime fetch_rate = calculate_fetch_rate(channel);
-				chan.m_fetch_timer->adjust(fetch_rate, 0, fetch_rate);
+				chan.m_fetch_timer->adjust_periodic(fetch_rate);
 				chan.m_field_pixels_remaining[0] = chan.m_pixels_per_odd_field;
 				chan.m_field_pixels_remaining[1] = chan.m_pixels_per_even_field;
 				chan.m_field_x = 0;

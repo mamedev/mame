@@ -53,7 +53,7 @@ template <uint8_t ROW_COUNT>
 void device_matrix_keyboard_interface<ROW_COUNT>::start_processing(const attotime &period)
 {
 	m_processing = 1U;
-	m_scan_timer.adjust(period, 0, period);
+	m_scan_timer.adjust_periodic(period);
 }
 
 

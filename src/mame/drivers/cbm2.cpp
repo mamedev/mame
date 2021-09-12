@@ -2066,7 +2066,7 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 	int todclk = (m_ntsc ? 60 : 50) * 2;
 
 	m_todclk_timer = timer_alloc();
-	m_todclk_timer->adjust(attotime::from_hz(todclk), 0, attotime::from_hz(todclk));
+	m_todclk_timer->adjust_periodic(attotime::from_hz(todclk));
 
 	// state saving
 	save_item(NAME(m_dramon));

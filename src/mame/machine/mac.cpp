@@ -1051,7 +1051,7 @@ void mac_state::machine_reset()
 	// start 60.15 Hz timer for most systems
 	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIFX)) || (m_model >= MODEL_MAC_LC))
 	{
-		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+		m_6015_timer->adjust_periodic(attotime::from_hz(60.15));
 	}
 
 	// default to 32-bit mode on LC

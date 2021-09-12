@@ -109,7 +109,7 @@ void sb16_lle_device::control_timer(bool start)
 	if(start && m_freq)
 	{
 		double rate = ((46.61512_MHz_XTAL).dvalue()/1024/256) * m_freq;
-		m_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+		m_timer->adjust_periodic(attotime::from_hz(rate));
 	}
 	else
 		m_timer->adjust(attotime::never);

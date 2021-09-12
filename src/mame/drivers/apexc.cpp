@@ -18,7 +18,7 @@ void apexc_state::machine_start()
 	teletyper_init();
 
 	m_input_timer = timer_alloc(TIMER_POLL_INPUTS);
-	m_input_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_input_timer->adjust_periodic(attotime::from_hz(60));
 
 	m_panel_data_reg = 0;
 }

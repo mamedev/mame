@@ -125,7 +125,7 @@ void dpb7000_combiner_card_device::device_reset()
 	memset(m_matte_u, 0, 2);
 	memset(m_matte_v, 0, 2);
 
-	m_fsck_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_fsck_timer->adjust_periodic(attotime::from_hz(clock()));
 }
 
 void dpb7000_combiner_card_device::device_add_mconfig(machine_config &config)

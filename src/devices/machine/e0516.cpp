@@ -55,7 +55,7 @@ void e0516_device::device_start()
 {
 	// allocate timers
 	m_timer = timer_alloc();
-	m_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+	m_timer->adjust_periodic(attotime::from_hz(clock() / 32768));
 
 	// state saving
 	save_item(NAME(m_cs));

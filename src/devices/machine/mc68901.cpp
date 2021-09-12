@@ -696,7 +696,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			{
 				int divisor = PRESCALER[m_tacr & 0x07];
 				LOG("MC68901 Timer A Delay Mode : %u Prescale\n", divisor);
-				m_timer[TIMER_A]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				m_timer[TIMER_A]->adjust_periodic(attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 
@@ -715,7 +715,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			{
 				int divisor = PRESCALER[m_tacr & 0x07];
 				LOG("MC68901 Timer A Pulse Width Mode : %u Prescale\n", divisor);
-				m_timer[TIMER_A]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
+				m_timer[TIMER_A]->adjust(attotime::never);
 				m_timer[TIMER_A]->enable(false);
 			}
 			break;
@@ -751,7 +751,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			{
 			int divisor = PRESCALER[m_tbcr & 0x07];
 			LOG("MC68901 Timer B Delay Mode : %u Prescale\n", divisor);
-			m_timer[TIMER_B]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+			m_timer[TIMER_B]->adjust_periodic(attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 
@@ -768,9 +768,8 @@ void mc68901_device::write(offs_t offset, u8 data)
 		case TCR_TIMER_PULSE_100:
 		case TCR_TIMER_PULSE_200:
 			{
-			int divisor = PRESCALER[m_tbcr & 0x07];
 			LOG("MC68901 Timer B Pulse Width Mode : %u Prescale\n", DIVISOR);
-			m_timer[TIMER_B]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
+			m_timer[TIMER_B]->adjust(attotime::never);
 			m_timer[TIMER_B]->enable(false);
 			}
 			break;
@@ -806,7 +805,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			{
 				int divisor = PRESCALER[m_tcdcr & 0x07];
 				LOG("MC68901 Timer D Delay Mode : %u Prescale\n", divisor);
-				m_timer[TIMER_D]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				m_timer[TIMER_D]->adjust_periodic(attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 		}
@@ -828,7 +827,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			{
 				int divisor = PRESCALER[(m_tcdcr >> 4) & 0x07];
 				LOG("MC68901 Timer C Delay Mode : %u Prescale\n", divisor);
-				m_timer[TIMER_C]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				m_timer[TIMER_C]->adjust_periodic(attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 		}

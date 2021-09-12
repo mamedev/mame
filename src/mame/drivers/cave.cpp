@@ -2620,7 +2620,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
 MACHINE_RESET_MEMBER(cave_state,sailormn)
 {
 	machine_reset();
-	m_startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
+	m_startup->adjust(attotime::from_usec(1000), 0);
 }
 
 void cave_state::sailormn(machine_config &config)

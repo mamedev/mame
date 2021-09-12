@@ -307,9 +307,9 @@ void hd63450_device::dma_transfer_start(int channel)
 	else if (!(m_reg[channel].ocr & 2))
 		m_timer[channel]->adjust(attotime::from_usec(500), channel, m_our_clock[channel]);
 	else if ((m_reg[channel].ocr & 3) == 3)
-		m_timer[channel]->adjust(attotime::from_usec(500), channel, attotime::never);
+		m_timer[channel]->adjust(attotime::from_usec(500), channel);
 	else if ((m_reg[channel].ocr & 3) == 2)
-		m_timer[channel]->adjust(attotime::never, channel, attotime::never);
+		m_timer[channel]->adjust(attotime::never, channel);
 
 	m_transfer_size[channel] = m_reg[channel].mtc;
 
@@ -534,7 +534,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq0_w)
 	{
 		// in cycle steal mode drq is supposed to be edge triggered
 		single_transfer(0);
-		m_timer[0]->adjust(m_our_clock[0], 0, m_our_clock[0]);
+		m_timer[0]->adjust_periodic(m_our_clock[0], 0);
 	}
 	else if (!state)
 		m_timer[0]->adjust(attotime::never);
@@ -548,7 +548,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq1_w)
 	if ((m_reg[1].ocr & 2) && (state && !ostate))
 	{
 		single_transfer(1);
-		m_timer[1]->adjust(m_our_clock[1], 1, m_our_clock[1]);
+		m_timer[1]->adjust_periodic(m_our_clock[1], 1);
 	}
 	else if (!state)
 		m_timer[1]->adjust(attotime::never);
@@ -562,7 +562,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq2_w)
 	if ((m_reg[2].ocr & 2) && (state && !ostate))
 	{
 		single_transfer(2);
-		m_timer[2]->adjust(m_our_clock[2], 2, m_our_clock[2]);
+		m_timer[2]->adjust_periodic(m_our_clock[2], 2);
 	}
 	else if (!state)
 		m_timer[2]->adjust(attotime::never);
@@ -576,7 +576,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq3_w)
 	if ((m_reg[3].ocr & 2) && (state && !ostate))
 	{
 		single_transfer(3);
-		m_timer[3]->adjust(m_our_clock[3], 3, m_our_clock[3]);
+		m_timer[3]->adjust_periodic(m_our_clock[3], 3);
 	}
 	else if (!state)
 		m_timer[3]->adjust(attotime::never);

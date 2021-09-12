@@ -856,7 +856,7 @@ void aristmk5_state::spi_data_w(uint8_t data)
 	m_spi_bits = 0;
 
 	// start the SPI clock
-	m_spi_timer->adjust(attotime::from_hz(MASTER_CLOCK / 9 / 512 / 2), 0, attotime::from_hz(MASTER_CLOCK / 9 / 512 / 2));
+	m_spi_timer->adjust_periodic(attotime::from_hz(MASTER_CLOCK / 9 / 512 / 2));
 }
 
 uint8_t aristmk5_state::spi_data_r()

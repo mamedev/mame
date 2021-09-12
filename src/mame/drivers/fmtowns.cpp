@@ -494,7 +494,7 @@ void towns_state::towns_sys6c_w(uint8_t data)
 {
 	// halts the CPU for 1 microsecond
 	m_maincpu->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
-	m_towns_wait_timer->adjust(attotime::from_usec(1),0,attotime::never);
+	m_towns_wait_timer->adjust(attotime::from_usec(1));
 }
 
 template<int Chip>
@@ -1145,7 +1145,7 @@ void towns_state::towns_pad_mask_w(uint8_t data)
 			}
 			else
 				m_towns_mouse_output++;
-			m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
+			m_towns_mouse_timer->adjust(attotime::from_usec(600));
 		}
 		if((m_towns_pad_mask & 0x10) == 0 && (m_prev_pad_mask & 0x10) != 0)
 		{
@@ -1161,7 +1161,7 @@ void towns_state::towns_pad_mask_w(uint8_t data)
 			}
 			else
 				m_towns_mouse_output++;
-			m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
+			m_towns_mouse_timer->adjust(attotime::from_usec(600));
 		}
 		m_prev_pad_mask = m_towns_pad_mask;
 	}
@@ -1181,7 +1181,7 @@ void towns_state::towns_pad_mask_w(uint8_t data)
 			}
 			else
 				m_towns_mouse_output++;
-			m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
+			m_towns_mouse_timer->adjust(attotime::from_usec(600));
 		}
 		if((m_towns_pad_mask & 0x20) == 0 && (m_prev_pad_mask & 0x20) != 0)
 		{
@@ -1197,7 +1197,7 @@ void towns_state::towns_pad_mask_w(uint8_t data)
 			}
 			else
 				m_towns_mouse_output++;
-			m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
+			m_towns_mouse_timer->adjust(attotime::from_usec(600));
 		}
 		m_prev_pad_mask = m_towns_pad_mask;
 	}
@@ -1436,7 +1436,7 @@ void towns_state::towns_cd_set_status(uint8_t st0, uint8_t st1, uint8_t st2, uin
 	m_towns_cd.cmd_status[2] = st2;
 	m_towns_cd.cmd_status[3] = st3;
 	// wait a bit
-	m_towns_status_timer->adjust(attotime::from_msec(1),0,attotime::never);
+	m_towns_status_timer->adjust(attotime::from_msec(1));
 }
 
 uint8_t towns_state::towns_cd_get_track()
@@ -1675,7 +1675,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 			case 0x04:  // Play Audio Track
 				if(LOG_CD) logerror("CD: Command 0x04: PLAY CD-DA\n");
 				m_towns_cdda_timer->set_ptr(device);
-				m_towns_cdda_timer->adjust(attotime::from_msec(1),0,attotime::never);
+				m_towns_cdda_timer->adjust(attotime::from_msec(1));
 				break;
 			case 0x05:  // Read TOC
 				if(LOG_CD) logerror("CD: Command 0x05: READ TOC\n");

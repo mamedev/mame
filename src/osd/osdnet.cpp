@@ -39,7 +39,7 @@ osd_netdev::osd_netdev(class device_network_interface *ifdev, int rate)
 {
 	m_dev = ifdev;
 	m_timer.init(ifdev->device().scheduler(), *this, FUNC(osd_netdev::recv));
-	m_timer.adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+	m_timer.adjust_periodic(attotime::from_hz(rate));
 }
 
 osd_netdev::~osd_netdev()

@@ -162,7 +162,7 @@ void psxcd_device::device_reset()
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
-		m_timers[i]->adjust(attotime::never, 0, attotime::never);
+		m_timers[i]->adjust(attotime::never);
 		m_timerinuse[i] = false;
 	}
 	open = true;
@@ -903,7 +903,7 @@ void psxcd_device::send_result(uint8_t res, uint8_t *data, int sz, int delay, ui
 	if ((next_read_event != -1) && ((systime+delay)>(next_sector_t)))
 	{
 		uint32_t hz = m_sysclock / (delay + 2000);
-		m_timers[next_read_event]->adjust(attotime::from_hz(hz), 0, attotime::never);
+		m_timers[next_read_event]->adjust(attotime::from_hz(hz));
 	}
 
 	add_system_event(event_cmd_complete, delay, prepare_result(res, data, sz, errcode));
@@ -1172,7 +1172,7 @@ void psxcd_device::stop_read()
 
 	if (next_read_event != -1)
 	{
-		m_timers[next_read_event]->adjust(attotime::never, 0, attotime::never);
+		m_timers[next_read_event]->adjust(attotime::never);
 		m_timerinuse[next_read_event] = false;
 		next_read_event = -1;
 	}
@@ -1224,7 +1224,7 @@ int psxcd_device::add_system_event(int type, uint64_t t, command_result *ptr)
 	{
 		if(!m_timerinuse[i])
 		{
-			m_timers[i]->adjust(attotime::from_hz(hz), type, attotime::never);
+			m_timers[i]->adjust(attotime::from_hz(hz), type);
 			if (ptr != nullptr)
 			{
 				m_command_result[i] = *ptr;

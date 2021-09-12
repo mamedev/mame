@@ -91,7 +91,7 @@ void vp550_device::device_start()
 {
 	// allocate timers
 	m_sync_timer = timer_alloc();
-	m_sync_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
+	m_sync_timer->adjust_periodic(attotime::from_hz(50));
 	m_sync_timer->enable(0);
 }
 

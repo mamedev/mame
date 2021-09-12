@@ -13,7 +13,6 @@
 
 #include "machine/6850acia.h"
 #include "machine/pit8253.h"
-#include "machine/timer.h"
 #include "sound/cem3394.h"
 
 
@@ -49,14 +48,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(counter_0_set_out);
 
 	void update_counter_0_timer();
-	TIMER_DEVICE_CALLBACK_MEMBER(clock_counter_0_ff);
+	void clock_counter_0_ff();
 	DECLARE_WRITE_LINE_MEMBER(set_counter_0_ff);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
 	required_device<pit8253_device> m_pit;
-	required_device<timer_device> m_counter_0_timer;
 	required_device_array<cem3394_device, 6> m_cem_device;
 	required_device<cpu_device> m_audiocpu;
 	required_device<acia6850_device> m_uart;
@@ -77,6 +75,8 @@ private:
 
 	// sound CPU 6850 states
 	bool m_uint;
+
+	persistent_timer m_counter_0_timer;
 };
 
 DECLARE_DEVICE_TYPE(SENTE6VB, sente6vb_device)

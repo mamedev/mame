@@ -192,7 +192,7 @@ void mc1502_state::machine_start()
 	memset(&m_kbd, 0, sizeof(m_kbd));
 	m_kbd.keyb_signal_timer =
 	timer_alloc(*this, FUNC(mc1502_state::keyb_signal_callback));
-	m_kbd.keyb_signal_timer->adjust(attotime::from_msec(20), 0, attotime::from_msec(20));
+	m_kbd.keyb_signal_timer->adjust_periodic(attotime::from_msec(20));
 }
 
 void mc1502_state::machine_reset()

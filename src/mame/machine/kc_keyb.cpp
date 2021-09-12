@@ -460,7 +460,7 @@ void kc_keyboard_device::device_start()
 
 	m_timer_transmit_pulse = timer_alloc(TIMER_TRANSMIT_PULSE);
 
-	m_timer_transmit_pulse->adjust(attotime::from_usec(1024), 0, attotime::from_usec(1024));
+	m_timer_transmit_pulse->adjust_periodic(attotime::from_usec(1024));
 }
 
 //-------------------------------------------------

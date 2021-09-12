@@ -256,10 +256,10 @@ void noki3310_state::machine_reset()
 	m_timer1_counter = 0;
 	m_timer0_counter = 0;
 
-	m_timer0->adjust(attotime::from_hz(33055 / (255 + 1)), 0, attotime::from_hz(33055 / (255 + 1)));    // programmable through port 0x0f
-	m_timer1->adjust(attotime::from_hz(1057), 0, attotime::from_hz(1057));
-	m_timer_watchdog->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
-	m_timer_fiq8->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
+	m_timer0->adjust_periodic(attotime::from_hz(33055 / (255 + 1)));    // programmable through port 0x0f
+	m_timer1->adjust_periodic(attotime::from_hz(1057));
+	m_timer_watchdog->adjust_periodic(attotime::from_hz(1));
+	m_timer_fiq8->adjust_periodic(attotime::from_hz(1000));
 
 	// simulate power-on input
 	if (machine().system().name[4] == '8' || machine().system().name[4] == '5')
@@ -579,7 +579,7 @@ void noki3310_state::mad2_io_w(offs_t offset, uint8_t data)
 			ack_irq((data << 3) & 0x100);
 			break;
 		case 0x0f:
-			m_timer0->adjust(attotime::from_hz(33055 / (data + 1)), 0, attotime::from_hz(33055 / (data + 1)));
+			m_timer0->adjust_periodic(attotime::from_hz(33055 / (data + 1)));
 			break;
 		case 0x16:
 			ack_fiq((data << 7) & 0x100);

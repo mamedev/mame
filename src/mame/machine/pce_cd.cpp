@@ -432,7 +432,7 @@ void pce_cd_device::read_6()
 	}
 	else
 	{
-		m_data_timer->adjust(attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND), 0, attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND));
+		m_data_timer->adjust_periodic(attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND));
 	}
 
 	/* TODO: correct place? */
@@ -1266,7 +1266,7 @@ void pce_cd_device::adpcm_dma_control_w(uint8_t data)
 {
 	if (data & 3)
 	{
-		m_adpcm_dma_timer->adjust(attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND * 2048), 0, attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND * 2048));
+		m_adpcm_dma_timer->adjust_periodic(attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND * 2048));
 		m_adpcm_status |= 4;
 	}
 	m_adpcm_dma_reg = data;

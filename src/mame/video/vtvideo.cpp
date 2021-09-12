@@ -112,7 +112,7 @@ void vt100_video_device::device_start()
 
 	// LBA7 is scan line frequency update
 	m_lba7_change_timer = timer_alloc(*this, FUNC(vt100_video_device::lba7_change));
-	m_lba7_change_timer->adjust(clocks_to_attotime(765), 0, clocks_to_attotime(765));
+	m_lba7_change_timer->adjust_periodic(clocks_to_attotime(765));
 
 	// LBA3 and LBA4 are first two stages of divide-by-17 counter
 	m_lba3_change_timer = timer_alloc(*this, FUNC(vt100_video_device::lba3_change));

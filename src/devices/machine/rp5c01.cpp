@@ -202,10 +202,10 @@ void rp5c01_device::device_start()
 	if (clock() > 0)
 	{
 		m_clock_timer = timer_alloc(TIMER_CLOCK);
-		m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
+		m_clock_timer->adjust_periodic(attotime::from_hz(clock() / 16384));
 
 		m_16hz_timer = timer_alloc(TIMER_16HZ);
-		m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
+		m_16hz_timer->adjust_periodic(attotime::from_hz(clock() / 1024));
 	}
 
 	memset(m_reg, 0, sizeof(m_reg));

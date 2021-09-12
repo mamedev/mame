@@ -403,16 +403,16 @@ void pb1000_state::kb_matrix_w(uint8_t data)
 	if (BIT(data, 7))
 	{
 		if (!BIT(m_kb_matrix, 7))
-			m_kb_timer->adjust(attotime::never, 0, attotime::never);
+			m_kb_timer->adjust(attotime::never);
 	}
 	else
 	{
 		if (BIT(m_kb_matrix, 6) != BIT(data, 6))
 		{
 			if (BIT(data, 6))
-				m_kb_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
+				m_kb_timer->adjust_periodic(attotime::from_hz(32));
 			else
-				m_kb_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+				m_kb_timer->adjust_periodic(attotime::from_hz(256));
 		}
 	}
 
@@ -456,7 +456,7 @@ void pb1000_state::machine_start()
 	membank("bank1")->set_base(m_rom_reg->base());
 
 	m_kb_timer = timer_alloc(*this, FUNC(pb1000_state::keyboard_timer));
-	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
+	m_kb_timer->adjust_periodic(attotime::from_hz(192));
 }
 
 void pb1000_state::pb1000(machine_config &config)

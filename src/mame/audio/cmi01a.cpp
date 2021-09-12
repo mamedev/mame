@@ -225,7 +225,7 @@ void cmi01a_device::device_reset()
 
 	m_zx_timer->adjust(attotime::never);
 	m_eosi_timer->adjust(attotime::never);
-	//m_bcas_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	//m_bcas_timer->adjust_periodic(attotime::from_hz(clock()));
 	m_bcas_timer->adjust(attotime::never);
 }
 
@@ -530,7 +530,7 @@ void cmi01a_device::run_voice()
 	// Set timers and things
 	m_zx_flag = 0;
 	attotime zx_period = attotime::from_ticks(64, cfreq);
-	m_zx_timer->adjust(zx_period, 0, zx_period);
+	m_zx_timer->adjust_periodic(zx_period);
 
 	if (m_load)
 	{

@@ -224,7 +224,7 @@ void v25_common_device::device_reset()
 
 	unsigned tmp = m_PCK << m_TB;
 	attotime time = clocks_to_attotime(tmp);
-	m_timers[3]->adjust(time, INTTB, time);
+	m_timers[3]->adjust_periodic(time, INTTB);
 
 	m_timers[0]->adjust(attotime::never);
 	m_timers[1]->adjust(attotime::never);

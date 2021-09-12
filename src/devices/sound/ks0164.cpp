@@ -95,7 +95,7 @@ void ks0164_device::device_reset()
 	m_midi_in = 0x00;
 	m_midi_in_active = false;
 
-	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_timer->adjust_periodic(attotime::from_msec(1));
 }
 
 void ks0164_device::device_timer(timer_instance const &timer)

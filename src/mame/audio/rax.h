@@ -12,7 +12,6 @@
 
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/gen_latch.h"
-#include "machine/timer.h"
 #include "sound/dmadac.h"
 
 
@@ -29,7 +28,7 @@ public:
 	void adsp_irq(int which);
 	void recompute_sample_rate(int which);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
+	void dma_timer_callback(int param);
 
 	void adsp_data_map(address_map &map);
 	void adsp_io_map(address_map &map);
@@ -43,13 +42,13 @@ protected:
 private:
 	required_device<adsp2181_device>    m_cpu;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
-	required_device<timer_device>       m_reg_timer;
-	required_device<timer_device>       m_dma_timer;
 	required_shared_ptr<uint32_t>       m_adsp_pram;
 	required_memory_bank                m_adsp_data_bank;
 	required_region_ptr<uint8_t>        m_rom;
 
 	uint32_t m_adsp_snd_pf0;
+	persistent_timer                    m_reg_timer;
+	persistent_timer                    m_dma_timer;
 
 	struct
 	{
@@ -82,8 +81,8 @@ private:
 
 	void adsp_sound_tx_callback(offs_t offset, uint32_t data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(adsp_irq0);
-	TIMER_DEVICE_CALLBACK_MEMBER(sport0_irq);
+	void adsp_irq0();
+	void sport0_irq(int param);
 	void dmovlay_callback(uint32_t data);
 
 	uint16_t adsp_control_r(offs_t offset);

@@ -293,13 +293,13 @@ void pwrview_state::unk4_w(u8 data)
 	switch(data & 7) // this is all hand tuned to match the expected ratio with the pit clock
 	{
 		case 2:
-			m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
+			m_tmr0ext->adjust_periodic(attotime::from_hz(31500));
 			break;
 		case 3:
-			m_tmr0ext->adjust(attotime::from_hz(90), 0, attotime::from_hz(90));
+			m_tmr0ext->adjust_periodic(attotime::from_hz(90));
 			break;
 		case 4:
-			m_tmr0ext->adjust(attotime::from_hz(500000), 0, attotime::from_hz(500000));
+			m_tmr0ext->adjust_periodic(attotime::from_hz(500000));
 			break;
 	}
 }

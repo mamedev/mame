@@ -338,7 +338,7 @@ void egret_device::onesec_w(uint8_t data)
 {
 //  printf("%02x to one-second control\n", data);
 
-	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_timer->adjust_periodic(attotime::from_seconds(1));
 
 	if ((onesec & 0x40) && !(data & 0x40))
 	{

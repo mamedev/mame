@@ -366,7 +366,7 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 	u8 transmit_data;
 
 	if(!m_tra_rate.is_never())
-		m_tra_clock.adjust(m_tra_rate, 0, m_tra_rate);
+		m_tra_clock.adjust_periodic(m_tra_rate);
 
 	m_tra_bit_count_transmitted = 0;
 	m_tra_bit_count = 0;

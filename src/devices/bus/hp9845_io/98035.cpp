@@ -198,11 +198,9 @@ void hp98035_io_card_device::device_reset()
 	sts_w(true);
 	set_flg(true);
 
-	attotime period(attotime::from_msec(1));
-	m_msec_timer->adjust(period , 0 , period);
+	m_msec_timer->adjust_periodic(attotime::from_msec(1));
 
-	period = attotime::from_hz(DIGIT_MUX_FREQ);
-	m_clock_timer->adjust(period , 0 , period);
+	m_clock_timer->adjust_periodic(attotime::from_hz(DIGIT_MUX_FREQ));
 
 	half_init();
 }

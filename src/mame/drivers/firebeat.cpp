@@ -1815,7 +1815,7 @@ void firebeat_kbm_state::init_keyboard()
 {
 	// set keyboard timer
 //  m_keyboard_timer = timer_alloc(*this, FUNC(firebeat_state::keyboard_timer_callback));
-//  m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+//  m_keyboard_timer->adjust_periodic(attotime::from_msec(10));
 }
 
 void firebeat_kbm_state::firebeat_kbm(machine_config &config)

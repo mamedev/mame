@@ -759,7 +759,7 @@ void duscc_channel::device_timer(timer_instance const &timer)
 				else // Pulse!
 				{
 					m_rtxc = 1;
-					rtxc_timer->adjust(attotime::from_hz(clock()), TIMER_ID_RTXC, attotime::from_hz(clock()));
+					rtxc_timer->adjust_periodic(attotime::from_hz(clock()), TIMER_ID_RTXC);
 				}
 				if (m_index == duscc_device::CHANNEL_A)
 					m_uart->m_out_rtxca_cb(m_rtxc);
@@ -777,7 +777,7 @@ void duscc_channel::device_timer(timer_instance const &timer)
 				else // Pulse!
 				{
 					m_trxc = 1;
-					trxc_timer->adjust(attotime::from_hz(clock()), TIMER_ID_TRXC, attotime::from_hz(clock()));
+					trxc_timer->adjust_periodic(attotime::from_hz(clock()), TIMER_ID_TRXC);
 				}
 				if (m_index == duscc_device::CHANNEL_A)
 					m_uart->m_out_trxca_cb(m_trxc);
@@ -2007,7 +2007,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 	/* Start. Starts the counteritimer and prescaler. */
 	case REG_CCR_START_TIMER:  LOG("- Start Counter/Timer\n");
 		rate = 100; // TODO: calculate correct rate
-		duscc_timer->adjust(attotime::from_hz(rate), TIMER_ID_RTXC, attotime::from_hz(rate));
+		duscc_timer->adjust_periodic(attotime::from_hz(rate), TIMER_ID_RTXC);
 		break;
 
 	/* Stop. Stops the counter/timer and prescaler. Since the command may be asynchronous with the selected clock source,

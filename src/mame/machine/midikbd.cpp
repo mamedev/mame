@@ -87,7 +87,7 @@ void midi_keyboard_device::device_start()
 	m_out_tx_func.resolve_safe();
 	m_head = m_tail = 0;
 	m_keyboard_timer = timer_alloc();
-	m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+	m_keyboard_timer->adjust_periodic(attotime::from_msec(10));
 }
 
 void midi_keyboard_device::tra_callback()

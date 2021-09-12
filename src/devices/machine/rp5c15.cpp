@@ -208,10 +208,10 @@ void rp5c15_device::device_start()
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
-	m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
+	m_clock_timer->adjust_periodic(attotime::from_hz(clock() / 16384));
 
 	m_16hz_timer = timer_alloc(TIMER_16HZ);
-	m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
+	m_16hz_timer->adjust_periodic(attotime::from_hz(clock() / 1024));
 
 	m_clkout_timer = timer_alloc(TIMER_CLKOUT);
 
@@ -378,23 +378,23 @@ void rp5c15_device::write(offs_t offset, uint8_t data)
 				switch (data & 0x07)
 				{
 				case CLKOUT_16384_HZ:
-					m_clkout_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+					m_clkout_timer->adjust_periodic(attotime::from_hz(clock()));
 					break;
 
 				case CLKOUT_1024_HZ:
-					m_clkout_timer->adjust(attotime::from_hz(clock() / 16), 0, attotime::from_hz(clock() / 16));
+					m_clkout_timer->adjust_periodic(attotime::from_hz(clock() / 16));
 					break;
 
 				case CLKOUT_128_HZ:
-					m_clkout_timer->adjust(attotime::from_hz(clock() / 128), 0, attotime::from_hz(clock() / 128));
+					m_clkout_timer->adjust_periodic(attotime::from_hz(clock() / 128));
 					break;
 
 				case CLKOUT_16_HZ:
-					m_clkout_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
+					m_clkout_timer->adjust_periodic(attotime::from_hz(clock() / 1024));
 					break;
 
 				case CLKOUT_1_HZ:
-					m_clkout_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
+					m_clkout_timer->adjust_periodic(attotime::from_hz(clock() / 16384));
 					break;
 
 				case CLKOUT_1_DIV_60_HZ:

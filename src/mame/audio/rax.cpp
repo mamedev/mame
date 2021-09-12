@@ -175,7 +175,7 @@ void acclaim_rax_device::adsp_control_w(offs_t offset, uint16_t data)
 
 			attotime word_period = attotime::from_hz(m_cpu->unscaled_clock());
 			attotime period = word_period * (data & 0x3fff) * 1;
-			m_dma_timer->adjust(period, src_addr, period);
+			m_dma_timer.adjust_periodic(period, src_addr);
 
 			break;
 		}
@@ -193,7 +193,7 @@ void acclaim_rax_device::adsp_control_w(offs_t offset, uint16_t data)
 			if ((data & 0x0002) == 0)
 			{
 				m_dmadac[0]->enable(0);
-				m_reg_timer->reset();
+				m_reg_timer.reset();
 			}
 			break;
 
@@ -216,7 +216,7 @@ void acclaim_rax_device::adsp_control_w(offs_t offset, uint16_t data)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
+void acclaim_rax_device::dma_timer_callback(int param)
 {
 	/* Update external address count and page */
 	m_control_regs[BDMA_WORD_COUNT_REG] = 0;
@@ -229,7 +229,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 	else
 		m_cpu->pulse_input_line(ADSP2181_BDMA, m_cpu->minimum_quantum());
 
-	m_dma_timer->adjust(attotime::never);
+	m_dma_timer.adjust(attotime::never);
 }
 
 
@@ -297,6 +297,9 @@ void acclaim_rax_device::adsp_io_map(address_map &map)
 
 void acclaim_rax_device::device_start()
 {
+	m_reg_timer.init(*this, FUNC(acclaim_rax_device::adsp_irq0));
+	m_dma_timer.init(*this, FUNC(acclaim_rax_device::dma_timer_callback));
+
 	m_program = &m_cpu->space(AS_PROGRAM);
 	m_data = &m_cpu->space(AS_DATA);
 
@@ -371,7 +374,7 @@ void acclaim_rax_device::adsp_irq(int which)
 	m_cpu->set_state_int(ADSP2100_I0 + m_ireg[which], reg);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::adsp_irq0 )
+void acclaim_rax_device::adsp_irq0()
 {
 	adsp_irq(0);
 }
@@ -395,10 +398,7 @@ void acclaim_rax_device::recompute_sample_rate(int which)
 
 	/* fire off a timer which will hit every half-buffer */
 	if (m_incs[which])
-	{
-		attotime period = (sample_period * m_size[which]) / (4 * 2 * m_incs[which]);
-		m_reg_timer->adjust(period, 0, period);
-	}
+		m_reg_timer.adjust_periodic((sample_period * m_size[which]) / (4 * 2 * m_incs[which]));
 }
 
 void acclaim_rax_device::adsp_sound_tx_callback(offs_t offset, uint32_t data)
@@ -453,7 +453,7 @@ void acclaim_rax_device::adsp_sound_tx_callback(offs_t offset, uint32_t data)
 		dmadac->enable(0);
 
 	/* remove timer */
-	m_reg_timer->reset();
+	m_reg_timer.reset();
 }
 
 void acclaim_rax_device::dmovlay_callback(uint32_t data)
@@ -480,8 +480,6 @@ acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char
 	: device_t(mconfig, ACCLAIM_RAX, tag, owner, clock)
 	, m_cpu(*this, "adsp")
 	, m_dmadac(*this, { "dacl", "dacr" })
-	, m_reg_timer(*this, "adsp_reg_timer")
-	, m_dma_timer(*this, "adsp_dma_timer")
 	, m_adsp_pram(*this, "adsp_pram")
 	, m_adsp_data_bank(*this, "databank")
 	, m_rom(*this, DEVICE_SELF)
@@ -503,9 +501,6 @@ void acclaim_rax_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &acclaim_rax_device::adsp_program_map);
 	m_cpu->set_addrmap(AS_DATA, &acclaim_rax_device::adsp_data_map);
 	m_cpu->set_addrmap(AS_IO, &acclaim_rax_device::adsp_io_map);
-
-	TIMER(config, "adsp_reg_timer").configure_generic(FUNC(acclaim_rax_device::adsp_irq0));
-	TIMER(config, "adsp_dma_timer").configure_generic(FUNC(acclaim_rax_device::dma_timer_callback));
 
 	GENERIC_LATCH_16(config, m_data_in);
 	GENERIC_LATCH_16(config, m_data_out);

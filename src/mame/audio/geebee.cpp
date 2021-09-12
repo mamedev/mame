@@ -86,7 +86,7 @@ void geebee_sound_device::sound_w(u8 data)
 		 * discharge C33 (1uF) through R50 (22k) -> 0.14058s
 		 */
 		attotime period = attotime::from_hz(32768) * 14058 / 100000;
-		m_volume_timer->adjust(period, 0, period);
+		m_volume_timer->adjust_periodic(period);
 	}
 	else
 	{
@@ -98,7 +98,7 @@ void geebee_sound_device::sound_w(u8 data)
 		 * maybe half as fast?
 		 */
 		attotime period = attotime::from_hz(32768) * 29060 / 100000;
-		m_volume_timer->adjust(period, 0, period);
+		m_volume_timer->adjust_periodic(period);
 	}
 }
 

@@ -1750,7 +1750,7 @@ void aristmk4_state::machine_reset()
 		break;
 	}
 
-	m_power_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
+	m_power_timer->adjust_periodic(attotime::from_hz(1));
 }
 
 void aristmk4_state::device_timer(timer_instance const &timer)

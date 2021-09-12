@@ -90,7 +90,7 @@ void icm7170_device::device_start()
 	m_timer = timer_alloc(ICM7170_TIMER_ID);
 
 	// TODO: frequency should be based on input clock and divisor
-	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+	m_timer->adjust_periodic(attotime::from_hz(100));
 	m_timer->enable(false);
 
 	save_item(NAME(m_regs));

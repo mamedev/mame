@@ -434,7 +434,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 	{
 		constexpr int RAMP_SHIFT = 6;
 		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
-		const u16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law 
+		const u16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law
 		const u16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
 		//check negative values so no cracks, is it a hardware feature ?
 		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0;
@@ -1112,7 +1112,7 @@ void ics2115_device::recalc_timer(int timer)
 		m_timer[timer].period = period;
 		// Adjust the timer lengths
 		if (period) // Reset the length
-			m_timer[timer].timer->adjust(attotime::from_nsec(period), 0, attotime::from_nsec(period));
+			m_timer[timer].timer->adjust_periodic(attotime::from_nsec(period));
 		else // Kill the timer if length == 0
 			m_timer[timer].timer->adjust(attotime::never);
 	}

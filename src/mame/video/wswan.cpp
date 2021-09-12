@@ -91,7 +91,7 @@ void wswan_video_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	m_timer = timer_alloc(TIMER_SCANLINE);
-	m_timer->adjust(attotime::from_ticks(256, clock()), 0, attotime::from_ticks(256, clock()));
+	m_timer->adjust_periodic(attotime::from_ticks(256, clock()));
 
 	// bind callbacks
 	m_set_irq_cb.resolve();

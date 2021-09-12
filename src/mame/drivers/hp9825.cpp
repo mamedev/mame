@@ -40,7 +40,6 @@
 
 #include "emu.h"
 #include "cpu/hphybrid/hphybrid.h"
-#include "machine/timer.h"
 #include "machine/hp9825_tape.h"
 #include "machine/hp98x5_io_sys.h"
 #include "machine/hp9825_optrom.h"
@@ -105,15 +104,12 @@ public:
 		, m_cpu(*this , "cpu")
 		, m_rom_drawers(*this , "drawer%u" , 0U)
 		, m_io_sys(*this , "io_sys")
-		, m_cursor_timer(*this , "cursor_timer")
 		, m_tape(*this , "tape")
 		, m_io_key(*this , "KEY%u" , 0)
 		, m_shift_key(*this , "KEY_SHIFT")
 		, m_prt_alpha_out(*this , "prt_alpha")
 		, m_prt_graph_out(*this , "prt_graph")
-		, m_prt_timer(*this , "prt_timer")
 		, m_beeper(*this , "beeper")
-		, m_beep_timer(*this , "beep_timer")
 		, m_io_slot(*this, "slot%u", 0U)
 		, m_display(*this , "char_%u_%u" , 0U , 0U)
 		, m_run_light(*this , "run_light")
@@ -132,15 +128,12 @@ protected:
 
 private:
 	required_device<hp98x5_io_sys_device> m_io_sys;
-	required_device<timer_device> m_cursor_timer;
 	required_device<hp9825_tape_device> m_tape;
 	required_ioport_array<4> m_io_key;
 	required_ioport m_shift_key;
 	required_device<bitbanger_device> m_prt_alpha_out;
 	required_device<bitbanger_device> m_prt_graph_out;
-	required_device<timer_device> m_prt_timer;
 	required_device<beep_device> m_beeper;
-	required_device<timer_device> m_beep_timer;
 	required_device_array<hp9845_io_slot_device , 3> m_io_slot;
 	output_finder<32 , 7> m_display;
 	output_finder<> m_run_light;
@@ -162,6 +155,11 @@ private:
 	// SC of slots
 	int m_slot_sc[ 3 ];
 
+	persistent_timer m_cursor_timer;
+	persistent_timer m_prt_timer;
+	persistent_timer m_beep_timer;
+	persistent_timer m_kb_periodic_timer;
+
 	void cpu_io_map(address_map &map);
 
 	uint16_t kb_scancode_r();
@@ -171,13 +169,13 @@ private:
 	void printer_w(uint16_t data);
 
 	void update_display();
-	TIMER_DEVICE_CALLBACK_MEMBER(cursor_blink);
+	void cursor_blink();
 	void kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx);
-	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
+	void kb_scan();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(prt_timer);
+	void prt_timer();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
+	void beep_timer();
 
 	// Slot handling
 	void set_irq_slot(unsigned slot , int state);
@@ -190,6 +188,13 @@ void hp9825_state::machine_start()
 {
 	m_display.resolve();
 	m_run_light.resolve();
+
+	m_cursor_timer.init(*this, FUNC(hp9825_state::cursor_blink));
+	m_prt_timer.init(*this, FUNC(hp9825_state::prt_timer));
+	m_beep_timer.init(*this, FUNC(hp9825_state::beep_timer));
+
+	// Keyboard scan timer. A scan of the whole keyboard should take 2^14 KDP clocks.
+	m_kb_periodic_timer.init(*this, FUNC(hp9825_state::kb_scan)).adjust_periodic(attotime::from_ticks(16384 , KDP_CLOCK));
 
 	save_item(NAME(m_display_on));
 	save_item(NAME(m_display_mem));
@@ -222,7 +227,7 @@ void hp9825_state::machine_reset()
 	m_display_on = false;
 	m_display_idx = 0;
 	m_rpl_cursor = false;
-	m_cursor_timer->reset();
+	m_cursor_timer.reset();
 	m_cursor_blink = true;
 	update_display();
 	m_scancode = 0;
@@ -231,9 +236,9 @@ void hp9825_state::machine_reset()
 	m_autorepeat_cnt = 0;
 	m_printer_idx = 0;
 	m_printer_line = 0;
-	m_prt_timer->reset();
+	m_prt_timer.reset();
 	m_beeper->set_state(0);
-	m_beep_timer->reset();
+	m_beep_timer.reset();
 }
 
 void hp9825_state::cpu_io_map(address_map &map)
@@ -260,7 +265,7 @@ void hp9825_state::disp_w(uint16_t data)
 {
 	if (m_display_on) {
 		m_display_on = false;
-		m_cursor_timer->reset();
+		m_cursor_timer.reset();
 		m_cursor_blink = true;
 		m_display_idx = 0;
 		update_display();
@@ -288,7 +293,7 @@ void hp9825_state::kdp_control_w(uint16_t data)
 		m_display_on = true;
 		// Cursor should blink at 2^-19 the KDP clock
 		attotime cursor_half_period{ attotime::from_ticks(262144 , KDP_CLOCK) };
-		m_cursor_timer->adjust(cursor_half_period , 0 , cursor_half_period);
+		m_cursor_timer.adjust_periodic(cursor_half_period);
 		regen_display = true;
 	}
 	if (BIT(data , 6) && !m_rpl_cursor) {
@@ -317,12 +322,12 @@ void hp9825_state::kdp_control_w(uint16_t data)
 		m_prt_alpha_out->output('\n');
 		m_printer_idx = 0;
 		m_printer_line++;
-		m_prt_timer->adjust(attotime::from_ticks(KDP_CLOCKS_PER_LINE , KDP_CLOCK));
+		m_prt_timer.adjust(attotime::from_ticks(KDP_CLOCKS_PER_LINE , KDP_CLOCK));
 	}
 	if (BIT(data , 2)) {
 		// Start beeper
 		m_beeper->set_state(1);
-		m_beep_timer->adjust(attotime::from_msec(BEEPER_MS));
+		m_beep_timer.adjust(attotime::from_msec(BEEPER_MS));
 	}
 	if (regen_display) {
 		update_display();
@@ -504,7 +509,7 @@ void hp9825_state::update_display()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::cursor_blink)
+void hp9825_state::cursor_blink()
 {
 	m_cursor_blink = !m_cursor_blink;
 	if (m_any_cursor) {
@@ -512,7 +517,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::cursor_blink)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::kb_scan)
+void hp9825_state::kb_scan()
 {
 	ioport_value input[ 4 ]
 	{ m_io_key[ 0 ]->read(),
@@ -569,7 +574,7 @@ void hp9825_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , uns
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::prt_timer)
+void hp9825_state::prt_timer()
 {
 	if (m_printer_line == 1 || m_printer_line == 9 || m_printer_line == 10) {
 		// Empty lines
@@ -589,13 +594,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::prt_timer)
 	m_prt_graph_out->output('\n');
 	m_printer_line++;
 	if (m_printer_line <= 10) {
-		m_prt_timer->adjust(attotime::from_ticks(KDP_CLOCKS_PER_LINE , KDP_CLOCK));
+		m_prt_timer.adjust(attotime::from_ticks(KDP_CLOCKS_PER_LINE , KDP_CLOCK));
 	} else {
 		m_printer_line = 0;
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::beep_timer)
+void hp9825_state::beep_timer()
 {
 	m_beeper->set_state(0);
 }
@@ -648,11 +653,6 @@ void hp9825_state::hp9825_base(machine_config &config)
 	m_io_sys->flg().set(m_cpu , FUNC(hp_09825_67907_cpu_device::flag_w));
 	m_io_sys->dmar().set(m_cpu , FUNC(hp_09825_67907_cpu_device::dmar_w));
 
-	TIMER(config , m_cursor_timer , 0).configure_generic(FUNC(hp9825_state::cursor_blink));
-
-	// Keyboard scan timer. A scan of the whole keyboard should take 2^14 KDP clocks.
-	TIMER(config , "kb_timer" , 0).configure_periodic(FUNC(hp9825_state::kb_scan), attotime::from_ticks(16384 , KDP_CLOCK));
-
 	// Tape drive
 	HP9825_TAPE(config , m_tape , 0);
 	m_tape->flg().set([this](int state) { m_io_sys->set_flg(TAPE_PA , state); });
@@ -662,12 +662,10 @@ void hp9825_state::hp9825_base(machine_config &config)
 	// Printer
 	BITBANGER(config , m_prt_alpha_out , 0);
 	BITBANGER(config , m_prt_graph_out , 0);
-	TIMER(config , m_prt_timer , 0).configure_generic(FUNC(hp9825_state::prt_timer));
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, BEEPER_FREQ).add_route(ALL_OUTPUTS, "mono", 1.00);
-	TIMER(config , m_beep_timer , 0).configure_generic(FUNC(hp9825_state::beep_timer));
 
 	// I/O slots
 	for (unsigned slot = 0; slot < 3; slot++) {

@@ -1051,7 +1051,7 @@ void interpro_ioga_device::timer0_w(offs_t offset, u32 data, u32 mem_mask)
 	// restart the timer
 	attotime period = attotime::from_ticks(m_prescaler ? m_prescaler & 0xffff : 0x10000, 10_MHz_XTAL);
 
-	m_timer0->adjust(period, 0, period);
+	m_timer0->adjust_periodic(period);
 }
 
 TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer0)
@@ -1114,7 +1114,7 @@ void interpro_ioga_device::timer1_w(offs_t offset, u32 data, u32 mem_mask)
 
 		attotime period = attotime::from_ticks(m_prescaler ? m_prescaler & 0xffff : 0x10000, 10_MHz_XTAL);
 
-		m_timer1->adjust(period, 0, period);
+		m_timer1->adjust_periodic(period);
 	}
 }
 

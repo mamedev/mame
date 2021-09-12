@@ -551,7 +551,7 @@ void lk201_device::device_reset()
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(4800);
-	m_count->adjust(attotime::from_hz(1200), 0, attotime::from_hz(1200));
+	m_count->adjust_periodic(attotime::from_hz(1200));
 	memset(m_timer.regs, 0, sizeof(m_timer.regs));
 
 	sci_status = (SCSR_TC | SCSR_TDRE);

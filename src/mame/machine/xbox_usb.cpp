@@ -109,7 +109,7 @@ void ohci_usb_controller::write(offs_t offset, uint32_t data)
 		hcfs = (data >> 6) & 3; // HostControllerFunctionalState
 		if (hcfs == UsbOperational) {
 			ohcist.timer->enable();
-			ohcist.timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+			ohcist.timer->adjust_periodic(attotime::from_msec(1));
 			ohcist.writebackdonehadcounter = 7;
 			// need to load the FrameRemaining field of HcFmRemaining with the value of the FrameInterval field in HcFmInterval
 		}

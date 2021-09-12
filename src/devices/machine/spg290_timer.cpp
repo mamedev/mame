@@ -51,7 +51,7 @@ void spg290_timer_device::device_reset()
 void spg290_timer_device::device_clock_changed()
 {
 	if (m_enabled)
-		m_tick_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+		m_tick_timer->adjust_periodic(attotime::from_hz(clock()));
 	else
 		m_tick_timer->adjust(attotime::never);
 }

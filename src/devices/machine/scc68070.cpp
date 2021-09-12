@@ -775,8 +775,8 @@ void scc68070_device::ucsr_w(uint8_t data)
 
 	attotime rx_rate = attotime::from_ticks(s_baud_divisors[(data >> 4) & 7] * 10, 49152000);
 	attotime tx_rate = attotime::from_ticks(s_baud_divisors[data & 7] * 10, 49152000);
-	m_uart.rx_timer->adjust(rx_rate, 0, rx_rate);
-	m_uart.tx_timer->adjust(tx_rate, 0, tx_rate);
+	m_uart.rx_timer->adjust_periodic(rx_rate);
+	m_uart.tx_timer->adjust_periodic(tx_rate);
 }
 
 uint8_t scc68070_device::ucr_r()

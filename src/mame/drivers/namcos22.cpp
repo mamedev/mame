@@ -2904,7 +2904,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
 	else
 	{
 		// not moving
-		m_pc_pedal_interrupt->adjust(attotime::never, 0, attotime::never);
+		m_pc_pedal_interrupt->adjust(attotime::never);
 	}
 }
 
@@ -2950,7 +2950,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_update)
 		else
 		{
 			// not moving
-			m_ar_tb_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
+			m_ar_tb_interrupt[axis]->adjust(attotime::never, axis);
 		}
 	}
 }

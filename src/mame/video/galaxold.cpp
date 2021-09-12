@@ -1475,7 +1475,7 @@ void galaxold_state::start_stars_blink_timer(double ra, double rb, double c)
 
 	int period_in_ms = 693 * (ra + 2.0 * rb) * c;
 
-	m_stars_blink_timer->adjust(attotime::from_msec(period_in_ms), 0, attotime::from_msec(period_in_ms));
+	m_stars_blink_timer->adjust_periodic(attotime::from_msec(period_in_ms));
 }
 
 

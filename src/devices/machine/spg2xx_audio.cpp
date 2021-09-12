@@ -138,7 +138,7 @@ void spg2xx_audio_device::device_reset()
 	m_audio_ctrl_regs[AUDIO_CHANNEL_REPEAT] = 0x3f;
 	m_audio_ctrl_regs[AUDIO_CHANNEL_ENV_MODE] = 0x3f;
 
-	m_audio_beat->adjust(attotime::from_ticks(4, 281250), 0, attotime::from_ticks(4, 281250));
+	m_audio_beat->adjust_periodic(attotime::from_ticks(4, 281250));
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -480,7 +480,7 @@ void spg2xx_audio_device::audio_ctrl_w(offs_t offset, uint16_t data)
 					m_audio_ctrl_regs[offset] |= mask;
 					if (BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_ENABLE], channel_bit))
 					{
-						m_channel_irq[channel_bit]->adjust(attotime::from_hz(m_channel_rate[channel_bit]), 0, attotime::from_hz(m_channel_rate[channel_bit]));
+						m_channel_irq[channel_bit]->adjust_periodic(attotime::from_hz(m_channel_rate[channel_bit]));
 					}
 					else
 					{

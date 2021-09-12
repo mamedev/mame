@@ -291,7 +291,7 @@ void techno_state::machine_reset()
 	m_digit = 0;
 
 	attotime freq = attotime::from_hz(XTAL(8'000'000) / 256); // 31250Hz
-	m_irq_set_timer->adjust(freq, 0, freq);
+	m_irq_set_timer->adjust_periodic(freq);
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 

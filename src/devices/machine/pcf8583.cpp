@@ -56,7 +56,7 @@ pcf8583_device::pcf8583_device(const machine_config &mconfig, const char *tag, d
 void pcf8583_device::device_start()
 {
 	m_timer = timer_alloc(TIMER_TICK);
-	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+	m_timer->adjust_periodic(attotime::from_hz(100));
 
 	save_item(NAME(m_scl));
 	save_item(NAME(m_sdaw));

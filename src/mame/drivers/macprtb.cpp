@@ -305,7 +305,7 @@ void macportable_state::machine_reset()
 	m_pmu_ack = 1;
 
 	// start 60.15 Hz timer
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+	m_6015_timer->adjust_periodic(attotime::from_hz(60.15));
 
 	// as with Egret/Cuda, the PMU starts the 68K when it's ready
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);

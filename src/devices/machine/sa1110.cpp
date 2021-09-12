@@ -914,10 +914,10 @@ attotime sa1110_periphs_device::mcp_get_telecom_frame_rate()
 void sa1110_periphs_device::mcp_update_sample_rate()
 {
 	const attotime audio_rate = mcp_get_audio_frame_rate();
-	m_mcp_regs.audio_tx_timer->adjust(audio_rate, 0, audio_rate);
+	m_mcp_regs.audio_tx_timer->adjust_periodic(audio_rate);
 
 	const attotime telecom_rate = mcp_get_telecom_frame_rate();
-	m_mcp_regs.telecom_tx_timer->adjust(telecom_rate, 0, telecom_rate);
+	m_mcp_regs.telecom_tx_timer->adjust_periodic(telecom_rate);
 }
 
 void sa1110_periphs_device::mcp_set_enabled(bool enabled)
@@ -1197,8 +1197,8 @@ void sa1110_periphs_device::ssp_update_enable_state()
 		uint64_t bit_count = (m_ssp_regs.sscr0 & SSCR0_DSS_MASK) >> SSCR0_DSS_BIT;
 		uint32_t clock_rate = 2 * (((m_ssp_regs.sscr0 & SSCR0_SCR_MASK) >> SSCR0_SCR_BIT) + 1);
 		attotime packet_rate = attotime::from_ticks(bit_count * clock_rate, 3686400);
-		m_ssp_regs.rx_timer->adjust(packet_rate, 0, packet_rate);
-		m_ssp_regs.tx_timer->adjust(packet_rate, 0, packet_rate);
+		m_ssp_regs.rx_timer->adjust_periodic(packet_rate);
+		m_ssp_regs.tx_timer->adjust_periodic(packet_rate);
 	}
 	else
 	{
@@ -2567,7 +2567,7 @@ void sa1110_periphs_device::device_reset()
 	m_rtc_regs.rcnr = 0;
 	m_rtc_regs.rttr = 0;
 	m_rtc_regs.rtsr = 0;
-	m_rtc_regs.tick_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_rtc_regs.tick_timer->adjust_periodic(attotime::from_seconds(1));
 
 	// init power regs
 	m_power_regs.pmcr = 0;

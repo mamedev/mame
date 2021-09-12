@@ -228,7 +228,7 @@ void timekeeper_device::device_start()
 	save_item(NAME(m_watchdog_delay));
 
 	emu_timer *timer = timer_alloc();
-	timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	timer->adjust_periodic(attotime::from_seconds(1));
 
 	m_watchdog_timer = timer_alloc(*this, FUNC(timekeeper_device::watchdog_callback));
 	m_watchdog_timer->adjust(attotime::never);

@@ -190,7 +190,7 @@ void clickstart_state::machine_reset()
 	m_uart_tx_fifo_start = 0;
 	m_uart_tx_fifo_end = 0;
 	m_uart_tx_fifo_count = 0;
-	m_uart_tx_timer->adjust(attotime::from_hz(3200/10), 0, attotime::from_hz(3200/10));
+	m_uart_tx_timer->adjust_periodic(attotime::from_hz(3200/10));
 
 	m_unk_portc_toggle = 0;
 }

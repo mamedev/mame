@@ -138,7 +138,7 @@ void hd61700_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	m_sec_timer = timer_alloc(SEC_TIMER);
-	m_sec_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_sec_timer->adjust_periodic(attotime::from_seconds(1));
 
 	m_lcd_ctrl_cb.resolve_safe();
 	m_lcd_read_cb.resolve_safe(0xff);

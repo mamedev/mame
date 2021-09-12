@@ -977,14 +977,14 @@ void hp48_state::base_machine_start(hp48_models model)
 
 	/* timers */
 	m_1st_timer = timer_alloc(*this, FUNC(hp48_state::timer1_cb));
-	m_1st_timer->adjust(attotime::from_hz(16), 0, attotime::from_hz(16));
+	m_1st_timer->adjust_periodic(attotime::from_hz(16));
 
 	m_2nd_timer = timer_alloc(*this, FUNC(hp48_state::timer2_cb));
-	m_2nd_timer->adjust(attotime::from_hz(8192), 0, attotime::from_hz(8192));
+	m_2nd_timer->adjust_periodic(attotime::from_hz(8192));
 
 	/* 1ms keyboard polling */
 	m_kbd_timer = timer_alloc(*this, FUNC(hp48_state::kbd_cb));
-	m_kbd_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_kbd_timer->adjust_periodic(attotime::from_msec(1));
 
 	m_rs232_byte_recv_cb.init(*this, FUNC(hp48_state::rs232_byte_recv_cb));
 	m_rs232_byte_sent_cb.init(*this, FUNC(hp48_state::rs232_byte_sent_cb));

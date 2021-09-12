@@ -130,7 +130,7 @@ void s_smp_device::device_reset()
 	}
 
 	attotime period = attotime::from_ticks(32, clock());
-	m_tick_timer->adjust(period, 0, period);
+	m_tick_timer->adjust_periodic(period);
 	spc700_device::device_reset();
 }
 
@@ -142,7 +142,7 @@ void s_smp_device::device_reset()
 void s_smp_device::device_clock_changed()
 {
 	attotime period = attotime::from_ticks(32, clock());
-	m_tick_timer->adjust(period, 0, period);
+	m_tick_timer->adjust_periodic(period);
 }
 
 //-------------------------------------------------

@@ -337,7 +337,7 @@ void pc9801_86_device::pcm_w(offs_t offset, u8 data)
 				break;
 			case 2:
 				if(((data & 7) != (m_pcm_ctrl & 7)) || !m_init)
-					m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
+					m_dac_timer->adjust_periodic(attotime::from_ticks(divs[data & 7], rate));
 				if(data & 8)
 					m_head = m_tail = m_count = 0;
 				if(!(data & 0x10))

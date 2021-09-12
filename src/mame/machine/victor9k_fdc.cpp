@@ -604,7 +604,7 @@ void victor_9000_fdc_device::update_rpm(floppy_image_device *floppy, emu_timer *
 		floppy->set_rpm(rpm[da]);
 
 		bool enabled = t_tach->enabled();
-		t_tach->adjust(attotime::from_hz(tach*2), 0, attotime::from_hz(tach*2));
+		t_tach->adjust_periodic(attotime::from_hz(tach*2));
 		t_tach->enable(enabled);
 	}
 #endif

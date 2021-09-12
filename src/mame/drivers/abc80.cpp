@@ -442,7 +442,7 @@ void abc80_state::machine_start()
 {
 	// start timers
 	m_cassette_timer = timer_alloc(TIMER_ID_CASSETTE);
-	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+	m_cassette_timer->adjust_periodic(attotime::from_hz(44100));
 
 	// register for state saving
 	save_item(NAME(m_key_data));

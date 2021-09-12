@@ -645,7 +645,7 @@ void mos6526_device::device_start()
 	if (m_tod_clock > 0)
 	{
 		m_tod_timer = timer_alloc();
-		m_tod_timer->adjust(attotime::from_hz(m_tod_clock), 0, attotime::from_hz(m_tod_clock));
+		m_tod_timer->adjust_periodic(attotime::from_hz(m_tod_clock));
 	}
 
 	// state saving

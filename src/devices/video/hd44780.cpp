@@ -115,7 +115,7 @@ void hd44780_device::device_start()
 
 	m_busy_timer = timer_alloc(TIMER_BUSY);
 	m_blink_timer = timer_alloc(TIMER_BLINKING);
-	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
+	m_blink_timer->adjust_periodic(attotime::from_msec(409));
 
 	// state saving
 	save_item(NAME(m_busy_factor));

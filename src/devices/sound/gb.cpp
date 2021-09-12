@@ -144,7 +144,7 @@ void gameboy_sound_device::device_start()
 {
 	m_channel = stream_alloc(0, 2, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 	m_timer = timer_alloc(*this, FUNC(gameboy_sound_device::timer_callback));
-	m_timer->adjust(clocks_to_attotime(FRAME_CYCLES/128), 0, clocks_to_attotime(FRAME_CYCLES/128));
+	m_timer->adjust_periodic(clocks_to_attotime(FRAME_CYCLES/128));
 
 	save_item(NAME(m_last_updated));
 	save_item(NAME(m_snd_regs));
@@ -175,7 +175,7 @@ void gameboy_sound_device::device_start()
 
 void gameboy_sound_device::device_clock_changed()
 {
-	m_timer->adjust(clocks_to_attotime(FRAME_CYCLES / 128), 0, clocks_to_attotime(FRAME_CYCLES / 128));
+	m_timer->adjust_periodic(clocks_to_attotime(FRAME_CYCLES / 128));
 }
 
 

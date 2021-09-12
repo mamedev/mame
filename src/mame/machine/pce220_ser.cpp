@@ -215,7 +215,7 @@ image_init_result pce220_serial_device::call_load()
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
-	m_send_timer->adjust(attotime::from_hz(SIO_BAUD_RATE), 0, attotime::from_hz(SIO_BAUD_RATE));
+	m_send_timer->adjust_periodic(attotime::from_hz(SIO_BAUD_RATE));
 
 	//read the first byte
 	fread(&m_current_byte, 1);
@@ -232,7 +232,7 @@ image_init_result pce220_serial_device::call_create(int format_type, util::optio
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
 	m_current_byte = 0;
-	m_receive_timer->adjust(attotime::from_hz(SIO_BAUD_RATE), 0, attotime::from_hz(SIO_BAUD_RATE));
+	m_receive_timer->adjust_periodic(attotime::from_hz(SIO_BAUD_RATE));
 
 	return image_init_result::PASS;
 }

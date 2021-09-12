@@ -101,7 +101,7 @@ void ad1848_device::write(offs_t offset, uint8_t data)
 					// FIXME: provide external configuration for XTAL1 (24.576 MHz) and XTAL2 (16.9344 MHz) inputs
 					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
 							/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
-					m_timer->adjust(rate, 0 , rate);
+					m_timer->adjust_periodic(rate);
 					m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);
 					break;
 				}

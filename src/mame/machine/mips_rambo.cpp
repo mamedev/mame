@@ -160,7 +160,7 @@ void mips_rambo_device::control_w(u32 data)
 	{
 		attotime const period = attotime::from_ticks(1 << ((data & CONTROL_BUZZMASK) >> 4), 1524_Hz_XTAL);
 
-		m_buzzer->adjust(period, 0, period);
+		m_buzzer->adjust_periodic(period);
 	}
 }
 

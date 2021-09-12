@@ -53,7 +53,7 @@ void hlcd0538_device::device_start()
 	// timer (when LCD pin is oscillator)
 	m_lcd_timer = timer_alloc();
 	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;
-	m_lcd_timer->adjust(period, 0, period);
+	m_lcd_timer->adjust_periodic(period);
 
 	// register for savestates
 	save_item(NAME(m_lcd));

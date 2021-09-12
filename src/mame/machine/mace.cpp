@@ -97,8 +97,8 @@ void mace_device::device_reset()
 	memset(&m_isa, 0, sizeof(isa_t));
 	memset(&m_ust_msc, 0, sizeof(ust_msc_t));
 
-	m_timer_ust->adjust(attotime::from_nsec(960), 0, attotime::from_nsec(960));
-	m_timer_msc->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_timer_ust->adjust_periodic(attotime::from_nsec(960));
+	m_timer_msc->adjust_periodic(attotime::from_msec(1));
 }
 
 //**************************************************************************

@@ -9706,7 +9706,7 @@ void segas16b_state::init_generic_korean()
 
 	// allocate a sound timer
 	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
-	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
+	timer->adjust_periodic(attotime::from_hz(10000));
 }
 void segas16b_state::init_lockonph()
 {

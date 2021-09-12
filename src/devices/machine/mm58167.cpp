@@ -68,7 +68,7 @@ void mm58167_device::device_start()
 {
 	// allocate timers
 	m_clock_timer = timer_alloc();
-	m_clock_timer->adjust(attotime::from_hz(clock() / 32.768f), 0, attotime::from_hz(clock() / 32.768f));
+	m_clock_timer->adjust_periodic(attotime::from_hz(clock() / 32.768f));
 
 	m_irq_w.resolve_safe();
 

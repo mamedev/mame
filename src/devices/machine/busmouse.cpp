@@ -156,7 +156,7 @@ void bus_mouse_device::device_reset()
 {
 	int hz = 2 * 15 * ioport("irq_rate")->read();
 
-	m_irq_timer->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
+	m_irq_timer->adjust_periodic(attotime::from_hz(hz));
 
 	irq = 0;
 	irq_disabled = 1;

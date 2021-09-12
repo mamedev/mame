@@ -361,7 +361,7 @@ void mfm_harddisk_device::device_start()
 	m_cache_timer = timer_alloc(CACHE_TM);
 
 	m_rev_time = attotime::from_hz(m_rpm/60);
-	m_index_timer->adjust(attotime::from_hz(m_rpm/60), 0, attotime::from_hz(m_rpm/60));
+	m_index_timer->adjust_periodic(attotime::from_hz(m_rpm/60));
 
 	m_current_cylinder = m_landing_zone; // Park position
 	m_spinup_timer->adjust(attotime::from_msec(m_spinupms));
@@ -369,7 +369,7 @@ void mfm_harddisk_device::device_start()
 	m_cache = std::make_unique<mfmhd_trackimage_cache>(machine());
 
 	// In 5 second periods, check whether the cache has dirty lines
-	m_cache_timer->adjust(attotime::from_msec(5000), 0, attotime::from_msec(5000));
+	m_cache_timer->adjust_periodic(attotime::from_msec(5000));
 
 	save_item(NAME(m_max_cylinders));
 	save_item(NAME(m_phys_cylinders));

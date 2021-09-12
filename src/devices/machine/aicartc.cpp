@@ -55,7 +55,7 @@ void aicartc_device::device_validity_check(validity_checker &valid) const
 void aicartc_device::device_start()
 {
 	m_clock_timer = timer_alloc();
-	m_clock_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_clock_timer->adjust_periodic(attotime::from_hz(clock()));
 }
 
 

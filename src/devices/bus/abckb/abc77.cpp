@@ -443,7 +443,7 @@ void abc77_device::device_start()
 {
 	// allocate timers
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_serial_timer->adjust(attotime::from_hz(19200), 0, attotime::from_hz(19200)); // ALE/32
+	m_serial_timer->adjust_periodic(attotime::from_hz(19200)); // ALE/32
 
 	m_reset_timer = timer_alloc(TIMER_RESET);
 }

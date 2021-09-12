@@ -83,7 +83,7 @@ void am2910_device::device_reset()
 	memset(m_stack, 0, sizeof(uint16_t) * 5);
 
 	if (m_execute_timer)
-		m_execute_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+		m_execute_timer->adjust_periodic(attotime::from_hz(clock()));
 }
 
 void am2910_device::device_timer(timer_instance const &timer)

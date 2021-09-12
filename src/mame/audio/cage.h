@@ -13,7 +13,6 @@
 
 #include "cpu/tms32031/tms32031.h"
 #include "machine/gen_latch.h"
-#include "machine/timer.h"
 #include "sound/dmadac.h"
 
 
@@ -51,8 +50,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
-	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
+	void dma_timer_callback(int param);
+	void cage_timer_callback(int which);
 
 	required_device<tms32031_device> m_cpu;
 
@@ -71,8 +70,6 @@ protected:
 private:
 	required_shared_ptr<uint32_t> m_cageram;
 	required_device<generic_latch_16_device> m_soundlatch;
-	required_device<timer_device> m_dma_timer;
-	required_device_array<timer_device, 2> m_timer;
 	optional_device_array<dmadac_sound_device, 4> m_dmadac;
 
 	required_memory_bank m_bootbank;
@@ -102,6 +99,9 @@ private:
 	uint32_t *m_speedup_ram;
 
 	offs_t m_speedup;
+
+	persistent_timer m_dma_timer;
+	persistent_timer m_timer[2];
 };
 
 

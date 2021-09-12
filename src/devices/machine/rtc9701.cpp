@@ -93,7 +93,7 @@ void rtc9701_device::device_start()
 {
 	/* let's call the timer callback every second */
 	m_timer = timer_alloc(*this, FUNC(rtc9701_device::timer_callback));
-	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
+	m_timer->adjust_periodic(attotime::from_hz(clock() / XTAL(32'768)));
 
 	system_time systime;
 	machine().base_datetime(systime);

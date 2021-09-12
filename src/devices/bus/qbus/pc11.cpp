@@ -82,7 +82,7 @@ void pc11_device::device_start()
 
 	// about 300 cps
 	emu_timer *timer = timer_alloc();
-	timer->adjust(attotime::from_usec(333), 0, attotime::from_usec(333));
+	timer->adjust_periodic(attotime::from_usec(333));
 }
 
 
