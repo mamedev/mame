@@ -286,6 +286,12 @@ void spifi3_device::auxctrl_w(uint32_t data)
     {
         // chip reset?
         LOG("CRST asserted\n");
+        spifi_reg = {}; // Reset register values
+        dma_command = false;
+        dma_dir = DMA_NONE;
+        tcounter = 0;
+        command_pos = 0;
+        command_length = 0;
     }
     if(spifi_reg.auxctrl & AUXCTRL_SETRST)
     {
@@ -403,6 +409,17 @@ void spifi3_device::prcmd_w(uint32_t data)
 
     switch(data) // TODO: commands might be queued like the 5390?
     {
+        case PRC_COMMAND:
+            LOG("Got COMMAND command! Starting transfer of status information...\n");
+            state = INIT_XFR;
+            xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+
+            dma_command = (spifi_reg.autodata & ADATA_EN) > 0; // TODO: ID check
+            command_pos = 0;
+            dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
+            check_drq();
+            step(false);
+            break;
         case PRC_STATUS:
         {
             LOG("Got STATUS command! Starting transfer of status information...\n");
@@ -432,6 +449,16 @@ void spifi3_device::prcmd_w(uint32_t data)
             step(false);
             break;
         }
+        case PRC_MSGOUT:
+            LOG("Got MSGOUT command! Starting message output phase...\n");
+            state = INIT_XFR;
+            xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+
+            dma_command = false; // xxx
+            dma_set(DMA_NONE); // xxx
+            check_drq();
+            step(false);
+            break;
         case PRC_MSGIN:
         {
             LOG("Got MSGIN command! Starting message input phase...\n");
@@ -1123,18 +1150,27 @@ void spifi3_device::step(bool timeout)
             }
 
             // Extract the command length from the cmlen register and reset our index into the command buffer if a command was given
-            if(!(spifi_reg.prcmd & PRC_NJMP) && (spifi_reg.prcmd & PRC_COMMAND))
+            /*if(!(spifi_reg.prcmd & PRC_NJMP) && (spifi_reg.prcmd & PRC_COMMAND))
             {
                 LOG("Starting command - length = %d\n", spifi_reg.cmlen & CML_LENMASK);
                 command_length = spifi_reg.cmlen & CML_LENMASK;
                 command_pos = 0;
             }
+            
+            else if((spifi_reg.cmlen & CML_AMSG_EN) && ((scsi_bus->ctrl_r() & S_PHASE_MASK) == S_PHASE_MSG_OUT))
+            {
+                LOG("Starting message - len = %d\n", spifi_reg.cmlen & CML_LENMASK);
+                command_length = spifi_reg.cmlen & CML_LENMASK;
+                command_pos = 0;
+            }
+
             // Otherwise, we are here because the host enabled autoidentify, so CDB isn't the source of the command. Instead, we'll send identify
             else
             {
+                */
                 LOG("Starting autoidentify...\n");
                 command_pos = -1; // XXX THIS IS TEMPORARY
-            }
+            // }
             state = DISC_SEL_ARBITRATION;
             step(false);
             break;
@@ -1380,7 +1416,7 @@ void spifi3_device::step(bool timeout)
                 LOG("Non-DMA transfer out complete, FIFO drained!\n");
                 state = INIT_XFR_BUS_COMPLETE;
             }
-            else if (xfrDataSource == FIFO && (!dma_command && (xfr_phase & S_INP) == S_INP && m_even_fifo.size() == 1))
+            else if (xfrDataSource == FIFO && (!dma_command && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.size() == 1))
             {
                 LOG("Non-DMA transfer in complete!\n");
                 state = INIT_XFR_BUS_COMPLETE;

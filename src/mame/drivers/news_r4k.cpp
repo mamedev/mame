@@ -761,7 +761,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
+    // LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
     return value;
 }
 
@@ -854,7 +854,7 @@ uint32_t news_r4k_state::inten_r(offs_t offset)
  */
 uint32_t news_r4k_state::intst_r(offs_t offset)
 {
-    LOG("intst_r: INTEN%d = 0x%x\n", offset, m_intst[offset]);
+    // LOG("intst_r: INTST%d = 0x%x\n", offset, m_intst[offset]);
     return m_intst[offset];
 }
 
