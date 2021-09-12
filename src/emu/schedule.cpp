@@ -482,6 +482,10 @@ persistent_timer &persistent_timer::adjust_internal(attotime const &delay, s32 p
 	{
 		m_instance.m_start = start;
 		m_instance.m_expire = expire;
+
+		// validate
+		if (SCHEDULER_DEBUG)
+			m_callback.scheduler().validate_timer_list();
 	}
 
 	// mark as modified
@@ -675,6 +679,54 @@ void device_scheduler::dump_timers() const
 	for (timer_instance *timer = m_active_timers_head; timer != &m_active_timers_tail; timer = timer->next())
 		timer->dump();
 	osd_printf_info("=============================================\n");
+}
+
+
+//-------------------------------------------------
+//  validate_timer_list - validate timer list
+//-------------------------------------------------
+
+void device_scheduler::validate_timer_list()
+{
+	// must always have at least one timer in the list
+	scheduler_assert(m_active_timers_head != nullptr);
+
+	// check them all
+	for (timer_instance *timer = m_active_timers_head; timer != nullptr; timer = timer->m_next)
+	{
+		// ensure the previous link is valid
+		if (timer == m_active_timers_head)
+			scheduler_assert(timer->m_prev == nullptr);
+		else
+		{
+			scheduler_assert(timer->m_prev != nullptr);
+			scheduler_assert(timer->m_prev->m_next == timer);
+		}
+
+		// ensure the next link is valid
+		if (timer == &m_active_timers_tail)
+		{
+			scheduler_assert(timer->m_next == nullptr);
+			scheduler_assert(timer->m_expire.is_never());
+		}
+		else
+		{
+			scheduler_assert(timer->m_next != nullptr);
+			scheduler_assert(timer->m_next->m_prev == timer);
+		}
+
+		// ensure the list is in order
+		if (timer != &m_active_timers_tail)
+		{
+			scheduler_assert(timer->m_active);
+			scheduler_assert(timer->m_callback != nullptr);
+			scheduler_assert(!timer->m_expire.is_never());
+			if (timer->m_prev != nullptr)
+				scheduler_assert(timer->m_expire >= timer->m_prev->m_expire);
+			if (timer->m_next != nullptr)
+				scheduler_assert(timer->m_next->m_expire >= timer->m_expire);
+		}
+	}
 }
 
 
@@ -1178,6 +1230,10 @@ inline void device_scheduler::execute_timers(attotime const &basetime)
 		m_active_timers_head->m_prev = nullptr;
 		timer.m_active = false;
 
+		// validate
+		if (SCHEDULER_DEBUG)
+			validate_timer_list();
+
 		// set the global state of which callback we're in
 		m_callback_timer = &timer;
 		m_callback_timer_expire_time = timer.m_expire;
@@ -1442,6 +1498,10 @@ inline timer_instance &device_scheduler::instance_insert(timer_instance &timer)
 		// since the head changed, the time of the first expirations changed
 		update_first_timer_expire();
 		abort_timeslice();
+
+		// validate
+		if (SCHEDULER_DEBUG)
+			validate_timer_list();
 		return timer;
 	}
 
@@ -1455,6 +1515,10 @@ inline timer_instance &device_scheduler::instance_insert(timer_instance &timer)
 		timer.m_prev = m_active_timers_tail.m_prev;
 		timer.m_next = &m_active_timers_tail;
 		m_active_timers_tail.m_prev = m_active_timers_tail.m_prev->m_next = &timer;
+
+		// validate
+		if (SCHEDULER_DEBUG)
+			validate_timer_list();
 
 		// no need to recompute if changing a later timer
 		return timer;
@@ -1472,12 +1536,17 @@ inline timer_instance &device_scheduler::instance_insert(timer_instance &timer)
 			timer.m_next = scan;
 			scan->m_prev = scan->m_prev->m_next = &timer;
 
+			// validate
+			if (SCHEDULER_DEBUG)
+				validate_timer_list();
+
 			// no need to recompute if changing a later timer
 			return timer;
 		}
 	}
 
 	// should never get here
+	scheduler_assert(false);
 	return timer;
 }
 
@@ -1502,6 +1571,10 @@ inline timer_instance &device_scheduler::instance_remove(timer_instance &timer)
 
 	// link the next to us; we can't be the tail, so presume next is non-null
 	timer.m_next->m_prev = timer.m_prev;
+
+	// validate
+	if (SCHEDULER_DEBUG)
+		validate_timer_list();
 
 	// return the timer back for chaining
 	return timer;

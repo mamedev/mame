@@ -26,7 +26,7 @@
 #ifdef MAME_DEBUG
 #define SCHEDULER_DEBUG (1)
 #else
-#define SCHEDULER_DEBUG (0)
+#define SCHEDULER_DEBUG (1)
 #endif
 
 // if SCHEDULER_DEBUG is on, make assertions fire regardless of MAME_DEBUG
@@ -628,6 +628,7 @@ public:
 
 	// debugging
 	void dump_timers() const;
+	void validate_timer_list();
 
 	// save state registration
 	void register_save(save_manager &save);
