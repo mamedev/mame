@@ -336,8 +336,8 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatc
 
 template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatch<HighBits, Width, AddrShift>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings)
 {
-	offs_t start_entry = start >> LowBits;
-	offs_t end_entry = end >> LowBits;
+	offs_t start_entry = (start & HIGHMASK) >> LowBits;
+	offs_t end_entry = (end & HIGHMASK) >> LowBits;
 	range_cut_before(ostart-1, start_entry);
 	range_cut_after(oend+1, end_entry);
 
