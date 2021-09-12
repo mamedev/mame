@@ -36931,6 +36931,7 @@ hisaturn                        // Hitachi HiSaturn
 saturn                          // 1995 Sega Saturn (USA)
 saturneu                        // 1995 Sega Saturn (Europe)
 saturnjp                        // 1994 Sega Saturn (Japan)
+saturnkr                        // 1995 Samsung Saturn (Korea)
 vsaturn                         // JVC V-Saturn
 
 @source:sauro.cpp
