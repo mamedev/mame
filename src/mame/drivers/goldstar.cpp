@@ -8621,8 +8621,8 @@ static const gfx_layout cm97_layout32 =
 };
 
 static GFXDECODE_START( gfx_cm97 )
-	GFXDECODE_ENTRY( "gfx", 0, cm97_layout,   0x0, 32 )
-	GFXDECODE_ENTRY( "gfx", 0, cm97_layout32, 0x0, 32 )
+	GFXDECODE_ENTRY( "gfx", 0,       cm97_layout,   0x0, 32 )
+	GFXDECODE_ENTRY( "gfx", 0x20000, cm97_layout32, 0x0, 32 )
 GFXDECODE_END
 
 
