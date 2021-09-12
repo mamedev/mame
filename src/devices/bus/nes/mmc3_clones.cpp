@@ -36,6 +36,7 @@ DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646"
 DEFINE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device,       "nes_pikay2k",       "NES Cart PIKACHU Y2K PCB")
 DEFINE_DEVICE_TYPE(NES_8237,          nes_8237_device,          "nes_8237",          "NES Cart UNL-8237 PCB")
 DEFINE_DEVICE_TYPE(NES_8237A,         nes_8237a_device,         "nes_8237a",         "NES Cart UNL-8237A PCB")
+DEFINE_DEVICE_TYPE(NES_158B,          nes_158b_device,          "nes_158b",          "NES Cart UNL-158B PCB")
 DEFINE_DEVICE_TYPE(NES_SG_LIONK,      nes_sglionk_device,       "nes_sglionk",       "NES Cart SuperGame Lion King PCB")
 DEFINE_DEVICE_TYPE(NES_SG_BOOG,       nes_sgboog_device,        "nes_sgbooger",      "NES Cart SuperGame BoogerMan PCB")
 DEFINE_DEVICE_TYPE(NES_KASING,        nes_kasing_device,        "nes_kasing",        "NES Cart Kasing PCB")
@@ -121,6 +122,11 @@ nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag,
 
 nes_8237a_device::nes_8237a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_8237_device(mconfig, NES_8237A, tag, owner, clock)
+{
+}
+
+nes_158b_device::nes_158b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_8237_device(mconfig, NES_158B, tag, owner, clock)
 {
 }
 
@@ -382,6 +388,18 @@ void nes_8237_device::pcb_reset()
 	m_reg[1] = 0x0f;
 	m_reg[2] = 0;
 	update_banks();
+}
+
+void nes_158b_device::device_start()
+{
+	nes_8237_device::device_start();
+	save_item(NAME(m_prot));
+}
+
+void nes_158b_device::pcb_reset()
+{
+	nes_8237_device::pcb_reset();
+	m_prot = 7;    // Blood of Jurassic needs this row of prot_table
 }
 
 void nes_kasing_device::device_start()
@@ -1055,6 +1073,67 @@ void nes_8237_device::write_h(offs_t offset, u8 data)
 	if (addr == 0x8000)
 		data = (data & 0xc0) | reg_table[m_reg[2]][data & 0x07];
 	txrom_write(addr & 0x6001, data);
+}
+
+/*-------------------------------------------------
+
+ Board UNL-158B
+
+ Games: Blood of Jurassic, Super Hang-On
+
+ MMC3 clone that appears to be the same as the 8237
+ boards above with added protection reads at 0x5000.
+
+ NES 2.0: mapper 258
+
+ In MAME: Preliminary supported.
+
+ TODO: Sprites in BoJ can sometimes become a garbled
+ mess. Not sure if zapper hit detection is ok either,
+ or why it seems you can't shoot at times (reload?).
+ Super Hang-On is a hack of Rad Racer/Highway Star so
+ it has all the graphics issues those games have.
+
+ -------------------------------------------------*/
+
+u8 nes_158b_device::read_l(offs_t offset)
+{
+	LOG_MMC(("unl_158b read_l, offset: %04x\n", offset));
+
+	static constexpr u8 prot_table[8][8] =
+	{
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x01, 0x00, 0x04, 0x05, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x01, 0x02, 0x04, 0x0f, 0x00}
+	};
+
+	u8 temp = get_open_bus();
+
+	offset += 0x100;
+	if (offset >= 0x1000)
+		temp = (temp & 0xf0) | prot_table[m_prot][offset & 0x07];
+
+	return temp;
+}
+
+void nes_158b_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("unl_158b write_l, offset: %04x, data: %02x\n", offset, data));
+
+	switch ((offset + 0x100) & 0x1003)
+	{
+		case 0x1002:
+			m_prot = data & 0x07;
+			break;
+		default:
+			nes_8237_device::write_l(offset, data);
+			break;
+	}
 }
 
 /*-------------------------------------------------

@@ -282,6 +282,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("subor0",           NES_SUBOR0);
 	device.option_add_internal("subor1",           NES_SUBOR1);
 	device.option_add_internal("subor2",           NES_SUBOR2);
+	device.option_add_internal("unl_158b",         NES_158B);
 	device.option_add_internal("cc21",             NES_CC21);
 	device.option_add_internal("xiaozy",           NES_XIAOZY);
 	device.option_add_internal("edu2k",            NES_EDU2K);
@@ -456,7 +457,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("pec586",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("coolboy",          NES_NROM);    // UNSUPPORTED
-	device.option_add_internal("unl_158b",         NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_drgnfgt",      NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?
 	device.option_add_internal("bmc_hik_kof",      NES_NROM); // mapper 251 - UNSUPPORTED

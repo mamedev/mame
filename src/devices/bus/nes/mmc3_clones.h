@@ -138,6 +138,28 @@ public:
 };
 
 
+// ======================> nes_158b_device
+
+class nes_158b_device : public nes_8237_device
+{
+public:
+	// construction/destruction
+	nes_158b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_l(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	int m_prot;
+};
+
+
 // ======================> nes_kasing_device
 
 class nes_kasing_device : public nes_txrom_device
@@ -912,6 +934,7 @@ DECLARE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device)
 DECLARE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device)
 DECLARE_DEVICE_TYPE(NES_8237,          nes_8237_device)
 DECLARE_DEVICE_TYPE(NES_8237A,         nes_8237a_device)
+DECLARE_DEVICE_TYPE(NES_158B,          nes_158b_device)
 DECLARE_DEVICE_TYPE(NES_SG_LIONK,      nes_sglionk_device)
 DECLARE_DEVICE_TYPE(NES_SG_BOOG,       nes_sgboog_device)
 DECLARE_DEVICE_TYPE(NES_KASING,        nes_kasing_device)
