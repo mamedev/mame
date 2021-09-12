@@ -575,6 +575,7 @@ void dcs_audio_device::dcs_reset()
 
 	/* initialize the ADSP control regs */
 	memset(m_control_regs, 0, sizeof(m_control_regs));
+
 	/* clear all interrupts */
 	m_cpu->set_input_line(ADSP2105_IRQ0, CLEAR_LINE);
 	m_cpu->set_input_line(ADSP2105_IRQ1, CLEAR_LINE);
@@ -736,9 +737,6 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 {
 	m_dmadac[0] = m_dmadac[1] = m_dmadac[2] = m_dmadac[3] = m_dmadac[4] = m_dmadac[5] = nullptr;
 	memset(m_control_regs, 0, sizeof(m_control_regs));
-	memset(&m_sdrc, 0, sizeof(m_sdrc));
-	memset(&m_dsio, 0, sizeof(m_dsio));
-	memset(&m_transfer, 0, sizeof(m_transfer));
 }
 
 void dcs_audio_device::device_reset()
@@ -1087,7 +1085,7 @@ void dcs_audio_device::sdrc_remap_memory()
 
 void dcs_audio_device::sdrc_reset()
 {
-	memset(m_sdrc.reg, 0, sizeof(m_sdrc.reg));
+	m_sdrc.reset();
 	sdrc_remap_memory();
 }
 
@@ -1225,7 +1223,7 @@ void dcs_audio_device::sdrc_w(offs_t offset, uint16_t data)
 
 void dcs_audio_device::dsio_reset()
 {
-	memset(&m_dsio, 0, sizeof(m_dsio));
+	m_dsio.reset();
 	m_dmovlay_val = 0;
 	dmovlay_remap_memory();
 }
@@ -1284,7 +1282,7 @@ void dcs_audio_device::dsio_w(offs_t offset, uint16_t data)
 
 void dcs_audio_device::denver_reset()
 {
-	memset(&m_dsio, 0, sizeof(m_dsio));
+	m_dsio.reset();
 	m_dmovlay_val = 0;
 	dmovlay_remap_memory();
 	dmadac_enable(&m_dmadac[0], m_channels, 0);

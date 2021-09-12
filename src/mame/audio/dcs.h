@@ -139,6 +139,9 @@ protected:
 
 	struct sdrc_state
 	{
+		sdrc_state() : seed(0) { reset(); }
+		void reset() { reg[0] = reg[1] = reg[2] = reg[3] = 0; }
+
 		uint16_t      reg[4];
 		uint8_t       seed;
 	};
@@ -146,6 +149,9 @@ protected:
 
 	struct dsio_state
 	{
+		dsio_state() { reset(); }
+		void reset() { reg[0] = reg[1] = reg[2] = reg[3] = 0; start_on_next_write = 0; channelbits = 0; }
+
 		uint16_t      reg[4];
 		uint8_t       start_on_next_write;
 		uint16_t      channelbits;
@@ -154,16 +160,16 @@ protected:
 
 	struct hle_transfer_state
 	{
-		uint8_t       hle_enabled;
-		int32_t       dcs_state;
-		int32_t       state;
-		int32_t       start;
-		int32_t       stop;
-		int32_t       type;
-		int32_t       temp;
-		int32_t       writes_left;
-		uint16_t      sum;
-		int32_t       fifo_entries;
+		uint8_t       hle_enabled = 0;
+		int32_t       dcs_state = 0;
+		int32_t       state = 0;
+		int32_t       start = 0;
+		int32_t       stop = 0;
+		int32_t       type = 0;
+		int32_t       temp = 0;
+		int32_t       writes_left = 0;
+		uint16_t      sum = 0;
+		int32_t       fifo_entries = 0;
 		persistent_timer watchdog;
 	};
 
