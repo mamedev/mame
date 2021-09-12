@@ -354,7 +354,7 @@ static const nes_mmc mmc_list[] =
 	// 316 Unused
 	// 317 Unused
 	// 318 Unused
-	// 319 HP-898F (has different bank order than UNIF!) and KD-7/9-E boards
+	{ 319, BMC_HP898F },
 	{ 320, BMC_830425C },
 	// 321 duplicate of 287?
 	// 322 BMC-K-3033 35-in-1, related to mc_35?
