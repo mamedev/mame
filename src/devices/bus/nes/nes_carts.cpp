@@ -34,6 +34,7 @@
 #include "act53.h"
 #include "aladdin.h"
 #include "ave.h"
+#include "batlab.h"
 #include "benshieng.h"
 #include "camerica.h"
 #include "cne.h"
@@ -450,6 +451,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("pjoy84",           NES_PJOY84);
 	device.option_add_internal("nocash_nochr",     NES_NOCHR);
 	device.option_add_internal("action53",         NES_ACTION53);
+	device.option_add_internal("batmap_srrx",      NES_BATMAP_SRRX);
 	device.option_add_internal("cufrom",           NES_CUFROM);
 	device.option_add_internal("unrom512",         NES_UNROM512);
 	device.option_add_internal("2a03pur",          NES_2A03PURITANS);

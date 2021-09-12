@@ -139,9 +139,10 @@ enum
 	WAIXING_SGZLZ, WAIXING_SGZ, WAIXING_WXZS, WAIXING_SECURITY, WAIXING_SH2,
 	WAIXING_DQ8, WAIXING_FFV, WAIXING_WXZS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
 	KAY_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD, ZEMINA_BOARD,
+	// homebrew PCBs
 	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
 	UNL_ACTION53,   // homebrew PCB for homebrew multicarts
-	UNL_CUFROM, UNL_UNROM512, UNL_2A03PURITANS,   // homebrew PCBs
+	BATMAP_SRRX, UNL_CUFROM, UNL_UNROM512, UNL_2A03PURITANS,
 	// FFE boards, for mappers 6, 8, 17
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	// Unsupported (for place-holder boards, with no working emulation) & no-board (at init)
@@ -196,6 +197,7 @@ public:
 
 	void prg_alloc(size_t size, const char *tag);
 	void vrom_alloc(size_t size, const char *tag);
+	void misc_rom_alloc(size_t size, const char *tag);
 	void prgram_alloc(size_t size);
 	void vram_alloc(size_t size);
 	void battery_alloc(size_t size);
@@ -224,6 +226,7 @@ public:
 	uint8_t *get_ciram_base() { return m_ciram; }
 	uint8_t *get_battery_base() { return &m_battery[0]; }
 	uint8_t *get_mapper_sram_base() { return m_mapper_sram; }
+	uint8_t *get_misc_rom_base() { return m_misc_rom; }
 
 	uint32_t get_prg_size() const { return m_prg_size; }
 	uint32_t get_prgram_size() const { return m_prgram.size(); }
@@ -231,6 +234,7 @@ public:
 	uint32_t get_vram_size() const { return m_vram.size(); }
 	uint32_t get_battery_size() const { return m_battery.size(); }
 	uint32_t get_mapper_sram_size() const { return m_mapper_sram_size; }
+	uint32_t get_misc_rom_size() const { return m_misc_rom_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
 	virtual void hblank_irq(int scanline, int vblank, int blanked) {}
@@ -271,8 +275,10 @@ protected:
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
 	uint8_t *m_mapper_sram;
+	uint8_t *m_misc_rom;
 	std::vector<uint8_t> m_ext_ntram;
 	uint32_t m_mapper_sram_size;
+	uint32_t m_misc_rom_size;
 
 	int m_ce_mask;
 	int m_ce_state;
@@ -449,5 +455,6 @@ DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 
 #define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
 #define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
+#define NESSLOT_MISC_ROM_REGION_TAG ":cart:misc_rom"
 
 #endif // MAME_BUS_NES_NES_SLOT_H
