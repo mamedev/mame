@@ -181,7 +181,6 @@ Not all regional versions are available for each Megatouch series
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
@@ -234,8 +233,6 @@ private:
 	int m_vint;
 	int m_interrupt_vdp0_state;
 	int m_interrupt_vdp1_state;
-	int m_layer0_enabled;
-	int m_layer1_enabled;
 	int m_bank;
 	int m_psd_a15;
 	uint16_t m_questions_loword_address;
@@ -263,8 +260,6 @@ private:
 	DECLARE_MACHINE_START(crt260);
 	DECLARE_MACHINE_START(common);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
 	void crt250_switch_banks(  );
 	void switch_banks(  );
 	int touch_coord_transform(int *touch_x, int *touch_y);
@@ -289,6 +284,7 @@ private:
  *  Microtouch touch coordinate transformation
  *
  *************************************/
+
 int meritm_state::touch_coord_transform(int *touch_x, int *touch_y)
 {
 	int xscr = (int)((double)(*touch_x)/0x4000*544);
@@ -320,25 +316,33 @@ int meritm_state::touch_coord_transform(int *touch_x, int *touch_y)
  *
  *************************************/
 
-
 WRITE_LINE_MEMBER(meritm_state::vdp0_interrupt)
 {
-	/* this is not used as the v9938 interrupt callbacks are broken
-	   interrupts seem to be fired quite randomly */
+	if (state != m_interrupt_vdp0_state)
+	{
+		m_vint = (m_vint & 8) | (state ? 0 : 0x10);
+		m_interrupt_vdp0_state = state;
+		m_z80pio[0]->port_a_write(m_vint);
+	}
 }
 
 WRITE_LINE_MEMBER(meritm_state::vdp1_interrupt)
 {
-	/* this is not used as the v9938 interrupt callbacks are broken
-	   interrupts seem to be fired quite randomly */
+	if (state != m_interrupt_vdp1_state)
+	{
+		m_vint = (m_vint & 0x10) | (state ? 0 : 8);
+		m_interrupt_vdp1_state = state;
+		m_z80pio[0]->port_a_write(m_vint);
+	}
 }
 
 
 void meritm_state::video_start()
 {
-	m_layer0_enabled = m_layer1_enabled = 1;
-
 	m_vint = 0x18;
+	m_interrupt_vdp0_state = 0;
+	m_interrupt_vdp1_state = 0;
+
 	save_item(NAME(m_vint));
 	save_item(NAME(m_interrupt_vdp0_state));
 	save_item(NAME(m_interrupt_vdp1_state));
@@ -346,28 +350,11 @@ void meritm_state::video_start()
 
 uint32_t meritm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		m_layer0_enabled^=1;
-		popmessage("Layer 0 %sabled",m_layer0_enabled ? "en" : "dis");
-	}
-	if(machine().input().code_pressed_once(KEYCODE_W))
-	{
-		m_layer1_enabled^=1;
-		popmessage("Layer 1 %sabled",m_layer1_enabled ? "en" : "dis");
-	}
-
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	if ( m_layer0_enabled )
-	{
-		copybitmap(bitmap, m_v9938[0]->get_bitmap(), 0, 0, 0, 0, cliprect);
-	}
+	copybitmap(bitmap, m_v9938[0]->get_bitmap(), 0, 0, 0, 0, cliprect);
+	copybitmap_transalpha(bitmap, m_v9938[1]->get_bitmap(), 0, 0, -6, -12, cliprect);
 
-	if ( m_layer1_enabled )
-	{
-		copybitmap_transalpha(bitmap, m_v9938[1]->get_bitmap(), 0, 0, -6, -12, cliprect);
-	}
 	return 0;
 }
 
@@ -376,7 +363,6 @@ uint32_t meritm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
  *  Bank switching (ROM/RAM)
  *
  *************************************/
-
 
 void meritm_state::crt250_switch_banks(  )
 {
@@ -422,7 +408,6 @@ void meritm_state::bank_w(uint8_t data)
  *  CRT250 question roms reading
  *
  *************************************/
-
 
 void meritm_state::crt250_questions_lo_w(uint8_t data)
 {
@@ -1088,20 +1073,6 @@ MACHINE_START_MEMBER(meritm_state, crt260)
 	save_pointer(NAME(m_ram), 0x8000);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)
-{
-	/* this is a workaround to signal the v9938 vblank interrupt correctly */
-	m_vint = 0x08;
-	m_z80pio[0]->port_a_write(m_vint);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
-{
-	/* this is a workaround to signal the v9938 vblank interrupt correctly */
-	m_vint = 0x18;
-	m_z80pio[0]->port_a_write(m_vint);
-}
-
 void meritm_state::crt250(machine_config &config)
 {
 	Z80(config, m_maincpu, SYSTEM_CLK/6);
@@ -1127,9 +1098,6 @@ void meritm_state::crt250(machine_config &config)
 	m_z80pio[1]->in_pb_callback().set_ioport("PIO1_PORTB");
 	m_z80pio[1]->out_pb_callback().set(FUNC(meritm_state::io_pio_port_b_w));
 
-	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
-	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	DS1204(config, m_ds1204);
@@ -1142,7 +1110,7 @@ void meritm_state::crt250(machine_config &config)
 	V9938(config, m_v9938[1], SYSTEM_CLK);
 	m_v9938[1]->set_screen_ntsc("screen");
 	m_v9938[1]->set_vram_size(0x20000);
-	m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
+	m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp1_interrupt));
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
 
