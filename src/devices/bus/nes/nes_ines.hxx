@@ -91,7 +91,7 @@ static const nes_mmc mmc_list[] =
 	{ 56, KAISER_KS202 },
 	{ 57, BMC_GKA },
 	{ 58, BMC_GKB },
-	// 59 BMC-T3H53 and BMC-D1038
+	{ 59, BMC_VT5201 },   // and BMC-T3H53, BMC-D1038
 	{ 60, BMC_4IN1RESET },
 	{ 61, RCM_TF9IN1 },
 	{ 62, BMC_SUPER_700IN1 },

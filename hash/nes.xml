@@ -80281,7 +80281,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_d1038" />
+			<feature name="slot" value="bmc_vt5201" />
 			<feature name="pcb" value="BMC-D1038" />
 			<dataarea name="chr" size="65536">
 				<rom name="46-in-1 (d1038) [p1][u].chr" size="65536" crc="a2f2b37b" sha1="4cd8720e70762038b4a9cf2dec92dde0e38698d6" offset="00000" status="baddump" />
@@ -80707,7 +80707,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_d1038" />
+			<feature name="slot" value="bmc_vt5201" />
 			<feature name="pcb" value="BMC-D1038" />
 			<dataarea name="chr" size="65536">
 				<rom name="65-in-1 (nt766) [p1][u].chr" size="65536" crc="e1d03e4a" sha1="13c52b601ee0a9e3fe4030562e86118b7a5c9d62" offset="00000" status="baddump" />
@@ -80938,7 +80938,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_d1038" />
+			<feature name="slot" value="bmc_vt5201" />
 			<feature name="pcb" value="BMC-D1038" />
 			<dataarea name="chr" size="65536">
 				<rom name="74-in-1 (nt886) [p1][u].chr" size="65536" crc="b2f00487" sha1="f21320df2d199887a4e9b231c7bf3afcc77ac9ec" offset="00000" status="baddump" />
@@ -80992,7 +80992,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_d1038" />
+			<feature name="slot" value="bmc_vt5201" />
 			<feature name="pcb" value="BMC-D1038" />
 			<dataarea name="chr" size="65536">
 				<rom name="77-in-1 (nt141) [p1][u].chr" size="65536" crc="3f03ecaf" sha1="1e65bb75da9f008bf37a0a2c058f9771ac09caac" offset="00000" status="baddump" />
@@ -81016,6 +81016,7 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_21in1" />
 			<feature name="pcb" value="BMC-21IN1" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="8-in-1 [p1].chr" size="32768" crc="a1f6c479" sha1="888834d627637e75d2636a7f34d6a0ff234e8929" offset="00000" status="baddump" />
 			</dataarea>
@@ -81915,6 +81916,21 @@ to check why this is different -->
 		</part>
 	</software>
 
+	<software name="mc_s190">
+		<description>Super 190 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_s700" />
+			<dataarea name="prg" size="2097152">
+				<rom name="super 190-in-1.prg" size="2097152" crc="8dae13b2" sha1="cd36b113a0091666621c3248601ae5ca33d0605d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="super 190-in-1.chr" size="1048576" crc="47abdc9f" sha1="289ae7628687dc4b370adee42f3a97034ce6ed2b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- If you select the keyboard it does not work due to missing data -->
 	<software name="mc_s200" supported="partial">
 		<description>Super 200 in 1 MD-8802 (Incomplete?)</description>
@@ -82089,7 +82105,6 @@ to check why this is different -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_vt5201" />
 			<feature name="pcb" value="BMC-VT5201" />
-			<feature name="mirroring" value="high" />
 			<dataarea name="chr" size="65536">
 				<rom name="super 35 in 1 (6 in 1 vt5201).chr" size="65536" crc="a3d8d9dd" sha1="34703a76b76c7244a21237e41b8aed7a1ef95cae" offset="00000" status="baddump" />
 			</dataarea>

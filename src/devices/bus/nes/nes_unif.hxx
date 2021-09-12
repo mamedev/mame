@@ -114,7 +114,7 @@ static const unif unif_list[] =
 	{ "UNL-YOKO",                   0,    0, CHRRAM_0,  YOKO_BOARD}, // similar to mapper 83, but not the same
 	{ "UNL-FS304",                  0,    8, CHRRAM_8,  WAIXING_FS304}, // used in Zelda 3 by Waixing
 	{ "UNL-43272",                  0,    0, CHRRAM_0,  UNL_43272}, // used in Gaau Hok Gwong Cheung
-	{ "BTL-MARIO1-MALEE2",          0,    0, CHRRAM_0,  UNL_MMALEE}, // mapper 55?
+	{ "BTL-MARIO1-MALEE2",          0,    0, CHRRAM_0,  UNL_MMALEE}, // mapper 55
 	{ "BMC-FK23C",                  0,    0, CHRRAM_0,  BMC_FK23C},
 	{ "BMC-FK23CA",                 0,    0, CHRRAM_0,  BMC_FK23CA},
 	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  BMC_G63IN1 },
@@ -123,7 +123,7 @@ static const unif unif_list[] =
 	{ "BMC-411120-C",               0,    0, CHRRAM_0,  BMC_411120C},
 	{ "BMC-8157",                   0,    0, CHRRAM_8,  BMC_8157},
 	{ "BMC-830118C",                0,    0, CHRRAM_0,  BMC_830118C},
-	{ "BMC-D1038",                  0,    0, CHRRAM_0,  BMC_VT5201}, // mapper 60?
+	{ "BMC-D1038",                  0,    0, CHRRAM_0,  BMC_VT5201}, // mapper 59
 	{ "BMC-SUPERVISION16IN1",       0,    0, CHRRAM_0,  SVISION16_BOARD}, // mapper 53
 	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  BMC_NTD_03},
 	{ "UNL-AC08",                   0,    0, CHRRAM_0,  UNL_AC08},
