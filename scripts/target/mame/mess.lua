@@ -3296,7 +3296,6 @@ files {
 	MAME_DIR .. "src/mame/machine/osborne1.cpp",
 	MAME_DIR .. "src/mame/drivers/osbexec.cpp",
 	MAME_DIR .. "src/mame/drivers/vixen.cpp",
-	MAME_DIR .. "src/mame/includes/vixen.h",
 }
 
 createMESSProjects(_target, _subtarget, "osi")

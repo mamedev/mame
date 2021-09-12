@@ -34,17 +34,20 @@ MB7051 - fuse programmed prom.
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/timer.h"
 #include "sound/mea8000.h"
 #include "sound/spkrdev.h"
-#include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
+namespace {
 
 class homelab_state : public driver_device
 {
@@ -66,7 +69,7 @@ protected:
 	u8 m_rows;
 	u8 m_cols;
 	required_device<cpu_device> m_maincpu;
-	required_memory_bank    m_bank1;
+	required_memory_bank m_bank1;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
@@ -76,14 +79,14 @@ protected:
 class homelab2_state : public homelab_state
 {
 public:
-	homelab2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: homelab_state(mconfig, type, tag)
-		{ }
+	using homelab_state::homelab_state;
 
 	void homelab2(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	void machine_start() override;
 	INTERRUPT_GEN_MEMBER(homelab_frame);
 	void homelab2_mem(address_map &map);
 	u8 cass2_r();
@@ -98,21 +101,22 @@ private:
 class homelab3_state : public homelab_state
 {
 public:
-	homelab3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: homelab_state(mconfig, type, tag)
-		{ }
+	using homelab_state::homelab_state;
 
 	void homelab3(machine_config &config);
 	void brailab4(machine_config &config);
+
 	DECLARE_READ_LINE_MEMBER(cass3_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	u8 exxx_r(offs_t offset);
 	std::unique_ptr<u8[]> m_ram;
 	void port7f_w(u8 data);
 	void portff_w(u8 data);
-	void machine_start() override;
-	void machine_reset() override;
 	void homelab3_io(address_map &map);
 	void homelab3_mem(address_map &map);
 	void brailab4_io(address_map &map);
@@ -133,9 +137,9 @@ u8 homelab2_state::mem3800_r()
 
 u8 homelab2_state::mem3a00_r(offs_t offset)
 {
-	u8 i,data = 0xff;
+	u8 data = 0xff;
 
-	for (i=0; i<8; i++)
+	for (u8 i=0; i<8; i++)
 		if (!BIT(offset, i))
 			data &= m_io_keyboard[i]->read();
 
@@ -231,7 +235,7 @@ void homelab2_state::homelab2_mem(address_map &map)
 	map(0x3c00, 0x3dff).w(FUNC(homelab2_state::mem3c00_w));
 	map(0x3e00, 0x3fff).w(FUNC(homelab2_state::mem3e00_w));
 	map(0x4000, 0x7fff).ram();
-	map(0xc000, 0xc3ff).mirror(0xc00).bankrw("bank1");
+	map(0xc000, 0xc3ff).mirror(0xc00).bankrw(m_bank1);
 	map(0xe000, 0xffff).r(FUNC(homelab2_state::cass2_r));
 }
 
@@ -240,7 +244,7 @@ void homelab3_state::homelab3_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xcfff).ram();
 	map(0xe800, 0xefff).r(FUNC(homelab3_state::exxx_r));
-	map(0xf800, 0xffff).bankrw("bank1");
+	map(0xf800, 0xffff).bankrw(m_bank1);
 }
 
 void homelab3_state::homelab3_io(address_map &map)
@@ -879,6 +883,9 @@ ROM_START( brailab4 )
 	// a small prom
 	ROM_LOAD_OPTIONAL( "brlcpm.rom",      0x5000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 
