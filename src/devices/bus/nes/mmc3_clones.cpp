@@ -73,6 +73,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45", 
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device,     "nes_bmc_k3006",     "NES Cart BMC K-3006 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device,   "nes_bmc_411120c",   "NES Cart BMC 411120C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_820720C,   nes_bmc_820720c_device,   "nes_bmc_820720c",   "NES Cart BMC 820720C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830118C,   nes_bmc_830118c_device,   "nes_bmc_830118c",   "NES Cart BMC 830118C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830832C,   nes_bmc_830832c_device,   "nes_bmc_830832c",   "NES Cart BMC 830832C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_841101C,   nes_bmc_841101c_device,   "nes_bmc_841101c",   "NES Cart BMC 841101C PCB")
@@ -322,6 +323,11 @@ nes_bmc_k3006_device::nes_bmc_k3006_device(const machine_config &mconfig, const 
 
 nes_bmc_411120c_device::nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_411120C, tag, owner, clock), m_reg(0)
+{
+}
+
+nes_bmc_820720c_device::nes_bmc_820720c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_820720C, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -750,6 +756,20 @@ void nes_bmc_411120c_device::pcb_reset()
 
 	m_reg = 0;
 	mmc3_common_initialize(0x0f, 0x7f, 0);
+}
+
+void nes_bmc_820720c_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_820720c_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_reg = 0;
+	mmc3_common_initialize(0x0f, 0xff, 0);
 }
 
 void nes_bmc_830118c_device::device_start()
@@ -2630,6 +2650,75 @@ void nes_bmc_411120c_device::write_m(offs_t offset, u8 data)
 		}
 		m_chr_base = (m_reg & 0x07) << 7;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+/*-------------------------------------------------
+
+ BMC-820720C
+
+ Games: 1993 Super HiK 8 in 1 (G-002)
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 393
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_820720c_device::set_prg(int prg_base, int prg_mask)
+{
+	switch (m_reg >> 4)
+	{
+		case 0:            // MMC3 mode
+		case 1:
+			nes_txrom_device::set_prg(prg_base, prg_mask);
+			break;
+		case 2:            // BNROM mode
+			prg32((prg_base | (m_mmc_prg_bank[BIT(m_latch, 6) << 1] & prg_mask)) >> 2);
+			break;
+		case 3:            // UNROM mode
+			prg16_89ab(m_prg_base >> 1);
+			prg16_cdef(m_prg_base >> 1 | 0x07);
+			break;
+	}
+}
+
+void nes_bmc_820720c_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (BIT(m_reg, 3))
+		chr8(0, CHRRAM);
+	else
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+}
+
+void nes_bmc_820720c_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_820720c write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if ((m_wram_protect & 0xc0) == 0x80)
+	{
+		m_reg = offset & 0x3f;
+
+		m_prg_base = (m_reg & 0x07) << 4;
+		set_prg(m_prg_base, m_prg_mask);
+
+		m_chr_base = (m_reg & 0x01) << 8;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+void nes_bmc_820720c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_820720c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	txrom_write(offset, data);     // MMC3 regs always written (for mirroring in non-MMC3 modes)
+
+	if ((m_reg & 0x30) == 0x30)    // UNROM mode
+	{
+		prg16_89ab(m_prg_base >> 1 | (data & 0x07));
+		prg16_cdef(m_prg_base >> 1 | 0x07);
 	}
 }
 

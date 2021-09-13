@@ -51820,6 +51820,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_7jy15">
+		<description>7 in 1 1993 Chess Series (JY-015)</description>
+		<year>1993</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_jy820845c" />
+			<dataarea name="prg" size="524288">
+				<rom name="7-in-1 1993 chess series (jy-015).prg" size="524288" crc="031145a4" sha1="8e3ac6091b56f1232b215ff71570511f73a5f60a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="7-in-1 1993 chess series (jy-015).chr" size="131072" crc="9161bb42" sha1="948b1ffcc923de38dd1b60c69a189ca807571e17" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4jy18">
 		<description>1996 Super HiK 4 in 1 (JY-018)</description>
 		<year>1996</year>
@@ -82516,6 +82534,24 @@ to check why this is different -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="super hik 7 in 1 (multicart k7006).prg" size="524288" crc="0a1969be" sha1="f7ed8a041765d4d8c397148e5e9a96128a02196a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_sh8g2">
+		<description>1993 Super HiK 8 in 1 (G-002)</description>
+		<year>1993</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_820720c" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1993 super hik 8-in-1 (g-002).prg" size="1048576" crc="7d53f79d" sha1="7bbd6ba60be45977a4b7f354619bf80132d594a4" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1993 super hik 8-in-1 (g-002).chr" size="524288" crc="aed5ac3c" sha1="342f804a753fbcaccebd0094f151183b62356dd1" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
