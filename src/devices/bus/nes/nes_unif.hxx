@@ -107,7 +107,7 @@ static const unif unif_list[] =
 	{ "UNL-TEK90",                  0,    0, CHRRAM_0,  JYCOMPANY_A}, // JY Company A (is TEK90 the real PCB name?)
 	{ "UNL-KS7017",                 0,    0, CHRRAM_0,  KAISER_KS7017},
 	{ "UNL-KS7032",                 0,    0, CHRRAM_0,  KAISER_KS7032}, //  mapper 142
-	{ "UNL-603-5052",               0,    0, CHRRAM_0,  UNL_603_5052}, // mapper 238?
+	{ "UNL-603-5052",               0,    0, CHRRAM_0,  UNL_603_5052}, // mapper 238
 	{ "UNL-EDU2000",                0,   32, CHRRAM_8,  UNL_EDU2K},
 	{ "UNL-H2288",                  0,    0, CHRRAM_0,  UNL_H2288}, // mapper 123
 	{ "UNL-SHERO",                  0,    0, CHRRAM_8,  SACHEN_SHERO},
@@ -135,8 +135,8 @@ static const unif unif_list[] =
 	{ "UNL-TF1201",                 0,    0, CHRRAM_0,  UNL_TF1201},
 	{ "UNL-DANCE2000",              0,    8, CHRRAM_8,  SUBOR_TYPE2}, // similar to some Subor carts
 	{ "BMC-12-IN-1",                0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
-	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236?
-	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236?
+	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236
+	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236
 	{ "BMC-42IN1RESETSWITCH",       0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 60?
 	{ "BMC-F-15",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // 150-in-1 Unchained Melody
 	{ "BMC-HP898F",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Primasoft 9999999-in-1

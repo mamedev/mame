@@ -314,16 +314,16 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("tobidase",         NES_TOBIDASE);   // mapper 120
 	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55
 	device.option_add_internal("unl_2708",         NES_2708);       // mapper 103
-	device.option_add_internal("unl_dh08",         NES_DH08);       // used in Bubble Bobble alt (FDS Conversion);
-	device.option_add_internal("unl_le05",         NES_LE05);       // used in ProWres (FDS Conversion);
-	device.option_add_internal("unl_lg25",         NES_LG25);       // used in Moero TwinBee (FDS Conversion);
-	device.option_add_internal("unl_lh10",         NES_LH10);       // used in Fuuun Shaolin Kyo (FDS Conversion);
+	device.option_add_internal("unl_dh08",         NES_DH08);       // used in Bubble Bobble alt (FDS Conversion)
+	device.option_add_internal("unl_le05",         NES_LE05);       // used in ProWres (FDS Conversion)
+	device.option_add_internal("unl_lg25",         NES_LG25);       // used in Moero TwinBee (FDS Conversion)
+	device.option_add_internal("unl_lh10",         NES_LH10);       // used in Fuuun Shaolin Kyo (FDS Conversion)
 	device.option_add_internal("unl_lh28_lh54",    NES_LH28_LH54);  // used in Falsion, Meikyuu Jiin Dababa FDS conversions
 	device.option_add_internal("unl_lh31",         NES_LH31);       // used in Bubble Bobble alt FDS conversion
 	device.option_add_internal("unl_lh32",         NES_LH32);       // used by Monty no Doki Doki Daidassou FDS conversion
 	device.option_add_internal("unl_lh42",         NES_LH42);       // used by Highway Star Whirlwind Manu bootleg
 	device.option_add_internal("unl_lh51",         NES_LH51);       // used in Ai Senshi Nicol alt FDS conversion
-	device.option_add_internal("unl_lh53",         NES_LH53);       // used in Nazo no Murasamejou (FDS Conversion);
+	device.option_add_internal("unl_lh53",         NES_LH53);       // used in Nazo no Murasamejou (FDS Conversion)
 	device.option_add_internal("unl_ac08",         NES_AC08);       // used by Green Beret FDS conversion
 	device.option_add_internal("sgpipe",           NES_SHUIGUAN);   // mapper 183
 	device.option_add_internal("rt01",             NES_RT01);
@@ -344,7 +344,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("kasing",           NES_KASING);
 	device.option_add_internal("kay",              NES_KAY);
 	device.option_add_internal("h2288",            NES_H2288);
-	device.option_add_internal("unl_6035052",      NES_6035052); // mapper 238?
+	device.option_add_internal("unl_6035052",      NES_6035052); // mapper 238
 	device.option_add_internal("txc_tw",           NES_TXC_TW);
 	device.option_add_internal("kof97",            NES_KOF97);
 	device.option_add_internal("kof96",            NES_KOF96);
@@ -405,14 +405,14 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_35in1",        NES_BMC_35IN1);
 	device.option_add_internal("bmc_36in1",        NES_BMC_36IN1);
 	device.option_add_internal("bmc_64in1",        NES_BMC_64IN1);
-	device.option_add_internal("bmc_70in1",        NES_BMC_70IN1);   // mapper 236?
+	device.option_add_internal("bmc_70in1",        NES_BMC_70IN1);   // mapper 236
 	device.option_add_internal("bmc_72in1",        NES_BMC_72IN1);
 	device.option_add_internal("bmc_76in1",        NES_BMC_76IN1);
 	device.option_add_internal("bmc_s42in1",       NES_BMC_76IN1);
 	device.option_add_internal("bmc_150in1",       NES_BMC_150IN1);
 	device.option_add_internal("bmc_190in1",       NES_BMC_190IN1);
 	device.option_add_internal("bmc_500in1",       NES_BMC_500IN1);
-	device.option_add_internal("bmc_800in1",       NES_BMC_800IN1);     // mapper 236?
+	device.option_add_internal("bmc_800in1",       NES_BMC_800IN1);     // mapper 236
 	device.option_add_internal("bmc_1200in1",      NES_BMC_1200IN1);
 	device.option_add_internal("bmc_gold150",      NES_BMC_GOLD150);    // mapper 235 with 2M PRG
 	device.option_add_internal("bmc_gold260",      NES_BMC_GOLD260);    // mapper 235 with 4M PRG
