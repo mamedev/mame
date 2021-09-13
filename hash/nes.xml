@@ -22801,6 +22801,7 @@ license:CC0
 			<feature name="slot" value="zemina" />
 			<!-- Generic board! No signature, according to kevtris. Using ZEMINA -->
 			<feature name="pcb" value="ZEMINA" />
+			<feature name="mirroring" value="vertical" />
 			<!-- No stickers either, except for "ZM-900" and "ZM-920". Likely production codes? -->
 			<dataarea name="chr" size="131072">
 				<rom name="zm-920" size="131072" crc="fc8c3915" sha1="e79bf2aa4d44243176128452e9f5db7e8d0cc8d1" offset="00000" />
