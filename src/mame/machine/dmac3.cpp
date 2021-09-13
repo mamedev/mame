@@ -108,7 +108,7 @@ void dmac3_device::conf_w(DMAC3_Controller controller, uint32_t data)
 	// Log is polluted with switching between SPIFI3 and regular mode
 	// Will probably remove the if at some point, but we can mostly trust all 3
 	// DMAC+SPIFI3 users (MROM, NEWS-OS, and NetBSD) to follow this correctly
-	if(data != CONF_FASTACCESS && data != CONF_SLOWACCESS)
+	if((data & CONF_WIDTH) != (m_controllers[controller].conf & CONF_WIDTH))
 	{
 		LOG("dmac3-%d conf_w: 0x%x\n", controller, data);
 	}

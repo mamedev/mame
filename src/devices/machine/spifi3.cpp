@@ -409,7 +409,33 @@ void spifi3_device::prcmd_w(uint32_t data)
 
     switch(data) // TODO: commands might be queued like the 5390?
     {
+        // TODO: a lot of these can be consolidated
+        case PRC_DATAOUT:
+        {
+            LOG("Got DATAOUT command! Starting data output phase...\n");
+            state = INIT_XFR;
+            xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+
+            dma_command = false; // xxx
+            dma_set(DMA_NONE); // xxx
+            check_drq();
+            step(false);
+            break;
+        }
+        case PRC_DATAIN:
+        {
+            LOG("Got DATAIN command! Starting data input phase...\n");
+            state = INIT_XFR;
+            xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+
+            dma_command = (spifi_reg.autodata & ADATA_IN) > 0; // TODO: ID check
+            dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
+            check_drq();
+            step(false);
+            break;
+        }
         case PRC_COMMAND:
+        {
             LOG("Got COMMAND command! Starting transfer of status information...\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
@@ -420,6 +446,7 @@ void spifi3_device::prcmd_w(uint32_t data)
             check_drq();
             step(false);
             break;
+        }
         case PRC_STATUS:
         {
             LOG("Got STATUS command! Starting transfer of status information...\n");
@@ -450,6 +477,7 @@ void spifi3_device::prcmd_w(uint32_t data)
             break;
         }
         case PRC_MSGOUT:
+        {
             LOG("Got MSGOUT command! Starting message output phase...\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
@@ -459,6 +487,7 @@ void spifi3_device::prcmd_w(uint32_t data)
             check_drq();
             step(false);
             break;
+        }
         case PRC_MSGIN:
         {
             LOG("Got MSGIN command! Starting message input phase...\n");
@@ -1115,7 +1144,7 @@ void spifi3_device::step(bool timeout)
             if((state & STATE_MASK) != INIT_XFR_RECV_PAD)
             {
                 auto data = scsi_bus->data_r();
-                LOG("Got 0x%x!\n", data);
+                LOG("Got 0x%x! FIFO count: %d\n", data, m_even_fifo.size() + 1);
                 m_even_fifo.push(data);
                 check_drq();
             }
@@ -1142,12 +1171,12 @@ void spifi3_device::step(bool timeout)
             // Wait for a command, or if autoidentify was enabled, just do it
             // This is reverse engineered from what the NWS-5000 MROM does - NetBSD doesn't use this at all
             // so this may not be fully accurate.
-            if (((spifi_reg.prcmd & PRC_NJMP) || !(spifi_reg.prcmd & PRC_COMMAND)) && !(spifi_reg.identify & 0x80)) // had && !(spifi_reg.cmlen & CML_ACOM_EN) here, but it needs to move
+            /*if (((spifi_reg.prcmd & PRC_NJMP) || !(spifi_reg.prcmd & PRC_COMMAND)) && !(spifi_reg.identify & 0x80)) // had && !(spifi_reg.cmlen & CML_ACOM_EN) here, but it needs to move
             {
                 // dma starts after bus arbitration/selection is complete
                 check_drq();
                 break;
-            }
+            } */
 
             // Extract the command length from the cmlen register and reset our index into the command buffer if a command was given
             /*if(!(spifi_reg.prcmd & PRC_NJMP) && (spifi_reg.prcmd & PRC_COMMAND))
@@ -1362,11 +1391,11 @@ void spifi3_device::step(bool timeout)
                 }
 
                 case S_PHASE_DATA_IN:
-                case S_PHASE_STATUS: // TODO: autostatus
+                case S_PHASE_STATUS:
                 case S_PHASE_MSG_IN:
                 {
                     // can't receive if the fifo is full
-                    if (m_even_fifo.size() == 8)
+                    if (m_even_fifo.size() == 8 && !(xfr_phase == S_PHASE_STATUS && spifi_reg.autostat)) // XXX - no idea if status goes to the fifo or not
                     {
                         // check_drq(); // in case data should be transferred now
                         break;
@@ -1451,11 +1480,28 @@ void spifi3_device::step(bool timeout)
             else
             {
                 // check for phase change
-                if((ctrl & S_PHASE_MASK) != xfr_phase)
+                auto newPhase = ctrl & S_PHASE_MASK;
+                if (newPhase != xfr_phase)
                 {
-                    LOG("Phase changed to %d\n", ctrl & S_PHASE_MASK);
+                    LOG("Phase changed to %d\n", newPhase);
                     command_pos = 0;
-                    state = INIT_XFR_BUS_COMPLETE;
+
+                    // If initiator autostatus is enabled, we can automatically do the status phase
+                    // TODO: ID checking and actually transferring the status byte to the appropriate SPIFI register
+                    if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                    {
+                        LOG("Autostat enabled, proceeding to status input automatically\n");
+                        state = INIT_XFR;
+
+                        // Below this is a guess
+                        dma_command = false;
+                        dma_dir = DMA_NONE;
+                    }
+                    else
+                    {
+                        LOG("Finished phase, marking bus complete\n");
+                        state = INIT_XFR_BUS_COMPLETE;
+                    }
                 }
                 else
                 {
