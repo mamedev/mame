@@ -12,7 +12,7 @@
 
   4 En Raya (set 1),                              1990, IDSA.
   4 En Raya (set 2),                              1990, IDSA.
-  Paradise / Gum                                  199?, TourVision
+  unknown bowling themed 'gum' poker machine      1992?,Paradise Automatique / TourVision
   unknown 'Pac-Man' gambling game,                1990, Unknown.
   unknown 'Space Invaders' gambling game (set 1), 1990, Unknown (made in France).
   unknown 'Space Invaders' gambling game (set 2), 199?, Unknown.
@@ -796,9 +796,20 @@ void unk_gambl_enc_state::driver_init()
 GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
 
-// ROMs had TourVision stickers, is Gum a generic term for gambling games?
-// TourVision was a Spanish developer, but this kind of machine was illegal in Spain, so made for the French market instead?
-GAME( 199?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"TourVisión", "Paradise / Gum (France)",        MACHINE_SUPPORTS_SAVE )
+// The PCB here was marked as a 'Gum' machine and is from a gambling machine that instead of paying out money would dispense chewing gum as prizes
+// Other games with 'Gum' in the title also exist, see 'Chewing Gum' and 'Royal Gum' in other drivers for example, these were likely used with similar
+// chewing gum dispensers.
+//
+// TourVision was a Spanish developer, PCB had TourVision stickers, but this kind of machine was illegal in Spain, so made for the French market instead
+//
+// Ariège Amusements was the exclusive distributor of TourVision products until 1991, Paradise Automatique was a spin-off of this distributor 
+// and was legally created in 1992 to import/export food vending machines, video games and audiovisual appliances and continued to work with
+// TourVision.
+// 
+// A version of this exists (on newer hardware?) with the title 'Lucky Gum' or 'Luck Gum' however the supported game shows no title screen so the title
+// is unknown.
+
+GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacgb, unkpacg, unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",        MACHINE_SUPPORTS_SAVE )
