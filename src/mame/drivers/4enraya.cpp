@@ -644,6 +644,20 @@ ROM_START( 4enrayaa )
 	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) /* system control: used for memory mapping */
 ROM_END
 
+/*
+  The PCB here was marked as a 'Gum' machine and is from a gambling machine that instead of paying out money would dispense chewing gum as prizes
+  Other games with 'Gum' in the title also exist, see 'Chewing Gum' and 'Royal Gum' in other drivers for example, these were likely used with similar
+  chewing gum dispensers.
+
+  TourVision was a Spanish developer, PCB had TourVision stickers, but this kind of machine was illegal in Spain, so made for the French market instead
+
+  Ariège Amusements was the exclusive distributor of TourVision products until 1991, Paradise Automatique was a spin-off of this distributor 
+  and was legally created in 1992 to import/export food vending machines, video games and audiovisual appliances and continued to work with
+  TourVision.
+ 
+  A version of this exists (on newer hardware?) with the title 'Lucky Gum' or 'Luck Gum' however the supported game shows no title screen so the title
+  is unknown.
+*/
 
 ROM_START( tourpgum )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -795,19 +809,6 @@ void unk_gambl_enc_state::driver_init()
 /*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS            INIT        ROT   COMPANY      FULLNAME                                          FLAGS  */
 GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
-
-// The PCB here was marked as a 'Gum' machine and is from a gambling machine that instead of paying out money would dispense chewing gum as prizes
-// Other games with 'Gum' in the title also exist, see 'Chewing Gum' and 'Royal Gum' in other drivers for example, these were likely used with similar
-// chewing gum dispensers.
-//
-// TourVision was a Spanish developer, PCB had TourVision stickers, but this kind of machine was illegal in Spain, so made for the French market instead
-//
-// Ariège Amusements was the exclusive distributor of TourVision products until 1991, Paradise Automatique was a spin-off of this distributor 
-// and was legally created in 1992 to import/export food vending machines, video games and audiovisual appliances and continued to work with
-// TourVision.
-// 
-// A version of this exists (on newer hardware?) with the title 'Lucky Gum' or 'Luck Gum' however the supported game shows no title screen so the title
-// is unknown.
 
 GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
 
