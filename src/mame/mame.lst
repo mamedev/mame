@@ -13820,6 +13820,9 @@ backgamc                        //
 cc7                             //
 cc7a                            //
 
+@source:fidel_checkc2.cpp
+checkc2
+
 @source:fidel_chesster.cpp
 chesster                        //
 chesstera                       //
