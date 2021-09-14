@@ -625,7 +625,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 	} else {
 		if(m_view) {
 			auto filter = [s = m_view->m_addrstart, e = m_view->m_addrend] (handler_entry::range r) { r.intersect(s, e); return r; };
-			
+
 			for(offs_t entry = start_entry & BITMASK; entry <= (end_entry & BITMASK); entry++) {
 				if(!(m_u_dispatch[entry]->flags() & handler_entry::F_UNMAP))
 					fatalerror("Collision on multiple init_handlers calls");

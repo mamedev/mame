@@ -10,6 +10,9 @@
 DEFINE_DEVICE_TYPE(INTELLEC4_UNIV_SLOT, bus::intellec4::univ_slot_device, "intlc4univslot", "INTELLEC 4 Universal Slot")
 DEFINE_DEVICE_TYPE(INTELLEC4_UNIV_BUS,  bus::intellec4::univ_bus_device,  "intlc4univbus",  "INTELLEC 4 Universal Bus")
 
+template class device_finder<bus::intellec4::device_univ_card_interface, false>;
+template class device_finder<bus::intellec4::device_univ_card_interface, true>;
+
 
 namespace bus::intellec4 {
 

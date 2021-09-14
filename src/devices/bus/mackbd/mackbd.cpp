@@ -94,6 +94,9 @@
 
 DEFINE_DEVICE_TYPE(MAC_KEYBOARD_PORT, mac_keyboard_port_device, "mackbd_port", "Macintosh 128k/512k/Plus Keyboard Port")
 
+template class device_finder<device_mac_keyboard_interface, false>;
+template class device_finder<device_mac_keyboard_interface, true>;
+
 
 //**************************************************************************
 //  HOST PORT
