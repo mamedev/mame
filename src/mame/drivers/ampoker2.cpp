@@ -1319,6 +1319,8 @@ ROM_END
   Could have jackpot features
   driven by external server.
 
+  The set is marked as "3A".
+
 */
 ROM_START( ampkr2jsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
