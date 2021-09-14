@@ -80212,10 +80212,11 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_42" supported="no">
+	<software name="mc_42">
 		<description>42 in 1 (Reset Switch)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch between two menus."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_reset42" />
 			<feature name="pcb" value="BMC-42IN1RESETSWITCH" />
@@ -81948,26 +81949,6 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_s22" supported="no">
-		<description>Super 22 in 1</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_s22games" />
-			<feature name="pcb" value="BMC-SUPER22GAMES" />
-			<dataarea name="prg" size="1048576">
-				<rom name="super 22-in-1 [p1].prg" size="1048576" crc="b27414ed" sha1="aedece9fbe7f399591816b6c642c6fb4779a8d40" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-			<dipswitch name="Menu type" tag="DSW" mask="1">
-				<dipvalue name="22-in-1" value="0" default="yes"/>
-				<dipvalue name="20-in-1" value="1"/>
-			</dipswitch>
-		</part>
-	</software>
-
 <!-- The UNIF file contained separate PRG/CHR banks -->
 	<software name="mc_s24" supported="partial">
 		<description>Super 24 in 1</description>
@@ -82253,7 +82234,7 @@ to check why this is different -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_s42in1" />
+			<feature name="slot" value="bmc_76in1" />
 			<feature name="pcb" value="BMC-SUPER42IN1" />
 			<dataarea name="prg" size="1048576">
 				<rom name="super 42 in 1.prg" size="1048576" crc="c9f92bd9" sha1="6060eb360b9b4ae7aca024c00ace5b472371d721" offset="00000" status="baddump" />
