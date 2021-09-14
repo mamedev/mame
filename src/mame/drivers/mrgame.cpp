@@ -705,6 +705,6 @@ ROM_END
 
 
 GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1990,  macattck,  0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  wcup90,    0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "World Cup 90",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
