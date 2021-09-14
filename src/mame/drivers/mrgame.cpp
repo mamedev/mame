@@ -657,31 +657,31 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(macattck)
 	ROM_REGION16_BE(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, NO_DUMP)
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, NO_DUMP)
+	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x0000, 0x8000, CRC(35cabad1) SHA1(01279df881b0d7d6586c1b8570b12bdc1fb9ff21) )
+	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x0001, 0x8000, CRC(6a4d7b89) SHA1(090e1a6c069cb6e5efd26a0260df613375f0b063) )
 
 	ROM_REGION(0x8000, "video", 0)
-	ROM_LOAD("vid_ic91.rom", 0x0000, 0x8000, CRC(42d2ba01) SHA1(c13d38c2798575760461912cef65dde57dfd938c))
+	ROM_LOAD("vid_ic91.rom", 0x0000, 0x8000, CRC(42d2ba01) SHA1(c13d38c2798575760461912cef65dde57dfd938c) )
 
-	ROM_REGION(0x30000, "chargen", 0)
-	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(f6e047fb) SHA1(6be712dda60257b9e7014315c8fee19812622bf6))
-	ROM_LOAD("vid_ic15.rom", 0x08000, 0x8000, CRC(405a8f54) SHA1(4d58915763db3c3be2bfc166be1a12285ff2c38b))
-	ROM_LOAD("vid_ic16.rom", 0x10000, 0x8000, CRC(063ea783) SHA1(385dbfcc8ecd3a784f9a8752d00e060b48d70d6a))
-	ROM_LOAD("vid_ic17.rom", 0x18000, 0x8000, CRC(9f95abf8) SHA1(d71cf36c8bf27ad41b2d3cebd0af620a34ce0062) BAD_DUMP)
-	ROM_LOAD("vid_ic18.rom", 0x20000, 0x8000, CRC(83ef25f8) SHA1(bab482badb8646b099dbb197ca9af3a126b274e3))
+	ROM_REGION(0x28000, "chargen", 0)
+	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(f6e047fb) SHA1(6be712dda60257b9e7014315c8fee19812622bf6) )
+	ROM_LOAD("vid_ic15.rom", 0x08000, 0x8000, CRC(405a8f54) SHA1(4d58915763db3c3be2bfc166be1a12285ff2c38b) )
+	ROM_LOAD("vid_ic16.rom", 0x10000, 0x8000, CRC(063ea783) SHA1(385dbfcc8ecd3a784f9a8752d00e060b48d70d6a) )
+	ROM_LOAD("vid_ic17.rom", 0x18000, 0x8000, CRC(7494e44e) SHA1(c7c062508e81b9fd818f36f80d4a6da02c3bda40) )
+	ROM_LOAD("vid_ic18.rom", 0x20000, 0x8000, CRC(83ef25f8) SHA1(bab482badb8646b099dbb197ca9af3a126b274e3) )
 
 	ROM_REGION(0x0020, "proms", 0)
-	ROM_LOAD("vid_ic61.rom", 0x0000, 0x0020, CRC(538c72ae) SHA1(f704492568257fcc4a4f1189207c6fb6526eb81c) BAD_DUMP)
+	ROM_LOAD("vid_ic61.rom", 0x0000, 0x0020, CRC(538c72ae) SHA1(f704492568257fcc4a4f1189207c6fb6526eb81c) BAD_DUMP) // from wcup90, assumed to be the same
 
 	ROM_REGION(0x10000, "audio1", 0)
-	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, NO_DUMP)
+	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(4ab94d16) SHA1(4c3755489f699c751d664f420b9852ef16bb3aa6) )
 
 	ROM_REGION(0x4000, "m114", 0)
-	ROM_LOAD("snd_ic22.rom", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD("snd_ic22.rom", 0x0000, 0x4000, CRC(9d3546c5) SHA1(cc6e91288692b927f7d046e192b1fd128c126d0d) )
 
 	ROM_REGION(0x10000, "audio2", 0)
-	ROM_LOAD("snd_ic35.rom", 0x0000, 0x8000, NO_DUMP)
-	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, NO_DUMP)
+	ROM_LOAD("snd_ic35.rom", 0x0000, 0x8000, CRC(52e9811c) SHA1(52223cf14a185b4dab14143d797000baf6d618cc) )
+	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(2e6b5822) SHA1(9e390e4b71cc103ec3d781575df484a3e4217b3b) )
 ROM_END
 
 /*-------------------------------------------------------------------
