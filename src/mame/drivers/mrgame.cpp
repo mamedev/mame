@@ -7,12 +7,7 @@
     These games have a M68000 and 3x Z80, and a M114 Sound IC.
     They have a video screen upon which the scores and other info is displayed.
 
-Status:
-- motrshow, motrshowa, dakar working in the electronic sense, but not mechanically
-- macattck most roms are missing
-- wcup90 different hardware, partially coded based on macattck schematic
-
-How to set up the machine (motrshow, motrshowa, dakar):
+How to set up the machine (motor show, dakar, wcup90):
 - These machines need to be loaded with default settings before they can accept coins
 - Press - key (minus in main keyboard)
 - Press again until you see test 25 (Motor Show) or test 23 (Dakar)
@@ -24,6 +19,9 @@ How to set up the machine (motrshow, motrshowa, dakar):
 - However, the game cannot be played due to missing balls.
 
 ToDo:
+- Video
+- Outputs
+- Inputs
 - Support for electronic volume control
 - Audio rom banking
 - Most sounds missing due to unemulated M114 chip
@@ -45,6 +43,7 @@ ToDo:
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class mrgame_state : public driver_device
 {
@@ -418,7 +417,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mrgame_state::irq_timer)
 	}
 }
 
-// layouts from pinmame
 static const gfx_layout charlayout =
 {
 	8, 8,
@@ -485,54 +483,8 @@ void mrgame_state::mrgame_palette(palette_device &palette) const
 	}
 }
 
-// most of this came from pinmame as the diagram doesn't make a lot of sense
 uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y,ptr=0,col;
-	int32_t scrolly[32];
-	uint16_t chr;
-	bool flipx,flipy;
-
-	// text
-	for (x = 0; x < 32; x++)
-	{
-		scrolly[x] = -m_p_objectram[ptr++];
-		col = m_p_objectram[ptr++];
-
-		for (y = 0; y < 32; y++)
-		{
-			chr = m_p_videoram[x+y*32] | (m_gfx_bank << 8);
-
-			m_gfxdecode->gfx(0)->opaque(*m_tile_bitmap, m_tile_bitmap->cliprect(),
-				chr,
-				col,
-				m_flip,0,
-				x*8,y*8);
-		}
-	}
-
-	// scroll each column as needed
-	copyscrollbitmap(bitmap,*m_tile_bitmap,0,nullptr,32,scrolly,cliprect);
-
-
-	// sprites
-	for (ptr = 0x40; ptr < 0x60; ptr += 4)
-	{
-		x = m_p_objectram[ptr + 3] + 1;
-		y = 255 - m_p_objectram[ptr];
-		flipx = BIT(m_p_objectram[ptr + 1], 6);
-		flipy = BIT(m_p_objectram[ptr + 1], 7);
-		chr = (m_p_objectram[ptr + 1] & 0x3f) | (m_gfx_bank << 6);
-		col = m_p_objectram[ptr + 2];
-
-		if ((y > 16) && (x > 24))
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				chr,
-				col,
-				flipx,flipy,
-				x,y-16,0);
-	}
-
 	return 0;
 }
 
@@ -766,6 +718,8 @@ ROM_START(wcup90)
 	ROM_REGION(0x10000, "audio2", 0)
 	ROM_LOAD("snd_ic44.rom", 0x00000, 0x8000, CRC(00946570) SHA1(83e7dd89844679571ab2a803295c8ca8941a4ac7))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
