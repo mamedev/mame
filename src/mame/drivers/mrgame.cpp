@@ -634,6 +634,35 @@ ROM_START(motrshow)
 	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(4f42be6e) SHA1(684e988f413cd21c785ad5d60ef5eaddddaf72ab))
 ROM_END
 
+/*-----------------------------------------------------------------------
+/ Fast Track (1989)  A predecessor of Motor Show. Green Screen text only
+/-----------------------------------------------------------------------*/
+ROM_START(fasttrack)
+	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_LOAD16_BYTE("cpuic13.rom", 0x0000, 0x8000, CRC(675cbef6) SHA1(0561aee09bb459a79e54a903d39ef5e5288e8368))
+	ROM_LOAD16_BYTE("cpuic14.rom", 0x0001, 0x8000, CRC(57a1c42f) SHA1(fbfc7527068a1e68afa4c20d5c2650399a1ee3cd))
+
+	ROM_REGION(0x8000, "video", 0)
+	ROM_LOAD("ft_vid1.764", 0x0000, 0x2000, NO_DUMP )  // only dump we found was all 0xF7
+
+	ROM_REGION(0x10000, "chargen", ROMREGION_ERASEFF)
+	ROM_LOAD("ft_vid2.532",  0x0000, 0x001000, CRC(5145685b) SHA1(6857be53efee5d439311ddb93e9f509590ff26c9) )  // 2nd half is rubbish
+
+	// from here wasn't supplied, assumed same as motorshow
+	ROM_REGION(0x0020, "proms", 0)
+	ROM_LOAD("vid_ic66.rom", 0x0000, 0x0020, CRC(5b585252) SHA1(b88e56ebdce2c3a4b170aff4b05018e7c21a79b8))
+
+	ROM_REGION(0x10000, "audio1", 0)
+	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(fba5a8f1) SHA1(ddf989abebe05c569c9ecdd498bd8ea409df88ac))
+
+	ROM_REGION(0x4000, "m114", 0)
+	ROM_LOAD("snd_ic22.rom", 0x0000, 0x4000, CRC(e6c1098e) SHA1(06bf8917a27d5e46e4aab93e1f212918418e3a82))
+
+	ROM_REGION(0x10000, "audio2", 0)
+	ROM_LOAD("snd_ic35.rom", 0x0000, 0x8000, CRC(9dec153d) SHA1(8a0140257316aa19c0401456839e11b6896609b1))
+	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(4f42be6e) SHA1(684e988f413cd21c785ad5d60ef5eaddddaf72ab))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Mac Attack (1990)
 /-------------------------------------------------------------------*/
@@ -705,6 +734,7 @@ ROM_END
 
 
 GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  fasttrack, motrshow,  mrgame,  mrgame, mrgame_state, empty_init,  ROT0, "Mr Game", "Fast Track",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1990,  macattck,  0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  wcup90,    0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "World Cup 90",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
