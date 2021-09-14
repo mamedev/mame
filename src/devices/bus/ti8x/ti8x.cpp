@@ -19,9 +19,6 @@
 
 DEFINE_DEVICE_TYPE(TI8X_LINK_PORT, ti8x_link_port_device, "ti8x_link_port", "TI-8x Link Port")
 
-template class device_finder<device_ti8x_link_port_interface, false>;
-template class device_finder<device_ti8x_link_port_interface, true>;
-
 
 ti8x_link_port_device::ti8x_link_port_device(
 		machine_config const &mconfig,
@@ -615,6 +612,12 @@ void device_ti8x_link_port_byte_interface::bit_received(bool data)
 #include "graphlinkhle.h"
 #include "teeconn.h"
 #include "tispeaker.h"
+
+
+// must come after including the headers that declare these extern
+template class device_finder<device_ti8x_link_port_interface, false>;
+template class device_finder<device_ti8x_link_port_interface, true>;
+
 
 void default_ti8x_link_devices(device_slot_interface &device)
 {

@@ -94,9 +94,6 @@
 
 DEFINE_DEVICE_TYPE(MAC_KEYBOARD_PORT, mac_keyboard_port_device, "mackbd_port", "Macintosh 128k/512k/Plus Keyboard Port")
 
-template class device_finder<device_mac_keyboard_interface, false>;
-template class device_finder<device_mac_keyboard_interface, true>;
-
 
 //**************************************************************************
 //  HOST PORT
@@ -161,6 +158,11 @@ void device_mac_keyboard_interface::interface_validity_check(validity_checker &v
 
 #include "keyboard.h"
 #include "pluskbd.h"
+
+
+// must come after including the headers that declare these extern
+template class device_finder<device_mac_keyboard_interface, false>;
+template class device_finder<device_mac_keyboard_interface, true>;
 
 
 void mac_keyboard_devices(device_slot_interface &device)
