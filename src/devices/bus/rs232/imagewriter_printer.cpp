@@ -5,9 +5,13 @@
 
     Apple ImageWriter Printer
 
-    Simple printer emulation
 
-    This allows capturing the byte stream to a file.
+
+If you use "#define IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE" then you also get
+
+    Simple printer emulation which allows capturing the byte stream to a file.
+
+    This can be useful in trying to debug the serial byte stream to confirm that the device is receiving it.
 
 
 Notes:
@@ -60,6 +64,7 @@ Notes:
 #include "logmacro.h"
 #include <math.h>
 
+
 DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "Apple ImageWriter Printer A9M0303")
 
 apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -69,10 +74,14 @@ apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine
 
 apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	device_serial_interface(mconfig, *this),
+#endif
 	device_rs232_port_interface(mconfig, *this),
 	m_initial_rx_state(1),
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	m_printer(*this, "printer"),
+#endif
 	m_maincpu(*this, "maincpu"),
 	m_uart(*this, "uart"),
 	m_8155head(*this, "8155head"),
@@ -82,19 +91,23 @@ apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine
 	m_bitmap_printer(*this, "bitmap_printer"),
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
-	m_timer_rxclock(*this, "rx_clock_8251"),
-
+	m_timer_rxclock(*this, "rx_clock_8251")
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
+	,
 	m_rs232_rxbaud(*this, "RS232_RXBAUD"),
 	m_rs232_databits(*this, "RS232_DATABITS"),
 	m_rs232_parity(*this, "RS232_PARITY"),
 	m_rs232_stopbits(*this, "RS232_STOPBITS")
+#endif
 {
 }
 
 void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config)
 {
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	PRINTER(config, m_printer, 0);
 	m_printer->online_callback().set(FUNC(apple_imagewriter_printer_device::printer_online));
+#endif
 
 	// basic machine hardware
 	i8085a_cpu_device &cpu(I8085A(config, m_maincpu, baseCLK ));  // 9.8304_MHz_XTAL effectively 4.9152_MHz_XTAL
@@ -191,12 +204,16 @@ const tiny_rom_entry *apple_imagewriter_printer_device::device_rom_region() cons
 	return ROM_NAME(apple_imagewriter_printer);
 }
 
+
 static INPUT_PORTS_START( apple_imagewriter )
+
+
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	PORT_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", apple_imagewriter_printer_device, update_serial)
 	PORT_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", apple_imagewriter_printer_device, update_serial)
 	PORT_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", apple_imagewriter_printer_device, update_serial)
 	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", apple_imagewriter_printer_device, update_serial)
-
+#endif
 
 
 	PORT_START("RESET")
@@ -603,7 +620,6 @@ void apple_imagewriter_printer_device::darken_pixel(double darkpct, unsigned int
 
 void apple_imagewriter_printer_device::update_printhead()
 {
-
 	LOG("PRINTHEAD %x\n",m_dotpattern);
 //  printf("PRINTHEAD %x %s\n",m_dotpattern, std::bitset<9>(m_dotpattern).to_string().c_str());
 	const auto numdots = 9;
@@ -783,6 +799,7 @@ void apple_imagewriter_printer_device::device_start()
 //    Update Serial
 //-------------------------------------------------
 
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 WRITE_LINE_MEMBER(apple_imagewriter_printer_device::update_serial)
 {
 	int startbits = 1;
@@ -801,21 +818,27 @@ WRITE_LINE_MEMBER(apple_imagewriter_printer_device::update_serial)
 	output_dsr(0);
 	output_cts(0);
 }
+#endif
 
 //-------------------------------------------------
 //    Device Reset
 //-------------------------------------------------
 
+
 void apple_imagewriter_printer_device::device_reset()
 {
-	update_serial(0);
-}
+	output_dcd(0);  // must have this or super serial card won't work
 
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
+	update_serial(0);
+#endif
+}
+/*
 void apple_imagewriter_printer_device::device_reset_after_children()
 {
 }
-
-
+*/
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 WRITE_LINE_MEMBER(apple_imagewriter_printer_device::printer_online)
 {
 	/// TODO: ?
@@ -838,4 +861,4 @@ void apple_imagewriter_printer_device::rcv_complete()
 		if (c >=32 &&  c<=0x7f) printf("CHAR = %c\n",c); else printf("CHAR = 0x%x\n",c);
 	}
 }
-
+#endif

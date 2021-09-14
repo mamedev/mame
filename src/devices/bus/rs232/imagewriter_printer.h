@@ -5,9 +5,18 @@
 
 #pragma once
 
+// uncomment this to use the device serial interface for debugging
+//#define IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
+
+
+
 #include "rs232.h"
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 #include "imagedev/printer.h"
+#endif
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 #include "diserial.h"
+#endif
 #include "cpu/i8085/i8085.h"
 #include "bus/a2bus/bitmap_printer.h"
 #include "machine/i8155.h"
@@ -17,8 +26,13 @@
 #include "machine/74161.h"
 #include "machine/timer.h"
 
+// uncomment this to use the device serial interface for debugging
+//#define IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
+
 class apple_imagewriter_printer_device : public device_t,
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	public device_serial_interface,
+#endif
 	public device_rs232_port_interface
 {
 public:
@@ -45,9 +59,12 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override
 	{
 		// pipe the bit state along
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 		device_serial_interface::rx_w(state);
+#endif
 		m_uart-> write_rxd(state);
 
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 		double elapsed_time = machine().time().as_double() - last_time;
 		if (ioportsaferead("DEBUGMSG")) printf("INPUT TXD STATE = %x   %f  elapsed=%f\n", state, machine().time().as_double(), machine().time().as_double()-last_time);
 		if (min_time > 0.0)
@@ -65,9 +82,11 @@ public:
 		}
 		last_time = machine().time().as_double();
 		last_value = state;
+#endif
 	}
-
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
+#endif
 
 	INPUT_CHANGED_MEMBER(reset_sw)
 	{
@@ -166,9 +185,11 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_reset_after_children() override;
+//  virtual void device_reset_after_children() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;  // gotta be const and const!
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	virtual void rcv_complete() override;
+#endif
 	int m_initial_rx_state;
 
 	void mem_map(address_map &map);
@@ -176,8 +197,9 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(printer_online);
-
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	required_device<printer_image_device> m_printer;
+#endif
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8155_device> m_8155head;
@@ -191,10 +213,12 @@ private:
 
 	required_device<timer_device> m_timer_rxclock;
 
+#ifdef IMAGEWRITER_USE_DEVICE_SERIAL_INTERFACE
 	required_ioport m_rs232_rxbaud;
 	required_ioport m_rs232_databits;
 	required_ioport m_rs232_parity;
 	required_ioport m_rs232_stopbits;
+#endif
 
 	void maincpu_out_sod_func(uint8_t data);
 
@@ -220,9 +244,9 @@ private:
 
 	int page_count = 0;
 
-	XTAL baseCLK = 9.8304_MHz_XTAL;
-	XTAL CLK2 = baseCLK / 2;
-	XTAL CLK1 = CLK2 / 2;
+	XTAL baseCLK = 9.8304_MHz_XTAL;  // base clock to 8085 cpu = 9.8304 Mhz
+	XTAL CLK2 = baseCLK / 2;         // CLK2 name from Sams schematic = 4.9152 Mhz
+	XTAL CLK1 = CLK2 / 2;            // CLK1 name from Sams schematic = 2.4576 Mhz
 
 	const int dpi = 144;
 	const double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 162 dpi, not 144 dpi)
