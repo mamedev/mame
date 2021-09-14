@@ -602,34 +602,16 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(motrshow)
 	ROM_REGION16_BE(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, CRC(e862ca71) SHA1(b02e5f39f9427d58b70b7999a5ff6075beff05ae))
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, CRC(c898ae25) SHA1(f0e1369284a1e0f394f1d40281fd46252016602e))
-
-	ROM_REGION(0x8000, "video", 0)
-	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
-
-	ROM_REGION(0x10000, "chargen", 0)
-	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db))
-	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(1664ec8d) SHA1(e7b15acdac7dfc51b668e908ca95f02a2b569737))
-
-	ROM_REGION(0x0020, "proms", 0)
-	ROM_LOAD("vid_ic66.rom", 0x0000, 0x0020, CRC(5b585252) SHA1(b88e56ebdce2c3a4b170aff4b05018e7c21a79b8))
-
-	ROM_REGION(0x10000, "audio1", 0)
-	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(fba5a8f1) SHA1(ddf989abebe05c569c9ecdd498bd8ea409df88ac))
-
-	ROM_REGION(0x4000, "m114", 0)
-	ROM_LOAD("snd_ic22.rom", 0x0000, 0x4000, CRC(e6c1098e) SHA1(06bf8917a27d5e46e4aab93e1f212918418e3a82))
-
-	ROM_REGION(0x10000, "audio2", 0)
-	ROM_LOAD("snd_ic35.rom", 0x0000, 0x8000, CRC(9dec153d) SHA1(8a0140257316aa19c0401456839e11b6896609b1))
-	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(4f42be6e) SHA1(684e988f413cd21c785ad5d60ef5eaddddaf72ab))
-ROM_END
-
-ROM_START(motrshowa)
-	ROM_REGION16_BE(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpuic13a.rom", 0x000000, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da))
-	ROM_LOAD16_BYTE("cpuic14b.rom", 0x000001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af))
+	ROM_DEFAULT_BIOS("0")
+	ROM_SYSTEM_BIOS(0, "0", "0")
+	ROMX_LOAD( "cpu_0.ic13",  0x0000, 0x8000, CRC(e862ca71) SHA1(b02e5f39f9427d58b70b7999a5ff6075beff05ae), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "cpu_0.ic14",  0x0001, 0x8000, CRC(c898ae25) SHA1(f0e1369284a1e0f394f1d40281fd46252016602e), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "1", "1")
+	ROMX_LOAD( "cpu_1.ic13a", 0x0000, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "cpu_1.ic14b", 0x0001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "2", "2")
+	ROMX_LOAD( "cpu_2.ic13b", 0x0000, 0x8000, CRC(9cd2d6f3) SHA1(6f123367ccbe1376b4bd8a5ee0f636efe42f9eac), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "cpu_2.ic14b", 0x0001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af), ROM_SKIP(1) | ROM_BIOS(2) )
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
@@ -724,6 +706,5 @@ ROM_END
 
 GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1990,  macattck,  0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  wcup90,    0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "World Cup 90",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
