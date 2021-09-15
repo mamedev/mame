@@ -88,7 +88,7 @@ private:
 	void triple_w(uint8_t data);
 	void video_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
-	void objectram_w(offs_t offset, uint8_t data);
+	void videoattr_w(offs_t offset, uint8_t data);
 	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(video_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(intst_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_intst_w);
@@ -162,7 +162,8 @@ void mrgame_state::video_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("video", 0);
 	map(0x4000, 0x47ff).ram();
 	map(0x4800, 0x4bff).mirror(0x0400).ram().share(m_p_videoram).w(FUNC(mrgame_state::videoram_w));
-	map(0x5000, 0x50ff).mirror(0x0700).ram().share(m_p_objectram).w(FUNC(mrgame_state::objectram_w));
+	map(0x5000, 0x50ff).mirror(0x0700).ram().share(m_p_objectram);
+	map(0x5000, 0x503f).mirror(0x0700).w(FUNC(mrgame_state::videoattr_w)); // only put this over the top of first 64 bytes
 	map(0x6800, 0x6807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0x7000, 0x7000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0x8100, 0x8103).mirror(0x7efc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -173,7 +174,8 @@ void mrgame_state::wcup90_video_map(address_map &map)
 	map(0x0000, 0x7fff).rom().region("video", 0);
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8bff).mirror(0x0400).ram().share(m_p_videoram).w(FUNC(mrgame_state::videoram_w));
-	map(0x9000, 0x90ff).mirror(0x0700).ram().share(m_p_objectram).w(FUNC(mrgame_state::objectram_w));
+	map(0x9000, 0x90ff).mirror(0x0700).ram().share(m_p_objectram);
+	map(0x9000, 0x903f).mirror(0x0700).w(FUNC(mrgame_state::videoattr_w)); // only put this over the top of first 64 bytes
 	map(0xa800, 0xa807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0xb000, 0xb000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0xc000, 0xc003).mirror(0x3ffc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -315,20 +317,17 @@ void mrgame_state::videoram_w(offs_t offset, uint8_t data)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-void mrgame_state::objectram_w(offs_t offset, uint8_t data)
+void mrgame_state::videoattr_w(offs_t offset, uint8_t data)
 {
 	m_p_objectram[offset] = data;
-	if (offset < 0x40)
+	if (BIT(offset, 0))
 	{
-		if (BIT(offset, 0))
-		{
-			for (int y = 0; y < 32; y++)
-				m_tilemap->mark_tile_dirty((y << 5) | (offset >> 1));
-		}
-		else
-		{
-			m_tilemap->set_scrolly(offset >> 1, data);
-		}
+		for (int y = 0; y < 32; y++)
+			m_tilemap->mark_tile_dirty((y << 5) | (offset >> 1));
+	}
+	else
+	{
+		m_tilemap->set_scrolly(offset >> 1, data);
 	}
 }
 
@@ -488,7 +487,7 @@ static const gfx_layout spritelayout_5bpp =
 {
 	16, 16,
 	1024,
-	2,
+	5,
 	{ 0x00000*8, 0x08000*8, 0x10000*8, 0x18000*8, 0x20000*8 },
 	{ STEP8(0, 1), STEP8(64, 1) },
 	{ STEP8(0, 8), STEP8(128, 8) },
