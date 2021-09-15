@@ -117,7 +117,7 @@ static const unif unif_list[] =
 	{ "BTL-MARIO1-MALEE2",          0,    0, CHRRAM_0,  UNL_MMALEE}, // mapper 55
 	{ "BMC-FK23C",                  0,    0, CHRRAM_0,  BMC_FK23C},
 	{ "BMC-FK23CA",                 0,    0, CHRRAM_0,  BMC_FK23CA},
-	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  BMC_G63IN1 },
+	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  BMC_76IN1 },
 	{ "BMC-BS-5",                   0,    0, CHRRAM_0,  BMC_BENSHIENG},
 	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  BMC_810544C},
 	{ "BMC-411120-C",               0,    0, CHRRAM_0,  BMC_411120C},

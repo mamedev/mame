@@ -263,7 +263,6 @@ static const nes_pcb pcb_list[] =
 	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
-	{ "bmc_gb63",         BMC_G63IN1 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
 	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
@@ -675,10 +674,6 @@ void nes_cart_slot_device::call_load_pcb()
 		m_cart->vram_alloc(vram_size);
 	if (prgram_size)
 		m_cart->prgram_alloc(prgram_size);
-
-	// also nes_smb2j_device needs WRAM initialized to 0xff? check!
-	if (m_pcb_id == UNL_SMB2J)
-		memset(m_cart->get_prgram_base(), 0xff, prgram_size);
 
 	// Attempt to load a battery file for this ROM
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
