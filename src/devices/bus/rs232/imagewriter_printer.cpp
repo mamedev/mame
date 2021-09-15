@@ -65,7 +65,6 @@ apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine
 apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_rs232_port_interface(mconfig, *this),
-	m_initial_rx_state(1),
 	m_maincpu(*this, "maincpu"),
 	m_uart(*this, "uart"),
 	m_8155head(*this, "8155head"),

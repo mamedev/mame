@@ -39,7 +39,6 @@ protected:
 	void io_map(address_map &map);
 
 private:
-	int m_initial_rx_state;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
