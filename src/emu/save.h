@@ -70,8 +70,42 @@ typedef named_delegate<void ()> save_prepost_delegate;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class save_manager;
 class ram_state;
 class rewinder;
+
+// helper class to provide pass-through interface for saving struct items
+class save_registrar
+{
+	friend class save_manager;
+
+public:
+	save_registrar(save_manager &manager, device_t *device, char const *module, char const *tag, int index, char const *valname) :
+		m_manager(manager),
+		m_device(device),
+		m_module(module),
+		m_tag(tag),
+		m_valname(valname),
+		m_inner_index(index),
+		m_outer_index(-1)
+	{
+	}
+
+	template <typename ItemType>
+	void reg(ItemType &value, const char *valname);
+
+	template <typename ItemType>
+	void reg(ItemType &value, const char *valname, int index);
+
+private:
+	save_manager &m_manager;
+	device_t *m_device;
+	char const *m_module;
+	char const *m_tag;
+	char const *m_valname;
+	int m_inner_index;
+	int m_outer_index;
+};
 
 class save_manager
 {
@@ -101,6 +135,13 @@ class save_manager
 	// set of templates to identify valid save types
 	template <typename ItemType> struct is_atom : public std::false_type { };
 	template <typename ItemType> struct is_vector_safe : public std::false_type { };
+
+	// template to query if a type is a struct/union that can be saved; note that bitmap_t is explicitly
+	// excluded because it is handled as a special case
+	template <typename ItemType> struct is_saveable_struct
+	{
+		static constexpr bool value = (std::is_class<ItemType>::value || std::is_union<ItemType>::value) && !std::is_base_of<bitmap_t, ItemType>::value && !is_atom<ItemType>::value;
+	};
 
 	class state_entry
 	{
@@ -164,6 +205,23 @@ public:
 	{
 		static_assert(!std::is_pointer<ItemType>::value, "Called save_item on a pointer with no count!");
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT);
+	}
+
+	// templatized wrappers for saving saveable structs
+	template<typename ItemType>
+	std::enable_if_t<is_saveable_struct<typename array_unwrap<ItemType>::underlying_type>::value && array_unwrap<ItemType>::SAVE_COUNT == 1>
+	save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	{
+		save_registrar save(*this, device, module, tag, index, valname);
+		value.register_save(save);
+	}
+	template<typename ItemType>
+	std::enable_if_t<is_saveable_struct<typename array_unwrap<ItemType>::underlying_type>::value && array_unwrap<ItemType>::SAVE_COUNT != 1>
+	save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	{
+		save_registrar save(*this, device, module, tag, index, valname);
+		for (save.m_outer_index = 0; save.m_outer_index < array_unwrap<ItemType>::SAVE_COUNT; save.m_outer_index++)
+			array_unwrap<ItemType>::ptr(value)[save.m_outer_index].register_save(save);
 	}
 
 	// templatized wrapper for structure members
@@ -234,37 +292,6 @@ public:
 	void save_item(device_t *device, const char *module, const char *tag, int index, bitmap_rgb32 &value, const char *valname)
 	{
 		save_memory(device, module, tag, index, valname, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
-	}
-
-	// specializations for attotimes
-	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
-	{
-		std::string tempstr;
-		tempstr.assign(valname).append(".attoseconds");
-		save_item(device, module, tag, index, value, &attotime::m_attoseconds, tempstr.c_str());
-		tempstr.assign(valname).append(".seconds");
-		save_item(device, module, tag, index, value, &attotime::m_seconds, tempstr.c_str());
-	}
-
-	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
-	{
-		std::string tempstr;
-		tempstr.assign(valname).append(".attoseconds");
-		save_item(device, module, tag, index, value, &attotime::m_attoseconds, tempstr.c_str(), count);
-		tempstr.assign(valname).append(".seconds");
-		save_item(device, module, tag, index, value, &attotime::m_seconds, tempstr.c_str(), count);
-	}
-
-	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
-	{
-		std::string tempstr;
-		tempstr.assign(valname).append(".attoseconds");
-		save_item(device, module, tag, index, value, &attotime::m_attoseconds, tempstr.c_str(), count);
-		tempstr.assign(valname).append(".seconds");
-		save_item(device, module, tag, index, value, &attotime::m_seconds, tempstr.c_str(), count);
 	}
 
 	// global memory registration
@@ -376,6 +403,28 @@ public:
 	bool step();
 };
 
+
+template <typename ItemType>
+void save_registrar::reg(ItemType &value, const char *valname)
+{
+	std::string fullname;
+	if (m_outer_index == -1)
+		fullname = string_format("%s.%s", m_valname, valname);
+	else
+		fullname = string_format("%s[%d].%s", m_valname, m_outer_index, valname);
+	m_manager.save_item(m_device, m_module, m_tag, m_inner_index, value, fullname.c_str());
+}
+
+template <typename ItemType>
+void save_registrar::reg(ItemType &value, const char *valname, int index)
+{
+	std::string fullname;
+	if (m_outer_index == -1)
+		fullname = string_format("%s.%s[%d]", m_valname, valname, index);
+	else
+		fullname = string_format("%s[%d].%s[%d]", m_valname, m_outer_index, valname, index);
+	m_manager.save_item(m_device, m_module, m_tag, m_inner_index, value, fullname.c_str());
+}
 
 // template specializations to enumerate the fundamental atomic types you are allowed to save
 ALLOW_SAVE_TYPE_AND_VECTOR(char)

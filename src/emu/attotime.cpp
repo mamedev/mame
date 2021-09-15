@@ -8,9 +8,8 @@
 
 ***************************************************************************/
 
-#include "emucore.h"
-#include "eminline.h"
-#include "attotime.h"
+#include "emu.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -169,4 +168,16 @@ std::string attotime::to_string() const
 	}
 	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
 	return util::string_format("%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//-------------------------------------------------
+
+void attotime::register_save(save_registrar &save)
+{
+	// use names without m_ prefix for backwards compatibility
+	save.reg(m_attoseconds, "attoseconds");
+	save.reg(m_seconds, "seconds");
 }
