@@ -96,7 +96,7 @@ void cr_state::machine_start()
 
 void cr_state::update_display()
 {
-	m_display->matrix(m_led_select, bitswap<7>(m_7seg_data,3,2,1,0,6,5,4));
+	m_display->matrix(m_led_select, m_7seg_data);
 }
 
 void cr_state::segsel_w(u8 data)
@@ -108,15 +108,15 @@ void cr_state::segsel_w(u8 data)
 
 void cr_state::seg0_w(u8 data)
 {
-	// H: 7seg data(low)
-	m_7seg_data = (m_7seg_data & 0xf0) | data;
+	// I: 7seg data(low)
+	m_7seg_data = (m_7seg_data & 0x78) | (data & 7);
 	update_display();
 }
 
 void cr_state::seg1_w(u8 data)
 {
-	// I: 7seg data(high)
-	m_7seg_data = (m_7seg_data & 0x0f) | data << 4;
+	// H: 7seg data(high)
+	m_7seg_data = (m_7seg_data & 0x07) | data << 3;
 	update_display();
 }
 
@@ -218,8 +218,8 @@ void cr_state::cr(machine_config &config)
 	m_maincpu->write_e().set(FUNC(cr_state::rama0_w));
 	m_maincpu->write_f().set(FUNC(cr_state::control_w));
 	m_maincpu->write_g().set(FUNC(cr_state::segsel_w));
-	m_maincpu->write_h().set(FUNC(cr_state::seg0_w));
-	m_maincpu->write_i().set(FUNC(cr_state::seg1_w));
+	m_maincpu->write_h().set(FUNC(cr_state::seg1_w));
+	m_maincpu->write_i().set(FUNC(cr_state::seg0_w));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
