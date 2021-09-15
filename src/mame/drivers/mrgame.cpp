@@ -29,6 +29,7 @@ ToDo:
 *****************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
@@ -39,9 +40,12 @@ ToDo:
 #include "sound/dac.h"
 #include "sound/tms5220.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
 
 namespace {
 
@@ -83,9 +87,9 @@ private:
 	void sound_w(uint8_t data);
 	void triple_w(uint8_t data);
 	void video_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(video_a11_w);
-	DECLARE_WRITE_LINE_MEMBER(video_a12_w);
-	DECLARE_WRITE_LINE_MEMBER(video_a13_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void objectram_w(offs_t offset, uint8_t data);
+	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(video_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(intst_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_intst_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
@@ -97,6 +101,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_int_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void audio1_io(address_map &map);
@@ -107,11 +112,20 @@ private:
 	void video_map(address_map &map);
 	void wcup90_video_map(address_map &map);
 
-	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_device<m68000_device> m_maincpu;
+	required_device<z80_device> m_audiocpu1;
+	required_device<z80_device> m_audiocpu2;
+	required_device<z80_device> m_videocpu;
+	required_device<ls259_device> m_selectlatch;
+	required_ioport m_io_dsw0;
+	required_ioport m_io_dsw1;
+	required_ioport m_io_x0;
+	required_ioport m_io_x1;
 
 	bool m_ack1;
 	bool m_ack2;
@@ -125,15 +139,7 @@ private:
 	uint8_t m_video_data;
 	uint8_t m_video_status;
 
-	required_device<m68000_device> m_maincpu;
-	required_device<z80_device> m_audiocpu1;
-	required_device<z80_device> m_audiocpu2;
-	required_device<z80_device> m_videocpu;
-	required_device<ls259_device> m_selectlatch;
-	required_ioport m_io_dsw0;
-	required_ioport m_io_dsw1;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
+	tilemap_t *m_tilemap;
 };
 
 
@@ -155,8 +161,8 @@ void mrgame_state::video_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("video", 0);
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().share("objectram");
+	map(0x4800, 0x4bff).mirror(0x0400).ram().share(m_p_videoram).w(FUNC(mrgame_state::videoram_w));
+	map(0x5000, 0x50ff).mirror(0x0700).ram().share(m_p_objectram).w(FUNC(mrgame_state::objectram_w));
 	map(0x6800, 0x6807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0x7000, 0x7000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0x8100, 0x8103).mirror(0x7efc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -166,8 +172,8 @@ void mrgame_state::wcup90_video_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("video", 0);
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).mirror(0x0400).ram().share("videoram");
-	map(0x9000, 0x90ff).mirror(0x0700).ram().share("objectram");
+	map(0x8800, 0x8bff).mirror(0x0400).ram().share(m_p_videoram).w(FUNC(mrgame_state::videoram_w));
+	map(0x9000, 0x90ff).mirror(0x0700).ram().share(m_p_objectram).w(FUNC(mrgame_state::objectram_w));
 	map(0xa800, 0xa807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0xb000, 0xb000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0xc000, 0xc003).mirror(0x3ffc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -303,19 +309,35 @@ void mrgame_state::video_w(uint8_t data)
 	m_video_data = data;
 }
 
-WRITE_LINE_MEMBER(mrgame_state::video_a11_w)
+void mrgame_state::videoram_w(offs_t offset, uint8_t data)
 {
-	m_gfx_bank = (m_gfx_bank & 6) | (state ? 1 : 0);
+	m_p_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(mrgame_state::video_a12_w)
+void mrgame_state::objectram_w(offs_t offset, uint8_t data)
 {
-	m_gfx_bank = (m_gfx_bank & 5) | (state ? 2 : 0);
+	m_p_objectram[offset] = data;
+	if (offset < 0x40)
+	{
+		if (BIT(offset, 0))
+		{
+			for (int y = 0; y < 32; y++)
+				m_tilemap->mark_tile_dirty((y << 5) | (offset >> 1));
+		}
+		else
+		{
+			m_tilemap->set_scrolly(offset >> 1, data);
+		}
+	}
 }
 
-WRITE_LINE_MEMBER(mrgame_state::video_a13_w)
+template <unsigned Bit>
+WRITE_LINE_MEMBER(mrgame_state::video_bank_w)
 {
-	m_gfx_bank = (m_gfx_bank & 3) | (state ? 4 : 0);
+	m_gfx_bank &= 0x0f & ~(uint8_t(1) << Bit);
+	m_gfx_bank |= uint8_t(state ? 1 : 0) << Bit;
+	m_tilemap->mark_all_dirty();
 }
 
 WRITE_LINE_MEMBER(mrgame_state::intst_w)
@@ -335,6 +357,7 @@ WRITE_LINE_MEMBER(mrgame_state::nmi_intst_w)
 WRITE_LINE_MEMBER(mrgame_state::flip_w)
 {
 	m_flip = state;
+	m_tilemap->mark_all_dirty();
 }
 
 void mrgame_state::ack1_w(uint8_t data)
@@ -365,7 +388,11 @@ uint8_t mrgame_state::portc_r()
 
 void mrgame_state::machine_start()
 {
-	m_tile_bitmap=std::make_unique<bitmap_ind16>(256,256);
+	m_tilemap = &machine().tilemap().create(
+			*m_gfxdecode,
+			tilemap_get_info_delegate(*this, FUNC(mrgame_state::get_tile_info)), TILEMAP_SCAN_ROWS,
+			8, 8, 32, 32);
+	m_tilemap->set_scroll_cols(32);
 }
 
 void mrgame_state::machine_reset()
@@ -417,32 +444,62 @@ TIMER_DEVICE_CALLBACK_MEMBER(mrgame_state::irq_timer)
 	}
 }
 
-static const gfx_layout charlayout =
+
+static const gfx_layout charlayout_2bpp =
 {
 	8, 8,
 	4096,
 	2,
-	{ 0, 0x8000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56 },
+	{ 0x00000*8, 0x08000*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8*8
 };
 
-static const gfx_layout spritelayout =
+static const gfx_layout spritelayout_2bpp =
 {
 	16, 16,
 	1024,
 	2,
-	{ 0, 0x8000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 64, 65, 66, 67, 68, 69, 70, 71 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56, 128, 136, 144, 152, 160, 168, 176, 184 },
+	{ 0x00000*8, 0x08000*8 },
+	{ STEP8(0, 1), STEP8(64, 1) },
+	{ STEP8(0, 8), STEP8(128, 8) },
 	32*8
 };
 
-static GFXDECODE_START(gfx_mrgame)
-	GFXDECODE_ENTRY("chargen", 0, charlayout, 0, 16)
-	GFXDECODE_ENTRY("chargen", 0, spritelayout, 0, 16)
+static GFXDECODE_START(gfx_2bpp)
+	GFXDECODE_ENTRY("chargen", 0, charlayout_2bpp, 0, 16)
+	GFXDECODE_ENTRY("chargen", 0, spritelayout_2bpp, 0, 16)
 GFXDECODE_END
+
+
+static const gfx_layout charlayout_5bpp
+{
+	8, 8,
+	4096,
+	5,
+	{ 0x00000*8, 0x08000*8, 0x10000*8, 0x18000*8, 0x20000*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8*8
+};
+
+static const gfx_layout spritelayout_5bpp =
+{
+	16, 16,
+	1024,
+	2,
+	{ 0x00000*8, 0x08000*8, 0x10000*8, 0x18000*8, 0x20000*8 },
+	{ STEP8(0, 1), STEP8(64, 1) },
+	{ STEP8(0, 8), STEP8(128, 8) },
+	32*8
+};
+
+static GFXDECODE_START(gfx_5bpp)
+	GFXDECODE_ENTRY("chargen", 0, charlayout_5bpp, 0, 1)
+	GFXDECODE_ENTRY("chargen", 0, spritelayout_5bpp, 0, 1)
+GFXDECODE_END
+
 
 void mrgame_state::mrgame_palette(palette_device &palette) const
 {
@@ -483,8 +540,18 @@ void mrgame_state::mrgame_palette(palette_device &palette) const
 	}
 }
 
+TILE_GET_INFO_MEMBER(mrgame_state::get_tile_info)
+{
+	tileinfo.set(
+			0, m_p_videoram[tile_index] | (uint16_t(m_gfx_bank) << 8),
+			m_p_objectram[((tile_index & 0x1f) << 1) | 1],
+			m_flip ? TILEMAP_FLIPX : 0);
+}
+
 uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_tilemap->draw(screen, bitmap, cliprect);
+
 	return 0;
 }
 
@@ -509,10 +576,10 @@ void mrgame_state::mrgame(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5564 (x2) + battery
 
 	LS259(config, m_selectlatch); // 5B
-	m_selectlatch->q_out_cb<0>().set(FUNC(mrgame_state::video_a11_w));
+	m_selectlatch->q_out_cb<0>().set(FUNC(mrgame_state::video_bank_w<0>));
 	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::nmi_intst_w));
-	m_selectlatch->q_out_cb<3>().set(FUNC(mrgame_state::video_a12_w));
-	m_selectlatch->q_out_cb<4>().set(FUNC(mrgame_state::video_a13_w));
+	m_selectlatch->q_out_cb<3>().set(FUNC(mrgame_state::video_bank_w<1>));
+	m_selectlatch->q_out_cb<4>().set(FUNC(mrgame_state::video_bank_w<2>));
 	m_selectlatch->q_out_cb<6>().set(FUNC(mrgame_state::flip_w));
 
 	//watchdog_timer_device &watchdog(WATCHDOG_TIMER(config, "watchdog")); // LS393 at 5D (video board) driven by VBLANK
@@ -527,7 +594,7 @@ void mrgame_state::mrgame(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(mrgame_state::mrgame_palette), 64);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrgame);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2bpp);
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();
@@ -562,7 +629,10 @@ void mrgame_state::wcup90(machine_config &config)
 
 	m_videocpu->set_addrmap(AS_PROGRAM, &mrgame_state::wcup90_video_map);
 
+	m_gfxdecode->set_info(gfx_5bpp);
+
 	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::intst_w)); // U48
+	m_selectlatch->q_out_cb<2>().set(FUNC(mrgame_state::video_bank_w<3>));
 
 	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(mrgame_state::vblank_int_w));
 }
