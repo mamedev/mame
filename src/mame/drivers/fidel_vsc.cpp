@@ -215,24 +215,16 @@ private:
 	u8 pio_portb_r();
 	void pio_portb_w(u8 data);
 
-	u8 m_led_data;
-	u8 m_7seg_data;
-	u8 m_cb_mux;
-	u8 m_kp_mux;
-	bool m_lan_switch;
-	u8 m_speech_bank;
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_cb_mux = 0;
+	u8 m_kp_mux = 0;
+	bool m_lan_switch = false;
+	u8 m_speech_bank = 0;
 };
 
 void vsc_state::machine_start()
 {
-	// zerofill
-	m_led_data = 0;
-	m_7seg_data = 0;
-	m_cb_mux = 0;
-	m_kp_mux = 0;
-	m_speech_bank = 0;
-	m_lan_switch = false;
-
 	// register for savestates
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));

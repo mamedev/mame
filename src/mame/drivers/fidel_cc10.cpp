@@ -14,7 +14,7 @@ TODO:
 Fidelity Chess Challenger 10 (CCX)
 -------------------
 3 versions are known to exist: A,B,C. Strangely, version C(UCC10) has an 8080
-instead of Z80 and no beeper, it's on CC1-based hardware.
+instead of Z80 and no beeper, it's on CC1-based hardware (see fidel_cc1.cpp).
 
 Z80A CPU @ 4MHz, NEC D8255C
 4KB ROM(NEC 2332A), 2*256 bytes RAM(4*NEC 2111AL-4)
