@@ -677,6 +677,11 @@ void device_execute_interface::device_input::set_state_synced(int state, int vec
 if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE);
 
+	// only keep the latest event when the machine is being reset
+	// (MAME emulates machine resets as instantaneous events, so this prevents the generation of spurious NMIs in some cases)
+	if (m_qindex != 0 && m_execute->device().machine().phase() == machine_phase::RESET)
+		m_qindex = 0;
+
 	// if we're full of events, flush the queue and log a message
 	int event_index = m_qindex++;
 	if (event_index >= std::size(m_queue))
