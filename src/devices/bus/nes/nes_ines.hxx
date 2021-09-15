@@ -428,7 +428,7 @@ static const nes_mmc mmc_list[] =
 	// 390 variant of mapper 236?
 	// 391 BS-110 MMC3 clone
 	// 392 8-in-1 variant of mc_sv16
-	// 393 820720C multicart
+	{ 393, BMC_820720C },
 	// 394 Realtec HSK007 multicart
 	// 395 Realtec 8210 multicarts
 	{ 396, BMC_850437C },
@@ -510,7 +510,7 @@ static const nes_mmc mmc_list[] =
 	// 547 Konami QTa adapter games
 	// { 548, BTL_CTC15 },            // Almana no Kiseki alt FDS conversion (dump available?)
 	{ 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
-	// 550 JY-015 multicart
+	{ 550, BMC_JY820845C },
 	// 551 variant of mapper 178, likely shenghuo, jingkzx, xiaokecq, zgfyun in nes.xml
 	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1

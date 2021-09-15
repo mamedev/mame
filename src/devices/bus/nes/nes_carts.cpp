@@ -374,6 +374,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_810544c",      NES_BMC_810544C);
 	device.option_add_internal("bmc_830425c",      NES_BMC_830425C);
 	device.option_add_internal("bmc_850437c",      NES_BMC_850437C);
+	device.option_add_internal("bmc_jy820845c",    NES_BMC_JY820845C);
 	device.option_add_internal("n32_4in1",         NES_N32_4IN1);
 	device.option_add_internal("ntd03",            NES_NTD03);
 	device.option_add_internal("bmc_ctc09",        NES_BMC_CTC09);
@@ -443,6 +444,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_gn45",         NES_BMC_GN45);
 	device.option_add_internal("bmc_gold7in1",     NES_BMC_GOLD7IN1);
 	device.option_add_internal("bmc_411120c",      NES_BMC_411120C);
+	device.option_add_internal("bmc_820720c",      NES_BMC_820720C);
 	device.option_add_internal("bmc_830118c",      NES_BMC_830118C);
 	device.option_add_internal("bmc_830832c",      NES_BMC_830832C);
 	device.option_add_internal("bmc_841101c",      NES_BMC_841101C);
