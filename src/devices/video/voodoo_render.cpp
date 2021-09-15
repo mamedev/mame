@@ -1265,12 +1265,12 @@ voodoo_renderer::voodoo_renderer(running_machine &machine, u16 tmu_config, const
 //  register_save - register for saving states
 //-------------------------------------------------
 
-void voodoo_renderer::register_save(save_proxy &save)
+void voodoo_renderer::register_save(save_registrar &save)
 {
-	save.save_item(NAME(m_rowpixels));
-	save.save_item(NAME(m_yorigin));
-	save.save_item(NAME(m_fogblend));
-	save.save_item(NAME(m_fogdelta));
+	save.reg(NAME(m_rowpixels));
+	save.reg(NAME(m_yorigin));
+	save.reg(NAME(m_fogblend));
+	save.reg(NAME(m_fogdelta));
 }
 
 

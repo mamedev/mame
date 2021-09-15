@@ -40,7 +40,7 @@ public:
 	void init(u8 *ram, u32 size) { m_ram = (u32 *)ram; m_mask = (size / 4) - 1; }
 
 	// state saving
-	void register_save(save_proxy &save);
+	void register_save(save_registrar &save);
 
 	// getters
 	bool enabled() const { return m_enable; }
@@ -128,22 +128,22 @@ private:
 struct setup_vertex
 {
 	// state saving
-	void register_save(save_proxy &save)
+	void register_save(save_registrar &save)
 	{
-		save.save_item(NAME(x));
-		save.save_item(NAME(y));
-		save.save_item(NAME(z));
-		save.save_item(NAME(wb));
-		save.save_item(NAME(r));
-		save.save_item(NAME(g));
-		save.save_item(NAME(b));
-		save.save_item(NAME(a));
-		save.save_item(NAME(s0));
-		save.save_item(NAME(t0));
-		save.save_item(NAME(w0));
-		save.save_item(NAME(s1));
-		save.save_item(NAME(t1));
-		save.save_item(NAME(w1));
+		save.reg(NAME(x));
+		save.reg(NAME(y));
+		save.reg(NAME(z));
+		save.reg(NAME(wb));
+		save.reg(NAME(r));
+		save.reg(NAME(g));
+		save.reg(NAME(b));
+		save.reg(NAME(a));
+		save.reg(NAME(s0));
+		save.reg(NAME(t0));
+		save.reg(NAME(w0));
+		save.reg(NAME(s1));
+		save.reg(NAME(t1));
+		save.reg(NAME(w1));
 	}
 
 	float x, y;               // X, Y coordinates
@@ -194,7 +194,7 @@ protected:
 
 	// system management
 	virtual void soft_reset() override;
-	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation) override;
+	virtual void register_save(u32 total_allocation) override;
 
 	// mapped writes
 	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);

@@ -1014,7 +1014,7 @@ public:
 	}
 
 	// state saving
-	void register_save(save_proxy &save);
+	void register_save(save_registrar &save);
 
 	// register aliasing
 	static u32 alias(u32 regnum) { return (regnum < 0x40) ? s_alias_map[regnum] : regnum; }
@@ -1180,7 +1180,7 @@ public:
 	banshee_2d_regs() { reset(); }
 
 	// state saving
-	void register_save(save_proxy &save);
+	void register_save(save_registrar &save);
 
 	// reset
 	void reset() { std::fill_n(&m_regs[0], std::size(m_regs), 0); }
@@ -1280,7 +1280,7 @@ public:
 	banshee_io_regs() { reset(); }
 
 	// state saving
-	void register_save(save_proxy &save);
+	void register_save(save_registrar &save);
 
 	// reset
 	void reset() { std::fill_n(&m_regs[0], std::size(m_regs), 0); }
@@ -1341,7 +1341,7 @@ public:
 	banshee_cmd_agp_regs() { reset(); }
 
 	// state saving
-	void register_save(save_proxy &save);
+	void register_save(save_registrar &save);
 
 	// reset
 	void reset() { std::fill_n(&m_regs[0], std::size(m_regs), 0); }
@@ -1391,7 +1391,7 @@ public:
 	banshee_vga_regs() { reset(); }
 
 	// state saving
-	void register_save(save_proxy &save);
+	void register_save(save_registrar &save);
 
 	// reset
 	void reset()

@@ -57,17 +57,17 @@ command_fifo::command_fifo(voodoo_2_device &device) :
 //  register_save - register for save states
 //-------------------------------------------------
 
-void command_fifo::register_save(save_proxy &save)
+void command_fifo::register_save(save_registrar &save)
 {
-	save.save_item(NAME(m_enable));
-	save.save_item(NAME(m_count_holes));
-	save.save_item(NAME(m_ram_base));
-	save.save_item(NAME(m_ram_end));
-	save.save_item(NAME(m_read_index));
-	save.save_item(NAME(m_address_min));
-	save.save_item(NAME(m_address_max));
-	save.save_item(NAME(m_depth));
-	save.save_item(NAME(m_holes));
+	save.reg(NAME(m_enable));
+	save.reg(NAME(m_count_holes));
+	save.reg(NAME(m_ram_base));
+	save.reg(NAME(m_ram_end));
+	save.reg(NAME(m_read_index));
+	save.reg(NAME(m_address_min));
+	save.reg(NAME(m_address_max));
+	save.reg(NAME(m_depth));
+	save.reg(NAME(m_holes));
 }
 
 
@@ -848,16 +848,14 @@ void voodoo_2_device::soft_reset()
 //  register_save - register for save states
 //-------------------------------------------------
 
-void voodoo_2_device::register_save(save_proxy &save, u32 total_allocation)
+void voodoo_2_device::register_save(u32 total_allocation)
 {
-	voodoo_1_device::register_save(save, total_allocation);
+	voodoo_1_device::register_save(total_allocation);
 
 	// Voodoo 2 stuff
-	save.save_item(NAME(m_sverts));
-	save.save_class(NAME(m_svert[0]));
-	save.save_class(NAME(m_svert[1]));
-	save.save_class(NAME(m_svert[2]));
-	save.save_class(NAME(m_cmdfifo));
+	save_item(NAME(m_sverts));
+	save_item(NAME(m_svert));
+	save_item(NAME(m_cmdfifo));
 }
 
 

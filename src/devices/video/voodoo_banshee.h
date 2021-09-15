@@ -75,7 +75,7 @@ protected:
 
 	// system management
 	virtual void soft_reset() override;
-	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation) override;
+	virtual void register_save(u32 total_allocation) override;
 
 	// buffer accessors
 	virtual u16 *lfb_buffer_indirect(int index) override;

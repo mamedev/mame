@@ -43,9 +43,9 @@ using namespace voodoo;
 //  register_save - register for save states
 //-------------------------------------------------
 
-void banshee_2d_regs::register_save(save_proxy &save)
+void banshee_2d_regs::register_save(save_registrar &save)
 {
-	save.save_item(NAME(m_regs));
+	save.reg(NAME(m_regs));
 }
 
 
@@ -70,9 +70,9 @@ char const *const banshee_2d_regs::s_names[0x20] =
 //  register_save - register for save states
 //-------------------------------------------------
 
-void banshee_io_regs::register_save(save_proxy &save)
+void banshee_io_regs::register_save(save_registrar &save)
 {
-	save.save_item(NAME(m_regs));
+	save.reg(NAME(m_regs));
 }
 
 
@@ -105,9 +105,9 @@ char const *const banshee_io_regs::s_names[0x40] =
 //  register_save - register for save states
 //-------------------------------------------------
 
-void banshee_cmd_agp_regs::register_save(save_proxy &save)
+void banshee_cmd_agp_regs::register_save(save_registrar &save)
 {
-	save.save_item(NAME(m_regs));
+	save.reg(NAME(m_regs));
 }
 
 
@@ -156,14 +156,14 @@ char const *const banshee_cmd_agp_regs::s_names[0x80] =
 //  register_save - register for save states
 //-------------------------------------------------
 
-void banshee_vga_regs::register_save(save_proxy &save)
+void banshee_vga_regs::register_save(save_registrar &save)
 {
-	save.save_item(NAME(m_regs));
-	save.save_item(NAME(m_crtc));
-	save.save_item(NAME(m_seq));
-	save.save_item(NAME(m_gc));
-	save.save_item(NAME(m_attr));
-	save.save_item(NAME(m_attr_flip_flop));
+	save.reg(NAME(m_regs));
+	save.reg(NAME(m_crtc));
+	save.reg(NAME(m_seq));
+	save.reg(NAME(m_gc));
+	save.reg(NAME(m_attr));
+	save.reg(NAME(m_attr_flip_flop));
 }
 
 
@@ -493,31 +493,31 @@ void voodoo_banshee_device::soft_reset()
 //  register_save - register for save states
 //-------------------------------------------------
 
-void voodoo_banshee_device::register_save(save_proxy &save, u32 total_allocation)
+void voodoo_banshee_device::register_save(u32 total_allocation)
 {
-	voodoo_2_device::register_save(save, total_allocation);
+	voodoo_2_device::register_save(total_allocation);
 
 	// Voodoo Banshee stuff
-	save.save_class(NAME(m_cmdfifo2));
-	save.save_class(NAME(m_io_regs));
-	save.save_class(NAME(m_cmd_agp_regs));
-	save.save_class(NAME(m_vga_regs));
-	save.save_class(NAME(m_2d_regs));
-	save.save_item(NAME(m_blt_dst_base));
-	save.save_item(NAME(m_blt_dst_x));
-	save.save_item(NAME(m_blt_dst_y));
-	save.save_item(NAME(m_blt_dst_width));
-	save.save_item(NAME(m_blt_dst_height));
-	save.save_item(NAME(m_blt_dst_stride));
-	save.save_item(NAME(m_blt_dst_bpp));
-	save.save_item(NAME(m_blt_cmd));
-	save.save_item(NAME(m_blt_src_base));
-	save.save_item(NAME(m_blt_src_x));
-	save.save_item(NAME(m_blt_src_y));
-	save.save_item(NAME(m_blt_src_width));
-	save.save_item(NAME(m_blt_src_height));
-	save.save_item(NAME(m_blt_src_stride));
-	save.save_item(NAME(m_blt_src_bpp));
+	save_item(NAME(m_cmdfifo2));
+	save_item(NAME(m_io_regs));
+	save_item(NAME(m_cmd_agp_regs));
+	save_item(NAME(m_vga_regs));
+	save_item(NAME(m_2d_regs));
+	save_item(NAME(m_blt_dst_base));
+	save_item(NAME(m_blt_dst_x));
+	save_item(NAME(m_blt_dst_y));
+	save_item(NAME(m_blt_dst_width));
+	save_item(NAME(m_blt_dst_height));
+	save_item(NAME(m_blt_dst_stride));
+	save_item(NAME(m_blt_dst_bpp));
+	save_item(NAME(m_blt_cmd));
+	save_item(NAME(m_blt_src_base));
+	save_item(NAME(m_blt_src_x));
+	save_item(NAME(m_blt_src_y));
+	save_item(NAME(m_blt_src_width));
+	save_item(NAME(m_blt_src_height));
+	save_item(NAME(m_blt_src_stride));
+	save_item(NAME(m_blt_src_bpp));
 }
 
 

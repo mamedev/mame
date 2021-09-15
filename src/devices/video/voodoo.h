@@ -18,7 +18,6 @@
 
 // forward declarations
 class voodoo_1_device;
-namespace voodoo { class save_proxy; }
 
 
 //**************************************************************************
@@ -68,54 +67,6 @@ static constexpr bool LOG_CMDFIFO_VERBOSE = false;
 namespace voodoo
 {
 
-// ======================> save_proxy
-
-// save_proxy is a helper class to make hierarchical state saving more manageable;
-class save_proxy
-{
-public:
-	// constructor
-	save_proxy(device_t &device) :
-		m_device(device)
-	{
-	}
-
-	// save an item; append the current prefix and pass through
-	template<typename T>
-	void save_item(T &&item, char const *name)
-	{
-		std::string fullname = m_prefix;
-		fullname += name;
-		m_device.save_item(std::forward<T>(item), fullname.c_str());
-	}
-
-	// save a pointer item; append the current prefix and pass through
-	template<typename T>
-	void save_pointer(T &&item, char const *name, u32 count)
-	{
-		std::string fullname = m_prefix;
-		fullname += name;
-		m_device.save_pointer(std::forward<T>(item), fullname.c_str(), count);
-	}
-
-	// save a class; update the prefix then call the register_save method on the class
-	template<typename T>
-	void save_class(T &item, char const *name)
-	{
-		std::string orig = m_prefix;
-		m_prefix += name;
-		m_prefix += "/";
-		item.register_save(*this);
-		m_prefix = orig;
-	}
-
-private:
-	// internal state
-	device_t &m_device;
-	std::string m_prefix;
-};
-
-
 // ======================> shared_tables
 
 // shared_tables are global tables that are shared between different components
@@ -156,7 +107,7 @@ public:
 	void set_baseaddr_mask_shift(u32 mask, u8 shift) { m_basemask = mask; m_baseshift = shift; }
 
 	// state saving
-	void register_save(save_proxy &save);
+	void register_save(save_registrar &save);
 	void post_load();
 
 	// simple getters
@@ -216,7 +167,7 @@ public:
 	void configure(u32 *base, u32 size);
 
 	// state saving
-	void register_save(save_proxy &save);
+	void register_save(save_registrar &save);
 
 	// basic queries
 	bool configured() const { return (m_size != 0); }
@@ -509,7 +460,7 @@ protected:
 
 	// system management
 	virtual void soft_reset();
-	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation);
+	virtual void register_save(u32 total_allocation);
 
 	// buffer accessors
 	virtual u16 *draw_buffer_indirect(int index);

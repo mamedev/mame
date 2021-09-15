@@ -203,18 +203,18 @@ inline s64 float_to_int64(u32 data, int fixedbits)
 //  register_save - save live state
 //-------------------------------------------------
 
-void voodoo_regs::register_save(save_proxy &save)
+void voodoo_regs::register_save(save_registrar &save)
 {
-	save.save_item(NAME(m_regs));
-	save.save_item(NAME(m_starts));
-	save.save_item(NAME(m_startt));
-	save.save_item(NAME(m_startw));
-	save.save_item(NAME(m_dsdx));
-	save.save_item(NAME(m_dtdx));
-	save.save_item(NAME(m_dwdx));
-	save.save_item(NAME(m_dsdy));
-	save.save_item(NAME(m_dtdy));
-	save.save_item(NAME(m_dwdy));
+	save.reg(NAME(m_regs));
+	save.reg(NAME(m_starts));
+	save.reg(NAME(m_startt));
+	save.reg(NAME(m_startw));
+	save.reg(NAME(m_dsdx));
+	save.reg(NAME(m_dtdx));
+	save.reg(NAME(m_dwdx));
+	save.reg(NAME(m_dsdy));
+	save.reg(NAME(m_dtdy));
+	save.reg(NAME(m_dwdy));
 }
 
 
@@ -343,11 +343,11 @@ void tmu_state::init(int index, shared_tables const &share, u8 *ram, u32 size)
 //  register_save - register for save states
 //-------------------------------------------------
 
-void tmu_state::register_save(save_proxy &save)
+void tmu_state::register_save(save_registrar &save)
 {
 	// register state
-	save.save_class(NAME(m_reg));
-	save.save_item(NAME(m_palette));
+	save.reg(NAME(m_reg));
+	save.reg(NAME(m_palette));
 }
 
 
@@ -491,11 +491,11 @@ void memory_fifo::configure(u32 *base, u32 size)
 //  register_save - register for save states
 //-------------------------------------------------
 
-void memory_fifo::register_save(save_proxy &save)
+void memory_fifo::register_save(save_registrar &save)
 {
-	save.save_item(NAME(m_size));
-	save.save_item(NAME(m_in));
-	save.save_item(NAME(m_out));
+	save.reg(NAME(m_size));
+	save.reg(NAME(m_in));
+	save.reg(NAME(m_out));
 }
 
 
@@ -1025,8 +1025,7 @@ void voodoo_1_device::device_start()
 	soft_reset();
 
 	// register for save states
-	save_proxy save(*this);
-	register_save(save, total_allocation);
+	register_save(total_allocation);
 }
 
 
@@ -1090,56 +1089,55 @@ ALLOW_SAVE_TYPE(reg_init_en);
 ALLOW_SAVE_TYPE(voodoo_regs::register_data);
 ALLOW_SAVE_TYPE(voodoo_1_device::stall_state);
 
-void voodoo_1_device::register_save(save_proxy &save, u32 total_allocation)
+void voodoo_1_device::register_save(u32 total_allocation)
 {
 	// PCI state/FIFOs
-	save.save_item(NAME(m_init_enable));
-	save.save_item(NAME(m_stall_state));
-	save.save_item(NAME(m_operation_end));
-	save.save_class(NAME(m_pci_fifo));
-	save.save_class(NAME(m_fbmem_fifo));
+	save_item(NAME(m_init_enable));
+	save_item(NAME(m_stall_state));
+	save_item(NAME(m_operation_end));
+	save_item(NAME(m_pci_fifo));
+	save_item(NAME(m_fbmem_fifo));
 
 	// allocated memory
-	save.save_pointer(NAME(m_fbram), 1024 * 1024 * total_allocation);
-	save.save_class(NAME(*m_renderer.get()));
+	save_pointer(NAME(m_fbram), 1024 * 1024 * total_allocation);
+	save_item(NAME(*m_renderer.get()));
 
 	// video buffer configuration
-	save.save_item(NAME(m_rgboffs));
-	save.save_item(NAME(m_auxoffs));
-	save.save_item(NAME(m_frontbuf));
-	save.save_item(NAME(m_backbuf));
+	save_item(NAME(m_rgboffs));
+	save_item(NAME(m_auxoffs));
+	save_item(NAME(m_frontbuf));
+	save_item(NAME(m_backbuf));
 
 	// linear frame buffer access configuration
-	save.save_item(NAME(m_lfb_stride));
+	save_item(NAME(m_lfb_stride));
 
 	// video configuration
-	save.save_item(NAME(m_width));
-	save.save_item(NAME(m_height));
-	save.save_item(NAME(m_xoffs));
-	save.save_item(NAME(m_yoffs));
-	save.save_item(NAME(m_vsyncstart));
-	save.save_item(NAME(m_vsyncstop));
+	save_item(NAME(m_width));
+	save_item(NAME(m_height));
+	save_item(NAME(m_xoffs));
+	save_item(NAME(m_yoffs));
+	save_item(NAME(m_vsyncstart));
+	save_item(NAME(m_vsyncstop));
 
 	// VBLANK/swapping state
-	save.save_item(NAME(m_swaps_pending));
-	save.save_item(NAME(m_vblank));
-	save.save_item(NAME(m_vblank_count));
-	save.save_item(NAME(m_vblank_swap_pending));
-	save.save_item(NAME(m_vblank_swap));
-	save.save_item(NAME(m_vblank_dont_swap));
+	save_item(NAME(m_swaps_pending));
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_vblank_count));
+	save_item(NAME(m_vblank_swap_pending));
+	save_item(NAME(m_vblank_swap));
+	save_item(NAME(m_vblank_dont_swap));
 
 	// register state
-	save.save_class(NAME(m_reg));
-	save.save_class(NAME(m_tmu[0]));
-	save.save_class(NAME(m_tmu[1]));
-	save.save_item(NAME(m_dac_reg));
-	save.save_item(NAME(m_dac_read_result));
+	save_item(NAME(m_reg));
+	save_item(NAME(m_tmu));
+	save_item(NAME(m_dac_reg));
+	save_item(NAME(m_dac_read_result));
 
 	// memory for PCI FIFO
-	save.save_item(NAME(m_pci_fifo_mem));
+	save_item(NAME(m_pci_fifo_mem));
 
 	// pens and CLUT
-	save.save_item(NAME(m_clut));
+	save_item(NAME(m_clut));
 }
 
 
