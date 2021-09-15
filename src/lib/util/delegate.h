@@ -585,7 +585,7 @@ private:
 	static functoid_setter make_functoid_setter()
 	{
 		using unwrapped_type = std::remove_cv_t<std::remove_reference_t<T> >;
-		if constexpr (matching_non_const_call(&T::operator()))
+		if constexpr (matching_non_const_call(&unwrapped_type::operator()))
 		{
 			return
 					[] (delegate &obj)
@@ -596,7 +596,7 @@ private:
 									std::any_cast<unwrapped_type>(&obj.m_functoid)));
 					};
 		}
-		else if constexpr (matching_const_call(&T::operator()))
+		else if constexpr (matching_const_call(&unwrapped_type::operator()))
 		{
 			return
 					[] (delegate &obj)
@@ -641,6 +641,11 @@ public:
 	{
 		if (m_functoid.has_value())
 			m_set_functoid(*this);
+	}
+
+	delegate(delegate &src)
+		: delegate(const_cast<delegate const &>(src))
+	{
 	}
 
 	delegate(delegate &&src)
