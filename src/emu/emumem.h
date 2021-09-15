@@ -18,6 +18,7 @@
 #define MAME_EMU_EMUMEM_H
 
 #include <optional>
+#include <set>
 #include <type_traits>
 
 using s8 = std::int8_t;
@@ -476,7 +477,6 @@ template<int Width, int AddrShift> class memory_units_descriptor;
 // =====================-> The root class of all handlers
 
 // Handlers the refcounting as part of the interface
-#include <set>
 class handler_entry
 {
 	DISABLE_COPYING(handler_entry);

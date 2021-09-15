@@ -392,7 +392,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 ///   avoid repetition.  Screen orientation flags may be included here.
 /// \sa GAME GAMEL COMP SYST
 #define CONS(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
-GAME_DRIVER_TRAITS(NAME,FULLNAME)                                       \
+GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
@@ -457,8 +457,8 @@ extern game_driver const GAME_NAME(NAME)                                \
 ///   all systems implemented using the class in the class itself to
 ///   avoid repetition.  Screen orientation flags may be included here.
 /// \sa GAME GAMEL CONS SYST
-#define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS) \
-GAME_DRIVER_TRAITS(NAME,FULLNAME)                                       \
+#define COMP(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
+GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
@@ -523,8 +523,8 @@ extern game_driver const GAME_NAME(NAME)                                \
 ///   all systems implemented using the class in the class itself to
 ///   avoid repetition.  Screen orientation flags may be included here.
 /// \sa GAME GAMEL CONS COMP
-#define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS) \
-GAME_DRIVER_TRAITS(NAME,FULLNAME)                                       \
+#define SYST(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
+GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
