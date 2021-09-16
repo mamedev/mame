@@ -97,7 +97,7 @@ private:
 
 INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
 {
-	logerror("switch_w: %0x\n", param);
+	logerror("switch_w: %x\n", param);
 	if (!oldval && newval)
 	{
 		if (m_switch == 0x1 && param != m_switch)
@@ -111,7 +111,7 @@ INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
 
 WRITE_LINE_MEMBER(ctk551_state::apo_w)
 {
-	logerror("apo_w: %0x\n", state);
+	logerror("apo_w: %x\n", state);
 	/* TODO: when 1, this should turn off the LCD, speakers, etc.
 	the CPU will go to sleep until the power switch triggers a NMI */
 }
@@ -155,11 +155,11 @@ void ctk551_state::ctk551(machine_config &config)
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:uart", FUNC(ay31015_device::write_si));
+	mdin.rxd_handler().set("maincpu:sci", FUNC(h8_sci_device::rx_w));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<ay31015_device>("uart")->write_so_callback().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->subdevice<h8_sci_device>("sci")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// LCD
 	HD44780(config, m_lcdc, 0);

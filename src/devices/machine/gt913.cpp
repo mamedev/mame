@@ -8,18 +8,13 @@
 	for many opcodes, as well as:
 
 	- Dedicated bank switching instructions (20-bit external address bus)
-	- Simplified interrupt behavior compared to "real" H8 chips
 	- Two timers, three 8-bit ports, two 8-bit ADCs
 	- Keyboard controller w/ key velocity detection
-	- MIDI UART (currently emulated as an AY-3-1015)
+	- MIDI UART
 	- 24-voice PCM sound (currently not emulated / fully understood)
 
 	Earlier and later Casio keyboard models contain "uPD912" and "uPD914" chips,
 	which are presumably similar.
-
-	TODO:
-	- timer behavior is unverified (see comment in timer_control_w)
-	- various other unemulated registers
 
 ***************************************************************************/
 
@@ -32,16 +27,15 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	h8_device(mconfig, GT913, tag, owner, clock, address_map_constructor(FUNC(gt913_device::map), this)),
 	opcodes_config("opcodes", ENDIANNESS_BIG, 16, 16, 0, address_map_constructor(FUNC(gt913_device::map_opcodes), this)),
 	m_rom(*this, DEVICE_SELF),
-	m_opcodes(*this, ":opcodes"),
+	m_opcodes(*this, "opcodes"),
 	m_bank(*this, "bank"),
+	m_intc(*this, "intc"),
 	m_sound(*this, "gt_sound"),
 	m_kbd(*this, "kbd"),
-	m_uart(*this, "uart"),
-	m_uart_clock(*this, "uart_clock"),
+	m_io_hle(*this, "io_hle"),
+	m_sci(*this, "sci"),
 	m_port(*this, "port%u", 1)
 {
-	m_nmi_vector = 3;
-	m_irq_base = 4;
 }
 
 device_memory_interface::space_config_vector gt913_device::memory_space_config() const
@@ -69,22 +63,23 @@ void gt913_device::map(address_map &map)
 	map(0xffd2, 0xffd3).rw(m_kbd, FUNC(gt913_kbd_hle_device::status_r), FUNC(gt913_kbd_hle_device::status_w));
 
 	/* ffd8-ffdf: timers */
-	map(0xffd8, 0xffd9).rw(FUNC(gt913_device::timer_control_r), FUNC(gt913_device::timer_control_w));
-	map(0xffdc, 0xffdd).w(FUNC(gt913_device::timer_rate0_w));
-	map(0xffdf, 0xffdf).w(FUNC(gt913_device::timer_rate1_w));
+	map(0xffd8, 0xffd9).rw(m_io_hle, FUNC(gt913_io_hle_device::timer_control_r), FUNC(gt913_io_hle_device::timer_control_w));
+	map(0xffdc, 0xffdd).w(m_io_hle, FUNC(gt913_io_hle_device::timer_rate0_w));
+	map(0xffdf, 0xffdf).w(m_io_hle, FUNC(gt913_io_hle_device::timer_rate1_w));
 
 	/* ffe0-ffe3: serial */
 	map(0xffe0, 0xffe0).w(FUNC(gt913_device::uart_rate_w));
-	map(0xffe1, 0xffe1).w(m_uart, FUNC(ay31015_device::transmit));
+	map(0xffe1, 0xffe1).w(m_sci, FUNC(h8_sci_device::tdr_w));
 	map(0xffe2, 0xffe2).rw(FUNC(gt913_device::uart_control_r), FUNC(gt913_device::uart_control_w));
-	map(0xffe3, 0xffe3).r(m_uart, FUNC(ay31015_device::receive));
+	map(0xffe3, 0xffe3).r(m_sci, FUNC(h8_sci_device::rdr_r));
 
 	/* ffe9-ffea: ADC */
-	map(0xffe9, 0xffe9).rw(FUNC(gt913_device::adc_control_r), FUNC(gt913_device::adc_control_w));
-	map(0xffea, 0xffea).r(FUNC(gt913_device::adc_data_r));
+	map(0xffe9, 0xffe9).rw(m_io_hle, FUNC(gt913_io_hle_device::adc_control_r), FUNC(gt913_io_hle_device::adc_control_w));
+	map(0xffea, 0xffea).r(m_io_hle, FUNC(gt913_io_hle_device::adc_data_r));
 
 	/* fff0-fff5: I/O ports */
-	map(0xfff0, 0xfff1).rw(FUNC(gt913_device::port_ddr_r), FUNC(gt913_device::port_ddr_w));
+	map(0xfff0, 0xfff0).rw(m_port[0], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
+	map(0xfff1, 0xfff1).rw(m_port[1], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
 	map(0xfff2, 0xfff2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff3, 0xfff3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 //	map(0xfff4, 0xfff4).nopw(); probably not port 3 DDR - ctk551 writes 0x00 but uses port 3 for output only
@@ -93,25 +88,17 @@ void gt913_device::map(address_map &map)
 
 void gt913_device::map_opcodes(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().share(":opcodes");
+	map(0x0000, 0x7fff).rom().share("opcodes");
 }
 
 void gt913_device::device_add_mconfig(machine_config &config)
 {
+	GT913_INTC(config, "intc");
+
 	GT913_SOUND_HLE(config, m_sound, 0);
-
-	GT913_KBD_HLE(config, m_kbd, 0);
-	m_kbd->int_handler().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ1);
-
-	AY31015(config, m_uart);
-	m_uart->write_fe_callback().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ4);
-	m_uart->write_or_callback().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ4);
-	m_uart->write_dav_callback().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ5);
-	m_uart->write_tbmt_callback().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ6);
-
-	CLOCK(config, m_uart_clock, 9600 * 16);
-	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
-	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
+	GT913_KBD_HLE(config, m_kbd, "intc", 5);
+	GT913_IO_HLE(config, m_io_hle, "intc", 6, 7);
+	H8_SCI(config, m_sci, "intc", 8, 9, 10, 0);
 
 	H8_PORT(config, m_port[0], h8_device::PORT_1, 0xff, 0x00);
 	H8_PORT(config, m_port[1], h8_device::PORT_2, 0xff, 0x00);
@@ -119,139 +106,24 @@ void gt913_device::device_add_mconfig(machine_config &config)
 }
 
 
-void gt913_device::timer_control_w(offs_t offset, uint8_t data)
-{
-	assert(offset < 2);
-
-	if (!BIT(data, 4))
-		set_input_line(INPUT_LINE_IRQ2 + offset, CLEAR_LINE);
-	set_irq_enable(INPUT_LINE_IRQ2 + offset, BIT(data, 3));
-
-	m_timer_control[offset] = data;
-}
-
-uint8_t gt913_device::timer_control_r(offs_t offset)
-{
-	assert(offset < 2);
-	return m_timer_control[offset];
-}
-
-void gt913_device::timer_rate0_w(uint16_t data)
-{
-	m_timer_rate[0] = data;
-	adjust_timer(0);
-}
-
-void gt913_device::timer_rate1_w(uint8_t data)
-{
-	m_timer_rate[1] = data;
-	adjust_timer(1);
-}
-
-void gt913_device::adjust_timer(offs_t num)
-{
-	assert(num < 2);
-
-	/*
-	On the CTK-551, this behavior provides the expected rate for timer 0, which is the MIDI PPQN timer.
-	For timer 1, this is less certain, but it seems to provide an auto power off delay only a little
-	longer than the "about six minutes" mentioned in the user manual.
-	*/
-	u64 clocks = m_timer_rate[num];
-	if (!clocks)
-	{
-		m_timer[num]->adjust(attotime::never);
-	}
-	else
-	{
-		switch (m_timer_control[num] & 0x7)
-		{
-		default:
-			logerror("unknown timer %u prescaler %u (pc = %04x)\n", num, m_timer_control[num] & 0x7, pc());
-			[[fallthrough]];
-		case 0:
-			clocks <<= 1; break;
-		case 2:
-			clocks <<= 10; break;
-		}
-
-		attotime period = clocks_to_attotime(clocks);
-		m_timer[num]->adjust(period, 0, period);
-	}
-}
-
-void gt913_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	set_input_line(INPUT_LINE_IRQ2 + id, ASSERT_LINE);
-}
-
 void gt913_device::uart_rate_w(uint8_t data)
 {
-	m_uart_clock->set_clock(clock() / (data + 1));
-	logerror("uart_rate_w: %d bps\n", m_uart_clock->clock() / 16);
+	m_sci->brr_w(data >> 1);
 }
 
 void gt913_device::uart_control_w(uint8_t data)
 {
-	m_uart_control = data;
-
-	// bit 7: clear Tx status
-	// bit 6: clear Rx status
-	m_uart->write_rdav(BIT(data, 6));
-	// bit 4-5: clear error status (ctk511 sets both to the same value)
-	m_uart->write_xr(BIT(data, 5) ? 0 : 1);
-	// bit 3: enable Tx interrupt
-	set_irq_enable(INPUT_LINE_IRQ6, BIT(data, 3));
-	// bit 2: enable Rx interrupt
-	set_irq_enable(INPUT_LINE_IRQ4, BIT(data, 2));
-	set_irq_enable(INPUT_LINE_IRQ5, BIT(data, 2));
-	// bit 1: enable Tx? (always 1)
-	// bit 0: enable Rx? (always 1)
-
-	// update IRQ 6 in case the TBMT callback isn't called (e.g. after a reset)
-	set_input_line(INPUT_LINE_IRQ6, m_uart->tbmt_r() ? ASSERT_LINE : CLEAR_LINE);
+	/*
+	upper 4 bits seem to correspond to the upper bits of SSR (Tx/Rx/error status)
+	lower 4 bits seem to correspond to the upper bits of SCR (Tx/Rx IRQ enable, Tx/Rx enable(?))
+	*/
+	m_sci->ssr_w(data & 0xf0);
+	m_sci->scr_w((data & 0x0f) << 4);
 }
 
 uint8_t gt913_device::uart_control_r()
 {
-	return (m_uart->tbmt_r() << 7) | (m_uart->dav_r() << 6) | (m_uart->or_r() << 5) | (m_uart->fe_r() << 4) | (m_uart_control & 0xf);
-}
-
-void gt913_device::adc_control_w(uint8_t data)
-{
-	m_adc_enable = BIT(data, 2);
-	m_adc_channel = BIT(data, 3);
-	if (m_adc_enable && BIT(data, 0))
-	{
-		if (!m_adc_channel)
-			m_adc_data[0] = io.read_word(h8_device::ADC_0);
-		else
-			m_adc_data[1] = io.read_word(h8_device::ADC_1);
-	}
-}
-
-uint8_t gt913_device::adc_control_r()
-{
-	return (m_adc_enable << 2) | (m_adc_channel << 3);
-}
-
-uint8_t gt913_device::adc_data_r()
-{
-	if (!m_adc_channel)
-		return m_adc_data[0];
-	else
-		return m_adc_data[1];
-}
-
-void gt913_device::port_ddr_w(offs_t offset, uint8_t data)
-{
-	m_port_ddr[offset & 1] = data;
-	m_port[offset & 1]->ddr_w(data);
-}
-
-uint8_t gt913_device::port_ddr_r(offs_t offset)
-{
-	return m_port_ddr[offset & 1];
+	return (m_sci->ssr_r() & 0xf0) | (m_sci->scr_r() >> 4);
 }
 
 void gt913_device::irq_setup()
@@ -261,75 +133,29 @@ void gt913_device::irq_setup()
 
 void gt913_device::update_irq_filter()
 {
-	int vector = 0;
-	bool nmi = false;
-
-	if (m_nmi_pending)
-	{
-		vector = m_nmi_vector;
-		nmi = true;
-	}
-	else if (!(CCR & F_I))
-	{
-		for (int i = INPUT_LINE_IRQ0; i < INPUT_LINE_IRQ7; i++)
-		{
-			if (BIT(m_irq_pending, i) && BIT(m_irq_enable, i))
-			{
-				vector = m_irq_base + i;
-				break;
-			}
-		}
-	}
-
-	set_irq(vector, 0, nmi);
+	if (CCR & F_I)
+		m_intc->set_filter(2, -1);
+	else
+		m_intc->set_filter(0, -1);
 }
 
 void gt913_device::interrupt_taken()
 {
-	if (taken_irq_vector == m_nmi_vector)
-	{
-		m_nmi_pending = false;
-		standard_irq_callback(INPUT_LINE_NMI);
-	}
-	else if (taken_irq_vector >= m_irq_base)
-	{
-		standard_irq_callback(taken_irq_vector - m_irq_base);
-	}
+	standard_irq_callback(m_intc->interrupt_taken(taken_irq_vector));
 }
 
 void gt913_device::internal_update(uint64_t current_time)
 {
 	uint64_t event_time = 0;
 
+	add_event(event_time, m_sci->internal_update(current_time));
+
 	recompute_bcount(event_time);
 }
 
 void gt913_device::execute_set_input(int inputnum, int state)
 {
-	if (inputnum == INPUT_LINE_NMI)
-	{
-		if (state == ASSERT_LINE && m_nmi_status != state)
-			m_nmi_pending = true;
-		state = m_nmi_status;
-	}
-	else if (inputnum <= INPUT_LINE_IRQ7)
-	{
-		if (state)
-			m_irq_pending |= (1 << inputnum);
-		else
-			m_irq_pending &= ~(1 << inputnum);
-	}
-	update_irq_filter();
-}
-
-void gt913_device::set_irq_enable(int inputnum, int state)
-{
-	if (state)
-		m_irq_enable |= (1 << inputnum);
-	else
-		m_irq_enable &= ~(1 << inputnum);
-
-	update_irq_filter();
+	m_intc->set_input(inputnum, state);
 }
 
 void gt913_device::device_start()
@@ -338,25 +164,9 @@ void gt913_device::device_start()
 
 	m_bank->configure_entries(0, m_rom->bytes() >> 12, m_rom->base(), 1 << 12);
 
-	m_timer[0] = timer_alloc(0);
-	m_timer[1] = timer_alloc(1);
-
 	decode_opcodes();
 
 	save_item(NAME(m_banknum));
-
-	save_item(NAME(m_nmi_pending));
-	save_item(NAME(m_nmi_status));
-	save_item(NAME(m_irq_pending));
-	save_item(NAME(m_irq_enable));
-
-	save_item(NAME(m_timer_control));
-	save_item(NAME(m_timer_rate));
-	save_item(NAME(m_uart_control));
-	save_item(NAME(m_adc_enable));
-	save_item(NAME(m_adc_channel));
-	save_item(NAME(m_adc_data));
-	save_item(NAME(m_port_ddr));
 }
 
 void gt913_device::device_reset()
@@ -364,36 +174,6 @@ void gt913_device::device_reset()
 	h8_device::device_reset();
 
 	m_banknum = 0;
-
-	m_nmi_pending = false;
-	m_nmi_status = CLEAR_LINE;
-	m_irq_pending = 0x00;
-	m_irq_enable = 0xff;
-
-	m_timer_control[0] = m_timer_control[1] = 0x00;
-	m_timer_rate[0] = m_timer_rate[1] = 0;
-
-	m_uart_control = 0x00;
-
-	m_adc_enable = false;
-	m_adc_channel = false;
-	m_adc_data[0] = m_adc_data[1] = 0;
-	m_port_ddr[0] = m_port_ddr[1] = 0;
-}
-
-void gt913_device::device_reset_after_children()
-{
-	h8_device::device_reset_after_children();
-
-	// MIDI UART, asynchronous 8/n/1
-	m_uart->write_xr(0);
-	m_uart->write_xr(1);
-	m_uart->write_swe(0);
-	m_uart->write_nb1(1);
-	m_uart->write_nb2(1);
-	m_uart->write_np(1);
-	m_uart->write_tsb(0);
-	m_uart->write_cs(1);
 }
 
 void gt913_device::do_exec_full()
