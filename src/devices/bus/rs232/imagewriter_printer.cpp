@@ -311,7 +311,7 @@ static INPUT_PORTS_START( apple_imagewriter )
 INPUT_PORTS_END
 
 //-------------------------------------------------
-//  io port constructor
+//    io port constructor
 //-------------------------------------------------
 
 ioport_constructor apple_imagewriter_printer_device::device_input_ports() const
@@ -320,11 +320,44 @@ ioport_constructor apple_imagewriter_printer_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  i8085 out sod function
+//    Input Changed Member Reset Switch
+//-------------------------------------------------
+
+
+INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::reset_sw)
+{
+	if (newval == 0) m_maincpu->reset();
+}
+
+//-------------------------------------------------
+//    Input Changed Member Select Switch
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::select_sw)
+{   // output from comparator is 5v if switch open, 260mv if switch closed so on press goes from 1 to 0,
+	// transition from 1 to 0 clocks the flipflop
+	if (oldval == 1 && newval == 0)
+	{
+		m_ic17_flipflop_select_status = !m_ic17_flipflop_select_status;
+	}
+}
+
+//-------------------------------------------------
+//    i8085 Main cpu in sid function
+//-------------------------------------------------
+
+uint8_t apple_imagewriter_printer_device::maincpu_in_sid_func()
+{
+	return ioportsaferead("WIDTH");
+}
+
+//-------------------------------------------------
+//    i8085 Main cpu out sod function
 //-------------------------------------------------
 
 void apple_imagewriter_printer_device::maincpu_out_sod_func(uint8_t data)
 {
+	// unimplemented
 	// connects to fault* on serial interface  pin 14  (secondary cts)
 	// Apple II super serial card has a secondary cts
 	//  printf("MAINCPU OUT SOD FUNCTION VALUE = %x   TIME = %f  %s\n",data, machine().time().as_double(), machine().describe_context().c_str());
@@ -366,7 +399,7 @@ void apple_imagewriter_printer_device::head_pa_w(uint8_t data)
 
 uint8_t apple_imagewriter_printer_device::head_pb_r(offs_t offset)
 {
-	u8 data = 0;
+	u8 data = 0;  // since this is an output port, this never gets called
 	return data;
 }
 
@@ -541,7 +574,7 @@ void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 void apple_imagewriter_printer_device::switch_to(uint8_t data)
 {
 	// is timerout* inverted yes
-	m_maincpu->set_input_line(I8085_RST75_LINE, data);  // is it !data for TIMEROUT*
+	m_maincpu->set_input_line(I8085_RST75_LINE, data);
 	m_pulse2->a_w(data);  // send data to pulse generator 74123 section 2
 
 	m_switches_to_last = data;
@@ -768,6 +801,9 @@ void apple_imagewriter_printer_device::device_reset()
 	output_dcd(0);  // must have this or super serial card won't work
 }
 
+//-------------------------------------------------
+//    IO port safe read
+//-------------------------------------------------
 
 int apple_imagewriter_printer_device::ioportsaferead(const char * name)
 {
@@ -779,57 +815,68 @@ int apple_imagewriter_printer_device::ioportsaferead(const char * name)
 	else return 0;
 }
 
-//virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override
+//-------------------------------------------------
+//    input_txd of serial port connects to write_rxd of m_uart
+//-------------------------------------------------
+
 WRITE_LINE_MEMBER( apple_imagewriter_printer_device::input_txd )
 {
 	m_uart->write_rxd(state);
 }
 
-INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::reset_sw)
+//-------------------------------------------------
+//    i8251 txd connects to output_rxd of serial port
+//-------------------------------------------------
+
+void apple_imagewriter_printer_device::txd_handler(uint8_t data)
 {
-	if (newval == 0) m_maincpu->reset();
+	output_rxd(data);
 }
 
-INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::select_sw)
-{   // output from comparator is 5v if switch open, 260mv if switch closed so on press goes from 1 to 0,
-	// transition from 1 to 0 clocks the flipflop
-	if (oldval == 1 && newval == 0)
-	{
-		m_ic17_flipflop_select_status = !m_ic17_flipflop_select_status;
-	}
-}
+//-------------------------------------------------
+//    8251 rxrdy_handler connects to i8085 RST65
+//-------------------------------------------------
 
 void apple_imagewriter_printer_device::rxrdy_handler(uint8_t data)
 {
 	m_maincpu->set_input_line(I8085_RST65_LINE, data);
 }
 
-void apple_imagewriter_printer_device::pulse1_out_handler(uint8_t data) {
+//-------------------------------------------------
+//    Pulse Handlers
+//-------------------------------------------------
+
+void apple_imagewriter_printer_device::pulse1_out_handler(uint8_t data) 
+{
 	if (m_pulse1_out_last == 1 && data == 0) update_printhead();
 	m_pulse1_out_last = data;
 }
+
 void apple_imagewriter_printer_device::pulse2_out_handler(uint8_t data) {
 	m_pulse1->a_w(data);
 }
 
-uint8_t apple_imagewriter_printer_device::maincpu_in_sid_func()
-{
-	return ioportsaferead("WIDTH");
-}
+//-------------------------------------------------
+//    i8251 DTR and CTS Handlers
+//-------------------------------------------------
 
-void apple_imagewriter_printer_device::dtr_handler(uint8_t data) {
+void apple_imagewriter_printer_device::dtr_handler(uint8_t data)
+{
+//	output_dsr(data);
 	if (ioport("DTR")->read() & 0x1) output_dsr(data ^ ioport("INVERT1")->read());
 	if (ioport("DTR")->read() & 0x2) output_cts(data ^ ioport("INVERT1")->read());
 }
 
-void apple_imagewriter_printer_device::rts_handler(uint8_t data) {
+void apple_imagewriter_printer_device::rts_handler(uint8_t data)
+{
+//	output_cts(data);
 	if (ioport("RTS")->read() & 0x1) output_dsr(data ^ ioport("INVERT2")->read());
 	if (ioport("RTS")->read() & 0x2) output_cts(data ^ ioport("INVERT2")->read());
 }
 
-void apple_imagewriter_printer_device::txd_handler(uint8_t data) {
-	output_rxd(data);
-}
+//-------------------------------------------------
+//    i8251 uart rxc and txc clock
+//-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER (apple_imagewriter_printer_device::pulse_uart_clock)
 {
@@ -840,5 +887,5 @@ TIMER_DEVICE_CALLBACK_MEMBER (apple_imagewriter_printer_device::pulse_uart_clock
 		m_uart->write_txc(m_uart_clock);
 		m_uart->write_rxc(m_uart_clock);
 	}
- }
+}
 
