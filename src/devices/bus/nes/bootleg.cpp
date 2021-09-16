@@ -50,6 +50,7 @@ DEFINE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device,    "nes_btl_dn",    "N
 DEFINE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device,     "nes_smb2j",     "NES Cart Super Mario Bros. 2 Jpn PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device,    "nes_smb2ja",    "NES Cart Super Mario Bros. 2 Jpn (Alt) PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device,    "nes_smb2jb",    "NES Cart Super Mario Bros. 2 Jpn (Alt 2) PCB")
+DEFINE_DEVICE_TYPE(NES_N32_4IN1,       nes_n32_4in1_device,  "nes_n32_4in1",  "NES Cart N-32 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_0353,           nes_0353_device,      "nes_0353",      "NES Cart 0353 PCB")
 DEFINE_DEVICE_TYPE(NES_09034A,         nes_09034a_device,    "nes_09034a",    "NES Cart 09-034A PCB")
 DEFINE_DEVICE_TYPE(NES_BATMANFS,       nes_batmanfs_device,  "nes_batmanfs",  "NES Cart Batman Pirate PCB")
@@ -62,6 +63,7 @@ DEFINE_DEVICE_TYPE(NES_LH10,           nes_lh10_device,      "nes_lh10",      "N
 DEFINE_DEVICE_TYPE(NES_LH28_LH54,      nes_lh28_lh54_device, "nes_lh28_lh54", "NES Cart LH28/LH54 Pirate PCBs")
 DEFINE_DEVICE_TYPE(NES_LH31,           nes_lh31_device,      "nes_lh31",      "NES Cart LH31 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH32,           nes_lh32_device,      "nes_lh32",      "NES Cart LH32 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH42,           nes_lh42_device,      "nes_lh42",      "NES Cart LH42 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH51,           nes_lh51_device,      "nes_lh51",      "NES Cart LH51 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH53,           nes_lh53_device,      "nes_lh53",      "NES Cart LH53 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_2708,           nes_2708_device,      "nes_2708",      "NES Cart BTL-2708 Pirate PCB")
@@ -117,8 +119,18 @@ nes_smb2ja_device::nes_smb2ja_device(const machine_config &mconfig, const char *
 {
 }
 
+nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), m_bank67(type == NES_SMB2JB ? 0x0f : 0x07), irq_timer(nullptr)
+{
+}
+
 nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_SMB2JB, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+	: nes_smb2jb_device(mconfig, NES_SMB2JB, tag, owner, clock)
+{
+}
+
+nes_n32_4in1_device::nes_n32_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_smb2jb_device(mconfig, NES_N32_4IN1, tag, owner, clock)
 {
 }
 
@@ -174,6 +186,11 @@ nes_lh31_device::nes_lh31_device(const machine_config &mconfig, const char *tag,
 
 nes_lh32_device::nes_lh32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_LH32, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_lh42_device::nes_lh42_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_LH42, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -421,6 +438,7 @@ void nes_smb2jb_device::device_start()
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
+	save_item(NAME(m_reg));
 }
 
 void nes_smb2jb_device::pcb_reset()
@@ -433,6 +451,16 @@ void nes_smb2jb_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
+	m_reg = 0;
+}
+
+void nes_n32_4in1_device::pcb_reset()
+{
+	// Powers up in menu, but soft reset does not touch banks (so each game returns to its own title). Is this correct?
+
+	m_irq_enable = 0;
+	m_irq_count = 0;
+	m_reg = 0;
 }
 
 void nes_0353_device::device_start()
@@ -532,6 +560,21 @@ void nes_lh32_device::pcb_reset()
 	m_latch = 0xf;
 }
 
+void nes_lh42_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_lh42_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);    // Last 16K is fixed
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
+}
+
 void nes_lg25_device::device_start()
 {
 	common_start();
@@ -565,11 +608,6 @@ void nes_lh10_device::pcb_reset()
 
 	m_latch = 0;
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
-}
-
-void nes_lh51_device::device_start()
-{
-	common_start();
 }
 
 void nes_lh51_device::pcb_reset()
@@ -1325,7 +1363,8 @@ void nes_smb2jb_device::write_45(offs_t offset, u8 data)
 	switch (offset & 0x4120)
 	{
 		case 0x4020:
-			prg8_cd(bitswap<4>(data, 3, 0, 2, 1));
+			m_reg = bitswap<4>(data, 3, 0, 2, 1);
+			prg8_cd(m_reg);
 			break;
 		case 0x4120:
 			m_irq_enable = BIT(data, 0);
@@ -1353,7 +1392,57 @@ void nes_smb2jb_device::write_l(offs_t offset, u8 data)
 u8 nes_smb2jb_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2jb read_m, offset: %04x\n", offset));
-	return m_prg[0x0f * 0x2000 + offset];
+	return m_prg[m_bank67 * 0x2000 + offset];
+}
+
+/*-------------------------------------------------
+
+ BMC-N32-4IN1
+
+ Unknown Bootleg Multigame Board
+ Games: 4 in 1
+
+ This multicart contains the mapper 50 version of SMB2.
+ There are changes to bank locations compared to that
+ game, but otherwise we rely on the existing SMB2JB
+ emulation (unless other differences are discovered?)
+
+ NES 2.0: mapper 416
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_n32_4in1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("n32_4in1 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x2000)
+	{
+		if (BIT(data, 3))    // NROM games
+		{
+			u8 bank = bitswap<3>(data, 3, 7, 5);
+			u8 mode = BIT(data, 7);
+			if (data & 0xc0)
+			{
+				prg16_89ab(bank & ~mode);
+				prg16_cdef(bank | mode);
+			}
+			else
+				for (int i = 0; i < 4; i++)
+					prg8_x(i, bank << 1);
+		}
+		else                 // SMB2 only
+		{
+			prg8_89(0);
+			prg8_ab(1);
+			prg8_cd(m_reg);
+			prg8_ef(3);
+		}
+
+		chr8((data >> 1) & 0x03, CHRROM);
+		set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
 }
 
 /*-------------------------------------------------
@@ -1672,6 +1761,42 @@ void nes_lh32_device::write_h(offs_t offset, uint8_t data)
 
 	if (offset >= 0x4000 && offset < 0x6000)
 		m_prgram[offset & 0x1fff] = data;
+}
+
+/*-------------------------------------------------
+
+ UNL-LH42
+
+ Games: Highway Star (Whirlwind Manu bootleg)
+
+ NES 2.0: mapper 418
+
+ In MAME: Preliminary supported.
+
+ TODO: Investigate garbage tiles on bottom half of
+ course map screens. This should be car dashboard?
+
+ -------------------------------------------------*/
+
+void nes_lh42_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("lh42 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 0))
+	{
+		switch (m_latch)
+		{
+			case 1:
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				break;
+			case 2:
+			case 3:
+				prg8_x(m_latch & 1, data & 0x0f);
+				break;
+		}
+	}
+	else
+		m_latch = data & 0x03;
 }
 
 /*-------------------------------------------------

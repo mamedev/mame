@@ -49,7 +49,8 @@ public:
 	virtual uint16_t width() const override { return m_width; }
 	virtual uint16_t height() const override { return m_height; }
 	virtual uint16_t rowpixels() const override { return m_width; }
-	virtual int convert_stride() const override { return 1; }
+	virtual int width_div_factor() const override { return 1; }
+	virtual int width_mul_factor() const override { return 1; }
 
 private:
 	std::string                 m_name;

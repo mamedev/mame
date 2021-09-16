@@ -77,9 +77,12 @@
 
 #pragma once
 
-// standard C++ includes
+#include <any>
+#include <cassert>
+#include <cstdint>
 #include <cstring>
-#include <functional>
+#include <exception>
+#include <type_traits>
 #include <typeinfo>
 #include <utility>
 
@@ -571,9 +574,54 @@ class delegate<ReturnType (Params...)> : public delegate_base<ReturnType, Params
 {
 private:
 	using basetype = delegate_base<ReturnType, Params...>;
-	using functional_type = std::function<ReturnType (Params...)>;
+	using functoid_setter = void (*)(delegate &);
 
-	functional_type m_std_func;
+	template <typename T> static constexpr bool matching_non_const_call(T &&) { return false; }
+	template <typename T> static constexpr bool matching_non_const_call(ReturnType (T::*)(Params...)) { return true; }
+	template <typename T> static constexpr bool matching_const_call(T &&) { return false; }
+	template <typename T> static constexpr bool matching_const_call(ReturnType (T::*)(Params...) const) { return true; }
+
+	template <typename T>
+	static functoid_setter make_functoid_setter()
+	{
+		using unwrapped_type = std::remove_cv_t<std::remove_reference_t<T> >;
+		if constexpr (matching_non_const_call(&unwrapped_type::operator()))
+		{
+			return
+					[] (delegate &obj)
+					{
+						obj.basetype::operator=(
+								basetype(
+									static_cast<ReturnType (unwrapped_type::*)(Params...)>(&unwrapped_type::operator()),
+									std::any_cast<unwrapped_type>(&obj.m_functoid)));
+					};
+		}
+		else if constexpr (matching_const_call(&unwrapped_type::operator()))
+		{
+			return
+					[] (delegate &obj)
+					{
+						obj.basetype::operator=(
+								basetype(
+									static_cast<ReturnType (unwrapped_type::*)(Params...) const>(&unwrapped_type::operator()),
+									std::any_cast<unwrapped_type>(&obj.m_functoid)));
+					};
+		}
+		else
+		{
+			return
+					[] (delegate &obj)
+					{
+						obj.basetype::operator=(
+								basetype(
+									[] (unwrapped_type &f, Params... args) { return ReturnType(f(std::forward<Params>(args)...)); },
+									std::any_cast<unwrapped_type>(&obj.m_functoid)));
+					};
+		}
+	}
+
+	std::any m_functoid;
+	functoid_setter m_set_functoid = nullptr;
 
 protected:
 	template <class FunctionClass> using traits = typename basetype::template traits<FunctionClass>;
@@ -581,34 +629,89 @@ protected:
 	template <class FunctionClass> using const_member_func_type = typename traits<FunctionClass>::const_member_func_type;
 	template <class FunctionClass> using static_ref_func_type = typename traits<FunctionClass>::static_ref_func_type;
 
+	template <typename T> using suitable_functoid = std::is_convertible<std::invoke_result_t<T, Params...>, ReturnType>;
+
 public:
-	// create a standard set of constructors
 	delegate() : basetype() { }
-	delegate(delegate const &src) : basetype(src.m_std_func ? basetype(&functional_type::operator(), &m_std_func) : static_cast<basetype const &>(src)), m_std_func(src.m_std_func) { }
-	delegate(delegate &&src) : basetype(src.m_std_func ? basetype(&functional_type::operator(), &m_std_func) : std::move(static_cast<basetype &>(src))), m_std_func(std::move(src.m_std_func)) { }
-	delegate(delegate const &src, delegate_late_bind &object) : basetype(src.m_std_func ? basetype(&functional_type::operator(), &m_std_func) : basetype(src, object)), m_std_func(src.m_std_func) { }
+
+	delegate(delegate const &src)
+		: basetype(src.m_functoid.has_value() ? static_cast<const basetype &>(basetype()) : src)
+		, m_functoid(src.m_functoid)
+		, m_set_functoid(src.m_set_functoid)
+	{
+		if (m_functoid.has_value())
+			m_set_functoid(*this);
+	}
+
+	delegate(delegate &src)
+		: delegate(const_cast<delegate const &>(src))
+	{
+	}
+
+	delegate(delegate &&src)
+		: basetype(src.m_functoid.has_value() ? basetype() : std::move(src))
+		, m_functoid(std::move(src.m_functoid))
+		, m_set_functoid(std::move(src.m_set_functoid))
+	{
+		if (m_functoid.has_value())
+			m_set_functoid(*this);
+	}
+
+	delegate(delegate const &src, delegate_late_bind &object)
+		: basetype(src.m_functoid.has_value() ? basetype() : basetype(src, object))
+		, m_functoid(src.m_functoid)
+		, m_set_functoid(src.m_set_functoid)
+	{
+		if (m_functoid.has_value())
+			m_set_functoid(*this);
+	}
+
 	template <class FunctionClass> delegate(member_func_type<FunctionClass> funcptr, FunctionClass *object) : basetype(funcptr, object) { }
 	template <class FunctionClass> delegate(const_member_func_type<FunctionClass> funcptr, FunctionClass *object) : basetype(funcptr, object) { }
-	explicit delegate(functional_type &&functoid) : basetype(&functional_type::operator(), &m_std_func), m_std_func(std::move(functoid)) { }
 	template <class FunctionClass> delegate(static_ref_func_type<FunctionClass> funcptr, FunctionClass *object) : basetype(funcptr, object) { }
+
+	template <typename T>
+	explicit delegate(T &&functoid, std::enable_if_t<suitable_functoid<T>::value, int> = 0)
+		: basetype()
+		, m_functoid(std::forward<T>(functoid))
+		, m_set_functoid(make_functoid_setter<T>())
+	{
+		m_set_functoid(*this);
+	}
+
+	delegate &operator=(std::nullptr_t) noexcept
+	{
+		reset();
+		return *this;
+	}
 
 	delegate &operator=(delegate const &src)
 	{
-		if (src.m_std_func)
-			basetype::operator=(basetype(&functional_type::operator(), &m_std_func));
+		m_functoid = src.m_functoid;
+		m_set_functoid = src.m_set_functoid;
+		if (m_functoid.has_value())
+			m_set_functoid(*this);
 		else
 			basetype::operator=(src);
-		m_std_func = src.m_std_func;
 		return *this;
 	}
+
 	delegate &operator=(delegate &&src)
 	{
-		if (src.m_std_func)
-			basetype::operator=(basetype(&functional_type::operator(), &m_std_func));
+		m_functoid = std::move(src.m_functoid);
+		m_set_functoid = std::move(src.m_set_functoid);
+		if (m_functoid.has_value())
+			m_set_functoid(*this);
 		else
 			basetype::operator=(std::move(src));
-		m_std_func = std::move(src.m_std_func);
 		return *this;
+	}
+
+	void reset() noexcept
+	{
+		basetype::operator=(basetype());
+		m_functoid.reset();
+		m_set_functoid = nullptr;
 	}
 };
 

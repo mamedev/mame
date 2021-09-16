@@ -8,12 +8,15 @@
 
 ****************************************************************************/
 
-#include <ctime>
-
 #include "imgtool.h"
+#include "iflopimg.h"
+
 #include "formats/imageutl.h"
 #include "formats/coco_dsk.h"
-#include "iflopimg.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <ctime>
 
 enum creation_policy_t
 {

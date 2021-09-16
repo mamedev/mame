@@ -59,18 +59,18 @@ void segam1audio_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	YM3438(config, m_ym, 8_MHz_XTAL);
-	m_ym->add_route(0, "lspeaker", 0.60);
-	m_ym->add_route(1, "rspeaker", 0.60);
+	m_ym->add_route(0, "lspeaker", 0.30);
+	m_ym->add_route(1, "rspeaker", 0.30);
 
 	MULTIPCM(config, m_multipcm_1, 10_MHz_XTAL);
 	m_multipcm_1->set_addrmap(0, &segam1audio_device::mpcm1_map);
-	m_multipcm_1->add_route(0, "lspeaker", 1.0);
-	m_multipcm_1->add_route(1, "rspeaker", 1.0);
+	m_multipcm_1->add_route(0, "lspeaker", 0.5);
+	m_multipcm_1->add_route(1, "rspeaker", 0.5);
 
 	MULTIPCM(config, m_multipcm_2, 10_MHz_XTAL);
 	m_multipcm_2->set_addrmap(0, &segam1audio_device::mpcm2_map);
-	m_multipcm_2->add_route(0, "lspeaker", 1.0);
-	m_multipcm_2->add_route(1, "rspeaker", 1.0);
+	m_multipcm_2->add_route(0, "lspeaker", 0.5);
+	m_multipcm_2->add_route(1, "rspeaker", 0.5);
 
 	I8251(config, m_uart, 8_MHz_XTAL); // T82C51, clock unknown
 	m_uart->rxrdy_handler().set_inputline(m_audiocpu, M68K_IRQ_2);

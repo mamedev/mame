@@ -139,7 +139,7 @@ void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args)
 
 osd_ticks_t osd_ticks()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	LARGE_INTEGER val;
 	QueryPerformanceCounter(&val);
 	return val.QuadPart;
@@ -155,7 +155,7 @@ osd_ticks_t osd_ticks()
 
 osd_ticks_t osd_ticks_per_second()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	LARGE_INTEGER val;
 	QueryPerformanceFrequency(&val);
 	return val.QuadPart;
@@ -170,7 +170,7 @@ osd_ticks_t osd_ticks_per_second()
 
 void osd_sleep(osd_ticks_t duration)
 {
-#ifdef WIN32
+#ifdef _WIN32
 // sleep_for appears to oversleep on Windows with gcc 8
 	Sleep(duration / (osd_ticks_per_second() / 1000));
 #else
@@ -190,7 +190,7 @@ void osd_sleep(osd_ticks_t duration)
 std::vector<std::string> osd_get_command_line(int argc, char *argv[])
 {
 	std::vector<std::string> results;
-#ifdef WIN32
+#ifdef _WIN32
 	{
 		// Get the command line from Windows
 		int count;
@@ -206,7 +206,7 @@ std::vector<std::string> osd_get_command_line(int argc, char *argv[])
 
 		LocalFree(wide_args);
 	}
-#else // !WIN32
+#else // !_WIN32
 	{
 		// for non Windows platforms, we are assuming that arguments are
 		// already UTF-8; we just need to convert to std::vector<std::string>
@@ -214,6 +214,6 @@ std::vector<std::string> osd_get_command_line(int argc, char *argv[])
 		for (int i = 0; i < argc; i++)
 			results.emplace_back(argv[i]);
 	}
-#endif // WIN32
+#endif // _WIN32
 	return results;
 }

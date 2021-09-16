@@ -157,7 +157,7 @@
                        '-------------------'
 
 
-  Both program ROMs are sharing the same adressing space.
+  Both program ROMs are sharing the same addressing space.
   The switch placed below the program ROMs is connected to each PD /PGM line,
   so you can switch between 2 different programs.
 
@@ -215,8 +215,7 @@
 #include "tilemap.h"
 
 
-#define MASTER_CLOCK    XTAL(6'000'000)   /* confirmed */
-
+namespace {
 
 class tmspoker_state : public driver_device
 {
@@ -224,6 +223,7 @@ public:
 	tmspoker_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
+		m_gamebank(*this, "gamebank"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_outlatch(*this, "outlatch%u", 0U),
@@ -241,22 +241,23 @@ protected:
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
+	required_memory_bank m_gamebank;
 	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<ls259_device, 4> m_outlatch;
 	required_ioport_array<3> m_inputs;
 
-	void tmspoker_videoram_w(offs_t offset, uint8_t data);
-	//void debug_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void debug_w(uint8_t data);
 	uint8_t inputs_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void tmspoker_palette(palette_device &palette) const;
-	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
 
-	void tmspoker_cru_map(address_map &map);
-	void tmspoker_map(address_map &map);
+	void cru_map(address_map &map);
+	void prg_map(address_map &map);
 };
 
 
@@ -264,7 +265,7 @@ private:
 *     Video Hardware     *
 *************************/
 
-void tmspoker_state::tmspoker_videoram_w(offs_t offset, uint8_t data)
+void tmspoker_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -289,13 +290,13 @@ void tmspoker_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tmspoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tmspoker_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-void tmspoker_state::tmspoker_palette(palette_device &palette) const
+void tmspoker_state::palette(palette_device &palette) const
 {
 }
 
@@ -304,12 +305,12 @@ void tmspoker_state::tmspoker_palette(palette_device &palette) const
 *  Read / Write Handlers  *
 **************************/
 
-//void tmspoker_state::debug_w(uint8_t data)
-//{
-//  popmessage("written : %02X", data);
-//}
+void tmspoker_state::debug_w(uint8_t data)
+{
+	popmessage("written : %02X", data);
+}
 
-INTERRUPT_GEN_MEMBER(tmspoker_state::tmspoker_interrupt)
+INTERRUPT_GEN_MEMBER(tmspoker_state::interrupt)
 {
 	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE);
 	// MZ: The TMS9980A uses level-triggered interrupts, so this
@@ -328,8 +329,7 @@ INTERRUPT_GEN_MEMBER(tmspoker_state::tmspoker_interrupt)
 
 void tmspoker_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x1000);
+	m_gamebank->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 }
 
 
@@ -339,7 +339,7 @@ void tmspoker_state::machine_reset()
 
 	popmessage("ROM Bank: %02X", seldsw);
 
-	membank("bank1")->set_entry(seldsw);
+	m_gamebank->set_entry(seldsw);
 }
 
 
@@ -357,13 +357,13 @@ void tmspoker_state::machine_reset()
 //     098E:     RT                        045B
 //
 
-void tmspoker_state::tmspoker_map(address_map &map)
+void tmspoker_state::prg_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x0fff).bankr("bank1");
+	map(0x0000, 0x0fff).bankr(m_gamebank);
 	map(0x2800, 0x2800).nopr().w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x3000, 0x33ff).ram().w(FUNC(tmspoker_state::tmspoker_videoram_w)).share("videoram");
+	map(0x3000, 0x33ff).ram().w(FUNC(tmspoker_state::videoram_w)).share(m_videoram);
 	map(0x3800, 0x3fff).ram(); //NVRAM?
 	map(0x2000, 0x20ff).ram(); //color RAM?
 }
@@ -379,7 +379,7 @@ uint8_t tmspoker_state::inputs_r(offs_t offset)
 	return 1;
 }
 
-void tmspoker_state::tmspoker_cru_map(address_map &map)
+void tmspoker_state::cru_map(address_map &map)
 {
 	map(0x0c80, 0x0c8f).w(m_outlatch[0], FUNC(ls259_device::write_d0));
 	map(0x0c90, 0x0c9f).r(FUNC(tmspoker_state::inputs_r)).w(m_outlatch[1], FUNC(ls259_device::write_d0));
@@ -551,12 +551,12 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8, 8,
-	RGN_FRAC(1,1),  /* 256 tiles */
+	RGN_FRAC(1,1),  // 256 tiles
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 
@@ -565,7 +565,7 @@ static const gfx_layout charlayout =
 ******************************/
 
 static GFXDECODE_START( gfx_tmspoker )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "chars", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -576,28 +576,28 @@ GFXDECODE_END
 void tmspoker_state::tmspoker(machine_config &config)
 {
 	// CPU TMS9980A; no line connections
-	TMS9980A(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmspoker_state::tmspoker_map);
-	m_maincpu->set_addrmap(AS_IO, &tmspoker_state::tmspoker_cru_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmspoker_state::tmspoker_interrupt));
+	TMS9980A(config, m_maincpu, 6_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmspoker_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &tmspoker_state::cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmspoker_state::interrupt));
 
 	LS259(config, m_outlatch[0]);
 	LS259(config, m_outlatch[1]);
 	LS259(config, m_outlatch[2]);
 	LS259(config, m_outlatch[3]);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(tmspoker_state::screen_update_tmspoker));
+	screen.set_screen_update(FUNC(tmspoker_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tmspoker);
-	PALETTE(config, "palette", FUNC(tmspoker_state::tmspoker_palette), 256);
+	PALETTE(config, "palette", FUNC(tmspoker_state::palette), 256);
 
-	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/4)); /* guess */
+	mc6845_device &crtc(MC6845(config, "crtc", 6_MHz_XTAL / 4)); // guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -609,14 +609,13 @@ void tmspoker_state::tmspoker(machine_config &config)
 *************************/
 
 ROM_START( tmspoker )
-	ROM_REGION( 0x4000, "maincpu", 0 ) /* TMS9980 selectable code */
-
-	ROM_LOAD( "0.bin",  0x0800, 0x0800, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )  /* Program 1 */
+	ROM_REGION( 0x4000, "maincpu", 0 ) // TMS9980 selectable code
+	ROM_LOAD( "0.bin",  0x0800, 0x0800, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )  // Program 1
 	ROM_CONTINUE(       0x0000, 0x0800 )
-	ROM_LOAD( "8.bin",  0x1800, 0x0800, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )  /* Program 2 */
+	ROM_LOAD( "8.bin",  0x1800, 0x0800, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )  // Program 2
 	ROM_CONTINUE(       0x1000, 0x0800 )
 
-	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_REGION( 0x0800, "chars", 0 )
 	ROM_LOAD( "3.bin",  0x0000, 0x0800, CRC(55458dae) SHA1(bf96d1b287292ff89bc2dbd9451a88a2ab941f3e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -630,7 +629,7 @@ ROM_END
 
 void tmspoker_state::init_bus()
 {
-	/* still need to decode the addressing lines */
+	// still need to decode the addressing lines
 	/* text found in the ROM (A at 6, B at 8, etc: consistent with gfx rom byte offsets) suggests
 	   that the lower address lines are good already:
 
@@ -647,6 +646,8 @@ void tmspoker_state::init_bus()
 	the same 53 bytes blob of data ("POINTS" to "TEST", text control codes included) is also located at offset $190c-$1941
 	*/
 }
+
+} // Anonymous namespace
 
 
 /*************************

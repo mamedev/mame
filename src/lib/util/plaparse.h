@@ -21,6 +21,6 @@
 ***************************************************************************/
 
 /* parse a file (read into memory) into a jed_data structure */
-int pla_parse(const void *data, size_t length, jed_data *result);
+int pla_parse(util::random_read &src, jed_data *result);
 
 #endif // MAME_UTIL_PLAPARSE_H

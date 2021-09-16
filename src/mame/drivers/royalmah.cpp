@@ -130,7 +130,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_mainbank(*this, "mainbank"),
 		m_mainopbank(*this, "mainopbank"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes")
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_mainview(*this, "mainview")
 	{ }
 
 	void mjdiplob(machine_config &config);
@@ -236,19 +237,10 @@ private:
 	void janptr96_coin_counter_w(uint8_t data);
 
 	void mjifb_coin_counter_w(uint8_t data);
-	uint8_t mjifb_rom_io_r(offs_t offset);
-	void mjifb_rom_io_w(offs_t offset, uint8_t data);
-	uint8_t mjifb_p3_r();
-	uint8_t mjifb_p5_r();
-	uint8_t mjifb_p6_r();
-	uint8_t mjifb_p7_r();
 	uint8_t mjifb_p8_r();
 	void mjifb_p3_w(uint8_t data);
 	void mjifb_p4_w(uint8_t data);
 	void mjifb_p8_w(uint8_t data);
-
-	uint8_t mjdejavu_rom_io_r(offs_t offset);
-	void mjdejavu_rom_io_w(offs_t offset, uint8_t data);
 
 	uint8_t mjtensin_p3_r();
 	void mjtensin_p4_w(uint8_t data);
@@ -330,6 +322,7 @@ private:
 	optional_memory_bank m_mainbank;
 	optional_memory_bank m_mainopbank;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	memory_view m_mainview;
 
 	// used by most games
 	uint8_t m_input_port_select;
@@ -351,8 +344,6 @@ private:
 	uint8_t m_gfxdata0;
 	uint8_t m_gfxdata1;
 	uint8_t m_jansou_colortable[16];
-
-	uint8_t m_mjifb_rom_enable;
 
 	void mjtensin_update_rombank();
 	void cafetime_update_rombank();
@@ -1171,77 +1162,24 @@ void royalmah_state::mjifb_coin_counter_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
-uint8_t royalmah_state::mjifb_rom_io_r(offs_t offset)
-{
-	if (m_mjifb_rom_enable)
-		return ((uint8_t*)(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
-
-	offset += 0x8000;
-
-	switch(offset)
-	{
-		case 0x8000:    return ioport("DSW4")->read();      // dsw 4
-		case 0x8200:    return ioport("DSW3")->read();      // dsw 3
-		case 0x9001:    return m_ay->data_r();              // inputs
-		case 0x9011:    return ioport("SYSTEM")->read();
-	}
-
-	logerror("%04X: unmapped input read at %04X\n", m_maincpu->pc(), offset);
-	return 0xff;
-}
-
-void royalmah_state::mjifb_rom_io_w(offs_t offset, uint8_t data)
-{
-	if (m_mjifb_rom_enable)
-	{
-		m_videoram[offset] = data;
-		return;
-	}
-
-	offset += 0x8000;
-
-	switch(offset)
-	{
-		case 0x8e00:    m_palette_base = data & 0x1f;   return;
-		case 0x9002:    m_ay->data_w(data);             return;
-		case 0x9003:    m_ay->address_w(data);          return;
-		case 0x9010:
-			mjifb_coin_counter_w(data);
-			return;
-		case 0x9011:    input_port_select_w(data);  return;
-		case 0x9013:
-//          if (data)   popmessage("%02x",data);
-			return;
-	}
-
-	logerror("%04X: unmapped input write at %04X = %02X\n", m_maincpu->pc(), offset,data);
-}
-
 void royalmah_state::mjifb_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).writeonly().share("videoram");
-	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjifb_rom_io_r), FUNC(royalmah_state::mjifb_rom_io_w));
+	map(0x8000, 0xffff).writeonly().share(m_videoram);
+	map(0x8000, 0xbfff).view(m_mainview);
+	m_mainview[0](0x8000, 0x8000).portr("DSW4");
+	m_mainview[0](0x8200, 0x8200).portr("DSW3");
+	m_mainview[0](0x8e00, 0x8e00).lw8(NAME([this] (uint8_t data) { m_palette_base = data & 0x1f; }));
+	m_mainview[0](0x9001, 0x9001).r(m_ay, FUNC(ay8910_device::data_r));
+	m_mainview[0](0x9002, 0x9002).w(m_ay, FUNC(ay8910_device::data_w));
+	m_mainview[0](0x9003, 0x9003).w(m_ay, FUNC(ay8910_device::address_w));
+	m_mainview[0](0x9010, 0x9010).w(FUNC(royalmah_state::mjifb_coin_counter_w));
+	m_mainview[0](0x9011, 0x9011).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	m_mainview[1](0x8000, 0xbfff).bankr(m_mainbank).lw8(NAME([this] (offs_t offset, uint8_t data) { m_videoram[offset] = data; }));
 	map(0xc000, 0xffff).rom();
 }
 
-uint8_t royalmah_state::mjifb_p3_r()
-{
-	return ioport("PORT3_5")->read() >> 6;
-}
-uint8_t royalmah_state::mjifb_p5_r()
-{
-	return ioport("PORT3_5")->read();
-}
-uint8_t royalmah_state::mjifb_p6_r()
-{
-	return ioport("PORT6_7")->read();
-}
-uint8_t royalmah_state::mjifb_p7_r()
-{
-	return ioport("PORT6_7")->read() >> 4;
-}
 uint8_t royalmah_state::mjifb_p8_r()
 {
 	return 0xff;
@@ -1250,14 +1188,16 @@ uint8_t royalmah_state::mjifb_p8_r()
 void royalmah_state::mjifb_p3_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0x0f) | ((data & 0x0c) << 2);
+	m_mainbank->set_entry(m_rombank);
 }
 void royalmah_state::mjifb_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
+	m_mainbank->set_entry(m_rombank);
 }
 void royalmah_state::mjifb_p8_w(uint8_t data)
 {
-	m_mjifb_rom_enable = (data & 0x08);
+	m_mainview.select(BIT(data, 3));
 }
 
 
@@ -1265,55 +1205,21 @@ void royalmah_state::mjifb_p8_w(uint8_t data)
                            Mahjong Shinkirou Deja Vu
 ****************************************************************************/
 
-uint8_t royalmah_state::mjdejavu_rom_io_r(offs_t offset)
-{
-	if (m_mjifb_rom_enable)
-		return ((uint8_t*)(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
-
-	offset += 0x8000;
-
-	switch(offset)
-	{
-		case 0x8000:    return ioport("DSW2")->read();      // dsw 2
-		case 0x8001:    return ioport("DSW1")->read();      // dsw 1
-		case 0x9001:    return m_ay->data_r();              // inputs
-		case 0x9011:    return ioport("SYSTEM")->read();
-	}
-
-	logerror("%04X: unmapped input read at %04X\n", m_maincpu->pc(), offset);
-	return 0xff;
-}
-
-void royalmah_state::mjdejavu_rom_io_w(offs_t offset, uint8_t data)
-{
-	if (m_mjifb_rom_enable)
-	{
-		m_videoram[offset] = data;
-		return;
-	}
-
-	offset += 0x8000;
-	switch(offset)
-	{
-		case 0x8802:    m_palette_base = data & 0x1f;           return;
-		case 0x9002:    m_ay->data_w(data);                     return;
-		case 0x9003:    m_ay->address_w(data);                  return;
-		case 0x9010:    janptr96_coin_counter_w(data);  return;
-		case 0x9011:    input_port_select_w(data);      return;
-		case 0x9013:
-//          if (data)   popmessage("%02x",data);
-			return;
-	}
-
-	logerror("%04X: unmapped input write at %04X = %02X\n", m_maincpu->pc(), offset,data);
-}
-
 void royalmah_state::mjdejavu_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).writeonly().share("videoram");
-	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjdejavu_rom_io_r), FUNC(royalmah_state::mjdejavu_rom_io_w));
+	map(0x8000, 0xffff).writeonly().share(m_videoram);
+	map(0x8000, 0xbfff).view(m_mainview);
+	m_mainview[0](0x8000, 0x8000).portr("DSW2");
+	m_mainview[0](0x8001, 0x8001).portr("DSW1");
+	m_mainview[0](0x8802, 0x8802).lw8(NAME([this] (uint8_t data) { m_palette_base = data & 0x1f; }));
+	m_mainview[0](0x9001, 0x9001).r(m_ay, FUNC(ay8910_device::data_r));
+	m_mainview[0](0x9002, 0x9002).w(m_ay, FUNC(ay8910_device::data_w));
+	m_mainview[0](0x9003, 0x9003).w(m_ay, FUNC(ay8910_device::address_w));
+	m_mainview[0](0x9010, 0x9010).w(FUNC(royalmah_state::janptr96_coin_counter_w));
+	m_mainview[0](0x9011, 0x9011).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	m_mainview[1](0x8000, 0xbfff).bankr(m_mainbank).lw8(NAME([this] (offs_t offset, uint8_t data) { m_videoram[offset] = data; }));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -3883,12 +3789,12 @@ void royalmah_state::mjifb(machine_config &config)
 	mjderngr(config);
 	tmp90841_device &tmp(TMP90841(config.replace(), m_maincpu, 8000000));   /* ? */
 	tmp.set_addrmap(AS_PROGRAM, &royalmah_state::mjifb_map);
-	tmp.port_read<3>().set(FUNC(royalmah_state::mjifb_p3_r));
+	tmp.port_read<3>().set_ioport("PORT3_5").rshift(6);
 	tmp.port_write<3>().set(FUNC(royalmah_state::mjifb_p3_w));
 	tmp.port_write<4>().set(FUNC(royalmah_state::mjifb_p4_w));
-	tmp.port_read<5>().set(FUNC(royalmah_state::mjifb_p5_r));
-	tmp.port_read<6>().set(FUNC(royalmah_state::mjifb_p6_r));
-	tmp.port_read<7>().set(FUNC(royalmah_state::mjifb_p7_r));
+	tmp.port_read<5>().set_ioport("PORT3_5");
+	tmp.port_read<6>().set_ioport("PORT6_7");
+	tmp.port_read<7>().set_ioport("PORT6_7").rshift(4);
 	tmp.port_read<8>().set(FUNC(royalmah_state::mjifb_p8_r));
 	tmp.port_write<8>().set(FUNC(royalmah_state::mjifb_p8_w));
 
@@ -3903,12 +3809,12 @@ void royalmah_state::mjdejavu(machine_config &config)
 	mjderngr(config);
 	tmp90841_device &tmp(TMP90841(config.replace(), m_maincpu, 8000000));   /* ? */
 	tmp.set_addrmap(AS_PROGRAM, &royalmah_state::mjdejavu_map);
-	tmp.port_read<3>().set(FUNC(royalmah_state::mjifb_p3_r));
+	tmp.port_read<3>().set_ioport("PORT3_5").rshift(6);
 	tmp.port_write<3>().set(FUNC(royalmah_state::mjifb_p3_w));
 	tmp.port_write<4>().set(FUNC(royalmah_state::mjifb_p4_w));
-	tmp.port_read<5>().set(FUNC(royalmah_state::mjifb_p5_r));
-	tmp.port_read<6>().set(FUNC(royalmah_state::mjifb_p6_r));
-	tmp.port_read<7>().set(FUNC(royalmah_state::mjifb_p7_r));
+	tmp.port_read<5>().set_ioport("PORT3_5");
+	tmp.port_read<6>().set_ioport("PORT6_7");
+	tmp.port_read<7>().set_ioport("PORT6_7").rshift(4);
 	tmp.port_read<8>().set(FUNC(royalmah_state::mjifb_p8_r));
 	tmp.port_write<8>().set(FUNC(royalmah_state::mjifb_p8_w));
 
@@ -5454,7 +5360,7 @@ void royalmah_state::init_jongshin()
 
 void royalmah_state::init_mjifb()
 {
-	save_item(NAME(m_mjifb_rom_enable));
+	m_mainbank->configure_entries(0, 256, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 void royalmah_state::init_tontonb()

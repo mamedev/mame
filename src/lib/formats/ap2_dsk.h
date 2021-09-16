@@ -13,6 +13,7 @@
 #pragma once
 
 #include "flopimg.h"
+#include "flopimg_legacy.h"
 
 
 /***************************************************************************

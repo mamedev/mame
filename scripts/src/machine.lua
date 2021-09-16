@@ -4203,6 +4203,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/spi_sdcard.h,MACHINES["SPISDCARD"] = true
+---------------------------------------------------
+if (MACHINES["SPISDCARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/spi_sdcard.cpp",
+		MAME_DIR .. "src/devices/machine/spi_sdcard.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/appldriv.h,MACHINES["APPLE_DRIVE"] = true
 ---------------------------------------------------
 if (MACHINES["APPLE_DRIVE"]~=null) then

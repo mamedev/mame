@@ -10,7 +10,7 @@ known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
- *055     uPD546C  1979, Fidelity Checker Challenger (CR)
+  055     uPD546C  1978, Fidelity Checker Challenger (CR) -> fidel_checkc2.cpp
 
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)

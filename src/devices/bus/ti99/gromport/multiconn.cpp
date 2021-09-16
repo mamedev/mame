@@ -49,7 +49,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_MULTI,  bus::ti99::gromport, ti99_multi_cart_conn_device,  "ti99_mcartconn", "TI-99 Multi-cartridge extender")
+DEFINE_DEVICE_TYPE(TI99_GROMPORT_MULTI,  bus::ti99::gromport::ti99_multi_cart_conn_device,  "ti99_mcartconn", "TI-99 Multi-cartridge extender")
 
 namespace bus::ti99::gromport {
 

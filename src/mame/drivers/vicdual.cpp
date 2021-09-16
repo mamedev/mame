@@ -3663,7 +3663,7 @@ ROM_START( carnival )
 	ROM_LOAD( "epr-666.u1",    0x3c00, 0x0400, CRC(4eec7fae) SHA1(cdc858165136c55b01511805c9d4dc6bc598fe1f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-633",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+	ROM_LOAD( "316-0633.u49",  0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",    0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
@@ -3692,7 +3692,7 @@ ROM_START( carnivalb )
 	ROM_LOAD( "epr-666.u1",    0x3c00, 0x0400, CRC(4eec7fae) SHA1(cdc858165136c55b01511805c9d4dc6bc598fe1f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-633",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+	ROM_LOAD( "316-0633.u49",  0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "carnival_b.u5", 0x0000, 0x0400, CRC(422abb43) SHA1(edb6f74ccf9382624353e927ac225e1455bb1144) )
@@ -3721,7 +3721,7 @@ ROM_START( carnivalc )
 	ROM_LOAD( "epr-516.u1",  0x3c00, 0x0400, CRC(7c32b352) SHA1(8cb472a7f71a301417c6a8e4a26a9bdcd43b6062) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-633",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+	ROM_LOAD( "316-0633.u49", 0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",   0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
@@ -3771,7 +3771,7 @@ ROM_START( carnivalh )
 	ROM_LOAD( "epr-162.u41",   0x3800, 0x0800, CRC(56e1c120) SHA1(24816b6a9bc238571ab8ea79bb876cf249ed4d60) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-633 */
+	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-0633 */
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
@@ -3793,7 +3793,7 @@ ROM_START( carnivalha )
 	ROM_LOAD( "epr-162.u41",   0x3800, 0x0800, CRC(56e1c120) SHA1(24816b6a9bc238571ab8ea79bb876cf249ed4d60) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-633 */
+	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-0633 */
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
@@ -3823,7 +3823,7 @@ ROM_START( verbena )
 	ROM_LOAD( "1v.u1",     0x3c00, 0x0400, CRC(6e10c057) SHA1(743a28bb6f4f395fd3db36d5e40acc3475f55f5d) ) // handwritten label
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "mmi6331.u4",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) // == 316-633 / pr-62.u44
+	ROM_LOAD( "mmi6331.u4",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) // == 316-0633 / pr-62.u44
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "sound.u25",    0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) ) // == epr-412.u5 - 2708
@@ -4144,6 +4144,33 @@ ROM_START( alphaho )
 	ROM_LOAD( "alphaho.col", 0x0000, 0x0020, BAD_DUMP CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) ) // wasn't dumped for this set, use the one from sspacaho (the game Data East cloned and modified) for now
 ROM_END
 
+ROM_START( alphahob ) // PCB marked NNS
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "03.bin", 0x0000, 0x0400, CRC(87de1bb0) SHA1(63626ac2b1f1419fd93dca33417834922ffc8634) )
+	ROM_LOAD( "13.bin", 0x0400, 0x0400, CRC(bd6dbd8e) SHA1(a001392b32be8218d5aebb1c02fc88a41ce995b0) )
+	ROM_LOAD( "16.bin", 0x0800, 0x0400, CRC(4c043d8b) SHA1(72f7db24fc60dae9879d8daf01ef2bb14e9597aa) )
+	ROM_LOAD( "04.bin", 0x0c00, 0x0400, CRC(10005956) SHA1(2e742b1764520c3de5b44018f94dc6476c9a4e84) )
+	ROM_LOAD( "05.bin", 0x1000, 0x0400, CRC(bbdaf42a) SHA1(57e5e72613c0852bc91e12a5713d93c222ed5b32) )
+	ROM_LOAD( "06.bin", 0x1400, 0x0400, CRC(07d4c69a) SHA1(7bb7dad200526a642debe3406ef9c0a74f6fc374) )
+	ROM_LOAD( "07.bin", 0x1800, 0x0400, CRC(8f766b30) SHA1(91e4c8ccb479dcd89f1c76f619bfac832ca7910e) )
+	ROM_LOAD( "08.bin", 0x1c00, 0x0400, CRC(88032202) SHA1(64e087c0a9a97f19c1c5ba5ca1d249d38efab391) )
+	ROM_LOAD( "01.bin", 0x2000, 0x0400, CRC(eb8278b3) SHA1(6349c64f718fc23f78788a612378681d9e6ef69b) )
+	ROM_LOAD( "09.bin", 0x2400, 0x0400, CRC(e5f622f7) SHA1(57858b6abbf34fc4ab2b19a469cbd945a0e14a0e) )
+	ROM_LOAD( "11.bin", 0x2800, 0x0400, CRC(5673be86) SHA1(d8f6bcc0231163c40c217e73dff9dd410fcd488c) )
+	ROM_LOAD( "12.bin", 0x2c00, 0x0400, CRC(939903c6) SHA1(2a570b9880bb8594501fa9b3d1320e5ad2abc86a) )
+	ROM_LOAD( "02.bin", 0x3000, 0x0400, CRC(404f120c) SHA1(7359c819f8a355783c00a972cb65a10aeff6bde4) )
+	ROM_LOAD( "14.bin", 0x3400, 0x0400, CRC(be76baac) SHA1(4b6a46c9484cfc90fa405f8568df44cfc96b1d7a) )
+	ROM_LOAD( "15.bin", 0x3800, 0x0400, CRC(ced0a642) SHA1(7f90803af926861261c9467fda293093409aff83) )
+	ROM_LOAD( "10.bin", 0x3c00, 0x0400, CRC(ba978bca) SHA1(69ee157d1aee8cf323d15630b99cff2747ed0189) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.u49", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+
+	ROM_REGION( 0x0040, "timing_proms", 0 )
+	ROM_LOAD( "prom.u14", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) ) // control PROM
+	ROM_LOAD( "prom.u15", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) ) // sequence PROM
+ROM_END
+
 // Wanted uses 2 sound boards. One from Head On and one from Space Attack. The sound board has the name printed on the bottom
 // together with the Sega Gremlin logo and other numbers.
 
@@ -4231,4 +4258,5 @@ GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,   empty_i
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,   empty_init, ROT270, "Sega",                    "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,   empty_init, ROT270, "Denki Onkyo",             "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, alphaho,    0,        alphaho,   alphaho,   vicdual_state,   empty_init, ROT270, "Data East Corporation",   "Alpha Fighter / Head On", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, alphahob,   alphaho,  alphaho,   alphaho,   vicdual_state,   empty_init, ROT270, "bootleg",                 "Missile / Circuit (bootleg of Alpha Fighter / Head On)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wantsega,   0,        carhntds,  wantsega,  vicdual_state,   empty_init, ROT270, "Sega",                    "Wanted (Sega)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE )

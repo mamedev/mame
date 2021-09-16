@@ -1158,10 +1158,8 @@ void hyperstone_device::hyperstone_shrdi()
 {
 	check_delay_PC();
 
-	const uint32_t fp = GET_FP;
-	const uint32_t code = DST_CODE;
-	const uint32_t dst_code = (code + fp) & 0x3f;
-	const uint32_t dstf_code = (code + 1 + fp) & 0x3f;
+	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
 	uint32_t high_order = m_core->local_regs[dst_code];
 	const uint32_t low_order  = m_core->local_regs[dstf_code];
 
@@ -1196,9 +1194,8 @@ void hyperstone_device::hyperstone_shrd()
 
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t d_code = DST_CODE;
-	const uint32_t dst_code = (d_code + fp) & 0x3f;
-	const uint32_t dstf_code = (d_code + 1 + fp) & 0x3f;
+	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
+	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
 
 	if (src_code == dst_code || src_code == dstf_code)
 	{
@@ -1260,8 +1257,10 @@ void hyperstone_device::hyperstone_sardi()
 
 	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
 	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
+	uint32_t high_order = m_core->local_regs[dst_code];
+	const uint32_t low_order  = m_core->local_regs[dstf_code];
 
-	uint64_t val = concat_64(m_core->local_regs[dst_code], m_core->local_regs[dstf_code]);
+	uint64_t val = concat_64(high_order, low_order);
 
 	SR &= ~(C_MASK | Z_MASK | N_MASK);
 
@@ -1277,12 +1276,14 @@ void hyperstone_device::hyperstone_sardi()
 			val |= 0xffffffff00000000U << (32 - n);
 	}
 
+	high_order = extract_64hi(val);
+
 	if (val == 0)
 		SR |= Z_MASK;
-	SR |= SIGN_TO_N(m_core->local_regs[dst_code]);
+	SR |= SIGN_TO_N(high_order);
 
-	m_core->local_regs[dst_code] = (uint32_t)(val >> 32);
-	m_core->local_regs[dstf_code] = (uint32_t)val;
+	m_core->local_regs[dst_code] = high_order;
+	m_core->local_regs[dstf_code] = extract_64lo(val);
 
 	m_core->icount -= m_core->clock_cycles_2;
 }
@@ -1303,7 +1304,10 @@ void hyperstone_device::hyperstone_sard()
 		return;
 	}
 
-	uint64_t val = concat_64(m_core->local_regs[dst_code], m_core->local_regs[dstf_code]);
+	uint32_t high_order = m_core->local_regs[dst_code];
+	const uint32_t low_order  = m_core->local_regs[dstf_code];
+
+	uint64_t val = concat_64(high_order, low_order);
 
 	SR &= ~(C_MASK | Z_MASK | N_MASK);
 
@@ -1313,22 +1317,21 @@ void hyperstone_device::hyperstone_sard()
 	{
 		SR |= (val >> (n - 1)) & 1;
 
-		uint32_t sign_bit = val >> 63;
-
+		const uint64_t sign_bit = val >> 63;
 		val >>= n;
 
 		if (sign_bit)
-		{
 			val |= 0xffffffff00000000L << (32 - n);
-		}
 	}
+
+	high_order = extract_64hi(val);
 
 	if (val == 0)
 		SR |= Z_MASK;
-	SR |= SIGN64_TO_N(val);
+	SR |= SIGN_TO_N(high_order);
 
-	m_core->local_regs[dst_code] = (uint32_t)(val >> 32);
-	m_core->local_regs[dstf_code] = (uint32_t)val;
+	m_core->local_regs[dst_code] = high_order;
+	m_core->local_regs[dstf_code] = extract_64lo(val);
 
 	m_core->icount -= m_core->clock_cycles_2;
 }

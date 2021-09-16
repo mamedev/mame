@@ -107,7 +107,7 @@ protected:
 	{
 	}
 
-	void sound_2151_4mhz(machine_config &config);
+	void sound_2151(machine_config &config, XTAL ymclk, XTAL okiclk);
 	void bluehawk_sound_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -233,7 +233,6 @@ protected:
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 
-	void sound_2151(machine_config &config);
 	void bluehawk_map(address_map &map);
 	void flytiger_map(address_map &map);
 	void primella_map(address_map &map);
@@ -296,7 +295,8 @@ protected:
 		save_item(NAME(m_palette_bank));
 	}
 
-	void sound_2203(machine_config &config);
+	template <typename T>
+	void sound_2203(machine_config &config, T ymclk);
 
 	void lastday_map(address_map &map);
 	void gulfstrm_map(address_map &map);
@@ -1447,7 +1447,8 @@ u8 dooyong_z80_ym2203_state::unk_r()
 
 ***************************************************************************/
 
-void dooyong_z80_ym2203_state::sound_2203(machine_config &config)
+template <typename T>
+void dooyong_z80_ym2203_state::sound_2203(machine_config &config, T ymclk)
 {
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
@@ -1455,43 +1456,29 @@ void dooyong_z80_ym2203_state::sound_2203(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", ymclk));
 	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	ym1.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 1500000));
+	ym2203_device &ym2(YM2203(config, "ym2", ymclk));
 	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
-void dooyong_z80_state::sound_2151(machine_config &config)
+void dooyong_state::sound_2151(machine_config &config, XTAL ymclk, XTAL okiclk)
 {
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579'545_MHz_XTAL));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", ymclk));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.50);
+	ymsnd.add_route(0, "mono", 0.35);
+	ymsnd.add_route(1, "mono", 0.35);
 
-	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);
-}
-
-void dooyong_state::sound_2151_4mhz(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL/4));  /* 4MHz (16MHz/4 for most, 8Mhz/2 for Super-X) */
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.50);
-
-	OKIM6295(config, "oki", 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
+	OKIM6295(config, "oki", okiclk, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.42);
 }
 
 void dooyong_z80_ym2203_state::lastday(machine_config &config)
@@ -1528,21 +1515,7 @@ void dooyong_z80_ym2203_state::lastday(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
 
 	/* sound hardware */
-	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
-
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
-	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
-	ym1.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
-	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
-
-	ym2203_device &ym2(YM2203(config, "ym2", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
-	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
-	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
+	sound_2203(config, 16_MHz_XTAL/4);  /* 4MHz verified for Last Day / D-day */
 }
 
 void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
@@ -1579,7 +1552,7 @@ void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
 
 	/* sound hardware */
-	sound_2203(config); /* 3.579545MHz */
+	sound_2203(config, 1'500'000); /* 3.579545MHz */
 }
 
 void dooyong_z80_ym2203_state::pollux(machine_config &config)
@@ -1616,7 +1589,7 @@ void dooyong_z80_ym2203_state::pollux(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
 
 	/* sound hardware */
-	sound_2203(config); /* 1.5MHz verified */
+	sound_2203(config, 1'500'000); /* 1.5MHz verified */
 }
 
 void dooyong_z80_state::bluehawk(machine_config &config)
@@ -1662,7 +1635,7 @@ void dooyong_z80_state::bluehawk(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, bluehawk)
 
 	/* sound hardware */
-	sound_2151(config); /* 3.579545MHz or 4Mhz ??? */
+	sound_2151(config, 3.579'545_MHz_XTAL, 1_MHz_XTAL); /* 3.579545MHz or 4Mhz ??? */
 }
 
 void dooyong_z80_state::flytiger(machine_config &config)
@@ -1700,7 +1673,7 @@ void dooyong_z80_state::flytiger(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
 
 	/* sound hardware */
-	sound_2151(config);
+	sound_2151(config, 3.579'545_MHz_XTAL, 1_MHz_XTAL);
 }
 
 void dooyong_z80_state::primella(machine_config &config)
@@ -1739,7 +1712,7 @@ void dooyong_z80_state::primella(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, primella)
 
 	/* sound hardware */
-	sound_2151_4mhz(config); /* PCB has only 1 OSC at 16Mhz */
+	sound_2151(config, 16_MHz_XTAL/4, 16_MHz_XTAL/16); /* PCB has only 1 OSC at 16Mhz */
 }
 
 
@@ -1795,7 +1768,7 @@ void rshark_state::dooyong_68k(machine_config &config)
 	m_fg[1]->set_tile_callback(FUNC(rshark_state::rshark_tile_callback));
 
 	// sound hardware
-	sound_2151_4mhz(config);
+	sound_2151(config, 8_MHz_XTAL/2, 8_MHz_XTAL/8);
 }
 
 void rshark_state::rshark(machine_config &config)
@@ -1844,7 +1817,7 @@ void popbingo_state::popbingo(machine_config &config)
 	m_bg[1]->set_tile_callback(FUNC(popbingo_state::popbingo_tile_callback));
 
 	// sound hardware
-	sound_2151_4mhz(config);
+	sound_2151(config, 16_MHz_XTAL/4, 16_MHz_XTAL/16);
 }
 
 } // anonymous namespace

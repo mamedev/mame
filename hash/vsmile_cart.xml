@@ -295,7 +295,6 @@ Regular game cartridges
 |   XX   | 80-092251(IT)     | Cenerentola - I desideri magici di Cenerentola (rev. 1)                                        |
 |   XX   | 80-084602(NL)     | Assepoester - De wonderwereld van Assepoester (2010)                                           |
 |   XX   | 80-092242(NL)     | Assepoester - De wonderwereld van Assepoester (2005, 52-092242(NL) on back label)              |
-|   XX   | 80-092242(NL)     | Assepoester - De wonderwereld van Assepoester (2005, alt)                                      |
 |   XX   | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester (rev. 123, 2007)                                 |
 |   XX   | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes                                                         |
 |        | 80-092243-103(UK) | Cinderella - Cinderella's Magic Wishes (rev. 103, 2007)                                        |
@@ -1507,21 +1506,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="cinderlanla" cloneof="cinderla">
-		<description>Walt Disney's Assepoester - De wonderwereld van Assepoester (Netherlands, alt, 2005)</description>
-		<year>2005</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-092242(NL)" />
-		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_rom" />
-			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92242 - Assepoester - De wonderwereld van Assepoester (NL) (2005).bin" size="8388608" crc="1153e6fa" sha1="f06990cd698fc41b5705dc3ffbd8751f9a6d4654" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cinderlanl" cloneof="cinderla">
 		<description>Walt Disney's Assepoester - De wonderwereld van Assepoester (Netherlands, 2005)</description>
 		<year>2005</year>
@@ -1534,7 +1518,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="50-092242 - Assepoester - De wonderwereld van Assepoester (NL).bin" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" />
+				<rom name="92242 - Assepoester - De wonderwereld van Assepoester (NL) (2005).bin" size="8388608" crc="1153e6fa" sha1="f06990cd698fc41b5705dc3ffbd8751f9a6d4654" />
 			</dataarea>
 		</part>
 	</software>
@@ -1611,7 +1595,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092247 - Disney Princess - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" />
+				<rom name="80-092247 - Disney Princess - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="8388608" crc="dbb7b765" sha1="442609ef00cb96b21c854239eb3f815722f644e3" />
 			</dataarea>
 		</part>
 	</software>
@@ -2467,7 +2451,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="mannyfr">
+	<software name="mannyfr" cloneof="mannyge">
 		<description>Disney Manny et ses outils (France)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>

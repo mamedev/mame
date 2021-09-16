@@ -17,7 +17,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98265A, bus::hp_dio, dio16_98265a_device, "hp98265a", "HP98265A SCSI S16 Interface")
+DEFINE_DEVICE_TYPE(HPDIO_98265A, bus::hp_dio::dio16_98265a_device, "hp98265a", "HP98265A SCSI S16 Interface")
 
 namespace bus::hp_dio {
 

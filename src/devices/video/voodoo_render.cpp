@@ -1246,6 +1246,10 @@ voodoo_renderer::voodoo_renderer(running_machine &machine, u16 tmu_config, const
 	// empty the hash table
 	std::fill(std::begin(m_raster_hash), std::end(m_raster_hash), nullptr);
 
+	// register our arrays
+	register_poly_array(m_textures);
+	register_poly_array(m_palettes);
+
 	// add all predefined rasterizers
 	for (static_rasterizer_info const *info = s_predef_raster_table; info->params.generic() != 0xffffffff; info++)
 		add_rasterizer(info->params, info->mfp, false);
@@ -1278,7 +1282,7 @@ void voodoo_renderer::register_save(save_proxy &save)
 poly_data &voodoo_renderer::alloc_poly()
 {
 	// allocate poly data and compute the rasterization parameters
-	poly_data &poly = object_data_alloc();
+	poly_data &poly = object_data().next();
 	poly.raster.compute(m_fbi_reg, m_tmu0_reg, m_tmu1_reg);
 	return poly;
 }
@@ -2607,19 +2611,6 @@ void voodoo_renderer::dump_rasterizer_stats()
 		// reset
 		best->display = display_index;
 	}
-}
-
-
-//-------------------------------------------------
-//  reset_after_wait - handle a reset after a
-//  wait operation by resetting our allocated
-//  object queues
-//-------------------------------------------------
-
-void voodoo_renderer::reset_after_wait()
-{
-	m_textures.reset();
-	m_palettes.reset();
 }
 
 

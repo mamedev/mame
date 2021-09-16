@@ -5,37 +5,18 @@
 
 #pragma once
 
-#include "machine/msm6242.h"
-#include "machine/timer.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v5x.h"
-#include "sound/l7a1045_l6028_dsp_a.h"
-#include "video/poly.h"
 #include "cpu/tlcs870/tlcs870.h"
 #include "machine/mb8421.h"
+#include "machine/msm6242.h"
+#include "machine/timer.h"
+#include "sound/l7a1045_l6028_dsp_a.h"
+#include "video/poly.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
-
-enum hng64trans_t
-{
-	HNG64_TILEMAP_NORMAL = 1,
-	HNG64_TILEMAP_ADDITIVE,
-	HNG64_TILEMAP_ALPHA
-};
-
-struct blit_parameters
-{
-	bitmap_rgb32 *      bitmap;
-	rectangle           cliprect;
-	uint32_t              tilemap_priority_code;
-	uint8_t               mask;
-	uint8_t               value;
-	uint8_t               alpha;
-	hng64trans_t        drawformat;
-};
-
-#define HNG64_MASTER_CLOCK 50000000
 
 
 /////////////////
@@ -141,14 +122,7 @@ class hng64_lamps_device : public device_t
 public:
 	hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto lamps0_out_cb() { return m_lamps_out_cb[0].bind(); }
-	auto lamps1_out_cb() { return m_lamps_out_cb[1].bind(); }
-	auto lamps2_out_cb() { return m_lamps_out_cb[2].bind(); }
-	auto lamps3_out_cb() { return m_lamps_out_cb[3].bind(); }
-	auto lamps4_out_cb() { return m_lamps_out_cb[4].bind(); }
-	auto lamps5_out_cb() { return m_lamps_out_cb[5].bind(); }
-	auto lamps6_out_cb() { return m_lamps_out_cb[6].bind(); }
-	auto lamps7_out_cb() { return m_lamps_out_cb[7].bind(); }
+	template <unsigned N> auto lamps_out_cb() { return m_lamps_out_cb[N].bind(); }
 
 	void lamps_w(offs_t offset, uint8_t data) { m_lamps_out_cb[offset](data); }
 
@@ -191,7 +165,6 @@ public:
 		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
-		m_an_in(*this, "AN%u", 0U),
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0)
 	{ }
@@ -214,17 +187,36 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
+	static constexpr int HNG64_MASTER_CLOCK = 50'000'000;
+
 	/* TODO: NOT measured! */
-	const int PIXEL_CLOCK = (HNG64_MASTER_CLOCK*2)/4; // x 2 is due to the interlaced screen ...
+	static constexpr int PIXEL_CLOCK = (HNG64_MASTER_CLOCK*2)/4; // x 2 is due to the interlaced screen ...
 
-	const int HTOTAL = 0x200+0x100;
-	const int HBEND = 0;
-	const int HBSTART = 0x200;
+	static constexpr int HTOTAL = 0x200+0x100;
+	static constexpr int HBEND = 0;
+	static constexpr int HBSTART = 0x200;
 
-	const int VTOTAL = 264*2;
-	const int VBEND = 0;
-	const int VBSTART = 224*2;
+	static constexpr int VTOTAL = 264*2;
+	static constexpr int VBEND = 0;
+	static constexpr int VBSTART = 224*2;
 
+	enum hng64trans_t
+	{
+		HNG64_TILEMAP_NORMAL = 1,
+		HNG64_TILEMAP_ADDITIVE,
+		HNG64_TILEMAP_ALPHA
+	};
+
+	struct blit_parameters
+	{
+		bitmap_rgb32 *      bitmap;
+		rectangle           cliprect;
+		uint32_t            tilemap_priority_code;
+		uint8_t             mask;
+		uint8_t             value;
+		uint8_t             alpha;
+		hng64trans_t        drawformat;
+	};
 
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
@@ -257,17 +249,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_ioport_array<8> m_in;
-	required_ioport_array<8> m_an_in;
 
-
-	void hng64_default_lamps0_w(uint8_t data) { logerror("lamps0 %02x\n", data); }
-	void hng64_default_lamps1_w(uint8_t data) { logerror("lamps1 %02x\n", data); }
-	void hng64_default_lamps2_w(uint8_t data) { logerror("lamps2 %02x\n", data); }
-	void hng64_default_lamps3_w(uint8_t data) { logerror("lamps3 %02x\n", data); }
-	void hng64_default_lamps4_w(uint8_t data) { logerror("lamps4 %02x\n", data); }
-	void hng64_default_lamps5_w(uint8_t data) { logerror("lamps5 %02x\n", data); }
-	void hng64_default_lamps6_w(uint8_t data) { logerror("lamps6 %02x\n", data); }
-	void hng64_default_lamps7_w(uint8_t data) { logerror("lamps7 %02x\n", data); }
+	template <unsigned N> void hng64_default_lamps_w(uint8_t data) { logerror("lamps%u %02x\n", N, data); }
 
 	void hng64_drive_lamps7_w(uint8_t data);
 	void hng64_drive_lamps6_w(uint8_t data);
@@ -405,16 +388,6 @@ private:
 	// unknown access
 	void ioport4_w(uint8_t data);
 
-	// analog input access
-	uint8_t anport0_r();
-	uint8_t anport1_r();
-	uint8_t anport2_r();
-	uint8_t anport3_r();
-	uint8_t anport4_r();
-	uint8_t anport5_r();
-	uint8_t anport6_r();
-	uint8_t anport7_r();
-
 	DECLARE_WRITE_LINE_MEMBER( sio0_w );
 
 	uint8_t m_port7;
@@ -470,6 +443,7 @@ private:
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
 
+	static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
 
 
 

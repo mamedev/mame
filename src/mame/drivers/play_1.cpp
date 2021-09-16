@@ -30,6 +30,8 @@ Others: When starting the game, hold down X, then release and hit Z, otherwise
 #include "play_1.lh"
 
 
+namespace {
+
 class play_1_state : public genpin_class
 {
 public:
@@ -39,10 +41,16 @@ public:
 		, m_dips(*this, "X.%u", 0)
 		, m_monotone(*this, "monotone")
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 1U)
+		, m_player_lamps(*this, "text%u", 1U)
 	{ }
 
 	void chance(machine_config &config);
 	void play_1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint8_t port07_r();
@@ -69,12 +77,12 @@ private:
 	uint8_t m_segment;
 	uint8_t m_match;
 	uint8_t m_ball;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cosmac_device> m_maincpu;
 	required_ioport_array<4> m_dips;
 	required_device<clock_device> m_monotone;
 	output_finder<46> m_digits;
+	output_finder<5> m_leds;
+	output_finder<4> m_player_lamps;
 };
 
 void play_1_state::play_1_map(address_map &map)
@@ -254,6 +262,13 @@ static INPUT_PORTS_START( spcgambl )
 INPUT_PORTS_END
 
 
+void play_1_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+	m_player_lamps.resolve();
+}
+
 void play_1_state::machine_reset()
 {
 	m_waitcnt = 0xffff;
@@ -337,13 +352,9 @@ void play_1_state::port03_w(uint8_t data)
 
 			// display player number
 			{
-				char wordnum[8];
 				uint8_t player = m_segment >> 5;
 				for (uint8_t i = 1; i < 5; i++)
-				{
-					sprintf(wordnum,"text%d", i);
-					output().set_value(wordnum, (player == i) ? 0:1);
-				}
+					m_player_lamps[i - 1] = (player == i) ? 0 : 1;
 			}
 			break;
 		case 2:
@@ -461,11 +472,11 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 		else
 		{
 			m_digits[43] = m_match;
-			output().set_value("led1", !BIT(m_ball, 1));
-			output().set_value("led2", !BIT(m_ball, 2));
-			output().set_value("led3", !BIT(m_ball, 3));
-			output().set_value("led4", !BIT(m_ball, 4));
-			output().set_value("led5", !BIT(m_ball, 5));
+			m_leds[0] = !BIT(m_ball, 1);
+			m_leds[1] = !BIT(m_ball, 2);
+			m_leds[2] = !BIT(m_ball, 3);
+			m_leds[3] = !BIT(m_ball, 4);
+			m_leds[4] = !BIT(m_ball, 5);
 		}
 	}
 }
@@ -567,6 +578,8 @@ ROM_START(ngtfever)
 	ROM_LOAD("nfevera.bin", 0x0000, 0x0400, CRC(253f1b93) SHA1(7ff5267d0dfe6ae19ec6b0412902f4ce83f23ed1))
 	ROM_LOAD("nfeverb.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
 ROM_END
+
+} // anonymous namespace
 
 
 /* Big Town, Last Lap, Night Fever, Party and Third World all reportedly share the same roms with different playfield/machine artworks */

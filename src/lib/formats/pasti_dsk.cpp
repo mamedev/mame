@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "pasti_dsk.h"
+#include "imageutl.h"
 
 #include "ioprocs.h"
+
+#include <cstring>
 
 // Pasti format supported using the documentation at
 // http://www.sarnau.info/atari:pasti_file_format

@@ -91,7 +91,7 @@ static const nes_mmc mmc_list[] =
 	{ 56, KAISER_KS202 },
 	{ 57, BMC_GKA },
 	{ 58, BMC_GKB },
-	// 59 BMC-T3H53 and BMC-D1038
+	{ 59, BMC_VT5201 },   // and BMC-T3H53, BMC-D1038
 	{ 60, BMC_4IN1RESET },
 	{ 61, RCM_TF9IN1 },
 	{ 62, BMC_SUPER_700IN1 },
@@ -175,7 +175,7 @@ static const nes_mmc mmc_list[] =
 	{ 139, SACHEN_8259C },
 	{ 140, JALECO_JF11 },
 	{ 141, SACHEN_8259A },
-	{ 142, KAISER_KS7032},
+	{ 142, KAISER_KS7032 },
 	{ 143, SACHEN_TCA01 },
 	{ 144, AGCI_50282 },
 	{ 145, SACHEN_SA72007 },
@@ -195,8 +195,8 @@ static const nes_mmc mmc_list[] =
 	{ 159, BANDAI_LZ93EX1 }, // with 24c01
 	{ 160, SACHEN_SA009 },
 	// 161 Unused
-	{ 162, WAIXING_FS304},  // not confirmed, but a lot of chinese releases use it like this...
-	{ 163, NANJING_BOARD},
+	{ 162, WAIXING_FS304 },  // not confirmed, but a lot of chinese releases use it like this...
+	{ 163, NANJING_BOARD },
 	{ 164, WAIXING_FFV },
 	{ 165, WAIXING_SH2 },
 	{ 166, SUBOR_TYPE1 },
@@ -208,14 +208,14 @@ static const nes_mmc mmc_list[] =
 	{ 172, TXC_DUMARACING },
 	{ 173, TXC_MJBLOCK },
 	{ 174, BMC_2751 },
-	{ 175, KAISER_KS7022},
+	{ 175, KAISER_KS7022 },
 	{ 176, UNL_XIAOZY },
 	{ 177, HENGG_SRICH },
 	{ 178, WAIXING_SGZLZ },
 	{ 179, HENGG_XHZS },
 	{ 180, UXROM_CC },
 	// 181 Unused
-	{ 182, HOSENKAN_BOARD },
+	{ 182, SUPERGAME_LIONKING },    // duplicate of mapper 114
 	{ 183, BTL_SHUIGUAN },
 	{ 184, SUNSOFT_1 },
 	{ 185, STD_CNROM },
@@ -266,7 +266,7 @@ static const nes_mmc mmc_list[] =
 	{ 230, BMC_22GAMES },
 	{ 231, BMC_20IN1 },
 	{ 232, CAMERICA_BF9096 },
-	{ 233, BMC_SUPER22 },
+	{ 233, BMC_42IN1RESET },
 	{ 234, AVE_MAXI15 },
 	{ 235, BMC_GOLD150 },   // 235 Golden Game x-in-1 - Unsupported
 	// 236 Game 800-in-1 - Unsupported, Realtec boards 8031 and 8155
@@ -293,7 +293,7 @@ static const nes_mmc mmc_list[] =
 	// NES 2.0
 	// 256 OneBus Famiclones
 	// 257 UNIF MAPR PEC-586?
-	// 258 UNIF MAPR 158B?
+	{ 258, UNL_158B },
 	{ 259, BMC_F15 },
 	// 260 HP10xx/HP20xx multicarts?
 	{ 261, BMC_810544C },
@@ -332,7 +332,7 @@ static const nes_mmc mmc_list[] =
 	// 294 variant of mapper 134?
 	// 295 JY multicarts not yet in nes.xml
 	// 296 VT3x handhelds
-	// 297 2-in-1 Uzi Lightgun not in nes.xml
+	{ 297, TXC_22110 },            // 2-in-1 Uzi Lightgun
 	{ 298, UNL_TF1201 },           // Lethal Weapon (Enforcers) pirate
 	{ 299, BMC_11160 },
 	{ 300, BMC_190IN1 },
@@ -347,14 +347,14 @@ static const nes_mmc mmc_list[] =
 	{ 309, UNL_LH51 },             // Ai Senshi Nicol alt FDS conversion
 	// 310 variant of mapper 125?
 	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
-	{ 312, KAISER_KS7013B },       // Highway Star FDS conversion
+	{ 312, KAISER_KS7013B },       // Highway Star Kaiser bootleg
 	{ 313, BMC_RESETTXROM0 },
 	{ 314, BMC_64IN1NR },
 	// 315 820732C and 830134C multicarts, not in nes.xml?
 	// 316 Unused
 	// 317 Unused
 	// 318 Unused
-	// 319 HP-898F (has different bank order than UNIF!) and KD-7/9-E boards
+	{ 319, BMC_HP898F },
 	{ 320, BMC_830425C },
 	// 321 duplicate of 287?
 	// 322 BMC-K-3033 35-in-1, related to mc_35?
@@ -409,7 +409,7 @@ static const nes_mmc mmc_list[] =
 	// 371 Spanish PEC-586 computer main cart
 	// 372 Rockman 1-6 multicart very close to mapper 45
 	// 373 Super 4-in-1, not in nes.xml?
-	// 374 various JY multicarts
+	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
 	// 376 JY-041 multicart
 	// 377 JY-111 multicart, similar to mapper 367
@@ -428,7 +428,7 @@ static const nes_mmc mmc_list[] =
 	// 390 variant of mapper 236?
 	// 391 BS-110 MMC3 clone
 	// 392 8-in-1 variant of mc_sv16
-	// 393 820720C multicart
+	{ 393, BMC_820720C },
 	// 394 Realtec HSK007 multicart
 	// 395 Realtec 8210 multicarts
 	{ 396, BMC_850437C },
@@ -446,14 +446,14 @@ static const nes_mmc mmc_list[] =
 	// 408 Konami PnP
 	// 409 (Sealie) homebrew game A Winner is You, 64MB music cart, easy to support if dump is available
 	// 410 Unused or JY?
-	// 411 various JY multicarts
+	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
 	// 413 homebrew game Super Russian Roulette
 	// 414 9999999-in-1 multicart
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
-	// 416 4-in-1 that includes mapper 50 SMB2j pirate
+	{ 416, BMC_N32_4IN1 },
 	{ 417, BTL_BATMANFS },         // "Fine Studio" Batman bootleg
-	// { 418, UNL_LH42 }              // Highway Star alt FDS conversion
+	{ 418, UNL_LH42 },             // Highway Star Whirlwind Manu bootleg
 	// 419 VT03 PnPs
 	// 420 Kasheng A971210 board
 	// 421 JY SC871115C board
@@ -469,7 +469,9 @@ static const nes_mmc mmc_list[] =
 	// 431 Realtec GN-91B
 	// 432 Realtec 8090
 	// 433 NC-20MB 20 in 1 (CA-006)
-	// 434...442 Unused
+	// 434 S-009
+	{ 435, NTDEC_2746 },
+	// 436...442 Unused
 	// 443 NC3000M multicart
 	// 444 NC7000M multicart
 	// 445...511 Unused
@@ -510,7 +512,7 @@ static const nes_mmc mmc_list[] =
 	// 547 Konami QTa adapter games
 	// { 548, BTL_CTC15 },            // Almana no Kiseki alt FDS conversion (dump available?)
 	{ 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
-	// 550 JY-015 multicart
+	{ 550, BMC_JY820845C },
 	// 551 variant of mapper 178, likely shenghuo, jingkzx, xiaokecq, zgfyun in nes.xml
 	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1

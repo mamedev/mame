@@ -61,6 +61,7 @@ project "utils"
 		MAME_DIR .. "src/lib/util/delegate.h",
 		MAME_DIR .. "src/lib/util/disasmintf.cpp",
 		MAME_DIR .. "src/lib/util/disasmintf.h",
+		MAME_DIR .. "src/lib/util/endianness.h",
 		MAME_DIR .. "src/lib/util/flac.cpp",
 		MAME_DIR .. "src/lib/util/flac.h",
 		MAME_DIR .. "src/lib/util/harddisk.cpp",

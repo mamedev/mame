@@ -1305,11 +1305,14 @@ cdtv                            // Commodore CDTV
 cdtvn                           //
 
 @source:ampoker2.cpp
-ampkr228                        // 1990 bootleg
+ampkr228                        // 1990 bootleg?
 ampkr2b1                        // 1990 bootleg
 ampkr2b2                        // 1990 bootleg
 ampkr2b3                        // 1994 bootleg
 ampkr2b4                        // 1994 bootleg
+ampkr2jsp                       // 1994 bootleg?
+ampkr2jspa                      // 1994 bootleg?
+ampkr2jspb                      // 1994 bootleg?
 ampkr95                         // 1995 bootleg
 ampoker2                        // (c) 1990 Novomatic
 arizna10                        // 1995 bootleg
@@ -1887,6 +1890,7 @@ deepfrz                         // (c) 2009
 deepfrzu                        // (c) 2009
 deltabel                        // (c) 2005
 deltaqn                         // (c) 2004
+diamhrts                        // (c) 2007
 dimeye                          // (c) 2004
 dimeyece                        // (c) 2004
 di4ever                         // (c) 2002
@@ -13819,6 +13823,9 @@ backgamc                        //
 cc7                             //
 cc7a                            //
 
+@source:fidel_checkc2.cpp
+checkc2
+
 @source:fidel_chesster.cpp
 chesster                        //
 chesstera                       //
@@ -14128,6 +14135,7 @@ funkyjeta                       // MAT (c) 1992 Data East (Mitchell license) (Wo
 funkyjeta2                      // MAT (c) 1992 Data East (Mitchell license) (World) - Rev unverified - alternative demo
 funkyjetj                       // MAT (c) 1992 Data East (Mitchell license) (Japan, Rev 2)
 sotsugyo                        // (c) 1995 Mitchell (Atlus license)
+sotsugyok                       // (c) 1996 Mitchell (Korea)
 
 @source:funtech.cpp
 fts2in1
@@ -15532,6 +15540,7 @@ cb3b                            // (c) 199? Dyna Electronics
 cb3c                            // (c) 199? Dyna Electronics
 cb3d                            // (c) 199? Dyna Electronics
 cb3e                            // 199? bootleg
+cb3f                            // 199? bootleg
 cherry96                        // bootleg
 chry10                          // bootleg
 chryangl                        // (c) 199? Dyna Electronics
@@ -16973,6 +16982,7 @@ klxyj                           // (c) 200?
 lhzb3                           // (c) 200?
 lhzb4                           // (c) 200?
 mgfx                            // (c) 200?
+qlgs                            // (c) 1999
 sddz                            // (c) 200?
 sdwx                            // (c) 2002
 slqz3                           // (c) 1999
@@ -19423,16 +19433,16 @@ tsupenta
 tsururin
 
 @source:konmedal68k.cpp
+crossmg2
 dobouchn
+fruitsmg
 kattobas
-konslot
-konslot2
 koropens
 kzaurus
 pwrchanc
-ymcapsul
 spcpokan
 unkkonmd
+ymcapsul
 
 @source:quickpick5.cpp
 quickp5
@@ -23034,6 +23044,7 @@ sport2k                         //
 bigappg                         // (c) 1986 Merit / Big Apple Games
 casino5                         // (c) 1989 Merit
 casino5a                        // (c) 1984 Merit
+casino5b                        // (c) 1984 Merit
 chkndraw                        // (c) 1984 Merit
 chkndrawa                       // (c) 1984 Merit
 couple                          // (c) 1988 Merit
@@ -23587,8 +23598,8 @@ gwinner                         // (c) 1983 Reben
 luckyplr                        // (c) 1981 Cirsa
 minisupf                        // (c) 1981 Cirsa
 msbamby                         // (c) 198? Automatics Pasqual
-trebol                          // 1985 Regama
-unkslot                         // (c) 198? MGA or Costa Net?
+multy                           // (c) 1987 Deta
+trebol                          // (c) 1985 Regama
 
 @source:missile.cpp
 mcombat                         // bootleg
@@ -30705,9 +30716,9 @@ mrflea                          // (c) 1982
 
 @source:mrgame.cpp
 dakar                           //
+fasttrack                       //
 macattck                        //
 motrshow                        //
-motrshowa                       //
 wcup90                          //
 
 @source:mrjong.cpp
@@ -31471,7 +31482,8 @@ swcourtb                        // bootleg (Playmark?)
 swcourtj                        // (c) 1992 (Japan)
 tinklpit                        // (c) 1993 (Japan)
 xday2                           // (c) 1995 (Japan)
-zelos                           // (c) 199? (Japan)
+zelos                           // (c) 1994 (Japan)
+zelost                          // (c) 1994 (Japan)
 
 @source:namconb1.cpp
 gslgr94j                        // (c) 1994 (Japan)
@@ -31752,8 +31764,8 @@ kyukaidk                        // (c) 1990 (Japan, new version)
 kyukaidko                       // (c) 1990 (Japan, old version)
 luckywld                        // (c) 1992
 luckywldj                       // (c) 1992
-marvland                        // (c) 1989 (US)
-marvlandj                       // (c) 1989 (Japan)
+marvland                        // (c) 1989 (Japan)
+marvlandup                      // (c) 1989 (US)
 metlhawk                        // (c) 1988
 metlhawkj                       // (c) 1988
 mirninja                        // (c) 1988 (Japan)
@@ -36032,6 +36044,23 @@ realbrkj                        // "523" Billiard Academy Real Break 1998 (Japan
 realbrkk                        // "600" Billiard Academy Real Break 1998 (Korea)
 realbrko                        // "600" Billiard Academy Real Break 1998 (Europe)
 
+@source:recel.cpp
+recel                           //
+r_alaska                        //
+r_blackm4                       //
+r_cavalier                      //
+r_crzyrace                      //
+r_fairfght                      //
+r_flipper                       //
+r_hotcold                       //
+r_mrdoom                        //
+r_mrevil                        //
+r_pokrplus                      //
+r_quijote                       //
+r_screech                       //
+r_swash                         //
+r_torneo                        //
+
 @source:redalert.cpp
 demoneye                        // M27 (c) 1981
 panther                         // M27 no copyright notice
@@ -36264,6 +36293,7 @@ route16a                        // (c) 1981 Tehkan/Sun + Centuri license
 route16b                        // (c) 1981 Tehkan/Sun + Centuri license
 route16bl                       // bootleg
 route16c                        // (c) 1981 Tehkan/Sun + Centuri license
+route16d                        // (c) 1981 Sun Electronics
 routex                          // bootleg
 routexa                         // bootleg
 spacecho                        // bootleg
@@ -37154,10 +37184,12 @@ columns                         // (c) 1990 Sega
 columns2                        // (c) 1990 Sega
 columnsj                        // (c) 1990 Sega
 columnsu                        // (c) 1990 Sega
+headonch                        // (c) 1994 Sega
 ichir                           // (c) 1994 Sega
 ichirj                          // (c) 1994 Sega
 ichirjbl                        // bootleg
 ichirk                          // (c) 1994 Sega
+ooparts                         // (c) 1992 Success
 pclubj                          //
 pclubjv2                        //
 pclub                           //
@@ -37174,6 +37206,7 @@ ribbitj                         // (c) 1991 Sega
 soniccar                        // (c) 1991 Sega
 sonicpop                        // (c) 1993 Sega
 sonicfgt                        // (c) 1993 Sega
+ssonicbr                        // (c) 1992 Sega
 stkclmns                        // (c) 1994 Sega
 stkclmnsj                       // (c) 1994 Sega
 tantr                           // (c) 1992 Sega
@@ -38928,6 +38961,7 @@ comil                           //
 decathln
 decathlna
 doraglob                        // (c) 2007 VTech
+doraglobg
 doraphon                        // (c) 2006 VTech
 dreamlss
 fordrace
@@ -38973,9 +39007,10 @@ icanpian                        //
 
 @source:spg2xx_jakks.cpp
 jak_batm                        // The Batman, 2004
-jak_wall                        //
 jak_mk
 jak_mpacw
+jak_sbjd
+jak_wall
 
 @source:spg2xx_jakks_gkr.cpp
 jak_capc                        //
@@ -41989,6 +42024,7 @@ vic20p                          // Commodore VIC 20 (PAL)
 
 @source:vicdual.cpp
 alphaho                         // Data East
+alphahob                        // bootleg
 brdrlinb                        // Karateco bootleg
 brdrline                        // (c) 1980 Sega
 brdrlinet                       // (c) 1981 Sega

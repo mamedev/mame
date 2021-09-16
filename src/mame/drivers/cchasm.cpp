@@ -15,17 +15,102 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cchasm.h"
 
-#include "machine/z80daisy.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/6840ptm.h"
-#include "machine/z80ctc.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "machine/z80ctc.h"
+#include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "video/vector.h"
+
+#include "screen.h"
 #include "speaker.h"
 
-#define CCHASM_68K_CLOCK (XTAL(8'000'000))
+
+namespace {
+
+class cchasm_state : public driver_device
+{
+public:
+	cchasm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ctc(*this, "ctc"),
+		m_audiocpu(*this, "audiocpu"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2"),
+		m_vector(*this, "vector"),
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3"),
+		m_soundlatch4(*this, "soundlatch4"),
+		m_ram(*this, "ram"),
+		m_inputs(*this, "IN%u", 1U)
+	{
+	}
+
+	void cchasm(machine_config &config);
+
+	INPUT_CHANGED_MEMBER(set_coin_flag);
+
+protected:
+	enum
+	{
+		TIMER_REFRESH_END
+	};
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void machine_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80_device> m_audiocpu;
+	required_device<dac_bit_interface> m_dac1;
+	required_device<dac_bit_interface> m_dac2;
+	required_device<vector_device> m_vector;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<generic_latch_8_device> m_soundlatch3;
+	required_device<generic_latch_8_device> m_soundlatch4;
+
+	required_shared_ptr<uint16_t> m_ram;
+
+	required_ioport_array<3> m_inputs;
+
+	int m_sound_flags;
+	int m_coin_flag;
+	int m_output[2];
+	int m_xcenter;
+	int m_ycenter;
+	emu_timer *m_refresh_end_timer;
+
+	void led_w(offs_t offset, uint16_t data);
+	void refresh_control_w(offs_t offset, uint8_t data);
+	void reset_coin_flag_w(uint8_t data);
+	uint8_t coin_sound_r();
+	uint8_t soundlatch2_r();
+	void soundlatch4_w(uint8_t data);
+	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t io_r(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(ctc_timer_1_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
+
+	void refresh();
+
+	void memmap(address_map &map);
+	void sound_memmap(address_map &map);
+	void sound_portmap(address_map &map);
+};
+
 
 /*************************************
  *
@@ -37,11 +122,11 @@ void cchasm_state::memmap(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x040000, 0x04000f).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	map(0x050000, 0x050001).w(FUNC(cchasm_state::refresh_control_w));
+	map(0x050000, 0x050000).w(FUNC(cchasm_state::refresh_control_w));
 	map(0x060000, 0x060001).portr("DSW").w(FUNC(cchasm_state::led_w));
 	map(0x070000, 0x070001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xf80000, 0xf800ff).rw(FUNC(cchasm_state::io_r), FUNC(cchasm_state::io_w));
-	map(0xffb000, 0xffffff).ram().share("ram");
+	map(0xffb000, 0xffffff).ram().share(m_ram);
 }
 
 /*************************************
@@ -125,6 +210,248 @@ static INPUT_PORTS_START( cchasm )
 INPUT_PORTS_END
 
 
+
+void cchasm_state::led_w(offs_t offset, uint16_t data)
+{
+	/*logerror("LED write %x to %x\n", data, offset);*/
+}
+
+
+void cchasm_state::reset_coin_flag_w(uint8_t data)
+{
+	if (m_coin_flag)
+	{
+		m_coin_flag = 0;
+		m_ctc->trg0(m_coin_flag);
+	}
+}
+
+INPUT_CHANGED_MEMBER(cchasm_state::set_coin_flag )
+{
+	if (!newval && !m_coin_flag)
+	{
+		m_coin_flag = 1;
+		m_ctc->trg0(m_coin_flag);
+	}
+}
+
+uint8_t cchasm_state::coin_sound_r()
+{
+	uint8_t coin = (m_inputs[2]->read() >> 4) & 0x7;
+	return m_sound_flags | (m_coin_flag << 3) | coin;
+}
+
+uint8_t cchasm_state::soundlatch2_r()
+{
+	m_sound_flags &= ~0x80;
+	m_ctc->trg2(0);
+	return m_soundlatch2->read();
+}
+
+void cchasm_state::soundlatch4_w(uint8_t data)
+{
+	m_sound_flags |= 0x40;
+	m_soundlatch4->write(data);
+	m_maincpu->set_input_line(1, HOLD_LINE);
+}
+
+void cchasm_state::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	//static int led;
+
+	if (ACCESSING_BITS_8_15)
+	{
+		data >>= 8;
+		switch (offset & 0xf)
+		{
+		case 0:
+			m_soundlatch->write(data);
+			break;
+		case 1:
+			m_sound_flags |= 0x80;
+			m_soundlatch2->write(data);
+			m_ctc->trg2(1);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			break;
+		case 2:
+			//led = data;
+			break;
+		}
+	}
+}
+
+uint16_t cchasm_state::io_r(offs_t offset)
+{
+	switch (offset & 0xf)
+	{
+	case 0x0:
+		return m_soundlatch3->read() << 8;
+	case 0x1:
+		m_sound_flags &= ~0x40;
+		return m_soundlatch4->read() << 8;
+	case 0x2:
+		return (m_sound_flags| (ioport("IN3")->read() & 0x07) | 0x08) << 8;
+	case 0x5:
+		return m_inputs[1]->read() << 8;
+	case 0x8:
+		return m_inputs[0]->read() << 8;
+	default:
+		return 0xff << 8;
+	}
+}
+
+
+WRITE_LINE_MEMBER(cchasm_state::ctc_timer_1_w)
+{
+	if (state) /* rising edge */
+	{
+		m_output[0] = !m_output[0];
+		m_dac1->write(m_output[0]);
+	}
+}
+
+WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
+{
+	if (state) /* rising edge */
+	{
+		m_output[1] = !m_output[1];
+		m_dac2->write(m_output[1]);
+	}
+}
+
+
+void cchasm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_REFRESH_END:
+		m_maincpu->set_input_line(2, ASSERT_LINE);
+		break;
+	default:
+		throw emu_fatalerror("Unknown id in cchasm_state::device_timer");
+	}
+}
+
+
+void cchasm_state::refresh()
+{
+	constexpr int HALT   = 0;
+	constexpr int JUMP   = 1;
+	constexpr int COLOR  = 2;
+	constexpr int SCALEY = 3;
+	constexpr int POSY   = 4;
+	constexpr int SCALEX = 5;
+	constexpr int POSX   = 6;
+	constexpr int LENGTH = 7;
+
+	int pc = 0;
+	int done = 0;
+	int currentx = 0, currenty = 0;
+	int scalex = 0, scaley = 0;
+	int color = 0;
+	int total_length = 1;   /* length of all lines drawn in a frame */
+	int move = 0;
+
+	m_vector->clear_list();
+
+	while (!done)
+	{
+		int data = m_ram[pc];
+		const int opcode = data >> 12;
+		data &= 0xfff;
+		if ((opcode > COLOR) && (data & 0x800))
+			data |= 0xfffff000;
+
+		pc++;
+
+		switch (opcode)
+		{
+		case HALT:
+			done=1;
+			break;
+		case JUMP:
+			pc = data - 0xb00;
+			logerror("JUMP to %x\n", data);
+			break;
+		case COLOR:
+			color = vector_device::color444(data ^ 0xfff);
+			break;
+		case SCALEY:
+			scaley = data << 5;
+			break;
+		case POSY:
+			move = 1;
+			currenty = m_ycenter + (data << 16);
+			break;
+		case SCALEX:
+			scalex = data << 5;
+			break;
+		case POSX:
+			move = 1;
+			currentx = m_xcenter - (data << 16);
+			break;
+		case LENGTH:
+			if (move)
+			{
+				m_vector->add_point (currentx, currenty, 0, 0);
+				move = 0;
+			}
+
+			currentx -= data * scalex;
+			currenty += data * scaley;
+
+			total_length += abs(data);
+
+			if (color)
+				m_vector->add_point (currentx, currenty, color, 0xff);
+			else
+				move = 1;
+			break;
+		default:
+			logerror("Unknown refresh proc opcode %x with data %x at pc = %x\n", opcode, data, pc-2);
+			done = 1;
+			break;
+		}
+	}
+	/* Refresh processor runs with 6 MHz */
+	m_refresh_end_timer->adjust(attotime::from_hz(6000000) * total_length);
+}
+
+
+void cchasm_state::refresh_control_w(offs_t offset, uint8_t data)
+{
+	switch (data)
+	{
+	case 0x37:
+		refresh();
+		break;
+	case 0xf7:
+		m_maincpu->set_input_line(2, CLEAR_LINE);
+		break;
+	}
+}
+
+void cchasm_state::machine_start()
+{
+	const rectangle &visarea = m_screen->visible_area();
+
+	m_xcenter = visarea.xcenter() << 16;
+	m_ycenter = visarea.ycenter() << 16;
+
+	m_refresh_end_timer = timer_alloc(TIMER_REFRESH_END);
+
+	m_coin_flag = 0;
+	m_sound_flags = 0;
+	m_output[0] = 0;
+	m_output[1] = 0;
+
+	save_item(NAME(m_sound_flags));
+	save_item(NAME(m_coin_flag));
+	save_item(NAME(m_output));
+}
+
+
+
 /*************************************
  *
  *  CPU config
@@ -147,6 +474,8 @@ static const z80_daisy_config daisy_chain[] =
 
 void cchasm_state::cchasm(machine_config &config)
 {
+	constexpr XTAL CCHASM_68K_CLOCK(8'000'000);
+
 	/* basic machine hardware */
 	M68000(config, m_maincpu, CCHASM_68K_CLOCK);    /* 8 MHz (from schematics) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchasm_state::memmap);
@@ -179,12 +508,12 @@ void cchasm_state::cchasm(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch3);
 	GENERIC_LATCH_8(config, m_soundlatch4);
 
-	AY8910(config, "ay1", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.2);
+	AY8910(config, "ay1", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	AY8910(config, "ay2", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.2);
+	AY8910(config, "ay2", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.375);
+	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.375);
 
 	/* 6840 PTM */
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", CCHASM_68K_CLOCK/10));
@@ -250,6 +579,7 @@ ROM_START( cchasm1 )
 	ROM_LOAD( "2732.bin", 0x0000, 0x1000, CRC(715adc4a) SHA1(426be4f3334ef7f2e8eb4d533e64276c30812aa3) )
 ROM_END
 
+} // anonymous namespace
 
 
 

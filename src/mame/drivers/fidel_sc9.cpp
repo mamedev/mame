@@ -28,6 +28,7 @@ I/O is via TTL, not further documented here
 The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
 with magnet sensors and came with CB9 and CB16.
 
+-------------------------------------------------------------------------------
 
 Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
 extra book opening databases and recorded games.
@@ -46,11 +47,11 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 
 #include "emu.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 
@@ -72,7 +73,6 @@ public:
 	sc9_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -90,7 +90,6 @@ protected:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -99,10 +98,6 @@ protected:
 	// address maps
 	void sc9_map(address_map &map);
 	void sc9d_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -269,10 +264,9 @@ void sc9_state::sc9d(machine_config &config)
 	M6502(config, m_maincpu, 3.9_MHz_XTAL / 2); // R6502AP, 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9d_map);
 
-	const attotime irq_period = attotime::from_hz(600); // from 555 timer (22nF, 102K, 2.7K), ideal frequency is 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(sc9_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
-	TIMER(config, "irq_off").configure_periodic(FUNC(sc9_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 555 timer (22nF, 102K, 2.7K), ideal frequency is 600Hz
+	irq_clock.set_pulse_width(attotime::from_usec(41)); // active for 41us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

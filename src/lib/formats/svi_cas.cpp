@@ -2,7 +2,7 @@
 // copyright-holders:Sean Young
 #include "svi_cas.h"
 
-#include <cassert>
+#include <cstring>
 
 #define CAS_PERIOD_0        (37)
 #define CAS_PERIOD_1        (18)

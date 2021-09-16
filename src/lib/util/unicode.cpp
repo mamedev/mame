@@ -457,7 +457,7 @@ int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar)
 
 std::wstring wstring_from_utf8(const std::string &utf8string)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
 	return osd::text::to_wstring(utf8string);
 #else
@@ -473,7 +473,7 @@ std::wstring wstring_from_utf8(const std::string &utf8string)
 
 std::string utf8_from_wstring(const std::wstring &string)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
 	return osd::text::from_wstring(string);
 #else

@@ -162,6 +162,8 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 #include <zlib.h>
 
 

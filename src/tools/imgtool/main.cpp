@@ -9,11 +9,17 @@
 ***************************************************************************/
 
 #include "imgtool.h"
+#include "filter.h"
 #include "main.h"
 #include "modules.h"
 
 #include "corefile.h"
+#include "corestr.h"
+#include "opresolv.h"
 #include "strformat.h"
+#include "unicode.h"
+
+#include "osdcore.h" // osd_get_command_line
 
 #include <cstdio>
 #include <cstring>

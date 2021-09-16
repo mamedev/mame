@@ -162,13 +162,13 @@ B0000x-xxxxxx: see V7, -800000
 
 #include "emu.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
 #include "machine/gen_latch.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
@@ -191,7 +191,6 @@ public:
 	eag_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_ram(*this, "ram"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -217,7 +216,6 @@ protected:
 
 	// devices/pointers
 	required_device<m68000_base_device> m_maincpu;
-	optional_device<timer_device> m_irq_on;
 	optional_device<ram_device> m_ram;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
@@ -228,10 +226,6 @@ protected:
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
 	void eagv10_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -558,10 +552,9 @@ void excel68k_state::fex68k(machine_config &config)
 	M68000(config, m_maincpu, 12_MHz_XTAL); // HD68HC000P12
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68k_map);
 
-	const attotime irq_period = attotime::from_hz(600); // 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), ideal is 600Hz (measured 580Hz, 604Hz, 632Hz)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(excel68k_state::irq_on<M68K_IRQ_2>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1525)); // active for 1.525us
-	TIMER(config, "irq_off").configure_periodic(FUNC(excel68k_state::irq_off<M68K_IRQ_2>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), ideal is 600Hz (measured 580Hz, 604Hz, 632Hz)
+	irq_clock.set_pulse_width(attotime::from_nsec(1525)); // active for 1.525us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -602,7 +595,7 @@ void excel68k_state::fex68km4(machine_config &config)
 	M68020(config.replace(), m_maincpu, 20_MHz_XTAL); // XC68020RC16 or MC68020RC20E
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km4_map);
 
-	m_irq_on->set_start_delay(attotime::from_hz(600) - attotime::from_usec(10)); // irq active for 10us
+	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(10)); // irq active for 10us
 }
 
 void eag_state::eag_base(machine_config &config)
@@ -612,10 +605,9 @@ void eag_state::eag_base(machine_config &config)
 	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
 
-	const attotime irq_period = attotime::from_hz(4.9152_MHz_XTAL/0x2000); // 4060 Q13, 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(eag_state::irq_on<M68K_IRQ_IPL1>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(8250)); // active for 8.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(eag_state::irq_off<M68K_IRQ_IPL1>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 4.9152_MHz_XTAL / 0x2000)); // 4060 Q13, 600Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(8250)); // active for 8.25us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M68K_IRQ_IPL1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -712,10 +704,9 @@ void eag_state::eagv11(machine_config &config)
 	/* basic machine hardware */
 	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2); // wrong! should be M68EC060
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv10_map);
-	m_maincpu->set_periodic_int(FUNC(eag_state::irq2_line_hold), attotime::from_hz(600));
 
-	config.device_remove("irq_on"); // 8.25us is too long
-	config.device_remove("irq_off");
+	config.device_remove("irq_clock"); // 8.25us is too long
+	m_maincpu->set_periodic_int(FUNC(eag_state::irq2_line_hold), attotime::from_hz(600));
 }
 
 

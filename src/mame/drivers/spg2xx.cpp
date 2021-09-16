@@ -2095,6 +2095,10 @@ ROM_START( doraglob )
 	ROM_LOAD16_WORD_SWAP( "doraglobe.bin", 0x000000, 0x800000, CRC(6f454c50) SHA1(201e2de3d90abe017a8dc141613cbf6383423d13) )
 ROM_END
 
+ROM_START( doraglobg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doraglobegerman.bin", 0x000000, 0x800000, CRC(538aa197) SHA1(e97e0641df04074a0e45d02cecb43fbec91a4ce6) )
+ROM_END
 
 ROM_START( senspeed )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2235,8 +2239,10 @@ CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,   
 CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day",      MACHINE_IMPERFECT_SOUND )
 // This was from a 'cost reduced' unit with the 'non-TV' mode switch and internal speaker removed, however it looks like the code was not disabled or removed as the mode is fully functional.
 // The ZC-Infinity video for this on YouTube shows the map scrolling to center the continent, there doesn't appear to be an input for this, different revision?
-// A Dutch localized version also exists, which again must be different code
+// Dutch and French localized versions also exists, which again must be different code
 CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe",                           MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobg,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Doras Abenteuer-Globus (Germany)",                  MACHINE_IMPERFECT_SOUND )
+
 
 // ROM checksum fails, but is expecting 0 as a result? shows 'CopyRight' when booting normally? protection?
 CONS( 200?, jouet, 0,             0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "<unknown>",                                              "10 Jeux Interactifs / Jeux Pour Filles (France)",                       MACHINE_NOT_WORKING )

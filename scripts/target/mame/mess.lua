@@ -693,6 +693,7 @@ MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
 MACHINES["SPG2XX"] = true
 MACHINES["SPG290"] = true
+MACHINES["SPISDCARD"] = true
 MACHINES["STVCD"] = true
 MACHINES["SUN4C_MMU"] = true
 MACHINES["SWTPC8212"] = true
@@ -2458,6 +2459,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidel_cc1.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_cc10.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_cc7.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_checkc2.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_chesster.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_csc.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_dames.cpp",
@@ -3297,7 +3299,6 @@ files {
 	MAME_DIR .. "src/mame/machine/osborne1.cpp",
 	MAME_DIR .. "src/mame/drivers/osbexec.cpp",
 	MAME_DIR .. "src/mame/drivers/vixen.cpp",
-	MAME_DIR .. "src/mame/includes/vixen.h",
 }
 
 createMESSProjects(_target, _subtarget, "osi")

@@ -103,6 +103,8 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 #define HFE_FORMAT_HEADER   "HXCPICFE"
 

@@ -4,599 +4,24 @@
 
   Nintendo 8080 hardware
 
-    - Space Fever
-    - Space Fever High Splitter (aka SF-Hisplitter)
-    - Space Launcher
-    - Sheriff / Bandido / Western Gun 2
-    - Helifire
+- Space Fever / Color Space Fever
+- SF-HiSplitter
+- Space Launcher
+- Sheriff / Bandido / Western Gun 2
+- HeliFire
+
+Space Fever was initially produced with B&W video hardware. It was later sold
+(maybe upgraded too) featuring color graphics, known as "Color Space Fever".
+The other Space Fever hardware games were only sold with color graphics, but
+they run fine on the older B&W video hardware. For example, doing a ROM swap
+on the older Space Fever.
+
+TODO:
+- spacefev sound pitch for laser fire and enemy explosion is wrong, see:
+  https://www.youtube.com/watch?v=mGMUPNqlyuw
+
+----------------------------------------------------------------------------
 
-***************************************************************************/
-
-#include "emu.h"
-#include "includes/n8080.h"
-
-#define MASTER_CLOCK    XTAL(20'160'000)
-
-
-void n8080_state::n8080_shift_bits_w(uint8_t data)
-{
-	m_shift_bits = data & 7;
-}
-
-void n8080_state::n8080_shift_data_w(uint8_t data)
-{
-	m_shift_data = (m_shift_data >> 8) | (data << 8);
-}
-
-
-uint8_t n8080_state::n8080_shift_r()
-{
-	return m_shift_data >> (8 - m_shift_bits);
-}
-
-void n8080_state::main_cpu_map(address_map &map)
-{
-	map.global_mask(0x7fff);
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).ram().share("videoram");
-}
-
-
-void helifire_state::main_cpu_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).ram().share("videoram");
-	map(0xc000, 0xdfff).ram().share("colorram");
-}
-
-void n8080_state::main_io_map(address_map &map)
-{
-	map.global_mask(0x7);
-	map(0x00, 0x00).portr("IN0");
-	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).r(FUNC(n8080_state::n8080_shift_r));
-	map(0x04, 0x04).portr("IN3");
-
-	map(0x02, 0x02).w(FUNC(n8080_state::n8080_shift_bits_w));
-	map(0x03, 0x03).w(FUNC(n8080_state::n8080_shift_data_w));
-	map(0x04, 0x04).w(FUNC(n8080_state::n8080_sound_1_w));
-	map(0x05, 0x05).w(FUNC(n8080_state::n8080_sound_2_w));
-	map(0x06, 0x06).w(FUNC(n8080_state::n8080_video_control_w));
-}
-
-
-/* Input ports */
-
-static INPUT_PORTS_START( spacefev )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game A") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game B") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game C") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* enables diagnostic ROM at $1c00 */
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-
-	PORT_START("IN3")
-
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( highsplt )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game A") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game B") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game C") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* enables diagnostic ROM at $2000 */
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ))
-	PORT_DIPSETTING(    0x00, "1500" )
-	PORT_DIPSETTING(    0x04, "2000" )
-	PORT_DIPSETTING(    0x08, "3000" )
-	PORT_DIPSETTING(    0x0c, "4000" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-
-	PORT_START("IN3")
-
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( spacelnc )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game A") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game B") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game C") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* enables diagnostic ROM at $2000 */
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ))
-	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPSETTING(    0x04, "3000" )
-	PORT_DIPSETTING(    0x08, "5000" )
-	PORT_DIPSETTING(    0x0c, "8000" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-
-	PORT_START("IN3")
-
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( sheriff )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_COCKTAIL
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP1 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP2 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP3 enables diagnostic ROM at $2400 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives )) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )    // Switches 3-7 are UNUSED
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:5" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ))   PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( bandido )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
-
-	PORT_START("IN1")
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP1 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP2 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP3 enables diagnostic ROM at $2400 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown )) /* don't know if this is used */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( westgun2 )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_COCKTAIL
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ))
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Upright ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* enables diagnostic ROM at $2400 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN3")
-
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( helifire )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP1 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP2 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) /* EXP3 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ))
-	PORT_DIPSETTING(    0x00, "5000" )
-	PORT_DIPSETTING(    0x04, "6000" )
-	PORT_DIPSETTING(    0x08, "8000" )
-	PORT_DIPSETTING(    0x0c, "10000" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
-
-	/* potentiometers */
-	PORT_START("POT0")
-	PORT_DIPNAME( 0xff, 0x50, "VR1 sun brightness" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x10, "10" )
-	PORT_DIPSETTING(    0x20, "20" )
-	PORT_DIPSETTING(    0x30, "30" )
-	PORT_DIPSETTING(    0x40, "40" )
-	PORT_DIPSETTING(    0x50, "50" )
-	PORT_DIPSETTING(    0x60, "60" )
-	PORT_DIPSETTING(    0x70, "70" )
-
-	PORT_START("POT1")
-	PORT_DIPNAME( 0xff, 0x00, "VR2 sea brightness" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x10, "10" )
-	PORT_DIPSETTING(    0x20, "20" )
-	PORT_DIPSETTING(    0x30, "30" )
-	PORT_DIPSETTING(    0x40, "40" )
-	PORT_DIPSETTING(    0x50, "50" )
-	PORT_DIPSETTING(    0x60, "60" )
-	PORT_DIPSETTING(    0x70, "70" )
-INPUT_PORTS_END
-
-
-/* Interrupts */
-
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
-{
-	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
-
-	/* V7 = 1, V6 = 0 */
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf); // I8080
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
-{
-	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
-
-	/* vblank */
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7); // I8080
-}
-
-WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
-{
-	m_inte = state;
-}
-
-void n8080_state::n8080_status_callback(uint8_t data)
-{
-	if (data & i8080_cpu_device::STATUS_INTA)
-	{
-		/* interrupt acknowledge */
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
-}
-
-void n8080_state::machine_start()
-{
-	save_item(NAME(m_shift_data));
-	save_item(NAME(m_shift_bits));
-	save_item(NAME(m_inte));
-}
-
-void n8080_state::machine_reset()
-{
-	m_shift_data = 0;
-	m_shift_bits = 0;
-	m_inte = 0;
-}
-
-void spacefev_state::machine_reset()
-{
-	n8080_state::machine_reset();
-
-	m_red_screen = 0;
-	m_red_cannon = 0;
-}
-
-void sheriff_state::machine_reset()
-{
-	n8080_state::machine_reset();
-
-	m_sheriff_color_mode = 0;
-	m_sheriff_color_data = 0;
-}
-
-void helifire_state::machine_reset()
-{
-	n8080_state::machine_reset();
-
-	m_mv = 0;
-	m_sc = 0;
-	m_flash = 0;
-}
-
-
-void spacefev_state::spacefev(machine_config &config)
-{
-	/* basic machine hardware */
-	I8080(config, m_maincpu, MASTER_CLOCK / 10);
-	m_maincpu->out_status_func().set(FUNC(spacefev_state::n8080_status_callback));
-	m_maincpu->out_inte_func().set(FUNC(spacefev_state::n8080_inte_callback));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spacefev_state::main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &spacefev_state::main_io_map);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 255, 16, 239);
-	m_screen->set_screen_update(FUNC(spacefev_state::screen_update));
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette, FUNC(spacefev_state::n8080_palette), 8);
-
-	TIMER(config, "rst1").configure_scanline(FUNC(spacefev_state::rst1_tick), "screen", 128, 256);
-	TIMER(config, "rst2").configure_scanline(FUNC(spacefev_state::rst2_tick), "screen", 240, 256);
-
-	/* sound hardware */
-	spacefev_sound(config);
-}
-
-
-void sheriff_state::sheriff(machine_config &config)
-{
-	/* basic machine hardware */
-	I8080(config, m_maincpu, MASTER_CLOCK / 10);
-	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
-	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
-	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 255, 16, 239);
-	m_screen->set_screen_update(FUNC(sheriff_state::screen_update));
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette, FUNC(sheriff_state::n8080_palette), 8);
-
-	TIMER(config, "rst1").configure_scanline(FUNC(sheriff_state::rst1_tick), "screen", 128, 256);
-	TIMER(config, "rst2").configure_scanline(FUNC(sheriff_state::rst2_tick), "screen", 240, 256);
-
-	/* sound hardware */
-	sheriff_sound(config);
-}
-
-void sheriff_state::westgun2(machine_config &config)
-{
-	sheriff(config);
-
-	/* basic machine hardware */
-	I8080(config.replace(), m_maincpu, XTAL(19'968'000) / 10);
-	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
-	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
-	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
-}
-
-void helifire_state::helifire(machine_config &config)
-{
-	/* basic machine hardware */
-	I8080(config, m_maincpu, MASTER_CLOCK / 10);
-	m_maincpu->out_status_func().set(FUNC(helifire_state::n8080_status_callback));
-	m_maincpu->out_inte_func().set(FUNC(helifire_state::n8080_inte_callback));
-	m_maincpu->set_addrmap(AS_PROGRAM, &helifire_state::main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &helifire_state::main_io_map);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 255, 16, 239);
-	m_screen->set_screen_update(FUNC(helifire_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(helifire_state::screen_vblank));
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette, FUNC(helifire_state::helifire_palette), 8 + 0x400);
-
-	TIMER(config, "rst1").configure_scanline(FUNC(helifire_state::rst1_tick), "screen", 128, 256);
-	TIMER(config, "rst2").configure_scanline(FUNC(helifire_state::rst2_tick), "screen", 240, 256);
-
-	/* sound hardware */
-	helifire_sound(config);
-}
-
-
-/*
 Space Fever (3 sets, Space Fever?, High Splitter?, Space Launcher?)
 Nintendo, 1979
 
@@ -708,7 +133,563 @@ Notes:
       The other two sets were supplied as just EPROMs.
       Set2 (maybe High Splitter) is missing the ROM at location I2. Might be missing, or maybe
       just the program is smaller and the extra ROM was not required.
-*/
+
+***************************************************************************/
+
+#include "emu.h"
+#include "includes/n8080.h"
+
+
+// Shifter circuit done with TTL
+
+void n8080_state::n8080_shift_bits_w(uint8_t data)
+{
+	m_shift_bits = data & 7;
+}
+
+void n8080_state::n8080_shift_data_w(uint8_t data)
+{
+	m_shift_data = (m_shift_data >> 8) | (data << 8);
+}
+
+uint8_t n8080_state::n8080_shift_r()
+{
+	return m_shift_data >> (8 - m_shift_bits);
+}
+
+
+// Memory maps
+
+void n8080_state::main_cpu_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram().share("videoram");
+}
+
+void helifire_state::main_cpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram().share("videoram");
+	map(0xc000, 0xdfff).ram().share("colorram");
+}
+
+void n8080_state::main_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).r(FUNC(n8080_state::n8080_shift_r));
+	map(0x04, 0x04).portr("IN3");
+
+	map(0x02, 0x02).w(FUNC(n8080_state::n8080_shift_bits_w));
+	map(0x03, 0x03).w(FUNC(n8080_state::n8080_shift_data_w));
+	map(0x04, 0x04).w(FUNC(n8080_state::n8080_sound_1_w));
+	map(0x05, 0x05).w(FUNC(n8080_state::n8080_sound_2_w));
+	map(0x06, 0x06).w(FUNC(n8080_state::n8080_video_control_w));
+}
+
+
+// Input ports
+
+static INPUT_PORTS_START( spacefev )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Game A")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Game B")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Game C")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // enables diagnostic ROM at $1c00 ($2000 for highsplt/spacelnc)
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("VIDEO")
+	PORT_CONFNAME( 0x01, 0x00, "Video Hardware" )
+	PORT_CONFSETTING(    0x01, "Monochrome" )
+	PORT_CONFSETTING(    0x00, "Color" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( highsplt )
+	PORT_INCLUDE( spacefev )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ))
+	PORT_DIPSETTING(    0x00, "1500" )
+	PORT_DIPSETTING(    0x04, "2000" )
+	PORT_DIPSETTING(    0x08, "3000" )
+	PORT_DIPSETTING(    0x0c, "4000" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( spacelnc )
+	PORT_INCLUDE( highsplt )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ))
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x04, "3000" )
+	PORT_DIPSETTING(    0x08, "5000" )
+	PORT_DIPSETTING(    0x0c, "8000" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( sheriff )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_COCKTAIL
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP1
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP2
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP3 enables diagnostic ROM at $2400
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives )) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )    // Switches 3-7 are UNUSED
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ))   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( bandido )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP1
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP2
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP3 enables diagnostic ROM at $2400
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ))
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown )) // don't know if this is used
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( westgun2 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_COCKTAIL
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ))
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // enables diagnostic ROM at $2400
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( helifire )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP1
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP2
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // EXP3
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ))
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPSETTING(    0x04, "6000" )
+	PORT_DIPSETTING(    0x08, "8000" )
+	PORT_DIPSETTING(    0x0c, "10000" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ))
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
+
+	/* potentiometers */
+	PORT_START("POT0")
+	PORT_DIPNAME( 0xff, 0x50, "VR1 sun brightness" )
+	PORT_DIPSETTING(    0x00, "00" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x20, "20" )
+	PORT_DIPSETTING(    0x30, "30" )
+	PORT_DIPSETTING(    0x40, "40" )
+	PORT_DIPSETTING(    0x50, "50" )
+	PORT_DIPSETTING(    0x60, "60" )
+	PORT_DIPSETTING(    0x70, "70" )
+
+	PORT_START("POT1")
+	PORT_DIPNAME( 0xff, 0x00, "VR2 sea brightness" )
+	PORT_DIPSETTING(    0x00, "00" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x20, "20" )
+	PORT_DIPSETTING(    0x30, "30" )
+	PORT_DIPSETTING(    0x40, "40" )
+	PORT_DIPSETTING(    0x50, "50" )
+	PORT_DIPSETTING(    0x60, "60" )
+	PORT_DIPSETTING(    0x70, "70" )
+INPUT_PORTS_END
+
+
+// Interrupts
+
+TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
+{
+	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
+
+	// V7 = 1, V6 = 0
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf); // I8080
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
+{
+	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
+
+	// vblank
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7); // I8080
+}
+
+WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
+{
+	m_inte = state;
+}
+
+void n8080_state::n8080_status_callback(uint8_t data)
+{
+	if (data & i8080a_cpu_device::STATUS_INTA)
+	{
+		// interrupt acknowledge
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+}
+
+
+// Machine start/reset
+
+void n8080_state::machine_start()
+{
+	save_item(NAME(m_shift_data));
+	save_item(NAME(m_shift_bits));
+	save_item(NAME(m_inte));
+}
+
+void n8080_state::machine_reset()
+{
+	m_shift_data = 0;
+	m_shift_bits = 0;
+	m_inte = 0;
+}
+
+void spacefev_state::machine_reset()
+{
+	n8080_state::machine_reset();
+
+	m_red_screen = 0;
+	m_red_cannon = 0;
+}
+
+void sheriff_state::machine_reset()
+{
+	n8080_state::machine_reset();
+
+	m_sheriff_color_mode = 0;
+	m_sheriff_color_data = 0;
+}
+
+void helifire_state::machine_reset()
+{
+	n8080_state::machine_reset();
+
+	m_mv = 0;
+	m_sc = 0;
+	m_flash = 0;
+}
+
+
+// Machine configs
+
+void spacefev_state::spacefev(machine_config &config)
+{
+	/* basic machine hardware */
+	I8080A(config, m_maincpu, XTAL(20'160'000) / 10);
+	m_maincpu->out_status_func().set(FUNC(spacefev_state::n8080_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(spacefev_state::n8080_inte_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spacefev_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &spacefev_state::main_io_map);
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_screen_update(FUNC(spacefev_state::screen_update));
+	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette, FUNC(spacefev_state::n8080_palette), 8);
+
+	TIMER(config, "rst1").configure_scanline(FUNC(spacefev_state::rst1_tick), "screen", 128, 256);
+	TIMER(config, "rst2").configure_scanline(FUNC(spacefev_state::rst2_tick), "screen", 240, 256);
+
+	/* sound hardware */
+	spacefev_sound(config);
+}
+
+void sheriff_state::sheriff(machine_config &config)
+{
+	/* basic machine hardware */
+	I8080A(config, m_maincpu, XTAL(20'160'000) / 10);
+	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_screen_update(FUNC(sheriff_state::screen_update));
+	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette, FUNC(sheriff_state::n8080_palette), 8);
+
+	TIMER(config, "rst1").configure_scanline(FUNC(sheriff_state::rst1_tick), "screen", 128, 256);
+	TIMER(config, "rst2").configure_scanline(FUNC(sheriff_state::rst2_tick), "screen", 240, 256);
+
+	/* sound hardware */
+	sheriff_sound(config);
+}
+
+void sheriff_state::westgun2(machine_config &config)
+{
+	sheriff(config);
+
+	/* basic machine hardware */
+	I8080A(config.replace(), m_maincpu, XTAL(19'968'000) / 10);
+	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
+}
+
+void helifire_state::helifire(machine_config &config)
+{
+	/* basic machine hardware */
+	I8080A(config, m_maincpu, XTAL(20'160'000) / 10);
+	m_maincpu->out_status_func().set(FUNC(helifire_state::n8080_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(helifire_state::n8080_inte_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &helifire_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &helifire_state::main_io_map);
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_screen_update(FUNC(helifire_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(helifire_state::screen_vblank));
+	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette, FUNC(helifire_state::helifire_palette), 8 + 0x400);
+
+	TIMER(config, "rst1").configure_scanline(FUNC(helifire_state::rst1_tick), "screen", 128, 256);
+	TIMER(config, "rst2").configure_scanline(FUNC(helifire_state::rst2_tick), "screen", 240, 256);
+
+	/* sound hardware */
+	helifire_sound(config);
+}
+
+
+// ROM definitions
 
 ROM_START( spacefev )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -723,7 +704,7 @@ ROM_START( spacefev )
 	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "ss3.ic2",     0x0000, 0x0400, CRC(95c2c1ee) SHA1(42a3a382fc7d2782052372d71f6d0e8a153e74d0) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
 	ROM_END
 
@@ -740,7 +721,7 @@ ROM_START( spacefevo )
 	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "ss3.ic2",     0x0000, 0x0400, CRC(95c2c1ee) SHA1(42a3a382fc7d2782052372d71f6d0e8a153e74d0) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
 	ROM_END
 
@@ -757,7 +738,7 @@ ROM_START( spacefevo2 )
 	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "ss3.ic2",     0x0000, 0x0400, CRC(95c2c1ee) SHA1(42a3a382fc7d2782052372d71f6d0e8a153e74d0) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
 ROM_END
 
@@ -922,15 +903,18 @@ ROM_START( helifirea )
 ROM_END
 
 
-GAME( 1979, spacefev,   0,        spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (Older Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, highsplt,   0,        spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, highsplta,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, highspltb,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
+//    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       MONITOR, COMPANY, FULLNAME, FLAGS
+GAME( 1979, spacefev,   0,        spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (older version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, highsplt,   0,        spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "SF-HiSplitter (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, highsplta,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "SF-HiSplitter (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, highspltb,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "SF-HiSplitter (alt sound)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spacelnc,   0,        spacefev, spacelnc, spacefev_state, empty_init, ROT270, "Nintendo", "Space Launcher", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1979, sheriff,    0,        sheriff,  sheriff,  sheriff_state,  empty_init, ROT270, "Nintendo", "Sheriff", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  sheriff_state,  empty_init, ROT270, "Nintendo (Exidy license)", "Bandido", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, sheriff_state,  empty_init, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", MACHINE_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
+
 GAME( 1980, helifire,   0,        helifire, helifire, helifire_state, empty_init, ROT270, "Nintendo", "HeliFire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, helifirea,  helifire, helifire, helifire, helifire_state, empty_init, ROT270, "Nintendo", "HeliFire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

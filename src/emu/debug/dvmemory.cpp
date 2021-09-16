@@ -70,7 +70,7 @@ debug_view_memory_source::debug_view_memory_source(std::string &&name, memory_re
 	, m_blocklength(region.bytes())
 	, m_numblocks(1)
 	, m_blockstride(0)
-	, m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1))
+	, m_offsetxor(region.endianness() == ENDIANNESS_NATIVE ? 0 : region.bytewidth() - 1)
 	, m_endianness(region.endianness())
 	, m_prefsize(std::min<u8>(region.bytewidth(), 8))
 {
