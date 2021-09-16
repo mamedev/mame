@@ -10522,9 +10522,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Pings Netlink [SMPC] commands, black screens waiting for command to complete -->
 	<!-- Pings [CD-Block] HIRM register, no noticeable effect? -->
-	<!-- Moans about modem not connected off the bat, pings [CD-Block] specific I/O for status -->
+	<!-- Moans about modem not connected off the bat, pings [CD-Block] specific I/O for status (kludged to work) -->
+	<!-- With -drc on it moans that the "backup RAM is unformatted", it actually tries to access wrong pointers and eventually corrupts it out -->
 	<!-- Title screen drawing cuts off backgrounds with black pens [VDP2] -->
 	<!-- Options menu doesn't show background layer(s) [VDP2] -->
 	<!-- Keyboard inputs doesn't work -->

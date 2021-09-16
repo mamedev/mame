@@ -135,6 +135,10 @@ void stvcd_device::io_regs(address_map &map)
 	map(0x9001c, 0x9001f).mirror(0x08000).rw(FUNC(stvcd_device::cr2_r), FUNC(stvcd_device::cr2_w)).umask32(0xffffffff);
 	map(0x90020, 0x90023).mirror(0x08000).rw(FUNC(stvcd_device::cr3_r), FUNC(stvcd_device::cr3_w)).umask32(0xffffffff);
 	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(stvcd_device::cr4_r), FUNC(stvcd_device::cr4_w)).umask32(0xffffffff);
+
+	// NetLink access
+	// dragndrm expects this
+	map(0x8502a, 0x8502a).lr8(NAME([this] () { return 0x11; }));
 }
 
 u32 stvcd_device::datatrns_r(offs_t offset, uint32_t mem_mask)
