@@ -11,9 +11,10 @@
 #include "emu.h"
 #include "drivenum.h"
 #include "media_ident.h"
-#include "unzip.h"
-#include "jedparse.h"
 #include "softlist_dev.h"
+
+#include "jedparse.h"
+#include "unzip.h"
 
 
 //**************************************************************************
@@ -102,6 +103,8 @@ void media_identifier::identify_file(const char *name)
 
 void media_identifier::identify_data(const char *name, const uint8_t *data, std::size_t length)
 {
+	assert(data != nullptr && length != 0);
+
 	std::vector<file_info> info;
 	digest_data(info, name, data, length);
 	match_hashes(info);
@@ -231,12 +234,12 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 		if (core_filename_ends_with(path, ".jed"))
 		{
 			// load the file and process if it opens and has a valid length
-			uint32_t length;
-			void *data;
-			if (!util::core_file::load(path, &data, length))
+			util::core_file::ptr file;
+			if (!util::core_file::open(path, OPEN_FLAG_READ, file))
 			{
 				jed_data jed;
-				if (JEDERR_NONE == jed_parse(data, length, &jed))
+				auto ptr = util::core_file_read(std::move(file));
+				if (ptr && JEDERR_NONE == jed_parse(*ptr, &jed))
 				{
 					try
 					{
@@ -246,7 +249,6 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 						util::hash_collection hashes;
 						hashes.compute(&tempjed[0], tempjed.size(), util::hash_collection::HASH_TYPES_CRC_SHA1);
 						info.emplace_back(path, tempjed.size(), std::move(hashes), file_flavour::JED);
-						free(data);
 						m_total++;
 						return;
 					}
@@ -254,7 +256,6 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 					{
 					}
 				}
-				free(data);
 			}
 		}
 
@@ -301,7 +302,7 @@ void media_identifier::digest_data(std::vector<file_info> &info, char const *nam
 	if (core_filename_ends_with(name, ".jed"))
 	{
 		jed_data jed;
-		if (JEDERR_NONE == jed_parse(data, length, &jed))
+		if (JEDERR_NONE == jed_parse(*util::ram_read(data, length), &jed))
 		{
 			try
 			{
