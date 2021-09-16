@@ -614,10 +614,6 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				case 0x0f: // CKCHG320
 					m_dotsel(m_comreg & 1);
 
-					// send a NMI to Master SH2 if enabled
-					if(m_NMI_reset == false)
-						master_sh2_nmi();
-
 					// assert Slave SH2 line
 					m_sshres(1);
 					// clear PLL system halt
@@ -625,6 +621,12 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 					// setup the new dot select
 					m_cur_dotsel = (m_comreg & 1) ^ 1;
+
+					// send a NMI to Master SH2 if enabled
+					// it is unconditionally requested:
+					// bigichig, capgen1, capgen4 and capgen5 triggers a SLEEP opcode from BIOS call and expects this to wake them up.
+					//if(m_NMI_reset == false)
+					master_sh2_nmi();
 					break;
 
 				case 0x10: // INTBACK

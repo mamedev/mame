@@ -2993,8 +2993,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hangs at Sega logo, uses [SMPC] command 0x0e via BIOS and SLEEP (expecting NMI to be unconditionally requested?) -->
-	<software name="capgen1" supported="no">
+	<software name="capgen1" supported="yes">
 		<description>Capcom Generation - Dai-1-Shuu - Gekitsui Ou no Jidai (Jpn)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
@@ -3009,7 +3008,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Capcom Generation - Dai 2 Shuu Makai to Kishi (Japan)... -->
+	<!-- DaiMakaiMura BGM playbacks misses one instrument starting from stage 2 (only in-game, works fine in sound test), [SCSP] key on/off issue? -->
+	<!-- Wrong [VDP2] tilemap [VDP1] sprite priorities, particularly noticeable in ChohMakaiMura -->
+	<!-- Missing [VDP2] mosaic for ChohMakaiMura on map transitions -->
 	<software name="capgen2" supported="no">
 		<description>Capcom Generation - Dai-2-Shuu - Makai to Kishi (Jpn)</description>
 		<year>1998</year>
@@ -3041,9 +3042,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hangs at Sega logo, uses [SMPC] command 0x0e via BIOS and SLEEP (expecting NMI to be unconditionally requested?) -->
-	<!-- Plays wrong sounds in all games, [CD-Block]? -->
-	<!-- Title select screen draws transparent instead of opaque [VDP2] -->
+	<!-- Plays wrong sound/BGMs in all games, [CD-Block]? -->
+	<!-- Capcon Generation "Title Select" screen draws transparent instead of opaque [VDP2] -->
 	<!-- All games uses unemulated [VDP1] framebuffer rotation in Yoko screen mode, sprites are slightly glitchy in Tate mode. -->
 	<software name="capgen4" supported="no">
 		<description>Capcom Generation - Dai-4-Shuu - Kokou no Eiyuu (Jpn)</description>
@@ -3060,8 +3060,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hangs at Sega logo, uses [SMPC] command 0x0e via BIOS and SLEEP (expecting NMI to be unconditionally requested?) -->
-	<software name="capgen5" supported="no">
+	<software name="capgen5" supported="yes">
 		<description>Capcom Generation - Dai-5-Shuu - Kakutou ke Tachi (Jpn)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
@@ -4380,9 +4379,9 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="serial" value="T-2111G"/>
 		<info name="release" value="19980625"/>
 		<info name="alt_title" value="ゲームベーシック フォー セガサターン"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<!-- TODO: in port 2? -->
 		<info name="usage" value="Needs keyboard connected"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="game basic for segasaturn (japan)" sha1="bda219fae902fbe1c5bc5c95226b038fc2733031" />
@@ -7353,7 +7352,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- PS2 (at least) has not working BGMs (repeats a very short chunk over and over) (Update: fixed by now, or random bug?) -->
-	<!-- PS2 sports wrong priority on gameplay (sprites going above buildings, menuing etc.) [VDP1/VDP2] -->
+	<!-- PS2 sports wrong tilemap-sprite priorities on gameplay (sprites going above buildings, menuing etc.) [VDP1/VDP2] -->
 	<!-- TODO: verify PS1/PS3/PS4 -->
 	<software name="pstarcol" supported="no">
 		<description>Sega Ages - Phantasy Star Collection (Jpn)</description>
@@ -9835,8 +9834,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hangs at Sega logo, uses [SMPC] command 0x0e via BIOS and SLEEP (expecting NMI to be unconditionally requested?) -->
-	<software name="bigichig" supported="no">
+	<software name="bigichig" supported="yes">
 		<description>Big Ichigeki! Pachi-slot Daikouryaku (Jpn, v1.000)</description>
 		<year>1996</year>
 		<publisher>ASK Kodansha</publisher>
@@ -10538,8 +10536,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="serial" value="GS-7114"/>
 		<info name="release" value="19971220?"/>
 		<info name="alt_title" value="ドラゴンズドリーム"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="usage" value="Needs Netlink modem and keyboard connected to port 2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dragon's dream (jpn) (dw0874)" sha1="7fa6b9bd0c8d3f03420290bc2f0909186c18d2bd" />
