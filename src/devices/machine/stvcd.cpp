@@ -137,8 +137,8 @@ void stvcd_device::io_regs(address_map &map)
 	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(stvcd_device::cr4_r), FUNC(stvcd_device::cr4_w)).umask32(0xffffffff);
 
 	// NetLink access
-	// dragndrm expects this
-	map(0x8502a, 0x8502a).lr8(NAME([this] () { return 0x11; }));
+	// dragndrm expects this value, most likely for status
+	map(0x8502a, 0x8502a).lr8(NAME([] () -> u8 { return 0x11; }));
 }
 
 u32 stvcd_device::datatrns_r(offs_t offset, uint32_t mem_mask)

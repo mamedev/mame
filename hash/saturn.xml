@@ -10528,7 +10528,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Title screen drawing cuts off backgrounds with black pens [VDP2] -->
 	<!-- Options menu doesn't show background layer(s) [VDP2] -->
 	<!-- Keyboard inputs doesn't work -->
-	<!-- Presumably dies when actually accessing Nifty Serve details  -->
+	<!-- Presumably dies when actually accessing Nifty Serve details -->
+	<!-- Attract mode draws only skill names and attribute bars over a black BG, enables [VDP2] Sprite Window -->
 	<software name="dragndrm" supported="no">
 		<description>Dragon's Dream (Jpn)</description>
 		<year>1997?</year>
