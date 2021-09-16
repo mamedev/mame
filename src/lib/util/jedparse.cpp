@@ -194,7 +194,7 @@ int jed_parse(util::random_read &src, jed_data *result)
 {
 	jed_parse_info pinfo;
 	int i;
-	uint64_t actual;
+	std::size_t actual;
 
 	/* initialize the output and the intermediate info struct */
 	memset(result, 0, sizeof(*result));
@@ -405,7 +405,7 @@ int jedbin_parse(util::read_stream &src, jed_data *result)
 
 	/* need at least 4 bytes */
 	uint8_t buf[4];
-	uint64_t actual;
+	std::size_t actual;
 	if (src.read(&buf[0], 4, actual) || actual != 4)
 		return JEDERR_INVALID_DATA;
 

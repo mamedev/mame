@@ -69,7 +69,7 @@ static uint32_t suck_number(util::random_read &src)
 
 	// find first digit
 	uint8_t ch;
-	uint64_t actual;
+	std::size_t actual;
 	bool found = false;
 	while (!src.read(&ch, 1, actual) && actual == 1)
 	{
@@ -193,7 +193,7 @@ static bool process_terms(jed_data *data, util::random_read &src, uint8_t &ch, p
 			curoutput = 0;
 		}
 
-		uint64_t actual;
+		std::size_t actual;
 		if (src.read(&ch, 1, actual))
 			return false;
 		if (actual != 1)
@@ -233,7 +233,7 @@ static bool process_field(jed_data *data, util::random_read &src, parse_info *pi
 	int destptr = 0;
 
 	uint8_t seek;
-	uint64_t actual;
+	std::size_t actual;
 	while (!src.read(&seek, 1, actual) && actual == 1 && isalpha(seek))
 	{
 		dest[destptr++] = tolower(seek);
@@ -329,7 +329,7 @@ int pla_parse(util::random_read &src, jed_data *result)
 	memset(result->fusemap, 0, sizeof(result->fusemap));
 
 	uint8_t ch;
-	uint64_t actual;
+	std::size_t actual;
 	while (!src.read(&ch, 1, actual) && actual == 1)
 	{
 		switch (ch)
