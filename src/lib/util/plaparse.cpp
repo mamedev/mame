@@ -99,7 +99,7 @@ static uint32_t suck_number(util::random_read &src)
     process_terms - process input/output matrix
 -------------------------------------------------*/
 
-static bool process_terms(jed_data *data, util::random_read &src, uint8_t &ch, parse_info *pinfo)
+static bool process_terms(jed_data *data, util::random_read &src, uint8_t ch, parse_info *pinfo)
 {
 	uint32_t curinput = 0;
 	uint32_t curoutput = 0;
@@ -197,12 +197,10 @@ static bool process_terms(jed_data *data, util::random_read &src, uint8_t &ch, p
 		if (src.read(&ch, 1, actual))
 			return false;
 		if (actual != 1)
-		{
-			ch = 0;
-			break;
-		}
+			return true;
 	}
 
+	src.seek(-1, SEEK_CUR);
 	return true;
 }
 
@@ -353,7 +351,7 @@ int pla_parse(util::random_read &src, jed_data *result)
 		case '0': case '1': case '-': case '~':
 			if (!process_terms(result, src, ch, &pinfo))
 				return JEDERR_INVALID_DATA;
-			continue;
+			break;
 
 		default:
 			break;
