@@ -171,7 +171,11 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	}
 
 #   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD || BX_PLATFORM_RPI
+#ifdef SDLMAME_X11
 	return (void*)wmi.info.x11.window;
+#else
+	return (void*)_window;
+#endif
 #   elif BX_PLATFORM_OSX
 	return wmi.info.cocoa.window;
 #   elif BX_PLATFORM_WINDOWS
@@ -192,8 +196,13 @@ inline bool sdlSetWindow(SDL_Window* _window)
 
 	bgfx::PlatformData pd;
 #   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+#ifdef SDLMAME_X11
 	pd.ndt          = wmi.info.x11.display;
 	pd.nwh          = (void*)(uintptr_t)wmi.info.x11.window;
+#else
+	pd.ndt = NULL;
+	pd.nwh = _window;
+#endif
 #   elif BX_PLATFORM_OSX
 	pd.ndt          = NULL;
 	pd.nwh          = wmi.info.cocoa.window;
