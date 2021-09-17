@@ -28,7 +28,7 @@ uint16_t retrokbd_state2[RETROK_LAST];
 int mouseLX;
 int mouseLY;
 int mouseBUT[4];
-Joystate joystate[4];
+Joystate joystate[6];
 
 int lightgunX, lightgunY;
 int lightgunBUT[4];
@@ -568,11 +568,11 @@ void retro_osd_interface::process_joypad_state(running_machine &machine)
 {
    unsigned i, j;
    int analog_l2, analog_r2;
-   int16_t ret[4];
+   int16_t ret[6];
 
    if (libretro_supports_bitmasks)
    {
-      for(j = 0;j < 4; j++)
+      for(j = 0;j < 6; j++)
       {
          ret[j] = 0;
          ret[j] = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
@@ -580,7 +580,7 @@ void retro_osd_interface::process_joypad_state(running_machine &machine)
    }
    else
    {
-      for(j = 0;j < 4; j++)
+      for(j = 0;j < 6; j++)
       {
          ret[j] = 0;
          for(i = 0;i < RETRO_MAX_BUTTONS; i++)
@@ -589,7 +589,7 @@ void retro_osd_interface::process_joypad_state(running_machine &machine)
       }
    }
 
-   for(j = 0;j < 4; j++)
+   for(j = 0;j < 6; j++)
    {
       for(i = 0;i < RETRO_MAX_BUTTONS; i++)
       {
@@ -975,7 +975,7 @@ public:
 		if (buttons_profiles)
 			Input_Binding(machine);
 
-		for (i = 0; i < 4; i++)
+		for (i = 0; i < 6; i++)
 		{
  			sprintf(defname, "RetroPad%d", i);
 
