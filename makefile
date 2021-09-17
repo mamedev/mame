@@ -406,6 +406,7 @@ endif
 endif
 
 ifeq ($(findstring riscv64,$(UNAME)),riscv64)
+ARCHITECTURE :=
 ifndef FORCE_DRC_C_BACKEND
 	FORCE_DRC_C_BACKEND := 1
 endif
