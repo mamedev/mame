@@ -24,6 +24,7 @@
 #endif
 
 
+namespace util::detail {
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -31,7 +32,7 @@
 
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_COMPATIBLE)
 
-delegate_mfp::raw_mfp_data delegate_mfp::s_null_mfp = { { 0 } };
+const delegate_mfp::raw_mfp_data delegate_mfp::s_null_mfp = { { 0 } };
 
 #endif
 
@@ -82,3 +83,5 @@ delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_clas
 }
 
 #endif
+
+} // namespace util::detail
