@@ -54,7 +54,7 @@ const alt_vector_device_usb_dvg::game_info_t alt_vector_device_usb_dvg::s_games[
 	{"astdelu1", false, GAME_NONE,    true},
 	{"llander",  false, GAME_NONE,    true},
 	{"llander1", false, GAME_NONE,    true},
-	{"demon",    false, GAME_NONE,    true,
+	{"demon",    false, GAME_NONE,    true},
 	{"barrier",  false, GAME_NONE,    true},
 	{"bzone",    false, GAME_NONE,    true},
 	{"bzone2",   false, GAME_NONE,    true},
