@@ -174,7 +174,7 @@ protected:
         CSR_DBURST = 0x0020,
     };
 
-    const uint32_t INTR_CLR_MASK = (INTR_INT | INTR_TCI | INTR_EOP | INTR_EOPI | INTR_DREQ | INTR_DRQI | INTR_PERR); // TODO: are EOP, DREQ, PERR actually intr?
+    const uint32_t INTR_CLR_MASK = (/*INTR_INT |*/ INTR_TCI | INTR_EOP | INTR_EOPI | INTR_DREQ | INTR_DRQI | INTR_PERR); // TODO: are EOP, DREQ, PERR actually intr?
     const uint32_t INTR_EN_MASK = (INTR_INTEN | INTR_TCIE | INTR_EOPIE | INTR_DRQIE);
     enum DMAC3_INTR_MASKS : uint32_t
     {

@@ -1539,11 +1539,20 @@ void spifi3_device::step(bool timeout)
                     {
                         LOG("Autostat enabled, proceeding to status input automatically\n");
                         state = INIT_XFR;
+                        xfr_phase = newPhase;
 
                         // Below this is a guess
                         dma_command = false;
                         dma_dir = DMA_NONE;
                         spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                    }
+                    else if (newPhase == S_PHASE_COMMAND && (spifi_reg.cmlen & CML_ACOM_EN))
+                    {
+                        LOG("Autocmd enabled, proceeding to command automatically\n");
+                        state = INIT_XFR;
+                        xfr_phase = newPhase;
+
+                        step(false); // TODO: delay needed?
                     }
                     else
                     {
