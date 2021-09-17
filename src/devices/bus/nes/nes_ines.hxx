@@ -417,7 +417,7 @@ static const nes_mmc mmc_list[] =
 	// 379 35-in-1 multicart, similar to mapper 38
 	// 380 970630C multicart
 	{ 381, UNL_KN42 },             // 2-in-1 Big Nose games
-	// 382 830928C 5-in-1 and 9-in-1 multicarts
+	{ 382, BMC_830928C },
 	// 383 JY-014 multicart
 	// 384 4-in-1 VRC4 clone with Crisis Force
 	// 385 NTDEC 2779 5-in-1, not in nes.xml?
@@ -427,7 +427,7 @@ static const nes_mmc mmc_list[] =
 	{ 389, CALTRON_9IN1 },
 	// 390 variant of mapper 236?
 	// 391 BS-110 MMC3 clone
-	// 392 8-in-1 variant of mc_sv16
+	{ 392, BMC_00202650 },
 	{ 393, BMC_820720C },
 	// 394 Realtec HSK007 multicart
 	// 395 Realtec 8210 multicarts

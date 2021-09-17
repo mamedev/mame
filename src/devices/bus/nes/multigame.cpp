@@ -46,6 +46,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_60311C,     nes_bmc_60311c_device,     "nes_bmc_60311
 DEFINE_DEVICE_TYPE(NES_BMC_80013B,     nes_bmc_80013b_device,     "nes_bmc_80013b",     "NES Cart BMC 80013-B PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device,    "nes_bmc_810544c",    "NES Cart BMC 810544-C-A1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device,    "nes_bmc_830425c",    "NES Cart BMC 830425C-4391T PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device,    "nes_bmc_830928c",    "NES Cart BMC 830928C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device,    "nes_bmc_850437c",    "NES Cart BMC 850437C PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
@@ -202,6 +203,11 @@ nes_bmc_810544c_device::nes_bmc_810544c_device(const machine_config &mconfig, co
 
 nes_bmc_830425c_device::nes_bmc_830425c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_830425C, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_bmc_830928c_device::nes_bmc_830928c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_830928C, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -660,6 +666,21 @@ void nes_bmc_830425c_device::pcb_reset()
 	prg16_cdef(0x0f);
 	chr8(0, CHRRAM);
 	set_nt_mirroring(PPU_MIRROR_VERT);
+
+	m_latch = 0;
+}
+
+void nes_bmc_830928c_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_bmc_830928c_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -1609,7 +1630,6 @@ void nes_bmc_810544c_device::write_h(offs_t offset, u8 data)
 	chr8(offset & 0x0f, CHRROM);
 }
 
-
 /*-------------------------------------------------
 
  BMC-830425C-4391T
@@ -1633,6 +1653,41 @@ void nes_bmc_830425c_device::write_h(offs_t offset, u8 data)
 	u8 mode = !BIT(m_latch, 4) << 3 | 0x07;
 	prg16_89ab(outer | (data & mode));
 	prg16_cdef(outer | mode);
+}
+
+/*-------------------------------------------------
+
+ BMC-830928C
+
+ Games: 9 in 1
+
+ NES 2.0: mapper 382
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_830928c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_830928c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	if (!BIT(m_latch, 5))
+	{
+		m_latch = offset & 0x3f;
+		set_nt_mirroring(BIT(m_latch, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
+
+	u8 outer = (m_latch & 0x07) << 3;
+	if (BIT(m_latch, 3))    // BNROM mode
+		prg32(outer >> 1 | (data & 0x03));
+	else                    // UNROM mode
+	{
+		prg16_89ab(outer | (data & 0x07));
+		prg16_cdef(outer | 7);
+	}
 }
 
 /*-------------------------------------------------
