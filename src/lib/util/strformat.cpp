@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "strformat.h"
-#include "vecstream.h"
 
 #include <iostream>
 #include <sstream>

@@ -597,10 +597,12 @@ private:
 			str << int(std::make_signed_t<U>(value));
 		else if constexpr (!std::is_signed_v<U> || std::is_same_v<typename Stream::char_type, U>)
 			str << std::make_signed_t<U>(value);
-		else if constexpr (std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
-			str << value;
-		else
+#if __cplusplus > 201703L
+		else if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
 			str << std::make_signed_t<U>(value);
+#endif
+		else
+			str << value;
 	}
 
 	template <typename U>
@@ -610,10 +612,12 @@ private:
 			str << unsigned(std::make_unsigned_t<U>(value));
 		else if constexpr (!std::is_unsigned_v<U> || std::is_same_v<typename Stream::char_type, U>)
 			str << std::make_unsigned_t<U>(value);
-		else if constexpr (std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
-			str << value;
-		else
+#if __cplusplus > 201703L
+		else if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
 			str << std::make_unsigned_t<U>(value);
+#endif
+		else
+			str << value;
 	}
 
 public:
@@ -819,14 +823,16 @@ public:
 				str << reinterpret_cast<void const *>(std::uintptr_t(value));
 				break;
 			default:
-				if constexpr (std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
-				{
-					str << value;
-				}
-				else
+#if __cplusplus > 201703L
+				if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
 				{
 					assert(false); // stream out operator not declared or declared deleted
 					str << '?';
+				}
+				else
+#endif
+				{
+					str << value;
 				}
 			}
 		}
