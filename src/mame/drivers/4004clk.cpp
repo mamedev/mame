@@ -87,12 +87,12 @@ void nixieclock_state::machine_start()
 void nixieclock_state::nixie_w(offs_t offset, uint8_t data)
 {
 	m_nixie[offset >> 4] = data;
-	m_nixie_out[5] = nixie_to_num(((m_nixie[2] & 3)<<8) | (m_nixie[1] << 4) | m_nixie[0]);
-	m_nixie_out[4] = nixie_to_num((m_nixie[4] << 6) | (m_nixie[3] << 2) | (m_nixie[2] >>2));
-	m_nixie_out[3] = nixie_to_num(((m_nixie[7] & 3)<<8) | (m_nixie[6] << 4) | m_nixie[5]);
-	m_nixie_out[2] = nixie_to_num((m_nixie[9] << 6) | (m_nixie[8] << 2) | (m_nixie[7] >>2));
-	m_nixie_out[1] = nixie_to_num(((m_nixie[12] & 3)<<8) | (m_nixie[11] << 4) | m_nixie[10]);
-	m_nixie_out[0] = nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >>2));
+	m_nixie_out[5] = nixie_to_num(((m_nixie[2] & 3) << 8) | (m_nixie[1] << 4) | m_nixie[0]);
+	m_nixie_out[4] = nixie_to_num((m_nixie[4] << 6) | (m_nixie[3] << 2) | (m_nixie[2] >> 2));
+	m_nixie_out[3] = nixie_to_num(((m_nixie[7] & 3) << 8) | (m_nixie[6] << 4) | m_nixie[5]);
+	m_nixie_out[2] = nixie_to_num((m_nixie[9] << 6) | (m_nixie[8] << 2) | (m_nixie[7] >> 2));
+	m_nixie_out[1] = nixie_to_num(((m_nixie[12] & 3) << 8) | (m_nixie[11] << 4) | m_nixie[10]);
+	m_nixie_out[0] = nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >> 2));
 }
 
 void nixieclock_state::neon_w(uint8_t data)
@@ -190,12 +190,12 @@ ROM_START( 4004clk )
 	ROM_LOAD( "clock.u37", 0x0700, 0x0100, CRC(4c2a2632) SHA1(5f75c2d67571ffcfb98f37944f7f4bc7f531c109))
 	ROM_LOAD( "clock.u38", 0x0800, 0x0100, CRC(133da0d6) SHA1(08863a287471c0e77f27cea087cb4a3b372d49c1))
 	ROM_LOAD( "clock.u39", 0x0900, 0x0100, CRC(0628593c) SHA1(34249753056cd425e0d48c188c830d64464006c9))
-	ROM_LOAD( "clock.u40", 0x0A00, 0x0100, CRC(1c2e94b5) SHA1(89e6c70b936fd9882a229de671dcada7c39b9e8e))
-	ROM_LOAD( "clock.u41", 0x0B00, 0x0100, CRC(48b4510d) SHA1(17c5eedc36b469bfae23e204c614ccc01bd4df02))
-	ROM_LOAD( "clock.u42", 0x0C00, 0x0100, CRC(4b768675) SHA1(8862b9911bd5907e679539c1e98921f0686b8a76))
-	ROM_LOAD( "clock.u43", 0x0D00, 0x0100, CRC(df8db80f) SHA1(34ef8e9ae9fd4e88659e1e14759a2baf1cf589a5))
-	ROM_LOAD( "clock.u44", 0x0E00, 0x0100, CRC(23037c71) SHA1(87702bdf5985fa58d4cabcc0d4530e229bfebcbb))
-	ROM_LOAD( "clock.u45", 0x0F00, 0x0100, CRC(a8d419ef) SHA1(86742a5ad410c027e9cf9a95e2006dc1128715e5))
+	ROM_LOAD( "clock.u40", 0x0a00, 0x0100, CRC(1c2e94b5) SHA1(89e6c70b936fd9882a229de671dcada7c39b9e8e))
+	ROM_LOAD( "clock.u41", 0x0b00, 0x0100, CRC(48b4510d) SHA1(17c5eedc36b469bfae23e204c614ccc01bd4df02))
+	ROM_LOAD( "clock.u42", 0x0c00, 0x0100, CRC(4b768675) SHA1(8862b9911bd5907e679539c1e98921f0686b8a76))
+	ROM_LOAD( "clock.u43", 0x0d00, 0x0100, CRC(df8db80f) SHA1(34ef8e9ae9fd4e88659e1e14759a2baf1cf589a5))
+	ROM_LOAD( "clock.u44", 0x0e00, 0x0100, CRC(23037c71) SHA1(87702bdf5985fa58d4cabcc0d4530e229bfebcbb))
+	ROM_LOAD( "clock.u45", 0x0f00, 0x0100, CRC(a8d419ef) SHA1(86742a5ad410c027e9cf9a95e2006dc1128715e5))
 ROM_END
 
 } // anonymous namespace
