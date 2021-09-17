@@ -37,8 +37,6 @@ DEFINE_DEVICE_TYPE(NES_KN42,           nes_kn42_device,           "nes_kn42",   
 DEFINE_DEVICE_TYPE(NES_N625092,        nes_n625092_device,        "nes_n625092",        "NES Cart N625092 PCB")
 DEFINE_DEVICE_TYPE(NES_A65AS,          nes_a65as_device,          "nes_a65as",          "NES Cart A65AS PCB")
 DEFINE_DEVICE_TYPE(NES_T262,           nes_t262_device,           "nes_t262",           "NES Cart T-262 PCB")
-DEFINE_DEVICE_TYPE(NES_NOVEL1,         nes_novel1_device,         "nes_novel1",         "NES Cart Novel Diamond Type 1 PCB")
-DEFINE_DEVICE_TYPE(NES_NOVEL2,         nes_novel2_device,         "nes_novel2",         "NES Cart Novel Diamond Type 2 PCB")
 DEFINE_DEVICE_TYPE(NES_STUDYNGAME,     nes_studyngame_device,     "nes_studyngame",     "NES Cart Study n Game PCB")
 DEFINE_DEVICE_TYPE(NES_SUPERGUN20IN1,  nes_sgun20in1_device,      "nes_sgun20in1",      "NES Cart Supergun 20 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_VT5201,         nes_vt5201_device,         "nes_vt5201",         "NES Cart VT5201 PCB")
@@ -155,16 +153,6 @@ nes_t262_device::nes_t262_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-nes_novel1_device::nes_novel1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_NOVEL1, tag, owner, clock)
-{
-}
-
-nes_novel2_device::nes_novel2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_NOVEL2, tag, owner, clock)
-{
-}
-
 nes_studyngame_device::nes_studyngame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_STUDYNGAME, tag, owner, clock)
 {
@@ -230,7 +218,7 @@ nes_bmc_gka_device::nes_bmc_gka_device(const machine_config &mconfig, const char
 {
 }
 
-nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_GKB, tag, owner, clock)
 {
 }
@@ -559,31 +547,6 @@ void nes_t262_device::pcb_reset()
 	m_latch = 0;
 }
 
-void nes_novel1_device::device_start()
-{
-	common_start();
-}
-
-void nes_novel1_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-	set_nt_mirroring(PPU_MIRROR_VERT);
-}
-
-void nes_novel2_device::device_start()
-{
-	common_start();
-}
-
-void nes_novel2_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
 void nes_studyngame_device::device_start()
 {
 	common_start();
@@ -735,18 +698,6 @@ void nes_bmc_gka_device::pcb_reset()
 	chr8(0, CHRROM);
 
 	m_reg[0] = m_reg[1] = 0;
-}
-
-void nes_bmc_gkb_device::device_start()
-{
-	common_start();
-}
-
-void nes_bmc_gkb_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
 }
 
 void nes_bmc_k3036_device::pcb_reset()
@@ -1417,39 +1368,6 @@ void nes_t262_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-NOVELDIAMOND and BMC-999999in1
-
- Unknown Bootleg Multigame Board
- Games: I only found 'Novel Diamond 999999-in-1.unf' using
- this mapper (hence the code is used for BMC_NOVELDIAMOND
- board). The code is included here in case a mapper 54
- dump arises.
-
- iNES: mappers 54 and 213
-
- In MESS: Partial Support.
-
- -------------------------------------------------*/
-
-// Are this correct or should they work the same?
-void nes_novel1_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("novel1 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	prg32(offset & 0x03);
-	chr8(offset & 0x07, CHRROM);
-}
-
-void nes_novel2_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("novel2 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	prg32(offset >> 1);
-	chr8(offset >> 3, CHRROM);
-}
-
-/*-------------------------------------------------
-
  Board UNL-STUDYNGAME
 
  Games: Study n Game 32 in 1
@@ -1810,23 +1728,32 @@ void nes_bmc_gka_device::write_h(offs_t offset, u8 data)
  Board BMC-GKB
 
  Unknown Bootleg Multigame Board
- Games: 68 in 1, 73 in 1, 98 in 1
+ Games: 68 in 1, 73 in 1, 98 in 1, and many others
 
  iNES: mapper 58
 
- In MESS: Supported.
+ In MAME: Supported.
+
+ TODO: Investigate why Jewel on mc_wq55 crashes after
+ its title screen. It further invokes write_h, causing
+ bank switching (and these games are all NROM/CNROM so
+ they should never switch PRG once the menu loads them),
+ but ignoring those writes doesn't fix the problem. Is
+ the game non-working on hardware? A bad dump?
 
  -------------------------------------------------*/
 
-void nes_bmc_gkb_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_gkb_device::write_h(offs_t offset, u8 data)
 {
-	uint8_t bank = (offset & 0x40) ? 0 : 1;
 	LOG_MMC(("bmc_gkb write_h, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(offset & ~bank);
-	prg16_cdef(offset | bank);
-	chr8(offset >> 3, m_chr_source);
-	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	u8 bank = offset & 0x07;
+	u8 mode = !BIT(offset, 6);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
+
+	chr8((offset >> 3) & 0x07, CHRROM);
+	set_nt_mirroring(BIT(offset, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------
@@ -2406,10 +2333,10 @@ void nes_bmc_20in1_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-21IN1
+ BMC-21IN1, BMC-NOVELDIAMOND
 
  Unknown Bootleg Multigame Board
- Games: 8 in 1, 21 in 1
+ Games: 8 in 1, 21 in 1, 9999999 in 1
 
  iNES: mapper 201
 
@@ -2422,7 +2349,7 @@ void nes_bmc_21in1_device::write_h(offs_t offset, u8 data)
 	LOG_MMC(("bmc_21in1 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(offset & 0x03);
-	chr8(offset & 0x03, CHRROM);
+	chr8(offset & 0x07, CHRROM);
 }
 
 /*-------------------------------------------------
