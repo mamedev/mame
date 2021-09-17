@@ -644,7 +644,7 @@ void nes_cart_slot_device::call_load_ines()
 		// read submappers (based on 20140116 specs)
 		submapper = (header[8] & 0xf0) >> 4;
 
-		// NES 2.0's extended exponential sizes, needed for loading 64MB PRG/CHR chunks. These bizarrely go up to 7 * 2^63!
+		// NES 2.0's extended exponential sizes, needed for loading PRG >= 64MB, CHR >= 32MB. These bizarrely go up to 7 * 2^63!
 		auto expsize = [] (u8 byte) { return (2*(byte & 0x03) + 1) * std::pow(2.0, byte >> 2); };
 
 		if ((header[9] & 0x0f) == 0x0f)
