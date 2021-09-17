@@ -54,11 +54,11 @@ public:
     {
         if (state)
         {
-            m_controllers[controller].intr |= 0x1; // TODO: const
+            m_controllers[controller].intr |= INTR_INT;
         }
         else
         {
-            m_controllers[controller].intr &= ~0x1;
+            m_controllers[controller].intr &= ~INTR_INT;
         }
         m_irq_check->adjust(attotime::zero);
     }
@@ -198,7 +198,7 @@ protected:
     {
         CONF_IPER = 0x8000,
         CONF_MPER = 0x4000,
-        CONF_PCEN = 0x2000,
+        CONF_PCEN = 0x2000, // parity check enable?
         CONF_DERR = 0x1000,
         CONF_DCEN = 0x0800,
         CONF_ODDP = 0x0200, // if I had to guess, odd parity?

@@ -117,6 +117,7 @@ public:
         : driver_device(mconfig, type, tag),
           m_cpu(*this, "cpu"),
           m_ram(*this, "ram"),
+          m_dma_ram(*this, "dmaram"),
           m_rtc(*this, "rtc"),
           m_escc(*this, "escc1"),
           m_fifo0(*this, "apfifo0"),
@@ -212,6 +213,7 @@ protected:
 
     // Main memory
     required_device<ram_device> m_ram;
+    required_device<ram_device> m_dma_ram;
 
     // ST Micro M48T02 Timekeeper NVRAM + RTC
     required_device<m48t02_device> m_rtc;
@@ -324,6 +326,9 @@ void news_r4k_state::machine_common(machine_config &config)
     RAM(config, m_ram);
     m_ram->set_default_size(MAIN_MEMORY_DEFAULT);
 
+    RAM(config, m_dma_ram);
+    m_dma_ram->set_default_size("128KB");
+
     // Timekeeper IC
     M48T02(config, m_rtc);
 
@@ -394,10 +399,17 @@ void news_r4k_state::machine_common(machine_config &config)
         adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL0>));
         adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL0>));
     });
-    NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {});
+    NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device)
+    {
+        spifi3_device &adapter = downcast<spifi3_device &>(*device);
+        adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL1>));
+        adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL1>));
+    });
 
     m_dmac->dma_r_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_r));
     m_dmac->dma_w_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_w));
+    m_dmac->dma_r_cb<dmac3_device::CTRL1>().set(m_scsi1, FUNC(spifi3_device::dma_r));
+    m_dmac->dma_w_cb<dmac3_device::CTRL1>().set(m_scsi1, FUNC(spifi3_device::dma_w));
 }
 
 void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); }
@@ -458,7 +470,13 @@ void news_r4k_state::cpu_map(address_map &map)
     // map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
 
     // DMAC3 DMA Controller
-    map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
+    //map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
+    map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset) { return m_dma_ram->read(offset); }),
+                                     NAME([this](offs_t offset, uint8_t data)
+                                          {
+                                              LOG("Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+                                              m_dma_ram->write(offset, data);
+                                          }));
     map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
     map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 

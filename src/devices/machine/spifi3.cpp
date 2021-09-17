@@ -16,7 +16,7 @@
 #define VERBOSE 1
 #include "logmacro.h"
 
-#define DELAY_HACK // XXX
+#define DELAY_HACK // TODO:
 
 DEFINE_DEVICE_TYPE(SPIFI3, spifi3_device, "spifi3", "HP 1TV3-0302 SPIFI3 SCSI-2 Protocol Controller")
 
@@ -93,7 +93,6 @@ void spifi3_device::map(address_map &map)
     map(0x3c, 0x3f).lrw32(NAME([this]() { LOG("read spifi_reg.fifodata = 0x%x\n", spifi_reg.fifodata); return spifi_reg.fifodata; }), NAME([this](uint32_t data) { LOG("write spifi_reg.fifodata = 0x%x\n", data); spifi_reg.fifodata = data; }));
     map(0x44, 0x47).lrw32(NAME([this]() { LOG("read spifi_reg.data_xfer = 0x%x\n", spifi_reg.data_xfer); return spifi_reg.data_xfer; }), NAME([this](uint32_t data) { LOG("write spifi_reg.data_xfer = 0x%x\n", data); spifi_reg.data_xfer = data; }));
     map(0x48, 0x4b).lrw32(NAME([this]() { LOG("read spifi_reg.autocmd = 0x%x\n", spifi_reg.autocmd); return spifi_reg.autocmd; }), NAME([this](uint32_t data) { LOG("write spifi_reg.autocmd = 0x%x\n", data); spifi_reg.autocmd = data; }));
-    map(0x4c, 0x4f).lrw32(NAME([this]() { LOG("read spifi_reg.autostat = 0x%x\n", spifi_reg.autostat); return spifi_reg.autostat; }), NAME([this](uint32_t data) { LOG("write spifi_reg.autostat = 0x%x\n", data); spifi_reg.autostat = data; }));
     map(0x50, 0x53).lrw32(NAME([this]() { LOG("read spifi_reg.resel = 0x%x\n", spifi_reg.resel); return spifi_reg.resel; }), NAME([this](uint32_t data) { LOG("write spifi_reg.resel = 0x%x\n", data); spifi_reg.resel = data; }));
     map(0x64, 0x67).lrw32(NAME([this]() { LOG("read spifi_reg.loopctrl = 0x%x\n", spifi_reg.loopctrl); return spifi_reg.loopctrl; }), NAME([this](uint32_t data) { LOG("write spifi_reg.loopctrl = 0x%x\n", data); spifi_reg.loopctrl = data; }));
     map(0x68, 0x6b).lrw32(NAME([this]() { LOG("read spifi_reg.loopdata = 0x%x\n", spifi_reg.loopdata); return spifi_reg.loopdata; }), NAME([this](uint32_t data) { LOG("write spifi_reg.loopdata = 0x%x\n", data); spifi_reg.loopdata = data; }));
@@ -181,13 +180,26 @@ void spifi3_device::map(address_map &map)
                                    LOG("write spifi_reg.init_status = 0x%x\n", data);
                                    spifi_reg.init_status = data;
                                }));
+    
+    map(0x4c, 0x4f).lrw32(NAME([this]() 
+                               { 
+                                   LOG("read spifi_reg.autostat = 0x%x\n", spifi_reg.autostat); 
+                                   return spifi_reg.autostat;
+                               }),
+                          NAME([this](uint32_t data)
+                               { 
+                                   LOG("write spifi_reg.autostat = 0x%x\n", data);
+                                   spifi_reg.autostat |= data; // This is a total guess based on what the NEWS-OS kernel does with this register.
+                                                               // NetBSD absolutely doesn't use it the same way.
+                                }));
+    
 
     // Below this line probably won't need to change
     map(0x30, 0x33).r(FUNC(spifi3_device::prstat_r));
     map(0x38, 0x3b).rw(FUNC(spifi3_device::fifoctrl_r), FUNC(spifi3_device::fifoctrl_w));
     map(0x40, 0x43).lrw32(NAME([this]() { LOG("read spifi_reg.config = 0x%x\n", spifi_reg.config); return spifi_reg.config; }), NAME([this](uint32_t data) { LOG("write spifi_reg.config = 0x%x\n", data); spifi_reg.config = data; }));
     map(0x54, 0x57).w(FUNC(spifi3_device::select_w));
-    map(0x54, 0x57).lr32(NAME([this]() { LOG("read spifi_reg.select = 0x%x\n", spifi_reg.select); select_w(spifi_reg.select | SEL_ISTART); return spifi_reg.select; })); // XXX mrom expects selection retries to happen automatically, but it does read the register - does this trigger a reselection attempt?
+    map(0x54, 0x57).lr32(NAME([this]() { LOG("read spifi_reg.select = 0x%x\n", spifi_reg.select); select_w(spifi_reg.select | SEL_ISTART); return spifi_reg.select; })); // TODO: mrom expects selection retries to happen automatically, but it does read the register - does this trigger a reselection attempt?
     map(0x58, 0x5b).rw(FUNC(spifi3_device::prcmd_r), FUNC(spifi3_device::prcmd_w));
     map(0x5c, 0x5f).rw(FUNC(spifi3_device::auxctrl_r), FUNC(spifi3_device::auxctrl_w));
     map(0x60, 0x63).w(FUNC(spifi3_device::autodata_w));
@@ -416,8 +428,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = false; // xxx
-            dma_set(DMA_NONE); // xxx
+            dma_command = false; // TODO:
+            dma_set(DMA_NONE); // TODO:
             check_drq();
             step(false);
             break;
@@ -436,7 +448,7 @@ void spifi3_device::prcmd_w(uint32_t data)
         }
         case PRC_COMMAND:
         {
-            LOG("Got COMMAND command! Starting transfer of status information...\n");
+            LOG("Got COMMAND command! Starting command...\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
@@ -454,8 +466,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
             // dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE); // TODO: proper setting of DMA???
-            dma_command = false; // xxx
-            dma_set(DMA_NONE); // xxx
+            dma_command = false; // TODO:
+            dma_set(DMA_NONE); // TODO:
             check_drq();
             step(false);
             break;
@@ -482,8 +494,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = false; // xxx
-            dma_set(DMA_NONE); // xxx
+            dma_command = false; // TODO:
+            dma_set(DMA_NONE); // TODO:
             check_drq();
             step(false);
             break;
@@ -494,8 +506,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = false; // xxx
-            dma_set(DMA_NONE); // xxx
+            dma_command = false; // TODO:
+            dma_set(DMA_NONE); // TODO:
             check_drq();
             step(false);
             break;
@@ -775,10 +787,10 @@ void spifi3_device::function_bus_complete()
 {
     LOG("function_bus_complete\n");
     state = IDLE;
-    spifi_reg.spstat = SPS_IDLE; // xxx
+    spifi_reg.spstat = SPS_IDLE; // TODO:
     // was: istatus |= I_FUNCTION|I_BUS;
-    spifi_reg.intr |= INTR_FCOMP | INTR_BSRQ; // XXX icond? is BSRQ 1:1 w/ bus complete?
-    spifi_reg.prcmd = 0; // XXX
+    spifi_reg.intr |= INTR_FCOMP | INTR_BSRQ; // TODO: icond? is BSRQ 1:1 w/ bus complete?
+    spifi_reg.prcmd = 0; // TODO:
     dma_set(DMA_NONE);
     check_drq();
     check_irq();
@@ -788,9 +800,9 @@ void spifi3_device::function_complete()
 {
     LOG("function_complete\n");
     state = IDLE;
-    spifi_reg.spstat = SPS_IDLE; // xxx
-    spifi_reg.intr |= INTR_FCOMP; // XXX icond?
-    spifi_reg.prcmd = 0; // XXX
+    spifi_reg.spstat = SPS_IDLE; // TODO:
+    spifi_reg.intr |= INTR_FCOMP; // TODO: icond?
+    spifi_reg.prcmd = 0; // TODO:
     dma_set(DMA_NONE);
     check_drq();
     check_irq();
@@ -801,8 +813,8 @@ void spifi3_device::bus_complete()
     LOG("bus_complete\n");
     state = IDLE;
     // was: istatus |= I_BUS;
-    spifi_reg.intr |= INTR_BSRQ; // XXX icond? is BSRQ 1:1 w/ bus complete?
-    spifi_reg.prcmd = 0; // XXX
+    spifi_reg.intr |= INTR_BSRQ; // TODO: icond? is BSRQ 1:1 w/ bus complete?
+    spifi_reg.prcmd = 0; // TODO:
     dma_set(DMA_NONE);
     check_drq();
     check_irq();
@@ -815,7 +827,7 @@ void spifi3_device::dma_set(int dir)
     // account for data already in the fifo
     if (dir == DMA_OUT && !m_even_fifo.empty())
     {
-        decrement_tcounter(m_even_fifo.size()); // XXX is this needed for SPIFI?
+        decrement_tcounter(m_even_fifo.size()); // TODO: is this needed for SPIFI?
     }
 }
 
@@ -967,7 +979,8 @@ void spifi3_device::step(bool timeout)
                 break;
             }
 
-            scsi_bus->data_w(scsi_refid, (1<<scsi_id) | (1<<bus_id));
+            bus_id = (spifi_reg.select & SEL_TARGET) >> 4; // TODO: this is ugly and temporary
+            scsi_bus->data_w(scsi_refid, (1 << scsi_id) | (1 << bus_id));
             state = (state & STATE_MASK) | (ARB_SET_DEST << SUB_SHIFT);
             delay_cycles(4);
             break;
@@ -1198,7 +1211,7 @@ void spifi3_device::step(bool timeout)
             {
                 */
                 LOG("Starting autoidentify...\n");
-                command_pos = -1; // XXX THIS IS TEMPORARY
+                command_pos = -1; // TODO: THIS IS TEMPORARY
             // }
             state = DISC_SEL_ARBITRATION;
             step(false);
@@ -1250,7 +1263,6 @@ void spifi3_device::step(bool timeout)
                 scsi_bus->data_w(scsi_refid, 0x80);         // TODO: calc DiscPriv and LUNTAR from register
                 scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK); // Send ACK
                 scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ); // Wait for REQ
-                // delay_cycles(sync_period); // Delay till next cycle XXX I didn't have the ctrl callback, maybe this isn't needed?
             }
             break;
         }
@@ -1260,16 +1272,24 @@ void spifi3_device::step(bool timeout)
             command_length--;
             if (command_pos < 0)
             {
-                // XXX RE ALERT - MIGHT BE WAY OFF
+                // TODO: RE ALERT - MIGHT BE WAY OFF
                 // autoidentified target, now we need to see if autocmd is enabled. If so, we can just proceed to the XFR phase automatically.
                 command_pos = 0;
-                if(spifi_reg.cmlen & CML_ACOM_EN)
+                auto newPhase = (ctrl & S_PHASE_MASK);
+                if((spifi_reg.cmlen & CML_ACOM_EN) && newPhase == S_PHASE_COMMAND)
                 {
-                    LOG("Select complete, autocmd enabled so moving on to XFR phase!");
-                    scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // XXX Deassert ACK - just trying this out
+                    LOG("Select complete, autocmd enabled so moving on to XFR phase!\n");
+                    scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // TODO: Deassert ACK - just trying this out
                     state = INIT_XFR;
-                    xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK; // XXX is this OK??
-                    step(false); // XXX delay needed?
+                    xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+                    step(false); // TODO: delay needed?
+                }
+                else if ((spifi_reg.cmlen & CML_AMSG_EN) && (newPhase == S_PHASE_MSG_OUT || newPhase == S_PHASE_MSG_IN))
+                {
+                    LOG("Select complete, automsg enabled so moving on to XFR phase!\n");
+                    state = INIT_XFR;
+                    xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+                    step(false); // TODO: delay needed?
                 }
                 else
                 {
@@ -1382,7 +1402,7 @@ void spifi3_device::step(bool timeout)
                         xfrDataSource = FIFO;
                         send_byte();
                     }
-                    else // send from cdb buffer
+                    else // send from cdb buffer on command or message
                     {
                         xfrDataSource = COMMAND_BUFFER;
                         send_cmd_byte();
@@ -1395,7 +1415,7 @@ void spifi3_device::step(bool timeout)
                 case S_PHASE_MSG_IN:
                 {
                     // can't receive if the fifo is full
-                    if (m_even_fifo.size() == 8 && !(xfr_phase == S_PHASE_STATUS && spifi_reg.autostat)) // XXX - no idea if status goes to the fifo or not
+                    if (m_even_fifo.size() == 8 && !(xfr_phase == S_PHASE_STATUS && spifi_reg.autostat)) // TODO: - no idea if status goes to the fifo or not
                     {
                         // check_drq(); // in case data should be transferred now
                         break;
@@ -1449,15 +1469,23 @@ void spifi3_device::step(bool timeout)
             {
                 LOG("Non-DMA transfer in complete!\n");
                 state = INIT_XFR_BUS_COMPLETE;
+                auto newPhase = (ctrl & S_PHASE_MASK);
+                if ((newPhase == S_PHASE_MSG_IN) && ((spifi_reg.cmlen & CML_AMSG_EN) > 0)) // Automsg enabled, do that instead
+                {
+                    LOG("AUTOMSG enabled, proceeding to message input!\n");
+                    state = INIT_XFR;
+                    xfr_phase = newPhase;
+                    // TODO: anything else? set ICOND AMSGOFF or something?
+                }
             }
             else if(xfrDataSource == COMMAND_BUFFER && (command_pos >= (spifi_reg.cmlen & CML_LENMASK))) // Done transferring message or command
             {
                 LOG("Command transfer complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
-                // spifi_reg.icond |= ICOND_ACMDOFF; XXX ???
+                // spifi_reg.icond |= ICOND_ACMDOFF; TODO: ???
 
                 // If autodata is enabled for this target, then we don't need to notify the host, we just keep going with the transfer instead.
-                // XXX is this the right interpretation??
+                // TODO: is this the right interpretation??
                 // If the target gives us a non-data phase, though, we will notify the host. Is this the correct behavior??
                 auto newPhase = (ctrl & S_PHASE_MASK);
                 if ( (newPhase == S_PHASE_DATA_IN && (((spifi_reg.autodata & (ADATA_EN | ADATA_IN)) == (ADATA_EN | ADATA_IN))
@@ -1475,6 +1503,25 @@ void spifi3_device::step(bool timeout)
                         dma_dir = DMA_OUT;
                     }
                     step(false);
+                }
+                else if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                {
+                    // TODO: ID enforcement for autostat
+                    LOG("Autostat enabled, proceeding to status input automatically\n");
+                    state = INIT_XFR;
+                    xfr_phase = newPhase;
+
+                    // Below this is a guess
+                    dma_command = false;
+                    dma_dir = DMA_NONE;
+                    spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                }
+                else if ((newPhase == S_PHASE_MSG_IN) && ((spifi_reg.cmlen & CML_AMSG_EN) > 0))
+                {
+                    LOG("AUTOMSG enabled, proceeding to message input!\n");
+                    state = INIT_XFR;
+                    xfr_phase = newPhase;
+                    // TODO: anything else? set ICOND AMSGOFF or something?
                 }
             }
             else
@@ -1496,6 +1543,7 @@ void spifi3_device::step(bool timeout)
                         // Below this is a guess
                         dma_command = false;
                         dma_dir = DMA_NONE;
+                        spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
                     }
                     else
                     {

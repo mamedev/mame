@@ -89,6 +89,8 @@ void dmac3_device::intr_w(DMAC3_Controller controller, uint32_t data)
 	m_controllers[controller].intr &= ~intr_clear_bits; // Clear requested interrupt flags
 	m_controllers[controller].intr &= ~INTR_EN_MASK;	// Clear all mask bits
 	m_controllers[controller].intr |= intr_enable_bits; // Set mask bits to new mask
+	m_irq_check->adjust(attotime::zero);
+	// TODO: does it make sense to clear INTR_INT??
 }
 
 void dmac3_device::length_w(DMAC3_Controller controller, uint32_t data)
@@ -99,16 +101,16 @@ void dmac3_device::length_w(DMAC3_Controller controller, uint32_t data)
 
 void dmac3_device::address_w(DMAC3_Controller controller, uint32_t data)
 {
-	LOG("dmac3-%d address_w: 0x%x\n", controller, data);
+	LOG("dmac3-%d address_w: 0x%x (%s)\n", controller, data, machine().describe_context()); // TODO: get address set
 	m_controllers[controller].address = data;
 }
 
 void dmac3_device::conf_w(DMAC3_Controller controller, uint32_t data)
 {
-	// Log is polluted with switching between SPIFI3 and regular mode
-	// Will probably remove the if at some point, but we can mostly trust all 3
-	// DMAC+SPIFI3 users (MROM, NEWS-OS, and NetBSD) to follow this correctly
-	if((data & CONF_WIDTH) != (m_controllers[controller].conf & CONF_WIDTH))
+	// Only log if something other than the access mode changed
+	// since, at least for now, DMAC and SPIFI accesses will go through regardless
+	// of this setting.
+	if((data & ~CONF_WIDTH) != (m_controllers[controller].conf & ~CONF_WIDTH))
 	{
 		LOG("dmac3-%d conf_w: 0x%x\n", controller, data);
 	}
@@ -134,7 +136,8 @@ void dmac3_device::reset_controller(DMAC3_Controller controller)
 
 uint32_t dmac3_device::dmac3_virt_to_phys(uint32_t v_address)
 {
-	uint32_t dmac_page_address = BASE_MAP_ADDRESS + 8 * (v_address >> 12); // Convert page number to PTE address
+	// FIXME: the bitmask & in the following line is in the wrong place
+	uint32_t dmac_page_address = BASE_MAP_ADDRESS + 8 * ((v_address >> 12) & ~0xC0000); // Convert page number to PTE address. NEWS-OS sets upper bits in the VADDRESS
 	uint64_t raw_pte = m_bus->read_qword(dmac_page_address);
 	dmac3_pte pte;
 	pte.valid = (raw_pte & ENTRY_VALID) > 0;
@@ -144,7 +147,8 @@ uint32_t dmac3_device::dmac3_virt_to_phys(uint32_t v_address)
 
 	if(!pte.valid)
 	{
-		fatalerror("DMAC3 TLB: out of universe!"); // TODO: is there an interrupt or something we can signal to the host instead?
+		LOG("WARNING: DMAC3 TLB out of universe! Check the DMA mapping RAM! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, dmac_page_address, raw_pte);
+		// fatalerror("DMAC3 TLB: out of universe!"); // TODO: is there an interrupt or something we can signal to the host instead?
 	}
 
 	return (pte.pfnum << 12) + (v_address & 0xFFF);
@@ -206,14 +210,15 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
 		if ((m_controllers[controller].address & DMAC_PAGE_MASK) + 0x1000 > MAP_RAM_SIZE)
 		{
 			// XXX Is there an interrupt or some other way to handle this besides killing the emulation?
-			fatalerror("DMAC3 address overflow! Ran beyond the bounds of the MAP RAM!");
+			//fatalerror("DMAC3 address overflow! Ran beyond the bounds of the MAP RAM!");
+			LOG("WARNING: DMAC3 address overflow! Ran beyond the bounds of the MAP RAM; ignore this if MSB maybe?\n");
 		}
 
 		// Decrement transfer count
 		--m_controllers[controller].length;
 		if(!m_controllers[controller].length)
 		{
-			m_controllers[controller].intr |= INTR_EOPI; // TODO: is this the right interrupt flag? Does TC also need to be set?
+			// TEMP m_controllers[controller].intr |= INTR_EOPI; // TODO: is this the right interrupt flag? Does TC also need to be set?
 			m_irq_check->adjust(attotime::zero);
 		}
 
