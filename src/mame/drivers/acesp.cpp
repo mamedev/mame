@@ -20,12 +20,17 @@
 #include "cpu/m6800/m6801.h"
 #include "machine/6821pia.h"
 
+#include "ace_sp_dmd.lh"
+
 class ace_sp_state : public driver_device
 {
 public:
 	ace_sp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_dmdram(*this, "dmdram")
+		, m_sevensegram(*this, "sevensegram")
+		, m_dmd(*this, "dotmatrix%u", 0U)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void ace_sp(machine_config &config);
@@ -34,13 +39,39 @@ public:
 	void init_ace_cr();
 
 private:
+	void machine_start() override;
+
 	void ace_sp_map(address_map &map);
+
+	void dmd_w(offs_t offset, uint8_t data);
+	void sevenseg_w(offs_t offset, uint8_t data);
+
+	required_shared_ptr<uint8_t> m_dmdram;
+	required_shared_ptr<uint8_t> m_sevensegram;
+
+	output_finder<1536> m_dmd;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
 
+void ace_sp_state::machine_start()
+{
+	m_dmd.resolve();
+}
 
+void ace_sp_state::dmd_w(offs_t offset, uint8_t data)
+{
+	m_dmdram[offset] = data;
+
+	for (int i = 0; i < 8; i++)
+		m_dmd[(offset * 8) + i] = (data >> i) & 1;
+}
+
+void ace_sp_state::sevenseg_w(offs_t offset, uint8_t data)
+{
+	m_sevensegram[offset] = data;
+}
 
 
 
@@ -48,7 +79,7 @@ void ace_sp_state::ace_sp_map(address_map &map)
 {
 	/**** 6303Y internal area ****/
 	//----- 0x0000 - 0x0027 is internal registers -----
-	map(0x0000, 0x0027).ram();
+	//map(0x0000, 0x0027).ram();
 	//----- 0x0028 - 0x003f is external access -----
 	// 0x30 - reels write
 	// 0x31 - lamp high
@@ -68,7 +99,12 @@ void ace_sp_state::ace_sp_map(address_map &map)
 
 
 	/**** regular map ****/
-	map(0x0140, 0x1fff).ram();
+	map(0x0140, 0x1eff).ram();
+	map(0x1f00, 0x1fbf).ram().w(FUNC(ace_sp_state::dmd_w)).share("dmdram");
+	map(0x1fc0, 0x1fff).ram().w(FUNC(ace_sp_state::sevenseg_w)).share("sevensegram");
+
+
+
 	map(0x2000, 0xffff).rom();
 }
 
@@ -92,6 +128,8 @@ void ace_sp_state::ace_sp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ace_sp_state::ace_sp_map);
 
 	PIA6821(config, "pia0", 0);
+
+	config.set_default_layout(layout_ace_sp_dmd);
 }
 
 
@@ -1466,15 +1504,15 @@ ROM_END
 	/* not used, or missing? */
 ROM_START( sp_playa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "playitagain-v1-6pound1.bin", 0x0000, 0x8000, CRC(e377e7af) SHA1(4ca7c8ddd15791f4d45bebe861fd3c193c7227e0) )
-	ROM_LOAD( "playitagain-v1-6pound2.bin", 0x8000, 0x8000, CRC(7bab5c33) SHA1(46bc6fe7d5cdd998fc1e4e9a4b1a6a95cd160cf0) )
+	ROM_LOAD( "playitagain-v1-6pound2.bin", 0x0000, 0x8000, CRC(7bab5c33) SHA1(46bc6fe7d5cdd998fc1e4e9a4b1a6a95cd160cf0) )
+	ROM_LOAD( "playitagain-v1-6pound1.bin", 0x8000, 0x8000, CRC(e377e7af) SHA1(4ca7c8ddd15791f4d45bebe861fd3c193c7227e0) )
 	SP_PLAYA_SOUND
 ROM_END
 
 ROM_START( sp_playaa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "575 pask p3.2.bin", 0x0000, 0x8000, CRC(f7d2d40d) SHA1(83e4e83217fef8d92bcba3edf1250d09243f9f79) )
-	ROM_LOAD( "575 pa p3.1.bin", 0x0000, 0x8000, CRC(9e51ff86) SHA1(a2da9eee6b5f7211296e8633e5ec8eeec8ec77fd) )
+	ROM_LOAD( "575 pa p3.1.bin", 0x8000, 0x8000, CRC(9e51ff86) SHA1(a2da9eee6b5f7211296e8633e5ec8eeec8ec77fd) )
 	SP_PLAYA_SOUND
 ROM_END
 
@@ -2427,56 +2465,56 @@ ROM_END
 ROM_START( sp_donky )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2b", 0x0000, 0x8000, CRC(49c60006) SHA1(9a4964df1238f267cdf05fa063f7de8b5716da10) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkya )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2c", 0x0000, 0x8000, CRC(c482c400) SHA1(dc5087260772807725ce08e7fd89ee5c19406fe5) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyb )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2d", 0x0000, 0x8000, CRC(4fd3db89) SHA1(f1233adfbfd95c87ebf7706bb242b7297947699c) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2e", 0x0000, 0x8000, CRC(c2971f8f) SHA1(c14db5294c397148293c496d52ac0b41067952b2) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2f", 0x0000, 0x8000, CRC(05e1c1df) SHA1(c00fe8553eac50229dc6bf2a5016c353fcb61c82) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkye )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2g", 0x0000, 0x8000, CRC(88a505d9) SHA1(0d10f8e102daddde840b582cb962270f6180a399) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyf )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2h", 0x0000, 0x8000, CRC(03f41a50) SHA1(907a947449a7dccfff00dca2536e0bc230b5771d) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyg )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2i", 0x0000, 0x8000, CRC(8eb0de56) SHA1(6411e9008b09f9387622911e09d954dc7e89c6cf) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
