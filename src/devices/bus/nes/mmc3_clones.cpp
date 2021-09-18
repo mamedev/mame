@@ -72,6 +72,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device,       "nes_bmc_f15",  
 DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45",      "NES Cart BMC GN-45 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device,     "nes_bmc_k3006",     "NES Cart BMC K-3006 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_00202650,  nes_bmc_00202650_device,  "nes_bmc_00202650",  "NES Cart BMC 00202650 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device,   "nes_bmc_411120c",   "NES Cart BMC 411120C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_820720C,   nes_bmc_820720c_device,   "nes_bmc_820720c",   "NES Cart BMC 820720C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830118C,   nes_bmc_830118c_device,   "nes_bmc_830118c",   "NES Cart BMC 830118C PCB")
@@ -318,6 +319,11 @@ nes_bmc_gold7in1_device::nes_bmc_gold7in1_device(const machine_config &mconfig, 
 
 nes_bmc_k3006_device::nes_bmc_k3006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_K3006, tag, owner, clock)
+{
+}
+
+nes_bmc_00202650_device::nes_bmc_00202650_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_00202650, tag, owner, clock), m_mmc3_mode(false)
 {
 }
 
@@ -742,6 +748,24 @@ void nes_bmc_k3006_device::pcb_reset()
 	mmc3_common_initialize(0x0f, 0x7f, 0);
 	prg16_89ab(0);
 	prg16_cdef(0);
+}
+
+void nes_bmc_00202650_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_mmc3_mode));
+}
+
+void nes_bmc_00202650_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_mmc3_mode = false;
+	mmc3_common_initialize(0x0f, 0x7f, 0);
+
+	// PCB has an extra 32KB boot menu chip, only the menu uses the CHRRAM
+	prg32((m_prg_chunks >> 1) - 1);
+	chr8(0, CHRRAM);
 }
 
 void nes_bmc_411120c_device::device_start()
@@ -2611,6 +2635,52 @@ void nes_bmc_k3006_device::write_m(offs_t offset, u8 data)
 			prg16_89ab(bank & ~mode);
 			prg16_cdef(bank | mode);
 		}
+	}
+}
+
+/*-------------------------------------------------
+
+ BMC-00202650
+
+ Games: 8 in 1
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 392
+
+ In MAME: Supported.
+
+ TODO: Soft reset does work for some games some of the
+ time. Seems to be caused by main RAM contents. Does
+ this happen on hardware?
+
+ -------------------------------------------------*/
+
+void nes_bmc_00202650_device::set_prg(int prg_base, int prg_mask)
+{
+	if (m_mmc3_mode)
+		nes_txrom_device::set_prg(prg_base, prg_mask);
+}
+
+void nes_bmc_00202650_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (m_mmc3_mode)
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+}
+
+void nes_bmc_00202650_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_00202650 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (!m_mmc3_mode)
+	{
+		m_mmc3_mode = BIT(data, 4);
+
+		m_prg_base = (data & 0x07) << 4;
+		set_prg(m_prg_base, m_prg_mask);
+
+		m_chr_base = m_prg_base << 3;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }
 

@@ -81111,6 +81111,29 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- All games work except Ninja Gaiden 2 which has the same issues as the set nryuken2 -->
+	<software name="mc_8sv" supported="partial">
+		<description>Super 8 in 1 (Supervision menu)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_00202650" />
+			<feature name="pcb_model" value="00202650" />
+			<dataarea name="prg" size="1081344">
+				<rom name="u2.prg" size="524288" crc="f9b3b492" sha1="dfb64f4d2b8336d1ea5d304461b4c049a6dab018" offset="0x000000" />
+				<rom name="u3.prg" size="524288" crc="f1a344a8" sha1="7311d1f107085b33208084cad7bde9047aa23903" offset="0x080000" />
+				<rom name="u1.prg" size="32768" crc="0336a65a" sha1="a3cc32158e3997b12e38988dcc6295c0610e9009" offset="0x100000" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="u10.prg" size="524288" crc="05c893e1" sha1="c9f1648eab7ec1b8d226dfae3dd2a0cab1daaf29" offset="0x000000" />
+				<rom name="u4.prg" size="524288" crc="688e9442" sha1="b7d293358ffca7ec8b9398b1a78abe98ef56522f" offset="0x080000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_80" supported="no">
 		<description>80 in 1</description>
 		<year>19??</year>
@@ -81217,6 +81240,23 @@ be better to redump them properly. -->
 			<feature name="pcb" value="BMC-N625092" />
 			<dataarea name="prg" size="1048576">
 				<rom name="800-in-1 (001-tetris 1p &amp; 800-flappy c).prg" size="1048576" crc="1b50cadf" sha1="68852c6aba5fe8a47e6963d16e5a52657496a51a" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- All games work except Journey to the West which has the same issues as the set jwest -->
+	<software name="mc_9jw" supported="partial">
+		<description>9 in 1 (Journey to the West)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830928c" />
+			<feature name="pcb_model" value="830928C" />
+			<dataarea name="prg" size="1048576">
+				<rom name="9-in-1.prg" size="1048576" crc="c41b19ac" sha1="ca6a70dff922864e53cfd37689b073c647b67097" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
