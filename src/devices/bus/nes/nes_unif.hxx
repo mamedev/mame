@@ -97,7 +97,7 @@ static const unif unif_list[] =
 	{ "BMC-A65AS",                  0,    0, CHRRAM_8,  BMC_A65AS},
 	{ "BMC-GS-2004",                0,    0, CHRRAM_8,  RCM_GS2004},
 	{ "BMC-GS-2013",                0,    0, CHRRAM_8,  RCM_GS2013},
-	{ "BMC-NOVELDIAMOND9999999IN1", 0,    0, CHRRAM_0,  BMC_NOVEL1},
+	{ "BMC-NOVELDIAMOND9999999IN1", 0,    0, CHRRAM_0,  BMC_21IN1},
 	{ "BMC-SUPER24IN1SC03",         8,    0, CHRRAM_8,  BMC_S24IN1SC03},
 	{ "BMC-SUPERHIK8IN1",           8,    0, CHRRAM_0,  BMC_HIK8IN1},
 	{ "BMC-T-262",                  0,    0, CHRRAM_8,  BMC_T262},

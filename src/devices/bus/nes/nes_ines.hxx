@@ -86,7 +86,7 @@ static const nes_mmc mmc_list[] =
 	{ 51, BMC_BALLGAMES_11IN1 },
 	{ 52, BMC_GOLD_7IN1 },
 	{ 53, SVISION16_BOARD },
-	{ 54, BMC_NOVEL1 },
+	{ 54, BMC_21IN1 },   // duplicate of mapper 201, though possibly should be "Unused"
 	{ 55, UNL_MMALEE },  // Genius SMB
 	{ 56, KAISER_KS202 },
 	{ 57, BMC_GKA },
@@ -246,7 +246,7 @@ static const nes_mmc mmc_list[] =
 	{ 210, NAMCOT_175 },
 	{ 211, JYCOMPANY_B },
 	{ 212, BMC_SUPERHIK_300IN1 },
-	{ 213, BMC_NOVEL2 },
+	{ 213, BMC_GKB },           // duplicate of mapper 58
 	{ 214, BMC_SUPERGUN_20IN1 },
 	{ 215, UNL_8237 },          // and UNL_8237A
 	{ 216, RCM_GS2015 },
@@ -288,7 +288,7 @@ static const nes_mmc mmc_list[] =
 	{ 252, WAIXING_SGZ },
 	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
 	{ 254, BTL_PIKACHUY2K },
-	{ 255, BMC_72IN1 },
+	{ 255, BMC_72IN1 },         // duplicate of mapper 225
 
 	// NES 2.0
 	// 256 OneBus Famiclones

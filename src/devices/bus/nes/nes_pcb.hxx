@@ -250,8 +250,6 @@ static const nes_pcb pcb_list[] =
 	{ "n625092",          UNL_N625092 },
 	{ "a65as",            BMC_A65AS },
 	{ "t262",             BMC_T262 },
-	{ "novel1",           BMC_NOVEL1 },
-	{ "novel2",           BMC_NOVEL2 },  // mapper 213... same as BMC-NOVELDIAMOND9999999IN1 board?
 	{ "studyngame",       UNL_STUDYNGAME },  // mapper 39
 	{ "sgun20in1",        BMC_SUPERGUN_20IN1 },
 	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 59
