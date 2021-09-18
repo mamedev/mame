@@ -13,6 +13,10 @@
  * 001 Yoshi flashes in-game.
  * 001 Back to the Future have heavily corrupted graphics (since forever).
 
+ TODO:
+ - Combine 2 versions of set_prg in SxROM base class. This means dealing with
+   variant boards SNROM, SUROM, etc which repurpose bits in the MMC1 regs.
+
  ***********************************************************************************************************/
 
 
@@ -142,6 +146,28 @@ TIMER_CALLBACK_MEMBER( nes_sxrom_device::resync_callback )
 }
 
 
+// Standard MMC1 PRG banking with base and mask (to support multicarts, etc)
+void nes_sxrom_device::set_prg(int prg_base, int prg_mask)
+{
+	u8 bank = prg_base | (m_reg[3] & prg_mask);
+
+	switch ((m_reg[0] >> 2) & 3)
+	{
+		case 0:
+		case 1:
+			prg32(bank >> 1);
+			break;
+		case 2:
+			prg16_89ab(prg_base);
+			prg16_cdef(bank);
+			break;
+		case 3:
+			prg16_89ab(bank);
+			prg16_cdef(prg_base | prg_mask);
+			break;
+	}
+}
+
 void nes_sxrom_device::set_prg()
 {
 	uint8_t prg_mode, prg_offset;
@@ -177,17 +203,16 @@ void nes_sxrom_device::set_prg()
 	}
 }
 
-void nes_sxrom_device::set_chr()
+// Standard MMC1 CHR banking with base and mask (to support multicarts, etc)
+void nes_sxrom_device::set_chr(int chr_base, int chr_mask)
 {
-	uint8_t chr_mode = BIT(m_reg[0], 4);
-
-	if (chr_mode)
+	if (BIT(m_reg[0], 4))
 	{
-		chr4_0(m_reg[1] & 0x1f, m_chr_source);
-		chr4_4(m_reg[2] & 0x1f, m_chr_source);
+		chr4_0(chr_base | (m_reg[1] & chr_mask), m_chr_source);
+		chr4_4(chr_base | (m_reg[2] & chr_mask), m_chr_source);
 	}
 	else
-		chr8((m_reg[1] & 0x1f) >> 1, m_chr_source);
+		chr8((chr_base | (m_reg[1] & chr_mask)) >> 1, m_chr_source);
 }
 
 // this allows for easier implementation of the NES-EVENT board used for Nintento World Championships

@@ -83,6 +83,8 @@ protected:
 	template <class FunctionClass> using const_member_func_type = typename basetype::template const_member_func_type<FunctionClass>;
 	template <class FunctionClass> using static_ref_func_type = typename basetype::template static_ref_func_type<FunctionClass>;
 
+	template <typename T> using suitable_functoid = typename basetype::template suitable_functoid<T>;
+
 public:
 	// create a standard set of constructors
 	named_delegate() = default;
@@ -91,12 +93,18 @@ public:
 	template <class FunctionClass> named_delegate(member_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
 	template <class FunctionClass> named_delegate(const_member_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
 	template <class FunctionClass> named_delegate(static_ref_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
-	template <typename T> named_delegate(T &&funcptr, std::enable_if_t<std::is_constructible<std::function<Signature>, T>::value, char const *> name) : basetype(std::forward<T>(funcptr)), m_name(name) { }
+	template <typename T> named_delegate(T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name) : basetype(std::forward<T>(funcptr)), m_name(name) { }
 
 	// allow assignment
 	named_delegate &operator=(named_delegate const &src) = default;
+	named_delegate &operator=(named_delegate &&src) = default;
+	named_delegate &operator=(std::nullptr_t) noexcept { reset(); return *this; }
 
+	// getters
 	char const *name() const { return m_name; }
+
+	// unsetter
+	void reset() noexcept { basetype::reset(); m_name = nullptr; }
 };
 
 // ======================> device_delegate
@@ -110,6 +118,9 @@ class device_delegate<ReturnType (Params...)> : protected named_delegate<ReturnT
 {
 private:
 	using basetype = named_delegate<ReturnType (Params...)>;
+
+	template <typename T>
+	using suitable_functoid = typename basetype::template suitable_functoid<T>;
 
 	template <class T, class U>
 	using is_related_device_implementation = std::bool_constant<std::is_base_of_v<T, U> && std::is_base_of_v<device_t, U> >;
@@ -189,7 +200,7 @@ public:
 
 	// construct with callable object
 	template <typename T>
-	device_delegate(device_t &owner, T &&funcptr, std::enable_if_t<std::is_constructible<std::function<ReturnType (Params...)>, T>::value, char const *> name)
+	device_delegate(device_t &owner, T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name)
 		: basetype(std::forward<T>(funcptr), name)
 		, detail::device_delegate_helper(owner)
 	{ basetype::operator=(basetype(std::forward<T>(funcptr), name)); }
@@ -219,12 +230,14 @@ public:
 	{ basetype::operator=(basetype(funcptr, name, static_cast<D *>(&object))); set_tag(finder_target().first); }
 
 	// setter that takes a functoid
-	template <typename T> std::enable_if_t<std::is_constructible<std::function<ReturnType (Params...)>, T>::value> set(T &&funcptr, char const *name)
+	template <typename T> std::enable_if_t<suitable_functoid<T>::value> set(T &&funcptr, char const *name)
 	{ basetype::operator=(basetype(std::forward<T>(funcptr), name)); }
 
 	// unsetter
 	void set(std::nullptr_t)
-	{ basetype::operator=(basetype()); set_tag(finder_target().first); }
+	{ reset(); }
+	void reset()
+	{ basetype::reset(); set_tag(finder_target().first); }
 
 	// perform the binding
 	void resolve() { if (!basetype::isnull() && !basetype::has_object()) basetype::late_bind(bound_object()); }

@@ -10,18 +10,16 @@
   JVS Support by R. Belmont
 
   Notes:
-    - technodr: Calibrate controls by turning on the service mode switch (F2) while holding service coin (9).
+    - technodr, kartduel: Calibrate controls by turning on the service mode switch (F2) while holding service coin (9).
 
   Issues:
-    not all games work due to either banking, dma or protection issues.
-    graphics are glitchy in some games.
-
-    - golgo13 assumes the test switch is a switch, not a button - must hold down F2 to stay in test mode
-
+    - not all games work due to either banking, dma or protection issues.
+    - graphics are glitchy in some games.
+    - kartduel does a "BSOD" crash when you start the game in race mode, or after finishing a race in time trial mode
+    - kartduel frame rate is choppy, it freezes every half second
     - truckk doesn't boot: the H8/3002 never enters InitJVSBoards @ 1DE2.  1DE2 is referenced in a table of commands at 4032,
       which is called by the routine at 3FEA.  It is not clear how execution is intended to get to 3FEA - there are no direct
       branches to that location, and the bytes 3F EA don't appear at all in the program.
-
     - technodr: printer not emulated. To play the game, press F2 to enter the test menu, navigate to GAME OPTIONS and disable
       the printer by setting "PRINTER" to OFF.
 
@@ -1135,6 +1133,7 @@ protected:
 	virtual void machine_reset() override;
 
 	void golgo13_h8iomap(address_map &map);
+	void kartduel_h8iomap(address_map &map);
 	void jvsiomap(address_map &map);
 	void jvsmap(address_map &map);
 	void namcos12_map(address_map &map);
@@ -1223,6 +1222,8 @@ public:
 	void truckk(machine_config &config);
 	void tektagt(machine_config &config);
 	void ptblank2(machine_config &config);
+	void kartduel(machine_config &config);
+
 private:
 	virtual void machine_reset() override;
 };
@@ -1664,6 +1665,14 @@ void namcos12_state::s12h8railiomap(address_map &map)
 	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
 }
 
+void namcos12_state::kartduel_h8iomap(address_map &map)
+{
+	s12h8iomap(map);
+	map(h8_device::ADC_0, h8_device::ADC_0).portr("BRAKE");
+	map(h8_device::ADC_1, h8_device::ADC_1).portr("GAS");
+	map(h8_device::ADC_2, h8_device::ADC_2).portr("STEER");
+}
+
 // Golgo 13 lightgun inputs
 
 uint16_t namcos12_state::s12_mcu_gun_h_r()
@@ -1809,6 +1818,14 @@ void namcos12_boothack_state::golgo13(machine_config &config)
 
 	/* basic machine hardware */
 	m_sub->set_addrmap(AS_IO, &namcos12_boothack_state::golgo13_h8iomap);
+}
+
+void namcos12_boothack_state::kartduel(machine_config &config)
+{
+	coh700(config);
+
+	/* basic machine hardware */
+	m_sub->set_addrmap(AS_IO, &namcos12_boothack_state::kartduel_h8iomap);
 }
 
 #define JVSCLOCK    (XTAL(14'745'600))
@@ -2058,6 +2075,29 @@ static INPUT_PORTS_START( golgo13 )
 
 	PORT_START("LIGHT0_Y")
 	PORT_BIT( 0xffff, 0x00fe, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x1f,0x1de) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( kartduel )
+	PORT_INCLUDE( namcos12 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // enter switch
+	PORT_BIT( 0xffe3, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN1")
+	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x1fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("GAS")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+
+	PORT_START("STEER")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( technodr )
@@ -2347,9 +2387,9 @@ ROM_START( kartduel )
 	ROM_LOAD16_BYTE( "ktd1vera.2l",  0x0000000, 0x200000, CRC(0c207249) SHA1(6c57de25d452226a25f658638d89b81257960741) )
 	ROM_LOAD16_BYTE( "ktd1vera.2p",  0x0000001, 0x200000, CRC(f6e2581f) SHA1(06eb108c2775290590dba75f964f26443a585d70) )
 
-	ROM_REGION32_LE( 0x00800000, "bankedroms", 0 ) /* main data */
-	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x400000, BAD_DUMP CRC(8e2d5d9e) SHA1(6f703e27a19740af4094004b783b3cc2974c3de0) ) // These probably should be 64MBIT
-	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x400000, BAD_DUMP CRC(49ec5dbd) SHA1(336db6d3e361938850a9234b6b64070dbdc36d45) ) //
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x800000, CRC(4a3bac12) SHA1(7758d97049d30a00b7bede3688d451fbf4eddbfb) )
+	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x800000, CRC(bab0d328) SHA1(9a15bfb38c63b0012f29755b2be071e9c82d1c20) )
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
 	ROM_LOAD16_WORD_SWAP( "ktd1vera.11s", 0x000000, 0x080000, CRC(c2ff1971) SHA1(32ee2afe08e92049d8139c9324a0ea1a3b7ee5a1) )
@@ -3262,6 +3302,7 @@ ROM_START( aplarail )
 	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(db1b63c5) SHA1(01fc3386a2d1cb1bed1b7fd9bd2fd59e503832d3) )
 ROM_END
 
+//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS                    INIT           ROT   COMPANY            FULLNAME, FLAGS
 GAME( 1996, tekken3,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.E1)", 0 ) /* KC006 */
 GAME( 1996, tekken3d,  tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.D)", 0 ) /* KC006 */
 GAME( 1996, tekken3b,  tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.B)", 0 ) /* KC006 */
@@ -3312,5 +3353,5 @@ GAME( 1999, golgo13,   0,        golgo13,  golgo13,   namcos12_boothack_state, i
 GAME( 2000, g13knd,    0,        golgo13,  golgo13,   namcos12_boothack_state, init_golgo13,  ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_NOT_WORKING ) /* KC055 */
 GAME( 2000, truckk,    0,        truckk,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
-GAME( 2000, kartduel,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
+GAME( 2000, kartduel,  0,        kartduel, kartduel,  namcos12_boothack_state, init_namcos12, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
 GAME( 2001, sws2001,   sws2000,  coh716,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_NOT_WORKING ) /* KC061 */

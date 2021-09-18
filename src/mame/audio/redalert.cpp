@@ -36,9 +36,9 @@
 #define DEMONEYE_AY8910_CLOCK       (DEMONEYE_AUDIO_PCB_CLOCK / 2)  /* what's the real divisor? */
 
 
-DEFINE_DEVICE_TYPE(IREM_M37B_AUDIO,        irem_m37b_audio_device,       "irem_m37b_audio",       "Irem M37B audio")
-DEFINE_DEVICE_TYPE(PANTHER_AUDIO,          panther_audio_device,         "panther_audio",         "Irem M37B audio (Panther)")
-DEFINE_DEVICE_TYPE(IREM_M37B_UE17B_AUDIO,  irem_m37b_ue17b_audio_device, "irem_m37b_ue17b_audio", "Irem M37B/UE17B audio/voice")
+DEFINE_DEVICE_TYPE(IREM_M37B_AUDIO,        irem_m37b_audio_device,       "irem_m37b_audio",       "Irem M-37B audio")
+DEFINE_DEVICE_TYPE(PANTHER_AUDIO,          panther_audio_device,         "panther_audio",         "Irem M-37B audio (Panther)")
+DEFINE_DEVICE_TYPE(IREM_M37B_UE17B_AUDIO,  irem_m37b_ue17b_audio_device, "irem_m37b_ue17b_audio", "Irem M-37B/UE-17B audio/voice")
 DEFINE_DEVICE_TYPE(DEMONEYE_AUDIO,         demoneye_audio_device,        "demoneye_audio",        "Irem Demoneye-X audio")
 
 
@@ -134,7 +134,7 @@ void irem_m37b_audio_device::analog_w(uint8_t data)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(irem_m37b_audio_device::sound_status_r)
+READ_LINE_MEMBER(irem_m37b_audio_device::sound_status_r)
 {
 	// communication handshake between host and sound CPU
 	// at least Panther uses it, unconfirmed for Red Alert and Demoneye-X

@@ -2830,6 +2830,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/legacy.h",
 		MAME_DIR .. "src/devices/bus/nes/mmc1.cpp",
 		MAME_DIR .. "src/devices/bus/nes/mmc1.h",
+		MAME_DIR .. "src/devices/bus/nes/mmc1_clones.cpp",
+		MAME_DIR .. "src/devices/bus/nes/mmc1_clones.h",
 		MAME_DIR .. "src/devices/bus/nes/mmc2.cpp",
 		MAME_DIR .. "src/devices/bus/nes/mmc2.h",
 		MAME_DIR .. "src/devices/bus/nes/mmc3.cpp",

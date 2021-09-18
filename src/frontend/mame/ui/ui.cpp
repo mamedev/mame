@@ -43,8 +43,6 @@
 #include <chrono>
 #include <type_traits>
 
-#define VISIBLE_SOUND_OVERDRIVE (1)
-
 
 /***************************************************************************
     CONSTANTS
@@ -646,7 +644,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	}
 
 	// show red if overdriving sound
-	if (VISIBLE_SOUND_OVERDRIVE && machine().phase() == machine_phase::RUNNING)
+	if (machine().options().speaker_report() != 0 && machine().phase() == machine_phase::RUNNING)
 	{
 		auto compressor = machine().sound().compressor_scale();
 		if (compressor < 1.0)

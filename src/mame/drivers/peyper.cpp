@@ -840,6 +840,7 @@ ROM_START(odisea)
 	ROM_LOAD("odiseab.bin", 0x2000, 0x2000, CRC(8bdf7c17) SHA1(7202b4770646fce5b2ba9e3b8ca097a993123b14))
 	ROM_LOAD("odiseac.bin", 0x4000, 0x2000, CRC(832dee5e) SHA1(9b87ffd768ab2610f2352adcf22c4a7880de47ab))
 ROM_END
+// Note that odisea roms of size 0x4000 exist on the web, the first half of each is identical to what we have, the 2nd half is all 0xFF.
 
 /*-------------------------------------------------------------------
 / Nemesis (1986)

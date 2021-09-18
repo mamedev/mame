@@ -316,6 +316,7 @@ fidel_card.cpp
 fidel_cc1.cpp
 fidel_cc10.cpp
 fidel_cc7.cpp
+fidel_checkc2.cpp
 fidel_chesster.cpp
 fidel_csc.cpp
 fidel_dames.cpp

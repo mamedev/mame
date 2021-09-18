@@ -98,15 +98,14 @@ private:
 	void control_w(u8 data);
 	u8 input_r(offs_t offset);
 
-	u8 m_inp_mux;
+	u8 m_inp_mux = 0;
 };
 
 void sc12_state::machine_start()
 {
 	fidel_clockdiv_state::machine_start();
 
-	// zerofill/register for savestates
-	m_inp_mux = 0;
+	// register for savestates
 	save_item(NAME(m_inp_mux));
 }
 

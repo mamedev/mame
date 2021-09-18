@@ -6,10 +6,10 @@
 Fidelity Dame Sensory Challenger (DSC)
 
 Hardware notes:
+- PCB label: 510-1030A01
 - Z80A CPU @ 3.9MHz
 - 8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
 - 4-digit 7seg panel, sensory board with 50 buttons
-- PCB label 510-1030A01
 
 Instead of chess, it's a checkers game for once (international rules).
 

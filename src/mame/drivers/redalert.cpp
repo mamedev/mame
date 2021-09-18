@@ -273,7 +273,7 @@ static INPUT_PORTS_START( m27_base )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 
 	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("soundboard", irem_m37b_audio_device, sound_status_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundboard", irem_m37b_audio_device, sound_status_r)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	// TODO: 2-way/4-way ...?

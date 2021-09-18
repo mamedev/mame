@@ -256,9 +256,9 @@ static INPUT_PORTS_START( agress )
 
 	PORT_MODIFY("DSW2")
 	/* Engrish here. The manual says "Number of Prayers". Maybe related to lives? */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Players ) )      PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END

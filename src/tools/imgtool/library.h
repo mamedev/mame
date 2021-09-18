@@ -23,9 +23,13 @@
 #include "utilfwd.h"
 
 #include <chrono>
+#include <cstdint>
 #include <ctime>
+#include <iosfwd>
 #include <list>
 #include <memory>
+#include <string>
+#include <vector>
 
 
 namespace imgtool

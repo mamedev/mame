@@ -1305,11 +1305,14 @@ cdtv                            // Commodore CDTV
 cdtvn                           //
 
 @source:ampoker2.cpp
-ampkr228                        // 1990 bootleg
+ampkr228                        // 1990 bootleg?
 ampkr2b1                        // 1990 bootleg
 ampkr2b2                        // 1990 bootleg
 ampkr2b3                        // 1994 bootleg
 ampkr2b4                        // 1994 bootleg
+ampkr2jsp                       // 1994 bootleg?
+ampkr2jspa                      // 1994 bootleg?
+ampkr2jspb                      // 1994 bootleg?
 ampkr95                         // 1995 bootleg
 ampoker2                        // (c) 1990 Novomatic
 arizna10                        // 1995 bootleg
@@ -13817,6 +13820,9 @@ backgamc                        //
 cc7                             //
 cc7a                            //
 
+@source:fidel_checkc2.cpp
+checkc2
+
 @source:fidel_chesster.cpp
 chesster                        //
 chesstera                       //
@@ -19424,16 +19430,16 @@ tsupenta
 tsururin
 
 @source:konmedal68k.cpp
+crossmg2
 dobouchn
+fruitsmg
 kattobas
-konslot
-konslot2
 koropens
 kzaurus
 pwrchanc
-ymcapsul
 spcpokan
 unkkonmd
+ymcapsul
 
 @source:quickpick5.cpp
 quickp5
@@ -30707,9 +30713,9 @@ mrflea                          // (c) 1982
 
 @source:mrgame.cpp
 dakar                           //
+fasttrack                       //
 macattck                        //
 motrshow                        //
-motrshowa                       //
 wcup90                          //
 
 @source:mrjong.cpp
@@ -36284,6 +36290,7 @@ route16a                        // (c) 1981 Tehkan/Sun + Centuri license
 route16b                        // (c) 1981 Tehkan/Sun + Centuri license
 route16bl                       // bootleg
 route16c                        // (c) 1981 Tehkan/Sun + Centuri license
+route16d                        // (c) 1981 Sun Electronics
 routex                          // bootleg
 routexa                         // bootleg
 spacecho                        // bootleg

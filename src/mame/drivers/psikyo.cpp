@@ -1107,7 +1107,7 @@ void psikyo_state::gunbird(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono",  1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono",  0.55);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);

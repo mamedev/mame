@@ -36,6 +36,7 @@ DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646"
 DEFINE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device,       "nes_pikay2k",       "NES Cart PIKACHU Y2K PCB")
 DEFINE_DEVICE_TYPE(NES_8237,          nes_8237_device,          "nes_8237",          "NES Cart UNL-8237 PCB")
 DEFINE_DEVICE_TYPE(NES_8237A,         nes_8237a_device,         "nes_8237a",         "NES Cart UNL-8237A PCB")
+DEFINE_DEVICE_TYPE(NES_158B,          nes_158b_device,          "nes_158b",          "NES Cart UNL-158B PCB")
 DEFINE_DEVICE_TYPE(NES_SG_LIONK,      nes_sglionk_device,       "nes_sglionk",       "NES Cart SuperGame Lion King PCB")
 DEFINE_DEVICE_TYPE(NES_SG_BOOG,       nes_sgboog_device,        "nes_sgbooger",      "NES Cart SuperGame BoogerMan PCB")
 DEFINE_DEVICE_TYPE(NES_KASING,        nes_kasing_device,        "nes_kasing",        "NES Cart Kasing PCB")
@@ -71,7 +72,9 @@ DEFINE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device,       "nes_bmc_f15",  
 DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45",      "NES Cart BMC GN-45 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device,     "nes_bmc_k3006",     "NES Cart BMC K-3006 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_00202650,  nes_bmc_00202650_device,  "nes_bmc_00202650",  "NES Cart BMC 00202650 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device,   "nes_bmc_411120c",   "NES Cart BMC 411120C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_820720C,   nes_bmc_820720c_device,   "nes_bmc_820720c",   "NES Cart BMC 820720C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830118C,   nes_bmc_830118c_device,   "nes_bmc_830118c",   "NES Cart BMC 830118C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830832C,   nes_bmc_830832c_device,   "nes_bmc_830832c",   "NES Cart BMC 830832C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_841101C,   nes_bmc_841101c_device,   "nes_bmc_841101c",   "NES Cart BMC 841101C PCB")
@@ -121,6 +124,11 @@ nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag,
 
 nes_8237a_device::nes_8237a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_8237_device(mconfig, NES_8237A, tag, owner, clock)
+{
+}
+
+nes_158b_device::nes_158b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_8237_device(mconfig, NES_158B, tag, owner, clock)
 {
 }
 
@@ -284,8 +292,8 @@ nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_bmc_hik4_device::nes_bmc_hik4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_HIK4, tag, owner, clock)
+nes_bmc_hik4_device::nes_bmc_hik4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_HIK4, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
@@ -314,8 +322,18 @@ nes_bmc_k3006_device::nes_bmc_k3006_device(const machine_config &mconfig, const 
 {
 }
 
+nes_bmc_00202650_device::nes_bmc_00202650_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_00202650, tag, owner, clock), m_mmc3_mode(false)
+{
+}
+
 nes_bmc_411120c_device::nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_411120C, tag, owner, clock), m_reg(0)
+{
+}
+
+nes_bmc_820720c_device::nes_bmc_820720c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_820720C, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -382,6 +400,18 @@ void nes_8237_device::pcb_reset()
 	m_reg[1] = 0x0f;
 	m_reg[2] = 0;
 	update_banks();
+}
+
+void nes_158b_device::device_start()
+{
+	nes_8237_device::device_start();
+	save_item(NAME(m_prot));
+}
+
+void nes_158b_device::pcb_reset()
+{
+	nes_8237_device::pcb_reset();
+	m_prot = 7;    // Blood of Jurassic needs this row of prot_table
 }
 
 void nes_kasing_device::device_start()
@@ -649,9 +679,16 @@ void nes_bmc_hik8_device::pcb_reset()
 	mmc3_common_initialize(0x3f, 0xff, 0);
 }
 
+void nes_bmc_hik4_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_mmc3_mode));
+}
+
 void nes_bmc_hik4_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	m_mmc3_mode = true;
 	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
@@ -713,6 +750,24 @@ void nes_bmc_k3006_device::pcb_reset()
 	prg16_cdef(0);
 }
 
+void nes_bmc_00202650_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_mmc3_mode));
+}
+
+void nes_bmc_00202650_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_mmc3_mode = false;
+	mmc3_common_initialize(0x0f, 0x7f, 0);
+
+	// PCB has an extra 32KB boot menu chip, only the menu uses the CHRRAM
+	prg32((m_prg_chunks >> 1) - 1);
+	chr8(0, CHRRAM);
+}
+
 void nes_bmc_411120c_device::device_start()
 {
 	mmc3_start();
@@ -725,6 +780,20 @@ void nes_bmc_411120c_device::pcb_reset()
 
 	m_reg = 0;
 	mmc3_common_initialize(0x0f, 0x7f, 0);
+}
+
+void nes_bmc_820720c_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_820720c_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_reg = 0;
+	mmc3_common_initialize(0x0f, 0xff, 0);
 }
 
 void nes_bmc_830118c_device::device_start()
@@ -1048,6 +1117,67 @@ void nes_8237_device::write_h(offs_t offset, u8 data)
 	if (addr == 0x8000)
 		data = (data & 0xc0) | reg_table[m_reg[2]][data & 0x07];
 	txrom_write(addr & 0x6001, data);
+}
+
+/*-------------------------------------------------
+
+ Board UNL-158B
+
+ Games: Blood of Jurassic, Super Hang-On
+
+ MMC3 clone that appears to be the same as the 8237
+ boards above with added protection reads at 0x5000.
+
+ NES 2.0: mapper 258
+
+ In MAME: Preliminary supported.
+
+ TODO: Sprites in BoJ can sometimes become a garbled
+ mess. Not sure if zapper hit detection is ok either,
+ or why it seems you can't shoot at times (reload?).
+ Super Hang-On is a hack of Rad Racer/Highway Star so
+ it has all the graphics issues those games have.
+
+ -------------------------------------------------*/
+
+u8 nes_158b_device::read_l(offs_t offset)
+{
+	LOG_MMC(("unl_158b read_l, offset: %04x\n", offset));
+
+	static constexpr u8 prot_table[8][8] =
+	{
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x01, 0x00, 0x04, 0x05, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		{0x00, 0x00, 0x00, 0x01, 0x02, 0x04, 0x0f, 0x00}
+	};
+
+	u8 temp = get_open_bus();
+
+	offset += 0x100;
+	if (offset >= 0x1000)
+		temp = (temp & 0xf0) | prot_table[m_prot][offset & 0x07];
+
+	return temp;
+}
+
+void nes_158b_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("unl_158b write_l, offset: %04x, data: %02x\n", offset, data));
+
+	switch ((offset + 0x100) & 0x1003)
+	{
+		case 0x1002:
+			m_prot = data & 0x07;
+			break;
+		default:
+			nes_8237_device::write_l(offset, data);
+			break;
+	}
 }
 
 /*-------------------------------------------------
@@ -2206,30 +2336,33 @@ void nes_bmc_hik8_device::write_m(offs_t offset, uint8_t data)
 
  iNES: mapper 49
 
- In MESS: Supported. It also uses mmc3_irq.
+ In MAME: Supported. It also uses mmc3_irq.
 
  -------------------------------------------------*/
 
-void nes_bmc_hik4_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_hik4_device::prg_cb(int start, int bank)
+{
+	if (m_mmc3_mode)    // all games use MMC3 PRG banking except Master Fighter III
+		nes_txrom_device::prg_cb(start, bank);
+}
+
+void nes_bmc_hik4_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_hik4 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	/* mid writes only work when WRAM is enabled. not sure if I should
-	 change the condition to m_mmc_latch2==0x80 (i.e. what is the effect of
-	 the read-only bit?) */
-	if (m_wram_protect & 0x80)
+	// mid writes only work when WRAM is enabled and writable
+	if ((m_wram_protect & 0xc0) == 0x80)
 	{
-		if (data & 0x01)    /* if this is 0, then we have 32k PRG blocks */
+		m_mmc3_mode = data & 0x01;
+		if (m_mmc3_mode)
 		{
 			m_prg_base = (data & 0xc0) >> 2;
-			m_prg_mask = 0x0f;
 			set_prg(m_prg_base, m_prg_mask);
 		}
-		else
+		else                // Master Fighter III only
 			prg32((data & 0x30) >> 4);
 
 		m_chr_base = (data & 0xc0) << 1;
-		m_chr_mask = 0x7f;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }
@@ -2507,6 +2640,52 @@ void nes_bmc_k3006_device::write_m(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
+ BMC-00202650
+
+ Games: 8 in 1
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 392
+
+ In MAME: Supported.
+
+ TODO: Soft reset does work for some games some of the
+ time. Seems to be caused by main RAM contents. Does
+ this happen on hardware?
+
+ -------------------------------------------------*/
+
+void nes_bmc_00202650_device::set_prg(int prg_base, int prg_mask)
+{
+	if (m_mmc3_mode)
+		nes_txrom_device::set_prg(prg_base, prg_mask);
+}
+
+void nes_bmc_00202650_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (m_mmc3_mode)
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+}
+
+void nes_bmc_00202650_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_00202650 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (!m_mmc3_mode)
+	{
+		m_mmc3_mode = BIT(data, 4);
+
+		m_prg_base = (data & 0x07) << 4;
+		set_prg(m_prg_base, m_prg_mask);
+
+		m_chr_base = m_prg_base << 3;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+/*-------------------------------------------------
+
  BMC-411120C, BMC-810849-C
 
  Games: 4 in 1, 19 in 1
@@ -2541,6 +2720,75 @@ void nes_bmc_411120c_device::write_m(offs_t offset, u8 data)
 		}
 		m_chr_base = (m_reg & 0x07) << 7;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+/*-------------------------------------------------
+
+ BMC-820720C
+
+ Games: 1993 Super HiK 8 in 1 (G-002)
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 393
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_820720c_device::set_prg(int prg_base, int prg_mask)
+{
+	switch (m_reg >> 4)
+	{
+		case 0:            // MMC3 mode
+		case 1:
+			nes_txrom_device::set_prg(prg_base, prg_mask);
+			break;
+		case 2:            // BNROM mode
+			prg32((prg_base | (m_mmc_prg_bank[BIT(m_latch, 6) << 1] & prg_mask)) >> 2);
+			break;
+		case 3:            // UNROM mode
+			prg16_89ab(m_prg_base >> 1);
+			prg16_cdef(m_prg_base >> 1 | 0x07);
+			break;
+	}
+}
+
+void nes_bmc_820720c_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (BIT(m_reg, 3))
+		chr8(0, CHRRAM);
+	else
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+}
+
+void nes_bmc_820720c_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_820720c write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if ((m_wram_protect & 0xc0) == 0x80)
+	{
+		m_reg = offset & 0x3f;
+
+		m_prg_base = (m_reg & 0x07) << 4;
+		set_prg(m_prg_base, m_prg_mask);
+
+		m_chr_base = (m_reg & 0x01) << 8;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+void nes_bmc_820720c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_820720c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	txrom_write(offset, data);     // MMC3 regs always written (for mirroring in non-MMC3 modes)
+
+	if ((m_reg & 0x30) == 0x30)    // UNROM mode
+	{
+		prg16_89ab(m_prg_base >> 1 | (data & 0x07));
+		prg16_cdef(m_prg_base >> 1 | 0x07);
 	}
 }
 

@@ -76,15 +76,14 @@ mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, co
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, data_map)
-	, m_cpu_select(false)
 	, m_cpum(0)
 	, m_ustate(microstate::UNKNOWN)
 	, m_da(0)
 	, m_tmp1(0)
 	, m_tmp2(0)
-	, m_output_queued(false)
+	, m_output_queue_state(0xff)
 	, m_icount(0)
-	, m_ie{0, 0}
+	, m_if(0)
 {
 }
 
@@ -95,22 +94,26 @@ mn1880_device::mn1880_device(const machine_config &mconfig, const char *tag, dev
 
 u8 mn1880_device::ie0_r()
 {
-	return m_ie[0];
+	return (get_active_cpu().ie & 0x00f) | (m_cpu[0].iemask ? 0x10 : 0) | (m_cpu[1].iemask ? 0x20 : 0);
 }
 
 void mn1880_device::ie0_w(u8 data)
 {
-	m_ie[0] = data;
+	cpu_registers &cpu = output_queued() ? m_cpu[m_output_queue_state] : get_active_cpu();
+	cpu.ie = (cpu.ie & 0xff0) | (data & 0x0f);
+	m_cpu[0].iemask = BIT(data, 4);
+	m_cpu[1].iemask = BIT(data, 5);
 }
 
 u8 mn1880_device::ie1_r()
 {
-	return m_ie[1];
+	return (get_active_cpu().ie & 0xff0) >> 4;
 }
 
 void mn1880_device::ie1_w(u8 data)
 {
-	m_ie[1] = data;
+	cpu_registers &cpu = output_queued() ? m_cpu[m_output_queue_state] : get_active_cpu();
+	cpu.ie = u16(data) << 4 | (cpu.ie & 0x00f);
 }
 
 u8 mn1880_device::cpum_r()
@@ -120,7 +123,7 @@ u8 mn1880_device::cpum_r()
 
 void mn1880_device::cpum_w(u8 data)
 {
-	m_cpum = data;
+	m_cpum = (data & 0xef) | (m_cpum & 0x10);
 }
 
 void mn1880_device::internal_data_map(address_map &map)
@@ -151,60 +154,68 @@ void mn1880_device::device_start()
 
 	using namespace std::placeholders;
 	state_add<u16>(MN1880_IP, "IP",
-		[this] () { return m_cpu[int(m_cpu_select)].ip; },
-		[this] (u16 data) { m_cpu[int(m_cpu_select)].ip = data; }
+		[this] () { return get_active_cpu().ip; },
+		[this] (u16 data) { get_active_cpu().ip = data; }
 	).noshow();
 	state_add<u16>(STATE_GENPC, "GENPC",
-		[this] () { return m_cpu[int(m_cpu_select)].ip; },
-		[this] (u16 data) { m_cpu[int(m_cpu_select)].ip = data; }
+		[this] () { return get_active_cpu().ip; },
+		[this] (u16 data) { get_active_cpu().ip = data; }
 	).noshow();
 	state_add<u16>(STATE_GENPCBASE, "CURPC",
-		[this] () { return m_cpu[int(m_cpu_select)].irp; },
-		[this] (u16 data) { m_cpu[int(m_cpu_select)].irp = data; }
+		[this] () { return get_active_cpu().irp; },
+		[this] (u16 data) { get_active_cpu().irp = data; }
 	).noshow();
 	state_add<u8>(MN1880_IR, "IR",
-		[this] () { return m_cpu[int(m_cpu_select)].ir; },
-		[this] (u8 data) { m_cpu[int(m_cpu_select)].ir = data; }
+		[this] () { return get_active_cpu().ir; },
+		[this] (u8 data) { get_active_cpu().ir = data; }
 	).noshow();
 	state_add<u8>(MN1880_FS, "FS",
-		[this] () { return m_cpu[int(m_cpu_select)].fs; },
-		[this] (u8 data) { m_cpu[int(m_cpu_select)].fs = data; }
+		[this] () { return get_active_cpu().fs; },
+		[this] (u8 data) { get_active_cpu().fs = data; }
 	).noshow();
 	state_add<u8>(STATE_GENFLAGS, "FLAGS",
-		[this] () { return m_cpu[int(m_cpu_select)].fs; },
-		[this] (u8 data) { m_cpu[int(m_cpu_select)].fs = data; }
+		[this] () { return get_active_cpu().fs; },
+		[this] (u8 data) { get_active_cpu().fs = data; }
 	).formatstr("%10s").noshow();
 	state_add<u16>(MN1880_XP, "XP",
-		[this] () { return m_cpu[int(m_cpu_select)].xp; },
-		[this] (u16 data) { m_cpu[int(m_cpu_select)].xp = data; }
+		[this] () { return get_active_cpu().xp; },
+		[this] (u16 data) { get_active_cpu().xp = data; }
 	).noshow();
 	state_add<u16>(MN1880_YP, "YP",
-		[this] () { return m_cpu[int(m_cpu_select)].yp; },
-		[this] (u16 data) { m_cpu[int(m_cpu_select)].yp = data; }
+		[this] () { return get_active_cpu().yp; },
+		[this] (u16 data) { get_active_cpu().yp = data; }
 	).noshow();
 	state_add<u8>(MN1880_XPL, "XPl",
-		[this] () { return m_cpu[int(m_cpu_select)].xp & 0x00ff; },
-		[this] (u8 data) { setl(m_cpu[int(m_cpu_select)].xp, data); }
+		[this] () { return get_active_cpu().xp & 0x00ff; },
+		[this] (u8 data) { setl(get_active_cpu().xp, data); }
 	).noshow();
 	state_add<u8>(MN1880_XPH, "XPh",
-		[this] () { return (m_cpu[int(m_cpu_select)].xp & 0xff00 >> 8); },
-		[this] (u8 data) { seth(m_cpu[int(m_cpu_select)].xp, data); }
+		[this] () { return (get_active_cpu().xp & 0xff00 >> 8); },
+		[this] (u8 data) { seth(get_active_cpu().xp, data); }
 	).noshow();
 	state_add<u8>(MN1880_YPL, "YPl",
-		[this] () { return m_cpu[int(m_cpu_select)].yp & 0x00ff; },
-		[this] (u8 data) { setl(m_cpu[int(m_cpu_select)].yp, data); }
+		[this] () { return get_active_cpu().yp & 0x00ff; },
+		[this] (u8 data) { setl(get_active_cpu().yp, data); }
 	).noshow();
 	state_add<u8>(MN1880_YPH, "YPh",
-		[this] () { return (m_cpu[int(m_cpu_select)].yp & 0xff00 >> 8); },
-		[this] (u8 data) { seth(m_cpu[int(m_cpu_select)].yp, data); }
+		[this] () { return (get_active_cpu().yp & 0xff00 >> 8); },
+		[this] (u8 data) { seth(get_active_cpu().yp, data); }
 	).noshow();
 	state_add<u16>(MN1880_SP, "SP",
-		[this] () { return m_cpu[int(m_cpu_select)].sp; },
-		[this] (u16 data) { m_cpu[int(m_cpu_select)].sp = data; }
+		[this] () { return get_active_cpu().sp; },
+		[this] (u16 data) { get_active_cpu().sp = data; }
 	).noshow();
 	state_add<u16>(MN1880_LP, "LP",
-		[this] () { return m_cpu[int(m_cpu_select)].lp; },
-		[this] (u16 data) { m_cpu[int(m_cpu_select)].lp = data; }
+		[this] () { return get_active_cpu().lp; },
+		[this] (u16 data) { get_active_cpu().lp = data; }
+	).noshow();
+	state_add<u16>(MN1880_IE, "IE",
+		[this] () { return get_active_cpu().ie; },
+		[this] (u16 data) { get_active_cpu().ie = data; }
+	).mask(0xfff).noshow();
+	state_add<bool>(MN1880_IE, "IEMASK",
+		[this] () { return get_active_cpu().iemask; },
+		[this] (bool data) { get_active_cpu().iemask = data; }
 	).noshow();
 
 	for (int i = 0; i < 2; i++)
@@ -216,11 +227,12 @@ void mn1880_device::device_start()
 		state_add(MN1880_YPA + i, util::string_format("YP%c", 'a' + i).c_str(), m_cpu[i].yp);
 		state_add(MN1880_SPA + i, util::string_format("SP%c", 'a' + i).c_str(), m_cpu[i].sp);
 		state_add(MN1880_LPA + i, util::string_format("LP%c", 'a' + i).c_str(), m_cpu[i].lp);
+		state_add(MN1880_IEA + i, util::string_format("IE%c", 'a' + i).c_str(), m_cpu[i].ie).mask(0xfff);
+		state_add(MN1880_IEMASKA + i, util::string_format("IEMASK%c", 'a' + i).c_str(), m_cpu[i].iemask);
 		state_add_divider(MN1880_DIVIDER1 + i);
 	}
 
-	state_add(MN1880_IE0, "IE0", m_ie[0]);
-	state_add(MN1880_IE1, "IE1", m_ie[1]);
+	state_add(MN1880_IF, "IF", m_if).mask(0xfff);
 	state_add(MN1880_CPUM, "CPUM", m_cpum);
 
 	save_item(STRUCT_MEMBER(m_cpu, ip));
@@ -231,14 +243,15 @@ void mn1880_device::device_start()
 	save_item(STRUCT_MEMBER(m_cpu, yp));
 	save_item(STRUCT_MEMBER(m_cpu, sp));
 	save_item(STRUCT_MEMBER(m_cpu, lp));
-	save_item(NAME(m_cpu_select));
+	save_item(STRUCT_MEMBER(m_cpu, ie));
+	save_item(STRUCT_MEMBER(m_cpu, iemask));
+	save_item(NAME(m_if));
 	save_item(NAME(m_cpum));
 	save_item(NAME(m_ustate));
 	save_item(NAME(m_da));
 	save_item(NAME(m_tmp1));
 	save_item(NAME(m_tmp2));
-	save_item(NAME(m_output_queued));
-	save_item(NAME(m_ie));
+	save_item(NAME(m_output_queue_state));
 }
 
 void mn1880_device::device_reset()
@@ -249,6 +262,8 @@ void mn1880_device::device_reset()
 		cpu.fs |= 0x10; // HACK: skip fake first instruction in debugger
 		cpu.ir = 0xf6;
 		cpu.wait = 0;
+		cpu.ie = 0;
+		cpu.iemask = true;
 	}
 	m_cpu[0].ip = 0x0000;
 	m_cpu[1].ip = 0x0020;
@@ -259,11 +274,10 @@ void mn1880_device::device_reset()
 	m_cpu[1].sp = 0x0200;
 	m_cpu[1].lp = 0x0160;
 
-	m_ie[0] = 0x30;
-	m_ie[1] = 0x00;
+	m_if = 0;
 	m_cpum = 0x0c;
 	m_ustate = microstate::NEXT;
-	m_output_queued = false;
+	m_output_queue_state = 0xff;
 }
 
 const mn1880_device::microstate mn1880_device::s_decode_map[256] =
@@ -440,13 +454,13 @@ void mn1880_device::cpu_registers::branch(u16 label)
 
 void mn1880_device::swap_cpus()
 {
-	if ((m_cpum & 0x03) != (m_cpu_select ? 0x01 : 0x02))
-		m_cpu_select = !m_cpu_select;
+	if ((m_cpum & 0x03) != (BIT(m_cpum, 4) ? 0x01 : 0x02))
+		m_cpum ^= 0x10;
 }
 
 void mn1880_device::next_instruction(u8 input)
 {
-	cpu_registers &cpu = m_cpu[int(m_cpu_select)];
+	cpu_registers &cpu = get_active_cpu();
 	if ((cpu.fs & 0x0f) != 0)
 		cpu.fs = (cpu.fs - 1) | 0x10;
 	else
@@ -464,13 +478,13 @@ void mn1880_device::execute_run()
 {
 	while (m_icount-- > 0)
 	{
-		cpu_registers &cpu = m_cpu[int(m_cpu_select)];
+		cpu_registers &cpu = get_active_cpu();
 
 		if (m_ustate == microstate::NEXT && cpu.wait == 0)
 		{
 			if (!BIT(cpu.fs, 4))
 				debugger_instruction_hook(cpu.irp);
-			if (!m_output_queued && !BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
+			if (!output_queued() && !BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
 				m_ustate = s_decode_map[cpu.ir];
 		}
 
@@ -485,10 +499,10 @@ void mn1880_device::execute_run()
 			}
 			else
 			{
-				if (m_output_queued)
+				if (output_queued())
 				{
 					m_data.write_byte(m_da, m_tmp1 & 0x00ff);
-					m_output_queued = false;
+					m_output_queue_state = 0xff;
 				}
 				if (BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
 				{
@@ -569,7 +583,7 @@ void mn1880_device::execute_run()
 			m_da = cpu.xp;
 			if ((cpu.fs & 0x1f) != 0)
 				++cpu.xp;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -597,7 +611,7 @@ void mn1880_device::execute_run()
 		case microstate::MOVL35_4:
 			m_tmp1 = m_data.read_byte(cpu.yp);
 			m_da = m_tmp2 + 1;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -612,7 +626,7 @@ void mn1880_device::execute_run()
 			m_da = cpu.xp;
 			if ((cpu.fs & 0x1f) != 0)
 				++cpu.xp;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -660,7 +674,7 @@ void mn1880_device::execute_run()
 			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
 			++m_da;
 			m_tmp1 >>= 8;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -679,7 +693,7 @@ void mn1880_device::execute_run()
 			m_tmp1 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
 			cpu.fs = (m_tmp1 & 0x80) | (cpu.fs & 0x7f);
 			m_tmp1 <<= 1;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -696,7 +710,7 @@ void mn1880_device::execute_run()
 
 		case microstate::ASR_2:
 			m_tmp1 = cpu.asrc(m_data.read_byte(m_da)); // TODO: read latch instead of terminal
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -812,7 +826,7 @@ void mn1880_device::execute_run()
 		case microstate::XCH4_2:
 			m_tmp1 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
 			m_tmp1 = (m_tmp1 << 4) | (m_tmp1 >> 4);
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -867,7 +881,7 @@ void mn1880_device::execute_run()
 
 		case microstate::ROL_2:
 			m_tmp1 = cpu.rolc(m_data.read_byte(m_da)); // TODO: read latch instead of terminal
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -888,7 +902,7 @@ void mn1880_device::execute_run()
 
 		case microstate::ROR_2:
 			m_tmp1 = cpu.rorc(m_data.read_byte(m_da)); // TODO: read latch instead of terminal
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -948,7 +962,7 @@ void mn1880_device::execute_run()
 			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
 			++m_da;
 			cpu.xp = m_da;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1050,7 +1064,7 @@ void mn1880_device::execute_run()
 			m_data.write_byte(m_da, m_tmp1 & 0x00ff);
 			m_tmp1 >>= 8;
 			m_da = m_tmp2;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1095,7 +1109,7 @@ void mn1880_device::execute_run()
 			if ((cpu.fs & 0x1f) != 0)
 				++cpu.xp;
 			m_tmp1 >>= 8;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1160,7 +1174,7 @@ void mn1880_device::execute_run()
 		case microstate::MOVL5E_4:
 			m_tmp1 = m_data.read_byte(m_da);
 			m_da = m_tmp2 + 1;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1272,7 +1286,7 @@ void mn1880_device::execute_run()
 				cpu.fs |= 0x40;
 			else
 				cpu.fs &= 0xbf;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1321,7 +1335,7 @@ void mn1880_device::execute_run()
 				cpu.fs |= 0x40;
 			else
 				cpu.fs &= 0xbf;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1370,7 +1384,7 @@ void mn1880_device::execute_run()
 				cpu.fs |= 0x40;
 			else
 				cpu.fs &= 0xbf;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1415,7 +1429,7 @@ void mn1880_device::execute_run()
 
 		case microstate::SUBC_3:
 			m_tmp1 = cpu.subcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1460,7 +1474,7 @@ void mn1880_device::execute_run()
 
 		case microstate::SUBD_3:
 			m_tmp1 = cpu.subdcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7)); // TODO: read latch instead of terminal
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1474,7 +1488,7 @@ void mn1880_device::execute_run()
 				else
 					cpu.fs &= 0xbf;
 			}
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1519,7 +1533,7 @@ void mn1880_device::execute_run()
 
 		case microstate::ADDC_3:
 			m_tmp1 = cpu.addcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), BIT(cpu.fs, 4)); // TODO: read latch instead of terminal
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1577,7 +1591,7 @@ void mn1880_device::execute_run()
 				else
 					cpu.fs &= 0xbf;
 			}
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1703,7 +1717,7 @@ void mn1880_device::execute_run()
 			m_tmp1 = cpu.subcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), true); // TODO: read latch instead of terminal
 			if (!BIT(cpu.ir, 1))
 				cpu.xp = m_da + 1;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1757,7 +1771,7 @@ void mn1880_device::execute_run()
 			m_tmp1 = cpu.addcz(m_data.read_byte(m_da), m_tmp1, BIT(cpu.fs, 7), true); // TODO: read latch instead of terminal
 			if (!BIT(cpu.ir, 1))
 				cpu.xp = m_da + 1;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -1822,7 +1836,7 @@ void mn1880_device::execute_run()
 			m_tmp1 = m_data.read_byte(m_da); // TODO: read latch instead of terminal
 			cpu.sp = m_da + 1;
 			m_da = m_tmp2;
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -2175,13 +2189,13 @@ void mn1880_device::execute_run()
 
 		case microstate::MOV1_4:
 			m_tmp1 |= m_data.read_byte(m_da); // TODO: read latch instead of terminal
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
 		case microstate::MOV1N_4:
 			m_tmp1 = m_data.read_byte(m_da) & ~m_tmp1; // TODO: read latch instead of terminal
-			m_output_queued = true;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -2334,7 +2348,7 @@ void mn1880_device::state_string_export(const device_state_entry &entry, std::st
 	{
 	case STATE_GENFLAGS:
 	{
-		u8 fs = m_cpu[int(m_cpu_select)].fs;
+		u8 fs = get_active_cpu().fs;
 		str = string_format("%c%c%c%c RC=%-2d",
 				BIT(fs, 7) ? 'C' : '.', // Carry flag
 				BIT(fs, 6) ? 'Z' : '.', // Zero flag
@@ -2345,11 +2359,11 @@ void mn1880_device::state_string_export(const device_state_entry &entry, std::st
 	}
 
 	case MN1880_IPA:
-		str = string_format("%04X%c", m_cpu[0].ip, m_cpu_select ? ' ' : '*');
+		str = string_format("%04X%c", m_cpu[0].ip, BIT(m_cpum, 4) ? ' ' : '*');
 		break;
 
 	case MN1880_IPB:
-		str = string_format("%04X%c", m_cpu[1].ip, m_cpu_select ? '*' : ' ');
+		str = string_format("%04X%c", m_cpu[1].ip, BIT(m_cpum, 4) ? '*' : ' ');
 		break;
 	}
 }
