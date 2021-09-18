@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles,Couriersud,Miodrag Milanovic
+// copyright-holders:Aaron Giles,Couriersud,Miodrag Milanovic,Vas Crabb
 /***************************************************************************
 
     delegate.h
@@ -52,16 +52,11 @@
 
     --------------------------------------------------------------------
 
-    The "internal" version of delegates makes use of the internal
+    The "Itanium" version of delegates makes use of the internal
     structure of member function pointers in order to convert them at
     binding time into simple static function pointers. This only works
     on platforms where object->func(p1, p2) is equivalent in calling
     convention to func(object, p1, p2).
-
-    Most of the information on how this works comes from Don Clugston
-    in this article:
-
-        http://www.codeproject.com/KB/cpp/FastDelegate.aspx
 
     Pros:
         * as fast as a standard function call in static and member cases
@@ -69,7 +64,33 @@
 
     Cons:
         * requires internal knowledge of the member function pointer
-        * only works for GCC (for now; MSVC info is also readily available)
+        * only works for two popular variants of the Itanium C++ ABI
+
+    --------------------------------------------------------------------
+
+    The "MSVC" version of delegates makes use of the internal structure
+    of member function pointers in order to convert them at binding time
+    into simple static function pointers. This only works on platforms
+    where object->func(p1, p2) is equivalent in calling convention to
+    func(object, p1, p2).
+
+    Pros:
+        * as fast as a standard function call in static and member cases
+        * no stub functions or double-hops needed
+
+    Cons:
+        * requires internal knowledge of the member function pointer
+        * only works works with MSVC ABI, and not on 32-bit x86
+        * does not work for classes with virtual inheritance
+        * structure return does not work with member function pointers
+
+    --------------------------------------------------------------------
+
+    Further reading:
+
+        http://www.codeproject.com/KB/cpp/FastDelegate.aspx
+
+        http://itanium-cxx-abi.github.io/cxx-abi/abi.html#member-pointers
 
 ***************************************************************************/
 #ifndef MAME_UTIL_DELEGATE_H
@@ -93,37 +114,47 @@
 //**************************************************************************
 
 // types of delegates supported
-#define DELEGATE_TYPE_COMPATIBLE 0
-#define DELEGATE_TYPE_INTERNAL 1
-#define DELEGATE_TYPE_MSVC 2
+#define MAME_DELEGATE_TYPE_COMPATIBLE 0
+#define MAME_DELEGATE_TYPE_ITANIUM 1
+#define MAME_DELEGATE_TYPE_MSVC 2
 
 // select which one we will be using
-#if defined(FORCE_COMPATIBLE)
-	#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+#if defined(MAME_DELEGATE_FORCE_COMPATIBLE)
+	#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 #elif defined(__GNUC__)
-	/* 32bit MINGW  asks for different convention */
+	// 32bit MINGW asks for different convention
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
-		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
-		#define MEMBER_ABI __thiscall
-		#define HAS_DIFFERENT_ABI 1
+		#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_ITANIUM
+		#define MAME_DELEGATE_MEMBER_ABI __thiscall
+		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 1
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
-		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+		#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 	#else
-		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
-		#define MEMBER_ABI
-		#define HAS_DIFFERENT_ABI 0
+		#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_ITANIUM
+		#define MAME_DELEGATE_MEMBER_ABI
+		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 	#endif
 #elif defined(_MSC_VER) && defined(_M_X64)
-	#define MEMBER_ABI
-	#define HAS_DIFFERENT_ABI 0
-	#define USE_DELEGATE_TYPE DELEGATE_TYPE_MSVC
+	#define MAME_DELEGATE_MEMBER_ABI
+	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
+	#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_MSVC
 #else
-	#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+	#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 #endif
 
-#if (USE_DELEGATE_TYPE == DELEGATE_TYPE_COMPATIBLE)
-	#define MEMBER_ABI
-	#define HAS_DIFFERENT_ABI 0
+#if defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__)
+	#define MAME_DELEGATE_ITANIUM_ARM 1
+#elif defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64)
+	#define MAME_DELEGATE_ITANIUM_ARM 1
+#elif defined(__EMSCRIPTEN__)
+	#define MAME_DELEGATE_ITANIUM_ARM 1
+#else
+	#define MAME_DELEGATE_ITANIUM_ARM 0
+#endif
+
+#if USE_DELEGATE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
+	#define MAME_DELEGATE_MEMBER_ABI
+	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 #endif
 
 
@@ -164,50 +195,49 @@ struct delegate_traits
 
 
 
-//**************************************************************************
-//  DELEGATE MEMBER FUNCTION POINTER WRAPPERS
-//**************************************************************************
-
-#if (USE_DELEGATE_TYPE == DELEGATE_TYPE_COMPATIBLE)
-
-// ======================> delegate_mfp
-
-// delegate_mfp is a class that wraps a generic member function pointer
-// in a static buffer, and can effectively recast itself back for later use;
-// it hides some of the gross details involved in copying arbitrary member
-// function pointers around
-class delegate_mfp
+/// \brief Maximally compatible member function pointer wrapper
+///
+/// Instantiates a static member function template on construction as
+/// an adaptor thunk to call the supplied member function with the
+/// supplied object.  Adds one layer of indirection to calls.
+///
+/// This implementation requires the representation of a null member
+/// function pointer to be all zeroes.
+class delegate_mfp_compatible
 {
 public:
 	// default constructor
-	delegate_mfp()
+	delegate_mfp_compatible()
 		: m_rawdata(s_null_mfp)
 		, m_realobject(nullptr)
 		, m_stubfunction(nullptr)
 	{ }
 
 	// copy constructor
-	delegate_mfp(const delegate_mfp &src) = default;
+	delegate_mfp_compatible(const delegate_mfp_compatible &src) = default;
 
 	// construct from any member function pointer
 	template <typename MemberFunctionType, class MemberFunctionClass, typename ReturnType, typename StaticFunctionType>
-	delegate_mfp(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
+	delegate_mfp_compatible(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
 		: m_rawdata(s_null_mfp)
 		, m_realobject(nullptr)
-		, m_stubfunction(make_generic<StaticFunctionType>(&delegate_mfp::method_stub<MemberFunctionClass, ReturnType>))
+		, m_stubfunction(make_generic<StaticFunctionType>(&delegate_mfp_compatible::method_stub<MemberFunctionClass, ReturnType>))
 	{
 		static_assert(sizeof(mfp) <= sizeof(m_rawdata), "Unsupported member function pointer size");
 		*reinterpret_cast<MemberFunctionType *>(&m_rawdata) = mfp;
 	}
 
 	// comparison helpers
-	bool operator==(const delegate_mfp &rhs) const { return (m_rawdata == rhs.m_rawdata); }
-	bool isnull() const { return (m_rawdata == s_null_mfp); }
+	bool operator==(const delegate_mfp_compatible &rhs) const { return m_rawdata == rhs.m_rawdata; }
+	bool isnull() const { return m_rawdata == s_null_mfp; }
 
 	// getters
-	delegate_generic_class *real_object(delegate_generic_class *original) const { return m_realobject; }
+	delegate_generic_class *real_object(delegate_generic_class *original) const
+	{
+		return m_realobject;
+	}
 
-	// binding helper
+	// binding helpers
 	template <typename FunctionType>
 	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
 	{
@@ -216,17 +246,23 @@ public:
 		funcptr = reinterpret_cast<FunctionType>(m_stubfunction);
 	}
 
+	template <typename FunctionType>
+	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object)
+	{
+		assert(reinterpret_cast<FunctionType>(m_stubfunction) == funcptr);
+		object = reinterpret_cast<delegate_generic_class *>(this);
+	}
+
 private:
 	// helper stubs for calling encased member function pointers
 	template <class FunctionClass, typename ReturnType, typename... Params>
 	static ReturnType method_stub(delegate_generic_class *object, Params ... args)
 	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
 		using mfptype = ReturnType(FunctionClass::*)(Params...);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<FunctionClass *>(_this->m_realobject)->*mfp)(std::forward<Params>(args)...);
+		delegate_mfp_compatible &_this = *reinterpret_cast<delegate_mfp_compatible *>(object);
+		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this.m_rawdata);
+		return (reinterpret_cast<FunctionClass *>(_this.m_realobject)->*mfp)(std::forward<Params>(args)...);
 	}
-
 
 	// helper to convert a function of a given type to a generic function, forcing template
 	// instantiation to match the source type
@@ -236,7 +272,7 @@ private:
 		return reinterpret_cast<delegate_generic_function>(funcptr);
 	}
 
-
+	// FIXME: not properly aligned for storing pointers
 	struct raw_mfp_data
 	{
 #if defined(__INTEL_COMPILER) && defined(_M_X64) // needed for "Intel(R) C++ Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.2.176 Build 20140130" at least
@@ -244,7 +280,7 @@ private:
 #else // all other cases - for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
 		int data[((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
 #endif
-		bool operator==(const raw_mfp_data &rhs) const { return (memcmp(data, rhs.data, sizeof(data)) == 0); }
+		bool operator==(const raw_mfp_data &rhs) const { return !std::memcmp(data, rhs.data, sizeof(data)); }
 	};
 
 	// internal state
@@ -255,40 +291,83 @@ private:
 	static const raw_mfp_data   s_null_mfp;         // nullptr mfp
 };
 
-#elif (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)
 
-// ======================> delegate_mfp
 
-// struct describing the contents of a member function pointer
-class delegate_mfp
+/// \brief Itanium C++ ABI member function pointer wrapper
+///
+/// Supports the two most popular pointer to member function
+/// implementations described in the Itanium C++ ABI.  Both of these
+/// consist of a pointer followed by a pointer followed by a ptrdiff_t.
+///
+/// The first variant is used when member the least significant bit of a
+/// member function pointer need never be set and vtable entry offsets
+/// are guaranteed to be even numbers of bytes.  If the pointer is even,
+/// it is a conventional function pointer to the member function.  If
+/// the pointer is odd, it is a byte offset into the vtable plus one.
+/// The ptrdiff_t is a byte offset to add to the this pointer.  A null
+/// member function pointer is represented by setting the pointer to
+/// a null pointer.
+///
+/// The second variant is used when the least significant bit of a
+/// pointer to a member function may need to be set or it may not be
+/// possible to distinguish between a vtable offset and a null pointer.
+/// (This is the case for ARM where the least significant bit of a
+/// pointer to a function is set if the function starts in Thumb mode.)
+/// If the least significant bit of the ptrdiff_t is clear, the pointer
+/// is a conventional function pointer to the member function.  If the
+/// least significant bit of the ptrdiff_t is set, the pointer is a byte
+/// offset into the vtable.  The ptrdiff_t must be shifted right one bit
+/// position to make a byte offset to add to the this pointer.  A null
+/// member function pointer is represented by setting the pointer to a
+/// null pointer and clearing the least significant bit of the
+/// ptrdiff_t.
+class delegate_mfp_itanium
 {
 public:
 	// default constructor
-	delegate_mfp() = default;
+	delegate_mfp_itanium() = default;
 
 	// copy constructor
-	delegate_mfp(const delegate_mfp &src) = default;
+	delegate_mfp_itanium(const delegate_mfp_itanium &src) = default;
 
 	// construct from any member function pointer
 	template <typename MemberFunctionType, class MemberFunctionClass, typename ReturnType, typename StaticFunctionType>
-	delegate_mfp(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
+	delegate_mfp_itanium(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
 	{
 		static_assert(sizeof(mfp) == sizeof(*this), "Unsupported member function pointer size");
 		*reinterpret_cast<MemberFunctionType *>(this) = mfp;
 	}
 
 	// comparison helpers
-	bool operator==(const delegate_mfp &rhs) const { return (m_function == rhs.m_function) && (m_this_delta == rhs.m_this_delta); }
-	bool isnull() const { return !m_function && !m_this_delta; }
+	bool operator==(const delegate_mfp_itanium &rhs) const
+	{
+		return (m_function == rhs.m_function) && (m_this_delta == rhs.m_this_delta);
+	}
+	bool isnull() const
+	{
+#if MAME_DELEGATE_ITANIUM_ARM
+		return !reinterpret_cast<void (*)()>(m_function) && !(m_this_delta & 1);
+#else
+		return !reinterpret_cast<void (*)()>(m_function);
+#endif
+	}
 
 	// getters
-	static delegate_generic_class *real_object(delegate_generic_class *original) { return original; }
+	static delegate_generic_class *real_object(delegate_generic_class *original)
+	{
+		return original;
+	}
 
-	// binding helper
+	// binding helpers
 	template <typename FunctionType>
 	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
 	{
 		funcptr = reinterpret_cast<FunctionType>(convert_to_generic(object));
+	}
+
+	template <typename FunctionType>
+	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object)
+	{
 	}
 
 private:
@@ -296,65 +375,111 @@ private:
 	delegate_generic_function convert_to_generic(delegate_generic_class *&object) const;
 
 	// actual state
-	uintptr_t               m_function = 0;     // first item can be one of two things:
-												//    if even, it's a pointer to the function
-												//    if odd, it's the byte offset into the vtable
-	int                     m_this_delta = 0;   // delta to apply to the 'this' pointer
+	uintptr_t   m_function = reinterpret_cast<uintptr_t>(static_cast<void (*)()>(nullptr)); // function pointer or vtable offset
+	ptrdiff_t   m_this_delta = 0;                                                           // delta to apply to the 'this' pointer
 };
 
-#elif (USE_DELEGATE_TYPE == DELEGATE_TYPE_MSVC)
 
-// ======================> delegate_mfp
 
-// struct describing the contents of a member function pointer
-class delegate_mfp
+/// \brief MSVC member function pointer wrapper
+///
+/// MSVC uses space optimisation.  A member function pointer is a
+/// conventional function pointer followed by zero to three int values,
+/// depending on whether the class has single, multiple, virtual or
+/// unknown inheritance of base classes.  The function pointer is always
+/// a conventional function pointer (a thunk is used to call virtual
+/// member functions through the vtable).
+///
+/// If present, the first int value is a byte offset to add to the this
+/// pointer before calling the function.
+///
+/// For the virtual inheritance case, the offset to the vtable pointer
+/// from the location the this pointer points to must be known by the
+/// compiler when the member function pointer is called.  The second int
+/// value is a byte offset into the vtable to an int value containing an
+/// additional byte offset to add to the this pointer.
+///
+/// For the unknown inheritance case, the second int value is a byte
+/// offset add to the this pointer to obtain a pointer to the vtable
+/// pointer, or undefined if not required.  If the third int value is
+/// not zero, it is a byte offset into the vtable to an int value
+/// containing an additional byte offset to add to the this pointer.
+///
+/// It is not possible to support the virtual inheritance case without
+/// some way of obtaining the offset to the vtable pointer.
+class delegate_mfp_msvc
 {
-	struct single_base_equiv { delegate_generic_function p; };
-	struct multi_base_equiv { delegate_generic_function p; int o; };
+	struct single_base_equiv { delegate_generic_function fptr; };
+	struct multi_base_equiv { delegate_generic_function fptr; int thisdisp; };
+	struct unknown_base_equiv { delegate_generic_function fptr; int thisdisp, vptrdisp, vtdisp; };
 
 public:
 	// default constructor
-	delegate_mfp() = default;
+	delegate_mfp_msvc() = default;
 
 	// copy constructor
-	delegate_mfp(const delegate_mfp &src) = default;
+	delegate_mfp_msvc(const delegate_mfp_msvc &src) = default;
 
 	// construct from any member function pointer
 	template <typename MemberFunctionType, class MemberFunctionClass, typename ReturnType, typename StaticFunctionType>
-	delegate_mfp(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
+	delegate_mfp_msvc(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
 	{
-		static_assert((sizeof(mfp) == sizeof(single_base_equiv)) || (sizeof(mfp) == sizeof(multi_base_equiv)), "Unsupported member function pointer size");
-		m_size = sizeof(mfp);
+		// FIXME: this doesn't actually catch the unsupported virtual inheritance case on 64-bit targets
+		// alignment of the pointer means sizeof gives the same value for multiple inheritance and virtual inheritance cases
+		static_assert(
+				(sizeof(mfp) == sizeof(single_base_equiv)) || (sizeof(mfp) == sizeof(multi_base_equiv)) || (sizeof(mfp) == sizeof(unknown_base_equiv)),
+				"Unsupported member function pointer size");
+		static_assert(sizeof(mfp) <= sizeof(*this), "Member function pointer is too large to support");
 		*reinterpret_cast<MemberFunctionType *>(this) = mfp;
+		m_size = sizeof(mfp);
 	}
 
 	// comparison helpers
-	bool operator==(const delegate_mfp &rhs) const { return m_function == rhs.m_function; }
-	bool isnull() const { return !m_function; }
+	bool operator==(const delegate_mfp_msvc &rhs) const { return m_function == rhs.m_function; }
+	bool isnull() const { return !reinterpret_cast<void (*)()>(m_function); }
 
 	// getters
 	static delegate_generic_class *real_object(delegate_generic_class *original) { return original; }
 
-	// binding helper
+	// binding helpers
 	template <typename FunctionType>
 	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
 	{
 		funcptr = reinterpret_cast<FunctionType>(m_function);
-		if (m_size > sizeof(single_base_equiv))
-			object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+		std::uint8_t *byteptr = reinterpret_cast<std::uint8_t *>(object);
+		if ((sizeof(unknown_base_equiv) == m_size) && m_vt_index)
+		{
+			std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(byteptr + m_vptr_offs);
+			byteptr += *reinterpret_cast<int const *>(vptr + m_vt_index);
+		}
+		if (sizeof(single_base_equiv) < m_size)
+			byteptr += m_this_delta;
+		object = reinterpret_cast<delegate_generic_class *>(byteptr);
+	}
+
+	template <typename FunctionType>
+	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object)
+	{
 	}
 
 private:
 	// actual state
-	uintptr_t   m_function = 0;     // pointer to function or non-virtual thunk for vtable index
+	uintptr_t   m_function = 0;     // pointer to function or non-virtual thunk for virtual function call
 	int         m_this_delta = 0;   // delta to apply to the 'this' pointer for multiple inheritance
-
-	int         m_dummy1 = 0;
-	int         m_dummy2 = 0;
+	int         m_vptr_offs = 0;    // offset to apply to this pointer to obtain pointer to vptr
+	int         m_vt_index = 0;     // offset into vtable to additional delta to apply to the 'this' pointer
 
 	unsigned    m_size = 0;
 };
 
+
+
+#if USE_DELEGATE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
+using delegate_mfp = delegate_mfp_compatible;
+#elif USE_DELEGATE_TYPE == MAME_DELEGATE_TYPE_ITANIUM
+using delegate_mfp = delegate_mfp_itanium;
+#elif USE_DELEGATE_TYPE == MAME_DELEGATE_TYPE_MSVC
+using delegate_mfp = delegate_mfp_msvc;
 #endif
 
 } // namespace util::detail
@@ -400,7 +525,7 @@ public:
 	// define our traits
 	template <class FunctionClass> using traits = util::detail::delegate_traits<FunctionClass, ReturnType, Params...>;
 	using generic_static_func = typename traits<util::detail::delegate_generic_class>::static_func_type;
-	typedef MEMBER_ABI generic_static_func generic_member_func;
+	typedef MAME_DELEGATE_MEMBER_ABI generic_static_func generic_member_func;
 
 	// generic constructor
 	delegate_base() = default;
@@ -408,11 +533,13 @@ public:
 	// copy constructor
 	delegate_base(const delegate_base &src)
 		: m_function(src.m_function)
+		, m_object(src.m_object)
 		, m_latebinder(src.m_latebinder)
 		, m_raw_function(src.m_raw_function)
 		, m_raw_mfp(src.m_raw_mfp)
 	{
-		bind(src.object());
+		if (src.object() && is_mfp())
+			m_raw_mfp.update_after_copy(m_function, m_object);
 	}
 
 	// copy constructor with late bind
@@ -431,7 +558,7 @@ public:
 		: m_latebinder(&late_bind_helper<FunctionClass>)
 		, m_raw_mfp(funcptr, object, static_cast<ReturnType *>(nullptr), static_cast<generic_static_func>(nullptr))
 	{
-		bind(reinterpret_cast<util::detail::delegate_generic_class *>(object));
+		bind(object);
 	}
 
 	template <class FunctionClass>
@@ -439,7 +566,7 @@ public:
 		: m_latebinder(&late_bind_helper<FunctionClass>)
 		, m_raw_mfp(funcptr, object, static_cast<ReturnType *>(nullptr), static_cast<generic_static_func>(nullptr))
 	{
-		bind(reinterpret_cast<util::detail::delegate_generic_class *>(object));
+		bind(object);
 	}
 
 	// construct from static reference function with object reference
@@ -449,7 +576,7 @@ public:
 		, m_latebinder(&late_bind_helper<FunctionClass>)
 		, m_raw_function(reinterpret_cast<generic_static_func>(funcptr))
 	{
-		bind(reinterpret_cast<util::detail::delegate_generic_class *>(object));
+		bind(object);
 	}
 
 	// copy operator
@@ -458,12 +585,13 @@ public:
 		if (this != &src)
 		{
 			m_function = src.m_function;
-			m_object = nullptr;
+			m_object = src.m_object;
 			m_latebinder = src.m_latebinder;
 			m_raw_function = src.m_raw_function;
 			m_raw_mfp = src.m_raw_mfp;
 
-			bind(src.object());
+			if (src.object() && is_mfp())
+				m_raw_mfp.update_after_copy(m_function, m_object);
 		}
 		return *this;
 	}
@@ -478,7 +606,7 @@ public:
 	// call the function
 	ReturnType operator()(Params... args) const
 	{
-		if (is_mfp() && (HAS_DIFFERENT_ABI))
+		if ((MAME_DELEGATE_DIFFERENT_MEMBER_ABI) && is_mfp())
 			return (*reinterpret_cast<generic_member_func>(m_function))(m_object, std::forward<Params>(args)...);
 		else
 			return (*m_function)(m_object, std::forward<Params>(args)...);
@@ -517,9 +645,10 @@ protected:
 	}
 
 	// bind the actual object
-	void bind(util::detail::delegate_generic_class *object)
+	template <typename FunctionClass>
+	void bind(FunctionClass *object)
 	{
-		m_object = object;
+		m_object = reinterpret_cast<util::detail::delegate_generic_class *>(object);
 
 		// if we're wrapping a member function pointer, handle special stuff
 		if (m_object && is_mfp())
@@ -615,7 +744,7 @@ protected:
 	template <class FunctionClass> using const_member_func_type = typename traits<FunctionClass>::const_member_func_type;
 	template <class FunctionClass> using static_ref_func_type = typename traits<FunctionClass>::static_ref_func_type;
 
-	template <typename T> using suitable_functoid = std::bool_constant<std::is_convertible_v<std::invoke_result_t<T, Params...>, ReturnType> || std::is_same_v<std::void_t<std::invoke_result_t<T, Params...> >, ReturnType> >;
+	template <typename T> using suitable_functoid = std::is_invocable_r<ReturnType, T, Params...>;
 
 public:
 	delegate() : basetype() { }
