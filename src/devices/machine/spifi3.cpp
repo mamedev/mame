@@ -199,7 +199,7 @@ void spifi3_device::map(address_map &map)
     map(0x38, 0x3b).rw(FUNC(spifi3_device::fifoctrl_r), FUNC(spifi3_device::fifoctrl_w));
     map(0x40, 0x43).lrw32(NAME([this]() { LOG("read spifi_reg.config = 0x%x\n", spifi_reg.config); return spifi_reg.config; }), NAME([this](uint32_t data) { LOG("write spifi_reg.config = 0x%x\n", data); spifi_reg.config = data; }));
     map(0x54, 0x57).w(FUNC(spifi3_device::select_w));
-    map(0x54, 0x57).lr32(NAME([this]() { LOG("read spifi_reg.select = 0x%x\n", spifi_reg.select); select_w(spifi_reg.select | SEL_ISTART); return spifi_reg.select; })); // TODO: mrom expects selection retries to happen automatically, but it does read the register - does this trigger a reselection attempt?
+    map(0x54, 0x57).lr32(NAME([this]() { LOG("read spifi_reg.select = 0x%x\n", spifi_reg.select); /*select_w(spifi_reg.select | SEL_ISTART);*/ return spifi_reg.select; })); // TODO: mrom expects selection retries to happen automatically, but it does read the register - does this trigger a reselection attempt?
     map(0x58, 0x5b).rw(FUNC(spifi3_device::prcmd_r), FUNC(spifi3_device::prcmd_w));
     map(0x5c, 0x5f).rw(FUNC(spifi3_device::auxctrl_r), FUNC(spifi3_device::auxctrl_w));
     map(0x60, 0x63).w(FUNC(spifi3_device::autodata_w));
@@ -377,7 +377,7 @@ void spifi3_device::select_w(uint32_t data)
     {
         LOG("Select started! Targeting ID %d\n", (data & SEL_TARGET) >> 4);
         state = DISC_SEL_ARBITRATION_INIT;
-        spifi_reg.spstat = SPS_SEL;
+        // spifi_reg.spstat = SPS_SEL;
         dma_set(DMA_OUT);
         arbitrate();
     }
