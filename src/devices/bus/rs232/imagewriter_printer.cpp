@@ -10,10 +10,38 @@ Notes:
 
     To get it to work, you can experiment with connecting DTR to DSR, CTS, or DSR + CTS.
     The same goes for RTS, you can connect to DSR, CTS or DSR + CTS.
+
+    Also Invert1 will invert the DTR and Invert2 will invert RTS.
+
     By default, DTR should connect to DSR and RTS should connect to CTS.
 
-    Also Invert1 will invert the DTR and Invert2 will invert CTS.
+    However, according to the Imagewriter manual, p103, it appears that DTR is used
+    as a CTS (clear to send) signal and the RTS signal is used for DSR (data set ready).
 
+        Request to Send: Output signal from the printer; logic 0
+        (Spacing) when the printer is turned on.
+
+        Data Terminal Ready: Output signal from the printer, logic 0
+        (Spacing) when the printer is on and able to receive data; logic 1
+        (marking) when unable to receive data.
+
+        Data Transfer Ready Protocol
+        Whenever the capacity of the input buffer becomes less than 30
+        characters, the printer sends a busy signal by setting the DTR line
+        false. The computer must stop transmission within the next 27
+        characters; if it does not, the printer will ignore the excess data.
+        The DTR line is also set false when the printer is deselected, and
+        when it receives a DC3 character. The DTR line is true whenever
+        there is room for at least 100 characters in the input buffer, when
+        the printer is turned on, selected, and has received a DC1
+        character.
+
+    With the a500 (amiga 500) and ct486 (pc) it appears to require DTR->CTS and RTS->DSR.
+
+    With the mac512 it appears to have DTR->DSR and RTS->CTS but needs those signals inverted.
+
+    So if the Imagewriter won't print or won't flow control properly, try swapping DTR and RTS,
+    and also inverting DTR/RTS.
 
     Running the self test:
     You probably won't be able to press keypad 7 quickly enough at the start of mame in order to
@@ -127,6 +155,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_uart->dtr_handler().set(FUNC(apple_imagewriter_printer_device::dtr_handler));
 	m_uart->rts_handler().set(FUNC(apple_imagewriter_printer_device::rts_handler));
 	m_uart->txd_handler().set(FUNC(apple_imagewriter_printer_device::txd_handler));
+	m_uart->write_cts(0);
 
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT);
 
@@ -136,6 +165,8 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	TIMER(config, m_timer_rxclock, 0);
 
 	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 16 * 2));
+
+//  printf("ioreadsafe = %x\n",ioportsaferead("WIDTH"));//causes segfault
 
 	// Baud Rate Clock (pulse_uart_clock)
 	// output from 74393 is either 1/16 input clock of (9.8304mhz / 2 / 2 (aka CLK1))  or 1/128 input clock (CLK1)
@@ -217,19 +248,39 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_CONFSETTING(0x3, "DSR + CTS")
 
 	PORT_START("INVERT1")  // for testing / inverting various things without having to recompile
-	PORT_CONFNAME(0x1, 0x01, "Invert1 DTR")
+	PORT_CONFNAME(0x1, 0x00, "Invert1 DTR")
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
 
 	PORT_START("INVERT2")
-	PORT_CONFNAME(0x1, 0x01, "Invert2 RTS")
+	PORT_CONFNAME(0x1, 0x00, "Invert2 RTS")
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
+
+	PORT_START("INVERTTXD")
+	PORT_CONFNAME(0x1, 0x00, "Invert TXD")
+	PORT_CONFSETTING(0x0, "Normal")
+	PORT_CONFSETTING(0x1, "Invert")
+
+	PORT_START("LONGLINEKICKDOWNHACK")
+	PORT_CONFNAME(0x1, 0x00, "Long Line Kickdown Hack")
+	PORT_CONFSETTING(0x0, "Normal")
+	PORT_CONFSETTING(0x1, "Kick Down")
+
+
+
+	PORT_START("DCD")
+	PORT_CONFNAME(0x1, 0x01, "DCD Output")
+	PORT_CONFSETTING(0x0, "0")
+	PORT_CONFSETTING(0x1, "1")
+	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, dcd_changed, 0)
+
 
 	PORT_START("WIDTH")
 	PORT_CONFNAME(0x1, 0x01, "Printer Width")
 	PORT_CONFSETTING(0x0, "15 Inches")
 	PORT_CONFSETTING(0x1, "8 Inches")
+	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, paper_width_changed, 0)
 
 	PORT_START("DARKPIXEL")
 	PORT_CONFNAME(0x7, 0x00, "Print Darkness")
@@ -320,7 +371,29 @@ ioport_constructor apple_imagewriter_printer_device::device_input_ports() const
 }
 
 //-------------------------------------------------
+//    Input Changed Member DCD changed
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::dcd_changed)
+{
+	output_dcd(ioportsaferead("DCD"));
+}
+
+//-------------------------------------------------
 //    Input Changed Member Reset Switch
+//-------------------------------------------------
+
+
+INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::paper_width_changed)
+{
+	PAPER_WIDTH_INCHES = ioportsaferead("WIDTH") ? 8.5 : 15.0;
+	PAPER_WIDTH = PAPER_WIDTH_INCHES * dpi * xscale;
+	m_right_edge = (PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1;
+}
+
+
+//-------------------------------------------------
+//    Input Changed Member Paper Width
 //-------------------------------------------------
 
 
@@ -328,6 +401,7 @@ INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::reset_sw)
 {
 	if (newval == 0) m_maincpu->reset();
 }
+
 
 //-------------------------------------------------
 //    Input Changed Member Select Switch
@@ -774,6 +848,20 @@ void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
 		}
 	}
 	update_head_pos();
+
+	if (ioport("LONGLINEKICKDOWNHACK")->read())
+	{
+		static int flag = 0;
+		// auto kickdown for coco line lines printout
+		if (m_xpos > m_right_edge - 80 && !flag)
+		{   flag = 1;
+			m_ypos += 16;
+		}
+		if (m_xpos < m_right_edge -90)
+		{
+			flag = 0;
+		}
+	}
 }
 
 //-------------------------------------------------
@@ -790,6 +878,8 @@ void apple_imagewriter_printer_device::device_start()
 	save_item(NAME(xposratio1));
 	save_item(NAME(yposratio0));
 	save_item(NAME(yposratio1));
+	save_item(NAME(PAPER_WIDTH_INCHES));
+	save_item(NAME(PAPER_WIDTH));
 }
 
 //-------------------------------------------------
@@ -799,6 +889,7 @@ void apple_imagewriter_printer_device::device_start()
 void apple_imagewriter_printer_device::device_reset()
 {
 	output_dcd(0);  // must have this or super serial card won't work
+	m_uart->write_cts(0);  // set cts or it won't send data out (xon/xoff won't work)
 }
 
 //-------------------------------------------------
@@ -830,7 +921,7 @@ WRITE_LINE_MEMBER( apple_imagewriter_printer_device::input_txd )
 
 void apple_imagewriter_printer_device::txd_handler(uint8_t data)
 {
-	output_rxd(data);
+	output_rxd(data ^ ioport("INVERTTXD")->read());
 }
 
 //-------------------------------------------------
@@ -846,7 +937,7 @@ void apple_imagewriter_printer_device::rxrdy_handler(uint8_t data)
 //    Pulse Handlers
 //-------------------------------------------------
 
-void apple_imagewriter_printer_device::pulse1_out_handler(uint8_t data) 
+void apple_imagewriter_printer_device::pulse1_out_handler(uint8_t data)
 {
 	if (m_pulse1_out_last == 1 && data == 0) update_printhead();
 	m_pulse1_out_last = data;
@@ -862,14 +953,14 @@ void apple_imagewriter_printer_device::pulse2_out_handler(uint8_t data) {
 
 void apple_imagewriter_printer_device::dtr_handler(uint8_t data)
 {
-//	output_dsr(data);
+//  output_dsr(data);
 	if (ioport("DTR")->read() & 0x1) output_dsr(data ^ ioport("INVERT1")->read());
 	if (ioport("DTR")->read() & 0x2) output_cts(data ^ ioport("INVERT1")->read());
 }
 
 void apple_imagewriter_printer_device::rts_handler(uint8_t data)
 {
-//	output_cts(data);
+//  output_cts(data);
 	if (ioport("RTS")->read() & 0x1) output_dsr(data ^ ioport("INVERT2")->read());
 	if (ioport("RTS")->read() & 0x2) output_cts(data ^ ioport("INVERT2")->read());
 }
@@ -880,7 +971,8 @@ void apple_imagewriter_printer_device::rts_handler(uint8_t data)
 
 TIMER_DEVICE_CALLBACK_MEMBER (apple_imagewriter_printer_device::pulse_uart_clock)
 {
-	++ m_baud_clock_divisor_delay %= m_baud_clock_divisor;  // increment divisor delay and wrap around
+//  ++ m_baud_clock_divisor_delay %= m_baud_clock_divisor;  // increment divisor delay and wrap around
+	++ m_baud_clock_divisor_delay &= (m_baud_clock_divisor - 1);  // is anding more efficient than mod function?
 	if (m_baud_clock_divisor_delay == 0)
 	{
 		m_uart_clock = !m_uart_clock;

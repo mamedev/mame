@@ -23,6 +23,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_sw);
 	DECLARE_INPUT_CHANGED_MEMBER(select_sw);
+	DECLARE_INPUT_CHANGED_MEMBER(paper_width_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(dcd_changed);
 
 
 protected:
@@ -99,22 +101,22 @@ private:
 	XTAL CLK2 = baseCLK / 2;         // CLK2 name from Sams schematic = 4.9152 Mhz
 	XTAL CLK1 = CLK2 / 2;            // CLK1 name from Sams schematic = 2.4576 Mhz
 
-	const int dpi = 144;
-	const double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 162 dpi, not 144 dpi)
-	const double PAPER_WIDTH_INCHES = 8.5;
-	const double PAPER_HEIGHT_INCHES = 11.0;
-	const double MARGIN_INCHES = .25;
-	const int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi * xscale;  // 8.5 inches wide
-	const int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;          // 11  inches high
-	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
-	const int distfrombottom = 50;
+	int dpi = 144;
+	double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 162 dpi, not 144 dpi)
+	double PAPER_WIDTH_INCHES = 8.5;
+	double PAPER_HEIGHT_INCHES = 11.0;
+	double MARGIN_INCHES = .25;
+	int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi * xscale;  // 8.5 inches wide
+	int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;          // 11  inches high
+	int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
+	int distfrombottom = 50;
 
 	int xposratio0 = 144;
 	int xposratio1 = 144;
 	int yposratio0 = 18;
 	int yposratio1 = 18;
 
-	int m_xpos = PAPER_WIDTH / 2;  // middle of paper (paper width in pixels)
+	int m_xpos = PAPER_WIDTH / 2;  // set initial position at middle of paper (paper width in pixels)
 	int m_ypos = 30;
 	s32 x_pixel_coord(s32 xpos) { return xpos * xposratio0 / xposratio1; }  // x position
 	s32 y_pixel_coord(s32 ypos) { return ypos * yposratio0 / yposratio1; }  // y position given in half steps
@@ -140,8 +142,17 @@ private:
 
 	int right_offset = 0;
 	int left_offset  = 0;
-	int m_left_edge  = (MARGIN_INCHES) * dpi * xscale + m_left_edge_adjust;    // 0 for starting at left edge, print shop seems to like -32 for centered print
-	int m_right_edge = (PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1;  // when it hits the right edge, will return to the left edge and go deselected (so subtracting margin_inches is enough to stop the self test)
+	int m_left_edge  = (MARGIN_INCHES) * dpi * xscale + m_left_edge_adjust;
+	int m_right_edge = (PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1;
+
+	// m_left_edge controls the location of the print head position sensor on the left side of the
+	// printer.
+	//
+	// m_right edge controls the location of the print head position switch on the right side of the
+	// printer.  When the carriage hits the right edge, it will return to the left edge and
+	// the printer will go deselected.
+	// If this is set improperly, the self test will not print more than a single line since it will
+	// deselect the printer at the right edge.
 
 	void darken_pixel(double darkpct, unsigned int& pixel);
 	void update_head_pos();
