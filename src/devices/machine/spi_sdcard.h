@@ -46,7 +46,7 @@ private:
 	hard_disk_file *m_harddisk;
 
 	u8 m_in_latch, m_out_latch;
-	int m_cmd_ptr, m_state, m_out_ptr, m_out_count, m_ss, m_in_bit, m_cur_bit, m_write_ptr;
+	int m_cmd_ptr, m_state, m_out_ptr, m_out_count, m_ss, m_in_bit, m_cur_bit, m_write_ptr, m_blksize;
 	bool m_bACMD;
 };
 

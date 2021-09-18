@@ -1,14 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-    SD Card emulation, SPI interface only currently
+    SD Card emulation, SPI interface.
     Emulation by R. Belmont
 
     This emulates an SDHC card, which means the block size is fixed at 512 bytes and makes things simpler.
     Adapting the code to also handle SD version 2 non-HC cards would be relatively straightforward as well;
     the block size defaults to 1 byte in that case but can be overridden with CMD16.
 
-    Adding the native 4-bit-wide SD interface is also possible
+    The block size set with CMD16 must match the underlying CHD block size if it's not 512.
+
+    Adding the native 4-bit-wide SD interface is also possible; this should be broken up into a base
+    SD Card class with SPI and SD frontends in that case.
 
     Multiple block read/write commands are not supported but would be straightforward to add.
 
@@ -43,7 +46,7 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 	m_image(*this, "image"),
 	m_harddisk(nullptr),
 	m_in_latch(0), m_out_latch(0), m_cmd_ptr(0), m_state(0), m_out_ptr(0), m_out_count(0), m_ss(0), m_in_bit(0),
-	m_cur_bit(0), m_write_ptr(0), m_bACMD(false)
+	m_cur_bit(0), m_write_ptr(0), m_blksize(512), m_bACMD(false)
 {
 }
 
@@ -134,7 +137,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 
 					case SD_STATE_WRITE_DATA:
 						m_data[m_write_ptr++] = m_in_latch;
-						if (m_write_ptr == 514)
+						if (m_write_ptr == (m_blksize + 2))
 						{
 							u32 blk = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
 							LOGMASKED(LOG_GENERAL, "writing LBA %x, data %02x %02x %02x %02x\n", blk, m_data[0], m_data[1], m_data[2], m_data[3]);
@@ -206,6 +209,23 @@ void spi_sdcard_device::do_command()
 		send_data(5);
 		break;
 
+	case 16: // CMD16 - SET_BLOCKLEN
+		m_blksize = (m_cmd[3] << 8) | m_cmd[4];
+		printf("SDCARD: set block size to %d\n", m_blksize);
+		if (hard_disk_set_block_size(m_harddisk, m_blksize))
+		{
+			m_data[0] = 0;
+		}
+		else
+		{
+			m_data[0] = 0xff;   // indicate an error
+			// if false was returned, it means the hard disk is a CHD file, and we can't resize the
+			// blocks on CHD files.
+			logerror("spi_sdcard: Couldn't change block size to %d, wrong CHD file?", m_blksize);
+		}
+		send_data(1);
+		break;
+
 	case 17: // CMD17 - READ_SINGLE_BLOCK
 		if (m_harddisk)
 		{
@@ -216,7 +236,7 @@ void spi_sdcard_device::do_command()
 			u32 blk = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
 			LOGMASKED(LOG_GENERAL, "reading LBA %x\n", blk);
 			hard_disk_read(m_harddisk, blk, &m_data[3]);
-			send_data(3 + 512 + 2);
+			send_data(3 + m_blksize + 2);
 		}
 		else
 		{
