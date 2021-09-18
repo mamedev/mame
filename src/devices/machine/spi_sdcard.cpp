@@ -4,9 +4,10 @@
     SD Card emulation, SPI interface.
     Emulation by R. Belmont
 
-    This emulates an SDHC card, which means the block size is fixed at 512 bytes and makes things simpler.
-    Adapting the code to also handle SD version 2 non-HC cards would be relatively straightforward as well;
-    the block size defaults to 1 byte in that case but can be overridden with CMD16.
+    This emulates either an SDHC (SPI_SDCARD) or an SDV2 card (SPI_SDCARDV2).  SDHC has a fixed
+    512 byte block size and the arguments to the read/write commands are block numbers.  SDV2
+    has a variable block size defaulting to 512 and the arguments to the read/write commands
+    are byte offsets.
 
     The block size set with CMD16 must match the underlying CHD block size if it's not 512.
 
@@ -38,7 +39,8 @@
 static constexpr u8 DATA_RESPONSE_OK        = 0x05;
 static constexpr u8 DATA_RESPONSE_IO_ERROR  = 0x0d;
 
-DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_device, "spi_sdcard", "SD Card (SPI Interface)")
+DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_sdhc_device, "spi_sdhccard", "SDHC Card (SPI Interface)")
+DEFINE_DEVICE_TYPE(SPI_SDCARDV2, spi_sdcard_sdv2_device, "spi_sdv2card", "SDV2 Card (SPI Interface)")
 
 spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -50,9 +52,16 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 {
 }
 
-spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spi_sdcard_sdv2_device::spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	spi_sdcard_device(mconfig, SPI_SDCARDV2, tag, owner, clock)
+{
+	m_type = SD_TYPE_V2;
+}
+
+spi_sdcard_sdhc_device::spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	spi_sdcard_device(mconfig, SPI_SDCARD, tag, owner, clock)
 {
+	m_type = SD_TYPE_HC;
 }
 
 void spi_sdcard_device::device_start()
@@ -68,6 +77,8 @@ void spi_sdcard_device::device_start()
 	save_item(NAME(m_in_bit));
 	save_item(NAME(m_cur_bit));
 	save_item(NAME(m_write_ptr));
+	save_item(NAME(m_blksize));
+	save_item(NAME(m_type));
 	save_item(NAME(m_cmd));
 	save_item(NAME(m_data));
 	save_item(NAME(m_bACMD));
@@ -140,6 +151,11 @@ void spi_sdcard_device::spi_clock_w(int state)
 						if (m_write_ptr == (m_blksize + 2))
 						{
 							u32 blk = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
+							if (m_type == SD_TYPE_V2)
+							{
+								blk /= m_blksize;
+							}
+
 							LOGMASKED(LOG_GENERAL, "writing LBA %x, data %02x %02x %02x %02x\n", blk, m_data[0], m_data[1], m_data[2], m_data[3]);
 							if (hard_disk_write(m_harddisk, blk, &m_data[0]))
 							{
@@ -211,7 +227,6 @@ void spi_sdcard_device::do_command()
 
 	case 16: // CMD16 - SET_BLOCKLEN
 		m_blksize = (m_cmd[3] << 8) | m_cmd[4];
-		printf("SDCARD: set block size to %d\n", m_blksize);
 		if (hard_disk_set_block_size(m_harddisk, m_blksize))
 		{
 			m_data[0] = 0;
@@ -234,6 +249,10 @@ void spi_sdcard_device::do_command()
 			// byte of space between R1 and the data packet.
 			m_data[2] = 0xfe; // data token
 			u32 blk = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
+			if (m_type == SD_TYPE_V2)
+			{
+				blk /= m_blksize;
+			}
 			LOGMASKED(LOG_GENERAL, "reading LBA %x\n", blk);
 			hard_disk_read(m_harddisk, blk, &m_data[3]);
 			send_data(3 + m_blksize + 2);
@@ -270,7 +289,14 @@ void spi_sdcard_device::do_command()
 
 	case 58: // CMD58 - READ_OCR
 		m_data[0] = 0;
-		m_data[1] = 0x40; // indicate SDHC support
+		if (m_type == SD_TYPE_HC)
+		{
+			m_data[1] = 0x40; // indicate SDHC support
+		}
+		else
+		{
+			m_data[1] = 0;
+		}
 		m_data[2] = 0;
 		m_data[3] = 0;
 		m_data[4] = 0;
