@@ -75,6 +75,7 @@ void nes_state::machine_start()
 			AVE_MAXI15,
 			BANDAI_DATACH,
 			BANDAI_KARAOKE,
+			BATMAP_SRRX,
 			BMC_70IN1,
 			BMC_800IN1,
 			BMC_8157,

@@ -448,7 +448,7 @@ static const nes_mmc mmc_list[] =
 	// 410 Unused or JY?
 	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
-	// 413 homebrew game Super Russian Roulette
+	{ 413, BATMAP_SRRX },          // homebrew game Super Russian Roulette
 	// 414 9999999-in-1 multicart
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
 	{ 416, BMC_N32_4IN1 },
