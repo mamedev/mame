@@ -36,6 +36,7 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	m_sci(*this, "sci"),
 	m_port(*this, "port%u", 1)
 {
+	has_hc = false;
 }
 
 device_memory_interface::space_config_vector gt913_device::memory_space_config() const
@@ -128,12 +129,12 @@ uint8_t gt913_device::uart_control_r()
 
 void gt913_device::irq_setup()
 {
-	CCR |= F_I;
+	CCR |= F_H;
 }
 
 void gt913_device::update_irq_filter()
 {
-	if (CCR & F_I)
+	if (CCR & F_H)
 		m_intc->set_filter(2, -1);
 	else
 		m_intc->set_filter(0, -1);
@@ -254,11 +255,6 @@ void gt913_device::decode_opcodes()
 			case 0x0300:
 				if (!BIT(opcode, 7))
 					opcode &= 0xff0f;
-				break;
-
-			case 0x0400: // ORC
-			case 0x0600: // ANDC
-				opcode = bitswap<16>(opcode, 15, 14, 13, 12, 11, 10, 9, 8, 5, 6, 7, 4, 3, 2, 1, 0);
 				break;
 
 			case 0x0F00: // MULXU

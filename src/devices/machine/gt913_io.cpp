@@ -4,7 +4,7 @@
 	Casio GT913 I/O (HLE)
 
 	TODO:
-	- timer behavior is unverified (see comment in timer_control_w)
+	- timer behavior is unverified (see comment in timer_control_w and timer_adjust)
 	- various other unemulated registers
 
 ***************************************************************************/
