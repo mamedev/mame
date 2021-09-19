@@ -126,7 +126,8 @@ void delegate_mfp_msvc::adjust_this_pointer(delegate_generic_class *&object) con
 	std::uint8_t *byteptr = reinterpret_cast<std::uint8_t *>(object);
 	if ((sizeof(unknown_base_equiv) == m_size) && m_vt_index)
 	{
-		std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(byteptr + m_vptr_offs);
+		byteptr += m_vptr_offs;
+		std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(byteptr);
 		byteptr += *reinterpret_cast<int const *>(vptr + m_vt_index);
 	}
 	if (sizeof(single_base_equiv) < m_size)
