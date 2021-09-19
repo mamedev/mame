@@ -645,24 +645,22 @@ void nes_cart_slot_device::call_load_ines()
 		submapper = (header[8] & 0xf0) >> 4;
 
 		// NES 2.0's extended exponential sizes, needed for loading PRG >= 64MB, CHR >= 32MB. These bizarrely go up to 7 * 2^63!
-		auto expsize = [] (u8 byte) { return (2*(byte & 0x03) + 1) * std::pow(2.0, byte >> 2); };
+		auto expsize = [] (u8 byte) { return (2*(byte & 0x03) + 1) << (byte >> 2); };
 
 		if ((header[9] & 0x0f) == 0x0f)
 		{
-			double temp = expsize(header[4]);
-			if (temp > 0x1p28)
-				fatalerror("MAME currently only supports NES 2.0 files with PRG up to 256MB\n");
-			prg_size = temp;
+			prg_size = expsize(header[4]);
+			if (prg_size == 0)    // 0 only on overflow
+				fatalerror("NES 2.0 PRG size >= 4GB is unsupported.\n");
 		}
 		else
 			prg_size += ((header[9] & 0x0f) << 8) * 0x4000;
 
 		if ((header[9] & 0xf0) == 0xf0)
 		{
-			double temp = expsize(header[5]);
-			if (temp > 0x1p28)
-				fatalerror("MAME currently only supports NES 2.0 files with CHR up to 256MB\n");
-			vrom_size = temp;
+			vrom_size = expsize(header[5]);
+			if (vrom_size == 0)    // 0 only on overflow
+				fatalerror("NES 2.0 PRG size >= 4GB is unsupported.\n");
 		}
 		else
 			vrom_size += ((header[9] & 0xf0) << 4) * 0x2000;
