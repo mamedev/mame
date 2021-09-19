@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_ACE_SP_REELCTRL_BASE_H
-#define MAME_MACHINE_ACE_SP_REELCTRL_BASE_H
+#ifndef MAME_MACHINE_ACE_SP_REELCTRL_H
+#define MAME_MACHINE_ACE_SP_REELCTRL_H
 
 #pragma once
 
@@ -11,10 +11,9 @@
 class ace_sp_reelctrl_base_device : public device_t
 {
 public:
-	//ace_sp_reelctrl_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
 	ace_sp_reelctrl_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -51,5 +50,5 @@ DECLARE_DEVICE_TYPE(ACE_SP_REELCTRL, ace_sp_reelctrl_device)
 DECLARE_DEVICE_TYPE(ACE_SP_REELCTRL_PCP, ace_sp_reelctrl_pcp_device)
 
 
-#endif // #define MAME_MACHINE_ACE_SP_REELCTRL_BASE_H
+#endif // #define MAME_MACHINE_ACE_SP_REELCTRL_H
 
