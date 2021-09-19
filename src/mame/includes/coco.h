@@ -75,6 +75,7 @@ void coco_cart(device_slot_interface &device);
 #define DIECOM_LIGHTGUN_LY_TAG      "dclg_ly"
 #define DIECOM_LIGHTGUN_BUTTONS_TAG "dclg_triggers"
 
+#define SERIAL_RX_SELECT_TAG            "serial_rx_select"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

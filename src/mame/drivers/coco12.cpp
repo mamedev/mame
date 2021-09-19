@@ -181,6 +181,17 @@ INPUT_PORTS_START( coco_rtc )
 	PORT_CONFSETTING(    0x01, "Cloud-9" )
 INPUT_PORTS_END
 
+//-------------------------------------------------
+//  INPUT_PORTS( coco_serial_select )
+//-------------------------------------------------
+
+INPUT_PORTS_START( coco_serial_rx_select )
+	PORT_START(SERIAL_RX_SELECT_TAG)
+	PORT_CONFNAME( 0x01, 0x01, "Serial RX Select" )
+	PORT_CONFSETTING(    0x00, "RX (Modem)" )
+	PORT_CONFSETTING(    0x01, "CTS (Printer)" )
+INPUT_PORTS_END
+
 
 
 //-------------------------------------------------
@@ -280,6 +291,7 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_analog_control )
 	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
+	PORT_INCLUDE( coco_serial_rx_select )
 INPUT_PORTS_END
 
 

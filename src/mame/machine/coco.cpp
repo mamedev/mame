@@ -444,8 +444,11 @@ uint8_t coco_state::pia1_pb_r()
 		|| (ram_size >= 0x8000 && (pia_0().b_output() & 0x40));
 
 	// serial in (PB0)
-	bool serial_in = (m_rs232 != nullptr) && (m_rs232->rxd_r() ? true : false);
-
+//	bool serial_in = (m_rs232 != nullptr) && (m_rs232->rxd_r() ? true : false);
+	bool serial_in = (m_rs232 != nullptr)
+		&& ((ioport(SERIAL_RX_SELECT_TAG)->read() ?
+				m_rs232->cts_r() :
+				m_rs232->rxd_r()) ? true : false);
 	// composite the results
 	return (memory_sense ? 0x04 : 0x00)
 		| (serial_in ? 0x01 : 0x00);
