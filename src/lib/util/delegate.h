@@ -33,7 +33,7 @@
     The "compatible" version of delegates is based on an implementation
     from Sergey Ryazanov, found here:
 
-        http://www.codeproject.com/KB/cpp/ImpossiblyFastCppDelegate.aspx
+        https://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates
 
     These delegates essentially generate a templated static stub function
     for each target function. The static function takes the first
@@ -75,26 +75,42 @@
     func(object, p1, p2).
 
     Pros:
-        * as fast as a standard function call in static and member cases
-        * no stub functions or double-hops needed
+        * as fast as a standard function call in static and non-virtual
+          member cases
+        * no stub functions needed
 
     Cons:
         * requires internal knowledge of the member function pointer
         * only works works with MSVC ABI, and not on 32-bit x86
-        * does not work for classes with virtual inheritance
+        * does not work for classes with virtual bases
         * structure return does not work with member function pointers
+        * virtual member function lookup cannot be done in advance
 
     --------------------------------------------------------------------
 
     Further reading:
 
-        http://www.codeproject.com/KB/cpp/FastDelegate.aspx
+        * http://itanium-cxx-abi.github.io/cxx-abi/abi.html#member-pointers
+          Formal specification for the most common member function pointer
+          implementations.
 
-        http://itanium-cxx-abi.github.io/cxx-abi/abi.html#member-pointers
+        * https://www.codeproject.com/Articles/7150/Member-Function-Pointers-and-the-Fastest-Possible
+          Discusses many member function pointer implementations.  Based
+          on reverse-engineering, so not entirely accurate.  In particular,
+          various fields are incorrectly assumed to be int-sized which is
+          not true in the general case.
+
+        * https://devblogs.microsoft.com/oldnewthing/20040209-00/?p=40713
+          Describes the MSVC implementation of pointers to member
+          functions for classes with single or multiple inheritance.  Does
+          not mention the additional variants for virtual or unknown
+          inheritance.  Incorrectly states that the "this" pointer
+          displacement is a size_t when in reality it is an int (important
+          for 64-bit architectures).
 
 ***************************************************************************/
-#ifndef MAME_UTIL_DELEGATE_H
-#define MAME_UTIL_DELEGATE_H
+#ifndef MAME_LIB_UTIL_DELEGATE_H
+#define MAME_LIB_UTIL_DELEGATE_H
 
 #pragma once
 
@@ -102,8 +118,8 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
-#include <exception>
 #include <functional>
+#include <string>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
@@ -120,26 +136,26 @@
 
 // select which one we will be using
 #if defined(MAME_DELEGATE_FORCE_COMPATIBLE)
-	#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
+	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 #elif defined(__GNUC__)
 	// 32bit MINGW asks for different convention
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
-		#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_ITANIUM
+		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
 		#define MAME_DELEGATE_MEMBER_ABI __thiscall
 		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 1
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
-		#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
+		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 	#else
-		#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_ITANIUM
+		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
 		#define MAME_DELEGATE_MEMBER_ABI
 		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 	#endif
 #elif defined(_MSC_VER) && defined(_M_X64)
 	#define MAME_DELEGATE_MEMBER_ABI
 	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
-	#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_MSVC
+	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_MSVC
 #else
-	#define USE_DELEGATE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
+	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 #endif
 
 #if defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__)
@@ -152,10 +168,43 @@
 	#define MAME_DELEGATE_ITANIUM_ARM 0
 #endif
 
-#if USE_DELEGATE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
+#if MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
 	#define MAME_DELEGATE_MEMBER_ABI
 	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 #endif
+
+
+/// \brief Base for objects used with late binding
+///
+/// Default polymorphic class used as base for objects that can be bound
+/// to after the target function has already been set.
+class delegate_late_bind
+{
+public:
+	virtual ~delegate_late_bind() = default;
+};
+
+
+/// \brief Inappropriate late bind object error
+///
+/// Thrown as an exception if the object supplied for late binding
+/// cannot be cast to the target type for the delegate's function.
+class binding_type_exception : public std::bad_cast
+{
+public:
+	binding_type_exception(std::type_info const &target_type, std::type_info const &actual_type);
+
+	virtual char const *what() const noexcept override;
+
+	std::type_info const &target_type() const noexcept { return *m_target_type; }
+	std::type_info const &actual_type() const noexcept { return *m_actual_type; }
+
+private:
+	std::string m_what;
+	std::type_info const *m_target_type;
+	std::type_info const *m_actual_type;
+};
+
 
 
 namespace util::detail {
@@ -172,7 +221,6 @@ using delegate_generic_function = void(*)();
 
 // define a dummy generic class that is just straight single-inheritance
 #ifdef _MSC_VER
-class __single_inheritance generic_class;
 class delegate_generic_class { };
 #else
 class delegate_generic_class;
@@ -343,13 +391,13 @@ public:
 	{
 		return (m_function == rhs.m_function) && (m_this_delta == rhs.m_this_delta);
 	}
+
 	bool isnull() const
 	{
-#if MAME_DELEGATE_ITANIUM_ARM
-		return !reinterpret_cast<void (*)()>(m_function) && !(m_this_delta & 1);
-#else
-		return !reinterpret_cast<void (*)()>(m_function);
-#endif
+		if (MAME_DELEGATE_ITANIUM_ARM)
+			return !reinterpret_cast<void (*)()>(m_function) && !(m_this_delta & 1);
+		else
+			return !reinterpret_cast<void (*)()>(m_function);
 	}
 
 	// getters
@@ -446,15 +494,7 @@ public:
 	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
 	{
 		funcptr = reinterpret_cast<FunctionType>(m_function);
-		std::uint8_t *byteptr = reinterpret_cast<std::uint8_t *>(object);
-		if ((sizeof(unknown_base_equiv) == m_size) && m_vt_index)
-		{
-			std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(byteptr + m_vptr_offs);
-			byteptr += *reinterpret_cast<int const *>(vptr + m_vt_index);
-		}
-		if (sizeof(single_base_equiv) < m_size)
-			byteptr += m_this_delta;
-		object = reinterpret_cast<delegate_generic_class *>(byteptr);
+		return adjust_this_pointer(object);
 	}
 
 	template <typename FunctionType>
@@ -463,6 +503,9 @@ public:
 	}
 
 private:
+	// adjust the object pointer
+	void adjust_this_pointer(delegate_generic_class *&object) const;
+
 	// actual state
 	uintptr_t   m_function = 0;     // pointer to function or non-virtual thunk for virtual function call
 	int         m_this_delta = 0;   // delta to apply to the 'this' pointer for multiple inheritance
@@ -474,57 +517,75 @@ private:
 
 
 
-#if USE_DELEGATE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
+#if MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
 using delegate_mfp = delegate_mfp_compatible;
-#elif USE_DELEGATE_TYPE == MAME_DELEGATE_TYPE_ITANIUM
+#elif MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_ITANIUM
 using delegate_mfp = delegate_mfp_itanium;
-#elif USE_DELEGATE_TYPE == MAME_DELEGATE_TYPE_MSVC
+#elif MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_MSVC
 using delegate_mfp = delegate_mfp_msvc;
 #endif
 
-} // namespace util::detail
 
 
-
-// ======================> delegate_late_bind
-
-// simple polymorphic class that must be mixed into any object that is late-bound
-class delegate_late_bind
+/// \brief Helper class for generating late bind functions
+///
+/// Members of this class don't depend on the delegate's signature.
+/// Keeping them here reduces the number of template instantiations as
+/// you'll only need one late bind helper for each class used for late
+/// binding, not for each class for each delegate signature.
+template <class LateBindBase>
+class delegate_late_bind_helper
 {
 public:
-	delegate_late_bind() { }
-	virtual ~delegate_late_bind() { }
+	// make it default constructible and copyable
+	delegate_late_bind_helper() = default;
+	delegate_late_bind_helper(delegate_late_bind_helper const &) = default;
+	delegate_late_bind_helper(delegate_late_bind_helper &&) = default;
+	delegate_late_bind_helper &operator=(delegate_late_bind_helper const &) = default;
+	delegate_late_bind_helper &operator=(delegate_late_bind_helper &&) = default;
+
+	template <class FunctionClass>
+	delegate_late_bind_helper(FunctionClass *)
+		: m_latebinder(&delegate_late_bind_helper::late_bind_helper<FunctionClass>)
+	{
+	}
+
+	delegate_generic_class *operator()(LateBindBase &object) { return m_latebinder(object); }
+
+	explicit operator bool() const noexcept { return bool(m_latebinder); }
+
+private:
+	using late_bind_func = delegate_generic_class*(*)(LateBindBase &object);
+
+	template <class FunctionClass> static delegate_generic_class *late_bind_helper(LateBindBase &object);
+
+	late_bind_func  m_latebinder = nullptr;
 };
 
 
-// ======================> binding_type_exception
-
-// exception that is thrown when a bind fails the dynamic_cast
-class binding_type_exception : public std::exception
+template <class LateBindBase>
+template <class FunctionClass>
+delegate_generic_class *delegate_late_bind_helper<LateBindBase>::late_bind_helper(LateBindBase &object)
 {
-public:
-	binding_type_exception(const std::type_info &target_type, const std::type_info &actual_type)
-		: m_target_type(target_type), m_actual_type(actual_type)
-	{ }
-	const std::type_info &m_target_type;
-	const std::type_info &m_actual_type;
-};
+	FunctionClass *result = dynamic_cast<FunctionClass *>(&object);
+	if (result)
+		return reinterpret_cast<delegate_generic_class *>(result);
+	throw binding_type_exception(typeid(FunctionClass), typeid(object));
+}
+
 
 
 //**************************************************************************
 //  COMMON DELEGATE BASE CLASS
 //**************************************************************************
 
-// ======================> delegate_base
-
-// general delegate class template supporting up to 5 parameters
-template <typename ReturnType, typename... Params>
+template <class LateBindBase, typename ReturnType, typename... Params>
 class delegate_base
 {
 public:
 	// define our traits
-	template <class FunctionClass> using traits = util::detail::delegate_traits<FunctionClass, ReturnType, Params...>;
-	using generic_static_func = typename traits<util::detail::delegate_generic_class>::static_func_type;
+	template <class FunctionClass> using traits = delegate_traits<FunctionClass, ReturnType, Params...>;
+	using generic_static_func = typename traits<delegate_generic_class>::static_func_type;
 	typedef MAME_DELEGATE_MEMBER_ABI generic_static_func generic_member_func;
 
 	// generic constructor
@@ -543,7 +604,7 @@ public:
 	}
 
 	// copy constructor with late bind
-	delegate_base(const delegate_base &src, delegate_late_bind &object)
+	delegate_base(const delegate_base &src, LateBindBase &object)
 		: m_function(src.m_function)
 		, m_latebinder(src.m_latebinder)
 		, m_raw_function(src.m_raw_function)
@@ -555,15 +616,16 @@ public:
 	// construct from member function with object pointer
 	template <class FunctionClass>
 	delegate_base(typename traits<FunctionClass>::member_func_type funcptr, FunctionClass *object)
-		: m_latebinder(&late_bind_helper<FunctionClass>)
+		: m_latebinder(object)
 		, m_raw_mfp(funcptr, object, static_cast<ReturnType *>(nullptr), static_cast<generic_static_func>(nullptr))
 	{
 		bind(object);
 	}
 
+	// construct from const member function with object pointer
 	template <class FunctionClass>
 	delegate_base(typename traits<FunctionClass>::const_member_func_type funcptr, FunctionClass *object)
-		: m_latebinder(&late_bind_helper<FunctionClass>)
+		: m_latebinder(object)
 		, m_raw_mfp(funcptr, object, static_cast<ReturnType *>(nullptr), static_cast<generic_static_func>(nullptr))
 	{
 		bind(object);
@@ -573,7 +635,7 @@ public:
 	template <class FunctionClass>
 	delegate_base(typename traits<FunctionClass>::static_ref_func_type funcptr, FunctionClass *object)
 		: m_function(reinterpret_cast<generic_static_func>(funcptr))
-		, m_latebinder(&late_bind_helper<FunctionClass>)
+		, m_latebinder(object)
 		, m_raw_function(reinterpret_cast<generic_static_func>(funcptr))
 	{
 		bind(object);
@@ -602,7 +664,6 @@ public:
 		return (m_raw_function == rhs.m_raw_function) && (object() == rhs.object()) && (m_raw_mfp == rhs.m_raw_mfp);
 	}
 
-
 	// call the function
 	ReturnType operator()(Params... args) const
 	{
@@ -614,41 +675,25 @@ public:
 
 	// getters
 	bool has_object() const { return object() != nullptr; }
-
-	// helpers
 	bool isnull() const { return !m_raw_function && m_raw_mfp.isnull(); }
 	bool is_mfp() const { return !m_raw_mfp.isnull(); }
 
 	// late binding
-	void late_bind(delegate_late_bind &object)
+	void late_bind(LateBindBase &object)
 	{
 		if (m_latebinder)
-			bind((*m_latebinder)(object));
+			bind(m_latebinder(object));
 	}
 
 protected:
 	// return the actual object (not the one we use for calling)
-	util::detail::delegate_generic_class *object() const { return is_mfp() ? m_raw_mfp.real_object(m_object) : m_object; }
-
-	// late binding function
-	using late_bind_func = util::detail::delegate_generic_class*(*)(delegate_late_bind &object);
-
-	// late binding helper
-	template <class FunctionClass>
-	static util::detail::delegate_generic_class *late_bind_helper(delegate_late_bind &object)
-	{
-		FunctionClass *result = dynamic_cast<FunctionClass *>(&object);
-		if (!result)
-			throw binding_type_exception(typeid(FunctionClass), typeid(object));
-
-		return reinterpret_cast<util::detail::delegate_generic_class *>(result);
-	}
+	delegate_generic_class *object() const { return is_mfp() ? m_raw_mfp.real_object(m_object) : m_object; }
 
 	// bind the actual object
 	template <typename FunctionClass>
 	void bind(FunctionClass *object)
 	{
-		m_object = reinterpret_cast<util::detail::delegate_generic_class *>(object);
+		m_object = reinterpret_cast<delegate_generic_class *>(object);
 
 		// if we're wrapping a member function pointer, handle special stuff
 		if (m_object && is_mfp())
@@ -657,11 +702,13 @@ protected:
 
 	// internal state
 	generic_static_func                     m_function = nullptr;       // resolved static function pointer
-	util::detail::delegate_generic_class *  m_object = nullptr;         // resolved object to the post-cast object
-	late_bind_func                          m_latebinder = nullptr;     // late binding helper
+	delegate_generic_class *                m_object = nullptr;         // resolved object to the post-cast object
+	delegate_late_bind_helper<LateBindBase> m_latebinder;               // late binding helper
 	generic_static_func                     m_raw_function = nullptr;   // raw static function pointer
-	util::detail::delegate_mfp              m_raw_mfp;                  // raw member function pointer
+	delegate_mfp                            m_raw_mfp;                  // raw member function pointer
 };
+
+} // namespace util::detail
 
 
 
@@ -670,13 +717,13 @@ protected:
 //**************************************************************************
 
 // declare the base template
-template <typename Signature> class delegate;
+template <typename Signature, class LateBindBase = delegate_late_bind> class delegate;
 
-template <typename ReturnType, typename... Params>
-class delegate<ReturnType (Params...)> : public delegate_base<ReturnType, Params...>
+template <class LateBindBase, typename ReturnType, typename... Params>
+class delegate<ReturnType (Params...), LateBindBase> : public util::detail::delegate_base<LateBindBase, ReturnType, Params...>
 {
 private:
-	using basetype = delegate_base<ReturnType, Params...>;
+	using basetype = util::detail::delegate_base<LateBindBase, ReturnType, Params...>;
 	using functoid_setter = void (*)(delegate &);
 
 	template <typename T> struct functoid_type_unwrap { using type = std::remove_reference_t<T>; };
@@ -772,7 +819,7 @@ public:
 			m_set_functoid(*this);
 	}
 
-	delegate(delegate const &src, delegate_late_bind &object)
+	delegate(delegate const &src, LateBindBase &object)
 		: basetype(src.m_functoid.has_value() ? basetype() : basetype(src, object))
 		, m_functoid(src.m_functoid)
 		, m_set_functoid(src.m_set_functoid)
@@ -830,4 +877,4 @@ public:
 	}
 };
 
-#endif // MAME_UTIL_DELEGATE_H
+#endif // MAME_LIB_UTIL_DELEGATE_H
