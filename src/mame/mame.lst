@@ -9783,11 +9783,13 @@ eballchp                        //
 esclwrld                        //
 esclwrldg                       //
 hardbody                        //
+hardbodyc                       //
 hardbodyg                       //
 hvymetap                        //
 hvymetapg                       //
 ladyluck                        //
 motrdome                        //
+motrdomeb                       //
 motrdomeg                       //
 prtyanim                        //
 prtyanimg                       //
@@ -11981,6 +11983,7 @@ hook_401                        //
 hook_401_p                      //
 hook_404                        //
 hook_408                        //
+hook_e406                       //
 jupk_305                        // (c) 1993 Data East
 jupk_307                        //
 jupk_501                        //
@@ -17623,6 +17626,7 @@ joystand                        // 1997 Yuvo
 america                         //
 aqualand                        //
 faeton                          //
+faeton6d                        //
 halley                          //
 halleya                         //
 lortium                         //
