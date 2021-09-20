@@ -434,7 +434,7 @@ static const nes_mmc mmc_list[] =
 	{ 396, BMC_850437C },
 	// 397 JY-082 multicart, not in nes.xml?
 	// 398 JY-048 multicart, not in nes.xml?
-	// 399 homebrew game Star Versus
+	{ 399, BATMAP_000 },           // homebrew game Star Versus
 	// 400 retroUSB (Sealie?) 8-bit XMAS 2017
 	// 401 Super 19-in-1 VIP 19, not in nes.xml?
 	// 402 22-in-1 Olympic Games, not in nes.xml?

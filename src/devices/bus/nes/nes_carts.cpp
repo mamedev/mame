@@ -451,6 +451,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("pjoy84",           NES_PJOY84);
 	device.option_add_internal("nocash_nochr",     NES_NOCHR);
 	device.option_add_internal("action53",         NES_ACTION53);
+	device.option_add_internal("batmap_000",       NES_BATMAP_000);
 	device.option_add_internal("batmap_srrx",      NES_BATMAP_SRRX);
 	device.option_add_internal("cufrom",           NES_CUFROM);
 	device.option_add_internal("unrom512",         NES_UNROM512);
