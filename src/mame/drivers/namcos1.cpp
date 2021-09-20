@@ -2783,7 +2783,7 @@ ROM_START( tankfrce )
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
 	/* 300000-37ffff empty */
-	ROM_LOAD_1024( "tf1prg7.bin",        0x380000, CRC(2ec28a87) SHA1(91d2c1efbe156982beab24e437852d1c79dab412) )
+	ROM_LOAD_1024( "tf6_prg7.bin",        0x380000, CRC(2ec28a87) SHA1(91d2c1efbe156982beab24e437852d1c79dab412) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
@@ -2821,7 +2821,7 @@ ROM_START( tankfrce4 )
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
 	/* 300000-37ffff empty */
-	ROM_LOAD_1024( "tfu4prg7.bin",       0x380000, CRC(162adea0) SHA1(9758433ae97b463253af455c80eefee4243f6c9e) )
+	ROM_LOAD_1024( "tfu4prg7.bin",       0x380000, CRC(162adea0) SHA1(9758433ae97b463253af455c80eefee4243f6c9e) ) // Need to verify / correct ROM label
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
