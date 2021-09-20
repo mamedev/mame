@@ -116,6 +116,7 @@
 
 #include <any>
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <functional>
@@ -123,7 +124,7 @@
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
-#include <cstddef>
+
 
 //**************************************************************************
 //  MACROS
@@ -139,7 +140,7 @@
 	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 #elif defined(__GNUC__)
 	// 32bit MINGW asks for different convention
-	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
+	#if defined(__MINGW32__) && !defined(__x86_64__) && defined(__i386__)
 		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
 		#define MAME_DELEGATE_MEMBER_ABI __thiscall
 		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 1
@@ -150,7 +151,7 @@
 		#define MAME_DELEGATE_MEMBER_ABI
 		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 	#endif
-#elif defined(_MSC_VER) && defined(_M_X64)
+#elif defined(_MSC_VER) && (defined(_M_X64) || defined(_M_ARM64))
 	#define MAME_DELEGATE_MEMBER_ABI
 	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_MSVC
@@ -287,30 +288,15 @@ public:
 
 	// binding helpers
 	template <typename FunctionType>
-	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
-	{
-		m_realobject = object;
-		object = reinterpret_cast<delegate_generic_class *>(this);
-		funcptr = reinterpret_cast<FunctionType>(m_stubfunction);
-	}
+	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object);
 
 	template <typename FunctionType>
-	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object)
-	{
-		assert(reinterpret_cast<FunctionType>(m_stubfunction) == funcptr);
-		object = reinterpret_cast<delegate_generic_class *>(this);
-	}
+	void update_after_copy(FunctionType &funcptr, delegate_generic_class *&object);
 
 private:
 	// helper stubs for calling encased member function pointers
 	template <class FunctionClass, typename ReturnType, typename... Params>
-	static ReturnType method_stub(delegate_generic_class *object, Params ... args)
-	{
-		using mfptype = ReturnType(FunctionClass::*)(Params...);
-		delegate_mfp_compatible &_this = *reinterpret_cast<delegate_mfp_compatible *>(object);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this.m_rawdata);
-		return (reinterpret_cast<FunctionClass *>(_this.m_realobject)->*mfp)(std::forward<Params>(args)...);
-	}
+	static ReturnType method_stub(delegate_generic_class *object, Params ... args);
 
 	// helper to convert a function of a given type to a generic function, forcing template
 	// instantiation to match the source type
@@ -338,6 +324,33 @@ private:
 
 	static const raw_mfp_data   s_null_mfp;         // nullptr mfp
 };
+
+
+template <typename FunctionType>
+void delegate_mfp_compatible::update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
+{
+	m_realobject = object;
+	object = reinterpret_cast<delegate_generic_class *>(this);
+	funcptr = reinterpret_cast<FunctionType>(m_stubfunction);
+}
+
+
+template <typename FunctionType>
+void delegate_mfp_compatible::update_after_copy(FunctionType &funcptr, delegate_generic_class *&object)
+{
+	assert(reinterpret_cast<FunctionType>(m_stubfunction) == funcptr);
+	object = reinterpret_cast<delegate_generic_class *>(this);
+}
+
+
+template <class FunctionClass, typename ReturnType, typename... Params>
+ReturnType delegate_mfp_compatible::method_stub(delegate_generic_class *object, Params ... args)
+{
+	using mfptype = ReturnType(FunctionClass::*)(Params...);
+	delegate_mfp_compatible &_this = *reinterpret_cast<delegate_mfp_compatible *>(object);
+	mfptype &mfp = *reinterpret_cast<mfptype *>(&_this.m_rawdata);
+	return (reinterpret_cast<FunctionClass *>(_this.m_realobject)->*mfp)(std::forward<Params>(args)...);
+}
 
 
 
@@ -512,18 +525,80 @@ private:
 	int         m_vptr_offs = 0;    // offset to apply to this pointer to obtain pointer to vptr
 	int         m_vt_index = 0;     // offset into vtable to additional delta to apply to the 'this' pointer
 
-	unsigned    m_size = 0;
+	unsigned    m_size = 0;         // overall size of the pointer to member function representation
 };
 
 
 
 #if MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
-using delegate_mfp = delegate_mfp_compatible;
+
+template <typename ReturnType>
+struct delegate_mfp { using type = delegate_mfp_compatible; };
+
 #elif MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_ITANIUM
-using delegate_mfp = delegate_mfp_itanium;
+
+template <typename ReturnType>
+struct delegate_mfp { using type = delegate_mfp_itanium; };
+
 #elif MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_MSVC
-using delegate_mfp = delegate_mfp_msvc;
+
+/// \brief Determine whether a type is returned conventionally
+///
+/// Under the MSVC C++ ABI with the Microsoft calling convention for
+/// x86-64 or AArch64, the calling convention for member functions is
+/// not quite the same as a free function with the "this" pointer as the
+/// first parameter.
+///
+/// Conventionally, structure and union values can be returned in
+/// registers if they are small enough and are aggregates (trivially
+/// constructible, destructible, copyable and assignable).  On x86-64,
+/// if the value cannot be returned in registers, the pointer to the
+/// area for the return value is conventionally passed in RCX and
+/// explicit parameters are shifted by one position.  On AArch64, if the
+/// value cannot be returned in registers, the pointer to the area for
+/// the return value is passed in X8 (explicit parameters do not need to
+/// be shifted).
+///
+/// For member functions, structure and union types are never returned
+/// in registers, and the pointer to the area for the return value is
+/// passed differently for structures and unions.  When a structure or
+/// union is to be returned, a pointer to the area for the return value
+/// is effectively passed as a second implicit parameter.  On x86-64,
+/// the "this" pointer is passed in RCX and the pointer to the area for
+/// the return value is passed in RDX; on AArch64, the "this" pointer is
+/// passed in X0 and the pointer to the area for the return value is
+/// passed in X1.  Explicit parameters are shifted an additional
+/// position to allow for the second implicit parameter.
+///
+/// Note that pointer types are returned conventionally from member
+/// functions even when they're too large to return in registers (e.g. a
+/// pointer to a function member of a class with unknown inheritance).
+///
+/// Because of this, we may need to use the #delegate_mfp_compatible
+/// class to generate adaptor thunks depending on the return type.  This
+/// trait doesn't need to reliably be true for types that are returned
+/// conventionally from member functions; it only needs to reliably be
+/// false for types that aren't.  Incorrectly yielding true will result
+/// in incorrect behaviour while incorrectly yielding false will just
+/// cause increased overhead (both compile-time and run-time).
+template <typename ReturnType>
+using delegate_mfp_conventional_return = std::bool_constant<
+		std::is_void_v<ReturnType> ||
+		std::is_scalar_v<ReturnType> ||
+		std::is_reference_v<ReturnType> >;
+
+template <typename ReturnType, typename Enable = void>
+struct delegate_mfp;
+
+template <typename ReturnType>
+struct delegate_mfp<ReturnType, std::enable_if_t<delegate_mfp_conventional_return<ReturnType>::value> > { using type = delegate_mfp_msvc; };
+
+template <typename ReturnType>
+struct delegate_mfp<ReturnType, std::enable_if_t<!delegate_mfp_conventional_return<ReturnType>::value> > { using type = delegate_mfp_compatible; };
+
 #endif
+
+template <typename ReturnType> using delegate_mfp_t = typename delegate_mfp<ReturnType>::type;
 
 
 
@@ -705,7 +780,7 @@ protected:
 	delegate_generic_class *                m_object = nullptr;         // resolved object to the post-cast object
 	delegate_late_bind_helper<LateBindBase> m_latebinder;               // late binding helper
 	generic_static_func                     m_raw_function = nullptr;   // raw static function pointer
-	delegate_mfp                            m_raw_mfp;                  // raw member function pointer
+	delegate_mfp_t<ReturnType>              m_raw_mfp;                  // raw member function pointer
 };
 
 } // namespace util::detail

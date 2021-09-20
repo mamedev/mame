@@ -25,7 +25,7 @@ namespace emu::render::detail {
 
 struct bounds_step
 {
-	void get(render_bounds &result) const { result = bounds; }
+	render_bounds get() const { return bounds; }
 
 	int             state;
 	render_bounds   bounds;
@@ -35,7 +35,7 @@ using bounds_vector = std::vector<bounds_step>;
 
 struct color_step
 {
-	void get(render_color &result) const { result = color; }
+	render_color get() const { return color; }
 
 	int             state;
 	render_color    color;
@@ -261,8 +261,8 @@ public:
 
 	public:
 		using state_delegate = delegate<int ()>;
-		using bounds_delegate = delegate<void (render_bounds &)>;
-		using color_delegate = delegate<void (render_color &)>;
+		using bounds_delegate = delegate<render_bounds ()>;
+		using color_delegate = delegate<render_color ()>;
 
 		// construction/destruction
 		item(
@@ -280,8 +280,8 @@ public:
 		screen_device *screen() const { return m_screen; }
 		bool bounds_animated() const { return m_bounds.size() > 1U; }
 		bool color_animated() const { return m_color.size() > 1U; }
-		render_bounds bounds() const { render_bounds result; m_get_bounds(result); return result; }
-		render_color color() const { render_color result; m_get_color(result); return result; }
+		render_bounds bounds() const { return m_get_bounds(); }
+		render_color color() const { return m_get_color(); }
 		int blend_mode() const { return m_blend_mode; }
 		u32 visibility_mask() const { return m_visibility_mask; }
 		int orientation() const { return m_orientation; }
@@ -323,8 +323,8 @@ public:
 		int get_input_field_conditional() const;
 		int get_anim_output() const;
 		int get_anim_input() const;
-		void get_interpolated_bounds(render_bounds &result) const;
-		void get_interpolated_color(render_color &result) const;
+		render_bounds get_interpolated_bounds() const;
+		render_color get_interpolated_color() const;
 
 		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
 		static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
