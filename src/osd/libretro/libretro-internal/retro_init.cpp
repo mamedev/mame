@@ -90,24 +90,24 @@ int PARAMCOUNT=0;
 
 
 // path configuration
-#define NB_OPTPATH 11//12
+#define NB_OPTPATH 13//12
 
 static const char *dir_name[NB_OPTPATH]= {
     "cfg","nvram"/*,"hi"*//*,"memcard"*/,"input",
     "states" ,"snaps","diff","samples",
-    "artwork","cheat","ini","hash"
+    "artwork","cheat","ini","hash","language","font"
 };
 
 static const char *opt_name[NB_OPTPATH]= {
     "-cfg_directory","-nvram_directory"/*,"-hiscore_directory"*/,/*"-memcard_directory",*/"-input_directory",
     "-state_directory" ,"-snapshot_directory","-diff_directory","-samplepath",
-    "-artpath","-cheatpath","-inipath","-hashpath"
+    "-artpath","-cheatpath","-inipath","-hashpath","-languagepath","-fontpath"
 };
 
 int opt_type[NB_OPTPATH]={ // 0 for save_dir | 1 for system_dir
     0,0/*,0*/,0,
     0,0,0,1,
-    1,1,1,1
+    1,1,1,1,1,1
 };
 
 
@@ -408,6 +408,19 @@ static void Set_Path_Option(void)
       Add_Option((char*)(tmp_dir));
    }
 
+ /*  #define PONY_LANGEUAGE_PATH "/storage/emulated/0/PonyEmu/System"
+   #define PONY_FONT_PATH "/storage/emulated/0/PonyEmu/System/mame/fonts"
+   #define LANGUAGE "Chinese (Simplified)"
+   Add_Option("-languagepath");
+   Add_Option(PONY_LANGEUAGE_PATH);
+   Add_Option("-language");
+   Add_Option(LANGUAGE);
+   
+   Add_Option("-fontpath");
+   Add_Option(PONY_FONT_PATH);
+   
+   Add_Option("-uifont");
+   Add_Option("Ubuntu-B");*/
 }
 
 //============================================================
@@ -499,10 +512,13 @@ static int execute_game(char* path)
    }
 
    Add_Option((char*)("-rompath"));
+   
 
+   
    if(!boot_to_osd_enable)
    {
-      sprintf(tmp_dir, "%s", MgamePath);
+      sprintf(tmp_dir, "%s;%s", MgamePath,"/storage/emulated/0/PonyEmu/System/mame/bios");
+
       Add_Option((char*)(tmp_dir));
 
       if(softlist_enable)

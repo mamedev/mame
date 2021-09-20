@@ -200,7 +200,7 @@ end
 		kind "SharedLib"	
 		targetsuffix "_libretro"
 		if _OPTIONS["targetos"]=="android" then
-			targetsuffix "_libretro_android"
+			targetsuffix "_ponyemu_android"
 			defines {
  				"SDLMAME_ARM=1",
 			}

@@ -653,7 +653,9 @@ void retro_deinit(void)
 
 void retro_reset (void)
 {
-   mame_reset = 1;
+ if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL){
+		 mame_machine_manager::instance()->machine()->schedule_soft_reset();
+    }
 }
 
 void retro_run (void)
