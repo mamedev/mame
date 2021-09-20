@@ -500,6 +500,35 @@ static const struct dasm_data gs_tools[] =
 	{ 0xffff, "" }
 };
 
+static const struct dasm_data gsos_calls[] =
+{
+	{ 0x0001, "CREATE" }, { 0x0002, "DESTROY" }, { 0x0004, "CHANGE_PATH" }, { 0x0005, "SET_FILE_INFO" },
+	{ 0x0006, "GET_FILE_INFO" }, { 0x0008, "VOLUME" }, { 0x0009, "SET_PREFIX" }, { 0x000A, "GET_PREFIX" },
+	{ 0x000B, "CLEAR_BACKUP_BIT" }, { 0x0010, "OPEN" }, { 0x0011, "NEWLINE" }, { 0x0012, "READ" },
+	{ 0x0013, "WRITE" }, { 0x0014, "CLOSE" }, { 0x0015, "FLUSH" }, { 0x0016, "SET_MARK" },
+	{ 0x0017, "GET_MARK" }, { 0x0018, "SET_EOF" }, { 0x0019, "GET_EOF" }, { 0x001A, "SET_LEVEL" },
+	{ 0x001B, "GET_LEVEL" }, { 0x001C, "GET_DIR_ENTRY" }, { 0x0020, "GET_DEV_NUM" }, { 0x0021, "GET_LAST_DEV" },
+	{ 0x0022, "READ_BLOCK" }, { 0x0023, "WRITE_BLOCK" }, { 0x0024, "FORMAT" }, { 0x0025, "ERASE_DISK" },
+	{ 0x0027, "GET_NAME" }, { 0x0028, "GET_BOOT_VOL" }, { 0x0029, "QUIT" }, { 0x002A, "GET_VERSION" },
+	{ 0x002C, "D_INFO" }, { 0x0031, "ALLOC_INTERRUPT" }, { 0x0032, "DEALLOC_INTERRUPT" }, { 0x2001, "CreateGS" },
+	{ 0x2002, "DestroyGS" }, { 0x2003, "OSShutdownGS" }, { 0x2004, "ChangePathGS" }, { 0x2005, "SetFileInfoGS" },
+	{ 0x2006, "GetFileInfoGS" }, { 0x2007, "JudgeNameGS" }, { 0x2008, "VolumeGS" }, { 0x2009, "SetPrefixGS" },
+	{ 0x200A, "GetPrefixGS" }, { 0x200B, "ClearBackupGS" }, { 0x200C, "SetSysPrefsGS" }, { 0x200D, "NullGS" },
+	{ 0x200E, "ExpandPathGS" }, { 0x200F, "GetSysPrefsGS" }, { 0x2010, "OpenGS" }, { 0x2011, "NewLineGS" },
+	{ 0x2012, "ReadGS" }, { 0x2013, "WriteGS" }, { 0x2014, "CloseGS" }, { 0x2015, "FlushGS" },
+	{ 0x2016, "SetMarkGS" }, { 0x2017, "GetMarkGS" }, { 0x2018, "SetEOFGS" }, { 0x2019, "GetEOFGS" },
+	{ 0x201A, "SetLevelGS" }, { 0x201B, "GetLevelGS" }, { 0x201C, "GetDirEntryGS" }, { 0x201D, "BeginSessionGS" },
+	{ 0x201E, "EndSessionGS" }, { 0x201F, "SessionStatusGS" }, { 0x2020, "GetDevNumberGS" }, { 0x2024, "FormatGS" },
+	{ 0x2025, "EraseDiskGS" }, { 0x2026, "ResetCacheGS" }, { 0x2027, "GetNameGS" }, { 0x2028, "GetBootvolGS" },
+	{ 0x2029, "QuitGS" }, { 0x202A, "GetVersionGS" }, { 0x202B, "GetFSTInfoGS" }, { 0x202C, "DInfoGS" },
+	{ 0x202D, "DStatusGS" }, { 0x202E, "DControlGS" }, { 0x202F, "DReadGS" }, { 0x2030, "DWriteGS" },
+	{ 0x2031, "BindIntGS" }, { 0x2032, "UnbindIntGS" }, { 0x2033, "FSTSpecificGS" }, { 0x2034, "AddNotifyProcGS" },
+	{ 0x2035, "DelNotifyProcGS" }, { 0x2036, "DRenameGS" }, { 0x2037, "GetStdRefNumGS" }, { 0x2038, "GetRefNumGS" },
+	{ 0x2039, "GetRefInfoGS" }, { 0x203A, "SetStdRefNumGS" },
+
+	{ 0xffff, "" }
+};
+
 static const struct dasm_data32 gs_vectors[] =
 {
 	{ 0xE10000, "System Tool dispatcher" }, { 0xE10004, "System Tool dispatcher, glue entry" }, { 0xE10008, "User Tool dispatcher" }, { 0xE1000C, "User Tool dispatcher, glue entry" },
@@ -761,24 +790,53 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 					item++;
 				}
 			}
-			else
+			break;
+
+		case 0x22:  // JSL
 			{
-				u32 vec = opcodes.r32(pc) >> 8;
-				int item = 0;
-				while (gs_vectors[item].addr != 0xffff)
+				u32 operand = opcodes.r32(pc) >> 8;
+				if (operand == 0xe100a8)
 				{
-					if (gs_tools[item].addr == vec)
+					u16 call = opcodes.r8(pc + 4);
+					u32 params = opcodes.r16(pc + 6) & 0xffffff;
+					int item = 0;
+
+					while (gsos_calls[item].addr != 0xffff)
 					{
-						util::stream_format(stream, "jsl %s (%06x)", gs_tools[item].name, vec);
-						return 4 | util::disasm_interface::SUPPORTED | util::disasm_interface::STEP_OVER;
+						if (gsos_calls[item].addr == call)
+						{
+							util::stream_format(stream, "_%s %06x", gsos_calls[item].name, params);
+							return 10 | util::disasm_interface::SUPPORTED | util::disasm_interface::STEP_OVER;
+						}
+						item++;
 					}
-					item++;
+				}
+				offs_t rv = com_long_op(stream, pc, opcodes, "jsl");
+
+				if (rv > 0)
+					return rv | util::disasm_interface::STEP_OVER;
+
+				// jsl to inline debug name?
+				if (opcodes.r8(operand) == 0x82 && opcodes.r16(operand + 3) == 0x7771)
+				{
+					int n = opcodes.r8(operand + 5);
+					std::string name;
+					for (int i = 0; i < n; ++i)
+						name.push_back(opcodes.r8(operand + 6 + i));
+
+					util::stream_format(stream, "jsl %s (%06x)", name.c_str(), operand);
+					return 4 | util::disasm_interface::SUPPORTED | util::disasm_interface::STEP_OVER;
 				}
 			}
 			break;
+		case 0x5c: // JML
+			return com_long_op(stream, pc, opcodes, "jml");
 
 		case 0x8f:  // STA long
 			return com_long_op(stream, pc, opcodes, "sta");
+
+		case 0xaf:  // LDA long
+			return com_long_op(stream, pc, opcodes, "lda");
 
 		// on IIgs, this is more likely to refer to some non-Monitor direct page, so don't do these that way
 		// (we need a m_maincpu so we can check the D register for a smarter version of this)
@@ -792,6 +850,28 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 		case 0xe6:  // INC ZP
 			return dasm_override(stream, pc, opcodes, params);
 
+
+		case 0x82:  // BRL
+			if (opcodes.r16(pc + 3) == 0x7771)
+			{
+				// inline debug name format:
+				// 82 xx xx      brl past name
+				// 71 77         signature
+				// nn xx xx xxx  pascal string
+				//               pastname
+				s16 operand = opcodes.r16(pc + 1);
+				int n = opcodes.r8(pc + 5);
+				if (operand >= n)
+				{
+					std::string name;
+					for (int i = 0; i < n; ++i)
+						name.push_back(opcodes.r8(pc + 6 + i));
+
+					stream << name;
+					return (operand + 3) | util::disasm_interface::SUPPORTED;
+				}
+			}
+			break;
 
 		default:
 			break;

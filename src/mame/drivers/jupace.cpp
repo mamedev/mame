@@ -249,7 +249,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 		cpu->set_state_int(Z80_R, RAM[0x2140]);
 
 		if ((RAM[0x2119] < 0x80) || !ace_index)
-			cpu->set_state_int(STATE_GENSP, RAM[0x2118] | (RAM[0x2119] << 8));
+			cpu->set_state_int(Z80_SP, RAM[0x2118] | (RAM[0x2119] << 8));
 	}
 
 	/* Copy data to the address space */

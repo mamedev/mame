@@ -29,6 +29,7 @@ TODO:
 #include "cambrp.lh"
 #include "mbaskb.lh"
 #include "mhockey.lh"
+#include "mhockeya.lh"
 #include "msoccer.lh"
 #include "qkracerm.lh"
 #include "qkspeller.lh"
@@ -138,9 +139,9 @@ namespace {
   Judging from videos online, there are two versions of Basketball. One where
   the display shows "12" at power-on(as on MAME), and one that shows "15".
 
-  There's also an other version of Hockey, presumably for the foreign market.
-  It plays more like Basketball/Soccer: no penalty boxes and you can't go
-  behind the goal.
+  There's also an older version of Hockey, it has the same ROM as Soccer.
+  This version wasn't sold in the USA. It is commonly known as the Canadian
+  version, though it was also released in Europe and Japan.
 
 ***************************************************************************/
 
@@ -161,6 +162,7 @@ public:
 	void mbaskb(machine_config &config);
 	void msoccer(machine_config &config);
 	void mhockey(machine_config &config);
+	void mhockeya(machine_config &config);
 };
 
 // handlers
@@ -211,7 +213,7 @@ void mbaskb_state::write_f(u8 data)
 u8 mbaskb_state::read_f()
 {
 	// F1: difficulty switch
-	// F2: N/C
+	// F2: N/C or tied high
 	return m_inputs[2]->read() | (m_f & 2);
 }
 
@@ -231,6 +233,13 @@ static INPUT_PORTS_START( mbaskb )
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mhockeya )
+	PORT_INCLUDE( mbaskb )
+
+	PORT_MODIFY("IN.2") // F2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) // tied high to select Hockey
 INPUT_PORTS_END
 
 void mbaskb_state::mbaskb(machine_config &config)
@@ -273,6 +282,12 @@ void mbaskb_state::mhockey(machine_config &config)
 	config.set_default_layout(layout_mhockey);
 }
 
+void mbaskb_state::mhockeya(machine_config &config)
+{
+	msoccer(config);
+	config.set_default_layout(layout_mhockeya);
+}
+
 // roms
 
 ROM_START( mbaskb )
@@ -285,6 +300,15 @@ ROM_START( mbaskb )
 ROM_END
 
 ROM_START( msoccer )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mm4799_c_ndc", 0x0000, 0x0200, CRC(4b5ce604) SHA1(6b3d58f633b4b36f533e9a3b3ca091b2e5ea5018) )
+	ROM_CONTINUE(             0x0400, 0x0400 )
+
+	ROM_REGION( 254, "maincpu:opla", 0 )
+	ROM_LOAD( "mm5799_common1_output.pla", 0, 254, CRC(c8d225f1) SHA1(4f1e1977e96e53d1d716b7785c4c3971ed9ff65b) )
+ROM_END
+
+ROM_START( mhockeya )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "mm4799_c_ndc", 0x0000, 0x0200, CRC(4b5ce604) SHA1(6b3d58f633b4b36f533e9a3b3ca091b2e5ea5018) )
 	ROM_CONTINUE(             0x0400, 0x0400 )
@@ -807,7 +831,8 @@ ROM_END
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1978, mbaskb,    0,       0, mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mhockeya,  mhockey, 0, mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
 CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***

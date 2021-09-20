@@ -89,6 +89,7 @@ libretro-build-windows-x64:
     key: "$CI_COMMIT_REF_SLUG-windows-x64"
   only:
     - master
+    - /^libretro/mame.*$/
 
 # Windows 32-bit
 libretro-build-windows-i686:
@@ -100,6 +101,7 @@ libretro-build-windows-i686:
     key: "$CI_COMMIT_REF_SLUG-windows-i686"
   only:
     - master
+    - /^libretro/mame.*$/
 
 # Linux 64-bit
 libretro-build-linux-x64:
@@ -111,6 +113,7 @@ libretro-build-linux-x64:
     key: "$CI_COMMIT_REF_SLUG-linux-x64"
   only:
     - master
+    - /^libretro/mame.*$/
 
 # Linux 32-bit
 libretro-build-linux-i686:
@@ -122,6 +125,7 @@ libretro-build-linux-i686:
     key: "$CI_COMMIT_REF_SLUG-linux-i686"
   only:
     - master
+    - /^libretro/mame.*$/
     
 # MacOS 64-bit
 libretro-build-osx-x64:
@@ -135,6 +139,7 @@ libretro-build-osx-x64:
     key: "$CI_COMMIT_REF_SLUG-osx-x64"
   only:
     - master
+    - /^libretro/mame.*$/
 
 ################################### CELLULAR #################################
 # Android ARMv7a
@@ -151,6 +156,7 @@ android-armeabi-v7a:
     key: "$CI_COMMIT_REF_SLUG-android-armeabi-v7a"
   only:
     - master
+    - /^libretro/mame.*$/
 
 # Android ARMv8a
 android-arm64-v8a:
@@ -166,6 +172,7 @@ android-arm64-v8a:
     key: "$CI_COMMIT_REF_SLUG-android-arm64-v8a"
   only:
     - master
+    - /^libretro/mame.*$/
 
 # Android 64-bit x86
 android-x86_64:
@@ -181,6 +188,7 @@ android-x86_64:
     key: "$CI_COMMIT_REF_SLUG-android-x86_64"
   only:
     - master
+    - /^libretro/mame.*$/
     
 # # Android 32-bit x86
 # android-x86:
@@ -200,6 +208,7 @@ libretro-build-ios-arm64:
     key: "$CI_COMMIT_REF_SLUG-ios-arm64"
   only:
     - master
+    - /^libretro/mame.*$/
 
 # tvOS
 libretro-build-tvos-arm64:
@@ -213,6 +222,7 @@ libretro-build-tvos-arm64:
     key: "$CI_COMMIT_REF_SLUG-tvos-arm64"
   only:
     - master
+    - /^libretro/mame.*$/
     
 ################################### CONSOLES #################################
 # # Nintendo 3DS

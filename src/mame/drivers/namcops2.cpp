@@ -1351,6 +1351,21 @@ ROM_START( timecrs3e )
 	ROM_LOAD("tss-iopc.ic3", 0x000000, 0x040000, CRC(bb112fe0) SHA1(6fa5dc81d258137c1b1ad427d49d136d0bbf53fa) )
 ROM_END
 
+ROM_START( timecrs3u )
+	ROM_REGION32_LE(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "tst3vera.ic002",     0x000000, 0x800000, CRC(4f8312b4) SHA1(c7a24679677b46fd35aac1210a333ce0f0076bc6) )
+	ROM_LOAD( "tst3vera_spr.ic002", 0x800000, 0x040000, CRC(1ad67985) SHA1(37a420f9a5a5467fcf7bc611f71fcd5070868b56) )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tst1dvd0", 0, SHA1(f8a447d9a4224282516bea590f5217c751bdc4ae) )
+
+	ROM_REGION(0x40000, "iocpu", 0)   // NAMCO V291 I/O PCB, HD643334 H8/3334 MCU code
+	ROM_LOAD("tss-iopc.ic3", 0x000000, 0x040000, CRC(bb112fe0) SHA1(6fa5dc81d258137c1b1ad427d49d136d0bbf53fa) )
+ROM_END
+
 ROM_START( zgundmdx )
 	ROM_REGION32_LE(0x200000, "bios", 0)
 	SYSTEM246_BIOS
@@ -1638,6 +1653,7 @@ GAME(2002, wanganmr,   sys246, system246, system246, namcops2_state, empty_init,
 GAME(2003, prdgp03,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Pride GP 2003 (PR21 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2003, timecrs3,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Time Crisis 3 (TST1)", MACHINE_IS_SKELETON)
 GAME(2003, timecrs3e,timecrs3, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Time Crisis 3 (TST2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2003, timecrs3u,timecrs3, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Time Crisis 3 (TST3 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2003, zgundm,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2004, fghtjam,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2004, sukuinuf,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", MACHINE_IS_SKELETON)

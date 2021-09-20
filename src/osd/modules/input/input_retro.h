@@ -48,7 +48,7 @@ extern int lightgunX;
 extern int lightgunY;
 extern int lightgunBUT[4];
 
-extern Joystate joystate[4];
+extern Joystate joystate[6];
 
 extern int fb_width;
 extern int fb_height;

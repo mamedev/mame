@@ -14,11 +14,12 @@ NA-1 Games:
 -   Emeraldia (C358)
 
 NA-2 Games:
--   Knuckle Heads (C3??)
+-   Knuckle Heads (C360)
 -   Numan Athletics (C359)
 -   Emeraldia (C358)
 -   Nettou! Gekitou! Quiztou!! (C365)
 -   X-Day 2 (C394)
+-   Zelos (no keycus)
 
 
 To Do:
@@ -28,7 +29,7 @@ To Do:
   area is uninitialized, the game software automatically writes these values there,
   but then hangs.
   *cgangpzl, cgangpzlj, exvania, exvaniaj, knckheadjp, quiztou
-- xday2: unemulated printer and RTC devices (check test mode game options), also battery always returns NG
+- xday2: unemulated printer and RTC devices (check test mode game options)
 
 - X-Day 2:
     Rom board  M112
@@ -587,7 +588,7 @@ void namcona1_state::namcona1_main_map(address_map &map)
 	map(0xf00000, 0xf01fff).ram().w(FUNC(namcona1_state::paletteram_w)).share("paletteram");
 	map(0xf40000, 0xf7ffff).rw(FUNC(namcona1_state::gfxram_r), FUNC(namcona1_state::gfxram_w)).share("cgram");
 	map(0xff0000, 0xffbfff).ram().w(FUNC(namcona1_state::videoram_w)).share("videoram");
-	map(0xffd000, 0xffdfff).ram();                         /* unknown */
+	map(0xffc000, 0xffdfff).ram();                         /* expects RAM here for some games or it won't boot*/
 	map(0xffe000, 0xffefff).ram().share("scroll");      /* scroll registers */
 	map(0xfff000, 0xffffff).ram().share("spriteram");   /* spriteram */
 }
@@ -595,6 +596,25 @@ void namcona1_state::namcona1_main_map(address_map &map)
 void namcona1_state::namcona1_c219_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).ram().share("workram");
+}
+
+void namcona2_state::zelos_ctrl_w(u16 data)
+{
+	// bit 15 to 7 are set during I/O test when switching between the 9 'windows'. Output test? Maybe which 'window' screen to update?
+	// at least bit 4 to 1 are used, too
+
+	m_zelos_ctrl = data;
+
+	//if (data & 0x007f)
+	//  logerror("zelos_ctrl_w: %04x\n", data);
+}
+
+void namcona2_state::zelos_main_map(address_map &map)
+{
+	namcona1_main_map(map);
+
+	map(0xd00000, 0xd00001).w(FUNC(namcona2_state::zelos_ctrl_w));
+	// map(0xd40000, 0xd40001).w(FUNC(namcona2_state::)); // bit 1 alternatively set and cleared in test mode
 }
 
 u8 xday2_namcona2_state::printer_r()
@@ -880,7 +900,6 @@ static INPUT_PORTS_START(namcona1_quiz)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE1)
 INPUT_PORTS_END
 
-
 /***************************************************************************/
 
 static const gfx_layout cg_layout_8bpp =
@@ -1055,6 +1074,13 @@ void namcona2_state::namcona2(machine_config &config)
 //  m_maincpu->set_addrmap(AS_PROGRAM, &namcona2_state::namcona2_main_map);
 }
 
+void namcona2_state::zelos(machine_config &config)
+{
+	namcona2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcona2_state::zelos_main_map);
+}
+
 void xday2_namcona2_state::xday2(machine_config &config)
 {
 	namcona_base(config);
@@ -1084,6 +1110,7 @@ void namcona2_state::init_knckhead()        { m_gametype = NAMCO_KNCKHEAD; }
 void namcona2_state::init_numanath()        { m_gametype = NAMCO_NUMANATH; }
 void namcona2_state::init_quiztou()         { m_gametype = NAMCO_QUIZTOU; }
 void xday2_namcona2_state::init_xday2()     { m_gametype = NAMCO_XDAY2; }
+void namcona2_state::init_zelos()           { m_gametype = -1; save_item(NAME(m_zelos_ctrl)); }
 
 ROM_START(bkrtmaq)
 	ROM_REGION(0x200000, "maincpu", 0)
@@ -1425,6 +1452,16 @@ ROM_START(xday2)
 	ROM_LOAD16_BYTE("xds1-dat3.8c", 0x400000, 0x200000, CRC(8980acc4) SHA1(ecd94a3d3a38923e8e322cd8863671af26e30812))
 ROM_END
 
+// an 8-liner game that runs on several Namco NA-2 PCBs. Cabinet pic shows 9 screens (one per reel, called windows in IO test) + 5 screens (one per terminal)
+ROM_START(zelos)
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("zs1 slp 1b.6c", 0x000001, 0x080000, CRC(d71df137) SHA1(457d3e7cb352b44706567e8346dcde82393d13c1))
+	ROM_LOAD16_BYTE("zs1 slp 0b.6f", 0x000000, 0x080000, CRC(5807ef9e) SHA1(5dde8d71637de480d1d679d88b25509c229c6056))
+
+	ROM_REGION16_BE(0x800000, "maskrom", ROMREGION_ERASE00)
+	// not populated
+ROM_END
+
 // NA-1 (C69 MCU)
 GAME(1992, bkrtmaq,    0,        namcona1, namcona1_quiz,  namcona1_state, init_bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1992, cgangpzl,   0,        namcona1,  namcona1_joy,  namcona1_state, init_cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
@@ -1449,3 +1486,4 @@ GAME(1993, numanath,   0,        namcona2,  namcona1_joy,  namcona2_state, init_
 GAME(1993, numanathj,  numanath, namcona2,  namcona1_joy,  namcona2_state, init_numanath, ROT0, "Namco", "Numan Athletics (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, init_quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, init_xday2, ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME(1994, zelos,      0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals

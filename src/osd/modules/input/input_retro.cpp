@@ -28,7 +28,7 @@ uint16_t retrokbd_state2[RETROK_LAST];
 int mouseLX;
 int mouseLY;
 int mouseBUT[4];
-Joystate joystate[4];
+Joystate joystate[6];
 
 int lightgunX, lightgunY;
 int lightgunBUT[4];
@@ -568,11 +568,11 @@ void retro_osd_interface::process_joypad_state(running_machine &machine)
 {
    unsigned i, j;
    int analog_l2, analog_r2;
-   int16_t ret[4];
+   int16_t ret[6];
 
    if (libretro_supports_bitmasks)
    {
-      for(j = 0;j < 4; j++)
+      for(j = 0;j < 6; j++)
       {
          ret[j] = 0;
          ret[j] = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
@@ -580,7 +580,7 @@ void retro_osd_interface::process_joypad_state(running_machine &machine)
    }
    else
    {
-      for(j = 0;j < 4; j++)
+      for(j = 0;j < 6; j++)
       {
          ret[j] = 0;
          for(i = 0;i < RETRO_MAX_BUTTONS; i++)
@@ -589,7 +589,7 @@ void retro_osd_interface::process_joypad_state(running_machine &machine)
       }
    }
 
-   for(j = 0;j < 4; j++)
+   for(j = 0;j < 6; j++)
    {
       for(i = 0;i < RETRO_MAX_BUTTONS; i++)
       {
@@ -758,8 +758,8 @@ class retro_keyboard_device : public event_based_device<KeyPressEventArgs>
 {
 public:
 
-	retro_keyboard_device(running_machine& machine, const char *name, const char *id, input_module &module)
-		: event_based_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module)
+	retro_keyboard_device(running_machine& machine, std::string &&name, std::string &&id, input_module &module)
+		: event_based_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module)
 	{
 	}
 
@@ -795,7 +795,7 @@ public:
 
 	virtual void input_init(running_machine &machine) override
 	{
-		retro_keyboard_device *devinfo = devicelist()->create_device<retro_keyboard_device>(machine, "Retro Keyboard 1", "Retro Keyboard 1", *this);
+		auto &devinfo = devicelist()->create_device<retro_keyboard_device>(machine, "Retro Keyboard 1", "Retro Keyboard 1", *this);
 
 		int i;
    		for(i = 0; i < RETROK_LAST; i++){
@@ -805,7 +805,7 @@ public:
 
    		i=0;
    		do{
-			devinfo->device()->add_item(\
+			devinfo.device()->add_item(\
 				ktable[i].mame_key_name,\
 				ktable[i].mame_key, \
 				generic_button_get_state<std::uint8_t>,\
@@ -836,15 +836,14 @@ class retro_mouse_device : public event_based_device<KeyPressEventArgs>
 {
 public:
 
-	retro_mouse_device(running_machine& machine, const char *name, const char *id, input_module &module)
-		: event_based_device(machine, name, id, DEVICE_CLASS_MOUSE, module)
+	retro_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module)
+		: event_based_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module)
 	{
 	}
 
 	void poll() override
 	{
-event_based_device::poll();
-
+      event_based_device::poll();
 	}
 
 	void reset() override
@@ -879,24 +878,20 @@ public:
 
 	virtual void input_init(running_machine &machine) override
 	{
-		retro_mouse_device *devinfo;
-
 		if (!input_enabled() || !mouse_enabled())
 			return;
 
-		devinfo = devicelist()->create_device<retro_mouse_device>(machine, "Retro mouse 1", "Retro mouse 1", *this);
-		if (devinfo == nullptr)
-			return;
+		auto &devinfo = devicelist()->create_device<retro_mouse_device>(machine, "Retro mouse 1", "Retro mouse 1", *this);
 
 		mouseLX=fb_width/2;
 		mouseLY=fb_height/2;
 
-		devinfo->device()->add_item(
+		devinfo.device()->add_item(
 				"X",
 				static_cast<input_item_id>(ITEM_ID_XAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&mouseLX);
-		devinfo->device()->add_item(
+		devinfo.device()->add_item(
 				"Y",
 				static_cast<input_item_id>(ITEM_ID_YAXIS),
 				generic_axis_get_state<std::int32_t>,
@@ -906,7 +901,7 @@ public:
 		for (button = 0; button < 4; button++)
 		{
 			mouseBUT[button]=0;
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				default_button_name(button),
 				static_cast<input_item_id>(ITEM_ID_BUTTON1 + button),
 				generic_button_get_state<std::int32_t>,
@@ -936,8 +931,8 @@ class retro_joystick_device : public event_based_device<KeyPressEventArgs>
 {
 public:
 
-	retro_joystick_device(running_machine& machine, const char *name, const char *id, input_module &module)
-		: event_based_device(machine, name, id, DEVICE_CLASS_JOYSTICK, module)
+	retro_joystick_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module)
+		: event_based_device(machine, std::move(name), std::move(id), DEVICE_CLASS_JOYSTICK, module)
 	{
 	}
 
@@ -980,83 +975,79 @@ public:
 		if (buttons_profiles)
 			Input_Binding(machine);
 
-		for (i = 0; i < 4; i++)
+		for (i = 0; i < 6; i++)
 		{
  			sprintf(defname, "RetroPad%d", i);
-
-			retro_joystick_device *devinfo;
 
 			if (!input_enabled()/* || !joystick_enabled()*/)
 				return;
 
-			devinfo = devicelist()->create_device<retro_joystick_device>(machine, defname, defname, *this);
-			if (devinfo == nullptr)
-				continue;
+			auto &devinfo = devicelist()->create_device<retro_joystick_device>(machine, defname, defname, *this);
 
 			// add the axes
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				"LSX",
 				static_cast<input_item_id>(ITEM_ID_XAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a1[0]);
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				"LSY",
 				static_cast<input_item_id>(ITEM_ID_YAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a1[1]);
 
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				"RSX",
 				static_cast<input_item_id>(ITEM_ID_RXAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a2[0]);
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				"RSY",
 				static_cast<input_item_id>(ITEM_ID_RYAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a2[1]);
 
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				"L2",
 				static_cast<input_item_id>(ITEM_ID_RZAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a3[0]);
 
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				"R2",
 				static_cast<input_item_id>(ITEM_ID_ZAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a3[1]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_START], ITEM_ID_START,
+			devinfo.device()->add_item(Buttons_Name[RETROPAD_START], ITEM_ID_START,
 				generic_button_get_state<std::int32_t>, &joystate[i].button[RETROPAD_START]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_SELECT], ITEM_ID_SELECT,
+			devinfo.device()->add_item(Buttons_Name[RETROPAD_SELECT], ITEM_ID_SELECT,
 				generic_button_get_state<std::int32_t>, &joystate[i].button[RETROPAD_SELECT]);
 
 			for(j = 0; j < 6; j++)
-				devinfo->device()->add_item(Buttons_Name[Buttons_mapping[j]],
+				devinfo.device()->add_item(Buttons_Name[Buttons_mapping[j]],
 					 (input_item_id)(ITEM_ID_BUTTON1+j),
 					 generic_button_get_state<std::int32_t>,
 					  &joystate[i].button[Buttons_mapping[j]]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_L3], ITEM_ID_BUTTON9,
+			devinfo.device()->add_item(Buttons_Name[RETROPAD_L3], ITEM_ID_BUTTON9,
 				generic_button_get_state<std::int32_t>, &joystate[i].button[RETROPAD_L3]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_R3], ITEM_ID_BUTTON10,
+			devinfo.device()->add_item(Buttons_Name[RETROPAD_R3], ITEM_ID_BUTTON10,
 				generic_button_get_state<std::int32_t>, &joystate[i].button[RETROPAD_R3]);
 
 			// D-Pad
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_UP], static_cast<input_item_id>(ITEM_ID_HAT1UP+i*4),
+			devinfo.device()->add_item(Buttons_Name[RETROPAD_PAD_UP], static_cast<input_item_id>(ITEM_ID_HAT1UP+i*4),
 				generic_button_get_state<std::uint8_t>, &joystate[i].button[RETROPAD_PAD_UP]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_DOWN], static_cast<input_item_id>(ITEM_ID_HAT1DOWN+i*4),
+			devinfo.device()->add_item(Buttons_Name[RETROPAD_PAD_DOWN], static_cast<input_item_id>(ITEM_ID_HAT1DOWN+i*4),
 				generic_button_get_state<std::uint8_t>, &joystate[i].button[RETROPAD_PAD_DOWN]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_LEFT], static_cast<input_item_id>(ITEM_ID_HAT1LEFT+i*4),
+			devinfo.device()->add_item(Buttons_Name[RETROPAD_PAD_LEFT], static_cast<input_item_id>(ITEM_ID_HAT1LEFT+i*4),
 				generic_button_get_state<std::uint8_t>, &joystate[i].button[RETROPAD_PAD_LEFT]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_RIGHT], static_cast<input_item_id>(ITEM_ID_HAT1RIGHT+i*4),
+			devinfo.device()->add_item(Buttons_Name[RETROPAD_PAD_RIGHT], static_cast<input_item_id>(ITEM_ID_HAT1RIGHT+i*4),
 				generic_button_get_state<std::uint8_t>, &joystate[i].button[RETROPAD_PAD_RIGHT]);
 		}
 
@@ -1082,15 +1073,14 @@ class retro_lightgun_device : public event_based_device<KeyPressEventArgs>
 {
 public:
 
-	retro_lightgun_device(running_machine& machine, const char *name, const char *id, input_module &module)
-		: event_based_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module)
+	retro_lightgun_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module)
+		: event_based_device(machine, std::move(name), std::move(id), DEVICE_CLASS_LIGHTGUN, module)
 	{
 	}
 
 	void poll() override
 	{
-event_based_device::poll();
-
+      event_based_device::poll();
 	}
 
 	void reset() override
@@ -1102,7 +1092,7 @@ event_based_device::poll();
 	}
 
 protected:
-	void process_event(KeyPressEventArgs &args) /*override*/
+	void process_event(KeyPressEventArgs &args) override
 	{
 //		printf("here\n");
 	}
@@ -1124,21 +1114,19 @@ public:
 
 	virtual void input_init(running_machine &machine) override
 	{
-		retro_lightgun_device *devinfo;
 		if (!input_enabled() || !lightgun_enabled())
 			return;
-		devinfo = devicelist()->create_device<retro_lightgun_device>(machine, "Retro lightgun 1", "Retro lightgun 1", *this);
-		if (devinfo == nullptr)
-			return;
+
+		auto &devinfo = devicelist()->create_device<retro_lightgun_device>(machine, "Retro lightgun 1", "Retro lightgun 1", *this);
 
 		lightgunX=fb_width/2;
 		lightgunY=fb_height/2;
-		devinfo->device()->add_item(
+		devinfo.device()->add_item(
 				"X",
 				static_cast<input_item_id>(ITEM_ID_XAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&lightgunX);
-		devinfo->device()->add_item(
+		devinfo.device()->add_item(
 				"Y",
 				static_cast<input_item_id>(ITEM_ID_YAXIS),
 				generic_axis_get_state<std::int32_t>,
@@ -1148,7 +1136,7 @@ public:
 		for (button = 0; button < 4; button++)
 		{
 			lightgunBUT[button]=0;
-			devinfo->device()->add_item(
+			devinfo.device()->add_item(
 				default_button_name(button),
 				static_cast<input_item_id>(ITEM_ID_BUTTON1 + button),
 				generic_button_get_state<std::int32_t>,

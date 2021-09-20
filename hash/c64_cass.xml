@@ -39,14 +39,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Superpipeline 2 / Mutant Monty / Henrys House / Gribblys Day Out / Snooker"/>
 			<dataarea name="cass" size="1756359">
-				<rom name="10_Computer_Hits_2_Tape_A.tap (alt)" size="1756359" crc="a72d0c19" sha1="6cab4ab2a3f491d13670089a9b250249cd3079ed"/>
+				<rom name="10_Computer_Hits_2_Tape_A (alt).tap" size="1756359" crc="a72d0c19" sha1="6cab4ab2a3f491d13670089a9b250249cd3079ed"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: Mama Llama / Raskel / Aqua Racer / Frenzy / Circus"/>
 			<dataarea name="cass" size="1767233">
-				<rom name="10_Computer_Hits_2_Tape_B.tap (alt)" size="1767233" crc="a4171a8f" sha1="22e60c455e7f764db3b4f632dd49e81f8f5b53f9"/>
+				<rom name="10_Computer_Hits_2_Tape_B (alt).tap" size="1767233" crc="a4171a8f" sha1="22e60c455e7f764db3b4f632dd49e81f8f5b53f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -227,7 +227,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="217093">
-				<rom name="3D_Pool.tap (kixx)" size="217093" crc="3114cd62" sha1="2c77dddf4165f49ca517a6e0908da3815cd46218"/>
+				<rom name="3D_Pool (kixx).tap" size="217093" crc="3114cd62" sha1="2c77dddf4165f49ca517a6e0908da3815cd46218"/>
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +344,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="557418">
-				<rom name="5th_Gear.tap (prism)" size="557418" crc="dd8af099" sha1="795512a880f8812799f4baa674eac1ea6fae52d7"/>
+				<rom name="5th_Gear (prism).tap" size="557418" crc="dd8af099" sha1="795512a880f8812799f4baa674eac1ea6fae52d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -760,7 +760,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="489454">
-				<rom name="Alleykat.tap (alt)" size="489454" crc="f8b33ba9" sha1="78392282306e82d5885a6291b1984dbdf0365156"/>
+				<rom name="Alleykat (alt).tap" size="489454" crc="f8b33ba9" sha1="78392282306e82d5885a6291b1984dbdf0365156"/>
 			</dataarea>
 		</part>
 	</software>
@@ -975,14 +975,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="582695">
-				<rom name="APB_Side_1.tap (alt)" size="582695" crc="5feeaf42" sha1="adfe6390e092435638cb397d5b080b87c9e24b45"/>
+				<rom name="APB_Side_1 (alt).tap" size="582695" crc="5feeaf42" sha1="adfe6390e092435638cb397d5b080b87c9e24b45"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="591908">
-				<rom name="APB_Side_2.tap (alt)" size="591908" crc="6d6b5ea1" sha1="7cbd62ddb837e401722978c0e9b301e71d9ddecb"/>
+				<rom name="APB_Side_2 (alt).tap" size="591908" crc="6d6b5ea1" sha1="7cbd62ddb837e401722978c0e9b301e71d9ddecb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1114,7 +1114,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="640955">
-				<rom name="Arkanoid_a1.tap (imagine)" size="640955" crc="bf774a67" sha1="a567a77a37f35ac00f38ad9f4511d8706ecd3767"/>
+				<rom name="Arkanoid_a1 (imagine).tap" size="640955" crc="bf774a67" sha1="a567a77a37f35ac00f38ad9f4511d8706ecd3767"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1391,6 +1391,61 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="badcat">
+		<description>Bad Cat</description>
+		<year>1987</year>
+		<publisher>Go!</publisher>
+		<info name="alt_title" value="Street Cat"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2340674">
+				<rom name="badcat.tap" size="2340674" crc="db8feec2" sha1="affb064c9d7a4ec49a71da69ec32bbeb10479f44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baddudes">
+		<description>Bad Dudes Vs. Dragon Ninja</description>
+		<year>1988</year>
+		<publisher>Imagine</publisher>
+		<info name="alt_title" value="Bad Dudes"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="894502">
+				<rom name="baddudes(a).tap" size="894502" crc="d9649e35" sha1="c7ab6ab08da7c8651b60f9954b7056af5adc22ce"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="299210">
+				<rom name="baddudes(b).tap" size="299210" crc="d6ecfbe0" sha1="039b85b56dafec26a66227938d9e9140da2820be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baddudese" cloneof="baddudes">
+		<description>Bad Dudes Vs. Dragon Ninja (Erbe)</description>
+		<year>1988</year>
+		<publisher>Erbe</publisher>
+		<info name="alt_title" value="Bad Dudes"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="894502">
+				<rom name="baddudese(a).tap" size="894502" crc="6563ba77" sha1="ed9845b7304ec4eb2d4cb52d00de637afcbc4aba"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="299198">
+				<rom name="baddudese(b).tap" size="299198" crc="eeff5af0" sha1="4acb42a50a4293e8238f90445699372a62962b20"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ballcrz">
 		<description>Ball Crazy</description>
 		<year>1987</year>
@@ -1412,6 +1467,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bangkokk">
+		<description>Bangkok Knights</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Cass 1"/>
+			<dataarea name="cass" size="1487343">
+				<rom name="bangkokk(1).tap" size="1487343" crc="79719e12" sha1="7c9abe0cc465cc477a343cd83428e9fbdf73749b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Cass 2"/>
+			<dataarea name="cass" size="905897">
+				<rom name="bangkokk(2).tap" size="905897" crc="ff018d38" sha1="9e201ba694ae9534d5bfc2d6bff8ae7eda51d144"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="barb2">
 		<description>Barbarian II</description>
 		<year>1988</year>
@@ -1428,6 +1503,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="712344">
 				<rom name="Barbarian_II_Side_2.tap" size="712344" crc="a3a0626f" sha1="f1914dcbde19ec3144fb8c3cacca52805f230f63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baskmast">
+		<description>Basket Master</description>
+		<year>1987</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="621746">
+				<rom name="baskmast.tap" size="621746" crc="8a01a352" sha1="5846ac268aa302102aa2463146a5e111cc15fee5"/>
 			</dataarea>
 		</part>
 	</software>

@@ -23,6 +23,7 @@ $208 strikes count
 #include "includes/tryout.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/gen_latch.h"
 #include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
@@ -30,17 +31,10 @@ $208 strikes count
 
 void tryout_state::nmi_ack_w(uint8_t data)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void tryout_state::sound_w(uint8_t data)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-/*this is actually irq/nmi mask, polls only four values at start up (81->01->81->01) and then
-  stays on this state.*/
+// this is actually irq/nmi mask, polls only four values at start up (81->01->81->01) and then stays on this state.
 void tryout_state::sound_irq_ack_w(uint8_t data)
 {
 //  m_audiocpu->set_input_line(0, CLEAR_LINE);
@@ -48,22 +42,22 @@ void tryout_state::sound_irq_ack_w(uint8_t data)
 
 void tryout_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 void tryout_state::bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x01);
+	m_rombank->set_entry(data & 0x01);
 }
 
 void tryout_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x17ff).ram().w(FUNC(tryout_state::videoram_w)).share("videoram");
-	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x1000, 0x17ff).ram().w(FUNC(tryout_state::videoram_w)).share(m_videoram);
+	map(0x2000, 0x3fff).bankr(m_rombank);
 	map(0x4000, 0xbfff).rom();
-	map(0xc800, 0xc87f).ram().share("spriteram");
-	map(0xcc00, 0xcc7f).ram().share("spriteram2");
+	map(0xc800, 0xc87f).ram().share(m_spriteram[0]);
+	map(0xcc00, 0xcc7f).ram().share(m_spriteram[1]);
 	map(0xd000, 0xd7ff).rw(FUNC(tryout_state::vram_r), FUNC(tryout_state::vram_w));
 	map(0xe000, 0xe000).portr("DSW");
 	map(0xe001, 0xe001).portr("P1");
@@ -72,17 +66,17 @@ void tryout_state::main_cpu(address_map &map)
 	map(0xe301, 0xe301).w(FUNC(tryout_state::flipscreen_w));
 	map(0xe302, 0xe302).w(FUNC(tryout_state::bankswitch_w));
 	map(0xe401, 0xe401).w(FUNC(tryout_state::vram_bankswitch_w));
-	map(0xe402, 0xe404).writeonly().share("gfx_control");
-	map(0xe414, 0xe414).w(FUNC(tryout_state::sound_w));
+	map(0xe402, 0xe404).writeonly().share(m_gfx_control);
+	map(0xe414, 0xe414).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xe417, 0xe417).w(FUNC(tryout_state::nmi_ack_w));
-	map(0xfff0, 0xffff).rom().region("maincpu", 0xbff0); /* reset vectors */
+	map(0xfff0, 0xffff).rom().region("maincpu", 0xbff0); // reset vectors
 }
 
 void tryout_state::sound_cpu(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xd000, 0xd000).w(FUNC(tryout_state::sound_irq_ack_w));
 	map(0xc000, 0xffff).rom();
 }
@@ -151,13 +145,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
+	8,8,    // 8*8 characters
 	RGN_FRAC(1,2),
-	2,  /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	2,  // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
 	{ 3, 2, 1, 0, RGN_FRAC(1,2)+3, RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+1, RGN_FRAC(1,2)+0 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static const gfx_layout vramlayout =
@@ -188,35 +182,36 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( gfx_tryout )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 4 )
-	GFXDECODE_ENTRY( nullptr,   0, vramlayout,   0, 4 )
+	GFXDECODE_RAM( "vram_gfx", 0, vramlayout, 0, 4 )
 GFXDECODE_END
 
 void tryout_state::tryout(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000);     /* ? */
+	// basic machine hardware
+	M6502(config, m_maincpu, 2000000);     // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &tryout_state::main_cpu);
 
-	M6502(config, m_audiocpu, 1500000);    /* ? */
+	M6502(config, m_audiocpu, 1500000);    // ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tryout_state::sound_cpu);
-	m_audiocpu->set_periodic_int(FUNC(tryout_state::nmi_line_pulse), attotime::from_hz(1000)); /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
+	m_audiocpu->set_periodic_int(FUNC(tryout_state::nmi_line_pulse), attotime::from_hz(1000)); // controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(tryout_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tryout);
-	PALETTE(config, m_palette, FUNC(tryout_state::tryout_palette), 0x20);
+	PALETTE(config, m_palette, FUNC(tryout_state::palette), 0x20);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
 	YM2203(config, "ymsnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
 }

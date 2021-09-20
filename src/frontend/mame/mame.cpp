@@ -278,7 +278,7 @@ int mame_machine_manager::execute()
 		error = retro_global_machine->run(is_empty);
 		m_firstrun = false;
 
-		return 1;
+		return error;
 #endif
 		// create the machine configuration
 		machine_config config(*system, m_options);

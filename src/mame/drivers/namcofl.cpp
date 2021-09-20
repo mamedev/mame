@@ -15,6 +15,9 @@
        it until you do.
     3) Exit MAME and restart the game, it's now calibrated.
 
+TODO:
+    speedrcr : Incorrect ROZ layer
+
 
 PCB Layout
 ----------
@@ -155,9 +158,6 @@ OSC3: 48.384MHz
 23D : IR2C24AN
 13E : HN58C65 EEPROM
 
-TODO
-    finalapr : Some objects aren't displayed, Wrong shadow behavior
-    speedrcr : Incorrect ROZ layer
 */
 
 #include "emu.h"
@@ -177,9 +177,12 @@ uint32_t namcofl_state::unk1_r()
 	return 0xffffffff;
 }
 
-uint32_t namcofl_state::network_r()
+uint8_t namcofl_state::network_r(offs_t offset)
 {
-	return 0xffffffff;
+	if (offset == 1)
+		return 0x7d;
+
+	return 0xff;
 }
 
 uint32_t namcofl_state::sysreg_r()
@@ -223,7 +226,7 @@ void namcofl_state::namcofl_mem(address_map &map)
 	map(0x30100000, 0x30100003).w(FUNC(namcofl_state::spritebank_w));
 	map(0x30284000, 0x3028bfff).ram().share("shareram");
 	map(0x30300000, 0x30303fff).ram(); /* COMRAM */
-	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::network_r)); /* network registers */
+	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::network_r)).umask32(0x00ff00ff); /* network registers */
 	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::c116_w));
 	map(0x30800000, 0x3080ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
 	map(0x30a00000, 0x30a0003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
@@ -374,10 +377,10 @@ static INPUT_PORTS_START( speedrcr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // buttons are named because their use in navigating test mode isn't clear
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Weapon 1 / Test Menu Down") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Weapon 2 / Test Menu Modify") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Weapon 3 / Test Menu Up") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Start / Jump") PORT_CODE(KEYCODE_SPACE) // jump / start button
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Weapon 3 / Test Menu Down")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Weapon 1 / Test Menu Modify")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Weapon 2 / Test Menu Up")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Start / Jump") // jump / start button
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -426,7 +429,7 @@ static INPUT_PORTS_START( finalapr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_LSHIFT) PORT_TOGGLE // gear
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE // gear
 	PORT_DIPNAME( 0x20, 0x20, "Freeze Screen" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -798,10 +801,10 @@ void namcofl_state::driver_init()
 	save_item(NAME(m_sprbank));
 }
 
-GAME(  1995, speedrcr,          0, namcofl, speedrcr, namcofl_state, driver_init, ROT0, "Namco", "Speed Racer",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1995, speedrcr,   0,        namcofl, speedrcr, namcofl_state, driver_init, ROT0, "Namco", "Speed Racer",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
 // Final Lap R was released 02/94, a 1993 copyright date is displayed on the title screen
-GAMEL( 1994, finalapr,          0, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalapr,   0,        namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
 GAMEL( 1994, finalapr1,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
 GAMEL( 1994, finalaprj,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
 GAMEL( 1994, finalaprj1, finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )

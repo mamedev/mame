@@ -698,6 +698,23 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from original media. size="1386496" crc="8B00FD46" sha1="5E85EAECDDBBD0D91B01F315F2E040247E36FA5A" -->
+	<!-- Originally released on two PC Booter 5.25" floppies and one 3.5" PC Booter floppy. Reprinted on CD by -->
+	<!-- GT Interactive as a standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. -->
+	<!-- Game can be run straight from the CD." -->
+	<software name="bad_dudescd">
+		<description>Bad Dudes (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bad_dudes_cd" sha1="97d6a57218a1ffaf50f7d89071e21d784855381c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 -->
 	<!-- Disc label Bad_mojo_uk -->
 	<!-- TODO: weird installer, missing graphics? -->
@@ -2105,6 +2122,22 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from original media. size="1239040" crc="A9510DC8" sha1="609D186B01197D971D0C1A20DC8954F79DAC80D9" -->
+	<!-- Originally released on two 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
+	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="heavybarrelcd">
+		<description>Heavy Barrel (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heavybarrel_cd" sha1="0d6ea927d897d36f71d49950ccb805e807b92857" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ironbld">
 		<description>Iron Blood</description>
 		<year>1996</year>
@@ -2235,6 +2268,22 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ku2impact" sha1="2e1f1c8ce81065fcdf2081daa97c72180243f1e0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Created from original media. size="931840" crc="25324098" sha1="15C4E7C307CCFC972A73C7C309E4104579D41287" -->
+	<!-- Originally released on PC Booter 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
+	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="karnovcd">
+		<description>Karnov (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="karnov_cd" sha1="6fb90bf33a608b855b917c8dfe94c900b10c47a9" />
 			</diskarea>
 		</part>
 	</software>
@@ -2393,6 +2442,23 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pmouse" sha1="c135e153fc7f9accfa4d1c2fa9213e8587af24fc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Created from an ISO. size="6352896" crc="DCEEEB82" sha1="EA7BE8CB7E91FB97C590D23AEDFA371DC98CF5C0" -->
+	<!-- Originally released on 3.5" and 5.25" floppies. Reprinted on CD by GT Interactive and included in -->
+	<!-- "Arcade Favorites CD-Rom 5 Pak." Game can be run straight from the CD or installed to a hard drive. -->
+	<software name="pipemaniacd">
+		<description>Pipe Mania (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="alt_title" value="Pipe Dream" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pipemaniacd" sha1="be7d5677f92a9820b5114980f70ab153f9e9b7b7" />
 			</diskarea>
 		</part>
 	</software>
@@ -2666,6 +2732,21 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from original media. size="1230848" crc="71FF88DB" sha1="5AA5CB751B6236892CF74AB37A8A7E3953E866E0" -->
+	<!-- Originally released on one PC Booter 5.25" floppy disk. Reprinted on CD by GT Interactive as a -->
+	<!-- standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="tagteamcd">
+		<description>Tag Team Wrestling (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tagteam_cd" sha1="33eaebcca48c8a4382dc3ac87e346e393f47b2d8" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="turricn2">
 		<description>Turrican II - The Final Fight</description>
@@ -3214,7 +3295,7 @@ license:CC0
 			<!-- Missing -->
 			<feature name="part_id" value="BonusPak for OS/2 version 3"/>
 			<diskarea name="cdrom">
-				<disk name="bonuspak" status="nodump"/>
+				<disk name="bonus_pak" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -250,6 +250,42 @@ namespace bx
 	///
 	template<uint32_t Min>
 	BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
+
+	///
+	template <typename Ty>
+	bool isAligned(Ty _a, int32_t _align);
+
+	///
+	template <typename Ty>
+	bool isAligned(void* _ptr, int32_t _align);
+
+	///
+	template <typename Ty>
+	bool isAligned(const void* _ptr, int32_t _align);
+
+	///
+	template <typename Ty>
+	Ty alignDown(Ty _a, int32_t _align);
+
+	///
+	template <typename Ty>
+	Ty* alignDown(Ty* _ptr, int32_t _align);
+
+	///
+	template <typename Ty>
+	const Ty* alignDown(const Ty* _ptr, int32_t _align);
+
+	///
+	template <typename Ty>
+	Ty alignUp(Ty _a, int32_t _align);
+
+	///
+	template <typename Ty>
+	Ty* alignUp(Ty* _ptr, int32_t _align);
+
+	///
+	template <typename Ty>
+	const Ty* alignUp(const Ty* _ptr, int32_t _align);
 
 	/// Convert float to half-float.
 	///

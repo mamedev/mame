@@ -98,6 +98,12 @@ extern int RLOOP;
 
 void retro_osd_interface::update(bool skip_redraw)
 {
+	if (mame_reset == 1)
+	{
+		machine().schedule_soft_reset();
+		mame_reset = -1;
+	}
+	
 	osd_common_t::update(skip_redraw);
 
    // if we're not skipping this redraw, update all windows

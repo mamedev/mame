@@ -90,7 +90,7 @@
 		{ "type": "float", "name": "scanline_scale",         "text": "Overall Scanline Scale",     "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
- 		{ "type": "float", "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 2.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 2.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 1.50, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
@@ -181,12 +181,12 @@
 			"bilinear": false,
 			"doublebuffer": true
 		},
-		{	"name": "internal",
+		{   "name": "internal",
 			"mode": "native",
 			"scale": 2,
 			"doublebuffer": true
 		},
-		{	"name": "previous",
+		{   "name": "previous",
 			"mode": "native",
 			"scale": 2,
 			"doublebuffer": true
@@ -195,7 +195,7 @@
 
 	// passes (required): The list of individual shaders to invoke, and any dynamic input parameters they need.
 	"passes": [
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"name": "Blit to filterable surface for NTSC",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "and", "name": "adjustments", "value": 0 },
@@ -314,7 +314,7 @@
 			// value: Any valid ASCII string that names a target.
 			"output": "ntsc"
 		},
-		{	"effect": "hlsl/ntsc_decode",
+		{   "effect": "hlsl/ntsc_decode",
 			"name": "NTSC Decode",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
@@ -340,7 +340,7 @@
 			],
 			"output": "guest"
 		},
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"name": "NTSC Skip",
 			"disablewhen": [
 				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "adjustments", "value": 0 },
@@ -352,7 +352,7 @@
 			"applytint": true,
 			"output": "guest"
 		},
-		{	"effect": "hlsl/color",
+		{   "effect": "hlsl/color",
 			"name": "Color Convolution",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 }
@@ -370,14 +370,14 @@
 			],
 			"output": "guest"
 		},
- 		{	"effect": "hlsl/prescale",
+		{   "effect": "hlsl/prescale",
 			"name": "Prescale",
 			"input": [
 				{ "sampler": "s_tex", "target": "guest" }
 			],
 			"output": "internal"
 		},
-		{	"effect": "hlsl/deconverge",
+		{   "effect": "hlsl/deconverge",
 			"name": "Deconvergence",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",           "value": 0 },
@@ -424,7 +424,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "hlsl/defocus",
+		{   "effect": "hlsl/defocus",
 			"name": "Defocus Pass",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
@@ -438,7 +438,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "hlsl/post",
+		{   "effect": "hlsl/post",
 			"name": "Non-Bloom Post Pass",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",    "value": 0 },
@@ -468,7 +468,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "hlsl/phosphor",
+		{   "effect": "hlsl/phosphor",
 			"name": "Phosphor Decay",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
@@ -484,7 +484,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "hlsl/phosphor",
+		{   "effect": "hlsl/phosphor",
 			"name": "Phosphor Store",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
@@ -501,23 +501,23 @@
 			"output": "previous"
 		},
 		{
-		 	"effect": "hlsl/chroma",
-		 	"name": "Phosphor Chromaticity Conversion",
-		 	"disablewhen": [
-		 		{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 }
-		 	],
-		 	"uniforms": [
-		 		{ "uniform": "u_y_gain", "slider": "chroma_y_gain" },
-		 		{ "uniform": "u_chroma_a", "slider": "chroma_a" },
-		 		{ "uniform": "u_chroma_b", "slider": "chroma_b" },
+			"effect": "hlsl/chroma",
+			"name": "Phosphor Chromaticity Conversion",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_y_gain", "slider": "chroma_y_gain" },
+				{ "uniform": "u_chroma_a", "slider": "chroma_a" },
+				{ "uniform": "u_chroma_b", "slider": "chroma_b" },
 				{ "uniform": "u_chroma_c", "slider": "chroma_c" }
-		 	],
-		 	"input": [
-		 		{ "sampler": "s_tex", "target": "internal" }
-		 	],
-		 	"output": "internal"
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
 		},
-		{	"effect": "hlsl/distortion",
+		{   "effect": "hlsl/distortion",
 			"name": "Distortion Pass",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",      "value": 0 },
@@ -577,7 +577,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }

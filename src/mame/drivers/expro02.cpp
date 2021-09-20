@@ -1247,7 +1247,7 @@ Fantasia (c) 1994  Comad & New Japan System
 +--------------------------------------+
 
    CPU: MC68000P10
- Sound: OKI M6295 (rebaged as AD-65)
+ Sound: OKI M6295 (rebadged as AD-65)
  Video: TI TPC1020AFN-084C
    OSC: 16MHz & 12MHz
    DSW: 8-way switch x 2
@@ -1275,7 +1275,7 @@ Memory: HY62C256P-15, HY6264ALP-10
 +--------------------------------------+
 
    CPU: MC68000P10
- Sound: OKI M6295 (rebaged as AD-65)
+ Sound: OKI M6295 (rebadged as AD-65)
  Video: TI TPC1020AFN-084C x 2
    OSC: 16MHz & 12MHz
    DSW: 8-way switch x 2
