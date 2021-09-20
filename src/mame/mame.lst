@@ -1728,6 +1728,7 @@ partygrs                        // (c) 2001
 partygrsa                       // (c) 2001
 partygrsb                       // (c) 2001
 peaflut                         // (c) 2000
+peafluta                        // (c) 2000
 pengpay                         // (c) 1997
 pengpaya                        // (c) 1996
 pengpayb                        // (c) 1997
@@ -9782,11 +9783,13 @@ eballchp                        //
 esclwrld                        //
 esclwrldg                       //
 hardbody                        //
+hardbodyc                       //
 hardbodyg                       //
 hvymetap                        //
 hvymetapg                       //
 ladyluck                        //
 motrdome                        //
+motrdomeb                       //
 motrdomeg                       //
 prtyanim                        //
 prtyanimg                       //
@@ -11980,6 +11983,7 @@ hook_401                        //
 hook_401_p                      //
 hook_404                        //
 hook_408                        //
+hook_e406                       //
 jupk_305                        // (c) 1993 Data East
 jupk_307                        //
 jupk_501                        //
@@ -17622,6 +17626,7 @@ joystand                        // 1997 Yuvo
 america                         //
 aqualand                        //
 faeton                          //
+faeton6d                        //
 halley                          //
 halleya                         //
 lortium                         //
@@ -19428,6 +19433,9 @@ slimekun
 tsukande
 tsupenta
 tsururin
+
+@source:konmedal020.cpp
+gs471
 
 @source:konmedal68k.cpp
 crossmg2
@@ -23155,10 +23163,10 @@ realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
 
 @source:merits.cpp
+pubtimed2ch                     // (c) 1992 Merit Industries, Inc.
 scrpiond                        // (c) 1999 Merit Industries, Inc.
 scrpionda                       // (c) 1997 Merit Industries, Inc.
 scrpiondb                       // (c) 1993 Merit Industries, Inc.
-scrpiondc                       // (c) 1992 Merit Industries, Inc.
 
 @source:meritsdx.cpp
 scrpndx                        //

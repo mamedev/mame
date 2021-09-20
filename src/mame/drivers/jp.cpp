@@ -492,6 +492,11 @@ ROM_START(faeton)
 	ROM_LOAD("faeton.cpu", 0x0000, 0x2000, CRC(ef7e6915) SHA1(5d3d86549606b3d9134bb3f6d3026d6f3e07d4cd))
 ROM_END
 
+ROM_START(faeton6d)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("faeton6d.bin", 0x0000, 0x2000, CRC(e7c45ba4) SHA1(c0f82271ef44841c599f0e7b9a1ed9cd16f0580a))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Halley Comet #1104
 /-------------------------------------------------------------------*/
@@ -637,7 +642,8 @@ GAME(1984,  petaco,   0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Popul
 GAME(1985,  petacon,  0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1985,  petacona, 0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME(1985,  petaco2,  0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1985,  faeton,   0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  faeton,   0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  faeton6d, faeton, jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1986,  halley,   0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1986,  halleya,  halley, jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1986,  aqualand, 0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

@@ -250,8 +250,6 @@ static const nes_pcb pcb_list[] =
 	{ "n625092",          UNL_N625092 },
 	{ "a65as",            BMC_A65AS },
 	{ "t262",             BMC_T262 },
-	{ "novel1",           BMC_NOVEL1 },
-	{ "novel2",           BMC_NOVEL2 },  // mapper 213... same as BMC-NOVELDIAMOND9999999IN1 board?
 	{ "studyngame",       UNL_STUDYNGAME },  // mapper 39
 	{ "sgun20in1",        BMC_SUPERGUN_20IN1 },
 	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 59
@@ -259,6 +257,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_80013b",       BMC_80013B },
 	{ "bmc_810544c",      BMC_810544C },
 	{ "bmc_830425c",      BMC_830425C },
+	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
 	{ "bmc_jy820845c",    BMC_JY820845C },
 	{ "n32_4in1",         BMC_N32_4IN1 },
@@ -320,6 +319,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_f15",          BMC_F15 },
 	{ "bmc_gn45",         BMC_GN45 },
 	{ "bmc_gold7in1",     BMC_GOLD_7IN1 },
+	{ "bmc_00202650",     BMC_00202650 },
 	{ "bmc_411120c",      BMC_411120C },
 	{ "bmc_820720c",      BMC_820720C },
 	{ "bmc_830118c",      BMC_830118C },
@@ -362,6 +362,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II
 	{ "nocash_nochr",     NOCASH_NOCHR },
 	{ "action53",         UNL_ACTION53 },
+	{ "batmap_srrx",      BATMAP_SRRX },
 	{ "cufrom",           UNL_CUFROM },
 	{ "unrom512",         UNL_UNROM512 },
 	{ "2a03pur",          UNL_2A03PURITANS },
@@ -670,7 +671,18 @@ void nes_cart_slot_device::call_load_pcb()
 		memcpy(m_cart->get_vrom_base(), get_software_region("chr"), vrom_size);
 	}
 
-	// SETUP steps 7: allocate the remaining pointer, when needed
+	// SETUP steps 7: allocate pointers for any extra chip data, when needed
+	if (m_pcb_id == BATMAP_SRRX)
+	{
+		uint32_t dpcm_size = get_software_region_length("dpcm");
+		if (dpcm_size)
+		{
+			m_cart->misc_rom_alloc(dpcm_size, tag());
+			memcpy(m_cart->get_misc_rom_base(), get_software_region("dpcm"), dpcm_size);
+		}
+	}
+
+	// SETUP steps 8: allocate the remaining pointers, when needed
 	if (vram_size)
 		m_cart->vram_alloc(vram_size);
 	if (prgram_size)

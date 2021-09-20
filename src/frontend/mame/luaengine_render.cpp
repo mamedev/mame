@@ -291,63 +291,17 @@ void lua_engine::initialize_render(sol::table &emu)
 				"set_animation_state_callback",
 				"animation state");
 	layout_view_item_type["set_bounds_callback"] =
-		[this] (layout_view::item &i, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				i.set_bounds_callback(layout_view::item::bounds_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				i.set_bounds_callback(layout_view::item::bounds_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] (render_bounds &b)
-							{
-								auto result(invoke(cbfunc).get<sol::optional<render_bounds> >());
-								if (result)
-								{
-									b = *result;
-								}
-								else
-								{
-									osd_printf_error("[LUA ERROR] invalid return from bounds callback\n");
-									b = render_bounds{ 0.0, 0.0, 1.0, 1.0 };
-								}
-							}));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_bounds_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<render_bounds>(
+				&layout_view::item::set_bounds_callback,
+				[] () { return render_bounds{ 0.0f, 0.0f, 1.0f, 1.0f }; },
+				"set_bounds_callback",
+				"bounds");
 	layout_view_item_type["set_color_callback"] =
-		[this] (layout_view::item &i, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				i.set_color_callback(layout_view::item::color_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				i.set_color_callback(layout_view::item::color_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] (render_color &c)
-							{
-								auto result(invoke(cbfunc).get<sol::optional<render_color> >());
-								if (result)
-								{
-									c = *result;
-								}
-								else
-								{
-									osd_printf_error("[LUA ERROR] invalid return from color callback\n");
-									c = render_color{ 1.0, 1.0, 1.0, 1.0 };
-								}
-							}));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_bounds_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<render_color>(
+				&layout_view::item::set_color_callback,
+				[] () { return render_color{ 1.0f, 1.0f, 1.0f, 1.0f }; },
+				"set_color_callback",
+				"color");
 	layout_view_item_type["id"] = sol::property(
 			[] (layout_view::item &i, sol::this_state s) -> sol::object
 			{

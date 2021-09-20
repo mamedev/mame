@@ -86,7 +86,7 @@ static const nes_mmc mmc_list[] =
 	{ 51, BMC_BALLGAMES_11IN1 },
 	{ 52, BMC_GOLD_7IN1 },
 	{ 53, SVISION16_BOARD },
-	{ 54, BMC_NOVEL1 },
+	{ 54, BMC_21IN1 },   // duplicate of mapper 201, though possibly should be "Unused"
 	{ 55, UNL_MMALEE },  // Genius SMB
 	{ 56, KAISER_KS202 },
 	{ 57, BMC_GKA },
@@ -246,7 +246,7 @@ static const nes_mmc mmc_list[] =
 	{ 210, NAMCOT_175 },
 	{ 211, JYCOMPANY_B },
 	{ 212, BMC_SUPERHIK_300IN1 },
-	{ 213, BMC_NOVEL2 },
+	{ 213, BMC_GKB },           // duplicate of mapper 58
 	{ 214, BMC_SUPERGUN_20IN1 },
 	{ 215, UNL_8237 },          // and UNL_8237A
 	{ 216, RCM_GS2015 },
@@ -288,7 +288,7 @@ static const nes_mmc mmc_list[] =
 	{ 252, WAIXING_SGZ },
 	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
 	{ 254, BTL_PIKACHUY2K },
-	{ 255, BMC_72IN1 },
+	{ 255, BMC_72IN1 },         // duplicate of mapper 225
 
 	// NES 2.0
 	// 256 OneBus Famiclones
@@ -417,7 +417,7 @@ static const nes_mmc mmc_list[] =
 	// 379 35-in-1 multicart, similar to mapper 38
 	// 380 970630C multicart
 	{ 381, UNL_KN42 },             // 2-in-1 Big Nose games
-	// 382 830928C 5-in-1 and 9-in-1 multicarts
+	{ 382, BMC_830928C },
 	// 383 JY-014 multicart
 	// 384 4-in-1 VRC4 clone with Crisis Force
 	// 385 NTDEC 2779 5-in-1, not in nes.xml?
@@ -427,7 +427,7 @@ static const nes_mmc mmc_list[] =
 	{ 389, CALTRON_9IN1 },
 	// 390 variant of mapper 236?
 	// 391 BS-110 MMC3 clone
-	// 392 8-in-1 variant of mc_sv16
+	{ 392, BMC_00202650 },
 	{ 393, BMC_820720C },
 	// 394 Realtec HSK007 multicart
 	// 395 Realtec 8210 multicarts
@@ -448,7 +448,7 @@ static const nes_mmc mmc_list[] =
 	// 410 Unused or JY?
 	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
-	// 413 homebrew game Super Russian Roulette
+	{ 413, BATMAP_SRRX },          // homebrew game Super Russian Roulette
 	// 414 9999999-in-1 multicart
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
 	{ 416, BMC_N32_4IN1 },

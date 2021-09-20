@@ -34,6 +34,7 @@
 #include "act53.h"
 #include "aladdin.h"
 #include "ave.h"
+#include "batlab.h"
 #include "benshieng.h"
 #include "camerica.h"
 #include "cne.h"
@@ -365,14 +366,13 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("n625092",          NES_N625092);
 	device.option_add_internal("a65as",            NES_A65AS);
 	device.option_add_internal("t262",             NES_T262);
-	device.option_add_internal("novel1",           NES_NOVEL1);
-	device.option_add_internal("novel2",           NES_NOVEL2); // mapper 213... same as BMC-NOVELDIAMOND9999999IN1 board?
 	device.option_add_internal("studyngame",       NES_STUDYNGAME); // mapper 39
 	device.option_add_internal("sgun20in1",        NES_SUPERGUN20IN1);
 	device.option_add_internal("bmc_vt5201",       NES_VT5201); // mapper 59
 	device.option_add_internal("bmc_60311c",       NES_BMC_60311C);
 	device.option_add_internal("bmc_80013b",       NES_BMC_80013B);
 	device.option_add_internal("bmc_810544c",      NES_BMC_810544C);
+	device.option_add_internal("bmc_830928c",      NES_BMC_830928C);
 	device.option_add_internal("bmc_830425c",      NES_BMC_830425C);
 	device.option_add_internal("bmc_850437c",      NES_BMC_850437C);
 	device.option_add_internal("bmc_jy820845c",    NES_BMC_JY820845C);
@@ -442,6 +442,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_f15",          NES_BMC_F15);
 	device.option_add_internal("bmc_gn45",         NES_BMC_GN45);
 	device.option_add_internal("bmc_gold7in1",     NES_BMC_GOLD7IN1);
+	device.option_add_internal("bmc_00202650",     NES_BMC_00202650);
 	device.option_add_internal("bmc_411120c",      NES_BMC_411120C);
 	device.option_add_internal("bmc_820720c",      NES_BMC_820720C);
 	device.option_add_internal("bmc_830118c",      NES_BMC_830118C);
@@ -450,6 +451,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("pjoy84",           NES_PJOY84);
 	device.option_add_internal("nocash_nochr",     NES_NOCHR);
 	device.option_add_internal("action53",         NES_ACTION53);
+	device.option_add_internal("batmap_srrx",      NES_BATMAP_SRRX);
 	device.option_add_internal("cufrom",           NES_CUFROM);
 	device.option_add_internal("unrom512",         NES_UNROM512);
 	device.option_add_internal("2a03pur",          NES_2A03PURITANS);

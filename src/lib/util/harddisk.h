@@ -48,6 +48,8 @@ void hard_disk_close(hard_disk_file *file);
 chd_file *hard_disk_get_chd(hard_disk_file *file);
 hard_disk_info *hard_disk_get_info(hard_disk_file *file);
 
+bool hard_disk_set_block_size(hard_disk_file *file, uint32_t blocksize);
+
 uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer);
 uint32_t hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer);
 

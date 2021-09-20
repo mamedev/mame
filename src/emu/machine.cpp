@@ -414,7 +414,7 @@ int running_machine::run(bool quiet)
 	}
 	catch (binding_type_exception &btex)
 	{
-		osd_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
+		osd_printf_error("Error performing a late bind of function expecting type %s to instance of type %s\n", btex.target_type().name(), btex.actual_type().name());
 		error = EMU_ERR_FATALERROR;
 	}
 	catch (tag_add_exception &aex)
