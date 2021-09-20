@@ -546,7 +546,7 @@ ROM_START( kot )
 	ROM_LOAD( "849.4", 0x06000, 0x2000, CRC(5d27fda6) SHA1(f1afb39c7422caaa5eff53388f1b7241dd7c1cd7) )
 ROM_END
 
-// Actual release dates unknown. konek, bilyard and kot was made before 1988, koroleva after 1988.
+// Actual release dates unknown. According to one of developers konek, bilyard and kot was released before 1988, koroleva after 1988.
 GAME( 198?, konek,    0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
 GAME( 198?, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
 GAME( 198?, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
