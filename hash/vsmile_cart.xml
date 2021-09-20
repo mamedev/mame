@@ -3046,7 +3046,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="upspr022" cloneof="up001">
+	<software name="upspr022" cloneof="upr001">
 		<description>Disney/Pixar Up (Spain, rev. 022)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
