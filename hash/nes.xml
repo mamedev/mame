@@ -80675,15 +80675,19 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_63gb" supported="no">
+<!-- The UNIF file contained separate PRG banks -->
+	<software name="mc_63gb">
 		<description>Ghostbusters 63 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gb63" />
+			<feature name="slot" value="bmc_76in1" />
 			<feature name="pcb" value="BMC-GHOSTBUSTERS63IN1" />
-			<dataarea name="prg" size="1572864">
-				<rom name="63-in-1 (ghostbusters63in1) [p1][u].prg" size="1572864" crc="54f2e672" sha1="d5316ddc53a4a70f99f80a0d4c9831b4835e0050" offset="00000" status="baddump" />
+			<dataarea name="prg" size="2097152">
+				<rom name="63-in-1 (ghostbusters63in1) [p1][u].prg0" size="524288" crc="64750df8" sha1="cfc6bd97c38061e344e37a2ce5d46d703fc1ee77" offset="0x000000" status="baddump" />
+				<rom size="524288" offset="0x080000" loadflag="reload" />
+				<rom name="63-in-1 (ghostbusters63in1) [p1][u].prg2" size="524288" crc="d01373cf" sha1="f26875339384d3700a9493d7044eb67fbc709c7b" offset="0x100000" status="baddump" />
+				<rom name="63-in-1 (ghostbusters63in1) [p1][u].prg3" size="524288" crc="561d4e03" sha1="170a43555a0883f18edc97d806430abbeec6bc83" offset="0x180000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -82664,7 +82668,7 @@ to check why this is different -->
 	</software>
 
 <!-- The UNIF file contained separate PRG banks  -->
-	<software name="mc_16sv" supported="no">
+	<software name="mc_16sv">
 		<description>Super 128k - 16 in 1</description>
 		<year>19??</year>
 		<publisher>Supervision</publisher>
