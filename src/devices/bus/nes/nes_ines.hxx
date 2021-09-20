@@ -660,7 +660,7 @@ void nes_cart_slot_device::call_load_ines()
 		{
 			vrom_size = expsize(header[5]);
 			if (vrom_size == 0)    // 0 only on overflow
-				fatalerror("NES 2.0 PRG size >= 4GB is unsupported.\n");
+				fatalerror("NES 2.0 CHR size >= 4GB is unsupported.\n");
 		}
 		else
 			vrom_size += ((header[9] & 0xf0) << 4) * 0x2000;
