@@ -513,7 +513,7 @@ static const nes_mmc mmc_list[] =
 	// { 548, BTL_CTC15 },            // Almana no Kiseki alt FDS conversion (dump available?)
 	{ 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
 	{ 550, BMC_JY820845C },
-	// 551 variant of mapper 178, likely shenghuo, jingkzx, xiaokecq, zgfyun in nes.xml
+	{ 551, JNCOTA_KT1001 },
 	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
