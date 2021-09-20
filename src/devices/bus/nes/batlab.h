@@ -5,7 +5,21 @@
 
 #pragma once
 
-#include "nxrom.h"
+#include "mmc3.h"
+
+
+// ======================> nes_batmap_000_device
+
+class nes_batmap_000_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_batmap_000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
 
 
 // ======================> nes_batmap_srrx_device
@@ -40,6 +54,7 @@ private:
 
 
 // device type definition
+DECLARE_DEVICE_TYPE(NES_BATMAP_000,  nes_batmap_000_device)
 DECLARE_DEVICE_TYPE(NES_BATMAP_SRRX, nes_batmap_srrx_device)
 
 #endif // MAME_BUS_NES_BATLAB_H

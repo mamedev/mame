@@ -8,7 +8,8 @@
 
  Here we emulate the following homebrew PCBs
 
- * BATLAP BATMAP-SRR-X [mapper 413]
+ * Batlab BATMAP-000 [mapper 399]
+ * Batlab BATMAP-SRR-X [mapper 413]
 
  ***********************************************************************************************************/
 
@@ -32,8 +33,14 @@
 //  constructor
 //-------------------------------------------------
 
+DEFINE_DEVICE_TYPE(NES_BATMAP_000,  nes_batmap_000_device,  "nes_batmap_000",  "NES Cart Batlab BATMAP-000 PCB")
 DEFINE_DEVICE_TYPE(NES_BATMAP_SRRX, nes_batmap_srrx_device, "nes_batmap_srrx", "NES Cart Batlab BATMAP-SRR-X PCB")
 
+
+nes_batmap_000_device::nes_batmap_000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BATMAP_000, tag, owner, clock)
+{
+}
 
 nes_batmap_srrx_device::nes_batmap_srrx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BATMAP_SRRX, tag, owner, clock), m_reg(0), m_dpcm_addr(0), m_dpcm_ctrl(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
@@ -41,6 +48,16 @@ nes_batmap_srrx_device::nes_batmap_srrx_device(const machine_config &mconfig, co
 }
 
 
+
+void nes_batmap_000_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x0f, 0xff, 0);
+
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);
+	chr8(0, CHRRAM);
+}
 
 void nes_batmap_srrx_device::device_start()
 {
@@ -74,6 +91,42 @@ void nes_batmap_srrx_device::pcb_reset()
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
+
+/*-------------------------------------------------
+
+ Batlab BATMAP-000 board
+
+ Games: Star Versus, Anamanaguchi carts? (not dumped?)
+
+ These boards have been seen using a Xilinx XC9572XL CPLD.
+ This provides a clone of MMC3-style IRQ and mirroring
+ (not sure how it may differ) with simpler PRG/CHR banking.
+ Boards are marked as having 1MB PRG, swappable in 8K banks
+ at 0xa000 and 0xc000, and 32KB CHR, swappable in 4K banks.
+
+ NES 2.0: mapper 399
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_batmap_000_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("batmap_000 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+		case 0x0000:
+			chr4_x(BIT(data, 7) << 2, data & 0x07, CHRRAM);
+			break;
+		case 0x0001:
+			prg8_x(BIT(data, 7) + 1, data & 0x7f);
+			break;
+		default:
+			txrom_write(offset, data);
+			break;
+	}
+}
 
 /*-------------------------------------------------
 
