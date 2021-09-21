@@ -100,6 +100,18 @@ class diamond_inheritance : public virtual_derived_a, public virtual_derived_b
 
 
 //-------------------------------------------------
+//  pure_virtual_base - abstract class with a
+//  vtable
+//-------------------------------------------------
+
+struct pure_virtual_base
+{
+	virtual ~pure_virtual_base() = default;
+	virtual char operator()(void const *&p) const = 0;
+};
+
+
+//-------------------------------------------------
 //  ioport_string_from_index - return an indexed
 //  string from the I/O port system
 //-------------------------------------------------
@@ -1419,18 +1431,12 @@ void validate_delegates_mfp()
 
 void validate_delegates_latebind()
 {
-	struct target
-	{
-		virtual ~target() = default;
-		virtual char operator()(void const *&p) const = 0;
-	};
-
-	struct derived_a : target, delegate_late_bind
+	struct derived_a : pure_virtual_base, delegate_late_bind
 	{
 		virtual char operator()(void const *&p) const override { p = this; return 'a'; }
 	};
 
-	struct derived_b : target, delegate_late_bind
+	struct derived_b : pure_virtual_base, delegate_late_bind
 	{
 		virtual char operator()(void const *&p) const override { p = this; return 'b'; }
 	};
@@ -1446,7 +1452,7 @@ void validate_delegates_latebind()
 	unrelated u;
 
 	// delegate with no target object
-	test_delegate cb1(&target::operator(), static_cast<target *>(nullptr));
+	test_delegate cb1(&pure_virtual_base::operator(), static_cast<pure_virtual_base *>(nullptr));
 
 	// test late bind on construction
 	test_delegate cb2(cb1, a);
@@ -1482,14 +1488,14 @@ void validate_delegates_latebind()
 	}
 	catch (binding_type_exception const &e)
 	{
-		if ((e.target_type() != typeid(target)) || (e.actual_type() != typeid(unrelated)))
+		if ((e.target_type() != typeid(pure_virtual_base)) || (e.actual_type() != typeid(unrelated)))
 		{
 			osd_printf_error(
 					"Error testing delegate late bind type error %s -> %s (expected %s -> %s)\n",
 					e.actual_type().name(),
 					e.target_type().name(),
 					typeid(unrelated).name(),
-					typeid(target).name());
+					typeid(pure_virtual_base).name());
 		}
 		ch = '+';
 	}
@@ -1497,7 +1503,7 @@ void validate_delegates_latebind()
 		osd_printf_error("Error testing delegate late bind type error\n");
 
 	// test syntax for creating delegate with alternate late bind base
-	delegate<char (void const *&), target> cb4(
+	delegate<char (void const *&), pure_virtual_base> cb4(
 			[] (auto &o, void const *&p) { p = &o; return 'l'; },
 			static_cast<unrelated *>(nullptr));
 	try { cb1.late_bind(a); }

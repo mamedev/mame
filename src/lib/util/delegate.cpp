@@ -113,10 +113,11 @@ delegate_generic_function delegate_mfp_itanium::convert_to_generic(delegate_gene
 //-------------------------------------------------
 //  delegate_mfp_msvc::adjust_this_pointer - given
 //  an object pointer and member function pointer,
-//  apply the displacement
+//  apply the displacement, and walk past
+//  recognisable thunks
 //-------------------------------------------------
 
-void delegate_mfp_msvc::adjust_this_pointer(delegate_generic_class *&object) const
+delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generic_class *&object) const
 {
 	LOG("Input this=%p ", reinterpret_cast<void const *>(object));
 	if (sizeof(single_base_equiv) < m_size)
@@ -124,16 +125,53 @@ void delegate_mfp_msvc::adjust_this_pointer(delegate_generic_class *&object) con
 	if (sizeof(unknown_base_equiv) == m_size)
 		LOG("vptrdelta=%d vindex=%d ", m_vptr_offs, m_vt_index);
 	std::uint8_t *byteptr = reinterpret_cast<std::uint8_t *>(object);
+
+	// test for pointer to member function cast across virtual inheritance relationship
 	if ((sizeof(unknown_base_equiv) == m_size) && m_vt_index)
 	{
+		// add offset from "this" pointer to location of vptr, and add offset to virtual base from vtable
 		byteptr += m_vptr_offs;
 		std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(byteptr);
 		byteptr += *reinterpret_cast<int const *>(vptr + m_vt_index);
 	}
+
+	// add "this" pointer displacement if present in the pointer to member function
 	if (sizeof(single_base_equiv) < m_size)
 		byteptr += m_this_delta;
 	LOG("Calculated this=%p\n", reinterpret_cast<void const *>(byteptr));
 	object = reinterpret_cast<delegate_generic_class *>(byteptr);
+
+	// walk past recognisable thunks
+	std::uint8_t const *func = reinterpret_cast<std::uint8_t const *>(m_function);
+#if defined(__x86_64__) || defined(_M_X64)
+	while (true)
+	{
+		if (0xe9 == func[0])
+		{
+			// absolute jump with 32-bit displacement
+			LOG("Found relative jump at %p ", func);
+			func += 5 + *reinterpret_cast<std::int32_t const *>(func + 1);
+			LOG("redirecting to %p\n", func);
+		}
+		else if ((0x48 == func[0]) && (0x8b == func[1]) && (0x01 == func[2]) && (0xff == func[3]) && ((0x60 == func[4]) || (0xa0 == func[4])))
+		{
+			// virtual function call thunk - mov rax,QWORD PTR [rcx] ; jmp QWORD PTR [rax+...]
+			LOG("Found virtual member function thunk at %p ", func);
+			std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(object);
+			if (0x60 == func[4])
+				func = *reinterpret_cast<std::uint8_t const *const *>(vptr + *reinterpret_cast<std::int8_t const *>(func + 5));
+			else
+				func = *reinterpret_cast<std::uint8_t const *const *>(vptr + *reinterpret_cast<std::int32_t const *>(func + 5));
+			LOG("redirecting to %p\n", func);
+		}
+		else
+		{
+			// not something we can easily bypass
+			break;
+		}
+	}
+#endif
+	return reinterpret_cast<delegate_generic_function>(std::uintptr_t(func));
 }
 
 } // namespace util::detail

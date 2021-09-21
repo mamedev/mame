@@ -506,8 +506,7 @@ public:
 	template <typename FunctionType>
 	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
 	{
-		funcptr = reinterpret_cast<FunctionType>(m_function);
-		return adjust_this_pointer(object);
+		funcptr = reinterpret_cast<FunctionType>(adjust_this_pointer(object));
 	}
 
 	template <typename FunctionType>
@@ -516,8 +515,8 @@ public:
 	}
 
 private:
-	// adjust the object pointer
-	void adjust_this_pointer(delegate_generic_class *&object) const;
+	// adjust the object pointer and bypass thunks
+	delegate_generic_function adjust_this_pointer(delegate_generic_class *&object) const;
 
 	// actual state
 	uintptr_t   m_function = 0;     // pointer to function or non-virtual thunk for virtual function call
