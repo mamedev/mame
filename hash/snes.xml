@@ -4258,6 +4258,51 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="raidenjp" cloneof="raiden">
+		<description>Raiden Densetsu (Jpn, prototype)</description>
+		<year>1991</year>
+		<publisher>Toei Animation</publisher>
+		<info name="alt_title" value="雷電伝説" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" /> <!-- SN74LS139N on the chip -->
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411 9111 A" />
+			<feature name="battery" value="BATT CR2032" /> <!-- empty socket -->
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="raiden_densetsu_prototype_v1.24.smc" size="1048576" crc="e72e8de3" sha1="fd758761885a6dcfe8aee62ce67a3112b40a8d58" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raidenp" cloneof="raiden">
+		<description>Raiden Trad (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Electro Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" /> <!-- MC74F139N on the chip -->
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411 9103 A" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="raiden trad (prototype).sfc" size="1048576" crc="7a384a02" sha1="01bee3646d06b2f7fdd59afac9b43d0a4eda076f" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shadowa" cloneof="shadow">
 		<description>The Shadow (USA, Prototype, Alt)</description>
 		<year>199?</year>
