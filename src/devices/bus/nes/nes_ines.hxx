@@ -396,7 +396,7 @@ static const nes_mmc mmc_list[] =
 	// 358 JY multicarts, variant of mapper 282
 	// 359 BMC-SB-5013 multicarts
 	// 360 Bit Corp 31-in-1 (ID 3150) (has five accessible DIP switches!)
-	{ 361, BMC_841101C },
+	{ 361, BMC_YY841101C },
 	// 362 JY-005 multicart
 	// 363 variant of mapper 358?
 	{ 364, BMC_830832C },
@@ -411,7 +411,7 @@ static const nes_mmc mmc_list[] =
 	// 373 Super 4-in-1, not in nes.xml?
 	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
-	// 376 JY-041 multicart
+	{ 376, BMC_YY841155C },
 	// 377 JY-111 multicart, similar to mapper 367
 	// 378 8-in-1 multicart, which one?
 	// 379 35-in-1 multicart, similar to mapper 38

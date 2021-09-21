@@ -51794,7 +51794,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1994</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="prg" size="524288">
 				<rom name="1994 ball 4-in-1 series (jy-009).prg" size="524288" crc="a75d2f6d" sha1="2b4250e0d0ad2225003d7f178bcc8fc353a27ea3" status="baddump" />
 			</dataarea>
@@ -51843,7 +51843,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1996</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-018).prg" size="524288" crc="b8740880" sha1="8e05438c36323e8c400c257d5d8007bfe5841d20" status="baddump" />
 			</dataarea>
@@ -51858,7 +51858,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1995</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-019).prg" size="524288" crc="5bb37e97" sha1="126b4701467e9cb94c69b079563937429f3fd3bf" status="baddump" />
 			</dataarea>
@@ -51873,7 +51873,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1996</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-020).prg" size="524288" crc="e858f260" sha1="60e0d13f27f567ed259aa8b91fe0f2b07e8a719e" status="baddump" />
 			</dataarea>
@@ -52016,6 +52016,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="1048576">
 				<rom name="1995 super hik 4-in-1 (jy-040).chr" size="1048576" crc="dc6704ce" sha1="0aa69fb1cd5d9bdd8b4d6c8626dea7fd0fd869e1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8jy41">
+		<description>Donkey Kong 8 in 1 (JY-041)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_yy841155c" />
+			<dataarea name="prg" size="524288">
+				<rom name="8-in-1 (jy-041).prg" size="524288" crc="7e7b1450" sha1="628fb99349060e21cd3e0b8386619018e470d438" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="8-in-1 (jy-041).chr" size="524288" crc="001b4bdf" sha1="7137baecda227bfebc2e810e9a4bef6d7fcb9eb7" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -55997,36 +56012,42 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="grandia" supported="no">
-		<description>Grandia (Chi)</description>
-		<year>199?</year>
+		<description>Grandia (China)</description>
+		<year>1998</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1078"/>
 		<info name="alt_title" value="格兰蒂亚"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says Mapper 227?!? -->
+			<feature name="slot" value="bmc_1200in1" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[es-1078] ge lan di ya (c).prg" size="1048576" crc="d176696b" sha1="2da44453b8276e5c2906c358cbb0f14e694f5125" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
 	<software name="grandiaa" cloneof="grandia" supported="no">
-		<description>Grandia (Chi, Alt)</description>
-		<year>199?</year>
+		<description>Grandia (China, alt)</description>
+		<year>1998</year>
 		<publisher>CoolBoy</publisher>
 		<info name="alt_title" value="格兰蒂亚"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says Mapper 227?!? -->
+			<feature name="slot" value="bmc_1200in1" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[cb] ge lan di ya (c).prg" size="1048576" crc="60b892cc" sha1="a7398436a77953a17f14fdf06422875c72fb9e76" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -56101,12 +56122,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="宠物进化史"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />  <!-- header says mapper 162! -->
+			<feature name="pcb" value="UNKNOWN" />  <!-- unimplemented mapper 558 -->
 			<dataarea name="prg" size="1048576">
 				<rom name="[es-1085] chong wu jin hua shi (c).prg" size="1048576" crc="8b41d49c" sha1="db969702b2adeb77fa07e99bc1f14838c03f48aa" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -79924,7 +79949,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="chr" size="524288">
 				<rom name="4-in-1 (ok-411)[p1].chr" size="524288" crc="b9300c30" sha1="90cef987aac482e7402891892779847cffaa6ef0" offset="00000" status="baddump" />
 			</dataarea>
