@@ -199,7 +199,7 @@ void spifi3_device::map(address_map &map)
     map(0x38, 0x3b).rw(FUNC(spifi3_device::fifoctrl_r), FUNC(spifi3_device::fifoctrl_w));
     map(0x40, 0x43).lrw32(NAME([this]() { LOG("read spifi_reg.config = 0x%x\n", spifi_reg.config); return spifi_reg.config; }), NAME([this](uint32_t data) { LOG("write spifi_reg.config = 0x%x\n", data); spifi_reg.config = data; }));
     map(0x54, 0x57).w(FUNC(spifi3_device::select_w));
-    map(0x54, 0x57).lr32(NAME([this]() { LOG("read spifi_reg.select = 0x%x\n", spifi_reg.select); /*select_w(spifi_reg.select | SEL_ISTART);*/ return spifi_reg.select; })); // TODO: mrom expects selection retries to happen automatically, but it does read the register - does this trigger a reselection attempt?
+    map(0x54, 0x57).lr32(NAME([this]() { LOG("read spifi_reg.select = 0x%x\n", spifi_reg.select); return spifi_reg.select; }));
     map(0x58, 0x5b).rw(FUNC(spifi3_device::prcmd_r), FUNC(spifi3_device::prcmd_w));
     map(0x5c, 0x5f).rw(FUNC(spifi3_device::auxctrl_r), FUNC(spifi3_device::auxctrl_w));
     map(0x60, 0x63).w(FUNC(spifi3_device::autodata_w));
@@ -419,7 +419,7 @@ void spifi3_device::prcmd_w(uint32_t data)
     LOG("write spifi_reg.prcmd = 0x%x\n", data);
     spifi_reg.prcmd = data;
 
-    switch(data) // TODO: commands might be queued like the 5390?
+    switch(data)
     {
         // TODO: a lot of these can be consolidated
         case PRC_DATAOUT:
@@ -428,8 +428,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = false; // TODO:
-            dma_set(DMA_NONE); // TODO:
+            dma_command = true; // TODO: This seems to be triggered by a write to the AUTODATA register. Not sure how to "reset" that, so to speak
+            dma_set(DMA_OUT); // TODO: This seems to be triggered by a write to the AUTODATA register. Not sure how to "reset" that, so to speak
             check_drq();
             step(false);
             break;
@@ -688,7 +688,6 @@ void spifi3_device::check_drq()
 
         case DMA_IN: // device to memory
         {
-            LOG("Checking DRQ! Even fifo count: %d\n", m_even_fifo.size());
             drq_state = !transfer_count_zero() && !m_even_fifo.empty();
             break;
         }

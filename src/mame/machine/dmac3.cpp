@@ -136,8 +136,14 @@ void dmac3_device::reset_controller(DMAC3_Controller controller)
 
 uint32_t dmac3_device::dmac3_virt_to_phys(uint32_t v_address)
 {
-	// FIXME: the bitmask & in the following line is in the wrong place
-	uint32_t dmac_page_address = BASE_MAP_ADDRESS + 8 * ((v_address >> 12) & ~0xC0000); // Convert page number to PTE address. NEWS-OS sets upper bits in the VADDRESS
+	if(v_address & 0x80000000)
+	{
+		// Wild speculation based on what NEWS-OS tries to do during boot - it populates a kseg0 address
+		// Now, is it doing that because there is something wrong elsewhere that leads to it sometimes
+		// using kseg0 addresses, or does the DMAC3 support a direct mode? Haven't figured that out yet.
+		return v_address & ~0x80000000;
+	}
+	uint32_t dmac_page_address = BASE_MAP_ADDRESS + 8 * (v_address >> 12); // Convert page number to PTE address.
 	uint64_t raw_pte = m_bus->read_qword(dmac_page_address);
 	dmac3_pte pte;
 	pte.valid = (raw_pte & ENTRY_VALID) > 0;
@@ -147,8 +153,7 @@ uint32_t dmac3_device::dmac3_virt_to_phys(uint32_t v_address)
 
 	if(!pte.valid)
 	{
-		LOG("WARNING: DMAC3 TLB out of universe! Check the DMA mapping RAM! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, dmac_page_address, raw_pte);
-		// fatalerror("DMAC3 TLB: out of universe!"); // TODO: is there an interrupt or something we can signal to the host instead?
+		fatalerror("DMAC3 TLB out of universe! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, dmac_page_address, raw_pte);
 	}
 
 	return (pte.pfnum << 12) + (v_address & 0xFFF);
@@ -207,11 +212,10 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
 
 		// Increment byte offset
 		++m_controllers[controller].address;
-		if ((m_controllers[controller].address & DMAC_PAGE_MASK) + 0x1000 > MAP_RAM_SIZE)
+		if ((m_controllers[controller].address & 0x80000000) == 0 && (m_controllers[controller].address & DMAC_PAGE_MASK) + 0x1000 > MAP_RAM_SIZE)
 		{
-			// XXX Is there an interrupt or some other way to handle this besides killing the emulation?
-			//fatalerror("DMAC3 address overflow! Ran beyond the bounds of the MAP RAM!");
-			LOG("WARNING: DMAC3 address overflow! Ran beyond the bounds of the MAP RAM; ignore this if MSB maybe?\n");
+			// TODO: Is there an interrupt or some other way to handle this besides killing the emulation?
+			fatalerror("DMAC3 address overflow! Ran beyond the bounds of the MAP RAM!");
 		}
 
 		// Decrement transfer count

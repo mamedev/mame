@@ -495,7 +495,7 @@ void news_r4k_state::cpu_map(address_map &map)
     // TODO: sb sound subsystem (0x1ed00000)
 
     // HID (kb + ms)
-    map(0x1f900000, 0x1f900027).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
+    map(0x1f900000, 0x1f900047).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
 
     // TODO: lp (0x1ed30000)
 
@@ -779,7 +779,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    // LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
+    LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
     return value;
 }
 
