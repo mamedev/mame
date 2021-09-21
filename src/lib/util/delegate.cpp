@@ -142,25 +142,27 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 	object = reinterpret_cast<delegate_generic_class *>(byteptr);
 
 	// walk past recognisable thunks
-	std::uint8_t const *func = reinterpret_cast<std::uint8_t const *>(m_function);
 #if defined(__x86_64__) || defined(_M_X64)
+	std::uint8_t const *func = reinterpret_cast<std::uint8_t const *>(m_function);
 	while (true)
 	{
 		if (0xe9 == func[0])
 		{
-			// absolute jump with 32-bit displacement
+			// relative jump with 32-bit displacement (typically a resolved PLT entry)
 			LOG("Found relative jump at %p ", func);
 			func += 5 + *reinterpret_cast<std::int32_t const *>(func + 1);
 			LOG("redirecting to %p\n", func);
 		}
-		else if ((0x48 == func[0]) && (0x8b == func[1]) && (0x01 == func[2]) && (0xff == func[3]) && ((0x60 == func[4]) || (0xa0 == func[4])))
+		else if ((0x48 == func[0]) && (0x8b == func[1]) && (0x01 == func[2]) && (0xff == func[3]) && ((0x20 == func[4]) || (0x60 == func[4]) || (0xa0 == func[4])))
 		{
 			// virtual function call thunk - mov rax,QWORD PTR [rcx] ; jmp QWORD PTR [rax+...]
 			LOG("Found virtual member function thunk at %p ", func);
 			std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(object);
-			if (0x60 == func[4])
+			if (0x20 == func[4])        // no displacement
+				func = *reinterpret_cast<std::uint8_t const *const *>(vptr);
+			else if (0x60 == func[4])   // 8-bit displacement
 				func = *reinterpret_cast<std::uint8_t const *const *>(vptr + *reinterpret_cast<std::int8_t const *>(func + 5));
-			else
+			else                        // 32-bit displacement
 				func = *reinterpret_cast<std::uint8_t const *const *>(vptr + *reinterpret_cast<std::int32_t const *>(func + 5));
 			LOG("redirecting to %p\n", func);
 		}
@@ -170,8 +172,29 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 			break;
 		}
 	}
-#endif
 	return reinterpret_cast<delegate_generic_function>(std::uintptr_t(func));
+#elif defined(__aarch64__) || defined(_M_ARM64)
+	std::uint32_t const *func = reinterpret_cast<std::uint32_t const *>(m_function);
+	while (true)
+	{
+		if ((0xf9400010 == func[0]) && (0xf9400210 == (func[1] & 0xffc003ff)) && (0xd61f0200 == func[2]))
+		{
+			// virtual function call thunk - ldr xip0,[x0] ; ldr xip0,[x0,#...] ; br xip0
+			LOG("Found virtual member function thunk at %p ", func);
+			std::uint32_t const *const *const vptr = *reinterpret_cast<std::uint32_t const *const *const *>(object);
+			func = vptr[(func[1] & 0x003ffc00) >> 10];
+			LOG("redirecting to %p\n", func);
+		}
+		else
+		{
+			// not something we can easily bypass
+			break;
+		}
+	}
+	return reinterpret_cast<delegate_generic_function>(std::uintptr_t(func));
+#else
+	return reinterpret_cast<delegate_generic_function>(m_function);
+#endif
 }
 
 } // namespace util::detail
