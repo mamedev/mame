@@ -51,8 +51,14 @@ public:
 	void set_ss(bool ss);
 	void set_s0_s1(int s0_s1);
 
-	u8 read();
-	void write(u8 command);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+
+	// CPU interface with CSL, CSR pin
+	u8 csl_r() { return read(0); }
+	u8 csr_r() { return read(1); }
+	void csl_w(u8 data) { write(0, data); }
+	void csr_w(u8 data) { write(1, data); }
 
 protected:
 	// device-level overrides
@@ -92,7 +98,7 @@ private:
 	static constexpr int TT5665_VOICES = 4;
 
 	tt5665_voice    m_voice[TT5665_VOICES * 2]; // separated voice for left and right output
-	s32             m_command;
+	s32             m_command[2];               // seperated command for left and right output
 	sound_stream*   m_stream;
 	s32             m_daol_output;
 	int             m_daol_timing;
