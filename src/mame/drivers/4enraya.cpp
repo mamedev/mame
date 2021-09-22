@@ -644,7 +644,33 @@ ROM_START( 4enrayaa )
 	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) /* system control: used for memory mapping */
 ROM_END
 
-/*
+/*  ________________________________________________________________________________________________________
+   |                          __________  __________  ______________  __________  __________ VIDEOGUM/TV   |
+   |                         |T74LS14B1| |_74LS74AN| | EPROM 1     | |MC1454BCP| |_TC4023BP|               |
+   |                                                 |_____________|  __________              __________   |
+   |  __________  __________  __________  __________  ______________ |SN74LS166N             |__7406N__| __|
+   | |_74LS08N_| |_74LS393_| |_74LS153N| |W2416K-10L | EPROM 2     |  __________              __________ |_
+   |  __________  __________  __________             |_____________| |SN74LS166N             |4116R-001| __|
+   | |_74LS393_| |__74LS10_| |74LS257AN|              ______________  __________  __________             __|
+   |  __________  __________  __________  __________ | EPROM 3     | |SN74LS166N |__7406N__|             __|
+   | |SN74LS08N| |SN74LS32N| |GD74LS157| |W2416K-10L |_____________|                                     __|
+   |  __________  __________  __________  __________      __________              __________  __________ __|
+   | |_GS74LS20| |74LS125AN| PC74HCT138P |SN74LS08N|     |SN74LS245N|             |_74LS273_| |ULN2003A| __|
+   |  __________  __________  __________  __________    ____________  __________  __________  __________ __|
+   | |_74LS74AN| |SN74LS32N| |T74LS00B1| PC74HCT138P   | W2416-10L | |SN74LS32N| |SN74LS245N  |4116R-001 __|
+   |  __________  __________  __________  __________   |___________|              __________             __|
+   | |GD72LS393| |_74LS74AN| |_74LS241N| |_74LS241N|  _________________          |T74LS273B1             __|
+   |  __________  __________  _________________      | AY3910A/P      |                       __________ __|
+   | |SN74LS92N| |_74LS74AN| | Z0840004PSC Z80|      |________________|                      |ULN2003A_| __|
+   |  __________  __________ |________________|                       __________  __________  __________ __|
+   | |__EMPTY__| |__EMPTY__|                                         |__8xDIPS_| |SN74LS245N |SN7407N_|  __|
+   |                              __________                          __________  __________  __________ |_
+   |                             |_74LS245N|                         |74LS02??*| |74LS273B1| |4116R-001|   |
+   |    Xtal                     ______________   BATT                __________  __________               |
+   |   18.000 MHz               | EPROM 4     |                      |_ULN2003A| |74LS273B1|               |
+   |                            |_____________|                  CONN-> ······     ······ <-CONN           |
+   |_______________________________________________________________________________________________________|
+
   The PCB here was marked as a 'Gum' machine and is from a gambling machine that instead of paying out money would dispense chewing gum as prizes
   Other games with 'Gum' in the title also exist, see 'Chewing Gum' and 'Royal Gum' in other drivers for example, these were likely used with similar
   chewing gum dispensers.
@@ -658,7 +684,6 @@ ROM_END
   A version of this exists (on newer hardware?) with the title 'Lucky Gum' or 'Luck Gum' however the supported game shows no title screen so the title
   is unknown.
 */
-
 ROM_START( tourpgum )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4.ic52",   0x0000, 0x8000, CRC(58d68a5a) SHA1(e1eb9113d6ebb1cedf5c6724c15b96934e357504) )
