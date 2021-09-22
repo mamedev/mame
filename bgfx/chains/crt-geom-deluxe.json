@@ -133,7 +133,7 @@
 		  "name": "blurwidth",
 		  "text": "Halation blur width",
 		  "default":  2.0,
-		  "max"    :  4.0,
+		  "max"    :  8.0,
 		  "min"    :  0.1,
 		  "step"   :  0.1,
 		  "format": "%1.1f",
