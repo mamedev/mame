@@ -4788,6 +4788,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/acefruit.cpp",
 	MAME_DIR .. "src/mame/drivers/aces1.cpp",
 	MAME_DIR .. "src/mame/drivers/acesp.cpp",
+	MAME_DIR .. "src/mame/machine/ace_sp_reelctrl.cpp",
+	MAME_DIR .. "src/mame/machine/ace_sp_reelctrl.h",
 	MAME_DIR .. "src/mame/drivers/age_candy.cpp",
 	MAME_DIR .. "src/mame/drivers/alinvade.cpp",
 	MAME_DIR .. "src/mame/drivers/amaticmg.cpp",
