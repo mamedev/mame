@@ -141,6 +141,9 @@ uint32_t dmac3_device::dmac3_virt_to_phys(uint32_t v_address)
 		// Wild speculation based on what NEWS-OS tries to do during boot - it populates a kseg0 address
 		// Now, is it doing that because there is something wrong elsewhere that leads to it sometimes
 		// using kseg0 addresses, or does the DMAC3 support a direct mode? Haven't figured that out yet.
+	 	// In this thread, one of the NetBSD port developers mentions that DMAC3 does support direct access (from 0xA0000000 up)
+		// http://www.jp.netbsd.org/ja/JP/ml/port-mips-ja/200005/msg00005.html
+		// Based on what NEWS-OS does, it seems like anything above 0x80000000 bypasses the DMA map.
 		return v_address & ~0x80000000;
 	}
 	uint32_t dmac_page_address = BASE_MAP_ADDRESS + 8 * (v_address >> 12); // Convert page number to PTE address.
