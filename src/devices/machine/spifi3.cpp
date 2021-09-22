@@ -520,142 +520,6 @@ void spifi3_device::prcmd_w(uint32_t data)
     }
 }
 
-
-
-/*
-void ncr5390_device::start_command()
-{
-    uint8_t c = command[0] & 0x7f;
-    if(!check_valid_command(c)) {
-        LOG("invalid command %02x\n", command[0]);
-        istatus |= I_ILLEGAL;
-        check_irq();
-        return;
-    }
-
-    // for dma commands, reload transfer counter
-    dma_command = command[0] & 0x80;
-    if (dma_command)
-    {
-        tcounter = tcount;
-
-        // clear transfer count zero flag when counter is reloaded
-        status &= ~S_TC0;
-    }
-    else
-        tcounter = 0;
-
-    switch(c) {
-    case CM_NOP:
-        LOGMASKED(LOG_COMMAND, "NOP\n");
-        command_pop_and_chain();
-        break;
-
-    case CM_FLUSH_FIFO:
-        LOGMASKED(LOG_COMMAND, "Flush FIFO\n");
-        fifo_pos = 0;
-        command_pop_and_chain();
-        break;
-
-    case CM_RESET:
-        LOGMASKED(LOG_COMMAND, "Reset chip\n");
-        device_reset();
-        break;
-
-    case CM_RESET_BUS:
-        LOGMASKED(LOG_COMMAND, "Reset SCSI bus\n");
-        state = BUSRESET_WAIT_INT;
-        scsi_bus->ctrl_w(scsi_refid, S_RST, S_RST);
-        delay(130);
-        break;
-
-    case CD_RESELECT:
-        LOGMASKED(LOG_COMMAND, "Reselect sequence\n");
-        state = DISC_REC_ARBITRATION;
-        arbitrate();
-        break;
-
-    case CD_SELECT:
-    case CD_SELECT_ATN:
-    case CD_SELECT_ATN_STOP:
-        LOGMASKED(LOG_COMMAND,
-            (c == CD_SELECT) ? "Select without ATN sequence\n" :
-            (c == CD_SELECT_ATN) ? "Select with ATN sequence\n" :
-            "Select with ATN and stop sequence\n");
-        seq = 0;
-        state = DISC_SEL_ARBITRATION_INIT;
-        dma_set(dma_command ? DMA_OUT : DMA_NONE);
-        arbitrate();
-        break;
-
-    case CD_ENABLE_SEL:
-        LOGMASKED(LOG_COMMAND, "Enable selection/reselection\n");
-        command_pop_and_chain();
-        break;
-
-    case CD_DISABLE_SEL:
-        LOGMASKED(LOG_COMMAND, "Disable selection/reselection\n");
-        command_pop_and_chain();
-        break;
-
-    case CI_XFER:
-        LOGMASKED(LOG_COMMAND, "Transfer information\n");
-        state = INIT_XFR;
-        xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-        dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
-        check_drq();
-        step(false);
-        break;
-
-    case CI_COMPLETE:
-        LOGMASKED(LOG_COMMAND, "Initiator command complete sequence\n");
-        state = INIT_CPT_RECV_BYTE_ACK;
-        dma_set(dma_command ? DMA_IN : DMA_NONE);
-        recv_byte();
-        break;
-
-    case CI_MSG_ACCEPT:
-        LOGMASKED(LOG_COMMAND, "Message accepted\n");
-        state = INIT_MSG_WAIT_REQ;
-        // It's undocumented what the sequence register should contain after a message accept
-        // command, but the InterPro boot code expects it to be non-zero; setting it to an
-        // arbirary 1 here makes InterPro happy. Also in the InterPro case (perhaps typical),
-        // after ACK is asserted the device disconnects and the INIT_MSG_WAIT_REQ state is never
-        // entered, meaning we end up with I_DISCONNECT instead of I_BUS interrupt status.
-        seq = 1;
-        scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-        step(false);
-        break;
-
-    case CI_PAD:
-        LOGMASKED(LOG_COMMAND, "Transfer pad\n");
-        xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-        if(xfr_phase & S_INP)
-            state = INIT_XFR_RECV_PAD_WAIT_REQ;
-        else
-            state = INIT_XFR_SEND_PAD_WAIT_REQ;
-        scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-        step(false);
-        break;
-
-    case CI_SET_ATN:
-        LOGMASKED(LOG_COMMAND, "Set ATN\n");
-        scsi_bus->ctrl_w(scsi_refid, S_ATN, S_ATN);
-        command_pop_and_chain();
-        break;
-
-    case CI_RESET_ATN:
-        LOGMASKED(LOG_COMMAND, "Reset ATN\n");
-        scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
-        command_pop_and_chain();
-        break;
-
-    default:
-        fatalerror("ncr5390_device::start_command unimplemented command %02x\n", c);
-    }
-}
-*/
-
 void spifi3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
     step(true);
@@ -761,6 +625,7 @@ void spifi3_device::send_byte()
         // Send next data from FIFO.
         scsi_bus->data_w(scsi_refid, m_even_fifo.front());
         m_even_fifo.pop();
+        check_drq();
     }
     else
     {
@@ -1387,6 +1252,8 @@ void spifi3_device::step(bool timeout)
                     // can't send if the fifo is empty and we are sending data
                     if (m_even_fifo.empty() && xfr_phase == S_PHASE_DATA_OUT)
                     {
+                        LOG("INIT_XFR: no data! Deferring until we have some.\n");
+                        xfrDataSource = FIFO;
                         break;
                     }
 
@@ -1398,11 +1265,13 @@ void spifi3_device::step(bool timeout)
 
                     if(xfr_phase == S_PHASE_DATA_OUT)
                     {
+                        LOG("Data out phase, using FIFO.\n");
                         xfrDataSource = FIFO;
                         send_byte();
                     }
                     else // send from cdb buffer on command or message
                     {
+                        LOG("Message or command out phase, using cdb.\n");
                         xfrDataSource = COMMAND_BUFFER;
                         send_cmd_byte();
                     }
@@ -1431,7 +1300,7 @@ void spifi3_device::step(bool timeout)
                         state = INIT_XFR_RECV_BYTE_ACK;
                     }
 
-                    xfrDataSource = FIFO;
+                    xfrDataSource = FIFO; // TODO: redirect status to appropriate place. What to do with automsg?
                     recv_byte();
                     break;
                 }
