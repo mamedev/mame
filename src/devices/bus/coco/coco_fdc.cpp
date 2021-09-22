@@ -708,6 +708,41 @@ namespace
 DEFINE_DEVICE_TYPE_PRIVATE(COCO3_HDB1, coco_family_fdc_device_base, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
 
 //**************************************************************************
+//              COCO RGB-DOS local
+//**************************************************************************
+
+ROM_START(coco_rgbdos)
+	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
+	ROM_LOAD("rgbdos_mess.rom", 0x0000, 0x2000, CRC(0b0e64db) SHA1(062ffab14dc788ec7744e528bf9bb425c3ec60ed))
+	ROM_RELOAD(0x2000, 0x2000)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x6000, 0x2000)
+ROM_END
+
+namespace
+{
+	class coco_rgbdos_device : public coco_fdc_device_base
+	{
+	public:
+		// construction/destruction
+		coco_rgbdos_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+			: coco_fdc_device_base(mconfig, COCO_LOCAL, tag, owner, clock)
+		{
+		}
+
+	protected:
+		// optional information overrides
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(coco_rgbdos);
+		}
+	};
+}
+
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_LOCAL, coco_family_fdc_device_base, coco_rgbdos_device, "coco_rgbdos", "CoCo RGB-DOS MAME")
+
+
+//**************************************************************************
 //              COCO-2 HDB-DOS
 //**************************************************************************
 

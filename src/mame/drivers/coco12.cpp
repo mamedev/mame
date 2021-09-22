@@ -411,6 +411,7 @@ void coco_cart(device_slot_interface &device)
 	device.option_add("fdcv11", COCO_FDC_V11);
 	device.option_add("cc2hdb1", COCO2_HDB1);
 	device.option_add("cc3hdb1", COCO3_HDB1);
+	device.option_add("rgbdos", COCO_LOCAL);
 	device.option_add("cp450_fdc", CP450_FDC);
 	device.option_add("cd6809_fdc", CD6809_FDC);
 	device.option_add("rs232", COCO_RS232);
