@@ -6,7 +6,7 @@
   Copyright 2011-2021 David Viens
 
 	Main CPU is a HD63B03RP
-	Sub  CPU is a HD6805S1P-A33 (ROM on chip which we originally HLE'ed then later dumped) 
+	Sub  CPU is a HD6805S1P-A33 (ROM on chip) 
 
 	The FM sound system is done by two discreet chips:
 	OPS(YM2128) and EGS(YM2129)
