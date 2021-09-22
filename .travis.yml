@@ -55,7 +55,7 @@ script:
     fi
 branches:
   only:
-    - master
+    - barryn-custom
 notifications:
   email: false
 
