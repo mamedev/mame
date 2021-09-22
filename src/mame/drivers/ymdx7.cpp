@@ -50,20 +50,11 @@ constexpr auto DX7CLOCK    = 9'426'500;
 constexpr auto NUM_ANALOG  = 7;
 constexpr auto NUM_INITIAL = (2*NUM_ANALOG);
 
+constexpr auto LCD_E  = 0x02;
+constexpr auto LCD_RW = 0x04;
+constexpr auto LCD_RS = 0x01;
+
 #define TRACE printf
-
-//initial analogue values of the previously HLE'ed sub CPU 
-constexpr uint8_t g_init_vals[NUM_INITIAL]={
-    //todo all notes off?
-    0x90,0x40,//Data Entry should be centered?
-    0x91,0x40,
-    0x92,0x40,
-    0x93,0,
-    0x94,0,
-    0x95,0,
-    0x96,0x60 //getting rid of "Change Battery"
-};
-
 
 class yamaha_dx7_state : public driver_device
 {
@@ -127,30 +118,20 @@ private:
     uint8_t m_PORT1=0;
     uint8_t m_PORT2=0;
     uint8_t m_irq0=0;//init in start
-    //past values of that port
+    
+	//past values of that port
     std::array<uint8_t,4> m_8255 = {};
-    //YM_EGS_OPS_EMU _ym;
-
-    //sub cpu message queue
-    uint8_t m_q[256];//init in start
-    uint8_t m_qrpos=0;
-    uint8_t m_qwpos = 0;
 
     uint32_t m_oNUMBERS=0;
     uint8_t  m_oNOYES=0;    
     uint8_t  m_oFUNCTION=0;
     uint8_t  m_oKEYBOARD=0;    
-    int m_acept=0;
-
-    void sub_cpu_hle();    
+    int      m_acept=0;
 };
 
 void yamaha_dx7_state::machine_start()
 {    
     m_irq0=1;
-    
-    memcpy(m_q,    g_init_vals,NUM_INITIAL);
-    m_qwpos = NUM_INITIAL;
 }
 
 void yamaha_dx7_state::dx7_acept_w(offs_t address, uint8_t data)
@@ -194,21 +175,12 @@ void yamaha_dx7_state::dx7_8255_w(offs_t offset, uint8_t data)
         break;
 
         case 1:{
-            //TRACE("PORTB  0x%x\n",data);
-
-            //PORTB write (LCD handshake)
+            // PORTB write (LCD handshake)
             // LCD Should Initially Display:
             //   "*  YAMAHA DX7  *"
             //   "*  SYNTHESIZER *"
             
-            //the only way to make this work is to invert LCD_E && LCD_RW 
-            //with regards to the schems, however, the schems MATCH with my machine... don't get it
-            //is portB pin-out different on some 8255's?
-            #define LCD_E  0x02 
-            #define LCD_RW 0x04
-            #define LCD_RS 0x01
-            
-             if(m_8255[3] & 0x10)
+            if(m_8255[3] & 0x10)
                 return; //firmware logic error! PortA is in READ MODE, old A port value would be random!
             
             if( (data & LCD_E) &&  !(data & LCD_RW) ){ 
@@ -251,7 +223,6 @@ uint8_t yamaha_dx7_state::dx7_8255_r(offs_t offset)
             TRACE("8255R:0x%x\n",offset);
             //LCD BUSY FLAG ADRS counter
             return 0;//m_lcdc->read(space, offset &1);
-                //return LCDReadData(&lcd);
         break;
 
         case 0x2:
@@ -305,7 +276,7 @@ void yamaha_dx7_state::main_map(address_map &map)
     map(0x1800, 0x1fff).ram().share("ram2");/* 2kb RAM2 IC20 M5M118P (Voice Memory part2) */
     map(0x2000, 0x27ff).ram().share("ram3");/* 2kb RAM3 IC21 M5M118P (Working Area)       */
     
-    //the 0x2800 to 0x2FFF range is then resplit by IC24(another 74LS138)
+    //the 0x2800 to 0x2fff range is then resplit by IC24(another 74LS138)
     // A3 A2 A1 A0
     //  0  0  0  X:  Y0 : IC12 8255 (LCD,porta/sustain)
     //  0  0  1  X:  Y1 : IC12 8255 (LCD,porta/sustain)
@@ -318,20 +289,20 @@ void yamaha_dx7_state::main_map(address_map &map)
 
     map(0x2800, 0x2803).rw(FUNC(yamaha_dx7_state::dx7_8255_r), FUNC(yamaha_dx7_state::dx7_8255_w));    
     map(0x2804, 0x2805).w(FUNC(yamaha_dx7_state::dx7_ops_w));
-    map(0x280A, 0x280B).w(FUNC(yamaha_dx7_state::dx7_dac_w));
-    map(0x280C, 0x280D).w(FUNC(yamaha_dx7_state::dx7_acept_w));
-    map(0x280E, 0x280F).w(FUNC(yamaha_dx7_state::dx7_led_w));
+    map(0x280a, 0x280b).w(FUNC(yamaha_dx7_state::dx7_dac_w));
+    map(0x280c, 0x280d).w(FUNC(yamaha_dx7_state::dx7_acept_w));
+    map(0x280e, 0x280f).w(FUNC(yamaha_dx7_state::dx7_led_w));
 
     //EGS (YM2129)
     map(0x3000, 0x37ff).w(FUNC(yamaha_dx7_state::dx7_egs_w));
 
   //map(0x4000, 0x4fff).rom().region("cartridge", 0); //or RAM!
-    map(0xC000, 0xffff).rom().region("program", 0);
+    map(0xc000, 0xffff).rom().region("program", 0);
 }
 
 void yamaha_dx7_state::sub_map(address_map &map)
 {
-    map(0x0000, 0x07FF).rom().region("subcpu", 0); //hhhm
+    map(0x0000, 0x07ff).rom().region("subcpu", 0);
 }
 
 static INPUT_PORTS_START(dx7)
@@ -397,10 +368,10 @@ ROM_START(dx7)
     //iG 11461(0)  HN 613128PC86 ROM DX7#2661~
     
     //V1.?
-    //ROM_LOAD( "ig11461.ic14", 0xC000, 0x4000, CRC(fb50c62b) SHA1(21c4995d65d0ae6f4868ac89bf7a4ae81dc3bd31) )
+    //ROM_LOAD( "ig11461.ic14", 0xc000, 0x4000, CRC(fb50c62b) SHA1(21c4995d65d0ae6f4868ac89bf7a4ae81dc3bd31) )
     
     //V1.? 
-    //ROM_LOAD( "ig11464.ic14", 0xC000, 0x4000, CRC(126c5a98) SHA1(ce4df31878dda9ec27b31c7bc172f16419264b90) )
+    //ROM_LOAD( "ig11464.ic14", 0xc000, 0x4000, CRC(126c5a98) SHA1(ce4df31878dda9ec27b31c7bc172f16419264b90) )
         
     //V1.? ig11467 (references online)
     //V1.? ig11468 (references online)
@@ -409,9 +380,8 @@ ROM_START(dx7)
     ROM_REGION(0x4000, "program", 0)    
     ROM_LOAD( "ig11469.ic14", 0x0000, 0x4000, CRC(6cbb0865) SHA1(715dbb8e96a4df2a7f096b368334a7654860bb26) )
     
-
     ROM_REGION(0x0800, "subcpu", 0)
     ROM_LOAD("hd6805s1p-a33.ic13", 0x0000, 0x800, CRC(ac1d84b3) SHA1(ee0ebb118dd0d282d7c195d3b246a0094b2cb6ad))
 ROM_END
 
-SYST(1983, dx7, 0, 0, dx7, dx7, yamaha_dx7_state, empty_init, "Yamaha", "DX7 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON)
+SYST(1983, dx7, 0, 0, dx7, dx7, yamaha_dx7_state, empty_init, "Yamaha", "DX7 Digital Programmable Algorithm Synthesizer", MACHINE_NOT_WORKING)
