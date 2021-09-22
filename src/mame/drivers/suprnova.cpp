@@ -744,6 +744,7 @@ void skns_state::skns_map(address_map &map)
 	map(0x02f00000, 0x02f000ff).rw(FUNC(skns_state::hit_r), FUNC(skns_state::hit_w));
 	map(0x04000000, 0x041fffff).bankr("bank1"); /* GAME ROM */
 	map(0x04800000, 0x0483ffff).ram().w(FUNC(skns_state::v3t_w)).share("v3t_ram"); /* tilemap b ram based tiles */
+	map(0x05000000, 0x05000003).nopw();  /* watchdog, probably.  Always writes 0 */
 	map(0x06000000, 0x060fffff).ram().share("main_ram");
 	map(0xc0000000, 0xc0000fff).ram().share("cache_ram"); /* 'cache' RAM */
 }
