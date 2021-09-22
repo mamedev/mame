@@ -9,7 +9,7 @@ Build status for tiny build only, containing just core parts of project:
 | ------------- |:-------------:| 
 |Linux GCC / OSX Clang| [![Build Status](https://travis-ci.com/abcbarryn/mame.svg?branch=master)](https://app.travis-ci.com/github/abcbarryn/mame) |
 |Windows MinGW | [![Build Status](https://tea-ci.org/api/badges/abcbarryn/mame/status.svg)](https://tea-ci.org/abcbarryn/mame) |
-|Windows MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/te0qy56b72tp5kmo?svg=true)](https://ci.appveyor.com/project/startaq/mame) |
+|Windows MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/te0qy56b72tp5kmo?svg=true)](https://ci.appveyor.com/project/abcbarryn/mame) |
 
 Static analysis status for entire build (except for third-party parts of project):
 
