@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "imgterrs.h"
-
 #include "utilfwd.h"
 
 #include "osdcomm.h"

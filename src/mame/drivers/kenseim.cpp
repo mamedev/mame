@@ -159,7 +159,10 @@ public:
 		m_from68k_st4(0),
 		m_from68k_st3(0),
 		m_from68k_st2(0),
-		m_lamps(*this, "lamp%u", 1U)
+		m_lamps(*this, "lamp%u", 1U),
+		m_startlamp(*this, "startlamp%u", 1U),
+		m_molea(*this, "molea_%u", 0U),
+		m_moleb(*this, "moleb_%u", 0U)
 	{
 		for (int i = 0; i < 6; i++)
 		{
@@ -198,18 +201,10 @@ private:
 	void update_moles()
 	{
 		for (int i = 0; i < 6; i++)
-		{
-			char temp[32];
-			sprintf(temp, "molea_%d", i);
-			output().set_value(temp, mole_state_a[i]);
-		}
+			m_molea[i] = mole_state_a[i];
 
 		for (int i = 0; i < 6; i++)
-		{
-			char temp[32];
-			sprintf(temp, "moleb_%d", i);
-			output().set_value(temp, mole_state_b[i]);
-		}
+			m_moleb[i] = mole_state_b[i];
 	}
 
 	/* kenseim */
@@ -255,6 +250,9 @@ private:
 	int mole_state_a[6];
 	int mole_state_b[6];
 	output_finder<20> m_lamps;
+	output_finder<2> m_startlamp;
+	output_finder<6> m_molea;
+	output_finder<6> m_moleb;
 };
 
 
@@ -357,10 +355,10 @@ void kenseim_state::cpu_portc_w(uint8_t data)
 	// d5: coin lock
 	// d6: left start button lamp
 	// d7: right start button lamp
-	machine().bookkeeping().coin_lockout_w(0, (data & 0x10) ? 0 : 1); // toggles if you attempt to insert a coin when there are already 15 coins inserted
-	machine().bookkeeping().coin_counter_w(0, (data & 0x20) ? 0 : 1);
-	output().set_value("startlamp1", (data & 0x80) ? 0 : 1);
-	output().set_value("startlamp2", (data & 0x40) ? 0 : 1);
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 4)); // toggles if you attempt to insert a coin when there are already 15 coins inserted
+	machine().bookkeeping().coin_counter_w(0, !BIT(data, 5));
+	m_startlamp[0] = !BIT(data, 7);
+	m_startlamp[1] = !BIT(data, 6);
 }
 
 
@@ -704,6 +702,9 @@ void kenseim_state::init_kenseim()
 	m_led_latch = 0;
 
 	m_lamps.resolve();
+	m_startlamp.resolve();
+	m_molea.resolve();
+	m_moleb.resolve();
 }
 
 

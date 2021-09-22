@@ -54,6 +54,7 @@
 
 #include "corestr.h"
 #include "ioprocs.h"
+#include "osdcomm.h"
 
 #include <cassert>
 #include <cctype>

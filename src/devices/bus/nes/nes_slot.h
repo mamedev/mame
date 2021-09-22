@@ -65,7 +65,7 @@ enum
 	NAMCOT_163, NAMCOT_175, NAMCOT_340,
 	NAMCOT_3425, NAMCOT_34X3, NAMCOT_3446,
 	// NTDEC
-	NTDEC_ASDER, NTDEC_FIGHTINGHERO, NTDEC_N715021,
+	NTDEC_2746, NTDEC_ASDER, NTDEC_FIGHTINGHERO, NTDEC_N715021,
 	// Rex Soft
 	REXSOFT_SL1632, REXSOFT_DBZ5,
 	// Sachen
@@ -83,33 +83,35 @@ enum
 	// Tengen
 	TENGEN_800008, TENGEN_800032, TENGEN_800037,
 	// TXC
-	TXC_22211, TXC_DUMARACING, TXC_MJBLOCK,
-	TXC_COMMANDOS, TXC_TW, TXC_STRIKEW,
+	TXC_22110, TXC_22211, TXC_COMMANDOS, TXC_DUMARACING,
+	TXC_MJBLOCK, TXC_STRIKEW, TXC_TW,
 	// Multigame Carts
-	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_F15, BMC_GN45,
-	BMC_HIK8IN1, BMC_NOVEL1, BMC_NOVEL2, BMC_S24IN1SC03, BMC_T262,
+	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_A88S1, BMC_F15,
+	BMC_GN45, BMC_HIK8IN1, BMC_S24IN1SC03, BMC_T262,
 	BMC_WS, BMC_SUPERBIG_7IN1, BMC_SUPERHIK_4IN1, BMC_BALLGAMES_11IN1,
 	BMC_MARIOPARTY_7IN1, BMC_GOLD_7IN1, BMC_SUPER_700IN1, BMC_FAMILY_4646,
 	BMC_36IN1, BMC_21IN1, BMC_150IN1, BMC_35IN1, BMC_64IN1,
 	BMC_8IN1, BMC_15IN1, BMC_SUPERHIK_300IN1, BMC_SUPERGUN_20IN1,
-	BMC_GOLDENCARD_6IN1, BMC_72IN1, BMC_SUPER_42IN1, BMC_76IN1,
+	BMC_72IN1, BMC_SUPER_42IN1, BMC_76IN1,
 	BMC_31IN1, BMC_22GAMES, BMC_20IN1,
 	BMC_70IN1, BMC_500IN1, BMC_800IN1, BMC_1200IN1,
-	BMC_GKA, BMC_GKB, BMC_GKCXIN1, BMC_VT5201, BMC_BENSHIENG,
-	BMC_60311C, BMC_80013B, BMC_810544C, BMC_830425C, BMC_850437C,
-	BMC_NT639, BMC_NTD_03, BMC_G63IN1, BMC_FCGENJIN_8IN1, BMC_FK23C, BMC_FK23CA,
+	BMC_GKA, BMC_GKB, BMC_GKCXIN1, BMC_HP898F, BMC_VT5201, BMC_BENSHIENG,
+	BMC_60311C, BMC_80013B, BMC_810544C, BMC_830425C, BMC_830928C, BMC_850437C,
+	BMC_N32_4IN1, BMC_NT639, BMC_NTD_03,
+	BMC_FCGENJIN_8IN1, BMC_FK23C, BMC_FK23CA, BMC_JY820845C,
 	BMC_PJOY84, BMC_TH22913, BMC_11160, BMC_G146,
-	BMC_2751, BMC_8157, BMC_830118C, BMC_830832C, BMC_841101C,
-	BMC_411120C, BMC_GOLD150, BMC_GOLD260, BMC_SUPER22,
+	BMC_2751, BMC_8157, BMC_00202650,
+	BMC_820720C, BMC_830118C, BMC_830832C, BMC_YY841101C, BMC_YY841155C,
+	BMC_411120C, BMC_GOLD150, BMC_GOLD260,
 	BMC_12IN1, BMC_4IN1RESET, BMC_42IN1RESET, BMC_LITTLECOM160, BMC_CTC09,
 	BMC_K1029, BMC_K3006, BMC_K3036, BMC_K3046, BMC_SA005A, BMC_TJ03,
-	BMC_RESETTXROM0, BMC_RESETTXROM1, BMC_RESETTXROM2, BMC_TECHLINE9IN1,
+	BMC_RESETSXROM, BMC_RESETTXROM0, BMC_RESETTXROM1, BMC_RESETTXROM2, BMC_TECHLINE9IN1,
 	// Unlicensed
 	UNL_8237, UNL_8237A, UNL_CC21, UNL_AX5705, UNL_KN42, UNL_KOF97,
 	UNL_N625092, UNL_SC127, UNL_SMB2J, UNL_T230, UNL_MMALEE,
 	UNL_UXROM, UNL_MK2, UNL_XIAOZY, UNL_KOF96, UNL_FS6,
 	UNL_SF3, UNL_RACERMATE, UNL_EDU2K,
-	UNL_STUDYNGAME, UNL_603_5052, UNL_H2288, UNL_2708,
+	UNL_STUDYNGAME, UNL_603_5052, UNL_H2288, UNL_158B, UNL_2708,
 	UNL_MALISB, UNL_AC08, UNL_A9746, UNL_WORLDHERO,
 	UNL_43272, UNL_TF1201, UNL_CITYFIGHT, UNL_NINJARYU, UNL_EH8813A, UNL_RT01,
 	// Bootleg boards
@@ -117,6 +119,8 @@ enum
 	BTL_CONTRAJ, BTL_DRAGONNINJA, BTL_MARIOBABY, BTL_PALTHENA,
 	BTL_PIKACHUY2K, BTL_SBROS11, BTL_SMB2JA, BTL_SMB2JB,
 	BTL_SMB3, BTL_SHUIGUAN, BTL_TOBIDASE, BTL_YUNG08,
+	// Shenzhen Jncota
+	JNCOTA_KT1001,
 	// Kaiser
 	KAISER_KS106C,  KAISER_KS202,  KAISER_KS7010,  KAISER_KS7012,
 	KAISER_KS7013B, KAISER_KS7016, KAISER_KS7016B, KAISER_KS7017,
@@ -137,9 +141,10 @@ enum
 	WAIXING_SGZLZ, WAIXING_SGZ, WAIXING_WXZS, WAIXING_SECURITY, WAIXING_SH2,
 	WAIXING_DQ8, WAIXING_FFV, WAIXING_WXZS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
 	KAY_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD, ZEMINA_BOARD,
+	// homebrew PCBs
 	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
 	UNL_ACTION53,   // homebrew PCB for homebrew multicarts
-	UNL_CUFROM, UNL_UNROM512, UNL_2A03PURITANS,   // homebrew PCBs
+	BATMAP_000, BATMAP_SRRX, UNL_CUFROM, UNL_UNROM512, UNL_2A03PURITANS,
 	// FFE boards, for mappers 6, 8, 17
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	// Unsupported (for place-holder boards, with no working emulation) & no-board (at init)
@@ -194,6 +199,7 @@ public:
 
 	void prg_alloc(size_t size, const char *tag);
 	void vrom_alloc(size_t size, const char *tag);
+	void misc_rom_alloc(size_t size, const char *tag);
 	void prgram_alloc(size_t size);
 	void vram_alloc(size_t size);
 	void battery_alloc(size_t size);
@@ -222,6 +228,7 @@ public:
 	uint8_t *get_ciram_base() { return m_ciram; }
 	uint8_t *get_battery_base() { return &m_battery[0]; }
 	uint8_t *get_mapper_sram_base() { return m_mapper_sram; }
+	uint8_t *get_misc_rom_base() { return m_misc_rom; }
 
 	uint32_t get_prg_size() const { return m_prg_size; }
 	uint32_t get_prgram_size() const { return m_prgram.size(); }
@@ -229,6 +236,7 @@ public:
 	uint32_t get_vram_size() const { return m_vram.size(); }
 	uint32_t get_battery_size() const { return m_battery.size(); }
 	uint32_t get_mapper_sram_size() const { return m_mapper_sram_size; }
+	uint32_t get_misc_rom_size() const { return m_misc_rom_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
 	virtual void hblank_irq(int scanline, int vblank, int blanked) {}
@@ -269,8 +277,10 @@ protected:
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
 	uint8_t *m_mapper_sram;
+	uint8_t *m_misc_rom;
 	std::vector<uint8_t> m_ext_ntram;
 	uint32_t m_mapper_sram_size;
+	uint32_t m_misc_rom_size;
 
 	int m_ce_mask;
 	int m_ce_state;
@@ -447,5 +457,6 @@ DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 
 #define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
 #define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
+#define NESSLOT_MISC_ROM_REGION_TAG ":cart:misc_rom"
 
 #endif // MAME_BUS_NES_NES_SLOT_H

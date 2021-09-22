@@ -20,6 +20,8 @@
 #include "harddisk.h"
 #include "romload.h"
 
+#include "opresolv.h"
+
 
 OPTION_GUIDE_START(hd_option_guide)
 	OPTION_INT('C', "cylinders",        "Cylinders")

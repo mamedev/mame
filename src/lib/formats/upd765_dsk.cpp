@@ -12,6 +12,10 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
+#include <cstring>
+
 
 upd765_format::upd765_format(const format *_formats) : file_header_skip_bytes(0), file_footer_skip_bytes(0), formats(_formats)
 {

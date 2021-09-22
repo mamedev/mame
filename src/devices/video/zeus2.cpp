@@ -1777,7 +1777,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			return;
 	}
 
-	zeus2_poly_extra_data& extra = this->object_data_alloc();
+	zeus2_poly_extra_data& extra = this->object_data().next();
 
 	extra.ucode_src = m_state->m_curUCodeSrc;
 	extra.tex_src = m_state->zeus_texbase;

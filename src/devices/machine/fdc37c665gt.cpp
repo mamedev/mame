@@ -129,7 +129,7 @@ uint8_t fdc37c665gt_device::read(offs_t offset)
 			return 0;
 		}
 
-		return m_serial[0]->ins8250_r(offset - device_addresses[LogicalDevice::Serial1]);
+		return m_serial[0]->ins8250_r(offset - com_addresses[device_addresses[LogicalDevice::Serial1]]);
 	}
 
 	// Serial 2
@@ -138,7 +138,7 @@ uint8_t fdc37c665gt_device::read(offs_t offset)
 			return 0;
 		}
 
-		return m_serial[1]->ins8250_r(offset - device_addresses[LogicalDevice::Serial2]);
+		return m_serial[1]->ins8250_r(offset - com_addresses[device_addresses[LogicalDevice::Serial2]]);
 	}
 
 	// FDC, +6 is used by IDE
@@ -177,22 +177,22 @@ void fdc37c665gt_device::write(offs_t offset, uint8_t data)
 	}
 
 	// Serial 1
-	if (offset >= device_addresses[LogicalDevice::Serial1] && offset <= device_addresses[LogicalDevice::Serial1] + 7) {
+	if (offset >= com_addresses[device_addresses[LogicalDevice::Serial1]] && offset <= com_addresses[device_addresses[LogicalDevice::Serial1]] + 7) {
 		if (!enabled_logical[LogicalDevice::Serial1]) {
 			return;
 		}
 
-		m_serial[0]->ins8250_w(offset - device_addresses[LogicalDevice::Serial1], data);
+		m_serial[0]->ins8250_w(offset - com_addresses[device_addresses[LogicalDevice::Serial1]], data);
 		return;
 	}
 
 	// Serial 2
-	if (offset >= device_addresses[LogicalDevice::Serial2] && offset <= device_addresses[LogicalDevice::Serial2] + 7) {
+	if (offset >= com_addresses[device_addresses[LogicalDevice::Serial2]] && offset <= com_addresses[device_addresses[LogicalDevice::Serial2]] + 7) {
 		if (!enabled_logical[LogicalDevice::Serial2]) {
 			return;
 		}
 
-		m_serial[1]->ins8250_w(offset - device_addresses[LogicalDevice::Serial2], data);
+		m_serial[1]->ins8250_w(offset - com_addresses[device_addresses[LogicalDevice::Serial2]], data);
 		return;
 	}
 

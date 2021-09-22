@@ -94,9 +94,8 @@ Unfortunately, I have no such a .tap file to test, so my implementation
 below could be not working.  FP ]
 */
 
-#include <cassert>
-
 #include "cbm_tap.h"
+#include "imageutl.h"
 
 
 #define CBM_WAV_FREQUENCY   44100

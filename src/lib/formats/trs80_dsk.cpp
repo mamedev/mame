@@ -68,6 +68,8 @@ Description of JV3:
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 jv1_format::jv1_format() : wd177x_format(formats)
 {

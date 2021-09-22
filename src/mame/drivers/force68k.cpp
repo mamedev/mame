@@ -382,7 +382,7 @@ void force68k_state::machine_start ()
 		m_usrrom = (uint16_t*)m_cart->get_rom_base();
 #if 0 // This should be the correct way but produces odd and even bytes swapped
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16sm_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-#else // So we installs a custom very inefficient handler for now until we understand hop to solve the problem better
+#else // So we install a custom very inefficient handler for now until we understand how to solve the problem better
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16sm_delegate(*this, FUNC(force68k_state::read16_rom)));
 #endif
 	}

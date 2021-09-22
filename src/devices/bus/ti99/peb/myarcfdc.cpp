@@ -47,8 +47,8 @@
 #define WD1772_TAG "wd1772"
 #define PAL_TAG "pal"
 
-DEFINE_DEVICE_TYPE_NS(TI99_DDCC1, bus::ti99::peb, myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
-DEFINE_DEVICE_TYPE_NS(DDCC1_PAL, bus::ti99::peb, ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
+DEFINE_DEVICE_TYPE(TI99_DDCC1, bus::ti99::peb::myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
+DEFINE_DEVICE_TYPE(DDCC1_PAL, bus::ti99::peb::ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
 
 namespace bus::ti99::peb {
 

@@ -14,7 +14,7 @@
  * Edited and translated to English by Kenji RIKITAKE
  */
 
-#include "flopimg.h"
+#include "flopimg_legacy.h"
 
 #include "ioprocs.h"
 

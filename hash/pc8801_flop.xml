@@ -1271,7 +1271,8 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<software name="acrojet" supported="no">
+	<!-- copy protection repaired by hand -->
+	<software name="acrojet">
 		<description>AcroJet</description>
 		<year>1988</year>
 		<publisher>システムソフト (System Software)</publisher>
@@ -1279,8 +1280,14 @@ INVESTIGATE
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="アクロジェット"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">    <!-- Data CRC16: 23888 -->
+			<!-- Data CRC16: 23888 -->
+			<!--
+			<dataarea name="flop" size="348848">
 				<rom name="acrojet.d88" size="348848" crc="dc271a9c" sha1="a0475d9c80c74b596fee938ba7b682e5d92dde44"/>
+			</dataarea>
+			-->
+			<dataarea name="flop" size="349120">
+				<rom name="acrojet_repair.d88" size="349120" crc="c8168a1b" sha1="f4b0e76e9a8d19f02441a9c17d223fcecdfdeb4e" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15416,6 +15423,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
+	<!-- copy protection repaired by hand -->
 	<software name="holein1">
 		<description>Hole in One</description>
 		<year>1985</year>
@@ -15424,8 +15432,13 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="ホールインワン"/>
 		<part name="flop1" interface="floppy_5_25">
+			<!--
 			<dataarea name="flop" size="348832">
 				<rom name="hole in one.d88" size="348832" crc="fdc86c72" sha1="12a1424aced7a859fccb5f00b9fbe314495b46b0"/>
+			</dataarea>
+			-->
+			<dataarea name="flop" size="349120">
+				<rom name="hole in one_repair.d88" size="349120" crc="aaff0df9" sha1="03179fed67c9addc8323d0c99322ccd6fcc86f44" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

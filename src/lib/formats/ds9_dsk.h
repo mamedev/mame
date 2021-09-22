@@ -11,9 +11,6 @@
 #pragma once
 
 #include "flopimg.h"
-#include "formats/basicdsk.h"
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(ds9);
 
 class ds9_format : public floppy_image_format_t
 {

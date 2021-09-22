@@ -433,8 +433,10 @@ void wardner_state::wardner(machine_config &config)
 	crtc.set_char_width(2);
 
 	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_screen(m_screen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(32, 14);
+	m_spritegen->set_pri_callback(FUNC(wardner_state::pri_cb));
 
 	BUFFERED_SPRITERAM8(config, m_spriteram8);
 

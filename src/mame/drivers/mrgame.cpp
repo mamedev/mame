@@ -7,12 +7,7 @@
     These games have a M68000 and 3x Z80, and a M114 Sound IC.
     They have a video screen upon which the scores and other info is displayed.
 
-Status:
-- motrshow, motrshowa, dakar working in the electronic sense, but not mechanically
-- macattck most roms are missing
-- wcup90 different hardware, partially coded based on macattck schematic
-
-How to set up the machine (motrshow, motrshowa, dakar):
+How to set up the machine (motor show, dakar, wcup90):
 - These machines need to be loaded with default settings before they can accept coins
 - Press - key (minus in main keyboard)
 - Press again until you see test 25 (Motor Show) or test 23 (Dakar)
@@ -24,6 +19,9 @@ How to set up the machine (motrshow, motrshowa, dakar):
 - However, the game cannot be played due to missing balls.
 
 ToDo:
+- Video
+- Outputs
+- Inputs
 - Support for electronic volume control
 - Audio rom banking
 - Most sounds missing due to unemulated M114 chip
@@ -31,6 +29,7 @@ ToDo:
 *****************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
@@ -41,10 +40,14 @@ ToDo:
 #include "sound/dac.h"
 #include "sound/tms5220.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
 
 class mrgame_state : public driver_device
 {
@@ -84,9 +87,9 @@ private:
 	void sound_w(uint8_t data);
 	void triple_w(uint8_t data);
 	void video_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(video_a11_w);
-	DECLARE_WRITE_LINE_MEMBER(video_a12_w);
-	DECLARE_WRITE_LINE_MEMBER(video_a13_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void videoattr_w(offs_t offset, uint8_t data);
+	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(video_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(intst_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_intst_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
@@ -98,6 +101,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_int_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void audio1_io(address_map &map);
@@ -108,11 +112,20 @@ private:
 	void video_map(address_map &map);
 	void wcup90_video_map(address_map &map);
 
-	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_device<m68000_device> m_maincpu;
+	required_device<z80_device> m_audiocpu1;
+	required_device<z80_device> m_audiocpu2;
+	required_device<z80_device> m_videocpu;
+	required_device<ls259_device> m_selectlatch;
+	required_ioport m_io_dsw0;
+	required_ioport m_io_dsw1;
+	required_ioport m_io_x0;
+	required_ioport m_io_x1;
 
 	bool m_ack1;
 	bool m_ack2;
@@ -126,15 +139,7 @@ private:
 	uint8_t m_video_data;
 	uint8_t m_video_status;
 
-	required_device<m68000_device> m_maincpu;
-	required_device<z80_device> m_audiocpu1;
-	required_device<z80_device> m_audiocpu2;
-	required_device<z80_device> m_videocpu;
-	required_device<ls259_device> m_selectlatch;
-	required_ioport m_io_dsw0;
-	required_ioport m_io_dsw1;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
+	tilemap_t *m_tilemap;
 };
 
 
@@ -156,8 +161,9 @@ void mrgame_state::video_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("video", 0);
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().share("objectram");
+	map(0x4800, 0x4bff).mirror(0x0400).ram().share(m_p_videoram).w(FUNC(mrgame_state::videoram_w));
+	map(0x5000, 0x50ff).mirror(0x0700).ram().share(m_p_objectram);
+	map(0x5000, 0x503f).mirror(0x0700).w(FUNC(mrgame_state::videoattr_w)); // only put this over the top of first 64 bytes
 	map(0x6800, 0x6807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0x7000, 0x7000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0x8100, 0x8103).mirror(0x7efc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -167,8 +173,9 @@ void mrgame_state::wcup90_video_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("video", 0);
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).mirror(0x0400).ram().share("videoram");
-	map(0x9000, 0x90ff).mirror(0x0700).ram().share("objectram");
+	map(0x8800, 0x8bff).mirror(0x0400).ram().share(m_p_videoram).w(FUNC(mrgame_state::videoram_w));
+	map(0x9000, 0x90ff).mirror(0x0700).ram().share(m_p_objectram);
+	map(0x9000, 0x903f).mirror(0x0700).w(FUNC(mrgame_state::videoattr_w)); // only put this over the top of first 64 bytes
 	map(0xa800, 0xa807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0xb000, 0xb000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0xc000, 0xc003).mirror(0x3ffc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -304,19 +311,32 @@ void mrgame_state::video_w(uint8_t data)
 	m_video_data = data;
 }
 
-WRITE_LINE_MEMBER(mrgame_state::video_a11_w)
+void mrgame_state::videoram_w(offs_t offset, uint8_t data)
 {
-	m_gfx_bank = (m_gfx_bank & 6) | (state ? 1 : 0);
+	m_p_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(mrgame_state::video_a12_w)
+void mrgame_state::videoattr_w(offs_t offset, uint8_t data)
 {
-	m_gfx_bank = (m_gfx_bank & 5) | (state ? 2 : 0);
+	m_p_objectram[offset] = data;
+	if (BIT(offset, 0))
+	{
+		for (int y = 0; y < 32; y++)
+			m_tilemap->mark_tile_dirty((y << 5) | (offset >> 1));
+	}
+	else
+	{
+		m_tilemap->set_scrolly(offset >> 1, data);
+	}
 }
 
-WRITE_LINE_MEMBER(mrgame_state::video_a13_w)
+template <unsigned Bit>
+WRITE_LINE_MEMBER(mrgame_state::video_bank_w)
 {
-	m_gfx_bank = (m_gfx_bank & 3) | (state ? 4 : 0);
+	m_gfx_bank &= 0x0f & ~(uint8_t(1) << Bit);
+	m_gfx_bank |= uint8_t(state ? 1 : 0) << Bit;
+	m_tilemap->mark_all_dirty();
 }
 
 WRITE_LINE_MEMBER(mrgame_state::intst_w)
@@ -336,6 +356,7 @@ WRITE_LINE_MEMBER(mrgame_state::nmi_intst_w)
 WRITE_LINE_MEMBER(mrgame_state::flip_w)
 {
 	m_flip = state;
+	m_tilemap->mark_all_dirty();
 }
 
 void mrgame_state::ack1_w(uint8_t data)
@@ -366,7 +387,11 @@ uint8_t mrgame_state::portc_r()
 
 void mrgame_state::machine_start()
 {
-	m_tile_bitmap=std::make_unique<bitmap_ind16>(256,256);
+	m_tilemap = &machine().tilemap().create(
+			*m_gfxdecode,
+			tilemap_get_info_delegate(*this, FUNC(mrgame_state::get_tile_info)), TILEMAP_SCAN_ROWS,
+			8, 8, 32, 32);
+	m_tilemap->set_scroll_cols(32);
 }
 
 void mrgame_state::machine_reset()
@@ -418,33 +443,62 @@ TIMER_DEVICE_CALLBACK_MEMBER(mrgame_state::irq_timer)
 	}
 }
 
-// layouts from pinmame
-static const gfx_layout charlayout =
+
+static const gfx_layout charlayout_2bpp =
 {
 	8, 8,
 	4096,
 	2,
-	{ 0, 0x8000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56 },
+	{ 0x00000*8, 0x08000*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8*8
 };
 
-static const gfx_layout spritelayout =
+static const gfx_layout spritelayout_2bpp =
 {
 	16, 16,
 	1024,
 	2,
-	{ 0, 0x8000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 64, 65, 66, 67, 68, 69, 70, 71 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56, 128, 136, 144, 152, 160, 168, 176, 184 },
+	{ 0x00000*8, 0x08000*8 },
+	{ STEP8(0, 1), STEP8(64, 1) },
+	{ STEP8(0, 8), STEP8(128, 8) },
 	32*8
 };
 
-static GFXDECODE_START(gfx_mrgame)
-	GFXDECODE_ENTRY("chargen", 0, charlayout, 0, 16)
-	GFXDECODE_ENTRY("chargen", 0, spritelayout, 0, 16)
+static GFXDECODE_START(gfx_2bpp)
+	GFXDECODE_ENTRY("chargen", 0, charlayout_2bpp, 0, 16)
+	GFXDECODE_ENTRY("chargen", 0, spritelayout_2bpp, 0, 16)
 GFXDECODE_END
+
+
+static const gfx_layout charlayout_5bpp
+{
+	8, 8,
+	4096,
+	5,
+	{ 0x00000*8, 0x08000*8, 0x10000*8, 0x18000*8, 0x20000*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8*8
+};
+
+static const gfx_layout spritelayout_5bpp =
+{
+	16, 16,
+	1024,
+	5,
+	{ 0x00000*8, 0x08000*8, 0x10000*8, 0x18000*8, 0x20000*8 },
+	{ STEP8(0, 1), STEP8(64, 1) },
+	{ STEP8(0, 8), STEP8(128, 8) },
+	32*8
+};
+
+static GFXDECODE_START(gfx_5bpp)
+	GFXDECODE_ENTRY("chargen", 0, charlayout_5bpp, 0, 1)
+	GFXDECODE_ENTRY("chargen", 0, spritelayout_5bpp, 0, 1)
+GFXDECODE_END
+
 
 void mrgame_state::mrgame_palette(palette_device &palette) const
 {
@@ -485,53 +539,17 @@ void mrgame_state::mrgame_palette(palette_device &palette) const
 	}
 }
 
-// most of this came from pinmame as the diagram doesn't make a lot of sense
+TILE_GET_INFO_MEMBER(mrgame_state::get_tile_info)
+{
+	tileinfo.set(
+			0, m_p_videoram[tile_index] | (uint16_t(m_gfx_bank) << 8),
+			m_p_objectram[((tile_index & 0x1f) << 1) | 1],
+			m_flip ? TILEMAP_FLIPX : 0);
+}
+
 uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y,ptr=0,col;
-	int32_t scrolly[32];
-	uint16_t chr;
-	bool flipx,flipy;
-
-	// text
-	for (x = 0; x < 32; x++)
-	{
-		scrolly[x] = -m_p_objectram[ptr++];
-		col = m_p_objectram[ptr++];
-
-		for (y = 0; y < 32; y++)
-		{
-			chr = m_p_videoram[x+y*32] | (m_gfx_bank << 8);
-
-			m_gfxdecode->gfx(0)->opaque(*m_tile_bitmap, m_tile_bitmap->cliprect(),
-				chr,
-				col,
-				m_flip,0,
-				x*8,y*8);
-		}
-	}
-
-	// scroll each column as needed
-	copyscrollbitmap(bitmap,*m_tile_bitmap,0,nullptr,32,scrolly,cliprect);
-
-
-	// sprites
-	for (ptr = 0x40; ptr < 0x60; ptr += 4)
-	{
-		x = m_p_objectram[ptr + 3] + 1;
-		y = 255 - m_p_objectram[ptr];
-		flipx = BIT(m_p_objectram[ptr + 1], 6);
-		flipy = BIT(m_p_objectram[ptr + 1], 7);
-		chr = (m_p_objectram[ptr + 1] & 0x3f) | (m_gfx_bank << 6);
-		col = m_p_objectram[ptr + 2];
-
-		if ((y > 16) && (x > 24))
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				chr,
-				col,
-				flipx,flipy,
-				x,y-16,0);
-	}
+	m_tilemap->draw(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -557,10 +575,10 @@ void mrgame_state::mrgame(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5564 (x2) + battery
 
 	LS259(config, m_selectlatch); // 5B
-	m_selectlatch->q_out_cb<0>().set(FUNC(mrgame_state::video_a11_w));
+	m_selectlatch->q_out_cb<0>().set(FUNC(mrgame_state::video_bank_w<0>));
 	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::nmi_intst_w));
-	m_selectlatch->q_out_cb<3>().set(FUNC(mrgame_state::video_a12_w));
-	m_selectlatch->q_out_cb<4>().set(FUNC(mrgame_state::video_a13_w));
+	m_selectlatch->q_out_cb<3>().set(FUNC(mrgame_state::video_bank_w<1>));
+	m_selectlatch->q_out_cb<4>().set(FUNC(mrgame_state::video_bank_w<2>));
 	m_selectlatch->q_out_cb<6>().set(FUNC(mrgame_state::flip_w));
 
 	//watchdog_timer_device &watchdog(WATCHDOG_TIMER(config, "watchdog")); // LS393 at 5D (video board) driven by VBLANK
@@ -575,7 +593,7 @@ void mrgame_state::mrgame(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(mrgame_state::mrgame_palette), 64);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrgame);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2bpp);
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();
@@ -610,7 +628,10 @@ void mrgame_state::wcup90(machine_config &config)
 
 	m_videocpu->set_addrmap(AS_PROGRAM, &mrgame_state::wcup90_video_map);
 
+	m_gfxdecode->set_info(gfx_5bpp);
+
 	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::intst_w)); // U48
+	m_selectlatch->q_out_cb<2>().set(FUNC(mrgame_state::video_bank_w<3>));
 
 	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(mrgame_state::vblank_int_w));
 }
@@ -650,8 +671,16 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(motrshow)
 	ROM_REGION16_BE(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, CRC(e862ca71) SHA1(b02e5f39f9427d58b70b7999a5ff6075beff05ae))
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, CRC(c898ae25) SHA1(f0e1369284a1e0f394f1d40281fd46252016602e))
+	ROM_DEFAULT_BIOS("0")
+	ROM_SYSTEM_BIOS(0, "0", "0")
+	ROMX_LOAD( "cpu_0.ic13",  0x0000, 0x8000, CRC(e862ca71) SHA1(b02e5f39f9427d58b70b7999a5ff6075beff05ae), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "cpu_0.ic14",  0x0001, 0x8000, CRC(c898ae25) SHA1(f0e1369284a1e0f394f1d40281fd46252016602e), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "1", "1")
+	ROMX_LOAD( "cpu_1.ic13a", 0x0000, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "cpu_1.ic14b", 0x0001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "2", "2")
+	ROMX_LOAD( "cpu_2.ic13b", 0x0000, 0x8000, CRC(9cd2d6f3) SHA1(6f123367ccbe1376b4bd8a5ee0f636efe42f9eac), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "cpu_2.ic14b", 0x0001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af), ROM_SKIP(1) | ROM_BIOS(2) )
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
@@ -674,18 +703,21 @@ ROM_START(motrshow)
 	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(4f42be6e) SHA1(684e988f413cd21c785ad5d60ef5eaddddaf72ab))
 ROM_END
 
-ROM_START(motrshowa)
+/*-----------------------------------------------------------------------
+/ Fast Track (1989)  A predecessor of Motor Show. Green Screen text only
+/-----------------------------------------------------------------------*/
+ROM_START(fasttrack)
 	ROM_REGION16_BE(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpuic13a.rom", 0x000000, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da))
-	ROM_LOAD16_BYTE("cpuic14b.rom", 0x000001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af))
+	ROM_LOAD16_BYTE("cpuic13.rom", 0x0000, 0x8000, CRC(675cbef6) SHA1(0561aee09bb459a79e54a903d39ef5e5288e8368))
+	ROM_LOAD16_BYTE("cpuic14.rom", 0x0001, 0x8000, CRC(57a1c42f) SHA1(fbfc7527068a1e68afa4c20d5c2650399a1ee3cd))
 
 	ROM_REGION(0x8000, "video", 0)
-	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
+	ROM_LOAD("ft_vid1.764", 0x0000, 0x2000, NO_DUMP )  // only dump we found was all 0xF7
 
-	ROM_REGION(0x10000, "chargen", 0)
-	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db))
-	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(1664ec8d) SHA1(e7b15acdac7dfc51b668e908ca95f02a2b569737))
+	ROM_REGION(0x10000, "chargen", ROMREGION_ERASEFF)
+	ROM_LOAD("ft_vid2.532",  0x0000, 0x001000, CRC(5145685b) SHA1(6857be53efee5d439311ddb93e9f509590ff26c9) )  // 2nd half is rubbish
 
+	// from here wasn't supplied, assumed same as motorshow
 	ROM_REGION(0x0020, "proms", 0)
 	ROM_LOAD("vid_ic66.rom", 0x0000, 0x0020, CRC(5b585252) SHA1(b88e56ebdce2c3a4b170aff4b05018e7c21a79b8))
 
@@ -705,31 +737,31 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(macattck)
 	ROM_REGION16_BE(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, NO_DUMP)
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, NO_DUMP)
+	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x0000, 0x8000, CRC(35cabad1) SHA1(01279df881b0d7d6586c1b8570b12bdc1fb9ff21) )
+	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x0001, 0x8000, CRC(6a4d7b89) SHA1(090e1a6c069cb6e5efd26a0260df613375f0b063) )
 
 	ROM_REGION(0x8000, "video", 0)
-	ROM_LOAD("vid_ic91.rom", 0x0000, 0x8000, CRC(42d2ba01) SHA1(c13d38c2798575760461912cef65dde57dfd938c))
+	ROM_LOAD("vid_ic91.rom", 0x0000, 0x8000, CRC(42d2ba01) SHA1(c13d38c2798575760461912cef65dde57dfd938c) )
 
-	ROM_REGION(0x30000, "chargen", 0)
-	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(f6e047fb) SHA1(6be712dda60257b9e7014315c8fee19812622bf6))
-	ROM_LOAD("vid_ic15.rom", 0x08000, 0x8000, CRC(405a8f54) SHA1(4d58915763db3c3be2bfc166be1a12285ff2c38b))
-	ROM_LOAD("vid_ic16.rom", 0x10000, 0x8000, CRC(063ea783) SHA1(385dbfcc8ecd3a784f9a8752d00e060b48d70d6a))
-	ROM_LOAD("vid_ic17.rom", 0x18000, 0x8000, CRC(9f95abf8) SHA1(d71cf36c8bf27ad41b2d3cebd0af620a34ce0062) BAD_DUMP)
-	ROM_LOAD("vid_ic18.rom", 0x20000, 0x8000, CRC(83ef25f8) SHA1(bab482badb8646b099dbb197ca9af3a126b274e3))
+	ROM_REGION(0x28000, "chargen", 0)
+	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(f6e047fb) SHA1(6be712dda60257b9e7014315c8fee19812622bf6) )
+	ROM_LOAD("vid_ic15.rom", 0x08000, 0x8000, CRC(405a8f54) SHA1(4d58915763db3c3be2bfc166be1a12285ff2c38b) )
+	ROM_LOAD("vid_ic16.rom", 0x10000, 0x8000, CRC(063ea783) SHA1(385dbfcc8ecd3a784f9a8752d00e060b48d70d6a) )
+	ROM_LOAD("vid_ic17.rom", 0x18000, 0x8000, CRC(7494e44e) SHA1(c7c062508e81b9fd818f36f80d4a6da02c3bda40) )
+	ROM_LOAD("vid_ic18.rom", 0x20000, 0x8000, CRC(83ef25f8) SHA1(bab482badb8646b099dbb197ca9af3a126b274e3) )
 
 	ROM_REGION(0x0020, "proms", 0)
-	ROM_LOAD("vid_ic61.rom", 0x0000, 0x0020, CRC(538c72ae) SHA1(f704492568257fcc4a4f1189207c6fb6526eb81c) BAD_DUMP)
+	ROM_LOAD("vid_ic61.rom", 0x0000, 0x0020, CRC(538c72ae) SHA1(f704492568257fcc4a4f1189207c6fb6526eb81c) BAD_DUMP) // from wcup90, assumed to be the same
 
 	ROM_REGION(0x10000, "audio1", 0)
-	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, NO_DUMP)
+	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(4ab94d16) SHA1(4c3755489f699c751d664f420b9852ef16bb3aa6) )
 
 	ROM_REGION(0x4000, "m114", 0)
-	ROM_LOAD("snd_ic22.rom", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD("snd_ic22.rom", 0x0000, 0x4000, CRC(9d3546c5) SHA1(cc6e91288692b927f7d046e192b1fd128c126d0d) )
 
 	ROM_REGION(0x10000, "audio2", 0)
-	ROM_LOAD("snd_ic35.rom", 0x0000, 0x8000, NO_DUMP)
-	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, NO_DUMP)
+	ROM_LOAD("snd_ic35.rom", 0x0000, 0x8000, CRC(52e9811c) SHA1(52223cf14a185b4dab14143d797000baf6d618cc) )
+	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(2e6b5822) SHA1(9e390e4b71cc103ec3d781575df484a3e4217b3b) )
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -767,9 +799,11 @@ ROM_START(wcup90)
 	ROM_LOAD("snd_ic44.rom", 0x00000, 0x8000, CRC(00946570) SHA1(83e7dd89844679571ab2a803295c8ca8941a4ac7))
 ROM_END
 
+} // anonymous namespace
+
 
 GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  fasttrack, motrshow,  mrgame,  mrgame, mrgame_state, empty_init,  ROT0, "Mr Game", "Fast Track",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1990,  macattck,  0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  wcup90,    0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "World Cup 90",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

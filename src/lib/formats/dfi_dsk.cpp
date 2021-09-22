@@ -15,6 +15,8 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 #define NUMBER_OF_MULTIREADS 3
 // thresholds for brickwall windowing

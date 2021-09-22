@@ -109,14 +109,17 @@
 
 *********************************************************************/
 #include "imgtool.h"
+#include "filter.h"
 
 #include "formats/hti_tape.h"
 #include "formats/imageutl.h"
 
 #include "corefile.h"
 #include "ioprocs.h"
+#include "opresolv.h"
 
 #include <bitset>
+#include <cstdio>
 
 
 // Constants

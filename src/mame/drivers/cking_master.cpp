@@ -22,9 +22,9 @@ TODO:
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/sensorboard.h"
 #include "machine/bankdev.h"
-#include "machine/timer.h"
+#include "machine/clock.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 
@@ -42,7 +42,6 @@ public:
 	master_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
@@ -61,16 +60,11 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
 	required_device<address_map_bank_device> m_mainmap;
 	required_ioport_array<2> m_inputs;
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// address maps
 	void main_map(address_map &map);
@@ -226,10 +220,9 @@ void master_state::master(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &master_state::main_trampoline);
 	ADDRESS_MAP_BANK(config, "mainmap").set_map(&master_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	const attotime irq_period = attotime::from_hz(418); // 555 timer (22nF, 150K, 1K5), measured 418Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(master_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(22870)); // active for 22.87us
-	TIMER(config, "irq_off").configure_periodic(FUNC(master_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 418)); // 555 timer (22nF, 150K, 1K5), measured 418Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(22870)); // active for 22.87us
+	irq_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

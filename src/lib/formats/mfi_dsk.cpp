@@ -6,6 +6,8 @@
 
 #include <zlib.h>
 
+#include <cstring>
+
 
 /*
   Mess floppy image structure:

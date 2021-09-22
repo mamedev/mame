@@ -13,22 +13,25 @@
 
   --- Supported Sets ---
 
-  Set Name | Relation | Description
-  ---------+----------+------------------------------------
-  ampoker2 |  parent  |  American Poker II.
-  ampkr2b1 |  clone   |  American Poker II (bootleg, set 1).
-  ampkr2b2 |  clone   |  American Poker II (bootleg, set 2).
-  ampkr2b3 |  clone   |  American Poker II (bootleg, set 3).
-  ampkr2b4 |  clone   |  American Poker II (bootleg, set 4).
-  ampkr228 |  clone   |  American Poker II (iamp2 v28).
-  pkrdewin |  clone   |  Poker De Win.
-  ampkr95  |  clone   |  American Poker 95.
-  videomat |  clone   |  Videomat (polish bootleg).
-  rabbitpk |  clone   |  Rabbit Poker / Arizona Poker 1.1? (with PIC)
-  sigmapkr |  parent  |  Sigma Poker.
-  sigma2k  |  parent  |  Sigma Poker 2000.
-  piccolop |  parent  |  Piccolo Poker 100.
-  arizna10 |  clone   |  Arizona Poker 1.1? (with PIC)
+  Set Name   | Relation | Description
+  -----------+----------+------------------------------------
+  ampoker2   |  parent  |  American Poker II.
+  ampkr2b1   |  clone   |  American Poker II (bootleg, set 1).
+  ampkr2b2   |  clone   |  American Poker II (bootleg, set 2).
+  ampkr2b3   |  clone   |  American Poker II (bootleg, set 3).
+  ampkr2b4   |  clone   |  American Poker II (bootleg, set 4).
+  ampkr228   |  clone   |  American Poker II (iamp2 v28).
+  ampkr2jsp  |  clone?  |  American Poker II - Jackpot (Spanish, set 1)
+  ampkr2jspa |  clone?  |  American Poker II - Jackpot (Spanish, set 2)
+  ampkr2jspb |  clone?  |  American Poker II - Jackpot (Spanish, set 3)
+  pkrdewin   |  clone   |  Poker De Win.
+  ampkr95    |  clone   |  American Poker 95.
+  videomat   |  clone   |  Videomat (polish bootleg).
+  rabbitpk   |  clone   |  Rabbit Poker / Arizona Poker 1.1? (with PIC)
+  sigmapkr   |  parent  |  Sigma Poker.
+  sigma2k    |  parent  |  Sigma Poker 2000.
+  piccolop   |  parent  |  Piccolo Poker 100.
+  arizna10   |  clone   |  Arizona Poker 1.1? (with PIC)
 
 *********************************************************************************
 
@@ -122,6 +125,12 @@
   Just discharge the credits one by one pressing quickly the door switch (O)
   If you want to play without the hopper issues, just leave the door open (O). In this mode,
   the game is playable but doesn't contabilize in the meters.
+
+
+  American Poker II - Jackpot (Spanish)
+
+  Not working yet, but could be a jackpot based game driven by an external server.
+  Will see later... As soon as we can improve the emulation.
 
 
 *********************************************************************************
@@ -1305,6 +1314,49 @@ ROM_START( ampkr228 )
 	ROM_LOAD( "gal16v8b.u8",      0x0200, 0x0117, CRC(7edb3276) SHA1(1302aec1d9703e6ce9da77fc7a0613e7eff1ccb5) )
 ROM_END
 
+/*
+  American Poker II - Jackpot
+  Spanish program.
+
+  Could have jackpot features
+  driven by external server.
+
+*/
+ROM_START( ampkr2jsp )
+	ROM_REGION( 0x10000, "maincpu", 0 )	// The set is marked as "3A".
+	ROM_LOAD( "u6", 0x0000, 0x10000, CRC(183b67a6) SHA1(8d5b1ce401e8783641c666a5b190a1f052f2dfca) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "u47", 0x0000, 0x4000, CRC(024d6263) SHA1(bf4eb4eff0cac85619c230255331a149e5f2e2c6) )
+	ROM_IGNORE(              0x4000)
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
+ROM_START( ampkr2jspa )
+	ROM_REGION( 0x10000, "maincpu", 0 )	// The set is marked as "zarate".
+	ROM_LOAD( "u6", 0x0000, 0x10000, CRC(35aa7c52) SHA1(8aa422b1b86d0366fe4736d97470fc330335ae78) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "u47", 0x0000, 0x4000, BAD_DUMP CRC(094d75a5) SHA1(069b3cacd648f59da42d0b7246ac125f16b54005) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
+ROM_START( ampkr2jspb )
+	ROM_REGION( 0x10000, "maincpu", 0 )	// The set is marked as "novomatic".
+	ROM_LOAD( "u6", 0x0000, 0x10000, CRC(e2f5ff56) SHA1(ab793a4f15673d6d4447024172f6fa6c61719fe7) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "u47", 0x0000, 0x4000, BAD_DUMP CRC(094d75a5) SHA1(069b3cacd648f59da42d0b7246ac125f16b54005) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
+
 ROM_START( pkrdewin )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "poker7.001", 0x4000, 0x10000, CRC(eca16b9e) SHA1(5063d733721457ab3b08caafbe8d33b2cbe4f88b) )
@@ -1522,20 +1574,23 @@ void ampoker2_state::init_rabbitpk()
 *      Game Drivers      *
 *************************/
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY              FULLNAME                                     FLAGS                   LAYOUT
-GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "Novomatic",         "American Poker II",                         MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 1)",        MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 2)",        MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 3)",        MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 4)",        MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg?",          "American Poker II (iamp2 v28)",             MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker 95",                         MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Poker De Win",                              MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Videomat (Polish bootleg)",                 MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAME(  1991, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, empty_init,    ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                         MACHINE_SUPPORTS_SAVE )
-GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)",        MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1995, arizna10, ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg (Ri.Bi)",   "Arizona 10 (v1.1)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,  layout_ampoker2 ) // undumped PIC for protection?
+//     YEAR  NAME        PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY              FULLNAME                                        FLAGS                                        LAYOUT
+GAMEL( 1990, ampoker2,   0,        ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "Novomatic",         "American Poker II",                            MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1990, ampkr2b1,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 1)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1990, ampkr2b2,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 2)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1994, ampkr2b3,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 3)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1994, ampkr2b4,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 4)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1994, ampkr228,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg?",          "American Poker II (iamp2 v28)",                MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1994, ampkr2jsp,  ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg?",          "American Poker II - Jackpot (Spanish, set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_ampoker2 )
+GAMEL( 1994, ampkr2jspa, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg?",          "American Poker II - Jackpot (Spanish, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_ampoker2 )
+GAMEL( 1994, ampkr2jspb, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg?",          "American Poker II - Jackpot (Spanish, set 3)", MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1995, ampkr95,    ampoker2, ampoker2, ampkr95,  ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker 95",                            MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1990, pkrdewin,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Poker De Win",                                 MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1990, videomat,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Videomat (Polish bootleg)",                    MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAME(  1991, piccolop,   ampoker2, ampoker2, piccolop, ampoker2_state, empty_init,    ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                            MACHINE_SUPPORTS_SAVE )
+GAMEL( 1990, rabbitpk,   ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1995, arizna10,   ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg (Ri.Bi)",   "Arizona 10 (v1.1)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_ampoker2 ) // undumped PIC for protection?
 
 // different games not based on american poker 2
-GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, ampoker2_state, empty_init,    ROT0, "Sigma Inc.",        "Sigma Poker",                               MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
-GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  ampoker2_state, empty_init,    ROT0, "Sigma Inc.",        "Sigma Poker 2000",                          MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
+GAMEL( 1995, sigmapkr,   0,        ampoker2, sigmapkr, ampoker2_state, empty_init,    ROT0, "Sigma Inc.",        "Sigma Poker",                                  MACHINE_SUPPORTS_SAVE,                       layout_sigmapkr )
+GAMEL( 1998, sigma2k,    0,        sigma2k,  sigma2k,  ampoker2_state, empty_init,    ROT0, "Sigma Inc.",        "Sigma Poker 2000",                             MACHINE_SUPPORTS_SAVE,                       layout_sigmapkr )

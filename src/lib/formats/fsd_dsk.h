@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "flopimg.h"
+#include "flopimg_legacy.h"
 #include "wd177x_dsk.h"
 
 /**************************************************************************/

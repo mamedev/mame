@@ -155,7 +155,7 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(INTERPRO_LLE_EN_US_KEYBOARD, bus::interpro::keyboard, lle_en_us_device, "kbd_lle_en_us", "InterPro Keyboard (LLE, US English)")
+DEFINE_DEVICE_TYPE(INTERPRO_LLE_EN_US_KEYBOARD, bus::interpro::keyboard::lle_en_us_device, "kbd_lle_en_us", "InterPro Keyboard (LLE, US English)")
 
 namespace bus::interpro::keyboard {
 

@@ -550,8 +550,7 @@ int dinput_joystick_device::configure()
 //============================================================
 
 dinput_api_helper::dinput_api_helper()
-	: m_dinput(nullptr),
-	  m_dinput_create_prt(nullptr)
+	: m_dinput(nullptr)
 {
 }
 

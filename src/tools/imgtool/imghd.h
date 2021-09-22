@@ -11,10 +11,15 @@
 #ifndef IMGHD_H
 #define IMGHD_H
 
-#include "stream.h"
+#include "imgterrs.h"
 
 #include "harddisk.h"
 
+
+namespace imgtool
+{
+	class stream;
+}
 
 struct mess_hard_disk_file
 {

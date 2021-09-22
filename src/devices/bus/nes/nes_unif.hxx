@@ -97,7 +97,7 @@ static const unif unif_list[] =
 	{ "BMC-A65AS",                  0,    0, CHRRAM_8,  BMC_A65AS},
 	{ "BMC-GS-2004",                0,    0, CHRRAM_8,  RCM_GS2004},
 	{ "BMC-GS-2013",                0,    0, CHRRAM_8,  RCM_GS2013},
-	{ "BMC-NOVELDIAMOND9999999IN1", 0,    0, CHRRAM_0,  BMC_NOVEL1},
+	{ "BMC-NOVELDIAMOND9999999IN1", 0,    0, CHRRAM_0,  BMC_21IN1},
 	{ "BMC-SUPER24IN1SC03",         8,    0, CHRRAM_8,  BMC_S24IN1SC03},
 	{ "BMC-SUPERHIK8IN1",           8,    0, CHRRAM_0,  BMC_HIK8IN1},
 	{ "BMC-T-262",                  0,    0, CHRRAM_8,  BMC_T262},
@@ -107,23 +107,23 @@ static const unif unif_list[] =
 	{ "UNL-TEK90",                  0,    0, CHRRAM_0,  JYCOMPANY_A}, // JY Company A (is TEK90 the real PCB name?)
 	{ "UNL-KS7017",                 0,    0, CHRRAM_0,  KAISER_KS7017},
 	{ "UNL-KS7032",                 0,    0, CHRRAM_0,  KAISER_KS7032}, //  mapper 142
-	{ "UNL-603-5052",               0,    0, CHRRAM_0,  UNL_603_5052}, // mapper 238?
+	{ "UNL-603-5052",               0,    0, CHRRAM_0,  UNL_603_5052}, // mapper 238
 	{ "UNL-EDU2000",                0,   32, CHRRAM_8,  UNL_EDU2K},
 	{ "UNL-H2288",                  0,    0, CHRRAM_0,  UNL_H2288}, // mapper 123
 	{ "UNL-SHERO",                  0,    0, CHRRAM_8,  SACHEN_SHERO},
 	{ "UNL-YOKO",                   0,    0, CHRRAM_0,  YOKO_BOARD}, // similar to mapper 83, but not the same
 	{ "UNL-FS304",                  0,    8, CHRRAM_8,  WAIXING_FS304}, // used in Zelda 3 by Waixing
 	{ "UNL-43272",                  0,    0, CHRRAM_0,  UNL_43272}, // used in Gaau Hok Gwong Cheung
-	{ "BTL-MARIO1-MALEE2",          0,    0, CHRRAM_0,  UNL_MMALEE}, // mapper 55?
+	{ "BTL-MARIO1-MALEE2",          0,    0, CHRRAM_0,  UNL_MMALEE}, // mapper 55
 	{ "BMC-FK23C",                  0,    0, CHRRAM_0,  BMC_FK23C},
 	{ "BMC-FK23CA",                 0,    0, CHRRAM_0,  BMC_FK23CA},
-	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  BMC_G63IN1 },
+	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  BMC_76IN1 },
 	{ "BMC-BS-5",                   0,    0, CHRRAM_0,  BMC_BENSHIENG},
 	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  BMC_810544C},
 	{ "BMC-411120-C",               0,    0, CHRRAM_0,  BMC_411120C},
 	{ "BMC-8157",                   0,    0, CHRRAM_8,  BMC_8157},
 	{ "BMC-830118C",                0,    0, CHRRAM_0,  BMC_830118C},
-	{ "BMC-D1038",                  0,    0, CHRRAM_0,  BMC_VT5201}, // mapper 60?
+	{ "BMC-D1038",                  0,    0, CHRRAM_0,  BMC_VT5201}, // mapper 59
 	{ "BMC-SUPERVISION16IN1",       0,    0, CHRRAM_0,  SVISION16_BOARD}, // mapper 53
 	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  BMC_NTD_03},
 	{ "UNL-AC08",                   0,    0, CHRRAM_0,  UNL_AC08},
@@ -135,8 +135,8 @@ static const unif unif_list[] =
 	{ "UNL-TF1201",                 0,    0, CHRRAM_0,  UNL_TF1201},
 	{ "UNL-DANCE2000",              0,    8, CHRRAM_8,  SUBOR_TYPE2}, // similar to some Subor carts
 	{ "BMC-12-IN-1",                0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
-	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236?
-	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236?
+	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236
+	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236
 	{ "BMC-42IN1RESETSWITCH",       0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 60?
 	{ "BMC-F-15",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // 150-in-1 Unchained Melody
 	{ "BMC-HP898F",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Primasoft 9999999-in-1

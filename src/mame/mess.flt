@@ -316,6 +316,7 @@ fidel_card.cpp
 fidel_cc1.cpp
 fidel_cc10.cpp
 fidel_cc7.cpp
+fidel_checkc2.cpp
 fidel_chesster.cpp
 fidel_csc.cpp
 fidel_dames.cpp
@@ -768,6 +769,9 @@ pc8401a.cpp
 pc8801.cpp
 pc88va.cpp
 pc9801.cpp
+pc9801_epson.cpp
+pc9821.cpp
+pc98ha.cpp
 pcd.cpp
 pce.cpp
 pce220.cpp

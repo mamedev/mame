@@ -105,7 +105,9 @@ private:
 class inflate_data : private zlib_data
 {
 protected:
-	using zlib_data::zlib_data;
+	inflate_data(std::size_t buffer_size) noexcept : zlib_data(buffer_size)
+	{
+	}
 
 	~inflate_data()
 	{

@@ -2212,7 +2212,7 @@ int main(int argc, char *argv[])
 {
 	bool                    keep_backup(false);
 	bool                    dry_run(false);
-#if defined(WIN32)
+#if defined(_WIN32)
 	cleaner_base::newline   newline_mode(cleaner_base::newline::DOS);
 #else
 	cleaner_base::newline   newline_mode(cleaner_base::newline::UNIX);

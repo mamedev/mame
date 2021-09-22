@@ -53,19 +53,6 @@ public:
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fix_tilemap;
 
-	/* misc */
-	uint16_t      m_i8751_return;
-	uint16_t      m_i8751_needs_ack;
-	uint16_t      m_i8751_coin_pending;
-	uint16_t      m_i8751_command_queue;
-	int         m_latch;
-
-	u16 wndrplnt_mcu_r();
-	void wndrplnt_mcu_w(u16 data);
-	void wndrplnt_mcu_ack_w(u16 data);
-	void wndrplnt_mcu_reset_w(u16 data);
-
-	void vint_ack_w(u16 data);
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -73,8 +60,6 @@ public:
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(wndrplnt_mcusim_vbint_w);
-	void vbint_w(int state);
 
 	void chelnovjbl(machine_config &config);
 	void karnov(machine_config &config);
@@ -86,7 +71,6 @@ public:
 	void chelnovjbl_mcu_io_map(address_map &map);
 	void karnov_map(address_map &map);
 	void karnovjbl_map(address_map &map);
-	void wndrplnt_map(address_map &map);
 	void karnov_sound_map(address_map &map);
 	void karnovjbl_sound_map(address_map &map);
 

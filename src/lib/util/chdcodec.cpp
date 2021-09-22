@@ -771,7 +771,7 @@ chd_zlib_allocator::chd_zlib_allocator()
 
 
 //-------------------------------------------------
-//  ~chd_zlib_allocator - constructor
+//  ~chd_zlib_allocator - destructor
 //-------------------------------------------------
 
 chd_zlib_allocator::~chd_zlib_allocator()

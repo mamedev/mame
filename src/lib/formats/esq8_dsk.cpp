@@ -16,6 +16,8 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 const floppy_image_format_t::desc_e esq8img_format::esq_6_desc[] = {
 	{ MFM, 0x4e, 80 },

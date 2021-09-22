@@ -18,14 +18,17 @@
     - check allocation bitmap against corruption when an image is opened
 */
 
-#include <climits>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <ctime>
 #include "imgtool.h"
 #include "harddisk.h"
 #include "imghd.h"
+
+#include "opresolv.h"
+
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 /*
     Concepts shared by both disk structures:

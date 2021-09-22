@@ -1400,7 +1400,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.texPageVertOffset = p->texPageVertOffset;
 
 	// Pass the render data into the rasterizer
-	hng64_poly_data& renderData = object_data_alloc();
+	hng64_poly_data& renderData = object_data().next();
 	renderData = rOptions;
 
 	const rectangle& visibleArea = m_state.m_screen->visible_area();

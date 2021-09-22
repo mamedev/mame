@@ -21,11 +21,12 @@ I/O is again similar to supercon
 #include "emu.h"
 
 #include "cpu/m6502/r65c02.h"
-#include "machine/sensorboard.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
+#include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -40,7 +41,6 @@ public:
 	cexpert_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_board(*this, "board"),
 		m_beeper(*this, "beeper"),
@@ -56,7 +56,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	required_device<beep_device> m_beeper;
@@ -64,10 +63,6 @@ private:
 
 	// address maps
 	void main_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -211,10 +206,9 @@ void cexpert_state::cexpert(machine_config &config)
 	R65C02(config, m_maincpu, 10_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cexpert_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(15440 / 32.0); // 555 timer (measured), to 4020
-	TIMER(config, m_irq_on).configure_periodic(FUNC(cexpert_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15200)); // active for 15.2us
-	TIMER(config, "irq_off").configure_periodic(FUNC(cexpert_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 15440 / 32)); // 555 timer (measured), to 4020
+	irq_clock.set_pulse_width(attotime::from_nsec(15200)); // active for 15.2us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

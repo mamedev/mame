@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(ZORRO_A2065, bus::amiga::zorro, a2065_device, "zorro_a2065", "CBM A2065 Ethernet Card")
+DEFINE_DEVICE_TYPE(ZORRO_A2065, bus::amiga::zorro::a2065_device, "zorro_a2065", "CBM A2065 Ethernet Card")
 
 
 namespace bus::amiga::zorro {

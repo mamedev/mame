@@ -364,7 +364,7 @@ const double XTAL::known_xtals[] = {
 	 27'562'000, /* 27.562_MHz_XTAL        Visual 220 */
 	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 132-column display clock */
 	 27'956'000, /* 27.956_MHz_XTAL        CIT-101e 132-column display clock */
-	 28'000'000, /* 28_MHz_XTAL            Sega System H1 SH2 clock */
+	 28'000'000, /* 28_MHz_XTAL            Sega System H1 SH2 clock, Kyukyoku Tiger / Twin Cobra */
 	 28'224'000, /* 28.224_MHz_XTAL        Roland JD-800 */
 	 28'322'000, /* 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux */
 	 28'375'160, /* 28.37516_MHz_XTAL      Amiga PAL systems */

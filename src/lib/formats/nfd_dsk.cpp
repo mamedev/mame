@@ -81,6 +81,10 @@
 
 #include "ioprocs.h"
 
+#include "osdcomm.h" // little_endianize_int*
+
+#include <cstring>
+
 
 nfd_format::nfd_format()
 {

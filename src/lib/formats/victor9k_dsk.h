@@ -61,8 +61,4 @@ protected:
 extern const floppy_format_type FLOPPY_VICTOR_9000_FORMAT;
 
 
-FLOPPY_IDENTIFY( victor9k_dsk_identify );
-
-FLOPPY_CONSTRUCT( victor9k_dsk_construct );
-
 #endif // MAME_FORMATS_VICTOR9K_DSK_H

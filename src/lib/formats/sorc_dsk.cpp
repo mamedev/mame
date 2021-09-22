@@ -8,11 +8,10 @@
 
 *********************************************************************/
 
-#include <cstring>
-#include <cassert>
-
 #include "sorc_dsk.h"
 #include "basicdsk.h"
+
+#include <cstring>
 
 static FLOPPY_IDENTIFY(sorc_dsk_identify)
 {

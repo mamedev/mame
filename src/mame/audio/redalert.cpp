@@ -10,11 +10,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/redalert.h"
+#include "redalert.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
+#include "sound/hc55516.h"
+
 #include "speaker.h"
 
 
@@ -34,23 +36,73 @@
 #define DEMONEYE_AY8910_CLOCK       (DEMONEYE_AUDIO_PCB_CLOCK / 2)  /* what's the real divisor? */
 
 
-TIMER_CALLBACK_MEMBER(redalert_state::audio_irq_on)
+DEFINE_DEVICE_TYPE(IREM_M37B_AUDIO,        irem_m37b_audio_device,       "irem_m37b_audio",       "Irem M-37B audio")
+DEFINE_DEVICE_TYPE(PANTHER_AUDIO,          panther_audio_device,         "panther_audio",         "Irem M-37B audio (Panther)")
+DEFINE_DEVICE_TYPE(IREM_M37B_UE17B_AUDIO,  irem_m37b_ue17b_audio_device, "irem_m37b_ue17b_audio", "Irem M-37B/UE-17B audio/voice")
+DEFINE_DEVICE_TYPE(DEMONEYE_AUDIO,         demoneye_audio_device,        "demoneye_audio",        "Irem Demoneye-X audio")
+
+
+irem_m37b_audio_device::irem_m37b_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock) :
+	irem_m37b_audio_device(config, IREM_M37B_AUDIO, tag, owner, clock)
 {
-	if (m_sndpia.found())
-		m_sndpia->cb1_w(0); // guess
-	else
-		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, ASSERT_LINE);
+}
+
+irem_m37b_audio_device::irem_m37b_audio_device(const machine_config &config, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(config, type, tag, owner, clock),
+	m_audiocpu(*this, "audiocpu"),
+	m_ay8910(*this, "aysnd"),
+	m_soundlatch(*this, "soundlatch")
+{
+}
+
+
+panther_audio_device::panther_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock) :
+	irem_m37b_audio_device(config, PANTHER_AUDIO, tag, owner, clock)
+{
+}
+
+
+irem_m37b_ue17b_audio_device::irem_m37b_ue17b_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock) :
+	irem_m37b_audio_device(config, IREM_M37B_UE17B_AUDIO, tag, owner, clock),
+	m_voicecpu(*this, "voice"),
+	m_soundlatch2(*this, "soundlatch2")
+{
+}
+
+
+demoneye_audio_device::demoneye_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(config, DEMONEYE_AUDIO, tag, owner, clock),
+	m_audiocpu(*this, "audiocpu"),
+	m_ay(*this, "ay%u", 1U),
+	m_sndpia(*this, "sndpia"),
+	m_soundlatch(*this, "soundlatch")
+{
+}
+
+
+TIMER_CALLBACK_MEMBER(irem_m37b_audio_device::audio_irq_on)
+{
+	m_audiocpu->set_input_line(m6502_device::IRQ_LINE, ASSERT_LINE);
 
 	m_audio_irq_off_timer->adjust(REDALERT_AUDIO_CPU_IRQ_TIME);
 }
 
-
-TIMER_CALLBACK_MEMBER(redalert_state::audio_irq_off)
+TIMER_CALLBACK_MEMBER(irem_m37b_audio_device::audio_irq_off)
 {
-	if (m_sndpia.found())
-		m_sndpia->cb1_w(1); // guess
-	else
-		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, CLEAR_LINE);
+	m_audiocpu->set_input_line(m6502_device::IRQ_LINE, CLEAR_LINE);
+}
+
+
+TIMER_CALLBACK_MEMBER(demoneye_audio_device::audio_irq_on)
+{
+	m_sndpia->cb1_w(0); // guess
+
+	m_audio_irq_off_timer->adjust(REDALERT_AUDIO_CPU_IRQ_TIME);
+}
+
+TIMER_CALLBACK_MEMBER(demoneye_audio_device::audio_irq_off)
+{
+	m_sndpia->cb1_w(1); // guess
 }
 
 
@@ -60,7 +112,7 @@ TIMER_CALLBACK_MEMBER(redalert_state::audio_irq_off)
  *
  *************************************/
 
-void redalert_state::redalert_analog_w(uint8_t data)
+void irem_m37b_audio_device::analog_w(uint8_t data)
 {
 	/* this port triggers analog sounds
 	   D0 = Formation Aircraft?
@@ -82,7 +134,14 @@ void redalert_state::redalert_analog_w(uint8_t data)
  *
  *************************************/
 
-void redalert_state::redalert_audio_command_w(uint8_t data)
+READ_LINE_MEMBER(irem_m37b_audio_device::sound_status_r)
+{
+	// communication handshake between host and sound CPU
+	// at least Panther uses it, unconfirmed for Red Alert and Demoneye-X
+	return m_sound_hs;
+}
+
+void irem_m37b_audio_device::audio_command_w(uint8_t data)
 {
 	/* the byte is connected to port A of the AY8910 */
 	m_soundlatch->write(data);
@@ -95,7 +154,7 @@ void redalert_state::redalert_audio_command_w(uint8_t data)
 }
 
 
-void redalert_state::redalert_AY8910_w(uint8_t data)
+void irem_m37b_audio_device::ay8910_w(uint8_t data)
 {
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
 	switch (data & 0x03)
@@ -121,34 +180,35 @@ void redalert_state::redalert_AY8910_w(uint8_t data)
 }
 
 
-uint8_t redalert_state::redalert_ay8910_latch_1_r()
+uint8_t irem_m37b_audio_device::ay8910_latch_1_r()
 {
 	return m_ay8910_latch_1;
 }
 
 
-void redalert_state::redalert_ay8910_latch_2_w(uint8_t data)
+void irem_m37b_audio_device::ay8910_latch_2_w(uint8_t data)
 {
 	m_ay8910_latch_2 = data;
 }
 
-void redalert_state::redalert_audio_map(address_map &map)
+void irem_m37b_audio_device::redalert_audio_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x03ff).mirror(0x0c00).ram();
-	map(0x1000, 0x1000).mirror(0x0ffe).nopr().w(FUNC(redalert_state::redalert_AY8910_w));
-	map(0x1001, 0x1001).mirror(0x0ffe).rw(FUNC(redalert_state::redalert_ay8910_latch_1_r), FUNC(redalert_state::redalert_ay8910_latch_2_w));
+	map(0x1000, 0x1000).mirror(0x0ffe).nopr().w(FUNC(irem_m37b_audio_device::ay8910_w));
+	map(0x1001, 0x1001).mirror(0x0ffe).rw(FUNC(irem_m37b_audio_device::ay8910_latch_1_r), FUNC(irem_m37b_audio_device::ay8910_latch_2_w));
 	map(0x2000, 0x6fff).noprw();
 	map(0x7000, 0x77ff).mirror(0x0800).rom();
 }
 
-void redalert_state::panther_audio_map(address_map &map)
+void panther_audio_device::panther_audio_map(address_map &map)
 {
 	redalert_audio_map(map);
+
 	// Panther maps these two to $2000 while Red Alert to $1000, different PAL addressing?
 	map(0x1000, 0x1fff).unmaprw();
-	map(0x2000, 0x2000).mirror(0x0ffe).nopr().w(FUNC(redalert_state::redalert_AY8910_w));
-	map(0x2001, 0x2001).mirror(0x0ffe).rw(FUNC(redalert_state::redalert_ay8910_latch_1_r), FUNC(redalert_state::redalert_ay8910_latch_2_w));
+	map(0x2000, 0x2000).mirror(0x0ffe).nopr().w(FUNC(panther_audio_device::ay8910_w));
+	map(0x2001, 0x2001).mirror(0x0ffe).rw(FUNC(panther_audio_device::ay8910_latch_1_r), FUNC(panther_audio_device::ay8910_latch_2_w));
 }
 
 /*************************************
@@ -157,10 +217,10 @@ void redalert_state::panther_audio_map(address_map &map)
  *
  *************************************/
 
-void redalert_state::sound_start()
+void irem_m37b_audio_device::device_start()
 {
-	m_audio_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(redalert_state::audio_irq_on), this));
-	m_audio_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(redalert_state::audio_irq_off), this));
+	m_audio_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irem_m37b_audio_device::audio_irq_on), this));
+	m_audio_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irem_m37b_audio_device::audio_irq_off), this));
 
 	m_audio_irq_on_timer->adjust(REDALERT_AUDIO_CPU_IRQ_FREQ, 0, REDALERT_AUDIO_CPU_IRQ_FREQ);
 
@@ -176,26 +236,14 @@ void redalert_state::sound_start()
  *
  *************************************/
 
-void redalert_state::redalert_voice_command_w(uint8_t data)
+void irem_m37b_ue17b_audio_device::voice_command_w(uint8_t data)
 {
 	m_soundlatch2->write((data & 0x78) >> 3);
 	m_voicecpu->set_input_line(I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(redalert_state::sod_callback)
-{
-	m_cvsd->digit_w(state);
-}
-
-
-READ_LINE_MEMBER(redalert_state::sid_callback)
-{
-	return m_cvsd->clock_state_r();
-}
-
-
-void redalert_state::redalert_voice_map(address_map &map)
+void irem_m37b_ue17b_audio_device::redalert_voice_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).noprw();
@@ -211,20 +259,23 @@ void redalert_state::redalert_voice_map(address_map &map)
  *
  *************************************/
 
-void redalert_state::redalert_audio_m37b(machine_config &config)
+void irem_m37b_audio_device::device_add_mconfig(machine_config &config)
 {
 	M6502(config, m_audiocpu, REDALERT_AUDIO_CPU_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &redalert_state::redalert_audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &irem_m37b_audio_device::redalert_audio_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
+	SPEAKER(config, "mono").front_center();
+
 	AY8910(config, m_ay8910, REDALERT_AY8910_CLOCK);
 	m_ay8910->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	m_ay8910->port_b_write_callback().set(FUNC(redalert_state::redalert_analog_w));
+	m_ay8910->port_b_write_callback().set(FUNC(irem_m37b_audio_device::analog_w));
 	m_ay8910->add_route(0, "mono", 0.50);
 	m_ay8910->add_route(1, "mono", 0.50);
 	/* channel C is used a noise source and is not connected to a speaker */
 }
+
 
 /*************************************
  *
@@ -232,16 +283,18 @@ void redalert_state::redalert_audio_m37b(machine_config &config)
  *
  *************************************/
 
-void redalert_state::redalert_audio_voice(machine_config &config)
+void irem_m37b_ue17b_audio_device::device_add_mconfig(machine_config &config)
 {
+	irem_m37b_audio_device::device_add_mconfig(config);
+
 	I8085A(config, m_voicecpu, REDALERT_VOICE_CPU_CLOCK);
-	m_voicecpu->set_addrmap(AS_PROGRAM, &redalert_state::redalert_voice_map);
-	m_voicecpu->in_sid_func().set(FUNC(redalert_state::sid_callback));
-	m_voicecpu->out_sod_func().set(FUNC(redalert_state::sod_callback));
+	m_voicecpu->set_addrmap(AS_PROGRAM, &irem_m37b_ue17b_audio_device::redalert_voice_map);
+	m_voicecpu->in_sid_func().set("cvsd", FUNC(hc55516_device::clock_state_r));
+	m_voicecpu->out_sod_func().set("cvsd", FUNC(hc55516_device::digit_w));
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	HC55516(config, m_cvsd, REDALERT_HC55516_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
+	HC55516(config, "cvsd", REDALERT_HC55516_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /*************************************
@@ -250,33 +303,11 @@ void redalert_state::redalert_audio_voice(machine_config &config)
  *
  *************************************/
 
-void redalert_state::redalert_audio(machine_config &config)
+void panther_audio_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "mono").front_center();
+	irem_m37b_audio_device::device_add_mconfig(config);
 
-	redalert_audio_m37b(config);
-	redalert_audio_voice(config);
-}
-
-/*************************************
- *
- *  Red Alert
- *
- *************************************/
-
-void redalert_state::ww3_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	redalert_audio_m37b(config);
-}
-
-void redalert_state::panther_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	redalert_audio_m37b(config);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &redalert_state::panther_audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &panther_audio_device::panther_audio_map);
 }
 
 /*************************************
@@ -285,8 +316,19 @@ void redalert_state::panther_audio(machine_config &config)
  *
  *************************************/
 
+void demoneye_audio_device::device_start()
+{
+	m_audio_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(demoneye_audio_device::audio_irq_on), this));
+	m_audio_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(demoneye_audio_device::audio_irq_off), this));
 
-void redalert_state::demoneye_audio_command_w(uint8_t data)
+	m_audio_irq_on_timer->adjust(REDALERT_AUDIO_CPU_IRQ_FREQ, 0, REDALERT_AUDIO_CPU_IRQ_FREQ);
+
+	save_item(NAME(m_ay8910_latch_1));
+	save_item(NAME(m_ay8910_latch_2));
+}
+
+
+void demoneye_audio_device::audio_command_w(uint8_t data)
 {
 	/* the byte is connected to port A of the AY8910 */
 	m_soundlatch->write(data);
@@ -294,57 +336,51 @@ void redalert_state::demoneye_audio_command_w(uint8_t data)
 }
 
 
-void redalert_state::demoneye_ay8910_latch_1_w(uint8_t data)
+void demoneye_audio_device::ay8910_latch_1_w(uint8_t data)
 {
 	m_ay8910_latch_1 = data;
 }
 
 
-uint8_t redalert_state::demoneye_ay8910_latch_2_r()
+uint8_t demoneye_audio_device::ay8910_latch_2_r()
 {
 	return m_ay8910_latch_2;
 }
 
 
-void redalert_state::demoneye_ay8910_data_w(uint8_t data)
+void demoneye_audio_device::ay8910_data_w(uint8_t data)
 {
 	switch (m_ay8910_latch_1 & 0x03)
 	{
 		case 0x00:
 			if (m_ay8910_latch_1 & 0x10)
 				m_ay[0]->data_w(data);
-
 			if (m_ay8910_latch_1 & 0x20)
 				m_ay[1]->data_w(data);
-
 			break;
 
 		case 0x01:
 			if (m_ay8910_latch_1 & 0x10)
 				m_ay8910_latch_2 = m_ay[0]->data_r();
-
 			if (m_ay8910_latch_1 & 0x20)
 				m_ay8910_latch_2 = m_ay[1]->data_r();
-
 			break;
 
 		case 0x03:
 			if (m_ay8910_latch_1 & 0x10)
 				m_ay[0]->address_w(data);
-
 			if (m_ay8910_latch_1 & 0x20)
 				m_ay[1]->address_w(data);
-
 			break;
 
 		default:
-			logerror("demoneye_ay8910_data_w called with latch %02X  data %02X\n", m_ay8910_latch_1, data);
+			logerror("demoneye_audio_device::ay8910_data_w called with latch %02X  data %02X\n", m_ay8910_latch_1, data);
 			break;
 	}
 }
 
 
-void redalert_state::demoneye_audio_map(address_map &map)
+void demoneye_audio_device::demoneye_audio_map(address_map &map)
 {
 	map(0x0500, 0x0503).mirror(0xc000).rw(m_sndpia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x3fff).mirror(0xc000).rom();
@@ -358,15 +394,15 @@ void redalert_state::demoneye_audio_map(address_map &map)
  *
  *************************************/
 
-void redalert_state::demoneye_audio(machine_config &config)
+void demoneye_audio_device::device_add_mconfig(machine_config &config)
 {
 	M6802(config, m_audiocpu, DEMONEYE_AUDIO_CPU_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &redalert_state::demoneye_audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &demoneye_audio_device::demoneye_audio_map);
 
 	PIA6821(config, m_sndpia);
-	m_sndpia->readpa_handler().set(FUNC(redalert_state::demoneye_ay8910_latch_2_r));
-	m_sndpia->writepa_handler().set(FUNC(redalert_state::demoneye_ay8910_data_w));
-	m_sndpia->writepb_handler().set(FUNC(redalert_state::demoneye_ay8910_latch_1_w));
+	m_sndpia->readpa_handler().set(FUNC(demoneye_audio_device::ay8910_latch_2_r));
+	m_sndpia->writepa_handler().set(FUNC(demoneye_audio_device::ay8910_data_w));
+	m_sndpia->writepb_handler().set(FUNC(demoneye_audio_device::ay8910_latch_1_w));
 	m_sndpia->irqb_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
 	SPEAKER(config, "mono").front_center();

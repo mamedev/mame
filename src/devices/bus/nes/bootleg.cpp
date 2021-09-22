@@ -50,6 +50,7 @@ DEFINE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device,    "nes_btl_dn",    "N
 DEFINE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device,     "nes_smb2j",     "NES Cart Super Mario Bros. 2 Jpn PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device,    "nes_smb2ja",    "NES Cart Super Mario Bros. 2 Jpn (Alt) PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device,    "nes_smb2jb",    "NES Cart Super Mario Bros. 2 Jpn (Alt 2) PCB")
+DEFINE_DEVICE_TYPE(NES_N32_4IN1,       nes_n32_4in1_device,  "nes_n32_4in1",  "NES Cart N-32 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_0353,           nes_0353_device,      "nes_0353",      "NES Cart 0353 PCB")
 DEFINE_DEVICE_TYPE(NES_09034A,         nes_09034a_device,    "nes_09034a",    "NES Cart 09-034A PCB")
 DEFINE_DEVICE_TYPE(NES_BATMANFS,       nes_batmanfs_device,  "nes_batmanfs",  "NES Cart Batman Pirate PCB")
@@ -118,8 +119,18 @@ nes_smb2ja_device::nes_smb2ja_device(const machine_config &mconfig, const char *
 {
 }
 
+nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), m_bank67(type == NES_SMB2JB ? 0x0f : 0x07), irq_timer(nullptr)
+{
+}
+
 nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_SMB2JB, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+	: nes_smb2jb_device(mconfig, NES_SMB2JB, tag, owner, clock)
+{
+}
+
+nes_n32_4in1_device::nes_n32_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_smb2jb_device(mconfig, NES_N32_4IN1, tag, owner, clock)
 {
 }
 
@@ -427,6 +438,7 @@ void nes_smb2jb_device::device_start()
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
+	save_item(NAME(m_reg));
 }
 
 void nes_smb2jb_device::pcb_reset()
@@ -439,6 +451,16 @@ void nes_smb2jb_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
+	m_reg = 0;
+}
+
+void nes_n32_4in1_device::pcb_reset()
+{
+	// Powers up in menu, but soft reset does not touch banks (so each game returns to its own title). Is this correct?
+
+	m_irq_enable = 0;
+	m_irq_count = 0;
+	m_reg = 0;
 }
 
 void nes_0353_device::device_start()
@@ -1248,7 +1270,7 @@ u8 nes_smb2j_device::read_l(offs_t offset)
 	if (offset >= 0x1000)
 		return m_prg[0x10000 + (offset & 0x0fff)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 u8 nes_smb2j_device::read_m(offs_t offset)
@@ -1341,7 +1363,8 @@ void nes_smb2jb_device::write_45(offs_t offset, u8 data)
 	switch (offset & 0x4120)
 	{
 		case 0x4020:
-			prg8_cd(bitswap<4>(data, 3, 0, 2, 1));
+			m_reg = bitswap<4>(data, 3, 0, 2, 1);
+			prg8_cd(m_reg);
 			break;
 		case 0x4120:
 			m_irq_enable = BIT(data, 0);
@@ -1369,7 +1392,57 @@ void nes_smb2jb_device::write_l(offs_t offset, u8 data)
 u8 nes_smb2jb_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2jb read_m, offset: %04x\n", offset));
-	return m_prg[0x0f * 0x2000 + offset];
+	return m_prg[m_bank67 * 0x2000 + offset];
+}
+
+/*-------------------------------------------------
+
+ BMC-N32-4IN1
+
+ Unknown Bootleg Multigame Board
+ Games: 4 in 1
+
+ This multicart contains the mapper 50 version of SMB2.
+ There are changes to bank locations compared to that
+ game, but otherwise we rely on the existing SMB2JB
+ emulation (unless other differences are discovered?)
+
+ NES 2.0: mapper 416
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_n32_4in1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("n32_4in1 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x2000)
+	{
+		if (BIT(data, 3))    // NROM games
+		{
+			u8 bank = bitswap<3>(data, 3, 7, 5);
+			u8 mode = BIT(data, 7);
+			if (data & 0xc0)
+			{
+				prg16_89ab(bank & ~mode);
+				prg16_cdef(bank | mode);
+			}
+			else
+				for (int i = 0; i < 4; i++)
+					prg8_x(i, bank << 1);
+		}
+		else                 // SMB2 only
+		{
+			prg8_89(0);
+			prg8_ab(1);
+			prg8_cd(m_reg);
+			prg8_ef(3);
+		}
+
+		chr8((data >> 1) & 0x03, CHRROM);
+		set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
 }
 
 /*-------------------------------------------------

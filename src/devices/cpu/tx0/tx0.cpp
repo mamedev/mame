@@ -989,12 +989,12 @@ void tx0_8kw_device::execute_instruction_8kw()
 				{
 					switch (MAR & 0000300)
 					{
-					case 0000000:   /* (1.6) CYR = CYcle ac contents Right one binary
+					case 0000200:   /* (1.6) CYR = CYcle ac contents Right one binary
 					                    position (AC(17) -> AC(0)) */
 						AC = (AC >> 1) | ((AC & 1) << 17);
 						break;
 
-					case 0000200:   /* (1.6) CYcle ac contents Right one binary
+					case 0000000:   /* (1.6) SHR = SHift ac contents Right one binary
 					                    position (AC(0) unchanged) */
 						AC = (AC >> 1) | (AC & 0400000);
 						break;
