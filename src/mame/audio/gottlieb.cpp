@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "audio/gottlieb.h"
 
-#include "sound/dac.h"
 #include "machine/input_merger.h"
 
 
@@ -171,6 +170,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
+	, m_dac(*this, "dac")
 	, m_riot(*this, "riot")
 {
 }
@@ -256,7 +256,7 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 	m_riot->irq_callback().set_inputline("audiocpu", M6502_IRQ_LINE);
 
 	// sound devices
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
 }
 
 
@@ -306,10 +306,13 @@ void gottlieb_sound_r1_with_votrax_device::device_add_mconfig(machine_config &co
 {
 	gottlieb_sound_r1_device::device_add_mconfig(config);
 
+	m_dac->reset_routes();
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.20);
+
 	// add the VOTRAX
 	VOTRAX_SC01(config, m_votrax, 720000);
 	m_votrax->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
-	m_votrax->add_route(ALL_OUTPUTS, *this, 0.5);
+	m_votrax->add_route(ALL_OUTPUTS, *this, 0.80);
 }
 
 

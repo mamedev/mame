@@ -10,6 +10,7 @@
 #include "machine/mos6530.h"
 #include "machine/6532riot.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "sound/sp0250.h"
 #include "sound/votrax.h"
 
@@ -87,6 +88,9 @@ protected:
 	virtual void device_start() override;
 
 	virtual void gottlieb_sound_r1_map(address_map &map);
+
+protected:
+	required_device<dac_8bit_r2r_device> m_dac;
 
 private:
 	// devices
