@@ -401,6 +401,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_ball11",       NES_BMC_BALL11);
 	device.option_add_internal("bmc_22games",      NES_BMC_22GAMES);
 	device.option_add_internal("bmc_64y2k",        NES_BMC_64Y2K);
+	device.option_add_internal("bmc_420y2k",       NES_BMC_420Y2K);
 	device.option_add_internal("bmc_12in1",        NES_BMC_12IN1);
 	device.option_add_internal("bmc_20in1",        NES_BMC_20IN1);
 	device.option_add_internal("bmc_21in1",        NES_BMC_21IN1);

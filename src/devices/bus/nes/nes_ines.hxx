@@ -270,7 +270,7 @@ static const nes_mmc mmc_list[] =
 	{ 234, AVE_MAXI15 },
 	{ 235, BMC_GOLD150 },   // 235 Golden Game x-in-1 - Unsupported
 	{ 236, BMC_70IN1 },
-	// 237 Teletubbies 420-in-1 multicart. Dump available?
+	{ 237, BMC_TELETUBBIES },
 	{ 238, UNL_603_5052 },
 	// 239 Unused
 	{ 240, CNE_SHLZ },

@@ -278,6 +278,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_ball11",       BMC_BALLGAMES_11IN1 },
 	{ "bmc_22games",      BMC_22GAMES },
 	{ "bmc_64y2k",        BMC_64IN1NR },
+	{ "bmc_420y2k",       BMC_TELETUBBIES },
 	{ "bmc_12in1",        BMC_12IN1 },
 	{ "bmc_20in1",        BMC_20IN1 },
 	{ "bmc_21in1",        BMC_21IN1 },
