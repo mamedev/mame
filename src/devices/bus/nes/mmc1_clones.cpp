@@ -29,6 +29,7 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(NES_BMC_JY820845C, nes_bmc_jy820845c_device, "nes_bmc_jy820845c", "NES Cart BMC JY820845C PCB")
+DEFINE_DEVICE_TYPE(NES_FARID_SLROM,   nes_farid_slrom_device,   "nes_farid_slrom",   "NES Cart Farid SLROM 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_NINJARYU,      nes_ninjaryu_device,      "nes_ninjaryu",      "NES Cart Ninja Ryukenden Chinese PCB")
 DEFINE_DEVICE_TYPE(NES_RESETSXROM,    nes_resetsxrom_device,    "nes_resetsxrom",    "NES Cart BMC RESET-SXROM PCB")
 DEFINE_DEVICE_TYPE(NES_TXC_22110,     nes_txc_22110_device,     "nes_txc_22110",     "NES Cart TXC 01-22110-000 PCB")
@@ -36,6 +37,11 @@ DEFINE_DEVICE_TYPE(NES_TXC_22110,     nes_txc_22110_device,     "nes_txc_22110",
 
 nes_bmc_jy820845c_device::nes_bmc_jy820845c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_sxrom_device(mconfig, NES_BMC_JY820845C, tag, owner, clock), m_latch0(0), m_mode(0)
+{
+}
+
+nes_farid_slrom_device::nes_farid_slrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_sxrom_device(mconfig, NES_FARID_SLROM, tag, owner, clock), m_outer(0)
 {
 }
 
@@ -70,6 +76,18 @@ void nes_bmc_jy820845c_device::pcb_reset()
 	m_latch0 = 0;
 	m_mode = 0;
 	update_banks();
+}
+
+void nes_farid_slrom_device::device_start()
+{
+	nes_sxrom_device::device_start();
+	save_item(NAME(m_outer));
+}
+
+void nes_farid_slrom_device::pcb_reset()
+{
+	m_outer = 0;
+	nes_sxrom_device::pcb_reset();
 }
 
 void nes_resetsxrom_device::device_start()
@@ -186,6 +204,27 @@ void nes_bmc_jy820845c_device::write_h(offs_t offset, u8 data)
 		nes_sxrom_device::write_h(offset, data);
 	else
 		update_banks();
+}
+
+/*-------------------------------------------------
+
+ FARID_SLROM_8-IN-1
+
+ Games: 8 in 1
+
+ MMC1 clone with banking for multigame menu.
+
+ NES 2.0: mapper 323
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_farid_slrom_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("farid_slrom write_m, offset: %04x, data: %02x\n", offset, data));
+	if (!BIT(m_reg[3], 4) && !BIT(m_outer, 3))    // MMC1 WRAM enabled and outer bank not locked
+		m_outer = data;
 }
 
 /*-------------------------------------------------
