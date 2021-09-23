@@ -54,6 +54,7 @@ public:
 
 	void kzaurus(machine_config &config);
 	void koropens(machine_config &config);
+	void pwrchanc(machine_config &config);
 	void spcpokan(machine_config &config);
 	void gs662(machine_config &config);
 
@@ -134,6 +135,7 @@ private:
 
 	void kzaurus_main(address_map &map);
 	void koropens_main(address_map &map);
+	void pwrchanc_main(address_map &map);
 	void spcpokan_main(address_map &map);
 	void gs662_main(address_map &map);
 
@@ -314,6 +316,13 @@ void konmedal68k_state::koropens_main(address_map &map)
 	common_main(map);
 	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_koropens_r));
+}
+
+void konmedal68k_state::pwrchanc_main(address_map &map)
+{
+	koropens_main(map);
+	map(0xa04000, 0xa05fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xa06000, 0xa07fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 }
 
 void konmedal68k_slot_state::slot_main(address_map &map)
@@ -652,6 +661,13 @@ void konmedal68k_state::koropens(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::koropens_main);
 }
 
+void konmedal68k_state::pwrchanc(machine_config &config)
+{
+	koropens(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::pwrchanc_main);
+}
+
 void konmedal68k_state::spcpokan(machine_config &config)
 {
 	kzaurus(config);
@@ -830,7 +846,7 @@ GAME( 1996, dobouchn, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0
 GAME( 1997, unkkonmd, 0, gs662,    kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami medal game (game code GS662)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1997, koropens, 0, koropens, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, kattobas, 0, koropens, kattobas, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, pwrchanc, 0, koropens, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, pwrchanc, 0, pwrchanc, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, spcpokan, 0, spcpokan, spcpokan, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 
