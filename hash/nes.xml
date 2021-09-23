@@ -43,7 +43,7 @@ license:CC0
 		<info name="release" value="19881210"/>
 		<info name="alt_title" value="神宮館'89電脳九星占い"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -799,7 +799,7 @@ license:CC0
 		<info name="serial" value="NES-AV-USA"/>
 		<info name="release" value="198904xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SEROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="32768">
@@ -1131,7 +1131,7 @@ license:CC0
 		<info name="release" value="19881224"/>
 		<info name="alt_title" value="エアーウルフ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -1530,7 +1530,7 @@ license:CC0
 		<info name="release" value="19881028"/>
 		<info name="alt_title" value="アメリカ大統領選挙"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -1594,7 +1594,7 @@ license:CC0
 		<info name="release" value="19881111"/>
 		<info name="alt_title" value="タッチダウンフェーバー ~ American Football - Touchdown Fever (Box)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -1633,7 +1633,7 @@ license:CC0
 		<info name="release" value="19890324"/>
 		<info name="alt_title" value="暗黒神話 ヤマトタケル伝説"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -1694,7 +1694,7 @@ license:CC0
 		<info name="serial" value="NES-AP-USA"/>
 		<info name="release" value="198811xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SEROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="32768">
@@ -1759,7 +1759,7 @@ license:CC0
 		<info name="release" value="19890420"/>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sorom_a" />
+			<feature name="slot" value="sorom" />
 			<feature name="pcb" value="HVC-SOROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -3117,7 +3117,7 @@ license:CC0
 		<info name="release" value="19890519"/>
 		<info name="alt_title" value="ベースボールスター めざせ三冠王!!"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -3186,7 +3186,7 @@ license:CC0
 		<info name="serial" value="NES-LD-USA"/>
 		<info name="release" value="198807xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -3838,7 +3838,7 @@ license:CC0
 		<info name="release" value="19880330"/>
 		<info name="alt_title" value="ビー・バップ・ハイスクール 高校生極楽伝説"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -3922,7 +3922,7 @@ license:CC0
 		<info name="release" value="19880715"/>
 		<info name="alt_title" value="ベストプレープロ野球"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SJROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="turbofile" />
@@ -3947,7 +3947,7 @@ license:CC0
 		<info name="release" value="19880715"/>
 		<info name="alt_title" value="ベストプレープロ野球"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SJROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="turbofile" />
@@ -4494,7 +4494,7 @@ license:CC0
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SKEPROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -4625,7 +4625,7 @@ license:CC0
 		<year>1988</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SKEPROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -5165,7 +5165,7 @@ license:CC0
 		<info name="serial" value="NES-BE-USA"/>
 		<info name="release" value="198711xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -5785,7 +5785,7 @@ license:CC0
 		<info name="release" value="19881216"/>
 		<info name="alt_title" value="キャプテンシルバー"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -5859,7 +5859,7 @@ license:CC0
 		<info name="release" value="19880428"/>
 		<info name="alt_title" value="キャプテン翼"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -6730,7 +6730,7 @@ license:CC0
 		<info name="release" value="19880617"/>
 		<info name="alt_title" value="超惑星戦記 メタファイト"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -7071,7 +7071,7 @@ license:CC0
 		<info name="release" value="19881021"/>
 		<info name="alt_title" value="コブラコマンド"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -7090,7 +7090,7 @@ license:CC0
 		<info name="serial" value="NES-CN-USA"/>
 		<info name="release" value="198811xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -7695,7 +7695,7 @@ license:CC0
 		<info name="release" value="19881217"/>
 		<info name="alt_title" value="サイクルレース ロードマン ～激走!! 日本一周4000km～"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -7850,7 +7850,7 @@ license:CC0
 		<info name="release" value="19881011"/>
 		<info name="alt_title" value="大戦略"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SJROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -7893,7 +7893,7 @@ license:CC0
 		<info name="serial" value="NES-AE-USA"/>
 		<info name="release" value="198903xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SBROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="powerpad" />
@@ -8215,7 +8215,7 @@ license:CC0
 		<info name="release" value="19880513"/>
 		<info name="alt_title" value="ディープダンジョンIII 勇士への旅"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -8426,7 +8426,7 @@ license:CC0
 		<info name="serial" value="NES-DF-USA"/>
 		<info name="release" value="198906xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -8864,7 +8864,7 @@ license:CC0
 		<info name="release" value="19880922"/>
 		<info name="alt_title" value="ドナルドダック"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -8884,7 +8884,7 @@ license:CC0
 		<info name="release" value="19880129"/>
 		<info name="alt_title" value="ドナルドランド"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -9199,7 +9199,7 @@ license:CC0
 		<info name="release" value="19880408"/>
 		<info name="alt_title" value="双載龍"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -9616,7 +9616,7 @@ license:CC0
 		<info name="serial" value="NES-JH-USA"/>
 		<info name="release" value="198904xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -10114,7 +10114,7 @@ license:CC0
 		<info name="release" value="19880210"/>
 		<info name="alt_title" value="ドラゴンクエストIII そして伝説へ・・・"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -10962,7 +10962,7 @@ license:CC0
 		<info name="release" value="19880809"/>
 		<info name="alt_title" value="エッガーランド 迷宮の復活"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -11102,7 +11102,7 @@ license:CC0
 		<info name="release" value="19880428"/>
 		<info name="alt_title" value="エリュシオン"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -12869,7 +12869,7 @@ license:CC0
 		<info name="release" value="19880324"/>
 		<info name="alt_title" value="ファイティングゴルフ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -12909,7 +12909,7 @@ license:CC0
 		<info name="release" value="19871218"/>
 		<info name="alt_title" value="ファイナルファンタジー"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -13022,7 +13022,7 @@ license:CC0
 		<info name="release" value="19881217"/>
 		<info name="alt_title" value="ファイナルファンタジーⅡ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -13647,7 +13647,7 @@ license:CC0
 		<info name="serial" value="NES-FE-USA"/>
 		<info name="release" value="198804xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="zapper" />
@@ -14735,7 +14735,7 @@ license:CC0
 		<info name="release" value="19881221"/>
 		<info name="alt_title" value="銀河英雄伝説 わが征くは星の大海"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -14855,7 +14855,7 @@ license:CC0
 		<info name="release" value="19881209"/>
 		<info name="alt_title" value="ゴジラ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -15012,7 +15012,7 @@ license:CC0
 		<info name="release" value="19871209"/>
 		<info name="alt_title" value="ゴルフ倶楽部バーディラッシユ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -15090,7 +15090,7 @@ license:CC0
 		<info name="release" value="19880326"/>
 		<info name="alt_title" value="ゴルゴ13 第一章 神々の黄昏"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -15452,7 +15452,7 @@ license:CC0
 		<info name="release" value="19880701"/>
 		<info name="alt_title" value="グレートタンク"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -15685,7 +15685,7 @@ license:CC0
 		<info name="release" value="19881226"/>
 		<info name="alt_title" value="ゲバラ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -15967,7 +15967,7 @@ license:CC0
 		<info name="release" value="19881202"/>
 		<info name="alt_title" value="半熟英雄"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -16498,7 +16498,7 @@ license:CC0
 		<info name="release" value="19870807"/>
 		<info name="alt_title" value="ハイウェイスター"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="3dglasses" />
@@ -16606,7 +16606,7 @@ license:CC0
 		<info name="release" value="19880729"/>
 		<info name="alt_title" value="飛龍の拳Ⅱ ドラゴンの翼"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -16770,7 +16770,7 @@ license:CC0
 		<info name="release" value="19880720"/>
 		<info name="alt_title" value="ヒットラーの復活"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -17043,7 +17043,7 @@ license:CC0
 		<info name="release" value="19890331"/>
 		<info name="alt_title" value="ホームランナイター ペナントリーグ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -17292,7 +17292,7 @@ license:CC0
 		<info name="release" value="19880819"/>
 		<info name="alt_title" value="不如帰"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -17430,7 +17430,7 @@ license:CC0
 		<info name="release" value="19890223"/>
 		<info name="alt_title" value="百鬼夜行"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -17918,7 +17918,7 @@ license:CC0
 		<info name="serial" value="NES-VR-USA"/>
 		<info name="release" value="198804xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -18385,7 +18385,7 @@ license:CC0
 		<info name="serial" value="NES-IT-USA"/>
 		<info name="release" value="198807xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -18972,7 +18972,7 @@ license:CC0
 		<info name="release" value="19890317"/>
 		<info name="alt_title" value="ジーザス 恐怖のバイオモンスター"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -19323,7 +19323,7 @@ license:CC0
 		<info name="release" value="19880201"/>
 		<info name="alt_title" value="ジャンボ尾崎のホールインワン プロフェッショナル"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SJROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -19561,7 +19561,7 @@ license:CC0
 		<info name="release" value="19890526"/>
 		<info name="alt_title" value="帰って来た!軍人将棋なんやそれ!?"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -19645,7 +19645,7 @@ license:CC0
 		<info name="release" value="19881216"/>
 		<info name="alt_title" value="かぐや姫伝説"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -19771,7 +19771,7 @@ license:CC0
 		<info name="release" value="19880826"/>
 		<info name="alt_title" value="亀の恩返し ウラシマ伝説"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -20256,7 +20256,7 @@ license:CC0
 		<info name="serial" value="NES-KD-USA"/>
 		<info name="release" value="198711xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -20901,7 +20901,7 @@ license:CC0
 		<info name="release" value="19890916"/>
 		<info name="alt_title" value="コナミックスポーツインソウル"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -21037,7 +21037,7 @@ license:CC0
 		<info name="release" value="19880921"/>
 		<info name="alt_title" value="孔雀王"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -21730,7 +21730,7 @@ license:CC0
 		<info name="serial" value="NES-ZL-USA"/>
 		<info name="release" value="198707xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -22662,7 +22662,7 @@ license:CC0
 		<info name="release" value="19880812"/>
 		<info name="alt_title" value="マッド・シティ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="zapper" />
@@ -23141,7 +23141,7 @@ license:CC0
 		<info name="release" value="19880721"/>
 		<info name="alt_title" value="めぞん一刻"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -23793,7 +23793,7 @@ license:CC0
 		<info name="release" value="19880218"/>
 		<info name="alt_title" value="松本亨の株式必勝学"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -24295,7 +24295,7 @@ license:CC0
 		<info name="release" value="19890501"/>
 		<info name="alt_title" value="名探偵ホームズ Ｍからの挑戦状"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -24598,7 +24598,7 @@ license:CC0
 		<info name="release" value="19871218"/>
 		<info name="alt_title" value="目指せパチプロ パチ夫くん"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -25636,7 +25636,7 @@ license:CC0
 		<info name="release" value="19871026"/>
 		<info name="alt_title" value="桃太郎伝説 ～Peach Boy Legend～"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -25696,7 +25696,7 @@ license:CC0
 		<info name="release" value="19880810"/>
 		<info name="alt_title" value="ザ・マネーゲーム"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SJROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -25942,7 +25942,7 @@ license:CC0
 		<info name="release" value="19890127"/>
 		<info name="alt_title" value="モトクロスチャンピオン"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -26581,7 +26581,7 @@ license:CC0
 		<info name="release" value="19880726"/>
 		<info name="alt_title" value="熱血高校ドッジボール部"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -27038,7 +27038,7 @@ license:CC0
 		<info name="release" value="19881209"/>
 		<info name="alt_title" value="忍者龍剣伝"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -27362,7 +27362,7 @@ license:CC0
 		<info name="release" value="19880318"/>
 		<info name="alt_title" value="信長の野望 全国版"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sorom_a" />
+			<feature name="slot" value="sorom" />
 			<feature name="pcb" value="HVC-SOROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -27388,7 +27388,7 @@ license:CC0
 		<info name="serial" value="NES-NZ-USA"/>
 		<info name="release" value="198906xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sorom_a" />
+			<feature name="slot" value="sorom" />
 			<feature name="pcb" value="NES-SOROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -27615,7 +27615,7 @@ license:CC0
 		<info name="release" value="19890725"/>
 		<info name="alt_title" value="美味しんぼ 究極のメニュー三本勝負 ~ Oishinbo - Kyuukyoku no Menu Sanbon Shoubu (Box)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SL1ROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -28241,7 +28241,7 @@ license:CC0
 		<info name="release" value="19890130"/>
 		<info name="alt_title" value="パチ夫くん2"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -29029,7 +29029,7 @@ license:CC0
 		<info name="serial" value="NES-PU-USA"/>
 		<info name="release" value="198812xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -29352,7 +29352,7 @@ license:CC0
 		<info name="release" value="19880310"/>
 		<info name="alt_title" value="プレデター"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -29664,7 +29664,7 @@ license:CC0
 		<info name="release" value="19881224"/>
 		<info name="alt_title" value="プロ野球?殺人事件!"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -30417,7 +30417,7 @@ license:CC0
 		<info name="serial" value="NES-RE-USA"/>
 		<info name="release" value="198810xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -30871,7 +30871,7 @@ license:CC0
 		<info name="release" value="19880916"/>
 		<info name="alt_title" value="霊幻道士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -30986,7 +30986,7 @@ license:CC0
 		<info name="release" value="19880123"/>
 		<info name="alt_title" value="リップルアイランド"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -31772,7 +31772,7 @@ license:CC0
 		<info name="release" value="19881220"/>
 		<info name="alt_title" value="ローラーボール"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -32461,7 +32461,7 @@ license:CC0
 		<info name="release" value="19880530"/>
 		<info name="alt_title" value="聖闘士星矢 黄金伝説 完結編"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -32539,7 +32539,7 @@ license:CC0
 		<info name="release" value="19880527"/>
 		<info name="alt_title" value="サラダの国のトマト姫"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -32606,7 +32606,7 @@ license:CC0
 		<info name="release" value="19880627"/>
 		<info name="alt_title" value="真田十勇士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -32630,7 +32630,7 @@ license:CC0
 		<info name="release" value="19881030"/>
 		<info name="alt_title" value="三國志"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sorom_a" />
+			<feature name="slot" value="sorom" />
 			<feature name="pcb" value="HVC-SOROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -32934,7 +32934,7 @@ license:CC0
 		<info name="release" value="19890120"/>
 		<info name="alt_title" value="里見八犬伝"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -32958,7 +32958,7 @@ license:CC0
 		<info name="release" value="19880107"/>
 		<info name="alt_title" value="殺意の階層 ソフトハウス連続殺人事件"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -33239,7 +33239,7 @@ license:CC0
 		<info name="release" value="19890210"/>
 		<info name="alt_title" value="赤龍王"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -33279,7 +33279,7 @@ license:CC0
 		<info name="release" value="19880428"/>
 		<info name="alt_title" value="戦車戦略 砂漠の狐"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -33884,7 +33884,7 @@ license:CC0
 		<info name="release" value="19880527"/>
 		<info name="alt_title" value="将軍"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -33948,7 +33948,7 @@ license:CC0
 		<info name="release" value="19881224"/>
 		<info name="alt_title" value="小公子セディ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -34849,7 +34849,7 @@ license:CC0
 		<info name="release" value="19880812"/>
 		<info name="alt_title" value="サッカーリーグ ウィナーズカップ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -35131,7 +35131,7 @@ license:CC0
 		<info name="release" value="19890106"/>
 		<info name="alt_title" value="スペースハリアー"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -36440,7 +36440,7 @@ license:CC0
 		<info name="release" value="19880714"/>
 		<info name="alt_title" value="スーパーブラックオニキス"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -36735,7 +36735,7 @@ license:CC0
 		<info name="serial" value="NES-WH-USA"/>
 		<info name="release" value="199012xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="zapper,powerpad" />
@@ -37135,7 +37135,7 @@ license:CC0
 		<info name="release" value="19880730"/>
 		<info name="alt_title" value="スーパーリアルベースボール"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -37393,7 +37393,7 @@ license:CC0
 		<info name="release" value="19871226"/>
 		<info name="alt_title" value="スーパーマン"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -37412,7 +37412,7 @@ license:CC0
 		<info name="serial" value="NES-SN-USA"/>
 		<info name="release" value="198812xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -37720,7 +37720,7 @@ license:CC0
 		<info name="serial" value="NES-OO-USA"/>
 		<info name="release" value="198904xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SEROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="32768">
@@ -37863,7 +37863,7 @@ license:CC0
 		<info name="release" value="19880803"/>
 		<info name="alt_title" value="太陽の神殿 アステカ2"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -38130,7 +38130,7 @@ license:CC0
 		<info name="release" value="19880318"/>
 		<info name="alt_title" value="谷川浩司の将棋指南Ⅱ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -38277,7 +38277,7 @@ license:CC0
 		<info name="release" value="19880810"/>
 		<info name="alt_title" value="闘将!!拉麺男 炸裂超人一○二芸"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -38877,7 +38877,7 @@ license:CC0
 		<info name="release" value="19890519"/>
 		<info name="alt_title" value="天地を喰らう"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -40214,7 +40214,7 @@ license:CC0
 		<info name="release" value="19881217"/>
 		<info name="alt_title" value="トップライダー"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="toprider" />
@@ -40350,7 +40350,7 @@ license:CC0
 		<info name="release" value="19881110"/>
 		<info name="alt_title" value="東方見文録"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -40446,7 +40446,7 @@ license:CC0
 		<info name="serial" value="NES-F2-USA"/>
 		<info name="release" value="198906xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -40542,7 +40542,7 @@ license:CC0
 		<info name="release" value="19881216"/>
 		<info name="alt_title" value="ザ・トライアスロン"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -41643,7 +41643,7 @@ license:CC0
 		<info name="release" value="19880930"/>
 		<info name="alt_title" value="ビバ・ラスベガス"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -42810,7 +42810,7 @@ license:CC0
 		<info name="release" value="19871222"/>
 		<info name="alt_title" value="ウィザードリィ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<feature name="peripheral" value="turbofile" />
@@ -43097,7 +43097,7 @@ license:CC0
 		<info name="release" value="19890131"/>
 		<info name="alt_title" value="ワールドグランプリ ポールトウフィニッシュ"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -43217,7 +43217,7 @@ license:CC0
 		<info name="serial" value="NES-XE-USA"/>
 		<info name="release" value="198812xx"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -43628,7 +43628,7 @@ license:CC0
 		<info name="release" value="19880826"/>
 		<info name="alt_title" value="イース"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
@@ -43761,7 +43761,7 @@ license:CC0
 		<info name="serial" value="NES-AL-EEC"/>
 		<info name="release" value="19880926"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -43784,7 +43784,7 @@ license:CC0
 		<info name="serial" value="NES-AL-EEC"/>
 		<info name="release" value="19880926"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="131072">
@@ -43954,7 +43954,7 @@ license:CC0
 		<info name="release" value="19890127"/>
 		<info name="alt_title" value="ゾイド2 ゼネバスの逆襲"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom_a" />
+			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">

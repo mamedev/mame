@@ -32,8 +32,6 @@ static const nes_pcb pcb_list[] =
 	{ "un1rom",           STD_UN1ROM },
 	{ "sxrom",            STD_SXROM },
 	{ "sorom",            STD_SOROM },
-	{ "sxrom_a",          STD_SXROM_A },
-	{ "sorom_a",          STD_SOROM_A },
 	{ "txrom",            STD_TXROM },
 	{ "hkrom",            STD_HKROM },
 	{ "tqrom",            STD_TQROM },
@@ -625,6 +623,22 @@ void nes_cart_slot_device::call_load_pcb()
 						nes_cart_get_line(get_feature("vrc6-pin10")),
 						0);
 //      osd_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
+	}
+
+	if (m_pcb_id == STD_SXROM || m_pcb_id == STD_SOROM)
+	{
+		if (get_feature("mmc1_type") != nullptr)
+		{
+			const char *type = get_feature("mmc1_type");
+			if (!strcmp(type, "MMC1"))
+				m_cart->set_mmc1_type(MMC1);
+			else if (!strcmp(type, "MMC1A"))
+				m_cart->set_mmc1_type(MMC1A);
+			else if (!strncmp(type, "MMC1B", 5)) // common prefix of several variants
+				m_cart->set_mmc1_type(MMC1B);
+			else if (!strcmp(type, "MMC1C"))
+				m_cart->set_mmc1_type(MMC1C);
+		}
 	}
 
 	if (m_pcb_id == STD_HKROM || m_pcb_id == TAITO_X1_017)

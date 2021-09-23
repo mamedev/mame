@@ -101,8 +101,6 @@ void nes_cart(device_slot_interface &device)
 // SxROM
 	device.option_add_internal("sxrom",            NES_SXROM);
 	device.option_add_internal("sorom",            NES_SOROM);
-	device.option_add_internal("sxrom_a",          NES_SXROM_A);  // in MMC1-A PRG RAM is always enabled
-	device.option_add_internal("sorom_a",          NES_SOROM_A);  // in MMC1-A PRG RAM is always enabled
 // TxROM
 	device.option_add_internal("txrom",            NES_TXROM);
 // HKROM
