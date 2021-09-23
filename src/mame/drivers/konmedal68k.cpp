@@ -762,7 +762,7 @@ ROM_START(spcpokan)
 	ROM_LOAD("642-a02-4f.bin", 0x080000, 0x080000, CRC(99265f42) SHA1(047ebf8ab5454ce8504b837fec17002b7d7da30f))
 ROM_END
 
-ROM_START(unkkonmd)
+ROM_START(unkkonmd) // probably Dragon Palace
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP("662-unk-2n.bin", 0x000000, 0x080000, CRC(e6168538) SHA1(093153adc97bc4add67bb1477b9ad3b25fee26f0))
 

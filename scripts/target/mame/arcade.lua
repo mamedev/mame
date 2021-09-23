@@ -864,6 +864,7 @@ FORMATS["NASLITE_DSK"] = true
 FORMATS["BASICDSK"] = true
 FORMATS["IBMXDF_DSK"] = true
 FORMATS["IPF_DSK"] = true
+FORMATS["TZX_CAS"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
