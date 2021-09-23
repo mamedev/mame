@@ -10724,8 +10724,8 @@ license:CC0
 		-->
 		<description>From The Associated Press: The Best of Photo Journalism [DVC]</description>
 		<year>1993</year>
-		<info name="serial" value="819 0036"/>
 		<publisher>XDRA Ltd. ~ Asia CD Ltd.</publisher>
+		<info name="serial" value="819 0036"/>
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
@@ -10766,8 +10766,8 @@ license:CC0
 		-->
 		<description>CD-i in Schools [DVC]</description>
 		<year>1994</year>
-		<info name="serial" value="819 0073"/>
 		<publisher>Scottish Interactive Technology Centre</publisher>
+		<info name="serial" value="819 0073"/>
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
@@ -10817,8 +10817,8 @@ license:CC0
 		-->
 		<description>Getting Ahead - Making Time (Euro)(Reprint)[CD-i-PC]</description>
 		<year>1995</year>
-		<info name="serial" value="819 0025"/>
 		<publisher>XDRA Ltd. ~ Temple Millar Multimedia</publisher>
+		<info name="serial" value="819 0025"/>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="getting ahead - making time (reprint)(1995)(temple millar multimedia - xdra)(eu)[cd-i-pc]" sha1="fcf77ca56c8b33a2032c7c3108eb542e586b3c78"/>
@@ -10880,8 +10880,8 @@ license:CC0
 		-->
 		<description>Peaches [DVC]</description>
 		<year>1995</year>
-		<info name="serial" value="IC 200"/>
 		<publisher>Icontact Multimedia Limited</publisher>
+		<info name="serial" value="IC 200"/>
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
