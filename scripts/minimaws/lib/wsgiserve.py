@@ -314,6 +314,7 @@ class MachineHandler(QueryPageHandler):
                     manufacturer=htmlescape(clonemanufacturer or '')).encode('utf-8')
         if not first:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-clones').encode('utf-8')
+            yield '<script>make_collapsible(document.getElementById("heading-clones"), document.getElementById("tbl-clones"));</script>\n'.encode('utf-8')
 
         # make a table of software lists
         yield htmltmpl.MACHINE_SOFTWARELISTS_TABLE_PROLOGUE.substitute().encode('utf-8')
@@ -359,7 +360,7 @@ class MachineHandler(QueryPageHandler):
                     size=htmlescape('{:,}'.format(size)),
                     isdefault=('yes' if isdef else 'no')).encode('utf-8')
         if not first:
-            yield '</select>\n<script>set_default_ram_option();</script>\n'.encode('utf-8')
+            yield '    </select>\n    <script>set_default_ram_option();</script>\n'.encode('utf-8')
 
         # placeholder for machine slots - populated by client-side JavaScript
         if self.dbcurs.count_slots(id):
@@ -373,7 +374,7 @@ class MachineHandler(QueryPageHandler):
             while pending:
                 requested = pending.pop()
                 slots = self.slot_data(self.dbcurs.get_machine_id(requested))
-                yield ('    slot_info[%s] = %s;\n' % (self.sanitised_json(requested), self.sanitised_json(slots))).encode('utf-8')
+                yield ('        slot_info[%s] = %s;\n' % (self.sanitised_json(requested), self.sanitised_json(slots))).encode('utf-8')
                 for slotname, slot in slots['slots'].items():
                     for choice, card in slot.items():
                         carddev = card['device']
@@ -385,17 +386,21 @@ class MachineHandler(QueryPageHandler):
                             cardid = self.dbcurs.get_machine_id(carddev)
                             carddev = self.sanitised_json(carddev)
                             yield (
-                                    '    bios_sets[%s] = %s;\n    machine_flags[%s] = %s;\n    softwarelist_info[%s] = %s;\n' %
+                                    '        bios_sets[%s] = %s;\n        machine_flags[%s] = %s;\n        softwarelist_info[%s] = %s;\n' %
                                     (carddev, self.sanitised_json(self.bios_data(cardid)), carddev, self.sanitised_json(self.flags_data(cardid)), carddev, self.sanitised_json(self.softwarelist_data(cardid)))).encode('utf-8')
             yield htmltmpl.MACHINE_SLOTS_PLACEHOLDER_EPILOGUE.substitute(
                     machine=self.sanitised_json(self.shortname)).encode('utf=8')
+
+        # add disclosure triangle for options if present
+        if haveoptions:
+            yield htmltmpl.MACHINE_OPTIONS_EPILOGUE.substitute().encode('utf=8')
 
         # list devices referenced by this system/device
         first = True
         for name, desc, src in self.dbcurs.get_devices_referenced(id):
             if first:
                 yield \
-                        '<h2>Devices Referenced</h2>\n' \
+                        '<h2 id="heading-dev-refs">Devices Referenced</h2>\n' \
                         '<table id="tbl-dev-refs">\n' \
                         '    <thead>\n' \
                         '        <tr><th>Short name</th><th>Description</th><th>Source file</th></tr>\n' \
@@ -405,13 +410,14 @@ class MachineHandler(QueryPageHandler):
             yield self.machine_row(name, desc, src)
         if not first:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-dev-refs').encode('utf-8')
+            yield '<script>make_collapsible(document.getElementById("heading-dev-refs"), document.getElementById("tbl-dev-refs"));</script>\n'.encode('utf-8')
 
         # list slots where this device is an option
         first = True
         for name, desc, slot, opt, src in self.dbcurs.get_compatible_slots(id):
             if (first):
                 yield \
-                        '<h2>Compatible Slots</h2>\n' \
+                        '<h2 id="heading-comp-slots">Compatible Slots</h2>\n' \
                         '<table id="tbl-comp-slots">\n' \
                         '    <thead>\n' \
                         '        <tr><th>Short name</th><th>Description</th><th>Slot</th><th>Choice</th><th>Source file</th></tr>\n' \
@@ -428,13 +434,14 @@ class MachineHandler(QueryPageHandler):
                     slotoption=htmlescape(opt)).encode('utf-8')
         if not first:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-comp-slots').encode('utf-8')
+            yield '<script>make_collapsible(document.getElementById("heading-comp-slots"), document.getElementById("tbl-comp-slots"));</script>\n'.encode('utf-8')
 
         # list systems/devices that reference this device
         first = True
         for name, desc, src in self.dbcurs.get_device_references(id):
             if first:
                 yield \
-                        '<h2>Referenced By</h2>\n' \
+                        '<h2 id="heading-ref-by">Referenced By</h2>\n' \
                         '<table id="tbl-ref-by">\n' \
                         '    <thead>\n' \
                         '        <tr><th>Short name</th><th>Description</th><th>Source file</th></tr>\n' \
@@ -444,6 +451,7 @@ class MachineHandler(QueryPageHandler):
             yield self.machine_row(name, desc, src)
         if not first:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-ref-by').encode('utf-8')
+            yield '<script>make_collapsible(document.getElementById("heading-ref-by"), document.getElementById("tbl-ref-by"));</script>\n'.encode('utf-8')
 
         yield '</html>\n'.encode('utf-8')
 
@@ -667,6 +675,7 @@ class SoftwareListHandler(QueryPageHandler):
                     status=htmlescape(machine_info['status'])).encode('utf-8')
         if not first:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-machines').encode('utf-8')
+            yield '<script>make_collapsible(document.getElementById("heading-machines"), document.getElementById("tbl-machines"));</script>\n'.encode('utf-8')
 
         first = True
         for software_info in self.dbcurs.get_softwarelist_software(softwarelist_info['id'], self.software or None):
@@ -678,6 +687,7 @@ class SoftwareListHandler(QueryPageHandler):
             yield '<p>No software found.</p>\n'.encode('utf-8')
         else:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-software').encode('utf-8')
+            yield '<script>make_collapsible(document.getElementById("heading-software"), document.getElementById("tbl-software"));</script>\n'.encode('utf-8')
 
         yield '</body>\n</html>\n'.encode('utf-8')
 
@@ -707,6 +717,7 @@ class SoftwareListHandler(QueryPageHandler):
             yield self.clone_row(clone_info)
         if not first:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-clones').encode('utf-8')
+            yield '<script>make_collapsible(document.getElementById("heading-clones"), document.getElementById("tbl-clones"));</script>\n'.encode('utf-8')
 
         parts = self.dbcurs.get_software_parts(software_info['id']).fetchall()
         first = True

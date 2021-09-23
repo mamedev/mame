@@ -1,6 +1,45 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 
+function make_collapsible(heading, section)
+{
+	var hidden = false;
+	var display = section.style.display;
+	var icon = heading.insertBefore(document.createElement('img'), heading.firstChild);
+	icon.setAttribute('src', assetsurl + '/disclosedown.svg');
+	icon.setAttribute('class', 'disclosure');
+	icon.addEventListener(
+			'click',
+			function (event)
+			{
+				hidden = !hidden;
+				if (hidden)
+				{
+					icon.setAttribute('src', assetsurl + '/discloseup.svg');
+					section.style.display = 'none';
+				}
+				else
+				{
+					icon.setAttribute('src', assetsurl + '/disclosedown.svg');
+					section.style.display = display;
+					var headingtop = 0;
+					for (var element = heading; element !== null; element = element.offsetParent)
+						headingtop += element.offsetTop;
+					var sectionbot = section.offsetHeight;
+					for (var element = section; element !== null; element = element.offsetParent)
+						sectionbot += element.offsetTop;
+					if ((window.pageYOffset + window.innerHeight) < sectionbot)
+					{
+						if ((sectionbot - headingtop) > window.innerHeight)
+							heading.scrollIntoView(true);
+						else
+							window.scroll(window.pageXOffset, sectionbot - window.innerHeight);
+					}
+				}
+			});
+}
+
+
 function make_table_sortable(tbl)
 {
 	var sorticons = new Array(tbl.tHead.rows[0].cells.length);
@@ -8,18 +47,16 @@ function make_table_sortable(tbl)
 	function TableSortHelper(i)
 	{
 		this.column = i;
-		this.header = tbl.tHead.rows[0].cells[i]
+		this.header = tbl.tHead.rows[0].cells[i];
 		this.sorted = false;
 		this.direction = 1;
 
-		this.icon = document.createElement('img');
+		var container = this.header.appendChild(document.createElement('div'));
+		container.setAttribute('class', 'sorticon');
+
+		this.icon = container.appendChild(document.createElement('img'));
 		this.icon.setAttribute('src', assetsurl + '/sortind.svg');
 		this.icon.addEventListener('click', this.icon_click.bind(this));
-
-		var container = document.createElement('div');
-		container.setAttribute('class', 'sorticon');
-		container.appendChild(this.icon);
-		this.header.appendChild(container);
 	}
 
 	TableSortHelper.prototype = (function ()

@@ -5,6 +5,8 @@
 th { text-align: left; background-color: #ddd; padding: 0.25em }
 td { padding-left: 0.25em; padding-right: 0.25em }
 
+img[class=disclosure] { height: 0.7em; margin-right: 0.25em; vertical-align: baseline }
+
 div[class=sorticon] { float: right; height: 100%; margin-left: 0.5em }
 div[class=sorticon] img { height: 0.7em; vertical-align: baseline }
 
