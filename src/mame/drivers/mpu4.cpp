@@ -549,7 +549,7 @@ ROM_START( m4frtgm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fruit.bin", 0x0000, 0x010000, CRC(dbe44316) SHA1(15cd49dd2e6166f7a7668663f7fea802d6cbb12f) )
 
-	ROM_REGION( 0x800000, "msm6376", 0 ) /* this isn't OKI, or is corrupt (bad size) */
+	ROM_REGION( 0x800000, "msm6376", 0 ) // this isn't OKI, or is corrupt (bad size)
 	ROM_LOAD( "fruitsnd.bin", 0x0000, 0x010000, CRC(86547dc7) SHA1(4bf64f22e84c0ee82d961b0ba64932b8bf6a521f) ) // matches 'Replay' on SC1 hardware, probably just belongs there.. or this is eurocoin with different sound hw here?
 ROM_END
 
@@ -669,7 +669,7 @@ ROM_START( m4jok300 )
 	ROM_LOAD( "cjo", 0x0000, 0x020000, CRC(386e99db) SHA1(5bb0b513ef63ffaedd98b8e9e7206658fe784fda) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASEFF )
-	/* missing? */
+	// missing?
 ROM_END
 
 ROM_START( m4jokmil )
@@ -677,7 +677,7 @@ ROM_START( m4jokmil )
 	ROM_LOAD( "cjm03.epr", 0x0000, 0x020000, CRC(e5e4986e) SHA1(149b950a739ad308f7759927c344de8193ce67c5) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASEFF )
-	/* missing? */
+	// missing?
 ROM_END
 
 
@@ -992,7 +992,7 @@ ROM_START( m4ringfr )
 	ROM_LOAD( "rof03s.p1", 0x0000, 0x020000, CRC(4b4703fe) SHA1(853ce1f5932e09af2b5f3b5314709f13aa35cf19) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	// missing?
 ROM_END
 
 
@@ -1390,7 +1390,7 @@ ROM_START( m4ch30 )
 	ROM_LOAD( "ch301s", 0x0000, 0x010000, CRC(d31c9081) SHA1(21d1f4cc3de2343d830e3ee02e3a53abd12b6b9d) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing */
+	// missing
 ROM_END
 
 
@@ -1512,11 +1512,83 @@ ROM_END
 
 
 
+/* Vifico MPU4 games.
+   Escalera Tobogan use the "Barcrest Sampled Sound" game PCB:
 
+  BARCREST SAMPLED SOUND
+ _________________________
+ | ·                      |  
+ | ·                      |
+ | ·                      |
+ | ·                      |_____________
+ | ·           _________   _________  |_|
+ |             SN74LS139N  |_A880440| |_|
+ |             _____________________  |_|
+ |             | ST EF68B21P        | |_|
+ |             |____________________| |_|
+ |   _______         _______________  |_|
+ |  |  OKI  |       | PROG EPROM    | |_|
+ |  | M6376 |       |_______________| |_|
+ |  |_______|         ______________  |_|
+ |                   | ST EF68B40P  | |_|
+ | _______________   |______________| |_|
+ | |  SOUND 2     |   __   ___________|_|
+ | |______________|  | |  |
+ | _______________   | |  |
+ | |  SOUND 1     |  | |<-PAL16L8D
+ | |______________|  |_|  |
+ |________________________|
 
+Just one different byte between the three "Escalera y Tobogan" sets, at address 00001401:
+ 1268: 0xF4
+ 1269: 0xF5
+ 1270: 0xF6
+May be the game serial number hard-encoded on the EPROM? 
+*/
+ROM_START( m4esctbg )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1270.rom1", 0x0000, 0x10000, CRC(6fa2a0ef) SHA1(3b60b545e417a45e61e3babbe27758a053ced926) )
 
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
+	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
 
+	ROM_REGION( 0x48, "chr", 0 )
+	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
 
+	ROM_REGION( 0x104, "pld", 0 )
+	ROM_LOAD( "pal16l8.ic7", 0x000, 0x104, NO_DUMP )
+ROM_END
+
+ROM_START( m4esctbga )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1269.rom1", 0x0000, 0x10000, CRC(8c3f1cf3) SHA1(0e7961bacc4ba701efbbd1ee99b2a72422f96b07) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
+	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
+
+	ROM_REGION( 0x48, "chr", 0 )
+	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
+
+	ROM_REGION( 0x104, "pld", 0 )
+	ROM_LOAD( "pal16l8.ic7", 0x000, 0x104, NO_DUMP )
+ROM_END
+
+ROM_START( m4esctbgb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1268.rom1", 0x0000, 0x10000, CRC(d2b47707) SHA1(65096835d94242a5c07b266b8561a9e0d9f95e36) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
+	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
+
+	ROM_REGION( 0x48, "chr", 0 )
+	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
+
+	ROM_REGION( 0x104, "pld", 0 )
+	ROM_LOAD( "pal16l8.ic7", 0x000, 0x104, NO_DUMP )
+ROM_END
 
 
 
@@ -1704,49 +1776,49 @@ ROM_START( m4bigban )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "big04.p1", 0x0000, 0x020000, CRC(f7ead9c6) SHA1(46c10abb892cb6d427ad508aae96752c14b4cb83) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */
+	// Missing?
 ROM_END
 
 ROM_START( m4crzcsn )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "crz03.bin", 0x0000, 0x020000, CRC(48610c4f) SHA1(a62ac8b3ee704ee4e98f9d56bfc723d4cbb25b54) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */
+	// Missing?
 ROM_END
 
 ROM_START( m4crzcav )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gcv05.p1", 0x0000, 0x020000, CRC(b9ba46f6) SHA1(78b745d85b36444c39747982987088a772b20a7e) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */
+	// Missing?
 ROM_END
 
 ROM_START( m4dragon )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "dgl01.p1", 0x0000, 0x020000, CRC(d7d39c9b) SHA1(5350c9db549edee30815516b1ce74a018390ff3d) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */
+	// Missing?
 ROM_END
 
 ROM_START( m4hilonv )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hnc02.p1", 0x0000, 0x020000, CRC(33a8022b) SHA1(5168b8f32630aa2cb56f30c941695f1728e4fb7a) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */
+	// Missing?
 ROM_END
 
 ROM_START( m4octo )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "oct03.p1", 0x0000, 0x020000, CRC(8df66e94) SHA1(e1ab93982846d83becae36b5814ebbd515b9078e) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */
+	// Missing?
 ROM_END
 
 ROM_START( m4sctagt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gse3_0.p1", 0x0000, 0x010000, CRC(eff705ff) SHA1(6bf96872ef4bcc8f8041c5384d892f072c72be2b) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */
+	// Missing?
 ROM_END
 
 
@@ -1762,7 +1834,7 @@ ROM_START( m4cld02 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cru0_2.bin", 0x0000, 0x010000, CRC(e3c01944) SHA1(33a2b2c05686f53811349b2980e590fdc4b72756) )
 	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
-	/* missing */
+	// missing
 ROM_END
 
 ROM_START( m4barcrz )
@@ -1806,7 +1878,7 @@ ROM_START( m4matdr )
 	ROM_LOAD( "matador.bin", 0x0000, 0x020000, CRC(367788a4) SHA1(3c9b077a64f993cb60107558efdfcbee0fe5c958) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing */
+	// missing
 ROM_END
 
 
@@ -2647,8 +2719,13 @@ GAME(199?, m4sctagt,  0,          mod4oki,    mpu4,    mpu4_state, init_m4defaul
 
 
 
-/* Others */
 
+
+// Others
+
+GAME(1994, m4esctbg,  0,          mod4oki,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 1)", GAME_FLAGS )
+GAME(1994, m4esctbga, m4esctbg,   mod4oki,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 2)", GAME_FLAGS )
+GAME(1994, m4esctbgb, m4esctbg,   mod4oki,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 3)", GAME_FLAGS )
 
 GAMEL(199?, m4aao,    0,          mod4oki,    mpu4,    mpu4_state, init_m4aao,     ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
 GAME(199?, m4bandgd,  0,          mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
