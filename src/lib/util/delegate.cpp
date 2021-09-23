@@ -29,7 +29,9 @@
 // other platforms using this convention include:
 // * AIX, Classic MacOS and WinNT on 32-bit POWER/PowerPC
 // * pretty much anything on Itanium
-#if (defined(__ppc64__) || (defined(__PPC64__))) && !defined(__APPLE__)
+// separately, on some architectures, function descriptors are stored in
+// vtables directly
+#if defined(__ia64__)
 	#define MAME_DELEGATE_VT_DESCRIPTOR 1
 #endif
 #ifndef MAME_DELEGATE_VT_DESCRIPTOR
