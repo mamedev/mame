@@ -1,55 +1,82 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 
-function sort_table(tbl, col, dir, numeric)
-{
-	var tbody = tbl.tBodies[0];
-	var trows = Array.prototype.slice.call(tbody.rows, 0).sort(
-			function (x, y)
-			{
-				if (numeric)
-					return dir * (parseFloat(x.cells[col].textContent) - parseFloat(y.cells[col].textContent));
-				else
-					return dir * x.cells[col].textContent.localeCompare(y.cells[col].textContent);
-			})
-	trows.forEach(function (row) { tbody.appendChild(row); });
-}
-
-
 function make_table_sortable(tbl)
 {
-	var headers = tbl.tHead.rows[0].cells;
-	for (var i = 0; i < headers.length; i++)
+	var sorticons = new Array(tbl.tHead.rows[0].cells.length);
+
+	function TableSortHelper(i)
 	{
-		(function (col)
-		{
-			var dir = 1;
-			var sorticon = document.createElement('img');
-			sorticon.setAttribute('src', assetsurl + '/sortind.png');
-			sorticon.style.cssFloat = 'right';
-			sorticon.style.marginLeft = '0.5em';
-			headers[col].appendChild(sorticon);
-			headers[col].addEventListener(
-					'click',
-					function (event)
-					{
-						var imgsrc = sorticon.getAttribute('src');
-						imgsrc = imgsrc.substr(imgsrc.lastIndexOf('/') + 1);
-						if (imgsrc != 'sortind.png')
-							dir = -dir;
-						if (dir < 0)
-							sorticon.setAttribute('src', assetsurl + '/sortdesc.png');
-						else
-							sorticon.setAttribute('src', assetsurl + '/sortasc.png');
-						for (var i = 0; i < headers.length; i++)
-						{
-							if (i != col)
-								headers[i].lastChild.setAttribute('src', assetsurl + '/sortind.png');
-						}
-						sort_table(tbl, col, dir, headers[col].getAttribute('class') == 'numeric');
-					});
-		}(i));
+		this.column = i;
+		this.header = tbl.tHead.rows[0].cells[i]
+		this.sorted = false;
+		this.direction = 1;
+
+		this.icon = document.createElement('img');
+		this.icon.setAttribute('src', assetsurl + '/sortind.svg');
+		this.icon.addEventListener('click', this.icon_click.bind(this));
+
+		var container = document.createElement('div');
+		container.setAttribute('class', 'sorticon');
+		container.appendChild(this.icon);
+		this.header.appendChild(container);
 	}
+
+	TableSortHelper.prototype = (function ()
+			{
+				function set_unsorted(obj)
+				{
+					obj.sorted = false;
+					obj.icon.setAttribute('src', assetsurl + '/sortind.svg');
+				}
+
+				function sort_table(obj)
+				{
+					var c = obj.header.cellIndex;
+					var numeric = obj.header.getAttribute('class') == 'numeric';
+					var tbody = tbl.tBodies[0];
+					var trows;
+					if (numeric)
+					{
+						trows = Array.prototype.slice.call(tbody.rows, 0).sort(
+								function (x, y)
+								{
+									return obj.direction * (parseFloat(x.cells[c].textContent) - parseFloat(y.cells[c].textContent));
+								});
+					}
+					else
+					{
+						trows = Array.prototype.slice.call(tbody.rows, 0).sort(
+								function (x, y)
+								{
+									return obj.direction * x.cells[c].textContent.localeCompare(y.cells[c].textContent);
+								});
+					}
+					trows.forEach(function (row) { tbody.appendChild(row); });
+				}
+
+				return {
+					icon_click : function (event)
+					{
+						if (this.sorted)
+							this.direction = -this.direction;
+						if (this.direction < 0)
+							this.icon.setAttribute('src', assetsurl + '/sortdesc.svg');
+						else
+							this.icon.setAttribute('src', assetsurl + '/sortasc.svg');
+						this.sorted = true;
+						for (var i = 0; i < sorticons.length; i++)
+						{
+							if (i != this.column)
+								set_unsorted(sorticons[i]);
+						}
+						sort_table(this);
+					}
+				};
+			})();
+
+	for (var i = 0; i < sorticons.length; i++)
+		sorticons[i] = new TableSortHelper(i);
 }
 
 

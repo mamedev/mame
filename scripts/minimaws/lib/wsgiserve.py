@@ -67,6 +67,8 @@ class ErrorPageHandler(HandlerBase):
 
 
 class AssetHandler(HandlerBase):
+    EXTENSIONMAP = { '.js': 'application/javascript', '.svg': 'image/svg+xml' }
+
     def __init__(self, directory, app, application_uri, environ, start_response, **kwargs):
         super(AssetHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.directory = directory
@@ -90,8 +92,11 @@ class AssetHandler(HandlerBase):
             else:
                 try:
                     f = open(path, 'rb')
-                    type, encoding = mimetypes.guess_type(path)
-                    self.start_response('200 OK', [('Content-type', type or 'application/octet-stream'), ('Cache-Control', 'public, max-age=3600')])
+                    base, extension = os.path.splitext(path)
+                    mimetype = self.EXTENSIONMAP.get(extension)
+                    if mimetype is None:
+                        mimetype, encoding = mimetypes.guess_type(path)
+                    self.start_response('200 OK', [('Content-type', mimetype or 'application/octet-stream'), ('Cache-Control', 'public, max-age=3600')])
                     return wsgiref.util.FileWrapper(f)
                 except:
                     self.start_response('500 %s' % (self.STATUS_MESSAGE[500], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])

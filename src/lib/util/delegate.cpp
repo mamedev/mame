@@ -156,6 +156,14 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 		else if ((0x48 == func[0]) && (0x8b == func[1]) && (0x01 == func[2]) && (0xff == func[3]) && ((0x20 == func[4]) || (0x60 == func[4]) || (0xa0 == func[4])))
 		{
 			// virtual function call thunk - mov rax,QWORD PTR [rcx] ; jmp QWORD PTR [rax+...]
+			// Assumes Windows calling convention, and doesn't consider
+			// that the "this" pointer could be in RDX if RCX is a
+			// pointer to space for an oversize scalar result.  Since
+			// the result area is uninitialised on entry, you won't see
+			// something that looks like a vtable dispatch through RCX
+			// in this case - it won't behave badly, it just won't
+			// bypass virtual call thunks in the rare situations where
+			// the return type is an oversize scalar.
 			LOG("Found virtual member function thunk at %p ", func);
 			std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(object);
 			if (0x20 == func[4])        // no displacement
@@ -177,6 +185,9 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 	std::uint32_t const *func = reinterpret_cast<std::uint32_t const *>(m_function);
 	while (true)
 	{
+		// Assumes little Endian mode.  Instructions are always stored
+		// in little Endian format on AArch64, so if big Endian mode is
+		// to be supported, the values need to be swapped.
 		if ((0xf9400010 == func[0]) && (0xf9400210 == (func[1] & 0xffc003ff)) && (0xd61f0200 == func[2]))
 		{
 			// virtual function call thunk - ldr xip0,[x0] ; ldr xip0,[x0,#...] ; br xip0
