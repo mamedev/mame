@@ -2828,7 +2828,8 @@ Core Sound Options
 
 **-[no]compressor**
 
-    Use compressor, it reduces overall volume when sound is overdriven.
+    Enable audio compressor. It temporarily reduces the overall volume when
+    the audio output is overdriven.
 
     The default is ON (**-compressor**).
 
