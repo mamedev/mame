@@ -64375,6 +64375,26 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
+	<software name="sango3ht" cloneof="sango2ht">
+		<description>Sangokushi III - Haou no Tairiku (Asia, Sangokushi II pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="三國志Ⅲ 覇王の大陸"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="l001" />
+			<feature name="pcb_model" value="L-001" />
+			<dataarea name="prg" size="262144">
+				<rom name="001" size="262144" crc="21491e8a" sha1="1b66d953f32d619b2c569c49ef8da5f8e96efcc6" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="002" size="262144" crc="1deb2eb6" sha1="76c7e47d32084b2a5a6e356ed426781292f85282" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sanguo2h">
 		<description>San Guo Zhi II (Chi)</description>
 		<year>19??</year>

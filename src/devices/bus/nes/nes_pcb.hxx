@@ -216,6 +216,7 @@ static const nes_pcb pcb_list[] =
 	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
+	{ "l001",             BTL_L001 },
 	{ "batmanfs",         BTL_BATMANFS },
 	{ "palthena",         BTL_PALTHENA },
 	{ "tobidase",         BTL_TOBIDASE },  // mapper 120
