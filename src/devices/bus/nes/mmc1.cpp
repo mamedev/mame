@@ -78,7 +78,7 @@ void nes_sxrom_device::pcb_reset()
 	m_count = 0;
 	m_reg[0] = 0x0f;
 	m_reg[1] = m_reg[2] = 0;
-	m_reg[3] = m_mmc1_type == MMC1C ? 0x10 : 0x00;   // WRAM disabled by default on MMC1C
+	m_reg[3] = m_mmc1_type == mmc1_type::MMC1C ? 0x10 : 0x00;   // WRAM disabled by default on MMC1C
 	m_reg_write_enable = 1;
 
 	set_nt_mirroring(PPU_MIRROR_HORZ);
@@ -258,7 +258,7 @@ void nes_sxrom_device::write_m(offs_t offset, uint8_t data)
 	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (!BIT(m_reg[3], 4) || m_mmc1_type == MMC1A)  // WRAM enabled
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (!m_battery.empty())
 			m_battery[((bank * 0x2000) + offset) & (m_battery.size() - 1)] = data;
@@ -272,7 +272,7 @@ uint8_t nes_sxrom_device::read_m(offs_t offset)
 	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom read_m, offset: %04x\n", offset));
 
-	if (!BIT(m_reg[3], 4) || m_mmc1_type == MMC1A)  // WRAM enabled
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (!m_battery.empty())
 			return m_battery[((bank * 0x2000) + offset) & (m_battery.size() - 1)];
@@ -289,7 +289,7 @@ void nes_sorom_device::write_m(offs_t offset, uint8_t data)
 	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (!BIT(m_reg[3], 4) || m_mmc1_type == MMC1A)  // WRAM enabled
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (type)
 			m_battery[offset & (m_battery.size() - 1)] = data;
@@ -303,7 +303,7 @@ uint8_t nes_sorom_device::read_m(offs_t offset)
 	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom read_m, offset: %04x\n", offset));
 
-	if (!BIT(m_reg[3], 4) || m_mmc1_type == MMC1A)  // WRAM enabled
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (type)
 			return m_battery[offset & (m_battery.size() - 1)];

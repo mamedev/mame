@@ -629,15 +629,17 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		if (get_feature("mmc1_type") != nullptr)
 		{
+			using mmc1_type = device_nes_cart_interface::mmc1_type;
+
 			const char *type = get_feature("mmc1_type");
 			if (!strcmp(type, "MMC1"))
-				m_cart->set_mmc1_type(MMC1);
+				m_cart->set_mmc1_type(mmc1_type::MMC1);
 			else if (!strcmp(type, "MMC1A"))
-				m_cart->set_mmc1_type(MMC1A);
+				m_cart->set_mmc1_type(mmc1_type::MMC1A);
 			else if (!strncmp(type, "MMC1B", 5)) // common prefix of several variants
-				m_cart->set_mmc1_type(MMC1B);
+				m_cart->set_mmc1_type(mmc1_type::MMC1B);
 			else if (!strcmp(type, "MMC1C"))
-				m_cart->set_mmc1_type(MMC1C);
+				m_cart->set_mmc1_type(mmc1_type::MMC1C);
 		}
 	}
 

@@ -780,7 +780,7 @@ void nes_cart_slot_device::call_load_ines()
 
 		case STD_SXROM:
 			if (mapper == 155)
-				m_cart->set_mmc1_type(MMC1A);
+				m_cart->set_mmc1_type(device_nes_cart_interface::mmc1_type::MMC1A);
 			break;
 
 		case NOCASH_NOCHR:
