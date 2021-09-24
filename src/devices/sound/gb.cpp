@@ -609,7 +609,7 @@ void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 
 			snd.offset = (snd.offset + counter) & 0x3f;
 			uint8_t bank = snd.size ? BIT(snd.offset, 5) : snd.bank;
-			snd.current_sample = m_wave_ram[bank][snd.offset / 2];
+			snd.current_sample = m_wave_ram[bank][(snd.offset / 2) & 0xf];
 			if (!(snd.offset & 1))
 			{
 				snd.current_sample >>= 4;
@@ -790,10 +790,10 @@ u8 agb_apu_device::wave_r(offs_t offset)
 
 	if (m_snd_3.on)
 	{
-		return m_wave_ram[m_snd_3.bank ^ 1][(m_snd_3.offset/2)];
+		return m_wave_ram[m_snd_3.bank ^ 1][(m_snd_3.offset/2) & 0xf];
 	}
 
-	return m_wave_ram[m_snd_3.bank ^ 1][offset];
+	return m_wave_ram[m_snd_3.bank ^ 1][offset & 0xf];
 }
 
 
@@ -903,11 +903,11 @@ void agb_apu_device::wave_w(offs_t offset, u8 data)
 
 	if (m_snd_3.on)
 	{
-		m_wave_ram[m_snd_3.bank ^ 1][(m_snd_3.offset/2)] = data;
+		m_wave_ram[m_snd_3.bank ^ 1][(m_snd_3.offset/2) & 0xf] = data;
 	}
 	else
 	{
-		m_wave_ram[m_snd_3.bank ^ 1][offset] = data;
+		m_wave_ram[m_snd_3.bank ^ 1][offset & 0xf] = data;
 	}
 }
 
