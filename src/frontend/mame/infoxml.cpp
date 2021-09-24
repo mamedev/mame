@@ -473,7 +473,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	unsigned int maximum_outstanding_task_count = maximum_active_task_count + 20;
 
 	// loop until we're done enumerating drivers, and until there are no outstanding tasks
-	while (!filtered_drivlist.done() || tasks.size() > 0)
+	while (!filtered_drivlist.done() || !tasks.empty())
 	{
 		// loop until there are as many outstanding tasks as possible (we want to separately cap outstanding
 		// tasks and active tasks)
@@ -483,7 +483,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		{
 			// we want to launch a task; grab a packet of drivers to process
 			std::vector<std::reference_wrapper<const game_driver>> drivers = filtered_drivlist.next(20);
-			if (drivers.size() <= 0)
+			if (drivers.empty())
 				break;
 
 			// do the dirty work asychronously
@@ -510,7 +510,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		}
 
 		// we've put as many outstanding tasks out as we can; are there any tasks outstanding?
-		if (tasks.size() > 0)
+		if (!tasks.empty())
 		{
 			// wait for the task at the front of the queue to complete and get the info, in the
 			// spirit of determinism
