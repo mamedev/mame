@@ -651,12 +651,15 @@ class nes_bmc_15in1_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+
+private:
+	u8 m_jumper;
 };
 
 

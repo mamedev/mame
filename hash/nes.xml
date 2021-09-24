@@ -78568,7 +78568,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_15" supported="no">
+	<software name="mc_15">
 		<description>15 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -79185,7 +79185,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_3" supported="no">
+	<software name="mc_3">
 		<description>3 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
