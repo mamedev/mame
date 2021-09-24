@@ -428,7 +428,6 @@ private:
 	uint8_t m_reg;
 };
 
-#ifdef UNUSED_FUNCTION
 // ======================> nes_a9746_device
 
 class nes_a9746_device : public nes_txrom_device
@@ -439,7 +438,7 @@ public:
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
@@ -449,7 +448,6 @@ private:
 	void update_banks(uint8_t value);
 	uint8_t m_reg[3];
 };
-#endif
 
 
 // ======================> nes_a88s1_device
@@ -1018,9 +1016,7 @@ DECLARE_DEVICE_TYPE(NES_SF3,           nes_sf3_device)
 DECLARE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device)
 DECLARE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device)
-#ifdef UNUSED_FUNCTION
 DECLARE_DEVICE_TYPE(NES_A9746,         nes_a9746_device)
-#endif
 
 DECLARE_DEVICE_TYPE(NES_A88S1,         nes_a88s1_device)
 DECLARE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device)

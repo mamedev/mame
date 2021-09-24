@@ -339,6 +339,7 @@ static const nes_pcb pcb_list[] =
 	{ "tek90",            JYCOMPANY_A },
 	{ "sa9602b",          SACHEN_SA9602B },
 	{ "unl_shero",        SACHEN_SHERO },
+	{ "a9746",            UNL_A9746 },
 	{ "mmalee2",          UNL_MMALEE },
 	{ "unl_2708",         UNL_2708 },
 	{ "unl_dh08",         UNL_DH08 },
@@ -376,7 +377,6 @@ static const nes_pcb pcb_list[] =
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "coolboy",          UNSUPPORTED_BOARD },
 	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
-	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },

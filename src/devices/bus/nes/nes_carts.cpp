@@ -356,6 +356,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("gouder",           NES_GOUDER);
 	device.option_add_internal("sa9602b",          NES_SA9602B);
 	device.option_add_internal("unl_shero",        NES_SACHEN_SHERO);
+	device.option_add_internal("a9746",            NES_A9746); // mapper 219
 // misc multigame cart boards
 	device.option_add_internal("benshieng",        NES_BENSHIENG);
 	device.option_add_internal("action52",         NES_ACTION52);
@@ -471,7 +472,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("konami_qtai",      NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	device.option_add_internal("unl_3d_block",     NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	device.option_add_internal("unl_c_n22m",       NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
-	device.option_add_internal("a9746",            NES_NROM); // mapper 219 - UNSUPPORTED (no dump available);
 // legacy boards for FFE copier mappers (are there images available to fix/improve emulation?)
 	device.option_add_internal("ffe3",             NES_FFE3);
 	device.option_add_internal("ffe4",             NES_FFE4);
