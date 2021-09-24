@@ -2824,6 +2824,19 @@ Core Sound Options
 
             mame qbert -nosamples
 
+.. _mame-commandline-nocompressor:
+
+**-[no]compressor**
+
+    Use compressor for sound.
+
+    The default is ON (**-compressor**).
+
+    Example:
+        .. code-block:: bash
+
+            mame popeye -nocompressor
+
 .. _mame-commandline-volume:
 
 **-volume** / **-vol** *<value>*
