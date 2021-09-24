@@ -10745,12 +10745,12 @@ license:CC0
 		<rom name="Bill Brandt - The Picture Post Years 1938-51.cue" size="279" crc="d9c1b4b0" md5="d96806ddded5ebd0901a5f4701a05519"/>
 		-->
 		<description>Bill Brandt: The Picture Post Years 1938-1951[DVC]</description>
-		<year>199?</year>
+		<year>1993</year>
 		<publisher>XDRA Ltd.</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bill brandt - the picture post years 1938-1951 (199x)(xdra ltd.)[dvc]" sha1="58d3e9bc147bb3cf698586c9942027bb7a783e9e"/>
+				<disk name="bill brandt - the picture post years 1938-1951 (1993)(xdra ltd.)[dvc]" sha1="58d3e9bc147bb3cf698586c9942027bb7a783e9e"/>
 			</diskarea>
 		</part>
 	</software>
