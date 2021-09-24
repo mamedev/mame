@@ -56934,15 +56934,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="xianscq" supported="no">
+<!-- The identical game was also released by Nanjing (probably later?) as NJ103 -->
+	<software name="xiangscq" supported="no">
 		<description>Xiāngshuài Chuánqí (China, Shenzhen Jncota)</description>
-		<year>19??</year>
+		<year>200?</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1007"/>
 		<info name="alt_title" value="香帅传奇"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="bmc_1200in1" /> <!-- mapper 227 is supposedly correct -->
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1007] xiang shuai chuan qi (c).prg" size="1048576" crc="f41f61d9" sha1="c5498e1778e88895a7b34b92c24f18b36d12b9eb" offset="00000" status="baddump" />
 			</dataarea>
@@ -59005,24 +59005,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xscq" supported="no">
-		<description>Xiang Shuai Chuan Qi (Chi)</description>
-		<year>19??</year>
-		<publisher>Nanjing</publisher>
-		<info name="serial" value="NJ0??"/>
-		<info name="alt_title" value="香帅传奇"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_1200in1" />
-			<feature name="pcb" value="BMC-1200IN1" /> <!-- is this really Mapper 227?!? -->
-			<dataarea name="prg" size="1048576">
-				<rom name="xiangshuai chuanqi (unl) (nanjing).prg" size="1048576" crc="f41f61d9" sha1="c5498e1778e88895a7b34b92c24f18b36d12b9eb" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
