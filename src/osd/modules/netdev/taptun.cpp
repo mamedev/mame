@@ -2,7 +2,7 @@
 // copyright-holders:Carl
 #if defined(OSD_NET_USE_TAPTUN)
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
 #include <winioctl.h>
 #else
@@ -23,7 +23,7 @@
 #define IFF_TAP     0x0002
 #define IFF_NO_PI   0x1000
 #define TUNSETIFF     _IOW('T', 202, int)
-#elif defined(WIN32)
+#elif defined(_WIN32)
 #include "tap-windows6/tap-windows.h"
 
 // for some reason this isn't defined in the header, and presumably it changes
@@ -62,7 +62,7 @@ public:
 protected:
 	int recv_dev(uint8_t **buf) override;
 private:
-#if defined(WIN32)
+#if defined(_WIN32)
 	HANDLE m_handle = INVALID_HANDLE_VALUE;
 	OVERLAPPED m_overlapped;
 	bool m_receive_pending;
@@ -98,7 +98,7 @@ netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, 
 	osd_printf_verbose("netdev_tap: network up!\n");
 	strncpy(m_ifname, ifr.ifr_name, 10);
 	fcntl(m_fd, F_SETFL, O_NONBLOCK);
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	std::wstring device_path(L"" USERMODEDEVICEDIR);
 	device_path.append(wstring_from_utf8(name));
 	device_path.append(L"" TAP_WIN_SUFFIX);
@@ -121,7 +121,7 @@ netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, 
 
 netdev_tap::~netdev_tap()
 {
-#if defined(WIN32)
+#if defined(_WIN32)
 	if (m_handle != INVALID_HANDLE_VALUE)
 	{
 		if (m_receive_pending)
@@ -169,7 +169,7 @@ static u32 finalise_frame(u8 buf[], u32 length)
 	return length;
 }
 
-#if defined(WIN32)
+#if defined(_WIN32)
 int netdev_tap::send(uint8_t *buf, int len)
 {
 	OVERLAPPED overlapped = {};
@@ -344,7 +344,7 @@ static CREATE_NETDEV(create_tap)
 
 int taptun_module::init(const osd_options &options)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
 	for (std::wstring &id : get_tap_adapters())
 		add_netdev(utf8_from_wstring(id).c_str(), utf8_from_wstring(get_connection_name(id)).c_str(), create_tap);
 #else

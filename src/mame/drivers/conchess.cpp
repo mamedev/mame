@@ -10,9 +10,12 @@ and Johan Enroth. After Consumenta went under in 1983, the Conchess brand was
 continued by Systemhuset, Enroth's company.
 
 TODO:
-- concplyv library module (L/L16 don't work, manual says it has its own add-on)
+- dump/add princhess module
+- dump/add plymate original 2MHz module
+- dump/add concplyv library module (L/L16 don't work, manual says it has its own add-on)
 - concplyv unmapped reads/writes
-- verify irq/beeper for concply/concplyv, though it is probably correct
+- verify irq/beeper for concplyv, though it is probably correct
+- official rom labels for concply5, concply8
 
 -------------------------------------------------------------------------------
 
@@ -26,6 +29,10 @@ same hardware, they just differ in size and material.
 All chess modules appear to be on similar PCBs, with room a 6502/65C02,
 and 8 ROM/RAM chips.
 
+For the newer programs, higher clocked versions were also available, the CPU speed
+was labeled on a sticker on the module (eg. A2/5.5MHz). A German redistributor
+named them "S"(speed) or "T"(top speed).
+
 A0 (untitled standard pack-in module):
 - SY6502A @ 2MHz (4MHz XTAL)
 - 3*8KB ROM, 4KB RAM(2*TMM2016P)
@@ -34,13 +41,13 @@ A0 (untitled standard pack-in module):
 note: XTAL goes to 4020, 4020 /2 goes to CPU clock, and other dividers to
 IRQ and beeper. On A0, IRQ is active for ~31.2us.
 
-P(A1) + M(A0) (Princhess)
+A1(P) + A0(M) (Princhess, aka Glasgow)
 - dual-module, each module has its own 6502 - need verification, more likely
-  2nd module has no CPU
-- ?
+  2nd module has no CPU (according to the manual, A0 is modified and won't
+  work stand-alone)
 
-T8 (Plymate Amsterdam)
-- R65C02P4 @ 4MHz (8MHz XTAL)
+A2(C) (Plymate, aka Amsterdam)
+- R65C02P4 @ 5.5MHz (11MHz XTAL) (5.5MHz version)
 - 32KB ROM, rest similar to A0
 
 A3 (Plymate Victoria)
@@ -54,14 +61,16 @@ Library modules:
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -84,7 +93,8 @@ public:
 
 	// machine configs
 	void concstd(machine_config &config);
-	void concply(machine_config &config);
+	void concply5(machine_config &config);
+	void concply8(machine_config &config);
 	void concplyv(machine_config &config);
 
 protected:
@@ -102,6 +112,7 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
+	void clear_irq();
 	u8 input_r();
 	void leds_w(offs_t offset, u8 data);
 	void sound_w(u8 data);
@@ -120,8 +131,15 @@ void conchess_state::machine_start()
     I/O
 ******************************************************************************/
 
+void conchess_state::clear_irq()
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
 u8 conchess_state::input_r()
 {
+	clear_irq();
+
 	u8 data = 0;
 
 	// read side panel buttons
@@ -137,6 +155,8 @@ u8 conchess_state::input_r()
 
 void conchess_state::leds_w(offs_t offset, u8 data)
 {
+	clear_irq();
+
 	// a0-a3: CD4028B to led select/input mux
 	m_inp_mux = offset;
 	if (m_inp_mux & 8)
@@ -161,9 +181,9 @@ void conchess_state::sound_w(u8 data)
 void conchess_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1050, 0x1050).r(FUNC(conchess_state::input_r));
-	map(0x1060, 0x106f).w(FUNC(conchess_state::leds_w));
-	map(0x1800, 0x1800).w(FUNC(conchess_state::sound_w));
+	map(0x1000, 0x1000).mirror(0x07ff).r(FUNC(conchess_state::input_r));
+	map(0x1000, 0x100f).mirror(0x07f0).w(FUNC(conchess_state::leds_w));
+	map(0x1800, 0x1800).mirror(0x07ff).w(FUNC(conchess_state::sound_w));
 	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x8000, 0xffff).rom();
 }
@@ -205,11 +225,11 @@ INPUT_PORTS_END
 void conchess_state::concstd(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 4_MHz_XTAL / 2);
+	M6502(config, m_maincpu, 4_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x2000);
-	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_hold), irq_period);
+	const attotime irq_period = attotime::from_hz(4_MHz_XTAL/2 / 0x1000);
+	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -224,38 +244,54 @@ void conchess_state::concstd(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 4_MHz_XTAL / 0x400);
+	BEEP(config, m_beeper, 4_MHz_XTAL/2 / 0x200);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void conchess_state::concply(machine_config &config)
+void conchess_state::concply5(machine_config &config)
 {
 	concstd(config);
 
 	/* basic machine hardware */
-	R65C02(config.replace(), m_maincpu, 8_MHz_XTAL / 2);
+	R65C02(config.replace(), m_maincpu, 11_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(8_MHz_XTAL / 0x2000);
-	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_hold), irq_period);
+	const attotime irq_period = attotime::from_hz(11_MHz_XTAL/2 / 0x2000);
+	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("conchess_plymate");
 
 	/* sound hardware */
-	BEEP(config.replace(), m_beeper, 8_MHz_XTAL / 0x800);
+	BEEP(config.replace(), m_beeper, 11_MHz_XTAL/2 / 0x400);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void conchess_state::concply8(machine_config &config)
+{
+	concply5(config);
+
+	/* basic machine hardware */
+	R65C02(config.replace(), m_maincpu, 16_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
+
+	const attotime irq_period = attotime::from_hz(16_MHz_XTAL/2 / 0x2000);
+	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
+
+	/* sound hardware */
+	BEEP(config.replace(), m_beeper, 16_MHz_XTAL/2 / 0x800);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void conchess_state::concplyv(machine_config &config)
 {
-	concply(config);
+	concstd(config);
 
 	/* basic machine hardware */
 	M65C02(config.replace(), m_maincpu, 12.288_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL/2 / 0x2000);
-	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("conchess_victoria");
 
@@ -277,9 +313,14 @@ ROM_START( concstd )
 	ROM_LOAD("c87009.b1", 0xe000, 0x2000, CRC(e1c648e2) SHA1(725a6ac1c69f788a7bba0573e5609b55b12899ac) )
 ROM_END
 
-ROM_START( concply )
+ROM_START( concply5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("conchess_8", 0x8000, 0x8000, CRC(85005b73) SHA1(edbc18d07552cab5951d8a6b738b2eacd73331c1) )
+	ROM_LOAD("plymate_5.5mhz.bin", 0x8000, 0x8000, CRC(9a9d1ec1) SHA1(75dbd1f96502775ed304f6b085d958f1b07d08f9) )
+ROM_END
+
+ROM_START( concply8 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("plymate_8mhz.bin", 0x8000, 0x8000, CRC(85005b73) SHA1(edbc18d07552cab5951d8a6b738b2eacd73331c1) )
 ROM_END
 
 ROM_START( concplyv )
@@ -295,7 +336,8 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1982, concstd,  0,      0,      concstd,  conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, concply,  0,      0,      concply,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate (Amsterdam, T8)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, concplyv, 0,      0,      concplyv, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
+CONS( 1982, concstd,  0,        0,      concstd,  conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, concply5, 0,        0,      concply5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, concply8, concply5, 0,      concply8, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate 8.0MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, concplyv, 0,        0,      concplyv, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

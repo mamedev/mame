@@ -358,7 +358,7 @@ void midvunit_renderer::process_dma_queue()
 	}
 
 	/* set up the object data for this triangle */
-	midvunit_object_data &objectdata = object_data_alloc();
+	midvunit_object_data &objectdata = object_data().next();
 	objectdata.destbase = &m_state.m_videoram[(m_state.m_page_control & 4) ? 0x40000 : 0x00000];
 	objectdata.texbase = (uint8_t *)m_state.m_textureram.target() + (m_state.m_dma_data[14] * 256);
 	objectdata.pixdata = pixdata;

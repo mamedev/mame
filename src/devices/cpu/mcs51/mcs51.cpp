@@ -246,6 +246,7 @@ DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
 DEFINE_DEVICE_TYPE(DS80C320, ds80c320_device, "ds80c320", "Dallas DS80C320 HSM")
 DEFINE_DEVICE_TYPE(SAB80C535, sab80c535_device, "sab80c535", "Siemens SAB80C535")
 DEFINE_DEVICE_TYPE(I8344, i8344_device, "i8344", "Intel 8344AH RUPI-44")
+DEFINE_DEVICE_TYPE(I8744, i8744_device, "i8744", "Intel 8744H RUPI-44")
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
 
@@ -290,7 +291,6 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	m_ds5002fp.crc = 0;
 
 	/* default to standard cmos interfacing */
-
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
 }
@@ -421,6 +421,11 @@ sab80c535_device::sab80c535_device(const machine_config &mconfig, const char *ta
 
 i8344_device::i8344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8344, tag, owner, clock, 0, 8)
+{
+}
+
+i8744_device::i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mcs51_cpu_device(mconfig, I8744, tag, owner, clock, 12, 8)
 {
 }
 
@@ -1375,8 +1380,7 @@ void mcs51_cpu_device::update_serial(int cycles)
 /* Check and update status of serial port */
 void mcs51_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
 {
-	int i;
-	for (i=0; i<8; i++)
+	for (int i=0; i<8; i++)
 		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
 }
 
@@ -1761,9 +1765,8 @@ void mcs51_cpu_device::check_irqs()
 	uint8_t int_vec = 0;
 	uint8_t int_mask;
 	int priority_request = -1;
-	int i;
 
-	//If All Inerrupts Disabled or no pending abort..
+	//If All Interrupts Disabled or no pending abort..
 	int_mask = (GET_EA ? IE : 0x00);
 
 	if (m_features & FEATURE_I8052)
@@ -1784,7 +1787,7 @@ void mcs51_cpu_device::check_irqs()
 
 	if (!ints)  return;
 
-	/* CLear IDL - got enabled interrupt */
+	/* Clear IDL - got enabled interrupt */
 	if (m_features & FEATURE_CMOS)
 	{
 		/* any interrupt terminates idle mode */
@@ -1796,7 +1799,7 @@ void mcs51_cpu_device::check_irqs()
 				SET_PD(0);
 	}
 
-	for (i=0; i<m_num_interrupts; i++)
+	for (int i=0; i<m_num_interrupts; i++)
 	{
 		if (ints & (1<<i))
 		{
@@ -1811,7 +1814,6 @@ void mcs51_cpu_device::check_irqs()
 	/* Skip the interrupt request if currently processing interrupt
 	 * and the new request does not have a higher priority
 	 */
-
 	LOG(("Request: %d\n", priority_request));
 	if (m_irq_active && (priority_request <= m_cur_irq_prio))
 	{
@@ -1875,7 +1877,6 @@ void mcs51_cpu_device::check_irqs()
 		 *  no flags are cleared, PFW is reset by software
 		 *  This has the same vector as V_TF2.
 		 */
-
 	}
 }
 
@@ -2165,7 +2166,6 @@ void mcs51_cpu_device::device_start()
 	m_serial_tx_cb.resolve_safe();
 
 	/* Save states */
-
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_last_op));
@@ -2254,6 +2254,7 @@ void mcs51_cpu_device::device_reset()
 	m_t1_cnt = 0;
 	m_t2_cnt = 0;
 	m_t2ex_cnt = 0;
+
 	/* Flag as NO IRQ in Progress */
 	m_irq_active = 0;
 	m_cur_irq_prio = -1;
@@ -2261,6 +2262,8 @@ void mcs51_cpu_device::device_reset()
 	m_last_bit = 0;
 
 	/* these are all defined reset states */
+	RWM = 0;
+	PPC = PC;
 	PC = 0;
 	SP = 0x7;
 	SET_PSW(0);
@@ -2279,6 +2282,7 @@ void mcs51_cpu_device::device_reset()
 	TH0 = 0;
 	TL1 = 0;
 	TL0 = 0;
+
 	/* set the port configurations to all 1's */
 	SET_P3(0xff);
 	SET_P2(0xff);
@@ -2576,6 +2580,11 @@ std::unique_ptr<util::disasm_interface> sab80c535_device::create_disassembler()
 }
 
 std::unique_ptr<util::disasm_interface> i8344_device::create_disassembler()
+{
+	return std::make_unique<rupi44_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i8744_device::create_disassembler()
 {
 	return std::make_unique<rupi44_disassembler>();
 }

@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/a5105_dsk.h"
 
 a5105_format::a5105_format() : upd765_format(formats)

@@ -27,8 +27,8 @@ VTech V.Smile Baby cartridges
 +========+===================+============================================================================+
 | Dumped |      Serial       |                                    Name                                    |
 +========+===================+============================================================================+
-|        | 80-099000(US)     | Learn and Discover Home (white background on title) (pack-in)              |
-|        | 80-099000(US)     | Learn and Discover Home (green background on title) (standalone)           |
+|   NA   | 80-099000(US)     | Learn and Discover Home (white background on title) (pack-in) (no-ROM cartridge)
+|   NA   | 80-099000(US)     | Learn and Discover Home (green background on title) (standalone) (no-ROM cartridge)
 |   XX   | 80-099002(NL)     | Dierenhuis                                                                 |
 |        | 80-099003(UK)     | Learn and Discover Home (white background on title) (pack-in)              |
 |   XX   | 80-099004(GE)     | Meine kleinen Tierfreunde (Explore and Learn Home on label)                |
@@ -43,12 +43,12 @@ VTech V.Smile Baby cartridges
 |   NA   | 80-099027(SP)     | Aventuras en el Bosque de los Cien Acres (no-ROM cartridge)                |
 |   XX   | 80-099034(SE)     | Nalle Puhs Äventyr i Sjumilaskogen                                         |
 +========+===================+============================================================================+
-|        | 80-099040(US)     | Baby Einstein - World of Discoveries                                       |
-|        | 80-099040(US)     | Baby Einstein - World of Discoveries (no # on front label)                 |
+|   XX   | 80-099040(US)     | Baby Einstein - World of Discoveries                                       |
+|   XX   | 80-099040(US)     | Baby Einstein - World of Discoveries (no # on front label)                 |
 |        | 80-099043(UK)     | Baby Einstein - World of Discoveries                                       |
 |   XX   | 80-099045(FR)     | Baby Einstein - Un monde de découvertes                                    |
 +========+===================+============================================================================+
-|        | 80-099060(US)     | A Day On The Farm                                                          |
+|   XX   | 80-099060(US)     | A Day On The Farm                                                          |
 |        | 80-099063(UK)     | A Day On The Farm                                                          |
 |   XX   | 80-099064(GE)     | Mein erster Bauernhof                                                      |
 |   XX   | 80-099065(FR)     | Un jour à la ferme                                                         |
@@ -56,19 +56,19 @@ VTech V.Smile Baby cartridges
 +========+===================+============================================================================+
 |        | 80-099080(US)     | <Unknown>                                                                  |
 +========+===================+============================================================================+
-|        | 80-099100(US)     | Noah's Ark Animal Adventure                                                |
+|   XX   | 80-099100(US)     | Noah's Ark Animal Adventure                                                |
 |        | 80-099102(NL)     | De ark van Noach                                                           |
 |        | 80-099103(UK)     | Noah's Ark Animal Adventure                                                |
 |   XX   | 80-099105(FR)     | L'arche de Noé - L'aventure des animaux                                    |
 +========+===================+============================================================================+
-|        | 80-099120(US)     | Barney - Let's Go to a Party                                               |
+|   XX   | 80-099120(US)     | Barney - Let's Go to a Party                                               |
 +========+===================+============================================================================+
-|        | 80-099140(US)     | Teletubbies                                                                |
+|   XX   | 80-099140(US)     | Teletubbies                                                                |
 |        | 80-099142(NL)     | Teletubbies                                                                |
 |        | 80-099143(UK)     | Teletubbies                                                                |
 |   XX   | 80-099145(FR)     | Teletubbies                                                                |
 +========+===================+============================================================================+
-|        | 80-099160(US)     | Discovery with Baby Mickey and Friends                                     |
+|   XX   | 80-099160(US)     | Discovery with Baby Mickey and Friends                                     |
 |        | 80-099163(UK)     | Discovery with Baby Mickey and Friends                                     |
 |   XX   | 80-099165(UK)     | Les découvertes de Mickey et ses amis                                      |
 +========+===================+============================================================================+
@@ -76,19 +76,44 @@ VTech V.Smile Baby cartridges
 |        | 80-099183(UK)     | Bailey Goes To Town (included Bailey Plush Bear Controller)                |
 |        | 80-099185(FR)     | En Ville avec l'ourson Patoune (included Patoune Plush Bear Controller) (no-ROM cart exists, unknown if a regular cart was sold too)
 +========+===================+============================================================================+
-|        | 80-099200(US)     | Mother Goose                                                               |
+|   XX   | 80-099200(US)     | Mother Goose                                                               |
 +========+===================+============================================================================+
-|        | 80-099220(US)     | Care Bears Play Day                                                        |
+|   XX   | 80-099220(US)     | Care Bears Play Day                                                        |
 +========+===================+============================================================================+
-|        | 80-099240(US)     | Backyardigans: Big Backyard Adventures                                     |
+|   XX   | 80-099240(US)     | Backyardigans: Big Backyard Adventures                                     |
 +========+===================+============================================================================+
 
 -->
 
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
 
+	<software name="babyeins" supported="no">
+		<description>Baby Einstein - World of Discoveries (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099040(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Baby Einstein (U) 099040 (Baby).bin" size="8388608" crc="9510fdba" sha1="ab7790b26b17fe000b9cef716e9c2aaa95b570f6" />
+			</dataarea>
+		</part>
+	</software>
 
-	<software name="babyeninfr" supported="no">
+	<software name="babyeinsa" cloneof="babyeins" supported="no">
+		<description>Baby Einstein - World of Discoveries (USA, alt)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099040(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Baby Einstein (U) (Baby).bin" size="8388608" crc="d8f964e4" sha1="b3bb1be91e51b9d19f2d03aeff7d8c3d05f38d74" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="babyeinsfr" cloneof="babyeins" supported="no">
 		<description>Baby Einstein - Un monde de découvertes (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -101,7 +126,59 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmge" supported="no">
+	<software name="backyardi" supported="no">
+		<description>Nickelodeon The Backyardigans - Big Backyard Adventure (USA)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099240(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="The Backyardigans (U) 099240 (Baby).bin" size="8388608" crc="2a1d80a4" sha1="aeab9a3458f2740a959a05e0ffe8103ecfcee3bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barney" supported="no">
+		<description>Barney - Let's Go to a Party (USA)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099120(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Barney (U) 099120 (Baby).bin" size="8388608" crc="77867487" sha1="5c7be12b4767f2679e1148d0ffd4b7232f4f7563" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carebear" supported="no">
+		<description>Care Bears - Play Day (USA)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099220(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Care Bears (U) 099220 (Baby).bin" size="8388608" crc="4a791d18" sha1="39d70dbeccd6ddf4fcbe3cee5c0630ea9059c3ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dayfarm" supported="no">
+		<description>A Day on the Farm (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099060(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="A Day on the Farm (U) (Baby).bin" size="8388608" crc="7f93ea7b" sha1="a130881e45c6a6a6158f64c2e7fb51d55fb2a15f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dayfarmge" cloneof="dayfarm" supported="no">
 		<description>Mein erster Bauernhof (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -116,7 +193,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmfr" cloneof="dayfarmge" supported="no">
+	<software name="dayfarmfr" cloneof="dayfarm" supported="no">
 		<description>Un jour à la ferme (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -129,7 +206,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmsp" cloneof="dayfarmge" supported="no">
+	<software name="dayfarmsp" cloneof="dayfarm" supported="no">
 		<description>Un Día en la Granja (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -144,7 +221,20 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dbabymifr" supported="no">
+	<software name="dbabymi" supported="no">
+		<description>Discovery with Baby Mickey &amp; Friends (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099160(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Disney Baby - Discovery with Baby Mickey and Friends (U) (Baby).bin" size="8388608" crc="8b694c2c" sha1="7d3ac29cda9728545bd040af182cb78f9a7b7c02" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbabymifr" cloneof="dbabymi" supported="no">
 		<description>Les découvertes de Mickey et ses amis (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -201,7 +291,33 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="noaharkfr" supported="no">
+	<software name="mothergoo" supported="no">
+		<description>Mother Goose (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099200(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Mother Goose (U) 099200 (Baby).bin" size="8388608" crc="1ef9e246" sha1="2093034c442c5bd7ace376eb9aa4e9c8378c75a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noahark" supported="no">
+		<description>Noah's Ark - Animal Adventures (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099100(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Noah's Ark Animal Adventures (U) 99100 (Baby).bin" size="8388608" crc="039d0465" sha1="826fd675f300fb14293344f6f180abc38b794e40" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noaharkfr" cloneof="noahark" supported="no">
 		<description>L'arche de Noé - L'aventure des animaux (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -221,7 +337,7 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099020(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="099020.bin" size="8388608" crc="a3ac4cd4" sha1="3562c632e0a1e70cb9e382ebb823449757afed67" status="baddump" />
+				<rom name="Disney Baby - Pooh's Hundred Acre Wood Adventure (U) 099020 (Baby).bin" size="8388608" crc="31e6ccc5" sha1="2379b95910b171aa984d41b3a11d295639e5c8da" />
 			</dataarea>
 		</part>
 	</software>
@@ -241,9 +357,21 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="teletubfr" supported="no">
-		<description>Teletubbies (France)</description>
-		<year>1996</year>
+	<software name="teletub" supported="no">
+		<description>Teletubbies - Time for Teletubbies (USA)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099140(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Teletubbies - Time for Teletubbies (U) 099140 (Baby).bin" size="8388608" crc="f4950adb" sha1="92b1d5ca2c6c249872a17a3820082eb24aa0ebe3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teletubfr" cloneof="teletub" supported="no">
+		<description>Teletubbies - C'est l'heure des Teletubbies (France)</description>
+		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099145(FR)" />
 		<part name="cart" interface="vsmile_cart">

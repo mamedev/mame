@@ -187,7 +187,7 @@ void h8_intc_device::update_irq_state()
 
 void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 {
-	icr_pri = 0;
+	icr_pri = vect == 3 ? 2 : 0; // NMI
 	ipr_pri = 0;
 }
 
@@ -293,10 +293,10 @@ void h8h_intc_device::update_irq_types()
 const int h8h_intc_device::vector_to_slot[64] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7
 	-1, -1, -1, -1,  0,  1,  2,  2, // IRQ 0-3
-		3,  3,  3,  3,  4,  4,  4,  4, // IRQ 4-5, (reservedx2), WOVI, CMI, (reserved), ADI
-		5,  5,  5,  5,  6,  6,  6,  6, // IMIA0, IMIB0, OVI0, (reserved), IMIA1, IMIB1, OVI1, (reserved)
-		7,  7,  7,  7,  8,  8,  8,  8, // IMIA2, IMIB2, OVI2, (reserved), CMIA0, CMIB0, CMIx1, TOVI0/1
-		9,  9,  9,  9, 10, 10, 10, 10, // CMIA2, CMIB2, CMIx3, TOVI2/3, DEND0A, DEND0B, DEND1A, DEND1B
+	 3,  3,  3,  3,  4,  4,  4,  4, // IRQ 4-5, (reservedx2), WOVI, CMI, (reserved), ADI
+	 5,  5,  5,  5,  6,  6,  6,  6, // IMIA0, IMIB0, OVI0, (reserved), IMIA1, IMIB1, OVI1, (reserved)
+	 7,  7,  7,  7,  8,  8,  8,  8, // IMIA2, IMIB2, OVI2, (reserved), CMIA0, CMIB0, CMIx1, TOVI0/1
+	 9,  9,  9,  9, 10, 10, 10, 10, // CMIA2, CMIB2, CMIx3, TOVI2/3, DEND0A, DEND0B, DEND1A, DEND1B
 	11, 11, 11, 11, 12, 12, 12, 12, // (reservedx4), ERI0, RXI0, TXI0, TEI0
 	13, 13, 13, 13, 14, 14, 14, 14  // ERI1, RXI1, TXI1, TEI1, ERI2, RXI2, TXI2, TEI2
 };

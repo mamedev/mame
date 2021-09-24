@@ -421,7 +421,7 @@ void mmodular_state::alm16(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);
-	subdevice<sensorboard_device>("board:board")->set_spawnpoints(12+2); // 2 jokers
+	subdevice<sensorboard_device>("board:board")->set_spawnpoints(12+2); // +2 jokers
 	subdevice<sensorboard_device>("board:board")->spawn_cb().set(FUNC(mmodular_state::spawn_cb));
 	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);
 

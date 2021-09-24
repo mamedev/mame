@@ -33,6 +33,8 @@
  * MB81464-12    262144x1 DRAM, x16 == 512K video RAM?
  * HM6264ALSP-12 8192-word 8-bit High Speed CMOS Static RAM, x2 == 16K non-volatile RAM?
  */
+// WIP: keyboard test at f040ae, if bypassed continues with more interesting tests
+
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
@@ -50,8 +52,9 @@
 
 // video
 #include "screen.h"
+#include "emupal.h"
 #include "video/mc6845.h"
-//#include "video/hd63484.h"
+#include "video/hd63484.h"
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
@@ -73,10 +76,15 @@ public:
 		, m_vram(*this, "vram")
 		, m_eprom(*this, "eprom")
 		, m_pic(*this, "pic")
-		, m_screen(*this, "screen")
+		, m_screen_crtc(*this, "screen_crtc")
+		, m_screen_acrtc(*this, "screen_acrtc")
+		, m_palette_acrtc(*this, "palette_acrtc")
 		, m_crtc(*this, "crtc")
+		, m_acrtc(*this, "acrtc")
 		, m_serial1(*this, "i8251_1")
 		, m_serial2(*this, "i8251_2")
+		, m_fontram(*this, "fontram")
+		, m_sw1(*this, "SW1")
 		, m_sw2(*this, "SW2")
 	{
 	}
@@ -89,6 +97,7 @@ protected:
 	virtual void machine_reset() override;
 
 	void cpu_map(address_map &map);
+	void acrtc_map(address_map &map);
 
 	void common(machine_config &config);
 
@@ -103,13 +112,20 @@ private:
 
 	required_device<pic8259_device> m_pic;
 
-	required_device<screen_device> m_screen;
+	required_device<screen_device> m_screen_crtc;
+	required_device<screen_device> m_screen_acrtc;
+	required_device<palette_device> m_palette_acrtc;
 	required_device<hd6345_device> m_crtc;
+	required_device<hd63484_device> m_acrtc;
 	required_device<i8251_device>  m_serial1;
 	required_device<i8251_device>  m_serial2;
 
+	required_shared_ptr<u16> m_fontram;
+
+	required_ioport m_sw1;
 	required_ioport m_sw2;
 	u16 f14000_r();
+	u16 f16000_r();
 };
 
 void sx1000_state::machine_start()
@@ -128,7 +144,8 @@ void sx1000_state::cpu_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().region(m_eprom, 0); // FIXME: probably mapped/unmapped during reset
 
-	map(0x1fe000, 0x1fffff).ram();
+	// FIXME: additional 1M RAM board seems to be mandatory?
+	map(0x010000, 0x1fffff).ram();
 
 	map(0xa00000, 0xbfffff).ram(); // Banking on f00000 writes, if it makes any sense? Would provide up to 32M of ram, bank is 4 bits
 
@@ -146,12 +163,23 @@ void sx1000_state::cpu_map(address_map &map)
 	map(0xf14101, 0xf14101).lrw8([this]() { return m_pic->read(1); }, "pic_r1", [this](u8 data) { m_pic->write(1, data); }, "pic_w1");
 
 	map(0xf14000, 0xf14001).r(FUNC(sx1000_state::f14000_r));
+	map(0xf16000, 0xf16001).r(FUNC(sx1000_state::f16000_r));
 
 	map(0xf1a001, 0xf1a001).rw(m_serial2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf1a003, 0xf1a003).rw(m_serial2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf1a004, 0xf1a005).lr16(NAME([this]() { return m_serial2->txrdy_r() ? 2 : 0; }));
 
 	map(0xf20000, 0xf23fff).ram().share(m_vram);
+
+	map(0xf28000, 0xf28001).lrw16([this]() { return m_acrtc->read16(0); }, "acrtc_status_r", [this](u16 data) { m_acrtc->write16(0, data); }, "acrtc_address_w");
+	map(0xf28100, 0xf28101).lrw16([this]() { return m_acrtc->read16(1); }, "acrtc_data_r", [this](u16 data) { m_acrtc->write16(1, data); }, "acrtc_data_w");
+
+	map(0xf2e000, 0xf2ffff).ram().share(m_fontram);
+}
+
+void sx1000_state::acrtc_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
 }
 
 u16 sx1000_state::f14000_r()
@@ -164,17 +192,21 @@ u16 sx1000_state::f14000_r()
 	return res;
 }
 
+u16 sx1000_state::f16000_r()
+{
+	u8 res = m_sw1->read();
+
+	return res;
+}
+
 MC6845_UPDATE_ROW( sx1000_state::crtc_update_row )
 {
-	//	logerror("ma=%x ra=%d y=%d x_count=%d cursor_x=%d de=%d hbp=%d vbp=%d\n", ma*2, ra, y, x_count, cursor_x, de, hbp, vbp);
-	const u16 *charset = reinterpret_cast<const u16 *>(m_eprom->base() + 0x5c40);
+	//  logerror("ma=%x ra=%d y=%d x_count=%d cursor_x=%d de=%d hbp=%d vbp=%d\n", ma*2, ra, y, x_count, cursor_x, de, hbp, vbp);
 	const u16 *vram = m_vram + ma;
 	u32 *dest = &bitmap.pix(y);
 	for(u32 x0 = 0; x0 != x_count; x0 ++) {
-		u16 data = *vram++;
-		u16 bitmap = charset[((data & 0xff) << 3) | (ra >> 1)];
-		if(!(ra & 1))
-			bitmap >>= 8;
+		u16 const data = *vram++;
+		u16 const bitmap = m_fontram[((data & 0xff) << 4) | (ra)];
 		for(u32 x1 = 0; x1 != 8; x1 ++) {
 			u32 color = BIT(bitmap, 7-x1) ? 0xffffff : 0x000000;
 			*dest ++ = color;
@@ -184,16 +216,16 @@ MC6845_UPDATE_ROW( sx1000_state::crtc_update_row )
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( terminal2 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -208,24 +240,38 @@ void sx1000_state::common(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("1M");
 
-	//	NVRAM(config, "nvram");
+	//  NVRAM(config, "nvram");
 
 	PIC8259(config, m_pic);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(48'800'000, 80*16, 0, 80*16, 25*16, 0, 25*16);
-	m_screen->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
+	// M6845 config screen: HTOTAL: 944  VTOTAL: 444  MAX_X: 639  MAX_Y: 399  HSYNC: 720-823  VSYNC: 416-425  Freq: 76.347534fps
+	SCREEN(config, m_screen_crtc, SCREEN_TYPE_RASTER);
+	m_screen_crtc->set_raw(48'800'000, 944, 0, 640, 444, 0, 400);
+	m_screen_crtc->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
+
+	// ACRTC: full 944x449 vis (200, 18)-(847, 417)
+	SCREEN(config, m_screen_acrtc, SCREEN_TYPE_RASTER);
+	m_screen_acrtc->set_raw(48'800'000, 944, 200, 847, 449, 18, 417);
+	m_screen_acrtc->set_screen_update(m_acrtc, FUNC(hd63484_device::update_screen));
+	m_screen_acrtc->set_palette(m_palette_acrtc);
+
+	PALETTE(config, m_palette_acrtc).set_entries(16);
 
 	// htotal = 117
 	// hdisp = 80
 	// vtotal = 26
 	// vdisp = 25
 	// mrast = 15
+	// MB89321A
 	HD6345(config, m_crtc, 4'000'000);
-	m_crtc->set_screen(m_screen);
+	m_crtc->set_screen(m_screen_crtc);
 	m_crtc->set_update_row_callback(FUNC(sx1000_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
-	m_crtc->set_hpixels_per_column(16);
+	m_crtc->set_hpixels_per_column(8);
+
+	HD63484(config, m_acrtc, 8'000'000);
+	m_acrtc->set_screen(m_screen_acrtc);
+	m_acrtc->set_addrmap(0, &sx1000_state::acrtc_map);
 
 	auto &rs232_1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
 	rs232_1.rxd_handler().set(m_serial1, FUNC(i8251_device::write_rxd));
@@ -238,7 +284,7 @@ void sx1000_state::common(machine_config &config)
 	m_serial1->dtr_handler().set(rs232_1, FUNC(rs232_port_device::write_dtr));
 	m_serial1->rts_handler().set(rs232_1, FUNC(rs232_port_device::write_rts));
 
-	CLOCK(config, "clock1", 19200*16).signal_handler().set(m_serial1, FUNC(i8251_device::write_txc));
+	CLOCK(config, "clock1", 1200*16).signal_handler().set(m_serial1, FUNC(i8251_device::write_txc));
 
 	auto &rs232_2(RS232_PORT(config, "serial2", default_rs232_devices, nullptr));
 	rs232_2.rxd_handler().set(m_serial2, FUNC(i8251_device::write_rxd));
@@ -251,7 +297,7 @@ void sx1000_state::common(machine_config &config)
 	m_serial2->dtr_handler().set(rs232_2, FUNC(rs232_port_device::write_dtr));
 	m_serial2->rts_handler().set(rs232_2, FUNC(rs232_port_device::write_rts));
 
-	CLOCK(config, "clock2", 19200*16).signal_handler().set(m_serial2, FUNC(i8251_device::write_txc));
+	CLOCK(config, "clock2", 9600*16).signal_handler().set(m_serial2, FUNC(i8251_device::write_txc));
 }
 
 void sx1000_state::sx1010(machine_config &config)
@@ -260,6 +306,11 @@ void sx1000_state::sx1010(machine_config &config)
 }
 
 static INPUT_PORTS_START(sx1010)
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x20, 0x00, "Ignore keyboard error" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPSETTING(    0x20, "On" )
+
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x02, 0x00, "Serial console" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, "Off" )

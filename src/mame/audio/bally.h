@@ -205,9 +205,7 @@ public:
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock = 3'579'545) :
-		bally_cheap_squeak_device(mconfig, BALLY_CHEAP_SQUEAK, tag, owner, clock)
-	{ }
+			uint32_t clock = 3'579'545);
 
 	auto sound_ack_w_handler() { return m_sound_ack_w_handler.bind(); }
 
@@ -224,13 +222,7 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock) :
-		device_t(mconfig, type, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_dac(*this, "dac"),
-		m_sound_ack_w_handler(*this)
-	{ }
+			uint32_t clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -247,6 +239,7 @@ private:
 	bool m_sound_ack;
 
 	devcb_write_line m_sound_ack_w_handler;
+	output_finder<1> m_leds;
 
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
@@ -269,9 +262,7 @@ public:
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock = 3'579'545) :
-		bally_squawk_n_talk_device(mconfig, BALLY_SQUAWK_N_TALK, tag, owner, clock)
-	{ }
+			uint32_t clock = 3'579'545);
 
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
@@ -286,19 +277,7 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock) :
-		device_t(mconfig, type, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_pia1(*this, "pia1"),
-		m_pia2(*this, "pia2"),
-		m_dac_filter(*this, "dac_filter"),
-		m_dac(*this, "dac"),
-		m_speech_filter(*this, "speech_filter"),
-		m_tms5200(*this, "tms5200"),
-		m_ay_filters(*this, "ay_filter%u", 0),
-		m_ay(*this, "ay")
-	{ }
+			uint32_t clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -313,8 +292,6 @@ protected:
 	required_device<dac_byte_interface> m_dac;
 	required_device<filter_rc_device> m_speech_filter;
 	required_device<tms5200_device> m_tms5200;
-	optional_device_array<filter_rc_device, 3> m_ay_filters;
-	optional_device<ay8910_device> m_ay;
 
 	uint8_t m_sound_select;
 
@@ -325,7 +302,6 @@ private:
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
 	void pia1_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
 };
 
@@ -337,9 +313,7 @@ public:
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock = 3'579'545) :
-		bally_squawk_n_talk_device(mconfig, BALLY_SQUAWK_N_TALK_AY, tag, owner, clock)
-	{ }
+			uint32_t clock = 3'579'545);
 
 protected:
 	// device-level overrides
@@ -352,6 +326,9 @@ private:
 	bool m_bc1;
 	bool m_bdir;
 	uint8_t m_ay_data;
+
+	required_device_array<filter_rc_device, 3> m_ay_filters;
+	required_device<ay8910_device> m_ay;
 
 	void pia2_porta_w(uint8_t data);
 	void pia2_portb_w(uint8_t data);

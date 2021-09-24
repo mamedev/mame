@@ -12,60 +12,134 @@
 
  driver by Pierpaolo Prazzoli
 
+ Outputs for Royal Poker 2 (royalpk2):
+  0: High button
+  1: Stop button
+  2: Double Up button
+  3: Low button *and* Bet button
+  4: Max Bet button
+  5: Change button
+  6: Gift button
+  7: Hold 1 button
+  8: Hold 2 button
+  9: Hold 3 button
+ 10: Hold 4 button
+ 11: Hold 5 button
+ 12: Hold Clear button
+ 13: Staff Call button
+ 14: Start / Deal / Draw button
+ 15: Half Double button
+ 16: 2x Double button
+ 17: Gift 1 lamp
+ 18: Gift 2 lamp
+ 19: Gift 3 lamp
+ 20: 'Medal' (coin output) lamp
+ 21: Counter 1 lamp
+ 22: Counter 2 lamp
+ 23: Counter 3 lamp
+ 24: Counter 4 lamp
+ 25: Counter 5 lamp
+ 26: Light 1 lamp
+ 27: Light 2 lamp
+ 28: Light 3 lamp
+ 29: Light 4 lamp
+ 30: Light 5 lamp
+
+ TODO: royalpk2 is marked non-working, as the machine will soft-lock
+ when attempting to use either settings-save options in the service
+ menu.
+
 *********************************************************************/
-
-/*
-royalpk2 : to get 'secret. OK.'
-
-0002D92C: MOV L18, L29
-0002D92E: CMPI L18, $1
-0002D930: BNE $2d94c
-
-go 2d92c
-do l29 = 1
-f5
-
-*/
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
-class mosaicf2_state : public driver_device
+class fe132_state : public driver_device
+{
+public:
+	fe132_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom"),
+		m_videoram(*this, "videoram"),
+		m_p1(*this, "P1"),
+		m_system_p2(*this, "SYSTEM_P2")
+	{ }
+
+protected:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void common_map(address_map &map);
+
+	required_device<hyperstone_device>  m_maincpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_shared_ptr<uint32_t> m_videoram;
+	required_ioport m_p1;
+	required_ioport m_system_p2;
+};
+
+class mosaicf2_state : public fe132_state
 {
 public:
 	mosaicf2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") ,
-		m_videoram(*this, "videoram")
+		fe132_state(mconfig, type, tag)
 	{ }
 
 	void mosaicf2(machine_config &config);
-	void royalpk2(machine_config &config);
 
-private:
-	/* devices */
-	required_device<hyperstone_device>  m_maincpu;
-
-	/* memory pointers */
-	required_shared_ptr<uint32_t> m_videoram;
-
-	uint32_t f32_input_port_1_r();
-	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void common_map(address_map &map);
+protected:
+	uint32_t input_port_1_r();
 	void mosaicf2_io(address_map &map);
-	void royalpk2_io(address_map &map);
-	void royalpk2_map(address_map &map);
 };
 
+class royalpk2_state : public fe132_state
+{
+public:
+	royalpk2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fe132_state(mconfig, type, tag),
+		m_nvram(*this, "nvram"),
+		m_hopper(*this, "hopper"),
+		m_lamps(*this, "lamps%u", 0U),
+		m_okibank(*this, "okibank")
+	{ }
 
-uint32_t mosaicf2_state::screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	void royalpk2(machine_config &config);
+
+	int hopper_r();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void royalpk2_io(address_map &map);
+	void royalpk2_map(address_map &map);
+	void oki_map(address_map &map);
+
+	void protection_seed_w(offs_t offset, uint32_t data);
+	uint32_t protection_response_r();
+
+	template <int Bank> void outputs_w(uint32_t data);
+
+	required_device<nvram_device> m_nvram;
+	required_device<hopper_device> m_hopper;
+	output_finder<31> m_lamps;
+	required_memory_bank m_okibank;
+
+	uint16_t m_protection_index;
+	uint8_t m_protection_response_byte;
+	int m_protection_response_bit;
+};
+
+uint32_t fe132_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (offs_t offs = 0; offs < 0x10000; offs++)
 	{
@@ -84,7 +158,7 @@ uint32_t mosaicf2_state::screen_update_mosaicf2(screen_device &screen, bitmap_in
 
 
 
-void mosaicf2_state::common_map(address_map &map)
+void fe132_state::common_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram();
 	map(0x40000000, 0x4003ffff).ram().share("videoram");
@@ -92,15 +166,15 @@ void mosaicf2_state::common_map(address_map &map)
 	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
 }
 
-uint32_t mosaicf2_state::f32_input_port_1_r()
+uint32_t mosaicf2_state::input_port_1_r()
 {
-	/* burn a bunch of cycles because this is polled frequently during busy loops */
+	// burn a bunch of cycles because this is polled frequently during busy loops
 
 	offs_t pc = m_maincpu->pc();
-	if ((pc == 0x000379de) || (pc == 0x000379cc) )
+	if (pc == 0x000379de || pc == 0x000379cc)
 		m_maincpu->eat_cycles(100);
 	//else printf("PC %08x\n", pc );
-	return ioport("SYSTEM_P2")->read();
+	return m_system_p2->read();
 }
 
 
@@ -109,7 +183,7 @@ void mosaicf2_state::mosaicf2_io(address_map &map)
 	map(0x4003, 0x4003).r("oki", FUNC(okim6295_device::read));
 	map(0x4813, 0x4813).r("ymsnd", FUNC(ym2151_device::status_r));
 	map(0x5000, 0x5003).portr("P1");
-	map(0x5200, 0x5203).r(FUNC(mosaicf2_state::f32_input_port_1_r));
+	map(0x5200, 0x5203).r(FUNC(mosaicf2_state::input_port_1_r));
 	map(0x5400, 0x5403).portr("EEPROMIN");
 	map(0x6003, 0x6003).w("oki", FUNC(okim6295_device::write));
 	map(0x6803, 0x6803).w("ymsnd", FUNC(ym2151_device::data_w));
@@ -174,9 +248,9 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mosaicf2_state::mosaicf2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaicf2_state::irq0_line_hold));
 
-	EEPROM_93C46_16BIT(config, "eeprom")
-		.erase_time(attotime::from_usec(1))
-		.write_time(attotime::from_usec(1));
+	EEPROM_93C46_16BIT(config, m_eeprom);
+	m_eeprom->erase_time(attotime::from_usec(1));
+	m_eeprom->write_time(attotime::from_usec(1));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -184,7 +258,7 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 319, 0, 223);
-	screen.set_screen_update(FUNC(mosaicf2_state::screen_update_mosaicf2));
+	screen.set_screen_update(FUNC(mosaicf2_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_555);
@@ -206,13 +280,45 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 
 static INPUT_PORTS_START( royalpk2 )
 	PORT_START("P1")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Max Bet")
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Change")
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gift")
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Staff Call") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Start/Deal/Draw") PORT_CODE(KEYCODE_1)
 
 	PORT_START("SYSTEM_P2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_GAMBLE_HALF )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("2x Double") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Credit Pay Out") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Income") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Income Clear") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0xff7fffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Medal Clear") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Operator Gift") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(royalpk2_state, hopper_r)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Over Flow") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Medal Empty") PORT_CODE(KEYCODE_L)
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
@@ -224,9 +330,7 @@ static INPUT_PORTS_START( royalpk2 )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
-
-
-void mosaicf2_state::royalpk2_map(address_map &map)
+void royalpk2_state::royalpk2_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram();
 	map(0x40000000, 0x4003ffff).ram().share("videoram");
@@ -234,28 +338,146 @@ void mosaicf2_state::royalpk2_map(address_map &map)
 	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
 }
 
-void mosaicf2_state::royalpk2_io(address_map &map)
+int royalpk2_state::hopper_r()
 {
+	return m_hopper->line_r() ? 0 : 1;
+}
+
+void royalpk2_state::royalpk2_io(address_map &map)
+{
+	// map(0x4000, 0x41ff).readonly().share("nvram"); // seems to expect to read NVRAM from here
+
+	map(0x4603, 0x4603).r("oki", FUNC(okim6295_device::read));
+
+	map(0x4800, 0x4803).portr("P1");
 	map(0x4900, 0x4903).portr("SYSTEM_P2");
 
 	map(0x4a00, 0x4a03).portr("EEPROMIN");
 
+	map(0x4b00, 0x4b03).r(FUNC(royalpk2_state::protection_response_r));
+
+	map(0x6000, 0x61ff).ram().share("nvram");
+
+	map(0x6603, 0x6603).w("oki", FUNC(okim6295_device::write));
+
 	map(0x6800, 0x6803).portw("EEPROMCLK");
 	map(0x6900, 0x6903).portw("EEPROMCS");
 	map(0x6a00, 0x6a03).portw("EEPROMOUT");
+
+	// map(0x6b00, 0x6b03).nopw(); // bits 8, 9, 10 and 13, 14 used
+
+	map(0x6c03, 0x6c03).lw8(NAME([this] (uint8_t data) { m_okibank->set_entry(data & 0x03); })); // TODO: double check this
+
+	map(0x6d00, 0x6d03).w(FUNC(royalpk2_state::protection_seed_w));
+
+	map(0x7000, 0x7003).w(FUNC(royalpk2_state::outputs_w<0>));
+	map(0x7100, 0x7103).w(FUNC(royalpk2_state::outputs_w<1>));
+	map(0x7200, 0x7203).w(FUNC(royalpk2_state::outputs_w<2>));
+	map(0x7300, 0x7303).w(FUNC(royalpk2_state::outputs_w<3>));
+	map(0x7400, 0x7403).w(FUNC(royalpk2_state::outputs_w<4>));
 }
 
-void mosaicf2_state::royalpk2(machine_config &config)
+void royalpk2_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr(m_okibank);
+}
+
+void royalpk2_state::machine_start()
+{
+	save_item(NAME(m_protection_index));
+	save_item(NAME(m_protection_response_byte));
+	save_item(NAME(m_protection_response_bit));
+
+	m_lamps.resolve();
+
+	for (int i = 0; i < 31; i++)
+		m_lamps[i] = 0;
+
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
+}
+
+void royalpk2_state::machine_reset()
+{
+	m_protection_index = 0;
+	m_protection_response_byte = 0;
+	m_protection_response_bit = 0;
+}
+
+void royalpk2_state::protection_seed_w(offs_t offset, uint32_t data)
+{
+	if ((m_protection_index % 2) == 0)
+		m_protection_response_byte = 0x85;
+	else if ((m_protection_index % 2) == 1)
+		m_protection_response_byte = 0x81;
+
+	m_protection_index++;
+	m_protection_response_bit = 7;
+}
+
+uint32_t royalpk2_state::protection_response_r()
+{
+	uint32_t data = BIT(m_protection_response_byte, m_protection_response_bit) << 6;
+	if (m_protection_response_bit > 0)
+	{
+		m_protection_response_bit--;
+	}
+	else
+	{
+		logerror("Protection response byte fully sent.\n");
+	}
+	return data;
+}
+
+template <int Bank>
+void royalpk2_state::outputs_w(uint32_t data)
+{
+	// TODO: Lamps 26 to 30 occupy multiple bits of a given output port. Find out if it's due to brightness control or something else.
+
+	switch (Bank)
+	{
+		case 0:
+			m_lamps[0] = BIT(data, 8);
+			for (int i = 0; i < 6; i++)
+				m_lamps[1 + i] = BIT(data, 10 + i);
+			break;
+		case 1:
+			for (int i = 0; i < 8; i++)
+				m_lamps[7 + i] = BIT(data, 8 + i);
+			break;
+		case 2:
+			for (int i = 0; i < 8; i++)
+				m_lamps[15 + i] = BIT(data, 8 + i);
+			break;
+		case 3:
+			for (int i = 0; i < 3; i++)
+				m_lamps[23 + i] = BIT(data, 8 + i);
+			m_lamps[26] = (data & 0x3000) ? 1 : 0;
+			m_lamps[27] = (data & 0xc000) ? 1 : 0;
+			break;
+		case 4:
+			m_lamps[28] = (data & 0x0f00) ? 1 : 0;
+			m_lamps[29] = (data & 0x3000) ? 1 : 0;
+			m_lamps[30] = (data & 0xc000) ? 1 : 0;
+			break;
+	}
+}
+
+void royalpk2_state::royalpk2(machine_config &config)
 {
 	/* basic machine hardware */
 	GMS30C2132(config, m_maincpu, XTAL(50'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &mosaicf2_state::royalpk2_map);
-	m_maincpu->set_addrmap(AS_IO, &mosaicf2_state::royalpk2_io);
-	m_maincpu->set_vblank_int("screen", FUNC(mosaicf2_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalpk2_state::royalpk2_map);
+	m_maincpu->set_addrmap(AS_IO, &royalpk2_state::royalpk2_io);
+	m_maincpu->set_vblank_int("screen", FUNC(royalpk2_state::irq1_line_hold));
 
-	EEPROM_93C46_16BIT(config, "eeprom")
-		.erase_time(attotime::from_usec(1))
-		.write_time(attotime::from_usec(1));
+	EEPROM_93C46_16BIT(config, m_eeprom);
+	m_eeprom->erase_time(attotime::from_usec(1));
+	m_eeprom->write_time(attotime::from_usec(1));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
+
+	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -263,7 +485,7 @@ void mosaicf2_state::royalpk2(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 319, 0, 223);
-	screen.set_screen_update(FUNC(mosaicf2_state::screen_update_mosaicf2));
+	screen.set_screen_update(FUNC(royalpk2_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_555);
@@ -277,6 +499,7 @@ void mosaicf2_state::royalpk2(machine_config &config)
 //  ymsnd.add_route(1, "rspeaker", 1.0);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH)); /* 1.7897725 MHz */
+	oki.set_addrmap(0, &royalpk2_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
@@ -336,7 +559,7 @@ S1 is the setup button
 VRAML & VRAMU are KM6161002CJ-12
 DRAML & DRAMU are GM71C18163CJ6
 
-ROM1 & SND are stardard 27C040 and/or 27C020 eproms
+ROM1 & SND are standard 27C040 and/or 27C020 eproms
 L00-L03 & U00-U03 are 29F1610ML Flash roms
 
 
@@ -377,6 +600,7 @@ ROM_START( royalpk2 )
 	ROM_LOAD( "snd2",             0x000000, 0x080000, CRC(f25e3315) SHA1(ce5350ecba6769b17bb01d82b55f26ded4d51773) )
 ROM_END
 
+} // anonymous namespace
 
 GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, empty_init, ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, royalpk2, 0, royalpk2, royalpk2, mosaicf2_state, empty_init, ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )
+GAME( 1999, royalpk2, 0, royalpk2, royalpk2, royalpk2_state, empty_init, ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )

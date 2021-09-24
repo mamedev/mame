@@ -1075,7 +1075,8 @@ void wd_fdc_device_base::do_generic()
 void wd_fdc_device_base::do_cmd_w()
 {
 	// it is actually possible to send another command even while in busy state.
-	// currently we simply accept any commands, but chip logic probably more complex (presumable it is possible change command of the same type only).
+	// currently we simply accept any commands, but chip logic is probably more complex
+	// (presumably it is only possible change to a command of the same type).
 #if 0
 	// Only available command when busy is interrupt
 	if(main_state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {

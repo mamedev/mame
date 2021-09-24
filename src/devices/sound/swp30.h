@@ -26,6 +26,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	enum {
+		IDLE,
+		ATTACK,
+		DECAY,
+		SUSTAIN,
+		RELEASE
+	};
+
 	required_device<meg_embedded_device> m_meg;
 
 	sound_stream *m_stream;
@@ -35,16 +43,18 @@ private:
 	s16 m_sample_log8[0x100];
 
 	u64 m_program[0x180];
-	u64 m_keyon_mask, m_active_mask;
+	u64 m_keyon_mask;
 	u32 m_pre_size[0x40], m_post_size[0x40], m_address[0x40];
 
-	s32 m_sample_pos[64];
+	s32 m_sample_pos[0x40];
 	s32 m_sample_history[0x40][2][2];
+	u32 m_current_volume[0x40], m_target_volume[0x40];
+	s32 m_step_volume[0x40];
 
 	u16 m_program_pfp[0x180], m_program_pint[0x80], m_program_plfo[0x80];
 
-	u16 m_volume[0x40], m_freq[0x40], m_pan[0x40], m_dry_rev[0x40], m_cho_var[0x40];
-	u16 m_envelope[0x40][3];
+	u16 m_base_volume[0x40], m_freq[0x40], m_pan[0x40], m_dry_rev[0x40], m_cho_var[0x40];
+	u16 m_attack[0x40], m_decay[0x40], m_release[0x40];
 	u16 m_lpf_cutoff[0x40], m_lpf_cutoff_inc[0x40], m_lpf_reso[0x40], m_hpf_cutoff[0x40];
 	s16 m_eq_filter[0x40][6];
 	u16 m_routing[0x40][3];
@@ -53,6 +63,8 @@ private:
 	u16 m_internal_adr;
 
 	u16 m_program_address;
+
+	u8 m_mode[0x40];
 
 	// AWM2 per-channel registers
 	u16 lpf_cutoff_r(offs_t offset);
@@ -63,12 +75,16 @@ private:
 	void hpf_cutoff_w(offs_t offset, u16 data);
 	u16 lpf_reso_r(offs_t offset);
 	void lpf_reso_w(offs_t offset, u16 data);
-	template<int sel> u16 envelope_r(offs_t offset);
-	template<int sel> void envelope_w(offs_t offset, u16 data);
+	u16 attack_r(offs_t offset);
+	void attack_w(offs_t offset, u16 data);
+	u16 decay_r(offs_t offset);
+	void decay_w(offs_t offset, u16 data);
+	u16 release_r(offs_t offset);
+	void release_w(offs_t offset, u16 data);
 	template<int coef> u16 eq_filter_r(offs_t offset);
 	template<int coef> void eq_filter_w(offs_t offset, u16 data);
-	u16 volume_r(offs_t offset);
-	void volume_w(offs_t offset, u16 data);
+	u16 base_volume_r(offs_t offset);
+	void base_volume_w(offs_t offset, u16 data);
 	u16 freq_r(offs_t offset);
 	void freq_w(offs_t offset, u16 data);
 	u16 pre_size_h_r(offs_t offset);
@@ -94,6 +110,9 @@ private:
 	u16 internal_r();
 	template<int sel> u16 routing_r(offs_t offset);
 	template<int sel> void routing_w(offs_t offset, u16 data);
+
+	// Envelope control
+	void change_mode(int channel, u8 mode);
 
 	// Control registers
 	template<int sel> u16 keyon_mask_r();

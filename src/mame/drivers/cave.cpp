@@ -1193,6 +1193,16 @@ void cave_state::paceight_map(address_map &map)
 
 //TODO: leds need verifying
 
+READ_LINE_MEMBER(cave_state::paccarn_bet4_r)
+{
+	return (m_io_bet->read() & 0x5) ? 1 : 0;
+}
+
+READ_LINE_MEMBER(cave_state::paccarn_bet8_r)
+{
+	return (m_io_bet->read() & 0x6) ? 1 : 0;
+}
+
 void cave_state::paccarn_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                   // ROM
@@ -1717,13 +1727,13 @@ static INPUT_PORTS_START( paceight )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Max Bet" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( paccarn ) // holding together Bet 4 and Bet 8 activates Bet 12 in IO Test Mode
+static INPUT_PORTS_START( paccarn )
 	PORT_START("IN0")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Bet 4" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, paccarn_bet4_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Bet 2" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, tjumpman_hopper_r)
@@ -1733,10 +1743,16 @@ static INPUT_PORTS_START( paccarn ) // holding together Bet 4 and Bet 8 activate
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Bet 8" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, paccarn_bet8_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Bet 3" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+
+	// holding together Bet 4 and Bet 8 activates Bet 12 in IO Test Mode
+	PORT_START("BET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME( "Bet 4" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME( "Bet 8" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME( "Bet 12" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppsatan )

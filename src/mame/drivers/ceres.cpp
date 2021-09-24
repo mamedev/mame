@@ -282,7 +282,7 @@ INPUT_CHANGED_MEMBER(ceres1_state::mouse_x)
 	else if (delta < -0x80)
 		delta += 0x100;
 
-	m_mouse_x = std::max(0, std::min(m_mouse_x + delta, 1023));
+	m_mouse_x = std::clamp(m_mouse_x + delta, 0, 1023);
 }
 
 INPUT_CHANGED_MEMBER(ceres1_state::mouse_y)
@@ -294,7 +294,7 @@ INPUT_CHANGED_MEMBER(ceres1_state::mouse_y)
 	else if (delta < -0x80)
 		delta += 0x100;
 
-	m_mouse_y = std::max(0, std::min(m_mouse_y - delta, 799));
+	m_mouse_y = std::clamp(m_mouse_y - delta, 0, 799);
 }
 
 static INPUT_PORTS_START(ceres1)

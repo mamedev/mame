@@ -17,6 +17,7 @@
    * Foreground tiles 2x or 4x 1Mbit SRAM in a 16-bit bus.
        - GTI Club: 37C 34C 32C 29C filled
        - NWK-TR: 34A 31A filled, no empty solder pads
+       - Cobra: 6F 6H
    * Background tiles 2x or 4x 1Mbit SRAM in a 16-bit bus.
        - GTI Club: 37A 34A filled, 32A 29A empty
        - NWK-TR: 34C 31C 28C 25C empty
@@ -28,6 +29,7 @@
    CLUT RAM:
    * 2x 256KBit SRAMs on NWK-TR in a 16-bit bus (32768 colors)
    * 2x 64Kbit SRAMs on "GTI Club" in a 16-bit bus (8192 colors)
+   * 3x 256KBit SRAMs on Cobra in a 24-bit bus (32768 colors). Cobra uses 24-bit colors instead of 15-bit.
 
    Background and foreground layer with ROZ capabilities
    Both tilemaps are 128x128 tiles, with ability to use smaller sub-tilemaps
@@ -159,7 +161,8 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 	m_tile_ram(nullptr),
 	m_fg_char_ram(nullptr),
 	m_bg_char_ram(nullptr),
-	m_reg(nullptr)
+	m_reg(nullptr),
+	m_irq(*this)
 {
 }
 
@@ -169,6 +172,8 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 
 void k001604_device::device_start()
 {
+	m_irq.resolve_safe();
+
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
@@ -542,4 +547,20 @@ void k001604_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void k001604_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_reg.get() + offset);
+
+	if (offset == 0x5c / 4)
+	{
+		if (ACCESSING_BITS_24_31)
+		{
+			// Cobra clears and enables 0x1 in the IRQ handler
+			// (1 = enable VBLANK IRQ, 0 = clear IRQ?)
+			if ((data & 0x1) == 0)
+			{
+				if (!m_irq.isnull())
+				{
+					m_irq(CLEAR_LINE);
+				}
+			}
+		}
+	}
 }

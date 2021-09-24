@@ -762,6 +762,7 @@ public:
 	attotime last_update() const { return m_last_update; }
 	int sample_count() const { return m_samples_this_update; }
 	int unique_id() { return m_unique_id++; }
+	stream_buffer::sample_t compressor_scale() const { return m_compressor_scale; }
 
 	// allocate a new stream with a new-style callback
 	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);
@@ -808,7 +809,7 @@ private:
 	void resume();
 
 	// handle configuration load/save
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_lvl, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// helper to adjust scale factor toward a goal

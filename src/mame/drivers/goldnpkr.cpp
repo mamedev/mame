@@ -991,8 +991,11 @@
 #include "upndown.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(10'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/16)
+#define PIXEL_CLOCK     (MASTER_CLOCK/2)
 
 
 class goldnpkr_state : public driver_device
@@ -1002,6 +1005,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia%u", 0U),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_discrete(*this, "discrete"),
@@ -1072,6 +1076,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pia6821_device, 2> m_pia;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<discrete_device> m_discrete;
@@ -4342,12 +4347,9 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((39+1)*8, (31+1)*8);          // From MC6845 init, registers 00 & 04 (programmed with value-1).
-	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1); // From MC6845 init, registers 01 & 06.
-	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
+	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); // 68B45 or 6845s @ CPU clock
 	crtc.set_screen("screen");
@@ -4410,6 +4412,7 @@ void goldnpkr_state::witchcrd(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	// video hardware
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8);
 	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	// sound hardware
@@ -4500,6 +4503,7 @@ void goldnpkr_state::wcrdxtnd(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	// video hardware
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8);
 	m_gfxdecode->set_info(gfx_wcrdxtnd);
 	m_palette->set_init(FUNC(goldnpkr_state::wcrdxtnd_palette));
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
@@ -4771,12 +4775,9 @@ void blitz_state::megadpkr(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((32)*8, (32)*8);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, (37 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8); // from MC6845 parameters
+	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
 	crtc.set_screen("screen");
@@ -11814,6 +11815,8 @@ void goldnpkr_state::init_super98()
 	ROM[0x69f6] = 0xea;
 }
 
+} // anonymous namespace
+
 
 /*********************************************
 *                Game Drivers                *
@@ -11976,5 +11979,5 @@ GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super
 
 GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS )  // banked program. how to switch gfx?
 
-GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
-GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", 0 ) // may need an extra reset to work the first time
+GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", MACHINE_NOT_WORKING )
+GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", MACHINE_NOT_WORKING ) // may need an extra reset to work the first time

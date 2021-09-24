@@ -8,11 +8,14 @@
     Raphael Nabet, 2003
 */
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <climits>
 #include "imgtool.h"
+
+#include "opresolv.h"
+
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 struct UINT16xE
 {

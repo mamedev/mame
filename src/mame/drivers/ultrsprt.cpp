@@ -18,6 +18,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class ultrsprt_state : public driver_device
 {
 public:
@@ -30,10 +32,15 @@ public:
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
 		m_upd(*this, "upd%u", 1),
+		m_vrambank(*this, "vram"),
 		m_service(*this, "SERVICE")
 	{ }
 
 	void ultrsprt(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	static const u32 VRAM_PAGES      = 2;
@@ -47,6 +54,8 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device_array<upd4701_device, 2> m_upd;
 
+	required_memory_bank m_vrambank;
+
 	required_ioport m_service;
 
 	u8 eeprom_r();
@@ -55,13 +64,10 @@ private:
 	u16 upd2_r(offs_t offset);
 	void int_ack_w(u32 data);
 
-	u32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sound_map(address_map &map);
-	void ultrsprt_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void main_map(address_map &map);
 
 	std::unique_ptr<u8[]> m_vram;
 	u32 m_cpu_vram_page;
@@ -70,7 +76,7 @@ private:
 
 /*****************************************************************************/
 
-u32 ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 ultrsprt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 const *const vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
 
@@ -126,7 +132,7 @@ void ultrsprt_state::eeprom_w(u8 data)
 	u32 vram_page = (data & 0x08) >> 3;
 	if (vram_page != m_cpu_vram_page)
 	{
-		membank("vram")->set_entry(vram_page);
+		m_vrambank->set_entry(vram_page);
 		m_cpu_vram_page = vram_page;
 	}
 
@@ -151,16 +157,16 @@ u16 ultrsprt_state::upd2_r(offs_t offset)
 
 /*****************************************************************************/
 
-void ultrsprt_state::ultrsprt_map(address_map &map)
+void ultrsprt_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).bankrw("vram");
+	map(0x00000000, 0x0007ffff).bankrw(m_vrambank);
 	map(0x70000000, 0x70000000).rw(FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
 	map(0x70000020, 0x70000023).r(FUNC(ultrsprt_state::upd1_r));
 	map(0x70000040, 0x70000043).r(FUNC(ultrsprt_state::upd2_r));
 	map(0x70000080, 0x7000008f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x700000c0, 0x700000cf).nopw(); // Written following DMA interrupt - unused int ack?
 	map(0x700000e0, 0x700000e3).w(FUNC(ultrsprt_state::int_ack_w));
-	map(0x7f000000, 0x7f01ffff).ram().share("workram");
+	map(0x7f000000, 0x7f01ffff).ram().share(m_workram);
 	map(0x7f700000, 0x7f703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x7f800000, 0x7f9fffff).mirror(0x00600000).rom().region("program", 0);
 }
@@ -212,15 +218,15 @@ INPUT_PORTS_END
 
 void ultrsprt_state::machine_start()
 {
-	/* set conservative DRC options */
+	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	/* configure fast RAM regions for DRC */
+	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, false, m_workram);
 
 	m_vram = std::make_unique<u8[]>(VRAM_PAGE_BYTES * VRAM_PAGES);
 
-	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
+	m_vrambank->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 
 	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
@@ -231,7 +237,7 @@ void ultrsprt_state::machine_reset()
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_cpu_vram_page = 0;
-	membank("vram")->set_entry(m_cpu_vram_page);
+	m_vrambank->set_entry(m_cpu_vram_page);
 }
 
 
@@ -239,9 +245,9 @@ void ultrsprt_state::machine_reset()
 
 void ultrsprt_state::ultrsprt(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PPC403GA(config, m_maincpu, 25000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ultrsprt_state::ultrsprt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ultrsprt_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ultrsprt_state::irq1_line_assert));
 
 	M68000(config, m_audiocpu, 8000000); // Unconfirmed
@@ -257,17 +263,17 @@ void ultrsprt_state::ultrsprt(machine_config &config)
 	m_upd[1]->set_portx_tag("P2X");
 	m_upd[1]->set_porty_tag("P2Y");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60); // TODO: Determine correct timings
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 511, 0, 399);
-	screen.set_screen_update(FUNC(ultrsprt_state::screen_update_ultrsprt));
+	screen.set_screen_update(FUNC(ultrsprt_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 
-	/* sound hardware */
+	// sound hardware
 	K056800(config, m_k056800, XTAL(18'432'000));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_6);
 
@@ -284,22 +290,25 @@ void ultrsprt_state::ultrsprt(machine_config &config)
 /*****************************************************************************/
 
 ROM_START( fiveside )
-	ROM_REGION32_BE(0x200000, "program", 0) /* PowerPC program ROMs */
+	ROM_REGION32_BE(0x200000, "program", 0) // PowerPC program ROMs
 	ROM_LOAD32_BYTE("479uaa01.bin", 0x000000, 0x80000, CRC(1bc4893d) SHA1(2c9df38ecb7efa7b686221ee98fa3aad9a63e152))
 	ROM_LOAD32_BYTE("479uaa02.bin", 0x000001, 0x80000, CRC(ae74a6d0) SHA1(6113c2eea1628b22737c7b87af0e673d94984e88))
 	ROM_LOAD32_BYTE("479uaa03.bin", 0x000002, 0x80000, CRC(5c0b176f) SHA1(9560259bc081d4cfd72eb485c3fdcecf484ba7a8))
 	ROM_LOAD32_BYTE("479uaa04.bin", 0x000003, 0x80000, CRC(01a3e4cb) SHA1(819df79909d57fa12481698ffdb32b00586131d8))
 
-	ROM_REGION(0x20000, "audiocpu", 0) /* M68K program */
+	ROM_REGION(0x20000, "audiocpu", 0) // M68K program
 	ROM_LOAD("479_a05.bin", 0x000000, 0x20000, CRC(251ae299) SHA1(5ffd74357e3c6ddb3a208c39a3b32b53fea90282))
 
-	ROM_REGION(0x100000, "k054539", 0) /* Sound ROMs */
+	ROM_REGION(0x100000, "k054539", 0) // Sound ROMs
 	ROM_LOAD("479_a06.bin", 0x000000, 0x80000, CRC(8d6ac8a2) SHA1(7c4b8bd47cddc766cbdb6a486acc9221be55b579))
 	ROM_LOAD("479_a07.bin", 0x080000, 0x80000, CRC(75835df8) SHA1(105b95c16f2ce6902c2e4c9c2fd9f2f7a848c546))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fiveside.nv", 0x0000, 0x0080, CRC(aad11072) SHA1(8f777ee47801faa7ce8420c3052034720225aae7) )
 ROM_END
+
+} // Anonymous namespace
+
 
 // Undumped: Ultra Hockey
 GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt_state, empty_init, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)

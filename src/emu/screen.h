@@ -552,13 +552,4 @@ DECLARE_DEVICE_TYPE(SCREEN, screen_device)
 // iterator helper
 typedef device_type_enumerator<screen_device> screen_device_enumerator;
 
-/*!
- @defgroup Screen device configuration functions
- @{
- @def set_type
-  Modify the screen device type
-  @see screen_type_enum
- @}
- */
-
 #endif // MAME_EMU_SCREEN_H

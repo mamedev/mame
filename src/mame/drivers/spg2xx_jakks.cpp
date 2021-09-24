@@ -16,8 +16,7 @@ public:
 	{ }
 
 	void base_config(machine_config& config);
-	void batman(machine_config &config);
-	void walle(machine_config& config);
+	void spg2xx_jakks(machine_config& config);
 	void mk(machine_config& config);
 
 	void jakks_mpac(machine_config& config);
@@ -46,13 +45,14 @@ static INPUT_PORTS_START( batman )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( walle )
+static INPUT_PORTS_START( spg2xx_jakks )
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
@@ -60,11 +60,18 @@ static INPUT_PORTS_START( walle )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED ) // Button 3 if used
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED ) // Button 4 if used
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
-	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mk )
@@ -127,13 +134,7 @@ void jakks_state::base_config(machine_config& config)
 	I2C_24C04(config, m_i2cmem, 0); // ?
 }
 
-void jakks_state::batman(machine_config &config)
-{
-	base_config(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_4m);
-}
-
-void jakks_state::walle(machine_config &config)
+void jakks_state::spg2xx_jakks(machine_config &config)
 {
 	base_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
@@ -181,6 +182,11 @@ ROM_START( jak_wall )
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
+ROM_START( jak_sbjd )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "spongebobjelly.bin", 0x000000, 0x400000, CRC(804fbd87) SHA1(519aa7fada993837cb57fce26a1d721547af1861) )
+ROM_END
+
 ROM_START( jak_mk )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// Sources indicate this should use a 6MB ROM.  The ROM here dosen't end on a blank fill and even the ROM checksum listed in the header seems to be about 50% off.
@@ -194,9 +200,9 @@ ROM_START( jak_mpacw )
 ROM_END
 
 
-// JAKKS Pacific Inc TV games
-CONS( 2004, jak_batm, 0, 0, batman, batman, jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Batman (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, jak_wall, 0, 0, walle,  walle,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game)",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// Pre-GameKey units
+
+CONS( 2004, jak_batm, 0, 0, spg2xx_jakks,  batman,        jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Batman (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // you could link 2 pads of this together for 2 player mode as you could with WWE (feature not emulated)
 CONS( 2004, jak_mk,   0, 0, mk,     mk,     jakks_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Mortal Kombat (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -204,3 +210,18 @@ CONS( 2004, jak_mk,   0, 0, mk,     mk,     jakks_state, empty_init, "JAKKS Paci
 // this is an older unit than the jak_mpac Game Key Ready set and features no GameKey branding
 CONS( 2004, jak_mpacw,0, 0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man 7-in-1 (Wireless) (Ms. Pac-Man, Pole Position, Galaga, Xevious, Mappy, New Rally X, Bosconian) (18 AUG 2004 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
 
+
+// Post-GameKey units (all of these still have GameKey references in the code even if the physical connector was no longer present on the PCB)
+
+// This was available in 2 different case styles, initially an underwater / jellyfish themed one, then later
+// reissued in a 'SpongeBob head' style case reminiscent of the undumpable 2003 SpongeBob plug and play but
+// with 2 buttons in the top left corner instead of 1
+// 
+// The software on both versions of Jellyfish Dodge is believed to be the same, the build date can be seen in
+// the 'hidden' test mode.
+//
+// A further updated version of this, adapted for touch controls, was released as a 'TV Touch' unit, see
+// spg2xx_jakks_tvtouch.cpp
+CONS( 2007, jak_sbjd, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "SpongeBob SquarePants Jellyfish Dodge (JAKKS Pacific TV Game) (Apr 5 2007)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2008, jak_wall, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game) (Dec 18 2007 11:34:25)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

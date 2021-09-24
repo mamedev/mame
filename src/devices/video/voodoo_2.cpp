@@ -233,7 +233,7 @@ u32 command_fifo::words_needed(u32 command)
 			//     0   2:0  = Packet type (3)
 
 			// determine words per vertex
-			u32 count = 2;	// X/Y
+			u32 count = 2;  // X/Y
 			if (BIT(command, 28))
 				count += (BIT(command, 10, 2) != 0) ? 1 : 0;       // ARGB in one word
 			else
@@ -263,7 +263,7 @@ u32 command_fifo::words_needed(u32 command)
 		case 5:
 			// Packet type 5: 2 + N words
 			//
-			//	Word  Bits
+			//  Word  Bits
 			//    0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
 			//    0  29:26 = Byte disable W2
 			//    0  25:22 = Byte disable WN
@@ -558,7 +558,7 @@ u32 command_fifo::packet_type_5(u32 command)
 {
 	// Packet type 5: 2 + N words
 	//
-	//	Word  Bits
+	//  Word  Bits
 	//    0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
 	//    0  29:26 = Byte disable W2
 	//    0  25:22 = Byte disable WN

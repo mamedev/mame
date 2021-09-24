@@ -20,7 +20,7 @@ struct k001005_polydata
 	int texture_page;
 	int texture_palette;
 	bool texture_mirror;
-	rgb_t poly_color;	
+	rgb_t poly_color;
 	rgb_t diffuse_light;
 	rgb_t ambient_light;
 	rgb_t fog_color;

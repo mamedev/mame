@@ -11,9 +11,10 @@
 #include "emu.h"
 #include "drivenum.h"
 #include "media_ident.h"
-#include "unzip.h"
-#include "jedparse.h"
 #include "softlist_dev.h"
+
+#include "jedparse.h"
+#include "unzip.h"
 
 
 //**************************************************************************
@@ -102,6 +103,8 @@ void media_identifier::identify_file(const char *name)
 
 void media_identifier::identify_data(const char *name, const uint8_t *data, std::size_t length)
 {
+	assert(data != nullptr && length != 0);
+
 	std::vector<file_info> info;
 	digest_data(info, name, data, length);
 	match_hashes(info);
@@ -134,13 +137,13 @@ void media_identifier::collect_files(std::vector<file_info> &info, char const *p
 	{
 		// first attempt to examine it as a valid zip/7z file
 		util::archive_file::ptr archive;
-		util::archive_file::error err;
+		std::error_condition err;
 		if (core_filename_ends_with(path, ".7z"))
 			err = util::archive_file::open_7z(path, archive);
 		else
 			err = util::archive_file::open_zip(path, archive);
 
-		if ((util::archive_file::error::NONE == err) && archive)
+		if (!err && archive)
 		{
 			std::vector<std::uint8_t> data;
 
@@ -158,10 +161,10 @@ void media_identifier::collect_files(std::vector<file_info> &info, char const *p
 						{
 							data.resize(std::size_t(length));
 							err = archive->decompress(&data[0], std::uint32_t(length));
-							if (util::archive_file::error::NONE == err)
+							if (!err)
 								digest_data(info, curfile.c_str(), &data[0], length);
 							else
-								osd_printf_error("%s: error decompressing file\n", curfile);
+								osd_printf_error("%s: error decompressing file (%s:%d %s)\n", curfile, err.category().name(), err.value(), err.message());
 						}
 						catch (...)
 						{
@@ -205,9 +208,9 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 	{
 		// attempt to open as a CHD; fail if not
 		chd_file chd;
-		chd_error const err = chd.open(path);
+		std::error_condition const err = chd.open(path);
 		m_total++;
-		if (err != CHDERR_NONE)
+		if (err)
 		{
 			osd_printf_info("%-20s NOT A CHD\n", core_filename_extract_base(path));
 			m_nonroms++;
@@ -231,12 +234,12 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 		if (core_filename_ends_with(path, ".jed"))
 		{
 			// load the file and process if it opens and has a valid length
-			uint32_t length;
-			void *data;
-			if (osd_file::error::NONE == util::core_file::load(path, &data, length))
+			util::core_file::ptr file;
+			if (!util::core_file::open(path, OPEN_FLAG_READ, file))
 			{
 				jed_data jed;
-				if (JEDERR_NONE == jed_parse(data, length, &jed))
+				auto ptr = util::core_file_read(std::move(file));
+				if (ptr && JEDERR_NONE == jed_parse(*ptr, &jed))
 				{
 					try
 					{
@@ -246,7 +249,6 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 						util::hash_collection hashes;
 						hashes.compute(&tempjed[0], tempjed.size(), util::hash_collection::HASH_TYPES_CRC_SHA1);
 						info.emplace_back(path, tempjed.size(), std::move(hashes), file_flavour::JED);
-						free(data);
 						m_total++;
 						return;
 					}
@@ -254,13 +256,12 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 					{
 					}
 				}
-				free(data);
 			}
 		}
 
 		// load the file and process if it opens and has a valid length
 		util::core_file::ptr file;
-		if ((osd_file::error::NONE == util::core_file::open(path, OPEN_FLAG_READ, file)) && file)
+		if (!util::core_file::open(path, OPEN_FLAG_READ, file) && file)
 		{
 			util::hash_collection hashes;
 			hashes.begin(util::hash_collection::HASH_TYPES_CRC_SHA1);
@@ -301,7 +302,7 @@ void media_identifier::digest_data(std::vector<file_info> &info, char const *nam
 	if (core_filename_ends_with(name, ".jed"))
 	{
 		jed_data jed;
-		if (JEDERR_NONE == jed_parse(data, length, &jed))
+		if (JEDERR_NONE == jed_parse(*util::ram_read(data, length), &jed))
 		{
 			try
 			{

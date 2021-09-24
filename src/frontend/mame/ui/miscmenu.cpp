@@ -599,11 +599,11 @@ void menu_export::handle()
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-				if (infile.open(filename + ".xml") == osd_file::error::NONE)
+				if (!infile.open(filename + ".xml"))
 					for (int seq = 0; ; ++seq)
 					{
 						const std::string seqtext = string_format("%s_%04d", filename, seq);
-						if (infile.open(seqtext + ".xml") != osd_file::error::NONE)
+						if (infile.open(seqtext + ".xml"))
 						{
 							filename = seqtext;
 							break;
@@ -612,7 +612,7 @@ void menu_export::handle()
 
 				// attempt to open the output file
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				if (file.open(filename + ".xml") == osd_file::error::NONE)
+				if (!file.open(filename + ".xml"))
 				{
 					const std::string fullpath(file.fullpath());
 					file.close();
@@ -644,11 +644,11 @@ void menu_export::handle()
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-				if (infile.open(filename + ".txt") == osd_file::error::NONE)
+				if (!infile.open(filename + ".txt"))
 					for (int seq = 0; ; ++seq)
 					{
 						const std::string seqtext = string_format("%s_%04d", filename, seq);
-						if (infile.open(seqtext + ".txt") != osd_file::error::NONE)
+						if (infile.open(seqtext + ".txt"))
 						{
 							filename = seqtext;
 							break;
@@ -657,7 +657,7 @@ void menu_export::handle()
 
 				// attempt to open the output file
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				if (file.open(filename + ".txt") == osd_file::error::NONE)
+				if (!file.open(filename + ".txt"))
 				{
 					// print the header
 					std::ostringstream buffer;
@@ -754,8 +754,8 @@ void menu_machine_configure::handle()
 				{
 					const std::string filename(m_drv.name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-					osd_file::error filerr = file.open(filename + ".ini");
-					if (filerr == osd_file::error::NONE)
+					std::error_condition const filerr = file.open(filename + ".ini");
+					if (!filerr)
 					{
 						std::string inistring = m_opts.output_ini();
 						file.puts(inistring);
@@ -891,7 +891,7 @@ menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_cont
 menu_plugins_configure::~menu_plugins_configure()
 {
 	emu_file file_plugin(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
+	if (file_plugin.open("plugin.ini"))
 		// Can't throw in a destructor, so let's ignore silently for
 		// now.  We shouldn't write files in a destructor in any case.
 		//

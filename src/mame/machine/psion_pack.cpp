@@ -23,6 +23,8 @@
 #include "emu.h"
 #include "psion_pack.h"
 
+#include "opresolv.h"
+
 // Datapack control lines
 #define DP_LINE_CLOCK           0x01
 #define DP_LINE_RESET           0x02

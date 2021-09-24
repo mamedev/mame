@@ -75,6 +75,20 @@ public:
 		return *this;
 	}
 
+	rectangle operator&(const rectangle &b)
+	{
+		rectangle a(*this);
+		a &= b;
+		return a;
+	}
+
+	rectangle operator|(const rectangle &b)
+	{
+		rectangle a(*this);
+		a |= b;
+		return a;
+	}
+
 	// comparisons
 	constexpr bool operator==(const rectangle &rhs) const { return min_x == rhs.min_x && max_x == rhs.max_x && min_y == rhs.min_y && max_y == rhs.max_y; }
 	constexpr bool operator!=(const rectangle &rhs) const { return min_x != rhs.min_x || max_x != rhs.max_x || min_y != rhs.min_y || max_y != rhs.max_y; }

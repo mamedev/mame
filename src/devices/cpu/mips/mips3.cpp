@@ -728,7 +728,6 @@ void mips3_device::device_start()
 	state_add( MIPS3_LLADDR,       "LLAddr", m_core->cpr[0][COP0_LLAddr]).formatstr("%08X");
 
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
-	state_add( STATE_GENSP, "CURSP", m_core->r[31]).noshow();
 	state_add( STATE_GENFLAGS, "CURFLAGS", m_debugger_temp).formatstr("%1s").noshow();
 
 	set_icountptr(m_core->icount);

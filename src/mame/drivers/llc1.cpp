@@ -35,16 +35,20 @@ ToDo:
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
 #include "machine/keyboard.h"
+#include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80pio.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 #include "llc1.lh"
 
+
+namespace {
 
 class llc1_state : public driver_device
 {
@@ -55,15 +59,18 @@ public:
 		, m_ctc(*this, "ctc")
 		, m_p_chargen(*this, "chargen")
 		, m_vram(*this, "videoram")
+		, m_inputs(*this, "X%u", 4U)
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void llc1(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(z3_button);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	void machine_start() override;
-	void machine_reset() override;
 	void kbd_put(u8 data);
 	u8 port1a_r();
 	u8 port2a_r();
@@ -81,6 +88,7 @@ private:
 	required_device<z80ctc_device> m_ctc;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_vram;
+	required_ioport_array<3> m_inputs;
 	output_finder<8> m_digits;
 };
 
@@ -182,11 +190,11 @@ u8 llc1_state::port1a_r()
 {
 	u8 data = 0;
 	if (!BIT(m_porta, 4))
-		data = ioport("X4")->read();
+		data = m_inputs[0]->read();
 	if (!BIT(m_porta, 5))
-		data = ioport("X5")->read();
+		data = m_inputs[1]->read();
 	if (!BIT(m_porta, 6))
-		data = ioport("X6")->read();
+		data = m_inputs[2]->read();
 	if (data & 0xf0)
 		data = (data >> 4) | 0x80;
 
@@ -352,6 +360,8 @@ ROM_START( llc1 )
 	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD ("llc1_zg.bin",  0x0000, 0x0400, CRC(fa2cd659) SHA1(1fa5f9992f35929f656c4ce55ed6980c5da1772b) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

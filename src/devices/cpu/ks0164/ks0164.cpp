@@ -28,7 +28,6 @@ void ks0164_cpu_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC",     m_r[R_PC]).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_r[R_PC]).callexport().noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_r[R_SP]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_r[R_PSW]).callimport().formatstr("%8s").noshow();
 	state_add(KS0164_PC,       "PC",        m_r[R_PC]).callimport();
 	state_add(KS0164_PSW,      "PSW",       m_r[R_PSW]).callimport();

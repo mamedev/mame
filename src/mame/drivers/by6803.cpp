@@ -21,14 +21,18 @@ ToDo:
 
 
 #include "emu.h"
+//#include "audio/midway.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6800/m6801.h"
 //#include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-//#include "audio/midway.h"
+
 //#include "by6803.lh"
 
+
+namespace {
 
 class by6803_state : public genpin_class
 {
@@ -39,12 +43,9 @@ public:
 		, m_pia0(*this, "pia0")
 		, m_pia1(*this, "pia1")
 		, m_io_test(*this, "TEST")
-		, m_io_x0(*this, "X0")
-		, m_io_x1(*this, "X1")
-		, m_io_x2(*this, "X2")
-		, m_io_x3(*this, "X3")
-		, m_io_x4(*this, "X4")
+		, m_io_x(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void init_by6803();
@@ -52,6 +53,10 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint8_t port1_r();
@@ -81,18 +86,13 @@ private:
 	uint8_t m_port1, m_port2;
 	//uint8_t m_digit;
 	uint8_t m_segment;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
 	required_ioport m_io_test;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
-	required_ioport m_io_x2;
-	required_ioport m_io_x3;
-	required_ioport m_io_x4;
+	required_ioport_array<5> m_io_x;
 	output_finder<40> m_digits;
+	output_finder<1> m_leds;
 };
 
 
@@ -193,7 +193,7 @@ uint8_t by6803_state::port2_r()
 void by6803_state::port2_w(uint8_t data)
 {
 	m_port2 = data;
-	output().set_value("led0", BIT(data, 2)); // P22 drives LED
+	m_leds[0] = BIT(data, 2); // P22 drives LED
 }
 
 // display latch strobes; display blanking
@@ -254,20 +254,9 @@ uint8_t by6803_state::pia0_b_r()
 {
 	uint8_t data = 0;
 
-	if (BIT(m_pia0_a, 0))
-		data |= m_io_x0->read();
-
-	if (BIT(m_pia0_a, 1))
-		data |= m_io_x1->read();
-
-	if (BIT(m_pia0_a, 2))
-		data |= m_io_x2->read();
-
-	if (BIT(m_pia0_a, 3))
-		data |= m_io_x3->read();
-
-	if (BIT(m_pia0_a, 4))
-		data |= m_io_x4->read();
+	for (unsigned i = 0; m_io_x.size() > i; ++i)
+		if (BIT(m_pia0_a, i))
+			data |= m_io_x[i]->read();
 
 	return data;
 }
@@ -340,6 +329,12 @@ void by6803_state::pia1_b_w(uint8_t data)
 		case 0xf: // not used
 			break;
 	}
+}
+
+void by6803_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
 }
 
 void by6803_state::machine_reset()
@@ -585,6 +580,14 @@ ROM_END
 /------------------------------------*/
 ROM_START(hardbody)
 	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "hb_cpu2.bin", 0x8000, 0x4000, CRC(03975ea9) SHA1(8a4ba6bb5e6ab8da5fffaead283e26edd297e637))
+	ROM_LOAD( "hb_cpu3.bin", 0xc000, 0x4000, CRC(10c10380) SHA1(98207c16b6d2a9990eb36b2629bfd668e45ca58e))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sound_u7.512", 0x0000, 0x10000, CRC(c96f91af) SHA1(9602a8991ca0cf9a7c68710f55c245d9c675b06f))
+ROM_END
+
+ROM_START(hardbodyc)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.128", 0x8000, 0x4000, CRC(c9248b47) SHA1(54239bd7d15574ebbb70ed306a804b7b32ed516a))
 	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(31c255d0) SHA1(b6ffa2616ae9a4a121585cc402080ec6f26f8472))
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -640,6 +643,14 @@ ROM_START(motrdome)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "modm_u2.dat", 0x8000, 0x4000, CRC(820ca073) SHA1(0b50712f7d65f629af934deccc52d588f390a05b))
 	ROM_LOAD( "modm_u3.dat", 0xc000, 0x4000, CRC(aae7c418) SHA1(9d3ea83ffff0b9696f5113043475c6e9b9a464ae))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("modm_u7.snd", 0x8000, 0x8000, CRC(29ce4679) SHA1(f17998198b542dd99a34abd678db7e031bde074b))
+ROM_END
+
+ROM_START(motrdomeb)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "md_cpu_u2.bin", 0x8000, 0x4000, CRC(72c84e3b) SHA1(cf8d890a574e7f5299abde6fd38be2f3e63b3a54))
+	ROM_LOAD( "md_cpu_u3.bin", 0xc000, 0x4000, CRC(3ae93465) SHA1(5b5ecee0c631131201bf4c52f297f87d143d0fcf))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("modm_u7.snd", 0x8000, 0x8000, CRC(29ce4679) SHA1(f17998198b542dd99a34abd678db7e031bde074b))
 ROM_END
@@ -750,12 +761,15 @@ ROM_START(trucksp2)
 	ROM_RELOAD(0x20000 +0x8000, 0x8000)
 ROM_END
 
+} // anonymous namespace
+
 
 GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1985, beatclck2, beatclck, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome (German)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome (rev. D)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdomeb, motrdome, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome (rev. B)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome (German rev. B)",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Strange Science (Rev C)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, strngscia, strngsci, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Strange Science (Rev A)",               MACHINE_IS_SKELETON_MECHANICAL)
@@ -764,8 +778,9 @@ GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, init_by6803, ROT0
 GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "City Slicker",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody (German)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody (rev. D)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbodyc, hardbody, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody (rev. C)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody (German rev. B)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL)

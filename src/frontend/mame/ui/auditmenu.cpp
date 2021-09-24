@@ -229,7 +229,7 @@ void menu_audit::save_available_machines()
 {
 	// attempt to open the output file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open(std::string(emulator_info::get_configname()) + "_avail.ini") == osd_file::error::NONE)
+	if (!file.open(std::string(emulator_info::get_configname()) + "_avail.ini"))
 	{
 		// generate header
 		file.printf("#\n%s%s\n#\n\n", UI_VERSION_TAG, emulator_info::get_bare_build_version());

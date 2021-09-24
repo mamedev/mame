@@ -5,7 +5,7 @@
 /*  Copied from the Dosbox source code        */
 /*  Copyright (C) 2002-2007  The DOSBox Team  */
 /*  License: GNU-GPL                          */
-/*  Adapted by guest(r) on 16.4.2007          */    
+/*  Adapted by guest(r) on 16.4.2007          */
 
 {
 	"name": "Super Eagle",
@@ -34,7 +34,7 @@
 			],
 			"output": "scaled_out"
 		},
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "scaled_out" }

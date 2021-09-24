@@ -20,12 +20,17 @@ ToDo:
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
+
 #include "by17.lh"
 #include "by17_pwerplay.lh"
 #include "by17_matahari.lh"
+
+
+namespace {
 
 class by17_state : public genpin_class
 {
@@ -118,7 +123,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
 	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
 	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
@@ -577,11 +581,6 @@ WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by17_state::u11_ca2_w )
-{
-	output().set_value("led0", state);
-}
-
 READ_LINE_MEMBER( by17_state::u11_ca1_r )
 {
 	return m_u11_ca1;
@@ -1014,8 +1013,8 @@ void by17_state::by17(machine_config &config)
 	m_pia_u10->readcb1_handler().set(FUNC(by17_state::u10_cb1_r));
 	m_pia_u10->ca2_handler().set(FUNC(by17_state::u10_ca2_w));
 	m_pia_u10->cb2_handler().set(FUNC(by17_state::u10_cb2_w));
-	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u10->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
+	m_pia_u10->irqb_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by17_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
 	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by17_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
@@ -1025,10 +1024,10 @@ void by17_state::by17(machine_config &config)
 	m_pia_u11->writepb_handler().set(FUNC(by17_state::u11_b_w));
 	m_pia_u11->readca1_handler().set(FUNC(by17_state::u11_ca1_r));
 	m_pia_u11->readcb1_handler().set(FUNC(by17_state::u11_cb1_r));
-	m_pia_u11->ca2_handler().set(FUNC(by17_state::u11_ca2_w));
+	m_pia_u11->ca2_handler().set_output("led0");
 	m_pia_u11->cb2_handler().set(FUNC(by17_state::u11_cb2_w));
-	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u11->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
+	m_pia_u11->irqb_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 	TIMER(config, "timer_d_freq").configure_periodic(FUNC(by17_state::u11_timer), attotime::from_hz(317)); // 555 timer
 	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by17_state::timer_d_pulse));   // 555 Active pulse length
 }
@@ -1148,6 +1147,8 @@ ROM_END
 /*--------------------------------------------------------------
 / Stellar Airship / Geiger-Automatenbau GMBH, of Germany (1981)
 /---------------------------------------------------------------*/
+
+} // anonymous namespace
 
 
 GAME(  1976, bowarrow,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 23)", MACHINE_IS_SKELETON_MECHANICAL)

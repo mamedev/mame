@@ -77,7 +77,7 @@ void sh_common_execution::device_start()
 	state_add(SH4_R15, "R15", m_sh2_state->r[15]).formatstr("%08X");
 	state_add(SH4_EA, "EA", m_sh2_state->ea).formatstr("%08X");
 
-	state_add(STATE_GENSP, "GENSP", m_sh2_state->r[15]).noshow();
+	state_add(SH4_SP, "SP", m_sh2_state->r[15]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr).formatstr("%20s").noshow();
 
 	set_icountptr(m_sh2_state->icount);

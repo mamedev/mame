@@ -319,7 +319,7 @@ ROM_END
 u32 groundfx_state::irq_speedup_r()
 {
 	int ptr;
-	offs_t sp = m_maincpu->sp();
+	offs_t sp = m_maincpu->state_int(M68K_SP);
 	if ((sp & 2) == 0) ptr = m_ram[(sp & 0x1ffff) / 4];
 	else ptr = (((m_ram[(sp & 0x1ffff) / 4]) & 0x1ffff) << 16) |
 	(m_ram[((sp & 0x1ffff) / 4) + 1] >> 16);

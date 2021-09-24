@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/nanos_dsk.h"
 
 nanos_format::nanos_format() : upd765_format(formats)

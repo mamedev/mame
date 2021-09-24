@@ -7,8 +7,8 @@
 #include <algorithm>
 
 
-DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_SLOT, bus::intellec4, univ_slot_device, "intlc4univslot", "INTELLEC 4 Universal Slot")
-DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_BUS,  bus::intellec4, univ_bus_device,  "intlc4univbus",  "INTELLEC 4 Universal Bus")
+DEFINE_DEVICE_TYPE(INTELLEC4_UNIV_SLOT, bus::intellec4::univ_slot_device, "intlc4univslot", "INTELLEC 4 Universal Slot")
+DEFINE_DEVICE_TYPE(INTELLEC4_UNIV_BUS,  bus::intellec4::univ_bus_device,  "intlc4univbus",  "INTELLEC 4 Universal Bus")
 
 
 namespace bus::intellec4 {
@@ -263,6 +263,12 @@ void device_univ_card_interface::set_bus(univ_bus_device &bus)
 #include "insdatastor.h"
 #include "prommemory.h"
 #include "tapereader.h"
+
+
+// must come after including the headers that declare these extern
+template class device_finder<bus::intellec4::device_univ_card_interface, false>;
+template class device_finder<bus::intellec4::device_univ_card_interface, true>;
+
 
 void intellec4_univ_cards(device_slot_interface &device)
 {

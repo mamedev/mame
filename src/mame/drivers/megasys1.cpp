@@ -78,19 +78,19 @@ Input Ports R   080000-080009   0e0000-0e0001** 0d8000-d80001** 100000-100001**
 
 
 
-Sound CPU       RW      MS1-A           MS1-B           MS1-C           MS1-D
+Sound CPU       RW          MS1-A           MS1-B           MS1-C           MS1-D
 -----------------------------------------------------------------------------------
-ROM         R       000000-01ffff       000000-01ffff       000000-01ffff       No Sound CPU
-Latch #1        R       040000-040001       <           060000-060001
-Latch #2         W      060000-060001       <           <
-2151 reg         W      080000-080001       <           <
-2151 data        W      080002-080003       <           <
-2151 status     R       080002-080003       <           <
-6295 #1 data         W      0a0000-0a0003       <           <
-6295 #1 status      R       0a0000-0a0001       <           <
-6295 #2 data         W      0c0000-0c0003       <           <
-6295 #2 status      R       0c0000-0c0001       <           <
-RAM         RW      0f0000-0f3fff       0e0000-0effff*      <
+ROM             R       000000-01ffff   000000-01ffff   000000-01ffff   No Sound CPU
+Latch #1        R       040000-040001         <         060000-060001
+Latch #2         W      060000-060001         <               <
+2151 reg         W      080000-080001         <               <
+2151 data        W      080002-080003         <               <
+2151 status     R       080002-080003         <               <
+6295 #1 data     W      0a0000-0a0003         <               <
+6295 #1 status  R       0a0000-0a0001         <               <
+6295 #2 data     W      0c0000-0c0003         <               <
+6295 #2 status  R       0c0000-0c0001         <               <
+RAM             RW      0e0000-0effff*        <               <
 -----------------------------------------------------------------------------------
 *Mirror at 0xf0000 (verified on hardware)
 
@@ -1840,7 +1840,7 @@ void megasys1_state::system_B_monkelf(machine_config &config)
 void megasys1_state::system_Bbl(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, SYS_B_CPU_CLOCK);
+	M68000(config, m_maincpu, 12_MHz_XTAL / 2); // edfbl has lower clock, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_edfbl_map);
 	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1B_scanline), "screen", 0, 1);
 
@@ -2204,7 +2204,7 @@ ROM_START( astyanax )  // EPROM version
 	ROM_LOAD( "astyan8.bin",  0x020000, 0x020000, CRC(5e5d2a22) SHA1(fc039d804fdcb8ce089e4436260d64408640b264) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "rd.bpr",       0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+	ROM_LOAD( "rd.14m",       0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 ROM_START( astyanaxa ) // mask ROM version, same content as the EPROM version, here for completeness
@@ -2242,7 +2242,7 @@ ROM_START( astyanaxa ) // mask ROM version, same content as the EPROM version, h
 	ROM_IGNORE( 0x40000 )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // Priority PROM
-	ROM_LOAD( "rd.bpr", 0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+	ROM_LOAD( "rd.14m", 0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 ROM_START( lordofk )
@@ -2289,7 +2289,7 @@ ROM_START( lordofk )
 	ROM_LOAD( "astyan8.bin",  0x020000, 0x020000, CRC(5e5d2a22) SHA1(fc039d804fdcb8ce089e4436260d64408640b264) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "rd.bpr",       0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+	ROM_LOAD( "rd.14m",       0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 
@@ -2466,7 +2466,7 @@ ROM_START( phantasm )
 	ROM_LOAD( "spirit13.rom", 0x000000, 0x040000, CRC(05bc04d9) SHA1(b903edf39393cad2b4b6b58b10651304793aaa3e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ph.bin",        0x0000, 0x0200, CRC(8359650a) SHA1(97d0105f06c64340fb19a541db03481a7e0b5e05) )
+	ROM_LOAD( "ph.14m",        0x0000, 0x0200, CRC(8359650a) SHA1(97d0105f06c64340fb19a541db03481a7e0b5e05) )
 ROM_END
 
 
@@ -2537,7 +2537,7 @@ ROM_START( monkelf )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 //  ROM_LOAD( "ph.bin",        0x0000, 0x0200, CRC(8359650a) SHA1(97d0105f06c64340fb19a541db03481a7e0b5e05) )
-	// the bootleg prom is a different format, i don't know how to use it
+	// the bootleg prom is a different format, I don't know how to use it
 	ROM_LOAD( "82s147",        0x0000, 0x0200, CRC(547eccc0) SHA1(44dd92e899a7852d2fd937b7d45519315b8b4d4f) )
 ROM_END
 
@@ -2929,7 +2929,7 @@ ROM_START( edfp )
 	ROM_LOAD( "8.rom8.27c010",  0x020000, 0x020000, CRC(fa0d1887) SHA1(d24c17806669f5b12527b36bc9c10fd16222e23c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type PROM) */
-	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+	ROM_LOAD( "rd.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
 
@@ -2940,7 +2940,8 @@ ROM_START( edfbl )
 	ROM_LOAD16_BYTE( "01.bin",  0x000001, 0x020000, CRC(fc893ad0) SHA1(6d7be560e2343f3943f52ccdae7bd255b7720b6e) )
 	ROM_CONTINUE (                  0x080001, 0x020000 )
 
-	/* no 2nd 68k on this bootleg, is there a PIC? */
+	ROM_REGION( 0x2000, "mcu", 0 ) // PIC, 28 pin, part number scratched off
+	ROM_LOAD( "pic", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "07.bin",  0x000000, 0x040000, CRC(4495c228) SHA1(2193561e193e696c66f27fa186f27ffbbdcb1826) )
@@ -3022,7 +3023,7 @@ ROM_START( hachoo )
 	ROM_LOAD( "hacho08.rom", 0x020000, 0x020000, CRC(888a6df1) SHA1(71d70633ecf7255287e55e92f8d2f186fe58f4b4) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ht.bin",      0x0000, 0x0200, CRC(85302b15) SHA1(8184c1184a71706cdb981e3c4f90a08521413e72) )
+	ROM_LOAD( "ht.14m",      0x0000, 0x0200, CRC(85302b15) SHA1(8184c1184a71706cdb981e3c4f90a08521413e72) )
 ROM_END
 
 
@@ -3197,7 +3198,7 @@ ROM_START( iganinju )
 	ROM_LOAD( "iga_08.bin", 0x000000, 0x040000, CRC(857dbf60) SHA1(e700b307aa481a57180a4529e2ce4326574e128e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "iga.131",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+	ROM_LOAD( "iga.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
 ROM_START( iganinjub )
@@ -3355,7 +3356,7 @@ ROM_START( jitsupro )
 	ROM_CONTINUE(          0x000000, 0x040000             )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type BPROM) */
-	ROM_LOAD( "bs.bpr",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+	ROM_LOAD( "bs.14m",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 
@@ -3424,7 +3425,7 @@ ROM_START( kickoff )
 	ROM_LOAD( "kioff10.rom", 0x000000, 0x020000, CRC(fd739fec) SHA1(1442d5ef7b8fbaa0c9f71c12ce993626364d2e1a) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "kick.bin",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+	ROM_LOAD( "kick.14m",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 /*
@@ -3636,6 +3637,38 @@ ROM_START( p47 )
 ROM_END
 
 
+/*
+The Japanese version of P-47 can be found in 2 different ROM board configurations:
+'Normal' rev - full split EPROMs
+Type B rev - 4x 2mb HN62312 and 1x HN62321 mask ROMs
+
+Type B on the left, normal on the right
+
+p-47_1_rom1.bin = p47j_1.bin          | Main CPU
+p-47_3_rom2.bin = p47j_3.bin          /
+
+p-47_9_rom8.bin = p47j_9.bin          | Audio CPU
+p-47_19_rom7.bin = p47j_19.bin        /
+
+rom4.bin = p47j_5.bin + p47j_6.bin    | Scroll0
+p-47_7_rom3.bin = p47j_7.bin**        /
+
+rom5.bin = p47j_23.bin                | Scroll1
+rom6.bin = p47j_12.bin                /
+
+p-47_16_rom12.bin = p47j_16.bin       | Scroll2
+
+rom11.bin = p47j_27.bin + p47j_18.bin | Sprites
+p-47_26_rom13.bin = p47j_26.bin       /
+
+rom9.bin = p47j_20.bin + p47j_21.bin  | OKI1
+
+rom10.bin = p47j_10.bin + p47j_11.bin | OKI2
+
+p-47.14m = p-47.14m                   | PROMS
+
+**p-47_7_rom3.bin is a 27512 compatible mask rom. The existing P47j set is 1mb. The 2nd half of the data is not present on the type B boardset.
+*/
 ROM_START( p47j )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "p47j_3.bin", 0x000000, 0x020000, CRC(11c655e5) SHA1(a2bfd6538ac81a5f20fa77460ba045584313413a) )
@@ -3875,8 +3908,8 @@ c2200<-0
 
 ROM_START( peekaboo )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 CPU Code */
-	ROM_LOAD16_BYTE( "j3", 0x000000, 0x020000, CRC(f5f4cf33) SHA1(f135f2b627347255bb0811e9a4a213e3b447c199) )
-	ROM_LOAD16_BYTE( "j2", 0x000001, 0x020000, CRC(7b3d430d) SHA1(8b48101929da4938a61dfd0eda845368c4184831) )
+	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 3.ic29", 0x000000, 0x020000, CRC(f5f4cf33) SHA1(f135f2b627347255bb0811e9a4a213e3b447c199) )
+	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 2.ic28", 0x000001, 0x020000, CRC(7b3d430d) SHA1(8b48101929da4938a61dfd0eda845368c4184831) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747 */
 	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x1000, NO_DUMP )
@@ -4043,7 +4076,7 @@ ROM_START( rodland )
 	ROM_LOAD( "s202000dr.rom8", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ps89013a.m14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "ps89013a.14m",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 ROM_START( rodlanda ) // JALECO MB-M02A EB-88003-3001-1, with jumper wire from a PAL to one of the connectors
@@ -4076,7 +4109,7 @@ ROM_START( rodlanda ) // JALECO MB-M02A EB-88003-3001-1, with jumper wire from a
 	ROM_LOAD( "s202000dr.rom8", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ps89013a.m14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "ps89013a.14m",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 ROM_START( rodlandj )
@@ -4109,7 +4142,7 @@ ROM_START( rodlandj )
 	ROM_LOAD( "s202000dr.rom8", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ps89013a.m14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "ps89013a.14m",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 /*
@@ -4119,7 +4152,7 @@ Prototype or test location. Original Japanese key and unscrambled ROMs, incorrec
 Title is controlled by the value at 0xF0D7A  - 0x00 for Japan region and Rod-Land title / 0x01 for Export and R&T title.
  These same locations and values work for the Japanese set, but not the Export version.  In R&T 0xF0D7A is initialized to 0x01
 
-To access the hidden Location Test Table, during the attaction mode at the title screen with NO Coins / Credits, use Player 1
+To access the hidden Location Test Table, during the attract mode at the title screen with NO Coins / Credits, use Player 1
  controls to enter:
 
   D U B1 D D B2 U U B1 B2
@@ -4164,7 +4197,7 @@ ROM_START( rittam )
 	ROM_LOAD( "jaleco_8.rom8", 0x020000, 0x020000, CRC(a771ab00) SHA1(be547b296ee3fcc0ab7339f2c99d1039ceb3b5bb) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ps89013a.m14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "ps89013a.14m",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 
@@ -4201,7 +4234,7 @@ ROM_START( rodlandjb )
 	ROM_LOAD( "s202000dr.rom8", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ps89013a.m14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "ps89013a.14m",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 
@@ -4435,7 +4468,7 @@ ROM_START( soldam )
 	ROM_LOAD( "8ver1.bin",  0x000000, 0x040000, CRC(fcd36019) SHA1(f4edb55bd62b697c5a73c461008e764c2f16956b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "pr-91023.m14",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "pr-91023.14m",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 
@@ -4469,7 +4502,7 @@ ROM_START( soldamj )
 	ROM_LOAD( "8ver1.bin",  0x000000, 0x040000, CRC(fcd36019) SHA1(f4edb55bd62b697c5a73c461008e764c2f16956b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "pr-91023.m14",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "pr-91023.14m",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 
@@ -4519,7 +4552,7 @@ ROM_START( tshingena )
 	ROM_LOAD( "shing_08.rom",  0x020000, 0x020000, CRC(36d56c8c) SHA1(391f8c6b3ee605ce846f1862b0d3b14694dbd556) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ts.bpr",        0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+	ROM_LOAD( "ts.14m",        0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 
@@ -4562,7 +4595,7 @@ ROM_START( tshingen )
 	ROM_LOAD( "shing_08.rom",  0x020000, 0x020000, CRC(36d56c8c) SHA1(391f8c6b3ee605ce846f1862b0d3b14694dbd556) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "ts.bpr",        0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+	ROM_LOAD( "ts.14m",        0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 
@@ -5109,5 +5142,5 @@ GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, ini
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
-GAME( 1993, peekaboo, 0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboo, 0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, peekaboou,peekaboo, system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )

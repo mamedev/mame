@@ -57,8 +57,11 @@
   |_________________________________|
 
     Two different PCBs were found with same components, albeit some from different producers.
-    The machine uses light bulbs.
     The coin acceptor is driven by a MCU (unknown type).
+
+    The dumped version (Mini Guay VD) uses plastic displays with light bulbs, but there's a different
+    one (undumped) called "Mini Guay VR" (VR stands for "Version Rodillos") or just "Mini Guay" with
+    reels instead, with an additional PCB for reels control (8031 + 2764 EPROM).
 */
 
 #include "emu.h"
@@ -213,4 +216,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_IS_SKELETON_MECHANICAL ) // VD stands for "Version Displays".

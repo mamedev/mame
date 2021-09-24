@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     System Sacom AMD-98 (AmuseMent boarD)
 
@@ -13,7 +13,7 @@
     - PIT control;
     - PCM section;
 
-=============================================================================
+===================================================================================================
 
 - Known games with AMD-98 support
     Brown's Run (System Sacom)
@@ -25,7 +25,7 @@
     Relics (Bothtec)
     Thexder (Game Arts)
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "bus/cbus/pc9801_amd98.h"
@@ -37,7 +37,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "pc9801_amd98")
+DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "System Sacom AMD-98")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -101,11 +101,11 @@ ioport_constructor pc9801_amd98_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_amd98_device::pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_AMD98, tag, owner, clock),
-		m_bus(*this, DEVICE_SELF_OWNER),
-		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2"),
-		m_ay3(*this, "ay3")
+	: device_t(mconfig, PC9801_AMD98, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_ay1(*this, "ay1")
+	, m_ay2(*this, "ay2")
+	, m_ay3(*this, "ay3")
 {
 }
 

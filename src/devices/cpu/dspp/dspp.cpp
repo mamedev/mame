@@ -169,7 +169,6 @@ void dspp_device::device_start()
 #if 0
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_core->m_flags).callimport().callexport().formatstr("%6s").noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_src2val[REGBASE + 31]).noshow();
 
 	state_add(DSPP_PS,         "PS",        m_core->m_flagsio).callimport().callexport();
 	for (int regnum = 0; regnum < 32; regnum++)

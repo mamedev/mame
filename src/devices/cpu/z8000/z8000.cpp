@@ -520,7 +520,6 @@ void z8002_device::register_debug_state()
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_fcw ).formatstr("%16s").noshow();
-	state_add( STATE_GENSP, "GENSP", m_nspoff ).noshow();
 }
 
 void z8002_device::state_string_export(const device_state_entry &entry, std::string &str) const

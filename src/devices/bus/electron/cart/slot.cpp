@@ -132,7 +132,7 @@ image_init_result electron_cartslot_device::call_load()
 
 			if (size % 0x2000)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 
@@ -152,7 +152,7 @@ image_init_result electron_cartslot_device::call_load()
 
 			if ((upsize % 0x2000 && upsize != 0) || (losize % 0x2000 && losize != 0) || (romsize % 0x2000 && romsize != 0))
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 

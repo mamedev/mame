@@ -30,14 +30,21 @@ public:
 		KBDC8042_STANDARD,
 		KBDC8042_PS2
 	};
+	enum kbdc8042_interrupt_type_t
+	{
+		KBDC8042_SINGLE,
+		KBDC8042_DOUBLE
+	};
 
 	// construction/destruction
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_keyboard_type(kbdc8042_type_t keybtype) { m_keybtype = keybtype; }
+	void set_interrupt_type(kbdc8042_interrupt_type_t interrupttype) { m_interrupttype = interrupttype; }
 	auto system_reset_callback() { return m_system_reset_cb.bind(); }
 	auto gate_a20_callback() { return m_gate_a20_cb.bind(); }
 	auto input_buffer_full_callback() { return m_input_buffer_full_cb.bind(); }
+	auto input_buffer_full_mouse_callback() { return m_input_buffer_full_mouse_cb.bind(); }
 	auto output_buffer_empty_callback() { return m_output_buffer_empty_cb.bind(); }
 	auto speaker_callback() { return m_speaker_cb.bind(); }
 
@@ -60,6 +67,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	void mouse_enqueue(uint8_t value);
+
 	static const device_timer_id TIMER_UPDATE = 0;
 
 private:
@@ -74,16 +83,19 @@ private:
 	} m_keyboard;
 	struct {
 		int received;
-		int on;
+		bool on;
+		bool reporting;
 		uint8_t sample_rate;
+		uint8_t resolution;
 		bool receiving_sample_rate;
+		bool receiving_resolution;
 		uint8_t transmit_buf[8];
-		uint8_t to_transmit;
+		int to_transmit;
+		int from_transmit;
 	} m_mouse;
 
 	int m_last_write_to_control;
 	int m_sending;
-	int m_send_to_mouse;
 
 	int m_operation_write_state;
 	int m_status_read_mode;
@@ -102,11 +114,13 @@ private:
 	optional_ioport m_mousebtn_port;
 
 	kbdc8042_type_t     m_keybtype;
+	kbdc8042_interrupt_type_t	m_interrupttype;
 
 	devcb_write_line    m_system_reset_cb;
 	devcb_write_line    m_gate_a20_cb;
 	devcb_write_line    m_input_buffer_full_cb;
-	devcb_write_line    m_output_buffer_empty_cb;
+	devcb_write_line    m_input_buffer_full_mouse_cb;
+	devcb_write_line    m_output_buffer_empty_cb; // currently not used
 
 	devcb_write8        m_speaker_cb;
 

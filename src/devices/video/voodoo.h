@@ -38,9 +38,9 @@ enum class voodoo_model : u8
 };
 
 // debug
-static constexpr bool DEBUG_DEPTH = false;		// ENTER key to view depthbuf
-static constexpr bool DEBUG_BACKBUF = false;	// L key to view backbuf
-static constexpr bool DEBUG_STATS = false;		// \ key to view stats
+static constexpr bool DEBUG_DEPTH = false;      // ENTER key to view depthbuf
+static constexpr bool DEBUG_BACKBUF = false;    // L key to view backbuf
+static constexpr bool DEBUG_STATS = false;      // \ key to view stats
 
 // logging
 static constexpr bool LOG_VBLANK_SWAP = false;

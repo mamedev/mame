@@ -2055,7 +2055,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].p[4] = tri->v[i].p[2];
 			}
 
-			model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data().next();
 			extra.texture = tri->texture;
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
@@ -2083,7 +2083,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].p[1] = tri->v[i].p[2];
 			}
 
-			model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data().next();
 			extra.color = tri->color;
 
 			render_triangle<2>(cliprect, render_delegate(&model3_renderer::draw_scanline_solid, this), v[0], v[1], v[2]);
@@ -2120,7 +2120,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 				v[i].p[4] = tri->v[i].p[2];
 			}
 
-			model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data().next();
 			extra.texture = tri->texture;
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
@@ -2137,7 +2137,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 				v[i].p[1] = tri->v[i].p[2];
 			}
 
-			model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data().next();
 			extra.color = tri->color;
 			extra.transparency = tri->transparency;
 

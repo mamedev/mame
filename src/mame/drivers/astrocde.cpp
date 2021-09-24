@@ -563,7 +563,7 @@ void astrocde_state::port_map_mono_pattern(address_map &map)
 void astrocde_state::port_map_stereo_pattern(address_map &map)
 {
 	port_map_mono_pattern(map);
-	map(0x0050, 0x0058).select(0xff00).w("astrocade2", FUNC(astrocade_io_device::write));
+	map(0x0050, 0x0058).select(0xff00).w(m_astrocade_sound2, FUNC(astrocade_io_device::write));
 }
 
 
@@ -1236,9 +1236,9 @@ void astrocde_state::astrocade_stereo_sound(machine_config &config)
 	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
 	m_astrocade_sound1->si_cb().set(FUNC(astrocde_state::input_mux_r));
 	m_astrocade_sound1->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
-	m_astrocade_sound1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
 
-	ASTROCADE_IO(config, "astrocade2", ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ASTROCADE_IO(config, m_astrocade_sound2, ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "rspeaker", 1.00);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024B on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 }
@@ -1357,9 +1357,15 @@ void astrocde_state::wow(machine_config &config)
 	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound1->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
 
+	m_astrocade_sound1->reset_routes();
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+
+	m_astrocade_sound2->reset_routes();
+	m_astrocade_sound2->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+
 	VOTRAX_SC01(config, m_votrax, 756000);
 
-	m_votrax->add_route(0, "f1", 0.85);
+	m_votrax->add_route(0, "f1", 0.65);
 	FILTER_RC(config, "f1").set_lowpass(110e3, 560e-12).add_route(0, "f2", 1.00);
 	FILTER_RC(config, "f2").set_lowpass(110e3, 560e-12).add_route(0, "f3", 1.00);
 	FILTER_RC(config, "f3").set_lowpass(110e3, 560e-12).add_route(0, "f4", 1.00);
@@ -1409,12 +1415,12 @@ void astrocde_state::gorf(machine_config &config)
 	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound1->so_cb<6>().set("lamplatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound1->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
-	m_astrocade_sound1->add_route(ALL_OUTPUTS, "upper", 1.0);
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "upper", 0.45);
 
-	ASTROCADE_IO(config, "astrocade2", ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "lower", 1.0);
+	ASTROCADE_IO(config, m_astrocade_sound2, ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "lower", 0.45);
 
 	VOTRAX_SC01(config, m_votrax, 756000);
-	m_votrax->add_route(ALL_OUTPUTS, "upper", 0.85);
+	m_votrax->add_route(ALL_OUTPUTS, "upper", 0.55);
 }
 
 void astrocde_state::robby(machine_config &config)

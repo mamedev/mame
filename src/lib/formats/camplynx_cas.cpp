@@ -25,6 +25,8 @@ Each byte is 8 bits (MSB first) with no start or stop bits.
 
 #include "camplynx_cas.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767

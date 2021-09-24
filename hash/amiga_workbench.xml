@@ -513,4 +513,31 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Version 3.9 -->
+
+	<software name="amigos39">
+		<description>AmigaOS 3.9</description>
+		<year>2000</year>
+		<publisher>Haage &amp; Partner</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="amigaos39" sha1="c7917402016b3627e533d11b998e21dec2a31029"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Version 4.0 -->
+
+	<software name="amigos40" supported="no">
+		<description>AmigaOS 4.0 Classic</description>
+		<year>2007</year>
+		<publisher>Hyperion Entertainment</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="Classic Installation Disc" />
+			<diskarea name="cdrom">
+				<disk name="amiga_os4_0_classic_52_21" sha1="39570993166af8a26d84d4f91d4725b508aa8942"/>
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

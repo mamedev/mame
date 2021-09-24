@@ -6,9 +6,8 @@
 
     Miodrag Milanovic
 */
-#include "gtp_cas.h"
 
-#include <cassert>
+#include "gtp_cas.h"
 
 
 #define GTP_WAV_FREQUENCY   44100

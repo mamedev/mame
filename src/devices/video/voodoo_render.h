@@ -497,7 +497,7 @@ struct thread_stats_block
 
 class voodoo_renderer : public voodoo_poly_manager
 {
-	static constexpr u32 RASTER_HASH_SIZE = 97;	// size of the rasterizer hash table
+	static constexpr u32 RASTER_HASH_SIZE = 97; // size of the rasterizer hash table
 
 public:
 	using rasterizer_mfp = void (voodoo_renderer::*)(int32_t, const extent_t &, const poly_data &, int);
@@ -573,10 +573,6 @@ public:
 
 	// dump rasterizer statistics if enabled
 	void dump_rasterizer_stats();
-
-protected:
-	// overrides
-	virtual void reset_after_wait() override;
 
 private:
 	// pipeline stages, in order

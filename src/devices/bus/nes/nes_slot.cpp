@@ -117,7 +117,9 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	// main NES CPU here, even if it does not belong to this device.
 	, m_maincpu(*this, ":maincpu")
 	, m_mapper_sram(nullptr)
+	, m_misc_rom(nullptr)
 	, m_mapper_sram_size(0)
+	, m_misc_rom_size(0)
 	, m_ce_mask(0)
 	, m_ce_state(0)
 	, m_vrc_ls_prg_a(0)
@@ -227,6 +229,17 @@ void device_nes_cart_interface::vrom_alloc(size_t size, const char *tag)
 		m_vrom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_vrom_size = size;
 		m_vrom_chunks = size / 0x2000;
+	}
+}
+
+void device_nes_cart_interface::misc_rom_alloc(size_t size, const char *tag)
+{
+	if (m_misc_rom == nullptr)
+	{
+		std::string tempstring(tag);
+		tempstring.append(NESSLOT_MISC_ROM_REGION_TAG);
+		m_misc_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_misc_rom_size = size;
 	}
 }
 
@@ -887,7 +900,7 @@ image_init_result nes_cart_slot_device::call_load()
 			else
 			{
 				logerror("%s is NOT a file in either iNES or UNIF format.\n", filename());
-				seterror(IMAGE_ERROR_UNSPECIFIED, "File is neither iNES or UNIF format");
+				seterror(image_error::INVALIDIMAGE, "File is neither iNES or UNIF format");
 				return image_init_result::FAIL;
 			}
 		}

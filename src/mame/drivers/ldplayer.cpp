@@ -185,15 +185,15 @@ chd_file *ldplayer_state::get_disc()
 		{
 			// open the file itself via our search path
 			emu_file image_file(machine().options().media_path(), OPEN_FLAG_READ);
-			osd_file::error filerr = image_file.open(dir->name);
-			if (filerr == osd_file::error::NONE)
+			std::error_condition filerr = image_file.open(dir->name);
+			if (!filerr)
 			{
 				std::string fullpath(image_file.fullpath());
 				image_file.close();
 
 				// try to open the CHD
 
-				if (machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()) == CHDERR_NONE)
+				if (!machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()))
 				{
 					m_filename.assign(dir->name);
 					found = true;
@@ -204,7 +204,8 @@ chd_file *ldplayer_state::get_disc()
 	}
 
 	// if we failed, pop a message and exit
-	if (found == false) {
+	if (!found)
+	{
 		machine().ui().popup_time(10, "No valid image file found!\n");
 		return nullptr;
 	}

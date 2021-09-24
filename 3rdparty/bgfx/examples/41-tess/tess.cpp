@@ -511,11 +511,8 @@ namespace
 
 				ImGui::End();
 
-				if (!ImGui::MouseOverArea() )
-				{
-					// Update camera.
-					cameraUpdate(deltaTime*0.01f, m_mouseState);
-				}
+				// Update camera.
+				cameraUpdate(deltaTime*0.01f, m_mouseState, ImGui::MouseOverArea() );
 
 				bgfx::touch(0);
 				bgfx::touch(1);
@@ -610,7 +607,7 @@ namespace
 
 				m_uniforms.submit();
 
-				bgfx::submit(1, m_programsDraw[m_shading], m_dispatchIndirect, 0, true);
+				bgfx::submit(1, m_programsDraw[m_shading], m_dispatchIndirect);
 
 				m_pingPong = 1 - m_pingPong;
 
@@ -928,6 +925,6 @@ namespace
 ENTRY_IMPLEMENT_MAIN(
 	  ExampleTessellation
 	, "41-tess"
-	, "Adaptive Gpu Tessellation."
+	, "Adaptive GPU Tessellation."
 	, "https://bkaradzic.github.io/bgfx/examples.html#tess"
 	);

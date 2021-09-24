@@ -113,8 +113,10 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/redalert.h"
+#include "audio/redalert.h"
+
+#include "cpu/m6502/m6502.h"
 
 
 #define MAIN_PCB_CLOCK      (XTAL(12'500'000))
@@ -180,10 +182,10 @@ void redalert_state::redalert_main_map(address_map &map)
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
 	map(0xc020, 0xc020).mirror(0x0f8f).portr("KEY2").nopw();
-	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
+	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w("soundboard", FUNC(irem_m37b_ue17b_audio_device::audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
-	map(0xc060, 0xc060).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_voice_command_w));
+	map(0xc060, 0xc060).mirror(0x0f8f).nopr().w("soundboard", FUNC(irem_m37b_ue17b_audio_device::voice_command_w));
 	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
 	map(0xf000, 0xffff).rom().region("maincpu", 0x8000);
 }
@@ -197,7 +199,7 @@ void redalert_state::ww3_main_map(address_map &map)
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
 	map(0xc020, 0xc020).mirror(0x0f8f).portr("KEY2").nopw();
-	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
+	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w("soundboard", FUNC(irem_m37b_ue17b_audio_device::audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
 	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
@@ -213,7 +215,7 @@ void redalert_state::panther_main_map(address_map &map)
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
 	map(0xc020, 0xc020).mirror(0x0f8f).portr("KEY2").nopw();
-	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
+	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w("soundboard", FUNC(panther_audio_device::audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
 	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::panther_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
@@ -229,7 +231,7 @@ void redalert_state::demoneye_main_map(address_map &map)
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
 	map(0xc020, 0xc020).mirror(0x0f8f).portr("KEY2").nopw();
-	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::demoneye_audio_command_w));
+	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w("soundboard", FUNC(demoneye_audio_device::audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
 	map(0xc060, 0xc063).mirror(0x0f80).w(FUNC(redalert_state::demoneye_bitmap_layer_w));
@@ -249,13 +251,6 @@ INPUT_CHANGED_MEMBER(redalert_state::coin_inserted)
 {
 	// TODO: the service coin is connected to the CPU's RDY pin as well
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
-}
-
-CUSTOM_INPUT_MEMBER(redalert_state::sound_status_r)
-{
-	// communication handshake between host and sound CPU
-	// at least Panther uses it, unconfirmed for Red Alert and Demoneye-X
-	return m_sound_hs;
 }
 
 static INPUT_PORTS_START( m27_base )
@@ -278,7 +273,7 @@ static INPUT_PORTS_START( m27_base )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 
 	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(redalert_state, sound_status_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundboard", irem_m37b_audio_device, sound_status_r)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	// TODO: 2-way/4-way ...?
@@ -358,6 +353,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( demoneye )
 	PORT_INCLUDE( m27_base )
 
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // audio status for panther
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -402,7 +400,7 @@ void redalert_state::redalert(machine_config &config)
 	redalert_video(config);
 
 	/* audio hardware */
-	redalert_audio(config);
+	IREM_M37B_UE17B_AUDIO(config, "soundboard");
 }
 
 void redalert_state::ww3(machine_config &config)
@@ -416,7 +414,7 @@ void redalert_state::ww3(machine_config &config)
 	ww3_video(config);
 
 	/* audio hardware */
-	ww3_audio(config);
+	IREM_M37B_AUDIO(config, "soundboard");
 }
 
 void redalert_state::panther(machine_config &config)
@@ -430,7 +428,7 @@ void redalert_state::panther(machine_config &config)
 	panther_video(config);
 
 	/* audio hardware */
-	panther_audio(config);
+	PANTHER_AUDIO(config, "soundboard");
 }
 
 void redalert_state::demoneye(machine_config &config)
@@ -444,7 +442,7 @@ void redalert_state::demoneye(machine_config &config)
 	demoneye_video(config);
 
 	/* audio hardware */
-	demoneye_audio(config);
+	DEMONEYE_AUDIO(config, "soundboard");
 }
 
 
@@ -467,7 +465,7 @@ ROM_START( panther )
 	ROM_LOAD( "qr-6.bin",      0xa800, 0x0800, BAD_DUMP CRC(02fbd9d9) SHA1(65b5875c78886b51c9bdfc75e730b9f67ce72cfc) )
 	ROM_LOAD( "qr-7.bin",      0xb000, 0x0800, BAD_DUMP CRC(b3e2d6cc) SHA1(7bb18f17d635196e617e8f68bf8d866134c362d1) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "soundboard:audiocpu", 0 )
 	ROM_LOAD( "q7a.bin",       0x7000, 0x0800, CRC(febd1674) SHA1(e122d0855ab6a352d741f9013c20ec31e0068248) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
@@ -485,7 +483,7 @@ ROM_START( ww3 )
 	ROM_LOAD( "w3ia.3c",      0xa000, 0x1000, CRC(dccb8605) SHA1(f4c5e1a5de0828c5e39f37e2bf10f4f60bef856a) )
 	ROM_LOAD( "w3ib.3a",      0xb000, 0x1000, CRC(3658e465) SHA1(2c910b2e9d689cb577d8a63bc4d07d0770a6de68) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "soundboard:audiocpu", 0 )
 	ROM_LOAD( "w3s1",         0x7000, 0x0800, CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
@@ -502,10 +500,10 @@ ROM_START( redalert )
 	ROM_LOAD( "ragab",        0xa000, 0x1000, CRC(ab99f5ed) SHA1(a93713bb03d61cce64adc89b874b67adea7c53cd) )
 	ROM_LOAD( "ragb",         0xb000, 0x1000, CRC(8e0d1661) SHA1(bff4ddca761ddd70113490f50777e62c66813685) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "soundboard:audiocpu", 0 )
 	ROM_LOAD( "w3s1",         0x7000, 0x0800, CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
 
-	ROM_REGION( 0x10000, "voice", 0 )
+	ROM_REGION( 0x10000, "soundboard:voice", 0 )
 	ROM_LOAD( "ras1b",        0x0000, 0x1000, CRC(ec690845) SHA1(26a84738bd45ed21dac6c8383ebd9c3b9831024a) )
 	ROM_LOAD( "ras2",         0x1000, 0x1000, CRC(fae94cfc) SHA1(2fd798706bb3afda3fb55bc877e597cc4e5d0c15) )
 	ROM_LOAD( "ras3",         0x2000, 0x1000, CRC(20d56f3e) SHA1(5c32ee3365407e6d3f7ab5662e9ecbac437ed4cb) )
@@ -525,7 +523,7 @@ ROM_START( demoneye )
 	ROM_LOAD( "demoneye.a",   0xa000, 0x1000, CRC(a27d08aa) SHA1(659ad22778e852fc58f3951d62bc01151c973d36) )
 	ROM_LOAD( "demoneye.b",   0xb000, 0x1000, CRC(1fd3585b) SHA1(b1697b7b21b739499fda1e155530dbfab89f3358) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "soundboard:audiocpu", 0 )
 	ROM_LOAD( "demoneye.7s",  0x2000, 0x1000, CRC(8fdc9364) SHA1(3fccb5b22f08d6a0cde85863c1ce5399c84f233e) )
 	ROM_LOAD( "demoneye.6s",  0x3000, 0x1000, CRC(0a23def9) SHA1(b52f52be312ec7810e3c9cbd3913e887f983b1ee) )
 
@@ -544,7 +542,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, panther,  0,        panther,  panther,  redalert_state, empty_init, ROT270, "Irem",               "Panther (bootleg?)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redalert, 0,        redalert, redalert, redalert_state, empty_init, ROT270, "Irem (GDI license)", "Red Alert",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ww3,      redalert, ww3,      redalert, redalert_state, empty_init, ROT270, "Irem",               "WW III",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, demoneye, 0,        demoneye, demoneye, redalert_state, empty_init, ROT270, "Irem",               "Demoneye-X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, panther,  0,        panther,  panther,  redalert_state, empty_init, ROT270, "Irem",               "Panther (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redalert, 0,        redalert, redalert, redalert_state, empty_init, ROT270, "Irem (GDI license)", "Red Alert",          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ww3,      redalert, ww3,      redalert, redalert_state, empty_init, ROT270, "Irem",               "WW III",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, demoneye, 0,        demoneye, demoneye, redalert_state, empty_init, ROT270, "Irem",               "Demoneye-X",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

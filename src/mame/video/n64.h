@@ -127,8 +127,6 @@ class n64_rdp;
 #include "video/rdpblend.h"
 #include "video/rdptpipe.h"
 
-typedef void (*rdp_command_t)(uint64_t w1);
-
 class n64_state;
 
 class n64_rdp : public poly_manager<uint32_t, rdp_poly_state, 8>
@@ -164,24 +162,24 @@ public:
 	}
 
 	void        process_command_list();
-	uint64_t      read_data(uint32_t address);
-	void        disassemble(char* buffer);
+	uint64_t    read_data(uint32_t address);
+	void        disassemble(uint64_t *cmd_buf, char* buffer);
 
 	void        set_machine(running_machine& machine) { m_machine = &machine; }
 	void        set_n64_periphs(n64_periphs* periphs) { m_n64_periphs = periphs; }
 
 	// CPU-visible registers
 	void        set_start(uint32_t val) { m_start = val; }
-	uint32_t      get_start() const { return m_start; }
+	uint32_t    get_start() const { return m_start; }
 
 	void        set_end(uint32_t val) { m_end = val; }
-	uint32_t      get_end() const { return m_end; }
+	uint32_t    get_end() const { return m_end; }
 
 	void        set_current(uint32_t val) { m_current = val; }
-	uint32_t      get_current() const { return m_current; }
+	uint32_t    get_current() const { return m_current; }
 
 	void        set_status(uint32_t val) { m_status = val; }
-	uint32_t      get_status() const { return m_status; }
+	uint32_t    get_status() const { return m_status; }
 
 	// Color Combiner
 	int32_t       color_combiner_equation(int32_t a, int32_t b, int32_t c, int32_t d);
@@ -226,48 +224,39 @@ public:
 	bool            z_compare(uint32_t zcurpixel, uint32_t dzcurpixel, uint32_t sz, uint16_t dzpix, rdp_span_aux* userdata, const rdp_poly_state &object);
 
 	// Commands
-	void        cmd_invalid(uint64_t w1);
-	void        cmd_noop(uint64_t w1);
-	void        cmd_triangle(uint64_t w1);
-	void        cmd_triangle_z(uint64_t w1);
-	void        cmd_triangle_t(uint64_t w1);
-	void        cmd_triangle_tz(uint64_t w1);
-	void        cmd_triangle_s(uint64_t w1);
-	void        cmd_triangle_sz(uint64_t w1);
-	void        cmd_triangle_st(uint64_t w1);
-	void        cmd_triangle_stz(uint64_t w1);
-	void        cmd_tex_rect(uint64_t w1);
-	void        cmd_tex_rect_flip(uint64_t w1);
-	void        cmd_sync_load(uint64_t w1);
-	void        cmd_sync_pipe(uint64_t w1);
-	void        cmd_sync_tile(uint64_t w1);
-	void        cmd_sync_full(uint64_t w1);
-	void        cmd_set_key_gb(uint64_t w1);
-	void        cmd_set_key_r(uint64_t w1);
-	void        cmd_set_fill_color32(uint64_t w1);
-	void        cmd_set_convert(uint64_t w1);
-	void        cmd_set_scissor(uint64_t w1);
-	void        cmd_set_prim_depth(uint64_t w1);
-	void        cmd_set_other_modes(uint64_t w1);
-	void        cmd_load_tlut(uint64_t w1);
-	void        cmd_set_tile_size(uint64_t w1);
-	void        cmd_load_block(uint64_t w1);
-	void        cmd_load_tile(uint64_t w1);
-	void        cmd_fill_rect(uint64_t w1);
-	void        cmd_set_tile(uint64_t w1);
-	void        cmd_set_fog_color(uint64_t w1);
-	void        cmd_set_blend_color(uint64_t w1);
-	void        cmd_set_prim_color(uint64_t w1);
-	void        cmd_set_env_color(uint64_t w1);
-	void        cmd_set_combine(uint64_t w1);
-	void        cmd_set_texture_image(uint64_t w1);
-	void        cmd_set_mask_image(uint64_t w1);
-	void        cmd_set_color_image(uint64_t w1);
+	void        cmd_noop(uint64_t *cmd_buf);
+	void        cmd_tex_rect(uint64_t *cmd_buf);
+	void        cmd_tex_rect_flip(uint64_t *cmd_buf);
+	void        cmd_sync_load(uint64_t *cmd_buf);
+	void        cmd_sync_pipe(uint64_t *cmd_buf);
+	void        cmd_sync_tile(uint64_t *cmd_buf);
+	void        cmd_sync_full(uint64_t *cmd_buf);
+	void        cmd_set_key_gb(uint64_t *cmd_buf);
+	void        cmd_set_key_r(uint64_t *cmd_buf);
+	void        cmd_set_fill_color32(uint64_t *cmd_buf);
+	void        cmd_set_convert(uint64_t *cmd_buf);
+	void        cmd_set_scissor(uint64_t *cmd_buf);
+	void        cmd_set_prim_depth(uint64_t *cmd_buf);
+	void        cmd_set_other_modes(uint64_t *cmd_buf);
+	void        cmd_load_tlut(uint64_t *cmd_buf);
+	void        cmd_set_tile_size(uint64_t *cmd_buf);
+	void        cmd_load_block(uint64_t *cmd_buf);
+	void        cmd_load_tile(uint64_t *cmd_buf);
+	void        cmd_fill_rect(uint64_t *cmd_buf);
+	void        cmd_set_tile(uint64_t *cmd_buf);
+	void        cmd_set_fog_color(uint64_t *cmd_buf);
+	void        cmd_set_blend_color(uint64_t *cmd_buf);
+	void        cmd_set_prim_color(uint64_t *cmd_buf);
+	void        cmd_set_env_color(uint64_t *cmd_buf);
+	void        cmd_set_combine(uint64_t *cmd_buf);
+	void        cmd_set_texture_image(uint64_t *cmd_buf);
+	void        cmd_set_mask_image(uint64_t *cmd_buf);
+	void        cmd_set_color_image(uint64_t *cmd_buf);
 
 	void        rgbaz_clip(int32_t sr, int32_t sg, int32_t sb, int32_t sa, int32_t* sz, rdp_span_aux* userdata);
 	void        rgbaz_correct_triangle(int32_t offx, int32_t offy, int32_t* r, int32_t* g, int32_t* b, int32_t* a, int32_t* z, rdp_span_aux* userdata, const rdp_poly_state &object);
 
-	void        triangle(bool shade, bool texture, bool zbuffer);
+	void        triangle(uint64_t *cmd_buf, bool shade, bool texture, bool zbuffer);
 
 	void        get_dither_values(int32_t x, int32_t y, int32_t* cdith, int32_t* adith, const rdp_poly_state &object);
 
@@ -309,7 +298,7 @@ public:
 	rectangle_t     m_scissor;
 	span_base_t     m_span_base;
 
-	void            draw_triangle(bool shade, bool texture, bool zbuffer, bool rect);
+	void            draw_triangle(uint64_t *cmd_buf, bool shade, bool texture, bool zbuffer, bool rect);
 
 	std::unique_ptr<uint8_t[]>  m_aux_buf;
 	uint32_t          m_aux_buf_ptr;
@@ -323,18 +312,40 @@ private:
 	void    compute_cvg_noflip(extent_t* spans, int32_t* majorx, int32_t* minorx, int32_t* majorxint, int32_t* minorxint, int32_t scanline, int32_t yh, int32_t yl, int32_t base);
 	void    compute_cvg_flip(extent_t* spans, int32_t* majorx, int32_t* minorx, int32_t* majorxint, int32_t* minorxint, int32_t scanline, int32_t yh, int32_t yl, int32_t base);
 
-	void    write_pixel(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
-	void    read_pixel(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
-	void    copy_pixel(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
-	void    fill_pixel(uint32_t curpixel, const rdp_poly_state &object);
+	void    write_pixel4(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    write_pixel8(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    write_pixel16(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    write_pixel32(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel4(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel8(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel16(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel32(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    copy_pixel4(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	void    copy_pixel8(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	void    copy_pixel16(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	void    copy_pixel32(uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	void    fill_pixel4(uint32_t curpixel, const rdp_poly_state &object);
+	void    fill_pixel8(uint32_t curpixel, const rdp_poly_state &object);
+	void    fill_pixel16(uint32_t curpixel, const rdp_poly_state &object);
+	void    fill_pixel32(uint32_t curpixel, const rdp_poly_state &object);
 
 	void    precalc_cvmask_derivatives(void);
 	void    z_build_com_table(void);
 
 	typedef void (n64_rdp::*compute_cvg_t) (extent_t* spans, int32_t* majorx, int32_t* minorx, int32_t* majorxint, int32_t* minorxint, int32_t scanline, int32_t yh, int32_t yl, int32_t base);
-	compute_cvg_t   m_compute_cvg[2];
+	compute_cvg_t     m_compute_cvg[2];
 
-	running_machine* m_machine;
+	typedef void (n64_rdp::*write_pixel_t) (uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
+	typedef void (n64_rdp::*read_pixel_t) (uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	typedef void (n64_rdp::*copy_pixel_t) (uint32_t curpixel, color_t& color, const rdp_poly_state &object);
+	typedef void (n64_rdp::*fill_pixel_t) (uint32_t curpixel, const rdp_poly_state &object);
+
+	write_pixel_t     m_write_pixel[4];
+	read_pixel_t      m_read_pixel[4];
+	copy_pixel_t      m_copy_pixel[4];
+	fill_pixel_t      m_fill_pixel[4];
+
+	running_machine*  m_machine;
 	uint32_t*         m_rdram;
 	uint32_t*         m_dmem;
 	n64_periphs* m_n64_periphs;
@@ -351,9 +362,6 @@ private:
 
 	uint64_t  m_cmd_data[0x800];
 	uint64_t  m_temp_rect_data[0x800];
-
-	int32_t   m_cmd_ptr;
-	int32_t   m_cmd_cur;
 
 	uint32_t  m_start;
 	uint32_t  m_end;
@@ -379,7 +387,6 @@ private:
 
 	static uint8_t const s_bayer_matrix[16];
 	static uint8_t const s_magic_matrix[16];
-	static rdp_command_t const m_commands[0x40];
 	static int32_t const s_rdp_command_length[];
 	static char const *const s_image_format[];
 	static char const *const s_image_size[];

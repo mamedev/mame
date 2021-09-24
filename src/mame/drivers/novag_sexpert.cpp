@@ -40,10 +40,10 @@ TODO:
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
-#include "machine/sensorboard.h"
+#include "machine/clock.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
+#include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/hd44780.h"
 #include "video/pwm.h"
@@ -67,7 +67,6 @@ public:
 	sexpert_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
 		m_screen(*this, "screen"),
 		m_display(*this, "display"),
@@ -93,7 +92,6 @@ protected:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_memory_bank m_rombank;
 	required_device<screen_device> m_screen;
 	required_device<pwm_display_device> m_display;
@@ -108,10 +106,6 @@ protected:
 
 	// address maps
 	void sexpert_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -429,10 +423,9 @@ void sexpert_state::sexpert(machine_config &config)
 	M65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2, also seen with R65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &sexpert_state::sexpert_map);
 
-	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(sexpert_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(21500)); // active for 21.5us
-	TIMER(config, "irq_off").configure_periodic(FUNC(sexpert_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 32.768_kHz_XTAL/128)); // 256Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(21500)); // active for 21.5us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -488,7 +481,7 @@ void sforte_state::sforte(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sforte_state::sforte_map);
-	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_usec(10)); // tlow measured between 8us and 12us (unstable)
+	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(10)); // measured between 8us and 12us (unstable)
 
 	m_board->set_type(sensorboard_device::BUTTONS);
 

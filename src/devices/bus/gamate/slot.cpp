@@ -134,7 +134,7 @@ image_init_result gamate_cart_slot_device::call_load()
 
 		if (len > 0x80000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 			return image_init_result::FAIL;
 		}
 

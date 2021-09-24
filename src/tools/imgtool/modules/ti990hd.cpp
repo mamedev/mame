@@ -8,11 +8,14 @@
     Raphael Nabet, 2003
 */
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <climits>
 #include "imgtool.h"
+
+#include "opresolv.h"
+
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 /* Max sector length is bytes.  Generally 256, except for a few older disk
 units which use 288-byte-long sectors, and SCSI units which generally use

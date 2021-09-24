@@ -325,7 +325,7 @@ QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 	read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 		image.message(" Cannot read the file");
 	}
 	else

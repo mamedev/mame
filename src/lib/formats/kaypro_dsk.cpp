@@ -16,8 +16,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/kaypro_dsk.h"
 
 kayproii_format::kayproii_format() : upd765_format(formats)

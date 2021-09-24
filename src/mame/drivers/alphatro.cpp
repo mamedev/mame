@@ -702,7 +702,7 @@ image_init_result alphatro_state::load_cart(device_image_interface &image, gener
 
 	if ((size != 0x4000) && (size != 0x2000))
 	{
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid size, must be 8 or 16 K" );
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size, must be 8 or 16 K" );
 		return image_init_result::FAIL;
 	}
 

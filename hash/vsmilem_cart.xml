@@ -56,7 +56,7 @@ Language:
 |   XX   | 80-084045(FR)     | Scooby-Doo! - Panique à Funland                                                            |
 |   XX   | 80-084047(SP)     | ¡¡Scooby-Doo!! - Misterio en el Parque                                                    |
 +========+===================+===========================================================================================+
-|        | 80-084060(US)     | Thomas and Friends - Engines Working Together                                             |
+|   XX   | 80-084060(US)     | Thomas and Friends - Engines Working Together                                             |
 |        | 80-084063(UK)     | Thomas and Friends - Engines Working Together                                             |
 |   XX   | 80-084064(GE)     | Thomas - Freunde halten zusammen                                                          |
 +========+===================+===========================================================================================+
@@ -66,7 +66,7 @@ Language:
 |   XX   | 80-084085(FR)     | Wall-E                                                                                    |
 |   XX   | 80-084087(SP)     | Wall-E                                                                                    |
 +========+===================+===========================================================================================+
-|        | 80-084100(US)     | Wonder Pets - Save the Animals!                                                           |
+|   XX   | 80-084100(US)     | Wonder Pets - Save the Animals!                                                           |
 |   XX   | 80-084103(UK)     | Wonder Pets - Save the Animals!                                                           |
 +========+===================+===========================================================================================+
 |   XX   | 80-084120(US)     | Kung Fu Panda - Path of the Panda                                                         |
@@ -100,7 +100,7 @@ Language:
 |   XX   | 80-084200(US)     | Nascar Academy - Race Car Superstar                                                       |
 |   XX   | 80-084200(US)     | Nascar Academy - Race Car Superstar (alt)                                                 |
 +========+===================+===========================================================================================+
-|        | 80-084220(US)     | Snow Park Challenge                                                                       |
+|   XX   | 80-084220(US)     | Snow Park Challenge                                                                       |
 |        | 80-084222(NL)     | Wintersport Games                                                                         |
 |        | 80-084223(UK)     | Snow Park Challenge                                                                       |
 |   XX   | 80-084224(GE)     | Wintersport                                                                               |
@@ -116,7 +116,7 @@ Language:
 |   XX   | 80-084265(FR)     | Mon Toutou tout fou!                                                                      |
 |        | 80-084267(SP)     | Dakota y su Mascota                                                                       |
 +========+===================+===========================================================================================+
-|        | 80-084280(US)     | Wild Waves                                                                                |
+|   XX   | 80-084280(US)     | Wild Waves                                                                                |
 |        | 80-084282(NL)     | Water-sport Games                                                                         |
 |        | 80-084283(UJ)     | Wild Waves                                                                                |
 |        | 80-084284(GE)     | Dolphis Wasser-abenteuer                                                                  |
@@ -139,7 +139,7 @@ Language:
 |        | 80-084326(PT)     | Sininho (84336 on cart)                                                                   |
 |        | 80-084327(SP)     | Campanilla                                                                                |
 +========+===================+===========================================================================================+
-|        | 80-084340(US)     | Up!                                                                                       |
+|   XX   | 80-084340(US)     | Up!                                                                                       |
 |        | 80-084342(NL)     | Up!                                                                                       |
 |        | 80-084344(GE)     | Oben                                                                                      |
 |   XX   | 80-084345(FR)     | Là-Haut                                                                                   |
@@ -154,7 +154,7 @@ Language:
 |        | 80-084366(PT)     | Manny Maozinhas (84376 on cart)                                                           |
 |        | 80-084367(SP)     | Manny Manitas                                                                             |
 +========+===================+===========================================================================================+
-|        | 80-084380(US)     | Winnie the Pooh - The Honey Hunt                                                          |
+|   XX   | 80-084380(US)     | Winnie the Pooh - The Honey Hunt                                                          |
 |        |          (IT)     | Winnie the Pooh - e la caccia al miele  ???                                               |
 |        | 80-084383(UK)     | Winnie the Pooh - The Honey Hunt                                                          |
 |   XX   | 80-084384(GE)     | Winnie Puuh - Die Honigjagd                                                               |
@@ -191,7 +191,7 @@ Language:
 |   XX   | 80-084465(FR)     | Oui-Oui - Détective d'un jour                                                             |
 |        | 80-084467(SP)     | Noddy - Detective por un día                                                              |
 +========+===================+===========================================================================================+
-|        | 80-084480(US)     | The Princess and the Frog  (motion version)                                               |
+|   XX   | 80-084480(US)     | The Princess and the Frog  (motion version)                                               |
 |        | 80-084481(US)     | The Princess and the Frog  (pocket version)                                               |
 |        | 80-084482(NL)     | Prinses en de Kikker (label in english)                                                   |
 |   XX   | 80-084483(UK)     | The Princess and the Frog                                                                 |
@@ -208,8 +208,8 @@ Language:
 +========+===================+===========================================================================================+
 |        | 80-084520(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
-|        | 80-084540(US)     | Super Why to the Rescue! The Beach Day Mystery                                            |
-|        | 80-084541(US)     | Super Why to the Rescue! The Beach Day Mystery (pocket version)                           |
+|   XX   | 80-084540(US)     | Super Why to the Rescue! - The Beach Day Mystery                                          |
+|        | 80-084541(US)     | Super Why to the Rescue! - The Beach Day Mystery (pocket version)                         |
 +========+===================+===========================================================================================+
 |        | 80-084560(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
@@ -998,7 +998,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="poohmge">
+	<software name="poohm">
+		<description>Disney Winnie the Pooh - The Honey Hunt (USA)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084380(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Winnie the Pooh - The Honey Hunt 80-084380(US) (Motion).bin" size="8388608" crc="5ffb0e13" sha1="44dfc7ea047d3d8ae2e36f8906a5053db16f2d8d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohmge" cloneof="poohm">
 		<description>Winnie Puuh - Die Honigjagd (Germany)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -1013,7 +1026,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="poohmfr" cloneof="poohmge">
+	<software name="poohmfr" cloneof="poohm">
 		<description>Disney Winnie L'ourson - La Chasse au miel de Winnie (France)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -1026,7 +1039,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="poohmsp" cloneof="poohmge">
+	<software name="poohmsp" cloneof="poohm">
 		<description>Disney Winnie the Pooh - En busca de la miel (Spain)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -1042,6 +1055,19 @@ Language:
 	</software>
 
 	<software name="prinfrogm">
+		<description>Disney Princess - The Princess and the Frog - Tiana's Big Dream (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084480(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="The Princess and the Frog - Tiana's Big Dream 80-084480(US) (Motion).bin" size="8388608" crc="90fde71c" sha1="a081771ff3610b65a91af545b0d0f7f3896bd45b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prinfrogmuk" cloneof="prinfrogm">
 		<description>Disney Princess - The Princess and the Frog - Tiana's Big Dream (UK)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -1179,6 +1205,30 @@ Language:
 		</part>
 	</software>
 
+	<software name="snowparkcm">
+		<description>Snow Park Challenge (USA)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084220(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Snow Park Challenge 80-084220(US) (Motion).bin" size="8388608" crc="67b2d1c4" sha1="9991f60711c533276a4cae451202881033c2b1a8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snowparkcge" cloneof="snowparkcm">
+		<description>Wintersport (Germany)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084224(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-84224.bin" size="8388608" crc="76e0952f" sha1="fd4bed2303a0e98af85645a477edb34281a5d17d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="soccerchm">
 		<description>Soccer Challenge (USA)</description>
 		<year>200?</year>
@@ -1274,7 +1324,33 @@ Language:
 		</part>
 	</software>
 
-	<software name="thomasmge">
+	<software name="superwhym">
+		<description>Super WHY! - The Beach Day Mystery (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084540(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="Super WHY - The Beach Day Mystery 80-084540(US) (Motion) LOW.bin" size="0x800000" crc="84a81df8" sha1="2b161b8e709d4dc1517fb57d346d72ec28338ef7" offset="0x000000" />
+				<rom name="Super WHY - The Beach Day Mystery 80-084540(US) (Motion) HIGH.bin" size="0x800000" crc="3021694d" sha1="5b9c8391d421a0e936de27c7f51642745d165c7c" offset="0x800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasm">
+		<description>Thomas &amp; Friends - Engines Working Together (USA)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084060(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Thomas and Friends - Engines Working Together 80-084060(US) (Motion).bin" size="8388608" crc="37ac541b" sha1="5f75fc5e006986b086fb58b522ffb3db0f5822eb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasmge" cloneof="thomasm">
 		<description>Thomas - Freunde halten zusammen (Germany)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1333,8 +1409,11 @@ Language:
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084420(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<feature name="u2" value="" />
 			<dataarea name="rom" size="0x1000000">
-				<rom name="vmotion80-084420.bin" size="0x1000000" crc="c0500151" sha1="265d55fd723ff7698154165719ff9cfe6c3bf0c3" />
+				<rom name="Toy Story 3 80-084420(US) (Motion) LOW.bin" size="0x800000" crc="0e2ded61" sha1="cec5b6ff4f0810ca9c91c3661cbcb2828e1fc41c" offset="0x000000" />
+				<rom name="Toy Story 3 80-084420(US) (Motion) HIGH.bin" size="0x800000" crc="fccf046f" sha1="124c88e2b6db5a57339a6fc72d698dcfe42c49a8" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1386,7 +1465,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="upmfr">
+	<software name="upm">
+		<description>Disney/Pixar Up (USA)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084340(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="Up 80-084340(US) (Motion).bin" size="0x0800000" crc="82a312d8" sha1="aae0883f3e6439296ce434a3fbbe90836d9a0634" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="upmfr" cloneof="upm">
 		<description>Disney/Pixar Là-Haut (France)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -1399,7 +1491,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="upmsp" cloneof="upmfr">
+	<software name="upmsp" cloneof="upm">
 		<description>Disney/Pixar UP (Spain)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -1472,6 +1564,18 @@ Language:
 		</part>
 	</software>
 
+	<software name="wldwavesm">
+		<description>Wild Waves (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084280(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Wild Waves 80-084280(US) (Motion).bin" size="8388608" crc="358506ff" sha1="ed99c63d6b1f2d6303fa96512f2e15d04d2eabc7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wldwavesmfr">
 		<description>Martin Le Dauphin (France)</description>
 		<year>200?</year>
@@ -1484,19 +1588,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="wintrsptmge">
-		<description>Wintersport (Germany)</description>
-		<year>2009?</year>
+	<software name="wonderpetm">
+		<description>Nickelodeon Wonder Pets! - Save the Animals! (USA)</description>
+		<year>2008</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-084224(GE)" />
+		<info name="serial" value="80-084100(US)" />
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="80-84224.bin" size="8388608" crc="76e0952f" sha1="fd4bed2303a0e98af85645a477edb34281a5d17d" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Wonder Pets - Save the Animals 80-084100(US) (Motion).bin" size="0x800000" crc="111cede7" sha1="fe586130706003646a436f2a1782cba36f424cf2" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wonderpetmuk">
+	<software name="wonderpetmuk" cloneof="wonderpetm">
 		<description>Nickelodeon Wonder Pets! - Save the Animals! (UK)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>

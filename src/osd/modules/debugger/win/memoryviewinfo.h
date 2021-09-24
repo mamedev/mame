@@ -11,8 +11,9 @@
 #pragma once
 
 #include "debugwin.h"
-
 #include "debugviewinfo.h"
+
+#include "debug/dvmemory.h"
 
 #include <string>
 
@@ -23,13 +24,13 @@ public:
 	memoryview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent);
 	virtual ~memoryview_info();
 
-	uint8_t data_format() const;
+	debug_view_memory::data_format data_format() const;
 	uint32_t chunks_per_row() const;
 	bool reverse() const;
 	bool physical() const;
 
 	void set_expression(const std::string &string);
-	void set_data_format(uint8_t dataformat);
+	void set_data_format(debug_view_memory::data_format dataformat);
 	void set_chunks_per_row(uint32_t rowchunks);
 	void set_reverse(bool reverse);
 	void set_physical(bool physical);

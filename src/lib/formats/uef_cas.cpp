@@ -18,10 +18,10 @@ Not nice, but it works...
 
 */
 #include "uef_cas.h"
+#include "imageutl.h"
 
 #include <zlib.h>
 
-#include <cassert>
 #include <cmath>
 #include <cstring>
 

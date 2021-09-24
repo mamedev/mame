@@ -16653,7 +16653,7 @@ license:CC0
 	</software>
 
 	<software name="mnymny84">
-		<description>Money Money (Version 09.13.84) (cleanly cracked)</description>
+		<description>Money! Money! (Version 09.13.84) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Hartley Courseware</publisher>
 		<info name="release" value="2017-12-23"/>
@@ -16666,7 +16666,7 @@ license:CC0
 	</software>
 
 	<software name="mnymny87">
-		<description>Money Money (Version 07.24.87) (cleanly cracked)</description>
+		<description>Money! Money! (Version 07.24.87) (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Hartley Courseware</publisher>
 		<info name="release" value="2017-04-21"/>
@@ -43088,6 +43088,307 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="print your own bingo plus (4am crack).dsk" size="143360" crc="09c2e5af" sha1="7cc963fe89ef2683ef3b62a469e153a944ef97f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdaiaddc">
+		<description>Computer Drill and Instruction: Addition C (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Science Research Associates</publisher>
+		<info name="release" value="2021-07-23"/>
+		<!--"Computer Drill and Instruction: Addition C" is a 1981 educational program developed and distributed by Science Research Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer drill and instruction - addition c (4am crack).dsk" size="143360" crc="bf859f12" sha1="a32092030c8bc66f71319b9e2f9350a406f111f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdaidecc1">
+		<description>Computer Drill and Instruction: Decimals C-1 (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Science Research Associates</publisher>
+		<info name="release" value="2021-07-24"/>
+		<!--"Computer Drill and Instruction: Decimals C-1" is a 1981 educational program developed and distributed by Science Research Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer drill and instruction - decimals c-1 (4am crack).dsk" size="143360" crc="36702c67" sha1="af6d4273cc19b0ea40bb04972652a8fa4c5ad36b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdaidivc">
+		<description>Computer Drill and Instruction: Division C (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Science Research Associates</publisher>
+		<info name="release" value="2021-07-24"/>
+		<!--"Computer Drill and Instruction: Division C" is a 1981 educational program developed and distributed by Science Research Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer drill and instruction - division c (4am crack).dsk" size="143360" crc="49bf476f" sha1="797fea0363fd70fd7f51058d48ea79f475eba2f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdaifrcc1">
+		<description>Computer Drill and Instruction: Fractions C-1 (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Science Research Associates</publisher>
+		<info name="release" value="2021-07-24"/>
+		<!--"Computer Drill and Instruction: Fractions C-1" is a 1981 educational program developed and distributed by Science Research Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer drill and instruction - fractions c-1 (4am crack).dsk" size="143360" crc="0717fb58" sha1="4796d215b86912339feae2421cafebfe6515e1e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdaimulc">
+		<description>Computer Drill and Instruction: Multiplication C (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Science Research Associates</publisher>
+		<info name="release" value="2021-07-24"/>
+		<!--"Computer Drill and Instruction: Multiplication C" is a 1981 educational program developed and distributed by Science Research Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer drill and instruction - multiplication c (4am crack).dsk" size="143360" crc="cfd0d0ea" sha1="354c6cd98223e6cb7f882e07df1800321d8964ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdaisubc">
+		<description>Computer Drill and Instruction: Subtraction C (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Science Research Associates</publisher>
+		<info name="release" value="2021-07-24"/>
+		<!--"Computer Drill and Instruction: Subtraction C" is a 1981 educational program developed and distributed by Science Research Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer drill and instruction - subtraction c (4am crack).dsk" size="143360" crc="ada42116" sha1="876783903c8e4b78d47a8d65a57a4639cd26a033"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdaiwnc">
+		<description>Computer Drill and Instruction: Whole Numbers C (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Science Research Associates</publisher>
+		<info name="release" value="2021-07-24"/>
+		<!--"Computer Drill and Instruction: Whole Numbers C" is a 1981 educational program developed and distributed by Science Research Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer drill and instruction - whole numbers c (4am crack).dsk" size="143360" crc="6675c0c5" sha1="07fc79ab457d4e7bde9468fcbac5f9dfbf74314b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdaitchu">
+		<description>Computer Drill and Instruction: Teacher Utilities (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Science Research Associates</publisher>
+		<info name="release" value="2021-07-24"/>
+		<!--"Computer Drill and Instruction: Teacher Utilities" is a 1981 educational program developed and distributed by Science Research Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer drill and instruction - teacher utilities (4am crack).dsk" size="143360" crc="30238cd8" sha1="b9ae4e983134ac6c88c6c0b0499dbcd10991f178"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybgolf">
+		<description>Keyboard Golf (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Softsmith</publisher>
+		<info name="release" value="2021-07-24"/>
+		<!--"Keyboard Golf" is a 1981 sports game developed by Stuart Aronoff and distributed by Softsmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard golf (softsmith) (4am and san inc crack) side a.dsk" size="143360" crc="649c131a" sha1="47eb07d2cb7ac399b649885828b68053bfd792d3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard golf (softsmith) (4am and san inc crack) side b.dsk" size="143360" crc="b94e7b07" sha1="ccc7689f7f8a3fe1e7edd3497157b1a4dc74535c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antut0485">
+		<description>Analogies Tutorial (Version 04.25.85) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-07-23"/>
+		<!--"Analogies Tutorial" is a 1983 educational game with content by Paul Fleischer and distributed by Hartley Courseware. This version, dated, 04.25.85, is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="analogies tutorial v04.25.85 (4am crack) disk 1.dsk" size="143360" crc="3ef60479" sha1="3175d88b91b99ce066f03b53bd0014a15dc12683"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="analogies tutorial v04.25.85 (4am crack) disk 2.dsk" size="143360" crc="b8249576" sha1="3464e39776baca3892f6ceaa88ddf7fffe8386f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="willybyte">
+		<description>Willy Byte in the Digital Dimension (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Data Trek</publisher>
+		<info name="release" value="2021-08-05"/>
+		<!--"Willy Byte in the Digital Dimension" is a 1984 action game developed by Murray Krehbiel, illustrated by Greg Hammond, and distributed by Data Trek.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="willy byte in the digital dimension (4am crack) side a.dsk" size="143360" crc="91be8df7" sha1="e417f2941f4eeb48c951f3d26b3480d6e9048030"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="willy byte in the digital dimension (4am crack) side b - boot.dsk" size="143360" crc="8e14f1ea" sha1="5699302848d6b62bf34f048811e4de81c1128857"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memmyth">
+		<description>Memory Myth (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Micro Power and Light</publisher>
+		<info name="release" value="2021-08-06"/>
+		<!--"Memory Myth" is a 1980 educational game developed and distributed by Micro Power and Light. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="memory myth (4am crack).dsk" size="143360" crc="2154579c" sha1="bdab7bed6f9b84a4ccb7e183cc950cd56ff16841"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capitpr1183">
+		<description>Capitalization Practice (Version 11.04.83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-08-13"/>
+		<!--"Capitalization Practice" is a 1983 educational game developed and distributed by Hartley Courseware. This version is dated 11.04.83. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="capitalization practice v11.04.83 (4am crack).dsk" size="143360" crc="53dff049" sha1="ccf88c87529ba7a5c9c08b70754990976e334f1d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capittst1183">
+		<description>Capitalization Test (Version 11.04.83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-08-13"/>
+		<!--"Capitalization Test" is a 1983 educational program developed and distributed by Hartley Courseware. This version is dated 11.04.83. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="capitalization test v11.04.83 (4am crack).dsk" size="143360" crc="d81bb317" sha1="289215e24b7e977e1afbfe3e69ea16219cfc4cd9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="factsh0983">
+		<description>Fact Sheets (Version 09.19.83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-08-13"/>
+		<!--"Fact Sheets" is a 1983 educational program developed and distributed by Hartley Courseware. This version is dated 09.19.83. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fact sheets v09.19.83 (4am crack).dsk" size="143360" crc="3aa00c12" sha1="6d4f2f25dd453b657481a0e4f0cab83f07876d32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="medsst0883">
+		<description>Medalist Series: States (Version 08.09.83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-08-13"/>
+		<!--"Medalist Series: States" is a 1983 educational program developed and distributed by Hartley Courseware. This version is dated 08.09.83. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="medalist series- states v08.09.83 (4am crack).dsk" size="143360" crc="41a38087" sha1="480b940e19b1a6dfda19475424ec9fdc9735d09a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mnymny0983">
+		<description>Money! Money! (Version 09.19.83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-08-13"/>
+		<!--"Money! Money!" is a 1983 educational program developed and distributed by Hartley Courseware. This version is dated 09.19.83. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="money money v09.19.83 (4am crack).dsk" size="143360" crc="a5e8bd1a" sha1="b8b86e8253bf986e4ad7e7ec92f5c404c07d6910"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nounspro0983">
+		<description>Nouns/Pronouns (Version 09.19.83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-08-13"/>
+		<!--"Nouns/Pronouns" is a 1983 educational program developed and distributed by Hartley Courseware. This version is dated 09.19.83. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="nouns-pronouns v09.19.83 (4am crack).dsk" size="143360" crc="1d6a528c" sha1="e3e7bc2b8de4f4ef2378e216ce1049bab3213753"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hcwwwww1183">
+		<description>Who-What-Where-When-Why (Version 11.04.83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-08-16"/>
+		<!--"Who-What-Where-When-Why" is a 1983 educational program developed and distributed by Hartley Courseware. This version is dated 11.04.83. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="who-what-where-when-why v11.04.83 (4am crack).dsk" size="143360" crc="466fb5a4" sha1="d57fcbf70be14cf52c27a69b6fafa667acec534b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hcwordf1183">
+		<description>Word Families (Version 11.04.83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-08-16"/>
+		<!--"Word Families" is a 1983 educational program developed and distributed by Hartley Courseware. This version is dated 11.04.83. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="word families v11.04.83 (4am crack).dsk" size="143360" crc="3bb55b31" sha1="36af60c1bbafccc4caa031a00da0664bca946dd4"/>
 			</dataarea>
 		</part>
 	</software>

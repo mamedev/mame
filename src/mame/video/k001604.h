@@ -13,6 +13,8 @@ class k001604_device : public device_t, public device_gfx_interface
 public:
 	k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto irq_callback() { return m_irq.bind(); }
+
 	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool front, tilemap_t* tilemap);
 
 	void draw_back_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -42,6 +44,8 @@ private:
 	TILE_GET_INFO_MEMBER(tile_info_fg);
 	TILE_GET_INFO_MEMBER(tile_info_bg8);
 	TILE_GET_INFO_MEMBER(tile_info_bg16);
+
+	devcb_write_line m_irq;
 };
 
 DECLARE_DEVICE_TYPE(K001604, k001604_device)

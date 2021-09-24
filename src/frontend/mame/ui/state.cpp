@@ -365,14 +365,16 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 						machine().options().state_directory(),
 						machine().get_statename(machine().options().state_name()),
 						m_confirm_delete->file_name()));
-			osd_file::error const err(osd_file::remove(filename));
-			if (osd_file::error::NONE != err)
+			std::error_condition const err(osd_file::remove(filename));
+			if (err)
 			{
 				osd_printf_error(
-						"Error removing file %s for state %s (%d)\n",
+						"Error removing file %s for state %s (%s:%d %s)\n",
 						filename,
 						m_confirm_delete->visible_name(),
-						std::underlying_type_t<osd_file::error>(err));
+						err.category().name(),
+						err.value(),
+						err.message());
 				machine().popmessage(_("Error removing saved state file %1$s"), filename);
 			}
 

@@ -1,29 +1,29 @@
 {
-    "blend": {
-        "equation": "add",
-        "srcColor": "1",
-        "dstColor": "0",
-        "srcAlpha": "1",
-        "dstAlpha": "0"
-    },
-    "depth": {
-        "function": "always",
-        "writeenable": false
-    },
-    "cull": {
-        "mode": "none"
-    },
-    "write": {
-        "rgb": true,
-        "alpha": true
-    },
-    "vertex": "chains/crt-geom/vs_gaussx",
-    "fragment": "chains/crt-geom/fs_gaussx",
-    "uniforms": [
-        { "name": "s_tex",       "type": "int",  "values": [ 0 ] },
-        { "name": "u_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-        { "name": "u_width",     "type": "vec4", "values": [ 2.0, 0.0, 0.0, 0.0 ] },
-        { "name": "u_aspect",    "type": "vec4", "values": [ 1.0,0.75, 0.0, 0.0 ] },
-        { "name": "u_gamma",     "type": "vec4", "values": [ 2.2, 0.0, 0.0, 0.0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+	"vertex": "chains/crt-geom/vs_gaussx",
+	"fragment": "chains/crt-geom/fs_gaussx",
+	"uniforms": [
+		{ "name": "s_tex",       "type": "int",  "values": [ 0 ] },
+		{ "name": "u_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_width",     "type": "vec4", "values": [ 2.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_aspect",    "type": "vec4", "values": [ 1.0,0.75, 0.0, 0.0 ] },
+		{ "name": "u_gamma",     "type": "vec4", "values": [ 2.2, 0.0, 0.0, 0.0 ] }
+	]
 }

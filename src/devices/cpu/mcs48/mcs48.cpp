@@ -1148,7 +1148,7 @@ void mcs48_cpu_device::device_start()
 		state_add(MCS48_PC,        "PC",        m_pc).mask(0xfff);
 		state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
-		state_add(STATE_GENSP,     "GENSP",     m_psw).mask(0x7).noshow();
+		state_add(MCS48_SP,        "SP",        m_psw).mask(0x7).noshow();
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%11s");
 		state_add(MCS48_A,         "A",         m_a);
 		state_add(MCS48_TC,        "TC",        m_timer);

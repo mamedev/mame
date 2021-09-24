@@ -33,6 +33,10 @@
 
 #pragma once
 
+#ifdef _MSC_VER
+ #define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
@@ -136,7 +140,7 @@ inline uint8_t count_leading_zeros(uint32_t value)
 inline uint8_t count_leading_zeros(uint32_t value)
 {
 	unsigned long index;
-	return _BitScanReverse(&index, value) ? (31U - index) : 32U;
+	return _BitScanReverse(&index, value) ? uint8_t(31U - index) : 32U;
 }
 
 #else
@@ -355,8 +359,8 @@ public:
 	void save(bool &data) { write(data ? 1 : 0); }
 	void save(int8_t &data) { write(data); }
 	void save(uint8_t &data) { write(data); }
-	void save(int16_t &data) { write(data).write(data >> 8); }
-	void save(uint16_t &data) { write(data).write(data >> 8); }
+	void save(int16_t &data) { write(uint8_t(data)).write(data >> 8); }
+	void save(uint16_t &data) { write(uint8_t(data)).write(data >> 8); }
 	void save(int32_t &data) { write(data).write(data >> 8).write(data >> 16).write(data >> 24); }
 	void save(uint32_t &data) { write(data).write(data >> 8).write(data >> 16).write(data >> 24); }
 	void save(envelope_state &data) { write(uint8_t(data)); }

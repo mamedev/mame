@@ -352,7 +352,7 @@ uint32_t midnrun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		m_k001005->draw(bitmap, cliprect);
 	}
-		
+
 	m_k056832->tilemap_draw_dj(screen, bitmap, cliprect, 0, 0, 0);
 
 	return 0;

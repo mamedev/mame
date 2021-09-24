@@ -45,7 +45,7 @@ inifile_manager::inifile_manager(ui_options &options)
 		if (core_filename_ends_with(name, ".ini"))
 		{
 			emu_file file(m_options.categoryini_path(), OPEN_FLAG_READ);
-			if (file.open(name) == osd_file::error::NONE)
+			if (!file.open(name))
 			{
 				init_category(std::move(name), file);
 				file.close();
@@ -63,7 +63,7 @@ void inifile_manager::load_ini_category(size_t file, size_t category, std::unord
 {
 	std::string const &filename(m_ini_index[file].first);
 	emu_file fp(m_options.categoryini_path(), OPEN_FLAG_READ);
-	if (fp.open(filename) != osd_file::error::NONE)
+	if (fp.open(filename))
 	{
 		osd_printf_error("Failed to open category file %s for reading\n", filename);
 		return;
@@ -216,7 +216,7 @@ favorite_manager::favorite_manager(ui_options &options)
 	, m_need_sort(true)
 {
 	emu_file file(m_options.ui_path(), OPEN_FLAG_READ);
-	if (file.open(FAVORITE_FILENAME) == osd_file::error::NONE)
+	if (!file.open(FAVORITE_FILENAME))
 	{
 		char readbuf[1024];
 		file.gets(readbuf, 1024);
@@ -537,7 +537,7 @@ void favorite_manager::save_favorites()
 {
 	// attempt to open the output file
 	emu_file file(m_options.ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open(FAVORITE_FILENAME) == osd_file::error::NONE)
+	if (!file.open(FAVORITE_FILENAME))
 	{
 		if (m_favorites.empty())
 		{

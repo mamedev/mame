@@ -128,7 +128,7 @@ enum
 #include "logmacro.h"
 
 // Hexbus instance
-DEFINE_DEVICE_TYPE_NS(IBC, bus::hexbus, ibc_device,  "ibc",  "Intelligent Peripheral Bus Controller")
+DEFINE_DEVICE_TYPE(IBC, bus::hexbus::ibc_device,  "hexbus_ibc",  "Intelligent Peripheral Bus Controller")
 
 namespace bus::hexbus {
 

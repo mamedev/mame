@@ -16,7 +16,7 @@
 
 #define BUFFRAM_TAG "buffered_ram"
 
-DEFINE_DEVICE_TYPE_NS(BUFF_RAM, bus::ti99::internal, buffered_ram_device, BUFFRAM_TAG, "Buffered SRAM")
+DEFINE_DEVICE_TYPE(BUFF_RAM, bus::ti99::internal::buffered_ram_device, BUFFRAM_TAG, "Buffered SRAM")
 
 namespace bus::ti99::internal {
 

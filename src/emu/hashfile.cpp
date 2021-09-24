@@ -27,10 +27,8 @@ static bool read_hash_config(const char *hash_path, const util::hash_collection 
 {
 	/* open a file */
 	emu_file file(hash_path, OPEN_FLAG_READ);
-	if (file.open(std::string(sysname) + ".hsi") != osd_file::error::NONE)
-	{
+	if (file.open(std::string(sysname) + ".hsi"))
 		return false;
-	}
 
 	pugi::xml_document doc;
 

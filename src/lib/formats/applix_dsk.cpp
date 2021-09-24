@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/applix_dsk.h"
 
 applix_format::applix_format() : wd177x_format(formats)

@@ -56,8 +56,6 @@ TAP - has an ID header of TAP_DGOS_BEE or MBEE, null terminated.
 
 ********************************************************************/
 
-#include <cassert>
-
 #include "mbee_cas.h"
 
 #define WAVEENTRY_LOW  -32768

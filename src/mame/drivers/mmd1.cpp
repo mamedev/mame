@@ -73,14 +73,19 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
+
 #include "speaker.h"
+
 #include "mmd1.lh"
 
+
+namespace {
 
 class mmd1_state : public driver_device
 {
@@ -90,6 +95,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
 		, m_uart(*this, "uart")
+		, m_lines(*this, "LINE%u", 1U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_p(*this, "p%u_%u", 0U, 0U)
 	{ }
@@ -98,9 +104,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	void round_leds_w(offs_t offset, u8 data);
 	u8 keyboard_r();
 	u8 port13_r();
@@ -119,6 +127,7 @@ private:
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<ay31015_device> m_uart;
+	required_ioport_array<2> m_lines;
 	output_finder<9> m_digits;
 	output_finder<3, 8> m_p;
 };
@@ -134,21 +143,20 @@ void mmd1_state::round_leds_w(offs_t offset, u8 data)
 // keyboard has a keydown and a keyup code. Keyup = last keydown + bit 7 set
 u8 mmd1_state::keyboard_r()
 {
-	u8 line1 = ioport("LINE1")->read();
-	u8 line2 = ioport("LINE2")->read();
-	u8 i, data = 0xff;
+	const u8 line1 = m_lines[0]->read();
+	const u8 line2 = m_lines[1]->read();
+	u8 data = 0xff;
 
-
-	for (i = 0; i < 8; i++)
+	for (unsigned i = 0; i < 8; i++)
 	{
 		if (!BIT(line1, i))
 			data = i;
 	}
 
-	for (i = 0; i < 8; i++)
+	for (unsigned i = 0; i < 8; i++)
 	{
 		if (!BIT(line2, i))
-			data = i+8;
+			data = i + 8;
 	}
 
 	if (data < 0x10)
@@ -335,6 +343,9 @@ ROM_START( mmd1 )
 	ROM_LOAD( "kex.ic15",    0x0000, 0x0100, CRC(434f6923) SHA1(a2af60deda54c8d3f175b894b47ff554eb37e9cb))
 	ROM_LOAD( "prom1.ic16",  0x0100, 0x0100, BAD_DUMP CRC(d23a6ac3) SHA1(469d981b635058dd23e843a3efc555316f87ece4) )     // Typed in by hand from the manual
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

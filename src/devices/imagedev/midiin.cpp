@@ -129,7 +129,7 @@ image_init_result midiin_device::call_load()
 {
 	// attempt to load if it's a real file
 	m_err = load_image_by_path(OPEN_FLAG_READ, filename());
-	if (m_err == IMAGE_ERROR_SUCCESS)
+	if (!m_err)
 	{
 		// if the parsing succeeds, schedule the start to happen at least
 		// 10 seconds after starting to allow the keyboards to initialize

@@ -710,7 +710,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="yakyukyo" supported="no">
-		<description>Yakyu Kyo</description>
+		<description>Yakyuu Kyou</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198508xx"/>
@@ -723,7 +723,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="yakyukyoa" cloneof="yakyukyo" supported="no">
-		<description>Yakyu Kyo (Alt)</description>
+		<description>Yakyuu Kyou (Alt)</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198508xx"/>
@@ -2050,7 +2050,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="yumepyak">
-		<description>Yume no Pro Yakyu</description>
+		<description>Yume no Pro Yakyuu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="夢のプロ野球"/>

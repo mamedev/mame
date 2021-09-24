@@ -68,7 +68,6 @@ public:
 	// game-specific driver init
 	void init_generic();
 	void init_sharrier();
-	void init_enduror();
 	void init_endurobl();
 	void init_endurob2();
 
@@ -90,8 +89,11 @@ private:
 	// Z80 sound CPU read/write handlers
 	uint8_t sound_data_r();
 
-	// I8751-related VBLANK interrupt handlers
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	// I8751
+	uint8_t i8751_r(offs_t offset);
+	void i8751_w(offs_t offset, uint8_t data);
+	void i8751_p1_w(uint8_t data);
+	uint8_t m_i8751_addr;
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -108,9 +110,6 @@ private:
 	void sound_portmap_2203x2(address_map &map);
 	void sub_map(address_map &map);
 
-	// internal types
-	typedef delegate<void ()> i8751_sim_delegate;
-
 	// timer IDs
 	enum
 	{
@@ -123,9 +122,6 @@ private:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// I8751 simulations
-	void sharrier_i8751_sim();
 
 	// devices
 	required_device<m68000_device> m_maincpu;
@@ -146,7 +142,6 @@ private:
 
 	// configuration
 	bool                    m_sharrier_video;
-	i8751_sim_delegate      m_i8751_vblank_hook;
 
 	// internal state
 	uint8_t                   m_adc_select;

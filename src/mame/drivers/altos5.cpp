@@ -10,20 +10,23 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
-#include "machine/z80daisy.h"
+#include "imagedev/snapquik.h"
+#include "machine/clock.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/z80dma.h"
-#include "machine/wd_fdc.h"
-#include "machine/clock.h"
+
 #include "softlist.h"
 
-#include "imagedev/snapquik.h"
 
+namespace {
 
 class altos5_state : public driver_device
 {
@@ -37,11 +40,15 @@ public:
 		, m_p_prom(*this, "proms")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
-		, m_bankr(*this, "bankr%d", 0)
-		, m_bankw(*this, "bankw%d", 0)
+		, m_bankr(*this, "bankr%x", 0)
+		, m_bankw(*this, "bankw%x", 0)
 	{ }
 
 	void altos5(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -69,8 +76,6 @@ private:
 	floppy_image_device *m_floppy;
 	std::unique_ptr<u8[]> m_ram;  // main ram 192k
 	std::unique_ptr<u8[]> m_dummy;  // for wrpt
-	void machine_reset() override;
-	void machine_start() override;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80dma_device> m_dma;
@@ -86,22 +91,22 @@ private:
 void altos5_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
-	map(0x1000, 0x1fff).bankr("bankr1").bankw("bankw1");
-	map(0x2000, 0x2fff).bankr("bankr2").bankw("bankw2");
-	map(0x3000, 0x3fff).bankr("bankr3").bankw("bankw3");
-	map(0x4000, 0x4fff).bankr("bankr4").bankw("bankw4");
-	map(0x5000, 0x5fff).bankr("bankr5").bankw("bankw5");
-	map(0x6000, 0x6fff).bankr("bankr6").bankw("bankw6");
-	map(0x7000, 0x7fff).bankr("bankr7").bankw("bankw7");
-	map(0x8000, 0x8fff).bankr("bankr8").bankw("bankw8");
-	map(0x9000, 0x9fff).bankr("bankr9").bankw("bankw9");
-	map(0xa000, 0xafff).bankr("bankr10").bankw("bankw10");
-	map(0xb000, 0xbfff).bankr("bankr11").bankw("bankw11");
-	map(0xc000, 0xcfff).bankr("bankr12").bankw("bankw12");
-	map(0xd000, 0xdfff).bankr("bankr13").bankw("bankw13");
-	map(0xe000, 0xefff).bankr("bankr14").bankw("bankw14");
-	map(0xf000, 0xffff).bankr("bankr15").bankw("bankw15");
+	map(0x0000, 0x0fff).bankr(m_bankr[0x0]).bankw(m_bankw[0x0]);
+	map(0x1000, 0x1fff).bankr(m_bankr[0x1]).bankw(m_bankw[0x1]);
+	map(0x2000, 0x2fff).bankr(m_bankr[0x2]).bankw(m_bankw[0x2]);
+	map(0x3000, 0x3fff).bankr(m_bankr[0x3]).bankw(m_bankw[0x3]);
+	map(0x4000, 0x4fff).bankr(m_bankr[0x4]).bankw(m_bankw[0x4]);
+	map(0x5000, 0x5fff).bankr(m_bankr[0x5]).bankw(m_bankw[0x5]);
+	map(0x6000, 0x6fff).bankr(m_bankr[0x6]).bankw(m_bankw[0x6]);
+	map(0x7000, 0x7fff).bankr(m_bankr[0x7]).bankw(m_bankw[0x7]);
+	map(0x8000, 0x8fff).bankr(m_bankr[0x8]).bankw(m_bankw[0x8]);
+	map(0x9000, 0x9fff).bankr(m_bankr[0x9]).bankw(m_bankw[0x9]);
+	map(0xa000, 0xafff).bankr(m_bankr[0xa]).bankw(m_bankw[0xa]);
+	map(0xb000, 0xbfff).bankr(m_bankr[0xb]).bankw(m_bankw[0xb]);
+	map(0xc000, 0xcfff).bankr(m_bankr[0xc]).bankw(m_bankw[0xc]);
+	map(0xd000, 0xdfff).bankr(m_bankr[0xd]).bankw(m_bankw[0xd]);
+	map(0xe000, 0xefff).bankr(m_bankr[0xe]).bankw(m_bankw[0xe]);
+	map(0xf000, 0xffff).bankr(m_bankr[0xf]).bankw(m_bankw[0xf]);
 }
 
 void altos5_state::io_map(address_map &map)
@@ -453,6 +458,9 @@ ROM_START( altos5 )
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("82s141.bin", 0x0000, 0x0200, CRC(35c8078c) SHA1(dce24374bfcc5d23959e2c03485d82a119c0c3c9)) // banking control
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 
