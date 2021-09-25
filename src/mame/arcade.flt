@@ -1524,10 +1524,11 @@ zwackery.cpp
 -ng_mv2f
 -ng_mv4f
 //saturn.cpp
--saturn
--saturnjp
--saturneu
--vsaturn
 -hisaturn
+-saturn
+-saturneu
+-saturnjp
+-saturnkr
+-vsaturn
 //vectrex.cpp
 -vectrex
