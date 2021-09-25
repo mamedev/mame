@@ -30488,7 +30488,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="radracr2" supported="partial">
+	<software name="radracr2">
 		<description>Rad Racer II (USA)</description>
 		<year>1990</year>
 		<publisher>Square</publisher>
@@ -53095,6 +53095,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mirroring" value="4screen" />
 			<dataarea name="chr" size="131072">
 				<rom name="jurassic boy 2 (asia) (unl).chr" size="131072" crc="6f043956" sha1="30b107c995edd9b986a496d54d7581f5a6e187ce" offset="00000" status="baddump" />
 			</dataarea>
@@ -53129,6 +53130,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mirroring" value="4screen" />
 			<dataarea name="chr" size="262144">
 				<rom name="rocman x (asia) (unl).chr" size="262144" crc="dcb06887" sha1="5e846b18a5caf16b1fb384a08b13b2e08d7a45e6" offset="00000" status="baddump" />
 			</dataarea>
@@ -53146,6 +53148,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mirroring" value="4screen" />
 			<dataarea name="chr" size="262144">
 				<rom name="rocman x (sachen) (japan).chr" size="262144" crc="5da2317a" sha1="ba45052ed4a2d8dc1320e6ec0ade293493322c4a" offset="00000" status="baddump" />
 			</dataarea>
