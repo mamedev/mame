@@ -633,7 +633,7 @@ stream_buffer::sample_t votrax_sc01_device::analog_calc()
 	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b);
 	shift_hist(vn, m_vn_6);
 
-	return vn*1.5;
+	return vn*0.35;
 }
 
 /*

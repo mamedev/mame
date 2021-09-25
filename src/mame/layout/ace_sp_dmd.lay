@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<element name="dotmatrixdot">
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+		<disk>
+			<color state="1" red="1.0" green="1.0" blue="1.0" />
+			<color state="0" red="0.125" green="0.125" blue="0.125" />
+		</disk>
+	</element>
+	
+	<group name="dmd">
+		<repeat count="24">
+			<param name="s" start="0" increment="64" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="64">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="0" increment="1" />
+				<element name="dotmatrix~n~" ref="dotmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="0.12" blue="0.12" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<view name="AWP Simulated Video">
+		<group ref="dmd">
+			<bounds x="0" y="0" width="520" height="168" />
+		</group>
+	</view>
+
+</mamelayout>

@@ -147,7 +147,7 @@ chd_file *hard_disk_get_chd(hard_disk_file *file)
  *
  * @brief   Hard disk get information.
  *
- * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  file    The hard disk file object to operate on.
  *
  * @return  null if it fails, else a hard_disk_info*.
  */
@@ -168,9 +168,9 @@ hard_disk_info *hard_disk_get_info(hard_disk_file *file)
  *
  * @brief   Hard disk read.
  *
- * @param [in,out]  file    If non-null, the file.
- * @param   lbasector       The lbasector.
- * @param [in,out]  buffer  If non-null, the buffer.
+ * @param [in,out]  file    The hard disk file object to operate on.
+ * @param   lbasector       The sector number (Linear Block Address) to read.
+ * @param   buffer          The buffer where the hard disk data will be placed.
  *
  * @return  An uint32_t.
  */
@@ -202,9 +202,9 @@ uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer)
  *
  * @brief   Hard disk write.
  *
- * @param [in,out]  file    If non-null, the file.
- * @param   lbasector       The lbasector.
- * @param   buffer          The buffer.
+ * @param [in,out]  file    The hard disk file object to operate on.
+ * @param   lbasector       The sector number (Linear Block Address) to write.
+ * @param   buffer          The buffer containing the data to write.
  *
  * @return  An uint32_t.
  */
@@ -223,4 +223,42 @@ uint32_t hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *b
 		actual = file->fhandle->write(buffer, file->info.sectorbytes);
 		return (actual == file->info.sectorbytes);
 	}
+}
+
+/*-------------------------------------------------
+    hard_disk_set_block_size - sets the block size
+    for a non-CHD-backed hard disk (a bare file).
+-------------------------------------------------*/
+
+/**
+ * @fn  bool hard_disk_set_block_size(hard_disk_file *file, uint32_t blocksize)
+ *
+ * @brief   Hard disk set block size (works only for non-CHD-files)
+ *
+ * @param [in,out]  file    The hard_disk_file object to operate on.
+ * @param   blocksize       The block size of this hard disk, in bytes.
+ *
+ * @return  true on success, false on failure.  Failure means a CHD is in use and the CHD
+ *          block size does not match the passed in size.  If a CHD is in use and the block
+ *          sizes match, success is returned).
+ */
+
+bool hard_disk_set_block_size(hard_disk_file *file, uint32_t blocksize)
+{
+	if (file->chd)
+	{
+		// if the CHD block size matches our block size, we're OK.
+		if (file->chd->unit_bytes() == blocksize)
+		{
+			return true;
+		}
+
+		// indicate failure, since we can't change the block size of a CHD.
+		return false;
+	}
+	else
+	{
+		file->info.sectorbytes = blocksize;
+	}
+	return true;
 }

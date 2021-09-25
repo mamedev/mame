@@ -833,6 +833,7 @@ private:
 
 	stream_buffer::sample_t m_compressor_scale; // current compressor scale factor
 	int m_compressor_counter;             // compressor update counter for backoff
+	bool m_compressor_enabled;            // enable compressor (it will still be calculated for detecting overdrive)
 
 	u8 m_muted;                           // bitmask of muting reasons
 	bool m_nosound_mode;                  // true if we're in "nosound" mode

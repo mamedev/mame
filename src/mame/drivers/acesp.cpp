@@ -4,59 +4,120 @@
  sp.ACE system by ACE
  based roughly on the Mach2000 hardware used by Castle
 
- skeleton driver!
+ Skeleton driver!
 
- should all games have OKI roms? are most missing?
- I think it was optional, some probably just use the AY..
+ Some games have OKI sample ROMs, others just use the AYs,
+ this depends on the additional plug-in boards.
+ We need to verify which is which as some samples could be missing
 
- has an undumped 'reel processor' (68705 like Mach2000?)
+ Some manufacturers, such as PCP, also used this hardware with
+ different reel controllers etc.
 
  based on internal accesses it seems to use a 6303Y (like Mach2000)
  which does NOT have the same internal map as a 6303R
+
+ some ROMsets here contain a single larger ROM instead of 2 smaller
+ ones, these need verifying to make sure they contain unique data
+ and removing if they do not.
+
 */
 
 
 #include "emu.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
+
+#include "machine/ace_sp_reelctrl.h"
+
+#include "ace_sp_dmd.lh"
 
 class ace_sp_state : public driver_device
 {
 public:
 	ace_sp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_dmdram(*this, "dmdram")
+		, m_sevensegram(*this, "sevensegram")
+		, m_dmd(*this, "dotmatrix%u", 0U)
+		, m_maincpu(*this, "maincpu")
+		, m_reelctrl(*this, "reelctrl")
 	{ }
 
 	void ace_sp(machine_config &config);
+	void ace_sp_pcp(machine_config &config);
 
 	void init_ace_sp();
 	void init_ace_cr();
 
 private:
+	void machine_start() override;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(gen_fixfreq);
+
 	void ace_sp_map(address_map &map);
 
+	void dmd_w(offs_t offset, uint8_t data);
+	void sevenseg_w(offs_t offset, uint8_t data);
+
+	uint8_t serial_r(offs_t offset);
+	void serial_w(offs_t offset, uint8_t data);
+
+	required_shared_ptr<uint8_t> m_dmdram;
+	required_shared_ptr<uint8_t> m_sevensegram;
+
+	output_finder<1536> m_dmd;
+
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<hd6303y_cpu_device> m_maincpu;
+	required_device<ace_sp_reelctrl_base_device> m_reelctrl;
 };
 
 
 
+void ace_sp_state::machine_start()
+{
+	m_dmd.resolve();
+}
 
+void ace_sp_state::dmd_w(offs_t offset, uint8_t data)
+{
+	m_dmdram[offset] = data;
+
+	for (int i = 0; i < 8; i++)
+		m_dmd[(offset * 8) + i] = (data >> i) & 1;
+}
+
+void ace_sp_state::sevenseg_w(offs_t offset, uint8_t data)
+{
+	m_sevensegram[offset] = data;
+}
+
+uint8_t ace_sp_state::serial_r(offs_t offset)
+{
+	logerror("%s: serial_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+void ace_sp_state::serial_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: serial_w %02x\n", machine().describe_context(), data);
+}
 
 void ace_sp_state::ace_sp_map(address_map &map)
 {
 	/**** 6303Y internal area ****/
 	//----- 0x0000 - 0x0027 is internal registers -----
-	map(0x0000, 0x0027).ram();
+	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
 	//----- 0x0028 - 0x003f is external access -----
-	// 0x30 - reels write
+	// 0x30 - to/from reel MCU
 	// 0x31 - lamp high
 	// 0x32 - lamp low
 	// 0x33 - lamp stb
 	// 0x34 - shift stb
 	// 0x35 - shift clk
-	// 0x36 - sio
+	map(0x36, 0x36).ram().rw(FUNC(ace_sp_state::serial_r), FUNC(ace_sp_state::serial_w)); 	// 0x36 - sio
+ 
 	// 0x37 - watchdog?
 	map(0x0038, 0x003b).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	/* 0x3c */
@@ -66,9 +127,11 @@ void ace_sp_state::ace_sp_map(address_map &map)
 	//----- 0x0040 - 0x013f is internal RAM (256 bytes) -----
 	map(0x0040, 0x013f).ram();
 
-
 	/**** regular map ****/
-	map(0x0140, 0x1fff).ram();
+	map(0x0140, 0x1eff).ram();
+	map(0x1f00, 0x1fbf).ram().w(FUNC(ace_sp_state::dmd_w)).share("dmdram");  // DMD controller shares the RAM? or does this get uploaded somewhere?
+	map(0x1fc0, 0x1fff).ram().w(FUNC(ace_sp_state::sevenseg_w)).share("sevensegram");
+
 	map(0x2000, 0xffff).rom();
 }
 
@@ -85,19 +148,45 @@ void ace_sp_state::ace_sp_portmap(address_map &map)
 static INPUT_PORTS_START( ace_sp )
 INPUT_PORTS_END
 
+TIMER_DEVICE_CALLBACK_MEMBER(ace_sp_state::gen_fixfreq)
+{
+	// 6303Y must take vector 0xffea periodically, as amongst other things it clears a counter
+	// in RAM which is increased in one of the other interrupts, with a time-out check which
+	// will cause the game to jump back to the reset vector if it fails
+	//
+	// adding code to the core to generate it at the moment then causes a stack overflow issue
+	// instead, which again the code checks for, and resets if the stack grows too large
+
+	//m_maincpu->force_irq2();
+}
 
 void ace_sp_state::ace_sp(machine_config &config)
 {
-	HD6303Y(config, m_maincpu, 1000000);
+	HD6303Y(config, m_maincpu, 2000000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &ace_sp_state::ace_sp_map);
 
 	PIA6821(config, "pia0", 0);
+
+	// unknown frequency
+	TIMER(config, "fixedfreq").configure_periodic(FUNC(ace_sp_state::gen_fixfreq), attotime::from_hz(50));
+
+	ACE_SP_REELCTRL(config, m_reelctrl, 2000000); // unknown clock
+
+	config.set_default_layout(layout_ace_sp_dmd);
 }
+
+void ace_sp_state::ace_sp_pcp(machine_config &config)
+{
+	ace_sp(config);
+
+	ACE_SP_REELCTRL_PCP(config.replace(), m_reelctrl, 2000000);
+}
+
 
 
 #define SP_CBOWL_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cashbowlsnd1.bin", 0x0000, 0x80000, CRC(44e67cef) SHA1(3cfe48122da527e82f9058e0c5b81b5096bf4181) ) \
+	ROM_LOAD( "cashbowlsnd1.bin", 0x00000, 0x80000, CRC(44e67cef) SHA1(3cfe48122da527e82f9058e0c5b81b5096bf4181) ) \
 	ROM_LOAD( "cashbowlsnd2.bin", 0x80000, 0x80000, CRC(a28291a2) SHA1(c07b585cee89bc35c880d24eb6124796d6df423c) )
 ROM_START( sp_cbowl )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -122,7 +211,7 @@ ROM_END
 
 ROM_START( sp_cbowlc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "cb.bin", 0x0000, 0x010000, CRC(dc454e67) SHA1(57f470fbb44fe50c9c8068bbcdc9b41c617b0d82) ) // just a merged rom?
+	ROM_LOAD( "cb.bin", 0x00000, 0x10000, CRC(dc454e67) SHA1(57f470fbb44fe50c9c8068bbcdc9b41c617b0d82) ) // just a merged rom?
 	SP_CBOWL_SOUND
 ROM_END
 
@@ -326,7 +415,7 @@ ROM_END
 
 #define SP_EMMRD_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "edsnd1.bin", 0x0000, 0x80000, CRC(e91382d7) SHA1(499a0606e9bbabcf207c8778323899b7b81ae372) ) \
+	ROM_LOAD( "edsnd1.bin", 0x00000, 0x80000, CRC(e91382d7) SHA1(499a0606e9bbabcf207c8778323899b7b81ae372) ) \
 	ROM_LOAD( "edsnd2.bin", 0x80000, 0x80000, CRC(0e103080) SHA1(2dcfcb35d04f34e4bc6da32f2d23bd8685654f8e) )
 
 
@@ -416,13 +505,13 @@ ROM_END
 
 ROM_START( sp_emmrdn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0015rp50.bin", 0x0000, 0x010000, CRC(e37fa624) SHA1(3d7e09a259ed53a88cd4c9dc2e39b1aadb7049c7) ) // just a merged rom?
+	ROM_LOAD( "0015rp50.bin", 0x00000, 0x10000, CRC(e37fa624) SHA1(3d7e09a259ed53a88cd4c9dc2e39b1aadb7049c7) ) // just a merged rom?
 	SP_EMMRD_SOUND
 ROM_END
 
 ROM_START( sp_emmrdo )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0015rp60.bin", 0x0000, 0x010000, CRC(b27378c8) SHA1(dd8dfc587d0c051d1144f4b0205bd8d4a28ceaaf) ) // just a merged rom?
+	ROM_LOAD( "0015rp60.bin", 0x00000, 0x10000, CRC(b27378c8) SHA1(dd8dfc587d0c051d1144f4b0205bd8d4a28ceaaf) ) // just a merged rom?
 	SP_EMMRD_SOUND
 ROM_END
 
@@ -636,13 +725,13 @@ ROM_END
 
 ROM_START( sp_zigzgl )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0013rp50.bin", 0x0000, 0x010000, CRC(5e7ba11a) SHA1(30477ff930e9f23bf32a5bdf8573fc47ed26773d) ) // just a merged rom?
+	ROM_LOAD( "0013rp50.bin", 0x00000, 0x10000, CRC(5e7ba11a) SHA1(30477ff930e9f23bf32a5bdf8573fc47ed26773d) ) // just a merged rom?
 	SP_ZIGZAG_SOUND
 ROM_END
 
 ROM_START( sp_zigzgm )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0013rp60.bin", 0x0000, 0x010000, CRC(fb439994) SHA1(0820cf663ed5f9600d4e0313a7b3c6f8b28db471) ) // just a merged rom?
+	ROM_LOAD( "0013rp60.bin", 0x00000, 0x10000, CRC(fb439994) SHA1(0820cf663ed5f9600d4e0313a7b3c6f8b28db471) ) // just a merged rom?
 	SP_ZIGZAG_SOUND
 ROM_END
 
@@ -860,13 +949,13 @@ ROM_END
 
 ROM_START( sp_goldm2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0017rp40.bin", 0x0000, 0x010000, CRC(6cdd6c14) SHA1(ef57586a770c0693eb16b381356a90040ab000a6) ) // merged rom?
+	ROM_LOAD( "0017rp40.bin", 0x00000, 0x10000, CRC(6cdd6c14) SHA1(ef57586a770c0693eb16b381356a90040ab000a6) ) // merged rom?
 	SP_GOLDM_SOUND
 ROM_END
 
 ROM_START( sp_goldm3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0017rp50.bin", 0x0000, 0x010000, CRC(56e77a5d) SHA1(5eae450637f5e57a08e67306d394a03ad18093aa) )
+	ROM_LOAD( "0017rp50.bin", 0x00000, 0x10000, CRC(56e77a5d) SHA1(5eae450637f5e57a08e67306d394a03ad18093aa) )
 	SP_GOLDM_SOUND
 ROM_END
 
@@ -1306,7 +1395,7 @@ ROM_END
 
 #define SP_JURAS_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "jt8_snd1.bin", 0x0000, 0x80000, CRC(54f02e21) SHA1(1f2142e3cad828f3f07b729ad8394392c3a5ef46) ) \
+	ROM_LOAD( "jt8_snd1.bin", 0x00000, 0x80000, CRC(54f02e21) SHA1(1f2142e3cad828f3f07b729ad8394392c3a5ef46) ) \
 	ROM_LOAD( "jt8_snd2.bin", 0x80000, 0x80000, CRC(6ae75d87) SHA1(f6a73c26f7715b2a2d69b05d7729571b05b2fdaa) )
 
 ROM_START( sp_juras )
@@ -1466,15 +1555,15 @@ ROM_END
 	/* not used, or missing? */
 ROM_START( sp_playa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "playitagain-v1-6pound1.bin", 0x0000, 0x8000, CRC(e377e7af) SHA1(4ca7c8ddd15791f4d45bebe861fd3c193c7227e0) )
-	ROM_LOAD( "playitagain-v1-6pound2.bin", 0x8000, 0x8000, CRC(7bab5c33) SHA1(46bc6fe7d5cdd998fc1e4e9a4b1a6a95cd160cf0) )
+	ROM_LOAD( "playitagain-v1-6pound2.bin", 0x0000, 0x8000, CRC(7bab5c33) SHA1(46bc6fe7d5cdd998fc1e4e9a4b1a6a95cd160cf0) )
+	ROM_LOAD( "playitagain-v1-6pound1.bin", 0x8000, 0x8000, CRC(e377e7af) SHA1(4ca7c8ddd15791f4d45bebe861fd3c193c7227e0) )
 	SP_PLAYA_SOUND
 ROM_END
 
 ROM_START( sp_playaa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "575 pask p3.2.bin", 0x0000, 0x8000, CRC(f7d2d40d) SHA1(83e4e83217fef8d92bcba3edf1250d09243f9f79) )
-	ROM_LOAD( "575 pa p3.1.bin", 0x0000, 0x8000, CRC(9e51ff86) SHA1(a2da9eee6b5f7211296e8633e5ec8eeec8ec77fd) )
+	ROM_LOAD( "575 pa p3.1.bin", 0x8000, 0x8000, CRC(9e51ff86) SHA1(a2da9eee6b5f7211296e8633e5ec8eeec8ec77fd) )
 	SP_PLAYA_SOUND
 ROM_END
 
@@ -1537,7 +1626,7 @@ ROM_END
 
 #define SP_SPELL_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "spellboundsnd1.bin", 0x0000, 0x80000, CRC(ab462981) SHA1(a88728eb8c5dbf114007551c7b5d4eb06cc7eb0b) ) \
+	ROM_LOAD( "spellboundsnd1.bin", 0x00000, 0x80000, CRC(ab462981) SHA1(a88728eb8c5dbf114007551c7b5d4eb06cc7eb0b) ) \
 	ROM_LOAD( "spellboundsnd2.bin", 0x80000, 0x80000, CRC(9ada4413) SHA1(2dc9b42cdd3a64b5e5d3eab0d68b109258d12eda) )
 
 ROM_START( sp_spell )
@@ -1598,13 +1687,13 @@ ROM_END
 
 ROM_START( sp_spelli )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0009p5.bin", 0x0000, 0x010000, CRC(5d94418e) SHA1(92a9b6deed307b99bb57193d9974a0b4d76ee569) ) // merged rom
+	ROM_LOAD( "0009p5.bin", 0x00000, 0x10000, CRC(5d94418e) SHA1(92a9b6deed307b99bb57193d9974a0b4d76ee569) ) // merged rom
 	SP_SPELL_SOUND
 ROM_END
 
 ROM_START( sp_spellj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0009p6.bin", 0x0000, 0x010000, CRC(1b55acee) SHA1(8364cf5b1c1d50f10e1e80031e9b8a587ec0bd39) ) // merged rom
+	ROM_LOAD( "0009p6.bin", 0x00000, 0x10000, CRC(1b55acee) SHA1(8364cf5b1c1d50f10e1e80031e9b8a587ec0bd39) ) // merged rom
 	SP_SPELL_SOUND
 ROM_END
 
@@ -1980,13 +2069,13 @@ ROM_END
 
 ROM_START( sp_tzfet )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0011rp40.bin", 0x0000, 0x010000, CRC(80600391) SHA1(d45e909bfe26e18047ece19bb8004f14a3388427) ) // merged rom?
+	ROM_LOAD( "0011rp40.bin", 0x00000, 0x10000, CRC(80600391) SHA1(d45e909bfe26e18047ece19bb8004f14a3388427) ) // merged rom?
 	SP_TZFE_SOUND
 ROM_END
 
 ROM_START( sp_tzfeu )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0011rp50.bin", 0x0000, 0x010000, CRC(0ad67cf0) SHA1(b4b436f1f0f0b9a0b50013f85c21f203bf8528d0) ) // merged rom
+	ROM_LOAD( "0011rp50.bin", 0x00000, 0x10000, CRC(0ad67cf0) SHA1(b4b436f1f0f0b9a0b50013f85c21f203bf8528d0) ) // merged rom
 	SP_TZFE_SOUND
 ROM_END
 
@@ -2114,7 +2203,7 @@ ROM_END
 
 ROM_START( sp_brkbkd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0008p6.bin", 0x0000, 0x010000, CRC(4fc20e58) SHA1(4530998a60731283430801028a59b7a4fbd3f1bc) ) // merged rom
+	ROM_LOAD( "0008p6.bin", 0x00000, 0x10000, CRC(4fc20e58) SHA1(4530998a60731283430801028a59b7a4fbd3f1bc) ) // merged rom
 	SP_BRKBK_SOUND
 ROM_END
 
@@ -2427,56 +2516,56 @@ ROM_END
 ROM_START( sp_donky )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2b", 0x0000, 0x8000, CRC(49c60006) SHA1(9a4964df1238f267cdf05fa063f7de8b5716da10) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkya )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2c", 0x0000, 0x8000, CRC(c482c400) SHA1(dc5087260772807725ce08e7fd89ee5c19406fe5) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyb )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2d", 0x0000, 0x8000, CRC(4fd3db89) SHA1(f1233adfbfd95c87ebf7706bb242b7297947699c) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2e", 0x0000, 0x8000, CRC(c2971f8f) SHA1(c14db5294c397148293c496d52ac0b41067952b2) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2f", 0x0000, 0x8000, CRC(05e1c1df) SHA1(c00fe8553eac50229dc6bf2a5016c353fcb61c82) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkye )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2g", 0x0000, 0x8000, CRC(88a505d9) SHA1(0d10f8e102daddde840b582cb962270f6180a399) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyf )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2h", 0x0000, 0x8000, CRC(03f41a50) SHA1(907a947449a7dccfff00dca2536e0bc230b5771d) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
 ROM_START( sp_donkyg )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "dd663p2i", 0x0000, 0x8000, CRC(8eb0de56) SHA1(6411e9008b09f9387622911e09d954dc7e89c6cf) )
-	ROM_LOAD( "dd663p2a", 0x0000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
+	ROM_LOAD( "dd663p2a", 0x8000, 0x8000, CRC(9a477e7e) SHA1(d6206495c1a75ac2c1ce51f24ca18898916b6e11) )
 	SP_DONKY_SOUND
 ROM_END
 
@@ -2500,7 +2589,7 @@ ROM_END
 
 ROM_START( sp_festi )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0001rp10.bin", 0x0000, 0x010000, CRC(e584c26e) SHA1(dc48e27895c5c0b2004f6bc74ec0bdfa24af9613) ) // merged rom
+	ROM_LOAD( "0001rp10.bin", 0x00000, 0x10000, CRC(e584c26e) SHA1(dc48e27895c5c0b2004f6bc74ec0bdfa24af9613) ) // merged rom
 	SP_FESTI_SOUND
 ROM_END
 
@@ -2771,7 +2860,7 @@ ROM_END
 	/* not used, or missing? */
 ROM_START( sp_gol )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "gl706p04.bin", 0x0000, 0x010000, CRC(01a48714) SHA1(0a48cfad05905450aa2a7c9dc22f937377894ff0) ) // merged rom
+	ROM_LOAD( "gl706p04.bin", 0x00000, 0x10000, CRC(01a48714) SHA1(0a48cfad05905450aa2a7c9dc22f937377894ff0) ) // merged rom
 	SP_GOL_SOUND
 ROM_END
 
@@ -2840,26 +2929,26 @@ ROM_END
 ROM_START( sp_goldse )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "724p2-0b.bin", 0x0000, 0x8000, CRC(39c3a458) SHA1(6fe06283e8d942c3fa851a29c069dbcf4a9f07a5) )
-	ROM_LOAD( "724p2-0a.bin", 0x0000, 0x8000, CRC(26c9e283) SHA1(7b817b89ff751c068de4c76ee1ddb68183bca5c8) )
+	ROM_LOAD( "724p2-0a.bin", 0x8000, 0x8000, CRC(26c9e283) SHA1(7b817b89ff751c068de4c76ee1ddb68183bca5c8) )
 	SP_GOLDS_SOUND
 ROM_END
 
 ROM_START( sp_goldsf )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "724p2-0z.bin", 0x0000, 0x8000, CRC(1219607f) SHA1(c5b4b92a237884df5cc4ca5d5563c9b66b183fa5) )
-	ROM_LOAD( "724p2-0a.bin", 0x0000, 0x8000, CRC(26c9e283) SHA1(7b817b89ff751c068de4c76ee1ddb68183bca5c8) )
+	ROM_LOAD( "724p2-0a.bin", 0x8000, 0x8000, CRC(26c9e283) SHA1(7b817b89ff751c068de4c76ee1ddb68183bca5c8) )
 	SP_GOLDS_SOUND
 ROM_END
 
 ROM_START( sp_goldsg )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0021rp30.bin", 0x0000, 0x010000, CRC(3228013a) SHA1(dcf41ddd3003804062cde928bcb5bc409fa66c75) )
+	ROM_LOAD( "0021rp30.bin", 0x00000, 0x10000, CRC(3228013a) SHA1(dcf41ddd3003804062cde928bcb5bc409fa66c75) )
 	SP_GOLDS_SOUND
 ROM_END
 
 ROM_START( sp_goldsh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0022rp30.bin", 0x0000, 0x010000, CRC(28b80866) SHA1(9f8af3d5cb6a03cba5ba37f2177390eef2950eb4) )
+	ROM_LOAD( "0022rp30.bin", 0x00000, 0x10000, CRC(28b80866) SHA1(9f8af3d5cb6a03cba5ba37f2177390eef2950eb4) )
 	SP_GOLDS_SOUND
 ROM_END
 
@@ -2959,7 +3048,7 @@ ROM_END
 	/* not used, or missing? */
 ROM_START( sp_lotto )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "sp705p14.bin", 0x0000, 0x010000, CRC(46a8a503) SHA1(39d40c6d34ec1879b037d13b47e648ae09f345d8) ) // merged rom
+	ROM_LOAD( "sp705p14.bin", 0x00000, 0x10000, CRC(46a8a503) SHA1(39d40c6d34ec1879b037d13b47e648ae09f345d8) ) // merged rom
 	SP_LOTTO_SOUND
 ROM_END
 
@@ -3060,7 +3149,7 @@ ROM_END
 
 ROM_START( sp_megmog )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0004p6.bin", 0x0000, 0x010000, CRC(fcfa212d) SHA1(968cc358450d85e6fd4e3086347be7d34d68e012) ) // merged rom
+	ROM_LOAD( "0004p6.bin", 0x00000, 0x10000, CRC(fcfa212d) SHA1(968cc358450d85e6fd4e3086347be7d34d68e012) ) // merged rom
 	SP_MEGMO_SOUND
 ROM_END
 
@@ -3287,13 +3376,13 @@ ROM_END
 
 ROM_START( sp_onboxm )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0016rp40.bin", 0x0000, 0x010000, CRC(591e3e24) SHA1(b147bfc19aa46eb3237b270d771031caaf978850) ) // merged rom
+	ROM_LOAD( "0016rp40.bin", 0x00000, 0x10000, CRC(591e3e24) SHA1(b147bfc19aa46eb3237b270d771031caaf978850) ) // merged rom
 	SP_ONBOX_SOUND
 ROM_END
 
 ROM_START( sp_onboxn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0016rp50.bin", 0x0000, 0x010000, CRC(73c5c449) SHA1(453969ec5c4fe1ce8f118110106e31126a358cda) ) // merged rom
+	ROM_LOAD( "0016rp50.bin", 0x00000, 0x10000, CRC(73c5c449) SHA1(453969ec5c4fe1ce8f118110106e31126a358cda) ) // merged rom
 	SP_ONBOX_SOUND
 ROM_END
 
@@ -3418,7 +3507,7 @@ ROM_END
 
 ROM_START( sp_pistep )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "otp10.bin", 0x0000, 0x010000, CRC(8a9e40df) SHA1(be1c8c5733d65dbdfefcaeb35050d82d59c75450) ) // merged rom
+	ROM_LOAD( "otp10.bin", 0x00000, 0x10000, CRC(8a9e40df) SHA1(be1c8c5733d65dbdfefcaeb35050d82d59c75450) ) // merged rom
 	SP_PISTE_SOUND
 ROM_END
 
@@ -3781,10 +3870,10 @@ ROM_END
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
 	/* actually I think this rom is just a bad dump, there is a rom which is the same in the JPM HW set, */ \
 	/* but twice the size.  Also this isn't an oki rom!                                                  */ \
-	ROM_LOAD( "atw80snd.bin", 0x0000, 0x020000, CRC(b002e11c) SHA1(f7133f4bb8c31feaad0a7b9ee88749f9b7877575) )
+	ROM_LOAD( "atw80snd.bin", 0x00000, 0x20000, CRC(b002e11c) SHA1(f7133f4bb8c31feaad0a7b9ee88749f9b7877575) )
 ROM_START( sp_atw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "artwld80", 0x0000, 0x010000, CRC(3ff314c3) SHA1(345df80243953b35916449b0aa6ffaf9d3501d2b) ) // pre-decrypted? bootleg?
+	ROM_LOAD( "artwld80", 0x00000, 0x10000, CRC(3ff314c3) SHA1(345df80243953b35916449b0aa6ffaf9d3501d2b) ) // pre-decrypted? bootleg?
 	SP_ATW_SOUND
 ROM_END
 
@@ -3794,13 +3883,13 @@ ROM_END
 
 ROM_START( sp_five )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fn19.bin", 0x0000, 0x010000, CRC(4721ccf8) SHA1(a6b7b238df7e7cf45c049b4fb16bf0c05fb95b41) )
+	ROM_LOAD( "fn19.bin", 0x00000, 0x10000, CRC(4721ccf8) SHA1(a6b7b238df7e7cf45c049b4fb16bf0c05fb95b41) )
 	SP_FIVE_SOUND
 ROM_END
 
 ROM_START( sp_fivea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fn19p.bin", 0x0000, 0x010000, CRC(ac2de72f) SHA1(61263944fe29b5f5c79c987989a784b32700c902) )
+	ROM_LOAD( "fn19p.bin", 0x00000, 0x10000, CRC(ac2de72f) SHA1(61263944fe29b5f5c79c987989a784b32700c902) )
 	SP_FIVE_SOUND
 ROM_END
 
@@ -3811,19 +3900,19 @@ ROM_END
 
 ROM_START( sp_crun )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "crun411.bin", 0x0000, 0x010000, CRC(74a69327) SHA1(087d791b8e5c43a9c614f5f4344ce2524a8c445d) )
+	ROM_LOAD( "crun411.bin", 0x00000, 0x10000, CRC(74a69327) SHA1(087d791b8e5c43a9c614f5f4344ce2524a8c445d) )
 	SP_CRUN_SOUND
 ROM_END
 
 ROM_START( sp_cruna )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "em111.bin", 0x0000, 0x010000, CRC(c1e9d4ec) SHA1(49eadcf7880d68c1559e94f4389eca739a3b04d7) )
+	ROM_LOAD( "em111.bin", 0x00000, 0x10000, CRC(c1e9d4ec) SHA1(49eadcf7880d68c1559e94f4389eca739a3b04d7) )
 	SP_CRUN_SOUND
 ROM_END
 
 ROM_START( sp_crunb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "em111p.bin", 0x0000, 0x010000, CRC(bbe90c64) SHA1(5e65c318f14f7aa160f3d0daeb1f3038df162b65) )
+	ROM_LOAD( "em111p.bin", 0x00000, 0x10000, CRC(bbe90c64) SHA1(5e65c318f14f7aa160f3d0daeb1f3038df162b65) )
 	SP_CRUN_SOUND
 ROM_END
 
@@ -3839,7 +3928,7 @@ ROM_END
 
 ROM_START( sp_roofa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "034p1-2i.bin", 0x000000, 0x008000, CRC(a64797fc) SHA1(7437dc2e203efc525aab251da5196d31b95d159a) )
+	ROM_LOAD( "034p1-2i.bin", 0x0000, 0x8000, CRC(a64797fc) SHA1(7437dc2e203efc525aab251da5196d31b95d159a) )
 	ROM_LOAD( "034p1-2a.bin", 0x8000, 0x8000, NO_DUMP )
 	SP_ROOF_SOUND
 ROM_END
@@ -4419,11 +4508,6 @@ GAME( 199?, sp_tkpikd,    sp_tkpik, ace_sp, ace_sp, ace_sp_state, init_ace_sp, R
 GAME( 199?, sp_tkpike,    sp_tkpik, ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Ace", "Take Your Pick (Ace) (sp.ACE) (set 6)",MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_tkpikf,    sp_tkpik, ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Ace", "Take Your Pick (Ace) (sp.ACE) (set 7)",MACHINE_IS_SKELETON_MECHANICAL )
 // not sure.. looks like 6303 code to me
-GAME( 199?, sp_carry,     0,        ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0,"Pcp", "Carry On (Pcp) (sp.ACE?) (set 1)",MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, sp_carrya,    sp_carry, ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0,"Pcp", "Carry On (Pcp) (sp.ACE?) (set 2)",MACHINE_IS_SKELETON_MECHANICAL )
-// not sure.. looks like 6303 code to me
-GAME( 199?, sp_front,     0,        ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Bwb", "Final Frontier (Bwb) (sp.ACE?)",MACHINE_IS_SKELETON_MECHANICAL )
-// not sure.. looks like 6303 code to me
 GAME( 199?, sp_atw,       0,        ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Crystal","Around The World In Eighty Days (Crystal) (sp.ACE?)",MACHINE_IS_SKELETON_MECHANICAL )
 // not sure.. looks like 6303 code to me
 GAME( 199?, sp_five,      0,        ace_sp, ace_sp, ace_sp_state, init_ace_cr, ROT0, "Crystal","Fiver Fever (Crystal) (sp.ACE?) (set 1)",MACHINE_IS_SKELETON_MECHANICAL )
@@ -4438,3 +4522,11 @@ GAME( 199?, sp_roof,      0,        ace_sp, ace_sp, ace_sp_state, init_ace_sp, R
 GAME( 199?, sp_roofa,     sp_roof,  ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Ace", "Thru' The Roof (Ace) (sp.ACE) (set 2)",MACHINE_IS_SKELETON_MECHANICAL )
 
 GAME( 199?, sp_cpal,      0,        ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Ace", "Caesars Palace (Ace) (sp.ACE?)",MACHINE_IS_SKELETON_MECHANICAL ) // was in an IMPACT set, might be a different game but CPU seems correct for here
+
+// these show something
+
+GAME( 199?, sp_carry,     0,        ace_sp_pcp, ace_sp, ace_sp_state, init_ace_sp, ROT0,"Pcp", "Carry On (Pcp) (sp.ACE) (set 1)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_carrya,    sp_carry, ace_sp_pcp, ace_sp, ace_sp_state, init_ace_sp, ROT0,"Pcp", "Carry On (Pcp) (sp.ACE) (set 2)",MACHINE_IS_SKELETON_MECHANICAL )
+// boots to 'Fire Crak V1' (maybe DMD wasn't visible on this machine or this is mislabaled?)
+GAME( 199?, sp_front,     0,        ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Bwb", "Final Frontier (Bwb) (sp.ACE)",MACHINE_IS_SKELETON_MECHANICAL )
+

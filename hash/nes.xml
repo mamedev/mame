@@ -7867,12 +7867,12 @@ license:CC0
 	</software>
 
 	<software name="daiva">
-		<description>Daiva - Imperial of Nirsartia (Jpn)</description>
+		<description>Daiva Story 6: Imperial of Nirsartia (Jpn)</description>
 		<year>1986</year>
 		<publisher>Toemiland</publisher>
 		<info name="serial" value="TFS-DV"/>
 		<info name="release" value="19861205"/>
-		<info name="alt_title" value="ディーヴァ ナーサティアの玉座"/>
+		<info name="alt_title" value="ディーヴァ ストーリー6·ナーサティアの玉座"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
@@ -51794,7 +51794,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1994</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="prg" size="524288">
 				<rom name="1994 ball 4-in-1 series (jy-009).prg" size="524288" crc="a75d2f6d" sha1="2b4250e0d0ad2225003d7f178bcc8fc353a27ea3" status="baddump" />
 			</dataarea>
@@ -51843,7 +51843,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1996</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-018).prg" size="524288" crc="b8740880" sha1="8e05438c36323e8c400c257d5d8007bfe5841d20" status="baddump" />
 			</dataarea>
@@ -51858,7 +51858,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1995</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-019).prg" size="524288" crc="5bb37e97" sha1="126b4701467e9cb94c69b079563937429f3fd3bf" status="baddump" />
 			</dataarea>
@@ -51873,7 +51873,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1996</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-020).prg" size="524288" crc="e858f260" sha1="60e0d13f27f567ed259aa8b91fe0f2b07e8a719e" status="baddump" />
 			</dataarea>
@@ -52016,6 +52016,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="1048576">
 				<rom name="1995 super hik 4-in-1 (jy-040).chr" size="1048576" crc="dc6704ce" sha1="0aa69fb1cd5d9bdd8b4d6c8626dea7fd0fd869e1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8jy41">
+		<description>Donkey Kong 8 in 1 (JY-041)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_yy841155c" />
+			<dataarea name="prg" size="524288">
+				<rom name="8-in-1 (jy-041).prg" size="524288" crc="7e7b1450" sha1="628fb99349060e21cd3e0b8386619018e470d438" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="8-in-1 (jy-041).chr" size="524288" crc="001b4bdf" sha1="7137baecda227bfebc2e810e9a4bef6d7fcb9eb7" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -55997,36 +56012,42 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="grandia" supported="no">
-		<description>Grandia (Chi)</description>
-		<year>199?</year>
+		<description>Grandia (China)</description>
+		<year>1998</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1078"/>
 		<info name="alt_title" value="格兰蒂亚"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says Mapper 227?!? -->
+			<feature name="slot" value="bmc_1200in1" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[es-1078] ge lan di ya (c).prg" size="1048576" crc="d176696b" sha1="2da44453b8276e5c2906c358cbb0f14e694f5125" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
 	<software name="grandiaa" cloneof="grandia" supported="no">
-		<description>Grandia (Chi, Alt)</description>
-		<year>199?</year>
+		<description>Grandia (China, alt)</description>
+		<year>1998</year>
 		<publisher>CoolBoy</publisher>
 		<info name="alt_title" value="格兰蒂亚"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says Mapper 227?!? -->
+			<feature name="slot" value="bmc_1200in1" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[cb] ge lan di ya (c).prg" size="1048576" crc="60b892cc" sha1="a7398436a77953a17f14fdf06422875c72fb9e76" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -56101,12 +56122,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="宠物进化史"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />  <!-- header says mapper 162! -->
+			<feature name="pcb" value="UNKNOWN" />  <!-- unimplemented mapper 558 -->
 			<dataarea name="prg" size="1048576">
 				<rom name="[es-1085] chong wu jin hua shi (c).prg" size="1048576" crc="8b41d49c" sha1="db969702b2adeb77fa07e99bc1f14838c03f48aa" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -56796,19 +56821,18 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 
-<!-- Shenzen Jincota -->
+<!-- Shenzhen Jncota -->
 <!-- Some of these partially work with mapper 4, 74, 227 or 240, but we need to figure out the proper behavior! -->
 
-<!-- any relation with jkxz ?? -->
-	<software name="jingkxz" supported="no">
-		<description>Jing Ke Xin Zhuan (Chi, Shenzen Jincota)</description>
+<!-- This is a later re-release of the Supertone game -->
+	<software name="jingkxz" cloneof="jkxz">
+		<description>Jīng Kē Xīnzhuàn (China, Shenzhen Jncota)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1001"/>
-		<info name="alt_title" value="荆轲新传"/>
+		<info name="alt_title" value="荊軻新傳"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1001] jing ke xin zhuan (c).chr" size="131072" crc="0024a801" sha1="ba7a408c852c5ec611851f3f1ae75ce6056837f2" offset="00000" status="baddump" />
 			</dataarea>
@@ -56822,16 +56846,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- any relation with shenghlz ?? -->
-	<software name="shenghuo" supported="no">
-		<description>Sheng Huo Lie Zhuan (Chi)</description>
+<!-- This is a later re-release of the C&E game -->
+	<software name="shenghuo" cloneof="shenghlz">
+		<description>Shènghuǒ Lièzhuàn (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1002"/>
-		<info name="alt_title" value="圣火列传"/>
+		<info name="alt_title" value="聖火列傳"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1002] sheng huo lie zhuan (c).chr" size="131072" crc="7c6f37fc" sha1="3a4da287653ec929adac7362c38687f14ca42080" offset="00000" status="baddump" />
 			</dataarea>
@@ -56846,11 +56869,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dierciji" supported="no">
-		<description>Di Er Ci Ji Qi Ren Da Zhan (Chi)</description>
+		<description>Dì-èr Cì Chāojí Jīqìrén Dàzhàn (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1003"/>
-		<info name="alt_title" value="第二次机器人大战"/>
+		<info name="alt_title" value="第二次超級机器人大战"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
@@ -56868,9 +56891,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="fankfb" supported="no">
-		<description>Fan Kong Feng Bao (Chi)</description>
+		<description>Fǎnkǒng Fēngbào (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1004"/>
 		<info name="alt_title" value="反恐风暴"/>
 		<part name="cart" interface="nes_cart">
@@ -56890,9 +56913,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="fengshnb" supported="no">
-		<description>Feng Shen Bang (Chi)</description>
+		<description>Fēngshén Bǎng (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1005"/>
 		<info name="alt_title" value="封神榜"/>
 		<part name="cart" interface="nes_cart">
@@ -56912,9 +56935,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="xianscq" supported="no">
-		<description>Xiang Shuai Chuan Qi (Chi, Shenzen Jincota)</description>
+		<description>Xiāngshuài Chuánqí (China, Shenzhen Jncota)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1007"/>
 		<info name="alt_title" value="香帅传奇"/>
 		<part name="cart" interface="nes_cart">
@@ -56934,9 +56957,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="jjzs3" supported="no">
-		<description>Ji Jia Zhan Shi III (Chi)</description>
+		<description>Jījiǎ Zhànshì III (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1010"/>
 		<info name="alt_title" value="机甲战士III"/>
 		<part name="cart" interface="nes_cart">
@@ -56955,15 +56978,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zgfyun" supported="no">
-		<description>Zhan Guo Feng Yun (Chi)</description>
+<!-- This seems to be a later re-release of the Supertone game with an altered title -->
+	<software name="zgfyun" cloneof="jkxz">
+		<description>Zhànguó Fēngyún (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1013"/>
 		<info name="alt_title" value="战国风云"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1013] zhan guo feng yun (c).chr" size="131072" crc="4026c277" sha1="31bca971eab6f2c3d9a3e58fd2441730d8e666e1" offset="00000" status="baddump" />
 			</dataarea>
@@ -56977,15 +57000,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="xiakecq" supported="no">
-		<description>Xia Ke Chuan Qi (Chi)</description>
+<!-- This seems to be a later re-release of the C&E game with an altered title -->
+	<software name="xiakecq" cloneof="shenghlz">
+		<description>Xiákè Chuánqí (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1014"/>
 		<info name="alt_title" value="侠客传奇"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="jncota_kt1001" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1014] xia ke chuan qi (c).chr" size="131072" crc="f6d312af" sha1="3261d2f7f8cf9bb366a9d0361251161dbce81033" offset="00000" status="baddump" />
 			</dataarea>
@@ -57000,9 +57023,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="chuliuxx" supported="no">
-		<description>Chu Liu Xiang Xin Zhuan (Chi)</description>
+		<description>Chǔ Liúxiāng Xīnzhuàn (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1015"/>
 		<info name="alt_title" value="楚留香新传"/>
 		<part name="cart" interface="nes_cart">
@@ -57022,9 +57045,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="zhanssj" supported="no">
-		<description>Zhan Shen Shi Jie (Chi)</description>
+		<description>Zhànshén Shìjiè (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1019"/>
 		<info name="alt_title" value="战神世界"/>
 		<part name="cart" interface="nes_cart">
@@ -57044,9 +57067,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="jianxqy" supported="no">
-		<description>Jian Xia Qing Yuan (Chi)</description>
+		<description>Jiànxiá Qíngyuán (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1020"/>
 		<info name="alt_title" value="剑侠情缘"/>
 		<part name="cart" interface="nes_cart">
@@ -57066,9 +57089,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="shenmoda" supported="no">
-		<description>Shen Mo Da Lu (Chi)</description>
+		<description>Shénmó Dàlù (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1052"/>
 		<info name="alt_title" value="神魔大陆"/>
 		<part name="cart" interface="nes_cart">
@@ -57088,9 +57111,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kdgsfc" supported="no">
-		<description>Kou Dai Guai Shou - Fei Cui Ban (Chi)</description>
+		<description>Kǒudài Guàishòu - Fěicuì Bǎn (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1063"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -57109,9 +57132,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hundunds" supported="no">
-		<description>Yong Zhe Hei An Shi Jie - Hun Dun De Shi Jie (Chi)</description>
+		<description>Yǒngzhě Hēi'àn Shìjiè - Hùndùn De Shìjiè (China)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1066"/>
 		<info name="alt_title" value="勇者黑暗世界-混沌的世界"/>
 		<part name="cart" interface="nes_cart">
@@ -57131,9 +57154,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kdgszs" supported="partial">
-		<description>Kou Dai Guai Shou - Zuan Shi Ban (KT-008 PCB)</description>
+		<description>Kǒudài Guàishòu - Zuànshí Bǎn (KT-008 PCB)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 钻石版 ~ Pokemon Diamond"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -57152,9 +57175,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kdgszz" cloneof="kdgszs" supported="partial">
-		<description>Kou Dai Guai Shou - Zhen Zhu Ban (KT-008 PCB, Alt)</description>
+		<description>Kǒudài Guàishòu - Zhēnzhū Bǎn (KT-008 PCB, alt)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 珍珠版 ~ Pokemon Pearl"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -57173,9 +57196,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kdgsbj" cloneof="kdgszs" supported="partial">
-		<description>Kou Dai Guai Shou - Bai jin Ban (KT-008 PCB, Alt 2)</description>
+		<description>Kǒudài Guàishòu - Báijīn Bǎn (KT-008 PCB, alt 2)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 白金版 ~ Pokemon Platinum"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -64416,7 +64439,7 @@ We don't include these hacks because they were not burned into real carts nor so
 
 <!-- nointro -->
 	<software name="shenghlz">
-		<description>Sheng Huo Lie Zhuan (Asia)</description>
+		<description>Shènghuǒ Lièzhuàn (Asia)</description>
 		<year>1991</year>
 		<publisher>Computer &amp; Entertainment</publisher>
 		<info name="serial" value="A-1061"/>
@@ -66004,7 +66027,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="jkxz1" cloneof="jkxz">
-		<description>Jing Ke Xin Zhuan (Chi, Alt)</description>
+		<description>Jīng Kē Xīnzhuàn (China, alt)</description>
 		<year>1992</year>
 		<publisher>Supertone</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66025,7 +66048,7 @@ All musics were removed in this game.
 
 <!-- Comment from Cah4e3: other dumps are patched lately with come portions of code to seems handle another PAL modes, which original game doesn't... so this might be the original version of the game -->
 	<software name="jkxz2" cloneof="jkxz">
-		<description>Jing Ke Xin Zhuan (Chi, Alt 2)</description>
+		<description>Jīng Kē Xīnzhuàn (China, alt 2)</description>
 		<year>1992</year>
 		<publisher>Supertone</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66045,7 +66068,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="jkxz">
-		<description>Jing Ke Xin Zhuan (Chi)</description>
+		<description>Jīng Kē Xīnzhuàn (China)</description>
 		<year>1992</year>
 		<publisher>Supertone</publisher>
 		<part name="cart" interface="nes_cart">
@@ -68885,9 +68908,10 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<software name="daivah" cloneof="daiva">
-		<description>Daiva - Imperial of Nirsartia (FMG pirate)</description>
+		<description>Daiva Story 6: Imperial of Nirsartia (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー6·ナーサティアの玉座"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
@@ -78048,6 +78072,41 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="starvers">
+		<description>Star Versus</description>
+		<year>2015</year>
+		<publisher>Studio Dustmop</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="batmap_000" />
+			<dataarea name="prg" size="131072">
+				<rom name="star versus.prg" size="131072" crc="9c987a2a" sha1="999535969f4ce9f3dbda1d1918f570209016a39c" status="baddump" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superrr">
+		<description>Super Russian Roulette</description>
+		<year>2017</year>
+		<publisher>Batlab Electronics</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="batmap_srrx" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
+			<dataarea name="prg" size="262144">
+				<rom name="super russian roulette.prg" size="262144" crc="d29e7bd7" sha1="bea73714080dfa2747a526724255fe34a381b0a0" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="super russian roulette.chr" size="262144" crc="6ba75953" sha1="93153b472c9a36e26e0d9243b9dee1bfacdaa3f8" status="baddump" />
+			</dataarea>
+			<dataarea name="dpcm" size="8388608">
+				<rom name="super russian roulette.dpcm" size="8388608" crc="e880dbe6" sha1="b05f2bd2845c3ec3aa63d7aec855c23058fc8412" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Multicarts using homebrew mapper #28. These have their origin in NESDev competitions. The following roms are freely available digital releases. They need to be checked against commercial physical carts. -->
 
@@ -79891,7 +79950,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_841101c" />
+			<feature name="slot" value="bmc_yy841101c" />
 			<dataarea name="chr" size="524288">
 				<rom name="4-in-1 (ok-411)[p1].chr" size="524288" crc="b9300c30" sha1="90cef987aac482e7402891892779847cffaa6ef0" offset="00000" status="baddump" />
 			</dataarea>
@@ -80655,15 +80714,19 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_63gb" supported="no">
+<!-- The UNIF file contained separate PRG banks -->
+	<software name="mc_63gb">
 		<description>Ghostbusters 63 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gb63" />
+			<feature name="slot" value="bmc_76in1" />
 			<feature name="pcb" value="BMC-GHOSTBUSTERS63IN1" />
-			<dataarea name="prg" size="1572864">
-				<rom name="63-in-1 (ghostbusters63in1) [p1][u].prg" size="1572864" crc="54f2e672" sha1="d5316ddc53a4a70f99f80a0d4c9831b4835e0050" offset="00000" status="baddump" />
+			<dataarea name="prg" size="2097152">
+				<rom name="63-in-1 (ghostbusters63in1) [p1][u].prg0" size="524288" crc="64750df8" sha1="cfc6bd97c38061e344e37a2ce5d46d703fc1ee77" offset="0x000000" status="baddump" />
+				<rom size="524288" offset="0x080000" loadflag="reload" />
+				<rom name="63-in-1 (ghostbusters63in1) [p1][u].prg2" size="524288" crc="d01373cf" sha1="f26875339384d3700a9493d7044eb67fbc709c7b" offset="0x100000" status="baddump" />
+				<rom name="63-in-1 (ghostbusters63in1) [p1][u].prg3" size="524288" crc="561d4e03" sha1="170a43555a0883f18edc97d806430abbeec6bc83" offset="0x180000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -82644,7 +82707,7 @@ to check why this is different -->
 	</software>
 
 <!-- The UNIF file contained separate PRG banks  -->
-	<software name="mc_16sv" supported="no">
+	<software name="mc_16sv">
 		<description>Super 128k - 16 in 1</description>
 		<year>19??</year>
 		<publisher>Supervision</publisher>
@@ -83246,7 +83309,7 @@ that the real dumps might surface -->
 	<software name="pokehg" supported="partial">
 		<description>Pokemon HeartGold (KT-008 PCB)</description>
 		<year>19??</year>
-		<publisher>Shenzen Jincota</publisher>
+		<publisher>Shenzhen Jncota</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />

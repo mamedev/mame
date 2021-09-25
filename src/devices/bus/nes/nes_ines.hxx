@@ -396,7 +396,7 @@ static const nes_mmc mmc_list[] =
 	// 358 JY multicarts, variant of mapper 282
 	// 359 BMC-SB-5013 multicarts
 	// 360 Bit Corp 31-in-1 (ID 3150) (has five accessible DIP switches!)
-	{ 361, BMC_841101C },
+	{ 361, BMC_YY841101C },
 	// 362 JY-005 multicart
 	// 363 variant of mapper 358?
 	{ 364, BMC_830832C },
@@ -411,7 +411,7 @@ static const nes_mmc mmc_list[] =
 	// 373 Super 4-in-1, not in nes.xml?
 	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
-	// 376 JY-041 multicart
+	{ 376, BMC_YY841155C },
 	// 377 JY-111 multicart, similar to mapper 367
 	// 378 8-in-1 multicart, which one?
 	// 379 35-in-1 multicart, similar to mapper 38
@@ -434,7 +434,7 @@ static const nes_mmc mmc_list[] =
 	{ 396, BMC_850437C },
 	// 397 JY-082 multicart, not in nes.xml?
 	// 398 JY-048 multicart, not in nes.xml?
-	// 399 homebrew game Star Versus
+	{ 399, BATMAP_000 },           // homebrew game Star Versus
 	// 400 retroUSB (Sealie?) 8-bit XMAS 2017
 	// 401 Super 19-in-1 VIP 19, not in nes.xml?
 	// 402 22-in-1 Olympic Games, not in nes.xml?
@@ -448,7 +448,7 @@ static const nes_mmc mmc_list[] =
 	// 410 Unused or JY?
 	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
-	// 413 homebrew game Super Russian Roulette
+	{ 413, BATMAP_SRRX },          // homebrew game Super Russian Roulette
 	// 414 9999999-in-1 multicart
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
 	{ 416, BMC_N32_4IN1 },
@@ -513,7 +513,7 @@ static const nes_mmc mmc_list[] =
 	// { 548, BTL_CTC15 },            // Almana no Kiseki alt FDS conversion (dump available?)
 	{ 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
 	{ 550, BMC_JY820845C },
-	// 551 variant of mapper 178, likely shenghuo, jingkzx, xiaokecq, zgfyun in nes.xml
+	{ 551, JNCOTA_KT1001 },
 	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion

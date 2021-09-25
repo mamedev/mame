@@ -48,7 +48,6 @@ DEFINE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device,    "nes_bmc_83092
 DEFINE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device,    "nes_bmc_850437c",    "NES Cart BMC 850437C PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
-DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63",       "NES Cart BMC Ghostbusters 63 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device,    "nes_bmc_gkcxin1",    "NES Cart BMC GKCXIN1 PCB")
@@ -134,7 +133,7 @@ nes_rumblestat_device::nes_rumblestat_device(const machine_config &mconfig, cons
 {
 }
 
-nes_svision16_device::nes_svision16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_svision16_device::nes_svision16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SVISION16, tag, owner, clock), m_latch1(0), m_latch2(0)
 {
 }
@@ -211,11 +210,6 @@ nes_ntd03_device::nes_ntd03_device(const machine_config &mconfig, const char *ta
 
 nes_bmc_ctc09_device::nes_bmc_ctc09_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_CTC09, tag, owner, clock)
-{
-}
-
-nes_bmc_gb63_device::nes_bmc_gb63_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_GB63, tag, owner, clock), m_latch(0), m_dipsetting(0), m_vram_disable(0)
 {
 }
 
@@ -502,9 +496,8 @@ void nes_svision16_device::device_start()
 
 void nes_svision16_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
-	chr8(0, m_chr_source);
+	chr8(0, CHRRAM);
 
 	m_latch1 = 0;
 	m_latch2 = 0;
@@ -681,29 +674,6 @@ void nes_bmc_ctc09_device::pcb_reset()
 // that games reset to their own title screens. This seems to be this cart's
 // intended behavior as trying to reset to the menu here crashes (due to RAM
 // contents?). Soft reset can similarly crash the main menu (BTANB?).
-}
-
-void nes_bmc_gb63_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_latch));
-	save_item(NAME(m_dipsetting));
-	save_item(NAME(m_reg));
-	save_item(NAME(m_vram_disable));
-}
-
-void nes_bmc_gb63_device::pcb_reset()
-{
-	prg16_89ab(0);
-	prg16_cdef(0xfff);
-	chr8(0, CHRRAM);
-
-	m_latch = 0;
-	m_dipsetting = 0;
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	update_banks();
-	m_vram_disable = 0;
 }
 
 void nes_bmc_gka_device::device_start()
@@ -1246,50 +1216,55 @@ void nes_rumblestat_device::write_h(offs_t offset, uint8_t data)
 
  Games: Supervision 16 in 1
 
+ This cart contains a 32KB boot menu that selects
+ games from a separate 2MB of ROM. The common iNES
+ file arbitrarily puts this first before the 2MB ROM.
+ A simpler alternate approach would be to place the
+ 32KB menu at the end of contiguous PRG. In that case
+ pcb_reset should be changed to point to the last
+ part of PRG and the +2s and +4 below can be removed.
+
  iNES: mapper 53
 
- In MESS: Partially Supported. (the dump contains 32KB of
- EEPROM which is not currently handled well)
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_svision16_device::update_prg()
 {
-	int base = (m_latch1 & 0x0f) << 3;
-	if (m_latch1 & 0x10)
+	if (BIT(m_latch1, 4))
 	{
-		prg16_89ab((base | (m_latch2 & 7)) + 2);    // +2 due to the eeprom
-		prg16_cdef((base | 0x07) + 2);  // +2 due to the eeprom
+		u8 bank = (m_latch1 & 0x0f) << 3 | (m_latch2 & 0x07);
+		prg16_89ab(bank + 2);             // +2 due to the 32KB menu
+		prg16_cdef((bank | 0x07) + 2);    // +2 due to the 32KB menu
 	}
-	else
-	{
-		prg16_89ab(0);
-		prg16_cdef(1);
-	}
-
 }
 
-uint8_t nes_svision16_device::read_m(offs_t offset)
-{
-	int bank = (((m_latch1 & 0x0f) << 4) | 0x0f) + 4 ;  // +4 due to the eeprom
-	LOG_MMC(("svision16 read_m, offset: %04x\n", offset));
-	return m_prg[((bank * 0x2000) + (offset & 0x1fff)) & m_prg_mask];
-}
-
-void nes_svision16_device::write_m(offs_t offset, uint8_t data)
+void nes_svision16_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("svision16 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	m_latch1 = data;
-	update_prg();
-	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	if (!BIT(m_latch1, 4))
+	{
+		m_latch1 = data;
+		update_prg();
+		set_nt_mirroring(BIT(m_latch1, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
 }
 
-void nes_svision16_device::write_h(offs_t offset, uint8_t data)
+void nes_svision16_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("svision16 write_h, offset: %04x, data: %02x\n", offset, data));
 	m_latch2 = data;
 	update_prg();
+}
+
+u8 nes_svision16_device::read_m(offs_t offset)
+{
+	LOG_MMC(("svision16 read_m, offset: %04x\n", offset));
+
+	u8 bank = m_latch1 << 4 | 0x0f;
+	return m_prg[((bank + 4) * 0x2000 + offset) % m_prg_size];    // +4 due to the 32KB menu
 }
 
 /*-------------------------------------------------
@@ -1689,60 +1664,6 @@ void nes_bmc_ctc09_device::write_h(offs_t offset, u8 data)
 	else
 		chr8(data & 0x0f, CHRROM);
 }
-
-/*-------------------------------------------------
-
- BMC-GHOSTBUSTERS63IN1
-
- in MESS: only preliminar support
-
- -------------------------------------------------*/
-
-void nes_bmc_gb63_device::chr_w(offs_t offset, uint8_t data)
-{
-	int bank = offset >> 10;
-
-	if (!m_vram_disable)
-		m_chr_access[bank][offset & 0x3ff] = data;
-}
-
-void nes_bmc_gb63_device::update_banks()
-{
-	set_nt_mirroring(BIT(m_reg[0], 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-
-	if (BIT(m_reg[0], 5))
-	{
-		prg16_89ab(m_reg[0] & 0x1f);
-		prg16_cdef(m_reg[0] & 0x1f);
-	}
-	else
-		prg32((m_reg[0] & 0x1f) >> 1);
-
-// according to FCEUMM source, the game should be able to disable the VRAM, but this stops the game from working
-// maybe the VRAM disable does not work at start?
-//  m_vram_disable = BIT(m_reg[1], 1) ? 0 : 1;
-}
-
-void nes_bmc_gb63_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("bmc_gb63 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	m_reg[offset & 1] = data;
-	m_latch = BIT(m_reg[0], 7) | (BIT(m_reg[1], 0) << 1);
-	update_banks();
-}
-
-uint8_t nes_bmc_gb63_device::read_h(offs_t offset)
-{
-	LOG_MMC(("bmc_gb63 read_h, offset: %04x\n", offset));
-	//  m_dipsetting = ioport("CARTDIPS")->read();
-
-	if (m_latch == 1)
-		return get_open_bus();    // open bus
-	else
-		return hi_access_rom(offset);
-}
-
 
 /*-------------------------------------------------
 
@@ -2608,14 +2529,22 @@ void nes_bmc_72in1_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-76IN1, BMC-SUPER42IN1
+ BMC-76IN1, BMC-SUPER42IN1, BMC-GHOSTBUSTERS63IN1
 
  Unknown Bootleg Multigame Board
- Games: 76 in 1, Super 42 in 1
+ Games: 76 in 1, Super 42 in 1, Ghostbusters 63 in 1
 
  iNES: mapper 226
 
  In MAME: Supported.
+
+ TODO: Investigate nature of GB63's PCB. It likely has
+ three 512KB chips and it seems the two high-order bits
+ here select between them. However, 0,1 select the first
+ chip and 2,3 correspond to the other two respectively.
+ Does the PCB have an empty socket for a fourth chip in
+ position 1? We mirror the first chip by reloading in
+ the softlist, but should this really be open bus?
 
  -------------------------------------------------*/
 

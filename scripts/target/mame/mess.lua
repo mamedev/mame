@@ -3110,6 +3110,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc8401a.cpp",
 	MAME_DIR .. "src/mame/includes/pc8401a.h",
 	MAME_DIR .. "src/mame/video/pc8401a.cpp",
+	MAME_DIR .. "src/mame/machine/pc80s31k.cpp",
+	MAME_DIR .. "src/mame/machine/pc80s31k.h",
 	MAME_DIR .. "src/mame/drivers/pc8001.cpp",
 	MAME_DIR .. "src/mame/includes/pc8001.h",
 	MAME_DIR .. "src/mame/drivers/pc8801.cpp",

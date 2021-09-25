@@ -120,6 +120,7 @@
 #define OPTION_SAMPLERATE           "samplerate"
 #define OPTION_SAMPLES              "samples"
 #define OPTION_VOLUME               "volume"
+#define OPTION_COMPRESSOR           "compressor"
 #define OPTION_SPEAKER_REPORT       "speaker_report"
 
 // core input options
@@ -405,6 +406,7 @@ public:
 	int sample_rate() const { return int_value(OPTION_SAMPLERATE); }
 	bool samples() const { return bool_value(OPTION_SAMPLES); }
 	int volume() const { return int_value(OPTION_VOLUME); }
+	bool compressor() const { return bool_value(OPTION_COMPRESSOR); }
 	int speaker_report() const { return int_value(OPTION_SPEAKER_REPORT); }
 
 	// core input options

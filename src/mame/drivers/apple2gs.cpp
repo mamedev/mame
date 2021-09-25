@@ -1543,7 +1543,7 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_ioudis = true;
-	m_newvideo = 0x01;
+	m_newvideo = 0x01;		// verified on ROM03 hardware
 	m_clock_frame = 0;
 	m_mouse_x = 0x00;
 	m_mouse_y = 0x00;
@@ -2188,19 +2188,19 @@ void apple2gs_state::do_io(int offset)
 			}
 
 			// 558 monostable one-shot timers; a running timer cannot be restarted
-			if (machine().time().as_double() >= m_joystick_x1_time) 
+			if (machine().time().as_double() >= m_joystick_x1_time)
 			{
 				m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
 			}
-			if (machine().time().as_double() >= m_joystick_y1_time) 
+			if (machine().time().as_double() >= m_joystick_y1_time)
 			{
 				m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
 			}
-			if (machine().time().as_double() >= m_joystick_x2_time) 
+			if (machine().time().as_double() >= m_joystick_x2_time)
 			{
 				m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
 			}
-			if (machine().time().as_double() >= m_joystick_y2_time) 
+			if (machine().time().as_double() >= m_joystick_y2_time)
 			{
 				m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
 			}
@@ -2641,19 +2641,19 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				}
 
 				// 558 monostable one-shot timers; a running timer cannot be restarted
-				if (machine().time().as_double() >= m_joystick_x1_time) 
+				if (machine().time().as_double() >= m_joystick_x1_time)
 				{
 					m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
 				}
-				if (machine().time().as_double() >= m_joystick_y1_time) 
+				if (machine().time().as_double() >= m_joystick_y1_time)
 				{
 					m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
 				}
-				if (machine().time().as_double() >= m_joystick_x2_time) 
+				if (machine().time().as_double() >= m_joystick_x2_time)
 				{
 					m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
 				}
-				if (machine().time().as_double() >= m_joystick_y2_time) 
+				if (machine().time().as_double() >= m_joystick_y2_time)
 				{
 					m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
 				}

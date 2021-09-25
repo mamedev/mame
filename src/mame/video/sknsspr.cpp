@@ -55,23 +55,23 @@ int sknsspr_device::skns_rle_decode ( int romoffset, int size )
 	int decodeoffset = 0;
 
 	while(size>0) {
-		u8 code = read_byte((romoffset++) % (1<<27));
+		u8 code = read_byte((romoffset++) & ((1<<27) - 1));
 		size -= (code & 0x7f) + 1;
 		if(code & 0x80) { /* (code & 0x7f) normal values will follow */
 			code &= 0x7f;
 			do {
-				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = read_byte((romoffset++) % (1<<27));
+				m_decodebuffer[(decodeoffset++) & (SUPRNOVA_DECODE_BUFFER_SIZE-1)] = read_byte((romoffset++) & ((1<<27) - 1));
 				code--;
 			} while(code != 0xff);
 		} else {  /* repeat next value (code & 0x7f) times */
-			u8 val = read_byte((romoffset++) % (1<<27));
+			u8 val = read_byte((romoffset++) & ((1<<27) - 1));
 			do {
-				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = val;
+				m_decodebuffer[(decodeoffset++) & (SUPRNOVA_DECODE_BUFFER_SIZE-1)] = val;
 				code--;
 			} while(code != 0xff);
 		}
 	}
-	return romoffset % (1<<27);
+	return romoffset & ((1<<27) - 1);
 }
 
 void sknsspr_device::skns_sprite_kludge(int x, int y)
@@ -110,11 +110,11 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	}
 
 #define z_clamp_x_max()         \
-	if(x > clip.max_x) {                \
+	if(x >= clip.max_x) {                \
 		do {                    \
 			bxs += zxs;             \
 			x -= zxd;                   \
-		} while(x > clip.max_x);                \
+		} while(x >= clip.max_x);                \
 	}
 
 #define z_clamp_y_min()         \
@@ -127,11 +127,11 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	}
 
 #define z_clamp_y_max()         \
-	if(y > clip.max_y) {                \
+	if(y >= clip.max_y) {                \
 		do {                    \
 			bys += zys;             \
 			y -= zyd;                   \
-		} while(y > clip.max_y);                \
+		} while(y >= clip.max_y);                \
 		src += (bys>>16)*step_spr;           \
 	}
 
@@ -156,7 +156,7 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	while(ys < sy && yd >= clip.min_y)
 
 #define z_draw_pixel()              \
-	u8 val = src[xs >> 16];           \
+	u8 val = src[(xs >> 16) & 0x3f];	\
 	if(val)                 \
 		bitmap.pix(yd>>16, xd>>16) = val + colour;
 

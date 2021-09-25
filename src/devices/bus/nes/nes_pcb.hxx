@@ -263,7 +263,6 @@ static const nes_pcb pcb_list[] =
 	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
-	{ "bmc_gb63",         BMC_G63IN1 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
 	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
@@ -324,7 +323,8 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_820720c",      BMC_820720C },
 	{ "bmc_830118c",      BMC_830118C },
 	{ "bmc_830832c",      BMC_830832C },
-	{ "bmc_841101c",      BMC_841101C },
+	{ "bmc_yy841101c",    BMC_YY841101C },
+	{ "bmc_yy841155c",    BMC_YY841155C },
 	{ "pjoy84",           BMC_PJOY84 },
 	{ "bmc_gold150",      BMC_GOLD150 },
 	{ "bmc_gold260",      BMC_GOLD260 },
@@ -332,6 +332,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_reset4",       BMC_4IN1RESET },
 	{ "bmc_reset42",      BMC_42IN1RESET },
 	{ "bmc_lc160",        BMC_LITTLECOM160 },
+	{ "jncota_kt1001",    JNCOTA_KT1001 },
 	{ "jyc_a",            JYCOMPANY_A },
 	{ "jyc_b",            JYCOMPANY_B },
 	{ "jyc_c",            JYCOMPANY_C },
@@ -362,6 +363,8 @@ static const nes_pcb pcb_list[] =
 	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II
 	{ "nocash_nochr",     NOCASH_NOCHR },
 	{ "action53",         UNL_ACTION53 },
+	{ "batmap_000",       BATMAP_000 },
+	{ "batmap_srrx",      BATMAP_SRRX },
 	{ "cufrom",           UNL_CUFROM },
 	{ "unrom512",         UNL_UNROM512 },
 	{ "2a03pur",          UNL_2A03PURITANS },
@@ -670,15 +673,22 @@ void nes_cart_slot_device::call_load_pcb()
 		memcpy(m_cart->get_vrom_base(), get_software_region("chr"), vrom_size);
 	}
 
-	// SETUP steps 7: allocate the remaining pointer, when needed
+	// SETUP steps 7: allocate pointers for any extra chip data, when needed
+	if (m_pcb_id == BATMAP_SRRX)
+	{
+		uint32_t dpcm_size = get_software_region_length("dpcm");
+		if (dpcm_size)
+		{
+			m_cart->misc_rom_alloc(dpcm_size, tag());
+			memcpy(m_cart->get_misc_rom_base(), get_software_region("dpcm"), dpcm_size);
+		}
+	}
+
+	// SETUP steps 8: allocate the remaining pointers, when needed
 	if (vram_size)
 		m_cart->vram_alloc(vram_size);
 	if (prgram_size)
 		m_cart->prgram_alloc(prgram_size);
-
-	// also nes_smb2j_device needs WRAM initialized to 0xff? check!
-	if (m_pcb_id == UNL_SMB2J)
-		memset(m_cart->get_prgram_base(), 0xff, prgram_size);
 
 	// Attempt to load a battery file for this ROM
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)

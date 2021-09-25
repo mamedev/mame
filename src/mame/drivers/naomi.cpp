@@ -5078,7 +5078,7 @@ ROM_START( mushike )
 	ROM_REGION( 0x80, "rf_tag", 0 )
 	ROM_LOAD( "mushi_type1.bin", 0, 0x80, CRC(8f36572b) SHA1(87e00e56d07a961e9180c7da02e35f7fd216dbae) )
 
-	// 840-0150    2003     317-0394-COM   Naomi
+	// 840-0150    2004     317-0394-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
 ROM_END
 
@@ -5106,7 +5106,37 @@ ROM_START( mushikeo )
 	ROM_REGION( 0x80, "rf_tag", 0 )
 	ROM_LOAD( "mushi_type1.bin", 0, 0x80, CRC(8f36572b) SHA1(87e00e56d07a961e9180c7da02e35f7fd216dbae) )
 
-	// 840-0150    2003     317-0394-COM   Naomi
+	// 840-0150    2004     317-0394-COM   Naomi
+	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
+ROM_END
+
+ROM_START( mushikk )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "epr-24265.ic11",			0x0000000, 0x0400000, CRC(dccb210b) SHA1(35891f97bec251083b2c927e926d73685d750a4d) )
+	ROM_LOAD32_WORD( "opr-24266.ic17s", 0x1000000, 0x0800000, CRC(293e5350) SHA1(7107d3378fe3a73e868bc03e0572b19e91152a3b) )
+	ROM_LOAD32_WORD( "opr-24267.ic18",  0x1000002, 0x0800000, CRC(80798f9a) SHA1(a843a052dce254f9a5a7b7024f21e4e6f8621666) )
+	ROM_LOAD32_WORD( "opr-24268.ic19s", 0x2000000, 0x0800000, CRC(b512c772) SHA1(f45084f2e242e07e47c25eeeed44624274a95a7e) )
+	ROM_LOAD32_WORD( "opr-24269.ic20",  0x2000002, 0x0800000, CRC(25d4a162) SHA1(2a987803e272d7d8b8302d9dedfecf4bdd8cad7b) )
+	ROM_LOAD32_WORD( "opr-24270.ic21s", 0x3000000, 0x0800000, CRC(02a513ad) SHA1(29213eac56b7b42a3ff43469093d53705019d9af) )
+	ROM_LOAD32_WORD( "opr-24271.ic22",  0x3000002, 0x0800000, CRC(7e5c745c) SHA1(1163b0d549e9af629fa57dcb68c25dbc99cb47cc) )
+
+	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
+
+	ROM_REGION( 0x200, "some_eeprom", ROMREGION_ERASEFF )
+	ROM_LOAD( "25lc010.ic13s", 0, 0x84, CRC(2299ab22) SHA1(8cf2cf3a6a7ca8cc13998f1cdeed5d6b4a832781) )
+
+	// MUSHIKING
+	// The King of Beetle
+	// TYPE-1
+	// 800
+	// note: this dump from "empty/dead" Management Chip with no game run count left
+	ROM_REGION( 0x80, "rf_tag", 0 )
+	ROM_LOAD( "mushi_type1.bin", 0, 0x80, CRC(8f36572b) SHA1(87e00e56d07a961e9180c7da02e35f7fd216dbae) )
+
+	// 840-0155    2004     317-0394-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
 ROM_END
 
@@ -11796,7 +11826,7 @@ ROM_END
 /* 0150    */ GAME( 2004, mushikeo,  mushike,  naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND Ver. 1.002-, World)", GAME_FLAGS ) // not for Japan
 /* 0150-FLS*/ GAME( 2004, mushikep,  mushike,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (MUSHIUSA '04 1ST, Prototype)", GAME_FLAGS )
 /* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
-// 0155 Mushiking 2K3 2ND (Korea)
+/* 0155    */ GAME( 2004, mushikk,   mushike,  naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND Ver. 1.000-, Korea)", GAME_FLAGS )
 // 0157 Mushiking 2K3 2ND (China)
 /* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2005 First (Japan)", GAME_FLAGS )
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.

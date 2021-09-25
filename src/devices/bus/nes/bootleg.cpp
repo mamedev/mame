@@ -1270,7 +1270,7 @@ u8 nes_smb2j_device::read_l(offs_t offset)
 	if (offset >= 0x1000)
 		return m_prg[0x10000 + (offset & 0x0fff)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 u8 nes_smb2j_device::read_m(offs_t offset)

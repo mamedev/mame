@@ -13174,10 +13174,10 @@ TODO:
 
 	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
 	<software name="daiva" supported="no">
-		<description>Daiva - Kari-Yuga no Kouki</description>
+		<description>Daiva Story 7: Light of Kari Yuga</description>
 		<year>1987</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
-		<info name="alt_title" value="ディーヴァ カリ・ユガの光輝" />
+		<info name="alt_title" value="ディーヴァ ストーリー7·カリ・ユガの光輝" />
 		<info name="release" value="198706xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
@@ -13193,11 +13193,12 @@ TODO:
 		</part>
 	</software>
 
+	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
 	<software name="daivaa" cloneof="daiva" supported="no">
-		<description>Daiva - Kari-Yuga no Kouki (Alt Format)</description>
+		<description>Daiva Story 7: Light of Kari Yuga (Alt)</description>
 		<year>1987</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
-		<info name="alt_title" value="ディーヴァ カリ・ユガの光輝" />
+		<info name="alt_title" value="ディーヴァ ストーリー7·カリ・ユガの光輝" />
 		<info name="release" value="198706xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -13209,6 +13210,28 @@ TODO:
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="disk_2.d88" size="1281968" crc="5973f551" sha1="aa88dc9fd37e0315b72796233e9369fccb7806d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Can't run the game, it asks for the system disk even when it's inserted -->
+	<software name="daivacal" cloneof="daiva" supported="no">
+		<description>Daiva Story 7: Light of Kari Yuga (Alt 2)</description>
+		<year>1987</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー7·カリ・ユガの光輝" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A?" />
+			<dataarea name="flop" size="1281968">
+				<rom name="daiva cali-yuga no mitsuteru a.d88" size="1281968" crc="065203c4" sha1="0755a9e2c0bd29844c4dc127c9b40ac53ff7bf32"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B?" />
+			<dataarea name="flop" size="1281968">
+				<rom name="daiva cali-yuga no mitsuteru b.d88" size="1281968" crc="481ae19e" sha1="05df1d3732ef4c91f87e65f9fd689a2e39da8be8"/>
 			</dataarea>
 		</part>
 	</software>
