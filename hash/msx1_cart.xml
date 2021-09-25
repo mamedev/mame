@@ -398,11 +398,11 @@ Xyzolog - Electric Software
 	</software>
 
 	<software name="daiva4">
-		<description>Daiva Story 4 - Asura's Bloodfeud (Jpn)</description>
+		<description>Daiva Story 4: Asura's Bloodfeud (Jpn)</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEX-75" />
-		<info name="alt_title" value="ディーヴァ アスラの血流" />
+		<info name="alt_title" value="ディーヴァ ストーリー4·アスラの血流" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
