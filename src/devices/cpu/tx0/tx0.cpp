@@ -16,7 +16,7 @@
 #include "debugger.h"
 
 #define LOG_RIM (1 << 1U)
-#define VERBOSE (LOG_RIM)
+//#define VERBOSE (LOG_RIM)
 #include "logmacro.h"
 
 
