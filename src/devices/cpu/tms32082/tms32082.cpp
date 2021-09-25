@@ -74,7 +74,7 @@ std::unique_ptr<util::disasm_interface> tms32082_mp_device::create_disassembler(
 
 void tms32082_mp_device::tc_command_execute(int channel, uint32_t entrypoint)
 {
-	static const char* CHANNEL_NAME[16] = {
+	[[maybe_unused]] static const char* CHANNEL_NAME[16] = {
 		"XPT15", "XPT14", "XPT13", "XPT12", "XPT11", "XPT10", "XPT9", "XPT8",
 		"XPT7", "XPT6", "XPT5", "XPT4", "XPT3", "XPT2", "XPT1", "MP"
 	};
