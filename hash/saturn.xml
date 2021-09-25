@@ -2605,7 +2605,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Alone in the Dark 2 (Japan)... -->
+	<!-- Black screen, enables [SCU] Timer 1 -->
 	<software name="aitd2j" cloneof="aitd2" supported="no">
 		<description>Alone in the Dark 2 (Jpn)</description>
 		<year>1996</year>
@@ -2653,7 +2653,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Aquazone - Desktop Life (Japan)... -->
+	<!-- Hardlocks at boot, caused by [SCU] DMA-ing with max sizes -->
 	<software name="aquazone" supported="no">
 		<description>Aquazone - Desktop Life (Jpn)</description>
 		<year>1996</year>
@@ -2701,7 +2701,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Arcade Gears Vol.4 - Image Fight &amp; X-Multiply (Japan)... -->
+	<!-- Image Fight has serious [VDP1/VDP2] video bugs (missing layers, misaligned layers, no options text is displayed ...) -->
 	<software name="imgftxm" supported="no">
 		<description>Arcade Gears Vol. 4 - Image Fight &amp; X-Multiply (Jpn)</description>
 		<year>1998</year>
@@ -2911,7 +2911,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Bio Hazard (Japan)... -->
+	<!-- No text in main menu [VDP1/VDP2] -->
+	<!-- No background layer in inventory screen, [VDP1] inverted window -->
+	<!-- Options menu is too large [VDP1], sports [VDP1] zooming error for the background zombie, has no back layer drawing [VDP2] -->
 	<software name="biohaz" cloneof="revil" supported="no">
 		<description>Bio Hazard (Jpn)</description>
 		<year>1997</year>
@@ -2927,7 +2929,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Black Matrix (Japan) (Reprint)... -->
+	<!-- Black screen after selecting new game, [CD-Block] reads FAD=165482 then jumps to lalaland -->
 	<software name="blckmtxa" cloneof="blckmtx" supported="no">
 		<description>Black/Matrix (Jpn, Reprint)</description>
 		<year>1998</year>
@@ -2991,8 +2993,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Capcom Generation - Dai 1 Shuu Gekitsui Ou no Jidai (Japan)... -->
-	<software name="capgen1" supported="no">
+	<software name="capgen1" supported="yes">
 		<description>Capcom Generation - Dai-1-Shuu - Gekitsui Ou no Jidai (Jpn)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
@@ -3007,7 +3008,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Capcom Generation - Dai 2 Shuu Makai to Kishi (Japan)... -->
+	<!-- DaiMakaiMura BGM playbacks misses one instrument starting from stage 2 (only in-game, works fine in sound test), [SCSP] key on/off issue? -->
+	<!-- Wrong [VDP2] tilemap [VDP1] sprite priorities, particularly noticeable in ChohMakaiMura -->
+	<!-- Missing [VDP2] mosaic for ChohMakaiMura on map transitions -->
 	<software name="capgen2" supported="no">
 		<description>Capcom Generation - Dai-2-Shuu - Makai to Kishi (Jpn)</description>
 		<year>1998</year>
@@ -3039,7 +3042,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Capcom Generation - Dai 4 Shuu Kokou no Eiyuu (Japan)... -->
+	<!-- Plays wrong sound/BGMs in all games, [CD-Block]? -->
+	<!-- Capcon Generation "Title Select" screen draws transparent instead of opaque [VDP2] -->
+	<!-- All games uses unemulated [VDP1] framebuffer rotation in Yoko screen mode, sprites are slightly glitchy in Tate mode. -->
 	<software name="capgen4" supported="no">
 		<description>Capcom Generation - Dai-4-Shuu - Kokou no Eiyuu (Jpn)</description>
 		<year>1998</year>
@@ -3055,8 +3060,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Capcom Generation - Dai 5 Shuu Kakutou ke Tachi (Japan)... -->
-	<software name="capgen5" supported="no">
+	<software name="capgen5" supported="yes">
 		<description>Capcom Generation - Dai-5-Shuu - Kakutou ke Tachi (Jpn)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
@@ -3087,7 +3091,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Chibi Maruko-chan no Taisen Puzzledama (Japan)... -->
+	<!-- Konami FMV logo sound is off-sync [CD-Block] -->
+	<!-- Black screen after FMV with -drc option -->
+	<!-- In-game speech and redbook audio are off-sync [CD-Block] -->
 	<software name="cpuzldam" supported="no">
 		<description>Chibi Maruko-chan no Taisen Puzzledama (Jpn)</description>
 		<year>1995</year>
@@ -3173,8 +3179,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Command &amp; Conquer (Japan) (Disc 1) (GDI Disc)... -->
-	<!-- Identifying Command &amp; Conquer (Japan) (Disc 2) (NOD Disc)... -->
+	<!-- Black screen (and SIGSEGV with -drc) on FMVs, [CD-Block] transfers 1 sector at a time but actual transfers are way ahead. -->
 	<software name="cncj" cloneof="cnc" supported="no">
 		<description>Command &amp; Conquer (Jpn)</description>
 		<year>1997</year>
@@ -3245,7 +3250,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Cyberbots - Fullmetal Madness (Japan) (1M)... -->
+	<!-- Hangs at Now loading screens, expects [VDP1] CEF to be 1 (in manual mode, without writing to the port first) -->
 	<software name="cybots" supported="no">
 		<description>Cyberbots - Fullmetal Madness (Jpn, 1M)</description>
 		<year>1997</year>
@@ -3322,7 +3327,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Darius Gaiden (Japan) (3M)... -->
+	<!-- Several sprites in intro have wrong colors (cfr. first mech exiting the planet, lasers when Silver Hawk is introduced, Golden Ogre) [VDP1] -->
 	<software name="dariusgj" cloneof="dariusg" supported="no">
 		<description>Darius Gaiden (Jpn, 3M)</description>
 		<year>1995</year>
@@ -3402,7 +3407,10 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying DecAthlete (Japan) (1M)... -->
+	<!-- Sega Sports logo has few glitchy tiles on bottom of screen [VDP2] -->
+	<!-- [SCSP] CPU often crashes during boot -->
+	<!-- Incorrectly blends ROZ layer [VDP2] -->
+	<!-- main menu/gameplay performance is poor [VDP2?] -->
 	<software name="decathltj" cloneof="athlking" supported="no">
 		<description>DecAthlete (Jpn, 1M)</description>
 		<year>1996</year>
@@ -3669,7 +3677,10 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying DoDonPachi (Japan)... -->
+	<!-- Hangs at now loading screen with Cave logo with -drc on -->
+	<!-- Right edge of screen has empty blue line on gameplay [VDP2] -->
+	<!-- Setting game in Tate Mode will often black screen Arcade Mode attract, sometimes gameplay too. -->
+	<!-- First boss initial GFX composition diverges compared to Arcade version [VDP1] -->
 	<software name="ddonpach" supported="no">
 		<description>DoDonPachi (Jpn)</description>
 		<year>1997</year>
@@ -3739,7 +3750,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Doukyuusei if (Japan) (1M, 2M)... -->
+	<!-- Fade in/out effect is reversed on title screen, enables [VDP2] Color Calculation -->
 	<software name="dokyuif" supported="no">
 		<description>Doukyuusei If (Jpn, 1M, 2M)</description>
 		<year>1996</year>
@@ -3836,7 +3847,9 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- The Dungeons and Dragons collection is a 2 disk set, but each disk is an independent game so I've left them separate -->
-	<!-- Identifying Dungeons &amp; Dragons Collection (Japan) (Disc 1) (Tower of Doom)... -->
+	<!-- Glitchy sprites [VDP1] -->
+	<!-- No SFXs [CD-Block/SCSP] -->
+	<!-- Hangs often -->
 	<software name="ddtod" supported="no">
 		<description>Dungeon's &amp; Dragons - Tower of Doom (Dungeons &amp; Dragons Collection Disc 1) (Jpn)</description>
 		<year>1999</year>
@@ -3853,6 +3866,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Dungeons &amp; Dragons Collection (Japan) (Disc 2) (Shadow over Mystara)... -->
+	<!-- Glitchy sprites [VDP1] -->
 	<software name="ddsom" supported="no">
 		<description>Dungeons &amp; Dragons - Shadow over Mystara (Dungeons &amp; Dragons Collection Disc 2) (Jpn)</description>
 		<year>1999</year>
@@ -4063,7 +4077,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Dragon Slayer crashes in DRC after being selected, with NODRC sound eventually dies during gameplay. -->
+	<!-- Dragon Slayer crashes with -drc during the initial loading -->
+	<!-- [SCSP] sound eventually dies during gameplay. -->
 	<software name="falcom1" supported="no">
 		<description>Falcom Classics (Jpn)</description>
 		<year>1997</year>
@@ -4079,7 +4094,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Falcom Classics II (Japan)... -->
+	<!-- Doesn't recognize start button on title screen, known to be related with [CD-Block] -->
 	<software name="falcom2" supported="no">
 		<description>Falcom Classics II (Jpn)</description>
 		<year>1998</year>
@@ -4111,8 +4126,11 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Fighter's History Dynamite (Japan)... -->
-	<software name="fhdyna" supported="no"> <!-- karnovr -->
+	<!-- On gameplay most characters draw garbage, [CD-Block] never starts most transfers -->
+	<!-- redbook audio don't playback, probably related to above. -->
+	<!-- Clears [VDP1] framebuffer every 2 frames, intentional? -->
+	<!-- Accesses ROM space at first boot, disabled debugging code? -->
+	<software name="fhdyna" supported="no">
 		<description>Fighter's History Dynamite (Jpn)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -4120,6 +4138,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19970704"/>
 		<info name="alt_title" value="ファイターズヒストリー・ダイナマイト"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<!-- TODO: 1 Mbit RAM? -->
 		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -4179,11 +4198,11 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Fighting Vipers (Korea)... -->
 	<software name="fvipersk" cloneof="fvipers" supported="no">
 		<description>Fighting Vipers (Kor)</description>
-		<year>1996</year>
+		<year>1996?</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="MK81041-08"/>
 		<info name="alt_title" value="파이팅바이퍼즈"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-K,NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fighting vipers (korea)" sha1="f5bc2c13ab82d18529426f70e460534b118d41c8" />
@@ -4223,7 +4242,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Fishing Koushien (Japan)... -->
+	<!-- title screen effect glitches out [VDP1] -->
 	<software name="fishk" supported="no">
 		<description>Fishing Koushien (Jpn)</description>
 		<year>1996</year>
@@ -4288,7 +4307,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gakkou no Kaidan (Japan)... -->
+	<!-- Black screen, [CD-Block] uses fnum reject filter -->
 	<software name="gakkokai" supported="no">
 		<description>Gakkou no Kaidan (Jpn)</description>
 		<year>1995</year>
@@ -4304,7 +4323,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Galaxy Fight - Universal Warriors (Japan)... -->
+	<!-- Glitchy sprites [VDP1] -->
 	<software name="galaxyfgj" cloneof="galaxyfg" supported="no">
 		<description>Galaxy Fight - Universal Warriors (Jpn)</description>
 		<year>1995</year>
@@ -4320,7 +4339,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gale Racer (Japan) (En,Ja) (1A)... -->
+	<!-- Gameplay car HUD becomes transparent when tilting on slopes [VDP2] -->
 	<software name="galerace" supported="no">
 		<description>Gale Racer (Jpn, 1A)</description>
 		<year>1994</year>
@@ -4336,7 +4355,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gals Panic SS (Japan)... -->
+	<!-- Gals select screen sports unmasked text layer over box, [VDP2] enables window logic OR on NBG2 with only one window enabled -->
 	<software name="gpanicss" supported="no">
 		<description>Gals Panic SS (Jpn)</description>
 		<year>1996</year>
@@ -4352,8 +4371,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Game Basic for SegaSaturn (Japan) (Windows CD)... -->
-	<!-- Identifying Game Basic for SegaSaturn (Japan)... -->
+	<!-- Keyboard inputs doesn't work properly (regression) -->
 	<software name="gamebas" supported="no">
 		<description>Game Basic for SegaSaturn (Jpn)</description>
 		<year>1998</year>
@@ -4361,6 +4379,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="serial" value="T-2111G"/>
 		<info name="release" value="19980625"/>
 		<info name="alt_title" value="ゲームベーシック フォー セガサターン"/>
+		<!-- TODO: in port 2? -->
+		<info name="usage" value="Needs keyboard connected"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -4390,7 +4410,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Game-Ware Vol. 3 (Japan)... -->
+	<!-- Black screen after "Lotte Green Gum" FMV with -drc -->
+	<!-- Triggers fnum rejects [CD-Block] -->
 	<software name="gware3" supported="no">
 		<description>Game-Ware Vol. 3 (Jpn)</description>
 		<year>1996</year>
@@ -4454,7 +4475,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gokujou Parodius Da! Deluxe Pack (Japan) (Rev A)... -->
+	<!-- Stop BGMs sound playback during gameplay in both games, [CD-Block] uses curfad filter rejection -->
 	<software name="gokuparo" cloneof="parodius" supported="no">
 		<description>Gokujou Parodius Da! Deluxe Pack (Jpn, Rev. A)</description>
 		<year>1995</year>
@@ -4470,7 +4491,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Golden Axe - The Duel (Japan) (2M)... -->
+	<!-- Returns to Sega MultiPlayer menu after [CD-Block] reads FAD=474 (COLOR.BIN) a second time around (upload failed?) -->
 	<software name="gaxeduelj" cloneof="gaxeduel" supported="no">
 		<description>Golden Axe - The Duel (Jpn, 2M)</description>
 		<year>1995</year>
@@ -4534,10 +4555,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Grandia (Japan) (Disc 1) (1M)... -->
-	<!-- Identifying Grandia (Japan) (Disc 1) (2M)... -->
-	<!-- Identifying Grandia (Japan) (Disc 2) (3M)... -->
-	<!-- Identifying Grandia (Japan) (Disc 2) (4M)... -->
+	<!-- Hangs on Sega logo with [CD-Block] keeps looping with command 0x51 (regression) -->
 	<software name="grandia" supported="no">
 		<description>Grandia (Jpn, 1M)</description>
 		<year>1997</year>
@@ -4568,7 +4586,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Grandia - Digital Museum (Japan) (Rev A)... -->
+	<!-- Hangs on Sega logo with [CD-Block] keeps looping with command 0x51 (regression) -->
 	<software name="granddm" supported="no">
 		<description>Grandia - Digital Museum (Jpn, Rev. A)</description>
 		<year>1998</year>
@@ -4600,7 +4618,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Greatest Nine '96 (Japan) (2M)... -->
+	<!-- SIGSEGV with -drc after starting a game -->
+	<!-- Selected team flags and in-game shadows sports zooming errors [VDP1] -->
+	<!-- Stadium select wireframes sports stippled oblique polylines [VDP1] -->
 	<software name="gnine96" supported="no">
 		<description>Greatest Nine '96 (Jpn, 2M)</description>
 		<year>1996</year>
@@ -4648,7 +4668,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gunbird (Japan)... -->
+	<!--  Doesn't read file ID of "Illust Gallery" / "Charactor Index" / ending(s?), [CD-Block] doesn't read root directory properly -->
 	<software name="gunbird" supported="no">
 		<description>Gunbird (Jpn)</description>
 		<year>1995</year>
@@ -4680,7 +4700,10 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gussun Oyoyo S (Japan)... -->
+	<!-- Options Mode has a slight garbage line on top, [VDP2] -->
+	<!-- Intro redbook audio is offset compared to video [CD-Block] -->
+	<!-- Some SFX volumes are really quiet (namely the piece swap) [SCSP] -->
+	<!-- TODO: check all on real HW -->
 	<software name="gussun" supported="no">
 		<description>Gussun Oyoyo S (Jpn)</description>
 		<year>1996</year>
@@ -4760,7 +4783,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying House of the Dead, The (Japan)... -->
+	<!-- Black screen after Sega logo with -drc -->
+	<!-- "Hold Your Fire" screen has empty last screen line, TODO: verify on real HW -->
 	<software name="hotdj" cloneof="hotd" supported="no">
 		<description>The House of the Dead (Jpn)</description>
 		<year>1998</year>
@@ -4998,7 +5022,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Jikkyou Oshaberi Parodius - Forever with Me (Japan)... -->
+	<!-- Black screen waiting for an irq event buffer to happen, culprit is [VDP1] irq? -->
 	<software name="jikkparo" supported="no">
 		<description>Jikkyou Oshaberi Parodius - Forever with Me (Jpn)</description>
 		<year>1996</year>
@@ -5244,7 +5268,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying King of Boxing, The (Japan)... -->
+	<!-- FMV playback is very glitchy [CD-Block] -->
+	<!-- main menu/gameplay performance is poor (caused by the polygon rasterizer) [VDP1] -->
+	<!-- Gameplay back layer still shows the main menu instead of being black filled [VDP2] -->
 	<software name="kingbox" cloneof="vicboxin" supported="no">
 		<description>The King of Boxing (Jpn)</description>
 		<year>1995</year>
@@ -5311,7 +5337,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Kisuishou Densetsu Astal (Japan) (4M)... -->
+	<!-- Black screen, caused by cache RAM setting a value of 0xf to [SCU] irq mask -->
+	<!-- Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43 -->
 	<software name="astalj" cloneof="astal" supported="no">
 		<description>Kisuishou Densetsu Astal (Jpn, 4M)</description>
 		<year>1995</year>
@@ -6006,7 +6033,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<publisher>Wooyoung</publisher>
 		<info name="serial" value="T-26801H-08"/>
 		<info name="alt_title" value="미스트"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-K,NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="myst (korea)" sha1="8a23e3c30758ddee048bb07229024c281adf7b8b" />
@@ -6493,7 +6520,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Pro Yakyuu Greatest Nine '97 - Make Miracle (Japan)... -->
-	<software name="gnine97ma" cloneof="gnine97" supported="no">
+	<software name="gnine97ma" cloneof="gnine97m" supported="no">
 		<description>Pro Yakyuu Greatest Nine '97 - Make Miracle (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -7230,7 +7257,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - Columns Arcade Collection (Japan)... -->
+	<!-- Doesn't draw the Sega Ages logo at boot [VDP2?] -->
+	<!-- Pings [CD-Block] HIRM register, no noticeable effect? -->
 	<software name="columns" supported="no">
 		<description>Sega Ages - Columns Arcade Collection (Jpn)</description>
 		<year>1997</year>
@@ -7246,7 +7274,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - Fantasy Zone (Japan)... -->
+	<!-- TODO: Verify initial Sega logo animation -->
+	<!-- BGMs are mostly silent, never completes underlying [CD-Block] transfer -->
 	<software name="fantzone" supported="no">
 		<description>Sega Ages - Fantasy Zone (Jpn)</description>
 		<year>1997</year>
@@ -7326,7 +7355,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Phantasy Star 2 (at least) has not working BGMs (repeats a very short chunk over and over) -->
+	<!-- PS2 (at least) has not working BGMs (repeats a very short chunk over and over) (Update: fixed by now, or random bug?) -->
+	<!-- PS2 sports wrong tilemap-sprite priorities on gameplay (sprites going above buildings, menuing etc.) [VDP1/VDP2] -->
+	<!-- TODO: verify PS1/PS3/PS4 -->
 	<software name="pstarcol" supported="no">
 		<description>Sega Ages - Phantasy Star Collection (Jpn)</description>
 		<year>1998</year>
@@ -7397,7 +7428,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<publisher>Samsung</publisher>
 		<info name="serial" value="MK81207-08"/>
 		<info name="alt_title" value="세가 랠리"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-K,NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sega rally championship (korea)" sha1="5ae79ef9b176075c4ee422bc8e631f70aa6e13ca" />
@@ -7453,8 +7484,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sengoku Blade - Sengoku Ace Episode II (Japan) (Disc 1)... -->
-	<!-- Identifying Sengoku Blade - Sengoku Ace Episode II (Japan) (Disc 2) (Omake CD)... -->
+	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="sengblad" supported="no">
 		<description>Sengoku Blade - Sengoku Ace Episode II (Jpn)</description>
 		<year>1996</year>
@@ -7475,8 +7505,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Senkutsu Katsuryu Taisen - Chaos Seed (Japan) (Disc 1) (Rev A) (10M)... -->
-	<!-- Identifying Senkutsu Katsuryu Taisen - Chaos Seed (Japan) (Disc 2) (Omake CD)... -->
+	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="chaossd" supported="no">
 		<description>Senkutsu Katsuryu Taisen - Chaos Seed (Jpn, Rev A)</description>
 		<year>1998</year>
@@ -7877,7 +7906,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying SimCity 2000 (Japan) (Rev A)... -->
+	<!-- Black screen, expects [VDP1] CEF to be 1 -->
 	<software name="simcit2kj" cloneof="simcit2k" supported="no">
 		<description>Sim City 2000 (Jpn, Rev A)</description>
 		<year>1995</year>
@@ -9219,7 +9248,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Whizz (Japan)... -->
+	<!-- black screen at boot, [CD-Block] never completes first FMV transfer after FAD=5561 -->
 	<software name="whizzj" cloneof="whizz" supported="no">
 		<description>Whizz (Jpn)</description>
 		<year>1997</year>
@@ -9395,14 +9424,15 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Worldwide Soccer - Sega International Victory Goal Edition (Korea)... -->
+	<!-- Trips some illegal sprites during transitions [VDP1] -->
+	<!-- Has sprite zooming errors (cfr. VS flags before matches) [VDP1] -->
 	<software name="intvgoalk" cloneof="intvgoal" supported="no">
 		<description>Worldwide Soccer - Sega International Victory Goal Edition (Kor)</description>
-		<year>199?</year>
+		<year>1995?</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="MK81105-08"/>
 		<info name="alt_title" value="월드 와이드 사커"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-K,NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="worldwide soccer - sega international victory goal edition (korea)" sha1="1db5e4e0e06bc2d7dec752ec15cfefc835c01f8d" />
@@ -9808,8 +9838,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Big Ichigeki! Pachi-slot Daikouryaku (JAP) (v1.000) (DW0472)... -->
-	<software name="bigichig" supported="no">
+	<software name="bigichig" supported="yes">
 		<description>Big Ichigeki! Pachi-slot Daikouryaku (Jpn, v1.000)</description>
 		<year>1996</year>
 		<publisher>ASK Kodansha</publisher>
@@ -9988,7 +10017,10 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Clockwork Knight - Pepperouchau's Adventure Gekan (JAP) (DW0440)... -->
+	<!-- FMV playbacks are jumpy [CD-Block] -->
+	<!-- Crashes in -drc after FMV playback -->
+	<!-- Can trip illegal sprite entries at FMV playback after beating prologue boss [VDP1] -->
+	<!-- [VDP2] window effect is doubled in X axis on world map, it also doesn't sport the leftmost unmasked line (real HW bug) -->
 	<software name="cknight2j" cloneof="cknight2" supported="no">
 		<description>Clockwork Knight - Pepperouchau no Daibouken Gekan (Jpn)</description>
 		<year>1995</year>
@@ -10072,7 +10104,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Daina Airan - Dinosaur Island (JAP) (DW0633)... -->
+	<!-- Main menu and several video items incorrectly blends [VDP2] -->
 	<software name="dinoisl" supported="no">
 		<description>Daina Airan (Jpn)</description>
 		<year>1997</year>
@@ -10136,7 +10168,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Dark Seed II (JAP) (DW0617)... -->
+	<!-- Hangs at now loading screen, [SH2] $60ffc13 comms -->
 	<software name="darksed2" supported="no">
 		<description>Darkseed II (Jpn)</description>
 		<year>1997</year>
@@ -10253,9 +10285,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Derby Analyst (JAP) (DW0471)... -->
+	<!-- (Verify main menu GFXs) -->
 	<software name="derbyana" supported="no">
-		<description>Derby Analist (Jpn)</description>
+		<description>Derby Analyst (Jpn)</description>
 		<year>1997</year>
 		<publisher>Media Entertainment</publisher>
 		<info name="serial" value="T-20505G"/>
@@ -10407,7 +10439,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Doukoku Soshite... (JAP) (DW0313)... -->
+	<!-- Inside the bus sports unblended handlebars compared to the full screen [VDP1/VDP2] -->
 	<software name="doukokus" supported="no">
 		<description>Doukoku Soshite... (Jpn)</description>
 		<year>1998</year>
@@ -10494,7 +10526,14 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Dragon's Dream (JAP) (DW0874)... -->
+	<!-- Pings [CD-Block] HIRM register, no noticeable effect? -->
+	<!-- Moans about modem not connected off the bat, pings [CD-Block] specific I/O for status (kludged to work) -->
+	<!-- With -drc on it moans that the "backup RAM is unformatted", it actually tries to access wrong pointers and eventually corrupts it out -->
+	<!-- Title screen drawing cuts off backgrounds with black pens [VDP2] -->
+	<!-- Options menu doesn't show background layer(s) [VDP2] -->
+	<!-- Keyboard inputs doesn't work -->
+	<!-- Presumably dies when actually accessing Nifty Serve details -->
+	<!-- Attract mode draws only skill names and attribute bars over a black BG, enables [VDP2] Sprite Window -->
 	<software name="dragndrm" supported="no">
 		<description>Dragon's Dream (Jpn)</description>
 		<year>1997?</year>
@@ -10502,6 +10541,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="serial" value="GS-7114"/>
 		<info name="release" value="19971220?"/>
 		<info name="alt_title" value="ドラゴンズドリーム"/>
+		<info name="usage" value="Needs Netlink modem and keyboard connected to port 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10740,7 +10780,13 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Fire Pro Gaiden Blazing Tornado (JAP) (DW0502)... -->
+	<!-- Sound balancing on main menu is quite off bass wise (verified on real HW) [SCSP] -->
+	<!-- Shows incorrect tilemap wrapping transitions on main menu [VDP2] -->
+	<!-- SIGSEGV in Circuit Mode before the "now loading" screen with -drc -->
+	<!-- Shows inaccurate fully transparent blending for lights on the Circuit Mode "now loading" screens [VDP1/VDP2] -->
+	<!-- Circuit Mode "now loading" background meshes for wrestlers have wrong patterns (expected: squared NxN, actual: oblique, verified on real HW) [VDP1] -->
+	<!-- Circuit Mode "now loading" start skip is available too early (expected: around the second character to be presented, actual: in the middle of first character, verified on real HW) [CD-Block] -->
+	<!-- Elimination Mode presentation screens shows HUD for 1 frame then layer gets erased [VDP1] -->
 	<software name="blaztorn" supported="no">
 		<description>Fire Pro Gaiden Blazing Tornado (Jpn)</description>
 		<year>1995</year>
@@ -10772,7 +10818,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Flash Sega Saturn ~Ochikadzuki-hen~ (JAP) (DW0878)... -->
+	<!-- TODO: check all games in it -->
 	<software name="flshssoh" supported="no">
 		<description>Flash Sega Saturn - Ochikadzuki-hen (Jpn)</description>
 		<year>1996</year>
@@ -10856,7 +10902,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gakkou no Kowai Uwasa - Hanako-san ga Kita!! (JAP) (DW0639)... -->
+	<!-- Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loops reading 0x6055670 -->
 	<software name="gakkokow" supported="no">
 		<description>Gakkou no Kowai Uwasa - Hanako-san ga Kita!! (Jpn)</description>
 		<year>1995</year>
@@ -11027,7 +11073,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Goiken Muyou ~Anarchy in the Nippon~ Taikenban (JAP) (DW0895)... -->
+	<!-- Voice samples are too high pitched [SCSP] -->
+	<!-- gameplay performance is poor [VDP1/VDP2] -->
 	<software name="anarchytai" cloneof="anarchy" supported="no">
 		<description>Goiken Muyou - Anarchy in the Nippon Taikenban (Jpn)</description>
 		<year>1997</year>
@@ -11393,7 +11440,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Java Tea Original Virtua Fighter Kids (JAP) (DW0887)... -->
+	<!-- has no audio redbook playback [CD-Block] -->
 	<software name="vfkidsjj" cloneof="vfkids" supported="no">
 		<description>Virtua Fighter Kids (Jpn, Java Tea Original version)</description>
 		<year>1996</year>
@@ -12894,8 +12941,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sengoku Blade (Disc 1 of 2) (JAP) (DW0190)... -->
-	<!-- Identifying Sengoku Blade (Disc 2 of 2) (JAP) (DW0190)... -->
+	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="sengblada" cloneof="sengblad" supported="no">
 		<description>Sengoku Blade - Sengoku Ace Episode II (Jpn, Alt)</description>
 		<year>1996</year>
@@ -12916,8 +12962,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Shichisei Toushin Guyferd (JAP) (DW0546)... -->
-	<software name="guyferd" supported="no">
+	<software name="guyferd" supported="yes">
 		<description>Shichisei Toushin Guyferd - Crown Kaimetsu Sakusen (Jpn)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
@@ -13498,7 +13543,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Tactics Ogre (JAP) (DW0432)... -->
+	<!-- New game character select has offset window sprite [VDP1/VDP2] -->
+	<!-- Intro GFXs are offset and doubled in X axis [VDP2] -->
+	<!-- Dialogue portraits are cut off if drawn to the right part of screen, [VDP2] window? -->
 	<software name="tactogre" supported="no">
 		<description>Tactics Ogre (Jpn)</description>
 		<year>1996</year>
@@ -14334,7 +14381,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Virtua Fighter Kids (JAP) (DW0142)... -->
+	<!-- has no audio redbook playback [CD-Block] -->
 	<software name="vfkidsj" cloneof="vfkids" supported="no">
 		<description>Virtua Fighter Kids (Jpn)</description>
 		<year>1996</year>
@@ -14886,7 +14933,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Alone in the Dark 2 (T-10602G)... -->
+	<!-- Black screen, enables [SCU] Timer 1 -->
 	<software name="aitd2ja" cloneof="aitd2" supported="no">
 		<description>Alone in the Dark 2 (Jpn, Alt)</description>
 		<year>1996</year>
@@ -14902,7 +14949,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Amagi Shien (J) (T-1513G)... -->
+	<!-- Hangs at Sega logo, expects [CD-Block] status change from PAUSE (Double PAUSE -> STANDBY?) -->
 	<software name="amagishi" supported="no">
 		<description>Amagi Shien (Jpn)</description>
 		<year>1997</year>
@@ -15290,7 +15337,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Big Ichigeki PachiSlot Daikoryaku Universal Museum (J) (T-16704G)... -->
+	<!-- Hangs at Sega logo, uses [SMPC] command 0x0e via BIOS and SLEEP (expecting NMI to be unconditionally requested?) -->
 	<software name="bigichiga" cloneof="bigichig" supported="no">
 		<description>Big Ichigeki! Pachi-Slot Daikouryaku (Jpn, Alt)</description>
 		<year>1996</year>
@@ -15471,7 +15518,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Brain Battle Q (J) (T-25701G)... -->
+	<!-- Voice samples are too high pitched [SCSP] -->
 	<software name="bbq" supported="no">
 		<description>Brain Battle Q (Jpn)</description>
 		<year>1996</year>
@@ -15653,7 +15700,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Chibi Maruko-Chan no Taisen Pazurudama (T-9507G)... -->
+	<!-- Konami FMV logo sound is off-sync [CD-Block] -->
+	<!-- Black screen after FMV with -drc option -->
+	<!-- In-game speech and redbook audio are off-sync [CD-Block] -->
 	<software name="cpuzldama" cloneof="cpuzldam" supported="no">
 		<description>Chibi Maruko-Chan no Taisen Puzzledama (Jpn, Alt)</description>
 		<year>1995</year>
@@ -15841,7 +15890,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Croc ~Pau-Pau Island~ (T-26410G)... -->
+	<!-- No sound [CD-Block/SCSP] -->
+	<!-- "Window enabled for RGB555 Zoom" [VDP2] -->
 	<software name="crocj" cloneof="croc" supported="no">
 		<description>Croc - Pau-Pau Island (Jpn)</description>
 		<year>1998</year>
@@ -15959,7 +16009,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying D-Xhird (T-10307G)... -->
+	<!-- Opening FMV has visible screen tearing [CD-Block] -->
 	<software name="dxhird" supported="no">
 		<description>D-Xhird (Jpn)</description>
 		<year>1997</year>
@@ -16356,7 +16406,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Derby Analist (T-20505G)... -->
 	<software name="derbyanaa" cloneof="derbyana" supported="no">
-		<description>Derby Analist (Jpn, Alt)</description>
+		<description>Derby Analyst (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>Media Entertainment</publisher>
 		<info name="serial" value="T-20505G"/>
@@ -16497,7 +16547,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Digital Pinball Last Gladiators Ver 9.7 (T-18903G)... -->
+	<!-- Black screen after Kaze logo with -drc option. -->
 	<software name="digipinj97" cloneof="digipin" supported="no">
 		<description>Digital Pinball - Last Gladiators Ver. 9.7 (Jpn)</description>
 		<year>1997</year>
@@ -16653,7 +16703,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Druid - Yami e no Tsuiseki Sha (T-7670G)... -->
+	<!-- Glitchy sprites [VDP1] -->
 	<software name="druid" supported="no">
 		<description>Druid - Yami e no Tsuiseki Sha (Jpn)</description>
 		<year>1998</year>
@@ -16933,7 +16983,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying FIFA Soccer 96 (J) (T-10606G)... -->
+	<!-- FMV playback is very glitchy [CD-Block] -->
 	<software name="fifa96j" cloneof="fifa96" supported="no">
 		<description>FIFA Soccer 96 (Jpn)</description>
 		<year>1996</year>
@@ -17057,7 +17107,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Flash Sega Saturn - Ochikadzuki Hen (610-6166-99)... -->
+	<!-- TODO: check all games in it -->
 	<software name="flshssoha" cloneof="flshssoh" supported="no">
 		<description>Flash Sega Saturn - Ochikadzuki-hen (Jpn, Alt)</description>
 		<year>1996</year>
@@ -17072,7 +17122,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Flash Sega Saturn Vol 4 (610-6166-04)... -->
+	<!-- TODO: check all games in it -->
 	<software name="flshss4" supported="no">
 		<description>Flash Sega Saturn Vol. 4 (Jpn)</description>
 		<year>1996</year>
@@ -17087,7 +17137,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Flash Sega Saturn Vol 7 (610-6166-07)... -->
+	<!-- TODO: check all games in it -->
 	<software name="flshss7" supported="no">
 		<description>Flash Sega Saturn Vol. 7 (Jpn)</description>
 		<year>1996</year>
@@ -17102,7 +17152,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Flash Sega Saturn Vol 8 (610-6166-08)... -->
+	<!-- TODO: check all games in it -->
 	<software name="flshss8" supported="no">
 		<description>Flash Sega Saturn Vol. 8 (Jpn)</description>
 		<year>1996</year>
@@ -17117,7 +17167,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Flash Sega Saturn Vol 10 (610-6166-10)... -->
+	<!-- TODO: check all games in it -->
 	<software name="flshss10" supported="no">
 		<description>Flash Sega Saturn Vol. 10 (Jpn)</description>
 		<year>1996</year>
@@ -17218,7 +17268,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Full Cowl Mini Yonku Super Factory (T-26408G)... -->
+	<!-- black screen at boot, master-slave comms at PC=601f776 (happens multiple times) -->
+	<!-- gameplay performance is poor [VDP1/VDP2] -->
 	<software name="fullcowl" supported="no">
 		<description>Full Cowled Mini Yonku Super Factory (Jpn)</description>
 		<year>1997</year>
@@ -17329,7 +17380,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gakkou no Kaidan (GS-9026)... -->
+	<!-- Initial FMV skips a lot (still uses [CD-Block] fnum reject but works here?) -->
+	<!-- Options menu has corrupt background layer, [VDP2] VRAM linescroll wraparound? -->
 	<software name="gakkokaia" cloneof="gakkokai" supported="no">
 		<description>Gakkou no Kaidan (Jpn, Alt)</description>
 		<year>1995</year>
@@ -17390,7 +17442,7 @@ Olympic Soccer (Fra) T-7904H-09
 	  = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
 	</software>-->
 
-	<!-- Identifying Game de Seishun (T-19711G)... -->
+	<!-- Hangs at "now loading" screen, [SH2] $60ffc13 comms -->
 	<software name="gameseis" supported="no">
 		<description>Game de Seishun (Jpn)</description>
 		<year>1998</year>
@@ -17438,7 +17490,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Game no Tatsujin 2 (T-1509G)... -->
+	<!-- Hangs at Sega logo, expects [CD-Block] status change from PAUSE (Double PAUSE -> STANDBY?) -->
 	<software name="gametat2" supported="no">
 		<description>Game no Tatsujin 2 (Jpn)</description>
 		<year>1996</year>
@@ -17556,7 +17608,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gekitotu Koshien (J) (T-6701G)... -->
+	<!-- After selecting new game and the prefecture sports corrupt background layer [VDP2] -->
 	<software name="gekikosh" supported="no">
 		<description>Gekitotsu Koushien (Jpn)</description>
 		<year>1997</year>
@@ -17572,7 +17624,10 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gekka no Kishi - Ouryussen (T-20606G)... -->
+	<!-- main menu sports solid GFX selection [VDP2] -->
+	<!-- Voice samples are too high pitched [SCSP] -->
+	<!-- Gameplay performance is quite poor [VDP1/VDP2] -->
+	<!-- Gameplay has no text, and enables undocumented [VDP2] layer BGON with bit 6!? -->
 	<software name="gekkakis" supported="no">
 		<description>Gekka no Kishi - Ouryuusen (Jpn)</description>
 		<year>1996</year>
@@ -17700,7 +17755,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Crashes at KSS logo with DRC -->
+	<!-- SIGSEGV at KSS logo or during intro with -drc on -->
+	<!-- Voice samples are too high pitched [SCSP] -->
 	<software name="anarchy" supported="no">
 		<description>Goiken Muyou - Anarchy in the Nippon (Jpn)</description>
 		<year>1997</year>
@@ -17812,7 +17868,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Groove on Fight ~Gouketsuji Ichizoku 3~ (Doukonban) (T-14413G)... -->
+	<!-- AI never moves, not even at "Abnormal" difficulty. [CD-Block] skips loading a file? -->
+	<!-- Ready text on start of round sports zooming errors [VDP1] -->
 	<software name="groovef" supported="no">
 		<description>Groove on Fight - Gouketsuji Ichizoku 3 - Kakuchou Ram Cartridge-tsuki! (Jpn)</description>
 		<year>1997</year>
@@ -17921,7 +17978,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Hattrick Hero S (T-1103G)... -->
+	<!-- No crowd is shown, particularly noticeable in intro (where performance dips) [VDP2] -->
 	<software name="htheros" supported="no">
 		<description>HatTrick Hero S (Jpn)</description>
 		<year>1995</year>
@@ -18093,8 +18150,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Houma Hunter Lime Perfect Collection Disc 1 (T-2001G)... -->
-	<!-- Identifying Houma Hunter Lime Perfect Collection Disc 2 (T-2001G)... -->
+	<!-- Fade in/out effect is reversed on title screen, enables [VDP2] Color Calculation -->
 	<software name="hhuntpc" supported="no">
 		<description>Houma Hunter Lime Perfect Collection (Jpn)</description>
 		<year>1995</year>
@@ -18115,7 +18171,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Hyper 3D Pinball (T-7007G)... -->
+	<!-- TODO: triggered "always nudge even with shoulder" presses bug once but cannot reproduce -->
 	<software name="h3dpinj" cloneof="tilt" supported="no">
 		<description>Hyper 3D Pinball (Jpn)</description>
 		<year>1997</year>
@@ -20969,7 +21025,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying The Hyper Golf - Devil's Course (T-2301G)... -->
+	<!-- Throws "Error Trap Vector 4" with -drc off the bat -->
+	<!-- Has garbage pixels all over the place [VDP1/VDP2] -->
+	<!-- Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 1 -->
 	<software name="hyprgolf" cloneof="valora" supported="no">
 		<description>The Hyper Golf - Devil's Course (Jpn)</description>
 		<year>1995</year>
@@ -22485,7 +22543,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Actua Golf (T-18710G)... -->
+	<!-- black screen at boot, spurious [SMPC] irq -->
 	<software name="actuagolj" cloneof="actuagol" supported="no">
 		<description>Actua Golf (Jpn)</description>
 		<year>1997</year>
@@ -22517,7 +22575,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Assault Rigs (T-18606G)... -->
+	<!-- Draws invalid polygon vertices [VDP1] (regression?) -->
 	<software name="assrigs" supported="no">
 		<description>Assault Rigs (Jpn)</description>
 		<year>1997</year>
@@ -22993,7 +23051,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Greatest Nine '97 (J) (GS-9139)... -->
+	<!-- Black screen after Sega Sports logo, buggy handshake bug with [SMPC] commands cfr. PC=6004FC0 (buggy [SH2] delay slot or command should just be faster?) -->
 	<software name="gnine97" supported="no">
 		<description>Pro Yakyuu Greatest Nine '97 (Jpn)</description>
 		<year>1997</year>
@@ -23009,7 +23067,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Greatest Nine '97 Make Miracle (J) (GS-9171)... -->
+	<!-- Black screen after Sega Sports logo, buggy handshake bug with [SMPC] commands cfr. PC=6004FC0 (buggy [SH2] delay slot or command should just be faster?) -->
 	<software name="gnine97m" supported="no">
 		<description>Pro Yakyuu Greatest Nine '97 - Make Miracle (Jpn)</description>
 		<year>1997</year>
@@ -23041,7 +23099,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Greatest Nine (J) (GS-9017)... -->
+	<!-- Hangs on first frame after loading match, trips illegal opcode, [CD-Block] misloads? -->
+	<!-- Selected team flags sports zooming errors [VDP1] -->
 	<software name="gnine" supported="no">
 		<description>Kanzen Chuukei Pro Yakyuu Greatest Nine (Jpn)</description>
 		<year>1995</year>
@@ -23057,7 +23116,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Greatest Nine 98 (J) (GS-9185)... -->
+	<!-- Black screen after Sega Sports logo, buggy handshake bug with [SMPC] commands cfr. PC=6004FC0 (buggy [SH2] delay slot or command should just be faster?) -->
 	<software name="gnine98" supported="no">
 		<description>Pro Yakyuu Greatest Nine '98 (Jpn)</description>
 		<year>1998</year>
@@ -23121,7 +23180,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Habitat II (GS-7105)... -->
+	<!-- NetLink game -->
+	<!-- Black screen on -drc when accessing "NIFTY" option on title menu -->
+	<!-- Triggers "0 trans no cc zoom" [VDP2] message -->
 	<software name="habitat2" supported="no">
 		<description>Habitat II (Jpn)</description>
 		<year>1996</year>
@@ -23217,7 +23278,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Hissatsu Pachinko Collection (J) (T-1503G)... -->
+	<!-- Hangs at Sega logo, expects to change [CD-Block] status after every loading phase -->
+	<!-- Draws no text in menu [VDP1/VDP2] -->
+	<!-- Has Nifty Serve option -> NetLink support? -->
 	<software name="hisspach" supported="no">
 		<description>Hissatsu Pachinko Collection (Jpn)</description>
 		<year>1996</year>
@@ -23434,9 +23497,10 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Idol Maajan Final Romance R Audio Disc (T-16703G)... -->
+	<!-- Mini CD, [CD-Block] doesn't playback in driver, expected length of 13:54 matches  -->
+	<!-- TODO: comes with T-16703G main disc, according to http://redump.org/disc/9318/ should be same as T-16705G-01 minus the changed serial -->
 	<software name="fromancra" cloneof="fromancr" supported="no">
-		<description>Idol Mahjong Final Romance R Audio Disc (Jpn)</description>
+		<description>Idol Mahjong Final Romance R Mini Drama CD (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="T-16703G"/>
@@ -23480,8 +23544,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Jantei Battle Cos-Player Disc 1 (T-34601G)... -->
-	<!-- Identifying Jantei Battle Cos-Player Disc 2 (T-34601G)... -->
+	<!-- Story Mode sometimes have transformation FMVs with no redbook audio [CD-Block] -->
 	<software name="jantbcp" supported="no">
 		<description>Jantei Battle Cos-Player (Jpn)</description>
 		<year>1997</year>
@@ -25581,7 +25644,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sega Saturn Internet Vol 1 (T-31301G)... -->
+	<!-- Returns to Sega MultiPlayer menu just after first transfer at FAD=172, bad [CD-Block] file parsing? -->
 	<software name="intrnet1" supported="no">
 		<description>Sega Saturn Internet Vol. 1 (Jpn)</description>
 		<year>1997</year>
@@ -25992,7 +26055,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sugobenchah - Dragon Master Silk Gaiden (T-19505G)... -->
+	<!-- Text layer incorrectly blends [VDP2] -->
 	<software name="drgmstsi" supported="no">
 		<description>Sugobencha - Dragon Master Silk Gaiden (Jpn)</description>
 		<year>1998</year>
@@ -27509,7 +27572,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Rouka ni Ichidant-R (GS-9043)... -->
+	<!-- TODO: Quiz Rouka ni Tattenasai black screen once before game over, cannot repro (stage 2?) -->
+	<!-- TODO: test Ichidant-R -->
 	<software name="ichidntr" supported="no">
 		<description>Sega Ages - Rouka ni Ichidant-R (Jpn)</description>
 		<year>1996</year>
@@ -28211,7 +28275,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Blast Wind (Japan)... -->
+	<!-- Black screen after Techno Soft logo with -drc option and Machine Config comms hack disabled. -->
 	<software name="blastwnd" supported="no">
 		<description>Blast Wind (Jpn)</description>
 		<year>1997</year>
@@ -28290,7 +28354,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Chaos Control Remix (T-7006G)... -->
+	<!-- Black screen, enables [SCU] Timer 1 -->
 	<!-- Box Art shows 'Remix' Title, game reprogrammed from previous version -->
 	<software name="chaoscrm" supported="no">
 		<description>Chaos Control Remix (Jpn)</description>
@@ -28361,7 +28425,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying CourierCrisis... -->
+	<!-- Hangs after FMV playback opening, [CD-Block] expects a FAD + 1 on pause? -->
 	<software name="ccrisisj" cloneof="ccrisis" supported="no">
 		<description>Courier Crisis (Jpn)</description>
 		<year>1998</year>
@@ -28489,7 +28553,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Defcon 5 (Japan) [T-24101G]... -->
+	<!-- Hangs on FMV opening, [CD-Block] never completes transfer after FAD=3460 -->
 	<software name="defcon5j" cloneof="defcon5" supported="no">
 		<description>Defcon 5 (Jpn)</description>
 		<year>1996</year>
@@ -28537,10 +28601,14 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Doom (T-18610G) Japan... -->
 	<!-- There are rumours that the Japan version should be different (containing Williams logos and such)
 	     I believe rumours to be false.  If you watch the movie linked from http://www.segagagadomain.com/saturn10/doom.htm
 	     it does not have a Williams logo ingame, and the footage is taken from a genuine Japanese CD -->
+	<!-- Black screen after GT Interactive logo, expects [VDP1] CEF to be 1 (in manual mode, without writing to the port first) -->
+	<!-- Title screen flames are white for the first few frames, [VDP2] -->
+	<!-- Hangs during gameplay expecting Work RAM H $260666b0 to be zero, cache access? -->
+	<!-- Incorrectly blends several polygons -->
+	<!-- gameplay performance is poor [VDP2?] -->
 	<software name="doomj" cloneof="doom" supported="no">
 		<description>Doom (Jpn)</description>
 		<year>1997</year>
@@ -28588,7 +28656,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Elevator Action Returns (J)... -->
+	<!-- Glitchy sprites [VDP1] -->
+	<!-- Lights uses unemulated raster effect with [VDP2] color offset registers -->
 	<software name="elevact2" supported="no">
 		<description>Elevator Action² Returns (Jpn)</description>
 		<year>1997</year>
@@ -28673,7 +28742,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Final Fight Revenge (Japan)... -->
+	<!-- Status bars incorrectly blends [VDP2] -->
 	<software name="ffreveng" supported="no">
 		<description>Final Fight Revenge (Jpn)</description>
 		<year>2000</year>
@@ -28738,7 +28807,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Gunblaze S (Japan) [T-19710G].. -->
+	<!-- Black screen, branches over [VDP1] CEF/BEF status at vblank-out while in PTM idle mode -->
 	<software name="gunblaze" supported="no">
 		<description>GunBlaze S (Jpn)</description>
 		<year>1998</year>
@@ -28846,7 +28915,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Irem Arcade Classics... -->
+	<!-- Hangs at "Now loading" screen with -drc, trips illegal opcode -->
+	<!-- 10 Yard Fight doesn't show sprites on the left portion of screen [VDP1] -->
 	<software name="iremac" supported="no">
 		<description>Irem Arcade Classics</description>
 		<year>1996</year>
@@ -29171,7 +29241,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Oracle no Houseki (T-1511G)... -->
+	<!-- Sports opaque black pixels as transparent during gameplay [VDP1] -->
 	<software name="jeworaclj" cloneof="jeworacl" supported="no">
 		<description>Oracle no Houseki (Jpn)</description>
 		<year>1996</year>
@@ -29842,7 +29912,8 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hangs during some scenes -->
+	<!-- Locks up during Ecseco FMV logo, [CD-Block] uses curfad filter rejection -->
+	<!-- Locks up on several scenes, fills buffer and never reaches target FAD. -->
 	<software name="timegal" supported="no">
 		<description>Time Gal (Time Gal &amp; Ninja Hayate Disc 1) (Jpn)</description>
 		<year>1997</year>
@@ -29890,14 +29961,15 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Virtua_Fighter_Kids(Kor)[!]... -->
+	<!-- Doesn't boot with -drc -->
+	<!-- has no audio redbook playback [CD-Block] -->
 	<software name="vfkidsk" cloneof="vfkids" supported="no">
 		<description>Virtua Fighter Kids (Kor)</description>
-		<year>199?</year>
+		<year>1996?</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="MK-81049-08"/>
 		<info name="alt_title" value="버쳐파이터키즈"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-K,NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="virtua_fighter_kids(kor)" sha1="48bbdd59caa47e3a950bfb1610b4e86656a0e08e" />
@@ -37818,7 +37890,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying dw-sat-0820-Three_Dirty_Dwarves-usa... -->
+	<!-- Gymhouse boss has incorrect shadow priority [VDP1/VDP2] -->
+	<!-- Continuing at Bronx by Day stage color glitches knight sprites [VDP1] -->
+	<!-- Eventually locks up with no player sprites at The Stadium boss stage (recheck) -->
 	<software name="3dwarvesu" cloneof="3dwarves" supported="no">
 		<description>Three Dirty Dwarves (USA)</description>
 		<year>1997</year>
@@ -38742,7 +38816,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<description>Three Dirty Dwarves (Prototype 19960417)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U, NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="three_dirty_dwarves_cd-1-1_mk8103300_v0.003_04171996_[jut]" sha1="16ad09ea3b81734e9833a4f38694b246a4506063" />
