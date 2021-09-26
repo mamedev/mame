@@ -365,7 +365,7 @@ static const nes_mmc mmc_list[] =
 	// 327 BMC-10-24-C-A1 6-in-1
 	{ 328, UNL_RT01 },             // test cart (Russia)
 	{ 329, UNL_EDU2K },
-	// 330 Sangokushi II - Haou no Tairiku hack - N163 bootleg
+	{ 330, BTL_L001 },             // Sangokushi II bootleg (retitled part III)
 	{ 331, BMC_12IN1 },
 	{ 332, BMC_WS },
 	{ 333, BMC_8IN1 },

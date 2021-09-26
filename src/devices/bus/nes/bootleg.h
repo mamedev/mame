@@ -320,6 +320,31 @@ private:
 };
 
 
+// ======================> nes_l001_device
+
+class nes_l001_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_l001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	u16 m_irq_count;
+
+	static const device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
+};
+
+
 // ======================> nes_batmanfs_device
 
 class nes_batmanfs_device : public nes_nrom_device
@@ -327,6 +352,7 @@ class nes_batmanfs_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_batmanfs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
@@ -751,6 +777,7 @@ DECLARE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device)
 DECLARE_DEVICE_TYPE(NES_N32_4IN1,       nes_n32_4in1_device)
 DECLARE_DEVICE_TYPE(NES_0353,           nes_0353_device)
 DECLARE_DEVICE_TYPE(NES_09034A,         nes_09034a_device)
+DECLARE_DEVICE_TYPE(NES_L001,           nes_l001_device)
 DECLARE_DEVICE_TYPE(NES_BATMANFS,       nes_batmanfs_device)
 DECLARE_DEVICE_TYPE(NES_PALTHENA,       nes_palthena_device)
 DECLARE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device)
