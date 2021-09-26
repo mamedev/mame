@@ -188,7 +188,7 @@ static const nes_mmc mmc_list[] =
 	{ 152, DIS_74X161X161X32 },
 	{ 153, BANDAI_LZ93 },
 	{ 154, NAMCOT_34X3 },
-	{ 155, STD_SXROM_A }, // diff compared to MMC1 concern WRAM
+	{ 155, STD_SXROM }, // same as mapper 1 but forces the use of MMC1A
 	{ 156, OPENCORP_DAOU306 },
 	{ 157, BANDAI_DATACH }, // Datach Reader games -> must go in the Datach subslot
 	{ 158, TENGEN_800037 },
@@ -651,10 +651,8 @@ void nes_cart_slot_device::call_load_ines()
 	// handle submappers
 	if (submapper)
 	{
-		// 001: MMC1
-		if (mapper == 1 && submapper == 3)
-			pcb_id = STD_SXROM_A;
-		else if (mapper == 1 && submapper == 5)
+		// 001: MMC1 (other submappers are deprecated)
+		if (mapper == 1 && submapper == 5)
 			logerror("Unimplemented NES 2.0 submapper: SEROM/SHROM/SH1ROM.\n");
 		// 002, 003, 007: UxROM, CNROM, AxROM
 		else if (mapper == 2 && submapper == 2)
@@ -778,6 +776,11 @@ void nes_cart_slot_device::call_load_ines()
 				fseek(0x810, SEEK_SET);
 				prg_size = 0xb800;
 			}
+			break;
+
+		case STD_SXROM:
+			if (mapper == 155)
+				m_cart->set_mmc1_type(device_nes_cart_interface::mmc1_type::MMC1A);
 			break;
 
 		case NOCASH_NOCHR:
@@ -1155,10 +1158,8 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 	// handle submappers
 	if (submapper)
 	{
-		// 001: MMC1
-		if (mapper == 1 && submapper == 3)
-			pcb_id = STD_SXROM_A;
-		else if (mapper == 1 && submapper == 5)
+		// 001: MMC1 (other submappers are deprecated)
+		if (mapper == 1 && submapper == 5)
 			logerror("Unimplemented NES 2.0 submapper: SEROM/SHROM/SH1ROM.\n");
 		// 021, 023, 025: VRC4 / VRC2
 		else if (mapper == 21 || mapper == 23 || mapper == 25)

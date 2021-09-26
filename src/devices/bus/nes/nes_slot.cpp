@@ -122,6 +122,7 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	, m_misc_rom_size(0)
 	, m_ce_mask(0)
 	, m_ce_state(0)
+	, m_mmc1_type(mmc1_type::MMC1B)
 	, m_vrc_ls_prg_a(0)
 	, m_vrc_ls_prg_b(0)
 	, m_vrc_ls_chr(0)

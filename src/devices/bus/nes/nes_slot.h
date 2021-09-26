@@ -23,11 +23,10 @@ enum
 	STD_CNROM, STD_CPROM,
 	STD_EXROM, STD_FXROM, STD_GXROM,
 	STD_HKROM, STD_PXROM,
-	STD_SXROM, STD_TXROM, STD_TXSROM,
-	STD_TKROM, STD_TQROM,
+	STD_SXROM, STD_SOROM,
+	STD_TXROM, STD_TXSROM, STD_TKROM, STD_TQROM,
 	STD_UXROM, STD_UN1ROM, UXROM_CC,
 	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT,
-	STD_SXROM_A, STD_SOROM, STD_SOROM_A,
 	STD_DISKSYS,
 	STD_NROM368,//homebrew extension of NROM!
 	// Discrete components boards (by various manufacturer)
@@ -176,6 +175,8 @@ enum
 class device_nes_cart_interface : public device_interface
 {
 public:
+	enum class mmc1_type : u8 { MMC1, MMC1A, MMC1B,	MMC1C };
+
 	// construction/destruction
 	virtual ~device_nes_cart_interface();
 
@@ -214,6 +215,7 @@ public:
 	void set_trainer(bool val) { m_has_trainer = val; }
 
 	void set_ce(int mask, int state) {  m_ce_mask = mask; m_ce_state = state; }
+	void set_mmc1_type(mmc1_type val) {  m_mmc1_type = val; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_n163_vol(int vol) { m_n163_vol = vol; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
@@ -284,6 +286,7 @@ protected:
 
 	int m_ce_mask;
 	int m_ce_state;
+	mmc1_type m_mmc1_type;
 	int m_vrc_ls_prg_a;
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;

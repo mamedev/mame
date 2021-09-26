@@ -51,37 +51,11 @@ public:
 
 	virtual uint8_t read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-};
-
-class nes_sxrom_a_device : public nes_sxrom_device
-{
-public:
-	// construction/destruction
-	nes_sxrom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_m(offs_t offset, uint8_t data) override;
-};
-
-class nes_sorom_a_device : public nes_sxrom_device
-{
-public:
-	// construction/destruction
-	nes_sorom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_m(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NES_SXROM,   nes_sxrom_device)
-DECLARE_DEVICE_TYPE(NES_SOROM,   nes_sorom_device)
-DECLARE_DEVICE_TYPE(NES_SXROM_A, nes_sxrom_a_device)
-DECLARE_DEVICE_TYPE(NES_SOROM_A, nes_sorom_a_device)
+DECLARE_DEVICE_TYPE(NES_SXROM, nes_sxrom_device)
+DECLARE_DEVICE_TYPE(NES_SOROM, nes_sorom_device)
 
 #endif // MAME_BUS_NES_MMC1_H
