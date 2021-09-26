@@ -160,7 +160,7 @@ References:
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34880 -->
-				<rom name="4 dimension house.d88" size="348848" crc="90e85539" sha1="450867c78915238f9de40bb98cd9d03f63eb01b6"/>
+				<rom name="4 dimension house [alt].d88" size="348848" crc="90e85539" sha1="450867c78915238f9de40bb98cd9d03f63eb01b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1425,7 +1425,7 @@ References:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
-				<rom name="missile commander.d88" size="348832" crc="05fdc754" sha1="4519345cad8c60383508e9b6b444ab4909462990"/>
+				<rom name="missile commander [set 3].d88" size="348832" crc="05fdc754" sha1="4519345cad8c60383508e9b6b444ab4909462990"/>
 			</dataarea>
 		</part>
 	</software>
