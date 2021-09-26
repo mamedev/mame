@@ -175,7 +175,7 @@ enum
 class device_nes_cart_interface : public device_interface
 {
 public:
-	enum class mmc1_type : u8 { MMC1, MMC1A, MMC1B,	MMC1C };
+	enum class mmc1_type : u8 { MMC1, MMC1A, MMC1B, MMC1C };
 
 	// construction/destruction
 	virtual ~device_nes_cart_interface();

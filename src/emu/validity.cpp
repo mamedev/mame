@@ -1410,7 +1410,7 @@ void validate_delegates_mfp()
 		osd_printf_error("Error testing delegate this pointer adjustment for incomplete class %p -> %p (expected %p)\n", static_cast<void const *>(&d), addr, static_cast<void const *>(static_cast<virtual_derived_b *>(&d)));
 
 	// test MSVC extension allowing casting member pointer types across virtual inheritance relationships
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 	cb1 = make_diamond_class_delegate(&diamond_inheritance::get_base, &d);
 
 	addr = nullptr;
