@@ -64942,13 +64942,12 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="toystory" supported="no">
+	<software name="toystory" supported="partial">
 		<description>Toy Story</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="a9746" />
 			<dataarea name="chr" size="131072">
 				<rom name="toy story (unl).chr" size="131072" crc="8d4e1c21" sha1="d62db28e8d17e3d5b38304c3b3f19e0c607dc0fa" offset="00000" status="baddump" />
 			</dataarea>
