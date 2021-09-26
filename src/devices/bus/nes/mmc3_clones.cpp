@@ -278,8 +278,8 @@ nes_bmc_8in1_device::nes_bmc_8in1_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_bmc_15in1_device::nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_15IN1, tag, owner, clock)
+nes_bmc_15in1_device::nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_15IN1, tag, owner, clock), m_jumper(0)
 {
 }
 
@@ -673,10 +673,7 @@ void nes_bmc_8in1_device::pcb_reset()
 void nes_bmc_15in1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	mmc3_common_initialize(0x1f, 0xff, 0);
-	m_prg_base = 0x10;  // this board has a diff prg_base
-	set_prg(m_prg_base, m_prg_mask);
 }
 
 void nes_bmc_sbig7_device::pcb_reset()
@@ -2326,30 +2323,32 @@ void nes_bmc_8in1_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-15IN1
+ BMC-15IN1 (PCB JC-016-2?)
 
- Unknown Bootleg Multigame Board
  Games: 3 in 1, 15 in 1
 
- iNES: mapper 205, MMC3 clone
+ MMC3 clone with banking for multigame menu.
 
- In MESS: Supported.
+ iNES: mapper 205
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_bmc_15in1_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_15in1_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_15in1 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset & 0x0800)
-	{
-		m_prg_base = (data & 0x03) << 4;
-		m_prg_mask = (data & 0x02) ? 0x0f : 0x1f;
-		m_chr_base = (data & 0x03) << 7;
-		m_chr_mask = (data & 0x02) ? 0x7f : 0xff;
-		set_prg(m_prg_base, m_prg_mask);
-		set_chr(m_chr_source, m_chr_base, m_chr_mask);
-	}
+	if (data & 1)
+		data |= m_jumper;    // TODO: add jumper settings, m_jumper is 0 for now
+
+	m_prg_base = (data & 0x03) << 4;
+	m_prg_mask = 0x1f >> BIT(data, 1);
+	set_prg(m_prg_base, m_prg_mask);
+
+	m_chr_base = m_prg_base << 3;
+	m_chr_mask = 0xff >> BIT(data, 1);
+	set_chr(m_chr_source, m_chr_base, m_chr_mask);
 }
 
 /*-------------------------------------------------

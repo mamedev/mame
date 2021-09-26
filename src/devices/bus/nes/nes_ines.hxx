@@ -269,7 +269,7 @@ static const nes_mmc mmc_list[] =
 	{ 233, BMC_42IN1RESET },
 	{ 234, AVE_MAXI15 },
 	{ 235, BMC_GOLD150 },   // 235 Golden Game x-in-1 - Unsupported
-	// 236 Game 800-in-1 - Unsupported, Realtec boards 8031 and 8155
+	{ 236, BMC_70IN1 },
 	// 237 Teletubbies 420-in-1 multicart. Dump available?
 	{ 238, UNL_603_5052 },
 	// 239 Unused
@@ -906,6 +906,11 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = UNL_8237A;
 			break;
 
+		case BMC_70IN1:
+			if (vrom_size == 0)
+				m_pcb_id = BMC_800IN1;
+			break;
+
 		case RCM_GS2004:
 			if (prg_size >= 0x50000)
 				m_pcb_id = RCM_GS2013;
@@ -1240,6 +1245,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		case UNL_8237:                                 // Mapper 215 is used for 2 diff boards
 			if (submapper == 1)
 				pcb_id = UNL_8237A;
+			break;
+
+		case BMC_70IN1:                                // Mapper 236 is used for 2 diff boards
+			if (ROM[5] == 0)
+				pcb_id = BMC_800IN1;
 			break;
 
 		case RCM_GS2004:                               // Mapper 283 is used for 2 diff boards
