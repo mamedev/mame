@@ -6033,6 +6033,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- "CD-i Bridge" format - playable on CD-i or Windows 95/98 -->
 	<software name="gettinga">
 		<!--
 		Origin: TOSEC
@@ -6040,7 +6041,7 @@ license:CC0
 		<rom name="Getting Ahead - Making Time (1994)(Temple Millar Multimedia - Xdra)(EU)(Track 2 of 2)[!][CD-i-PC].wav" size="376795148" crc="3576d879" md5="d2fa76c544f819f5ddbe7e742603b746"/>
 		<rom name="Getting Ahead - Making Time (1994)(Temple Millar Multimedia - Xdra)(EU)[!][CD-i-PC].cue" size="363" crc="3a4f2123" md5="3ed5329375d9ae86b331b9b4bab4d81a"/>
 		-->
-		<description>Getting Ahead - Making Time (Euro)[CD-i-PC]</description>
+		<description>Getting Ahead - Making Time (Euro)</description>
 		<year>1994</year>
 		<publisher>Temple Millar Multimedia ~ Xdra</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
@@ -10722,7 +10723,7 @@ license:CC0
 		<rom name="The Best of Photo Journalism (Track 2)" size="272361600" crc="ac49ca6f" md5="f90ae501920abaf205b41f7f68a9da2f"/>
 		<rom name="The Best of Photo Journalism.cue" size="249" crc="79dd5617" md5="617ca8df6119c466908e17bd27beda6f"/>
 		-->
-		<description>From The Associated Press: The Best of Photo Journalism [DVC]</description>
+		<description>From The Associated Press: The Best of Photo Journalism</description>
 		<year>1993</year>
 		<publisher>XDRA Ltd. ~ Asia CD Ltd.</publisher>
 		<info name="serial" value="819 0036"/>
@@ -10744,7 +10745,7 @@ license:CC0
 		value. The info for the original cue is below.
 		<rom name="Bill Brandt - The Picture Post Years 1938-51.cue" size="279" crc="d9c1b4b0" md5="d96806ddded5ebd0901a5f4701a05519"/>
 		-->
-		<description>Bill Brandt: The Picture Post Years 1938-1951[DVC]</description>
+		<description>Bill Brandt: The Picture Post Years 1938-1951</description>
 		<year>1993</year>
 		<publisher>XDRA Ltd.</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10764,7 +10765,7 @@ license:CC0
 		value. The info for the original cue is below.
 		<rom name="CD-i in Schools.cue" size="102" crc="a7808dda" md5="2835f5bd9aa0d0941ae992f813582285"/>
 		-->
-		<description>CD-i in Schools [DVC]</description>
+		<description>CD-i in Schools</description>
 		<year>1994</year>
 		<publisher>Scottish Interactive Technology Centre</publisher>
 		<info name="serial" value="819 0073"/>
@@ -10785,7 +10786,7 @@ license:CC0
 		The info for the original cue is below.
 		<rom name="Depression - The Search for the NaSSA.cue" size="101" crc="e0683fe3" md5="04d6c528037689bab54873d0834418e6"/>
 		-->
-		<description>Depression - The Search For The NaSSA (NL)[DVC]</description>
+		<description>Depression - The Search For The NaSSA (NL)</description>
 		<year>1993</year>
 		<publisher>N.V. Organon</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10807,6 +10808,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- "CD-i Bridge" format - playable on CD-i or Windows 95/98 -->
 	<software name="gettinga2" cloneof="gettinga">
 		<!--
 		Origin: Gaming Alexandria
@@ -10815,7 +10817,7 @@ license:CC0
 		<rom name="Getting Ahead - Making Time.cue" size="247" crc="c1f664f0" md5="61a958d52c26a7f10386e5f693857a09"/>
 		Note: This is a later release that added Windows 3.1 playback software.
 		-->
-		<description>Getting Ahead - Making Time (Euro)(Reprint)[CD-i-PC]</description>
+		<description>Getting Ahead - Making Time (Euro, reprint)</description>
 		<year>1995</year>
 		<publisher>XDRA Ltd. ~ Temple Millar Multimedia</publisher>
 		<info name="serial" value="819 0025"/>
@@ -10838,7 +10840,7 @@ license:CC0
 		The info for the original cue is below.
 		<rom name="Nijmegen 'n rijk aan mogelijkheden.cue" size="515" crc="d0c1ea7f" md5="f1e4aca62f80f9594f2b584fde665266"/>
 		-->
-		<description>Nijmegen 'n rijk aan mogelijkheden (NL)[DVC]</description>
+		<description>Nijmegen 'n rijk aan mogelijkheden (NL)</description>
 		<year>1994</year>
 		<publisher>Harlon Publishing</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10878,7 +10880,7 @@ license:CC0
 		Note: This disc is a hybrid CD-i and Windows 3.1 disc. It will boot in a CD-i without issues, and it contains software
 		to play back the disc images on Windows 3.1.
 		-->
-		<description>Peaches [DVC]</description>
+		<description>Peaches</description>
 		<year>1995</year>
 		<publisher>Icontact Multimedia Limited</publisher>
 		<info name="serial" value="IC 200"/>
