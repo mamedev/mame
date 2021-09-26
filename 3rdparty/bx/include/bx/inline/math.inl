@@ -909,6 +909,57 @@ namespace bx
 		};
 	}
 
+	inline BX_CONST_FUNC Vec3 toXAxis(const Quaternion _a)
+	{
+		const float xx  = _a.x;
+		const float yy  = _a.y;
+		const float zz  = _a.z;
+		const float ww  = _a.w;
+		const float ysq = square(yy);
+		const float zsq = square(zz);
+
+		return
+		{
+			1.0f - 2.0f * ysq     - 2.0f * zsq,
+			       2.0f * xx * yy + 2.0f * zz * ww,
+			       2.0f * xx * zz - 2.0f * yy * ww,
+		};
+	}
+
+	inline BX_CONST_FUNC Vec3 toYAxis(const Quaternion _a)
+	{
+		const float xx  = _a.x;
+		const float yy  = _a.y;
+		const float zz  = _a.z;
+		const float ww  = _a.w;
+		const float xsq = square(xx);
+		const float zsq = square(zz);
+
+		return
+		{
+			       2.0f * xx * yy - 2.0f * zz * ww,
+			1.0f - 2.0f * xsq     - 2.0f * zsq,
+			       2.0f * yy * zz + 2.0f * xx * ww,
+		};
+	}
+
+	inline BX_CONST_FUNC Vec3 toZAxis(const Quaternion _a)
+	{
+		const float xx  = _a.x;
+		const float yy  = _a.y;
+		const float zz  = _a.z;
+		const float ww  = _a.w;
+		const float xsq = square(xx);
+		const float ysq = square(yy);
+
+		return
+		{
+			       2.0f * xx * zz + 2.0f * yy * ww,
+			       2.0f * yy * zz - 2.0f * xx * ww,
+			1.0f - 2.0f * xsq     - 2.0f * ysq,
+		};
+	}
+
 	inline BX_CONST_FUNC Quaternion rotateAxis(const Vec3 _axis, float _angle)
 	{
 		const float ha = _angle * 0.5f;

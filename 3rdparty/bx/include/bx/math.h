@@ -493,6 +493,15 @@ namespace bx
 	BX_CONST_FUNC Vec3 toEuler(const Quaternion _a);
 
 	///
+	BX_CONST_FUNC Vec3 toXAxis(const Quaternion _a);
+
+	///
+	BX_CONST_FUNC Vec3 toYAxis(const Quaternion _a);
+
+	///
+	BX_CONST_FUNC Vec3 toZAxis(const Quaternion _a);
+
+	///
 	BX_CONST_FUNC Quaternion rotateAxis(const Vec3 _axis, float _angle);
 
 	///
