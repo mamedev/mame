@@ -60,7 +60,7 @@ private:
 
 	u8 terminal_count_r(address_space &space);
 	void motor_control_w(u8 data);
-	
+
 	emu_timer *m_tc_zero_timer;
 
 	IRQ_CALLBACK_MEMBER(irq_cb);

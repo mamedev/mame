@@ -1517,7 +1517,7 @@ ROM_END
 
   BARCREST SAMPLED SOUND
  _________________________
- | ·                      |  
+ | ·                      |
  | ·                      |
  | ·                      |
  | ·                      |_____________
@@ -1543,7 +1543,7 @@ Just one different byte between the three "Escalera y Tobogan" sets, at address 
  1268: 0xF4
  1269: 0xF5
  1270: 0xF6
-May be the game serial number hard-encoded on the EPROM? 
+May be the game serial number hard-encoded on the EPROM?
 */
 ROM_START( m4esctbg )
 	ROM_REGION( 0x20000, "maincpu", 0 )

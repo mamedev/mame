@@ -1543,7 +1543,7 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_ioudis = true;
-	m_newvideo = 0x01;		// verified on ROM03 hardware
+	m_newvideo = 0x01;      // verified on ROM03 hardware
 	m_clock_frame = 0;
 	m_mouse_x = 0x00;
 	m_mouse_y = 0x00;

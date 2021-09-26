@@ -156,7 +156,7 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	while(ys < sy && yd >= clip.min_y)
 
 #define z_draw_pixel()              \
-	u8 val = src[(xs >> 16) & 0x3f];	\
+	u8 val = src[(xs >> 16) & 0x3f];    \
 	if(val)                 \
 		bitmap.pix(yd>>16, xd>>16) = val + colour;
 

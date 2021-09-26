@@ -655,7 +655,7 @@ void pc8801_state::pc8801_alu_w(offs_t offset, uint8_t data)
 			for(i=0;i<3;i++)
 			{
 				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
-				
+
 				switch(logic_op)
 				{
 					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
@@ -843,7 +843,7 @@ void pc8801_state::pc8801_mem_w(offs_t offset, uint8_t data)
 			window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 			// castlex and imenes accesses this
-			// TODO: high TVRAM even 
+			// TODO: high TVRAM even
 			// (uPD3301 reads from this instead of the regular work RAM)
 			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				pc8801_high_wram_w(window_offset & 0xfff,data);
@@ -2165,7 +2165,7 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 
 	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
 	// TODO: FDC board shouldn't be connected to the clock setting, verify
-//	m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
+//  m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
 	m_baudrate_val = 0;
 }
 
@@ -2240,7 +2240,7 @@ void pc8801_state::pc8801(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
-//	config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
+//  config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
 
 	#if USE_PROPER_I8214
 	I8214(config, I8214_TAG, MASTER_CLOCK);

@@ -11,19 +11,19 @@
     TODO:
 
     - pinpoint how much of pc8001/pc8801 drawing functions should actually be inherited
-   	  here;
+      here;
     - N interrupt (special control character)
     - light pen
     - reset counters
     - proper DMA timing (now the whole screen is transferred at the end of the frame,
         accurate timing requires CCLK timer which kills performance)
-	- DMA burst mode;
-	- cleanup: variable namings should be more verbose
-	  (i.e. not be a single letter like m_y, m_z, m_b ...);
-	- sorcerml (pc8801) has buggy DMA burst mode, causing an underrun (hence a status U interrupt);
-	- jettermi (pc8801) expects to colorize its underlying 400 b&w mode by masking with the
-	  text color attributes here;
-	- xak2 (pc8801) throws text garbage on legacy renderer (verify);
+    - DMA burst mode;
+    - cleanup: variable namings should be more verbose
+      (i.e. not be a single letter like m_y, m_z, m_b ...);
+    - sorcerml (pc8801) has buggy DMA burst mode, causing an underrun (hence a status U interrupt);
+    - jettermi (pc8801) expects to colorize its underlying 400 b&w mode by masking with the
+      text color attributes here;
+    - xak2 (pc8801) throws text garbage on legacy renderer (verify);
 
 */
 
@@ -187,7 +187,7 @@ void upd3301_device::device_reset()
 	m_cm = 0;
 	m_b = 48;
 	m_reverse_display = false;
-	
+
 	recompute_parameters();
 }
 
@@ -581,7 +581,7 @@ UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 		u8 attr_end = std::min(attr_row[ex+2], attr_max_size);
 		// if the target is == 0 then just consider max size instead
 		// (starfire (pc8001) wants this otherwise will black screen on gameplay)
- 		if (attr_end == 0)
+		if (attr_end == 0)
 			attr_end = attr_max_size;
 
 		//printf("%04x %d %d [%02x]\n", ex, attr_start, attr_end, attr_value);
@@ -592,7 +592,7 @@ UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 		if (attr_end == attr_max_size)
 			break;
 	}
-	
+
 	return attr_extend_info;
 }
 
@@ -623,14 +623,14 @@ void upd3301_device::draw_scanline()
 			// - "highlight" should be attribute blinking?
 			// - is "gpa" actually NEC-ese for attr bus?
 			// - is sl0 / sl12 NEC names for upper/lower line?
-//			int hlgt = 0;
-//			int rvv = 0;
-//			int vsp = 0;
-//			int sl0 = 0;
-//			int sl12 = 0;
-//			int gpa = 0;
-			
-//			m_display_cb(m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
+//          int hlgt = 0;
+//          int rvv = 0;
+//          int vsp = 0;
+//          int sl0 = 0;
+//          int sl12 = 0;
+//          int gpa = 0;
+
+//          m_display_cb(m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
 			m_display_cb(m_bitmap, y, sx, cc, lc, csr, m_attr_blink, extend_attr[sx], m_gfx_mode, is_lowestline);
 		}
 	}

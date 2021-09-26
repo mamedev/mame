@@ -595,7 +595,7 @@ void tx0_64kw_device::execute_instruction_64kw()
 				MBR |= m_tbr;
 
 			if ((MAR & 0000003) == 2 && ((MAR & 0000600) >> 7) == 1)
-			    /* LMB and MBL used simultaneously interchange LR and MBR */
+				/* LMB and MBL used simultaneously interchange LR and MBR */
 				std::swap(LR, MBR);
 			else if ((MAR & 0000003) == 2)
 				/* (1.3) LMB = Store the contents of the LR in the MBR. */
@@ -1203,7 +1203,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 				}
 
 				if (((! (MAR & 0000400)) && (MAR & 0000200)) && ((! (MAR & 0000004)) && (MAR & 0000002)))
-				    /* LMB and MBL used simultaneously interchange LR and MBR */
+					/* LMB and MBL used simultaneously interchange LR and MBR */
 					std::swap(LR, MBR);
 				else if ((! (MAR & 0000400)) && (MAR & 0000200))
 					/* (1.4) MBL = Transfer MBR contents to LR */

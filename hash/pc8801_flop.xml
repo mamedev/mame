@@ -1225,7 +1225,7 @@ INVESTIGATE
 			<!-- Data CRC16: 23888 -->
 			<!--
 			<dataarea name="flop" size="348848">
-				<rom name="acrojet.d88" size="348848" crc="dc271a9c" sha1="a0475d9c80c74b596fee938ba7b682e5d92dde44"/>
+			    <rom name="acrojet.d88" size="348848" crc="dc271a9c" sha1="a0475d9c80c74b596fee938ba7b682e5d92dde44"/>
 			</dataarea>
 			-->
 			<dataarea name="flop" size="349120">
@@ -1406,7 +1406,7 @@ INVESTIGATE
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
-		<info name="usage" value="Needs BASIC V2"/>	
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="advanced fantasian.d88" size="1395328" crc="9e0d4f83" sha1="d8b593e3384d3bc3573fbeb5bdff64ac8a7680d6"/-->
 
@@ -4161,7 +4161,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="ボールパニカー"/>
 		<info name="usage" value="Needs N[80SR] BASIC"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ball panicker.d88" size="348848" crc="46dfdc04" sha1="f1683c1ee087df390ddac33494661cf4cb2b321a"/>
@@ -4242,7 +4242,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		<info name="release" value="19900309"/>
 		<info name="alt_title" value="バルバドゥスの魔女"/>
 		<info name="usage" value="Needs PC8801mkIISR or higher"/>
-		
+
 		<!--combined image-->
 		<!--rom name="barbatus no majo.d88" size="1688384" crc="2849e578" sha1="572adfd01a4816222e5915eb46e8e7d9f747dfb6"/-->
 
@@ -5019,7 +5019,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<info name="release" value="198410xx"/>
 		<info name="alt_title" value="バルダーダッシュ"/>
 		<info name="usage" value="Needs BASIC V1"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="boulder dash.d88" size="392368" crc="eeed6e7d" sha1="a85403a3cccc6fd8b6f617d14255b5589c978b02"/>
@@ -5126,7 +5126,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<info name="alt_title" value="バグ・アタック"/>
 		<info name="usage" value="Needs BASIC V1"/>
 		<!-- "Converted by BEAR'S" -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="bug attack.d88" size="392368" crc="44bad437" sha1="f9910f906f28ab8abb0b45bc4298a64f6f4356f7"/>
@@ -6395,7 +6395,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<info name="release" value="199612xx"/>
 		<info name="alt_title" value="クリスチーヌ"/>
 		<info name="usage" value="Needs BASIC V1"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="christine.d88" size="348848" crc="619d66fb" sha1="b12c38fe940ff518340df6f0ca1aff28aae3fc40"/>
@@ -7006,7 +7006,7 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 		<!-- Press space then "NOW COPYING" appears -->
 		<!-- If everything goes correct then "user disk created" appears, otherwise restart from scratch -->
 		<!-- Finally select new game with the newly created user disk in drive 2 -->
-		<!-- NB: "scenario" disk seems to be a default copy of user disk --> 
+		<!-- NB: "scenario" disk seems to be a default copy of user disk -->
 		<!--     in some Xtal games (i.e. Babylon) having the scenario disk in drive 2 -->
 		<!--     is enough to make it to boot, not in Crimson case tho. -->
 
@@ -11735,7 +11735,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="F2グランプリ"/>
 		<info name="usage" value="Needs BASIC V1"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="f2 grand prix.d88" size="348848" crc="3a01fdb7" sha1="b95e930ec3b0ec78fd2f6ad3ee0e193a7959d2c8"/>
@@ -13329,7 +13329,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派3"/>
-		<!-- NB: just never change disks, otherwise GFXs garbage happens --> 
+		<!-- NB: just never change disks, otherwise GFXs garbage happens -->
 		<!-- (game doesn't seem to have a mechanism for floppy identifiers) -->
 
 		<!--combined image-->
@@ -13396,7 +13396,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="ガンマ5"/>
 		<info name="usage" value="Needs BASIC V2"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gamma5.d88" size="348848" crc="b3a6736f" sha1="3cdbdbb0056aa89e0ce5656c8e3a4bc4a26d4b73"/>
@@ -15225,7 +15225,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hashiressr">
 		<description>Hashire! 7th Skyline</description>
 		<year>19??</year>
@@ -15238,7 +15238,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hashiressra" cloneof="hashiressr">
 		<description>Hashire! 7th Skyline (alt)</description>
 		<year>19??</year>
@@ -15711,7 +15711,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<!--
 			<dataarea name="flop" size="348832">
-				<rom name="hole in one.d88" size="348832" crc="fdc86c72" sha1="12a1424aced7a859fccb5f00b9fbe314495b46b0"/>
+			    <rom name="hole in one.d88" size="348832" crc="fdc86c72" sha1="12a1424aced7a859fccb5f00b9fbe314495b46b0"/>
 			</dataarea>
 			-->
 			<dataarea name="flop" size="349120">
@@ -26285,7 +26285,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="プラズマライン"/>
 		<info name="usage" value="Needs BASIC V1"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="plazma line.d88" size="348848" crc="70b87e12" sha1="f0b34cce7fe7914c88e37811f8e6b68b9336be00"/>
@@ -29764,7 +29764,7 @@ ExtractDisk  [02]"MUSIC2          " -> "scheme music disk_02.d88"
 				<rom name="seena (wide screen).d88" size="283552" crc="ec26333f" sha1="2459e5907e756013f0ac55e7625276c1af4284a6"/>
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<!-- [Incorrect layout on track 0 head 0, expected_size=100000, current_size=101120] -->
 	<software name="seibunar" supported="no">
@@ -31549,7 +31549,7 @@ ExtractDisk  [04]"disk 4          " -> "shiryo sensen 2_04.d88"
 		<info name="release" value="198602xx"/>
 		<info name="alt_title" value="スカイスクレーパー"/>
 		<info name="usage" value="Needs BASIC V1"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="sky scraper.d88" size="392368" crc="574b0d12" sha1="6100f8997563a3e83d1389610f5b11416ee2e15d"/>
@@ -32637,7 +32637,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		<info name="release" value="198406xx"/>
 		<info name="alt_title" value="スターアーサー伝説 Ⅱ -暗黒星雲-"/>
 		<info name="usage" value="Needs BASIC V1, on BASIC prompt type: run &quot;DRK1&quot; (case sensitive)"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="345296">
 				<rom name="dark nebula.d88" size="345296" crc="d92f2494" sha1="cd52a7365dcba2b6c568627ccced720d7fba0e0e"/>
@@ -39384,7 +39384,7 @@ ExtractDisk  [02]"やじペナB    " -> "Yajiuma Pennant Race 02.d88"
 				<rom name="yajiuma pennant race (a) (disk b).d88" size="348848" crc="bbd224c1" sha1="c902500ed28c6bd672fde64089cfa3d0346e9720"/>
 			</dataarea>
 		</part>
-		
+
 		<!-- TODO: Disk C? -->
 	</software>
 
@@ -39840,7 +39840,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		<info name="release" value="198407xx"/>
 		<info name="alt_title" value="野球狂"/>
 		<info name="usage" value="Needs BASIC V1"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131136">
 				<rom name="yakyu kyo.d88" size="131136" crc="5abc8c91" sha1="7788bdc38ff05ecbd34f23b4cbec92aeb4cb74ef"/>
@@ -40493,7 +40493,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="ザース -人工頭脳オリオンの奪還-"/>
 		<!-- Studio Jandora -->
-		
+
 		<!-- TODO: checkout if this and clones have non-factory saves -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348928">
@@ -49909,7 +49909,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- title screen uses raster effects -->
 	<software name="rosepoti" supported="partial">
 		<description>Rose Potion</description>
@@ -50155,7 +50155,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="alt_title" value="スパイ大作戦"/>
 		<!-- Ｙ．Ｔ氏 / Yoshinobu Takahashi -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
 				<rom name="spy daisakusen(8801 version).d88" size="66240" crc="b8a764e8" sha1="2104b26bf5f636d57a870d23c1615d9b3fd9c990"/>
@@ -52913,7 +52913,7 @@ ExtractDisk  [02]"Disk_B          " -> "pakapaka shoboken dp_02.d88"
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Needs BASIC V2"/>
 		<!-- SSS -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="pink stream 3.d88" size="348848" crc="21af21a1" sha1="11f90503a280b0ac363acf6d9cb3e05856d4f2b9"/>
@@ -54286,8 +54286,8 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 	</software>
 
 	<!--
-		01 Pocket Man
-		02 Dungeon (Koei, later V1 BASIC rev)
+	    01 Pocket Man
+	    02 Dungeon (Koei, later V1 BASIC rev)
 	-->
 	<software name="gpac06d8">
 		<description>Gpac06</description>
@@ -54600,13 +54600,13 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 	</software>
 
 	<!--
-		01 Pascom Tower
-		02 Jagey
-		03 Trump Kyou
-		04 Yakyuu Kyou
-		05 PUNCH BALL [Mario Bros]
-		06 DRAGON SLAYER
-		07 ??? (doesn't boot)
+	    01 Pascom Tower
+	    02 Jagey
+	    03 Trump Kyou
+	    04 Yakyuu Kyou
+	    05 PUNCH BALL [Mario Bros]
+	    06 DRAGON SLAYER
+	    07 ??? (doesn't boot)
 	-->
 	<software name="88gamez1">
 		<description>88Gamez1</description>
@@ -54622,12 +54622,12 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 	</software>
 
 	<!--
-		"PC-8801 GAME PACK"
-		1: [Nintendo no] GOLF
-		2: [Nintendo no] TENNIS
-		3: EGGY
-		4: BILLIARDS [Lunar Ball]
-		5: [David's] MIDNIGHT MAGIC
+	    "PC-8801 GAME PACK"
+	    1: [Nintendo no] GOLF
+	    2: [Nintendo no] TENNIS
+	    3: EGGY
+	    4: BILLIARDS [Lunar Ball]
+	    5: [David's] MIDNIGHT MAGIC
 	-->
 	<software name="88gamez2">
 		<description>88Gamez2</description>
@@ -55211,13 +55211,13 @@ ExtractDisk  [02]"DATA_DISK    " -> "ncs music art v.2_02.d88"
 	</software>
 
 	<!--
-		"Auto run system." by K.B.C.
-		
-		1 Corageous Perseus
-		2 Yakyuu Kyou
-		3 Trump Kyou
-		4 "auto"
-		5 "VOLGURD" (doesn't boot)
+	    "Auto run system." by K.B.C.
+
+	    1 Corageous Perseus
+	    2 Yakyuu Kyou
+	    3 Trump Kyou
+	    4 "auto"
+	    5 "VOLGURD" (doesn't boot)
 	-->
 	<software name="packtrum">
 		<description>K.B.C. Game Pack</description>
@@ -56418,7 +56418,7 @@ ExtractDisk  [04]"UTILITY        " -> "lalf graphic tool_04.d88"
 ExtractDisk  [01]"Disk 1          " -> "multiplan ver.1.07_01.d88"
 ExtractDisk  [02]"Disk 2          " -> "multiplan ver.1.07_02.d88"
 -->
-	
+
 	<!-- Slight line of GFX garbage when loading Multiplan -->
 	<software name="multipla" supported="partial">
 		<!-- Has MSDOS 1.10 -->

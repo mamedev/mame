@@ -2,48 +2,48 @@
 // copyright-holders:Michael Zapf
 /***************************************************************************
 
-	rpk.cpp
+    rpk.cpp
 
-	RPK format support
+    RPK format support
 
-	A RPK file ("rompack") contains a collection of dump files and a layout
-	file that defines the kind of circuit board (PCB) used in the cartridge
-	and the mapping of dumps to sockets on the board.
+    A RPK file ("rompack") contains a collection of dump files and a layout
+    file that defines the kind of circuit board (PCB) used in the cartridge
+    and the mapping of dumps to sockets on the board.
 
 Example:
-	<?xml version="1.0" encoding="utf-8"?>
-	<romset>
-		<resources>
-			<rom id="gromimage" file="ed-assmg.bin" />
-		</resources>
-		<configuration>
-			<pcb type="standard">
-				<socket id="grom_socket" uses="gromimage"/>
-			</pcb>
-		</configuration>
-	</romset>
+    <?xml version="1.0" encoding="utf-8"?>
+    <romset>
+        <resources>
+            <rom id="gromimage" file="ed-assmg.bin" />
+        </resources>
+        <configuration>
+            <pcb type="standard">
+                <socket id="grom_socket" uses="gromimage"/>
+            </pcb>
+        </configuration>
+    </romset>
 
 DTD:
-	<!ELEMENT romset (resources, configuration)>
-	<!ELEMENT resources (rom|ram)+>
-	<!ELEMENT rom EMPTY>
-	<!ELEMENT ram EMPTY>
-	<!ELEMENT configuration (pcb)>
-	<!ELEMENT pcb (socket)+>
-	<!ELEMENT socket EMPTY>
-	<!ATTLIST romset version CDATA #IMPLIED>
-	<!ATTLIST rom id ID #REQUIRED
-	<!ATTLIST rom file CDATA #REQUIRED>
-	<!ATTLIST rom crc CDATA #IMPLIED>
-	<!ATTLIST rom sha1 CDATA #IMPLIED>
-	<!ATTLIST ram id ID #REQUIRED>
-	<!ATTLIST ram type (volatile|persistent) #IMPLIED>
-	<!ATTLIST ram store (internal|external) #IMPLIED>
-	<!ATTLIST ram file CDATA #IMPLIED>
-	<!ATTLIST ram length CDATA #REQUIRED>
-	<!ATTLIST pcb type CDATA #REQUIRED>
-	<!ATTLIST socket id ID #REQUIRED>
-	<!ATTLIST socket uses IDREF #REQUIRED>
+    <!ELEMENT romset (resources, configuration)>
+    <!ELEMENT resources (rom|ram)+>
+    <!ELEMENT rom EMPTY>
+    <!ELEMENT ram EMPTY>
+    <!ELEMENT configuration (pcb)>
+    <!ELEMENT pcb (socket)+>
+    <!ELEMENT socket EMPTY>
+    <!ATTLIST romset version CDATA #IMPLIED>
+    <!ATTLIST rom id ID #REQUIRED
+    <!ATTLIST rom file CDATA #REQUIRED>
+    <!ATTLIST rom crc CDATA #IMPLIED>
+    <!ATTLIST rom sha1 CDATA #IMPLIED>
+    <!ATTLIST ram id ID #REQUIRED>
+    <!ATTLIST ram type (volatile|persistent) #IMPLIED>
+    <!ATTLIST ram store (internal|external) #IMPLIED>
+    <!ATTLIST ram file CDATA #IMPLIED>
+    <!ATTLIST ram length CDATA #REQUIRED>
+    <!ATTLIST pcb type CDATA #REQUIRED>
+    <!ATTLIST socket id ID #REQUIRED>
+    <!ATTLIST socket uses IDREF #REQUIRED>
 
 ***************************************************************************/
 
@@ -55,7 +55,7 @@ namespace
 {
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 class rpk_category_impl : public std::error_category
@@ -67,7 +67,7 @@ public:
 
 
 /***************************************************************************
-	GLOBAL VARIABLES
+    GLOBAL VARIABLES
 ***************************************************************************/
 
 rpk_category_impl const f_rpk_category_instance;
@@ -75,7 +75,7 @@ rpk_category_impl const f_rpk_category_instance;
 
 
 /***************************************************************************
-	RPK READER
+    RPK READER
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -220,7 +220,7 @@ std::error_condition rpk_reader::read(std::unique_ptr<util::random_read> &&strea
 
 
 /***************************************************************************
-	RPK FILE
+    RPK FILE
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -347,7 +347,7 @@ std::error_condition rpk_file::add_ram_socket(std::string &&id, const util::xml:
 
 
 /***************************************************************************
-	RPK SOCKET
+    RPK SOCKET
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -416,7 +416,7 @@ std::error_condition rpk_socket::read_file(std::vector<std::uint8_t> &result) co
 
 
 /***************************************************************************
-	RPK EXCEPTION HANDLING
+    RPK EXCEPTION HANDLING
 ***************************************************************************/
 
 //-------------------------------------------------

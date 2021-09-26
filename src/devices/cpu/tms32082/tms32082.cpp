@@ -92,10 +92,10 @@ void tms32082_mp_device::tc_command_execute(int channel, uint32_t entrypoint)
 		uint32_t dst_addr = m_program.read_dword(address + 12);
 		uint32_t src_b_count = m_program.read_word(address + 16);
 		uint32_t src_a_count = m_program.read_word(address + 18);
-	//	uint32_t dst_b_count = m_program.read_word(address + 20);
-	//	uint32_t dst_a_count = m_program.read_word(address + 22);
+	//  uint32_t dst_b_count = m_program.read_word(address + 20);
+	//  uint32_t dst_a_count = m_program.read_word(address + 22);
 		uint32_t src_c_count = m_program.read_dword(address + 24);
-	//	uint32_t dst_c_count = m_program.read_dword(address + 28);
+	//  uint32_t dst_c_count = m_program.read_dword(address + 28);
 		uint32_t src_b_pitch = m_program.read_dword(address + 32);
 		uint32_t dst_b_pitch = m_program.read_dword(address + 36);
 		uint32_t src_c_pitch = m_program.read_dword(address + 40);
@@ -152,10 +152,10 @@ void tms32082_mp_device::tc_command_execute(int channel, uint32_t entrypoint)
 		do
 		{
 
-		//	uint32_t src_addr = m_program.read_dword(address + 8);
-		//	uint32_t dst_addr = m_program.read_dword(address + 12);
+		//  uint32_t src_addr = m_program.read_dword(address + 8);
+		//  uint32_t dst_addr = m_program.read_dword(address + 12);
 
-		//	int count = pt_options & 0xffff;
+		//  int count = pt_options & 0xffff;
 			stop = (pt_options & 0x80000000) ? true : false;
 
 			/*
@@ -305,7 +305,7 @@ void tms32082_mp_device::device_reset()
 	m_intpen = 0;
 	m_ie = 0;
 
-	m_pp_status = 0xf0000;		// start with all PPs halted
+	m_pp_status = 0xf0000;      // start with all PPs halted
 }
 
 void tms32082_mp_device::processor_command(uint32_t command)
@@ -329,7 +329,7 @@ void tms32082_mp_device::processor_command(uint32_t command)
 	}
 
 	if (!m_cmd_callback.isnull())
-		m_cmd_callback(space(AS_PROGRAM), command);	
+		m_cmd_callback(space(AS_PROGRAM), command);
 }
 
 uint32_t tms32082_mp_device::read_creg(int reg)
@@ -342,7 +342,7 @@ uint32_t tms32082_mp_device::read_creg(int reg)
 		case 0x1:           // EIP
 			return m_eip;
 
-		case 0x2:			// CONFIG
+		case 0x2:           // CONFIG
 			// Type = 0010: 2 Parallel Processors
 			// Release = 0011: Production release silicon
 			return (0x2 << 12) | (0x3 << 4);

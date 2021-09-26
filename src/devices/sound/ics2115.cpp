@@ -434,7 +434,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 	{
 		constexpr int RAMP_SHIFT = 6;
 		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
-		const u16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law 
+		const u16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law
 		const u16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
 		//check negative values so no cracks, is it a hardware feature ?
 		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0;

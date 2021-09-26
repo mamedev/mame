@@ -16,24 +16,24 @@
     - PCG-1000;
     - Intel 8251;
     - cassette;
-	- dip-switches;
+    - dip-switches;
     - PC-8011 (expansion unit)
     - PC-8021;
     - PC-8031 (mini disk unit, in progress)
-	- pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
-	  (Has 3 bitplane GVRAM like PC-8801 V1 mode);
-	- waitstates & DMA penalty (some games are suspciously fast);
-	- buzzer has pretty ugly aliasing in places;
+    - pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
+      (Has 3 bitplane GVRAM like PC-8801 V1 mode);
+    - waitstates & DMA penalty (some games are suspciously fast);
+    - buzzer has pretty ugly aliasing in places;
 
     Notes:
     - pc8001 v1.01 / v1.02 sports a buggy readout of the expansion ROM at PC=17a1:
       It expects an header read of 0x41-0x42 at offset $6000-6001, but second read at
       PC=0x17aa is just a comparison to $6000 == 0x42, which is impossible at that point
       unless external aid is given. This has been fixed in v1.10;
-	- Color Magical (pc8001gp:flop5 option 7) transfers two 8 color screens at
-	  even/odd frame intervals, effectively boosting the number of available colors to 27.
-	  This trick is kinda flickery even on real HW, no wonder it looks ugly in MAME, 
-	  can it be improved?
+    - Color Magical (pc8001gp:flop5 option 7) transfers two 8 color screens at
+      even/odd frame intervals, effectively boosting the number of available colors to 27.
+      This trick is kinda flickery even on real HW, no wonder it looks ugly in MAME,
+      can it be improved?
 
 */
 
@@ -152,7 +152,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 	if (reverse ^ m_screen_reverse)
 		tile ^= 0xff;
 
-//	if (m_width80)
+//  if (m_width80)
 	{
 		u8 pen;
 
@@ -170,7 +170,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 				pen = tile;
 				pen = (pen >> (7 - (xi >> (dot_width - 1)))) & 1;
 			}
-			
+
 			for (int di = 0; di < dot_width; di++)
 				bitmap.pix(y, res_x + di) = m_crtc_palette->pen(pen ? color : 0);
 		}
@@ -237,7 +237,7 @@ void pc8001_base_state::port30_w(uint8_t data)
 
 	/* color mode */
 	m_color = BIT(data, 1);
-	
+
 	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
@@ -257,7 +257,7 @@ void pc8001mk2_state::port31_w(uint8_t data)
 	    7       background color
 
 	*/
-    membank("bank2")->set_entry(data & 1);
+	membank("bank2")->set_entry(data & 1);
 }
 
 WRITE_LINE_MEMBER( pc8001_state::write_centronics_busy )
@@ -438,8 +438,8 @@ void pc8001mk2sr_state::port71_w(u8 data)
 
 void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 {
-    pc8001mk2_io(map);
-    map(0x33, 0x33).w(FUNC(pc8001mk2sr_state::port33_w));
+	pc8001mk2_io(map);
+	map(0x33, 0x33).w(FUNC(pc8001mk2sr_state::port33_w));
 	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
 }
 
@@ -546,13 +546,13 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)                          PORT_CHAR(' ')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)                            PORT_CHAR(27)
 
-//	PORT_START("DSW1")
+//  PORT_START("DSW1")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8001mk2 )
-    PORT_INCLUDE( pc8001 )
+	PORT_INCLUDE( pc8001 )
 
-    PORT_START("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "Boot Mode" )
 	PORT_DIPSETTING(    0x00, "N-BASIC" )
 	PORT_DIPSETTING(    0x01, "N80-BASIC" )
@@ -606,7 +606,7 @@ static INPUT_PORTS_START( pc8001mk2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8001mk2sr )
-    PORT_INCLUDE( pc8001mk2 )
+	PORT_INCLUDE( pc8001mk2 )
 
 	PORT_MODIFY("DSW1")
 	// This is really a tri-state dip on front panel
@@ -690,10 +690,10 @@ void pc8001_state::machine_start()
 		program.install_readwrite_bank(0x0000, 0x5fff, membank("bank1"));
 		program.install_readwrite_bank(0x6000, 0xbfff, membank("bank2"));
 		program.install_readwrite_bank(0x8000, 0xffff, membank("bank3"));
-//		membank("bank2")->set_entry(0);
+//      membank("bank2")->set_entry(0);
 		break;
 	}
-	
+
 	// PC8001 is 15KHz only
 	set_screen_frequency(false);
 }
@@ -707,18 +707,18 @@ void pc8001_state::machine_reset()
 
 void pc8001mk2sr_state::machine_start()
 {
-    pc8001_state::machine_start();
+	pc8001_state::machine_start();
 
 	membank("bank1")->configure_entry(2, m_n80sr_rom->base());
 	membank("bank2")->configure_entry(2, m_n80sr_rom->base() + 0x6000);
 	membank("bank2")->configure_entry(3, m_n80sr_rom->base() + 0x8000);
-	
+
 	save_item(NAME(m_n80sr_bank));
 }
 
 void pc8001mk2sr_state::machine_reset()
 {
-    pc8001_state::machine_reset();
+	pc8001_state::machine_reset();
 
 	//membank("bank1")->set_entry(2);
 	//membank("bank2")->set_entry(2);
@@ -728,8 +728,8 @@ void pc8001mk2sr_state::machine_reset()
 
 void pc8001_state::pc8001(machine_config &config)
 {
-    constexpr XTAL MASTER_CLOCK = XTAL(4'000'000);
-    constexpr XTAL VIDEO_CLOCK = XTAL(14'318'181);
+	constexpr XTAL MASTER_CLOCK = XTAL(4'000'000);
+	constexpr XTAL VIDEO_CLOCK = XTAL(14'318'181);
 
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK);
@@ -744,7 +744,7 @@ void pc8001_state::pc8001(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
 	m_screen->set_screen_update(FUNC(pc8001_state::screen_update));
-//	m_screen->set_palette(m_crtc_palette);
+//  m_screen->set_palette(m_crtc_palette);
 
 	PALETTE(config, m_crtc_palette, palette_device::BRG_3BIT);
 
@@ -783,7 +783,7 @@ void pc8001_state::pc8001(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-    // TODO: unknown clock, is it really a beeper?
+	// TODO: unknown clock, is it really a beeper?
 	BEEP(config, m_beep, 2400).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 

@@ -2,34 +2,34 @@
 // copyright-holders:Angelo Salese, Olivier Galibert
 /**************************************************************************************************
 
-	NEC PC-80S31(K) Mini Disk Unit
+    NEC PC-80S31(K) Mini Disk Unit
 
-	Z80 + μPD765 + PPI that connects in cross with an host PPI
-	
-	"Mini" as compared to the PC-8881 8-inch floppy I/F
+    Z80 + μPD765 + PPI that connects in cross with an host PPI
 
-	Design is decidedly derived from Epson TF-20 and friends,
-	cfr. devices/bus/epson_sio/tf20.cpp
+    "Mini" as compared to the PC-8881 8-inch floppy I/F
 
-	TODO:
-	- What's PC-80S32? Is it the 88VA version or a different beast?
-	- PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn), 
-	  expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
-	  Are those incorrectly identified as 2DD? Hacked to work for now;
-	- set_input_line_vector fn doesn't work properly when issued from a device_reset, 
-	  we currently just implement the irq_callback instead;
-	- Bus option;
-	- Cascade mode, i.e. the CN2 connector used to accept a second disk unit for drive 2 & 3;
-	- pc80s31k: verify that irq vector write (I/O port $f0) belongs here or just
-	  whatever PC88VA uses.
-	- printer interface (used for debugging? 4-bit serial?)
-	- Pinpoint what host I/O ports $f6, $f7 truly are 
+    Design is decidedly derived from Epson TF-20 and friends,
+    cfr. devices/bus/epson_sio/tf20.cpp
+
+    TODO:
+    - What's PC-80S32? Is it the 88VA version or a different beast?
+    - PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn),
+      expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
+      Are those incorrectly identified as 2DD? Hacked to work for now;
+    - set_input_line_vector fn doesn't work properly when issued from a device_reset,
+      we currently just implement the irq_callback instead;
+    - Bus option;
+    - Cascade mode, i.e. the CN2 connector used to accept a second disk unit for drive 2 & 3;
+    - pc80s31k: verify that irq vector write (I/O port $f0) belongs here or just
+      whatever PC88VA uses.
+    - printer interface (used for debugging? 4-bit serial?)
+    - Pinpoint what host I/O ports $f6, $f7 truly are
       (direct FDC access from this device or a different beast? cfr. play6lim with pc8001mk2)
     - filemst tries to access undocumented I/O port $09 at PC=5000:
-	  \- If that's 0 then it tries to read a vector at [0x8000];
-	  \- It then tries to read at memory [0xc0ff], set the value read in [0xf012];
-	  \- Expects that ROM [0x0000] is not equal to 0xc3;
-	  Bottom line: Is it trying to access some custom HW?
+      \- If that's 0 then it tries to read a vector at [0x8000];
+      \- It then tries to read at memory [0xc0ff], set the value read in [0xf012];
+      \- Expects that ROM [0x0000] is not equal to 0xc3;
+      Bottom line: Is it trying to access some custom HW?
 
 ===================================================================================================
 
@@ -37,29 +37,29 @@ PCB (PC-80S31K)
 
 ===================================================================================================
 
-	|--------------------------------------|
-	|      P1 P2 P3         X1             |
-	|                                      |
-	| CN2                                  |
+    |--------------------------------------|
+    |      P1 P2 P3         X1             |
+    |                                      |
+    | CN2                                  |
     |                 B6102C022            |
     |      FD1 FD2              (**)       |
     |       |   |                          |
     | CN1 -------       D765AC  D2364EC (*)|
-	|                                   (*)|
-	|      D8255AC-2  B6101C017 D780C-1    |
-	|                                      |
-	|--------------------------------------|
-	
-	PCB is marked PC-80S31KFDC NEC-14T
-	P1, P2, P3 are power supplies (+5V, +12V, -5V for P1, lacks -5V for the other two)
-	μPD2364EC is at position IC13, it's a 8192 size ROM. (***)
-	(*) are μPD41416C
-	(**) marked as JP, unpopulated x 3;
-	μPB6101/2 are bipolar TTL gate arrays, presumably
-	Cannot read marking of X1 (8 MHz?)
+    |                                   (*)|
+    |      D8255AC-2  B6101C017 D780C-1    |
+    |                                      |
+    |--------------------------------------|
 
-	(***) Given this, we guess that PC80S31 is the 2D version while the 'K
-	variant is the 2D/2DD/2HD version.
+    PCB is marked PC-80S31KFDC NEC-14T
+    P1, P2, P3 are power supplies (+5V, +12V, -5V for P1, lacks -5V for the other two)
+    μPD2364EC is at position IC13, it's a 8192 size ROM. (***)
+    (*) are μPD41416C
+    (**) marked as JP, unpopulated x 3;
+    μPB6101/2 are bipolar TTL gate arrays, presumably
+    Cannot read marking of X1 (8 MHz?)
+
+    (***) Given this, we guess that PC80S31 is the 2D version while the 'K
+    variant is the 2D/2DD/2HD version.
 
 ===================================================================================================
 
@@ -67,7 +67,7 @@ Command Protocol
 
 ===================================================================================================
 
-Command & parameters are normally communicated from Host via port B 
+Command & parameters are normally communicated from Host via port B
 (read on port A on FDC side)
 An RPi implementation can be seen at https://github.com/MinatsuT/RPi_PC-80S31
 
@@ -93,10 +93,10 @@ An RPi implementation can be seen at https://github.com/MinatsuT/RPi_PC-80S31
    %7  destination sector number +1
 [0x05] Format
    %1  drive number
-[0x06] Send result status to Host 
+[0x06] Send result status to Host
        x--- ---- I/O complete
-	   -x-- ---- has unread buffer
-	   ---- ---x error occurred
+       -x-- ---- has unread buffer
+       ---- ---x error occurred
 [0x07] Drive status
 [0x0b] Send memory data
 %1-%2  address start
@@ -110,12 +110,12 @@ An RPi implementation can be seen at https://github.com/MinatsuT/RPi_PC-80S31
        (picks up number of sector etc. from previous issued commands?)
 [0x14] Device status
        x--- ---- ESIG: error
-	   -x-- ---- WPDR: write protected
-	   --x- ---- RDY:  ready
-	   ---x ---- TRK0: track 0
-	   ---- x--- DSDR: double sided drive
-	   ---- -x-- HDDR: head
-	   ---- --xx DS1, DS2: drive select
+       -x-- ---- WPDR: write protected
+       --x- ---- RDY:  ready
+       ---x ---- TRK0: track 0
+       ---- x--- DSDR: double sided drive
+       ---- -x-- HDDR: head
+       ---- --xx DS1, DS2: drive select
        (same as 765 ST3?)
 [0x17] Mode change
    %1  ---- xxxx mode select
@@ -133,7 +133,7 @@ Used as a communication protocol flags
  (swap 4-bit nibbles and r/w direction for FDC side, all bits are active high):
  x--- ---- (w) ATN AtenTioN:
                host sends a command to FDC, interrupts current one
-          	   (looks unconnected the other way around?)
+               (looks unconnected the other way around?)
  -x-- ---- (w) DAC DAta aCcepted:
                host just picked up data from FDC
  --x- ---- (w) RFD Ready For Data:
@@ -231,11 +231,11 @@ void pc80s31_device::fdc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//	map(0x09, 0x09).r accessed by filemst (pc8801), cfr. notes
+//  map(0x09, 0x09).r accessed by filemst (pc8801), cfr. notes
 
-//	map(0xf0, 0xf0).w(FUNC(pc8801_state::fdc_irq_vector_w)); // Interrupt Opcode Port
-//	map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
-//	map(0xf6, 0xf6).nopw(); // printer related
+//  map(0xf0, 0xf0).w(FUNC(pc8801_state::fdc_irq_vector_w)); // Interrupt Opcode Port
+//  map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
+//  map(0xf6, 0xf6).nopw(); // printer related
 	map(0xf7, 0xf7).nopw(); // printer port output
 	map(0xf8, 0xf8).rw(FUNC(pc80s31_device::terminal_count_r), FUNC(pc80s31_device::motor_control_w));
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
@@ -301,7 +301,7 @@ void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	m_fdc->tc_w(false);
 
-	// several games tries to scan invalid IDs from their structures, if this hits then 
+	// several games tries to scan invalid IDs from their structures, if this hits then
 	// it's possibly an attempt to scan a missing sector from the floppy structure.
 	// cfr. acrojet: the third read data command issued tries to access a CHRN of (0, 0, 16, 256)
 	// and checks at PC=500B if any of these status flags are satisfied:
@@ -313,7 +313,7 @@ void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	if ((u8)m_fdc_cpu->state_int(Z80_HALT) == 1)
 	{
 		logerror("%s: attempt to trigger TC while in HALT state (read ID copy protection warning)\n", machine().describe_context());
-//		throw emu_fatalerror("copy protection hit");
+//      throw emu_fatalerror("copy protection hit");
 	}
 }
 
@@ -324,7 +324,7 @@ void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int para
 void pc80s31_device::device_start()
 {
 	m_tc_zero_timer = timer_alloc(0);
-	
+
 	save_item(NAME(m_irq_vector));
 }
 
@@ -357,14 +357,14 @@ void pc80s31_device::device_reset()
 template <unsigned N> u8 pc80s31_device::latch_r()
 {
 	const int port_mask = N & 4 ? 0x0f : 0xff;
-//	machine().scheduler().synchronize();
+//  machine().scheduler().synchronize();
 	return m_latch[N]->read() & port_mask;
 }
 
 template <unsigned N> void pc80s31_device::latch_w(u8 data)
 {
 	const int lower_nibble = N & 4;
-//	machine().scheduler().synchronize();
+//  machine().scheduler().synchronize();
 	if (lower_nibble)
 	{
 		LOG("%s: %s port C write %02x  (ATN=%d DAC=%d RFD=%d DAV=%d)\n"
@@ -398,14 +398,14 @@ void pc80s31_device::motor_control_w(uint8_t data)
 {
 	// FIXME: on pc80s31k device (particularly on later releases) this stays always on
 	// babylon: just spins indefinitely at PC=6d8 (using the internal routines),
-	//			waiting for DAV or ATN being on. Never hits the port until a flag is issued.
+	//          waiting for DAV or ATN being on. Never hits the port until a flag is issued.
 	// prajator: on idle times it spins at PC=7060, waiting for ATN and keep issuing a 0xff here.
 	// valis2: calls PC=7009 subroutine for idle, waits for ATN on.
 	//         It eventually writes a 0 here, not before an extremely long time
 	//         (~10000 frames!)
 	m_floppy[0]->get_device()->mon_w(!(data & 1));
 	m_floppy[1]->get_device()->mon_w(!(data & 2));
-	
+
 	// TODO: according to docs a value of 0x07 enables precompensation to tracks 0-19, 0xf enables it on 20-39
 }
 

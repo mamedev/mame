@@ -10857,7 +10857,7 @@ license:CC0
 		Notes: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352
 		value. The info for the original cue is below.
 		<rom name="Paranasal Sinuses & Anterior Skull Base.cue" size="126" crc="6e9ca05a" md5="3ae2399c2f5bbd754d67682e5bb7f2f7"/>
-		
+
 		This also included an IBM PC / Windows 3.1 version, which is included in the ibm5170_cdrom software list.
 		-->
 		<description>Paranasal Sinuses &amp; Anterior Skull Base</description>

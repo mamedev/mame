@@ -71,16 +71,16 @@
 
 
 
-	TODO:
+    TODO:
 
-	- TMS320C82 parallel processors are not emulated
-	  * PP0 transfers polygon data from a software FIFO to the graphics processor. This is currently HLE'd.
-	  * PP1 most likely does sound mixing. This is currently not emulated.
-	- 93C66 EEPROM
-	- Alpha blending (probably based on palette index like on gaelco3d)
-	- Minor Z-buffer issues
-	- Wrong textures in a few places (could be a CPU core bug)
-	- Networking
+    - TMS320C82 parallel processors are not emulated
+      * PP0 transfers polygon data from a software FIFO to the graphics processor. This is currently HLE'd.
+      * PP1 most likely does sound mixing. This is currently not emulated.
+    - 93C66 EEPROM
+    - Alpha blending (probably based on palette index like on gaelco3d)
+    - Minor Z-buffer issues
+    - Wrong textures in a few places (could be a CPU core bug)
+    - Networking
 
 */
 
@@ -193,7 +193,7 @@ void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &ext
 			int ty = tex_origin_y + (int)(v);
 
 
-#if BILINEAR			
+#if BILINEAR
 			float intu, intv;
 
 			int fracu = modff(u, &intu) * 255.0f;
@@ -470,7 +470,7 @@ uint32_t rollext_state::a0000000_r(offs_t offset, uint32_t mem_mask)
 			data |= m_in[0]->read() << 16;
 			data |= m_in[1]->read();
 
-			data |= 0x200;		// 0 causes inf loop
+			data |= 0x200;      // 0 causes inf loop
 
 			// -------- ---x---- -------- -------- ADC channel 0
 			// -------- --x----- -------- -------- ADC channel 1?
@@ -485,7 +485,7 @@ uint32_t rollext_state::a0000000_r(offs_t offset, uint32_t mem_mask)
 		case 1:
 			uint32_t data = 0;
 			data |= m_in[2]->read();
-			return data;			
+			return data;
 	}
 
 	return 0xffffffff;
@@ -538,7 +538,7 @@ void rollext_state::cmd_callback(address_space &space, uint32_t data)
 		if (command & 0x00004000)
 		{
 			// simulate PP behavior for now...
-			space.write_dword(0x00000084, 3);			
+			space.write_dword(0x00000084, 3);
 
 			m_renderer->m_fb_current ^= 1;
 			m_renderer->clear_fb();
@@ -559,7 +559,7 @@ void rollext_state::cmd_callback(address_space &space, uint32_t data)
 }
 
 void rollext_state::palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{	
+{
 	if (ACCESSING_BITS_16_31)
 	{
 		m_renderer->palette_write((offset * 2) + 1, data >> 16);
@@ -609,7 +609,7 @@ void rollext_state::memmap(address_map &map)
 
 static INPUT_PORTS_START(rollext)
 	PORT_START("INPUTS1")
-	PORT_SERVICE_NO_TOGGLE(0x8, IP_ACTIVE_LOW)		// test button
+	PORT_SERVICE_NO_TOGGLE(0x8, IP_ACTIVE_LOW)      // test button
 	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_VOLUME_DOWN)
 	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_VOLUME_UP)
@@ -668,7 +668,7 @@ void rollext_state::fifo_ptr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		}
 		m_maincpu->space().write_dword(0x600ffffc, oldnum + consume_num);
 		m_maincpu->space().write_dword(0x00000090, 0);
-	}	
+	}
 }
 
 

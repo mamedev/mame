@@ -677,10 +677,10 @@ ROM_END
 
   TourVision was a Spanish developer, PCB had TourVision stickers, but this kind of machine was illegal in Spain, so made for the French market instead
 
-  Ariège Amusements was the exclusive distributor of TourVision products until 1991, Paradise Automatique was a spin-off of this distributor 
+  Ariège Amusements was the exclusive distributor of TourVision products until 1991, Paradise Automatique was a spin-off of this distributor
   and was legally created in 1992 to import/export food vending machines, video games and audiovisual appliances and continued to work with
   TourVision.
- 
+
   A version of this exists (on newer hardware?) with the title 'Lucky Gum' or 'Luck Gum' however the supported game shows no title screen so the title
   is unknown.
 */

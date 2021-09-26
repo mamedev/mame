@@ -823,7 +823,7 @@ void stvcd_device::cmd_play_disc()
 			// FIXME: verify implementation with Galaxy Fight
 			// it calls 10ff ffff ffff ffff, but then it follows up with
 			// 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
-			// (and current implementation nukes start/end FAD addresses at 0x04). 
+			// (and current implementation nukes start/end FAD addresses at 0x04).
 			// I'm sure that this doesn't work like this, but there could
 			// be countless possible combinations ...
 			if(fadstoplay == 0)
@@ -1730,7 +1730,7 @@ void stvcd_device::cmd_get_target_file_info()
 		// (iso9660 parsing doesn't read beyond the first sector)
 		if (curdir[temp].firstfad == 0 || curdir[temp].length == 0)
 			throw emu_fatalerror("File ID not found in XFERTYPE_FILEINFO_1");
-//		printf("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
+//      printf("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
 		// first 4 bytes = FAD
 		finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
 		finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;

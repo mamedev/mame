@@ -598,12 +598,12 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					sf_ack(true); //set hand-shake flag
 					return;
 
-                case 0x0a: // NETLINKON
+				case 0x0a: // NETLINKON
 					// TODO: understand where NetLink actually lies and implement delegation accordingly
 					// (is it really an SH1 device like suggested by the space access or it overlays on CS2 bus?)
 					popmessage("%s: NetLink enabled", this->tag());
 					 [[fallthrough]];
-                case 0x0b: // NETLINKOFF
+				case 0x0b: // NETLINKOFF
 					break;
 
 				case 0x0d: // SYSRES

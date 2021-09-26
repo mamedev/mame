@@ -188,7 +188,7 @@ u8 nes_batmap_srrx_device::read_dpcm()
 
 u8 nes_batmap_srrx_device::read_l(offs_t offset)
 {
-//	LOG_MMC(("batmap_srrx read_l, offset: %04x", offset));
+//  LOG_MMC(("batmap_srrx read_l, offset: %04x", offset));
 
 	offset += 0x100;
 	switch (offset & 0x1800)
@@ -204,7 +204,7 @@ u8 nes_batmap_srrx_device::read_l(offs_t offset)
 
 u8 nes_batmap_srrx_device::read_m(offs_t offset)
 {
-//	LOG_MMC(("batmap_srrx read_m, offset: %04x", offset));
+//  LOG_MMC(("batmap_srrx read_m, offset: %04x", offset));
 	return m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
 }
 

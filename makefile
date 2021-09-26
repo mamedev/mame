@@ -1803,39 +1803,24 @@ tests: $(REGTESTS)
 cleansrc:
 	@echo Cleaning up tabs/spaces/end of lines....
 ifeq (posix,$(SHELLTYPE))
-	$(SILENT) find src -name \*.c -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.cpp -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.h -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.hpp -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.hxx -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.ipp -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.lay -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.lst -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.mak -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.mm -exec ./srcclean {} \; >&2
-	$(SILENT) find hash -name \*.hsi -exec ./srcclean {} \; >&2
-	$(SILENT) find hash -name \*.xml -exec ./srcclean {} \; >&2
-	$(SILENT) find bgfx -name \*.json -exec ./srcclean {} \; >&2
-	$(SILENT) find plugins -name \*.lua -exec ./srcclean {} \; >&2
-	$(SILENT) find plugins -name \*.json -exec ./srcclean {} \; >&2
-	$(SILENT) find scripts -name \*.lua -exec ./srcclean {} \; >&2
+	$(SILENT) find src \
+		-name \*.c -o -name \*.cpp -o \
+		-name \*.h -o -name \*.hpp -o -name \*.hxx -o \
+		-name \*.ipp -o \
+		-name \*.mm -o \
+		-name \*.lay -o \
+		-name \*.lst \
+		-exec ./srcclean {} \; >&2
+	$(SILENT) find hash    -name \*.hsi -o -name \*.xml  -exec ./srcclean {} \; >&2
+	$(SILENT) find bgfx    -name \*.json                 -exec ./srcclean {} \; >&2
+	$(SILENT) find plugins -name \*.lua -o -name \*.json -exec ./srcclean {} \; >&2
+	$(SILENT) find scripts -name \*.lua                  -exec ./srcclean {} \; >&2
 else
-	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.cpp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.hpp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.ipp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mm) do srcclean %%i >&2 )
-	$(shell for /r hash %%i in (*.hsi) do srcclean %%i >&2 )
-	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
-	$(shell for /r bgfx %%i in (*.json) do srcclean %%i >&2 )
-	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
-	$(shell for /r plugins %%i in (*.json) do srcclean %%i >&2 )
-	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
+	$(shell for /r src     %%i in (*.c, *.cpp, *.h, *.hpp, *.hxx, *.ipp, *.mm, *.lay, *.lst) do srcclean %%i >&2 )
+	$(shell for /r hash    %%i in (*.hsi, *.xml)  do srcclean %%i >&2 )
+	$(shell for /r bgfx    %%i in (*.json)        do srcclean %%i >&2 )
+	$(shell for /r plugins %%i in (*.lua, *.json) do srcclean %%i >&2 )
+	$(shell for /r scripts %%i in (*.lua)         do srcclean %%i >&2 )
 endif
 
 #-------------------------------------------------

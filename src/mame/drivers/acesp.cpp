@@ -116,8 +116,8 @@ void ace_sp_state::ace_sp_map(address_map &map)
 	// 0x33 - lamp stb
 	// 0x34 - shift stb
 	// 0x35 - shift clk
-	map(0x36, 0x36).ram().rw(FUNC(ace_sp_state::serial_r), FUNC(ace_sp_state::serial_w)); 	// 0x36 - sio
- 
+	map(0x36, 0x36).ram().rw(FUNC(ace_sp_state::serial_r), FUNC(ace_sp_state::serial_w));   // 0x36 - sio
+
 	// 0x37 - watchdog?
 	map(0x0038, 0x003b).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	/* 0x3c */

@@ -14,7 +14,7 @@ license:CC0
 			<color state="0" red="0.125" green="0.125" blue="0.125" />
 		</disk>
 	</element>
-	
+
 	<group name="dmd">
 		<repeat count="24">
 			<param name="s" start="0" increment="64" />

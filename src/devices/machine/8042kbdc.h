@@ -114,7 +114,7 @@ private:
 	optional_ioport m_mousebtn_port;
 
 	kbdc8042_type_t     m_keybtype;
-	kbdc8042_interrupt_type_t	m_interrupttype;
+	kbdc8042_interrupt_type_t   m_interrupttype;
 
 	devcb_write_line    m_system_reset_cb;
 	devcb_write_line    m_gate_a20_cb;
