@@ -5,7 +5,7 @@ license:CC0
 -->
 <softwarelist name="pc6001_cart" description="NEC PC-6001 cartridges">
 
-	<!-- Games -->
+	<!-- Official Games -->
 
 	<software name="canyoncl" supported="yes">
 		<description>Canyon Climber</description>
@@ -31,6 +31,20 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Has missing text (uses raster effect) -->
+	<software name="tutankhm" supported="partial">
+		<description>Tutankham</description>
+		<year>1982</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ツタンカーム"/>
+
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="510t.12" size="4096" crc="7a114d77" sha1="d0920e7d9d2a26530037350bf8399494ab0df0c5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Homebrew Games -->
 
 	<!-- both these dumps aren't valid ROM sizes -->
@@ -39,6 +53,8 @@ license:CC0
 		<year>2010</year>
 		<!-- Developed by XYZ, author: mosesu -->
 		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="alt_title" value="ムーンレイダース"/>
+
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="16079">
 				<rom name="mr.bin" size="16079" crc="51ac06d8" sha1="736c7c72bb632a3bc26ed2e081a53d30b99cee2b" status="baddump"/>
@@ -52,6 +68,8 @@ license:CC0
 		<year>2010</year>
 		<!-- Developed by XYZ, author: mosesu -->
 		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="alt_title" value="ムーンレイダース"/>
+
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="16106">
 				<rom name="moon raiders.bin" size="16106" crc="997a98ce" sha1="3b79342d24b87af70e9c4d3ad112153c6c02045a" status="baddump"/>
