@@ -332,7 +332,7 @@ void DebuggerView::copyVisibleSlot()
 			text += wchar_t(viewdata[col].byte);
 		std::string::size_type const nonblank = text.find_last_not_of("\t\n\v\r ");
 		if (nonblank != std::string::npos)
-			text.resize((std::max)(nonblank + 1, start));
+			text.resize((std::max)(start, nonblank + 1));
 		text += "\n";
 	}
 
