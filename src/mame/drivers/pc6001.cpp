@@ -29,7 +29,6 @@
     - AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the
        player to press either 'B' or 'C' then a number but nothing is shown on screen,
        other emus behaves the same, bad dump?
-    - Dawn Patrol (cart): presumably too slow;
     (Mk2 mode 5 games)
     - 3D Golf Simulation Super Version: gameplay / inputs seems broken
     - American Truck: Screen is offset at the loading screen, loading bug?
@@ -1354,7 +1353,7 @@ void pc6001_state::machine_reset()
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
-	m_port_c_8255=0;
+	m_port_c_8255 = 0;
 
 	m_cas_switch = 0;
 	m_cas_offset = 0;
@@ -1507,6 +1506,7 @@ void pc6001_state::pc6001(machine_config &config)
 	I8251(config, "uart", 0);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pc6001_cart");
+	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
 
 //  CASSETTE(config, m_cassette);
 //  m_cassette->set_formats(pc6001_cassette_formats);
