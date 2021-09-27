@@ -53083,14 +53083,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sheroes" supported="no">
-		<description>Street Heroes (Tw)</description>
-		<year>19??</year>
+	<software name="sheroes">
+		<description>Street Heroes (Taiwan)</description>
+		<year>199?</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-027"/>
+		<info name="alt_title" value="侍魂 (Shìhún)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_shero" />
 			<feature name="pcb" value="UNL-SHERO" />
+			<feature name="mirroring" value="4screen" />
 			<dataarea name="chr" size="524288">
 				<rom name="street heroes (asia) (unl).chr" size="524288" crc="123c0c4b" sha1="a2f99d60945a8f62d138414c97fe69cfdd114d6e" offset="00000" status="baddump" />
 			</dataarea>
@@ -53100,10 +53102,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<dipswitch name="Region" tag="DSW" mask="1">
-				<dipvalue name="USA" value="0"/>
-				<dipvalue name="Asia" value="1" default="yes"/>
-			</dipswitch>
 		</part>
 	</software>
 
