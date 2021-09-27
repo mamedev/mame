@@ -42,13 +42,25 @@ protected:
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
 	virtual bool take_c800() override;
 
-private:
 	uint8_t *m_rom;
 	uint8_t m_slot7_ram[0x800];
-	int m_slot7_bank, m_slot7_ram_bank;
+	int m_slot7_bank;
+
+private:
+	int m_slot7_ram_bank;
+};
+
+class a2bus_laser128_orig_device: public a2bus_laser128_device
+{
+public:
+	a2bus_laser128_orig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual uint8_t read_c800(uint16_t offset) override;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_LASER128, a2bus_laser128_device)
+DECLARE_DEVICE_TYPE(A2BUS_LASER128_ORIG, a2bus_laser128_orig_device)
 
 #endif // MAME_BUS_A2BUS_LASER128_H
