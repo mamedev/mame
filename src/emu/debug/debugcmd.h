@@ -34,6 +34,12 @@ public:
 	/* validates a parameter as a cpu and retrieves the given address space */
 	bool validate_cpu_space_parameter(const char *param, int spacenum, address_space *&result);
 
+	/* validates a parameter as a device with a memory interface */
+	bool validate_device_memory_parameter(const char *param, device_memory_interface *&result);
+
+	/* validates a parameter as a device with a memory interface and retrieves the given address space */
+	bool validate_device_space_parameter(const char *param, int spacenum, address_space *&result);
+
 	/* validates a parameter as a memory region name and retrieves the given region */
 	bool validate_memory_region_parameter(const std::string &param, memory_region *&result);
 
@@ -148,6 +154,7 @@ private:
 	void execute_rewind(int ref, const std::vector<std::string> &params);
 	void execute_save(int ref, const std::vector<std::string> &params);
 	void execute_saveregion(int ref, const std::vector<std::string> &params);
+	void execute_savedevice(int ref, const std::vector<std::string> &params);
 	void execute_load(int ref, const std::vector<std::string> &params);
 	void execute_loadregion(int ref, const std::vector<std::string> &params);
 	void execute_dump(int ref, const std::vector<std::string> &params);

@@ -238,6 +238,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saveo",     CMDFLAG_NONE, AS_OPCODES, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saver",     CMDFLAG_NONE, 0, 4, 4, std::bind(&debugger_commands::execute_saveregion, this, _1, _2));
+	m_console.register_command("savev",     CMDFLAG_NONE, 0, 4, 5, std::bind(&debugger_commands::execute_savedevice, this, _1, _2));
 
 	m_console.register_command("load",      CMDFLAG_NONE, AS_PROGRAM, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
 	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
@@ -594,6 +595,60 @@ bool debugger_commands::validate_cpu_space_parameter(const char *param, int spac
 		return false;
 	}
 	result = &cpu->memory().space(spacenum);
+	return true;
+}
+
+
+/*-------------------------------------------------
+    validate_device_memory_parameter - validates
+    a parameter as a device with a memory
+    interface
+-------------------------------------------------*/
+
+bool debugger_commands::validate_device_memory_parameter(const char *param, device_memory_interface *&result)
+{
+	result = nullptr;
+
+	/* if no parameter, report an errror */
+	if (param == nullptr)
+	{
+		m_console.printf("No valid device name was supplied\n");
+		return true;
+	}
+
+	device_t *device = m_machine.root_device().subdevice(strmakelower(param));
+	if (device->interface(result))
+		return true;
+
+	m_console.printf("Device '%s' found but lacks memory interface\n", strmakelower(param));
+	return false;
+}
+
+
+/*-------------------------------------------------
+    validate_device_space_parameter - validates
+    a parameter as a device and retrieves the
+    given address space
+-------------------------------------------------*/
+
+bool debugger_commands::validate_device_space_parameter(const char *param, int spacenum, address_space *&result)
+{
+	/* first look for a tag match */
+	device_t *device = m_machine.root_device().subdevice(strmakelower(param));
+	if (!device)
+	{
+		m_console.printf("No matching device found for '%s'\n", strmakelower(param));
+		return false;
+	}
+
+	/* verify if this device has the appropriate space index */
+	if (!device->memory().has_space(spacenum))
+	{
+		m_console.printf("No matching memory space %d found for device '%s'\n", spacenum, strmakelower(param));
+		return false;
+	}
+
+	result = &device->memory().space(spacenum);
 	return true;
 }
 
@@ -2063,6 +2118,109 @@ void debugger_commands::execute_saveregion(int ref, const std::vector<std::strin
 	}
 	fwrite(region->base() + offset, 1, length, f);
 
+	fclose(f);
+	m_console.printf("Data saved successfully\n");
+}
+
+
+/*-------------------------------------------------
+    execute_savedevice - execute the savedevice
+    command, which looks up a specific space index
+    provided by a specific device
+-------------------------------------------------*/
+
+void debugger_commands::execute_savedevice(int ref, const std::vector<std::string> &params)
+{
+	u64 offset, endoffset, length, spacenum;
+	address_space *space;
+	FILE *f;
+
+	/* validate parameters */
+	if (!validate_number_parameter(params[1], offset))
+	{
+		m_console.printf("Offset '%s' does not appear to be a valid hex value.\n", params[1]);
+		return;
+	}
+	if (!validate_number_parameter(params[2], length))
+	{
+		m_console.printf("Length '%s' does not appear to be a valid hex value.\n", params[2]);
+		return;
+	}
+	if (!validate_number_parameter(params[4], spacenum))
+	{
+		m_console.printf("Space '%s' does not appear to be a valid decimal value.\n", params[4]);
+		return;
+	}
+	if (!validate_device_space_parameter(params.size() > 3 ? params[3].c_str() : nullptr, spacenum, space))
+		return;
+
+	/* determine the addresses to write */
+	endoffset = (offset + length - 1) & space->addrmask();
+	offset = offset & space->addrmask();
+	endoffset ++;
+
+	/* open the file */
+	f = fopen(params[0].c_str(), "wb");
+	if (!f)
+	{
+		m_console.printf("Error opening file '%s'\n", params[0]);
+		return;
+	}
+
+	/* now write the data out */
+	auto dis = space->device().machine().disable_side_effects();
+	switch (space->addr_shift())
+	{
+	case -3:
+		for (u64 i = offset; i != endoffset; i++)
+		{
+			offs_t curaddr = i;
+			u64 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_qword(curaddr) : space->unmap();
+			fwrite(&data, 8, 1, f);
+		}
+		break;
+	case -2:
+		for (u64 i = offset; i != endoffset; i++)
+		{
+			offs_t curaddr = i;
+			u32 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_dword(curaddr) : space->unmap();
+			fwrite(&data, 4, 1, f);
+		}
+		break;
+	case -1:
+		for (u64 i = offset; i != endoffset; i++)
+		{
+			offs_t curaddr = i;
+			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_word(curaddr) : space->unmap();
+			fwrite(&data, 2, 1, f);
+		}
+		break;
+	case  0:
+		for (u64 i = offset; i != endoffset; i++)
+		{
+			offs_t curaddr = i;
+			u8 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_byte(curaddr) : space->unmap();
+			fwrite(&data, 1, 1, f);
+		}
+		break;
+	case  3:
+		offset &= ~15;
+		endoffset &= ~15;
+		for (u64 i = offset; i != endoffset; i+=16)
+		{
+			offs_t curaddr = i;
+			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_word(curaddr) : space->unmap();
+			fwrite(&data, 2, 1, f);
+		}
+		break;
+	}
+
+	/* close the file */
 	fclose(f);
 	m_console.printf("Data saved successfully\n");
 }
