@@ -746,7 +746,8 @@ bool debugger_commands::validate_target_address_parameter(std::string_view param
 
 	// parse the address first
 	u64 addrval;
-	if (!validate_number_parameter(param.substr(0, devdelim), addrval));
+	if (!validate_number_parameter(param.substr(0, devdelim), addrval))
+		return false;
 
 	// find the address space
 	if (!validate_device_space_parameter(device, spacenum, space))

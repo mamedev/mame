@@ -13,7 +13,6 @@
 
 #include "corestr.h"
 
-#include <cctype>
 #include <cstdio>
 #include <iterator>
 #include <map>
