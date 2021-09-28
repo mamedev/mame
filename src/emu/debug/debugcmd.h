@@ -16,26 +16,31 @@
 #include "debugcpu.h"
 #include "debugcon.h"
 
+#include <string_view>
+
 
 class debugger_commands
 {
 public:
-	debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console);
+	debugger_commands(running_machine &machine, debugger_cpu &cpu, debugger_console &console);
 
-	/* validates a parameter as a boolean value */
+	// validates a parameter as a boolean value
 	bool validate_boolean_parameter(const std::string &param, bool &result);
 
-	/* validates a parameter as a numeric value */
-	bool validate_number_parameter(const std::string &param, u64 &result);
+	// validates a parameter as a numeric value
+	bool validate_number_parameter(std::string_view param, u64 &result);
 
-	/* validates a parameter as a cpu */
-	bool validate_cpu_parameter(const char *param, device_t *&result);
+	// validates a parameter as a device
+	bool validate_device_parameter(std::string_view param, device_t *&result);
 
-	/* validates a parameter as a cpu and retrieves the given address space */
-	bool validate_cpu_space_parameter(const char *param, int spacenum, address_space *&result);
+	// validates a parameter as a CPU
+	bool validate_cpu_parameter(std::string_view param, device_t *&result);
 
-	/* validates a parameter as a memory region name and retrieves the given region */
-	bool validate_memory_region_parameter(const std::string &param, memory_region *&result);
+	// validates a parameter as an address space identifier
+	bool validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result);
+
+	// validates a parameter as a memory region name and retrieves the given region
+	bool validate_memory_region_parameter(std::string_view param, memory_region *&result);
 
 private:
 	struct global_entry
