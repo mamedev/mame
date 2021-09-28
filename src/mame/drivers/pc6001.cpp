@@ -30,7 +30,7 @@
        player to press either 'B' or 'C' then a number but nothing is shown on screen,
        other emus behaves the same, bad dump?
     (Mk2 mode 5 games)
-    - 3D Golf Simulation Super Version: gameplay / inputs seems broken
+    - 3D Golf Simulation Super Version: gameplay / inputs seems broken;
     - American Truck: Screen is offset at the loading screen, loading bug?
     - Castle Excellent: copyright text drawing is quite bogus, scans text in vertical
        instead of horizontal?
@@ -42,9 +42,9 @@
     - (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
     - Grobda: when "get ready" speech plays, screen should be full white but instead it's all
        black, same issue as AX-6 Demo?
-    - Pac-Man / Tiny Xevious 2: gameplay is too fast
-    - Salad no Kunino Tomato-Hime: can't start a play
-    - Space Harrier: inputs doesn't work properly
+    - Pac-Man / Tiny Xevious 2: gameplay is too fast;
+    - Salad no Kunino Tomato-Hime: can't start a play;
+    - Space Harrier: inputs doesn't work properly (can't go down), draws garbage on vanilla pc6001 and eventually crashes MAME;
     - The Black Onyx: dies when it attempts to save the character, that obviously means saving
        on the tape;
     - Yakyukyo / Punchball Mario: waits for an irq, check which one;
@@ -1137,6 +1137,13 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 
+	PORT_START("key_fn")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1 / F6") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2 / F7") PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3 / F8") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4 / F9") PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5 / F10") PORT_CODE(KEYCODE_F5)
+
 	PORT_START("key_modifiers")
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
@@ -1167,9 +1174,10 @@ INTERRUPT_GEN_MEMBER(pc6001sr_state::sr_vrtc_irq)
 	m_kludge ^= 1;
 
 	// TODO: it is unclear who is responsible of the "Joystick IRQ" vs VRTC
+	// (it wants one at POST otherwise it refuses to boot)
 	if(m_kludge)
 	{
-		m_cur_keycode = check_joy_press();
+		//m_cur_keycode = check_joy_press();
 		if(IRQ_LOG) printf("Joystick IRQ called 0x16\n");
 		set_maincpu_irq_line(0x16);
 	}
@@ -1216,16 +1224,25 @@ uint8_t pc6001_state::ppi_portc_r()
 	return 0x88;
 }
 
+// TODO: move to own device, and add remapping tables depending on the mode used
 uint8_t pc6001_state::check_keyboard_press()
 {
-	int i,port_i,scancode;
-	uint8_t shift_pressed,caps_lock;
+	int i, port_i, scancode;
+	u8 shift_pressed, caps_lock;
+	u8 io_fn = m_io_fn_keys->read();
 	scancode = 0;
 
 	shift_pressed = (m_io_key_modifiers->read() & 2)>>1;
 	caps_lock = (m_io_key_modifiers->read() & 8)>>3;
 
-	for(port_i=0;port_i<3;port_i++)
+	if (io_fn)
+	{
+		for(i = 0; i < 5; i++)
+			if (BIT(io_fn, i))
+				return (i + 0xf0) + shift_pressed * 5;
+	}
+
+	for(port_i = 0; port_i < 3; port_i++)
 	{
 		for(i=0;i<32;i++)
 		{
@@ -1340,18 +1357,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 	uint32_t key1 = m_io_keys[0]->read();
 	uint32_t key2 = m_io_keys[1]->read();
 	uint32_t key3 = m_io_keys[2]->read();
+	u8 key_fn = m_io_fn_keys->read();
 //  uint8_t p1_key = m_io_p1->read();
 
 	if(m_cas_switch == 0)
 	{
-		if((key1 != m_old_key1) || (key2 != m_old_key2) || (key3 != m_old_key3))
+		if((key1 != m_old_key1) || (key2 != m_old_key2) || (key3 != m_old_key3) || (key_fn != m_old_key_fn))
 		{
 			m_cur_keycode = check_keyboard_press();
+			const u8 key_vector = (m_cur_keycode & 0xf0) == 0xf0 ? 0x14 : 0x02;
 			if(IRQ_LOG) printf("KEY IRQ 0x02\n");
-			set_maincpu_irq_line(0x02);
+			set_maincpu_irq_line(key_vector);
 			m_old_key1 = key1;
 			m_old_key2 = key2;
 			m_old_key3 = key3;
+			m_old_key_fn = key_fn;
 		}
 		#if 0
 		else /* joypad polling */
@@ -1394,6 +1414,9 @@ void pc6001_state::machine_reset()
 	// timer irq vector is fixed in plain PC-6001
 	m_timer_irq_vector = 0x06;
 	set_timer_divider(3);
+
+	m_old_key1 = m_old_key2 = m_old_key3 = 0;
+	m_old_key_fn = 0;
 }
 
 void pc6001mk2_state::machine_reset()

@@ -547,7 +547,7 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 	else
 	{
 		//4bpp bitmap mode
-		// TODO: scrolling
+		// TODO: scrolling, I/O ports 0xca-0xcb (X) and 0xcc (Y)
 		for(int y=0;y<200;y++)
 		{
 			for(int x=0;x<320;x++)

@@ -43,6 +43,7 @@ public:
 		, m_io_p1(*this, "P1")
 		, m_io_p2(*this, "P2")
 		, m_io_keys(*this, "key%u", 1U)
+		, m_io_fn_keys(*this, "key_fn")
 		, m_io_key_modifiers(*this, "key_modifiers")
 		, m_bank1(*this, "bank1")
 		, m_palette(*this, "palette")
@@ -87,6 +88,7 @@ protected:
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 	required_ioport_array<3> m_io_keys;
+	required_ioport m_io_fn_keys;
 	required_ioport m_io_key_modifiers;
 	required_memory_bank m_bank1;
 	required_device<palette_device> m_palette;
@@ -134,6 +136,7 @@ private:
 	uint32_t m_old_key1;
 	uint32_t m_old_key2;
 	uint32_t m_old_key3;
+	u8 m_old_key_fn;
 };
 
 
