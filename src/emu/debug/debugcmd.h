@@ -39,6 +39,9 @@ public:
 	// validates a parameter as an address space identifier
 	bool validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result);
 
+	// validates a parameter as a target address and retrieves the given address space and address
+	bool validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr);
+
 	// validates a parameter as a memory region name and retrieves the given region
 	bool validate_memory_region_parameter(std::string_view param, memory_region *&result);
 

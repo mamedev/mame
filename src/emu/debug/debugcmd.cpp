@@ -28,6 +28,35 @@
 
 
 
+namespace {
+
+template <typename T>
+inline std::string_view::size_type find_delimiter(std::string_view str, T &&is_delim)
+{
+	unsigned parens = 0;
+	for (std::string_view::size_type i = 0; str.length() > i; ++i)
+	{
+		if (str[i] == '(')
+		{
+			++parens;
+		}
+		else if (parens)
+		{
+			if (str[i] == ')')
+				--parens;
+		}
+		else if (is_delim(str[i]))
+		{
+			return i;
+		}
+	}
+	return std::string_view::npos;
+}
+
+} // anonymous namespace
+
+
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -205,12 +234,12 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("bpenable",  CMDFLAG_NONE, 1, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, _1, _2));
 	m_console.register_command("bplist",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_bplist, this, _1, _2));
 
-	m_console.register_command("wpset",     CMDFLAG_NONE, AS_PROGRAM, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wp",        CMDFLAG_NONE, AS_PROGRAM, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpdset",    CMDFLAG_NONE, AS_DATA, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpd",       CMDFLAG_NONE, AS_DATA, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpiset",    CMDFLAG_NONE, AS_IO, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpi",       CMDFLAG_NONE, AS_IO, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
+	m_console.register_command("wpset",     CMDFLAG_NONE, -1,         3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
+	m_console.register_command("wp",        CMDFLAG_NONE, -1,         3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
+	m_console.register_command("wpdset",    CMDFLAG_NONE, AS_DATA,    3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
+	m_console.register_command("wpd",       CMDFLAG_NONE, AS_DATA,    3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
+	m_console.register_command("wpiset",    CMDFLAG_NONE, AS_IO,      3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
+	m_console.register_command("wpi",       CMDFLAG_NONE, AS_IO,      3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
 	m_console.register_command("wposet",    CMDFLAG_NONE, AS_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
 	m_console.register_command("wpo",       CMDFLAG_NONE, AS_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
 	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_wpclear, this, _1, _2));
@@ -233,27 +262,27 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("rewind",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
 	m_console.register_command("rw",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
 
-	m_console.register_command("save",      CMDFLAG_NONE, -1,         3, 4,    std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA,    3, 4,    std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO,      3, 4,    std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("saveo",     CMDFLAG_NONE, AS_OPCODES, 3, 4,    std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("saver",     CMDFLAG_NONE,             0, 4, 4, std::bind(&debugger_commands::execute_saveregion, this, _1, _2));
+	m_console.register_command("save",      CMDFLAG_NONE, -1,         3, 3, std::bind(&debugger_commands::execute_save, this, _1, _2));
+	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA,    3, 3, std::bind(&debugger_commands::execute_save, this, _1, _2));
+	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO,      3, 3, std::bind(&debugger_commands::execute_save, this, _1, _2));
+	m_console.register_command("saveo",     CMDFLAG_NONE, AS_OPCODES, 3, 3, std::bind(&debugger_commands::execute_save, this, _1, _2));
+	m_console.register_command("saver",     CMDFLAG_NONE, 0,          4, 4, std::bind(&debugger_commands::execute_saveregion, this, _1, _2));
 
-	m_console.register_command("load",      CMDFLAG_NONE, -1,         2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA,    2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO,      2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loado",     CMDFLAG_NONE, AS_OPCODES, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("load",      CMDFLAG_NONE, -1,         2, 3, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA,    2, 3, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO,      2, 3, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loado",     CMDFLAG_NONE, AS_OPCODES, 2, 3, std::bind(&debugger_commands::execute_load, this, _1, _2));
 	m_console.register_command("loadr",     CMDFLAG_NONE, 0,          4, 4, std::bind(&debugger_commands::execute_loadregion, this, _1, _2));
 
-	m_console.register_command("dump",      CMDFLAG_NONE, -1,         3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
-	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA,    3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
-	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO,      3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
-	m_console.register_command("dumpo",     CMDFLAG_NONE, AS_OPCODES, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
+	m_console.register_command("dump",      CMDFLAG_NONE, -1,         3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2));
+	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA,    3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2));
+	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO,      3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2));
+	m_console.register_command("dumpo",     CMDFLAG_NONE, AS_OPCODES, 3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2));
 
-	m_console.register_command("strdump",   CMDFLAG_NONE, -1,         3, 5, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
-	m_console.register_command("strdumpd",  CMDFLAG_NONE, AS_DATA,    3, 5, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
-	m_console.register_command("strdumpi",  CMDFLAG_NONE, AS_IO,      3, 5, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
-	m_console.register_command("strdumpo",  CMDFLAG_NONE, AS_OPCODES, 3, 5, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+	m_console.register_command("strdump",   CMDFLAG_NONE, -1,         3, 4, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+	m_console.register_command("strdumpd",  CMDFLAG_NONE, AS_DATA,    3, 4, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+	m_console.register_command("strdumpi",  CMDFLAG_NONE, AS_IO,      3, 4, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+	m_console.register_command("strdumpo",  CMDFLAG_NONE, AS_OPCODES, 3, 4, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
 
 	m_console.register_command("cheatinit", CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
 	m_console.register_command("ci",        CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
@@ -687,6 +716,44 @@ bool debugger_commands::validate_device_space_parameter(std::string_view param, 
 	}
 
 	m_console.printf("No memory spaces found for device '%s'\n", device->tag());
+	return true;
+}
+
+
+/// \brief Validate a parameter as a target address
+///
+/// Validates a parameter as an numeric expression to use as an address
+/// optionally followed by a colon and a device identifier.  If the
+/// device identifier is not presnt, the current CPU with debugger focus
+/// is assumed.  See #validate_device_parameter for information on how
+/// device parametersare interpreted.
+/// \param [in] The parameter string.
+/// \param [in] spacenum The default address space index.  If negative,
+///   the first address space exposed by the device (i.e. the address
+///   space with the lowest index) will be used as the default.
+/// \param [out] space The address space on success, or unchanged on
+///   failure.
+/// \param [out] addr The address on success, or unchanged on failure.
+/// \return true if the address is a valid expression evaluating to a
+///   number and the address space is found, or false otherwise.
+bool debugger_commands::validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr)
+{
+	// check for the device delimiter
+	std::string_view::size_type const devdelim = find_delimiter(param, [] (char ch) { return ':' == ch; });
+	std::string_view device;
+	if (devdelim != std::string::npos)
+		device = param.substr(devdelim + 1);
+
+	// parse the address first
+	u64 addrval;
+	if (!validate_number_parameter(param.substr(0, devdelim), addrval));
+
+	// find the address space
+	if (!validate_device_space_parameter(device, spacenum, space))
+		return false;
+
+	// set the address now that we have the space
+	addr = addrval;
 	return true;
 }
 
@@ -2051,11 +2118,9 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	address_space *space;
 
 	// validate parameters
-	if (!validate_number_parameter(params[1], offset))
+	if (!validate_target_address_parameter(params[1], ref, space, offset))
 		return;
 	if (!validate_number_parameter(params[2], length))
-		return;
-	if (!validate_device_space_parameter(params.size() > 3 ? params[3] : std::string_view(), ref, space))
 		return;
 
 	// determine the addresses to write
@@ -2071,7 +2136,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		return;
 	}
 
-	/* now write the data out */
+	// now write the data out
 	auto dis = space->device().machine().disable_side_effects();
 	switch (space->addr_shift())
 	{
@@ -2124,7 +2189,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		break;
 	}
 
-	/* close the file */
+	// close the file
 	fclose(f);
 	m_console.printf("Data saved successfully\n");
 }
@@ -2139,7 +2204,7 @@ void debugger_commands::execute_saveregion(int ref, const std::vector<std::strin
 	u64 offset, length;
 	memory_region *region;
 
-	/* validate parameters */
+	// validate parameters
 	if (!validate_number_parameter(params[1], offset))
 		return;
 	if (!validate_number_parameter(params[2], length))
@@ -2179,11 +2244,9 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	address_space *space;
 
 	// validate parameters
-	if (!validate_number_parameter(params[1], offset))
+	if (!validate_target_address_parameter(params[1], ref, space, offset))
 		return;
 	if (params.size() > 2 && !validate_number_parameter(params[2], length))
-		return;
-	if (!validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), ref, space))
 		return;
 
 	// open the file
@@ -2211,6 +2274,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	endoffset = (offset + length - 1) & space->addrmask();
 	offset = offset & space->addrmask();
 	u64 i = 0;
+
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
 	switch (space->addr_shift())
 	{
@@ -2332,8 +2396,9 @@ void debugger_commands::execute_loadregion(int ref, const std::vector<std::strin
 void debugger_commands::execute_dump(int ref, const std::vector<std::string> &params)
 {
 	// validate parameters
+	address_space *space;
 	u64 offset;
-	if (!validate_number_parameter(params[1], offset))
+	if (!validate_target_address_parameter(params[1], ref, space, offset))
 		return;
 
 	u64 length;
@@ -2346,10 +2411,6 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 
 	u64 ascii = 1;
 	if (params.size() > 4 && !validate_number_parameter(params[4], ascii))
-		return;
-
-	address_space *space;
-	if (!validate_device_space_parameter((params.size() > 6) ? params[6] : std::string_view(), ref, space))
 		return;
 
 	u64 rowsize = space->byte_to_address(16);
