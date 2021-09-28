@@ -209,6 +209,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("sa72008",          NES_SACHEN_SA72008);
 	device.option_add_internal("tca01",            NES_SACHEN_TCA01);
 	device.option_add_internal("s3013",            NES_SACHEN_3013);
+	device.option_add_internal("s3014",            NES_SACHEN_3014);
 	device.option_add_internal("s8259a",           NES_SACHEN_8259A);
 	device.option_add_internal("s8259b",           NES_SACHEN_8259B);
 	device.option_add_internal("s8259c",           NES_SACHEN_8259C);

@@ -92,6 +92,7 @@ void nes_state::machine_start()
 			KAISER_KS7037,
 			KAISER_KS7057,
 			SACHEN_3013,
+			SACHEN_3014,
 			STD_DISKSYS,
 			STD_EXROM,
 			STD_NROM368,
