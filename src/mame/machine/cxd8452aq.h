@@ -31,8 +31,28 @@ public:
 
     void map(address_map &map);
 
-    uint32_t cpu_r(offs_t offset, uint32_t mem_mask) { return space(0).read_dword(offset, mem_mask); }
-	void cpu_w(offs_t offset, uint32_t data, uint32_t mem_mask) { space(0).write_dword(offset, data, mem_mask); }
+    // CPU-side accessors for the WSC-SONIC3 registers
+    uint32_t cpu_r(offs_t offset, uint32_t mem_mask) { return space(1).read_dword(offset, mem_mask); }
+	void cpu_w(offs_t offset, uint32_t data, uint32_t mem_mask) { space(1).write_dword(offset, data, mem_mask); }
+
+    auto irq_out() { return m_irq_handler.bind(); }
+    void irq_w(int state)
+    {
+        // NEWS-OS seems to check the LSB of the SONIC register when starting the interrupt processing
+        // This doesn't line up with what is in the NetBSD source code, which seems to check the SONIC
+        // directly. However, other APbus devices share the same relationship (see: DMAC3 and SPIFI)
+        // so this is likely "legit". If the DMAC3 is anything to go by, there are probably other interrupt
+        // conditions that this chip detects or sets. This chip might have DMA functions of some kind too.
+        if (state)
+        {
+            sonic3_reg.sonic |= 0x1;
+        }
+        else
+        {
+            sonic3_reg.sonic &= ~0x1;
+        }
+        m_irq_check->adjust(attotime::zero);
+    }
 
 protected:
     // overrides
@@ -45,8 +65,14 @@ protected:
     void sonic_bus_map(address_map &map);
     address_space_config main_bus_config;
     address_space_config sonic_config;
-    uint32_t sonic_r(offs_t offset, uint32_t mem_mask);
-    void sonic_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+    uint16_t sonic_r(offs_t offset, uint16_t mem_mask);
+    void sonic_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+    // Other I/O
+    devcb_write_line m_irq_handler;
+    bool m_irq = false; // Chip-level IRQ
+    emu_timer *m_irq_check;
+    TIMER_CALLBACK_MEMBER(irq_check);
 
     struct WscSonicRegisters
 	{

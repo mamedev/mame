@@ -29,7 +29,7 @@
 #define LOG_FILTER  (1U << 2)
 #define LOG_PACKETS (1U << 3)
 
-//#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FILTER|LOG_PACKETS)
+#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FILTER|LOG_PACKETS)
 #include "logmacro.h"
 
 #define EA(hi, lo) ((u32(hi) << 16) | lo)
@@ -352,6 +352,7 @@ void dp83932c_device::transmit()
 	m_reg[TCR] = m_bus->read_word(tda + word++ * width) & TCR_TPC;
 	m_reg[TPS] = m_bus->read_word(tda + word++ * width);
 	m_reg[TFC] = m_bus->read_word(tda + word++ * width);
+	LOG("width = %u TDA= 0x%x TCR = 0x%x TPS = 0x%x TFC = 0x%x\n", width, tda, m_reg[TCR], m_reg[TPS], m_reg[TFC]);
 
 	// check for programmable interrupt
 	if ((m_reg[TCR] & TCR_PINT) && !(tcr & TCR_PINT))
@@ -370,6 +371,7 @@ void dp83932c_device::transmit()
 		m_reg[TFS] = m_bus->read_word(tda + word++ * width);
 
 		offs_t const tsa = EA(m_reg[TSA1], m_reg[TSA0]);
+		LOG("fragment %u: TCR = 0x%x TPS = 0x%x TFC = 0x%x TSA = 0x%x\n", fragment, m_reg[TCR], m_reg[TPS], m_reg[TFC], tsa);
 
 		// FIXME: word/dword transfers (allow unaligned)
 		for (unsigned byte = 0; byte < m_reg[TFS]; byte++)

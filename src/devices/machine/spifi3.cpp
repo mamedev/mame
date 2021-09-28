@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "spifi3.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 #define DELAY_HACK // TODO:
@@ -83,7 +83,6 @@ void spifi3_device::map(address_map &map)
                                    spifi_reg.spstat = data;
                                }));
 
-    map(0x04, 0x07).lrw32(NAME([this]() { LOG("read spifi_reg.cmlen = 0x%x\n", spifi_reg.cmlen); return spifi_reg.cmlen; }), NAME([this](uint32_t data) { LOG("write spifi_reg.cmlen = 0x%x\n", data); spifi_reg.cmlen = data; }));
     map(0x08, 0x0b).lrw32(NAME([this]() { LOG("read spifi_reg.cmdpage = 0x%x\n", spifi_reg.cmdpage); return spifi_reg.cmdpage; }), NAME([this](uint32_t data) { LOG("write spifi_reg.cmdpage = 0x%x\n", data); spifi_reg.cmdpage = data; }));
     map(0x18, 0x1b).lrw32(NAME([this]() { LOG("read spifi_reg.svptr_hi = 0x%x\n", spifi_reg.svptr_hi); return spifi_reg.svptr_hi; }), NAME([this](uint32_t data) { LOG("write spifi_reg.svptr_hi = 0x%x\n", data); spifi_reg.svptr_hi = data; }));
     map(0x1c, 0x1f).lrw32(NAME([this]() { LOG("read spifi_reg.svptr_mid = 0x%x\n", spifi_reg.svptr_mid); return spifi_reg.svptr_mid; }), NAME([this](uint32_t data) { LOG("write spifi_reg.svptr_mid = 0x%x\n", data); spifi_reg.svptr_mid = data; }));
@@ -112,6 +111,20 @@ void spifi3_device::map(address_map &map)
     // mirror of above values goes here
 
     // stuff I'm actively working on
+    map(0x04, 0x07).lrw32(NAME([this]()
+                               {
+                                   LOG("read spifi_reg.cmlen = 0x%x\n", spifi_reg.cmlen);
+                                   return spifi_reg.cmlen;
+                               }),
+                          NAME([this](uint32_t data)
+                               {
+                                   LOG("write spifi_reg.cmlen = 0x%x\n", data);
+                                   spifi_reg.cmlen = data;
+                                   spifi_reg.icond &= ~ICOND_CNTZERO; // Not sure if this is where this is actually cleared.
+                                                                      // Putting it here prevents NEWS-OS from trying to
+                                                                      // transition to the DATAOUT phase too early when it sees
+                                                                      // the CNTZERO condition flag
+                               }));
     map(0x0c, 0x0f).lrw32(NAME([this]()
                                {
                                    uint8_t count_hi = (tcounter >> 16) & 0xff;
@@ -623,6 +636,7 @@ void spifi3_device::send_byte()
     if((state & STATE_MASK) != INIT_XFR_SEND_PAD && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE || command_length))
     {
         // Send next data from FIFO.
+        LOG("tcounter = %d\n", tcounter);
         scsi_bus->data_w(scsi_refid, m_even_fifo.front());
         m_even_fifo.pop();
         check_drq();
@@ -1152,6 +1166,8 @@ void spifi3_device::step(bool timeout)
                 {
                     LOG("Select complete, automsg enabled so moving on to XFR phase!\n");
                     state = INIT_XFR;
+                    dma_command = true;
+                    dma_dir = DMA_OUT; // fake
                     xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
                     step(false); // TODO: delay needed?
                 }
@@ -1327,6 +1343,20 @@ void spifi3_device::step(bool timeout)
             {
                 LOG("DMA Data transfer complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
+
+                auto newPhase = (ctrl & S_PHASE_MASK);
+                if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                {
+                    // TODO: ID enforcement for autostat
+                    LOG("Autostat enabled, proceeding to status input automatically\n");
+                    state = INIT_XFR;
+                    xfr_phase = newPhase;
+
+                    // Below this is a guess
+                    dma_command = false;
+                    dma_dir = DMA_NONE;
+                    spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                }
             }
             else if (xfrDataSource == FIFO && (!dma_command && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()))
             {
@@ -1348,7 +1378,7 @@ void spifi3_device::step(bool timeout)
             }
             else if(xfrDataSource == COMMAND_BUFFER && (command_pos >= (spifi_reg.cmlen & CML_LENMASK))) // Done transferring message or command
             {
-                LOG("Command transfer complete\n");
+                LOG("Command transfer complete, new phase = %d\n", ctrl & S_PHASE_MASK);
                 state = INIT_XFR_BUS_COMPLETE;
                 // spifi_reg.icond |= ICOND_ACMDOFF; TODO: ???
 
@@ -1498,7 +1528,6 @@ void spifi3_device::step(bool timeout)
             // wait for dma transfer to complete or fifo to drain
             if (dma_command && !transfer_count_zero() && !m_even_fifo.empty())
             {
-                //check_drq(); // Why didn't the 5390 have to do this? What am I doing wrong?
                 break;
             }
 

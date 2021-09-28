@@ -10,6 +10,7 @@
  *   - https://katsu.watanabe.name/doc/sonynews/
  *   - https://web.archive.org/web/20170202100940/www3.videa.or.jp/NEWS/
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/newsmips
+ *   - https://web.archive.org/web/19970713173157/http%3A%2F%2Fwww1.sony.co.jp%2FOCMP%2F
  *   - https://github.com/briceonk/news-os
  *
  *  For an in-depth write-up of the current issues, see: https://github.com/briceonk/news-os/blob/master/nws5000x-mame.md
@@ -118,6 +119,7 @@ public:
           m_cpu(*this, "cpu"),
           m_ram(*this, "ram"),
           m_dma_ram(*this, "dmaram"),
+          m_net_ram(*this, "netram"),
           m_rtc(*this, "rtc"),
           m_escc(*this, "escc1"),
           m_fifo0(*this, "apfifo0"),
@@ -214,6 +216,7 @@ protected:
     // Main memory
     required_device<ram_device> m_ram;
     required_device<ram_device> m_dma_ram;
+    required_device<ram_device> m_net_ram;
 
     // ST Micro M48T02 Timekeeper NVRAM + RTC
     required_device<m48t02_device> m_rtc;
@@ -329,6 +332,9 @@ void news_r4k_state::machine_common(machine_config &config)
     RAM(config, m_dma_ram);
     m_dma_ram->set_default_size("128KB");
 
+    RAM(config, m_net_ram);
+    m_net_ram->set_default_size("32KB");
+
     // Timekeeper IC
     M48T02(config, m_rtc);
 
@@ -342,9 +348,10 @@ void news_r4k_state::machine_common(machine_config &config)
     // SONIC ethernet controller
     CXD8452AQ(config, m_sonic3, 0);
     m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
+    m_sonic3->irq_out().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>));
 
     DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
-    m_sonic->out_int_cb().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>)); // TODO: WSC-SONIC might do some interrupt processing
+    m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
     m_sonic->set_bus(m_sonic3, 1);
 
     // Keyboard and mouse
@@ -465,16 +472,20 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
 
     // SONIC network controller (not working yet)
-    // map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map)); // WSC-SONIC3 registers
-    // map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff); // SONIC registers - this doesn't fully match the hw
-    // map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
-
+    map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map)); // WSC-SONIC3 registers
+    map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff); // SONIC registers - this doesn't fully match the hw
+    //map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
+    map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
+                          NAME([this](offs_t offset, uint8_t data)
+                              {
+                                m_net_ram->write(offset, data);
+                              }));// dedicated network RAM
     // DMAC3 DMA Controller
     //map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
     map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset) { return m_dma_ram->read(offset); }),
                                      NAME([this](offs_t offset, uint8_t data)
                                           {
-                                              LOG("Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+                                              // LOG("Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
                                               m_dma_ram->write(offset, data);
                                           }));
     map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
@@ -525,7 +536,11 @@ void news_r4k_state::cpu_map(address_map &map)
 
 void news_r4k_state::sonic3_map(address_map &map)
 {
-    map(0x0, 0x7fff).ram(); // dedicated network RAM
+    map(0x0, 0x7fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
+                          NAME([this](offs_t offset, uint8_t data)
+                              {
+                                m_net_ram->write(offset, data);
+                              }));// dedicated network RAM
 }
 
 /*
@@ -779,7 +794,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
+    // LOG("APbus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
     return value;
 }
 
@@ -902,7 +917,13 @@ void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
  */
 void news_r4k_state::intclr_w(offs_t offset, uint32_t data)
 {
-    LOG("intclr_w: INTCLR%d = 0x%x\n", offset, data);
+    if(offset != 5)
+    {
+        // NEWS-OS clears 5 periodically, but we don't emulate any of the stuff
+        // that would set it, so we can minimize log noise by only logging what
+        // we actually emulate
+        LOG("intclr_w: INTCLR%d = 0x%x\n", offset, data);
+    }
     m_intst[offset] &= ~data; // TODO: is this correct?
     int_check();
 }

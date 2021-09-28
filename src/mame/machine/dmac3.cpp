@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "dmac3.h"
 
-#define VERBOSE 1
+// #define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC3, dmac3_device, "dmac3", "Sony CXD8403Q DMA Controller")
@@ -215,10 +215,10 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
 
 		// Increment byte offset
 		++m_controllers[controller].address;
-		if ((m_controllers[controller].address & 0x80000000) == 0 && (m_controllers[controller].address & DMAC_PAGE_MASK) + 0x1000 > MAP_RAM_SIZE)
+		if ((m_controllers[controller].address & 0x80000000) == 0 && (((m_controllers[controller].address & DMAC_PAGE_MASK) >> 12) + 1) > MAP_ENTRY_COUNT)
 		{
 			// TODO: Is there an interrupt or some other way to handle this besides killing the emulation?
-			fatalerror("DMAC3 address overflow! Ran beyond the bounds of the MAP RAM!");
+			fatalerror("DMAC3 address overflow! Ran beyond the bounds of the MAP RAM! Bad address: 0x%x", m_controllers[controller].address);
 		}
 
 		// Decrement transfer count

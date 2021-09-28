@@ -73,6 +73,7 @@ protected:
     // DMAC3 requires off-board RAM to be allocated for the DMA map
     // The platform host controls this configuration.
     const uint32_t MAP_RAM_SIZE = 0x20000; // 128 kibibytes
+    const uint32_t MAP_ENTRY_COUNT = MAP_RAM_SIZE / 8; // 8 bytes per entry
     uint32_t BASE_MAP_ADDRESS; // Where do we start on the bus?
 
     // Overrides from device_t
