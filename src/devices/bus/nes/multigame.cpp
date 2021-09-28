@@ -66,7 +66,8 @@ DEFINE_DEVICE_TYPE(NES_BMC_HIK300,     nes_bmc_hik300_device,     "nes_bmc_hik30
 DEFINE_DEVICE_TYPE(NES_BMC_S700,       nes_bmc_s700_device,       "nes_bmc_s700",       "NES Cart BMC Super 700 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_BALL11,     nes_bmc_ball11_device,     "nes_bmc_ball11",     "NES Cart BMC Ball 11 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_22GAMES,    nes_bmc_22games_device,    "nes_bmc_22games",    "NES Cart BMC 22 Games PCB")
-DEFINE_DEVICE_TYPE(NES_BMC_64Y2K,      nes_bmc_64y2k_device,      "nes_bmc_64y2k",      "NES Cart BMC 64 in 1 Y2K PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_64Y2K,      nes_bmc_64y2k_device,      "nes_bmc_64y2k",      "NES Cart BMC Y2K 64 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_420Y2K,     nes_bmc_420y2k_device,     "nes_bmc_420y2k",     "NES Cart BMC Y2K 420 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_12IN1,      nes_bmc_12in1_device,      "nes_bmc_12in1",      "NES Cart BMC 12 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_20IN1,      nes_bmc_20in1_device,      "nes_bmc_20in1",      "NES Cart BMC 20 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_21IN1,      nes_bmc_21in1_device,      "nes_bmc_21in1",      "NES Cart BMC 21 in 1 PCB")
@@ -302,6 +303,11 @@ nes_bmc_22games_device::nes_bmc_22games_device(const machine_config &mconfig, co
 
 nes_bmc_64y2k_device::nes_bmc_64y2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_64Y2K, tag, owner, clock)
+{
+}
+
+nes_bmc_420y2k_device::nes_bmc_420y2k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_420Y2K, tag, owner, clock), m_latch(0), m_reg(0)
 {
 }
 
@@ -822,6 +828,23 @@ void nes_bmc_64y2k_device::pcb_reset()
 	m_reg[2] = m_reg[3] = 0;
 	set_prg();
 	set_nt_mirroring(PPU_MIRROR_VERT);
+}
+
+void nes_bmc_420y2k_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_420y2k_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
+	m_reg = 0;
 }
 
 void nes_bmc_12in1_device::device_start()
@@ -2224,6 +2247,48 @@ void nes_bmc_64y2k_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("bmc64y2k write_h, offset: %04x, data: %02x\n", offset, data));
 
 	m_reg[3] = data;    // reg[3] is currently unused?!?
+}
+
+/*-------------------------------------------------
+
+ Board BMC-TELETUBBIES
+ (name assigned by BootGod who said the board has
+ no markings, a glop top, and an 8K VRAM chip)
+
+ Games: Y2K 420 in 1
+
+ iNES: mapper 237
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_420y2k_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_420y2k write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(m_latch, 1))    // lock bit
+		m_reg = (m_reg & ~0x07) | (data & 0x07);
+	else
+	{
+		m_latch = offset;
+		m_reg = data;
+	}
+
+	u8 bank = BIT(m_latch, 2) << 5 | (m_reg & 0x1f);
+	u8 mode = BIT(m_reg, 6);
+	prg16_89ab(bank & ~mode);    // strangely for UNROM games it DOESN'T ignore the NROM mode bit
+	prg16_cdef(bank | (BIT(m_reg, 7) ? mode : 0x07));
+
+	set_nt_mirroring(BIT(m_reg, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+u8 nes_bmc_420y2k_device::read_h(offs_t offset)
+{
+	LOG_MMC(("bmc_420y2k read_h, offset: %04x\n", offset));
+	// latch bit 0 is only used to determine the menu, and the behavior of
+	// this cart seems hardwired to OR $02 (ORing $00-$03 allows four menus)
+	return hi_access_rom(offset | (m_latch & 1) << 1);
 }
 
 /*-------------------------------------------------

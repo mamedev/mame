@@ -672,6 +672,28 @@ private:
 };
 
 
+// ======================> nes_bmc_420y2k_device
+
+class nes_bmc_420y2k_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_420y2k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch, m_reg;
+};
+
+
 // ======================> nes_bmc_12in1_device
 
 class nes_bmc_12in1_device : public nes_nrom_device
@@ -1141,6 +1163,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_S700,       nes_bmc_s700_device)
 DECLARE_DEVICE_TYPE(NES_BMC_BALL11,     nes_bmc_ball11_device)
 DECLARE_DEVICE_TYPE(NES_BMC_22GAMES,    nes_bmc_22games_device)
 DECLARE_DEVICE_TYPE(NES_BMC_64Y2K,      nes_bmc_64y2k_device)
+DECLARE_DEVICE_TYPE(NES_BMC_420Y2K,     nes_bmc_420y2k_device)
 DECLARE_DEVICE_TYPE(NES_BMC_12IN1,      nes_bmc_12in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_20IN1,      nes_bmc_20in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_21IN1,      nes_bmc_21in1_device)

@@ -80,6 +80,7 @@ void nes_state::machine_start()
 			BMC_800IN1,
 			BMC_8157,
 			BMC_GOLD150,
+			BMC_TELETUBBIES,
 			BMC_VT5201,
 			BTL_PALTHENA,
 			CAMERICA_ALADDIN,
