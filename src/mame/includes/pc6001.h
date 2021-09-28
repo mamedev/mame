@@ -28,24 +28,24 @@
 class pc6001_state : public driver_device
 {
 public:
-	pc6001_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_ppi(*this, "ppi8255"),
-		m_ram(*this, "ram"),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_cassette(*this, "cassette"),
-		m_cas_hack(*this, "cas_hack"),
-		m_cart(*this, "cartslot"),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_gfx1(*this, "gfx1"),
-		m_io_mode4_dsw(*this, "MODE4_DSW"),
-		m_io_p1(*this, "P1"),
-		m_io_p2(*this, "P2"),
-		m_io_keys(*this, "key%u", 1U),
-		m_io_key_modifiers(*this, "key_modifiers"),
-		m_bank1(*this, "bank1"),
-		m_palette(*this, "palette")
+	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_ppi(*this, "ppi8255")
+		, m_ram(*this, "ram")
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_cassette(*this, "cassette")
+		, m_cas_hack(*this, "cas_hack")
+		, m_cart(*this, "cartslot")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_gfx1(*this, "gfx1")
+		, m_io_mode4_dsw(*this, "MODE4_DSW")
+		, m_io_p1(*this, "P1")
+		, m_io_p2(*this, "P2")
+		, m_io_keys(*this, "key%u", 1U)
+		, m_io_key_modifiers(*this, "key_modifiers")
+		, m_bank1(*this, "bank1")
+		, m_palette(*this, "palette")
 	{ }
 
 	void system_latch_w(uint8_t data);
@@ -134,22 +134,21 @@ private:
 	uint32_t m_old_key1;
 	uint32_t m_old_key2;
 	uint32_t m_old_key3;
-
 };
 
 
 class pc6001mk2_state : public pc6001_state
 {
 public:
-	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc6001_state(mconfig, type, tag),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3"),
-		m_bank4(*this, "bank4"),
-		m_bank5(*this, "bank5"),
-		m_bank6(*this, "bank6"),
-		m_bank7(*this, "bank7"),
-		m_bank8(*this, "bank8")
+	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc6001_state(mconfig, type, tag)
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_bank7(*this, "bank7")
+		, m_bank8(*this, "bank8")
 	{ }
 
 	uint8_t mk2_bank_r0_r();
@@ -213,8 +212,8 @@ private:
 class pc6601_state : public pc6001mk2_state
 {
 public:
-	pc6601_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc6001mk2_state(mconfig, type, tag)
+	pc6601_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc6001mk2_state(mconfig, type, tag)
 	{ }
 
 	uint8_t fdc_r();
@@ -227,8 +226,8 @@ public:
 class pc6001sr_state : public pc6601_state
 {
 public:
-	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc6601_state(mconfig, type, tag)
+	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc6601_state(mconfig, type, tag)
 		, m_sr_irq_vectors(*this, "irq_vectors")
 		, m_gvram_view_r(*this, "gvram_view_r")
 		, m_gvram_view_w(*this, "gvram_view_w")
@@ -299,8 +298,8 @@ private:
 class pc6601sr_state : public pc6001sr_state
 {
 public:
-	pc6601sr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc6001sr_state(mconfig, type, tag)
+	pc6601sr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc6001sr_state(mconfig, type, tag)
 	{ }
 
 	void pc6601sr(machine_config &config);
