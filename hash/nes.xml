@@ -76876,7 +76876,7 @@ be better to redump them properly. -->
 
 <!-- Did this ever exist on an individual cart? Its CRCs match Golden Card 6 in 1 (the third 256K chunks). -->
 	<software name="mk3a">
-		<description>Mortal Kombat 3 (Asia, Alt)</description>
+		<description>Mortal Kombat 3 (Asia, alt)</description>
 		<year>19??</year>
 		<publisher>Super Games</publisher>
 		<part name="cart" interface="nes_cart">

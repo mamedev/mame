@@ -121,4 +121,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1997, gs471,  0, gs471,  gs471, konmedal020_state, empty_init, ROT0, "Konami", "Unknown medal game GS471", MACHINE_NOT_WORKING )
+GAME( 1997, gs471,  0, gs471,  gs471, konmedal020_state, empty_init, ROT0, "Konami", "unknown medal game GS471", MACHINE_NOT_WORKING )

@@ -48464,17 +48464,6 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="fullfire">
-		<description>Full Fire &amp; Other Old Games</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="full fire &amp; other old games.d88" size="348848" crc="9eec8b75" sha1="0229b1e62264647baf93b126674ca7ab304859ad"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fuyudego">
 		<description>Fuyu de Gozaru</description>
 		<year>19??</year>
