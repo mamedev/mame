@@ -72,8 +72,6 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void pc6001(machine_config &config);
-	void pc6001_io(address_map &map);
-	void pc6001_map(address_map &map);
 protected:
 	required_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_ram;
@@ -100,6 +98,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+	void pc6001_map(address_map &map);
+	void pc6001_io(address_map &map);
 
 	// i/o functions
 	uint8_t check_joy_press();
@@ -182,9 +183,10 @@ public:
 
 	uint32_t screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pc6001mk2_io(address_map &map);
-	void pc6001mk2_map(address_map &map);
 protected:
+	void pc6001mk2_map(address_map &map);
+	void pc6001mk2_io(address_map &map);
+
 	uint8_t m_bgcol_bank;
 	uint8_t m_gfx_bank_on;
 	required_memory_bank m_bank2;
@@ -194,7 +196,7 @@ protected:
 	required_memory_bank m_bank6;
 	required_memory_bank m_bank7;
 	required_memory_bank m_bank8;
-	inline void refresh_crtc_params();
+	virtual void refresh_crtc_params();
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
@@ -219,10 +221,12 @@ public:
 		: pc6001mk2_state(mconfig, type, tag)
 	{ }
 
+	void pc6601(machine_config &config);
+
+protected:
 	uint8_t fdc_r();
 	void fdc_w(uint8_t data);
 
-	void pc6601(machine_config &config);
 	void pc6601_io(address_map &map);
 };
 
@@ -242,6 +246,9 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
+	void pc6001sr_map(address_map &map);
+	void pc6001sr_io(address_map &map);
+
 private:
 	uint8_t m_sr_bank_r[8];
 	uint8_t m_sr_bank_w[8];
@@ -250,6 +257,7 @@ private:
 	uint8_t m_sr_text_rows;
 	std::unique_ptr<uint8_t []> m_gvram;
 	uint8_t m_bitmap_yoffs, m_bitmap_xoffs;
+	u8 m_width80;
 
 	enum{
 		SUB_CPU_IRQ = 0,
@@ -283,19 +291,19 @@ private:
 	void sr_vram_bank_w(uint8_t data);
 	void sr_system_latch_w(uint8_t data);
 	void necsr_ppi8255_w(offs_t offset, uint8_t data);
+
+	virtual void refresh_crtc_params() override;
 	void sr_bitmap_yoffs_w(uint8_t data);
 	void sr_bitmap_xoffs_w(uint8_t data);
 	void refresh_gvram_access(bool is_write);
-
 	u8 sr_gvram_r(offs_t offset);
 	void sr_gvram_w(offs_t offset, u8 data);
+	void crt_mode_w(u8 data);
 
 	INTERRUPT_GEN_MEMBER(sr_vrtc_irq);
 
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pc6001sr_io(address_map &map);
-	void pc6001sr_map(address_map &map);
 };
 
 class pc6601sr_state : public pc6001sr_state

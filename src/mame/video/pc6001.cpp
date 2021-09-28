@@ -518,27 +518,35 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 
 	if(m_sr_text_mode == true) // text mode
 	{
-		for(int y=0;y<m_sr_text_rows;y++)
+		const u8 text_cols = (m_width80 + 1) * 40;
+
+		for(int y = 0; y < m_sr_text_rows; y++)
 		{
-			for(int x=0;x<40;x++)
+			for(int x = 0; x < text_cols; x++)
 			{
-				int tile = m_video_base[(x+(y*40))*2+0];
-				int attr = m_video_base[(x+(y*40))*2+1];
+				int tile = m_video_base[(x + (y * text_cols)) * 2 + 0];
+				int attr = m_video_base[(x + (y * text_cols)) * 2 + 1];
 				tile += ((attr & 0x80) << 1);
 
-				for(int yi=0;yi<12;yi++)
+				for(int yi = 0; yi < 12; yi++)
 				{
-					for(int xi=0;xi<8;xi++)
+					int res_y = y * 12 + yi;
+
+					for(int xi = 0; xi < 8; xi++)
 					{
-						int pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+						int res_x = x * 8 + xi;
+
+						int pen = gfx_data[(tile * 0x10) + yi] >> (7 - xi) & 1;
 
 						int fgcol = (attr & 0x0f) + 0x10;
-						int bgcol = ((attr & 0x70) >> 4) + 0x10 + ((m_bgcol_bank & 2) << 2);
+						// TODO: definitely wants bright colors for N66SR BASIC, but quite won't work for "PC-6*01 World" screens
+						// (can't pinpoint banking on this HW, or maybe it's side effect of CLUT?)
+						int bgcol = ((attr & 0x70) >> 4) + 0x18; //+ m_bgcol_bank;
 
 						int color = pen ? fgcol : bgcol;
 
-						if (cliprect.contains(x*8+xi, y*12+yi))
-							bitmap.pix(((y*12+yi)), (x*8+xi)) = m_palette->pen(color);
+						if (cliprect.contains(res_x, res_y))
+							bitmap.pix(res_y, res_x) = m_palette->pen(color);
 					}
 				}
 			}
@@ -548,9 +556,9 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 	{
 		//4bpp bitmap mode
 		// TODO: scrolling, I/O ports 0xca-0xcb (X) and 0xcc (Y)
-		for(int y=0;y<200;y++)
+		for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			for(int x=0;x<320;x++)
+			for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				uint32_t vram_addr;
 
@@ -558,11 +566,11 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 //				vram_addr = 0x1a00 + (x-256)+y*64;
 				vram_addr = (x & 0xfff) + y * 320;
 
-				int color;
-				
-				color = (m_gvram[vram_addr] & 0x0f);
-				if (cliprect.contains(x+0, y+0))
-					bitmap.pix((y+0), (x+0)) = m_palette->pen(color+0x10);
+				// wants RGB -> BRG rotation
+				// (is it using a different palette bank?)
+				u8 color = bitswap<4>(m_gvram[vram_addr] & 0x0f, 3, 0, 2, 1) + 0x10;
+				if (cliprect.contains(x, y))
+					bitmap.pix(y, x) = m_palette->pen(color);
 			}
 		}
 	}

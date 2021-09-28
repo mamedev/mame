@@ -881,6 +881,7 @@ void pc6001sr_state::sr_mode_w(uint8_t data)
 	m_sr_text_rows = data & 4 ? 20 : 25;
 	refresh_gvram_access(false);
 	refresh_gvram_access(true);
+	refresh_crtc_params();
 
 	// bit 1: bus request
 
@@ -936,6 +937,25 @@ u8 pc6601sr_state::hw_rev_r()
 	return 2;
 }
 
+void pc6001sr_state::crt_mode_w(u8 data)
+{
+//	m_bgcol_bank = (data & 8) ^ 8;
+	m_width80 = !BIT(data, 1);
+	refresh_crtc_params();
+}
+
+inline void pc6001sr_state::refresh_crtc_params()
+{
+	/* Apparently bitmap modes changes the screen res to 320 x 200 */
+	rectangle visarea = m_screen->visible_area();
+	const int y_height = (m_sr_text_mode) ? 240 : 200;
+	const int x_width = (m_sr_text_mode) ? (m_width80 ? 640 : 320) : 320;
+
+	visarea.set(0, (x_width) - 1, 0, (y_height) - 1);
+
+	m_screen->configure(m_screen->width(), m_screen->height(), visarea, m_screen->frame_period().attoseconds());
+}
+
 void pc6001sr_state::pc6001sr_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -978,7 +998,7 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 
 	map(0xb8, 0xbf).ram().share("irq_vectors");
 //  map(0xc0, 0xc0).w(FUNC(pc6001sr_state::mk2_col_bank_w));
-//  map(0xc1, 0xc1).w(FUNC(pc6001sr_state::mk2_vram_bank_w));
+    map(0xc1, 0xc1).w(FUNC(pc6001sr_state::crt_mode_w));
 //  map(0xc2, 0xc2).w(FUNC(pc6001sr_state::opt_bank_w));
 
 	map(0xc8, 0xc8).w(FUNC(pc6001sr_state::sr_mode_w));
@@ -1446,6 +1466,8 @@ void pc6001mk2_state::machine_reset()
 		m_bank_opt = 0x02; //tv rom
 		m_bank_w = 0x50; //enable write to work ram 4,5,6,7
 		m_gfx_bank_on = 0;
+
+		m_bgcol_bank = 0;
 	}
 
 //  refresh_crtc_params();
@@ -1459,6 +1481,7 @@ void pc6001sr_state::machine_reset()
 	// default to bitmap mode
 	m_sr_text_mode = false;
 	m_sr_text_rows = 20;
+	m_width80 = 0;
 
 	m_kludge = 0;
 
@@ -1631,7 +1654,7 @@ void pc6001sr_state::pc6001sr(machine_config &config)
 
 	// TODO: ym2203
 	// TODO: 1D 3'5" floppy drive
-	// TODO: telopper board (needs a tape dump)
+	// TODO: telopper board (system explicitly asks for missing tape loading)
 }
 
 void pc6601sr_state::pc6601sr(machine_config &config)
@@ -1639,7 +1662,8 @@ void pc6601sr_state::pc6601sr(machine_config &config)
 	pc6001sr(config);
 
 	// TODO: 1DD 3'5" floppy drive
-	// TODO: wireless keyboard (currently doesn't seem to accept inputs)
+	// TODO: IR keyboard (does it have functional differences wrt normal PC-6001?)
+	// TODO: TV tuner
 }
 
 // TODO: all labels needs to be checked up
