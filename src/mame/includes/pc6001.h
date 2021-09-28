@@ -260,7 +260,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_sr_irq_vectors;
 
-	uint8_t hw_rev_r();
+	virtual u8 hw_rev_r();
 	uint8_t sr_bank_rn_r(offs_t offset);
 	void sr_bank_rn_w(offs_t offset, uint8_t data);
 	uint8_t sr_bank_wn_r(offs_t offset);
@@ -286,6 +286,19 @@ private:
 
 	void pc6001sr_io(address_map &map);
 	void pc6001sr_map(address_map &map);
+};
+
+class pc6601sr_state : public pc6001sr_state
+{
+public:
+	pc6601sr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc6001sr_state(mconfig, type, tag)
+	{ }
+
+	void pc6601sr(machine_config &config);
+
+private:
+	virtual u8 hw_rev_r() override;
 };
 
 #endif

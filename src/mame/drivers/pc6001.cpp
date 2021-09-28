@@ -865,7 +865,7 @@ void pc6001sr_state::sr_mode_w(uint8_t data)
 	// bit 1: bus request
 
 	if(data & 1)
-		assert("PC-6001SR in Mk-2 compatibility mode not yet supported!\n");
+		throw emu_fatalerror("PC-6001SR in Mk-2 compatibility mode not yet supported!");
 }
 
 void pc6001sr_state::sr_vram_bank_w(uint8_t data)
@@ -904,10 +904,16 @@ void pc6001sr_state::necsr_ppi8255_w(offs_t offset, uint8_t data)
 	m_ppi->write(offset,data);
 }
 
-uint8_t pc6001sr_state::hw_rev_r()
+u8 pc6001sr_state::hw_rev_r()
 {
-	// bit 1 is active for pc6601sr, causes a direct jump to "video telopper" for pc6001mk2sr
+	// bit 1 is active for pc6601sr (and shows the "PC6601SR World" screen in place of the "PC6001mkIISR World"), 
+	// causes a direct jump to "video telopper" for pc6001mk2sr
 	return 0;
+}
+
+u8 pc6601sr_state::hw_rev_r()
+{
+	return 2;
 }
 
 void pc6001sr_state::pc6001sr_map(address_map &map)
@@ -1469,6 +1475,7 @@ static GFXDECODE_START( gfx_pc6001m2 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, kanji_layout, 2, 1 )
 GFXDECODE_END
 
+// TODO: same as PC-88 / PC-98 31'948'800 ?
 #define PC6001_MAIN_CLOCK 7987200
 
 void pc6001_state::pc6001(machine_config &config)
@@ -1525,8 +1532,6 @@ void pc6001_state::pc6001(machine_config &config)
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
 }
 
-
-
 void pc6001mk2_state::pc6001mk2(machine_config &config)
 {
 	pc6001(config);
@@ -1563,7 +1568,7 @@ void pc6001sr_state::pc6001sr(machine_config &config)
 	pc6001mk2(config);
 
 	/* basic machine hardware */
-	//*Yes*, PC-6001 SR Z80 CPU is actually slower than older models (better waitstates tho?)
+	// PC-6001SR clock is actually slower than older models (better waitstates tho?)
 	Z80(config.replace(), m_maincpu, XTAL(3'579'545));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001sr_state::pc6001sr_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6001sr_state::pc6001sr_io);
@@ -1573,6 +1578,17 @@ void pc6001sr_state::pc6001sr(machine_config &config)
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
 	m_screen->set_screen_update(FUNC(pc6001sr_state::screen_update_pc6001sr));
+	
+	// TODO: 1D 3'5" floppy drive
+}
+
+void pc6601sr_state::pc6601sr(machine_config &config)
+{
+	pc6001sr(config);
+
+	// TODO: ym2203
+	// TODO: 1DD 3'5" floppy drive
+	// TODO: telopper board (needs a tape dump)
 }
 
 /* ROM definition */
@@ -1625,7 +1641,8 @@ ROM_START( pc6001mk2 )
 	ROM_COPY( "maincpu", 0x20000, 0x00000, 0x8000 )
 ROM_END
 
-ROM_START( pc6601 ) /* Variant of pc6001m2 */
+/* Variant of pc6001mk2 */
+ROM_START( pc6601 )
 	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.66", 0x10000, 0x8000, CRC(c0b01772) SHA1(9240bb6b97fe06f5f07b5d65541c4d2f8758cc2a) )
 	ROM_LOAD( "voicerom.66", 0x18000, 0x4000, CRC(91d078c1) SHA1(6a93bd7723ef67f461394530a9feee57c8caf7b7) )
@@ -1665,9 +1682,33 @@ ROM_START( pc6001sr )
 	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
 ROM_END
 
+ROM_START( pc6601sr )
+	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "systemrom1.68", 0x010000, 0x010000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
+	ROM_LOAD( "systemrom2.68", 0x020000, 0x010000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
+
+	// mkII compatible ROMs
+	ROM_REGION( 0x20000, "mk2", ROMREGION_ERASEFF )
+	ROM_LOAD( "basicrom.68",  0x00000, 0x008000, CRC(516b1be3) SHA1(e9977fc13f65f009f03d0340b1f1eb9a3e586739) )
+	ROM_LOAD( "voicerom.68",  0x08000, 0x004000, CRC(37ff3829) SHA1(f887e95e29d071df8329168b48c07b78e492c837) )
+	ROM_LOAD( "cgrom60.68",   0x0c000, 0x002000, CRC(331473a9) SHA1(361836f9758d6d9b5133c9dc7860a7c74f9cf596) )
+	ROM_LOAD( "cgrom66.68",   0x0e000, 0x002000, CRC(03ba2cf1) SHA1(6fb32a4332b26aba2f28c3d8872cac5606be3998) )
+	ROM_LOAD( "sysrom2.68",   0x10000, 0x002000, CRC(07318218) SHA1(061f3e7d6c85a560846856feb55fdc0a1f561548) )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "cgrom68.68",   0x000000, 0x004000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
+ROM_END
+
 //    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT   STATE            INIT        COMPANY  FULLNAME                 FLAGS
 COMP( 1981, pc6001,    0,      0,     pc6001,    pc6001, pc6001_state,    empty_init, "NEC",   "PC-6001 (Japan)",       MACHINE_NOT_WORKING )
 COMP( 1981, pc6001a,   pc6001, 0,     pc6001,    pc6001, pc6001_state,    empty_init, "NEC",   "PC-6001A (US)",         MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
 COMP( 1983, pc6001mk2, pc6001, 0,     pc6001mk2, pc6001, pc6001mk2_state, empty_init, "NEC",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
 COMP( 1983, pc6601,    pc6001, 0,     pc6601,    pc6001, pc6601_state,    empty_init, "NEC",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
 COMP( 1984, pc6001sr,  pc6001, 0,     pc6001sr,  pc6001, pc6001sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )
+COMP( 1984, pc6601sr,  pc6001, 0,     pc6601sr,  pc6001, pc6601sr_state,  empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING )
