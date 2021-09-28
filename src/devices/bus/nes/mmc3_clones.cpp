@@ -87,7 +87,7 @@ INPUT_PORTS_START( sachen_shero )
 	PORT_START("JUMPER")
 	PORT_CONFNAME( 0x80, 0x00, "Title Screen" )
 	PORT_CONFSETTING(    0x00, "Street Heroes" )
-	PORT_CONFSETTING(    0x80, "侍魂 (Shìhún)" )
+	PORT_CONFSETTING(    0x80, u8"\u4f8d\u9b42 (Shìhún)" )    // 侍魂
 INPUT_PORTS_END
 
 

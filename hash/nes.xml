@@ -53088,7 +53088,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>199?</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-027"/>
-		<info name="alt_title" value="侍魂 (Shìhún)"/>
+		<info name="alt_title" value="侍魂"/>
+		<info name="alt_title" value="Shìhún"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_shero" />
 			<feature name="pcb" value="UNL-SHERO" />
