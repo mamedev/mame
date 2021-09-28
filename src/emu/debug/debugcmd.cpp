@@ -838,9 +838,9 @@ bool debugger_commands::debug_command_parameter_command(const char *param)
 void debugger_commands::execute_help(int ref, const std::vector<std::string> &params)
 {
 	if (params.size() == 0)
-		m_console.printf_wrap(80, "%s\n", debug_get_help(""));
+		m_console.printf_wrap(80, "%s\n", debug_get_help(std::string_view()));
 	else
-		m_console.printf_wrap(80, "%s\n", debug_get_help(params[0].c_str()));
+		m_console.printf_wrap(80, "%s\n", debug_get_help(params[0]));
 }
 
 

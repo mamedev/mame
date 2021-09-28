@@ -10,49 +10,29 @@
 
 #include "emu.h"
 #include "debughlp.h"
+
 #include "corestr.h"
+
 #include <cctype>
+#include <cstdio>
+#include <iterator>
+#include <map>
 
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define CONSOLE_HISTORY     (10000)
-#define CONSOLE_LINE_CHARS  (100)
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct help_item
-{
-	const char *        tag;
-	const char *        help;
-};
-
-
-
-/***************************************************************************
-    LOCAL VARIABLES
-***************************************************************************/
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
+namespace {
 
 /***************************************************************************
     TABLE OF HELP
 ***************************************************************************/
 
-static const help_item static_help_list[] =
+struct help_item
+{
+	char const *tag;
+	char const *help;
+};
+
+const help_item f_static_help_list[] =
 {
 	{
 		"",
@@ -92,10 +72,11 @@ static const help_item static_help_list[] =
 		"  history [<CPU>,<length>] -- outputs a brief history of visited opcodes\n"
 		"  trackpc [<bool>,<CPU>,<bool>] -- visually track visited opcodes [boolean to turn on and off, for the given CPU, clear]\n"
 		"  trackmem [<bool>,<bool>] -- record which PC writes to each memory address [boolean to turn on and off, clear]\n"
-		"  pcatmemp <address>[,<CPU>] -- query which PC wrote to a given program memory address for the current CPU\n"
+		"  pcatmem <address>[,<CPU>] -- query which PC wrote to a given program memory address for the current CPU\n"
 		"  pcatmemd <address>[,<CPU>] -- query which PC wrote to a given data memory address for the current CPU\n"
 		"  pcatmemi <address>[,<CPU>] -- query which PC wrote to a given I/O memory address for the current CPU\n"
-		"                                (Note: you can also query this info by right clicking in a memory window\n"
+		"  pcatmemo <address>[,<CPU>] -- query which PC wrote to a given opcode memory address for the current CPU\n"
+		"                                (Note: you can also query this info by right-clicking in a memory window)\n"
 		"  rewind[rw] -- go back in time by loading the most recent rewind state"
 		"  statesave[ss] <filename> -- save a state file for the current driver\n"
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
@@ -115,27 +96,31 @@ static const help_item static_help_list[] =
 		"  f[ind]d <address>,<length>[,<data>[,...]] -- search data memory for data\n"
 		"  f[ind]i <address>,<length>[,<data>[,...]] -- search I/O memory for data\n"
 		"  fill <address>,<length>[,<data>[,...]] -- fill program memory with data\n"
-		"  filld <address>,<length>[,<data>[,...]] -- fill data memory with data\n"
-		"  filli <address>,<length>[,<data>[,...][ -- fill I/O memory with data\n"
-		"  dump <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump program memory as text\n"
-		"  dumpd <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump data memory as text\n"
-		"  dumpi <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump I/O memory as text\n"
-		"  dumpo <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump opcodes memory as text\n"
-		"  strdump <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from program memory\n"
-		"  strdumpd <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from data memory\n"
-		"  strdumpi <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from I/O memory\n"
-		"  strdumpo <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from opcodes memory\n"
-		"  save <filename>,<address>,<length>[,<CPU>] -- save binary program memory to the given file\n"
-		"  saved <filename>,<address>,<length>[,<CPU>] -- save binary data memory to the given file\n"
-		"  savei <filename>,<address>,<length>[,<CPU>] -- save binary I/O memory to the given file\n"
-		"  saver <filename>,<address>,<length>,<region> -- save binary memory region to the given file\n"
-		"  load <filename>,<address>[,<length>,<CPU>] -- load binary program memory from the given file\n"
-		"  loadd <filename>,<address>[,<length>,<CPU>] -- load binary data memory from the given file\n"
-		"  loadi <filename>,<address>[,<length>,<CPU>] -- load binary I/O memory from the given file\n"
-		"  loadr <filename>,<address>,<length>,<region> -- load binary memory region from the given file\n"
-		"  map <address> -- map logical program address to physical address and bank\n"
-		"  mapd <address> -- map logical data address to physical address and bank\n"
-		"  mapi <address> -- map logical I/O address to physical address and bank\n"
+		"  filld <address>[:<CPU>],<length>[,<data>[,...]] -- fill data memory with data\n"
+		"  filli <address>[:<CPU>],<length>[,<data>[,...][ -- fill I/O memory with data\n"
+		"  fillo <address>[:<CPU>],<length>[,<data>[,...][ -- fill opcode memory with data\n"
+		"  dump <filename>,<address>[:<CPU>],<length>[,<group>[,<ascii>[,<rowsize>]]] -- dump program memory as text\n"
+		"  dumpd <filename>,<address>[:<CPU>],<length>[,<group>[,<ascii>[,<rowsize>]]] -- dump data memory as text\n"
+		"  dumpi <filename>,<address>[:<CPU>],<length>[,<group>[,<ascii>[,<rowsize>]]] -- dump I/O memory as text\n"
+		"  dumpo <filename>,<address>[:<CPU>],<length>[,<group>[,<ascii>[,<rowsize>]]] -- dump opcodes memory as text\n"
+		"  strdump <filename>,<address>[:<CPU>],<length>[,<term>] -- dump ASCII strings from program memory\n"
+		"  strdumpd <filename>,<address>[:<CPU>],<length>[,<term>] -- dump ASCII strings from data memory\n"
+		"  strdumpi <filename>,<address>[:<CPU>],<length>[,<term>] -- dump ASCII strings from I/O memory\n"
+		"  strdumpo <filename>,<address>[:<CPU>],<length>[,<term>] -- dump ASCII strings from opcodes memory\n"
+		"  save <filename>,<address>[:<CPU>],<length> -- save binary program memory to the given file\n"
+		"  saved <filename>,<address>[:<CPU>],<length> -- save binary data memory to the given file\n"
+		"  savei <filename>,<address>[:<CPU>],<length> -- save binary I/O memory to the given file\n"
+		"  saveo <filename>,<address>[:<CPU>],<length> -- save binary opcode memory to the given file\n"
+		"  saver <filename>,<address>[:<CPU>],<length>,<region> -- save binary memory region to the given file\n"
+		"  load <filename>,<address>[:<CPU>][,<length>] -- load binary program memory from the given file\n"
+		"  loadd <filename>,<address>[:<CPU>][,<length>] -- load binary data memory from the given file\n"
+		"  loadi <filename>,<address>[:<CPU>][,<length>] -- load binary I/O memory from the given file\n"
+		"  loado <filename>,<address>[:<CPU>][,<length>] -- load binary opcode memory from the given file\n"
+		"  loadr <filename>,<address>[:<CPU>],<length>,<region> -- load binary memory region from the given file\n"
+		"  map <address>[:<CPU>] -- map logical program address to physical address and bank\n"
+		"  mapd <address>[:<CPU>] -- map logical data address to physical address and bank\n"
+		"  mapi <address>[:<CPU>] -- map logical I/O address to physical address and bank\n"
+		"  mapo <address>[:<CPU>] -- map logical opcode address to physical address and bank\n"
 		"  memdump [<filename>] -- dump the current memory map to <filename>\n"
 	},
 	{
@@ -169,7 +154,7 @@ static const help_item static_help_list[] =
 		"Breakpoint Commands\n"
 		"Type help <command> for further details on each command\n"
 		"\n"
-		"  bp[set] <address>[,<condition>[,<action>]] -- sets breakpoint at <address>\n"
+		"  bp[set] <address>[:<CPU>][,<condition>[,<action>]] -- sets breakpoint at <address>\n"
 		"  bpclear [<bpnum>] -- clears a given breakpoint or all if no <bpnum> specified\n"
 		"  bpdisable [<bpnum>] -- disables a given breakpoint or all if no <bpnum> specified\n"
 		"  bpenable [<bpnum>] -- enables a given breakpoint or all if no <bpnum> specified\n"
@@ -181,9 +166,10 @@ static const help_item static_help_list[] =
 		"Watchpoint Commands\n"
 		"Type help <command> for further details on each command\n"
 		"\n"
-		"  wp[set] <address>,<length>,<type>[,<condition>[,<action>]] -- sets program space watchpoint\n"
-		"  wpd[set] <address>,<length>,<type>[,<condition>[,<action>]] -- sets data space watchpoint\n"
-		"  wpi[set] <address>,<length>,<type>[,<condition>[,<action>]] -- sets I/O space watchpoint\n"
+		"  wp[set] <address>[:<CPU>],<length>,<type>[,<condition>[,<action>]] -- sets program space watchpoint\n"
+		"  wpd[set] <address>[:<CPU>],<length>,<type>[,<condition>[,<action>]] -- sets data space watchpoint\n"
+		"  wpi[set] <address>[:<CPU>],<length>,<type>[,<condition>[,<action>]] -- sets I/O space watchpoint\n"
+		"  wpo[set] <address>[:<CPU>],<length>,<type>[,<condition>[,<action>]] -- sets opcode space watchpoint\n"
 		"  wpclear [<wpnum>] -- clears a given watchpoint or all if no <wpnum> specified\n"
 		"  wpdisable [<wpnum>] -- disables a given watchpoint or all if no <wpnum> specified\n"
 		"  wpenable [<wpnum>] -- enables a given watchpoint or all if no <wpnum> specified\n"
@@ -463,7 +449,7 @@ static const help_item static_help_list[] =
 	{
 		"pcatmem",
 		"\n"
-		"  pcatmem(p/d/i) <address>[,<CPU>]\n"
+		"  pcatmem[{d|i|o}] <address>[,<CPU>]\n"
 		"\n"
 		"The pcatmem command returns which PC wrote to a given memory address for the current CPU. "
 		"The first argument is the requested address.  The second argument is a CPU selector; if no "
@@ -475,6 +461,9 @@ static const help_item static_help_list[] =
 		"pcatmem 400000\n"
 		"  Print which PC wrote this CPU's memory location 0x400000.\n"
 	},
+	{ "pcatmemd", "#pcatmem" },
+	{ "pcatmemi", "#pcatmem" },
+	{ "pcatmemo", "#pcatmem" },
 	{
 		"rewind[rw]",
 		"\n"
@@ -583,7 +572,7 @@ static const help_item static_help_list[] =
 	{
 		"find",
 		"\n"
-		"  f[ind][{d|i}] <address>,<length>[,<data>[,...]]\n"
+		"  f[ind][{d|i|o}] <address>[:<CPU>],<length>[,<data>[,...]]\n"
 		"\n"
 		"The find/findd/findi commands search through memory for the specified sequence of data. "
 		"'find' will search program space memory, while 'findd' will search data space memory "
@@ -612,10 +601,13 @@ static const help_item static_help_list[] =
 		"  Searches the address range 0000-7fff for the string \"AAR\" followed by a dword-sized 0 "
 		"followed by the string \"BEN\", followed by a word-sized 0.\n"
 	},
+	{ "findd", "#find" },
+	{ "findi", "#find" },
+	{ "findo", "#find" },
 	{
 		"fill",
 		"\n"
-		"  fill[{d|i}] <address>,<length>[,<data>[,...]]\n"
+		"  fill[{d|i|o}] <address>[:<CPU>],<length>[,<data>[,...]]\n"
 		"\n"
 		"The fill/filld/filli commands overwrite a block of memory with copies of the specified "
 		"sequence of data. 'fill' will fill program space memory, while 'filld' will fill data space "
@@ -629,10 +621,13 @@ static const help_item static_help_list[] =
 		"sizes in order to perform more complex fills. The fill operation may be truncated if a page "
 		"fault occurs or if part of the sequence or string would fall beyond <address>+<length>-1.\n"
 	},
+	{ "filld", "#fill" },
+	{ "filli", "#fill" },
+	{ "fillo", "#fill" },
 	{
 		"dump",
 		"\n"
-		"  dump[{d|i}] <filename>,<address>,<length>[,<size>[,<ascii>[,<CPU>]]]\n"
+		"  dump[{d|i|o}] <filename>,<address>[:<CPU>],<length>[,<group>[,<ascii>[,<rowsize>]]]\n"
 		"\n"
 		"The dump/dumpd/dumpi/dumpo commands dump memory to the text file specified in the <filename> "
 		"parameter. 'dump' will dump program space memory, while 'dumpd' will dump data space memory, "
@@ -640,7 +635,7 @@ static const help_item static_help_list[] =
 		"the address of the start of dumping, and <length> indicates how much memory to dump. The range "
 		"<address> through <address>+<length>-1 inclusive will be output to the file. By default, the data "
 		"will be output in byte format, unless the underlying address space is word/dword/qword-only. "
-		"You can override this by specifying the <size> parameter, which can be used to group the data in "
+		"You can override this by specifying the <group> parameter, which can be used to group the data in "
 		"1, 2, 4 or 8-byte chunks. The optional <ascii> parameter can be used to enable (1) or disable (0) "
 		"the output of ASCII characters to the right of each line; by default, this is enabled. Finally, "
 		"you can dump memory from another CPU by specifying the <CPU> parameter.\n"
@@ -655,10 +650,13 @@ static const help_item static_help_list[] =
 		"  Dumps data memory addresses 3000-3fff from CPU #3 in 4-byte chunks, with no ASCII data, "
 		"to the file 'harddriv.dmp'.\n"
 	},
+	{ "dumpd", "#dump" },
+	{ "dumpi", "#dump" },
+	{ "dumpo", "#dump" },
 	{
 		"strdump",
 		"\n"
-		"  strdump[{d|i}] <filename>,<address>,<length>[,<term>[,<CPU>]]\n"
+		"  strdump[{d|i|o}] <filename>,<address>[:<CPU>],<length>[,<term>]\n"
 		"\n"
 		"The strdump/strdumpd/strdumpi/strdumpo commands dump memory to the text file specified in the "
 		"<filename> parameter. 'strdump' will dump program space memory, while 'strdumpd' will dump data "
@@ -670,10 +668,13 @@ static const help_item static_help_list[] =
 		"<term> parameter can be used to specify a different character as the string terminator. Finally, "
 		"you can dump memory from another CPU by specifying the <CPU> parameter.\n"
 	},
+	{ "strdumpd", "#strdump" },
+	{ "strdumpi", "#strdump" },
+	{ "strdumpo", "#strdump" },
 	{
 		"save",
 		"\n"
-		"  save[{d|i}] <filename>,<address>,<length>[,<CPU>]\n"
+		"  save[{d|i|o}] <filename>,<address>[:<CPU>],<length>\n"
 		"\n"
 		"The save/saved/savei commands save raw memory to the binary file specified in the <filename> "
 		"parameter. 'save' will save program space memory, while 'saved' will save data space memory "
@@ -690,6 +691,9 @@ static const help_item static_help_list[] =
 		"saved harddriv.bin,3000,1000,3\n"
 		"  Saves data memory addresses 3000-3fff from CPU #3 to the binary file 'harddriv.bin'.\n"
 	},
+	{ "saved", "#save" },
+	{ "savei", "#save" },
+	{ "saveo", "#save" },
 	{
 		"saver",
 		"\n"
@@ -708,7 +712,7 @@ static const help_item static_help_list[] =
 	{
 		"load",
 		"\n"
-		"  load[{d|i}] <filename>,<address>[,<length>,<CPU>]\n"
+		"  load[{d|i|o}] <filename>,<address>[:<CPU>][,<length>]\n"
 		"\n"
 		"The load/loadd/loadi commands load raw memory from the binary file specified in the <filename> "
 		"parameter. 'load' will load program space memory, while 'loadd' will load data space memory "
@@ -727,6 +731,9 @@ static const help_item static_help_list[] =
 		"loadd harddriv.bin,3000,1000,3\n"
 		"  Loads data memory addresses 3000-3fff from CPU #3 from the binary file 'harddriv.bin'.\n"
 	},
+	{ "loadd", "#load" },
+	{ "loadi", "#load" },
+	{ "loado", "#load" },
 	{
 		"loadr",
 		"\n"
@@ -1021,7 +1028,7 @@ static const help_item static_help_list[] =
 	{
 		"bpset",
 		"\n"
-		"  bp[set] <address>[,<condition>[,<action>]]\n"
+		"  bp[set] <address>[:<CPU>][,<condition>[,<action>]]\n"
 		"\n"
 		"Sets a new execution breakpoint at the specified <address>. The optional <condition> "
 		"parameter lets you specify an expression that will be evaluated each time the breakpoint is "
@@ -1115,7 +1122,7 @@ static const help_item static_help_list[] =
 	{
 		"wpset",
 		"\n"
-		"  wp[{d|i}][set] <address>,<length>,<type>[,<condition>[,<action>]]\n"
+		"  wp[{d|i|o}][set] <address>[:<CPU>],<length>,<type>[,<condition>[,<action>]]\n"
 		"\n"
 		"Sets a new watchpoint starting at the specified <address> and extending for <length>. The "
 		"inclusive range of the watchpoint is <address> through <address> + <length> - 1. The 'wpset' "
@@ -1156,6 +1163,9 @@ static const help_item static_help_list[] =
 		"the value being written is equal to f0. When that happens, increment the variable temp0 and "
 		"resume execution.\n"
 	},
+	{ "wpdset", "#wpset" },
+	{ "wpiset", "#wpset" },
+	{ "wposet", "#wpset" },
 	{
 		"wpclear",
 		"\n"
@@ -1300,7 +1310,7 @@ static const help_item static_help_list[] =
 	{
 		"map",
 		"\n"
-		"  map[{d|i}] <address>\n"
+		"  map[{d|i|o}] <address>\n"
 		"\n"
 		"The map/mapd/mapi commands map a logical address in memory to the correct physical address, as "
 		"well as specifying the bank. 'map' will map program space memory, while 'mapd' will map data space "
@@ -1311,6 +1321,9 @@ static const help_item static_help_list[] =
 		"map 152d0\n"
 		"  Gives physical address and bank for logical address 152d0 in program memory\n"
 	},
+	{ "mapd", "#map" },
+	{ "mapi", "#map" },
+	{ "mapo", "#map" },
 	{
 		"memdump",
 		"\n"
@@ -1355,6 +1368,7 @@ static const help_item static_help_list[] =
 		"  Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
 		"\n"
 	},
+	{ "//", "#comadd" },
 	{
 		"commit",
 		"\n"
@@ -1596,41 +1610,87 @@ static const help_item static_help_list[] =
 
 
 /***************************************************************************
-    CODE
+    HELP_MANAGER
 ***************************************************************************/
 
-const char *debug_get_help(const char *tag)
+class help_manager
 {
-	static char ambig_message[1024];
-	const help_item *found = nullptr;
-	int i, msglen, foundcount = 0;
-	size_t taglen = strlen(tag);
+private:
+	using help_map = std::map<std::string_view, char const *>;
 
-	/* find a match */
-	for (i = 0; i < std::size(static_help_list); i++)
-		if (!core_strnicmp(static_help_list[i].tag, tag, taglen))
+	help_map m_help_list;
+	help_item const *m_uncached_help = std::begin(f_static_help_list);
+
+	help_manager() = default;
+
+public:
+	char const *find(std::string_view tag)
+	{
+		// find a cached exact match if possible
+		std::string const lower = strmakelower(tag);
+		auto const found = m_help_list.find(lower);
+		if (m_help_list.end() != found)
+			return found->second;
+
+		// cache more entries while searching for an exact match
+		while (std::end(f_static_help_list) != m_uncached_help)
 		{
-			foundcount++;
-			found = &static_help_list[i];
-			if (strlen(found->tag) == taglen)
+			help_map::iterator ins;
+			if (*m_uncached_help->help == '#')
 			{
-				foundcount = 1;
-				break;
+				auto const xref = m_help_list.find(&m_uncached_help->help[1]);
+				assert(m_help_list.end() != xref);
+				ins = m_help_list.emplace(m_uncached_help->tag, xref->second).first;
 			}
+			else
+			{
+				ins = m_help_list.emplace(m_uncached_help->tag, m_uncached_help->help).first;
+			}
+			++m_uncached_help;
+			if (lower == ins->first)
+				return ins->second;
 		}
 
-	/* only a single match makes sense */
-	if (foundcount == 1)
-		return found->help;
+		// find a partial match
+		auto candidate = m_help_list.lower_bound(lower);
+		if ((m_help_list.end() != candidate) && (candidate->first.substr(0, lower.length()) == lower))
+		{
+			// if only one partial match, take it
+			if (m_help_list.end() == std::next(candidate))
+				return candidate->second;
 
-	/* if not found, return the first entry */
-	if (foundcount == 0)
-		return static_help_list[0].help;
+			// TODO: pointers to static strings are bad, mmmkay?
+			static char ambig_message[1024];
+			int msglen = std::sprintf(ambig_message, "Ambiguous help request, did you mean:\n");
+			do
+			{
+				msglen += std::sprintf(&ambig_message[msglen], "  help %.*s?\n", int(candidate->first.length()), &candidate->first[0]);
+				++candidate;
+			}
+			while ((m_help_list.end() != candidate) && (candidate->first.substr(0, lower.length()) == lower));
+			return ambig_message;
+		}
 
-	/* otherwise, indicate ambiguous help */
-	msglen = sprintf(ambig_message, "Ambiguous help request, did you mean:\n");
-	for (i = 0; i < std::size(static_help_list); i++)
-		if (!core_strnicmp(static_help_list[i].tag, tag, taglen))
-			msglen += sprintf(&ambig_message[msglen], "  help %s?\n", static_help_list[i].tag);
-	return ambig_message;
+		// take the first help entry if no matches at all
+		return f_static_help_list[0].help;
+	}
+
+	static help_manager &instance()
+	{
+		static help_manager s_instance;
+		return s_instance;
+	}
+};
+
+} // anonymous namespace
+
+
+
+/***************************************************************************
+    PUBLIC INTERFACE
+***************************************************************************/
+
+const char *debug_get_help(std::string_view tag)
+{
+	return help_manager::instance().find(tag);
 }
