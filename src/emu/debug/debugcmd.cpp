@@ -1763,10 +1763,10 @@ void debugger_commands::execute_bplist(int ref, const std::vector<std::string> &
 void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &params)
 {
 	u64 address, length;
-
-	// CPU is implicit
 	address_space *space;
-	if (!validate_device_space_parameter(std::string_view(), ref, space))
+
+	// param 1 is the address/CPU
+	if (!validate_target_address_parameter(params[0], ref, space, address))
 		return;
 
 	device_execute_interface const *execute;
@@ -1776,10 +1776,6 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 		return;
 	}
 	device_debug *const debug = space->device().debug();
-
-	// param 1 is the address
-	if (!validate_number_parameter(params[0], address))
-		return;
 
 	// param 2 is the length
 	if (!validate_number_parameter(params[1], length))
@@ -3174,11 +3170,9 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 	address_space *space;
 
 	// validate parameters
-	if (!validate_number_parameter(params[0], offset))
+	if (!validate_target_address_parameter(params[0], ref, space, offset))
 		return;
 	if (!validate_number_parameter(params[1], length))
-		return;
-	if (!validate_device_space_parameter(std::string_view(), ref, space))
 		return;
 
 	// further validation
@@ -3302,11 +3296,9 @@ void debugger_commands::execute_fill(int ref, const std::vector<std::string> &pa
 	address_space *space;
 
 	// validate parameters
-	if (!validate_number_parameter(params[0], offset))
+	if (!validate_target_address_parameter(params[0], ref, space, offset))
 		return;
 	if (!validate_number_parameter(params[1], length))
-		return;
-	if (!validate_device_space_parameter(std::string_view(), ref, space))
 		return;
 
 	// further validation
