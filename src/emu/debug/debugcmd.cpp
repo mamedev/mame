@@ -325,7 +325,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("trackpc",   CMDFLAG_NONE, 0, 0, 3, std::bind(&debugger_commands::execute_trackpc, this, _1, _2));
 
 	m_console.register_command("trackmem",  CMDFLAG_NONE, 0,          0, 3, std::bind(&debugger_commands::execute_trackmem, this, _1, _2));
-	m_console.register_command("pcatmemp",  CMDFLAG_NONE, AS_PROGRAM, 1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
+	m_console.register_command("pcatmem",   CMDFLAG_NONE, AS_PROGRAM, 1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
 	m_console.register_command("pcatmemd",  CMDFLAG_NONE, AS_DATA,    1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
 	m_console.register_command("pcatmemi",  CMDFLAG_NONE, AS_IO,      1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
 	m_console.register_command("pcatmemo",  CMDFLAG_NONE, AS_OPCODES, 1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
@@ -1622,19 +1622,28 @@ void debugger_commands::execute_comment_save(int ref, const std::vector<std::str
 
 void debugger_commands::execute_bpset(int ref, const std::vector<std::string> &params)
 {
+	// param 1 is the address/CPU
 	u64 address;
-
-	// CPU is implicit
-	device_t *cpu;
-	if (!validate_cpu_parameter(std::string_view(), cpu))
+	address_space *space;
+	if (!validate_target_address_parameter(params[0], ref, space, address))
 		return;
 
-	// param 1 is the address
-	if (!validate_number_parameter(params[0], address))
+	device_execute_interface const *execute;
+	if (!space->device().interface(execute))
+	{
+		m_console.printf("Device %s is not a CPU\n", space->device().name());
 		return;
+	}
+	device_debug *const debug = space->device().debug();
+
+	if (space->spacenum() != AS_PROGRAM)
+	{
+		m_console.printf("Only program space breakpoints are supported\n");
+		return;
+	}
 
 	// param 2 is the condition
-	parsed_expression condition(cpu->debug()->symtable());
+	parsed_expression condition(debug->symtable());
 	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
 		return;
 
@@ -1644,7 +1653,7 @@ void debugger_commands::execute_bpset(int ref, const std::vector<std::string> &p
 		return;
 
 	// set the breakpoint
-	int const bpnum = cpu->debug()->breakpoint_set(address, condition.is_empty() ? nullptr : condition.original_string(), action);
+	int const bpnum = debug->breakpoint_set(address, condition.is_empty() ? nullptr : condition.original_string(), action);
 	m_console.printf("Breakpoint %X set\n", bpnum);
 }
 
@@ -3855,12 +3864,8 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 {
 	// validate parameters
 	u64 address;
-	if (!validate_number_parameter(params[0], address))
-		return;
-
-	// CPU is implicit
 	address_space *space;
-	if (!validate_device_space_parameter(std::string_view(), ref, space))
+	if (!validate_target_address_parameter(params[0], ref, space, address))
 		return;
 
 	// do the translation first
