@@ -63,6 +63,40 @@
 
         ROM [0xc0050000] 0x10000 floats copied to [0x40180000]
 
+		ROM [0xff800000 - 0xff80171f] sound data headers, 32 bytes each
+		    Word 0: sound data pointer (offset from 0xff800000)
+			Word 1: uncompressed length?
+			Word 2: ?
+			Word 3: same as word 1?
+			Word 4: ?
+			Word 5: ?
+			Word 6: ?
+			Word 7: 0
+
+		ROM [0xff801720 -> ] compressed audio data
+
+		[0x0000100c] bitmask of active sound channels (max 16 channels?)
+		[0x00001018 -> ] sound channel data, 64 bytes each
+			+0x00: sound data pointer in ROM
+			+0x04: 0
+			+0x08: uncompressed length
+			+0x0c: uncompressed length
+			+0x10: 0?
+			+0x14: 0 - sample rate?
+			+0x18: 0?
+			+0x1c: sample rate? (halfword)
+			+0x1e: ?? (halfword)
+			+0x20: ?
+			+0x24: ?
+			+0x28: ?
+			+0x2c: ?
+			+0x30: ?
+			+0x34: ?
+			+0x36: ? (halfword)
+			+0x38: ?
+			+0x3c: ?
+
+
 
     Texture ROM decode:
 
@@ -76,7 +110,6 @@
     - TMS320C82 parallel processors are not emulated
       * PP0 transfers polygon data from a software FIFO to the graphics processor. This is currently HLE'd.
       * PP1 most likely does sound mixing. This is currently not emulated.
-    - 93C66 EEPROM
     - Alpha blending (probably based on palette index like on gaelco3d)
     - Minor Z-buffer issues
     - Wrong textures in a few places (could be a CPU core bug)
@@ -88,6 +121,7 @@
 #include "cpu/tms32082/tms32082.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"
+#include "machine/eepromser.h"
 #include "screen.h"
 
 #define BILINEAR 1
@@ -218,7 +252,7 @@ void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &ext
 				rgbaint_t fb_color(fb[x]);
 				texel_color.blend(fb_color, 255-mask_level);
 
-				fb[x] = texel_color.to_rgba();
+				fb[x] = texel_color.to_rgba_clamp();
 				if (UseZ)
 					zb[x] = zbufval;
 			}
@@ -377,7 +411,9 @@ public:
 		m_disp_ram(*this, "disp_ram"),
 		m_screen(*this, "screen"),
 		m_in(*this, "INPUTS%u", 1U),
-		m_analog(*this, "ANALOG%u", 1U)
+		m_analog(*this, "ANALOG%u", 1U),
+		m_eeprom_in(*this, "EEPROMIN"),
+		m_eeprom_out(*this, "EEPROMOUT")
 	{
 	}
 
@@ -413,6 +449,8 @@ private:
 
 	required_ioport_array<3> m_in;
 	required_ioport_array<1> m_analog;
+	required_ioport m_eeprom_in;
+	required_ioport m_eeprom_out;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	virtual void machine_start() override;
@@ -467,17 +505,27 @@ uint32_t rollext_state::a0000000_r(offs_t offset, uint32_t mem_mask)
 		case 0:         // inputs
 		{
 			uint32_t data = 0;
-			data |= m_in[0]->read() << 16;
-			data |= m_in[1]->read();
 
-			data |= 0x200;      // 0 causes inf loop
+			if (ACCESSING_BITS_16_23)
+			{
+				// -------- ---x---- -------- -------- ADC channel 0
+				// -------- --x----- -------- -------- ADC channel 1?
+				// -------- -x------ -------- -------- ADC channel 2?
+				// -------- x------- -------- -------- ADC channel 3?
 
-			// -------- ---x---- -------- -------- ADC channel 0
-			// -------- --x----- -------- -------- ADC channel 1?
-			// -------- -x------ -------- -------- ADC channel 2?
-			// -------- x------- -------- -------- ADC channel 3?
+				data |= (m_adc_readbit & 1) ? 0x100000 : 0;
 
-			data |= (m_adc_readbit & 1) ? 0x100000 : 0;
+				data |= m_in[0]->read() << 16;
+			}
+			if (ACCESSING_BITS_8_15)
+			{
+				data |= 0x200;		// 0 causes inf loop
+				data |= m_eeprom_in->read() << 8;
+			}
+			if (ACCESSING_BITS_0_7)
+			{
+				data |= m_in[1]->read();
+			}
 
 			return data;
 		}
@@ -493,7 +541,14 @@ uint32_t rollext_state::a0000000_r(offs_t offset, uint32_t mem_mask)
 
 void rollext_state::a0000000_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (offset == 1)
+	if (offset == 0)
+	{
+		if (ACCESSING_BITS_8_15)
+		{
+			m_eeprom_out->write(data >> 8, 0xff);
+		}
+	}
+	else if (offset == 1)
 	{
 		if (ACCESSING_BITS_16_23)
 		{
@@ -512,7 +567,6 @@ void rollext_state::a0000000_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_adc_reg = newdata;
 		}
 	}
-	//printf("a0000000_w: %08X, %08X at %s\n", offset, data, machine().describe_context().c_str());
 }
 
 uint32_t rollext_state::b0000000_r(offs_t offset)
@@ -628,6 +682,14 @@ static INPUT_PORTS_START(rollext)
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
 
+	PORT_START("EEPROMIN")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+	PORT_START("EEPROMOUT")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)	
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+
 	PORT_START("ANALOG1")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_NAME("Seat Tilt")
 INPUT_PORTS_END
@@ -695,6 +757,8 @@ void rollext_state::rollext(machine_config &config)
 	pp0.set_addrmap(AS_PROGRAM, &rollext_state::memmap);
 
 	config.set_maximum_quantum(attotime::from_hz(100));
+
+	EEPROM_93C66_16BIT(config, "eeprom");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
