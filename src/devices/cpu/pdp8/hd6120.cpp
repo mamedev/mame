@@ -168,8 +168,8 @@ hd6120_device::hd6120_device(const machine_config &config, const char *tag, devi
 	: cpu_device(config, HD6120, tag, owner, clock)
 	, m_inst_config("instruction", ENDIANNESS_BIG, 16, 16, -1) // 12 data bits
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1) // 12 data bits
-	, m_io_config("I/O", ENDIANNESS_BIG, 16, 9, -1) // 12 data bits
-	, m_devctl_config("device control", ENDIANNESS_BIG, 8, 9, 0) // only 3 bits used
+	, m_io_config("io", ENDIANNESS_BIG, 16, 9, -1) // 12 data bits
+	, m_devctl_config("devctl", ENDIANNESS_BIG, 8, 9, 0) // only 3 bits used
 	, m_lxmar_callback(*this)
 	, m_lxpar_callback(*this)
 	, m_lxdar_callback(*this)

@@ -45,12 +45,11 @@ sparc_base_device::sparc_base_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_mmu(*this, finder_base::DUMMY_TAG)
 {
-	char asi_buf[10];
 	m_debugger_config = address_space_config("debug", ENDIANNESS_BIG, 32, 32);
 	for (int i = 0; i < 0x10; i++)
 	{
-		snprintf(asi_buf, std::size(asi_buf), "asi%X", i);
-		m_asi_config[i] = address_space_config(asi_buf, ENDIANNESS_BIG, 32, 32);
+		m_asi_names[i] = util::string_format("asi%x", i);
+		m_asi_config[i] = address_space_config(m_asi_names[i].c_str(), ENDIANNESS_BIG, 32, 32);
 	}
 }
 

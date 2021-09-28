@@ -32,7 +32,7 @@ acorn_memc_device::acorn_memc_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, ACORN_MEMC, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
-	, m_space_config("MEMC", ENDIANNESS_LITTLE, 32, 26, 0)
+	, m_space_config("memc", ENDIANNESS_LITTLE, 32, 26, 0)
 	, m_abort_w(*this)
 	, m_sirq_w(*this)
 	, m_output_dram_rowcol(false)
