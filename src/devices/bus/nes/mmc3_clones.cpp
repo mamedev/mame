@@ -83,6 +83,29 @@ DEFINE_DEVICE_TYPE(NES_PJOY84,        nes_pjoy84_device,        "nes_pjoy84",   
 DEFINE_DEVICE_TYPE(NES_COOLBOY,       nes_coolboy_device,       "nes_coolboy",       "NES Cart CoolBoy PCB")
 
 
+INPUT_PORTS_START( sachen_shero )
+	PORT_START("JUMPER")
+	PORT_CONFNAME( 0x80, 0x00, "Title Screen" )
+	PORT_CONFSETTING(    0x00, "Street Heroes" )
+	PORT_CONFSETTING(    0x80, u8"\u4f8d\u9b42 (Shìhún)" )    // 侍魂
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor nes_sachen_shero_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( sachen_shero );
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
 nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_NITRA, tag, owner, clock)
 {
@@ -203,8 +226,10 @@ nes_sa9602b_device::nes_sa9602b_device(const machine_config &mconfig, const char
 {
 }
 
-nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_SACHEN_SHERO, tag, owner, clock), m_reg(0)
+nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_SACHEN_SHERO, tag, owner, clock)
+	, m_jumper(*this, "JUMPER")
+	, m_reg(0)
 {
 }
 
@@ -533,7 +558,7 @@ void nes_sachen_shero_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
 	m_reg = 0;
-	mmc3_common_initialize(0xff, 0x1ff, 0);
+	mmc3_common_initialize(0xff, 0xff, 0);
 }
 
 void nes_a9746_device::device_start()
@@ -1887,22 +1912,21 @@ void nes_sa9602b_device::write_h(offs_t offset, uint8_t data)
 
  Sachen boards used for Street Heroes
 
- in MESS: Very Preliminary support
+ NES 2.0: mapper 262
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-
-void nes_sachen_shero_device::chr_cb( int start, int bank, int source )
+void nes_sachen_shero_device::chr_cb(int start, int bank, int source)
 {
-	int shift = start < 2 ? 5 :
-				start < 4 ? 6 :
-				start < 6 ? 8 : 7;
+	static constexpr u8 shift[4] = {5, 6, 8, 7};
+
 	if (!BIT(m_reg, 6))
-		chr1_x(start, ((m_reg << shift) & 0x100) | bank, source);
+		chr1_x(start, ((m_reg << shift[start >> 1]) & 0x100) | bank, source);
 }
 
-
-void nes_sachen_shero_device::write_l(offs_t offset, uint8_t data)
+void nes_sachen_shero_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("shero write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x4100;
@@ -1917,16 +1941,15 @@ void nes_sachen_shero_device::write_l(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t nes_sachen_shero_device::read_l(offs_t offset)
+u8 nes_sachen_shero_device::read_l(offs_t offset)
 {
 	LOG_MMC(("shero read_l, offset: %04x\n", offset));
 	offset += 0x4100;
 
 	if (offset == 0x4100)
-	{
-		// DSW read!
-	}
-	return get_open_bus();  // open bus
+		return m_jumper->read();
+	else
+		return get_open_bus();
 }
 
 /*-------------------------------------------------
