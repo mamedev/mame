@@ -802,6 +802,17 @@ void pc6001sr_state::sr_bank_rn_w(offs_t offset, uint8_t data)
 		case 0x00: bank[offset]->set_base(&ROM[SR_WRAM0(bank_num)]); break;
 		default:   bank[offset]->set_base(&ROM[SR_NULL(bank_num)]); break;
 	}
+
+	if (offset == 0)
+		refresh_gvram_access(false);
+}
+
+void pc6001sr_state::refresh_gvram_access(bool is_write)
+{
+	if (is_write)
+		m_gvram_view_w.select(m_sr_bank_w[0] == 0 && m_sr_text_mode == false);
+	else
+		m_gvram_view_r.select(m_sr_bank_r[0] == 0 && m_sr_text_mode == false);
 }
 
 uint8_t pc6001sr_state::sr_bank_wn_r(offs_t offset)
@@ -812,6 +823,9 @@ uint8_t pc6001sr_state::sr_bank_wn_r(offs_t offset)
 void pc6001sr_state::sr_bank_wn_w(offs_t offset, uint8_t data)
 {
 	m_sr_bank_w[offset] = data;
+
+	if (offset == 0)
+		refresh_gvram_access(true);
 }
 
 void pc6001sr_state::sr_bitmap_yoffs_w(uint8_t data)
@@ -835,20 +849,23 @@ void pc6001sr_state::sr_bitmap_xoffs_w(uint8_t data)
 		ROM[offset+(SR_EXRAM0(bank_num))] = data; \
 }
 
-void pc6001sr_state::sr_work_ram0_w(offs_t offset, uint8_t data)
+u8 pc6001sr_state::sr_gvram_r(offs_t offset)
 {
-	// TODO: not entirely correct
-	if(m_sr_text_mode == false && m_sr_bank_w[0] == 0)
-	{
-		uint32_t real_offs = (m_bitmap_xoffs*16+m_bitmap_yoffs)*256;
-		real_offs += offset;
+	uint32_t real_offs = (m_bitmap_xoffs*16+m_bitmap_yoffs)*320;
+	real_offs += offset;
 
-		m_gvram[real_offs] = data;
-		return;
-	}
-
-	SR_WRAM_BANK_W(0);
+	return m_gvram[real_offs];
 }
+
+void pc6001sr_state::sr_gvram_w(offs_t offset, uint8_t data)
+{
+	uint32_t real_offs = (m_bitmap_xoffs*16+m_bitmap_yoffs)*320;
+	real_offs += offset;
+
+	m_gvram[real_offs] = data;
+}
+
+void pc6001sr_state::sr_work_ram0_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(0); }
 void pc6001sr_state::sr_work_ram1_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(1); }
 void pc6001sr_state::sr_work_ram2_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(2); }
 void pc6001sr_state::sr_work_ram3_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(3); }
@@ -862,6 +879,9 @@ void pc6001sr_state::sr_mode_w(uint8_t data)
 	// if 1 text mode else bitmap mode
 	m_sr_text_mode = bool(BIT(data,3));
 	m_sr_text_rows = data & 4 ? 20 : 25;
+	refresh_gvram_access(false);
+	refresh_gvram_access(true);
+
 	// bit 1: bus request
 
 	if(data & 1)
@@ -919,7 +939,12 @@ u8 pc6601sr_state::hw_rev_r()
 void pc6001sr_state::pc6001sr_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).bankr("bank1").w(FUNC(pc6001sr_state::sr_work_ram0_w));
+	map(0x0000, 0x1fff).view(m_gvram_view_r);
+	m_gvram_view_r[0](0x0000, 0x1fff).bankr("bank1");
+	m_gvram_view_r[1](0x0000, 0x1fff).r(FUNC(pc6001sr_state::sr_gvram_r));
+	map(0x0000, 0x1fff).view(m_gvram_view_w);
+	m_gvram_view_w[0](0x0000, 0x1fff).w(FUNC(pc6001sr_state::sr_work_ram0_w));
+	m_gvram_view_w[1](0x0000, 0x1fff).w(FUNC(pc6001sr_state::sr_gvram_w));
 	map(0x2000, 0x3fff).bankr("bank2").w(FUNC(pc6001sr_state::sr_work_ram1_w));
 	map(0x4000, 0x5fff).bankr("bank3").w(FUNC(pc6001sr_state::sr_work_ram2_w));
 	map(0x6000, 0x7fff).bankr("bank4").w(FUNC(pc6001sr_state::sr_work_ram3_w));
@@ -1441,6 +1466,8 @@ void pc6001sr_state::machine_reset()
 		m_sr_bank_w[6] = 0x0c;
 		m_sr_bank_w[7] = 0x0e;
 
+		refresh_gvram_access(false);
+		refresh_gvram_access(true);
 //      m_gfx_bank_on = 0;
 	}
 }
@@ -1578,19 +1605,21 @@ void pc6001sr_state::pc6001sr(machine_config &config)
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
 	m_screen->set_screen_update(FUNC(pc6001sr_state::screen_update_pc6001sr));
-	
+
+	// TODO: ym2203
 	// TODO: 1D 3'5" floppy drive
+	// TODO: telopper board (needs a tape dump)
 }
 
 void pc6601sr_state::pc6601sr(machine_config &config)
 {
 	pc6001sr(config);
 
-	// TODO: ym2203
 	// TODO: 1DD 3'5" floppy drive
-	// TODO: telopper board (needs a tape dump)
+	// TODO: wireless keyboard (currently doesn't seem to accept inputs)
 }
 
+// TODO: all labels needs to be checked up
 /* ROM definition */
 ROM_START( pc6001 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -1662,9 +1691,13 @@ ROM_START( pc6601 )
 ROM_END
 
 ROM_START( pc6001sr )
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
 	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
 	ROM_LOAD( "systemrom2.64", 0x20000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
+	ROM_COPY( "gfx1", 0, 0x30000, 0x4000 )
 //  cgrom 1                    0x30000, 0x10000
 //  exrom 0                    0x40000, 0x10000
 //  exrom 1                    0x50000, 0x10000
@@ -1675,17 +1708,19 @@ ROM_START( pc6001sr )
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
-
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
 ROM_END
 
 ROM_START( pc6601sr )
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "cgrom68.68",   0x000000, 0x004000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
 	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
+	// Note: identical to pc6001sr?
 	ROM_LOAD( "systemrom1.68", 0x010000, 0x010000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
 	ROM_LOAD( "systemrom2.68", 0x020000, 0x010000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
+	ROM_COPY( "gfx1", 0, 0x30000, 0x4000 )
 
 	// mkII compatible ROMs
 	ROM_REGION( 0x20000, "mk2", ROMREGION_ERASEFF )
@@ -1697,9 +1732,6 @@ ROM_START( pc6601sr )
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "cgrom68.68",   0x000000, 0x004000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )

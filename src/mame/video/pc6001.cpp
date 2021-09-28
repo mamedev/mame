@@ -544,28 +544,25 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 			}
 		}
 	}
-	else //4bpp bitmap mode (TODO)
+	else
 	{
+		//4bpp bitmap mode
+		// TODO: scrolling
 		for(int y=0;y<200;y++)
 		{
-			for(int x=0;x<320;x+=2)
+			for(int x=0;x<320;x++)
 			{
 				uint32_t vram_addr;
 
-				if(x >= 256)
-					vram_addr = 0x1a00 + (x-256)+y*64;
-				else
-					vram_addr = x+y*256;
+				// The Jp emulators maps this for the rightmost X > 256, but it doesn't seem to be the case?
+//				vram_addr = 0x1a00 + (x-256)+y*64;
+				vram_addr = (x & 0xfff) + y * 320;
 
 				int color;
-
-				color = (m_gvram[vram_addr] & 0xf0) >> 4;
-				if (cliprect.contains(x, y+0))
-					bitmap.pix((y+0), (x+0)) = m_palette->pen(color+0x10);
-
+				
 				color = (m_gvram[vram_addr] & 0x0f);
-				if (cliprect.contains(x+1, y+0))
-					bitmap.pix((y+0), (x+1)) = m_palette->pen(color+0x10);
+				if (cliprect.contains(x+0, y+0))
+					bitmap.pix((y+0), (x+0)) = m_palette->pen(color+0x10);
 			}
 		}
 	}

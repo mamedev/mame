@@ -228,8 +228,10 @@ class pc6001sr_state : public pc6601_state
 {
 public:
 	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc6601_state(mconfig, type, tag),
-		m_sr_irq_vectors(*this, "irq_vectors")
+		pc6601_state(mconfig, type, tag)
+		, m_sr_irq_vectors(*this, "irq_vectors")
+		, m_gvram_view_r(*this, "gvram_view_r")
+		, m_gvram_view_w(*this, "gvram_view_w")
 	{ }
 
 	void pc6001sr(machine_config &config);
@@ -245,7 +247,7 @@ private:
 	bool m_sr_text_mode;
 	uint8_t m_sr_text_rows;
 	std::unique_ptr<uint8_t []> m_gvram;
-	uint8_t m_bitmap_yoffs,m_bitmap_xoffs;
+	uint8_t m_bitmap_yoffs, m_bitmap_xoffs;
 
 	enum{
 		SUB_CPU_IRQ = 0,
@@ -259,6 +261,8 @@ private:
 	};
 
 	required_shared_ptr<uint8_t> m_sr_irq_vectors;
+	memory_view m_gvram_view_r;
+	memory_view m_gvram_view_w;
 
 	virtual u8 hw_rev_r();
 	uint8_t sr_bank_rn_r(offs_t offset);
@@ -279,6 +283,10 @@ private:
 	void necsr_ppi8255_w(offs_t offset, uint8_t data);
 	void sr_bitmap_yoffs_w(uint8_t data);
 	void sr_bitmap_xoffs_w(uint8_t data);
+	void refresh_gvram_access(bool is_write);
+
+	u8 sr_gvram_r(offs_t offset);
+	void sr_gvram_w(offs_t offset, u8 data);
 
 	INTERRUPT_GEN_MEMBER(sr_vrtc_irq);
 
