@@ -3005,6 +3005,12 @@ void nes_bmc_k1029_device::write_h(offs_t offset, u8 data)
 
  In MAME: Supported.
 
+ TODO: Several games have incorrect mirroring bits
+ on all carts they appear on. It's subtle so it's
+ likely a BTANB? Noticeable in Flappy, Pacman, and
+ Warpman title scrolls and at bottom of screen in
+ Zippy Race in-game.
+
  -------------------------------------------------*/
 
 void nes_n625092_device::write_h(offs_t offset, u8 data)
@@ -3013,7 +3019,7 @@ void nes_n625092_device::write_h(offs_t offset, u8 data)
 
 	m_latch[BIT(offset, 14)] = offset;
 
-	u8 bank = (m_latch[0] & 0x200) >> 3 | (m_latch[0] & 0xe0) >> 2 | (m_latch[1] & 0x07);    // NesDev shows the high bit here, but is it correct? So far no cart is large enough to use this.
+	u8 bank = (m_latch[0] & 0x200) >> 3 | (m_latch[0] & 0xe0) >> 2 | (m_latch[1] & 0x07);
 	u8 mode = BIT(m_latch[0], 1);
 	if (mode && BIT(m_latch[0], 8))    // UNROM mode
 	{
