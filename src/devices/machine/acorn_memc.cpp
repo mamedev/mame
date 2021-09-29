@@ -51,7 +51,7 @@ device_memory_interface::space_config_vector acorn_memc_device::memory_space_con
 	};
 }
 
-void acorn_memc_device::memc_map_debug_commands(int ref, const std::vector<std::string> &params)
+void acorn_memc_device::memc_map_debug_commands(const std::vector<std::string> &params)
 {
 	uint64_t offset;
 	if (params.size() != 1 || !machine().debugger().commands().validate_number_parameter(params[0], offset))
@@ -103,7 +103,7 @@ void acorn_memc_device::device_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("memc_map", CMDFLAG_NONE, 0, 1, 1, std::bind(&acorn_memc_device::memc_map_debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("memc_map", CMDFLAG_NONE, 1, 1, std::bind(&acorn_memc_device::memc_map_debug_commands, this, _1));
 	}
 }
 

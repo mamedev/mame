@@ -246,9 +246,9 @@ const help_item f_static_help_list[] =
 		"Cheat Commands\n"
 		"Type help <command> for further details on each command\n"
 		"\n"
-		"  cheatinit [<address>,<length>[,<CPU>]] -- initialize the cheat search to the selected memory area\n"
+		"  cheatinit [<sign><width>[<swap>],[<address>,<length>[,<CPU>]]] -- initialize the cheat search to the selected memory area\n"
 		"  cheatrange <address>,<length> -- add to the cheat search the selected memory area\n"
-		"  cheatnext <condition>[,<comparisonvalue>] -- continue cheat search comparing with the last value\n"
+		"  cheatnext <condition>[,<comparisonvalue>] -- continue cheat search comparing with the previous value\n"
 		"  cheatnextf <condition>[,<comparisonvalue>] -- continue cheat search comparing with the first value\n"
 		"  cheatlist [<filename>] -- show the list of cheat search matches or save them to <filename>\n"
 		"  cheatundo -- undo the last cheat search (state only)\n"
@@ -1415,7 +1415,7 @@ const help_item f_static_help_list[] =
 	{
 		"cheatinit",
 		"\n"
-		"  cheatinit [<sign><width><swap>,[<address>,<length>[,<CPU>]]]\n"
+		"  cheatinit [<sign><width>[<swap>],[<address>,<length>[,<CPU>]]]\n"
 		"\n"
 		"The cheatinit command initializes the cheat search to the selected memory area.\n"
 		"If no parameter is specified the cheat search is initialized to all changeable memory of the main CPU.\n"
@@ -1452,29 +1452,29 @@ const help_item f_static_help_list[] =
 		"\n"
 		"  cheatnext <condition>[,<comparisonvalue>]\n"
 		"\n"
-		"The cheatnext command will make comparisons with the last search matches.\n"
+		"The cheatnext command will make comparisons with the previous search matches.\n"
 		"Possible <condition>:\n"
 		"  all\n"
 		"   no <comparisonvalue> needed.\n"
-		"   use to update the last value without changing the current matches.\n"
+		"   use to update the previous value without changing the current matches.\n"
 		"  equal [eq]\n"
-		"   without <comparisonvalue> search for all bytes that are equal to the last search.\n"
+		"   without <comparisonvalue> search for all bytes that are equal to the previous search.\n"
 		"   with <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.\n"
 		"  notequal [ne]\n"
-		"   without <comparisonvalue> search for all bytes that are not equal to the last search.\n"
+		"   without <comparisonvalue> search for all bytes that are not equal to the previous search.\n"
 		"   with <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.\n"
 		"  decrease [de, +]\n"
-		"   without <comparisonvalue> search for all bytes that have decreased since the last search.\n"
-		"   with <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the last search.\n"
+		"   without <comparisonvalue> search for all bytes that have decreased since the previous search.\n"
+		"   with <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the previous search.\n"
 		"  increase [in, -]\n"
-		"   without <comparisonvalue> search for all bytes that have increased since the last search.\n"
-		"   with <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the last search.\n"
+		"   without <comparisonvalue> search for all bytes that have increased since the previous search.\n"
+		"   with <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the previous search.\n"
 		"  decreaseorequal [deeq]\n"
 		"   no <comparisonvalue> needed.\n"
-		"   search for all bytes that have decreased or have same value since the last search.\n"
+		"   search for all bytes that have decreased or have same value since the previous search.\n"
 		"  increaseorequal [ineq]\n"
 		"   no <comparisonvalue> needed.\n"
-		"   search for all bytes that have decreased or have same value since the last search.\n"
+		"   search for all bytes that have decreased or have same value since the previous search.\n"
 		"  smallerof [lt]\n"
 		"   without <comparisonvalue> this condition is invalid\n"
 		"   with <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.\n"
@@ -1483,15 +1483,15 @@ const help_item f_static_help_list[] =
 		"   with <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.\n"
 		"  changedby [ch, ~]\n"
 		"   without <comparisonvalue> this condition is invalid\n"
-		"   with <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the last search.\n"
+		"   with <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the previous search.\n"
 		"\n"
 		"Examples:\n"
 		"\n"
 		"cheatnext increase\n"
-		"  search for all bytes that have increased since the last search.\n"
+		"  search for all bytes that have increased since the previous search.\n"
 		"\n"
 		"cheatnext decrease, 1\n"
-		"  search for all bytes that have decreased by 1 since the last search.\n"
+		"  search for all bytes that have decreased by 1 since the previous search.\n"
 	},
 	{
 		"cheatnextf",
@@ -1502,7 +1502,7 @@ const help_item f_static_help_list[] =
 		"Possible <condition>:\n"
 		"  all\n"
 		"   no <comparisonvalue> needed.\n"
-		"   use to update the last value without changing the current matches.\n"
+		"   use to update the previous value without changing the current matches.\n"
 		"  equal [eq]\n"
 		"   without <comparisonvalue> search for all bytes that are equal to the initial search.\n"
 		"   with <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.\n"
@@ -1655,7 +1655,8 @@ public:
 		if ((m_help_list.end() != candidate) && (candidate->first.substr(0, lower.length()) == lower))
 		{
 			// if only one partial match, take it
-			if (m_help_list.end() == std::next(candidate))
+			auto const next = std::next(candidate);
+			if ((m_help_list.end() == next) || (next->first.substr(0, lower.length()) != lower))
 				return candidate->second;
 
 			// TODO: pointers to static strings are bad, mmmkay?

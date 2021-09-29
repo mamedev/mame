@@ -184,173 +184,173 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	}
 
 	/* add all the commands */
-	m_console.register_command("help",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_help, this, _1, _2));
-	m_console.register_command("print",     CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_print, this, _1, _2));
-	m_console.register_command("printf",    CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_printf, this, _1, _2));
-	m_console.register_command("logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_logerror, this, _1, _2));
-	m_console.register_command("tracelog",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracelog, this, _1, _2));
-	m_console.register_command("tracesym",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracesym, this, _1, _2));
-	m_console.register_command("cls",       CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cls, this, _1, _2));
-	m_console.register_command("quit",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1, _2));
-	m_console.register_command("exit",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1, _2));
-	m_console.register_command("do",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_do, this, _1, _2));
-	m_console.register_command("step",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_step, this, _1, _2));
-	m_console.register_command("s",         CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_step, this, _1, _2));
-	m_console.register_command("over",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_over, this, _1, _2));
-	m_console.register_command("o",         CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_over, this, _1, _2));
-	m_console.register_command("out" ,      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_out, this, _1, _2));
-	m_console.register_command("go",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go, this, _1, _2));
-	m_console.register_command("g",         CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go, this, _1, _2));
-	m_console.register_command("gvblank",   CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_go_vblank, this, _1, _2));
-	m_console.register_command("gv",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_go_vblank, this, _1, _2));
-	m_console.register_command("gint",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1, _2));
-	m_console.register_command("gi",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1, _2));
-	m_console.register_command("gex",       CMDFLAG_NONE, 0, 0, 2, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
-	m_console.register_command("ge",        CMDFLAG_NONE, 0, 0, 2, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
-	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
-	m_console.register_command("gt",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
-	m_console.register_command("gp",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1, _2));
-	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
-	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
-	m_console.register_command("focus",     CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1, _2));
-	m_console.register_command("ignore",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_ignore, this, _1, _2));
-	m_console.register_command("observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_observe, this, _1, _2));
-	m_console.register_command("suspend",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_suspend, this, _1, _2));
-	m_console.register_command("resume",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1, _2));
-	m_console.register_command("cpulist",   CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cpulist, this, _1, _2));
+	m_console.register_command("help",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_help, this, _1));
+	m_console.register_command("print",     CMDFLAG_NONE, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_print, this, _1));
+	m_console.register_command("printf",    CMDFLAG_NONE, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_printf, this, _1));
+	m_console.register_command("logerror",  CMDFLAG_NONE, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_logerror, this, _1));
+	m_console.register_command("tracelog",  CMDFLAG_NONE, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracelog, this, _1));
+	m_console.register_command("tracesym",  CMDFLAG_NONE, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracesym, this, _1));
+	m_console.register_command("cls",       CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_cls, this, _1));
+	m_console.register_command("quit",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1));
+	m_console.register_command("exit",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1));
+	m_console.register_command("do",        CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_do, this, _1));
+	m_console.register_command("step",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_step, this, _1));
+	m_console.register_command("s",         CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_step, this, _1));
+	m_console.register_command("over",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_over, this, _1));
+	m_console.register_command("o",         CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_over, this, _1));
+	m_console.register_command("out" ,      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_out, this, _1));
+	m_console.register_command("go",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go, this, _1));
+	m_console.register_command("g",         CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go, this, _1));
+	m_console.register_command("gvblank",   CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_go_vblank, this, _1));
+	m_console.register_command("gv",        CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_go_vblank, this, _1));
+	m_console.register_command("gint",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1));
+	m_console.register_command("gi",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1));
+	m_console.register_command("gex",       CMDFLAG_NONE, 0, 2, std::bind(&debugger_commands::execute_go_exception, this, _1));
+	m_console.register_command("ge",        CMDFLAG_NONE, 0, 2, std::bind(&debugger_commands::execute_go_exception, this, _1));
+	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1));
+	m_console.register_command("gt",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1));
+	m_console.register_command("gp",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1));
+	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_next, this, _1));
+	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_next, this, _1));
+	m_console.register_command("focus",     CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1));
+	m_console.register_command("ignore",    CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_ignore, this, _1));
+	m_console.register_command("observe",   CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_observe, this, _1));
+	m_console.register_command("suspend",   CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_suspend, this, _1));
+	m_console.register_command("resume",    CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1));
+	m_console.register_command("cpulist",   CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_cpulist, this, _1));
 
-	m_console.register_command("comadd",    CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
-	m_console.register_command("//",        CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
-	m_console.register_command("comdelete", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_comment_del, this, _1, _2));
-	m_console.register_command("comsave",   CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_comment_save, this, _1, _2));
-	m_console.register_command("comlist",   CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_comment_list, this, _1, _2));
-	m_console.register_command("commit",    CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_commit, this, _1, _2));
-	m_console.register_command("/*",        CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_commit, this, _1, _2));
+	m_console.register_command("comadd",    CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1));
+	m_console.register_command("//",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1));
+	m_console.register_command("comdelete", CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_comment_del, this, _1));
+	m_console.register_command("comsave",   CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_comment_save, this, _1));
+	m_console.register_command("comlist",   CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_comment_list, this, _1));
+	m_console.register_command("commit",    CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_commit, this, _1));
+	m_console.register_command("/*",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_commit, this, _1));
 
-	m_console.register_command("bpset",     CMDFLAG_NONE, 0, 1, 3, std::bind(&debugger_commands::execute_bpset, this, _1, _2));
-	m_console.register_command("bp",        CMDFLAG_NONE, 0, 1, 3, std::bind(&debugger_commands::execute_bpset, this, _1, _2));
-	m_console.register_command("bpclear",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_bpclear, this, _1, _2));
-	m_console.register_command("bpdisable", CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, _1, _2));
-	m_console.register_command("bpenable",  CMDFLAG_NONE, 1, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, _1, _2));
-	m_console.register_command("bplist",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_bplist, this, _1, _2));
+	m_console.register_command("bpset",     CMDFLAG_NONE, 1, 3, std::bind(&debugger_commands::execute_bpset, this, _1));
+	m_console.register_command("bp",        CMDFLAG_NONE, 1, 3, std::bind(&debugger_commands::execute_bpset, this, _1));
+	m_console.register_command("bpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpclear, this, _1));
+	m_console.register_command("bpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, false, _1));
+	m_console.register_command("bpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, true, _1));
+	m_console.register_command("bplist",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_bplist, this, _1));
 
-	m_console.register_command("wpset",     CMDFLAG_NONE, -1,         3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wp",        CMDFLAG_NONE, -1,         3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpdset",    CMDFLAG_NONE, AS_DATA,    3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpd",       CMDFLAG_NONE, AS_DATA,    3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpiset",    CMDFLAG_NONE, AS_IO,      3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpi",       CMDFLAG_NONE, AS_IO,      3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wposet",    CMDFLAG_NONE, AS_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpo",       CMDFLAG_NONE, AS_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2));
-	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_wpclear, this, _1, _2));
-	m_console.register_command("wpdisable", CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, _1, _2));
-	m_console.register_command("wpenable",  CMDFLAG_NONE, 1, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, _1, _2));
-	m_console.register_command("wplist",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_wplist, this, _1, _2));
+	m_console.register_command("wpset",     CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, -1, _1));
+	m_console.register_command("wp",        CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, -1, _1));
+	m_console.register_command("wpdset",    CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_DATA, _1));
+	m_console.register_command("wpd",       CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_DATA, _1));
+	m_console.register_command("wpiset",    CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_IO, _1));
+	m_console.register_command("wpi",       CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_IO, _1));
+	m_console.register_command("wposet",    CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_OPCODES, _1));
+	m_console.register_command("wpo",       CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_OPCODES, _1));
+	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpclear, this, _1));
+	m_console.register_command("wpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, false, _1));
+	m_console.register_command("wpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, true, _1));
+	m_console.register_command("wplist",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_wplist, this, _1));
 
-	m_console.register_command("rpset",     CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1, _2));
-	m_console.register_command("rp",        CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1, _2));
-	m_console.register_command("rpclear",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_rpclear, this, _1, _2));
-	m_console.register_command("rpdisable", CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_rpdisenable, this, _1, _2));
-	m_console.register_command("rpenable",  CMDFLAG_NONE, 1, 0, 1, std::bind(&debugger_commands::execute_rpdisenable, this, _1, _2));
-	m_console.register_command("rplist",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rplist, this, _1, _2));
+	m_console.register_command("rpset",     CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1));
+	m_console.register_command("rp",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1));
+	m_console.register_command("rpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_rpclear, this, _1));
+	m_console.register_command("rpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_rpdisenable, this, false, _1));
+	m_console.register_command("rpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_rpdisenable, this, true, _1));
+	m_console.register_command("rplist",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_rplist, this, _1));
 
-	m_console.register_command("statesave", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1, _2));
-	m_console.register_command("ss",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1, _2));
-	m_console.register_command("stateload", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
-	m_console.register_command("sl",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
+	m_console.register_command("statesave", CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1));
+	m_console.register_command("ss",        CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1));
+	m_console.register_command("stateload", CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1));
+	m_console.register_command("sl",        CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1));
 
-	m_console.register_command("rewind",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
-	m_console.register_command("rw",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
+	m_console.register_command("rewind",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1));
+	m_console.register_command("rw",        CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1));
 
-	m_console.register_command("save",      CMDFLAG_NONE, -1,         3, 3, std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA,    3, 3, std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO,      3, 3, std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("saveo",     CMDFLAG_NONE, AS_OPCODES, 3, 3, std::bind(&debugger_commands::execute_save, this, _1, _2));
-	m_console.register_command("saver",     CMDFLAG_NONE, 0,          4, 4, std::bind(&debugger_commands::execute_saveregion, this, _1, _2));
+	m_console.register_command("save",      CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, -1, _1));
+	m_console.register_command("saved",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_DATA, _1));
+	m_console.register_command("savei",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_IO, _1));
+	m_console.register_command("saveo",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_OPCODES, _1));
+	m_console.register_command("saver",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_saveregion, this, _1));
 
-	m_console.register_command("load",      CMDFLAG_NONE, -1,         2, 3, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA,    2, 3, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO,      2, 3, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loado",     CMDFLAG_NONE, AS_OPCODES, 2, 3, std::bind(&debugger_commands::execute_load, this, _1, _2));
-	m_console.register_command("loadr",     CMDFLAG_NONE, 0,          4, 4, std::bind(&debugger_commands::execute_loadregion, this, _1, _2));
+	m_console.register_command("load",      CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, -1, _1));
+	m_console.register_command("loadd",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_DATA, _1));
+	m_console.register_command("loadi",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_IO, _1));
+	m_console.register_command("loado",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_OPCODES, _1));
+	m_console.register_command("loadr",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_loadregion, this, _1));
 
-	m_console.register_command("dump",      CMDFLAG_NONE, -1,         3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2));
-	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA,    3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2));
-	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO,      3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2));
-	m_console.register_command("dumpo",     CMDFLAG_NONE, AS_OPCODES, 3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2));
+	m_console.register_command("dump",      CMDFLAG_NONE, 3, 6, std::bind(&debugger_commands::execute_dump, this, -1, _1));
+	m_console.register_command("dumpd",     CMDFLAG_NONE, 3, 6, std::bind(&debugger_commands::execute_dump, this, AS_DATA, _1));
+	m_console.register_command("dumpi",     CMDFLAG_NONE, 3, 6, std::bind(&debugger_commands::execute_dump, this, AS_IO, _1));
+	m_console.register_command("dumpo",     CMDFLAG_NONE, 3, 6, std::bind(&debugger_commands::execute_dump, this, AS_OPCODES, _1));
 
-	m_console.register_command("strdump",   CMDFLAG_NONE, -1,         3, 4, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
-	m_console.register_command("strdumpd",  CMDFLAG_NONE, AS_DATA,    3, 4, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
-	m_console.register_command("strdumpi",  CMDFLAG_NONE, AS_IO,      3, 4, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
-	m_console.register_command("strdumpo",  CMDFLAG_NONE, AS_OPCODES, 3, 4, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+	m_console.register_command("strdump",   CMDFLAG_NONE, 3, 4, std::bind(&debugger_commands::execute_strdump, this, -1, _1));
+	m_console.register_command("strdumpd",  CMDFLAG_NONE, 3, 4, std::bind(&debugger_commands::execute_strdump, this, AS_DATA, _1));
+	m_console.register_command("strdumpi",  CMDFLAG_NONE, 3, 4, std::bind(&debugger_commands::execute_strdump, this, AS_IO, _1));
+	m_console.register_command("strdumpo",  CMDFLAG_NONE, 3, 4, std::bind(&debugger_commands::execute_strdump, this, AS_OPCODES, _1));
 
-	m_console.register_command("cheatinit", CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
-	m_console.register_command("ci",        CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
+	m_console.register_command("cheatinit", CMDFLAG_NONE, 0, 4, std::bind(&debugger_commands::execute_cheatrange, this, true, _1));
+	m_console.register_command("ci",        CMDFLAG_NONE, 0, 4, std::bind(&debugger_commands::execute_cheatrange, this, true, _1));
 
-	m_console.register_command("cheatrange",CMDFLAG_NONE, 1, 2, 2, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
-	m_console.register_command("cr",        CMDFLAG_NONE, 1, 2, 2, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
+	m_console.register_command("cheatrange",CMDFLAG_NONE, 2, 2, std::bind(&debugger_commands::execute_cheatrange, this, false, _1));
+	m_console.register_command("cr",        CMDFLAG_NONE, 2, 2, std::bind(&debugger_commands::execute_cheatrange, this, false, _1));
 
-	m_console.register_command("cheatnext", CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_cheatnext, this, _1, _2));
-	m_console.register_command("cn",        CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_cheatnext, this, _1, _2));
-	m_console.register_command("cheatnextf",CMDFLAG_NONE, 1, 1, 2, std::bind(&debugger_commands::execute_cheatnext, this, _1, _2));
-	m_console.register_command("cnf",       CMDFLAG_NONE, 1, 1, 2, std::bind(&debugger_commands::execute_cheatnext, this, _1, _2));
+	m_console.register_command("cheatnext", CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_cheatnext, this, false, _1));
+	m_console.register_command("cn",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_cheatnext, this, false, _1));
+	m_console.register_command("cheatnextf",CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_cheatnext, this, true, _1));
+	m_console.register_command("cnf",       CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_cheatnext, this, true, _1));
 
-	m_console.register_command("cheatlist", CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_cheatlist, this, _1, _2));
-	m_console.register_command("cl",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_cheatlist, this, _1, _2));
+	m_console.register_command("cheatlist", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_cheatlist, this, _1));
+	m_console.register_command("cl",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_cheatlist, this, _1));
 
-	m_console.register_command("cheatundo", CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cheatundo, this, _1, _2));
-	m_console.register_command("cu",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cheatundo, this, _1, _2));
+	m_console.register_command("cheatundo", CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_cheatundo, this, _1));
+	m_console.register_command("cu",        CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_cheatundo, this, _1));
 
-	m_console.register_command("f",         CMDFLAG_KEEP_QUOTES, -1,         3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("find",      CMDFLAG_KEEP_QUOTES, -1,         3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("fd",        CMDFLAG_KEEP_QUOTES, AS_DATA,    3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("findd",     CMDFLAG_KEEP_QUOTES, AS_DATA,    3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("fi",        CMDFLAG_KEEP_QUOTES, AS_IO,      3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("findi",     CMDFLAG_KEEP_QUOTES, AS_IO,      3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("fo",        CMDFLAG_KEEP_QUOTES, AS_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
-	m_console.register_command("findo",     CMDFLAG_KEEP_QUOTES, AS_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
+	m_console.register_command("f",         CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, -1, _1));
+	m_console.register_command("find",      CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, -1, _1));
+	m_console.register_command("fd",        CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, AS_DATA, _1));
+	m_console.register_command("findd",     CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, AS_DATA, _1));
+	m_console.register_command("fi",        CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, AS_IO, _1));
+	m_console.register_command("findi",     CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, AS_IO, _1));
+	m_console.register_command("fo",        CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, AS_OPCODES, _1));
+	m_console.register_command("findo",     CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, AS_OPCODES, _1));
 
-	m_console.register_command("fill",      CMDFLAG_KEEP_QUOTES, -1,         3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, _1, _2));
-	m_console.register_command("filld",     CMDFLAG_KEEP_QUOTES, AS_DATA,    3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, _1, _2));
-	m_console.register_command("filli",     CMDFLAG_KEEP_QUOTES, AS_IO,      3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, _1, _2));
-	m_console.register_command("fillo",     CMDFLAG_KEEP_QUOTES, AS_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, _1, _2));
+	m_console.register_command("fill",      CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, -1, _1));
+	m_console.register_command("filld",     CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, AS_DATA, _1));
+	m_console.register_command("filli",     CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, AS_IO, _1));
+	m_console.register_command("fillo",     CMDFLAG_KEEP_QUOTES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, AS_OPCODES, _1));
 
-	m_console.register_command("dasm",      CMDFLAG_NONE, 0, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1, _2));
+	m_console.register_command("dasm",      CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1));
 
-	m_console.register_command("trace",     CMDFLAG_NONE, 0, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1, _2));
-	m_console.register_command("traceover", CMDFLAG_NONE, 0, 1, 4, std::bind(&debugger_commands::execute_traceover, this, _1, _2));
-	m_console.register_command("traceflush",CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_traceflush, this, _1, _2));
+	m_console.register_command("trace",     CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1));
+	m_console.register_command("traceover", CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_traceover, this, _1));
+	m_console.register_command("traceflush",CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_traceflush, this, _1));
 
-	m_console.register_command("history",   CMDFLAG_NONE, 0, 0, 2, std::bind(&debugger_commands::execute_history, this, _1, _2));
-	m_console.register_command("trackpc",   CMDFLAG_NONE, 0, 0, 3, std::bind(&debugger_commands::execute_trackpc, this, _1, _2));
+	m_console.register_command("history",   CMDFLAG_NONE, 0, 2, std::bind(&debugger_commands::execute_history, this, _1));
+	m_console.register_command("trackpc",   CMDFLAG_NONE, 0, 3, std::bind(&debugger_commands::execute_trackpc, this, _1));
 
-	m_console.register_command("trackmem",  CMDFLAG_NONE, 0,          0, 3, std::bind(&debugger_commands::execute_trackmem, this, _1, _2));
-	m_console.register_command("pcatmem",   CMDFLAG_NONE, AS_PROGRAM, 1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
-	m_console.register_command("pcatmemd",  CMDFLAG_NONE, AS_DATA,    1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
-	m_console.register_command("pcatmemi",  CMDFLAG_NONE, AS_IO,      1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
-	m_console.register_command("pcatmemo",  CMDFLAG_NONE, AS_OPCODES, 1, 2, std::bind(&debugger_commands::execute_pcatmem,  this, _1, _2));
+	m_console.register_command("trackmem",  CMDFLAG_NONE, 0, 3, std::bind(&debugger_commands::execute_trackmem, this, _1));
+	m_console.register_command("pcatmem",   CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, -1, _1));
+	m_console.register_command("pcatmemd",  CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, AS_DATA, _1));
+	m_console.register_command("pcatmemi",  CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, AS_IO, _1));
+	m_console.register_command("pcatmemo",  CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, AS_OPCODES, _1));
 
-	m_console.register_command("snap",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_snap, this, _1, _2));
+	m_console.register_command("snap",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_snap, this, _1));
 
-	m_console.register_command("source",    CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_source, this, _1, _2));
+	m_console.register_command("source",    CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_source, this, _1));
 
-	m_console.register_command("map",       CMDFLAG_NONE, AS_PROGRAM, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
-	m_console.register_command("mapd",      CMDFLAG_NONE, AS_DATA, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
-	m_console.register_command("mapi",      CMDFLAG_NONE, AS_IO, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
-	m_console.register_command("mapo",      CMDFLAG_NONE, AS_OPCODES, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2));
-	m_console.register_command("memdump",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_memdump, this, _1, _2));
+	m_console.register_command("map",       CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_map, this, -1, _1));
+	m_console.register_command("mapd",      CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_map, this, AS_DATA, _1));
+	m_console.register_command("mapi",      CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_map, this, AS_IO, _1));
+	m_console.register_command("mapo",      CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_map, this, AS_OPCODES, _1));
+	m_console.register_command("memdump",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_memdump, this, _1));
 
-	m_console.register_command("symlist",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_symlist, this, _1, _2));
+	m_console.register_command("symlist",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_symlist, this, _1));
 
-	m_console.register_command("softreset", CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_softreset, this, _1, _2));
-	m_console.register_command("hardreset", CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_hardreset, this, _1, _2));
+	m_console.register_command("softreset", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_softreset, this, _1));
+	m_console.register_command("hardreset", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_hardreset, this, _1));
 
-	m_console.register_command("images",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_images, this, _1, _2));
-	m_console.register_command("mount",     CMDFLAG_NONE, 0, 2, 2, std::bind(&debugger_commands::execute_mount, this, _1, _2));
-	m_console.register_command("unmount",   CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_unmount, this, _1, _2));
+	m_console.register_command("images",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_images, this, _1));
+	m_console.register_command("mount",     CMDFLAG_NONE, 2, 2, std::bind(&debugger_commands::execute_mount, this, _1));
+	m_console.register_command("unmount",   CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_unmount, this, _1));
 
-	m_console.register_command("input",     CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_input, this, _1, _2));
-	m_console.register_command("dumpkbd",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_dumpkbd, this, _1, _2));
+	m_console.register_command("input",     CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_input, this, _1));
+	m_console.register_command("dumpkbd",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_dumpkbd, this, _1));
 
 	/* set up the initial debugscript if specified */
 	const char* name = m_machine.options().debug_script();
@@ -836,7 +836,7 @@ bool debugger_commands::debug_command_parameter_command(const char *param)
     execute_help - execute the help command
 -------------------------------------------------*/
 
-void debugger_commands::execute_help(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_help(const std::vector<std::string> &params)
 {
 	if (params.size() == 0)
 		m_console.printf_wrap(80, "%s\n", debug_get_help(std::string_view()));
@@ -849,7 +849,7 @@ void debugger_commands::execute_help(int ref, const std::vector<std::string> &pa
     execute_print - execute the print command
 -------------------------------------------------*/
 
-void debugger_commands::execute_print(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_print(const std::vector<std::string> &params)
 {
 	/* validate the other parameters */
 	u64 values[MAX_COMMAND_PARAMS];
@@ -1000,7 +1000,7 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
     execute_printf - execute the printf command
 -------------------------------------------------*/
 
-void debugger_commands::execute_printf(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_printf(const std::vector<std::string> &params)
 {
 	/* validate the other parameters */
 	u64 values[MAX_COMMAND_PARAMS];
@@ -1019,7 +1019,7 @@ void debugger_commands::execute_printf(int ref, const std::vector<std::string> &
     execute_logerror - execute the logerror command
 -------------------------------------------------*/
 
-void debugger_commands::execute_logerror(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_logerror(const std::vector<std::string> &params)
 {
 	/* validate the other parameters */
 	u64 values[MAX_COMMAND_PARAMS];
@@ -1038,7 +1038,7 @@ void debugger_commands::execute_logerror(int ref, const std::vector<std::string>
     execute_tracelog - execute the tracelog command
 -------------------------------------------------*/
 
-void debugger_commands::execute_tracelog(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_tracelog(const std::vector<std::string> &params)
 {
 	/* validate the other parameters */
 	u64 values[MAX_COMMAND_PARAMS];
@@ -1057,7 +1057,7 @@ void debugger_commands::execute_tracelog(int ref, const std::vector<std::string>
     execute_tracesym - execute the tracesym command
 -------------------------------------------------*/
 
-void debugger_commands::execute_tracesym(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_tracesym(const std::vector<std::string> &params)
 {
 	// build a format string appropriate for the parameters and validate them
 	std::stringstream format;
@@ -1093,7 +1093,7 @@ void debugger_commands::execute_tracesym(int ref, const std::vector<std::string>
     execute_cls - execute the cls command
 -------------------------------------------------*/
 
-void debugger_commands::execute_cls(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_cls(const std::vector<std::string> &params)
 {
 	text_buffer_clear(m_console.get_console_textbuf());
 }
@@ -1103,7 +1103,7 @@ void debugger_commands::execute_cls(int ref, const std::vector<std::string> &par
     execute_quit - execute the quit command
 -------------------------------------------------*/
 
-void debugger_commands::execute_quit(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_quit(const std::vector<std::string> &params)
 {
 	osd_printf_warning("Exited via the debugger\n");
 	m_machine.schedule_exit();
@@ -1114,7 +1114,7 @@ void debugger_commands::execute_quit(int ref, const std::vector<std::string> &pa
     execute_do - execute the do command
 -------------------------------------------------*/
 
-void debugger_commands::execute_do(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_do(const std::vector<std::string> &params)
 {
 	u64 dummy;
 	validate_number_parameter(params[0], dummy);
@@ -1125,7 +1125,7 @@ void debugger_commands::execute_do(int ref, const std::vector<std::string> &para
     execute_step - execute the step command
 -------------------------------------------------*/
 
-void debugger_commands::execute_step(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_step(const std::vector<std::string> &params)
 {
 	/* if we have a parameter, use it */
 	u64 steps = 1;
@@ -1140,7 +1140,7 @@ void debugger_commands::execute_step(int ref, const std::vector<std::string> &pa
     execute_over - execute the over command
 -------------------------------------------------*/
 
-void debugger_commands::execute_over(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_over(const std::vector<std::string> &params)
 {
 	/* if we have a parameter, use it */
 	u64 steps = 1;
@@ -1155,7 +1155,7 @@ void debugger_commands::execute_over(int ref, const std::vector<std::string> &pa
     execute_out - execute the out command
 -------------------------------------------------*/
 
-void debugger_commands::execute_out(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_out(const std::vector<std::string> &params)
 {
 	m_console.get_visible_cpu()->debug()->single_step_out();
 }
@@ -1165,7 +1165,7 @@ void debugger_commands::execute_out(int ref, const std::vector<std::string> &par
     execute_go - execute the go command
 -------------------------------------------------*/
 
-void debugger_commands::execute_go(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_go(const std::vector<std::string> &params)
 {
 	u64 addr = ~0;
 
@@ -1182,7 +1182,7 @@ void debugger_commands::execute_go(int ref, const std::vector<std::string> &para
     command
 -------------------------------------------------*/
 
-void debugger_commands::execute_go_vblank(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_go_vblank(const std::vector<std::string> &params)
 {
 	m_console.get_visible_cpu()->debug()->go_vblank();
 }
@@ -1192,7 +1192,7 @@ void debugger_commands::execute_go_vblank(int ref, const std::vector<std::string
     execute_go_interrupt - execute the goint command
 -------------------------------------------------*/
 
-void debugger_commands::execute_go_interrupt(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_go_interrupt(const std::vector<std::string> &params)
 {
 	u64 irqline = -1;
 
@@ -1207,7 +1207,7 @@ void debugger_commands::execute_go_interrupt(int ref, const std::vector<std::str
     execute_go_exception - execute the goex command
 -------------------------------------------------*/
 
-void debugger_commands::execute_go_exception(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_go_exception(const std::vector<std::string> &params)
 {
 	u64 exception = -1;
 
@@ -1227,7 +1227,7 @@ void debugger_commands::execute_go_exception(int ref, const std::vector<std::str
     execute_go_time - execute the gtime command
 -------------------------------------------------*/
 
-void debugger_commands::execute_go_time(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_go_time(const std::vector<std::string> &params)
 {
 	u64 milliseconds = -1;
 
@@ -1243,7 +1243,7 @@ void debugger_commands::execute_go_time(int ref, const std::vector<std::string> 
 /*-------------------------------------------------
     execute_go_privilege - execute the gp command
 -------------------------------------------------*/
-void debugger_commands::execute_go_privilege(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_go_privilege(const std::vector<std::string> &params)
 {
 	parsed_expression condition(m_console.visible_symtable());
 	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
@@ -1256,7 +1256,7 @@ void debugger_commands::execute_go_privilege(int ref, const std::vector<std::str
     execute_next - execute the next command
 -------------------------------------------------*/
 
-void debugger_commands::execute_next(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_next(const std::vector<std::string> &params)
 {
 	m_console.get_visible_cpu()->debug()->go_next_device();
 }
@@ -1266,7 +1266,7 @@ void debugger_commands::execute_next(int ref, const std::vector<std::string> &pa
     execute_focus - execute the focus command
 -------------------------------------------------*/
 
-void debugger_commands::execute_focus(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_focus(const std::vector<std::string> &params)
 {
 	// validate params
 	device_t *cpu;
@@ -1288,7 +1288,7 @@ void debugger_commands::execute_focus(int ref, const std::vector<std::string> &p
     execute_ignore - execute the ignore command
 -------------------------------------------------*/
 
-void debugger_commands::execute_ignore(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_ignore(const std::vector<std::string> &params)
 {
 	if (params.empty())
 	{
@@ -1351,7 +1351,7 @@ void debugger_commands::execute_ignore(int ref, const std::vector<std::string> &
     execute_observe - execute the observe command
 -------------------------------------------------*/
 
-void debugger_commands::execute_observe(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_observe(const std::vector<std::string> &params)
 {
 	if (params.empty())
 	{
@@ -1399,7 +1399,7 @@ void debugger_commands::execute_observe(int ref, const std::vector<std::string> 
     execute_suspend - suspend execution on cpu
 -------------------------------------------------*/
 
-void debugger_commands::execute_suspend(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_suspend(const std::vector<std::string> &params)
 {
 	// if there are no parameters, dump the ignore list
 	if (params.empty())
@@ -1458,7 +1458,7 @@ void debugger_commands::execute_suspend(int ref, const std::vector<std::string> 
     execute_resume - Resume execution on CPU
 -------------------------------------------------*/
 
-void debugger_commands::execute_resume(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_resume(const std::vector<std::string> &params)
 {
 	// if there are no parameters, dump the ignore list
 	if (params.empty())
@@ -1503,7 +1503,7 @@ void debugger_commands::execute_resume(int ref, const std::vector<std::string> &
 //  execute_cpulist - list all CPUs
 //-------------------------------------------------
 
-void debugger_commands::execute_cpulist(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_cpulist(const std::vector<std::string> &params)
 {
 	int index = 0;
 	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
@@ -1518,7 +1518,7 @@ void debugger_commands::execute_cpulist(int ref, const std::vector<std::string> 
     execute_comment - add a comment to a line
 -------------------------------------------------*/
 
-void debugger_commands::execute_comment_add(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_comment_add(const std::vector<std::string> &params)
 {
 	// param 1 is the address for the comment
 	u64 address;
@@ -1547,7 +1547,7 @@ void debugger_commands::execute_comment_add(int ref, const std::vector<std::stri
     execute_comment_del - remove a comment from an addr
 --------------------------------------------------------*/
 
-void debugger_commands::execute_comment_del(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_comment_del(const std::vector<std::string> &params)
 {
 	// param 1 can either be a command or the address for the comment
 	u64 address;
@@ -1566,35 +1566,35 @@ void debugger_commands::execute_comment_del(int ref, const std::vector<std::stri
 }
 
 /**
- * @fn void execute_comment_list(running_machine &machine, int ref, int params, const char *param[])
+ * @fn void execute_comment_list(const std::vector<std::string> &params)
  * @brief Print current list of comments in debugger
  *
  *
  */
 
-void debugger_commands::execute_comment_list(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_comment_list(const std::vector<std::string> &params)
 {
 	if (!m_machine.debugger().cpu().comment_load(false))
 		m_console.printf("Error while parsing XML file\n");
 }
 
 /**
- * @fn void execute_comment_commit(running_machine &machine, int ref, int params, const char *param[])
+ * @fn void execute_comment_commit(const std::vector<std::string> &params)
  * @brief Add and Save current list of comments in debugger
  *
  */
 
-void debugger_commands::execute_comment_commit(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_comment_commit(const std::vector<std::string> &params)
 {
-	execute_comment_add(ref, params);
-	execute_comment_save(ref, params);
+	execute_comment_add(params);
+	execute_comment_save(params);
 }
 
 /*-------------------------------------------------
     execute_comment - add a comment to a line
 -------------------------------------------------*/
 
-void debugger_commands::execute_comment_save(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_comment_save(const std::vector<std::string> &params)
 {
 	if (m_machine.debugger().cpu().comment_save())
 		m_console.printf("Comment successfully saved\n");
@@ -1604,7 +1604,7 @@ void debugger_commands::execute_comment_save(int ref, const std::vector<std::str
 
 // TODO: add color hex editing capabilities for comments, see below for more info
 /**
- * @fn void execute_comment_color(running_machine &machine, int ref, int params, const char *param[])
+ * @fn void execute_comment_color(const std::vector<std::string> &params)
  * @brief Modifies comment given at address $xx with given color
  * Useful for marking comment with a different color scheme (for example by marking start and end of a given function visually).
  * @param[in] "address,color" First is the comment address in the current context, color can be hexadecimal or shorthanded to common 1bpp RGB names.
@@ -1621,12 +1621,12 @@ void debugger_commands::execute_comment_save(int ref, const std::vector<std::str
     command
 -------------------------------------------------*/
 
-void debugger_commands::execute_bpset(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_bpset(const std::vector<std::string> &params)
 {
 	// param 1 is the address/CPU
 	u64 address;
 	address_space *space;
-	if (!validate_target_address_parameter(params[0], ref, space, address))
+	if (!validate_target_address_parameter(params[0], AS_PROGRAM, space, address))
 		return;
 
 	device_execute_interface const *execute;
@@ -1664,27 +1664,29 @@ void debugger_commands::execute_bpset(int ref, const std::vector<std::string> &p
     clear command
 -------------------------------------------------*/
 
-void debugger_commands::execute_bpclear(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_bpclear(const std::vector<std::string> &params)
 {
 	u64 bpindex;
 
-	/* if 0 parameters, clear all */
-	if (params.empty())
+	if (params.empty()) // if no parameters, clear all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->breakpoint_clear_all();
 		m_console.printf("Cleared all breakpoints\n");
 	}
-
-	/* otherwise, clear the specific one */
-	else if (!validate_number_parameter(params[0], bpindex))
+	else if (!validate_number_parameter(params[0], bpindex)) // otherwise, clear the specific one
+	{
 		return;
+	}
 	else
 	{
 		bool found = false;
 		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug()->breakpoint_clear(bpindex))
+			{
 				found = true;
+				break;
+			}
 		if (found)
 			m_console.printf("Breakpoint %X cleared\n", u32(bpindex));
 		else
@@ -1698,32 +1700,34 @@ void debugger_commands::execute_bpclear(int ref, const std::vector<std::string> 
     disable/enable commands
 -------------------------------------------------*/
 
-void debugger_commands::execute_bpdisenable(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_bpdisenable(bool enable, const std::vector<std::string> &params)
 {
 	u64 bpindex;
 
-	/* if 0 parameters, clear all */
-	if (params.empty())
+	if (params.empty()) // if 0 parameters, disable/enable all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
-			device.debug()->breakpoint_enable_all(ref);
-		if (ref == 0)
+			device.debug()->breakpoint_enable_all(enable);
+		if (!enable)
 			m_console.printf("Disabled all breakpoints\n");
 		else
 			m_console.printf("Enabled all breakpoints\n");
 	}
-
-	/* otherwise, clear the specific one */
-	else if (!validate_number_parameter(params[0], bpindex))
+	else if (!validate_number_parameter(params[0], bpindex)) // otherwise, disable/enable the specific one
+	{
 		return;
+	}
 	else
 	{
 		bool found = false;
 		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->breakpoint_enable(bpindex, ref))
+			if (device.debug()->breakpoint_enable(bpindex, enable))
+			{
 				found = true;
+				break;
+			}
 		if (found)
-			m_console.printf("Breakpoint %X %s\n", u32(bpindex), ref ? "enabled" : "disabled");
+			m_console.printf("Breakpoint %X %s\n", u32(bpindex), enable ? "enabled" : "disabled");
 		else
 			m_console.printf("Invalid breakpoint number %X\n", u32(bpindex));
 	}
@@ -1735,7 +1739,7 @@ void debugger_commands::execute_bpdisenable(int ref, const std::vector<std::stri
     command
 -------------------------------------------------*/
 
-void debugger_commands::execute_bplist(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_bplist(const std::vector<std::string> &params)
 {
 	int printed = 0;
 	std::string buffer;
@@ -1770,13 +1774,13 @@ void debugger_commands::execute_bplist(int ref, const std::vector<std::string> &
     command
 -------------------------------------------------*/
 
-void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_wpset(int spacenum, const std::vector<std::string> &params)
 {
 	u64 address, length;
 	address_space *space;
 
 	// param 1 is the address/CPU
-	if (!validate_target_address_parameter(params[0], ref, space, address))
+	if (!validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
 
 	device_execute_interface const *execute;
@@ -1826,7 +1830,7 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
     clear command
 -------------------------------------------------*/
 
-void debugger_commands::execute_wpclear(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_wpclear(const std::vector<std::string> &params)
 {
 	u64 wpindex;
 
@@ -1860,32 +1864,31 @@ void debugger_commands::execute_wpclear(int ref, const std::vector<std::string> 
     disable/enable commands
 -------------------------------------------------*/
 
-void debugger_commands::execute_wpdisenable(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_wpdisenable(bool enable, const std::vector<std::string> &params)
 {
 	u64 wpindex;
 
-	/* if 0 parameters, clear all */
-	if (params.empty())
+	if (params.empty()) // if no parameters, clear all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
-			device.debug()->watchpoint_enable_all(ref);
-		if (ref == 0)
+			device.debug()->watchpoint_enable_all(enable);
+		if (!enable)
 			m_console.printf("Disabled all watchpoints\n");
 		else
 			m_console.printf("Enabled all watchpoints\n");
 	}
-
-	/* otherwise, clear the specific one */
-	else if (!validate_number_parameter(params[0], wpindex))
+	else if (!validate_number_parameter(params[0], wpindex)) // otherwise, clear the specific one
+	{
 		return;
+	}
 	else
 	{
 		bool found = false;
 		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->watchpoint_enable(wpindex, ref))
+			if (device.debug()->watchpoint_enable(wpindex, enable))
 				found = true;
 		if (found)
-			m_console.printf("Watchpoint %X %s\n", u32(wpindex), ref ? "enabled" : "disabled");
+			m_console.printf("Watchpoint %X %s\n", u32(wpindex), enable ? "enabled" : "disabled");
 		else
 			m_console.printf("Invalid watchpoint number %X\n", u32(wpindex));
 	}
@@ -1897,7 +1900,7 @@ void debugger_commands::execute_wpdisenable(int ref, const std::vector<std::stri
     command
 -------------------------------------------------*/
 
-void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_wplist(const std::vector<std::string> &params)
 {
 	int printed = 0;
 	std::string buffer;
@@ -1938,7 +1941,7 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
     command
 -------------------------------------------------*/
 
-void debugger_commands::execute_rpset(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_rpset(const std::vector<std::string> &params)
 {
 	// CPU is implicit
 	device_t *cpu;
@@ -1966,7 +1969,7 @@ void debugger_commands::execute_rpset(int ref, const std::vector<std::string> &p
     clear command
 -------------------------------------------------*/
 
-void debugger_commands::execute_rpclear(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_rpclear(const std::vector<std::string> &params)
 {
 	u64 rpindex;
 
@@ -2000,32 +2003,31 @@ void debugger_commands::execute_rpclear(int ref, const std::vector<std::string> 
     disable/enable commands
 -------------------------------------------------*/
 
-void debugger_commands::execute_rpdisenable(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_rpdisenable(bool enable, const std::vector<std::string> &params)
 {
 	u64 rpindex;
 
-	/* if 0 parameters, clear all */
-	if (params.empty())
+	if (params.empty()) // if no parameters, clear all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
-			device.debug()->registerpoint_enable_all(ref);
-		if (ref == 0)
+			device.debug()->registerpoint_enable_all(enable);
+		if (!enable)
 			m_console.printf("Disabled all registerpoints\n");
 		else
 			m_console.printf("Enabled all registeroints\n");
 	}
-
-	/* otherwise, clear the specific one */
-	else if (!validate_number_parameter(params[0], rpindex))
+	else if (!validate_number_parameter(params[0], rpindex)) // otherwise, clear the specific one
+	{
 		return;
+	}
 	else
 	{
 		bool found = false;
 		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->registerpoint_enable(rpindex, ref))
+			if (device.debug()->registerpoint_enable(rpindex, enable))
 				found = true;
 		if (found)
-			m_console.printf("Registerpoint %X %s\n", u32(rpindex), ref ? "enabled" : "disabled");
+			m_console.printf("Registerpoint %X %s\n", u32(rpindex), enable ? "enabled" : "disabled");
 		else
 			m_console.printf("Invalid registerpoint number %X\n", u32(rpindex));
 	}
@@ -2037,7 +2039,7 @@ void debugger_commands::execute_rpdisenable(int ref, const std::vector<std::stri
     command
 -------------------------------------------------*/
 
-void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_rplist(const std::vector<std::string> &params)
 {
 	int printed = 0;
 	std::string buffer;
@@ -2068,7 +2070,7 @@ void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &
     execute_statesave - execute the statesave command
 -------------------------------------------------*/
 
-void debugger_commands::execute_statesave(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_statesave(const std::vector<std::string> &params)
 {
 	const std::string &filename(params[0]);
 	m_machine.immediate_save(filename.c_str());
@@ -2080,7 +2082,7 @@ void debugger_commands::execute_statesave(int ref, const std::vector<std::string
     execute_stateload - execute the stateload command
 -------------------------------------------------*/
 
-void debugger_commands::execute_stateload(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_stateload(const std::vector<std::string> &params)
 {
 	const std::string &filename(params[0]);
 	m_machine.immediate_load(filename.c_str());
@@ -2099,7 +2101,7 @@ void debugger_commands::execute_stateload(int ref, const std::vector<std::string
     execute_rewind - execute the rewind command
 -------------------------------------------------*/
 
-void debugger_commands::execute_rewind(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_rewind(const std::vector<std::string> &params)
 {
 	bool success = m_machine.rewind_step();
 	if (success)
@@ -2118,13 +2120,13 @@ void debugger_commands::execute_rewind(int ref, const std::vector<std::string> &
     execute_save - execute the save command
 -------------------------------------------------*/
 
-void debugger_commands::execute_save(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_save(int spacenum, const std::vector<std::string> &params)
 {
 	u64 offset, endoffset, length;
 	address_space *space;
 
 	// validate parameters
-	if (!validate_target_address_parameter(params[1], ref, space, offset))
+	if (!validate_target_address_parameter(params[1], spacenum, space, offset))
 		return;
 	if (!validate_number_parameter(params[2], length))
 		return;
@@ -2205,7 +2207,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
     execute_saveregion - execute the save command on region memory
 -------------------------------------------------*/
 
-void debugger_commands::execute_saveregion(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_saveregion(const std::vector<std::string> &params)
 {
 	u64 offset, length;
 	memory_region *region;
@@ -2244,13 +2246,13 @@ void debugger_commands::execute_saveregion(int ref, const std::vector<std::strin
     execute_load - execute the load command
 -------------------------------------------------*/
 
-void debugger_commands::execute_load(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_load(int spacenum, const std::vector<std::string> &params)
 {
 	u64 offset, endoffset, length = 0;
 	address_space *space;
 
 	// validate parameters
-	if (!validate_target_address_parameter(params[1], ref, space, offset))
+	if (!validate_target_address_parameter(params[1], spacenum, space, offset))
 		return;
 	if (params.size() > 2 && !validate_number_parameter(params[2], length))
 		return;
@@ -2351,7 +2353,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
     execute_loadregion - execute the load command on region memory
 -------------------------------------------------*/
 
-void debugger_commands::execute_loadregion(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_loadregion(const std::vector<std::string> &params)
 {
 	u64 offset, length;
 	memory_region *region;
@@ -2399,12 +2401,12 @@ void debugger_commands::execute_loadregion(int ref, const std::vector<std::strin
     execute_dump - execute the dump command
 -------------------------------------------------*/
 
-void debugger_commands::execute_dump(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_dump(int spacenum, const std::vector<std::string> &params)
 {
 	// validate parameters
 	address_space *space;
 	u64 offset;
-	if (!validate_target_address_parameter(params[1], ref, space, offset))
+	if (!validate_target_address_parameter(params[1], spacenum, space, offset))
 		return;
 
 	u64 length;
@@ -2560,7 +2562,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 //  execute_strdump - execute the strdump command
 //-------------------------------------------------
 
-void debugger_commands::execute_strdump(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_strdump(int spacenum, const std::vector<std::string> &params)
 {
 	// validate parameters
 	u64 offset;
@@ -2576,7 +2578,7 @@ void debugger_commands::execute_strdump(int ref, const std::vector<std::string> 
 		return;
 
 	address_space *space;
-	if (!validate_device_space_parameter((params.size() > 4) ? params[4] : std::string_view(), ref, space))
+	if (!validate_device_space_parameter((params.size() > 4) ? params[4] : std::string_view(), spacenum, space))
 		return;
 
 	// further validation
@@ -2732,10 +2734,11 @@ void debugger_commands::execute_strdump(int ref, const std::vector<std::string> 
 
 
 /*-------------------------------------------------
-   execute_cheatinit - initialize the cheat system
+   execute_cheatrange - add a range to search for
+   cheats
 -------------------------------------------------*/
 
-void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_cheatrange(bool init, const std::vector<std::string> &params)
 {
 	cheat_region_map cheat_region[100];
 	memset(cheat_region, 0, sizeof(cheat_region));
@@ -2745,14 +2748,14 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
 	if (!validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), -1, space))
 		return;
 
-	if (ref == 0)
+	if (init)
 	{
 		m_cheat.width = 1;
 		m_cheat.signed_cheat = false;
 		m_cheat.swapped_cheat = false;
 		if (!params.empty())
 		{
-			char *srtpnt = (char*)params[0].c_str();
+			char const *srtpnt = params[0].c_str();
 
 			char sspec = std::tolower((unsigned char)*srtpnt);
 			if (sspec == 's')
@@ -2813,9 +2816,9 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
 	{
 		// validate parameters
 		u64 offset;
-		if (!validate_number_parameter(params[(ref == 0) ? 1 : 0], offset))
+		if (!validate_number_parameter(params[init ? 1 : 0], offset))
 			return;
-		if (!validate_number_parameter(params[(ref == 0) ? 2 : 1], length))
+		if (!validate_number_parameter(params[init ? 2 : 1], length))
 			return;
 
 		// force region to the specified range
@@ -2841,7 +2844,7 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
 	}
 
 	u32 active_cheat = 0;
-	if (ref == 0)
+	if (init)
 	{
 		// initialize new cheat system
 		m_cheat.cheatmap.resize(real_length);
@@ -2887,7 +2890,7 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
     execute_cheatnext - execute the search
 -------------------------------------------------*/
 
-void debugger_commands::execute_cheatnext(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_cheatnext(bool initial, const std::vector<std::string> &params)
 {
 	enum
 	{
@@ -2958,7 +2961,7 @@ void debugger_commands::execute_cheatnext(int ref, const std::vector<std::string
 		if (m_cheat.cheatmap[cheatindex].state == 1)
 		{
 			u64 cheat_value = cheat_read_extended(&m_cheat, *space, m_cheat.cheatmap[cheatindex].offset);
-			u64 comp_byte = (ref == 0) ? m_cheat.cheatmap[cheatindex].previous_value : m_cheat.cheatmap[cheatindex].first_value;
+			u64 comp_byte = !initial ? m_cheat.cheatmap[cheatindex].previous_value : m_cheat.cheatmap[cheatindex].first_value;
 			u8 disable_byte = false;
 
 			switch (condition)
@@ -3052,7 +3055,7 @@ void debugger_commands::execute_cheatnext(int ref, const std::vector<std::string
 		}
 
 	if (active_cheat <= 5)
-		execute_cheatlist(0, std::vector<std::string>());
+		execute_cheatlist(std::vector<std::string>());
 
 	m_console.printf("%u cheats found\n", active_cheat);
 }
@@ -3062,7 +3065,7 @@ void debugger_commands::execute_cheatnext(int ref, const std::vector<std::string
     execute_cheatlist - show a list of active cheat
 -------------------------------------------------*/
 
-void debugger_commands::execute_cheatlist(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_cheatlist(const std::vector<std::string> &params)
 {
 	if (m_cheat.cpu[0] == 0)
 	{
@@ -3147,7 +3150,7 @@ void debugger_commands::execute_cheatlist(int ref, const std::vector<std::string
     execute_cheatundo - undo the last search
 -------------------------------------------------*/
 
-void debugger_commands::execute_cheatundo(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_cheatundo(const std::vector<std::string> &params)
 {
 	if (m_cheat.undo > 0)
 	{
@@ -3174,13 +3177,13 @@ void debugger_commands::execute_cheatundo(int ref, const std::vector<std::string
     execute_find - execute the find command
 -------------------------------------------------*/
 
-void debugger_commands::execute_find(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_find(int spacenum, const std::vector<std::string> &params)
 {
 	u64 offset, length;
 	address_space *space;
 
 	// validate parameters
-	if (!validate_target_address_parameter(params[0], ref, space, offset))
+	if (!validate_target_address_parameter(params[0], spacenum, space, offset))
 		return;
 	if (!validate_number_parameter(params[1], length))
 		return;
@@ -3300,13 +3303,13 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 //  execute_fill - execute the fill command
 //-------------------------------------------------
 
-void debugger_commands::execute_fill(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_fill(int spacenum, const std::vector<std::string> &params)
 {
 	u64 offset, length;
 	address_space *space;
 
 	// validate parameters
-	if (!validate_target_address_parameter(params[0], ref, space, offset))
+	if (!validate_target_address_parameter(params[0], spacenum, space, offset))
 		return;
 	if (!validate_number_parameter(params[1], length))
 		return;
@@ -3405,7 +3408,7 @@ void debugger_commands::execute_fill(int ref, const std::vector<std::string> &pa
     execute_dasm - execute the dasm command
 -------------------------------------------------*/
 
-void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 {
 	u64 offset, length, bytes = 1;
 	address_space *space;
@@ -3502,7 +3505,7 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
     trace over and trace info
 -------------------------------------------------*/
 
-void debugger_commands::execute_trace_internal(int ref, const std::vector<std::string> &params, bool trace_over)
+void debugger_commands::execute_trace_internal(const std::vector<std::string> &params, bool trace_over)
 {
 	const char *action = nullptr;
 	bool detect_loops = true;
@@ -3573,9 +3576,9 @@ void debugger_commands::execute_trace_internal(int ref, const std::vector<std::s
     execute_trace - execute the trace command
 -------------------------------------------------*/
 
-void debugger_commands::execute_trace(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_trace(const std::vector<std::string> &params)
 {
-	execute_trace_internal(ref, params, false);
+	execute_trace_internal(params, false);
 }
 
 
@@ -3583,9 +3586,9 @@ void debugger_commands::execute_trace(int ref, const std::vector<std::string> &p
     execute_traceover - execute the trace over command
 -------------------------------------------------*/
 
-void debugger_commands::execute_traceover(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_traceover(const std::vector<std::string> &params)
 {
-	execute_trace_internal(ref, params, true);
+	execute_trace_internal(params, true);
 }
 
 
@@ -3593,7 +3596,7 @@ void debugger_commands::execute_traceover(int ref, const std::vector<std::string
     execute_traceflush - execute the trace flush command
 -------------------------------------------------*/
 
-void debugger_commands::execute_traceflush(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_traceflush(const std::vector<std::string> &params)
 {
 	m_machine.debugger().cpu().flush_traces();
 }
@@ -3603,7 +3606,7 @@ void debugger_commands::execute_traceflush(int ref, const std::vector<std::strin
     execute_history - execute the history command
 -------------------------------------------------*/
 
-void debugger_commands::execute_history(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_history(const std::vector<std::string> &params)
 {
 	// validate parameters
 	address_space *space;
@@ -3654,7 +3657,7 @@ void debugger_commands::execute_history(int ref, const std::vector<std::string> 
     execute_trackpc - execute the trackpc command
 -------------------------------------------------*/
 
-void debugger_commands::execute_trackpc(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_trackpc(const std::vector<std::string> &params)
 {
 	// Gather the on/off switch (if present)
 	bool turnOn = true;
@@ -3703,7 +3706,7 @@ void debugger_commands::execute_trackpc(int ref, const std::vector<std::string> 
     execute_trackmem - execute the trackmem command
 -------------------------------------------------*/
 
-void debugger_commands::execute_trackmem(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_trackmem(const std::vector<std::string> &params)
 {
 	// Gather the on/off switch (if present)
 	bool turnOn = true;
@@ -3741,7 +3744,7 @@ void debugger_commands::execute_trackmem(int ref, const std::vector<std::string>
     execute_pcatmem - execute the pcatmem command
 -------------------------------------------------*/
 
-void debugger_commands::execute_pcatmem(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::string> &params)
 {
 	// Gather the required address parameter
 	u64 address;
@@ -3758,7 +3761,7 @@ void debugger_commands::execute_pcatmem(int ref, const std::vector<std::string> 
 
 	// Get the address space for the given cpu
 	address_space *space;
-	if (!validate_device_space_parameter(cpuparam, ref, space))
+	if (!validate_device_space_parameter(cpuparam, spacenum, space))
 		return;
 
 	// Translate the address
@@ -3792,8 +3795,7 @@ void debugger_commands::execute_pcatmem(int ref, const std::vector<std::string> 
 	}
 
 	// Recover the pc & print
-	const int space_num = (int)ref;
-	const offs_t result = space->device().debug()->track_mem_pc_from_space_address_data(space_num, address, data);
+	const offs_t result = space->device().debug()->track_mem_pc_from_space_address_data(spacenum, address, data);
 	if (result != (offs_t)(-1))
 		m_console.printf("%02x\n", result);
 	else
@@ -3805,7 +3807,7 @@ void debugger_commands::execute_pcatmem(int ref, const std::vector<std::string> 
     execute_snap - execute the snapshot command
 -------------------------------------------------*/
 
-void debugger_commands::execute_snap(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_snap(const std::vector<std::string> &params)
 {
 	/* if no params, use the default behavior */
 	if (params.empty())
@@ -3851,7 +3853,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
     execute_source - execute the source command
 -------------------------------------------------*/
 
-void debugger_commands::execute_source(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_source(const std::vector<std::string> &params)
 {
 	m_console.source_script(params[0].c_str());
 }
@@ -3861,12 +3863,12 @@ void debugger_commands::execute_source(int ref, const std::vector<std::string> &
     execute_map - execute the map command
 -------------------------------------------------*/
 
-void debugger_commands::execute_map(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_map(int spacenum, const std::vector<std::string> &params)
 {
 	// validate parameters
 	u64 address;
 	address_space *space;
-	if (!validate_target_address_parameter(params[0], ref, space, address))
+	if (!validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
 
 	// do the translation first
@@ -3894,7 +3896,7 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
     execute_memdump - execute the memdump command
 -------------------------------------------------*/
 
-void debugger_commands::execute_memdump(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_memdump(const std::vector<std::string> &params)
 {
 	FILE *file;
 	const char *filename;
@@ -3907,7 +3909,8 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 	if (file)
 	{
 		memory_interface_enumerator iter(m_machine.root_device());
-		for (device_memory_interface &memory : iter) {
+		for (device_memory_interface &memory : iter)
+		{
 			for (int space = 0; space != memory.max_space_count(); space++)
 				if (memory.has_space(space))
 				{
@@ -3946,7 +3949,7 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
     execute_symlist - execute the symlist command
 -------------------------------------------------*/
 
-void debugger_commands::execute_symlist(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_symlist(const std::vector<std::string> &params)
 {
 	const char *namelist[1000];
 	symbol_table *symtable;
@@ -4008,7 +4011,7 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
     execute_softreset - execute the softreset command
 -------------------------------------------------*/
 
-void debugger_commands::execute_softreset(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_softreset(const std::vector<std::string> &params)
 {
 	m_machine.schedule_soft_reset();
 }
@@ -4018,7 +4021,7 @@ void debugger_commands::execute_softreset(int ref, const std::vector<std::string
     execute_hardreset - execute the hardreset command
 -------------------------------------------------*/
 
-void debugger_commands::execute_hardreset(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_hardreset(const std::vector<std::string> &params)
 {
 	m_machine.schedule_hard_reset();
 }
@@ -4028,7 +4031,7 @@ void debugger_commands::execute_hardreset(int ref, const std::vector<std::string
     mounted files
 -------------------------------------------------*/
 
-void debugger_commands::execute_images(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_images(const std::vector<std::string> &params)
 {
 	image_interface_enumerator iter(m_machine.root_device());
 	for (device_image_interface &img : iter)
@@ -4041,7 +4044,7 @@ void debugger_commands::execute_images(int ref, const std::vector<std::string> &
     execute_mount - execute the image mount command
 -------------------------------------------------*/
 
-void debugger_commands::execute_mount(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_mount(const std::vector<std::string> &params)
 {
 	bool done = false;
 	for (device_image_interface &img : image_interface_enumerator(m_machine.root_device()))
@@ -4064,7 +4067,7 @@ void debugger_commands::execute_mount(int ref, const std::vector<std::string> &p
     execute_unmount - execute the image unmount command
 -------------------------------------------------*/
 
-void debugger_commands::execute_unmount(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_unmount(const std::vector<std::string> &params)
 {
 	bool done = false;
 	for (device_image_interface &img : image_interface_enumerator(m_machine.root_device()))
@@ -4087,7 +4090,7 @@ void debugger_commands::execute_unmount(int ref, const std::vector<std::string> 
     natural keyboard input
 -------------------------------------------------*/
 
-void debugger_commands::execute_input(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_input(const std::vector<std::string> &params)
 {
 	m_machine.natkeyboard().post_coded(params[0].c_str());
 }
@@ -4098,7 +4101,7 @@ void debugger_commands::execute_input(int ref, const std::vector<std::string> &p
     keyboard codes
 -------------------------------------------------*/
 
-void debugger_commands::execute_dumpkbd(int ref, const std::vector<std::string> &params)
+void debugger_commands::execute_dumpkbd(const std::vector<std::string> &params)
 {
 	// was there a file specified?
 	const char *filename = !params.empty() ? params[0].c_str() : nullptr;

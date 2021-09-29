@@ -173,9 +173,9 @@ protected:
 	bitmap_argb32 m_log_bitmap;
 
 	void debug_init();
-	void debug_commands(int ref, const std::vector<std::string> &params);
-	void debug_help_command(int ref, const std::vector<std::string> &params);
-	void debug_png_dma_command(int ref, const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
+	void debug_help_command(const std::vector<std::string> &params);
+	void debug_png_dma_command(const std::vector<std::string> &params);
 	void log_bitmap(int command, int bpp, bool skip);
 };
 

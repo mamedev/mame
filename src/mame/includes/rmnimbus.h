@@ -252,8 +252,8 @@ private:
 	void decode_dssi_f_plonk_char(uint16_t ds, uint16_t si, uint8_t raw_flag);
 	void decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si, uint8_t raw_flag);
 
-	void debug_command(int ref, const std::vector<std::string> &params);
-	void video_debug(int ref, const std::vector<std::string> &params);
+	void debug_command(const std::vector<std::string> &params);
+	void video_debug(const std::vector<std::string> &params);
 };
 
 #endif // MAME_INCLUDES_RMNIMBUS_H
