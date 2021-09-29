@@ -145,12 +145,13 @@ void kim1_state::mem_map(address_map &map)
 
 INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
 {
-	// RS and ST key input
+	// RS key input
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER(kim1_state::trigger_nmi)
 {
+	// ST key input
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
