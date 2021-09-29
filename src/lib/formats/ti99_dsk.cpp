@@ -49,7 +49,6 @@
 
 #include <cstring>
 #include <ctime>
-#include <cassert>
 #include <iomanip>
 
 #define SECTOR_SIZE 256

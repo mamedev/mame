@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "dsk_dsk.h"
+#include "flopimg_legacy.h"
 #include "imageutl.h"
 
 #include "ioprocs.h"

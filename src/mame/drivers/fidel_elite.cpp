@@ -62,10 +62,10 @@ uninteresting to emulate as separate drivers.
 #include "bus/generic/slot.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "machine/clock.h"
 #include "machine/i8255.h"
-#include "machine/sensorboard.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "sound/s14001a.h"
 #include "video/pwm.h"
@@ -90,7 +90,6 @@ class elite_state : public fidel_clockdiv_state
 public:
 	elite_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidel_clockdiv_state(mconfig, type, tag),
-		m_irq_on(*this, "irq_on"),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
 		m_board(*this, "board"),
@@ -117,7 +116,6 @@ protected:
 	void set_cpu_freq();
 
 	// devices/pointers
-	required_device<timer_device> m_irq_on;
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
@@ -131,10 +129,6 @@ protected:
 	// address maps
 	void eas_map(address_map &map);
 	void pc_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -469,10 +463,9 @@ void elite_state::pc(machine_config &config)
 	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::pc_map);
 
-	const attotime irq_period = attotime::from_hz(38.4_kHz_XTAL/64); // through 4060 IC, 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(elite_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
-	TIMER(config, "irq_off").configure_periodic(FUNC(elite_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
+	irq_clock.set_pulse_width(attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

@@ -10,8 +10,11 @@
 */
 
 #include "imghd.h"
-#include "imgtool.h"
+#include "library.h"
+#include "stream.h"
+
 #include "harddisk.h"
+#include "opresolv.h"
 
 
 static imgtoolerr_t map_chd_error(std::error_condition chderr)

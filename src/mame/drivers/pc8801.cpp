@@ -25,29 +25,17 @@
       probably others (does bus have an actual codename or just "PC-8801 bus"?);
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks
       the floppy ports. Wrong info or check for external board anyway?
-    - fix "jumps" in mouse support pointer (noticeable in Balance of Power);
+    - fix "jumps" in PC-8872 mouse pointer (noticeable in balpower);
 
-    per-game specific TODO:
-    - 100yen Soft 8 Revival Special: tight loop with vblank bit, but vblank irq takes too much time to execute its code;
-    - 177: gameplay is too fast (parent pc8801 only);
-    - 1942: missing sound, enables a masked irq;
-    - Acro Jet: hangs waiting for an irq (floppy issue);
-    - Arcus: doesn't surpass Wolf Team logo;
-    - Advanced Fantasian: garbage during gameplay (floppy?)
-    - American Success: reads the light pen?
-    - Attacker: resets after a bunch of animation frames;
-    - Balance of Power: uses the SIO port for something ...
+    per-game specific TODO (move to XML):
     - Belloncho Shintai Kensa: hangs
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "sono kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
-    - Boukenshatachi: dies after the intro.
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
-    - Carigraph: inputs doesn't work?
     - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
     - Can Can Bunny: no sound (regression);
     - Can Can Bunny Superior: black screen during the intro
     - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
-    - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Cranston Manor (actually N88-Basic demo): no sound
     - Datenshi Kyouko: gfx garbage on the right edge?
     - Final Crisis: sound stuck with OPNA?
@@ -56,10 +44,7 @@
     - Gaudi - Barcelona no Kaze: fails PCM loading
     - GeGeGe no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
     - Grobda: palette is ugly (parent pc8801 only);
-    - Makaimura: after losing a life the game doesn't work properly anymore, copy protection?
     - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
-    - N-BASIC: cursor doesn't show up;
-    - The Return of Ishtar: z80 exception after entering the name.
     - Star Cruiser: bad kanji data?
     - Star Cruiser: reads at i/o 0x8e?
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
@@ -120,11 +105,6 @@
     - Fruit Panic
     - FSD Sample Ongaku Shuu Vol. 1-7
     - Gaia no Kiba (Disk I/O error at 150)
-    - Gaiflame
-    - Gambler Jiko Chuushin ha
-    - Gambler Jiko Chuushin ha 2
-    - Gambler Jiko Chuushin ha 3
-    - Gambler Jiko Chuushin ha 3 (demo)
     - Gambler Jiko Chuushin ha Mahjong Puzzle Collection
     - Gambler Jiko Chuushin ha Mahjong Puzzle Collection (demo)
     * Game Music Library
@@ -142,14 +122,12 @@
     * MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     * Mugen Senshi Valis (at Telenet logo, it also appears to have a nasty copy protection when taking a specific item (untested))
     - Mr. Pro Yakyuu
-    - Panorama Toh
     - PC-8034 (app)
     - PC-8037SR (app)
     - P1 (app)
     - Pattern Editor 88 (app)
     - Super Shunbo II (app) (Load error)
     - Super TII (app)
-    * The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
     list of games that doesn't like i8214_irq_level == 5 in sound irq
@@ -360,6 +338,8 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 
 void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
+	// TODO: jettermi really masks the color attribute from 3301
+	// (we currently draw it in b&w, should be colorized)
 	uint32_t count = 0;
 	uint8_t color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
 	uint8_t is_cursor = 0;
@@ -803,9 +783,7 @@ uint8_t pc8801_state::pc8801_mem_r(offs_t offset)
 
 		window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
-		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-			printf("Read from 0xf000 - 0xffff window offset\n"); //accessed by Castle Excellent, no noticeable quirk
-
+		// castlex and imenes accesses this
 		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 			return pc8801_high_wram_r(window_offset & 0xfff);
 
@@ -864,9 +842,9 @@ void pc8801_state::pc8801_mem_w(offs_t offset, uint8_t data)
 
 			window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
-			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-				printf("Write to 0xf000 - 0xffff window offset\n"); //accessed by Castle Excellent, no noticeable quirk
-
+			// castlex and imenes accesses this
+			// TODO: high TVRAM even
+			// (uPD3301 reads from this instead of the regular work RAM)
 			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				pc8801_high_wram_w(window_offset & 0xfff,data);
 			else
@@ -1117,6 +1095,20 @@ void pc8801_state::pc8801_window_bank_inc_w(uint8_t data)
 	m_window_offset_bank&=0xff;
 }
 
+/*
+ * I/O Port $32 (R/W)
+ *
+ * x--- ---- sound irq mask (0) irq enabled (1) irq masked
+ * -x-- ---- Graphic VRAM access mode (0) independent access mode (1) ALU mode
+ * --x- ---- analog (1) / digital (0) palette select
+ * ---x ---- high speed RAM select (for TVRAM) (1) main RAM bank (0) dedicated Text RAM
+ * ---- xx-- Screen output mode
+ * ---- 00-- TV / video mode
+ * ---- 01-- None (as in disabling the screen entirely?)
+ * ---- 10-- Analog RGB mode
+ * ---- 11-- Optional mode
+ * ---- --xx internal EROM selection
+ */
 uint8_t pc8801_state::pc8801_misc_ctrl_r()
 {
 	return m_misc_ctrl;
@@ -1124,11 +1116,6 @@ uint8_t pc8801_state::pc8801_misc_ctrl_r()
 
 void pc8801_state::pc8801_misc_ctrl_w(uint8_t data)
 {
-	/*
-	x--- ---- sound irq mask, active low
-	--x- ---- analog (1) / digital (0) palette select
-	*/
-
 	m_misc_ctrl = data;
 
 	#if USE_PROPER_I8214
@@ -1182,6 +1169,7 @@ void pc8801_state::pc8801_palram_w(offs_t offset, uint8_t data)
 	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
 	// Preserve content? Translation? Undefined?
 	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
+	// TODO: at least analog mode can do rasters
 }
 
 void pc8801_state::pc8801_layer_masking_w(uint8_t data)
@@ -1472,7 +1460,7 @@ uint8_t pc8801_state::pc8801_sound_board_r(offs_t offset)
 void pc8801_state::pc8801_sound_board_w(offs_t offset, uint8_t data)
 {
 	if(m_has_opna)
-		m_opna->write(offset,data);
+		m_opna->write(offset, data);
 	else if((offset & 2) == 0)
 		m_opn->write(offset, data);
 }
@@ -1590,95 +1578,7 @@ void pc8801_state::pc8801_io(address_map &map)
 //  map(0xf3, 0xf3).noprw();                                     /* DMA floppy (unknown) */
 //  map(0xf4, 0xf7).noprw();                                     /* DMA 5'floppy (may be not released) */
 //  map(0xf8, 0xfb).noprw();                                     /* DMA 8'floppy (unknown) */
-	map(0xfc, 0xff).rw("d8255_master", FUNC(i8255_device::read), FUNC(i8255_device::write));
-}
-
-uint8_t pc8801_state::cpu_8255_c_r()
-{
-//  machine().scheduler().synchronize(); // force resync
-
-	return m_i8255_1_pc >> 4;
-}
-
-void pc8801_state::cpu_8255_c_w(uint8_t data)
-{
-//  machine().scheduler().synchronize(); // force resync
-
-	m_i8255_0_pc = data;
-}
-
-
-uint8_t pc8801_state::fdc_8255_c_r()
-{
-//  machine().scheduler().synchronize(); // force resync
-
-	return m_i8255_0_pc >> 4;
-}
-
-void pc8801_state::fdc_8255_c_w(uint8_t data)
-{
-//  machine().scheduler().synchronize(); // force resync
-
-	m_i8255_1_pc = data;
-}
-
-void pc8801_state::pc8801fdc_mem(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x7fff).ram();
-}
-
-TIMER_CALLBACK_MEMBER(pc8801_state::pc8801fd_upd765_tc_to_zero)
-{
-	// TODO: holein1 explictly reads TC port at PC=504e followed by an HALT opcode, failing to boot
-	// is this gonna unbreak HALT state too?
-	m_fdc->tc_w(false);
-}
-
-void pc8801_state::upd765_mc_w(uint8_t data)
-{
-	m_fdd[0]->get_device()->mon_w(!(data & 1));
-	m_fdd[1]->get_device()->mon_w(!(data & 2));
-}
-
-uint8_t pc8801_state::upd765_tc_r()
-{
-	//printf("%04x 1\n",m_fdccpu->pc());
-
-	if (!machine().side_effects_disabled())
-	{
-		m_fdc->tc_w(true);
-		//TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-		//OTOH, 50 seems more than enough for the new upd...
-		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
-	}
-	return 0xff; // value is meaningless
-}
-
-void pc8801_state::fdc_irq_vector_w(uint8_t data)
-{
-	popmessage("Write to FDC IRQ vector I/O %02x, contact MESSdev\n",data);
-	m_fdc_irq_opcode = data;
-}
-
-void pc8801_state::fdc_drive_mode_w(uint8_t data)
-{
-	logerror("FDC drive mode %02x\n", data);
-	m_fdd[0]->get_device()->set_rpm(data & 0x01 ? 360 : 300);
-	m_fdd[1]->get_device()->set_rpm(data & 0x02 ? 360 : 300);
-
-	m_fdc->set_rate(data & 0x20 ? 500000 : 250000);
-}
-
-void pc8801_state::pc8801fdc_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(pc8801_state::fdc_irq_vector_w)); // Interrupt Opcode Port
-	map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
-	map(0xf7, 0xf7).nopw(); // printer port output
-	map(0xf8, 0xf8).rw(FUNC(pc8801_state::upd765_tc_r), FUNC(pc8801_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
-	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
-	map(0xfc, 0xff).rw("d8255_slave", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
 void pc8801_state::opna_map(address_map &map)
@@ -2005,12 +1905,6 @@ static GFXDECODE_START( gfx_pc8801 )
 	GFXDECODE_ENTRY( "kanji", 0, kanji_layout, 0, 8 )
 GFXDECODE_END
 
-/* Floppy Configuration */
-
-static void pc88_floppies(device_slot_interface &device)
-{
-	device.option_add("525hd", FLOPPY_525_HD);
-}
 
 #if 0
 /* Cassette Configuration */
@@ -2164,10 +2058,6 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 
 void pc8801_state::machine_start()
 {
-	m_fdd[0]->get_device()->set_rpm(300);
-	m_fdd[1]->get_device()->set_rpm(300);
-	m_fdc->set_rate(250000);
-
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
@@ -2203,10 +2093,7 @@ void pc8801_state::machine_reset()
 
 //  pc8801_dynamic_res_change(machine());
 
-	m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 	m_mouse.phase = 0;
-
-	m_fdccpu->set_input_line_vector(0, 0); // Z80
 
 	{
 		m_txt_color = 2;
@@ -2277,7 +2164,8 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 	m_clock_setting = ioport("CFG")->read() & 0x80;
 
 	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
-	m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000)); // correct?
+	// TODO: FDC board shouldn't be connected to the clock setting, verify
+//  m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
 	m_baudrate_val = 0;
 }
 
@@ -2348,28 +2236,11 @@ void pc8801_state::pc8801(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::pc8801_vrtc_irq));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::pc8801_irq_callback));
 
-	/* sub CPU(5 inch floppy drive) */
-	Z80(config, m_fdccpu, MASTER_CLOCK);       /* 4 MHz */
-	m_fdccpu->set_addrmap(AS_PROGRAM, &pc8801_state::pc8801fdc_mem);
-	m_fdccpu->set_addrmap(AS_IO, &pc8801_state::pc8801fdc_io);
-
-	//config.set_maximum_quantum(attotime::from_hz(300000));
+	PC80S31(config, m_pc80s31, MASTER_CLOCK);
 	config.set_perfect_quantum(m_maincpu);
+	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
-	i8255_device &d8255_master(I8255(config, "d8255_master"));
-	d8255_master.in_pa_callback().set("d8255_slave", FUNC(i8255_device::pb_r));
-	d8255_master.in_pb_callback().set("d8255_slave", FUNC(i8255_device::pa_r));
-	d8255_master.in_pc_callback().set(FUNC(pc8801_state::cpu_8255_c_r));
-	d8255_master.out_pc_callback().set(FUNC(pc8801_state::cpu_8255_c_w));
-
-	i8255_device &d8255_slave(I8255(config, "d8255_slave"));
-	d8255_slave.in_pa_callback().set("d8255_master", FUNC(i8255_device::pb_r));
-	d8255_slave.in_pb_callback().set("d8255_master", FUNC(i8255_device::pa_r));
-	d8255_slave.in_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_r));
-	d8255_slave.out_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_w));
-
-	UPD765A(config, m_fdc, 8'000'000, true, true);
-	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, INPUT_LINE_IRQ0);
+//  config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
 
 	#if USE_PROPER_I8214
 	I8214(config, I8214_TAG, MASTER_CLOCK);
@@ -2386,9 +2257,8 @@ void pc8801_state::pc8801(machine_config &config)
 	i8251.txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	i8251.rts_handler().set(FUNC(pc8801_state::rxrdy_w));
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pc88_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pc88_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
-	SOFTWARE_LIST(config, "disk_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2431,21 +2301,27 @@ void pc8801_state::pc8801(machine_config &config)
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::pc8801_rtc_irq), attotime::from_hz(600));
 }
 
-void pc8801_state::pc8801fh(machine_config &config)
+void pc8801_state::pc8801mk2mr(machine_config &config)
 {
 	pc8801(config);
+	PC80S31K(config.replace(), m_pc80s31, MASTER_CLOCK);
+}
+
+void pc8801_state::pc8801fh(machine_config &config)
+{
+	pc8801mk2mr(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
 }
 
 void pc8801_state::pc8801ma(machine_config &config)
 {
-	pc8801(config);
+	pc8801fh(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
 }
 
 void pc8801_state::pc8801mc(machine_config &config)
 {
-	pc8801(config);
+	pc8801ma(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
 }
 
@@ -2456,9 +2332,6 @@ ROM_START( pc8801 )
 	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 1.0
 	ROM_LOAD( "n88.rom",   0x0000, 0x8000, CRC(ffd68be0) SHA1(3518193b8207bdebf22c1380c2db8c554baff329) )
 	ROM_LOAD( "n88_0.rom", 0x8000, 0x2000, CRC(61984bab) SHA1(d1ae642aed4f0584eeb81ff50180db694e5101d4) )
-
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
 
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF)
 	ROM_LOAD_OPTIONAL( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
@@ -2477,9 +2350,6 @@ ROM_START( pc8801mk2 )
 	ROM_LOAD( "m2_n88.rom",   0x0000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
 	ROM_LOAD( "m2_n88_0.rom", 0x8000, 0x2000, CRC(5eb7a8d0) SHA1(95a70af83b0637a5a0f05e31fb0452bb2cb68055) )
 
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
-
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF)
 	ROM_LOAD_OPTIONAL( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 
@@ -2497,13 +2367,6 @@ ROM_START( pc8801mk2sr )
 	ROM_LOAD( "n88_1.rom",       0xa000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
 	ROM_LOAD( "n88_2.rom",       0xc000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
 	ROM_LOAD( "n88_3.rom",       0xe000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
-
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
@@ -2524,13 +2387,6 @@ ROM_START( pc8801mk2fr )
 	ROM_LOAD( "m2fr_n88_2.rom", 0xc000, 0x2000, CRC(98c3a7b2) SHA1(fc4980762d3caa56964d0ae583424756f511d186) )
 	ROM_LOAD( "m2fr_n88_3.rom", 0xe000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
 
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "m2fr_disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
-
 	ROM_REGION( 0x40000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 
@@ -2548,13 +2404,6 @@ ROM_START( pc8801mk2mr )
 	ROM_LOAD( "m2mr_n88_1.rom", 0xa000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
 	ROM_LOAD( "m2mr_n88_2.rom", 0xc000, 0x2000, CRC(11176e0b) SHA1(f13f14f3d62df61498a23f7eb624e1a646caea45) )
 	ROM_LOAD( "m2mr_n88_3.rom", 0xe000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
-
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "m2mr_disk.rom", 0x0000, 0x2000, CRC(2447516b) SHA1(1492116f15c426f9796dc2bb6fcccf2656c0ca75) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom",      0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
@@ -2575,13 +2424,6 @@ ROM_START( pc8801mh )
 	ROM_LOAD( "mh_n88_2.rom", 0xc000, 0x2000, CRC(6aa6b6d8) SHA1(2a077ab444a4fd1470cafb06fd3a0f45420c39cc) )
 	ROM_LOAD( "mh_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "mh_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
-
 	ROM_REGION( 0x40000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "mh_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
@@ -2601,13 +2443,6 @@ ROM_START( pc8801fa )
 	ROM_LOAD( "fa_n88_2.rom", 0xc000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
 	ROM_LOAD( "fa_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "fa_disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
-
 	ROM_REGION( 0x40000, "kanji", 0 )
 	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "fa_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
@@ -2626,13 +2461,6 @@ ROM_START( pc8801ma ) // newer floppy BIOS and Jisyo (dictionary) ROM
 	ROM_LOAD( "ma_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
 	ROM_LOAD( "ma_n88_2.rom", 0xc000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
 	ROM_LOAD( "ma_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
-
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "ma_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "kanji", 0 )
 	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
@@ -2657,13 +2485,6 @@ ROM_START( pc8801ma2 )
 	ROM_LOAD( "ma2_n88_2.rom", 0xc000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
 	ROM_LOAD( "ma2_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "ma2_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
-
 	ROM_REGION( 0x40000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom",     0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "ma2_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
@@ -2686,15 +2507,8 @@ ROM_START( pc8801mc )
 	ROM_LOAD( "mc_n88_2.rom", 0xc000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
 	ROM_LOAD( "mc_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD( "mc_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
-
 	ROM_REGION( 0x10000, "cdrom", 0 )
 	ROM_LOAD( "cdbios.rom", 0x0000, 0x10000, CRC(5c230221) SHA1(6394a8a23f44ea35fcfc3e974cf940bc8f84d62a) )
-
-	/* No idea of the proper size: it has never been dumped */
-	ROM_REGION( 0x2000, "audiocpu", 0)
-	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "kanji", 0 )
 	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
@@ -2716,15 +2530,15 @@ COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc88sr, pc8801_state, empt
 COMP( 1985, pc8801mk2sr, pc8801, 0,      pc8801,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_NOT_WORKING )
 //COMP( 1985, pc8801mk2tr, pc8801, 0,      pc8801,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_NOT_WORKING )
 COMP( 1985, pc8801mk2fr, pc8801, 0,      pc8801,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2mr, pc8801, 0,      pc8801,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2mr, pc8801, 0,      pc8801mk2mr, pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,    0,      0,      pc8801,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
+//COMP( 1986, pc8801fh,    0,      0,      pc8801mk2fr,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
 COMP( 1986, pc8801mh,    pc8801, 0,      pc8801fh,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
 COMP( 1987, pc8801fa,    pc8801, 0,      pc8801fh,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
 COMP( 1987, pc8801ma,    pc8801, 0,      pc8801ma,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
-//COMP( 1988, pc8801fe,    pc8801, 0,      pc8801,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
+//COMP( 1988, pc8801fe,    pc8801, 0,      pc8801fa,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
 COMP( 1988, pc8801ma2,   pc8801, 0,      pc8801ma,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
-//COMP( 1989, pc8801fe2,   pc8801, 0,      pc8801,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
+//COMP( 1989, pc8801fe2,   pc8801, 0,      pc8801fa,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
 COMP( 1989, pc8801mc,    pc8801, 0,      pc8801mc,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
 
 //COMP( 1989, pc98do,      0,      0,      pc88va,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-98DO",       MACHINE_NOT_WORKING )

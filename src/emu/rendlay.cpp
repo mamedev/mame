@@ -4823,10 +4823,10 @@ int layout_view::item::get_anim_input() const
 //  get_interpolated_bounds - animated bounds
 //-------------------------------------------------
 
-void layout_view::item::get_interpolated_bounds(render_bounds &result) const
+render_bounds layout_view::item::get_interpolated_bounds() const
 {
 	assert(m_bounds.size() > 1U);
-	result = interpolate_bounds(m_bounds, m_get_anim_state());
+	return interpolate_bounds(m_bounds, m_get_anim_state());
 }
 
 
@@ -4834,10 +4834,10 @@ void layout_view::item::get_interpolated_bounds(render_bounds &result) const
 //  get_interpolated_color - animated color
 //-------------------------------------------------
 
-void layout_view::item::get_interpolated_color(render_color &result) const
+render_color layout_view::item::get_interpolated_color() const
 {
 	assert(m_color.size() > 1U);
-	result = interpolate_color(m_color, m_get_anim_state());
+	return interpolate_color(m_color, m_get_anim_state());
 }
 
 

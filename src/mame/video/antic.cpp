@@ -1227,16 +1227,14 @@ void antic_device::write(offs_t offset, uint8_t data)
 	case  2:
 		LOG("ANTIC 02 write DLISTL $%02X\n", data);
 		m_w.dlistl = data;
-		temp = (m_w.dlisth << 8) + m_w.dlistl;
-		m_dpage = temp & DPAGE;
-		m_doffs = temp & DOFFS;
+		m_doffs = (m_doffs & 0x300) | (data & 0xff);  // keep bits 9 and 8 of m_doffs
 		break;
 	case  3:
 		LOG("ANTIC 03 write DLISTH $%02X\n", data);
 		m_w.dlisth = data;
 		temp = (m_w.dlisth << 8) + m_w.dlistl;
 		m_dpage = temp & DPAGE;
-		m_doffs = temp & DOFFS;
+		m_doffs = (m_doffs & 0xff) | (temp & 0x300);  // keep bits 7 to 0 of m_doffs
 		break;
 	case  4:
 		if( data == m_w.hscrol )
@@ -1853,12 +1851,14 @@ void antic_device::linerefresh()
 		if( (m_cmd & 0x0f) == 2 || (m_cmd & 0x0f) == 3 )
 		{
 			artifacts_txt(src, (uint8_t*)(dst + 3), HCHARS);
+			draw_scanline8(*m_bitmap, 12, y, std::min(size_t(m_bitmap->width() - 12), sizeof(scanline)), (const uint8_t *) scanline, nullptr);
 			return;
 		}
 		else
 			if( (m_cmd & 0x0f) == 15 )
 			{
 				artifacts_gfx(src, (uint8_t*)(dst + 3), HCHARS);
+				draw_scanline8(*m_bitmap, 12, y, std::min(size_t(m_bitmap->width() - 12), sizeof(scanline)), (const uint8_t *) scanline, nullptr);
 				return;
 			}
 	}

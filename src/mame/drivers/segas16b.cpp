@@ -1332,44 +1332,6 @@ void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //**************************************************************************
 
 //-------------------------------------------------
-//  altbeast_common_i8751_sim - simulate the I8751
-//  from Altered Beast
-//-------------------------------------------------
-
-void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank)
-{
-	// signal a VBLANK to the main CPU
-	m_maincpu->set_input_line(4, HOLD_LINE);
-
-	// set tile banks
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int bank = m_workram[0x3094 / 2] & 0x00ff;
-	// alt_bank is used for the alt ROM loading (where there are space between the ROMs)
-	// alternatively the ROM loading could be changed, but the loading is correct for the non-mcu .b14/.a14 type
-	// board so presumably our MCU simulation should act accordingly.
-	if (alt_bank) bank = (bank & 0x1) | ((bank & 0xfe) << 1);
-
-	rom_5704_bank_w(space, 1, bank, 0x00ff);
-
-	// process any new sound data
-	uint16_t temp = m_workram[soundoffs];
-	if ((temp & 0xff00) != 0x0000)
-	{
-		m_mapper->write(0x03, temp >> 8);
-		m_workram[soundoffs] = temp & 0x00ff;
-	}
-
-	// read inputs
-	m_workram[inputoffs] = ~ioport("SERVICE")->read() << 8;
-}
-
-void segas16b_state::altbeasj_i8751_sim()
-{
-	altbeast_common_i8751_sim(0x30d4/2, 0x30d0/2, 1);
-}
-
-
-//-------------------------------------------------
 //  tturf_i8751_sim - simulate the I8751
 //  from Tough Turf
 //-------------------------------------------------
@@ -4677,6 +4639,9 @@ ROM_END
 //  Jyuohki (Altered Beast), Sega System 16B
 //  CPU: 68000 + i8751 (317-0077)
 //  ROM Board type: 171-5521
+//  Sega game ID: 833-6660-09 JYUOHKI
+//    Main board: 837-6662-06
+//     ROM board: 834-6661-09
 //
 ROM_START( altbeastj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -4713,7 +4678,7 @@ ROM_START( altbeastj )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0077.c2", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "317-0077.c2", 0x00000, 0x1000, CRC(eef80d68) SHA1(a932129a4e7ba9f813f0f46253940c90fac98d50) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "315-5298.b9",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) ) // PLS153
@@ -8006,7 +7971,7 @@ ROM_START( riotcity )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-14614.a10", 0x00000, 0x10000, CRC(c65cc69a) SHA1(28a75dd2085b8e1447fe4e6af210a54a6666fcb1) )
-	ROM_LOAD( "epr-14615.all", 0x10000, 0x20000, CRC(46653db1) SHA1(7a43d8742ee451d93bb5f1b0f4f261b274c3f0ef) )
+	ROM_LOAD( "epr-14615.a11", 0x10000, 0x20000, CRC(46653db1) SHA1(7a43d8742ee451d93bb5f1b0f4f261b274c3f0ef) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "315-5298.b9",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) ) // PLS153
@@ -9744,12 +9709,6 @@ void segas16b_state::init_aliensyn7_5358_small()
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-void segas16b_state::init_altbeasj_5521()
-{
-	init_generic_5521();
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeasj_i8751_sim, this);
-}
-
 void segas16b_state::init_altbeas4_5521()
 {
 	init_generic_5521();
@@ -9882,7 +9841,7 @@ GAME( 1986, afighterg,  afighter, system16b_fd1089b,     afighter, segas16b_stat
 GAME( 1986, afighterh,  afighter, system16b_fd1089a,     afighter, segas16b_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089A 317-0018)", 0 ) // same rev as afighterg
 
 GAME( 1988, altbeast,   0,        system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 8) (8751 317-0078)", 0 )
-GAME( 1988, altbeastj,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_altbeasj_5521,      ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
+GAME( 1988, altbeastj,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
 GAME( 1988, altbeast6,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 6) (8751 317-0076)", 0 )
 GAME( 1988, altbeast5,  altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 5) (FD1094 317-0069)", 0 )
 GAME( 1988, altbeast4,  altbeast, system16b_mc8123,      altbeast, segas16b_state, init_altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4) (MC-8123B 317-0066)", 0 )

@@ -38,7 +38,7 @@
     1.4 | 600020 (PAD) Partial add (exclusive or) MBR to AC
     1.4 | 600400 (SHR) Shift AC right once
     1.4 | 600600 (CYR) Cycle AC right once
-    1.7 | 600010 (CRY) Add carry digits to AC (according to LR)
+    1.7 | 600010 (CRY) Add carry digits to AC (according to MBR)
     1.8 | 603000 (HLT) Halt computer
 
     ANL and ORL were added in the first half of 1959 (M-5001-6).
@@ -72,7 +72,7 @@
     1.6 | 600400 (SHR) Shift AC right once
     1.6 | 600600 (CYR) Cycle AC right once
     1.6 | 607000 (SPF) Set PFR from MBR
-    1.7 | 600010 (CRY) Add carry digits to AC (according to LR)
+    1.7 | 600010 (CRY) Add carry digits to AC (according to MBR)
     1.8 | 600001 (MBX) Transfer MBR to XR
     1.8 | 603000 (HLT) Halt computer
 
@@ -119,7 +119,15 @@ offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		// Addressable instructions (only 3 in this version)
 		util::stream_format(stream, "%s %06o", s_addressable_insts[(inst & 0600000) >> 13], inst & 0177777);
 	}
-	else switch (inst)
+	else
+		dasm_opr(stream, inst);
+
+	return 1 | SUPPORTED;
+}
+
+void tx0_64kw_disassembler::dasm_opr(std::ostream &stream, u32 inst)
+{
+switch (inst)
 	{
 	case 0600012:
 		stream << "cry";
@@ -245,6 +253,10 @@ offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		stream << "clc";
 		break;
 
+	case 0740062:
+		stream << "lcc";
+		break;
+
 	case 0740200:
 		stream << "cal";
 		break;
@@ -274,6 +286,46 @@ offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			util::stream_format(stream, "ios %o", inst & 017777);
 		else
 			util::stream_format(stream, "opr %o", inst & 0177777);
+		break;
+	}
+}
+
+offs_t tx0_8kwo_disassembler::disassemble(std::ostream &stream, offs_t pc, const tx0_8kwo_disassembler::data_buffer &opcodes, const tx0_8kwo_disassembler::data_buffer &params)
+{
+	u32 inst = opcodes.r32(pc) & 0777777;
+
+	if (inst < 0600000)
+	{
+		// Addressable instructions (only 6 in this version)
+		if ((inst & 060000) != 0)
+			util::stream_format(stream, "%06o", inst);
+		else
+			util::stream_format(stream, "%s %05o", s_addressable_insts[(inst & 0700000) >> 13], inst & 017777);
+	}
+	else switch (inst)
+	{
+	case 0600105:
+		stream << "orl";
+		break;
+
+	case 0600125:
+		stream << "ora";
+		break;
+
+	case 0600305:
+		stream << "anl";
+		break;
+
+	case 0600325:
+		stream << "ana";
+		break;
+
+	case 0610000: case 0611000: case 0612000: case 0613000: case 0614000: case 0615000: case 0616000: case 0617000:
+		util::stream_format(stream, "ex%d", BIT(inst, 9, 3));
+		break;
+
+	default:
+		dasm_opr(stream, inst);
 		break;
 	}
 
@@ -309,10 +361,10 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	}
 	else
 	{
-		if ((inst & 037000) == 02000)
+		if ((inst & 0137020) == 0102020)
 		{
 			stream << "tbr";
-			if ((inst & 0100757) == 0)
+			if ((inst & 000757) == 0)
 				return 1 | SUPPORTED;
 			stream << 'U';
 		}
@@ -642,6 +694,10 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream << "alo";
 			break;
 
+		case 040227:
+			stream << "anl 20"; // no consistent mnemonic used in program macros
+			break;
+
 		case 040230:
 			stream << "all";
 			break;
@@ -660,6 +716,10 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		case 040247:
 			stream << "anlUcom";
+			break;
+
+		case 040250:
+			stream << "alrUamz";
 			break;
 
 		case 040260:
@@ -694,6 +754,10 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream << "clc";
 			break;
 
+		case 0100041:
+			stream << "clcUxro";
+			break;
+
 		case 0100062:
 			stream << "lcc";
 			break;
@@ -716,6 +780,18 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		case 0100200:
 			stream << "cal";
+			break;
+
+		case 0100201:
+			stream << "calUxro";
+			break;
+
+		case 0100212:
+			stream << "lalUlro";
+			break;
+
+		case 0100222:
+			stream << "lacUlro";
 			break;
 
 		case 0100240:

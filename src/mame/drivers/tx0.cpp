@@ -1612,6 +1612,31 @@ void tx0_state::tx0_64kw(machine_config &config)
 	SOFTWARE_LIST(config, "ptp_list").set_original("tx0_ptp").set_filter("64,OLDCODE");
 }
 
+void tx0_state::tx0_8kwo(machine_config &config)
+{
+	tx0_64kw(config);
+
+	/* basic machine hardware */
+	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
+	approximately 6usec) */
+	TX0_8KW_OLD(config.replace(), m_maincpu, 166667);
+	m_maincpu->cpy().set(FUNC(tx0_state::tx0_io_cpy));
+	m_maincpu->r1l().set(FUNC(tx0_state::tx0_io_r1l));
+	m_maincpu->dis().set(FUNC(tx0_state::tx0_io_dis));
+	m_maincpu->r3l().set(FUNC(tx0_state::tx0_io_r3l));
+	m_maincpu->prt().set(FUNC(tx0_state::tx0_io_prt));
+	m_maincpu->rsv().set_nop();
+	m_maincpu->p6h().set(FUNC(tx0_state::tx0_io_p6h));
+	m_maincpu->p7h().set(FUNC(tx0_state::tx0_io_p7h));
+	m_maincpu->sel().set(FUNC(tx0_state::tx0_sel));
+	m_maincpu->res().set(FUNC(tx0_state::tx0_io_reset_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_8kw_map);
+	/* dummy interrupt: handles input */
+	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
+
+	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8,OLDCODE");
+}
+
 void tx0_state::tx0_8kw(machine_config &config)
 {
 	tx0_64kw(config);
@@ -1642,6 +1667,11 @@ ROM_START(tx0_64kw)
 		/* space filled with our font */
 ROM_END
 
+ROM_START(tx0_8kwo)
+	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
+		/* space filled with our font */
+ROM_END
+
 ROM_START(tx0_8kw)
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
@@ -1653,6 +1683,7 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE      INIT      COMPANY  FULLNAME                                         FLAGS
-COMP( 1956, tx0_64kw, 0,        0,      tx0_64kw, tx0,   tx0_state, init_tx0, "MIT",   "TX-0 original demonstrator (64 kWords of RAM)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
-COMP( 1962, tx0_8kw,  tx0_64kw, 0,      tx0_8kw,  tx0,   tx0_state, init_tx0, "MIT",   "TX-0 upgraded system (8 kWords of RAM)",        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE      INIT      COMPANY  FULLNAME                                                  FLAGS
+COMP( 1956, tx0_64kw, tx0_8kw,  0,      tx0_64kw, tx0,   tx0_state, init_tx0, "MIT",   "TX-0 original demonstrator (64 kWords of RAM)",          MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+COMP( 1959, tx0_8kwo, tx0_8kw,  0,      tx0_8kwo, tx0,   tx0_state, init_tx0, "MIT",   "TX-0 upgraded system (8 kWords of RAM, old order code)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+COMP( 1962, tx0_8kw,  0,        0,      tx0_8kw,  tx0,   tx0_state, init_tx0, "MIT",   "TX-0 upgraded system (8 kWords of RAM, new order code)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)

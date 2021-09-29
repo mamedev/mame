@@ -171,7 +171,7 @@ Language:
 |   XX   | 80-084407(SP)     | Cars - Acelera el Motor en Radiador Springs                                               |
 +========+===================+===========================================================================================+
 |   XX   | 80-084420(US)     | Toy Story 3                                                                               |
-|        | 80-084421(US)     | Toy Story 3 (pocket version)                                                              |
+|   **   | 80-084421(US)     | Toy Story 3 (pocket version, same ROM as 084420(US))                                      |
 |        |          (IT)     | Toy Story 3 (EAN 8033836704196, GP470419?)                                                |
 |        | 80-084422(NL)     | Toy Story 3                                                                               |
 |        | 80-084423(UK)     | Toy Story 3                                                                               |
@@ -209,7 +209,7 @@ Language:
 |        | 80-084520(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084540(US)     | Super Why to the Rescue! - The Beach Day Mystery                                          |
-|        | 80-084541(US)     | Super Why to the Rescue! - The Beach Day Mystery (pocket version)                         |
+|   **   | 80-084541(US)     | Super Why to the Rescue! - The Beach Day Mystery (pocket version, same ROM as 084540(US)  |
 +========+===================+===========================================================================================+
 |        | 80-084560(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+

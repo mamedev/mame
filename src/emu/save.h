@@ -51,18 +51,36 @@ enum save_error
 typedef named_delegate<void ()> save_prepost_delegate;
 
 
-// use this to declare a given type is a simple, non-pointer type that can be
-// saved; in general, this is intended only to be used for specific enum types
-// defined by your device
+/// \brief Declare a type as safe to automatically save/restore
+///
+/// Use this to declare that a given type is a simple, non-pointer type
+/// that can be saved and restored.  In general, this should only be
+/// be used for specific enum types that have fixed width integer types
+/// as their storage classes.
+/// \param TYPE The name of the type to declare safe to save.
+/// \sa ALLOW_SAVE_TYPE_AND_VECTOR
 #define ALLOW_SAVE_TYPE(TYPE) \
 	template <> struct save_manager::is_atom<TYPE> : public std::true_type { };
 
-// use this as above, but also to declare that std::vector<TYPE> is safe as well
+/// \brief Declare a type as safe to automatically save/restore,
+///   including in \c std::vector instances
+///
+/// Used the same way as #ALLOW_SAVE_TYPE, but also declares that
+/// \c std::vector instances containing the type are safe to save.
+/// that can be saved and restored.  This must not be used if
+/// \c std::vector is specialised in an incompatible way.
+/// \param TYPE The name of the type to declare safe to save.
+/// \sa ALLOW_SAVE_TYPE
 #define ALLOW_SAVE_TYPE_AND_VECTOR(TYPE) \
 	ALLOW_SAVE_TYPE(TYPE) \
 	template <> struct save_manager::is_vector_safe<TYPE> : public std::true_type { };
 
-// use this for saving members of structures in arrays
+/// \brief Helper for referring to members of structures in arrays
+///
+/// Expands to the necessary reference, pointer to member and name to
+/// refer to a structure member.
+/// \param s Reference to a C array or \c std::array of structures.
+/// \param m Name of the structure member to refer to.
 #define STRUCT_MEMBER(s, m) s, &save_manager::pointer_unwrap<decltype(s)>::underlying_type::m, #s "." #m
 
 

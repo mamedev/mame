@@ -656,6 +656,7 @@ konblands.cpp
 konendev.cpp
 kongs470.cpp
 konmedal.cpp
+konmedal020.cpp
 konmedal68k.cpp
 kontest.cpp
 kopunch.cpp
@@ -1045,6 +1046,7 @@ rbmk.cpp
 rcorsair.cpp
 re900.cpp
 realbrk.cpp
+recel.cpp
 redalert.cpp
 redclash.cpp
 relief.cpp
@@ -1522,10 +1524,11 @@ zwackery.cpp
 -ng_mv2f
 -ng_mv4f
 //saturn.cpp
--saturn
--saturnjp
--saturneu
--vsaturn
 -hisaturn
+-saturn
+-saturneu
+-saturnjp
+-saturnkr
+-vsaturn
 //vectrex.cpp
 -vectrex

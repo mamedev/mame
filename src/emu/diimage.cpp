@@ -18,6 +18,7 @@
 #include "ui/uimain.h"
 
 #include "corestr.h"
+#include "opresolv.h"
 #include "zippath.h"
 
 #include <algorithm>

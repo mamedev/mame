@@ -86,12 +86,12 @@ Titles, serial #s, publishers and release dates taken from:
 
 <!-- the alt set with crcs 21fc2e80 and 22ecff45 only differs for d77 headers, but data in the disks are identical -->
 	<software name="daiva" supported="no">
-		<description>Daiva - Active Simulation War</description>
+		<description>Daiva Story 2: Memory in Durga</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-74"/>
 		<info name="release" value="198702xx"/>
-		<info name="alt_title" value="ディーヴァ"/>
+		<info name="alt_title" value="ディーヴァ ストーリー2·ドゥルガーの記憶"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="daiva_a.d77" size="348848" crc="80e45da2" sha1="576741ef1cf5f4821634414bfe4ffa4904e4904a"/>

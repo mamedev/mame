@@ -18,6 +18,7 @@
 #define MAME_EMU_EMUMEM_H
 
 #include <optional>
+#include <set>
 #include <type_traits>
 
 using s8 = std::int8_t;
@@ -476,7 +477,6 @@ template<int Width, int AddrShift> class memory_units_descriptor;
 // =====================-> The root class of all handlers
 
 // Handlers the refcounting as part of the interface
-
 class handler_entry
 {
 	DISABLE_COPYING(handler_entry);
@@ -485,10 +485,11 @@ class handler_entry
 
 public:
 	// Typing flags
-	static constexpr u32 F_DISPATCH    = 0x00000001; // handler that forwards the access to other handlers
-	static constexpr u32 F_UNITS       = 0x00000002; // handler that merges/splits an access among multiple handlers (unitmask support)
-	static constexpr u32 F_PASSTHROUGH = 0x00000004; // handler that passes through the request to another handler
-	static constexpr u32 F_VIEW        = 0x00000008; // handler for a view (kinda like dispatch except not entirely)
+	static constexpr u32 F_UNMAP       = 0x00000001; // the unmapped memory accessed handler
+	static constexpr u32 F_DISPATCH    = 0x00000002; // handler that forwards the access to other handlers
+	static constexpr u32 F_UNITS       = 0x00000004; // handler that merges/splits an access among multiple handlers (unitmask support)
+	static constexpr u32 F_PASSTHROUGH = 0x00000008; // handler that passes through the request to another handler
+	static constexpr u32 F_VIEW        = 0x00000010; // handler for a view (kinda like dispatch except not entirely)
 
 	// Start/end of range flags
 	static constexpr u8 START = 1;
@@ -528,6 +529,8 @@ public:
 
 	virtual void select_a(int slot);
 	virtual void select_u(int slot);
+
+	virtual offs_t dispatch_entry(offs_t address) const;
 
 protected:
 	// Address range storage
@@ -624,7 +627,7 @@ public:
 	// Return the internal structures of the root dispatch
 	virtual const handler_entry_read<Width, AddrShift> *const *get_dispatch() const;
 
-	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges);
+	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges);
 	virtual handler_entry_read<Width, AddrShift> *dup();
 };
 
@@ -699,7 +702,7 @@ public:
 	// Return the internal structures of the root dispatch
 	virtual const handler_entry_write<Width, AddrShift> *const *get_dispatch() const;
 
-	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges);
+	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges);
 	virtual handler_entry_write<Width, AddrShift> *dup();
 };
 

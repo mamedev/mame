@@ -53,6 +53,8 @@
 #include "formats/imageutl.h"
 #include "imghd.h"
 
+#include "opresolv.h"
+
 #define FAT_SECLEN  512
 
 OPTION_GUIDE_START( pc_chd_create_optionguide )

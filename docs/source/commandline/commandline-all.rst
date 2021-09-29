@@ -2824,6 +2824,20 @@ Core Sound Options
 
             mame qbert -nosamples
 
+.. _mame-commandline-nocompressor:
+
+**-[no]compressor**
+
+    Enable audio compressor. It temporarily reduces the overall volume when
+    the audio output is overdriven.
+
+    The default is ON (**-compressor**).
+
+    Example:
+        .. code-block:: bash
+
+            mame popeye -nocompressor
+
 .. _mame-commandline-volume:
 
 **-volume** / **-vol** *<value>*

@@ -33,6 +33,7 @@ public:
 	void init_route16();
 	void init_route16a();
 	void init_route16c();
+	void init_route16d();
 	void init_vscompmj();
 
 protected:
@@ -40,6 +41,7 @@ protected:
 
 	void out0_w(uint8_t data);
 	void out1_w(uint8_t data);
+
 private:
 	template<bool cpu1> void route16_sharedram_w(offs_t offset, uint8_t data);
 	uint8_t route16_prot_read();
@@ -50,6 +52,7 @@ private:
 	DECLARE_MACHINE_START(jongpute);
 
 	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
 	uint32_t screen_update_jongpute(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

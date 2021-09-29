@@ -131,13 +131,15 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
-#include "sound/s14001a.h"
 #include "sound/dac.h"
+#include "sound/s14001a.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -156,7 +158,6 @@ public:
 	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -184,7 +185,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -195,10 +195,6 @@ private:
 	// address maps
 	void fexcel_map(address_map &map);
 	void fexcelb_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	u8 speech_r(offs_t offset);
@@ -392,10 +388,9 @@ void excel_state::fexcel(machine_config &config)
 	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
-	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(excel_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

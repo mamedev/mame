@@ -8,12 +8,17 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include "imgtool.h"
-#include "formats/coco_dsk.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "formats/coco_dsk.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 /* this structure mirrors the structure of an RS-DOS directory entry on disk */
 struct rsdos_dirent

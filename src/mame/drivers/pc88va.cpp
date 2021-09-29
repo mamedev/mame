@@ -13,7 +13,7 @@
     - What exact kind of garbage happens if you try to enable both direct and palette color
       modes to a graphic layer?
     - unemulated upd71071 demand mode;
-    - What is exactly supposed to be a "bus slot"?
+    - What is exactly supposed to be a "bus slot"? Does it have an official name?
     - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
       hooked up by the current z80 core
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.

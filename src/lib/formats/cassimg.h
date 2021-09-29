@@ -14,15 +14,9 @@
 
 #include "ioprocs.h"
 
-#include "osdcore.h"
-
 #include <memory>
 #include <string>
 #include <vector>
-
-#ifndef LOG_FORMATS
-#define LOG_FORMATS(...) do { if (0) osd_printf_info(__VA_ARGS__); } while (false)
-#endif
 
 // hack to get around rogues that define this
 #ifdef UNSUPPORTED

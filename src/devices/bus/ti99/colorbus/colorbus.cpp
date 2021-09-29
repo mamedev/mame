@@ -21,7 +21,7 @@
 #include "colorbus.h"
 #include "busmouse.h"
 
-DEFINE_DEVICE_TYPE_NS(V9938_COLORBUS, bus::ti99::colorbus, v9938_colorbus_device, "v9938_colorbus", "V9938 Color bus")
+DEFINE_DEVICE_TYPE(V9938_COLORBUS, bus::ti99::colorbus::v9938_colorbus_device, "v9938_colorbus", "V9938 Color bus")
 
 namespace bus::ti99::colorbus {
 

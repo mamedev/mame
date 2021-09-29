@@ -14,6 +14,10 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
+#include <cstring>
+
 
 d64_format::d64_format()
 {

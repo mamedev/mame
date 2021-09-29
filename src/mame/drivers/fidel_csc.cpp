@@ -199,13 +199,15 @@ clicking on the game board.
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
-#include "machine/timer.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
 #include "sound/s14001a.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -224,7 +226,6 @@ public:
 	csc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_pia(*this, "pia%u", 0),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -248,7 +249,6 @@ protected:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	optional_device_array<pia6821_device, 2> m_pia;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
@@ -262,10 +262,6 @@ protected:
 	void csc_map(address_map &map);
 	void su9_map(address_map &map);
 	void rsc_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	u16 read_inputs();
@@ -621,10 +617,9 @@ void csc_state::csc(machine_config &config)
 	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // from 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::csc_map);
 
-	const attotime irq_period = attotime::from_hz(38.4_kHz_XTAL/64); // through 4060 IC, 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(csc_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
-	TIMER(config, "irq_off").configure_periodic(FUNC(csc_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
+	irq_clock.set_pulse_width(attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
@@ -683,10 +678,9 @@ void csc_state::rsc(machine_config &config)
 	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::rsc_map);
 
-	const attotime irq_period = attotime::from_hz(546); // from 555 timer, measured
-	TIMER(config, m_irq_on).configure_periodic(FUNC(csc_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(38)); // active for 38us
-	TIMER(config, "irq_off").configure_periodic(FUNC(csc_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 546)); // from 555 timer, measured
+	irq_clock.set_pulse_width(attotime::from_usec(38)); // active for 38us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	PIA6821(config, m_pia[0], 0); // MOS 6520
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));

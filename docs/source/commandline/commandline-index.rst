@@ -237,9 +237,9 @@ Core Video OpenGL GLSL Options
 Core Sound Options
 ~~~~~~~~~~~~~~~~~~
 
-
 | :ref:`samplerate <mame-commandline-samplerate>`
 | :ref:`[no]samples <mame-commandline-nosamples>`
+| :ref:`[no]compressor <mame-commandline-nocompressor>`
 | :ref:`volume <mame-commandline-volume>`
 | :ref:`sound <mame-commandline-sound>`
 | :ref:`audio_latency <mame-commandline-audiolatency>`

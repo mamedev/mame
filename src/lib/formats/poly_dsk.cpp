@@ -12,6 +12,8 @@
 
 #include "ioprocs.h"
 
+#include <cstring>
+
 
 poly_cpm_format::poly_cpm_format()
 {

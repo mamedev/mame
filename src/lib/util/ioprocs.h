@@ -151,7 +151,7 @@ public:
 	/// \brief Get the length of the stream
 	///
 	/// Gets the current length of the stream.
-	/// \param [out] result The lenght of the stream in bytes.  Not
+	/// \param [out] result The length of the stream in bytes.  Not
 	///   valid if the operation fails.
 	/// \return An error condtion if the operation failed.
 	virtual std::error_condition length(std::uint64_t &result) noexcept = 0;
@@ -160,7 +160,7 @@ public:
 
 /// \brief Interface to a random-access byte input sequence
 ///
-/// Provides an interface for reading from aritrary positions within a
+/// Provides an interface for reading from arbitrary positions within a
 /// byte sequence.  No further structure is provided.
 /// \sa read_stream random_write random_read_write
 class random_read : public virtual read_stream, public virtual random_access

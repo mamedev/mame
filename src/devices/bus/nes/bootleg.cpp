@@ -50,8 +50,10 @@ DEFINE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device,    "nes_btl_dn",    "N
 DEFINE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device,     "nes_smb2j",     "NES Cart Super Mario Bros. 2 Jpn PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device,    "nes_smb2ja",    "NES Cart Super Mario Bros. 2 Jpn (Alt) PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device,    "nes_smb2jb",    "NES Cart Super Mario Bros. 2 Jpn (Alt 2) PCB")
+DEFINE_DEVICE_TYPE(NES_N32_4IN1,       nes_n32_4in1_device,  "nes_n32_4in1",  "NES Cart N-32 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_0353,           nes_0353_device,      "nes_0353",      "NES Cart 0353 PCB")
 DEFINE_DEVICE_TYPE(NES_09034A,         nes_09034a_device,    "nes_09034a",    "NES Cart 09-034A PCB")
+DEFINE_DEVICE_TYPE(NES_L001,           nes_l001_device,      "nes_l001",      "NES Cart L-001 PCB")
 DEFINE_DEVICE_TYPE(NES_BATMANFS,       nes_batmanfs_device,  "nes_batmanfs",  "NES Cart Batman Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_PALTHENA,       nes_palthena_device,  "nes_palthena",  "NES Cart Palthena no Kagami Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device,  "nes_tobidase",  "NES Cart Tobidase Daisakusen Pirate PCB")
@@ -118,8 +120,18 @@ nes_smb2ja_device::nes_smb2ja_device(const machine_config &mconfig, const char *
 {
 }
 
+nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), m_bank67(type == NES_SMB2JB ? 0x0f : 0x07), irq_timer(nullptr)
+{
+}
+
 nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_SMB2JB, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+	: nes_smb2jb_device(mconfig, NES_SMB2JB, tag, owner, clock)
+{
+}
+
+nes_n32_4in1_device::nes_n32_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_smb2jb_device(mconfig, NES_N32_4IN1, tag, owner, clock)
 {
 }
 
@@ -130,6 +142,11 @@ nes_0353_device::nes_0353_device(const machine_config &mconfig, const char *tag,
 
 nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_09034A, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), irq_timer(nullptr)
+{
+}
+
+nes_l001_device::nes_l001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_L001, tag, owner, clock), m_irq_count(0), irq_timer(nullptr)
 {
 }
 
@@ -427,6 +444,7 @@ void nes_smb2jb_device::device_start()
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
+	save_item(NAME(m_reg));
 }
 
 void nes_smb2jb_device::pcb_reset()
@@ -439,6 +457,16 @@ void nes_smb2jb_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
+	m_reg = 0;
+}
+
+void nes_n32_4in1_device::pcb_reset()
+{
+	// Powers up in menu, but soft reset does not touch banks (so each game returns to its own title). Is this correct?
+
+	m_irq_enable = 0;
+	m_irq_count = 0;
+	m_reg = 0;
 }
 
 void nes_0353_device::device_start()
@@ -475,6 +503,23 @@ void nes_09034a_device::pcb_reset()
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_reg = 0;
+}
+
+void nes_l001_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_count));
+}
+
+void nes_l001_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);
+	chr8(0, CHRROM);
+
+	m_irq_count = 0;
 }
 
 void nes_palthena_device::device_start()
@@ -1248,7 +1293,7 @@ u8 nes_smb2j_device::read_l(offs_t offset)
 	if (offset >= 0x1000)
 		return m_prg[0x10000 + (offset & 0x0fff)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 u8 nes_smb2j_device::read_m(offs_t offset)
@@ -1341,7 +1386,8 @@ void nes_smb2jb_device::write_45(offs_t offset, u8 data)
 	switch (offset & 0x4120)
 	{
 		case 0x4020:
-			prg8_cd(bitswap<4>(data, 3, 0, 2, 1));
+			m_reg = bitswap<4>(data, 3, 0, 2, 1);
+			prg8_cd(m_reg);
 			break;
 		case 0x4120:
 			m_irq_enable = BIT(data, 0);
@@ -1369,7 +1415,57 @@ void nes_smb2jb_device::write_l(offs_t offset, u8 data)
 u8 nes_smb2jb_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2jb read_m, offset: %04x\n", offset));
-	return m_prg[0x0f * 0x2000 + offset];
+	return m_prg[m_bank67 * 0x2000 + offset];
+}
+
+/*-------------------------------------------------
+
+ BMC-N32-4IN1
+
+ Unknown Bootleg Multigame Board
+ Games: 4 in 1
+
+ This multicart contains the mapper 50 version of SMB2.
+ There are changes to bank locations compared to that
+ game, but otherwise we rely on the existing SMB2JB
+ emulation (unless other differences are discovered?)
+
+ NES 2.0: mapper 416
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_n32_4in1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("n32_4in1 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x2000)
+	{
+		if (BIT(data, 3))    // NROM games
+		{
+			u8 bank = bitswap<3>(data, 3, 7, 5);
+			u8 mode = BIT(data, 7);
+			if (data & 0xc0)
+			{
+				prg16_89ab(bank & ~mode);
+				prg16_cdef(bank | mode);
+			}
+			else
+				for (int i = 0; i < 4; i++)
+					prg8_x(i, bank << 1);
+		}
+		else                 // SMB2 only
+		{
+			prg8_89(0);
+			prg8_ab(1);
+			prg8_cd(m_reg);
+			prg8_ef(3);
+		}
+
+		chr8((data >> 1) & 0x03, CHRROM);
+		set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
 }
 
 /*-------------------------------------------------
@@ -1473,6 +1569,64 @@ u8 nes_09034a_device::read_m(offs_t offset)
 	LOG_MMC(("09-034a read_m, offset: %04x\n", offset));
 	// in 0x6000-0x7fff is mapped the 2nd PRG chip which starts after 32K (hence the +4)
 	return m_prg[(((m_reg + 4) * 0x2000) + offset) & (m_prg_size - 1)];
+}
+
+/*-------------------------------------------------
+
+ Board L-001
+
+ Games: Sangokushi III (Sangokushi II bootleg)
+
+ This board has swappable 8K PRG banks at 0x8000, 0xa000,
+ and 0xc000, while 0xe000 is fixed to the final bank.
+ CHRROM and CIRAM are also swappable in 1K banks.
+ The board has a 16-bit IRQ counter with the enable bit
+ acting as the MSB. The enhanced audio of the original
+ Namco 163 board is not retained.
+
+ NES 2.0: mapper 330
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_l001_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (BIT(m_irq_count, 15))
+		{
+			if (++m_irq_count == 0)
+				set_irq_line(ASSERT_LINE);
+		}
+	}
+}
+
+void nes_l001_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("l-001 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6400)
+	{
+		case 0x0000:
+		case 0x2000:
+			chr1_x((offset >> 11) & 0x07, data, CHRROM);
+			break;
+		case 0x0400:
+			m_irq_count = (m_irq_count & 0xff00) | data;
+			break;
+		case 0x2400:
+			m_irq_count = (m_irq_count & 0x00ff) | data << 8;
+			set_irq_line(CLEAR_LINE);
+			break;
+		case 0x4000:
+			set_nt_page((offset >> 11) & 0x03, CIRAM, data & 1, 1);
+			break;
+		case 0x6000:
+			if (offset < 0x7800)
+				prg8_x((offset >> 11) & 0x03, data & 0x1f);
+			break;
+	}
 }
 
 /*-------------------------------------------------
@@ -2134,7 +2288,7 @@ void nes_shuiguan_device::write_h(offs_t offset, uint8_t data)
 			{
 				case 0x00: m_irq_count = (m_irq_count & 0xf0) | ((data & 0x0f) << 0); break;
 				case 0x04: m_irq_count = (m_irq_count & 0x0f) | ((data & 0x0f) << 4); break;
-				case 0x08: m_irq_enable= data; break;
+				case 0x08: m_irq_enable = data; break;
 				case 0x0c: break;
 			}
 			break;

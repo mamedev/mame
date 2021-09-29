@@ -12,6 +12,8 @@
 
 #include "ioprocs.h"
 
+#include <cstring>
+
 
 st_format::st_format()
 {

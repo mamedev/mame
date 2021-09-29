@@ -108,6 +108,8 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 
 jvc_format::jvc_format()
 {

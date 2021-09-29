@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/fl1_dsk.h"
 
 fl1_format::fl1_format() : wd177x_format(formats)

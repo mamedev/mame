@@ -32,8 +32,6 @@ static const nes_pcb pcb_list[] =
 	{ "un1rom",           STD_UN1ROM },
 	{ "sxrom",            STD_SXROM },
 	{ "sorom",            STD_SOROM },
-	{ "sxrom_a",          STD_SXROM_A },
-	{ "sorom_a",          STD_SOROM_A },
 	{ "txrom",            STD_TXROM },
 	{ "hkrom",            STD_HKROM },
 	{ "tqrom",            STD_TQROM },
@@ -108,6 +106,7 @@ static const nes_pcb pcb_list[] =
 	{ "cne_fsb",          CNE_FSB },
 	{ "cne_shlz",         CNE_SHLZ },
 	{ "nanjing",          NANJING_BOARD },  // mapper 163
+	{ "ntdec_2746",       NTDEC_2746 },
 	{ "ntdec_asder",      NTDEC_ASDER },    // mapper 112
 	{ "ntdec_fh",         NTDEC_FIGHTINGHERO },     // mapper 193
 	{ "ntdec_n715021",    NTDEC_N715021 },  // mapper 81
@@ -130,6 +129,7 @@ static const nes_pcb pcb_list[] =
 	{ "tengen_800008",    TENGEN_800008 },  /* FIXME: Is this the same as mapper 3? */
 	{ "tengen_800032",    TENGEN_800032 },
 	{ "tengen_800037",    TENGEN_800037 },
+	{ "txc_22110",        TXC_22110 },
 	{ "txc_22211",        TXC_22211 },
 	{ "txc_dumarc",       TXC_DUMARACING },
 	{ "txc_mjblock",      TXC_MJBLOCK },
@@ -193,6 +193,7 @@ static const nes_pcb pcb_list[] =
 	{ "subor0",           SUBOR_TYPE0 },
 	{ "subor1",           SUBOR_TYPE1 },
 	{ "subor2",           SUBOR_TYPE2 },
+	{ "unl_158b",         UNL_158B },  // Blood of Jurassic
 	{ "cc21",             UNL_CC21 },
 	{ "xiaozy",           UNL_XIAOZY },
 	{ "edu2k",            UNL_EDU2K },
@@ -213,6 +214,7 @@ static const nes_pcb pcb_list[] =
 	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
+	{ "l001",             BTL_L001 },
 	{ "batmanfs",         BTL_BATMANFS },
 	{ "palthena",         BTL_PALTHENA },
 	{ "tobidase",         BTL_TOBIDASE },  // mapper 120
@@ -231,7 +233,7 @@ static const nes_pcb pcb_list[] =
 	{ "kasing",           KASING_BOARD },
 	{ "kay",              KAY_BOARD },
 	{ "h2288",            UNL_H2288 },
-	{ "unl_6035052",      UNL_603_5052 },   // mapper 238?
+	{ "unl_6035052",      UNL_603_5052 },   // mapper 238
 	{ "txc_tw",           TXC_TW },
 	{ "kof97",            UNL_KOF97 },
 	{ "kof96",            UNL_KOF96 },
@@ -247,23 +249,23 @@ static const nes_pcb pcb_list[] =
 	{ "n625092",          UNL_N625092 },
 	{ "a65as",            BMC_A65AS },
 	{ "t262",             BMC_T262 },
-	{ "novel1",           BMC_NOVEL1 },
-	{ "novel2",           BMC_NOVEL2 },  // mapper 213... same as BMC-NOVELDIAMOND9999999IN1 board?
 	{ "studyngame",       UNL_STUDYNGAME },  // mapper 39
 	{ "sgun20in1",        BMC_SUPERGUN_20IN1 },
-	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 59?
-	{ "bmc_d1038",        BMC_VT5201 },  // mapper 59?
+	{ "bmc_vt5201",       BMC_VT5201 },  // mapper 59
 	{ "bmc_60311c",       BMC_60311C },
 	{ "bmc_80013b",       BMC_80013B },
 	{ "bmc_810544c",      BMC_810544C },
 	{ "bmc_830425c",      BMC_830425C },
+	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
+	{ "bmc_jy820845c",    BMC_JY820845C },
+	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
-	{ "bmc_gb63",         BMC_G63IN1 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
 	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
+	{ "bmc_hp898f",       BMC_HP898F },
 	{ "bmc_k1029",        BMC_K1029 },
 	{ "bmc_k3006",        BMC_K3006 },
 	{ "bmc_k3036",        BMC_K3036 },
@@ -276,6 +278,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_ball11",       BMC_BALLGAMES_11IN1 },
 	{ "bmc_22games",      BMC_22GAMES },
 	{ "bmc_64y2k",        BMC_64IN1NR },
+	{ "bmc_420y2k",       BMC_TELETUBBIES },
 	{ "bmc_12in1",        BMC_12IN1 },
 	{ "bmc_20in1",        BMC_20IN1 },
 	{ "bmc_21in1",        BMC_21IN1 },
@@ -286,7 +289,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_70in1",        BMC_70IN1 },
 	{ "bmc_72in1",        BMC_72IN1 },
 	{ "bmc_76in1",        BMC_76IN1 },
-	{ "bmc_s42in1",       BMC_76IN1 },
 	{ "bmc_150in1",       BMC_150IN1 },
 	{ "bmc_190in1",       BMC_190IN1 },
 	{ "bmc_500in1",       BMC_500IN1 },
@@ -296,10 +298,12 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_8157",         BMC_8157 },
 	{ "bmc_g146",         BMC_G146 },
 	{ "bmc_11160",        BMC_11160 },
+	{ "a88s1",            BMC_A88S1 },
 	{ "fcgj8in1",         BMC_FCGENJIN_8IN1 },
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
 	{ "nt639",            BMC_NT639 },
+	{ "resetsxrom",       BMC_RESETSXROM },
 	{ "resettxrom0",      BMC_RESETTXROM0 },
 	{ "resettxrom1",      BMC_RESETTXROM1 },
 	{ "resettxrom2",      BMC_RESETTXROM2 },
@@ -314,24 +318,28 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_f15",          BMC_F15 },
 	{ "bmc_gn45",         BMC_GN45 },
 	{ "bmc_gold7in1",     BMC_GOLD_7IN1 },
+	{ "bmc_00202650",     BMC_00202650 },
 	{ "bmc_411120c",      BMC_411120C },
+	{ "bmc_820720c",      BMC_820720C },
 	{ "bmc_830118c",      BMC_830118C },
 	{ "bmc_830832c",      BMC_830832C },
-	{ "bmc_841101c",      BMC_841101C },
+	{ "bmc_yy841101c",    BMC_YY841101C },
+	{ "bmc_yy841155c",    BMC_YY841155C },
 	{ "pjoy84",           BMC_PJOY84 },
 	{ "bmc_gold150",      BMC_GOLD150 },
 	{ "bmc_gold260",      BMC_GOLD260 },
 	{ "bmc_th22913",      BMC_TH22913 },
-	{ "bmc_s22games",     BMC_SUPER22 },
 	{ "bmc_reset4",       BMC_4IN1RESET },
 	{ "bmc_reset42",      BMC_42IN1RESET },
 	{ "bmc_lc160",        BMC_LITTLECOM160 },
+	{ "jncota_kt1001",    JNCOTA_KT1001 },
 	{ "jyc_a",            JYCOMPANY_A },
 	{ "jyc_b",            JYCOMPANY_B },
 	{ "jyc_c",            JYCOMPANY_C },
 	{ "tek90",            JYCOMPANY_A },
 	{ "sa9602b",          SACHEN_SA9602B },
 	{ "unl_shero",        SACHEN_SHERO },
+	{ "a9746",            UNL_A9746 },
 	{ "mmalee2",          UNL_MMALEE },
 	{ "unl_2708",         UNL_2708 },
 	{ "unl_dh08",         UNL_DH08 },
@@ -356,6 +364,8 @@ static const nes_pcb pcb_list[] =
 	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II
 	{ "nocash_nochr",     NOCASH_NOCHR },
 	{ "action53",         UNL_ACTION53 },
+	{ "batmap_000",       BATMAP_000 },
+	{ "batmap_srrx",      BATMAP_SRRX },
 	{ "cufrom",           UNL_CUFROM },
 	{ "unrom512",         UNL_UNROM512 },
 	{ "2a03pur",          UNL_2A03PURITANS },
@@ -367,10 +377,7 @@ static const nes_pcb pcb_list[] =
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "coolboy",          UNSUPPORTED_BOARD },
 	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
-	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
-	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
@@ -620,6 +627,24 @@ void nes_cart_slot_device::call_load_pcb()
 //      osd_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
 	}
 
+	if (m_pcb_id == STD_SXROM || m_pcb_id == STD_SOROM)
+	{
+		if (get_feature("mmc1_type") != nullptr)
+		{
+			using mmc1_type = device_nes_cart_interface::mmc1_type;
+
+			const char *type = get_feature("mmc1_type");
+			if (!strcmp(type, "MMC1"))
+				m_cart->set_mmc1_type(mmc1_type::MMC1);
+			else if (!strcmp(type, "MMC1A"))
+				m_cart->set_mmc1_type(mmc1_type::MMC1A);
+			else if (!strncmp(type, "MMC1B", 5)) // common prefix of several variants
+				m_cart->set_mmc1_type(mmc1_type::MMC1B);
+			else if (!strcmp(type, "MMC1C"))
+				m_cart->set_mmc1_type(mmc1_type::MMC1C);
+		}
+	}
+
 	if (m_pcb_id == STD_HKROM || m_pcb_id == TAITO_X1_017)
 		mapper_sram_size = m_cart->get_mapper_sram_size();
 
@@ -666,15 +691,22 @@ void nes_cart_slot_device::call_load_pcb()
 		memcpy(m_cart->get_vrom_base(), get_software_region("chr"), vrom_size);
 	}
 
-	// SETUP steps 7: allocate the remaining pointer, when needed
+	// SETUP steps 7: allocate pointers for any extra chip data, when needed
+	if (m_pcb_id == BATMAP_SRRX)
+	{
+		uint32_t dpcm_size = get_software_region_length("dpcm");
+		if (dpcm_size)
+		{
+			m_cart->misc_rom_alloc(dpcm_size, tag());
+			memcpy(m_cart->get_misc_rom_base(), get_software_region("dpcm"), dpcm_size);
+		}
+	}
+
+	// SETUP steps 8: allocate the remaining pointers, when needed
 	if (vram_size)
 		m_cart->vram_alloc(vram_size);
 	if (prgram_size)
 		m_cart->prgram_alloc(prgram_size);
-
-	// also nes_smb2j_device needs WRAM initialized to 0xff? check!
-	if (m_pcb_id == UNL_SMB2J)
-		memset(m_cart->get_prgram_base(), 0xff, prgram_size);
 
 	// Attempt to load a battery file for this ROM
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)

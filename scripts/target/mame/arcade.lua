@@ -651,6 +651,7 @@ MACHINES["SMC91C9X"] = true
 MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
 --MACHINES["SPG2XX"] = true
+--MACHINES["SPISDCARD"] = true
 MACHINES["STVCD"] = true
 --MACHINES["SUN4C_MMU"] = true
 MACHINES["SWTPC8212"] = true
@@ -863,6 +864,7 @@ FORMATS["NASLITE_DSK"] = true
 FORMATS["BASICDSK"] = true
 FORMATS["IBMXDF_DSK"] = true
 FORMATS["IPF_DSK"] = true
+FORMATS["TZX_CAS"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
@@ -1635,10 +1637,6 @@ files {
 	MAME_DIR .. "src/mame/audio/nl_warrior.cpp",
 	MAME_DIR .. "src/mame/audio/nl_warrior.h",
 	MAME_DIR .. "src/mame/drivers/cchasm.cpp",
-	MAME_DIR .. "src/mame/includes/cchasm.h",
-	MAME_DIR .. "src/mame/machine/cchasm.cpp",
-	MAME_DIR .. "src/mame/audio/cchasm.cpp",
-	MAME_DIR .. "src/mame/video/cchasm.cpp",
 	MAME_DIR .. "src/mame/drivers/dlair.cpp",
 	MAME_DIR .. "src/mame/drivers/dlair2.cpp",
 	MAME_DIR .. "src/mame/drivers/embargo.cpp",
@@ -2246,6 +2244,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/redalert.cpp",
 	MAME_DIR .. "src/mame/includes/redalert.h",
 	MAME_DIR .. "src/mame/audio/redalert.cpp",
+	MAME_DIR .. "src/mame/audio/redalert.h",
 	MAME_DIR .. "src/mame/video/redalert.cpp",
 	MAME_DIR .. "src/mame/drivers/shisen.cpp",
 	MAME_DIR .. "src/mame/includes/shisen.h",
@@ -2542,6 +2541,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/konblands.cpp",
 	MAME_DIR .. "src/mame/drivers/kongs470.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal.cpp",
+	MAME_DIR .. "src/mame/drivers/konmedal020.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal68k.cpp",
 	MAME_DIR .. "src/mame/drivers/kontest.cpp",
 	MAME_DIR .. "src/mame/drivers/konendev.cpp",
@@ -3830,8 +3830,6 @@ files {
 	MAME_DIR .. "src/mame/video/pin64.cpp",
 	MAME_DIR .. "src/mame/video/pin64.h",
 	MAME_DIR .. "src/mame/drivers/hanaawas.cpp",
-	MAME_DIR .. "src/mame/includes/hanaawas.h",
-	MAME_DIR .. "src/mame/video/hanaawas.cpp",
 	MAME_DIR .. "src/mame/drivers/jclub2.cpp",
 	MAME_DIR .. "src/mame/drivers/macs.cpp",
 	MAME_DIR .. "src/mame/drivers/seta.cpp",
@@ -4704,6 +4702,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/play_1.cpp",
 	MAME_DIR .. "src/mame/drivers/play_2.cpp",
 	MAME_DIR .. "src/mame/drivers/play_3.cpp",
+	MAME_DIR .. "src/mame/drivers/recel.cpp",
 	MAME_DIR .. "src/mame/drivers/rowamet.cpp",
 	MAME_DIR .. "src/mame/drivers/s11.cpp",
 	MAME_DIR .. "src/mame/includes/s11.h",
@@ -4790,6 +4789,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/acefruit.cpp",
 	MAME_DIR .. "src/mame/drivers/aces1.cpp",
 	MAME_DIR .. "src/mame/drivers/acesp.cpp",
+	MAME_DIR .. "src/mame/machine/ace_sp_reelctrl.cpp",
+	MAME_DIR .. "src/mame/machine/ace_sp_reelctrl.h",
 	MAME_DIR .. "src/mame/drivers/age_candy.cpp",
 	MAME_DIR .. "src/mame/drivers/alinvade.cpp",
 	MAME_DIR .. "src/mame/drivers/amaticmg.cpp",

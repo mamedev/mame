@@ -12,6 +12,8 @@
 
 #include "ioprocs.h"
 
+#include <cstring>
+
 
 const char *oric_dsk_format::name() const
 {

@@ -435,8 +435,7 @@ uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
 
  JxROM & Sunsoft 5A / 5B / FME7 board emulation
 
- Notice that Sunsoft-5B = FME7 + sound chip (the latter being
- currently unemulated in MESS)
+ Notice that Sunsoft-5B = FME7 + sound chip
 
  iNES: mapper 69
 
