@@ -1,25 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/************************************************************************************************
+/**************************************************************************************************
 
     PC-6001 series (c) 1981 NEC
 
     driver by Angelo Salese
 
     TODO:
-    - Hook up tape loading, images that are floating around the net are already
-      ADC'ed, so they should be easy to implement (but not exactly faithful)
-    - cassette handling requires a decap of the MCU. It could be possible to
-      do some tight synch between the master CPU and a code simulation, but maybe
-      it's not worth the effort...
-    - Identify and hook-up the FDC device, apparently PC-6001 and PC-6601 doesn't
-      even use the same thing;
+	- Remove 8255 kludge;
+    - Proper tape loading, .cas format images are ADC'ed therefore needs a .wav conversion 
+	  strategy;
+	- Move MCU HLE simulation in a device (assuming we'll never get the MCS48 dump);
+	- Sometimes irqs aren't catched up, how the system actually handles daisy chain?
+	- Refactor memory maps to use view models;
     - PC-6601: mon r-0 type games doesn't seem to work at all on this system?
-    - PC-6001SR: get it to boot, also implement MK-2 compatibility mode (it changes
-      the memory map to behave like the older versions)
+    - PC-6001SR: Implement MK-2 compatibility mode (it changes the memory map to behave like
+	  the older versions)
     - Hookup MC6847 for vanilla PC-6001 and fix video bugs for that device;
     - upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
       Chrith game is a good test case, it's supposed to talk before title screen;
+    - Identify and hook-up the FDC device, apparently PC-6001 and PC-6601 doesn't even use the same
+	  thing;
 
     TODO (game specific):
     - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
@@ -44,12 +45,12 @@
        black, same issue as AX-6 Demo?
     - Pac-Man / Tiny Xevious 2: gameplay is too fast;
     - Salad no Kunino Tomato-Hime: can't start a play;
-    - Space Harrier: inputs doesn't work properly (can't go down), draws garbage on vanilla pc6001 and eventually crashes MAME;
+    - Space Harrier: very sensitive with sub irq triggers, draws garbage on vanilla pc6001 and eventually crashes MAME;
     - The Black Onyx: dies when it attempts to save the character, that obviously means saving
        on the tape;
     - Yakyukyo / Punchball Mario: waits for an irq, check which one;
 
-=================================================================================================
+===================================================================================================
 
     PC-6001 (1981-09):
 
@@ -102,7 +103,7 @@
 
     info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
 
-=================================================================================================
+===================================================================================================
 
 PC-6001 irq table:
 irq vector 0x00: writes 0x00 to [$fa19]                                                     ;(unused)
@@ -115,18 +116,18 @@ irq vector 0x0c: writes 0x00 to [$fa19]                                         
 irq vector 0x0e: same as 2, (A = 0x03, B = 0x00)                                            ;keyboard data ready, unknown type
 irq vector 0x10: same as 2, (A = 0x03, B = 0x00)                                            ;(unused)
 irq vector 0x12: writes 0x10 to [$fa19]                                                     ;end of tape reached
-irq vector 0x14: same as 2, (A = 0x00, B = 0x01)                                            ;kanji lock enabled
-irq vector 0x16: tests ppi port c, writes the result to $feca.                              ;joystick
+irq vector 0x14: same as 2, (A = 0x00, B = 0x01)                                            ;keyboard control irq (function keys)
+irq vector 0x16: tests ppi port c, writes the result to $feca.                              ;joystick / sub irq trigger
 irq vector 0x18:                                                                            ;TVR (?)
 irq vector 0x1a:                                                                            ;Date
 irq vector 0x1c:                                                                            ;(unused)
 irq vector 0x1e:                                                                            ;(unused)
-irq vector 0x20:                                                                            ;voice
-irq vector 0x22:                                                                            ;VRTC (?)
+irq vector 0x20:                                                                            ;uPD7752 voice irq
+irq vector 0x22:                                                                            ;VRTC (SR only?)
 irq vector 0x24:                                                                            ;(unused)
 irq vector 0x26:                                                                            ;(unused)
 
-************************************************************************************************/
+***************************************************************************************************/
 
 #include "emu.h"
 #include "includes/pc6001.h"
@@ -185,7 +186,7 @@ void pc6001_state::system_latch_w(uint8_t data)
 {
 	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
-	m_video_base =  &m_ram[startaddr[(data >> 1) & 0x03] - 0x8000];
+	m_video_base = &m_ram[startaddr[(data >> 1) & 0x03] - 0x8000];
 
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;
@@ -709,7 +710,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 	map(0xc1, 0xc1).w(FUNC(pc6001mk2_state::mk2_vram_bank_w));
 	map(0xc2, 0xc2).w(FUNC(pc6001mk2_state::mk2_opt_bank_w));
 
-	map(0xd0, 0xd3).mirror(0x0c).noprw(); // disk device
+	map(0xd0, 0xd3).mirror(0x0c).noprw(); // PC80S31 disk device
 
 	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
@@ -1182,7 +1183,7 @@ TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(pc6001_state::vrtc_irq)
+TIMER_CALLBACK_MEMBER(pc6001_state::sub_trig_callback)
 {
 	m_cur_keycode = check_joy_press();
 	if(IRQ_LOG) printf("Joystick IRQ called 0x16\n");
@@ -1191,20 +1192,7 @@ INTERRUPT_GEN_MEMBER(pc6001_state::vrtc_irq)
 
 INTERRUPT_GEN_MEMBER(pc6001sr_state::sr_vrtc_irq)
 {
-	m_kludge ^= 1;
-
-	// TODO: it is unclear who is responsible of the "Joystick IRQ" vs VRTC
-	// (it wants one at POST otherwise it refuses to boot)
-	if(m_kludge)
-	{
-		//m_cur_keycode = check_joy_press();
-		if(IRQ_LOG) printf("Joystick IRQ called 0x16\n");
-		set_maincpu_irq_line(0x16);
-	}
-	else
-	{
-		set_maincpu_irq_line(m_sr_irq_vectors[VRTC_IRQ]);
-	}
+	set_maincpu_irq_line(m_sr_irq_vectors[VRTC_IRQ]);
 }
 
 IRQ_CALLBACK_MEMBER(pc6001_state::irq_callback)
@@ -1220,8 +1208,20 @@ uint8_t pc6001_state::ppi_porta_r()
 
 void pc6001_state::ppi_porta_w(uint8_t data)
 {
-//  if(data != 0x06)
-//      printf("ppi_porta_w %02x\n",data);
+	// sub command
+	// [0x06]: trigger a 0x16 irq 
+	// [0x19/0x39]: Cassette PLAY
+	// [0x1a]: Cassette STOP
+	// [0x1d/0x3d]: Cassette baud select 600
+	// [0x1e/0x3e]: Cassette baud select 1200
+	// [0x38]: Cassette RECord
+	
+	if (data == 0x6)
+	{
+		// (timing is unknown, 0.1 msec is way too short for Space Harrier)
+		m_sub_trig_timer->reset();
+		m_sub_trig_timer->adjust(attotime::from_usec(3000));
+	}
 }
 
 uint8_t pc6001_state::ppi_portb_r()
@@ -1407,6 +1407,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 void pc6001_state::machine_start()
 {
 	m_timer_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc6001_state::audio_callback),this));
+	m_sub_trig_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc6001_state::sub_trig_callback),this));
 }
 
 inline void pc6001_state::set_videoram_bank(uint32_t offs)
@@ -1483,11 +1484,10 @@ void pc6001sr_state::machine_reset()
 	m_sr_text_rows = 20;
 	m_width80 = 0;
 
-	m_kludge = 0;
-
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	// should this be mirrored into the EXROM regions? hard to tell without an actual cart dump...
+	// should this be mirrored into the EXROM regions?
+	// hard to tell without an actual SR cart dump
 
 	/* set default bankswitch */
 	{
@@ -1557,7 +1557,7 @@ void pc6001_state::pc6001(machine_config &config)
 	Z80(config, m_maincpu, PC6001_MAIN_CLOCK / 2); // PD 780C-1, ~4 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001_state::pc6001_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6001_state::pc6001_io);
-	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
+//	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
 
 //  I8049(config, "subcpu", 7987200);
@@ -1632,7 +1632,7 @@ void pc6601_state::pc6601(machine_config &config)
 	Z80(config.replace(), m_maincpu, PC6001_MAIN_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6601_state::pc6001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6601_state::pc6601_io);
-	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
+//	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
 }
 
