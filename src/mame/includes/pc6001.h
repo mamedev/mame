@@ -57,7 +57,7 @@ public:
 
 	uint32_t screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-//	INTERRUPT_GEN_MEMBER(vrtc_irq);
+//  INTERRUPT_GEN_MEMBER(vrtc_irq);
 	TIMER_CALLBACK_MEMBER(audio_callback);
 	TIMER_CALLBACK_MEMBER(sub_trig_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
@@ -139,7 +139,7 @@ private:
 	uint32_t m_old_key2;
 	uint32_t m_old_key3;
 	u8 m_old_key_fn;
-	
+
 	emu_timer *m_sub_trig_timer;
 };
 

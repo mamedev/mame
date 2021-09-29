@@ -7,20 +7,20 @@
     driver by Angelo Salese
 
     TODO:
-	- Remove 8255 kludge;
-    - Proper tape loading, .cas format images are ADC'ed therefore needs a .wav conversion 
-	  strategy;
-	- Move MCU HLE simulation in a device (assuming we'll never get the MCS48 dump);
-	- Sometimes irqs aren't catched up, how the system actually handles daisy chain?
-	- Refactor memory maps to use view models;
+    - Remove 8255 kludge;
+    - Proper tape loading, .cas format images are ADC'ed therefore needs a .wav conversion
+      strategy;
+    - Move MCU HLE simulation in a device (assuming we'll never get the MCS48 dump);
+    - Sometimes irqs aren't catched up, how the system actually handles daisy chain?
+    - Refactor memory maps to use view models;
     - PC-6601: mon r-0 type games doesn't seem to work at all on this system?
     - PC-6001SR: Implement MK-2 compatibility mode (it changes the memory map to behave like
-	  the older versions)
+      the older versions)
     - Hookup MC6847 for vanilla PC-6001 and fix video bugs for that device;
     - upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
       Chrith game is a good test case, it's supposed to talk before title screen;
     - Identify and hook-up the FDC device, apparently PC-6001 and PC-6601 doesn't even use the same
-	  thing;
+      thing;
 
     TODO (game specific):
     - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
@@ -928,7 +928,7 @@ void pc6001sr_state::necsr_ppi8255_w(offs_t offset, uint8_t data)
 
 u8 pc6001sr_state::hw_rev_r()
 {
-	// bit 1 is active for pc6601sr (and shows the "PC6601SR World" screen in place of the "PC6001mkIISR World"), 
+	// bit 1 is active for pc6601sr (and shows the "PC6601SR World" screen in place of the "PC6001mkIISR World"),
 	// causes a direct jump to "video telopper" for pc6001mk2sr
 	return 0;
 }
@@ -940,7 +940,7 @@ u8 pc6601sr_state::hw_rev_r()
 
 void pc6001sr_state::crt_mode_w(u8 data)
 {
-//	m_bgcol_bank = (data & 8) ^ 8;
+//  m_bgcol_bank = (data & 8) ^ 8;
 	m_width80 = !BIT(data, 1);
 	refresh_crtc_params();
 }
@@ -999,7 +999,7 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 
 	map(0xb8, 0xbf).ram().share("irq_vectors");
 //  map(0xc0, 0xc0).w(FUNC(pc6001sr_state::mk2_col_bank_w));
-    map(0xc1, 0xc1).w(FUNC(pc6001sr_state::crt_mode_w));
+	map(0xc1, 0xc1).w(FUNC(pc6001sr_state::crt_mode_w));
 //  map(0xc2, 0xc2).w(FUNC(pc6001sr_state::opt_bank_w));
 
 	map(0xc8, 0xc8).w(FUNC(pc6001sr_state::sr_mode_w));
@@ -1209,13 +1209,13 @@ uint8_t pc6001_state::ppi_porta_r()
 void pc6001_state::ppi_porta_w(uint8_t data)
 {
 	// sub command
-	// [0x06]: trigger a 0x16 irq 
+	// [0x06]: trigger a 0x16 irq
 	// [0x19/0x39]: Cassette PLAY
 	// [0x1a]: Cassette STOP
 	// [0x1d/0x3d]: Cassette baud select 600
 	// [0x1e/0x3e]: Cassette baud select 1200
 	// [0x38]: Cassette RECord
-	
+
 	if (data == 0x6)
 	{
 		// (timing is unknown, 0.1 msec is way too short for Space Harrier)
@@ -1557,7 +1557,7 @@ void pc6001_state::pc6001(machine_config &config)
 	Z80(config, m_maincpu, PC6001_MAIN_CLOCK / 2); // PD 780C-1, ~4 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001_state::pc6001_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6001_state::pc6001_io);
-//	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
+//  m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
 
 //  I8049(config, "subcpu", 7987200);
@@ -1632,7 +1632,7 @@ void pc6601_state::pc6601(machine_config &config)
 	Z80(config.replace(), m_maincpu, PC6001_MAIN_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6601_state::pc6001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6601_state::pc6601_io);
-//	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
+//  m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
 }
 

@@ -563,7 +563,7 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 				uint32_t vram_addr;
 
 				// The Jp emulators maps this for the rightmost X > 256, but it doesn't seem to be the case?
-//				vram_addr = 0x1a00 + (x-256)+y*64;
+//              vram_addr = 0x1a00 + (x-256)+y*64;
 				vram_addr = (x & 0xfff) + y * 320;
 
 				// wants RGB -> BRG rotation
