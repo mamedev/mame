@@ -11312,8 +11312,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="exboxing">
-		<description>Exciting Boxing (Jpn)</description>
+<!-- This game uses an unemulated punching bag controller -->
+	<software name="exboxing" supported="no">
+		<description>Exciting Boxing (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC250"/>
@@ -37027,8 +37028,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="supermog">
-		<description>Super Mogura Tataki!! Pokkun Moguraa (Jpn)</description>
+<!-- This game uses an unemulated whack-a-mole pad -->
+	<software name="supermog" supported="no">
+		<description>Super Mogura Tataki!! Pokkun Moguraa (Japan)</description>
 		<year>1989</year>
 		<publisher>IGS</publisher>
 		<info name="serial" value="IGS-X1"/>
@@ -40227,13 +40229,15 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="toprider">
-		<description>Top Rider (Jpn)</description>
+<!-- This game uses an unemulated motorcycle handle controller -->
+	<software name="toprider" supported="partial">
+		<description>Top Rider (Japan)</description>
 		<year>1988</year>
 		<publisher>Varie</publisher>
 		<info name="serial" value="VRE-R1"/>
 		<info name="release" value="19881217"/>
 		<info name="alt_title" value="トップライダー"/>
+		<info name="usage" value="To use a standard controller, at the title screen press A, B, Right, Down, Left, Up, Right, B, A on controller 2."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SFROM" />
@@ -76857,7 +76861,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk3" supported="partial">
+	<software name="mk3">
 		<description>Mortal Kombat 3 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -77006,8 +77010,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk2blue" supported="partial">
-		<description>Mortal Kombat II (Asia, Blue Version)</description>
+	<software name="mk2blue">
+		<description>Mortal Kombat II (Asia, blue version)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78238,6 +78242,22 @@ be better to redump them properly. -->
 			<feature name="pcb" value="UNL-N625092" />
 			<dataarea name="prg" size="1048576">
 				<rom name="1000-in-1 (jpx72).prg" size="1048576" crc="f03bec60" sha1="3952f91686fee280ab73b9fe47b83fc2a32b65d0" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_1ka">
+		<description>1000 in 1 (alt games)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="n625092" />
+			<feature name="pcb" value="UNL-N625092" />
+			<dataarea name="prg" size="2097152">
+				<rom name="1000-in-1 (sun wukong title screen).prg" size="2097152" crc="a175ff8d" sha1="87358910929a2566ab65743610bd057184f143f7" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
