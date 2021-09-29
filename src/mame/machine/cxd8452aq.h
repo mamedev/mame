@@ -65,8 +65,8 @@ protected:
     void sonic_bus_map(address_map &map);
     address_space_config main_bus_config;
     address_space_config sonic_config;
-    uint16_t sonic_r(offs_t offset, uint16_t mem_mask);
-    void sonic_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+    uint8_t sonic_r(offs_t offset, uint8_t mem_mask);
+    void sonic_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
     // Other I/O
     devcb_write_line m_irq_handler;

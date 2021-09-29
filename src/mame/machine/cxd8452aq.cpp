@@ -52,19 +52,19 @@ void cxd8452aq_device::sonic_bus_map(address_map &map)
 	map(0x00000000U, 0xffffffffU).rw(FUNC(cxd8452aq_device::sonic_r), FUNC(cxd8452aq_device::sonic_w));
 }
 
-uint16_t cxd8452aq_device::sonic_r(offs_t offset, uint16_t mem_mask)
+uint8_t cxd8452aq_device::sonic_r(offs_t offset, uint8_t mem_mask)
 {
-    const auto adjustedOffset = (offset & 0xffff) << 1; // get rid of upper order bits and shift to compensate for off-by-one (need to find where that is)
-    auto result = space(0).read_dword(adjustedOffset, mem_mask) & 0xffff; // APbus mapping nonsense
-    LOG("sonic_r[0x%x (0x%x) | 0x%x] = 0x%x\n", adjustedOffset, offset, mem_mask, result);
+    //const auto adjustedOffset = (offset & 0xffff) << 1;
+    auto result = space(0).read_byte(offset & 0xfffff);
+    LOG("sonic_r[0x%x (0x%x) | 0x%x] = 0x%x\n", offset, offset & 0xfffff, mem_mask, result);
     return result;
 }
 
-void cxd8452aq_device::sonic_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void cxd8452aq_device::sonic_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-    const auto adjustedOffset = (offset & 0xffff) << 1; // get rid of upper order bits and shift to compensate for off-by-one (need to find where that is)
-	LOG("sonic_w[0x%x (0x%x) | 0x%x]\n", adjustedOffset, offset, mem_mask);
-    space(0).write_word(adjustedOffset, data, mem_mask);
+    //const auto adjustedOffset = (offset & 0xffff) << 1;
+	LOG("sonic_w[0x%x (0x%x) | 0x%x]\n", offset, offset & 0xfffff, mem_mask);
+    space(0).write_byte(offset & 0xfffff, data);
 }
 
 TIMER_CALLBACK_MEMBER(cxd8452aq_device::irq_check)
@@ -81,7 +81,8 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::irq_check)
 void cxd8452aq_device::device_add_mconfig(machine_config &config) { }
 
 void cxd8452aq_device::device_start()
-{ 
+{
+    m_irq_handler.resolve_safe();
     m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::irq_check), this));
 }
 

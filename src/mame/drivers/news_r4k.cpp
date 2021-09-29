@@ -353,6 +353,7 @@ void news_r4k_state::machine_common(machine_config &config)
     DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
     m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
     m_sonic->set_bus(m_sonic3, 1);
+    m_sonic->set_bmode(true); // big-endian mode to set word order
 
     // Keyboard and mouse
     // Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
@@ -478,6 +479,7 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
                           NAME([this](offs_t offset, uint8_t data)
                               {
+                                LOG("Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
                                 m_net_ram->write(offset, data);
                               }));// dedicated network RAM
     // DMAC3 DMA Controller

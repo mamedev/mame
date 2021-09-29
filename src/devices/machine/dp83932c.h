@@ -21,6 +21,7 @@ public:
 	void map(address_map &map);
 	u16 reg_r(offs_t offset) { return m_reg[offset]; }
 	void reg_w(offs_t offset, u16 data);
+	void set_bmode(bool bmode) { m_bmode = bmode; }
 
 protected:
 	// device_t overrides
@@ -207,6 +208,9 @@ private:
 	bool m_int_state;
 	u16 m_reg[64];
 	u64 m_cam[16];
+
+	// Endian control
+	bool m_bmode = false; // Low = LE, High = BE
 };
 
 DECLARE_DEVICE_TYPE(DP83932C, dp83932c_device)

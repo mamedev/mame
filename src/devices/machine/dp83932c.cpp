@@ -113,6 +113,7 @@ void dp83932c_device::device_reset()
 
 int dp83932c_device::recv_start_cb(u8 *buf, int length)
 {
+	LOG("recv_start_cb_debug %d\n", length);
 	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
 
 	if (!(m_reg[CR] & CR_RXEN))
@@ -149,7 +150,7 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	if (m_reg[CRDA] & 1)
 	{
 		// re-read the previous descriptor link field
-		m_reg[CRDA] = m_bus->read_word(EA(m_reg[URDA], m_reg[LLFA]));
+		m_reg[CRDA] = !m_bmode ? m_bus->read_word(EA(m_reg[URDA], m_reg[LLFA])) : m_bus->read_word(EA(m_reg[URDA], m_reg[LLFA]) + 2);
 		if (m_reg[CRDA] & 1)
 		{
 			logerror("no receive descriptor available\n");
@@ -169,7 +170,10 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	// TODO: check for buffer overflow
 	offs_t const rba = EA(m_reg[CRBA1], m_reg[CRBA0]);
 	for (unsigned i = 0; i < length; i++)
+	{
+		LOG("rba: set 0x%x to 0x%x\n", rba + i, buf[i]);
 		m_bus->write_byte(rba + i, buf[i]);
+	}
 
 	// update remaining buffer word count
 	u32 const rbwc = ((u32(m_reg[RBWC1]) << 16) | m_reg[RBWC0]) - (length + 1) / 2;
@@ -182,19 +186,19 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	// write status to rda
 	// TODO: don't write the rda if rba limit exceeded (buffer overflow)
 	offs_t const rda = EA(m_reg[URDA], m_reg[CRDA]);
-	m_bus->write_word(rda + 0 * width, m_reg[RCR]);
-	m_bus->write_word(rda + 1 * width, length);
-	m_bus->write_word(rda + 2 * width, m_reg[CRBA0]);
-	m_bus->write_word(rda + 3 * width, m_reg[CRBA1]);
-	m_bus->write_word(rda + 4 * width, m_reg[RSC]);
+	!m_bmode ? m_bus->write_word(rda + 0 * width, m_reg[RCR]) : m_bus->write_word(rda + 0 * width + 2, m_reg[RCR]);
+	!m_bmode ? m_bus->write_word(rda + 1 * width, length) : m_bus->write_word(rda + 1 * width + 2, length);
+	!m_bmode ? m_bus->write_word(rda + 2 * width, m_reg[CRBA0]) : m_bus->write_word(rda + 2 * width + 2, m_reg[CRBA0]);
+	!m_bmode ? m_bus->write_word(rda + 3 * width, m_reg[CRBA1]) : m_bus->write_word(rda + 3 * width + 2, m_reg[CRBA1]);
+	!m_bmode ? m_bus->write_word(rda + 4 * width, m_reg[RSC]) : m_bus->write_word(rda + 4 * width + 2, m_reg[RSC]);
 	m_reg[LLFA] = m_reg[CRDA] + 5 * width;
-	m_reg[CRDA] = m_bus->read_word(rda + 5 * width);
+	m_reg[CRDA] = !m_bmode ? m_bus->read_word(rda + 5 * width) : m_bus->read_word(rda + 5 * width + 2);
 
 	// check for end of list
 	if (m_reg[CRDA] & 1)
 		m_reg[ISR] |= ISR_RDE;
 	else
-		m_bus->write_word(rda + 6 * width, 0);
+		!m_bmode ? m_bus->write_word(rda + 6 * width, 0) : m_bus->write_word(rda + 6 * width + 2, 0);
 
 	// handle buffer exhaustion
 	if (rbwc < m_reg[EOBC])
@@ -247,8 +251,16 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 			return;
 		}
 
-		m_reg[offset] |= data & regmask[offset];
-		m_command->adjust(attotime::zero, data & regmask[offset]);
+		if(!(m_reg[offset] & CR_TXP) || ((m_reg[offset] & CR_TXP) != (data & CR_TXP)) || data & CR_HTX) // don't smash command in progress TODO: if this fixes it, make it better
+		{
+			m_reg[offset] |= data & regmask[offset];
+			m_command->adjust(attotime::zero, data & regmask[offset]);
+		}
+		else
+		{
+			m_reg[offset] |= data & regmask[offset];
+		}
+		
 		break;
 
 	case RCR:
@@ -346,12 +358,13 @@ void dp83932c_device::transmit()
 	m_reg[TTDA] = m_reg[CTDA];
 	offs_t const tda = EA(m_reg[UTDA], m_reg[CTDA]);
 	unsigned word = 1;
+	LOG("transmit: CTDA = 0x%x\n", m_reg[CTDA]);
 
 	// read control information from tda and load registers
 	u16 const tcr = m_reg[TCR];
-	m_reg[TCR] = m_bus->read_word(tda + word++ * width) & TCR_TPC;
-	m_reg[TPS] = m_bus->read_word(tda + word++ * width);
-	m_reg[TFC] = m_bus->read_word(tda + word++ * width);
+	m_reg[TCR] = !m_bmode ? m_bus->read_word(tda + word++ * width) & TCR_TPC : m_bus->read_word(tda + word++ * width + 2) & TCR_TPC;
+	m_reg[TPS] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
+	m_reg[TFC] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
 	LOG("width = %u TDA= 0x%x TCR = 0x%x TPS = 0x%x TFC = 0x%x\n", width, tda, m_reg[TCR], m_reg[TPS], m_reg[TFC]);
 
 	// check for programmable interrupt
@@ -366,16 +379,19 @@ void dp83932c_device::transmit()
 	for (unsigned fragment = 0; fragment < m_reg[TFC]; fragment++)
 	{
 		// read fragment address and size
-		m_reg[TSA0] = m_bus->read_word(tda + word++ * width);
-		m_reg[TSA1] = m_bus->read_word(tda + word++ * width);
-		m_reg[TFS] = m_bus->read_word(tda + word++ * width);
+		m_reg[TSA0] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
+		m_reg[TSA1] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
+		m_reg[TFS] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
 
 		offs_t const tsa = EA(m_reg[TSA1], m_reg[TSA0]);
 		LOG("fragment %u: TCR = 0x%x TPS = 0x%x TFC = 0x%x TSA = 0x%x\n", fragment, m_reg[TCR], m_reg[TPS], m_reg[TFC], tsa);
 
 		// FIXME: word/dword transfers (allow unaligned)
 		for (unsigned byte = 0; byte < m_reg[TFS]; byte++)
+		{
 			buf[length++] = m_bus->read_byte(tsa + byte);
+			LOG("byte[0x%x] = 0x%x\n", tsa + byte, buf[length - 1]);
+		}
 	}
 
 	// append fcs if not inhibited
@@ -392,6 +408,7 @@ void dp83932c_device::transmit()
 
 	// advance ctda to the link field
 	m_reg[CTDA] += word * width;
+	LOG("transmit after link adjust: CTDA = 0x%x\n", m_reg[CTDA]);
 
 	// transmit data
 	dump_bytes(buf, length);
@@ -409,13 +426,15 @@ void dp83932c_device::send_complete_cb(int result)
 	}
 
 	// write descriptor status
-	m_bus->write_word(EA(m_reg[UTDA], m_reg[TTDA]), m_reg[TCR] & TCR_TPS);
+	!m_bmode ? m_bus->write_word(EA(m_reg[UTDA], m_reg[TTDA]), m_reg[TCR] & TCR_TPS) : m_bus->write_word(EA(m_reg[UTDA], m_reg[TTDA]) + 2, m_reg[TCR] & TCR_TPS);
 
 	// check for halt
 	if (!(m_reg[CR] & CR_HTX))
 	{
 		// load next descriptor address
-		m_reg[CTDA] = m_bus->read_word(EA(m_reg[UTDA], m_reg[CTDA]));
+		LOG("scc before loading next addr: CTDA = 0x%x\n", m_reg[CTDA]);
+		m_reg[CTDA] = !m_bmode ? m_bus->read_word(EA(m_reg[UTDA], m_reg[CTDA])) : m_bus->read_word(EA(m_reg[UTDA], m_reg[CTDA]) + 2);
+		LOG("scc after loading next addr: CTDA = 0x%x\n", m_reg[CTDA]);
 
 		// check for end of list
 		if (m_reg[CTDA] & 1)
@@ -442,10 +461,10 @@ void dp83932c_device::read_rra(bool command)
 
 	offs_t const rrp = EA(m_reg[URRA], m_reg[RRP]);
 
-	m_reg[CRBA0] = m_bus->read_word(rrp + 0 * width);
-	m_reg[CRBA1] = m_bus->read_word(rrp + 1 * width);
-	m_reg[RBWC0] = m_bus->read_word(rrp + 2 * width);
-	m_reg[RBWC1] = m_bus->read_word(rrp + 3 * width);
+	m_reg[CRBA0] = !m_bmode ? m_bus->read_word(rrp + 0 * width) : m_bus->read_word(rrp + 0 * width + 2);
+	m_reg[CRBA1] = !m_bmode ? m_bus->read_word(rrp + 1 * width) : m_bus->read_word(rrp + 1 * width + 2);
+	m_reg[RBWC0] = !m_bmode ? m_bus->read_word(rrp + 2 * width) : m_bus->read_word(rrp + 2 * width + 2);
+	m_reg[RBWC1] = !m_bmode ? m_bus->read_word(rrp + 3 * width) : m_bus->read_word(rrp + 3 * width + 2);
 
 	LOG("read_rra crba 0x%08x rbwc 0x%08x\n",
 		EA(m_reg[CRBA1], m_reg[CRBA0]), EA(m_reg[RBWC1], m_reg[RBWC0]));
@@ -474,15 +493,29 @@ void dp83932c_device::load_cam()
 	{
 		offs_t const cdp = EA(m_reg[URRA], m_reg[CDP]);
 
-		u16 const cep = m_bus->read_word(cdp + 0 * width) & 0xf;
-		u16 const cap0 = m_bus->read_word(cdp + 1 * width);
-		u16 const cap1 = m_bus->read_word(cdp + 2 * width);
-		u16 const cap2 = m_bus->read_word(cdp + 3 * width);
+		u16 const cep = !m_bmode ? m_bus->read_word(cdp + 0 * width) & 0xf : m_bus->read_word(cdp + 0 * width + 2) & 0xf;
+		u16 const cap0 = !m_bmode ? m_bus->read_word(cdp + 1 * width) :  m_bus->read_word(cdp + 1 * width + 2);
+		u16 const cap1 = !m_bmode ? m_bus->read_word(cdp + 2 * width) :  m_bus->read_word(cdp + 2 * width + 2);
+		u16 const cap2 = !m_bmode ? m_bus->read_word(cdp + 3 * width) :  m_bus->read_word(cdp + 3 * width + 2);
 
 		// FIXME: documented byte/word order doesn't match emulation
 
 		LOG("load_cam entry %2d %02x:%02x:%02x:%02x:%02x:%02x\n",
 			cep, u8(cap0), cap0 >> 8, u8(cap1), cap1 >> 8, u8(cap2), cap2 >> 8);
+		
+		if(cep == 0)
+		{
+			// hack - need osd to pass packets targeted for this MAC address
+			// still need to find out why this doesn't work out of the box
+			char mac[6];
+			mac[0] = (u8)cap0;
+			mac[1] = cap0 >> 8;
+			mac[2] = (u8)cap1;
+			mac[3] = cap1 >> 8;
+			mac[4] = (u8)cap2;
+			mac[5] = cap2 >> 8;
+			set_mac(mac);
+		}
 
 		m_cam[cep] =
 			(u64(u8(cap0 >> 0)) << 40) | (u64(u8(cap0 >> 8)) << 32) | (u64(u8(cap1 >> 0)) << 24) |
@@ -493,7 +526,7 @@ void dp83932c_device::load_cam()
 	}
 
 	// read cam enable
-	m_reg[CE] = m_bus->read_word(EA(m_reg[URRA], m_reg[CDP]));
+	m_reg[CE] = !m_bmode ? m_bus->read_word(EA(m_reg[URRA], m_reg[CDP])) : m_bus->read_word(EA(m_reg[URRA], m_reg[CDP]) + 2);
 	LOG("load_cam enable 0x%04x\n", m_reg[CE]);
 
 	m_reg[CR] &= ~CR_LCAM;
@@ -555,6 +588,8 @@ bool dp83932c_device::address_filter(u8 *buf)
 			return true;
 		}
 	}
+
+	LOGMASKED(LOG_FILTER, "address_filter rejected\n");
 
 	return false;
 }
