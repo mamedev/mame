@@ -2,7 +2,9 @@
 // copyright-holders:David Haywood, Luca Elia, MetalliC
 /*
 
-U2 flash rom note
+Cave CV1000 hardware
+
+U2 flash rom note:
 
 Cave often programmed the u2 roms onto defective flash chips, programming around the bad blocks.
 As a result these are highly susceptible to failure, blocks around the known bad blocks appear to
@@ -14,32 +16,38 @@ The flash roms do contain a 'bad block' table, so it should be possible to rebui
 flash ROM for each game by comparing multiple dumps of each game and ensuring no other data has
 decayed.  Naturally this is not an ideal situation for the less common games!
 
-----
-
-Cave CV1000 hardware
+--------------------------------------------------------------------------------
 
 Games by Cave ID number:
+ID is labeled on U13 chip, not always
+Serial is on a sticker on PCB, eg. "CAVE DS-10104"
 
-CA011  Mushihime-Sama
-CA012  Ibara
-CA012B Ibara Kuro Black Label
-CA013  Espgaluda II
-CA014  Pink Sweets: Ibara Sorekara
-CA015  Mushihime-Sama Futari
-CA015B Mushihime-Sama Futari Black Label
-CA016  Muchi Muchi Pork!
-CA017  Deathsmiles
-CA017B Deathsmiles Black Label
-CA019  Do-Don-Pachi Dai-Fukkatsu
-CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
-CA021  Akai Katana
+ID     Serial   PCB  Title
+-------------------------------------
+CA011  -        B    Mushihime-Sama
+CA???  MHN      B    Mushihime-Sama Cave Matsuri 1.5
+CA012  -        B    Ibara
+CA012B IB       B    Ibara Kuro Black Label
+CA013  E        B    Espgaluda II
+CA???  M        B    Puzzle! Mushihime-Tama
+CA014  CA       B    Pink Sweets: Ibara Sorekara
+CA015  CA       B    Mushihime-Sama Futari
+CA015B MFBA/MMB B    Mushihime-Sama Futari Black Label
+CA016  MP       B    Muchi Muchi Pork!
+CA017  DS       B    Deathsmiles
+CA017B DSB      D    Deathsmiles Black Label
+CA019  DD       D    DoDonPachi DaiFukkatsu
+CA019B DDB      D    DoDonPachi DaiFukkatsu Black Label
+CA021  AK       D    Akai Katana
+CA???  SDO      D    DoDonPachi SaiDaiOuJou
 
-CMDL01 Medal Mahjong Moukari Bancho
-?????? Pirates of Gappori: http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
-?????? Uhauha Ooku: http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
+CMDL01 - Medal Mahjong Moukari Bancho
+?????? - Pirates of Gappori: http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
+?????? - Uhauha Ooku: http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
 
 Note: CA018 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
-      CA020 - Do-Don-Pachi Dai-ou-jou Tamashii on PGM2 platform
+      CA020 - DoDonPachi DaiOuJou Tamashii on PGM2 platform
+
 
 PCB CV1000-B / CV1000-D
 +--------------------------------------------+
@@ -140,11 +148,15 @@ Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
 
 ------------------------------------------------------
 
- To enter service mode in most cases hold down Service (F2) for a few seconds
-  (I believe it's the test button on the PCB)
- Some games also use the test dipswitch as an alternative method.
+To enter service mode in most cases hold down Service (F2) for a few seconds
+ (I believe it's the test button on the PCB)
+Some games also use the test dipswitch as an alternative method.
 
-ToDo:
+Common game codes:
+ - During boot hold P1 Right+A+B+C and P2 Left+A+B+C - Forcibly initialise non-volatile data (EEPROM or NAND settings area)
+ - During boot hold P1 A and P2 A - Reset random numbers generator at each game start. Probably was used during testing or/and competition events.
+
+TODO:
 
 Improve Blending precision?
  - I'm not sure what precision the original HW mixes with, source data is 555 RGB with 1 bit transparency (16-bits)
@@ -166,9 +178,6 @@ Blitter Timing
  - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait loops
  - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 
-Common game codes:
- - During boot hold P1 Right+A+B+C and P2 Left+A+B+C - Forcibly initialise non-volatile data (EEPROM or NAND settings area)
- - During boot hold P1 A and P2 A - Reset random numbers generator at each game start. Probably was used during testing or/and competition events.
 */
 
 #include "emu.h"
@@ -312,7 +321,6 @@ void cv1k_state::flash_io_w(offs_t offset, uint8_t data)
 }
 
 
-
 // ibarablk uses the rtc to render the clock in the first attract demo
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
 uint8_t cv1k_state::serial_rtc_eeprom_r(offs_t offset)
@@ -351,7 +359,7 @@ void cv1k_state::cv1k_map(address_map &map)
 	map(0x0c000000, 0x0c7fffff).ram().share("mainram");// work RAM
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
+	map(0x10c00000, 0x10c00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
@@ -362,7 +370,7 @@ void cv1k_state::cv1k_d_map(address_map &map)
 	map(0x0c000000, 0x0cffffff).ram().share("mainram"); // work RAM
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
+	map(0x10c00000, 0x10c00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
@@ -463,8 +471,8 @@ void cv1k_state::cv1k(machine_config &config)
 {
 	/* basic machine hardware */
 	SH3BE(config, m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
-	m_maincpu->set_md(0, 0);  // none of this is verified
-	m_maincpu->set_md(1, 0);  // (the sh3 is different to the sh4 anyway, should be changed)
+	m_maincpu->set_md(0, 0); // none of this is verified
+	m_maincpu->set_md(1, 0); // (the sh3 is different to the sh4 anyway, should be changed)
 	m_maincpu->set_md(2, 0);
 	m_maincpu->set_md(3, 0);
 	m_maincpu->set_md(4, 0);
@@ -505,8 +513,8 @@ void cv1k_state::cv1k_d(machine_config &config)
 
 	/* basic machine hardware */
 	SH3BE(config.replace(), m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
-	m_maincpu->set_md(0, 0);  // none of this is verified
-	m_maincpu->set_md(1, 0);  // (the sh3 is different to the sh4 anyway, should be changed)
+	m_maincpu->set_md(0, 0); // none of this is verified
+	m_maincpu->set_md(1, 0); // (the sh3 is different to the sh4 anyway, should be changed)
 	m_maincpu->set_md(2, 0);
 	m_maincpu->set_md(3, 0);
 	m_maincpu->set_md(4, 0);
