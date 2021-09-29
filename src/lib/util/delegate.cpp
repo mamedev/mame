@@ -214,7 +214,7 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 		// 48 ff e0                jmp     rax
 		// Trying to decode these thunks likely isn't worth the effort.
 		// Chasing performance in unoptimised builds isn't very useful,
-		// and the format of these thinks may be fragile.
+		// and the format of these thunks may be fragile.
 
 		// not something we can easily bypass
 		break;
