@@ -45,7 +45,9 @@
        black, same issue as AX-6 Demo?
     - Pac-Man / Tiny Xevious 2: gameplay is too fast;
     - Salad no Kunino Tomato-Hime: can't start a play;
-    - Space Harrier: very sensitive with sub irq triggers, draws garbage on vanilla pc6001 and eventually crashes MAME;
+    - Space Harrier: very sensitive with sub irq triggers, keyboard joy triggers doesn't work
+	  properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes 
+	  MAME;
     - The Black Onyx: dies when it attempts to save the character, that obviously means saving
        on the tape;
     - Yakyukyo / Punchball Mario: waits for an irq, check which one;
@@ -132,7 +134,12 @@ irq vector 0x26:                                                                
 #include "emu.h"
 #include "includes/pc6001.h"
 
-#define IRQ_LOG (0)
+#define LOG_IRQ    (1U << 1)
+
+#define VERBOSE (LOG_IRQ)
+#include "logmacro.h"
+
+#define LOGIRQ(...)     LOGMASKED(LOG_IRQ, __VA_ARGS__)
 
 inline void pc6001_state::cassette_latch_control(bool new_state)
 {
@@ -149,7 +156,6 @@ inline void pc6001_state::cassette_latch_control(bool new_state)
 		m_cas_switch = 0;
 		//m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		//m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
-		//set_maincpu_irq_line(0x00);
 	}
 }
 
@@ -176,10 +182,22 @@ inline void pc6001_state::ppi_control_hack_w(uint8_t data)
 	m_port_c_8255 |= 0xa8;
 }
 
-inline void pc6001_state::set_maincpu_irq_line(uint8_t vector_num)
+inline void pc6001_state::set_subcpu_irq_vector(u8 vector_num)
 {
-	m_irq_vector = vector_num;
+	// TODO: if anything the new vector must never override an old one
+	// sub CPU INT pin is directly connected to the OBFA (PC7) on PPI while WR is connected to INTRA (PC3),
+	// former should act as an handshake flag to inhibit further irqs until current is processed.
+	// (Also note tight loops in main CPU code that checks against masks 0x28 or 0x88 for I/O $92)
+	LOGIRQ("%s: sub CPU new irq vector old: %02x new: %02x\n", machine().describe_context(), m_sub_vector, vector_num);
+	m_sub_vector = vector_num;
+	set_irq_level(SUB_CPU_IRQ);
+}
+
+inline void pc6001_state::set_irq_level(int which)
+{
+	m_irq_pending |= 1 << which;
 	m_maincpu->set_input_line(0, ASSERT_LINE);
+	LOGIRQ("%s: assert %d, state %02x\n", machine().describe_context(), which, m_irq_pending);
 }
 
 void pc6001_state::system_latch_w(uint8_t data)
@@ -1176,29 +1194,90 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
 {
+	// TODO: shouldn't really need the cas switch check, different thread
 	if(m_cas_switch == 0 && ((m_timer_irq_mask == 0) || (m_timer_irq_mask2 == 0)))
-	{
-		if(IRQ_LOG) printf("Timer IRQ called %02x\n",m_timer_irq_vector);
-		set_maincpu_irq_line(m_timer_irq_vector);
-	}
+		set_irq_level(TIMER_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(pc6001_state::sub_trig_callback)
 {
 	m_cur_keycode = check_joy_press();
-	if(IRQ_LOG) printf("Joystick IRQ called 0x16\n");
-	set_maincpu_irq_line(0x16);
+	// TODO: is sub CPU the actual source of this?
+	set_irq_level(JOYSTICK_IRQ);
 }
 
 INTERRUPT_GEN_MEMBER(pc6001sr_state::sr_vrtc_irq)
 {
-	set_maincpu_irq_line(m_sr_irq_vectors[VRTC_IRQ]);
+	set_irq_level(VRTC_IRQ);
+}
+
+u8 pc6001_state::sub_ack()
+{
+	return m_sub_vector;
+}
+
+u8 pc6001_state::joystick_ack()
+{
+	return 0x16;
+}
+
+u8 pc6001_state::timer_ack()
+{
+	return m_timer_irq_vector;
+}
+
+u8 pc6001_state::vrtc_ack()
+{
+	// not present for PC-6001
+	throw emu_fatalerror("Vanilla PC-6001 doesn't have VRTC irq ack");
+}
+
+u8 pc6001mk2_state::vrtc_ack()
+{
+	// TODO: currently unimplemented, find and verify any software that needs this
+	return 0x22;
+}
+
+u8 pc6001sr_state::vrtc_ack()
+{
+	// TODO: bit 0 of sr_mode_w
+//	if (sr_mode == false)
+//		return pc6001mk2_state::vrtc_ack();
+
+	return m_sr_irq_vectors[VRTC_IRQ];
 }
 
 IRQ_CALLBACK_MEMBER(pc6001_state::irq_callback)
 {
-	device.execute().set_input_line(0, CLEAR_LINE);
-	return m_irq_vector;
+	u8 result_vector = 0x00;
+	for (int i = 0; i < 8; i++)
+	{
+		u8 mask = m_irq_pending & (1 << i);
+		if (mask)
+		{
+			// TODO: understand how HW implements daisy chain if at all
+			// priority should be right, i.e. lower level gets serviced first
+			switch(i)
+			{
+				case SUB_CPU_IRQ: result_vector = sub_ack(); break;
+				case JOYSTICK_IRQ: result_vector = joystick_ack(); break;
+				case TIMER_IRQ: result_vector = timer_ack(); break;
+				case VRTC_IRQ: result_vector = vrtc_ack(); break;
+				default:
+					throw emu_fatalerror("Unhandled irq ack %d", i);
+			}
+			m_irq_pending &= ~mask;
+			if (m_irq_pending == 0)
+				device.execute().set_input_line(0, CLEAR_LINE);
+			LOGIRQ("%s: ack %d, state %02x, vector %02x\n", machine().describe_context(), i, m_irq_pending, result_vector);
+
+			return result_vector;
+		}
+	}
+
+	// check if this ever happens
+	LOGIRQ("%s: spurious IRQ fired!\n", machine().describe_context());
+	return 0x06;
 }
 
 uint8_t pc6001_state::ppi_porta_r()
@@ -1349,7 +1428,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 				m_cur_keycode = cas_data_poll;
 				cas_data_i = 0x80;
 				/* data ready, poll irq */
-				set_maincpu_irq_line(0x08);
+				set_subcpu_irq_vector(0x08);
 			}
 			else
 				cas_data_i>>=1;
@@ -1360,13 +1439,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 			{
 				m_cas_offset = 0;
 				m_cas_switch = 0;
-				if(IRQ_LOG) printf("Tape-E IRQ 0x12\n");
-				set_maincpu_irq_line(0x12);
+				// Tape-E
+				set_subcpu_irq_vector(0x12);
 			}
 			else
 			{
-				if(IRQ_LOG) printf("Tape-D IRQ 0x08\n");
-				set_maincpu_irq_line(0x08);
+				// Tape-D
+				set_subcpu_irq_vector(0x08);
 			}
 		#endif
 	}
@@ -1386,21 +1465,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 		{
 			m_cur_keycode = check_keyboard_press();
 			const u8 key_vector = (m_cur_keycode & 0xf0) == 0xf0 ? 0x14 : 0x02;
-			if(IRQ_LOG) printf("KEY IRQ 0x02\n");
-			set_maincpu_irq_line(key_vector);
+			set_subcpu_irq_vector(key_vector);
 			m_old_key1 = key1;
 			m_old_key2 = key2;
 			m_old_key3 = key3;
 			m_old_key_fn = key_fn;
 		}
-		#if 0
-		else /* joypad polling */
-		{
-			m_cur_keycode = check_joy_press();
-			if(m_cur_keycode)
-				set_maincpu_irq_line(0x16);
-		}
-		#endif
 	}
 }
 
@@ -1434,6 +1504,7 @@ void pc6001_state::machine_reset()
 	m_timer_irq_mask2 = 1;
 	// timer irq vector is fixed in plain PC-6001
 	m_timer_irq_vector = 0x06;
+	m_irq_pending = 0;
 	set_timer_divider(3);
 
 	m_old_key1 = m_old_key2 = m_old_key3 = 0;
@@ -1611,6 +1682,7 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001mk2_state::pc6001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6001mk2_state::pc6001mk2_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001mk2_state::irq_callback));
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
@@ -1633,7 +1705,7 @@ void pc6601_state::pc6601(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6601_state::pc6001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6601_state::pc6601_io);
 //  m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6601_state::irq_callback));
 }
 
 void pc6001sr_state::pc6001sr(machine_config &config)
@@ -1646,7 +1718,7 @@ void pc6001sr_state::pc6001sr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001sr_state::pc6001sr_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6001sr_state::pc6001sr_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pc6001sr_state::sr_vrtc_irq));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001sr_state::irq_callback));
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
@@ -1654,7 +1726,7 @@ void pc6001sr_state::pc6001sr(machine_config &config)
 
 	// TODO: ym2203
 	// TODO: 1D 3'5" floppy drive
-	// TODO: telopper board (system explicitly asks for missing tape loading)
+	// TODO: telopper board (system explicitly asks for missing tape dump tho)
 }
 
 void pc6601sr_state::pc6601sr(machine_config &config)

@@ -70,8 +70,6 @@ public:
 	void ppi_portc_w(uint8_t data);
 	uint8_t ppi_portc_r();
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
 	void pc6001(machine_config &config);
 protected:
 	required_device<i8255_device> m_ppi;
@@ -110,7 +108,6 @@ protected:
 	inline void ppi_control_hack_w(uint8_t data);
 	inline void set_timer_divider(uint8_t data);
 	inline void set_videoram_bank(uint32_t offs);
-	inline void set_maincpu_irq_line(uint8_t vector_num);
 
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
@@ -123,7 +120,6 @@ protected:
 	emu_timer *m_timer_irq_timer;
 	uint8_t *m_video_base;
 	std::unique_ptr<uint8_t[]> m_video_ram;
-	uint8_t m_irq_vector;
 	uint8_t m_cas_switch;
 	uint8_t m_sys_latch;
 	uint32_t m_cas_offset;
@@ -141,6 +137,31 @@ private:
 	u8 m_old_key_fn;
 
 	emu_timer *m_sub_trig_timer;
+
+protected:
+	// vanilla PC-6001 just maps sub CPU and Timer IRQs, mapping is otherwise confirmed by $b8-$bf vector setups in SR machines
+	enum{
+		SUB_CPU_IRQ = 0,
+		JOYSTICK_IRQ,
+		TIMER_IRQ,
+		VOICE_IRQ,
+		VRTC_IRQ,
+		RS232_IRQ,
+		PRINTER_IRQ,
+		EXT_IRQ
+	};
+
+	u8 timer_ack();
+	u8 joystick_ack();
+	u8 sub_ack();
+	virtual u8 vrtc_ack();
+	void set_irq_level(int which);
+	void set_subcpu_irq_vector(u8 vector_num);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+
+private:
+	u8 m_irq_pending;
+	u8 m_sub_vector;
 };
 
 
@@ -204,6 +225,8 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
+	virtual u8 vrtc_ack() override;
+
 private:
 	uint8_t m_bank_r0;
 	uint8_t m_bank_r1;
@@ -252,6 +275,8 @@ protected:
 	void pc6001sr_map(address_map &map);
 	void pc6001sr_io(address_map &map);
 
+	virtual u8 vrtc_ack() override;
+
 private:
 	uint8_t m_sr_bank_r[8];
 	uint8_t m_sr_bank_w[8];
@@ -260,17 +285,6 @@ private:
 	std::unique_ptr<uint8_t []> m_gvram;
 	uint8_t m_bitmap_yoffs, m_bitmap_xoffs;
 	u8 m_width80;
-
-	enum{
-		SUB_CPU_IRQ = 0,
-		JOYSTICK_IRQ,
-		TIMER_IRQ,
-		VOICE_IRQ,
-		VRTC_IRQ,
-		RS232_IRQ,
-		PRINTER_IRQ,
-		EXT_IRQ
-	};
 
 	required_shared_ptr<uint8_t> m_sr_irq_vectors;
 	memory_view m_gvram_view_r;
