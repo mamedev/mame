@@ -1007,7 +1007,7 @@ void video_manager::recompute_speed(const attotime &emutime)
 	{
 		// create a final screenshot
 		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		std::error_condition filerr = file.open(machine().basename() + PATH_SEPARATOR "final.png");
+		std::error_condition const filerr = open_next(file, "png");
 		if (!filerr)
 			save_snapshot(nullptr, file);
 
