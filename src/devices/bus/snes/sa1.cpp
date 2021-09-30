@@ -305,6 +305,7 @@ void sns_sa1_device::dma_transfer()
 		if ((m_dma_ctrl & 0x03) == 1 && (m_dma_ctrl & 0x04) == 0x04) continue;
 		if ((m_dma_ctrl & 0x03) == 2 && (m_dma_ctrl & 0x04) == 0x00) continue;
 
+		m_sa1->adjust_icount(-1); // 1 cycle per memory accessing
 		switch (m_dma_ctrl & 0x03)
 		{
 			case 0: // ROM
@@ -325,10 +326,12 @@ void sns_sa1_device::dma_transfer()
 			case 1: // BWRAM
 				if ((dma_src & 0x40e000) == 0x006000)
 				{
+					m_sa1->adjust_icount(-1); // wait 1 cycle
 					data = read_bwram<true>((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff));
 				}
 				if ((dma_src & 0xf00000) == 0x400000)
 				{
+					m_sa1->adjust_icount(-1); // wait 1 cycle
 					data = read_bwram<true>(dma_src & 0xfffff);
 				}
 				break;
@@ -347,10 +350,12 @@ void sns_sa1_device::dma_transfer()
 			case 0x04:  // BWRAM
 				if ((dma_dst & 0x40e000) == 0x006000)
 				{
+					m_sa1->adjust_icount(-1); // wait 1 cycle
 					write_bwram((m_bwram_sa1 * 0x2000) + (dma_dst & 0x1fff), data);
 				}
 				if ((dma_dst & 0xf00000) == 0x400000)
 				{
+					m_sa1->adjust_icount(-1); // wait 1 cycle
 					write_bwram(dma_dst & 0xfffff, data);
 				}
 				break;
@@ -1161,7 +1166,10 @@ uint8_t sns_sa1_device::sa1_hi_r(offs_t offset)
 				return read_iram(offset);   // Internal SA-1 RAM (2K)
 		}
 		else if (address < 0x8000)
+		{
+			m_sa1->adjust_icount(-1); // wait 1 cycle
 			return read_bwram<true>((m_bwram_sa1 * 0x2000) + (offset & 0x1fff) + (m_bwram_sa1_source * 0x100000));        // SA-1 BWRAM
+		}
 		else
 			return read_h(offset);   // ROM
 
@@ -1187,7 +1195,10 @@ uint8_t sns_sa1_device::sa1_lo_r(offs_t offset)
 				return read_iram(offset);   // Internal SA-1 RAM (2K)
 		}
 		else if (address < 0x8000)
+		{
+			m_sa1->adjust_icount(-1); // wait 1 cycle
 			return read_bwram<true>((m_bwram_sa1 * 0x2000) + (offset & 0x1fff) + (m_bwram_sa1_source * 0x100000));        // SA-1 BWRAM
+		}
 		else if (offset == 0xffee)
 		{
 			return m_sa1_irq & 0xff;
@@ -1218,9 +1229,15 @@ uint8_t sns_sa1_device::sa1_lo_r(offs_t offset)
 		return 0xff;    // maybe open bus? same as the main system one or diff? (currently not accessible from carts anyway...)
 	}
 	else if (offset < 0x500000)
+	{
+		m_sa1->adjust_icount(-1); // wait 1 cycle
 		return read_bwram<true>(offset & 0xfffff);      // SA-1 BWRAM (not mirrored above!)
+	}
 	else if (offset >= 0x600000 && offset < 0x700000)
+	{
+		m_sa1->adjust_icount(-1); // wait 1 cycle
 		return read_bwram<true>((offset & 0xfffff) + 0x100000);       // SA-1 BWRAM Bitmap mode
+	}
 	else
 		return 0xff;    // nothing should be mapped here, so maybe open bus?
 }
@@ -1240,16 +1257,25 @@ void sns_sa1_device::sa1_hi_w(offs_t offset, uint8_t data)
 				write_iram(offset, data);   // Internal SA-1 RAM (2K)
 		}
 		else if (address < 0x8000)
+		{
+			m_sa1->adjust_icount(-1); // wait 1 cycle
 			write_bwram((m_bwram_sa1 * 0x2000) + (offset & 0x1fff) + (m_bwram_sa1_source * 0x100000), data);        // SA-1 BWRAM
+		}
 	}
 }
 
 void sns_sa1_device::sa1_lo_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x400000 && offset < 0x500000)
+	{
+		m_sa1->adjust_icount(-1); // wait 1 cycle
 		write_bwram(offset & 0xfffff, data);        // SA-1 BWRAM (not mirrored above!)
+	}
 	else if (offset >= 0x600000 && offset < 0x700000)
+	{
+		m_sa1->adjust_icount(-1); // wait 1 cycle
 		write_bwram((offset & 0xfffff) + 0x100000, data);       // SA-1 BWRAM Bitmap mode
+	}
 	else
 		sa1_hi_w(offset, data);
 }
@@ -1264,6 +1290,6 @@ void sns_sa1_device::sa1_map(address_map &map)
 
 void sns_sa1_device::device_add_mconfig(machine_config &config)
 {
-	G65816(config, m_sa1, 10000000);
+	G65816(config, m_sa1, DERIVED_CLOCK(1,2)); // Nintendo SA1 RF5A123, 10.738636MHz (21.477272MHz XTAL / 2)
 	m_sa1->set_addrmap(AS_PROGRAM, &sns_sa1_device::sa1_map);
 }
