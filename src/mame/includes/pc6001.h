@@ -106,7 +106,7 @@ protected:
 	uint8_t check_keyboard_press();
 	inline void cassette_latch_control(bool new_state);
 	inline void ppi_control_hack_w(uint8_t data);
-	inline void set_timer_divider(uint8_t data);
+	inline void set_timer_divider();
 	inline void set_videoram_bank(uint32_t offs);
 
 	// video functions
@@ -125,8 +125,8 @@ protected:
 	uint32_t m_cas_offset;
 	uint32_t m_cas_maxsize;
 	uint8_t m_bank_opt;
-	uint8_t m_timer_irq_mask;
-	uint8_t m_timer_irq_mask2;
+	bool m_timer_enable;
+	bool m_timer_irq_mask;
 	uint8_t m_port_c_8255;
 	uint8_t m_cur_keycode;
 
@@ -158,6 +158,8 @@ protected:
 	void set_irq_level(int which);
 	void set_subcpu_irq_vector(u8 vector_num);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+
+	virtual u8 get_timer_base_divider();
 
 private:
 	u8 m_irq_pending;
@@ -276,6 +278,7 @@ protected:
 	void pc6001sr_io(address_map &map);
 
 	virtual u8 vrtc_ack() override;
+	virtual u8 get_timer_base_divider() override;
 
 private:
 	uint8_t m_sr_bank_r[8];

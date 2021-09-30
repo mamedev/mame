@@ -43,14 +43,14 @@
     - (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
     - Grobda: when "get ready" speech plays, screen should be full white but instead it's all
        black, same issue as AX-6 Demo?
-    - Pac-Man / Tiny Xevious 2: gameplay is too fast;
+    - Pac-Man / Tiny Xevious 2: gameplay is too fast (unrelated with timer irq);
     - Salad no Kunino Tomato-Hime: can't start a play;
     - Space Harrier: very sensitive with sub irq triggers, keyboard joy triggers doesn't work
 	  properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes 
 	  MAME;
     - The Black Onyx: dies when it attempts to save the character, that obviously means saving
        on the tape;
-    - Yakyukyo / Punchball Mario: waits for an irq, check which one;
+    - Yakyukyo / Punchball Mario: waits for an irq (fixed, wrong timer enable behaviour);
 
 ===================================================================================================
 
@@ -209,8 +209,8 @@ void pc6001_state::system_latch_w(uint8_t data)
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;
 
-	m_timer_irq_mask = data & 1;
-	//printf("%02x\n",data);
+	m_timer_enable = !(data & 1);
+	set_timer_divider();
 }
 
 
@@ -604,10 +604,10 @@ void pc6001mk2_state::mk2_system_latch_w(uint8_t data)
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;
 
-	m_timer_irq_mask = data & 1;
-	vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
+	m_timer_enable = !(data & 1);
+	set_timer_divider();
 
-	//printf("%02x B0\n",data);
+	vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
 }
 
 inline void pc6001mk2_state::refresh_crtc_params()
@@ -661,19 +661,36 @@ void pc6001mk2_state::mk2_0xf3_w(uint8_t data)
 	---- --x- custom irq 2 mask
 	---- ---x custom irq 1 mask
 	*/
-	m_timer_irq_mask2 = data & 4;
+	m_timer_irq_mask = BIT(data, 2);
 }
 
-inline void pc6001_state::set_timer_divider(uint8_t data)
+inline u8 pc6001_state::get_timer_base_divider()
 {
-	m_timer_hz_div = data;
-	attotime period = attotime::from_hz((487.5*4)/(m_timer_hz_div+1));
+	return 4;
+}
+
+inline u8 pc6001sr_state::get_timer_base_divider()
+{
+//	if (sr_mode == false)
+//		return pc6001mk2_state::get_timer_base_divider();
+	return 0x80;
+}
+
+inline void pc6001_state::set_timer_divider()
+{
+	if (m_timer_enable == false)
+	{
+		m_timer_irq_timer->adjust(attotime::never);
+		return;
+	}
+	attotime period = attotime::from_hz((487.5 * get_timer_base_divider()) / (m_timer_hz_div+1));
 	m_timer_irq_timer->adjust(period,  0, period);
 }
 
 void pc6001mk2_state::mk2_timer_adj_w(uint8_t data)
 {
-	set_timer_divider(data);
+	m_timer_hz_div = data;
+	set_timer_divider();
 }
 
 void pc6001mk2_state::mk2_timer_irqv_w(uint8_t data)
@@ -918,7 +935,8 @@ void pc6001sr_state::sr_system_latch_w(uint8_t data)
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;
 
-	m_timer_irq_mask = data & 1;
+	m_timer_enable = !(data & 1);
+	set_timer_divider();
 	//vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
 
 	//printf("%02x B0\n",data);
@@ -1195,7 +1213,7 @@ INPUT_PORTS_END
 TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
 {
 	// TODO: shouldn't really need the cas switch check, different thread
-	if(m_cas_switch == 0 && ((m_timer_irq_mask == 0) || (m_timer_irq_mask2 == 0)))
+	if(m_cas_switch == 0 && m_timer_irq_mask == false)
 		set_irq_level(TIMER_IRQ);
 }
 
@@ -1376,6 +1394,7 @@ uint8_t pc6001_state::check_keyboard_press()
 
 uint8_t pc6001_state::check_joy_press()
 {
+	// TODO: this may really just rearrange keyboard key presses in a joystick like fashion, somehow akin to Sharp X1 mode
 	uint8_t p1_key = m_io_p1->read() ^ 0xff;
 	uint8_t shift_key = m_io_key_modifiers->read() & 0x02;
 	uint8_t space_key = m_io_keys[1]->read() & 0x01;
@@ -1500,12 +1519,13 @@ void pc6001_state::machine_reset()
 	m_cas_switch = 0;
 	m_cas_offset = 0;
 	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
-	m_timer_irq_mask = 1;
-	m_timer_irq_mask2 = 1;
+	m_timer_enable = false;
+	m_timer_irq_mask = false;
 	// timer irq vector is fixed in plain PC-6001
 	m_timer_irq_vector = 0x06;
 	m_irq_pending = 0;
-	set_timer_divider(3);
+	m_timer_hz_div = 3;
+	set_timer_divider();
 
 	m_old_key1 = m_old_key2 = m_old_key3 = 0;
 	m_old_key_fn = 0;
