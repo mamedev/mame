@@ -182,6 +182,15 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 			else if ((0x48 == func[3]) && (0x8b == func[4]))
 			{
 				// clang virtual function call thunk - mov rax,QWORD PTR [rcx] ; mov rax,QWORD PTR [rax+...] ; jmp rax
+				if  ((0x00 == func[5]) && (0x48 == func[6]) && (0xff == func[7]) && (0xe0 == func[8]))
+				{
+					// no displacement
+					LOG("Found virtual member function thunk at %p ", func);
+					std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(object);
+					func = *reinterpret_cast<std::uint8_t const *const *>(vptr);
+					LOG("redirecting to %p\n", func);
+					continue;
+				}
 				if  ((0x40 == func[5]) && (0x48 == func[7]) && (0xff == func[8]) && (0xe0 == func[9]))
 				{
 					// 8-bit displacement
