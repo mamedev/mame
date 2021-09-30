@@ -142,34 +142,50 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	: m_machine(machine)
 	, m_console(console)
 {
+	using namespace std::placeholders;
 	m_global_array = std::make_unique<global_entry []>(MAX_GLOBALS);
 
 	symbol_table &symtable = cpu.global_symtable();
 
-	/* add a few simple global functions */
-	using namespace std::placeholders;
-	symtable.add("min", 2, 2, std::bind(&debugger_commands::execute_min, this, _1, _2));
-	symtable.add("max", 2, 2, std::bind(&debugger_commands::execute_max, this, _1, _2));
-	symtable.add("if", 3, 3, std::bind(&debugger_commands::execute_if, this, _1, _2));
-	symtable.add("abs", 1, 1, std::bind(&debugger_commands::execute_abs, this, _1, _2));
-	symtable.add("bit", 2, 3, std::bind(&debugger_commands::execute_bit, this, _1, _2));
-	symtable.add("s8", 1, 1, std::bind(&debugger_commands::execute_s8, this, _1, _2));
-	symtable.add("s16", 1, 1, std::bind(&debugger_commands::execute_s16, this, _1, _2));
-	symtable.add("s32", 1, 1, std::bind(&debugger_commands::execute_s32, this, _1, _2));
+	// add a few simple global functions
+	symtable.add("min", 2, 2, // lower of two values
+			[this] (int params, const u64 *param) -> u64
+			{ return (std::min)(param[0], param[1]); });
+	symtable.add("max", 2, 2, // higher of two values
+			[this] (int params, const u64 *param) -> u64
+			{ return (std::max)(param[0], param[1]); });
+	symtable.add("if", 3, 3, // a ? b : c
+			[this] (int params, const u64 *param) -> u64
+			{ return param[0] ? param[1] : param[2]; });
+	symtable.add("abs", 1, 1, // absolute value of signed number
+			[this] (int params, const u64 *param) -> u64
+			{ return std::abs(s64(param[0])); });
+	symtable.add("bit", 2, 3, // extract bit field
+			[this] (int params, const u64 *param) -> u64
+			{ return (params == 2) ? BIT(param[0], param[1]) : BIT(param[0], param[1], param[2]); });
+	symtable.add("s8", 1, 1, // sign-extend from 8 bits
+			[this] (int params, const u64 *param) -> u64
+			{ return s64(s8(u8(param[0]))); });
+	symtable.add("s16", 1, 1, // sign-extend from 16 bits
+			[this] (int params, const u64 *param) -> u64
+			{ return s64(s16(u16(param[0]))); });
+	symtable.add("s32", 1, 1, // sign-extend from 32 bits
+			[this] (int params, const u64 *param) -> u64
+			{ return s64(s32(u32(param[0]))); });
 	symtable.add("cpunum", std::bind(&debugger_commands::get_cpunum, this));
 
-	/* add all single-entry save state globals */
+	// add all single-entry save state globals
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
 	{
 		void *base;
 		u32 valsize, valcount, blockcount, stride;
 
-		/* stop when we run out of items */
+		// stop when we run out of items
 		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount, blockcount, stride);
 		if (!name)
 			break;
 
-		/* if this is a single-entry global, add it */
+		// if this is a single-entry global, add it
 		if ((valcount == 1) && (blockcount == 1) && strstr(name, "/globals/"))
 		{
 			char symname[100];
@@ -183,7 +199,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 		}
 	}
 
-	/* add all the commands */
+	// add all the commands
 	m_console.register_command("help",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_help, this, _1));
 	m_console.register_command("print",     CMDFLAG_NONE, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_print, this, _1));
 	m_console.register_command("printf",    CMDFLAG_NONE, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_printf, this, _1));
@@ -325,10 +341,10 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("trackpc",   CMDFLAG_NONE, 0, 3, std::bind(&debugger_commands::execute_trackpc, this, _1));
 
 	m_console.register_command("trackmem",  CMDFLAG_NONE, 0, 3, std::bind(&debugger_commands::execute_trackmem, this, _1));
-	m_console.register_command("pcatmem",   CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, -1, _1));
-	m_console.register_command("pcatmemd",  CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, AS_DATA, _1));
-	m_console.register_command("pcatmemi",  CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, AS_IO, _1));
-	m_console.register_command("pcatmemo",  CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, AS_OPCODES, _1));
+	m_console.register_command("pcatmem",   CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_pcatmem, this, -1, _1));
+	m_console.register_command("pcatmemd",  CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_pcatmem, this, AS_DATA, _1));
+	m_console.register_command("pcatmemi",  CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_pcatmem, this, AS_IO, _1));
+	m_console.register_command("pcatmemo",  CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_pcatmem, this, AS_OPCODES, _1));
 
 	m_console.register_command("snap",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_snap, this, _1));
 
@@ -352,94 +368,12 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("input",     CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_input, this, _1));
 	m_console.register_command("dumpkbd",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_dumpkbd, this, _1));
 
-	/* set up the initial debugscript if specified */
+	// set up the initial debugscript if specified
 	const char* name = m_machine.options().debug_script();
 	if (name[0] != 0)
 		m_console.source_script(name);
 
 	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
-}
-
-//-------------------------------------------------
-//  execute_min - return the minimum of two values
-//-------------------------------------------------
-
-u64 debugger_commands::execute_min(int params, const u64 *param)
-{
-	return (param[0] < param[1]) ? param[0] : param[1];
-}
-
-
-//-------------------------------------------------
-//  execute_max - return the maximum of two values
-//-------------------------------------------------
-
-u64 debugger_commands::execute_max(int params, const u64 *param)
-{
-	return (param[0] > param[1]) ? param[0] : param[1];
-}
-
-
-//-------------------------------------------------
-//  execute_if - if (a) return b; else return c;
-//-------------------------------------------------
-
-u64 debugger_commands::execute_if(int params, const u64 *param)
-{
-	return param[0] ? param[1] : param[2];
-}
-
-
-//-------------------------------------------------
-//  execute_abs - return the absolute value
-//-------------------------------------------------
-
-u64 debugger_commands::execute_abs(int params, const u64 *param)
-{
-	return std::abs(s64(param[0]));
-}
-
-
-//-------------------------------------------------
-//  execute_bit - extract bit field from value
-//-------------------------------------------------
-
-u64 debugger_commands::execute_bit(int params, const u64 *param)
-{
-	if (params == 2)
-		return BIT(param[0], param[1]);
-	else
-		return BIT(param[0], param[1], param[2]);
-}
-
-
-//-------------------------------------------------
-//  execute_s8 - sign-extend from 8 bits
-//-------------------------------------------------
-
-u64 debugger_commands::execute_s8(int params, const u64 *param)
-{
-	return s8(param[0]);
-}
-
-
-//-------------------------------------------------
-//  execute_s16 - sign-extend from 16 bits
-//-------------------------------------------------
-
-u64 debugger_commands::execute_s16(int params, const u64 *param)
-{
-	return s16(param[0]);
-}
-
-
-//-------------------------------------------------
-//  execute_s32 - sign-extend from 32 bits
-//-------------------------------------------------
-
-u64 debugger_commands::execute_s32(int params, const u64 *param)
-{
-	return s32(param[0]);
 }
 
 
@@ -450,8 +384,18 @@ u64 debugger_commands::execute_s32(int params, const u64 *param)
 
 u64 debugger_commands::get_cpunum()
 {
-	execute_interface_enumerator iter(m_machine.root_device());
-	return iter.indexof(m_console.get_visible_cpu()->execute());
+	unsigned index = 0;
+	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
+	{
+		if (m_console.get_visible_cpu() == &exec.device())
+			return index;
+
+		// real CPUs should have pcbase
+		device_state_interface const *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE))
+			++index;
+	}
+	return u64(s64(-1));
 }
 
 
@@ -467,10 +411,10 @@ u64 debugger_commands::global_get(global_entry *global)
 {
 	switch (global->size)
 	{
-		case 1:     return *(u8 *)global->base;
-		case 2:     return *(u16 *)global->base;
-		case 4:     return *(u32 *)global->base;
-		case 8:     return *(u64 *)global->base;
+	case 1: return *(u8 *)global->base;
+	case 2: return *(u16 *)global->base;
+	case 4: return *(u32 *)global->base;
+	case 8: return *(u64 *)global->base;
 	}
 	return ~0;
 }
@@ -484,10 +428,10 @@ void debugger_commands::global_set(global_entry *global, u64 value)
 {
 	switch (global->size)
 	{
-		case 1:     *(u8 *)global->base = value; break;
-		case 2:     *(u16 *)global->base = value;    break;
-		case 4:     *(u32 *)global->base = value;    break;
-		case 8:     *(u64 *)global->base = value;    break;
+	case 1: *(u8 *)global->base = value; break;
+	case 2: *(u16 *)global->base = value; break;
+	case 4: *(u32 *)global->base = value; break;
+	case 8: *(u64 *)global->base = value; break;
 	}
 }
 
@@ -591,7 +535,9 @@ bool debugger_commands::validate_device_parameter(std::string_view param, device
 	}
 
 	// next look for a tag match
-	device_t *const device = m_machine.root_device().subdevice(strmakelower(param));
+	std::string_view relative = param;
+	device_t &base = get_device_search_base(relative);
+	device_t *device = base.subdevice(strmakelower(relative));
 	if (device)
 	{
 		result = device;
@@ -611,24 +557,18 @@ bool debugger_commands::validate_device_parameter(std::string_view param, device
 	}
 
 	// attempt to find by numerical index
-	unsigned index = 0;
-	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
+	device = get_cpu_by_index(cpunum);
+	if (device)
 	{
-		// real CPUs should have pcbase
-		const device_state_interface *state;
-		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE))
-		{
-			if (index++ == cpunum)
-			{
-				result = &exec.device();
-				return true;
-			}
-		}
+		result = device;
+		return true;
 	}
-
-	// if out of range, complain
-	m_console.printf("Invalid CPU index %u\n", cpunum);
-	return false;
+	else
+	{
+		// if out of range, complain
+		m_console.printf("Invalid CPU index %u\n", cpunum);
+		return false;
+	}
 }
 
 
@@ -666,7 +606,7 @@ bool debugger_commands::validate_cpu_parameter(std::string_view param, device_t 
 /// Validates a parameter as an address space identifier.  Uses the same
 /// rules as #validate_device_parameter to identify devices.  If the
 /// default address space number is negative, the first address space
-/// exposed by the device will be used.
+/// exposed by the device will be used as the default.
 /// \param [in] The parameter string.
 /// \param [in] spacenum The default address space index.  If negative,
 ///   the first address space exposed by the device (i.e. the address
@@ -677,21 +617,76 @@ bool debugger_commands::validate_cpu_parameter(std::string_view param, device_t 
 ///   current system, or false otherwise.
 bool debugger_commands::validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result)
 {
-	// first do the standard device thing
 	device_t *device;
-	if (!validate_device_parameter(param, device))
-		return false;
+	std::string spacename;
+	if (param.empty())
+	{
+		// if no parameter, use the visible CPU
+		device = m_console.get_visible_cpu();
+		if (!device)
+		{
+			m_console.printf("No valid CPU is currently selected\n");
+			return false;
+		}
+	}
+	else
+	{
+		// look for a tag match on the whole parameter value
+		std::string_view relative = param;
+		device_t &base = get_device_search_base(relative);
+		device = base.subdevice(strmakelower(relative));
+
+		// if that failed, treat the last component as an address space
+		if (!device)
+		{
+			auto const delimiter = relative.find_last_of(':');
+			bool const found = std::string_view::npos != delimiter;
+			spacename = strmakelower(relative.substr(found ? (delimiter + 1) : 0));
+			relative = relative.substr(0, !found ? 0 : !delimiter ? 1 : delimiter);
+			if (!relative.empty())
+				device = base.subdevice(strmakelower(relative));
+			else if (m_console.get_visible_cpu())
+				device = m_console.get_visible_cpu();
+			else
+				device = &m_machine.root_device();
+		}
+	}
+
+	// if still no device found, evaluate as an expression
+	if (!device)
+	{
+		u64 cpunum;
+		try
+		{
+			cpunum = parsed_expression(m_console.visible_symtable(), param).execute();
+		}
+		catch (expression_error const &)
+		{
+			// parsing failed - assume it was a tag
+			m_console.printf("Unable to find device '%s'\n", param);
+			return false;
+		}
+
+		// attempt to find by numerical index
+		device = get_cpu_by_index(cpunum);
+		if (!device)
+		{
+			// if out of range, complain
+			m_console.printf("Invalid CPU index %u\n", cpunum);
+			return false;
+		}
+	}
 
 	// ensure the device implements the memory interface
 	device_memory_interface *memory;
 	if (!device->interface(memory))
 	{
-		m_console.printf("No memory interface found for device '%s'\n", device->tag());
+		m_console.printf("No memory interface found for device %s\n", device->name());
 		return false;
 	}
 
-	// fetch space if specified
-	if (0 <= spacenum)
+	// fall back to supplied default space if appropriate
+	if (spacename.empty() && (0 <= spacenum))
 	{
 		if (memory->has_space(spacenum))
 		{
@@ -705,18 +700,22 @@ bool debugger_commands::validate_device_space_parameter(std::string_view param, 
 		}
 	}
 
-	// otherwise find the first populated space
+	// otherwise find the specified space or fall back to the first populated space
 	for (int i = 0; memory->max_space_count() > i; ++i)
 	{
-		if (memory->has_space(i))
+		if (memory->has_space(i) && (spacename.empty() || (memory->space(i).name() == spacename)))
 		{
 			result = &memory->space(i);
 			return true;
 		}
 	}
 
-	m_console.printf("No memory spaces found for device '%s'\n", device->tag());
-	return true;
+	// report appropriate error message
+	if (spacename.empty())
+		m_console.printf("No memory spaces found for device '%s'\n", device->tag());
+	else
+		m_console.printf("Memory space '%s' not found found for device '%s'\n", spacename, device->tag());
+	return false;
 }
 
 
@@ -785,22 +784,73 @@ bool debugger_commands::validate_memory_region_parameter(std::string_view param,
 }
 
 
+/// \brief Get search base for device or address space parameter
+///
+/// Handles prefix prefixes used to indicate that a device tag should be
+/// interpreted relative to the selected CPU.  Removes the recognised
+/// prefixes from the parameter value.
+/// \param [in,out] param The parameter string.  Recognised prefixes
+///   affecting the search base are removed, leaving a tag relative to
+///   the base device.
+/// \return A reference to the base device that the tag should be
+///   interpreted relative to.
+device_t &debugger_commands::get_device_search_base(std::string_view &param)
+{
+	// handle ".:" or ".^" prefix for tag relative to current CPU if any
+	if (!param.empty() && ('.' == param[0]) && ((param.size() == 1) || (':' == param[1]) || ('^' == param[1])))
+	{
+		param.remove_prefix(((param.size() > 1) && (':' == param[1])) ? 2 : 1);
+		device_t *const current = m_console.get_visible_cpu();
+		return current ? *current : m_machine.root_device();
+	}
+
+	// default to root device
+	return m_machine.root_device();
+}
+
+
+/// \brief Get CPU by index
+///
+/// Looks up a CPU by the number the debugger assigns it based on its
+/// position in the device tree relative to other CPUs.
+/// \param [in] cpunum Zero-based index of the CPU to find.
+/// \return A pointer to the CPU if found, or \c nullptr if no CPU has
+///   the specified index.
+device_t *debugger_commands::get_cpu_by_index(u64 cpunum)
+{
+	unsigned index = 0;
+	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
+	{
+		// real CPUs should have pcbase
+		device_state_interface const *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE))
+		{
+			if (index++ == cpunum)
+			{
+				return &exec.device();
+			}
+		}
+	}
+	return nullptr;
+}
+
+
 /*-------------------------------------------------
     debug_command_parameter_expression - validates
     an expression parameter
 -------------------------------------------------*/
 
-bool debugger_commands::debug_command_parameter_expression(const std::string &param, parsed_expression &result)
+bool debugger_commands::debug_command_parameter_expression(std::string_view param, parsed_expression &result)
 {
-	/* parse the expression; success if no error */
 	try
 	{
-		result.parse(param.c_str());
+		// parse the expression; success if no error
+		result.parse(param);
 		return true;
 	}
-	catch (expression_error &err)
+	catch (expression_error const &err)
 	{
-		/* output an error */
+		// output an error
 		m_console.printf("Error in expression: %s\n", param);
 		m_console.printf("                     %*s^", err.offset(), "");
 		m_console.printf("%s\n", err.code_string());
@@ -3746,29 +3796,17 @@ void debugger_commands::execute_trackmem(const std::vector<std::string> &params)
 
 void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::string> &params)
 {
-	// Gather the required address parameter
+	// Gather the required target address/space parameter
 	u64 address;
-	if (!validate_number_parameter(params[0], address))
-		return;
-
-	// Gather the cpu id (if present)
-	std::string_view cpuparam;
-	if (params.size() > 1)
-		cpuparam = params[1];
-	device_t *cpu = nullptr;
-	if (!validate_device_parameter(cpuparam, cpu))
-		return;
-
-	// Get the address space for the given cpu
 	address_space *space;
-	if (!validate_device_space_parameter(cpuparam, spacenum, space))
+	if (!validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
 
 	// Translate the address
 	offs_t a = address & space->logaddrmask();
 	if (!space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, a))
 	{
-		m_console.printf("Bad address\n");
+		m_console.printf("Address translation failed\n");
 		return;
 	}
 

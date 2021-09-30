@@ -75,7 +75,6 @@ private:
 		u8          swapped_cheat;
 	};
 
-
 	struct cheat_region_map
 	{
 		u64         offset;
@@ -84,7 +83,9 @@ private:
 		u8          disabled;
 	};
 
-	bool debug_command_parameter_expression(const std::string &param, parsed_expression &result);
+	device_t &get_device_search_base(std::string_view &param);
+	device_t *get_cpu_by_index(u64 cpunum);
+	bool debug_command_parameter_expression(std::string_view param, parsed_expression &result);
 	bool debug_command_parameter_command(const char *param);
 
 	bool cheat_address_is_valid(address_space &space, offs_t address);
@@ -92,14 +93,6 @@ private:
 	u64 cheat_byte_swap(const cheat_system *cheatsys, u64 value);
 	u64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
 
-	u64 execute_min(int params, const u64 *param);
-	u64 execute_max(int params, const u64 *param);
-	u64 execute_if(int params, const u64 *param);
-	u64 execute_abs(int params, const u64 *param);
-	u64 execute_bit(int params, const u64 *param);
-	u64 execute_s8(int params, const u64 *param);
-	u64 execute_s16(int params, const u64 *param);
-	u64 execute_s32(int params, const u64 *param);
 	u64 get_cpunum();
 
 	u64 global_get(global_entry *global);

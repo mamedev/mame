@@ -923,7 +923,7 @@ device_t *device_t::subdevice_slow(std::string_view tag) const
 std::string device_t::subtag(std::string_view tag) const
 {
 	std::string result;
-	if (!tag.empty() && tag[0] == ':')
+	if (!tag.empty() && (tag[0] == ':'))
 	{
 		// if the tag begins with a colon, ignore our path and start from the root
 		tag.remove_prefix(1);
@@ -934,28 +934,41 @@ std::string device_t::subtag(std::string_view tag) const
 		// otherwise, start with our path
 		result.assign(m_tag);
 		if (result != ":")
-			result.append(":");
+			result.append(1, ':');
 	}
 
 	// iterate over the tag, look for special path characters to resolve
-	std::string_view::size_type caret;
-	while ((caret = tag.find('^')) != std::string_view::npos)
+	std::string_view::size_type delimiter;
+	while ((delimiter = tag.find_first_of("^:")) != std::string_view::npos)
 	{
 		// copy everything up to there
-		result.append(tag, 0, caret);
-		tag.remove_prefix(caret + 1);
+		bool const parent = tag[delimiter] == '^';
+		result.append(tag, 0, delimiter);
+		tag.remove_prefix(delimiter + 1);
 
-		// strip trailing colons
-		int len = result.length();
-		while (result[--len] == ':')
-			result = result.substr(0, len);
-
-		// remove the last path part, leaving the last colon
-		if (result != ":")
+		if (parent)
 		{
-			int lastcolon = result.find_last_of(':');
-			if (lastcolon != -1)
-				result = result.substr(0, lastcolon + 1);
+			// strip trailing colons
+			std::string::size_type len = result.length();
+			while ((len > 1) && (result[--len] == ':'))
+				result.resize(len);
+
+			// remove the last path part, leaving the last colon
+			if (result != ":")
+			{
+				std::string::size_type lastcolon = result.find_last_of(':');
+				if (lastcolon != std::string::npos)
+					result.resize(lastcolon + 1);
+			}
+		}
+		else
+		{
+			// collapse successive colons
+			if (result.back() != ':')
+				result.append(1, ':');
+			delimiter = tag.find_first_not_of(':');
+			if (delimiter != std::string_view::npos)
+				tag.remove_prefix(delimiter);
 		}
 	}
 
@@ -963,9 +976,9 @@ std::string device_t::subtag(std::string_view tag) const
 	result.append(tag);
 
 	// strip trailing colons up to the root
-	int len = result.length();
-	while (len > 1 && result[--len] == ':')
-		result = result.substr(0, len);
+	std::string::size_type len = result.length();
+	while ((len > 1) && (result[--len] == ':'))
+		result.resize(len);
 	return result;
 }
 
