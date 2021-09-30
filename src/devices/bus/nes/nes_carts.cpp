@@ -430,13 +430,11 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("resetsxrom",       NES_RESETSXROM);
 // misc multigame cart MMC3 clone boards
 	device.option_add_internal("a88s1",            NES_A88S1);
-	device.option_add_internal("fcgj8in1",         NES_FCGJ8IN1);
+	device.option_add_internal("bmc_el86xc",       NES_BMC_EL86XC);
 	device.option_add_internal("fk23c",            NES_FK23C);
 	device.option_add_internal("fk23ca",           NES_FK23CA);
 	device.option_add_internal("nt639",            NES_NT639);
-	device.option_add_internal("resettxrom0",      NES_RESETTXROM0);
-	device.option_add_internal("resettxrom1",      NES_RESETTXROM1);
-	device.option_add_internal("resettxrom2",      NES_RESETTXROM2);
+	device.option_add_internal("resettxrom",       NES_RESETTXROM);
 	device.option_add_internal("s24in1c03",        NES_S24IN1SC03);
 	device.option_add_internal("tech9in1",         NES_TECHLINE9IN1);
 	device.option_add_internal("bmc_8in1",         NES_BMC_8IN1);

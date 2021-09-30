@@ -51718,7 +51718,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1994 super hik 4-in-1 (jy-001 rev1).prg" size="524288" crc="dbdfef5e" sha1="289a97175056bc5bff5c5c09635a450bda7058ad" status="baddump" />
 			</dataarea>
@@ -51734,7 +51736,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1993 heroe series 4-in-1 (jy-001).prg" size="524288" crc="8e40296d" sha1="5d0b50d195f11a656f6d46c369bb3f60000ed085" status="baddump" />
 			</dataarea>
@@ -51750,7 +51754,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1994 super hik 4-in-1 (jy-002).prg" size="524288" crc="fbc1ee6b" sha1="7c82449372191ac3b6cfa4cc72e53b860c9f635b" status="baddump" />
 			</dataarea>
@@ -51766,7 +51772,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1994 super hik 4-in-1 (jy-003).prg" size="524288" crc="f6822fe5" sha1="81dcace66ae60a4fe4035bb8b2e7901a8b33170f" status="baddump" />
 			</dataarea>
@@ -51775,6 +51783,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy4">
+		<description>1996 Super HiK 4 in 1 (JY-004)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-004).prg" size="524288" crc="1ad4b9d5" sha1="87911ce6cae6799f8fa2a785190b54e397472b35" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-004).chr" size="524288" crc="d851081c" sha1="688ff9f483751d42ec6eb3c1eb4c90c019746609" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -51800,7 +51826,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-008).prg" size="524288" crc="74a6176e" sha1="920e7a9a42b903b98c80166bc3dbf0aa50367709" status="baddump" />
 			</dataarea>
@@ -51835,7 +51863,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="mario series 4-in-1 (jy-013).prg" size="524288" crc="4558acd5" sha1="86d99d13e813f19c792fac8802c15888739179d2" status="baddump" />
 			</dataarea>
@@ -51946,7 +51976,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-023).prg" size="524288" crc="cadebc3e" sha1="92024688aaa583c673801bc585c4d693458f4d78" status="baddump" />
 			</dataarea>
@@ -51965,7 +51997,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1997 super hik 4-in-1 (jy-024 rev1).prg" size="524288" crc="cef38f6c" sha1="5aebb9e0bb157d3eaa53204607610c22e8bc2548" status="baddump" />
 			</dataarea>
@@ -51984,7 +52018,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-024).prg" size="524288" crc="cef38f6c" sha1="5aebb9e0bb157d3eaa53204607610c22e8bc2548" status="baddump" />
 			</dataarea>
@@ -52003,7 +52039,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-038).prg" size="524288" crc="bd705234" sha1="499393d8bd79b3de5a2ada099fc9477a573cc6ef" status="baddump" />
 			</dataarea>
@@ -52019,7 +52057,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom2" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="256K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-039).prg" size="524288" crc="a32b698b" sha1="f12d34c330d0577aa560507d15c3083a885138fa" status="baddump" />
 			</dataarea>
@@ -52035,7 +52075,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom2" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="256K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-040).prg" size="524288" crc="677c6862" sha1="1f212b29ac4c7fa52eed6dbe4ef2ce62ed7e3bda" status="baddump" />
 			</dataarea>
@@ -52066,7 +52108,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom1" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="256K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="1995 super hik 4-in-1 (jy-043).prg" size="1048576" crc="a5d89dc1" sha1="cf238422714e35e86e6e2fa5dd3fc0a64230db6e" status="baddump" />
 			</dataarea>
@@ -52083,7 +52127,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1997 super hik 4-in-1 (jy-047).prg" size="524288" crc="7a82a25c" sha1="f05a95eecd16073e82d5ec8e05c6cdf262025735" status="baddump" />
 			</dataarea>
@@ -52099,7 +52145,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-047 rev0).prg" size="524288" crc="113688e2" sha1="600e52f8a93cf3aa0bbb09e56bf570ad09d10184" status="baddump" />
 			</dataarea>
@@ -52147,7 +52195,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom2" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="256K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-057).prg" size="524288" crc="142184be" sha1="eec27f45ded5a7111e7b2d5ac8e0d33b0f6449cc" status="baddump" />
 			</dataarea>
@@ -52166,7 +52216,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom2" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="256K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-058).prg" size="524288" crc="019a5cf7" sha1="ace2c8eada92bda13ca9bd3e3dc336648ebb28c7" status="baddump" />
 			</dataarea>
@@ -52182,7 +52234,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-072).prg" size="524288" crc="8b1f7c74" sha1="0987c7b4aaf4419605e71a65405c9fe7a1e98a04" status="baddump" />
 			</dataarea>
@@ -52222,12 +52276,48 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_8j111">
+		<description>1998 Super Game 8 in 1 (JY-111)</description>
+		<year>1998</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_el86xc" />
+			<feature name="pcb" value="EL860947C" />
+			<feature name="outer-prg-size" value="128K" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1998 super game 8-in-1 (jy-111).prg" size="1048576" crc="8d6805f0" sha1="c13d1a3c72f48ad00db939f088f67750fafef13e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1998 super game 8-in-1 (jy-111).chr" size="1048576" crc="c907cacf" sha1="de2a790ca0ce7e5aa2312f97cb8d92ac3836ddc5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j112">
+		<description>1997 8 in 1 (JY-112)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_el86xc" />
+			<feature name="pcb" value="EL860947C" />
+			<feature name="outer-prg-size" value="128K" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1997 8-in-1 (jy-112).prg" size="1048576" crc="c6971394" sha1="d3f37dd47c9a857515b40035debe6d2dbd2ec825" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1997 8-in-1 (jy-112).chr" size="1048576" crc="6751a900" sha1="fc88086b13d379848d8582aee932c3d821eea7c1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_8j119">
 		<description>FC Genjin 8 in 1 (JY-119)</description>
 		<year>199?</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="fcgj8in1" />
+			<feature name="slot" value="bmc_el86xc" />
+			<feature name="pcb" value="EL861121C" />
+			<feature name="outer-prg-size" value="256K" />
 			<dataarea name="prg" size="2097152">
 				<rom name="8-in-1 (jy-119).prg" size="2097152" crc="acb1f4e9" sha1="e65bf41010b4f3d4692b458698e355c233ecd729" status="baddump" />
 			</dataarea>

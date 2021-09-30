@@ -302,7 +302,7 @@ static const nes_mmc mmc_list[] =
 	{ 264, YOKO_BOARD },
 	{ 265, BMC_T262 },
 	{ 266, UNL_CITYFIGHT },
-	{ 267, BMC_FCGENJIN_8IN1 },
+	{ 267, BMC_EL861121C },
 	// 268 COOLBOY and MINDKIDS
 	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
 	// 270 multicarts on OneBus Famiclones
@@ -348,7 +348,7 @@ static const nes_mmc mmc_list[] =
 	// 310 variant of mapper 125?
 	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
 	{ 312, KAISER_KS7013B },       // Highway Star Kaiser bootleg
-	{ 313, BMC_RESETTXROM0 },
+	{ 313, BMC_RESETTXROM },
 	{ 314, BMC_64IN1NR },
 	// 315 820732C and 830134C multicarts, not in nes.xml?
 	// 316 Unused
@@ -412,7 +412,7 @@ static const nes_mmc mmc_list[] =
 	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
 	{ 376, BMC_YY841155C },
-	// 377 JY-111 multicart, similar to mapper 367
+	{ 377, BMC_EL860947C },
 	// 378 8-in-1 multicart, which one?
 	// 379 35-in-1 multicart, similar to mapper 38
 	{ 380, BMC_970630C },
@@ -748,6 +748,32 @@ void nes_cart_slot_device::call_load_ines()
 			submapper = 0;
 			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
 		}
+		// 313: BMC RESET-TXROM
+		else if (mapper == 313)
+		{
+			if (submapper == 0)
+			{
+				m_cart->set_outer_prg_size(128);
+				m_cart->set_outer_chr_size(128);
+			}
+			else if (submapper == 1)
+			{
+				m_cart->set_outer_prg_size(256);
+				m_cart->set_outer_chr_size(128);
+			}
+			else if (submapper == 2)
+			{
+				m_cart->set_outer_prg_size(128);
+				m_cart->set_outer_chr_size(256);
+			}
+			else if (submapper == 3)
+			{
+				m_cart->set_outer_prg_size(256);
+				m_cart->set_outer_chr_size(256);
+			}
+			else
+				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
+		}
 		else if (submapper)
 		{
 			submapper = 0;
@@ -937,15 +963,6 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = RCM_GS2013;
 			break;
 
-		case BMC_RESETTXROM0:
-			if (submapper == 1)
-				m_pcb_id = BMC_RESETTXROM1;
-			else if (submapper == 2)
-				m_pcb_id = BMC_RESETTXROM2;
-			else if (submapper > 2)
-				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
-			break;
-
 		case HES_BOARD:
 			if (crc_hack)
 				m_cart->set_pcb_ctrl_mirror(true);    // Mapper 113 is used for 2 diff boards
@@ -999,7 +1016,16 @@ void nes_cart_slot_device::call_load_ines()
 		case NAMCOT_163:
 			mapper_sram_size = m_cart->get_mapper_sram_size();
 			break;
-			//FIXME: we also have to fix Action 52 PRG loading somewhere...
+
+		case BMC_EL860947C:
+			m_cart->set_outer_prg_size(128);
+			break;
+
+		case BMC_EL861121C:
+			m_cart->set_outer_prg_size(256);
+			break;
+
+		//FIXME: we also have to fix Action 52 PRG loading somewhere...
 
 		case BANDAI_DATACH:
 			fatalerror("Bandai Datach games have to be mounted in the Datach subslot!\n");
@@ -1282,13 +1308,6 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		case RCM_GS2004:                               // Mapper 283 is used for 2 diff boards
 			if (ROM[4] >= 20)
 				pcb_id = RCM_GS2013;
-			break;
-
-		case BMC_RESETTXROM0:                          // Mapper 313 is used for 3 diff boards
-			if (submapper == 1)
-				pcb_id = BMC_RESETTXROM1;
-			if (submapper == 2)
-				pcb_id = BMC_RESETTXROM2;
 			break;
 	}
 
