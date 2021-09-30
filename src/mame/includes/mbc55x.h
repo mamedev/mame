@@ -149,7 +149,7 @@ private:
 	bool          m_ls123_strobe;
 	double        m_ls123_clear_time[4];
 
-	void video_debug(int ref, const std::vector<std::string> &params);
+	void video_debug(const std::vector<std::string> &params);
 };
 
 /*----------- defined in machine/mbc55x.c -----------*/
