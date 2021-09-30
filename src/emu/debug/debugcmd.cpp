@@ -149,28 +149,28 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 
 	// add a few simple global functions
 	symtable.add("min", 2, 2, // lower of two values
-			[this] (int params, const u64 *param) -> u64
+			[] (int params, const u64 *param) -> u64
 			{ return (std::min)(param[0], param[1]); });
 	symtable.add("max", 2, 2, // higher of two values
-			[this] (int params, const u64 *param) -> u64
+			[] (int params, const u64 *param) -> u64
 			{ return (std::max)(param[0], param[1]); });
 	symtable.add("if", 3, 3, // a ? b : c
-			[this] (int params, const u64 *param) -> u64
+			[] (int params, const u64 *param) -> u64
 			{ return param[0] ? param[1] : param[2]; });
 	symtable.add("abs", 1, 1, // absolute value of signed number
-			[this] (int params, const u64 *param) -> u64
+			[] (int params, const u64 *param) -> u64
 			{ return std::abs(s64(param[0])); });
 	symtable.add("bit", 2, 3, // extract bit field
-			[this] (int params, const u64 *param) -> u64
+			[] (int params, const u64 *param) -> u64
 			{ return (params == 2) ? BIT(param[0], param[1]) : BIT(param[0], param[1], param[2]); });
 	symtable.add("s8", 1, 1, // sign-extend from 8 bits
-			[this] (int params, const u64 *param) -> u64
+			[] (int params, const u64 *param) -> u64
 			{ return s64(s8(u8(param[0]))); });
 	symtable.add("s16", 1, 1, // sign-extend from 16 bits
-			[this] (int params, const u64 *param) -> u64
+			[] (int params, const u64 *param) -> u64
 			{ return s64(s16(u16(param[0]))); });
 	symtable.add("s32", 1, 1, // sign-extend from 32 bits
-			[this] (int params, const u64 *param) -> u64
+			[] (int params, const u64 *param) -> u64
 			{ return s64(s32(u32(param[0]))); });
 	symtable.add("cpunum", std::bind(&debugger_commands::get_cpunum, this));
 
@@ -639,16 +639,19 @@ bool debugger_commands::validate_device_space_parameter(std::string_view param, 
 		// if that failed, treat the last component as an address space
 		if (!device)
 		{
-			auto const delimiter = relative.find_last_of(':');
+			auto const delimiter = relative.find_last_of(":^");
 			bool const found = std::string_view::npos != delimiter;
-			spacename = strmakelower(relative.substr(found ? (delimiter + 1) : 0));
-			relative = relative.substr(0, !found ? 0 : !delimiter ? 1 : delimiter);
-			if (!relative.empty())
-				device = base.subdevice(strmakelower(relative));
-			else if (m_console.get_visible_cpu())
-				device = m_console.get_visible_cpu();
-			else
-				device = &m_machine.root_device();
+			if (!found || (':' == relative[delimiter]))
+			{
+				spacename = strmakelower(relative.substr(found ? (delimiter + 1) : 0));
+				relative = relative.substr(0, !found ? 0 : !delimiter ? 1 : delimiter);
+				if (!relative.empty())
+					device = base.subdevice(strmakelower(relative));
+				else if (m_console.get_visible_cpu())
+					device = m_console.get_visible_cpu();
+				else
+					device = &m_machine.root_device();
+			}
 		}
 	}
 
@@ -796,13 +799,24 @@ bool debugger_commands::validate_memory_region_parameter(std::string_view param,
 ///   interpreted relative to.
 device_t &debugger_commands::get_device_search_base(std::string_view &param)
 {
-	// handle ".:" or ".^" prefix for tag relative to current CPU if any
-	if (!param.empty() && ('.' == param[0]) && ((param.size() == 1) || (':' == param[1]) || ('^' == param[1])))
+	if (!param.empty())
 	{
-		param.remove_prefix(((param.size() > 1) && (':' == param[1])) ? 2 : 1);
-		device_t *const current = m_console.get_visible_cpu();
-		return current ? *current : m_machine.root_device();
+		// handle ".:" or ".^" prefix for tag relative to current CPU if any
+		if (('.' == param[0]) && ((param.size() == 1) || (':' == param[1]) || ('^' == param[1])))
+		{
+			param.remove_prefix(((param.size() > 1) && (':' == param[1])) ? 2 : 1);
+			device_t *const current = m_console.get_visible_cpu();
+			return current ? *current : m_machine.root_device();
+		}
+
+		// a sibling path makes most sense relative to current CPU
+		if ('^' == param[0])
+		{
+			device_t *const current = m_console.get_visible_cpu();
+			return current ? *current : m_machine.root_device();
+		}
 	}
+
 
 	// default to root device
 	return m_machine.root_device();
