@@ -496,7 +496,7 @@ static const nes_mmc mmc_list[] =
 	{ 530, UNL_AX5705 },           // Super Mario Bros Pocker Mali
 	// 531 Used by Asder PC-95 Famicom clone built into a keyboard
 	// 532 Emulator only mapper for Chinese version of sangoht2?
-	// 533 Used by dongdng2 which is a CNROM variant with protection?
+	{ 533, SACHEN_3014 },          // Dong Dong Nao II
 	// 534 Are these all PnPs? Is one mc_101 or a clone not in nes.xml?
 	{ 535, UNL_LH53 },             // Nazo no Murasamejo FDS conversion
 	// 536 and 537 Waixing FS303, mapper 195 variants?

@@ -117,6 +117,7 @@ static const nes_pcb pcb_list[] =
 	{ "sa72008",          SACHEN_SA72008 },
 	{ "tca01",            SACHEN_TCA01 },
 	{ "s3013",            SACHEN_3013 },
+	{ "s3014",            SACHEN_3014 },
 	{ "s8259a",           SACHEN_8259A },
 	{ "s8259b",           SACHEN_8259B },
 	{ "s8259c",           SACHEN_8259C },

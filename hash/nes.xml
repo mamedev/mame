@@ -52330,14 +52330,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- Sachen / Thin Chen (and clones) -->
 
-	<software name="englpyrm">
-		<description>English Pyramid (Pirate)</description>
+	<software name="englpyrm" cloneof="dongdng2">
+		<description>Yeong-eo, Pyramid (Korea)</description>
 		<year>1991</year>
-		<publisher>Sachen</publisher>
-		<info name="serial" value="K-001"/>
+		<publisher>Kuk Je Academy</publisher>
+		<info name="serial" value="KA-001"/>
+		<info name="alt_title" value="영어, 피라미드"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ffe4" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="slot" value="s74x374" />
+			<feature name="pcb" value="UNL-SACHEN-74LS374N" />
 			<dataarea name="prg" size="32768">
 				<rom name="k-001 prg" size="32768" crc="7093ac82" sha1="7ec247a4fa445d8ee029ec5577767261e5685b8e" />
 			</dataarea>
@@ -53444,11 +53445,31 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dongdng2">
-		<description>Middle School English - Dong Dong Nao II (Tw)</description>
-		<!-- check title: Dong Dong Nao Ii - Guo Zhong Ying Wen in GoodNES, Middle School English - Dong Dong Nao - Guo Zhong Ying Wen in TOSEC -->
+		<description>Dòngdòngnǎo II: Guózhōng Yīngwén (I) (Taiwan)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-003"/>
+		<info name="alt_title" value="動動腦II: 國中英文(一)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="s3014" />
+			<feature name="pcb_model" value="3014" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="dde9079f" sha1="337235dbe6747a196e8aac7f97d18ad047f2f929" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="0.chr" size="16384" crc="cfd300b8" sha1="4c35e636de1b8527684252185061055a30999c70" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Is this a bootleg of the parent set or just a rom hack? PRG differs slightly, first half of CHR is a match, and second half of CHR is? -->
+	<software name="dongdng2a" cloneof="dongdng2">
+		<description>Dòngdòngnǎo II: Guózhōng Yīngwén (I) (Taiwan, alt)</description>
+		<year>1989</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="SA-003"/>
+		<info name="alt_title" value="動動腦II: 國中英文(一)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
