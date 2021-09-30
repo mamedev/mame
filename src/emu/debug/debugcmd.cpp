@@ -354,7 +354,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("mapd",      CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_map, this, AS_DATA, _1));
 	m_console.register_command("mapi",      CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_map, this, AS_IO, _1));
 	m_console.register_command("mapo",      CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_map, this, AS_OPCODES, _1));
-	m_console.register_command("memdump",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_memdump, this, _1));
+	m_console.register_command("memdump",   CMDFLAG_NONE, 0, 2, std::bind(&debugger_commands::execute_memdump, this, _1));
 
 	m_console.register_command("symlist",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_symlist, this, _1));
 
@@ -443,9 +443,9 @@ void debugger_commands::global_set(global_entry *global, u64 value)
 
 /// \brief Validate parameter as a Boolean value
 ///
-/// Validates a parameter as a Boolean value.  Only fixed string values
-/// are recognised, the parameter is not parsed as an expression.  The
-/// result is unchanged for an empty string.
+/// Validates a parameter as a Boolean value.  Fixed strings and
+/// expressions evaluating to numeric values are recognised.  The result
+/// is unchanged for an empty string.
 /// \param [in] param The parameter string.
 /// \param [in,out] result The default value on entry, and the value of
 ///   the parameter interpreted as a Boolean on success.  Unchanged if
@@ -459,19 +459,22 @@ bool debugger_commands::validate_boolean_parameter(const std::string &param, boo
 		return true;
 
 	// evaluate the expression; success if no error
-	bool is_true = core_stricmp(param.c_str(), "true") == 0 || param == "1";
-	bool is_false = core_stricmp(param.c_str(), "false") == 0 || param == "0";
+	bool const is_true = !core_stricmp(param.c_str(), "true");
+	bool const is_false = !core_stricmp(param.c_str(), "false");
 
 	if (is_true || is_false)
 	{
 		result = is_true;
 		return true;
 	}
-	else
-	{
-		m_console.printf("Invalid boolean '%s'\n", param);
+
+	// try to evaluate as a number
+	u64 val;
+	if (!validate_number_parameter(param, val))
 		return false;
-	}
+
+	result = val != 0;
+	return true;
 }
 
 
@@ -773,7 +776,9 @@ bool debugger_commands::validate_target_address_parameter(std::string_view param
 bool debugger_commands::validate_memory_region_parameter(std::string_view param, memory_region *&result)
 {
 	auto const &regions = m_machine.memory().regions();
-	auto const iter = regions.find(strmakelower(param));
+	std::string_view relative = param;
+	device_t &base = get_device_search_base(relative);
+	auto const iter = regions.find(base.subtag(strmakelower(relative)));
 	if (regions.end() != iter)
 	{
 		result = iter->second.get();
@@ -2481,8 +2486,8 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 	if (params.size() > 3 && !validate_number_parameter(params[3], width))
 		return;
 
-	u64 ascii = 1;
-	if (params.size() > 4 && !validate_number_parameter(params[4], ascii))
+	bool ascii = true;
+	if (params.size() > 4 && !validate_boolean_parameter(params[4], ascii))
 		return;
 
 	u64 rowsize = space->byte_to_address(16);
@@ -3950,17 +3955,24 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string>
 
 void debugger_commands::execute_memdump(const std::vector<std::string> &params)
 {
-	FILE *file;
-	const char *filename;
+	device_t *root = &m_machine.root_device();
+	if ((params.size() >= 2) && !validate_device_parameter(params[1], root))
+		return;
 
-	filename = params.empty() ? "memdump.log" : params[0].c_str();
-
-	m_console.printf("Dumping memory to %s\n", filename);
-
-	file = fopen(filename, "w");
-	if (file)
+	char const *const filename = params.empty() ? "memdump.log" : params[0].c_str();
+	FILE *const file = fopen(filename, "w");
+	if (!file)
 	{
-		memory_interface_enumerator iter(m_machine.root_device());
+		m_console.printf("Error opening file %s\n", filename);
+		return;
+	}
+
+	m_console.printf("Dumping memory maps to %s\n", filename);
+
+	try
+	{
+		memory_interface_enumerator iter(*root);
+		std::vector<memory_entry> entries[2];
 		for (device_memory_interface &memory : iter)
 		{
 			for (int space = 0; space != memory.max_space_count(); space++)
@@ -3970,7 +3982,6 @@ void debugger_commands::execute_memdump(const std::vector<std::string> &params)
 					bool octal = sp.is_octal();
 					int nc = octal ? (sp.addr_width() + 2) / 3 : (sp.addr_width() + 3) / 4;
 
-					std::vector<memory_entry> entries[2];
 					sp.dump_maps(entries[0], entries[1]);
 					for (int mode = 0; mode < 2; mode ++)
 					{
@@ -3981,8 +3992,8 @@ void debugger_commands::execute_memdump(const std::vector<std::string> &params)
 								fprintf(file, "%0*o - %0*o:", nc, entry.start, nc, entry.end);
 							else
 								fprintf(file, "%0*x - %0*x:", nc, entry.start, nc, entry.end);
-							for(const auto &c : entry.context)
-								if(c.disabled)
+							for (const auto &c : entry.context)
+								if (c.disabled)
 									fprintf(file, " %s[off]", c.view->name().c_str());
 								else
 									fprintf(file, " %s[%d]", c.view->name().c_str(), c.slot);
@@ -3990,9 +4001,16 @@ void debugger_commands::execute_memdump(const std::vector<std::string> &params)
 						}
 						fprintf(file, "\n");
 					}
+					entries[0].clear();
+					entries[1].clear();
 				}
 		}
 		fclose(file);
+	}
+	catch (...)
+	{
+		fclose(file);
+		throw;
 	}
 }
 
