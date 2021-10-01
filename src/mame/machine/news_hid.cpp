@@ -63,7 +63,11 @@ void news_hid_hle_device::map_68k(address_map &map)
 void news_hid_hle_device::map_apbus(address_map &map)
 {
 	// see https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/kb_ap.c#L44
-	// TODO: speed, buzzer, keyboard tx
+	// Note that this isn't actually fully functional yet, but it doesn't matter since
+	// the APbus driver (NWS-5000X/news_r4k) doesn't have the framebuffer emulated yet
+	// so the graphical console can't be used anyways. This is enough to satisfy the
+	// keyboard/mouse init routines in NEWS-OS.
+	// TODO: speed, buzzer, keyboard tx, make it actually work
 	map(0x0, 0x3).r(FUNC(news_hid_hle_device::data_r<KEYBOARD>));
 	map(0x4, 0x7).r(FUNC(news_hid_hle_device::status_r<KEYBOARD>));
 	map(0x8, 0xb).w(FUNC(news_hid_hle_device::init_w<KEYBOARD>));
@@ -73,12 +77,11 @@ void news_hid_hle_device::map_apbus(address_map &map)
 	map(0x18, 0x1b).r(FUNC(news_hid_hle_device::status_r<MOUSE>));
 	map(0x1c, 0x1f).w(FUNC(news_hid_hle_device::init_w<MOUSE>));
 	map(0x20, 0x23).w(FUNC(news_hid_hle_device::reset_w<MOUSE>));
-	map(0x24, 0x27).lr32(NAME([this](offs_t offset) { return 0x0; })); // ms speed r
+	// 24-27 ms speed r
 	// 28-2b kb buzzf
 	// 2c-2f kb buzz
 	// 30-33 kb tx data
-	map(0x30, 0x37).lr32(NAME([this](offs_t offset) { return 0x4; }));
-	// 34-37 kb tx stat
+	map(0x34, 0x37).lr32(NAME([this](offs_t offset) { return 0x1; })); // kb tx stat (pretend to accept anything, AFAICT)
 	// 38-3b kb tx init
 	// 3c-3f kb tx reset
 	// 40-43 kb tx speed
