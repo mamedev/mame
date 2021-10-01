@@ -121,7 +121,7 @@ irq vector 0x12: writes 0x10 to [$fa19]                                         
 irq vector 0x14: same as 2, (A = 0x00, B = 0x01)                                            ;keyboard control irq (function keys)
 irq vector 0x16: tests ppi port c, writes the result to $feca.                              ;joystick / sub irq trigger
 irq vector 0x18:                                                                            ;TVR (?)
-irq vector 0x1a:                                                                            ;Date
+irq vector 0x1a:                                                                            floppy_formats;Date
 irq vector 0x1c:                                                                            ;(unused)
 irq vector 0x1e:                                                                            ;(unused)
 irq vector 0x20:                                                                            ;uPD7752 voice irq
@@ -136,7 +136,8 @@ irq vector 0x26:                                                                
 
 #define LOG_IRQ    (1U << 1)
 
-#define VERBOSE (LOG_IRQ)
+//#define VERBOSE (LOG_IRQ)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 #define LOGIRQ(...)     LOGMASKED(LOG_IRQ, __VA_ARGS__)
@@ -265,7 +266,6 @@ void pc6001_state::pc6001_io(address_map &map)
 	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0xa3, 0xa3).mirror(0x0c).nopw();
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001_state::system_latch_w));
-	map(0xd0, 0xd3).mirror(0x0c).noprw(); // disk device
 }
 
 /*****************************************
@@ -745,8 +745,6 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 	map(0xc1, 0xc1).w(FUNC(pc6001mk2_state::mk2_vram_bank_w));
 	map(0xc2, 0xc2).w(FUNC(pc6001mk2_state::mk2_opt_bank_w));
 
-	map(0xd0, 0xd3).mirror(0x0c).noprw(); // PC80S31 disk device
-
 	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
 	map(0xf0, 0xf0).rw(FUNC(pc6001mk2_state::mk2_bank_r0_r), FUNC(pc6001mk2_state::mk2_bank_r0_w));
@@ -765,15 +763,43 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
  *
  ****************************************/
 
-// disk device placeholder
-// TODO: identify & hook-up this FDC
-uint8_t pc6601_state::fdc_r()
+// disk device I/F
+void pc6601_state::fdc_sel_w(uint8_t data)
 {
-	return machine().rand();
+	// bit 2 selects between internal (0) and external (1) FDC interfaces
+	// other bits unknown purpose
+	m_fdc_intf_view.select((data & 4) >> 2);
 }
 
-void pc6601_state::fdc_w(uint8_t data)
+u8 pc6601_state::fdc_mon_r()
 {
+	// bit 0 reads the motor line status (active low)
+	return 0;
+}
+
+void pc6601_state::fdc_mon_w(u8 data)
+{
+	m_floppy->get_device()->mon_w(!BIT(data,0));
+}
+
+// TODO: 0xd0, 0xd3 FIFO data buffer from/to FDC (external DMA?)
+// PC-6001mk2SR / PC-6601SR tests these FIFO ports first,
+// ditching attempt to floppy load if reading doesn't match 0x55aa previous writes.
+// PC-6601 ignores this.
+
+// TODO: hangs at first internal FDC command sense irq status in PC-6601 (and later machines if data buffer is enabled)
+// It recalibrate and expects that uPD765 returns a DIO high that never happens.
+
+void pc6601_state::pc6601_fdc_io(address_map &map)
+{
+	map(0xb1, 0xb1).mirror(0x4).w(FUNC(pc6601_state::fdc_sel_w));
+//  0xb0, 0xb3
+	map(0xd0, 0xdf).view(m_fdc_intf_view);
+	m_fdc_intf_view[0](0xd4, 0xd4).r(FUNC(pc6601_state::fdc_mon_r));
+	m_fdc_intf_view[0](0xd6, 0xd6).w(FUNC(pc6601_state::fdc_mon_w));
+	m_fdc_intf_view[0](0xdc, 0xdd).m(m_fdc, FUNC(upd765a_device::map));
+
+	m_fdc_intf_view[1](0xd0, 0xd3).mirror(0x4).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
 void pc6601_state::pc6601_io(address_map &map)
@@ -782,12 +808,7 @@ void pc6601_state::pc6601_io(address_map &map)
 	map.global_mask(0xff);
 	pc6001mk2_io(map);
 
-	// these are disk related
-//  map(0xb1
-//  map(0xb2
-//  map(0xb3
-
-	map(0xd0, 0xdf).rw(FUNC(pc6601_state::fdc_r), FUNC(pc6601_state::fdc_w));
+	pc6601_fdc_io(map);
 }
 
 /*****************************************
@@ -966,12 +987,13 @@ u8 pc6001sr_state::hw_rev_r()
 {
 	// bit 1 is active for pc6601sr (and shows the "PC6601SR World" screen in place of the "PC6001mkIISR World"),
 	// causes a direct jump to "video telopper" for pc6001mk2sr
-	return 0;
+	// bit 0 is related to FDC irq status
+	return 0 | 1;
 }
 
 u8 pc6601sr_state::hw_rev_r()
 {
-	return 2;
+	return 2 | 1;
 }
 
 void pc6001sr_state::crt_mode_w(u8 data)
@@ -1028,10 +1050,9 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 	map(0xa3, 0xa3).mirror(0x0c).noprw();
 
 	map(0xb0, 0xb0).w(FUNC(pc6001sr_state::sr_system_latch_w));
-	/* these are disk related */
-//  map(0xb1
+
+	pc6601_fdc_io(map);
 	map(0xb2, 0xb2).r(FUNC(pc6001sr_state::hw_rev_r));
-//  map(0xb3
 
 	map(0xb8, 0xbf).ram().share("irq_vectors");
 //  map(0xc0, 0xc0).w(FUNC(pc6001sr_state::mk2_col_bank_w));
@@ -1042,8 +1063,6 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 	map(0xc9, 0xc9).w(FUNC(pc6001sr_state::sr_vram_bank_w));
 	map(0xce, 0xce).w(FUNC(pc6001sr_state::sr_bitmap_yoffs_w));
 	map(0xcf, 0xcf).w(FUNC(pc6001sr_state::sr_bitmap_xoffs_w));
-
-	map(0xd0, 0xdf).rw(FUNC(pc6001sr_state::fdc_r), FUNC(pc6001sr_state::fdc_w)); // disk device
 
 	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
@@ -1565,6 +1584,14 @@ void pc6001mk2_state::machine_reset()
 //  refresh_crtc_params();
 }
 
+void pc6601_state::machine_start()
+{
+	pc6001mk2_state::machine_start();
+	
+	m_fdc->set_rate(250000);
+	m_floppy->get_device()->set_rpm(300);
+}
+
 void pc6001sr_state::machine_reset()
 {
 	pc6001_state::machine_reset();
@@ -1713,7 +1740,34 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pc6001m2);
 
-	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
+	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
+
+void pc6601_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	// TODO: cannot identify .dsk images anyway
+	// (HxC reports them to be MSX based images)
+	fr.add(FLOPPY_MSX_FORMAT);
+	fr.add(FLOPPY_DSK_FORMAT);
+}
+
+static void pc6601_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35ssdd", FLOPPY_35_SSDD);
+}
+
+void pc6601_state::pc6601_fdc_config(machine_config &config)
+{
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	FLOPPY_CONNECTOR(config, m_floppy, pc6601_floppies, "35ssdd", pc6601_state::floppy_formats).enable_sound(true);
+
+	// TODO: slotify external I/F 
+	// PC-6031 mini disk unit (single 5'25 2D drive)
+	PC80S31(config, m_pc80s31, XTAL(4'000'000));
+	config.set_perfect_quantum(m_maincpu);
+//	config.set_perfect_quantum("pc80s31:fdc_cpu");
 }
 
 void pc6601_state::pc6601(machine_config &config)
@@ -1726,6 +1780,8 @@ void pc6601_state::pc6601(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc6601_state::pc6601_io);
 //  m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6601_state::irq_callback));
+	
+	pc6601_fdc_config(config);
 }
 
 void pc6001sr_state::pc6001sr(machine_config &config)
@@ -1744,6 +1800,8 @@ void pc6001sr_state::pc6001sr(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(pc6001sr_state::screen_update_pc6001sr));
 
+	pc6601_fdc_config(config);
+
 	// TODO: ym2203
 	// TODO: 1D 3'5" floppy drive
 	// TODO: telopper board (system explicitly asks for missing tape dump tho)
@@ -1753,7 +1811,8 @@ void pc6601sr_state::pc6601sr(machine_config &config)
 {
 	pc6001sr(config);
 
-	// TODO: 1DD 3'5" floppy drive
+	FLOPPY_CONNECTOR(config.replace(), m_floppy, pc6601_floppies, "35dd", pc6601sr_state::floppy_formats);
+
 	// TODO: IR keyboard (does it have functional differences wrt normal PC-6001?)
 	// TODO: TV tuner
 }

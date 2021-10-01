@@ -7,10 +7,15 @@
 
 
 #include "cpu/z80/z80.h"
+#include "formats/dsk_dsk.h"
+#include "formats/msx_dsk.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/pc80s31k.h"
 #include "machine/timer.h"
+#include "machine/upd765.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
 //#include "sound/ymopn.h"
@@ -247,15 +252,31 @@ class pc6601_state : public pc6001mk2_state
 public:
 	pc6601_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6001mk2_state(mconfig, type, tag)
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
+		, m_pc80s31(*this, "pc80s31")
+		, m_fdc_intf_view(*this, "fdc_intf")
 	{ }
 
 	void pc6601(machine_config &config);
 
 protected:
-	uint8_t fdc_r();
-	void fdc_w(uint8_t data);
+	virtual void machine_start() override;
 
 	void pc6601_io(address_map &map);
+
+	void pc6601_fdc_io(address_map &map);
+	void pc6601_fdc_config(machine_config &config);
+	static void floppy_formats(format_registration &fr);
+
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
+	required_device<pc80s31_device> m_pc80s31;
+	memory_view m_fdc_intf_view;
+
+	u8 fdc_mon_r();
+	void fdc_mon_w(u8 data);
+	void fdc_sel_w(u8 data);
 };
 
 class pc6001sr_state : public pc6601_state
