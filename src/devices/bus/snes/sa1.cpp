@@ -327,12 +327,12 @@ void sns_sa1_device::dma_transfer()
 				if ((dma_src & 0x40e000) == 0x006000)
 				{
 					m_sa1->adjust_icount(-1); // wait 1 cycle
-					data = read_bwram<true>((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff), false);
+					data = read_bwram<true>((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff));
 				}
 				if ((dma_src & 0xf00000) == 0x400000)
 				{
 					m_sa1->adjust_icount(-1); // wait 1 cycle
-					data = read_bwram<true>(dma_src & 0xfffff, false);
+					data = read_bwram<true>(dma_src & 0xfffff);
 				}
 				break;
 
