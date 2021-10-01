@@ -1745,11 +1745,13 @@ void nes_bmc_gkb_device::write_h(offs_t offset, u8 data)
  Board BMC-GKCXIN1
 
  Unknown Bootleg Multigame Board
- Games: 21 in 1
+ Games: 21 in 1, 64 in 1
 
  NES 2.0: mapper 288
 
  In MAME: Supported.
+
+ TODO: This has some sort of solder pad settings.
 
  -------------------------------------------------*/
 
