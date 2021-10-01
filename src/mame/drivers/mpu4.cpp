@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* these are the MPU4 set listings / set specific code, for hardware emulation see machine/mpu4.cpp */
+// these are the MPU4 set listings / set specific code, for hardware emulation see machine/mpu4.cpp
 
 /* todo: driver inits (basic hw reel, protection configs etc.) should probably be moved here
          once the actual code for them is cleaned up and can be put into neater structures
@@ -1557,7 +1557,7 @@ ROM_START( m4esctbg )
 	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
 
 	ROM_REGION( 0x104, "pld", 0 )
-	ROM_LOAD( "pal16l8.ic7", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8d-2pc.ic7", 0x000, 0x104, CRC(e8e7ccde) SHA1(b1ece0d51003c794f00655a8c52e5f7fd843b4c5) )
 ROM_END
 
 ROM_START( m4esctbga )
@@ -1572,7 +1572,7 @@ ROM_START( m4esctbga )
 	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
 
 	ROM_REGION( 0x104, "pld", 0 )
-	ROM_LOAD( "pal16l8.ic7", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8d-2pc.ic7", 0x000, 0x104, CRC(e8e7ccde) SHA1(b1ece0d51003c794f00655a8c52e5f7fd843b4c5) )
 ROM_END
 
 ROM_START( m4esctbgb )
@@ -1587,7 +1587,7 @@ ROM_START( m4esctbgb )
 	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
 
 	ROM_REGION( 0x104, "pld", 0 )
-	ROM_LOAD( "pal16l8.ic7", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8d-2pc.ic7", 0x000, 0x104, CRC(e8e7ccde) SHA1(b1ece0d51003c794f00655a8c52e5f7fd843b4c5) )
 ROM_END
 
 
