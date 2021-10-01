@@ -13,8 +13,6 @@
  *   - https://web.archive.org/web/19970713173157/http%3A%2F%2Fwww1.sony.co.jp%2FOCMP%2F
  *   - https://github.com/briceonk/news-os
  *
- *  For an in-depth write-up of the current issues, see: https://github.com/briceonk/news-os/blob/master/nws5000x-mame.md
- *
  *  CPU configuration:
  *	- CPU card has a 75MHz crystal, multiplier (if any) TBD
  *	- PRId = 0x450
@@ -49,7 +47,15 @@
  *  General Emulation Status (major chips only, there are additional smaller chips including CPLDs on the boards)
  *  CPU card:
  *   - MIPS R4400: emulated, with the caveats above
+ *     - The DRC breaks the NEWS-OS APbus bootloader, so for now, the `-nodrc` flag is required to boot NEWS-OS.
+ *       The monitor ROM and the NetBSD floppy bootloader seems OK with DRC so far.
  *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache?): not emulated
+ *     - The lack of secondary cache doesn't stop NEWS-OS from booting... except for the fact that the memory allocator hangs
+ *       early in the boot flow if the secondary cache size is 0KB as measured by the kernel because the scache size is used
+ *       when determining some of the variables used by the memory allocator. This can be bypassed using the debugger.
+ *       Caveat: other NEWS-OS 4 kernels will have this in a different spot.
+ *        - Vanilla NEWS-OS 4.2.1aRD (FCS#2): Set breakpoint at 0x800CD5E8, then update memory location 0x801AECB0 to 0x100000 (1024 KB)
+ *        - Kernel recompiled without esccf driver (highly unlikely to match other builds): bp@0x800CBA78, memory location 0x801A46AC
  *  Motherboard:
  *   - Sony CXD8490G, CXD8491G, CXD8492G, CXD8489G (unknown ASICs): not emulated
  *   - Main memory: partially emulated (hack required for the monitor ROM to enumerate RAM correctly)
@@ -58,8 +64,9 @@
  *   - National Semi PC8477B Floppy Controller: emulated (uses the -A version currently, but it seems to work)
  *   - Zilog Z8523010VSC ESCC serial interface: emulated (see following)
  *   - Sony CXD8421Q WSC-ESCC1 serial APbus interface controller: skeleton (ESCC connections, probably DMA, APbus interface, etc. handled by this chip)
+ *     - The ESCC FIFO is unemulated at the moment, so the NEWS-OS 4.2.1aRD kernel only boots with a recompiled kernel removing the esccf async driver
  *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and DMA for sound, floppy, etc.)
- *   - National Semi DP83932B-VF SONIC Ethernet controller: Not fully working yet (also, is using -C rather than -B version)
+ *   - National Semi DP83932B-VF SONIC Ethernet controller: Emulated (still testing though)
  *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: partially emulated
  *   - Sony CXD8418Q WSC-PARK3: not fully emulated, but some of the general platform functions may come from this chip (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
  *   - Sony CXD8403Q DMAC3Q DMA controller: Partially emulated
@@ -354,6 +361,10 @@ void news_r4k_state::machine_common(machine_config &config)
     m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
     m_sonic->set_bus(m_sonic3, 1);
     m_sonic->set_bmode(true); // big-endian mode to set word order
+
+    // Use promiscuous mode to force network driver to accept all packets, since SONIC has its own filter (CAM table)
+    // Not sure if needing to use this means something else isn't set up correctly.
+    m_sonic->set_promisc(true);
 
     // Keyboard and mouse
     // Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt

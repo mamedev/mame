@@ -10,7 +10,7 @@
  *   http://bitsavers.org/components/national/_dataBooks/1995_National_Ethernet_Databook.pdf
  *
  * TODO
- *   - bus mode (big endian, interrupts active low)
+ *   - bus mode (big endian, interrupts active low) - partially implemented
  *   - byte count mismatch
  *   - data widths
  *   - tally counters
@@ -150,7 +150,7 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	if (m_reg[CRDA] & 1)
 	{
 		// re-read the previous descriptor link field
-		m_reg[CRDA] = !m_bmode ? m_bus->read_word(EA(m_reg[URDA], m_reg[LLFA])) : m_bus->read_word(EA(m_reg[URDA], m_reg[LLFA]) + 2);
+		m_reg[CRDA] = read_bus_word(EA(m_reg[URDA], m_reg[LLFA]));
 		if (m_reg[CRDA] & 1)
 		{
 			logerror("no receive descriptor available\n");
@@ -186,19 +186,19 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	// write status to rda
 	// TODO: don't write the rda if rba limit exceeded (buffer overflow)
 	offs_t const rda = EA(m_reg[URDA], m_reg[CRDA]);
-	!m_bmode ? m_bus->write_word(rda + 0 * width, m_reg[RCR]) : m_bus->write_word(rda + 0 * width + 2, m_reg[RCR]);
-	!m_bmode ? m_bus->write_word(rda + 1 * width, length) : m_bus->write_word(rda + 1 * width + 2, length);
-	!m_bmode ? m_bus->write_word(rda + 2 * width, m_reg[CRBA0]) : m_bus->write_word(rda + 2 * width + 2, m_reg[CRBA0]);
-	!m_bmode ? m_bus->write_word(rda + 3 * width, m_reg[CRBA1]) : m_bus->write_word(rda + 3 * width + 2, m_reg[CRBA1]);
-	!m_bmode ? m_bus->write_word(rda + 4 * width, m_reg[RSC]) : m_bus->write_word(rda + 4 * width + 2, m_reg[RSC]);
+	write_bus_word(rda + 0 * width, m_reg[RCR]);
+	write_bus_word(rda + 1 * width, length);
+	write_bus_word(rda + 2 * width, m_reg[CRBA0]);
+	write_bus_word(rda + 3 * width, m_reg[CRBA1]);
+	write_bus_word(rda + 4 * width, m_reg[RSC]);
 	m_reg[LLFA] = m_reg[CRDA] + 5 * width;
-	m_reg[CRDA] = !m_bmode ? m_bus->read_word(rda + 5 * width) : m_bus->read_word(rda + 5 * width + 2);
+	m_reg[CRDA] = read_bus_word(rda + 5 * width);
 
 	// check for end of list
 	if (m_reg[CRDA] & 1)
 		m_reg[ISR] |= ISR_RDE;
 	else
-		!m_bmode ? m_bus->write_word(rda + 6 * width, 0) : m_bus->write_word(rda + 6 * width + 2, 0);
+		write_bus_word(rda + 6 * width, 0);
 
 	// handle buffer exhaustion
 	if (rbwc < m_reg[EOBC])
@@ -362,9 +362,9 @@ void dp83932c_device::transmit()
 
 	// read control information from tda and load registers
 	u16 const tcr = m_reg[TCR];
-	m_reg[TCR] = !m_bmode ? m_bus->read_word(tda + word++ * width) & TCR_TPC : m_bus->read_word(tda + word++ * width + 2) & TCR_TPC;
-	m_reg[TPS] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
-	m_reg[TFC] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
+	m_reg[TCR] = read_bus_word(tda + word++ * width) & TCR_TPC;
+	m_reg[TPS] = read_bus_word(tda + word++ * width);
+	m_reg[TFC] = read_bus_word(tda + word++ * width);
 	LOG("width = %u TDA= 0x%x TCR = 0x%x TPS = 0x%x TFC = 0x%x\n", width, tda, m_reg[TCR], m_reg[TPS], m_reg[TFC]);
 
 	// check for programmable interrupt
@@ -379,9 +379,9 @@ void dp83932c_device::transmit()
 	for (unsigned fragment = 0; fragment < m_reg[TFC]; fragment++)
 	{
 		// read fragment address and size
-		m_reg[TSA0] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
-		m_reg[TSA1] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
-		m_reg[TFS] = !m_bmode ? m_bus->read_word(tda + word++ * width) : m_bus->read_word(tda + word++ * width + 2);
+		m_reg[TSA0] = read_bus_word(tda + word++ * width);
+		m_reg[TSA1] = read_bus_word(tda + word++ * width);
+		m_reg[TFS] = read_bus_word(tda + word++ * width);
 
 		offs_t const tsa = EA(m_reg[TSA1], m_reg[TSA0]);
 		LOG("fragment %u: TCR = 0x%x TPS = 0x%x TFC = 0x%x TSA = 0x%x\n", fragment, m_reg[TCR], m_reg[TPS], m_reg[TFC], tsa);
@@ -426,14 +426,14 @@ void dp83932c_device::send_complete_cb(int result)
 	}
 
 	// write descriptor status
-	!m_bmode ? m_bus->write_word(EA(m_reg[UTDA], m_reg[TTDA]), m_reg[TCR] & TCR_TPS) : m_bus->write_word(EA(m_reg[UTDA], m_reg[TTDA]) + 2, m_reg[TCR] & TCR_TPS);
+	write_bus_word(EA(m_reg[UTDA], m_reg[TTDA]), m_reg[TCR] & TCR_TPS);
 
 	// check for halt
 	if (!(m_reg[CR] & CR_HTX))
 	{
 		// load next descriptor address
 		LOG("scc before loading next addr: CTDA = 0x%x\n", m_reg[CTDA]);
-		m_reg[CTDA] = !m_bmode ? m_bus->read_word(EA(m_reg[UTDA], m_reg[CTDA])) : m_bus->read_word(EA(m_reg[UTDA], m_reg[CTDA]) + 2);
+		m_reg[CTDA] = read_bus_word(EA(m_reg[UTDA], m_reg[CTDA]));
 		LOG("scc after loading next addr: CTDA = 0x%x\n", m_reg[CTDA]);
 
 		// check for end of list
@@ -461,10 +461,10 @@ void dp83932c_device::read_rra(bool command)
 
 	offs_t const rrp = EA(m_reg[URRA], m_reg[RRP]);
 
-	m_reg[CRBA0] = !m_bmode ? m_bus->read_word(rrp + 0 * width) : m_bus->read_word(rrp + 0 * width + 2);
-	m_reg[CRBA1] = !m_bmode ? m_bus->read_word(rrp + 1 * width) : m_bus->read_word(rrp + 1 * width + 2);
-	m_reg[RBWC0] = !m_bmode ? m_bus->read_word(rrp + 2 * width) : m_bus->read_word(rrp + 2 * width + 2);
-	m_reg[RBWC1] = !m_bmode ? m_bus->read_word(rrp + 3 * width) : m_bus->read_word(rrp + 3 * width + 2);
+	m_reg[CRBA0] = read_bus_word(rrp + 0 * width);
+	m_reg[CRBA1] = read_bus_word(rrp + 1 * width);
+	m_reg[RBWC0] = read_bus_word(rrp + 2 * width);
+	m_reg[RBWC1] = read_bus_word(rrp + 3 * width);
 
 	LOG("read_rra crba 0x%08x rbwc 0x%08x\n",
 		EA(m_reg[CRBA1], m_reg[CRBA0]), EA(m_reg[RBWC1], m_reg[RBWC0]));
@@ -493,29 +493,15 @@ void dp83932c_device::load_cam()
 	{
 		offs_t const cdp = EA(m_reg[URRA], m_reg[CDP]);
 
-		u16 const cep = !m_bmode ? m_bus->read_word(cdp + 0 * width) & 0xf : m_bus->read_word(cdp + 0 * width + 2) & 0xf;
-		u16 const cap0 = !m_bmode ? m_bus->read_word(cdp + 1 * width) :  m_bus->read_word(cdp + 1 * width + 2);
-		u16 const cap1 = !m_bmode ? m_bus->read_word(cdp + 2 * width) :  m_bus->read_word(cdp + 2 * width + 2);
-		u16 const cap2 = !m_bmode ? m_bus->read_word(cdp + 3 * width) :  m_bus->read_word(cdp + 3 * width + 2);
+		u16 const cep = read_bus_word(cdp + 0 * width) & 0xf;
+		u16 const cap0 = read_bus_word(cdp + 1 * width);
+		u16 const cap1 = read_bus_word(cdp + 2 * width);
+		u16 const cap2 = read_bus_word(cdp + 3 * width);
 
 		// FIXME: documented byte/word order doesn't match emulation
 
 		LOG("load_cam entry %2d %02x:%02x:%02x:%02x:%02x:%02x\n",
 			cep, u8(cap0), cap0 >> 8, u8(cap1), cap1 >> 8, u8(cap2), cap2 >> 8);
-		
-		if(cep == 0)
-		{
-			// hack - need osd to pass packets targeted for this MAC address
-			// still need to find out why this doesn't work out of the box
-			char mac[6];
-			mac[0] = (u8)cap0;
-			mac[1] = cap0 >> 8;
-			mac[2] = (u8)cap1;
-			mac[3] = cap1 >> 8;
-			mac[4] = (u8)cap2;
-			mac[5] = cap2 >> 8;
-			set_mac(mac);
-		}
 
 		m_cam[cep] =
 			(u64(u8(cap0 >> 0)) << 40) | (u64(u8(cap0 >> 8)) << 32) | (u64(u8(cap1 >> 0)) << 24) |
@@ -526,7 +512,7 @@ void dp83932c_device::load_cam()
 	}
 
 	// read cam enable
-	m_reg[CE] = !m_bmode ? m_bus->read_word(EA(m_reg[URRA], m_reg[CDP])) : m_bus->read_word(EA(m_reg[URRA], m_reg[CDP]) + 2);
+	m_reg[CE] = read_bus_word(EA(m_reg[URRA], m_reg[CDP]));
 	LOG("load_cam enable 0x%04x\n", m_reg[CE]);
 
 	m_reg[CR] &= ~CR_LCAM;
@@ -608,4 +594,34 @@ void dp83932c_device::dump_bytes(u8 *buf, int length)
 				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
 				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
 	}
+}
+
+u16 dp83932c_device::read_bus_word(offs_t address)
+{
+	// I need to research other drivers in MAME to see how this is handled elsewhere.
+	// This logic compensates for the fact that, while read_word will deal with the endian-ness
+	// because the bus is configured as such, the organization in memory is a bit annoying to deal
+	// with in 32 bit mode.
+	// In LE mode, SONIC's access pattern will be:
+	//  <byte 0>  <byte 1> <byte 2>  <byte 3>
+	// |----- word 0 -----|----- word 1 -----|
+	// and only cares about word 0 in 32 bit mode.
+	// In BE mode, SONIC's access pattern will be:
+	//  <byte 3>  <byte 2> <byte 1>  <byte 0>
+	// |----- word 1 -----|----- word 0 -----|
+	// So, since we have the bus magic doing the bytewise endian-ness conversion in the read_word/memory_read_generic methods,
+	// in 32-bit BE mode we only need to offset the word address by 2 in order to get the appropriate alignment.
+	// Also, that all might be wrong, I'm still learning... This results in well-formed packets from the Sony NEWS NWS-5000X
+	// driver though, so hopefully it is at least on the right track.
+	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
+
+	return (!m_bmode || width == 2) ? m_bus->read_word(address) : m_bus->read_word(address + 2);
+}
+
+void dp83932c_device::write_bus_word(offs_t address, u16 data)
+{
+	// See read_bus_word for an in-depth description of why this method exists
+	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
+
+	(!m_bmode || width == 2) ? m_bus->write_word(address, data) : m_bus->write_word(address + 2, data);
 }
