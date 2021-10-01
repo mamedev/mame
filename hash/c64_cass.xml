@@ -1539,6 +1539,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="batmano" cloneof="batman">
+		<description>Batman (Ocean)</description>
+		<year>1989</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="1628718">
+				<rom name="batmano(a).tap" size="1628718" crc="69ce7e7e" sha1="695286f87a34cf8960958cd3ab1d875431537299"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1400538">
+				<rom name="batmano(b).tap" size="1400538" crc="d305af35" sha1="80e3d3706a890508ce27a1ea00812370041bf7c3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmancc">
 		<description>Batman: The Caped Crusader</description>
 		<year>1989</year>
@@ -1589,6 +1609,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bthrtime">
+		<description>Battle Through Time</description>
+		<year>1984</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="326295">
+				<rom name="bthrtime.tap" size="326295" crc="fa7ecb54" sha1="ca428209978836d606f920ad1b7c1554713c4f3b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bvalley">
 		<description>Battle Valley</description>
 		<year>1987</year>
@@ -1609,6 +1641,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="493122">
 				<rom name="Bazooka_Bill.tap" size="493122" crc="f68cd82c" sha1="d3f816f99b28d26b138c36a84e9a1b6c33669897"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bazbillm" cloneof="bazbill" supported="no"> <!-- tape loads but doesn't run (remains stuck light blue screen) -->
+		<description>Bazooka Bill (Melbourne House)</description>
+		<year>1986</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="585746">
+				<rom name="bazbillm.tap" size="585746" crc="5e357065" sha1="6a773637b697e42479bd332284fd1bd9ae6a1250"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1661,6 +1705,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="beachhd2">
+		<description>Beach-Head II</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="945354">
+				<rom name="beachhd2.tap" size="945354" crc="3ed32747" sha1="c49495b182e3543351515c26fe36fd86f83738f8"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="945354">
+				<rom name="beachhd2a.tap" size="945354" crc="a9a0e3bb" sha1="fa98be41d59c972517011dbb36d9bca15997b9d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beachhd2e" cloneof="beachhd2">
+		<description>Beach-Head II (Erbe)</description>
+		<year>1985</year>
+		<publisher>Erbe</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="945354">
+				<rom name="beachhd2e.tap" size="945354" crc="b9f29c99" sha1="9193e0360b183fa2384e2c6eb214bdd6226834a6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beatit">
 		<description>Beat-It</description>
 		<year>1987</year>
@@ -1669,6 +1743,46 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="550094">
 				<rom name="Beat-It.tap" size="550094" crc="e24040ff" sha1="d68529fb4b731987a00826567563ca95b3660bb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boelite1">
+		<description>Best of Elite: Vol. 1</description>
+		<year>1987</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Commando / Airwolf / Bomb Jack"/>
+			<dataarea name="cass" size="1788282">
+				<rom name="boelite1(a).tap" size="1788282" crc="3789f966" sha1="aed0cd955da419746bb8c093fef239b51b974701"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Frank Bruno's Boxing"/>
+			<dataarea name="cass" size="2072344">
+				<rom name="boelite1(b).tap" size="2072344" crc="a14f9a2c" sha1="2a7dde4db206e4d6676c7afb5d49d854cbbb2b35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boelite2">
+		<description>Best of Elite: Vol. 2</description>
+		<year>1987</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Paperboy / Ghosts'n Goblins"/>
+			<dataarea name="cass" size="1435903">
+				<rom name="boelite2(a).tap" size="1435903" crc="747d7ab0" sha1="eb635f66d51ad64fb13763ee0afd3e431bc7620f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Battle Ships / Bomb Jack II"/>
+			<dataarea name="cass" size="1342038">
+				<rom name="boelite2(b).tap" size="1342038" crc="d98aa91c" sha1="8ecae3c238d701f2a74204057fcd318e60757fe2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1691,6 +1805,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="beyondff">
+		<description>Beyond the Forbidden Forest</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1175779">
+				<rom name="beyondff.tap" size="1175779" crc="e8898afa" sha1="55dad25bf904c1c8435f23a7af2ee2c1def37c81"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="icepalac">
 		<description>Beyond the Ice Palace</description>
 		<year>1989</year>
@@ -1705,6 +1831,50 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="721721">
 				<rom name="Beyond_the_Ice_Palace_a1.tap" size="721721" crc="a331cacf" sha1="8d57bf2cacdf9a05d47fc826303b9f1b89cdd06b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icepalace">
+		<description>Beyond the Ice Palace (Elite Systems)</description>
+		<year>1988</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="721721">
+				<rom name="icepalace.tap" size="721721" crc="0f9cba6d" sha1="247cc5605a9f88efa72543a67859e7125adcd4c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biff">
+		<description>Biff</description>
+		<year>1992</year>
+		<publisher>Beyond Belief Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="457042">
+				<rom name="biff.tap" size="457042" crc="d002f17f" sha1="abdc8d85d258a9d9bf6b0376413819967dcd386e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bignames">
+		<description>Big Names Bonanza</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Forbidden Forest / Talladega"/>
+			<dataarea name="cass" size="965880">
+				<rom name="bignames(a).tap" size="965880" crc="56fedbc3" sha1="be8edb32566531c510241c28aa3a9cc3739e5fb3"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Fight Night / Stellar 7"/>
+			<dataarea name="cass" size="1526168">
+				<rom name="bignames(b).tap" size="1526168" crc="af26ad24" sha1="92a2a63db6d2e5026367dc084fc15d37f20e309e"/>
 			</dataarea>
 		</part>
 	</software>
