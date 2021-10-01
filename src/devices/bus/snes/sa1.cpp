@@ -327,12 +327,12 @@ void sns_sa1_device::dma_transfer()
 				if ((dma_src & 0x40e000) == 0x006000)
 				{
 					m_sa1->adjust_icount(-1); // wait 1 cycle
-					data = read_bwram<true>((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff));
+					data = read_bwram<true>((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff), false);
 				}
 				if ((dma_src & 0xf00000) == 0x400000)
 				{
 					m_sa1->adjust_icount(-1); // wait 1 cycle
-					data = read_bwram<true>(dma_src & 0xfffff);
+					data = read_bwram<true>(dma_src & 0xfffff, false);
 				}
 				break;
 
@@ -451,12 +451,15 @@ uint8_t sns_sa1_device::read_regs(uint32_t offset)
 				uint32_t data = (var_length_read<SA1Read>(m_vda + 0) <<  0) | (var_length_read<SA1Read>(m_vda + 1) <<  8) | (var_length_read<SA1Read>(m_vda + 2) << 16);
 				data >>= m_vbit;
 
-				if (m_drm == 1)
+				if (!machine().side_effects_disabled())
 				{
-					//auto-increment mode
-					m_vbit += m_vlen;
-					m_vda += (m_vbit >> 3);
-					m_vbit &= 7;
+					if (m_drm == 1)
+					{
+						//auto-increment mode
+						m_vbit += m_vlen;
+						m_vda += (m_vbit >> 3);
+						m_vbit &= 7;
+					}
 				}
 
 				value = (data >> 8) & 0xff;
@@ -890,53 +893,56 @@ uint8_t sns_sa1_device::read_cconv1_dma(uint32_t offset)
 {
 	uint32_t store_mask = (1 << (6 - m_dma_cconv_bits)) - 1;
 
-	if ((offset & store_mask) == 0)
+	if (!machine().side_effects_disabled())
 	{
-		uint32_t bpp = 2 << (2 - m_dma_cconv_bits);
-		uint32_t tile_stride = (8 << m_dma_cconv_size) >> m_dma_cconv_bits;
-		uint32_t bwram_addr_mask = m_nvram.size() - 1;
-		uint32_t tile = ((offset - m_src_addr) & bwram_addr_mask) >> (6 - m_dma_cconv_bits);
-		uint32_t ty = (tile >> m_dma_cconv_size);
-		uint32_t tx = tile & ((1 << m_dma_cconv_size) - 1);
-		uint32_t bwram_src = m_src_addr + ty * 8 * tile_stride + tx * bpp;
-
-		for (uint32_t y = 0; y < 8; y++)
+		if ((offset & store_mask) == 0)
 		{
-			uint64_t raw_pixels = 0;
-			for (uint64_t bit = 0; bit < bpp; bit++)
-			{
-				raw_pixels |= (uint64_t)m_nvram[(bwram_src + bit) & bwram_addr_mask] << (bit << 3);
-			}
-			bwram_src += tile_stride;
+			uint32_t bpp = 2 << (2 - m_dma_cconv_bits);
+			uint32_t tile_stride = (8 << m_dma_cconv_size) >> m_dma_cconv_bits;
+			uint32_t bwram_addr_mask = m_nvram.size() - 1;
+			uint32_t tile = ((offset - m_src_addr) & bwram_addr_mask) >> (6 - m_dma_cconv_bits);
+			uint32_t ty = (tile >> m_dma_cconv_size);
+			uint32_t tx = tile & ((1 << m_dma_cconv_size) - 1);
+			uint32_t bwram_src = m_src_addr + ty * 8 * tile_stride + tx * bpp;
 
-			uint8_t linear[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-			for (uint32_t x = 0; x < 8; x++)
+			for (uint32_t y = 0; y < 8; y++)
 			{
-				linear[0] |= BIT(raw_pixels, 0) << (7 - x);
-				linear[1] |= BIT(raw_pixels, 1) << (7 - x);
-				if (m_dma_cconv_bits == 2)
+				uint64_t raw_pixels = 0;
+				for (uint64_t bit = 0; bit < bpp; bit++)
 				{
-					raw_pixels >>= 2;
-					continue;
+					raw_pixels |= (uint64_t)m_nvram[(bwram_src + bit) & bwram_addr_mask] << (bit << 3);
 				}
-				linear[2] |= BIT(raw_pixels, 2) << (7 - x);
-				linear[3] |= BIT(raw_pixels, 3) << (7 - x);
-				if (m_dma_cconv_bits == 1)
-				{
-					raw_pixels >>= 4;
-					continue;
-				}
-				linear[4] |= BIT(raw_pixels, 4) << (7 - x);
-				linear[5] |= BIT(raw_pixels, 5) << (7 - x);
-				linear[6] |= BIT(raw_pixels, 6) << (7 - x);
-				linear[7] |= BIT(raw_pixels, 7) << (7 - x);
-				raw_pixels >>= 8;
-			}
+				bwram_src += tile_stride;
 
-			for (uint32_t byte = 0; byte < bpp; byte++)
-			{
-				uint32_t dst_addr = m_dst_addr + (y << 1) + ((byte & 6) << 3) + (byte & 1);
-				write_iram(dst_addr, linear[byte]);
+				uint8_t linear[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+				for (uint32_t x = 0; x < 8; x++)
+				{
+					linear[0] |= BIT(raw_pixels, 0) << (7 - x);
+					linear[1] |= BIT(raw_pixels, 1) << (7 - x);
+					if (m_dma_cconv_bits == 2)
+					{
+						raw_pixels >>= 2;
+						continue;
+					}
+					linear[2] |= BIT(raw_pixels, 2) << (7 - x);
+					linear[3] |= BIT(raw_pixels, 3) << (7 - x);
+					if (m_dma_cconv_bits == 1)
+					{
+						raw_pixels >>= 4;
+						continue;
+					}
+					linear[4] |= BIT(raw_pixels, 4) << (7 - x);
+					linear[5] |= BIT(raw_pixels, 5) << (7 - x);
+					linear[6] |= BIT(raw_pixels, 6) << (7 - x);
+					linear[7] |= BIT(raw_pixels, 7) << (7 - x);
+					raw_pixels >>= 8;
+				}
+
+				for (uint32_t byte = 0; byte < bpp; byte++)
+				{
+					uint32_t dst_addr = m_dst_addr + (y << 1) + ((byte & 6) << 3) + (byte & 1);
+					write_iram(dst_addr, linear[byte]);
+				}
 			}
 		}
 	}
@@ -945,7 +951,7 @@ uint8_t sns_sa1_device::read_cconv1_dma(uint32_t offset)
 }
 
 template<bool SA1Read>
-uint8_t sns_sa1_device::read_bwram(uint32_t offset)
+uint8_t sns_sa1_device::read_bwram(uint32_t offset, bool bitmap)
 {
 	int shift;
 	uint8_t mask;
@@ -954,16 +960,12 @@ uint8_t sns_sa1_device::read_bwram(uint32_t offset)
 		return 0xff;    // this should probably never happen, or are there SA-1 games with no BWRAM?
 
 	if (m_cconv1_dma_active && !SA1Read)
-	{
 		return read_cconv1_dma(offset);
-	}
 
-	if (offset < 0x100000)
+	if (!bitmap)
 		return m_nvram[offset & (m_nvram.size() - 1)];
 
 	// Bitmap BWRAM
-	offset -= 0x100000;
-
 	if (m_bwram_sa1_format)
 	{
 		// 2bits mode
@@ -983,22 +985,20 @@ uint8_t sns_sa1_device::read_bwram(uint32_t offset)
 	return (m_nvram[offset & (m_nvram.size() - 1)] >> shift) & mask;
 }
 
-void sns_sa1_device::write_bwram(uint32_t offset, uint8_t data)
+void sns_sa1_device::write_bwram(uint32_t offset, uint8_t data, bool bitmap)
 {
 	uint8_t mask;
 
 	if (m_nvram.empty())
 		return; // this should probably never happen, or are there SA-1 games with no BWRAM?
 
-	if (offset < 0x100000)
+	if (!bitmap)
 	{
 		m_nvram[offset & (m_nvram.size() - 1)] = data;
 		return;
 	}
 
 	// Bitmap BWRAM
-	offset -= 0x100000;
-
 	if (m_bwram_sa1_format)
 	{
 		// 2bits mode
@@ -1168,7 +1168,7 @@ uint8_t sns_sa1_device::sa1_hi_r(offs_t offset)
 		else if (address < 0x8000)
 		{
 			m_sa1->adjust_icount(-1); // wait 1 cycle
-			return read_bwram<true>((m_bwram_sa1 * 0x2000) + (offset & 0x1fff) + (m_bwram_sa1_source * 0x100000));        // SA-1 BWRAM
+			return read_bwram<true>((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), m_bwram_sa1_source);        // SA-1 BWRAM
 		}
 		else
 			return read_h(offset);   // ROM
@@ -1197,7 +1197,7 @@ uint8_t sns_sa1_device::sa1_lo_r(offs_t offset)
 		else if (address < 0x8000)
 		{
 			m_sa1->adjust_icount(-1); // wait 1 cycle
-			return read_bwram<true>((m_bwram_sa1 * 0x2000) + (offset & 0x1fff) + (m_bwram_sa1_source * 0x100000));        // SA-1 BWRAM
+			return read_bwram<true>((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), m_bwram_sa1_source);        // SA-1 BWRAM
 		}
 		else if (offset == 0xffee)
 		{
@@ -1231,12 +1231,12 @@ uint8_t sns_sa1_device::sa1_lo_r(offs_t offset)
 	else if (offset < 0x500000)
 	{
 		m_sa1->adjust_icount(-1); // wait 1 cycle
-		return read_bwram<true>(offset & 0xfffff);      // SA-1 BWRAM (not mirrored above!)
+		return read_bwram<true>(offset & 0xfffff, false);      // SA-1 BWRAM (not mirrored above!)
 	}
 	else if (offset >= 0x600000 && offset < 0x700000)
 	{
 		m_sa1->adjust_icount(-1); // wait 1 cycle
-		return read_bwram<true>((offset & 0xfffff) + 0x100000);       // SA-1 BWRAM Bitmap mode
+		return read_bwram<true>(offset & 0xfffff, true);       // SA-1 BWRAM Bitmap mode
 	}
 	else
 		return 0xff;    // nothing should be mapped here, so maybe open bus?
@@ -1259,7 +1259,7 @@ void sns_sa1_device::sa1_hi_w(offs_t offset, uint8_t data)
 		else if (address < 0x8000)
 		{
 			m_sa1->adjust_icount(-1); // wait 1 cycle
-			write_bwram((m_bwram_sa1 * 0x2000) + (offset & 0x1fff) + (m_bwram_sa1_source * 0x100000), data);        // SA-1 BWRAM
+			write_bwram((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), data, m_bwram_sa1_source);        // SA-1 BWRAM
 		}
 	}
 }
@@ -1269,12 +1269,12 @@ void sns_sa1_device::sa1_lo_w(offs_t offset, uint8_t data)
 	if (offset >= 0x400000 && offset < 0x500000)
 	{
 		m_sa1->adjust_icount(-1); // wait 1 cycle
-		write_bwram(offset & 0xfffff, data);        // SA-1 BWRAM (not mirrored above!)
+		write_bwram(offset & 0xfffff, data, false);        // SA-1 BWRAM (not mirrored above!)
 	}
 	else if (offset >= 0x600000 && offset < 0x700000)
 	{
 		m_sa1->adjust_icount(-1); // wait 1 cycle
-		write_bwram((offset & 0xfffff) + 0x100000, data);       // SA-1 BWRAM Bitmap mode
+		write_bwram(offset & 0xfffff, data, true);       // SA-1 BWRAM Bitmap mode
 	}
 	else
 		sa1_hi_w(offset, data);
