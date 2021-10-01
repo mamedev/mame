@@ -412,23 +412,24 @@ class nes_sachen_shero_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_shero_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sachen_shero_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_l(offs_t offset) override;
-	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual u8 read_l(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
 	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
 private:
-	uint8_t m_reg;
+	required_ioport m_jumper;
+	u8 m_reg;
 };
 
-#ifdef UNUSED_FUNCTION
 // ======================> nes_a9746_device
 
 class nes_a9746_device : public nes_txrom_device
@@ -439,7 +440,7 @@ public:
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
@@ -449,7 +450,6 @@ private:
 	void update_banks(uint8_t value);
 	uint8_t m_reg[3];
 };
-#endif
 
 
 // ======================> nes_a88s1_device
@@ -651,12 +651,15 @@ class nes_bmc_15in1_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+
+private:
+	u8 m_jumper;
 };
 
 
@@ -1018,9 +1021,7 @@ DECLARE_DEVICE_TYPE(NES_SF3,           nes_sf3_device)
 DECLARE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device)
 DECLARE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device)
-#ifdef UNUSED_FUNCTION
 DECLARE_DEVICE_TYPE(NES_A9746,         nes_a9746_device)
-#endif
 
 DECLARE_DEVICE_TYPE(NES_A88S1,         nes_a88s1_device)
 DECLARE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device)

@@ -12,7 +12,19 @@ public:
 	tx0_64kw_disassembler() = default;
 	virtual ~tx0_64kw_disassembler() = default;
 
+protected:
 	virtual u32 opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+	void dasm_opr(std::ostream &stream, u32 inst);
+};
+
+class tx0_8kwo_disassembler : public tx0_64kw_disassembler
+{
+public:
+	tx0_8kwo_disassembler() = default;
+
+protected:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 };
 
@@ -22,6 +34,7 @@ public:
 	tx0_8kw_disassembler() = default;
 	virtual ~tx0_8kw_disassembler() = default;
 
+protected:
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 };

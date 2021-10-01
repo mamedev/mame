@@ -1323,7 +1323,7 @@ ROM_END
 
 */
 ROM_START( ampkr2jsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// The set is marked as "3A".
+	ROM_REGION( 0x10000, "maincpu", 0 ) // The set is marked as "3A".
 	ROM_LOAD( "u6", 0x0000, 0x10000, CRC(183b67a6) SHA1(8d5b1ce401e8783641c666a5b190a1f052f2dfca) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -1335,7 +1335,7 @@ ROM_START( ampkr2jsp )
 ROM_END
 
 ROM_START( ampkr2jspa )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// The set is marked as "zarate".
+	ROM_REGION( 0x10000, "maincpu", 0 ) // The set is marked as "zarate".
 	ROM_LOAD( "u6", 0x0000, 0x10000, CRC(35aa7c52) SHA1(8aa422b1b86d0366fe4736d97470fc330335ae78) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -1346,7 +1346,7 @@ ROM_START( ampkr2jspa )
 ROM_END
 
 ROM_START( ampkr2jspb )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// The set is marked as "novomatic".
+	ROM_REGION( 0x10000, "maincpu", 0 ) // The set is marked as "novomatic".
 	ROM_LOAD( "u6", 0x0000, 0x10000, CRC(e2f5ff56) SHA1(ab793a4f15673d6d4447024172f6fa6c61719fe7) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )

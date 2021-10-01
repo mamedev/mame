@@ -114,6 +114,19 @@ void fd1094_init_debugging(running_machine &machine, const char *cpureg, const c
         fdcset 1072,7fff,ffff,irq
         //fdcset 1074,4e73,ffff,irq
 
+****************************************************************************
+
+    Add something like this to debug_view_memory::write
+
+    // hack for FD1094 editing
+    #ifdef FD1094_HACK
+        if (source.m_base == machine().root_device().memregion("user2"))
+        {
+            extern void fd1094_regenerate_key(running_machine &machine);
+            fd1094_regenerate_key(machine());
+        }
+    #endif
+
 ***************************************************************************/
 
 #include "emu.h"

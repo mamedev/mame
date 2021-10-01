@@ -17,6 +17,7 @@
  * Sachen TCU-01 [mapper 147]
  * Sachen TCU-02 [mapper 136]
  * Sachen 3013 [mapper 553]
+ * Sachen 3014 [mapper 533]
  * Sachen Discrete PCBs [mapper 150 & 243]
  * Sachen 8259 [mapper 141 (A), 138 (B), 139 (C), 137 (D)]
 
@@ -54,6 +55,7 @@ DEFINE_DEVICE_TYPE(NES_SACHEN_TCA01,      nes_sachen_tca01_device,      "nes_tca
 DEFINE_DEVICE_TYPE(NES_SACHEN_TCU01,      nes_sachen_tcu01_device,      "nes_tcu01",    "NES Cart Sachen TCU-01 PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_TCU02,      nes_sachen_tcu02_device,      "nes_tcu02",    "NES Cart Sachen TCU-02 PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_3013,       nes_sachen_3013_device,       "nes_3013",     "NES Cart Sachen 3013 PCB")
+DEFINE_DEVICE_TYPE(NES_SACHEN_3014,       nes_sachen_3014_device,       "nes_3014",     "NES Cart Sachen 3014 PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_74X374,     nes_sachen_74x374_device,     "nes_s74x374",  "NES Cart Sachen 74*374 PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_74X374_ALT, nes_sachen_74x374_alt_device, "nes_s74x374a", "NES Cart Sachen 74*374 Alt PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_8259A,      nes_sachen_8259a_device,      "nes_s8259a",   "NES Cart Sachen 8259A PCB")
@@ -104,6 +106,11 @@ nes_sachen_tcu02_device::nes_sachen_tcu02_device(const machine_config &mconfig, 
 
 nes_sachen_3013_device::nes_sachen_3013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_3013, tag, owner, clock)
+{
+}
+
+nes_sachen_3014_device::nes_sachen_3014_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_SACHEN_3014, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -246,6 +253,20 @@ void nes_sachen_tcu02_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
+
+	m_latch = 0;
+}
+
+void nes_sachen_3014_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_sachen_3014_device::pcb_reset()
+{
+	prg32(0);
+	chr8(0, CHRROM);
 
 	m_latch = 0;
 }
@@ -503,7 +524,44 @@ uint8_t nes_sachen_tcu02_device::read_l(offs_t offset)
 
 u8 nes_sachen_3013_device::read_h(offs_t offset)
 {
-	 return (offset < 0x4000) ? 0x3a : hi_access_rom(offset);
+	return (offset < 0x4000) ? 0x3a : hi_access_rom(offset);
+}
+
+/*-------------------------------------------------
+
+ Sachen 3014 board (also marked with serial SA-003)
+
+ Games: Dong Dong Nao 2
+
+ This board is a CNROM variant with simple protection.
+ The upper nibble of high address writes is latched
+ and read back in the lower nibble at 0xe000-0xefff.
+
+ NES 2.0: mapper 533
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_sachen_3014_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("Sachen 3014 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	m_latch = data >> 4;
+	chr8(m_latch & 1, CHRROM);
+}
+
+u8 nes_sachen_3014_device::read_h(offs_t offset)
+{
+//	LOG_MMC(("Sachen 3014 read_h, offset: %04x\n", offset));
+	u8 temp = hi_access_rom(offset);
+
+	if ((offset & 0x7000) == 0x6000)
+		temp = (temp & 0xf0) | m_latch;
+	return temp;
 }
 
 /*-------------------------------------------------
@@ -539,7 +597,6 @@ void nes_sachen_74x374_device::set_mirror(uint8_t nt) // also used by mappers 13
 			break;
 	}
 }
-
 
 void nes_sachen_74x374_device::write_l(offs_t offset, uint8_t data)
 {

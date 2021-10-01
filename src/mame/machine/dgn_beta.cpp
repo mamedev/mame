@@ -807,8 +807,8 @@ void dgn_beta_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("beta_dat_log", CMDFLAG_NONE, 0, 0, 0, std::bind(&dgn_beta_state::execute_beta_dat_log, this, _1, _2));
-		machine().debugger().console().register_command("beta_key_dump", CMDFLAG_NONE, 0, 0, 0, std::bind(&dgn_beta_state::execute_beta_key_dump, this, _1, _2));
+		machine().debugger().console().register_command("beta_dat_log", CMDFLAG_NONE, 0, 0, std::bind(&dgn_beta_state::execute_beta_dat_log, this, _1));
+		machine().debugger().console().register_command("beta_key_dump", CMDFLAG_NONE, 0, 0, std::bind(&dgn_beta_state::execute_beta_key_dump, this, _1));
 	}
 	m_LogDatWrites = false;
 	m_wd2797_written = 0;
@@ -824,14 +824,14 @@ offs_t dgn_beta_state::dgnbeta_dasm_override(std::ostream &stream, offs_t pc, co
 	return coco_state::os9_dasm_override(stream, pc, opcodes, params);
 }
 
-void dgn_beta_state::execute_beta_dat_log(int ref, const std::vector<std::string> &params)
+void dgn_beta_state::execute_beta_dat_log(const std::vector<std::string> &params)
 {
 	m_LogDatWrites = !m_LogDatWrites;
 
 	machine().debugger().console().printf("DAT register write info set : %d\n", m_LogDatWrites);
 }
 
-void dgn_beta_state::execute_beta_key_dump(int ref, const std::vector<std::string> &params)
+void dgn_beta_state::execute_beta_key_dump(const std::vector<std::string> &params)
 {
 	for (int idx = 0; idx < NoKeyrows; idx++)
 	{

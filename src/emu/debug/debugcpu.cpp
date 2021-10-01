@@ -1607,12 +1607,20 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 	}
 
 	// if we're stepping out and this isn't a step out instruction, reset the steps until stop to a high number
+	// (TODO: this doesn't work with conditional return instructions)
 	if ((m_flags & DEBUG_FLAG_STEPPING_OUT) != 0)
 	{
 		if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OUT) == 0)
 			m_stepsleft = 100;
 		else
-			m_stepsleft = 1;
+		{
+			// add extra instructions for delay slots
+			int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
+			m_stepsleft = extraskip + 1;
+
+			// take the last few steps normally
+			m_flags = (m_flags | DEBUG_FLAG_STEPPING) & ~DEBUG_FLAG_STEPPING_OUT;
+		}
 	}
 }
 

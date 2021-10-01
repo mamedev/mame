@@ -62,18 +62,18 @@ enum
 
 static char const *const pcbdefs[] =
 {
-	"standard",		// PCB_STANDARD
-	"paged12k",		// PCB_PAGED12K
-	"paged",		// PCB_PAGED16K
-	"minimem",		// PCB_MINIMEM
-	"super",		// PCB_SUPER
-	"mbx",			// PCB_MBX
-	"paged379i",	// PCB_PAGED379I
-	"paged378",		// PCB_PAGED378
-	"paged377",		// PCB_PAGED377
-	"pagedcru",		// PCB_PAGEDCRU
-	"gromemu",		// PCB_GROMEMU
-	"paged7",		// PCB_PAGED7
+	"standard",     // PCB_STANDARD
+	"paged12k",     // PCB_PAGED12K
+	"paged",        // PCB_PAGED16K
+	"minimem",      // PCB_MINIMEM
+	"super",        // PCB_SUPER
+	"mbx",          // PCB_MBX
+	"paged379i",    // PCB_PAGED379I
+	"paged378",     // PCB_PAGED378
+	"paged377",     // PCB_PAGED377
+	"pagedcru",     // PCB_PAGEDCRU
+	"gromemu",      // PCB_GROMEMU
+	"paged7",       // PCB_PAGED7
 	nullptr
 };
 

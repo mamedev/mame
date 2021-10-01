@@ -18,6 +18,7 @@
 #include <deque>
 #include <functional>
 #include <list>
+#include <string_view>
 #include <unordered_map>
 
 
@@ -223,7 +224,8 @@ class parsed_expression
 {
 public:
 	// construction/destruction
-	parsed_expression(symbol_table &symtable, const char *expression = nullptr, int default_base = 16);
+	parsed_expression(symbol_table &symtable);
+	parsed_expression(symbol_table &symtable, std::string_view expression, int default_base = 16);
 	parsed_expression(const parsed_expression &src);
 	parsed_expression(parsed_expression &&src) = default;
 
@@ -241,7 +243,7 @@ public:
 	void set_default_base(int base) { assert(base == 8 || base == 10 || base == 16); m_default_base = base; }
 
 	// execution
-	void parse(const char *string);
+	void parse(std::string_view string);
 	u64 execute() { return execute_tokens(); }
 
 private:

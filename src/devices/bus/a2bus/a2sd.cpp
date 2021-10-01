@@ -9,7 +9,7 @@
 
     AppleIISD has a Xilinx FPGA which implements a minimally hardware
     assisted SPI interface, and the SD card is thus driven in SPI
-	mode rather than SD.
+    mode rather than SD.
 
     The SPI controller is fixed to SPI Mode 3 only.
     (shift on falling CLK edges, shift-then-latch).

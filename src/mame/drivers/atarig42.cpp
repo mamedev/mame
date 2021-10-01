@@ -375,7 +375,7 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( dangerex )
-	PORT_START("IN0")		/* e00000 */
+	PORT_START("IN0")       /* e00000 */
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) // Toggle 0 - D4
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) // Toggle 1 - D5
@@ -798,7 +798,7 @@ ROM_END
 
 
 ROM_START( dangerex )
-	ROM_REGION( 0x80004, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "dx8d-0h.8d", 0x00000, 0x20000, CRC(4957b65d) SHA1(de9f187b6496cf96d29c4b1b29887abc2bdf9bf0) )
 	ROM_LOAD16_BYTE( "dx8c-0l.8c", 0x00001, 0x20000, CRC(aedcb497) SHA1(7e201b7db5c0ff661f782566a6b17299d514c77a) )
 	ROM_LOAD16_BYTE( "dx9d-1h.9d", 0x40000, 0x20000, CRC(2eb943e2) SHA1(87dbf11720e2938bf5755b13231fc668ab3e0e05) )
@@ -849,7 +849,7 @@ ROM_START( dangerex )
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "dx-eeprom.5c", 0x0000, 0x800, CRC(d14e813d) SHA1(b206ce85f7a87986d401d34eafa188b5bffae08c) )
 
-	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
 	ROM_LOAD( "092-1001.20p",  0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "092-1002.22p",  0x0200, 0x0200, NO_DUMP )
 	ROM_LOAD( "092-1003.21p",  0x0400, 0x0200, NO_DUMP )

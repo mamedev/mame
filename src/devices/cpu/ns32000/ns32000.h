@@ -142,7 +142,15 @@ protected:
 private:
 	// configuration
 	address_space_config m_program_config;
-	address_space_config m_interrupt_config;
+	address_space_config m_iam_config;
+	address_space_config m_iac_config;
+	address_space_config m_eim_config;
+	address_space_config m_eic_config;
+	address_space_config m_sif_config;
+	address_space_config m_nif_config;
+	address_space_config m_odt_config;
+	address_space_config m_rmw_config;
+	address_space_config m_ear_config;
 
 	optional_device<ns32000_slave_interface> m_fpu;
 	optional_device<ns32000_mmu_interface> m_mmu;

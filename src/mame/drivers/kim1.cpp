@@ -64,13 +64,20 @@ Paste test:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
+#include "formats/kim1_cas.h"
+#include "imagedev/cassette.h"
 #include "machine/mos6530.h"
 #include "machine/timer.h"
-#include "imagedev/cassette.h"
-#include "formats/kim1_cas.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
+
 #include "kim1.lh"
+
+
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -82,11 +89,11 @@ public:
 	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_riot2(*this, "miot_u2")
+		, m_miot(*this, "miot%u", 0)
+		, m_digit_pwm(*this, "digit_pwm")
 		, m_cass(*this, "cassette")
 		, m_row(*this, "ROW%u", 0U)
 		, m_special(*this, "SPECIAL")
-		, m_digit(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
@@ -104,23 +111,21 @@ private:
 	virtual void machine_reset() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
-	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
 
 	void mem_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<mos6530_device> m_riot2;
+	required_device_array<mos6530_device, 2> m_miot;
+	required_device<pwm_display_device> m_digit_pwm;
 	required_device<cassette_image_device> m_cass;
 
 	required_ioport_array<3> m_row;
 	required_ioport m_special;
-	output_finder<6> m_digit;
 
 	uint8_t m_u2_port_b;
 	uint8_t m_311_output;
 	uint32_t m_cassette_high_count;
-	uint8_t m_led_time[6];
 };
 
 
@@ -132,22 +137,24 @@ void kim1_state::mem_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x03ff).ram();
-	map(0x1700, 0x173f).rw("miot_u3", FUNC(mos6530_device::read), FUNC(mos6530_device::write));
-	map(0x1740, 0x177f).rw(m_riot2, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x1700, 0x173f).rw(m_miot[1], FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x1740, 0x177f).rw(m_miot[0], FUNC(mos6530_device::read), FUNC(mos6530_device::write));
 	map(0x1780, 0x17ff).ram();
 	map(0x1800, 0x1fff).rom().region("maincpu",0);
 }
 
-// RS and ST key input
 INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
 {
-		m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	// RS key input
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER(kim1_state::trigger_nmi)
 {
-		m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	// ST key input
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
+
 
 //**************************************************************************
 //  INPUT PORTS
@@ -197,106 +204,78 @@ static INPUT_PORTS_START( kim1 )
 	PORT_BIT( 0x01, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
-// Read from keyboard
 uint8_t kim1_state::kim1_u2_read_a()
 {
 	uint8_t data = 0xff;
 
-	offs_t const sel = ( m_u2_port_b >> 1 ) & 0x0f;
-	if ( 3U > sel )
+	// Read from keyboard
+	offs_t const sel = (m_u2_port_b >> 1) & 0x0f;
+	if (3U > sel)
 		data = m_row[sel]->read();
 
 	return data;
 }
 
-// Write to 7-Segment LEDs
 void kim1_state::kim1_u2_write_a(uint8_t data)
 {
-	uint8_t idx = ( m_u2_port_b >> 1 ) & 0x0f;
-
-	if ( idx >= 4 && idx < 10 )
-	{
-		if ( data & 0x80 )
-		{
-			m_digit[idx - 4] = data & 0x7f;
-			m_led_time[idx - 4] = 15;
-		}
-	}
+	// Write to 7-segment LEDs
+	m_digit_pwm->write_mx(data & 0x7f);
 }
 
-// Load from cassette
 uint8_t kim1_state::kim1_u2_read_b()
 {
-	if ( m_riot2->portb_out_get() & 0x20 )
-		return 0xFF;
+	if (m_miot[0]->portb_out_get() & 0x20)
+		return 0xff;
 
-	return 0x7F | ( m_311_output ^ 0x80 );
+	// Load from cassette
+	return 0x7f | (m_311_output ^ 0x80);
 }
 
-// Save to cassette
 void kim1_state::kim1_u2_write_b(uint8_t data)
 {
 	m_u2_port_b = data;
 
-	if ( data & 0x20 )
-		/* cassette write/speaker update */
-		m_cass->output(( data & 0x80 ) ? -1.0 : 1.0 );
+	// Select 7-segment LED
+	m_digit_pwm->write_my(1 << (data >> 1 & 0xf) >> 4);
 
-	/* Set IRQ when bit 7 is cleared */
+	// Cassette write/speaker update
+	if (data & 0x20)
+		m_cass->output((data & 0x80) ? -1.0 : 1.0);
+
+	// Set IRQ when bit 7 is cleared
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
 {
 	double tap_val = m_cass->input();
 
-	if ( tap_val <= 0 )
+	if (tap_val <= 0)
 	{
-		if ( m_cassette_high_count )
+		if (m_cassette_high_count)
 		{
-			m_311_output = ( m_cassette_high_count < 8 ) ? 0x80 : 0;
+			m_311_output = (m_cassette_high_count < 8) ? 0x80 : 0;
 			m_cassette_high_count = 0;
 		}
 	}
 
-	if ( tap_val > 0 )
+	if (tap_val > 0)
 		m_cassette_high_count++;
 }
 
-// Blank LEDs during cassette operations
-TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
-{
-	uint8_t i;
-
-	for ( i = 0; i < 6; i++ )
-	{
-		if ( m_led_time[i] )
-			m_led_time[i]--;
-		else
-			m_digit[i] = 0;
-	}
-}
-
-// Register for save states
 void kim1_state::machine_start()
 {
-	m_digit.resolve();
-
+	// Register for save states
 	save_item(NAME(m_u2_port_b));
 	save_item(NAME(m_311_output));
 	save_item(NAME(m_cassette_high_count));
-	save_item(NAME(m_led_time));
 }
 
 void kim1_state::machine_reset()
 {
-	uint8_t i;
-
-	for ( i = 0; i < 6; i++ )
-		m_led_time[i] = 0;
-
 	m_311_output = 0;
 	m_cassette_high_count = 0;
 }
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -307,21 +286,20 @@ void kim1_state::kim1(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, 1_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kim1_state::mem_map);
-	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
+	PWM_DISPLAY(config, m_digit_pwm).set_size(6, 7);
+	m_digit_pwm->set_segmask(0x3f, 0x7f);
 	config.set_default_layout(layout_kim1);
 
-	SPEAKER(config, "mono").front_center();
-
 	// devices
-	MOS6530(config, m_riot2, 1_MHz_XTAL);
-	m_riot2->in_pa_callback().set(FUNC(kim1_state::kim1_u2_read_a));
-	m_riot2->out_pa_callback().set(FUNC(kim1_state::kim1_u2_write_a));
-	m_riot2->in_pb_callback().set(FUNC(kim1_state::kim1_u2_read_b));
-	m_riot2->out_pb_callback().set(FUNC(kim1_state::kim1_u2_write_b));
+	MOS6530(config, m_miot[0], 1_MHz_XTAL); // u2
+	m_miot[0]->in_pa_callback().set(FUNC(kim1_state::kim1_u2_read_a));
+	m_miot[0]->out_pa_callback().set(FUNC(kim1_state::kim1_u2_write_a));
+	m_miot[0]->in_pb_callback().set(FUNC(kim1_state::kim1_u2_read_b));
+	m_miot[0]->out_pb_callback().set(FUNC(kim1_state::kim1_u2_write_b));
 
-	MOS6530(config, "miot_u3", 1_MHz_XTAL);
+	MOS6530(config, m_miot[1], 1_MHz_XTAL); // u3
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(kim1_cassette_formats);
@@ -329,12 +307,14 @@ void kim1_state::kim1(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_interface ("kim1_cass");
 
-	TIMER(config, "led_timer").configure_periodic(FUNC(kim1_state::kim1_update_leds), attotime::from_hz(60));
+	SPEAKER(config, "mono").front_center();
+
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::kim1_cassette_input), attotime::from_hz(44100));
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("kim1_cass");
 }
+
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -342,13 +322,16 @@ void kim1_state::kim1(machine_config &config)
 
 ROM_START(kim1)
 	ROM_REGION(0x0800,"maincpu",0)
-	ROM_LOAD("6530-003.bin",    0x0000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
-	ROM_LOAD("6530-002.bin",    0x0400, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
+	ROM_LOAD("6530-003.bin", 0x0000, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
+	ROM_LOAD("6530-002.bin", 0x0400, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
 ROM_END
+
+} // anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME  FLAGS
-COMP( 1975, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technologies", "KIM-1",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+COMP( 1975, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technologies", "KIM-1",  MACHINE_SUPPORTS_SAVE)

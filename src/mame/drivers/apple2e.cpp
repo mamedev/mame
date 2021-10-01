@@ -232,9 +232,9 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #define CNXX_UNCLAIMED  -1
 #define CNXX_INTROM     -2
 
-#define IRQ_SLOT 0
-#define IRQ_VBL  1
-#define IRQ_MOUSEXY 2
+static constexpr int IRQ_SLOT = 0;
+static constexpr int IRQ_VBL = 1;
+static constexpr int IRQ_MOUSEXY = 2;
 
 class apple2e_state : public driver_device
 {
@@ -286,12 +286,14 @@ public:
 		m_ds1315(*this, "nsc")
 	{
 		m_accel_laser = false;
+		m_has_laser_mouse = false;
 		m_isiic = false;
 		m_isiicplus = false;
 		m_iscec = false;
 		m_iscecm = false;
 		m_iscec2000 = false;
 		m_spectrum_text = false;
+		m_inverse_text = false;
 		m_pal = false;
 #if IICP_NEW_IWM
 		m_cur_floppy = nullptr;
@@ -377,6 +379,7 @@ public:
 	void auxram4000_w(offs_t offset, u8 data);
 	u8 c000_r(offs_t offset);
 	void c000_w(offs_t offset, u8 data);
+	u8 c000_laser_r(offs_t offset);
 	void c000_laser_w(offs_t offset, u8 data);
 	u8 c000_iic_r(offs_t offset);
 	void c000_iic_w(offs_t offset, u8 data);
@@ -413,6 +416,8 @@ public:
 	void lc_w(offs_t offset, u8 data);
 	u8 lc_romswitch_r(offs_t offset);
 	void lc_romswitch_w(offs_t offset, u8 data);
+	u8 laser_mouse_r(offs_t offset);
+	void laser_mouse_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
@@ -425,9 +430,10 @@ public:
 	u8 nsc_backing_r(offs_t offset);
 
 	void apple2cp(machine_config &config);
-	void laser128ex2(machine_config &config);
 	void spectred(machine_config &config);
 	void laser128(machine_config &config);
+	void laser128o(machine_config &config);
+	void laser128ex2(machine_config &config);
 	void apple2c_iwm(machine_config &config);
 	void apple2c_mem(machine_config &config);
 	void cec(machine_config &config);
@@ -456,6 +462,7 @@ public:
 	void r2000bank_map(address_map &map);
 	void r4000bank_map(address_map &map);
 	void spectred_keyb_map(address_map &map);
+	void init_laser128();
 	void init_128ex();
 	void init_spect();
 	void init_pal();
@@ -495,7 +502,7 @@ private:
 	bool m_mockingboard4c;
 	bool m_intc8rom;
 
-	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_spectrum_text, m_pal;
+	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_spectrum_text, m_inverse_text, m_pal;
 	u8 m_migram[0x800];
 	u16 m_migpage;
 
@@ -504,6 +511,7 @@ private:
 	bool m_accel_present;
 	bool m_accel_temp_slowdown;
 	bool m_accel_laser;
+	bool m_has_laser_mouse;
 	int m_accel_stage;
 	u32 m_accel_speed;
 	u8 m_accel_slotspk, m_accel_gameio;
@@ -1233,11 +1241,18 @@ void apple2e_state::machine_reset()
 void apple2e_state::init_128ex()
 {
 	m_accel_laser = true;
+	m_has_laser_mouse = true;
 }
 
 void apple2e_state::init_spect()
 {
 	m_spectrum_text = true;
+}
+
+void apple2e_state::init_laser128()
+{
+	m_inverse_text = true;
+	m_has_laser_mouse = true;
 }
 
 void apple2e_state::init_pal()
@@ -1274,7 +1289,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 {
 	int scanline = param;
 
-	if (m_isiic)
+	if ((m_isiic) || (m_has_laser_mouse))
 	{
 		update_iic_mouse();
 	}
@@ -1337,7 +1352,19 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				{
 					m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
 				}
-				m_video->text_update(screen, bitmap, cliprect, 160, 191);
+
+				if (m_spectrum_text)
+				{
+					m_video->text_update_spectrum(screen, bitmap, cliprect, 160, 191);
+				}
+				else if (m_inverse_text)
+				{
+					m_video->text_update_inverse(screen, bitmap, cliprect, 160, 191);
+				}
+				else
+				{
+					m_video->text_update(screen, bitmap, cliprect, 160, 191);
+				}
 			}
 			else
 			{
@@ -1384,6 +1411,10 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		if (m_spectrum_text)
 		{
 			m_video->text_update_spectrum(screen, bitmap, cliprect, 0, 191);
+		}
+		else if (m_inverse_text)
+		{
+			m_video->text_update_inverse(screen, bitmap, cliprect, 0, 191);
 		}
 		else
 		{
@@ -2068,6 +2099,25 @@ u8 apple2e_state::c000_r(offs_t offset)
 	return read_floatingbus();
 }
 
+u8 apple2e_state::c000_laser_r(offs_t offset)
+{
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+
+	switch (offset)
+	{
+		case 0x63:  // read mouse button
+			return (m_mouseb->read() ? 0 : 0x80) | uFloatingBus7;
+
+		case 0x66:  // read mouse xdir
+			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
+
+		case 0x67:  // read mouse ydir
+			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
+	}
+
+	return c000_r(offset);
+}
+
 void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 {
 	if ((m_accel_laser) && (offset == 0x74))
@@ -2095,6 +2145,11 @@ void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 	}
 	else
 	{
+		if ((offset & 0xf0) == 0x70)
+		{
+			lower_irq(IRQ_VBL);
+		}
+
 		c000_w(offset, data);
 	}
 }
@@ -2657,6 +2712,75 @@ void apple2e_state::update_iic_mouse()
 		}
 
 		m_y0 = !m_y0;
+	}
+}
+
+u8 apple2e_state::laser_mouse_r(offs_t offset)
+{
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+
+	switch (offset)
+	{
+		case 0x8:  // read X0Edge
+			return (m_x0edge ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0x9:  // read Y0Edge
+			return (m_y0edge ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0xa:  // read XYMask
+			return (m_xy ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0xb:  // read VBL mask
+			return (m_vblmask ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0xc: // mouse X1 IRQ status
+			return (m_xirq ? 0x80 : 0) | uFloatingBus7;
+
+		case 0xd: // mouse Y1 IRQ status
+			return (m_yirq ? 0x80 : 0) | uFloatingBus7;
+
+		case 0xe: // VBL interrupt status
+			return ((m_irqmask & IRQ_VBL) ? 0x80 : 0) | uFloatingBus7;
+	}
+
+	return 0xff;
+}
+
+void apple2e_state::laser_mouse_w(offs_t offset, u8 data)
+{
+	// these are the same as the //c mouse registers, but with bit 4 of the
+	// address inverted, pretty much.
+	switch (offset)
+	{
+		case 0x0:  // RisX0Edge
+			m_x0edge = false; break;
+
+		case 0x1:  // FalX0Edge
+			m_x0edge = true; break;
+
+		case 0x2:  // RisY0Edge
+			m_y0edge = false; break;
+
+		case 0x3:  // FalY0Edge
+			m_y0edge = true; break;
+
+		case 0x4:  // DisXY
+			m_xy = false; break;
+
+		case 0x5:  // EnbXY
+			m_xy = true; break;
+
+		case 0x6:  // DisVBL
+			lower_irq(IRQ_VBL);
+			m_vblmask = false; break;
+
+		case 0x7:  // EnVBL
+			m_vblmask = true; break;
+
+		case 0xf: // clear XY interrupt
+			lower_irq(IRQ_MOUSEXY);
+			m_xirq = m_yirq = false;
+			break;
 	}
 }
 
@@ -3333,10 +3457,11 @@ void apple2e_state::laser128_map(address_map &map)
 	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
 	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_laser_w));
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_laser_r), FUNC(apple2e_state::c000_laser_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc0c0, 0xc0cf).rw(FUNC(apple2e_state::laser_mouse_r), FUNC(apple2e_state::laser_mouse_w));
 	map(0xc0d0, 0xc0d3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
 	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::read), FUNC(applefdc_base_device::write));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
@@ -4148,6 +4273,15 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( laser128 )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2_sysconfig_no_accel )
+
+	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+
+	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2cp )
@@ -5153,6 +5287,31 @@ void apple2e_state::laser128(machine_config &config)
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 }
 
+void apple2e_state::laser128o(machine_config &config)
+{
+	apple2c(config);
+	M65C02(config.replace(), m_maincpu, 1021800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
+
+	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+
+	config.device_remove("sl4");
+	config.device_remove("sl6");
+
+	A2BUS_LASER128_ORIG(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128_ORIG(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128_ORIG(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128_ORIG(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_LASER128_ORIG(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
+
+	// original Laser 128 doesn't have the Slinky memory expansion
+	m_ram->set_default_size("128K").set_extra_options("128K");
+}
+
 void apple2e_state::laser128ex2(machine_config &config)
 {
 	apple2c(config);
@@ -5404,11 +5563,41 @@ ROM_END
 
 ROM_START(laser128)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD( "laser 128 video rom vt27-0706-0.bin", 0x000000, 0x002000, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc) )
 
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("laser128.256", 0x0000, 0x8000, CRC(39e59ed3) SHA1(cbd2f45c923725bfd57f8548e65cc80b13bc18da))
+	ROM_SYSTEM_BIOS(0, "871222", "v4.3")
+	ROMX_LOAD( "laser 128 v4.3 871222.bin", 0x000000, 0x008000, CRC(e091af13) SHA1(3232f7036a68b996fd4126d5e19e855c4d5c64df), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "870917", "v4.2")
+	ROMX_LOAD( "laser 128 v4.2 870917.bin", 0x000000, 0x008000, CRC(39e59ed3) SHA1(cbd2f45c923725bfd57f8548e65cc80b13bc18da), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "870724", "v4.1")
+	ROMX_LOAD( "laser 128 v4.1 870724.bin", 0x000000, 0x008000, CRC(ce087911) SHA1(f6dba711f0d727f1d13b0256f10ba62bde6d7f5b), ROM_BIOS(2) )
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
+ROM_END
+
+ROM_START(laser128o)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "laser 128 video rom vt27-0706-0.bin", 0x000000, 0x002000, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc) )
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_SYSTEM_BIOS(0, "871212", "v3.3")
+	ROMX_LOAD( "laser 128 v3.3 871212.bin", 0x000000, 0x008000, CRC(3f5deffe) SHA1(4e7195b941c51ba83d5ef16e1f78e3f62bccd8cd), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "870320", "v3.0")
+	ROMX_LOAD( "laser 128 v3.0 870320.bin", 0x000000, 0x008000, CRC(145d39ff) SHA1(087e992548c2e9849d4262a0eb505548f846c7f5), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "870203", "v2.9")
+	ROMX_LOAD( "laser 128 v2.9 870203.bin", 0x000000, 0x008000, CRC(7e12fe93) SHA1(d7be7ba05725111354e4bdbaaef620a2a8ea65f7), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS(3, "860915", "860915")
+	ROMX_LOAD( "laser 128 860915.bin", 0x000000, 0x008000, CRC(8d1a181d) SHA1(8fae95776c3d8a581c621cd258e118b8dfdb0cfd), ROM_BIOS(3) )
+
+	ROM_SYSTEM_BIOS(4, "860801", "860801")
+	ROMX_LOAD( "laser 128 860801.bin", 0x000000, 0x008000, CRC(a88c2fcf) SHA1(ec163bb6e7e07cb256e0ed0f8d148cf85313e9f9), ROM_BIOS(4) )
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
@@ -5605,7 +5794,8 @@ COMP( 1984, apple2c,    0,       apple2, apple2c,     apple2c,   apple2e_state, 
 COMP( 1985?,spectred,   apple2e, 0,      spectred,    apple2e,   apple2e_state, init_spect, "Scopus/Spectrum",  "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
 COMP( 1986, tk3000,     apple2c, 0,      tk3000,      apple2e,   apple2e_state, empty_init, "Microdigital",     "TK3000//e" , MACHINE_SUPPORTS_SAVE )
 COMP( 1989, prav8c,     apple2e, 0,      apple2e,     apple2e,   apple2e_state, empty_init, "Pravetz",          "Pravetz 8C", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, laser128,   apple2c, 0,      laser128,    laser128,  apple2e_state, empty_init, "Video Technology", "Laser 128 (version 4.2)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, laser128,   apple2c, 0,      laser128,    laser128,  apple2e_state, init_laser128, "Video Technology", "Laser 128", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, laser128o,  apple2c, 0,      laser128o,   laser128,  apple2e_state, init_laser128, "Video Technology", "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, las128ex,   apple2c, 0,      laser128,    laser128,  apple2e_state, init_128ex, "Video Technology", "Laser 128ex (version 4.5)", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, las128e2,   apple2c, 0,      laser128ex2, laser128,  apple2e_state, init_128ex, "Video Technology", "Laser 128ex2 (version 6.1)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )

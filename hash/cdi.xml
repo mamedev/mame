@@ -6033,6 +6033,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- "CD-i Bridge" format - playable on CD-i or Windows 95/98 -->
 	<software name="gettinga">
 		<!--
 		Origin: TOSEC
@@ -6040,7 +6041,7 @@ license:CC0
 		<rom name="Getting Ahead - Making Time (1994)(Temple Millar Multimedia - Xdra)(EU)(Track 2 of 2)[!][CD-i-PC].wav" size="376795148" crc="3576d879" md5="d2fa76c544f819f5ddbe7e742603b746"/>
 		<rom name="Getting Ahead - Making Time (1994)(Temple Millar Multimedia - Xdra)(EU)[!][CD-i-PC].cue" size="363" crc="3a4f2123" md5="3ed5329375d9ae86b331b9b4bab4d81a"/>
 		-->
-		<description>Getting Ahead - Making Time (Euro)[CD-i-PC]</description>
+		<description>Getting Ahead - Making Time (Euro)</description>
 		<year>1994</year>
 		<publisher>Temple Millar Multimedia ~ Xdra</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
@@ -10715,6 +10716,87 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bestphoto92" supported="no">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="The Best of Photo Journalism (Track 1)" size="431650800" crc="45466b63" md5="ff50e6413b71da4a0e1629bf6ce6d71a"/>
+		<rom name="The Best of Photo Journalism (Track 2)" size="272361600" crc="ac49ca6f" md5="f90ae501920abaf205b41f7f68a9da2f"/>
+		<rom name="The Best of Photo Journalism.cue" size="249" crc="79dd5617" md5="617ca8df6119c466908e17bd27beda6f"/>
+		-->
+		<description>From The Associated Press: The Best of Photo Journalism</description>
+		<year>1993</year>
+		<publisher>XDRA Ltd. ~ Asia CD Ltd.</publisher>
+		<info name="serial" value="819 0036"/>
+		<sharedfeat name="compatibility" value="DVC" />
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="from the associated press - the best of photo journalism (1993)[dvc]" sha1="c8eb407a10916be732e9fa10c198dce1a277e525"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="billbrandt" supported="no">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Bill Brandt - The Picture Post Years 1938-51 (Track 1).bin" size="269362800" crc="127ea530" md5="705ae4318ce308d3ba9a2560234f87bd"/>
+		<rom name="Bill Brandt - The Picture Post Years 1938-51 (Track 2).bin" size="321048000" crc="c25b17d4" md5="cdb22db9082a737a4e311db8255faed4"/>
+		<rom name="Bill Brandt - The Picture Post Years 1938-51.cue" size="281" crc="bfedf081" md5="e95d6b2cd0089cae5c11a8d0813d0228"/>
+		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352
+		value. The info for the original cue is below.
+		<rom name="Bill Brandt - The Picture Post Years 1938-51.cue" size="279" crc="d9c1b4b0" md5="d96806ddded5ebd0901a5f4701a05519"/>
+		-->
+		<description>Bill Brandt: The Picture Post Years 1938-1951</description>
+		<year>1993</year>
+		<publisher>XDRA Ltd.</publisher>
+		<sharedfeat name="compatibility" value="DVC" />
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bill brandt - the picture post years 1938-1951 (1993)(xdra ltd.)[dvc]" sha1="58d3e9bc147bb3cf698586c9942027bb7a783e9e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cdischools" supported="no">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="CD-i in Schools.bin" size="549490704" crc="52ac54f4" md5="cfa4e4385bfb71fa0696555285ef12ab"/>
+		<rom name="CD-i in Schools.cue" size="104" crc="13e1370e" md5="95dbb460df985b31dfa5315fb3e4bab1"/>
+		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352
+		value. The info for the original cue is below.
+		<rom name="CD-i in Schools.cue" size="102" crc="a7808dda" md5="2835f5bd9aa0d0941ae992f813582285"/>
+		-->
+		<description>CD-i in Schools</description>
+		<year>1994</year>
+		<publisher>Scottish Interactive Technology Centre</publisher>
+		<info name="serial" value="819 0073"/>
+		<sharedfeat name="compatibility" value="DVC" />
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd-i in schools (1994)(scottish interactive technology centre)[dvc]" sha1="08ad14f7559a3be8a65091bdc1b015b7a7ab21fc"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="depression" supported="no">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Depression - The Search for the NaSSA.bin" size="720241200" crc="fcacf7b2" md5="33d81841dd368b541afaabdaf447d1bc"/>
+		<rom name="Depression - The Search for the NaSSA.cue" size="103" crc="380a2ffc" md5="087a4420a1581fe841d070dd97758b33"/>
+		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352 value.
+		The info for the original cue is below.
+		<rom name="Depression - The Search for the NaSSA.cue" size="101" crc="e0683fe3" md5="04d6c528037689bab54873d0834418e6"/>
+		-->
+		<description>Depression - The Search For The NaSSA (NL)</description>
+		<year>1993</year>
+		<publisher>N.V. Organon</publisher>
+		<sharedfeat name="compatibility" value="DVC" />
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="depression - the search for the nassa (1993)(n.v. organon)(nl)[dvc]" sha1="5ba1b7f5defaf1e8e1876e64042d3f610d2b1118"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dimos">
 		<description>Dimo's Quest [CDi Ready]</description>
 		<year>????</year>
@@ -10722,6 +10804,90 @@ license:CC0
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dimo's quest (cdi-ready)" sha1="dff8f6fa034a9f0cb2b84a42aa07c20f875c2614" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- "CD-i Bridge" format - playable on CD-i or Windows 95/98 -->
+	<software name="gettinga2" cloneof="gettinga">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Getting Ahead - Making Time (Track 1).bin" size="261958704" crc="4d0385c4" md5="399d1b66a0419376e1d868a7972d5ded"/>
+		<rom name="Getting Ahead - Making Time (Track 2).bin" size="377312544" crc="f9feccd9" md5="44ff35070f8ee7bfcc8a276abcf12b06"/>
+		<rom name="Getting Ahead - Making Time.cue" size="247" crc="c1f664f0" md5="61a958d52c26a7f10386e5f693857a09"/>
+		Note: This is a later release that added Windows 3.1 playback software.
+		-->
+		<description>Getting Ahead - Making Time (Euro, reprint)</description>
+		<year>1995</year>
+		<publisher>XDRA Ltd. ~ Temple Millar Multimedia</publisher>
+		<info name="serial" value="819 0025"/>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="getting ahead - making time (reprint)(1995)(temple millar multimedia - xdra)(eu)[cd-i-pc]" sha1="fcf77ca56c8b33a2032c7c3108eb542e586b3c78"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nijmegen">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Nijmegen 'n rijk aan mogelijkheden (Track 1).bin" size="483164304" crc="0ed9bbe7" md5="ed4617933f49d5b4861dc8843e217fc1"/>
+		<rom name="Nijmegen 'n rijk aan mogelijkheden (Track 2).bin" size="12658464" crc="b2b5e0f0" md5="37ecddc07507df2695ac480d1b90f923"/>
+		<rom name="Nijmegen 'n rijk aan mogelijkheden (Track 3).bin" size="19091184" crc="a8012306" md5="e94267559ec217b028e4b5db703e6c59"/>
+		<rom name="Nijmegen 'n rijk aan mogelijkheden (Track 4).bin" size="11207280" crc="6714f41f" md5="8405bf0e070b280cbd8656893187a1eb"/>
+		<rom name="Nijmegen 'n rijk aan mogelijkheden.cue" size="517" crc="0625495e" md5="3599970708eaf9b3872244474aa8b9a6"/>
+		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352 value.
+		The info for the original cue is below.
+		<rom name="Nijmegen 'n rijk aan mogelijkheden.cue" size="515" crc="d0c1ea7f" md5="f1e4aca62f80f9594f2b584fde665266"/>
+		-->
+		<description>Nijmegen 'n rijk aan mogelijkheden (NL)</description>
+		<year>1994</year>
+		<publisher>Harlon Publishing</publisher>
+		<sharedfeat name="compatibility" value="DVC" />
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nijmegen 'n rijk aan mogelijkheden (1994)(harlon publishing)(nl)[dvc]" sha1="7387afeb526764ca2ad7f49cc2d181f769bbda12"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="paranasalcdi">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Paranasal Sinuses & Anterior Skull Base.bin" size="232316448" crc="e4d95bd8" md5="4fce667ada6e01a04ebb59b516b3880e"/>
+		<rom name="Paranasal Sinuses & Anterior Skull Base.cue" size="128" crc="6dbd3a2c" md5="8de5a6d9098ba9629e0f14a673f63aa2"/>
+		Notes: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352
+		value. The info for the original cue is below.
+		<rom name="Paranasal Sinuses & Anterior Skull Base.cue" size="126" crc="6e9ca05a" md5="3ae2399c2f5bbd754d67682e5bb7f2f7"/>
+
+		This also included an IBM PC / Windows 3.1 version, which is included in the ibm5170_cdrom software list.
+		-->
+		<description>Paranasal Sinuses &amp; Anterior Skull Base</description>
+		<year>1993</year>
+		<publisher>Elsevier Science B.V.</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="paranasal sinuses &amp; anterior skull base (1993)(elsevier science b.v.)(cd-i disc)" sha1="79df7a6d6773bb42647b32c198869b6a4b9c3c52"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="peaches" supported="no">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Peaches.bin" size="283655904" crc="39652a98" md5="30f5433afd596a06bfe105ea4c75b311"/>
+		<rom name="Peaches.cue" size="96" crc="c6b8b160" md5="9b70bcc1a3e8e46aba03f371d30ad964"/>
+		Note: This disc is a hybrid CD-i and Windows 3.1 disc. It will boot in a CD-i without issues, and it contains software
+		to play back the disc images on Windows 3.1.
+		-->
+		<description>Peaches</description>
+		<year>1995</year>
+		<publisher>Icontact Multimedia Limited</publisher>
+		<info name="serial" value="IC 200"/>
+		<sharedfeat name="compatibility" value="DVC" />
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="peaches (1995)(icontact multimedia limited)[dvc]" sha1="df00e53db21f8f924569a9b842c9dd1f4bb608b3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10737,69 +10903,14 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- this is just bad, and has visible corruption during the startup animations as a result of bad sectors -->
-	<software name="gose">
-		<description>Go - Special Edition</description>
-		<year>????</year>
-		<publisher>The Vision Factory</publisher>
-		<part name="cdrom" interface="cdi_cdrom">
-			<diskarea name="cdrom">
-				<disk name="go - special edition" sha1="abcb043a29b8c5f432b8c1097a76a8b45e9c946c" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-	
-	<software name="depression">
-		<!--
-		Origin: Gaming Alexandria
-		<rom name="Depression - The Search for the NaSSA.bin" size="720241200" crc="fcacf7b2" md5="33d81841dd368b541afaabdaf447d1bc"/>
-		<rom name="Depression - The Search for the NaSSA.cue" size="101" crc="e0683fe3" md5="04d6c528037689bab54873d0834418e6"/>
-		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352 value.
-		The info for the edited cue is below.
-		<rom name="Depression - The Search for the NaSSA.cue" size="103" crc="380a2ffc" md5="087a4420a1581fe841d070dd97758b33"/>
-		-->
-		<description>Depression - The Search For The NaSSA (NL)[DVC]</description>
-		<year>1993</year>
-		<publisher>N.V. Organon</publisher>
-		<sharedfeat name="compatibility" value="DVC" />
-		<part name="cdrom" interface="cdi_cdrom">
-			<diskarea name="cdrom">
-				<disk name="depression - the search for the nassa (nl)[dvc]" sha1="5ba1b7f5defaf1e8e1876e64042d3f610d2b1118"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="nijmegen">
-		<!--
-		Origin: Gaming Alexandria
-		<rom name="Nijmegen 'n rijk aan mogelijkheden (Track 1).bin" size="483164304" crc="0ed9bbe7" md5="ed4617933f49d5b4861dc8843e217fc1"/>
-		<rom name="Nijmegen 'n rijk aan mogelijkheden (Track 2).bin" size="12658464" crc="b2b5e0f0" md5="37ecddc07507df2695ac480d1b90f923"/>
-		<rom name="Nijmegen 'n rijk aan mogelijkheden (Track 3).bin" size="19091184" crc="a8012306" md5="e94267559ec217b028e4b5db703e6c59"/>
-		<rom name="Nijmegen 'n rijk aan mogelijkheden (Track 4).bin" size="11207280" crc="6714f41f" md5="8405bf0e070b280cbd8656893187a1eb"/>
-		<rom name="Nijmegen 'n rijk aan mogelijkheden.cue" size="515" crc="d0c1ea7f" md5="f1e4aca62f80f9594f2b584fde665266"/>
-		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352 value.
-		The info for the edited cue is below.
-		<rom name="Nijmegen 'n rijk aan mogelijkheden.cue" size="517" crc="0625495e" md5="3599970708eaf9b3872244474aa8b9a6"/>
-		-->
-		<description>Nijmegen 'n rijk aan mogelijkheden (NL)[DVC]</description>
-		<year>1994</year>
-		<publisher>Harlon Publishing</publisher>
-		<sharedfeat name="compatibility" value="DVC" />
-		<part name="cdrom" interface="cdi_cdrom">
-			<diskarea name="cdrom">
-				<disk name="nijmegen 'n rijk aan mogelijkheden (NL)[DVC]" sha1="7387afeb526764ca2ad7f49cc2d181f769bbda12"/>
-			</diskarea>
-		</part>
-	</software>
-
-<software name="sinnaneun2">
+	<software name="sinnaneun2">
 		<!--
 		Origin: Gaming Alexandria
 		<rom name="Exciting Number Nation.bin" size="469581504" crc="bb4b2605" md5="2e62bbb6beb3c4314cf449ac560f9833"/>
-		<rom name="Exciting Number Nation.cue" size="104" crc="9d9eaea6" md5="a019b04bcfad2ed1fd1021500d23dffa"/>
-		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352
-		value, and to fix an incorrect file name. The info for the edited cue is below.
 		<rom name="Exciting Number Nation.cue" size="111" crc="9f49d76e" md5="da4ee735065d6815b41e995da0a0bfb8"/>
+		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352
+		value, and to fix an incorrect file name. The info for the original cue is below.
+		<rom name="Exciting Number Nation.cue" size="104" crc="9d9eaea6" md5="a019b04bcfad2ed1fd1021500d23dffa"/>
 		-->
 		<description>Sinnaneun Susjanala 2 (KR)</description>
 		<year>1993</year>
@@ -10808,7 +10919,28 @@ license:CC0
 		<info name="alt_title" value="신나는 숫자나라 2"/>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sinnaneun susjanala 2 (kr)" sha1="398e6a0e5e02e50a67db325c9fdf893647cbb165"/>
+				<disk name="sinnaneun susjanala 2 (1993)(skc limited)(kr)" sha1="398e6a0e5e02e50a67db325c9fdf893647cbb165"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ulichinguwa">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Let's Sing Together - With Friends.bin" size="562720704" crc="b2bcfaf3" md5="e866f80816473df9821553f3b078f638"/>
+		<rom name="Let's Sing Together - With Friends.cue" size="123" crc="b5605569" md5="d77a3e4b90bbd5d2f75f53a116e3fe4e"/>
+		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352
+		value. The info for the original cue is below.
+		<rom name="Let's Sing Together - With Friends.cue" size="121" crc="4a15ffbf" md5="d5bb3c2ff4e1acb48804432a9392f1e3"/>
+		-->
+		<description>Ulihamkke Bulleoyo - Chinguwa Hamkke (KR)</description>
+		<year>1993</year>
+		<publisher>SKC Limited</publisher>
+		<info name="serial" value="ISC 4002"/>
+		<info name="alt_title" value="우리함께 불러요 - 친구와 함께"/>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ulihamkke bulleoyo - chinguwa hamkke (1993)(skc limited)(kr)" sha1="c8eb407a10916be732e9fa10c198dce1a277e525"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10817,9 +10949,9 @@ license:CC0
 		<!--
 		Origin: Gaming Alexandria
 		<rom name="Let's Sing Together - With Nature.bin" size="593943504" crc="c2eff6f1" md5="25e7947dd2723571d2ab4b11c25c8e24"/>
-		<rom name="Let's Sing Together - With Nature.cue" size="122" crc="3b37228f" md5="8bb7ebbf8b028da086157094ab6b44fb"/>
+		<rom name="Let's Sing Together - With Nature.cue" size="122" crc="0f7ed0c6" md5="38b95de29bb384acff0b4b09cce7af1b"/>
 		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352 value.
-		The info for the edited cue is below.
+		The info for the original cue is below.
 		<rom name="Let's Sing Together - With Nature.cue" size="120" crc="985b94c8" md5="f0ef5af76dccc5dbc65ca9c0b3d07175"/>
 		-->
 		<description>Ulihamkke Bulleoyo - Jayeongwa Hamkke (KR)</description>
@@ -10829,28 +10961,19 @@ license:CC0
 		<info name="alt_title" value="우리함께 불러요 - 자연과 함께"/>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ulihamkke bulleoyo - jayeongwa hamkke (kr)" sha1="64e69cd4fc4c71d8cdddd65465da2646a3cb434a"/>
+				<disk name="ulihamkke bulleoyo - jayeongwa hamkke (1993)(skc limited)(kr)" sha1="64e69cd4fc4c71d8cdddd65465da2646a3cb434a"/>
 			</diskarea>
 		</part>
 	</software>
 
-<software name="ulichinguwa">
-		<!--
-		Origin: Gaming Alexandria
-		<rom name="Let's Sing Together - With Friends.bin" size="562720704" crc="b2bcfaf3" md5="e866f80816473df9821553f3b078f638"/>
-		<rom name="Let's Sing Together - With Friends.cue" size="121" crc="4a15ffbf" md5="d5bb3c2ff4e1acb48804432a9392f1e3"/>
-		Note: Track 1 in the cue file had to be edited to read MODE1/2352 to get around chdman not recognizing a valid CDI/2352
-		value. The info for the edited cue is below.
-		<rom name="Let's Sing Together - With Friends.cue" size="123" crc="b5605569" md5="d77a3e4b90bbd5d2f75f53a116e3fe4e"/>
-		-->
-		<description>Ulihamkke Bulleoyo - Chinguwa Hamkke (KR)</description>
-		<year>1993</year>
-		<publisher>SKC Limited</publisher>
-		<info name="serial" value="ISC 4002"/>
-		<info name="alt_title" value="우리함께 불러요 - 친구와 함께"/>
+	<!-- this is just bad, and has visible corruption during the startup animations as a result of bad sectors -->
+	<software name="gose">
+		<description>Go - Special Edition</description>
+		<year>????</year>
+		<publisher>The Vision Factory</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ulihamkke bulleoyo - chinguwa hamkke (kr)" sha1="c8eb407a10916be732e9fa10c198dce1a277e525"/>
+				<disk name="go - special edition" sha1="abcb043a29b8c5f432b8c1097a76a8b45e9c946c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>

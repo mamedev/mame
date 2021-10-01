@@ -16,6 +16,9 @@
  TODO:
  - Combine 2 versions of set_prg in SxROM base class. This means dealing with
    variant boards SNROM, SUROM, etc which repurpose bits in the MMC1 regs.
+ - Determine if "MMC1" marked chips, the earliest version, ignores WRAM
+   enable/disable bit like its first revision, MMC1A. Also determine if MMC1C
+   really exists. It's described by kevtris, but it's not in BootGod's DB.
 
  ***********************************************************************************************************/
 
@@ -36,10 +39,8 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_SXROM,   nes_sxrom_device,   "nes_sxrom",   "NES Cart SxROM (MMC-1) PCB")
-DEFINE_DEVICE_TYPE(NES_SOROM,   nes_sorom_device,   "nes_sorom",   "NES Cart SOROM (MMC-1) PCB")
-DEFINE_DEVICE_TYPE(NES_SXROM_A, nes_sxrom_a_device, "nes_sxrom_a", "NES Cart SxROM (MMC-1A) PCB")
-DEFINE_DEVICE_TYPE(NES_SOROM_A, nes_sorom_a_device, "nes_sorom_a", "NES Cart SOROM (MMC-1A) PCB")
+DEFINE_DEVICE_TYPE(NES_SXROM, nes_sxrom_device, "nes_sxrom", "NES Cart SxROM (MMC-1) PCB")
+DEFINE_DEVICE_TYPE(NES_SOROM, nes_sorom_device, "nes_sorom", "NES Cart SOROM (MMC-1) PCB")
 
 
 
@@ -55,16 +56,6 @@ nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *ta
 
 nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_sxrom_device(mconfig, NES_SOROM, tag, owner, clock)
-{
-}
-
-nes_sxrom_a_device::nes_sxrom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_sxrom_device(mconfig, NES_SXROM_A, tag, owner, clock)
-{
-}
-
-nes_sorom_a_device::nes_sorom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_sxrom_device(mconfig, NES_SOROM_A, tag, owner, clock)
 {
 }
 
@@ -86,7 +77,8 @@ void nes_sxrom_device::pcb_reset()
 	m_latch = 0;
 	m_count = 0;
 	m_reg[0] = 0x0f;
-	m_reg[1] = m_reg[2] = m_reg[3] = 0;
+	m_reg[1] = m_reg[2] = 0;
+	m_reg[3] = m_mmc1_type == mmc1_type::MMC1C ? 0x10 : 0x00;   // WRAM disabled by default on MMC1C
 	m_reg_write_enable = 1;
 
 	set_nt_mirroring(PPU_MIRROR_HORZ);
@@ -94,35 +86,6 @@ void nes_sxrom_device::pcb_reset()
 	set_prg();
 }
 
-void nes_sorom_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_latch = 0;
-	m_count = 0;
-	m_reg[0] = 0x0f;
-	m_reg[1] = m_reg[2] = m_reg[3] = 0;
-	m_reg_write_enable = 1;
-
-	set_nt_mirroring(PPU_MIRROR_HORZ);
-	set_chr();
-	set_prg();
-}
-
-void nes_sorom_a_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_latch = 0;
-	m_count = 0;
-	m_reg[0] = 0x0f;
-	m_reg[1] = m_reg[2] = m_reg[3] = 0;
-	m_reg_write_enable = 1;
-
-	set_nt_mirroring(PPU_MIRROR_HORZ);
-	set_chr();
-	set_prg();
-}
 
 
 
@@ -295,7 +258,7 @@ void nes_sxrom_device::write_m(offs_t offset, uint8_t data)
 	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (!BIT(m_reg[3], 4))  // WRAM enabled
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (!m_battery.empty())
 			m_battery[((bank * 0x2000) + offset) & (m_battery.size() - 1)] = data;
@@ -309,7 +272,7 @@ uint8_t nes_sxrom_device::read_m(offs_t offset)
 	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom read_m, offset: %04x\n", offset));
 
-	if (!BIT(m_reg[3], 4))  // WRAM enabled
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (!m_battery.empty())
 			return m_battery[((bank * 0x2000) + offset) & (m_battery.size() - 1)];
@@ -317,7 +280,7 @@ uint8_t nes_sxrom_device::read_m(offs_t offset)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
 	}
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 // SOROM has two RAM banks, the first is not battery backed up, the second is.
@@ -326,7 +289,7 @@ void nes_sorom_device::write_m(offs_t offset, uint8_t data)
 	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (!BIT(m_reg[3], 4))  // WRAM enabled
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (type)
 			m_battery[offset & (m_battery.size() - 1)] = data;
@@ -340,7 +303,7 @@ uint8_t nes_sorom_device::read_m(offs_t offset)
 	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom read_m, offset: %04x\n", offset));
 
-	if (!BIT(m_reg[3], 4))  // WRAM enabled
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (type)
 			return m_battery[offset & (m_battery.size() - 1)];
@@ -348,52 +311,5 @@ uint8_t nes_sorom_device::read_m(offs_t offset)
 			return m_prgram[offset & (m_prgram.size() - 1)];
 	}
 
-	return get_open_bus();   // open bus
-}
-
-// MMC1A boards have no wram enable/disable bit
-void nes_sxrom_a_device::write_m(offs_t offset, uint8_t data)
-{
-	uint8_t bank = (m_reg[1] >> 2) & 3;
-	LOG_MMC(("sxrom_a write_m, offset: %04x, data: %02x\n", offset, data));
-
-	if (!m_battery.empty())
-		m_battery[((bank * 0x2000) + offset) & (m_battery.size() - 1)] = data;
-	if (!m_prgram.empty())
-		m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)] = data;
-}
-
-uint8_t nes_sxrom_a_device::read_m(offs_t offset)
-{
-	uint8_t bank = (m_reg[1] >> 2) & 3;
-	LOG_MMC(("sxrom_a read_m, offset: %04x\n", offset));
-
-	if (!m_battery.empty())
-		return m_battery[((bank * 0x2000) + offset) & (m_battery.size() - 1)];
-	if (!m_prgram.empty())
-		return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
-
-	return get_open_bus();   // open bus
-}
-
-void nes_sorom_a_device::write_m(offs_t offset, uint8_t data)
-{
-	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
-	LOG_MMC(("sorom_a write_m, offset: %04x, data: %02x\n", offset, data));
-
-	if (type)
-		m_battery[offset & (m_battery.size() - 1)] = data;
-	else
-		m_prgram[offset & (m_prgram.size() - 1)] = data;
-}
-
-uint8_t nes_sorom_a_device::read_m(offs_t offset)
-{
-	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
-	LOG_MMC(("sorom_a read_m, offset: %04x\n", offset));
-
-	if (type)
-		return m_battery[offset & (m_battery.size() - 1)];
-	else
-		return m_prgram[offset & (m_prgram.size() - 1)];
+	return get_open_bus();
 }

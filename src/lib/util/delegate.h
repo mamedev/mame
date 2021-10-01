@@ -141,9 +141,10 @@
 #elif defined(__GNUC__)
 	// 32bit MINGW asks for different convention
 	#if defined(__MINGW32__) && !defined(__x86_64__) && defined(__i386__)
-		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
-		#define MAME_DELEGATE_MEMBER_ABI __thiscall
-		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 1
+		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
+		//#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
+		//#define MAME_DELEGATE_MEMBER_ABI __thiscall
+		//#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 1
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
 		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 	#else

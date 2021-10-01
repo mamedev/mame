@@ -32,8 +32,6 @@ static const nes_pcb pcb_list[] =
 	{ "un1rom",           STD_UN1ROM },
 	{ "sxrom",            STD_SXROM },
 	{ "sorom",            STD_SOROM },
-	{ "sxrom_a",          STD_SXROM_A },
-	{ "sorom_a",          STD_SOROM_A },
 	{ "txrom",            STD_TXROM },
 	{ "hkrom",            STD_HKROM },
 	{ "tqrom",            STD_TQROM },
@@ -119,6 +117,7 @@ static const nes_pcb pcb_list[] =
 	{ "sa72008",          SACHEN_SA72008 },
 	{ "tca01",            SACHEN_TCA01 },
 	{ "s3013",            SACHEN_3013 },
+	{ "s3014",            SACHEN_3014 },
 	{ "s8259a",           SACHEN_8259A },
 	{ "s8259b",           SACHEN_8259B },
 	{ "s8259c",           SACHEN_8259C },
@@ -216,6 +215,7 @@ static const nes_pcb pcb_list[] =
 	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
+	{ "l001",             BTL_L001 },
 	{ "batmanfs",         BTL_BATMANFS },
 	{ "palthena",         BTL_PALTHENA },
 	{ "tobidase",         BTL_TOBIDASE },  // mapper 120
@@ -279,6 +279,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_ball11",       BMC_BALLGAMES_11IN1 },
 	{ "bmc_22games",      BMC_22GAMES },
 	{ "bmc_64y2k",        BMC_64IN1NR },
+	{ "bmc_420y2k",       BMC_TELETUBBIES },
 	{ "bmc_12in1",        BMC_12IN1 },
 	{ "bmc_20in1",        BMC_20IN1 },
 	{ "bmc_21in1",        BMC_21IN1 },
@@ -339,6 +340,7 @@ static const nes_pcb pcb_list[] =
 	{ "tek90",            JYCOMPANY_A },
 	{ "sa9602b",          SACHEN_SA9602B },
 	{ "unl_shero",        SACHEN_SHERO },
+	{ "a9746",            UNL_A9746 },
 	{ "mmalee2",          UNL_MMALEE },
 	{ "unl_2708",         UNL_2708 },
 	{ "unl_dh08",         UNL_DH08 },
@@ -376,7 +378,6 @@ static const nes_pcb pcb_list[] =
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "coolboy",          UNSUPPORTED_BOARD },
 	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
-	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
@@ -625,6 +626,24 @@ void nes_cart_slot_device::call_load_pcb()
 						nes_cart_get_line(get_feature("vrc6-pin10")),
 						0);
 //      osd_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
+	}
+
+	if (m_pcb_id == STD_SXROM || m_pcb_id == STD_SOROM)
+	{
+		if (get_feature("mmc1_type") != nullptr)
+		{
+			using mmc1_type = device_nes_cart_interface::mmc1_type;
+
+			const char *type = get_feature("mmc1_type");
+			if (!strcmp(type, "MMC1"))
+				m_cart->set_mmc1_type(mmc1_type::MMC1);
+			else if (!strcmp(type, "MMC1A"))
+				m_cart->set_mmc1_type(mmc1_type::MMC1A);
+			else if (!strncmp(type, "MMC1B", 5)) // common prefix of several variants
+				m_cart->set_mmc1_type(mmc1_type::MMC1B);
+			else if (!strcmp(type, "MMC1C"))
+				m_cart->set_mmc1_type(mmc1_type::MMC1C);
+		}
 	}
 
 	if (m_pcb_id == STD_HKROM || m_pcb_id == TAITO_X1_017)
