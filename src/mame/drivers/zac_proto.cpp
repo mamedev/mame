@@ -14,16 +14,24 @@
     The ball number is how many balls are left. 1 = last ball.
 
 
+Status:
+- All games are working.
+
 ToDo:
-- Mechanical
-- Sound board, no info available. Also knocker output not known.
+- Doesn't appear to have a knocker. To be confirmed.
+- Find out how to enter test mode.
 
 **********************************************************************/
 
 #include "emu.h"
+#include "machine/clock.h"
 #include "machine/genpin.h"
+#include "sound/spkrdev.h"
 #include "cpu/scmp/scmp.h"
+#include "speaker.h"
 #include "zac_proto.lh"
+
+namespace {
 
 class zac_proto_state : public genpin_class
 {
@@ -31,22 +39,33 @@ public:
 	zac_proto_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
 		, m_digits(*this, "digit%u", 0U)
+		, m_io_lamps(*this, "lamp%u", 0U)
+		, m_io_solenoids(*this, "sol%u", 0U)
 	{ }
 
 	void zac_proto(machine_config &config);
 
 private:
 	void out0_w(offs_t offset, uint8_t data);
-	void out1_w(uint8_t data);
+	void out1_w(offs_t offset, uint8_t data);
 	void digit_w(offs_t offset, uint8_t data);
-	void sound_w(uint8_t data);
+	void sound_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(audio_clock);
 	void zac_proto_map(address_map &map);
+	u8 m_u36 = 0;  // preset divider for u44/u45
+	u8 m_u37 = 0;  // selector for u48
+	u8 m_u44u45 = 0;  // counters for u44/u45
+	u8 m_u46u47 = 0;  // counters for u46/u47
 
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
 	output_finder<11> m_digits;
+	output_finder<84> m_io_lamps;
+	output_finder<12> m_io_solenoids;
 };
 
 
@@ -66,7 +85,7 @@ void zac_proto_state::zac_proto_map(address_map &map)
 	map(0x0e02, 0x0e06).w(FUNC(zac_proto_state::digit_w));
 	map(0x0e07, 0x0e08).w(FUNC(zac_proto_state::sound_w));
 	map(0x0e09, 0x0e16).w(FUNC(zac_proto_state::out1_w));
-	map(0x1400, 0x1bff).rom();
+	map(0x1400, 0x17ff).rom();
 }
 
 static INPUT_PORTS_START( zac_proto )
@@ -75,38 +94,38 @@ static INPUT_PORTS_START( zac_proto )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START )
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_TILT)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B)
 	PORT_START("PL1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
 	PORT_START("PL2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
 	PORT_START("PL3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_N)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP)
 	PORT_START("PL4")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -196,7 +215,8 @@ INPUT_PORTS_END
 // solenoids (not knocker)
 void zac_proto_state::out0_w(offs_t offset, uint8_t data)
 {
-	uint16_t t = data | (offset << 8);
+	data &= 0x3f;
+	uint16_t t = data | (offset << 6);
 
 	switch (t)
 	{
@@ -213,11 +233,16 @@ void zac_proto_state::out0_w(offs_t offset, uint8_t data)
 			m_samples->start(5, 0); // bumpers
 			break;
 	}
+	for (u8 i = 0; i < 6; i++)
+		m_io_solenoids[offset*6+i] = BIT(data, i);
 }
 
-void zac_proto_state::out1_w(uint8_t data)
-{
 // lamps
+void zac_proto_state::out1_w(offs_t offset, uint8_t data)
+{
+	data &= 0x3f;
+	for (u8 i = 0; i < 6; i++)
+		m_io_lamps[offset*6+i] = BIT(data, i);
 }
 
 // need to implement blanking of leading zeroes
@@ -231,9 +256,48 @@ void zac_proto_state::digit_w(offs_t offset, uint8_t data)
 	m_digits[offset] = patterns[data>>4] | decimals[offset];
 }
 
-void zac_proto_state::sound_w(uint8_t data)
+void zac_proto_state::sound_w(offs_t offset, uint8_t data)
 {
-// to unknown sound board
+	data &= 0x3f;
+	if (offset)
+	{
+		data ^= 0x0e;
+		// sch labels shows bit 1 as enable, but pin numbers show bit 4 being enable.
+		// we will go by the pin numbers.
+		m_u37 = BIT(data, 1, 4);
+		m_u36 = (m_u36 & 0x3f) | (BIT(data, 0) << 6) | 0x80;
+	}
+	else
+	{
+		m_u36 = (m_u36 & 0x40) | data | 0x80;
+	}
+}
+
+WRITE_LINE_MEMBER(zac_proto_state::audio_clock)
+{
+	if (state)// && BIT(m_u37, 3))
+	{
+		m_u44u45--;
+		if (m_u44u45 == 0)
+		{
+			m_u44u45 = m_u36;
+			m_u46u47--;
+			if (BIT(m_u37, 3))
+				m_speaker->level_w(BIT(m_u46u47, m_u37 & 7) ? 1 : -1);
+		}
+	}
+}
+
+void zac_proto_state::machine_start()
+{
+	m_digits.resolve();
+	m_io_lamps.resolve();
+	m_io_solenoids.resolve();
+
+	save_item(NAME(m_u36));
+	save_item(NAME(m_u37));
+	save_item(NAME(m_u44u45));
+	save_item(NAME(m_u46u47));
 }
 
 void zac_proto_state::machine_reset()
@@ -254,41 +318,51 @@ void zac_proto_state::zac_proto(machine_config &config)
 
 	/* Sound */
 	genpin_audio(config);
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	clock_device &snd_clock(CLOCK(config, "sys_clock", XTAL(4'000'000) / 2));
+	snd_clock.signal_handler().set(FUNC(zac_proto_state::audio_clock));
 }
+
+// The PCB has a space for another rom, U27, @0x1800, but it was never used.
 
 /*--------------------------------
 / Strike
 /-------------------------------*/
 ROM_START(strike)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("strike1.bin", 0x0000, 0x0400, CRC(650abc54) SHA1(6a4f83016a38338ba6a04271532f0880264e61a7))
-	ROM_LOAD("strike2.bin", 0x0400, 0x0400, CRC(13c5a168) SHA1(2da3a5bc0c28a2aacd8c1396dac95cf35f8797cd))
-	ROM_LOAD("strike3.bin", 0x0800, 0x0400, CRC(ebbbf315) SHA1(c87e961c8e5e99b0672cd632c5e104ea52088b5d))
-	ROM_LOAD("strike4.bin", 0x1400, 0x0400, CRC(ca0eddd0) SHA1(52f9faf791c56b68b1806e685d0479ea67aba019))
+	ROM_REGION(0x1800, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("strike1.u23", 0x0000, 0x0400, CRC(650abc54) SHA1(6a4f83016a38338ba6a04271532f0880264e61a7))
+	ROM_LOAD("strike2.u24", 0x0400, 0x0400, CRC(13c5a168) SHA1(2da3a5bc0c28a2aacd8c1396dac95cf35f8797cd))
+	ROM_LOAD("strike3.u25", 0x0800, 0x0400, CRC(ebbbf315) SHA1(c87e961c8e5e99b0672cd632c5e104ea52088b5d))
+	ROM_LOAD("strike4.u26", 0x1400, 0x0400, CRC(ca0eddd0) SHA1(52f9faf791c56b68b1806e685d0479ea67aba019))
 ROM_END
 
 /*--------------------------------
 / Ski Jump (10/78)
 /-------------------------------*/
 ROM_START(skijump)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("skijump1.bin", 0x0000, 0x0400, CRC(c0c0e18c) SHA1(d28ec2541f6c2e86e5b5514c7f9e558df68be72a))
-	ROM_LOAD("skijump2.bin", 0x0400, 0x0400, CRC(b08aafb5) SHA1(ff6df4efa20a4461d525209a487d04896eeef29e))
-	ROM_LOAD("skijump3.bin", 0x0800, 0x0400, CRC(9a8731c0) SHA1(9f7aaa8c6df04b925c8beff8b426c59bc3696f50))
-	ROM_LOAD("skijump4.bin", 0x1400, 0x0400, CRC(fa064b51) SHA1(d4d02ca661e4084805f00247f31c0701320ab62d))
+	ROM_REGION(0x1800, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("skijump1.u23", 0x0000, 0x0400, CRC(c0c0e18c) SHA1(d28ec2541f6c2e86e5b5514c7f9e558df68be72a))
+	ROM_LOAD("skijump2.u24", 0x0400, 0x0400, CRC(b08aafb5) SHA1(ff6df4efa20a4461d525209a487d04896eeef29e))
+	ROM_LOAD("skijump3.u25", 0x0800, 0x0400, CRC(9a8731c0) SHA1(9f7aaa8c6df04b925c8beff8b426c59bc3696f50))
+	ROM_LOAD("skijump4.u26", 0x1400, 0x0400, CRC(fa064b51) SHA1(d4d02ca661e4084805f00247f31c0701320ab62d))
 ROM_END
 
 /*--------------------------------
 / Space City (09/79)
 /-------------------------------*/
 ROM_START(spacecty)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("zsc1.dat", 0x0000, 0x0400, CRC(4405368f) SHA1(037ad7e7158424bb714b28e4effa2c96c8736ce4))
-	ROM_LOAD("zsc2.dat", 0x0400, 0x0400, CRC(a6c41475) SHA1(7d7d851efb2db7d9a1988265cdff676260d753c3))
-	ROM_LOAD("zsc3.dat", 0x0800, 0x0400, CRC(e6a2dcee) SHA1(d2dfff896ae90208c28179f9bbe43f93d7f2131c))
-	ROM_LOAD("zsc4.dat", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
+	ROM_REGION(0x1800, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("zsc1.u23", 0x0000, 0x0400, CRC(4405368f) SHA1(037ad7e7158424bb714b28e4effa2c96c8736ce4))
+	ROM_LOAD("zsc2.u24", 0x0400, 0x0400, CRC(a6c41475) SHA1(7d7d851efb2db7d9a1988265cdff676260d753c3))
+	ROM_LOAD("zsc3.u25", 0x0800, 0x0400, CRC(e6a2dcee) SHA1(d2dfff896ae90208c28179f9bbe43f93d7f2131c))
+	ROM_LOAD("zsc4.u26", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
 ROM_END
 
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+} // anonymous namespace
+
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
