@@ -143,7 +143,11 @@ enum
 	// homebrew PCBs
 	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
 	UNL_ACTION53,   // homebrew PCB for homebrew multicarts
-	BATMAP_000, BATMAP_SRRX, UNL_CUFROM, UNL_UNROM512, UNL_2A03PURITANS,
+	UNL_2A03PURITANS,
+	// Batlab Electronics
+	BATMAP_000, BATMAP_SRRX,
+	// Sealie
+	UNL_CUFROM, UNL_UNROM512, UNL_DPCMCART,
 	// FFE boards, for mappers 6, 8, 17
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	// Unsupported (for place-holder boards, with no working emulation) & no-board (at init)

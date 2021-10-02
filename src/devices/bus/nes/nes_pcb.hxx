@@ -370,6 +370,7 @@ static const nes_pcb pcb_list[] =
 	{ "cufrom",           UNL_CUFROM },
 	{ "unrom512",         UNL_UNROM512 },
 	{ "2a03pur",          UNL_2A03PURITANS },
+	{ "dpcmcart",         UNL_DPCMCART },
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },

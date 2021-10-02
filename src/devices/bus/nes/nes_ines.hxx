@@ -444,7 +444,7 @@ static const nes_mmc mmc_list[] =
 	// 406 homebrew game Haradius Zero
 	// 407 VT03 PnP
 	// 408 Konami PnP
-	// 409 (Sealie) homebrew game A Winner is You, 64MB music cart, easy to support if dump is available
+	{ 409, UNL_DPCMCART },         // A Winner is You homebrew music cart
 	// 410 Unused or JY?
 	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
@@ -643,8 +643,27 @@ void nes_cart_slot_device::call_load_ines()
 		mapper |= (header[8] & 0x0f) << 8;
 		// read submappers (based on 20140116 specs)
 		submapper = (header[8] & 0xf0) >> 4;
-		prg_size += ((header[9] & 0x0f) << 8) * 0x4000;
-		vrom_size += ((header[9] & 0xf0) << 4) * 0x2000;
+
+		// NES 2.0's extended exponential sizes, needed for loading PRG >= 64MB, CHR >= 32MB. These bizarrely go up to 7 * 2^63!
+		auto expsize = [] (u8 byte) { return (2*(byte & 0x03) + 1) << (byte >> 2); };
+
+		if ((header[9] & 0x0f) == 0x0f)
+		{
+			prg_size = expsize(header[4]);
+			if (prg_size == 0)    // 0 only on overflow
+				fatalerror("NES 2.0 PRG size >= 4GB is unsupported.\n");
+		}
+		else
+			prg_size += ((header[9] & 0x0f) << 8) * 0x4000;
+
+		if ((header[9] & 0xf0) == 0xf0)
+		{
+			vrom_size = expsize(header[5]);
+			if (vrom_size == 0)    // 0 only on overflow
+				fatalerror("NES 2.0 CHR size >= 4GB is unsupported.\n");
+		}
+		else
+			vrom_size += ((header[9] & 0xf0) << 4) * 0x2000;
 	}
 	ines_mapr_setup(mapper, &pcb_id);
 
