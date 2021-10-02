@@ -3,11 +3,84 @@
 #include "emu.h"
 #include "a2pic.h"
 
+#include "bus/centronics/ctronics.h"
+
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 namespace {
+
+class a2bus_pic_device : public device_t, public device_a2bus_card_interface
+{
+public:
+	a2bus_pic_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// DIP switch/jumper handlers
+	DECLARE_INPUT_CHANGED_MEMBER(sw1_strobe);
+	DECLARE_INPUT_CHANGED_MEMBER(sw1_ack);
+	DECLARE_INPUT_CHANGED_MEMBER(sw1_firmware);
+	DECLARE_INPUT_CHANGED_MEMBER(sw1_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(x_data_out);
+	DECLARE_INPUT_CHANGED_MEMBER(x_char_width);
+
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual u8 read_cnxx(u8 offset) override;
+	virtual void write_cnxx(u8 offset, u8 data) override;
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	// printer status inputs
+	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	DECLARE_WRITE_LINE_MEMBER(perror_w);
+	DECLARE_WRITE_LINE_MEMBER(select_w);
+	DECLARE_WRITE_LINE_MEMBER(fault_w);
+
+	// timer handlers
+	TIMER_CALLBACK_MEMBER(release_strobe);
+
+	// synchronised inputs
+	void set_ack_in(void *ptr, s32 param);
+	void set_perror_in(void *ptr, s32 param);
+	void set_select_in(void *ptr, s32 param);
+	void set_fault_in(void *ptr, s32 param);
+	void data_write(void *ptr, s32 param);
+
+	// helpers
+	void reset_mode();
+	void set_ack_latch();
+	void clear_ack_latch();
+	void enable_irq();
+	void disable_irq();
+
+	required_device<centronics_device>      m_printer_conn;
+	required_device<output_latch_device>    m_printer_out;
+	required_ioport                         m_input_sw1;
+	required_ioport                         m_input_x;
+	required_region_ptr<u8>                 m_prom;
+	emu_timer *                             m_strobe_timer;
+
+	u16 m_firmware_base;        // controlled by SW6
+	u8  m_data_latch;           // 9B
+	u8  m_autostrobe_disable;   // 2A pin 8
+	u8  m_ack_latch;            // 2A pin 6
+	u8  m_irq_enable;           // 2B pin 9
+	u8  m_ack_in;
+	u8  m_perror_in;            // DI5
+	u8  m_select_in;            // DI6
+	u8  m_fault_in;             // DI3
+};
+
+
 
 ROM_START(pic)
 	ROM_REGION(0x0200, "prom", 0)
@@ -50,12 +123,6 @@ INPUT_PORTS_START(pic)
 	PORT_CONFSETTING(   0x00, "7-bit (X5)")
 	PORT_CONFSETTING(   0x04, "8-bit (X6)")
 INPUT_PORTS_END
-
-} // anonymous namespace
-
-
-
-DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple II Parallel Interface Card")
 
 
 
@@ -529,3 +596,9 @@ void a2bus_pic_device::disable_irq()
 		LOG("IRQ already disabled\n");
 	}
 }
+
+} // anonymous namespace
+
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_PIC, device_a2bus_card_interface, a2bus_pic_device, "a2pic", "Apple II Parallel Interface Card")

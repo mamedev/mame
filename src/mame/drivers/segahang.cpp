@@ -391,7 +391,7 @@ void segahang_state::sharrier_map(address_map &map)
 //  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
-	// On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
+// On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
 void segahang_state::sub_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( hangon_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINAGE")
-	SEGA_COINAGE_LOC(SWA)
+	SEGA_COINAGE_NO_FREE_LOC(SWA)
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
@@ -512,7 +512,7 @@ static INPUT_PORTS_START( sharrier_generic )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINAGE")
-	SEGA_COINAGE_LOC(SWA)
+	SEGA_COINAGE_NO_FREE_LOC(SWA)
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
@@ -578,6 +578,9 @@ static INPUT_PORTS_START( shangupb )
 
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Supercharger") PORT_CODE(KEYCODE_LSHIFT)
+
+	PORT_MODIFY("COINAGE")
+	SEGA_COINAGE_LOC(SWA)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:1")
@@ -660,6 +663,9 @@ static INPUT_PORTS_START( enduror )
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("COINAGE")
+	SEGA_COINAGE_LOC(SWA)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1")

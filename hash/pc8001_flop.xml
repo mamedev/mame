@@ -4,7 +4,7 @@
 license:CC0
 -->
 <softwarelist name="pc8001_flop" description="NEC PC-8001 (N-BASIC) disk images">
-<!-- 
+<!--
 PC-8001 / PC-8801 N-BASIC compatible SW list
 
 Generic troubleshooting:
@@ -27,7 +27,7 @@ TODO:
 - Fill unknown years and manufacturers;
 - Pinpoint if there are further games that needs to be moved from pc8801_flop to here
   (1982, 1983 and 1984 releases may really work on N-BASIC only);
-- Checkout the collection disks, printout what they contains and eventually extract a 
+- Checkout the collection disks, printout what they contains and eventually extract a
   list of games released for the system;
 - verify minimum RAM & minimum N Basic version requirements
 
@@ -107,7 +107,7 @@ References:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Locks up at "BASIC LODGE" screen, blinks player after too much time, never start gameplay -->
 	<!-- [Does extensive reads of the RTC, keeps looping at 340-350 basic lines] -->
 	<software name="300m" supported="no">
@@ -160,7 +160,7 @@ References:
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34880 -->
-				<rom name="4 dimension house.d88" size="348848" crc="90e85539" sha1="450867c78915238f9de40bb98cd9d03f63eb01b6"/>
+				<rom name="4 dimension house [alt].d88" size="348848" crc="90e85539" sha1="450867c78915238f9de40bb98cd9d03f63eb01b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -253,7 +253,7 @@ References:
 		<year>1981</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<info name="alt_title" value="エイリアン　パート２"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="alien part 2 [set 1].d88" size="31424" crc="142bf95b" sha1="cdaf6e7268de0a0fcfb53a54e2787e19c28406c2"/>
@@ -401,7 +401,7 @@ References:
 		<!-- Inputs: -->
 		<!-- p1 Shift and Right CTRL -->
 		<!-- p2 Page Up and + (Numpad) -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="block tennis.d88" size="31424" crc="25fa6b41" sha1="dbb7f33bff050c442e09518b4769de27335f4d9d"/>
@@ -425,7 +425,7 @@ References:
 		</part>
 	</software>
 
-	<!-- Timer never start, --> 
+	<!-- Timer never start, -->
 	<!-- Hi-Score doesn't initialize properly (sometimes 0, other times 0xFFFFFF) -->
 	<!-- TODO: both smells as btanb, verify on real HW -->
 	<!-- TODO: is the I/O 81.03 release based off later code? -->
@@ -444,7 +444,7 @@ References:
 		</part>
 	</software>
 
-	<!-- Timer never start, --> 
+	<!-- Timer never start, -->
 	<!-- Hi-Score doesn't initialize properly (sometimes 0, other times 0xFFFFFF) -->
 	<!-- TODO: both smells as btanb, verify on real HW -->
 	<software name="bugfirea" cloneof="bugfire" supported="partial">
@@ -559,7 +559,7 @@ References:
 		<!-- J&P -->
 		<publisher>アポロテクニカ (Apollo Technica)</publisher>
 		<!-- M,Nakajima Ｍ．Ｎ（ＴＯＴＯ）氏 -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="cosmo traveler.d88" size="31424" crc="c04c4679" sha1="5b371499a5b77cbceedaa6bb7c48b3065e544a1a"/>
@@ -1425,11 +1425,11 @@ References:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
-				<rom name="missile commander.d88" size="348832" crc="05fdc754" sha1="4519345cad8c60383508e9b6b444ab4909462990"/>
+				<rom name="missile commander [set 3].d88" size="348832" crc="05fdc754" sha1="4519345cad8c60383508e9b6b444ab4909462990"/>
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="monstbal">
 		<description>Monster and Ball</description>
 		<year>19??</year>
@@ -1495,7 +1495,7 @@ References:
 		<year>1982</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<!-- Ｙ．Ｋ氏 -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="new rally-x.d88" size="31424" crc="7a619338" sha1="cda51808ba71490a1a5b8960d9027498a22cdf8b"/>
@@ -1523,7 +1523,7 @@ References:
 		<!-- TODO: verify -->
 		<!-- <info name="alt_title" value="日本列島会姫ゲーム"/> -->
 		<!-- conversion from MZ by K.S -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="nippon rettou kaishime game.d88" size="348848" crc="78111ff0" sha1="09d2996c7f28333b146c4627fa7d383aaaea4e81"/>
@@ -1778,7 +1778,7 @@ References:
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!-- Koichi -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="river rescue.d88" size="31424" crc="46c85f30" sha1="5234e88f37e963eb336392cdda3de5e437c84b01"/>
@@ -2006,7 +2006,7 @@ References:
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="alt_title" value="スパイ大作戦"/>
 		<!-- Ｙ．Ｔ氏 / Yoshinobu Takahashi -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="spy daisakusen(8001 version).d88" size="31424" crc="19460d73" sha1="7e329c06760ae939f18f7f742ef039a71718d8b5"/>
@@ -2079,7 +2079,7 @@ References:
 		<!-- isisu Yo -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="サブマリン パート3"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="submarine 3.d88" size="348848" crc="8ee3594b" sha1="0c7be5aad64080b3876739735f5d9b9c92b15f2b"/>
@@ -2133,7 +2133,7 @@ References:
 		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- M.D.S. Takuya Kojima -->
 		<!-- Produced and Arranged by PonyCa Masaichiro Hirano -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="surabaya-oki kaisen.d88" size="31424" crc="b69ab788" sha1="78f7307200ab1bd6a5775101041cf8fb5c2ec0fe"/>
@@ -2373,7 +2373,7 @@ References:
 		<year>1983</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- Yasugi Kenta (ESC) -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="the racer.d88" size="31424" crc="c5a21f00" sha1="b950839fd4adefb8d64486aabcc3ca03a845f62a"/>
@@ -2581,7 +2581,7 @@ References:
 		<description>Zaxus (alt)</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
-	
+
 		<info name="release" value="198503xx"/>
 		<info name="alt_title" value="ザクサス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2632,7 +2632,7 @@ References:
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Press Up arrow or LSHIFT to break from the initial listing"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="[compilation] ndisk (disk 1).d88" size="348848" crc="a3f69ff2" sha1="b825c97afa84db047b261be676de2f0f8e7c71d2"/>
@@ -2804,7 +2804,7 @@ References:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pc801pac">
 		<description>PC80 1 (collection)</description>
 		<year>19??</year>
@@ -3003,7 +3003,7 @@ ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pc8034d8">
 		<description>PC-8034</description>
 		<year>19??</year>

@@ -2308,6 +2308,10 @@ void TParseContext::builtInOpCheck(const TSourceLoc& loc, const TFunction& fnCan
         if (!(*argp)[10]->getAsConstantUnion())
             error(loc, "argument must be compile-time constant", "payload number", "a");
         break;
+    case EOpTraceRayMotionNV:
+        if (!(*argp)[11]->getAsConstantUnion())
+            error(loc, "argument must be compile-time constant", "payload number", "a");
+        break;
     case EOpTraceKHR:
         if (!(*argp)[10]->getAsConstantUnion())
             error(loc, "argument must be compile-time constant", "payload number", "a");
@@ -7687,7 +7691,13 @@ TIntermTyped* TParseContext::addConstructor(const TSourceLoc& loc, TIntermNode* 
             return nullptr;
     }
 
-    return intermediate.setAggregateOperator(aggrNode, op, type, loc);
+    TIntermTyped *ret_node = intermediate.setAggregateOperator(aggrNode, op, type, loc);
+
+    TIntermAggregate *agg_node = ret_node->getAsAggregate();
+    if (agg_node && (agg_node->isVector() || agg_node->isArray() || agg_node->isMatrix()))
+        agg_node->updatePrecision();
+
+    return ret_node;
 }
 
 // Function for constructor implementation. Calls addUnaryMath with appropriate EOp value

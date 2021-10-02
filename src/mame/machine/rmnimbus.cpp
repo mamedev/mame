@@ -217,7 +217,7 @@ void rmnimbus_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1, _2));
+		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1));
 
 		/* set up the instruction hook */
 		m_maincpu->debug()->set_instruction_hook(instruction_hook);
@@ -227,7 +227,7 @@ void rmnimbus_state::machine_start()
 	m_fdc->dden_w(0);
 }
 
-void rmnimbus_state::debug_command(int ref, const std::vector<std::string> &params)
+void rmnimbus_state::debug_command(const std::vector<std::string> &params)
 {
 	if (params.size() > 0)
 	{

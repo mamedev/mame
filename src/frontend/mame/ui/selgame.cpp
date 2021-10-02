@@ -247,7 +247,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 
 	if (s_first_start)
 	{
-		//s_first_start = false; TODO: why wansn't it ever clearing the first start flag?
+		//s_first_start = false; TODO: why wasn't it ever clearing the first start flag?
 		reselect_last::set_driver(moptions.last_used_machine());
 		ui_globals::rpanel = std::min<int>(std::max<int>(moptions.last_right_panel(), RP_FIRST), RP_LAST);
 
@@ -256,13 +256,13 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 		std::string fake_ini;
 		if (found == std::string::npos)
 		{
-			fake_ini = util::string_format("%s = 1\n", tmp);
+			fake_ini = util::string_format(u8"\uFEFF%s = 1\n", tmp);
 		}
 		else
 		{
 			std::string const sub_filter(tmp.substr(found + 1));
 			tmp.resize(found);
-			fake_ini = util::string_format("%s = %s\n", tmp, sub_filter);
+			fake_ini = util::string_format(u8"\uFEFF%s = %s\n", tmp, sub_filter);
 		}
 
 		emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);

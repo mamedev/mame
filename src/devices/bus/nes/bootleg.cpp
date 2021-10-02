@@ -53,6 +53,7 @@ DEFINE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device,    "nes_smb2jb",    "N
 DEFINE_DEVICE_TYPE(NES_N32_4IN1,       nes_n32_4in1_device,  "nes_n32_4in1",  "NES Cart N-32 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_0353,           nes_0353_device,      "nes_0353",      "NES Cart 0353 PCB")
 DEFINE_DEVICE_TYPE(NES_09034A,         nes_09034a_device,    "nes_09034a",    "NES Cart 09-034A PCB")
+DEFINE_DEVICE_TYPE(NES_L001,           nes_l001_device,      "nes_l001",      "NES Cart L-001 PCB")
 DEFINE_DEVICE_TYPE(NES_BATMANFS,       nes_batmanfs_device,  "nes_batmanfs",  "NES Cart Batman Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_PALTHENA,       nes_palthena_device,  "nes_palthena",  "NES Cart Palthena no Kagami Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device,  "nes_tobidase",  "NES Cart Tobidase Daisakusen Pirate PCB")
@@ -141,6 +142,11 @@ nes_0353_device::nes_0353_device(const machine_config &mconfig, const char *tag,
 
 nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_09034A, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), irq_timer(nullptr)
+{
+}
+
+nes_l001_device::nes_l001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_L001, tag, owner, clock), m_irq_count(0), irq_timer(nullptr)
 {
 }
 
@@ -497,6 +503,23 @@ void nes_09034a_device::pcb_reset()
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_reg = 0;
+}
+
+void nes_l001_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_count));
+}
+
+void nes_l001_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);
+	chr8(0, CHRROM);
+
+	m_irq_count = 0;
 }
 
 void nes_palthena_device::device_start()
@@ -1550,6 +1573,64 @@ u8 nes_09034a_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
+ Board L-001
+
+ Games: Sangokushi III (Sangokushi II bootleg)
+
+ This board has swappable 8K PRG banks at 0x8000, 0xa000,
+ and 0xc000, while 0xe000 is fixed to the final bank.
+ CHRROM and CIRAM are also swappable in 1K banks.
+ The board has a 16-bit IRQ counter with the enable bit
+ acting as the MSB. The enhanced audio of the original
+ Namco 163 board is not retained.
+
+ NES 2.0: mapper 330
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_l001_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (BIT(m_irq_count, 15))
+		{
+			if (++m_irq_count == 0)
+				set_irq_line(ASSERT_LINE);
+		}
+	}
+}
+
+void nes_l001_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("l-001 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6400)
+	{
+		case 0x0000:
+		case 0x2000:
+			chr1_x((offset >> 11) & 0x07, data, CHRROM);
+			break;
+		case 0x0400:
+			m_irq_count = (m_irq_count & 0xff00) | data;
+			break;
+		case 0x2400:
+			m_irq_count = (m_irq_count & 0x00ff) | data << 8;
+			set_irq_line(CLEAR_LINE);
+			break;
+		case 0x4000:
+			set_nt_page((offset >> 11) & 0x03, CIRAM, data & 1, 1);
+			break;
+		case 0x6000:
+			if (offset < 0x7800)
+				prg8_x((offset >> 11) & 0x03, data & 0x1f);
+			break;
+	}
+}
+
+/*-------------------------------------------------
+
  BTL-BATMANFS
 
  Games: Batman "Fine Studio" pirate
@@ -2207,7 +2288,7 @@ void nes_shuiguan_device::write_h(offs_t offset, uint8_t data)
 			{
 				case 0x00: m_irq_count = (m_irq_count & 0xf0) | ((data & 0x0f) << 0); break;
 				case 0x04: m_irq_count = (m_irq_count & 0x0f) | ((data & 0x0f) << 4); break;
-				case 0x08: m_irq_enable= data; break;
+				case 0x08: m_irq_enable = data; break;
 				case 0x0c: break;
 			}
 			break;

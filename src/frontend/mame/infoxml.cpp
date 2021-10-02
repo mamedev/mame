@@ -52,6 +52,51 @@ public:
 	bool operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const;
 };
 
+
+class device_filter
+{
+public:
+	device_filter(const std::function<bool(const char *shortname, bool &done)> &callback)
+		: m_callback(callback)
+		, m_done(false)
+	{
+	}
+
+	// methods
+	bool filter(const char *shortname);
+
+	// accessors
+	bool done() const { return m_done; }
+
+private:
+	const std::function<bool(const char *shortname, bool &done)> &	m_callback;
+	bool															m_done;
+};
+
+
+class filtered_driver_enumerator
+{
+public:
+	filtered_driver_enumerator(driver_enumerator &drivlist, device_filter &devfilter)
+		: m_drivlist(drivlist)
+		, m_devfilter(devfilter)
+		, m_done(false)
+	{
+	}
+
+	// methods
+	std::vector<std::reference_wrapper<const game_driver>> next(int count);
+
+	// accessors
+	bool done() const { return m_done || m_devfilter.done(); }
+
+private:
+	driver_enumerator &	m_drivlist;
+	device_filter &		m_devfilter;
+	bool				m_done;
+};
+
+
 typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
 
 std::string normalize_string(const char *string);
@@ -386,16 +431,22 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 {
 	struct prepared_info
 	{
+		prepared_info() = default;
+		prepared_info(const prepared_info &) = delete;
+		prepared_info(prepared_info &&) = default;
+		prepared_info &operator=(const prepared_info &) = delete;
+
 		std::string     m_xml_snippet;
 		device_type_set m_dev_set;
 	};
 
 	// prepare a driver enumerator and the queue
 	driver_enumerator drivlist(m_lookup_options);
-	bool drivlist_done = false;
-	bool filter_done = false;
+	device_filter devfilter(filter);
+	filtered_driver_enumerator filtered_drivlist(drivlist, devfilter);
 	bool header_outputted = false;
 
+	// essentially a local method to emit the header if necessary
 	auto output_header_if_necessary = [this, &header_outputted](std::ostream &out)
 	{
 		if (!header_outputted)
@@ -406,79 +457,97 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	};
 
 	// only keep a device set when we're asked to track it
-	std::unique_ptr<device_type_set> devfilter;
+	std::optional<device_type_set> devset;
 	if (include_devices && filter)
-		devfilter = std::make_unique<device_type_set>();
+		devset.emplace();
 
-	// prepare a queue of futures
-	std::queue<std::future<prepared_info>> queue;
+	// prepare a queue of tasks - this is a FIFO queue because of the
+	// need to be deterministic
+	std::queue<std::future<prepared_info>> tasks;
 
-	// try enumerating drivers and outputting them
-	while (!queue.empty() || (!drivlist_done && !filter_done))
+	// while we want to be deterministic, asynchronous task scheduling is not; so we want to
+	// track the amount of active tasks so that we can keep on spawning tasks even if we're
+	// waiting on the task in the front of the queue
+	std::atomic<unsigned int> active_task_count = 0;
+	unsigned int maximum_active_task_count = std::thread::hardware_concurrency() + 10;
+	unsigned int maximum_outstanding_task_count = maximum_active_task_count + 20;
+
+	// loop until we're done enumerating drivers, and until there are no outstanding tasks
+	while (!filtered_drivlist.done() || !tasks.empty())
 	{
-		// try populating the queue
-		while (queue.size() < 20 && !drivlist_done && !filter_done)
+		// loop until there are as many outstanding tasks as possible (we want to separately cap outstanding
+		// tasks and active tasks)
+		while (!filtered_drivlist.done()
+			&& active_task_count < maximum_active_task_count
+			&& tasks.size() < maximum_outstanding_task_count)
 		{
-			if (!drivlist.next())
-			{
-				// at this point we are done enumerating through drivlist and it is no
-				// longer safe to call next(), so record that we're done
-				drivlist_done = true;
-			}
-			else if (!filter || filter(drivlist.driver().name, filter_done))
-			{
-				const game_driver &driver(drivlist.driver());
-				std::future<prepared_info> future_pi = std::async(std::launch::async, [&drivlist, &driver, &devfilter]
-				{
-					prepared_info result;
-					std::ostringstream stream;
+			// we want to launch a task; grab a packet of drivers to process
+			std::vector<std::reference_wrapper<const game_driver>> drivers = filtered_drivlist.next(20);
+			if (drivers.empty())
+				break;
 
-					output_one(stream, drivlist, driver, devfilter ? &result.m_dev_set : nullptr);
-					result.m_xml_snippet = stream.str();
-					return result;
-				});
-				queue.push(std::move(future_pi));
-			}
+			// do the dirty work asychronously
+			auto task_proc = [&drivlist, drivers{ std::move(drivers) }, include_devices, &active_task_count]
+			{
+				prepared_info result;
+				std::ostringstream stream;
+
+				// output each of the drivers
+				for (const game_driver &driver : drivers)
+					output_one(stream, drivlist, driver, include_devices ? &result.m_dev_set : nullptr);
+
+				// capture the XML snippet
+				result.m_xml_snippet = stream.str();
+
+				// we're done with the task; decrement the counter and return
+				active_task_count--;
+				return result;
+			};
+
+			// add this task to the queue
+			active_task_count++;
+			tasks.emplace(std::async(std::launch::async, std::move(task_proc)));
 		}
 
-		// now that we have the queue populated, try grabbing one (assuming that it is not empty)
-		if (!queue.empty())
+		// we've put as many outstanding tasks out as we can; are there any tasks outstanding?
+		if (!tasks.empty())
 		{
-			// wait for the future to complete and get the info
-			prepared_info pi = queue.front().get();
-			queue.pop();
+			// wait for the task at the front of the queue to complete and get the info, in the
+			// spirit of determinism
+			prepared_info pi = tasks.front().get();
+			tasks.pop();
 
-			// emit the XML
+			// emit whatever XML we accumulated in the task
 			output_header_if_necessary(out);
 			out << pi.m_xml_snippet;
 
-			// merge devices into devfilter, if appropriate
-			if (devfilter)
+			// merge devices into devset, if appropriate
+			if (devset)
 			{
 				for (const auto &x : pi.m_dev_set)
-					devfilter->insert(x);
+					devset->insert(x);
 			}
 		}
 	}
 
 	// iterate through the device types if not everything matches a driver
-	if (devfilter && !filter_done)
+	if (devset && !devfilter.done())
 	{
 		for (device_type type : registered_device_types)
 		{
-			if (!filter || filter(type.shortname(), filter_done))
-				devfilter->insert(&type);
+			if (devfilter.filter(type.shortname()))
+				devset->insert(&type);
 
-			if (filter_done)
+			if (devfilter.done())
 				break;
 		}
 	}
 
 	// output devices (both devices with roms and slot devices)
-	if (include_devices && (!devfilter || !devfilter->empty()))
+	if (include_devices && (!devset || !devset->empty()))
 	{
 		output_header_if_necessary(out);
-		output_devices(out, m_lookup_options, devfilter.get());
+		output_devices(out, m_lookup_options, devset ? &*devset : nullptr);
 	}
 
 	if (header_outputted)
@@ -519,6 +588,43 @@ std::string normalize_string(const char *string)
 		}
 	}
 	return stream.str();
+}
+
+
+//-------------------------------------------------
+//	device_filter::filter - apply the filter, if
+//	present
+//-------------------------------------------------
+
+bool device_filter::filter(const char *shortname)
+{
+	return !m_done && (!m_callback || m_callback(shortname, m_done));
+}
+
+
+//-------------------------------------------------
+//  filtered_driver_enumerator::next - take a number
+//	of game_drivers, while applying filters
+//-------------------------------------------------
+
+std::vector<std::reference_wrapper<const game_driver>> filtered_driver_enumerator::next(int count)
+{
+	std::vector<std::reference_wrapper<const game_driver>> results;
+	while (!done() && results.size() < count)
+	{
+		if (!m_drivlist.next())
+		{
+			// at this point we are done enumerating through drivlist and it is no
+			// longer safe to call next(), so record that we're done
+			m_done = true;
+		}
+		else if (m_devfilter.filter(m_drivlist.driver().name))
+		{
+			const game_driver &driver(m_drivlist.driver());
+			results.push_back(driver);
+		}
+	}
+	return results;
 }
 
 

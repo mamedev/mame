@@ -283,7 +283,8 @@ void nes_txrom_device::txrom_write(offs_t offset, uint8_t data)
 			break;
 
 		case 0x2000:
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			if (m_mirroring != PPU_MIRROR_4SCREEN)
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x2001:

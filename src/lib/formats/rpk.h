@@ -2,9 +2,9 @@
 // copyright-holders:Michael Zapf
 /***************************************************************************
 
-	rpk.h
+    rpk.h
 
-	RPK format support
+    RPK format support
 
 ***************************************************************************/
 
@@ -22,7 +22,7 @@
 
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 class rpk_reader;
@@ -57,12 +57,12 @@ public:
 	std::error_condition read_file(std::vector<std::uint8_t> &result) const;
 
 private:
-	rpk_file &								m_rpk;
-	std::string								m_id;
-	socket_type								m_type;
-	std::string								m_filename;
-	std::optional<util::hash_collection>	m_hashes;
-	std::uint32_t							m_length;
+	rpk_file &                              m_rpk;
+	std::string                             m_id;
+	socket_type                             m_type;
+	std::string                             m_filename;
+	std::optional<util::hash_collection>    m_hashes;
+	std::uint32_t                           m_length;
 };
 
 
@@ -87,9 +87,9 @@ public:
 	const std::list<rpk_socket> &sockets() const { return m_sockets; }
 
 private:
-	util::archive_file::ptr		m_zipfile;
-	int							m_pcb_type;
-	std::list<rpk_socket>		m_sockets;
+	util::archive_file::ptr     m_zipfile;
+	int                         m_pcb_type;
+	std::list<rpk_socket>       m_sockets;
 
 	// accesors
 	util::archive_file &zipfile() { return *m_zipfile; }
@@ -127,8 +127,8 @@ public:
 	std::error_condition read(std::unique_ptr<util::random_read> &&stream, rpk_file::ptr &result) const;
 
 private:
-	char const *const *	m_pcb_types;
-	bool				m_supports_ram;
+	char const *const * m_pcb_types;
+	bool                m_supports_ram;
 };
 
 

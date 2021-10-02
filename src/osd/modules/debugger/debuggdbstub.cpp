@@ -421,7 +421,7 @@ class debug_gdbstub : public osd_module, public debug_module
 public:
 	debug_gdbstub()
 	: osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
-	    m_readbuf_state(PACKET_START),
+		m_readbuf_state(PACKET_START),
 		m_machine(nullptr),
 		m_maincpu(nullptr),
 		m_state(nullptr),

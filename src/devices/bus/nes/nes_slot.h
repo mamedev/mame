@@ -23,11 +23,10 @@ enum
 	STD_CNROM, STD_CPROM,
 	STD_EXROM, STD_FXROM, STD_GXROM,
 	STD_HKROM, STD_PXROM,
-	STD_SXROM, STD_TXROM, STD_TXSROM,
-	STD_TKROM, STD_TQROM,
+	STD_SXROM, STD_SOROM,
+	STD_TXROM, STD_TXSROM, STD_TKROM, STD_TQROM,
 	STD_UXROM, STD_UN1ROM, UXROM_CC,
 	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT,
-	STD_SXROM_A, STD_SOROM, STD_SOROM_A,
 	STD_DISKSYS,
 	STD_NROM368,//homebrew extension of NROM!
 	// Discrete components boards (by various manufacturer)
@@ -72,7 +71,7 @@ enum
 	SACHEN_8259A, SACHEN_8259B, SACHEN_8259C, SACHEN_8259D,
 	SACHEN_SA009, SACHEN_SA0036, SACHEN_SA0037,
 	SACHEN_SA72007, SACHEN_SA72008, SACHEN_SA9602B,
-	SACHEN_TCA01, SACHEN_TCU01, SACHEN_TCU02, SACHEN_3013,
+	SACHEN_TCA01, SACHEN_TCU01, SACHEN_TCU02, SACHEN_3013, SACHEN_3014,
 	SACHEN_74LS374, SACHEN_74LS374_ALT, SACHEN_SHERO,
 	// Sunsoft
 	SUNSOFT_1, SUNSOFT_2, SUNSOFT_3, SUNSOFT_4,
@@ -87,7 +86,7 @@ enum
 	TXC_MJBLOCK, TXC_STRIKEW, TXC_TW,
 	// Multigame Carts
 	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_A88S1, BMC_F15,
-	BMC_GN45, BMC_HIK8IN1, BMC_S24IN1SC03, BMC_T262,
+	BMC_GN45, BMC_HIK8IN1, BMC_S24IN1SC03, BMC_T262, BMC_TELETUBBIES,
 	BMC_WS, BMC_SUPERBIG_7IN1, BMC_SUPERHIK_4IN1, BMC_BALLGAMES_11IN1,
 	BMC_MARIOPARTY_7IN1, BMC_GOLD_7IN1, BMC_SUPER_700IN1, BMC_FAMILY_4646,
 	BMC_36IN1, BMC_21IN1, BMC_150IN1, BMC_35IN1, BMC_64IN1,
@@ -116,9 +115,9 @@ enum
 	UNL_43272, UNL_TF1201, UNL_CITYFIGHT, UNL_NINJARYU, UNL_EH8813A, UNL_RT01,
 	// Bootleg boards
 	BTL_0353, BTL_09034A, BTL_AISENSHINICOL, BTL_BATMANFS,
-	BTL_CONTRAJ, BTL_DRAGONNINJA, BTL_MARIOBABY, BTL_PALTHENA,
-	BTL_PIKACHUY2K, BTL_SBROS11, BTL_SMB2JA, BTL_SMB2JB,
-	BTL_SMB3, BTL_SHUIGUAN, BTL_TOBIDASE, BTL_YUNG08,
+	BTL_CONTRAJ, BTL_DRAGONNINJA, BTL_L001, BTL_MARIOBABY,
+	BTL_PALTHENA, BTL_PIKACHUY2K, BTL_SBROS11, BTL_SHUIGUAN,
+	BTL_SMB2JA, BTL_SMB2JB, BTL_SMB3, BTL_TOBIDASE, BTL_YUNG08,
 	// Shenzhen Jncota
 	JNCOTA_KT1001,
 	// Kaiser
@@ -176,6 +175,8 @@ enum
 class device_nes_cart_interface : public device_interface
 {
 public:
+	enum class mmc1_type : u8 { MMC1, MMC1A, MMC1B, MMC1C };
+
 	// construction/destruction
 	virtual ~device_nes_cart_interface();
 
@@ -214,6 +215,7 @@ public:
 	void set_trainer(bool val) { m_has_trainer = val; }
 
 	void set_ce(int mask, int state) {  m_ce_mask = mask; m_ce_state = state; }
+	void set_mmc1_type(mmc1_type val) {  m_mmc1_type = val; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_n163_vol(int vol) { m_n163_vol = vol; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
@@ -284,6 +286,7 @@ protected:
 
 	int m_ce_mask;
 	int m_ce_state;
+	mmc1_type m_mmc1_type;
 	int m_vrc_ls_prg_a;
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;

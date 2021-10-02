@@ -228,7 +228,7 @@ void conchess_state::concstd(machine_config &config)
 	M6502(config, m_maincpu, 4_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(4_MHz_XTAL/2 / 0x1000);
+	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x2000);
 	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
@@ -244,7 +244,7 @@ void conchess_state::concstd(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 4_MHz_XTAL/2 / 0x200);
+	BEEP(config, m_beeper, 4_MHz_XTAL / 0x400);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -256,13 +256,13 @@ void conchess_state::concply5(machine_config &config)
 	R65C02(config.replace(), m_maincpu, 11_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(11_MHz_XTAL/2 / 0x2000);
+	const attotime irq_period = attotime::from_hz(11_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("conchess_plymate");
 
 	/* sound hardware */
-	BEEP(config.replace(), m_beeper, 11_MHz_XTAL/2 / 0x400);
+	BEEP(config.replace(), m_beeper, 11_MHz_XTAL / 0x800);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -274,11 +274,11 @@ void conchess_state::concply8(machine_config &config)
 	R65C02(config.replace(), m_maincpu, 16_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(16_MHz_XTAL/2 / 0x2000);
+	const attotime irq_period = attotime::from_hz(16_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
 	/* sound hardware */
-	BEEP(config.replace(), m_beeper, 16_MHz_XTAL/2 / 0x800);
+	BEEP(config.replace(), m_beeper, 16_MHz_XTAL / 0x1000);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -290,13 +290,13 @@ void conchess_state::concplyv(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 12.288_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL/2 / 0x2000);
+	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("conchess_victoria");
 
 	/* sound hardware */
-	BEEP(config.replace(), m_beeper, 12.288_MHz_XTAL/2 / 0x800);
+	BEEP(config.replace(), m_beeper, 12.288_MHz_XTAL / 0x1000);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 

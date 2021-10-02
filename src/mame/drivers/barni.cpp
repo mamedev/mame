@@ -218,21 +218,21 @@ void barni_state::barni(machine_config &config)
 	config.set_default_layout(layout_barni);
 
 	PIA6821(config, m_pia1, 0);
-//	m_pia1->writepa_handler().set(FUNC(barni_state::pia1_pa_w));
-//	m_pia1->writepb_handler().set(FUNC(barni_state::pia1_pb_w));
-//	m_pia1->readpa_handler().set(FUNC(barni_state::pia1_pa_r));
+//  m_pia1->writepa_handler().set(FUNC(barni_state::pia1_pa_w));
+//  m_pia1->writepb_handler().set(FUNC(barni_state::pia1_pb_w));
+//  m_pia1->readpa_handler().set(FUNC(barni_state::pia1_pa_r));
 
 	PIA6821(config, m_pia2, 0);
-//	m_pia2->writepa_handler().set(FUNC(barni_state::pia2_pa_w));
-//	m_pia2->writepb_handler().set(FUNC(barni_state::pia2_pb_w));
-//	m_pia2->readpa_handler().set(FUNC(barni_state::pia2_pa_r));
+//  m_pia2->writepa_handler().set(FUNC(barni_state::pia2_pa_w));
+//  m_pia2->writepb_handler().set(FUNC(barni_state::pia2_pb_w));
+//  m_pia2->readpa_handler().set(FUNC(barni_state::pia2_pa_r));
 
 	MOS6522(config, m_via, 4'000'000 / 4);  // to check
 	m_via->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_via->writepa_handler().set(FUNC(barni_state::via_pa_w));
 	m_via->writepb_handler().set(FUNC(barni_state::via_pb_w));
-//	m_via->ca2_handler().set(FUNC(barni_state::via_ca2_w));
-//	m_via->cb2_handler().set(FUNC(barni_state::via_cb2_w));
+//  m_via->ca2_handler().set(FUNC(barni_state::via_ca2_w));
+//  m_via->cb2_handler().set(FUNC(barni_state::via_cb2_w));
 
 	// SOUND BOARD
 	M6802(config, m_audiocpu, 4000000); // guess - crystal value not shown

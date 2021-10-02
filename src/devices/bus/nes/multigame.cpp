@@ -66,7 +66,8 @@ DEFINE_DEVICE_TYPE(NES_BMC_HIK300,     nes_bmc_hik300_device,     "nes_bmc_hik30
 DEFINE_DEVICE_TYPE(NES_BMC_S700,       nes_bmc_s700_device,       "nes_bmc_s700",       "NES Cart BMC Super 700 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_BALL11,     nes_bmc_ball11_device,     "nes_bmc_ball11",     "NES Cart BMC Ball 11 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_22GAMES,    nes_bmc_22games_device,    "nes_bmc_22games",    "NES Cart BMC 22 Games PCB")
-DEFINE_DEVICE_TYPE(NES_BMC_64Y2K,      nes_bmc_64y2k_device,      "nes_bmc_64y2k",      "NES Cart BMC 64 in 1 Y2K PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_64Y2K,      nes_bmc_64y2k_device,      "nes_bmc_64y2k",      "NES Cart BMC Y2K 64 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_420Y2K,     nes_bmc_420y2k_device,     "nes_bmc_420y2k",     "NES Cart BMC Y2K 420 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_12IN1,      nes_bmc_12in1_device,      "nes_bmc_12in1",      "NES Cart BMC 12 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_20IN1,      nes_bmc_20in1_device,      "nes_bmc_20in1",      "NES Cart BMC 20 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_21IN1,      nes_bmc_21in1_device,      "nes_bmc_21in1",      "NES Cart BMC 21 in 1 PCB")
@@ -305,6 +306,11 @@ nes_bmc_64y2k_device::nes_bmc_64y2k_device(const machine_config &mconfig, const 
 {
 }
 
+nes_bmc_420y2k_device::nes_bmc_420y2k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_420Y2K, tag, owner, clock), m_latch(0), m_reg(0)
+{
+}
+
 nes_bmc_12in1_device::nes_bmc_12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_12IN1, tag, owner, clock)
 {
@@ -340,8 +346,18 @@ nes_bmc_64in1_device::nes_bmc_64in1_device(const machine_config &mconfig, const 
 {
 }
 
-nes_bmc_70in1_device::nes_bmc_70in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_70IN1, tag, owner, clock), m_mode(0)
+nes_bmc_70in1_device::nes_bmc_70in1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_jumper(type == NES_BMC_70IN1 ? 0x0d : 0x06)
+{
+}
+
+nes_bmc_70in1_device::nes_bmc_70in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_70in1_device(mconfig, NES_BMC_70IN1, tag, owner, clock)
+{
+}
+
+nes_bmc_800in1_device::nes_bmc_800in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_70in1_device(mconfig, NES_BMC_800IN1, tag, owner, clock)
 {
 }
 
@@ -362,11 +378,6 @@ nes_bmc_150in1_device::nes_bmc_150in1_device(const machine_config &mconfig, cons
 
 nes_bmc_500in1_device::nes_bmc_500in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_500IN1, tag, owner, clock)
-{
-}
-
-nes_bmc_800in1_device::nes_bmc_800in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_800IN1, tag, owner, clock), m_mode(0)
 {
 }
 
@@ -819,6 +830,23 @@ void nes_bmc_64y2k_device::pcb_reset()
 	set_nt_mirroring(PPU_MIRROR_VERT);
 }
 
+void nes_bmc_420y2k_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_420y2k_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
+	m_reg = 0;
+}
+
 void nes_bmc_12in1_device::device_start()
 {
 	common_start();
@@ -878,18 +906,16 @@ void nes_bmc_64in1_device::pcb_reset()
 void nes_bmc_70in1_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_reg));
-	save_item(NAME(m_mode));
+	save_item(NAME(m_latch));
 }
 
 void nes_bmc_70in1_device::pcb_reset()
 {
-	prg16_89ab(m_prg_chunks - 1);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, CHRROM);
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	m_mode = 0;
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	chr8(0, m_chr_source);
+
+	m_latch[0] = m_latch[1] = 0;
+	update_banks();
 }
 
 void nes_bmc_72in1_device::device_start()
@@ -917,24 +943,6 @@ void nes_bmc_150in1_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, CHRROM);
-}
-
-void nes_bmc_800in1_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_reg));
-	save_item(NAME(m_mode));
-}
-
-void nes_bmc_800in1_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(m_prg_chunks - 1);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	m_mode = 0;
 }
 
 void nes_bmc_1200in1_device::device_start()
@@ -1737,11 +1745,13 @@ void nes_bmc_gkb_device::write_h(offs_t offset, u8 data)
  Board BMC-GKCXIN1
 
  Unknown Bootleg Multigame Board
- Games: 21 in 1
+ Games: 21 in 1, 64 in 1
 
  NES 2.0: mapper 288
 
  In MAME: Supported.
+
+ TODO: This has some sort of solder pad settings.
 
  -------------------------------------------------*/
 
@@ -2243,6 +2253,48 @@ void nes_bmc_64y2k_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
+ Board BMC-TELETUBBIES
+ (name assigned by BootGod who said the board has
+ no markings, a glop top, and an 8K VRAM chip)
+
+ Games: Y2K 420 in 1
+
+ iNES: mapper 237
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_420y2k_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_420y2k write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(m_latch, 1))    // lock bit
+		m_reg = (m_reg & ~0x07) | (data & 0x07);
+	else
+	{
+		m_latch = offset;
+		m_reg = data;
+	}
+
+	u8 bank = BIT(m_latch, 2) << 5 | (m_reg & 0x1f);
+	u8 mode = BIT(m_reg, 6);
+	prg16_89ab(bank & ~mode);    // strangely for UNROM games it DOESN'T ignore the NROM mode bit
+	prg16_cdef(bank | (BIT(m_reg, 7) ? mode : 0x07));
+
+	set_nt_mirroring(BIT(m_reg, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+u8 nes_bmc_420y2k_device::read_h(offs_t offset)
+{
+	LOG_MMC(("bmc_420y2k read_h, offset: %04x\n", offset));
+	// latch bit 0 is only used to determine the menu, and the behavior of
+	// this cart seems hardwired to OR $02 (ORing $00-$03 allows four menus)
+	return hi_access_rom(offset | (m_latch & 1) << 1);
+}
+
+/*-------------------------------------------------
+
  BMC-12IN1
 
  Unknown Bootleg Multigame Board
@@ -2432,52 +2484,82 @@ void nes_bmc_64in1_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
- BMC-70IN1
+ BMC-70IN1 (FIXME: according to NesDev the boards for this
+ and BMC-800IN1 are Realtec 8031 and 8155. Which is which?)
 
- Unknown Bootleg Multigame Board
- Games:
+ Games: 35 in 1, 68 in 1, 70 in 1
 
- iNES: mapper
+ iNES: mapper 236
 
- This is same hardware as BMC-800IN1 below, but this
- cart has CHR and slightly diff bankswitch.
- DSW not emulated yet.
+ This is the same hardware as BMC-800IN1 below, but
+ these carts have CHRROM and lack the extended PRG
+ bank switching. Solder pads/jumpers not emulated yet.
 
- In MESS: Preliminary Supported.
+ In MAME: Supported.
+
+ TODO: Determine if Excitebike on 68 in 1 is actually
+ bugged on the real cartridge. It sets mirroring bit
+ to horizontal when it should be vertical.
 
  -------------------------------------------------*/
 
-void nes_bmc_70in1_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_70in1_device::update_banks()
+{
+	update_prg(m_latch[1] & 0x07);
+	chr8(m_latch[0] & 0x07, CHRROM);
+}
+
+void nes_bmc_70in1_device::update_prg(u8 bank)
+{
+	if (BIT(m_latch[1], 5))    // NROM mode
+	{
+		u8 mode = !BIT(m_latch[1], 4);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+	}
+	else                       // UNROM mode
+	{
+		prg16_89ab(bank);
+		prg16_cdef(bank | 0x07);
+	}
+}
+
+void nes_bmc_70in1_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc70in1 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if (offset < 0x4000)
-	{
-		set_nt_mirroring(BIT(offset, 5) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
-		chr8(offset & 7, CHRROM);
-	}
-	else
-	{
-		switch (offset & 0x30)
-		{
-			case 0x00: m_mode = 0x0; m_reg[0] = (m_reg[0] & 0x38) | (offset & 0x7); m_reg[1] = m_reg[0] | 0x7; break;
-			case 0x10: m_mode = 0x1; m_reg[0] = (m_reg[0] & 0x38) | (offset & 0x7); m_reg[1] = m_reg[0] | 0x7; break;
-			case 0x20: m_mode = 0x0; m_reg[0] = (m_reg[0] & 0x38) | (offset & 0x6); m_reg[1] = m_reg[0] | 0x1; break;
-			case 0x30: m_mode = 0x0; m_reg[0] = (m_reg[0] & 0x38) | (offset & 0x7); m_reg[1] = m_reg[0] | 0x0; break;
-		}
-		prg16_89ab(m_reg[0]);
-		prg16_cdef(m_reg[1]);
-	}
+	m_latch[BIT(offset, 14)] = offset;
+	update_banks();
+	set_nt_mirroring(BIT(m_latch[0], 5) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 uint8_t nes_bmc_70in1_device::read_h(offs_t offset)
 {
 	LOG_MMC(("bmc70in1 read_h, offset: %04x\n", offset));
 
-	if (m_mode)
-		offset = (offset & 0x7ff0) | m_mode;
+	if ((m_latch[1] & 0x30) == 0x10)
+		offset = (offset & ~0x0f) | m_jumper;    // TODO: make jumper selectable
 
 	return hi_access_rom(offset);
+}
+
+/*-------------------------------------------------
+
+ BMC-800IN1
+
+ Games: 800 in 1
+
+ iNES: mapper 236
+
+ This is the same hardware as BMC-70IN1, but this
+ cart supports larger PRG and has unbanked CHRRAM.
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_800in1_device::update_banks()
+{
+	update_prg((m_latch[0] & 0x07) << 3 | (m_latch[1] & 0x07));
 }
 
 /*-------------------------------------------------
@@ -2605,56 +2687,6 @@ void nes_bmc_500in1_device::write_h(offs_t offset, u8 data)
 	LOG_MMC(("bmc500in1 write_h, offset: %04x, data: %02x\n", offset, data));
 	prg32((offset >> 2) & 0x07);
 	chr8(offset & 0x07, CHRROM);
-}
-
-/*-------------------------------------------------
-
- BMC-800IN1
-
- Unknown Bootleg Multigame Board
- Games:
-
- iNES: mapper
-
- DSW not emulated yet.
-
- In MESS: Preliminary Supported.
-
- -------------------------------------------------*/
-
-void nes_bmc_800in1_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("bmc800in1 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if (offset < 0x4000)
-	{
-		set_nt_mirroring(BIT(offset, 5) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
-
-		m_reg[0] = (m_reg[0]) | ((offset << 3) & 0x38);
-		m_reg[1] = (m_reg[1]) | ((offset << 3) & 0x38);
-	}
-	else
-	{
-		switch (offset & 0x30)
-		{
-			case 0x00: m_mode = 0x0; m_reg[0] = (m_reg[0] & 0x38) | (offset & 0x7); m_reg[1] = m_reg[0] | 0x7; break;
-			case 0x10: m_mode = 0x1; m_reg[0] = (m_reg[0] & 0x38) | (offset & 0x7); m_reg[1] = m_reg[0] | 0x7; break;
-			case 0x20: m_mode = 0x0; m_reg[0] = (m_reg[0] & 0x38) | (offset & 0x6); m_reg[1] = m_reg[0] | 0x1; break;
-			case 0x30: m_mode = 0x0; m_reg[0] = (m_reg[0] & 0x38) | (offset & 0x7); m_reg[1] = m_reg[0] | 0x0; break;
-		}
-	}
-	prg16_89ab(m_reg[0]);
-	prg16_cdef(m_reg[1]);
-}
-
-uint8_t nes_bmc_800in1_device::read_h(offs_t offset)
-{
-	LOG_MMC(("bmc800in1 read_h, offset: %04x\n", offset));
-
-	if (m_mode)
-		offset = (offset & 0x7ff0) | m_mode;
-
-	return hi_access_rom(offset);
 }
 
 /*-------------------------------------------------
@@ -2975,6 +3007,12 @@ void nes_bmc_k1029_device::write_h(offs_t offset, u8 data)
 
  In MAME: Supported.
 
+ TODO: Several games have incorrect mirroring bits
+ on all carts they appear on. It's subtle so it's
+ likely a BTANB? Noticeable in Flappy, Pacman, and
+ Warpman title scrolls and at bottom of screen in
+ Zippy Race in-game.
+
  -------------------------------------------------*/
 
 void nes_n625092_device::write_h(offs_t offset, u8 data)
@@ -2983,7 +3021,7 @@ void nes_n625092_device::write_h(offs_t offset, u8 data)
 
 	m_latch[BIT(offset, 14)] = offset;
 
-	u8 bank = (m_latch[0] & 0x200) >> 3 | (m_latch[0] & 0xe0) >> 2 | (m_latch[1] & 0x07);    // NesDev shows the high bit here, but is it correct? So far no cart is large enough to use this.
+	u8 bank = (m_latch[0] & 0x200) >> 3 | (m_latch[0] & 0xe0) >> 2 | (m_latch[1] & 0x07);
 	u8 mode = BIT(m_latch[0], 1);
 	if (mode && BIT(m_latch[0], 8))    // UNROM mode
 	{

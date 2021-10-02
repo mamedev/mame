@@ -43,11 +43,11 @@ private:
 
 	template<bool SA1Read> uint8_t read_regs(uint32_t offset);
 	uint8_t read_iram(uint32_t offset);
-	template<bool SA1Read> uint8_t read_bwram(uint32_t offset);
+	template<bool SA1Read> uint8_t read_bwram(uint32_t offset, bool bitmap = false);
 	uint8_t read_cconv1_dma(uint32_t offset);
 	void write_regs(uint32_t offset, uint8_t data);
 	void write_iram(uint32_t offset, uint8_t data);
-	void write_bwram(uint32_t offset, uint8_t data);
+	void write_bwram(uint32_t offset, uint8_t data, bool bitmap = false);
 	void recalc_irqs();
 
 	required_device<g65816_device> m_sa1;

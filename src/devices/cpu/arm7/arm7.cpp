@@ -841,17 +841,17 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 	}
 }
 
-void arm7_cpu_device::translate_insn_command(int ref, const std::vector<std::string> &params)
+void arm7_cpu_device::translate_insn_command(const std::vector<std::string> &params)
 {
-	translate_command(ref, params, TRANSLATE_FETCH);
+	translate_command(params, TRANSLATE_FETCH);
 }
 
-void arm7_cpu_device::translate_data_command(int ref, const std::vector<std::string> &params)
+void arm7_cpu_device::translate_data_command(const std::vector<std::string> &params)
 {
-	translate_command(ref, params, TRANSLATE_READ);
+	translate_command(params, TRANSLATE_READ);
 }
 
-void arm7_cpu_device::translate_command(int ref, const std::vector<std::string> &params, int intention)
+void arm7_cpu_device::translate_command(const std::vector<std::string> &params, int intention)
 {
 	uint64_t vaddr;
 
@@ -1024,8 +1024,8 @@ void arm7_cpu_device::device_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("translate_insn", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_insn_command, this, _1, _2));
-		machine().debugger().console().register_command("translate_data", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_data_command, this, _1, _2));
+		machine().debugger().console().register_command("translate_insn", CMDFLAG_NONE, 1, 1, std::bind(&arm7_cpu_device::translate_insn_command, this, _1));
+		machine().debugger().console().register_command("translate_data", CMDFLAG_NONE, 1, 1, std::bind(&arm7_cpu_device::translate_data_command, this, _1));
 	}
 }
 

@@ -92,7 +92,7 @@ protected:
 	void pc8001_map(address_map &map);
 
 	virtual void machine_start() override;
-    virtual void machine_reset() override;
+	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -123,7 +123,7 @@ public:
 	pc8001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8001_state(mconfig, type, tag)
 		, m_kanji_rom(*this, "kanji")
-        , m_dsw(*this, "DSW%d", 1U)
+		, m_dsw(*this, "DSW%d", 1U)
 	{ }
 
 	void pc8001mk2(machine_config &config);
@@ -133,7 +133,7 @@ protected:
 	void pc8001mk2_map(address_map &map);
 
 	required_memory_region m_kanji_rom;
-    required_ioport_array<2> m_dsw;
+	required_ioport_array<2> m_dsw;
 private:
 	void port31_w(uint8_t data);
 };
@@ -150,10 +150,10 @@ public:
 
 private:
 	virtual void machine_start() override;
-    virtual void machine_reset() override;
-    void pc8001mk2sr_io(address_map &map);
+	virtual void machine_reset() override;
+	void pc8001mk2sr_io(address_map &map);
 
-   	required_memory_region m_n80sr_rom;
+	required_memory_region m_n80sr_rom;
 
 	void port33_w(u8 data);
 	u8 port71_r();

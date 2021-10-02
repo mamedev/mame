@@ -4,7 +4,7 @@
 license:CC0
 -->
 <softwarelist name="pc8001mk2_flop" description="NEC PC-8001mkII (N80 BASIC) disk images">
-<!-- 
+<!--
 
 Known list of SW released for the system (all cassette releases?):
 kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
@@ -77,17 +77,6 @@ Bon Bon, Bon Bon, Compaq, Aug 83, Aug 83,
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 18249 -->
 				<rom name="n-basic.d88" size="348848" crc="0ed0a4c8" sha1="2e80b0b4fc38eb1f81fd27f6828249c764091a55"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="n80diska" cloneof="n80diskb">
-		<description>N80 Disk BASIC (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34301 -->
-				<rom name="n80 basic (1983)(microsoft - nec).d88" size="348848" crc="ff9416a4" sha1="3321c6a723545ef7f413a372683a1e40ef7ea4ef"/>
 			</dataarea>
 		</part>
 	</software>

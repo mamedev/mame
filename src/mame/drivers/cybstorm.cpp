@@ -12,8 +12,8 @@
     Known bugs:
         * STAIN effect not 100% correct
 
-	Possible bugs:
-	    * Tilemap offsets shifted by 1 pixel?
+    Possible bugs:
+        * Tilemap offsets shifted by 1 pixel?
 
 ***************************************************************************/
 

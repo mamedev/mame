@@ -1764,8 +1764,8 @@ Core Performance Options
     benchmarking and automated testing.  By combining this with a fixed set of
     other command line options, you can set up a consistent environment for
     benchmarking MAME's emulation performance.  In addition, upon exit, the
-    **-str** option will write a screenshot called ``final.png`` to the system's
-    snapshot directory.
+    **-str** option will write a screenshot to the system's snapshot directory
+    with the file name determined by the **-snapname** option.
 
     Example:
         .. code-block:: bash

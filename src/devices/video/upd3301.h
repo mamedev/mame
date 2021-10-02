@@ -56,7 +56,7 @@ class upd3301_device :  public device_t,
 						public device_video_interface
 {
 public:
-//	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> draw_character_delegate;
+//  typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> draw_character_delegate;
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int csr, bool attr_blink_on, u16 attr, u8 gfx_mode, bool is_lowerline)> draw_character_delegate;
 	typedef device_delegate<std::array<u16, 80> (const std::array<u8, 41> attr_row, u8 gfx_mode, int y, u8 attr_fifo_size, u8 row_size)> fetch_attribute_delegate;
 
@@ -66,7 +66,7 @@ public:
 	void set_character_width(int value) { m_width = value; }
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_attribute_fetch_callback(T &&... args) { m_attr_fetch_cb.set(std::forward<T>(args)...); }
-	
+
 	UPD3301_FETCH_ATTRIBUTE( default_attr_fetch );
 
 	auto drq_wr_callback() { return m_write_drq.bind(); }
@@ -154,10 +154,10 @@ private:
 	int m_z;                        // horizontal blanking width
 
 	// attributes
-//	int m_at1;                      //
-//	int m_at0;                      //
-//	int m_sc;                       //
-	u8  m_gfx_mode;					// AT1 + AT0 + SC
+//  int m_at1;                      //
+//  int m_at0;                      //
+//  int m_sc;                       //
+	u8  m_gfx_mode;                 // AT1 + AT0 + SC
 	int m_attr;                     // attributes per row
 	int m_attr_blink;               // attribute blink
 	int m_attr_frame;               // attribute blink frame counter

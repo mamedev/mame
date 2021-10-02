@@ -82,7 +82,7 @@ void xbox_base_state::find_debug_params()
 	}
 }
 
-void xbox_base_state::dump_string_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::dump_string_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
@@ -124,7 +124,7 @@ void xbox_base_state::dump_string_command(int ref, const std::vector<std::string
 	con.printf("\n");
 }
 
-void xbox_base_state::dump_process_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::dump_process_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
@@ -154,7 +154,7 @@ void xbox_base_state::dump_process_command(int ref, const std::vector<std::strin
 	con.printf("_padding %d byte\n", space.read_byte(address + 27));
 }
 
-void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::dump_list_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
@@ -207,7 +207,7 @@ void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> 
 	}
 }
 
-void xbox_base_state::dump_dpc_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::dump_dpc_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
@@ -236,7 +236,7 @@ void xbox_base_state::dump_dpc_command(int ref, const std::vector<std::string> &
 	con.printf("SystemArgument2 %08X dword\n", space.read_dword_unaligned(address + 24));
 }
 
-void xbox_base_state::dump_timer_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::dump_timer_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
@@ -267,7 +267,7 @@ void xbox_base_state::dump_timer_command(int ref, const std::vector<std::string>
 	con.printf("Period %d dword\n", space.read_dword_unaligned(address + 36));
 }
 
-void xbox_base_state::curthread_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::curthread_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
@@ -300,7 +300,7 @@ void xbox_base_state::curthread_command(int ref, const std::vector<std::string> 
 		con.printf("Current thread function is %08X\n", space.read_dword_unaligned(address));
 }
 
-void xbox_base_state::threadlist_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::threadlist_command(const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
 	debugger_console &con = machine().debugger().console();
@@ -339,7 +339,7 @@ void xbox_base_state::threadlist_command(int ref, const std::vector<std::string>
 	}
 }
 
-void xbox_base_state::generate_irq_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::generate_irq_command(const std::vector<std::string> &params)
 {
 	uint64_t irq;
 
@@ -354,7 +354,7 @@ void xbox_base_state::generate_irq_command(int ref, const std::vector<std::strin
 	debug_generate_irq((int)irq, true);
 }
 
-void xbox_base_state::nv2a_combiners_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::nv2a_combiners_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	bool en = nvidia_nv2a->toggle_register_combiners_usage();
@@ -364,7 +364,7 @@ void xbox_base_state::nv2a_combiners_command(int ref, const std::vector<std::str
 		con.printf("Register combiners disabled\n");
 }
 
-void xbox_base_state::nv2a_wclipping_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::nv2a_wclipping_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	bool en = nvidia_nv2a->toggle_clipping_w_support();
@@ -374,7 +374,7 @@ void xbox_base_state::nv2a_wclipping_command(int ref, const std::vector<std::str
 		con.printf("W clipping disabled\n");
 }
 
-void xbox_base_state::waitvblank_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::waitvblank_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	bool en = nvidia_nv2a->toggle_wait_vblank_support();
@@ -384,7 +384,7 @@ void xbox_base_state::waitvblank_command(int ref, const std::vector<std::string>
 		con.printf("Vblank method disabled\n");
 }
 
-void xbox_base_state::grab_texture_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::grab_texture_command(const std::vector<std::string> &params)
 {
 	uint64_t type;
 
@@ -397,7 +397,7 @@ void xbox_base_state::grab_texture_command(int ref, const std::vector<std::strin
 	nvidia_nv2a->debug_grab_texture((int)type, params[2].c_str());
 }
 
-void xbox_base_state::grab_vprog_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::grab_vprog_command(const std::vector<std::string> &params)
 {
 	uint32_t instruction[4];
 	FILE *fil;
@@ -416,7 +416,7 @@ void xbox_base_state::grab_vprog_command(int ref, const std::vector<std::string>
 	fclose(fil);
 }
 
-void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::vprogdis_command(const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
 
@@ -468,7 +468,7 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 	}
 }
 
-void xbox_base_state::vdeclaration_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::vdeclaration_command(const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
 
@@ -549,7 +549,7 @@ void xbox_base_state::vdeclaration_command(int ref, const std::vector<std::strin
 	}
 }
 
-void xbox_base_state::help_command(int ref, const std::vector<std::string> &params)
+void xbox_base_state::help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -572,42 +572,42 @@ void xbox_base_state::help_command(int ref, const std::vector<std::string> &para
 	con.printf("  xbox help -- this list\n");
 }
 
-void xbox_base_state::xbox_debug_commands(int ref, const std::vector<std::string> &params)
+void xbox_base_state::xbox_debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 	if (params[0] == "dump_string")
-		dump_string_command(ref, params);
+		dump_string_command(params);
 	else if (params[0] == "dump_process")
-		dump_process_command(ref, params);
+		dump_process_command(params);
 	else if (params[0] == "dump_list")
-		dump_list_command(ref, params);
+		dump_list_command(params);
 	else if (params[0] == "dump_dpc")
-		dump_dpc_command(ref, params);
+		dump_dpc_command(params);
 	else if (params[0] == "dump_timer")
-		dump_timer_command(ref, params);
+		dump_timer_command(params);
 	else if (params[0] == "curthread")
-		curthread_command(ref, params);
+		curthread_command(params);
 	else if (params[0] == "threadlist")
-		threadlist_command(ref, params);
+		threadlist_command(params);
 	else if (params[0] == "irq")
-		generate_irq_command(ref, params);
+		generate_irq_command(params);
 	else if (params[0] == "nv2a_combiners")
-		nv2a_combiners_command(ref, params);
+		nv2a_combiners_command(params);
 	else if (params[0] == "nv2a_wclipping")
-		nv2a_wclipping_command(ref, params);
+		nv2a_wclipping_command(params);
 	else if (params[0] == "waitvblank")
-		waitvblank_command(ref, params);
+		waitvblank_command(params);
 	else if (params[0] == "grab_texture")
-		grab_texture_command(ref, params);
+		grab_texture_command(params);
 	else if (params[0] == "grab_vprog")
-		grab_vprog_command(ref, params);
+		grab_vprog_command(params);
 	else if (params[0] == "vprogdis")
-		vprogdis_command(ref, params);
+		vprogdis_command(params);
 	else if (params[0] == "vdeclaration")
-		vdeclaration_command(ref, params);
+		vdeclaration_command(params);
 	else
-		help_command(ref, params);
+		help_command(params);
 }
 
 void xbox_base_state::debug_generate_irq(int irq, bool active)
@@ -905,7 +905,7 @@ void xbox_base_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("xbox", CMDFLAG_CUSTOM_HELP, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("xbox", CMDFLAG_CUSTOM_HELP, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1));
 	}
 	subdevice<xbox_eeprom_device>("pci:01.1:154")->hack_eeprom =
 		[&](void)

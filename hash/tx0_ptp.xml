@@ -13,9 +13,10 @@ license:CC0
 		<description>Munching Squares</description>
 		<year>196?</year>
 		<publisher>MIT</publisher>
-		<info name="usage" value="Press read in switch, then restart after loader halts at 17777. Use TAC switches to vary display."/>
+		<info name="usage" value="Press read in switch, then restart after loader halts at 17777. Use TAC switches to vary display pattern."/>
 		<sharedfeat name="compatibility" value="NEWCODE"/>
 		<part name="ptp" interface="tx0_ptp">
+			<feature name="blocks_used" value="20-52, 17756-17777"/>
 			<dataarea name="ptap" size="327">
 				<rom name="bin_munchingSquares.bin" size="327" crc="54afd9a3" sha1="a7fc6d62ea1cef21f1563cb8b86a5e63198af0ae"/>
 			</dataarea>
