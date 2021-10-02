@@ -19,7 +19,7 @@
 #include "machine/upd765.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
-//#include "sound/ymopn.h"
+#include "sound/ymopn.h"
 #include "video/mc6847.h"
 
 #include "bus/generic/slot.h"
@@ -43,6 +43,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_cas_hack(*this, "cas_hack")
 		, m_cart(*this, "cartslot")
+		, m_ay(*this, "aysnd")
 		, m_region_maincpu(*this, "maincpu")
 		, m_region_gfx1(*this, "gfx1")
 		, m_io_mode4_dsw(*this, "MODE4_DSW")
@@ -85,6 +86,7 @@ protected:
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
+	optional_device<ay8910_device> m_ay;
 	optional_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	required_ioport m_io_mode4_dsw;
@@ -295,6 +297,7 @@ public:
 		, m_sr_bank(*this, "sr_bank_%u", 1U)
 		, m_sr_irq_vectors(*this, "irq_vectors")
 //		, m_gvram_view(*this, "gvram_view")
+		, m_ym(*this, "ymsnd")
 	{ }
 
 	void pc6001mk2sr(machine_config &config);
@@ -312,6 +315,8 @@ protected:
 
 private:
 	required_device_array<address_map_bank_device, 16> m_sr_bank;
+	required_shared_ptr<uint8_t> m_sr_irq_vectors;
+	required_device<ym2203_device> m_ym;
 
 	uint8_t m_sr_bank_reg[16];
 	bool m_sr_text_mode;
@@ -320,7 +325,6 @@ private:
 	uint8_t m_bitmap_yoffs, m_bitmap_xoffs;
 	u8 m_width80;
 
-	required_shared_ptr<uint8_t> m_sr_irq_vectors;
 //	memory_view m_gvram_view;
 
 	virtual u8 hw_rev_r();

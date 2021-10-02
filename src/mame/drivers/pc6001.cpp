@@ -261,9 +261,9 @@ void pc6001_state::pc6001_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001_state::nec_ppi8255_r), FUNC(pc6001_state::nec_ppi8255_w));
-	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
-	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa0, 0xa0).mirror(0x0c).w(m_ay, FUNC(ay8910_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w(m_ay, FUNC(ay8910_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0xa3, 0xa3).mirror(0x0c).nopw();
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001_state::system_latch_w));
 }
@@ -734,9 +734,9 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 
 	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2_state::nec_ppi8255_r), FUNC(pc6001mk2_state::necmk2_ppi8255_w));
 
-	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
-	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa0, 0xa0).mirror(0x0c).w(m_ay, FUNC(ay8910_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w(m_ay, FUNC(ay8910_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0xa3, 0xa3).mirror(0x0c).noprw();
 
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001mk2_state::mk2_system_latch_w));
@@ -1010,10 +1010,10 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 
 	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2sr_state::nec_ppi8255_r), FUNC(pc6001mk2sr_state::necsr_ppi8255_w));
 
-	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
-	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
-	map(0xa3, 0xa3).mirror(0x0c).noprw();
+	map(0xa0, 0xa0).mirror(0x0c).w(m_ym, FUNC(ym2203_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w(m_ym, FUNC(ym2203_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r(m_ym, FUNC(ym2203_device::data_r));
+	map(0xa3, 0xa3).mirror(0x0c).r(m_ym, FUNC(ym2203_device::status_r));
 
 	map(0xb0, 0xb0).w(FUNC(pc6001mk2sr_state::sr_system_latch_w));
 
@@ -1701,10 +1701,10 @@ void pc6001_state::pc6001(machine_config &config)
 	GENERIC_CARTSLOT(config, m_cas_hack, generic_plain_slot, "pc6001_cass", "cas,p6");
 
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay8910(AY8910(config, "ay8910", PC6001_MAIN_CLOCK/4));
-	ay8910.port_a_read_callback().set_ioport("P1");
-	ay8910.port_b_read_callback().set_ioport("P2");
-	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
+	AY8910(config, m_ay, PC6001_MAIN_CLOCK/4);
+	m_ay->port_a_read_callback().set_ioport("P1");
+	m_ay->port_b_read_callback().set_ioport("P2");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* TODO: accurate timing on this */
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
@@ -1795,7 +1795,12 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 
 	pc6601_fdc_config(config);
 
-	// TODO: ym2203
+	config.device_remove("aysnd");
+	YM2203(config, m_ym, PC6001_MAIN_CLOCK/4);
+	m_ym->port_a_read_callback().set_ioport("P1");
+	m_ym->port_b_read_callback().set_ioport("P2");
+	m_ym->add_route(ALL_OUTPUTS, "mono", 1.00);
+
 	// TODO: 1D 3'5" floppy drive
 	// TODO: telopper board (system explicitly asks for missing tape dump tho)
 }
