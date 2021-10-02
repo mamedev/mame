@@ -81,14 +81,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override
 	{
 		RS232_PORT(config, m_dce_port, default_rs232_devices, nullptr);
-		m_dce_port->rxd_handler().set(FUNC(signal_in<RXD>));
-		m_dce_port->dcd_handler().set(FUNC(signal_in<DCD>));
-		m_dce_port->dsr_handler().set(FUNC(signal_in<DSR>));
-		m_dce_port->ri_handler().set(FUNC(signal_in<RI>));
-		m_dce_port->si_handler().set(FUNC(signal_in<SI>));
-		m_dce_port->cts_handler().set(FUNC(signal_in<CTS>));
-		m_dce_port->rxc_handler().set(FUNC(signal_in<RXC>));
-		m_dce_port->txc_handler().set(FUNC(signal_in<TXC>));
+		m_dce_port->rxd_handler().set(FUNC(rs232_patch_box_device::signal_in<RXD>));
+		m_dce_port->dcd_handler().set(FUNC(rs232_patch_box_device::signal_in<DCD>));
+		m_dce_port->dsr_handler().set(FUNC(rs232_patch_box_device::signal_in<DSR>));
+		m_dce_port->ri_handler().set(FUNC(rs232_patch_box_device::signal_in<RI>));
+		m_dce_port->si_handler().set(FUNC(rs232_patch_box_device::signal_in<SI>));
+		m_dce_port->cts_handler().set(FUNC(rs232_patch_box_device::signal_in<CTS>));
+		m_dce_port->rxc_handler().set(FUNC(rs232_patch_box_device::signal_in<RXC>));
+		m_dce_port->txc_handler().set(FUNC(rs232_patch_box_device::signal_in<TXC>));
 	}
 
 	virtual ioport_constructor device_input_ports() const override;
