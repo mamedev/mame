@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(NES_DAOU306,     nes_daou306_device,     "nes_daou306",     "
 DEFINE_DEVICE_TYPE(NES_CC21,        nes_cc21_device,        "nes_cc21",        "NES Cart CC-21 PCB")
 DEFINE_DEVICE_TYPE(NES_XIAOZY,      nes_xiaozy_device,      "nes_xiaozy",      "NES Cart Xiao Zhuan Yuan PCB")
 DEFINE_DEVICE_TYPE(NES_EDU2K,       nes_edu2k_device,       "nes_edu2k",       "NES Cart Educational Computer 2000 PCB")
-DEFINE_DEVICE_TYPE(NES_MK2,         nes_mk2_device,         "nes_mk2",         "NES Cart Mortal Kombat 2 PCB")
+DEFINE_DEVICE_TYPE(NES_JY830623C,   nes_jy830623c_device,   "nes_jy830623c",   "NES Cart JY830623C PCB")
 DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "NES Cart UNL-43272 PCB")
 DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",     "NES Cart UNL-EH8813A PCB")
 
@@ -93,8 +93,8 @@ nes_edu2k_device::nes_edu2k_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_mk2_device::nes_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_MK2, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+nes_jy830623c_device::nes_jy830623c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_JY830623C, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
 {
 }
 
@@ -217,24 +217,23 @@ void nes_edu2k_device::pcb_reset()
 	m_latch = 0;
 }
 
-void nes_mk2_device::device_start()
+void nes_jy830623c_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_irq_clear));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
 }
 
-void nes_mk2_device::pcb_reset()
+void nes_jy830623c_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(m_prg_chunks - 1);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
+	m_latch = 0;
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
+	update_banks();
 	set_nt_mirroring(PPU_MIRROR_VERT);
 
-	m_irq_clear = 0;
 	m_irq_enable = 0;
 	m_irq_count = m_irq_count_latch = 0;
 }
@@ -625,67 +624,86 @@ uint8_t nes_edu2k_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
- Bootleg Board for MK2
+ Bootleg Board JY830623C
 
  Games: Mortal Kombat II, Street Fighter III, Super Mario
  Kart Rider
 
- This board uses an IRQ system very similar to MMC3. We indeed
- use mapper4_irq, but there is some small glitch!
-
  iNES: mapper 91
 
- In MESS: Supported.
+ In MAME: Partially supported.
+
+ FIXME: IRQ is fixed length but not every 7 scanlines
+ as done here. Rather it triggers once every 64 rises
+ of PPU A12. Various games have very obvious raster-
+ split issues from this bug. Also note there is
+ another submapper with cycle-based IRQ.
 
  -------------------------------------------------*/
 
-// Same IRQ as MMC3
-void nes_mk2_device::hblank_irq( int scanline, int vblank, int blanked )
+void nes_jy830623c_device::hblank_irq(int scanline, int vblank, int blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
 		int prior_count = m_irq_count;
-		if ((m_irq_count == 0) || m_irq_clear)
-			m_irq_count = m_irq_count_latch;
-		else
+		if (m_irq_count)
 			m_irq_count--;
+		else
+			m_irq_count = m_irq_count_latch;
 
-		if (m_irq_enable && !blanked && (m_irq_count == 0) && (prior_count || m_irq_clear))
+		if (m_irq_enable && !blanked && !m_irq_count && prior_count)
 		{
 			LOG_MMC(("irq fired, scanline: %d\n", scanline));
-			hold_irq_line();
+			set_irq_line(ASSERT_LINE);
 		}
 	}
-	m_irq_clear = 0;
 }
 
-void nes_mk2_device::write_m(offs_t offset, uint8_t data)
+void nes_jy830623c_device::update_banks()
 {
-	LOG_MMC(("mk2 write_m, offset: %04x, data: %02x\n", offset, data));
+	prg8_89((m_latch & 0x06) << 3 | m_reg[4]);
+	prg8_ab((m_latch & 0x06) << 3 | m_reg[5]);
+	prg16_cdef((m_latch & 0x06) << 2 | 0x07);
 
-	switch (offset & 0x1000)
+	for (int i = 0; i < 4; i++)
+		chr2_x(2 * i, (m_latch & 1) << 8 | m_reg[i], CHRROM);
+}
+
+void nes_jy830623c_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("jy830623c write_m, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x1003)
 	{
 		case 0x0000:
-			switch (offset & 0x03)
-			{
-				case 0x00: chr2_0(data, CHRROM); break;
-				case 0x01: chr2_2(data, CHRROM); break;
-				case 0x02: chr2_4(data, CHRROM); break;
-				case 0x03: chr2_6(data, CHRROM); break;
-			}
-			break;
+		case 0x0001:
+		case 0x0002:
+		case 0x0003:
 		case 0x1000:
-			switch (offset & 0x03)
-			{
-				case 0x00: prg8_89(data); break;
-				case 0x01: prg8_ab(data); break;
-				case 0x02: m_irq_enable = 0; m_irq_count = 0; break;
-				case 0x03: m_irq_enable = 1; m_irq_count = 7; break;
-			}
+		case 0x1001:
+			m_reg[bitswap<3>(offset, 12, 1, 0)] = data;
+			update_banks();
 			break;
-		default:
-			logerror("mk2 write_m, uncaught addr: %04x value: %02x\n", offset + 0x6000, data);
+		case 0x1002:
+			m_irq_enable = 0;
+			m_irq_count = 0;
+			set_irq_line(CLEAR_LINE);
 			break;
+		case 0x1003:
+			m_irq_enable = 1;
+			m_irq_count = 7;
+			break;
+	}
+}
+
+void nes_jy830623c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("jy830623c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x2000)
+	{
+		m_latch = offset;
+		update_banks();
 	}
 }
 
