@@ -60,7 +60,7 @@ public:
 
 	void pc6001_palette(palette_device &palette) const;
 
-	uint32_t screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 //  INTERRUPT_GEN_MEMBER(vrtc_irq);
 	TIMER_CALLBACK_MEMBER(audio_callback);
@@ -212,7 +212,7 @@ public:
 	void pc6001mk2_palette(palette_device &palette) const;
 	void pc6001mk2(machine_config &config);
 
-	uint32_t screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 protected:
 	void pc6001mk2_map(address_map &map);
@@ -279,24 +279,24 @@ protected:
 	void fdc_sel_w(u8 data);
 };
 
-class pc6001sr_state : public pc6601_state
+class pc6001mk2sr_state : public pc6601_state
 {
 public:
-	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc6001mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6601_state(mconfig, type, tag)
 		, m_sr_irq_vectors(*this, "irq_vectors")
 		, m_gvram_view_r(*this, "gvram_view_r")
 		, m_gvram_view_w(*this, "gvram_view_w")
 	{ }
 
-	void pc6001sr(machine_config &config);
+	void pc6001mk2sr(machine_config &config);
 
 protected:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
-	void pc6001sr_map(address_map &map);
-	void pc6001sr_io(address_map &map);
+	void pc6001mk2sr_map(address_map &map);
+	void pc6001mk2sr_io(address_map &map);
 
 	virtual u8 vrtc_ack() override;
 	virtual u8 get_timer_base_divider() override;
@@ -342,15 +342,15 @@ private:
 
 	INTERRUPT_GEN_MEMBER(sr_vrtc_irq);
 
-	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 };
 
-class pc6601sr_state : public pc6001sr_state
+class pc6601sr_state : public pc6001mk2sr_state
 {
 public:
 	pc6601sr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc6001sr_state(mconfig, type, tag)
+		: pc6001mk2sr_state(mconfig, type, tag)
 	{ }
 
 	void pc6601sr(machine_config &config);

@@ -126,7 +126,7 @@ void pc6001mk2_state::video_start()
 	// ...
 }
 
-void pc6001sr_state::video_start()
+void pc6001mk2sr_state::video_start()
 {
 //  m_video_ram = std::make_unique<uint8_t[]>(0x4000);
 	m_gvram = std::make_unique<uint8_t []>(320*256*8); // TODO: size
@@ -134,7 +134,6 @@ void pc6001sr_state::video_start()
 	save_pointer(NAME(m_gvram), 320*256*8);
 }
 
-/* this is known as gfx mode 4 */
 void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr)
 {
 	static const uint8_t pen_gattr[4][4] = {
@@ -291,7 +290,6 @@ void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect
 					color = pen ? (fgcol+0) : (fgcol+1);
 				else
 					color = pen ? (fgcol+1) : (fgcol+0);
-
 			}
 			else
 			{
@@ -368,14 +366,14 @@ void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &clip
 	}
 }
 
-uint32_t pc6001_state::screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pc6001_screen_draw(bitmap,cliprect,1);
 
 	return 0;
 }
 
-uint32_t pc6001mk2_state::screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* note: bitmap mode have priority over everything else, check American Truck */
 	if(m_exgfx_bitmap_mode)
@@ -510,7 +508,7 @@ uint32_t pc6001mk2_state::screen_update_pc6001mk2(screen_device &screen, bitmap_
 	return 0;
 }
 
-uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *const gfx_data = m_region_gfx1->base();
 

@@ -33852,8 +33852,8 @@ pc4                             //
 pc6001                          //
 pc6001a                         //
 pc6001mk2                       //
-pc6001sr                        //
 pc6601                          //
+pc6001mk2sr                     //
 pc6601sr                        //
 
 @source:pc8001.cpp
