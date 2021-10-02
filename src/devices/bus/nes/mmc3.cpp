@@ -119,7 +119,14 @@ void nes_txrom_device::mmc3_common_initialize( int prg_mask, int chr_mask, int i
 {
 	m_mmc_prg_bank[0] = m_mmc_prg_bank[2] = 0xffe; // m_mmc_prg_bank[2] & m_mmc_prg_bank[3] remain always the same in most MMC3 variants
 	m_mmc_prg_bank[1] = m_mmc_prg_bank[3] = 0xfff; // but some pirate clone mappers change them after writing certain registers
-	std::fill(std::begin(m_mmc_vrom_bank), std::end(m_mmc_vrom_bank), 0x00);
+	m_mmc_vrom_bank[0] = 0;
+	m_mmc_vrom_bank[1] = 2;
+	m_mmc_vrom_bank[2] = 4;
+	m_mmc_vrom_bank[3] = 5;
+	m_mmc_vrom_bank[4] = 6;
+	m_mmc_vrom_bank[5] = 7;
+	m_mmc_vrom_bank[6] = 0;
+	m_mmc_vrom_bank[7] = 0;
 	m_mmc_mirror = 0;
 
 	m_latch = 0;

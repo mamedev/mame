@@ -380,7 +380,7 @@ static const nes_mmc mmc_list[] =
 	// 342 COOLGIRL homebrew
 	// 343 reset-based 4-in-1 pirate?
 	// 344 3/6-in-1 GN-26 multicart, not in nes.xml
-	// 345 BMC-L6IN1 multicart, not in nes.xml?
+	{ 345, BMC_L6IN1 },
 	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
 	{ 347, KAISER_KS7030 },        // Doki Doki Panic alt FDS conversion
 	{ 348, BMC_830118C },
