@@ -237,7 +237,7 @@ TEST_CASE("quaternion", "")
 	float mtxQ[16];
 	float mtx[16];
 
-	bx::Quaternion quat = { 0.0f, 0.0f, 0.0f, 1.0f };
+	bx::Quaternion quat = bx::init::Identity;
 	bx::mtxQuat(mtxQ, quat);
 	bx::mtxIdentity(mtx);
 	mtxCheck(mtxQ, mtx);

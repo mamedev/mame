@@ -67,7 +67,7 @@
 namespace bgfx
 {
 #if BX_COMPILER_CLANG_ANALYZER
-	void __attribute__( (analyzer_noreturn) ) fatal(Fatal::Enum _code, const char* _format, ...);
+	void __attribute__( (analyzer_noreturn) ) fatal(const char* _filePath, uint16_t _line, Fatal::Enum _code, const char* _format, ...);
 #else
 	void fatal(const char* _filePath, uint16_t _line, Fatal::Enum _code, const char* _format, ...);
 #endif // BX_COMPILER_CLANG_ANALYZER
@@ -245,6 +245,8 @@ namespace stl = std;
 #define BGFX_SUBMIT_INTERNAL_OCCLUSION_VISIBLE UINT8_C(0x80)
 #define BGFX_SUBMIT_INTERNAL_RESERVED_MASK     UINT8_C(0xff)
 
+#define BGFX_RENDERER_NOOP_NAME       "Noop"
+#define BGFX_RENDERER_AGC_NAME        "AGC"
 #define BGFX_RENDERER_DIRECT3D9_NAME  "Direct3D 9"
 #define BGFX_RENDERER_DIRECT3D11_NAME "Direct3D 11"
 #define BGFX_RENDERER_DIRECT3D12_NAME "Direct3D 12"
@@ -253,7 +255,6 @@ namespace stl = std;
 #define BGFX_RENDERER_NVN_NAME        "NVN"
 #define BGFX_RENDERER_VULKAN_NAME     "Vulkan"
 #define BGFX_RENDERER_WEBGPU_NAME     "WebGPU"
-#define BGFX_RENDERER_NOOP_NAME       "Noop"
 
 #if BGFX_CONFIG_RENDERER_OPENGL
 #	if BGFX_CONFIG_RENDERER_OPENGL >= 31 && BGFX_CONFIG_RENDERER_OPENGL <= 33
@@ -303,6 +304,7 @@ namespace bgfx
 	extern PlatformData g_platformData;
 	extern bool g_platformDataChangedSinceReset;
 	extern void isFrameBufferValid(uint8_t _num, const Attachment* _attachment, bx::Error* _err);
+	extern void isIdentifierValid(const bx::StringView& _name, bx::Error* _err);
 
 #if BGFX_CONFIG_MAX_DRAW_CALLS < (64<<10)
 	typedef uint16_t RenderItemCount;
@@ -791,7 +793,7 @@ namespace bgfx
 	const char* getUniformTypeName(UniformType::Enum _enum);
 	UniformType::Enum nameToUniformTypeEnum(const char* _name);
 	const char* getPredefinedUniformName(PredefinedUniform::Enum _enum);
-	PredefinedUniform::Enum nameToPredefinedUniformEnum(const char* _name);
+	PredefinedUniform::Enum nameToPredefinedUniformEnum(const bx::StringView& _name);
 
 	class CommandBuffer
 	{
@@ -3194,21 +3196,29 @@ namespace bgfx
 			cmdbuf.write(_handle);
 		}
 
-		VertexLayoutHandle findVertexLayout(const VertexLayout& _layout)
+		VertexLayoutHandle findOrCreateVertexLayout(const VertexLayout& _layout, bool _refCountOnCreation = false)
 		{
 			VertexLayoutHandle layoutHandle = m_vertexLayoutRef.find(_layout.m_hash);
 
+			if (isValid(layoutHandle) )
+			{
+				return layoutHandle;
+			}
+
+			layoutHandle = { m_layoutHandle.alloc() };
 			if (!isValid(layoutHandle) )
 			{
-				layoutHandle.idx = m_layoutHandle.alloc();
-				if (!isValid(layoutHandle) )
-				{
-					return layoutHandle;
-				}
+				BX_TRACE("WARNING: Failed to allocate vertex layout handle (BGFX_CONFIG_MAX_VERTEX_LAYOUTS, max: %d).", BGFX_CONFIG_MAX_VERTEX_LAYOUTS);
+				return BGFX_INVALID_HANDLE;
+			}
 
-				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateVertexLayout);
-				cmdbuf.write(layoutHandle);
-				cmdbuf.write(_layout);
+			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateVertexLayout);
+			cmdbuf.write(layoutHandle);
+			cmdbuf.write(_layout);
+
+			if (_refCountOnCreation)
+			{
+				m_vertexLayoutRef.add(layoutHandle, _layout.m_hash);
 			}
 
 			return layoutHandle;
@@ -3218,10 +3228,9 @@ namespace bgfx
 		{
 			BGFX_MUTEX_SCOPE(m_resourceApiLock);
 
-			VertexLayoutHandle handle = findVertexLayout(_layout);
+			VertexLayoutHandle handle = findOrCreateVertexLayout(_layout);
 			if (!isValid(handle) )
 			{
-				BX_TRACE("WARNING: Failed to allocate vertex layout handle (BGFX_CONFIG_MAX_VERTEX_LAYOUTS, max: %d).", BGFX_CONFIG_MAX_VERTEX_LAYOUTS);
 				return BGFX_INVALID_HANDLE;
 			}
 
@@ -3247,7 +3256,7 @@ namespace bgfx
 
 			if (isValid(handle) )
 			{
-				VertexLayoutHandle layoutHandle = findVertexLayout(_layout);
+				VertexLayoutHandle layoutHandle = findOrCreateVertexLayout(_layout);
 				if (!isValid(layoutHandle) )
 				{
 					BX_TRACE("WARNING: Failed to allocate vertex layout handle (BGFX_CONFIG_MAX_VERTEX_LAYOUTS, max: %d).", BGFX_CONFIG_MAX_VERTEX_LAYOUTS);
@@ -3557,7 +3566,7 @@ namespace bgfx
 		{
 			BGFX_MUTEX_SCOPE(m_resourceApiLock);
 
-			VertexLayoutHandle layoutHandle = findVertexLayout(_layout);
+			VertexLayoutHandle layoutHandle = findOrCreateVertexLayout(_layout);
 			if (!isValid(layoutHandle) )
 			{
 				BX_TRACE("WARNING: Failed to allocate vertex layout handle (BGFX_CONFIG_MAX_VERTEX_LAYOUTS, max: %d).", BGFX_CONFIG_MAX_VERTEX_LAYOUTS);
@@ -3790,7 +3799,7 @@ namespace bgfx
 
 				if (NULL != _layout)
 				{
-					layoutHandle = findVertexLayout(*_layout);
+					layoutHandle = findOrCreateVertexLayout(*_layout);
 					m_vertexLayoutRef.add(handle, layoutHandle, _layout->m_hash);
 
 					stride = _layout->m_stride;
@@ -3829,32 +3838,19 @@ namespace bgfx
 			BX_ALIGNED_FREE(g_allocator, _tvb, 16);
 		}
 
-		BGFX_API_FUNC(void allocTransientVertexBuffer(TransientVertexBuffer* _tvb, uint32_t _num, const VertexLayout& _layout) )
+		BGFX_API_FUNC(void allocTransientVertexBuffer(TransientVertexBuffer* _tvb, uint32_t _num, VertexLayoutHandle _layoutHandle, uint16_t _stride) )
 		{
 			BGFX_MUTEX_SCOPE(m_resourceApiLock);
 
-			VertexLayoutHandle layoutHandle = m_vertexLayoutRef.find(_layout.m_hash);
+			const uint32_t offset = m_submit->allocTransientVertexBuffer(_num, _stride);
+			const TransientVertexBuffer& dvb = *m_submit->m_transientVb;
 
-			TransientVertexBuffer& dvb = *m_submit->m_transientVb;
-
-			if (!isValid(layoutHandle) )
-			{
-				VertexLayoutHandle temp = { m_layoutHandle.alloc() };
-				layoutHandle = temp;
-				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateVertexLayout);
-				cmdbuf.write(layoutHandle);
-				cmdbuf.write(_layout);
-				m_vertexLayoutRef.add(layoutHandle, _layout.m_hash);
-			}
-
-			uint32_t offset = m_submit->allocTransientVertexBuffer(_num, _layout.m_stride);
-
-			_tvb->data = &dvb.data[offset];
-			_tvb->size = _num * _layout.m_stride;
-			_tvb->startVertex = bx::strideAlign(offset, _layout.m_stride)/_layout.m_stride;
-			_tvb->stride = _layout.m_stride;
-			_tvb->handle = dvb.handle;
-			_tvb->layoutHandle   = layoutHandle;
+			_tvb->data         = &dvb.data[offset];
+			_tvb->size         = _num * _stride;
+			_tvb->startVertex  = bx::strideAlign(offset, _stride)/_stride;
+			_tvb->stride       = _stride;
+			_tvb->handle       = dvb.handle;
+			_tvb->layoutHandle = _layoutHandle;
 		}
 
 		BGFX_API_FUNC(void allocInstanceDataBuffer(InstanceDataBuffer* _idb, uint32_t _num, uint16_t _stride) )
@@ -4697,10 +4693,15 @@ namespace bgfx
 		{
 			BGFX_MUTEX_SCOPE(m_resourceApiLock);
 
-			if (PredefinedUniform::Count != nameToPredefinedUniformEnum(_name) )
 			{
-				BX_TRACE("%s is predefined uniform name.", _name);
-				return BGFX_INVALID_HANDLE;
+				bx::Error err;
+				isIdentifierValid(_name, &err);
+				BGFX_ERROR_ASSERT(&err);
+
+				if (!err.isOk() )
+				{
+					return BGFX_INVALID_HANDLE;
+				}
 			}
 
 			_num  = bx::max<uint16_t>(1, _num);
