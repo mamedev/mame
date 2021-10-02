@@ -11,6 +11,7 @@
 #include "formats/msx_dsk.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pc80s31k.h"
@@ -84,7 +85,7 @@ protected:
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
-	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	required_ioport m_io_mode4_dsw;
 	required_ioport m_io_p1;
@@ -92,7 +93,7 @@ protected:
 	required_ioport_array<3> m_io_keys;
 	required_ioport m_io_fn_keys;
 	required_ioport m_io_key_modifiers;
-	required_memory_bank m_bank1;
+	optional_memory_bank m_bank1;
 	required_device<palette_device> m_palette;
 
 	memory_region *m_cart_rom;
@@ -101,6 +102,12 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void default_cartridge_reset();
+	void default_cassette_hack_reset();
+	void default_keyboard_hle_reset();
+	void irq_reset(u8 timer_default_setting);
+	
 	virtual void video_start() override;
 
 	void pc6001_map(address_map &map);
@@ -143,6 +150,7 @@ private:
 
 	emu_timer *m_sub_trig_timer;
 
+// IRQ model
 protected:
 	// vanilla PC-6001 just maps sub CPU and Timer IRQs, mapping is otherwise confirmed by $b8-$bf vector setups in SR machines
 	enum{
@@ -220,13 +228,13 @@ protected:
 
 	uint8_t m_bgcol_bank;
 	uint8_t m_gfx_bank_on;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
-	required_memory_bank m_bank5;
-	required_memory_bank m_bank6;
-	required_memory_bank m_bank7;
-	required_memory_bank m_bank8;
+	optional_memory_bank m_bank2;
+	optional_memory_bank m_bank3;
+	optional_memory_bank m_bank4;
+	optional_memory_bank m_bank5;
+	optional_memory_bank m_bank6;
+	optional_memory_bank m_bank7;
+	optional_memory_bank m_bank8;
 	virtual void refresh_crtc_params();
 
 	virtual void video_start() override;
@@ -284,9 +292,9 @@ class pc6001mk2sr_state : public pc6601_state
 public:
 	pc6001mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6601_state(mconfig, type, tag)
+		, m_sr_bank(*this, "sr_bank_%u", 1U)
 		, m_sr_irq_vectors(*this, "irq_vectors")
-		, m_gvram_view_r(*this, "gvram_view_r")
-		, m_gvram_view_w(*this, "gvram_view_w")
+//		, m_gvram_view(*this, "gvram_view")
 	{ }
 
 	void pc6001mk2sr(machine_config &config);
@@ -296,14 +304,16 @@ protected:
 	virtual void machine_reset() override;
 
 	void pc6001mk2sr_map(address_map &map);
+	void sr_banked_map(address_map &map);
 	void pc6001mk2sr_io(address_map &map);
 
 	virtual u8 vrtc_ack() override;
 	virtual u8 get_timer_base_divider() override;
 
 private:
-	uint8_t m_sr_bank_r[8];
-	uint8_t m_sr_bank_w[8];
+	required_device_array<address_map_bank_device, 16> m_sr_bank;
+
+	uint8_t m_sr_bank_reg[16];
 	bool m_sr_text_mode;
 	uint8_t m_sr_text_rows;
 	std::unique_ptr<uint8_t []> m_gvram;
@@ -311,22 +321,12 @@ private:
 	u8 m_width80;
 
 	required_shared_ptr<uint8_t> m_sr_irq_vectors;
-	memory_view m_gvram_view_r;
-	memory_view m_gvram_view_w;
+//	memory_view m_gvram_view;
 
 	virtual u8 hw_rev_r();
-	uint8_t sr_bank_rn_r(offs_t offset);
-	void sr_bank_rn_w(offs_t offset, uint8_t data);
-	uint8_t sr_bank_wn_r(offs_t offset);
-	void sr_bank_wn_w(offs_t offset, uint8_t data);
-	void sr_work_ram0_w(offs_t offset, uint8_t data);
-	void sr_work_ram1_w(offs_t offset, uint8_t data);
-	void sr_work_ram2_w(offs_t offset, uint8_t data);
-	void sr_work_ram3_w(offs_t offset, uint8_t data);
-	void sr_work_ram4_w(offs_t offset, uint8_t data);
-	void sr_work_ram5_w(offs_t offset, uint8_t data);
-	void sr_work_ram6_w(offs_t offset, uint8_t data);
-	void sr_work_ram7_w(offs_t offset, uint8_t data);
+	uint8_t sr_bank_reg_r(offs_t offset);
+	void sr_bank_reg_w(offs_t offset, uint8_t data);
+
 	void sr_mode_w(uint8_t data);
 	void sr_vram_bank_w(uint8_t data);
 	void sr_system_latch_w(uint8_t data);
@@ -336,6 +336,8 @@ private:
 	void sr_bitmap_yoffs_w(uint8_t data);
 	void sr_bitmap_xoffs_w(uint8_t data);
 	void refresh_gvram_access(bool is_write);
+	u8 work_ram_r(offs_t offset);
+	void work_ram_w(offs_t offset, u8 data);
 	u8 sr_gvram_r(offs_t offset);
 	void sr_gvram_w(offs_t offset, u8 data);
 	void crt_mode_w(u8 data);

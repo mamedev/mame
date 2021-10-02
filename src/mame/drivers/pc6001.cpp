@@ -121,7 +121,7 @@ irq vector 0x12: writes 0x10 to [$fa19]                                         
 irq vector 0x14: same as 2, (A = 0x00, B = 0x01)                                            ;keyboard control irq (function keys)
 irq vector 0x16: tests ppi port c, writes the result to $feca.                              ;joystick / sub irq trigger
 irq vector 0x18:                                                                            ;TVR (?)
-irq vector 0x1a:                                                                            floppy_formats;Date
+irq vector 0x1a:                                                                            ;Date
 irq vector 0x1c:                                                                            ;(unused)
 irq vector 0x1e:                                                                            ;(unused)
 irq vector 0x20:                                                                            ;uPD7752 voice irq
@@ -817,72 +817,20 @@ void pc6601_state::pc6601_io(address_map &map)
  *
  ****************************************/
 
-#define SR_SYSROM_1(_v_) \
-	0x10000+(0x1000*_v_)
-#define SR_SYSROM_2(_v_) \
-	0x20000+(0x1000*_v_)
-#define SR_CGROM1(_v_) \
-	0x30000+(0x1000*_v_)
-#define SR_EXROM0(_v_) \
-	0x40000+(0x1000*_v_)
-#define SR_EXROM1(_v_) \
-	0x50000+(0x1000*_v_)
-#define SR_EXRAM0(_v_) \
-	0x60000+(0x1000*_v_)
-#define SR_WRAM0(_v_) \
-	0x70000+(0x1000*_v_)
-#define SR_NULL(_v_) \
-	0x80000+(0x1000*_v_)
-
-uint8_t pc6001mk2sr_state::sr_bank_rn_r(offs_t offset)
+uint8_t pc6001mk2sr_state::sr_bank_reg_r(offs_t offset)
 {
-	return m_sr_bank_r[offset];
+	return m_sr_bank_reg[offset];
 }
 
-void pc6001mk2sr_state::sr_bank_rn_w(offs_t offset, uint8_t data)
+// offset & 8 maps to bank writes
+void pc6001mk2sr_state::sr_bank_reg_w(offs_t offset, uint8_t data)
 {
-	memory_bank *bank[8] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8 };
-	uint8_t *ROM = m_region_maincpu->base();
-	uint8_t bank_num;
+//	memory_bank *bank[8] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8 };
+//	uint8_t *ROM = m_region_maincpu->base();
 
-	m_sr_bank_r[offset] = data;
-	bank_num = data & 0x0f;
-
-	switch(data & 0xf0)
-	{
-		case 0xf0: bank[offset]->set_base(&ROM[SR_SYSROM_1(bank_num)]); break;
-		case 0xe0: bank[offset]->set_base(&ROM[SR_SYSROM_2(bank_num)]); break;
-		case 0xd0: bank[offset]->set_base(&ROM[SR_CGROM1(bank_num)]); break;
-		case 0xc0: bank[offset]->set_base(&ROM[SR_EXROM1(bank_num)]); break;
-		case 0xb0: bank[offset]->set_base(&ROM[SR_EXROM0(bank_num)]); break;
-		case 0x20: bank[offset]->set_base(&ROM[SR_EXRAM0(bank_num)]); break;
-		case 0x00: bank[offset]->set_base(&ROM[SR_WRAM0(bank_num)]); break;
-		default:   bank[offset]->set_base(&ROM[SR_NULL(bank_num)]); break;
-	}
-
-	if (offset == 0)
-		refresh_gvram_access(false);
-}
-
-void pc6001mk2sr_state::refresh_gvram_access(bool is_write)
-{
-	if (is_write)
-		m_gvram_view_w.select(m_sr_bank_w[0] == 0 && m_sr_text_mode == false);
-	else
-		m_gvram_view_r.select(m_sr_bank_r[0] == 0 && m_sr_text_mode == false);
-}
-
-uint8_t pc6001mk2sr_state::sr_bank_wn_r(offs_t offset)
-{
-	return m_sr_bank_w[offset];
-}
-
-void pc6001mk2sr_state::sr_bank_wn_w(offs_t offset, uint8_t data)
-{
-	m_sr_bank_w[offset] = data;
-
-	if (offset == 0)
-		refresh_gvram_access(true);
+	// TODO: is bit 0 truly a NOP?
+	m_sr_bank_reg[offset] = data & 0xfe;
+	m_sr_bank[offset]->set_bank(m_sr_bank_reg[offset] >> 1);
 }
 
 void pc6001mk2sr_state::sr_bitmap_yoffs_w(uint8_t data)
@@ -895,17 +843,29 @@ void pc6001mk2sr_state::sr_bitmap_xoffs_w(uint8_t data)
 	m_bitmap_xoffs = data;
 }
 
-#define SR_WRAM_BANK_W(_v_) \
-{ \
-	uint8_t *ROM = m_region_maincpu->base(); \
-	uint8_t bank_num; \
-	bank_num = m_sr_bank_w[_v_] & 0x0e; \
-	if((m_sr_bank_w[_v_] & 0xf0) == 0x00) \
-		ROM[offset+(SR_WRAM0(bank_num))] = data; \
-	else if((m_sr_bank_w[_v_] & 0xf0) == 0x20) \
-		ROM[offset+(SR_EXRAM0(bank_num))] = data; \
+u8 pc6001mk2sr_state::work_ram_r(offs_t offset)
+{
+//	if (m_sr_text_mode == false && (offset & 0xe000) == 0) && m_sr_mode)
+	if (m_sr_text_mode == false && (offset & 0xe000) == 0)
+		return sr_gvram_r(offset);
+
+	return m_ram[offset];
 }
 
+void pc6001mk2sr_state::work_ram_w(offs_t offset, u8 data)
+{
+//	if (m_sr_text_mode == false && (offset & 0xe000) == 0) && m_sr_mode)
+	if (m_sr_text_mode == false && (offset & 0xe000) == 0)
+	{
+		sr_gvram_w(offset, data);
+		return;
+	}
+
+	m_ram[offset] = data;
+}
+
+// TODO: does this maps to the work RAM in an alt fashion?
+// Note that the few games that maps 
 u8 pc6001mk2sr_state::sr_gvram_r(offs_t offset)
 {
 	uint32_t real_offs = (m_bitmap_xoffs*16+m_bitmap_yoffs)*320;
@@ -922,25 +882,19 @@ void pc6001mk2sr_state::sr_gvram_w(offs_t offset, uint8_t data)
 	m_gvram[real_offs] = data;
 }
 
-void pc6001mk2sr_state::sr_work_ram0_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(0); }
-void pc6001mk2sr_state::sr_work_ram1_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(1); }
-void pc6001mk2sr_state::sr_work_ram2_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(2); }
-void pc6001mk2sr_state::sr_work_ram3_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(3); }
-void pc6001mk2sr_state::sr_work_ram4_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(4); }
-void pc6001mk2sr_state::sr_work_ram5_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(5); }
-void pc6001mk2sr_state::sr_work_ram6_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(6); }
-void pc6001mk2sr_state::sr_work_ram7_w(offs_t offset, uint8_t data){ SR_WRAM_BANK_W(7); }
-
 void pc6001mk2sr_state::sr_mode_w(uint8_t data)
 {
 	// if 1 text mode else bitmap mode
-	m_sr_text_mode = bool(BIT(data,3));
+	m_sr_text_mode = bool(BIT(data, 3));
+	// in theory we need a view,
+	// in practice this approach doesn't work cause we can't mix views with address banks
+//	m_gvram_view.select(m_sr_text_mode == false);
+
 	m_sr_text_rows = data & 4 ? 20 : 25;
-	refresh_gvram_access(false);
-	refresh_gvram_access(true);
 	refresh_crtc_params();
 
 	// bit 1: bus request
+	// bit 4: VRAM bank select
 
 	if(data & 1)
 		throw emu_fatalerror("PC-6001SR in Mk-2 compatibility mode not yet supported!");
@@ -948,7 +902,9 @@ void pc6001mk2sr_state::sr_mode_w(uint8_t data)
 
 void pc6001mk2sr_state::sr_vram_bank_w(uint8_t data)
 {
-	set_videoram_bank(0x70000 + ((data & 0x0f)*0x1000));
+	m_video_base = &m_ram[(data & 0x0f) * 0x1000];
+
+//	set_videoram_bank(0x70000 + ((data & 0x0f)*0x1000));
 }
 
 void pc6001mk2sr_state::sr_system_latch_w(uint8_t data)
@@ -969,7 +925,7 @@ void pc6001mk2sr_state::necsr_ppi8255_w(offs_t offset, uint8_t data)
 	{
 		ppi_control_hack_w(data);
 
-		if(0)
+		#ifdef UNUSED_FUNCTION
 		{
 			//printf("%02x\n",data);
 
@@ -978,6 +934,7 @@ void pc6001mk2sr_state::necsr_ppi8255_w(offs_t offset, uint8_t data)
 			if ((data & 0x0f) == 0x04)
 				m_bank1->set_base(m_region_gfx1->base());
 		}
+		#endif
 	}
 
 	m_ppi->write(offset,data);
@@ -1018,28 +975,37 @@ inline void pc6001mk2sr_state::refresh_crtc_params()
 void pc6001mk2sr_state::pc6001mk2sr_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).view(m_gvram_view_r);
-	m_gvram_view_r[0](0x0000, 0x1fff).bankr("bank1");
-	m_gvram_view_r[1](0x0000, 0x1fff).r(FUNC(pc6001mk2sr_state::sr_gvram_r));
-	map(0x0000, 0x1fff).view(m_gvram_view_w);
-	m_gvram_view_w[0](0x0000, 0x1fff).w(FUNC(pc6001mk2sr_state::sr_work_ram0_w));
-	m_gvram_view_w[1](0x0000, 0x1fff).w(FUNC(pc6001mk2sr_state::sr_gvram_w));
-	map(0x2000, 0x3fff).bankr("bank2").w(FUNC(pc6001mk2sr_state::sr_work_ram1_w));
-	map(0x4000, 0x5fff).bankr("bank3").w(FUNC(pc6001mk2sr_state::sr_work_ram2_w));
-	map(0x6000, 0x7fff).bankr("bank4").w(FUNC(pc6001mk2sr_state::sr_work_ram3_w));
-	map(0x8000, 0x9fff).bankr("bank5").w(FUNC(pc6001mk2sr_state::sr_work_ram4_w));
-	map(0xa000, 0xbfff).bankr("bank6").w(FUNC(pc6001mk2sr_state::sr_work_ram5_w));
-	map(0xc000, 0xdfff).bankr("bank7").w(FUNC(pc6001mk2sr_state::sr_work_ram6_w));
-	map(0xe000, 0xffff).bankr("bank8").w(FUNC(pc6001mk2sr_state::sr_work_ram7_w));
+	for (int bank = 0; bank < 8; bank++)
+	{
+		map(bank << 13, (bank << 13) | 0x1fff).r(m_sr_bank[bank], FUNC(address_map_bank_device::read8));
+		map(bank << 13, (bank << 13) | 0x1fff).w(m_sr_bank[bank+8], FUNC(address_map_bank_device::write8));
+	}
+}
+
+void pc6001mk2sr_state::sr_banked_map(address_map &map)
+{
+//	map(0x00000, 0x0ffff).view(m_gvram_view);
+//	m_gvram_view[0](0x0000, 0xffff).ram();
+//	m_gvram_view[1](0x0000, 0x1fff).rw(FUNC(pc6001mk2sr_state::sr_gvram_r), FUNC(pc6001mk2sr_state::sr_gvram_w));
+	map(0x00000, 0x0ffff).rw(FUNC(pc6001mk2sr_state::work_ram_r), FUNC(pc6001mk2sr_state::work_ram_w)).share("ram");
+
+	// exram0
+	map(0x20000, 0x2ffff).ram();
+	// exrom0 / 1
+//	map(0xb0000, 0xcffff).rom();
+	// cgrom 1
+	map(0xd0000, 0xd3fff).rom().region("cgrom", 0);
+	// sysrom 1 / 2
+	map(0xe0000, 0xfffff).rom().region("sr_sysrom", 0);
 }
 
 void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  0x40-0x43 palette indexes
-	map(0x60, 0x67).rw(FUNC(pc6001mk2sr_state::sr_bank_rn_r), FUNC(pc6001mk2sr_state::sr_bank_rn_w));
-	map(0x68, 0x6f).rw(FUNC(pc6001mk2sr_state::sr_bank_wn_r), FUNC(pc6001mk2sr_state::sr_bank_wn_w));
+	map(0x40, 0x43).nopw(); // palette CLUTs
+	map(0x60, 0x6f).rw(FUNC(pc6001mk2sr_state::sr_bank_reg_r), FUNC(pc6001mk2sr_state::sr_bank_reg_w));
+
 	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2sr_state::nec_ppi8255_r), FUNC(pc6001mk2sr_state::necsr_ppi8255_w));
@@ -1523,43 +1489,63 @@ inline void pc6001_state::set_videoram_bank(uint32_t offs)
 	m_video_base = m_region_maincpu->base() + offs;
 }
 
-void pc6001_state::machine_reset()
+inline void pc6001_state::default_cartridge_reset()
 {
-	set_videoram_bank(0xc000);
-
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
-
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+}
 
-	m_port_c_8255 = 0;
-
+inline void pc6001_state::default_cassette_hack_reset()
+{
 	m_cas_switch = 0;
 	m_cas_offset = 0;
 	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
+}
+
+inline void pc6001_state::default_keyboard_hle_reset()
+{
+	m_port_c_8255 = 0;
+	m_old_key1 = m_old_key2 = m_old_key3 = 0;
+	m_old_key_fn = 0;
+}
+
+void pc6001_state::irq_reset(u8 timer_default_setting)
+{
 	m_timer_enable = false;
 	m_timer_irq_mask = false;
 	// timer irq vector is fixed in plain PC-6001
 	m_timer_irq_vector = 0x06;
 	m_irq_pending = 0;
-	m_timer_hz_div = 3;
+	m_timer_hz_div = timer_default_setting;
 	set_timer_divider();
+}
 
-	m_old_key1 = m_old_key2 = m_old_key3 = 0;
-	m_old_key_fn = 0;
+void pc6001_state::machine_reset()
+{
+	set_videoram_bank(0xc000);
+
+	default_cartridge_reset();
+	if (m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
+
+	default_cassette_hack_reset();
+	irq_reset(3);
+	default_keyboard_hle_reset();
 }
 
 void pc6001mk2_state::machine_reset()
 {
-	pc6001_state::machine_reset();
+//	pc6001_state::machine_reset();
 	set_videoram_bank(0xc000 + 0x28000);
 
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	default_cartridge_reset();
 	// TODO: hackish way to simplify bankswitch handling
-	if (m_cart_rom)
+	if (m_cart->exists())
 		memcpy(m_region_maincpu->base() + 0x48000, m_cart_rom->base(), 0x4000);
+
+	default_cassette_hack_reset();
+	irq_reset(3);
+	default_keyboard_hle_reset();
 
 	/* set default bankswitch */
 	{
@@ -1594,44 +1580,46 @@ void pc6601_state::machine_start()
 
 void pc6001mk2sr_state::machine_reset()
 {
-	pc6001_state::machine_reset();
-	set_videoram_bank(0x70000);
+//	pc6001_state::machine_reset();
+	default_cassette_hack_reset();
+	
+//	set_videoram_bank(0x70000);
+	m_video_base = &m_ram[0];
 
-	// default to bitmap mode
-	m_sr_text_mode = false;
+	default_cartridge_reset();
+	// TODO: checkout where cart actually maps in SR model
+	// should be mirrored into the EXROM regions?
+	// hard to tell without an actual SR cart dump
+//	std::string region_tag;
+//	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	default_cassette_hack_reset();
+	irq_reset(0x7f);
+	default_keyboard_hle_reset();
+
+	// default to text mode
+	m_sr_text_mode = true;
 	m_sr_text_rows = 20;
 	m_width80 = 0;
 
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	// should this be mirrored into the EXROM regions?
-	// hard to tell without an actual SR cart dump
-
 	/* set default bankswitch */
 	{
-		uint8_t *ROM = m_region_maincpu->base();
-		m_sr_bank_r[0] = 0xf8; m_bank1->set_base(&ROM[SR_SYSROM_1(0x08)]);
-		m_sr_bank_r[1] = 0xfa; m_bank2->set_base(&ROM[SR_SYSROM_1(0x0a)]);
-		m_sr_bank_r[2] = 0xc0; m_bank3->set_base(&ROM[SR_EXROM1(0x00)]);
-		m_sr_bank_r[3] = 0xb0; m_bank4->set_base(&ROM[SR_EXROM0(0x00)]);
-		m_sr_bank_r[4] = 0x08; m_bank5->set_base(&ROM[SR_WRAM0(0x08)]);
-		m_sr_bank_r[5] = 0x0a; m_bank6->set_base(&ROM[SR_WRAM0(0x0a)]);
-		m_sr_bank_r[6] = 0x0c; m_bank7->set_base(&ROM[SR_WRAM0(0x0c)]);
-		m_sr_bank_r[7] = 0x0e; m_bank8->set_base(&ROM[SR_WRAM0(0x0e)]);
-//      m_bank_opt = 0x02; //tv rom
+		// TODO: confirm this arrangement
+		u8 default_banks[16] = { 
+			// read default:
+			// 0x0000 - 0x3fff sysrom 1 0x8000 - 0xbfff
+			// 0x4000 - 0x5fff exrom 1 0x0000 - 0x1fff
+			// 0x6000 - 0x7fff exrom 0 0x0000 - 0x1fff
+			// 0x8000 - 0xffff RAM 0x8000 - 0xffff
+			0xf8, 0xfa, 0xc0, 0xb0, 0x08, 0x0a, 0x0c, 0x0e,
+			// enable all work RAM writes
+			0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e
+		};
 
-		/* enable default work RAM writes */
-		m_sr_bank_w[0] = 0x00;
-		m_sr_bank_w[1] = 0x02;
-		m_sr_bank_w[2] = 0x04;
-		m_sr_bank_w[3] = 0x06;
-		m_sr_bank_w[4] = 0x08;
-		m_sr_bank_w[5] = 0x0a;
-		m_sr_bank_w[6] = 0x0c;
-		m_sr_bank_w[7] = 0x0e;
-
-		refresh_gvram_access(false);
-		refresh_gvram_access(true);
+		for (int i = 0; i < 16; i++)
+		{
+			m_sr_bank_reg[i] = default_banks[i] & 0xfe;
+			m_sr_bank[i]->set_bank(m_sr_bank_reg[i] >> 1);
+		}
 //      m_gfx_bank_on = 0;
 	}
 }
@@ -1796,6 +1784,11 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(pc6001mk2sr_state::sr_vrtc_irq));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001mk2sr_state::irq_callback));
 
+	for (auto &bank : m_sr_bank)
+	{
+		ADDRESS_MAP_BANK(config, bank).set_map(&pc6001mk2sr_state::sr_banked_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x2000);
+	}
+
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2sr_state,pc6001mk2sr)
 
 	m_screen->set_screen_update(FUNC(pc6001mk2sr_state::screen_update));
@@ -1889,36 +1882,28 @@ ROM_START( pc6601 )
 ROM_END
 
 ROM_START( pc6001mk2sr )
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
-
-	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "sr_sysrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
-	ROM_LOAD( "systemrom2.64", 0x20000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
-	ROM_COPY( "gfx1", 0, 0x30000, 0x4000 )
-//  cgrom 1                    0x30000, 0x10000
-//  exrom 0                    0x40000, 0x10000
-//  exrom 1                    0x50000, 0x10000
-//  exram 0                    0x60000, 0x10000
-//  work ram 0                 0x70000, 0x10000
-//  <invalid>                  0x80000, 0x10000
+	ROM_LOAD( "systemrom2.64", 0x00000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
+	ROM_REGION( 0x4000, "cgrom", 0 )
+	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
+	ROM_REGION( 0x4000, "gfx1", 0)
+	ROM_COPY( "cgrom", 0, 0, 0x4000 )
+
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
+	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
 ROM_END
 
 ROM_START( pc6601sr )
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "cgrom68.68",   0x000000, 0x004000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
-
-	ROM_REGION( 0x90000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "sr_sysrom", ROMREGION_ERASEFF )
 	// Note: identical to pc6001mk2sr?
-	ROM_LOAD( "systemrom1.68", 0x010000, 0x010000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
-	ROM_LOAD( "systemrom2.68", 0x020000, 0x010000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
-	ROM_COPY( "gfx1", 0, 0x30000, 0x4000 )
+	ROM_LOAD( "systemrom1.68", 0x10000, 0x010000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
+	ROM_LOAD( "systemrom2.68", 0x00000, 0x010000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
 
 	// mkII compatible ROMs
 	ROM_REGION( 0x20000, "mk2", ROMREGION_ERASEFF )
@@ -1931,8 +1916,14 @@ ROM_START( pc6601sr )
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
+	ROM_REGION( 0x4000, "cgrom", 0 )
+	ROM_LOAD( "cgrom68.68",   0x000000, 0x004000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
+	ROM_REGION( 0x4000, "gfx1", 0)
+	ROM_COPY( "cgrom", 0, 0, 0x4000 )
+
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
+	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
 ROM_END
 
 COMP( 1981, pc6001,       0,      0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING )
