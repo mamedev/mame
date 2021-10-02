@@ -535,3 +535,17 @@ TEST_CASE("strFindBlock", "")
 	bx::StringView result = bx::strFindBlock(test1, '{', '}');
 	REQUIRE(19 == result.getLength() );
 }
+
+TEST_CASE("hasPrefix", "")
+{
+	REQUIRE( bx::hasPrefix("abvgd-1389.0", "abv") );
+	REQUIRE(!bx::hasPrefix("abvgd-1389.0", "bvg") );
+	REQUIRE( bx::hasPrefix("abvgd-1389.0", "") );
+}
+
+TEST_CASE("hasSuffix", "")
+{
+	REQUIRE( bx::hasSuffix("abvgd-1389.0", "389.0") );
+	REQUIRE(!bx::hasSuffix("abvgd-1389.0", "1389") );
+	REQUIRE( bx::hasSuffix("abvgd-1389.0", "") );
+}
