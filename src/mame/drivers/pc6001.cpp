@@ -817,30 +817,30 @@ void pc6601_state::pc6601_io(address_map &map)
  *
  ****************************************/
 
-uint8_t pc6001mk2sr_state::sr_bank_reg_r(offs_t offset)
+u8 pc6001mk2sr_state::sr_bank_reg_r(offs_t offset)
 {
 	return m_sr_bank_reg[offset];
 }
 
 // offset & 8 maps to bank writes
-void pc6001mk2sr_state::sr_bank_reg_w(offs_t offset, uint8_t data)
+void pc6001mk2sr_state::sr_bank_reg_w(offs_t offset, u8 data)
 {
-//	memory_bank *bank[8] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8 };
-//	uint8_t *ROM = m_region_maincpu->base();
-
 	// TODO: is bit 0 truly a NOP?
 	m_sr_bank_reg[offset] = data & 0xfe;
 	m_sr_bank[offset]->set_bank(m_sr_bank_reg[offset] >> 1);
 }
 
-void pc6001mk2sr_state::sr_bitmap_yoffs_w(uint8_t data)
+void pc6001mk2sr_state::sr_bitmap_yoffs_w(u8 data)
 {
 	m_bitmap_yoffs = data;
 }
 
-void pc6001mk2sr_state::sr_bitmap_xoffs_w(uint8_t data)
+void pc6001mk2sr_state::sr_bitmap_xoffs_w(u8 data)
 {
 	m_bitmap_xoffs = data;
+
+	if (data)
+		popmessage("xoffs write %02x", data);
 }
 
 u8 pc6001mk2sr_state::work_ram_r(offs_t offset)
@@ -865,7 +865,12 @@ void pc6001mk2sr_state::work_ram_w(offs_t offset, u8 data)
 }
 
 // TODO: does this maps to the work RAM in an alt fashion?
-// Note that the few games that maps 
+// Games that uses GVRAM never writes outside 0-0x13f, and xoffs is unconfirmed.
+// Games also expects that GVRAM is read-back as 4-bit, otherwise fill issues happens
+// By logic it should be a 320x204 8-bit area -> 0x7f80
+// The interface is otherwise pretty inconvenient,
+// and it is unconfirmed if raster effect over SR text mode is even possible (which would halve the time required for drawing)
+// or if double buffering is possible (that would require EXRAM installed)
 u8 pc6001mk2sr_state::sr_gvram_r(offs_t offset)
 {
 	uint32_t real_offs = (m_bitmap_xoffs*16+m_bitmap_yoffs)*320;
@@ -874,7 +879,7 @@ u8 pc6001mk2sr_state::sr_gvram_r(offs_t offset)
 	return m_gvram[real_offs];
 }
 
-void pc6001mk2sr_state::sr_gvram_w(offs_t offset, uint8_t data)
+void pc6001mk2sr_state::sr_gvram_w(offs_t offset, u8 data)
 {
 	uint32_t real_offs = (m_bitmap_xoffs*16+m_bitmap_yoffs)*320;
 	real_offs += offset;
@@ -882,7 +887,7 @@ void pc6001mk2sr_state::sr_gvram_w(offs_t offset, uint8_t data)
 	m_gvram[real_offs] = data;
 }
 
-void pc6001mk2sr_state::sr_mode_w(uint8_t data)
+void pc6001mk2sr_state::sr_mode_w(u8 data)
 {
 	// if 1 text mode else bitmap mode
 	m_sr_text_mode = bool(BIT(data, 3));
@@ -895,19 +900,21 @@ void pc6001mk2sr_state::sr_mode_w(uint8_t data)
 
 	// bit 1: bus request
 	// bit 4: VRAM bank select
+//	if (data & 0x10)
+//		popmessage("VRAM bank select enabled");
 
 	if(data & 1)
-		throw emu_fatalerror("PC-6001SR in Mk-2 compatibility mode not yet supported!");
+		throw emu_fatalerror("PC-6601SR in Mk-2 compatibility mode not yet supported!");
 }
 
-void pc6001mk2sr_state::sr_vram_bank_w(uint8_t data)
+void pc6001mk2sr_state::sr_vram_bank_w(u8 data)
 {
 	m_video_base = &m_ram[(data & 0x0f) * 0x1000];
 
 //	set_videoram_bank(0x70000 + ((data & 0x0f)*0x1000));
 }
 
-void pc6001mk2sr_state::sr_system_latch_w(uint8_t data)
+void pc6001mk2sr_state::sr_system_latch_w(u8 data)
 {
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;
@@ -919,7 +926,7 @@ void pc6001mk2sr_state::sr_system_latch_w(uint8_t data)
 	//printf("%02x B0\n",data);
 }
 
-void pc6001mk2sr_state::necsr_ppi8255_w(offs_t offset, uint8_t data)
+void pc6001mk2sr_state::necsr_ppi8255_w(offs_t offset, u8 data)
 {
 	if (offset==3)
 	{
@@ -991,8 +998,10 @@ void pc6001mk2sr_state::sr_banked_map(address_map &map)
 
 	// exram0
 	map(0x20000, 0x2ffff).ram();
-	// exrom0 / 1
-//	map(0xb0000, 0xcffff).rom();
+	// exrom0
+	map(0xb4000, 0xb7fff).r(m_cart, FUNC(generic_slot_device::read_rom));
+	// exrom1
+//	map(0xc0000, 0xcffff).rom();
 	// cgrom 1
 	map(0xd0000, 0xd3fff).rom().region("cgrom", 0);
 	// sysrom 1 / 2
@@ -1027,6 +1036,9 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 
 	map(0xc8, 0xc8).w(FUNC(pc6001mk2sr_state::sr_mode_w));
 	map(0xc9, 0xc9).w(FUNC(pc6001mk2sr_state::sr_vram_bank_w));
+	// TODO: confirm readback
+	map(0xca, 0xcb).ram().share("sr_scrollx");
+	map(0xcc, 0xcc).ram().share("sr_scrolly");
 	map(0xce, 0xce).w(FUNC(pc6001mk2sr_state::sr_bitmap_yoffs_w));
 	map(0xcf, 0xcf).w(FUNC(pc6001mk2sr_state::sr_bitmap_xoffs_w));
 

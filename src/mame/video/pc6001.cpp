@@ -553,7 +553,13 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	else
 	{
 		//4bpp bitmap mode
-		// TODO: scrolling, I/O ports 0xca-0xcb (X) and 0xcc (Y)
+		const u32 scroll_x = (m_sr_scrollx[0]) + (m_sr_scrollx[1] << 8);
+		const u32 scroll_y = m_sr_scrolly[0];
+		const int x_pitch = 320;
+		const int y_pitch = 204;
+
+		//popmessage("%04x %02x", scroll_x, scroll_y);
+
 		for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -562,7 +568,11 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 				// The Jp emulators maps this for the rightmost X > 256, but it doesn't seem to be the case?
 //              vram_addr = 0x1a00 + (x-256)+y*64;
-				vram_addr = (x & 0xfff) + y * 320;
+
+				// TODO: scrolling is preliminary, based off how Pakuridius sets VRAM and scroll regs
+				// It seems to wraparound at 320x204
+				// Title screen scrolling usage is quite jerky, but it sorta makes sense on gameplay ...
+				vram_addr = ((x + scroll_x) % x_pitch) + ((y + scroll_y) % y_pitch) * x_pitch;
 
 				// wants RGB -> BRG rotation
 				// (is it using a different palette bank?)

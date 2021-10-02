@@ -297,6 +297,8 @@ public:
 		, m_sr_bank(*this, "sr_bank_%u", 1U)
 		, m_sr_irq_vectors(*this, "irq_vectors")
 //		, m_gvram_view(*this, "gvram_view")
+		, m_sr_scrollx(*this, "sr_scrollx")
+		, m_sr_scrolly(*this, "sr_scrolly")
 		, m_ym(*this, "ymsnd")
 	{ }
 
@@ -315,30 +317,32 @@ protected:
 
 private:
 	required_device_array<address_map_bank_device, 16> m_sr_bank;
-	required_shared_ptr<uint8_t> m_sr_irq_vectors;
+	required_shared_ptr<u8> m_sr_irq_vectors;
+	required_shared_ptr<u8> m_sr_scrollx;
+	required_shared_ptr<u8> m_sr_scrolly;
 	required_device<ym2203_device> m_ym;
 
-	uint8_t m_sr_bank_reg[16];
+	u8 m_sr_bank_reg[16];
 	bool m_sr_text_mode;
-	uint8_t m_sr_text_rows;
-	std::unique_ptr<uint8_t []> m_gvram;
-	uint8_t m_bitmap_yoffs, m_bitmap_xoffs;
+	u8 m_sr_text_rows;
+	std::unique_ptr<u8 []> m_gvram;
+	u8 m_bitmap_yoffs, m_bitmap_xoffs;
 	u8 m_width80;
 
 //	memory_view m_gvram_view;
 
 	virtual u8 hw_rev_r();
-	uint8_t sr_bank_reg_r(offs_t offset);
-	void sr_bank_reg_w(offs_t offset, uint8_t data);
+	u8 sr_bank_reg_r(offs_t offset);
+	void sr_bank_reg_w(offs_t offset, u8 data);
 
-	void sr_mode_w(uint8_t data);
-	void sr_vram_bank_w(uint8_t data);
-	void sr_system_latch_w(uint8_t data);
-	void necsr_ppi8255_w(offs_t offset, uint8_t data);
+	void sr_mode_w(u8 data);
+	void sr_vram_bank_w(u8 data);
+	void sr_system_latch_w(u8 data);
+	void necsr_ppi8255_w(offs_t offset, u8 data);
 
 	virtual void refresh_crtc_params() override;
-	void sr_bitmap_yoffs_w(uint8_t data);
-	void sr_bitmap_xoffs_w(uint8_t data);
+	void sr_bitmap_yoffs_w(u8 data);
+	void sr_bitmap_xoffs_w(u8 data);
 	void refresh_gvram_access(bool is_write);
 	u8 work_ram_r(offs_t offset);
 	void work_ram_w(offs_t offset, u8 data);
