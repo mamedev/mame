@@ -144,4 +144,16 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- White screen, pings AY8910 registers with custom writes -->
+	<software name="touchpan" supported="no">
+		<description>Touch Panel Utility</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="[Utility] Touch Panel (ROM cart).bin" size="4096" crc="50a31175" sha1="9c18b6fad8acdd438d63b144a21c4405e7ae8f15"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
