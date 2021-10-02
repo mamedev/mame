@@ -63432,7 +63432,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="flyingsb" cloneof="menaceb">
-		<description>Flying Superboy (Korea)</description>
+		<description>Nar-ara Superboy (Korea)</description>
 		<year>199?</year>
 		<publisher>Haitai</publisher>
 		<info name="alt_title" value="날아라 슈퍼보이"/>

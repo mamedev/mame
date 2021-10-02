@@ -17,12 +17,49 @@
 
 #include "emu.h"
 #include "mboardd.h"
+
+#include "cpu/m6800/m6801.h"
+#include "sound/ay8910.h"
+
 #include "speaker.h"
+
+
+namespace {
 
 ROM_START(mboardd)
 	ROM_REGION(0x800, "mbcpu", 0)
 	ROM_LOAD("mockingboard d rom.bin", 0x000000, 0x000800, CRC(277b1813) SHA1(e8d20f4b59fe867ff76434d35a14d2cbdc8533e3))
 ROM_END
+
+class mockingboard_d_device : public device_t, public device_rs232_port_interface
+{
+public:
+	mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
+
+	required_device<m6803_cpu_device> m_cpu;
+	required_device<ay8913_device> m_ay1;
+	required_device<ay8913_device> m_ay2;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	u8 p2_r() { return m_rx_state<<3; };
+	void p1_w(u8 data);
+
+	void ser_tx_w(int state) { output_rxd(state); }
+
+	void c000_w(u8 data) { m_c000_latch = data; };
+
+	void m6803_mem(address_map &map);
+	int m_rx_state;
+	u8 m_c000_latch;
+};
 
 mockingboard_d_device::mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SERIAL_MOCKINGBOARD_D, tag, owner, clock)
@@ -102,4 +139,7 @@ void mockingboard_d_device::p1_w(u8 data)
 	}
 }
 
-DEFINE_DEVICE_TYPE(SERIAL_MOCKINGBOARD_D, mockingboard_d_device, "mockingboardd", "Sweet Micro Systems Mockingboard D")
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(SERIAL_MOCKINGBOARD_D, device_rs232_port_interface, mockingboard_d_device, "mockingboardd", "Sweet Micro Systems Mockingboard D")

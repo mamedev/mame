@@ -191,7 +191,7 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 					LOG("redirecting to %p\n", func);
 					continue;
 				}
-				if  ((0x40 == func[5]) && (0x48 == func[7]) && (0xff == func[8]) && (0xe0 == func[9]))
+				else if  ((0x40 == func[5]) && (0x48 == func[7]) && (0xff == func[8]) && (0xe0 == func[9]))
 				{
 					// 8-bit displacement
 					LOG("Found virtual member function thunk at %p ", func);
