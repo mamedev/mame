@@ -109,7 +109,7 @@ protected:
 	void default_cassette_hack_reset();
 	void default_keyboard_hle_reset();
 	void irq_reset(u8 timer_default_setting);
-	
+
 	virtual void video_start() override;
 
 	void pc6001_map(address_map &map);
@@ -296,7 +296,7 @@ public:
 		: pc6601_state(mconfig, type, tag)
 		, m_sr_bank(*this, "sr_bank_%u", 1U)
 		, m_sr_irq_vectors(*this, "irq_vectors")
-//		, m_gvram_view(*this, "gvram_view")
+//      , m_gvram_view(*this, "gvram_view")
 		, m_sr_scrollx(*this, "sr_scrollx")
 		, m_sr_scrolly(*this, "sr_scrolly")
 		, m_ym(*this, "ymsnd")
@@ -329,7 +329,7 @@ private:
 	u8 m_bitmap_yoffs, m_bitmap_xoffs;
 	u8 m_width80;
 
-//	memory_view m_gvram_view;
+//  memory_view m_gvram_view;
 
 	virtual u8 hw_rev_r();
 	u8 sr_bank_reg_r(offs_t offset);

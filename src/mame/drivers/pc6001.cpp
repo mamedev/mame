@@ -8,28 +8,28 @@
 
     TODO:
     - Move MCU HLE simulation in a device or even make an handcrafted LLE version
-	  (assuming we'll never get the MCS48 dump). Additionally remove the 8255 hacks;
-	- Proper support for .cas/.wav/.p6/.p6t file formats used by the cassette interface;
-	- Make FDC to actually load images, also fix .dsk identification;
+      (assuming we'll never get the MCS48 dump). Additionally remove the 8255 hacks;
+    - Proper support for .cas/.wav/.p6/.p6t file formats used by the cassette interface;
+    - Make FDC to actually load images, also fix .dsk identification;
     - Confirm irq model daisy chain behaviour, and add missing irqs and features
-	  (namely the irq dispatch for SR mode should really honor I/O $fb and fallback to legacy
-	   behaviour if masked);
+      (namely the irq dispatch for SR mode should really honor I/O $fb and fallback to legacy
+       behaviour if masked);
     - Several games are decidedly too fast, down to missing waitstates, no screen raw
-	  parameters, crtkill signal and bus request;
-	- PC-6001mkII: refactor memory model to use address_map_bank_device;
-	- PC-6001mkII: confirm optional FDC used mapped at 0xd0-0xd3
-	  (PC-6031? It looks like a 5'25 single drive with 8255 protocol, presumably earlier revision
-	  of PC-80S31 with no dump available);
+      parameters, crtkill signal and bus request;
+    - PC-6001mkII: refactor memory model to use address_map_bank_device;
+    - PC-6001mkII: confirm optional FDC used mapped at 0xd0-0xd3
+      (PC-6031? It looks like a 5'25 single drive with 8255 protocol, presumably earlier revision
+      of PC-80S31 with no dump available);
     - PC-6601: current regression caused by an internal FDC sense interrupt status that expects a
-	  DIO high that never occurs;
+      DIO high that never occurs;
     - PC-6601: mon r-0 type games doesn't seem to work at all on this system?
-	- PC-6001SR: Implement MK-2 compatibility mode via view handler(s)
-	  (it changes the memory map to behave like the older versions);
+    - PC-6001SR: Implement MK-2 compatibility mode via view handler(s)
+      (it changes the memory map to behave like the older versions);
     - Merge PC-6001 video emulation with MC6847 (is it really one or rather a M5C6847P-1?);
-	- Pinpoint what VDG supersets PC-6001mkII and SR models really uses;
+    - Pinpoint what VDG supersets PC-6001mkII and SR models really uses;
     - upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
       Chrith game is a good test case, it's supposed to talk before title screen;
-	- Video Telopper (superimposer) & TV tuner functions for later machines;
+    - Video Telopper (superimposer) & TV tuner functions for later machines;
 
     TODO (game specific):
     - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
@@ -55,8 +55,8 @@
     - Pac-Man / Tiny Xevious 2: gameplay is too fast (unrelated with timer irq);
     - Salad no Kunino Tomato-Hime: can't start a play;
     - Space Harrier: very sensitive with sub irq triggers, keyboard joy triggers doesn't work
-	  properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes 
-	  MAME;
+      properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes
+      MAME;
     - The Black Onyx: dies when it attempts to save the character, that obviously means saving
        on the tape;
     - Yakyukyo / Punchball Mario: waits for an irq (fixed, wrong timer enable behaviour);
@@ -680,8 +680,8 @@ inline u8 pc6001_state::get_timer_base_divider()
 
 inline u8 pc6001mk2sr_state::get_timer_base_divider()
 {
-//	if (sr_mode == false)
-//		return pc6001mk2_state::get_timer_base_divider();
+//  if (sr_mode == false)
+//      return pc6001mk2_state::get_timer_base_divider();
 	return 0x80;
 }
 
@@ -854,7 +854,7 @@ void pc6001mk2sr_state::sr_bitmap_xoffs_w(u8 data)
 
 u8 pc6001mk2sr_state::work_ram_r(offs_t offset)
 {
-//	if (m_sr_text_mode == false && (offset & 0xe000) == 0) && m_sr_mode)
+//  if (m_sr_text_mode == false && (offset & 0xe000) == 0) && m_sr_mode)
 	if (m_sr_text_mode == false && (offset & 0xe000) == 0)
 		return sr_gvram_r(offset);
 
@@ -863,7 +863,7 @@ u8 pc6001mk2sr_state::work_ram_r(offs_t offset)
 
 void pc6001mk2sr_state::work_ram_w(offs_t offset, u8 data)
 {
-//	if (m_sr_text_mode == false && (offset & 0xe000) == 0) && m_sr_mode)
+//  if (m_sr_text_mode == false && (offset & 0xe000) == 0) && m_sr_mode)
 	if (m_sr_text_mode == false && (offset & 0xe000) == 0)
 	{
 		sr_gvram_w(offset, data);
@@ -902,15 +902,15 @@ void pc6001mk2sr_state::sr_mode_w(u8 data)
 	m_sr_text_mode = bool(BIT(data, 3));
 	// in theory we need a view,
 	// in practice this approach doesn't work cause we can't mix views with address banks
-//	m_gvram_view.select(m_sr_text_mode == false);
+//  m_gvram_view.select(m_sr_text_mode == false);
 
 	m_sr_text_rows = data & 4 ? 20 : 25;
 	refresh_crtc_params();
 
 	// bit 1: bus request
 	// bit 4: VRAM bank select
-//	if (data & 0x10)
-//		popmessage("VRAM bank select enabled");
+//  if (data & 0x10)
+//      popmessage("VRAM bank select enabled");
 
 	if(data & 1)
 		throw emu_fatalerror("PC-6601SR in Mk-2 compatibility mode not yet supported!");
@@ -920,7 +920,7 @@ void pc6001mk2sr_state::sr_vram_bank_w(u8 data)
 {
 	m_video_base = &m_ram[(data & 0x0f) * 0x1000];
 
-//	set_videoram_bank(0x70000 + ((data & 0x0f)*0x1000));
+//  set_videoram_bank(0x70000 + ((data & 0x0f)*0x1000));
 }
 
 void pc6001mk2sr_state::sr_system_latch_w(u8 data)
@@ -1000,9 +1000,9 @@ void pc6001mk2sr_state::pc6001mk2sr_map(address_map &map)
 
 void pc6001mk2sr_state::sr_banked_map(address_map &map)
 {
-//	map(0x00000, 0x0ffff).view(m_gvram_view);
-//	m_gvram_view[0](0x0000, 0xffff).ram();
-//	m_gvram_view[1](0x0000, 0x1fff).rw(FUNC(pc6001mk2sr_state::sr_gvram_r), FUNC(pc6001mk2sr_state::sr_gvram_w));
+//  map(0x00000, 0x0ffff).view(m_gvram_view);
+//  m_gvram_view[0](0x0000, 0xffff).ram();
+//  m_gvram_view[1](0x0000, 0x1fff).rw(FUNC(pc6001mk2sr_state::sr_gvram_r), FUNC(pc6001mk2sr_state::sr_gvram_w));
 	map(0x00000, 0x0ffff).rw(FUNC(pc6001mk2sr_state::work_ram_r), FUNC(pc6001mk2sr_state::work_ram_w)).share("ram");
 
 	// exram0
@@ -1010,7 +1010,7 @@ void pc6001mk2sr_state::sr_banked_map(address_map &map)
 	// exrom0
 	map(0xb4000, 0xb7fff).r(m_cart, FUNC(generic_slot_device::read_rom));
 	// exrom1
-//	map(0xc0000, 0xcffff).rom();
+//  map(0xc0000, 0xcffff).rom();
 	// cgrom 1
 	map(0xd0000, 0xd3fff).rom().region("cgrom", 0);
 	// sysrom 1 / 2
@@ -1265,8 +1265,8 @@ u8 pc6001mk2_state::vrtc_ack()
 u8 pc6001mk2sr_state::vrtc_ack()
 {
 	// TODO: bit 0 of sr_mode_w
-//	if (sr_mode == false)
-//		return pc6001mk2_state::vrtc_ack();
+//  if (sr_mode == false)
+//      return pc6001mk2_state::vrtc_ack();
 
 	return m_sr_irq_vectors[VRTC_IRQ];
 }
@@ -1556,7 +1556,7 @@ void pc6001_state::machine_reset()
 
 void pc6001mk2_state::machine_reset()
 {
-//	pc6001_state::machine_reset();
+//  pc6001_state::machine_reset();
 	set_videoram_bank(0xc000 + 0x28000);
 
 	default_cartridge_reset();
@@ -1594,25 +1594,25 @@ void pc6001mk2_state::machine_reset()
 void pc6601_state::machine_start()
 {
 	pc6001mk2_state::machine_start();
-	
+
 	m_fdc->set_rate(250000);
 	m_floppy->get_device()->set_rpm(300);
 }
 
 void pc6001mk2sr_state::machine_reset()
 {
-//	pc6001_state::machine_reset();
+//  pc6001_state::machine_reset();
 	default_cassette_hack_reset();
-	
-//	set_videoram_bank(0x70000);
+
+//  set_videoram_bank(0x70000);
 	m_video_base = &m_ram[0];
 
 	default_cartridge_reset();
 	// TODO: checkout where cart actually maps in SR model
 	// should be mirrored into the EXROM regions?
 	// hard to tell without an actual SR cart dump
-//	std::string region_tag;
-//	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+//  std::string region_tag;
+//  m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	default_cassette_hack_reset();
 	irq_reset(0x7f);
 	default_keyboard_hle_reset();
@@ -1625,7 +1625,7 @@ void pc6001mk2sr_state::machine_reset()
 	/* set default bankswitch */
 	{
 		// TODO: confirm this arrangement
-		u8 default_banks[16] = { 
+		u8 default_banks[16] = {
 			// read default:
 			// 0x0000 - 0x3fff sysrom 1 0x8000 - 0xbfff
 			// 0x4000 - 0x5fff exrom 1 0x0000 - 0x1fff
@@ -1772,11 +1772,11 @@ void pc6601_state::pc6601_fdc_config(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	FLOPPY_CONNECTOR(config, m_floppy, pc6601_floppies, "35ssdd", pc6601_state::floppy_formats).enable_sound(true);
 
-	// TODO: slotify external I/F 
+	// TODO: slotify external I/F
 	// PC-6031 mini disk unit (single 5'25 2D drive)
 	PC80S31(config, m_pc80s31, XTAL(4'000'000));
 	config.set_perfect_quantum(m_maincpu);
-//	config.set_perfect_quantum("pc80s31:fdc_cpu");
+//  config.set_perfect_quantum("pc80s31:fdc_cpu");
 }
 
 void pc6601_state::pc6601(machine_config &config)
@@ -1789,7 +1789,7 @@ void pc6601_state::pc6601(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc6601_state::pc6601_io);
 //  m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6601_state::irq_callback));
-	
+
 	pc6601_fdc_config(config);
 }
 
