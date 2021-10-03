@@ -43,6 +43,9 @@ protected:
 	int m_count;
 };
 
+
+// ======================> nes_sorom_device
+
 class nes_sorom_device : public nes_sxrom_device
 {
 public:
@@ -54,8 +57,22 @@ public:
 };
 
 
+// ======================> nes_szrom_device
+
+class nes_szrom_device : public nes_sxrom_device
+{
+public:
+	// construction/destruction
+	nes_szrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(NES_SXROM, nes_sxrom_device)
 DECLARE_DEVICE_TYPE(NES_SOROM, nes_sorom_device)
+DECLARE_DEVICE_TYPE(NES_SZROM, nes_szrom_device)
 
 #endif // MAME_BUS_NES_MMC1_H

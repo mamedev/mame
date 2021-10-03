@@ -44502,7 +44502,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<info name="release" value="19910821"/>
 		<info name="alt_title" value="A列車で行こう"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom" />
+			<feature name="slot" value="szrom" />
 			<feature name="pcb_model" value="HVC-SZROM-01" />
 			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
