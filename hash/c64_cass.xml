@@ -1904,7 +1904,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="906166">
-				<rom name="bigfoot.tap" size="906166" crc="bcd74d9a" sha1="cbe793fe4215a8491a401b88a414869c101b9f98"/>
+				<rom name="Bigfoot.tap" size="906166" crc="bcd74d9a" sha1="cbe793fe4215a8491a401b88a414869c101b9f98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1916,7 +1916,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="663080">
-				<rom name="btbarney.tap" size="663080" crc="6e02ccfb" sha1="613900ea51510046a1d28154a3f4c7df7a37be81"/>
+				<rom name="Bigtop_Barney.tap" size="663080" crc="6e02ccfb" sha1="613900ea51510046a1d28154a3f4c7df7a37be81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1940,7 +1940,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="596610">
-				<rom name="blacklam.tap" size="596610" crc="60e67c7f" sha1="175a973c8b4e9210e3361c9ba35efd8b6ae6a250"/>
+				<rom name="Black_Lamp.tap" size="596610" crc="60e67c7f" sha1="175a973c8b4e9210e3361c9ba35efd8b6ae6a250"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1953,14 +1953,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="362554">
-				<rom name="blktiger(a).tap" size="362554" crc="5421feea" sha1="1230f156671bf96ee7ae7ce58f676375e9952795"/>
+				<rom name="Black_Tiger_Side_1.tap" size="362554" crc="5421feea" sha1="1230f156671bf96ee7ae7ce58f676375e9952795"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="1430144">
-				<rom name="blktiger(b).tap" size="1430144" crc="ed755483" sha1="eb800461efb771041ffc79ad2a3f7cd0dd2ad90f"/>
+				<rom name="Black_Tiger_Side_2.tap" size="1430144" crc="ed755483" sha1="eb800461efb771041ffc79ad2a3f7cd0dd2ad90f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1996,7 +1996,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="594843">
-				<rom name="bloodbro.tap" size="594843" crc="2eb63d08" sha1="dfc17f42a04a13768949504fbfad4a391c70f494"/>
+				<rom name="Blood_Brothers.tap" size="594843" crc="2eb63d08" sha1="dfc17f42a04a13768949504fbfad4a391c70f494"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2020,13 +2020,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="275370">
-				<rom name="bluemax.tap" size="275370" crc="63b89717" sha1="3c6c74ced6fccda5d2d51bb0f59fca92d236297b"/>
+				<rom name="Blue_Max.tap" size="275370" crc="63b89717" sha1="3c6c74ced6fccda5d2d51bb0f59fca92d236297b"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="275370">
-				<rom name="bluemaxa.tap" size="275370" crc="9a0efcba" sha1="fd773d7d3949eafb5fedaefe9af016da27e396eb"/>
+				<rom name="Blue_Max_a1.tap" size="275370" crc="9a0efcba" sha1="fd773d7d3949eafb5fedaefe9af016da27e396eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2038,13 +2038,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="291673">
-				<rom name="bmax2001.tap" size="291673" crc="c74b1d70" sha1="b4a69ad20e73c3d0d086ed5ba87b4e2528206c62"/>
+				<rom name="Blue_Max_2001.tap" size="291673" crc="c74b1d70" sha1="b4a69ad20e73c3d0d086ed5ba87b4e2528206c62"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="291922">
-				<rom name="bmax2001a.tap" size="291922" crc="e7646b01" sha1="4b7fc773e2177236f3f32dbd1ab8424e11b9512f"/>
+				<rom name="Blue_Max_2001_a1.tap" size="291922" crc="e7646b01" sha1="4b7fc773e2177236f3f32dbd1ab8424e11b9512f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2074,13 +2074,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1055826">
-				<rom name="bluesbro.tap" size="1055826" crc="474fa7cd" sha1="50932ca5f0867210dc60fd42dbc5d67d3f24d4cb"/>
+				<rom name="Blues_Brothers,_The.tap" size="1055826" crc="474fa7cd" sha1="50932ca5f0867210dc60fd42dbc5d67d3f24d4cb"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="1055826">
-				<rom name="bluesbroa.tap" size="1055826" crc="ac7d129a" sha1="b24d6efaabe885704db1006f2aab892fed2155d9"/>
+				<rom name="Blues_Brothers,_The_a1.tap" size="1055826" crc="ac7d129a" sha1="b24d6efaabe885704db1006f2aab892fed2155d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2163,14 +2163,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: BMX Simulator 2 (Easy)"/>
 			<dataarea name="cass" size="850644">
-				<rom name="bmxsim2(a).tap" size="850644" crc="7bf73241" sha1="f1b38e7becc0f2e4d08af8ae1997dd446425d995"/>
+				<rom name="BMX_Simulator_2_Side_1_(Easy).tap" size="850644" crc="7bf73241" sha1="f1b38e7becc0f2e4d08af8ae1997dd446425d995"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: BMX Simulator 2 (Hard)"/>
 			<dataarea name="cass" size="856976">
-				<rom name="bmxsim2(b).tap" size="856976" crc="455df3c9" sha1="ef27aa7e353ff23f0777ab6d24bb9c900770f772"/>
+				<rom name="BMX_Simulator_2_Side_2_(Hard).tap" size="856976" crc="455df3c9" sha1="ef27aa7e353ff23f0777ab6d24bb9c900770f772"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2200,7 +2200,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="511778">
-				<rom name="bbearing.tap" size="511778" crc="767f6728" sha1="a692a001b1392f39c0256ca2d0d624cf6e3af87b"/>
+				<rom name="Bobby_Bearing.tap" size="511778" crc="767f6728" sha1="a692a001b1392f39c0256ca2d0d624cf6e3af87b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2213,14 +2213,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass1" size="1021004">
-				<rom name="theboggi(a).tap" size="1021004" crc="68f71906" sha1="556209a1f5721604014eef709d18502468e0932c"/>
+				<rom name="Boggit,_The-_Bored_Too_Side_1.tap" size="1021004" crc="68f71906" sha1="556209a1f5721604014eef709d18502468e0932c"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="805950">
-				<rom name="theboggi(b).tap" size="805950" crc="6b6bf72e" sha1="47d2d2c9e8ad2a4f8c40fd7e27b4b8117b49a57a"/>
+				<rom name="Boggit,_The-_Bored_Too_Side_2.tap" size="805950" crc="6b6bf72e" sha1="47d2d2c9e8ad2a4f8c40fd7e27b4b8117b49a57a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2264,7 +2264,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="565967">
-				<rom name="bombjacke.tap" size="565967" crc="d2969fd4" sha1="ec27b8a23557eef5f052c8fb5034ef7915d6ff5b"/>
+				<rom name="Bomb_Jack.tap" size="565967" crc="d2969fd4" sha1="ec27b8a23557eef5f052c8fb5034ef7915d6ff5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2295,14 +2295,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Bomb Jack II"/>
 			<dataarea name="cass" size="719393">
-				<rom name="bombjack2e(a).tap" size="719393" crc="ab06e01b" sha1="d5369bec6c1b3efe0ba206212c2024b459bdfd10"/>
+				<rom name="Bomb_Jack_II_Side_1.tap" size="719393" crc="ab06e01b" sha1="d5369bec6c1b3efe0ba206212c2024b459bdfd10"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: Bomb Jack"/>
 			<dataarea name="cass" size="565967">
-				<rom name="bombjack2e(b).tap" size="565967" crc="8d45e10e" sha1="c53ade7e0363c690b1367858e45cb99a38d53987"/>
+				<rom name="Bomb_Jack_II_Side_2.tap" size="565967" crc="8d45e10e" sha1="c53ade7e0363c690b1367858e45cb99a38d53987"/>
 			</dataarea>
 		</part>
 	</software>
