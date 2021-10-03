@@ -137,22 +137,26 @@ private:
 	template <ioport_value Signal>
 	DECLARE_WRITE_LINE_MEMBER( signal_in )
 	{
-		m_signals[Signal] = state ? 1 : 0;
+		state = state ? 1 : 0;
+		if (m_signals[Signal] != state)
+		{
+			m_signals[Signal] = state;
 
-		if (Signal == m_sources[RXD]) output_rxd(m_signals[Signal] ^ m_invert[RXD]);
-		if (Signal == m_sources[DCD]) output_dcd(m_signals[Signal] ^ m_invert[DCD]);
-		if (Signal == m_sources[DSR]) output_dsr(m_signals[Signal] ^ m_invert[DSR]);
-		if (Signal == m_sources[RI])  output_ri(m_signals[Signal] ^ m_invert[RI]);
-		if (Signal == m_sources[SI])  output_si(m_signals[Signal] ^ m_invert[SI]);
-		if (Signal == m_sources[CTS]) output_cts(m_signals[Signal] ^ m_invert[CTS]);
-		if (Signal == m_sources[RXC]) output_rxc(m_signals[Signal] ^ m_invert[RXC]);
-		if (Signal == m_sources[TXC]) output_txc(m_signals[Signal] ^ m_invert[TXC]);
+			if (Signal == m_sources[RXD]) output_rxd(state ^ m_invert[RXD]);
+			if (Signal == m_sources[DCD]) output_dcd(state ^ m_invert[DCD]);
+			if (Signal == m_sources[DSR]) output_dsr(state ^ m_invert[DSR]);
+			if (Signal == m_sources[RI])  output_ri(state ^ m_invert[RI]);
+			if (Signal == m_sources[SI])  output_si(state ^ m_invert[SI]);
+			if (Signal == m_sources[CTS]) output_cts(state ^ m_invert[CTS]);
+			if (Signal == m_sources[RXC]) output_rxc(state ^ m_invert[RXC]);
+			if (Signal == m_sources[TXC]) output_txc(state ^ m_invert[TXC]);
 
-		if (Signal == m_sources[TXD])  m_dce_port->write_txd(m_signals[Signal] ^ m_invert[TXD]);
-		if (Signal == m_sources[DTR])  m_dce_port->write_dtr(m_signals[Signal] ^ m_invert[DTR]);
-		if (Signal == m_sources[RTS])  m_dce_port->write_rts(m_signals[Signal] ^ m_invert[RTS]);
-		if (Signal == m_sources[ETC])  m_dce_port->write_etc(m_signals[Signal] ^ m_invert[ETC]);
-		if (Signal == m_sources[SPDS]) m_dce_port->write_spds(m_signals[Signal] ^ m_invert[SPDS]);
+			if (Signal == m_sources[TXD])  m_dce_port->write_txd(state ^ m_invert[TXD]);
+			if (Signal == m_sources[DTR])  m_dce_port->write_dtr(state ^ m_invert[DTR]);
+			if (Signal == m_sources[RTS])  m_dce_port->write_rts(state ^ m_invert[RTS]);
+			if (Signal == m_sources[ETC])  m_dce_port->write_etc(state ^ m_invert[ETC]);
+			if (Signal == m_sources[SPDS]) m_dce_port->write_spds(state ^ m_invert[SPDS]);
+		}
 	}
 
 	required_device<rs232_port_device> m_dce_port;
