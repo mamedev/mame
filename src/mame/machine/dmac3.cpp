@@ -45,7 +45,7 @@ uint32_t dmac3_device::csr_r(DMAC3_Controller controller)
 uint32_t dmac3_device::intr_r(DMAC3_Controller controller)
 {
 	uint32_t val = m_controllers[controller].intr;
-	LOG("dmac3-%d intr_r: 0x%x\n", controller, val);
+	// LOG("dmac3-%d intr_r: 0x%x\n", controller, val);
 	return val;
 }
 uint32_t dmac3_device::length_r(DMAC3_Controller controller)
@@ -180,7 +180,7 @@ TIMER_CALLBACK_MEMBER(dmac3_device::irq_check)
 
 	if (m_irq != newIrq)
 	{
-		LOG("DMAC3 interrupt changed to %d!\n", newIrq);
+		//LOG("DMAC3 interrupt changed to %d!\n", newIrq);
 		m_irq = newIrq;
 		m_irq_handler(newIrq);
 	}
@@ -202,14 +202,14 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
 		{
 			// Device to memory
 			uint8_t data = m_dma_r[controller]();
-			LOG("dma_r data 0x%02x address 0x%08x count %d -> %d\n", data, address, m_controllers[controller].length, m_controllers[controller].length - 1);
+			// LOG("dma_r data 0x%02x address 0x%08x count %d -> %d\n", data, address, m_controllers[controller].length, m_controllers[controller].length - 1);
 			m_bus->write_byte(address, data);
 		}
 		else
 		{
 			// Memory to device
 			uint8_t data = m_bus->read_byte(address);
-			LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
+			// LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
 			m_dma_w[controller](data);
 		}
 

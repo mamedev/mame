@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "spifi3.h"
 
-//#define VERBOSE 1
+// #define VERBOSE 1
 #include "logmacro.h"
 
 #define DELAY_HACK // TODO:
@@ -349,7 +349,7 @@ void spifi3_device::fifoctrl_w(uint32_t data)
     if(spifi_reg.fifoctrl & FIFOC_RQOVRN) { LOG("fifoctrl.RQOVRN: w unimplemented"); } // likely RO - Whatever this is, it would cause NetBSD to panic
     if(spifi_reg.fifoctrl & FIFOC_CLREVEN)
     {
-        LOG("Clearing even FIFO of %d items\n", m_even_fifo.size());
+        // LOG("Clearing even FIFO of %d items\n", m_even_fifo.size());
         while (!m_even_fifo.empty())
         {
             m_even_fifo.pop();
@@ -357,7 +357,7 @@ void spifi3_device::fifoctrl_w(uint32_t data)
     }
     if(spifi_reg.fifoctrl & FIFOC_CLRODD)
     {
-        LOG("Clearing odd FIFO of %d items\n", m_odd_fifo.size());
+        // LOG("Clearing odd FIFO of %d items\n", m_odd_fifo.size());
         while (!m_odd_fifo.empty())
         {
             m_odd_fifo.pop();
@@ -369,12 +369,12 @@ void spifi3_device::fifoctrl_w(uint32_t data)
 
 void spifi3_device::clear_fifo()
 {
-    LOG("Clearing even FIFO of %d items\n", m_even_fifo.size());
+    // LOG("Clearing even FIFO of %d items\n", m_even_fifo.size());
     while (!m_even_fifo.empty())
     {
         m_even_fifo.pop();
     }
-    LOG("Clearing odd FIFO of %d items\n", m_odd_fifo.size());
+    // LOG("Clearing odd FIFO of %d items\n", m_odd_fifo.size());
     while (!m_odd_fifo.empty())
     {
         m_odd_fifo.pop();
@@ -542,10 +542,10 @@ void spifi3_device::check_irq()
 {
     // There are various ways interrupts can be triggered by the SPIFI - this method is a work in progress.
     bool irqState = (spifi_reg.intr & ~spifi_reg.imask) > 0; // ICOND plays a role here - need to determine how to make sure it is in sync
-    LOG("Checking IRQ state - is %d, going to %d\n", irq, irqState);
+    // LOG("Checking IRQ state - is %d, going to %d\n", irq, irqState);
     if (irq != irqState)
     {
-        LOG("Setting IRQ line to %d\n", irqState);
+        // LOG("Setting IRQ line to %d\n", irqState);
         irq = irqState;
         m_irq_handler(irq);
     }
@@ -578,7 +578,7 @@ void spifi3_device::check_drq()
 
     if (drq_state != drq)
     {
-        LOG("DRQ changed to %d!\n", drq_state);
+        // LOG("DRQ changed to %d!\n", drq_state);
         drq = drq_state;
         m_drq_handler(drq);
     }
@@ -610,7 +610,7 @@ void spifi3_device::send_cmd_byte()
         {
             fatalerror("Tried to send command past the end of cdb! Command_pos: %d", command_pos);
         }
-        LOG("Sending byte from cmbuf[%d].cdb[%d] = 0x%x\n", scsi_id, command_pos, spifi_reg.cmbuf[scsi_id].cdb[command_pos]);
+        // LOG("Sending byte from cmbuf[%d].cdb[%d] = 0x%x\n", scsi_id, command_pos, spifi_reg.cmbuf[scsi_id].cdb[command_pos]);
         scsi_bus->data_w(scsi_refid, spifi_reg.cmbuf[scsi_id].cdb[command_pos++]);
     }
     else
@@ -636,7 +636,7 @@ void spifi3_device::send_byte()
     if((state & STATE_MASK) != INIT_XFR_SEND_PAD && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE || command_length))
     {
         // Send next data from FIFO.
-        LOG("tcounter = %d\n", tcounter);
+        // LOG("tcounter = %d\n", tcounter);
         scsi_bus->data_w(scsi_refid, m_even_fifo.front());
         m_even_fifo.pop();
         check_drq();
@@ -654,7 +654,7 @@ void spifi3_device::send_byte()
 
 void spifi3_device::recv_byte()
 {
-    LOG("recv_byte started - state = %d.%d\n", state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
+    // LOG("recv_byte started - state = %d.%d\n", state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
     // Wait for valid input
     scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
     state = (state & STATE_MASK) | (RECV_WAIT_REQ_1 << SUB_SHIFT);
@@ -762,7 +762,7 @@ void spifi3_device::dma_w(uint8_t val)
 
 uint8_t spifi3_device::dma_r()
 {
-    LOG("dma_r called! Fifo count = %d, state = %d.%d, tcounter = %d\n", m_even_fifo.size(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, tcounter);
+    // LOG("dma_r called! Fifo count = %d, state = %d.%d, tcounter = %d\n", m_even_fifo.size(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, tcounter);
     uint8_t val = m_even_fifo.front();
     m_even_fifo.pop();
     decrement_tcounter();
@@ -1035,7 +1035,7 @@ void spifi3_device::step(bool timeout)
             if((state & STATE_MASK) != INIT_XFR_RECV_PAD)
             {
                 auto data = scsi_bus->data_r();
-                LOG("Got 0x%x! FIFO count: %d\n", data, m_even_fifo.size() + 1);
+                // LOG("Got 0x%x! FIFO count: %d\n", data, m_even_fifo.size() + 1);
                 m_even_fifo.push(data);
                 check_drq();
             }
@@ -1156,7 +1156,7 @@ void spifi3_device::step(bool timeout)
                 auto newPhase = (ctrl & S_PHASE_MASK);
                 if((spifi_reg.cmlen & CML_ACOM_EN) && newPhase == S_PHASE_COMMAND)
                 {
-                    LOG("Select complete, autocmd enabled so moving on to XFR phase!\n");
+                    // LOG("Select complete, autocmd enabled so moving on to XFR phase!\n");
                     scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // TODO: Deassert ACK - just trying this out
                     state = INIT_XFR;
                     xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
@@ -1164,7 +1164,7 @@ void spifi3_device::step(bool timeout)
                 }
                 else if ((spifi_reg.cmlen & CML_AMSG_EN) && (newPhase == S_PHASE_MSG_OUT || newPhase == S_PHASE_MSG_IN))
                 {
-                    LOG("Select complete, automsg enabled so moving on to XFR phase!\n");
+                    // LOG("Select complete, automsg enabled so moving on to XFR phase!\n");
                     state = INIT_XFR;
                     dma_command = true;
                     dma_dir = DMA_OUT; // fake
@@ -1268,7 +1268,7 @@ void spifi3_device::step(bool timeout)
                     // can't send if the fifo is empty and we are sending data
                     if (m_even_fifo.empty() && xfr_phase == S_PHASE_DATA_OUT)
                     {
-                        LOG("INIT_XFR: no data! Deferring until we have some.\n");
+                        // LOG("INIT_XFR: no data! Deferring until we have some.\n");
                         xfrDataSource = FIFO;
                         break;
                     }
@@ -1281,13 +1281,13 @@ void spifi3_device::step(bool timeout)
 
                     if(xfr_phase == S_PHASE_DATA_OUT)
                     {
-                        LOG("Data out phase, using FIFO.\n");
+                        // LOG("Data out phase, using FIFO.\n");
                         xfrDataSource = FIFO;
                         send_byte();
                     }
                     else // send from cdb buffer on command or message
                     {
-                        LOG("Message or command out phase, using cdb.\n");
+                        // LOG("Message or command out phase, using cdb.\n");
                         xfrDataSource = COMMAND_BUFFER;
                         send_cmd_byte();
                     }
@@ -1341,7 +1341,7 @@ void spifi3_device::step(bool timeout)
             // check for command complete
             if (xfrDataSource == FIFO && ((dma_command && transfer_count_zero() && (dma_dir == DMA_IN || m_even_fifo.empty()))))
             {
-                LOG("DMA Data transfer complete\n");
+                // LOG("DMA Data transfer complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
 
                 auto newPhase = (ctrl & S_PHASE_MASK);
@@ -1460,7 +1460,7 @@ void spifi3_device::step(bool timeout)
                 }
                 else
                 {
-                    LOG("Continuing transfer\n");
+                    // LOG("Continuing transfer\n");
                     state = INIT_XFR;
                 }
             }
@@ -1500,7 +1500,7 @@ void spifi3_device::step(bool timeout)
                 LOG("Data left to transfer, not marking function complete.\n");
                 break;
             }
-            LOG("Clearing ACK and completing function because automsg is enabled!\n");
+            // LOG("Clearing ACK and completing function because automsg is enabled!\n");
             scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
             function_complete();
 

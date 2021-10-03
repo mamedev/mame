@@ -356,6 +356,7 @@ void news_r4k_state::machine_common(machine_config &config)
     CXD8452AQ(config, m_sonic3, 0);
     m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
     m_sonic3->irq_out().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>));
+    m_sonic3->set_bus(m_cpu, 0);
 
     DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
     m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
@@ -490,7 +491,7 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
                           NAME([this](offs_t offset, uint8_t data)
                               {
-                                LOG("Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+                                // LOG("Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
                                 m_net_ram->write(offset, data);
                               }));// dedicated network RAM
     // DMAC3 DMA Controller
@@ -512,7 +513,7 @@ void news_r4k_state::cpu_map(address_map &map)
     // TODO: DSC-39 xb framebuffer/video card (0x14900000)
     map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset)
                                          {
-                                             LOG("xb read attempted, offset 0x%x\n", offset);
+                                             // LOG("xb read attempted, offset 0x%x\n", offset);
                                              return 0xff;
                                          }));
 
