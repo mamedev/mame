@@ -745,7 +745,7 @@ void ti85_state::ti84pce(machine_config &config)
 {
 	ti84pse(config);
 
-	EZ80(config.replace(), m_maincpu, 25000000);
+	EZ80(config.replace(), m_maincpu, 15000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti83p_asic_mem);
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83pse_io);
 }
