@@ -666,49 +666,26 @@ void nes_cart_slot_device::call_load_pcb()
 			m_cart->set_n163_vol(n163_get_submapper_num(get_feature("n163-vol")));
 	}
 
-	if (m_pcb_id == BMC_EL860947C)
+	// get outer PRG bank size for multicart boards that use this feature
+	if (m_pcb_id == BMC_EL860947C || m_pcb_id == BMC_RESETTXROM)
 	{
 		const char *size = get_feature("outer-prg-size");
-		if (size != nullptr)
-		{
-			if (!strcmp(size, "128K"))
-				m_cart->set_outer_prg_size(128);
-			else if (!strcmp(size, "256K"))
-				m_cart->set_outer_prg_size(256);
-			else
-				fatalerror("Unexpected outer-prg-size: %s\n", size);
-		}
-		else
-			fatalerror("EL86XC must define outer-prg-size!\n");
+		int kbyte = 128;
+
+		if (size == nullptr || sscanf(size, "%u%*c", &kbyte) != 1 || kbyte & (kbyte - 1) || kbyte <= 0)
+			logerror("Unexpected outer-prg-size: %s\n", size ? size : "(nullptr)");
+		m_cart->set_outer_prg_size(kbyte);
 	}
 
+	// get outer CHR bank size for multicart boards that use this feature
 	if (m_pcb_id == BMC_RESETTXROM)
 	{
-		const char *size = get_feature("outer-prg-size");
-		if (size != nullptr)
-		{
-			if (!strcmp(size, "128K"))
-				m_cart->set_outer_prg_size(128);
-			else if (!strcmp(size, "256K"))
-				m_cart->set_outer_prg_size(256);
-			else
-				fatalerror("Unexpected outer-prg-size: %s\n", size);
-		}
-		else
-			fatalerror("RESET-TXROM must define outer-prg-size!\n");
+		const char *size = get_feature("outer-chr-size");
+		int kbyte = 128;
 
-		size = get_feature("outer-chr-size");
-		if (size != nullptr)
-		{
-			if (!strcmp(size, "128K"))
-				m_cart->set_outer_chr_size(128);
-			else if (!strcmp(size, "256K"))
-				m_cart->set_outer_chr_size(256);
-			else
-				fatalerror("Unexpected outer-chr-size: %s\n", size);
-		}
-		else
-			fatalerror("RESET-TXROM must define outer-chr-size!\n");
+		if (size == nullptr || sscanf(size, "%u%*c", &kbyte) != 1 || kbyte & (kbyte - 1) || kbyte <= 0)
+			logerror("Unexpected outer-chr-size: %s\n", size ? size : "(nullptr)");
+		m_cart->set_outer_chr_size(kbyte);
 	}
 
 

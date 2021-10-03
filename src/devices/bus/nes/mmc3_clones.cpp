@@ -661,8 +661,8 @@ void nes_resettxrom_device::pcb_reset()
 	mmc3_common_initialize((m_outer_prg_size >> 3) - 1, m_outer_chr_size - 1, 0);
 
 	m_count = (m_count + 1) & 3;
-	m_prg_base = m_count << (m_outer_prg_size == 128 ? 4 : 5);  // << std::countr_zero(m_outer_prg_size) - 3; in C++20
-	m_chr_base = m_count << (m_outer_chr_size == 128 ? 7 : 8);  // << std::countr_zero(m_outer_chr_size); in C++20
+	m_prg_base = m_count << (31 - count_leading_zeros_32(m_outer_prg_size) - 3);  // << std::countr_zero(m_outer_prg_size) - 3; in C++20
+	m_chr_base = m_count << (31 - count_leading_zeros_32(m_outer_chr_size));  // << std::countr_zero(m_outer_chr_size); in C++20
 	set_prg(m_prg_base, m_prg_mask);
 	set_chr(m_chr_source, m_chr_base, m_chr_mask);
 }
@@ -2760,7 +2760,7 @@ void nes_bmc_el86xc_device::write_m(offs_t offset, u8 data)
 	if (!(offset & 0x1000))    // game only banks via 0x6000, this mask is a guess
 	{
 		int outer = bitswap<3>(data, 5, 2, 1);
-		m_prg_base = outer << (m_outer_prg_size == 128 ? 4 : 5);  // << std::countr_zero(m_outer_prg_size) - 3; in C++20
+		m_prg_base = outer << (31 - count_leading_zeros_32(m_outer_prg_size) - 3);  // << std::countr_zero(m_outer_prg_size) - 3; in C++20
 		set_prg(m_prg_base, m_prg_mask);
 		m_chr_base = outer << 7;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
