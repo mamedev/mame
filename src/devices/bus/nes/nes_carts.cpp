@@ -460,6 +460,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("cufrom",           NES_CUFROM);
 	device.option_add_internal("unrom512",         NES_UNROM512);
 	device.option_add_internal("2a03pur",          NES_2A03PURITANS);
+	device.option_add_internal("dpcmcart",         NES_DPCMCART);
 // other unsupported...
 	device.option_add_internal("unl_dance",        NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED
