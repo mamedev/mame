@@ -7,20 +7,29 @@
     driver by Angelo Salese
 
     TODO:
-    - Remove 8255 kludge;
-    - Proper tape loading, .cas format images are ADC'ed therefore needs a .wav conversion
-      strategy;
-    - Move MCU HLE simulation in a device (assuming we'll never get the MCS48 dump);
-    - Sometimes irqs aren't catched up, how the system actually handles daisy chain?
-    - Refactor memory maps to use view models;
+    - Move MCU HLE simulation in a device or even make an handcrafted LLE version
+	  (assuming we'll never get the MCS48 dump). Additionally remove the 8255 hacks;
+	- Proper support for .cas/.wav/.p6/.p6t file formats used by the cassette interface;
+	- Make FDC to actually load images, also fix .dsk identification;
+    - Confirm irq model daisy chain behaviour, and add missing irqs and features
+	  (namely the irq dispatch for SR mode should really honor I/O $fb and fallback to legacy
+	   behaviour if masked);
+    - Several games are decidedly too fast, down to missing waitstates, no screen raw
+	  parameters, crtkill signal and bus request;
+	- PC-6001mkII: refactor memory model to use address_map_bank_device;
+	- PC-6001mkII: confirm optional FDC used mapped at 0xd0-0xd3
+	  (PC-6031? It looks like a 5'25 single drive with 8255 protocol, presumably earlier revision
+	  of PC-80S31 with no dump available);
+    - PC-6601: current regression caused by an internal FDC sense interrupt status that expects a
+	  DIO high that never occurs;
     - PC-6601: mon r-0 type games doesn't seem to work at all on this system?
-    - PC-6001SR: Implement MK-2 compatibility mode (it changes the memory map to behave like
-      the older versions)
-    - Hookup MC6847 for vanilla PC-6001 and fix video bugs for that device;
+	- PC-6001SR: Implement MK-2 compatibility mode via view handler(s)
+	  (it changes the memory map to behave like the older versions);
+    - Merge PC-6001 video emulation with MC6847 (is it really one or rather a M5C6847P-1?);
+	- Pinpoint what VDG supersets PC-6001mkII and SR models really uses;
     - upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
       Chrith game is a good test case, it's supposed to talk before title screen;
-    - Identify and hook-up the FDC device, apparently PC-6001 and PC-6601 doesn't even use the same
-      thing;
+	- Video Telopper (superimposer) & TV tuner functions for later machines;
 
     TODO (game specific):
     - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
