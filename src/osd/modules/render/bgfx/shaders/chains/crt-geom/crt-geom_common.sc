@@ -34,6 +34,7 @@ uniform vec4 aperture_strength;
 uniform vec4 aperture_brightboost;
 
 uniform vec4 CRTgamma;
+uniform vec4 monitorsRGB;
 uniform vec4 monitorgamma;
 
 uniform vec4 overscan;
@@ -182,4 +183,21 @@ vec3 apply_shadow_mask(vec2 coord, vec3 col)
   // colour of bright mask pixels
   vec3 chi = vec3_splat(ifbright*aperture_average) * col - vec3_splat(ifbright - 1.0) * clow;
   return mix(clow,chi,mask.rgb); // mask texture selects dark vs bright
+}
+
+vec3 linear_to_sRGB(vec3 col)
+{
+  // only applies the gamma ramp; does not adjust the primaries
+  vec3 linear_ramp = vec3(lessThan(col, vec3_splat(0.0031308)));
+  vec3 clin = col * vec3_splat(12.92);
+  vec3 cpow = pow(col, vec3_splat(1.0/2.4)) * vec3_splat(1.055) - vec3_splat(0.055);
+  return mix(cpow, clin, linear_ramp);
+}
+
+vec3 linear_to_output(vec3 col)
+{
+  if (monitorsRGB.x > 0.5)
+    return linear_to_sRGB(col);
+  else
+    return pow(col, vec3_splat(1.0 / monitorgamma.x));
 }

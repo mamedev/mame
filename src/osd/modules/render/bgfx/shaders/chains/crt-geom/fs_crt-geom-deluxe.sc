@@ -137,7 +137,7 @@ void main()
   vec3 cout = apply_shadow_mask(v_texCoord.xy, mul_res);
 
   // Convert the image gamma for display on our output device.
-  cout = pow(cout, vec3_splat(1.0 / monitorgamma.x));
+  cout = linear_to_output(cout);
 
   gl_FragColor = vec4(cout,1.0);
 }
