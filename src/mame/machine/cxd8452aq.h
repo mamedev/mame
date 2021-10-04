@@ -31,6 +31,8 @@ public:
 
     void map(address_map &map);
 
+    template <typename... T> void set_apbus_address_translator(T &&... args) { apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
+
     // CPU-side accessors for the WSC-SONIC3 registers
     uint32_t cpu_r(offs_t offset, uint32_t mem_mask) { return space(1).read_dword(offset, mem_mask); }
 	void cpu_w(offs_t offset, uint32_t data, uint32_t mem_mask) { space(1).write_dword(offset, data, mem_mask); }
@@ -80,32 +82,11 @@ protected:
     TIMER_CALLBACK_MEMBER(irq_check);
 
     // APbus DMA
-    // TODO: This is copy+paste from DMAC3 for testing - will consolidate later
-    const int DMA_TIMER = 1; // No idea what this should be - maybe it would run at the APbus frequency?
+    device_delegate<uint32_t(uint32_t)> apbus_virt_to_phys_callback;
+    const int DMA_TIMER = 1;      // No idea what this should be - maybe it would run at the APbus frequency?
     required_address_space m_bus; // direct bus access for DMA
     emu_timer *m_dma_check;
     TIMER_CALLBACK_MEMBER(dma_check);
-    uint32_t apbus_virt_to_phys(uint32_t v_address);
-    const uint32_t BASE_MAP_ADDRESS = 0x14c20000;
-
-    // Page table entry structure
-    struct apbus_pte
-    {
-        uint32_t pad; // unused??
-        bool valid;   // Entry is OK to use
-        bool coherent;  // DMA coherence enabled (don't care for emulation??)
-        uint32_t pad2;
-        uint32_t pfnum; // Page number (upper 20 bits of physical address)
-    };
-
-    enum APBUS_PTE_MASKS
-    {
-        ENTRY_VALID = 0x80000000,
-        ENTRY_COHERENT = 0x40000000,
-        ENTRY_PAD = 0x3FF00000,
-        ENTRY_PAD_SHIFT = 20,
-        ENTRY_PFNUM = 0xFFFFF
-    };
 
     struct WscSonicRegisters
 	{
@@ -126,7 +107,7 @@ protected:
     // Register-related constants
     // SONIC register
     const uint32_t INT_EN_MASK = 0x7f00;
-    const uint32_t INT_CLR_MASK = 0xf0; // XXX external interupt too?
+    const uint32_t INT_CLR_MASK = 0xf0; // XXX external interrupt too?
     const uint32_t RX_DMA_COMPLETE = 0x40;
     const uint32_t TX_DMA_COMPLETE = 0x20;
     const uint32_t EXT_INT = 0x1;

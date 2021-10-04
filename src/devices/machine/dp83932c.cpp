@@ -29,7 +29,7 @@
 #define LOG_FILTER  (1U << 2)
 #define LOG_PACKETS (1U << 3)
 
-#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FILTER|LOG_PACKETS)
+// #define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FILTER|LOG_PACKETS)
 #include "logmacro.h"
 
 #define EA(hi, lo) ((u32(hi) << 16) | lo)
@@ -113,7 +113,6 @@ void dp83932c_device::device_reset()
 
 int dp83932c_device::recv_start_cb(u8 *buf, int length)
 {
-	LOG("recv_start_cb_debug %d\n", length);
 	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
 
 	if (!(m_reg[CR] & CR_RXEN))
@@ -170,10 +169,7 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	// TODO: check for buffer overflow
 	offs_t const rba = EA(m_reg[CRBA1], m_reg[CRBA0]);
 	for (unsigned i = 0; i < length; i++)
-	{
-		LOG("rba: set 0x%x to 0x%x\n", rba + i, buf[i]);
 		m_bus->write_byte(rba + i, buf[i]);
-	}
 
 	// update remaining buffer word count
 	u32 const rbwc = ((u32(m_reg[RBWC1]) << 16) | m_reg[RBWC0]) - (length + 1) / 2;
@@ -358,14 +354,12 @@ void dp83932c_device::transmit()
 	m_reg[TTDA] = m_reg[CTDA];
 	offs_t const tda = EA(m_reg[UTDA], m_reg[CTDA]);
 	unsigned word = 1;
-	LOG("transmit: CTDA = 0x%x\n", m_reg[CTDA]);
 
 	// read control information from tda and load registers
 	u16 const tcr = m_reg[TCR];
 	m_reg[TCR] = read_bus_word(tda + word++ * width) & TCR_TPC;
 	m_reg[TPS] = read_bus_word(tda + word++ * width);
 	m_reg[TFC] = read_bus_word(tda + word++ * width);
-	LOG("width = %u TDA= 0x%x TCR = 0x%x TPS = 0x%x TFC = 0x%x\n", width, tda, m_reg[TCR], m_reg[TPS], m_reg[TFC]);
 
 	// check for programmable interrupt
 	if ((m_reg[TCR] & TCR_PINT) && !(tcr & TCR_PINT))
@@ -384,13 +378,11 @@ void dp83932c_device::transmit()
 		m_reg[TFS] = read_bus_word(tda + word++ * width);
 
 		offs_t const tsa = EA(m_reg[TSA1], m_reg[TSA0]);
-		LOG("fragment %u: TCR = 0x%x TPS = 0x%x TFC = 0x%x TSA = 0x%x\n", fragment, m_reg[TCR], m_reg[TPS], m_reg[TFC], tsa);
 
 		// FIXME: word/dword transfers (allow unaligned)
 		for (unsigned byte = 0; byte < m_reg[TFS]; byte++)
 		{
 			buf[length++] = m_bus->read_byte(tsa + byte);
-			LOG("byte[0x%x] = 0x%x\n", tsa + byte, buf[length - 1]);
 		}
 	}
 
@@ -408,7 +400,6 @@ void dp83932c_device::transmit()
 
 	// advance ctda to the link field
 	m_reg[CTDA] += word * width;
-	LOG("transmit after link adjust: CTDA = 0x%x\n", m_reg[CTDA]);
 
 	// transmit data
 	dump_bytes(buf, length);
@@ -432,9 +423,7 @@ void dp83932c_device::send_complete_cb(int result)
 	if (!(m_reg[CR] & CR_HTX))
 	{
 		// load next descriptor address
-		LOG("scc before loading next addr: CTDA = 0x%x\n", m_reg[CTDA]);
 		m_reg[CTDA] = read_bus_word(EA(m_reg[UTDA], m_reg[CTDA]));
-		LOG("scc after loading next addr: CTDA = 0x%x\n", m_reg[CTDA]);
 
 		// check for end of list
 		if (m_reg[CTDA] & 1)

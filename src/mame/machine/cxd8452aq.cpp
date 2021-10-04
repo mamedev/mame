@@ -14,7 +14,7 @@
 
 #include "cxd8452aq.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(CXD8452AQ, cxd8452aq_device, "cxd8452aq", "Sony CXD8452AQ WSC-SONIC3")
@@ -25,6 +25,7 @@ cxd8452aq_device::cxd8452aq_device(const machine_config &mconfig, const char *ta
     main_bus_config("main_bus", ENDIANNESS_BIG, 32, 32, 0),
     sonic_config("sonic", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(cxd8452aq_device::sonic_bus_map), this)),
     m_irq_handler(*this),
+    apbus_virt_to_phys_callback(*this),
     m_bus(*this, finder_base::DUMMY_TAG, -1, 64)
 {
 
@@ -81,7 +82,7 @@ void cxd8452aq_device::tx_count_w(offs_t offset, uint32_t data)
     {
         m_dma_check->adjust(attotime::zero);
     }
-    m_irq_check->adjust(attotime::zero); // TODO: Is there something else that will clear the INT?
+    m_irq_check->adjust(attotime::zero);
 }
 
 uint32_t cxd8452aq_device::rx_count_r(offs_t offset)
@@ -98,7 +99,7 @@ void cxd8452aq_device::rx_count_w(offs_t offset, uint32_t data)
     {
         m_dma_check->adjust(attotime::zero);
     }
-    m_irq_check->adjust(attotime::zero); // TODO: Is there something else that will clear the INT?
+    m_irq_check->adjust(attotime::zero);
 }
 
 void cxd8452aq_device::sonic_bus_map(address_map &map)
@@ -106,32 +107,8 @@ void cxd8452aq_device::sonic_bus_map(address_map &map)
 	map(0x00000000U, 0xffffffffU).rw(FUNC(cxd8452aq_device::sonic_r), FUNC(cxd8452aq_device::sonic_w));
 }
 
-uint32_t cxd8452aq_device::apbus_virt_to_phys(uint32_t v_address) // TODO: this should be shared w/ DMAC3
-{
-	if(v_address & 0x80000000) // XXX is this DMAC3-only?
-	{
-		return v_address & ~0x80000000;
-	}
-	uint32_t dmac_page_address = BASE_MAP_ADDRESS + 8 * (v_address >> 12); // Convert page number to PTE address.
-	uint64_t raw_pte = m_bus->read_qword(dmac_page_address);
-	apbus_pte pte;
-	pte.valid = (raw_pte & ENTRY_VALID) > 0;
-	pte.coherent = (raw_pte & ENTRY_COHERENT) > 0;
-	pte.pad2 = (raw_pte & ENTRY_PAD) >> ENTRY_PAD_SHIFT;
-	pte.pfnum = raw_pte & ENTRY_PFNUM;
-
-	if(!pte.valid)
-	{
-		fatalerror("APbus TLB out of universe! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, dmac_page_address, raw_pte);
-	}
-
-	return (pte.pfnum << 12) + (v_address & 0xFFF);
-}
-
-
 uint8_t cxd8452aq_device::sonic_r(offs_t offset, uint8_t mem_mask)
 {
-    //const auto adjustedOffset = (offset & 0xffff) << 1;
     auto result = space(0).read_byte(offset & 0xfffff);
     // LOG("sonic_r[0x%x (0x%x) | 0x%x] = 0x%x\n", offset, offset & 0xfffff, mem_mask, result);
     return result;
@@ -139,7 +116,6 @@ uint8_t cxd8452aq_device::sonic_r(offs_t offset, uint8_t mem_mask)
 
 void cxd8452aq_device::sonic_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-    //const auto adjustedOffset = (offset & 0xffff) << 1;
 	// LOG("sonic_w[0x%x (0x%x) | 0x%x]\n", offset, offset & 0xfffff, mem_mask);
     space(0).write_byte(offset & 0xfffff, data);
 }
@@ -160,21 +136,20 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
     // Check to see if we should be doing DMA
     bool rxDmaActive = sonic3_reg.rx_count > DMA_START;
     bool txDmaActive = sonic3_reg.tx_count > DMA_START;
-    if (rxDmaActive && txDmaActive)
+    if (rxDmaActive && txDmaActive) // TODO: is this an error? allow it for now, but log it.
     {
-        // TODO: is this an error? allow it for now, but log it.
         LOG("WARNING: RX and TX DMA active at the same time, this may not be a valid condition.\n");
     }
+
     if (rxDmaActive)
     {
         // Move byte from the SONIC RAM region to main memory
         uint8_t data = space(0).read_byte(sonic3_reg.rx_sonic_address & 0xffff);
         LOG("sonic3.rx(0x%x -> 0x%x, data=0x%x)\n", sonic3_reg.rx_sonic_address, sonic3_reg.rx_host_address, data);
-        m_bus->write_byte(apbus_virt_to_phys(sonic3_reg.rx_host_address), data);
+        m_bus->write_byte(apbus_virt_to_phys_callback(sonic3_reg.rx_host_address), data);
         sonic3_reg.rx_count -= 1;
         sonic3_reg.rx_sonic_address += 1;
         sonic3_reg.rx_host_address += 1;
-        LOG("sonic3.rx(0x%x -> 0x%x, count now 0x%x\n", sonic3_reg.rx_sonic_address, sonic3_reg.rx_host_address, sonic3_reg.rx_count);
         if(sonic3_reg.rx_count == DMA_START)
         {
             sonic3_reg.sonic |= RX_DMA_COMPLETE;
@@ -185,7 +160,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
     if (txDmaActive)
     {
         // Move byte from main memory to the SONIC RAM
-        uint8_t data = m_bus->read_byte(apbus_virt_to_phys(sonic3_reg.tx_host_address));
+        uint8_t data = m_bus->read_byte(apbus_virt_to_phys_callback(sonic3_reg.tx_host_address));
         LOG("sonic3.tx(0x%x -> 0x%x, data=0x%x)\n", sonic3_reg.tx_host_address, sonic3_reg.tx_sonic_address, data);
         space(0).write_byte(sonic3_reg.tx_sonic_address & 0xffff, data);
         sonic3_reg.tx_count -= 1;
@@ -206,13 +181,14 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
     }
 }
 
-void cxd8452aq_device::device_add_mconfig(machine_config &config) { }
-
 void cxd8452aq_device::device_start()
 {
     m_irq_handler.resolve_safe();
+    apbus_virt_to_phys_callback.resolve();
     m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::irq_check), this));
     m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::dma_check), this));
 }
+
+void cxd8452aq_device::device_add_mconfig(machine_config &config) { }
 
 void cxd8452aq_device::device_reset() { }

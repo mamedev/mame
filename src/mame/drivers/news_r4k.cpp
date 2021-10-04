@@ -76,6 +76,15 @@
  *   - Sony CXD8486Q XB: not emulated (most likely APbus interface)
  *   - 16x NEC D482235G5 Dual Port Graphics Buffers: not emulated
  *   - Brooktree Bt468KG220 RAMDAC: not emulated
+ *
+ *  Known issues w/ NEWS-OS 4.2.1aRD:
+ *  - Telnet is broken - the login prompt works, but hangs after completing authentication and sending the initial login message
+ *    How X11 and SXDM work when Telnet doesn't is beyond me... Might be missing some SONIC3 functionality, or it might be
+ *    connected to the following item...
+ *  - Some shell commands are problematic and can cause MAME to hang (`dbx` especially; `ps` after another user has logged in).
+ *    I haven't seen any attempts to communicate with unemulated APbus hardware or anything like that, yet. However, this needs
+ *    more investigation.
+ *  - Bootloader doesn't work with DRC enabled (see CPU section above)
  */
 
 #include "emu.h"
@@ -282,6 +291,26 @@ protected:
     // APbus control (should be split into a device eventually)
     uint8_t apbus_cmd_r(offs_t offset);
     void apbus_cmd_w(offs_t offset, uint32_t data);
+    uint32_t apbus_virt_to_phys(uint32_t v_address);
+
+    // Page table entry structure
+    struct apbus_pte
+    {
+        uint32_t pad; // unused??
+        bool valid;   // Entry is OK to use
+        bool coherent;  // DMA coherence enabled (don't care for emulation??)
+        uint32_t pad2;
+        uint32_t pfnum; // Page number (upper 20 bits of physical address)
+    };
+
+    enum APBUS_PTE_MASKS
+    {
+        ENTRY_VALID = 0x80000000,
+        ENTRY_COHERENT = 0x40000000,
+        ENTRY_PAD = 0x3FF00000,
+        ENTRY_PAD_SHIFT = 20,
+        ENTRY_PFNUM = 0xFFFFF
+    };
 
     // Other platform hardware emulation methods
     uint32_t bus_error();
@@ -293,6 +322,7 @@ protected:
     const char *MAIN_MEMORY_DEFAULT = "64M";
     const int FREERUN_FREQUENCY = 1000000; // Hz
     const int TIMER0_FREQUENCY = 100; // Hz
+    const uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
 
     // RAM debug
     bool m_map_shift = false;
@@ -308,7 +338,7 @@ protected:
 static void news_scsi_devices(device_slot_interface &device)
 {
     device.option_add("harddisk", NSCSI_HARDDISK);
-    device.option_add("cdrom", NSCSI_CDROM);
+    // device.option_add("cdrom", NSCSI_CDROM); // APmonitor chokes on CDROM at the moment
 }
 
 /*
@@ -352,11 +382,12 @@ void news_r4k_state::machine_common(machine_config &config)
     // APbus FIFOs
     CXD8442Q(config, m_fifo0, 0);
 
-    // SONIC ethernet controller
+    // SONIC + WSC-SONIC3 ethernet controller
     CXD8452AQ(config, m_sonic3, 0);
     m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
     m_sonic3->irq_out().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>));
     m_sonic3->set_bus(m_cpu, 0);
+    m_sonic3->set_apbus_address_translator(FUNC(news_r4k_state::apbus_virt_to_phys));
 
     DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
     m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
@@ -385,7 +416,7 @@ void news_r4k_state::machine_common(machine_config &config)
 
     // DMA controller
     DMAC3(config, m_dmac, 0);
-    m_dmac->set_base_map_address(0x14c20000);
+    m_dmac->set_base_map_address(APBUS_DMA_MAP_ADDRESS);
     m_dmac->set_bus(m_cpu, 0);
     m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
 
@@ -484,9 +515,9 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
     map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
 
-    // SONIC network controller (not working yet)
+    // SONIC network controller
     map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map)); // WSC-SONIC3 registers
-    map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff); // SONIC registers - this doesn't fully match the hw
+    map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff);
     //map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
     map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
                           NAME([this](offs_t offset, uint8_t data)
@@ -768,6 +799,64 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 }
 
 /*
+ * APbus memory addressing
+ *
+ * The DMAC3 has its own virtual->physical addressing scheme. Like the CPU's TLB, the host OS
+ * is responsible for populating the DMAC's TLB. The `dmac3_pte` struct defines what each entry looks like. Note that to avoid
+ * bit-order dependencies and other platform-specific stuff, in this implementation, valid, coherent, pad2, and pfnum are
+ * separate variables, but the actual register is packed like this:
+ *
+ * 0x xxxx xxxx xxxx xxxx
+ *   |   pad   |  entry  |
+ *
+ * Entry is packed as follows:
+ * 0b    x      x     xxxxxxxxxx xxxxxxxxxxxxxxxxxxxx
+ *    |valid|coherent|    pad2  |       pfnum        |
+ *
+ * The DMAC3 requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
+ *
+ * The monitor ROM populates the PTEs as follows in response to a `dl` command.
+ * Addr       PTE1             PTE2
+ * 0x14c20000 0000000080103ff5 0000000080103ff6
+ *
+ * It also loads the `address` register with 0xd60.
+ *
+ * This will cause the DMAC to start mapping from virtual address 0xd60 to physical address 0x3ff5d60.
+ * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
+ * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
+ *
+ * NetBSD splits the mapping RAM into two sections, one for each DMAC controller. If the OS does not keep track, the DMACs
+ * could end up in a configuration that would cause them to overwrite each other's data.
+ *
+ * Another note: NetBSD mentions that the `pad2` section of the register is 10 bits. However, this might not be fully accurate.
+ * On the NWS-5000X, the physical address bus is 36 bits because it has an R4400SC. The 32nd bit is sometimes set, depending
+ * on the virtual address being used (maybe it goes to the memory controller). It doesn't impact the normal operation of the
+ * computer, but does mean that the `pad2` section might only be 6 bits, not 10 bits.
+ */
+uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
+{
+    // Convert page number to PTE address and read raw PTE data from the APbus DMA mapping RAM
+    uint32_t dmac_page_address = APBUS_DMA_MAP_ADDRESS + 8 * (v_address >> 12);
+    uint64_t raw_pte = m_cpu->space(0).read_qword(dmac_page_address);
+
+    // Marshal raw data to struct
+    apbus_pte pte;
+    pte.valid = (raw_pte & ENTRY_VALID) > 0;
+    pte.coherent = (raw_pte & ENTRY_COHERENT) > 0;
+    pte.pad2 = (raw_pte & ENTRY_PAD) >> ENTRY_PAD_SHIFT;
+    pte.pfnum = raw_pte & ENTRY_PFNUM;
+
+    // This might be able to trigger some kind of interrupt - for now, we'll mark it as a fatal error, but this can be improved for sure.
+    if(!pte.valid)
+    {
+        fatalerror("DMAC3 TLB out of universe! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, dmac_page_address, raw_pte);
+    }
+
+    // Since the entry is valid, use it to calculate the physical address
+    return (pte.pfnum << 12) + (v_address & 0xFFF);
+}
+
+/*
  * apbus_cmd_r
  *
  * Emulates a call to the APbus controller (placeholder)
@@ -863,7 +952,7 @@ void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
  * Maybe different values being written to this address control it somehow? NetBSD only uses 1.
  * Maybe this will be more clear after SCSI is implemented and a NEWS-OS boot can be attempted.
  * If NEWS-OS 4, 6, and NetBSD all only write a 1, then this level of emulation is probably sufficient anyways.
- * See https://github.com/NetBSD/src/blob/05082e19134c05f2f4b6eca73223cdc6b5ab09bf/sys/arch/newsmips/newsmips/news5000.c#L114
+ * See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/newsmips/news5000.c#L114
  */
 void news_r4k_state::timer0_w(offs_t offset, uint32_t data)
 {
