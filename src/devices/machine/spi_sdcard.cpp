@@ -239,7 +239,7 @@ void spi_sdcard_device::do_command()
 		m_data[10] = 'D';
 		m_data[11] = 0x10;  // Product Revision in BCD (1.0)
 		{
-			u32 uSerial = machine().rand();
+			u32 uSerial = 0x12345678;
 			m_data[12] = (uSerial>>24) & 0xff;  // PSN - Product Serial Number
 			m_data[13] = (uSerial>>16) & 0xff;
 			m_data[14] = (uSerial>>8) & 0xff;
