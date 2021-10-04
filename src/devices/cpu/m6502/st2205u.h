@@ -13,7 +13,7 @@
 
 #include "st2xxx.h"
 
-class st2205u_base_device : public st2xxx_device
+class st2205u_base_device : public st2xxx_device, public device_sound_interface
 {
 public:
 	enum {
@@ -61,6 +61,9 @@ protected:
 
 	virtual void device_reset() override;
 
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
 	virtual unsigned st2xxx_bt_divider(int n) const override;
 	virtual u8 st2xxx_prs_mask() const override { return 0xc0; }
 	virtual void st2xxx_tclk_start() override;
@@ -68,6 +71,9 @@ protected:
 	virtual bool st2xxx_has_dma() const override { return true; }
 
 	void base_init(std::unique_ptr<mi_st2xxx> &&intf);
+
+	void push_adpcm_value(int channel, u16 psg_data);
+	void reset_adpcm_value(int channel);
 
 	u8 btc_r();
 	void btc_w(u8 data);
@@ -132,6 +138,8 @@ protected:
 
 	void base_map(address_map &map);
 
+	sound_stream *m_stream;
+
 	u8 m_btc;
 	u16 m_tc_12bit[4];
 	u16 m_count_12bit[4];
@@ -156,6 +164,8 @@ protected:
 	u8 m_dmod[2];
 	u8 m_rctr;
 	u8 m_lvctr;
+
+	s16 m_adpcm_level[4];
 };
 
 class st2205u_device : public st2205u_base_device
