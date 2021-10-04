@@ -24,20 +24,6 @@
 	#define LOG(...) do { if (false) printf(__VA_ARGS__); } while (false)
 #endif
 
-// on some architectures, function pointers point to descriptors
-// usually this is a global pointer value along with the branch target
-// other platforms using this convention include:
-// * AIX, Classic MacOS and WinNT on 32-bit POWER/PowerPC
-// * pretty much anything on Itanium
-// separately, on some architectures, function descriptors are stored in
-// vtables directly
-#if defined(__ia64__)
-	#define MAME_DELEGATE_VT_DESCRIPTOR 1
-#endif
-#ifndef MAME_DELEGATE_VT_DESCRIPTOR
-	#define MAME_DELEGATE_VT_DESCRIPTOR 0
-#endif
-
 
 
 //**************************************************************************
@@ -102,7 +88,7 @@ delegate_generic_function delegate_mfp_itanium::convert_to_generic(delegate_gene
 		// byte index into the vtable to the function
 		std::uint8_t const *const vtable_ptr = *reinterpret_cast<std::uint8_t const *const *>(object) + m_function - ((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? 0 : 1);
 		delegate_generic_function result;
-		if (MAME_DELEGATE_VT_DESCRIPTOR)
+		if (MAME_ABI_CXX_VTABLE_FNDESC)
 			result = reinterpret_cast<delegate_generic_function>(uintptr_t(vtable_ptr));
 		else
 			result = *reinterpret_cast<delegate_generic_function const *>(vtable_ptr);
