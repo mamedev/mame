@@ -32,6 +32,7 @@ static const nes_pcb pcb_list[] =
 	{ "un1rom",           STD_UN1ROM },
 	{ "sxrom",            STD_SXROM },
 	{ "sorom",            STD_SOROM },
+	{ "szrom",            STD_SZROM },
 	{ "txrom",            STD_TXROM },
 	{ "hkrom",            STD_HKROM },
 	{ "tqrom",            STD_TQROM },
