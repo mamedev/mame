@@ -1322,7 +1322,7 @@ std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t
 		info = &pnginfo;
 
 	// write the PNG signature
-	size_t written;
+	std::size_t written;
 	std::error_condition err = fp.write(PNG_SIGNATURE, sizeof(PNG_SIGNATURE), written);
 	if (err)
 		return err;

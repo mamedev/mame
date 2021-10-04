@@ -431,7 +431,7 @@ uint32_t stream::write(const void *buf, uint32_t sz)
 			if (!write_protect)
 			{
 				// do we have to expand the buffer?
-				uint64_t end = position + sz;
+				const uint64_t end = position + sz;
 				if ((filesize < end) && (size_t(end) == end))
 				{
 					// try to expand the buffer
@@ -453,7 +453,7 @@ uint32_t stream::write(const void *buf, uint32_t sz)
 			break;
 
 		case IMG_FILE:
-			if (file->seek(position, SEEK_SET))
+			if (!file->seek(position, SEEK_SET))
 				file->write(buf, sz, result); // FIXME: check error return
 			break;
 

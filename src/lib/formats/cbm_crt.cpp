@@ -183,7 +183,7 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 	while (!file.eof())
 	{
 		cbm_crt_chip chip;
-		if (file.read(&chip, CRT_CHIP_LENGTH, actual) || (CRT_HEADER_LENGTH != actual))
+		if (file.read(&chip, CRT_CHIP_LENGTH, actual) || (CRT_CHIP_LENGTH != actual))
 			return false;
 
 		const uint16_t address = pick_integer_be(chip.start_address, 0, 2);
@@ -230,7 +230,7 @@ bool cbm_crt_read_data(util::core_file &file, uint8_t *roml, uint8_t *romh)
 		size_t actual;
 
 		cbm_crt_chip chip;
-		if (file.read(&chip, CRT_CHIP_LENGTH, actual) || (CRT_HEADER_LENGTH != actual))
+		if (file.read(&chip, CRT_CHIP_LENGTH, actual) || (CRT_CHIP_LENGTH != actual))
 			return false;
 
 		const uint16_t address = pick_integer_be(chip.start_address, 0, 2);

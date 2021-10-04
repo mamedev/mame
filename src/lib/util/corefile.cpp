@@ -267,7 +267,6 @@ int core_text_file::getc()
 			{
 				std::size_t readlen;
 				std::uint8_t bom[4];
-
 				read(bom, 4, readlen);
 				if (readlen == 4)
 				{
@@ -980,7 +979,7 @@ std::error_condition core_file::open_ram_copy(void const *data, std::size_t leng
 	if (std::uint64_t(length) != length)
 		return std::errc::file_too_large;
 
-	ptr result(new (std::nothrow) core_in_memory_file(openflags, data, length, false));
+	ptr result(new (std::nothrow) core_in_memory_file(openflags, data, length, true));
 	if (!result || !result->buffer())
 		return std::errc::not_enough_memory;
 

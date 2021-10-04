@@ -433,9 +433,11 @@ public:
 						}
 						else
 						{
-							std::error_condition err = m_file->seek((src_frame_start >= split_track_start)
-									? src_frame_start - split_track_start
-									: src_frame_start, SEEK_SET);
+							std::error_condition err = m_file->seek(
+									(src_frame_start >= split_track_start)
+										? src_frame_start - split_track_start
+										: src_frame_start,
+									SEEK_SET);
 							std::size_t count = 0;
 							if (!err)
 								err = m_file->read(dest, bytesperframe, count);
