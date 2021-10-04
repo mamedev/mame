@@ -33,6 +33,7 @@ DEFINE_DEVICE_TYPE(NES_CALTRON6IN1,    nes_caltron6in1_device,    "nes_caltron6i
 DEFINE_DEVICE_TYPE(NES_CALTRON9IN1,    nes_caltron9in1_device,    "nes_caltron9in1",    "NES Cart Caltron 9 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_RUMBLESTATION,  nes_rumblestat_device,     "nes_rumblestat",     "NES Cart Rumblestation PCB")
 DEFINE_DEVICE_TYPE(NES_SVISION16,      nes_svision16_device,      "nes_svision16",      "NES Cart Supervision 16 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_FARID_UNROM,    nes_farid_unrom_device,    "nes_farid_unrom",    "NES Cart Farid UNROM 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_KN42,           nes_kn42_device,           "nes_kn42",           "NES Cart KN-42 PCB")
 DEFINE_DEVICE_TYPE(NES_N625092,        nes_n625092_device,        "nes_n625092",        "NES Cart N625092 PCB")
 DEFINE_DEVICE_TYPE(NES_A65AS,          nes_a65as_device,          "nes_a65as",          "NES Cart A65AS PCB")
@@ -136,6 +137,11 @@ nes_rumblestat_device::nes_rumblestat_device(const machine_config &mconfig, cons
 
 nes_svision16_device::nes_svision16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SVISION16, tag, owner, clock), m_latch1(0), m_latch2(0)
+{
+}
+
+nes_farid_unrom_device::nes_farid_unrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_FARID_UNROM, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -512,6 +518,21 @@ void nes_svision16_device::pcb_reset()
 
 	m_latch1 = 0;
 	m_latch2 = 0;
+}
+
+void nes_farid_unrom_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_farid_unrom_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_reg &= 0x87;    // only middle four bits cleared on soft reset
 }
 
 void nes_kn42_device::device_start()
@@ -1273,6 +1294,35 @@ u8 nes_svision16_device::read_m(offs_t offset)
 
 	u8 bank = m_latch1 << 4 | 0x0f;
 	return m_prg[((bank + 4) * 0x2000 + offset) % m_prg_size];    // +4 due to the 32KB menu
+}
+
+/*-------------------------------------------------
+
+ FARID_UNROM_8-IN-1
+
+ Games: 8 in 1
+
+ NES 2.0: mapper 324
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_farid_unrom_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("farid_unrom write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	if (BIT(data, 7) && !(m_reg & 0x88))
+		m_reg = data;
+	else
+		m_reg = (m_reg & 0x78) | (data & 0x87);
+
+	u8 bank = (m_reg & 0x70) >> 1 | (m_reg & 0x07);
+	prg16_89ab(bank);
+	prg16_cdef(bank | 0x07);
 }
 
 /*-------------------------------------------------

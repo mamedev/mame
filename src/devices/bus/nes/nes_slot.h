@@ -143,7 +143,7 @@ enum
 	// homebrew PCBs
 	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
 	UNL_ACTION53,   // homebrew PCB for homebrew multicarts
-	UNL_2A03PURITANS,
+	UNL_2A03PURITANS, FARID_SLROM8IN1, FARID_UNROM8IN1,
 	// Batlab Electronics
 	BATMAP_000, BATMAP_SRRX,
 	// Sealie

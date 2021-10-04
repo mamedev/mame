@@ -358,8 +358,8 @@ static const nes_mmc mmc_list[] =
 	{ 320, BMC_830425C },
 	// 321 duplicate of 287?
 	// 322 BMC-K-3033 35-in-1, related to mc_35?
-	// 323 Farid SLROM homebrew 8-in-1
-	// 324 Farid UNROM homebrew 8-in-1
+	{ 323, FARID_SLROM8IN1 },      // homebrew 8-in-1
+	{ 324, FARID_UNROM8IN1 },      // homebrew 8-in-1
 	{ 325, UNL_MALISB },           // Super Mali Splash Bomb pirate hack
 	{ 326, BTL_CONTRAJ },
 	// 327 BMC-10-24-C-A1 6-in-1
