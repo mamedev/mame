@@ -8,8 +8,6 @@
 
     TODO:
     - implement proper i8214 routing, and add irq latch mechanism;
-    - Fix up Floppy Terminal Count 0 / 1 writes properly, Castle Excellent (and presumably other
-      games) is very picky about it.
     - implement proper upd3301 / i8257 text support (currently hacked around);
     - Add limits for extend work RAM;
     - waitstates;
@@ -18,7 +16,7 @@
       - refactor memory banking to use address maps;
       - video;
       - double check dipswitches;
-      - move PC80S31K to device, needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801.
+      - move PC80S31K to device, needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. (in progress)
         Also notice that there are common points with SPC-1000 and TF-20 FDDs;
       - backport/merge what is portable to PC-8001;
     - implement bus slot mechanism for NEC boards ("PC-8800-**"), HAL PCG-8100 & GSX8800,
