@@ -10,13 +10,16 @@
 
 #include "png.h"
 
-#include "osdcomm.h"
+#include "ioprocs.h"
 #include "unicode.h"
+
+#include "osdcomm.h"
 
 #include <zlib.h>
 
 #include <algorithm>
 #include <cassert>
+#include <cerrno>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
@@ -102,6 +105,38 @@ inline void put_16bit(uint8_t *v, uint16_t data) { *reinterpret_cast<uint16_t *>
 inline void put_32bit(uint8_t *v, uint32_t data) { *reinterpret_cast<uint32_t *>(v) = big_endianize_int32(data); }
 
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+class png_category_impl : public std::error_category
+{
+public:
+	virtual char const *name() const noexcept override { return "png"; }
+
+	virtual std::string message(int condition) const override
+	{
+		using namespace std::literals;
+		static std::string_view const s_messages[] = {
+				"No error"sv,
+				"Unknown filter algorithm"sv,
+				"Bad file signature"sv,
+				"Decompression error"sv,
+				"Image file truncated"sv,
+				"Image file corrupt"sv,
+				"Unknown chunk type"sv,
+				"Compression error"sv,
+				"Unsupported image format"sv };
+		if ((0 <= condition) && (std::size(s_messages) > condition))
+			return std::string(s_messages[condition]);
+		else
+			return "Unknown error"s;
+	}
+};
+
+png_category_impl const f_png_category_instance;
+
+
 class png_private
 {
 private:
@@ -120,7 +155,7 @@ private:
 		std::unique_ptr<std::uint8_t []>    data;
 	};
 
-	png_error process(std::list<image_data_chunk> const &idata)
+	std::error_condition process(std::list<image_data_chunk> const &idata)
 	{
 		// do some basic checks for unsupported images
 		if (!pnginfo.bit_depth || (std::size(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
@@ -137,14 +172,15 @@ private:
 			pass_offset[pass + 1] = pass_offset[pass] + get_pass_bytes(pass);
 
 		// allocate memory for the filtered image
-		try { pnginfo.image.reset(new std::uint8_t [pass_offset[pass_count]]); }
-		catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
+		pnginfo.image.reset(new (std::nothrow) std::uint8_t [pass_offset[pass_count]]);
+		if (!pnginfo.image)
+			return std::errc::not_enough_memory;
 
 		// decompress image data
-		png_error error = png_error::NONE;
+		std::error_condition error;
 		error = decompress(idata, pass_offset[pass_count]);
 		std::uint32_t const bpp(get_bytes_per_pixel());
-		for (unsigned pass = 0; (pass_count > pass) && (png_error::NONE == error); ++pass)
+		for (unsigned pass = 0; (pass_count > pass) && !error; ++pass)
 		{
 			// compute some basic parameters
 			std::pair<std::uint32_t, std::uint32_t> const dimensions(get_pass_dimensions(pass));
@@ -153,7 +189,7 @@ private:
 			// we de-filter in place, stripping the filter bytes off the rows
 			uint8_t *dst(&pnginfo.image[pass_offset[pass]]);
 			uint8_t const *src(dst);
-			for (std::uint32_t y = 0; (dimensions.second > y) && (png_error::NONE == error); ++y)
+			for (std::uint32_t y = 0; (dimensions.second > y) && !error; ++y)
 			{
 				// first byte of each row is the filter type
 				uint8_t const filter(*src++);
@@ -164,13 +200,13 @@ private:
 		}
 
 		// if we errored, free the image data
-		if (error != png_error::NONE)
+		if (error)
 			pnginfo.image.reset();
 
 		return error;
 	}
 
-	png_error decompress(std::list<image_data_chunk> const &idata, std::uint32_t expected)
+	std::error_condition decompress(std::list<image_data_chunk> const &idata, std::uint32_t expected)
 	{
 		// only deflate is permitted
 		if (0 != pnginfo.compression_method)
@@ -186,7 +222,11 @@ private:
 		stream.avail_in = 0;
 		stream.next_in = Z_NULL;
 		zerr = inflateInit(&stream);
-		if (Z_OK != zerr)
+		if (Z_ERRNO == zerr)
+			return std::error_condition(errno, std::generic_category());
+		else if (Z_MEM_ERROR == zerr)
+			return std::errc::not_enough_memory;
+		else if (Z_OK != zerr)
 			return png_error::DECOMPRESS_ERROR;
 
 		// decompress IDAT blocks
@@ -209,12 +249,12 @@ private:
 
 		// it's all good if we got end-of-stream or we have with no data remaining
 		if ((Z_OK == inflateEnd(&stream)) && ((Z_STREAM_END == zerr) || ((Z_OK == zerr) && (idata.end() == it) && !stream.avail_in)))
-			return png_error::NONE;
+			return std::error_condition();
 		else
-			return png_error::DECOMPRESS_ERROR;
+			return png_error::DECOMPRESS_ERROR; // TODO: refactor this function for more fine-grained error reporting?
 	}
 
-	png_error unfilter_row(std::uint8_t type, uint8_t const *src, uint8_t *dst, uint8_t const *dstprev, int bpp, std::uint32_t rowbytes)
+	std::error_condition unfilter_row(std::uint8_t type, uint8_t const *src, uint8_t *dst, uint8_t const *dstprev, int bpp, std::uint32_t rowbytes)
 	{
 		if (0 != pnginfo.filter_method)
 			return png_error::UNKNOWN_FILTER;
@@ -223,14 +263,14 @@ private:
 		{
 		case PNG_PF_None: // no filter, just copy
 			std::copy_n(src, rowbytes, dst);
-			return png_error::NONE;
+			return std::error_condition();
 
 		case PNG_PF_Sub: // SUB = previous pixel
 			dst = std::copy_n(src, bpp, dst);
 			src += bpp;
 			for (std::uint32_t x = bpp; rowbytes > x; ++x, ++src, ++dst)
 				*dst = *src + dst[-bpp];
-			return png_error::NONE;
+			return std::error_condition();
 
 		case PNG_PF_Up: // UP = pixel above
 			if (dstprev)
@@ -242,7 +282,7 @@ private:
 			{
 				std::copy_n(src, rowbytes, dst);
 			}
-			return png_error::NONE;
+			return std::error_condition();
 
 		case PNG_PF_Average: // AVERAGE = average of pixel above and previous pixel
 			if (dstprev)
@@ -259,7 +299,7 @@ private:
 				for (std::uint32_t x = bpp; rowbytes > x; ++x, ++src, ++dst)
 					*dst = *src + (dst[-bpp] >> 1);
 			}
-			return png_error::NONE;
+			return std::error_condition();
 
 		case PNG_PF_Paeth: // PAETH = special filter
 			for (std::uint32_t x = 0; rowbytes > x; ++x, ++src, ++dst)
@@ -273,14 +313,14 @@ private:
 				int32_t const dc(std::abs(prediction - pc));
 				*dst = ((da <= db) && (da <= dc)) ? (*src + pa) : (db <= dc) ? (*src + pb) : (*src + pc);
 			}
-			return png_error::NONE;
+			return std::error_condition();
 
 		default: // unknown filter type
 			return png_error::UNKNOWN_FILTER;
 		}
 	}
 
-	png_error process_chunk(std::list<image_data_chunk> &idata, std::unique_ptr<std::uint8_t []> &&data, uint32_t type, uint32_t length)
+	std::error_condition process_chunk(std::list<image_data_chunk> &idata, std::unique_ptr<std::uint8_t []> &&data, uint32_t type, uint32_t length)
 	{
 		switch (type)
 		{
@@ -312,7 +352,7 @@ private:
 
 		case PNG_CN_IDAT: // image data
 			try { idata.emplace_back(length, std::move(data)); }
-			catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
+			catch (std::bad_alloc const &) { return std::errc::not_enough_memory; }
 			break;
 
 		case PNG_CN_gAMA: // gamma
@@ -353,7 +393,7 @@ private:
 			}
 			catch (std::bad_alloc const &)
 			{
-				return png_error::OUT_OF_MEMORY;
+				return std::errc::not_enough_memory;
 			}
 			break;
 
@@ -363,7 +403,7 @@ private:
 				return png_error::UNKNOWN_CHUNK;
 			break;
 		}
-		return png_error::NONE;
+		return std::error_condition();
 	}
 
 	unsigned get_pass_count() const
@@ -405,23 +445,31 @@ private:
 		return ((samples[pnginfo.color_type] * pnginfo.bit_depth) + 7) >> 3;
 	}
 
-	static png_error read_chunk(core_file &fp, std::unique_ptr<std::uint8_t []> &data, std::uint32_t &type, std::uint32_t &length)
+	static std::error_condition read_chunk(read_stream &fp, std::unique_ptr<std::uint8_t []> &data, std::uint32_t &type, std::uint32_t &length)
 	{
+		std::error_condition err;
+		std::size_t actual;
 		std::uint8_t tempbuff[4];
 
 		/* fetch the length of this chunk */
-		if (fp.read(tempbuff, 4) != 4)
+		err = fp.read(tempbuff, 4, actual);
+		if (err)
+			return err;
+		else if (4 != actual)
 			return png_error::FILE_TRUNCATED;
 		length = fetch_32bit(tempbuff);
 
 		/* fetch the type of this chunk */
-		if (fp.read(tempbuff, 4) != 4)
+		err = fp.read(tempbuff, 4, actual);
+		if (err)
+			return err;
+		else if (4 != actual)
 			return png_error::FILE_TRUNCATED;
 		type = fetch_32bit(tempbuff);
 
 		/* stop when we hit an IEND chunk */
 		if (type == PNG_CN_IEND)
-			return png_error::NONE;
+			return std::error_condition();
 
 		/* start the CRC with the chunk type (but not the length) */
 		std::uint32_t crc = crc32(0, tempbuff, 4);
@@ -430,11 +478,18 @@ private:
 		if (length)
 		{
 			/* allocate memory for this chunk */
-			try { data.reset(new std::uint8_t [length]); }
-			catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
+			data.reset(new (std::nothrow) std::uint8_t [length]);
+			if (!data)
+				return std::errc::not_enough_memory;
 
 			/* read the data from the file */
-			if (fp.read(data.get(), length) != length)
+			err = fp.read(data.get(), length, actual);
+			if (err)
+			{
+				data.reset();
+				return err;
+			}
+			else if (length != actual)
 			{
 				data.reset();
 				return png_error::FILE_TRUNCATED;
@@ -445,7 +500,13 @@ private:
 		}
 
 		/* read the CRC */
-		if (fp.read(tempbuff, 4) != 4)
+		err = fp.read(tempbuff, 4, actual);
+		if (err)
+		{
+			data.reset();
+			return err;
+		}
+		else if (4 != actual)
 		{
 			data.reset();
 			return png_error::FILE_TRUNCATED;
@@ -459,7 +520,7 @@ private:
 			return png_error::FILE_CORRUPT;
 		}
 
-		return png_error::NONE;
+		return std::error_condition();
 	}
 
 	png_info &  pnginfo;
@@ -469,7 +530,7 @@ public:
 	{
 	}
 
-	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha) const
+	std::error_condition copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha) const
 	{
 		// do some basic checks for unsupported images
 		if ((8 > pnginfo.bit_depth) || (pnginfo.bit_depth % 8))
@@ -595,14 +656,14 @@ public:
 
 		// set hasalpha flag and return
 		hasalpha = 0xffU != accumalpha;
-		return png_error::NONE;
+		return std::error_condition();
 	}
 
-	png_error expand_buffer_8bit()
+	std::error_condition expand_buffer_8bit()
 	{
 		// nothing to do if we're at 8 or greater already
 		if (pnginfo.bit_depth >= 8)
-			return png_error::NONE;
+			return std::error_condition();
 
 		// do some basic checks for unsupported images
 		if (!pnginfo.bit_depth || (8 % pnginfo.bit_depth))
@@ -623,9 +684,9 @@ public:
 		}
 
 		// allocate a new buffer at 8-bit
-		std::unique_ptr<std::uint8_t []> outbuf;
-		try { outbuf.reset(new std::uint8_t [outp_offset[pass_count]]); }
-		catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
+		std::unique_ptr<std::uint8_t []> outbuf(new (std::nothrow) std::uint8_t [outp_offset[pass_count]]);
+		if (!outbuf)
+			return std::errc::not_enough_memory;
 
 		// upsample bitmap
 		std::uint8_t const bytesamples(8 / pnginfo.bit_depth);
@@ -679,13 +740,13 @@ public:
 
 		pnginfo.image = std::move(outbuf);
 		pnginfo.bit_depth = 8;
-		return png_error::NONE;
+		return std::error_condition();
 	}
 
-	png_error read_file(core_file &fp)
+	std::error_condition read_file(read_stream &fp)
 	{
 		// initialize the data structures
-		png_error error = png_error::NONE;
+		std::error_condition error;
 		pnginfo.reset();
 		std::list<image_data_chunk> idata;
 
@@ -693,13 +754,13 @@ public:
 		error = verify_header(fp);
 
 		// loop until we hit an IEND chunk
-		while (png_error::NONE == error)
+		while (!error)
 		{
 			// read a chunk
 			std::unique_ptr<std::uint8_t []> chunk_data;
 			std::uint32_t chunk_type = 0, chunk_length;
 			error = read_chunk(fp, chunk_data, chunk_type, chunk_length);
-			if (png_error::NONE == error)
+			if (!error)
 			{
 				if (chunk_type == PNG_CN_IEND)
 					break; // stop when we hit an IEND chunk
@@ -709,29 +770,33 @@ public:
 		}
 
 		// finish processing the image
-		if (png_error::NONE == error)
+		if (!error)
 			error = process(idata);
 
 		// if we have an error, free all the output data
-		if (error != png_error::NONE)
+		if (error)
 			pnginfo.reset();
 
 		return error;
 	}
 
-	static png_error verify_header(core_file &fp)
+	static std::error_condition verify_header(read_stream &fp)
 	{
 		std::uint8_t signature[sizeof(PNG_SIGNATURE)];
 
 		// read 8 bytes
-		if (fp.read(signature, sizeof(signature)) != sizeof(signature))
+		std::size_t actual;
+		std::error_condition err = fp.read(signature, sizeof(signature), actual);
+		if (err)
+			return err;
+		else if (sizeof(signature) != actual)
 			return png_error::FILE_TRUNCATED;
 
 		// return an error if we don't match
 		if (std::memcmp(signature, PNG_SIGNATURE, sizeof(PNG_SIGNATURE)))
 			return png_error::BAD_SIGNATURE;
 
-		return png_error::NONE;
+		return std::error_condition();
 	}
 };
 
@@ -752,7 +817,7 @@ constexpr unsigned png_private::ADAM7_Y_OFFS[7];
     core stream
 -------------------------------------------------*/
 
-png_error png_info::verify_header(core_file &fp)
+std::error_condition png_info::verify_header(read_stream &fp)
 {
 	return png_private::verify_header(fp);
 }
@@ -762,7 +827,7 @@ png_error png_info::verify_header(core_file &fp)
     read_file - read a PNG from a core stream
 -------------------------------------------------*/
 
-png_error png_info::read_file(core_file &fp)
+std::error_condition png_info::read_file(read_stream &fp)
 {
 	return png_private(*this).read_file(fp);
 }
@@ -773,20 +838,20 @@ png_error png_info::read_file(core_file &fp)
     bitmap
 -------------------------------------------------*/
 
-png_error png_read_bitmap(core_file &fp, bitmap_argb32 &bitmap)
+std::error_condition png_read_bitmap(read_stream &fp, bitmap_argb32 &bitmap)
 {
-	png_error result;
+	std::error_condition result;
 	png_info pnginfo;
 	png_private png(pnginfo);
 
 	// read the PNG data
 	result = png.read_file(fp);
-	if (png_error::NONE != result)
+	if (result)
 		return result;
 
 	// resample to 8bpp if necessary
 	result = png.expand_buffer_8bit();
-	if (png_error::NONE != result)
+	if (result)
 	{
 		pnginfo.free_data();
 		return result;
@@ -803,7 +868,7 @@ png_error png_read_bitmap(core_file &fp, bitmap_argb32 &bitmap)
     bitmap
 -------------------------------------------------*/
 
-png_error png_info::copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha)
+std::error_condition png_info::copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha)
 {
 	return png_private(*this).copy_to_bitmap(bitmap, hasalpha);
 }
@@ -814,7 +879,7 @@ png_error png_info::copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha)
     sub 8-bit to 8-bit
 -------------------------------------------------*/
 
-png_error png_info::expand_buffer_8bit()
+std::error_condition png_info::expand_buffer_8bit()
 {
 	return png_private(*this).expand_buffer_8bit();
 }
@@ -829,7 +894,7 @@ png_error png_info::expand_buffer_8bit()
     add_text - add a text entry to the png_info
 -------------------------------------------------*/
 
-png_error png_info::add_text(std::string_view keyword, std::string_view text)
+std::error_condition png_info::add_text(std::string_view keyword, std::string_view text)
 {
 	// apply rules to keyword
 	char32_t prev(0);
@@ -859,8 +924,8 @@ png_error png_info::add_text(std::string_view keyword, std::string_view text)
 
 	// allocate a new text element
 	try { textlist.emplace_back(std::piecewise_construct, std::forward_as_tuple(keyword), std::forward_as_tuple(text)); }
-	catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
-	return png_error::NONE;
+	catch (std::bad_alloc const &) { return std::errc::not_enough_memory; }
+	return std::error_condition();
 }
 
 
@@ -869,10 +934,12 @@ png_error png_info::add_text(std::string_view keyword, std::string_view text)
     the given file
 -------------------------------------------------*/
 
-static png_error write_chunk(core_file &fp, const uint8_t *data, uint32_t type, uint32_t length)
+static std::error_condition write_chunk(write_stream &fp, const uint8_t *data, uint32_t type, uint32_t length)
 {
-	uint8_t tempbuff[8];
-	uint32_t crc;
+	std::error_condition err;
+	std::size_t written;
+	std::uint8_t tempbuff[8];
+	std::uint32_t crc;
 
 	/* stuff the length/type into the buffer */
 	put_32bit(tempbuff + 0, length);
@@ -880,23 +947,32 @@ static png_error write_chunk(core_file &fp, const uint8_t *data, uint32_t type, 
 	crc = crc32(0, tempbuff + 4, 4);
 
 	/* write that data */
-	if (fp.write(tempbuff, 8) != 8)
-		return png_error::FILE_ERROR;
+	err = fp.write(tempbuff, 8, written);
+	if (err)
+		return err;
+	else if (8 != written)
+		return std::errc::io_error;
 
 	/* append the actual data */
 	if (length > 0)
 	{
-		if (fp.write(data, length) != length)
-			return png_error::FILE_ERROR;
+		err = fp.write(data, length, written);
+		if (err)
+			return err;
+		else if (length != written)
+			return std::errc::io_error;
 		crc = crc32(crc, data, length);
 	}
 
 	/* write the CRC */
 	put_32bit(tempbuff, crc);
-	if (fp.write(tempbuff, 4) != 4)
-		return png_error::FILE_ERROR;
+	err = fp.write(tempbuff, 4, written);
+	if (err)
+		return err;
+	else if (4 != written)
+		return std::errc::io_error;
 
-	return png_error::NONE;
+	return std::error_condition();
 }
 
 
@@ -905,13 +981,19 @@ static png_error write_chunk(core_file &fp, const uint8_t *data, uint32_t type, 
     chunk to the given file by deflating it
 -------------------------------------------------*/
 
-static png_error write_deflated_chunk(core_file &fp, uint8_t *data, uint32_t type, uint32_t length)
+static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data, uint32_t type, uint32_t length)
 {
-	uint64_t lengthpos = fp.tell();
-	uint8_t tempbuff[8192];
-	uint32_t zlength = 0;
+	std::error_condition err;
+	std::uint64_t lengthpos;
+	err = fp.tell(lengthpos);
+	if (err)
+		return err;
+
+	std::size_t written;
+	std::uint8_t tempbuff[8192];
+	std::uint32_t zlength = 0;
 	z_stream stream;
-	uint32_t crc;
+	std::uint32_t crc;
 	int zerr;
 
 	/* stuff the length/type into the buffer */
@@ -920,15 +1002,22 @@ static png_error write_deflated_chunk(core_file &fp, uint8_t *data, uint32_t typ
 	crc = crc32(0, tempbuff + 4, 4);
 
 	/* write that data */
-	if (fp.write(tempbuff, 8) != 8)
-		return png_error::FILE_ERROR;
+	err = fp.write(tempbuff, 8, written);
+	if (err)
+		return err;
+	else if (8 != written)
+		return std::errc::io_error;
 
 	/* initialize the stream */
 	memset(&stream, 0, sizeof(stream));
 	stream.next_in = data;
 	stream.avail_in = length;
 	zerr = deflateInit(&stream, Z_DEFAULT_COMPRESSION);
-	if (zerr != Z_OK)
+	if (Z_ERRNO == zerr)
+		return std::error_condition(errno, std::generic_category());
+	else if (Z_MEM_ERROR == zerr)
+		return std::errc::not_enough_memory;
+	else if (Z_OK != zerr)
 		return png_error::COMPRESS_ERROR;
 
 	/* now loop until we run out of data */
@@ -943,10 +1032,16 @@ static png_error write_deflated_chunk(core_file &fp, uint8_t *data, uint32_t typ
 		if (stream.avail_out < sizeof(tempbuff))
 		{
 			int bytes = sizeof(tempbuff) - stream.avail_out;
-			if (fp.write(tempbuff, bytes) != bytes)
+			err = fp.write(tempbuff, bytes, written);
+			if (err)
 			{
 				deflateEnd(&stream);
-				return png_error::FILE_ERROR;
+				return err;
+			}
+			else if (bytes != written)
+			{
+				deflateEnd(&stream);
+				return std::errc::io_error;
 			}
 			crc = crc32(crc, tempbuff, bytes);
 			zlength += bytes;
@@ -960,29 +1055,45 @@ static png_error write_deflated_chunk(core_file &fp, uint8_t *data, uint32_t typ
 		if (zerr != Z_OK)
 		{
 			deflateEnd(&stream);
-			return png_error::COMPRESS_ERROR;
+			if (Z_ERRNO == zerr)
+				return std::error_condition(errno, std::generic_category());
+			else if (Z_MEM_ERROR == zerr)
+				return std::errc::not_enough_memory;
+			else
+				return png_error::COMPRESS_ERROR;
 		}
 	}
 
 	/* clean up deflater(maus) */
 	zerr = deflateEnd(&stream);
-	if (zerr != Z_OK)
+	if (Z_ERRNO == zerr)
+		return std::error_condition(errno, std::generic_category());
+	else if (Z_MEM_ERROR == zerr)
+		return std::errc::not_enough_memory;
+	else if (Z_OK != zerr)
 		return png_error::COMPRESS_ERROR;
 
 	/* write the CRC */
 	put_32bit(tempbuff, crc);
-	if (fp.write(tempbuff, 4) != 4)
-		return png_error::FILE_ERROR;
+	err = fp.write(tempbuff, 4, written);
+	if (err)
+		return err;
+	else if (4 != written)
+		return std::errc::io_error;
 
 	/* seek back and update the length */
-	fp.seek(lengthpos, SEEK_SET);
+	err = fp.seek(lengthpos, SEEK_SET);
+	if (err)
+		return err;
 	put_32bit(tempbuff + 0, zlength);
-	if (fp.write(tempbuff, 4) != 4)
-		return png_error::FILE_ERROR;
+	err = fp.write(tempbuff, 4, written);
+	if (err)
+		return err;
+	else if (4 != written)
+		return std::errc::io_error;
 
 	/* return to the end */
-	fp.seek(lengthpos + 8 + zlength + 4, SEEK_SET);
-	return png_error::NONE;
+	return fp.seek(lengthpos + 8 + zlength + 4, SEEK_SET);
 }
 
 
@@ -991,26 +1102,24 @@ static png_error write_deflated_chunk(core_file &fp, uint8_t *data, uint32_t typ
     bitmap to a palettized image
 -------------------------------------------------*/
 
-static png_error convert_bitmap_to_image_palette(png_info &pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+static std::error_condition convert_bitmap_to_image_palette(png_info &pnginfo, bitmap_t const &bitmap, int palette_length, const rgb_t *palette)
 {
-	int rowbytes;
-	int x, y;
-
 	/* set the common info */
 	pnginfo.width = bitmap.width();
 	pnginfo.height = bitmap.height();
 	pnginfo.bit_depth = 8;
 	pnginfo.color_type = 3;
 	pnginfo.num_palette = 256;
-	rowbytes = pnginfo.width;
+	int const rowbytes = pnginfo.width;
 
 	/* allocate memory for the palette */
-	try { pnginfo.palette.reset(new std::uint8_t [3 * 256]); }
-	catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
+	pnginfo.palette.reset(new (std::nothrow) std::uint8_t [3 * 256]);
+	if (!pnginfo.palette)
+		return std::errc::not_enough_memory;
 
 	/* build the palette */
 	std::fill_n(pnginfo.palette.get(), 3 * 256, 0);
-	for (x = 0; x < palette_length; x++)
+	for (int x = 0; x < palette_length; x++)
 	{
 		rgb_t color = palette[x];
 		pnginfo.palette[3 * x + 0] = color.r();
@@ -1019,29 +1128,26 @@ static png_error convert_bitmap_to_image_palette(png_info &pnginfo, const bitmap
 	}
 
 	/* allocate memory for the image */
-	try
-	{
-		pnginfo.image.reset(new std::uint8_t [pnginfo.height * (rowbytes + 1)]);
-	}
-	catch (std::bad_alloc const &)
+	pnginfo.image.reset(new (std::nothrow) std::uint8_t [pnginfo.height * (rowbytes + 1)]);
+	if (!pnginfo.image)
 	{
 		pnginfo.palette.reset();
-		return png_error::OUT_OF_MEMORY;
+		return std::errc::not_enough_memory;
 	}
 
 	/* copy in the pixels, specifying a nullptr filter */
-	for (y = 0; y < pnginfo.height; y++)
+	for (int y = 0; y < pnginfo.height; y++)
 	{
 		uint16_t const *src = reinterpret_cast<uint16_t const *>(bitmap.raw_pixptr(y));
 		uint8_t *dst = &pnginfo.image[y * (rowbytes + 1)];
 
 		/* store the filter byte, then copy the data */
 		*dst++ = 0;
-		for (x = 0; x < pnginfo.width; x++)
+		for (int x = 0; x < pnginfo.width; x++)
 			*dst++ = *src++;
 	}
 
-	return png_error::NONE;
+	return std::error_condition();
 }
 
 
@@ -1050,77 +1156,75 @@ static png_error convert_bitmap_to_image_palette(png_info &pnginfo, const bitmap
     bitmap to an RGB image
 -------------------------------------------------*/
 
-static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+static std::error_condition convert_bitmap_to_image_rgb(png_info &pnginfo, bitmap_t const &bitmap, int palette_length, const rgb_t *palette)
 {
-	int alpha = (bitmap.format() == BITMAP_FORMAT_ARGB32);
-	int rowbytes;
-	int x, y;
+	bool const alpha = (bitmap.format() == BITMAP_FORMAT_ARGB32);
 
 	/* set the common info */
 	pnginfo.width = bitmap.width();
 	pnginfo.height = bitmap.height();
 	pnginfo.bit_depth = 8;
 	pnginfo.color_type = alpha ? 6 : 2;
-	rowbytes = pnginfo.width * (alpha ? 4 : 3);
+	int const rowbytes = pnginfo.width * (alpha ? 4 : 3);
 
 	/* allocate memory for the image */
-	try { pnginfo.image.reset(new std::uint8_t [pnginfo.height * (rowbytes + 1)]); }
-	catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
+	pnginfo.image.reset(new (std::nothrow) std::uint8_t [pnginfo.height * (rowbytes + 1)]);
+	if (!pnginfo.image)
+		return std::errc::not_enough_memory;
 
 	/* copy in the pixels, specifying a nullptr filter */
-	for (y = 0; y < pnginfo.height; y++)
+	for (int y = 0; y < pnginfo.height; y++)
 	{
 		uint8_t *dst = &pnginfo.image[y * (rowbytes + 1)];
 
 		/* store the filter byte, then copy the data */
 		*dst++ = 0;
 
-		/* 16bpp palettized format */
 		if (bitmap.format() == BITMAP_FORMAT_IND16)
 		{
+			/* 16bpp palettized format */
 			uint16_t const *src16 = reinterpret_cast<uint16_t const *>(bitmap.raw_pixptr(y));
-			for (x = 0; x < pnginfo.width; x++)
+			for (int x = 0; x < pnginfo.width; x++)
 			{
-				rgb_t color = palette[*src16++];
+				rgb_t const color = palette[*src16++];
 				*dst++ = color.r();
 				*dst++ = color.g();
 				*dst++ = color.b();
 			}
 		}
-
-		/* 32-bit RGB direct */
 		else if (bitmap.format() == BITMAP_FORMAT_RGB32)
 		{
+			/* 32-bit RGB direct */
 			uint32_t const *src32 = reinterpret_cast<uint32_t const *>(bitmap.raw_pixptr(y));
-			for (x = 0; x < pnginfo.width; x++)
+			for (int x = 0; x < pnginfo.width; x++)
 			{
-				rgb_t raw = *src32++;
+				rgb_t const raw = *src32++;
 				*dst++ = raw.r();
 				*dst++ = raw.g();
 				*dst++ = raw.b();
 			}
 		}
-
-		/* 32-bit ARGB direct */
 		else if (bitmap.format() == BITMAP_FORMAT_ARGB32)
 		{
+			/* 32-bit ARGB direct */
 			uint32_t const *src32 = reinterpret_cast<uint32_t const *>(bitmap.raw_pixptr(y));
-			for (x = 0; x < pnginfo.width; x++)
+			for (int x = 0; x < pnginfo.width; x++)
 			{
-				rgb_t raw = *src32++;
+				rgb_t const raw = *src32++;
 				*dst++ = raw.r();
 				*dst++ = raw.g();
 				*dst++ = raw.b();
 				*dst++ = raw.a();
 			}
 		}
-
-		/* unsupported format */
 		else
+		{
+			/* unsupported format */
 			return png_error::UNSUPPORTED_FORMAT;
+		}
 	}
 
-	return png_error::NONE;
+	return std::error_condition();
 }
 
 
@@ -1129,17 +1233,17 @@ static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &
     chunks to the given file
 -------------------------------------------------*/
 
-static png_error write_png_stream(core_file &fp, png_info &pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+static std::error_condition write_png_stream(random_write &fp, png_info &pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	uint8_t tempbuff[16];
-	png_error error;
+	std::error_condition error;
 
 	// create an unfiltered image in either palette or RGB form
 	if (bitmap.format() == BITMAP_FORMAT_IND16 && palette_length <= 256)
 		error = convert_bitmap_to_image_palette(pnginfo, bitmap, palette_length, palette);
 	else
 		error = convert_bitmap_to_image_rgb(pnginfo, bitmap, palette_length, palette);
-	if (error != png_error::NONE)
+	if (error)
 		return error;
 
 	// if we wanted to get clever and do filtering, we would do it here
@@ -1153,18 +1257,18 @@ static png_error write_png_stream(core_file &fp, png_info &pnginfo, const bitmap
 	put_8bit(tempbuff + 11, pnginfo.filter_method);
 	put_8bit(tempbuff + 12, pnginfo.interlace_method);
 	error = write_chunk(fp, tempbuff, PNG_CN_IHDR, 13);
-	if (error != png_error::NONE)
+	if (error)
 		return error;
 
 	// write the PLTE chunk
 	if (pnginfo.num_palette > 0)
 		error = write_chunk(fp, pnginfo.palette.get(), PNG_CN_PLTE, pnginfo.num_palette * 3);
-	if (error != png_error::NONE)
+	if (error)
 		return error;
 
 	// write a single IDAT chunk
 	error = write_deflated_chunk(fp, pnginfo.image.get(), PNG_CN_IDAT, pnginfo.height * (compute_rowbytes(pnginfo) + 1));
-	if (error != png_error::NONE)
+	if (error)
 		return error;
 
 	// write TEXT chunks
@@ -1172,7 +1276,7 @@ static png_error write_png_stream(core_file &fp, png_info &pnginfo, const bitmap
 	for (png_info::png_text const &text : pnginfo.textlist)
 	{
 		try { textbuf.resize(text.first.length() + 1 + text.second.length()); }
-		catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
+		catch (std::bad_alloc const &) { return std::errc::not_enough_memory; }
 		std::uint8_t *dst(&textbuf[0]);
 
 		// convert keyword to ISO-8859-1
@@ -1201,7 +1305,7 @@ static png_error write_png_stream(core_file &fp, png_info &pnginfo, const bitmap
 		}
 
 		error = write_chunk(fp, &textbuf[0], PNG_CN_tEXt, dst - &textbuf[0]);
-		if (error != png_error::NONE)
+		if (error)
 			return error;
 	}
 
@@ -1210,16 +1314,20 @@ static png_error write_png_stream(core_file &fp, png_info &pnginfo, const bitmap
 }
 
 
-png_error png_write_bitmap(core_file &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette)
+std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette)
 {
 	// use a dummy pnginfo if none passed to us
 	png_info pnginfo;
-	if (info == nullptr)
+	if (!info)
 		info = &pnginfo;
 
 	// write the PNG signature
-	if (fp.write(PNG_SIGNATURE, sizeof(PNG_SIGNATURE)) != sizeof(PNG_SIGNATURE))
-		return png_error::FILE_ERROR;
+	std::size_t written;
+	std::error_condition err = fp.write(PNG_SIGNATURE, sizeof(PNG_SIGNATURE), written);
+	if (err)
+		return err;
+	else if (sizeof(PNG_SIGNATURE) != written)
+		return std::errc::io_error;
 
 	/* write the rest of the PNG data */
 	return write_png_stream(fp, *info, bitmap, palette_length, palette);
@@ -1233,25 +1341,16 @@ png_error png_write_bitmap(core_file &fp, png_info *info, bitmap_t const &bitmap
 
 ********************************************************************************/
 
-/**
- * @fn  png_error mng_capture_start(core_file &fp, bitmap_t &bitmap, unsigned rate)
- *
- * @brief   Mng capture start.
- *
- * @param [in,out]  fp      If non-null, the fp.
- * @param [in,out]  bitmap  The bitmap.
- * @param   rate            The framerate.
- *
- * @return  A png_error.
- */
-
-png_error mng_capture_start(core_file &fp, bitmap_t &bitmap, unsigned rate)
+std::error_condition mng_capture_start(random_write &fp, bitmap_t const &bitmap, unsigned rate)
 {
+	std::size_t written;
+	std::error_condition err = fp.write(MNG_Signature, 8, written);
+	if (err)
+		return err;
+	else if (8 != written)
+		return std::errc::io_error;
+
 	uint8_t mhdr[28];
-
-	if (fp.write(MNG_Signature, 8) != 8)
-		return png_error::FILE_ERROR;
-
 	memset(mhdr, 0, 28);
 	put_32bit(mhdr + 0, bitmap.width());
 	put_32bit(mhdr + 4, bitmap.height());
@@ -1260,38 +1359,27 @@ png_error mng_capture_start(core_file &fp, bitmap_t &bitmap, unsigned rate)
 	return write_chunk(fp, mhdr, MNG_CN_MHDR, 28);
 }
 
-/**
- * @fn  png_error mng_capture_frame(core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
- *
- * @brief   Mng capture frame.
- *
- * @param [in,out]  fp      If non-null, the fp.
- * @param [in,out]  info    If non-null, the information.
- * @param [in,out]  bitmap  The bitmap.
- * @param   palette_length  Length of the palette.
- * @param   palette         The palette.
- *
- * @return  A png_error.
- */
 
-png_error mng_capture_frame(core_file &fp, png_info &info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette)
+std::error_condition mng_capture_frame(random_write &fp, png_info &info, bitmap_t const &bitmap, int palette_length, rgb_t const *palette)
 {
 	return write_png_stream(fp, info, bitmap, palette_length, palette);
 }
 
-/**
- * @fn  png_error mng_capture_stop(core_file &fp)
- *
- * @brief   Mng capture stop.
- *
- * @param [in,out]  fp  If non-null, the fp.
- *
- * @return  A png_error.
- */
 
-png_error mng_capture_stop(core_file &fp)
+std::error_condition mng_capture_stop(random_write &fp)
 {
 	return write_chunk(fp, nullptr, MNG_CN_MEND, 0);
+}
+
+
+/*-------------------------------------------------
+    png_category - gets the PNG error category
+    instance
+-------------------------------------------------*/
+
+std::error_category const &png_category() noexcept
+{
+	return f_png_category_instance;
 }
 
 } // namespace util

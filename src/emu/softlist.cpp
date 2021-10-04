@@ -192,7 +192,7 @@ class softlist_parser
 public:
 	// construction (== execution)
 	softlist_parser(
-			util::core_file &file,
+			util::random_read &file,
 			std::string_view filename,
 			std::string &listname,
 			std::string &description,
@@ -239,12 +239,10 @@ private:
 	void parse_soft_end(const char *name);
 
 	// internal parsing state
-	util::core_file &           m_file;
 	const std::string_view      m_filename;
 	std::list<software_info> &  m_infolist;
 	std::ostream &              m_errors;
 	struct XML_ParserStruct *   m_parser;
-	bool                        m_done;
 	std::string &               m_listname;
 	std::string &               m_description;
 	bool                        m_data_accum_expected;
@@ -260,17 +258,15 @@ private:
 //-------------------------------------------------
 
 softlist_parser::softlist_parser(
-		util::core_file &file,
+		util::random_read &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
 		std::list<software_info> &infolist,
 		std::ostream &errors) :
-	m_file(file),
 	m_filename(filename),
 	m_infolist(infolist),
 	m_errors(errors),
-	m_done(false),
 	m_listname(listname),
 	m_description(description),
 	m_data_accum_expected(false),
@@ -280,7 +276,7 @@ softlist_parser::softlist_parser(
 {
 	// create the parser
 	m_parser = XML_ParserCreate_MM(nullptr, nullptr, nullptr);
-	if (m_parser == nullptr)
+	if (!m_parser)
 		throw std::bad_alloc();
 
 	// set the handlers
@@ -289,13 +285,15 @@ softlist_parser::softlist_parser(
 	XML_SetCharacterDataHandler(m_parser, &softlist_parser::data_handler);
 
 	// parse the file contents
-	m_file.seek(0, SEEK_SET);
+	file.seek(0, SEEK_SET);
 	char buffer[1024];
-	while (!m_done)
+	for (bool done = false; !done; )
 	{
-		u32 length = m_file.read(buffer, sizeof(buffer));
-		m_done = m_file.eof();
-		if (XML_Parse(m_parser, buffer, length, m_done) == XML_STATUS_ERROR)
+		size_t length;
+		file.read(buffer, sizeof(buffer), length); // TODO: better error handling
+		if (!length)
+			done = true;
+		if (XML_Parse(m_parser, buffer, length, done) == XML_STATUS_ERROR)
 		{
 			parse_error("%s", parser_error());
 			break;
@@ -885,7 +883,7 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 
 void parse_software_list(
-		util::core_file &file,
+		util::random_read &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,

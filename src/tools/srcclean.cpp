@@ -2287,9 +2287,15 @@ int main(int argc, char *argv[])
 
 			// read/process in chunks
 			output.clear();
-			std::uint64_t remaining(infile->size());
-			std::uint32_t block;
-			while (remaining && (0U != (block = infile->read(original, (std::min)(std::uint64_t(sizeof(original)), remaining)))))
+			std::uint64_t remaining;
+			if (infile->length(remaining))
+			{
+				util::stream_format(std::cerr, "Can't get length of %1$s\n", argv[i]);
+				++failures;
+				continue;
+			}
+			std::size_t block;
+			while (remaining && !infile->read(original, (std::min)(std::uint64_t(sizeof(original)), remaining), block) && block)
 			{
 				remaining -= block;
 				cleaner->process(original, original + block);

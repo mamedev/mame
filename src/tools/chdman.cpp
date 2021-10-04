@@ -247,11 +247,16 @@ class chd_rawfile_compressor : public chd_file_compressor
 {
 public:
 	// construction/destruction
-	chd_rawfile_compressor(util::core_file &file, std::uint64_t offset = 0, std::uint64_t maxoffset = std::numeric_limits<std::uint64_t>::max())
+	chd_rawfile_compressor(util::random_read &file, std::uint64_t offset = 0, std::uint64_t maxoffset = std::numeric_limits<std::uint64_t>::max())
 		: m_file(file)
 		, m_offset(offset)
-		, m_maxoffset((std::min)(maxoffset, file.size()))
 	{
+		// TODO: what to do about error getting file size?
+		std::uint64_t filelen;
+		if (!file.length(filelen))
+			m_maxoffset = (std::min)(maxoffset, filelen);
+		else
+			m_maxoffset = maxoffset;
 	}
 
 	// read interface
@@ -262,13 +267,16 @@ public:
 			return 0;
 		if (offset + length > m_maxoffset)
 			length = m_maxoffset - offset;
-		m_file.seek(offset, SEEK_SET);
-		return m_file.read(dest, length);
+		if (m_file.seek(offset, SEEK_SET)) // FIXME: better error reporting?
+			return 0;
+		std::size_t actual;
+		m_file.read(dest, length, actual); // FIXME: check for error return
+		return actual;
 	}
 
 private:
 	// internal state
-	util::core_file &   m_file;
+	util::random_read & m_file;
 	std::uint64_t       m_offset;
 	std::uint64_t       m_maxoffset;
 };
@@ -425,11 +433,15 @@ public:
 						}
 						else
 						{
-							m_file->seek((src_frame_start >= split_track_start)
-								? src_frame_start - split_track_start
-								: src_frame_start, SEEK_SET);
-							uint32_t count = m_file->read(dest, bytesperframe);
-							if (count != bytesperframe)
+							std::error_condition err = m_file->seek(
+									(src_frame_start >= split_track_start)
+										? src_frame_start - split_track_start
+										: src_frame_start,
+									SEEK_SET);
+							std::size_t count = 0;
+							if (!err)
+								err = m_file->read(dest, bytesperframe, count);
+							if (err || (count != bytesperframe))
 								report_error(1, "Error reading input file (%s)'", m_lastfile);
 						}
 
@@ -1693,7 +1705,9 @@ static void do_create_raw(parameters_map &params)
 	// process input start/end (needs to know hunk_size)
 	uint64_t input_start;
 	uint64_t input_end;
-	parse_input_start_end(params, input_file->size(), hunk_size, hunk_size, input_start, input_end);
+	uint64_t input_size = 0;
+	input_file->length(input_size); // FIXME: check error return
+	parse_input_start_end(params, input_size, hunk_size, hunk_size, input_start, input_end);
 
 	// process compression
 	chd_codec_type compression[4];
@@ -1708,7 +1722,7 @@ static void do_create_raw(parameters_map &params)
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	printf("Input file:   %s\n", input_file_str->second->c_str());
-	if (input_start != 0 || input_end != input_file->size())
+	if (input_start != 0 || input_end != input_size)
 	{
 		printf("Input start:  %s\n", big_int_string(input_start).c_str());
 		printf("Input length: %s\n", big_int_string(input_end - input_start).c_str());
@@ -1789,7 +1803,9 @@ static void do_create_hd(parameters_map &params)
 	uint64_t input_end = 0;
 	if (input_file)
 	{
-		parse_input_start_end(params, input_file->size(), hunk_size, hunk_size, input_start, input_end);
+		uint64_t input_size = 0;
+		input_file->length(input_size); // FIXME: check error return
+		parse_input_start_end(params, input_size, hunk_size, hunk_size, input_start, input_end);
 		filesize = input_end - input_start;
 	}
 	else
@@ -1897,8 +1913,10 @@ static void do_create_hd(parameters_map &params)
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	if (input_file)
 	{
+		uint64_t input_size = 0;
+		input_file->length(input_size); // FIXME: check error return
 		printf("Input file:   %s\n", input_file_str->second->c_str());
-		if (input_start != 0 || input_end != input_file->size())
+		if (input_start != 0 || input_end != input_size)
 		{
 			printf("Input start:  %s\n", big_int_string(input_start).c_str());
 			printf("Input length: %s\n", big_int_string(filesize).c_str());
@@ -2361,8 +2379,9 @@ static void do_extract_raw(parameters_map &params)
 				report_error(1, "Error reading CHD file (%s): %s", *params.find(OPTION_INPUT)->second, err.message());
 
 			// write to the output
-			uint32_t count = output_file->write(&buffer[0], bytes_to_read);
-			if (count != bytes_to_read)
+			size_t count;
+			std::error_condition const writerr = output_file->write(&buffer[0], bytes_to_read, count);
+			if (writerr || (count != bytes_to_read))
 				report_error(1, "Error writing to file; check disk space (%s)", *output_file_str->second);
 
 			// advance
@@ -2555,8 +2574,9 @@ static void do_extract_cd(parameters_map &params)
 				if (bufferoffs == buffer.size() || frame == actualframes - 1)
 				{
 					output_bin_file->seek(outputoffs, SEEK_SET);
-					uint32_t byteswritten = output_bin_file->write(&buffer[0], bufferoffs);
-					if (byteswritten != bufferoffs)
+					size_t byteswritten;
+					std::error_condition const writerr = output_bin_file->write(&buffer[0], bufferoffs, byteswritten);
+					if (writerr || (byteswritten != bufferoffs))
 						report_error(1, "Error writing frame %d to file (%s): %s\n", frame, *output_file_str->second, "Write error");
 					outputoffs += bufferoffs;
 					bufferoffs = 0;
@@ -2898,23 +2918,28 @@ static void do_dump_metadata(parameters_map &params)
 		// create the file
 		if (output_file_str != params.end())
 		{
-			std::error_condition const filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+			std::error_condition filerr;
+
+			filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
 			if (filerr)
 				report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
 
 			// output the metadata
-			uint32_t count = output_file->write(&buffer[0], buffer.size());
-			if (count != buffer.size())
+			size_t count;
+			filerr = output_file->write(&buffer[0], buffer.size(), count);
+			if (!filerr)
+				filerr = output_file->flush();
+			if (filerr || (count != buffer.size()))
 				report_error(1, "Error writing file (%s)", *output_file_str->second);
 			output_file.reset();
 
 			// provide some feedback
 			printf("File (%s) written, %s bytes\n", output_file_str->second->c_str(), big_int_string(buffer.size()).c_str());
 		}
-
-		// flush to stdout
 		else
 		{
+			// flush to stdout
+			// FIXME: check for errors
 			fwrite(&buffer[0], 1, buffer.size(), stdout);
 			fflush(stdout);
 		}

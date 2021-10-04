@@ -30,7 +30,7 @@
 #include "emu.h"
 #include "hp_dc100_tape.h"
 
-#include "util/ioprocs.h"
+#include "util/ioprocsfilter.h"
 
 // Debugging
 #include "logmacro.h"
@@ -110,7 +110,7 @@ void hp_dc100_tape_device::call_unload()
 
 	if (m_image_dirty) {
 		check_for_file();
-		auto io = util::core_file_read_write(image_core_file(), 0);
+		auto io = util::random_read_write_fill(image_core_file(), 0);
 		if (io) {
 			m_image.save_tape(*io);
 			m_image_dirty = false;
@@ -606,7 +606,7 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 
 	check_for_file();
 	if (is_create) {
-		auto io = util::core_file_read_write(image_core_file(), 0);
+		auto io = util::random_read_write_fill(image_core_file(), 0);
 		if (!io) {
 			LOG("out of memory\n");
 			seterror(std::errc::not_enough_memory, nullptr);
@@ -616,7 +616,7 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 		m_image.clear_tape();
 		m_image.save_tape(*io);
 	} else {
-		auto io = util::core_file_read(image_core_file(), 0);
+		auto io = util::random_read_fill(image_core_file(), 0);
 		if (!io) {
 			LOG("out of memory\n");
 			seterror(std::errc::not_enough_memory, nullptr);

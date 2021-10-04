@@ -41,6 +41,8 @@
 
 #include "cbm_crt.h"
 
+#include "corefile.h"
+
 #include "osdcore.h" // osd_printf_*
 
 
@@ -134,9 +136,10 @@ std::string cbm_crt_get_card(util::core_file &file)
 {
 	// read the header
 	cbm_crt_header header;
-	file.read(&header, CRT_HEADER_LENGTH);
+	size_t actual;
+	std::error_condition err = file.read(&header, CRT_HEADER_LENGTH, actual);
 
-	if (memcmp(header.signature, CRT_SIGNATURE, 16) == 0)
+	if (!err && (CRT_HEADER_LENGTH == actual) && !memcmp(header.signature, CRT_SIGNATURE, 16))
 	{
 		uint16_t hardware = pick_integer_be(header.hardware, 0, 2);
 
@@ -153,11 +156,14 @@ std::string cbm_crt_get_card(util::core_file &file)
 
 bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_size, int *exrom, int *game)
 {
+	size_t actual;
+
 	// read the header
 	cbm_crt_header header;
-	file.read(&header, CRT_HEADER_LENGTH);
+	if (file.read(&header, CRT_HEADER_LENGTH, actual))
+		return false;
 
-	if (memcmp(header.signature, CRT_SIGNATURE, 16) != 0)
+	if ((CRT_HEADER_LENGTH != actual) || (memcmp(header.signature, CRT_SIGNATURE, 16) != 0))
 		return false;
 
 	uint16_t hardware = pick_integer_be(header.hardware, 0, 2);
@@ -177,11 +183,12 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 	while (!file.eof())
 	{
 		cbm_crt_chip chip;
-		file.read(&chip, CRT_CHIP_LENGTH);
+		if (file.read(&chip, CRT_CHIP_LENGTH, actual) || (CRT_CHIP_LENGTH != actual))
+			return false;
 
-		uint16_t address = pick_integer_be(chip.start_address, 0, 2);
-		uint16_t size = pick_integer_be(chip.image_size, 0, 2);
-		uint16_t type = pick_integer_be(chip.chip_type, 0, 2);
+		const uint16_t address = pick_integer_be(chip.start_address, 0, 2);
+		const uint16_t size = pick_integer_be(chip.image_size, 0, 2);
+		const uint16_t type = pick_integer_be(chip.chip_type, 0, 2);
 
 		if (LOG)
 		{
@@ -198,7 +205,8 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 		default: osd_printf_verbose("Invalid CHIP loading address!\n"); break;
 		}
 
-		file.seek(size, SEEK_CUR);
+		if (file.seek(size, SEEK_CUR))
+			return false;
 	}
 
 	return true;
@@ -211,25 +219,33 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 
 bool cbm_crt_read_data(util::core_file &file, uint8_t *roml, uint8_t *romh)
 {
+	if (file.seek(CRT_HEADER_LENGTH, SEEK_SET))
+		return false;
+
 	uint32_t roml_offset = 0;
 	uint32_t romh_offset = 0;
 
-	file.seek(CRT_HEADER_LENGTH, SEEK_SET);
-
 	while (!file.eof())
 	{
+		size_t actual;
+
 		cbm_crt_chip chip;
-		file.read(&chip, CRT_CHIP_LENGTH);
+		if (file.read(&chip, CRT_CHIP_LENGTH, actual) || (CRT_CHIP_LENGTH != actual))
+			return false;
 
-		uint16_t address = pick_integer_be(chip.start_address, 0, 2);
-		uint16_t size = pick_integer_be(chip.image_size, 0, 2);
+		const uint16_t address = pick_integer_be(chip.start_address, 0, 2);
+		const uint16_t size = pick_integer_be(chip.image_size, 0, 2);
 
+		std::error_condition err;
 		switch (address)
 		{
-		case 0x8000: file.read(roml + roml_offset, size); roml_offset += size; break;
-		case 0xa000: file.read(romh + romh_offset, size); romh_offset += size; break;
-		case 0xe000: file.read(romh + romh_offset, size); romh_offset += size; break;
+		case 0x8000: err = file.read(roml + roml_offset, size, actual); roml_offset += size; break;
+		case 0xa000: err = file.read(romh + romh_offset, size, actual); romh_offset += size; break;
+		case 0xe000: err = file.read(romh + romh_offset, size, actual); romh_offset += size; break;
+		// FIXME: surely one needs to report an error or skip over the data if the load address is not recognised?
 		}
+		if (err) // TODO: check size - all bets are off if the address isn't recognised anyway
+			return false;
 	}
 
 	return true;

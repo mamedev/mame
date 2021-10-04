@@ -8,15 +8,18 @@
 
 ****************************************************************************/
 
+#include "corefile.h"
+#include "png.h"
+
+#include "osdfile.h"
+
+#include <cassert>
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
-#include <cassert>
-#include "osdfile.h"
-#include "png.h"
-
 #include <new>
+
 
 /***************************************************************************
     CONSTANTS & DEFINES
@@ -74,7 +77,6 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	int width, height, maxwidth;
 	util::core_file::ptr file;
 	std::error_condition filerr;
-	util::png_error pngerr;
 	int error = 100;
 
 	/* open the source image */
@@ -86,11 +88,11 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	}
 
 	/* load the source image */
-	pngerr = util::png_read_bitmap(*file, bitmap1);
+	filerr = util::png_read_bitmap(*file, bitmap1);
 	file.reset();
-	if (pngerr != util::png_error::NONE)
+	if (filerr)
 	{
-		printf("Could not read %s (%d)\n", imgfile1.c_str(), int(pngerr));
+		printf("Could not read %s (%s)\n", imgfile1.c_str(), filerr.message().c_str());
 		goto error;
 	}
 
@@ -103,11 +105,11 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	}
 
 	/* load the source image */
-	pngerr = util::png_read_bitmap(*file, bitmap2);
+	filerr = util::png_read_bitmap(*file, bitmap2);
 	file.reset();
-	if (pngerr != util::png_error::NONE)
+	if (filerr)
 	{
-		printf("Could not read %s (%d)\n", imgfile2.c_str(), int(pngerr));
+		printf("Could not read %s (%s)\n", imgfile2.c_str(), filerr.message().c_str());
 		goto error;
 	}
 
@@ -176,11 +178,11 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 			printf("Could not open %s (%s)\n", outfilename.c_str(), filerr.message().c_str());
 			goto error;
 		}
-		pngerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
+		filerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
 		file.reset();
-		if (pngerr != util::png_error::NONE)
+		if (filerr)
 		{
-			printf("Could not write %s (%d)\n", outfilename.c_str(), int(pngerr));
+			printf("Could not write %s (%s)\n", outfilename.c_str(), filerr.message().c_str());
 			goto error;
 		}
 	}
