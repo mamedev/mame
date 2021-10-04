@@ -159,7 +159,7 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 		{
 			// relative jump with 32-bit displacement (typically a resolved PLT entry)
 			LOG("Found relative jump at %p ", func);
-			func += 5 + *reinterpret_cast<std::int32_t const *>(func + 1);
+			func += std::ptrdiff_t(5) + *reinterpret_cast<std::int32_t const *>(func + 1);
 			LOG("redirecting to %p\n", func);
 			continue;
 		}
