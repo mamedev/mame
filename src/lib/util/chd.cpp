@@ -702,17 +702,14 @@ std::error_condition chd_file::create(std::string_view filename, uint64_t logica
 	std::error_condition filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
 	if (filerr)
 		return filerr;
-	util::random_read_write::ptr io = util::core_file_read_write(std::move(file));
-	if (!io)
-		return std::errc::not_enough_memory;
 
 	// create the file normally, then claim the file
-	std::error_condition chderr = create(std::move(io), logicalbytes, hunkbytes, unitbytes, compression);
+	std::error_condition chderr = create(std::move(file), logicalbytes, hunkbytes, unitbytes, compression);
 
 	// if an error happened, close and delete the file
 	if (chderr)
 	{
-		io.reset();
+		file.reset();
 		osd_file::remove(std::string(filename)); // FIXME: allow osd_file to use std::string_view
 	}
 	return chderr;
@@ -745,17 +742,14 @@ std::error_condition chd_file::create(std::string_view filename, uint64_t logica
 	std::error_condition filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
 	if (filerr)
 		return filerr;
-	util::random_read_write::ptr io = util::core_file_read_write(std::move(file));
-	if (!io)
-		return std::errc::not_enough_memory;
 
 	// create the file normally, then claim the file
-	std::error_condition chderr = create(std::move(io), logicalbytes, hunkbytes, compression, parent);
+	std::error_condition chderr = create(std::move(file), logicalbytes, hunkbytes, compression, parent);
 
 	// if an error happened, close and delete the file
 	if (chderr)
 	{
-		io.reset();
+		file.reset();
 		osd_file::remove(std::string(filename)); // FIXME: allow osd_file to use std::string_view
 	}
 	return chderr;
@@ -787,12 +781,9 @@ std::error_condition chd_file::open(std::string_view filename, bool writeable, c
 	std::error_condition filerr = util::core_file::open(filename, openflags, file);
 	if (filerr)
 		return filerr;
-	util::random_read_write::ptr io = util::core_file_read_write(std::move(file));
-	if (!io)
-		return std::errc::not_enough_memory;
 
 	// now open the CHD
-	std::error_condition err = open(std::move(io), writeable, parent);
+	std::error_condition err = open(std::move(file), writeable, parent);
 	if (err)
 		return err;
 

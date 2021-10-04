@@ -182,10 +182,10 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		u32 size = hook.image_file()->size();
-		int type = (size == 0x4000) ? O2_RALLY : O2_STD;
-		slot_string = o2_get_slot(type);
+		uint64_t size;
+		hook.image_file()->length(size); // FIXME: check error return
+		int const type = (size == 0x4000) ? O2_RALLY : O2_STD;
+		char const *const slot_string = o2_get_slot(type);
 
 		return std::string(slot_string);
 	}

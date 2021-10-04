@@ -11,6 +11,8 @@
 #include "msdib.h"
 
 #include "coretmpl.h"
+#include "ioprocs.h"
+
 #include "eminline.h"
 #include "osdcore.h"
 
@@ -91,7 +93,7 @@ union bitmap_headers
 };
 
 
-bool dib_parse_mask(uint32_t mask, unsigned &shift, unsigned &bits)
+bool dib_parse_mask(std::uint32_t mask, unsigned &shift, unsigned &bits)
 {
 	shift = count_leading_zeros_32(mask);
 	mask <<= shift;
@@ -113,7 +115,7 @@ void dib_truncate_channel(unsigned &shift, unsigned &bits)
 }
 
 
-uint8_t dib_splat_sample(uint8_t val, unsigned bits)
+std::uint8_t dib_splat_sample(std::uint8_t val, unsigned bits)
 {
 	assert(8U >= bits);
 	for (val <<= (8U - bits); bits && (8U > bits); bits <<= 1)
@@ -122,11 +124,13 @@ uint8_t dib_splat_sample(uint8_t val, unsigned bits)
 }
 
 
-msdib_error dib_read_file_header(core_file &fp, std::uint32_t &filelen)
+msdib_error dib_read_file_header(read_stream &fp, std::uint32_t &filelen)
 {
+	std::size_t actual;
+
 	// the bitmap file header doesn't use natural alignment
 	bitmap_file_header file_header;
-	if (fp.read(file_header, sizeof(file_header)) != sizeof(file_header))
+	if (fp.read(file_header, sizeof(file_header), actual) || (sizeof(file_header) != actual))
 	{
 		LOG("Error reading DIB file header\n");
 		return msdib_error::FILE_TRUNCATED;
@@ -161,7 +165,7 @@ msdib_error dib_read_file_header(core_file &fp, std::uint32_t &filelen)
 
 
 msdib_error dib_read_bitmap_header(
-		core_file &fp,
+		random_read &fp,
 		bitmap_headers &header,
 		unsigned &palette_bytes,
 		bool &indexed,
@@ -170,6 +174,8 @@ msdib_error dib_read_bitmap_header(
 		std::size_t &row_bytes,
 		std::uint32_t length)
 {
+	std::size_t actual;
+
 	// check that these things haven't been padded somehow
 	static_assert(sizeof(bitmap_core_header) == 12U, "compiler has applied padding to bitmap_core_header");
 	static_assert(sizeof(bitmap_info_header) == 56U, "compiler has applied padding to bitmap_info_header");
@@ -179,7 +185,7 @@ msdib_error dib_read_bitmap_header(
 	if (sizeof(header.core) > length)
 		return msdib_error::FILE_TRUNCATED;
 	std::memset(&header, 0, sizeof(header));
-	if (fp.read(&header.core.size, sizeof(header.core.size)) != sizeof(header.core.size))
+	if (fp.read(&header.core.size, sizeof(header.core.size), actual) || (sizeof(header.core.size) != actual))
 	{
 		LOG("Error reading DIB header size (length %u)\n", length);
 		return msdib_error::FILE_TRUNCATED;
@@ -209,12 +215,18 @@ msdib_error dib_read_bitmap_header(
 		{
 			palette_bytes = 3U;
 			std::uint32_t const header_read(std::min<std::uint32_t>(header.core.size, sizeof(header.core)) - sizeof(header.core.size));
-			if (fp.read(&header.core.width, header_read) != header_read)
+			if (fp.read(&header.core.width, header_read, actual) || (header_read != actual))
 			{
 				LOG("Error reading DIB core header from image data (%u bytes)\n", length);
 				return msdib_error::FILE_TRUNCATED;
 			}
-			fp.seek(header.core.size - sizeof(header.core.size) - header_read, SEEK_CUR);
+			if (fp.seek(header.core.size - sizeof(header.core.size) - header_read, SEEK_CUR))
+			{
+				LOG(
+						"Error seeking past additional DIB header data (%u bytes)\n",
+						header.core.size - sizeof(header.core.size) - header_read);
+				return msdib_error::FILE_ERROR;
+			}
 			header.core.width = little_endianize_int16(header.core.width);
 			header.core.height = little_endianize_int16(header.core.height);
 			header.core.planes = little_endianize_int16(header.core.planes);
@@ -256,12 +268,18 @@ msdib_error dib_read_bitmap_header(
 		{
 			palette_bytes = 4U;
 			std::uint32_t const header_read(std::min<std::uint32_t>(header.info.size, sizeof(header.info)) - sizeof(header.info.size));
-			if (fp.read(&header.info.width,  header_read) != header_read)
+			if (fp.read(&header.info.width, header_read, actual) || (header_read != actual))
 			{
 				LOG("Error reading DIB info header from image data (%u bytes)\n", length);
 				return msdib_error::FILE_TRUNCATED;
 			}
-			fp.seek(header.info.size - sizeof(header.info.size) - header_read, SEEK_CUR);
+			if (fp.seek(header.info.size - sizeof(header.info.size) - header_read, SEEK_CUR))
+			{
+				LOG(
+						"Error seeking past additional DIB header data (%u bytes)\n",
+						header.info.size - sizeof(header.info.size) - header_read);
+				return msdib_error::FILE_ERROR;
+			}
 			header.info.width = little_endianize_int32(header.info.width);
 			header.info.height = little_endianize_int32(header.info.height);
 			header.info.planes = little_endianize_int16(header.info.planes);
@@ -379,7 +397,7 @@ msdib_error dib_read_bitmap_header(
 
 
 
-msdib_error msdib_verify_header(core_file &fp)
+msdib_error msdib_verify_header(random_read &fp)
 {
 	msdib_error err;
 
@@ -420,7 +438,7 @@ msdib_error msdib_verify_header(core_file &fp)
 }
 
 
-msdib_error msdib_read_bitmap(core_file &fp, bitmap_argb32 &bitmap)
+msdib_error msdib_read_bitmap(random_read &fp, bitmap_argb32 &bitmap)
 {
 	std::uint32_t file_length;
 	msdib_error const headerr(dib_read_file_header(fp, file_length));
@@ -431,9 +449,10 @@ msdib_error msdib_read_bitmap(core_file &fp, bitmap_argb32 &bitmap)
 }
 
 
-msdib_error msdib_read_bitmap_data(core_file &fp, bitmap_argb32 &bitmap, std::uint32_t length, std::uint32_t dirheight)
+msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::uint32_t length, std::uint32_t dirheight)
 {
 	// read the bitmap header
+	std::size_t actual;
 	bitmap_headers header;
 	unsigned palette_bytes;
 	bool indexed;
@@ -477,17 +496,18 @@ msdib_error msdib_read_bitmap_data(core_file &fp, bitmap_argb32 &bitmap, std::ui
 	if (indexed)
 	{
 		// read palette and convert
-		std::unique_ptr<std::uint8_t []> palette_data;
-		try { palette_data.reset(new std::uint8_t [palette_size]); }
-		catch (std::bad_alloc const &) { return msdib_error::OUT_OF_MEMORY; }
-		if (fp.read(palette_data.get(), palette_size) != palette_size)
+		std::unique_ptr<std::uint8_t []> palette_data(new (std::nothrow) std::uint8_t [palette_size]);
+		if (!palette_data)
+			return msdib_error::OUT_OF_MEMORY;
+		if (fp.read(palette_data.get(), palette_size, actual) || (palette_size != actual))
 		{
 			LOG("Error reading palette from DIB image data (%u bytes)\n", length);
 			return msdib_error::FILE_TRUNCATED;
 		}
 		std::size_t const palette_usable(std::min<std::size_t>(palette_entries, std::size_t(1) << header.info.bpp));
-		try { palette.reset(new rgb_t [palette_usable]); }
-		catch (std::bad_alloc const &) { return msdib_error::OUT_OF_MEMORY; }
+		palette.reset(new (std::nothrow) rgb_t [palette_usable]);
+		if (!palette)
+			return msdib_error::OUT_OF_MEMORY;
 		std::uint8_t const *ptr(palette_data.get());
 		for (std::size_t i = 0; palette_usable > i; ++i, ptr += palette_bytes)
 			palette[i] = rgb_t(ptr[2], ptr[1], ptr[0]);
@@ -496,7 +516,13 @@ msdib_error msdib_read_bitmap_data(core_file &fp, bitmap_argb32 &bitmap, std::ui
 	{
 		// skip over the palette if necessary
 		if (palette_entries)
-			fp.seek(palette_bytes * palette_entries, SEEK_CUR);
+		{
+			if (fp.seek(palette_bytes * palette_entries, SEEK_CUR))
+			{
+				LOG("Error seeking past DIB palette data (%u bytes)\n", palette_bytes * palette_entries);
+				return msdib_error::FILE_ERROR;
+			}
+		}
 
 		// convert masks to shifts
 		bool const masks_contiguous(
@@ -545,14 +571,14 @@ msdib_error msdib_read_bitmap_data(core_file &fp, bitmap_argb32 &bitmap, std::ui
 	}
 
 	// allocate the bitmap and process row data
-	std::unique_ptr<std::uint8_t []> row_data;
-	try {row_data.reset(new std::uint8_t [row_bytes]); }
-	catch (std::bad_alloc const &) { return msdib_error::OUT_OF_MEMORY; }
+	std::unique_ptr<std::uint8_t []> row_data(new (std::nothrow) std::uint8_t [row_bytes]);
+	if (!row_data)
+		return msdib_error::OUT_OF_MEMORY;
 	bitmap.allocate(header.info.width, header.info.height);
 	int const y_inc(top_down ? 1 : -1);
 	for (std::int32_t i = 0, y = top_down ? 0 : (header.info.height - 1); header.info.height > i; ++i, y += y_inc)
 	{
-		if (fp.read(row_data.get(), row_bytes) != row_bytes)
+		if (fp.read(row_data.get(), row_bytes, actual) || (row_bytes != actual))
 		{
 			LOG("Error reading DIB row %d data from image data\n", i);
 			return msdib_error::FILE_TRUNCATED;
@@ -615,7 +641,7 @@ msdib_error msdib_read_bitmap_data(core_file &fp, bitmap_argb32 &bitmap, std::ui
 	{
 		for (std::int32_t i = 0, y = top_down ? 0 : (header.info.height - 1); header.info.height > i; ++i, y += y_inc)
 		{
-			if (fp.read(row_data.get(), mask_row_bytes) != mask_row_bytes)
+			if (fp.read(row_data.get(), mask_row_bytes, actual) || (mask_row_bytes != actual))
 			{
 				LOG("Error reading DIB mask row %d data from image data\n", i);
 				return msdib_error::FILE_TRUNCATED;

@@ -365,9 +365,9 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	pnginfo.add_text("System", text2);
 
 	// now do the actual work
-	util::png_error error = util::png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
-	if (error != util::png_error::NONE)
-		osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", std::underlying_type_t<util::png_error>(error));
+	std::error_condition const error = util::png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
+	if (error)
+		osd_printf_error("Error generating PNG for HLSL snapshot (%s:%d %s)\n", error.category().name(), error.value(), error.message());
 
 	result = snap_copy_target->UnlockRect();
 	if (FAILED(result))

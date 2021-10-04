@@ -41,7 +41,7 @@ struct hard_disk_info
 ***************************************************************************/
 
 hard_disk_file *hard_disk_open(chd_file *chd);
-hard_disk_file *hard_disk_open(util::core_file &corefile, uint32_t skipoffs);
+hard_disk_file *hard_disk_open(util::random_read_write &corefile, uint32_t skipoffs);
 
 void hard_disk_close(hard_disk_file *file);
 
@@ -50,7 +50,7 @@ hard_disk_info *hard_disk_get_info(hard_disk_file *file);
 
 bool hard_disk_set_block_size(hard_disk_file *file, uint32_t blocksize);
 
-uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer);
-uint32_t hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer);
+bool hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer);
+bool hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer);
 
 #endif // MAME_LIB_UTIL_HARDDISK_H

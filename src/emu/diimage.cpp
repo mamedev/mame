@@ -434,11 +434,13 @@ bool device_image_interface::run_hash(util::core_file &file, u32 skip_bytes, uti
 	hashes.reset();
 
 	// figure out the size, and "cap" the skip bytes
-	u64 size = file.size();
-	skip_bytes = (u32) std::min((u64) skip_bytes, size);
+	u64 size;
+	if (file.length(size))
+		return false;
+	skip_bytes = u32(std::min<u64>(skip_bytes, size));
 
 	// seek to the beginning
-	file.seek(skip_bytes, SEEK_SET);
+	file.seek(skip_bytes, SEEK_SET); // TODO: check error return
 	u64 position = skip_bytes;
 
 	// keep on reading hashes
@@ -448,9 +450,10 @@ bool device_image_interface::run_hash(util::core_file &file, u32 skip_bytes, uti
 		uint8_t buffer[8192];
 
 		// read bytes
-		const u32 count = (u32) std::min(size - position, (u64) sizeof(buffer));
-		const u32 actual_count = file.read(buffer, count);
-		if (actual_count == 0)
+		const size_t count = size_t(std::min<u64>(size - position, sizeof(buffer)));
+		size_t actual_count;
+		const std::error_condition filerr = file.read(buffer, count, actual_count);
+		if (filerr || !actual_count)
 			return false;
 		position += actual_count;
 
@@ -460,7 +463,7 @@ bool device_image_interface::run_hash(util::core_file &file, u32 skip_bytes, uti
 	hashes.end();
 
 	// cleanup
-	file.seek(0, SEEK_SET);
+	file.seek(0, SEEK_SET); // TODO: check error return
 	return true;
 }
 

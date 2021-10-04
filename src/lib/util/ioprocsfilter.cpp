@@ -11,6 +11,7 @@
 #include "ioprocsfilter.h"
 
 #include "ioprocs.h"
+#include "ioprocsfill.h"
 
 #include <zlib.h>
 
@@ -335,7 +336,7 @@ private:
 template <typename T>
 class filter_base
 {
-protected:
+public:
 	filter_base(std::unique_ptr<T> &&object) noexcept : m_object(object.release()), m_owned(true)
 	{
 		assert(m_object);
@@ -345,6 +346,7 @@ protected:
 	{
 	}
 
+protected:
 	~filter_base()
 	{
 		if (m_owned)
@@ -359,6 +361,111 @@ protected:
 private:
 	T *const m_object;
 	bool const m_owned;
+};
+
+
+// helper for forwarding to a read stream
+
+template <typename T>
+class read_stream_proxy : public virtual read_stream, public T
+{
+public:
+	using T::T;
+
+	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		return this->object().read(buffer, length, actual);
+	}
+};
+
+
+// helper for forwarding to a write stream
+
+template <typename T>
+class write_stream_proxy : public virtual write_stream, public T
+{
+public:
+	using T::T;
+
+	virtual std::error_condition finalize() noexcept override
+	{
+		return this->object().finalize();
+	}
+
+	virtual std::error_condition flush() noexcept override
+	{
+		return this->object().flush();
+	}
+
+	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		return this->object().write(buffer, length, actual);
+	}
+};
+
+
+// helper for forwarding to random-access storage
+
+template <typename T>
+class random_access_proxy : public virtual random_access, public T
+{
+public:
+	using T::T;
+
+	virtual std::error_condition seek(std::int64_t offset, int whence) noexcept override
+	{
+		return this->object().seek(offset, whence);
+	}
+
+	virtual std::error_condition tell(std::uint64_t &result) noexcept override
+	{
+		return this->object().tell(result);
+	}
+
+	virtual std::error_condition length(std::uint64_t &result) noexcept override
+	{
+		return this->object().length(result);
+	}
+};
+
+
+// helper for forwarding to random-access read storage
+
+template <typename T>
+class random_read_proxy : public virtual random_read, public read_stream_proxy<T>
+{
+public:
+	using read_stream_proxy<T>::read_stream_proxy;
+
+	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		return this->object().read_at(offset, buffer, length, actual);
+	}
+};
+
+
+// helper for forwarding to random-access write storage
+
+template <typename T>
+class random_write_proxy : public virtual random_write, public write_stream_proxy<T>
+{
+public:
+	using write_stream_proxy<T>::write_stream_proxy;
+
+	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		return this->object().write_at(offset, buffer, length, actual);
+	}
+};
+
+
+// helper for forwarding to random-access read/write storage
+
+template <typename T>
+class random_read_write_proxy : public random_read_write, protected random_write_proxy<random_read_proxy<T> >
+{
+public:
+	using random_write_proxy<random_read_proxy<T> >::random_write_proxy;
 };
 
 
@@ -551,6 +658,91 @@ private:
 };
 
 } // anonymous namespace
+
+
+// creating filters that fill unread space
+
+read_stream::ptr read_stream_fill(read_stream::ptr &&stream, std::uint8_t filler) noexcept
+{
+	std::unique_ptr<read_stream_fill_wrapper<read_stream_proxy<filter_base<read_stream> > > > result;
+	if (stream)
+		result.reset(new (std::nothrow) decltype(result)::element_type(std::move(stream)));
+	if (result)
+		result->set_filler(filler);
+	return result;
+}
+
+random_read::ptr random_read_fill(random_read::ptr &&stream, std::uint8_t filler) noexcept
+{
+	std::unique_ptr<random_read_fill_wrapper<random_read_proxy<random_access_proxy<filter_base<random_read> > > > > result;
+	if (stream)
+		result.reset(new (std::nothrow) decltype(result)::element_type(std::move(stream)));
+	if (result)
+		result->set_filler(filler);
+	return result;
+}
+
+read_stream::ptr read_stream_fill(read_stream &stream, std::uint8_t filler) noexcept
+{
+	std::unique_ptr<read_stream_fill_wrapper<read_stream_proxy<filter_base<read_stream> > > > result;
+	result.reset(new (std::nothrow) decltype(result)::element_type(stream));
+	if (result)
+		result->set_filler(filler);
+	return result;
+}
+
+random_read::ptr random_read_fill(random_read &stream, std::uint8_t filler) noexcept
+{
+	std::unique_ptr<random_read_fill_wrapper<random_read_proxy<random_access_proxy<filter_base<random_read> > > > > result;
+	result.reset(new (std::nothrow) decltype(result)::element_type(stream));
+	if (result)
+		result->set_filler(filler);
+	return result;
+}
+
+
+// creating filters that fill unwritten space
+
+random_write::ptr random_write_fill(random_write::ptr &&stream, std::uint8_t filler) noexcept
+{
+	std::unique_ptr<random_write_fill_wrapper<random_write_proxy<random_access_proxy<filter_base<random_write> > > > > result;
+	if (stream)
+		result.reset(new (std::nothrow) decltype(result)::element_type(std::move(stream)));
+	if (result)
+		result->set_filler(filler);
+	return result;
+}
+
+random_write::ptr random_write_fill(random_write &stream, std::uint8_t filler) noexcept
+{
+	std::unique_ptr<random_write_fill_wrapper<random_write_proxy<random_access_proxy<filter_base<random_write> > > > > result;
+	result.reset(new (std::nothrow) decltype(result)::element_type(stream));
+	if (result)
+		result->set_filler(filler);
+	return result;
+}
+
+
+// creating filters that fill unread/unwritten space
+
+random_read_write::ptr random_read_write_fill(random_read_write::ptr &&stream, std::uint8_t filler) noexcept
+{
+	std::unique_ptr<random_read_write_fill_wrapper<random_read_write_proxy<random_access_proxy<filter_base<random_read_write> > > > > result;
+	if (stream)
+		result.reset(new (std::nothrow) decltype(result)::element_type(std::move(stream)));
+	if (result)
+		result->set_filler(filler);
+	return result;
+}
+
+random_read_write::ptr random_read_write_fill(random_read_write &stream, std::uint8_t filler) noexcept
+{
+	std::unique_ptr<random_read_write_fill_wrapper<random_read_write_proxy<random_access_proxy<filter_base<random_read_write> > > > > result;
+	result.reset(new (std::nothrow) decltype(result)::element_type(stream));
+	if (result)
+		result->set_filler(filler);
+	return result;
+}
 
 
 // creating decompressing filters

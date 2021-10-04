@@ -87,11 +87,11 @@ delegate_generic_function delegate_mfp_itanium::convert_to_generic(delegate_gene
 	// apply the "this" delta to the object first - the value is shifted to the left one bit position for the ARM-like variant
 	LOG("Input this=%p ptr=%p adj=%ld ", reinterpret_cast<void const *>(object), reinterpret_cast<void const *>(m_function), long(m_this_delta));
 	object = reinterpret_cast<delegate_generic_class *>(
-			reinterpret_cast<std::uint8_t *>(object) + (m_this_delta >> (MAME_DELEGATE_ITANIUM_ARM ? 1 : 0)));
+			reinterpret_cast<std::uint8_t *>(object) + (m_this_delta >> ((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? 1 : 0)));
 	LOG("Calculated this=%p ", reinterpret_cast<void const *>(object));
 
 	// test the virtual member function flag - it's the low bit of either the ptr or adj field, depending on the variant
-	if (MAME_DELEGATE_ITANIUM_ARM ? !(m_this_delta & 1) : !(m_function & 1))
+	if ((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? !(m_this_delta & 1) : !(m_function & 1))
 	{
 		// conventional function pointer
 		LOG("ptr=%p\n", reinterpret_cast<void const *>(m_function));
@@ -100,7 +100,7 @@ delegate_generic_function delegate_mfp_itanium::convert_to_generic(delegate_gene
 	else
 	{
 		// byte index into the vtable to the function
-		std::uint8_t const *const vtable_ptr = *reinterpret_cast<std::uint8_t const *const *>(object) + m_function - (MAME_DELEGATE_ITANIUM_ARM ? 0 : 1);
+		std::uint8_t const *const vtable_ptr = *reinterpret_cast<std::uint8_t const *const *>(object) + m_function - ((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? 0 : 1);
 		delegate_generic_function result;
 		if (MAME_DELEGATE_VT_DESCRIPTOR)
 			result = reinterpret_cast<delegate_generic_function>(uintptr_t(vtable_ptr));
