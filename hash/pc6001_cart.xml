@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="pc6001_cart" description="NEC PC-6001 cartridges">
+
+	<!-- Official Games -->
+
+	<software name="canyoncl" supported="yes">
+		<description>Canyon Climber</description>
+		<year>1982</year>
+		<!-- "licensed to NEC" -->
+		<publisher>Datasoft</publisher>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="canyon climber.bin" size="16384" crc="c92870fe" sha1="7d0e44b19a7c59b92f297735fc69b415081843ac"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Doesn't boot -->
+	<software name="crowman" supported="no">
+		<description>The Curse of Crowley Manor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="the curse of crowley manor.bin" size="16384" crc="592c54af" sha1="c0e2155181a20d3c963ee9151a3eabab4765ffd9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Has missing text (uses raster effect) -->
+	<software name="tutankhm" supported="partial">
+		<description>Tutankham</description>
+		<year>1982</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ツタンカーム"/>
+
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="510t.12" size="4096" crc="7a114d77" sha1="d0920e7d9d2a26530037350bf8399494ab0df0c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Homebrew Games -->
+
+	<!-- both these dumps aren't valid ROM sizes -->
+	<software name="moonraid" supported="yes">
+		<description>Moon Raiders</description>
+		<year>2010</year>
+		<!-- Developed by XYZ, author: mosesu -->
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="alt_title" value="ムーンレイダース"/>
+
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="16079">
+				<rom name="mr.bin" size="16079" crc="51ac06d8" sha1="736c7c72bb632a3bc26ed2e081a53d30b99cee2b" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonraida" cloneof="moonraid" supported="yes">
+		<!-- sports older website on title screen -->
+		<description>Moon Raiders (older)</description>
+		<year>2010</year>
+		<!-- Developed by XYZ, author: mosesu -->
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="alt_title" value="ムーンレイダース"/>
+
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="16106">
+				<rom name="moon raiders.bin" size="16106" crc="997a98ce" sha1="3b79342d24b87af70e9c4d3ad112153c6c02045a" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Too slow during gameplay -->
+	<software name="dawnpat" supported="no">
+		<!-- VZ200 port -->
+		<description>Dawn Patrol (beta)</description>
+		<year>2012</year>
+		<!-- Developed by fuzzballj -->
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="11829">
+				<rom name="dawn.bin" size="11829" crc="17f5a534" sha1="bd2a1bb78ae25e4f0f189bdcb963ba8e4038228d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Operating Systems -->
+
+	<!-- TODO: checkout which extra commands it introduces -->
+	<software name="n60basic">
+		<description>N60 Extended BASIC</description>
+		<year>1981</year>
+		<publisher>NEC / Microsoft</publisher>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="[os] n60 extended basic.bin" size="8192" crc="26a33482" sha1="9034860224856033717a6d1157b469e61ff4467a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Utilities -->
+	
+	<!-- TODO: how to actually draw? Missing key? -->
+	<software name="micropai" supported="no">
+		<!-- Stylized with double hyphen in the middle on title screen -->
+		<description>Micro-Painter</description>
+		<year>1982</year>
+		<publisher>Datasoft</publisher>
+		<!-- author: James Garon -->
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="[utility] micro-painter.bin" size="8192" crc="95537612" sha1="2c75af086e57f4cdf68d6349505d6cfe13a0c510"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="musedit" supported="no">
+		<description>Music Editor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="[utility] music editor.bin" size="8192" crc="5bad1bca" sha1="1b41fc82f9b59c30fadb8d40d326145dd76a0bd2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: not sure what this is supposed to do -->
+	<software name="electpen">
+		<description>The Electric Pencil (v2.0R)</description>
+		<year>1982</year>
+		<publisher>Racet Computes</publisher>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="[utility] the electric pencil (32kb).bin" size="16384" crc="31237eb5" sha1="7a46de43d30f5f5d05cc99bd1159d3a00238cf90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- White screen, pings AY8910 registers with custom writes -->
+	<software name="touchpan" supported="no">
+		<description>Touch Panel Utility</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="[Utility] Touch Panel (ROM cart).bin" size="4096" crc="50a31175" sha1="9c18b6fad8acdd438d63b144a21c4405e7ae8f15"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
