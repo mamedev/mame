@@ -262,7 +262,7 @@ INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 24000000); // unknown clock; type not confirmed
+	ST2302U(config, m_maincpu, 32000000); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");

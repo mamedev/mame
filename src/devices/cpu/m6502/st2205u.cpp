@@ -711,14 +711,11 @@ void st2205u_base_device::st2xxx_tclk_stop()
 u32 st2205u_base_device::tclk_pres_div(u8 mode) const
 {
 	assert(mode < 6);
-	if (mode < 3)
-		return 2 << mode;
-	else if (mode == 3)
-		return 32;
-	else if (mode == 4)
-		return 1024;
-	else
-		return 4096;
+
+	// dphh8630 game 17 "Gang Nam Style" uses mode 0 for ADPCM music and if a 32Mhz clock is used, requires a divider of 1
+	const int divtable[8] = { 1, 4, 8, 32, 1024, 4096, 4096, 4096 };
+
+	return divtable[mode];
 }
 
 TIMER_CALLBACK_MEMBER(st2205u_base_device::t0_interrupt)
