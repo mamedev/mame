@@ -1897,6 +1897,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bigfoot">
+		<description>Bigfoot</description>
+		<year>1990</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="906166">
+				<rom name="Bigfoot.tap" size="906166" crc="bcd74d9a" sha1="cbe793fe4215a8491a401b88a414869c101b9f98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btbarney">
+		<description>Bigtop Barney</description>
+		<year>1985</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="663080">
+				<rom name="Bigtop_Barney.tap" size="663080" crc="6e02ccfb" sha1="613900ea51510046a1d28154a3f4c7df7a37be81"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="biongran">
 		<description>Bionic Granny</description>
 		<year>1984</year>
@@ -1905,6 +1929,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="788388">
 				<rom name="Bionic_Granny.tap" size="788388" crc="70d62811" sha1="5d96d1084fc655edae4afc8e14679ff5a1d1d2ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blacklam">
+		<description>Black Lamp</description>
+		<year>1987</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="596610">
+				<rom name="Black_Lamp.tap" size="596610" crc="60e67c7f" sha1="175a973c8b4e9210e3361c9ba35efd8b6ae6a250"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blktiger">
+		<description>Black Tiger</description>
+		<year>1990</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="362554">
+				<rom name="Black_Tiger_Side_1.tap" size="362554" crc="5421feea" sha1="1230f156671bf96ee7ae7ce58f676375e9952795"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1430144">
+				<rom name="Black_Tiger_Side_2.tap" size="1430144" crc="ed755483" sha1="eb800461efb771041ffc79ad2a3f7cd0dd2ad90f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1933,6 +1989,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bloodbro">
+		<description>Blood Brothers</description>
+		<year>1988</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="594843">
+				<rom name="Blood_Brothers.tap" size="594843" crc="2eb63d08" sha1="dfc17f42a04a13768949504fbfad4a391c70f494"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blueangl">
 		<description>Blue Angel 69</description>
 		<year>1989</year>
@@ -1941,6 +2009,42 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="821037">
 				<rom name="Blue_Angel_69.tap" size="821037" crc="13de1e7d" sha1="1e264b4c59122ad067dcb2833baf372e702e237b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluemax">
+		<description>Blue Max</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="275370">
+				<rom name="Blue_Max.tap" size="275370" crc="63b89717" sha1="3c6c74ced6fccda5d2d51bb0f59fca92d236297b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="275370">
+				<rom name="Blue_Max_a1.tap" size="275370" crc="9a0efcba" sha1="fd773d7d3949eafb5fedaefe9af016da27e396eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmax2001">
+		<description>Blue Max 2001</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="291673">
+				<rom name="Blue_Max_2001.tap" size="291673" crc="c74b1d70" sha1="b4a69ad20e73c3d0d086ed5ba87b4e2528206c62"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="291922">
+				<rom name="Blue_Max_2001_a1.tap" size="291922" crc="e7646b01" sha1="4b7fc773e2177236f3f32dbd1ab8424e11b9512f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1959,6 +2063,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="620993">
 				<rom name="Blue_Thunder_a1.tap" size="620993" crc="d9087f4f" sha1="940e7d2de723e2f9afc581b29c474913b4974064"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluesbro">
+		<description>The Blues Brothers</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1055826">
+				<rom name="Blues_Brothers,_The.tap" size="1055826" crc="474fa7cd" sha1="50932ca5f0867210dc60fd42dbc5d67d3f24d4cb"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="1055826">
+				<rom name="Blues_Brothers,_The_a1.tap" size="1055826" crc="ac7d129a" sha1="b24d6efaabe885704db1006f2aab892fed2155d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2033,6 +2155,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bmxsim2">
+		<description>BMX Simulator 2</description>
+		<year>1989</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: BMX Simulator 2 (Easy)"/>
+			<dataarea name="cass" size="850644">
+				<rom name="BMX_Simulator_2_Side_1_(Easy).tap" size="850644" crc="7bf73241" sha1="f1b38e7becc0f2e4d08af8ae1997dd446425d995"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: BMX Simulator 2 (Hard)"/>
+			<dataarea name="cass" size="856976">
+				<rom name="BMX_Simulator_2_Side_2_(Hard).tap" size="856976" crc="455df3c9" sha1="ef27aa7e353ff23f0777ab6d24bb9c900770f772"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bmxtrials">
 		<description>BMX Trials</description>
 		<year>1985</year>
@@ -2047,6 +2189,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="563306">
 				<rom name="BMX_Trials_a1.tap" size="563306" crc="ed544e3b" sha1="f4e364c61f2c3465e2936543961ff0da3d843012"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbearing">
+		<description>Bobby Bearing</description>
+		<year>1986</year>
+		<publisher>The Edge</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="511778">
+				<rom name="Bobby_Bearing.tap" size="511778" crc="767f6728" sha1="a692a001b1392f39c0256ca2d0d624cf6e3af87b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theboggi">
+		<description>The Boggit: Bored Too</description>
+		<year>1986</year>
+		<publisher>CRL</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass1" size="1021004">
+				<rom name="Boggit,_The-_Bored_Too_Side_1.tap" size="1021004" crc="68f71906" sha1="556209a1f5721604014eef709d18502468e0932c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="805950">
+				<rom name="Boggit,_The-_Bored_Too_Side_2.tap" size="805950" crc="6b6bf72e" sha1="47d2d2c9e8ad2a4f8c40fd7e27b4b8117b49a57a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2083,6 +2257,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bombjacke" cloneof="bombjack">
+		<description>Bomb Jack (Elite Systems)</description>
+		<year>1985</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="565967">
+				<rom name="Bomb_Jack.tap" size="565967" crc="d2969fd4" sha1="ec27b8a23557eef5f052c8fb5034ef7915d6ff5b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bombjack2">
 		<description>Bomb Jack II</description>
 		<year>1989</year>
@@ -2097,6 +2283,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="719393">
 				<rom name="Bomb_Jack_II_a1.tap" size="719393" crc="2ca15b06" sha1="955017d80b8f80d8c4748078ff2e018915a1e634"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombjack2e" cloneof="bombjack2">
+		<description>Bomb Jack II (Elite Systems)</description>
+		<year>1986</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Bomb Jack II"/>
+			<dataarea name="cass" size="719393">
+				<rom name="Bomb_Jack_II_Side_1.tap" size="719393" crc="ab06e01b" sha1="d5369bec6c1b3efe0ba206212c2024b459bdfd10"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Bomb Jack"/>
+			<dataarea name="cass" size="565967">
+				<rom name="Bomb_Jack_II_Side_2.tap" size="565967" crc="8d45e10e" sha1="c53ade7e0363c690b1367858e45cb99a38d53987"/>
 			</dataarea>
 		</part>
 	</software>
