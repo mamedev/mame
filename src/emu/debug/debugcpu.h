@@ -138,7 +138,7 @@ public:
 	void track_pc_data_clear() { m_track_pc_set.clear(); }
 
 	// memory tracking
-	void set_track_mem(bool value) { m_track_mem = value; }
+	void set_track_mem(bool value);
 	offs_t track_mem_pc_from_space_address_data(const int& space,
 												const offs_t& address,
 												const u64& data) const;
