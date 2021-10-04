@@ -243,7 +243,6 @@ private:
 	std::list<software_info> &  m_infolist;
 	std::ostream &              m_errors;
 	struct XML_ParserStruct *   m_parser;
-	bool                        m_done;
 	std::string &               m_listname;
 	std::string &               m_description;
 	bool                        m_data_accum_expected;
@@ -294,7 +293,7 @@ softlist_parser::softlist_parser(
 		file.read(buffer, sizeof(buffer), length); // TODO: better error handling
 		if (!length)
 			done = true;
-		if (XML_Parse(m_parser, buffer, length, m_done) == XML_STATUS_ERROR)
+		if (XML_Parse(m_parser, buffer, length, done) == XML_STATUS_ERROR)
 		{
 			parse_error("%s", parser_error());
 			break;
@@ -884,7 +883,7 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 
 void parse_software_list(
-		util::core_file &file,
+		util::random_read &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
