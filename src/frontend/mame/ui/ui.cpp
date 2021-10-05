@@ -431,7 +431,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			// draw a standard message window
 			draw_text_box(container, warning_text, ui::text_layout::LEFT, 0.5f, 0.5f, warning_color);
 
-			if (machine().ui_input().pressed(IPT_UI_CANCEL))
+			if (machine().ui_input().pressed(IPT_UI_EXIT_GAME))
 			{
 				// if the user cancels, exit out completely
 				machine().schedule_exit();
@@ -1270,7 +1270,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (ui_disabled)
 		return ui_disabled;
 
-	if (machine().ui_input().pressed(IPT_UI_CANCEL))
+	if (machine().ui_input().pressed(IPT_UI_EXIT_GAME))
 	{
 		request_quit();
 		return 0;
