@@ -689,6 +689,9 @@ class SoftwareListHandler(QueryPageHandler):
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-software').encode('utf-8')
             yield '<script>make_collapsible(document.getElementById("heading-software"), document.getElementById("tbl-software"));</script>\n'.encode('utf-8')
 
+        if (softwarelist_info['notes']):
+            yield htmltmpl.SOFTWARELIST_EPILOGUE.substitute(notes=htmlescape(softwarelist_info['notes'])).encode('utf-8')
+
         yield '</body>\n</html>\n'.encode('utf-8')
 
     def software_page(self, software_info):
@@ -732,6 +735,9 @@ class SoftwareListHandler(QueryPageHandler):
             for name, value in self.dbcurs.get_softwarepart_features(id):
                 yield ('    <tr><th>%s:</th><td>%s</td>\n' % (htmlescape(name), htmlescape(value))).encode('utf-8')
             yield '</table>\n\n'.encode('utf-8')
+
+        if (software_info['notes']):
+            yield htmltmpl.SOFTWARE_EPILOGUE.substitute(notes=htmlescape(software_info['notes'])).encode('utf-8')
 
         yield '</body>\n</html>\n'.encode('utf-8')
 
