@@ -210,7 +210,12 @@ void amiga_fdc_device::live_run(const attotime &limit)
 				}
 
 				if(cur_live.bit_counter > 8)
-					fatalerror("amiga_fdc_device::live_run - cur_live.bit_counter > 8\n");
+				{
+					// CHECKME: abreed, ghoulsvf Ghouls'n Goblins and lastnin2 at very least throws this
+					// is it a side effect of something else not happening at the right time or the assumption is right?
+					cur_live.bit_counter = 0;
+					logerror("amiga_fdc_device::live_run - cur_live.bit_counter > 8\n")
+				}
 
 				if(cur_live.bit_counter == 8) {
 					live_delay(RUNNING_SYNCPOINT);
@@ -233,7 +238,10 @@ void amiga_fdc_device::live_run(const attotime &limit)
 					return;
 				cur_live.bit_counter++;
 				if(cur_live.bit_counter > 8)
-					fatalerror("amiga_fdc_device::live_run - cur_live.bit_counter > 8\n");
+				{
+					cur_live.bit_counter = 0;
+					logerror("amiga_fdc_device::live_run - cur_live.bit_counter > 8\n")
+				}
 
 				if(cur_live.bit_counter == 8) {
 					live_delay(RUNNING_SYNCPOINT);
@@ -454,6 +462,7 @@ void amiga_fdc_device::ciaaprb_w(uint8_t data)
 
 	live_sync();
 
+	// FIXME: several sources claims that multiple drive selects is really possible
 	if(!(data & 0x08))
 		floppy = floppy_devices[0];
 	else if(!(data & 0x10))
