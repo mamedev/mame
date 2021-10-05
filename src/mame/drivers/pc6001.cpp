@@ -802,7 +802,8 @@ void pc6601_state::fdc_mon_w(u8 data)
 void pc6601_state::pc6601_fdc_io(address_map &map)
 {
 	map(0xb1, 0xb1).mirror(0x4).w(FUNC(pc6601_state::fdc_sel_w));
-//  0xb0, 0xb3
+	map(0xb2, 0xb2).lr8([this]() { return m_fdc->get_irq() ? 1 : 0; }, "FDCINT");
+	//map(0xb3, 0xb3).w  b3 is written when b2 is read
 	map(0xd0, 0xdf).view(m_fdc_intf_view);
 	m_fdc_intf_view[0](0xd4, 0xd4).r(FUNC(pc6601_state::fdc_mon_r));
 	m_fdc_intf_view[0](0xd6, 0xd6).w(FUNC(pc6601_state::fdc_mon_w));
