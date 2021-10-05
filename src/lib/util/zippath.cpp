@@ -208,10 +208,11 @@ std::error_condition zippath_resolve(std::string_view path, osd::directory::entr
 	do
 	{
 		// trim the path of trailing path separators
-		auto i = apath.find_last_not_of(PATH_SEPARATOR);
-		if (i == std::string::npos)
+		auto const i = apath.find_last_not_of(PATH_SEPARATOR);
+		if (i != std::string::npos)
+			apath.erase(std::max<decltype(i)>(i + 1, 2)); // don't erase drive letter
+		else if (!is_root(apath))
 			break;
-		apath = apath.erase(std::max<decltype(i)>(i + 1, 2)); // don't erase drive letter
 
 		apath_trimmed = apath;
 
@@ -667,7 +668,7 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 	file = nullptr;
 
 	// loop through
-	while (!file && !mainpath.empty() && ((openflags == OPEN_FLAG_READ) || subpath.empty()))
+	while (!file && !mainpath.empty())
 	{
 		// is the mainpath a ZIP path?
 		if (is_zip_file(mainpath) || is_7z_file(mainpath))
@@ -676,23 +677,34 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 			std::error_condition const ziperr = is_zip_file(mainpath) ? archive_file::open_zip(mainpath, zip) : archive_file::open_7z(mainpath, zip);
 			if (!ziperr)
 			{
-				// it is a zip file - error if we're not opening for reading
-				if (openflags != OPEN_FLAG_READ)
-				{
-					filerr = std::errc::permission_denied;
-					goto done;
-				}
-
 				osd::directory::entry::entry_type entry_type;
 				int header;
 				if (!subpath.empty())
+				{
 					header = zippath_find_sub_path(*zip, subpath, entry_type);
+				}
 				else
+				{
 					header = zip->first_file();
+					entry_type = osd::directory::entry::entry_type::FILE;
+				}
 
 				if (header < 0)
 				{
-					filerr = std::errc::no_such_file_or_directory;
+					if (openflags & OPEN_FLAG_CREATE)
+						filerr = std::errc::permission_denied;
+					else
+						filerr = std::errc::no_such_file_or_directory;
+					goto done;
+				}
+				else if (osd::directory::entry::entry_type::DIR == entry_type)
+				{
+					filerr = std::errc::is_a_directory;
+					goto done;
+				}
+				else if (openflags & OPEN_FLAG_WRITE)
+				{
+					filerr = std::errc::permission_denied;
 					goto done;
 				}
 
