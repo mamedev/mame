@@ -81,7 +81,7 @@ Notes:
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 //#include <math.h>
-
+#include "imagewriter_printer.lh"
 
 DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "Apple ImageWriter Printer A9M0303")
 
@@ -102,7 +102,10 @@ apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine
 	m_bitmap_printer(*this, "bitmap_printer"),
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
-	m_timer_rxclock(*this, "rx_clock_8251")
+	m_timer_rxclock(*this, "rx_clock_8251"),
+	m_power_led(*this, "power_led"),
+	m_paper_error_led(*this, "paper_error_led"),
+	m_select_led(*this, "select_led")
 {
 }
 
@@ -175,6 +178,8 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	// 2400 baud: 9.8304e6 / 2 / 2 (=CLK1) / 16 (=output from 74393) / (64=m_br_factor 8251) = 2400
 	// 1200 baud: 9.8304e6 / 2 / 2 (=CLK1) / 128 (=output from 74393) / (16=m_br_factor 8251) = 1200
 	// 300  baud: 9.8304e6 / 2 / 2 (=CLK1) / 128 (=output from 74393) / (64=m_br_factor 8251) = 300
+
+	config.set_default_layout(layout_imagewriter_printer);
 }
 
 //-------------------------------------------------
@@ -578,6 +583,8 @@ uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 			m_ic17_flipflop_select_status   ? 0x888888 : 0x00dd00,    // select led
 			ioport("PAPEREND")->read()      ? 0xff0000 : 0x000000 );  // paperend led
 
+	m_power_led = 1;
+	m_paper_error_led = ioport("PAPEREND")->read();
 	return data;
 }
 
@@ -622,10 +629,12 @@ void apple_imagewriter_printer_device::switch_pc_w(uint8_t data)
 	if (!BIT(m_switches_pc_last, CLEARBIT))
 	{
 		m_ic17_flipflop_select_status = 0;  // *CLR
+		m_select_led = !m_ic17_flipflop_select_status;
 	}
 	if (!BIT(m_switches_pc_last, PRESETBIT))
 	{
 		m_ic17_flipflop_select_status = 1;  // *PRE
+		m_select_led = !m_ic17_flipflop_select_status;
 	}
 
 	// base clock is (9600 hz * 16)
@@ -870,6 +879,10 @@ void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
 
 void apple_imagewriter_printer_device::device_start()
 {
+	m_power_led.resolve();  // will get segfault if you forget to resolve
+	m_paper_error_led.resolve();
+	m_select_led.resolve();
+
 	save_item(NAME(left_offset));
 	save_item(NAME(right_offset));
 	save_item(NAME(m_left_edge));

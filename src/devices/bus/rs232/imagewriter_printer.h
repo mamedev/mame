@@ -55,6 +55,10 @@ private:
 
 	required_device<timer_device> m_timer_rxclock;
 
+	output_finder<> m_power_led;
+	output_finder<> m_paper_error_led;
+	output_finder<> m_select_led;
+
 	void maincpu_out_sod_func(uint8_t data);
 
 	uint8_t head_pa_r(offs_t offset);

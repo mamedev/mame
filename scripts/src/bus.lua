@@ -2707,6 +2707,14 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/mboardd.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/mboardd.h",
 	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/rs232/imagewriter_printer.cpp",  GEN_DIR .. "emu/layout/imagewriter_printer.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "imagewriter_printer"),
+	}
 end
 
 ---------------------------------------------------
