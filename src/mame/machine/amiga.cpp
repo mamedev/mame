@@ -387,9 +387,9 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 	m_irq_timer->reset();
 }
 
-WRITE_LINE_MEMBER( amiga_state::paula_int_w )
+void amiga_state::paula_int_w (offs_t channel, u8 state)
 {
-	set_interrupt(INTENA_SETCLR | (0x80 << state));
+	set_interrupt(INTENA_SETCLR | (0x80 << channel));
 }
 
 
@@ -1443,7 +1443,6 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 			data = (data & INTENA_SETCLR) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			CUSTOM_REG(offset) = data;
-
 			if (temp & INTENA_SETCLR)
 				// if we're enabling irq's, delay a bit
 				m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));

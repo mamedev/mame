@@ -142,7 +142,7 @@ void paula_8364_device::reg_w(offs_t offset, uint16_t data)
 
 TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 {
-	m_int_w(param);
+	m_int_w(param, 1);
 }
 
 //-------------------------------------------------
@@ -152,6 +152,7 @@ TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 void paula_8364_device::dma_reload(audio_channel *chan)
 {
 	chan->curlocation = chan->loc;
+	// TODO: how to treat length == 0?
 	chan->curlength = chan->len;
 	chan->irq_timer->adjust(attotime::from_hz(15750), chan->index); // clock() / 227
 
@@ -268,9 +269,14 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 					if (chan->curlength != 0)
 						chan->curlength--;
 
-					// if we run out of data, reload the dma
+					// if we run out of data, reload the dma and signal an IRQ,
+					// gpmaster/asparmgp definitely expects this
+					// (uses channel 3 as a sequencer, changing the start address on the fly)
 					if (chan->curlength == 0)
+					{
 						dma_reload(chan);
+						signal_irq(nullptr, channum);
+					}
 				}
 
 				// latch the next byte of the sample

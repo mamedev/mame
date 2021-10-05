@@ -137,7 +137,7 @@ private:
 
 	// callbacks
 	devcb_read16 m_mem_r;
-	devcb_write_line m_int_w;
+	devcb_write8 m_int_w;
 
 	// internal state
 	uint16_t m_dmacon;
