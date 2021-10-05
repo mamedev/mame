@@ -13,6 +13,7 @@
 #include "corestr.h"
 #include "unzip.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdlib>
@@ -350,6 +351,9 @@ public:
 		m_zipfile(std::move(zipfile)),
 		m_zipprefix(std::move(zipprefix))
 	{
+		for (char &ch : m_zipprefix)
+			if (is_path_separator(ch))
+				ch = '/';
 	}
 
 	virtual bool is_archive() const override { return true; }
@@ -455,7 +459,7 @@ private:
 
 	bool m_called_zip_first = false;
 	archive_file::ptr const m_zipfile;
-	std::string const m_zipprefix;
+	std::string m_zipprefix;
 	std::forward_list<std::string> m_returned_dirlist;
 };
 
@@ -566,14 +570,13 @@ zippath_directory::~zippath_directory()
 std::string zippath_parent(std::string_view path)
 {
 	// skip over trailing path separators
-	std::string_view::size_type pos = path.find_last_not_of(PATH_SEPARATOR);
+	auto pos = std::find_if_not(path.rbegin(), path.rend(), &is_path_separator);
 
 	// now skip until we find a path separator
-	while ((pos != std::string_view::npos) && !is_path_separator(path[pos]))
-		pos = (pos > 0) ? pos - 1 : std::string_view::npos;
+	pos = std::find_if(pos, path.rend(), &is_path_separator);
 
-	if (pos != std::string_view::npos)
-		return std::string(path, 0, pos + 1);
+	if (path.rend() != pos)
+		return std::string(path.begin(), pos.base());
 	else
 		return std::string();
 }
