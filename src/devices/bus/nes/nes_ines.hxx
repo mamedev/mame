@@ -357,7 +357,7 @@ static const nes_mmc mmc_list[] =
 	{ 319, BMC_HP898F },
 	{ 320, BMC_830425C },
 	// 321 duplicate of 287?
-	// 322 BMC-K-3033 35-in-1, related to mc_35?
+	{ 322, BMC_K3033 },
 	{ 323, FARID_SLROM8IN1 },      // homebrew 8-in-1
 	{ 324, FARID_UNROM8IN1 },      // homebrew 8-in-1
 	{ 325, UNL_MALISB },           // Super Mali Splash Bomb pirate hack
@@ -415,7 +415,7 @@ static const nes_mmc mmc_list[] =
 	// 377 JY-111 multicart, similar to mapper 367
 	// 378 8-in-1 multicart, which one?
 	// 379 35-in-1 multicart, similar to mapper 38
-	// 380 970630C multicart
+	{ 380, BMC_970630C },
 	{ 381, UNL_KN42 },             // 2-in-1 Big Nose games
 	{ 382, BMC_830928C },
 	// 383 JY-014 multicart

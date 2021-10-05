@@ -47,6 +47,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device,    "nes_bmc_81054
 DEFINE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device,    "nes_bmc_830425c",    "NES Cart BMC 830425C-4391T PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device,    "nes_bmc_830928c",    "NES Cart BMC 830928C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device,    "nes_bmc_850437c",    "NES Cart BMC 850437C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_970630C,    nes_bmc_970630c_device,    "nes_bmc_970630c",    "NES Cart BMC 970630C PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
@@ -207,6 +208,11 @@ nes_bmc_830928c_device::nes_bmc_830928c_device(const machine_config &mconfig, co
 
 nes_bmc_850437c_device::nes_bmc_850437c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_850437C, tag, owner, clock)
+{
+}
+
+nes_bmc_970630c_device::nes_bmc_970630c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_970630C, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -686,6 +692,21 @@ void nes_bmc_850437c_device::pcb_reset()
 	chr8(0, CHRRAM);
 
 	m_reg[0] = m_reg[1] = 0;
+}
+
+void nes_bmc_970630c_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_bmc_970630c_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
 }
 
 void nes_ntd03_device::device_start()
@@ -1668,7 +1689,60 @@ void nes_bmc_850437c_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
+ BMC-970630C
+
+ Games: 2 in 1 (NT-811), 4 in 1 1999
+
+ NES 2.0: mapper 380
+
+ In MAME: Supported.
+
+ TODO: Contra has the same graphics glitches as in
+ BMC-8157. These are marked as partially supported
+ in the softlist, but maybe this is just a BTANB?
+
+ -------------------------------------------------*/
+
+void nes_bmc_970630c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_970630c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	u8 bank = (offset >> 2) & 0x1f;
+	if (BIT(offset, 9))    // NROM mode
+	{
+		u8 mode = !BIT(offset, 0);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+	}
+	else                   // UNROM-esque mode
+	{
+		prg16_89ab(bank);
+		prg16_cdef(bank | 0x07);
+	}
+
+	set_nt_mirroring(BIT(offset, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	m_latch = BIT(offset, 8);
+}
+
+u8 nes_bmc_970630c_device::read_h(offs_t offset)
+{
+//	LOG_MMC(("bmc_970630c read_h, offset: %04x\n", offset));
+
+	if (m_latch)
+		return 0;    // TODO: menu supposedly varies by solder pad value returned here, but it doesn't seem to work...
+	else
+		return hi_access_rom(offset);
+}
+
+/*-------------------------------------------------
+
  BMC-NTD-03
+
+ Games: ASDER 20 in 1
+
+ NES 2.0: mapper 290
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
