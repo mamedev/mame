@@ -122,7 +122,21 @@
 #include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 
-#define VERBOSE 1
+// Logging setup
+#define LOG_GENERAL (1U << 0)
+#define LOG_INTERRUPT (1U << 1)
+#define LOG_ALL_INTERRUPT (1U << 2)
+#define LOG_LED (1U << 3)
+#define LOG_MEMORY (1U << 4)
+#define LOG_APBUS (1U << 5)
+
+#define NEWS_R4K_INFO (LOG_LED)
+#define NEWS_R4K_DEBUG (LOG_GENERAL|LOG_INTERRUPT|LOG_LED)
+#define NEWS_R4K_TRACE (NEWS_R4K_DEBUG|LOG_ALL_INTERRUPT|LOG_APBUS)
+#define NEWS_R4K_MAX (NEWS_R4K_TRACE|LOG_MEMORY)
+
+#define VERBOSE NEWS_R4K_INFO
+
 // MAME infra includes
 #include "debugger.h"
 #include "logmacro.h"
@@ -524,14 +538,14 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
                           NAME([this](offs_t offset, uint8_t data)
                               {
-                                // LOG("Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+                                LOGMASKED(LOG_MEMORY, "Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
                                 m_net_ram->write(offset, data);
                               }));// dedicated network RAM
     // DMAC3 DMA Controller
     map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset) { return m_dma_ram->read(offset); }),
                                      NAME([this](offs_t offset, uint8_t data)
                                           {
-                                              // LOG("Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+                                              LOGMASKED(LOG_MEMORY, "Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
                                               m_dma_ram->write(offset, data);
                                           }));
     map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
@@ -545,7 +559,7 @@ void news_r4k_state::cpu_map(address_map &map)
     // TODO: DSC-39 xb framebuffer/video card (0x14900000)
     map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset)
                                          {
-                                             // LOG("xb read attempted, offset 0x%x\n", offset);
+                                             LOGMASKED(LOG_GENERAL, "xb read attempted, offset 0x%x\n", offset);
                                              return 0xff;
                                          }));
 
@@ -616,12 +630,12 @@ void news_r4k_state::cpu_map_debug(address_map &map)
                    {
                        if (data == 0x10001)
                        {
-                           LOG("Enabling map shift!\n");
+                           LOGMASKED(LOG_GENERAL, "Enabling map shift!\n");
                            m_map_shift = true;
                        }
                        else
                        {
-                           LOG("Disabling map shift!\n");
+                           LOGMASKED(LOG_GENERAL, "Disabling map shift!\n");
                            m_map_shift = false;
                        }
                    }));
@@ -670,7 +684,7 @@ uint8_t news_r4k_state::debug_ram_r(offs_t offset)
     }
     else
     {
-        LOG("Unmapped RAM read attempted at offset 0x%x\n", offset);
+        LOGMASKED(LOG_GENERAL, "Unmapped RAM read attempted at offset 0x%x\n", offset);
     }
     return result;
 }
@@ -693,7 +707,7 @@ void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data)
     }
     else
     {
-        LOG("Unmapped RAM write attempted at offset 0x%x (data: 0x%x)\n", offset, data);
+        LOGMASKED(LOG_GENERAL, "Unmapped RAM write attempted at offset 0x%x (data: 0x%x)\n", offset, data);
     }
 }
 
@@ -794,7 +808,7 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 {
     if (m_led[offset] != data)
     {
-        LOG(LED_MAP[offset] + ": " + (data ? "ON" : "OFF") + "\n");
+        LOGMASKED(LOG_LED, LED_MAP[offset] + ": " + (data ? "ON" : "OFF") + "\n");
         m_led[offset] = data;
     }
 }
@@ -802,8 +816,8 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 /*
  * APbus memory addressing
  *
- * The DMAC3 has its own virtual->physical addressing scheme. Like the CPU's TLB, the host OS
- * is responsible for populating the DMAC's TLB. The `dmac3_pte` struct defines what each entry looks like. Note that to avoid
+ * The APbus has its own virtual->physical addressing scheme. Like the CPU's TLB, the host OS
+ * is responsible for populating the APbus TLB. The `apbus_pte` struct defines what each entry looks like. Note that to avoid
  * bit-order dependencies and other platform-specific stuff, in this implementation, valid, coherent, pad2, and pfnum are
  * separate variables, but the actual register is packed like this:
  *
@@ -814,15 +828,15 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
  * 0b    x      x     xxxxxxxxxx xxxxxxxxxxxxxxxxxxxx
  *    |valid|coherent|    pad2  |       pfnum        |
  *
- * The DMAC3 requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
+ * The APbus requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
  *
  * The monitor ROM populates the PTEs as follows in response to a `dl` command.
  * Addr       PTE1             PTE2
  * 0x14c20000 0000000080103ff5 0000000080103ff6
  *
- * It also loads the `address` register with 0xd60.
+ * It also loads the `address` register of the DMAC3 with 0xd60.
  *
- * This will cause the DMAC to start mapping from virtual address 0xd60 to physical address 0x3ff5d60.
+ * This will cause the consuming ASIC (in this case, the DMAC3) to start mapping from virtual address 0xd60 to physical address 0x3ff5d60.
  * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
  * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
  *
@@ -837,8 +851,8 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 {
     // Convert page number to PTE address and read raw PTE data from the APbus DMA mapping RAM
-    uint32_t dmac_page_address = APBUS_DMA_MAP_ADDRESS + 8 * (v_address >> 12);
-    uint64_t raw_pte = m_cpu->space(0).read_qword(dmac_page_address);
+    uint32_t apbus_page_address = APBUS_DMA_MAP_ADDRESS + 8 * (v_address >> 12);
+    uint64_t raw_pte = m_cpu->space(0).read_qword(apbus_page_address);
 
     // Marshal raw data to struct
     apbus_pte pte;
@@ -850,7 +864,7 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
     // This might be able to trigger some kind of interrupt - for now, we'll mark it as a fatal error, but this can be improved for sure.
     if(!pte.valid)
     {
-        fatalerror("DMAC3 TLB out of universe! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, dmac_page_address, raw_pte);
+        fatalerror("APbus DMA TLB out of universe! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, apbus_page_address, raw_pte);
     }
 
     // Since the entry is valid, use it to calculate the physical address
@@ -898,7 +912,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    // LOG("APbus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
+    LOGMASKED(LOG_APBUS, "APbus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
     return value;
 }
 
@@ -918,10 +932,9 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
     // map(0x1400005c, 0x1400005c); // APBUS_DER_A - DMA error address
     // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S - DMA error slot
     // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
-    // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
     if(data != 0x424f4d42) // mask out reset noise
     {
-        LOG("APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
+        LOGMASKED(LOG_APBUS, "APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
     }
 }
 
@@ -942,7 +955,7 @@ uint32_t news_r4k_state::freerun_r(offs_t offset)
  */
 void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
 {
-    LOG("freerun_w: Set freerun timer to 0x%x\n", data);
+    LOGMASKED(LOG_INTERRUPT, "freerun_w: Set freerun timer to 0x%x\n", data);
     m_freerun_timer_val = data;
 }
 
@@ -968,7 +981,7 @@ void news_r4k_state::timer0_w(offs_t offset, uint32_t data)
  */
 void news_r4k_state::inten_w(offs_t offset, uint32_t data)
 {
-    LOG("inten_w: INTEN%d = 0x%x\n", offset, data);
+    LOGMASKED(LOG_INTERRUPT, "inten_w: INTEN%d = 0x%x\n", offset, data);
     m_inten[offset] = data;
     int_check();
 }
@@ -980,7 +993,7 @@ void news_r4k_state::inten_w(offs_t offset, uint32_t data)
  */
 uint32_t news_r4k_state::inten_r(offs_t offset)
 {
-    LOG("inten_r: INTEN%d = 0x%x\n", offset, m_inten[offset]);
+    LOGMASKED(LOG_ALL_INTERRUPT, "inten_r: INTEN%d = 0x%x\n", offset, m_inten[offset]);
     return m_inten[offset];
 }
 
@@ -991,7 +1004,7 @@ uint32_t news_r4k_state::inten_r(offs_t offset)
  */
 uint32_t news_r4k_state::intst_r(offs_t offset)
 {
-    // LOG("intst_r: INTST%d = 0x%x\n", offset, m_intst[offset]);
+    LOGMASKED(LOG_ALL_INTERRUPT, "intst_r: INTST%d = 0x%x\n", offset, m_intst[offset]);
     return m_intst[offset];
 }
 
@@ -1002,7 +1015,7 @@ uint32_t news_r4k_state::intst_r(offs_t offset)
  */
 void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
 {
-    LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
+    LOGMASKED(LOG_INTERRUPT, "generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
     if (state)
     {
         m_intst[irq] |= mask;
@@ -1021,13 +1034,7 @@ void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
  */
 void news_r4k_state::intclr_w(offs_t offset, uint32_t data)
 {
-    if(offset != 5)
-    {
-        // NEWS-OS clears 5 periodically, but we don't emulate any of the stuff
-        // that would set it, so we can minimize log noise by only logging what
-        // we actually emulate
-        LOG("intclr_w: INTCLR%d = 0x%x\n", offset, data);
-    }
+    LOGMASKED(LOG_INTERRUPT, "intclr_w: INTCLR%d = 0x%x\n", offset, data);
     m_intst[offset] &= ~data; // TODO: is this correct?
     int_check();
 }
@@ -1047,10 +1054,10 @@ void news_r4k_state::int_check()
     for (int i = 0; i < 6; i++)
     {
         bool state = (m_intst[i] & m_inten[i]) > 0;
-        // LOG("int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
+        LOGMASKED(LOG_ALL_INTERRUPT, "int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
         if (m_int_state[i] != state) // Interrupt changed state
         {
-            // LOG("Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
+            LOGMASKED(LOG_ALL_INTERRUPT, "Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
             m_int_state[i] = state;
             m_cpu->set_input_line(interrupt_map[i], state ? 1 : 0);
         }
@@ -1064,9 +1071,9 @@ void news_r4k_state::int_check()
  */
 uint32_t news_r4k_state::bus_error()
 {
-    LOG("bus_error: address access caused bus error\n");
+    LOGMASKED(LOG_GENERAL, "bus_error: address access caused bus error\n");
 #ifndef NO_MIPS3 // Is there a mips3.h device equivalent?
-    LOG("bus_error: not implemented for this CPU type\n");
+    LOGMASKED(LOG_GENERAL, "bus_error: not implemented for this CPU type\n");
 #else
     m_cpu->bus_error();
 #endif
