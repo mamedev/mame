@@ -80972,6 +80972,25 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_5srpg">
+		<description>Super RPG 5 in 1 (CH501)</description>
+		<year>1996</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="srpg_5in1" />
+			<dataarea name="prg" size="2097152">
+				<rom name="super rpg 5 in 1 ch501.prg" size="2097152" crc="d65e0e3b" sha1="4d8502e6a55649f41d8b6f45e5c352d306dc1e8e" status="baddump" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge, only 8k used -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+			<!-- 64k WRAM on cartridge, battery backed up, 2x32k chips -->
+			<dataarea name="bwram" size="65536">
+				<rom value="0x00" size="65536" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_5tvg">
 		<description>TV Game 5 in 1</description>
 		<year>1989</year>

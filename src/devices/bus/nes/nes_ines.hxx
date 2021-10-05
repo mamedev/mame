@@ -505,7 +505,7 @@ static const nes_mmc mmc_list[] =
 	// 540 for mstrfgt6 in nes.xml or a variant of it not in nes.xml?
 	{ 541, BMC_LITTLECOM160 },
 	// 542 Chairman Mao's 100th anniversary cart? You've got to be kidding me.
-	// 543 5 in 1 (CH-501) multicart, not in nes.xml?
+	{ 543, BMC_SRPG_5IN1 },
 	// 544 another alt of sango2ht/sanguo2a?
 	// 545 4 in 1 (ST-80) multicart, not in nes.xml?
 	// 546 10 in 1 Tenchi wo Kurau multicart, not in nes.xml?
