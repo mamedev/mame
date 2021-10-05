@@ -13,6 +13,7 @@
 #include "machine/segag80.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "sound/tms5110.h"
 #include "video/vector.h"
 
 #include "screen.h"
@@ -64,6 +65,7 @@ public:
 	void startrek(machine_config &config);
 	void zektor(machine_config &config);
 	void spacfury(machine_config &config);
+	void spacfurybl(machine_config &config);
 
 	void init_waitstates();
 	void init_zektor();
@@ -72,6 +74,7 @@ public:
 	void init_elim2();
 	void init_tacscan();
 	void init_spacfury();
+	void init_spacfurybl();
 
 	DECLARE_READ_LINE_MEMBER(elim4_joint_coin_r);
 	DECLARE_READ_LINE_MEMBER(draw_r);
@@ -160,4 +163,6 @@ private:
 	void main_map(address_map &map);
 	void opcodes_map(address_map &map);
 	void main_portmap(address_map &map);
+	void spacfurybl_speech_prg_map(address_map &map);
+	void spacfurybl_speech_io_map(address_map &map);
 };
