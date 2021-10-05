@@ -84,7 +84,7 @@ private:
 	const char *                    m_interface;
 	std::string &                   m_result;
 	std::list<entry_info>           m_entrylist;
-	std::string                     m_filename_buffer;
+	std::string                     m_search;
 	bool                            m_ordered_by_shortname;
 
 	// functions
