@@ -89,8 +89,6 @@
 
 #include "emu.h"
 
-// Devices
-
 // There are two MIPSIII/R4000 implementations in MAME
 // The default one has DRC and is faster, but the other one has some different features
 // Uncomment the following line and rebuild to switch implementations. This driver supports
@@ -113,16 +111,13 @@
 #include "machine/cxd8452aq.h"
 #include "machine/dp83932c.h"
 
-// Buses
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 
-// Floppy includes
 #include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 
-// Logging setup
 #define LOG_GENERAL (1U << 0)
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_ALL_INTERRUPT (1U << 2)
@@ -137,8 +132,6 @@
 
 #define VERBOSE NEWS_R4K_INFO
 
-// MAME infra includes
-#include "debugger.h"
 #include "logmacro.h"
 
 class news_r4k_state : public driver_device
@@ -502,24 +495,24 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e980000, 0x1e9fffff).ram(); // TODO: double-check RAM length (0x1e99ffff end?)
 
     // NEWS firmware
-    map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);  // Monitor ROM (system firmware)
-    map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM (system-specific information)
-    map(0x1e600000, 0x1e6003ff).rom().region("macrom", 0); // SONIC/Ethernet ROM
+    map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);
+    map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0);
+    map(0x1e600000, 0x1e6003ff).rom().region("macrom", 0);
 
     // Front panel DIP switches - TODO: mirror length
     map(0x1f3d0000, 0x1f3d0007).r(FUNC(news_r4k_state::front_panel_r));
 
     // Hardware timers
-    map(0x1f800000, 0x1f800003).w(FUNC(news_r4k_state::timer0_w)); // TIMER0
-    map(0x1f840000, 0x1f840003).rw(FUNC(news_r4k_state::freerun_r), FUNC(news_r4k_state::freerun_w)); // FREERUN
+    map(0x1f800000, 0x1f800003).w(FUNC(news_r4k_state::timer0_w));
+    map(0x1f840000, 0x1f840003).rw(FUNC(news_r4k_state::freerun_r), FUNC(news_r4k_state::freerun_w));
 
     // Timekeeper NVRAM and RTC
     map(0x1f880000, 0x1f881fff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
 
     // Interrupt ports
-    map(0x1f4e0000, 0x1f4e0017).w(FUNC(news_r4k_state::intclr_w));                                // Clear
-    map(0x1fa00000, 0x1fa00017).rw(FUNC(news_r4k_state::inten_r), FUNC(news_r4k_state::inten_w)); // Enable
-    map(0x1fa00020, 0x1fa00037).r(FUNC(news_r4k_state::intst_r));                                 // Status
+    map(0x1f4e0000, 0x1f4e0017).w(FUNC(news_r4k_state::intclr_w));
+    map(0x1fa00000, 0x1fa00017).rw(FUNC(news_r4k_state::inten_r), FUNC(news_r4k_state::inten_w));
+    map(0x1fa00020, 0x1fa00037).r(FUNC(news_r4k_state::intst_r));
 
     // Port to shut off system (write a 0 to this)
     // map(0x1fc40000, 0x1fc40003)
@@ -534,13 +527,13 @@ void news_r4k_state::cpu_map(address_map &map)
     // SONIC network controller
     map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map)); // WSC-SONIC3 registers
     map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff);
-    //map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
+    //map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w));
     map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
                           NAME([this](offs_t offset, uint8_t data)
                               {
                                 LOGMASKED(LOG_MEMORY, "Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
                                 m_net_ram->write(offset, data);
-                              }));// dedicated network RAM
+                              }));
     // DMAC3 DMA Controller
     map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset) { return m_dma_ram->read(offset); }),
                                      NAME([this](offs_t offset, uint8_t data)
@@ -553,8 +546,8 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // SPIFI SCSI controllers
     // The DMAC has to swap modes when talking to the SPIFI, so the physical route for this might be through the DMAC3.
-    map(0x1e280000, 0x1e2803ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
-    map(0x1e380000, 0x1e3803ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
+    map(0x1e280000, 0x1e2803ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: double-check actual end address
+    map(0x1e380000, 0x1e3803ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: double-check actual end address
 
     // TODO: DSC-39 xb framebuffer/video card (0x14900000)
     map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset)
@@ -879,21 +872,7 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
 {
     // This function spoofs the APbus being fully initialized
-    // Needless to say, that might be causing problems, but this is enough for it to boot to the monitor shell
-    // and the NetBSD installer.
-    //
-    // In general, the APbus seems to be pretty transparent at the software level, DMA excluded.
-    // Devices attached to the APbus are still mapped into the CPU's address space.
-    // However, more advanced APbus DMA functionality is still unimplemented. Neither the monitor ROM nor the
-    // NetBSD floppy miniroot attempts to use any of it as far as I can tell. That might change when SCSI
-    // is implemented, but many of the Sony devices that the APbus connects to have their own DMA controllers
-    // like the FIFO chip used for subsystems like the FDC and sound, the DMAC3 used for SCSI, etc.
-    // The 5000 series seems to have a lot of DMA controllers...
-    //
-    // NetBSD has some code that can use the APbus DMA, see the following for more information.
-    // https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/apbus.c
-    // Given that NetBSD doesn't fully implement everything NEWS-OS does, there might be even more that the APbus can do.
-
+    // More may have to be added to this method in the future
     uint8_t value = 0x0;
     if (offset == 7)
     {
