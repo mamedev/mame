@@ -86,16 +86,16 @@ void nubus_image_device::messimg_disk_image_device::device_start()
 {
 	m_data = nullptr;
 
-	if (exists() && fseek(0, SEEK_END) == 0)
+	if (exists() && !fseek(0, SEEK_END))
 	{
-		m_size = (uint32_t)ftell();
+		m_size = uint32_t(ftell());
 	}
 }
 
 image_init_result nubus_image_device::messimg_disk_image_device::call_load()
 {
 	fseek(0, SEEK_END);
-	m_size = (uint32_t)ftell();
+	m_size = uint32_t(ftell());
 	if (m_size > (256*1024*1024))
 	{
 		osd_printf_error("Mac image too large: must be 256MB or less!\n");

@@ -510,8 +510,11 @@ std::error_condition read_partial_sector(cdrom_file *file, void *dest, uint32_t 
 
 		//  printf("Reading sector %d from track %d at offset %lu\n", chdsector, tracknum, sourcefileoffset);
 
-		srcfile.seek(sourcefileoffset, SEEK_SET);
-		srcfile.read(dest, length);
+		size_t actual;
+		result = srcfile.seek(sourcefileoffset, SEEK_SET);
+		if (!result)
+			result = srcfile.read(dest, length, actual);
+		// FIXME: if (actual < length) report error
 
 		needswap = file->track_info.track[tracknum].swap;
 	}

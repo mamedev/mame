@@ -13,15 +13,14 @@
 
 #include "emu.h"
 #include "a2cffa.h"
+
 #include "imagedev/harddriv.h"
+#include "bus/ata/ataintf.h"
+
 #include "softlist.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_CFFA2,      a2bus_cffa2_device,      "a2cffa2",  "CFFA 2.0 Compact Flash (65C02 firmware, www.dreher.net)")
-DEFINE_DEVICE_TYPE(A2BUS_CFFA2_6502, a2bus_cffa2_6502_device, "a2cffa02", "CFFA 2.0 Compact Flash (6502 firmware, www.dreher.net)")
+namespace {
 
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_ATA_TAG     "cffa2_ata"
@@ -35,6 +34,66 @@ ROM_START( cffa2_6502 )
 	ROM_REGION(0x1000, CFFA2_ROM_REGION, 0)
 	ROM_LOAD( "cffa20ee02.bin", 0x000000, 0x001000, CRC(3ecafce5) SHA1(d600692ed9626668233a22a48236af639410cb7b) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_cffa2000_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+protected:
+	// construction/destruction
+	a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual void write_c800(uint16_t offset, uint8_t data) override;
+
+	required_device<ata_interface_device> m_ata;
+	required_region_ptr<uint8_t> m_rom;
+
+	uint8_t m_eeprom[0x1000];
+
+private:
+	uint16_t m_lastdata, m_lastreaddata;
+	bool m_writeprotect;
+	bool m_inwritecycle;
+};
+
+class a2bus_cffa2_device : public a2bus_cffa2000_device, public device_nvram_interface
+{
+public:
+	a2bus_cffa2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_config_nvram_interface overrides
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
+};
+
+class a2bus_cffa2_6502_device : public a2bus_cffa2000_device, public device_nvram_interface
+{
+public:
+	a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+protected:
+	// device_config_nvram_interface overrides
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -74,7 +133,9 @@ const tiny_rom_entry *a2bus_cffa2_6502_device::device_rom_region() const
 a2bus_cffa2000_device::a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
-	m_ata(*this, CFFA2_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_lastreaddata(0), m_writeprotect(false), m_inwritecycle(false)
+	m_ata(*this, CFFA2_ATA_TAG),
+	m_rom(*this, CFFA2_ROM_REGION),
+	m_lastdata(0), m_lastreaddata(0), m_writeprotect(false), m_inwritecycle(false)
 {
 }
 
@@ -96,8 +157,6 @@ a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, 
 
 void a2bus_cffa2000_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(CFFA2_ROM_REGION).c_str())->base();
-
 	// patch default setting so slave device is enabled and up to 13 devices on both connectors
 	m_rom[0x800] = 13;
 	m_rom[0x801] = 13;
@@ -125,7 +184,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			return m_lastreaddata>>8;
+			return m_lastreaddata >> 8;
 
 		case 3:
 			m_writeprotect = false;
@@ -150,7 +209,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(uint8_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->cs0_r(offset-8, 0xff);
+			return m_ata->cs0_r(offset - 8, 0xff);
 	}
 
 	return 0xff;
@@ -260,3 +319,13 @@ void a2bus_cffa2_6502_device::nvram_write(emu_file &file)
 {
 	file.write(m_eeprom, 0x1000);
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_CFFA2,      device_a2bus_card_interface, a2bus_cffa2_device,      "a2cffa2",  "CFFA 2.0 Compact Flash (65C02 firmware, www.dreher.net)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_CFFA2_6502, device_a2bus_card_interface, a2bus_cffa2_6502_device, "a2cffa02", "CFFA 2.0 Compact Flash (6502 firmware, www.dreher.net)")

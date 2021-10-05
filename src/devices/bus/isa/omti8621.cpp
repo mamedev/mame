@@ -1458,9 +1458,9 @@ void omti_disk_image_device::device_reset()
 {
 	logerror("device_reset_omti_disk\n");
 
-	if (exists() && fseek(0, SEEK_END) == 0)
+	if (exists() && !fseek(0, SEEK_END))
 	{
-		uint32_t disk_size = (uint32_t)(ftell() / OMTI_DISK_SECTOR_SIZE);
+		uint32_t disk_size = uint32_t(ftell() / OMTI_DISK_SECTOR_SIZE);
 		uint16_t disk_type = disk_size >= 300000 ? OMTI_DISK_TYPE_348_MB : OMTI_DISK_TYPE_155_MB;
 		if (disk_type != m_type) {
 			logerror("device_reset_omti_disk: disk size=%d blocks, disk type=%x\n", disk_size, disk_type);
@@ -1477,12 +1477,10 @@ image_init_result omti_disk_image_device::call_create(int format_type, util::opt
 {
 	logerror("device_create_omti_disk: creating OMTI Disk with %d blocks\n", m_sector_count);
 
-	int x;
 	unsigned char sectordata[OMTI_DISK_SECTOR_SIZE]; // empty block data
-
-
 	memset(sectordata, 0x55, sizeof(sectordata));
-	for (x = 0; x < m_sector_count; x++)
+
+	for (int x = 0; x < m_sector_count; x++)
 	{
 		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
 				< OMTI_DISK_SECTOR_SIZE)
@@ -1490,5 +1488,6 @@ image_init_result omti_disk_image_device::call_create(int format_type, util::opt
 			return image_init_result::FAIL;
 		}
 	}
+
 	return image_init_result::PASS;
 }

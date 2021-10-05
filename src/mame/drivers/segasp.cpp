@@ -500,7 +500,7 @@ ROM_START( lovebery )
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
+	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, CRC(9e519dc6) SHA1(69a1efc81c9dc44fcb8fc9c17bd7f879d3259950) )
 
 	// LOVE AND BERRY
 	// Dress up and Dance!
@@ -524,7 +524,7 @@ ROM_START( lovebero )
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
+	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, CRC(9e519dc6) SHA1(69a1efc81c9dc44fcb8fc9c17bd7f879d3259950) )
 ROM_END
 
 // Mirage World
@@ -719,7 +719,7 @@ ROM_START( loveber3 )
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
+	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, CRC(9e519dc6) SHA1(69a1efc81c9dc44fcb8fc9c17bd7f879d3259950) )
 ROM_END
 
 // This game's protection uses contact IC card reader made by Hirocon, with 2 IC card slots, cards probably SLE4428 or SLE5528.
@@ -739,7 +739,7 @@ ROM_START( loveber3cn )
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
+	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, CRC(9e519dc6) SHA1(69a1efc81c9dc44fcb8fc9c17bd7f879d3259950) )
 ROM_END
 
 ROM_START( tetgiano )

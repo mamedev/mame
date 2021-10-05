@@ -508,16 +508,18 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		std::vector<uint8_t> head(128);
-		int type = A78_TYPE0, mapper;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return
 
 		// Load and check the header
-		hook.image_file()->read(&head[0], 128);
+		uint8_t head[128];
+		std::size_t actual;
+		hook.image_file()->read(&head[0], 128, actual); // FIXME: check error return or read returning short
 
 		// let's try to auto-fix some common errors in the header
-		mapper = validate_header((head[53] << 8) | head[54], false);
+		int const mapper = validate_header((head[53] << 8) | head[54], false);
 
+		int type = A78_TYPE0;
 		switch (mapper & 0x2e)
 		{
 			case 0x0000:
@@ -534,7 +536,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 				break;
 			case 0x0022:
 			case 0x0026:
-				if (hook.image_file()->size() > 0x40000)
+				if (len > 0x40000)
 					type = A78_MEGACART;
 				else
 					type = A78_VERSABOARD;
@@ -560,7 +562,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 			type = A78_TYPE8;
 
 		logerror("Cart type: %x\n", type);
-		slot_string = a78_get_slot(type);
+		char const *const slot_string = a78_get_slot(type);
 
 		return std::string(slot_string);
 	}

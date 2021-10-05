@@ -6,16 +6,19 @@
 
 ****************************************************************************/
 
+#include "corefile.h"
+#include "corestr.h"
+#include "png.h"
+
+#include "osdcomm.h"
+
+#include <cassert>
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
 #include <new>
-#include <cassert>
-#include "corefile.h"
-#include "corestr.h"
-#include "osdcomm.h"
-#include "png.h"
+
 
 using util::string_format;
 
@@ -153,7 +156,7 @@ static summary_file *sort_file_list(void);
 
 /* HTML helpers */
 static util::core_file::ptr create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &title);
-static void output_footer_and_close_file(util::core_file::ptr &&file, std::string &templatefile, std::string &title);
+static void output_footer_and_close_file(util::write_stream::ptr &&file, std::string &templatefile, std::string &title);
 
 /* report generators */
 static void output_report(std::string &dirname, std::string &tempheader, std::string &tempfooter, summary_file *filelist);
@@ -575,7 +578,8 @@ static util::core_file::ptr create_file_and_output_header(std::string &filename,
 	/* print a header */
 	std::string modified(templatefile);
 	strreplace(modified, "<!--TITLE-->", title.c_str());
-	file->write(modified.c_str(), modified.length());
+	std::size_t written;
+	file->write(modified.c_str(), modified.length(), written); // FIXME: check for errors
 
 	/* return the file */
 	return file;
@@ -587,11 +591,12 @@ static util::core_file::ptr create_file_and_output_header(std::string &filename,
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(util::core_file::ptr &&file, std::string &templatefile, std::string &title)
+static void output_footer_and_close_file(util::write_stream::ptr &&file, std::string &templatefile, std::string &title)
 {
 	std::string modified(templatefile);
 	strreplace(modified, "<!--TITLE-->", title.c_str());
-	file->write(modified.c_str(), modified.length());
+	std::size_t written;
+	file->write(modified.c_str(), modified.length(), written); // FIXME: check for errors
 	file.reset();
 }
 
@@ -839,7 +844,6 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	int bitmapcount = 0;
 	util::core_file::ptr file;
 	std::error_condition filerr;
-	util::png_error pngerr;
 	int error = -1;
 	int starty;
 
@@ -859,9 +863,9 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 				goto error;
 
 			/* load the source image */
-			pngerr = util::png_read_bitmap(*file, bitmaps[bitmapcount++]);
+			filerr = util::png_read_bitmap(*file, bitmaps[bitmapcount++]);
 			file.reset();
-			if (pngerr != util::png_error::NONE)
+			if (filerr)
 				goto error;
 		}
 
@@ -928,9 +932,9 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	filerr = util::core_file::open(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
 	if (filerr)
 		goto error;
-	pngerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
+	filerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
 	file.reset();
-	if (pngerr != util::png_error::NONE)
+	if (filerr)
 		goto error;
 
 	/* if we get here, we are error free */

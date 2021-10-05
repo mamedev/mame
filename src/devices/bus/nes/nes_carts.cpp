@@ -101,6 +101,7 @@ void nes_cart(device_slot_interface &device)
 // SxROM
 	device.option_add_internal("sxrom",            NES_SXROM);
 	device.option_add_internal("sorom",            NES_SOROM);
+	device.option_add_internal("szrom",            NES_SZROM);
 // TxROM
 	device.option_add_internal("txrom",            NES_TXROM);
 // HKROM
@@ -460,6 +461,9 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("cufrom",           NES_CUFROM);
 	device.option_add_internal("unrom512",         NES_UNROM512);
 	device.option_add_internal("2a03pur",          NES_2A03PURITANS);
+	device.option_add_internal("dpcmcart",         NES_DPCMCART);
+	device.option_add_internal("farid_slrom8in1",  NES_FARID_SLROM);
+	device.option_add_internal("farid_unrom8in1",  NES_FARID_UNROM);
 // other unsupported...
 	device.option_add_internal("unl_dance",        NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED

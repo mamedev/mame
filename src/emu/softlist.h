@@ -148,7 +148,7 @@ private:
 
 // parses a software list
 void parse_software_list(
-		util::core_file &file,
+		util::random_read &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,

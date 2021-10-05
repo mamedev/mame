@@ -9,6 +9,7 @@
  Here we emulate the following homebrew PCBs
 
  * SEALIE RET-CUFROM [mapper 29]
+ * SEALIE DPCMcart [mapper 409]
  * SEALIE UNROM 512 [mapper 30]
 
  ***********************************************************************************************************/
@@ -32,11 +33,17 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(NES_CUFROM,   nes_cufrom_device,   "nes_cufrom",   "NES Cart Sealie RET-CUFROM PCB")
+DEFINE_DEVICE_TYPE(NES_DPCMCART, nes_dpcmcart_device, "nes_dpcmcart", "NES Cart Sealie DPCMcart PCB")
 DEFINE_DEVICE_TYPE(NES_UNROM512, nes_unrom512_device, "nes_unrom512", "NES Cart Sealie UNROM 512 PCB")
 
 
 nes_cufrom_device::nes_cufrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_CUFROM, tag, owner, clock)
+{
+}
+
+nes_dpcmcart_device::nes_dpcmcart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_DPCMCART, tag, owner, clock)
 {
 }
 
@@ -48,6 +55,13 @@ nes_unrom512_device::nes_unrom512_device(const machine_config &mconfig, const ch
 
 
 void nes_cufrom_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);
+	chr8(0, CHRRAM);
+}
+
+void nes_dpcmcart_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
@@ -91,6 +105,29 @@ void nes_cufrom_device::write_h(offs_t offset, u8 data)
 
 	prg16_89ab((data >> 2) & 0x07);
 	chr8(data & 0x03, CHRRAM);
+}
+
+/*-------------------------------------------------
+
+ Sealie DPCMcart board
+
+ Games: A Winner is You
+
+ This homebrew mapper supports a whopping 64MB which
+ is paged in 16K chucks at 0x8000. 0xc000 is fixed.
+
+ NES 2.0: mapper 409
+
+ In MAME: Partially supported.
+
+ TODO: Controls other than 'next track' don't work.
+
+ -------------------------------------------------*/
+
+void nes_dpcmcart_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("dpcmcart write_h, offset: %04x, data: %02x\n", offset, data));
+	prg16_89ab(offset & 0x0fff);
 }
 
 /*-------------------------------------------------

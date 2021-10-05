@@ -292,4 +292,20 @@ namespace bx
 		return m_line;
 	}
 
+	inline bool hasPrefix(const StringView& _str, const StringView& _prefix)
+	{
+		const int32_t len = _prefix.getLength();
+		return _str.getLength() >= len
+			&& 0 == strCmp(_str, _prefix, len)
+			;
+	}
+
+	inline bool hasSuffix(const StringView& _str, const StringView& _suffix)
+	{
+		const int32_t len = _suffix.getLength();
+		return _str.getLength() >= len
+			&& 0 == strCmp(StringView(_str.getTerm() - len, _str.getTerm() ), _suffix, len)
+			;
+	}
+
 } // namespace bx

@@ -148,7 +148,10 @@ image_init_result harddisk_image_device::call_create(int create_format, util::op
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	std::error_condition err = m_origchd.create(util::core_file_read_write(image_core_file()), (uint64_t)totalsectors * (uint64_t)sectorsize, hunksize, sectorsize, compression);
+	util::core_file::ptr proxy;
+	std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+	if (!err)
+		err = m_origchd.create(std::move(proxy), uint64_t(totalsectors) * uint64_t(sectorsize), hunksize, sectorsize, compression);
 	if (err)
 		return image_init_result::FAIL;
 
@@ -250,7 +253,10 @@ image_init_result harddisk_image_device::internal_load_hd()
 
 		if (!memcmp("MComprHD", header, 8))
 		{
-			err = m_origchd.open(util::core_file_read_write(image_core_file()), true);
+			util::core_file::ptr proxy;
+			err = util::core_file::open_proxy(image_core_file(), proxy);
+			if (!err)
+				err = m_origchd.open(std::move(proxy), true);
 
 			if (!err)
 			{
@@ -258,7 +264,10 @@ image_init_result harddisk_image_device::internal_load_hd()
 			}
 			else if (err == chd_file::error::FILE_NOT_WRITEABLE)
 			{
-				err = m_origchd.open(util::core_file_read_write(image_core_file()), false);
+				err = util::core_file::open_proxy(image_core_file(), proxy);
+				if (!err)
+					err = m_origchd.open(std::move(proxy), false);
+
 				if (!err)
 				{
 					err = open_disk_diff(device().machine().options(), basename_noext(), m_origchd, m_diffchd);
@@ -295,7 +304,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 			{
 				skip = header[0x8] | (header[0x9] << 8) | (header[0xa] << 16) | (header[0xb] << 24);
 				uint32_t data_size = header[0xc] | (header[0xd] << 8) | (header[0xe] << 16) | (header[0xf] << 24);
-				if (data_size == image_core_file().size() - skip)
+				if (data_size == length() - skip)
 				{
 					osd_printf_verbose("harddriv: detected Anex86 HDI, data at %08x\n", skip);
 				}

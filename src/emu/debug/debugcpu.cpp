@@ -566,10 +566,10 @@ void device_debug::reinstall(address_space &space, read_or_write mode)
 		if (m_track_mem)
 			switch (space.data_width())
 			{
-			case  8: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u8  &data, u8 ) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 16: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u16 &data, u16) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 32: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u32 &data, u32) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 64: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u64 &data, u64) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case  8: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u8  &data, u8 ) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 16: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u16 &data, u16) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 32: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u32 &data, u32) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 64: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u64 &data, u64) { write_tracking(space, address, data); }, m_phw[id]); break;
 			}
 	}
 }
@@ -581,6 +581,21 @@ void device_debug::reinstall_all(read_or_write mode)
 		if (m_memory->has_space(i))
 			reinstall(m_memory->space(i), mode);
 }
+
+//-------------------------------------------------
+//  set_track_mem - start or stop tracking memory
+//  writes
+//-------------------------------------------------
+
+void device_debug::set_track_mem(bool value)
+{
+	if (m_track_mem != value)
+	{
+		m_track_mem = value;
+		reinstall_all(read_or_write::WRITE);
+	}
+}
+
 
 //-------------------------------------------------
 //  start_hook - the scheduler calls this hook

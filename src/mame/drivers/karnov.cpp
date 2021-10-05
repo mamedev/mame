@@ -78,15 +78,116 @@ Stephh's notes (based on the games M68000 code and some tests) :
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/karnov.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs51/mcs51.h"
+#include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
+#include "video/bufsprite.h"
+#include "video/deckarn.h"
+#include "video/decrmc3.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+
+/*************************************
+ *
+ *  Type definitions
+ *
+ *************************************/
+
+class karnov_state : public driver_device
+{
+public:
+	karnov_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"),
+		m_screen(*this, "screen"),
+		m_spriteram(*this, "spriteram") ,
+		m_spritegen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_ram(*this, "ram"),
+		m_videoram(*this, "videoram"),
+		m_pf_data(*this, "pf_data"),
+		m_scroll(*this, "scroll") { }
+
+	void chelnovjbl(machine_config &config);
+	void karnov(machine_config &config);
+	void wndrplnt(machine_config &config);
+	void karnovjbl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<mcs51_cpu_device> m_mcu;
+	required_device<screen_device> m_screen;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<deco_karnovsprites_device> m_spritegen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<deco_rmc3_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_pf_data;
+	required_shared_ptr<uint16_t> m_scroll;
+
+	// video
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fix_tilemap;
+
+	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	DECLARE_VIDEO_START(karnov);
+	DECLARE_VIDEO_START(wndrplnt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void base_sound_map(address_map &map);
+	void chelnovjbl_mcu_map(address_map &map);
+	void chelnovjbl_mcu_io_map(address_map &map);
+	void karnov_map(address_map &map);
+	void karnovjbl_map(address_map &map);
+	void karnov_sound_map(address_map &map);
+	void karnovjbl_sound_map(address_map &map);
+
+	// protection mcu
+	void mcu_coin_irq(int state);
+	void mcu_ack_w(uint16_t data);
+	uint16_t mcu_r();
+	void mcu_w(uint16_t data);
+	void mcu_p2_w(uint8_t data);
+
+	// protection mcu (bootleg specific)
+	uint8_t mcu_data_l_r();
+	void mcu_data_l_w(uint8_t data);
+	uint8_t mcu_data_h_r();
+	void mcu_data_h_w(uint8_t data);
+	void mcubl_p1_w(uint8_t data);
+
+	uint8_t m_mcu_p0;
+	uint8_t m_mcu_p1;
+	uint8_t m_mcu_p2;
+	uint16_t m_mcu_to_maincpu;
+	uint16_t m_maincpu_to_mcu;
+	bool m_coin_state;
+};
 
 
 /*************************************
@@ -483,6 +584,72 @@ static INPUT_PORTS_START( chelnovjbl )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE1)
 INPUT_PORTS_END
+
+
+/*************************************
+ *
+ *  Video emulation
+ *
+ *************************************/
+
+uint32_t karnov_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int const flip = BIT(m_scroll[0], 15);
+
+	m_bg_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_spritegen->set_flip_screen(flip);
+
+	m_bg_tilemap->set_scrollx(m_scroll[0]);
+	m_bg_tilemap->set_scrolly(m_scroll[1]);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram->buffer(), 0x800);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
+{
+	int tile = m_videoram[tile_index];
+	tileinfo.set(0, tile & 0xfff, tile >> 14, 0);
+}
+
+TILE_GET_INFO_MEMBER(karnov_state::get_bg_tile_info)
+{
+	int tile = m_pf_data[tile_index];
+	tileinfo.set(1, tile & 0x7ff, tile >> 12, 0);
+}
+
+void karnov_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_videoram[offset]);
+	m_fix_tilemap->mark_tile_dirty(offset);
+}
+
+void karnov_state::playfield_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_pf_data[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+VIDEO_START_MEMBER(karnov_state, karnov)
+{
+	/* Allocate bitmap & tilemap */
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_fix_tilemap->set_transparent_pen(0);
+}
+
+VIDEO_START_MEMBER(karnov_state, wndrplnt)
+{
+	/* Allocate bitmap & tilemap */
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_fix_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+
+	m_fix_tilemap->set_transparent_pen(0);
+}
 
 
 /*************************************
@@ -1051,6 +1218,9 @@ ROM_START( chelnovjbla )
 	ROM_LOAD( "ee-17.k8",     0x0000, 0x0400, CRC(b1db6586) SHA1(a7ecfcb4cf0f7450900820b3dfad8813efedfbea) )    /* not dumped here, taken from parent */
 	ROM_LOAD( "ee-16.l6",     0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) )
 ROM_END
+
+
+} // Anonymous namespace
 
 
 /*************************************

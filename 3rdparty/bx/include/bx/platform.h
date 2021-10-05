@@ -56,6 +56,7 @@
 #define BX_PLATFORM_NX         0
 #define BX_PLATFORM_OSX        0
 #define BX_PLATFORM_PS4        0
+#define BX_PLATFORM_PS5        0
 #define BX_PLATFORM_RPI        0
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
@@ -203,6 +204,9 @@
 #elif defined(__ORBIS__)
 #	undef  BX_PLATFORM_PS4
 #	define BX_PLATFORM_PS4 1
+#elif defined(__PROSPERO__)
+#	undef  BX_PLATFORM_PS5
+#	define BX_PLATFORM_PS5 1
 #elif  defined(__FreeBSD__)        \
 	|| defined(__FreeBSD_kernel__) \
 	|| defined(__NetBSD__)         \
@@ -268,6 +272,7 @@
 	||  BX_PLATFORM_NX         \
 	||  BX_PLATFORM_OSX        \
 	||  BX_PLATFORM_PS4        \
+	||  BX_PLATFORM_PS5        \
 	||  BX_PLATFORM_RPI        \
 	)
 
@@ -283,6 +288,7 @@
 	||  BX_PLATFORM_NX         \
 	||  BX_PLATFORM_OSX        \
 	||  BX_PLATFORM_PS4        \
+	||  BX_PLATFORM_PS5        \
 	||  BX_PLATFORM_RPI        \
 	||  BX_PLATFORM_WINDOWS    \
 	||  BX_PLATFORM_WINRT      \
@@ -293,6 +299,7 @@
 #define BX_PLATFORM_OS_CONSOLE  (0 \
 	||  BX_PLATFORM_NX             \
 	||  BX_PLATFORM_PS4            \
+	||  BX_PLATFORM_PS5            \
 	||  BX_PLATFORM_WINRT          \
 	||  BX_PLATFORM_XBOXONE        \
 	)
@@ -380,6 +387,8 @@
 #	define BX_PLATFORM_NAME "OSX"
 #elif BX_PLATFORM_PS4
 #	define BX_PLATFORM_NAME "PlayStation 4"
+#elif BX_PLATFORM_PS5
+#	define BX_PLATFORM_NAME "PlayStation 5"
 #elif BX_PLATFORM_RPI
 #	define BX_PLATFORM_NAME "RaspberryPi"
 #elif BX_PLATFORM_WINDOWS

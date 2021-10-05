@@ -53,45 +53,7 @@
 #pragma once
 
 #include "a2bus.h"
-#include "bus/centronics/ctronics.h"
 
-class a2bus_parprn_device : public device_t, public device_a2bus_card_interface
-{
-public:
-	a2bus_parprn_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
-
-	// device_a2bus_card_interface implementation
-	virtual u8 read_c0nx(u8 offset) override;
-	virtual void write_c0nx(u8 offset, u8 data) override;
-	virtual u8 read_cnxx(u8 offset) override;
-
-protected:
-	// device_t implementation
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
-
-	// timer handlers
-	TIMER_CALLBACK_MEMBER(update_strobe);
-
-	required_device<centronics_device>      m_printer_conn;
-	required_device<output_latch_device>    m_printer_out;
-	required_ioport                         m_input_config;
-	required_region_ptr<u8>                 m_prom;
-	emu_timer *                             m_strobe_timer;
-
-	u8  m_next_strobe;  // B3 pin 13
-	u8  m_ack_latch;    // B2 pin 6
-	u8  m_ack_in;       // pin 2
-};
-
-
-DECLARE_DEVICE_TYPE(A2BUS_PARPRN, a2bus_parprn_device)
+DECLARE_DEVICE_TYPE(A2BUS_PARPRN, device_a2bus_card_interface)
 
 #endif // MAME_BUS_A2BUS_A2PARPRN_H

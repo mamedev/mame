@@ -68,14 +68,12 @@
 
 #include "emu.h"
 #include "a2zipdrive.h"
+
+#include "bus/ata/ataintf.h"
 #include "imagedev/harddriv.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_ZIPDRIVE, a2bus_zipdrive_device, "a2zipdrv", "Zip Technologies ZipDrive")
-DEFINE_DEVICE_TYPE(A2BUS_FOCUSDRIVE, a2bus_focusdrive_device, "a2focdrv", "Parsons Engineering Focus Drive")
+namespace {
 
 #define ZIPDRIVE_ROM_REGION  "zipdrive_rom"
 #define ZIPDRIVE_ATA_TAG     "zipdrive_ata"
@@ -89,6 +87,53 @@ ROM_START( focusdrive )
 	ROM_REGION(0x2000, ZIPDRIVE_ROM_REGION, 0)
 	ROM_LOAD( "focusrom.bin", 0x001000, 0x001000, CRC(0fd0ba25) SHA1(acf414aa145fcfa1c12aca0269f1f7ada82f1c04) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_zipdrivebase_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+protected:
+	// construction/destruction
+	a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+
+	required_device<ata_interface_device> m_ata;
+	required_region_ptr<uint8_t> m_rom;
+
+	uint16_t m_lastdata;
+};
+
+class a2bus_zipdrive_device : public a2bus_zipdrivebase_device
+{
+public:
+	a2bus_zipdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class a2bus_focusdrive_device : public a2bus_zipdrivebase_device
+{
+public:
+	a2bus_focusdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -124,7 +169,9 @@ const tiny_rom_entry *a2bus_focusdrive_device::device_rom_region() const
 a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
-	m_ata(*this, ZIPDRIVE_ATA_TAG), m_rom(nullptr), m_lastdata(0)
+	m_ata(*this, ZIPDRIVE_ATA_TAG),
+	m_rom(*this, ZIPDRIVE_ROM_REGION),
+	m_lastdata(0)
 {
 }
 
@@ -144,8 +191,6 @@ a2bus_focusdrive_device::a2bus_focusdrive_device(const machine_config &mconfig, 
 
 void a2bus_zipdrivebase_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(ZIPDRIVE_ROM_REGION).c_str())->base();
-
 	save_item(NAME(m_lastdata));
 }
 
@@ -325,3 +370,13 @@ uint8_t a2bus_zipdrivebase_device::read_c800(uint16_t offset)
 
 	return m_rom[offset+0x1800];
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ZIPDRIVE,   device_a2bus_card_interface, a2bus_zipdrive_device,   "a2zipdrv", "Zip Technologies ZipDrive")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_FOCUSDRIVE, device_a2bus_card_interface, a2bus_focusdrive_device, "a2focdrv", "Parsons Engineering Focus Drive")

@@ -30,6 +30,7 @@
 #include "formats/imageutl.h"
 
 #include "util/ioprocs.h"
+#include "util/ioprocsfilter.h"
 #include "util/zippath.h"
 
 /*
@@ -403,7 +404,7 @@ void floppy_image_device::commit_image()
 		return;
 
 	check_for_file();
-	auto io = util::core_file_read_write(image_core_file(), 0xff);
+	auto io = util::random_read_write_fill(image_core_file(), 0xff);
 	if(!io) {
 		popmessage("Error, out of memory");
 		return;
@@ -543,7 +544,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 		return nullptr;
 	}
 
-	auto io = util::core_file_read(std::move(fd), 0xff);
+	auto io = util::random_read_fill(std::move(fd), 0xff);
 	if(!io) {
 		seterror(std::errc::not_enough_memory, nullptr);
 		return nullptr;
@@ -591,7 +592,7 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 image_init_result floppy_image_device::call_load()
 {
 	check_for_file();
-	auto io = util::core_file_read(image_core_file(), 0xff);
+	auto io = util::random_read_fill(image_core_file(), 0xff);
 	if(!io) {
 		seterror(std::errc::not_enough_memory, nullptr);
 		return image_init_result::FAIL;
