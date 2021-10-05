@@ -88,7 +88,6 @@ private:
 	bool                            m_ordered_by_shortname;
 
 	// functions
-	int compare_entries(const entry_info &e1, const entry_info &e2, bool shortname);
 	void append_software_entry(const software_info &swinfo);
 };
 

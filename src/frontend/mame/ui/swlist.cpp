@@ -17,6 +17,8 @@
 #include "corestr.h"
 #include "softlist_dev.h"
 
+#include <locale>
+
 
 namespace ui {
 
@@ -164,26 +166,6 @@ menu_software_list::~menu_software_list()
 
 
 //-------------------------------------------------
-//  compare_entries
-//-------------------------------------------------
-
-int menu_software_list::compare_entries(const entry_info &e1, const entry_info &e2, bool shortname)
-{
-	int result;
-	const char *e1_basename = shortname ? e1.short_name.c_str() : e1.long_name.c_str();
-	const char *e2_basename = shortname ? e2.short_name.c_str() : e2.long_name.c_str();
-
-	result = core_stricmp(e1_basename, e2_basename);
-	if (result == 0)
-	{
-		result = strcmp(e1_basename, e2_basename);
-	}
-
-	return result;
-}
-
-
-//-------------------------------------------------
 //  append_software_entry - populate a specific list
 //-------------------------------------------------
 
@@ -206,14 +188,7 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 
 	// skip this if no new entry has been allocated (e.g. if the software has no matching interface for this image device)
 	if (entry_updated)
-	{
-		// find the end of the list
-		auto iter = m_entrylist.begin();
-		while (iter != m_entrylist.end() && compare_entries(entry, *iter, m_ordered_by_shortname) >= 0)
-			++iter;
-
-		m_entrylist.emplace(iter, std::move(entry));
-	}
+		m_entrylist.emplace_back(std::move(entry));
 }
 
 
@@ -223,12 +198,31 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 
 void menu_software_list::populate(float &customtop, float &custombottom)
 {
-	// clear all entries before populating
-	m_entrylist.clear();
-
 	// build up the list of entries for the menu
-	for (const software_info &swinfo : m_swlist->get_info())
-		append_software_entry(swinfo);
+	if (m_entrylist.empty())
+		for (const software_info &swinfo : m_swlist->get_info())
+			append_software_entry(swinfo);
+
+	if (m_ordered_by_shortname)
+	{
+		// short names are restricted to lowercase ASCII anyway, a dumb compare works
+		m_entrylist.sort([] (entry_info const &e1, entry_info const &e2) { return e1.short_name < e2.short_name; });
+	}
+	else
+	{
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		m_entrylist.sort(
+				[&coll] (entry_info const &e1, entry_info const &e2) -> bool
+				{
+					std::wstring const xstr = wstring_from_utf8(e1.long_name);
+					std::wstring const ystr = wstring_from_utf8(e2.long_name);
+					auto const cmp = coll.compare(xstr.data(), xstr.data() + xstr.size(), ystr.data(), ystr.data() + ystr.size());
+					if (cmp)
+						return cmp < 0;
+					else
+						return e1.short_name < e2.short_name;
+				});
+	}
 
 	// add an entry to change ordering
 	item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
@@ -283,8 +277,7 @@ void menu_software_list::handle()
 						: nullptr;
 
 				// if it's a perfect match for the current selection, don't move it
-				auto const &cur_name = m_ordered_by_shortname ? cur_selected->short_name : cur_selected->long_name;
-				if (!cur_selected || core_strnicmp(cur_name.c_str(), m_search.c_str(), m_search.size()))
+				if (!cur_selected || core_strnicmp((m_ordered_by_shortname ? cur_selected->short_name : cur_selected->long_name).c_str(), m_search.c_str(), m_search.size()))
 				{
 					std::string::size_type bestmatch(0);
 					entry_info const *selected_entry(cur_selected);

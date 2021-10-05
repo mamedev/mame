@@ -29,52 +29,10 @@
 #include <algorithm>
 #include <iterator>
 #include <functional>
+#include <locale>
 
 
 namespace ui {
-
-namespace {
-
-//-------------------------------------------------
-//  compares two items in the software list and
-//  sort them by parent-clone
-//-------------------------------------------------
-
-bool compare_software(ui_software_info const &a, ui_software_info const &b)
-{
-	bool const clonex = !a.parentname.empty() && !a.parentlongname.empty();
-	bool const cloney = !b.parentname.empty() && !b.parentlongname.empty();
-
-	if (!clonex && !cloney)
-	{
-		return 0 > core_stricmp(a.longname.c_str(), b.longname.c_str());
-	}
-	else if (!clonex && cloney)
-	{
-		if ((a.shortname == b.parentname) && (a.instance == b.instance))
-			return true;
-		else
-			return 0 > core_stricmp(a.longname.c_str(), b.parentlongname.c_str());
-	}
-	else if (clonex && !cloney)
-	{
-		if ((a.parentname == b.shortname) && (a.instance == b.instance))
-			return false;
-		else
-			return 0 > core_stricmp(a.parentlongname.c_str(), b.longname.c_str());
-	}
-	else if ((a.parentname == b.parentname) && (a.instance == b.instance))
-	{
-		return 0 > core_stricmp(a.longname.c_str(), b.longname.c_str());
-	}
-	else
-	{
-		return 0 > core_stricmp(a.parentlongname.c_str(), b.parentlongname.c_str());
-	}
-}
-
-} // anonymous namespace
-
 
 menu_select_software::search_item::search_item(ui_software_info const &s)
 	: software(s)
@@ -455,7 +413,51 @@ void menu_select_software::build_software_list()
 	}
 
 	// sort array
-	std::stable_sort(m_swinfo.begin() + 1, m_swinfo.end(), compare_software);
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+	auto const compare_names =
+			[&coll] (std::string const &x, std::string const &y) -> bool
+			{
+				std::wstring const wx = wstring_from_utf8(x);
+				std::wstring const wy = wstring_from_utf8(y);
+				return 0 > coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size());
+			};
+	std::stable_sort(
+			m_swinfo.begin() + 1,
+			m_swinfo.end(),
+			[&compare_names] (ui_software_info const &a, ui_software_info const &b) -> bool
+			{
+				bool const clonex = !a.parentname.empty() && !a.parentlongname.empty();
+				bool const cloney = !b.parentname.empty() && !b.parentlongname.empty();
+
+				if (!clonex && !cloney)
+				{
+					return compare_names(a.longname, b.longname);
+				}
+				else if (!clonex && cloney)
+				{
+					if ((a.shortname == b.parentname) && (a.instance == b.instance))
+						return true;
+					else
+						return compare_names(a.longname, b.longname);
+				}
+				else if (clonex && !cloney)
+				{
+					if ((a.parentname == b.shortname) && (a.instance == b.instance))
+						return false;
+					else
+						return compare_names(a.longname, b.longname);
+				}
+				else if ((a.parentname == b.parentname) && (a.instance == b.instance))
+				{
+					return compare_names(a.longname, b.longname);
+				}
+				else
+				{
+					return compare_names(a.parentlongname, b.parentlongname);
+				}
+			});
+
+
 	m_filter_data.finalise();
 }
 
