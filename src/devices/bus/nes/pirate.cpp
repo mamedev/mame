@@ -127,8 +127,8 @@ nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const 
 {
 }
 
-nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_EH8813A, tag, owner, clock), m_dipsetting(0), m_latch(0)
+nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_EH8813A, tag, owner, clock), m_jumper(0), m_latch(0), m_reg(0)
 {
 }
 
@@ -402,20 +402,19 @@ void nes_cityfight_device::pcb_reset()
 void nes_eh8813a_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_dipsetting));
+	save_item(NAME(m_jumper));
 	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
 }
 
 void nes_eh8813a_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_89ab(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-	set_nt_mirroring(PPU_MIRROR_VERT);
+	prg32(0);
+	chr8(0, CHRROM);
 
-	m_dipsetting = 0; // no means to adjust cart DIPs - unimplemented
+	m_jumper = 0;
 	m_latch = 0;
+	m_reg = 0;
 }
 
 
@@ -1238,46 +1237,41 @@ void nes_cityfight_device::write_h(offs_t offset, uint8_t data)
 
  UNL-EH8813A
 
- Games: Dr. Mario II
-
- Board is used in multicarts other than this? "BY ES"
- in pause menu suggests this may be by Waixing. Title
- menus change with DIP settings (currently unimplemented),
- but it is unclear if PCB has switch or solder pads or...?
+ Games: Dr. Mario II, 1996 English CAI 3 in 1,
+ Elementary School Math CAI
 
  NES 2.0: mapper 519
 
- In MAME: Preliminary supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_eh8813a_device::write_h(offs_t offset, uint8_t data)
+void nes_eh8813a_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("unl_eh8813a write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (BIT(offset, 8))
-		return;
-
-	chr8(data & 0x7f, m_chr_source);
-	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	uint8_t bank = offset & 0x3f;
-	if (BIT(offset, 7))
+	if (!BIT(m_latch, 8))
 	{
-		prg16_89ab(bank);
-		prg16_cdef(bank);
-	}
-	else
-		prg32(bank >> 1);
+		m_latch = offset;
+		m_reg = data;
 
-	m_latch = BIT(offset, 6);
+		u8 bank = m_latch & 0x3f;
+		u8 mode = !BIT(m_latch, 7);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+
+		set_nt_mirroring(BIT(m_reg, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
+
+	chr8((m_reg & 0x7c) | (data & 0x03), CHRROM);
 }
 
-uint8_t nes_eh8813a_device::read_h(offs_t offset)
+u8 nes_eh8813a_device::read_h(offs_t offset)
 {
 	LOG_MMC(("unl_eh8813a read_h, offset: %04x\n", offset));
-	if (m_latch)
-		offset = (offset & 0xfff0) | m_dipsetting;
+
+	if (BIT(m_latch, 6))
+		offset = (offset & ~0x0f) | m_jumper;  // TODO: jumper setting that controls which menu appears is 0 for now
 	return hi_access_rom(offset);
 }
 
