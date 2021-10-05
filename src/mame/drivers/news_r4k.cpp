@@ -323,6 +323,8 @@ protected:
     const int FREERUN_FREQUENCY = 1000000; // Hz
     const int TIMER0_FREQUENCY = 100; // Hz
     const uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
+    const uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
+    const uint32_t MAP_ENTRY_COUNT = APBUS_DMA_MAP_RAM_SIZE / 8; // 8 bytes per entry
 
     // RAM debug
     bool m_map_shift = false;
@@ -416,7 +418,7 @@ void news_r4k_state::machine_common(machine_config &config)
 
     // DMA controller
     DMAC3(config, m_dmac, 0);
-    m_dmac->set_base_map_address(APBUS_DMA_MAP_ADDRESS);
+    m_dmac->set_apbus_address_translator(FUNC(news_r4k_state::apbus_virt_to_phys));
     m_dmac->set_bus(m_cpu, 0);
     m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
 
@@ -526,7 +528,6 @@ void news_r4k_state::cpu_map(address_map &map)
                                 m_net_ram->write(offset, data);
                               }));// dedicated network RAM
     // DMAC3 DMA Controller
-    //map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
     map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset) { return m_dma_ram->read(offset); }),
                                      NAME([this](offs_t offset, uint8_t data)
                                           {

@@ -33,8 +33,7 @@ public:
     };
 
     // Address map setup
-    void map_dma_ram(address_map &map);
-    void set_base_map_address(uint32_t base_map_address);
+    template <typename... T> void set_apbus_address_translator(T &&... args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
     template <DMAC3_Controller controller> void map(address_map &map)
     {
         map(0x0, 0x3).rw(FUNC(dmac3_device::csr_r<controller>), FUNC(dmac3_device::csr_w<controller>));
@@ -47,7 +46,7 @@ public:
     // Signal routing
     template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
     template <DMAC3_Controller controller> auto dma_r_cb() { return m_dma_r[controller].bind(); }
-	template <DMAC3_Controller controller> auto dma_w_cb() { return m_dma_w[controller].bind(); }
+    template <DMAC3_Controller controller> auto dma_w_cb() { return m_dma_w[controller].bind(); }
     auto irq_out() { return m_irq_handler.bind(); } // XXX Seems to be one IRQ pin for both controllers?
 
     template <DMAC3_Controller controller> void irq_w(int state)
@@ -70,87 +69,26 @@ public:
     }
 
 protected:
-    // DMAC3 requires off-board RAM to be allocated for the DMA map
-    // The platform host controls this configuration.
-    const uint32_t MAP_RAM_SIZE = 0x20000; // 128 kibibytes
-    const uint32_t MAP_ENTRY_COUNT = MAP_RAM_SIZE / 8; // 8 bytes per entry
-    uint32_t BASE_MAP_ADDRESS; // Where do we start on the bus?
-
     // Overrides from device_t
     virtual void device_start() override;
     virtual void device_reset() override;
 
-    // Connections to other devices and associated state
+    // Connections to other devices
     required_address_space m_bus;
     devcb_write_line m_irq_handler;
     devcb_read8::array<2> m_dma_r; // XXX 32b? 64b?
-	devcb_write8::array<2> m_dma_w; // XXX 32b? 64b?
-    emu_timer *m_irq_check;
-	emu_timer *m_dma_check;
-    bool m_irq = false; // Chip-level IRQ
+    devcb_write8::array<2> m_dma_w; // XXX 32b? 64b?
+    device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
 
-    // Misc functions
-    void reset_controller(DMAC3_Controller controller);
-    uint32_t dmac3_virt_to_phys(uint32_t v_address);
+    // Timers and interrupts
+    emu_timer *m_irq_check;
+    emu_timer *m_dma_check;
+    bool m_irq = false; // Chip-level IRQ
     TIMER_CALLBACK_MEMBER(irq_check);
     TIMER_CALLBACK_MEMBER(dma_check);
 
-    /*
-     * DMAC3 memory addressing
-     * 
-     * The DMAC3 has its own virtual->physical addressing scheme. Like the CPU's TLB, the host OS
-     * is responsible for populating the DMAC's TLB. The `dmac3_pte` struct defines what each entry looks like. Note that to avoid
-     * bit-order dependencies and other platform-specific stuff, in this implementation, valid, coherent, pad2, and pfnum are
-     * separate variables, but the actual register is packed like this:
-     * 
-     * 0x xxxx xxxx xxxx xxxx
-     *   |   pad   |  entry  |
-     * 
-     * Entry is packed as follows:
-     * 0b    x      x     xxxxxxxxxx xxxxxxxxxxxxxxxxxxxx
-     *    |valid|coherent|    pad2  |       pfnum        |
-     * 
-     * The DMAC3 requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
-     * 
-     * The monitor ROM populates the PTEs as follows in response to a `dl` command.
-     * Addr       PTE1             PTE2
-     * 0x14c20000 0000000080103ff5 0000000080103ff6
-     * 
-     * It also loads the `address` register with 0xd60. 
-     * 
-     * This will cause the DMAC to start mapping from virtual address 0xd60 to physical address 0x3ff5d60. 
-     * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
-     * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
-     * 
-     * NetBSD splits the mapping RAM into two sections, one for each DMAC controller. If the OS does not keep track, the DMACs
-     * could end up in a configuration that would cause them to overwrite each other's data.
-     * 
-     * Another note: NetBSD mentions that the `pad2` section of the register is 10 bits. However, this might not be fully accurate.
-     * On the NWS-5000X, the physical address bus is 36 bits because it has an R4400SC. The 32nd bit is sometimes set, depending
-     * on the virtual address being used (maybe it goes to the memory controller). It doesn't impact the normal operation of the
-     * computer, but does mean that the `pad2` section might only be 6 bits, not 10 bits.
-     */
-    
-    // Page table entry structure
-    struct dmac3_pte
-    {
-        uint32_t pad; // unused??
-        bool valid;   // Entry is OK to use
-        bool coherent;  // DMA coherence enabled (don't care for emulation??)
-        uint32_t pad2;
-        uint32_t pfnum; // Page number (upper 20 bits of physical address)
-    };
-
-    enum DMAC3_PTE_MASKS
-    {
-        ENTRY_VALID = 0x80000000,
-        ENTRY_COHERENT = 0x40000000,
-        ENTRY_PAD = 0x3FF00000,
-        ENTRY_PAD_SHIFT = 20,
-        ENTRY_PFNUM = 0xFFFFF
-    };
-
-    const uint32_t DMAC_PAGE_MASK = 0xFFF000; // Index into page map XXX might need to be adjusted
+    // Other methods
+    void reset_controller(DMAC3_Controller controller);
 
     // DMAC3 has two controllers on-chip
     struct dmac3_register_file
@@ -158,7 +96,7 @@ protected:
         uint32_t csr = 0; // Status register
         uint32_t intr = 0; // Interrupt status register
         uint32_t length = 0; // Transfer count register
-        uint32_t address = 0; // Starting byte offset XXX why is this incremented by 200000 for CTRL1 in NetBSD???
+        uint32_t address = 0; // Starting byte offset
         uint32_t conf = 0; // Transaction configuration register
         bool drq = false; // XXX Is this something different from DREQ?
     } m_controllers[2];
@@ -175,7 +113,8 @@ protected:
         CSR_DBURST = 0x0020,
     };
 
-    const uint32_t INTR_CLR_MASK = (/*INTR_INT |*/ INTR_TCI | INTR_EOP | INTR_EOPI | INTR_DREQ | INTR_DRQI | INTR_PERR); // TODO: are EOP, DREQ, PERR actually intr?
+    // TODO: are EOP, DREQ, PERR actually intr? Can DMAC3 clear INTR_INT itself?
+    const uint32_t INTR_CLR_MASK = (INTR_TCI | INTR_EOP | INTR_EOPI | INTR_DREQ | INTR_DRQI | INTR_PERR);
     const uint32_t INTR_EN_MASK = (INTR_INTEN | INTR_TCIE | INTR_EOPIE | INTR_DRQIE);
     enum DMAC3_INTR_MASKS : uint32_t
     {

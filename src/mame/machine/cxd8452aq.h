@@ -31,7 +31,7 @@ public:
 
     void map(address_map &map);
 
-    template <typename... T> void set_apbus_address_translator(T &&... args) { apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
+    template <typename... T> void set_apbus_address_translator(T &&... args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
 
     // CPU-side accessors for the WSC-SONIC3 registers
     uint32_t cpu_r(offs_t offset, uint32_t mem_mask) { return space(1).read_dword(offset, mem_mask); }
@@ -82,7 +82,7 @@ protected:
     TIMER_CALLBACK_MEMBER(irq_check);
 
     // APbus DMA
-    device_delegate<uint32_t(uint32_t)> apbus_virt_to_phys_callback;
+    device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
     const int DMA_TIMER = 1;      // No idea what this should be - maybe it would run at the APbus frequency?
     required_address_space m_bus; // direct bus access for DMA
     emu_timer *m_dma_check;

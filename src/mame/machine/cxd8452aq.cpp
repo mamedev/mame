@@ -25,7 +25,7 @@ cxd8452aq_device::cxd8452aq_device(const machine_config &mconfig, const char *ta
     main_bus_config("main_bus", ENDIANNESS_BIG, 32, 32, 0),
     sonic_config("sonic", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(cxd8452aq_device::sonic_bus_map), this)),
     m_irq_handler(*this),
-    apbus_virt_to_phys_callback(*this),
+    m_apbus_virt_to_phys_callback(*this),
     m_bus(*this, finder_base::DUMMY_TAG, -1, 64)
 {
 
@@ -146,7 +146,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
         // Move byte from the SONIC RAM region to main memory
         uint8_t data = space(0).read_byte(sonic3_reg.rx_sonic_address & 0xffff);
         LOG("sonic3.rx(0x%x -> 0x%x, data=0x%x)\n", sonic3_reg.rx_sonic_address, sonic3_reg.rx_host_address, data);
-        m_bus->write_byte(apbus_virt_to_phys_callback(sonic3_reg.rx_host_address), data);
+        m_bus->write_byte(m_apbus_virt_to_phys_callback(sonic3_reg.rx_host_address), data);
         sonic3_reg.rx_count -= 1;
         sonic3_reg.rx_sonic_address += 1;
         sonic3_reg.rx_host_address += 1;
@@ -160,7 +160,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
     if (txDmaActive)
     {
         // Move byte from main memory to the SONIC RAM
-        uint8_t data = m_bus->read_byte(apbus_virt_to_phys_callback(sonic3_reg.tx_host_address));
+        uint8_t data = m_bus->read_byte(m_apbus_virt_to_phys_callback(sonic3_reg.tx_host_address));
         LOG("sonic3.tx(0x%x -> 0x%x, data=0x%x)\n", sonic3_reg.tx_host_address, sonic3_reg.tx_sonic_address, data);
         space(0).write_byte(sonic3_reg.tx_sonic_address & 0xffff, data);
         sonic3_reg.tx_count -= 1;
@@ -184,7 +184,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
 void cxd8452aq_device::device_start()
 {
     m_irq_handler.resolve_safe();
-    apbus_virt_to_phys_callback.resolve();
+    m_apbus_virt_to_phys_callback.resolve();
     m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::irq_check), this));
     m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::dma_check), this));
 }
