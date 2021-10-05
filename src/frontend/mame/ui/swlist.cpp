@@ -152,7 +152,7 @@ menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &c
 {
 	m_swlist = swlist;
 	m_interface = interface;
-	m_ordered_by_shortname = true;
+	m_ordered_by_shortname = false;
 }
 
 
@@ -229,7 +229,7 @@ void menu_software_list::populate(float &customtop, float &custombottom)
 
 	// append all of the menu entries
 	for (auto &entry : m_entrylist)
-		item_append(entry.short_name, entry.long_name, 0, &entry);
+		item_append(entry.long_name, entry.short_name, 0, &entry);
 
 	item_append(menu_item_type::SEPARATOR);
 }
