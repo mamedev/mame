@@ -10,7 +10,7 @@
  *   http://bitsavers.org/components/national/_dataBooks/1995_National_Ethernet_Databook.pdf
  *
  * TODO
- *   - bus mode (big endian, interrupts active low) - partially implemented
+ *   - bus mode (big endian, interrupts active low)
  *   - byte count mismatch
  *   - data widths
  *   - tally counters
@@ -587,30 +587,14 @@ void dp83932c_device::dump_bytes(u8 *buf, int length)
 
 u16 dp83932c_device::read_bus_word(offs_t address)
 {
-	// I need to research other drivers in MAME to see how this is handled elsewhere.
-	// This logic compensates for the fact that, while read_word will deal with the endian-ness
-	// because the bus is configured as such, the organization in memory is a bit annoying to deal
-	// with in 32 bit mode.
-	// In LE mode, SONIC's access pattern will be:
-	//  <byte 0>  <byte 1> <byte 2>  <byte 3>
-	// |----- word 0 -----|----- word 1 -----|
-	// and only cares about word 0 in 32 bit mode.
-	// In BE mode, SONIC's access pattern will be:
-	//  <byte 3>  <byte 2> <byte 1>  <byte 0>
-	// |----- word 1 -----|----- word 0 -----|
-	// So, since we have the bus magic doing the bytewise endian-ness conversion in the read_word/memory_read_generic methods,
-	// in 32-bit BE mode we only need to offset the word address by 2 in order to get the appropriate alignment.
-	// Also, that all might be wrong, I'm still learning... This results in well-formed packets from the Sony NEWS NWS-5000X
-	// driver though, so hopefully it is at least on the right track.
 	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
 
-	return (!m_bmode || width == 2) ? m_bus->read_word(address) : m_bus->read_word(address + 2);
+	return width == 2 ? m_bus->read_word(address) : m_bus->read_dword(address, 0xffff);
 }
 
 void dp83932c_device::write_bus_word(offs_t address, u16 data)
 {
-	// See read_bus_word for an in-depth description of why this method exists
 	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
 
-	(!m_bmode || width == 2) ? m_bus->write_word(address, data) : m_bus->write_word(address + 2, data);
+	width == 2 ? m_bus->write_word(address, data) : m_bus->write_dword(address, data, 0xffff);
 }

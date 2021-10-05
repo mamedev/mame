@@ -300,7 +300,7 @@ protected:
     void apbus_cmd_w(offs_t offset, uint32_t data);
     uint32_t apbus_virt_to_phys(uint32_t v_address);
 
-    // Page table entry structure
+    // APbus DMA page table entry structure
     struct apbus_pte
     {
         uint32_t pad; // unused??
@@ -401,7 +401,6 @@ void news_r4k_state::machine_common(machine_config &config)
     DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
     m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
     m_sonic->set_bus(m_sonic3, 1);
-    m_sonic->set_bmode(true); // big-endian mode to set word order
 
     // Use promiscuous mode to force network driver to accept all packets, since SONIC has its own filter (CAM table)
     // Not sure if needing to use this means something else isn't set up correctly.
@@ -833,8 +832,9 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
  * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
  * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
  *
- * NetBSD splits the mapping RAM into two sections, one for each DMAC controller. If the OS does not keep track, the DMACs
- * could end up in a configuration that would cause them to overwrite each other's data.
+ * NetBSD splits the mapping RAM into two sections, one for each DMAC controller. If the OS does not keep track, the ASICs
+ * could end up in a configuration that would cause them to overwrite each other's data. NEWS-OS makes even more extensive
+ * use of APbus DMA, including the WSC-SONIC3 for network DMA.
  *
  * Another note: NetBSD mentions that the `pad2` section of the register is 10 bits. However, this might not be fully accurate.
  * On the NWS-5000X, the physical address bus is 36 bits because it has an R4400SC. The 32nd bit is sometimes set, depending
@@ -845,6 +845,8 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 {
     // Convert page number to PTE address and read raw PTE data from the APbus DMA mapping RAM
     uint32_t apbus_page_address = APBUS_DMA_MAP_ADDRESS + 8 * (v_address >> 12);
+
+    // TODO: bounds check of apbus_page_address
     uint64_t raw_pte = m_cpu->space(0).read_qword(apbus_page_address);
 
     // Marshal raw data to struct

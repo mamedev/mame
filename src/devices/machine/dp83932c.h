@@ -21,7 +21,6 @@ public:
 	void map(address_map &map);
 	u16 reg_r(offs_t offset) { return m_reg[offset]; }
 	void reg_w(offs_t offset, u16 data);
-	void set_bmode(bool bmode) { m_bmode = bmode; }
 
 protected:
 	// device_t overrides
@@ -209,8 +208,6 @@ private:
 	u16 m_reg[64];
 	u64 m_cam[16];
 
-	// Endian control
-	bool m_bmode = false; // Low = LE, High = BE
 	u16 read_bus_word(offs_t address);
 	void write_bus_word(offs_t address, u16 data);
 };
