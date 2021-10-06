@@ -93,6 +93,9 @@ public:
 	virtual void chr_cb(int start, int bank, int source) override;
 
 protected:
+	// construction/destruction
+	nes_txsrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	void set_mirror();
 };
 

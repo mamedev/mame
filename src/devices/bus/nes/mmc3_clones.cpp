@@ -69,6 +69,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device,      "nes_bmc_hik8", 
 DEFINE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device,      "nes_bmc_hik4",      "NES Cart BMC HIK 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device, "nes_bmc_mario7in1", "NES Cart BMC Mario 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device,       "nes_bmc_f15",       "NES Cart BMC F-15 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_F600,      nes_bmc_f600_device,      "nes_bmc_f600",      "NES Cart BMC F600 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45",      "NES Cart BMC GN-45 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device,     "nes_bmc_k3006",     "NES Cart BMC K-3006 PCB")
@@ -90,6 +91,13 @@ INPUT_PORTS_START( sachen_shero )
 	PORT_CONFSETTING(    0x80, u8"\u4f8d\u9b42 (Shìhún)" )    // 侍魂
 INPUT_PORTS_END
 
+INPUT_PORTS_START( bmc_f600 )
+	PORT_START("JUMPER")
+	PORT_CONFNAME( 0x80, 0x80, "Menu Type" )
+	PORT_CONFSETTING(    0x00, "Mario 67 in 1" )
+	PORT_CONFSETTING(    0x80, "Mario Party II (6 in 1)" )
+INPUT_PORTS_END
+
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -98,6 +106,11 @@ INPUT_PORTS_END
 ioport_constructor nes_sachen_shero_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( sachen_shero );
+}
+
+ioport_constructor nes_bmc_f600_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bmc_f600 );
 }
 
 
@@ -330,6 +343,13 @@ nes_bmc_mario7in1_device::nes_bmc_mario7in1_device(const machine_config &mconfig
 
 nes_bmc_f15_device::nes_bmc_f15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_F15, tag, owner, clock)
+{
+}
+
+nes_bmc_f600_device::nes_bmc_f600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txsrom_device(mconfig, NES_BMC_F600, tag, owner, clock)
+	, m_jumper(*this, "JUMPER")
+	, m_reg(0)
 {
 }
 
@@ -756,6 +776,20 @@ void nes_bmc_f15_device::pcb_reset()
 	mmc3_common_initialize(0x1f, 0xff, 0);
 	prg16_89ab(0);
 	prg16_cdef(0);
+}
+
+void nes_bmc_f600_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_f600_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_reg = 0;
+	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
 
 void nes_bmc_gn45_device::device_start()
@@ -2636,6 +2670,69 @@ void nes_bmc_f15_device::write_m(offs_t offset, u8 data)
 void nes_bmc_f15_device::prg_cb(int start, int bank)
 {
 	// Ignore MMC3 PRG bank switching. Master Fighter II (game #150) uses the bank switching above.
+}
+
+/*-------------------------------------------------
+
+ BMC-F600
+
+ Games: Golden Mario Party II 6 in 1
+
+ MMC3 clone with banking for multigame menu. Note,
+ this cart has one TxSROM game (SMB4) and so it uses
+ the nonstandard MMC3 mirroring of those boards.
+
+ NES 2.0: mapper 370
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_bmc_f600_device::read_l(offs_t offset)
+{
+	LOG_MMC(("bmc_f600 read_l, offset: %04x\n", offset));
+
+	offset += 0x100;
+	if (offset >= 0x1000)
+		return (get_open_bus() & 0x7f) | m_jumper->read();
+	else
+		return get_open_bus();
+}
+
+void nes_bmc_f600_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_f600 write_l, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+	if (offset >= 0x1000)
+	{
+		m_reg = offset;
+
+		m_prg_base = (m_reg & 0x38) << 1;
+		m_prg_mask = 0x1f >> BIT(m_reg, 5);
+		set_prg(m_prg_base, m_prg_mask);
+
+		m_chr_base = (m_reg & 0x07) << 7;
+		m_chr_mask = 0xff >> !BIT(m_reg, 2);
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+void nes_bmc_f600_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_f600 write_h, offset: %04x, data: %02x\n", offset, data));
+	if ((m_reg & 0x07) == 1)
+		nes_txsrom_device::write_h(offset, data);
+	else
+		nes_txrom_device::write_h(offset, data);
+}
+
+void nes_bmc_f600_device::chr_cb(int start, int bank, int source)
+{
+	if ((m_reg & 0x07) == 1)
+		nes_txsrom_device::chr_cb(start, bank, source);
+	else
+		nes_txrom_device::chr_cb(start, bank, source);
 }
 
 /*-------------------------------------------------

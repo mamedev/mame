@@ -758,6 +758,32 @@ public:
 };
 
 
+// ======================> nes_bmc_f600_device
+
+class nes_bmc_f600_device : public nes_txsrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_f600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_l(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+	virtual void chr_cb(int start, int bank, int source) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+
+private:
+	required_ioport m_jumper;
+	u8 m_reg;
+};
+
+
 // ======================> nes_bmc_gn45_device
 
 class nes_bmc_gn45_device : public nes_txrom_device
@@ -1040,6 +1066,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device)
 DECLARE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device)
+DECLARE_DEVICE_TYPE(NES_BMC_F600,      nes_bmc_f600_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device)
