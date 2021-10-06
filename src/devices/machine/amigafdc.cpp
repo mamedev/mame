@@ -12,6 +12,16 @@
 #include "formats/ipf_dsk.h"
 #include "amigafdc.h"
 
+#define LOG_WARN    (1U << 1)   // Show warnings
+#define LOG_DMA     (1U << 2)   // Show DMA setups
+
+#define VERBOSE (LOG_WARN | LOG_DMA)
+
+#include "logmacro.h"
+
+#define LOGWARN(...)     LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGDMA(...)      LOGMASKED(LOG_DMA, __VA_ARGS__)
+
 DEFINE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device, "amiga_fdc", "Amiga FDC")
 
 void amiga_fdc_device::floppy_formats(format_registration &fr)
@@ -214,7 +224,7 @@ void amiga_fdc_device::live_run(const attotime &limit)
 					// CHECKME: abreed, ghoulsvf Ghouls'n Goblins and lastnin2 at very least throws this
 					// is it a side effect of something else not happening at the right time or the assumption is right?
 					cur_live.bit_counter = 0;
-					logerror("amiga_fdc_device::live_run - cur_live.bit_counter > 8\n")
+					LOGWARN("%s: live_run - cur_live.bit_counter > 8\n", machine().describe_context());
 				}
 
 				if(cur_live.bit_counter == 8) {
@@ -240,7 +250,7 @@ void amiga_fdc_device::live_run(const attotime &limit)
 				if(cur_live.bit_counter > 8)
 				{
 					cur_live.bit_counter = 0;
-					logerror("amiga_fdc_device::live_run - cur_live.bit_counter > 8\n")
+					LOGWARN("%s: live_run - cur_live.bit_counter > 8\n", machine().describe_context());
 				}
 
 				if(cur_live.bit_counter == 8) {
@@ -340,6 +350,8 @@ void amiga_fdc_device::dma_check()
 	bool was_writing = dskbyt & 0x2000;
 	dskbyt &= 0x9fff;
 	if(dma_enabled()) {
+		LOGDMA("%s: DMA start dskpt=%08x dsklen=%04x adkcon=%04x dsksync=%04x\n", machine().describe_context(), dskpt, dsklen & 0x3fff, adkcon, dsksync);
+
 		if(dma_state == IDLE) {
 			dma_state = adkcon & 0x0400 ? DMA_WAIT_START : DMA_RUNNING_BYTE_0;
 			if(dma_state == DMA_RUNNING_BYTE_0) {
@@ -503,7 +515,8 @@ uint8_t amiga_fdc_device::ciaapra_r()
 {
 	uint8_t ret = 0x3c;
 	if(floppy) {
-		//if(!floppy->ready_r()) fixit: seems to not work well with multiple disk drives
+		// FIXME: seems to not work well with multiple disk drives
+		//if(!floppy->ready_r())
 			ret &= ~0x20;
 		if(!floppy->trk00_r())
 			ret &= ~0x10;
