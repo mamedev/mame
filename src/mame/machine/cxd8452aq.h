@@ -6,12 +6,9 @@
  * Sony CXD8452AQ WSC-SONIC3 APbus interface and Ethernet controller controller
  *
  * The SONIC3 is an APbus controller designed for interfacing the SONIC Ethernet
- * controller to the APbus while providing DMA capabilities.
- *
- * TODO:
- *  - Determine if address bus translation actually goes through this chip
- *  - Interrupts
- *  - Other functionality
+ * controller to the APbus while providing DMA capabilities. It also manages
+ * RAM access for the SONIC. The host can write to SONIC's RAM, but not the other
+ * way around.
  */
 
 #ifndef MAME_MACHINE_CXD8452AQ_H
@@ -31,27 +28,25 @@ public:
 
     void map(address_map &map);
 
-    template <typename... T> void set_apbus_address_translator(T &&... args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
-
-    // CPU-side accessors for the WSC-SONIC3 registers
-    uint32_t cpu_r(offs_t offset, uint32_t mem_mask) { return space(1).read_dword(offset, mem_mask); }
-	void cpu_w(offs_t offset, uint32_t data, uint32_t mem_mask) { space(1).write_dword(offset, data, mem_mask); }
+    template <typename... T>
+    void set_apbus_address_translator(T &&...args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
 
     auto irq_out() { return m_irq_handler.bind(); }
     void irq_w(int state)
     {
         if (state)
         {
-            sonic3_reg.sonic |= 0x1;
+            m_sonic3_reg.sonic |= 0x1;
         }
         else
         {
-            sonic3_reg.sonic &= ~0x1;
+            m_sonic3_reg.sonic &= ~0x1;
         }
         m_irq_check->adjust(attotime::zero);
     }
 
-    template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
+    template <typename T>
+    void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
 
 protected:
     // overrides
@@ -82,14 +77,16 @@ protected:
     TIMER_CALLBACK_MEMBER(irq_check);
 
     // APbus DMA
+    // TODO: Actual frequency, since we don't have DRQ to implictly rate limit
+    //       Might be the APbus frequency.
+    const int DMA_TIMER = 1;
     device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
-    const int DMA_TIMER = 1;      // No idea what this should be - maybe it would run at the APbus frequency?
-    required_address_space m_bus; // direct bus access for DMA
+    required_address_space m_bus;
     emu_timer *m_dma_check;
     TIMER_CALLBACK_MEMBER(dma_check);
 
-    struct WscSonicRegisters
-	{
+    struct sonic3_register_file
+    {
         // General registers
         uint32_t sonic = 0x80000000;
         uint32_t config = 0x0;
@@ -102,17 +99,17 @@ protected:
         uint32_t tx_sonic_address = 0x0;
         uint32_t tx_host_address = 0x0;
         uint32_t tx_count = 0x0;
-    } sonic3_reg;
+    } m_sonic3_reg;
 
-    // Register-related constants
-    // SONIC register
+    // sonic register constants
     const uint32_t INT_EN_MASK = 0x7f00;
-    const uint32_t INT_CLR_MASK = 0xf0; // XXX external interrupt too?
+    // TODO: determine if external interrupt should be included when cleared
+    const uint32_t INT_CLR_MASK = 0xf0;
     const uint32_t RX_DMA_COMPLETE = 0x40;
     const uint32_t TX_DMA_COMPLETE = 0x20;
     const uint32_t EXT_INT = 0x1;
 
-    // Count registers
+    // count register constants
     const uint32_t DMA_START = 0x80000000;
 };
 

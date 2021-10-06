@@ -85,6 +85,8 @@
  *    I haven't seen any attempts to communicate with unemulated APbus hardware or anything like that, yet. However, this needs
  *    more investigation.
  *  - Bootloader doesn't work with DRC enabled (see CPU section above)
+ *  - Monitor ROM command `ss -r` doesn't show most register values
+ *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly)
  */
 
 #include "emu.h"
@@ -126,9 +128,9 @@
 #define LOG_APBUS (1U << 5)
 
 #define NEWS_R4K_INFO (LOG_LED)
-#define NEWS_R4K_DEBUG (LOG_GENERAL|LOG_INTERRUPT|LOG_LED)
-#define NEWS_R4K_TRACE (NEWS_R4K_DEBUG|LOG_ALL_INTERRUPT|LOG_APBUS)
-#define NEWS_R4K_MAX (NEWS_R4K_TRACE|LOG_MEMORY)
+#define NEWS_R4K_DEBUG (LOG_GENERAL | LOG_INTERRUPT | LOG_LED)
+#define NEWS_R4K_TRACE (NEWS_R4K_DEBUG | LOG_ALL_INTERRUPT | LOG_APBUS)
+#define NEWS_R4K_MAX (NEWS_R4K_TRACE | LOG_MEMORY)
 
 #define VERBOSE NEWS_R4K_INFO
 
@@ -169,6 +171,7 @@ protected:
     // address maps
     void cpu_map(address_map &map);
     void sonic3_map(address_map &map);
+    void cpu_map_main_memory(address_map &map);
     void cpu_map_debug(address_map &map);
 
     // machine config
@@ -299,15 +302,30 @@ protected:
     uint8_t apbus_cmd_r(offs_t offset);
     void apbus_cmd_w(offs_t offset, uint32_t data);
     uint32_t apbus_virt_to_phys(uint32_t v_address);
+    std::map<offs_t, std::string> m_apbus_cmd_decoder
+    {
+        {0xc, "INTMSK"}, // Interrupt mask
+        {0x14, "INSTST"}, // Interrupt status
+        {0x1c, "BER_ADDR"}, // Bus error address
+        {0x34, "CFG_CTRL"}, // config control
+        {0x5c, "DER_A"}, // DMA error address
+        {0x6c, "DER_S"}, // DMA error slot
+        {0x84, "DMA"} // unmapped DMA coherency (?)
+    };
 
     // APbus DMA page table entry structure
     struct apbus_pte
     {
-        uint32_t pad; // unused??
-        bool valid;   // Entry is OK to use
-        bool coherent;  // DMA coherence enabled (don't care for emulation??)
+        // Unused
+        uint32_t pad;
+        // Entry is OK to use
+        bool valid;
+        // DMA coherence enabled (don't care for emulation??)
+        bool coherent;
+        // Unused
         uint32_t pad2;
-        uint32_t pfnum; // Page number (upper 20 bits of physical address)
+        // Page number (upper 20 bits of physical address)
+        uint32_t pfnum;
     };
 
     enum APBUS_PTE_MASKS
@@ -328,15 +346,15 @@ protected:
     const uint32_t DCACHE_SIZE = 16384;
     const char *MAIN_MEMORY_DEFAULT = "64M";
     const int FREERUN_FREQUENCY = 1000000; // Hz
-    const int TIMER0_FREQUENCY = 100; // Hz
+    const int TIMER0_FREQUENCY = 100;      // Hz
     const uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
-    const uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
+    const uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000;             // 128 kibibytes
     const uint32_t MAP_ENTRY_COUNT = APBUS_DMA_MAP_RAM_SIZE / 8; // 8 bytes per entry
 
     // RAM debug
     bool m_map_shift = false;
-    uint8_t debug_ram_r(offs_t offset);
-    void debug_ram_w(offs_t offset, uint8_t data);
+    uint8_t ram_r(offs_t offset);
+    void ram_w(offs_t offset, uint8_t data);
 };
 
 /*
@@ -398,7 +416,8 @@ void news_r4k_state::machine_common(machine_config &config)
     m_sonic3->set_bus(m_cpu, 0);
     m_sonic3->set_apbus_address_translator(FUNC(news_r4k_state::apbus_virt_to_phys));
 
-    DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
+    // TODO: actual clock frequency - there is a 20MHz crystal nearby on the board, but traces need to be confirmed
+    DP83932C(config, m_sonic, 20'000'000);
     m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
     m_sonic->set_bus(m_sonic3, 1);
 
@@ -418,9 +437,13 @@ void news_r4k_state::machine_common(machine_config &config)
     // TODO: find out the difference between B and A. Only A is emulated in MAME, but it works so it might not be significant
     PC8477A(config, m_fdc, 24_MHz_XTAL, pc8477a_device::mode_t::PS2);
     FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
-    m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>)); // TODO: FIFO IRQ handling
-    m_fdc->drq_wr_callback().set([this](int status) { m_fifo0->drq_w<cxd8442q_device::FifoChannelNumber::CH2>(status); });
-    m_fifo0->bind_dma_r<cxd8442q_device::FifoChannelNumber::CH2>([this]() { return (uint32_t)(m_fdc->dma_r()); });
+
+    // Note - FDC IRQ probably goes through the FIFO first. Might need to be updated in the future.
+    m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>));
+    m_fdc->drq_wr_callback().set([this](int status)
+                                 { m_fifo0->drq_w<cxd8442q_device::FifoChannelNumber::CH2>(status); });
+    m_fifo0->bind_dma_r<cxd8442q_device::FifoChannelNumber::CH2>([this]()
+                                                                 { return (uint32_t)(m_fdc->dma_r()); });
 
     // DMA controller
     DMAC3(config, m_dmac, 0);
@@ -453,17 +476,17 @@ void news_r4k_state::machine_common(machine_config &config)
     // Connect SPIFI3s to the buses
     // TODO: Actual clock frequency
     NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device)
-    { 
-        spifi3_device &adapter = downcast<spifi3_device &>(*device);
-        adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL0>));
-        adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL0>));
-    });
+                                                                                                     {
+                                                                                                         spifi3_device &adapter = downcast<spifi3_device &>(*device);
+                                                                                                         adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL0>));
+                                                                                                         adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL0>));
+                                                                                                     });
     NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device)
-    {
-        spifi3_device &adapter = downcast<spifi3_device &>(*device);
-        adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL1>));
-        adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL1>));
-    });
+                                                                                                     {
+                                                                                                         spifi3_device &adapter = downcast<spifi3_device &>(*device);
+                                                                                                         adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL1>));
+                                                                                                         adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL1>));
+                                                                                                     });
 
     m_dmac->dma_r_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_r));
     m_dmac->dma_w_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_w));
@@ -489,9 +512,11 @@ void news_r4k_state::cpu_map(address_map &map)
     // there must be a side effect caused by unmapping high somewhere.
     map.unmap_value_low();
 
+    cpu_map_main_memory(map);
     // This is the RAM that is used before main memory is initialized
     // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
     map(0x1e980000, 0x1e9fffff).ram(); // TODO: double-check RAM length (0x1e99ffff end?)
+
 
     // NEWS firmware
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);
@@ -519,22 +544,27 @@ void news_r4k_state::cpu_map(address_map &map)
     // LEDs
     map(0x1f3f0000, 0x1f3f0017).w(FUNC(news_r4k_state::led_state_w));
 
+    // APbus
+    map(0x14c00000, 0x14c0008f).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
+
     // WSC-ESCC1 (CXD8421Q) serial controller
     map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
     map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
 
-    // SONIC network controller
-    map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map)); // WSC-SONIC3 registers
+    // SONIC3 APbus interface and SONIC ethernet controller
+    map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map));
     map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff);
-    //map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w));
-    map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
-                          NAME([this](offs_t offset, uint8_t data)
-                              {
-                                LOGMASKED(LOG_MEMORY, "Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
-                                m_net_ram->write(offset, data);
-                              }));
+    map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset)
+                                          { return m_net_ram->read(offset); }),
+                                     NAME([this](offs_t offset, uint8_t data)
+                                          {
+                                              LOGMASKED(LOG_MEMORY, "Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+                                              m_net_ram->write(offset, data);
+                                          }));
+
     // DMAC3 DMA Controller
-    map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset) { return m_dma_ram->read(offset); }),
+    map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset)
+                                          { return m_dma_ram->read(offset); }),
                                      NAME([this](offs_t offset, uint8_t data)
                                           {
                                               LOGMASKED(LOG_MEMORY, "Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
@@ -544,7 +574,6 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
     // SPIFI SCSI controllers
-    // The DMAC has to swap modes when talking to the SPIFI, so the physical route for this might be through the DMAC3.
     map(0x1e280000, 0x1e2803ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: double-check actual end address
     map(0x1e380000, 0x1e3803ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: double-check actual end address
 
@@ -570,14 +599,19 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
 
     // The NEWS monitor ROM FDC routines won't run if DRV2 is inactive.
-    // Why, I'm not sure yet, because the 5000X only has a single floppy drive.
-    map(0x1ed60000, 0x1ed60003).lr8(NAME([this](offs_t offset) { return m_fdc->sra_r() & ~0x40; })).umask32(0x000000ff);
+    // TODO: The 5000X only has a single floppy drive. Why is this needed?
+    map(0x1ed60000, 0x1ed60003).lr8(NAME([this](offs_t offset)
+                                         { return m_fdc->sra_r() & ~0x40; }))
+        .umask32(0x000000ff);
 
-    //map(0x1ed60200, 0x1ed60207).noprw(); // TODO: Floppy aux registers
-    map(0x1ed60200, 0x1ed60207).lr8(NAME([this](offs_t offset) { return 0x1; }));
+    // TODO: Floppy aux registers
+    map(0x1ed60200, 0x1ed60207).noprw();
+    map(0x1ed60200, 0x1ed60207).lr8(NAME([this](offs_t offset)
+                                         { return 0x1; }));
 
-    // Map FDCAUX interrupt read (still need to implement button interrupt mask from 208-20b)
-    map(0x1ed60208, 0x1ed6020f).lr32(NAME([this](offs_t offset) { return (offset == 1) && ((m_intst[0] & irq0_number::FDC) > 0) ? 0x2 : 0x0; }));
+    // Map FDCAUX interrupt read (TODO: still need to implement button interrupt mask from 208-20b)
+    map(0x1ed60208, 0x1ed6020f).lr32(NAME([this](offs_t offset)
+                                          { return (offset == 1) && ((m_intst[0] & irq0_number::FDC) > 0) ? 0x2 : 0x0; }));
 
     // Map FDC and sound FIFO register file
     map(0x1ed00000, 0x1ed8ffff).m(m_fifo0, FUNC(cxd8442q_device::map)); // TODO: is it aligned so CH0 is 1ed00000? Seems likely since that is the `sb` address
@@ -586,37 +620,28 @@ void news_r4k_state::cpu_map(address_map &map)
     cpu_map_debug(map);
 }
 
-void news_r4k_state::sonic3_map(address_map &map)
-{
-    map(0x0, 0x7fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
-                          NAME([this](offs_t offset, uint8_t data)
-                              {
-                                m_net_ram->write(offset, data);
-                              }));// dedicated network RAM
-}
-
 /*
- * cpu_map_debug
+ * cpu_map_main_memory
  *
- * Method with temporary address map assignments. Everything in this function can be moved to the main memory
- * map function once it is understood. This separates the "real" mapping from the hacks required to get the
- * monitor ROM to boot due to missing information or incomplete emulation.
+ * Maps the main memory and supporting items into the provided address map.
  */
-void news_r4k_state::cpu_map_debug(address_map &map)
+void news_r4k_state::cpu_map_main_memory(address_map &map)
 {
-    // After spending some quality time with the monitor ROM in the debugger, I did find a horrible hack that
-    // gets the MROM to both enumerate 64MB of memory and pass memtest, by only enabling 0x2000000-0x3ffffff
-    // after a certain point in the boot process. While this seems to kinda work???????, there are still issues
-    // (like `ss -r` not showing the register values if it is dumping them to memory before printing them perhaps)
-    // that might be related. I also still don't know if there is actually some magic going on with the memory map,
-    // or if I am just not smart enough to figure out the "real" mapping that would make everything just work.
-    map(0x0, 0x7ffffff).rw(FUNC(news_r4k_state::debug_ram_r), FUNC(news_r4k_state::debug_ram_w));
+    // After spending some quality time with the monitor ROM in the debugger, I did find that
+    // only enabling 0x2000000-0x3ffffff after a certain point in the boot process allowed the
+    // monitor ROM to initialize and complete memtest fully.
+    // This works for the monitor ROM, NEWS-OS kernel, and NetBSD kernel.
+    map(0x0, 0x7ffffff).rw(FUNC(news_r4k_state::ram_r), FUNC(news_r4k_state::ram_w));
 
-    // Data around this range might influence the memory configuration
-    // or, this only works due to coincidence. Also possible.
-    map(0x14400000, 0x14400003).lr32(NAME([this](offs_t offset) { return 0x0; }));
-    map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
-    map(0x14400024, 0x14400027).lr32(NAME([this](offs_t offset) { return 0x600a4; }));
+    // Not 100% sure where the below lives on the system. This seems to be related to memory and perhaps APbus init.
+    // This was all developed by inspecting a real NWS-5000X.
+    // Hopefully, we will be able to determine more about this over time.
+    map(0x14400000, 0x14400003).lr32(NAME([this](offs_t offset)
+                                          { return 0x0; }));
+    map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset)
+                                          { return 0x3ff17; }));
+    map(0x14400024, 0x14400027).lr32(NAME([this](offs_t offset)
+                                          { return 0x600a4; }));
     map(0x1440003c, 0x1440003f)
         .lw32(NAME([this](offs_t offset, uint32_t data)
                    {
@@ -631,39 +656,83 @@ void news_r4k_state::cpu_map_debug(address_map &map)
                            m_map_shift = false;
                        }
                    }));
-
-    // APbus region
-    // WSC-PARK3 gate array
-    map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
-    map(0x14c00004, 0x14c00007).lr32(NAME([this](offs_t offset) { return 0x4; }));
-    // 0x14c00000-0x14c40000 also has APbus stuff
-    // map(0x14c00000, 0x14c0000f).lr8(NAME([this](offs_t offset) {return 0x0;}));
-
-    // More onboard devices that needs to be mapped for the platform to boot
-    map(0x1fe00000, 0x1fe03fff).ram().mirror(0x1fc000);
-    map(0x1f3e0000, 0x1f3effff).lr8(NAME([this](offs_t offset) {
-        if (offset % 4 == 2)
-        {
-            return 0x6f;
-        }
-        else if (offset % 4 == 3)
-        {
-            return 0xe0;
-        }
-        else
-        {
-            return 0x0;
-        }
-    }));
 }
 
 /*
- * debug_ram_r
+ * cpu_map_debug
  *
- * Method that returns the byte at `offset` in main memory. Hopefully the need for this method will disappear once
- * the memory mapping setup for the main memory is fully understood.
+ * Method with temporary address map assignments. Everything in this function can be moved to the main memory
+ * map function once it is understood. This separates the "real" mapping from the workarounds required to get 
+ * the monitor ROM to boot due to missing information or incomplete emulation.
  */
-uint8_t news_r4k_state::debug_ram_r(offs_t offset)
+void news_r4k_state::cpu_map_debug(address_map &map)
+{
+    // APbus regions
+    // map(0x14c00004, 0x14c00007).lr32(NAME([this](offs_t offset) { return 0x4; }));
+
+    // APbus WBFLUSH + unknown
+    map(0x1f520000, 0x1f520017).nopw();
+    map(0x1f520000, 0x1f520017).lr8(NAME([this](offs_t offset)
+                                         {
+                                             uint8_t value = 0x0;
+                                             if (offset == 7)
+                                             {
+                                                 value = 0x1;
+                                             }
+                                             else if (offset == 11)
+                                             {
+                                                 value = 0x1;
+                                             }
+                                             else if (offset == 15)
+                                             {
+                                                 value = 0xc8;
+                                             }
+                                             else if (offset == 19)
+                                             {
+                                                 value = 0x32;
+                                             }
+
+                                             return value;
+                                         }));
+
+    // More onboard devices that needs to be mapped for the platform to boot
+    map(0x1fe00000, 0x1fe03fff).ram().mirror(0x1fc000);
+    map(0x1f3e0000, 0x1f3effff).lr8(NAME([this](offs_t offset)
+                                         {
+                                             uint8_t value = 0x0;
+                                             if (offset % 4 == 2)
+                                             {
+                                                 value = 0x6f;
+                                             }
+                                             else if (offset % 4 == 3)
+                                             {
+                                                 value = 0xe0;
+                                             }
+
+                                             return value;
+                                         }));
+}
+
+/*
+ * sonic3_map
+ *
+ * Memory accessor for the SONIC. The SONIC3 ASIC arbitrates memory access for the SONIC. The host platform can
+ * access SONIC's memory directly, but SONIC may not access the bus directly.
+ */
+void news_r4k_state::sonic3_map(address_map &map)
+{
+    map(0x0, 0x7fff).lrw8(NAME([this](offs_t offset)
+                               { return m_net_ram->read(offset); }),
+                          NAME([this](offs_t offset, uint8_t data)
+                               { m_net_ram->write(offset, data); }));
+}
+
+/*
+ * ram_r
+ *
+ * Method that returns the byte at `offset` in main memory.
+ */
+uint8_t news_r4k_state::ram_r(offs_t offset)
 {
     uint8_t result = 0xff;
     if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff))
@@ -682,12 +751,11 @@ uint8_t news_r4k_state::debug_ram_r(offs_t offset)
 }
 
 /*
- * debug_ram_w
+ * ram_w
  *
- * Method that writes the byte `data` at `offset` in main memory. Hopefully the need for this method will disappear once
- * the memory mapping setup for the main memory is fully understood.
+ * Method that writes the byte `data` at `offset` in main memory.
  */
-void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data)
+void news_r4k_state::ram_w(offs_t offset, uint8_t data)
 {
     if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff))
     {
@@ -713,13 +781,13 @@ void news_r4k_state::machine_start()
     // Init front panel LEDs
     m_led.resolve();
 
-    // Save state support (incomplete)
+    // Save state support
     save_item(NAME(m_inten));
     save_item(NAME(m_intst));
     save_item(NAME(m_int_state));
     save_item(NAME(m_freerun_timer_val));
 
-    // Allocate freerunning clock
+    // Allocate hardware timers
     m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
     m_timer0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::timer0_clock), this));
 }
@@ -741,7 +809,7 @@ TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
  */
 TIMER_CALLBACK_MEMBER(news_r4k_state::timer0_clock)
 {
-    // Whenever this timer elapses, we need to trigger timer0 interrupt
+    // Whenever this timer elapses, we need to trigger the timer0 interrupt
     m_intst[2] |= irq2_number::TIMER0;
     int_check();
 }
@@ -763,21 +831,14 @@ void news_r4k_state::machine_reset()
  *
  * Initialization method called when the machine first starts.
  */
-void news_r4k_state::init_common()
-{
-    // map the configured ram (temporarily not using this)
-    //m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
-}
+void news_r4k_state::init_common() {}
 
 /*
  * init_nws5000x
  *
  * Initialization method specific to the NWS-5000X emulation.
  */
-void news_r4k_state::init_nws5000x()
-{
-    init_common();
-}
+void news_r4k_state::init_nws5000x() { init_common(); }
 
 /*
  * front_panel_r
@@ -857,7 +918,7 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
     pte.pfnum = raw_pte & ENTRY_PFNUM;
 
     // This might be able to trigger some kind of interrupt - for now, we'll mark it as a fatal error, but this can be improved for sure.
-    if(!pte.valid)
+    if (!pte.valid)
     {
         fatalerror("APbus DMA TLB out of universe! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, apbus_page_address, raw_pte);
     }
@@ -904,19 +965,18 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
  */
 void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
 {
-    // map(0x1f520004, 0x1f520007); // WBFLUSH
-    // map(0x14c00004, 0x14c00007).ram(); // some kind of APbus register? Fully booted 5000X yields: 14c00004: 00007316
-    // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK - interrupt mask
-    // map(0x14c00014, 0x14c00014); // APBUS_INTST - interrupt status
-    // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A - Bus error address
-    // map(0x14c00034, 0x14c00034); // APBUS_CTRL - configuration control
-    // map(0x1400005c, 0x1400005c); // APBUS_DER_A - DMA error address
-    // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S - DMA error slot
-    // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
-    if(data != 0x424f4d42) // mask out reset noise
+    // Don't take the performance hit unless user cares about logs
+#if (VERBOSE & LOG_APBUS) > 0
+    auto cmd_iter = m_apbus_cmd_decoder.find(offset);
+    if (cmd_iter != m_apbus_cmd_decoder.end() )
     {
-        LOGMASKED(LOG_APBUS, "APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
+        LOGMASKED(LOG_APBUS, "APbus %s command invoked, data 0x%x\n", cmd_iter->second, data);
     }
+    else
+    {
+        LOGMASKED(LOG_APBUS, "Unknown APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
+    }
+#endif
 }
 
 /*
@@ -1011,12 +1071,13 @@ void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
 /*
  * intclr_w
  *
- * Set the clear trigger for the provided interrupt.
+ * Clear the provided interrupt.
  */
 void news_r4k_state::intclr_w(offs_t offset, uint32_t data)
 {
+    // TODO: Haven't found much that uses INTCLR. Might be some nuances to this that will be discovered later.
     LOGMASKED(LOG_INTERRUPT, "intclr_w: INTCLR%d = 0x%x\n", offset, data);
-    m_intst[offset] &= ~data; // TODO: is this correct?
+    m_intst[offset] &= ~data;
     int_check();
 }
 
@@ -1035,8 +1096,8 @@ void news_r4k_state::int_check()
     for (int i = 0; i < 6; i++)
     {
         bool state = (m_intst[i] & m_inten[i]) > 0;
-        LOGMASKED(LOG_ALL_INTERRUPT, "int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
-        if (m_int_state[i] != state) // Interrupt changed state
+
+        if (m_int_state[i] != state)
         {
             LOGMASKED(LOG_ALL_INTERRUPT, "Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
             m_int_state[i] = state;
@@ -1117,5 +1178,5 @@ ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(22d384d2) SHA1(b78a2861310929e92f16deab
 ROM_END
 
 // Machine definitions
-//   YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0,     0,     nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+//   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
