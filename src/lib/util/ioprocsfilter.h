@@ -12,6 +12,7 @@
 
 #include "utilfwd.h"
 
+#include <cstdint>
 #include <cstdlib>
 #include <memory>
 
