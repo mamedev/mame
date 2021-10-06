@@ -223,6 +223,7 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 	switch (offset)
 	{
 	case CR:
+	{
 		if (m_reg[CR] & CR_RST)
 		{
 			if (!(data & CR_RST))
@@ -247,18 +248,21 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 			return;
 		}
 
-		if(!(m_reg[offset] & CR_TXP) || ((m_reg[offset] & CR_TXP) != (data & CR_TXP)) || data & CR_HTX) // don't smash command in progress TODO: if this fixes it, make it better
+		auto cmd_to_run = data & regmask[offset];
+		if((m_reg[CR] & CR_TXP))
 		{
-			m_reg[offset] |= data & regmask[offset];
-			m_command->adjust(attotime::zero, data & regmask[offset]);
+			// Per section 3.5.4 in the datasheet, TDAs can be dynamically added.
+			// The TXP command will be re-sent by the host, but doesn't do anything
+			// unless the SONIC finished the last commmand right before the TDA was
+			// appended to the list. So, null the CR_TXP bit if it was already set
+			// so we don't smash the currently running transmission.
+			cmd_to_run &= ~CR_TXP;
 		}
-		else
-		{
-			m_reg[offset] |= data & regmask[offset];
-		}
+		m_reg[offset] |= data & regmask[offset];
+		m_command->adjust(attotime::zero, cmd_to_run);
 		
 		break;
-
+	}
 	case RCR:
 		m_reg[offset] = (m_reg[offset] & ~regmask[offset]) | (data & regmask[offset]);
 		set_loopback(bool(m_reg[offset] & RCR_LB));

@@ -77,7 +77,7 @@
  *   - 16x NEC D482235G5 Dual Port Graphics Buffers: not emulated
  *   - Brooktree Bt468KG220 RAMDAC: not emulated
  *
- *  Known issues w/ NEWS-OS 4.2.1aRD:
+ *  Known issues:
  *  - Telnet is broken - the login prompt works, but hangs after completing authentication and sending the initial login message
  *    How X11 and SXDM work when Telnet doesn't is beyond me... Might be missing some SONIC3 functionality, or it might be
  *    connected to the following item...
@@ -87,6 +87,13 @@
  *  - Bootloader doesn't work with DRC enabled (see CPU section above)
  *  - Monitor ROM command `ss -r` doesn't show most register values
  *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly)
+ *
+ *  TODO before opening first MR:
+ *  - ESCCF/FIFO DMA
+ *  - CD-ROM access if possible
+ *  - See if NEWS-OS 4 can be stabilized further (telnet, etc.)
+ *  - Find better workaround for SCACHE enumeration
+ *  - Save state support for Sony ASICs
  */
 
 #include "emu.h"
