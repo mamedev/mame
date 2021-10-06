@@ -3,7 +3,7 @@
 // thanks-to:Patrick Mackinlay,Olivier Galibert,Tsubai Masanari
 
 /*
- * Sony NEWS R4000/4400 APbus workstations.
+ * Sony NEWS R4000/4400 APbus-based workstations
  *
  * Sources and more information:
  *   - http://ozuma.o.oo7.jp/nws5000x.htm
@@ -49,7 +49,7 @@
  *   - MIPS R4400: emulated, with the caveats above
  *     - The DRC breaks the NEWS-OS APbus bootloader, so for now, the `-nodrc` flag is required to boot NEWS-OS.
  *       The monitor ROM and the NetBSD floppy bootloader seems OK with DRC so far.
- *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache?): not emulated
+ *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache): not emulated
  *     - The lack of secondary cache doesn't stop NEWS-OS from booting... except for the fact that the memory allocator hangs
  *       early in the boot flow if the secondary cache size is 0KB as measured by the kernel because the scache size is used
  *       when determining some of the variables used by the memory allocator. This can be bypassed using the debugger.
@@ -58,7 +58,7 @@
  *        - Kernel recompiled without esccf driver (highly unlikely to match other builds): bp@0x800CBA78, memory location 0x801A46AC
  *  Motherboard:
  *   - Sony CXD8490G, CXD8491G, CXD8492G, CXD8489G (unknown ASICs): not emulated
- *   - Main memory: partially emulated (hack required for the monitor ROM to enumerate RAM correctly)
+ *   - Main memory: partially emulated (memory controller is unknown and not emulated - memory configurations other than 64MB don't work at the moment)
  *  I/O board:
  *   - Sony CXD8409Q Parallel Interface: not emulated
  *   - National Semi PC8477B Floppy Controller: emulated (uses the -A version currently, but it seems to work)
@@ -890,7 +890,7 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
  *
  * The APbus requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
  *
- * The monitor ROM populates the PTEs as follows in response to a `dl` command.
+ * For example, the monitor ROM populates the PTEs as follows in response to a `dl` command.
  * Addr       PTE1             PTE2
  * 0x14c20000 0000000080103ff5 0000000080103ff6
  *
@@ -900,7 +900,7 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
  * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
  * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
  *
- * NetBSD splits the mapping RAM into two sections, one for each DMAC controller. If the OS does not keep track, the ASICs
+ * NetBSD splits the mapping RAM into two sections, one for each DMAC3 controller. If the OS does not keep track, the ASICs
  * could end up in a configuration that would cause them to overwrite each other's data. NEWS-OS makes even more extensive
  * use of APbus DMA, including the WSC-SONIC3 for network DMA.
  *
