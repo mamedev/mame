@@ -459,7 +459,8 @@ license:CC0
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
-		<publisher>Ocean</publisher>    <!-- Actually published by Maxis outside Europe -->
+		<!-- Actually published by Maxis outside Europe -->
+		<publisher>Ocean</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 (HiRes)" />
 			<dataarea name="flop" size="1049612">
@@ -1437,6 +1438,8 @@ license:CC0
 	</software>
 
 	<!-- Throws "amiga_fdc_device::live_run - cur_live.bit_counter > 8" after credits display -->
+	<!-- Motor keeps spinning badly on disk swap screen(s) (verify) -->
+	<!-- No player sprite, red dots incorrectly drawn on several elements during gameplay (namely alien enemies) -->
 	<software name="abreed" supported="no">
 		<!-- SPS (CAPS) release 998 -->
 		<description>Alien Breed (Euro)</description>
@@ -1760,8 +1763,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Black screen after pressing fire on title screen -->
-	<software name="altbeast" supported="no">
+	<!-- Seldomly throw Guru Meditation (TODO: btanb? verify) -->
+	<software name="altbeast" supported="partial">
 		<!-- SPS (CAPS) release 819 -->
 		<description>Altered Beast (Euro)</description>
 		<!-- retail, standalone -->
@@ -1827,8 +1830,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK in English, crashes after copy-protection otherwise -->
-	<software name="spidermn" supported="no">
+	<!-- boot OK (tested English and Italian) -->
+	<software name="spidermn" supported="yes">
 		<!-- SPS (CAPS) release 1006 -->
 		<description>The Amazing Spider-Man (Euro)</description>
 		<!-- retail, standalone -->
@@ -2508,14 +2511,15 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<software name="archipel" supported="no">
+	<software name="archipel" supported="yes">
 		<!-- SPS (CAPS) release 627 -->
 		<description>Archipelagos (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Logotron</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="376986">
 				<rom name="(sps627)archipelagos.ipf" size="376986" crc="5bb45d86" sha1="8f044750f718ba200ae73a5de3756cbfabe4520a"/>
@@ -2812,7 +2816,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK, can randomly lock up during gameplay, has continous whistle after every sample -->
+	<!-- boot OK, verify clicking at the end of samples playbacks -->
+	<!-- can randomly lock up during gameplay -->
 	<software name="arnie" supported="no">
 		<!-- SPS (CAPS) release 1007 -->
 		<description>Arnie (Euro)</description>
@@ -2827,7 +2832,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen with continous floppy access -->
+	<!-- black screen with continous floppy access [FDC] -->
+	<!-- (keeps jumping to empty area at PC=4d000 after failing a copy protection check at PC=70032, D0=0 D1=5d5 D2=67 D3=0) -->
 	<software name="arnie2" supported="no">
 		<!-- SPS (CAPS) release 1924 -->
 		<description>Arnie 2 (Euro)</description>
@@ -2932,8 +2938,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK, first chunk of BGM keeps repeating -->
-	<software name="asparmgp" cloneof="gpmaster" supported="no">
+	<!-- boot OK -->
+	<software name="asparmgp" cloneof="gpmaster" supported="yes">
 		<!-- SPS (CAPS) release 1241 -->
 		<description>Aspar Master Grand Prix (Euro, Les Fous du Volant)</description>
 		<!-- retail, standalone -->
@@ -3937,7 +3943,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Gets stuck at "The game is loading" -->
+	<!-- Guru Meditation during "The game is loading" phase -->
 	<software name="barbpal" supported="no">
 		<!-- SPS (CAPS) release 1784 -->
 		<description>Barbarian (Euro, v16.3.88, Palace)</description>
@@ -3994,7 +4000,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- blue screen -->
+	<!-- Prompts to a CLI 2 (implicitly failing a copy protection?) -->
 	<software name="barb2pal" supported="no">
 		<!-- SPS (CAPS) release 2264 -->
 		<description>Barbarian II (Euro, Palace, v4.8.89)</description>
@@ -4017,7 +4023,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="barb2paln4" cloneof="barb2pal" supported="no">
+	<!-- boot OK -->
+	<software name="barb2paln4" cloneof="barb2pal" supported="yes">
 		<!-- SPS (CAPS) release 1828 -->
 		<description>Barbarian II (Euro, Palace, NRJ Vol. 4)</description>
 		<!-- retail, standalone -->
@@ -4536,8 +4543,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after Kickstart (white screen) -->
-	<software name="battlesq" supported="no">
+	<!-- Most gameplay SFXs gets cut off [Paula] -->
+	<software name="battlesq" supported="partial">
 		<!-- SPS (CAPS) release 941 -->
 		<description>Battle Squadron (Euro)</description>
 		<!-- retail, standalone -->
@@ -4720,8 +4727,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- blue screen -->
-	<software name="bchvolly" supported="no">
+	<!-- BGMs/SFXs channels whistles [Paula] -->
+	<!-- Has transparent stripes all over the place during intro [copper] -->
+	<software name="bchvolly" supported="partial">
 		<!-- SPS (CAPS) release 1249 -->
 		<description>Beach Volley (Euro)</description>
 		<!-- retail, standalone -->
@@ -5261,7 +5269,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- crashes in AmigaOS with DSKDAT R -->
+	<!-- crashes in AmigaOS with DSKDAT R [FDC] -->
 	<software name="bhcop" supported="no">
 		<!-- SPS (CAPS) release 179 -->
 		<description>Beverly Hills Cop (Euro)</description>
@@ -7017,8 +7025,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK, samples may keep repeating -->
-	<software name="budokan" supported="partial">
+	<!-- boot OK -->
+	<software name="budokan" supported="yes">
 		<!-- SPS (CAPS) release 1215 -->
 		<description>Budokan - The Martial Spirit (Euro)</description>
 		<!-- retail, standalone -->
@@ -7348,7 +7356,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] -->
+	<!-- (Hangs at PC=21050 after failing a copy protection check, D0=0 D1=16 D2=12 D3=0) -->
 	<software name="cadaver" supported="no">
 		<!-- SPS (CAPS) release 103 -->
 		<description>Cadaver (Euro, v0.01)</description>
@@ -7370,6 +7379,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- black screen [FDC] -->
 	<software name="cadavera" cloneof="cadaver" supported="no">
 		<!-- SPS (CAPS) release 2876 -->
 		<description>Cadaver (Euro, v1.03, The Bitmap Brothers Volume 1)</description>
@@ -7581,7 +7591,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a rainbow colored loading screen -->
+	<!-- Hangs at a rainbow colored loading screen [FDC] -->
+	<!-- (checks for string "SOS6" at PC=500be, which is offset because precompensation is enabled) -->
+	<!-- (eventually disables precompensation when starting a level, tries to sync with MFM instead of GCR) -->
 	<software name="cfodder" supported="no">
 		<!-- SPS (CAPS) release 860 -->
 		<description>Cannon Fodder (Euro)</description>
@@ -7862,7 +7874,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a green-black-green striped screen -->
+	<!-- Hangs during gameplay when actually landing on a planet (sometimes it throws DSKDAT access) -->
 	<software name="captive" supported="no">
 		<!-- SPS (CAPS) release 2164 -->
 		<description>Captive (Euro, v1.2)</description>
@@ -7947,6 +7959,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- no BGM, black screen after loading arcade mode (spurious irq?) -->
 	<software name="lewisch" supported="no">
 		<!-- SPS (CAPS) release 639 -->
 		<description>The Carl Lewis Challenge (Euro)</description>
@@ -10108,7 +10121,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Gets stuck at the AmigaOS blue screen -->
+	<!-- Gets stuck at the AmigaOS blue screen [FDC] -->
+	<!-- (Sets up a clearly invalid DMA dskpt of 0, enables MFM precomp) -->
 	<software name="cosmcbnc" supported="no">
 		<!-- SPS (CAPS) release 309 -->
 		<description>Cosmic Bouncer (Euro)</description>
@@ -11671,7 +11685,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a rainbow colored screen -->
+	<!-- Hangs at a rainbow colored screen [FDC] -->
+	<!-- (fails a CRC check with data uploaded at 0x800, TODO: verify if it's using copper DMA) -->
 	<software name="deep" supported="no">
 		<!-- SPS (CAPS) release 1218 -->
 		<description>The Deep (Euro)</description>
@@ -11728,7 +11743,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- "Software error", clicking on cancel causes Guru Meditation -->
+	<!-- "Program failed", clicking on reboot causes Guru Meditation -->
 	<software name="defcrown" supported="no">
 		<!-- SPS (CAPS) release 317 -->
 		<description>Defender of the Crown (Euro)</description>
@@ -11967,7 +11982,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Asks to disc swap with disc 1 (which is already in) -->
+	<!-- Asks to disc swap with disc 1, which is already in [FDC] -->
+	<!-- (copy protection) -->
 	<software name="dstrike" supported="no">
 		<!-- SPS (CAPS) release 112 -->
 		<description>Desert Strike - Return to the Gulf (Euro)</description>
@@ -12365,7 +12381,7 @@ license:CC0
 		<publisher>Elite</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1016901">
-				<rom name="dogsofwar.ipf" size="1016901" crc="e738511f" sha1="5581ab144292d0e1283beaa6188addd111bb4099"/>
+				<rom name="dogsofwar.ipf" size="1016901" crc="e738511f" sha1="5581ab144292d0e1283beaa6188addd111bb4099" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12507,8 +12523,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Black screen after pressing fire on title -->
-	<software name="ddragon" supported="no">
+	<!-- boot OK -->
+	<software name="ddragon" supported="yes">
 		<!-- SPS (CAPS) release 2438 -->
 		<description>Double Dragon (Euro, v2.16)</description>
 		<!-- retail, standalone -->
@@ -12536,7 +12552,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Guru Meditation -->
+	<!-- Guru Meditation [FDC] -->
+	<!-- (Checks data once with adkcon=0x3db0) -->
 	<software name="ddragon2" supported="no">
 		<!-- SPS (CAPS) release 768 -->
 		<description>Double Dragon II (Euro, v4.01ECS)</description>
@@ -12582,7 +12599,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] -->
 	<software name="ddragon3" supported="no">
 		<!-- SPS (CAPS) release 321 -->
 		<description>Double Dragon 3 - The Rosetta Stone (Euro)</description>
@@ -12879,6 +12896,7 @@ license:CC0
 	</software>
 
 	<!-- boot OK, starting a level has background with GFX pitch issue, repeating sample on every correct move -->
+	<!-- Update: hangs when loading a game, regression? -->
 	<software name="dlairsc" supported="partial">
 		<!-- SPS (CAPS) release 980 -->
 		<description>Dragon's Lair: Escape from Singe's Castle (Euro)</description>
@@ -12958,7 +12976,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at VDT logo -->
+	<!-- Hangs at VDT logo [FDC] -->
+	<!-- (Checks specific value in the loaded buffer, offset by 2. Enables MFM precomp) -->
 	<software name="dlair" supported="no">
 		<!-- SPS (CAPS) release 1360 -->
 		<description>Dragon's Lair (Euro)</description>
@@ -13004,7 +13023,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- locks up at ReadySoft logo -->
+	<!-- locks up at ReadySoft logo [FDC] -->
 	<software name="dlair2" supported="no">
 		<!-- SPS (CAPS) release 59 -->
 		<description>Dragon's Lair II - Time Warp (Euro)</description>
@@ -13050,7 +13069,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] -->
+	<!-- (same copy protection as dlair2) -->
 	<software name="dlair3" supported="no">
 		<!-- SPS (CAPS) release 649 -->
 		<description>Dragon's Lair III: The Curse of Mordread (Euro)</description>
@@ -14248,7 +14268,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK, voice speech keeps repeating -->
+	<!-- boot OK -->
+	<!-- sports garbage pitch on intro with a500p, works with a500 only -->
+	<!-- Loading doesn't work on a1200 machine -->
 	<software name="elvira" supported="partial">
 		<!-- SPS (CAPS) release 267 -->
 		<description>Elvira - Mistress of the Dark (Euro)</description>
@@ -14600,7 +14622,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- locks up on AmigaDOS with "Now Loading" msg -->
+	<!-- locks up on AmigaDOS with "Now Loading" msg [FDC] -->
 	<software name="hughesis" supported="no">
 		<!-- SPS (CAPS) release 1077 -->
 		<description>Emlyn Hughes International Soccer (Euro)</description>
@@ -14622,6 +14644,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Tomahawk</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2693)emmanuelle.ipf" size="1049180" crc="1836371c" sha1="3ede574ec023320c47a952d2264e74aa30de9dfd"/>
@@ -15075,7 +15099,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Keeps loading on a green-black screen fade transition -->
+	<!-- Keeps loading on a green-black screen fade transition [FDC] -->
+	<!-- TODO: verify if it's using copper DMA for transfers -->
 	<software name="exile" supported="no">
 		<!-- SPS (CAPS) release 32 -->
 		<description>Exile (Euro)</description>
@@ -18239,7 +18264,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- locks up at "please wait, loading" screen -->
+	<!-- Guru Meditation [FDC] -->
 	<software name="ghostbs2" supported="no">
 		<!-- SPS (CAPS) release 1029 -->
 		<description>Ghostbusters II (Euro)</description>
@@ -18338,8 +18363,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- gng: fatalerrors with amiga_fdc_device::live_run - cur_live.bit_counter > 8 -->
-	<!-- venus: black screen -->
+	<!-- gng: throws "amiga_fdc_device::live_run - cur_live.bit_counter > 8" then fatalerrors after DSKDAT access -->
+	<!-- venus: asks to swap disk with incorrect pitch GFX then throws DSKDAT R and hangs -->
 	<software name="ghoulsvf" supported="no">
 		<!-- SPS (CAPS) release 1985 -->
 		<description>Ghouls 'n' Ghosts &amp; Venus the Flytrap (Euro, Chart Attack)</description>
@@ -18750,7 +18775,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] -->
+	<!-- (Hangs at PC=10c after failing a copy protection check, D0=0 D1=295 D2=40 D3=0) -->
 	<software name="gods" supported="no">
 		<!-- SPS (CAPS) release 666 -->
 		<description>Gods (Euro, v1.00)</description>
@@ -18906,6 +18932,7 @@ license:CC0
 	</software>
 
 	<!-- boot OK, sprites flickers in-game -->
+	<!-- Sports garbage pitch with a500p -->
 	<software name="graffiti" supported="partial">
 		<!-- SPS (CAPS) release 2168 -->
 		<description>Graffiti Man (Euro, 5th Anniversary)</description>
@@ -19095,7 +19122,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK, SFXs repeats -->
+	<!-- boot OK -->
 	<software name="gcourts2" supported="partial">
 		<!-- SPS (CAPS) release 333 -->
 		<description>Great Courts 2 (Euro)</description>
@@ -19125,7 +19152,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after Kickstart (white screen) -->
+	<!-- Locks up after Kickstart (white screen) [FDC] -->
 	<software name="ggiana" supported="no">
 		<!-- SPS (CAPS) release 2945 -->
 		<description>The Great Giana Sisters (Euro)</description>
@@ -19211,8 +19238,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs after pressing fire on ranking screen -->
-	<software name="gridstrt" supported="no">
+	<!-- boot OK -->
+	<software name="gridstrt" supported="yes">
 		<!-- SPS (CAPS) release 1470 -->
 		<description>Grid Start (Euro, Sextett)</description>
 		<!-- retail, standalone -->
@@ -19398,7 +19425,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] -->
 	<software name="guyspy" supported="no">
 		<!-- SPS (CAPS) release 335 -->
 		<description>Guy Spy (Euro)</description>
@@ -20147,7 +20174,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a red and black flashing screen -->
+	<!-- Hangs at a red and black flashing screen [FDC] -->
 	<software name="heroqst" supported="no">
 		<!-- SPS (CAPS) release 127 -->
 		<description>HeroQuest (Euro)</description>
@@ -20455,7 +20482,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after Kickstart (white screen) -->
+	<!-- Locks up after Kickstart (white screen) [FDC] -->
 	<software name="hoi" supported="no">
 		<!-- SPS (CAPS) release 962 -->
 		<description>Hoi (Euro)</description>
@@ -21252,7 +21279,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Grey screen -->
+	<!-- Grey screen [FDC] -->
 	<software name="hybris" supported="no">
 		<!-- SPS (CAPS) release 1457 -->
 		<description>Hybris (USA, v0.95)</description>
@@ -21767,7 +21794,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at Indy logo on a cyan background -->
+	<!-- Hangs at Indy logo on a cyan background [FDC] -->
 	<software name="indycrus" supported="no">
 		<!-- SPS (CAPS) release 1619 -->
 		<description>Indiana Jones and the Last Crusade (Euro, TAG)</description>
@@ -22607,7 +22634,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] -->
 	<software name="ivanhoe" supported="no">
 		<!-- SPS (CAPS) release 1648 -->
 		<description>Ivanhoe (Euro)</description>
@@ -23163,7 +23190,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- keeps repeating samples, crashes on the "You've got it, we've used it" screen if expansion RAM is installed -->
+	<!-- crashes on the "You've got it, we've used it" screen if expansion RAM is installed -->
 	<software name="madden" supported="no">
 		<!-- SPS (CAPS) release 71 -->
 		<description>John Madden Football (Euro)</description>
@@ -23172,6 +23199,7 @@ license:CC0
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="Sports manual copy-protection (Player Ratings)" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049180">
@@ -23512,7 +23540,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Guru Meditation (white screen on a500) -->
+	<!-- Guru Meditation on a500p, white screen on a500 -->
 	<software name="katakis" supported="no">
 		<!-- SPS (CAPS) release 347 -->
 		<description>Katakis (Euro, v1.1)</description>
@@ -23758,7 +23786,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- blue screen -->
+	<!-- blue screen (keeps accessing invalid areas, [FDC]?) -->
 	<software name="kickoff" supported="no">
 		<!-- SPS (CAPS) release 189 -->
 		<description>Kick Off (Euro, v1.1)</description>
@@ -23773,6 +23801,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- blue screen [FDC] -->
 	<software name="kickoffex" cloneof="kickoff" supported="no">
 		<!-- SPS (CAPS) release 73 -->
 		<description>Kick Off - Extra Time (Euro, v2.2)</description>
@@ -23788,6 +23817,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- blue screen [FDC] (same as kickoffex) -->
 	<software name="koffet" supported="no">
 		<!-- SPS (CAPS) release 881 -->
 		<description>Kick Off + Extra Time (Euro)</description>
@@ -24206,8 +24236,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<software name="killmach" supported="no">
+	<!-- boot OK, stuck note on SFXs when playback ends -->
+	<software name="killmach" supported="partial">
 		<!-- SPS (CAPS) release 2504 -->
 		<description>Killing Machine (Euro)</description>
 		<!-- retail, standalone -->
@@ -24576,7 +24606,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK, no sound (clicks), DSKDAT W on ranking screen -->
+	<!-- boot OK, DSKDAT W on ranking screen -->
 	<software name="knigtfrc" supported="partial">
 		<!-- SPS (CAPS) release 1574 -->
 		<description>Knight Force (Euro)</description>
@@ -24626,8 +24656,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Gets to main menu, repeating speech and actual menu never appears -->
-	<software name="crystaln" supported="no">
+	<!-- boot OK -->
+	<software name="crystaln" supported="yes">
 		<!-- SPS (CAPS) release 1160 -->
 		<description>Knights of the Crystallion (Euro)</description>
 		<!-- retail, standalone -->
@@ -24945,7 +24975,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a rainbow colored screen -->
+	<!-- Hangs at a rainbow colored screen [FDC] -->
 	<software name="lastbtle" supported="no">
 		<!-- SPS (CAPS) release 1044 -->
 		<description>Last Battle (Euro)</description>
@@ -25924,7 +25954,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Guru Meditation (white screen on a500) -->
+	<!-- Guru Meditation on a500p, white screen on a500 -->
 	<software name="lemming2" supported="no">
 		<!-- SPS (CAPS) release 351 -->
 		<description>Lemmings 2 - The Tribes (Euro)</description>
@@ -26014,7 +26044,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] -->
 	<software name="lweapon" supported="no">
 		<!-- SPS (CAPS) release 814 -->
 		<description>Lethal Weapon (Euro)</description>
@@ -37585,7 +37615,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- white/black boxes scattered thru intro, gameplay sports repeating samples -->
+	<!-- white/black boxes scattered thru intro -->
 	<software name="shadwar" supported="partial">
 		<!-- SPS (CAPS) release 830 -->
 		<description>Shadow Warriors (Euro)</description>
@@ -37593,6 +37623,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Ocean</publisher>
+		<info name="usage" value="Press 1 or 2 to start a game. Press S during intro to switch between Music or SFX"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -46806,6 +46838,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Incorrectly drawn copy protection screen (repeats numpad at bottom) -->
+	<!-- TODO: verify afterwards -->
 	<software name="waxworks" supported="no">
 		<!-- SPS (CAPS) release 2274 -->
 		<description>Waxworks (Euro)</description>
@@ -46813,6 +46847,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
 		<publisher>Accolade</publisher>
+		<info name="usage" value="Sports manual copy-protection" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
