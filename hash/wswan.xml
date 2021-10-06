@@ -2,7 +2,9 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
-
+-->
+<softwarelist name="wswan" description="Bandai Wonderswan cartridges">
+	<notes><![CDATA[
 This is a full list of known WonderSwan and WonderSwan Color games.
 +===+=====+==========+============+=====+================================================================================================+
 | D | ROM |   CRC    |   Serial   | Rev |                                    Name                                                        |
@@ -281,9 +283,7 @@ game will boot up and start to initialize the save area.
 
 The GIZA chip used on a lot of cartridges is a sram voltage switch.
 
--->
-
-<softwarelist name="wswan" description="Bandai Wonderswan cartridges">
+]]></notes>
 	<software name="anchorz">
 		<description>Anchorz Field</description>
 		<year>1999</year>
@@ -523,10 +523,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="choaniki">
-		<!-- Rev 4 -->
 		<description>Chou Aniki - Otoko no Tamafuda</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
+		<notes>Revision from header: Rev 4</notes>
 		<info name="serial" value="SWJ-BAN023"/>
 		<info name="release" value="20000210"/>
 		<info name="alt_title" value="超兄貴 男の魂札"/>
@@ -546,10 +546,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="youfumak">
-		<!-- Rev 3 -->
 		<description>Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou</description>
 		<year>1999</year>
 		<publisher>Kobunsha</publisher>
+		<notes>Revision from header: Rev 3</notes>
 		<info name="serial" value="SWJ-KBS002"/>
 		<info name="release" value="19991216"/>
 		<info name="alt_title" value="超伝奇カードバトル 妖符魔界 菊地秀行"/>
@@ -569,10 +569,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="clocktow">
-		<!-- Rev 1 -->
 		<description>Clock Tower for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-KGT002"/>
 		<info name="release" value="19991209"/>
 		<info name="alt_title" value="クロックタワー フォー ワンダースワン"/>
@@ -611,10 +611,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="dendego">
-		<!-- Rev 1 -->
 		<description>Densha de Go!</description>
 		<year>1999</year>
 		<publisher>Taito</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-TAT001"/>
 		<info name="release" value="19990304"/>
 		<info name="alt_title" value="電車でGO!"/>
@@ -762,12 +762,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 	-->
 
-  <!-- how to play? -->
 	<software name="digimon">
-		<!-- Rev 1 -->
 		<description>Digital Monster - Ver. WonderSwan</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BAN005"/>
 		<info name="release" value="19990325"/>
 		<info name="alt_title" value="デジタルモンスター バージョン ワンダースワン"/>
@@ -787,7 +786,6 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="digimon1" cloneof="digimon">
-		<!-- Alt title: -->
 		<description>Digimon - Ver. WonderSwan (Asia)</description>
 		<year>19??</year>
 		<publisher>Bandai</publisher>
@@ -980,10 +978,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="fireprow">
-		<!-- Rev 5 -->
 		<description>Fire Pro Wrestling for WonderSwan</description>
 		<year>2000</year>
 		<publisher>Kaga Tech</publisher>
+		<notes>Revision from header: Rev 5</notes>
 		<info name="serial" value="SWJ-KGT007"/>
 		<info name="release" value="20000831"/>
 		<info name="alt_title" value="ファイヤープロレスリング フォー ワンダースワン"/>
@@ -1063,10 +1061,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="gorakuta">
-		<!-- Rev 2 -->
 		<description>Goraku Ou Tango!</description>
 		<year>1999</year>
 		<publisher>Moebius</publisher>
+		<notes>Revision from header: Rev 2</notes>
 		<info name="serial" value="SWJ-PAW001"/>
 		<info name="release" value="19990401"/>
 		<info name="alt_title" value="語楽王 タンゴ !"/>
@@ -1186,11 +1184,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		</part>
 	</software>
 
-  <!-- background incorrect during bot transform? -->
 	<software name="harobots">
 		<description>Harobots (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Sunrise Interactive</publisher>
+		<notes>background incorrect during bot transform?</notes>
 		<info name="serial" value="SWJ-SRV001"/>
 		<info name="release" value="19991007"/>
 		<info name="alt_title" value="ハロボッツ"/>
@@ -1339,10 +1337,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="kissyori">
-		<!-- Rev 2 -->
 		<description>Kiss Yori... - Seaside Serenade</description>
 		<year>1999</year>
 		<publisher>Kid</publisher>
+		<notes>Revision from header: Rev 2</notes>
 		<info name="serial" value="SWJ-KDX001"/>
 		<info name="release" value="19991202"/>
 		<info name="alt_title" value="キスより... ～シーサイドセレナーデ～"/>
@@ -1406,10 +1404,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="kyousoub">
-		<!-- Rev 1 -->
 		<description>Kyousouba Ikusei Simulation - Keiba</description>
 		<year>1999</year>
 		<publisher>BEC</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BEC001"/>
 		<info name="release" value="19991118"/>
 		<info name="alt_title" value="競走馬育成シミュレーション ケイバ"/>
@@ -1429,10 +1427,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="langriss">
-		<!-- Rev 1 -->
 		<description>Langrisser Millennium WS - The Last Century</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BAN024"/>
 		<info name="release" value="20000309"/>
 		<info name="alt_title" value="ラングリッサーミレニアム WS ～The LastCentury～"/>
@@ -1516,11 +1514,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		</part>
 	</software>
 
-	<!-- Small graphics glitch between 4th and 5th column -->
 	<software name="magdrop" supported="partial">
 		<description>Magical Drop for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Data East Corp.</publisher>
+		<notes>Small graphics glitch between 4th and 5th column</notes>
 		<info name="serial" value="SWJ-DTE002"/>
 		<info name="release" value="19991014"/>
 		<info name="alt_title" value="マジカルドロップ for ワンダースワン"/>
@@ -1691,10 +1689,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="mingmagn">
-		<!-- Rev 1 -->
 		<description>Mingle Magnet</description>
 		<year>1999</year>
 		<publisher>Hal Corporation</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-HAL002"/>
 		<info name="release" value="19991102"/>
 		<info name="alt_title" value="ミングルマグネット"/>
@@ -1711,10 +1709,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="mjkiwame">
-		<!-- Rev 1 -->
 		<description>Pro Mahjong Kiwame for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Athena</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-ATN001"/>
 		<info name="release" value="19991007"/>
 		<info name="alt_title" value="プロ麻雀 極 フォー ワンダースワン"/>
@@ -1734,10 +1732,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="mjtetsu">
-		<!-- Rev 2 -->
 		<description>Nihon Pro Mahjong Renmei Kounin Tetsuman</description>
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>
+		<notes>Revision from header: Rev 2</notes>
 		<info name="serial" value="SWJ-KGT001"/>
 		<info name="release" value="19990715"/>
 		<info name="alt_title" value="日本プロ麻雀連盟公認 徹萬"/>
@@ -1756,12 +1754,11 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		</part>
 	</software>
 
-	<!-- wondergate hardware is not emulated yet -->
 	<software name="mobilewg" supported="partial">
-		<!-- Rev 1 -->
 		<description>MobileWonderGate (Rev 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes>wondergate hardware is not emulated yet</notes>
 		<info name="serial" value="SWJ-SCC001"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="pcb" value="PTS-0110 or PTS-0105" />
@@ -1866,10 +1863,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="niceon">
-		<!-- Rev 1 -->
 		<description>Nice On</description>
 		<year>1999</year>
 		<publisher>Sammy</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-SUM002"/>
 		<info name="release" value="19990408"/>
 		<info name="alt_title" value="ナイスオン"/>
@@ -2060,6 +2057,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		<description>Ring Infinity (alt)</description>
 		<year>2000</year>
 		<publisher>Kid</publisher>
+		<notes>The roms in this are a simple split of mh32m16e119b.u3. It needs to be verified whether this is correct.</notes>
 		<info name="serial" value="SWJ-KDK001"/>
 		<info name="release" value="20000810"/>
 		<info name="alt_title" value="リング インフィニティ"/>
@@ -2071,7 +2069,6 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 			<feature name="u5" value="ROM (on PTS-0120)" />
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304" width="16" endianness="little">
-				<!-- these roms are a simple split of mh32m16e119b.u3. Need to be verified -->
 				<rom name="mh16m16e114b.u4" size="2097152" crc="1bed45b0" sha1="46eff2164d8fccac161b0fd1cde8098e3bc08fd6" offset="000000" status="baddump" />
 				<rom name="mh16m16e115b.u5" size="2097152" crc="baeb4a36" sha1="d5d8220dadc41e5dbaa13ac188d642dacbed68c3" offset="2097152" status="baddump" />
 			</dataarea>
@@ -2212,15 +2209,15 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		</part>
 	</software>
 
-	<!--
-	The Robot Works cartridge has an integrated infrared port for programming an
-	external robot (the Wonder Borg).
-	The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
-	-->
 	<software name="robworks" supported="partial">
 		<description>Wonder Borg Robot Works</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+The Robot Works cartridge has an integrated infrared port for programming an
+external robot (the Wonder Borg).
+The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
+]]></notes>
 		<info name="serial" value="SWJ-BAN033"/>
 		<info name="release" value="20000804"/>
 		<info name="alt_title" value="ワンダーボーグ 完"/>
@@ -2240,17 +2237,20 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 		</part>
 	</software>
 
-	<!--
-	The Robot Works cartridge has an integrated infrared port for programming an
-	external robot (the Wonder Borg).
-	The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
-	-->
 	<software name="robworks1" cloneof="robworks" supported="partial">
-		<!-- Rev 1 -->
 		<description>Robot Works (Asia)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
-		<info name="serial" value="SWJ-BAN033"/> <!-- Same ROM as cart SWJ-BAN034 (labeled "Ver.1.5") -->
+		<notes><![CDATA[
+Revision from header: Rev 1
+
+Same ROM as cart SWJ-BAN034 (labeled "Ver.1.5")
+
+The Robot Works cartridge has an integrated infrared port for programming an
+external robot (the Wonder Borg).
+The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
+]]></notes>
+		<info name="serial" value="SWJ-BAN033"/>
 		<info name="release" value="20000804"/>
 		<info name="alt_title" value="ワンダーボーグ 完"/>
 		<part name="cart" interface="wswan_cart">
@@ -2506,10 +2506,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="sprowres">
-		<!-- Rev 1 -->
 		<description>Shin Nihon Pro Wrestling Toukon Retsuden</description>
 		<year>1999</year>
 		<publisher>Tomy</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-TMY001"/>
 		<info name="release" value="19990304"/>
 		<info name="alt_title" value="新日本プロレスリング 闘魂烈伝"/>
@@ -2609,10 +2609,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="sotsugyo">
-		<!-- Rev 1 -->
 		<description>Sotsugyou for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Bandai Visual</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BVL002"/>
 		<info name="release" value="19991216"/>
 		<info name="alt_title" value="卒業 フォー ワンダースワン"/>
@@ -2695,10 +2695,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="tanjodeb">
-		<!-- Rev 1 -->
 		<description>Tanjou Debut for WonderSwan</description>
 		<year>2000</year>
 		<publisher>Bandai Visual</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BVL003"/>
 		<info name="release" value="20000224"/>
 		<info name="alt_title" value="誕生 デビュー フォー ワンダースワン"/>
@@ -2848,10 +2848,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="trumpcl2">
-		<!-- Rev 1 -->
 		<description>Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi</description>
 		<year>2000</year>
 		<publisher>Bottom Up</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BTM002"/>
 		<info name="release" value="20000928"/>
 		<info name="alt_title" value="トランプコレクション ボトムアップ的トランプ生活"/>
@@ -2868,10 +2868,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="trumpcol">
-		<!-- Rev 1 -->
 		<description>Trump Collection - Bottom-Up Teki Trump Seikatsu</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BTM001"/>
 		<info name="release" value="19990701"/>
 		<info name="alt_title" value="トランプコレクション2 ボトムアップ的世界一周の旅"/>
@@ -2928,10 +2928,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="uzumaki">
-		<!-- Rev 4 -->
 		<description>Uzumaki - Denshi Kaiki Hen</description>
 		<year>2000</year>
 		<publisher>Omage Micott, Inc.</publisher>
+		<notes>Revision from header: Rev 4</notes>
 		<info name="serial" value="SWJ-OMM001"/>
 		<info name="release" value="20000203"/>
 		<info name="alt_title" value="うずまき ～電視怪奇篇～"/>
@@ -2950,10 +2950,10 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="vaitzbla">
-		<!-- Rev 1 -->
 		<description>Vaitz Blade</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
+		<notes>Revision from header: Rev 1</notes>
 		<info name="serial" value="SWJ-BAN00C"/>
 		<info name="release" value="19990624"/>
 		<info name="alt_title" value="ヴァイツブレイド"/>

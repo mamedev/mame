@@ -11880,7 +11880,7 @@ GAME( 1995, quizdaisk,  quizdais, neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1992, lresort,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Last Resort", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, lresortp,   lresort,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Last Resort (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, eightman,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Pallas", "Eight Man (NGM-025 ~ NGH-025)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, legendos,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Legend of Success Joe / Ashita no Joe Densetsu", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, legendos,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Wave", "Legend of Success Joe / Ashita no Joe Densetsu", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 2020bb,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Pallas", "2020 Super Baseball (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 2020bba,    2020bb,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Pallas", "2020 Super Baseball (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 2020bbh,    2020bb,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Pallas", "2020 Super Baseball (set 3)", MACHINE_SUPPORTS_SAVE )

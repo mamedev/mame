@@ -709,7 +709,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	// if we should hide the mouse cursor, then do it
 	// rules are:
 	//   1. we must have focus before hiding the cursor
-	//   2. we also hide the cursor in full screen mode and when tshe window doesn't have a menu
+	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
 	if (winwindow_has_focus() && (

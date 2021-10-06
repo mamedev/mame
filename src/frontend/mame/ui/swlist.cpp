@@ -17,6 +17,8 @@
 #include "corestr.h"
 #include "softlist_dev.h"
 
+#include <locale>
+
 
 namespace ui {
 
@@ -150,7 +152,7 @@ menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &c
 {
 	m_swlist = swlist;
 	m_interface = interface;
-	m_ordered_by_shortname = true;
+	m_ordered_by_shortname = false;
 }
 
 
@@ -160,26 +162,6 @@ menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &c
 
 menu_software_list::~menu_software_list()
 {
-}
-
-
-//-------------------------------------------------
-//  compare_entries
-//-------------------------------------------------
-
-int menu_software_list::compare_entries(const entry_info &e1, const entry_info &e2, bool shortname)
-{
-	int result;
-	const char *e1_basename = shortname ? e1.short_name.c_str() : e1.long_name.c_str();
-	const char *e2_basename = shortname ? e2.short_name.c_str() : e2.long_name.c_str();
-
-	result = core_stricmp(e1_basename, e2_basename);
-	if (result == 0)
-	{
-		result = strcmp(e1_basename, e2_basename);
-	}
-
-	return result;
 }
 
 
@@ -206,14 +188,7 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 
 	// skip this if no new entry has been allocated (e.g. if the software has no matching interface for this image device)
 	if (entry_updated)
-	{
-		// find the end of the list
-		auto iter = m_entrylist.begin();
-		while (iter != m_entrylist.end() && compare_entries(entry, *iter, m_ordered_by_shortname) >= 0)
-			++iter;
-
-		m_entrylist.emplace(iter, std::move(entry));
-	}
+		m_entrylist.emplace_back(std::move(entry));
 }
 
 
@@ -223,19 +198,38 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 
 void menu_software_list::populate(float &customtop, float &custombottom)
 {
-	// clear all entries before populating
-	m_entrylist.clear();
-
 	// build up the list of entries for the menu
-	for (const software_info &swinfo : m_swlist->get_info())
-		append_software_entry(swinfo);
+	if (m_entrylist.empty())
+		for (const software_info &swinfo : m_swlist->get_info())
+			append_software_entry(swinfo);
+
+	if (m_ordered_by_shortname)
+	{
+		// short names are restricted to lowercase ASCII anyway, a dumb compare works
+		m_entrylist.sort([] (entry_info const &e1, entry_info const &e2) { return e1.short_name < e2.short_name; });
+	}
+	else
+	{
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		m_entrylist.sort(
+				[&coll] (entry_info const &e1, entry_info const &e2) -> bool
+				{
+					std::wstring const xstr = wstring_from_utf8(e1.long_name);
+					std::wstring const ystr = wstring_from_utf8(e2.long_name);
+					auto const cmp = coll.compare(xstr.data(), xstr.data() + xstr.size(), ystr.data(), ystr.data() + ystr.size());
+					if (cmp)
+						return cmp < 0;
+					else
+						return e1.short_name < e2.short_name;
+				});
+	}
 
 	// add an entry to change ordering
 	item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
 
 	// append all of the menu entries
 	for (auto &entry : m_entrylist)
-		item_append(entry.short_name, entry.long_name, 0, &entry);
+		item_append(entry.long_name, entry.short_name, 0, &entry);
 
 	item_append(menu_item_type::SEPARATOR);
 }
@@ -247,9 +241,6 @@ void menu_software_list::populate(float &customtop, float &custombottom)
 
 void menu_software_list::handle()
 {
-	const entry_info *selected_entry = nullptr;
-	int bestmatch = 0;
-
 	// process the menu
 	const event *event = process(0);
 
@@ -260,7 +251,7 @@ void menu_software_list::handle()
 			m_ordered_by_shortname = !m_ordered_by_shortname;
 
 			// reset the char buffer if we change ordering criterion
-			m_filename_buffer.clear();
+			m_search.clear();
 
 			// reload the menu with the new order
 			reset(reset_options::REMEMBER_REF);
@@ -275,29 +266,32 @@ void menu_software_list::handle()
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
-			if (input_character(m_filename_buffer, event->unichar, &is_valid_softlist_part_char))
+			if (input_character(m_search, event->unichar, m_ordered_by_shortname ? is_valid_softlist_part_char : [] (char32_t ch) { return true; }))
 			{
 				// display the popup
-				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_search);
 
 				// identify the selected entry
 				entry_info const *const cur_selected = (uintptr_t(event->itemref) != 1)
 						? reinterpret_cast<entry_info const *>(get_selection_ref())
 						: nullptr;
 
-				// loop through all entries
-				for (auto &entry : m_entrylist)
+				// if it's a perfect match for the current selection, don't move it
+				if (!cur_selected || core_strnicmp((m_ordered_by_shortname ? cur_selected->short_name : cur_selected->long_name).c_str(), m_search.c_str(), m_search.size()))
 				{
-					// is this entry the selected entry?
-					if (cur_selected != &entry)
+					std::string::size_type bestmatch(0);
+					entry_info const *selected_entry(cur_selected);
+					for (auto &entry : m_entrylist)
 					{
-						auto &compare_name = m_ordered_by_shortname ? entry.short_name : entry.long_name;
-
-						int match = 0;
-						for (int i = 0; i < m_filename_buffer.size() + 1; i++)
+						// TODO: more efficient "common prefix" code
+						auto const &compare_name = m_ordered_by_shortname ? entry.short_name : entry.long_name;
+						std::string::size_type match(0);
+						for (std::string::size_type i = 1; m_search.size() >= i; ++i)
 						{
-							if (core_strnicmp(compare_name.c_str(), m_filename_buffer.c_str(), i) == 0)
+							if (!core_strnicmp(compare_name.c_str(), m_search.c_str(), i))
 								match = i;
+							else
+								break;
 						}
 
 						if (match > bestmatch)
@@ -306,20 +300,20 @@ void menu_software_list::handle()
 							selected_entry = &entry;
 						}
 					}
-				}
 
-				if (selected_entry != nullptr && selected_entry != cur_selected)
-				{
-					set_selection((void *)selected_entry);
-					centre_selection();
+					if (selected_entry && (selected_entry != cur_selected))
+					{
+						set_selection((void *)selected_entry);
+						centre_selection();
+					}
 				}
 			}
 		}
 		else if (event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
-			m_filename_buffer.clear();
-			m_result = m_filename_buffer;
+			m_search.clear();
+			m_result = m_search;
 			stack_pop();
 		}
 	}
