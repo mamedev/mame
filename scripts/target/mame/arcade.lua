@@ -1764,8 +1764,6 @@ files {
 	MAME_DIR .. "src/mame/video/decocass.cpp",
 	MAME_DIR .. "src/mame/drivers/deshoros.cpp",
 	MAME_DIR .. "src/mame/drivers/dietgo.cpp",
-	MAME_DIR .. "src/mame/includes/dietgo.h",
-	MAME_DIR .. "src/mame/video/dietgo.cpp",
 	MAME_DIR .. "src/mame/drivers/dreambal.cpp",
 	MAME_DIR .. "src/mame/drivers/exprraid.cpp",
 	MAME_DIR .. "src/mame/includes/exprraid.h",
