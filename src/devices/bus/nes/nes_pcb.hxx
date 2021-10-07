@@ -303,14 +303,12 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_g146",         BMC_G146 },
 	{ "bmc_11160",        BMC_11160 },
 	{ "a88s1",            BMC_A88S1 },
-	{ "fcgj8in1",         BMC_FCGENJIN_8IN1 },
+	{ "bmc_el86xc",       BMC_EL860947C },
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
 	{ "nt639",            BMC_NT639 },
 	{ "resetsxrom",       BMC_RESETSXROM },
-	{ "resettxrom0",      BMC_RESETTXROM0 },
-	{ "resettxrom1",      BMC_RESETTXROM1 },
-	{ "resettxrom2",      BMC_RESETTXROM2 },
+	{ "resettxrom",       BMC_RESETTXROM },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
 	{ "tech9in1",         BMC_TECHLINE9IN1 },
 	{ "bmc_8in1",         BMC_8IN1 },
@@ -666,6 +664,28 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		if (get_feature("n163-vol"))
 			m_cart->set_n163_vol(n163_get_submapper_num(get_feature("n163-vol")));
+	}
+
+	// get outer PRG bank size for multicart boards that use this feature
+	if (m_pcb_id == BMC_EL860947C || m_pcb_id == BMC_RESETTXROM)
+	{
+		const char *size = get_feature("outer-prg-size");
+		int kbyte = 128;
+
+		if (size == nullptr || sscanf(size, "%u%*c", &kbyte) != 1 || kbyte & (kbyte - 1) || kbyte <= 0)
+			logerror("Unexpected outer-prg-size: %s\n", size ? size : "(nullptr)");
+		m_cart->set_outer_prg_size(kbyte);
+	}
+
+	// get outer CHR bank size for multicart boards that use this feature
+	if (m_pcb_id == BMC_RESETTXROM)
+	{
+		const char *size = get_feature("outer-chr-size");
+		int kbyte = 128;
+
+		if (size == nullptr || sscanf(size, "%u%*c", &kbyte) != 1 || kbyte & (kbyte - 1) || kbyte <= 0)
+			logerror("Unexpected outer-chr-size: %s\n", size ? size : "(nullptr)");
+		m_cart->set_outer_chr_size(kbyte);
 	}
 
 

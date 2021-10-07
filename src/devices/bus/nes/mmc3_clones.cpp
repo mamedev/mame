@@ -53,13 +53,11 @@ DEFINE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device,  "nes_shero",    
 DEFINE_DEVICE_TYPE(NES_A9746,         nes_a9746_device,         "nes_bmc_a9746",     "NES Cart A-9746 PCB")
 
 DEFINE_DEVICE_TYPE(NES_A88S1,         nes_a88s1_device,         "nes_a88s1",         "NES Cart BMC A88S-1 PCB")
-DEFINE_DEVICE_TYPE(NES_FCGJ8IN1,      nes_fcgj8in1_device,      "nes_fcgj8in1",      "NES Cart BMC FC Genjin 8 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_EL86XC,    nes_bmc_el86xc_device,    "nes_bmc_el86xc",    "NES Cart BMC EL860947C/EL861121C PCB")
 DEFINE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device,         "nes_fk23c",         "NES Cart FK23C PCB")
 DEFINE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device,        "nes_fk23ca",        "NES Cart FK23CA PCB")
 DEFINE_DEVICE_TYPE(NES_NT639,         nes_nt639_device,         "nes_nt639",         "NES Cart NT-639 PCB")
-DEFINE_DEVICE_TYPE(NES_RESETTXROM0,   nes_resettxrom0_device,   "nes_resettxrom0",   "NES Cart BMC RESET-TXROM 128K/128K PCB")
-DEFINE_DEVICE_TYPE(NES_RESETTXROM1,   nes_resettxrom1_device,   "nes_resettxrom1",   "NES Cart BMC RESET-TXROM 256K/128K PCB")
-DEFINE_DEVICE_TYPE(NES_RESETTXROM2,   nes_resettxrom2_device,   "nes_resettxrom2",   "NES Cart BMC RESET-TXROM 128K/256K PCB")
+DEFINE_DEVICE_TYPE(NES_RESETTXROM,    nes_resettxrom_device,    "nes_resettxrom",    "NES Cart BMC RESET-TXROM PCB")
 DEFINE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device,    "nes_s24in1c03",     "NES Cart Super 24 in 1 SC-03 PCB")
 DEFINE_DEVICE_TYPE(NES_TECHLINE9IN1,  nes_tech9in1_device,      "nes_tech9in1",      "NES Cart Techline 9 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device,      "nes_bmc_8in1",      "NES Cart BMC GRM070 8 in 1 PCB")
@@ -257,8 +255,8 @@ nes_a88s1_device::nes_a88s1_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_fcgj8in1_device::nes_fcgj8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_txrom_device(mconfig, NES_FCGJ8IN1, tag, owner, clock)
+nes_bmc_el86xc_device::nes_bmc_el86xc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_EL86XC, tag, owner, clock)
 {
 }
 
@@ -282,23 +280,8 @@ nes_nt639_device::nes_nt639_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_resettxrom0_device::nes_resettxrom0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prg_shift, int chr_shift)
-	: nes_txrom_device(mconfig, type, tag, owner, clock), m_count(-1), m_prg_shift(prg_shift), m_chr_shift(chr_shift)
-{
-}
-
-nes_resettxrom0_device::nes_resettxrom0_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_resettxrom0_device(mconfig, NES_RESETTXROM0, tag, owner, clock, 4, 7)
-{
-}
-
-nes_resettxrom1_device::nes_resettxrom1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_resettxrom0_device(mconfig, NES_RESETTXROM1, tag, owner, clock, 5, 7)
-{
-}
-
-nes_resettxrom2_device::nes_resettxrom2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_resettxrom0_device(mconfig, NES_RESETTXROM2, tag, owner, clock, 4, 8)
+nes_resettxrom_device::nes_resettxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_RESETTXROM, tag, owner, clock), m_count(-1)
 {
 }
 
@@ -620,10 +603,10 @@ void nes_a88s1_device::pcb_reset()
 	update_banks();
 }
 
-void nes_fcgj8in1_device::pcb_reset()
+void nes_bmc_el86xc_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	mmc3_common_initialize(0x1f, 0x7f, 0);
+	mmc3_common_initialize((m_outer_prg_size >> 3) - 1, 0x7f, 0);
 }
 
 void nes_fk23c_device::device_start()
@@ -666,20 +649,20 @@ void nes_nt639_device::pcb_reset()
 }
 
 // These reset-based PCBs are emulated here with no additional handlers
-void nes_resettxrom0_device::device_start()
+void nes_resettxrom_device::device_start()
 {
 	mmc3_start();
 	save_item(NAME(m_count));
 }
 
-void nes_resettxrom0_device::pcb_reset()
+void nes_resettxrom_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	mmc3_common_initialize((1 << m_prg_shift) - 1, (1 << m_chr_shift) - 1, 0);
+	mmc3_common_initialize((m_outer_prg_size >> 3) - 1, m_outer_chr_size - 1, 0);
 
 	m_count = (m_count + 1) & 3;
-	m_prg_base = m_count << m_prg_shift;
-	m_chr_base = m_count << m_chr_shift;
+	m_prg_base = m_count << (31 - count_leading_zeros_32(m_outer_prg_size) - 3);  // << std::countr_zero(m_outer_prg_size) - 3; in C++20
+	m_chr_base = m_count << (31 - count_leading_zeros_32(m_outer_chr_size));  // << std::countr_zero(m_outer_chr_size); in C++20
 	set_prg(m_prg_base, m_prg_mask);
 	set_chr(m_chr_source, m_chr_base, m_chr_mask);
 }
@@ -2759,27 +2742,27 @@ void nes_bmc_f600_device::chr_cb(int start, int bank, int source)
 
 /*-------------------------------------------------
 
- BMC-FCGENJIN-8IN1
+ BMC EL860947C and EL861121C boards
 
- Unknown Multigame Bootleg Board
- Games: 8 in 1 (JY-119)
+ Games: 8 in 1 (JY-111, JY-112, and JY-119)
 
  MMC3 clone with banking for multigame menu.
 
- NES 2.0: mapper 267
+ NES 2.0: mapper 267 and mapper 377
 
  In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_fcgj8in1_device::write_m(offs_t offset, u8 data)
+void nes_bmc_el86xc_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("fcgj8in1 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("bmc_el86xc write_m, offset: %04x, data: %02x\n", offset, data));
 	if (!(offset & 0x1000))    // game only banks via 0x6000, this mask is a guess
 	{
-		m_prg_base = (data & 0x20) << 2 | (data & 0x06) << 4;
+		int outer = bitswap<3>(data, 5, 2, 1);
+		m_prg_base = outer << (31 - count_leading_zeros_32(m_outer_prg_size) - 3);  // << std::countr_zero(m_outer_prg_size) - 3; in C++20
 		set_prg(m_prg_base, m_prg_mask);
-		m_chr_base = m_prg_base << 2;
+		m_chr_base = outer << 7;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }

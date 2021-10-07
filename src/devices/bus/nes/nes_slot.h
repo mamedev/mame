@@ -98,14 +98,14 @@ enum
 	BMC_60311C, BMC_80013B, BMC_810544C, BMC_830425C,
 	BMC_830928C, BMC_850437C, BMC_970630C,
 	BMC_N32_4IN1, BMC_NT639, BMC_NTD_03,
-	BMC_FCGENJIN_8IN1, BMC_FK23C, BMC_FK23CA, BMC_JY820845C,
+	BMC_EL860947C, BMC_EL861121C, BMC_FK23C, BMC_FK23CA, BMC_JY820845C,
 	BMC_PJOY84, BMC_TH22913, BMC_11160, BMC_G146,
 	BMC_2751, BMC_8157, BMC_00202650,
 	BMC_820720C, BMC_830118C, BMC_830832C, BMC_YY841101C, BMC_YY841155C,
 	BMC_411120C, BMC_GOLD150, BMC_GOLD260,
 	BMC_12IN1, BMC_4IN1RESET, BMC_42IN1RESET, BMC_LITTLECOM160, BMC_CTC09,
 	BMC_K1029, BMC_K3006, BMC_K3033, BMC_K3036, BMC_K3046, BMC_SA005A, BMC_TJ03,
-	BMC_RESETSXROM, BMC_RESETTXROM0, BMC_RESETTXROM1, BMC_RESETTXROM2, BMC_TECHLINE9IN1,
+	BMC_RESETSXROM, BMC_RESETTXROM, BMC_TECHLINE9IN1,
 	// Unlicensed
 	UNL_8237, UNL_8237A, UNL_CC21, UNL_AX5705, UNL_KN42, UNL_KOF97,
 	UNL_N625092, UNL_SC127, UNL_SMB2J, UNL_T230, UNL_MMALEE,
@@ -223,6 +223,8 @@ public:
 	void set_mmc1_type(mmc1_type val) {  m_mmc1_type = val; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_n163_vol(int vol) { m_n163_vol = vol; }
+	void set_outer_prg_size(int val) { m_outer_prg_size = val; }
+	void set_outer_chr_size(int val) { m_outer_chr_size = val; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
 	uint8_t get_open_bus() { return m_open_bus; }
@@ -296,6 +298,8 @@ protected:
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
 	int m_n163_vol;
+	int m_outer_prg_size;
+	int m_outer_chr_size;
 
 	int m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
