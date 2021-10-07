@@ -14,13 +14,15 @@
 
 #define LOG_WARN    (1U << 1)   // Show warnings
 #define LOG_DMA     (1U << 2)   // Show DMA setups
+#define LOG_SYNC    (1U << 3)	// Show sync block setups
 
-#define VERBOSE (LOG_WARN | LOG_DMA)
+#define VERBOSE (LOG_WARN | LOG_DMA | LOG_SYNC)
 
 #include "logmacro.h"
 
 #define LOGWARN(...)     LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGDMA(...)      LOGMASKED(LOG_DMA, __VA_ARGS__)
+#define LOGSYNC(...)     LOGMASKED(LOG_SYNC, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device, "amiga_fdc", "Amiga FDC")
 
@@ -275,16 +277,22 @@ void amiga_fdc_device::live_run(const attotime &limit)
 								cur_live.bit_counter = 0;
 								dma_value = dma_read();
 
-							} else
+							} else {
+								LOGSYNC("%s: DSKSYNC on %06x %d\n", this->tag(), dskpt, dma_state);
 								dma_write(dsksync);
+							}
 
 						} else if(dma_state != DMA_IDLE) {
+							LOGSYNC("%s: DSKSYNC on %06x %d\n", this->tag(), dskpt, dma_state);
 							dma_write(dsksync);
 							cur_live.bit_counter = 0;
 
 						} else if(cur_live.bit_counter != 8)
 							cur_live.bit_counter = 0;
 					}
+					else
+						LOGSYNC("%s: no DSKSYNC\n", this->tag());
+
 					dskbyt |= 0x1000;
 					m_write_dsksyn(1);
 				} else
@@ -364,7 +372,6 @@ void amiga_fdc_device::dma_check()
 				}
 			}
 		} else {
-			dskbyt |= 0x4000;
 			if(dsklen & 0x4000)
 				dskbyt |= 0x2000;
 		}
@@ -375,7 +382,6 @@ void amiga_fdc_device::dma_check()
 		cur_live.pll.stop_writing(floppy, cur_live.tm);
 	if(!was_writing && (dskbyt & 0x2000))
 		cur_live.pll.start_writing(cur_live.tm);
-
 }
 
 void amiga_fdc_device::adkcon_set(uint16_t data)
@@ -429,6 +435,7 @@ uint16_t amiga_fdc_device::dskptl_r()
 void amiga_fdc_device::dsksync_w(uint16_t data)
 {
 	live_sync();
+	LOGSYNC("%s: DSKSYNC %04x\n", machine().describe_context(), data);
 	dsksync = data;
 	live_run();
 }
@@ -436,6 +443,7 @@ void amiga_fdc_device::dsksync_w(uint16_t data)
 void amiga_fdc_device::dmacon_set(uint16_t data)
 {
 	live_sync();
+	LOGDMA("%s: DMACON set DSKEN %d DMAEN %d (%04x)\n", machine().describe_context(), BIT(data, 4), BIT(data, 9), data);
 	dmacon = data;
 	dma_check();
 	live_run();
@@ -443,8 +451,15 @@ void amiga_fdc_device::dmacon_set(uint16_t data)
 
 uint16_t amiga_fdc_device::dskbytr_r()
 {
-	uint16_t res = dskbyt;
-	dskbyt &= 0x7fff;
+	uint16_t res = (dskbyt & ~0x4000);
+	// check if DMA is on
+	// logica2 diagnostic BIOS floppy test requires this
+	bool dmaon = (dma_state != DMA_IDLE) && ((dmacon & 0x0210) == 0x0210);
+	res |= dmaon << 14;
+
+	// reset DSKBYT ready on read
+	if (!machine().side_effects_disabled())
+		dskbyt &= 0x7fff;
 	return res;
 }
 
