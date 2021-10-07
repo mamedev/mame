@@ -4153,6 +4153,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Sport wrong pitch on Workbench loading for a500p -->
 	<software name="bargames" supported="no">
 		<!-- SPS (CAPS) release 2947 -->
 		<description>Bar Games (Euro)</description>
@@ -4160,6 +4161,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Accolade</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -4249,12 +4252,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="basejump" supported="no">
+	<software name="basejump" supported="yes">
 		<!-- SPS (CAPS) release 1799 -->
 		<description>Base Jumpers (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1995</year>
+		<!-- Omake: Will give two hidden messages if player press b2 during gameplay -->
+
 		<publisher>Grandslam</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
@@ -4284,6 +4289,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Black screen, [CIAB] fails on comparing a TOD 9 > 0x115 at PC=de4 -->
+	<!-- BGMs and SFXs whistles [Paula] -->
 	<software name="batman1" cloneof="batman" supported="no">
 		<!-- SPS (CAPS) release 19 -->
 		<description>Batman (Euro, Single Disk)</description>
@@ -22584,7 +22591,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up on AmigaOS with DSKDAT R -->
+	<!-- Locks up on AmigaOS with DSKDAT R [FDC] -->
+	<!-- (actually a side effect of failing earlier than that) -->
 	<software name="itcame" supported="no">
 		<!-- SPS (CAPS) release 14 -->
 		<description>It Came from the Desert (Euro)</description>
@@ -26412,7 +26420,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- crashes in AmigaOS with DSKDAT R -->
+	<!-- crashes in AmigaOS with DSKDAT R [FDC] -->
+	<!-- (False positive, thrashing memory) -->
 	<software name="racrally" supported="no">
 		<!-- SPS (CAPS) release 1098 -->
 		<description>Lombard RAC Rally (Euro)</description>
@@ -46351,6 +46360,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- hangs at Kickstart white screen, [FDC] wants dsksync to not write on RAM after bootblock load -->
+	<!-- Runs too fast, and button isn't recognized during gameplay -->
 	<software name="viz" supported="no">
 		<!-- SPS (CAPS) release 3030 -->
 		<description>Viz - The Soft Floppy One (Euro)</description>
