@@ -713,6 +713,8 @@ u32 st2205u_base_device::tclk_pres_div(u8 mode) const
 	assert(mode < 6);
 
 	// dphh8630 game 17 "Gang Nam Style" uses mode 0 for ADPCM music and if a 32Mhz clock is used, requires a divider of 1
+	// alternatively the divider can remain as 2 if the code in timer_12bit_process processes the FIFO every call instead
+	// of toggling it with m_psg_on, which is correct?
 	const int divtable[8] = { 1, 4, 8, 32, 1024, 4096, 4096, 4096 };
 
 	return divtable[mode];
@@ -740,6 +742,10 @@ TIMER_CALLBACK_MEMBER(st2205u_base_device::t3_interrupt)
 
 void st2205u_base_device::push_adpcm_value(int channel, u16 psg_data)
 {
+	// the ADPCM often ends up off-center before samples are played
+	// is the FIFO hookup causing non-ADPCM data to be processed as ADPCM
+	// if mode changes in m_psgm aren't in sync with the FIFO output?
+
 	m_stream->update();
 
 	if (BIT(psg_data, 8))
