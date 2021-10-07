@@ -525,6 +525,7 @@ void olyboss_state::bossb85(machine_config &config)
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
+	m_crtc->set_attribute_fetch_callback(m_crtc, FUNC(upd3301_device::default_attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->int_wr_callback().set_inputline("maincpu", I8085_RST75_LINE);
 	m_crtc->set_screen(SCREEN_TAG);
