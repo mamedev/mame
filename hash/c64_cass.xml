@@ -1399,7 +1399,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2340674">
-				<rom name="badcat.tap" size="2340674" crc="db8feec2" sha1="affb064c9d7a4ec49a71da69ec32bbeb10479f44"/>
+				<rom name="Bad_Cat.tap" size="2340674" crc="db8feec2" sha1="affb064c9d7a4ec49a71da69ec32bbeb10479f44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1413,14 +1413,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="894502">
-				<rom name="baddudes(a).tap" size="894502" crc="d9649e35" sha1="c7ab6ab08da7c8651b60f9954b7056af5adc22ce"/>
+				<rom name="Bad_Dudes_vs_Dragon_Ninja_Side_1.tap" size="894502" crc="d9649e35" sha1="c7ab6ab08da7c8651b60f9954b7056af5adc22ce"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="299210">
-				<rom name="baddudes(b).tap" size="299210" crc="d6ecfbe0" sha1="039b85b56dafec26a66227938d9e9140da2820be"/>
+				<rom name="Bad_Dudes_vs_Dragon_Ninja_Side_2.tap" size="299210" crc="d6ecfbe0" sha1="039b85b56dafec26a66227938d9e9140da2820be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1434,14 +1434,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="894502">
-				<rom name="baddudese(a).tap" size="894502" crc="6563ba77" sha1="ed9845b7304ec4eb2d4cb52d00de637afcbc4aba"/>
+				<rom name="Bad_Dudes_vs_Dragon_Ninja_Side_1.tap" size="894502" crc="6563ba77" sha1="ed9845b7304ec4eb2d4cb52d00de637afcbc4aba"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="299198">
-				<rom name="baddudese(b).tap" size="299198" crc="eeff5af0" sha1="4acb42a50a4293e8238f90445699372a62962b20"/>
+				<rom name="Bad_Dudes_vs_Dragon_Ninja_Side_2.tap" size="299198" crc="eeff5af0" sha1="4acb42a50a4293e8238f90445699372a62962b20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1475,14 +1475,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Cass 1"/>
 			<dataarea name="cass" size="1487343">
-				<rom name="bangkokk(1).tap" size="1487343" crc="79719e12" sha1="7c9abe0cc465cc477a343cd83428e9fbdf73749b"/>
+				<rom name="Bangkok_Knights_Cassette_1.tap" size="1487343" crc="79719e12" sha1="7c9abe0cc465cc477a343cd83428e9fbdf73749b"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Cass 2"/>
 			<dataarea name="cass" size="905897">
-				<rom name="bangkokk(2).tap" size="905897" crc="ff018d38" sha1="9e201ba694ae9534d5bfc2d6bff8ae7eda51d144"/>
+				<rom name="Bangkok_Knights_Cassette_2.tap" size="905897" crc="ff018d38" sha1="9e201ba694ae9534d5bfc2d6bff8ae7eda51d144"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1514,7 +1514,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="621746">
-				<rom name="baskmast.tap" size="621746" crc="8a01a352" sha1="5846ac268aa302102aa2463146a5e111cc15fee5"/>
+				<rom name="Basket_Master.tap" size="621746" crc="8a01a352" sha1="5846ac268aa302102aa2463146a5e111cc15fee5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1547,14 +1547,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="1628718">
-				<rom name="batmano(a).tap" size="1628718" crc="69ce7e7e" sha1="695286f87a34cf8960958cd3ab1d875431537299"/>
+				<rom name="Batman_Side_1.tap" size="1628718" crc="69ce7e7e" sha1="695286f87a34cf8960958cd3ab1d875431537299"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="1400538">
-				<rom name="batmano(b).tap" size="1400538" crc="d305af35" sha1="80e3d3706a890508ce27a1ea00812370041bf7c3"/>
+				<rom name="Batman_Side_2.tap" size="1400538" crc="d305af35" sha1="80e3d3706a890508ce27a1ea00812370041bf7c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1616,7 +1616,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="326295">
-				<rom name="bthrtime.tap" size="326295" crc="fa7ecb54" sha1="ca428209978836d606f920ad1b7c1554713c4f3b"/>
+				<rom name="Battle_Through_Time.tap" size="326295" crc="fa7ecb54" sha1="ca428209978836d606f920ad1b7c1554713c4f3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1652,7 +1652,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="585746">
-				<rom name="bazbillm.tap" size="585746" crc="5e357065" sha1="6a773637b697e42479bd332284fd1bd9ae6a1250"/>
+				<rom name="Bazooka_Bill.tap" size="585746" crc="5e357065" sha1="6a773637b697e42479bd332284fd1bd9ae6a1250"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1712,13 +1712,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="945354">
-				<rom name="beachhd2.tap" size="945354" crc="3ed32747" sha1="c49495b182e3543351515c26fe36fd86f83738f8"/>
+				<rom name="Beach-Head_II.tap" size="945354" crc="3ed32747" sha1="c49495b182e3543351515c26fe36fd86f83738f8"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="945354">
-				<rom name="beachhd2a.tap" size="945354" crc="a9a0e3bb" sha1="fa98be41d59c972517011dbb36d9bca15997b9d8"/>
+				<rom name="Beach-Head_II_a1.tap" size="945354" crc="a9a0e3bb" sha1="fa98be41d59c972517011dbb36d9bca15997b9d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1730,7 +1730,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="945354">
-				<rom name="beachhd2e.tap" size="945354" crc="b9f29c99" sha1="9193e0360b183fa2384e2c6eb214bdd6226834a6"/>
+				<rom name="Beach-Head_II.tap" size="945354" crc="b9f29c99" sha1="9193e0360b183fa2384e2c6eb214bdd6226834a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1755,14 +1755,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Commando / Airwolf / Bomb Jack"/>
 			<dataarea name="cass" size="1788282">
-				<rom name="boelite1(a).tap" size="1788282" crc="3789f966" sha1="aed0cd955da419746bb8c093fef239b51b974701"/>
+				<rom name="Best_of_Elite_Vol._1_Side_1.tap" size="1788282" crc="3789f966" sha1="aed0cd955da419746bb8c093fef239b51b974701"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: Frank Bruno's Boxing"/>
 			<dataarea name="cass" size="2072344">
-				<rom name="boelite1(b).tap" size="2072344" crc="a14f9a2c" sha1="2a7dde4db206e4d6676c7afb5d49d854cbbb2b35"/>
+				<rom name="Best_of_Elite_Vol._1_Side_2.tap" size="2072344" crc="a14f9a2c" sha1="2a7dde4db206e4d6676c7afb5d49d854cbbb2b35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1775,14 +1775,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Paperboy / Ghosts'n Goblins"/>
 			<dataarea name="cass" size="1435903">
-				<rom name="boelite2(a).tap" size="1435903" crc="747d7ab0" sha1="eb635f66d51ad64fb13763ee0afd3e431bc7620f"/>
+				<rom name="Best_of_Elite_Vol._2_Side_1.tap" size="1435903" crc="747d7ab0" sha1="eb635f66d51ad64fb13763ee0afd3e431bc7620f"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: Battle Ships / Bomb Jack II"/>
 			<dataarea name="cass" size="1342038">
-				<rom name="boelite2(b).tap" size="1342038" crc="d98aa91c" sha1="8ecae3c238d701f2a74204057fcd318e60757fe2"/>
+				<rom name="Best_of_Elite_Vol._2_Side_2.tap" size="1342038" crc="d98aa91c" sha1="8ecae3c238d701f2a74204057fcd318e60757fe2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1812,7 +1812,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1175779">
-				<rom name="beyondff.tap" size="1175779" crc="e8898afa" sha1="55dad25bf904c1c8435f23a7af2ee2c1def37c81"/>
+				<rom name="Beyond_the_Forbidden_Forest.tap" size="1175779" crc="e8898afa" sha1="55dad25bf904c1c8435f23a7af2ee2c1def37c81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1842,7 +1842,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="721721">
-				<rom name="icepalace.tap" size="721721" crc="0f9cba6d" sha1="247cc5605a9f88efa72543a67859e7125adcd4c2"/>
+				<rom name="Beyond_the_Ice_Palace.tap" size="721721" crc="0f9cba6d" sha1="247cc5605a9f88efa72543a67859e7125adcd4c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1854,7 +1854,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="457042">
-				<rom name="biff.tap" size="457042" crc="d002f17f" sha1="abdc8d85d258a9d9bf6b0376413819967dcd386e"/>
+				<rom name="Biff.tap" size="457042" crc="d002f17f" sha1="abdc8d85d258a9d9bf6b0376413819967dcd386e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1867,14 +1867,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Forbidden Forest / Talladega"/>
 			<dataarea name="cass" size="965880">
-				<rom name="bignames(a).tap" size="965880" crc="56fedbc3" sha1="be8edb32566531c510241c28aa3a9cc3739e5fb3"/>
+				<rom name="Big_Names_Bonanza_Side_1.tap" size="965880" crc="56fedbc3" sha1="be8edb32566531c510241c28aa3a9cc3739e5fb3"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: Fight Night / Stellar 7"/>
 			<dataarea name="cass" size="1526168">
-				<rom name="bignames(b).tap" size="1526168" crc="af26ad24" sha1="92a2a63db6d2e5026367dc084fc15d37f20e309e"/>
+				<rom name="Big_Names_Bonanza_Side_2.tap" size="1526168" crc="af26ad24" sha1="92a2a63db6d2e5026367dc084fc15d37f20e309e"/>
 			</dataarea>
 		</part>
 	</software>
