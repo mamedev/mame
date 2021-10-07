@@ -278,11 +278,13 @@ class nes_h2288_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_l(offs_t offset) override;
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+// FIXME: This is a hack and should be removed once open bus behavior is properly working. UMK3 depends on an open bus read (F51F: lda $5f74) at bootup.
+	virtual u8 read_l(offs_t offset) override { return 0x5f; }
+
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 	virtual void prg_cb(int start, int bank) override;
 
 	virtual void pcb_reset() override;
@@ -292,7 +294,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_reg[2]; // reg 1 is unused?
+	bool m_mmc3_mode;
 };
 
 

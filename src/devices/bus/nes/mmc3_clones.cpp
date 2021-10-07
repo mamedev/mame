@@ -222,8 +222,8 @@ nes_kay_device::nes_kay_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-nes_h2288_device::nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_H2288, tag, owner, clock)
+nes_h2288_device::nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_H2288, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
@@ -571,16 +571,15 @@ void nes_kay_device::pcb_reset()
 void nes_h2288_device::device_start()
 {
 	mmc3_start();
-	save_item(NAME(m_reg));
+	save_item(NAME(m_mmc3_mode));
 }
 
 void nes_h2288_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	mmc3_common_initialize(0xff, 0xff, 0);
+	m_mmc3_mode = true;
+	mmc3_common_initialize(0x3f, 0xff, 0);
 }
 
 void nes_6035052_device::device_start()
@@ -1660,66 +1659,49 @@ void nes_kay_device::write_h(offs_t offset, u8 data)
 
  UNL-H2288
 
+ Games: Earthworm Jim 2, Ultimate Mortal Kombat 3
+
+ iNES: mapper 123
+
+ In MAME: Supported.
+
  -------------------------------------------------*/
 
 void nes_h2288_device::prg_cb(int start, int bank)
 {
-	if (!(m_reg[0] & 0x40))
-		prg8_x(start, bank);
+	if (m_mmc3_mode)
+		nes_txrom_device::prg_cb(start, bank);
 }
 
-void nes_h2288_device::write_l(offs_t offset, uint8_t data)
+void nes_h2288_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("h2288 write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
 
+	offset += 0x100;
 	if (offset >= 0x1800)
 	{
-		m_reg[offset & 1] = data;
-		if (m_reg[0] & 0x40)
-		{
-			uint8_t helper1 = (m_reg[0] & 0x05) | ((m_reg[0] >> 2) & 0x0a);
-			uint8_t helper2 = BIT(m_reg[0], 1);
-			prg16_89ab(helper1 & ~helper2);
-			prg16_cdef(helper1 |  helper2);
-		}
-		else
+		m_mmc3_mode = !BIT(data, 6);
+		if (m_mmc3_mode)
 			set_prg(m_prg_base, m_prg_mask);
-	}
-}
-
-uint8_t nes_h2288_device::read_l(offs_t offset)
-{
-	LOG_MMC(("h2288 read_l, offset: %04x\n", offset));
-	offset += 0x100;
-
-	if (offset >= 0x1000)
-	{
-		int helper = offset >> 8;
-		if (offset & 1)
-			return helper | 0x01;
 		else
-			return helper ^ 0x01;
+		{
+			u8 bank = bitswap<4>(data, 5, 2, 3, 0);
+			u8 mode = BIT(data, 1);
+			prg16_89ab(bank & ~mode);
+			prg16_cdef(bank | mode);
+		}
 	}
-
-	return 0;
 }
 
-void nes_h2288_device::write_h(offs_t offset, uint8_t data)
+void nes_h2288_device::write_h(offs_t offset, u8 data)
 {
-	static const uint8_t conv_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 	LOG_MMC(("h2288 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x6001)
-	{
-		case 0x0000:
-			txrom_write(0x0000, (data & 0xc0) | conv_table[data & 0x07]);
-			break;
+	static constexpr u8 reg_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 
-		default:
-			txrom_write(offset, data);
-			break;
-	}
+	if (!(offset & 0x6001))
+		data = (data & 0xc0) | reg_table[data & 0x07];
+	txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
@@ -1839,7 +1821,7 @@ void nes_kof96_device::write_l(offs_t offset, u8 data)
 	LOG_MMC(("kof96 write_l, offset: %04x, data: %02x\n", offset, data));
 
 	offset += 0x100;
-	if ((offset & 0x5001) == 0x1000)
+	if ((offset & 0x1001) == 0x1000)
 	{
 		m_mmc3_mode = !BIT(data, 7);
 		if (m_mmc3_mode)
