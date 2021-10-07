@@ -82163,8 +82163,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed
-to check why this is different -->
+<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed to check why this is different -->
 	<software name="mc_mario">
 		<description>Mario 7 in 1 (Bad Dump)</description>
 		<year>19??</year>
@@ -82196,6 +82195,25 @@ to check why this is different -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="mario family 10-in-1 [p1].prg" size="524288" crc="bb191650" sha1="3af18925766baa141dce6ab67ce011fa94d643f7" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_marp2">
+		<description>Golden Mario Party II - Around the World 6 in 1</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_f600" />
+			<feature name="pcb_model" value="F600" />
+			<dataarea name="prg" size="1048576">
+				<rom name="golden mario party ii - around the world 6-in-1.prg" size="1048576" crc="83392938" sha1="0421b301bece7217162164bb79fc6f896b988260" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="golden mario party ii - around the world 6-in-1.chr" size="1048576" crc="f5056252" sha1="018aa1ada019f8cdd4a192251bfcbe159c3f429e" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
