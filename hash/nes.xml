@@ -79192,6 +79192,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Gunsmoke has a bug that makes some enemies and barrels not appear in-game until they are near the bottom of the screen. They cannot be interacted with until they materialize. It needs to be confirmed if this happens on hardware. -->
+	<software name="mc_2gn91">
+		<description>2 in 1 (GN-91B)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_gn91b" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 (gn-91b).prg" size="262144" crc="3c1d4ae3" sha1="ea31bf78a2bcb9fff752c12b07dfff8d65ba89fe" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_2hikg">
 		<description>2 in 1 1996 Super HIK Gold Card (NT-803)</description>
 		<year>19??</year>
@@ -79222,6 +79238,60 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2vt37">
+		<description>2 in 1 (VT-2037)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 (vt-2037).prg" size="262144" crc="9c1ab014" sha1="d5b565c27cab0fbe0cf2bc46a748f292323faa4b" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="2-in-1 (vt-2037).chr" size="262144" crc="df2c7a9b" sha1="8b40907ea0e753fecdfcb1962dae0fa7f76f21c7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2vt38">
+		<description>2 in 1 (VT-2038)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 (vt-2038).prg" size="262144" crc="0b86f42d" sha1="f39e83f7aadcd62e9901604dd58e6ba0f8601a47" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="2-in-1 (vt-2038).chr" size="262144" crc="46d5f59b" sha1="3273cd0f59aa765d3d7c14dfb97221a06b303ae9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2wq47">
+		<description>Super 2 in 1 (WQ 2047)</description>
+		<year>1998</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
+			<dataarea name="prg" size="262144">
+				<rom name="super 2-in-1 (wq 2047, 1998).prg" size="262144" crc="018a778d" sha1="b6d579b431f2b3869b7a738b4778069d4002a6c0" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="super 2-in-1 (wq 2047, 1998).chr" size="262144" crc="16685dcc" sha1="c51cf4df3122610cf2f90a9b75b77e2942f3ba1a" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -79296,6 +79366,22 @@ be better to redump them properly. -->
 			<feature name="pcb_model" value="KS-7041" />
 			<dataarea name="prg" size="524288">
 				<rom name="20-in-1 [p1].prg" size="524288" crc="8f4fec56" sha1="0934fcf5f83a6ebef24d43ce577a547a31303615" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_20ca6">
+		<description>20 in 1 (CA-006)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_nc20mb" />
+			<feature name="pcb_model" value="NC-20MB" />
+			<dataarea name="prg" size="524288">
+				<rom name="20-in-1 (ca-006).prg" size="524288" crc="2f544832" sha1="9aeb8ea71ceff1eeea5a293c4257d259d1652aae" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -81553,6 +81639,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Gunsmoke has a bug that makes some enemies and barrels not appear in-game until they are near the bottom of the screen. They cannot be interacted with until they materialize. It needs to be confirmed if this happens on hardware. -->
 	<software name="mc_8et40">
 		<description>8 in 1 (ET40, 821242c)</description>
 		<year>19??</year>
