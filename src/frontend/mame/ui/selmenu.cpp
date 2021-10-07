@@ -73,23 +73,23 @@ enum
 
 std::pair<char const *, char const *> const arts_info[] =
 {
-	{ __("Snapshots"),       OPTION_SNAPSHOT_DIRECTORY },
-	{ __("Cabinets"),        OPTION_CABINETS_PATH },
-	{ __("Control Panels"),  OPTION_CPANELS_PATH },
-	{ __("PCBs"),            OPTION_PCBS_PATH },
-	{ __("Flyers"),          OPTION_FLYERS_PATH },
-	{ __("Titles"),          OPTION_TITLES_PATH },
-	{ __("Ends"),            OPTION_ENDS_PATH },
-	{ __("Artwork Preview"), OPTION_ARTPREV_PATH },
-	{ __("Bosses"),          OPTION_BOSSES_PATH },
-	{ __("Logos"),           OPTION_LOGOS_PATH },
-	{ __("Versus"),          OPTION_VERSUS_PATH },
-	{ __("Game Over"),       OPTION_GAMEOVER_PATH },
-	{ __("HowTo"),           OPTION_HOWTO_PATH },
-	{ __("Scores"),          OPTION_SCORES_PATH },
-	{ __("Select"),          OPTION_SELECT_PATH },
-	{ __("Marquees"),        OPTION_MARQUEES_PATH },
-	{ __("Covers"),          OPTION_COVER_PATH },
+	{ __p("selmenu-artwork", "Snapshots"),       OPTION_SNAPSHOT_DIRECTORY },
+	{ __p("selmenu-artwork", "Cabinet"),         OPTION_CABINETS_PATH },
+	{ __p("selmenu-artwork", "Control Panel"),   OPTION_CPANELS_PATH },
+	{ __p("selmenu-artwork", "PCB"),             OPTION_PCBS_PATH },
+	{ __p("selmenu-artwork", "Flyer"),           OPTION_FLYERS_PATH },
+	{ __p("selmenu-artwork", "Title Screen"),    OPTION_TITLES_PATH },
+	{ __p("selmenu-artwork", "Ending"),          OPTION_ENDS_PATH },
+	{ __p("selmenu-artwork", "Artwork Preview"), OPTION_ARTPREV_PATH },
+	{ __p("selmenu-artwork", "Bosses"),          OPTION_BOSSES_PATH },
+	{ __p("selmenu-artwork", "Logo"),            OPTION_LOGOS_PATH },
+	{ __p("selmenu-artwork", "Versus"),          OPTION_VERSUS_PATH },
+	{ __p("selmenu-artwork", "Game Over"),       OPTION_GAMEOVER_PATH },
+	{ __p("selmenu-artwork", "HowTo"),           OPTION_HOWTO_PATH },
+	{ __p("selmenu-artwork", "Scores"),          OPTION_SCORES_PATH },
+	{ __p("selmenu-artwork", "Select"),          OPTION_SELECT_PATH },
+	{ __p("selmenu-artwork", "Marquee"),         OPTION_MARQUEES_PATH },
+	{ __p("selmenu-artwork", "Covers"),          OPTION_COVER_PATH },
 };
 
 char const *const hover_msg[] = {
@@ -1335,7 +1335,7 @@ void menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, flo
 void menu_select_launch::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
-	snaptext.assign(_(arts_info[m_image_view].first));
+	snaptext.assign(_("selmenu-artwork", arts_info[m_image_view].first));
 
 	// get search path
 	std::string addpath;
@@ -2340,7 +2340,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 	{
 		float text_length;
 		ui().draw_text_full(container(),
-				_(arts_info[x].first), origx1, origy1, origx2 - origx1,
+				_("selmenu-artwork", arts_info[x].first), origx1, origy1, origx2 - origx1,
 				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
 				&text_length, nullptr);
 		title_size = (std::max)(text_length + 0.01f, title_size);
@@ -2731,13 +2731,13 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float const ud_arrow_width = line_height * aspect;
 	float oy1 = origy1 + line_height;
 
-	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_(first)));
+	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_("selmenu-artwork", first)));
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_(first)));
+		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_("selmenu-artwork", first)));
 		float txt_length(0.0f);
 		ui().draw_text_full(
 				container(), name,

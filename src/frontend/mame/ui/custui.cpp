@@ -781,34 +781,34 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 	if (m_lock_ref != RGB_ALPHA)
 	{
 		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->a());
-		item_append(_("Alpha"), string_format("%3u", m_color->a()), arrow_flags, (void *)(uintptr_t)RGB_ALPHA);
+		item_append(_("color-channel", "Alpha"), string_format("%3u", m_color->a()), arrow_flags, (void *)(uintptr_t)RGB_ALPHA);
 	}
 	else
-		item_append(_("Alpha"), s_text, 0, (void *)(uintptr_t)RGB_ALPHA);
+		item_append(_("color-channel", "Alpha"), s_text, 0, (void *)(uintptr_t)RGB_ALPHA);
 
 	if (m_lock_ref != RGB_RED)
 	{
 		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->r());
-		item_append(_("Red"), string_format("%3u", m_color->r()), arrow_flags, (void *)(uintptr_t)RGB_RED);
+		item_append(_("color-channel", "Red"), string_format("%3u", m_color->r()), arrow_flags, (void *)(uintptr_t)RGB_RED);
 	}
 	else
-		item_append(_("Red"), s_text, 0, (void *)(uintptr_t)RGB_RED);
+		item_append(_("color-channel", "Red"), s_text, 0, (void *)(uintptr_t)RGB_RED);
 
 	if (m_lock_ref != RGB_GREEN)
 	{
 		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->g());
-		item_append(_("Green"), string_format("%3u", m_color->g()), arrow_flags, (void *)(uintptr_t)RGB_GREEN);
+		item_append(_("color-channel", "Green"), string_format("%3u", m_color->g()), arrow_flags, (void *)(uintptr_t)RGB_GREEN);
 	}
 	else
-		item_append(_("Green"), s_text, 0, (void *)(uintptr_t)RGB_GREEN);
+		item_append(_("color-channel", "Green"), s_text, 0, (void *)(uintptr_t)RGB_GREEN);
 
 	if (m_lock_ref != RGB_BLUE)
 	{
 		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->b());
-		item_append(_("Blue"), string_format("%3u", m_color->b()), arrow_flags, (void *)(uintptr_t)RGB_BLUE);
+		item_append(_("color-channel", "Blue"), string_format("%3u", m_color->b()), arrow_flags, (void *)(uintptr_t)RGB_BLUE);
 	}
 	else
-		item_append(_("Blue"), s_text, 0, (void *)(uintptr_t)RGB_BLUE);
+		item_append(_("color-channel", "Blue"), s_text, 0, (void *)(uintptr_t)RGB_BLUE);
 
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Choose from palette"), 0, (void *)(uintptr_t)PALETTE_CHOOSE);
@@ -931,16 +931,16 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 }
 
 std::pair<const char *, const char *> const menu_palette_sel::s_palette[] = {
-	{ __("White"),  "FFFFFFFF" },
-	{ __("Silver"), "FFC0C0C0" },
-	{ __("Gray"),   "FF808080" },
-	{ __("Black"),  "FF000000" },
-	{ __("Red"),    "FFFF0000" },
-	{ __("Orange"), "FFFFA500" },
-	{ __("Yellow"), "FFFFFF00" },
-	{ __("Green"),  "FF00FF00" },
-	{ __("Blue"),   "FF0000FF" },
-	{ __("Violet"), "FF8F00FF" }
+	{ __p("color-preset", "White"),  "FFFFFFFF" },
+	{ __p("color-preset", "Silver"), "FFC0C0C0" },
+	{ __p("color-preset", "Gray"),   "FF808080" },
+	{ __p("color-preset", "Black"),  "FF000000" },
+	{ __p("color-preset", "Red"),    "FFFF0000" },
+	{ __p("color-preset", "Orange"), "FFFFA500" },
+	{ __p("color-preset", "Yellow"), "FFFFFF00" },
+	{ __p("color-preset", "Green"),  "FF00FF00" },
+	{ __p("color-preset", "Blue"),   "FF0000FF" },
+	{ __p("color-preset", "Violet"), "FF8F00FF" }
 };
 
 //-------------------------------------------------
@@ -986,7 +986,7 @@ void menu_palette_sel::handle()
 void menu_palette_sel::populate(float &customtop, float &custombottom)
 {
 	for (unsigned x = 0; x < std::size(s_palette); ++x)
-		item_append(_(s_palette[x].first), s_palette[x].second, FLAG_COLOR_BOX, (void *)(uintptr_t)(x + 1));
+		item_append(_("color-preset", s_palette[x].first), s_palette[x].second, FLAG_COLOR_BOX, (void *)(uintptr_t)(x + 1));
 
 	item_append(menu_item_type::SEPARATOR);
 }

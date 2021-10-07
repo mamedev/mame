@@ -329,7 +329,7 @@ void favorite_manager::add_favorite(running_machine &machine)
 					}
 
 					// fill in with the first usage entry we find
-					for (feature_list_item const &feature : software->other_info())
+					for (auto const &feature : software->info())
 					{
 						if (feature.name() == "usage")
 						{

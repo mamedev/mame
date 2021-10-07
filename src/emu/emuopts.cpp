@@ -36,7 +36,7 @@ const options_entry emu_options::s_option_entries[] =
 
 	// search path options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
-	{ OPTION_HOMEPATH,                                   ".",         OPTION_STRING,     "path to base folder for plugin data (read/write)" },
+	{ OPTION_PLUGINDATAPATH,                             ".",         OPTION_STRING,     "path to base folder for plugin data (read/write)" },
 	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "roms",      OPTION_STRING,     "path to ROM sets and hard disk images" },
 	{ OPTION_HASHPATH ";hash_directory;hash",            "hash",      OPTION_STRING,     "path to software definition files" },
 	{ OPTION_SAMPLEPATH ";sp",                           "samples",   OPTION_STRING,     "path to audio sample sets" },
@@ -951,7 +951,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 						//      ...
 						//      <sharedfeat name = "ctrl1_default" value = "paddle" />
 						//  </software>
-						for (const feature_list_item &fi : swinfo->shared_info())
+						for (const software_info_item &fi : swinfo->shared_features())
 						{
 							const std::string default_suffix = "_default";
 							if (fi.name().size() > default_suffix.size()

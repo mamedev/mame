@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-29 22:30+1000\n"
+"POT-Creation-Date: 2021-10-08 09:04+1100\n"
 "PO-Revision-Date: 2016-03-02 21:46+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -33,21 +33,21 @@ msgstr ""
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr "Za ovaj drajver je neophodno da slike budu učitane u sledeće uređaje:"
 
-#: src/frontend/mame/ui/ui.cpp:1247
+#: src/frontend/mame/ui/ui.cpp:1261
 #, c-format
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1249
+#: src/frontend/mame/ui/ui.cpp:1263
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1442
+#: src/frontend/mame/ui/ui.cpp:1456
 #, c-format
 msgid ""
 "Are you sure you want to quit?\n"
@@ -60,185 +60,185 @@ msgstr ""
 "Pritisnite ''%s'' za napuštaǌe programa,\n"
 "Pritisnite ''%s'' za nastavak emulacije."
 
-#: src/frontend/mame/ui/ui.cpp:1492
+#: src/frontend/mame/ui/ui.cpp:1506
 msgid "Master Volume"
 msgstr "Glavna jačina zvuka"
 
-#: src/frontend/mame/ui/ui.cpp:1501
+#: src/frontend/mame/ui/ui.cpp:1515
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s jačina zvuka"
 
-#: src/frontend/mame/ui/ui.cpp:1523
+#: src/frontend/mame/ui/ui.cpp:1537
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "Ubrzaǌe osnovnog takta CPU %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1531
+#: src/frontend/mame/ui/ui.cpp:1545
 #, c-format
 msgid "Overclock %1$s sound"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1550
+#: src/frontend/mame/ui/ui.cpp:1564
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s frekvencija osvežavaǌa"
 
-#: src/frontend/mame/ui/ui.cpp:1555
+#: src/frontend/mame/ui/ui.cpp:1569
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s osvetǉenost"
 
-#: src/frontend/mame/ui/ui.cpp:1557
+#: src/frontend/mame/ui/ui.cpp:1571
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s kontrast"
 
-#: src/frontend/mame/ui/ui.cpp:1559
+#: src/frontend/mame/ui/ui.cpp:1573
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$s gama"
 
-#: src/frontend/mame/ui/ui.cpp:1563
+#: src/frontend/mame/ui/ui.cpp:1577
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s rastezaǌe po horizontali"
 
-#: src/frontend/mame/ui/ui.cpp:1565
+#: src/frontend/mame/ui/ui.cpp:1579
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s horizontalna pozicija"
 
-#: src/frontend/mame/ui/ui.cpp:1567
+#: src/frontend/mame/ui/ui.cpp:1581
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s rastezaǌe po vertikali"
 
-#: src/frontend/mame/ui/ui.cpp:1569
+#: src/frontend/mame/ui/ui.cpp:1583
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s vertikalna pozicija"
 
-#: src/frontend/mame/ui/ui.cpp:1585
+#: src/frontend/mame/ui/ui.cpp:1599
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "Laserdisc '%1$s' rastezaǌe po horizontali"
 
-#: src/frontend/mame/ui/ui.cpp:1588
+#: src/frontend/mame/ui/ui.cpp:1602
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "Laserdisc '%1$s' horizontalna pozicija"
 
-#: src/frontend/mame/ui/ui.cpp:1590
+#: src/frontend/mame/ui/ui.cpp:1604
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "Laserdisc '%1$s' rastezaǌe po vertikali"
 
-#: src/frontend/mame/ui/ui.cpp:1593
+#: src/frontend/mame/ui/ui.cpp:1607
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "Laserdisc '%1$s' vertikalna pozicija"
 
-#: src/frontend/mame/ui/ui.cpp:1603
+#: src/frontend/mame/ui/ui.cpp:1617
 msgid "Vector Flicker"
 msgstr "Trepereǌe vektora"
 
-#: src/frontend/mame/ui/ui.cpp:1604
+#: src/frontend/mame/ui/ui.cpp:1618
 msgid "Beam Width Minimum"
 msgstr "Minimalna širina snopa"
 
-#: src/frontend/mame/ui/ui.cpp:1605
+#: src/frontend/mame/ui/ui.cpp:1619
 msgid "Beam Width Maximum"
 msgstr "Maksimalna širinia snopa"
 
-#: src/frontend/mame/ui/ui.cpp:1606
+#: src/frontend/mame/ui/ui.cpp:1620
 msgid "Beam Dot Size"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1607
+#: src/frontend/mame/ui/ui.cpp:1621
 msgid "Beam Intensity Weight"
 msgstr "Intenzitet snopa"
 
-#: src/frontend/mame/ui/ui.cpp:1620
+#: src/frontend/mame/ui/ui.cpp:1634
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "Razmera nišana %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1620 src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1634 src/frontend/mame/ui/ui.cpp:1636
 msgid "X"
 msgstr "X"
 
-#: src/frontend/mame/ui/ui.cpp:1620 src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1634 src/frontend/mame/ui/ui.cpp:1636
 msgid "Y"
 msgstr "Y"
 
-#: src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1636
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "Pomeraj nišana %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1654
+#: src/frontend/mame/ui/ui.cpp:1668
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/frontend/mame/ui/ui.cpp:1697
+#: src/frontend/mame/ui/ui.cpp:1711
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/frontend/mame/ui/ui.cpp:1712
+#: src/frontend/mame/ui/ui.cpp:1726
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/frontend/mame/ui/ui.cpp:1735 src/frontend/mame/ui/ui.cpp:1755
-#: src/frontend/mame/ui/ui.cpp:1774 src/frontend/mame/ui/ui.cpp:1792
-#: src/frontend/mame/ui/ui.cpp:1811 src/frontend/mame/ui/ui.cpp:1830
-#: src/frontend/mame/ui/ui.cpp:1849 src/frontend/mame/ui/ui.cpp:1868
-#: src/frontend/mame/ui/ui.cpp:1889 src/frontend/mame/ui/ui.cpp:1910
-#: src/frontend/mame/ui/ui.cpp:1931 src/frontend/mame/ui/ui.cpp:1952
+#: src/frontend/mame/ui/ui.cpp:1749 src/frontend/mame/ui/ui.cpp:1769
+#: src/frontend/mame/ui/ui.cpp:1788 src/frontend/mame/ui/ui.cpp:1806
+#: src/frontend/mame/ui/ui.cpp:1825 src/frontend/mame/ui/ui.cpp:1844
+#: src/frontend/mame/ui/ui.cpp:1863 src/frontend/mame/ui/ui.cpp:1882
+#: src/frontend/mame/ui/ui.cpp:1903 src/frontend/mame/ui/ui.cpp:1924
+#: src/frontend/mame/ui/ui.cpp:1945 src/frontend/mame/ui/ui.cpp:1966
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/frontend/mame/ui/ui.cpp:1967 src/frontend/mame/ui/ui.cpp:1982
-#: src/frontend/mame/ui/ui.cpp:1997 src/frontend/mame/ui/ui.cpp:2012
-#: src/frontend/mame/ui/ui.cpp:2027
+#: src/frontend/mame/ui/ui.cpp:1981 src/frontend/mame/ui/ui.cpp:1996
+#: src/frontend/mame/ui/ui.cpp:2011 src/frontend/mame/ui/ui.cpp:2026
+#: src/frontend/mame/ui/ui.cpp:2041
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/frontend/mame/ui/ui.cpp:2043
+#: src/frontend/mame/ui/ui.cpp:2057
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "Razmera nišana X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2043
+#: src/frontend/mame/ui/ui.cpp:2057
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "Razmera nišana Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2060
+#: src/frontend/mame/ui/ui.cpp:2074
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "Pomeraj nišana X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2060
+#: src/frontend/mame/ui/ui.cpp:2074
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "Pomeraj nišana Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2167
+#: src/frontend/mame/ui/ui.cpp:2181
 msgid "**Error saving ui.ini**"
 msgstr "**Greška prilikom snimaǌa ui.ini**"
 
-#: src/frontend/mame/ui/ui.cpp:2225
+#: src/frontend/mame/ui/ui.cpp:2240
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "**Greška prlikom zapisivaǌa %s.ini**"
 
-#: src/frontend/mame/ui/ui.cpp:2229 src/frontend/mame/ui/miscmenu.cpp:762
+#: src/frontend/mame/ui/ui.cpp:2244 src/frontend/mame/ui/miscmenu.cpp:762
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -248,7 +248,7 @@ msgstr ""
 "    Konfiguracija sačuvana    \n"
 "\n"
 
-#: src/frontend/mame/ui/selsoft.cpp:225 src/frontend/mame/ui/selgame.cpp:461
+#: src/frontend/mame/ui/selsoft.cpp:183 src/frontend/mame/ui/selgame.cpp:461
 #, c-format
 msgid ""
 "%s\n"
@@ -257,7 +257,7 @@ msgstr ""
 "%s\n"
 " dodato u listu omiǉenih"
 
-#: src/frontend/mame/ui/selsoft.cpp:230 src/frontend/mame/ui/selgame.cpp:466
+#: src/frontend/mame/ui/selsoft.cpp:188 src/frontend/mame/ui/selgame.cpp:466
 #: src/frontend/mame/ui/selgame.cpp:472
 #, c-format
 msgid ""
@@ -267,33 +267,33 @@ msgstr ""
 "%s\n"
 " izbrisano iz liste omiǉenih."
 
-#: src/frontend/mame/ui/selsoft.cpp:630
+#: src/frontend/mame/ui/selsoft.cpp:631
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr "%1$s %2$s ( %3$d / %4$d programskih paketa )"
 
-#: src/frontend/mame/ui/selsoft.cpp:631
+#: src/frontend/mame/ui/selsoft.cpp:632
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr "Drajver: \"%1$s\" lista programa "
 
-#: src/frontend/mame/ui/selsoft.cpp:636 src/frontend/mame/ui/selgame.cpp:1422
+#: src/frontend/mame/ui/selsoft.cpp:637 src/frontend/mame/ui/selgame.cpp:1422
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr "%1$s: %2$s - Pretraga: %3$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:638 src/frontend/mame/ui/selgame.cpp:1424
+#: src/frontend/mame/ui/selsoft.cpp:639 src/frontend/mame/ui/selgame.cpp:1424
 #, c-format
 msgid "Search: %1$s_"
 msgstr "Pretraga: %1$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:645 src/frontend/mame/ui/selsoft.cpp:652
+#: src/frontend/mame/ui/selsoft.cpp:646 src/frontend/mame/ui/selsoft.cpp:653
 #: src/frontend/mame/ui/simpleselgame.cpp:315
 #, c-format
 msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
-#: src/frontend/mame/ui/optsmenu.cpp:72 src/frontend/mame/ui/sndmenu.cpp:149
+#: src/frontend/mame/ui/optsmenu.cpp:72 src/frontend/mame/ui/sndmenu.cpp:163
 msgid "Sound Options"
 msgstr "Opcije za zvuk"
 
@@ -321,7 +321,7 @@ msgstr "Prilagodi korisnički interfejs"
 msgid "Configure Directories"
 msgstr "Konfiguracija direktorijuma"
 
-#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:87
+#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:89
 #: src/frontend/mame/ui/slotopt.cpp:220
 msgid "[empty slot]"
 msgstr "[prazan slot]"
@@ -330,7 +330,7 @@ msgstr "[prazan slot]"
 msgid "[create]"
 msgstr "[kreiraj]"
 
-#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:98
+#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
 msgstr "[lista programa]"
 
@@ -339,23 +339,23 @@ msgstr "[lista programa]"
 msgid "Error accessing %s"
 msgstr ""
 
-#: src/frontend/mame/ui/filesel.cpp:538
+#: src/frontend/mame/ui/filesel.cpp:542
 msgid "Select access mode"
 msgstr "Odaberi mod pristupa"
 
-#: src/frontend/mame/ui/filesel.cpp:539
+#: src/frontend/mame/ui/filesel.cpp:543
 msgid "Read-only"
 msgstr "Samo čitaǌe"
 
-#: src/frontend/mame/ui/filesel.cpp:541
+#: src/frontend/mame/ui/filesel.cpp:545
 msgid "Read-write"
 msgstr "Čitaǌe-pisaǌe"
 
-#: src/frontend/mame/ui/filesel.cpp:542
+#: src/frontend/mame/ui/filesel.cpp:546
 msgid "Read this image, write to another image"
 msgstr "Čitaj ovaj fajl, piši u drugi"
 
-#: src/frontend/mame/ui/filesel.cpp:543
+#: src/frontend/mame/ui/filesel.cpp:547
 msgid "Read this image, write to diff"
 msgstr "Čitaj ovaj fajl, piši razlike"
 
@@ -375,7 +375,7 @@ msgstr ""
 msgid "Enlarge images in the right panel"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:35 src/frontend/mame/ui/dirmenu.cpp:46
+#: src/frontend/mame/ui/submenu.cpp:35
 msgid "Cheats"
 msgstr "Varaǌa"
 
@@ -734,86 +734,107 @@ msgid "Cannot change options while recording!"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:31
+msgctxt "emulation-feature"
 msgid "protection"
 msgstr "zaštita"
 
 #: src/frontend/mame/ui/info.cpp:32
+msgctxt "emulation-feature"
 msgid "timing"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:33
+msgctxt "emulation-feature"
 msgid "graphics"
 msgstr "grafika"
 
 #: src/frontend/mame/ui/info.cpp:34
+msgctxt "emulation-feature"
 msgid "color palette"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:35
+msgctxt "emulation-feature"
 msgid "sound"
 msgstr "zvuk"
 
 #: src/frontend/mame/ui/info.cpp:36
+msgctxt "emulation-feature"
 msgid "capture hardware"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:37
+msgctxt "emulation-feature"
 msgid "camera"
 msgstr "kamera"
 
 #: src/frontend/mame/ui/info.cpp:38
+msgctxt "emulation-feature"
 msgid "microphone"
 msgstr "mikrofon"
 
 #: src/frontend/mame/ui/info.cpp:39
+msgctxt "emulation-feature"
 msgid "controls"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:40
+msgctxt "emulation-feature"
 msgid "keyboard"
 msgstr "tastatura"
 
 #: src/frontend/mame/ui/info.cpp:41
+msgctxt "emulation-feature"
 msgid "mouse"
 msgstr "miš"
 
 #: src/frontend/mame/ui/info.cpp:42
+msgctxt "emulation-feature"
 msgid "media"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:43
+msgctxt "emulation-feature"
 msgid "disk"
-msgstr ""
+msgstr "disk"
 
 #: src/frontend/mame/ui/info.cpp:44
+msgctxt "emulation-feature"
 msgid "printer"
-msgstr ""
+msgstr "štampač"
 
 #: src/frontend/mame/ui/info.cpp:45
+msgctxt "emulation-feature"
 msgid "magnetic tape"
-msgstr ""
+msgstr "magnetna traka"
 
 #: src/frontend/mame/ui/info.cpp:46
+msgctxt "emulation-feature"
 msgid "punch tape"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:47
+msgctxt "emulation-feature"
 msgid "magnetic drum"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:48
+msgctxt "emulation-feature"
 msgid "solid state storage"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:49
+msgctxt "emulation-feature"
 msgid "communications"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:50
+msgctxt "emulation-feature"
 msgid "LAN"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:51
+msgctxt "emulation-feature"
 msgid "WAN"
 msgstr ""
 
@@ -1001,28 +1022,28 @@ msgstr "Delimično podržano"
 msgid "[empty]"
 msgstr "[prazno]"
 
-#: src/frontend/mame/ui/swlist.cpp:92
+#: src/frontend/mame/ui/swlist.cpp:94
 msgid "[file manager]"
 msgstr "[upravǉaǌe fajlovima]"
 
-#: src/frontend/mame/ui/swlist.cpp:234
+#: src/frontend/mame/ui/swlist.cpp:228
 msgid "Switch Item Ordering"
 msgstr "Promeni sortiraǌe"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
 msgstr "Promeǌen redosled: sada je sortirano po %s"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 msgid "shortname"
 msgstr "skraćeno ime"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 msgid "description"
 msgstr "opis"
 
-#: src/frontend/mame/ui/swlist.cpp:397
+#: src/frontend/mame/ui/swlist.cpp:391
 msgid "[compatible lists]"
 msgstr "[kompatibilne liste]"
 
@@ -1030,11 +1051,11 @@ msgstr "[kompatibilne liste]"
 msgid "File Already Exists - Override?"
 msgstr "Fajl već postoji - prepiši?"
 
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1044
 msgid "No"
 msgstr "Ne"
 
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1044
 msgid "Yes"
 msgstr "Da"
 
@@ -1075,7 +1096,7 @@ msgstr "Prirodni"
 msgid "Emulated"
 msgstr "Emulirani"
 
-#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:478
+#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:484
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr ""
@@ -1092,172 +1113,241 @@ msgstr "Omogućeno"
 msgid "Disabled"
 msgstr "Onemogućeno"
 
-#: src/frontend/mame/ui/utils.cpp:62 src/frontend/mame/ui/utils.cpp:86
+#: src/frontend/mame/ui/utils.cpp:61
+msgctxt "machine-filter"
 msgid "Unfiltered"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:63 src/frontend/mame/ui/utils.cpp:87
+#: src/frontend/mame/ui/utils.cpp:62
+msgctxt "machine-filter"
 msgid "Available"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:64 src/frontend/mame/ui/utils.cpp:88
+#: src/frontend/mame/ui/utils.cpp:63
+msgctxt "machine-filter"
 msgid "Unavailable"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:65
+#: src/frontend/mame/ui/utils.cpp:64
+msgctxt "machine-filter"
 msgid "Working"
 msgstr "Radi"
 
-#: src/frontend/mame/ui/utils.cpp:66
+#: src/frontend/mame/ui/utils.cpp:65
+msgctxt "machine-filter"
 msgid "Not Working"
 msgstr "Ne radi"
 
-#: src/frontend/mame/ui/utils.cpp:67
+#: src/frontend/mame/ui/utils.cpp:66
+msgctxt "machine-filter"
 msgid "Mechanical"
-msgstr ""
+msgstr "Mehanički"
+
+#: src/frontend/mame/ui/utils.cpp:67
+msgctxt "machine-filter"
+msgid "Not Mechanical"
+msgstr "Ne mehanički"
 
 #: src/frontend/mame/ui/utils.cpp:68
-msgid "Not Mechanical"
-msgstr ""
-
-#: src/frontend/mame/ui/utils.cpp:69
+msgctxt "machine-filter"
 msgid "Category"
 msgstr "Kategorija"
 
-#: src/frontend/mame/ui/utils.cpp:70 src/frontend/mame/ui/utils.cpp:89
+#: src/frontend/mame/ui/utils.cpp:69
+msgctxt "machine-filter"
 msgid "Favorites"
 msgstr "Lista omiǉenih"
 
-#: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/miscmenu.cpp:806
+#: src/frontend/mame/ui/utils.cpp:70
+msgctxt "machine-filter"
 msgid "BIOS"
-msgstr "BIOS"
+msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:72
+#: src/frontend/mame/ui/utils.cpp:71
+msgctxt "machine-filter"
 msgid "Not BIOS"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:73 src/frontend/mame/ui/utils.cpp:90
+#: src/frontend/mame/ui/utils.cpp:72
+msgctxt "machine-filter"
 msgid "Parents"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:74 src/frontend/mame/ui/utils.cpp:91
+#: src/frontend/mame/ui/utils.cpp:73
+msgctxt "machine-filter"
 msgid "Clones"
-msgstr ""
+msgstr "Klonovi"
 
-#: src/frontend/mame/ui/utils.cpp:75
+#: src/frontend/mame/ui/utils.cpp:74
+msgctxt "machine-filter"
 msgid "Manufacturer"
 msgstr "Proizvođač"
 
-#: src/frontend/mame/ui/utils.cpp:76 src/frontend/mame/ui/utils.cpp:92
+#: src/frontend/mame/ui/utils.cpp:75
+msgctxt "machine-filter"
 msgid "Year"
 msgstr "Godina"
 
-#: src/frontend/mame/ui/utils.cpp:77
+#: src/frontend/mame/ui/utils.cpp:76
+msgctxt "machine-filter"
 msgid "Save Supported"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:78
+#: src/frontend/mame/ui/utils.cpp:77
+msgctxt "machine-filter"
 msgid "Save Unsupported"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:79
+#: src/frontend/mame/ui/utils.cpp:78
+msgctxt "machine-filter"
 msgid "CHD Required"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:80
+#: src/frontend/mame/ui/utils.cpp:79
+msgctxt "machine-filter"
 msgid "No CHD Required"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:81
+#: src/frontend/mame/ui/utils.cpp:80
+msgctxt "machine-filter"
 msgid "Vertical Screen"
 msgstr "Vertikalni ekran"
 
-#: src/frontend/mame/ui/utils.cpp:82
+#: src/frontend/mame/ui/utils.cpp:81
+msgctxt "machine-filter"
 msgid "Horizontal Screen"
 msgstr "Horizontalni ekran"
 
-#: src/frontend/mame/ui/utils.cpp:83 src/frontend/mame/ui/utils.cpp:100
+#: src/frontend/mame/ui/utils.cpp:82
+msgctxt "machine-filter"
 msgid "Custom Filter"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:93
+#: src/frontend/mame/ui/utils.cpp:85
+msgctxt "software-filter"
+msgid "Unfiltered"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:86
+msgctxt "software-filter"
+msgid "Available"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:87
+msgctxt "software-filter"
+msgid "Unavailable"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:88
+msgctxt "software-filter"
+msgid "Favorites"
+msgstr "Lista omiǉenih"
+
+#: src/frontend/mame/ui/utils.cpp:89
+msgctxt "software-filter"
+msgid "Parents"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:90
+msgctxt "software-filter"
+msgid "Clones"
+msgstr "Klonovi"
+
+#: src/frontend/mame/ui/utils.cpp:91
+msgctxt "software-filter"
+msgid "Year"
+msgstr "Godina"
+
+#: src/frontend/mame/ui/utils.cpp:92
+msgctxt "software-filter"
 msgid "Publisher"
 msgstr "Izdavač"
 
-#: src/frontend/mame/ui/utils.cpp:94
+#: src/frontend/mame/ui/utils.cpp:93
+msgctxt "software-filter"
 msgid "Supported"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:95
+#: src/frontend/mame/ui/utils.cpp:94
+msgctxt "software-filter"
 msgid "Partially Supported"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:96
+#: src/frontend/mame/ui/utils.cpp:95
+msgctxt "software-filter"
 msgid "Unsupported"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:97
+#: src/frontend/mame/ui/utils.cpp:96
+msgctxt "software-filter"
 msgid "Release Region"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:98
+#: src/frontend/mame/ui/utils.cpp:97
+msgctxt "software-filter"
 msgid "Device Type"
 msgstr "Tip uredjaja"
 
-#: src/frontend/mame/ui/utils.cpp:99
+#: src/frontend/mame/ui/utils.cpp:98
+msgctxt "software-filter"
 msgid "Software List"
 msgstr "Lista programa"
 
-#: src/frontend/mame/ui/utils.cpp:247
+#: src/frontend/mame/ui/utils.cpp:99
+msgctxt "software-filter"
+msgid "Custom Filter"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:246
 msgid "<set up filters>"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:351
+#: src/frontend/mame/ui/utils.cpp:350
 msgid "Select custom filters:"
 msgstr "Izbor proizvoǉnih filtera"
 
-#: src/frontend/mame/ui/utils.cpp:502
+#: src/frontend/mame/ui/utils.cpp:501
 #, c-format
 msgid "Filter %1$u"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:516
+#: src/frontend/mame/ui/utils.cpp:515
 msgid "Remove last filter"
 msgstr "Ukloni posledǌi filter"
 
-#: src/frontend/mame/ui/utils.cpp:518
+#: src/frontend/mame/ui/utils.cpp:517
 msgid "Add filter"
 msgstr "Dodaj filter"
 
-#: src/frontend/mame/ui/utils.cpp:957
+#: src/frontend/mame/ui/utils.cpp:956
 msgid "Select category:"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:988
+#: src/frontend/mame/ui/utils.cpp:987
 msgid "[no category INI files]"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:996
+#: src/frontend/mame/ui/utils.cpp:995
 msgid "[no groups in INI file]"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1030
+#: src/frontend/mame/ui/utils.cpp:1029
 msgid "No category INI files found"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1035
+#: src/frontend/mame/ui/utils.cpp:1034
 msgid "File"
 msgstr "Fajl"
 
-#: src/frontend/mame/ui/utils.cpp:1039
+#: src/frontend/mame/ui/utils.cpp:1038
 msgid "No groups found in category file"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/utils.cpp:1043
 msgid "Group"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/utils.cpp:1044
 msgid "Include clones"
 msgstr ""
 
@@ -1354,6 +1444,10 @@ msgstr "Eksportuj listu u XML formatu (kao -listxml, ali bez uredjaja)"
 msgid "Export list in TXT format (like -listfull)"
 msgstr "Eksportuj listu u TXT formatu (kao -listfull)"
 
+#: src/frontend/mame/ui/miscmenu.cpp:806
+msgid "BIOS"
+msgstr "BIOS"
+
 #: src/frontend/mame/ui/miscmenu.cpp:810
 msgid "Driver"
 msgstr "Drajver"
@@ -1378,7 +1472,7 @@ msgstr ""
 msgid "Configure Machine:"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:872 src/frontend/mame/ui/selmenu.cpp:2595
+#: src/frontend/mame/ui/miscmenu.cpp:872 src/frontend/mame/ui/selmenu.cpp:2589
 msgid " (default)"
 msgstr " (uobičajeno)"
 
@@ -1394,23 +1488,41 @@ msgstr "Pseudo terminali"
 msgid "[failed]"
 msgstr "[neuspešno]"
 
-#: src/frontend/mame/ui/state.cpp:213
+#: src/frontend/mame/ui/state.cpp:215
 msgid "No save states found"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:404
+#: src/frontend/mame/ui/state.cpp:265
+#, c-format
+msgid ""
+"Delete saved state %1$s?\n"
+"Press %2$s to delete\n"
+"Press %3$s to cancel"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:378
+#, c-format
+msgid "Error removing saved state file %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:424
+#, c-format
+msgid "Press %1$s to delete"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:497
 msgid "Load State"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:404
+#: src/frontend/mame/ui/state.cpp:497
 msgid "Select state to load"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:428
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Save State"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:428
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Press a key or joystick button, or select state to overwrite"
 msgstr ""
 
@@ -1433,7 +1545,7 @@ msgid "Other Controls"
 msgstr "Ostale kontrole"
 
 #: src/frontend/mame/ui/inputmap.cpp:227
-msgid "This machine has no input map."
+msgid "This machine has no configurable inputs."
 msgstr ""
 
 #: src/frontend/mame/ui/inputmap.cpp:310
@@ -1445,27 +1557,27 @@ msgstr ""
 msgid "Invalid sequence entered"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:480
+#: src/frontend/mame/ui/inputmap.cpp:486
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:507
+#: src/frontend/mame/ui/inputmap.cpp:513
 #, c-format
 msgid "Press %1$s to set\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:508
+#: src/frontend/mame/ui/inputmap.cpp:514
 #, c-format
 msgid "Press %1$s to append\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:509
+#: src/frontend/mame/ui/inputmap.cpp:515
 #, c-format
 msgid "Press %1$s to clear\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:510
+#: src/frontend/mame/ui/inputmap.cpp:516
 #, c-format
 msgid "Press %1$s to restore default\n"
 msgstr ""
@@ -1557,7 +1669,7 @@ msgid "Type name or select: (random)"
 msgstr "Otkucajte ime ili izaberite: (nasumičan izbor)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:318
-#: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:713
+#: src/frontend/mame/ui/selmenu.cpp:679 src/frontend/mame/ui/selmenu.cpp:715
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s, %2$-.100s"
@@ -1568,52 +1680,52 @@ msgid "Driver: %1$-.100s"
 msgstr "Drajver: %1$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:337
-#: src/frontend/mame/ui/selmenu.cpp:726
+#: src/frontend/mame/ui/selmenu.cpp:728
 msgid "Overall: NOT WORKING"
 msgstr "Uopšteno: NE RADI"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:339
-#: src/frontend/mame/ui/selmenu.cpp:728
+#: src/frontend/mame/ui/selmenu.cpp:730
 msgid "Overall: Unemulated Protection"
 msgstr "Uopšteno: Zaštita nije emulirana"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:341
-#: src/frontend/mame/ui/selmenu.cpp:730
+#: src/frontend/mame/ui/selmenu.cpp:732
 msgid "Overall: Working"
 msgstr "Uopšteno: radi"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:345
-#: src/frontend/mame/ui/selmenu.cpp:734
+#: src/frontend/mame/ui/selmenu.cpp:736
 msgid "Graphics: Unimplemented, "
 msgstr "Grafika: nije implementirana, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:347
-#: src/frontend/mame/ui/selmenu.cpp:736
+#: src/frontend/mame/ui/selmenu.cpp:738
 msgid "Graphics: Imperfect, "
 msgstr "Grafika: nesavršena, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:349
-#: src/frontend/mame/ui/selmenu.cpp:738
+#: src/frontend/mame/ui/selmenu.cpp:740
 msgid "Graphics: OK, "
 msgstr "Grafika: OK, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:352
-#: src/frontend/mame/ui/selmenu.cpp:741
+#: src/frontend/mame/ui/selmenu.cpp:743
 msgid "Sound: None"
 msgstr ""
 
 #: src/frontend/mame/ui/simpleselgame.cpp:354
-#: src/frontend/mame/ui/selmenu.cpp:743
+#: src/frontend/mame/ui/selmenu.cpp:745
 msgid "Sound: Unimplemented"
 msgstr "Zvuk: nije implementiran"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:356
-#: src/frontend/mame/ui/selmenu.cpp:745
+#: src/frontend/mame/ui/selmenu.cpp:747
 msgid "Sound: Imperfect"
 msgstr "Zvuk: nesavršen"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:358
-#: src/frontend/mame/ui/selmenu.cpp:747
+#: src/frontend/mame/ui/selmenu.cpp:749
 msgid "Sound: OK"
 msgstr "Zvuk: OK"
 
@@ -1639,164 +1751,221 @@ msgid "Reload All"
 msgstr "Ponovo učitaj sve"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
+msgctxt "path-option"
 msgid "ROMs"
 msgstr "ROM-ovi"
 
 #: src/frontend/mame/ui/dirmenu.cpp:38
+msgctxt "path-option"
 msgid "Software Media"
 msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
-msgid "UI"
-msgstr "Korisnički interfejs"
-
-#: src/frontend/mame/ui/dirmenu.cpp:40 src/frontend/mame/ui/custui.cpp:177
-msgid "Language"
-msgstr "Jezici"
-
-#: src/frontend/mame/ui/dirmenu.cpp:41
-msgid "Samples"
-msgstr "Semplovi"
-
-#: src/frontend/mame/ui/dirmenu.cpp:42
-msgid "DATs"
-msgstr "DAT fajlovi"
-
-#: src/frontend/mame/ui/dirmenu.cpp:43
-msgid "INIs"
-msgstr "INI fajlovi"
-
-#: src/frontend/mame/ui/dirmenu.cpp:44
-msgid "Category INIs"
+msgctxt "path-option"
+msgid "Sound Samples"
 msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:45
-msgid "Icons"
-msgstr "Ikone"
+#: src/frontend/mame/ui/dirmenu.cpp:40
+msgctxt "path-option"
+msgid "Artwork"
+msgstr "Ilustracije"
 
-#: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/selmenu.cpp:74
-msgid "Snapshots"
-msgstr "Snimci ekrana"
-
-#: src/frontend/mame/ui/dirmenu.cpp:48 src/frontend/mame/ui/selmenu.cpp:75
-msgid "Cabinets"
-msgstr "Kabineti"
-
-#: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:78
-msgid "Flyers"
-msgstr "Letci"
-
-#: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:79
-msgid "Titles"
-msgstr "Naslovni ekrani"
-
-#: src/frontend/mame/ui/dirmenu.cpp:51 src/frontend/mame/ui/selmenu.cpp:80
-msgid "Ends"
-msgstr "Ekrani završetka igre"
-
-#: src/frontend/mame/ui/dirmenu.cpp:52 src/frontend/mame/ui/selmenu.cpp:77
-msgid "PCBs"
-msgstr "PCB (štampane pločice)"
-
-#: src/frontend/mame/ui/dirmenu.cpp:53 src/frontend/mame/ui/selmenu.cpp:89
-msgid "Marquees"
-msgstr "Posteri iznad kabineta"
-
-#: src/frontend/mame/ui/dirmenu.cpp:54
-msgid "Controls Panels"
-msgstr "Upravǉački paneli"
-
-#: src/frontend/mame/ui/dirmenu.cpp:55
+#: src/frontend/mame/ui/dirmenu.cpp:41
+msgctxt "path-option"
 msgid "Crosshairs"
 msgstr "Nišani"
 
-#: src/frontend/mame/ui/dirmenu.cpp:56
-msgid "Artworks"
-msgstr "Ilustracije"
+#: src/frontend/mame/ui/dirmenu.cpp:42
+msgctxt "path-option"
+msgid "Cheat Files"
+msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/selmenu.cpp:82
+#: src/frontend/mame/ui/dirmenu.cpp:43
+msgctxt "path-option"
+msgid "Plugins"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:44
+msgctxt "path-option"
+msgid "UI Translations"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:45
+msgctxt "path-option"
+msgid "INIs"
+msgstr "INI fajlovi"
+
+#: src/frontend/mame/ui/dirmenu.cpp:46
+msgctxt "path-option"
+msgid "UI Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:47
+msgctxt "path-option"
+msgid "Plugin Data"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:48
+msgctxt "path-option"
+msgid "DATs"
+msgstr "DAT fajlovi"
+
+#: src/frontend/mame/ui/dirmenu.cpp:49
+msgctxt "path-option"
+msgid "Category INIs"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:50
+msgctxt "path-option"
+msgid "Snapshots"
+msgstr "Snimci ekrana"
+
+#: src/frontend/mame/ui/dirmenu.cpp:51
+msgctxt "path-option"
+msgid "Icons"
+msgstr "Ikone"
+
+#: src/frontend/mame/ui/dirmenu.cpp:52
+msgctxt "path-option"
+msgid "Control Panels"
+msgstr "Upravǉački paneli"
+
+#: src/frontend/mame/ui/dirmenu.cpp:53
+msgctxt "path-option"
+msgid "Cabinets"
+msgstr "Kabineti"
+
+#: src/frontend/mame/ui/dirmenu.cpp:54
+msgctxt "path-option"
+msgid "Marquees"
+msgstr "Posteri iznad kabineta"
+
+#: src/frontend/mame/ui/dirmenu.cpp:55
+msgctxt "path-option"
+msgid "PCBs"
+msgstr "PCB (štampane pločice)"
+
+#: src/frontend/mame/ui/dirmenu.cpp:56
+msgctxt "path-option"
+msgid "Flyers"
+msgstr "Letci"
+
+#: src/frontend/mame/ui/dirmenu.cpp:57
+msgctxt "path-option"
+msgid "Title Screens"
+msgstr "Naslovni ekrani"
+
+#: src/frontend/mame/ui/dirmenu.cpp:58
+msgctxt "path-option"
+msgid "Game Endings"
+msgstr "Ekrani završetka igre"
+
+#: src/frontend/mame/ui/dirmenu.cpp:59
+msgctxt "path-option"
 msgid "Bosses"
 msgstr "Finalni protivnici"
 
-#: src/frontend/mame/ui/dirmenu.cpp:58
-msgid "Artworks Preview"
+#: src/frontend/mame/ui/dirmenu.cpp:60
+msgctxt "path-option"
+msgid "Artwork Previews"
 msgstr "Umaǌeni prikaz ilustracija"
 
-#: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/selmenu.cpp:88
+#: src/frontend/mame/ui/dirmenu.cpp:61
+msgctxt "path-option"
 msgid "Select"
 msgstr "Izborni ekrani"
 
-#: src/frontend/mame/ui/dirmenu.cpp:60
-msgid "GameOver"
-msgstr "Neuspešan kraj igre"
+#: src/frontend/mame/ui/dirmenu.cpp:62
+msgctxt "path-option"
+msgid "Game Over Screens"
+msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/selmenu.cpp:86
+#: src/frontend/mame/ui/dirmenu.cpp:63
+msgctxt "path-option"
 msgid "HowTo"
 msgstr "Uputstvo"
 
-#: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:83
+#: src/frontend/mame/ui/dirmenu.cpp:64
+msgctxt "path-option"
 msgid "Logos"
 msgstr "Logoi"
 
-#: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/selmenu.cpp:87
+#: src/frontend/mame/ui/dirmenu.cpp:65
+msgctxt "path-option"
 msgid "Scores"
 msgstr "Najboǉi rezultata"
 
-#: src/frontend/mame/ui/dirmenu.cpp:64 src/frontend/mame/ui/selmenu.cpp:84
+#: src/frontend/mame/ui/dirmenu.cpp:66
+msgctxt "path-option"
 msgid "Versus"
 msgstr "Versus ekrani"
 
-#: src/frontend/mame/ui/dirmenu.cpp:65 src/frontend/mame/ui/selmenu.cpp:90
+#: src/frontend/mame/ui/dirmenu.cpp:67
+msgctxt "path-option"
 msgid "Covers"
 msgstr "Maske"
 
-#: src/frontend/mame/ui/dirmenu.cpp:118
+#: src/frontend/mame/ui/dirmenu.cpp:120
 msgid "Folders Setup"
 msgstr "Podešavaǌe direktorijuma"
 
-#: src/frontend/mame/ui/dirmenu.cpp:169
+#: src/frontend/mame/ui/dirmenu.cpp:171
 #, c-format
 msgid "Current %1$s Folders"
 msgstr "Trenutni %1$s direktorijum"
 
-#: src/frontend/mame/ui/dirmenu.cpp:181
+#: src/frontend/mame/ui/dirmenu.cpp:183
 msgid "Change Folder"
 msgstr "Promeni direktorijum"
 
-#: src/frontend/mame/ui/dirmenu.cpp:181
+#: src/frontend/mame/ui/dirmenu.cpp:183
 msgid "Add Folder"
 msgstr "Dodaj direktorijum"
 
-#: src/frontend/mame/ui/dirmenu.cpp:184
+#: src/frontend/mame/ui/dirmenu.cpp:186
 msgid "Remove Folder"
 msgstr "Ukloni direktorijum"
 
-#: src/frontend/mame/ui/dirmenu.cpp:419
+#: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
 msgstr "Promeni %1$s direktorijum - Pretraga: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:419
+#: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
 msgstr "Dodaj %1$s direktorijum - Pretraga: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:430
+#: src/frontend/mame/ui/dirmenu.cpp:432
 msgid "Press TAB to set"
 msgstr "Pritisnite TAB da podesite"
 
-#: src/frontend/mame/ui/dirmenu.cpp:514
+#: src/frontend/mame/ui/dirmenu.cpp:516
 #, c-format
 msgid "Remove %1$s Folder"
 msgstr "Ukloni %1$s direktorijum"
 
-#: src/frontend/mame/ui/viewgfx.cpp:428
+#: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " COLORS"
 msgstr " BOJE"
 
-#: src/frontend/mame/ui/viewgfx.cpp:428
+#: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " PENS"
 msgstr " OLOVKE"
+
+#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
+#, c-format
+msgid "Zoom = 1/%1$d"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
+#, c-format
+msgid "Zoom = %1$d"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:1262
+msgid "Expand to fit"
+msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:604
 msgid "Configure Machine"
@@ -2178,6 +2347,10 @@ msgstr "Fontovi"
 msgid "Colors"
 msgstr "Boje"
 
+#: src/frontend/mame/ui/custui.cpp:177
+msgid "Language"
+msgstr "Jezici"
+
 #: src/frontend/mame/ui/custui.cpp:181
 msgid "Show side panels"
 msgstr "Prikaži bočne panele"
@@ -2321,21 +2494,22 @@ msgid "ARGB Settings"
 msgstr "ARGB podešavaǌa"
 
 #: src/frontend/mame/ui/custui.cpp:784 src/frontend/mame/ui/custui.cpp:787
+msgctxt "color-channel"
 msgid "Alpha"
 msgstr "Alfa"
 
 #: src/frontend/mame/ui/custui.cpp:792 src/frontend/mame/ui/custui.cpp:795
-#: src/frontend/mame/ui/custui.cpp:938
+msgctxt "color-channel"
 msgid "Red"
 msgstr "Crvenа"
 
 #: src/frontend/mame/ui/custui.cpp:800 src/frontend/mame/ui/custui.cpp:803
-#: src/frontend/mame/ui/custui.cpp:941
+msgctxt "color-channel"
 msgid "Green"
 msgstr "Zelenа"
 
 #: src/frontend/mame/ui/custui.cpp:808 src/frontend/mame/ui/custui.cpp:811
-#: src/frontend/mame/ui/custui.cpp:942
+msgctxt "color-channel"
 msgid "Blue"
 msgstr "Plavа"
 
@@ -2348,34 +2522,56 @@ msgid "Color preview ="
 msgstr "Prikaz boja ="
 
 #: src/frontend/mame/ui/custui.cpp:934
+msgctxt "color-preset"
 msgid "White"
 msgstr "Bela"
 
 #: src/frontend/mame/ui/custui.cpp:935
+msgctxt "color-preset"
 msgid "Silver"
 msgstr "Srebrna"
 
 #: src/frontend/mame/ui/custui.cpp:936
+msgctxt "color-preset"
 msgid "Gray"
 msgstr "Siva"
 
 #: src/frontend/mame/ui/custui.cpp:937
+msgctxt "color-preset"
 msgid "Black"
 msgstr "Crna"
 
+#: src/frontend/mame/ui/custui.cpp:938
+msgctxt "color-preset"
+msgid "Red"
+msgstr "Crvenа"
+
 #: src/frontend/mame/ui/custui.cpp:939
+msgctxt "color-preset"
 msgid "Orange"
 msgstr "Naranǆasta"
 
 #: src/frontend/mame/ui/custui.cpp:940
+msgctxt "color-preset"
 msgid "Yellow"
 msgstr "Žuta"
 
+#: src/frontend/mame/ui/custui.cpp:941
+msgctxt "color-preset"
+msgid "Green"
+msgstr "Zelenа"
+
+#: src/frontend/mame/ui/custui.cpp:942
+msgctxt "color-preset"
+msgid "Blue"
+msgstr "Plavа"
+
 #: src/frontend/mame/ui/custui.cpp:943
+msgctxt "color-preset"
 msgid "Violet"
 msgstr "ǈubičasta"
 
-#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:757
+#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:759
 #, c-format
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
@@ -2406,7 +2602,7 @@ msgstr "Analogne kontrole"
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "DIP Switches"
-msgstr ""
+msgstr "DIP prekidači"
 
 #: src/frontend/mame/ui/mainmenu.cpp:73
 msgid "Machine Configuration"
@@ -2482,137 +2678,214 @@ msgid "Select New Machine"
 msgstr "Izaberi novu mašinu"
 
 #: src/frontend/mame/ui/selmenu.cpp:76
-msgid "Control Panels"
-msgstr "Kontrolni panel"
+msgctxt "selmenu-artwork"
+msgid "Snapshots"
+msgstr "Snimci ekrana"
+
+#: src/frontend/mame/ui/selmenu.cpp:77
+msgctxt "selmenu-artwork"
+msgid "Cabinet"
+msgstr "Kabinet"
+
+#: src/frontend/mame/ui/selmenu.cpp:78
+msgctxt "selmenu-artwork"
+msgid "Control Panel"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:79
+msgctxt "selmenu-artwork"
+msgid "PCB"
+msgstr "PCB (štampana pločica)"
+
+#: src/frontend/mame/ui/selmenu.cpp:80
+msgctxt "selmenu-artwork"
+msgid "Flyer"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:81
+msgctxt "selmenu-artwork"
+msgid "Title Screen"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:82
+msgctxt "selmenu-artwork"
+msgid "Ending"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:83
+msgctxt "selmenu-artwork"
 msgid "Artwork Preview"
 msgstr "Pregled artwork-a"
 
+#: src/frontend/mame/ui/selmenu.cpp:84
+msgctxt "selmenu-artwork"
+msgid "Bosses"
+msgstr "Finalni protivnici"
+
 #: src/frontend/mame/ui/selmenu.cpp:85
+msgctxt "selmenu-artwork"
+msgid "Logo"
+msgstr "Logo"
+
+#: src/frontend/mame/ui/selmenu.cpp:86
+msgctxt "selmenu-artwork"
+msgid "Versus"
+msgstr "Versus ekrani"
+
+#: src/frontend/mame/ui/selmenu.cpp:87
+msgctxt "selmenu-artwork"
 msgid "Game Over"
 msgstr "Završni ekran igre"
 
-#: src/frontend/mame/ui/selmenu.cpp:94
+#: src/frontend/mame/ui/selmenu.cpp:88
+msgctxt "selmenu-artwork"
+msgid "HowTo"
+msgstr "Uputstvo"
+
+#: src/frontend/mame/ui/selmenu.cpp:89
+msgctxt "selmenu-artwork"
+msgid "Scores"
+msgstr "Najboǉi rezultata"
+
+#: src/frontend/mame/ui/selmenu.cpp:90
+msgctxt "selmenu-artwork"
+msgid "Select"
+msgstr "Izborni ekrani"
+
+#: src/frontend/mame/ui/selmenu.cpp:91
+msgctxt "selmenu-artwork"
+msgid "Marquee"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:92
+msgctxt "selmenu-artwork"
+msgid "Covers"
+msgstr "Maske"
+
+#: src/frontend/mame/ui/selmenu.cpp:96
 msgid "Add or remove favorites"
 msgstr "Dodavaǌe ili uklaǌaǌe omiǉenih"
 
-#: src/frontend/mame/ui/selmenu.cpp:95
+#: src/frontend/mame/ui/selmenu.cpp:97
 msgid "Export displayed list to file"
 msgstr "Eksportuj prikazanu listu u fajl"
 
-#: src/frontend/mame/ui/selmenu.cpp:96
+#: src/frontend/mame/ui/selmenu.cpp:98
 msgid "Show DATs view"
 msgstr "Prikaži DAT"
 
-#: src/frontend/mame/ui/selmenu.cpp:320
+#: src/frontend/mame/ui/selmenu.cpp:322
 msgid "Software part selection:"
 msgstr "Izbor dela softvera:"
 
-#: src/frontend/mame/ui/selmenu.cpp:426
+#: src/frontend/mame/ui/selmenu.cpp:428
 msgid "BIOS selection:"
 msgstr "Izbor BIOS-a:"
 
-#: src/frontend/mame/ui/selmenu.cpp:681
+#: src/frontend/mame/ui/selmenu.cpp:683
 #, c-format
 msgid "Software is clone of: %1$-.100s"
 msgstr "Softver je klon od: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:683
+#: src/frontend/mame/ui/selmenu.cpp:685
 msgid "Software is parent"
 msgstr "Softver je predak"
 
-#: src/frontend/mame/ui/selmenu.cpp:688
+#: src/frontend/mame/ui/selmenu.cpp:690
 msgid "Supported: No"
 msgstr "Podržano: ne"
 
-#: src/frontend/mame/ui/selmenu.cpp:693
+#: src/frontend/mame/ui/selmenu.cpp:695
 msgid "Supported: Partial"
 msgstr "Podržano: delimično"
 
-#: src/frontend/mame/ui/selmenu.cpp:698
+#: src/frontend/mame/ui/selmenu.cpp:700
 msgid "Supported: Yes"
 msgstr "Podržano: da"
 
-#: src/frontend/mame/ui/selmenu.cpp:703
+#: src/frontend/mame/ui/selmenu.cpp:705
 #, c-format
-msgid "romset: %1$-.100s"
-msgstr "ROM skup: %1$-.100s"
+msgid "Software list/item: %1$s:%2$s"
+msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:719
+#: src/frontend/mame/ui/selmenu.cpp:721
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
 msgstr "Drajver je klon od: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:721
+#: src/frontend/mame/ui/selmenu.cpp:723
 msgid "Driver is parent"
 msgstr "Drajver je osnovni"
 
-#: src/frontend/mame/ui/selmenu.cpp:2198
+#: src/frontend/mame/ui/selmenu.cpp:2192
 msgid "Images"
 msgstr "Programi"
 
-#: src/frontend/mame/ui/selmenu.cpp:2199
+#: src/frontend/mame/ui/selmenu.cpp:2193
 msgid "Infos"
 msgstr "Informacije"
 
-#: src/frontend/mame/ui/selmenu.cpp:2508
+#: src/frontend/mame/ui/selmenu.cpp:2502
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2524
+#: src/frontend/mame/ui/selmenu.cpp:2518
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2540
+#: src/frontend/mame/ui/selmenu.cpp:2534
 msgid "incorrect checksum"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2543
+#: src/frontend/mame/ui/selmenu.cpp:2537
 msgid "incorrect length"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2546
+#: src/frontend/mame/ui/selmenu.cpp:2540
 msgid "not found"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2557
+#: src/frontend/mame/ui/selmenu.cpp:2551
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2559
+#: src/frontend/mame/ui/selmenu.cpp:2553
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2563
+#: src/frontend/mame/ui/selmenu.cpp:2557
 msgid "Press any key to continue."
 msgstr "Pritisnite bilo koji taster za nastavak."
 
-#: src/frontend/mame/ui/selmenu.cpp:2664
+#: src/frontend/mame/ui/selmenu.cpp:2658
 msgid "Usage"
 msgstr "Upotreba"
 
-#: src/frontend/mame/ui/selmenu.cpp:2699
+#: src/frontend/mame/ui/selmenu.cpp:2693
 msgid "General Info"
 msgstr "Opšte informacije"
 
-#: src/frontend/mame/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/sndmenu.cpp:148
 msgid "Sound"
 msgstr "Zvuk"
 
-#: src/frontend/mame/ui/sndmenu.cpp:136
+#: src/frontend/mame/ui/sndmenu.cpp:149
+msgid "Compressor"
+msgstr ""
+
+#: src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
 msgstr "Učestalost uzorkovaǌa"
 
-#: src/frontend/mame/ui/sndmenu.cpp:137
+#: src/frontend/mame/ui/sndmenu.cpp:151
 msgid "Use External Samples"
 msgstr "Koristi dodatne semplove"
 
@@ -3200,7 +3473,7 @@ msgstr ""
 msgid "Gameinit"
 msgstr "Inicijalizacija"
 
-#: plugins/data/data_history.lua:171
+#: plugins/data/data_history.lua:172
 msgid "History"
 msgstr "Istorija"
 
@@ -3220,17 +3493,49 @@ msgstr "МESS - informacije"
 msgid "MAMEinfo"
 msgstr "МАМЕ - informacije"
 
-#~ msgid "Backdrops"
-#~ msgstr "Kulise (pozadine)"
+#~ msgctxt "path-option"
+#~ msgid "UI"
+#~ msgstr "Korisnički interfejs"
 
-#~ msgid "Overlays"
-#~ msgstr "Prekrivajuće ilustracije"
+#~ msgctxt "path-option"
+#~ msgid "Language"
+#~ msgstr "Jezici"
 
-#~ msgid "Bezels"
-#~ msgstr "Ivice"
+#~ msgctxt "path-option"
+#~ msgid "Samples"
+#~ msgstr "Semplovi"
 
-#~ msgid "CPanels"
-#~ msgstr "Komandni paneli"
+#~ msgctxt "path-option"
+#~ msgid "Cheats"
+#~ msgstr "Varaǌa"
+
+#~ msgctxt "path-option"
+#~ msgid "GameOver"
+#~ msgstr "Neuspešan kraj igre"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Control Panels"
+#~ msgstr "Kontrolni panel"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Flyers"
+#~ msgstr "Letci"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Titles"
+#~ msgstr "Naslovni ekrani"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Ends"
+#~ msgstr "Ekrani završetka igre"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Marquees"
+#~ msgstr "Posteri iznad kabineta"
+
+#, c-format
+#~ msgid "romset: %1$-.100s"
+#~ msgstr "ROM skup: %1$-.100s"
 
 #~ msgid "View"
 #~ msgstr "Prikaz"
@@ -3240,9 +3545,6 @@ msgstr "МАМЕ - informacije"
 
 #~ msgid "Full"
 #~ msgstr "Potpuno"
-
-#~ msgid "Dip Switches"
-#~ msgstr "DIP prekidači"
 
 #~ msgid "Select position to load from"
 #~ msgstr "Izaberite poziciju sa koje želite da učitate"

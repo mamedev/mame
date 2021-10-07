@@ -28,27 +28,27 @@ constexpr machine_flags::type MACHINE_WARNINGS  = machine_flags::NO_COCKTAIL | m
 constexpr machine_flags::type MACHINE_BTANB     = machine_flags::NO_SOUND_HW | machine_flags::IS_INCOMPLETE;
 
 constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
-		{ device_t::feature::PROTECTION,    __("protection")            },
-		{ device_t::feature::TIMING,        __("timing")                },
-		{ device_t::feature::GRAPHICS,      __("graphics")              },
-		{ device_t::feature::PALETTE,       __("color palette")         },
-		{ device_t::feature::SOUND,         __("sound")                 },
-		{ device_t::feature::CAPTURE,       __("capture hardware")      },
-		{ device_t::feature::CAMERA,        __("camera")                },
-		{ device_t::feature::MICROPHONE,    __("microphone")            },
-		{ device_t::feature::CONTROLS,      __("controls")              },
-		{ device_t::feature::KEYBOARD,      __("keyboard")              },
-		{ device_t::feature::MOUSE,         __("mouse")                 },
-		{ device_t::feature::MEDIA,         __("media")                 },
-		{ device_t::feature::DISK,          __("disk")                  },
-		{ device_t::feature::PRINTER,       __("printer")               },
-		{ device_t::feature::TAPE,          __("magnetic tape")         },
-		{ device_t::feature::PUNCH,         __("punch tape")            },
-		{ device_t::feature::DRUM,          __("magnetic drum")         },
-		{ device_t::feature::ROM,           __("solid state storage")   },
-		{ device_t::feature::COMMS,         __("communications")        },
-		{ device_t::feature::LAN,           __("LAN")                   },
-		{ device_t::feature::WAN,           __("WAN")                   } };
+		{ device_t::feature::PROTECTION,    __p("emulation-feature",    "protection")           },
+		{ device_t::feature::TIMING,        __p("emulation-feature",    "timing")               },
+		{ device_t::feature::GRAPHICS,      __p("emulation-feature",    "graphics")             },
+		{ device_t::feature::PALETTE,       __p("emulation-feature",    "color palette")        },
+		{ device_t::feature::SOUND,         __p("emulation-feature",    "sound")                },
+		{ device_t::feature::CAPTURE,       __p("emulation-feature",    "capture hardware")     },
+		{ device_t::feature::CAMERA,        __p("emulation-feature",    "camera")               },
+		{ device_t::feature::MICROPHONE,    __p("emulation-feature",    "microphone")           },
+		{ device_t::feature::CONTROLS,      __p("emulation-feature",    "controls")             },
+		{ device_t::feature::KEYBOARD,      __p("emulation-feature",    "keyboard")             },
+		{ device_t::feature::MOUSE,         __p("emulation-feature",    "mouse")                },
+		{ device_t::feature::MEDIA,         __p("emulation-feature",    "media")                },
+		{ device_t::feature::DISK,          __p("emulation-feature",    "disk")                 },
+		{ device_t::feature::PRINTER,       __p("emulation-feature",    "printer")              },
+		{ device_t::feature::TAPE,          __p("emulation-feature",    "magnetic tape")        },
+		{ device_t::feature::PUNCH,         __p("emulation-feature",    "punch tape")           },
+		{ device_t::feature::DRUM,          __p("emulation-feature",    "magnetic drum")        },
+		{ device_t::feature::ROM,           __p("emulation-feature",    "solid state storage")  },
+		{ device_t::feature::COMMS,         __p("emulation-feature",    "communications")       },
+		{ device_t::feature::LAN,           __p("emulation-feature",    "LAN")                  },
+		{ device_t::feature::WAN,           __p("emulation-feature",    "WAN")                  } };
 
 } // anonymous namespace
 
@@ -253,7 +253,7 @@ std::string machine_info::warnings_string() const
 		{
 			if (unemulated_features() & feature.first)
 			{
-				util::stream_format(buf, first ? _("%s") : _(", %s"), _(feature.second));
+				util::stream_format(buf, first ? _("%s") : _(", %s"), _("emulation-feature", feature.second));
 				first = false;
 			}
 		}
@@ -269,7 +269,7 @@ std::string machine_info::warnings_string() const
 		{
 			if (imperfect_features() & feature.first)
 			{
-				util::stream_format(buf, first ? _("%s") : _(", %s"), _(feature.second));
+				util::stream_format(buf, first ? _("%s") : _(", %s"), _("emulation-feature", feature.second));
 				first = false;
 			}
 		}

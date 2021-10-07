@@ -58,45 +58,45 @@ constexpr char const *SOFTWARE_REGIONS[] = {
 		"uk", "ukr", "usa" };
 
 constexpr char const *MACHINE_FILTER_NAMES[machine_filter::COUNT] = {
-		__("Unfiltered"),
-		__("Available"),
-		__("Unavailable"),
-		__("Working"),
-		__("Not Working"),
-		__("Mechanical"),
-		__("Not Mechanical"),
-		__("Category"),
-		__("Favorites"),
-		__("BIOS"),
-		__("Not BIOS"),
-		__("Parents"),
-		__("Clones"),
-		__("Manufacturer"),
-		__("Year"),
-		__("Save Supported"),
-		__("Save Unsupported"),
-		__("CHD Required"),
-		__("No CHD Required"),
-		__("Vertical Screen"),
-		__("Horizontal Screen"),
-		__("Custom Filter") };
+		__p("machine-filter", "Unfiltered"),
+		__p("machine-filter", "Available"),
+		__p("machine-filter", "Unavailable"),
+		__p("machine-filter", "Working"),
+		__p("machine-filter", "Not Working"),
+		__p("machine-filter", "Mechanical"),
+		__p("machine-filter", "Not Mechanical"),
+		__p("machine-filter", "Category"),
+		__p("machine-filter", "Favorites"),
+		__p("machine-filter", "BIOS"),
+		__p("machine-filter", "Not BIOS"),
+		__p("machine-filter", "Parents"),
+		__p("machine-filter", "Clones"),
+		__p("machine-filter", "Manufacturer"),
+		__p("machine-filter", "Year"),
+		__p("machine-filter", "Save Supported"),
+		__p("machine-filter", "Save Unsupported"),
+		__p("machine-filter", "CHD Required"),
+		__p("machine-filter", "No CHD Required"),
+		__p("machine-filter", "Vertical Screen"),
+		__p("machine-filter", "Horizontal Screen"),
+		__p("machine-filter", "Custom Filter") };
 
 constexpr char const *SOFTWARE_FILTER_NAMES[software_filter::COUNT] = {
-		__("Unfiltered"),
-		__("Available"),
-		__("Unavailable"),
-		__("Favorites"),
-		__("Parents"),
-		__("Clones"),
-		__("Year"),
-		__("Publisher"),
-		__("Supported"),
-		__("Partially Supported"),
-		__("Unsupported"),
-		__("Release Region"),
-		__("Device Type"),
-		__("Software List"),
-		__("Custom Filter") };
+		__p("software-filter", "Unfiltered"),
+		__p("software-filter", "Available"),
+		__p("software-filter", "Unavailable"),
+		__p("software-filter", "Favorites"),
+		__p("software-filter", "Parents"),
+		__p("software-filter", "Clones"),
+		__p("software-filter", "Year"),
+		__p("software-filter", "Publisher"),
+		__p("software-filter", "Supported"),
+		__p("software-filter", "Partially Supported"),
+		__p("software-filter", "Unsupported"),
+		__p("software-filter", "Release Region"),
+		__p("software-filter", "Device Type"),
+		__p("software-filter", "Software List"),
+		__p("software-filter", "Custom Filter") };
 
 
 
@@ -1707,7 +1707,7 @@ char const *machine_filter::config_name(type n)
 char const *machine_filter::display_name(type n)
 {
 	assert(COUNT > n);
-	return _(MACHINE_FILTER_NAMES[n]);
+	return _("machine-filter", MACHINE_FILTER_NAMES[n]);
 }
 
 machine_filter::machine_filter()
@@ -1728,7 +1728,7 @@ char const *software_filter::config_name(type n)
 char const *software_filter::display_name(type n)
 {
 	assert(COUNT > n);
-	return _(SOFTWARE_FILTER_NAMES[n]);
+	return _("software-filter", SOFTWARE_FILTER_NAMES[n]);
 }
 
 software_filter::software_filter()
@@ -1884,7 +1884,7 @@ ui_software_info::ui_software_info(
 	, devicetype(de)
 	, available(false)
 {
-	for (feature_list_item const &feature : info.other_info())
+	for (software_info_item const &feature : info.info())
 	{
 		if (feature.name() == "usage")
 		{
