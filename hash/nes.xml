@@ -82360,18 +82360,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_marif" supported="no">
-		<description>Mario Family 10 in 1</description>
-		<year>19??</year>
+	<software name="mc_marif" supported="partial">
+		<description>Super Mario Family 10 in 1</description>
+		<year>1992?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="524288">
-				<rom name="mario family 10-in-1 [p1].chr" size="524288" crc="b9724865" sha1="9b2416a5d2d6e92c8ea28bba40ba9b3646d40d92" offset="00000" status="baddump" />
+			<feature name="slot" value="bmc_810305c" />
+			<feature name="pcb_model" value="81-03-05-C" />
+			<dataarea name="prg" size="1048576">
+				<rom name="0001" size="1048576" crc="880fc6a9" sha1="a677e8aaa0f58be6c62ab72936ef0c2065014ff4" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="524288">
-				<rom name="mario family 10-in-1 [p1].prg" size="524288" crc="bb191650" sha1="3af18925766baa141dce6ab67ce011fa94d643f7" offset="00000" status="baddump" />
+			<dataarea name="chr" size="524288">
+				<rom name="0002" size="524288" crc="b9724865" sha1="9b2416a5d2d6e92c8ea28bba40ba9b3646d40d92" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
