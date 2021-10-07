@@ -79084,6 +79084,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_2n811" supported="partial">
+		<description>2 in 1 (NT-811)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_970630c" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 (nt-811).prg" size="262144" crc="fa38298e" sha1="b111185897125231072d36308f05e869303a2a72" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- JP Ronny (Unl) [headerless crc: a9c69118] has been ripped from this multicart -->
 	<software name="mc_20asd">
 		<description>ASDER 20 in 1</description>
@@ -79554,6 +79569,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="chr" size="65536">
 				<rom name="35-in-1 (hm5511) [p1][u].chr" size="65536" crc="10852729" sha1="53b9a1ec244a85bd0c9585b05ddc68cc52dc4c22" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_35k33">
+		<description>35 in 1 (K-3033)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_k3033" />
+			<dataarea name="prg" size="1048576">
+				<rom name="35-in-1 (k-3033).prg" size="1048576" crc="71c2171e" sha1="06114bbb419a9ae51966ceb91b40868410402c2d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="35-in-1 (k-3033).chr" size="1048576" crc="bded0afd" sha1="9561865c4f34fbfc79636e6d86a2ad36161b1c83" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -80154,6 +80184,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="4-in-1 (ok-411)[p1].prg" size="524288" crc="08ad4796" sha1="96f57a5e8f352d9545ebb259e9c15e581d01cb43" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4pw99">
+		<description>4 in 1 1999</description>
+		<year>1999</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_970630c" />
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 1999.prg" size="524288" crc="57004aca" sha1="cffa3179223004f3f7a3571228cc9b4d6de2bbf6" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
