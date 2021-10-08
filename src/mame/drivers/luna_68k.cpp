@@ -21,7 +21,8 @@
  *  GPU8  graphics processor + serial, 68020 @ 20MHz? + +68881 @ 16MHz?
  *  DPU8  video/framebuffer, Bt458 @ 108MHz
  *  CMC   communications (GPIB, Ethernet, serial), 68020 @ 12.5MHz?
- * 
+ *
+ * gets stuck at 0x40003880 when testing the am5913 status, expects output 3 active
  */
 #include "emu.h"
 
@@ -34,6 +35,7 @@
 #include "machine/mc146818.h"
 #include "machine/z80sio.h"
 #include "machine/am9513.h"
+#include "machine/timer.h"
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
@@ -98,14 +100,16 @@ void luna_68k_state::machine_reset()
 
 void luna_68k_state::cpu_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).rom().region("eprom", 0); // TODO: no doubt this is banked out after boot
+	map(0x00000000, 0x0001ffff).rom().region("eprom", 0);
 
 	map(0x40000000, 0x4001ffff).rom().region("eprom", 0);
 
-	map(0x50000000, 0x50000007).rw(m_sio, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w)).umask32(0x00ff00ff);
+	map(0x50000000, 0x50000007).rw(m_sio, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask32(0xff00ff00);
 	map(0x60000000, 0x60000003).rw(m_stc, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 
 	map(0x70000000, 0x70000003).lr32([]() { return 0x00fe0000; }, "sw3"); // FIXME: possibly CPU board DIP switch?
+	map(0x78000000, 0x78000003).lw32(
+		[this](u32 data) { m_cpu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer()); }, "ram_size"); // FIXME: ram size/enable?
 }
 
 void luna_68k_state::cpu_autovector_map(address_map &map)
@@ -131,13 +135,28 @@ void luna_68k_state::luna(machine_config &config)
 
 	DS1287(config, m_rtc, 32'768);
 
-	UPD7201(config, m_sio, 9'830'000); // D9.83B0
+	UPD7201(config, m_sio, 9'830'000 / 2); // D9.83B0
 
 	// TODO: one of these is for console, other is keyboard
-	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
-	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	m_sio->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
+	m_serial[0]->rxd_handler().set(m_sio, FUNC(upd7201_device::rxa_w));
+	m_serial[0]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsa_w));
 
-	AM9513(config, m_stc, 9'830'000); // FIXME: clock? sources?
+	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	m_sio->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
+	m_serial[1]->rxd_handler().set(m_sio, FUNC(upd7201_device::rxb_w));
+	m_serial[1]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsb_w));
+
+	AM9513(config, m_stc, 9'830'000 / 2); // FIXME: clock? sources?
+	m_stc->out4_cb().set(m_sio, FUNC(upd7201_device::rxca_w));
+	m_stc->out4_cb().append(m_sio, FUNC(upd7201_device::txca_w));
+	m_stc->out5_cb().set(m_sio, FUNC(upd7201_device::rxcb_w));
+	m_stc->out5_cb().append(m_sio, FUNC(upd7201_device::txcb_w));
 }
 
 ROM_START(luna)
