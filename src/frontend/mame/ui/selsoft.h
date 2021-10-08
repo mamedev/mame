@@ -45,6 +45,7 @@ private:
 		std::reference_wrapper<ui_software_info const> software;
 		std::u32string ucs_shortname;
 		std::u32string ucs_longname;
+		std::vector<std::u32string> ucs_alttitles;
 		double penalty;
 	};
 

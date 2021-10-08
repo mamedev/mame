@@ -38,8 +38,12 @@ menu_select_software::search_item::search_item(ui_software_info const &s)
 	: software(s)
 	, ucs_shortname(ustr_from_utf8(normalize_unicode(s.shortname, unicode_normalization_form::D, true)))
 	, ucs_longname(ustr_from_utf8(normalize_unicode(s.longname, unicode_normalization_form::D, true)))
+	, ucs_alttitles()
 	, penalty(1.0)
 {
+	ucs_alttitles.reserve(s.alttitles.size());
+	for (std::string const &alttitle : s.alttitles)
+		ucs_alttitles.emplace_back(ustr_from_utf8(normalize_unicode(alttitle, unicode_normalization_form::D, true)));
 }
 
 void menu_select_software::search_item::set_penalty(std::u32string const &search)
@@ -47,8 +51,8 @@ void menu_select_software::search_item::set_penalty(std::u32string const &search
 	penalty = util::edit_distance(search, ucs_shortname);
 	if (penalty)
 		penalty = (std::min)(penalty, util::edit_distance(search, ucs_longname));
-	auto it(software.get().alttitles.begin());
-	while (penalty && (software.get().alttitles.end() != it))
+	auto it(ucs_alttitles.begin());
+	while (penalty && (ucs_alttitles.end() != it))
 		penalty = (std::min)(penalty, util::edit_distance(search, *it++));
 }
 
@@ -377,6 +381,8 @@ void menu_select_software::build_software_list()
 					m_filter_data.add_region(ins->longname);
 					m_filter_data.add_publisher(ins->publisher);
 					m_filter_data.add_year(ins->year);
+					for (software_info_item const &i : ins->info)
+						m_filter_data.add_info(i);
 					m_filter_data.add_device_type(ins->devicetype);
 				}
 			}
@@ -459,7 +465,6 @@ void menu_select_software::build_software_list()
 				}
 			});
 
-
 	m_filter_data.finalise();
 }
 
@@ -540,7 +545,8 @@ void menu_select_software::find_matches()
 	if (m_searchlist.empty())
 	{
 		m_searchlist.reserve(m_swinfo.size());
-		std::copy(m_swinfo.begin(), m_swinfo.end(), std::back_inserter(m_searchlist));
+		for (ui_software_info const &sw : m_swinfo)
+			m_searchlist.emplace_back(sw);
 	}
 
 	// update search

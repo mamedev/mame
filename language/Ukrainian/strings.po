@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 16:57+1100\n"
+"POT-Creation-Date: 2021-10-08 23:24+1100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -237,14 +237,14 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:183 src/frontend/mame/ui/selgame.cpp:461
+#: src/frontend/mame/ui/selsoft.cpp:189 src/frontend/mame/ui/selgame.cpp:461
 #, c-format
 msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:188 src/frontend/mame/ui/selgame.cpp:466
+#: src/frontend/mame/ui/selsoft.cpp:194 src/frontend/mame/ui/selgame.cpp:466
 #: src/frontend/mame/ui/selgame.cpp:472
 #, c-format
 msgid ""
@@ -252,27 +252,27 @@ msgid ""
 " removed from favorites list."
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:631
+#: src/frontend/mame/ui/selsoft.cpp:640
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:632
+#: src/frontend/mame/ui/selsoft.cpp:641
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:637 src/frontend/mame/ui/selgame.cpp:1422
+#: src/frontend/mame/ui/selsoft.cpp:646 src/frontend/mame/ui/selgame.cpp:1422
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:639 src/frontend/mame/ui/selgame.cpp:1424
+#: src/frontend/mame/ui/selsoft.cpp:648 src/frontend/mame/ui/selgame.cpp:1424
 #, c-format
 msgid "Search: %1$s_"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:646 src/frontend/mame/ui/selsoft.cpp:653
+#: src/frontend/mame/ui/selsoft.cpp:655 src/frontend/mame/ui/selsoft.cpp:662
 #: src/frontend/mame/ui/simpleselgame.cpp:315
 #, c-format
 msgid "%1$-.100s"
@@ -1012,11 +1012,11 @@ msgstr ""
 msgid "File Already Exists - Override?"
 msgstr ""
 
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1067
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1089
 msgid "No"
 msgstr ""
 
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1067
+#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1089
 msgid "Yes"
 msgstr ""
 
@@ -1101,294 +1101,319 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
-msgid "ISBN"
+msgid "Installation Instructions"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
-msgid "OEM"
+msgid "ISBN"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgctxt "swlist-info"
-msgid "Original Publisher"
+msgid "OEM"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
-msgid "Part Number"
+msgid "Original Publisher"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
-msgid "PCB"
+msgid "Part Number"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
-msgid "Programmer"
+msgid "PCB"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
-msgid "Release Date"
+msgid "Programmer"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
-msgid "Serial Number"
+msgid "Release Date"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
-msgid "Usage Instructions"
+msgid "Serial Number"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
-msgid "Version"
+msgid "Usage Instructions"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:83
-msgctxt "machine-filter"
-msgid "Unfiltered"
+#: src/frontend/mame/ui/utils.cpp:78
+msgctxt "swlist-info"
+msgid "Version"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
-msgid "Available"
+msgid "Unfiltered"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:85
 msgctxt "machine-filter"
-msgid "Unavailable"
+msgid "Available"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:86
 msgctxt "machine-filter"
-msgid "Working"
+msgid "Unavailable"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgctxt "machine-filter"
-msgid "Not Working"
+msgid "Working"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
-msgid "Mechanical"
+msgid "Not Working"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgctxt "machine-filter"
-msgid "Not Mechanical"
+msgid "Mechanical"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgctxt "machine-filter"
-msgid "Category"
+msgid "Not Mechanical"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgctxt "machine-filter"
-msgid "Favorites"
+msgid "Category"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgctxt "machine-filter"
-msgid "BIOS"
+msgid "Favorites"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:93
 msgctxt "machine-filter"
-msgid "Not BIOS"
+msgid "BIOS"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:94
 msgctxt "machine-filter"
-msgid "Parents"
+msgid "Not BIOS"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
-msgid "Clones"
+msgid "Parents"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
-msgid "Manufacturer"
+msgid "Clones"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:97
 msgctxt "machine-filter"
-msgid "Year"
+msgid "Manufacturer"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:98
 msgctxt "machine-filter"
-msgid "Save Supported"
+msgid "Year"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:99
 msgctxt "machine-filter"
-msgid "Save Unsupported"
+msgid "Save Supported"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:100
 msgctxt "machine-filter"
-msgid "CHD Required"
+msgid "Save Unsupported"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:101
 msgctxt "machine-filter"
-msgid "No CHD Required"
+msgid "CHD Required"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:102
 msgctxt "machine-filter"
-msgid "Vertical Screen"
+msgid "No CHD Required"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:103
 msgctxt "machine-filter"
-msgid "Horizontal Screen"
+msgid "Vertical Screen"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:104
 msgctxt "machine-filter"
-msgid "Custom Filter"
+msgid "Horizontal Screen"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:108
-msgctxt "software-filter"
-msgid "Unfiltered"
+#: src/frontend/mame/ui/utils.cpp:105
+msgctxt "machine-filter"
+msgid "Custom Filter"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:109
 msgctxt "software-filter"
-msgid "Available"
+msgid "Unfiltered"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:110
 msgctxt "software-filter"
-msgid "Unavailable"
+msgid "Available"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:111
 msgctxt "software-filter"
-msgid "Favorites"
+msgid "Unavailable"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:112
 msgctxt "software-filter"
-msgid "Parents"
+msgid "Favorites"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
-msgid "Clones"
+msgid "Parents"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
-msgid "Year"
+msgid "Clones"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:115
 msgctxt "software-filter"
-msgid "Publisher"
+msgid "Year"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:116
 msgctxt "software-filter"
-msgid "Supported"
+msgid "Publisher"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:117
 msgctxt "software-filter"
-msgid "Partially Supported"
+msgid "Developer"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
-msgid "Unsupported"
+msgid "Distributor"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
-msgid "Release Region"
+msgid "Author"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
-msgid "Device Type"
+msgid "Programmer"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
-msgid "Software List"
+msgid "Supported"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:122
 msgctxt "software-filter"
+msgid "Partially Supported"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:123
+msgctxt "software-filter"
+msgid "Unsupported"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:124
+msgctxt "software-filter"
+msgid "Release Region"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:125
+msgctxt "software-filter"
+msgid "Device Type"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:126
+msgctxt "software-filter"
+msgid "Software List"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:127
+msgctxt "software-filter"
 msgid "Custom Filter"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:269
+#: src/frontend/mame/ui/utils.cpp:291
 msgid "<set up filters>"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:373
+#: src/frontend/mame/ui/utils.cpp:395
 msgid "Select custom filters:"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:524
+#: src/frontend/mame/ui/utils.cpp:546
 #, c-format
 msgid "Filter %1$u"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:538
+#: src/frontend/mame/ui/utils.cpp:560
 msgid "Remove last filter"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:540
+#: src/frontend/mame/ui/utils.cpp:562
 msgid "Add filter"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:979
+#: src/frontend/mame/ui/utils.cpp:1001
 msgid "Select category:"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1010
+#: src/frontend/mame/ui/utils.cpp:1032
 msgid "[no category INI files]"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1018
+#: src/frontend/mame/ui/utils.cpp:1040
 msgid "[no groups in INI file]"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1052
+#: src/frontend/mame/ui/utils.cpp:1074
 msgid "No category INI files found"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1057
+#: src/frontend/mame/ui/utils.cpp:1079
 msgid "File"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1061
+#: src/frontend/mame/ui/utils.cpp:1083
 msgid "No groups found in category file"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1066
+#: src/frontend/mame/ui/utils.cpp:1088
 msgid "Group"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1067
+#: src/frontend/mame/ui/utils.cpp:1089
 msgid "Include clones"
 msgstr ""
 
-#: src/frontend/mame/ui/datmenu.cpp:81
-msgid "Software Usage"
+#: src/frontend/mame/ui/datmenu.cpp:81 src/frontend/mame/ui/selmenu.cpp:2658
+msgid "Software List Info"
 msgstr ""
 
 #: src/frontend/mame/ui/datmenu.cpp:365
@@ -2885,10 +2910,6 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2557
 msgid "Press any key to continue."
-msgstr ""
-
-#: src/frontend/mame/ui/selmenu.cpp:2658
-msgid "Software List Info"
 msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2693

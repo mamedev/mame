@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 16:57+1100\n"
+"POT-Creation-Date: 2021-10-08 23:24+1100\n"
 "PO-Revision-Date: 2021-05-30 17:40+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
@@ -250,7 +250,7 @@ msgstr ""
 "        設定已儲存        \n"
 "\n"
 
-#: src/frontend/mame/ui/selsoft.cpp:183 src/frontend/mame/ui/selgame.cpp:461
+#: src/frontend/mame/ui/selsoft.cpp:189 src/frontend/mame/ui/selgame.cpp:461
 #, c-format
 msgid ""
 "%s\n"
@@ -259,7 +259,7 @@ msgstr ""
 "%s\n"
 " 已新增至最愛清單。"
 
-#: src/frontend/mame/ui/selsoft.cpp:188 src/frontend/mame/ui/selgame.cpp:466
+#: src/frontend/mame/ui/selsoft.cpp:194 src/frontend/mame/ui/selgame.cpp:466
 #: src/frontend/mame/ui/selgame.cpp:472
 #, c-format
 msgid ""
@@ -269,27 +269,27 @@ msgstr ""
 "%s\n"
 " 已從最愛清單移除。"
 
-#: src/frontend/mame/ui/selsoft.cpp:631
+#: src/frontend/mame/ui/selsoft.cpp:640
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr "%1$s %2$s ( %3$d / %4$d 軟體套件 )"
 
-#: src/frontend/mame/ui/selsoft.cpp:632
+#: src/frontend/mame/ui/selsoft.cpp:641
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr "驅動程式： \"%1$s\" 軟體清單 "
 
-#: src/frontend/mame/ui/selsoft.cpp:637 src/frontend/mame/ui/selgame.cpp:1422
+#: src/frontend/mame/ui/selsoft.cpp:646 src/frontend/mame/ui/selgame.cpp:1422
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr "%1$s： %2$s - 搜尋： %3$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:639 src/frontend/mame/ui/selgame.cpp:1424
+#: src/frontend/mame/ui/selsoft.cpp:648 src/frontend/mame/ui/selgame.cpp:1424
 #, c-format
 msgid "Search: %1$s_"
 msgstr "搜尋： %1$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:646 src/frontend/mame/ui/selsoft.cpp:653
+#: src/frontend/mame/ui/selsoft.cpp:655 src/frontend/mame/ui/selsoft.cpp:662
 #: src/frontend/mame/ui/simpleselgame.cpp:315
 #, c-format
 msgid "%1$-.100s"
@@ -917,8 +917,8 @@ msgid ""
 "experience this machine.\n"
 msgstr ""
 "\n"
-"此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。"
-"故無法達成此機台的完成體驗。\n"
+"此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。故無法達成"
+"此機台的完成體驗。\n"
 
 #: src/frontend/mame/ui/info.cpp:315
 #, c-format
@@ -1049,11 +1049,11 @@ msgstr "[ 完整清單 ]"
 msgid "File Already Exists - Override?"
 msgstr "檔案已存在 — 是否覆蓋？"
 
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1067
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1089
 msgid "No"
 msgstr "否"
 
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1067
+#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1089
 msgid "Yes"
 msgstr "是"
 
@@ -1138,295 +1138,320 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
-msgid "ISBN"
+msgid "Installation Instructions"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
-msgid "OEM"
+msgid "ISBN"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgctxt "swlist-info"
-msgid "Original Publisher"
+msgid "OEM"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
-msgid "Part Number"
+msgid "Original Publisher"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
-msgid "PCB"
+msgid "Part Number"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
-msgid "Programmer"
+msgid "PCB"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
-msgid "Release Date"
+msgid "Programmer"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
-msgid "Serial Number"
+msgid "Release Date"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
-msgid "Usage Instructions"
+msgid "Serial Number"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
+msgid "Usage Instructions"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:78
+msgctxt "swlist-info"
 msgid "Version"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:83
+#: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
 msgid "Unfiltered"
 msgstr "未篩選"
 
-#: src/frontend/mame/ui/utils.cpp:84
+#: src/frontend/mame/ui/utils.cpp:85
 msgctxt "machine-filter"
 msgid "Available"
 msgstr "可用"
 
-#: src/frontend/mame/ui/utils.cpp:85
+#: src/frontend/mame/ui/utils.cpp:86
 msgctxt "machine-filter"
 msgid "Unavailable"
 msgstr "不可用"
 
-#: src/frontend/mame/ui/utils.cpp:86
+#: src/frontend/mame/ui/utils.cpp:87
 msgctxt "machine-filter"
 msgid "Working"
 msgstr "可以執行"
 
-#: src/frontend/mame/ui/utils.cpp:87
+#: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
 msgid "Not Working"
 msgstr "不可執行"
 
-#: src/frontend/mame/ui/utils.cpp:88
+#: src/frontend/mame/ui/utils.cpp:89
 msgctxt "machine-filter"
 msgid "Mechanical"
 msgstr "機械式"
 
-#: src/frontend/mame/ui/utils.cpp:89
+#: src/frontend/mame/ui/utils.cpp:90
 msgctxt "machine-filter"
 msgid "Not Mechanical"
 msgstr "非機械式"
 
-#: src/frontend/mame/ui/utils.cpp:90
+#: src/frontend/mame/ui/utils.cpp:91
 msgctxt "machine-filter"
 msgid "Category"
 msgstr "類別"
 
-#: src/frontend/mame/ui/utils.cpp:91
+#: src/frontend/mame/ui/utils.cpp:92
 msgctxt "machine-filter"
 msgid "Favorites"
 msgstr "最愛"
 
-#: src/frontend/mame/ui/utils.cpp:92
+#: src/frontend/mame/ui/utils.cpp:93
 msgctxt "machine-filter"
 msgid "BIOS"
 msgstr "BIOS"
 
-#: src/frontend/mame/ui/utils.cpp:93
+#: src/frontend/mame/ui/utils.cpp:94
 msgctxt "machine-filter"
 msgid "Not BIOS"
 msgstr "非 BIOS"
 
-#: src/frontend/mame/ui/utils.cpp:94
+#: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
 msgstr "母檔"
 
-#: src/frontend/mame/ui/utils.cpp:95
+#: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
 msgid "Clones"
 msgstr "仿製版"
 
-#: src/frontend/mame/ui/utils.cpp:96
+#: src/frontend/mame/ui/utils.cpp:97
 msgctxt "machine-filter"
 msgid "Manufacturer"
 msgstr "製造商"
 
-#: src/frontend/mame/ui/utils.cpp:97
+#: src/frontend/mame/ui/utils.cpp:98
 msgctxt "machine-filter"
 msgid "Year"
 msgstr "年代"
 
-#: src/frontend/mame/ui/utils.cpp:98
+#: src/frontend/mame/ui/utils.cpp:99
 msgctxt "machine-filter"
 msgid "Save Supported"
 msgstr "已支援即時存檔"
 
-#: src/frontend/mame/ui/utils.cpp:99
+#: src/frontend/mame/ui/utils.cpp:100
 msgctxt "machine-filter"
 msgid "Save Unsupported"
 msgstr "未支援即時存檔"
 
-#: src/frontend/mame/ui/utils.cpp:100
+#: src/frontend/mame/ui/utils.cpp:101
 msgctxt "machine-filter"
 msgid "CHD Required"
 msgstr "需要 CHD"
 
-#: src/frontend/mame/ui/utils.cpp:101
+#: src/frontend/mame/ui/utils.cpp:102
 msgctxt "machine-filter"
 msgid "No CHD Required"
 msgstr "不需要 CHD"
 
-#: src/frontend/mame/ui/utils.cpp:102
+#: src/frontend/mame/ui/utils.cpp:103
 msgctxt "machine-filter"
 msgid "Vertical Screen"
 msgstr "垂直螢幕"
 
-#: src/frontend/mame/ui/utils.cpp:103
+#: src/frontend/mame/ui/utils.cpp:104
 msgctxt "machine-filter"
 msgid "Horizontal Screen"
 msgstr "水平螢幕"
 
-#: src/frontend/mame/ui/utils.cpp:104
+#: src/frontend/mame/ui/utils.cpp:105
 msgctxt "machine-filter"
 msgid "Custom Filter"
 msgstr "自訂篩選"
 
-#: src/frontend/mame/ui/utils.cpp:108
+#: src/frontend/mame/ui/utils.cpp:109
 msgctxt "software-filter"
 msgid "Unfiltered"
 msgstr "未篩選"
 
-#: src/frontend/mame/ui/utils.cpp:109
+#: src/frontend/mame/ui/utils.cpp:110
 msgctxt "software-filter"
 msgid "Available"
 msgstr "可用"
 
-#: src/frontend/mame/ui/utils.cpp:110
+#: src/frontend/mame/ui/utils.cpp:111
 msgctxt "software-filter"
 msgid "Unavailable"
 msgstr "不可用"
 
-#: src/frontend/mame/ui/utils.cpp:111
+#: src/frontend/mame/ui/utils.cpp:112
 msgctxt "software-filter"
 msgid "Favorites"
 msgstr "最愛"
 
-#: src/frontend/mame/ui/utils.cpp:112
+#: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
 msgstr "母檔"
 
-#: src/frontend/mame/ui/utils.cpp:113
+#: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
 msgid "Clones"
 msgstr "仿製版"
 
-#: src/frontend/mame/ui/utils.cpp:114
+#: src/frontend/mame/ui/utils.cpp:115
 msgctxt "software-filter"
 msgid "Year"
 msgstr "年代"
 
-#: src/frontend/mame/ui/utils.cpp:115
+#: src/frontend/mame/ui/utils.cpp:116
 msgctxt "software-filter"
 msgid "Publisher"
 msgstr "出版商"
 
-#: src/frontend/mame/ui/utils.cpp:116
+#: src/frontend/mame/ui/utils.cpp:117
+msgctxt "software-filter"
+msgid "Developer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:118
+msgctxt "software-filter"
+msgid "Distributor"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:119
+msgctxt "software-filter"
+msgid "Author"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:120
+msgctxt "software-filter"
+msgid "Programmer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
 msgid "Supported"
 msgstr "已支援"
 
-#: src/frontend/mame/ui/utils.cpp:117
+#: src/frontend/mame/ui/utils.cpp:122
 msgctxt "software-filter"
 msgid "Partially Supported"
 msgstr "部分支援"
 
-#: src/frontend/mame/ui/utils.cpp:118
+#: src/frontend/mame/ui/utils.cpp:123
 msgctxt "software-filter"
 msgid "Unsupported"
 msgstr "不支援"
 
-#: src/frontend/mame/ui/utils.cpp:119
+#: src/frontend/mame/ui/utils.cpp:124
 msgctxt "software-filter"
 msgid "Release Region"
 msgstr "釋出區域"
 
-#: src/frontend/mame/ui/utils.cpp:120
+#: src/frontend/mame/ui/utils.cpp:125
 msgctxt "software-filter"
 msgid "Device Type"
 msgstr "裝置類別"
 
-#: src/frontend/mame/ui/utils.cpp:121
+#: src/frontend/mame/ui/utils.cpp:126
 msgctxt "software-filter"
 msgid "Software List"
 msgstr "軟體清單"
 
-#: src/frontend/mame/ui/utils.cpp:122
+#: src/frontend/mame/ui/utils.cpp:127
 msgctxt "software-filter"
 msgid "Custom Filter"
 msgstr "自訂篩選"
 
-#: src/frontend/mame/ui/utils.cpp:269
+#: src/frontend/mame/ui/utils.cpp:291
 msgid "<set up filters>"
 msgstr "<設定篩選>"
 
-#: src/frontend/mame/ui/utils.cpp:373
+#: src/frontend/mame/ui/utils.cpp:395
 msgid "Select custom filters:"
 msgstr "選擇自訂篩選："
 
-#: src/frontend/mame/ui/utils.cpp:524
+#: src/frontend/mame/ui/utils.cpp:546
 #, c-format
 msgid "Filter %1$u"
 msgstr "篩選 %1$u"
 
-#: src/frontend/mame/ui/utils.cpp:538
+#: src/frontend/mame/ui/utils.cpp:560
 msgid "Remove last filter"
 msgstr "移除最後篩選"
 
-#: src/frontend/mame/ui/utils.cpp:540
+#: src/frontend/mame/ui/utils.cpp:562
 msgid "Add filter"
 msgstr "新增篩選"
 
-#: src/frontend/mame/ui/utils.cpp:979
+#: src/frontend/mame/ui/utils.cpp:1001
 msgid "Select category:"
 msgstr "選擇類別："
 
-#: src/frontend/mame/ui/utils.cpp:1010
+#: src/frontend/mame/ui/utils.cpp:1032
 msgid "[no category INI files]"
 msgstr "[沒有類別 INI 檔案]"
 
-#: src/frontend/mame/ui/utils.cpp:1018
+#: src/frontend/mame/ui/utils.cpp:1040
 msgid "[no groups in INI file]"
 msgstr "[INI 檔案中無群組]"
 
-#: src/frontend/mame/ui/utils.cpp:1052
+#: src/frontend/mame/ui/utils.cpp:1074
 msgid "No category INI files found"
 msgstr "沒有找到類別 INI 檔案"
 
-#: src/frontend/mame/ui/utils.cpp:1057
+#: src/frontend/mame/ui/utils.cpp:1079
 msgid "File"
 msgstr "檔案"
 
-#: src/frontend/mame/ui/utils.cpp:1061
+#: src/frontend/mame/ui/utils.cpp:1083
 msgid "No groups found in category file"
 msgstr "類別檔案中沒有找到群組"
 
-#: src/frontend/mame/ui/utils.cpp:1066
+#: src/frontend/mame/ui/utils.cpp:1088
 msgid "Group"
 msgstr "群組"
 
-#: src/frontend/mame/ui/utils.cpp:1067
+#: src/frontend/mame/ui/utils.cpp:1089
 msgid "Include clones"
 msgstr "包含仿製版"
 
-#: src/frontend/mame/ui/datmenu.cpp:81
-msgid "Software Usage"
-msgstr "軟體用法"
+#: src/frontend/mame/ui/datmenu.cpp:81 src/frontend/mame/ui/selmenu.cpp:2658
+msgid "Software List Info"
+msgstr ""
 
 #: src/frontend/mame/ui/datmenu.cpp:365
 msgid "Revision: "
@@ -1727,8 +1752,8 @@ msgid ""
 msgstr ""
 "找不到機台，請檢查 %1$s.ini 的 ROM 目錄設定\n"
 "\n"
-"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關"
-"資訊。"
+"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關資"
+"訊。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:278
 #: src/frontend/mame/ui/selgame.cpp:603
@@ -2910,8 +2935,8 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
-"選定系統所需要的 ROM / 磁碟映像檔為缺少或不正確。"
-"請取得正確的檔案或選擇不同的系統。\n"
+"選定系統所需要的 ROM / 磁碟映像檔為缺少或不正確。請取得正確的檔案或選擇不同的"
+"系統。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
@@ -2920,8 +2945,8 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"選定軟體所需要的 ROM / 磁碟映像檔為缺少或不正確。"
-"請取得正確的檔案或選擇不同的軟體項目。\n"
+"選定軟體所需要的 ROM / 磁碟映像檔為缺少或不正確。請取得正確的檔案或選擇不同的"
+"軟體項目。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2534
@@ -2949,10 +2974,6 @@ msgstr "%1$s - %2$s\n"
 #: src/frontend/mame/ui/selmenu.cpp:2557
 msgid "Press any key to continue."
 msgstr "按任意鍵繼續。"
-
-#: src/frontend/mame/ui/selmenu.cpp:2658
-msgid "Software List Info"
-msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2693
 msgid "General Info"
@@ -3342,15 +3363,13 @@ msgstr "測試/寫入塞入值"
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
-msgstr ""
-"如果你想塞入插槽 1 的值（如你開始某事但忘了），用這個"
+msgstr "如果你想塞入插槽 1 的值（如你開始某事但忘了），用這個"
 
 #: plugins/cheatfind/init.lua:746
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
-msgstr ""
-"如果你想塞入最後的插槽值（如你開始時忘了某項但終於找到了），用這個"
+msgstr "如果你想塞入最後的插槽值（如你開始時忘了某項但終於找到了），用這個"
 
 #: plugins/cheatfind/init.lua:748
 #, lua-format
@@ -3599,6 +3618,9 @@ msgstr "MESSinfo"
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
+
+#~ msgid "Software Usage"
+#~ msgstr "軟體用法"
 
 #~ msgid "Usage"
 #~ msgstr "用法"

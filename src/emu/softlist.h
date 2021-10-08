@@ -54,10 +54,10 @@ public:
 	// construction/destruction
 	software_info_item(std::string &&name, std::string &&value);
 	software_info_item(const std::string &name, const std::string &value);
-	software_info_item(software_info_item const &) = delete;
-	software_info_item(software_info_item &&) = delete;
-	software_info_item& operator=(software_info_item const &) = delete;
-	software_info_item& operator=(software_info_item &&) = delete;
+	software_info_item(software_info_item const &) = default;
+	software_info_item(software_info_item &&) = default;
+	software_info_item& operator=(software_info_item const &) = default;
+	software_info_item& operator=(software_info_item &&) = default;
 
 	// getters
 	const std::string &name() const noexcept { return m_name; }

@@ -77,7 +77,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 	, m_issoft(true)
 
 {
-	if (swinfo != nullptr && !swinfo->info.empty())
+	if (swinfo != nullptr && !swinfo->infotext.empty())
 		m_items_list.emplace_back(_("Software List Info"), 0, "");
 	std::vector<std::string> lua_list;
 	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", std::string(m_short).append(1, ',').append(m_list).c_str(), lua_list))
@@ -417,7 +417,7 @@ void menu_dats_view::get_data_sw()
 	std::vector<int> xend;
 	std::string buffer;
 	if (m_items_list[m_actual].option == 0)
-		buffer = m_swinfo->info;
+		buffer = m_swinfo->infotext;
 	else
 		mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option - 1, buffer);
 

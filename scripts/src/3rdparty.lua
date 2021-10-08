@@ -2208,10 +2208,6 @@ project "utf8proc"
 	uuid "1f881f09-0395-4483-ac37-2935fb092187"
 	kind "StaticLib"
 
-	defines {
-		"UTF8PROC_DLLEXPORT="
-	}
-
 	configuration "Debug"
 		defines {
 			"verbose=-1",

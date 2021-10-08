@@ -858,7 +858,7 @@ void menu_select_launch::inkey_dats()
 	{
 		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
 			menu::stack_push<menu_dats_view>(ui(), container(), software->driver);
-		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->info.empty())
+		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->infotext.empty())
 			menu::stack_push<menu_dats_view>(ui(), container(), software);
 	}
 	else if (driver)
@@ -2677,7 +2677,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 
 			if (m_info_view == 0)
 			{
-				m_info_buffer = software->info;
+				m_info_buffer = software->infotext;
 			}
 			else
 			{
