@@ -644,12 +644,12 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 
 	// determine the text to render below
 	ui_software_info const *swinfo;
-	game_driver const *driver;
-	get_selection(swinfo, driver);
+	ui_system_info const *system;
+	get_selection(swinfo, system);
 
 	bool isstar = false;
 	rgb_t color = ui().colors().background_color();
-	if (swinfo && ((swinfo->startempty != 1) || !driver))
+	if (swinfo && !swinfo->startempty)
 	{
 		isstar = mame_machine_manager::instance()->favorite().is_favorite_system_software(*swinfo);
 
@@ -685,26 +685,29 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		// last line is romset name
 		tempbuf[4] = string_format(_("Software list/item: %1$s:%2$s"), swinfo->listname, swinfo->shortname);
 	}
-	else if (driver)
+	else if (system || (swinfo && swinfo->driver))
 	{
-		isstar = mame_machine_manager::instance()->favorite().is_favorite_system(*driver);
+		game_driver const &driver(system ? *system->driver : *swinfo->driver);
+		isstar = mame_machine_manager::instance()->favorite().is_favorite_system(driver);
 
-		// first line is game description/game name
-		tempbuf[0] = make_driver_description(*driver);
+		// first line is the ROM set
+		tempbuf[0] = string_format(_("Romset: %1$-.100s"), driver.name);
 
 		// next line is year, manufacturer
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver.year, driver.manufacturer);
 
 		// next line is clone/parent status
-		int cloneof = driver_list::non_bios_clone(*driver);
+		int cloneof = driver_list::non_bios_clone(driver);
 
-		if (cloneof != -1)
-			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).type.fullname());
-		else
+		if (0 > cloneof)
 			tempbuf[2] = _("Driver is parent");
+		else if (system)
+			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), system->parent);
+		else
+			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).type.fullname());
 
 		// next line is overall driver status
-		system_flags const &flags(get_system_flags(*driver));
+		system_flags const &flags(get_system_flags(driver));
 		if (flags.machine_flags() & machine_flags::NOT_WORKING)
 			tempbuf[3] = _("Overall: NOT WORKING");
 		else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
@@ -720,7 +723,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		else
 			tempbuf[4] = _("Graphics: OK, ");
 
-		if (driver->flags & machine_flags::NO_SOUND_HW)
+		if (driver.flags & machine_flags::NO_SOUND_HW)
 			tempbuf[4].append(_("Sound: None"));
 		else if (flags.unemulated_features() & device_t::feature::SOUND)
 			tempbuf[4].append(_("Sound: Unimplemented"));
@@ -833,8 +836,8 @@ void menu_select_launch::rotate_focus(int dir)
 void menu_select_launch::inkey_dats()
 {
 	ui_software_info const *software;
-	game_driver const *driver;
-	get_selection(software, driver);
+	ui_system_info const *system;
+	get_selection(software, system);
 	if (software)
 	{
 		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
@@ -842,10 +845,10 @@ void menu_select_launch::inkey_dats()
 		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->infotext.empty())
 			menu::stack_push<menu_dats_view>(ui(), container(), software);
 	}
-	else if (driver)
+	else if (system)
 	{
-		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), driver);
+		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", system->driver->name, true))
+			menu::stack_push<menu_dats_view>(ui(), container(), system->driver);
 	}
 }
 
@@ -2234,10 +2237,10 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 void menu_select_launch::arts_render(float origx1, float origy1, float origx2, float origy2)
 {
 	ui_software_info const *software;
-	game_driver const *driver;
-	get_selection(software, driver);
+	ui_system_info const *system;
+	get_selection(software, system);
 
-	if (software && (!software->startempty || !driver))
+	if (software && (!software->startempty || !system))
 	{
 		m_cache.set_snapx_driver(nullptr);
 
@@ -2276,23 +2279,23 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		// if the image is available, loaded and valid, display it
 		draw_snapx(origx1, origy1, origx2, origy2);
 	}
-	else if (driver)
+	else if (system)
 	{
 		m_cache.set_snapx_software(nullptr);
 
 		if (m_default_image)
-			m_image_view = ((driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
+			m_image_view = ((system->driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
 
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (!m_cache.snapx_driver_is(driver) || !snapx_valid() || m_switch_image)
+		if (!m_cache.snapx_driver_is(system->driver) || !snapx_valid() || m_switch_image)
 		{
 			emu_file snapfile(searchstr, OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
-			load_driver_image(tmp_bitmap, snapfile, *driver);
+			load_driver_image(tmp_bitmap, snapfile, *system->driver);
 
-			m_cache.set_snapx_driver(driver);
+			m_cache.set_snapx_driver(system->driver);
 			m_switch_image = false;
 			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
@@ -2622,11 +2625,11 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	std::vector<int> xend;
 	const char *first = "";
 	ui_software_info const *software;
-	game_driver const *driver;
+	ui_system_info const *system;
 	int total;
-	get_selection(software, driver);
+	get_selection(software, system);
 
-	if (software && (!software->startempty || !driver))
+	if (software && (!software->startempty || !system))
 	{
 		m_info_driver = nullptr;
 		first = N_("Software List Info");
@@ -2661,31 +2664,33 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		}
 		total = ui_globals::cur_sw_dats_total;
 	}
-	else if (driver)
+	else if (system)
 	{
 		m_info_software = nullptr;
 		first = N_("General Info");
 
-		if (driver != m_info_driver || ui_globals::curdats_view != m_info_view)
+		if (system->driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{
 			m_info_buffer.clear();
-			if (driver == m_info_driver)
+			if (system->driver == m_info_driver)
 			{
 				m_info_view = ui_globals::curdats_view;
 			}
 			else
 			{
-				m_info_driver = driver;
+				m_info_driver = system->driver;
 				m_info_view = 0;
 				ui_globals::curdats_view = 0;
 
 				m_items_list.clear();
-				mame_machine_manager::instance()->lua()->call_plugin("data_list", driver->name, m_items_list);
+				mame_machine_manager::instance()->lua()->call_plugin("data_list", system->driver->name, m_items_list);
 				ui_globals::curdats_total = m_items_list.size() + 1;
 			}
 
 			if (m_info_view == 0)
-				general_info(driver, m_info_buffer);
+			{
+				general_info(*system, m_info_buffer);
+			}
 			else
 			{
 				m_info_buffer = "";

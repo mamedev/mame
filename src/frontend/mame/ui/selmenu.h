@@ -23,7 +23,9 @@
 #include <vector>
 
 
+struct ui_system_info;
 struct ui_software_info;
+
 
 namespace ui {
 
@@ -244,10 +246,10 @@ private:
 
 	// draw infos
 	void infos_render(float x1, float y1, float x2, float y2);
-	virtual void general_info(const game_driver *driver, std::string &buffer) = 0;
+	virtual void general_info(ui_system_info const &system, std::string &buffer) = 0;
 
 	// get selected software and/or driver
-	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
+	virtual void get_selection(ui_software_info const *&software, ui_system_info const *&system) const = 0;
 	virtual bool accept_search() const { return true; }
 	void select_prev()
 	{
@@ -300,7 +302,6 @@ private:
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
-	virtual std::string make_driver_description(game_driver const &driver) const = 0;
 	virtual std::string make_software_description(ui_software_info const &software) const = 0;
 
 	// filter navigation

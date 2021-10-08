@@ -359,8 +359,23 @@ private:
 //-------------------------------------------------
 
 menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, game_driver const &driver)
+	: menu_select_software(mui, container, driver.type.fullname(), driver)
+{
+}
+
+menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, ui_system_info const &system)
+	: menu_select_software(mui, container, system.description.c_str(), *system.driver)
+{
+}
+
+menu_select_software::menu_select_software(
+		mame_ui_manager &mui,
+		render_container &container,
+		char const *description,
+		game_driver const &driver)
 	: menu_select_launch(mui, container, true)
 	, m_icon_paths()
+	, m_description(description)
 	, m_driver(driver)
 	, m_displaylist()
 {
@@ -690,10 +705,10 @@ render_texture *menu_select_software::get_icon_texture(int linenum, void *select
 //  get selected software and/or driver
 //-------------------------------------------------
 
-void menu_select_software::get_selection(ui_software_info const *&software, game_driver const *&driver) const
+void menu_select_software::get_selection(ui_software_info const *&software, ui_system_info const *&system) const
 {
 	software = reinterpret_cast<ui_software_info const *>(get_selection_ptr());
-	driver = software ? software->driver : nullptr;
+	system = nullptr;
 }
 
 
@@ -702,7 +717,7 @@ void menu_select_software::make_topbox_text(std::string &line0, std::string &lin
 	// determine the text for the header
 	int vis_item = !m_search.empty() ? m_available_items : (m_data->has_empty_start() ? m_available_items - 1 : m_available_items);
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_data->swinfo().size() - 1);
-	line1 = string_format(_("Driver: \"%1$s\" software list "), m_driver.type.fullname());
+	line1 = string_format(_("Driver: \"%1$s\" software list "), m_description);
 
 	software_filter const *const it(m_data->current_filter());
 	char const *const filter(it ? it->filter_text() : nullptr);
@@ -710,13 +725,6 @@ void menu_select_software::make_topbox_text(std::string &line0, std::string &lin
 		line2 = string_format(_("%1$s: %2$s - Search: %3$s_"), it->display_name(), filter, m_search);
 	else
 		line2 = string_format(_("Search: %1$s_"), m_search);
-}
-
-
-std::string menu_select_software::make_driver_description(game_driver const &driver) const
-{
-	// first line is game description
-	return string_format(_("%1$-.100s"), driver.type.fullname());
 }
 
 

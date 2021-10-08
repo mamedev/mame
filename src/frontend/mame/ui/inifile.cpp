@@ -219,48 +219,48 @@ favorite_manager::favorite_manager(ui_options &options)
 	if (!file.open(FAVORITE_FILENAME))
 	{
 		char readbuf[1024];
-		file.gets(readbuf, 1024);
+		file.gets(readbuf, std::size(readbuf));
 
 		while (readbuf[0] == '[')
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 
-		while (file.gets(readbuf, 1024))
+		while (file.gets(readbuf, std::size(readbuf)))
 		{
 			ui_software_info tmpmatches;
 			tmpmatches.shortname = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.longname = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.parentname = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.year = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.publisher = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.supported = software_support(atoi(readbuf));
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.part = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			chartrimcarriage(readbuf);
 			auto dx = driver_list::find(readbuf);
 			if (0 > dx)
 				continue;
 			tmpmatches.driver = &driver_list::driver(dx);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.listname = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.interface = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.instance = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.startempty = atoi(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.parentlongname = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			//tmpmatches.usage = chartrimcarriage(readbuf); TODO: recover multi-line info
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.devicetype = chartrimcarriage(readbuf);
-			file.gets(readbuf, 1024);
+			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.available = atoi(readbuf);
 			m_favorites.emplace(std::move(tmpmatches));
 		}

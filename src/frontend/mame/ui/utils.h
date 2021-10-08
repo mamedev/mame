@@ -39,9 +39,14 @@ struct ui_system_info
 	int index;
 	bool available = false;
 
+	std::string description;
+	std::string parent;
+
 	std::u32string ucs_shortname;
 	std::u32string ucs_description;
 	std::u32string ucs_manufacturer_description;
+	std::u32string ucs_default_description;
+	std::u32string ucs_manufacturer_default_description;
 };
 
 struct ui_software_info

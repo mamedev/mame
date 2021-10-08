@@ -21,6 +21,9 @@
 #include <vector>
 
 
+struct ui_system_info;
+
+
 namespace ui {
 
 class menu_network_devices : public menu
@@ -130,6 +133,12 @@ public:
 	menu_machine_configure(
 			mame_ui_manager &mui,
 			render_container &container,
+			ui_system_info const &info,
+			std::function<void (bool, bool)> &&handler = nullptr,
+			float x0 = 0.0f, float y0 = 0.0f);
+	menu_machine_configure(
+			mame_ui_manager &mui,
+			render_container &container,
 			game_driver const &drv,
 			std::function<void (bool, bool)> &&handler = nullptr,
 			float x0 = 0.0f, float y0 = 0.0f);
@@ -153,12 +162,21 @@ private:
 		LAST = ADVANCED
 	};
 
+	menu_machine_configure(
+			mame_ui_manager &mui,
+			render_container &container,
+			char const *description,
+			game_driver const &drv,
+			std::function<void (bool, bool)> &&handler,
+			float x0, float y0);
+
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	void setup_bios();
 
 	std::function<void (bool, bool)> const m_handler;
+	char const *const m_description;
 	game_driver const &m_drv;
 	emu_options m_opts;
 	float const m_x0;
