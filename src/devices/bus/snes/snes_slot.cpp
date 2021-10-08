@@ -188,6 +188,30 @@ uint8_t device_sns_cart_interface::read_open_bus()
 	return 0xff;
 }
 
+//-------------------------------------------------
+//  scanlines_r - get motherboard scanline count
+//-------------------------------------------------
+
+int device_sns_cart_interface::scanlines_r()
+{
+	if (m_slot != nullptr)
+		return m_slot->scanlines_r();
+
+	return 0xff;
+}
+
+//-------------------------------------------------
+//  address_r - get address pin from S-CPU
+//-------------------------------------------------
+
+offs_t device_sns_cart_interface::address_r()
+{
+	if (m_slot != nullptr)
+		return m_slot->address_r();
+
+	return 0xff;
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
