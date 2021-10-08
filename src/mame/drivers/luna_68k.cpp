@@ -34,6 +34,7 @@
 #include "machine/mc146818.h"
 #include "machine/z80sio.h"
 #include "machine/am9513.h"
+#include "machine/clock.h"
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
@@ -56,6 +57,7 @@ public:
 		, m_sio(*this, "sio")
 		, m_stc(*this, "stc")
 		, m_serial(*this, "serial%u", 0U)
+		, m_eprom(*this, "eprom")
 	{
 	}
 
@@ -75,13 +77,6 @@ protected:
 	void common(machine_config &config);
 
 private:
-	// HACK: this timer drives the am9513 gate1 line
-	void timer(void *ptr, s32 param)
-	{
-		m_stc->gate1_w(1);
-		m_stc->gate1_w(0);
-	}
-
 	// devices
 	required_device<m68030_device> m_cpu;
 	required_device<ram_device> m_ram;
@@ -90,28 +85,25 @@ private:
 	required_device<am9513_device> m_stc;
 	required_device_array<rs232_port_device, 2> m_serial;
 
-	emu_timer *m_timer;
+	required_region_ptr<u32> m_eprom;
 };
 
 void luna_68k_state::init()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(luna_68k_state::timer), this));
 }
 
 void luna_68k_state::machine_start()
 {
-	// HACK: arbitrary/unknown cycle time
-	m_timer->adjust(attotime::from_hz(1'000'000), 0, attotime::from_hz(1'000'000));
 }
 
 void luna_68k_state::machine_reset()
 {
+	// mirror eprom at reset
+	m_cpu->space(AS_PROGRAM).install_rom(0, m_eprom.bytes() - 1, m_eprom);
 }
 
 void luna_68k_state::cpu_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).rom().region("eprom", 0);
-
 	map(0x40000000, 0x4001ffff).rom().region("eprom", 0);
 
 	map(0x50000000, 0x50000007).rw(m_sio, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask32(0xff00ff00);
@@ -133,6 +125,11 @@ void luna_68k_state::cpu_autovector_map(address_map &map)
 	map(0xffffffff, 0xffffffff).lr8(NAME([]() { return m68000_base_device::autovector(7); }));
 }
 
+static DEVICE_INPUT_DEFAULTS_START(terminal)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_19200)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_19200)
+DEVICE_INPUT_DEFAULTS_END
+
 void luna_68k_state::luna(machine_config &config)
 {
 	M68030(config, m_cpu, 50_MHz_XTAL / 2);
@@ -145,10 +142,11 @@ void luna_68k_state::luna(machine_config &config)
 
 	DS1287(config, m_rtc, 32'768);
 
-	UPD7201(config, m_sio, 9'830'000 / 2); // D9.83B0
+	UPD7201(config, m_sio, 9'830'000); // D9.83B0
 
 	// TODO: one of these is for console, other is keyboard
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	m_serial[0]->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 	m_sio->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
@@ -162,11 +160,15 @@ void luna_68k_state::luna(machine_config &config)
 	m_serial[1]->rxd_handler().set(m_sio, FUNC(upd7201_device::rxb_w));
 	m_serial[1]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsb_w));
 
-	AM9513(config, m_stc, 9'830'000 / 2); // FIXME: clock? sources?
+	AM9513(config, m_stc, 9'830'000); // FIXME: clock? sources?
 	m_stc->out4_cb().set(m_sio, FUNC(upd7201_device::rxca_w));
 	m_stc->out4_cb().append(m_sio, FUNC(upd7201_device::txca_w));
 	m_stc->out5_cb().set(m_sio, FUNC(upd7201_device::rxcb_w));
 	m_stc->out5_cb().append(m_sio, FUNC(upd7201_device::txcb_w));
+
+	// HACK: arbitrary input clock for am9513 gate1
+	clock_device &stc_clock(CLOCK(config, "stc_clock", 1'000'000));
+	stc_clock.signal_handler().set(m_stc, FUNC(am9513_device::gate1_w));
 }
 
 ROM_START(luna)
