@@ -43,30 +43,10 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container
 	: menu(mui, container)
 	, m_handler(std::move(handler))
 	, m_currlang(0)
+	, m_currsysnames(0)
 {
-	// load languages
-	file_enumerator path(mui.machine().options().language_path());
-	const char *const lang = mui.machine().options().language();
-	const osd::directory::entry *dirent;
-	std::string name;
-	while ((dirent = path.next()))
-	{
-		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
-		{
-			name = dirent->name;
-			auto i = strreplace(name, "_", " (");
-			if (i > 0)
-				name.append(")");
-			m_lang.emplace_back(std::move(name));
-		}
-	}
-	std::sort(
-			m_lang.begin(),
-			m_lang.end(),
-			[] (const std::string &x, const std::string &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
-	const auto found = std::lower_bound(m_lang.begin(), m_lang.end(), lang, [] (std::string const &x, const char *y) { return 0 > core_stricmp(x.c_str(), y); });
-	if ((m_lang.end() != found) && !core_stricmp(found->c_str(), lang))
-		m_currlang = std::distance(m_lang.begin(), found);
+	find_languages();
+	find_sysnames();
 }
 
 //-------------------------------------------------
@@ -76,11 +56,12 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container
 menu_custom_ui::~menu_custom_ui()
 {
 	ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
-	if (!m_lang.empty())
-	{
-		machine().options().set_value(OPTION_LANGUAGE, m_lang[m_currlang], OPTION_PRIORITY_CMDLINE);
-		load_translation(machine().options());
-	}
+
+	machine().options().set_value(OPTION_LANGUAGE, m_currlang ? m_languages[m_currlang] : "", OPTION_PRIORITY_CMDLINE);
+	load_translation(machine().options());
+
+	ui().options().set_value(OPTION_SYSTEM_NAMES, m_currsysnames ? m_sysnames[m_currsysnames] : "", OPTION_PRIORITY_CMDLINE);
+
 	ui_globals::reset = true;
 
 	if (m_handler)
@@ -96,7 +77,7 @@ void menu_custom_ui::handle()
 	bool changed = false;
 
 	// process the menu
-	const event *menu_event = process(0);
+	const event *menu_event = process(PROCESS_LR_REPEAT);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
@@ -140,16 +121,40 @@ void menu_custom_ui::handle()
 			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 			{
 				changed = true;
-				(menu_event->iptkey == IPT_UI_RIGHT) ? m_currlang++ : m_currlang--;
+				if (menu_event->iptkey == IPT_UI_LEFT)
+					m_currlang = (m_currlang ? m_currlang : m_languages.size())- 1;
+				else if (++m_currlang >= m_languages.size())
+					m_currlang = 0;
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
 				// copying list of language names - expensive
 				menu::stack_push<menu_selector>(
-						ui(), container(), std::vector<std::string>(m_lang), m_currlang,
+						ui(), container(), std::vector<std::string>(m_languages), m_currlang,
 						[this] (int selection)
 						{
 							m_currlang = selection;
+							reset(reset_options::REMEMBER_REF);
+						});
+			}
+			break;
+		case SYSNAMES_MENU:
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+			{
+				changed = true;
+				if (menu_event->iptkey == IPT_UI_LEFT)
+					m_currsysnames = (m_currsysnames ? m_currsysnames : m_sysnames.size())- 1;
+				else if (++m_currsysnames >= m_sysnames.size())
+					m_currsysnames = 0;
+			}
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+			{
+				// copying list of file names - expensive
+				menu::stack_push<menu_selector>(
+						ui(), container(), std::vector<std::string>(m_sysnames), m_currsysnames,
+						[this] (int selection)
+						{
+							m_currsysnames = selection;
 							reset(reset_options::REMEMBER_REF);
 						});
 			}
@@ -171,11 +176,11 @@ void menu_custom_ui::populate(float &customtop, float &custombottom)
 	item_append(_("Fonts"), 0, (void *)(uintptr_t)FONT_MENU);
 	item_append(_("Colors"), 0, (void *)(uintptr_t)COLORS_MENU);
 
-	if (!m_lang.empty())
-	{
-		arrow_flags = get_arrow_flags<std::uint16_t>(0, m_lang.size() - 1, m_currlang);
-		item_append(_("Language"), m_lang[m_currlang], arrow_flags, (void *)(uintptr_t)LANGUAGE_MENU);
-	}
+	arrow_flags = get_arrow_flags<std::size_t>(0, m_languages.size() - 1, m_currlang);
+	item_append(_("Language"), m_languages[m_currlang], arrow_flags, (void *)(uintptr_t)LANGUAGE_MENU);
+
+	arrow_flags = get_arrow_flags<std::size_t>(0, m_sysnames.size() - 1, m_currsysnames);
+	item_append(_("System Names"), m_sysnames[m_currsysnames], arrow_flags, (void *)(uintptr_t)SYSNAMES_MENU);
 
 	arrow_flags = get_arrow_flags<uint16_t>(0, HIDE_BOTH, ui_globals::panels_status);
 	item_append(_("Show side panels"), _(HIDE_STATUS[ui_globals::panels_status]), arrow_flags, (void *)(uintptr_t)HIDE_MENU);
@@ -190,13 +195,101 @@ void menu_custom_ui::populate(float &customtop, float &custombottom)
 
 void menu_custom_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Custom UI Settings") };
+	char const *const text[] = { _("UI Customization Settings") };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
+
+//-------------------------------------------------
+//  find UI translation files
+//-------------------------------------------------
+
+void menu_custom_ui::find_languages()
+{
+	m_languages.emplace_back(_("[built-in]"));
+
+	file_enumerator path(machine().options().language_path());
+	osd::directory::entry const *dirent;
+	std::string name;
+	while ((dirent = path.next()))
+	{
+		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
+		{
+			name = dirent->name;
+			auto i = strreplace(name, "_", " (");
+			if (i > 0)
+				name.append(")");
+			m_languages.emplace_back(std::move(name));
+		}
+	}
+	std::sort(
+			std::next(m_languages.begin()),
+			m_languages.end(),
+			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
+
+	char const *const lang = machine().options().language();
+	if (*lang)
+	{
+		auto const found = std::lower_bound(
+				std::next(m_languages.begin()),
+				m_languages.end(),
+				lang,
+				[] (std::string const &x, char const *y) { return 0 > core_stricmp(x.c_str(), y); });
+		if ((m_languages.end() != found) && !core_stricmp(found->c_str(), lang))
+			m_currlang = std::distance(m_languages.begin(), found);
+	}
+	else
+	{
+		m_currlang = 0;
+	}
+}
+
+//-------------------------------------------------
+//  find translated system names
+//-------------------------------------------------
+
+void menu_custom_ui::find_sysnames()
+{
+	m_sysnames.emplace_back(_("[built-in]"));
+
+	path_iterator search(ui().options().history_path());
+	std::string path;
+	while (search.next(path))
+	{
+		file_enumerator dir(path);
+		osd::directory::entry const *dirent;
+		while ((dirent = dir.next()))
+		{
+			if (dirent->type == osd::directory::entry::entry_type::FILE && core_filename_ends_with(dirent->name, ".lst"))
+				m_sysnames.emplace_back(dirent->name);
+		}
+	}
+	std::sort(
+			m_sysnames.begin(),
+			m_sysnames.end(),
+			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
+
+	char const *const names = ui().options().system_names();
+	if (*names)
+	{
+		auto const found = std::lower_bound(
+				std::next(m_sysnames.begin()),
+				m_sysnames.end(),
+				names,
+				[] (std::string const &x, char const *y) { return 0 > core_stricmp(x.c_str(), y); });
+		m_currsysnames = std::distance(m_sysnames.begin(), found);
+		if ((m_sysnames.end() == found) || core_stricmp(found->c_str(), names))
+			m_sysnames.emplace(found, names);
+	}
+	else
+	{
+		m_currsysnames = 0;
+	}
+}
+
 
 //-------------------------------------------------
 //  ctor
