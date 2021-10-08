@@ -139,7 +139,6 @@ private:
 	u8 m_iram_write_snes, m_iram_write_sa1;
 	// $2230-$2231
 	u8 m_dma_ctrl, m_dma_ccparam;
-	bool m_dma_cconv_end;
 	u8 m_dma_cconv_size;
 	u8 m_dma_cconv_bits;
 	// DMA Control (DCNT)

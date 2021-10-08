@@ -387,21 +387,19 @@ void sns_sa1_device::dma_transfer()
 				break;
 		}
 
-		switch (DCNT_DD())
+		if (DCNT_DD())  // BWRAM
 		{
-			case false:  // IRAM
-				if (bus_conflict_iram() && (cycle < 3)) // wait 2 cycle if conflict
-					cycle = 3;
-				write_iram(dma_dst, data);
-				break;
-
-			case true:  // BWRAM
-				if (bus_conflict_bwram() && (cycle < 4)) // wait 3 cycle if conflict
-					cycle = 4;
-				else if (cycle < 2)
-					cycle = 2;
-				write_bwram(dma_dst & 0xfffff, data);
-				break;
+			if (bus_conflict_bwram() && (cycle < 4)) // wait 3 cycle if conflict
+				cycle = 4;
+			else if (cycle < 2)
+				cycle = 2;
+			write_bwram(dma_dst & 0xfffff, data);
+		}
+		else  // IRAM
+		{
+			if (bus_conflict_iram() && (cycle < 3)) // wait 2 cycle if conflict
+				cycle = 3;
+			write_iram(dma_dst, data);
 		}
 		m_sa1->adjust_icount(-cycle); // progress
 	}
