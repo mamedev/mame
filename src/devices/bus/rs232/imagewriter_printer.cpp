@@ -296,12 +296,13 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_CONFSETTING(0x1, "1")
 	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, dcd_changed, 0)
 
-
+/*
 	PORT_START("WIDTH")
 	PORT_CONFNAME(0x1, 0x01, "Printer Width")
 	PORT_CONFSETTING(0x0, "15 Inches")
 	PORT_CONFSETTING(0x1, "8 Inches")
 	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, paper_width_changed, 0)
+*/
 
 	PORT_START("DARKPIXEL")
 	PORT_CONFNAME(0x7, 0x00, "Print Darkness")
@@ -400,8 +401,11 @@ INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::dcd_changed)
 	output_dcd(ioportsaferead("DCD"));
 }
 
+
+/*
+
 //-------------------------------------------------
-//    Input Changed Member Reset Switch
+//    Input Changed Member Paper Width Changed
 //-------------------------------------------------
 
 
@@ -411,7 +415,7 @@ INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::paper_width_changed)
 	PAPER_WIDTH = PAPER_WIDTH_INCHES * dpi * xscale;
 	m_right_edge = (PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1;
 }
-
+*/
 
 //-------------------------------------------------
 //    Input Changed Member Paper Width
@@ -443,7 +447,8 @@ INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::select_sw)
 
 uint8_t apple_imagewriter_printer_device::maincpu_in_sid_func()
 {
-	return ioportsaferead("WIDTH");
+	return (PAPER_WIDTH_INCHES == 15.0) ? 0 : 1;  // for imagewriter15, will be 0, regular imagewriter will be 1
+//	return ioportsaferead("WIDTH");
 }
 
 //-------------------------------------------------
