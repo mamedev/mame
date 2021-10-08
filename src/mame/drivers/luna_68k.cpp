@@ -22,7 +22,6 @@
  *  DPU8  video/framebuffer, Bt458 @ 108MHz
  *  CMC   communications (GPIB, Ethernet, serial), 68020 @ 12.5MHz?
  *
- * gets stuck at 0x40003880 when testing the am5913 status, expects output 3 active
  */
 #include "emu.h"
 
@@ -35,7 +34,6 @@
 #include "machine/mc146818.h"
 #include "machine/z80sio.h"
 #include "machine/am9513.h"
-#include "machine/timer.h"
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
@@ -77,6 +75,13 @@ protected:
 	void common(machine_config &config);
 
 private:
+	// HACK: this timer drives the am9513 gate1 line
+	void timer(void *ptr, s32 param)
+	{
+		m_stc->gate1_w(1);
+		m_stc->gate1_w(0);
+	}
+
 	// devices
 	required_device<m68030_device> m_cpu;
 	required_device<ram_device> m_ram;
@@ -84,14 +89,19 @@ private:
 	required_device<upd7201_device> m_sio;
 	required_device<am9513_device> m_stc;
 	required_device_array<rs232_port_device, 2> m_serial;
+
+	emu_timer *m_timer;
 };
 
 void luna_68k_state::init()
 {
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(luna_68k_state::timer), this));
 }
 
 void luna_68k_state::machine_start()
 {
+	// HACK: arbitrary/unknown cycle time
+	m_timer->adjust(attotime::from_hz(1'000'000), 0, attotime::from_hz(1'000'000));
 }
 
 void luna_68k_state::machine_reset()
