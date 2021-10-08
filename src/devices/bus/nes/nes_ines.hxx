@@ -466,9 +466,9 @@ static const nes_mmc mmc_list[] =
 	// 428 a couple multicarts
 	// 429 Unused
 	// 430 Unused
-	// 431 Realtec GN-91B
+	{ 431, BMC_GN91B },
 	// 432 Realtec 8090
-	// 433 NC-20MB 20 in 1 (CA-006)
+	{ 433, BMC_NC20MB },
 	// 434 S-009
 	{ 435, NTDEC_2746 },
 	// 436...442 Unused
