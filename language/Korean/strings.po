@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 09:04+1100\n"
+"POT-Creation-Date: 2021-10-08 16:57+1100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -1051,11 +1051,11 @@ msgstr "[호환 목록]"
 msgid "File Already Exists - Override?"
 msgstr "그 파일이 이미 있습니다. 덮어쓰겠습니까?"
 
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1067
 msgid "No"
 msgstr "아니오"
 
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1067
 msgid "Yes"
 msgstr "예"
 
@@ -1113,241 +1113,316 @@ msgstr "활성"
 msgid "Disabled"
 msgstr "비활성"
 
-#: src/frontend/mame/ui/utils.cpp:61
+#: src/frontend/mame/ui/utils.cpp:63
+msgctxt "swlist-info"
+msgid "Alternate Title"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:64
+msgctxt "swlist-info"
+msgid "Author"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:65
+msgctxt "swlist-info"
+msgid "Barcode Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:66
+msgctxt "swlist-info"
+msgid "Developer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:67
+msgctxt "swlist-info"
+msgid "Distributor"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:68
+msgctxt "swlist-info"
+msgid "ISBN"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:69
+msgctxt "swlist-info"
+msgid "OEM"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:70
+msgctxt "swlist-info"
+msgid "Original Publisher"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:71
+msgctxt "swlist-info"
+msgid "Part Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:72
+msgctxt "swlist-info"
+msgid "PCB"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:73
+msgctxt "swlist-info"
+msgid "Programmer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:74
+msgctxt "swlist-info"
+msgid "Release Date"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:75
+msgctxt "swlist-info"
+msgid "Serial Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:76
+msgctxt "swlist-info"
+msgid "Usage Instructions"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:77
+msgctxt "swlist-info"
+msgid "Version"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:83
 msgctxt "machine-filter"
 msgid "Unfiltered"
 msgstr "필터 미사용"
 
-#: src/frontend/mame/ui/utils.cpp:62
+#: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
 msgid "Available"
 msgstr "사용 가능"
 
-#: src/frontend/mame/ui/utils.cpp:63
+#: src/frontend/mame/ui/utils.cpp:85
 msgctxt "machine-filter"
 msgid "Unavailable"
 msgstr "사용 불가"
 
-#: src/frontend/mame/ui/utils.cpp:64
+#: src/frontend/mame/ui/utils.cpp:86
 msgctxt "machine-filter"
 msgid "Working"
 msgstr "작동함"
 
-#: src/frontend/mame/ui/utils.cpp:65
+#: src/frontend/mame/ui/utils.cpp:87
 msgctxt "machine-filter"
 msgid "Not Working"
 msgstr "작동 불가"
 
-#: src/frontend/mame/ui/utils.cpp:66
+#: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
 msgid "Mechanical"
 msgstr "기계적"
 
-#: src/frontend/mame/ui/utils.cpp:67
+#: src/frontend/mame/ui/utils.cpp:89
 msgctxt "machine-filter"
 msgid "Not Mechanical"
 msgstr "비기계적"
 
-#: src/frontend/mame/ui/utils.cpp:68
+#: src/frontend/mame/ui/utils.cpp:90
 msgctxt "machine-filter"
 msgid "Category"
 msgstr "분류"
 
-#: src/frontend/mame/ui/utils.cpp:69
+#: src/frontend/mame/ui/utils.cpp:91
 msgctxt "machine-filter"
 msgid "Favorites"
 msgstr "즐겨찾기"
 
-#: src/frontend/mame/ui/utils.cpp:70
+#: src/frontend/mame/ui/utils.cpp:92
 msgctxt "machine-filter"
 msgid "BIOS"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:71
+#: src/frontend/mame/ui/utils.cpp:93
 msgctxt "machine-filter"
 msgid "Not BIOS"
 msgstr "바이오스 아님"
 
-#: src/frontend/mame/ui/utils.cpp:72
+#: src/frontend/mame/ui/utils.cpp:94
 msgctxt "machine-filter"
 msgid "Parents"
 msgstr "원형"
 
-#: src/frontend/mame/ui/utils.cpp:73
+#: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Clones"
 msgstr "복제"
 
-#: src/frontend/mame/ui/utils.cpp:74
+#: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
 msgid "Manufacturer"
 msgstr "제조사"
 
-#: src/frontend/mame/ui/utils.cpp:75
+#: src/frontend/mame/ui/utils.cpp:97
 msgctxt "machine-filter"
 msgid "Year"
 msgstr "연도"
 
-#: src/frontend/mame/ui/utils.cpp:76
+#: src/frontend/mame/ui/utils.cpp:98
 msgctxt "machine-filter"
 msgid "Save Supported"
 msgstr "저장 지원"
 
-#: src/frontend/mame/ui/utils.cpp:77
+#: src/frontend/mame/ui/utils.cpp:99
 msgctxt "machine-filter"
 msgid "Save Unsupported"
 msgstr "저장 지원 안 됨"
 
-#: src/frontend/mame/ui/utils.cpp:78
+#: src/frontend/mame/ui/utils.cpp:100
 msgctxt "machine-filter"
 msgid "CHD Required"
 msgstr "CHD 필요"
 
-#: src/frontend/mame/ui/utils.cpp:79
+#: src/frontend/mame/ui/utils.cpp:101
 msgctxt "machine-filter"
 msgid "No CHD Required"
 msgstr "CHD 필요없음"
 
-#: src/frontend/mame/ui/utils.cpp:80
+#: src/frontend/mame/ui/utils.cpp:102
 msgctxt "machine-filter"
 msgid "Vertical Screen"
 msgstr "세로 화면"
 
-#: src/frontend/mame/ui/utils.cpp:81
+#: src/frontend/mame/ui/utils.cpp:103
 msgctxt "machine-filter"
 msgid "Horizontal Screen"
 msgstr "가로 화면"
 
-#: src/frontend/mame/ui/utils.cpp:82
+#: src/frontend/mame/ui/utils.cpp:104
 msgctxt "machine-filter"
 msgid "Custom Filter"
 msgstr "사용자 제작 필터"
 
-#: src/frontend/mame/ui/utils.cpp:85
+#: src/frontend/mame/ui/utils.cpp:108
 msgctxt "software-filter"
 msgid "Unfiltered"
 msgstr "필터 미사용"
 
-#: src/frontend/mame/ui/utils.cpp:86
+#: src/frontend/mame/ui/utils.cpp:109
 msgctxt "software-filter"
 msgid "Available"
 msgstr "사용 가능"
 
-#: src/frontend/mame/ui/utils.cpp:87
+#: src/frontend/mame/ui/utils.cpp:110
 msgctxt "software-filter"
 msgid "Unavailable"
 msgstr "사용 불가"
 
-#: src/frontend/mame/ui/utils.cpp:88
+#: src/frontend/mame/ui/utils.cpp:111
 msgctxt "software-filter"
 msgid "Favorites"
 msgstr "즐겨찾기"
 
-#: src/frontend/mame/ui/utils.cpp:89
+#: src/frontend/mame/ui/utils.cpp:112
 msgctxt "software-filter"
 msgid "Parents"
 msgstr "원형"
 
-#: src/frontend/mame/ui/utils.cpp:90
+#: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Clones"
 msgstr "복제"
 
-#: src/frontend/mame/ui/utils.cpp:91
+#: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
 msgid "Year"
 msgstr "연도"
 
-#: src/frontend/mame/ui/utils.cpp:92
+#: src/frontend/mame/ui/utils.cpp:115
 msgctxt "software-filter"
 msgid "Publisher"
 msgstr "배급사"
 
-#: src/frontend/mame/ui/utils.cpp:93
+#: src/frontend/mame/ui/utils.cpp:116
 msgctxt "software-filter"
 msgid "Supported"
 msgstr "지원됨"
 
-#: src/frontend/mame/ui/utils.cpp:94
+#: src/frontend/mame/ui/utils.cpp:117
 msgctxt "software-filter"
 msgid "Partially Supported"
 msgstr "부분적으로 지원됨"
 
-#: src/frontend/mame/ui/utils.cpp:95
+#: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Unsupported"
 msgstr "지원 안 됨"
 
-#: src/frontend/mame/ui/utils.cpp:96
+#: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Release Region"
 msgstr "발매 지역"
 
-#: src/frontend/mame/ui/utils.cpp:97
+#: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Device Type"
 msgstr "장치 종류"
 
-#: src/frontend/mame/ui/utils.cpp:98
+#: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
 msgid "Software List"
 msgstr "소프트웨어 목록"
 
-#: src/frontend/mame/ui/utils.cpp:99
+#: src/frontend/mame/ui/utils.cpp:122
 msgctxt "software-filter"
 msgid "Custom Filter"
 msgstr "사용자 제작 필터"
 
-#: src/frontend/mame/ui/utils.cpp:246
+#: src/frontend/mame/ui/utils.cpp:269
 msgid "<set up filters>"
 msgstr "<필터 결정>"
 
-#: src/frontend/mame/ui/utils.cpp:350
+#: src/frontend/mame/ui/utils.cpp:373
 msgid "Select custom filters:"
 msgstr "사용자 제작 필터 선택:"
 
-#: src/frontend/mame/ui/utils.cpp:501
+#: src/frontend/mame/ui/utils.cpp:524
 #, c-format
 msgid "Filter %1$u"
 msgstr "필터 %1$u"
 
-#: src/frontend/mame/ui/utils.cpp:515
+#: src/frontend/mame/ui/utils.cpp:538
 msgid "Remove last filter"
 msgstr "가장 최근의 필터 삭제"
 
-#: src/frontend/mame/ui/utils.cpp:517
+#: src/frontend/mame/ui/utils.cpp:540
 msgid "Add filter"
 msgstr "필터 추가"
 
-#: src/frontend/mame/ui/utils.cpp:956
+#: src/frontend/mame/ui/utils.cpp:979
 msgid "Select category:"
 msgstr "분류 선택"
 
-#: src/frontend/mame/ui/utils.cpp:987
+#: src/frontend/mame/ui/utils.cpp:1010
 msgid "[no category INI files]"
 msgstr "[카테고리 INI 파일 없음]"
 
-#: src/frontend/mame/ui/utils.cpp:995
+#: src/frontend/mame/ui/utils.cpp:1018
 msgid "[no groups in INI file]"
 msgstr "[INI 파일에 그룹 없음]"
 
-#: src/frontend/mame/ui/utils.cpp:1029
+#: src/frontend/mame/ui/utils.cpp:1052
 msgid "No category INI files found"
 msgstr "카테고리 INI 파일을 찾을 수 없습니다"
 
-#: src/frontend/mame/ui/utils.cpp:1034
+#: src/frontend/mame/ui/utils.cpp:1057
 msgid "File"
 msgstr "파일"
 
-#: src/frontend/mame/ui/utils.cpp:1038
+#: src/frontend/mame/ui/utils.cpp:1061
 msgid "No groups found in category file"
 msgstr "카테고리 파일 내에 그룹이 없습니다"
 
-#: src/frontend/mame/ui/utils.cpp:1043
+#: src/frontend/mame/ui/utils.cpp:1066
 msgid "Group"
 msgstr "그룹"
 
-#: src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/utils.cpp:1067
 msgid "Include clones"
 msgstr "복제판 포함"
 
@@ -2873,8 +2948,8 @@ msgid "Press any key to continue."
 msgstr "아무 키를 누르면 진행합니다."
 
 #: src/frontend/mame/ui/selmenu.cpp:2658
-msgid "Usage"
-msgstr "사용"
+msgid "Software List Info"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2693
 msgid "General Info"
@@ -3519,6 +3594,9 @@ msgstr "MESSinfo"
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
+
+#~ msgid "Usage"
+#~ msgstr "사용"
 
 #~ msgctxt "path-option"
 #~ msgid "UI"

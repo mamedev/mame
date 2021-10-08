@@ -28,27 +28,27 @@ constexpr machine_flags::type MACHINE_WARNINGS  = machine_flags::NO_COCKTAIL | m
 constexpr machine_flags::type MACHINE_BTANB     = machine_flags::NO_SOUND_HW | machine_flags::IS_INCOMPLETE;
 
 constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
-		{ device_t::feature::PROTECTION,    __p("emulation-feature",    "protection")           },
-		{ device_t::feature::TIMING,        __p("emulation-feature",    "timing")               },
-		{ device_t::feature::GRAPHICS,      __p("emulation-feature",    "graphics")             },
-		{ device_t::feature::PALETTE,       __p("emulation-feature",    "color palette")        },
-		{ device_t::feature::SOUND,         __p("emulation-feature",    "sound")                },
-		{ device_t::feature::CAPTURE,       __p("emulation-feature",    "capture hardware")     },
-		{ device_t::feature::CAMERA,        __p("emulation-feature",    "camera")               },
-		{ device_t::feature::MICROPHONE,    __p("emulation-feature",    "microphone")           },
-		{ device_t::feature::CONTROLS,      __p("emulation-feature",    "controls")             },
-		{ device_t::feature::KEYBOARD,      __p("emulation-feature",    "keyboard")             },
-		{ device_t::feature::MOUSE,         __p("emulation-feature",    "mouse")                },
-		{ device_t::feature::MEDIA,         __p("emulation-feature",    "media")                },
-		{ device_t::feature::DISK,          __p("emulation-feature",    "disk")                 },
-		{ device_t::feature::PRINTER,       __p("emulation-feature",    "printer")              },
-		{ device_t::feature::TAPE,          __p("emulation-feature",    "magnetic tape")        },
-		{ device_t::feature::PUNCH,         __p("emulation-feature",    "punch tape")           },
-		{ device_t::feature::DRUM,          __p("emulation-feature",    "magnetic drum")        },
-		{ device_t::feature::ROM,           __p("emulation-feature",    "solid state storage")  },
-		{ device_t::feature::COMMS,         __p("emulation-feature",    "communications")       },
-		{ device_t::feature::LAN,           __p("emulation-feature",    "LAN")                  },
-		{ device_t::feature::WAN,           __p("emulation-feature",    "WAN")                  } };
+		{ device_t::feature::PROTECTION,    N_p("emulation-feature",    "protection")           },
+		{ device_t::feature::TIMING,        N_p("emulation-feature",    "timing")               },
+		{ device_t::feature::GRAPHICS,      N_p("emulation-feature",    "graphics")             },
+		{ device_t::feature::PALETTE,       N_p("emulation-feature",    "color palette")        },
+		{ device_t::feature::SOUND,         N_p("emulation-feature",    "sound")                },
+		{ device_t::feature::CAPTURE,       N_p("emulation-feature",    "capture hardware")     },
+		{ device_t::feature::CAMERA,        N_p("emulation-feature",    "camera")               },
+		{ device_t::feature::MICROPHONE,    N_p("emulation-feature",    "microphone")           },
+		{ device_t::feature::CONTROLS,      N_p("emulation-feature",    "controls")             },
+		{ device_t::feature::KEYBOARD,      N_p("emulation-feature",    "keyboard")             },
+		{ device_t::feature::MOUSE,         N_p("emulation-feature",    "mouse")                },
+		{ device_t::feature::MEDIA,         N_p("emulation-feature",    "media")                },
+		{ device_t::feature::DISK,          N_p("emulation-feature",    "disk")                 },
+		{ device_t::feature::PRINTER,       N_p("emulation-feature",    "printer")              },
+		{ device_t::feature::TAPE,          N_p("emulation-feature",    "magnetic tape")        },
+		{ device_t::feature::PUNCH,         N_p("emulation-feature",    "punch tape")           },
+		{ device_t::feature::DRUM,          N_p("emulation-feature",    "magnetic drum")        },
+		{ device_t::feature::ROM,           N_p("emulation-feature",    "solid state storage")  },
+		{ device_t::feature::COMMS,         N_p("emulation-feature",    "communications")       },
+		{ device_t::feature::LAN,           N_p("emulation-feature",    "LAN")                  },
+		{ device_t::feature::WAN,           N_p("emulation-feature",    "WAN")                  } };
 
 } // anonymous namespace
 

@@ -44,10 +44,12 @@ menu_select_software::search_item::search_item(ui_software_info const &s)
 
 void menu_select_software::search_item::set_penalty(std::u32string const &search)
 {
-	// TODO: search alternate title as well
 	penalty = util::edit_distance(search, ucs_shortname);
 	if (penalty)
 		penalty = (std::min)(penalty, util::edit_distance(search, ucs_longname));
+	auto it(software.get().alttitles.begin());
+	while (penalty && (software.get().alttitles.end() != it))
+		penalty = (std::min)(penalty, util::edit_distance(search, *it++));
 }
 
 

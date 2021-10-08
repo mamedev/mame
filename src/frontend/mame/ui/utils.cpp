@@ -30,6 +30,7 @@
 #include <cstring>
 #include <iterator>
 #include <unordered_set>
+#include <utility>
 
 
 namespace ui {
@@ -57,46 +58,68 @@ constexpr char const *SOFTWARE_REGIONS[] = {
 		"tha", "tpe", "tw",
 		"uk", "ukr", "usa" };
 
-constexpr char const *MACHINE_FILTER_NAMES[machine_filter::COUNT] = {
-		__p("machine-filter", "Unfiltered"),
-		__p("machine-filter", "Available"),
-		__p("machine-filter", "Unavailable"),
-		__p("machine-filter", "Working"),
-		__p("machine-filter", "Not Working"),
-		__p("machine-filter", "Mechanical"),
-		__p("machine-filter", "Not Mechanical"),
-		__p("machine-filter", "Category"),
-		__p("machine-filter", "Favorites"),
-		__p("machine-filter", "BIOS"),
-		__p("machine-filter", "Not BIOS"),
-		__p("machine-filter", "Parents"),
-		__p("machine-filter", "Clones"),
-		__p("machine-filter", "Manufacturer"),
-		__p("machine-filter", "Year"),
-		__p("machine-filter", "Save Supported"),
-		__p("machine-filter", "Save Unsupported"),
-		__p("machine-filter", "CHD Required"),
-		__p("machine-filter", "No CHD Required"),
-		__p("machine-filter", "Vertical Screen"),
-		__p("machine-filter", "Horizontal Screen"),
-		__p("machine-filter", "Custom Filter") };
+// must be sorted in std::string comparison order
+constexpr std::pair<char const *, char const *> SOFTWARE_INFO_NAMES[] = {
+		{ "alt_title",          N_p("swlist-info", "Alternate Title")    },
+		{ "author",             N_p("swlist-info", "Author")             },
+		{ "barcode",            N_p("swlist-info", "Barcode Number")     },
+		{ "developer",          N_p("swlist-info", "Developer")          },
+		{ "distributor",        N_p("swlist-info", "Distributor")        },
+		{ "isbn",               N_p("swlist-info", "ISBN")               },
+		{ "oem",                N_p("swlist-info", "OEM")                },
+		{ "original_publisher", N_p("swlist-info", "Original Publisher") },
+		{ "partno",             N_p("swlist-info", "Part Number")        },
+		{ "pcb",                N_p("swlist-info", "PCB")                },
+		{ "programmer",         N_p("swlist-info", "Programmer")         },
+		{ "release",            N_p("swlist-info", "Release Date")       },
+		{ "serial",             N_p("swlist-info", "Serial Number")      },
+		{ "usage",              N_p("swlist-info", "Usage Instructions") },
+		{ "version",            N_p("swlist-info", "Version")            } };
 
+
+
+// must be in sync with the machine_filter::type enum
+constexpr char const *MACHINE_FILTER_NAMES[machine_filter::COUNT] = {
+		N_p("machine-filter", "Unfiltered"),
+		N_p("machine-filter", "Available"),
+		N_p("machine-filter", "Unavailable"),
+		N_p("machine-filter", "Working"),
+		N_p("machine-filter", "Not Working"),
+		N_p("machine-filter", "Mechanical"),
+		N_p("machine-filter", "Not Mechanical"),
+		N_p("machine-filter", "Category"),
+		N_p("machine-filter", "Favorites"),
+		N_p("machine-filter", "BIOS"),
+		N_p("machine-filter", "Not BIOS"),
+		N_p("machine-filter", "Parents"),
+		N_p("machine-filter", "Clones"),
+		N_p("machine-filter", "Manufacturer"),
+		N_p("machine-filter", "Year"),
+		N_p("machine-filter", "Save Supported"),
+		N_p("machine-filter", "Save Unsupported"),
+		N_p("machine-filter", "CHD Required"),
+		N_p("machine-filter", "No CHD Required"),
+		N_p("machine-filter", "Vertical Screen"),
+		N_p("machine-filter", "Horizontal Screen"),
+		N_p("machine-filter", "Custom Filter") };
+
+// must be in sync with the software_filter::type enum
 constexpr char const *SOFTWARE_FILTER_NAMES[software_filter::COUNT] = {
-		__p("software-filter", "Unfiltered"),
-		__p("software-filter", "Available"),
-		__p("software-filter", "Unavailable"),
-		__p("software-filter", "Favorites"),
-		__p("software-filter", "Parents"),
-		__p("software-filter", "Clones"),
-		__p("software-filter", "Year"),
-		__p("software-filter", "Publisher"),
-		__p("software-filter", "Supported"),
-		__p("software-filter", "Partially Supported"),
-		__p("software-filter", "Unsupported"),
-		__p("software-filter", "Release Region"),
-		__p("software-filter", "Device Type"),
-		__p("software-filter", "Software List"),
-		__p("software-filter", "Custom Filter") };
+		N_p("software-filter", "Unfiltered"),
+		N_p("software-filter", "Available"),
+		N_p("software-filter", "Unavailable"),
+		N_p("software-filter", "Favorites"),
+		N_p("software-filter", "Parents"),
+		N_p("software-filter", "Clones"),
+		N_p("software-filter", "Year"),
+		N_p("software-filter", "Publisher"),
+		N_p("software-filter", "Supported"),
+		N_p("software-filter", "Partially Supported"),
+		N_p("software-filter", "Unsupported"),
+		N_p("software-filter", "Release Region"),
+		N_p("software-filter", "Device Type"),
+		N_p("software-filter", "Software List"),
+		N_p("software-filter", "Custom Filter") };
 
 
 
@@ -1866,31 +1889,49 @@ std::vector<std::string> tokenize(const std::string &text, char sep)
 
 
 ui_software_info::ui_software_info(
-		software_info const &info,
+		software_info const &sw,
 		software_part const &p,
 		game_driver const &d,
 		std::string const &li,
 		std::string const &is,
 		std::string const &de)
-	: shortname(info.shortname()), longname(info.longname()), parentname(info.parentname())
-	, year(info.year()), publisher(info.publisher())
-	, supported(info.supported())
+	: shortname(sw.shortname()), longname(sw.longname()), parentname(sw.parentname())
+	, year(sw.year()), publisher(sw.publisher())
+	, supported(sw.supported())
 	, part(p.name())
 	, driver(&d)
 	, listname(li), interface(p.interface()), instance(is)
 	, startempty(0)
 	, parentlongname()
-	, usage()
+	, info()
 	, devicetype(de)
+	, alttitles()
 	, available(false)
 {
-	for (software_info_item const &feature : info.info())
+	bool firstinfo(true);
+	for (software_info_item const &feature : sw.info())
 	{
-		if (feature.name() == "usage")
-		{
-			usage = feature.value();
-			break;
-		}
+		// add info for the internal UI, localising recognised
+		if (!firstinfo)
+			info.append(1, '\n');
+		firstinfo = false;
+		auto const found = std::lower_bound(
+				std::begin(ui::SOFTWARE_INFO_NAMES),
+				std::end(ui::SOFTWARE_INFO_NAMES),
+				feature.name().c_str(),
+				[] (std::pair<char const *, char const *> const &a, char const *b)
+				{
+					return 0 > std::strcmp(a.first, b);
+				});
+		if ((std::end(ui::SOFTWARE_INFO_NAMES) != found) && (feature.name() == found->first))
+			info.append(_("swlist-info", found->second));
+		else
+			info.append(feature.name());
+		info.append(1, '\n').append(feature.value()).append(1, '\n');
+
+		// pre-process alternate titles for searching
+		if (feature.name() == "alt_title")
+			alttitles.push_back(ustr_from_utf8(normalize_unicode(feature.value(), unicode_normalization_form::D, true)));
 	}
 }
 

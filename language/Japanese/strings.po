@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 09:04+1100\n"
+"POT-Creation-Date: 2021-10-08 16:57+1100\n"
 "PO-Revision-Date: 2016-02-23 01:39+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -1051,11 +1051,11 @@ msgstr "【互換リスト】"
 msgid "File Already Exists - Override?"
 msgstr "ファイルが存在します－上書きしますか？"
 
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1067
 msgid "No"
 msgstr "いいえ"
 
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1067
 msgid "Yes"
 msgstr "はい"
 
@@ -1113,241 +1113,316 @@ msgstr "有効"
 msgid "Disabled"
 msgstr "無効"
 
-#: src/frontend/mame/ui/utils.cpp:61
+#: src/frontend/mame/ui/utils.cpp:63
+msgctxt "swlist-info"
+msgid "Alternate Title"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:64
+msgctxt "swlist-info"
+msgid "Author"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:65
+msgctxt "swlist-info"
+msgid "Barcode Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:66
+msgctxt "swlist-info"
+msgid "Developer"
+msgstr "開発元"
+
+#: src/frontend/mame/ui/utils.cpp:67
+msgctxt "swlist-info"
+msgid "Distributor"
+msgstr "発売元"
+
+#: src/frontend/mame/ui/utils.cpp:68
+msgctxt "swlist-info"
+msgid "ISBN"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:69
+msgctxt "swlist-info"
+msgid "OEM"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:70
+msgctxt "swlist-info"
+msgid "Original Publisher"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:71
+msgctxt "swlist-info"
+msgid "Part Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:72
+msgctxt "swlist-info"
+msgid "PCB"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:73
+msgctxt "swlist-info"
+msgid "Programmer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:74
+msgctxt "swlist-info"
+msgid "Release Date"
+msgstr "発売日"
+
+#: src/frontend/mame/ui/utils.cpp:75
+msgctxt "swlist-info"
+msgid "Serial Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:76
+msgctxt "swlist-info"
+msgid "Usage Instructions"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:77
+msgctxt "swlist-info"
+msgid "Version"
+msgstr "バージョン"
+
+#: src/frontend/mame/ui/utils.cpp:83
 msgctxt "machine-filter"
 msgid "Unfiltered"
 msgstr "フィルタ無し"
 
-#: src/frontend/mame/ui/utils.cpp:62
+#: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
 msgid "Available"
 msgstr "存在する"
 
-#: src/frontend/mame/ui/utils.cpp:63
+#: src/frontend/mame/ui/utils.cpp:85
 msgctxt "machine-filter"
 msgid "Unavailable"
 msgstr "存在しない"
 
-#: src/frontend/mame/ui/utils.cpp:64
+#: src/frontend/mame/ui/utils.cpp:86
 msgctxt "machine-filter"
 msgid "Working"
 msgstr "動作可"
 
-#: src/frontend/mame/ui/utils.cpp:65
+#: src/frontend/mame/ui/utils.cpp:87
 msgctxt "machine-filter"
 msgid "Not Working"
 msgstr "動作不可"
 
-#: src/frontend/mame/ui/utils.cpp:66
+#: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
 msgid "Mechanical"
 msgstr "機械仕掛け"
 
-#: src/frontend/mame/ui/utils.cpp:67
+#: src/frontend/mame/ui/utils.cpp:89
 msgctxt "machine-filter"
 msgid "Not Mechanical"
 msgstr "機械仕掛け以外"
 
-#: src/frontend/mame/ui/utils.cpp:68
+#: src/frontend/mame/ui/utils.cpp:90
 msgctxt "machine-filter"
 msgid "Category"
 msgstr "カテゴリ"
 
-#: src/frontend/mame/ui/utils.cpp:69
+#: src/frontend/mame/ui/utils.cpp:91
 msgctxt "machine-filter"
 msgid "Favorites"
 msgstr "お気に入り"
 
-#: src/frontend/mame/ui/utils.cpp:70
+#: src/frontend/mame/ui/utils.cpp:92
 msgctxt "machine-filter"
 msgid "BIOS"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:71
+#: src/frontend/mame/ui/utils.cpp:93
 msgctxt "machine-filter"
 msgid "Not BIOS"
 msgstr "BIOS以外"
 
-#: src/frontend/mame/ui/utils.cpp:72
+#: src/frontend/mame/ui/utils.cpp:94
 msgctxt "machine-filter"
 msgid "Parents"
 msgstr "親セット"
 
-#: src/frontend/mame/ui/utils.cpp:73
+#: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Clones"
 msgstr "クローン"
 
-#: src/frontend/mame/ui/utils.cpp:74
+#: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
 msgid "Manufacturer"
 msgstr "製造元"
 
-#: src/frontend/mame/ui/utils.cpp:75
+#: src/frontend/mame/ui/utils.cpp:97
 msgctxt "machine-filter"
 msgid "Year"
 msgstr "年度"
 
-#: src/frontend/mame/ui/utils.cpp:76
+#: src/frontend/mame/ui/utils.cpp:98
 msgctxt "machine-filter"
 msgid "Save Supported"
 msgstr "セーブ対応"
 
-#: src/frontend/mame/ui/utils.cpp:77
+#: src/frontend/mame/ui/utils.cpp:99
 msgctxt "machine-filter"
 msgid "Save Unsupported"
 msgstr "セーブ非対応"
 
-#: src/frontend/mame/ui/utils.cpp:78
+#: src/frontend/mame/ui/utils.cpp:100
 msgctxt "machine-filter"
 msgid "CHD Required"
 msgstr "CHDが必要"
 
-#: src/frontend/mame/ui/utils.cpp:79
+#: src/frontend/mame/ui/utils.cpp:101
 msgctxt "machine-filter"
 msgid "No CHD Required"
 msgstr "CHDが不要"
 
-#: src/frontend/mame/ui/utils.cpp:80
+#: src/frontend/mame/ui/utils.cpp:102
 msgctxt "machine-filter"
 msgid "Vertical Screen"
 msgstr "縦画面"
 
-#: src/frontend/mame/ui/utils.cpp:81
+#: src/frontend/mame/ui/utils.cpp:103
 msgctxt "machine-filter"
 msgid "Horizontal Screen"
 msgstr "横画面"
 
-#: src/frontend/mame/ui/utils.cpp:82
+#: src/frontend/mame/ui/utils.cpp:104
 msgctxt "machine-filter"
 msgid "Custom Filter"
 msgstr "カスタムフィルタ"
 
-#: src/frontend/mame/ui/utils.cpp:85
+#: src/frontend/mame/ui/utils.cpp:108
 msgctxt "software-filter"
 msgid "Unfiltered"
 msgstr "フィルタ無し"
 
-#: src/frontend/mame/ui/utils.cpp:86
+#: src/frontend/mame/ui/utils.cpp:109
 msgctxt "software-filter"
 msgid "Available"
 msgstr "存在する"
 
-#: src/frontend/mame/ui/utils.cpp:87
+#: src/frontend/mame/ui/utils.cpp:110
 msgctxt "software-filter"
 msgid "Unavailable"
 msgstr "存在しない"
 
-#: src/frontend/mame/ui/utils.cpp:88
+#: src/frontend/mame/ui/utils.cpp:111
 msgctxt "software-filter"
 msgid "Favorites"
 msgstr "お気に入り"
 
-#: src/frontend/mame/ui/utils.cpp:89
+#: src/frontend/mame/ui/utils.cpp:112
 msgctxt "software-filter"
 msgid "Parents"
 msgstr "親セット"
 
-#: src/frontend/mame/ui/utils.cpp:90
+#: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Clones"
 msgstr "クローン"
 
-#: src/frontend/mame/ui/utils.cpp:91
+#: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
 msgid "Year"
 msgstr "年度"
 
-#: src/frontend/mame/ui/utils.cpp:92
+#: src/frontend/mame/ui/utils.cpp:115
 msgctxt "software-filter"
 msgid "Publisher"
 msgstr "発売元"
 
-#: src/frontend/mame/ui/utils.cpp:93
+#: src/frontend/mame/ui/utils.cpp:116
 msgctxt "software-filter"
 msgid "Supported"
 msgstr "対応"
 
-#: src/frontend/mame/ui/utils.cpp:94
+#: src/frontend/mame/ui/utils.cpp:117
 msgctxt "software-filter"
 msgid "Partially Supported"
 msgstr "一部対応"
 
-#: src/frontend/mame/ui/utils.cpp:95
+#: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Unsupported"
 msgstr "非対応"
 
-#: src/frontend/mame/ui/utils.cpp:96
+#: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Release Region"
 msgstr "リリース地域"
 
-#: src/frontend/mame/ui/utils.cpp:97
+#: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Device Type"
 msgstr "デバイスタイプ"
 
-#: src/frontend/mame/ui/utils.cpp:98
+#: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
 msgid "Software List"
 msgstr "ソフトウェアリスト"
 
-#: src/frontend/mame/ui/utils.cpp:99
+#: src/frontend/mame/ui/utils.cpp:122
 msgctxt "software-filter"
 msgid "Custom Filter"
 msgstr "カスタムフィルタ"
 
-#: src/frontend/mame/ui/utils.cpp:246
+#: src/frontend/mame/ui/utils.cpp:269
 msgid "<set up filters>"
 msgstr "〔フィルタを設定する〕"
 
-#: src/frontend/mame/ui/utils.cpp:350
+#: src/frontend/mame/ui/utils.cpp:373
 msgid "Select custom filters:"
 msgstr "カスタムフィルタ選択:"
 
-#: src/frontend/mame/ui/utils.cpp:501
+#: src/frontend/mame/ui/utils.cpp:524
 #, c-format
 msgid "Filter %1$u"
 msgstr "フィルタ%1$u"
 
-#: src/frontend/mame/ui/utils.cpp:515
+#: src/frontend/mame/ui/utils.cpp:538
 msgid "Remove last filter"
 msgstr "最後のフィルタを削除"
 
-#: src/frontend/mame/ui/utils.cpp:517
+#: src/frontend/mame/ui/utils.cpp:540
 msgid "Add filter"
 msgstr "フィルタを追加"
 
-#: src/frontend/mame/ui/utils.cpp:956
+#: src/frontend/mame/ui/utils.cpp:979
 msgid "Select category:"
 msgstr "カテゴリを選択："
 
-#: src/frontend/mame/ui/utils.cpp:987
+#: src/frontend/mame/ui/utils.cpp:1010
 msgid "[no category INI files]"
 msgstr "［カテゴリINIファイルがありません］"
 
-#: src/frontend/mame/ui/utils.cpp:995
+#: src/frontend/mame/ui/utils.cpp:1018
 msgid "[no groups in INI file]"
 msgstr "［INIファイルにグループが見つかりません］"
 
-#: src/frontend/mame/ui/utils.cpp:1029
+#: src/frontend/mame/ui/utils.cpp:1052
 msgid "No category INI files found"
 msgstr "カテゴリINIファイルがありません"
 
-#: src/frontend/mame/ui/utils.cpp:1034
+#: src/frontend/mame/ui/utils.cpp:1057
 msgid "File"
 msgstr "ファイル"
 
-#: src/frontend/mame/ui/utils.cpp:1038
+#: src/frontend/mame/ui/utils.cpp:1061
 msgid "No groups found in category file"
 msgstr "カテゴリファイルにグループが見つかりません"
 
-#: src/frontend/mame/ui/utils.cpp:1043
+#: src/frontend/mame/ui/utils.cpp:1066
 msgid "Group"
 msgstr "グループ"
 
-#: src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/utils.cpp:1067
 msgid "Include clones"
 msgstr "クローンを含める"
 
@@ -2874,8 +2949,8 @@ msgid "Press any key to continue."
 msgstr "進めるには、何かキーを押してください。"
 
 #: src/frontend/mame/ui/selmenu.cpp:2658
-msgid "Usage"
-msgstr "使い方"
+msgid "Software List Info"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2693
 msgid "General Info"
@@ -3520,6 +3595,9 @@ msgstr "MESSinfoファイル"
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
 msgstr "MAMEinfoファイル"
+
+#~ msgid "Usage"
+#~ msgstr "使い方"
 
 #~ msgctxt "path-option"
 #~ msgid "UI"

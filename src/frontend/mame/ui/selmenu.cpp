@@ -73,29 +73,29 @@ enum
 
 std::pair<char const *, char const *> const arts_info[] =
 {
-	{ __p("selmenu-artwork", "Snapshots"),       OPTION_SNAPSHOT_DIRECTORY },
-	{ __p("selmenu-artwork", "Cabinet"),         OPTION_CABINETS_PATH },
-	{ __p("selmenu-artwork", "Control Panel"),   OPTION_CPANELS_PATH },
-	{ __p("selmenu-artwork", "PCB"),             OPTION_PCBS_PATH },
-	{ __p("selmenu-artwork", "Flyer"),           OPTION_FLYERS_PATH },
-	{ __p("selmenu-artwork", "Title Screen"),    OPTION_TITLES_PATH },
-	{ __p("selmenu-artwork", "Ending"),          OPTION_ENDS_PATH },
-	{ __p("selmenu-artwork", "Artwork Preview"), OPTION_ARTPREV_PATH },
-	{ __p("selmenu-artwork", "Bosses"),          OPTION_BOSSES_PATH },
-	{ __p("selmenu-artwork", "Logo"),            OPTION_LOGOS_PATH },
-	{ __p("selmenu-artwork", "Versus"),          OPTION_VERSUS_PATH },
-	{ __p("selmenu-artwork", "Game Over"),       OPTION_GAMEOVER_PATH },
-	{ __p("selmenu-artwork", "HowTo"),           OPTION_HOWTO_PATH },
-	{ __p("selmenu-artwork", "Scores"),          OPTION_SCORES_PATH },
-	{ __p("selmenu-artwork", "Select"),          OPTION_SELECT_PATH },
-	{ __p("selmenu-artwork", "Marquee"),         OPTION_MARQUEES_PATH },
-	{ __p("selmenu-artwork", "Covers"),          OPTION_COVER_PATH },
+	{ N_p("selmenu-artwork", "Snapshots"),       OPTION_SNAPSHOT_DIRECTORY },
+	{ N_p("selmenu-artwork", "Cabinet"),         OPTION_CABINETS_PATH },
+	{ N_p("selmenu-artwork", "Control Panel"),   OPTION_CPANELS_PATH },
+	{ N_p("selmenu-artwork", "PCB"),             OPTION_PCBS_PATH },
+	{ N_p("selmenu-artwork", "Flyer"),           OPTION_FLYERS_PATH },
+	{ N_p("selmenu-artwork", "Title Screen"),    OPTION_TITLES_PATH },
+	{ N_p("selmenu-artwork", "Ending"),          OPTION_ENDS_PATH },
+	{ N_p("selmenu-artwork", "Artwork Preview"), OPTION_ARTPREV_PATH },
+	{ N_p("selmenu-artwork", "Bosses"),          OPTION_BOSSES_PATH },
+	{ N_p("selmenu-artwork", "Logo"),            OPTION_LOGOS_PATH },
+	{ N_p("selmenu-artwork", "Versus"),          OPTION_VERSUS_PATH },
+	{ N_p("selmenu-artwork", "Game Over"),       OPTION_GAMEOVER_PATH },
+	{ N_p("selmenu-artwork", "HowTo"),           OPTION_HOWTO_PATH },
+	{ N_p("selmenu-artwork", "Scores"),          OPTION_SCORES_PATH },
+	{ N_p("selmenu-artwork", "Select"),          OPTION_SELECT_PATH },
+	{ N_p("selmenu-artwork", "Marquee"),         OPTION_MARQUEES_PATH },
+	{ N_p("selmenu-artwork", "Covers"),          OPTION_COVER_PATH },
 };
 
 char const *const hover_msg[] = {
-	__("Add or remove favorites"),
-	__("Export displayed list to file"),
-	__("Show DATs view"),
+	N_("Add or remove favorites"),
+	N_("Export displayed list to file"),
+	N_("Show DATs view"),
 };
 
 
@@ -858,7 +858,7 @@ void menu_select_launch::inkey_dats()
 	{
 		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
 			menu::stack_push<menu_dats_view>(ui(), container(), software->driver);
-		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->usage.empty())
+		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->info.empty())
 			menu::stack_push<menu_dats_view>(ui(), container(), software);
 	}
 	else if (driver)
@@ -2655,7 +2655,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	if (software && (!software->startempty || !driver))
 	{
 		m_info_driver = nullptr;
-		first = __("Usage");
+		first = N_("Software List Info");
 
 		if ((m_info_software != software) || (m_info_view != ui_globals::cur_sw_dats_view))
 		{
@@ -2677,7 +2677,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 
 			if (m_info_view == 0)
 			{
-				m_info_buffer = software->usage;
+				m_info_buffer = software->info;
 			}
 			else
 			{
@@ -2690,7 +2690,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	else if (driver)
 	{
 		m_info_software = nullptr;
-		first = __("General Info");
+		first = N_("General Info");
 
 		if (driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{

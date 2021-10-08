@@ -575,7 +575,7 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 void softlist_parser::parse_main_end(const char *tagname)
 {
 	if (strcmp(tagname, "notes") == 0)
-		m_notes = m_data_accum;
+		m_notes = std::move(m_data_accum);
 }
 
 
@@ -874,19 +874,19 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 	// <description>
 	if (strcmp(tagname, "description") == 0)
-		m_current_info->m_longname = m_data_accum;
+		m_current_info->m_longname = std::move(m_data_accum);
 
 	// <year>
 	else if (strcmp(tagname, "year") == 0)
-		m_current_info->m_year = m_data_accum;
+		m_current_info->m_year = std::move(m_data_accum);
 
 	// <publisher>
 	else if (strcmp(tagname, "publisher") == 0)
-		m_current_info->m_publisher = m_data_accum;
+		m_current_info->m_publisher = std::move(m_data_accum);
 
 	// <notes>
 	else if (strcmp(tagname, "notes") == 0)
-		m_current_info->m_notes = m_data_accum;
+		m_current_info->m_notes = std::move(m_data_accum);
 
 	// </part>
 	else if (strcmp(tagname, "part") == 0)

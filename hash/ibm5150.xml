@@ -2707,7 +2707,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<year>1989</year>
 		<publisher>Kyodia Software Marketing</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="Origin Publisher" value="日本ファルコム (Nihon Falcom)" />
+		<info name="original_publisher" value="日本ファルコム (Nihon Falcom)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697170">
 				<rom name="ancient land of ys.td0" size="697170" crc="2ce1c65b" sha1="3e24853872cf98e10983c51ff51159dc7a61e063"/>
@@ -6092,7 +6092,7 @@ has been replaced with an all-zero block. -->
 		<description>MS-DOS (Version 5.00, 5.25", RTM)</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
-		<info name="OEM" value="Mecer" />
+		<info name="oem" value="Mecer" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="disk 1.img" size="368640" crc="de9e3bf6" sha1="b78aaced6bf262a5aa7af6d328caaf8370539c7c"/>
@@ -6186,7 +6186,7 @@ has been replaced with an all-zero block. -->
 		<description>MS-DOS (Version 5.00, 5.25", Upgrade, RTM)</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
-		<info name="OEM" value="Mecer" />
+		<info name="oem" value="Mecer" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="disk 1 (upgrade).img" size="368640" crc="01a3d9a2" sha1="083400723e475ed497b276c9d4f2799eff3b88b8"/>
@@ -6223,7 +6223,7 @@ has been replaced with an all-zero block. -->
 		<description>MS-DOS (Version 5.00, Mecer OEM)</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
-		<info name="OEM" value="Mecer" />
+		<info name="oem" value="Mecer" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="disk_serial" value="0044238" />
 			<dataarea name="flop" size="737280">

@@ -270,7 +270,7 @@ X-1414 : Streetracer
 		<description>3-D Genesis (Prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
-		<info name="programmers" value="Jerry Lawson, Dan Mcelroy" />
+		<info name="programmer" value="Jerry Lawson, Dan Mcelroy" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />

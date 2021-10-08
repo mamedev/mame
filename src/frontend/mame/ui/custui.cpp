@@ -30,10 +30,10 @@
 namespace ui {
 
 const char *const menu_custom_ui::HIDE_STATUS[] = {
-		__("Show All"),
-		__("Hide Filters"),
-		__("Hide Info/Image"),
-		__("Hide Both") };
+		N_("Show All"),
+		N_("Hide Filters"),
+		N_("Hide Info/Image"),
+		N_("Hide Both") };
 
 //-------------------------------------------------
 //  ctor
@@ -931,16 +931,16 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 }
 
 std::pair<const char *, const char *> const menu_palette_sel::s_palette[] = {
-	{ __p("color-preset", "White"),  "FFFFFFFF" },
-	{ __p("color-preset", "Silver"), "FFC0C0C0" },
-	{ __p("color-preset", "Gray"),   "FF808080" },
-	{ __p("color-preset", "Black"),  "FF000000" },
-	{ __p("color-preset", "Red"),    "FFFF0000" },
-	{ __p("color-preset", "Orange"), "FFFFA500" },
-	{ __p("color-preset", "Yellow"), "FFFFFF00" },
-	{ __p("color-preset", "Green"),  "FF00FF00" },
-	{ __p("color-preset", "Blue"),   "FF0000FF" },
-	{ __p("color-preset", "Violet"), "FF8F00FF" }
+	{ N_p("color-preset", "White"),  "FFFFFFFF" },
+	{ N_p("color-preset", "Silver"), "FFC0C0C0" },
+	{ N_p("color-preset", "Gray"),   "FF808080" },
+	{ N_p("color-preset", "Black"),  "FF000000" },
+	{ N_p("color-preset", "Red"),    "FFFF0000" },
+	{ N_p("color-preset", "Orange"), "FFFFA500" },
+	{ N_p("color-preset", "Yellow"), "FFFFFF00" },
+	{ N_p("color-preset", "Green"),  "FF00FF00" },
+	{ N_p("color-preset", "Blue"),   "FF0000FF" },
+	{ N_p("color-preset", "Violet"), "FF8F00FF" }
 };
 
 //-------------------------------------------------

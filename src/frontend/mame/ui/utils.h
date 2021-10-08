@@ -49,7 +49,7 @@ struct ui_software_info
 
 	// info for software list item
 	ui_software_info(
-			software_info const &info,
+			software_info const &sw,
 			software_part const &p,
 			game_driver const &d,
 			std::string const &li,
@@ -67,12 +67,12 @@ struct ui_software_info
 
 	bool operator==(ui_software_info const &r) const
 	{
-		// compares all fields except available
+		// compares all fields except alttitles (included in info) and available (environmental)
 		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
 			   && year == r.year && publisher == r.publisher && supported == r.supported
 			   && part == r.part && driver == r.driver && listname == r.listname
 			   && interface == r.interface && instance == r.instance && startempty == r.startempty
-			   && parentlongname == r.parentlongname && usage == r.usage && devicetype == r.devicetype;
+			   && parentlongname == r.parentlongname && info == r.info && devicetype == r.devicetype;
 	}
 
 	std::string shortname;
@@ -88,8 +88,9 @@ struct ui_software_info
 	std::string instance;
 	uint8_t startempty = 0;
 	std::string parentlongname;
-	std::string usage;
+	std::string info;
 	std::string devicetype;
+	std::vector<std::u32string> alttitles;
 	bool available = false;
 };
 

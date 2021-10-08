@@ -1916,9 +1916,9 @@ shaders: bgfx-tools
 $(GENDIR)/mame.pot: FORCE
 	$(SILENT) echo Generating mame.pot
 	$(SILENT) find src "(" -name "*.cpp" -o -name "*.ipp" ")" -print0 | xargs -0 \
-		xgettext --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -k__ -k__p:1c,2 -o $@
+		xgettext --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -kN_ -kN_p:1c,2 -o $@
 	$(SILENT) find plugins -name "*.lua" -print0 | xargs -0 \
-		xgettext --from-code=UTF-8 --language=Lua -k_ -k__ -j -o $@
+		xgettext --from-code=UTF-8 --language=Lua -k_:1,1t -k_:1c,2,2t -j -o $@
 
 translation: $(GENDIR)/mame.pot
 	$(SILENT) find language -name "*.po" -print0 | xargs -0 -n 1 -I %% msgmerge -U -N %% $<
