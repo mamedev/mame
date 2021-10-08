@@ -84,6 +84,9 @@ Notes:
 #include "imagewriter_printer.lh"
 
 DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "Apple ImageWriter Printer A9M0303")
+DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER15_PRINTER, apple_imagewriter15_printer_device, "apple_imagewriter", "Apple ImageWriter Printer A9M0305")
+
+
 
 apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: apple_imagewriter_printer_device(mconfig, APPLE_IMAGEWRITER_PRINTER, tag, owner, clock)
@@ -233,7 +236,20 @@ const tiny_rom_entry *apple_imagewriter_printer_device::device_rom_region() cons
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
+#define PORT_ADJUSTER_16MASK(_default, _name)					\
+        configurer.field_alloc(IPT_ADJUSTER, (_default), 0xffff, (_name)); \
+        configurer.field_set_min_max(0, 100);
+
+
 static INPUT_PORTS_START( apple_imagewriter )
+
+	PORT_START("TOPMARGIN")
+	PORT_ADJUSTER_16MASK(18, "Top Margin")
+	PORT_MINMAX(0,500)
+
+	PORT_START("BOTTOMMARGIN")
+	PORT_ADJUSTER_16MASK(18, "Bottom Margin")
+	PORT_MINMAX(0,500)
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, reset_sw, 0)
@@ -798,9 +814,12 @@ void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 
 		if (newpageflag == 1)
 		{
-			m_ypos = 10;  // lock to the top of page until we seek horizontally
+//			m_ypos = 10;  // lock to the top of page until we seek horizontally
+			m_ypos = ioport("TOPMARGIN")->read();  // lock to the top of page until we seek horizontally
+
 		}
-		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
+//		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
+		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 1 - ioport("BOTTOMMARGIN")->read())  // i see why it's failing
 			// if we are within 50 pixels of the bottom of the page we will
 			// write the page to a file, then erase the top part of the page
 			// so we can still see the last page printed.
@@ -821,7 +840,8 @@ void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 			// clear page down to visible area, starting from the top of page
 			m_bitmap_printer->bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
 
-			m_ypos = 10;
+//			m_ypos = 10;
+			m_ypos = ioport("TOPMARGIN")->read();  // lock to the top of page until we seek horizontally
 		}
 		// clear page down to visible area
 		m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + distfrombottom, std::min(y_pixel_coord(m_ypos) + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());

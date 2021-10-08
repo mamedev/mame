@@ -26,7 +26,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(paper_width_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(dcd_changed);
 
-
 protected:
 	apple_imagewriter_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -104,7 +103,7 @@ private:
 	XTAL baseCLK = 9.8304_MHz_XTAL;  // base clock to 8085 cpu = 9.8304 Mhz
 	XTAL CLK2 = baseCLK / 2;         // CLK2 name from Sams schematic = 4.9152 Mhz
 	XTAL CLK1 = CLK2 / 2;            // CLK1 name from Sams schematic = 2.4576 Mhz
-
+protected:
 	int dpi = 144;
 	double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 162 dpi, not 144 dpi)
 	double PAPER_WIDTH_INCHES = 8.5;
@@ -162,6 +161,20 @@ private:
 	void update_head_pos();
 };
 
+
+class apple_imagewriter15_printer_device : public apple_imagewriter_printer_device
+{
+public:
+	apple_imagewriter15_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		apple_imagewriter_printer_device(mconfig, tag, owner, clock)
+	{
+		PAPER_WIDTH_INCHES = 15.0;
+		PAPER_WIDTH = PAPER_WIDTH_INCHES * dpi * xscale;
+		m_right_edge = ((PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1);
+	};
+};
+
 DECLARE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device)
+DECLARE_DEVICE_TYPE(APPLE_IMAGEWRITER15_PRINTER, apple_imagewriter15_printer_device)
 
 #endif // MAME_BUS_IMAGEWRITER_PRINTER_H
