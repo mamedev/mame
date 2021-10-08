@@ -1345,6 +1345,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"olivetti",
 		"olympia",
 		"omnibyte",
+		"omron",
 		"openuni",
 		"orion",
 		"osborne",
@@ -3277,6 +3278,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/msbc1.cpp",
 	MAME_DIR .. "src/mame/drivers/ob68k1a.cpp",
 	MAME_DIR .. "src/mame/includes/ob68k1a.h",
+}
+
+createMESSProjects(_target, _subtarget, "omron")
+files {
+	MAME_DIR .. "src/mame/drivers/luna_68k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "openuni")
