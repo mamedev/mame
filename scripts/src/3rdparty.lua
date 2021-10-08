@@ -2208,6 +2208,10 @@ project "utf8proc"
 	uuid "1f881f09-0395-4483-ac37-2935fb092187"
 	kind "StaticLib"
 
+	defines {
+		"UTF8PROC_STATIC",
+	}
+
 	configuration "Debug"
 		defines {
 			"verbose=-1",
@@ -2219,9 +2223,6 @@ project "utf8proc"
 		}
 
 	configuration { }
-		defines {
-			"ZLIB_CONST",
-		}
 
 	files {
 		MAME_DIR .. "3rdparty/utf8proc/utf8proc.c"
