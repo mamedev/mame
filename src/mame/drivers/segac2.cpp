@@ -2905,7 +2905,7 @@ GAME( 1994, puyopuy2,   0,        segac2,     puyopuy2, segac2_state,    init_pu
 
 GAME( 1994, zunkyou,    0,        segac2,     zunkyou,  segac2_state,    init_zunkyou,  ROT0,   "Sega", "Zunzunkyou no Yabou (Japan)", 0 )
 
-GAME( 1994, headonch,   0,        segac2,     headonch, segac2_state,    init_noprot,   ROT0,   "hack", "Head On Channel (prototype, hack)", 0 )
+GAME( 1994, headonch,   0,        segac2,     headonch, segac2_state,    init_noprot,   ROT0,   "hack", "Monita to Rimoko no Head On Channel (prototype, hack)", 0 )
 
 /* Atlus Print Club 'Games' (C-2 Hardware) requires printer and camera emulation */
 GAME( 1995, pclubj,     0,        segac2,     pclub,    pclub_state,     init_pclubj,   ROT0,   "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING )

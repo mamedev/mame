@@ -22,7 +22,6 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/z80ctc.h"
-#include "machine/z80ctc.h"
 #include "machine/z80daisy.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"

@@ -74,6 +74,7 @@ public:
 	void ti85d(machine_config &config);
 	void ti83pse(machine_config &config);
 	void ti84pse(machine_config &config);
+	void ti84pce(machine_config &config);
 	void ti86(machine_config &config);
 	void ti81(machine_config &config);
 	void ti85(machine_config &config);

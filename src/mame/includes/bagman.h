@@ -32,6 +32,7 @@ public:
 	void sbagmani(machine_config &config);
 
 	void init_bagmans3();
+	void init_botanic2();
 
 protected:
 	// common

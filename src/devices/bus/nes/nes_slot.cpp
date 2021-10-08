@@ -126,6 +126,9 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	, m_vrc_ls_prg_a(0)
 	, m_vrc_ls_prg_b(0)
 	, m_vrc_ls_chr(0)
+	, m_n163_vol(0)
+	, m_outer_prg_size(0)
+	, m_outer_chr_size(0)
 	, m_mirroring(PPU_MIRROR_NONE)
 	, m_pcb_ctrl_mirror(false)
 	, m_four_screen_vram(false)
@@ -944,16 +947,17 @@ std::string nes_cart_slot_device::get_default_card_software(get_default_card_sof
 {
 	if (hook.image_file())
 	{
-		const char *slot_string = "nrom";
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
+		const char *slot_string = "nrom";
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))
 			slot_string = get_default_card_ines(hook, &rom[0], len);
-
-		if ((rom[0] == 'U') && (rom[1] == 'N') && (rom[2] == 'I') && (rom[3] == 'F'))
+		else if ((rom[0] == 'U') && (rom[1] == 'N') && (rom[2] == 'I') && (rom[3] == 'F'))
 			slot_string = get_default_card_unif(&rom[0], len);
 
 		return std::string(slot_string);

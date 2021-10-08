@@ -91,7 +91,10 @@ image_init_result cdrom_image_device::call_load()
 
 	if (!loaded_through_softlist()) {
 		if (is_filetype("chd") && is_loaded()) {
-			err = m_self_chd.open(util::core_file_read_write(image_core_file()));    // CDs are never writeable
+			util::core_file::ptr proxy;
+			err = util::core_file::open_proxy(image_core_file(), proxy);
+			if (!err)
+				err = m_self_chd.open(std::move(proxy)); // CDs are never writeable
 			if (err)
 				goto error;
 			chd = &m_self_chd;

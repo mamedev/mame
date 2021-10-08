@@ -134,6 +134,8 @@ static const unif unif_list[] =
 	{ "UNL-MALISB",                 0,    0, CHRRAM_0,  UNL_MALISB},
 	{ "UNL-TF1201",                 0,    0, CHRRAM_0,  UNL_TF1201},
 	{ "UNL-DANCE2000",              0,    8, CHRRAM_8,  SUBOR_TYPE2}, // similar to some Subor carts
+	{ "FARID_SLROM_8-IN-1",         0,    0, CHRRAM_0,  FARID_SLROM8IN1},
+	{ "FARID_UNROM_8-IN-1",         0,    0, CHRRAM_8,  FARID_UNROM8IN1},
 	{ "BMC-12-IN-1",                0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236
 	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236

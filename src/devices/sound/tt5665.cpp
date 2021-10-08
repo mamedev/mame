@@ -312,8 +312,7 @@ u8 tt5665_device::read(offs_t offset)
 void tt5665_device::write(offs_t offset, u8 data)
 {
 	const u8 ch = offset & 1;
-	// if a command is pending, process the second half
-	if (m_command[ch] != -1)
+	if (m_command[ch] != -1) // if a command is pending, process the second half
 	{
 		// the chip can only play one voice at a time, but has extra phrase spaces. that's are main difference from MSM 6295.
 		const int voicemask = (data >> 4) & 3;
@@ -353,10 +352,9 @@ void tt5665_device::write(offs_t offset, u8 data)
 				voice.m_adpcm.reset();
 				voice.m_volume = s_volume_table[data & 0x0f];
 			}
-
-			// invalid samples go here
 			else
 			{
+				// invalid samples go here
 				logerror("Requested to play invalid sample %04x\n", sample_ind);
 			}
 		}
@@ -368,13 +366,11 @@ void tt5665_device::write(offs_t offset, u8 data)
 		// reset the command
 		m_command[ch] = -1;
 	}
-
-	// if this is the start of a command, remember the sample number for next time
-	else if (data & 0x80)
+	else if (data & 0x80) // if this is the start of a command, remember the sample number for next time
+	{
 		m_command[ch] = data & 0x7f;
-
-	// otherwise, see if this is a silence command
-	else
+	}
+	else // otherwise, see if this is a silence command
 	{
 		// update the stream, then turn it off
 		m_stream->update();

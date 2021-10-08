@@ -32,6 +32,7 @@ static const nes_pcb pcb_list[] =
 	{ "un1rom",           STD_UN1ROM },
 	{ "sxrom",            STD_SXROM },
 	{ "sorom",            STD_SOROM },
+	{ "szrom",            STD_SZROM },
 	{ "txrom",            STD_TXROM },
 	{ "hkrom",            STD_HKROM },
 	{ "tqrom",            STD_TQROM },
@@ -259,6 +260,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_830425c",      BMC_830425C },
 	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
+	{ "bmc_970630c",      BMC_970630C },
 	{ "bmc_jy820845c",    BMC_JY820845C },
 	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
@@ -269,6 +271,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_hp898f",       BMC_HP898F },
 	{ "bmc_k1029",        BMC_K1029 },
 	{ "bmc_k3006",        BMC_K3006 },
+	{ "bmc_k3033",        BMC_K3033 },
 	{ "bmc_k3036",        BMC_K3036 },
 	{ "bmc_k3046",        BMC_K3046 },
 	{ "bmc_sa005a",       BMC_SA005A },
@@ -300,14 +303,12 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_g146",         BMC_G146 },
 	{ "bmc_11160",        BMC_11160 },
 	{ "a88s1",            BMC_A88S1 },
-	{ "fcgj8in1",         BMC_FCGENJIN_8IN1 },
+	{ "bmc_el86xc",       BMC_EL860947C },
 	{ "fk23c",            BMC_FK23C },
 	{ "fk23ca",           BMC_FK23CA },
 	{ "nt639",            BMC_NT639 },
 	{ "resetsxrom",       BMC_RESETSXROM },
-	{ "resettxrom0",      BMC_RESETTXROM0 },
-	{ "resettxrom1",      BMC_RESETTXROM1 },
-	{ "resettxrom2",      BMC_RESETTXROM2 },
+	{ "resettxrom",       BMC_RESETTXROM },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
 	{ "tech9in1",         BMC_TECHLINE9IN1 },
 	{ "bmc_8in1",         BMC_8IN1 },
@@ -317,6 +318,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
 	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
 	{ "bmc_f15",          BMC_F15 },
+	{ "bmc_f600",         BMC_F600 },
 	{ "bmc_gn45",         BMC_GN45 },
 	{ "bmc_gold7in1",     BMC_GOLD_7IN1 },
 	{ "bmc_00202650",     BMC_00202650 },
@@ -371,6 +373,8 @@ static const nes_pcb pcb_list[] =
 	{ "unrom512",         UNL_UNROM512 },
 	{ "2a03pur",          UNL_2A03PURITANS },
 	{ "dpcmcart",         UNL_DPCMCART },
+	{ "farid_slrom8in1",  FARID_SLROM8IN1 },
+	{ "farid_unrom8in1",  FARID_UNROM8IN1 },
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
@@ -660,6 +664,28 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		if (get_feature("n163-vol"))
 			m_cart->set_n163_vol(n163_get_submapper_num(get_feature("n163-vol")));
+	}
+
+	// get outer PRG bank size for multicart boards that use this feature
+	if (m_pcb_id == BMC_EL860947C || m_pcb_id == BMC_RESETTXROM)
+	{
+		const char *size = get_feature("outer-prg-size");
+		int kbyte = 128;
+
+		if (size == nullptr || sscanf(size, "%u%*c", &kbyte) != 1 || kbyte & (kbyte - 1) || kbyte <= 0)
+			logerror("Unexpected outer-prg-size: %s\n", size ? size : "(nullptr)");
+		m_cart->set_outer_prg_size(kbyte);
+	}
+
+	// get outer CHR bank size for multicart boards that use this feature
+	if (m_pcb_id == BMC_RESETTXROM)
+	{
+		const char *size = get_feature("outer-chr-size");
+		int kbyte = 128;
+
+		if (size == nullptr || sscanf(size, "%u%*c", &kbyte) != 1 || kbyte & (kbyte - 1) || kbyte <= 0)
+			logerror("Unexpected outer-chr-size: %s\n", size ? size : "(nullptr)");
+		m_cart->set_outer_chr_size(kbyte);
 	}
 
 

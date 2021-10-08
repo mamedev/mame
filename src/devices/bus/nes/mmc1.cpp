@@ -41,6 +41,7 @@
 
 DEFINE_DEVICE_TYPE(NES_SXROM, nes_sxrom_device, "nes_sxrom", "NES Cart SxROM (MMC-1) PCB")
 DEFINE_DEVICE_TYPE(NES_SOROM, nes_sorom_device, "nes_sorom", "NES Cart SOROM (MMC-1) PCB")
+DEFINE_DEVICE_TYPE(NES_SZROM, nes_szrom_device, "nes_szrom", "NES Cart SZROM (MMC-1) PCB")
 
 
 
@@ -56,6 +57,11 @@ nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *ta
 
 nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_sxrom_device(mconfig, NES_SOROM, tag, owner, clock)
+{
+}
+
+nes_szrom_device::nes_szrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_sxrom_device(mconfig, NES_SZROM, tag, owner, clock)
 {
 }
 
@@ -306,6 +312,35 @@ uint8_t nes_sorom_device::read_m(offs_t offset)
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
 		if (type)
+			return m_battery[offset & (m_battery.size() - 1)];
+		else
+			return m_prgram[offset & (m_prgram.size() - 1)];
+	}
+
+	return get_open_bus();
+}
+
+// SZROM has two RAM banks, the first is not battery backed up, the second is.
+void nes_szrom_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("szrom write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
+	{
+		if (BIT(m_reg[BIT(m_reg[0], 4) + 1], 4))
+			m_battery[offset & (m_battery.size() - 1)] = data;
+		else
+			m_prgram[offset & (m_prgram.size() - 1)] = data;
+	}
+}
+
+u8 nes_szrom_device::read_m(offs_t offset)
+{
+	LOG_MMC(("szrom read_m, offset: %04x\n", offset));
+
+	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
+	{
+		if (BIT(m_reg[BIT(m_reg[0], 4) + 1], 4))
 			return m_battery[offset & (m_battery.size() - 1)];
 		else
 			return m_prgram[offset & (m_prgram.size() - 1)];

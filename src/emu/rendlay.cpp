@@ -1860,7 +1860,7 @@ private:
 		}
 	}
 
-	bool load_bitmap(util::core_file &file)
+	bool load_bitmap(util::random_read &file)
 	{
 		ru_imgformat const format = render_detect_image(file);
 		switch (format)
@@ -1890,9 +1890,16 @@ private:
 		}
 	}
 
-	void load_svg(util::core_file &file)
+	void load_svg(util::random_read &file)
 	{
-		u64 len(file.size());
+		std::error_condition filerr;
+		u64 len;
+		filerr = file.length(len);
+		if (filerr)
+		{
+			osd_printf_warning("Error getting length of component image '%s'\n", m_imagefile);
+			return;
+		}
 		if ((std::numeric_limits<size_t>::max() - 1) < len)
 		{
 			osd_printf_warning("Component image '%s' is too large to read into memory\n", m_imagefile);
@@ -1907,9 +1914,9 @@ private:
 		svgbuf[len] = '\0';
 		for (char *ptr = svgbuf.get(); len; )
 		{
-			u32 const block(u32(std::min<u64>(std::numeric_limits<u32>::max(), len)));
-			u32 const read(file.read(ptr, block));
-			if (!read)
+			size_t read;
+			filerr = file.read(ptr, size_t(len), read);
+			if (filerr || !read)
 			{
 				osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
 				return;

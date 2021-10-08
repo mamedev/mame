@@ -302,7 +302,7 @@ static const nes_mmc mmc_list[] =
 	{ 264, YOKO_BOARD },
 	{ 265, BMC_T262 },
 	{ 266, UNL_CITYFIGHT },
-	{ 267, BMC_FCGENJIN_8IN1 },
+	{ 267, BMC_EL861121C },
 	// 268 COOLBOY and MINDKIDS
 	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
 	// 270 multicarts on OneBus Famiclones
@@ -348,7 +348,7 @@ static const nes_mmc mmc_list[] =
 	// 310 variant of mapper 125?
 	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
 	{ 312, KAISER_KS7013B },       // Highway Star Kaiser bootleg
-	{ 313, BMC_RESETTXROM0 },
+	{ 313, BMC_RESETTXROM },
 	{ 314, BMC_64IN1NR },
 	// 315 820732C and 830134C multicarts, not in nes.xml?
 	// 316 Unused
@@ -357,9 +357,9 @@ static const nes_mmc mmc_list[] =
 	{ 319, BMC_HP898F },
 	{ 320, BMC_830425C },
 	// 321 duplicate of 287?
-	// 322 BMC-K-3033 35-in-1, related to mc_35?
-	// 323 Farid SLROM homebrew 8-in-1
-	// 324 Farid UNROM homebrew 8-in-1
+	{ 322, BMC_K3033 },
+	{ 323, FARID_SLROM8IN1 },      // homebrew 8-in-1
+	{ 324, FARID_UNROM8IN1 },      // homebrew 8-in-1
 	{ 325, UNL_MALISB },           // Super Mali Splash Bomb pirate hack
 	{ 326, BTL_CONTRAJ },
 	// 327 BMC-10-24-C-A1 6-in-1
@@ -405,17 +405,17 @@ static const nes_mmc mmc_list[] =
 	// 367 7-in-1 cart that is a close variant of mapper 205
 	{ 368, BTL_YUNG08 },            // SMB2 FDS conversion
 	// 369 Super Mario Bros Party multicart
-	// 370 Golden Mario Party II multicart
+	{ 370, BMC_F600 },              // Golden Mario Party II multicart
 	// 371 Spanish PEC-586 computer main cart
 	// 372 Rockman 1-6 multicart very close to mapper 45
 	// 373 Super 4-in-1, not in nes.xml?
 	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
 	{ 376, BMC_YY841155C },
-	// 377 JY-111 multicart, similar to mapper 367
+	{ 377, BMC_EL860947C },
 	// 378 8-in-1 multicart, which one?
 	// 379 35-in-1 multicart, similar to mapper 38
-	// 380 970630C multicart
+	{ 380, BMC_970630C },
 	{ 381, UNL_KN42 },             // 2-in-1 Big Nose games
 	{ 382, BMC_830928C },
 	// 383 JY-014 multicart
@@ -748,6 +748,32 @@ void nes_cart_slot_device::call_load_ines()
 			submapper = 0;
 			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
 		}
+		// 313: BMC RESET-TXROM
+		else if (mapper == 313)
+		{
+			if (submapper == 0)
+			{
+				m_cart->set_outer_prg_size(128);
+				m_cart->set_outer_chr_size(128);
+			}
+			else if (submapper == 1)
+			{
+				m_cart->set_outer_prg_size(256);
+				m_cart->set_outer_chr_size(128);
+			}
+			else if (submapper == 2)
+			{
+				m_cart->set_outer_prg_size(128);
+				m_cart->set_outer_chr_size(256);
+			}
+			else if (submapper == 3)
+			{
+				m_cart->set_outer_prg_size(256);
+				m_cart->set_outer_chr_size(256);
+			}
+			else
+				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
+		}
 		else if (submapper)
 		{
 			submapper = 0;
@@ -798,6 +824,8 @@ void nes_cart_slot_device::call_load_ines()
 			break;
 
 		case STD_SXROM:
+			if (mapper == 1 && ines20 && prgram_size == 0x2000 && battery_size == 0x2000 && vrom_size == 0x4000)
+				m_pcb_id = STD_SZROM;
 			if (mapper == 155)
 				m_cart->set_mmc1_type(device_nes_cart_interface::mmc1_type::MMC1A);
 			break;
@@ -935,15 +963,6 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = RCM_GS2013;
 			break;
 
-		case BMC_RESETTXROM0:
-			if (submapper == 1)
-				m_pcb_id = BMC_RESETTXROM1;
-			else if (submapper == 2)
-				m_pcb_id = BMC_RESETTXROM2;
-			else if (submapper > 2)
-				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
-			break;
-
 		case HES_BOARD:
 			if (crc_hack)
 				m_cart->set_pcb_ctrl_mirror(true);    // Mapper 113 is used for 2 diff boards
@@ -997,7 +1016,16 @@ void nes_cart_slot_device::call_load_ines()
 		case NAMCOT_163:
 			mapper_sram_size = m_cart->get_mapper_sram_size();
 			break;
-			//FIXME: we also have to fix Action 52 PRG loading somewhere...
+
+		case BMC_EL860947C:
+			m_cart->set_outer_prg_size(128);
+			break;
+
+		case BMC_EL861121C:
+			m_cart->set_outer_prg_size(256);
+			break;
+
+		//FIXME: we also have to fix Action 52 PRG loading somewhere...
 
 		case BANDAI_DATACH:
 			fatalerror("Bandai Datach games have to be mounted in the Datach subslot!\n");
@@ -1219,6 +1247,12 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 				pcb_id = STD_NROM368;
 			break;
 
+		case STD_SXROM:
+			// only A Ressha de Ikou uses SZROM and it can be detected by its profile: 8K WRAM, 8K BWRAM, 16K CHR ROM
+			if (mapper == 1 && ines20 && ROM[10] == 0x77 && ROM[5] == 2)
+				pcb_id = STD_SZROM;
+			break;
+
 		case KONAMI_VRC2:
 			if (mapper == 23 && crc_hack && !submapper)
 				pcb_id = KONAMI_VRC4; // this allows for konami_irq to be installed at reset
@@ -1274,13 +1308,6 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		case RCM_GS2004:                               // Mapper 283 is used for 2 diff boards
 			if (ROM[4] >= 20)
 				pcb_id = RCM_GS2013;
-			break;
-
-		case BMC_RESETTXROM0:                          // Mapper 313 is used for 3 diff boards
-			if (submapper == 1)
-				pcb_id = BMC_RESETTXROM1;
-			if (submapper == 2)
-				pcb_id = BMC_RESETTXROM2;
 			break;
 	}
 
