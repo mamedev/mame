@@ -1022,7 +1022,7 @@ u8 sns_sa1_device::read_cconv1_dma(offs_t offset)
 
 				bwram_src += tile_stride;
 
-				u8 linear[bpp] = {0};
+				u8 linear[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 				for (u8 x = 0; x < 8; x++)
 				{
 					for (u8 bit = 0; bit < bpp; bit++)
