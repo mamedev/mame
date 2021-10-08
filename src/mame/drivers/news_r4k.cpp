@@ -88,8 +88,18 @@
  *  - Monitor ROM command `ss -r` doesn't show most register values
  *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly)
  *
+ *  TODO:
+ *  - More complete floppy support (only supports floppy boot at the moment)
+ *  - Sound (lots of undocumented hardware)
+ *  - Parallel I/O
+ *  - Framebuffer (and remaining kb/ms support)
+ *  - APbus expansion slots
+ *  - ESCCF/FIFO DMA (This is harder than it sounds because there is no documentation on how the FIFO works
+ *                    and the ESCCF uses way more of its features than reading from the floppy drive. Interrupts are also
+ *                    a big question mark)
+ *
  *  TODO before opening first MR:
- *  - ESCCF/FIFO DMA
+ *  - SPIFI3 refactoring, actual AUTOSTAT
  *  - CD-ROM access if possible
  *  - See if NEWS-OS 4 can be stabilized further (telnet, etc.)
  *  - Find better workaround for SCACHE enumeration
@@ -1161,7 +1171,8 @@ PORT_DIPSETTING(0x10, "Auto Boot Enable")
 PORT_DIPNAME(0x20, 0x00, "Run Diagnostic Test") PORT_DIPLOCATION("FRONT_PANEL:6")
 PORT_DIPSETTING(0x00, "No Diagnostic Test")
 PORT_DIPSETTING(0x20, "Run Diagnostic Test")
-PORT_DIPNAME(0x40, 0x00, "External APbus Slot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
+// This default is actually 0, but the external slots aren't emulated.
+PORT_DIPNAME(0x40, 0x40, "External APbus Slot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
 PORT_DIPSETTING(0x00, "Enable External Slot Probe")
 PORT_DIPSETTING(0x40, "Disable External Slot Probe")
 PORT_DIPNAME(0x80, 0x00, "No Memory Mode") PORT_DIPLOCATION("FRONT_PANEL:8")
