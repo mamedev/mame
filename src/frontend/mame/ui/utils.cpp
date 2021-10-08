@@ -2065,9 +2065,9 @@ ui_software_info::ui_software_info(
 		infotext.append(1, '\n').append(feature.value());
 
 		// keep references to stuff for filtering and searching
-		info.emplace_back(feature.name(), feature.value());
+		auto const &ins = info.emplace_back(feature.name(), feature.value());
 		if (feature.name() == "alt_title")
-			alttitles.emplace_back(feature.value());
+			alttitles.emplace_back(ins.value());
 	}
 }
 
@@ -2075,4 +2075,68 @@ ui_software_info::ui_software_info(
 ui_software_info::ui_software_info(game_driver const &d)
 	: shortname(d.name), longname(d.type.fullname()), driver(&d), startempty(1), available(true)
 {
+}
+
+ui_software_info::ui_software_info(ui_software_info const &that)
+	: shortname(that.shortname)
+	, longname(that.longname)
+	, parentname(that.parentname)
+	, year(that.year)
+	, publisher(that.publisher)
+	, supported(that.supported)
+	, part(that.part)
+	, driver(that.driver)
+	, listname(that.listname)
+	, interface(that.interface)
+	, instance(that.instance)
+	, startempty(that.startempty)
+	, parentlongname(that.parentlongname)
+	, infotext(that.infotext)
+	, devicetype(that.devicetype)
+	, info(that.info)
+	, alttitles()
+	, available(that.available)
+{
+	// build self-referencing member
+	alttitles.reserve(that.alttitles.size());
+	for (software_info_item const &feature : info)
+	{
+		if (feature.name() == "alt_title")
+			alttitles.emplace_back(feature.value());
+	}
+}
+
+ui_software_info &ui_software_info::operator=(ui_software_info const &that)
+{
+	if (&that != this)
+	{
+		// copy simple stuff
+		shortname = that.shortname;
+		longname = that.longname;
+		parentname = that.parentname;
+		year = that.year;
+		publisher = that.publisher;
+		supported = that.supported;
+		part = that.part;
+		driver = that.driver;
+		listname = that.listname;
+		interface = that.interface;
+		instance = that.instance;
+		startempty = that.startempty;
+		parentlongname = that.parentlongname;
+		infotext = that.infotext;
+		devicetype = that.devicetype;
+		info = that.info;
+		alttitles.clear();
+		available = that.available;
+
+		// build self-referencing member
+		alttitles.reserve(that.alttitles.size());
+		for (software_info_item const &feature : info)
+		{
+			if (feature.name() == "alt_title")
+				alttitles.emplace_back(feature.value());
+		}
+	}
+	return *this;
 }

@@ -202,9 +202,6 @@ std::string menu_select_launch::reselect_last::s_software;
 std::string menu_select_launch::reselect_last::s_swlist;
 bool menu_select_launch::reselect_last::s_reselect = false;
 
-std::mutex menu_select_launch::s_cache_guard;
-menu_select_launch::cache_ptr_map menu_select_launch::s_caches;
-
 // instantiate possible variants of these so derived classes don't get link errors
 template bool menu_select_launch::select_bios(game_driver const &, bool);
 template bool menu_select_launch::select_bios(ui_software_info const &, bool);
@@ -514,7 +511,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_info_view(-1)
 	, m_items_list()
 	, m_info_buffer()
-	, m_cache()
+	, m_cache(mui.get_session_data<menu_select_launch, cache_wrapper>(machine()))
 	, m_is_swlist(is_swlist)
 	, m_focus(focused_menu::MAIN)
 	, m_pressed(false)
@@ -526,22 +523,6 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_image_view(FIRST_VIEW)
 	, m_flags(256)
 {
-	// set up persistent cache for machine run
-	{
-		std::lock_guard<std::mutex> guard(s_cache_guard);
-		auto const found(s_caches.find(&machine()));
-		if (found != s_caches.end())
-		{
-			assert(found->second);
-			m_cache = found->second;
-		}
-		else
-		{
-			m_cache = std::make_shared<cache>(machine());
-			s_caches.emplace(&machine(), m_cache);
-			add_cleanup_callback(&menu_select_launch::exit);
-		}
-	}
 }
 
 
@@ -1261,8 +1242,8 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	y1 += ui().box_tb_border();
 	y2 -= ui().box_tb_border();
 
-	texture_ptr_vector const &t_texture(m_is_swlist ? m_cache->sw_toolbar_texture() : m_cache->toolbar_texture());
-	bitmap_vector const &t_bitmap(m_is_swlist ? m_cache->sw_toolbar_bitmap() : m_cache->toolbar_bitmap());
+	texture_ptr_vector const &t_texture(m_is_swlist ? m_cache.sw_toolbar_texture() : m_cache.toolbar_texture());
+	bitmap_vector const &t_bitmap(m_is_swlist ? m_cache.sw_toolbar_bitmap() : m_cache.toolbar_bitmap());
 
 	auto const num_valid(std::count_if(std::begin(t_bitmap), std::end(t_bitmap), [](bitmap_argb32 const &e) { return e.valid(); }));
 
@@ -1300,7 +1281,7 @@ void menu_select_launch::draw_star(float x0, float y0)
 {
 	float y1 = y0 + ui().get_line_height();
 	float x1 = x0 + ui().get_line_height() * container().manager().ui_aspect(&container());
-	container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_cache->star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_cache.star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -2258,7 +2239,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 
 	if (software && (!software->startempty || !driver))
 	{
-		m_cache->set_snapx_driver(nullptr);
+		m_cache.set_snapx_driver(nullptr);
 
 		if (m_default_image)
 			m_image_view = (software->startempty == 0) ? SNAPSHOT_VIEW : CABINETS_VIEW;
@@ -2267,7 +2248,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (!m_cache->snapx_software_is(software) || !snapx_valid() || m_switch_image)
+		if (!m_cache.snapx_software_is(software) || !snapx_valid() || m_switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
@@ -2287,7 +2268,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 					load_image(tmp_bitmap, snapfile, util::path_concat(software->driver->name + software->part, software->shortname));
 			}
 
-			m_cache->set_snapx_software(software);
+			m_cache.set_snapx_software(software);
 			m_switch_image = false;
 			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
@@ -2297,7 +2278,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 	}
 	else if (driver)
 	{
-		m_cache->set_snapx_software(nullptr);
+		m_cache.set_snapx_software(nullptr);
 
 		if (m_default_image)
 			m_image_view = ((driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
@@ -2305,13 +2286,13 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (!m_cache->snapx_driver_is(driver) || !snapx_valid() || m_switch_image)
+		if (!m_cache.snapx_driver_is(driver) || !snapx_valid() || m_switch_image)
 		{
 			emu_file snapfile(searchstr, OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
 			load_driver_image(tmp_bitmap, snapfile, *driver);
 
-			m_cache->set_snapx_driver(driver);
+			m_cache.set_snapx_driver(driver);
 			m_switch_image = false;
 			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
@@ -2389,7 +2370,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 	if (!tmp_bitmap.valid())
 	{
 		tmp_bitmap.allocate(256, 256);
-		const bitmap_argb32 &src(m_cache->no_avail_bitmap());
+		const bitmap_argb32 &src(m_cache.no_avail_bitmap());
 		for (int x = 0; x < 256; x++)
 		{
 			for (int y = 0; y < 256; y++)
@@ -2398,7 +2379,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 		no_available = true;
 	}
 
-	bitmap_argb32 &snapx_bitmap(m_cache->snapx_bitmap());
+	bitmap_argb32 &snapx_bitmap(m_cache.snapx_bitmap());
 	if (tmp_bitmap.valid())
 	{
 		float panel_width = origx2 - origx1 - 0.02f;
@@ -2459,7 +2440,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 				snapx_bitmap.pix(y + y1, x + x1) = dest_bitmap.pix(y, x);
 
 		// apply bitmap
-		m_cache->snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
+		m_cache.snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
 	}
 	else
 	{
@@ -2484,7 +2465,7 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		float const y2 = origy2 - ui().box_tb_border() - line_height;
 
 		// apply texture
-		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache.snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 }
 
@@ -2595,13 +2576,6 @@ bool menu_select_launch::has_multiple_bios(game_driver const &driver, s_bios &bi
 		}
 	}
 	return biosname.size() > 1U;
-}
-
-
-void menu_select_launch::exit(running_machine &machine)
-{
-	std::lock_guard<std::mutex> guard(s_cache_guard);
-	s_caches.erase(&machine);
 }
 
 

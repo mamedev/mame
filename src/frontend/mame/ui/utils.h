@@ -61,9 +61,9 @@ struct ui_software_info
 	ui_software_info(game_driver const &d);
 
 	// copyable/movable
-	ui_software_info(ui_software_info const &) = default;
-	ui_software_info(ui_software_info &&) = default;
-	ui_software_info &operator=(ui_software_info const &) = default;
+	ui_software_info(ui_software_info const &that);
+	ui_software_info(ui_software_info &&that) = default;
+	ui_software_info &operator=(ui_software_info const &that);
 	ui_software_info &operator=(ui_software_info &&) = default;
 
 	bool operator==(ui_software_info const &r) const

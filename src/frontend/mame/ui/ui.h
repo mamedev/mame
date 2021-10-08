@@ -21,10 +21,15 @@
 #include "ui/slider.h"
 #include "ui/text.h"
 
+#include <any>
+#include <cassert>
 #include <ctime>
 #include <functional>
+#include <map>
 #include <set>
 #include <string_view>
+#include <typeindex>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 
@@ -213,9 +218,22 @@ public:
 
 	virtual void menu_reset() override;
 
+	template <typename Owner, typename Data, typename... Param>
+	Data &get_session_data(Param &&... args)
+	{
+		auto const ins(m_session_data.try_emplace(typeid(Owner)));
+		assert(!ins.first->second.has_value() == ins.second);
+		if (ins.second)
+			return ins.first->second.emplace<Data>(std::forward<Param>(args)...);
+		Data *const result(std::any_cast<Data>(&ins.first->second));
+		assert(result);
+		return *result;
+	}
+
 private:
 	using handler_callback_func = std::function<uint32_t (render_container &)>;
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;
+	using session_data_map = std::map<std::type_index, std::any>;
 
 	// instance variables
 	std::unique_ptr<render_font> m_font;
@@ -242,6 +260,8 @@ private:
 	device_feature_set      m_imperfect_features;
 	std::time_t             m_last_launch_time;
 	std::time_t             m_last_warning_time;
+
+	session_data_map        m_session_data;
 
 	// static variables
 	static std::string      messagebox_text;
@@ -284,10 +304,10 @@ private:
 	int32_t slider_beam_dot_size(screen_device &screen, std::string *str, int32_t newval);
 	int32_t slider_beam_intensity_weight(screen_device &screen, std::string *str, int32_t newval);
 	std::string slider_get_screen_desc(screen_device &screen);
-	#ifdef MAME_DEBUG
+#ifdef MAME_DEBUG
 	int32_t slider_crossscale(ioport_field &field, std::string *str, int32_t newval);
 	int32_t slider_crossoffset(ioport_field &field, std::string *str, int32_t newval);
-	#endif
+#endif
 
 	std::vector<std::unique_ptr<slider_state>> m_sliders;
 };

@@ -78,7 +78,6 @@ bool menu::exclusive_input_pressed(int &iptkey, int key, int repeat)
 menu::global_state::global_state(running_machine &machine, ui_options const &options)
 	: widgets_manager(machine)
 	, m_machine(machine)
-	, m_cleanup_callbacks()
 	, m_bgrnd_bitmap()
 	, m_bgrnd_texture(nullptr, machine.render())
 	, m_stack()
@@ -120,15 +119,6 @@ menu::global_state::~global_state()
 
 	stack_reset();
 	clear_free_list();
-
-	for (auto const &callback : m_cleanup_callbacks)
-		callback(m_machine);
-}
-
-
-void menu::global_state::add_cleanup_callback(cleanup_callback &&callback)
-{
-	m_cleanup_callbacks.emplace_back(std::move(callback));
 }
 
 
