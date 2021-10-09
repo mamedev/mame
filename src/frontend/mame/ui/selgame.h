@@ -34,7 +34,6 @@ private:
 	{
 		CONF_OPTS = 1,
 		CONF_MACHINE,
-		CONF_PLUGINS,
 	};
 
 	using icon_cache = texture_lru<game_driver const *>;

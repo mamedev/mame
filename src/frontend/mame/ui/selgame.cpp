@@ -861,11 +861,6 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		item_append(_("Configure Options"), FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
 		item_append(_("Configure Machine"), FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 2;
-		if (machine().options().plugins())
-		{
-			item_append(_("Plugins"), FLAGS_UI, (void *)(uintptr_t)CONF_PLUGINS);
-			skip_main_items++;
-		}
 	}
 	else
 		skip_main_items = 0;
@@ -1037,11 +1032,6 @@ void menu_select_game::inkey_select(const event *menu_event)
 			menu::stack_push<menu_machine_configure>(ui(), container(), *reinterpret_cast<const ui_system_info *>(m_prev_selected));
 		return;
 	}
-	else if (uintptr_t(system) == CONF_PLUGINS)
-	{
-		// special case for configure plugins
-		menu::stack_push<menu_plugins_configure>(ui(), container());
-	}
 	else
 	{
 		// anything else is a driver
@@ -1110,11 +1100,6 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 					});
 		}
 		return;
-	}
-	else if (uintptr_t(ui_swinfo) == CONF_PLUGINS)
-	{
-		// special case for configure plugins
-		menu::stack_push<menu_plugins_configure>(ui(), container());
 	}
 	else if (ui_swinfo->startempty == 1)
 	{
