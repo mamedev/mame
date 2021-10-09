@@ -360,6 +360,20 @@ protected:
 };
 
 
+// ======================> nes_cocoma_device
+
+class nes_cocoma_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_cocoma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_gouder_device
 
 class nes_gouder_device : public nes_txrom_device
@@ -1042,6 +1056,7 @@ DECLARE_DEVICE_TYPE(NES_TXC_TW,        nes_txc_tw_device)
 DECLARE_DEVICE_TYPE(NES_KOF97,         nes_kof97_device)
 DECLARE_DEVICE_TYPE(NES_KOF96,         nes_kof96_device)
 DECLARE_DEVICE_TYPE(NES_SF3,           nes_sf3_device)
+DECLARE_DEVICE_TYPE(NES_COCOMA,        nes_cocoma_device)
 DECLARE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device)
 DECLARE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device)
