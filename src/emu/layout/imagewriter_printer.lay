@@ -207,9 +207,11 @@ copyright-holders:Golden Child
 		  <bounds x="0" y="0" width="512" height="384"/>
 		</screen>
 
-		<group ref="Control Panel Group">
-			<bounds x="362" y="0" width="150" height="250" />	
-		</group>	
+		<collection name="Imagewriter Control Panel" visible="yes">
+			<group ref="Control Panel Group">
+				<bounds x="362" y="0" width="150" height="250" />
+			</group>
+		</collection>
 
 		<element id="devicetag_back" ref="background">
 			<bounds xc="128" yc="20" width="200" height="30" />
