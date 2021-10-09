@@ -177,10 +177,13 @@ private:
 
 		// try to load localised descriptions
 		if (try_titles)
+		{
 			load_titles(titles_file);
 
-		// populate parent descriptions while still ordered by shortname
-		populate_parents();
+			// populate parent descriptions while still ordered by shortname
+			// already done on the first pass if built-in titles are used
+			populate_parents();
+		}
 
 		// get rid of the "empty" driver - we don't need positions to line up any more
 		m_sorted_list.erase(m_sorted_list.begin() + driver_list::find(GAME_NAME(___empty)));
@@ -202,36 +205,18 @@ private:
 					game_driver const &x(*lhs.driver);
 					game_driver const &y(*rhs.driver);
 
-					bool clonex = (x.parent[0] != '0') || x.parent[1];
-					int cx = -1;
-					if (clonex)
-					{
-						cx = driver_list::find(x.parent);
-						if ((0 > cx) || (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
-							clonex = false;
-					}
-
-					bool cloney = (y.parent[0] != '0') || y.parent[1];
-					int cy = -1;
-					if (cloney)
-					{
-						cy = driver_list::find(y.parent);
-						if ((0 > cy) || (driver_list::driver(cy).flags & machine_flags::IS_BIOS_ROOT))
-							cloney = false;
-					}
-
-					if (!clonex && !cloney)
+					if (!lhs.is_clone && !rhs.is_clone)
 					{
 						return compare_names(lhs.description, rhs.description);
 					}
-					else if (clonex && cloney)
+					else if (lhs.is_clone && rhs.is_clone)
 					{
 						if (!std::strcmp(x.parent, y.parent))
 							return compare_names(lhs.description, rhs.description);
 						else
 							return compare_names(lhs.parent, rhs.parent);
 					}
-					else if (!clonex && cloney)
+					else if (!lhs.is_clone && rhs.is_clone)
 					{
 						if (!std::strcmp(x.name, y.parent))
 							return true;
@@ -316,6 +301,29 @@ private:
 				if (driver.flags & machine_flags::IS_BIOS_ROOT)
 					++m_bios_count;
 
+				if ((driver.parent[0] != '0') || driver.parent[1])
+				{
+					auto const parentindex(driver_list::find(driver.parent));
+					if (copydesc)
+					{
+						if (0 <= parentindex)
+						{
+							game_driver const &parentdriver(driver_list::driver(parentindex));
+							ins.is_clone = bool(parentdriver.flags & machine_flags::IS_BIOS_ROOT);
+							ins.parent = parentdriver.type.fullname();
+						}
+						else
+						{
+							ins.is_clone = false;
+							ins.parent = driver.parent;
+						}
+					}
+					else
+					{
+						ins.is_clone = (0 <= parentindex) && !(driver_list::driver(parentindex).flags & machine_flags::IS_BIOS_ROOT);
+					}
+				}
+
 				if (copydesc)
 					ins.description = driver.type.fullname();
 
@@ -386,7 +394,7 @@ private:
 	{
 		for (ui_system_info &info : m_sorted_list)
 		{
-			if (info.driver->parent[0] != '0')
+			if ((info.driver->parent[0] != '0') || info.driver->parent[1])
 			{
 				auto const found(
 						std::lower_bound(
