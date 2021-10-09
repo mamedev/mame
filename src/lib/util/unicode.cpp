@@ -461,7 +461,7 @@ std::wstring wstring_from_utf8(std::string_view utf8string)
 	return osd::text::to_wstring(utf8string);
 #else
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-	return converter.from_bytes(string.data(), string.data() + string.length());
+	return converter.from_bytes(utf8string.data(), utf8string.data() + utf8string.length());
 #endif
 }
 
