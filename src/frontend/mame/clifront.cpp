@@ -1136,8 +1136,11 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 		if (!swinfo.notes().empty())
 			util::stream_format(out, "\t\t\t<notes>%s</notes>\n", util::xml::normalize_string(swinfo.notes().c_str()));
 
-		for (const feature_list_item &flist : swinfo.other_info())
+		for (const auto &flist : swinfo.info())
 			util::stream_format(out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
+
+		for (const auto &flist : swinfo.shared_features())
+			util::stream_format(out, "\t\t\t<sharedfeat name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 		for (const software_part &part : swinfo.parts())
 		{
@@ -1147,7 +1150,7 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 
 			out << ">\n";
 
-			for (const feature_list_item &flist : part.featurelist())
+			for (const auto &flist : part.features())
 				util::stream_format(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 			// TODO: display ROM region information

@@ -53,8 +53,6 @@ private:
 	phase m_phase;
 };
 
-bool sorted_game_list(const game_driver *x, const game_driver *y);
-
 } // namespace ui
 
 #endif // MAME_FRONTEND_UI_AUDITMENU_H

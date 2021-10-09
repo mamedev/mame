@@ -251,6 +251,9 @@ void mame_ui_manager::exit()
 
 	// free the font
 	m_font.reset();
+
+	// free persistent data for other classes
+	m_session_data.clear();
 }
 
 

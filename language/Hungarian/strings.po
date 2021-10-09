@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-29 22:30+1000\n"
+"POT-Creation-Date: 2021-10-09 10:52+1100\n"
 "PO-Revision-Date: 2017-05-20 09:18+0200\n"
 "Last-Translator: Delirious <zsoltn71@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
@@ -15,7 +15,7 @@ msgstr ""
 "X-Generator: Poedit 1.8.11\n"
 "X-Loco-Parser: loco_parse_mo\n"
 
-#: src/frontend/mame/ui/ui.cpp:470 src/frontend/mame/ui/ui.cpp:543
+#: src/frontend/mame/ui/ui.cpp:473 src/frontend/mame/ui/ui.cpp:546
 msgid ""
 "\n"
 "\n"
@@ -25,27 +25,27 @@ msgstr ""
 "\n"
 "Nyomj egy gombot a folytatáshoz"
 
-#: src/frontend/mame/ui/ui.cpp:555
+#: src/frontend/mame/ui/ui.cpp:558
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
 "Az illesztő számára szükségesek a következő eszköz(ök) által betöltött "
 "képek: "
 
-#: src/frontend/mame/ui/ui.cpp:1247
+#: src/frontend/mame/ui/ui.cpp:1264
 #, c-format
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1249
+#: src/frontend/mame/ui/ui.cpp:1266
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1442
+#: src/frontend/mame/ui/ui.cpp:1459
 #, c-format
 msgid ""
 "Are you sure you want to quit?\n"
@@ -58,185 +58,185 @@ msgstr ""
 "Nyomj ''%1$s'' gombot a kilépéshez,\n"
 "Nyomj ''%2$s'' gombot, hogy visszatérj az emulációhoz."
 
-#: src/frontend/mame/ui/ui.cpp:1492
+#: src/frontend/mame/ui/ui.cpp:1509
 msgid "Master Volume"
 msgstr "Fő hangerő"
 
-#: src/frontend/mame/ui/ui.cpp:1501
+#: src/frontend/mame/ui/ui.cpp:1518
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s Hangerő"
 
-#: src/frontend/mame/ui/ui.cpp:1523
+#: src/frontend/mame/ui/ui.cpp:1540
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "Processzor túlhajtás %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1531
+#: src/frontend/mame/ui/ui.cpp:1548
 #, c-format
 msgid "Overclock %1$s sound"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1550
+#: src/frontend/mame/ui/ui.cpp:1567
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s Képfrissítés"
 
-#: src/frontend/mame/ui/ui.cpp:1555
+#: src/frontend/mame/ui/ui.cpp:1572
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s Fényerő"
 
-#: src/frontend/mame/ui/ui.cpp:1557
+#: src/frontend/mame/ui/ui.cpp:1574
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s Kontraszt"
 
-#: src/frontend/mame/ui/ui.cpp:1559
+#: src/frontend/mame/ui/ui.cpp:1576
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$s Gamma"
 
-#: src/frontend/mame/ui/ui.cpp:1563
+#: src/frontend/mame/ui/ui.cpp:1580
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s Vízszintes nyújtás"
 
-#: src/frontend/mame/ui/ui.cpp:1565
+#: src/frontend/mame/ui/ui.cpp:1582
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s Vízszintes helyzet"
 
-#: src/frontend/mame/ui/ui.cpp:1567
+#: src/frontend/mame/ui/ui.cpp:1584
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s Függőleges nyújtás"
 
-#: src/frontend/mame/ui/ui.cpp:1569
+#: src/frontend/mame/ui/ui.cpp:1586
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s Függőleges helyzet"
 
-#: src/frontend/mame/ui/ui.cpp:1585
+#: src/frontend/mame/ui/ui.cpp:1602
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "Lézerlemez '%1$s' vízszintes nyújtás"
 
-#: src/frontend/mame/ui/ui.cpp:1588
+#: src/frontend/mame/ui/ui.cpp:1605
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "Lézerlemez '%1$s' vízszintes pozíció"
 
-#: src/frontend/mame/ui/ui.cpp:1590
+#: src/frontend/mame/ui/ui.cpp:1607
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "Lézerlemez '%1$s' függőleges nyújtás"
 
-#: src/frontend/mame/ui/ui.cpp:1593
+#: src/frontend/mame/ui/ui.cpp:1610
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "Lézerlemez '%1$s' függőleges pozíció"
 
-#: src/frontend/mame/ui/ui.cpp:1603
+#: src/frontend/mame/ui/ui.cpp:1620
 msgid "Vector Flicker"
 msgstr "Vektor villogás"
 
-#: src/frontend/mame/ui/ui.cpp:1604
+#: src/frontend/mame/ui/ui.cpp:1621
 msgid "Beam Width Minimum"
 msgstr "Minimális sugár szélesség"
 
-#: src/frontend/mame/ui/ui.cpp:1605
+#: src/frontend/mame/ui/ui.cpp:1622
 msgid "Beam Width Maximum"
 msgstr "Maximális sugár szélesség"
 
-#: src/frontend/mame/ui/ui.cpp:1606
+#: src/frontend/mame/ui/ui.cpp:1623
 msgid "Beam Dot Size"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1607
+#: src/frontend/mame/ui/ui.cpp:1624
 msgid "Beam Intensity Weight"
 msgstr "Sugár erősség mértéke"
 
-#: src/frontend/mame/ui/ui.cpp:1620
+#: src/frontend/mame/ui/ui.cpp:1637
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "Célkereszt skála %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1620 src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1637 src/frontend/mame/ui/ui.cpp:1639
 msgid "X"
 msgstr "X"
 
-#: src/frontend/mame/ui/ui.cpp:1620 src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1637 src/frontend/mame/ui/ui.cpp:1639
 msgid "Y"
 msgstr "Y"
 
-#: src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1639
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "Célkereszt kiegyenlítés %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1654
+#: src/frontend/mame/ui/ui.cpp:1671
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/frontend/mame/ui/ui.cpp:1697
+#: src/frontend/mame/ui/ui.cpp:1714
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/frontend/mame/ui/ui.cpp:1712
+#: src/frontend/mame/ui/ui.cpp:1729
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/frontend/mame/ui/ui.cpp:1735 src/frontend/mame/ui/ui.cpp:1755
-#: src/frontend/mame/ui/ui.cpp:1774 src/frontend/mame/ui/ui.cpp:1792
-#: src/frontend/mame/ui/ui.cpp:1811 src/frontend/mame/ui/ui.cpp:1830
-#: src/frontend/mame/ui/ui.cpp:1849 src/frontend/mame/ui/ui.cpp:1868
-#: src/frontend/mame/ui/ui.cpp:1889 src/frontend/mame/ui/ui.cpp:1910
-#: src/frontend/mame/ui/ui.cpp:1931 src/frontend/mame/ui/ui.cpp:1952
+#: src/frontend/mame/ui/ui.cpp:1752 src/frontend/mame/ui/ui.cpp:1772
+#: src/frontend/mame/ui/ui.cpp:1791 src/frontend/mame/ui/ui.cpp:1809
+#: src/frontend/mame/ui/ui.cpp:1828 src/frontend/mame/ui/ui.cpp:1847
+#: src/frontend/mame/ui/ui.cpp:1866 src/frontend/mame/ui/ui.cpp:1885
+#: src/frontend/mame/ui/ui.cpp:1906 src/frontend/mame/ui/ui.cpp:1927
+#: src/frontend/mame/ui/ui.cpp:1948 src/frontend/mame/ui/ui.cpp:1969
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/frontend/mame/ui/ui.cpp:1967 src/frontend/mame/ui/ui.cpp:1982
-#: src/frontend/mame/ui/ui.cpp:1997 src/frontend/mame/ui/ui.cpp:2012
-#: src/frontend/mame/ui/ui.cpp:2027
+#: src/frontend/mame/ui/ui.cpp:1984 src/frontend/mame/ui/ui.cpp:1999
+#: src/frontend/mame/ui/ui.cpp:2014 src/frontend/mame/ui/ui.cpp:2029
+#: src/frontend/mame/ui/ui.cpp:2044
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/frontend/mame/ui/ui.cpp:2043
+#: src/frontend/mame/ui/ui.cpp:2060
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "Célkereszt skála X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2043
+#: src/frontend/mame/ui/ui.cpp:2060
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "Célkereszt skála Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2060
+#: src/frontend/mame/ui/ui.cpp:2077
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "Célkereszt kiegyenlítés X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2060
+#: src/frontend/mame/ui/ui.cpp:2077
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "Célkereszt kiegyenlítés Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2167
+#: src/frontend/mame/ui/ui.cpp:2184
 msgid "**Error saving ui.ini**"
 msgstr "**ui.ini mentése közben hiba történt**"
 
-#: src/frontend/mame/ui/ui.cpp:2225
+#: src/frontend/mame/ui/ui.cpp:2243
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "**%s.ini mentése közben hiba történt**"
 
-#: src/frontend/mame/ui/ui.cpp:2229 src/frontend/mame/ui/miscmenu.cpp:762
+#: src/frontend/mame/ui/ui.cpp:2247 src/frontend/mame/ui/miscmenu.cpp:785
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -246,7 +246,7 @@ msgstr ""
 "    Beállítás elmentve    \n"
 "\n"
 
-#: src/frontend/mame/ui/selsoft.cpp:225 src/frontend/mame/ui/selgame.cpp:461
+#: src/frontend/mame/ui/selsoft.cpp:498 src/frontend/mame/ui/selgame.cpp:665
 #, c-format
 msgid ""
 "%s\n"
@@ -255,8 +255,8 @@ msgstr ""
 "%s\n"
 " felvéve a Kedvencek listára."
 
-#: src/frontend/mame/ui/selsoft.cpp:230 src/frontend/mame/ui/selgame.cpp:466
-#: src/frontend/mame/ui/selgame.cpp:472
+#: src/frontend/mame/ui/selsoft.cpp:503 src/frontend/mame/ui/selgame.cpp:670
+#: src/frontend/mame/ui/selgame.cpp:676
 #, c-format
 msgid ""
 "%s\n"
@@ -265,33 +265,33 @@ msgstr ""
 "%s\n"
 " eltávolítva a Kedvencek listáról."
 
-#: src/frontend/mame/ui/selsoft.cpp:630
+#: src/frontend/mame/ui/selsoft.cpp:719
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr "%1$s %2$s ( %3$d / %4$d szoftver csomag )"
 
-#: src/frontend/mame/ui/selsoft.cpp:631
+#: src/frontend/mame/ui/selsoft.cpp:720
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr "Vezérlőprogram: \"%1$s\" szoftver lista "
 
-#: src/frontend/mame/ui/selsoft.cpp:636 src/frontend/mame/ui/selgame.cpp:1422
+#: src/frontend/mame/ui/selsoft.cpp:725 src/frontend/mame/ui/selgame.cpp:1655
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:638 src/frontend/mame/ui/selgame.cpp:1424
+#: src/frontend/mame/ui/selsoft.cpp:727 src/frontend/mame/ui/selgame.cpp:1657
 #, c-format
 msgid "Search: %1$s_"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:645 src/frontend/mame/ui/selsoft.cpp:652
+#: src/frontend/mame/ui/selsoft.cpp:734
 #: src/frontend/mame/ui/simpleselgame.cpp:315
 #, c-format
 msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
-#: src/frontend/mame/ui/optsmenu.cpp:72 src/frontend/mame/ui/sndmenu.cpp:149
+#: src/frontend/mame/ui/optsmenu.cpp:72 src/frontend/mame/ui/sndmenu.cpp:163
 msgid "Sound Options"
 msgstr "Hang beállítások"
 
@@ -319,7 +319,7 @@ msgstr "Felület testre szabása"
 msgid "Configure Directories"
 msgstr "Könyvtár beállítások"
 
-#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:87
+#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:89
 #: src/frontend/mame/ui/slotopt.cpp:220
 msgid "[empty slot]"
 msgstr "[üres hely]"
@@ -328,7 +328,7 @@ msgstr "[üres hely]"
 msgid "[create]"
 msgstr "[létrehozás]"
 
-#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:98
+#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
 msgstr "[szoftver lista]"
 
@@ -337,23 +337,23 @@ msgstr "[szoftver lista]"
 msgid "Error accessing %s"
 msgstr ""
 
-#: src/frontend/mame/ui/filesel.cpp:538
+#: src/frontend/mame/ui/filesel.cpp:542
 msgid "Select access mode"
 msgstr "Hozzáférési mód választás"
 
-#: src/frontend/mame/ui/filesel.cpp:539
+#: src/frontend/mame/ui/filesel.cpp:543
 msgid "Read-only"
 msgstr "Csak olvasható"
 
-#: src/frontend/mame/ui/filesel.cpp:541
+#: src/frontend/mame/ui/filesel.cpp:545
 msgid "Read-write"
 msgstr "Olvasható-írható"
 
-#: src/frontend/mame/ui/filesel.cpp:542
+#: src/frontend/mame/ui/filesel.cpp:546
 msgid "Read this image, write to another image"
 msgstr "A kép beolvasása és mentése egy másik képbe"
 
-#: src/frontend/mame/ui/filesel.cpp:543
+#: src/frontend/mame/ui/filesel.cpp:547
 msgid "Read this image, write to diff"
 msgstr "A kép beolvasása és mentése másikba"
 
@@ -373,7 +373,7 @@ msgstr ""
 msgid "Enlarge images in the right panel"
 msgstr "Képek nagyítása a jobb panelen"
 
-#: src/frontend/mame/ui/submenu.cpp:35 src/frontend/mame/ui/dirmenu.cpp:46
+#: src/frontend/mame/ui/submenu.cpp:35
 msgid "Cheats"
 msgstr "Csalások"
 
@@ -399,7 +399,7 @@ msgstr "Kép beállítása háttérként"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "BIOS választási menü kihagyása"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Skip software parts selection menu"
@@ -665,36 +665,36 @@ msgstr "Szinkronizált frissítés"
 msgid "Wait Vertical Sync"
 msgstr "V-sync-re várás"
 
-#: src/frontend/mame/ui/menu.cpp:380 src/frontend/mame/ui/menu.cpp:672
+#: src/frontend/mame/ui/menu.cpp:370 src/frontend/mame/ui/menu.cpp:662
 #: src/frontend/mame/ui/videoopt.cpp:192 plugins/cheatfind/init.lua:763
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:668
 msgid "On"
 msgstr "Be"
 
-#: src/frontend/mame/ui/menu.cpp:380 src/frontend/mame/ui/menu.cpp:675
+#: src/frontend/mame/ui/menu.cpp:370 src/frontend/mame/ui/menu.cpp:665
 #: src/frontend/mame/ui/videoopt.cpp:208 plugins/cheatfind/init.lua:760
 #: plugins/cheatfind/init.lua:771 plugins/cheat/init.lua:671
 #: plugins/cheat/init.lua:680
 msgid "Off"
 msgstr "Ki"
 
-#: src/frontend/mame/ui/menu.cpp:678
+#: src/frontend/mame/ui/menu.cpp:668
 msgid "Auto"
 msgstr "Automata"
 
-#: src/frontend/mame/ui/menu.cpp:1178
+#: src/frontend/mame/ui/menu.cpp:1168
 msgid "Start Machine"
 msgstr ""
 
-#: src/frontend/mame/ui/menu.cpp:1180
+#: src/frontend/mame/ui/menu.cpp:1170
 msgid "Return to Machine"
 msgstr "Vissza a géphez"
 
-#: src/frontend/mame/ui/menu.cpp:1185 src/frontend/mame/ui/menu.cpp:1187
+#: src/frontend/mame/ui/menu.cpp:1175 src/frontend/mame/ui/menu.cpp:1177
 msgid "Exit"
 msgstr "Kilépés"
 
-#: src/frontend/mame/ui/menu.cpp:1192 src/frontend/mame/ui/menu.cpp:1194
+#: src/frontend/mame/ui/menu.cpp:1182 src/frontend/mame/ui/menu.cpp:1184
 msgid "Return to Previous Menu"
 msgstr "Vissza az előző menübe"
 
@@ -732,86 +732,107 @@ msgid "Cannot change options while recording!"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:31
+msgctxt "emulation-feature"
 msgid "protection"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:32
+msgctxt "emulation-feature"
 msgid "timing"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:33
+msgctxt "emulation-feature"
 msgid "graphics"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:34
+msgctxt "emulation-feature"
 msgid "color palette"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:35
+msgctxt "emulation-feature"
 msgid "sound"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:36
+msgctxt "emulation-feature"
 msgid "capture hardware"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:37
+msgctxt "emulation-feature"
 msgid "camera"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:38
+msgctxt "emulation-feature"
 msgid "microphone"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:39
+msgctxt "emulation-feature"
 msgid "controls"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:40
+msgctxt "emulation-feature"
 msgid "keyboard"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:41
+msgctxt "emulation-feature"
 msgid "mouse"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:42
+msgctxt "emulation-feature"
 msgid "media"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:43
+msgctxt "emulation-feature"
 msgid "disk"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:44
+msgctxt "emulation-feature"
 msgid "printer"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:45
+msgctxt "emulation-feature"
 msgid "magnetic tape"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:46
+msgctxt "emulation-feature"
 msgid "punch tape"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:47
+msgctxt "emulation-feature"
 msgid "magnetic drum"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:48
+msgctxt "emulation-feature"
 msgid "solid state storage"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:49
+msgctxt "emulation-feature"
 msgid "communications"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:50
+msgctxt "emulation-feature"
 msgid "LAN"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:51
+msgctxt "emulation-feature"
 msgid "WAN"
 msgstr ""
 
@@ -906,6 +927,9 @@ msgid ""
 "\n"
 "There are working clones of this machine: %s"
 msgstr ""
+"\n"
+"\n"
+"Ennek a gépnek vannak működő klónjai: %s"
 
 #: src/frontend/mame/ui/info.cpp:339
 #, c-format
@@ -996,28 +1020,28 @@ msgstr "Részlegesen támogatva"
 msgid "[empty]"
 msgstr "[üres]"
 
-#: src/frontend/mame/ui/swlist.cpp:92
+#: src/frontend/mame/ui/swlist.cpp:94
 msgid "[file manager]"
 msgstr "[fájl kezelő]"
 
-#: src/frontend/mame/ui/swlist.cpp:234
+#: src/frontend/mame/ui/swlist.cpp:228
 msgid "Switch Item Ordering"
 msgstr "Elem sorrend beállítása"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
 msgstr "Beállított sorrend: bejegyzések a következő sorrendben %s"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 msgid "shortname"
 msgstr "rövid név"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 msgid "description"
 msgstr "leírás"
 
-#: src/frontend/mame/ui/swlist.cpp:397
+#: src/frontend/mame/ui/swlist.cpp:391
 msgid "[compatible lists]"
 msgstr "[kompatibilitási lista]"
 
@@ -1025,11 +1049,11 @@ msgstr "[kompatibilitási lista]"
 msgid "File Already Exists - Override?"
 msgstr "Fájl már lézeik - Felülírod?"
 
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1089
 msgid "No"
 msgstr "Nem"
 
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1089
 msgid "Yes"
 msgstr "Igen"
 
@@ -1070,7 +1094,7 @@ msgstr "Természetes"
 msgid "Emulated"
 msgstr "Emulálva"
 
-#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:478
+#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:484
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr ""
@@ -1087,189 +1111,358 @@ msgstr "Bekapcsolva"
 msgid "Disabled"
 msgstr "Kikapcsolva"
 
-#: src/frontend/mame/ui/utils.cpp:62 src/frontend/mame/ui/utils.cpp:86
-msgid "Unfiltered"
+#: src/frontend/mame/ui/utils.cpp:63
+msgctxt "swlist-info"
+msgid "Alternate Title"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:63 src/frontend/mame/ui/utils.cpp:87
-msgid "Available"
-msgstr ""
-
-#: src/frontend/mame/ui/utils.cpp:64 src/frontend/mame/ui/utils.cpp:88
-msgid "Unavailable"
+#: src/frontend/mame/ui/utils.cpp:64
+msgctxt "swlist-info"
+msgid "Author"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:65
-msgid "Working"
+msgctxt "swlist-info"
+msgid "Barcode Number"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:66
-msgid "Not Working"
+msgctxt "swlist-info"
+msgid "Developer"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:67
-msgid "Mechanical"
+msgctxt "swlist-info"
+msgid "Distributor"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:68
-msgid "Not Mechanical"
+msgctxt "swlist-info"
+msgid "Installation Instructions"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:69
-msgid "Category"
+msgctxt "swlist-info"
+msgid "ISBN"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:70 src/frontend/mame/ui/utils.cpp:89
-msgid "Favorites"
+#: src/frontend/mame/ui/utils.cpp:70
+msgctxt "swlist-info"
+msgid "OEM"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/miscmenu.cpp:806
-msgid "BIOS"
+#: src/frontend/mame/ui/utils.cpp:71
+msgctxt "swlist-info"
+msgid "Original Publisher"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:72
-msgid "Not BIOS"
+msgctxt "swlist-info"
+msgid "Part Number"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:73 src/frontend/mame/ui/utils.cpp:90
-msgid "Parents"
+#: src/frontend/mame/ui/utils.cpp:73
+msgctxt "swlist-info"
+msgid "PCB"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:74 src/frontend/mame/ui/utils.cpp:91
-msgid "Clones"
+#: src/frontend/mame/ui/utils.cpp:74
+msgctxt "swlist-info"
+msgid "Programmer"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:75
-msgid "Manufacturer"
+msgctxt "swlist-info"
+msgid "Release Date"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:76 src/frontend/mame/ui/utils.cpp:92
-msgid "Year"
+#: src/frontend/mame/ui/utils.cpp:76
+msgctxt "swlist-info"
+msgid "Serial Number"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:77
-msgid "Save Supported"
+msgctxt "swlist-info"
+msgid "Usage Instructions"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:78
-msgid "Save Unsupported"
+msgctxt "swlist-info"
+msgid "Version"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:79
-msgid "CHD Required"
+#: src/frontend/mame/ui/utils.cpp:84
+msgctxt "machine-filter"
+msgid "Unfiltered"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:80
-msgid "No CHD Required"
+#: src/frontend/mame/ui/utils.cpp:85
+msgctxt "machine-filter"
+msgid "Available"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:81
-msgid "Vertical Screen"
+#: src/frontend/mame/ui/utils.cpp:86
+msgctxt "machine-filter"
+msgid "Unavailable"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:82
-msgid "Horizontal Screen"
+#: src/frontend/mame/ui/utils.cpp:87
+msgctxt "machine-filter"
+msgid "Working"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:83 src/frontend/mame/ui/utils.cpp:100
-msgid "Custom Filter"
+#: src/frontend/mame/ui/utils.cpp:88
+msgctxt "machine-filter"
+msgid "Not Working"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:89
+msgctxt "machine-filter"
+msgid "Mechanical"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:90
+msgctxt "machine-filter"
+msgid "Not Mechanical"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:91
+msgctxt "machine-filter"
+msgid "Category"
+msgstr "Kategória"
+
+#: src/frontend/mame/ui/utils.cpp:92
+msgctxt "machine-filter"
+msgid "Favorites"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:93
-msgid "Publisher"
+msgctxt "machine-filter"
+msgid "BIOS"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:94
-msgid "Supported"
+msgctxt "machine-filter"
+msgid "Not BIOS"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:95
-msgid "Partially Supported"
+msgctxt "machine-filter"
+msgid "Parents"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:96
-msgid "Unsupported"
+msgctxt "machine-filter"
+msgid "Clones"
 msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:97
+msgctxt "machine-filter"
+msgid "Manufacturer"
+msgstr "Gyártó"
+
+#: src/frontend/mame/ui/utils.cpp:98
+msgctxt "machine-filter"
+msgid "Year"
+msgstr "Év"
+
+#: src/frontend/mame/ui/utils.cpp:99
+msgctxt "machine-filter"
+msgid "Save Supported"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:100
+msgctxt "machine-filter"
+msgid "Save Unsupported"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:101
+msgctxt "machine-filter"
+msgid "CHD Required"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:102
+msgctxt "machine-filter"
+msgid "No CHD Required"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:103
+msgctxt "machine-filter"
+msgid "Vertical Screen"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:104
+msgctxt "machine-filter"
+msgid "Horizontal Screen"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:105
+msgctxt "machine-filter"
+msgid "Custom Filter"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:109
+msgctxt "software-filter"
+msgid "Unfiltered"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:110
+msgctxt "software-filter"
+msgid "Available"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:111
+msgctxt "software-filter"
+msgid "Unavailable"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:112
+msgctxt "software-filter"
+msgid "Favorites"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:113
+msgctxt "software-filter"
+msgid "Parents"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:114
+msgctxt "software-filter"
+msgid "Clones"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:115
+msgctxt "software-filter"
+msgid "Year"
+msgstr "Év"
+
+#: src/frontend/mame/ui/utils.cpp:116
+msgctxt "software-filter"
+msgid "Publisher"
+msgstr "Kiadó"
+
+#: src/frontend/mame/ui/utils.cpp:117
+msgctxt "software-filter"
+msgid "Developer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:118
+msgctxt "software-filter"
+msgid "Distributor"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:119
+msgctxt "software-filter"
+msgid "Author"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:120
+msgctxt "software-filter"
+msgid "Programmer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:121
+msgctxt "software-filter"
+msgid "Supported"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:122
+msgctxt "software-filter"
+msgid "Partially Supported"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:123
+msgctxt "software-filter"
+msgid "Unsupported"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:124
+msgctxt "software-filter"
 msgid "Release Region"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:98
+#: src/frontend/mame/ui/utils.cpp:125
+msgctxt "software-filter"
 msgid "Device Type"
-msgstr ""
+msgstr "Eszköz fajtája"
 
-#: src/frontend/mame/ui/utils.cpp:99
+#: src/frontend/mame/ui/utils.cpp:126
+msgctxt "software-filter"
 msgid "Software List"
+msgstr "Szoftver lista"
+
+#: src/frontend/mame/ui/utils.cpp:127
+msgctxt "software-filter"
+msgid "Custom Filter"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:247
+#: src/frontend/mame/ui/utils.cpp:291
 msgid "<set up filters>"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:351
+#: src/frontend/mame/ui/utils.cpp:395
 msgid "Select custom filters:"
 msgstr "Egyéni szűrő választás:"
 
-#: src/frontend/mame/ui/utils.cpp:502
+#: src/frontend/mame/ui/utils.cpp:546
 #, c-format
 msgid "Filter %1$u"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:516
+#: src/frontend/mame/ui/utils.cpp:560
 msgid "Remove last filter"
 msgstr "Utolsó szűrő eltávolítása"
 
-#: src/frontend/mame/ui/utils.cpp:518
+#: src/frontend/mame/ui/utils.cpp:562
 msgid "Add filter"
 msgstr "Szűrő beállítás"
 
-#: src/frontend/mame/ui/utils.cpp:957
+#: src/frontend/mame/ui/utils.cpp:1001
 msgid "Select category:"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:988
+#: src/frontend/mame/ui/utils.cpp:1032
 msgid "[no category INI files]"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:996
+#: src/frontend/mame/ui/utils.cpp:1040
 msgid "[no groups in INI file]"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1030
+#: src/frontend/mame/ui/utils.cpp:1074
 msgid "No category INI files found"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1035
+#: src/frontend/mame/ui/utils.cpp:1079
 msgid "File"
-msgstr ""
+msgstr "Fájl"
 
-#: src/frontend/mame/ui/utils.cpp:1039
+#: src/frontend/mame/ui/utils.cpp:1083
 msgid "No groups found in category file"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/utils.cpp:1088
 msgid "Group"
 msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/utils.cpp:1089
 msgid "Include clones"
 msgstr ""
 
-#: src/frontend/mame/ui/datmenu.cpp:81
-msgid "Software Usage"
-msgstr "Szoftver használat"
+#: src/frontend/mame/ui/datmenu.cpp:81 src/frontend/mame/ui/selmenu.cpp:2635
+msgid "Software List Info"
+msgstr ""
 
 #: src/frontend/mame/ui/datmenu.cpp:365
 msgid "Revision: "
 msgstr "Revízió:"
 
-#: src/frontend/mame/ui/miscmenu.cpp:77 src/frontend/mame/ui/confswitch.cpp:162
+#: src/frontend/mame/ui/miscmenu.cpp:78 src/frontend/mame/ui/confswitch.cpp:162
 #: src/frontend/mame/ui/slotopt.cpp:203
 msgid "Reset"
 msgstr "Alapra állítás"
 
-#: src/frontend/mame/ui/miscmenu.cpp:235
+#: src/frontend/mame/ui/miscmenu.cpp:236
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
@@ -1278,7 +1471,7 @@ msgstr ""
 "Játékidő: %1$d:%2$02d:%3$02d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:237
+#: src/frontend/mame/ui/miscmenu.cpp:238
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d\n"
@@ -1287,7 +1480,7 @@ msgstr ""
 "Játékidő: %1$d:%2$02d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:241
+#: src/frontend/mame/ui/miscmenu.cpp:242
 #, c-format
 msgid ""
 "Tickets dispensed: %1$d\n"
@@ -1296,90 +1489,94 @@ msgstr ""
 "Kiosztott jegyek: %1$d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:252
+#: src/frontend/mame/ui/miscmenu.cpp:253
 msgid "Coin %1$c: NA%3$s\n"
 msgstr "Érme %1$c: NA%3$s\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:252
+#: src/frontend/mame/ui/miscmenu.cpp:253
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
 msgstr "Érme %1$c: %2$d%3$s\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:255
+#: src/frontend/mame/ui/miscmenu.cpp:256
 msgid " (locked)"
 msgstr " (zárolva)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:455
+#: src/frontend/mame/ui/miscmenu.cpp:456
 #, c-format
 msgid "P%d Visibility"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:509
+#: src/frontend/mame/ui/miscmenu.cpp:510
 #, c-format
 msgid "P%d Crosshair"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:526
+#: src/frontend/mame/ui/miscmenu.cpp:527
 msgid "Visible Delay"
 msgstr "Látható késés"
 
-#: src/frontend/mame/ui/miscmenu.cpp:638
+#: src/frontend/mame/ui/miscmenu.cpp:639
 #, c-format
 msgid "%s.xml saved under ui folder."
 msgstr "%s.xml mentve az ui mappába."
 
-#: src/frontend/mame/ui/miscmenu.cpp:664
+#: src/frontend/mame/ui/miscmenu.cpp:665
 msgid "Name:             Description:\n"
 msgstr "Név:             Leírás:\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:675
+#: src/frontend/mame/ui/miscmenu.cpp:676
 #, c-format
 msgid "%s.txt saved under ui folder."
 msgstr "%s.txt mentve az ui mappába."
 
-#: src/frontend/mame/ui/miscmenu.cpp:692
+#: src/frontend/mame/ui/miscmenu.cpp:693
 msgid "Export list in XML format (like -listxml)"
 msgstr "Lista exportálása XML formátumba (mint -listxml)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:693
+#: src/frontend/mame/ui/miscmenu.cpp:694
 msgid "Export list in XML format (like -listxml, but exclude devices)"
 msgstr ""
 "Lista exportálása XML formátumba (mint -listxml, de belefoglalva az "
 "eszközöket)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:694
+#: src/frontend/mame/ui/miscmenu.cpp:695
 msgid "Export list in TXT format (like -listfull)"
 msgstr "Lista exportálása TXT formátumba (mint -listfull)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:810
+#: src/frontend/mame/ui/miscmenu.cpp:829
+msgid "BIOS"
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:833
 msgid "Driver"
 msgstr "Vezérlőprogram"
 
-#: src/frontend/mame/ui/miscmenu.cpp:813
+#: src/frontend/mame/ui/miscmenu.cpp:836
 msgid "This machine has no BIOS."
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:822 src/frontend/mame/ui/mainmenu.cpp:134
+#: src/frontend/mame/ui/miscmenu.cpp:845 src/frontend/mame/ui/mainmenu.cpp:134
 msgid "Add To Favorites"
 msgstr "Felvétel a Kedvencekhez"
 
-#: src/frontend/mame/ui/miscmenu.cpp:824 src/frontend/mame/ui/mainmenu.cpp:136
+#: src/frontend/mame/ui/miscmenu.cpp:847 src/frontend/mame/ui/mainmenu.cpp:136
 msgid "Remove From Favorites"
 msgstr "Eltávolítás a kedvencekből"
 
-#: src/frontend/mame/ui/miscmenu.cpp:827
+#: src/frontend/mame/ui/miscmenu.cpp:850
 msgid "Save Machine Configuration"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:838
+#: src/frontend/mame/ui/miscmenu.cpp:861
 msgid "Configure Machine:"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:872 src/frontend/mame/ui/selmenu.cpp:2595
+#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/selmenu.cpp:2573
 msgid " (default)"
 msgstr " (alap)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:954 src/frontend/mame/ui/selgame.cpp:608
+#: src/frontend/mame/ui/miscmenu.cpp:977 src/frontend/mame/ui/selgame.cpp:812
 msgid "Plugins"
 msgstr "Beépülők"
 
@@ -1391,30 +1588,48 @@ msgstr "Pszeudó terminálok"
 msgid "[failed]"
 msgstr "[sikertelen]"
 
-#: src/frontend/mame/ui/state.cpp:213
+#: src/frontend/mame/ui/state.cpp:215
 msgid "No save states found"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:404
+#: src/frontend/mame/ui/state.cpp:265
+#, c-format
+msgid ""
+"Delete saved state %1$s?\n"
+"Press %2$s to delete\n"
+"Press %3$s to cancel"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:378
+#, c-format
+msgid "Error removing saved state file %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:424
+#, c-format
+msgid "Press %1$s to delete"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:497
 msgid "Load State"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:404
+#: src/frontend/mame/ui/state.cpp:497
 msgid "Select state to load"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:428
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Save State"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:428
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Press a key or joystick button, or select state to overwrite"
 msgstr ""
 
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
 msgid "%s [internal]"
-msgstr ""
+msgstr "%s [belső]"
 
 #: src/frontend/mame/ui/inputmap.cpp:38
 msgid "User Interface"
@@ -1430,7 +1645,7 @@ msgid "Other Controls"
 msgstr "Egyéb irányítók"
 
 #: src/frontend/mame/ui/inputmap.cpp:227
-msgid "This machine has no input map."
+msgid "This machine has no configurable inputs."
 msgstr ""
 
 #: src/frontend/mame/ui/inputmap.cpp:310
@@ -1442,27 +1657,27 @@ msgstr ""
 msgid "Invalid sequence entered"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:480
+#: src/frontend/mame/ui/inputmap.cpp:486
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:507
+#: src/frontend/mame/ui/inputmap.cpp:513
 #, c-format
 msgid "Press %1$s to set\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:508
+#: src/frontend/mame/ui/inputmap.cpp:514
 #, c-format
 msgid "Press %1$s to append\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:509
+#: src/frontend/mame/ui/inputmap.cpp:515
 #, c-format
 msgid "Press %1$s to clear\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:510
+#: src/frontend/mame/ui/inputmap.cpp:516
 #, c-format
 msgid "Press %1$s to restore default\n"
 msgstr ""
@@ -1541,7 +1756,7 @@ msgstr ""
 "információk végett."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:278
-#: src/frontend/mame/ui/selgame.cpp:603
+#: src/frontend/mame/ui/selgame.cpp:807
 msgid "Configure Options"
 msgstr "Beállítási lehetőségek"
 
@@ -1555,7 +1770,7 @@ msgid "Type name or select: (random)"
 msgstr "Név beírása vagy kiválasztás: (véletlenszerű)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:318
-#: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:713
+#: src/frontend/mame/ui/selmenu.cpp:660 src/frontend/mame/ui/selmenu.cpp:697
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s, %2$-.100s"
@@ -1566,52 +1781,52 @@ msgid "Driver: %1$-.100s"
 msgstr "Illesztőprogram: %1$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:337
-#: src/frontend/mame/ui/selmenu.cpp:726
+#: src/frontend/mame/ui/selmenu.cpp:712
 msgid "Overall: NOT WORKING"
 msgstr "Összegezve: NEM MŰKÖDIK"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:339
-#: src/frontend/mame/ui/selmenu.cpp:728
+#: src/frontend/mame/ui/selmenu.cpp:714
 msgid "Overall: Unemulated Protection"
 msgstr "Összegezve: Emulálatlan védelem"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:341
-#: src/frontend/mame/ui/selmenu.cpp:730
+#: src/frontend/mame/ui/selmenu.cpp:716
 msgid "Overall: Working"
 msgstr "Összegezve: Működik"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:345
-#: src/frontend/mame/ui/selmenu.cpp:734
+#: src/frontend/mame/ui/selmenu.cpp:720
 msgid "Graphics: Unimplemented, "
 msgstr ""
 
 #: src/frontend/mame/ui/simpleselgame.cpp:347
-#: src/frontend/mame/ui/selmenu.cpp:736
+#: src/frontend/mame/ui/selmenu.cpp:722
 msgid "Graphics: Imperfect, "
 msgstr "Grafika: Hibás, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:349
-#: src/frontend/mame/ui/selmenu.cpp:738
+#: src/frontend/mame/ui/selmenu.cpp:724
 msgid "Graphics: OK, "
 msgstr "Grafika: Jó, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:352
-#: src/frontend/mame/ui/selmenu.cpp:741
+#: src/frontend/mame/ui/selmenu.cpp:727
 msgid "Sound: None"
 msgstr ""
 
 #: src/frontend/mame/ui/simpleselgame.cpp:354
-#: src/frontend/mame/ui/selmenu.cpp:743
+#: src/frontend/mame/ui/selmenu.cpp:729
 msgid "Sound: Unimplemented"
 msgstr "Hang: nincs beépítve"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:356
-#: src/frontend/mame/ui/selmenu.cpp:745
+#: src/frontend/mame/ui/selmenu.cpp:731
 msgid "Sound: Imperfect"
 msgstr "Hang: Hibás"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:358
-#: src/frontend/mame/ui/selmenu.cpp:747
+#: src/frontend/mame/ui/selmenu.cpp:733
 msgid "Sound: OK"
 msgstr "Hang: Jó"
 
@@ -1637,482 +1852,534 @@ msgid "Reload All"
 msgstr "Mind újratöltése"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
+msgctxt "path-option"
 msgid "ROMs"
 msgstr "ROM"
 
 #: src/frontend/mame/ui/dirmenu.cpp:38
+msgctxt "path-option"
 msgid "Software Media"
 msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
-msgid "UI"
-msgstr "Felület"
-
-#: src/frontend/mame/ui/dirmenu.cpp:40 src/frontend/mame/ui/custui.cpp:177
-msgid "Language"
-msgstr "Nyelv"
-
-#: src/frontend/mame/ui/dirmenu.cpp:41
-msgid "Samples"
-msgstr "Minták"
-
-#: src/frontend/mame/ui/dirmenu.cpp:42
-msgid "DATs"
-msgstr "DAT"
-
-#: src/frontend/mame/ui/dirmenu.cpp:43
-msgid "INIs"
-msgstr "INI fájlok"
-
-#: src/frontend/mame/ui/dirmenu.cpp:44
-msgid "Category INIs"
+msgctxt "path-option"
+msgid "Sound Samples"
 msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:45
-msgid "Icons"
-msgstr "Ikonok"
+#: src/frontend/mame/ui/dirmenu.cpp:40
+msgctxt "path-option"
+msgid "Artwork"
+msgstr "Illusztrációk"
 
-#: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/selmenu.cpp:74
-msgid "Snapshots"
-msgstr "Pillanatképek"
-
-#: src/frontend/mame/ui/dirmenu.cpp:48 src/frontend/mame/ui/selmenu.cpp:75
-msgid "Cabinets"
-msgstr "Játékgép"
-
-#: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:78
-msgid "Flyers"
-msgstr "Plakátok"
-
-#: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:79
-msgid "Titles"
-msgstr "Címkép"
-
-#: src/frontend/mame/ui/dirmenu.cpp:51 src/frontend/mame/ui/selmenu.cpp:80
-msgid "Ends"
-msgstr "Befejezések"
-
-#: src/frontend/mame/ui/dirmenu.cpp:52 src/frontend/mame/ui/selmenu.cpp:77
-msgid "PCBs"
-msgstr "PCB-k"
-
-#: src/frontend/mame/ui/dirmenu.cpp:53 src/frontend/mame/ui/selmenu.cpp:89
-msgid "Marquees"
-msgstr "Matricák"
-
-#: src/frontend/mame/ui/dirmenu.cpp:54
-msgid "Controls Panels"
-msgstr "Kezelő pult"
-
-#: src/frontend/mame/ui/dirmenu.cpp:55
+#: src/frontend/mame/ui/dirmenu.cpp:41
+msgctxt "path-option"
 msgid "Crosshairs"
 msgstr "Célkeresztek"
 
-#: src/frontend/mame/ui/dirmenu.cpp:56
-msgid "Artworks"
-msgstr "Illusztrációk"
+#: src/frontend/mame/ui/dirmenu.cpp:42
+msgctxt "path-option"
+msgid "Cheat Files"
+msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/selmenu.cpp:82
+#: src/frontend/mame/ui/dirmenu.cpp:43
+msgctxt "path-option"
+msgid "Plugins"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:44
+msgctxt "path-option"
+msgid "UI Translations"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:45
+msgctxt "path-option"
+msgid "INIs"
+msgstr "INI fájlok"
+
+#: src/frontend/mame/ui/dirmenu.cpp:46
+msgctxt "path-option"
+msgid "UI Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:47
+msgctxt "path-option"
+msgid "Plugin Data"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:48
+msgctxt "path-option"
+msgid "DATs"
+msgstr "DAT"
+
+#: src/frontend/mame/ui/dirmenu.cpp:49
+msgctxt "path-option"
+msgid "Category INIs"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:50
+msgctxt "path-option"
+msgid "Snapshots"
+msgstr "Pillanatképek"
+
+#: src/frontend/mame/ui/dirmenu.cpp:51
+msgctxt "path-option"
+msgid "Icons"
+msgstr "Ikonok"
+
+#: src/frontend/mame/ui/dirmenu.cpp:52
+msgctxt "path-option"
+msgid "Control Panels"
+msgstr "Kezelő pult"
+
+#: src/frontend/mame/ui/dirmenu.cpp:53
+msgctxt "path-option"
+msgid "Cabinets"
+msgstr "Játékgép"
+
+#: src/frontend/mame/ui/dirmenu.cpp:54
+msgctxt "path-option"
+msgid "Marquees"
+msgstr "Matricák"
+
+#: src/frontend/mame/ui/dirmenu.cpp:55
+msgctxt "path-option"
+msgid "PCBs"
+msgstr "PCB-k"
+
+#: src/frontend/mame/ui/dirmenu.cpp:56
+msgctxt "path-option"
+msgid "Flyers"
+msgstr "Plakátok"
+
+#: src/frontend/mame/ui/dirmenu.cpp:57
+msgctxt "path-option"
+msgid "Title Screens"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:58
+msgctxt "path-option"
+msgid "Game Endings"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:59
+msgctxt "path-option"
 msgid "Bosses"
 msgstr "Boss"
 
-#: src/frontend/mame/ui/dirmenu.cpp:58
-msgid "Artworks Preview"
-msgstr "Illusztrációk előnézete"
-
-#: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/selmenu.cpp:88
-msgid "Select"
-msgstr "Választás"
-
 #: src/frontend/mame/ui/dirmenu.cpp:60
-msgid "GameOver"
-msgstr "Végkép"
+msgctxt "path-option"
+msgid "Artwork Previews"
+msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/selmenu.cpp:86
+#: src/frontend/mame/ui/dirmenu.cpp:61
+msgctxt "path-option"
+msgid "Select"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:62
+msgctxt "path-option"
+msgid "Game Over Screens"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:63
+msgctxt "path-option"
 msgid "HowTo"
 msgstr "Hogyan"
 
-#: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:83
+#: src/frontend/mame/ui/dirmenu.cpp:64
+msgctxt "path-option"
 msgid "Logos"
 msgstr "Logók"
 
-#: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/selmenu.cpp:87
+#: src/frontend/mame/ui/dirmenu.cpp:65
+msgctxt "path-option"
 msgid "Scores"
 msgstr "Eredmények"
 
-#: src/frontend/mame/ui/dirmenu.cpp:64 src/frontend/mame/ui/selmenu.cpp:84
+#: src/frontend/mame/ui/dirmenu.cpp:66
+msgctxt "path-option"
 msgid "Versus"
 msgstr "Ellen"
 
-#: src/frontend/mame/ui/dirmenu.cpp:65 src/frontend/mame/ui/selmenu.cpp:90
+#: src/frontend/mame/ui/dirmenu.cpp:67
+msgctxt "path-option"
 msgid "Covers"
 msgstr "Borítók"
 
-#: src/frontend/mame/ui/dirmenu.cpp:118
+#: src/frontend/mame/ui/dirmenu.cpp:120
 msgid "Folders Setup"
 msgstr "Mappa beállítások"
 
-#: src/frontend/mame/ui/dirmenu.cpp:169
+#: src/frontend/mame/ui/dirmenu.cpp:171
 #, c-format
 msgid "Current %1$s Folders"
 msgstr "Jelenlegi %1$s mappák"
 
-#: src/frontend/mame/ui/dirmenu.cpp:181
+#: src/frontend/mame/ui/dirmenu.cpp:183
 msgid "Change Folder"
 msgstr "Mappa váltás"
 
-#: src/frontend/mame/ui/dirmenu.cpp:181
+#: src/frontend/mame/ui/dirmenu.cpp:183
 msgid "Add Folder"
 msgstr "Mappa létrehozása"
 
-#: src/frontend/mame/ui/dirmenu.cpp:184
+#: src/frontend/mame/ui/dirmenu.cpp:186
 msgid "Remove Folder"
 msgstr "Mappa eltávolítása"
 
-#: src/frontend/mame/ui/dirmenu.cpp:419
+#: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
 msgstr "%1$s mappára váltás - Keresés: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:419
+#: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
 msgstr "%1$s mappa létrehozása - Keresés: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:430
+#: src/frontend/mame/ui/dirmenu.cpp:432
 msgid "Press TAB to set"
 msgstr "Beállítás a TAB billentyűvel"
 
-#: src/frontend/mame/ui/dirmenu.cpp:514
+#: src/frontend/mame/ui/dirmenu.cpp:516
 #, c-format
 msgid "Remove %1$s Folder"
 msgstr "%1$s mappa eltávolítása"
 
-#: src/frontend/mame/ui/viewgfx.cpp:428
+#: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " COLORS"
 msgstr " SZÍNEK"
 
-#: src/frontend/mame/ui/viewgfx.cpp:428
+#: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " PENS"
 msgstr " TOLLAK"
 
-#: src/frontend/mame/ui/selgame.cpp:604
+#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
+#, c-format
+msgid "Zoom = 1/%1$d"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
+#, c-format
+msgid "Zoom = %1$d"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:1262
+msgid "Expand to fit"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:808
 msgid "Configure Machine"
 msgstr "Gép beállítások"
 
-#: src/frontend/mame/ui/selgame.cpp:1046
+#: src/frontend/mame/ui/selgame.cpp:1279
 #, c-format
 msgid "Romset\t%1$-.100s\n"
-msgstr ""
+msgstr "Romkészlet\t%1$-.100s\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1047
+#: src/frontend/mame/ui/selgame.cpp:1280
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr ""
+msgstr "Év\t%1$s\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1048
+#: src/frontend/mame/ui/selgame.cpp:1281
 #, c-format
 msgid "Manufacturer\t%1$-.100s\n"
-msgstr ""
+msgstr "Gyártó\t%1$-.100s\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1052
+#: src/frontend/mame/ui/selgame.cpp:1285
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr ""
+msgstr "Vezérlőprogram klónja ennek\t%1$-.100s\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1054
+#: src/frontend/mame/ui/selgame.cpp:1287
 msgid "Driver is Parent\t\n"
-msgstr ""
+msgstr "A vezérlőprogram Alap\t\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1057
+#: src/frontend/mame/ui/selgame.cpp:1290
 msgid "Analog Controls\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1059
+#: src/frontend/mame/ui/selgame.cpp:1292
 msgid "Keyboard Inputs\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1062
+#: src/frontend/mame/ui/selgame.cpp:1295
 msgid "Overall\tNOT WORKING\n"
-msgstr ""
+msgstr "Összegezve\tNEM MŰKÖDIK\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1064
+#: src/frontend/mame/ui/selgame.cpp:1297
 msgid "Overall\tUnemulated Protection\n"
-msgstr ""
+msgstr "Összegezve\tEmulálatlan védelem\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1066
+#: src/frontend/mame/ui/selgame.cpp:1299
 msgid "Overall\tWorking\n"
-msgstr ""
+msgstr "Összegezve\tMűködik\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1069
+#: src/frontend/mame/ui/selgame.cpp:1302
 msgid "Graphics\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1071
+#: src/frontend/mame/ui/selgame.cpp:1304
 msgid "Graphics\tWrong Colors\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1073
+#: src/frontend/mame/ui/selgame.cpp:1306
 msgid "Graphics\tImperfect Colors\n"
-msgstr ""
+msgstr "Grafika\tHibás színek\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1075
+#: src/frontend/mame/ui/selgame.cpp:1308
 msgid "Graphics\tImperfect\n"
-msgstr ""
+msgstr "Grafika\tHibás\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1077
+#: src/frontend/mame/ui/selgame.cpp:1310
 msgid "Graphics\tOK\n"
-msgstr ""
+msgstr "Grafika\tJó\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1080
+#: src/frontend/mame/ui/selgame.cpp:1313
 msgid "Sound\tNone\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1082
+#: src/frontend/mame/ui/selgame.cpp:1315
 msgid "Sound\tUnimplemented\n"
-msgstr ""
+msgstr "Hang\tnincs beépítve\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1084
+#: src/frontend/mame/ui/selgame.cpp:1317
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "Hang\tHibás\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1086
+#: src/frontend/mame/ui/selgame.cpp:1319
 msgid "Sound\tOK\n"
-msgstr ""
+msgstr "Hang\tJó\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1089
+#: src/frontend/mame/ui/selgame.cpp:1322
 msgid "Capture\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1091
+#: src/frontend/mame/ui/selgame.cpp:1324
 msgid "Capture\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1094
+#: src/frontend/mame/ui/selgame.cpp:1327
 msgid "Camera\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1096
+#: src/frontend/mame/ui/selgame.cpp:1329
 msgid "Camera\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1099
+#: src/frontend/mame/ui/selgame.cpp:1332
 msgid "Microphone\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1101
+#: src/frontend/mame/ui/selgame.cpp:1334
 msgid "Microphone\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1104
+#: src/frontend/mame/ui/selgame.cpp:1337
 msgid "Controls\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1106
+#: src/frontend/mame/ui/selgame.cpp:1339
 msgid "Controls\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1109
+#: src/frontend/mame/ui/selgame.cpp:1342
 msgid "Keyboard\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1111
+#: src/frontend/mame/ui/selgame.cpp:1344
 msgid "Keyboard\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1114
+#: src/frontend/mame/ui/selgame.cpp:1347
 msgid "Mouse\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1116
+#: src/frontend/mame/ui/selgame.cpp:1349
 msgid "Mouse\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1119
+#: src/frontend/mame/ui/selgame.cpp:1352
 msgid "Media\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1121
+#: src/frontend/mame/ui/selgame.cpp:1354
 msgid "Media\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1124
+#: src/frontend/mame/ui/selgame.cpp:1357
 msgid "Disk\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1126
+#: src/frontend/mame/ui/selgame.cpp:1359
 msgid "Disk\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1129
+#: src/frontend/mame/ui/selgame.cpp:1362
 msgid "Printer\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1131
+#: src/frontend/mame/ui/selgame.cpp:1364
 msgid "Printer\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1134
+#: src/frontend/mame/ui/selgame.cpp:1367
 msgid "Mag. Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1136
+#: src/frontend/mame/ui/selgame.cpp:1369
 msgid "Mag. Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1139
+#: src/frontend/mame/ui/selgame.cpp:1372
 msgid "Punch Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1141
+#: src/frontend/mame/ui/selgame.cpp:1374
 msgid "Punch Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1144
+#: src/frontend/mame/ui/selgame.cpp:1377
 msgid "Mag. Drum\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1146
+#: src/frontend/mame/ui/selgame.cpp:1379
 msgid "Mag. Drum\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1149
+#: src/frontend/mame/ui/selgame.cpp:1382
 msgid "(EP)ROM\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1151
+#: src/frontend/mame/ui/selgame.cpp:1384
 msgid "(EP)ROM\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1154
+#: src/frontend/mame/ui/selgame.cpp:1387
 msgid "Communications\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1156
+#: src/frontend/mame/ui/selgame.cpp:1389
 msgid "Communications\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1159
+#: src/frontend/mame/ui/selgame.cpp:1392
 msgid "LAN\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1161
+#: src/frontend/mame/ui/selgame.cpp:1394
 msgid "LAN\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1164
+#: src/frontend/mame/ui/selgame.cpp:1397
 msgid "WAN\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1166
+#: src/frontend/mame/ui/selgame.cpp:1399
 msgid "WAN\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1169
+#: src/frontend/mame/ui/selgame.cpp:1402
 msgid "Timing\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1171
+#: src/frontend/mame/ui/selgame.cpp:1404
 msgid "Timing\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1173
+#: src/frontend/mame/ui/selgame.cpp:1406
 msgid "Mechanical Machine\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1173
+#: src/frontend/mame/ui/selgame.cpp:1406
 msgid "Mechanical Machine\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1174
+#: src/frontend/mame/ui/selgame.cpp:1407
 msgid "Requires Artwork\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1174
+#: src/frontend/mame/ui/selgame.cpp:1407
 msgid "Requires Artwork\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1175
+#: src/frontend/mame/ui/selgame.cpp:1408
 msgid "Requires Clickable Artwork\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1175
+#: src/frontend/mame/ui/selgame.cpp:1408
 msgid "Requires Clickable Artwork\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1177
+#: src/frontend/mame/ui/selgame.cpp:1410
 msgid "Support Cocktail\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1178
+#: src/frontend/mame/ui/selgame.cpp:1411
 msgid "Driver is BIOS\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1178
+#: src/frontend/mame/ui/selgame.cpp:1411
 msgid "Driver is BIOS\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1179
+#: src/frontend/mame/ui/selgame.cpp:1412
 msgid "Support Save\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1179
+#: src/frontend/mame/ui/selgame.cpp:1412
 msgid "Support Save\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1180
+#: src/frontend/mame/ui/selgame.cpp:1413
 msgid "Screen Orientation\tVertical\n"
-msgstr ""
+msgstr "Kép igazítottság\tFüggőleges"
 
-#: src/frontend/mame/ui/selgame.cpp:1180
+#: src/frontend/mame/ui/selgame.cpp:1413
 msgid "Screen Orientation\tHorizontal\n"
-msgstr ""
+msgstr "Kép igazítottság\tVízszintes"
 
-#: src/frontend/mame/ui/selgame.cpp:1190
+#: src/frontend/mame/ui/selgame.cpp:1423
 msgid "Requires CHD\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1190
+#: src/frontend/mame/ui/selgame.cpp:1423
 msgid "Requires CHD\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1203
+#: src/frontend/mame/ui/selgame.cpp:1436
 msgid "ROM Audit Result\tOK\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1205
+#: src/frontend/mame/ui/selgame.cpp:1438
 msgid "ROM Audit Result\tBAD\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1208
+#: src/frontend/mame/ui/selgame.cpp:1441
 msgid "Samples Audit Result\tNone Needed\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1210
+#: src/frontend/mame/ui/selgame.cpp:1443
 msgid "Samples Audit Result\tOK\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1212
+#: src/frontend/mame/ui/selgame.cpp:1445
 msgid "Samples Audit Result\tBAD\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1216
+#: src/frontend/mame/ui/selgame.cpp:1449
 msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1406
+#: src/frontend/mame/ui/selgame.cpp:1639
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 msgstr "%1$s %2$s ( %3$d / %4$d gép (%5$d BIOS) )"
 
-#: src/frontend/mame/ui/selgame.cpp:1434
-#, c-format
-msgid "Romset: %1$-.100s"
-msgstr "Romkészlet: %1$-.100s"
-
-#: src/frontend/mame/ui/selgame.cpp:1441
+#: src/frontend/mame/ui/selgame.cpp:1667
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "Rendszer: %1$-.100s"
@@ -2126,29 +2393,29 @@ msgstr "Kiválasztási lista - Keresés: "
 msgid "Double click or press %1$s to select"
 msgstr "Dupla kattintás vagy %1$s megnyomása a kiválasztáshoz"
 
-#: src/frontend/mame/ui/auditmenu.cpp:97
+#: src/frontend/mame/ui/auditmenu.cpp:49
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
 msgstr ""
 
-#: src/frontend/mame/ui/auditmenu.cpp:100
+#: src/frontend/mame/ui/auditmenu.cpp:52
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
 msgstr ""
 
-#: src/frontend/mame/ui/auditmenu.cpp:105
+#: src/frontend/mame/ui/auditmenu.cpp:57
 #, c-format
 msgid "(results will be saved to %1$s)"
 msgstr ""
 
-#: src/frontend/mame/ui/auditmenu.cpp:131
+#: src/frontend/mame/ui/auditmenu.cpp:83
 #, c-format
 msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
 
-#: src/frontend/mame/ui/auditmenu.cpp:143
+#: src/frontend/mame/ui/auditmenu.cpp:95
 msgid "Start Audit"
 msgstr ""
 
@@ -2168,212 +2435,247 @@ msgstr "Infó / kép elrejtése"
 msgid "Hide Both"
 msgstr "Mindkettő elrejtése"
 
-#: src/frontend/mame/ui/custui.cpp:171
+#: src/frontend/mame/ui/custui.cpp:176
 msgid "Fonts"
 msgstr "Betűk"
 
-#: src/frontend/mame/ui/custui.cpp:172
+#: src/frontend/mame/ui/custui.cpp:177
 msgid "Colors"
 msgstr "Színek"
 
-#: src/frontend/mame/ui/custui.cpp:181
+#: src/frontend/mame/ui/custui.cpp:180
+msgid "Language"
+msgstr "Nyelv"
+
+#: src/frontend/mame/ui/custui.cpp:183
+msgid "System Names"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:186
 msgid "Show side panels"
 msgstr "Oldal panelek mutatása"
 
-#: src/frontend/mame/ui/custui.cpp:193
-msgid "Custom UI Settings"
-msgstr "Egyedi felület beállításai"
+#: src/frontend/mame/ui/custui.cpp:198
+msgid "UI Customization Settings"
+msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:245
+#: src/frontend/mame/ui/custui.cpp:212 src/frontend/mame/ui/custui.cpp:256
+msgid "[built-in]"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:338
 msgid "default"
 msgstr "alap"
 
-#: src/frontend/mame/ui/custui.cpp:366
+#: src/frontend/mame/ui/custui.cpp:459
 msgid "UI Font"
 msgstr "Felület betűkészlete"
 
-#: src/frontend/mame/ui/custui.cpp:371
+#: src/frontend/mame/ui/custui.cpp:464
 msgid "Bold"
 msgstr "Félkövér"
 
-#: src/frontend/mame/ui/custui.cpp:372
+#: src/frontend/mame/ui/custui.cpp:465
 msgid "Italic"
 msgstr "Dőlt"
 
-#: src/frontend/mame/ui/custui.cpp:377
+#: src/frontend/mame/ui/custui.cpp:470
 msgid "Lines"
 msgstr "Vonalak"
 
-#: src/frontend/mame/ui/custui.cpp:383
+#: src/frontend/mame/ui/custui.cpp:476
 msgid "Infos text size"
 msgstr "Infó szöveg mérete"
 
-#: src/frontend/mame/ui/custui.cpp:397
+#: src/frontend/mame/ui/custui.cpp:490
 msgid "UI Fonts Settings"
 msgstr "Felület betűkészleteinek beállítása"
 
-#: src/frontend/mame/ui/custui.cpp:406
+#: src/frontend/mame/ui/custui.cpp:499
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 "Minta szöveg - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
-#: src/frontend/mame/ui/custui.cpp:489
+#: src/frontend/mame/ui/custui.cpp:582
 msgid "Normal text"
 msgstr "Normál szöveg"
 
-#: src/frontend/mame/ui/custui.cpp:490
+#: src/frontend/mame/ui/custui.cpp:583
 msgid "Selected color"
 msgstr "Választott szín"
 
-#: src/frontend/mame/ui/custui.cpp:491
+#: src/frontend/mame/ui/custui.cpp:584
 msgid "Normal text background"
 msgstr "Normál szöveg háttér"
 
-#: src/frontend/mame/ui/custui.cpp:492
+#: src/frontend/mame/ui/custui.cpp:585
 msgid "Selected background color"
 msgstr "Választott háttérszín"
 
-#: src/frontend/mame/ui/custui.cpp:493
+#: src/frontend/mame/ui/custui.cpp:586
 msgid "Subitem color"
 msgstr "Segédeszköz szín"
 
-#: src/frontend/mame/ui/custui.cpp:494 src/frontend/mame/ui/custui.cpp:550
+#: src/frontend/mame/ui/custui.cpp:587 src/frontend/mame/ui/custui.cpp:643
 msgid "Clone"
 msgstr "Klón"
 
-#: src/frontend/mame/ui/custui.cpp:495
+#: src/frontend/mame/ui/custui.cpp:588
 msgid "Border"
 msgstr "Keret"
 
-#: src/frontend/mame/ui/custui.cpp:496
+#: src/frontend/mame/ui/custui.cpp:589
 msgid "Background"
 msgstr "Háttér"
 
-#: src/frontend/mame/ui/custui.cpp:497
+#: src/frontend/mame/ui/custui.cpp:590
 msgid "Dipswitch"
 msgstr "Dipswitch"
 
-#: src/frontend/mame/ui/custui.cpp:498
+#: src/frontend/mame/ui/custui.cpp:591
 msgid "Unavailable color"
 msgstr "Nem használható szín"
 
-#: src/frontend/mame/ui/custui.cpp:499
+#: src/frontend/mame/ui/custui.cpp:592
 msgid "Slider color"
 msgstr "Csúszka színe"
 
-#: src/frontend/mame/ui/custui.cpp:500
+#: src/frontend/mame/ui/custui.cpp:593
 msgid "Gfx viewer background"
 msgstr "Grafikai betekintő háttere"
 
-#: src/frontend/mame/ui/custui.cpp:501
+#: src/frontend/mame/ui/custui.cpp:594
 msgid "Mouse over color"
 msgstr "Mouseover szín"
 
-#: src/frontend/mame/ui/custui.cpp:502
+#: src/frontend/mame/ui/custui.cpp:595
 msgid "Mouse over background color"
 msgstr "Mouseover háttér szín"
 
-#: src/frontend/mame/ui/custui.cpp:503
+#: src/frontend/mame/ui/custui.cpp:596
 msgid "Mouse down color"
 msgstr "Mousedown szín"
 
-#: src/frontend/mame/ui/custui.cpp:504
+#: src/frontend/mame/ui/custui.cpp:597
 msgid "Mouse down background color"
 msgstr "Mousedown háttér szín"
 
-#: src/frontend/mame/ui/custui.cpp:507
+#: src/frontend/mame/ui/custui.cpp:600
 msgid "Restore originals colors"
 msgstr "Eredeti színek visszaállítása"
 
-#: src/frontend/mame/ui/custui.cpp:519
+#: src/frontend/mame/ui/custui.cpp:612
 msgid "UI Colors Settings"
 msgstr "Felület színeinek beállítása"
 
-#: src/frontend/mame/ui/custui.cpp:528
+#: src/frontend/mame/ui/custui.cpp:621
 #, c-format
 msgid "Double click or press %1$s to change the color value"
 msgstr "Dupla kattintás erre: %1$s a szín megváltoztatásához"
 
-#: src/frontend/mame/ui/custui.cpp:536
+#: src/frontend/mame/ui/custui.cpp:629
 msgid "Menu Preview"
 msgstr "Menü előnézet"
 
-#: src/frontend/mame/ui/custui.cpp:546
+#: src/frontend/mame/ui/custui.cpp:639
 msgid "Normal"
 msgstr "Normál"
 
-#: src/frontend/mame/ui/custui.cpp:547
+#: src/frontend/mame/ui/custui.cpp:640
 msgid "Subitem"
 msgstr "Segédeszköz"
 
-#: src/frontend/mame/ui/custui.cpp:548
+#: src/frontend/mame/ui/custui.cpp:641
 msgid "Selected"
 msgstr "Kiválasztva"
 
-#: src/frontend/mame/ui/custui.cpp:549
+#: src/frontend/mame/ui/custui.cpp:642
 msgid "Mouse Over"
 msgstr "Mouseover"
 
-#: src/frontend/mame/ui/custui.cpp:779
+#: src/frontend/mame/ui/custui.cpp:872
 msgid "ARGB Settings"
-msgstr ""
+msgstr "ARGB beállítások"
 
-#: src/frontend/mame/ui/custui.cpp:784 src/frontend/mame/ui/custui.cpp:787
+#: src/frontend/mame/ui/custui.cpp:877 src/frontend/mame/ui/custui.cpp:880
+msgctxt "color-channel"
 msgid "Alpha"
 msgstr "Alpha"
 
-#: src/frontend/mame/ui/custui.cpp:792 src/frontend/mame/ui/custui.cpp:795
-#: src/frontend/mame/ui/custui.cpp:938
+#: src/frontend/mame/ui/custui.cpp:885 src/frontend/mame/ui/custui.cpp:888
+msgctxt "color-channel"
 msgid "Red"
 msgstr "Vörös"
 
-#: src/frontend/mame/ui/custui.cpp:800 src/frontend/mame/ui/custui.cpp:803
-#: src/frontend/mame/ui/custui.cpp:941
+#: src/frontend/mame/ui/custui.cpp:893 src/frontend/mame/ui/custui.cpp:896
+msgctxt "color-channel"
 msgid "Green"
 msgstr "Zöld"
 
-#: src/frontend/mame/ui/custui.cpp:808 src/frontend/mame/ui/custui.cpp:811
-#: src/frontend/mame/ui/custui.cpp:942
+#: src/frontend/mame/ui/custui.cpp:901 src/frontend/mame/ui/custui.cpp:904
+msgctxt "color-channel"
 msgid "Blue"
 msgstr "Kék"
 
-#: src/frontend/mame/ui/custui.cpp:814
+#: src/frontend/mame/ui/custui.cpp:907
 msgid "Choose from palette"
 msgstr "Választás a palettából"
 
-#: src/frontend/mame/ui/custui.cpp:853
+#: src/frontend/mame/ui/custui.cpp:946
 msgid "Color preview ="
 msgstr "Szín előnézet ="
 
-#: src/frontend/mame/ui/custui.cpp:934
+#: src/frontend/mame/ui/custui.cpp:1027
+msgctxt "color-preset"
 msgid "White"
 msgstr "Fehér"
 
-#: src/frontend/mame/ui/custui.cpp:935
+#: src/frontend/mame/ui/custui.cpp:1028
+msgctxt "color-preset"
 msgid "Silver"
 msgstr "Ezüst"
 
-#: src/frontend/mame/ui/custui.cpp:936
+#: src/frontend/mame/ui/custui.cpp:1029
+msgctxt "color-preset"
 msgid "Gray"
 msgstr "Szürke"
 
-#: src/frontend/mame/ui/custui.cpp:937
+#: src/frontend/mame/ui/custui.cpp:1030
+msgctxt "color-preset"
 msgid "Black"
 msgstr "Fekete"
 
-#: src/frontend/mame/ui/custui.cpp:939
+#: src/frontend/mame/ui/custui.cpp:1031
+msgctxt "color-preset"
+msgid "Red"
+msgstr "Vörös"
+
+#: src/frontend/mame/ui/custui.cpp:1032
+msgctxt "color-preset"
 msgid "Orange"
 msgstr "Narancs"
 
-#: src/frontend/mame/ui/custui.cpp:940
+#: src/frontend/mame/ui/custui.cpp:1033
+msgctxt "color-preset"
 msgid "Yellow"
 msgstr "Sárga"
 
-#: src/frontend/mame/ui/custui.cpp:943
+#: src/frontend/mame/ui/custui.cpp:1034
+msgctxt "color-preset"
+msgid "Green"
+msgstr "Zöld"
+
+#: src/frontend/mame/ui/custui.cpp:1035
+msgctxt "color-preset"
+msgid "Blue"
+msgstr "Kék"
+
+#: src/frontend/mame/ui/custui.cpp:1036
+msgctxt "color-preset"
 msgid "Violet"
 msgstr "Ibolya"
 
-#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:757
+#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:743
 #, c-format
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
@@ -2436,7 +2738,7 @@ msgstr "Kazetta irányítók"
 
 #: src/frontend/mame/ui/mainmenu.cpp:101
 msgid "BIOS Selection"
-msgstr ""
+msgstr "BIOS választás"
 
 #: src/frontend/mame/ui/mainmenu.cpp:104
 msgid "Slot Devices"
@@ -2480,137 +2782,215 @@ msgid "Select New Machine"
 msgstr "Új gép választás"
 
 #: src/frontend/mame/ui/selmenu.cpp:76
-msgid "Control Panels"
-msgstr "Kezelő pult"
+msgctxt "selmenu-artwork"
+msgid "Snapshots"
+msgstr "Pillanatképek"
+
+#: src/frontend/mame/ui/selmenu.cpp:77
+msgctxt "selmenu-artwork"
+msgid "Cabinet"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:78
+msgctxt "selmenu-artwork"
+msgid "Control Panel"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:79
+msgctxt "selmenu-artwork"
+msgid "PCB"
+msgstr "PCB"
+
+#: src/frontend/mame/ui/selmenu.cpp:80
+msgctxt "selmenu-artwork"
+msgid "Flyer"
+msgstr "Plakát"
 
 #: src/frontend/mame/ui/selmenu.cpp:81
+msgctxt "selmenu-artwork"
+msgid "Title Screen"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:82
+msgctxt "selmenu-artwork"
+msgid "Ending"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:83
+msgctxt "selmenu-artwork"
 msgid "Artwork Preview"
 msgstr "Illusztráció előnézet"
 
+#: src/frontend/mame/ui/selmenu.cpp:84
+msgctxt "selmenu-artwork"
+msgid "Bosses"
+msgstr "Boss"
+
 #: src/frontend/mame/ui/selmenu.cpp:85
+msgctxt "selmenu-artwork"
+msgid "Logo"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:86
+msgctxt "selmenu-artwork"
+msgid "Versus"
+msgstr "Ellen"
+
+#: src/frontend/mame/ui/selmenu.cpp:87
+msgctxt "selmenu-artwork"
 msgid "Game Over"
 msgstr "A játék végetért"
 
-#: src/frontend/mame/ui/selmenu.cpp:94
+#: src/frontend/mame/ui/selmenu.cpp:88
+msgctxt "selmenu-artwork"
+msgid "HowTo"
+msgstr "Hogyan"
+
+#: src/frontend/mame/ui/selmenu.cpp:89
+msgctxt "selmenu-artwork"
+msgid "Scores"
+msgstr "Eredmények"
+
+#: src/frontend/mame/ui/selmenu.cpp:90
+msgctxt "selmenu-artwork"
+msgid "Select"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:91
+msgctxt "selmenu-artwork"
+msgid "Marquee"
+msgstr "Matrica"
+
+#: src/frontend/mame/ui/selmenu.cpp:92
+msgctxt "selmenu-artwork"
+msgid "Covers"
+msgstr "Borítók"
+
+#: src/frontend/mame/ui/selmenu.cpp:96
 msgid "Add or remove favorites"
 msgstr "Kedvencek felvétele vagy eltávolítása"
 
-#: src/frontend/mame/ui/selmenu.cpp:95
+#: src/frontend/mame/ui/selmenu.cpp:97
 msgid "Export displayed list to file"
 msgstr "A megjelenített lista exportálása fájlba"
 
-#: src/frontend/mame/ui/selmenu.cpp:96
+#: src/frontend/mame/ui/selmenu.cpp:98
 msgid "Show DATs view"
 msgstr "DAT nézet mutatása"
 
-#: src/frontend/mame/ui/selmenu.cpp:320
+#: src/frontend/mame/ui/selmenu.cpp:319
 msgid "Software part selection:"
 msgstr "Szoftver rész választás:"
 
-#: src/frontend/mame/ui/selmenu.cpp:426
+#: src/frontend/mame/ui/selmenu.cpp:425
 msgid "BIOS selection:"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:681
+#: src/frontend/mame/ui/selmenu.cpp:664
 #, c-format
 msgid "Software is clone of: %1$-.100s"
 msgstr "A szoftver a következő klónja: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:683
+#: src/frontend/mame/ui/selmenu.cpp:666
 msgid "Software is parent"
 msgstr "A szoftver alap"
 
-#: src/frontend/mame/ui/selmenu.cpp:688
+#: src/frontend/mame/ui/selmenu.cpp:671
 msgid "Supported: No"
 msgstr "Támogatás: Nem"
 
-#: src/frontend/mame/ui/selmenu.cpp:693
+#: src/frontend/mame/ui/selmenu.cpp:676
 msgid "Supported: Partial"
 msgstr "Támogatás: Részleges"
 
-#: src/frontend/mame/ui/selmenu.cpp:698
+#: src/frontend/mame/ui/selmenu.cpp:681
 msgid "Supported: Yes"
 msgstr "Támogatás: Igen"
 
-#: src/frontend/mame/ui/selmenu.cpp:703
+#: src/frontend/mame/ui/selmenu.cpp:686
 #, c-format
-msgid "romset: %1$-.100s"
-msgstr "romkészlet: %1$-.100s"
+msgid "Software list/item: %1$s:%2$s"
+msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:719
+#: src/frontend/mame/ui/selmenu.cpp:694
+#, c-format
+msgid "Romset: %1$-.100s"
+msgstr "Romkészlet: %1$-.100s"
+
+#: src/frontend/mame/ui/selmenu.cpp:703
+msgid "Driver is parent"
+msgstr "A vezérlőprogram alap"
+
+#: src/frontend/mame/ui/selmenu.cpp:705 src/frontend/mame/ui/selmenu.cpp:707
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
 msgstr "A vezérlőprogram a következő klónja: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:721
-msgid "Driver is parent"
-msgstr "A vezérlőprogram alap"
-
-#: src/frontend/mame/ui/selmenu.cpp:2198
+#: src/frontend/mame/ui/selmenu.cpp:2176
 msgid "Images"
 msgstr "Képek"
 
-#: src/frontend/mame/ui/selmenu.cpp:2199
+#: src/frontend/mame/ui/selmenu.cpp:2177
 msgid "Infos"
 msgstr "Infók"
 
-#: src/frontend/mame/ui/selmenu.cpp:2508
+#: src/frontend/mame/ui/selmenu.cpp:2486
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2524
+#: src/frontend/mame/ui/selmenu.cpp:2502
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2540
+#: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "incorrect checksum"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2543
+#: src/frontend/mame/ui/selmenu.cpp:2521
 msgid "incorrect length"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2546
+#: src/frontend/mame/ui/selmenu.cpp:2524
 msgid "not found"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2557
+#: src/frontend/mame/ui/selmenu.cpp:2535
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2559
+#: src/frontend/mame/ui/selmenu.cpp:2537
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2563
+#: src/frontend/mame/ui/selmenu.cpp:2541
 msgid "Press any key to continue."
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2664
-msgid "Usage"
-msgstr "Használat"
-
-#: src/frontend/mame/ui/selmenu.cpp:2699
+#: src/frontend/mame/ui/selmenu.cpp:2670
 msgid "General Info"
 msgstr "Általános infók"
 
-#: src/frontend/mame/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/sndmenu.cpp:148
 msgid "Sound"
 msgstr "Hang"
 
-#: src/frontend/mame/ui/sndmenu.cpp:136
+#: src/frontend/mame/ui/sndmenu.cpp:149
+msgid "Compressor"
+msgstr ""
+
+#: src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
 msgstr "Mintavételezés"
 
-#: src/frontend/mame/ui/sndmenu.cpp:137
+#: src/frontend/mame/ui/sndmenu.cpp:151
 msgid "Use External Samples"
 msgstr "Külső minták használata"
 
@@ -3198,7 +3578,7 @@ msgstr ""
 msgid "Gameinit"
 msgstr "Gameinit"
 
-#: plugins/data/data_history.lua:171
+#: plugins/data/data_history.lua:172
 msgid "History"
 msgstr "Történet"
 
@@ -3218,17 +3598,73 @@ msgstr ""
 msgid "MAMEinfo"
 msgstr ""
 
-#~ msgid "Backdrops"
-#~ msgstr "Háttérfelület"
+#~ msgid "Custom UI Settings"
+#~ msgstr "Egyedi felület beállításai"
 
-#~ msgid "Overlays"
-#~ msgstr "Átfedők"
+#~ msgid "Software Usage"
+#~ msgstr "Szoftver használat"
 
-#~ msgid "Bezels"
-#~ msgstr "Keretek"
+#~ msgid "Usage"
+#~ msgstr "Használat"
 
-#~ msgid "CPanels"
-#~ msgstr "Vezérlőpult"
+#~ msgctxt "path-option"
+#~ msgid "UI"
+#~ msgstr "Felület"
+
+#~ msgctxt "path-option"
+#~ msgid "Language"
+#~ msgstr "Nyelv"
+
+#~ msgctxt "path-option"
+#~ msgid "Samples"
+#~ msgstr "Minták"
+
+#~ msgctxt "path-option"
+#~ msgid "Cheats"
+#~ msgstr "Csalások"
+
+#~ msgctxt "path-option"
+#~ msgid "Titles"
+#~ msgstr "Címkép"
+
+#~ msgctxt "path-option"
+#~ msgid "Ends"
+#~ msgstr "Befejezések"
+
+#~ msgctxt "path-option"
+#~ msgid "Artworks Preview"
+#~ msgstr "Illusztrációk előnézete"
+
+#~ msgctxt "path-option"
+#~ msgid "GameOver"
+#~ msgstr "Végkép"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Cabinets"
+#~ msgstr "Játékgép"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Control Panels"
+#~ msgstr "Kezelő pult"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Titles"
+#~ msgstr "Címkép"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Ends"
+#~ msgstr "Befejezések"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Logos"
+#~ msgstr "Logók"
+
+#~ msgid "Select"
+#~ msgstr "Választás"
+
+#, c-format
+#~ msgid "romset: %1$-.100s"
+#~ msgstr "romkészlet: %1$-.100s"
 
 #~ msgid "View"
 #~ msgstr "Nézet"
@@ -3303,21 +3739,6 @@ msgstr ""
 #~ msgid "Artwork Crop"
 #~ msgstr "Illusztráció levágása"
 
-#~ msgid "Use Backdrops"
-#~ msgstr "Háttérfelületek használata"
-
-#~ msgid "Use Overlays"
-#~ msgstr "Átfedők használata"
-
-#~ msgid "Use Bezels"
-#~ msgstr "Keretek használata"
-
-#~ msgid "Use Control Panels"
-#~ msgstr "Kezelő pultok használata"
-
-#~ msgid "Use Marquees"
-#~ msgstr "Matricák használata"
-
 #~ msgid "Bilinear snapshot"
 #~ msgstr "Bilineáris pillanatkép"
 
@@ -3328,12 +3749,6 @@ msgstr ""
 #~ "A kiválasztott szoftver működéséhez hiányzik egy vagy több ROM illetve "
 #~ "CHD képfájl. Válassz másikat."
 
-#~ msgid "Vertical"
-#~ msgstr "Függőleges"
-
-#~ msgid "Horizontal"
-#~ msgstr "Vízszintes"
-
 #~ msgid "Unimplemented"
 #~ msgstr "Beépítetlen"
 
@@ -3343,20 +3758,11 @@ msgstr ""
 #~ msgid "OK"
 #~ msgstr "Rendben"
 
-#~ msgid "Gfx: %s, Sound: %s"
-#~ msgstr "Grafika: %s, Hang: %s"
-
 #~ msgid "Audit in progress..."
 #~ msgstr "Ellenőrzés folyamatban..."
 
 #~ msgid "Extra INIs"
 #~ msgstr "Extra INI fájlok"
-
-#~ msgid " ^!File"
-#~ msgstr " ^!Fájl"
-
-#~ msgid " ^!Category"
-#~ msgstr " ^!Kategória"
 
 #~ msgid "%1$s (%2$s - %3$s) - "
 #~ msgstr "%1$s (%2$s - %3$s) - "
@@ -3373,21 +3779,6 @@ msgstr ""
 #~ msgid "Other filter"
 #~ msgstr "Egyéb szűrő"
 
-#~ msgid "^!Manufacturer"
-#~ msgstr "^!Gyártó"
-
-#~ msgid "^!Year"
-#~ msgstr "^!Év"
-
-#~ msgid "^!Publisher"
-#~ msgstr "^!Kiadó"
-
-#~ msgid "^!Software List"
-#~ msgstr "^!Szoftver lista"
-
-#~ msgid "^!Device type"
-#~ msgstr "^!Eszköz fajtája"
-
 #~ msgid "^!Region"
 #~ msgstr "^!Régió"
 
@@ -3397,38 +3788,14 @@ msgstr ""
 #~ msgid "Region: %1$s -"
 #~ msgstr "Régió: %1$s -"
 
-#~ msgid "Publisher: %1$s -"
-#~ msgstr "Kiadó: %1$s -"
-
-#~ msgid "Year: %1$s -"
-#~ msgstr "Év: %1$s -"
-
-#~ msgid "Software List: %1$s -"
-#~ msgstr "Szoftver lista: %1$s -"
-
 #~ msgid "Device type: %1$s -"
 #~ msgstr "Eszköz típus: %1$s -"
 
 #~ msgid "%s Search: %s_"
 #~ msgstr "%s Keresés: %s_"
 
-#~ msgid "Bios selection:"
-#~ msgstr "Bios választás:"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Bios választási menü kihagyása"
-
-#~ msgid "Bios"
-#~ msgstr "Bios"
-
 #~ msgid "This machine has no bios."
 #~ msgstr "Ez a gép nem rendelkezik bios-szal."
-
-#~ msgid "Bios Selection"
-#~ msgstr "Bios választás"
-
-#~ msgid " - ARGB Settings"
-#~ msgstr " - ARGB beállítások"
 
 #~ msgid "Software History"
 #~ msgstr "Szoftver történet"
@@ -3475,15 +3842,6 @@ msgstr ""
 #~ "hibátlanul játszani ezzel a géppel.\n"
 
 #~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "There are working clones of this machine: "
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "Ennek a gépnek vannak működő klónjai: "
-
-#~ msgid ""
 #~ "The selected machine is missing one or more required ROM or CHD images. "
 #~ "Please select a different machine.\n"
 #~ "\n"
@@ -3493,51 +3851,6 @@ msgstr ""
 #~ "Válassz másik gépet.\n"
 #~ "\n"
 #~ "Press any key to continue."
-
-#~ msgid "Romset: %1$-.100s\n"
-#~ msgstr "Romkészlet: %1$-.100s\n"
-
-#~ msgid "Year: %1$s\n"
-#~ msgstr "Év: %1$s\n"
-
-#~ msgid "Manufacturer: %1$-.100s\n"
-#~ msgstr "Gyártó: %1$-.100s\n"
-
-#~ msgid "Driver is Clone of: %1$-.100s\n"
-#~ msgstr "Vezérlőprogram klónja ennek: %1$-.100s\n"
-
-#~ msgid "Driver is Parent\n"
-#~ msgstr "A vezérlőprogram Alap\n"
-
-#~ msgid "Overall: NOT WORKING\n"
-#~ msgstr "Összegezve: NEM MŰKÖDIK\n"
-
-#~ msgid "Overall: Unemulated Protection\n"
-#~ msgstr "Összegezve: Emulálatlan védelem\n"
-
-#~ msgid "Overall: Working\n"
-#~ msgstr "Összegezve: Működik\n"
-
-#~ msgid "Graphics: Imperfect Colors\n"
-#~ msgstr "Grafika: Hibás színek\n"
-
-#~ msgid "Graphics: Imperfect\n"
-#~ msgstr "Grafika: Hibás\n"
-
-#~ msgid "Graphics: OK\n"
-#~ msgstr "Grafika: Jó\n"
-
-#~ msgid "Sound: Unimplemented\n"
-#~ msgstr "Hang: nincs beépítve\n"
-
-#~ msgid "Sound: Imperfect\n"
-#~ msgstr "Hang: Hibás\n"
-
-#~ msgid "Sound: OK\n"
-#~ msgstr "Hang: Jó\n"
-
-#~ msgid "Driver is Skeleton: %1$s\n"
-#~ msgstr "A vezérlőprogram Skeleton: %1$s\n"
 
 #~ msgid "Game is Mechanical: %1$s\n"
 #~ msgstr "A játék mechanikus: %1$s\n"
@@ -3556,9 +3869,6 @@ msgstr ""
 
 #~ msgid "Support Save: %1$s\n"
 #~ msgstr "Támogatott mentés: %1$s\n"
-
-#~ msgid "Screen Orientation: %1$s\n"
-#~ msgstr "Kép igazítottság: %1$s\n"
 
 #~ msgid "Requires CHD: %1$s\n"
 #~ msgstr "Szükséges CHD: %1$s\n"
@@ -3598,9 +3908,6 @@ msgstr ""
 #~ "Válassz másik szoftvert.\n"
 #~ "\n"
 #~ "Nyomj egy gombot a folytatáshoz."
-
-#~ msgid " [internal]"
-#~ msgstr " [belső]"
 
 #~ msgid "DATs info"
 #~ msgstr "DAT infó"

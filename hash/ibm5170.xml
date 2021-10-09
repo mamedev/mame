@@ -15385,7 +15385,7 @@ license:CC0
 		<description>Microsoft Return of Arcade</description>
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
-		<info name="Install Notes" value="Needs Windows 95" />
+		<info name="usage" value="Requires Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="52469b53" sha1="70b4b69e56821ab549c80ae0ecad6cbd335d0631"/>

@@ -15,6 +15,7 @@
 #include "ui/selector.h"
 #include "ui/submenu.h"
 #include "ui/ui.h"
+#include "ui/utils.h"
 
 #include "infoxml.h"
 #include "mame.h"
@@ -702,11 +703,33 @@ void menu_export::populate(float &customtop, float &custombottom)
 menu_machine_configure::menu_machine_configure(
 		mame_ui_manager &mui,
 		render_container &container,
+		ui_system_info const &info,
+		std::function<void (bool, bool)> &&handler,
+		float x0, float y0)
+	: menu_machine_configure(mui, container, info.description.c_str(), *info.driver, std::move(handler), x0, y0)
+{
+}
+
+menu_machine_configure::menu_machine_configure(
+		mame_ui_manager &mui,
+		render_container &container,
+		game_driver const &drv,
+		std::function<void (bool, bool)> &&handler,
+		float x0, float y0)
+	: menu_machine_configure(mui, container, drv.type.fullname(), drv, std::move(handler), x0, y0)
+{
+}
+
+menu_machine_configure::menu_machine_configure(
+		mame_ui_manager &mui,
+		render_container &container,
+		char const *description,
 		game_driver const &drv,
 		std::function<void (bool, bool)> &&handler,
 		float x0, float y0)
 	: menu(mui, container)
 	, m_handler(std::move(handler))
+	, m_description(description)
 	, m_drv(drv)
 	, m_x0(x0)
 	, m_y0(y0)
@@ -835,7 +858,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure Machine:"), m_drv.type.fullname() };
+	char const *const text[] = { _("Configure Machine:"), m_description };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),

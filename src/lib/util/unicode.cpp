@@ -14,7 +14,6 @@
 
 #ifdef _WIN32
 #include "strconv.h"
-#define UTF8PROC_DLLEXPORT
 #endif
 
 #include <utf8proc.h>

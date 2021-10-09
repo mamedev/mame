@@ -1,14 +1,14 @@
-# Korean translations for PACKAGE package
-# PACKAGE 패키지에 대한 한국어 번역문.
+# Korean translations for MAME package
+# MAME 패키지에 대한 한국어 번역문.
 # Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the MAME package.
 # Automatically generated, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-29 22:30+1000\n"
+"POT-Creation-Date: 2021-10-09 10:52+1100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: src/frontend/mame/ui/ui.cpp:470 src/frontend/mame/ui/ui.cpp:543
+#: src/frontend/mame/ui/ui.cpp:473 src/frontend/mame/ui/ui.cpp:546
 msgid ""
 "\n"
 "\n"
@@ -28,26 +28,26 @@ msgstr ""
 "\n"
 "아무 키를 누르면 진행합니다"
 
-#: src/frontend/mame/ui/ui.cpp:555
+#: src/frontend/mame/ui/ui.cpp:558
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
 "이 드라이버를 사용하기 위해선 다음 장치(들)에 이미지를 불러와야 합니다: "
 
-#: src/frontend/mame/ui/ui.cpp:1247
+#: src/frontend/mame/ui/ui.cpp:1264
 #, c-format
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1249
+#: src/frontend/mame/ui/ui.cpp:1266
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1442
+#: src/frontend/mame/ui/ui.cpp:1459
 #, c-format
 msgid ""
 "Are you sure you want to quit?\n"
@@ -60,185 +60,185 @@ msgstr ""
 "''%1$s''를 누르면 종료.\n"
 "''%2$s''를 누르면 원래 화면으로 복귀."
 
-#: src/frontend/mame/ui/ui.cpp:1492
+#: src/frontend/mame/ui/ui.cpp:1509
 msgid "Master Volume"
 msgstr "마스터 볼륨"
 
-#: src/frontend/mame/ui/ui.cpp:1501
+#: src/frontend/mame/ui/ui.cpp:1518
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s 볼륨"
 
-#: src/frontend/mame/ui/ui.cpp:1523
+#: src/frontend/mame/ui/ui.cpp:1540
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "CPU %1$s 오버클럭"
 
-#: src/frontend/mame/ui/ui.cpp:1531
+#: src/frontend/mame/ui/ui.cpp:1548
 #, c-format
 msgid "Overclock %1$s sound"
 msgstr "%1$s 사운드 오버클럭"
 
-#: src/frontend/mame/ui/ui.cpp:1550
+#: src/frontend/mame/ui/ui.cpp:1567
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s 재생 빈도"
 
-#: src/frontend/mame/ui/ui.cpp:1555
+#: src/frontend/mame/ui/ui.cpp:1572
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s 명도"
 
-#: src/frontend/mame/ui/ui.cpp:1557
+#: src/frontend/mame/ui/ui.cpp:1574
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s 대비"
 
-#: src/frontend/mame/ui/ui.cpp:1559
+#: src/frontend/mame/ui/ui.cpp:1576
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$s 감마값"
 
-#: src/frontend/mame/ui/ui.cpp:1563
+#: src/frontend/mame/ui/ui.cpp:1580
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s 가로방향 연장"
 
-#: src/frontend/mame/ui/ui.cpp:1565
+#: src/frontend/mame/ui/ui.cpp:1582
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s 가로방향 위치"
 
-#: src/frontend/mame/ui/ui.cpp:1567
+#: src/frontend/mame/ui/ui.cpp:1584
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s 세로방향 연장"
 
-#: src/frontend/mame/ui/ui.cpp:1569
+#: src/frontend/mame/ui/ui.cpp:1586
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s 세로방향 위치"
 
-#: src/frontend/mame/ui/ui.cpp:1585
+#: src/frontend/mame/ui/ui.cpp:1602
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "레이저디스크 '%1$s' 가로방향 연장"
 
-#: src/frontend/mame/ui/ui.cpp:1588
+#: src/frontend/mame/ui/ui.cpp:1605
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "레이저디스크 '%1$s' 가로방향 위치"
 
-#: src/frontend/mame/ui/ui.cpp:1590
+#: src/frontend/mame/ui/ui.cpp:1607
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "레이저디스크 '%1$s' 세로방향 연장"
 
-#: src/frontend/mame/ui/ui.cpp:1593
+#: src/frontend/mame/ui/ui.cpp:1610
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "레이저디스크 '%1$s' 세로방향 위치"
 
-#: src/frontend/mame/ui/ui.cpp:1603
+#: src/frontend/mame/ui/ui.cpp:1620
 msgid "Vector Flicker"
 msgstr "벡터 깜빡임"
 
-#: src/frontend/mame/ui/ui.cpp:1604
+#: src/frontend/mame/ui/ui.cpp:1621
 msgid "Beam Width Minimum"
 msgstr "선 폭 최소량"
 
-#: src/frontend/mame/ui/ui.cpp:1605
+#: src/frontend/mame/ui/ui.cpp:1622
 msgid "Beam Width Maximum"
 msgstr "선 폭 최대량"
 
-#: src/frontend/mame/ui/ui.cpp:1606
+#: src/frontend/mame/ui/ui.cpp:1623
 msgid "Beam Dot Size"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1607
+#: src/frontend/mame/ui/ui.cpp:1624
 msgid "Beam Intensity Weight"
 msgstr "선 강도 비중"
 
-#: src/frontend/mame/ui/ui.cpp:1620
+#: src/frontend/mame/ui/ui.cpp:1637
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "조준선 크기 %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1620 src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1637 src/frontend/mame/ui/ui.cpp:1639
 msgid "X"
 msgstr "X"
 
-#: src/frontend/mame/ui/ui.cpp:1620 src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1637 src/frontend/mame/ui/ui.cpp:1639
 msgid "Y"
 msgstr "Y"
 
-#: src/frontend/mame/ui/ui.cpp:1622
+#: src/frontend/mame/ui/ui.cpp:1639
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "조준선 영점 %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1654
+#: src/frontend/mame/ui/ui.cpp:1671
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/frontend/mame/ui/ui.cpp:1697
+#: src/frontend/mame/ui/ui.cpp:1714
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/frontend/mame/ui/ui.cpp:1712
+#: src/frontend/mame/ui/ui.cpp:1729
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/frontend/mame/ui/ui.cpp:1735 src/frontend/mame/ui/ui.cpp:1755
-#: src/frontend/mame/ui/ui.cpp:1774 src/frontend/mame/ui/ui.cpp:1792
-#: src/frontend/mame/ui/ui.cpp:1811 src/frontend/mame/ui/ui.cpp:1830
-#: src/frontend/mame/ui/ui.cpp:1849 src/frontend/mame/ui/ui.cpp:1868
-#: src/frontend/mame/ui/ui.cpp:1889 src/frontend/mame/ui/ui.cpp:1910
-#: src/frontend/mame/ui/ui.cpp:1931 src/frontend/mame/ui/ui.cpp:1952
+#: src/frontend/mame/ui/ui.cpp:1752 src/frontend/mame/ui/ui.cpp:1772
+#: src/frontend/mame/ui/ui.cpp:1791 src/frontend/mame/ui/ui.cpp:1809
+#: src/frontend/mame/ui/ui.cpp:1828 src/frontend/mame/ui/ui.cpp:1847
+#: src/frontend/mame/ui/ui.cpp:1866 src/frontend/mame/ui/ui.cpp:1885
+#: src/frontend/mame/ui/ui.cpp:1906 src/frontend/mame/ui/ui.cpp:1927
+#: src/frontend/mame/ui/ui.cpp:1948 src/frontend/mame/ui/ui.cpp:1969
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/frontend/mame/ui/ui.cpp:1967 src/frontend/mame/ui/ui.cpp:1982
-#: src/frontend/mame/ui/ui.cpp:1997 src/frontend/mame/ui/ui.cpp:2012
-#: src/frontend/mame/ui/ui.cpp:2027
+#: src/frontend/mame/ui/ui.cpp:1984 src/frontend/mame/ui/ui.cpp:1999
+#: src/frontend/mame/ui/ui.cpp:2014 src/frontend/mame/ui/ui.cpp:2029
+#: src/frontend/mame/ui/ui.cpp:2044
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/frontend/mame/ui/ui.cpp:2043
+#: src/frontend/mame/ui/ui.cpp:2060
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "조준선 크기 X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2043
+#: src/frontend/mame/ui/ui.cpp:2060
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "조준선 크기 Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2060
+#: src/frontend/mame/ui/ui.cpp:2077
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "조준선 영점 X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2060
+#: src/frontend/mame/ui/ui.cpp:2077
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "조준선 영점 Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2167
+#: src/frontend/mame/ui/ui.cpp:2184
 msgid "**Error saving ui.ini**"
 msgstr "**ui.ini 저장 오류**"
 
-#: src/frontend/mame/ui/ui.cpp:2225
+#: src/frontend/mame/ui/ui.cpp:2243
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "**%s.ini 저장 오류**"
 
-#: src/frontend/mame/ui/ui.cpp:2229 src/frontend/mame/ui/miscmenu.cpp:762
+#: src/frontend/mame/ui/ui.cpp:2247 src/frontend/mame/ui/miscmenu.cpp:785
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -248,7 +248,7 @@ msgstr ""
 "    환경설정 저장됨    \n"
 "\n"
 
-#: src/frontend/mame/ui/selsoft.cpp:225 src/frontend/mame/ui/selgame.cpp:461
+#: src/frontend/mame/ui/selsoft.cpp:498 src/frontend/mame/ui/selgame.cpp:665
 #, c-format
 msgid ""
 "%s\n"
@@ -257,8 +257,8 @@ msgstr ""
 "%s\n"
 " 즐겨찾기 목록에 추가됐습니다."
 
-#: src/frontend/mame/ui/selsoft.cpp:230 src/frontend/mame/ui/selgame.cpp:466
-#: src/frontend/mame/ui/selgame.cpp:472
+#: src/frontend/mame/ui/selsoft.cpp:503 src/frontend/mame/ui/selgame.cpp:670
+#: src/frontend/mame/ui/selgame.cpp:676
 #, c-format
 msgid ""
 "%s\n"
@@ -267,33 +267,33 @@ msgstr ""
 "%s\n"
 " 즐겨찾기 목록에서 삭제됐습니다."
 
-#: src/frontend/mame/ui/selsoft.cpp:630
+#: src/frontend/mame/ui/selsoft.cpp:719
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr "%1$s %2$s ( %3$d / %4$d 소프트웨어 패키지 )"
 
-#: src/frontend/mame/ui/selsoft.cpp:631
+#: src/frontend/mame/ui/selsoft.cpp:720
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr "드라이버: \"%1$s\" 소프트웨어 목록 "
 
-#: src/frontend/mame/ui/selsoft.cpp:636 src/frontend/mame/ui/selgame.cpp:1422
+#: src/frontend/mame/ui/selsoft.cpp:725 src/frontend/mame/ui/selgame.cpp:1655
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr "%1$s: %2$s - 검색: %3$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:638 src/frontend/mame/ui/selgame.cpp:1424
+#: src/frontend/mame/ui/selsoft.cpp:727 src/frontend/mame/ui/selgame.cpp:1657
 #, c-format
 msgid "Search: %1$s_"
 msgstr "검색: %1$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:645 src/frontend/mame/ui/selsoft.cpp:652
+#: src/frontend/mame/ui/selsoft.cpp:734
 #: src/frontend/mame/ui/simpleselgame.cpp:315
 #, c-format
 msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
-#: src/frontend/mame/ui/optsmenu.cpp:72 src/frontend/mame/ui/sndmenu.cpp:149
+#: src/frontend/mame/ui/optsmenu.cpp:72 src/frontend/mame/ui/sndmenu.cpp:163
 msgid "Sound Options"
 msgstr "사운드 설정"
 
@@ -321,7 +321,7 @@ msgstr "UI 꾸미기"
 msgid "Configure Directories"
 msgstr "디렉토리 환경설정"
 
-#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:87
+#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:89
 #: src/frontend/mame/ui/slotopt.cpp:220
 msgid "[empty slot]"
 msgstr "[빈 칸]"
@@ -330,7 +330,7 @@ msgstr "[빈 칸]"
 msgid "[create]"
 msgstr "[생성]"
 
-#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:98
+#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
 msgstr "[소프트웨어 목록]"
 
@@ -339,23 +339,23 @@ msgstr "[소프트웨어 목록]"
 msgid "Error accessing %s"
 msgstr "%s 접근에 오류 발생"
 
-#: src/frontend/mame/ui/filesel.cpp:538
+#: src/frontend/mame/ui/filesel.cpp:542
 msgid "Select access mode"
 msgstr "엑세스 방식 선택"
 
-#: src/frontend/mame/ui/filesel.cpp:539
+#: src/frontend/mame/ui/filesel.cpp:543
 msgid "Read-only"
 msgstr "읽기 전용"
 
-#: src/frontend/mame/ui/filesel.cpp:541
+#: src/frontend/mame/ui/filesel.cpp:545
 msgid "Read-write"
 msgstr "읽기/쓰기"
 
-#: src/frontend/mame/ui/filesel.cpp:542
+#: src/frontend/mame/ui/filesel.cpp:546
 msgid "Read this image, write to another image"
 msgstr "이 이미지를 읽고 다른 이미지에 씁니다"
 
-#: src/frontend/mame/ui/filesel.cpp:543
+#: src/frontend/mame/ui/filesel.cpp:547
 msgid "Read this image, write to diff"
 msgstr "이 이미지를 읽고 diff에 씁니다"
 
@@ -375,7 +375,7 @@ msgstr ""
 msgid "Enlarge images in the right panel"
 msgstr "오른쪽 패널 이미지 확대"
 
-#: src/frontend/mame/ui/submenu.cpp:35 src/frontend/mame/ui/dirmenu.cpp:46
+#: src/frontend/mame/ui/submenu.cpp:35
 msgid "Cheats"
 msgstr "치트"
 
@@ -667,36 +667,36 @@ msgstr "새로고침 동기화"
 msgid "Wait Vertical Sync"
 msgstr "수직동기화 기다림"
 
-#: src/frontend/mame/ui/menu.cpp:380 src/frontend/mame/ui/menu.cpp:672
+#: src/frontend/mame/ui/menu.cpp:370 src/frontend/mame/ui/menu.cpp:662
 #: src/frontend/mame/ui/videoopt.cpp:192 plugins/cheatfind/init.lua:763
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:668
 msgid "On"
 msgstr "켜기"
 
-#: src/frontend/mame/ui/menu.cpp:380 src/frontend/mame/ui/menu.cpp:675
+#: src/frontend/mame/ui/menu.cpp:370 src/frontend/mame/ui/menu.cpp:665
 #: src/frontend/mame/ui/videoopt.cpp:208 plugins/cheatfind/init.lua:760
 #: plugins/cheatfind/init.lua:771 plugins/cheat/init.lua:671
 #: plugins/cheat/init.lua:680
 msgid "Off"
 msgstr "끄기"
 
-#: src/frontend/mame/ui/menu.cpp:678
+#: src/frontend/mame/ui/menu.cpp:668
 msgid "Auto"
 msgstr "자동"
 
-#: src/frontend/mame/ui/menu.cpp:1178
+#: src/frontend/mame/ui/menu.cpp:1168
 msgid "Start Machine"
 msgstr ""
 
-#: src/frontend/mame/ui/menu.cpp:1180
+#: src/frontend/mame/ui/menu.cpp:1170
 msgid "Return to Machine"
 msgstr "장치로 돌아가기"
 
-#: src/frontend/mame/ui/menu.cpp:1185 src/frontend/mame/ui/menu.cpp:1187
+#: src/frontend/mame/ui/menu.cpp:1175 src/frontend/mame/ui/menu.cpp:1177
 msgid "Exit"
 msgstr "닫기"
 
-#: src/frontend/mame/ui/menu.cpp:1192 src/frontend/mame/ui/menu.cpp:1194
+#: src/frontend/mame/ui/menu.cpp:1182 src/frontend/mame/ui/menu.cpp:1184
 msgid "Return to Previous Menu"
 msgstr "이전 메뉴로 돌아가기"
 
@@ -734,86 +734,107 @@ msgid "Cannot change options while recording!"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:31
+msgctxt "emulation-feature"
 msgid "protection"
 msgstr "보호처리"
 
 #: src/frontend/mame/ui/info.cpp:32
+msgctxt "emulation-feature"
 msgid "timing"
 msgstr "타이밍"
 
 #: src/frontend/mame/ui/info.cpp:33
+msgctxt "emulation-feature"
 msgid "graphics"
 msgstr "그래픽"
 
 #: src/frontend/mame/ui/info.cpp:34
+msgctxt "emulation-feature"
 msgid "color palette"
 msgstr "컬러 팔레트"
 
 #: src/frontend/mame/ui/info.cpp:35
+msgctxt "emulation-feature"
 msgid "sound"
 msgstr "사운드"
 
 #: src/frontend/mame/ui/info.cpp:36
+msgctxt "emulation-feature"
 msgid "capture hardware"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:37
+msgctxt "emulation-feature"
 msgid "camera"
 msgstr "카메라"
 
 #: src/frontend/mame/ui/info.cpp:38
+msgctxt "emulation-feature"
 msgid "microphone"
 msgstr "마이크로폰"
 
 #: src/frontend/mame/ui/info.cpp:39
+msgctxt "emulation-feature"
 msgid "controls"
 msgstr "컨트롤"
 
 #: src/frontend/mame/ui/info.cpp:40
+msgctxt "emulation-feature"
 msgid "keyboard"
 msgstr "키보드"
 
 #: src/frontend/mame/ui/info.cpp:41
+msgctxt "emulation-feature"
 msgid "mouse"
 msgstr "마우스"
 
 #: src/frontend/mame/ui/info.cpp:42
+msgctxt "emulation-feature"
 msgid "media"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:43
+msgctxt "emulation-feature"
 msgid "disk"
 msgstr "디스크"
 
 #: src/frontend/mame/ui/info.cpp:44
+msgctxt "emulation-feature"
 msgid "printer"
 msgstr "프린터"
 
 #: src/frontend/mame/ui/info.cpp:45
+msgctxt "emulation-feature"
 msgid "magnetic tape"
-msgstr ""
+msgstr "자기 테이프"
 
 #: src/frontend/mame/ui/info.cpp:46
+msgctxt "emulation-feature"
 msgid "punch tape"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:47
+msgctxt "emulation-feature"
 msgid "magnetic drum"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:48
+msgctxt "emulation-feature"
 msgid "solid state storage"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:49
+msgctxt "emulation-feature"
 msgid "communications"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:50
+msgctxt "emulation-feature"
 msgid "LAN"
 msgstr "LAN"
 
 #: src/frontend/mame/ui/info.cpp:51
+msgctxt "emulation-feature"
 msgid "WAN"
 msgstr "WAN"
 
@@ -1001,28 +1022,28 @@ msgstr "부분적으로 지원함"
 msgid "[empty]"
 msgstr "[공백]"
 
-#: src/frontend/mame/ui/swlist.cpp:92
+#: src/frontend/mame/ui/swlist.cpp:94
 msgid "[file manager]"
 msgstr "[파일 관리자]"
 
-#: src/frontend/mame/ui/swlist.cpp:234
+#: src/frontend/mame/ui/swlist.cpp:228
 msgid "Switch Item Ordering"
 msgstr "항목 정렬순서 변경"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
 msgstr "정렬순서 변경: 현재 %s 순서로 항목이 배열됨"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 msgid "shortname"
 msgstr "약칭"
 
-#: src/frontend/mame/ui/swlist.cpp:267
+#: src/frontend/mame/ui/swlist.cpp:258
 msgid "description"
 msgstr "설명"
 
-#: src/frontend/mame/ui/swlist.cpp:397
+#: src/frontend/mame/ui/swlist.cpp:391
 msgid "[compatible lists]"
 msgstr "[호환 목록]"
 
@@ -1030,11 +1051,11 @@ msgstr "[호환 목록]"
 msgid "File Already Exists - Override?"
 msgstr "그 파일이 이미 있습니다. 덮어쓰겠습니까?"
 
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1089
 msgid "No"
 msgstr "아니오"
 
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1089
 msgid "Yes"
 msgstr "예"
 
@@ -1075,7 +1096,7 @@ msgstr "실재"
 msgid "Emulated"
 msgstr "에뮬레이션"
 
-#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:478
+#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:484
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr ""
@@ -1092,189 +1113,358 @@ msgstr "활성"
 msgid "Disabled"
 msgstr "비활성"
 
-#: src/frontend/mame/ui/utils.cpp:62 src/frontend/mame/ui/utils.cpp:86
+#: src/frontend/mame/ui/utils.cpp:63
+msgctxt "swlist-info"
+msgid "Alternate Title"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:64
+msgctxt "swlist-info"
+msgid "Author"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:65
+msgctxt "swlist-info"
+msgid "Barcode Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:66
+msgctxt "swlist-info"
+msgid "Developer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:67
+msgctxt "swlist-info"
+msgid "Distributor"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:68
+msgctxt "swlist-info"
+msgid "Installation Instructions"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:69
+msgctxt "swlist-info"
+msgid "ISBN"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:70
+msgctxt "swlist-info"
+msgid "OEM"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:71
+msgctxt "swlist-info"
+msgid "Original Publisher"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:72
+msgctxt "swlist-info"
+msgid "Part Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:73
+msgctxt "swlist-info"
+msgid "PCB"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:74
+msgctxt "swlist-info"
+msgid "Programmer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:75
+msgctxt "swlist-info"
+msgid "Release Date"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:76
+msgctxt "swlist-info"
+msgid "Serial Number"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:77
+msgctxt "swlist-info"
+msgid "Usage Instructions"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:78
+msgctxt "swlist-info"
+msgid "Version"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:84
+msgctxt "machine-filter"
 msgid "Unfiltered"
 msgstr "필터 미사용"
 
-#: src/frontend/mame/ui/utils.cpp:63 src/frontend/mame/ui/utils.cpp:87
+#: src/frontend/mame/ui/utils.cpp:85
+msgctxt "machine-filter"
 msgid "Available"
 msgstr "사용 가능"
 
-#: src/frontend/mame/ui/utils.cpp:64 src/frontend/mame/ui/utils.cpp:88
+#: src/frontend/mame/ui/utils.cpp:86
+msgctxt "machine-filter"
 msgid "Unavailable"
 msgstr "사용 불가"
 
-#: src/frontend/mame/ui/utils.cpp:65
+#: src/frontend/mame/ui/utils.cpp:87
+msgctxt "machine-filter"
 msgid "Working"
 msgstr "작동함"
 
-#: src/frontend/mame/ui/utils.cpp:66
+#: src/frontend/mame/ui/utils.cpp:88
+msgctxt "machine-filter"
 msgid "Not Working"
 msgstr "작동 불가"
 
-#: src/frontend/mame/ui/utils.cpp:67
+#: src/frontend/mame/ui/utils.cpp:89
+msgctxt "machine-filter"
 msgid "Mechanical"
 msgstr "기계적"
 
-#: src/frontend/mame/ui/utils.cpp:68
+#: src/frontend/mame/ui/utils.cpp:90
+msgctxt "machine-filter"
 msgid "Not Mechanical"
 msgstr "비기계적"
 
-#: src/frontend/mame/ui/utils.cpp:69
+#: src/frontend/mame/ui/utils.cpp:91
+msgctxt "machine-filter"
 msgid "Category"
 msgstr "분류"
 
-#: src/frontend/mame/ui/utils.cpp:70 src/frontend/mame/ui/utils.cpp:89
+#: src/frontend/mame/ui/utils.cpp:92
+msgctxt "machine-filter"
 msgid "Favorites"
 msgstr "즐겨찾기"
 
-#: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/miscmenu.cpp:806
+#: src/frontend/mame/ui/utils.cpp:93
+msgctxt "machine-filter"
 msgid "BIOS"
-msgstr "바이오스"
+msgstr ""
 
-#: src/frontend/mame/ui/utils.cpp:72
+#: src/frontend/mame/ui/utils.cpp:94
+msgctxt "machine-filter"
 msgid "Not BIOS"
 msgstr "바이오스 아님"
 
-#: src/frontend/mame/ui/utils.cpp:73 src/frontend/mame/ui/utils.cpp:90
+#: src/frontend/mame/ui/utils.cpp:95
+msgctxt "machine-filter"
 msgid "Parents"
 msgstr "원형"
 
-#: src/frontend/mame/ui/utils.cpp:74 src/frontend/mame/ui/utils.cpp:91
+#: src/frontend/mame/ui/utils.cpp:96
+msgctxt "machine-filter"
 msgid "Clones"
 msgstr "복제"
 
-#: src/frontend/mame/ui/utils.cpp:75
+#: src/frontend/mame/ui/utils.cpp:97
+msgctxt "machine-filter"
 msgid "Manufacturer"
 msgstr "제조사"
 
-#: src/frontend/mame/ui/utils.cpp:76 src/frontend/mame/ui/utils.cpp:92
+#: src/frontend/mame/ui/utils.cpp:98
+msgctxt "machine-filter"
 msgid "Year"
 msgstr "연도"
 
-#: src/frontend/mame/ui/utils.cpp:77
+#: src/frontend/mame/ui/utils.cpp:99
+msgctxt "machine-filter"
 msgid "Save Supported"
 msgstr "저장 지원"
 
-#: src/frontend/mame/ui/utils.cpp:78
+#: src/frontend/mame/ui/utils.cpp:100
+msgctxt "machine-filter"
 msgid "Save Unsupported"
 msgstr "저장 지원 안 됨"
 
-#: src/frontend/mame/ui/utils.cpp:79
+#: src/frontend/mame/ui/utils.cpp:101
+msgctxt "machine-filter"
 msgid "CHD Required"
 msgstr "CHD 필요"
 
-#: src/frontend/mame/ui/utils.cpp:80
+#: src/frontend/mame/ui/utils.cpp:102
+msgctxt "machine-filter"
 msgid "No CHD Required"
 msgstr "CHD 필요없음"
 
-#: src/frontend/mame/ui/utils.cpp:81
+#: src/frontend/mame/ui/utils.cpp:103
+msgctxt "machine-filter"
 msgid "Vertical Screen"
 msgstr "세로 화면"
 
-#: src/frontend/mame/ui/utils.cpp:82
+#: src/frontend/mame/ui/utils.cpp:104
+msgctxt "machine-filter"
 msgid "Horizontal Screen"
 msgstr "가로 화면"
 
-#: src/frontend/mame/ui/utils.cpp:83 src/frontend/mame/ui/utils.cpp:100
+#: src/frontend/mame/ui/utils.cpp:105
+msgctxt "machine-filter"
 msgid "Custom Filter"
 msgstr "사용자 제작 필터"
 
-#: src/frontend/mame/ui/utils.cpp:93
+#: src/frontend/mame/ui/utils.cpp:109
+msgctxt "software-filter"
+msgid "Unfiltered"
+msgstr "필터 미사용"
+
+#: src/frontend/mame/ui/utils.cpp:110
+msgctxt "software-filter"
+msgid "Available"
+msgstr "사용 가능"
+
+#: src/frontend/mame/ui/utils.cpp:111
+msgctxt "software-filter"
+msgid "Unavailable"
+msgstr "사용 불가"
+
+#: src/frontend/mame/ui/utils.cpp:112
+msgctxt "software-filter"
+msgid "Favorites"
+msgstr "즐겨찾기"
+
+#: src/frontend/mame/ui/utils.cpp:113
+msgctxt "software-filter"
+msgid "Parents"
+msgstr "원형"
+
+#: src/frontend/mame/ui/utils.cpp:114
+msgctxt "software-filter"
+msgid "Clones"
+msgstr "복제"
+
+#: src/frontend/mame/ui/utils.cpp:115
+msgctxt "software-filter"
+msgid "Year"
+msgstr "연도"
+
+#: src/frontend/mame/ui/utils.cpp:116
+msgctxt "software-filter"
 msgid "Publisher"
 msgstr "배급사"
 
-#: src/frontend/mame/ui/utils.cpp:94
+#: src/frontend/mame/ui/utils.cpp:117
+msgctxt "software-filter"
+msgid "Developer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:118
+msgctxt "software-filter"
+msgid "Distributor"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:119
+msgctxt "software-filter"
+msgid "Author"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:120
+msgctxt "software-filter"
+msgid "Programmer"
+msgstr ""
+
+#: src/frontend/mame/ui/utils.cpp:121
+msgctxt "software-filter"
 msgid "Supported"
 msgstr "지원됨"
 
-#: src/frontend/mame/ui/utils.cpp:95
+#: src/frontend/mame/ui/utils.cpp:122
+msgctxt "software-filter"
 msgid "Partially Supported"
 msgstr "부분적으로 지원됨"
 
-#: src/frontend/mame/ui/utils.cpp:96
+#: src/frontend/mame/ui/utils.cpp:123
+msgctxt "software-filter"
 msgid "Unsupported"
 msgstr "지원 안 됨"
 
-#: src/frontend/mame/ui/utils.cpp:97
+#: src/frontend/mame/ui/utils.cpp:124
+msgctxt "software-filter"
 msgid "Release Region"
 msgstr "발매 지역"
 
-#: src/frontend/mame/ui/utils.cpp:98
+#: src/frontend/mame/ui/utils.cpp:125
+msgctxt "software-filter"
 msgid "Device Type"
 msgstr "장치 종류"
 
-#: src/frontend/mame/ui/utils.cpp:99
+#: src/frontend/mame/ui/utils.cpp:126
+msgctxt "software-filter"
 msgid "Software List"
 msgstr "소프트웨어 목록"
 
-#: src/frontend/mame/ui/utils.cpp:247
+#: src/frontend/mame/ui/utils.cpp:127
+msgctxt "software-filter"
+msgid "Custom Filter"
+msgstr "사용자 제작 필터"
+
+#: src/frontend/mame/ui/utils.cpp:291
 msgid "<set up filters>"
 msgstr "<필터 결정>"
 
-#: src/frontend/mame/ui/utils.cpp:351
+#: src/frontend/mame/ui/utils.cpp:395
 msgid "Select custom filters:"
 msgstr "사용자 제작 필터 선택:"
 
-#: src/frontend/mame/ui/utils.cpp:502
+#: src/frontend/mame/ui/utils.cpp:546
 #, c-format
 msgid "Filter %1$u"
 msgstr "필터 %1$u"
 
-#: src/frontend/mame/ui/utils.cpp:516
+#: src/frontend/mame/ui/utils.cpp:560
 msgid "Remove last filter"
 msgstr "가장 최근의 필터 삭제"
 
-#: src/frontend/mame/ui/utils.cpp:518
+#: src/frontend/mame/ui/utils.cpp:562
 msgid "Add filter"
 msgstr "필터 추가"
 
-#: src/frontend/mame/ui/utils.cpp:957
+#: src/frontend/mame/ui/utils.cpp:1001
 msgid "Select category:"
 msgstr "분류 선택"
 
-#: src/frontend/mame/ui/utils.cpp:988
+#: src/frontend/mame/ui/utils.cpp:1032
 msgid "[no category INI files]"
 msgstr "[카테고리 INI 파일 없음]"
 
-#: src/frontend/mame/ui/utils.cpp:996
+#: src/frontend/mame/ui/utils.cpp:1040
 msgid "[no groups in INI file]"
 msgstr "[INI 파일에 그룹 없음]"
 
-#: src/frontend/mame/ui/utils.cpp:1030
+#: src/frontend/mame/ui/utils.cpp:1074
 msgid "No category INI files found"
 msgstr "카테고리 INI 파일을 찾을 수 없습니다"
 
-#: src/frontend/mame/ui/utils.cpp:1035
+#: src/frontend/mame/ui/utils.cpp:1079
 msgid "File"
 msgstr "파일"
 
-#: src/frontend/mame/ui/utils.cpp:1039
+#: src/frontend/mame/ui/utils.cpp:1083
 msgid "No groups found in category file"
 msgstr "카테고리 파일 내에 그룹이 없습니다"
 
-#: src/frontend/mame/ui/utils.cpp:1044
+#: src/frontend/mame/ui/utils.cpp:1088
 msgid "Group"
 msgstr "그룹"
 
-#: src/frontend/mame/ui/utils.cpp:1045
+#: src/frontend/mame/ui/utils.cpp:1089
 msgid "Include clones"
 msgstr "복제판 포함"
 
-#: src/frontend/mame/ui/datmenu.cpp:81
-msgid "Software Usage"
-msgstr "소프트웨어 사용"
+#: src/frontend/mame/ui/datmenu.cpp:81 src/frontend/mame/ui/selmenu.cpp:2635
+msgid "Software List Info"
+msgstr ""
 
 #: src/frontend/mame/ui/datmenu.cpp:365
 msgid "Revision: "
 msgstr "개정: "
 
-#: src/frontend/mame/ui/miscmenu.cpp:77 src/frontend/mame/ui/confswitch.cpp:162
+#: src/frontend/mame/ui/miscmenu.cpp:78 src/frontend/mame/ui/confswitch.cpp:162
 #: src/frontend/mame/ui/slotopt.cpp:203
 msgid "Reset"
 msgstr "리셋"
 
-#: src/frontend/mame/ui/miscmenu.cpp:235
+#: src/frontend/mame/ui/miscmenu.cpp:236
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
@@ -1283,7 +1473,7 @@ msgstr ""
 "가동 시간: %1$d:%2$02d:%3$02d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:237
+#: src/frontend/mame/ui/miscmenu.cpp:238
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d\n"
@@ -1292,7 +1482,7 @@ msgstr ""
 "가동 시간: %1$d:%2$02d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:241
+#: src/frontend/mame/ui/miscmenu.cpp:242
 #, c-format
 msgid ""
 "Tickets dispensed: %1$d\n"
@@ -1301,88 +1491,92 @@ msgstr ""
 "티켓 발행: %1$d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:252
+#: src/frontend/mame/ui/miscmenu.cpp:253
 msgid "Coin %1$c: NA%3$s\n"
 msgstr "코인 %1$c: NA%3$s\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:252
+#: src/frontend/mame/ui/miscmenu.cpp:253
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
 msgstr "코인 %1$c: %2$d%3$s\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:255
+#: src/frontend/mame/ui/miscmenu.cpp:256
 msgid " (locked)"
 msgstr " (잠김)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:455
+#: src/frontend/mame/ui/miscmenu.cpp:456
 #, c-format
 msgid "P%d Visibility"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:509
+#: src/frontend/mame/ui/miscmenu.cpp:510
 #, c-format
 msgid "P%d Crosshair"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:526
+#: src/frontend/mame/ui/miscmenu.cpp:527
 msgid "Visible Delay"
 msgstr "표시 지연"
 
-#: src/frontend/mame/ui/miscmenu.cpp:638
+#: src/frontend/mame/ui/miscmenu.cpp:639
 #, c-format
 msgid "%s.xml saved under ui folder."
 msgstr "%s.xml가 ui 폴더에 저장됐습니다.."
 
-#: src/frontend/mame/ui/miscmenu.cpp:664
+#: src/frontend/mame/ui/miscmenu.cpp:665
 msgid "Name:             Description:\n"
 msgstr "이름:             설명:\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:675
+#: src/frontend/mame/ui/miscmenu.cpp:676
 #, c-format
 msgid "%s.txt saved under ui folder."
 msgstr "%s.txt가 ui 폴더에 저장됐습니다.."
 
-#: src/frontend/mame/ui/miscmenu.cpp:692
+#: src/frontend/mame/ui/miscmenu.cpp:693
 msgid "Export list in XML format (like -listxml)"
 msgstr "XML 형식으로 명단 보내기 (-listxml)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:693
+#: src/frontend/mame/ui/miscmenu.cpp:694
 msgid "Export list in XML format (like -listxml, but exclude devices)"
 msgstr "XML 형식으로 명단 보내기 (-listxml, 장치 제외)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:694
+#: src/frontend/mame/ui/miscmenu.cpp:695
 msgid "Export list in TXT format (like -listfull)"
 msgstr "TXT 형식으로 명단 보내기 (-listfull)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:810
+#: src/frontend/mame/ui/miscmenu.cpp:829
+msgid "BIOS"
+msgstr "바이오스"
+
+#: src/frontend/mame/ui/miscmenu.cpp:833
 msgid "Driver"
 msgstr "드라이버"
 
-#: src/frontend/mame/ui/miscmenu.cpp:813
+#: src/frontend/mame/ui/miscmenu.cpp:836
 msgid "This machine has no BIOS."
 msgstr "장치에 바이오스가 없습니다."
 
-#: src/frontend/mame/ui/miscmenu.cpp:822 src/frontend/mame/ui/mainmenu.cpp:134
+#: src/frontend/mame/ui/miscmenu.cpp:845 src/frontend/mame/ui/mainmenu.cpp:134
 msgid "Add To Favorites"
 msgstr "즐겨찾기에 추가"
 
-#: src/frontend/mame/ui/miscmenu.cpp:824 src/frontend/mame/ui/mainmenu.cpp:136
+#: src/frontend/mame/ui/miscmenu.cpp:847 src/frontend/mame/ui/mainmenu.cpp:136
 msgid "Remove From Favorites"
 msgstr "즐겨찾기에서 삭제"
 
-#: src/frontend/mame/ui/miscmenu.cpp:827
+#: src/frontend/mame/ui/miscmenu.cpp:850
 msgid "Save Machine Configuration"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:838
+#: src/frontend/mame/ui/miscmenu.cpp:861
 msgid "Configure Machine:"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:872 src/frontend/mame/ui/selmenu.cpp:2595
+#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/selmenu.cpp:2573
 msgid " (default)"
 msgstr " (기본)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:954 src/frontend/mame/ui/selgame.cpp:608
+#: src/frontend/mame/ui/miscmenu.cpp:977 src/frontend/mame/ui/selgame.cpp:812
 msgid "Plugins"
 msgstr "플러그인"
 
@@ -1394,23 +1588,41 @@ msgstr "유사 터미널"
 msgid "[failed]"
 msgstr "[실패]"
 
-#: src/frontend/mame/ui/state.cpp:213
+#: src/frontend/mame/ui/state.cpp:215
 msgid "No save states found"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:404
+#: src/frontend/mame/ui/state.cpp:265
+#, c-format
+msgid ""
+"Delete saved state %1$s?\n"
+"Press %2$s to delete\n"
+"Press %3$s to cancel"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:378
+#, c-format
+msgid "Error removing saved state file %1$s"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:424
+#, c-format
+msgid "Press %1$s to delete"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:497
 msgid "Load State"
 msgstr "상태 불러오기"
 
-#: src/frontend/mame/ui/state.cpp:404
+#: src/frontend/mame/ui/state.cpp:497
 msgid "Select state to load"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:428
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Save State"
 msgstr "상태 저장하기"
 
-#: src/frontend/mame/ui/state.cpp:428
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Press a key or joystick button, or select state to overwrite"
 msgstr ""
 
@@ -1433,7 +1645,7 @@ msgid "Other Controls"
 msgstr "기타 조작"
 
 #: src/frontend/mame/ui/inputmap.cpp:227
-msgid "This machine has no input map."
+msgid "This machine has no configurable inputs."
 msgstr ""
 
 #: src/frontend/mame/ui/inputmap.cpp:310
@@ -1445,27 +1657,27 @@ msgstr ""
 msgid "Invalid sequence entered"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:480
+#: src/frontend/mame/ui/inputmap.cpp:486
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:507
+#: src/frontend/mame/ui/inputmap.cpp:513
 #, c-format
 msgid "Press %1$s to set\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:508
+#: src/frontend/mame/ui/inputmap.cpp:514
 #, c-format
 msgid "Press %1$s to append\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:509
+#: src/frontend/mame/ui/inputmap.cpp:515
 #, c-format
 msgid "Press %1$s to clear\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:510
+#: src/frontend/mame/ui/inputmap.cpp:516
 #, c-format
 msgid "Press %1$s to restore default\n"
 msgstr ""
@@ -1546,7 +1758,7 @@ msgstr ""
 "라 %2$s 환경설정에 관한 정보를 찾아 참고하십시오."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:278
-#: src/frontend/mame/ui/selgame.cpp:603
+#: src/frontend/mame/ui/selgame.cpp:807
 msgid "Configure Options"
 msgstr "옵션 환경설정"
 
@@ -1560,7 +1772,7 @@ msgid "Type name or select: (random)"
 msgstr "새 이름을 짓거나 선택하십시오: (무작위)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:318
-#: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:713
+#: src/frontend/mame/ui/selmenu.cpp:660 src/frontend/mame/ui/selmenu.cpp:697
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s, %2$-.100s"
@@ -1571,52 +1783,52 @@ msgid "Driver: %1$-.100s"
 msgstr "드라이버: %1$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:337
-#: src/frontend/mame/ui/selmenu.cpp:726
+#: src/frontend/mame/ui/selmenu.cpp:712
 msgid "Overall: NOT WORKING"
 msgstr "종합: 작동 불가"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:339
-#: src/frontend/mame/ui/selmenu.cpp:728
+#: src/frontend/mame/ui/selmenu.cpp:714
 msgid "Overall: Unemulated Protection"
 msgstr "종합: 보호처리 에뮬레이션 미완"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:341
-#: src/frontend/mame/ui/selmenu.cpp:730
+#: src/frontend/mame/ui/selmenu.cpp:716
 msgid "Overall: Working"
 msgstr "종합: 작동 가능"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:345
-#: src/frontend/mame/ui/selmenu.cpp:734
+#: src/frontend/mame/ui/selmenu.cpp:720
 msgid "Graphics: Unimplemented, "
 msgstr "그래픽: 적용 안 됨,"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:347
-#: src/frontend/mame/ui/selmenu.cpp:736
+#: src/frontend/mame/ui/selmenu.cpp:722
 msgid "Graphics: Imperfect, "
 msgstr "그래픽: 불완전,"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:349
-#: src/frontend/mame/ui/selmenu.cpp:738
+#: src/frontend/mame/ui/selmenu.cpp:724
 msgid "Graphics: OK, "
 msgstr "그래픽: 양호,"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:352
-#: src/frontend/mame/ui/selmenu.cpp:741
+#: src/frontend/mame/ui/selmenu.cpp:727
 msgid "Sound: None"
 msgstr "사운드: 없음"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:354
-#: src/frontend/mame/ui/selmenu.cpp:743
+#: src/frontend/mame/ui/selmenu.cpp:729
 msgid "Sound: Unimplemented"
 msgstr "사운드: 적용 안 됨"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:356
-#: src/frontend/mame/ui/selmenu.cpp:745
+#: src/frontend/mame/ui/selmenu.cpp:731
 msgid "Sound: Imperfect"
 msgstr "사운드: 불완전"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:358
-#: src/frontend/mame/ui/selmenu.cpp:747
+#: src/frontend/mame/ui/selmenu.cpp:733
 msgid "Sound: OK"
 msgstr "사운드: 양호"
 
@@ -1642,466 +1854,523 @@ msgid "Reload All"
 msgstr "전부 불러오기"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
+msgctxt "path-option"
 msgid "ROMs"
 msgstr "ROM"
 
 #: src/frontend/mame/ui/dirmenu.cpp:38
+msgctxt "path-option"
 msgid "Software Media"
 msgstr "소프트웨어 미디어"
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
-msgid "UI"
-msgstr "UI"
+msgctxt "path-option"
+msgid "Sound Samples"
+msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:40 src/frontend/mame/ui/custui.cpp:177
-msgid "Language"
-msgstr "언어"
+#: src/frontend/mame/ui/dirmenu.cpp:40
+msgctxt "path-option"
+msgid "Artwork"
+msgstr "삽화"
 
 #: src/frontend/mame/ui/dirmenu.cpp:41
-msgid "Samples"
-msgstr "견본"
-
-#: src/frontend/mame/ui/dirmenu.cpp:42
-msgid "DATs"
-msgstr "DAT"
-
-#: src/frontend/mame/ui/dirmenu.cpp:43
-msgid "INIs"
-msgstr "INI"
-
-#: src/frontend/mame/ui/dirmenu.cpp:44
-msgid "Category INIs"
-msgstr "카테고리 INI"
-
-#: src/frontend/mame/ui/dirmenu.cpp:45
-msgid "Icons"
-msgstr "아이콘"
-
-#: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/selmenu.cpp:74
-msgid "Snapshots"
-msgstr "스냅샷"
-
-#: src/frontend/mame/ui/dirmenu.cpp:48 src/frontend/mame/ui/selmenu.cpp:75
-msgid "Cabinets"
-msgstr "캐비닛"
-
-#: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:78
-msgid "Flyers"
-msgstr "전단지"
-
-#: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:79
-msgid "Titles"
-msgstr "시작화면"
-
-#: src/frontend/mame/ui/dirmenu.cpp:51 src/frontend/mame/ui/selmenu.cpp:80
-msgid "Ends"
-msgstr "종료화면"
-
-#: src/frontend/mame/ui/dirmenu.cpp:52 src/frontend/mame/ui/selmenu.cpp:77
-msgid "PCBs"
-msgstr "PCB"
-
-#: src/frontend/mame/ui/dirmenu.cpp:53 src/frontend/mame/ui/selmenu.cpp:89
-msgid "Marquees"
-msgstr "간판"
-
-#: src/frontend/mame/ui/dirmenu.cpp:54
-msgid "Controls Panels"
-msgstr "조작반"
-
-#: src/frontend/mame/ui/dirmenu.cpp:55
+msgctxt "path-option"
 msgid "Crosshairs"
 msgstr "조준선"
 
-#: src/frontend/mame/ui/dirmenu.cpp:56
-msgid "Artworks"
-msgstr "삽화"
+#: src/frontend/mame/ui/dirmenu.cpp:42
+msgctxt "path-option"
+msgid "Cheat Files"
+msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/selmenu.cpp:82
+#: src/frontend/mame/ui/dirmenu.cpp:43
+msgctxt "path-option"
+msgid "Plugins"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:44
+msgctxt "path-option"
+msgid "UI Translations"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:45
+msgctxt "path-option"
+msgid "INIs"
+msgstr "INI"
+
+#: src/frontend/mame/ui/dirmenu.cpp:46
+msgctxt "path-option"
+msgid "UI Settings"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:47
+msgctxt "path-option"
+msgid "Plugin Data"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:48
+msgctxt "path-option"
+msgid "DATs"
+msgstr "DAT"
+
+#: src/frontend/mame/ui/dirmenu.cpp:49
+msgctxt "path-option"
+msgid "Category INIs"
+msgstr "카테고리 INI"
+
+#: src/frontend/mame/ui/dirmenu.cpp:50
+msgctxt "path-option"
+msgid "Snapshots"
+msgstr "스냅샷"
+
+#: src/frontend/mame/ui/dirmenu.cpp:51
+msgctxt "path-option"
+msgid "Icons"
+msgstr "아이콘"
+
+#: src/frontend/mame/ui/dirmenu.cpp:52
+msgctxt "path-option"
+msgid "Control Panels"
+msgstr "조작반"
+
+#: src/frontend/mame/ui/dirmenu.cpp:53
+msgctxt "path-option"
+msgid "Cabinets"
+msgstr "캐비닛"
+
+#: src/frontend/mame/ui/dirmenu.cpp:54
+msgctxt "path-option"
+msgid "Marquees"
+msgstr "간판"
+
+#: src/frontend/mame/ui/dirmenu.cpp:55
+msgctxt "path-option"
+msgid "PCBs"
+msgstr "PCB"
+
+#: src/frontend/mame/ui/dirmenu.cpp:56
+msgctxt "path-option"
+msgid "Flyers"
+msgstr "전단지"
+
+#: src/frontend/mame/ui/dirmenu.cpp:57
+msgctxt "path-option"
+msgid "Title Screens"
+msgstr "시작화면"
+
+#: src/frontend/mame/ui/dirmenu.cpp:58
+msgctxt "path-option"
+msgid "Game Endings"
+msgstr ""
+
+#: src/frontend/mame/ui/dirmenu.cpp:59
+msgctxt "path-option"
 msgid "Bosses"
 msgstr "보스"
 
-#: src/frontend/mame/ui/dirmenu.cpp:58
-msgid "Artworks Preview"
+#: src/frontend/mame/ui/dirmenu.cpp:60
+msgctxt "path-option"
+msgid "Artwork Previews"
 msgstr "삽화 미리보기"
 
-#: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/selmenu.cpp:88
+#: src/frontend/mame/ui/dirmenu.cpp:61
+msgctxt "path-option"
 msgid "Select"
-msgstr "선택"
+msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:60
-msgid "GameOver"
-msgstr "게임오버"
+#: src/frontend/mame/ui/dirmenu.cpp:62
+msgctxt "path-option"
+msgid "Game Over Screens"
+msgstr ""
 
-#: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/selmenu.cpp:86
+#: src/frontend/mame/ui/dirmenu.cpp:63
+msgctxt "path-option"
 msgid "HowTo"
 msgstr "조작법"
 
-#: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/selmenu.cpp:83
+#: src/frontend/mame/ui/dirmenu.cpp:64
+msgctxt "path-option"
 msgid "Logos"
 msgstr "로고"
 
-#: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/selmenu.cpp:87
+#: src/frontend/mame/ui/dirmenu.cpp:65
+msgctxt "path-option"
 msgid "Scores"
 msgstr "점수"
 
-#: src/frontend/mame/ui/dirmenu.cpp:64 src/frontend/mame/ui/selmenu.cpp:84
+#: src/frontend/mame/ui/dirmenu.cpp:66
+msgctxt "path-option"
 msgid "Versus"
 msgstr "대전"
 
-#: src/frontend/mame/ui/dirmenu.cpp:65 src/frontend/mame/ui/selmenu.cpp:90
+#: src/frontend/mame/ui/dirmenu.cpp:67
+msgctxt "path-option"
 msgid "Covers"
 msgstr "표지"
 
-#: src/frontend/mame/ui/dirmenu.cpp:118
+#: src/frontend/mame/ui/dirmenu.cpp:120
 msgid "Folders Setup"
 msgstr "폴더 정리"
 
-#: src/frontend/mame/ui/dirmenu.cpp:169
+#: src/frontend/mame/ui/dirmenu.cpp:171
 #, c-format
 msgid "Current %1$s Folders"
 msgstr "현재 %1$s 폴더"
 
-#: src/frontend/mame/ui/dirmenu.cpp:181
+#: src/frontend/mame/ui/dirmenu.cpp:183
 msgid "Change Folder"
 msgstr "폴더 변경"
 
-#: src/frontend/mame/ui/dirmenu.cpp:181
+#: src/frontend/mame/ui/dirmenu.cpp:183
 msgid "Add Folder"
 msgstr "폴더 추가"
 
-#: src/frontend/mame/ui/dirmenu.cpp:184
+#: src/frontend/mame/ui/dirmenu.cpp:186
 msgid "Remove Folder"
 msgstr "폴더 삭제"
 
-#: src/frontend/mame/ui/dirmenu.cpp:419
+#: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
 msgstr "%1$s 폴더 바꾸기 - 검색: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:419
+#: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
 msgstr "%1$s 폴더 추가 - 검색: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:430
+#: src/frontend/mame/ui/dirmenu.cpp:432
 msgid "Press TAB to set"
 msgstr "TAB을 누르면 결정됩니다"
 
-#: src/frontend/mame/ui/dirmenu.cpp:514
+#: src/frontend/mame/ui/dirmenu.cpp:516
 #, c-format
 msgid "Remove %1$s Folder"
 msgstr "%1$s 폴더 제거"
 
-#: src/frontend/mame/ui/viewgfx.cpp:428
+#: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " COLORS"
 msgstr " COLORS"
 
-#: src/frontend/mame/ui/viewgfx.cpp:428
+#: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " PENS"
 msgstr " PENS"
 
-#: src/frontend/mame/ui/selgame.cpp:604
+#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
+#, c-format
+msgid "Zoom = 1/%1$d"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
+#, c-format
+msgid "Zoom = %1$d"
+msgstr ""
+
+#: src/frontend/mame/ui/viewgfx.cpp:1262
+msgid "Expand to fit"
+msgstr ""
+
+#: src/frontend/mame/ui/selgame.cpp:808
 msgid "Configure Machine"
 msgstr "장치 환경설정"
 
-#: src/frontend/mame/ui/selgame.cpp:1046
+#: src/frontend/mame/ui/selgame.cpp:1279
 #, c-format
 msgid "Romset\t%1$-.100s\n"
 msgstr "롬셋\t%1$-.100s\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1047
+#: src/frontend/mame/ui/selgame.cpp:1280
 #, c-format
 msgid "Year\t%1$s\n"
 msgstr "연도\t%1$s\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1048
+#: src/frontend/mame/ui/selgame.cpp:1281
 #, c-format
 msgid "Manufacturer\t%1$-.100s\n"
 msgstr "제조사\t%1$-.100s\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1052
+#: src/frontend/mame/ui/selgame.cpp:1285
 #, c-format
 msgid "Driver is Clone of\t%1$-.100s\n"
 msgstr "다음 드라이버의 복제\t%1$-.100s\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1054
+#: src/frontend/mame/ui/selgame.cpp:1287
 msgid "Driver is Parent\t\n"
 msgstr "원형 드라이버\t\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1057
+#: src/frontend/mame/ui/selgame.cpp:1290
 msgid "Analog Controls\tYes\n"
 msgstr "아날로그 조작\t예\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1059
+#: src/frontend/mame/ui/selgame.cpp:1292
 msgid "Keyboard Inputs\tYes\n"
 msgstr "키보드 입력\t예\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1062
+#: src/frontend/mame/ui/selgame.cpp:1295
 msgid "Overall\tNOT WORKING\n"
 msgstr "종합\t작동 불가\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1064
+#: src/frontend/mame/ui/selgame.cpp:1297
 msgid "Overall\tUnemulated Protection\n"
 msgstr "종합\t보호처리 에뮬레이션 미완\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1066
+#: src/frontend/mame/ui/selgame.cpp:1299
 msgid "Overall\tWorking\n"
 msgstr "종합\t작동\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1069
+#: src/frontend/mame/ui/selgame.cpp:1302
 msgid "Graphics\tUnimplemented\n"
 msgstr "그래픽\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1071
+#: src/frontend/mame/ui/selgame.cpp:1304
 msgid "Graphics\tWrong Colors\n"
 msgstr "그래픽\t잘못된 색상\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1073
+#: src/frontend/mame/ui/selgame.cpp:1306
 msgid "Graphics\tImperfect Colors\n"
 msgstr "그래픽\t불완전한 색상\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1075
+#: src/frontend/mame/ui/selgame.cpp:1308
 msgid "Graphics\tImperfect\n"
 msgstr "그래픽\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1077
+#: src/frontend/mame/ui/selgame.cpp:1310
 msgid "Graphics\tOK\n"
 msgstr "그래픽\t양호\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1080
+#: src/frontend/mame/ui/selgame.cpp:1313
 msgid "Sound\tNone\n"
 msgstr "사운드\t없음\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1082
+#: src/frontend/mame/ui/selgame.cpp:1315
 msgid "Sound\tUnimplemented\n"
 msgstr "사운드\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1084
+#: src/frontend/mame/ui/selgame.cpp:1317
 msgid "Sound\tImperfect\n"
 msgstr "사운드\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1086
+#: src/frontend/mame/ui/selgame.cpp:1319
 msgid "Sound\tOK\n"
 msgstr "사운드\t양호\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1089
+#: src/frontend/mame/ui/selgame.cpp:1322
 msgid "Capture\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1091
+#: src/frontend/mame/ui/selgame.cpp:1324
 msgid "Capture\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1094
+#: src/frontend/mame/ui/selgame.cpp:1327
 msgid "Camera\tUnimplemented\n"
 msgstr "카메라\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1096
+#: src/frontend/mame/ui/selgame.cpp:1329
 msgid "Camera\tImperfect\n"
 msgstr "카메라\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1099
+#: src/frontend/mame/ui/selgame.cpp:1332
 msgid "Microphone\tUnimplemented\n"
 msgstr "마이크로폰\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1101
+#: src/frontend/mame/ui/selgame.cpp:1334
 msgid "Microphone\tImperfect\n"
 msgstr "마이크로폰\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1104
+#: src/frontend/mame/ui/selgame.cpp:1337
 msgid "Controls\tUnimplemented\n"
 msgstr "컨트롤\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1106
+#: src/frontend/mame/ui/selgame.cpp:1339
 msgid "Controls\tImperfect\n"
 msgstr "컨트롤\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1109
+#: src/frontend/mame/ui/selgame.cpp:1342
 msgid "Keyboard\tUnimplemented\n"
 msgstr "키보드\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1111
+#: src/frontend/mame/ui/selgame.cpp:1344
 msgid "Keyboard\tImperfect\n"
 msgstr "키보드\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1114
+#: src/frontend/mame/ui/selgame.cpp:1347
 msgid "Mouse\tUnimplemented\n"
 msgstr "마우스\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1116
+#: src/frontend/mame/ui/selgame.cpp:1349
 msgid "Mouse\tImperfect\n"
 msgstr "마우스\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1119
+#: src/frontend/mame/ui/selgame.cpp:1352
 msgid "Media\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1121
+#: src/frontend/mame/ui/selgame.cpp:1354
 msgid "Media\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1124
+#: src/frontend/mame/ui/selgame.cpp:1357
 msgid "Disk\tUnimplemented\n"
 msgstr "디스크\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1126
+#: src/frontend/mame/ui/selgame.cpp:1359
 msgid "Disk\tImperfect\n"
 msgstr "디스크\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1129
+#: src/frontend/mame/ui/selgame.cpp:1362
 msgid "Printer\tUnimplemented\n"
 msgstr "프린터\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1131
+#: src/frontend/mame/ui/selgame.cpp:1364
 msgid "Printer\tImperfect\n"
 msgstr "프린터\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1134
+#: src/frontend/mame/ui/selgame.cpp:1367
 msgid "Mag. Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1136
+#: src/frontend/mame/ui/selgame.cpp:1369
 msgid "Mag. Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1139
+#: src/frontend/mame/ui/selgame.cpp:1372
 msgid "Punch Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1141
+#: src/frontend/mame/ui/selgame.cpp:1374
 msgid "Punch Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1144
+#: src/frontend/mame/ui/selgame.cpp:1377
 msgid "Mag. Drum\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1146
+#: src/frontend/mame/ui/selgame.cpp:1379
 msgid "Mag. Drum\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1149
+#: src/frontend/mame/ui/selgame.cpp:1382
 msgid "(EP)ROM\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1151
+#: src/frontend/mame/ui/selgame.cpp:1384
 msgid "(EP)ROM\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1154
+#: src/frontend/mame/ui/selgame.cpp:1387
 msgid "Communications\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1156
+#: src/frontend/mame/ui/selgame.cpp:1389
 msgid "Communications\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1159
+#: src/frontend/mame/ui/selgame.cpp:1392
 msgid "LAN\tUnimplemented\n"
 msgstr "LAN\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1161
+#: src/frontend/mame/ui/selgame.cpp:1394
 msgid "LAN\tImperfect\n"
 msgstr "LAN\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1164
+#: src/frontend/mame/ui/selgame.cpp:1397
 msgid "WAN\tUnimplemented\n"
 msgstr "WAN\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1166
+#: src/frontend/mame/ui/selgame.cpp:1399
 msgid "WAN\tImperfect\n"
 msgstr "WAN\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1169
+#: src/frontend/mame/ui/selgame.cpp:1402
 msgid "Timing\tUnimplemented\n"
 msgstr "타이밍\t적용 안 됨\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1171
+#: src/frontend/mame/ui/selgame.cpp:1404
 msgid "Timing\tImperfect\n"
 msgstr "타이밍\t불완전\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1173
+#: src/frontend/mame/ui/selgame.cpp:1406
 msgid "Mechanical Machine\tYes\n"
 msgstr "기계적 장치\t예\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1173
+#: src/frontend/mame/ui/selgame.cpp:1406
 msgid "Mechanical Machine\tNo\n"
 msgstr "기계적 장치\t아니오\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1174
+#: src/frontend/mame/ui/selgame.cpp:1407
 msgid "Requires Artwork\tYes\n"
 msgstr "삽화 필요\t예\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1174
+#: src/frontend/mame/ui/selgame.cpp:1407
 msgid "Requires Artwork\tNo\n"
 msgstr "삽화 필요\t아니오\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1175
+#: src/frontend/mame/ui/selgame.cpp:1408
 msgid "Requires Clickable Artwork\tYes\n"
 msgstr "클릭가능한 삽화 필요\t예\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1175
+#: src/frontend/mame/ui/selgame.cpp:1408
 msgid "Requires Clickable Artwork\tNo\n"
 msgstr "클릭가능한 삽화 필요\t아니오\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1177
+#: src/frontend/mame/ui/selgame.cpp:1410
 msgid "Support Cocktail\tNo\n"
 msgstr "칵테일 지원\t아니오\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1178
+#: src/frontend/mame/ui/selgame.cpp:1411
 msgid "Driver is BIOS\tYes\n"
 msgstr "드라이버가 바이오스\t예\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1178
+#: src/frontend/mame/ui/selgame.cpp:1411
 msgid "Driver is BIOS\tNo\n"
 msgstr "드라이버가 바이오스\t아니오\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1179
+#: src/frontend/mame/ui/selgame.cpp:1412
 msgid "Support Save\tYes\n"
 msgstr "저장 지원\t예\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1179
+#: src/frontend/mame/ui/selgame.cpp:1412
 msgid "Support Save\tNo\n"
 msgstr "저장 지원\t아니오\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1180
+#: src/frontend/mame/ui/selgame.cpp:1413
 msgid "Screen Orientation\tVertical\n"
 msgstr "화면 방향\t세로형\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1180
+#: src/frontend/mame/ui/selgame.cpp:1413
 msgid "Screen Orientation\tHorizontal\n"
 msgstr "화면 방향\t가로형\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1190
+#: src/frontend/mame/ui/selgame.cpp:1423
 msgid "Requires CHD\tYes\n"
 msgstr "CHD 필요\t예\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1190
+#: src/frontend/mame/ui/selgame.cpp:1423
 msgid "Requires CHD\tNo\n"
 msgstr "CHD 필요\t아니오\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1203
+#: src/frontend/mame/ui/selgame.cpp:1436
 msgid "ROM Audit Result\tOK\n"
 msgstr "ROM 검사 결과\t양호\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1205
+#: src/frontend/mame/ui/selgame.cpp:1438
 msgid "ROM Audit Result\tBAD\n"
 msgstr "ROM 검사 결과\t불량\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1208
+#: src/frontend/mame/ui/selgame.cpp:1441
 msgid "Samples Audit Result\tNone Needed\n"
 msgstr "견본 검사 결과\t불필요\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1210
+#: src/frontend/mame/ui/selgame.cpp:1443
 msgid "Samples Audit Result\tOK\n"
 msgstr "견본 검사 결과\t양호\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1212
+#: src/frontend/mame/ui/selgame.cpp:1445
 msgid "Samples Audit Result\tBAD\n"
 msgstr "견본 검사 결과\t불량\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1216
+#: src/frontend/mame/ui/selgame.cpp:1449
 msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
@@ -2109,17 +2378,12 @@ msgstr ""
 "ROM 검사 \t사용 안 함\n"
 "견본 검사 \t사용 안 함\n"
 
-#: src/frontend/mame/ui/selgame.cpp:1406
+#: src/frontend/mame/ui/selgame.cpp:1639
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 msgstr "%1$s %2$s ( %3$d / %4$d 장치 (%5$d BIOS) "
 
-#: src/frontend/mame/ui/selgame.cpp:1434
-#, c-format
-msgid "Romset: %1$-.100s"
-msgstr "롬셋: %1$-.100s"
-
-#: src/frontend/mame/ui/selgame.cpp:1441
+#: src/frontend/mame/ui/selgame.cpp:1667
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "시스템: %1$-.100s"
@@ -2133,22 +2397,22 @@ msgstr "선택 목록 - 검색: "
 msgid "Double click or press %1$s to select"
 msgstr "더블 클릭 혹은 %1$s 키를 눌러 선택"
 
-#: src/frontend/mame/ui/auditmenu.cpp:97
+#: src/frontend/mame/ui/auditmenu.cpp:49
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
 msgstr "현재 이용할 수 없는 %1$u 장치들에 대해 ROM 검사를 실시합니까?"
 
-#: src/frontend/mame/ui/auditmenu.cpp:100
+#: src/frontend/mame/ui/auditmenu.cpp:52
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
 msgstr "모든 %1$u 장치들에 대해 ROM 검사를 실시합니까?"
 
-#: src/frontend/mame/ui/auditmenu.cpp:105
+#: src/frontend/mame/ui/auditmenu.cpp:57
 #, c-format
 msgid "(results will be saved to %1$s)"
 msgstr "(결과는 %1$s에 저장됩니다)"
 
-#: src/frontend/mame/ui/auditmenu.cpp:131
+#: src/frontend/mame/ui/auditmenu.cpp:83
 #, c-format
 msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
@@ -2157,7 +2421,7 @@ msgstr ""
 "%3$u %2$u 장치의 ROM을 검사중...\n"
 "%1$s"
 
-#: src/frontend/mame/ui/auditmenu.cpp:143
+#: src/frontend/mame/ui/auditmenu.cpp:95
 msgid "Start Audit"
 msgstr "검사 시작"
 
@@ -2177,212 +2441,247 @@ msgstr "정보 및 이미지 숨기기"
 msgid "Hide Both"
 msgstr "모두 숨기기"
 
-#: src/frontend/mame/ui/custui.cpp:171
+#: src/frontend/mame/ui/custui.cpp:176
 msgid "Fonts"
 msgstr "문자"
 
-#: src/frontend/mame/ui/custui.cpp:172
+#: src/frontend/mame/ui/custui.cpp:177
 msgid "Colors"
 msgstr "색상"
 
-#: src/frontend/mame/ui/custui.cpp:181
+#: src/frontend/mame/ui/custui.cpp:180
+msgid "Language"
+msgstr "언어"
+
+#: src/frontend/mame/ui/custui.cpp:183
+msgid "System Names"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:186
 msgid "Show side panels"
 msgstr "사이드 패널 보이기"
 
-#: src/frontend/mame/ui/custui.cpp:193
-msgid "Custom UI Settings"
-msgstr "UI 꾸미기 환경설정"
+#: src/frontend/mame/ui/custui.cpp:198
+msgid "UI Customization Settings"
+msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:245
+#: src/frontend/mame/ui/custui.cpp:212 src/frontend/mame/ui/custui.cpp:256
+msgid "[built-in]"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:338
 msgid "default"
 msgstr "기본"
 
-#: src/frontend/mame/ui/custui.cpp:366
+#: src/frontend/mame/ui/custui.cpp:459
 msgid "UI Font"
 msgstr "UI 글꼴"
 
-#: src/frontend/mame/ui/custui.cpp:371
+#: src/frontend/mame/ui/custui.cpp:464
 msgid "Bold"
 msgstr "굵은 글씨"
 
-#: src/frontend/mame/ui/custui.cpp:372
+#: src/frontend/mame/ui/custui.cpp:465
 msgid "Italic"
 msgstr "이탤릭체"
 
-#: src/frontend/mame/ui/custui.cpp:377
+#: src/frontend/mame/ui/custui.cpp:470
 msgid "Lines"
 msgstr "줄"
 
-#: src/frontend/mame/ui/custui.cpp:383
+#: src/frontend/mame/ui/custui.cpp:476
 msgid "Infos text size"
 msgstr "정보표시 글자 크기"
 
-#: src/frontend/mame/ui/custui.cpp:397
+#: src/frontend/mame/ui/custui.cpp:490
 msgid "UI Fonts Settings"
 msgstr "UI 문자 환경설정"
 
-#: src/frontend/mame/ui/custui.cpp:406
+#: src/frontend/mame/ui/custui.cpp:499
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 "예시문 - 다람쥐 헌 쳇바퀴에 타고파. ABCDEFGHIJKLMNabcdefghijklmn 1234567890"
 
-#: src/frontend/mame/ui/custui.cpp:489
+#: src/frontend/mame/ui/custui.cpp:582
 msgid "Normal text"
 msgstr "보통 글자"
 
-#: src/frontend/mame/ui/custui.cpp:490
+#: src/frontend/mame/ui/custui.cpp:583
 msgid "Selected color"
 msgstr "선택된 색상"
 
-#: src/frontend/mame/ui/custui.cpp:491
+#: src/frontend/mame/ui/custui.cpp:584
 msgid "Normal text background"
 msgstr "보통 글자 배경"
 
-#: src/frontend/mame/ui/custui.cpp:492
+#: src/frontend/mame/ui/custui.cpp:585
 msgid "Selected background color"
 msgstr "선택된 배경색"
 
-#: src/frontend/mame/ui/custui.cpp:493
+#: src/frontend/mame/ui/custui.cpp:586
 msgid "Subitem color"
 msgstr "하위 항목 색상"
 
-#: src/frontend/mame/ui/custui.cpp:494 src/frontend/mame/ui/custui.cpp:550
+#: src/frontend/mame/ui/custui.cpp:587 src/frontend/mame/ui/custui.cpp:643
 msgid "Clone"
 msgstr "클론"
 
-#: src/frontend/mame/ui/custui.cpp:495
+#: src/frontend/mame/ui/custui.cpp:588
 msgid "Border"
 msgstr "테두리"
 
-#: src/frontend/mame/ui/custui.cpp:496
+#: src/frontend/mame/ui/custui.cpp:589
 msgid "Background"
 msgstr "배경"
 
-#: src/frontend/mame/ui/custui.cpp:497
+#: src/frontend/mame/ui/custui.cpp:590
 msgid "Dipswitch"
 msgstr "DIP 스위치"
 
-#: src/frontend/mame/ui/custui.cpp:498
+#: src/frontend/mame/ui/custui.cpp:591
 msgid "Unavailable color"
 msgstr "사용불가 색상"
 
-#: src/frontend/mame/ui/custui.cpp:499
+#: src/frontend/mame/ui/custui.cpp:592
 msgid "Slider color"
 msgstr "슬라이더 색상"
 
-#: src/frontend/mame/ui/custui.cpp:500
+#: src/frontend/mame/ui/custui.cpp:593
 msgid "Gfx viewer background"
 msgstr "그래픽 뷰어 배경"
 
-#: src/frontend/mame/ui/custui.cpp:501
+#: src/frontend/mame/ui/custui.cpp:594
 msgid "Mouse over color"
 msgstr "마우스 오버 색상"
 
-#: src/frontend/mame/ui/custui.cpp:502
+#: src/frontend/mame/ui/custui.cpp:595
 msgid "Mouse over background color"
 msgstr "마우스 오버 배경색상"
 
-#: src/frontend/mame/ui/custui.cpp:503
+#: src/frontend/mame/ui/custui.cpp:596
 msgid "Mouse down color"
 msgstr "마우스 다운 색상"
 
-#: src/frontend/mame/ui/custui.cpp:504
+#: src/frontend/mame/ui/custui.cpp:597
 msgid "Mouse down background color"
 msgstr "마우스 다운 배경색상"
 
-#: src/frontend/mame/ui/custui.cpp:507
+#: src/frontend/mame/ui/custui.cpp:600
 msgid "Restore originals colors"
 msgstr "원래 색상으로 복귀"
 
-#: src/frontend/mame/ui/custui.cpp:519
+#: src/frontend/mame/ui/custui.cpp:612
 msgid "UI Colors Settings"
 msgstr "UI 색상 환경설정"
 
-#: src/frontend/mame/ui/custui.cpp:528
+#: src/frontend/mame/ui/custui.cpp:621
 #, c-format
 msgid "Double click or press %1$s to change the color value"
 msgstr "더블 클릭 혹은 %1$s를 눌러 색상값 변경하기"
 
-#: src/frontend/mame/ui/custui.cpp:536
+#: src/frontend/mame/ui/custui.cpp:629
 msgid "Menu Preview"
 msgstr "메뉴 미리보기"
 
-#: src/frontend/mame/ui/custui.cpp:546
+#: src/frontend/mame/ui/custui.cpp:639
 msgid "Normal"
 msgstr "일반"
 
-#: src/frontend/mame/ui/custui.cpp:547
+#: src/frontend/mame/ui/custui.cpp:640
 msgid "Subitem"
 msgstr "하위항목"
 
-#: src/frontend/mame/ui/custui.cpp:548
+#: src/frontend/mame/ui/custui.cpp:641
 msgid "Selected"
 msgstr "선택된 항목"
 
-#: src/frontend/mame/ui/custui.cpp:549
+#: src/frontend/mame/ui/custui.cpp:642
 msgid "Mouse Over"
 msgstr "마우스 오버"
 
-#: src/frontend/mame/ui/custui.cpp:779
+#: src/frontend/mame/ui/custui.cpp:872
 msgid "ARGB Settings"
 msgstr "ARGB 설정"
 
-#: src/frontend/mame/ui/custui.cpp:784 src/frontend/mame/ui/custui.cpp:787
+#: src/frontend/mame/ui/custui.cpp:877 src/frontend/mame/ui/custui.cpp:880
+msgctxt "color-channel"
 msgid "Alpha"
 msgstr "불투명도"
 
-#: src/frontend/mame/ui/custui.cpp:792 src/frontend/mame/ui/custui.cpp:795
-#: src/frontend/mame/ui/custui.cpp:938
+#: src/frontend/mame/ui/custui.cpp:885 src/frontend/mame/ui/custui.cpp:888
+msgctxt "color-channel"
 msgid "Red"
 msgstr "적"
 
-#: src/frontend/mame/ui/custui.cpp:800 src/frontend/mame/ui/custui.cpp:803
-#: src/frontend/mame/ui/custui.cpp:941
+#: src/frontend/mame/ui/custui.cpp:893 src/frontend/mame/ui/custui.cpp:896
+msgctxt "color-channel"
 msgid "Green"
 msgstr "녹"
 
-#: src/frontend/mame/ui/custui.cpp:808 src/frontend/mame/ui/custui.cpp:811
-#: src/frontend/mame/ui/custui.cpp:942
+#: src/frontend/mame/ui/custui.cpp:901 src/frontend/mame/ui/custui.cpp:904
+msgctxt "color-channel"
 msgid "Blue"
 msgstr "청"
 
-#: src/frontend/mame/ui/custui.cpp:814
+#: src/frontend/mame/ui/custui.cpp:907
 msgid "Choose from palette"
 msgstr "팔레트에서 고르기"
 
-#: src/frontend/mame/ui/custui.cpp:853
+#: src/frontend/mame/ui/custui.cpp:946
 msgid "Color preview ="
 msgstr "색상 미리보기 ="
 
-#: src/frontend/mame/ui/custui.cpp:934
+#: src/frontend/mame/ui/custui.cpp:1027
+msgctxt "color-preset"
 msgid "White"
 msgstr "하양"
 
-#: src/frontend/mame/ui/custui.cpp:935
+#: src/frontend/mame/ui/custui.cpp:1028
+msgctxt "color-preset"
 msgid "Silver"
 msgstr "은색"
 
-#: src/frontend/mame/ui/custui.cpp:936
+#: src/frontend/mame/ui/custui.cpp:1029
+msgctxt "color-preset"
 msgid "Gray"
 msgstr "회색"
 
-#: src/frontend/mame/ui/custui.cpp:937
+#: src/frontend/mame/ui/custui.cpp:1030
+msgctxt "color-preset"
 msgid "Black"
 msgstr "검정"
 
-#: src/frontend/mame/ui/custui.cpp:939
+#: src/frontend/mame/ui/custui.cpp:1031
+msgctxt "color-preset"
+msgid "Red"
+msgstr "적"
+
+#: src/frontend/mame/ui/custui.cpp:1032
+msgctxt "color-preset"
 msgid "Orange"
 msgstr "주황"
 
-#: src/frontend/mame/ui/custui.cpp:940
+#: src/frontend/mame/ui/custui.cpp:1033
+msgctxt "color-preset"
 msgid "Yellow"
 msgstr "노랑"
 
-#: src/frontend/mame/ui/custui.cpp:943
+#: src/frontend/mame/ui/custui.cpp:1034
+msgctxt "color-preset"
+msgid "Green"
+msgstr "녹"
+
+#: src/frontend/mame/ui/custui.cpp:1035
+msgctxt "color-preset"
+msgid "Blue"
+msgstr "청"
+
+#: src/frontend/mame/ui/custui.cpp:1036
+msgctxt "color-preset"
 msgid "Violet"
 msgstr "보라"
 
-#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:757
+#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:743
 #, c-format
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
@@ -2413,7 +2712,7 @@ msgstr "아날로그 조작"
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "DIP Switches"
-msgstr ""
+msgstr "DIP 스위치"
 
 #: src/frontend/mame/ui/mainmenu.cpp:73
 msgid "Machine Configuration"
@@ -2489,137 +2788,215 @@ msgid "Select New Machine"
 msgstr "새로운 장치 선택"
 
 #: src/frontend/mame/ui/selmenu.cpp:76
-msgid "Control Panels"
+msgctxt "selmenu-artwork"
+msgid "Snapshots"
+msgstr "스냅샷"
+
+#: src/frontend/mame/ui/selmenu.cpp:77
+msgctxt "selmenu-artwork"
+msgid "Cabinet"
+msgstr "캐비닛"
+
+#: src/frontend/mame/ui/selmenu.cpp:78
+msgctxt "selmenu-artwork"
+msgid "Control Panel"
 msgstr "조작반"
 
+#: src/frontend/mame/ui/selmenu.cpp:79
+msgctxt "selmenu-artwork"
+msgid "PCB"
+msgstr "PCB"
+
+#: src/frontend/mame/ui/selmenu.cpp:80
+msgctxt "selmenu-artwork"
+msgid "Flyer"
+msgstr "전단지"
+
 #: src/frontend/mame/ui/selmenu.cpp:81
+msgctxt "selmenu-artwork"
+msgid "Title Screen"
+msgstr "시작화면"
+
+#: src/frontend/mame/ui/selmenu.cpp:82
+msgctxt "selmenu-artwork"
+msgid "Ending"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:83
+msgctxt "selmenu-artwork"
 msgid "Artwork Preview"
 msgstr "삽화 미리보기"
 
+#: src/frontend/mame/ui/selmenu.cpp:84
+msgctxt "selmenu-artwork"
+msgid "Bosses"
+msgstr "보스"
+
 #: src/frontend/mame/ui/selmenu.cpp:85
+msgctxt "selmenu-artwork"
+msgid "Logo"
+msgstr "로고"
+
+#: src/frontend/mame/ui/selmenu.cpp:86
+msgctxt "selmenu-artwork"
+msgid "Versus"
+msgstr "대전"
+
+#: src/frontend/mame/ui/selmenu.cpp:87
+msgctxt "selmenu-artwork"
 msgid "Game Over"
 msgstr "게임 오버"
 
-#: src/frontend/mame/ui/selmenu.cpp:94
+#: src/frontend/mame/ui/selmenu.cpp:88
+msgctxt "selmenu-artwork"
+msgid "HowTo"
+msgstr "조작법"
+
+#: src/frontend/mame/ui/selmenu.cpp:89
+msgctxt "selmenu-artwork"
+msgid "Scores"
+msgstr "점수"
+
+#: src/frontend/mame/ui/selmenu.cpp:90
+msgctxt "selmenu-artwork"
+msgid "Select"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:91
+msgctxt "selmenu-artwork"
+msgid "Marquee"
+msgstr "간판"
+
+#: src/frontend/mame/ui/selmenu.cpp:92
+msgctxt "selmenu-artwork"
+msgid "Covers"
+msgstr "표지"
+
+#: src/frontend/mame/ui/selmenu.cpp:96
 msgid "Add or remove favorites"
 msgstr "즐겨찾기 추가 및 삭제"
 
-#: src/frontend/mame/ui/selmenu.cpp:95
+#: src/frontend/mame/ui/selmenu.cpp:97
 msgid "Export displayed list to file"
 msgstr "표시된 목록을 파일로 보내기"
 
-#: src/frontend/mame/ui/selmenu.cpp:96
+#: src/frontend/mame/ui/selmenu.cpp:98
 msgid "Show DATs view"
 msgstr "DAT 화면 보이기"
 
-#: src/frontend/mame/ui/selmenu.cpp:320
+#: src/frontend/mame/ui/selmenu.cpp:319
 msgid "Software part selection:"
 msgstr "선택한 소프트웨어 요소:"
 
-#: src/frontend/mame/ui/selmenu.cpp:426
+#: src/frontend/mame/ui/selmenu.cpp:425
 msgid "BIOS selection:"
 msgstr "바이오스 선택:"
 
-#: src/frontend/mame/ui/selmenu.cpp:681
+#: src/frontend/mame/ui/selmenu.cpp:664
 #, c-format
 msgid "Software is clone of: %1$-.100s"
 msgstr "이 소프트웨어는 다음의 복제입니다: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:683
+#: src/frontend/mame/ui/selmenu.cpp:666
 msgid "Software is parent"
 msgstr "이 소프트웨어는 원형입니다"
 
-#: src/frontend/mame/ui/selmenu.cpp:688
+#: src/frontend/mame/ui/selmenu.cpp:671
 msgid "Supported: No"
 msgstr "지원여부: 아니오"
 
-#: src/frontend/mame/ui/selmenu.cpp:693
+#: src/frontend/mame/ui/selmenu.cpp:676
 msgid "Supported: Partial"
 msgstr "지원여부: 부분적"
 
-#: src/frontend/mame/ui/selmenu.cpp:698
+#: src/frontend/mame/ui/selmenu.cpp:681
 msgid "Supported: Yes"
 msgstr "지원여부: 예"
 
-#: src/frontend/mame/ui/selmenu.cpp:703
+#: src/frontend/mame/ui/selmenu.cpp:686
 #, c-format
-msgid "romset: %1$-.100s"
+msgid "Software list/item: %1$s:%2$s"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:694
+#, c-format
+msgid "Romset: %1$-.100s"
 msgstr "롬셋: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:719
+#: src/frontend/mame/ui/selmenu.cpp:703
+msgid "Driver is parent"
+msgstr "이 드라이버는 원형입니다"
+
+#: src/frontend/mame/ui/selmenu.cpp:705 src/frontend/mame/ui/selmenu.cpp:707
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
 msgstr "이 드라이버는 다음의 복제입니다: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:721
-msgid "Driver is parent"
-msgstr "이 드라이버는 원형입니다"
-
-#: src/frontend/mame/ui/selmenu.cpp:2198
+#: src/frontend/mame/ui/selmenu.cpp:2176
 msgid "Images"
 msgstr "사진"
 
-#: src/frontend/mame/ui/selmenu.cpp:2199
+#: src/frontend/mame/ui/selmenu.cpp:2177
 msgid "Infos"
 msgstr "정보"
 
-#: src/frontend/mame/ui/selmenu.cpp:2508
+#: src/frontend/mame/ui/selmenu.cpp:2486
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2524
+#: src/frontend/mame/ui/selmenu.cpp:2502
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2540
+#: src/frontend/mame/ui/selmenu.cpp:2518
 msgid "incorrect checksum"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2543
+#: src/frontend/mame/ui/selmenu.cpp:2521
 msgid "incorrect length"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2546
+#: src/frontend/mame/ui/selmenu.cpp:2524
 msgid "not found"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2557
+#: src/frontend/mame/ui/selmenu.cpp:2535
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2559
+#: src/frontend/mame/ui/selmenu.cpp:2537
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2563
+#: src/frontend/mame/ui/selmenu.cpp:2541
 msgid "Press any key to continue."
 msgstr "아무 키를 누르면 진행합니다."
 
-#: src/frontend/mame/ui/selmenu.cpp:2664
-msgid "Usage"
-msgstr "사용"
-
-#: src/frontend/mame/ui/selmenu.cpp:2699
+#: src/frontend/mame/ui/selmenu.cpp:2670
 msgid "General Info"
 msgstr "일반 정보"
 
-#: src/frontend/mame/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/sndmenu.cpp:148
 msgid "Sound"
 msgstr "사운드"
 
-#: src/frontend/mame/ui/sndmenu.cpp:136
+#: src/frontend/mame/ui/sndmenu.cpp:149
+msgid "Compressor"
+msgstr ""
+
+#: src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
 msgstr "샘플 레이트"
 
-#: src/frontend/mame/ui/sndmenu.cpp:137
+#: src/frontend/mame/ui/sndmenu.cpp:151
 msgid "Use External Samples"
 msgstr "외부 샘플 이용"
 
@@ -2673,12 +3050,12 @@ msgstr "  화면 '%1$s': 벡터\n"
 #: src/frontend/mame/ui/devopt.cpp:116
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr ""
+msgstr "  화면 '%1$s': %2$d × %3$d (V) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:117
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-msgstr ""
+msgstr "  화면 '%1$s': %2$d × %3$d (H) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:130
 msgid "* Sound:\n"
@@ -3223,7 +3600,7 @@ msgstr "MARP 점수"
 msgid "Gameinit"
 msgstr "Gameinit"
 
-#: plugins/data/data_history.lua:171
+#: plugins/data/data_history.lua:172
 msgid "History"
 msgstr "역사"
 
@@ -3247,17 +3624,49 @@ msgstr "MESSinfo"
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
 
-#~ msgid "Backdrops"
-#~ msgstr "배경"
+#~ msgid "Custom UI Settings"
+#~ msgstr "UI 꾸미기 환경설정"
 
-#~ msgid "Overlays"
-#~ msgstr "오버레이"
+#~ msgid "Software Usage"
+#~ msgstr "소프트웨어 사용"
 
-#~ msgid "Bezels"
-#~ msgstr "베젤"
+#~ msgid "Usage"
+#~ msgstr "사용"
 
-#~ msgid "CPanels"
-#~ msgstr "조작반"
+#~ msgctxt "path-option"
+#~ msgid "UI"
+#~ msgstr "UI"
+
+#~ msgctxt "path-option"
+#~ msgid "Language"
+#~ msgstr "언어"
+
+#~ msgctxt "path-option"
+#~ msgid "Samples"
+#~ msgstr "견본"
+
+#~ msgctxt "path-option"
+#~ msgid "Cheats"
+#~ msgstr "치트"
+
+#~ msgctxt "path-option"
+#~ msgid "Ends"
+#~ msgstr "종료화면"
+
+#~ msgctxt "path-option"
+#~ msgid "GameOver"
+#~ msgstr "게임오버"
+
+#~ msgctxt "selmenu-artwork"
+#~ msgid "Ends"
+#~ msgstr "종료화면"
+
+#~ msgid "Select"
+#~ msgstr "선택"
+
+#, c-format
+#~ msgid "romset: %1$-.100s"
+#~ msgstr "롬셋: %1$-.100s"
 
 #~ msgid "View"
 #~ msgstr "시야"
@@ -3267,9 +3676,6 @@ msgstr "MAMEinfo"
 
 #~ msgid "Full"
 #~ msgstr "전체"
-
-#~ msgid "Dip Switches"
-#~ msgstr "DIP 스위치"
 
 #~ msgid "Select position to load from"
 #~ msgstr "불러올 상태의 위치 선택"
@@ -3353,51 +3759,8 @@ msgstr "MAMEinfo"
 #~ msgid "Artwork Crop"
 #~ msgstr "삽화 자르기"
 
-#~ msgid "Use Backdrops"
-#~ msgstr "배경화면 사용"
-
-#~ msgid "Use Overlays"
-#~ msgstr "오버레이 사용"
-
-#~ msgid "Use Bezels"
-#~ msgstr "제벨 사용"
-
-#~ msgid "Use Control Panels"
-#~ msgstr "조작반 사용"
-
-#~ msgid "Use Marquees"
-#~ msgstr "간판 사용"
-
 #~ msgid "Bilinear snapshot"
 #~ msgstr "이중선형 스냅샷"
-
-#, c-format
-#~ msgid "  %1$d×%2$s %3$d.%4$06d MHz\n"
-#~ msgstr "  %1$d×%2$s %3$d.%4$06d MHz\n"
-
-#~ msgid "  %1$d×%2$s %5$d.%6$03d kHz\n"
-#~ msgstr "  %1$d×%2$s %5$d.%6$03d kHz\n"
-
-#~ msgid "  %2$s %3$d.%4$06d MHz\n"
-#~ msgstr "  %2$s %3$d.%4$06d MHz\n"
-
-#~ msgid "  %2$s %5$d.%6$03d kHz\n"
-#~ msgstr "  %2$s %5$d.%6$03d kHz\n"
-
-#, c-format
-#~ msgid "  Screen '%1$s': %2$d × %3$d (V) %4$f Hz\n"
-#~ msgstr "  화면 '%1$s': %2$d × %3$d (V) %4$f Hz\n"
-
-#, c-format
-#~ msgid "  Screen '%1$s': %2$d × %3$d (H) %4$f Hz\n"
-#~ msgstr "  화면 '%1$s': %2$d × %3$d (H) %4$f Hz\n"
-
-#, c-format
-#~ msgid "  %1$d×%2$s\n"
-#~ msgstr "  %1$d×%2$s\n"
-
-#~ msgid "  %2$s\n"
-#~ msgstr "  %2$s\n"
 
 #~ msgid ""
 #~ "The software selected is missing one or more required ROM or CHD images. "

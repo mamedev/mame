@@ -761,7 +761,9 @@ void lua_engine::initialize()
 				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
 				return lua_yield(L, 0);
 			});
-	emu["lang_translate"] = &lang_translate;
+	emu["lang_translate"] = sol::overload(
+			static_cast<char const *(*)(char const *)>(&lang_translate),
+			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
 	emu["subst_env"] =
 		[] (const std::string &str)
