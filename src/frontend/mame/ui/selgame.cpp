@@ -182,8 +182,11 @@ private:
 		// populate parent descriptions while still ordered by shortname
 		populate_parents();
 
+		// get rid of the "empty" driver - we don't need positions to line up any more
+		m_sorted_list.erase(m_sorted_list.begin() + driver_list::find(GAME_NAME(___empty)));
+
 		// sort drivers and notify
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
 		auto const compare_names =
 				[&coll] (std::string const &x, std::string const &y) -> bool
 				{
@@ -307,12 +310,12 @@ private:
 		for (int x = 0; x < driver_list::total(); ++x)
 		{
 			game_driver const &driver(driver_list::driver(x));
+			ui_system_info &ins(m_sorted_list.emplace_back(driver, x, false));
 			if (&driver != &GAME_NAME(___empty))
 			{
 				if (driver.flags & machine_flags::IS_BIOS_ROOT)
 					++m_bios_count;
 
-				ui_system_info &ins(m_sorted_list.emplace_back(driver, x, false));
 				if (copydesc)
 					ins.description = driver.type.fullname();
 

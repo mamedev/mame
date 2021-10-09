@@ -218,7 +218,7 @@ public:
 		}
 
 		// sort array
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
 		auto const compare_names =
 				[&coll] (std::string const &x, std::string const &y) -> bool
 				{
