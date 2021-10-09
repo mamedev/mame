@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
 	DECLARE_WRITE_LINE_MEMBER( field_sync );
 
+	void ms1600(machine_config &config);
 	void coco2bh(machine_config &config);
 	void coco2h(machine_config &config);
 	void cocoeh(machine_config &config);
@@ -72,6 +73,7 @@ protected:
 	void coco_rom0(address_map &map);
 	void coco_rom1(address_map &map);
 	void coco_rom2(address_map &map);
+	void ms1600_rom2(address_map &map);
 	void coco_io0(address_map &map);
 	void coco_io1(address_map &map);
 	void coco_io2(address_map &map);
