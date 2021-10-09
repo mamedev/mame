@@ -94,12 +94,10 @@
  *  - Parallel I/O
  *  - Framebuffer (and remaining kb/ms support)
  *  - APbus expansion slots
- *  - ESCCF/FIFO DMA (This is harder than it sounds because there is no documentation on how the FIFO works
- *                    and the ESCCF uses way more of its features than reading from the floppy drive. Interrupts are also
- *                    a big question mark)
  *
  *  TODO before opening first MR:
- *  - SPIFI3 refactoring, actual AUTOSTAT
+ *  - FIFO and ESCC cleanup (lots of it!)
+ *  - SPIFI3 refactoring (actual AUTOSTAT too)
  *  - CD-ROM access if possible
  *  - See if NEWS-OS 4 can be stabilized further (telnet, etc.)
  *  - Find better workaround for SCACHE enumeration
@@ -126,9 +124,10 @@
 #include "machine/spifi3.h"
 #include "machine/upd765.h"
 #include "machine/cxd8442q.h"
-#include "machine/cxd8421q.h"
 #include "machine/cxd8452aq.h"
 #include "machine/dp83932c.h"
+#include "machine/z80scc.h"
+#include "bus/rs232/rs232.h"
 
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
@@ -149,7 +148,7 @@
 #define NEWS_R4K_TRACE (NEWS_R4K_DEBUG | LOG_ALL_INTERRUPT | LOG_APBUS)
 #define NEWS_R4K_MAX (NEWS_R4K_TRACE | LOG_MEMORY)
 
-#define VERBOSE NEWS_R4K_INFO
+#define VERBOSE NEWS_R4K_DEBUG
 
 #include "logmacro.h"
 
@@ -163,8 +162,11 @@ public:
           m_dma_ram(*this, "dmaram"),
           m_net_ram(*this, "netram"),
           m_rtc(*this, "rtc"),
-          m_escc(*this, "escc1"),
+          // m_escc(*this, "escc1"),
+          m_escc(*this, "escc"),
+          m_serial(*this, "serial%u", 0U),
           m_fifo0(*this, "apfifo0"),
+          m_fifo1(*this, "apfifo1"),
           m_sonic3(*this, "sonic3"),
           m_sonic(*this, "sonic"),
           m_fdc(*this, "fdc"),
@@ -265,10 +267,13 @@ protected:
     required_device<m48t02_device> m_rtc;
 
     // Sony CXD8421Q ESCC1 serial controller (includes a Zilog ESCC)
-    required_device<cxd8421q_device> m_escc;
+    // required_device<cxd8421q_device> m_escc;
+    required_device<z80scc_device> m_escc;
+    required_device_array<rs232_port_device, 2> m_serial;
 
-    // Sony CXD8442Q APbus FIFO (2x, but only one set up so far)
+    // Sony CXD8442Q APbus FIFO
     required_device<cxd8442q_device> m_fifo0;
+    required_device<cxd8442q_device> m_fifo1;
 
     // Sony CXD8452AQ WSC-SONIC3 APbus interface
     required_device<cxd8452aq_device> m_sonic3;
@@ -300,6 +305,8 @@ protected:
     bool m_int_state[6] = {false, false, false, false, false, false};
     uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
     uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
+    uint32_t escc1_int_status = 0;
+    uint32_t escc1_int_mask = 0;
 
     // Freerun timer (1us period)
     // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
@@ -372,6 +379,50 @@ protected:
     bool m_map_shift = false;
     uint8_t ram_r(offs_t offset);
     void ram_w(offs_t offset, uint8_t data);
+
+    // avaliable ESCC channels
+    enum ESCC_Channel
+    {
+        CHA,
+        CHB
+    };
+
+    // Direct channel access
+    template <ESCC_Channel channel>
+    uint32_t escc_ch_read(offs_t offset) { return escc_ch_read(channel, offset); }
+    template <ESCC_Channel channel>
+    void escc_ch_write(offs_t offset, uint32_t data) { escc_ch_write(channel, offset, data); }
+
+    // temp
+    uint32_t escc_ch_read(ESCC_Channel channel, offs_t offset)
+    {
+        if (offset < 2)
+        {
+            offset |= (channel == CHA ? 0x2 : 0x0);
+            return m_escc->ab_dc_r(offset);
+        } 
+        else 
+        {
+            // Placeholder for ESCC1 extport and ctl registers
+            LOG("escc1 ch%d r non-passthrough: 0x%x\n", channel, offset);
+            return 0x0;
+        }
+    }
+
+    void escc_ch_write(ESCC_Channel channel, offs_t offset, uint32_t data)
+    {
+        if (offset < 2)
+        {
+            offset |= (channel == CHA ? 0x2 : 0x0);
+            m_escc->ab_dc_w(offset, data);
+        } 
+        else
+        {
+            // Placeholder for ESCC1 extport and ctl registers
+            LOG("escc1 ch%d w non-passthrough: 0x%x = 0x%x\n", channel, offset, data);
+            return;
+        }
+    }
 };
 
 /*
@@ -420,11 +471,71 @@ void news_r4k_state::machine_common(machine_config &config)
     M48T02(config, m_rtc);
 
     // ESCC setup
-    CXD8421Q(config, m_escc, 0);
+    //CXD8421Q(config, m_escc, 0);
+        // General ESCC setup
+    SCC85230(config, m_escc, 9.8304_MHz_XTAL); // 9.8304MHz per NetBSD source
+    //m_escc->out_int_callback().set(FUNC(cxd8421q_device::escc_irq_w));
+
+    RS232_PORT(config, m_serial[0], default_rs232_devices, "pty");
+    m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
+    m_serial[0]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
+    m_serial[0]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
+    m_escc->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
+    m_escc->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+    m_escc->out_dtra_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
+
+    RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+    m_serial[1]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsb_w));
+    m_serial[1]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcdb_w));
+    m_serial[1]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxb_w));
+    m_escc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
+    m_escc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+    m_escc->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
     m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<ESCC>));
 
     // APbus FIFOs
     CXD8442Q(config, m_fifo0, 0);
+    CXD8442Q(config, m_fifo1, 0);
+
+    // Wire ESCC and FIFO
+    // Sony loved DMA controllers so much, they decided to use two channels of DMA to enable
+    // duplex asynchronous serial transmission
+    // truly a love story for the ages
+    m_escc->out_dtra_callback().set([this](int status)
+                                            {
+                                                // LOG("DTR/REQ changed to 0x%x\n", status);
+                                                // Reverse polarity for DRQ active
+                                                m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status);
+                                            });
+    m_escc->out_wreqa_callback().set([this](int status)
+                                     {
+                                        LOG("WREQ changed to 0x%x\n", status);
+                                        m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status);
+                                     });
+    m_fifo1->bind_dma_w<cxd8442q_device::fifo_channel_number::CH2>([this](uint32_t data)
+                                                                   {
+                                                                       LOG("Sent 0x%x to ESCC\n", data);
+                                                                       m_escc->da_w(0, data);
+                                                                   });
+    m_fifo1->bind_dma_r<cxd8442q_device::fifo_channel_number::CH3>([this]()
+                                                                   {
+                                                                       auto data = m_escc->da_r(0);
+                                                                       LOG("Got 0x%x from ESCC\n", data);
+                                                                       return data;
+                                                                   });
+
+    // INTEN0 = 3f1f
+    // INTEN1 = 3faf
+    // INTEN4 = 7
+    // INTEN5 = 7
+    m_fifo1->out_int_callback().set([this](int status)
+                                    {
+                                        // Not sure if this is the actual mapping, or if sending any level 0 interrupt causes
+                                        // NEWS-OS to scan the ESCC and FIFO registers. It seems to work OK, but should be
+                                        // revisited if the exact details can be worked out.
+                                        generic_irq_w(0, 0x4, status);
+                                        escc1_int_status = status ? 0x8 : 0x0; // was; 0x20
+                                    });                                        // XXX
 
     // SONIC + WSC-SONIC3 ethernet controller
     CXD8452AQ(config, m_sonic3, 0);
@@ -455,11 +566,11 @@ void news_r4k_state::machine_common(machine_config &config)
     PC8477A(config, m_fdc, 24_MHz_XTAL, pc8477a_device::mode_t::PS2);
     FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
-    // Note - FDC IRQ probably goes through the FIFO first. Might need to be updated in the future.
+    // Note - FDC IRQ might go through the FIFO first. Might need to be updated in the future.
     m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>));
     m_fdc->drq_wr_callback().set([this](int status)
-                                 { m_fifo0->drq_w<cxd8442q_device::FifoChannelNumber::CH2>(status); });
-    m_fifo0->bind_dma_r<cxd8442q_device::FifoChannelNumber::CH2>([this]()
+                                 { m_fifo0->drq_w<cxd8442q_device::fifo_channel_number::CH2>(status); });
+    m_fifo0->bind_dma_r<cxd8442q_device::fifo_channel_number::CH2>([this]()
                                                                  { return (uint32_t)(m_fdc->dma_r()); });
 
     // DMA controller
@@ -534,7 +645,6 @@ void news_r4k_state::cpu_map(address_map &map)
     // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
     map(0x1e980000, 0x1e9fffff).ram(); // TODO: double-check RAM length (0x1e99ffff end?)
 
-
     // NEWS firmware
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);
     map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0);
@@ -565,8 +675,30 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x14c00000, 0x14c0008f).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
 
     // WSC-ESCC1 (CXD8421Q) serial controller
-    map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
-    map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
+    map(0x1e900000, 0x1e93ffff).m(m_fifo1, FUNC(cxd8442q_device::map));
+    //map(0x1e980000, 0x1e98ffff).m(m_fifo1, FUNC(cxd8442q_device::map_fifo_ram)); seems to be covered by bootstrap RAM? Or does bootstrap use the FIFO RAM??
+    map(0x1e940000, 0x1e94000f).rw(FUNC(news_r4k_state::escc_ch_read<CHB>), FUNC(news_r4k_state::escc_ch_write<CHB>));
+    map(0x1e950000, 0x1e95000f).rw(FUNC(news_r4k_state::escc_ch_read<CHA>), FUNC(news_r4k_state::escc_ch_write<CHA>));
+    map(0x1e960000, 0x1e960003).lrw32(NAME([this](offs_t offset)
+                                           {
+                                               LOG("Read ESCC1 int status 0x%x (%s)\n", escc1_int_status, machine().describe_context());
+                                               return escc1_int_status;
+                                           }),
+                                      NAME([this](offs_t offset, uint32_t data)
+                                           {
+                                               LOG("Clear ESCC1 int status (%s)\n", machine().describe_context());
+                                               escc1_int_status = 0; // assume clear for now
+                                           }));
+    map(0x1e960004, 0x1e960007).lrw32(NAME([this](offs_t offset)
+                                           {
+                                               LOG("Read ESCC1 int mask 0x%x (%s)\n", escc1_int_mask, machine().describe_context());
+                                               return escc1_int_mask;
+                                           }),
+                                      NAME([this](offs_t offset, uint32_t data)
+                                           {
+                                               LOG("Set ESCC1 int mask 0x%x (%s)\n", data, machine().describe_context());
+                                               escc1_int_mask = data;
+                                           }));
 
     // SONIC3 APbus interface and SONIC ethernet controller
     map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map));
@@ -631,7 +763,8 @@ void news_r4k_state::cpu_map(address_map &map)
                                           { return (offset == 1) && ((m_intst[0] & irq0_number::FDC) > 0) ? 0x2 : 0x0; }));
 
     // Map FDC and sound FIFO register file
-    map(0x1ed00000, 0x1ed8ffff).m(m_fifo0, FUNC(cxd8442q_device::map)); // TODO: is it aligned so CH0 is 1ed00000? Seems likely since that is the `sb` address
+    map(0x1ed00000, 0x1ed3ffff).m(m_fifo0, FUNC(cxd8442q_device::map));
+    map(0x1ed80000, 0x1ed8ffff).m(m_fifo0, FUNC(cxd8442q_device::map_fifo_ram));
 
     // Assign debug mappings
     cpu_map_debug(map);
@@ -1150,6 +1283,9 @@ uint32_t news_r4k_state::bus_error()
  * 6. Run Diagnostic Test - Attempt to run diagnostic test after ROM monitor has booted
  * 7. External APbus Slot Probe Disable - If set, do not attempt to probe the expansion APbus slots
  * 8. No Memory Mode - If set, do not use the main memory (limits system to 128KiB)
+ *
+ * On real hardware, the default for sw7 is off (probe external APslots).
+ * Since the APbus expansion slots are not emulated yet, setting this avoids a harmless error message during the monitor ROM boot sequence
  */
 static INPUT_PORTS_START(nws5000)
 PORT_START("FRONT_PANEL")
