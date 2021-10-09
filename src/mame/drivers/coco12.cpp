@@ -751,4 +751,4 @@ COMP( 1983,  lzcolor64, coco,   0,      coco,    coco,    coco12_state, empty_in
 COMP( 1983,  cd6809,    coco,   0,      cd6809,  coco,    coco12_state, empty_init, "Codimex",                      "CD-6809",                             0 )
 COMP( 1984,  mx1600,    coco,   0,      coco,    coco,    coco12_state, empty_init, "Dynacom",                      "MX-1600",                             0 )
 COMP( 1986,  t4426,     coco,   0,      t4426,   coco,    coco12_state, empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  0 )
-COMP( 1987,  ms1600,    coco,   0,      ms1600,  coco,    coco12_state, empty_init, "Latin American Institute of Educative Communication","Micro-SEP 1600",0 )
+COMP( 1987,  ms1600,    coco,   0,      ms1600,  coco,    coco12_state, empty_init, "Instituto Latinoamericano de la Comunicación Educativa / Secretaría de Educación Pública","Micro-SEP 1600",0 )
