@@ -268,7 +268,10 @@ public:
 				{
 					m_searchlist.reserve(m_swinfo.size());
 					for (ui_software_info const &sw : m_swinfo)
-						m_searchlist.emplace_back(sw);
+					{
+						if (!sw.startempty)
+							m_searchlist.emplace_back(sw);
+					}
 				});
 
 		// build derivative filter data
@@ -532,9 +535,11 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 	// no active search
 	if (m_search.empty())
 	{
-		// if the device can be loaded empty, add an item
-		if (m_data->has_empty_start())
-			item_append("[Start empty]", flags_ui, (void *)&m_data->swinfo()[0]);
+		// add an item to start empty or let the user use the file manager
+		item_append(
+				m_data->has_empty_start() ? _("[Start empty]") : _("[Use file manager]"),
+				flags_ui,
+				(void *)&m_data->swinfo()[0]);
 
 		if (!flt)
 			std::copy(std::next(m_data->swinfo().begin()), m_data->swinfo().end(), std::back_inserter(m_displaylist));
@@ -569,7 +574,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 		if (reselect_last::software() == "[Start empty]" && !reselect_last::driver().empty())
 			old_software = 0;
 		else if (m_displaylist[curitem].get().shortname == reselect_last::software() && m_displaylist[curitem].get().listname == reselect_last::swlist())
-			old_software = m_data->has_empty_start() ? curitem + 1 : curitem;
+			old_software = curitem + 1;
 
 		item_append(
 				m_displaylist[curitem].get().longname, m_displaylist[curitem].get().devicetype,
@@ -715,7 +720,7 @@ void menu_select_software::get_selection(ui_software_info const *&software, ui_s
 void menu_select_software::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
 {
 	// determine the text for the header
-	int vis_item = !m_search.empty() ? m_available_items : (m_data->has_empty_start() ? m_available_items - 1 : m_available_items);
+	int vis_item = !m_search.empty() ? m_available_items : (m_available_items - 1);
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_data->swinfo().size() - 1);
 	line1 = string_format(_("Driver: \"%1$s\" software list "), m_description);
 

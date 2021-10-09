@@ -815,15 +815,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 			if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
 				old_item_selected = curitem;
 
-			bool cloneof = strcmp(elem.driver->parent, "0");
-			if (cloneof)
-			{
-				int cx = driver_list::find(elem.driver->parent);
-				if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
-					cloneof = false;
-			}
-
-			item_append(elem.description, (cloneof) ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&elem);
+			item_append(elem.description, elem.is_clone ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&elem);
 			curitem++;
 		}
 	}
@@ -835,7 +827,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		mame_machine_manager::instance()->favorite().apply_sorted(
 				[this, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
 				{
-					if (info.startempty == 1)
+					if (info.startempty)
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
 							old_item_selected = curitem;
