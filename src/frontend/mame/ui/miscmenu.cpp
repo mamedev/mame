@@ -957,13 +957,20 @@ void menu_plugins_configure::handle()
 
 void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
-	plugin_options& plugins = mame_machine_manager::instance()->plugins();
+	plugin_options const &plugins = mame_machine_manager::instance()->plugins();
 
-	for (auto &curentry : plugins.plugins())
+	bool first(true);
+	for (auto const &curentry : plugins.plugins())
 	{
-		bool enabled = curentry.m_start;
-		item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
+		if ("library" != curentry.m_type)
+		{
+			first = false;
+			bool const enabled = curentry.m_start;
+			item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
+		}
 	}
+	if (first)
+		item_append(_("No plugins found"), 0, nullptr);
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
