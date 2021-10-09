@@ -235,5 +235,5 @@ offs_t pic17_disassembler::disassemble(std::ostream &stream, offs_t pc, const pi
 		break;
 	}
 
-	return words;
+	return words | SUPPORTED;
 }
