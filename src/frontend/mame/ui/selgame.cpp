@@ -191,10 +191,8 @@ private:
 		// sort drivers and notify
 		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
 		auto const compare_names =
-				[&coll] (std::string const &x, std::string const &y) -> bool
+				[&coll] (std::wstring const &wx, std::wstring const &wy) -> bool
 				{
-					std::wstring const wx = wstring_from_utf8(x);
-					std::wstring const wy = wstring_from_utf8(y);
 					return 0 > coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size());
 				};
 		std::stable_sort(
@@ -207,28 +205,50 @@ private:
 
 					if (!lhs.is_clone && !rhs.is_clone)
 					{
-						return compare_names(lhs.description, rhs.description);
+						return compare_names(
+								lhs.reading_description.empty() ? wstring_from_utf8(lhs.description) : lhs.reading_description,
+								rhs.reading_description.empty() ? wstring_from_utf8(rhs.description) : rhs.reading_description);
 					}
 					else if (lhs.is_clone && rhs.is_clone)
 					{
 						if (!std::strcmp(x.parent, y.parent))
-							return compare_names(lhs.description, rhs.description);
+						{
+							return compare_names(
+									lhs.reading_description.empty() ? wstring_from_utf8(lhs.description) : lhs.reading_description,
+									rhs.reading_description.empty() ? wstring_from_utf8(rhs.description) : rhs.reading_description);
+						}
 						else
-							return compare_names(lhs.parent, rhs.parent);
+						{
+							return compare_names(
+									lhs.reading_parent.empty() ? wstring_from_utf8(lhs.parent) : lhs.reading_parent,
+									rhs.reading_parent.empty() ? wstring_from_utf8(rhs.parent) : rhs.reading_parent);
+						}
 					}
 					else if (!lhs.is_clone && rhs.is_clone)
 					{
 						if (!std::strcmp(x.name, y.parent))
+						{
 							return true;
+						}
 						else
-							return compare_names(lhs.description, rhs.parent);
+						{
+							return compare_names(
+									lhs.reading_description.empty() ? wstring_from_utf8(lhs.description) : lhs.reading_description,
+									rhs.reading_parent.empty() ? wstring_from_utf8(rhs.parent) : rhs.reading_parent);
+						}
 					}
 					else
 					{
 						if (!std::strcmp(x.parent, y.name))
+						{
 							return false;
+						}
 						else
-							return compare_names(lhs.parent, rhs.description);
+						{
+							return compare_names(
+									lhs.reading_parent.empty() ? wstring_from_utf8(lhs.parent) : lhs.reading_parent,
+									rhs.reading_description.empty() ? wstring_from_utf8(rhs.description) : rhs.reading_description);
+						}
 					}
 				});
 		notify_available(AVAIL_SORTED_LIST);
@@ -336,11 +356,17 @@ private:
 	void load_titles(util::core_file &file)
 	{
 		char readbuf[1024];
+		std::string convbuf;
 		while (file.gets(readbuf, std::size(readbuf)))
 		{
-			// shortname and description separated by tab
-			auto const split(std::find(std::begin(readbuf), std::end(readbuf), '\t'));
-			if (std::end(readbuf) == split)
+			// shortname, description, and description reading separated by tab
+			auto const eoln(
+					std::find_if(
+						std::begin(readbuf),
+						std::end(readbuf),
+						[] (char ch) { return !ch || ('\n' == ch) || ('\r' == ch); }));
+			auto const split(std::find(std::begin(readbuf), eoln, '\t'));
+			if (eoln == split)
 				continue;
 			std::string_view const shortname(readbuf, split - readbuf);
 
@@ -360,10 +386,10 @@ private:
 				continue;
 			}
 
-			// strip additional columns
-			auto const start(std::next(split));
-			auto const end(std::find(start, std::end(readbuf), '\t'));
-			auto const description(strtrimspace(std::string_view(start, end - start)));
+			// find the end of the description
+			auto const descstart(std::next(split));
+			auto const descend(std::find(descstart, eoln, '\t'));
+			auto const description(strtrimspace(std::string_view(descstart, descend - descstart)));
 			if (description.empty())
 			{
 				osd_printf_warning("Empty translated description for system '%s'\n", shortname);
@@ -379,6 +405,26 @@ private:
 			else
 			{
 				found->description = description;
+			}
+
+			// populate the reading if it's present
+			if (eoln == descend)
+				continue;
+			auto const readstart(std::next(descend));
+			auto const readend(std::find(readstart, eoln, '\t'));
+			auto const reading(strtrimspace(std::string_view(readstart, readend - readstart)));
+			if (reading.empty())
+			{
+				osd_printf_warning("Empty translated description reading for system '%s'\n", shortname);
+			}
+			else
+			{
+				found->reading_description = wstring_from_utf8(reading);
+				found->ucs_reading_description = ustr_from_utf8(normalize_unicode(reading, unicode_normalization_form::D, true));
+				convbuf.assign(found->driver->manufacturer);
+				convbuf.append(1, ' ');
+				convbuf.append(reading);
+				found->ucs_manufacturer_reading_description = ustr_from_utf8(normalize_unicode(convbuf, unicode_normalization_form::D, true));
 			}
 		}
 
@@ -406,9 +452,14 @@ private:
 								return a.driver->name < b;
 							}));
 				if (m_sorted_list.end() != found)
+				{
 					info.parent = found->description;
+					info.reading_parent = found->reading_description;
+				}
 				else
+				{
 					info.parent = info.driver->parent;
+				}
 			}
 		}
 	}
@@ -1204,67 +1255,53 @@ void menu_select_game::populate_search()
 	// keep track of what we matched against
 	const std::u32string ucs_search(ustr_from_utf8(normalize_unicode(m_search, unicode_normalization_form::D, true)));
 
-	// match shortnames
+	// check available search data
 	if (m_persistent_data.is_available(persistent_data::AVAIL_UCS_SHORTNAME))
-	{
 		m_searched_fields |= persistent_data::AVAIL_UCS_SHORTNAME;
-		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
-			info.first = util::edit_distance(ucs_search, info.second.get().ucs_shortname);
-	}
-
-	// match descriptions
 	if (m_persistent_data.is_available(persistent_data::AVAIL_UCS_DESCRIPTION))
-	{
 		m_searched_fields |= persistent_data::AVAIL_UCS_DESCRIPTION;
-		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
-		{
-			if (info.first)
-			{
-				double const penalty(util::edit_distance(ucs_search, info.second.get().ucs_description));
-				info.first = (std::min)(penalty, info.first);
-			}
-		}
-	}
-
-	// match "<manufacturer> <description>"
 	if (m_persistent_data.is_available(persistent_data::AVAIL_UCS_MANUF_DESC))
-	{
 		m_searched_fields |= persistent_data::AVAIL_UCS_MANUF_DESC;
-		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
-		{
-			if (info.first)
-			{
-				double const penalty(util::edit_distance(ucs_search, info.second.get().ucs_manufacturer_description));
-				info.first = (std::min)(penalty, info.first);
-			}
-		}
-	}
-
-	// match default description
 	if (m_persistent_data.is_available(persistent_data::AVAIL_UCS_DFLT_DESC))
-	{
 		m_searched_fields |= persistent_data::AVAIL_UCS_DFLT_DESC;
-		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
-		{
-			if (info.first && !info.second.get().ucs_default_description.empty())
-			{
-				double const penalty(util::edit_distance(ucs_search, info.second.get().ucs_default_description));
-				info.first = (std::min)(penalty, info.first);
-			}
-		}
-	}
-
-	// match default description
 	if (m_persistent_data.is_available(persistent_data::AVAIL_UCS_MANUF_DFLT_DESC))
+		m_searched_fields |= persistent_data::AVAIL_UCS_MANUF_DFLT_DESC;
+
+	for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
 	{
-		m_searched_fields |= persistent_data::AVAIL_UCS_DFLT_DESC;
-		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
+		info.first = 1.0;
+		ui_system_info const &sys(info.second);
+
+		// match shortnames
+		if (m_searched_fields & persistent_data::AVAIL_UCS_SHORTNAME)
+			info.first = util::edit_distance(ucs_search, sys.ucs_shortname);
+
+		// match reading
+		if (info.first && !sys.ucs_reading_description.empty())
 		{
-			if (info.first && !info.second.get().ucs_manufacturer_default_description.empty())
-			{
-				double const penalty(util::edit_distance(ucs_search, info.second.get().ucs_manufacturer_default_description));
-				info.first = (std::min)(penalty, info.first);
-			}
+			info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_reading_description), info.first);
+
+			// match "<manufacturer> <reading>"
+			if (info.first)
+				info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_manufacturer_reading_description), info.first);
+		}
+
+		// match descriptions
+		if (info.first && (m_searched_fields & persistent_data::AVAIL_UCS_DESCRIPTION))
+			info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_description), info.first);
+
+		// match "<manufacturer> <description>"
+		if (info.first && (m_searched_fields & persistent_data::AVAIL_UCS_MANUF_DESC))
+			info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_manufacturer_description), info.first);
+
+		// match default description
+		if (info.first && (m_searched_fields & persistent_data::AVAIL_UCS_DFLT_DESC) && !sys.ucs_default_description.empty())
+		{
+			info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_default_description), info.first);
+
+			// match "<manufacturer> <default description>"
+			if (info.first && (m_searched_fields & persistent_data::AVAIL_UCS_MANUF_DFLT_DESC))
+				info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_manufacturer_default_description), info.first);
 		}
 	}
 

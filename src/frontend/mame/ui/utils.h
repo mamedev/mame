@@ -48,9 +48,14 @@ struct ui_system_info
 	std::string description;
 	std::string parent;
 
+	std::wstring reading_description;
+	std::wstring reading_parent;
+
 	std::u32string ucs_shortname;
 	std::u32string ucs_description;
+	std::u32string ucs_reading_description;
 	std::u32string ucs_manufacturer_description;
+	std::u32string ucs_manufacturer_reading_description;
 	std::u32string ucs_default_description;
 	std::u32string ucs_manufacturer_default_description;
 };
