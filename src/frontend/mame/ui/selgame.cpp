@@ -329,7 +329,7 @@ private:
 						if (0 <= parentindex)
 						{
 							game_driver const &parentdriver(driver_list::driver(parentindex));
-							ins.is_clone = bool(parentdriver.flags & machine_flags::IS_BIOS_ROOT);
+							ins.is_clone = !(parentdriver.flags & machine_flags::IS_BIOS_ROOT);
 							ins.parent = parentdriver.type.fullname();
 						}
 						else
