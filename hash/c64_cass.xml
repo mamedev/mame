@@ -2567,6 +2567,133 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="cabal">
+		<description>Cabal</description>
+		<year>1989</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="726358">
+				<rom name="Cabal_Side_1.tap" size="726358" crc="912a1676" sha1="c1f7c8e86ef7e41956e12167d842701329f799bf"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="596334">
+				<rom name="Cabal_Side_2.tap" size="596334" crc="b50a8fc6" sha1="d9324adbd6ee7234939dbb2f755757963d53dca8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caligame">
+		<description>California Games</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="2132994">
+				<rom name="California_Games_Side_1.tap" size="2132994" crc="1d24491b" sha1="80416f244004a5f2128c87bebe4a4a190224f969"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1638332">
+				<rom name="California_Games_Side_2.tap" size="1638332" crc="b620a25b" sha1="bf745f35c09622ab700a3994b32578fde97f5742"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capcomco">
+		<description>Capcom Collection</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Strider"/>
+			<dataarea name="cass" size="1282606">
+				<rom name="Capcom_Collection_Tape_1_Side_1.tap" size="1282606" crc="a84617fb" sha1="96d29a365a5f55928b0886a733a26f72c8721b4c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Strider II"/>
+			<dataarea name="cass" size="1300550">
+				<rom name="Capcom_Collection_Tape_1_Side_2.tap" size="1300550" crc="d331f3fb" sha1="b1a0a8dc7849b143f4b9673a8208694ddcd82235"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: L.E.D. Storm"/>
+			<dataarea name="cass" size="636206">
+				<rom name="Capcom_Collection_Tape_2_Side_1.tap" size="636206" crc="e2353eac" sha1="8b599913dc05ddb5d5a00bd08408f23b8c72bc75"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Dynasty Wars"/>
+			<dataarea name="cass" size="963898">
+				<rom name="Capcom_Collection_Tape_2_Side_2.tap" size="963898" crc="31055871" sha1="56b567620bcdf8ff812d7e70c272c5d9037834ca"/>
+			</dataarea>
+		</part>
+
+		<part name="cass5" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3 Side 1: U.N. Squadron"/>
+			<dataarea name="cass" size="1614658">
+				<rom name="Capcom_Collection_Tape_3_Side_1.tap" size="1614658" crc="73dc1d65" sha1="86281340fed65e98568bc3d1163782b18dafb35b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass6" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3 Side 2: Forgotten Worlds"/>
+			<dataarea name="cass" size="2164522">
+				<rom name="Capcom_Collection_Tape_3_Side_2.tap" size="2164522" crc="bda8c0bf" sha1="36f314b9b7a6b363f5e6ae29fc0b9e6eef092c66"/>
+			</dataarea>
+		</part>
+
+		<part name="cass7" interface="cbm_cass">
+			<feature name="part_id" value="Tape 4 Side 1: Last Duel"/>
+			<dataarea name="cass" size="1414822">
+				<rom name="Capcom_Collection_Tape_4_Side_1.tap" size="1414822" crc="48f11dd8" sha1="29ed1bc452fcfb86eeaef7e6cbb3bfeaf6da6805"/>
+			</dataarea>
+		</part>
+
+		<part name="cass8" interface="cbm_cass">
+			<feature name="part_id" value="Tape 4 Side 2: Ghouls'n Ghosts"/>
+			<dataarea name="cass" size="1525686">
+				<rom name="Capcom_Collection_Tape_4_Side_2.tap" size="1525686" crc="914ea528" sha1="ecb67340ef93a0d1c6bd7dc88ee9bb2f91764fb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="captaina">
+		<description>Captain America in: The Doom Tube of Dr. Megalomann</description>
+		<year>1987</year>
+		<publisher>Go!</publisher>
+		<info name="alt_title" value="Captain America Defies the Doom Tube"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="592070">
+				<rom name="Captain_America_In-_The_Doom_Tube_of_Dr._Megalomann.tap" size="592070" crc="90112121" sha1="11c3da7d7d612e333003f532fab5957297164698"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catacomb">
+		<description>Catacombs</description>
+		<year>1984</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="627826">
+				<rom name="Catacombs.tap" size="627826" crc="e3ed070e" sha1="043cd134f5eebd66bb36bac9f414c0c168e10a1d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cauldrn12">
 		<description>Cauldron I &amp; II</description>
 		<year>1987</year>
@@ -2755,6 +2882,64 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="csprint">
+		<description>Championship Sprint</description>
+		<year>1987</year>
+		<publisher>Proein Soft Line</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="519043">
+				<rom name="Championship_Sprint.tap" size="519043" crc="c5e16856" sha1="4be328652fd59c7803963482a854c9b1cf67d269"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champwrs" supported="no"> <!-- loading stops with a black screen after the options screen -->
+		<description>Championship Wrestling</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1239702">
+				<rom name="Championship_Wrestling.tap" size="1239702" crc="424bf72d" sha1="acce5a778218ea47d1448ccbd9315862c0b80b52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chartbus">
+		<description>Chart Busters</description>
+		<year>1988</year>
+		<publisher>Beau-Jolly</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Ghostbusters / F.A. Cup Football / Agent X II / Kane / L.A. SWAT"/>
+			<dataarea name="cass" size="2932053">
+				<rom name="Chartbusters_Tape_1_Side_1.tap" size="2932053" crc="18e472dd" sha1="815fc4f09aea9291b04d43db886cd4355a38e226"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Ninja Master / Rasputin / Ollie and Lissa / Ricochet / Zolyx"/>
+			<dataarea name="cass" size="2523440">
+				<rom name="Chartbusters_Tape_1_Side_2.tap" size="2523440" crc="8dcb3ed6" sha1="3df2695ac332517055d2f8900928608f9098f478"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Way of the Exploding Fist / Dan Dare / Formula 1 Simulator / Brian Jack's Superstar Challenge / Tau Ceti"/>
+			<dataarea name="cass" size="2525380">
+				<rom name="Chartbusters_Tape_2_Side_1.tap" size="2525380" crc="1347b59d" sha1="4f0d0b9a270b504a54cbbea3019257ca960e0335"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: I, Ball / Park Patrol / Thrust / Harvey Headbanger / War Cars"/>
+			<dataarea name="cass" size="2684421">
+				<rom name="Chartbusters_Tape_2_Side_2.tap" size="2684421" crc="b191d6fa" sha1="33af9f1aca8cbf0236f3d986f08610b3e8af1d3a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chiller">
 		<description>Chiller</description>
 		<year>1984</year>
@@ -2773,6 +2958,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="chimera">
+		<description>Chimera</description>
+		<year>1985</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="547447">
+				<rom name="Chimera.tap" size="547447" crc="b8a15e8e" sha1="25eafece5d093db1453ae30223c9c718778e92ff"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="547450">
+				<rom name="Chimera_a1.tap" size="547450" crc="5a758012" sha1="0b7c13a76449a42f7f1c748c77b8dd3c09970acc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chinamin">
+		<description>China Miner</description>
+		<year>1983</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="443134">
+				<rom name="China_Miner.tap" size="443134" crc="65e5595b" sha1="6166a8171d43b568c1f53277638ed3dff05166e1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chinjgglr">
 		<description>Chinese Juggler</description>
 		<year>1983</year>
@@ -2781,6 +2996,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="796229">
 				<rom name="Chinese_Juggler.tap" size="796229" crc="a7c1367e" sha1="c54c2cefc93c0f6640d3b95329ba30858eb599af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipscha">
+		<description>Chip's Challenge</description>
+		<year>1990</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="518058">
+				<rom name="Chip's_Challenge_Side_1.tap" size="518058" crc="5d1b8fd1" sha1="ca5ee6ff3f69f8260fe3c6a914e5c7226ce7a20e"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="678092">
+				<rom name="Chip's_Challenge_Side_2.tap" size="678092" crc="54f56f3a" sha1="52294784cb783c1d5f8fdc2b236e5f2dec45b05e"/>
 			</dataarea>
 		</part>
 	</software>
