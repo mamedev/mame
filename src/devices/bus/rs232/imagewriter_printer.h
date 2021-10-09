@@ -165,14 +165,10 @@ protected:
 class apple_imagewriter15_printer_device : public apple_imagewriter_printer_device
 {
 public:
-	apple_imagewriter15_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		apple_imagewriter_printer_device(mconfig, tag, owner, clock)
-	{
-		PAPER_WIDTH_INCHES = 15.0;
-		PAPER_WIDTH = PAPER_WIDTH_INCHES * dpi * xscale;
-		m_right_edge = ((PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1);
-	};
+	apple_imagewriter15_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 };
+
 
 DECLARE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device)
 DECLARE_DEVICE_TYPE(APPLE_IMAGEWRITER15_PRINTER, apple_imagewriter15_printer_device)

@@ -84,14 +84,22 @@ Notes:
 #include "imagewriter_printer.lh"
 
 DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device, "apple_imagewriter", "Apple ImageWriter Printer A9M0303")
-DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER15_PRINTER, apple_imagewriter15_printer_device, "apple_imagewriter", "Apple ImageWriter Printer A9M0305")
-
+DEFINE_DEVICE_TYPE(APPLE_IMAGEWRITER15_PRINTER, apple_imagewriter15_printer_device, "apple_imagewriter15", "Apple ImageWriter Printer A9M0305")
 
 
 apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: apple_imagewriter_printer_device(mconfig, APPLE_IMAGEWRITER_PRINTER, tag, owner, clock)
 {
 }
+
+apple_imagewriter15_printer_device::apple_imagewriter15_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: apple_imagewriter_printer_device(mconfig, APPLE_IMAGEWRITER15_PRINTER, tag, owner, clock)
+{
+	PAPER_WIDTH_INCHES = 15.0;
+	PAPER_WIDTH = PAPER_WIDTH_INCHES * dpi * xscale;
+	m_right_edge = ((PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1);
+}
+
 
 apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
