@@ -1177,6 +1177,13 @@ void jclub2o_state::jclub2o(machine_config &config)
 
 	// layout
 	config.set_default_layout(layout_jclub2o);
+
+	// TODO: Mono?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	m_soundcpu->add_route(0, "lspeaker", 1.0);
+	m_soundcpu->add_route(1, "rspeaker", 1.0);
 }
 
 
