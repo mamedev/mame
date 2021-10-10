@@ -364,7 +364,6 @@ static const nes_pcb pcb_list[] =
 	{ "unl_malisb",       UNL_MALISB },
 	{ "sgpipe",           BTL_SHUIGUAN },
 	{ "rt01",             UNL_RT01 },   // Russian Test Cart
-	{ "unl_whero",        UNL_WORLDHERO },
 	{ "unl_43272",        UNL_43272 },
 	{ "tf1201",           UNL_TF1201 },
 	{ "unl_cfight",       UNL_CITYFIGHT },

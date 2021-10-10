@@ -64040,13 +64040,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="lweaponc" supported="no">
-		<description>Lethal Weapon (Chi)</description>
-		<year>19??</year>
+<!-- Zapper hit detection is erratic, but this is playable with regular joypad -->
+	<software name="lweaponc" supported="partial">
+		<description>Lethal Weapon (China)</description>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="tf1201" />
 			<feature name="pcb" value="UNL-TF1201" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="131072">
 				<rom name="lethal weapon (ch) [u].chr" size="131072" crc="b779fa62" sha1="ede029c2fbbd66cec7b3af84099f3cee377ec85f" offset="00000" status="baddump" />
 			</dataarea>
@@ -74880,10 +74882,11 @@ Other
 		</part>
 	</software>
 
-	<software name="suikanp" cloneof="gimmick" supported="no">
-		<description>Shui Guan Pipe (Gimmick pirate, Asia)</description>
+	<software name="suikanp" cloneof="gimmick">
+		<description>Gimmick! (Asia, pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="水管 Pipe V"/> <!-- cartridge label -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sgpipe" />
 			<feature name="pcb" value="BTL-SHUIGUANPIPE" />
@@ -78107,14 +78110,18 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="whero" supported="no">
+	<software name="whero">
 		<!-- China Forever - World Hero (Box?) -->
 		<description>World Hero (Asia)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="英雄传"/>
+		<info name="alt_title" value="Yīngxióng Zhuàn"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_whero" />
-			<feature name="pcb" value="UNL-WORLDHERO" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A1" />
+			<feature name="vrc4-pin4" value="PRG A0" />
 			<dataarea name="chr" size="524288">
 				<rom name="world hero (unl).chr" size="524288" crc="a7790fdd" sha1="7e8943ff4b1248e8e75f62c3b3f9585b0fd0fa21" offset="00000" status="baddump" />
 			</dataarea>
@@ -78124,13 +78131,18 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="wheroa" supported="no">
-		<description>World Hero (Asia, Alt)</description>
+<!-- This seems to be a later alteration of the parent that adds an initial NTSC/PAL select screen -->
+	<software name="wheroa" cloneof="whero">
+		<description>World Hero (Asia, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="英雄传"/>
+		<info name="alt_title" value="Yīngxióng Zhuàn"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_whero" />
-			<feature name="pcb" value="UNL-WORLDHERO" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A1" />
+			<feature name="vrc4-pin4" value="PRG A0" />
 			<dataarea name="chr" size="524288">
 				<rom name="world hero (unl)(tv system select).chr" size="524288" crc="a7790fdd" sha1="7e8943ff4b1248e8e75f62c3b3f9585b0fd0fa21" offset="00000" status="baddump" />
 			</dataarea>

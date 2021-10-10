@@ -59,11 +59,11 @@ static const nes_mmc mmc_list[] =
 	{ 24, KONAMI_VRC6 },
 	{ 25, KONAMI_VRC4 },
 	{ 26, KONAMI_VRC6 },
-	{ 27, UNL_WORLDHERO },  // 27 World Hero board - Unsupported
-	{ 28, UNL_ACTION53 },   // 28 - Multi-discrete PCB designed by Tepples for Action 53
-	{ 29, UNL_CUFROM },     // 29 - homebrew PCB used by Glider
-	{ 30, UNL_UNROM512 },   // 30 - UNROM 512 + Flash
-	{ 31, UNL_2A03PURITANS },   // 31 - PCB designed by infinitelives & rainwarrior for 2A03 Puritans Album
+	{ 27, UNL_CC21 },       // Mihunche, but previously used for World Hero
+	{ 28, UNL_ACTION53 },   // Multi-discrete PCB designed by Tepples for Action 53
+	{ 29, UNL_CUFROM },     // homebrew PCB used by Glider
+	{ 30, UNL_UNROM512 },   // UNROM 512 + Flash
+	{ 31, UNL_2A03PURITANS },   // PCB designed by infinitelives & rainwarrior for 2A03 Puritans Album
 	{ 32, IREM_G101 },
 	{ 33, TAITO_TC0190FMC },
 	{ 34, STD_BXROM },
