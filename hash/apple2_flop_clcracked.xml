@@ -391,6 +391,7 @@ license:CC0
 		<description>Hardball (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Accolade</publisher>
+		<!--"Hardball!" is a 1985 sports game developed by Bob Whitehead, Dan Thompson, Mimi Doggett (graphics), and Ed Bogas (music), and distributed by Accolade.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -415,6 +416,7 @@ license:CC0
 		<description>Law of the West (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Accolade</publisher>
+		<!--"Law of the West" is a 1985 adventure game developed by Alan Miller (design), Tom McWilliams (Apple II port), Mimi Doggett (graphics), and Ed Bogas (music), and distributed by Accolade.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -24181,7 +24183,7 @@ license:CC0
 	</software>
 
 	<software name="thquik12">
-		<description>Think Quick 1.2 (cleanly cracked)</description>
+		<description>Think Quick (Version 1.2) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
 		<info name="release" value="2015-11-16"/>
@@ -44026,6 +44028,436 @@ license:CC0
 			<feature name="part_id" value="Disk 1 - Interactive and statistical game play"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the world's greatest baseball game (4am crack).dsk" size="143360" crc="321fa87d" sha1="fea4c0afb38f06eb9a35843ef7dc7aefc38a334a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmbiofact">
+		<description>Match Maker Biology Facts (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>American Educational Computer</publisher>
+		<info name="release" value="2021-09-19"/>
+		<!--"Match Maker Biology Facts" is a 1984 educational program developed and distributed by American Educational Computer.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="match maker biology facts (4am crack).dsk" size="143360" crc="738d400e" sha1="c9b9f4066b07c6e855310a6b35f3a9ccb219604b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dambstrs">
+		<description>The Dam Busters (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-09-19"/>
+		<!--"The Dam Busters" is a 1985 action game developed by Jeff Sember, Mike Benna, and Don Mattrick, and distributed by Accolade.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the dam busters (4am crack).dsk" size="143360" crc="a06836d3" sha1="f8942d79eb0fc1f55717fb1681ccbd7f5d980405"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scruples">
+		<description>A Question of Scruples (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Leisure Genius</publisher>
+		<info name="release" value="2021-09-23"/>
+		<!--"A Question of Scruples" is a 1988 board game developed by Sentient Software and distributed by Leisure Genius.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="a question of scruples (4am crack) - disk a (program disk).dsk" size="143360" crc="aaec2b02" sha1="a9cd29b0b2aecf4dd9775dfc4ccaaf03392bcd06"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B - Questions disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="a question of scruples (4am crack) - disk b (questions disk).dsk" size="143360" crc="33c1767c" sha1="544768e88fe46690b40f218dc7d43720015babdc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicsbasic">
+		<description>The Basics of BASIC (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2021-09-25"/>
+		<!--"The Basics of BASIC" is a 1983 educational program developed by Scot Robinson and Neil R. Rader, and distributed by Focus Media. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the basics of basic (4am crack) disk 1.dsk" size="143360" crc="47841979" sha1="d3cf4cd6c5565d2591130c8ee5db998fac4a7e49"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the basics of basic (4am crack) disk 2.dsk" size="143360" crc="a67e431b" sha1="6ecb51ae53a800a7ca18705522a4ce4a7f8ccf68"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the basics of basic (4am crack) disk 3.dsk" size="143360" crc="beb01a8d" sha1="47fa9b31ca2521d52a2066f36e9895d9fb48f194"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the basics of basic (4am crack) disk 4.dsk" size="143360" crc="7e475c5f" sha1="cb03a73fd077df50b3435dcaf894f46a7105b4d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soloflt">
+		<description>Solo Flight (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Microprose Software</publisher>
+		<info name="release" value="2021-09-30"/>
+		<!--"Solo Flight" is a 1984 simulation game designed by Sid Meier, ported to the Apple II by Andy Hollis, and distributed by Microprose Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="solo flight (4am crack).dsk" size="143360" crc="ed040baf" sha1="5945d9d7d491ce5b13f207f73271f48bd1103b10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsa02">
+		<description>PFS (Version A.02, 1980-10-23) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2021-10-07"/>
+		<!--"PFS" is a 1980 productivity program developed and distributed by Software Publishing Corporation. This is version A.02, dated 1980-10-23 according to file metadata. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs va.02 (4am crack).dsk" size="143360" crc="5ace09ae" sha1="26063377c1a5e317710b18954b8db1306d08e8e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bldrdash2">
+		<description>Boulder Dash II (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Boulder Dash II" is a 1986 action game developed by First Star Software and distributed by Electronic Arts.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="boulder dash ii (4am and san inc crack).dsk" size="143360" crc="3f7b11ba" sha1="e8f951750c14dc0fb2f7a8ae111308c88d688bee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apescape">
+		<description>Ape Escape (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Howard W. Sams</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Ape Escape" is a 1984 action game developed by Kevin Bagley and distributed by Howard W. Sams.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ape escape (4am crack).dsk" size="143360" crc="0e78187e" sha1="86c671022166264b4e237677e41b9b81af0f4c2f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trompers">
+		<description>Trompers (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Trompers" is a 1983 action game developed by Erik Bollt and distributed by Avant-Garde Creations.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="trompers (4am crack).dsk" size="143360" crc="6d3e575c" sha1="7eb6817f81487af30bf01f1efc41373f9e1564a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squire10">
+		<description>Squire (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Blue Chip Software</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Squire: The Financial Planning Simulation" is a 1984 simulation game developed by Jim Zuber and distributed by Blue Chip Software. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="squire v1.0 (4am crack) side a.dsk" size="143360" crc="721bf82d" sha1="fa9e39398fa9a22aa3138ad90dff8f27a7fd6d0e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="squire v1.0 (4am crack) side b.dsk" size="143360" crc="44103924" sha1="94b85ffc96a8d007e2ac0c964e61f376844bbe3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intrlud2">
+		<description>Interlude II (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Recreational Technology</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Interlude II" is a 1986 program developed and distributed by Recreational Technology.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="interlude ii (4am crack) side a.dsk" size="143360" crc="3dda549d" sha1="454605f3183079f363235dbbe89ec2fc0eb6235a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="interlude ii (4am crack) side b.dsk" size="143360" crc="1dd2e370" sha1="3db2fc40593fd01d68e990ebe13fea62753425b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rogrrabt">
+		<description>Who Framed Roger Rabbit (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Buena Vista Software</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Who Framed Roger Rabbit" is a 1988 action game designed by Eric Daniels and Reichart Von Wolfshield, and distributed by Buena Vista Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="who framed roger rabbit (4am crack) disk 1a.dsk" size="143360" crc="c8641643" sha1="57b3fcb7d4d169bcf81bf5f2e7b4fb02956ae81e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="who framed roger rabbit (4am crack) disk 1b.dsk" size="143360" crc="cc006ea0" sha1="f8738f9386250875ef675c27ae5e970625c564e6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="who framed roger rabbit (4am crack) disk 2a.dsk" size="143360" crc="49aa58b5" sha1="a4c3067c4b98d41f5ae025e953497ba4405c59fe"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="who framed roger rabbit (4am crack) disk 2b.dsk" size="143360" crc="c4c19575" sha1="c8cc06c5bb355a58b764201afb4c8557eca7c602"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logicbld">
+		<description>Logic Builders (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Logic Builders" is a 1984 educational game developed by Methods and Solutions and distributed by Scholastic.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="logic builders (4am and san inc crack).dsk" size="143360" crc="fe027324" sha1="f8657baadef5c3e4f10b50b2a751222169a2008a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsb00">
+		<description>PFS (Version B.00, 1981-01-03) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2021-10-08"/>
+		<!--"PFS" is a 1980 productivity program developed and distributed by Software Publishing Corporation. This is version B.00, dated 1981-01-03 according to file metadata.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs vb.00 (4am crack).dsk" size="143360" crc="8106efe8" sha1="5f33707a6014b6d68c147130bcceb8ffb97240a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algv1v112">
+		<description>Algebra Volume 1 (Version 1.1.2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Algebra Volume 1" is a 1981 educational program developed and distributed by Edu-Ware Services. This is version 1.1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 1 v1.1.2 (4am crack).dsk" size="143360" crc="5388d103" sha1="c8c9e942096bc029a06b871e8c3d46661ca7575c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popnsplr2">
+		<description>Pop 'R Spell (Rev 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2021-09-09"/>
+		<!--"Pop 'R Spell and Pop 'R Spell Challenge" is a 1983 educational game developed and distributed by Milliken Publishing. This is an undated revision that fixes an off-by-1 error.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pop 'r spell and pop 'r spell challenge rev. 2 (4am crack).dsk" size="143360" crc="bfd30521" sha1="842e89724fa646efb0eae1dd2ab67125800ebc7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulperev">
+		<description>Multidimensional Personality Evaluation (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Psychological Psoftware</publisher>
+		<info name="release" value="2021-09-10"/>
+		<!--"Multidimensional Personality Evaluation" is a 1983 educational program developed and distributed by Psychological Psoftware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="multidimensional personality evaluation (4am crack).dsk" size="143360" crc="4624d984" sha1="b3d1e7a73a1152848e1fd0b9f364495956dbe626"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serendip">
+		<description>Serendipity (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>K-12 MicroMedia</publisher>
+		<info name="release" value="2021-09-16"/>
+		<!--"Serendipity" is a 1983 educational program developed by Dynacomp and distributed by K-12 MicroMedia. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="serendipity (4am crack).dsk" size="143360" crc="31f34848" sha1="45522cd7c33d7b8698670467f0a28afc7972e765"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inca">
+		<description>Inca (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Hayden Software</publisher>
+		<info name="release" value="2021-09-17"/>
+		<!--"Inca" is a 1985 adventure game developed by Joe Emerson and Ken Smith, and distributed by Hayden Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="inca (4am crack) side a.dsk" size="143360" crc="622c8e05" sha1="52f15fff82587642fecc73342139260cb12f025e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="inca (4am crack) side b.dsk" size="143360" crc="32d9ef26" sha1="827d2c6c8e93731d1f8b52e5ae3d1ac8fa4754f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hlygrail">
+		<description>The Holy Grail (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Hayden Software</publisher>
+		<info name="release" value="2021-09-17"/>
+		<!--"The Holy Grail" is a 1985 adventure game developed by Joe Emerson and Ken Smith, and distributed by Hayden Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the holy grail (4am crack) side a.dsk" size="143360" crc="25da1ecc" sha1="40b0ee95721d8540fedc0142046aad10131f72c7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the holy grail (4am crack) side b.dsk" size="143360" crc="9f63ad15" sha1="77e377fe95af1dc4898e159a8e6ded37d440c275"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readctar">
+		<description>How to Read in the Content Areas (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>American Educational Computer</publisher>
+		<info name="release" value="2021-09-19"/>
+		<!--"How to Read in the Content Areas" is an educational program developed and distributed by American Educational Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="how to read in the content areas (4am crack).dsk" size="143360" crc="c58174c2" sha1="41f6610d9748cca988e39f38b99eb6e2ed21a1d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mixnumc">
+		<description>Mixed Number Concepts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Courses By Computers</publisher>
+		<info name="release" value="2021-09-19"/>
+		<!--"Mixed Number Concepts" is a 1985 educational program developed and distributed by Courses By Computers. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Lessons"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mixed number concepts (4am crack) side a - lessons.dsk" size="143360" crc="df03272b" sha1="6b3c64c2eef8ccc8075c12872f91ac1190bf24dd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Tests"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mixed number concepts (4am crack) side b - tests.dsk" size="143360" crc="0632f1ce" sha1="d8408eda127e213e1d2d2988620cb2ad53138c64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsw8604">
+		<description>PFS:Write (Version 26-APR-86) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2021-09-19"/>
+		<!--"PFS:Write" is a 1986 productivity program developed and distributed by Software Publishing Corporation. This version is dated 28-APR-86 according to disk catalog metadata. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pfs write v28-apr-86 (4am crack) side a - program.dsk" size="143360" crc="231f58c0" sha1="35a8f8352224cb7ac6cc5244bd5ebf3e1512c9b9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Dictionary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pfs write v28-apr-86 (4am crack) side b - dictionary.dsk" size="143360" crc="e1cba377" sha1="faa895ab1c64becfc7ffbfbec7418f0465a1f622"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conjectr">
+		<description>Conjecture (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Robert Scott Enterprises</publisher>
+		<info name="release" value="2021-09-19"/>
+		<!--"Conjecture" is a 1986 educational game developed by Robert Scott and distributed by Robert Scott Enterprises.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="conjecture (4am crack) side a - program disk.dsk" size="143360" crc="b50ce118" sha1="67fb6dc063e131419ad05a288b70d48ce36d0b56"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Puzzle disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="conjecture (4am crack) side b - puzzle disk.dsk" size="143360" crc="04b8fe85" sha1="77169a01376791344b36431aee7f84edc283ea06"/>
 			</dataarea>
 		</part>
 	</software>

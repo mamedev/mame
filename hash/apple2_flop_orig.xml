@@ -17726,4 +17726,210 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="magics23">
+		<description>Magic Spells (Version 2.3) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple //e, //c+ or IIgs. -->
+		<!--"Magic Spells" is a 1985 educational game developed by K. Elliott, G. Genoar, S. Gordon, L. Grimm, and K. Klose, and distributed by The Learning Company. This is version 2.3. It requires a 64K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296218">
+				<rom name="magic spells 800k.woz" size="1296218" crc="8fdcca18" sha1="88beae2101715a83a12dce18e0087e8d78f45533"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathrb13">
+		<description>Math Rabbit (Version 1.3) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"Math Rabbit" is a 1986 educational game developed by Teri Perl, Analee Nunan, and Aaron Weiss, and distributed by The Learning Company. This is version 1.3. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296204">
+				<rom name="math rabbit 800k.woz" size="1296204" crc="92d6a324" sha1="eff164d131db23346afa189c667d215153f9c911"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thquik14">
+		<description>Think Quick! (Version 1.4) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"Think Quick!" is a 1987 educational game developed by Leslie Grimm and Sid Weber, and distributed by The Learning Company. This is version 1.4. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296193">
+				<rom name="think quick 800k.woz" size="1296193" crc="dd552c51" sha1="fd81362e8608fbba19189db5b5976c640c3c1b70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdatk8706">
+		<description>Word Attack! (Version 06.01.87) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+, //e, //c+ or IIgs. -->
+		<!--"Word Attack!" is a 1985 educational game developed by Richard Eckert and Janice Davidson, Ph.D., and distributed by Davidson and Associates. This version is dated 06.01.87. It requires a 64K Apple ][+, //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296214">
+				<rom name="word attack 800k.woz" size="1296214" crc="05d95b9d" sha1="ab2d4881afeb8197dcecf696db6acc061056d45f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wdatkpl12">
+		<description>Word Attack Plus! (Version 1.2) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs -->
+		<!--"Word Attack Plus!" is a 1988 educational game developed by Jan Davidson, Julie Baumgartner, J.M. Albanese, and Kevin R. Burley, and distributed by Davidson and Associates. This is version 1.2, dated 04.01.88. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329012">
+				<rom name="word attack plus 800k.woz" size="1329012" crc="d794d8ad" sha1="261977a948ad76d34dcbdae4ac3314300cc2fea4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdatkpfr13">
+		<description>Word Attack Plus! French (Version 1.3) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"Word Attack Plus! French" is a 1988 educational game developed by Jan Davidson, Julie Baumgartner, J.M. Albanese, and Kevin R. Burley, and distributed by Davidson and Associates. This is version 1.3, dated 09.01.88. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1330036">
+				<rom name="word attack plus french 800k.woz" size="1330036" crc="4fa72218" sha1="e4704d7382a7f4e2b850928c0597a48fbf06c51a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdatkpsp12">
+		<description>Word Attack Plus! Spanish (Version 1.2, 09.01.88) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"Word Attack Plus! Spanish" is a 1988 educational game developed by Jan Davidson, Julie Baumgartner, J.M. Albanese, and Kevin R. Burley, and distributed by Davidson and Associates. This is version 1.2, dated 09.01.88. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329013">
+				<rom name="word attack plus spanish 800k.woz" size="1329013" crc="fc7872de" sha1="ee9e91738a9a2ac6790750490c8948c09e8ccb02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprprii">
+		<description>SuperPrint II (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"SuperPrint II" is a 1989 graphics program developed by Joel Fried, Susan Swanson, Ken Grey, Lester Humphreys, Kim Looney, and David Shearer of Pelican Software, and distributed by Scholastic. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296289">
+				<rom name="superprint ii 800k.woz" size="1296289" crc="6e4761ec" sha1="e5b0e2c187b0d46a0738f5c325951f3a0529892e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trakattk">
+		<description>Track Attack</description>
+		<year>1982</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-08-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Track Attack" is a 1982 action game developed by Chris Jochumson and distributed by Broderbund Software. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261303">
+				<rom name="track attack.woz" size="261303" crc="e924de56" sha1="f3d636e0eabfbe196da71016e87424cc12ea0157"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="printshp">
+		<description>The Print Shop</description>
+		<year>1984</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-09-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"The Print Shop" is a 1984 graphics program developed by David Balsam and Martin Kahn, and distributed by Broderbund Software. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234809">
+				<rom name="the print shop side a.woz" size="234809" crc="97344ce3" sha1="3bc4427ed991ecc742f252ca0d201783cef5c2c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234784">
+				<rom name="the print shop side b.woz" size="234784" crc="e1d16e70" sha1="66f324eae1053f3a50c54b906aba8be5aadd31d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesis">
+		<description>Genesis</description>
+		<year>1983</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2021-09-16"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Genesis" is a 1983 action game developed by Kevin Furry, with art design by Whitney Caughlan, and distributed by Datasoft. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="88367">
+				<rom name="genesis.woz" size="88367" crc="21107442" sha1="f3061301b932789a3fbba20f9184fa41527694d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kiludead">
+		<description>Killed Until Dead</description>
+		<year>1987</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-09-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Killed Until Dead" is a 1987 adventure game developed by Michael Bate, Rick Banks, Allan Johanson, and John Boechler, and distributed by Accolade. It requires a 64K Apple ][+ or later. Due to coding bugs in the original game, it does not properly write-enable certain regions of RAM before writing to them, which leads to crashes in some emulators.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="228232">
+				<rom name="killed until dead side a.woz" size="228232" crc="747bec69" sha1="897b9fc89b80b5a3fa8d66f6904e494b34b42a17"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234888">
+				<rom name="killed until dead side b.woz" size="234888" crc="da6d7e77" sha1="b8aca63b2269330030e9be2dc589e16e2701c013"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
