@@ -243,14 +243,14 @@ public:
 						if ((a.shortname == b.parentname) && (a.instance == b.instance))
 							return true;
 						else
-							return compare_names(a.longname, b.longname);
+							return compare_names(a.longname, b.parentlongname);
 					}
 					else if (clonex && !cloney)
 					{
 						if ((a.parentname == b.shortname) && (a.instance == b.instance))
 							return false;
 						else
-							return compare_names(a.longname, b.longname);
+							return compare_names(a.parentlongname, b.longname);
 					}
 					else if ((a.parentname == b.parentname) && (a.instance == b.instance))
 					{
