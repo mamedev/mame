@@ -149,12 +149,16 @@ TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 //  dma_reload
 //-------------------------------------------------
 
-void paula_8364_device::dma_reload(audio_channel *chan)
+void paula_8364_device::dma_reload(audio_channel *chan, bool startup)
 {
 	chan->curlocation = chan->loc;
 	// TODO: how to treat length == 0?
 	chan->curlength = chan->len;
-	chan->irq_timer->adjust(attotime::from_hz(15750), chan->index); // clock() / 227
+	// TODO: on startup=false irq should be delayed two cycles
+	if (startup)
+		chan->irq_timer->adjust(attotime::from_hz(15750), chan->index); // clock() / 227
+	else
+		signal_irq(nullptr, chan->index);
 
 	LOG("dma_reload(%d): offs=%05X len=%04X\n", chan->index, chan->curlocation, chan->curlength);
 }
@@ -188,7 +192,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 	{
 		audio_channel *chan = &m_channel[channum];
 		if (!chan->dma_enabled && ((m_dmacon >> channum) & 1))
-			dma_reload(chan);
+			dma_reload(chan, true);
 
 		chan->dma_enabled = BIT(m_dmacon, channum);
 	}
@@ -220,6 +224,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 			int i;
 
 			// normalize the volume value
+			// FIXME: definitely not linear
 			volume = (volume & 0x40) ? 64 : (volume & 0x3f);
 			volume *= 4;
 
@@ -274,8 +279,12 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 					// (uses channel 3 as a sequencer, changing the start address on the fly)
 					if (chan->curlength == 0)
 					{
-						dma_reload(chan);
-						signal_irq(nullptr, channum);
+						dma_reload(chan, false);
+						// reload the data pointer, otherwise aliasing / buzzing outside the given buffer will be heard
+						// For example: Xenon 2 sets up location=0x63298 length=0x20 
+						// for silencing channels on-the-fly without relying on irqs.
+						// Without this the location will read at 0x632d8 (data=0x7a7d), causing annoying buzzing.
+						chan->dat = m_mem_r(chan->curlocation);
 					}
 				}
 

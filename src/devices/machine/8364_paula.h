@@ -133,7 +133,7 @@ private:
 		uint16_t dat;
 	};
 
-	void dma_reload(audio_channel *chan);
+	void dma_reload(audio_channel *chan, bool startup);
 
 	// callbacks
 	devcb_read16 m_mem_r;
