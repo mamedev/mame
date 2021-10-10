@@ -47,6 +47,7 @@ DEFINE_DEVICE_TYPE(NES_TXC_TW,        nes_txc_tw_device,        "nes_txc_tw",   
 DEFINE_DEVICE_TYPE(NES_KOF97,         nes_kof97_device,         "nes_kof97",         "NES Cart KoF 97 PCB")
 DEFINE_DEVICE_TYPE(NES_KOF96,         nes_kof96_device,         "nes_kof96",         "NES Cart KoF 96 PCB")
 DEFINE_DEVICE_TYPE(NES_SF3,           nes_sf3_device,           "nes_sf3",           "NES Cart Super Fighter III PCB")
+DEFINE_DEVICE_TYPE(NES_COCOMA,        nes_cocoma_device,        "nes_cocoma",        "NES Cart Cocoma Core Pro PCB")
 DEFINE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device,        "nes_gouder",        "NES Cart Gouder PCB")
 DEFINE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device,       "nes_sa9602b",       "NES Cart SA-9602B PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device,  "nes_shero",         "NES Cart Street Hero PCB")
@@ -226,6 +227,11 @@ nes_kof96_device::nes_kof96_device(const machine_config &mconfig, const char *ta
 
 nes_sf3_device::nes_sf3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_SF3, tag, owner, clock)
+{
+}
+
+nes_cocoma_device::nes_cocoma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_COCOMA, tag, owner, clock)
 {
 }
 
@@ -531,6 +537,12 @@ void nes_kof96_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	memset(m_reg, 0, sizeof(m_reg));
 	mmc3_common_initialize(0xff, 0xff, 0);
+}
+
+void nes_cocoma_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
 void nes_gouder_device::device_start()
@@ -1851,6 +1863,35 @@ void nes_sf3_device::write_h(offs_t offset, uint8_t data)
 			txrom_write(offset, data);
 			break;
 	}
+}
+
+/*-------------------------------------------------
+
+ Cocoma Core Pro Board
+
+ Games: BrilliantCom Cocoma Pack 1 and 2
+
+ MMC3 clone with an extra outer bank latch.
+
+ NES 2.0: mapper 516
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_cocoma_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("cocoma write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 4))
+	{
+		m_prg_base = (offset & 0x03) << 4;
+		set_prg(m_prg_base, m_prg_mask);
+		m_chr_base = (offset & 0x0c) << 5;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+	else
+		txrom_write(offset, data);
 }
 
 /*-------------------------------------------------

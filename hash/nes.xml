@@ -62814,18 +62814,34 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="brillco2">
-		<description>Brilliant Com Pack 2 (Kor)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="brillco1">
+		<description>Yeongjaekeom Cocoma Pack 1 (Korea)</description>
+		<year>1999</year>
+		<publisher>EduBank</publisher>
+		<info name="alt_title" value="영재컴 꼬꼬마 Pack 1"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="brilliant com pack 2 (k).chr" size="131072" crc="16a1ed7f" sha1="97201872c4d3d62849e5161103791e58adbb3632" offset="00000" />
+			<feature name="slot" value="cocoma" />
+			<dataarea name="prg" size="524288">
+				<rom name="brilliantcom cocoma pack 1.prg" size="524288" crc="cde78918" sha1="9ff8ffe51405b580f05fc0409b227a924aefda87" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="brilliant com pack 2 (k).prg" size="131072" crc="3462aa7f" sha1="d8a9d95f6185b37f4842b42366190acddd7f11af" offset="00000" />
+			<dataarea name="chr" size="524288">
+				<rom name="brilliantcom cocoma pack 1.chr" size="524288" crc="a1d7355c" sha1="08e6cbda7f16233d3cd5e0ce9f62591158854ee6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brillco2">
+		<description>Yeongjaekeom Cocoma Pack 2 (Korea)</description>
+		<year>1999</year>
+		<publisher>EduBank</publisher>
+		<info name="alt_title" value="영재컴 꼬꼬마 Pack 2"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cocoma" />
+			<dataarea name="prg" size="524288">
+				<rom name="brilliantcom cocoma pack 2.prg" size="524288" crc="1a1e9f91" sha1="7de52bfd475f15f75c8b739c269ecb778ae53c59" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="brilliantcom cocoma pack 2.chr" size="524288" crc="cd2d3259" sha1="41899d235abc1bb85b7a448437791c4d40d65709" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
