@@ -95,7 +95,7 @@ void memoryview_info::update_context_menu(HMENU menu)
 		{
 			// get the last known PC to write to this memory location
 			debug_view_xy const pos = memview.cursor_position();
-			offs_t const address = memview.addressAtCursorPosition(pos);
+			offs_t const address = space->byte_to_address(memview.addressAtCursorPosition(pos));
 			offs_t a = address & space->logaddrmask();
 			if (!space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, a))
 			{
@@ -119,7 +119,10 @@ void memoryview_info::update_context_menu(HMENU menu)
 						memval);
 				if (pc != offs_t(-1))
 				{
-					m_lastpc = util::string_format("Address %x written at PC=%x", address, pc);
+					if (space->is_octal())
+						m_lastpc = util::string_format("Address %o written at PC=%o", address, pc);
+					else
+						m_lastpc = util::string_format("Address %x written at PC=%x", address, pc);
 					enable = true;
 				}
 				else

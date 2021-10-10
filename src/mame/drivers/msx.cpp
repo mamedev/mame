@@ -527,6 +527,7 @@ PCB Layouts missing
 
 
 #include "emu.h"
+#include "cpu/z80/r800.h"
 #include "includes/msx.h"
 #include "formats/dsk_dsk.h"
 #include "formats/dmk_dsk.h"
@@ -1541,6 +1542,15 @@ void msx2_state::msx2_pal(machine_config &config)
 {
 	msx2(config);
 	m_v9938->set_screen_pal("screen");
+}
+
+void msx2_state::turbor(machine_config &config)
+{
+	msx2p(config);
+
+	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
+	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2p_io_map);
 }
 
 
@@ -8563,7 +8573,7 @@ ROM_END
 
 void msx2_state::fsa1gt(machine_config &config)
 {
-	msx2(config);
+	turbor(config);
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -8608,7 +8618,7 @@ ROM_END
 
 void msx2_state::fsa1st(machine_config &config)
 {
-	msx2(config);
+	turbor(config);
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
 	// 2 Cartridge slots

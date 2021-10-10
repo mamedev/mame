@@ -32,10 +32,10 @@ static std::regex s_potential_softlist_regex("\\w+(\\:\\w+)*");
 //**************************************************************************
 
 //-------------------------------------------------
-//  feature_list_item - constructor
+//  software_info_item - constructor
 //-------------------------------------------------
 
-feature_list_item::feature_list_item(const std::string &name, const std::string &value) :
+software_info_item::software_info_item(const std::string &name, const std::string &value) :
 	m_name(name),
 	m_value(value)
 {
@@ -43,10 +43,10 @@ feature_list_item::feature_list_item(const std::string &name, const std::string 
 
 
 //-------------------------------------------------
-//  feature_list_item - constructor
+//  software_info_item - constructor
 //-------------------------------------------------
 
-feature_list_item::feature_list_item(std::string &&name, std::string &&value) :
+software_info_item::software_info_item(std::string &&name, std::string &&value) :
 	m_name(std::move(name)),
 	m_value(std::move(value))
 {
@@ -77,14 +77,8 @@ software_part::software_part(software_info &info, std::string &&name, std::strin
 const char *software_part::feature(std::string_view feature_name) const noexcept
 {
 	// scan the feature list for an entry matching feature_name and return the value
-	auto iter = std::find_if(
-			m_featurelist.begin(),
-			m_featurelist.end(),
-			[&feature_name] (const feature_list_item &feature) { return feature.name() == feature_name; });
-
-	return iter != m_featurelist.end()
-		? iter->value().c_str()
-		: nullptr;
+	auto const iter = m_features.find(feature_name);
+	return (iter != m_features.end()) ? iter->value().c_str() : nullptr;
 }
 
 
@@ -192,10 +186,11 @@ class softlist_parser
 public:
 	// construction (== execution)
 	softlist_parser(
-			util::core_file &file,
+			util::read_stream &file,
 			std::string_view filename,
 			std::string &listname,
 			std::string &description,
+			std::string &notes,
 			std::list<software_info> &infolist,
 			std::ostream &errors);
 
@@ -236,17 +231,17 @@ private:
 	void parse_soft_start(const char *tagname, const char **attributes);
 	void parse_part_start(const char *tagname, const char **attributes);
 	void parse_data_start(const char *tagname, const char **attributes);
+	void parse_main_end(const char *tagname);
 	void parse_soft_end(const char *name);
 
 	// internal parsing state
-	util::core_file &           m_file;
 	const std::string_view      m_filename;
 	std::list<software_info> &  m_infolist;
 	std::ostream &              m_errors;
 	struct XML_ParserStruct *   m_parser;
-	bool                        m_done;
 	std::string &               m_listname;
 	std::string &               m_description;
+	std::string &               m_notes;
 	bool                        m_data_accum_expected;
 	std::string                 m_data_accum;
 	software_info *             m_current_info;
@@ -260,19 +255,19 @@ private:
 //-------------------------------------------------
 
 softlist_parser::softlist_parser(
-		util::core_file &file,
+		util::read_stream &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
+		std::string &notes,
 		std::list<software_info> &infolist,
 		std::ostream &errors) :
-	m_file(file),
 	m_filename(filename),
 	m_infolist(infolist),
 	m_errors(errors),
-	m_done(false),
 	m_listname(listname),
 	m_description(description),
+	m_notes(notes),
 	m_data_accum_expected(false),
 	m_current_info(nullptr),
 	m_current_part(nullptr),
@@ -280,7 +275,7 @@ softlist_parser::softlist_parser(
 {
 	// create the parser
 	m_parser = XML_ParserCreate_MM(nullptr, nullptr, nullptr);
-	if (m_parser == nullptr)
+	if (!m_parser)
 		throw std::bad_alloc();
 
 	// set the handlers
@@ -289,13 +284,14 @@ softlist_parser::softlist_parser(
 	XML_SetCharacterDataHandler(m_parser, &softlist_parser::data_handler);
 
 	// parse the file contents
-	m_file.seek(0, SEEK_SET);
 	char buffer[1024];
-	while (!m_done)
+	for (bool done = false; !done; )
 	{
-		u32 length = m_file.read(buffer, sizeof(buffer));
-		m_done = m_file.eof();
-		if (XML_Parse(m_parser, buffer, length, m_done) == XML_STATUS_ERROR)
+		size_t length;
+		file.read(buffer, sizeof(buffer), length); // TODO: better error handling
+		if (!length)
+			done = true;
+		if (XML_Parse(m_parser, buffer, length, done) == XML_STATUS_ERROR)
 		{
 			parse_error("%s", parser_error());
 			break;
@@ -474,6 +470,7 @@ void softlist_parser::end_handler(void *data, const char *name)
 			break;
 
 		case POS_MAIN:
+			state->parse_main_end(name);
 			state->m_current_info = nullptr;
 			break;
 
@@ -565,13 +562,25 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 		else
 			parse_error("No name defined for item");
 	}
+	// <notes>
+	else if (strcmp(tagname, "notes") == 0)
+	{
+		m_data_accum_expected = true;
+	}
 	else
 		unknown_tag(tagname);
 }
 
 
+void softlist_parser::parse_main_end(const char *tagname)
+{
+	if (strcmp(tagname, "notes") == 0)
+		m_notes = std::move(m_data_accum);
+}
+
+
 //-------------------------------------------------
-//  parse_main_start - handle tag start within
+//  parse_soft_start - handle tag start within
 //  a software tag
 //-------------------------------------------------
 
@@ -596,13 +605,17 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 	else if (strcmp(tagname, "publisher") == 0)
 		m_data_accum_expected = true;
 
+	// <notes>
+	else if (strcmp(tagname, "notes") == 0)
+		m_data_accum_expected = true;
+
 	// <info name='' value=''>
 	else if (strcmp(tagname, "info") == 0)
 	{
 		std::string infoname, infovalue;
 
 		if (parse_name_and_value(attributes, infoname, infovalue))
-			m_current_info->m_other_info.emplace_back(std::move(infoname), std::move(infovalue));
+			m_current_info->m_info.emplace_back(std::move(infoname), std::move(infovalue));
 		else
 			parse_error("Incomplete other_info definition");
 	}
@@ -613,9 +626,14 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		std::string featname, featvalue;
 
 		if (parse_name_and_value(attributes, featname, featvalue))
-			m_current_info->m_shared_info.emplace_back(std::move(featname), std::move(featvalue));
+		{
+			if (!m_current_info->m_shared_features.emplace(std::move(featname), std::move(featvalue)).second)
+				parse_error("Duplicate sharedfeat name");
+		}
 		else
+		{
 			parse_error("Incomplete sharedfeat definition");
+		}
 	}
 
 	// <part name='' interface=''>
@@ -711,9 +729,14 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 		std::string featname, featvalue;
 
 		if (parse_name_and_value(attributes, featname, featvalue))
-			m_current_part->m_featurelist.emplace_back(std::move(featname), std::move(featvalue));
+		{
+			if (!m_current_part->m_features.emplace(std::move(featname), std::move(featvalue)).second)
+				parse_error("Duplicate feature name");
+		}
 		else
+		{
 			parse_error("Incomplete feature definition");
+		}
 	}
 
 	// <dipswitch>
@@ -851,15 +874,19 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 	// <description>
 	if (strcmp(tagname, "description") == 0)
-		m_current_info->m_longname = m_data_accum;
+		m_current_info->m_longname = std::move(m_data_accum);
 
 	// <year>
 	else if (strcmp(tagname, "year") == 0)
-		m_current_info->m_year = m_data_accum;
+		m_current_info->m_year = std::move(m_data_accum);
 
 	// <publisher>
 	else if (strcmp(tagname, "publisher") == 0)
-		m_current_info->m_publisher = m_data_accum;
+		m_current_info->m_publisher = std::move(m_data_accum);
+
+	// <notes>
+	else if (strcmp(tagname, "notes") == 0)
+		m_current_info->m_notes = std::move(m_data_accum);
 
 	// </part>
 	else if (strcmp(tagname, "part") == 0)
@@ -873,11 +900,10 @@ void softlist_parser::parse_soft_end(const char *tagname)
 		if (!m_current_part->m_romdata.empty())
 			add_rom_entry("", "", 0, 0, ROMENTRYTYPE_END);
 
-		// get the info; if present, copy shared data (we assume name/value strings live
-		// in the string pool and don't need to be reallocated)
+		// get the info; if present, copy shared data
 		if (m_current_info != nullptr)
-			for (const feature_list_item &item : m_current_info->shared_info())
-				m_current_part->m_featurelist.emplace_back(item.name(), item.value());
+			for (const software_info_item &item : m_current_info->shared_features())
+				m_current_part->m_features.emplace(item.name(), item.value());
 	}
 }
 
@@ -885,14 +911,15 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 
 void parse_software_list(
-		util::core_file &file,
+		util::read_stream &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
+		std::string &notes,
 		std::list<software_info> &infolist,
 		std::ostream &errors)
 {
-	detail::softlist_parser(file, filename, listname, description, infolist, errors);
+	detail::softlist_parser(file, filename, listname, description, notes, infolist, errors);
 }
 
 

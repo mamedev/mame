@@ -20,11 +20,12 @@
 
 #include <map>
 #include <memory>
-#include <mutex>
 #include <vector>
 
 
+struct ui_system_info;
 struct ui_software_info;
+
 
 namespace ui {
 
@@ -220,8 +221,16 @@ private:
 		texture_ptr_vector      m_toolbar_texture;
 		texture_ptr_vector      m_sw_toolbar_texture;
 	};
-	using cache_ptr = std::shared_ptr<cache>;
-	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
+
+	// this is to satisfy the std::any requirement that objects be copyable
+	class cache_wrapper : public cache
+	{
+	public:
+		cache_wrapper(running_machine &machine) : cache(machine), m_machine(machine) { }
+		cache_wrapper(cache_wrapper const &that) : cache(that.m_machine), m_machine(that.m_machine) { }
+	private:
+		running_machine         &m_machine;
+	};
 
 	using flags_cache = util::lru_cache_map<game_driver const *, system_flags>;
 
@@ -229,7 +238,7 @@ private:
 	bool mouse_pressed() const { return (osd_ticks() >= m_repeat); }
 	void set_pressed();
 
-	bool snapx_valid() const { return m_cache->snapx_bitmap().valid(); }
+	bool snapx_valid() const { return m_cache.snapx_bitmap().valid(); }
 
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
@@ -237,10 +246,10 @@ private:
 
 	// draw infos
 	void infos_render(float x1, float y1, float x2, float y2);
-	virtual void general_info(const game_driver *driver, std::string &buffer) = 0;
+	virtual void general_info(ui_system_info const &system, std::string &buffer) = 0;
 
 	// get selected software and/or driver
-	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
+	virtual void get_selection(ui_software_info const *&software, ui_system_info const *&system) const = 0;
 	virtual bool accept_search() const { return true; }
 	void select_prev()
 	{
@@ -293,7 +302,6 @@ private:
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
-	virtual std::string make_driver_description(game_driver const &driver) const = 0;
 	virtual std::string make_software_description(ui_software_info const &software) const = 0;
 
 	// filter navigation
@@ -305,9 +313,6 @@ private:
 	static bool has_multiple_bios(ui_software_info const &swinfo, s_bios &biosname);
 	static bool has_multiple_bios(game_driver const &driver, s_bios &biosname);
 
-	// cleanup function
-	static void exit(running_machine &machine);
-
 	bool        m_ui_error;
 	std::string m_error_text;
 
@@ -317,7 +322,7 @@ private:
 	std::vector<std::string>    m_items_list;
 	std::string                 m_info_buffer;
 
-	cache_ptr               m_cache;
+	cache                   &m_cache;
 	bool                    m_is_swlist;
 	focused_menu            m_focus;
 	bool                    m_pressed;              // mouse button held down
@@ -330,9 +335,6 @@ private:
 	bool                    m_default_image;
 	uint8_t                 m_image_view;
 	flags_cache             m_flags;
-
-	static std::mutex       s_cache_guard;
-	static cache_ptr_map    s_caches;
 };
 
 } // namespace ui

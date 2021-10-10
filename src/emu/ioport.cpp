@@ -2730,7 +2730,7 @@ time_t ioport_manager::playback_init()
 		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname, machine().system().name);
 
 	// enable compression
-	m_playback_stream = util::zlib_read(util::core_file_read(m_playback_file), 16386);
+	m_playback_stream = util::zlib_read(m_playback_file, 16386);
 	return basetime;
 }
 
@@ -2911,7 +2911,7 @@ void ioport_manager::record_init()
 	header.write(m_record_file);
 
 	// enable compression
-	m_record_stream = util::zlib_write(util::core_file_read_write(m_record_file), 6, 16384);
+	m_record_stream = util::zlib_write(m_record_file, 6, 16384);
 }
 
 

@@ -6,6 +6,9 @@
 Fidelity Elite A/S series hardware (EAS, EAG, PC)
 see fidel_eag68k.cpp for 68000-based EAG hardware
 
+TODO:
+- verify fpres/feas irq active time
+
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
   To resolve this, hold the Game Control button while booting to clear nvram.
@@ -464,7 +467,7 @@ void elite_state::pc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::pc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
-	irq_clock.set_pulse_width(attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
+	irq_clock.set_pulse_width(attotime::from_usec(10)); // active for ~10us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
@@ -529,6 +532,10 @@ void eag_state::eag(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(5_MHz_XTAL); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
+
+	auto &irq_clock(CLOCK(config.replace(), "irq_clock", 600)); // from 556 timer (22nF, 82K+pot, 1K), ideal frequency is 600Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	config.device_remove("nvram");
 	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);

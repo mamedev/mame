@@ -37,6 +37,7 @@ private:
 	enum
 	{
 		LANGUAGE_MENU = 1,
+		SYSNAMES_MENU,
 		FONT_MENU,
 		COLORS_MENU,
 		HIDE_MENU
@@ -45,11 +46,16 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
+	void find_languages();
+	void find_sysnames();
+
 	static const char *const    HIDE_STATUS[];
 
 	std::function<void ()>      m_handler;
-	std::vector<std::string>    m_lang;
-	std::uint16_t               m_currlang;
+	std::vector<std::string>    m_languages;
+	std::vector<std::string>    m_sysnames;
+	std::size_t                 m_currlang;
+	std::size_t                 m_currsysnames;
 };
 
 //-------------------------------------------------

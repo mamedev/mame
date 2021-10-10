@@ -34,7 +34,6 @@ private:
 	{
 		CONF_OPTS = 1,
 		CONF_MACHINE,
-		CONF_PLUGINS,
 	};
 
 	using icon_cache = texture_lru<game_driver const *>;
@@ -60,12 +59,11 @@ private:
 	virtual render_texture *get_icon_texture(int linenum, void *selectedref) override;
 
 	// get selected software and/or driver
-	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const override;
+	virtual void get_selection(ui_software_info const *&software, ui_system_info const *&system) const override;
 	virtual bool accept_search() const override { return !isfavorite(); }
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const override;
-	virtual std::string make_driver_description(game_driver const &driver) const override;
 	virtual std::string make_software_description(ui_software_info const &software) const override;
 
 	// filter navigation
@@ -85,7 +83,7 @@ private:
 	void load_custom_filters();
 
 	// General info
-	virtual void general_info(const game_driver *driver, std::string &buffer) override;
+	virtual void general_info(ui_system_info const &system, std::string &buffer) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);

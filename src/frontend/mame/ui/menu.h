@@ -132,7 +132,6 @@ private:
 	void draw_text_box();
 
 protected:
-	using cleanup_callback = std::function<void(running_machine &)>;
 	using bitmap_ptr = widgets_manager::bitmap_ptr;
 	using texture_ptr = widgets_manager::texture_ptr;
 
@@ -180,8 +179,6 @@ protected:
 	void stack_pop() { m_global_state->stack_pop(); }
 	void stack_reset() { m_global_state->stack_reset(); }
 	bool stack_has_special_main_menu() const { return m_global_state->stack_has_special_main_menu(); }
-
-	void add_cleanup_callback(cleanup_callback &&callback) { m_global_state->add_cleanup_callback(std::move(callback)); }
 
 	// process a menu, drawing it and returning any interesting events
 	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
@@ -336,8 +333,6 @@ private:
 		global_state(global_state &&) = delete;
 		~global_state();
 
-		void add_cleanup_callback(cleanup_callback &&callback);
-
 		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
 		render_texture *bgrnd_texture() { return m_bgrnd_texture.get(); }
 
@@ -351,10 +346,7 @@ private:
 		bool stack_has_special_main_menu() const;
 
 	private:
-		using cleanup_callback_vector = std::vector<cleanup_callback>;
-
 		running_machine         &m_machine;
-		cleanup_callback_vector m_cleanup_callbacks;
 
 		bitmap_ptr              m_bgrnd_bitmap;
 		texture_ptr             m_bgrnd_texture;

@@ -34,35 +34,37 @@ struct folders_entry
 
 static const folders_entry s_folders[] =
 {
-	{ __("ROMs"),                OPTION_MEDIAPATH,          ADDING },
-	{ __("Software Media"),      OPTION_SWPATH,             CHANGE },
-	{ __("UI"),                  OPTION_UI_PATH,            CHANGE },
-	{ __("Language"),            OPTION_LANGUAGEPATH,       CHANGE },
-	{ __("Samples"),             OPTION_SAMPLEPATH,         ADDING },
-	{ __("DATs"),                OPTION_HISTORY_PATH,       ADDING },
-	{ __("INIs"),                OPTION_INIPATH,            ADDING },
-	{ __("Category INIs"),       OPTION_CATEGORYINI_PATH,   CHANGE },
-	{ __("Icons"),               OPTION_ICONS_PATH,         ADDING },
-	{ __("Cheats"),              OPTION_CHEATPATH,          ADDING },
-	{ __("Snapshots"),           OPTION_SNAPSHOT_DIRECTORY, ADDING },
-	{ __("Cabinets"),            OPTION_CABINETS_PATH,      ADDING },
-	{ __("Flyers"),              OPTION_FLYERS_PATH,        ADDING },
-	{ __("Titles"),              OPTION_TITLES_PATH,        ADDING },
-	{ __("Ends"),                OPTION_ENDS_PATH,          ADDING },
-	{ __("PCBs"),                OPTION_PCBS_PATH,          ADDING },
-	{ __("Marquees"),            OPTION_MARQUEES_PATH,      ADDING },
-	{ __("Controls Panels"),     OPTION_CPANELS_PATH,       ADDING },
-	{ __("Crosshairs"),          OPTION_CROSSHAIRPATH,      ADDING },
-	{ __("Artworks"),            OPTION_ARTPATH,            ADDING },
-	{ __("Bosses"),              OPTION_BOSSES_PATH,        ADDING },
-	{ __("Artworks Preview"),    OPTION_ARTPREV_PATH,       ADDING },
-	{ __("Select"),              OPTION_SELECT_PATH,        ADDING },
-	{ __("GameOver"),            OPTION_GAMEOVER_PATH,      ADDING },
-	{ __("HowTo"),               OPTION_HOWTO_PATH,         ADDING },
-	{ __("Logos"),               OPTION_LOGOS_PATH,         ADDING },
-	{ __("Scores"),              OPTION_SCORES_PATH,        ADDING },
-	{ __("Versus"),              OPTION_VERSUS_PATH,        ADDING },
-	{ __("Covers"),              OPTION_COVER_PATH,         ADDING }
+	{ N_p("path-option", "ROMs"),               OPTION_MEDIAPATH,          ADDING },
+	{ N_p("path-option", "Software Media"),     OPTION_SWPATH,             CHANGE },
+	{ N_p("path-option", "Sound Samples"),      OPTION_SAMPLEPATH,         ADDING },
+	{ N_p("path-option", "Artwork"),            OPTION_ARTPATH,            ADDING },
+	{ N_p("path-option", "Crosshairs"),         OPTION_CROSSHAIRPATH,      ADDING },
+	{ N_p("path-option", "Cheat Files"),        OPTION_CHEATPATH,          ADDING },
+	{ N_p("path-option", "Plugins"),            OPTION_PLUGINSPATH,        ADDING },
+	{ N_p("path-option", "UI Translations"),    OPTION_LANGUAGEPATH,       CHANGE },
+	{ N_p("path-option", "INIs"),               OPTION_INIPATH,            ADDING },
+	{ N_p("path-option", "UI Settings"),        OPTION_UI_PATH,            CHANGE },
+	{ N_p("path-option", "Plugin Data"),        OPTION_PLUGINDATAPATH,     CHANGE },
+	{ N_p("path-option", "DATs"),               OPTION_HISTORY_PATH,       ADDING },
+	{ N_p("path-option", "Category INIs"),      OPTION_CATEGORYINI_PATH,   CHANGE },
+	{ N_p("path-option", "Snapshots"),          OPTION_SNAPSHOT_DIRECTORY, ADDING },
+	{ N_p("path-option", "Icons"),              OPTION_ICONS_PATH,         ADDING },
+	{ N_p("path-option", "Control Panels"),     OPTION_CPANELS_PATH,       ADDING },
+	{ N_p("path-option", "Cabinets"),           OPTION_CABINETS_PATH,      ADDING },
+	{ N_p("path-option", "Marquees"),           OPTION_MARQUEES_PATH,      ADDING },
+	{ N_p("path-option", "PCBs"),               OPTION_PCBS_PATH,          ADDING },
+	{ N_p("path-option", "Flyers"),             OPTION_FLYERS_PATH,        ADDING },
+	{ N_p("path-option", "Title Screens"),      OPTION_TITLES_PATH,        ADDING },
+	{ N_p("path-option", "Game Endings"),       OPTION_ENDS_PATH,          ADDING },
+	{ N_p("path-option", "Bosses"),             OPTION_BOSSES_PATH,        ADDING },
+	{ N_p("path-option", "Artwork Previews"),   OPTION_ARTPREV_PATH,       ADDING },
+	{ N_p("path-option", "Select"),             OPTION_SELECT_PATH,        ADDING },
+	{ N_p("path-option", "Game Over Screens"),  OPTION_GAMEOVER_PATH,      ADDING },
+	{ N_p("path-option", "HowTo"),              OPTION_HOWTO_PATH,         ADDING },
+	{ N_p("path-option", "Logos"),              OPTION_LOGOS_PATH,         ADDING },
+	{ N_p("path-option", "Scores"),             OPTION_SCORES_PATH,        ADDING },
+	{ N_p("path-option", "Versus"),             OPTION_VERSUS_PATH,        ADDING },
+	{ N_p("path-option", "Covers"),             OPTION_COVER_PATH,         ADDING }
 };
 
 
@@ -103,7 +105,7 @@ void menu_directory::handle()
 void menu_directory::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : s_folders)
-		item_append(_(elem.name), 0, (void *)(uintptr_t)elem.action);
+		item_append(_("path-option", elem.name), 0, (void *)(uintptr_t)elem.action);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
@@ -166,7 +168,7 @@ void menu_display_actual::handle()
 
 void menu_display_actual::populate(float &customtop, float &custombottom)
 {
-	m_heading[0] = string_format(_("Current %1$s Folders"), _(s_folders[m_ref].name));
+	m_heading[0] = string_format(_("Current %1$s Folders"), _("path-option", s_folders[m_ref].name));
 	if (ui().options().exists(s_folders[m_ref].option))
 		m_searchpath.assign(ui().options().value(s_folders[m_ref].option));
 	else
@@ -417,7 +419,7 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 	std::string const toptext[] = {
 			util::string_format(
 					m_change ? _("Change %1$s Folder - Search: %2$s_") : _("Add %1$s Folder - Search: %2$s_"),
-					_(s_folders[m_ref].name),
+					_("path-option", s_folders[m_ref].name),
 					m_search),
 			m_current_path };
 	draw_text_box(
@@ -511,7 +513,7 @@ void menu_remove_folder::populate(float &customtop, float &custombottom)
 
 void menu_remove_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	std::string const toptext[] = {string_format(_("Remove %1$s Folder"), _(s_folders[m_ref].name)) };
+	std::string const toptext[] = {string_format(_("Remove %1$s Folder"), _("path-option", s_folders[m_ref].name)) };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),

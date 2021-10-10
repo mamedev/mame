@@ -30,6 +30,7 @@
 #include <cstring>
 #include <iterator>
 #include <unordered_set>
+#include <utility>
 
 
 namespace ui {
@@ -57,46 +58,87 @@ constexpr char const *SOFTWARE_REGIONS[] = {
 		"tha", "tpe", "tw",
 		"uk", "ukr", "usa" };
 
-constexpr char const *MACHINE_FILTER_NAMES[machine_filter::COUNT] = {
-		__("Unfiltered"),
-		__("Available"),
-		__("Unavailable"),
-		__("Working"),
-		__("Not Working"),
-		__("Mechanical"),
-		__("Not Mechanical"),
-		__("Category"),
-		__("Favorites"),
-		__("BIOS"),
-		__("Not BIOS"),
-		__("Parents"),
-		__("Clones"),
-		__("Manufacturer"),
-		__("Year"),
-		__("Save Supported"),
-		__("Save Unsupported"),
-		__("CHD Required"),
-		__("No CHD Required"),
-		__("Vertical Screen"),
-		__("Horizontal Screen"),
-		__("Custom Filter") };
+// must be sorted in std::string comparison order
+constexpr std::pair<char const *, char const *> SOFTWARE_INFO_NAMES[] = {
+		{ "alt_title",          N_p("swlist-info", "Alternate Title")           },
+		{ "author",             N_p("swlist-info", "Author")                    },
+		{ "barcode",            N_p("swlist-info", "Barcode Number")            },
+		{ "developer",          N_p("swlist-info", "Developer")                 },
+		{ "distributor",        N_p("swlist-info", "Distributor")               },
+		{ "install",            N_p("swlist-info", "Installation Instructions") },
+		{ "isbn",               N_p("swlist-info", "ISBN")                      },
+		{ "oem",                N_p("swlist-info", "OEM")                       },
+		{ "original_publisher", N_p("swlist-info", "Original Publisher")        },
+		{ "partno",             N_p("swlist-info", "Part Number")               },
+		{ "pcb",                N_p("swlist-info", "PCB")                       },
+		{ "programmer",         N_p("swlist-info", "Programmer")                },
+		{ "release",            N_p("swlist-info", "Release Date")              },
+		{ "serial",             N_p("swlist-info", "Serial Number")             },
+		{ "usage",              N_p("swlist-info", "Usage Instructions")        },
+		{ "version",            N_p("swlist-info", "Version")                   } };
 
+
+
+// must be in sync with the machine_filter::type enum
+constexpr char const *MACHINE_FILTER_NAMES[machine_filter::COUNT] = {
+		N_p("machine-filter", "Unfiltered"),
+		N_p("machine-filter", "Available"),
+		N_p("machine-filter", "Unavailable"),
+		N_p("machine-filter", "Working"),
+		N_p("machine-filter", "Not Working"),
+		N_p("machine-filter", "Mechanical"),
+		N_p("machine-filter", "Not Mechanical"),
+		N_p("machine-filter", "Category"),
+		N_p("machine-filter", "Favorites"),
+		N_p("machine-filter", "BIOS"),
+		N_p("machine-filter", "Not BIOS"),
+		N_p("machine-filter", "Parents"),
+		N_p("machine-filter", "Clones"),
+		N_p("machine-filter", "Manufacturer"),
+		N_p("machine-filter", "Year"),
+		N_p("machine-filter", "Save Supported"),
+		N_p("machine-filter", "Save Unsupported"),
+		N_p("machine-filter", "CHD Required"),
+		N_p("machine-filter", "No CHD Required"),
+		N_p("machine-filter", "Vertical Screen"),
+		N_p("machine-filter", "Horizontal Screen"),
+		N_p("machine-filter", "Custom Filter") };
+
+// must be in sync with the software_filter::type enum
 constexpr char const *SOFTWARE_FILTER_NAMES[software_filter::COUNT] = {
-		__("Unfiltered"),
-		__("Available"),
-		__("Unavailable"),
-		__("Favorites"),
-		__("Parents"),
-		__("Clones"),
-		__("Year"),
-		__("Publisher"),
-		__("Supported"),
-		__("Partially Supported"),
-		__("Unsupported"),
-		__("Release Region"),
-		__("Device Type"),
-		__("Software List"),
-		__("Custom Filter") };
+		N_p("software-filter", "Unfiltered"),
+		N_p("software-filter", "Available"),
+		N_p("software-filter", "Unavailable"),
+		N_p("software-filter", "Favorites"),
+		N_p("software-filter", "Parents"),
+		N_p("software-filter", "Clones"),
+		N_p("software-filter", "Year"),
+		N_p("software-filter", "Publisher"),
+		N_p("software-filter", "Developer"),
+		N_p("software-filter", "Distributor"),
+		N_p("software-filter", "Author"),
+		N_p("software-filter", "Programmer"),
+		N_p("software-filter", "Supported"),
+		N_p("software-filter", "Partially Supported"),
+		N_p("software-filter", "Unsupported"),
+		N_p("software-filter", "Release Region"),
+		N_p("software-filter", "Device Type"),
+		N_p("software-filter", "Software List"),
+		N_p("software-filter", "Custom Filter") };
+
+
+
+//-------------------------------------------------
+//  helper for building a sorted vector
+//-------------------------------------------------
+
+template <typename T>
+void add_info_value(std::vector<std::string> &items, T &&value)
+{
+	std::vector<std::string>::iterator const pos(std::lower_bound(items.begin(), items.end(), value));
+	if ((items.end() == pos) || (*pos != value))
+		items.emplace(pos, std::forward<T>(value));
+}
 
 
 
@@ -213,11 +255,14 @@ protected:
 		, m_selection(0U)
 	{
 		if (value)
-		{
-			std::vector<std::string>::const_iterator const found(std::find(choices.begin(), choices.end(), value));
-			if (choices.end() != found)
-				m_selection = std::distance(choices.begin(), found);
-		}
+			set_value(value);
+	}
+
+	void set_value(char const *value)
+	{
+		auto const found(std::find(m_choices.begin(), m_choices.end(), value));
+		if (m_choices.end() != found)
+			m_selection = std::distance(m_choices.begin(), found);
 	}
 
 	bool have_choices() const { return !m_choices.empty(); }
@@ -1395,6 +1440,93 @@ private:
 
 
 //-------------------------------------------------
+//  software info filters
+//-------------------------------------------------
+
+template <software_filter::type Type>
+class software_info_filter_base : public choice_filter_impl_base<software_filter, Type>
+{
+public:
+	virtual bool apply(ui_software_info const &info) const override
+	{
+		if (!this->have_choices())
+		{
+			return true;
+		}
+		else if (!this->selection_valid())
+		{
+			return false;
+		}
+		else
+		{
+			auto const found(
+					std::find_if(
+						info.info.begin(),
+						info.info.end(),
+						[this] (software_info_item const &i) { return this->apply(i); }));
+			return info.info.end() != found;
+		}
+	}
+
+protected:
+	software_info_filter_base(char const *type, std::vector<std::string> const &choices, char const *value)
+		: choice_filter_impl_base<software_filter, Type>(choices, value)
+		, m_info_type(type)
+	{
+	}
+
+private:
+	bool apply(software_info_item const &info) const
+	{
+		return (info.name() == m_info_type) && (info.value() == this->selection_text());
+	}
+
+	char const *const m_info_type;
+};
+
+
+class developer_software_filter : public software_info_filter_base<software_filter::DEVELOPERS>
+{
+public:
+	developer_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: software_info_filter_base<software_filter::DEVELOPERS>("developer", data.developers(), value)
+	{
+	}
+};
+
+
+class distributor_software_filter : public software_info_filter_base<software_filter::DISTRIBUTORS>
+{
+public:
+	distributor_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: software_info_filter_base<software_filter::DISTRIBUTORS>("distributor", data.distributors(), value)
+	{
+	}
+};
+
+
+class author_software_filter : public software_info_filter_base<software_filter::AUTHORS>
+{
+public:
+	author_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: software_info_filter_base<software_filter::AUTHORS>("author", data.authors(), value)
+	{
+	}
+};
+
+
+class programmer_software_filter : public software_info_filter_base<software_filter::PROGRAMMERS>
+{
+public:
+	programmer_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: software_info_filter_base<software_filter::PROGRAMMERS>("programmer", data.programmers(), value)
+	{
+	}
+};
+
+
+
+//-------------------------------------------------
 //  composite software filter
 //-------------------------------------------------
 
@@ -1432,6 +1564,10 @@ public:
 		case FAVORITE:
 		case YEAR:
 		case PUBLISHERS:
+		case DEVELOPERS:
+		case DISTRIBUTORS:
+		case AUTHORS:
+		case PROGRAMMERS:
 		case REGION:
 		case DEVICE_TYPE:
 		case LIST:
@@ -1444,7 +1580,15 @@ public:
 
 	static bool is_inclusion(type n)
 	{
-		return (YEAR == n) || (PUBLISHERS == n) || (REGION == n) || (DEVICE_TYPE == n) || (LIST == n);
+		return (YEAR == n)
+				|| (PUBLISHERS == n)
+				|| (DEVELOPERS == n)
+				|| (DISTRIBUTORS == n)
+				|| (AUTHORS == n)
+				|| (PROGRAMMERS == n)
+				|| (REGION == n)
+				|| (DEVICE_TYPE == n)
+				|| (LIST == n);
 	}
 
 private:
@@ -1542,31 +1686,35 @@ bool machine_filter_data::load_ini(emu_file &file)
 void software_filter_data::add_region(std::string const &longname)
 {
 	std::string name(extract_region(longname));
-	std::vector<std::string>::iterator const pos(std::lower_bound(m_regions.begin(), m_regions.end(), name));
-	if ((m_regions.end() == pos) || (*pos != name))
-		m_regions.emplace(pos, std::move(name));
+	add_info_value(m_regions, std::move(name));
 }
 
 void software_filter_data::add_publisher(std::string const &publisher)
 {
 	std::string name(extract_publisher(publisher));
-	std::vector<std::string>::iterator const pos(std::lower_bound(m_publishers.begin(), m_publishers.end(), name));
-	if ((m_publishers.end() == pos) || (*pos != name))
-		m_publishers.emplace(pos, std::move(name));
+	add_info_value(m_publishers, std::move(name));
 }
 
 void software_filter_data::add_year(std::string const &year)
 {
-	std::vector<std::string>::iterator const pos(std::lower_bound(m_years.begin(), m_years.end(), year));
-	if ((m_years.end() == pos) || (*pos != year))
-		m_years.emplace(pos, year);
+	add_info_value(m_years, year);
+}
+
+void software_filter_data::add_info(software_info_item const &info)
+{
+	if (info.name() == "developer")
+		add_info_value(m_developers, info.value());
+	else if (info.name() == "distributor")
+		add_info_value(m_distributors, info.value());
+	else if (info.name() == "author")
+		add_info_value(m_authors, info.value());
+	else if (info.name() == "programmer")
+		add_info_value(m_programmers, info.value());
 }
 
 void software_filter_data::add_device_type(std::string const &device_type)
 {
-	std::vector<std::string>::iterator const pos(std::lower_bound(m_device_types.begin(), m_device_types.end(), device_type));
-	if ((m_device_types.end() == pos) || (*pos != device_type))
-		m_device_types.emplace(pos, device_type);
+	add_info_value(m_device_types, device_type);
 }
 
 void software_filter_data::add_list(std::string const &name, std::string const &description)
@@ -1707,7 +1855,7 @@ char const *machine_filter::config_name(type n)
 char const *machine_filter::display_name(type n)
 {
 	assert(COUNT > n);
-	return _(MACHINE_FILTER_NAMES[n]);
+	return _("machine-filter", MACHINE_FILTER_NAMES[n]);
 }
 
 machine_filter::machine_filter()
@@ -1728,7 +1876,7 @@ char const *software_filter::config_name(type n)
 char const *software_filter::display_name(type n)
 {
 	assert(COUNT > n);
-	return _(SOFTWARE_FILTER_NAMES[n]);
+	return _("software-filter", SOFTWARE_FILTER_NAMES[n]);
 }
 
 software_filter::software_filter()
@@ -1756,6 +1904,14 @@ software_filter::ptr software_filter::create(type n, software_filter_data const 
 		return std::make_unique<years_software_filter>(data, value, file, indent);
 	case PUBLISHERS:
 		return std::make_unique<publishers_software_filter>(data, value, file, indent);
+	case DEVELOPERS:
+		return std::make_unique<developer_software_filter>(data, value, file, indent);
+	case DISTRIBUTORS:
+		return std::make_unique<distributor_software_filter>(data, value, file, indent);
+	case AUTHORS:
+		return std::make_unique<author_software_filter>(data, value, file, indent);
+	case PROGRAMMERS:
+		return std::make_unique<programmer_software_filter>(data, value, file, indent);
 	case SUPPORTED:
 		return std::make_unique<supported_software_filter>(data, value, file, indent);
 	case PARTIAL_SUPPORTED:
@@ -1866,31 +2022,52 @@ std::vector<std::string> tokenize(const std::string &text, char sep)
 
 
 ui_software_info::ui_software_info(
-		software_info const &info,
+		software_info const &sw,
 		software_part const &p,
 		game_driver const &d,
 		std::string const &li,
 		std::string const &is,
 		std::string const &de)
-	: shortname(info.shortname()), longname(info.longname()), parentname(info.parentname())
-	, year(info.year()), publisher(info.publisher())
-	, supported(info.supported())
+	: shortname(sw.shortname()), longname(sw.longname()), parentname(sw.parentname())
+	, year(sw.year()), publisher(sw.publisher())
+	, supported(sw.supported())
 	, part(p.name())
 	, driver(&d)
 	, listname(li), interface(p.interface()), instance(is)
 	, startempty(0)
 	, parentlongname()
-	, usage()
+	, infotext()
 	, devicetype(de)
+	, info()
+	, alttitles()
 	, available(false)
 {
-	for (feature_list_item const &feature : info.other_info())
+	info.reserve(sw.info().size());
+	bool firstinfo(true);
+	for (software_info_item const &feature : sw.info())
 	{
-		if (feature.name() == "usage")
-		{
-			usage = feature.value();
-			break;
-		}
+		// add info for the internal UI, localising recognised
+		if (!firstinfo)
+			infotext.append(2, '\n');
+		firstinfo = false;
+		auto const found = std::lower_bound(
+				std::begin(ui::SOFTWARE_INFO_NAMES),
+				std::end(ui::SOFTWARE_INFO_NAMES),
+				feature.name().c_str(),
+				[] (std::pair<char const *, char const *> const &a, char const *b)
+				{
+					return 0 > std::strcmp(a.first, b);
+				});
+		if ((std::end(ui::SOFTWARE_INFO_NAMES) != found) && (feature.name() == found->first))
+			infotext.append(_("swlist-info", found->second));
+		else
+			infotext.append(feature.name());
+		infotext.append(1, '\n').append(feature.value());
+
+		// keep references to stuff for filtering and searching
+		auto const &ins = info.emplace_back(feature.name(), feature.value());
+		if (feature.name() == "alt_title")
+			alttitles.emplace_back(ins.value());
 	}
 }
 
@@ -1898,4 +2075,89 @@ ui_software_info::ui_software_info(
 ui_software_info::ui_software_info(game_driver const &d)
 	: shortname(d.name), longname(d.type.fullname()), driver(&d), startempty(1), available(true)
 {
+}
+
+ui_software_info::ui_software_info(ui_software_info const &that)
+	: shortname(that.shortname)
+	, longname(that.longname)
+	, parentname(that.parentname)
+	, year(that.year)
+	, publisher(that.publisher)
+	, supported(that.supported)
+	, part(that.part)
+	, driver(that.driver)
+	, listname(that.listname)
+	, interface(that.interface)
+	, instance(that.instance)
+	, startempty(that.startempty)
+	, parentlongname(that.parentlongname)
+	, infotext(that.infotext)
+	, devicetype(that.devicetype)
+	, info(that.info)
+	, alttitles()
+	, available(that.available)
+{
+	// build self-referencing member
+	alttitles.reserve(that.alttitles.size());
+	for (software_info_item const &feature : info)
+	{
+		if (feature.name() == "alt_title")
+			alttitles.emplace_back(feature.value());
+	}
+}
+
+ui_software_info &ui_software_info::operator=(ui_software_info const &that)
+{
+	if (&that != this)
+	{
+		// copy simple stuff
+		shortname = that.shortname;
+		longname = that.longname;
+		parentname = that.parentname;
+		year = that.year;
+		publisher = that.publisher;
+		supported = that.supported;
+		part = that.part;
+		driver = that.driver;
+		listname = that.listname;
+		interface = that.interface;
+		instance = that.instance;
+		startempty = that.startempty;
+		parentlongname = that.parentlongname;
+		infotext = that.infotext;
+		devicetype = that.devicetype;
+		info = that.info;
+		alttitles.clear();
+		available = that.available;
+
+		// build self-referencing member
+		alttitles.reserve(that.alttitles.size());
+		for (software_info_item const &feature : info)
+		{
+			if (feature.name() == "alt_title")
+				alttitles.emplace_back(feature.value());
+		}
+	}
+	return *this;
+}
+
+
+void swap(ui_system_info &a, ui_system_info &b) noexcept
+{
+	using std::swap;
+	swap(a.driver,                               b.driver);
+	swap(a.index,                                b.index);
+	swap(a.is_clone,                             b.is_clone);
+	swap(a.available,                            b.available);
+	swap(a.description,                          b.description);
+	swap(a.parent,                               b.parent);
+	swap(a.reading_description,                  b.reading_description);
+	swap(a.reading_parent,                       b.reading_parent);
+	swap(a.ucs_shortname,                        b.ucs_shortname);
+	swap(a.ucs_description,                      b.ucs_description);
+	swap(a.ucs_reading_description,              b.ucs_reading_description);
+	swap(a.ucs_manufacturer_description,         b.ucs_manufacturer_description);
+	swap(a.ucs_manufacturer_reading_description, b.ucs_manufacturer_reading_description);
+	swap(a.ucs_default_description,              b.ucs_default_description);
+	swap(a.ucs_manufacturer_default_description, b.ucs_manufacturer_default_description);
 }

@@ -34,6 +34,30 @@ private:
 };
 
 
+// ======================> nes_farid_slrom_device
+
+class nes_farid_slrom_device : public nes_sxrom_device
+{
+public:
+	// construction/destruction
+	nes_farid_slrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void set_prg() override { nes_sxrom_device::set_prg((m_outer & 0x70) >> 1, 0x07); }
+	virtual void set_chr() override { nes_sxrom_device::set_chr((m_outer & 0x70) << 1, 0x1f); }
+
+private:
+	u8 m_outer;
+};
+
+
 // ======================> nes_ninjaryu_device
 
 class nes_ninjaryu_device : public nes_sxrom_device
@@ -100,6 +124,7 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_BMC_JY820845C, nes_bmc_jy820845c_device)
+DECLARE_DEVICE_TYPE(NES_FARID_SLROM,   nes_farid_slrom_device)
 DECLARE_DEVICE_TYPE(NES_NINJARYU,      nes_ninjaryu_device)
 DECLARE_DEVICE_TYPE(NES_RESETSXROM,    nes_resetsxrom_device)
 DECLARE_DEVICE_TYPE(NES_TXC_22110,     nes_txc_22110_device)

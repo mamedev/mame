@@ -31,54 +31,6 @@ void *const ITEMREF_START = reinterpret_cast<void *>(std::uintptr_t(1));
 } // anonymous namespace
 
 
-bool sorted_game_list(const game_driver *x, const game_driver *y)
-{
-	bool clonex = (x->parent[0] != '0') || x->parent[1];
-	int cx = -1;
-	if (clonex)
-	{
-		cx = driver_list::find(x->parent);
-		if ((0 > cx) || (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
-			clonex = false;
-	}
-
-	bool cloney = (y->parent[0] != '0') || y->parent[1];
-	int cy = -1;
-	if (cloney)
-	{
-		cy = driver_list::find(y->parent);
-		if ((0 > cy) || (driver_list::driver(cy).flags & machine_flags::IS_BIOS_ROOT))
-			cloney = false;
-	}
-
-	if (!clonex && !cloney)
-	{
-		return (core_stricmp(x->type.fullname(), y->type.fullname()) < 0);
-	}
-	else if (clonex && cloney)
-	{
-		if (!core_stricmp(x->parent, y->parent))
-			return (core_stricmp(x->type.fullname(), y->type.fullname()) < 0);
-		else
-			return (core_stricmp(driver_list::driver(cx).type.fullname(), driver_list::driver(cy).type.fullname()) < 0);
-	}
-	else if (!clonex && cloney)
-	{
-		if (!core_stricmp(x->name, y->parent))
-			return true;
-		else
-			return (core_stricmp(x->type.fullname(), driver_list::driver(cy).type.fullname()) < 0);
-	}
-	else
-	{
-		if (!core_stricmp(x->parent, y->name))
-			return false;
-		else
-			return (core_stricmp(driver_list::driver(cx).type.fullname(), y->type.fullname()) < 0);
-	}
-}
-
-
 menu_audit::menu_audit(mame_ui_manager &mui, render_container &container, std::vector<ui_system_info> &availablesorted, mode audit_mode)
 	: menu(mui, container)
 	, m_worker_thread()

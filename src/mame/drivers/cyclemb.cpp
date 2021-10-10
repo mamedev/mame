@@ -322,7 +322,7 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 			int cycle = (m_cram[0*64+0] & 0xf0)>>4;
 
 			color ^= 0x3f;
-			// hardcoded to thie palette bit?
+			// hardcoded to this palette bit?
 			if (attr & 0x40) color ^= cycle;
 
 			scrollx -= 0xc0;

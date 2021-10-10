@@ -948,8 +948,8 @@ ROM_START( botanic2 ) // PCB has Valadon logo with 'bajo licencia Itisa (Palamos
 	ROM_LOAD( "1.1c",    0x0000, 0x1000, CRC(a1148d89) SHA1(b1424693cebc410749216457d07bae54b903bc07) )
 	ROM_LOAD( "3.1f",    0x1000, 0x1000, CRC(70be5565) SHA1(a7eab667a82d3e7321f393073f29c6e5e865ec6b) )
 
-	ROM_REGION( 0x0040, "proms", 0 ) // strangely uses one PROM from bagman and one from botanic
-	ROM_LOAD( "82s123.6r",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_REGION( 0x0040, "proms", 0 ) // the PCB incorrectly had a bagman PROM left in place, we're using the one from the other Botanic sets instead but marked as BAD_DUMP
+	ROM_LOAD( "bota_3p.3p",      0x0000, 0x0020, BAD_DUMP CRC(a8a2ddd2) SHA1(fc2da863d13e92f7682f393a08bc9357841ae7ea) )
 	ROM_LOAD( "b-tbp18s030.3r",  0x0020, 0x0020, CRC(edf88f34) SHA1(b9c342d51303d552f87df2543a34e38c30acd07c) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
@@ -1260,6 +1260,14 @@ void bagman_state::init_bagmans3()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xed01, 0xed01, read8smo_delegate(*this, []() { return 0x01; }, "hack_r"));
 }
 
+void bagman_state::init_botanic2()
+{
+	// the protection PAL here must have been changed, the code checks for a fixed value of 0x0b
+	// if this isn't returned the title screen bank doesn't get set correctly, there is a garbage enemy
+	// tile at the top left corner of the 2nd screen, and the player moves very slowly on the 2nd stage
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xa000, read8smo_delegate(*this, []() { return 0x0b; }, "prot_r"));
+}
+
 GAME( 1982, bagman,    0,       bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Bagman",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagnard,   bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Le Bagnard (set 1)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagnarda,  bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Le Bagnard (set 2)",                      MACHINE_SUPPORTS_SAVE )
@@ -1275,10 +1283,10 @@ GAME( 1984, sbagman2,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init,
 GAME( 1984, sbagmani,  sbagman, sbagmani, sbagman,   bagman_state,   empty_init,    ROT90,  "Valadon Automation (Itisa license)",             "Super Bagman (Itisa, Spain)",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Different color PROMs, needs correct decoding
 GAME( 1984, sbagmans,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init,    ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, pickin,    0,       pickin,   pickin,    pickin_state,   empty_init,    ROT270,    "Valadon Automation",                             "Pickin'",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pickin,    0,       pickin,   pickin,    pickin_state,   empty_init,    ROT270, "Valadon Automation",                             "Pickin'",                                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,   0,       botanic,  botanici,  pickin_state,   empty_init,    ROT90,     "Itisa",                                          "Botanic (English / Spanish, set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init,    ROT90,     "Itisa",                                          "Botanic (English / Spanish, set 2)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, OK from the second on. Colors likely wrong, too. Has a leftover 5110.
-GAME( 1984, botanicf,  botanic, botanic,  botanicf,  pickin_state,   empty_init,    ROT270,    "Itisa (Valadon Automation license)",             "Botanic (French)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic,   0,       botanic,  botanici,  pickin_state,   empty_init,    ROT90,  "Itisa",                                          "Botanic (English / Spanish)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   init_botanic2, ROT90,  "Itisa",                                          "Botanic (English / Spanish, Bagman conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, botanicf,  botanic, botanic,  botanicf,  pickin_state,   empty_init,    ROT270, "Itisa (Valadon Automation license)",             "Botanic (French)",                        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init,    ROT0,      "Itisa",                                          "Squash (Itisa)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init,    ROT0,   "Itisa",                                          "Squash (Itisa)",                          MACHINE_SUPPORTS_SAVE )

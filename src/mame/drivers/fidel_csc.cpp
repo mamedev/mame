@@ -10,10 +10,10 @@ Fidelity CSC(and derived) hardware
 - Reversi Sensory Challenger
 
 TODO:
-- dump/add original csce
 - hook up csce I/O properly, it doesn't have PIAs
-- IRQ Tlow duration, on csc it was measured and turned out to be 73.425us
-  but that's too long csce and super9cc
+- verify csc/super9cc irq duration, it was measured 73.425us but that's too long,
+  so it's using the one from csce for now instead
+- is super9cc 101-1024B03 really 2KB? rom chip looks the same as the other ones
 
 *******************************************************************************
 
@@ -155,15 +155,16 @@ All three of the above are called "segment H".
 
 *******************************************************************************
 
-Elite Champion Challenger
+Elite Champion Challenger (ELITE)
 This is a limited-release chess computer based on the CSC. They removed the PIAs
 and did the I/O with TTL instead (PIAs will still work from software point of view).
 ---------------------------------
-R6502B? CPU @ 4MHz
-32KB ROMs total size, 4KB RAM(8*HM6147P)
+MPS 6502C CPU @ 4MHz
+20KB total ROM size, 4KB RAM(8*HM6147P)
 
-In the 90s, Wilfried Bucke provided an upgrade to make it more similar to the one
-that won the 1981 Travemünde contest. CPU was changed to R65C02 or UM6502C at 5MHz.
+The "Fidelity X" that won the 1981 Travemünde contest is also on this hardware, with
+a 5MHz CPU and 32KB total ROM size. In the 90s, Wilfried Bucke provided an upgrade
+kit for csce to make it similar to this version, CPU was changed to a R65C02P4.
 
 *******************************************************************************
 
@@ -173,7 +174,7 @@ Model DS9(Deluxe) has a 5MHz XTAL, but is otherwise same.
 Septennial(SCC) is the same as well, but clocked even higher.
 ---------------------------------
 R6502AP CPU, 1.95MHz(3.9MHz resonator)
-2 RAM chips, assume 4KB
+2 RAM chips (2KB + 1KB)
 2*8KB ROM + 1*2KB ROM
 built-in CB9 module
 
@@ -239,7 +240,7 @@ public:
 	// machine drivers
 	void csc(machine_config &config);
 	void csce(machine_config &config);
-	void su9(machine_config &config);
+	void cscet(machine_config &config);
 	void rsc(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(rsc_init_board);
@@ -260,7 +261,7 @@ protected:
 
 	// address maps
 	void csc_map(address_map &map);
-	void su9_map(address_map &map);
+	void csce_map(address_map &map);
 	void rsc_map(address_map &map);
 
 	// I/O handlers
@@ -281,20 +282,14 @@ protected:
 	u8 pia1_pb_r();
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
 
-	u8 m_led_data;
-	u8 m_7seg_data;
-	u8 m_inp_mux;
-	u8 m_speech_bank;
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
 };
 
 void csc_state::machine_start()
 {
-	// zerofill
-	m_led_data = 0;
-	m_7seg_data = 0;
-	m_inp_mux = 0;
-	m_speech_bank = 0;
-
 	// register for savestates
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
@@ -310,6 +305,8 @@ public:
 	su9_state(const machine_config &mconfig, device_type type, const char *tag) :
 		csc_state(mconfig, type, tag)
 	{ }
+
+	void su9(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq) { su9_set_cpu_freq(); }
 
@@ -337,7 +334,7 @@ void su9_state::su9_set_cpu_freq()
     I/O
 ******************************************************************************/
 
-// misc handlers
+// sensorboard handlers
 
 INPUT_CHANGED_MEMBER(csc_state::rsc_init_board)
 {
@@ -366,6 +363,9 @@ INPUT_CHANGED_MEMBER(csc_state::rsc_init_board)
 
 	m_board->refresh();
 }
+
+
+// misc handlers
 
 u16 csc_state::read_inputs()
 {
@@ -517,7 +517,7 @@ void csc_state::csc_map(address_map &map)
 	map(0xc000, 0xffff).rom();
 }
 
-void csc_state::su9_map(address_map &map)
+void csc_state::csce_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
@@ -618,7 +618,7 @@ void csc_state::csc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::csc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
-	irq_clock.set_pulse_width(attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
+	irq_clock.set_pulse_width(attotime::from_nsec(10480)); // 74LS221 (4.7K, 5nF), measured ~10.48us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	PIA6821(config, m_pia[0], 0);
@@ -659,16 +659,23 @@ void csc_state::csce(machine_config &config)
 	csc(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(5_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
+	m_maincpu->set_clock(4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::csce_map);
 }
 
-void csc_state::su9(machine_config &config)
+void csc_state::cscet(machine_config &config)
+{
+	csce(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_clock(5_MHz_XTAL);
+}
+
+void su9_state::su9(machine_config &config)
 {
 	csc(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
 	config.set_default_layout(layout_fidel_su9);
 }
 
@@ -740,7 +747,41 @@ ROM_START( csc )
 	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
+
 ROM_START( csce )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_FILL(          0x2000, 0x2000, 0xff) // unpopulated
+	ROM_LOAD("orange", 0xa000, 0x1000, CRC(53348363) SHA1(8465cb15d7d25e7172150774bb1c38caed9c720d) ) // MCM2532C
+	ROM_RELOAD(        0xb000, 0x1000)
+	ROM_LOAD("blue",   0xc000, 0x0800, CRC(49a915c8) SHA1(cfc04dbc2bc780297e5fd24f756c3d1e635b25e6) ) // N82S191N
+	ROM_LOAD("red",    0xc800, 0x0800, CRC(fcdd072b) SHA1(41571d96a7465d3e4a6ce7746e4002fe71173216) ) // N82S191N
+	ROM_LOAD("green",  0xd000, 0x0800, CRC(7537f682) SHA1(6db262aeea6686a65fe4f6f6c3de034bc9859748) ) // N82S191N
+	ROM_LOAD("brown",  0xd800, 0x0800, CRC(a70f4c20) SHA1(a990336726504d480dbb52e695483d39fb00a60e) ) // D2716
+	ROM_LOAD("black",  0xe000, 0x1000, CRC(4eec7f71) SHA1(b11e10492451fe6790deb6177c90a9fb037e4ec6) ) // MCM2532C
+	ROM_LOAD("yellow", 0xf000, 0x1000, CRC(51b9694b) SHA1(46582eb168f1e33fd05dd1554590351355e8afa4) ) // MCM2532C
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( cscet )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("03", 0x2000, 0x2000, CRC(22e43531) SHA1(696dc019bea3812ae6cf9c2b2c4d3a7b9017807d) )
 	ROM_LOAD("02", 0xa000, 0x2000, CRC(e593f114) SHA1(4dc5a2456a87c128235958f046cee9502cb3ac65) )
@@ -777,6 +818,7 @@ ROM_START( super9cc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
 	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
+	ROM_RELOAD(             0xa800, 0x0800)
 	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
 	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
 
@@ -817,7 +859,8 @@ ROM_END
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, cscet,    csce,   0, cscet,    csc,  csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

@@ -124,7 +124,7 @@ void image_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 					{
 						const char *const working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
-							image.set_working_directory(working_directory);
+							image.set_working_directory(std::string_view(working_directory));
 					}
 				}
 			}

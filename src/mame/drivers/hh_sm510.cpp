@@ -9192,9 +9192,11 @@ ROM_END
 
 /***************************************************************************
 
-  Tronica Space Rescue (model MG-9)
-  * PCB label MG-9 080492
-  * Sharp SM510 label 0015 224B TRONICA (no decap)
+  Tronica: Space Rescue (model MG-9), Thunder Ball (model FR-23)
+  * PCB labels: SPACE RESCUE MG-9 080492 (MG-9)
+                SPACE RESCUE MG-9 210982 (FR-23)
+  * Sharp SM510 labels (no decap): 0015 224B TRONICA (MG-9)
+                                   0015 236D TRONICA (FR-23)
   * lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
@@ -9207,6 +9209,7 @@ public:
 	{ }
 
 	void trsrescue(machine_config &config);
+	void trthuball(machine_config &config);
 };
 
 // config
@@ -9233,6 +9236,11 @@ void trsrescue_state::trsrescue(machine_config &config)
 	sm510_common(config, 1533, 1080); // R mask options confirmed
 }
 
+void trsrescue_state::trthuball(machine_config &config)
+{
+	sm510_common(config, 1599, 1080); // R mask options confirmed
+}
+
 // roms
 
 ROM_START( trsrescue )
@@ -9241,6 +9249,14 @@ ROM_START( trsrescue )
 
 	ROM_REGION( 178760, "screen", 0)
 	ROM_LOAD( "trsrescue.svg", 0, 178760, CRC(40756fd3) SHA1(9762ebbe4753a3194d7f0844c91addb8e1f8930b) )
+ROM_END
+
+ROM_START( trthuball )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0015_236d", 0x0000, 0x1000, CRC(f58a3832) SHA1(2d843b3520de66463e628cea9344a04015d1f5f1) )
+
+	ROM_REGION( 175018, "screen", 0)
+	ROM_LOAD( "trthuball.svg", 0, 175018, CRC(3404cc1d) SHA1(4cebe3c742c6947c6fddb8a84ae2f7d0cea1b527) )
 ROM_END
 
 
@@ -9647,6 +9663,7 @@ CONS( 1992, tbatmana,     0,           0, tbatmana,     tbatmana,     tbatmana_s
 CONS( 1983, trshutvoy,    0,           0, trshutvoy,    trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, tigarden,     trshutvoy,   0, tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trsrescue,    0,           0, trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, trthuball,    trsrescue,   0, trthuball,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Thunder Ball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

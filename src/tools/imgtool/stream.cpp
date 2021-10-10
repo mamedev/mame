@@ -198,10 +198,11 @@ stream::stream(bool wp, util::core_file::ptr &&f)
 	: imgtype(IMG_FILE)
 	, write_protect(wp)
 	, position(0)
-	, filesize(f->size())
+	, filesize(0)
 	, file(std::move(f))
 	, buffer(nullptr)
 {
+	file->length(filesize); // FIXME: check error return
 }
 
 
@@ -389,20 +390,19 @@ util::core_file *stream::core_file()
 
 uint32_t stream::read(void *buf, uint32_t sz)
 {
-	uint32_t result = 0;
+	size_t result = 0;
 
 	switch(imgtype)
 	{
 		case IMG_FILE:
-			assert(sz == (uint32_t) sz);
-			file->seek(position, SEEK_SET);
-			result = file->read(buf, (uint32_t) sz);
+			if (!file->seek(position, SEEK_SET))
+				file->read(buf, sz, result); // FIXME: check error return
 			break;
 
 		case IMG_MEM:
-			/* do we have to limit sz? */
+			// do we have to limit sz?
 			if (sz > (filesize - position))
-				sz = (uint32_t) (filesize - position);
+				sz = uint32_t(filesize - position);
 
 			memcpy(buf, buffer + position, sz);
 			result = sz;
@@ -423,29 +423,29 @@ uint32_t stream::read(void *buf, uint32_t sz)
 
 uint32_t stream::write(const void *buf, uint32_t sz)
 {
-	void *new_buffer;
-	uint32_t result = 0;
+	size_t result = 0;
 
 	switch(imgtype)
 	{
 		case IMG_MEM:
 			if (!write_protect)
 			{
-				/* do we have to expand the buffer? */
-				if (filesize < position + sz)
+				// do we have to expand the buffer?
+				const uint64_t end = position + sz;
+				if ((filesize < end) && (size_t(end) == end))
 				{
-					/* try to expand the buffer */
-					new_buffer = realloc(buffer , position + sz);
+					// try to expand the buffer
+					void *const new_buffer = realloc(buffer, size_t(end));
 					if (new_buffer)
 					{
-						buffer = (uint8_t*)new_buffer;
-						filesize = position + sz;
+						buffer = reinterpret_cast<uint8_t *>(new_buffer);
+						filesize = end;
 					}
 				}
 
-				/* do we have to limit sz? */
+				// do we have to limit sz?
 				if (sz > (filesize - position))
-					sz = (uint32_t) (filesize - position);
+					sz = uint32_t(filesize - position);
 
 				memcpy(buffer + position, buf, sz);
 				result = sz;
@@ -453,8 +453,8 @@ uint32_t stream::write(const void *buf, uint32_t sz)
 			break;
 
 		case IMG_FILE:
-			file->seek(position, SEEK_SET);
-			result = file->write(buf, sz);
+			if (!file->seek(position, SEEK_SET))
+				file->write(buf, sz, result); // FIXME: check error return
 			break;
 
 		default:
@@ -462,10 +462,10 @@ uint32_t stream::write(const void *buf, uint32_t sz)
 			break;
 	}
 
-	/* advance the file pointer */
+	// advance the file pointer
 	position += result;
 
-	/* did we grow the file */
+	// did we grow the file
 	if (position > filesize)
 		filesize = position;
 	return result;

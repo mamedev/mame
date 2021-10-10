@@ -47,7 +47,8 @@ void write_escaped(core_file &file, std::string const &str)
 		std::string::size_type const found = str.find_first_of("\"&<>", pos);
 		if (found != std::string::npos)
 		{
-			file.write(&str[pos], found - pos);
+			std::size_t written;
+			file.write(&str[pos], found - pos, written);
 			switch (str[found])
 			{
 			case '"': file.puts("&quot;"); pos = found + 1; break;
@@ -59,7 +60,8 @@ void write_escaped(core_file &file, std::string const &str)
 		}
 		else
 		{
-			file.write(&str[pos], str.size() - pos);
+			std::size_t written;
+			file.write(&str[pos], str.size() - pos, written);
 			pos = found;
 		}
 	}
@@ -118,28 +120,28 @@ file::ptr file::create()
 //  read - parse an XML file into its nodes
 //-------------------------------------------------
 
-file::ptr file::read(util::core_file &file, parse_options const *opts)
+file::ptr file::read(read_stream &file, parse_options const *opts)
 {
-	parse_info info;
-	int done;
-
 	// set up the parser
+	parse_info info;
 	if (!expat_setup_parser(info, opts))
 		return ptr();
 
 	// loop through the file and parse it
+	bool done;
 	do
 	{
 		char tempbuf[TEMP_BUFFER_SIZE];
 
 		// read as much as we can
-		int bytes = file.read(tempbuf, sizeof(tempbuf));
-		done = file.eof();
+		size_t bytes;
+		file.read(tempbuf, sizeof(tempbuf), bytes); // TODO: better error handling
+		done = !bytes;
 
 		// parse the data
 		if (XML_Parse(info.parser, tempbuf, bytes, done) == XML_STATUS_ERROR)
 		{
-			if (opts != nullptr && opts->error != nullptr)
+			if (opts && opts->error)
 			{
 				opts->error->error_message = XML_ErrorString(XML_GetErrorCode(info.parser));
 				opts->error->error_line = XML_GetCurrentLineNumber(info.parser);

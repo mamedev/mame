@@ -44502,7 +44502,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<info name="release" value="19910821"/>
 		<info name="alt_title" value="A列車で行こう"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom" />
+			<feature name="slot" value="szrom" />
 			<feature name="pcb_model" value="HVC-SZROM-01" />
 			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
@@ -51718,7 +51718,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1994 super hik 4-in-1 (jy-001 rev1).prg" size="524288" crc="dbdfef5e" sha1="289a97175056bc5bff5c5c09635a450bda7058ad" status="baddump" />
 			</dataarea>
@@ -51734,7 +51736,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1993 heroe series 4-in-1 (jy-001).prg" size="524288" crc="8e40296d" sha1="5d0b50d195f11a656f6d46c369bb3f60000ed085" status="baddump" />
 			</dataarea>
@@ -51750,7 +51754,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1994 super hik 4-in-1 (jy-002).prg" size="524288" crc="fbc1ee6b" sha1="7c82449372191ac3b6cfa4cc72e53b860c9f635b" status="baddump" />
 			</dataarea>
@@ -51766,7 +51772,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1994 super hik 4-in-1 (jy-003).prg" size="524288" crc="f6822fe5" sha1="81dcace66ae60a4fe4035bb8b2e7901a8b33170f" status="baddump" />
 			</dataarea>
@@ -51775,6 +51783,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy4">
+		<description>1996 Super HiK 4 in 1 (JY-004)</description>
+		<year>1996</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
+			<dataarea name="prg" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-004).prg" size="524288" crc="1ad4b9d5" sha1="87911ce6cae6799f8fa2a785190b54e397472b35" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1996 super hik 4-in-1 (jy-004).chr" size="524288" crc="d851081c" sha1="688ff9f483751d42ec6eb3c1eb4c90c019746609" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -51800,7 +51826,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-008).prg" size="524288" crc="74a6176e" sha1="920e7a9a42b903b98c80166bc3dbf0aa50367709" status="baddump" />
 			</dataarea>
@@ -51835,7 +51863,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="mario series 4-in-1 (jy-013).prg" size="524288" crc="4558acd5" sha1="86d99d13e813f19c792fac8802c15888739179d2" status="baddump" />
 			</dataarea>
@@ -51946,7 +51976,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-023).prg" size="524288" crc="cadebc3e" sha1="92024688aaa583c673801bc585c4d693458f4d78" status="baddump" />
 			</dataarea>
@@ -51965,7 +51997,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1997 super hik 4-in-1 (jy-024 rev1).prg" size="524288" crc="cef38f6c" sha1="5aebb9e0bb157d3eaa53204607610c22e8bc2548" status="baddump" />
 			</dataarea>
@@ -51984,7 +52018,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-024).prg" size="524288" crc="cef38f6c" sha1="5aebb9e0bb157d3eaa53204607610c22e8bc2548" status="baddump" />
 			</dataarea>
@@ -52003,7 +52039,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-038).prg" size="524288" crc="bd705234" sha1="499393d8bd79b3de5a2ada099fc9477a573cc6ef" status="baddump" />
 			</dataarea>
@@ -52019,7 +52057,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom2" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="256K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-039).prg" size="524288" crc="a32b698b" sha1="f12d34c330d0577aa560507d15c3083a885138fa" status="baddump" />
 			</dataarea>
@@ -52035,7 +52075,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom2" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="256K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-040).prg" size="524288" crc="677c6862" sha1="1f212b29ac4c7fa52eed6dbe4ef2ce62ed7e3bda" status="baddump" />
 			</dataarea>
@@ -52066,7 +52108,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom1" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="256K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="1995 super hik 4-in-1 (jy-043).prg" size="1048576" crc="a5d89dc1" sha1="cf238422714e35e86e6e2fa5dd3fc0a64230db6e" status="baddump" />
 			</dataarea>
@@ -52083,7 +52127,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1997 super hik 4-in-1 (jy-047).prg" size="524288" crc="7a82a25c" sha1="f05a95eecd16073e82d5ec8e05c6cdf262025735" status="baddump" />
 			</dataarea>
@@ -52099,7 +52145,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1995 super hik 4-in-1 (jy-047 rev0).prg" size="524288" crc="113688e2" sha1="600e52f8a93cf3aa0bbb09e56bf570ad09d10184" status="baddump" />
 			</dataarea>
@@ -52147,7 +52195,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom2" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="256K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-057).prg" size="524288" crc="142184be" sha1="eec27f45ded5a7111e7b2d5ac8e0d33b0f6449cc" status="baddump" />
 			</dataarea>
@@ -52166,7 +52216,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom2" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="256K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-058).prg" size="524288" crc="019a5cf7" sha1="ace2c8eada92bda13ca9bd3e3dc336648ebb28c7" status="baddump" />
 			</dataarea>
@@ -52182,7 +52234,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>J.Y. Company</publisher>
 		<info name="usage" value="Press reset to switch games."/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="resettxrom0" />
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
 			<dataarea name="prg" size="524288">
 				<rom name="1996 super hik 4-in-1 (jy-072).prg" size="524288" crc="8b1f7c74" sha1="0987c7b4aaf4419605e71a65405c9fe7a1e98a04" status="baddump" />
 			</dataarea>
@@ -52222,12 +52276,48 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_8j111">
+		<description>1998 Super Game 8 in 1 (JY-111)</description>
+		<year>1998</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_el86xc" />
+			<feature name="pcb" value="EL860947C" />
+			<feature name="outer-prg-size" value="128K" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1998 super game 8-in-1 (jy-111).prg" size="1048576" crc="8d6805f0" sha1="c13d1a3c72f48ad00db939f088f67750fafef13e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1998 super game 8-in-1 (jy-111).chr" size="1048576" crc="c907cacf" sha1="de2a790ca0ce7e5aa2312f97cb8d92ac3836ddc5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j112">
+		<description>1997 8 in 1 (JY-112)</description>
+		<year>1997</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_el86xc" />
+			<feature name="pcb" value="EL860947C" />
+			<feature name="outer-prg-size" value="128K" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1997 8-in-1 (jy-112).prg" size="1048576" crc="c6971394" sha1="d3f37dd47c9a857515b40035debe6d2dbd2ec825" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1997 8-in-1 (jy-112).chr" size="1048576" crc="6751a900" sha1="fc88086b13d379848d8582aee932c3d821eea7c1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_8j119">
 		<description>FC Genjin 8 in 1 (JY-119)</description>
 		<year>199?</year>
 		<publisher>J.Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="fcgj8in1" />
+			<feature name="slot" value="bmc_el86xc" />
+			<feature name="pcb" value="EL861121C" />
+			<feature name="outer-prg-size" value="256K" />
 			<dataarea name="prg" size="2097152">
 				<rom name="8-in-1 (jy-119).prg" size="2097152" crc="acb1f4e9" sha1="e65bf41010b4f3d4692b458698e355c233ecd729" status="baddump" />
 			</dataarea>
@@ -55452,6 +55542,43 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="xi tian qu jing ii (ch) (pal).prg" size="262144" crc="c61c10ff" sha1="167da84e9d0f683c9f1516043affd979afefec34" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathcai">
+		<description>Xiǎoxuéshēng Shùxué CAI (China)</description>
+		<year>1996</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1037"/>
+		<info name="alt_title" value="小学生数学 CAI"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_eh8813a" />
+			<feature name="pcb" value="UNL-EH8813A" />
+			<feature name="peripheral" value="subor_keyboard" />
+			<dataarea name="prg" size="131072">
+				<rom name="elementary school math cai.prg" size="131072" crc="7b30a397" sha1="7d635ffacb6b947bc9a134aecafe65e968b516ab" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="elementary school math cai.chr" size="131072" crc="38b9a06a" sha1="d50e50817905ea1ed39cd7b446eb31cfd29658bd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="englcai">
+		<description>1996 Yīngyǔ CAI 3 in 1 (China)</description>
+		<year>1996</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1???"/>
+		<info name="alt_title" value="1996 英語 CAI 3合1"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_eh8813a" />
+			<feature name="pcb" value="UNL-EH8813A" />
+			<dataarea name="prg" size="262144">
+				<rom name="1996 english cai 3-in-1.prg" size="262144" crc="e2654b44" sha1="1f5c72a9844bda2c554f384e128761fb1f48c9be" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="1996 english cai 3-in-1.chr" size="131072" crc="af296124" sha1="51775019b1cbb940fdd82f82020fa419c0080457" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -62687,18 +62814,34 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="brillco2">
-		<description>Brilliant Com Pack 2 (Kor)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="brillco1">
+		<description>Yeongjaekeom Cocoma Pack 1 (Korea)</description>
+		<year>1999</year>
+		<publisher>EduBank</publisher>
+		<info name="alt_title" value="영재컴 꼬꼬마 Pack 1"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="brilliant com pack 2 (k).chr" size="131072" crc="16a1ed7f" sha1="97201872c4d3d62849e5161103791e58adbb3632" offset="00000" />
+			<feature name="slot" value="cocoma" />
+			<dataarea name="prg" size="524288">
+				<rom name="brilliantcom cocoma pack 1.prg" size="524288" crc="cde78918" sha1="9ff8ffe51405b580f05fc0409b227a924aefda87" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="brilliant com pack 2 (k).prg" size="131072" crc="3462aa7f" sha1="d8a9d95f6185b37f4842b42366190acddd7f11af" offset="00000" />
+			<dataarea name="chr" size="524288">
+				<rom name="brilliantcom cocoma pack 1.chr" size="524288" crc="a1d7355c" sha1="08e6cbda7f16233d3cd5e0ce9f62591158854ee6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brillco2">
+		<description>Yeongjaekeom Cocoma Pack 2 (Korea)</description>
+		<year>1999</year>
+		<publisher>EduBank</publisher>
+		<info name="alt_title" value="영재컴 꼬꼬마 Pack 2"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cocoma" />
+			<dataarea name="prg" size="524288">
+				<rom name="brilliantcom cocoma pack 2.prg" size="524288" crc="1a1e9f91" sha1="7de52bfd475f15f75c8b739c269ecb778ae53c59" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="brilliantcom cocoma pack 2.chr" size="524288" crc="cd2d3259" sha1="41899d235abc1bb85b7a448437791c4d40d65709" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -79065,6 +79208,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Gunsmoke has a bug that makes some enemies and barrels not appear in-game until they are near the bottom of the screen. They cannot be interacted with until they materialize. It needs to be confirmed if this happens on hardware. -->
+	<software name="mc_2gn91">
+		<description>2 in 1 (GN-91B)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_gn91b" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 (gn-91b).prg" size="262144" crc="3c1d4ae3" sha1="ea31bf78a2bcb9fff752c12b07dfff8d65ba89fe" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_2hikg">
 		<description>2 in 1 1996 Super HIK Gold Card (NT-803)</description>
 		<year>19??</year>
@@ -79080,6 +79239,75 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2n811" supported="partial">
+		<description>2 in 1 (NT-811)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_970630c" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 (nt-811).prg" size="262144" crc="fa38298e" sha1="b111185897125231072d36308f05e869303a2a72" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2vt37">
+		<description>2 in 1 (VT-2037)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 (vt-2037).prg" size="262144" crc="9c1ab014" sha1="d5b565c27cab0fbe0cf2bc46a748f292323faa4b" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="2-in-1 (vt-2037).chr" size="262144" crc="df2c7a9b" sha1="8b40907ea0e753fecdfcb1962dae0fa7f76f21c7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2vt38">
+		<description>2 in 1 (VT-2038)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 (vt-2038).prg" size="262144" crc="0b86f42d" sha1="f39e83f7aadcd62e9901604dd58e6ba0f8601a47" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="2-in-1 (vt-2038).chr" size="262144" crc="46d5f59b" sha1="3273cd0f59aa765d3d7c14dfb97221a06b303ae9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2wq47">
+		<description>Super 2 in 1 (WQ 2047)</description>
+		<year>1998</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resettxrom" />
+			<feature name="outer-prg-size" value="128K" />
+			<feature name="outer-chr-size" value="128K" />
+			<dataarea name="prg" size="262144">
+				<rom name="super 2-in-1 (wq 2047, 1998).prg" size="262144" crc="018a778d" sha1="b6d579b431f2b3869b7a738b4778069d4002a6c0" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="super 2-in-1 (wq 2047, 1998).chr" size="262144" crc="16685dcc" sha1="c51cf4df3122610cf2f90a9b75b77e2942f3ba1a" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -79154,6 +79382,22 @@ be better to redump them properly. -->
 			<feature name="pcb_model" value="KS-7041" />
 			<dataarea name="prg" size="524288">
 				<rom name="20-in-1 [p1].prg" size="524288" crc="8f4fec56" sha1="0934fcf5f83a6ebef24d43ce577a547a31303615" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_20ca6">
+		<description>20 in 1 (CA-006)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_nc20mb" />
+			<feature name="pcb_model" value="NC-20MB" />
+			<dataarea name="prg" size="524288">
+				<rom name="20-in-1 (ca-006).prg" size="524288" crc="2f544832" sha1="9aeb8ea71ceff1eeea5a293c4257d259d1652aae" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -79554,6 +79798,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="chr" size="65536">
 				<rom name="35-in-1 (hm5511) [p1][u].chr" size="65536" crc="10852729" sha1="53b9a1ec244a85bd0c9585b05ddc68cc52dc4c22" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_35k33">
+		<description>35 in 1 (K-3033)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_k3033" />
+			<dataarea name="prg" size="1048576">
+				<rom name="35-in-1 (k-3033).prg" size="1048576" crc="71c2171e" sha1="06114bbb419a9ae51966ceb91b40868410402c2d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="35-in-1 (k-3033).chr" size="1048576" crc="bded0afd" sha1="9561865c4f34fbfc79636e6d86a2ad36161b1c83" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -80154,6 +80413,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="4-in-1 (ok-411)[p1].prg" size="524288" crc="08ad4796" sha1="96f57a5e8f352d9545ebb259e9c15e581d01cb43" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4pw99">
+		<description>4 in 1 1999</description>
+		<year>1999</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_970630c" />
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 1999.prg" size="524288" crc="57004aca" sha1="cffa3179223004f3f7a3571228cc9b4d6de2bbf6" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -81381,6 +81655,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Gunsmoke has a bug that makes some enemies and barrels not appear in-game until they are near the bottom of the screen. They cannot be interacted with until they materialize. It needs to be confirmed if this happens on hardware. -->
 	<software name="mc_8et40">
 		<description>8 in 1 (ET40, 821242c)</description>
 		<year>19??</year>
@@ -82081,8 +82356,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed
-to check why this is different -->
+<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed to check why this is different -->
 	<software name="mc_mario">
 		<description>Mario 7 in 1 (Bad Dump)</description>
 		<year>19??</year>
@@ -82102,18 +82376,40 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_marif" supported="no">
-		<description>Mario Family 10 in 1</description>
-		<year>19??</year>
+	<software name="mc_marif" supported="partial">
+		<description>Super Mario Family 10 in 1</description>
+		<year>1992?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="524288">
-				<rom name="mario family 10-in-1 [p1].chr" size="524288" crc="b9724865" sha1="9b2416a5d2d6e92c8ea28bba40ba9b3646d40d92" offset="00000" status="baddump" />
+			<feature name="slot" value="bmc_810305c" />
+			<feature name="pcb_model" value="81-03-05-C" />
+			<dataarea name="prg" size="1048576">
+				<rom name="0001" size="1048576" crc="880fc6a9" sha1="a677e8aaa0f58be6c62ab72936ef0c2065014ff4" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="524288">
-				<rom name="mario family 10-in-1 [p1].prg" size="524288" crc="bb191650" sha1="3af18925766baa141dce6ab67ce011fa94d643f7" offset="00000" status="baddump" />
+			<dataarea name="chr" size="524288">
+				<rom name="0002" size="524288" crc="b9724865" sha1="9b2416a5d2d6e92c8ea28bba40ba9b3646d40d92" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_marp2">
+		<description>Golden Mario Party II - Around the World 6 in 1</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_f600" />
+			<feature name="pcb_model" value="F600" />
+			<dataarea name="prg" size="1048576">
+				<rom name="golden mario party ii - around the world 6-in-1.prg" size="1048576" crc="83392938" sha1="0421b301bece7217162164bb79fc6f896b988260" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="golden mario party ii - around the world 6-in-1.chr" size="1048576" crc="f5056252" sha1="018aa1ada019f8cdd4a192251bfcbe159c3f429e" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">

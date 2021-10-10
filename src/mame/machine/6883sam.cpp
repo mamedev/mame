@@ -66,7 +66,7 @@
 
 #define VERBOSE (0)
 // #define VERBOSE (LOG_FBITS)
-// #define VERBOSE (LOG_FBITS | LOG_VBITS | LOG_PBITS | LOG_MBITS | LOG_RBITS)
+// #define VERBOSE (LOG_FBITS | LOG_VBITS | LOG_PBITS | LOG_TBITS | LOG_MBITS | LOG_RBITS)
 
 #include "logmacro.h"
 
@@ -405,7 +405,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 
 	if (xorval & (SAM_STATE_TY))
 	{
-		LOGTBITS("%s: SAM TY Bits: $%02x\n",
+		LOGTBITS("%s: SAM TY Bit: $%02x\n",
 			machine().describe_context(),
 			(m_sam_state & (SAM_STATE_TY)) >> 15);
 	}
@@ -414,7 +414,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 	{
 		LOGMBITS("%s: SAM M Bits: $%02x\n",
 			machine().describe_context(),
-			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 9);
+			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 13);
 	}
 
 	if (xorval & (SAM_STATE_R0|SAM_STATE_R1))

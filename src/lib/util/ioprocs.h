@@ -253,16 +253,6 @@ random_read::ptr osd_file_read(osd_file &file) noexcept;
 random_read_write::ptr osd_file_read_write(std::unique_ptr<osd_file> &&file) noexcept;
 random_read_write::ptr osd_file_read_write(osd_file &file) noexcept;
 
-random_read::ptr core_file_read(std::unique_ptr<core_file> &&file) noexcept;
-random_read::ptr core_file_read(std::unique_ptr<core_file> &&file, std::uint8_t filler) noexcept;
-random_read::ptr core_file_read(core_file &file) noexcept;
-random_read::ptr core_file_read(core_file &file, std::uint8_t filler) noexcept;
-
-random_read_write::ptr core_file_read_write(std::unique_ptr<core_file> &&file) noexcept;
-random_read_write::ptr core_file_read_write(std::unique_ptr<core_file> &&file, std::uint8_t filler) noexcept;
-random_read_write::ptr core_file_read_write(core_file &file) noexcept;
-random_read_write::ptr core_file_read_write(core_file &file, std::uint8_t filler) noexcept;
-
 } // namespace util
 
 #endif // MAME_LIB_UTIL_IOPROCS_H

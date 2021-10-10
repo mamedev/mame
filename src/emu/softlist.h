@@ -19,6 +19,9 @@
 #include "corefile.h"
 
 #include <list>
+#include <set>
+#include <string>
+#include <string_view>
 
 
 //**************************************************************************
@@ -45,20 +48,30 @@ enum class software_support
 //**************************************************************************
 
 // an item in a list of name/value pairs
-class feature_list_item
+class software_info_item
 {
 public:
 	// construction/destruction
-	feature_list_item(std::string &&name, std::string &&value);
-	feature_list_item(const std::string &name, const std::string &value);
-	feature_list_item(feature_list_item const &) = delete;
-	feature_list_item(feature_list_item &&) = delete;
-	feature_list_item& operator=(feature_list_item const &) = delete;
-	feature_list_item& operator=(feature_list_item &&) = delete;
+	software_info_item(std::string &&name, std::string &&value);
+	software_info_item(const std::string &name, const std::string &value);
+	software_info_item(software_info_item const &) = default;
+	software_info_item(software_info_item &&) = default;
+	software_info_item& operator=(software_info_item const &) = default;
+	software_info_item& operator=(software_info_item &&) = default;
 
 	// getters
 	const std::string &name() const noexcept { return m_name; }
 	const std::string &value() const noexcept { return m_value; }
+
+	// collection
+	struct compare
+	{
+		using is_transparent = void;
+		bool operator()(const software_info_item &a, const software_info_item &b) const noexcept { return a.m_name < b.m_name; }
+		bool operator()(const software_info_item &a, const std::string_view &b) const noexcept { return a.m_name < b; }
+		bool operator()(const std::string_view &a, const software_info_item &b) const noexcept { return a < b.m_name; }
+	};
+	using set = std::set<software_info_item, compare>;
 
 private:
 	// internal state
@@ -84,7 +97,7 @@ public:
 	software_info &info() const noexcept { return m_info; }
 	const std::string &name() const noexcept { return m_name; }
 	const std::string &interface() const noexcept { return m_interface; }
-	const std::list<feature_list_item> &featurelist() const noexcept { return m_featurelist; }
+	const software_info_item::set &features() const noexcept { return m_features; }
 	const std::vector<rom_entry> &romdata() const noexcept { return m_romdata; }
 
 	// helpers
@@ -93,11 +106,11 @@ public:
 
 private:
 	// internal state
-	software_info &                 m_info;
-	std::string                     m_name;
-	std::string                     m_interface;
-	std::list<feature_list_item>    m_featurelist;
-	std::vector<rom_entry>          m_romdata;
+	software_info &         m_info;
+	std::string             m_name;
+	std::string             m_interface;
+	software_info_item::set m_features;
+	std::vector<rom_entry>  m_romdata;
 };
 
 
@@ -120,8 +133,9 @@ public:
 	const std::string &parentname() const { return m_parentname; }
 	const std::string &year() const { return m_year; }
 	const std::string &publisher() const { return m_publisher; }
-	const std::list<feature_list_item> &other_info() const { return m_other_info; }
-	const std::list<feature_list_item> &shared_info() const { return m_shared_info; }
+	const std::string &notes() const { return m_notes; }
+	const std::list<software_info_item> &info() const { return m_info; }
+	const software_info_item::set &shared_features() const { return m_shared_features; }
 	software_support supported() const { return m_supported; }
 	const std::list<software_part> &parts() const { return m_partdata; }
 
@@ -131,15 +145,16 @@ public:
 
 private:
 	// internal state
-	software_support        m_supported;
-	std::string             m_shortname;
-	std::string             m_longname;
-	std::string             m_parentname;
-	std::string             m_year;           // Copyright year on title screen, actual release dates can be tracked in external resources
-	std::string             m_publisher;
-	std::list<feature_list_item> m_other_info;   // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
-	std::list<feature_list_item> m_shared_info;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
-												// by each part of this software entry (after loading these are stored in partdata->featurelist)
+	software_support                m_supported;
+	std::string                     m_shortname;
+	std::string                     m_longname;
+	std::string                     m_parentname;
+	std::string                     m_year;             // Copyright year on title screen, actual release dates can be tracked in external resources
+	std::string                     m_publisher;
+	std::string                     m_notes;
+	std::list<software_info_item>   m_info;             // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
+	software_info_item::set         m_shared_features;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
+													    // by each part of this software entry (after loading these are stored in partdata->features)
 	std::list<software_part> m_partdata;
 };
 
@@ -148,10 +163,11 @@ private:
 
 // parses a software list
 void parse_software_list(
-		util::core_file &file,
+		util::read_stream &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
+		std::string &notes,
 		std::list<software_info> &infolist,
 		std::ostream &errors);
 

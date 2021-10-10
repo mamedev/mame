@@ -3852,7 +3852,7 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 	}
 
 	// Recover the pc & print
-	const offs_t result = space->device().debug()->track_mem_pc_from_space_address_data(spacenum, address, data);
+	const offs_t result = space->device().debug()->track_mem_pc_from_space_address_data(space->spacenum(), address, data);
 	if (result != (offs_t)(-1))
 		m_console.printf("%02x\n", result);
 	else

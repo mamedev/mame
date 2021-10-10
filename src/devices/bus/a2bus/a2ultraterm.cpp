@@ -29,19 +29,17 @@
 
 #include "emu.h"
 #include "a2ultraterm.h"
+
+#include "video/mc6845.h"
+
 #include "screen.h"
 
+
+namespace {
 
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_ULTRATERM,    a2bus_ultraterm_device,    "a2ulttrm", "Videx UltraTerm (original)")
-DEFINE_DEVICE_TYPE(A2BUS_ULTRATERMENH, a2bus_ultratermenh_device, "a2ultrme", "Videx UltraTerm (enhanced //e)")
 
 #define ULTRATERM_ROM_REGION  "uterm_rom"
 #define ULTRATERM_GFX_REGION  "uterm_gfx"
@@ -65,7 +63,7 @@ DEFINE_DEVICE_TYPE(A2BUS_ULTRATERMENH, a2bus_ultratermenh_device, "a2ultrme", "V
 #define CT2_HLBIT7L (0x01)
 
 
-static const rgb_t ultraterm_palette[4] =
+const rgb_t ultraterm_palette[4] =
 {
 	rgb_t(0x00,0x00,0x00),
 	rgb_t(0x55,0x55,0x55),
@@ -95,6 +93,60 @@ ROM_START( a2ultratermenh )
 	ROM_REGION(0x400, "pal", 0)
 	ROM_LOAD( "ult_251c.jed", 0x000000, 0x000305, CRC(12fabb0d) SHA1(d4a36837cb98bb65f7ddef7455eb5a7f8e648a82) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_videx160_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+protected:
+	// construction/destruction
+	a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual void write_c800(uint16_t offset, uint8_t data) override;
+
+	uint8_t m_ram[256*16];
+	int m_framecnt;
+	uint8_t m_ctrl1, m_ctrl2;
+
+	required_device<mc6845_device> m_crtc;
+	required_region_ptr<uint8_t> m_rom, m_chrrom;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	MC6845_UPDATE_ROW(crtc_update_row);
+
+	int m_rambank;
+};
+
+class a2bus_ultraterm_device : public a2bus_videx160_device
+{
+public:
+	a2bus_ultraterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class a2bus_ultratermenh_device : public a2bus_videx160_device
+{
+public:
+	a2bus_ultratermenh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -138,8 +190,12 @@ const tiny_rom_entry *a2bus_ultratermenh_device::device_rom_region() const
 
 a2bus_videx160_device::a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr), m_framecnt(0), m_ctrl1(0), m_ctrl2(0),
-	m_crtc(*this, ULTRATERM_MC6845_NAME), m_rambank(0)
+	device_a2bus_card_interface(mconfig, *this),
+	m_framecnt(0), m_ctrl1(0), m_ctrl2(0),
+	m_crtc(*this, ULTRATERM_MC6845_NAME),
+	m_rom(*this, ULTRATERM_ROM_REGION),
+	m_chrrom(*this, ULTRATERM_GFX_REGION),
+	m_rambank(0)
 {
 }
 
@@ -159,10 +215,6 @@ a2bus_ultratermenh_device::a2bus_ultratermenh_device(const machine_config &mconf
 
 void a2bus_videx160_device::device_start()
 {
-	m_rom = machine().root_device().memregion(this->subtag(ULTRATERM_ROM_REGION).c_str())->base();
-
-	m_chrrom = machine().root_device().memregion(this->subtag(ULTRATERM_GFX_REGION).c_str())->base();
-
 	memset(m_ram, 0, 256*16);
 
 	save_item(NAME(m_ram));
@@ -391,3 +443,13 @@ WRITE_LINE_MEMBER( a2bus_videx160_device::vsync_changed )
 		m_framecnt++;
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ULTRATERM,    device_a2bus_card_interface, a2bus_ultraterm_device,    "a2ulttrm", "Videx UltraTerm (original)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ULTRATERMENH, device_a2bus_card_interface, a2bus_ultratermenh_device, "a2ultrme", "Videx UltraTerm (enhanced //e)")

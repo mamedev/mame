@@ -73,29 +73,29 @@ enum
 
 std::pair<char const *, char const *> const arts_info[] =
 {
-	{ __("Snapshots"),       OPTION_SNAPSHOT_DIRECTORY },
-	{ __("Cabinets"),        OPTION_CABINETS_PATH },
-	{ __("Control Panels"),  OPTION_CPANELS_PATH },
-	{ __("PCBs"),            OPTION_PCBS_PATH },
-	{ __("Flyers"),          OPTION_FLYERS_PATH },
-	{ __("Titles"),          OPTION_TITLES_PATH },
-	{ __("Ends"),            OPTION_ENDS_PATH },
-	{ __("Artwork Preview"), OPTION_ARTPREV_PATH },
-	{ __("Bosses"),          OPTION_BOSSES_PATH },
-	{ __("Logos"),           OPTION_LOGOS_PATH },
-	{ __("Versus"),          OPTION_VERSUS_PATH },
-	{ __("Game Over"),       OPTION_GAMEOVER_PATH },
-	{ __("HowTo"),           OPTION_HOWTO_PATH },
-	{ __("Scores"),          OPTION_SCORES_PATH },
-	{ __("Select"),          OPTION_SELECT_PATH },
-	{ __("Marquees"),        OPTION_MARQUEES_PATH },
-	{ __("Covers"),          OPTION_COVER_PATH },
+	{ N_p("selmenu-artwork", "Snapshots"),       OPTION_SNAPSHOT_DIRECTORY },
+	{ N_p("selmenu-artwork", "Cabinet"),         OPTION_CABINETS_PATH },
+	{ N_p("selmenu-artwork", "Control Panel"),   OPTION_CPANELS_PATH },
+	{ N_p("selmenu-artwork", "PCB"),             OPTION_PCBS_PATH },
+	{ N_p("selmenu-artwork", "Flyer"),           OPTION_FLYERS_PATH },
+	{ N_p("selmenu-artwork", "Title Screen"),    OPTION_TITLES_PATH },
+	{ N_p("selmenu-artwork", "Ending"),          OPTION_ENDS_PATH },
+	{ N_p("selmenu-artwork", "Artwork Preview"), OPTION_ARTPREV_PATH },
+	{ N_p("selmenu-artwork", "Bosses"),          OPTION_BOSSES_PATH },
+	{ N_p("selmenu-artwork", "Logo"),            OPTION_LOGOS_PATH },
+	{ N_p("selmenu-artwork", "Versus"),          OPTION_VERSUS_PATH },
+	{ N_p("selmenu-artwork", "Game Over"),       OPTION_GAMEOVER_PATH },
+	{ N_p("selmenu-artwork", "HowTo"),           OPTION_HOWTO_PATH },
+	{ N_p("selmenu-artwork", "Scores"),          OPTION_SCORES_PATH },
+	{ N_p("selmenu-artwork", "Select"),          OPTION_SELECT_PATH },
+	{ N_p("selmenu-artwork", "Marquee"),         OPTION_MARQUEES_PATH },
+	{ N_p("selmenu-artwork", "Covers"),          OPTION_COVER_PATH },
 };
 
 char const *const hover_msg[] = {
-	__("Add or remove favorites"),
-	__("Export displayed list to file"),
-	__("Show DATs view"),
+	N_("Add or remove favorites"),
+	N_("Export displayed list to file"),
+	N_("Show DATs view"),
 };
 
 
@@ -201,9 +201,6 @@ std::string menu_select_launch::reselect_last::s_driver;
 std::string menu_select_launch::reselect_last::s_software;
 std::string menu_select_launch::reselect_last::s_swlist;
 bool menu_select_launch::reselect_last::s_reselect = false;
-
-std::mutex menu_select_launch::s_cache_guard;
-menu_select_launch::cache_ptr_map menu_select_launch::s_caches;
 
 // instantiate possible variants of these so derived classes don't get link errors
 template bool menu_select_launch::select_bios(game_driver const &, bool);
@@ -514,7 +511,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_info_view(-1)
 	, m_items_list()
 	, m_info_buffer()
-	, m_cache()
+	, m_cache(mui.get_session_data<menu_select_launch, cache_wrapper>(machine()))
 	, m_is_swlist(is_swlist)
 	, m_focus(focused_menu::MAIN)
 	, m_pressed(false)
@@ -526,22 +523,6 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_image_view(FIRST_VIEW)
 	, m_flags(256)
 {
-	// set up persistent cache for machine run
-	{
-		std::lock_guard<std::mutex> guard(s_cache_guard);
-		auto const found(s_caches.find(&machine()));
-		if (found != s_caches.end())
-		{
-			assert(found->second);
-			m_cache = found->second;
-		}
-		else
-		{
-			m_cache = std::make_shared<cache>(machine());
-			s_caches.emplace(&machine(), m_cache);
-			add_cleanup_callback(&menu_select_launch::exit);
-		}
-	}
 }
 
 
@@ -663,12 +644,12 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 
 	// determine the text to render below
 	ui_software_info const *swinfo;
-	game_driver const *driver;
-	get_selection(swinfo, driver);
+	ui_system_info const *system;
+	get_selection(swinfo, system);
 
 	bool isstar = false;
 	rgb_t color = ui().colors().background_color();
-	if (swinfo && ((swinfo->startempty != 1) || !driver))
+	if (swinfo && !swinfo->startempty)
 	{
 		isstar = mame_machine_manager::instance()->favorite().is_favorite_system_software(*swinfo);
 
@@ -704,26 +685,29 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		// last line is romset name
 		tempbuf[4] = string_format(_("Software list/item: %1$s:%2$s"), swinfo->listname, swinfo->shortname);
 	}
-	else if (driver)
+	else if (system || (swinfo && swinfo->driver))
 	{
-		isstar = mame_machine_manager::instance()->favorite().is_favorite_system(*driver);
+		game_driver const &driver(system ? *system->driver : *swinfo->driver);
+		isstar = mame_machine_manager::instance()->favorite().is_favorite_system(driver);
 
-		// first line is game description/game name
-		tempbuf[0] = make_driver_description(*driver);
+		// first line is the ROM set
+		tempbuf[0] = string_format(_("Romset: %1$-.100s"), driver.name);
 
 		// next line is year, manufacturer
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver.year, driver.manufacturer);
 
 		// next line is clone/parent status
-		int cloneof = driver_list::non_bios_clone(*driver);
+		int cloneof = driver_list::non_bios_clone(driver);
 
-		if (cloneof != -1)
-			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).type.fullname());
-		else
+		if (0 > cloneof)
 			tempbuf[2] = _("Driver is parent");
+		else if (system)
+			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), system->parent);
+		else
+			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).type.fullname());
 
 		// next line is overall driver status
-		system_flags const &flags(get_system_flags(*driver));
+		system_flags const &flags(get_system_flags(driver));
 		if (flags.machine_flags() & machine_flags::NOT_WORKING)
 			tempbuf[3] = _("Overall: NOT WORKING");
 		else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
@@ -739,7 +723,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		else
 			tempbuf[4] = _("Graphics: OK, ");
 
-		if (driver->flags & machine_flags::NO_SOUND_HW)
+		if (driver.flags & machine_flags::NO_SOUND_HW)
 			tempbuf[4].append(_("Sound: None"));
 		else if (flags.unemulated_features() & device_t::feature::SOUND)
 			tempbuf[4].append(_("Sound: Unimplemented"));
@@ -852,19 +836,19 @@ void menu_select_launch::rotate_focus(int dir)
 void menu_select_launch::inkey_dats()
 {
 	ui_software_info const *software;
-	game_driver const *driver;
-	get_selection(software, driver);
+	ui_system_info const *system;
+	get_selection(software, system);
 	if (software)
 	{
 		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
 			menu::stack_push<menu_dats_view>(ui(), container(), software->driver);
-		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->usage.empty())
+		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->infotext.empty())
 			menu::stack_push<menu_dats_view>(ui(), container(), software);
 	}
-	else if (driver)
+	else if (system)
 	{
-		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), driver);
+		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", system->driver->name, true))
+			menu::stack_push<menu_dats_view>(ui(), container(), system->driver);
 	}
 }
 
@@ -1261,8 +1245,8 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	y1 += ui().box_tb_border();
 	y2 -= ui().box_tb_border();
 
-	texture_ptr_vector const &t_texture(m_is_swlist ? m_cache->sw_toolbar_texture() : m_cache->toolbar_texture());
-	bitmap_vector const &t_bitmap(m_is_swlist ? m_cache->sw_toolbar_bitmap() : m_cache->toolbar_bitmap());
+	texture_ptr_vector const &t_texture(m_is_swlist ? m_cache.sw_toolbar_texture() : m_cache.toolbar_texture());
+	bitmap_vector const &t_bitmap(m_is_swlist ? m_cache.sw_toolbar_bitmap() : m_cache.toolbar_bitmap());
 
 	auto const num_valid(std::count_if(std::begin(t_bitmap), std::end(t_bitmap), [](bitmap_argb32 const &e) { return e.valid(); }));
 
@@ -1300,7 +1284,7 @@ void menu_select_launch::draw_star(float x0, float y0)
 {
 	float y1 = y0 + ui().get_line_height();
 	float x1 = x0 + ui().get_line_height() * container().manager().ui_aspect(&container());
-	container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_cache->star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_cache.star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -1335,7 +1319,7 @@ void menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, flo
 void menu_select_launch::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
-	snaptext.assign(_(arts_info[m_image_view].first));
+	snaptext.assign(_("selmenu-artwork", arts_info[m_image_view].first));
 
 	// get search path
 	std::string addpath;
@@ -2253,12 +2237,12 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 void menu_select_launch::arts_render(float origx1, float origy1, float origx2, float origy2)
 {
 	ui_software_info const *software;
-	game_driver const *driver;
-	get_selection(software, driver);
+	ui_system_info const *system;
+	get_selection(software, system);
 
-	if (software && (!software->startempty || !driver))
+	if (software && (!software->startempty || !system))
 	{
-		m_cache->set_snapx_driver(nullptr);
+		m_cache.set_snapx_driver(nullptr);
 
 		if (m_default_image)
 			m_image_view = (software->startempty == 0) ? SNAPSHOT_VIEW : CABINETS_VIEW;
@@ -2267,7 +2251,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (!m_cache->snapx_software_is(software) || !snapx_valid() || m_switch_image)
+		if (!m_cache.snapx_software_is(software) || !snapx_valid() || m_switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
@@ -2287,7 +2271,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 					load_image(tmp_bitmap, snapfile, util::path_concat(software->driver->name + software->part, software->shortname));
 			}
 
-			m_cache->set_snapx_software(software);
+			m_cache.set_snapx_software(software);
 			m_switch_image = false;
 			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
@@ -2295,23 +2279,23 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		// if the image is available, loaded and valid, display it
 		draw_snapx(origx1, origy1, origx2, origy2);
 	}
-	else if (driver)
+	else if (system)
 	{
-		m_cache->set_snapx_software(nullptr);
+		m_cache.set_snapx_software(nullptr);
 
 		if (m_default_image)
-			m_image_view = ((driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
+			m_image_view = ((system->driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
 
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (!m_cache->snapx_driver_is(driver) || !snapx_valid() || m_switch_image)
+		if (!m_cache.snapx_driver_is(system->driver) || !snapx_valid() || m_switch_image)
 		{
 			emu_file snapfile(searchstr, OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
-			load_driver_image(tmp_bitmap, snapfile, *driver);
+			load_driver_image(tmp_bitmap, snapfile, *system->driver);
 
-			m_cache->set_snapx_driver(driver);
+			m_cache.set_snapx_driver(system->driver);
 			m_switch_image = false;
 			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
@@ -2340,7 +2324,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 	{
 		float text_length;
 		ui().draw_text_full(container(),
-				_(arts_info[x].first), origx1, origy1, origx2 - origx1,
+				_("selmenu-artwork", arts_info[x].first), origx1, origy1, origx2 - origx1,
 				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
 				&text_length, nullptr);
 		title_size = (std::max)(text_length + 0.01f, title_size);
@@ -2389,7 +2373,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 	if (!tmp_bitmap.valid())
 	{
 		tmp_bitmap.allocate(256, 256);
-		const bitmap_argb32 &src(m_cache->no_avail_bitmap());
+		const bitmap_argb32 &src(m_cache.no_avail_bitmap());
 		for (int x = 0; x < 256; x++)
 		{
 			for (int y = 0; y < 256; y++)
@@ -2398,7 +2382,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 		no_available = true;
 	}
 
-	bitmap_argb32 &snapx_bitmap(m_cache->snapx_bitmap());
+	bitmap_argb32 &snapx_bitmap(m_cache.snapx_bitmap());
 	if (tmp_bitmap.valid())
 	{
 		float panel_width = origx2 - origx1 - 0.02f;
@@ -2459,7 +2443,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 				snapx_bitmap.pix(y + y1, x + x1) = dest_bitmap.pix(y, x);
 
 		// apply bitmap
-		m_cache->snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
+		m_cache.snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
 	}
 	else
 	{
@@ -2484,7 +2468,7 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		float const y2 = origy2 - ui().box_tb_border() - line_height;
 
 		// apply texture
-		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache.snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 }
 
@@ -2598,13 +2582,6 @@ bool menu_select_launch::has_multiple_bios(game_driver const &driver, s_bios &bi
 }
 
 
-void menu_select_launch::exit(running_machine &machine)
-{
-	std::lock_guard<std::mutex> guard(s_cache_guard);
-	s_caches.erase(&machine);
-}
-
-
 //-------------------------------------------------
 //  draw collapsed left panel
 //-------------------------------------------------
@@ -2648,14 +2625,14 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	std::vector<int> xend;
 	const char *first = "";
 	ui_software_info const *software;
-	game_driver const *driver;
+	ui_system_info const *system;
 	int total;
-	get_selection(software, driver);
+	get_selection(software, system);
 
-	if (software && (!software->startempty || !driver))
+	if (software && (!software->startempty || !system))
 	{
 		m_info_driver = nullptr;
-		first = __("Usage");
+		first = N_("Software List Info");
 
 		if ((m_info_software != software) || (m_info_view != ui_globals::cur_sw_dats_view))
 		{
@@ -2677,7 +2654,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 
 			if (m_info_view == 0)
 			{
-				m_info_buffer = software->usage;
+				m_info_buffer = software->infotext;
 			}
 			else
 			{
@@ -2687,31 +2664,33 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		}
 		total = ui_globals::cur_sw_dats_total;
 	}
-	else if (driver)
+	else if (system)
 	{
 		m_info_software = nullptr;
-		first = __("General Info");
+		first = N_("General Info");
 
-		if (driver != m_info_driver || ui_globals::curdats_view != m_info_view)
+		if (system->driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{
 			m_info_buffer.clear();
-			if (driver == m_info_driver)
+			if (system->driver == m_info_driver)
 			{
 				m_info_view = ui_globals::curdats_view;
 			}
 			else
 			{
-				m_info_driver = driver;
+				m_info_driver = system->driver;
 				m_info_view = 0;
 				ui_globals::curdats_view = 0;
 
 				m_items_list.clear();
-				mame_machine_manager::instance()->lua()->call_plugin("data_list", driver->name, m_items_list);
+				mame_machine_manager::instance()->lua()->call_plugin("data_list", system->driver->name, m_items_list);
 				ui_globals::curdats_total = m_items_list.size() + 1;
 			}
 
 			if (m_info_view == 0)
-				general_info(driver, m_info_buffer);
+			{
+				general_info(*system, m_info_buffer);
+			}
 			else
 			{
 				m_info_buffer = "";
@@ -2731,13 +2710,13 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float const ud_arrow_width = line_height * aspect;
 	float oy1 = origy1 + line_height;
 
-	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_(first)));
+	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_("selmenu-artwork", first)));
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_(first)));
+		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_("selmenu-artwork", first)));
 		float txt_length(0.0f);
 		ui().draw_text_full(
 				container(), name,

@@ -114,6 +114,8 @@
 
 #pragma once
 
+#include "abi.h"
+
 #include <any>
 #include <cassert>
 #include <cstddef>
@@ -143,35 +145,21 @@
 	#if defined(__MINGW32__) && !defined(__x86_64__) && defined(__i386__)
 		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 		//#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
-		//#define MAME_DELEGATE_MEMBER_ABI __thiscall
 		//#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 1
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
 		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 	#else
 		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
-		#define MAME_DELEGATE_MEMBER_ABI
 		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 	#endif
 #elif defined(_MSC_VER) && (defined(_M_X64) || defined(_M_ARM64))
-	#define MAME_DELEGATE_MEMBER_ABI
 	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_MSVC
 #else
 	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 #endif
 
-#if defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__)
-	#define MAME_DELEGATE_ITANIUM_ARM 1
-#elif defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64)
-	#define MAME_DELEGATE_ITANIUM_ARM 1
-#elif defined(__EMSCRIPTEN__)
-	#define MAME_DELEGATE_ITANIUM_ARM 1
-#else
-	#define MAME_DELEGATE_ITANIUM_ARM 0
-#endif
-
 #if MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
-	#define MAME_DELEGATE_MEMBER_ABI
 	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 #endif
 
@@ -359,7 +347,7 @@ ReturnType delegate_mfp_compatible::method_stub(delegate_generic_class *object, 
 ///
 /// Supports the two most popular pointer to member function
 /// implementations described in the Itanium C++ ABI.  Both of these
-/// consist of a pointer followed by a pointer followed by a ptrdiff_t.
+/// consist of a pointer followed by a ptrdiff_t.
 ///
 /// The first variant is used when member the least significant bit of a
 /// member function pointer need never be set and vtable entry offsets
@@ -367,8 +355,8 @@ ReturnType delegate_mfp_compatible::method_stub(delegate_generic_class *object, 
 /// it is a conventional function pointer to the member function.  If
 /// the pointer is odd, it is a byte offset into the vtable plus one.
 /// The ptrdiff_t is a byte offset to add to the this pointer.  A null
-/// member function pointer is represented by setting the pointer to
-/// a null pointer.
+/// member function pointer is represented by setting the pointer to a
+/// null pointer.
 ///
 /// The second variant is used when the least significant bit of a
 /// pointer to a member function may need to be set or it may not be
@@ -408,7 +396,7 @@ public:
 
 	bool isnull() const
 	{
-		if (MAME_DELEGATE_ITANIUM_ARM)
+		if (MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM)
 			return !reinterpret_cast<void (*)()>(m_function) && !(m_this_delta & 1);
 		else
 			return !reinterpret_cast<void (*)()>(m_function);
@@ -690,7 +678,7 @@ public:
 	// define our traits
 	template <class FunctionClass> using traits = delegate_traits<FunctionClass, ReturnType, Params...>;
 	using generic_static_func = typename traits<delegate_generic_class>::static_func_type;
-	typedef MAME_DELEGATE_MEMBER_ABI generic_static_func generic_member_func;
+	typedef MAME_ABI_CXX_MEMBER_CALL generic_static_func generic_member_func;
 
 	// generic constructor
 	delegate_base() = default;
