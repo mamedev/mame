@@ -853,21 +853,20 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 				});
 	}
 
-	item_append(menu_item_type::SEPARATOR, FLAGS_UI);
-
 	// add special items
 	if (stack_has_special_main_menu())
 	{
+		item_append(menu_item_type::SEPARATOR, FLAGS_UI);
 		item_append(_("Configure Options"), FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
 		item_append(_("Configure Machine"), FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
-		skip_main_items = 2;
+		skip_main_items = 3;
 	}
 	else
 		skip_main_items = 0;
 
 	// configure the custom rendering
 	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 5.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	custombottom = 4.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
@@ -1287,194 +1286,6 @@ void menu_select_game::populate_search()
 			m_searchlist.begin(),
 			m_searchlist.end(),
 			[] (auto const &lhs, auto const &rhs) { return lhs.first < rhs.first; });
-}
-
-//-------------------------------------------------
-//  generate general info
-//-------------------------------------------------
-
-void menu_select_game::general_info(ui_system_info const &system, std::string &buffer)
-{
-	game_driver const &driver(*system.driver);
-	system_flags const &flags(get_system_flags(driver));
-	std::ostringstream str;
-
-	str << "#j2\n";
-
-	util::stream_format(str, _("Romset\t%1$-.100s\n"), driver.name);
-	util::stream_format(str, _("Year\t%1$s\n"), driver.year);
-	util::stream_format(str, _("Manufacturer\t%1$-.100s\n"), driver.manufacturer);
-
-	int cloneof = driver_list::non_bios_clone(driver);
-	if (cloneof != -1)
-		util::stream_format(str, _("Driver is Clone of\t%1$-.100s\n"), system.parent);
-	else
-		str << _("Driver is Parent\t\n");
-
-	if (flags.has_analog())
-		str << _("Analog Controls\tYes\n");
-	if (flags.has_keyboard())
-		str << _("Keyboard Inputs\tYes\n");
-
-	if (flags.machine_flags() & machine_flags::NOT_WORKING)
-		str << _("Overall\tNOT WORKING\n");
-	else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
-		str << _("Overall\tUnemulated Protection\n");
-	else
-		str << _("Overall\tWorking\n");
-
-	if (flags.unemulated_features() & device_t::feature::GRAPHICS)
-		str << _("Graphics\tUnimplemented\n");
-	else if (flags.unemulated_features() & device_t::feature::PALETTE)
-		str << _("Graphics\tWrong Colors\n");
-	else if (flags.imperfect_features() & device_t::feature::PALETTE)
-		str << _("Graphics\tImperfect Colors\n");
-	else if (flags.imperfect_features() & device_t::feature::GRAPHICS)
-		str << _("Graphics\tImperfect\n");
-	else
-		str << _("Graphics\tOK\n");
-
-	if (flags.machine_flags() & machine_flags::NO_SOUND_HW)
-		str << _("Sound\tNone\n");
-	else if (flags.unemulated_features() & device_t::feature::SOUND)
-		str << _("Sound\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::SOUND)
-		str << _("Sound\tImperfect\n");
-	else
-		str << _("Sound\tOK\n");
-
-	if (flags.unemulated_features() & device_t::feature::CAPTURE)
-		str << _("Capture\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::CAPTURE)
-		str << _("Capture\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::CAMERA)
-		str << _("Camera\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::CAMERA)
-		str << _("Camera\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::MICROPHONE)
-		str << _("Microphone\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::MICROPHONE)
-		str << _("Microphone\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::CONTROLS)
-		str << _("Controls\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::CONTROLS)
-		str << _("Controls\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::KEYBOARD)
-		str << _("Keyboard\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::KEYBOARD)
-		str << _("Keyboard\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::MOUSE)
-		str << _("Mouse\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::MOUSE)
-		str << _("Mouse\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::MEDIA)
-		str << _("Media\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::MEDIA)
-		str << _("Media\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::DISK)
-		str << _("Disk\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::DISK)
-		str << _("Disk\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::PRINTER)
-		str << _("Printer\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::PRINTER)
-		str << _("Printer\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::TAPE)
-		str << _("Mag. Tape\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::TAPE)
-		str << _("Mag. Tape\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::PUNCH)
-		str << _("Punch Tape\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::PUNCH)
-		str << _("Punch Tape\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::DRUM)
-		str << _("Mag. Drum\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::DRUM)
-		str << _("Mag. Drum\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::ROM)
-		str << _("(EP)ROM\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::ROM)
-		str << _("(EP)ROM\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::COMMS)
-		str << _("Communications\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::COMMS)
-		str << _("Communications\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::LAN)
-		str << _("LAN\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::LAN)
-		str << _("LAN\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::WAN)
-		str << _("WAN\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::WAN)
-		str << _("WAN\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::TIMING)
-		str << _("Timing\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::TIMING)
-		str << _("Timing\tImperfect\n");
-
-	str << ((flags.machine_flags() & machine_flags::MECHANICAL)        ? _("Mechanical Machine\tYes\n")         : _("Mechanical Machine\tNo\n"));
-	str << ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK)  ? _("Requires Artwork\tYes\n")           : _("Requires Artwork\tNo\n"));
-	str << ((flags.machine_flags() & machine_flags::CLICKABLE_ARTWORK) ? _("Requires Clickable Artwork\tYes\n") : _("Requires Clickable Artwork\tNo\n"));
-	if (flags.machine_flags() & machine_flags::NO_COCKTAIL)
-		str << _("Support Cocktail\tNo\n");
-	str << ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT)      ? _("Driver is BIOS\tYes\n")             : _("Driver is BIOS\tNo\n"));
-	str << ((flags.machine_flags() & machine_flags::SUPPORTS_SAVE)     ? _("Support Save\tYes\n")               : _("Support Save\tNo\n"));
-	str << ((flags.machine_flags() & ORIENTATION_SWAP_XY)              ? _("Screen Orientation\tVertical\n")    : _("Screen Orientation\tHorizontal\n"));
-	bool found = false;
-	for (romload::region const &region : romload::entries(driver.rom).get_regions())
-	{
-		if (region.is_diskdata())
-		{
-			found = true;
-			break;
-		}
-	}
-	str << (found ? _("Requires CHD\tYes\n") : _("Requires CHD\tNo\n"));
-
-	// audit the game first to see if we're going to work
-	if (ui().options().info_audit())
-	{
-		driver_enumerator enumerator(machine().options(), driver);
-		enumerator.next();
-		media_auditor auditor(enumerator);
-		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
-		media_auditor::summary summary_samples = auditor.audit_samples();
-
-		// if everything looks good, schedule the new driver
-		if (audit_passed(summary))
-			str << _("ROM Audit Result\tOK\n");
-		else
-			str << _("ROM Audit Result\tBAD\n");
-
-		if (summary_samples == media_auditor::NONE_NEEDED)
-			str << _("Samples Audit Result\tNone Needed\n");
-		else if (audit_passed(summary_samples))
-			str << _("Samples Audit Result\tOK\n");
-		else
-			str << _("Samples Audit Result\tBAD\n");
-	}
-	else
-	{
-		str << _("ROM Audit \tDisabled\nSamples Audit \tDisabled\n");
-	}
-
-	buffer = str.str();
 }
 
 

@@ -201,10 +201,10 @@ private:
 		bitmap_argb32 &no_avail_bitmap() { return m_no_avail_bitmap; }
 		render_texture *star_texture() { return m_star_texture.get(); }
 
-		bitmap_vector const &toolbar_bitmap() { return m_toolbar_bitmap; }
-		bitmap_vector const &sw_toolbar_bitmap() { return m_sw_toolbar_bitmap; }
-		texture_ptr_vector const &toolbar_texture() { return m_toolbar_texture; }
-		texture_ptr_vector const &sw_toolbar_texture() { return m_sw_toolbar_texture; }
+		bitmap_vector const &toolbar_bitmaps() { return m_toolbar_bitmaps; }
+		texture_ptr_vector const &toolbar_textures() { return m_toolbar_textures; }
+
+		void cache_toolbar(running_machine &machine, float width, float height);
 
 	private:
 		bitmap_ptr              m_snapx_bitmap;
@@ -216,10 +216,8 @@ private:
 		bitmap_argb32           m_star_bitmap;
 		texture_ptr             m_star_texture;
 
-		bitmap_vector           m_toolbar_bitmap;
-		bitmap_vector           m_sw_toolbar_bitmap;
-		texture_ptr_vector      m_toolbar_texture;
-		texture_ptr_vector      m_sw_toolbar_texture;
+		bitmap_vector           m_toolbar_bitmaps;
+		texture_ptr_vector      m_toolbar_textures;
 	};
 
 	// this is to satisfy the std::any requirement that objects be copyable
@@ -246,7 +244,7 @@ private:
 
 	// draw infos
 	void infos_render(float x1, float y1, float x2, float y2);
-	virtual void general_info(ui_system_info const &system, std::string &buffer) = 0;
+	void general_info(ui_system_info const *system, game_driver const &driver, std::string &buffer);
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, ui_system_info const *&system) const = 0;

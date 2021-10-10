@@ -581,11 +581,10 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 				m_displaylist[curitem].get().parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&m_displaylist[curitem].get());
 	}
 
-	item_append(menu_item_type::SEPARATOR, flags_ui);
-
 	// configure the custom rendering
+	skip_main_items = 0;
 	customtop = 4.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 5.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
+	custombottom = 4.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
 
 	if (old_software != -1)
 	{

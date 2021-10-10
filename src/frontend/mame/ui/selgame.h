@@ -82,9 +82,6 @@ private:
 	bool load_available_machines();
 	void load_custom_filters();
 
-	// General info
-	virtual void general_info(ui_system_info const &system, std::string &buffer) override;
-
 	// handlers
 	void inkey_select(const event *menu_event);
 	void inkey_select_favorite(const event *menu_event);

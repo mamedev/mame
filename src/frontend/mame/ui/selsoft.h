@@ -65,8 +65,6 @@ private:
 	// handlers
 	void inkey_select(const event *menu_event);
 
-	virtual void general_info(ui_system_info const &system, std::string &buffer) override { }
-
 	std::map<std::string, std::string>  m_icon_paths;
 	char const *const                   m_description;
 	game_driver const                   &m_driver;
