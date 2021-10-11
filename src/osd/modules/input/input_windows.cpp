@@ -156,10 +156,6 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 				entry.configure_osd("POST_PROCESS", "Toggle Post-Processing");
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LALT, KEYCODE_LCONTROL);
 				break;
-			// add a NOT-lctrl-lalt to our default F5
-			case IPT_UI_TOGGLE_DEBUG: // emu/input.c: input_seq(KEYCODE_F5)
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LALT);
-				break;
 
 			// leave everything else alone
 			default:

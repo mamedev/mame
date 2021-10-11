@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
@@ -10,11 +10,6 @@ import sys
 import xml.sax
 import xml.sax.saxutils
 import zlib
-
-
-# workaround for version incompatibility
-if sys.version_info > (3, ):
-    long = int
 
 
 class ErrorHandler(object):
@@ -347,7 +342,7 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element mamelayout missing attribute version')
             else:
                 try:
-                    long(attrs['version'])
+                    int(attrs['version'])
                 except:
                     self.handleError('Element mamelayout attribute version "%s" is not an integer' % (attrs['version'], ))
             self.have_script = None

@@ -13840,6 +13840,7 @@ kishona                         //
 @source:fidel_csc.cpp
 csc                             //
 csce                            //
+cscet                           //
 reversic                        //
 super9cc                        //
 
@@ -20119,6 +20120,9 @@ luckybalb                       // (c) 1996 Sielcon Games
 luckybalc                       // (c) 1996 Sielcon Games
 luckybald                       // (c) 1996 Sielcon Games
 luckybale                       // (c) 1996 Sielcon Games
+
+@source:luna_68k.cpp
+luna                            // Omron Luna
 
 @source:lvcards.cpp
 lvcards                         // (c) 1985 Tehkan
@@ -39642,6 +39646,7 @@ mtrainnv                        // (c) 1996 Subsino
 sharkpy                         // (c) 1996 Subsino
 sharkpya                        // (c) 1996 Subsino
 sharkpye                        // (c) 1996 Subsino (Alpha license)
+smoto13                         // (c) 1996 Subsino
 smoto16                         // (c) 1996 Subsino
 smoto20                         // (c) 1996 Subsino
 stbsub                          // (c) 1995 Subsino (Alpha license)

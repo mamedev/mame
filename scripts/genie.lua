@@ -435,7 +435,7 @@ else
 	LIBTYPE = "StaticLib"
 end
 
-PYTHON = "python"
+PYTHON = "python3"
 
 if _OPTIONS["PYTHON_EXECUTABLE"]~=nil then
 	PYTHON = _OPTIONS["PYTHON_EXECUTABLE"]

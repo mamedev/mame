@@ -32,10 +32,10 @@ static std::regex s_potential_softlist_regex("\\w+(\\:\\w+)*");
 //**************************************************************************
 
 //-------------------------------------------------
-//  feature_list_item - constructor
+//  software_info_item - constructor
 //-------------------------------------------------
 
-feature_list_item::feature_list_item(const std::string &name, const std::string &value) :
+software_info_item::software_info_item(const std::string &name, const std::string &value) :
 	m_name(name),
 	m_value(value)
 {
@@ -43,10 +43,10 @@ feature_list_item::feature_list_item(const std::string &name, const std::string 
 
 
 //-------------------------------------------------
-//  feature_list_item - constructor
+//  software_info_item - constructor
 //-------------------------------------------------
 
-feature_list_item::feature_list_item(std::string &&name, std::string &&value) :
+software_info_item::software_info_item(std::string &&name, std::string &&value) :
 	m_name(std::move(name)),
 	m_value(std::move(value))
 {
@@ -77,14 +77,8 @@ software_part::software_part(software_info &info, std::string &&name, std::strin
 const char *software_part::feature(std::string_view feature_name) const noexcept
 {
 	// scan the feature list for an entry matching feature_name and return the value
-	auto iter = std::find_if(
-			m_featurelist.begin(),
-			m_featurelist.end(),
-			[&feature_name] (const feature_list_item &feature) { return feature.name() == feature_name; });
-
-	return iter != m_featurelist.end()
-		? iter->value().c_str()
-		: nullptr;
+	auto const iter = m_features.find(feature_name);
+	return (iter != m_features.end()) ? iter->value().c_str() : nullptr;
 }
 
 
@@ -192,7 +186,7 @@ class softlist_parser
 public:
 	// construction (== execution)
 	softlist_parser(
-			util::random_read &file,
+			util::read_stream &file,
 			std::string_view filename,
 			std::string &listname,
 			std::string &description,
@@ -261,7 +255,7 @@ private:
 //-------------------------------------------------
 
 softlist_parser::softlist_parser(
-		util::random_read &file,
+		util::read_stream &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
@@ -290,7 +284,6 @@ softlist_parser::softlist_parser(
 	XML_SetCharacterDataHandler(m_parser, &softlist_parser::data_handler);
 
 	// parse the file contents
-	file.seek(0, SEEK_SET);
 	char buffer[1024];
 	for (bool done = false; !done; )
 	{
@@ -582,7 +575,7 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 void softlist_parser::parse_main_end(const char *tagname)
 {
 	if (strcmp(tagname, "notes") == 0)
-		m_notes = m_data_accum;
+		m_notes = std::move(m_data_accum);
 }
 
 
@@ -622,7 +615,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		std::string infoname, infovalue;
 
 		if (parse_name_and_value(attributes, infoname, infovalue))
-			m_current_info->m_other_info.emplace_back(std::move(infoname), std::move(infovalue));
+			m_current_info->m_info.emplace_back(std::move(infoname), std::move(infovalue));
 		else
 			parse_error("Incomplete other_info definition");
 	}
@@ -633,9 +626,14 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		std::string featname, featvalue;
 
 		if (parse_name_and_value(attributes, featname, featvalue))
-			m_current_info->m_shared_info.emplace_back(std::move(featname), std::move(featvalue));
+		{
+			if (!m_current_info->m_shared_features.emplace(std::move(featname), std::move(featvalue)).second)
+				parse_error("Duplicate sharedfeat name");
+		}
 		else
+		{
 			parse_error("Incomplete sharedfeat definition");
+		}
 	}
 
 	// <part name='' interface=''>
@@ -731,9 +729,14 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 		std::string featname, featvalue;
 
 		if (parse_name_and_value(attributes, featname, featvalue))
-			m_current_part->m_featurelist.emplace_back(std::move(featname), std::move(featvalue));
+		{
+			if (!m_current_part->m_features.emplace(std::move(featname), std::move(featvalue)).second)
+				parse_error("Duplicate feature name");
+		}
 		else
+		{
 			parse_error("Incomplete feature definition");
+		}
 	}
 
 	// <dipswitch>
@@ -871,19 +874,19 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 	// <description>
 	if (strcmp(tagname, "description") == 0)
-		m_current_info->m_longname = m_data_accum;
+		m_current_info->m_longname = std::move(m_data_accum);
 
 	// <year>
 	else if (strcmp(tagname, "year") == 0)
-		m_current_info->m_year = m_data_accum;
+		m_current_info->m_year = std::move(m_data_accum);
 
 	// <publisher>
 	else if (strcmp(tagname, "publisher") == 0)
-		m_current_info->m_publisher = m_data_accum;
+		m_current_info->m_publisher = std::move(m_data_accum);
 
 	// <notes>
 	else if (strcmp(tagname, "notes") == 0)
-		m_current_info->m_notes = m_data_accum;
+		m_current_info->m_notes = std::move(m_data_accum);
 
 	// </part>
 	else if (strcmp(tagname, "part") == 0)
@@ -897,11 +900,10 @@ void softlist_parser::parse_soft_end(const char *tagname)
 		if (!m_current_part->m_romdata.empty())
 			add_rom_entry("", "", 0, 0, ROMENTRYTYPE_END);
 
-		// get the info; if present, copy shared data (we assume name/value strings live
-		// in the string pool and don't need to be reallocated)
+		// get the info; if present, copy shared data
 		if (m_current_info != nullptr)
-			for (const feature_list_item &item : m_current_info->shared_info())
-				m_current_part->m_featurelist.emplace_back(item.name(), item.value());
+			for (const software_info_item &item : m_current_info->shared_features())
+				m_current_part->m_features.emplace(item.name(), item.value());
 	}
 }
 
@@ -909,7 +911,7 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 
 void parse_software_list(
-		util::random_read &file,
+		util::read_stream &file,
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,

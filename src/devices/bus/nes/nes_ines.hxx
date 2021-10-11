@@ -302,7 +302,7 @@ static const nes_mmc mmc_list[] =
 	{ 264, YOKO_BOARD },
 	{ 265, BMC_T262 },
 	{ 266, UNL_CITYFIGHT },
-	{ 267, BMC_FCGENJIN_8IN1 },
+	{ 267, BMC_EL861121C },
 	// 268 COOLBOY and MINDKIDS
 	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
 	// 270 multicarts on OneBus Famiclones
@@ -348,7 +348,7 @@ static const nes_mmc mmc_list[] =
 	// 310 variant of mapper 125?
 	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
 	{ 312, KAISER_KS7013B },       // Highway Star Kaiser bootleg
-	{ 313, BMC_RESETTXROM0 },
+	{ 313, BMC_RESETTXROM },
 	{ 314, BMC_64IN1NR },
 	// 315 820732C and 830134C multicarts, not in nes.xml?
 	// 316 Unused
@@ -357,7 +357,7 @@ static const nes_mmc mmc_list[] =
 	{ 319, BMC_HP898F },
 	{ 320, BMC_830425C },
 	// 321 duplicate of 287?
-	// 322 BMC-K-3033 35-in-1, related to mc_35?
+	{ 322, BMC_K3033 },
 	{ 323, FARID_SLROM8IN1 },      // homebrew 8-in-1
 	{ 324, FARID_UNROM8IN1 },      // homebrew 8-in-1
 	{ 325, UNL_MALISB },           // Super Mali Splash Bomb pirate hack
@@ -388,7 +388,7 @@ static const nes_mmc mmc_list[] =
 	// { 350, BMC_891227 }, not in nes.xml
 	{ 351, BMC_TECHLINE9IN1 },
 	{ 352, KAISER_KS106C },        // 4-in-1
-	// 353 Super Mario Family multicart
+	{ 353, BMC_810305C },          // Super Mario Family multicart
 	// 354 250-in-1 multicart with FDS Bubble Bobble
 	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
 	// 356 7-in-1 Rockman (JY-208)
@@ -405,17 +405,17 @@ static const nes_mmc mmc_list[] =
 	// 367 7-in-1 cart that is a close variant of mapper 205
 	{ 368, BTL_YUNG08 },            // SMB2 FDS conversion
 	// 369 Super Mario Bros Party multicart
-	// 370 Golden Mario Party II multicart
+	{ 370, BMC_F600 },              // Golden Mario Party II multicart
 	// 371 Spanish PEC-586 computer main cart
 	// 372 Rockman 1-6 multicart very close to mapper 45
 	// 373 Super 4-in-1, not in nes.xml?
 	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
 	{ 376, BMC_YY841155C },
-	// 377 JY-111 multicart, similar to mapper 367
+	{ 377, BMC_EL860947C },
 	// 378 8-in-1 multicart, which one?
 	// 379 35-in-1 multicart, similar to mapper 38
-	// 380 970630C multicart
+	{ 380, BMC_970630C },
 	{ 381, UNL_KN42 },             // 2-in-1 Big Nose games
 	{ 382, BMC_830928C },
 	// 383 JY-014 multicart
@@ -466,9 +466,9 @@ static const nes_mmc mmc_list[] =
 	// 428 a couple multicarts
 	// 429 Unused
 	// 430 Unused
-	// 431 Realtec GN-91B
+	{ 431, BMC_GN91B },
 	// 432 Realtec 8090
-	// 433 NC-20MB 20 in 1 (CA-006)
+	{ 433, BMC_NC20MB },
 	// 434 S-009
 	{ 435, NTDEC_2746 },
 	// 436...442 Unused
@@ -479,7 +479,7 @@ static const nes_mmc mmc_list[] =
 	{ 513, SACHEN_SA9602B },
 	// 514 seems to be for skaraok, currently set to UNKNOWN in nes.xml
 	// 515 Korean Family Noraebang karaoke cart with expansion cart, mic, and YM2413!
-	// 516 is this for brillco2 and another related title not in nes.xml?
+	{ 516, COCOMA_BOARD },
 	// 517 another Korean karaoke cart with mic
 	// 518 Subor UNL-DANCE2000 and a few others
 	{ 519, UNL_EH8813A },          // Dr Mario II Chinese pirate
@@ -505,7 +505,7 @@ static const nes_mmc mmc_list[] =
 	// 540 for mstrfgt6 in nes.xml or a variant of it not in nes.xml?
 	{ 541, BMC_LITTLECOM160 },
 	// 542 Chairman Mao's 100th anniversary cart? You've got to be kidding me.
-	// 543 5 in 1 (CH-501) multicart, not in nes.xml?
+	{ 543, BMC_SRPG_5IN1 },
 	// 544 another alt of sango2ht/sanguo2a?
 	// 545 4 in 1 (ST-80) multicart, not in nes.xml?
 	// 546 10 in 1 Tenchi wo Kurau multicart, not in nes.xml?
@@ -748,6 +748,32 @@ void nes_cart_slot_device::call_load_ines()
 			submapper = 0;
 			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
 		}
+		// 313: BMC RESET-TXROM
+		else if (mapper == 313)
+		{
+			if (submapper == 0)
+			{
+				m_cart->set_outer_prg_size(128);
+				m_cart->set_outer_chr_size(128);
+			}
+			else if (submapper == 1)
+			{
+				m_cart->set_outer_prg_size(256);
+				m_cart->set_outer_chr_size(128);
+			}
+			else if (submapper == 2)
+			{
+				m_cart->set_outer_prg_size(128);
+				m_cart->set_outer_chr_size(256);
+			}
+			else if (submapper == 3)
+			{
+				m_cart->set_outer_prg_size(256);
+				m_cart->set_outer_chr_size(256);
+			}
+			else
+				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
+		}
 		else if (submapper)
 		{
 			submapper = 0;
@@ -937,15 +963,6 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = RCM_GS2013;
 			break;
 
-		case BMC_RESETTXROM0:
-			if (submapper == 1)
-				m_pcb_id = BMC_RESETTXROM1;
-			else if (submapper == 2)
-				m_pcb_id = BMC_RESETTXROM2;
-			else if (submapper > 2)
-				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
-			break;
-
 		case HES_BOARD:
 			if (crc_hack)
 				m_cart->set_pcb_ctrl_mirror(true);    // Mapper 113 is used for 2 diff boards
@@ -999,7 +1016,16 @@ void nes_cart_slot_device::call_load_ines()
 		case NAMCOT_163:
 			mapper_sram_size = m_cart->get_mapper_sram_size();
 			break;
-			//FIXME: we also have to fix Action 52 PRG loading somewhere...
+
+		case BMC_EL860947C:
+			m_cart->set_outer_prg_size(128);
+			break;
+
+		case BMC_EL861121C:
+			m_cart->set_outer_prg_size(256);
+			break;
+
+		//FIXME: we also have to fix Action 52 PRG loading somewhere...
 
 		case BANDAI_DATACH:
 			fatalerror("Bandai Datach games have to be mounted in the Datach subslot!\n");
@@ -1282,13 +1308,6 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		case RCM_GS2004:                               // Mapper 283 is used for 2 diff boards
 			if (ROM[4] >= 20)
 				pcb_id = RCM_GS2013;
-			break;
-
-		case BMC_RESETTXROM0:                          // Mapper 313 is used for 3 diff boards
-			if (submapper == 1)
-				pcb_id = BMC_RESETTXROM1;
-			if (submapper == 2)
-				pcb_id = BMC_RESETTXROM2;
 			break;
 	}
 

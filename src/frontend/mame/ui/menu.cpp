@@ -78,7 +78,6 @@ bool menu::exclusive_input_pressed(int &iptkey, int key, int repeat)
 menu::global_state::global_state(running_machine &machine, ui_options const &options)
 	: widgets_manager(machine)
 	, m_machine(machine)
-	, m_cleanup_callbacks()
 	, m_bgrnd_bitmap()
 	, m_bgrnd_texture(nullptr, machine.render())
 	, m_stack()
@@ -120,15 +119,6 @@ menu::global_state::~global_state()
 
 	stack_reset();
 	clear_free_list();
-
-	for (auto const &callback : m_cleanup_callbacks)
-		callback(m_machine);
-}
-
-
-void menu::global_state::add_cleanup_callback(cleanup_callback &&callback)
-{
-	m_cleanup_callbacks.emplace_back(std::move(callback));
 }
 
 
@@ -240,6 +230,7 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_visible_items(0)
 	, m_global_state(get_global_state(mui.machine()))
 	, m_special_main_menu(false)
+	, m_needs_prev_menu_item(true)
 	, m_ui(mui)
 	, m_container(container)
 	, m_parent()
@@ -331,12 +322,9 @@ void menu::item_append(menu_item_type type, uint32_t flags)
 
 void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
 {
-	// only allow multiline as the first item
-	if ((flags & FLAG_MULTILINE) != 0)
+	if ((flags & FLAG_MULTILINE) != 0) // only allow multiline as the first item
 		assert(m_items.size() == 1);
-
-	// only allow a single multi-line item
-	else if (m_items.size() >= 2)
+	else if (m_items.size() >= 2) // only allow a single multi-line item
 		assert((m_items[0].flags & FLAG_MULTILINE) == 0);
 
 	// allocate a new item and populate it
@@ -349,7 +337,7 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 
 	// append to array
 	auto index = m_items.size();
-	if (!m_items.empty())
+	if (!m_items.empty() && m_needs_prev_menu_item)
 	{
 		m_items.emplace(m_items.end() - 1, std::move(pitem));
 		--index;
@@ -902,7 +890,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 			{
 				m_selected = m_hover;
 				ev.iptkey = IPT_UI_SELECT;
-				if (is_last_selected())
+				if (is_last_selected() && m_needs_prev_menu_item)
 				{
 					ev.iptkey = IPT_UI_CANCEL;
 					stack_pop();
@@ -986,7 +974,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	// if we hit select, return true or pop the stack, depending on the item
 	if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 	{
-		if (is_last_selected())
+		if (is_last_selected() && m_needs_prev_menu_item)
 		{
 			iptkey = IPT_UI_CANCEL;
 			stack_pop();
@@ -1172,27 +1160,8 @@ void menu::do_handle()
 	if (m_items.empty())
 	{
 		// add an item to return - this is a really hacky way of doing this
-		if (!m_parent)
-		{
-			if (machine().phase() == machine_phase::INIT)
-				item_append(_("Start Machine"), 0, nullptr);
-			else
-				item_append(_("Return to Machine"), 0, nullptr);
-		}
-		else if (m_parent->is_special_main_menu())
-		{
-			if (machine().options().ui() == emu_options::UI_SIMPLE)
-				item_append(_("Exit"), 0, nullptr);
-			else
-				item_append(_("Exit"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
-		}
-		else
-		{
-			if (machine().options().ui() != emu_options::UI_SIMPLE && stack_has_special_main_menu())
-				item_append(_("Return to Previous Menu"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
-			else
-				item_append(_("Return to Previous Menu"), 0, nullptr);
-		}
+		if (m_needs_prev_menu_item)
+			item_append(_("Return to Previous Menu"), 0, nullptr);
 
 		// let implementation add other items
 		populate(m_customtop, m_custombottom);

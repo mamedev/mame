@@ -50,38 +50,6 @@ public:
 		FLAG_COLOR_BOX      = 1U << 8
 	};
 
-	enum : unsigned {
-		INPUT_GROUPS,
-		INPUT_SPECIFIC,
-		SETTINGS_DIP_SWITCHES,
-		SETTINGS_DRIVER_CONFIG,
-		ANALOG,
-		BOOKKEEPING,
-		GAME_INFO,
-		WARN_INFO,
-		IMAGE_MENU_IMAGE_INFO,
-		IMAGE_MENU_FILE_MANAGER,
-		TAPE_CONTROL,
-		SLOT_DEVICES,
-		NETWORK_DEVICES,
-		KEYBOARD_MODE,
-		SLIDERS,
-		VIDEO_TARGETS,
-		VIDEO_OPTIONS,
-		CROSSHAIR,
-		CHEAT,
-		PLUGINS,
-		SELECT_GAME,
-		BIOS_SELECTION,
-		BARCODE_READ,
-		PTY_INFO,
-		EXTERNAL_DATS,
-		ADD_FAVORITE,
-		REMOVE_FAVORITE,
-		QUIT_GAME,
-		ABOUT
-	};
-
 	virtual ~menu();
 
 	// append a new item to the end of the menu
@@ -132,7 +100,6 @@ private:
 	void draw_text_box();
 
 protected:
-	using cleanup_callback = std::function<void(running_machine &)>;
 	using bitmap_ptr = widgets_manager::bitmap_ptr;
 	using texture_ptr = widgets_manager::texture_ptr;
 
@@ -172,6 +139,7 @@ protected:
 	running_machine &machine() const { return m_ui.machine(); }
 	render_container &container() const { return m_container; }
 
+	void set_needs_prev_menu_item(bool needs) { m_needs_prev_menu_item = needs; }
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
 
@@ -180,8 +148,6 @@ protected:
 	void stack_pop() { m_global_state->stack_pop(); }
 	void stack_reset() { m_global_state->stack_reset(); }
 	bool stack_has_special_main_menu() const { return m_global_state->stack_has_special_main_menu(); }
-
-	void add_cleanup_callback(cleanup_callback &&callback) { m_global_state->add_cleanup_callback(std::move(callback)); }
 
 	// process a menu, drawing it and returning any interesting events
 	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
@@ -336,8 +302,6 @@ private:
 		global_state(global_state &&) = delete;
 		~global_state();
 
-		void add_cleanup_callback(cleanup_callback &&callback);
-
 		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
 		render_texture *bgrnd_texture() { return m_bgrnd_texture.get(); }
 
@@ -351,10 +315,7 @@ private:
 		bool stack_has_special_main_menu() const;
 
 	private:
-		using cleanup_callback_vector = std::vector<cleanup_callback>;
-
 		running_machine         &m_machine;
-		cleanup_callback_vector m_cleanup_callbacks;
 
 		bitmap_ptr              m_bgrnd_bitmap;
 		texture_ptr             m_bgrnd_texture;
@@ -398,6 +359,7 @@ protected: // TODO: remove need to expose these
 private:
 	global_state_ptr const  m_global_state;
 	bool                    m_special_main_menu;
+	bool                    m_needs_prev_menu_item;
 	mame_ui_manager         &m_ui;              // UI we are attached to
 	render_container        &m_container;       // render_container we render to
 	std::unique_ptr<menu>   m_parent;           // pointer to parent menu

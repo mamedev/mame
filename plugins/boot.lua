@@ -3,6 +3,8 @@
 require('lfs')
 
 _G._ = emu.lang_translate
+_G.N_ = function (message) return message end
+_G.N_p = function (context, message) return message end
 _G.emu.plugin = {} -- table to contain plugin interfaces
 -- substitute environment variables in the plugins path from options
 local dirs = emu.subst_env(manager.options.entries.pluginspath:value())

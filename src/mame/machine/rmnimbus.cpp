@@ -109,12 +109,16 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-enum
-{
-	MOUSE_PHASE_STATIC = 0,
-	MOUSE_PHASE_POSITIVE,
-	MOUSE_PHASE_NEGATIVE
-};
+#define MOUSE_NONE		0x00
+#define MOUSE_LEFT		0x01
+#define MOUSE_RIGHT		0x02
+#define MOUSE_DOWN		0x04
+#define MOUSE_UP		0x08
+#define MOUSE_LBUTTON	0x10
+#define MOUSE_RBUTTON	0x20
+
+// Frequency in Hz to poll for mouse movement.
+#define MOUSE_POLL_FREQUENCY	5000
 
 #define MOUSE_INT_ENABLED(state)     (((state)->m_iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
@@ -1064,7 +1068,7 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 			result |= m_scsi_cd << 6;
 			result |= m_scsi_io << 5;
 			result |= m_scsi_bsy << 4;
-			result |= !m_scsi_msg << 3;
+			result |= m_scsi_msg << 3;
 			if(floppy)
 			{
 				result |= FDC_MOTOR() << 2;
@@ -1100,7 +1104,7 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 */
 void rmnimbus_state::fdc_ctl_w(uint8_t data)
 {
-	uint8_t reg400_old = m_nimbus_drives.reg400;
+	uint8_t old_drq = m_nimbus_drives.reg400 & HDC_DRQ_MASK;
 	char drive[5];
 	floppy_image_device *floppy;
 
@@ -1117,8 +1121,8 @@ void rmnimbus_state::fdc_ctl_w(uint8_t data)
 	}
 
 	// if we enable hdc drq with a pending condition, act on it
-	if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
-		hdc_drq(true);
+	if((data & HDC_DRQ_MASK) && (!old_drq))
+		set_scsi_drqlat(false, false);
 }
 
 /*
@@ -1157,7 +1161,17 @@ void rmnimbus_state::hdc_reset()
 	m_scsi_io = 0;
 	m_scsi_cd = 0;
 	m_scsi_req = 0;
+
+	// Latched req, IC11b
+	m_scsi_reqlat = 0; 
 }
+
+/* 
+	The SCSI code outputs a 1 to indicate an active line, even though it is active low
+	The inputs on the RM schematic are fed through inverters, but because of the above
+	we don't need to invert them, unless the schematic uses the signal directly
+	For consistency we will invert msg before latching.
+*/
 
 void rmnimbus_state::check_scsi_irq()
 {
@@ -1170,10 +1184,27 @@ WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
 	check_scsi_irq();
 }
 
+// This emulates the 74LS74 latched version of req
+void rmnimbus_state::set_scsi_drqlat(bool	clock, bool clear)
+{ 
+	if (clear)
+		m_scsi_reqlat = 0;
+	else if (clock)
+		m_scsi_reqlat = 1;
+		
+	if(m_scsi_reqlat)
+		hdc_drq(true);
+	else
+		hdc_drq(false);
+}
+
 void rmnimbus_state::hdc_post_rw()
 {
 	if(m_scsi_req)
 		m_scsibus->write_ack(1);
+		
+	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
+	set_scsi_drqlat(false, true);		
 }
 
 void rmnimbus_state::hdc_drq(bool state)
@@ -1189,6 +1220,10 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 {
 	m_scsi_cd = state;
+	
+	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
+	set_scsi_drqlat(false, !m_scsi_cd);
+	
 	check_scsi_irq();
 }
 
@@ -1205,26 +1240,23 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
 
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_msg )
 {
-	m_scsi_msg = state;
+	m_scsi_msg = !state;
 }
 
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
 {
-	int last = m_scsi_req;
+	// Detect rising edge on req, IC11b, clock
+	int rising = ((m_scsi_req == 0) && (state == 1));
+	
+	// This is the state of the actual line from the SCSI
 	m_scsi_req = state;
-
-	if (state)
-	{
-		if (!m_scsi_cd && !last)
-		{
-			hdc_drq(true);
-		}
-	}
-	else
-	{
-		hdc_drq(false);
+	
+	// Latched req, is forced low by C/D being set to command
+	set_scsi_drqlat(rising, m_scsi_cd);
+	
+	if (!m_scsi_reqlat)
 		m_scsibus->write_ack(0);
-	}
+	
 	check_scsi_irq();
 }
 
@@ -1500,18 +1532,13 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
 		external_int(EXTERNAL_INT_MSM5205,state);
 }
 
-static const int MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
-static const int MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
-//static const int MOUSE_XYA[4] = { 1, 1, 0, 0 };
-//static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
+static const int MOUSE_XYA[4] = { 1, 1, 0, 0 };
+static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
 
 void rmnimbus_state::mouse_js_reset()
 {
-	m_nimbus_mouse.m_mouse_px=0;
-	m_nimbus_mouse.m_mouse_py=0;
 	m_nimbus_mouse.m_mouse_x=128;
 	m_nimbus_mouse.m_mouse_y=128;
-	m_nimbus_mouse.m_mouse_pc=0;
 	m_nimbus_mouse.m_mouse_pcx=0;
 	m_nimbus_mouse.m_mouse_pcy=0;
 	m_nimbus_mouse.m_intstate_x=0;
@@ -1519,114 +1546,88 @@ void rmnimbus_state::mouse_js_reset()
 	m_nimbus_mouse.m_reg0a4=0xC0;
 
 	// Setup timer to poll the mouse
-	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(1000));
+	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
 }
 
 void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	uint8_t   x = 0;
-	uint8_t   y = 0;
-//  int     pc=m_maincpu->pc();
-
-	uint8_t   intstate_x;
-	uint8_t   intstate_y;
-	int     xint;
+	int   mouse_x 	= 0;	// Current mouse X and Y
+	int   mouse_y 	= 0;
+	int   xdiff 	= 0;	// Difference from previous X and Y
+	int   ydiff 	= 0;
+	
+	uint8_t	intstate_x;		// Used to calculate if we should trigger interrupt
+	uint8_t	intstate_y;
+	int     xint;			// X and Y interrupts to trigger
 	int     yint;
 
-	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read() | 0xC0;
-	x = m_io_mousex->read();
-	y = m_io_mousey->read();
-
-	uint8_t   mxa;
+	uint8_t   mxa;			// Values of quadrature encoders for X and Y
 	uint8_t   mxb;
 	uint8_t   mya;
 	uint8_t   myb;
 
-	//logerror("poll_mouse()\n");
+	// Read mouse buttons
+	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read();
+	
+	// Read mose positions and calculate difference from previous value
+	mouse_x = m_io_mousex->read();
+	mouse_y = m_io_mousey->read();
 
-	if (x == m_nimbus_mouse.m_mouse_x)
-	{
-		m_nimbus_mouse.m_mouse_px = MOUSE_PHASE_STATIC;
-	}
-	else if (x > m_nimbus_mouse.m_mouse_x)
-	{
-		m_nimbus_mouse.m_mouse_px = MOUSE_PHASE_POSITIVE;
-	}
-	else if (x < m_nimbus_mouse.m_mouse_x)
-	{
-		m_nimbus_mouse.m_mouse_px = MOUSE_PHASE_NEGATIVE;
-	}
+	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
+	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
+	
+	// check and compensate for wrap.....
+	if (xdiff > 0x80) 
+		xdiff -= 0x100;
+	else if (xdiff < -0x80)
+		xdiff += 0x100;
 
-	if (y == m_nimbus_mouse.m_mouse_y)
-	{
-		m_nimbus_mouse.m_mouse_py = MOUSE_PHASE_STATIC;
-	}
-	else if (y > m_nimbus_mouse.m_mouse_y)
-	{
-		m_nimbus_mouse.m_mouse_py = MOUSE_PHASE_POSITIVE;
-	}
-	else if (y < m_nimbus_mouse.m_mouse_y)
-	{
-		m_nimbus_mouse.m_mouse_py = MOUSE_PHASE_NEGATIVE;
-	}
+	if (ydiff > 0x80) 
+		ydiff -= 0x100;
+	else if (ydiff < -0x80)
+		ydiff += 0x100;	
 
-	switch (m_nimbus_mouse.m_mouse_px)
-	{
-		case MOUSE_PHASE_STATIC     : break;
-		case MOUSE_PHASE_POSITIVE   : m_nimbus_mouse.m_mouse_pcx++; break;
-		case MOUSE_PHASE_NEGATIVE   : m_nimbus_mouse.m_mouse_pcx--; break;
-	}
+	// convert movement into emulated movement of quadrature encoder in mouse.
+	if (xdiff < 0)
+		m_nimbus_mouse.m_mouse_pcx++;
+	else if (xdiff > 0)
+		m_nimbus_mouse.m_mouse_pcx--;
+
+	if (ydiff < 0)
+		m_nimbus_mouse.m_mouse_pcy++;
+	else if (ydiff > 0)
+		m_nimbus_mouse.m_mouse_pcy--;
+	
+	// Compensate for quadrature wrap.
 	m_nimbus_mouse.m_mouse_pcx &= 0x03;
-
-	switch (m_nimbus_mouse.m_mouse_py)
-	{
-		case MOUSE_PHASE_STATIC     : break;
-		case MOUSE_PHASE_POSITIVE   : m_nimbus_mouse.m_mouse_pcy++; break;
-		case MOUSE_PHASE_NEGATIVE   : m_nimbus_mouse.m_mouse_pcy--; break;
-	}
 	m_nimbus_mouse.m_mouse_pcy &= 0x03;
 
-//  mxb = MOUSE_XYB[state.m_mouse_px][state->m_mouse_pcx]; // XB
-//  mxa = MOUSE_XYA[state.m_mouse_px][state->m_mouse_pcx]; // XA
-//  mya = MOUSE_XYA[state.m_mouse_py][state->m_mouse_pcy]; // YA
-//  myb = MOUSE_XYB[state.m_mouse_py][state->m_mouse_pcy]; // YB
+	// get value of mouse quadrature encoders for this wheel position
+	mxa = MOUSE_XYA[m_nimbus_mouse.m_mouse_pcx]; // XA
+	mxb = MOUSE_XYB[m_nimbus_mouse.m_mouse_pcx]; // XB
+	mya = MOUSE_XYA[m_nimbus_mouse.m_mouse_pcy]; // YA
+	myb = MOUSE_XYB[m_nimbus_mouse.m_mouse_pcy]; // YB
 
-	mxb = MOUSE_XYB[1][m_nimbus_mouse.m_mouse_pcx]; // XB
-	mxa = MOUSE_XYA[1][m_nimbus_mouse.m_mouse_pcx]; // XA
-	mya = MOUSE_XYA[1][m_nimbus_mouse.m_mouse_pcy]; // YA
-	myb = MOUSE_XYB[1][m_nimbus_mouse.m_mouse_pcy]; // YB
-
-	if ((m_nimbus_mouse.m_mouse_py!=MOUSE_PHASE_STATIC) || (m_nimbus_mouse.m_mouse_px!=MOUSE_PHASE_STATIC))
-	{
-//        logerror("mouse_px=%02X, mouse_py=%02X, mouse_pcx=%02X, mouse_pcy=%02X\n",
-//              state.m_mouse_px,state->m_mouse_py,state->m_mouse_pcx,state->m_mouse_pcy);
-
-//        logerror("mxb=%02x, mxa=%02X (mxb ^ mxa)=%02X, (ay8910_a & 0xC0)=%02X, (mxb ^ mxa) ^ ((ay8910_a & 0x80) >> 7)=%02X\n",
-//              mxb,mxa, (mxb ^ mxa) , (state.m_ay8910_a & 0xC0), (mxb ^ mxa) ^ ((state->m_ay8910_a & 0x40) >> 6));
-	}
-
+	// calculate interrupt state
 	intstate_x = (mxb ^ mxa) ^ ((m_ay8910_a & 0x40) >> 6);
 	intstate_y = (myb ^ mya) ^ ((m_ay8910_a & 0x80) >> 7);
 
+	// Generate interrupts if enabled, otherwise return values in
+	// mouse register
 	if (MOUSE_INT_ENABLED(this))
 	{
 		if ((intstate_x==1) && (m_nimbus_mouse.m_intstate_x==0))
-//        if (intstate_x!=state.m_intstate_x)
 		{
-			xint=mxa ? EXTERNAL_INT_MOUSE_XR : EXTERNAL_INT_MOUSE_XL;
+			xint=mxa ? EXTERNAL_INT_MOUSE_XL : EXTERNAL_INT_MOUSE_XR;
 
 			external_int(xint, true);
-
-//            logerror("Xint:%02X, mxb=%02X\n",xint,mxb);
 		}
 
 		if ((intstate_y==1) && (m_nimbus_mouse.m_intstate_y==0))
-//        if (intstate_y!=state.m_intstate_y)
 		{
-			yint=myb ? EXTERNAL_INT_MOUSE_YU : EXTERNAL_INT_MOUSE_YD;
+			yint=myb ? EXTERNAL_INT_MOUSE_YD : EXTERNAL_INT_MOUSE_YU;
 
 			external_int(yint, true);
-//            logerror("Yint:%02X, myb=%02X\n",yint,myb);
 		}
 	}
 	else
@@ -1638,15 +1639,11 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nimbus_mouse.m_reg0a4 |= ( myb & 0x01) << 0; // YB
 	}
 
-	m_nimbus_mouse.m_mouse_x = x;
-	m_nimbus_mouse.m_mouse_y = y;
+	// Update current mouse position
+	m_nimbus_mouse.m_mouse_x = mouse_x;
+	m_nimbus_mouse.m_mouse_y = mouse_y;
 
-	if ((m_nimbus_mouse.m_mouse_py!=MOUSE_PHASE_STATIC) || (m_nimbus_mouse.m_mouse_px!=MOUSE_PHASE_STATIC))
-	{
-//        logerror("pc=%05X, reg0a4=%02X, reg092=%02X, ay_a=%02X, x=%02X, y=%02X, px=%02X, py=%02X, intstate_x=%02X, intstate_y=%02X\n",
-//                 pc,state.m_reg0a4,state->m_iou_reg092,state->m_ay8910_a,state->m_mouse_x,state->m_mouse_y,state->m_mouse_px,state->m_mouse_py,intstate_x,intstate_y);
-	}
-
+	// and interrupt state
 	m_nimbus_mouse.m_intstate_x=intstate_x;
 	m_nimbus_mouse.m_intstate_y=intstate_y;
 }
@@ -1672,20 +1669,24 @@ uint8_t rmnimbus_state::nimbus_mouse_js_r()
 
 	if (m_io_config->read() & 0x01)
 	{
-		result=m_nimbus_mouse.m_reg0a4;
+		result=m_nimbus_mouse.m_reg0a4 | 0xC0;
 		//logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
 	}
 	else
 	{
-		result = m_io_joystick0->read();
+		result = m_io_joystick0->read() | 0xC0;
 	}
 
 	return result;
 }
 
+// Clear mose latches
 void rmnimbus_state::nimbus_mouse_js_w(uint8_t data)
 {
+	m_nimbus_mouse.m_reg0a4 = 0x00;
+	//logerror("clear mouse latches\n");
 }
+
 
 /**********************************************************************
 Parallel printer / User port.
