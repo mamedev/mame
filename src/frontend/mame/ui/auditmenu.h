@@ -25,9 +25,7 @@ namespace ui {
 class menu_audit : public menu
 {
 public:
-	enum class mode { FAST, ALL };
-
-	menu_audit(mame_ui_manager &mui, render_container &container, std::vector<ui_system_info> &availablesorted, mode audit_mode);
+	menu_audit(mame_ui_manager &mui, render_container &container, std::vector<ui_system_info> &availablesorted);
 	virtual ~menu_audit() override;
 
 protected:
@@ -44,13 +42,13 @@ private:
 	void save_available_machines();
 
 	std::thread m_worker_thread;
-	mode const m_audit_mode;
-	std::size_t const m_total;
-	std::string m_prompt[2];
+	std::size_t const m_unavailable;
+	std::string m_prompt;
 	std::vector<ui_system_info> &m_availablesorted;
 	std::atomic<std::size_t> m_audited;
 	std::atomic<game_driver const *> m_current;
 	phase m_phase;
+	bool m_fast;
 };
 
 } // namespace ui

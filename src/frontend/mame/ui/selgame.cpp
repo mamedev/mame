@@ -742,13 +742,8 @@ void menu_select_game::handle()
 					}
 					break;
 
-				case IPT_UI_AUDIT_FAST:
-					if (m_persistent_data.unavailable_systems())
-						menu::stack_push<menu_audit>(ui(), container(), m_persistent_data.sorted_list(), menu_audit::mode::FAST);
-					break;
-
-				case IPT_UI_AUDIT_ALL:
-					menu::stack_push<menu_audit>(ui(), container(), m_persistent_data.sorted_list(), menu_audit::mode::ALL);
+				case IPT_UI_AUDIT:
+					menu::stack_push<menu_audit>(ui(), container(), m_persistent_data.sorted_list());
 					break;
 				}
 			}

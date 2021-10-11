@@ -25,10 +25,19 @@ char const *const toolbar_icons_svg[] = {
 			"<path fill='#e7e7e7' d='m 11,48 a 3,3 0 0,1 3,-3 h 72 a 3,3 0 0,1 3,3 v 40 h -78 z' />"
 			"<path fill='#f71f1f' d='m 11,87 h 78 v 9 a 3,3 0 0,1 -3,3 h -72 a 3,3 0 0,1 -3,-3 z' />"
 		"</svg>",
+		// audit magnifying glass
+		u8"<?xml version='1.0' encoding='UTF-8' standalone='no'?>"
+		"<svg xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' version='1.1' height='100' width='100'>"
+			"<path fill-opacity='0' stroke='#bfbfbf' stroke-linecap='butt' stroke-width='8' d='m 68,68 -10,-10' />"
+			"<path fill-opacity='0' stroke='#cf8f3f' stroke-linecap='round' stroke-width='16' d='m 92,92 -22,-22' />"
+			"<circle cx='36' cy='36' r='36' fill='#cfcfcf' />"
+			"<circle cx='36' cy='36' r='30' fill='#9ebeff' />"
+			"<path fill-opacity='0' stroke='#b9cef7' stroke-linecap='round' stroke-width='10' d='m 16,36 a 20,20 0 0,1 20,-20' />"
+		"</svg>",
 		// info
 		u8"<?xml version='1.0' encoding='UTF-8' standalone='no'?>"
 		"<svg xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' version='1.1' height='100' width='100'>"
-			"<circle cx='50' cy='50' r='47' fill='#001fff' stroke='#001bdf' stroke-width='6' />"
+			"<circle cx='50' cy='50' r='47' fill='#001fff' stroke='#3f56ff' stroke-width='6' />"
 			"<circle cx='50' cy='20' r='10' fill='#ffffff' />"
 			"<path fill='#ffffff' d='m 59,38 v 34 a 10,4 0 0,0 10,4 v 8 h -36 v -8 a 10,4 0 0,0 10,-4 v -23 a 8,4 0 0,0 -8,-4 v -6 z' />"
 		"</svg>",
@@ -51,6 +60,7 @@ enum
 {
 	TOOLBAR_BITMAP_FAVORITE,
 	TOOLBAR_BITMAP_SAVE,
+	TOOLBAR_BITMAP_AUDIT,
 	TOOLBAR_BITMAP_INFO,
 	TOOLBAR_BITMAP_PREVMENU,
 	TOOLBAR_BITMAP_EXIT

@@ -199,7 +199,6 @@ private:
 		void set_snapx_software(ui_software_info const *software) { m_snapx_software = software; }
 
 		bitmap_argb32 &no_avail_bitmap() { return m_no_avail_bitmap; }
-		render_texture *star_texture() { return m_star_texture.get(); }
 
 		bitmap_vector const &toolbar_bitmaps() { return m_toolbar_bitmaps; }
 		texture_ptr_vector const &toolbar_textures() { return m_toolbar_textures; }
@@ -213,8 +212,6 @@ private:
 		ui_software_info const  *m_snapx_software;
 
 		bitmap_argb32           m_no_avail_bitmap;
-		bitmap_argb32           m_star_bitmap;
-		texture_ptr             m_star_texture;
 
 		bitmap_vector           m_toolbar_bitmaps;
 		texture_ptr_vector      m_toolbar_textures;

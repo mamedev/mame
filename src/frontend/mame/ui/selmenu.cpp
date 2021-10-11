@@ -17,7 +17,6 @@
 
 // these hold static bitmap images
 #include "ui/defimg.ipp"
-#include "ui/starimg.ipp"
 #include "ui/toolbar.ipp"
 
 #include "audit.h"
@@ -96,6 +95,7 @@ std::pair<char const *, char const *> const arts_info[] =
 char const *const hover_msg[] = {
 	N_("Add or remove favorite"),
 	N_("Export displayed list to file"),
+	N_("Audit media"),
 	N_("Show DATs view"),
 };
 
@@ -438,8 +438,6 @@ menu_select_launch::cache::cache(running_machine &machine)
 	, m_snapx_driver(nullptr)
 	, m_snapx_software(nullptr)
 	, m_no_avail_bitmap(256, 256)
-	, m_star_bitmap(32, 32)
-	, m_star_texture(nullptr, machine.render())
 	, m_toolbar_bitmaps()
 	, m_toolbar_textures()
 {
@@ -449,10 +447,6 @@ menu_select_launch::cache::cache(running_machine &machine)
 	m_snapx_texture.reset(render.texture_alloc(render_texture::hq_scale));
 
 	std::memcpy(&m_no_avail_bitmap.pix(0), no_avail_bmp, 256 * 256 * sizeof(uint32_t));
-
-	std::memcpy(&m_star_bitmap.pix(0), favorite_star_bmp, 32 * 32 * sizeof(uint32_t));
-	m_star_texture.reset(render.texture_alloc());
-	m_star_texture->set_bitmap(m_star_bitmap, m_star_bitmap.cliprect(), TEXFORMAT_ARGB32);
 
 	m_toolbar_bitmaps.resize(UI_TOOLBAR_BUTTONS);
 	m_toolbar_textures.reserve(UI_TOOLBAR_BUTTONS);
@@ -1268,7 +1262,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	y2 -= ui().box_tb_border();
 
 	// work out which buttons we're going to draw
-	constexpr unsigned SYS_TOOLBAR_BITMAPS[] = { TOOLBAR_BITMAP_FAVORITE, TOOLBAR_BITMAP_SAVE, TOOLBAR_BITMAP_INFO };
+	constexpr unsigned SYS_TOOLBAR_BITMAPS[] = { TOOLBAR_BITMAP_FAVORITE, TOOLBAR_BITMAP_SAVE, TOOLBAR_BITMAP_AUDIT, TOOLBAR_BITMAP_INFO };
 	constexpr unsigned SW_TOOLBAR_BITMAPS[] = { TOOLBAR_BITMAP_FAVORITE, TOOLBAR_BITMAP_INFO };
 	bool const have_parent = m_is_swlist || !stack_has_special_main_menu();
 	unsigned const *const toolbar_bitmaps = m_is_swlist ? SW_TOOLBAR_BITMAPS : SYS_TOOLBAR_BITMAPS;
@@ -1332,9 +1326,16 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 
 void menu_select_launch::draw_star(float x0, float y0)
 {
-	float y1 = y0 + ui().get_line_height();
-	float x1 = x0 + ui().get_line_height() * container().manager().ui_aspect(&container());
-	container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_cache.star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
+	if (TOOLBAR_BITMAP_FAVORITE < m_cache.toolbar_textures().size())
+	{
+		float const y1 = y0 + ui().get_line_height();
+		float const x1 = x0 + ui().get_line_height() * container().manager().ui_aspect(&container());
+		container().add_quad(
+				x0, y0, x1, y1,
+				rgb_t::white(),
+				m_cache.toolbar_textures()[TOOLBAR_BITMAP_FAVORITE].get(),
+				PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
+	}
 }
 
 
@@ -1758,6 +1759,11 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				else if (hover() == HOVER_B_EXPORT)
 				{
 					inkey_export();
+					stop = true;
+				}
+				else if (hover() == HOVER_B_AUDIT)
+				{
+					ev.iptkey = IPT_UI_AUDIT;
 					stop = true;
 				}
 				else if (hover() == HOVER_B_DATS)
