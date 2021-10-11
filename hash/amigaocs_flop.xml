@@ -8790,7 +8790,7 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1246)chasehqii-specialcriminalinvestigation_disk2.ipf" size="1049612" crc="950fe6b4" sha1="471e0b0535db4121f1a4c37f5b70ba2611f5d005"status="baddump" />
+				<rom name="(sps1246)chasehqii-specialcriminalinvestigation_disk2.ipf" size="1049612" crc="950fe6b4" sha1="471e0b0535db4121f1a4c37f5b70ba2611f5d005" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
