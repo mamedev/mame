@@ -664,7 +664,13 @@ void hd6120_device::execute_run()
 
 		case minor_state::OP1_1:
 			m_pc = m_temp & 07777;
-			m_temp = ((BIT(m_ir, 7) ? 0 : m_ac) ^ (BIT(m_ir, 5) ? 07777 : 0)) + (m_ir & 0001);
+			m_temp = (BIT(m_ir, 7) ? 0 : m_ac) ^ (BIT(m_ir, 5) ? 07777 : 0);
+			if (BIT(m_ir, 0))
+			{
+				++m_temp;
+				if (m_temp >= 010000)
+					m_flags ^= 4; // LINK is complemented upon carry out
+			}
 			m_state = minor_state::OP1_2;
 			break;
 
