@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER(amiga_state::fdc_dskblk_w)
 
 WRITE_LINE_MEMBER(amiga_state::fdc_dsksyn_w)
 {
-	set_interrupt(INTENA_SETCLR | INTENA_DSKSYN);
+	set_interrupt((state ? INTENA_SETCLR : 0) | INTENA_DSKSYN);
 }
 
 WRITE_LINE_MEMBER( amiga_state::kbreset_w )
@@ -922,7 +922,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	// signal an interrupt
-	set_interrupt(0x8000 | INTENA_BLIT);
+	set_interrupt(INTENA_SETCLR | INTENA_BLIT);
 
 	/* reset the blitter timer */
 	m_blitter_timer->reset();
