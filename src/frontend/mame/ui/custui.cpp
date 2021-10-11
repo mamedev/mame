@@ -623,7 +623,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// compute maxwidth
 	char const *const topbuf = _("Menu Preview");
@@ -751,8 +751,6 @@ menu_rgb_ui::~menu_rgb_ui()
 
 void menu_rgb_ui::handle()
 {
-	bool changed = false;
-
 	// process the menu
 	const event *menu_event;
 
@@ -761,103 +759,63 @@ void menu_rgb_ui::handle()
 	else
 		menu_event = process(PROCESS_ONLYCHAR);
 
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (menu_event && menu_event->itemref != nullptr)
 	{
-		switch ((uintptr_t)menu_event->itemref)
+		bool changed = false;
+		switch (menu_event->iptkey)
 		{
-			case RGB_ALPHA:
-				if (menu_event->iptkey == IPT_UI_LEFT && m_color->a() > 1)
+		case IPT_UI_LEFT:
+		case IPT_UI_RIGHT:
+			{
+				int updated = (IPT_UI_LEFT == menu_event->iptkey) ? -1 : 1;
+				switch (uintptr_t(menu_event->itemref))
 				{
-					m_color->set_a(m_color->a() - 1);
-					changed = true;
+				case RGB_ALPHA:
+					updated += m_color->a();
+					if ((0 <= updated) && (255 >= updated))
+					{
+						m_color->set_a(updated);
+						changed = true;
+					}
+					break;
+				case RGB_RED:
+					updated += m_color->r();
+					if ((0 <= updated) && (255 >= updated))
+					{
+						m_color->set_r(updated);
+						changed = true;
+					}
+					break;
+				case RGB_GREEN:
+					updated += m_color->g();
+					if ((0 <= updated) && (255 >= updated))
+					{
+						m_color->set_g(updated);
+						changed = true;
+					}
+					break;
+				case RGB_BLUE:
+					updated += m_color->b();
+					if ((0 <= updated) && (255 >= updated))
+					{
+						m_color->set_b(updated);
+						changed = true;
+					}
+					break;
 				}
+			}
+			break;
 
-				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->a() < 255)
-				{
-					m_color->set_a(m_color->a() + 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_SELECT || menu_event->iptkey == IPT_SPECIAL)
-				{
-					inkey_special(menu_event);
-					changed = true;
-				}
-
-				break;
-
-			case RGB_RED:
-				if (menu_event->iptkey == IPT_UI_LEFT && m_color->r() > 1)
-				{
-					m_color->set_r(m_color->r() - 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->r() < 255)
-				{
-					m_color->set_r(m_color->r() + 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_SELECT || menu_event->iptkey == IPT_SPECIAL)
-				{
-					inkey_special(menu_event);
-					changed = true;
-				}
-
-				break;
-
-			case RGB_GREEN:
-				if (menu_event->iptkey == IPT_UI_LEFT && m_color->g() > 1)
-				{
-					m_color->set_g(m_color->g() - 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->g() < 255)
-				{
-					m_color->set_g(m_color->g() + 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_SELECT || menu_event->iptkey == IPT_SPECIAL)
-				{
-					inkey_special(menu_event);
-					changed = true;
-				}
-
-				break;
-
-			case RGB_BLUE:
-				if (menu_event->iptkey == IPT_UI_LEFT && m_color->b() > 1)
-				{
-					m_color->set_b(m_color->b() - 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->b() < 255)
-				{
-					m_color->set_b(m_color->b() + 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_SELECT || menu_event->iptkey == IPT_SPECIAL)
-				{
-					inkey_special(menu_event);
-					changed = true;
-				}
-
-				break;
-
-			case PALETTE_CHOOSE:
-				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_palette_sel>(ui(), container(), *m_color);
-				break;
+		case IPT_UI_SELECT:
+		case IPT_SPECIAL:
+			inkey_special(menu_event);
+			changed = true;
+			break;
 		}
-	}
 
-	if (changed)
-		reset(reset_options::REMEMBER_REF);
+		if (changed)
+			reset(reset_options::REMEMBER_REF);
+	}
 }
 
 //-------------------------------------------------
@@ -940,12 +898,21 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	y1 += ui().box_tb_border();
 
 	// draw the text within it
-	ui().draw_text_full(container(), m_title, x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-						mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
+	ui().draw_text_full(
+			container(),
+			m_title,
+			x1, y1, x2 - x1,
+			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
 
-	std::string sampletxt(_("Color preview ="));
-	ui().draw_text_full(container(), sampletxt, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width);
+	std::string sampletxt(_("Color preview:"));
+	ui().draw_text_full(
+			container(),
+			sampletxt,
+			0.0f, 0.0f, 1.0f,
+			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+			&width);
 	width += 2 * lr_border;
 	maxwidth = std::max(origx2 - origx1, width);
 
@@ -955,22 +922,28 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	y1 = origy2 + ui().box_tb_border();
 	y2 = origy2 + bottom;
 
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x1 + width, y2, UI_RED_COLOR);
+	// draw a box - force black to ensure the text is legible
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t::black());
 
 	// take off the borders
 	x1 += lr_border;
 	y1 += ui().box_tb_border();
 
-	// draw the normal text
-	ui().draw_text_full(container(), sampletxt, x1, y1, width - lr_border, ui::text_layout::CENTER, ui::text_layout::NEVER,
-						mame_ui_manager::NORMAL, rgb_t::white(), rgb_t::black());
+	// draw the text label - force white to ensure it's legible
+	ui().draw_text_full(
+			container(),
+			sampletxt,
+			x1, y1, width - lr_border,
+			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NORMAL, rgb_t::white(), rgb_t::black());
 
-	x1 += width + lr_border;
-	y1 -= ui().box_tb_border();
+	x1 += width + (lr_border * 2.0f);
+	x2 -= lr_border;
+	y2 -= ui().box_tb_border();
 
-	// draw color box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, *m_color);
+	// add white under half the sample swatch to make alpha effects visible
+	container().add_rect((x1 + x2) * 0.5f, y1, x2, y2, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container().add_rect(x1, y1, x2, y2, *m_color, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 //-------------------------------------------------

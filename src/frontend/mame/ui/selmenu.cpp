@@ -1799,12 +1799,6 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				set_selected_index(hover());
 				ev.iptkey = IPT_UI_SELECT;
 			}
-
-			if (is_last_selected())
-			{
-				ev.iptkey = IPT_UI_CANCEL;
-				stack_pop();
-			}
 			stop = true;
 			break;
 
