@@ -73,11 +73,11 @@ protected:
 	void coco_rom0(address_map &map);
 	void coco_rom1(address_map &map);
 	void coco_rom2(address_map &map);
-	void ms1600_rom2(address_map &map);
 	void coco_io0(address_map &map);
 	void coco_io1(address_map &map);
 	void coco_io2(address_map &map);
 	void coco_ff60(address_map &map);
+	void ms1600_rom2(address_map &map);
 
 private:
 	void configure_sam(void);

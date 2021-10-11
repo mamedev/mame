@@ -10629,20 +10629,20 @@ racjamdx                        // G?676 (c)1997 Japan JAA
 
 @source:coco12.cpp
 coco                            // Color Computer
-coco2                           // Color Computer 2
-coco2b                          // Color Computer 2B (uses M6847T1 video chip)
+trsvidtx                        // TRS-80 Videotex
 cocoe                           // Color Computer (Extended BASIC 1.0)
 cocoh                           // Color Computer with HD6309 CPU
-coco2h                          // Color Computer 2 with HD6309 CPU
-coco2bh                         // Color Computer 2B (uses M6847T1 video chip) with HD6309 CPU
 cocoeh                          // Color Computer (Extended BASIC 1.0) with HD6309 CPU
+coco2                           // Color Computer 2
+coco2h                          // Color Computer 2 with HD6309 CPU
+coco2b                          // Color Computer 2B (uses M6847T1 video chip)
+coco2bh                         // Color Computer 2B (uses M6847T1 video chip) with HD6309 CPU
 cp400                           // Prológica CP400
 cp400c2                         // Prológica CP400 Color II
-lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 mx1600                          // Dynacom MX-1600
-cd6809                          // Codimex CD-6809
 t4426                           // Terco 4426 CNC programming station
-trsvidtx                        // TRS-80 Videotex
+lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
+cd6809                          // Codimex CD-6809
 ms1600                          // Instituto Latinoamericano de la Comunicación Educativa / Secretaría de Educación Pública Micro-SEP 1600
 
 @source:coco3.cpp
