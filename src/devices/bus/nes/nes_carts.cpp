@@ -65,6 +65,7 @@
 #include "pirate.h"
 #include "mmc1_clones.h"
 #include "mmc3_clones.h"
+#include "vrc_clones.h"
 
 
 void nes_cart(device_slot_interface &device)
@@ -293,7 +294,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("edu2k",            NES_EDU2K);
 	device.option_add_internal("t230",             NES_T230);
 	device.option_add_internal("mk2",              NES_MK2);
-	device.option_add_internal("unl_whero",        NES_WHERO);     // mapper 27
 	device.option_add_internal("unl_43272",        NES_43272);     // used in Gaau Hok Gwong Cheung
 	device.option_add_internal("tf1201",           NES_TF1201);
 	device.option_add_internal("unl_cfight",       NES_CITYFIGHT); // used by City Fighter IV

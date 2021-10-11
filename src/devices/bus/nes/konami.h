@@ -105,7 +105,7 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_prg();
-	uint8_t m_mmc_vrom_bank[8];
+	uint16_t m_mmc_vrom_bank[8];
 	uint8_t m_latch, m_mmc_prg_bank;
 
 	void irq_tick();

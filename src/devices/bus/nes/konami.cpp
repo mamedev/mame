@@ -484,7 +484,7 @@ void nes_konami_vrc4_device::set_prg()
 
 void nes_konami_vrc4_device::write_h(offs_t offset, uint8_t data)
 {
-	uint8_t bank, shift, mask;
+	int bank, shift, mask;
 	uint16_t add_lines = ((offset << (9 - m_vrc_ls_prg_a)) & 0x200) | ((offset << (8 - m_vrc_ls_prg_b)) & 0x100);
 	LOG_MMC(("VRC-4 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -520,8 +520,8 @@ void nes_konami_vrc4_device::write_h(offs_t offset, uint8_t data)
 		case 0x6000:
 			bank = ((offset & 0x7000) - 0x3000) / 0x0800 + BIT(add_lines, 9);
 			shift = BIT(add_lines, 8) * 4;
-			mask = (0xf0 >> shift);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & mask) | ((data & 0x0f) << shift);
+			mask = shift ? 0x1f0 : 0x0f;
+			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & ~mask) | ((data << shift) & mask);
 			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 			break;
 		case 0x7000:
