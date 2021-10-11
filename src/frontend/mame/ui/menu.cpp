@@ -638,8 +638,11 @@ void menu::draw(uint32_t flags)
 					// give 2 spaces worth of padding
 					subitem_width = ui().get_string_width("FF00FF00");
 
-					ui().draw_outlined_box(container(), effective_left + effective_width - subitem_width, line_y0,
-						effective_left + effective_width, line_y1, color);
+					ui().draw_outlined_box(
+							container(),
+							effective_left + effective_width - subitem_width, line_y0 + (UI_LINE_WIDTH * 2.0f),
+							effective_left + effective_width, line_y1 - (UI_LINE_WIDTH * 2.0f),
+							color);
 				}
 				else
 				{

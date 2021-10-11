@@ -9,18 +9,18 @@
 *********************************************************************/
 
 #include "emu.h"
-
 #include "ui/custui.h"
 
-#include "ui/ui.h"
 #include "ui/selector.h"
+#include "ui/ui.h"
 #include "ui/utils.h"
 
-#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
-#include "osdepend.h"
 #include "uiinput.h"
+
+#include "corestr.h"
+#include "osdepend.h"
 
 #include <algorithm>
 #include <iterator>
@@ -579,25 +579,25 @@ void menu_colors_ui::handle()
 
 void menu_colors_ui::populate(float &customtop, float &custombottom)
 {
-	item_append(_("Normal text"), 0, (void *)(uintptr_t)MUI_TEXT_COLOR);
-	item_append(_("Selected color"), 0, (void *)(uintptr_t)MUI_SELECTED_COLOR);
-	item_append(_("Normal text background"), 0, (void *)(uintptr_t)MUI_TEXT_BG_COLOR);
-	item_append(_("Selected background color"), 0, (void *)(uintptr_t)MUI_SELECTED_BG_COLOR);
-	item_append(_("Subitem color"), 0, (void *)(uintptr_t)MUI_SUBITEM_COLOR);
-	item_append(_("Clone"), 0, (void *)(uintptr_t)MUI_CLONE_COLOR);
-	item_append(_("Border"), 0, (void *)(uintptr_t)MUI_BORDER_COLOR);
-	item_append(_("Background"), 0, (void *)(uintptr_t)MUI_BACKGROUND_COLOR);
-	item_append(_("Dipswitch"), 0, (void *)(uintptr_t)MUI_DIPSW_COLOR);
-	item_append(_("Unavailable color"), 0, (void *)(uintptr_t)MUI_UNAVAILABLE_COLOR);
-	item_append(_("Slider color"), 0, (void *)(uintptr_t)MUI_SLIDER_COLOR);
-	item_append(_("Gfx viewer background"), 0, (void *)(uintptr_t)MUI_GFXVIEWER_BG_COLOR);
-	item_append(_("Mouse over color"), 0, (void *)(uintptr_t)MUI_MOUSEOVER_COLOR);
-	item_append(_("Mouse over background color"), 0, (void *)(uintptr_t)MUI_MOUSEOVER_BG_COLOR);
-	item_append(_("Mouse down color"), 0, (void *)(uintptr_t)MUI_MOUSEDOWN_COLOR);
-	item_append(_("Mouse down background color"), 0, (void *)(uintptr_t)MUI_MOUSEDOWN_BG_COLOR);
+	item_append(_("color-option", "Normal text"),                 0, (void *)(uintptr_t)MUI_TEXT_COLOR);
+	item_append(_("color-option", "Selected color"),              0, (void *)(uintptr_t)MUI_SELECTED_COLOR);
+	item_append(_("color-option", "Normal text background"),      0, (void *)(uintptr_t)MUI_TEXT_BG_COLOR);
+	item_append(_("color-option", "Selected background color"),   0, (void *)(uintptr_t)MUI_SELECTED_BG_COLOR);
+	item_append(_("color-option", "Subitem color"),               0, (void *)(uintptr_t)MUI_SUBITEM_COLOR);
+	item_append(_("color-option", "Clone"),                       0, (void *)(uintptr_t)MUI_CLONE_COLOR);
+	item_append(_("color-option", "Border"),                      0, (void *)(uintptr_t)MUI_BORDER_COLOR);
+	item_append(_("color-option", "Background"),                  0, (void *)(uintptr_t)MUI_BACKGROUND_COLOR);
+	item_append(_("color-option", "DIP switch"),                  0, (void *)(uintptr_t)MUI_DIPSW_COLOR);
+	item_append(_("color-option", "Unavailable color"),           0, (void *)(uintptr_t)MUI_UNAVAILABLE_COLOR);
+	item_append(_("color-option", "Slider color"),                0, (void *)(uintptr_t)MUI_SLIDER_COLOR);
+	item_append(_("color-option", "Graphics viewer background"),  0, (void *)(uintptr_t)MUI_GFXVIEWER_BG_COLOR);
+	item_append(_("color-option", "Mouse over color"),            0, (void *)(uintptr_t)MUI_MOUSEOVER_COLOR);
+	item_append(_("color-option", "Mouse over background color"), 0, (void *)(uintptr_t)MUI_MOUSEOVER_BG_COLOR);
+	item_append(_("color-option", "Mouse down color"),            0, (void *)(uintptr_t)MUI_MOUSEDOWN_COLOR);
+	item_append(_("color-option", "Mouse down background color"), 0, (void *)(uintptr_t)MUI_MOUSEDOWN_BG_COLOR);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Restore originals colors"), 0, (void *)(uintptr_t)MUI_RESTORE);
+	item_append(_("Restore default colors"), 0, (void *)(uintptr_t)MUI_RESTORE);
 
 	custombottom = customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
@@ -609,7 +609,7 @@ void menu_colors_ui::populate(float &customtop, float &custombottom)
 void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// top text
-	char const *const toptext[] = { _("UI Colors Settings") };
+	char const *const toptext[] = { _("UI Color Settings") };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
@@ -618,7 +618,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	// bottom text
 	// get the text for 'UI Select'
-	std::string const bottomtext[] = { util::string_format(_("Double click or press %1$s to change the color value"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD))) };
+	std::string const bottomtext[] = { util::string_format(_("Double-click or press %1$s to change the color value"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD))) };
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
@@ -636,11 +636,11 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	std::string sampletxt[5];
 
-	sampletxt[0] = _("Normal");
-	sampletxt[1] = _("Subitem");
-	sampletxt[2] = _("Selected");
-	sampletxt[3] = _("Mouse Over");
-	sampletxt[4] = _("Clone");
+	sampletxt[0] = _("color-sample", "Normal");
+	sampletxt[1] = _("color-sample", "Subitem");
+	sampletxt[2] = _("color-sample", "Selected");
+	sampletxt[3] = _("color-sample", "Mouse Over");
+	sampletxt[4] = _("color-sample", "Clone");
 
 	for (auto & elem: sampletxt)
 	{
@@ -807,9 +807,23 @@ void menu_rgb_ui::handle()
 			break;
 
 		case IPT_UI_SELECT:
+			if (uintptr_t(menu_event->itemref) == PALETTE_CHOOSE)
+			{
+				menu::stack_push<menu_palette_sel>(ui(), container(), *m_color);
+				break;
+			}
+			[[fallthrough]];
 		case IPT_SPECIAL:
-			inkey_special(menu_event);
-			changed = true;
+			switch (uintptr_t(menu_event->itemref))
+			{
+			case RGB_ALPHA:
+			case RGB_RED:
+			case RGB_GREEN:
+			case RGB_BLUE:
+				inkey_special(menu_event);
+				changed = true;
+				break;
+			}
 			break;
 		}
 
