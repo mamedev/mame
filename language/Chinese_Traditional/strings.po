@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-09 10:52+1100\n"
-"PO-Revision-Date: 2021-05-30 17:40+0800\n"
+"PO-Revision-Date: 2021-10-11 01:40+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -917,8 +917,8 @@ msgid ""
 "experience this machine.\n"
 msgstr ""
 "\n"
-"此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。故無法達成"
-"此機台的完成體驗。\n"
+"此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。 "
+"故無法達成此機台的完整體驗。\n"
 
 #: src/frontend/mame/ui/info.cpp:315
 #, c-format
@@ -1114,17 +1114,17 @@ msgstr "已停用"
 #: src/frontend/mame/ui/utils.cpp:63
 msgctxt "swlist-info"
 msgid "Alternate Title"
-msgstr ""
+msgstr "別題名"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgctxt "swlist-info"
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgctxt "swlist-info"
 msgid "Barcode Number"
-msgstr ""
+msgstr "條碼編號"
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgctxt "swlist-info"
@@ -1134,17 +1134,17 @@ msgstr "開發商"
 #: src/frontend/mame/ui/utils.cpp:67
 msgctxt "swlist-info"
 msgid "Distributor"
-msgstr ""
+msgstr "經銷商"
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
 msgid "Installation Instructions"
-msgstr ""
+msgstr "安裝說明"
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
 msgid "ISBN"
-msgstr ""
+msgstr "ISBN"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgctxt "swlist-info"
@@ -1159,37 +1159,37 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
 msgid "Part Number"
-msgstr ""
+msgstr "配件編號"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
 msgid "PCB"
-msgstr ""
+msgstr "PCB"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
 msgid "Programmer"
-msgstr ""
+msgstr "程式設計"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
 msgid "Release Date"
-msgstr "發行日 "
+msgstr "發行日"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
 msgid "Serial Number"
-msgstr ""
+msgstr "序號"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
 msgid "Usage Instructions"
-msgstr ""
+msgstr "使用說明"
 
 #: src/frontend/mame/ui/utils.cpp:78
 msgctxt "swlist-info"
 msgid "Version"
-msgstr ""
+msgstr "版本"
 
 #: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
@@ -1349,17 +1349,17 @@ msgstr "開發商"
 #: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Distributor"
-msgstr ""
+msgstr "經銷商"
 
 #: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Programmer"
-msgstr ""
+msgstr "程式設計"
 
 #: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
@@ -1451,7 +1451,7 @@ msgstr "包含仿製版"
 
 #: src/frontend/mame/ui/datmenu.cpp:81 src/frontend/mame/ui/selmenu.cpp:2635
 msgid "Software List Info"
-msgstr ""
+msgstr "軟體列表資訊"
 
 #: src/frontend/mame/ui/datmenu.cpp:365
 msgid "Revision: "
@@ -1597,16 +1597,19 @@ msgid ""
 "Press %2$s to delete\n"
 "Press %3$s to cancel"
 msgstr ""
+"刪除已儲存的狀態 %1$s?\n"
+"按下 %2$s 刪除\n"
+"按下 %3$s 取消"
 
 #: src/frontend/mame/ui/state.cpp:378
 #, c-format
 msgid "Error removing saved state file %1$s"
-msgstr ""
+msgstr "移除已儲存的狀態檔 %1$s 時發生錯誤"
 
 #: src/frontend/mame/ui/state.cpp:424
 #, c-format
 msgid "Press %1$s to delete"
-msgstr ""
+msgstr "按下  %1$s 刪除"
 
 #: src/frontend/mame/ui/state.cpp:497
 msgid "Load State"
@@ -1644,7 +1647,7 @@ msgstr "其他控制"
 
 #: src/frontend/mame/ui/inputmap.cpp:227
 msgid "This machine has no configurable inputs."
-msgstr ""
+msgstr "此機台沒有可設定的輸入"
 
 #: src/frontend/mame/ui/inputmap.cpp:310
 msgid "Pressed"
@@ -1752,8 +1755,8 @@ msgid ""
 msgstr ""
 "找不到機台，請檢查 %1$s.ini 的 ROM 目錄設定\n"
 "\n"
-"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關資"
-"訊。"
+"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關"
+"資訊。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:278
 #: src/frontend/mame/ui/selgame.cpp:807
@@ -1864,7 +1867,7 @@ msgstr "軟體媒體"
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgctxt "path-option"
 msgid "Sound Samples"
-msgstr ""
+msgstr "聲音樣本檔"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
@@ -1879,17 +1882,17 @@ msgstr "十字準星"
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
 msgid "Cheat Files"
-msgstr ""
+msgstr "作弊檔"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
 msgid "Plugins"
-msgstr ""
+msgstr "外掛"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44
 msgctxt "path-option"
 msgid "UI Translations"
-msgstr ""
+msgstr "UI 翻譯"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
@@ -1899,12 +1902,12 @@ msgstr "INI"
 #: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
 msgid "UI Settings"
-msgstr ""
+msgstr "UI 設定"
 
 #: src/frontend/mame/ui/dirmenu.cpp:47
 msgctxt "path-option"
 msgid "Plugin Data"
-msgstr ""
+msgstr "外掛資料"
 
 #: src/frontend/mame/ui/dirmenu.cpp:48
 msgctxt "path-option"
@@ -1959,7 +1962,7 @@ msgstr ""
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Game Endings"
-msgstr ""
+msgstr "遊戲結局"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
@@ -1979,7 +1982,7 @@ msgstr ""
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr ""
+msgstr "遊戲結束畫面"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
@@ -2062,11 +2065,11 @@ msgstr ""
 #: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
 #, c-format
 msgid "Zoom = %1$d"
-msgstr ""
+msgstr "縮放 = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1262
 msgid "Expand to fit"
-msgstr ""
+msgstr "展開以符合"
 
 #: src/frontend/mame/ui/selgame.cpp:808
 msgid "Configure Machine"
@@ -2453,7 +2456,7 @@ msgstr "語言"
 
 #: src/frontend/mame/ui/custui.cpp:183
 msgid "System Names"
-msgstr ""
+msgstr "系統名稱"
 
 #: src/frontend/mame/ui/custui.cpp:186
 msgid "Show side panels"
@@ -2461,11 +2464,11 @@ msgstr "顯示側面版"
 
 #: src/frontend/mame/ui/custui.cpp:198
 msgid "UI Customization Settings"
-msgstr ""
+msgstr "UI 自訂設置"
 
 #: src/frontend/mame/ui/custui.cpp:212 src/frontend/mame/ui/custui.cpp:256
 msgid "[built-in]"
-msgstr ""
+msgstr "[內建]"
 
 #: src/frontend/mame/ui/custui.cpp:338
 msgid "default"
@@ -2812,12 +2815,12 @@ msgstr "廣告圖"
 #: src/frontend/mame/ui/selmenu.cpp:81
 msgctxt "selmenu-artwork"
 msgid "Title Screen"
-msgstr ""
+msgstr "標題畫面"
 
 #: src/frontend/mame/ui/selmenu.cpp:82
 msgctxt "selmenu-artwork"
 msgid "Ending"
-msgstr ""
+msgstr "結局"
 
 #: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
@@ -2913,7 +2916,7 @@ msgstr "已支援： 是"
 #: src/frontend/mame/ui/selmenu.cpp:686
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "軟體列表/項目: %1$s:%2$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:694
 #, c-format
@@ -2943,8 +2946,8 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
-"選定系統所需要的 ROM / 磁碟映像檔為缺少或不正確。請取得正確的檔案或選擇不同的"
-"系統。\n"
+"選定系統所需要的 ROM / 磁碟映像檔為缺少或不正確。 "
+"請取得正確的檔案或選擇不同的系統。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2502
@@ -2953,8 +2956,8 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"選定軟體所需要的 ROM / 磁碟映像檔為缺少或不正確。請取得正確的檔案或選擇不同的"
-"軟體項目。\n"
+"選定軟體所需要的 ROM / 磁碟映像檔為缺少或不正確。 "
+"請取得正確的檔案或選擇不同的軟體項目。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
@@ -2993,7 +2996,7 @@ msgstr "聲音"
 
 #: src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Compressor"
-msgstr ""
+msgstr "壓縮"
 
 #: src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
@@ -3495,15 +3498,15 @@ msgstr ""
 
 #: plugins/autofire/autofire_menu.lua:115 plugins/cheat/init.lua:618
 msgid "Press button for hotkey or wait to leave unchanged"
-msgstr ""
+msgstr "按下熱鍵按鍵或稍後保持不變"
 
 #: plugins/autofire/autofire_menu.lua:161
 msgid "Number of frames button will be pressed"
-msgstr ""
+msgstr "經過幀數後按鈕將按下"
 
 #: plugins/autofire/autofire_menu.lua:169
 msgid "Number of frames button will be released"
-msgstr ""
+msgstr "經過幀數後按鈕將放開"
 
 #: plugins/autofire/autofire_menu.lua:181
 msgid "Edit autofire button"
@@ -3515,7 +3518,7 @@ msgstr "完成"
 
 #: plugins/autofire/autofire_menu.lua:245
 msgid "Select an input for autofire"
-msgstr ""
+msgstr "選擇供連射用的按鍵"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
@@ -3626,58 +3629,3 @@ msgstr "MESSinfo"
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
-
-#~ msgid "Custom UI Settings"
-#~ msgstr "連射設定"
-
-#~ msgid "Software Usage"
-#~ msgstr "軟體用法"
-
-#~ msgid "Usage"
-#~ msgstr "用法"
-
-#~ msgctxt "path-option"
-#~ msgid "UI"
-#~ msgstr "使用者介面"
-
-#~ msgctxt "path-option"
-#~ msgid "Language"
-#~ msgstr "語言"
-
-#~ msgctxt "path-option"
-#~ msgid "Samples"
-#~ msgstr "樣本檔"
-
-#~ msgctxt "path-option"
-#~ msgid "Cheats"
-#~ msgstr "作弊引擎"
-
-#~ msgctxt "path-option"
-#~ msgid "Titles"
-#~ msgstr "標題圖"
-
-#~ msgctxt "path-option"
-#~ msgid "Ends"
-#~ msgstr "結束圖"
-
-#~ msgctxt "path-option"
-#~ msgid "GameOver"
-#~ msgstr "遊戲結束"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Titles"
-#~ msgstr "標題圖"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Ends"
-#~ msgstr "結束圖"
-
-#~ msgid "This machine has no input map."
-#~ msgstr "此機台沒有輸入對應表"
-
-#~ msgid "Select"
-#~ msgstr "選擇"
-
-#, c-format
-#~ msgid "romset: %1$-.100s"
-#~ msgstr "Rom組： %1$-.100s"

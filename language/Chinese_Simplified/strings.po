@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-09 10:52+1100\n"
-"PO-Revision-Date: 2021-05-30 18:00+0800\n"
+"PO-Revision-Date: 2021-10-11 01:50+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -1114,17 +1114,17 @@ msgstr "已停用"
 #: src/frontend/mame/ui/utils.cpp:63
 msgctxt "swlist-info"
 msgid "Alternate Title"
-msgstr ""
+msgstr "别题名"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgctxt "swlist-info"
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgctxt "swlist-info"
 msgid "Barcode Number"
-msgstr ""
+msgstr "条码编号"
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgctxt "swlist-info"
@@ -1134,17 +1134,17 @@ msgstr "开发商"
 #: src/frontend/mame/ui/utils.cpp:67
 msgctxt "swlist-info"
 msgid "Distributor"
-msgstr ""
+msgstr "经销商"
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
 msgid "Installation Instructions"
-msgstr ""
+msgstr "安装说明"
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
 msgid "ISBN"
-msgstr ""
+msgstr "ISBN"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgctxt "swlist-info"
@@ -1159,17 +1159,17 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
 msgid "Part Number"
-msgstr ""
+msgstr "配件编号"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
 msgid "PCB"
-msgstr ""
+msgstr "PCB"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
 msgid "Programmer"
-msgstr ""
+msgstr "编码"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
@@ -1179,17 +1179,17 @@ msgstr "发行日"
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
 msgid "Serial Number"
-msgstr ""
+msgstr "序号"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
 msgid "Usage Instructions"
-msgstr ""
+msgstr "使用说明"
 
 #: src/frontend/mame/ui/utils.cpp:78
 msgctxt "swlist-info"
 msgid "Version"
-msgstr ""
+msgstr "版本"
 
 #: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
@@ -1349,17 +1349,17 @@ msgstr "开发商"
 #: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Distributor"
-msgstr ""
+msgstr "经销商"
 
 #: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Programmer"
-msgstr ""
+msgstr "编码"
 
 #: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
@@ -1601,12 +1601,12 @@ msgstr ""
 #: src/frontend/mame/ui/state.cpp:378
 #, c-format
 msgid "Error removing saved state file %1$s"
-msgstr ""
+msgstr "移除已保存的状态档 %1$s 时发生错误"
 
 #: src/frontend/mame/ui/state.cpp:424
 #, c-format
 msgid "Press %1$s to delete"
-msgstr ""
+msgstr "按下  %1$s 删除"
 
 #: src/frontend/mame/ui/state.cpp:497
 msgid "Load State"
@@ -1644,7 +1644,7 @@ msgstr "其他控制"
 
 #: src/frontend/mame/ui/inputmap.cpp:227
 msgid "This machine has no configurable inputs."
-msgstr ""
+msgstr "此机台没有可设定的输入"
 
 #: src/frontend/mame/ui/inputmap.cpp:310
 msgid "Pressed"
@@ -1864,7 +1864,7 @@ msgstr "软件媒介"
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgctxt "path-option"
 msgid "Sound Samples"
-msgstr ""
+msgstr "声音样本档"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
@@ -1879,17 +1879,17 @@ msgstr "十字准星"
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
 msgid "Cheat Files"
-msgstr ""
+msgstr "作弊档"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
 msgid "Plugins"
-msgstr ""
+msgstr "外挂"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44
 msgctxt "path-option"
 msgid "UI Translations"
-msgstr ""
+msgstr "UI 翻译"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
@@ -1899,12 +1899,12 @@ msgstr "INI"
 #: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
 msgid "UI Settings"
-msgstr ""
+msgstr "UI 设定"
 
 #: src/frontend/mame/ui/dirmenu.cpp:47
 msgctxt "path-option"
 msgid "Plugin Data"
-msgstr ""
+msgstr "外挂资料"
 
 #: src/frontend/mame/ui/dirmenu.cpp:48
 msgctxt "path-option"
@@ -1959,7 +1959,7 @@ msgstr ""
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Game Endings"
-msgstr ""
+msgstr "游戏结局"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
@@ -1979,7 +1979,7 @@ msgstr ""
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr ""
+msgstr "游戏结束画面"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
@@ -2062,11 +2062,11 @@ msgstr ""
 #: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
 #, c-format
 msgid "Zoom = %1$d"
-msgstr ""
+msgstr "缩放 = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1262
 msgid "Expand to fit"
-msgstr ""
+msgstr "展开以符合"
 
 #: src/frontend/mame/ui/selgame.cpp:808
 msgid "Configure Machine"
@@ -2453,7 +2453,7 @@ msgstr "语言"
 
 #: src/frontend/mame/ui/custui.cpp:183
 msgid "System Names"
-msgstr ""
+msgstr "系统名称"
 
 #: src/frontend/mame/ui/custui.cpp:186
 msgid "Show side panels"
@@ -2461,11 +2461,11 @@ msgstr "显示侧面版"
 
 #: src/frontend/mame/ui/custui.cpp:198
 msgid "UI Customization Settings"
-msgstr ""
+msgstr "UI 自订设置"
 
 #: src/frontend/mame/ui/custui.cpp:212 src/frontend/mame/ui/custui.cpp:256
 msgid "[built-in]"
-msgstr ""
+msgstr "[内建]"
 
 #: src/frontend/mame/ui/custui.cpp:338
 msgid "default"
@@ -2709,7 +2709,7 @@ msgstr "类比控制"
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "DIP Switches"
-msgstr ""
+msgstr "机台设定开关"
 
 #: src/frontend/mame/ui/mainmenu.cpp:73
 msgid "Machine Configuration"
@@ -2725,7 +2725,7 @@ msgstr "机器信息"
 
 #: src/frontend/mame/ui/mainmenu.cpp:80
 msgid "Warning Information"
-msgstr ""
+msgstr "警示信息"
 
 #: src/frontend/mame/ui/mainmenu.cpp:86
 msgid "Image Information"
@@ -2778,7 +2778,7 @@ msgstr "檢視外部文件"
 #: src/frontend/mame/ui/mainmenu.cpp:140
 #, c-format
 msgid "About %s"
-msgstr ""
+msgstr "关于 %s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:146
 msgid "Select New Machine"
@@ -2812,12 +2812,12 @@ msgstr "广告图"
 #: src/frontend/mame/ui/selmenu.cpp:81
 msgctxt "selmenu-artwork"
 msgid "Title Screen"
-msgstr ""
+msgstr "标题画面"
 
 #: src/frontend/mame/ui/selmenu.cpp:82
 msgctxt "selmenu-artwork"
 msgid "Ending"
-msgstr ""
+msgstr "结局"
 
 #: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
@@ -2913,7 +2913,7 @@ msgstr "已支援： 是"
 #: src/frontend/mame/ui/selmenu.cpp:686
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "软体列表/项目: %1$s:%2$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:694
 #, c-format
@@ -2943,8 +2943,8 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
-"选定系统所需要的 ROM / 磁碟映像档为缺少或不正确。请取得正确的档案或选择不同的"
-"系统。\n"
+"选定系统所需要的 ROM / 磁碟映像档为缺少或不正确。 "
+"请取得正确的档案或选择不同的系统。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2502
@@ -2953,8 +2953,8 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"选定软体所需要的 ROM / 磁碟映像档为缺少或不正确。请取得正确的档案或选择不同的"
-"软体项目。\n"
+"选定软体所需要的 ROM / 磁碟映像档为缺少或不正确。 "
+"请取得正确的档案或选择不同的软体项目。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2518
@@ -3357,11 +3357,11 @@ msgstr "资料格式"
 
 #: plugins/cheatfind/init.lua:734
 msgid "Slot 1 Value"
-msgstr ""
+msgstr "插槽 1 的值"
 
 #: plugins/cheatfind/init.lua:734
 msgid "Last Slot Value"
-msgstr ""
+msgstr "最后插槽的值"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Test/Write Poke Value"
@@ -3495,15 +3495,15 @@ msgstr ""
 
 #: plugins/autofire/autofire_menu.lua:115 plugins/cheat/init.lua:618
 msgid "Press button for hotkey or wait to leave unchanged"
-msgstr ""
+msgstr "按下热键按键或稍后保持不变"
 
 #: plugins/autofire/autofire_menu.lua:161
 msgid "Number of frames button will be pressed"
-msgstr ""
+msgstr "经过帧数后按钮将按下"
 
 #: plugins/autofire/autofire_menu.lua:169
 msgid "Number of frames button will be released"
-msgstr ""
+msgstr "经过帧数后按钮将放开"
 
 #: plugins/autofire/autofire_menu.lua:181
 msgid "Edit autofire button"
@@ -3626,58 +3626,3 @@ msgstr "MESSinfo"
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
-
-#~ msgid "Custom UI Settings"
-#~ msgstr "连发设定"
-
-#~ msgid "Software Usage"
-#~ msgstr "软件用法"
-
-#~ msgid "Usage"
-#~ msgstr "用法"
-
-#~ msgctxt "path-option"
-#~ msgid "UI"
-#~ msgstr "使用者介面"
-
-#~ msgctxt "path-option"
-#~ msgid "Language"
-#~ msgstr "语言"
-
-#~ msgctxt "path-option"
-#~ msgid "Samples"
-#~ msgstr "采样文件"
-
-#~ msgctxt "path-option"
-#~ msgid "Cheats"
-#~ msgstr "作弊码文件 (cheat)"
-
-#~ msgctxt "path-option"
-#~ msgid "Titles"
-#~ msgstr "标题图 (titles)"
-
-#~ msgctxt "path-option"
-#~ msgid "Ends"
-#~ msgstr "结束图 (ends)"
-
-#~ msgctxt "path-option"
-#~ msgid "GameOver"
-#~ msgstr "游戏结束"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Titles"
-#~ msgstr "标题图"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Ends"
-#~ msgstr "结束图"
-
-#~ msgid "This machine has no input map."
-#~ msgstr "此机台没有输入对应表"
-
-#~ msgid "Select"
-#~ msgstr "选择"
-
-#, c-format
-#~ msgid "romset: %1$-.100s"
-#~ msgstr "Rom套： %1$-.100s"
