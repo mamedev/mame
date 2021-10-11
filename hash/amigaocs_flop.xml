@@ -79,7 +79,7 @@ license:CC0
     any non-write protected discs you insert as long as they're memory resident.
  -->
 
-<softwarelist name="amigaocs_flop" description="Amiga OCS disk images">
+<softwarelist name="amigaocs_flop" description="Commodore Amiga OCS disk images">
 
 	<!-- Not listed in SPS? -->
 
@@ -2832,7 +2832,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen with continous floppy access [FDC] -->
+	<!-- black screen with continous floppy access [FDC] dsksync -->
 	<!-- (keeps jumping to empty area at PC=4d000 after failing a copy protection check at PC=70032, D0=0 D1=5d5 D2=67 D3=0) -->
 	<software name="arnie2" supported="no">
 		<!-- SPS (CAPS) release 1924 -->
@@ -3607,9 +3607,10 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
 		<publisher>King Size</publisher>
+		<info name="additional" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps206)backgammon.ipf" size="1049180" crc="b7e159cb" sha1="64a12d9db73c704195ce0d6733fb3c52cc5fba7b"/>
+				<rom name="(sps206)backgammon.ipf" size="1049180" crc="b7e159cb" sha1="64a12d9db73c704195ce0d6733fb3c52cc5fba7b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3894,7 +3895,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bangkokk" supported="no">
+	<!-- boot OK -->
+	<software name="bangkokk" supported="yes">
 		<!-- SPS (CAPS) release 1137 -->
 		<description>Bangkok Knights (Euro)</description>
 		<!-- retail, standalone -->
@@ -3943,7 +3945,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Guru Meditation during "The game is loading" phase -->
+	<!-- Guru Meditation during "The game is loading" phase [FDC] with adkcon=1100 -->
 	<software name="barbpal" supported="no">
 		<!-- SPS (CAPS) release 1784 -->
 		<description>Barbarian (Euro, v16.3.88, Palace)</description>
@@ -3959,6 +3961,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Hangs at kickstart white screen [FDC] dsksync -->
 	<software name="barb2psy" supported="no">
 		<!-- SPS (CAPS) release 611 -->
 		<description>Barbarian II (Euro, Psygnosis)</description>
@@ -4290,7 +4293,6 @@ license:CC0
 	</software>
 
 	<!-- Black screen, [CIAB] fails on comparing a TOD 9 > 0x115 at PC=de4 -->
-	<!-- BGMs and SFXs whistles [Paula] -->
 	<software name="batman1" cloneof="batman" supported="no">
 		<!-- SPS (CAPS) release 19 -->
 		<description>Batman (Euro, Single Disk)</description>
@@ -4734,7 +4736,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- BGMs/SFXs channels whistles [Paula] -->
+	<!-- intro BGM hiccups [Paula] -->
 	<!-- Has transparent stripes all over the place during intro [copper] -->
 	<software name="bchvolly" supported="partial">
 		<!-- SPS (CAPS) release 1249 -->
@@ -4771,9 +4773,10 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Magic Bytes</publisher>
+		<info name="additional" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1043202">
-				<rom name="(sps1304)beam.ipf" size="1043202" crc="7b894a65" sha1="d88c483405e7b3cb3c1ab2e4fb374036f342e032"/>
+				<rom name="(sps1304)beam.ipf" size="1043202" crc="7b894a65" sha1="d88c483405e7b3cb3c1ab2e4fb374036f342e032" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5276,7 +5279,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- crashes in AmigaOS with DSKDAT R [FDC] -->
+	<!-- crashes in AmigaDOS with DSKDAT R [FDC] dsksync bootblock -->
 	<software name="bhcop" supported="no">
 		<!-- SPS (CAPS) release 179 -->
 		<description>Beverly Hills Cop (Euro)</description>
@@ -6210,6 +6213,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="bluesb" supported="no">
 		<!-- SPS (CAPS) release 3081 -->
 		<description>The Blues Brothers (Euro)</description>
@@ -6224,6 +6228,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="bluesb1" cloneof="bluesb" supported="no">
 		<!-- SPS (CAPS) release 3082 -->
 		<description>The Blues Brothers (Euro, Alt)</description>
@@ -7363,8 +7368,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen [FDC] -->
+	<!-- black screen [FDC] dsksync -->
 	<!-- (Hangs at PC=21050 after failing a copy protection check, D0=0 D1=16 D2=12 D3=0) -->
+	<!-- Doesn't accept [KBD] inputs on language select -->
 	<software name="cadaver" supported="no">
 		<!-- SPS (CAPS) release 103 -->
 		<description>Cadaver (Euro, v0.01)</description>
@@ -7386,7 +7392,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen [FDC] -->
+	<!-- black screen [FDC] dsksync -->
 	<software name="cadavera" cloneof="cadaver" supported="no">
 		<!-- SPS (CAPS) release 2876 -->
 		<description>Cadaver (Euro, v1.03, The Bitmap Brothers Volume 1)</description>
@@ -7598,9 +7604,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a rainbow colored loading screen [FDC] -->
-	<!-- (checks for string "SOS6" at PC=500be, which is offset because precompensation is enabled) -->
-	<!-- (eventually disables precompensation when starting a level, tries to sync with MFM instead of GCR) -->
+	<!-- Hangs at a rainbow colored loading screen [FDC] dsksync -->
+	<!-- (checks for string "SOS6" at PC=500be, which is offset because of dsksync) -->
 	<software name="cfodder" supported="no">
 		<!-- SPS (CAPS) release 860 -->
 		<description>Cannon Fodder (Euro)</description>
@@ -7752,6 +7757,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Hangs at a rainbow colored loading screen [FDC] dsksync -->
+	<!-- (Same as cfodder) -->
 	<software name="csoccer" supported="no">
 		<!-- SPS (CAPS) release 165 -->
 		<description>Cannon Soccer (Euro)</description>
@@ -7966,7 +7973,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- no BGM, black screen after loading arcade mode (spurious irq?) -->
+	<!-- black screen after loading arcade mode (spurious irq?) -->
 	<software name="lewisch" supported="no">
 		<!-- SPS (CAPS) release 639 -->
 		<description>The Carl Lewis Challenge (Euro)</description>
@@ -8455,6 +8462,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- offset flashing on main menu -->
+	<!-- key repeat is too fast on main menu -->
+	<!-- Jumps to lalaland after selecting a competition, [FDC] -->
 	<software name="champdrv" supported="no">
 		<!-- SPS (CAPS) release 1292 -->
 		<description>Champion Driver (Euro)</description>
@@ -8770,6 +8780,7 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Ocean</publisher>
+		<info name="additional" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -8779,7 +8790,7 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1246)chasehqii-specialcriminalinvestigation_disk2.ipf" size="1049612" crc="950fe6b4" sha1="471e0b0535db4121f1a4c37f5b70ba2611f5d005"/>
+				<rom name="(sps1246)chasehqii-specialcriminalinvestigation_disk2.ipf" size="1049612" crc="950fe6b4" sha1="471e0b0535db4121f1a4c37f5b70ba2611f5d005"status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -10128,7 +10139,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Gets stuck at the AmigaOS blue screen [FDC] -->
+	<!-- Gets stuck at the AmigaDOS blue screen [FDC] dsksync bootblock -->
 	<!-- (Sets up a clearly invalid DMA dskpt of 0, enables MFM precomp) -->
 	<software name="cosmcbnc" supported="no">
 		<!-- SPS (CAPS) release 309 -->
@@ -11989,8 +12000,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Asks to disc swap with disc 1, which is already in [FDC] -->
-	<!-- (copy protection) -->
+	<!-- Asks to disc swap with disc 1, which is already in, [FDC] dsksync -->
+	<!-- Mouse input doesn't work (TODO: recheck) -->
 	<software name="dstrike" supported="no">
 		<!-- SPS (CAPS) release 112 -->
 		<description>Desert Strike - Return to the Gulf (Euro)</description>
@@ -12606,7 +12617,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen [FDC] -->
+	<!-- black screen [FDC] dsksync -->
 	<software name="ddragon3" supported="no">
 		<!-- SPS (CAPS) release 321 -->
 		<description>Double Dragon 3 - The Rosetta Stone (Euro)</description>
@@ -12712,6 +12723,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Throws "system status abnormal" and refuses to boot, [FDC] dsksync bootblock -->
 	<software name="drgnfght" supported="no">
 		<!-- SPS (CAPS) release 1023 -->
 		<description>Dragon Fighter (Euro)</description>
@@ -12983,8 +12995,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at VDT logo [FDC] -->
-	<!-- (Checks specific value in the loaded buffer, offset by 2. Enables MFM precomp) -->
+	<!-- Hangs at VDT logo [FDC] dsksync -->
+	<!-- (Checks specific value in the loaded buffer, offset by 2) -->
+	<!-- Hangs at "Randy Linden production", tries to check [FDC] with dsksync == 0 -->
 	<software name="dlair" supported="no">
 		<!-- SPS (CAPS) release 1360 -->
 		<description>Dragon's Lair (Euro)</description>
@@ -13030,7 +13043,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- locks up at ReadySoft logo [FDC] -->
+	<!-- locks up at ReadySoft logo [FDC] dsksync -->
+	<!-- In-game it enables [FDC] dsklen == 0 -->
 	<software name="dlair2" supported="no">
 		<!-- SPS (CAPS) release 59 -->
 		<description>Dragon's Lair II - Time Warp (Euro)</description>
@@ -13076,8 +13090,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen [FDC] -->
-	<!-- (same copy protection as dlair2) -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- In-game it enables [FDC] dsklen == 0 -->
+	<!-- (same as dlair2) -->
 	<software name="dlair3" supported="no">
 		<!-- SPS (CAPS) release 649 -->
 		<description>Dragon's Lair III: The Curse of Mordread (Euro)</description>
@@ -14629,7 +14644,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- locks up on AmigaDOS with "Now Loading" msg [FDC] -->
+	<!-- locks up on AmigaDOS with "Now Loading" msg [FDC] dsksync -->
+	<!-- Menu draws a pointer garbage when it's at the bottom of the screen -->
+	<!-- TODO: Understand how to change cpu controlled teams to human -->
 	<software name="hughesis" supported="no">
 		<!-- SPS (CAPS) release 1077 -->
 		<description>Emlyn Hughes International Soccer (Euro)</description>
@@ -14916,10 +14933,11 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Grandslam</publisher>
+		<info name="additional" value="Mastered with virus" />
 		<info name="alt_title" value="Espionage - The Computer Game (Box)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps11)espionage.ipf" size="1049612" crc="258a0c8e" sha1="604fbea189f9f2a1dc252bb9dc952f4af2f3b051"/>
+				<rom name="(sps11)espionage.ipf" size="1049612" crc="258a0c8e" sha1="604fbea189f9f2a1dc252bb9dc952f4af2f3b051" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15106,8 +15124,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Keeps loading on a green-black screen fade transition [FDC] -->
-	<!-- TODO: verify if it's using copper DMA for transfers -->
+	<!-- Keeps loading on a green-black screen fade transition [FDC] dsksync -->
+	<!-- Gameplay GFXs are pitch skewed -->
 	<software name="exile" supported="no">
 		<!-- SPS (CAPS) release 32 -->
 		<description>Exile (Euro)</description>
@@ -16049,6 +16067,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Prompts to a CLI 2 (implicitly failing a copy protection?) -->
 	<software name="fernandz" supported="no">
 		<!-- SPS (CAPS) release 1980 -->
 		<description>Fernandez Must Die (Euro)</description>
@@ -16236,6 +16255,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Cut off title GFX -->
+	<!-- Status bar on the right is offset, cuts off timer (raster effect?) -->
+	<!-- Doesn't recognize double click presses (cfr. attract mode instructions) -->
 	<software name="fsoccer" supported="no">
 		<!-- SPS (CAPS) release 1532 -->
 		<description>Fighting Soccer (Euro)</description>
@@ -16243,6 +16265,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Activision</publisher>
+		<info name="usage" value="Requires Joystick on port 1"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049304">
 				<rom name="(sps1532)fightingsoccer.ipf" size="1049304" crc="f8825b02" sha1="89db1d0c75d817fdd46d286b682b8a12e6183eb4"/>
@@ -18271,7 +18295,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Guru Meditation [FDC] -->
+	<!-- Guru Meditation [FDC] dsksync bootblock -->
 	<software name="ghostbs2" supported="no">
 		<!-- SPS (CAPS) release 1029 -->
 		<description>Ghostbusters II (Euro)</description>
@@ -18782,7 +18806,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen [FDC] -->
+	<!-- black screen [FDC] dsksync -->
 	<!-- (Hangs at PC=10c after failing a copy protection check, D0=0 D1=295 D2=40 D3=0) -->
 	<software name="gods" supported="no">
 		<!-- SPS (CAPS) release 666 -->
@@ -19159,7 +19183,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after Kickstart (white screen) [FDC] -->
+	<!-- Locks up after Kickstart (white screen) [FDC] dsksync -->
 	<software name="ggiana" supported="no">
 		<!-- SPS (CAPS) release 2945 -->
 		<description>The Great Giana Sisters (Euro)</description>
@@ -20181,7 +20205,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a red and black flashing screen [FDC] -->
+	<!-- Hangs at a red and black flashing screen [FDC] dsksync -->
 	<software name="heroqst" supported="no">
 		<!-- SPS (CAPS) release 127 -->
 		<description>HeroQuest (Euro)</description>
@@ -20189,6 +20213,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+		
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1010622">
 				<rom name="(sps127)heroquest.ipf" size="1010622" crc="910577eb" sha1="a40aaba4de04248e5fcc5443c818da7790ef910c"/>
@@ -20205,6 +20231,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>Gremlin Graphics</publisher>
 		<info name="usage" value="Requires &quot;Hero Quest&quot; to work" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps508)heroquestreturnofthewitchlord.ipf" size="1049612" crc="7e3e0955" sha1="72817f62c3a0de5defa39e9ca3d56c2ff1de06f4"/>
@@ -20489,7 +20516,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after Kickstart (white screen) [FDC] -->
+	<!-- Locks up after Kickstart (white screen) [FDC] dsksync -->
+	<!-- No sprites on gameplay, BGM is too fast? -->
 	<software name="hoi" supported="no">
 		<!-- SPS (CAPS) release 962 -->
 		<description>Hoi (Euro)</description>
@@ -21286,7 +21314,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Grey screen [FDC] -->
+	<!-- Grey screen [FDC] dsksync -->
+	<!-- Has slight GFX shifted text (attribute color on pilot select, lives counter) -->
+	<!-- GFX garbage strips pops in from time to time during gameplay -->
 	<software name="hybris" supported="no">
 		<!-- SPS (CAPS) release 1457 -->
 		<description>Hybris (USA, v0.95)</description>
@@ -21364,6 +21394,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Doesn't boot with debugger on, otherwise hangs anytime during the boot phase (spurious irqs or unsafe video code) -->
 	<software name="ikplus" supported="no">
 		<!-- SPS (CAPS) release 339 -->
 		<description>IK+ (Euro)</description>
@@ -21801,7 +21832,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at Indy logo on a cyan background [FDC] -->
+	<!-- Hangs at Indy logo on a cyan background [FDC] dsksync -->
+	<!-- Hangs after Lucasarts logo with stuck note (INTREQ=$aaaa) -->
 	<software name="indycrus" supported="no">
 		<!-- SPS (CAPS) release 1619 -->
 		<description>Indiana Jones and the Last Crusade (Euro, TAG)</description>
@@ -22591,8 +22623,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up on AmigaOS with DSKDAT R [FDC] -->
-	<!-- (actually a side effect of failing earlier than that) -->
+	<!-- Locks up on AmigaDOS with DSKDAT R, side effect of [FDC] dsksync bootblock -->
 	<software name="itcame" supported="no">
 		<!-- SPS (CAPS) release 14 -->
 		<description>It Came from the Desert (Euro)</description>
@@ -22642,7 +22673,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen [FDC] -->
+	<!-- black screen [FDC] dsksync -->
 	<software name="ivanhoe" supported="no">
 		<!-- SPS (CAPS) release 1648 -->
 		<description>Ivanhoe (Euro)</description>
@@ -23794,7 +23825,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- blue screen (keeps accessing invalid areas, [FDC]?) -->
+	<!-- blue screen, keeps accessing invalid areas, [FDC] dsksync bootblock? -->
 	<software name="kickoff" supported="no">
 		<!-- SPS (CAPS) release 189 -->
 		<description>Kick Off (Euro, v1.1)</description>
@@ -24983,7 +25014,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a rainbow colored screen [FDC] -->
+	<!-- Hangs at a rainbow colored screen [FDC] dsksync -->
+	<!-- Has serious GFX pitch corruption when scrolls during gameplay -->
 	<software name="lastbtle" supported="no">
 		<!-- SPS (CAPS) release 1044 -->
 		<description>Last Battle (Euro)</description>
@@ -25321,6 +25353,7 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
+		<info name="additional" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -25336,7 +25369,7 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps1589)legendoffaerghail_disk3.ipf" size="1049180" crc="235c8d31" sha1="45b63cc92bc499405474049ba774adef0baeccb4"/>
+				<rom name="(sps1589)legendoffaerghail_disk3.ipf" size="1049180" crc="235c8d31" sha1="45b63cc92bc499405474049ba774adef0baeccb4" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25842,7 +25875,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after Kickstart (white screen) -->
+	<!-- Locks up after Kickstart (white screen) [FDC] dsksync -->
+	<!-- Detects expansion RAM as default -->
 	<software name="lemmings" supported="no">
 		<!-- SPS (CAPS) release 132 -->
 		<description>Lemmings (Euro)</description>
@@ -26052,7 +26086,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen [FDC] -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- masked Lethal Weapon intro text has raster issue -->
+	<!-- TODO: Needs multiple presses with no video feedback on mission select section? -->
 	<software name="lweapon" supported="no">
 		<!-- SPS (CAPS) release 814 -->
 		<description>Lethal Weapon (Euro)</description>
@@ -26255,7 +26291,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK in a1200, has major raster/alignment issues, first boss background layer has wrong colors. Doesn't boot in a500 -->
+	<!-- boot OK in a1200 and a500. a500 doesn't draw any sprite -->
+	<!-- has major raster/alignment issues (stage intro text, in-game), first boss background layer has wrong colors. -->
 	<software name="lionhart" supported="no">
 		<!-- SPS (CAPS) release 845 -->
 		<description>Lionheart (Euro)</description>
@@ -26420,8 +26457,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- crashes in AmigaOS with DSKDAT R [FDC] -->
-	<!-- (False positive, thrashing memory) -->
+	<!-- crashes in AmigaDOS with DSKDAT R, side effect of [FDC] dsksync bootblock -->
 	<software name="racrally" supported="no">
 		<!-- SPS (CAPS) release 1098 -->
 		<description>Lombard RAC Rally (Euro)</description>
@@ -26663,7 +26699,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- crashes in AmigaOS with DSKDAT R -->
+	<!-- crashes in AmigaDOS with DSKDAT R, side effect of [FDC] dsksync bootblock -->
 	<software name="risinsun" supported="no">
 		<!-- SPS (CAPS) release 133 -->
 		<description>Lords of the Rising Sun (Euro)</description>
@@ -26795,6 +26831,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Guru Meditation after selecting new game [FDC] dsksync -->
+	<!-- Crashes with wrong GFX colors if player gives up a stage (recheck) -->
 	<software name="lostvik" supported="no">
 		<!-- SPS (CAPS) release 2235 -->
 		<description>The Lost Vikings (Euro)</description>
@@ -29933,6 +29971,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- black screen with eventually running irq at $ffffff, [FDC] dsksync -->
+	<!-- Hangs on CIA timer A readback while setting mode $99 -->
 	<software name="nevermnd" supported="no">
 		<!-- SPS (CAPS) release 1507 -->
 		<description>Never Mind (Euro)</description>
@@ -31071,9 +31111,10 @@ license:CC0
 		<year>1988</year>
 		<publisher>Ariolasoft</publisher>
 		<info name="alt_title" value="Ooze - Als die Geister mürbe wurden (Box)" />
+		<info name="additional" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1255)ooze.ipf" size="1049612" crc="40d448b7" sha1="66c53d7a931bae8c5436db777c19e40893fd0c9d"/>
+				<rom name="(sps1255)ooze.ipf" size="1049612" crc="40d448b7" sha1="66c53d7a931bae8c5436db777c19e40893fd0c9d" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31459,7 +31500,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after Kickstart with DSKDAT W 4000 message (white screen) -->
+	<!-- Locks up after Kickstart with DSKDAT W $4000 message (white screen) [FDC] dsksync -->
+	<!-- Uses more [FDC] DSKDAT W $4000 afterwards -->
 	<software name="outrun" supported="no">
 		<!-- SPS (CAPS) release 1161 -->
 		<description>Out Run (Euro)</description>
@@ -31502,7 +31544,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs at a red and black flashing screen -->
+	<!-- Hangs at a red and black flashing screen [FDC] -->
 	<software name="outrneur" supported="no">
 		<!-- SPS (CAPS) release 1597 -->
 		<description>Out Run Europa (Euro)</description>
@@ -31769,7 +31811,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- Gameplay BGM gets cut off [Paula] -->
 	<software name="pang" supported="no">
 		<!-- SPS (CAPS) release 929 -->
 		<description>Pang (Euro)</description>
@@ -31784,7 +31827,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up on AmigaOS -->
+	<!-- Locks up on AmigaDOS, [FDC] uses adkcon=$1100 -->
 	<software name="panzakb" supported="no">
 		<!-- SPS (CAPS) release 2400 -->
 		<description>Panza Kick Boxing (Euro)</description>
@@ -31841,6 +31884,10 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Hangs at Kickstart white screen, [FDC] dsksync -->
+	<!-- Hangs on a1200 on boot -->
+	<!-- Expects to read an autoconfig board at $200000, otherwise it straight off refuses to run with a blue screen (should be possible to run with standard  512k RAM?) -->
+	<!-- Bad colors on intro and gameplay -->
 	<software name="paradr90" supported="no">
 		<!-- SPS (CAPS) release 692 -->
 		<description>Paradroid 90 (Euro)</description>
@@ -31925,7 +31972,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="parasol" supported="no">
+	<!-- Missing text status on top, known to do sprite rasters with [Copper] -->
+	<software name="parasol" supported="partial">
 		<!-- SPS (CAPS) release 139 -->
 		<description>Parasol Stars - The Story of Rainbow Islands II (Euro)</description>
 		<!-- retail, standalone -->
@@ -32774,8 +32822,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Crashes on title screen -->
-	<software name="pmanger" supported="no">
+	<!-- Has slight glitches during gameplay (empty box on startup, sprite overlap drawing, garbage stripe GFX from time to time) -->
+	<software name="pmanger" supported="partial">
 		<!-- SPS (CAPS) release 171 -->
 		<description>Player Manager (Euro)</description>
 		<!-- retail, standalone -->
@@ -32803,8 +32851,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Crashes on title screen -->
-	<software name="pmangeri" cloneof="pmanger" supported="no">
+	<!-- Has slight glitches during gameplay (empty box on startup, sprite overlap drawing, garbage stripe GFX from time to time) -->
+	<software name="pmangeri" cloneof="pmanger" supported="partial">
 		<!-- SPS (CAPS) release 2572 -->
 		<description>Player Manager (Ita)</description>
 		<!-- retail, standalone -->
@@ -33512,9 +33560,10 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>MicroProse</publisher>
+		<info name="additional" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps712)presidentismissing,the.ipf" size="1049612" crc="03a617da" sha1="d5d5028f8b834567ee9b5a55264a9b860f00b6f8"/>
+				<rom name="(sps712)presidentismissing,the.ipf" size="1049612" crc="03a617da" sha1="d5d5028f8b834567ee9b5a55264a9b860f00b6f8" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33743,7 +33792,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="profezia" supported="no">
+	<!-- Has slight GFX color issue when doors opens before starting a game -->
+	<software name="profezia" supported="partial">
 		<!-- SPS (CAPS) release 2375 -->
 		<description>Profezia (Ita)</description>
 		<!-- retail, standalone -->
@@ -35239,7 +35289,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- locks up on AmigaDOS with "Now Loading" msg -->
+	<!-- locks up on AmigaDOS with "Now Loading" msg [FDC] dsksync -->
 	<software name="rete" cloneof="hughesis" supported="no">
 		<!-- SPS (CAPS) release 2751 -->
 		<description>Retee! (Ita)</description>
@@ -36447,6 +36497,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Vertical scrolling b&w stripes after Kickstart, [FDC] dsksync -->
 	<software name="runninmn" supported="no">
 		<!-- SPS (CAPS) release 382 -->
 		<description>The Running Man (Euro)</description>
@@ -36983,6 +37034,10 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- black screen, [FDC] dsksync -->
+	<!-- Does not boot on a500, accesses autoconfig RAM banks at $300000 and $c00000 -->
+	<!-- very offset title GFXs -->
+	<!-- Offset background layer(s) during gameplay -->
 	<software name="seekdest" supported="no">
 		<!-- SPS (CAPS) release 252 -->
 		<description>Seek and Destroy (Euro)</description>
@@ -37270,7 +37325,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen with continous floppy access after AmigaOS loading -->
+	<!-- black screen, [FDC] dsksync -->
+	<!-- Uses [FDC] dskdatr at end of loading cycles, no noticeable effect? -->
 	<software name="swos9697" supported="no">
 		<!-- SPS (CAPS) release 842 -->
 		<description>Sensible World of Soccer 96-97 (Euro)</description>
@@ -37856,7 +37912,7 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disquette 0" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2669)shortgrey,the_disquette0.ipf" size="1049180" crc="75229841" sha1="5ebf2dd7c0b5c2cd7a3b5cf32bfe75aced00490d"/>
+				<rom name="(sps2669)shortgrey,the_disquette0.ipf" size="1049180" crc="75229841" sha1="5ebf2dd7c0b5c2cd7a3b5cf32bfe75aced00490d" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -37868,19 +37924,19 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disquette 2" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2669)shortgrey,the_disquette2.ipf" size="1049180" crc="5d98644d" sha1="e71d1fd635af5d8676f23d94a9e843880efe579c"/>
+				<rom name="(sps2669)shortgrey,the_disquette2.ipf" size="1049180" crc="5d98644d" sha1="e71d1fd635af5d8676f23d94a9e843880efe579c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disquette 3" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2669)shortgrey,the_disquette3.ipf" size="1049180" crc="8554cdcc" sha1="d8cf8560e3e5ffbad7f18f6d6754ead0b9171e7b"/>
+				<rom name="(sps2669)shortgrey,the_disquette3.ipf" size="1049180" crc="8554cdcc" sha1="d8cf8560e3e5ffbad7f18f6d6754ead0b9171e7b" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disquette 4" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2669)shortgrey,the_disquette4.ipf" size="1049180" crc="ba114b74" sha1="1fc3ff80b3b61a191337fb30e03c1cebae032b31"/>
+				<rom name="(sps2669)shortgrey,the_disquette4.ipf" size="1049180" crc="ba114b74" sha1="1fc3ff80b3b61a191337fb30e03c1cebae032b31" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39147,7 +39203,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after title screen by pressing fire on joystick -->
+	<!-- Locks up after title screen by pressing fire on joystick [FDC] dsksync -->
+	<!-- Player GFX sprite is black filled -->
 	<software name="slipstrm" supported="no">
 		<!-- SPS (CAPS) release 1629 -->
 		<description>Slip Stream (Euro)</description>
@@ -39288,7 +39345,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- Hangs on title screen -->
 	<software name="soccerpb" supported="no">
 		<!-- SPS (CAPS) release 2522 -->
 		<description>Soccer Pinball (Euro)</description>
@@ -39499,7 +39557,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- locks up at ReadySoft logo -->
+	<!-- locks up at ReadySoft logo [FDC] dsksync -->
 	<software name="spaceace" supported="no">
 		<!-- SPS (CAPS) release 85 -->
 		<description>Space Ace (Euro)</description>
@@ -39533,7 +39591,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- In-game it enables [FDC] dsklen == $0 and hangs (same as dlair2) -->
 	<software name="spaceac2" supported="no">
 		<!-- SPS (CAPS) release 931 -->
 		<description>Space Ace II - Borf's Revenge (Euro)</description>
@@ -40951,10 +41010,11 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Logotron</publisher>
+		<info name="additional" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1612)starray_bootdisk.ipf" size="1049612" crc="a2c003ee" sha1="a217fb846733230ea739616065aa1f9c98bb39b1"/>
+				<rom name="(sps1612)starray_bootdisk.ipf" size="1049612" crc="a2c003ee" sha1="a217fb846733230ea739616065aa1f9c98bb39b1" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -41369,7 +41429,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs on a cyan background (cfr. indycrus) -->
+	<!-- Hangs on a cyan background [FDC] dsksync -->
 	<software name="strider" supported="no">
 		<!-- SPS (CAPS) release 1224 -->
 		<description>Strider (Euro)</description>
@@ -41738,7 +41798,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Guru Meditation (yellow screen on a500) -->
+	<!-- Guru Meditation (yellow screen on a500) [FDC] -->
 	<software name="supaplex" supported="no">
 		<!-- SPS (CAPS) release 1902 -->
 		<description>Supaplex (Euro)</description>
@@ -41753,7 +41813,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] -->
 	<software name="supercar" supported="no">
 		<!-- SPS (CAPS) release 1527 -->
 		<description>Super Cars (Euro)</description>
@@ -41789,7 +41849,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up after Kickstart (white screen) -->
+	<!-- Locks up after Kickstart (white screen) [FDC] dsksync -->
 	<software name="supercr2" supported="no">
 		<!-- SPS (CAPS) release 224 -->
 		<description>Super Cars II (Euro)</description>
@@ -41797,6 +41857,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="996938">
@@ -41867,7 +41929,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
 	<software name="smgp" supported="no">
 		<!-- SPS (CAPS) release 1422 -->
 		<description>Super Monaco GP (Euro)</description>
@@ -42212,7 +42274,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- Has serious GFX pitch issues on gameplay, no sprites with a500p -->
 	<software name="suprfrog" supported="no">
 		<!-- SPS (CAPS) release 35 -->
 		<description>Superfrog (Euro)</description>
@@ -42467,7 +42530,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- Hangs at title screen with no BGM -->
 	<software name="swordsod" supported="no">
 		<!-- SPS (CAPS) release 1103 -->
 		<description>Sword of Sodan (Euro)</description>
@@ -42495,7 +42559,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- doesn't recognize data disk when asked to disc swap (compiled with different Workbench?) -->
+	<!-- doesn't recognize data disk when asked to disc swap [FDC] -->
 	<software name="swrdtwil" supported="no">
 		<!-- SPS (CAPS) release 972 -->
 		<description>Swords of Twilight (Euro)</description>
@@ -42777,7 +42841,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Black screen after AmigaOS -->
+	<!-- Black screen after AmigaDOS, [FDC] dsksync -->
+	<!-- Hangs at Targhan title screen [FDC] -->
 	<software name="targhan" supported="no">
 		<!-- SPS (CAPS) release 1859 -->
 		<description>Targhan (Euro)</description>
@@ -44764,7 +44829,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- TODO: verify after copy protection manual -->
 	<software name="tourgolf" supported="no">
 		<!-- SPS (CAPS) release 1278 -->
 		<description>Tournament Golf (Euro)</description>
@@ -44772,6 +44838,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Elite</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Program Disk" />
 			<dataarea name="flop" size="1009544">
@@ -44884,7 +44952,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen after AmigaOS -->
+	<!-- black screen after AmigaDOS [FDC] dsksync -->
+	<!-- Mouse cursor is uncontrollable -->
 	<software name="transarc" supported="no">
 		<!-- SPS (CAPS) release 744 -->
 		<description>Transarctica (Euro)</description>
@@ -46127,7 +46196,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen after AmigaOS loading -->
+	<!-- black screen after AmigaDOS loading [FDC] -->
 	<software name="vengexcl" supported="no">
 		<!-- SPS (CAPS) release 2499 -->
 		<description>Vengeance of Excalibur (Euro)</description>
@@ -46331,7 +46400,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up at AmigaOS -->
+	<!-- Locks up at AmigaDOS [FDC] dsksync -->
+	<!-- Screen is too dim (tested on a500p) -->
+	<!-- Doesn't accept joy/key inputs on ranking screen (PC=18dcc) -->
 	<software name="vixen" supported="no">
 		<!-- SPS (CAPS) release 993 -->
 		<description>Vixen (Euro)</description>
@@ -46360,8 +46431,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- hangs at Kickstart white screen, [FDC] wants dsksync to not write on RAM after bootblock load -->
-	<!-- Runs too fast, and button isn't recognized during gameplay -->
+	<!-- hangs at Kickstart white screen, [FDC] dsksync -->
+	<!-- Runs too fast -->
 	<software name="viz" supported="no">
 		<!-- SPS (CAPS) release 3030 -->
 		<description>Viz - The Soft Floppy One (Euro)</description>
@@ -46527,7 +46598,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
+	<!-- Hangs at Vyrus title screen, [FDC] -->
 	<software name="vyrus" supported="no">
 		<!-- SPS (CAPS) release 1069 -->
 		<description>Vyrus (Euro)</description>
@@ -46849,7 +46921,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Incorrectly drawn copy protection screen (repeats numpad at bottom) -->
+	<!-- Incorrectly GFX drawn copy protection screen (repeats numpad at bottom) -->
 	<!-- TODO: verify afterwards -->
 	<software name="waxworks" supported="no">
 		<!-- SPS (CAPS) release 2274 -->
@@ -47362,7 +47434,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Black screen, continous access to floppy -->
+	<!-- Black screen, continous access to [FDC] floppy -->
 	<software name="wildstrt" supported="no">
 		<!-- SPS (CAPS) release 1678 -->
 		<description>Wild Streets (Euro)</description>
@@ -47565,7 +47637,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen [FDC] dsksync -->
 	<software name="wingfury" supported="no">
 		<!-- SPS (CAPS) release 599 -->
 		<description>Wings of Fury (Euro)</description>
@@ -47888,7 +47960,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Shows Core Design logo then hangs with red backdrop -->
+	<!-- Shows Core Design logo then hangs with red backdrop [FDC] dsksync -->
+	<!-- Has GFX stripe glitch when player dies -->
 	<software name="wolfchld" supported="no">
 		<!-- SPS (CAPS) release 411 -->
 		<description>Wolfchild (Euro)</description>
@@ -48142,6 +48215,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<info name="usage" value="Sports manual copy-protection (Worms codes)" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -48391,7 +48465,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up at Xenon logo -->
+	<!-- Locks up at Xenon logo [FDC] dsksync -->
 	<software name="xenon" supported="no">
 		<!-- SPS (CAPS) release 399 -->
 		<description>Xenon (Euro)</description>
@@ -48420,8 +48494,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<software name="xenon2" supported="no">
+	<!-- boot OK -->
+	<software name="xenon2" supported="yes">
 		<!-- SPS (CAPS) release 297 -->
 		<description>Xenon 2 - Megablast (Euro)</description>
 		<!-- retail, standalone -->
@@ -48434,6 +48508,7 @@ license:CC0
 				<rom name="(sps297)xenon2_disk1.ipf" size="1049304" crc="41441b95" sha1="72cf591760e014b53e946bf9603ae71b3d21d0d8"/>
 			</dataarea>
 		</part>
+		<!-- "Game Disk" -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
@@ -48851,7 +48926,7 @@ license:CC0
 		<info name="additional" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1055523">
-				<rom name="(sps2768)zombi.ipf" size="1055523" crc="97261026" sha1="922fdade85ab40968c3c4d028ab841151573d572"/>
+				<rom name="(sps2768)zombi.ipf" size="1055523" crc="97261026" sha1="922fdade85ab40968c3c4d028ab841151573d572" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

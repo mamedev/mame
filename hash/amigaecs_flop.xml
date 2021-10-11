@@ -10,7 +10,7 @@ license:CC0
     will not function.
 -->
 
-<softwarelist name="amigaecs_flop" description="Amiga ECS disk images">
+<softwarelist name="amigaecs_flop" description="Commodore Amiga ECS disk images">
 
 	<software name="cmang2up" supported="no">
 		<!-- SPS (CAPS) release 1997 -->
