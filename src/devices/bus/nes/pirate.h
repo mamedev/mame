@@ -257,38 +257,6 @@ private:
 };
 
 
-// ======================> nes_cityfight_device
-
-class nes_cityfight_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
-	static constexpr device_timer_id TIMER_IRQ = 0;
-
-	void update_prg();
-
-	uint8_t m_prg_reg, m_prg_mode;
-	uint16_t m_irq_count;
-	int m_irq_enable;
-
-	emu_timer *irq_timer;
-
-	uint8_t m_mmc_vrom_bank[8];
-};
-
-
 // ======================> nes_eh8813a_device
 
 class nes_eh8813a_device : public nes_nrom_device
@@ -351,7 +319,6 @@ DECLARE_DEVICE_TYPE(NES_EDU2K,       nes_edu2k_device)
 DECLARE_DEVICE_TYPE(NES_T230,        nes_t230_device)
 DECLARE_DEVICE_TYPE(NES_MK2,         nes_mk2_device)
 DECLARE_DEVICE_TYPE(NES_43272,       nes_43272_device)
-DECLARE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device)
 DECLARE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device)
 //DECLARE_DEVICE_TYPE(NES_FUJIYA,      nes_fujiya_device)
 

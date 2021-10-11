@@ -487,7 +487,7 @@ static const nes_mmc mmc_list[] =
 	{ 521, DREAMTECH_BOARD },      // Korean Igo
 	{ 522, UNL_LH10 },             // Fuuun Shaolin Kyo FDS conversion
 	// { 523, UNKNOWN }, likely fengshnb or a clone not yet in nes.xml
-	// { 524, BTL_900218 }, this seems to be lordkinga
+	{ 524, BTL_900218 },           // Lord of King pirate
 	{ 525, KAISER_KS7021A },       // GetsuFumaDen pirate (and maybe a Contra?)
 	// 526 sangochu clone not yet in nes.xml?
 	// 527 demnswrd/fudomyod clone not yet in nes.xml
