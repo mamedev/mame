@@ -626,7 +626,7 @@ void spifi3_device::send_cmd_byte()
 
 void spifi3_device::send_byte()
 {
-    if(m_even_fifo.empty())
+    if(m_even_fifo.empty() && ((state & STATE_MASK) != INIT_XFR_SEND_PAD))
     {
         fatalerror("spifi3_device::send_byte - Tried to send data with an empty FIFO!\n");
     }
@@ -1357,6 +1357,20 @@ void spifi3_device::step(bool timeout)
                     dma_dir = DMA_NONE;
                     spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
                 }
+                else if(newPhase == S_PHASE_DATA_OUT)
+                {
+                    // WORKAROUND - I haven't been able to figure out how to make the interrupts and register values work out
+                    // to where DMAC3 triggers a parity error only when PAD is needed. So, we'll just transfer it ourselves instead.
+                    // This is probably not hardware accurate.
+                    LOG("Still in data out - expecting PAD command!");
+                    state = INIT_XFR_SEND_PAD_WAIT_REQ;
+                }
+                else if(newPhase == S_PHASE_DATA_IN)
+                {
+                    // See above
+                    LOG("Still in data in - expecting PAD command!");
+                    state = INIT_XFR_RECV_PAD_WAIT_REQ;
+                }
             }
             else if (xfrDataSource == FIFO && (!dma_command && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()))
             {
@@ -1542,10 +1556,28 @@ void spifi3_device::step(bool timeout)
                 break;
             }
 
-            if((ctrl & S_PHASE_MASK) != xfr_phase)
+            auto newPhase = (ctrl & S_PHASE_MASK);
+            if(newPhase != xfr_phase)
             {
                 command_pos = 0;
-                bus_complete();
+
+                if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                {
+                    // TODO: ID enforcement for autostat
+                    LOG("PAD: Autostat enabled, proceeding to status input automatically\n");
+                    state = INIT_XFR;
+                    xfr_phase = newPhase;
+
+                    // Below this is a guess
+                    dma_command = false;
+                    dma_dir = DMA_NONE;
+                    spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                    step(false);
+                }
+                else
+                {
+                    bus_complete();
+                }
             }
             else
             {
@@ -1557,16 +1589,8 @@ void spifi3_device::step(bool timeout)
 
         case INIT_XFR_SEND_PAD:
         {
-            decrement_tcounter();
-            if(!transfer_count_zero())
-            {
-                state = INIT_XFR_SEND_PAD_WAIT_REQ;
-                step(false);
-            }
-            else
-            {
-                function_complete();
-            }
+            state = INIT_XFR_SEND_PAD_WAIT_REQ;
+            step(false);
             break;
         }
 
@@ -1577,10 +1601,28 @@ void spifi3_device::step(bool timeout)
                 break;
             }
 
-            if((ctrl & S_PHASE_MASK) != xfr_phase)
+            auto newPhase = (ctrl & S_PHASE_MASK);
+            if(newPhase != xfr_phase)
             {
                 command_pos = 0;
-                bus_complete();
+
+                if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                {
+                    // TODO: ID enforcement for autostat
+                    LOG("PAD: Autostat enabled, proceeding to status input automatically\n");
+                    state = INIT_XFR;
+                    xfr_phase = newPhase;
+
+                    // Below this is a guess
+                    dma_command = false;
+                    dma_dir = DMA_NONE;
+                    spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                    step(false);
+                }
+                else
+                {
+                    bus_complete();
+                }
             }
             else
             {
@@ -1592,17 +1634,9 @@ void spifi3_device::step(bool timeout)
 
         case INIT_XFR_RECV_PAD:
         {
-            decrement_tcounter();
-            if(!transfer_count_zero())
-            {
-                state = INIT_XFR_RECV_PAD_WAIT_REQ;
-                scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-                step(false);
-            }
-            else
-            {
-                function_complete();
-            }
+            state = INIT_XFR_RECV_PAD_WAIT_REQ;
+            scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+            step(false);
             break;
         }
 
