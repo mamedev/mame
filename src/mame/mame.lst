@@ -10643,7 +10643,7 @@ mx1600                          // Dynacom MX-1600
 t4426                           // Terco 4426 CNC programming station
 lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 cd6809                          // Codimex CD-6809
-ms1600                          // Instituto Latinoamericano de la Comunicación Educativa / Secretaría de Educación Pública Micro-SEP 1600
+ms1600                          // ILCE / SEP Micro-SEP 1600
 
 @source:coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
