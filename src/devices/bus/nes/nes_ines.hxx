@@ -343,7 +343,7 @@ static const nes_mmc mmc_list[] =
 	{ 305, KAISER_KS7031 },        // Dracula II FDS conversion
 	{ 306, KAISER_KS7016 },        // Exciting Basket FDS conversion
 	{ 307, KAISER_KS7037 },        // Metroid FDS conversion
-	// 308 Batman (Sunsoft) pirate on VRC2 clone hardware
+	{ 308, UNL_TH21311 },          // Batman (Sunsoft) pirate on VRC2 clone hardware
 	{ 309, UNL_LH51 },             // Ai Senshi Nicol alt FDS conversion
 	// 310 variant of mapper 125?
 	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
@@ -490,9 +490,9 @@ static const nes_mmc mmc_list[] =
 	{ 524, BTL_900218 },           // Lord of King pirate
 	{ 525, KAISER_KS7021A },       // GetsuFumaDen pirate (and maybe a Contra?)
 	// 526 sangochu clone not yet in nes.xml?
-	// 527 demnswrd/fudomyod clone not yet in nes.xml
+	{ 527, UNL_AX40G },            // Fudou Myouou Den pirate
 	// 528 1995 New Series Super 2-in-1 multicart not in nes.xml
-	// 529 Datach Dragon Ball Z bootleg?
+	{ 529, UNL_T230 },             // Datach Dragon Ball Z IV bootleg
 	{ 530, UNL_AX5705 },           // Super Mario Bros Pocker Mali
 	// 531 Used by Asder PC-95 Famicom clone built into a keyboard
 	// 532 Emulator only mapper for Chinese version of sangoht2?

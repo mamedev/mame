@@ -29,14 +29,21 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(NES_900218,    nes_900218_device,    "nes_900218",    "NES Cart 900218 PCB")
+DEFINE_DEVICE_TYPE(NES_AX40G,     nes_ax40g_device,     "nes_ax40g",     "NES Cart UNL-AX-40G PCB")
 DEFINE_DEVICE_TYPE(NES_AX5705,    nes_ax5705_device,    "nes_ax5705",    "NES Cart AX5705 PCB")
 DEFINE_DEVICE_TYPE(NES_CITYFIGHT, nes_cityfight_device, "nes_cityfight", "NES Cart City Fighter PCB")
 DEFINE_DEVICE_TYPE(NES_SHUIGUAN,  nes_shuiguan_device,  "nes_shuiguan",  "NES Cart Shui Guan Pipe Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_TF1201,    nes_tf1201_device,    "nes_tf1201",    "NES Cart UNL-TF1201 PCB")
+DEFINE_DEVICE_TYPE(NES_TH21311,   nes_th21311_device,   "nes_th21311",   "NES Cart UNL-TH2131-1 PCB")
 
 
 nes_900218_device::nes_900218_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_konami_vrc4_device(mconfig, NES_900218, tag, owner, clock)
+	: nes_konami_vrc2_device(mconfig, NES_900218, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
+}
+
+nes_ax40g_device::nes_ax40g_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc2_device(mconfig, NES_AX40G, tag, owner, clock)
 {
 }
 
@@ -60,13 +67,39 @@ nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *
 {
 }
 
+nes_th21311_device::nes_th21311_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc2_device(mconfig, NES_TH21311, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
+}
+
 
 
 void nes_900218_device::device_start()
 {
-	nes_konami_vrc4_device::device_start();
+	nes_konami_vrc2_device::device_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
-	// VRC4 pins 3 and 4
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
+
+	// VRC2 pins 3 and 4
+	m_vrc_ls_prg_a = 1;  // A1
+	m_vrc_ls_prg_b = 0;  // A0
+}
+
+void nes_900218_device::pcb_reset()
+{
+	nes_konami_vrc2_device::pcb_reset();
+	m_irq_enable = 0;
+	m_irq_count = 0;
+}
+
+void nes_ax40g_device::device_start()
+{
+	nes_konami_vrc2_device::device_start();
+
+	// VRC2 pins 3 and 4
 	m_vrc_ls_prg_a = 1;  // A1
 	m_vrc_ls_prg_b = 0;  // A0
 }
@@ -112,6 +145,29 @@ void nes_tf1201_device::device_start()
 	// VRC4 pins 3 and 4
 	m_vrc_ls_prg_a = 0;  // A0
 	m_vrc_ls_prg_b = 1;  // A1
+}
+
+void nes_th21311_device::device_start()
+{
+	nes_konami_vrc2_device::device_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_latch));
+
+	// VRC2 pins 3 and 4
+	m_vrc_ls_prg_a = 1;  // A1
+	m_vrc_ls_prg_b = 0;  // A0
+}
+
+void nes_th21311_device::pcb_reset()
+{
+	nes_konami_vrc2_device::pcb_reset();
+	m_irq_enable = 0;
+	m_irq_count = 0;
+	m_irq_latch = 0;
 }
 
 
@@ -166,7 +222,35 @@ void nes_900218_device::write_h(offs_t offset, u8 data)
 		}
 	}
 	else
-		nes_konami_vrc4_device::write_h(offset, data);
+		nes_konami_vrc2_device::write_h(offset, data);
+}
+
+/*-------------------------------------------------
+
+ Board UNL-AX-40G
+
+ Games: Fudou Myouou Den pirate
+
+ VRC2 clone that supports extra single screen mirroring
+ modes seen in the original Taito X1-005 board.
+
+ NES 2.0: mapper 527
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_ax40g_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("ax40g write_h, offset: %04x, data: %02x\n", offset, data));
+
+	nes_konami_vrc2_device::write_h(offset, data);
+
+	if ((offset & 0x7001) == 0x3001)
+	{
+		set_nt_page(offset & 0x02, CIRAM, BIT(data, 3), 1);
+		set_nt_page((offset & 0x02) + 1, CIRAM, BIT(data, 3), 1);
+	}
 }
 
 /*-------------------------------------------------
@@ -315,6 +399,62 @@ void nes_tf1201_device::write_h(offs_t offset, u8 data)
 		set_irq_line(CLEAR_LINE);
 	else
 		nes_konami_vrc4_device::write_h(offset, data);
+}
+
+/*-------------------------------------------------
+
+ Board UNL-TH2131-1
+
+ Games: Batman pirate (Dynacon)
+
+ VRC2 clone with an added IRQ timer. A selectable 4-bit
+ latch controls the duration as it is decremented
+ relative to another internal 12-bit counter.
+
+ NES 2.0: mapper 308
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_th21311_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (m_irq_enable)
+		{
+			m_irq_count = (m_irq_count + 1) & 0xfff; // 12-bit counter
+			if (m_irq_count == 0x800)
+				m_irq_latch--;
+			if (!m_irq_latch && m_irq_count < 0x800)
+				set_irq_line(ASSERT_LINE);
+		}
+	}
+}
+
+void nes_th21311_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("th21311 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if ((offset & 0x7000) == 0x7000)
+	{
+		switch (offset & 3)
+		{
+			case 0:
+				m_irq_enable = 0;
+				m_irq_count = 0;
+				set_irq_line(CLEAR_LINE);
+				break;
+			case 1:
+				m_irq_enable = 1;
+				break;
+			case 3:
+				m_irq_latch = data >> 4;
+				break;
+		}
+	}
+	else
+		nes_konami_vrc2_device::write_h(offset, data);
 }
 
 
