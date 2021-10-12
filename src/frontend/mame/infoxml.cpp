@@ -434,7 +434,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		prepared_info() = default;
 		prepared_info(const prepared_info &) = delete;
 		prepared_info(prepared_info &&) = default;
-		prepared_info &operator=(const prepared_info &) = delete;
+		prepared_info &operator=(const prepared_info &) = default;
 
 		std::string     m_xml_snippet;
 		device_type_set m_dev_set;
