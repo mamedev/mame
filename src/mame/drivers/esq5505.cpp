@@ -226,6 +226,7 @@ public:
 	void vfxsd(machine_config &config);
 	void eps(machine_config &config);
 	void vfx32(machine_config &config);
+	void ks32(machine_config &config);
 
 	void init_eps();
 	void init_common();
@@ -785,6 +786,16 @@ void esq5505_state::sq1(machine_config &config)
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 }
 
+void esq5505_state::ks32(machine_config &config)
+{
+	vfx32(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::sq1_map);
+
+	ESQPANEL2X16_SQ1(config.replace(), m_panel);
+	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
+	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+}
+
 static INPUT_PORTS_START( vfx )
 #if KEYBOARD_HACK
 	PORT_START("KEY0")
@@ -1013,6 +1024,27 @@ ROM_START( eps16p )
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
 ROM_END
 
+ROM_START( ks32 )
+	ROM_REGION16_BE(0x40000, "osrom", 0)
+	ROM_SYSTEM_BIOS(0, "301", "KS-32 v3.01")
+	ROM_LOAD16_BYTE_BIOS(0, "ks32v301lower.bin", 0x000001, 0x010000, CRC(de37e49c) SHA1(fd5a25e23ff217a5926daae4f57dd966d392d26d) )
+	ROM_LOAD16_BYTE_BIOS(0, "ks32v301upper.bin", 0x000000, 0x020000, CRC(d8249b32) SHA1(8712cf2c63a31c00e98fa42e518093cac51f5214) )
+
+	ROM_SYSTEM_BIOS(1, "30", "KS-32 v3.0")
+	ROM_LOAD16_BYTE_BIOS(1, "ks32v3pt00lower.bin", 0x000001, 0x010000, CRC(c347708e) SHA1(637e1a5c0a62f4d5726363bdb782448ca9637afc) )
+	ROM_LOAD16_BYTE_BIOS(1, "ks32v3pt00upper.bin", 0x000000, 0x020000, CRC(8c56c88f) SHA1(4424f39f74f067f15030b8d4a90d9ace8ea14677) )
+
+	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
+	ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
+	ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )
+
+	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
+	ROM_LOAD( "rom2.u39",     0x000000, 0x100000, CRC(8d1b5e91) SHA1(12991083a6c574133a1a799813fa4573a33d2297) )
+	ROM_LOAD( "rom3.u38",     0x100000, 0x100000, CRC(cb9875ce) SHA1(82021bdc34953e9be97d45746a813d7882250ae0) )
+
+	ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
+ROM_END
+
 void esq5505_state::init_common()
 {
 	m_system_type = GENERIC;
@@ -1071,5 +1103,6 @@ CONS( 1990, eps16p, eps, 0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "
 CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sq2,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sq2,    0,   0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1991, sd132,  sd1, 0, vfx32, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1992, ks32,   sq2, 0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "KS-32",           MACHINE_NOT_WORKING)                       // 2x16 LCD

@@ -13464,6 +13464,7 @@ sqrack                          // 1990 SQ-Rack
 sq2                             // 1991 SQ-2
 vfx                             // 1989 VFX
 vfxsd                           // 1989 VFX-SD
+ks32							// 1992 KS-32
 
 @source:esqasr.cpp
 asr10                           // 1992 ASR-10
