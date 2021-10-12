@@ -29,24 +29,24 @@
 		  "step"   :  0.01,
 		  "format": "%1.2f",
 		  "screen": "raster" },
-    { "type": "float",
-      "name": "rasterbloom_smooth",
-      "text": "Raster bloom temporal smoothing",
-      "default":  0.5,
-      "max"    :  0.99,
-      "min"    :  0.0,
-      "step"   :  0.01,
-      "format": "%1.2f",
-      "screen": "raster" },
-    { "type": "float",
-      "name": "rasterbloom",
-      "text": "Raster bloom amplitude",
-      "default":  0.01,
-      "max"    :  0.1,
-      "min"    :  0.0,
-      "step"   :  0.001,
-      "format": "%1.3f",
-      "screen": "raster" },
+		{ "type": "float",
+		  "name": "rasterbloom_smooth",
+		  "text": "Raster bloom temporal smoothing",
+		  "default":  0.5,
+		  "max"    :  0.99,
+		  "min"    :  0.0,
+		  "step"   :  0.01,
+		  "format": "%1.2f",
+		  "screen": "raster" },
+		{ "type": "float",
+		  "name": "rasterbloom",
+		  "text": "Raster bloom amplitude",
+		  "default":  0.01,
+		  "max"    :  0.1,
+		  "min"    :  0.0,
+		  "step"   :  0.001,
+		  "format": "%1.3f",
+		  "screen": "raster" },
 		{ "type": "float",
 		  "name": "halation",
 		  "text": "Halation amplitude",
@@ -175,18 +175,18 @@
 
 	],
 	"passes": [
-    {
-      "effect": "crt-geom/mipmap8",
-      "name": "mipmap",
-      "uniforms": [
-        { "uniform": "u_smooth",   "slider": "rasterbloom_smooth" }
-      ],
-      "input": [
-        { "sampler": "s_screen",   "target": "internal2" },
-        { "sampler": "s_mipmap",   "target": "mipmap" }
-      ],
-      "output": "mipmap"
-    },
+		{
+			"effect": "crt-geom/mipmap8",
+			"name": "mipmap",
+			"uniforms": [
+				{ "uniform": "u_smooth",   "slider": "rasterbloom_smooth" }
+			],
+			"input": [
+				{ "sampler": "s_screen",   "target": "internal2" },
+				{ "sampler": "s_mipmap",   "target": "mipmap" }
+			],
+			"output": "mipmap"
+		},
 		{
 			"effect": "crt-geom/phosphor_apply",
 			"name": "phosphor apply",
