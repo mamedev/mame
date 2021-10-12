@@ -5025,7 +5025,7 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
 msgid "Original Publisher"
-msgstr ""
+msgstr "原出版商"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
@@ -5065,7 +5065,7 @@ msgstr "版本"
 #: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
 msgid "Unfiltered"
-msgstr "未过滤"
+msgstr "未筛选"
 
 #: src/frontend/mame/ui/utils.cpp:85
 msgctxt "machine-filter"
@@ -5175,7 +5175,7 @@ msgstr "自订过滤"
 #: src/frontend/mame/ui/utils.cpp:109
 msgctxt "software-filter"
 msgid "Unfiltered"
-msgstr "未过滤"
+msgstr "未筛选"
 
 #: src/frontend/mame/ui/utils.cpp:110
 msgctxt "software-filter"
@@ -5833,7 +5833,7 @@ msgstr "装饰图预览"
 #: src/frontend/mame/ui/dirmenu.cpp:61
 msgctxt "path-option"
 msgid "Select"
-msgstr ""
+msgstr "精选"
 
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
@@ -6412,7 +6412,7 @@ msgstr "得分"
 #: src/frontend/mame/ui/selmenu.cpp:90
 msgctxt "selmenu-artwork"
 msgid "Select"
-msgstr ""
+msgstr "精选"
 
 #: src/frontend/mame/ui/selmenu.cpp:91
 msgctxt "selmenu-artwork"

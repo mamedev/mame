@@ -5025,7 +5025,7 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
 msgid "Original Publisher"
-msgstr ""
+msgstr "原出版商"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
@@ -5836,7 +5836,7 @@ msgstr "裝飾圖預覽"
 #: src/frontend/mame/ui/dirmenu.cpp:61
 msgctxt "path-option"
 msgid "Select"
-msgstr ""
+msgstr "精選"
 
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
@@ -6415,7 +6415,7 @@ msgstr "得分"
 #: src/frontend/mame/ui/selmenu.cpp:90
 msgctxt "selmenu-artwork"
 msgid "Select"
-msgstr ""
+msgstr "精選"
 
 #: src/frontend/mame/ui/selmenu.cpp:91
 msgctxt "selmenu-artwork"

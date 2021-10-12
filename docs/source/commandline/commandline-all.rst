@@ -1544,12 +1544,12 @@ Core State/Playback Options
 
     The default is ``NULL`` (no recording).
 
-.. _mame-commandline-snapname:
-
     Example:
         .. code-block:: bash
 
             mame pacman -wavewrite pacsounds
+
+.. _mame-commandline-snapname:
 
 **-snapname** *<name>*
 
@@ -3445,9 +3445,10 @@ Debugging Options
 
 **-[no]debug**
 
-    Activates the integrated debugger.  By default, the debugger is entered by
-    pressing the tilde (**~**) key during emulation. It is also entered
-    immediately at startup.
+    Activates the integrated debugger.  By default, pressing the tilde
+    (**~**) key during emulation breaks into the debugger.  MAME also
+    breaks into the debugger after the initial soft reset on startup if
+    the debugger is active.
 
     The default is OFF (**-nodebug**).
 

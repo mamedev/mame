@@ -56,7 +56,7 @@ class laserdisc_device;
 /* handy colors */
 #define UI_GREEN_COLOR          rgb_t(0xef,0x0a,0x66,0x0a)
 #define UI_YELLOW_COLOR         rgb_t(0xef,0xcc,0x7a,0x28)
-#define UI_RED_COLOR            rgb_t(0xef,0xcc,0x14,0x14)
+#define UI_RED_COLOR            rgb_t(0xef,0xb2,0x00,0x00)
 
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((uint32_t)~0)

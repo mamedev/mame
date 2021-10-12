@@ -9,21 +9,25 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "debugger.h"
 #include "debugcmd.h"
+
+#include "debugbuf.h"
 #include "debugcon.h"
 #include "debugcpu.h"
-#include "debugbuf.h"
-#include "express.h"
 #include "debughlp.h"
 #include "debugvw.h"
+#include "express.h"
 #include "points.h"
+
+#include "debugger.h"
+#include "emuopts.h"
 #include "natkeyboard.h"
 #include "render.h"
+
 #include "corestr.h"
-#include <cctype>
+
 #include <algorithm>
+#include <cctype>
 #include <fstream>
 
 
@@ -2353,6 +2357,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 	u64 i = 0;
 
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
+	auto dis = space->device().machine().disable_side_effects();
 	switch (space->addr_shift())
 	{
 	case -3:
@@ -3479,7 +3484,8 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 
 void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 {
-	u64 offset, length, bytes = 1;
+	u64 offset, length;
+	bool bytes = true;
 	address_space *space;
 
 	// validate parameters
@@ -3487,7 +3493,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 		return;
 	if (!validate_number_parameter(params[2], length))
 		return;
-	if (params.size() > 3 && !validate_number_parameter(params[3], bytes))
+	if (params.size() > 3 && !validate_boolean_parameter(params[3], bytes))
 		return;
 	if (!validate_device_space_parameter(params.size() > 4 ? params[4] : std::string_view(), AS_PROGRAM, space))
 		return;
@@ -3523,11 +3529,11 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 		topcodes.emplace_back(buffer.data_to_string(offset, size, true));
 
 		int osize = topcodes.back().size();
-		if(osize > max_opcodes_size)
+		if (osize > max_opcodes_size)
 			max_opcodes_size = osize;
 
 		int dsize = instructions.back().size();
-		if(dsize > max_disasm_size)
+		if (dsize > max_disasm_size)
 			max_disasm_size = dsize;
 
 		i += size;
@@ -3544,7 +3550,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 
 	if (bytes)
 	{
-		for(unsigned int i=0; i != pcs.size(); i++)
+		for (unsigned int i=0; i != pcs.size(); i++)
 		{
 			const char *comment = space->device().debug()->comment_text(pcs[i]);
 			if (comment)
@@ -3555,7 +3561,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 	}
 	else
 	{
-		for(unsigned int i=0; i != pcs.size(); i++)
+		for (unsigned int i=0; i != pcs.size(); i++)
 		{
 			const char *comment = space->device().debug()->comment_text(pcs[i]);
 			if (comment)
@@ -3678,8 +3684,8 @@ void debugger_commands::execute_traceflush(const std::vector<std::string> &param
 void debugger_commands::execute_history(const std::vector<std::string> &params)
 {
 	// validate parameters
-	address_space *space;
-	if (!validate_device_space_parameter(!params.empty() ? params[0] : std::string_view(), AS_PROGRAM, space))
+	device_t *device;
+	if (!validate_cpu_parameter(!params.empty() ? params[0] : std::string_view(), device))
 		return;
 
 	u64 count = device_debug::HISTORY_SIZE;
@@ -3690,34 +3696,31 @@ void debugger_commands::execute_history(const std::vector<std::string> &params)
 	if (count > device_debug::HISTORY_SIZE)
 		count = device_debug::HISTORY_SIZE;
 
-	device_execute_interface const *execute;
-	if (!space->device().interface(execute))
+	device_debug *const debug = device->debug();
+
+	device_disasm_interface *dasmintf;
+	if (!device->interface(dasmintf))
 	{
-		m_console.printf("Device %s is not a CPU\n", space->device().name());
+		m_console.printf("No disassembler available for device %s\n", device->name());
 		return;
 	}
-	device_debug *const debug = space->device().debug();
 
 	// loop over lines
-	device_disasm_interface *dasmintf;
-	if (!space->device().interface(dasmintf))
+	debug_disasm_buffer buffer(*device);
+	std::string instruction;
+	for (int index = int(unsigned(count)); index > 0; index--)
 	{
-		m_console.printf("No disassembler available for device %s\n", space->device().name());
-		return;
-	}
+		auto const pc = debug->history_pc(1 - index);
+		if (pc.second)
+		{
+			offs_t next_offset;
+			offs_t size;
+			u32 info;
+			instruction.clear();
+			buffer.disassemble(pc.first, instruction, next_offset, size, info);
 
-	debug_disasm_buffer buffer(space->device());
-
-	for (int index = 0; index < (int) count; index++)
-	{
-		offs_t const pc = debug->history_pc(-index);
-		std::string instruction;
-		offs_t next_offset;
-		offs_t size;
-		u32 info;
-		buffer.disassemble(pc, instruction, next_offset, size, info);
-
-		m_console.printf("%s: %s\n", buffer.pc_to_string(pc), instruction);
+			m_console.printf("%s: %s\n", buffer.pc_to_string(pc.first), instruction);
+		}
 	}
 }
 
