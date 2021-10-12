@@ -8,6 +8,55 @@
 #include "konami.h"
 
 
+// ======================> nes_900218_device
+
+class nes_900218_device : public nes_konami_vrc4_device
+{
+public:
+	// construction/destruction
+	nes_900218_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+};
+
+
+// ======================> nes_ax5705_device
+
+class nes_ax5705_device : public nes_konami_vrc4_device
+{
+public:
+	// construction/destruction
+	nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+};
+
+
+// ======================> nes_cityfight_device
+
+class nes_cityfight_device : public nes_konami_vrc4_device
+{
+public:
+	// construction/destruction
+	nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+};
+
+
 // ======================> nes_shuiguan_device
 
 class nes_shuiguan_device : public nes_konami_vrc4_device
@@ -48,7 +97,10 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NES_SHUIGUAN, nes_shuiguan_device)
-DECLARE_DEVICE_TYPE(NES_TF1201,   nes_tf1201_device)
+DECLARE_DEVICE_TYPE(NES_900218,    nes_900218_device)
+DECLARE_DEVICE_TYPE(NES_AX5705,    nes_ax5705_device)
+DECLARE_DEVICE_TYPE(NES_CITYFIGHT, nes_cityfight_device)
+DECLARE_DEVICE_TYPE(NES_SHUIGUAN,  nes_shuiguan_device)
+DECLARE_DEVICE_TYPE(NES_TF1201,    nes_tf1201_device)
 
 #endif // MAME_BUS_NES_VRC_CLONES_H

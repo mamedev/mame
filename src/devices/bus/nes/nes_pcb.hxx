@@ -216,6 +216,7 @@ static const nes_pcb pcb_list[] =
 	{ "smb2jb",           BTL_SMB2JB },
 	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
+	{ "btl_900218",       BTL_900218 },  // pirate The Lord of King
 	{ "09034a",           BTL_09034A },
 	{ "l001",             BTL_L001 },
 	{ "batmanfs",         BTL_BATMANFS },
@@ -386,7 +387,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "coolboy",          UNSUPPORTED_BOARD },
-	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
 	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
