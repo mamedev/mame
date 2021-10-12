@@ -34,6 +34,9 @@ license:CC0
 	  disks 1, 2, and 7.
 	-->
 
+	<!-- Imperfect cracks for Epyx software were missing and never added
+	  to this list, thus only the corrected versions are listed here. -->
+
 	<software name="101mword">
 		<description>101 Misused Words (cleanly cracked)</description>
 		<year>1983</year>
@@ -339,6 +342,43 @@ license:CC0
 			<feature name="part_id" value="Side D"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego (4am crack) disk d.dsk" size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartime10b">
+		<description>Where in Time is Carmen Sandiego (Version 1.0) (imperfect clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (imperfect 4am crack) side a.dsk" size="143360" crc="cd3da2a7" sha1="21a9fc7220c84ffec91b4e76b28dc8b514ab56a3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (imperfect 4am crack) side b.dsk" size="143360" crc="3bad4b59" sha1="7e84dc0db9e964db44692fa340b6c6828f83bfe6" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (imperfect 4am crack) side c.dsk" size="143360" crc="650735af" sha1="aecf8b17bb26e73036100ac648e5eddede12fe91" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (imperfect 4am crack) side d.dsk" size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" />
 			</dataarea>
 		</part>
 	</software>
@@ -3286,6 +3326,34 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="allabtamb">
+		<description>All About America (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2018-11-06"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="all about america (imperfect 4am crack) - disk 1a - story disk.dsk" size="143360" crc="5bb77698" sha1="d3ca0e38606c545d0d119242f92032268bdede62" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="all about america (imperfect 4am crack) - disk 1b - questions and answers.dsk" size="143360" crc="29a58302" sha1="42249ed8018708f51e758c579b22d5c480907e63" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="all about america (imperfect 4am crack) - disk 2a - maps and quizzes.dsk" size="143360" crc="93b110dd" sha1="75e378b79110c4d45a6c7774b04e98ae2aa87f7c" />
+			</dataarea>
+		</part>	</software>
+
 	<software name="allabtpm">
 		<description>All About Purim (cleanly cracked)</description>
 		<year>1983</year>
@@ -3752,6 +3820,44 @@ license:CC0
 			<feature name="part_id" value="Disk 4 - Background Library"/>
 			<dataarea name="flop" size="143360">
 				<rom name="animate (4am crack) disk 4 - background library.dsk" size="143360" crc="e32a2cd4" sha1="d469e03996f33e2bbe237993e1cb29652e4bd5a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animateb">
+		<description>Animate (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2017-06-28"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animate (imperfect 4am crack) disk 1.dsk" size="143360" crc="ad7eb4c2" sha1="034ac6879ae76c2b26b674718f002ad8eb754b6b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animate (imperfect 4am crack) disk 2.dsk" size="143360" crc="279a2ba1" sha1="86c74c50ac197ac4aed10ab67cd0c2aae4ba9bec" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Character Library"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animate (imperfect 4am crack) disk 3 - character library.dsk" size="143360" crc="6491c465" sha1="403b8534858b9cb74564ea5832e5b72cd055b846" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Background Library"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animate (imperfect 4am crack) disk 4 - background library.dsk" size="143360" crc="e32a2cd4" sha1="d469e03996f33e2bbe237993e1cb29652e4bd5a2" />
 			</dataarea>
 		</part>
 	</software>
@@ -4289,6 +4395,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bsstoryb11b">
+		<description>Bank Street StoryBook 1.1 (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2017-01-10"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bank street storybook 1.1 (imperfect 4am crack) side a.dsk" size="143360" crc="ffe02515" sha1="c969465833554dca4d030aaaeca8e6c131dba727" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bank street storybook 1.1 (imperfect 4am crack) side b.dsk" size="143360" crc="bfc9ab7f" sha1="32eaf443c837bfdbe2ae1cfb020e7b04a48a8977" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bswriter2">
 		<description>Bank Street Writer II (cleanly cracked)</description>
 		<year>1984</year>
@@ -4306,6 +4436,30 @@ license:CC0
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="bank street writer ii (4am crack) disk 2.dsk" size="143360" crc="23adadb3" sha1="9cbd40664e6ad1da4134bf891ddf0e1e5d29bca9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswriter2b">
+		<description>Bank Street Writer II (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2017-01-17"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bank street writer ii (imperfect 4am crack) disk 1.dsk" size="143360" crc="2a23b716" sha1="5b69dbe5a41a87a61c9ca70f0d47d6ed555f4ef2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bank street writer ii (imperfect 4am crack) disk 2.dsk" size="143360" crc="23adadb3" sha1="9cbd40664e6ad1da4134bf891ddf0e1e5d29bca9" />
 			</dataarea>
 		</part>
 	</software>
@@ -5052,6 +5206,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bldkitb">
+		<description>Boulderdash Construction Kit (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2017-05-16"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="boulderdash construction kit (imperfect 4am crack).dsk" size="143360" crc="cf7fac16" sha1="d190de3042f2684cae2b2cb0c9484d454b4b6b1a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bnckmg">
 		<description>Bouncing Kamungas (cleanly cracked)</description>
 		<year>1983</year>
@@ -5536,6 +5709,56 @@ license:CC0
 			<feature name="part_id" value="Disk 3 Side B - Scenario 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) disk 3b - scenery 4.dsk" size="143360" crc="f0926edf" sha1="8bf06e1dc19fcc9be58e0bf0b5c24819a688b64d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cntralncb">
+		<description>Centauri Alliance (imperfect clean crack)</description>
+		<year>1990</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2017-01-17"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="centauri alliance (imperfect 4am crack) boot.dsk" size="143360" crc="6575734c" sha1="91de6b82846f547963388541a1b9472d81c41219" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Roster"/>
+			<dataarea name="flop" size="143360">
+				<rom name="centauri alliance (imperfect 4am crack) roster.dsk" size="143360" crc="e258fb1e" sha1="daf12471584e5a6c3fc3e501e9334adb35c38ea7" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Scenario 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="centauri alliance (imperfect 4am crack) scenery 1.dsk" size="143360" crc="4d026cd8" sha1="c9f610fd2a6d08a4ee5bf3fa46f260ed56984121" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Scenario 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="centauri alliance (imperfect 4am crack) scenery 2.dsk" size="143360" crc="0d976331" sha1="b6830cb95028bce75ca509964eb701ff5b96f7c2" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A - Scenario 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="centauri alliance (imperfect 4am crack) scenery 3.dsk" size="143360" crc="5ed890de" sha1="518301730baaef9fa2cbde4cecf73bd3c35b6353" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B - Scenario 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="centauri alliance (imperfect 4am crack) scenery 4.dsk" size="143360" crc="f0926edf" sha1="8bf06e1dc19fcc9be58e0bf0b5c24819a688b64d" />
 			</dataarea>
 		</part>
 	</software>
@@ -6854,6 +7077,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="crtvplayb">
+		<description>Creative Play (imperfect clean crack)</description>
+		<year>1982</year>
+		<publisher>The Regents of the University of California</publisher>
+		<info name="release" value="2016-10-17"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="creative play (imperfect 4am crack) side a.dsk" size="143360" crc="f0f411a7" sha1="08cc965669c534ea1d5c686d606dbba0b73db88b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="creative play (imperfect 4am crack) side b.dsk" size="143360" crc="58283e22" sha1="1db7172d6549dc8a4f39133ba1c05941acc69a2d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crtunl">
 		<description>Creativity, Unlimited (cleanly cracked)</description>
 		<year>1986</year>
@@ -7840,6 +8089,56 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dondrab">
+		<description>Dondra - A New Beginning (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="release" value="2018-09-18"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning (imperfect 4am crack) disk 1a.dsk" size="143360" crc="0ed3cb1c" sha1="1c4e8ee58b79a68fd72a09ac0e614547a19b02d5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning (imperfect 4am crack) disk 1b.dsk" size="143360" crc="a7ac63fb" sha1="02e7014a8f61157a751a83b15e0da8aa45fb344f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning (imperfect 4am crack) disk 2a.dsk" size="143360" crc="a53bf3ff" sha1="b59ff5f8dc747d3661813298bb62afe48852a40d" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning (imperfect 4am crack) disk 2b.dsk" size="143360" crc="21d16289" sha1="67d50f6a17202f3023e839e0bca36008e8b0f9cc" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning (imperfect 4am crack) disk 3a.dsk" size="143360" crc="6937806f" sha1="add4fdf602972f9cb6e2e0edbcfeabcf4cd851a0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning (imperfect 4am crack) disk 3b.dsk" size="143360" crc="31f9ff79" sha1="525966f5b9b6510259b2a5dae1884de95afcde49" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dqmeadjs">
 		<description>Don't Quote Me and Adjective Scramble (cleanly cracked)</description>
 		<year>1986</year>
@@ -8398,6 +8697,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="engachv4b">
+		<description>English Achievement IV (imperfect clean crack)</description>
+		<year>1982</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2017-05-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="english achievement iv (imperfect 4am crack).dsk" size="143360" crc="477d5b33" sha1="6c6e6db183a8555544bb76fffb1cd25476d8f2d3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="engachv5">
 		<description>English Achievement V (cleanly cracked)</description>
 		<year>1982</year>
@@ -8832,6 +9144,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="felonythb">
+		<description>Felony (Thunder Mountain release) (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Thunder Mountain</publisher>
+		<info name="release" value="2018-03-16"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="felony (thunder mountain release) (imperfect 4am crack).dsk" size="143360" crc="ff3a1a1d" sha1="6b5fc4a04b74ad75f9dd249313d9c4db49890c78" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fldofire">
 		<description>Field of Fire (cleanly cracked)</description>
 		<year>1984</year>
@@ -9040,6 +9371,32 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="five in a row - addition and subtraction (4am crack) side b.dsk" size="143360" crc="16d265c2" sha1="f1f0326e54de3542c454cea8dbbc230eab08cb8b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="5rowaddsubb">
+		<description>Five in a Row - Addition and Subtraction (imperfect clean crack)</description>
+		<year>1992</year>
+		<publisher>Critical Thinking Press</publisher>
+		<info name="release" value="2016-04-07"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="five in a row - addition and subtraction (imperfect 4am crack) side a.dsk" size="143360" crc="af3f48de" sha1="c3983bacbcc518d49de8c9315c96ae67e9197d7b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="five in a row - addition and subtraction (imperfect 4am crack) side b.dsk" size="143360" crc="16d265c2" sha1="f1f0326e54de3542c454cea8dbbc230eab08cb8b" />
 			</dataarea>
 		</part>
 	</software>
@@ -10058,6 +10415,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="goldfngrb">
+		<description>Goldfinger (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2018-10-06"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="goldfinger (imperfect 4am crack).dsk" size="143360" crc="7e8b51ff" sha1="a986bb4d486ef2b067f3983498f957571042cb22" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grmrbase">
 		<description>Grammar Baseball (cleanly cracked)</description>
 		<year>1991</year>
@@ -10648,6 +11024,34 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="microz7b">
+		<description>Microzine 7 (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-12-23"/>
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 7 (imperfect 4am crack) side a.dsk" size="143360" crc="0912f2d9" sha1="f97ce5e1a31a860ba5555b0f1d033af87eba6c46" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 7 (imperfect 4am crack) side b.dsk" size="143360" crc="963acf79" sha1="cdaa13217113d64d45cad49e87807bb7d6755a34" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="microz8">
 		<description>Microzine 8 (cleanly cracked)</description>
 		<year>????</year>
@@ -10691,6 +11095,34 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="microzine 9 (4am crack) side b.dsk" size="143360" crc="b67df29c" sha1="7ffd5df5a86c6dafc580b5e63d8c27c66823177f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz9b">
+		<description>Microzine 9 (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-12-23"/>
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 9 (imperfect 4am crack) side a.dsk" size="143360" crc="6f29d83b" sha1="bfe3a40473da56bc0e020ad8423b68a6b7fdbd29" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 9 (imperfect 4am crack) side b.dsk" size="143360" crc="e67167bd" sha1="feebeb1e9dce3ed06322256f67d8da963b486be0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10782,6 +11214,34 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="microzine 14 (4am crack) side b.dsk" size="143360" crc="194f42a3" sha1="57e4ef80ae4be866e153e6c7feaf579995fcb53c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz14b">
+		<description>Microzine 14 (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2017-01-27"/>
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 14 (imperfect 4am crack) side a.dsk" size="143360" crc="a57b307f" sha1="5d0a1364bfd62c1451ba8a1a1c770a06a14ab4a3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 14 (imperfect 4am crack) side b.dsk" size="143360" crc="6c3093e1" sha1="6771508ffbeed75a6007888df944250ced006e77" />
 			</dataarea>
 		</part>
 	</software>
@@ -11777,6 +12237,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="highstksb">
+		<description>High Stakes (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2018-10-05"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="high stakes (imperfect 4am crack).dsk" size="143360" crc="ed359815" sha1="5b82f93e39ee9286c58a3f0f22248e18f330fab6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hwirelgc">
 		<description>High Wire Logic (cleanly cracked)</description>
 		<year>1985</year>
@@ -12120,6 +12599,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="amzthgr2b">
+		<description>In Search of the Most Amazing Thing (Revision 2) (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Spinnaker Software</publisher>
+		<info name="release" value="2018-03-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="in search of the most amazing thing rev. 2 (imperfect 4am crack).dsk" size="143360" crc="7002c2e9" sha1="04c5dffb5bb80503c7e009a4d05655caa1b3d2b2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ijonesra">
 		<description>Indiana Jones in Revenge of the Ancients (cleanly cracked)</description>
 		<year>1987</year>
@@ -12132,6 +12624,19 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="indiana jones in revenge of the ancients (4am crack).dsk" size="143360" crc="409f3eea" sha1="d4bc91d1eb50fcb142b9fa3759d3262bc0e58407" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ijonesrab">
+		<description>Indiana Jones in Revenge of the Ancients (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2018-10-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="indiana jones in revenge of the ancients (imperfect 4am crack).dsk" size="143360" crc="a668433f" sha1="4132e144c615e3b42a2523dfd27dde6f32470f5f" />
 			</dataarea>
 		</part>
 	</software>
@@ -12930,6 +13435,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="kungfumb">
+		<description>Kung Fu Master (imperfect clean crack)</description>
+		<year>1983</year>
+		<publisher>Data East</publisher>
+		<info name="release" value="2016-07-26"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kung fu master (imperfect 4am crack).dsk" size="143360" crc="977b97fa" sha1="149576958a5f0208a3b16c82002eca47dabace18" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lacrkdwn">
 		<description>L.A. Crackdown (cleanly cracked)</description>
 		<year>1988</year>
@@ -13500,6 +14024,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lcksmth50cb">
+		<description>Locksmith (Version 5.0 Revision C) (imperfect clean crack)</description>
+		<year>1983</year>
+		<publisher>Omega MicroWare</publisher>
+		<info name="release" value="2016-08-01"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="locksmith 5.0 rev c (imperfect 4am crack).dsk" size="143360" crc="f1babc45" sha1="2d3df1fa974832f8a9f2a2ddc8ffd580085df914" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lcksmth50f">
 		<description>Locksmith (Version 5.0 Revision F) (cleanly cracked)</description>
 		<year>1983</year>
@@ -13512,6 +14055,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="locksmith 5.0 rev f (4am crack).dsk" size="143360" crc="1246095e" sha1="a41321e6174368d2f6b048c2746f2709639ca447" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcksmth50fb">
+		<description>Locksmith (Version 5.0 Revision F) (imperfect clean crack)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="release" value="2018-06-23"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="locksmith 5.0 rev f (imperfect 4am crack).dsk" size="143360" crc="a28819ea" sha1="1de6c7672a3f48e6dda1cd74ecd540aaafe46873" />
 			</dataarea>
 		</part>
 	</software>
@@ -15046,6 +15608,19 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mathematics skills software level 2 (4am crack).dsk" size="143360" crc="f458da5d" sha1="b3857522fa6feef957612344f8111972338ce472" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matskll2b">
+		<description>Mathematics Skills Software Level 2 (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2017-04-13"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics skills software level 2 (imperfect 4am crack).dsk" size="143360" crc="34546027" sha1="c68de97341cf217eedaec51edcdbfe7a7502c1cb" />
 			</dataarea>
 		</part>
 	</software>
@@ -17089,6 +17664,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pxcartnkb">
+		<description>Mr. Pixel's Cartoon Kit (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2018-09-23"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mr. pixel's cartoon kit (imperfect 4am crack).dsk" size="143360" crc="2b8b52ac" sha1="381964a5653447508c2a7fb37189549460d09cff" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pxppaint">
 		<description>Mr. Pixel's Programming Paint Set (cleanly cracked)</description>
 		<year>1985</year>
@@ -17173,6 +17767,32 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="multiple choices (4am crack) side b.dsk" size="143360" crc="5c4b47c6" sha1="ab32e3c123718f5f799b87af30eac768fb35966b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multchoib">
+		<description>Multiple Choices (imperfect clean crack)</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2018-06-01"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="multiple choices (imperfect 4am crack) side a.dsk" size="143360" crc="3117deb0" sha1="9931ff0d391fc48c93292e096aa678a3db8a04f2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="multiple choices (imperfect 4am crack) side b.dsk" size="143360" crc="5c4b47c6" sha1="ab32e3c123718f5f799b87af30eac768fb35966b" />
 			</dataarea>
 		</part>
 	</software>
@@ -17662,6 +18282,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mystsntcb">
+		<description>Mystery Sentences (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-12-24"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mystery sentences (imperfect 4am crack) side a.dsk" size="143360" crc="3553b9cd" sha1="5c48397d8ef6cc937804a3863f567ff2bf84676b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mystery sentences (imperfect 4am crack) side b.dsk" size="143360" crc="bec55691" sha1="f50dd87d8d4ae7b959ed233bb76e080794975a50" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nam">
 		<description>NAM (cleanly cracked)</description>
 		<year>1986</year>
@@ -18128,6 +18774,25 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="operation frog (4am crack) side b.dsk" size="143360" crc="949b1c73" sha1="98d1b3956cbdd875b5fe23e79416881641659880" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opfrogb">
+		<description>Operation Frog (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-12-03"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="operation frog (imperfect 4am crack).dsk" size="143360" crc="cca3962f" sha1="dc2cc50dd30c6bff92273d85441d79d6a22d2824" />
 			</dataarea>
 		</part>
 	</software>
@@ -19178,6 +19843,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="prjspcstb">
+		<description>Project Space Station (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Hesware</publisher>
+		<info name="release" value="2016-08-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="project space station (imperfect 4am crack) side a.dsk" size="143360" crc="9210d6f8" sha1="4b70e9c4b66137475e3ecb8c1d216e60b03b2fec" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="project space station (imperfect 4am crack) side b.dsk" size="143360" crc="76d95fcc" sha1="45b7a4b3a8e44975f66e8bdc89e566d9ec6976bc" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mkpnoun1">
 		<description>Pronouns I (cleanly cracked)</description>
 		<year>1982</year>
@@ -19388,6 +20073,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="pyramid puzzler (4am crack).dsk" size="143360" crc="c44f5af5" sha1="3d4134773d676e56fb6fd61467e5caa309cd20f0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pyrapzlrb">
+		<description>Pyramid Puzzler (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-01-25"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pyramid puzzler (imperfect 4am crack).dsk" size="143360" crc="6f1a474b" sha1="66b41656dbc4411205e23da12c439f3963e4e474" />
 			</dataarea>
 		</part>
 	</software>
@@ -20228,6 +20932,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="secfilerb">
+		<description>Secret Filer (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2019-05-11"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="secret filer (imperfect 4am crack).dsk" size="143360" crc="88261b0a" sha1="675a300d0b433dcfb28fcd26905ad6951bc77160" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="serpntne">
 		<description>Serpentine (cleanly cracked)</description>
 		<year>1982</year>
@@ -20345,6 +21068,26 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="ten little robots (4am crack).dsk" size="143360" crc="e7b845e3" sha1="c195776fdc4b8544c6c8e3e85fc6ba15be11fdfe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenlrobtb">
+		<description>Ten Little Robots (imperfect clean crack)</description>
+		<year>1983</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2019-06-01"/>
+		<!-- This is an undated updated revision that had updated copy protection. -->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ten little robots (imperfect 4am crack).dsk" size="143360" crc="b7b4d0c2" sha1="5e627a8d20d78f67ca18bc110fd12e55a4642b21" />
 			</dataarea>
 		</part>
 	</software>
@@ -20557,6 +21300,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="forbcstlb">
+		<description>Forbidden Castle (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-02-23"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="forbidden castle (imperfect 4am crack).dsk" size="143360" crc="b1a98dfe" sha1="d7ca81084186c907df1f128bfa91e17287b3d949" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fore">
 		<description>Fore (cleanly cracked)</description>
 		<year>1982</year>
@@ -20582,6 +21344,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="fractions v3.1 (4am crack).dsk" size="143360" crc="1abc2385" sha1="bcd9b30632c752bf3df26c55725921b355af2cd0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractv31b">
+		<description>Fractions (Version 3.1 / 25-NOV-83) (imperfect clean crack)</description>
+		<year>1983</year>
+		<publisher>Edu-Ware Services</publisher>
+		<info name="release" value="2019-04-08"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions v3.1 (imperfect 4am crack).dsk" size="143360" crc="dab099ff" sha1="e4c0dcd81d93ebc4fe3906a53261bd91ecbe4881" />
 			</dataarea>
 		</part>
 	</software>
@@ -20624,7 +21405,6 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
 
 	<software name="gtdcl2">
 		<description>Good Thinking - Drawing Conclusions Level Two (cleanly cracked)</description>
@@ -20765,6 +21545,44 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mastrsatb">
+		<description>Mastering the SAT (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-02-23"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastering the sat (mindscape) (imperfect 4am crack) disk 1.dsk" size="143360" crc="dee018ff" sha1="f7d057a08eed2935bf1ed6725163eabb9a8a1523" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastering the sat (mindscape) (imperfect 4am crack) disk 2.dsk" size="143360" crc="9503e6dc" sha1="82482daa7c6a2cda3dc5f58cd4bc4cd0abf246af" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastering the sat (mindscape) (imperfect 4am crack) disk 3.dsk" size="143360" crc="8c2ef736" sha1="67412d36f0397cd3e4db9ab7c456be562d0b3409" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastering the sat (mindscape) (imperfect 4am crack) disk 4.dsk" size="143360" crc="f294f336" sha1="fa27bb62a31f6198201bb8505ea488d9c91d6bb1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="millrel2">
 		<description>Millionaire (Release 2) (cleanly cracked)</description>
 		<year>1987</year>
@@ -20784,6 +21602,32 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="millionaire release 2 (4am crack) side b.dsk" size="143360" crc="df69dcb4" sha1="454b1720cd9bd5a9ec8730149268d1d565617583" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="millr2b">
+		<description>Millionaire Release 2 (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Designware</publisher>
+		<info name="release" value="2019-02-09"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="millionaire release 2 (imperfect 4am crack) side a.dsk" size="143360" crc="50eee2af" sha1="58125ec55efbd8b7f41208364f96be7776abe38a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="millionaire release 2 (imperfect 4am crack) side b.dsk" size="143360" crc="df69dcb4" sha1="454b1720cd9bd5a9ec8730149268d1d565617583" />
 			</dataarea>
 		</part>
 	</software>
@@ -25422,6 +26266,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rboots40b">
+		<description>Rocky's Boots (Version 4.0) (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2016-04-01"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rocky's boots 4.0 (imperfect 4am crack).dsk" size="143360" crc="fdf32263" sha1="d1ee264209ad6b497a9c0415954c32f3df788f52" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wrdroult">
 		<description>Word Roulette (cleanly cracked)</description>
 		<year>1984</year>
@@ -25624,6 +26487,32 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the hangtown trilogy (4am crack) side b.dsk" size="143360" crc="e1359e3a" sha1="efa7cd4791a42533edd65aa67a7656d74976e0f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangtwntb">
+		<description>The Hangtown Trilogy (Version 2.2) (imperfect clean crack)</description>
+		<year>1990</year>
+		<publisher>Critical Thinking Press</publisher>
+		<info name="release" value="2016-04-27"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the hangtown trilogy (imperfect 4am crack) side a.dsk" size="143360" crc="8154e335" sha1="be65913a0c61c8c1cd5ecb72b016ce1fb2f17301" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the hangtown trilogy (imperfect 4am crack) side b.dsk" size="143360" crc="e1359e3a" sha1="efa7cd4791a42533edd65aa67a7656d74976e0f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -25902,6 +26791,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tagtmwrsb">
+		<description>Tag Team Wrestling (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Data East</publisher>
+		<info name="release" value="2016-07-26"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tag team wrestling (imperfect 4am crack).dsk" size="143360" crc="17bae282" sha1="da9e98eec9f73b76645a8860382960dda82bc8a0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sammyltf">
 		<description>Sammy Lightfoot (cleanly cracked)</description>
 		<year>1983</year>
@@ -25944,6 +26852,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="submissnb">
+		<description>Sub Mission (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2016-07-26"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sub mission (imperfect 4am crack).dsk" size="143360" crc="3200326f" sha1="4f5db3436135fb3c48cfe909000708b9e92b5a2e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thartunl">
 		<description>Tharolian Tunnels (cleanly cracked)</description>
 		<year>1982</year>
@@ -25969,6 +26896,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the eidolon (4am crack).dsk" size="143360" crc="631b027b" sha1="9318b15135daf66cebb3f9ed726dcb76e912006f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teidolonb">
+		<description>The Eidolon (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2016-07-26"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the eidolon (imperfect 4am crack).dsk" size="143360" crc="3de6ea12" sha1="fe83ee31fdc13d6ce13541eddd7edb2df8ef54ae" />
 			</dataarea>
 		</part>
 	</software>
@@ -26018,6 +26964,32 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="techno cop (4am crack) side b.dsk" size="143360" crc="72768b2f" sha1="830b81d356e358825dda189255d25675fd7608f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techncopb">
+		<description>Techno Cop (imperfect clean crack)</description>
+		<year>1988</year>
+		<publisher>Gray Matter</publisher>
+		<info name="release" value="2016-07-28"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="techno cop (imperfect 4am crack) side a.dsk" size="143360" crc="8edaccfa" sha1="7f987949e583c77cf60f9f49f34d94884a79e40b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="techno cop (imperfect 4am crack) side b.dsk" size="143360" crc="72768b2f" sha1="830b81d356e358825dda189255d25675fd7608f3" />
 			</dataarea>
 		</part>
 	</software>
@@ -26091,6 +27063,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="circtsimb">
+		<description>The Circuit Simulator (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Natural Intelligence</publisher>
+		<info name="release" value="2016-07-31"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the circuit simulator (imperfect 4am crack).dsk" size="143360" crc="ee496545" sha1="1cf0832df75aeab6195817dd44132956bd0774fd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="readmc13">
 		<description>The Reading Machine (Version 1.3, 1984-03-02) (cleanly cracked)</description>
 		<year>1984</year>
@@ -26156,6 +27147,32 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in europe is carmen sandiego (4am crack) side b.dsk" size="143360" crc="6b3c939a" sha1="542b72a2bacbf86ef4e65ee310501456dc9cb8ab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmneurb">
+		<description>Where in Europe is Carmen Sandiego? (imperfect clean crack)</description>
+		<year>1988</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2016-08-01"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in europe is carmen sandiego (imperfect 4am crack) side a.dsk" size="143360" crc="d5a2ddd7" sha1="c4ee1714220a00286f26daaa80b791425a5689d9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in europe is carmen sandiego (imperfect 4am crack) side b.dsk" size="143360" crc="6b3c939a" sha1="542b72a2bacbf86ef4e65ee310501456dc9cb8ab" />
 			</dataarea>
 		</part>
 	</software>
@@ -27106,6 +28123,33 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="stymkr64b">
+		<description>Story Maker (64K Version) (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2017-01-12"/>
+		<!-- This version only requires 64K of memory. -->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="story maker (imperfect 4am crack).dsk" size="143360" crc="17784da0" sha1="62e7fe8ef62f4322789f0e184178473267e075fc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Picture gallery disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="story maker (imperfect 4am crack) picture gallery disk.dsk" size="143360" crc="7f171b17" sha1="7734b51b4971465ad936adcf5327840103c036d3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="newtgmes">
 		<description>Sir Isaac Newton's Games (cleanly cracked)</description>
 		<year>1985</year>
@@ -27764,6 +28808,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="robody11b">
+		<description>Robot Odyssey (Version 1.1) (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2017-04-18"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey v1.1 (imperfect 4am crack) side a.dsk" size="143360" crc="8a1986e5" sha1="05d42470c949bf53f6ac7c1ecddeec83859d3649" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey v1.1 (imperfect 4am crack) side b.dsk" size="143360" crc="bdefe1fe" sha1="5f3d8c172bed74f5b95173fcc62cf8fc640cb3eb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rrbit11">
 		<description>Reader Rabbit (Version 1.1) (cleanly cracked)</description>
 		<year>1984</year>
@@ -28213,6 +29283,32 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="reading workshop - distant views (4am crack) side b.dsk" size="143360" crc="39ffcbc6" sha1="039f059729e530761ef04b92668325993da60a3a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdwksdvb">
+		<description>Reading Workshop: Distant Views (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2017-05-04"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - distant views (imperfect 4am crack) side a.dsk" size="143360" crc="e768ef34" sha1="9da1139f1f1364566a6ff67f64055a242a52af02" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - distant views (imperfect 4am crack) side b.dsk" size="143360" crc="39ffcbc6" sha1="039f059729e530761ef04b92668325993da60a3a" />
 			</dataarea>
 		</part>
 	</software>
@@ -28670,6 +29766,32 @@ license:CC0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="story tree v1.4 (4am crack) disk 2.dsk" size="143360" crc="9dfb755e" sha1="ade03c019aeff9f49d56110b4a386fc88bf1c501" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stytre14b">
+		<description>Story Tree (Version 1.4) (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2017-06-11"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="story tree v1.4 (imperfect 4am crack) disk 1.dsk" size="143360" crc="0f2efebf" sha1="73582385b7b5e2644c3910ab13e266099f8db90a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="story tree v1.4 (imperfect 4am crack) disk 2.dsk" size="143360" crc="9dfb755e" sha1="ade03c019aeff9f49d56110b4a386fc88bf1c501" />
 			</dataarea>
 		</part>
 	</software>
@@ -29242,6 +30364,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="winnieb">
+		<description>Winnie the Pooh in the Hundred Acre Wood (Sierra On-Line) (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2017-07-18"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="winnie the pooh in the hundred acre wood (sierra variant) (imperfect 4am and san inc crack) side a.dsk" size="143360" crc="b6a4c33f" sha1="71d9a286ad178c8fb915fe1c8b35efa5dfe9c42a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="winnie the pooh in the hundred acre wood (sierra variant) (imperfect 4am and san inc crack) side b.dsk" size="143360" crc="a1b8f04d" sha1="e90eb60f174d48e3f1ec110cb5de51f33ac82d54" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scrnwr20">
 		<description>Screen Writer (Version 2.0) (cleanly cracked)</description>
 		<year>1982</year>
@@ -29400,6 +30548,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sokobanb">
+		<description>Soko-Ban (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="release" value="2017-08-04"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="soko-ban (imperfect 4am crack) side a.dsk" size="143360" crc="6e6a0bd2" sha1="9aa22f23bd0f69dadf5dcaabba41494fdd903219" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="soko-ban (imperfect 4am crack) side b.dsk" size="143360" crc="acb083a6" sha1="75c60df2bedafb294448f5b1fe085b8a509bbf52" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="saadlnd1">
 		<description>Scott Adams Graphic Adventure 1: Adventureland (Version 2.1/416) (cleanly cracked)</description>
 		<year>1982</year>
@@ -29486,6 +30660,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="swiss family robinson (4am crack).dsk" size="143360" crc="1cd108f6" sha1="f072c4dcb9bcc05289927adc55da5cd79170185b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swsfamrbb">
+		<description>Swiss Family Robinson (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Windham Classics</publisher>
+		<info name="release" value="2017-08-12"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="swiss family robinson (imperfect 4am crack).dsk" size="143360" crc="75f5b079" sha1="652ec117b904ffbe4a5e7f2b53d58273caf67b59" />
 			</dataarea>
 		</part>
 	</software>
@@ -29581,6 +30774,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="tink tonk tuk goes to town (4am crack).dsk" size="143360" crc="21d4031d" sha1="4b1909095baacdb89a06c84bc5f50a8947b66043" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttnktuktb">
+		<description>Tink Tonk - Tuk Goes to Town (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2017-09-02"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tink tonk tuk goes to town (imperfect 4am crack).dsk" size="143360" crc="e1d8b967" sha1="6d77aef426c08328ec809dc6b5a3a8fe459a2af6" />
 			</dataarea>
 		</part>
 	</software>
@@ -29956,6 +31168,68 @@ license:CC0
 			<feature name="part_id" value="Disk D-2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="reading workshop - running free (4am crack) disk d-2.dsk" size="143360" crc="0eaadde2" sha1="bf87af4e6baf11c08347a75a2ad46161a45d95bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readwkrfb">
+		<description>Reading Workshop: Running Free (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2017-09-23"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A-1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - running free (imperfect 4am crack) disk a-1.dsk" size="143360" crc="ac607654" sha1="bb9bec12a889bf7c76313cd7b0b2db7069f5ab39" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A-2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - running free (imperfect 4am crack) disk a-2.dsk" size="143360" crc="7714fe1a" sha1="cfa665c8c10d03cc38c3c2519390a175c37f2048" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B-1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - running free (imperfect 4am crack) disk b-1.dsk" size="143360" crc="8b021c99" sha1="49c08efbdcc684a0914e13572e128554f248bda3" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B-2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - running free (imperfect 4am crack) disk b-2.dsk" size="143360" crc="3dea4afe" sha1="821570a959288cb84ded7e0e7391f55ba2f544b1" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C-1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - running free (imperfect 4am crack) disk c-1.dsk" size="143360" crc="a822108c" sha1="490afaaaf8cec7dc4a6fa2fa0b5d15122ca18569" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C-2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - running free (imperfect 4am crack) disk c-2.dsk" size="143360" crc="b1401b34" sha1="4edb4a6ba27609c394fe53eb859ab6a3ceaf41eb" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D-1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - running free (imperfect 4am crack) disk d-1.dsk" size="143360" crc="49fd5e46" sha1="20d4351d62a7309012a32190c822dc405a4f8911" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D-2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading workshop - running free (imperfect 4am crack) disk d-2.dsk" size="143360" crc="0eaadde2" sha1="bf87af4e6baf11c08347a75a2ad46161a45d95bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -30925,6 +32199,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="voodooisb">
+		<description>Voodoo Island (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2017-12-19"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="voodoo island (imperfect 4am crack).dsk" size="143360" crc="551a3285" sha1="64c242b8371add1dd2aed60bffdf80e59bb2fe2e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shppatrn">
 		<description>Shapes and Patterns (cleanly cracked)</description>
 		<year>1988</year>
@@ -31849,6 +33142,44 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="suctyp12b">
+		<description>Success with Typing (Version 1.2) (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2018-03-07"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="success with typing v1.2 (imperfect 4am crack) disk 1.dsk" size="143360" crc="21f580bb" sha1="fe7dd8937e3fb873313dc03f9390693ce34a5eb9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="success with typing v1.2 (imperfect 4am crack) disk 2.dsk" size="143360" crc="c544dbaa" sha1="cd3c42d857ce31edbb334c973430df83423fc060" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="success with typing v1.2 (imperfect 4am crack) disk 3.dsk" size="143360" crc="ace237b3" sha1="48ba18c3d314d754337ae4a30ae2926c8bc643db" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="success with typing v1.2 (imperfect 4am crack) disk 4.dsk" size="143360" crc="a1cfc2a2" sha1="51be8e51fc6c7106b91a3660463812a12fd36193" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="siwa5220">
 		<description>Sound Ideas: Word Attack (Version 5220C) (cleanly cracked)</description>
 		<year>1987</year>
@@ -32022,6 +33353,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="talesmstb">
+		<description>Tales of Mystery (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2018-03-12"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tales of mystery (imperfect 4am crack) side a.dsk" size="143360" crc="822823a0" sha1="12ebad8a6e40b4ce5cb4859b25db5b8db254f7ad" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tales of mystery (imperfect 4am crack) side b.dsk" size="143360" crc="150d40f5" sha1="f0d3bf7a77a4c5db3c98a6435d6d3881cbdbab87" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stymach2">
 		<description>The Story Machine (Revision 2) (cleanly cracked)</description>
 		<year>1982</year>
@@ -32108,6 +33465,38 @@ license:CC0
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the wizard of oz (4am crack) disk c.dsk" size="143360" crc="4e23048d" sha1="db11585b49ffd145c8b06b33b804cd64fb9efe05" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizozb">
+		<description>The Wizard of Oz (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="release" value="2018-03-13"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (imperfect 4am crack) disk a - boot.dsk" size="143360" crc="f11dcc1b" sha1="49190cb5c69a41f4aaa1d135c303ce69c783cfee" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (imperfect 4am crack) disk b.dsk" size="143360" crc="f7f64f0b" sha1="94be36f818a7c76ecba6a485e1b40e2f0c7a2aff" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (imperfect 4am crack) disk c.dsk" size="143360" crc="4e23048d" sha1="db11585b49ffd145c8b06b33b804cd64fb9efe05" />
 			</dataarea>
 		</part>
 	</software>
@@ -32369,6 +33758,38 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="robodyv2b">
+		<description>Robot Odyssey I (Version 2.0) (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2018-05-27"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey i v2.0 (imperfect 4am crack) disk a.dsk" size="143360" crc="9b892eb3" sha1="dd45e3b31932ad7547d130a56f58708744653bca" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey i v2.0 (imperfect 4am crack) disk b.dsk" size="143360" crc="1a7ed51e" sha1="642f6ce855f8e0c3da653527eda2285b600907a5" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey i v2.0 (imperfect 4am crack) disk c.dsk" size="143360" crc="84ee0157" sha1="4265eac0e6eb6eac2abb93a845fc8d25b46a49e7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cavolymp">
 		<description>The Caves of Olympus (cleanly cracked)</description>
 		<year>1982</year>
@@ -32398,6 +33819,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tttsubfb">
+		<description>Tink! Tink! Tink's Subtraction Fair (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2018-05-30"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tink tonk - tink's subtraction fair (imperfect 4am crack).dsk" size="143360" crc="7ea508ac" sha1="b939b5a0ca1265c4182fbfb3ea582c1525b09dff" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tonkbdy">
 		<description>Tonk in the Land of the Buddy-Bots (cleanly cracked)</description>
 		<year>1984</year>
@@ -32410,6 +33850,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="tink tonk - tonk in the land of the buddy-bots (4am crack).dsk" size="143360" crc="04ace393" sha1="55ce15aa2cbb36086a0f2748c8959b4cd82c817c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tonkbdyb">
+		<description>Tonk in the Land of the Buddy-Bots (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2018-06-01"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tink tonk - tonk in the land of the buddy-bots (imperfect 4am crack).dsk" size="143360" crc="c4a059e9" sha1="52729fa8709a5ee535d92a16c9bca06d56ddfb33" />
 			</dataarea>
 		</part>
 	</software>
@@ -32645,7 +34104,7 @@ license:CC0
 	</software>
 
 	<software name="crmusa89">
-		<description>Where in the USA is Carmen Sandiego? (Version 26-APR-1989) (cleanly cracked)</description>
+		<description>Where in the USA is Carmen Sandiego? (Version 2.0, 26-APR-1989) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
 		<info name="release" value="2018-09-05"/>
@@ -32671,6 +34130,40 @@ license:CC0
 			<feature name="part_id" value="Side C"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in the usa is carmen sandiego v2.0 (4am crack) side c.dsk" size="143360" crc="f41a8d2b" sha1="9d788a8c21a4fb08372b2f319188252203667b36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmusa89b">
+		<description>Where in the USA is Carmen Sandiego? (Version 2.0, 26-APR-1989) (imperfect clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2018-09-05"/>
+		<!-- This re-release on 3 sides is dated 26-APR-1989 according to ProDOS
+		file metadata.-->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the usa is carmen sandiego v2.0 (imperfect 4am crack) side a.dsk" size="143360" crc="923eee47" sha1="42425214a5c27a091b09b6fd5ffdb665dbdafd53" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the usa is carmen sandiego v2.0 (imperfect 4am crack) side b.dsk" size="143360" crc="0c1470ee" sha1="6e491ac8d2bb1c83a207c2ff0b8d993a6c94ccab" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the usa is carmen sandiego v2.0 (imperfect 4am crack) side c.dsk" size="143360" crc="f41a8d2b" sha1="9d788a8c21a4fb08372b2f319188252203667b36" />
 			</dataarea>
 		</part>
 	</software>
@@ -32709,6 +34202,28 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in the world is carmen sandiego v2.0 (4am crack) side b.dsk" size="143360" crc="29b48061" sha1="96fc5b5cf4de66d6f4e1ac0364b0c3347b26e2d1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmwld89b">
+		<description>Where in the World is Carmen Sandiego? (Version 15-AUG-1989) (imperfect clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2018-09-05"/>
+		<!-- This ProDOS re-release is dated 15-AUG-1989 according to file
+		metadata. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the world is carmen sandiego v2.0 (imperfect 4am crack) side a.dsk" size="143360" crc="20e8edb2" sha1="11d018c3665cb9764ac3838a17f9fbcad40b4d5b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the world is carmen sandiego v2.0 (imperfect 4am crack) side b.dsk" size="143360" crc="29b48061" sha1="96fc5b5cf4de66d6f4e1ac0364b0c3347b26e2d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -33109,6 +34624,44 @@ license:CC0
 			<feature name="part_id" value="Side D"/>
 			<dataarea name="flop" size="143360">
 				<rom name="treasure island (4am crack) side d.dsk" size="143360" crc="ba3b4b42" sha1="5ce7ab049c18615ee5165620aa23185523c5a1e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trsrisldb">
+		<description>Treasure Island (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="release" value="2018-10-03"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (imperfect 4am crack) side a.dsk" size="143360" crc="fe6343dc" sha1="29c771367983e74bc72825a0dc805b831585f486" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (imperfect 4am crack) side b.dsk" size="143360" crc="c3ca1416" sha1="000ffa7d1a40ce5d892a94690a5a398c15bceafc" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (imperfect 4am crack) side c.dsk" size="143360" crc="0f671042" sha1="3297a11b79c7185a77e8eabd1e93e3d2dabe0a45" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (imperfect 4am crack) side d.dsk" size="143360" crc="ba3b4b42" sha1="5ce7ab049c18615ee5165620aa23185523c5a1e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -34489,6 +36042,44 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cpsat11ab">
+		<description>Computer Preparation for the SAT (Version 1.1A) (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>Harcourt Brace Jovanovich</publisher>
+		<info name="release" value="2019-09-05"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Mathematics"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (imperfect 4am crack) disk 1 - mathematics.dsk" size="143360" crc="3fd1ba92" sha1="4d5c88056164044a42035fd8b135fabbfefc5f04" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Vocabulary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (imperfect 4am crack) disk 2 - vocabulary.dsk" size="143360" crc="44cf4f2a" sha1="dde57f4bba46dd3218123828907da63abb1a98e4" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Verbal item banks"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (imperfect 4am crack) disk 3 - verbal item banks.dsk" size="143360" crc="6e22a81e" sha1="5095b94df65225ebe9b28a4e5de94ea1cd30ac65" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Practice tests"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (imperfect 4am crack) disk 4 - practice tests.dsk" size="143360" crc="8ad412c8" sha1="68417e227245307801fc79bf6b89cb72e801fcac" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crchoru4">
 		<description>Creature Chorus (Version 4.0) (cleanly cracked)</description>
 		<year>1987</year>
@@ -34625,6 +36216,44 @@ license:CC0
 			<feature name="part_id" value="Disk 4 - 1985 teams roster"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the world's greatest baseball game (enhanced version)(4am crack) disk 4 - 1985 teams roster.dsk" size="143360" crc="6bbc19a9" sha1="12e35693433e6e2b9505c716f28322b201d26ad5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wgbbenhb">
+		<description>The World's Greatest Baseball Game (Enhanced Version) (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>Quest</publisher>
+		<info name="release" value="2019-09-29"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Interactive and statistical game play"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the world's greatest baseball game (enhanced version) (imperfect 4am crack) disk 1 - interactive and statistical game play.dsk" size="143360" crc="06291f92" sha1="61c8ccd17cd988284b12a825e7af6f0a5d89187b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Team trading functions"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the world's greatest baseball game (enhanced version) (imperfect 4am crack) disk 2 - team trading functions.dsk" size="143360" crc="eb43d434" sha1="69026be09657404cd9d08e038ac9ef6627bd522d" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - 1984 teams roster"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the world's greatest baseball game (enhanced version) (imperfect 4am crack) disk 3 - 1984 teams roster.dsk" size="143360" crc="034912e1" sha1="6783ed0dd291cccaf4cf2a6383d272bb4d036dbf" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - 1985 teams roster"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the world's greatest baseball game (enhanced version) (imperfect 4am crack) disk 4 - 1985 teams roster.dsk" size="143360" crc="6bbc19a9" sha1="12e35693433e6e2b9505c716f28322b201d26ad5" />
 			</dataarea>
 		</part>
 	</software>
@@ -34929,6 +36558,38 @@ license:CC0
 			<feature name="part_id" value="Disk 3 - Borders and fonts"/>
 			<dataarea name="flop" size="143360">
 				<rom name="certificates and more (4am crack) disk 3 - borders and fonts.dsk" size="143360" crc="c89753e1" sha1="e8545509b0f94025ab3ef9c93c93078fca619971" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="certmoreb">
+		<description>Certificates and More! (imperfect clean crack)</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-11-21"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="certificates and more (imperfect 4am crack) disk 1 - program.dsk" size="143360" crc="41e32298" sha1="895ceebcc95c97cec1ba9558c0ff17caaae2c3a1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Templates"/>
+			<dataarea name="flop" size="143360">
+				<rom name="certificates and more (imperfect 4am crack) disk 2 - templates.dsk" size="143360" crc="a4f43948" sha1="72c15e0c21abf599dd1e9ba4de53503f1fc942b8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Borders and fonts"/>
+			<dataarea name="flop" size="143360">
+				<rom name="certificates and more (imperfect 4am crack) disk 3 - borders and fonts.dsk" size="143360" crc="c89753e1" sha1="e8545509b0f94025ab3ef9c93c93078fca619971"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35407,6 +37068,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ewalg610b">
+		<description>Algebra Volume 6 (Version 1.0) (imperfect clean crack)</description>
+		<year>1983</year>
+		<publisher>EduWare Services</publisher>
+		<info name="release" value="2020-02-01"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 6 v1.0 (imperfect 4am crack).dsk" size="143360" crc="54360c54" sha1="c4fa3589b8ad74528e8f0acbc0b983aba4a9a838"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alkemstn">
 		<description>Alkemstone (cleanly cracked)</description>
 		<year>1981</year>
@@ -35595,6 +37275,37 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in north dakota is carmen sandiego (4am crack) side b.dsk" size="143360" crc="7235925f" sha1="67758499be96c5844cdcd12a9ae91e49d6d15794"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcarmenb">
+		<description>Where in North Dakota is Carmen Sandiego? (imperfect clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-03-09"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in north dakota is carmen sandiego (imperfect 4am crack) side a.dsk" size="143360" crc="72421125" sha1="9f673c85383c89b2ddd92d8379af8c130daf2d0d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in north dakota is carmen sandiego (imperfect 4am crack) side b.dsk" size="143360" crc="7235925f" sha1="67758499be96c5844cdcd12a9ae91e49d6d15794"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36354,6 +38065,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="spcjournb">
+		<description>Space Journey (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2020-06-28"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space journey (imperfect 4am crack).dsk" size="143360" crc="963043ba" sha1="9d2b4f9caeef9b02df9f1bda17a42763c642e98a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xpmapsgl">
 		<description>Exploring Maps and Globes (cleanly cracked)</description>
 		<year>1987</year>
@@ -37018,6 +38748,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="conceptrb">
+		<description>Conceptor (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>Mentor Learning Systems</publisher>
+		<info name="release" value="2020-08-08"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="conceptor (imperfect 4am crack) side a.dsk" size="143360" crc="87502ff2" sha1="d8ba21f1ceb0c04952919c223deca7e1415c117e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="conceptor (imperfect 4am crack) side b.dsk" size="143360" crc="47a2b340" sha1="b8fd53a5ed08f0937c9897f1bfbf22f9f511b7fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epyx3pck">
 		<description>Epyx 3-Pack (cleanly cracked)</description>
 		<year>1980</year>
@@ -37573,6 +39329,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mathtwstb">
+		<description>The Math Twister (imperfect clean crack)</description>
+		<year>1986</year>
+		<publisher>The Ellen Nelson Learning Library</publisher>
+		<info name="release" value="2020-09-29"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math 3- advanced word problems- the math twister (imperfect 4am crack).dsk" size="143360" crc="322cd089" sha1="18c4dc9ce12dc7f4ecd3d9ffdbef0e56f1b62e59"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cavrncrt">
 		<description>Cavern Creatures (cleanly cracked)</description>
 		<year>1983</year>
@@ -37869,6 +39644,56 @@ license:CC0
 			<feature name="part_id" value="Disk 3 Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 3b.dsk" size="143360" crc="6f67c489" sha1="c9cb59f9b170c8d8b372dea69922eb8dcc81b48f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dondrar2b">
+		<description>Dondra: A New Beginning (Revision 2) (imperfect clean crack)</description>
+		<year>1987</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="release" value="2020-12-04"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (imperfect 4am crack) disk 1a.dsk" size="143360" crc="8bc20698" sha1="be42d27bf4466d78da98188cf2fc1ee73dbd5fea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (imperfect 4am crack) disk 1b.dsk" size="143360" crc="01a43225" sha1="899304bd0ebe95472901768d0fb321484ddbba3d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (imperfect 4am crack) disk 2a.dsk" size="143360" crc="8d1b21ff" sha1="45c7edd4f4afc90c6cc3a96057c8496e9cabe14e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (imperfect 4am crack) disk 2b.dsk" size="143360" crc="f8117f5b" sha1="118c9a8ac340a9c6ee70c9bf5b73d1649ca7f7b4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (imperfect 4am crack) disk 3a.dsk" size="143360" crc="b9d36f8f" sha1="4d4b3108e4cf809b58695853d7609a5b9d57d8d7"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (imperfect 4am crack) disk 3b.dsk" size="143360" crc="6f67c489" sha1="c9cb59f9b170c8d8b372dea69922eb8dcc81b48f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39763,6 +41588,27 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mcspst10b">
+		<description>MECC-A405 Sports Stats (Version 1.0) (imperfect clean crack)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-18"/>
+		<info name="programmer" value="Jim Sydow, Ron Geiser, Reed Christiansen, Dave Laden, Curt Traaseth, and Jean Brown"/>
+		<!--"Sports Stats" is a 1985 educational program developed by Jim Sydow, Ron Geiser, Reed Christiansen, Dave Laden, Curt Traaseth, and Jean Brown, and distributed by MECC. This is version 1.0.-->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a405 sports stats v1.0 (imperfect 4am crack).dsk" size="143360" crc="f6c8c982" sha1="897feba8aff55998851bfde89d18fd743bb0b196"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcgts10">
 		<description>MECC-A271 Grammar Toy Shop (Version 1.0) (cleanly cracked)</description>
 		<year>1990</year>
@@ -41204,6 +43050,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="algvl411b">
+		<description>Algebra Volume 4 (Version 1.1) (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>Peachtree Software</publisher>
+		<info name="release" value="2021-04-07"/>
+		<!--"Algebra Volume 4" is a 1984 educational program developed and distributed by Peachtree Software (formerly EduWare).-->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 4 v1.1 (imperfect 4am crack).dsk" size="143360" crc="6e31db75" sha1="1fb34a385b6fce375287d075311628d814883c91"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcev11lang11">
 		<description>MECC-A735 Elementary Volume 11: Language Arts (Version 1.1) (cleanly cracked)</description>
 		<year>1981</year>
@@ -41365,6 +43231,26 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="algebra volume 3 rev. 0 (4am crack).dsk" size="143360" crc="14d5ea47" sha1="0e31c95f052799c3322658b2c2b2fd79d6e7c56f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algv3rev0b">
+		<description>Algebra Volume 3 (Revision 0) (imperfect clean crack)</description>
+		<year>1984</year>
+		<publisher>EduWare</publisher>
+		<info name="release" value="2021-04-07"/>
+		<!--"Algebra Volume 3" is a 1984 educational program developed and distributed by EduWare.-->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 3 rev. 0 (imperfect 4am crack).dsk" size="143360" crc="44d97f66" sha1="f3f7e35ba0af4a96c37cd4650a1662af60ce2e43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43898,7 +45784,6 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
 
 	<software name="movimons">
 		<description>The Movie Monster Game (cleanly cracked)</description>
