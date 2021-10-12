@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Angelo Salese
 /*
 
     http://www2.odn.ne.jp/~haf09260/Pc80/EnrPc.htm
@@ -12,14 +12,28 @@
 
     TODO:
 
-    - uPD3301 attributes
-    - PCG1000
-    - Intel 8251
-    - cassette
-    - floppy
-    - PC-8011
-    - PC-8021
-    - PC-8031
+    - uPD3301 attributes;
+    - PCG-1000;
+    - Intel 8251;
+    - cassette;
+    - dip-switches;
+    - PC-8011 (expansion unit)
+    - PC-8021;
+    - PC-8031 (mini disk unit, in progress)
+    - pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
+      (Has 3 bitplane GVRAM like PC-8801 V1 mode);
+    - waitstates & DMA penalty (some games are suspciously fast);
+    - buzzer has pretty ugly aliasing in places;
+
+    Notes:
+    - pc8001 v1.01 / v1.02 sports a buggy readout of the expansion ROM at PC=17a1:
+      It expects an header read of 0x41-0x42 at offset $6000-6001, but second read at
+      PC=0x17aa is just a comparison to $6000 == 0x42, which is impossible at that point
+      unless external aid is given. This has been fixed in v1.10;
+    - Color Magical (pc8001gp:flop5 option 7) transfers two 8 color screens at
+      even/odd frame intervals, effectively boosting the number of available colors to 27.
+      This trick is kinda flickery even on real HW, no wonder it looks ugly in MAME,
+      can it be improved?
 
 */
 
@@ -27,6 +41,150 @@
 #include "includes/pc8001.h"
 #include "screen.h"
 #include "speaker.h"
+
+WRITE_LINE_MEMBER( pc8001_base_state::crtc_reverse_w )
+{
+	// rvv acts as a global flip for reverse attribute meaning
+	// (does not act on underlying palette)
+	// TODO: what happens if RVV changes mid-frame?
+	// I suspect monitor resync more likely than rasters.
+	m_screen_reverse = state;
+}
+
+UPD3301_FETCH_ATTRIBUTE( pc8001_base_state::attr_fetch )
+{
+	const u8 attr_max_size = 80;
+	const bool is_color_mode = gfx_mode == 0x2;
+	std::array<u16, attr_max_size> attr_extend_info = m_crtc->default_attr_fetch(attr_row, gfx_mode, y, attr_fifo_size, row_size);
+
+	// further extend the attributes if we are in color mode
+	if (is_color_mode)
+	{
+		// TODO: defaults
+		// flgworld (pc8001) gameplay sets up:
+		// - 0x00 0x00 0x02 0x88 on playfield
+		// \- (wanting the default from the first defined color)
+		// - 0x00 0x00 0x00 0x48 0x12 0x88 for first row
+		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green wtf)
+		// undermon (pc8001) instruction screen sets up:
+		// - 0x00 0x00 0x06 0xb8
+		// \- (expecting blue fill up to 0x06)
+		u8 attr_color = 0xe8;
+		u8 attr_decoration = 0x00;
+
+		for (int ex = 0; ex < row_size; ex++)
+		{
+			u16 cur_attr = attr_extend_info[ex];
+			if (BIT(cur_attr, 3))
+				attr_color = cur_attr;
+			else
+				attr_decoration = cur_attr;
+			attr_extend_info[ex] = (attr_color << 8) | attr_decoration;
+		}
+	}
+
+	return attr_extend_info;
+}
+
+UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
+{
+	// punt if we are in width 40 (discarded on this end)
+	if (sx % 2 && !m_width80)
+		return;
+
+	const bool is_color_mode = gfx_mode == 0x2;
+	u8 tile;
+	const u8 tile_width = m_width80 ? 8 : 16;
+	const u8 dot_width = (m_width80 ^ 1) + 1;
+	const u8 y_double = m_screen_is_24KHz ? 2 : 1;
+	const u8 y_height = y_double * 8;
+
+	bool semigfx_tile, reverse, attr_blink, secret;
+	bool upperline, lowerline;
+	u8 color;
+
+	if (is_color_mode)
+	{
+		color = (attr & 0xe000) >> 13;
+		semigfx_tile = bool(BIT(attr, 12));
+		// bit 7 is used by 2001spc and many others, no effect?
+	}
+	else
+	{
+		color = 7;
+		semigfx_tile = bool(BIT(attr, 7));
+	}
+
+	lowerline = bool(BIT(attr, 5));
+	upperline = bool(BIT(attr, 4));
+	reverse = bool(BIT(attr, 2));
+	attr_blink = bool(BIT(attr, 1));
+	secret = bool(BIT(attr, 0));
+
+	if (semigfx_tile)
+		tile = cc;
+	else
+	{
+		if (lc > y_height - 1)
+			tile = 0;
+		else
+			tile = m_cgrom->base()[(cc << 3) | (lc >> (y_double-1))];
+	}
+
+	// secret blacks out every tile connections,
+	// has lower priority over blinking and other attribute decorations
+	if (secret)
+		tile = 0;
+
+	if (csr)
+		tile ^= 0xff;
+	else if (attr_blink_on && attr_blink)
+		tile = 0;
+
+	// upper/lower line aren't affected by secret and blinking, only reverse
+	// TODO: should downshift chars by one
+	if (lc == 0 && upperline)
+		tile = 0xff;
+
+	if (is_lowestline && lowerline)
+		tile = 0xff;
+
+	if (reverse ^ m_screen_reverse)
+		tile ^= 0xff;
+
+//  if (m_width80)
+	{
+		u8 pen;
+
+		for (int xi = 0; xi < tile_width; xi += dot_width)
+		{
+			int res_x = (sx * 8) + xi;
+			if (semigfx_tile)
+			{
+				u8 mask = (xi & (4 << (dot_width - 1))) ? 0x10 : 0x01;
+				mask <<= (lc & (0x3 << y_double)) >> y_double;
+				pen = tile & mask;
+			}
+			else
+			{
+				pen = tile;
+				pen = (pen >> (7 - (xi >> (dot_width - 1)))) & 1;
+			}
+
+			for (int di = 0; di < dot_width; di++)
+				bitmap.pix(y, res_x + di) = m_crtc_palette->pen(pen ? color : 0);
+		}
+	}
+}
+
+uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	// TODO: superimposing
+	// TODO: merging with previous frame for Color Magical (is it driver area?)
+	m_crtc->screen_update(screen, bitmap, cliprect);
+	return 0;
+}
 
 /* Read/Write Handlers */
 
@@ -57,7 +215,7 @@ void pc8001_state::port10_w(uint8_t data)
 	m_cent_data_out->write(data);
 }
 
-void pc8001_state::port30_w(uint8_t data)
+void pc8001_base_state::port30_w(uint8_t data)
 {
 	/*
 
@@ -80,8 +238,7 @@ void pc8001_state::port30_w(uint8_t data)
 	/* color mode */
 	m_color = BIT(data, 1);
 
-	/* cassette motor */
-	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 void pc8001mk2_state::port31_w(uint8_t data)
@@ -100,6 +257,7 @@ void pc8001mk2_state::port31_w(uint8_t data)
 	    7       background color
 
 	*/
+	membank("bank2")->set_entry(data & 1);
 }
 
 WRITE_LINE_MEMBER( pc8001_state::write_centronics_busy )
@@ -129,12 +287,13 @@ uint8_t pc8001_state::port40_r()
 
 	*/
 
-	uint8_t data = 0x08;
+	uint8_t data = 0x00;
 
 	data |= m_centronics_busy;
 	data |= m_centronics_ack << 1;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
+	// TODO: enable line from pc80s31k (bit 3, active_low)
 
 	return data;
 }
@@ -158,15 +317,15 @@ void pc8001_state::port40_w(uint8_t data)
 
 	m_centronics->write_strobe(BIT(data, 0));
 
-	m_rtc->clk_w(BIT(data, 2));
 	m_rtc->stb_w(BIT(data, 1));
+	m_rtc->clk_w(BIT(data, 2));
 
 	m_beep->set_state(BIT(data, 5));
 }
 
 /* Memory Maps */
 
-void pc8001_state::pc8001_mem(address_map &map)
+void pc8001_state::pc8001_map(address_map &map)
 {
 	map(0x0000, 0x5fff).bankrw("bank1");
 	map(0x6000, 0x7fff).bankrw("bank2");
@@ -217,10 +376,10 @@ void pc8001_state::pc8001_io(address_map &map)
 //  map(0xe6, 0xe6).w(FUNC(pc8001_state::irq_mask_w));
 //  map(0xe7, 0xe7).w(FUNC(pc8001_state::pc8012_memory_mode_w));
 //  map(0xe8, 0xfb) unused
-	map(0xfc, 0xff).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
-void pc8001mk2_state::pc8001mk2_mem(address_map &map)
+void pc8001mk2_state::pc8001mk2_map(address_map &map)
 {
 	map(0x0000, 0x5fff).bankrw("bank1");
 	map(0x6000, 0x7fff).bankrw("bank2");
@@ -231,8 +390,8 @@ void pc8001mk2_state::pc8001mk2_mem(address_map &map)
 void pc8001mk2_state::pc8001mk2_io(address_map &map)
 {
 	pc8001_io(map);
-	map(0x30, 0x30).w(FUNC(pc8001mk2_state::port30_w));
-	map(0x31, 0x31).w(FUNC(pc8001mk2_state::port31_w));
+	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8001mk2_state::port30_w));
+	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8001mk2_state::port31_w));
 //  map(0x5c, 0x5c).w(FUNC(pc8001mk2_state::gram_on_w));
 //  map(0x5f, 0x5f).w(FUNC(pc8001mk2_state::gram_off_w));
 //  map(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
@@ -248,6 +407,40 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 //  map(0xf9, 0xf9) DMA type 5 inch margin control
 //  map(0xfa, 0xfa) DMA type 5 inch FDC status
 //  map(0xfb, 0xfb) DMA type 5 inch FDC data register
+}
+
+void pc8001mk2sr_state::port33_w(u8 data)
+{
+	// TODO: needs progressive flush
+#ifdef UNUSED_FUNCTION
+	if (data & 0x80)
+	{
+		membank("bank1")->set_entry(2);
+		membank("bank2")->set_entry(2 | (m_n80sr_bank & 1));
+	}
+	else
+	{
+		membank("bank1")->set_entry(0);
+		membank("bank2")->set_entry(0);
+	}
+#endif
+}
+
+u8 pc8001mk2sr_state::port71_r()
+{
+	return m_n80sr_bank;
+}
+
+void pc8001mk2sr_state::port71_w(u8 data)
+{
+	m_n80sr_bank = data;
+}
+
+void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
+{
+	pc8001mk2_io(map);
+	map(0x33, 0x33).w(FUNC(pc8001mk2sr_state::port33_w));
+	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
 }
 
 /* Input Ports */
@@ -353,60 +546,84 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)                          PORT_CHAR(' ')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)                            PORT_CHAR(27)
 
-	PORT_START("DSW1")
+//  PORT_START("DSW1")
 INPUT_PORTS_END
 
-/* uPD3301 Interface */
+static INPUT_PORTS_START( pc8001mk2 )
+	PORT_INCLUDE( pc8001 )
 
-static const rgb_t PALETTE_PC8001[] =
-{
-	rgb_t::black(),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0x00, 0x00),
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0x00, 0xff, 0xff),
-	rgb_t(0xff, 0xff, 0x00),
-	rgb_t::white()
-};
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Boot Mode" )
+	PORT_DIPSETTING(    0x00, "N-BASIC" )
+	PORT_DIPSETTING(    0x01, "N80-BASIC" )
+	PORT_DIPNAME( 0x02, 0x02, "DSW1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::pc8001_display_pixels )
-{
-	uint8_t data = m_char_rom->base()[(cc << 3) | lc];
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
-	if (lc >= 8) return;
-	if (csr) data = 0xff;
+static INPUT_PORTS_START( pc8001mk2sr )
+	PORT_INCLUDE( pc8001mk2 )
 
-	if (m_width80)
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			int color = BIT(data, 7) ^ rvv;
-
-			bitmap.pix(y, (sx * 8) + i) = PALETTE_PC8001[color ? 7 : 0];
-
-			data <<= 1;
-		}
-	}
-	else
-	{
-		if (sx % 2) return;
-
-		for (int i = 0; i < 8; i++)
-		{
-			int color = BIT(data, 7) ^ rvv;
-
-			bitmap.pix(y, (sx/2 * 16) + (i * 2)) = PALETTE_PC8001[color ? 7 : 0];
-			bitmap.pix(y, (sx/2 * 16) + (i * 2) + 1) = PALETTE_PC8001[color ? 7 : 0];
-
-			data <<= 1;
-		}
-	}
-}
+	PORT_MODIFY("DSW1")
+	// This is really a tri-state dip on front panel
+	// BIOS just expects bit 1 to be off for SR mode
+	PORT_DIPNAME( 0x03, 0x02, "Boot Mode" )
+	PORT_DIPSETTING(    0x00, "N80SR-BASIC (duplicate)")
+	PORT_DIPSETTING(    0x01, "N80SR-BASIC" )
+	PORT_DIPSETTING(    0x02, "N-BASIC" )
+	PORT_DIPSETTING(    0x03, "N80-BASIC" )
+	PORT_DIPNAME( 0x04, 0x04, "DSW1" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /* 8257 Interface */
 
-WRITE_LINE_MEMBER( pc8001_state::hrq_w )
+WRITE_LINE_MEMBER( pc8001_base_state::hrq_w )
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
@@ -415,7 +632,7 @@ WRITE_LINE_MEMBER( pc8001_state::hrq_w )
 	m_dma->hlda_w(state);
 }
 
-uint8_t pc8001_state::dma_mem_r(offs_t offset)
+uint8_t pc8001_base_state::dma_mem_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -423,6 +640,14 @@ uint8_t pc8001_state::dma_mem_r(offs_t offset)
 }
 
 /* Machine Initialization */
+
+void pc8001_base_state::machine_start()
+{
+	save_item(NAME(m_width80));
+	save_item(NAME(m_color));
+	save_item(NAME(m_screen_reverse));
+	save_item(NAME(m_screen_is_24KHz));
+}
 
 void pc8001_state::machine_start()
 {
@@ -441,6 +666,7 @@ void pc8001_state::machine_start()
 	membank("bank1")->configure_entry(1, m_rom->base());
 	program.install_read_bank(0x0000, 0x5fff, membank("bank1"));
 	program.unmap_write(0x0000, 0x5fff);
+	membank("bank2")->configure_entry(1, m_rom->base() + 0x6000);
 
 	switch (m_ram->size())
 	{
@@ -464,55 +690,81 @@ void pc8001_state::machine_start()
 		program.install_readwrite_bank(0x0000, 0x5fff, membank("bank1"));
 		program.install_readwrite_bank(0x6000, 0xbfff, membank("bank2"));
 		program.install_readwrite_bank(0x8000, 0xffff, membank("bank3"));
-		membank("bank2")->set_entry(0);
+//      membank("bank2")->set_entry(0);
 		break;
 	}
 
-	membank("bank1")->set_entry(1);
-	membank("bank3")->set_entry(0);
+	// PC8001 is 15KHz only
+	set_screen_frequency(false);
+}
 
-	/* register for state saving */
-	save_item(NAME(m_width80));
-	save_item(NAME(m_color));
+void pc8001_state::machine_reset()
+{
+	membank("bank1")->set_entry(1);
+	membank("bank2")->set_entry(1);
+	membank("bank3")->set_entry(0);
+}
+
+void pc8001mk2sr_state::machine_start()
+{
+	pc8001_state::machine_start();
+
+	membank("bank1")->configure_entry(2, m_n80sr_rom->base());
+	membank("bank2")->configure_entry(2, m_n80sr_rom->base() + 0x6000);
+	membank("bank2")->configure_entry(3, m_n80sr_rom->base() + 0x8000);
+
+	save_item(NAME(m_n80sr_bank));
+}
+
+void pc8001mk2sr_state::machine_reset()
+{
+	pc8001_state::machine_reset();
+
+	//membank("bank1")->set_entry(2);
+	//membank("bank2")->set_entry(2);
 }
 
 /* Machine Drivers */
 
 void pc8001_state::pc8001(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = XTAL(4'000'000);
+	constexpr XTAL VIDEO_CLOCK = XTAL(14'318'181);
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_mem);
+	Z80(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
 
+	PC80S31(config, m_pc80s31, MASTER_CLOCK);
+	config.set_perfect_quantum(m_maincpu);
+	config.set_perfect_quantum("pc80s31:fdc_cpu");
+
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
-	screen.set_size(640, 220);
-	screen.set_visarea(0, 640-1, 0, 200-1);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
+	m_screen->set_screen_update(FUNC(pc8001_state::screen_update));
+//  m_screen->set_palette(m_crtc_palette);
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	PALETTE(config, m_crtc_palette, palette_device::BRG_3BIT);
 
-	/* devices */
-	I8251(config, I8251_TAG, 0);
+	UPD3301(config, m_crtc, VIDEO_CLOCK);
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(pc8001_state::draw_text));
+	m_crtc->set_attribute_fetch_callback(FUNC(pc8001_state::attr_fetch));
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	m_crtc->rvv_wr_callback().set(FUNC(pc8001_state::crtc_reverse_w));
+	m_crtc->set_screen(m_screen);
 
-	I8255A(config, I8255A_TAG, 0);
-
-	I8257(config, m_dma, XTAL(4'000'000));
+	I8257(config, m_dma, MASTER_CLOCK);
 	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
-	UPD1990A(config, m_rtc);
+	/* devices */
+	I8251(config, I8251_TAG, 0);
 
-	UPD3301(config, m_crtc, XTAL(14'318'181));
-	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels));
-	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
-	m_crtc->set_screen(SCREEN_TAG);
+	UPD1990A(config, m_rtc);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(FUNC(pc8001_state::write_centronics_ack));
@@ -526,77 +778,81 @@ void pc8001_state::pc8001(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
+
+	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	// TODO: unknown clock, is it really a beeper?
+	BEEP(config, m_beep, 2400).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void pc8001mk2_state::pc8001mk2(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_mem);
+	pc8001(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001mk2_state::pc8001mk2_io);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
-	screen.set_size(640, 220);
-	screen.set_visarea(0, 640-1, 0, 200-1);
+	// TODO: video HW has extra GVRAM setup
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	RAM(config.replace(), RAM_TAG).set_default_size("64K");
 
-	/* devices */
-	I8251(config, I8251_TAG, 0);
+	SOFTWARE_LIST(config, "disk_n80_list").set_original("pc8001mk2_flop");
+}
 
-	I8255A(config, I8255A_TAG, 0);
+void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
+{
+	pc8001mk2(config);
+	m_maincpu->set_addrmap(AS_IO, &pc8001mk2sr_state::pc8001mk2sr_io);
 
-	I8257(config, m_dma, XTAL(4'000'000));
-	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
-	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
-	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
+	// TODO: mods for SR mode support
 
-	UPD1990A(config, m_rtc);
-
-	UPD3301(config, m_crtc, XTAL(14'318'181));
-	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels));
-	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
-	m_crtc->set_screen(SCREEN_TAG);
-
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-
-	OUTPUT_LATCH(config, m_cent_data_out);
-	m_centronics->set_output_latch(*m_cent_data_out);
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-
-	RAM(config, RAM_TAG).set_default_size("64K");
+	SOFTWARE_LIST(config, "disk_n80sr_list").set_original("pc8001mk2sr_flop");
 }
 
 /* ROMs */
 
 ROM_START( pc8001 )
-	ROM_REGION( 0x6000, Z80_TAG, 0 )
+	ROM_REGION( 0x8000, Z80_TAG, ROMREGION_ERASEFF )
+	// PCB pictures shows divided by 3 ROMs (and 4th socket unpopulated)
 	ROM_SYSTEM_BIOS( 0, "v101", "N-BASIC v1.01" )
-	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(0) )
+	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, BAD_DUMP CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v102", "N-BASIC v1.02" )
-	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(1) )
+	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, BAD_DUMP CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v110", "N-BASIC v1.10" )
-	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
+	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, BAD_DUMP CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
 
-	ROM_REGION( 0x800, UPD3301_TAG, 0)
+	ROM_REGION( 0x800, CGROM_TAG, 0)
 	ROM_LOAD( "font.rom", 0x000, 0x800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 ROM_END
 
 ROM_START( pc8001mk2 )
 	ROM_REGION( 0x8000, Z80_TAG, 0 )
-	ROM_LOAD( "n80_2.rom", 0x00000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
+	// N-BASIC v1.3
+	// N80-BASIC v1.0
+	ROM_LOAD( "n80_2.rom", 0x0000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
 
-	ROM_REGION( 0x800, UPD3301_TAG, 0)
+	ROM_REGION( 0x800, CGROM_TAG, 0)
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
+
+	ROM_REGION( 0x20000, "kanji", 0)
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+ROM_END
+
+ROM_START( pc8001mk2sr )
+	ROM_REGION( 0x8000, Z80_TAG, 0 )
+	// N-BASIC v1.6
+	// N80-BASIC v1.2
+	ROM_LOAD( "n80_2sr.rom", 0x0000, 0x8000, CRC(dcb71282) SHA1(e8db5dc5eae11da14e48656d324874e59f2e3844) )
+
+	ROM_REGION (0x10000, N80SR_ROM_TAG, ROMREGION_ERASEFF )
+	// N80SR-BASIC v1.0
+	ROM_LOAD( "n80_3.rom",    0x0000, 0xa000, BAD_DUMP CRC(d99ef247) SHA1(9bfa5009d703cd31caa734d932d2a847d74cbfa6) )
+
+	ROM_REGION( 0x2000, CGROM_TAG, 0)
+	ROM_LOAD( "font80sr.rom", 0x000000, 0x001000, CRC(784c0b17) SHA1(565dc8e5e46b1633cb434d12b4d8b3a662546b33) )
+	ROM_LOAD( "fonthira.rom", 0x001000, 0x000800, CRC(fe7059d5) SHA1(10c5f85adcce540cbd0a11352e2c38a84c989a26) )
+	ROM_LOAD( "fontkata.rom", 0x001800, 0x000800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 
 	ROM_REGION( 0x20000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
@@ -605,5 +861,8 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT   CLASS            INIT        COMPANY  FULLNAME       FLAGS
-COMP( 1979, pc8001,    0,      0,      pc8001,    pc8001, pc8001_state,    empty_init, "NEC",   "PC-8001",     MACHINE_NOT_WORKING )
-COMP( 1983, pc8001mk2, pc8001, 0,      pc8001mk2, pc8001, pc8001mk2_state, empty_init, "NEC",   "PC-8001mkII", MACHINE_NOT_WORKING )
+// 1978?, pc8001g, Wirewrapped prototype version
+COMP( 1979, pc8001,      0,      0,      pc8001,      pc8001,      pc8001_state,      empty_init, "NEC",   "PC-8001",     MACHINE_NOT_WORKING )
+// 1981 pc8001a, US version of PC-8001 with Greek alphabet instead of Kana
+COMP( 1983, pc8001mk2,   pc8001, 0,      pc8001mk2,   pc8001mk2,   pc8001mk2_state,   empty_init, "NEC",   "PC-8001mkII", MACHINE_NOT_WORKING )
+COMP( 1985, pc8001mk2sr, pc8001, 0,      pc8001mk2sr, pc8001mk2sr, pc8001mk2sr_state, empty_init, "NEC",   "PC-8001mkIISR", MACHINE_NOT_WORKING )

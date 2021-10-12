@@ -3313,4 +3313,111 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rrbit23">
+		<description>Reader Rabbit (Version 2.3)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 256K Apple IIgs. -->
+		<!--"Reader Rabbit" is a 1987 educational program developed by Pete Rowe and Aaron Weiss, and distributed by The Learning Company. This is version 2.3. It requires a 256K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296165">
+				<rom name="reader rabbit iigs.woz" size="1296165" crc="fc417d0a" sha1="5d6c7179955c227182a5e48f0f1ef16de8b710e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madlibs">
+		<description>Mad Libs (Version 1.0)</description>
+		<year>1987</year>
+		<publisher>First Byte</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Mad Libs" is a 1987 educational program developed and distributed by First Byte. This is version 1.0. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328903">
+				<rom name="mad libs iigs.woz" size="1328903" crc="91007135" sha1="73eba5eb4cb6b0b99d04c6b8aa9790ccb866b2d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tarabn">
+		<description>Tales From The Arabian Nights</description>
+		<year>1988</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2021-07-26"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Tales From The Arabian Nights" is a 1988 educational program developed by Stanley Brewster and June Stark, and distributed by Unicorn Software. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296716">
+				<rom name="tales from the arabian nights iigs - disk 1.woz" size="1296716" crc="551d0a16" sha1="b446d573570b7686a76ce7071122dd68dcfce86b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296204">
+				<rom name="tales from the arabian nights iigs - disk 2.woz" size="1296204" crc="06407198" sha1="9c8cf68514acfa818ce6e1807e5cfa05f40d8eb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdarama">
+		<description>Read-A-Rama</description>
+		<year>1989</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2021-07-26"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"Read-A-Rama" is a 1989 educational program developed by Stan Brewster and Joseph Hewitt, and distributed by Unicorn Software. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Boot disk"/>
+			<dataarea name="flop" size="1296719">
+				<rom name="read-a-rama iigs - disk 1 - boot disk.woz" size="1296719" crc="e430df4a" sha1="96dba78e27ab06de97117a27542c3ce211a7bd44"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Level 1"/>
+			<dataarea name="flop" size="1296205">
+				<rom name="read-a-rama iigs - disk 2 - level 1.woz" size="1296205" crc="9b23b421" sha1="0fc3c37883a2358c7644785eaa7488184d431558"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Level 2"/>
+			<dataarea name="flop" size="1296216">
+				<rom name="read-a-rama iigs - disk 3 - level 2.woz" size="1296216" crc="7420be24" sha1="1bb82fc0da0c56c291fda9c19213659123fde543"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readnme">
+		<description>Reading and Me (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Reading and Me" is a 1988 educational program developed by Louis X. Savain and C. K. Haun, and distributed by Davidson and Associates. This is version 1.0. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1328940">
+				<rom name="reading and me iigs - disk 1 - program.woz" size="1328940" crc="598bd916" sha1="aeff5dc46e4175b69702fd393eea6fc3d95f089c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Data disk"/>
+			<dataarea name="flop" size="1312556">
+				<rom name="reading and me iigs - disk 2 - data.woz" size="1312556" crc="8c0d3e1f" sha1="ba53651eed2bd0393b8d83390555825302b9bba5"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

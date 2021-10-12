@@ -25,7 +25,7 @@
 #define OPTION_WRITECONFIG          "writeconfig"
 
 // core search path options
-#define OPTION_HOMEPATH             "homepath"
+#define OPTION_PLUGINDATAPATH       "homepath"
 #define OPTION_MEDIAPATH            "rompath"
 #define OPTION_HASHPATH             "hashpath"
 #define OPTION_SAMPLEPATH           "samplepath"
@@ -120,6 +120,7 @@
 #define OPTION_SAMPLERATE           "samplerate"
 #define OPTION_SAMPLES              "samples"
 #define OPTION_VOLUME               "volume"
+#define OPTION_COMPRESSOR           "compressor"
 #define OPTION_SPEAKER_REPORT       "speaker_report"
 
 // core input options
@@ -310,7 +311,7 @@ public:
 	bool write_config() const { return bool_value(OPTION_WRITECONFIG); }
 
 	// core search path options
-	const char *home_path() const { return value(OPTION_HOMEPATH); }
+	const char *plugin_data_path() const { return value(OPTION_PLUGINDATAPATH); }
 	const char *media_path() const { return value(OPTION_MEDIAPATH); }
 	const char *hash_path() const { return value(OPTION_HASHPATH); }
 	const char *sample_path() const { return value(OPTION_SAMPLEPATH); }
@@ -405,6 +406,7 @@ public:
 	int sample_rate() const { return int_value(OPTION_SAMPLERATE); }
 	bool samples() const { return bool_value(OPTION_SAMPLES); }
 	int volume() const { return int_value(OPTION_VOLUME); }
+	bool compressor() const { return bool_value(OPTION_COMPRESSOR); }
 	int speaker_report() const { return int_value(OPTION_SPEAKER_REPORT); }
 
 	// core input options

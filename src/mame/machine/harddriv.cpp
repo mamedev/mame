@@ -37,6 +37,8 @@
 void harddriv_state::device_start()
 {
 	m_lamps.resolve();
+	m_sel.resolve();
+	m_wheel.resolve();
 
 	/* predetermine memory regions */
 	m_adsp_pgm_memory_word = (uint16_t *)(reinterpret_cast<uint8_t *>(m_adsp_pgm_memory.target()) + 1);
@@ -46,7 +48,7 @@ void harddriv_state::device_start()
 }
 
 
-void  harddriv_state::device_reset()
+void harddriv_state::device_reset()
 {
 	/* halt several of the DSPs to start */
 	m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -359,24 +361,24 @@ void harddriv_state::hd68k_wr1_write(offs_t offset, uint16_t data)
 		data = data >> 8;
 		switch (m_sel_select)
 		{
-			case 1: /* SEL1 */
-				m_sel1_data = data;
-				machine().output().set_value("SEL1", m_sel1_data);
+		case 1: /* SEL1 */
+			m_sel1_data = data;
+			m_sel[0] = m_sel1_data;
 			break;
 
-			case 2: /* SEL2 */
-				m_sel2_data = data;
-				machine().output().set_value("SEL2", m_sel2_data);
+		case 2: /* SEL2 */
+			m_sel2_data = data;
+			m_sel[1] = m_sel2_data;
 			break;
 
-			case 3: /* SEL3 */
-				m_sel3_data = data;
-				machine().output().set_value("SEL3", m_sel3_data);
+		case 3: /* SEL3 */
+			m_sel3_data = data;
+			m_sel[2] = m_sel3_data;
 			break;
 
-			case 4: /* SEL4 */
-				m_sel4_data = data;
-				machine().output().set_value("SEL4", m_sel4_data);
+		case 4: /* SEL4 */
+			m_sel4_data = data;
+			m_sel[3] = m_sel4_data;
 			break;
 		}
 	} else {
@@ -389,7 +391,7 @@ void harddriv_state::hd68k_wr2_write(offs_t offset, uint16_t data)
 {
 	if (offset == 0) {
 		// logerror("Steering Wheel Latch = %02X\n", data);
-		machine().output().set_value("wheel", data >> 8);
+		m_wheel = data >> 8;
 	} else {
 		logerror("/WR2(%04X)=%02X\n", offset, data);
 	}

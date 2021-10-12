@@ -180,13 +180,13 @@ void memorywin_info::update_menu()
 
 	auto *const memview = downcast<memoryview_info *>(m_views[0].get());
 	HMENU const menu = GetMenu(window());
-	CheckMenuItem(menu, ID_1_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == 1 ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_2_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == 2 ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_4_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == 4 ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_8_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == 8 ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_FLOATING_POINT_32BIT, MF_BYCOMMAND | (memview->data_format() == 9 ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_FLOATING_POINT_64BIT, MF_BYCOMMAND | (memview->data_format() == 10 ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_FLOATING_POINT_80BIT, MF_BYCOMMAND | (memview->data_format() == 11 ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_1_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::HEX_8BIT ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_2_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::HEX_16BIT ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_4_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::HEX_32BIT ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_8_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::HEX_64BIT ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_FLOATING_POINT_32BIT, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::FLOAT_32BIT ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_FLOATING_POINT_64BIT, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::FLOAT_64BIT ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_FLOATING_POINT_80BIT, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::FLOAT_80BIT ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_LOGICAL_ADDRESSES, MF_BYCOMMAND | (memview->physical() ? MF_UNCHECKED : MF_CHECKED));
 	CheckMenuItem(menu, ID_PHYSICAL_ADDRESSES, MF_BYCOMMAND | (memview->physical() ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_REVERSE_VIEW, MF_BYCOMMAND | (memview->reverse() ? MF_CHECKED : MF_UNCHECKED));
@@ -220,31 +220,31 @@ bool memorywin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		switch (LOWORD(wparam))
 		{
 		case ID_1_BYTE_CHUNKS:
-			memview->set_data_format(1);
+			memview->set_data_format(debug_view_memory::data_format::HEX_8BIT);
 			return true;
 
 		case ID_2_BYTE_CHUNKS:
-			memview->set_data_format(2);
+			memview->set_data_format(debug_view_memory::data_format::HEX_16BIT);
 			return true;
 
 		case ID_4_BYTE_CHUNKS:
-			memview->set_data_format(4);
+			memview->set_data_format(debug_view_memory::data_format::HEX_32BIT);
 			return true;
 
 		case ID_8_BYTE_CHUNKS:
-			memview->set_data_format(8);
+			memview->set_data_format(debug_view_memory::data_format::HEX_64BIT);
 			return true;
 
 		case ID_FLOATING_POINT_32BIT:
-			memview->set_data_format(9);
+			memview->set_data_format(debug_view_memory::data_format::FLOAT_32BIT);
 			return true;
 
 		case ID_FLOATING_POINT_64BIT:
-			memview->set_data_format(10);
+			memview->set_data_format(debug_view_memory::data_format::FLOAT_64BIT);
 			return true;
 
 		case ID_FLOATING_POINT_80BIT:
-			memview->set_data_format(11);
+			memview->set_data_format(debug_view_memory::data_format::FLOAT_80BIT);
 			return true;
 
 		case ID_LOGICAL_ADDRESSES:

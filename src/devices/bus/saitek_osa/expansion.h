@@ -31,6 +31,8 @@
 
 #include "screen.h"
 
+DECLARE_DEVICE_TYPE(SAITEKOSA_EXPANSION, saitekosa_expansion_device)
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -121,8 +123,5 @@ protected:
 
 void saitekosa_expansion_modules(device_slot_interface &device);
 
-
-// device type definition
-DECLARE_DEVICE_TYPE(SAITEKOSA_EXPANSION, saitekosa_expansion_device)
 
 #endif // MAME_BUS_SAITEKOSA_EXPANSION_H

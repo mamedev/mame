@@ -47,7 +47,6 @@ Shifted
 Space Frenzy (64K cart)
 Spinnerama
 Staiga
-Star Sling
 Stramash Zone
 Sundance
 Sundance - Dark of the Sun
@@ -55,7 +54,6 @@ Sundance - Matrix
 Tsunami/Vix
 VeCaves/Spike's Spree
 Vecmania (64K cart)
-Vec Sports Boxing
 Vectopia (64K cart)
 Vector 21 - A Fistful of Wildcards!
 Vector 21 - OMEGA
@@ -751,6 +749,19 @@ War of the Worlds - Time Rift
 		</part>
 	</software>
 
+	<software name="sslingte">
+		<description>Star Sling Turbo Edition</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Vectorzoa" />
+		<part name="cart" interface="vectrex_cart">
+			<feature name="slot" value="vec_rom" />
+			<dataarea name="rom" size = "4096">
+				<rom name="sslingte.bin" size="4096" crc="c8b02b4e" sha1="0bd7956c7291ef30ccc77e2aec5f121b90a39e24" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="startrek">
 		<description>Star Trek - The Game</description>
 		<year>1982</year>
@@ -823,6 +834,19 @@ War of the Worlds - Time Rift
 			<feature name="slot" value="vec_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="tourdefr.bin" size="8192" crc="bb4791f1" sha1="4f461b0b51c82433e70130eac5494f26239b4453" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vecspbox">
+		<description>Vec Sports Boxing</description>
+		<year>2002</year>
+		<publisher>Good Deal Games</publisher>
+		<info name="programmer" value="Manu Pärssinen" />
+		<part name="cart" interface="vectrex_cart">
+			<feature name="slot" value="vec_rom" />
+			<dataarea name="rom" size = "15245">
+				<rom name="vsbfinal.bin" size="15245" crc="1e29ec6b" sha1="ae56133ffcbdecf5489af53c5238aacefa9d74db" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

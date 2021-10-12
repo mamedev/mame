@@ -93,7 +93,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 					item.group = entry.group();
 					item.type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item.is_optional = false;
-					item.name = entry.name();
+					item.name = _("input-name", entry.name());
 					item.owner = nullptr;
 
 					// stop after one, unless we're analog
@@ -165,7 +165,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 						item.group = machine().ioport().type_group(field.type(), field.player());
 						item.type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 						item.is_optional = field.optional();
-						item.name = field.name();
+						item.name = _("input-name", field.name());
 						item.owner = &field.device();
 
 						// stop after one, unless we're analog

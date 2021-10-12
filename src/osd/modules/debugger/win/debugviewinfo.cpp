@@ -320,8 +320,8 @@ void debugview_info::handle_context_menu(unsigned command)
 				for (uint32_t col = 0; col < visarea.x; ++col)
 					text += wchar_t(viewdata[col].byte);
 				std::wstring::size_type const nonblank = text.find_last_not_of(L"\t\n\v\r ");
-				if ((nonblank != std::wstring::npos) && (nonblank >= start))
-					text.resize(nonblank + 1);
+				if (nonblank != std::wstring::npos)
+					text.resize((std::max)(start, nonblank + 1));
 				text += L"\r\n";
 			}
 

@@ -704,6 +704,20 @@ ROM_START(hook_401_p)
 	ROM_LOAD("hook-voi_p.u21", 0x040000, 0x40000, CRC(04775416) SHA1(5675aea39b76178ff476b0f627223a1c75a3d6b7))
 ROM_END
 
+ROM_START(hook_e406)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("hokcpue.406", 0x0000, 0x10000, CRC(0e2893e2) SHA1(fb13f34a45ec75d9cc1439c90b10c0b1ad38d1f6))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x400, "user3", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000, "gfx3", 0)
+	ROM_LOAD("hokdspa.401", 0x00000, 0x20000, CRC(59a07eb5) SHA1(d1ca41ce417f1772fe4da1eb37077f924b66ad36))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("hooksnd.u7", 0x8000, 0x8000, CRC(642f45b3) SHA1(a4b2084f32e52a596547384906281d04424332fc))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("hook-voi.u17", 0x000000, 0x40000, CRC(6ea9fcd2) SHA1(bffc66df542e06dedddaa403b5513446d9d6fc8c))
+	ROM_LOAD("hook-voi.u21", 0x040000, 0x40000, CRC(b5c275e2) SHA1(ff51c2007132a1310ac53b5ab2a4af7d0ab15948))
+ROM_END
+
 /*-------------------------------------------------------------
 / Jurassic Park - CPU Rev 3b /DMD  Type 2 512K Rom - 64K CPU Rom
 /------------------------------------------------------------*/
@@ -1452,6 +1466,7 @@ GAME(1992,  hook_408,      0,        de_3_dmd1, de_3, de_3_state, empty_init, RO
 GAME(1992,  hook_404,      hook_408, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.04, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.04
 GAME(1992,  hook_401,      hook_408, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.01
 GAME(1992,  hook_401_p,    hook_408, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01 with prototype sound, display A4.01)",                      MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.01
+GAME(1992,  hook_e406,     hook_408, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (UK 4.06, display A4.01)",                                            MACHINE_IS_SKELETON_MECHANICAL) // HOOK U.K. 4.06
 GAME(1993,  jupk_513,      0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.13, display A5.10)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK SEP. 28, 1993 USA CPU 5.13. DISPLAY VERSION- JURASSIC A5.10 8/24/1993
 GAME(1993,  jupk_501,      jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01, display A5.01)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC A5.01 6/24/1993
 GAME(1993,  jupk_501g,     jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01 Germany, display G5.01)",                          MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC G5.01 6/24/1993

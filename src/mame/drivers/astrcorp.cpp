@@ -34,11 +34,10 @@ TODO:
 
 - Find source of level 2 interrupt (sprite DMA end?);
 - magibomb: fix timings;
-- astoneag, magibombd: currently stop with 'ROM error'. The first few hundred bytes don't decrypt correctly,
+- astoneag, dinodino, magibombd: currently stop with 'ROM error'. The first few hundred bytes don't decrypt correctly,
   it is suspected there's a ROM overlay provided by the protection device;
 - winbingo and clones, zulu: these should be at the same state of the two above, but don't show anything on screen;
 - magibomba, westvent: need a redump of one of the program ROMs;
-- dinodino: decryption should be on par with the others but code jumps early into the weeds after RTE.
 
 *************************************************************************************************************/
 
@@ -97,6 +96,7 @@ protected:
 	// memory pointers
 	required_shared_ptr<u16> m_spriteram;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline_cb);
 	void draw_sprites_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void eeprom_w(u8 data);
 	void showhand_outputs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -107,7 +107,6 @@ protected:
 	u8      m_screen_enable;
 
 private:
-
 	// video-related
 	bitmap_ind16 m_bitmap;
 	u16     m_sprite_dma;
@@ -115,7 +114,6 @@ private:
 	output_finder<7> m_lamps;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline_cb);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -152,6 +150,7 @@ public:
 	{ }
 
 	void astoneage(machine_config &config);
+	void dinodino(machine_config &config);
 	void magibombd(machine_config &config);
 	void init_astoneage();
 	void init_dinodino();
@@ -167,6 +166,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(astoneage_scanline_cb);
 	void astoneage_map(address_map &map);
+	void dinodino_map(address_map &map);
 	void magibombd_map(address_map &map);
 	void ramdac_map(address_map &map);
 
@@ -523,6 +523,23 @@ void astoneage_state::astoneage_map(address_map &map)
 	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
+void astoneage_state::dinodino_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM crc at mirror
+	map(0x900000, 0x903fff).ram().share("nvram"); // battery
+	map(0xb00000, 0xb00fff).ram().share("spriteram");
+	map(0xb02000, 0xb02001).w(FUNC(astoneage_state::draw_sprites_w));
+	map(0xb04000, 0xb04001).portr("INPUTS");
+	map(0xb08001, 0xb08001).w(FUNC(astoneage_state::eeprom_w));
+	map(0xb0a000, 0xb0a001).w(FUNC(astoneage_state::skilldrp_outputs_w));
+	map(0xb0e000, 0xb0e001).portr("EEPROMIN");
+	map(0xc80000, 0xc801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	// unknown location
+//  map(0x500001, 0x500001).w(FUNC(astoneage_state::screen_enable_w));
+	map(0x580001, 0x580001).w(FUNC(astoneage_state::oki_bank_w));
+	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
 void astoneage_state::magibombd_map(address_map &map) // seems to use old style palette instead of ramdac
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000);
@@ -814,6 +831,14 @@ void astoneage_state::magibombd(machine_config &config)
 
 	PALETTE(config.replace(), m_palette).set_format(palette_device::BGR_565, 0x100);
 	config.device_remove("ramdac");
+}
+
+void astoneage_state::dinodino(machine_config &config)
+{
+	magibombd(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &astoneage_state::dinodino_map);
+	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(astoneage_state::skilldrp_scanline_cb), "screen", 0, 1);
 }
 
 /***************************************************************************
@@ -1502,7 +1527,7 @@ ROM_START( dinodino )
 	ROM_LOAD( "dd_rom5.u33", 0x00000, 0x80000, CRC(482e456a) SHA1(c7111522383c4e1fd98b0f759153be98dcbe06c1) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(6769bfb8) SHA1(bf6b905805c2c61a89fbc4c046b23069431e4709) )
+	ROM_LOAD16_WORD_SWAP( "93c46.u10", 0x0000, 0x0080, CRC(6769bfb8) SHA1(bf6b905805c2c61a89fbc4c046b23069431e4709) )
 ROM_END
 
 
@@ -1804,6 +1829,9 @@ void astoneage_state::init_dinodino()
 	u16 *rom = (u16 *)memregion("maincpu")->base();
 	rom[0x004/2] = 0x0000;
 	rom[0x006/2] = 0x0446;
+
+	// enable the patch below to pass ROM checksum, but then it jumps into the weeds after expecting to read something from 0xb80000
+	//rom[0x30b70/2] = 0xe5f5;
 }
 
 void magibomb_state::init_magibomb()
@@ -1857,7 +1885,7 @@ GAME( 2001,  magibombc, magibomb, magibombb, magibomb, magibomb_state,  init_mag
 GAME( 2001?, magibombe, magibomb, magibombb, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Heavier encryption
-GAME( 2005,  dinodino,  0,        magibombd, skilldrp, astoneage_state, init_dinodino,  ROT0, "Astro Corp.",        "Dino Dino (Ver. A1.1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 13/01.2005 10:59
+GAME( 2005,  dinodino,  0,        dinodino,  skilldrp, astoneage_state, init_dinodino,  ROT0, "Astro Corp.",        "Dino Dino (Ver. A1.1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 13/01.2005 10:59
 GAME( 2005,  astoneag,  0,        astoneage, skilldrp, astoneage_state, init_astoneage, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 2005/02/21
 GAME( 2005,  magibombd, magibomb, magibombd, skilldrp, astoneage_state, init_magibombd, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AA.72D, 14/11/05)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2006,  winbingo,  0,        magibombd, skilldrp, astoneage_state, init_winbingo,  ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 15:47:48 Feb 23 2006

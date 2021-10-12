@@ -557,6 +557,31 @@ ROM_START( kangaroob )
 ROM_END
 
 
+ROM_START( kangarool ) // runs on earlier revision TVG-1-CPU-A + TVG-1-VIDEO-A PCBs
+	ROM_REGION( 0x14000, "maincpu", 0 ) // only ic17 differs from the parent
+	ROM_LOAD( "tvg_75.ic7",  0x0000, 0x1000, CRC(0d18c581) SHA1(0e0f89d644b79e887c53e5294783843ca7e875ba) )
+	ROM_LOAD( "tvg_76.ic8",  0x1000, 0x1000, CRC(5978d37a) SHA1(684c1092de4a0927a03752903c86c3bbe99e868a) )
+	ROM_LOAD( "tvg_77.ic9",  0x2000, 0x1000, CRC(522d1097) SHA1(09fe627a46d32df2e098d9fad7757f9d61bef41f) )
+	ROM_LOAD( "tvg_78.ic10", 0x3000, 0x1000, CRC(063da970) SHA1(582ff21dd46c651f07a4846e0f8a7544a5891988) )
+	ROM_LOAD( "tvg_79.ic16", 0x4000, 0x1000, CRC(9e5cf8ca) SHA1(015387f038c5670f88c9b22453d074bd9b2a129d) )
+	ROM_LOAD( "tvg_80.ic17", 0x5000, 0x1000, CRC(62df0271) SHA1(4043d90d33ff04729077be7956d30bf82add103c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "tvg_81.ic24", 0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  // internal ROM from the 8841 custom MCU
+	ROM_LOAD( "mb8841.ic29", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x0800, "user1", 0 )    // data for the 8841 custom MCU
+	ROM_LOAD( "tvg_82.ic28", 0x0000, 0x0800, CRC(57766f69) SHA1(94a7a557d8325799523d5e1a88653a9a3fbe34f9) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "tvg_83.ic76", 0x0000, 0x1000, CRC(c0446ca6) SHA1(fca6ba565051337c0198c93b7b8477632e0dd0b6) )
+	ROM_LOAD( "tvg_85.ic77", 0x1000, 0x1000, CRC(72c52695) SHA1(87f4715fbb7d509bd9cc4e71e2afb0d475bbac13) )
+	ROM_LOAD( "tvg_84.ic52", 0x2000, 0x1000, CRC(e4cb26c2) SHA1(5016db9d48fdcfb757618659d063b90862eb0e90) )
+	ROM_LOAD( "tvg_86.ic53", 0x3000, 0x1000, CRC(9e6a599f) SHA1(76b4eddb4efcd8189d8cc5962d8497e82885f212) )
+ROM_END
+
 
 /*************************************
  *
@@ -564,7 +589,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, kangaroo_state, empty_init, ROT90, "Sun Electronics",                 "Funky Fish",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroo,  0,        mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics",                 "Kangaroo",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, kangaroo_state, empty_init, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, kangaroo_state, empty_init, ROT90, "Sun Electronics",                            "Funky Fish",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroo,  0,        mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics",                            "Kangaroo",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics (Atari license)",            "Kangaroo (Atari)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, kangaroo_state, empty_init, ROT90, "bootleg",                                    "Kangaroo (bootleg)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangarool, kangaroo, mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics (Loewen-Automaten license)", "Kangaroo (Loewen-Automaten)", MACHINE_SUPPORTS_SAVE )

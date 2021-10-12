@@ -65,7 +65,7 @@ local function populate_main_menu(buttons)
 		local rate = 60 / (button.on_frames + button.off_frames)
 		-- Round to two decimal places
 		rate = math.floor(rate * 100) / 100
-		local text = button.button.name .. ' [' .. rate .. ' Hz]'
+		local text = string.format(_('%s [%d Hz]'), _p("input-name", button.button.name), rate)
 		local subtext = input:seq_name(button.key)
 		menu[#menu + 1] = {text, subtext, ''}
 	end
@@ -100,7 +100,7 @@ end
 -- Add/edit menus (mostly identical)
 
 local function populate_configure_menu(menu)
-	local button_name = current_button.button and current_button.button.name or _('NOT SET')
+	local button_name = current_button.button and _p("input-name", current_button.button.name) or _('NOT SET')
 	local key_name = current_button.key and manager.machine.input:seq_name(current_button.key) or _('NOT SET')
 	menu[#menu + 1] = {_('Input'), button_name, ''}
 	menu[#menu + 1] = {_('Hotkey'), key_name, ''}
@@ -249,7 +249,7 @@ local function populate_button_menu()
 	for port_key, port in pairs(manager.machine.ioport.ports) do
 		for field_key, field in pairs(port.fields) do
 			if is_supported_input(field) then
-				menu[#menu + 1] = {field.name, '', ''}
+				menu[#menu + 1] = { _p("input-name", field.name), '', '' }
 				inputs[#inputs + 1] = {
 					port_name = port_key,
 					field_name = field_key,

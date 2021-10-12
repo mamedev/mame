@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "machine/gen_latch.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -18,37 +17,41 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"),
-		m_gfx_control(*this, "gfx_control")
+		m_spriteram(*this, "spriteram%u", 1U),
+		m_gfx_control(*this, "gfx_control"),
+		m_vram(*this, "vram", 8 * 0x800, ENDIANNESS_LITTLE),
+		m_vram_gfx(*this, "vram_gfx", 0x6000, ENDIANNESS_LITTLE),
+		m_rombank(*this, "rombank")
 	{ }
 
 	void tryout(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 	required_shared_ptr<uint8_t> m_gfx_control;
+	memory_share_creator<uint8_t> m_vram;
+	memory_share_creator<uint8_t> m_vram_gfx;
+
+	required_memory_bank m_rombank;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_vram_bank;
-	std::unique_ptr<uint8_t[]> m_vram;
-	std::unique_ptr<uint8_t[]> m_vram_gfx;
 
 	void nmi_ack_w(uint8_t data);
-	void sound_w(uint8_t data);
 	void sound_irq_ack_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
 	uint8_t vram_r(offs_t offset);
@@ -62,9 +65,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
 	TILEMAP_MAPPER_MEMBER(get_bg_memory_offset);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	void tryout_palette(palette_device &palette) const;
+	void palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);

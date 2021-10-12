@@ -316,6 +316,7 @@ fidel_card.cpp
 fidel_cc1.cpp
 fidel_cc10.cpp
 fidel_cc7.cpp
+fidel_checkc2.cpp
 fidel_chesster.cpp
 fidel_csc.cpp
 fidel_dames.cpp
@@ -371,6 +372,7 @@ gimix.cpp
 gizmondo.cpp
 gkidabc.cpp
 glcx.cpp
+gm1000.cpp
 gmaster.cpp
 gnat10.cpp
 goupil.cpp
@@ -546,6 +548,7 @@ llc2.cpp
 lms46.cpp
 lnw80.cpp
 lola8a.cpp
+luna_68k.cpp
 lviv.cpp
 lwriter.cpp
 lynx.cpp
@@ -766,6 +769,9 @@ pc8401a.cpp
 pc8801.cpp
 pc88va.cpp
 pc9801.cpp
+pc9801_epson.cpp
+pc9821.cpp
+pc98ha.cpp
 pcd.cpp
 pce.cpp
 pce220.cpp
@@ -836,6 +842,7 @@ pv1000.cpp
 pv2000.cpp
 pv9234.cpp
 pve500.cpp
+pwp14.cpp
 pwrview.cpp
 px4.cpp
 px8.cpp
@@ -1193,6 +1200,8 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr16.cpp
+ympsr40.cpp
 ympsr60.cpp
 ympsr340.cpp
 ymsy35.cpp

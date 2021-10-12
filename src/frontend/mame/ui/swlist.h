@@ -84,11 +84,10 @@ private:
 	const char *                    m_interface;
 	std::string &                   m_result;
 	std::list<entry_info>           m_entrylist;
-	std::string                     m_filename_buffer;
+	std::string                     m_search;
 	bool                            m_ordered_by_shortname;
 
 	// functions
-	int compare_entries(const entry_info &e1, const entry_info &e2, bool shortname);
 	void append_software_entry(const software_info &swinfo);
 };
 

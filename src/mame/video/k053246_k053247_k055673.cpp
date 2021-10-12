@@ -1045,7 +1045,6 @@ void k055673_device::device_start()
 
 
 DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "K053246/K053247 Sprite Generator")
-decltype(K053247) K053246 = K053247;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: k053247_device(mconfig, K053247, tag, owner, clock)

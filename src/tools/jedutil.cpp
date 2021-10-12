@@ -145,6 +145,7 @@
 #include <vector>
 
 #include "corestr.h"
+#include "ioprocs.h"
 #include "jedparse.h"
 #include "plaparse.h"
 
@@ -443,9 +444,6 @@ static uint16_t get_peel18cv8_pin_fuse_state(const pal_data* pal, const jed_data
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
-
-static uint8_t *srcbuf;
-static size_t srcbuflen;
 
 static uint8_t *dstbuf;
 static size_t dstbuflen;
@@ -7838,53 +7836,6 @@ static uint16_t get_peel18cv8_pin_fuse_state(const pal_data* pal, const jed_data
 
 
 /*-------------------------------------------------
-    read_source_file - read a raw source file
-    into an allocated memory buffer
--------------------------------------------------*/
-
-static int read_source_file(const char *srcfile)
-{
-	size_t bytes;
-	FILE *file;
-
-	/* open the source file */
-	file = fopen(srcfile, "rb");
-	if (!file)
-	{
-		fprintf(stderr, "Unable to open source file '%s'!\n", srcfile);
-		return 1;
-	}
-
-	/* allocate memory for the data */
-	fseek(file, 0, SEEK_END);
-	srcbuflen = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	srcbuf = (uint8_t *)malloc(srcbuflen);
-	if (!srcbuf)
-	{
-		fprintf(stderr, "Unable to allocate %d bytes for the source!\n", (int)srcbuflen);
-		fclose(file);
-		return 1;
-	}
-
-	/* read the data */
-	bytes = fread(srcbuf, 1, srcbuflen, file);
-	if (bytes != srcbuflen)
-	{
-		fprintf(stderr, "Error reading %d bytes from the source!\n", (int)srcbuflen);
-		free(srcbuf);
-		fclose(file);
-		return 1;
-	}
-
-	/* close up shop */
-	fclose(file);
-	return 0;
-}
-
-
-
-/*-------------------------------------------------
     write_dest_file - write a memory buffer raw
     into a desintation file
 -------------------------------------------------*/
@@ -7952,7 +7903,6 @@ static int command_convert(int argc, char *argv[])
 	int src_is_jed, src_is_pla, dst_is_jed;
 	int numfuses = 0;
 	jed_data jed;
-	int err;
 
 	if (argc < 2)
 	{
@@ -7987,10 +7937,10 @@ static int command_convert(int argc, char *argv[])
 	}
 
 	/* read the source file */
-	err = read_source_file(srcfile);
-	if (err != 0)
+	auto src = util::stdio_read(fopen(srcfile, "rb"));
+	if (!src)
 	{
-		free(srcbuf);
+		fprintf(stderr, "Unable to open source file '%s'!\n", srcfile);
 		return 1;
 	}
 
@@ -8002,16 +7952,18 @@ static int command_convert(int argc, char *argv[])
 		printf("Converting '%s' to binary form '%s'\n", srcfile, dstfile);
 
 		/* read the fuse data */
+		int err;
 		if (src_is_jed)
-			err = jed_parse(srcbuf, srcbuflen, &jed);
-		else if (src_is_pla)
-			err = pla_parse(srcbuf, srcbuflen, &jed);
+			err = jed_parse(*src, &jed);
+		else /* if (src_is_pla) */
+			err = pla_parse(*src, &jed);
+		src.reset();
 
 		switch (err)
 		{
-			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid source file\n"); free(srcbuf); return 1;
-			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); free(srcbuf); return 1;
-			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); free(srcbuf); return 1;
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid source file\n"); return 1;
+			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); return 1;
+			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); return 1;
 		}
 
 		/* override the number of fuses */
@@ -8028,7 +7980,6 @@ static int command_convert(int argc, char *argv[])
 		if (!dstbuf)
 		{
 			fprintf(stderr, "Unable to allocate %d bytes for the target buffer!\n", (int)dstbuflen);
-			free(srcbuf);
 			return 1;
 		}
 		dstbuflen = jedbin_output(&jed, dstbuf, dstbuflen);
@@ -8040,10 +7991,12 @@ static int command_convert(int argc, char *argv[])
 		printf("Converting '%s' to JED form '%s'\n", srcfile, dstfile);
 
 		/* read the binary data */
-		err = jedbin_parse(srcbuf, srcbuflen, &jed);
+		int err = jedbin_parse(*src, &jed);
+		src.reset();
+
 		switch (err)
 		{
-			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); free(srcbuf); return 1;
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); return 1;
 		}
 
 		/* print out data */
@@ -8056,15 +8009,13 @@ static int command_convert(int argc, char *argv[])
 		if (!dstbuf)
 		{
 			fprintf(stderr, "Unable to allocate %d bytes for the target buffer!\n", (int)dstbuflen);
-			free(srcbuf);
 			return 1;
 		}
 		dstbuflen = jed_output(&jed, dstbuf, dstbuflen);
 	}
 
 	/* write the destination file */
-	err = write_dest_file(dstfile);
-	free(srcbuf);
+	int err = write_dest_file(dstfile);
 	if (err != 0)
 		return 1;
 
@@ -8111,10 +8062,10 @@ static int command_view(int argc, char *argv[])
 	}
 
 	/* read the source file */
-	err = read_source_file(srcfile);
-	if (err != 0)
+	auto src = util::stdio_read(fopen(srcfile, "rb"));
+	if (!src)
 	{
-		result = 1;
+		fprintf(stderr, "Unable to open source file '%s'!\n", srcfile);
 		goto end;
 	}
 
@@ -8122,7 +8073,8 @@ static int command_view(int argc, char *argv[])
 	if (is_jed)
 	{
 		/* read the JEDEC data */
-		err = jed_parse(srcbuf, srcbuflen, &jed);
+		err = jed_parse(*src, &jed);
+		src.reset();
 		switch (err)
 		{
 			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid .JED file\n"); result = 1; goto end;
@@ -8133,7 +8085,8 @@ static int command_view(int argc, char *argv[])
 	else
 	{
 		/* read the binary data */
-		err = jedbin_parse(srcbuf, srcbuflen, &jed);
+		err = jedbin_parse(*src, &jed);
+		src.reset();
 		switch (err)
 		{
 			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); result = 1; goto end;
@@ -8172,7 +8125,6 @@ static int command_view(int argc, char *argv[])
 	}
 
 end:
-	free(srcbuf);
 	return result;
 }
 
@@ -8236,10 +8188,10 @@ static int command_listcompatible(int argc, char *argv[])
 	is_jed = is_jed_file(srcfile);
 
 	/* read the source file */
-	err = read_source_file(srcfile);
-	if (err != 0)
+	auto src = util::stdio_read(fopen(srcfile, "rb"));
+	if (!src)
 	{
-		result = 1;
+		fprintf(stderr, "Unable to open source file '%s'!\n", srcfile);
 		goto end;
 	}
 
@@ -8247,7 +8199,8 @@ static int command_listcompatible(int argc, char *argv[])
 	if (is_jed)
 	{
 		/* read the JEDEC data */
-		err = jed_parse(srcbuf, srcbuflen, &jed);
+		err = jed_parse(*src, &jed);
+		src.reset();
 		switch (err)
 		{
 			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid .JED file\n"); result = 1; goto end;
@@ -8258,7 +8211,8 @@ static int command_listcompatible(int argc, char *argv[])
 	else
 	{
 		/* read the binary data */
-		err = jedbin_parse(srcbuf, srcbuflen, &jed);
+		err = jedbin_parse(*src, &jed);
+		src.reset();
 		switch (err)
 		{
 			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); result = 1; goto end;
@@ -8274,7 +8228,6 @@ static int command_listcompatible(int argc, char *argv[])
 	}
 
 end:
-	free(srcbuf);
 	return result;
 }
 

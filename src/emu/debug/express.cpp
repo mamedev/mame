@@ -1057,15 +1057,19 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 //  parsed_expression - constructor
 //-------------------------------------------------
 
-parsed_expression::parsed_expression(symbol_table &symtable, const char *expression, int default_base)
+parsed_expression::parsed_expression(symbol_table &symtable)
+	: m_symtable(symtable)
+	, m_default_base(16)
+{
+}
+
+parsed_expression::parsed_expression(symbol_table &symtable, std::string_view expression, int default_base)
 	: m_symtable(symtable)
 	, m_default_base(default_base)
 {
 	assert(default_base == 8 || default_base == 10 || default_base == 16);
 
-	// if we got an expression parse it
-	if (expression != nullptr)
-		parse(expression);
+	parse(expression);
 }
 
 
@@ -1087,7 +1091,7 @@ parsed_expression::parsed_expression(const parsed_expression &src)
 //  parse - parse an expression into tokens
 //-------------------------------------------------
 
-void parsed_expression::parse(const char *expression)
+void parsed_expression::parse(std::string_view expression)
 {
 	// copy the string and reset our parsing state
 	m_original_string.assign(expression);

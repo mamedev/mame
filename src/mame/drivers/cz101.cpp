@@ -25,6 +25,8 @@
 #include "cz101.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -266,50 +268,50 @@ HD44780_PIXEL_UPDATE( cz101_state::lcd_pixel_update )
 
 void cz101_state::led_4_w(uint8_t data)
 {
-	m_leds[0] = BIT(data, 7) ? 0 : 1;
-	m_leds[1] = BIT(data, 6) ? 0 : 1;
-	m_leds[2] = BIT(data, 5) ? 0 : 1;
-	m_leds[3] = BIT(data, 4) ? 0 : 1;
-	m_leds[4] = BIT(data, 3) ? 0 : 1;
-	m_leds[5] = BIT(data, 2) ? 0 : 1;
-	m_leds[6] = BIT(data, 1) ? 0 : 1;
-	m_leds[7] = BIT(data, 0) ? 0 : 1;
+	m_leds[0] = BIT(~data, 7);
+	m_leds[1] = BIT(~data, 6);
+	m_leds[2] = BIT(~data, 5);
+	m_leds[3] = BIT(~data, 4);
+	m_leds[4] = BIT(~data, 3);
+	m_leds[5] = BIT(~data, 2);
+	m_leds[6] = BIT(~data, 1);
+	m_leds[7] = BIT(~data, 0);
 }
 
 void cz101_state::led_3_w(uint8_t data)
 {
-	m_leds[8] = BIT(data, 7) ? 0 : 1;
-	m_leds[9] = BIT(data, 6) ? 0 : 1;
-	m_leds[10] = BIT(data, 5) ? 0 : 1;
-	m_leds[11] = BIT(data, 4) ? 0 : 1;
-	m_leds[12] = BIT(data, 3) ? 0 : 1;
-	m_leds[13] = BIT(data, 2) ? 0 : 1;
-	m_leds[14] = BIT(data, 1) ? 0 : 1;
-	m_leds[15] = BIT(data, 0) ? 0 : 1;
+	m_leds[8] = BIT(~data, 7);
+	m_leds[9] = BIT(~data, 6);
+	m_leds[10] = BIT(~data, 5);
+	m_leds[11] = BIT(~data, 4);
+	m_leds[12] = BIT(~data, 3);
+	m_leds[13] = BIT(~data, 2);
+	m_leds[14] = BIT(~data, 1);
+	m_leds[15] = BIT(~data, 0);
 }
 
 void cz101_state::led_2_w(uint8_t data)
 {
-	m_leds[16] = BIT(data, 7) ? 0 : 1;
-	m_leds[17] = BIT(data, 6) ? 0 : 1;
-	m_leds[18] = BIT(data, 5) ? 0 : 1;
-	m_leds[19] = BIT(data, 4) ? 0 : 1;
-	m_leds[20] = BIT(data, 3) ? 0 : 1;
-	m_leds[21] = BIT(data, 2) ? 0 : 1;
-	m_leds[22] = BIT(data, 1) ? 0 : 1;
-	m_leds[23] = BIT(data, 0) ? 0 : 1;
+	m_leds[16] = BIT(~data, 7);
+	m_leds[17] = BIT(~data, 6);
+	m_leds[18] = BIT(~data, 5);
+	m_leds[19] = BIT(~data, 4);
+	m_leds[20] = BIT(~data, 3);
+	m_leds[21] = BIT(~data, 2);
+	m_leds[22] = BIT(~data, 1);
+	m_leds[23] = BIT(~data, 0);
 }
 
 void cz101_state::led_1_w(uint8_t data)
 {
-	m_leds[24] = BIT(data, 7) ? 0 : 1;
-	m_leds[25] = BIT(data, 6) ? 0 : 1;
-	m_leds[26] = BIT(data, 5) ? 0 : 1;
-	m_leds[27] = BIT(data, 4) ? 0 : 1;
-	m_leds[28] = BIT(data, 3) ? 0 : 1;
-	m_leds[29] = BIT(data, 2) ? 0 : 1;
-	m_leds[30] = BIT(data, 1) ? 0 : 1;
-	m_leds[31] = BIT(data, 0) ? 0 : 1;
+	m_leds[24] = BIT(~data, 7);
+	m_leds[25] = BIT(~data, 6);
+	m_leds[26] = BIT(~data, 5);
+	m_leds[27] = BIT(~data, 4);
+	m_leds[28] = BIT(~data, 3);
+	m_leds[29] = BIT(~data, 2);
+	m_leds[30] = BIT(~data, 1);
+	m_leds[31] = BIT(~data, 0);
 }
 
 uint8_t cz101_state::keys_r()
@@ -411,6 +413,8 @@ ROM_START( cz101 )
 	ROM_REGION(0x8000, "program", 0)
 	ROM_LOAD("5f3_s40.bin", 0x0000, 0x8000, CRC(c417bc57) SHA1(2aa5bfb76dc0a56797cf5dd547197816cedfa370))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

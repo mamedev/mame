@@ -3772,9 +3772,12 @@ Manx TT
 
 837-12279        SOUND BD MANX T.T (for DX only)
 
-Rom boards:
- 834-12467  ROM BD MANX T.T TWIN
- 834-12277  ROM BD MANX T.T DX
+Sega ID #:
+   Game: 834-12466 MANX T.T TWIN
+ ROM BD: 833-12467
+
+   Game: 834-12276 MANX T.T DX
+ ROM BD: 833-12277
 
 Known missing roms:
 
@@ -4191,7 +4194,7 @@ ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-1134
 	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
 
-ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A */
+ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A, Sega Game ID# 833-13461 DYNAMITE DEKA 2 A-CRX */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-20922.12",  0x000000, 0x080000, CRC(0a8b5604) SHA1(4076998fc600c1df3bb5ef48d42681c01e651495) )
 	ROM_LOAD32_WORD("epr-20923.13",  0x000002, 0x080000, CRC(83be73d4) SHA1(1404a9c79cd2bae13f60e5e008307417324c3666) )

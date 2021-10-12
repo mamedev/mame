@@ -1,14 +1,39 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
+/*
+ A T-connector, strangely enough.
+ */
 
 #include "emu.h"
 #include "teeconn.h"
 
 
-DEFINE_DEVICE_TYPE_NS(TI8X_TEE_CONNECTOR, bus::ti8x, tee_connector_device, "ti8x_tconn", "TI-8x T-connector")
+namespace {
 
+class tee_connector_device : public device_t, public device_ti8x_link_port_interface
+{
+public:
+	tee_connector_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-namespace bus::ti8x {
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+	virtual DECLARE_WRITE_LINE_MEMBER(input_tip) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(input_ring) override;
+
+	DECLARE_WRITE_LINE_MEMBER(tip_a_w);
+	DECLARE_WRITE_LINE_MEMBER(ring_a_w);
+	DECLARE_WRITE_LINE_MEMBER(tip_b_w);
+	DECLARE_WRITE_LINE_MEMBER(ring_b_w);
+
+	required_device<ti8x_link_port_device>  m_port_a;
+	required_device<ti8x_link_port_device>  m_port_b;
+
+	bool    m_tip_host, m_tip_a, m_tip_b;
+	bool    m_ring_host, m_ring_a, m_ring_b;
+};
+
 
 tee_connector_device::tee_connector_device(
 		machine_config const &mconfig,
@@ -102,4 +127,7 @@ WRITE_LINE_MEMBER(tee_connector_device::input_ring)
 	m_port_b->ring_w((m_ring_host && m_ring_a) ? 1 : 0);
 }
 
-} // namespace bus::ti8x
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(TI8X_TEE_CONNECTOR, device_ti8x_link_port_interface, tee_connector_device, "ti8x_tconn", "TI-8x T-connector")

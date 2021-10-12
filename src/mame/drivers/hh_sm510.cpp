@@ -17,7 +17,7 @@ Use -autosave to at least make them remember the highscores.
 TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
-- improve/redo SVG of: exospace, auslalom
+- improve/redo SVG of: exospace
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
 - confirm gnw_smb rom (assumed to be the same as gnw_smbn)
@@ -635,7 +635,9 @@ static INPUT_PORTS_START( gnw_flagman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
@@ -830,7 +832,9 @@ static INPUT_PORTS_START( gnw_judge )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+	PORT_CONFNAME( 0x01, 0x01, "Increase Computer's Operation Time (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
@@ -1046,6 +1050,11 @@ static INPUT_PORTS_START( gnw_lion )
 
 	PORT_START("B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
@@ -9183,9 +9192,11 @@ ROM_END
 
 /***************************************************************************
 
-  Tronica Space Rescue (model MG-9)
-  * PCB label MG-9 080492
-  * Sharp SM510 label 0015 224B TRONICA (no decap)
+  Tronica: Space Rescue (model MG-9), Thunder Ball (model FR-23)
+  * PCB labels: SPACE RESCUE MG-9 080492 (MG-9)
+                SPACE RESCUE MG-9 210982 (FR-23)
+  * Sharp SM510 labels (no decap): 0015 224B TRONICA (MG-9)
+                                   0015 236D TRONICA (FR-23)
   * lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
@@ -9198,6 +9209,7 @@ public:
 	{ }
 
 	void trsrescue(machine_config &config);
+	void trthuball(machine_config &config);
 };
 
 // config
@@ -9224,6 +9236,11 @@ void trsrescue_state::trsrescue(machine_config &config)
 	sm510_common(config, 1533, 1080); // R mask options confirmed
 }
 
+void trsrescue_state::trthuball(machine_config &config)
+{
+	sm510_common(config, 1599, 1080); // R mask options confirmed
+}
+
 // roms
 
 ROM_START( trsrescue )
@@ -9232,6 +9249,14 @@ ROM_START( trsrescue )
 
 	ROM_REGION( 178760, "screen", 0)
 	ROM_LOAD( "trsrescue.svg", 0, 178760, CRC(40756fd3) SHA1(9762ebbe4753a3194d7f0844c91addb8e1f8930b) )
+ROM_END
+
+ROM_START( trthuball )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0015_236d", 0x0000, 0x1000, CRC(f58a3832) SHA1(2d843b3520de66463e628cea9344a04015d1f5f1) )
+
+	ROM_REGION( 175018, "screen", 0)
+	ROM_LOAD( "trthuball.svg", 0, 175018, CRC(3404cc1d) SHA1(4cebe3c742c6947c6fddb8a84ae2f7d0cea1b527) )
 ROM_END
 
 
@@ -9373,7 +9398,7 @@ INPUT_PORTS_END
 
 void auslalom_state::auslalom(machine_config &config)
 {
-	kb1013vk12_common(config, 1780, 1080); // R mask option ?
+	kb1013vk12_common(config, 1732, 1080); // R mask option ?
 }
 
 // roms
@@ -9382,8 +9407,8 @@ ROM_START( auslalom )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
 
-	ROM_REGION( 85857, "screen", 0)
-	ROM_LOAD( "auslalom.svg", 0, 85857, BAD_DUMP CRC(47381b27) SHA1(de0410331669c07c32aaed391b8da469696adbe7) )
+	ROM_REGION( 117520, "screen", 0)
+	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
 ROM_END
 
 
@@ -9638,6 +9663,7 @@ CONS( 1992, tbatmana,     0,           0, tbatmana,     tbatmana,     tbatmana_s
 CONS( 1983, trshutvoy,    0,           0, trshutvoy,    trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, tigarden,     trshutvoy,   0, tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trsrescue,    0,           0, trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, trthuball,    trsrescue,   0, trthuball,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Thunder Ball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

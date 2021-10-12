@@ -11,8 +11,8 @@
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
-DEFINE_DEVICE_TYPE_NS(HP_ITF_HLE_KEYBOARD, bus::hp_hil, hle_hp_itf_device, "hp_itf_hle_kbd", "HP ITF Keyboard")
+DEFINE_DEVICE_TYPE(HP_IPC_HLE_KEYBOARD, bus::hp_hil::hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
+DEFINE_DEVICE_TYPE(HP_ITF_HLE_KEYBOARD, bus::hp_hil::hle_hp_itf_device, "hp_itf_hle_kbd", "HP ITF Keyboard")
 
 namespace bus::hp_hil {
 

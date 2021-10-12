@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/adam_dsk.h"
 
 adam_format::adam_format() : wd177x_format(formats)

@@ -21,8 +21,10 @@ public:
 		MN1880_YPL, MN1880_YPH,
 		MN1880_SP, MN1880_SPA, MN1880_SPB,
 		MN1880_LP, MN1880_LPA, MN1880_LPB,
+		MN1880_IE, MN1880_IEA, MN1880_IEB,
+		MN1880_IEMASK, MN1880_IEMASKA, MN1880_IEMASKB,
 		MN1880_DIVIDER1, MN1880_DIVIDER2,
-		MN1880_IE0, MN1880_IE1,
+		MN1880_IF,
 		MN1880_CPUM
 	};
 
@@ -50,7 +52,7 @@ protected:
 private:
 	struct cpu_registers
 	{
-		cpu_registers() : ip(0), irp(0), ir(0), fs(0), xp(0), yp(0), sp(0), lp(0), wait(0) { }
+		cpu_registers() : ip(0), irp(0), ir(0), fs(0), xp(0), yp(0), sp(0), lp(0), wait(0), ie(0), iemask(false) { }
 
 		u8 addcz(u8 data1, u8 data2, bool carry, bool holdz);
 		u8 adddcz(u8 data1, u8 data2, bool carry);
@@ -70,6 +72,8 @@ private:
 		u16 sp;
 		u16 lp;
 		u16 wait;
+		u16 ie;
+		bool iemask;
 	};
 
 	enum class microstate : u8 {
@@ -172,6 +176,11 @@ private:
 	static void setl(u16 &pr, u8 data) { pr = (pr & 0xff00) | data; }
 	static void seth(u16 &pr, u8 data) { pr = (pr & 0x00ff) | (data << 8); }
 
+	cpu_registers &get_active_cpu() { return m_cpu[BIT(m_cpum, 4)]; }
+	const cpu_registers &get_active_cpu() const { return m_cpu[BIT(m_cpum, 4)]; }
+	bool output_queued() const { return m_output_queue_state != 0xff; }
+	void set_output_queued() { m_output_queue_state = BIT(m_cpum, 4); }
+
 	u8 ie0_r();
 	void ie0_w(u8 data);
 	u8 ie1_r();
@@ -196,17 +205,16 @@ private:
 
 	// execution state
 	cpu_registers m_cpu[2];
-	bool m_cpu_select;
 	u8 m_cpum;
 	microstate m_ustate;
 	u16 m_da;
 	u16 m_tmp1;
 	u16 m_tmp2;
-	bool m_output_queued;
+	u8 m_output_queue_state;
 	s32 m_icount;
 
 	// interrupt state
-	u8 m_ie[2];
+	u16 m_if;
 };
 
 DECLARE_DEVICE_TYPE(MN1880, mn1880_device)

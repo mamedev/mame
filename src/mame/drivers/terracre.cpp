@@ -482,10 +482,10 @@ void terracre_state::ym3526(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 1.0);     // 4MHz verified on PCB
+	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.5);     // 4MHz verified on PCB
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 void terracre_state::ym2203(machine_config &config)
@@ -496,10 +496,10 @@ void terracre_state::ym2203(machine_config &config)
 	config.device_remove("ymsnd");
 
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(16'000'000)/4));     // 4MHz verified on PCB
-	ym1.add_route(0, "speaker", 0.2);
-	ym1.add_route(1, "speaker", 0.2);
-	ym1.add_route(2, "speaker", 0.2);
-	ym1.add_route(3, "speaker", 0.4);
+	ym1.add_route(0, "speaker", 0.1);
+	ym1.add_route(1, "speaker", 0.1);
+	ym1.add_route(2, "speaker", 0.1);
+	ym1.add_route(3, "speaker", 0.2);
 }
 
 void terracre_state::amazon_base(machine_config &config)

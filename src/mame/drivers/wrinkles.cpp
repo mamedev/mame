@@ -8,14 +8,24 @@ Hardware is a P80C31BH @ 11MHz and a 32KB ROM, RAM is in the MCU.
 It also has a cartridge slot, but no known cartridges were released.
 The speech technology is by Electronic Speech Systems.
 
+Known sensors:
+- 0x02: bellybutton, literally a button
+- 0x04: detect violent motion (Wrinkles will cry)
+- 0x10: detect light motion
+- 0x40: detect open mouth (use as handpuppet to make it 'talk')
+- 0x80: detect magnet in mouth (the toy came with a 'bone' that has a magnet in it)
+
 TODO:
-- add sensors
+- where is the microphone? or are they the same inputs as the motion sensors?
+- power-on by pressing button
 
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 
@@ -31,42 +41,11 @@ public:
 
 	void wrinkles(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
 private:
-	// devices/pointers
 	required_device<mcs51_cpu_device> m_maincpu;
 
 	void main_map(address_map &map);
-
-	// I/O handlers
-	void sensor_w(u8 data);
-	u8 sensor_r();
 };
-
-void wrinkles_state::machine_start()
-{
-}
-
-
-
-/******************************************************************************
-    I/O
-******************************************************************************/
-
-void wrinkles_state::sensor_w(u8 data)
-{
-}
-
-u8 wrinkles_state::sensor_r()
-{
-	// sensors here
-	// d1: hold down for power-off?
-	// d7: mouth sensor?
-	// other: ?
-	return 0xff;
-}
 
 
 
@@ -87,6 +66,15 @@ void wrinkles_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( wrinkles )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Tickle Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Shake Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Motion Sensor")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("Mouth Open")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Mouth Magnet")
 INPUT_PORTS_END
 
 
@@ -100,8 +88,7 @@ void wrinkles_state::wrinkles(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, 11_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wrinkles_state::main_map);
-	m_maincpu->port_in_cb<1>().set(FUNC(wrinkles_state::sensor_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(wrinkles_state::sensor_w));
+	m_maincpu->port_in_cb<1>().set_ioport("INPUTS");
 	m_maincpu->port_out_cb<3>().set("dac", FUNC(dac_8bit_r2r_device::write));
 
 	/* sound hardware */
@@ -129,4 +116,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, wrinkles,  0,      0, wrinkles, wrinkles, wrinkles_state, empty_init, "Coleco / Ganz", "Talking Wrinkles", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1986, wrinkles,  0,      0, wrinkles, wrinkles, wrinkles_state, empty_init, "Coleco / Ganz", "Talking Wrinkles", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )

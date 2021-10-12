@@ -9,11 +9,12 @@
 
 ****************************************************************************/
 
-#include <cstring>
-#include <algorithm>
-
-#include "imgtool.h"
 #include "library.h"
+
+#include "corestr.h"
+
+#include <algorithm>
+#include <cstring>
 
 namespace imgtool {
 
@@ -179,8 +180,8 @@ void library::add_class(const imgtool_class *imgclass)
 	module->tracks_are_called_cylinders = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? true : false;
 	module->writing_untested            = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_WRITING_UNTESTED) ? true : false;
 	module->creation_untested           = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_CREATION_UNTESTED) ? true : false;
-	module->open                        = (imgtoolerr_t (*)(imgtool::image &, imgtool::stream::ptr &&)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
-	module->create                      = (imgtoolerr_t (*)(imgtool::image &, imgtool::stream::ptr &&, util::option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
+	module->open                        = (imgtoolerr_t (*)(imgtool::image &, std::unique_ptr<imgtool::stream> &&)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
+	module->create                      = (imgtoolerr_t (*)(imgtool::image &, std::unique_ptr<imgtool::stream> &&, util::option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
 	module->close                       = (void (*)(imgtool::image &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CLOSE);
 	module->info                        = (void (*)(imgtool::image &, std::ostream &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_INFO);
 	module->read_sector                 = (imgtoolerr_t (*)(imgtool::image &, uint32_t, uint32_t, uint32_t, std::vector<uint8_t> &)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_SECTOR);

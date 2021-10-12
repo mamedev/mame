@@ -13,7 +13,7 @@
     KTR    1      1 x x x   1 1 0 0    Transfer Keyboard Return
     KTS    1      1 x x x   1 0 1 0    Transfer Keyboard Strobe
     KLA    1      1 x x x   1 1 1 0    Load Display Register A
-    KLB    1      1 x x x   1 1 0 1    Load Display Register A
+    KLB    1      1 x x x   1 1 0 1    Load Display Register B
     KDN    1      1 x x x   0 0 1 1    Turn On Display
     KAF    1      1 x x x   1 0 1 1    Turn Off A
     KBF    1      1 x x x   0 1 1 1    Turn Off B
@@ -34,6 +34,9 @@
     7.) KER takes a maximum of 10-bit times to complete (= 80 clocks)
         Therefore, there must be at least 10 bit times between KER
         and the next KTS instruction.
+    8.) This device has only been tested on the gts1 driver. It does
+        not use the keyboard. The digit data is inverted (so it stores
+        6 when we want to display 9).
 **********************************************************************/
 
 #include "emu.h"
@@ -137,7 +140,7 @@ void r10788_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void r10788_device::io_w(offs_t offset, uint8_t data)
 {
-	assert(offset < 16);
+	offset &= 15;
 	switch (offset)
 	{
 		case KTR:  // Transfer Keyboard Return
@@ -149,6 +152,7 @@ void r10788_device::io_w(offs_t offset, uint8_t data)
 			m_kts = data;
 			break;
 		case KLA:  // Load Display Register A
+			m_io_counter = (m_io_counter + 1) % 16;
 			LOG("%s: KLA [%2d] data:%02x\n", __FUNCTION__, m_io_counter, data);
 			m_kla = data;
 			m_reg[0][m_io_counter] = m_kla;
@@ -156,21 +160,22 @@ void r10788_device::io_w(offs_t offset, uint8_t data)
 		case KLB:  // Load Display Register B
 			LOG("%s: KLB [%2d] data:%02x\n", __FUNCTION__, m_io_counter, data);
 			m_klb = data;
-			m_reg[1][m_io_counter] = m_kla;
+			m_reg[1][m_io_counter] = m_klb;
 			break;
 		case KDN:  // Turn On Display
 			LOG("%s: KDN data:%02x\n", __FUNCTION__, data);
 			m_mask_a = 15;
 			m_mask_b = 15;
+			m_io_counter = 15;
 			break;
 		case KAF:  // Turn Off A
 			LOG("%s: KAF data:%02x\n", __FUNCTION__, data);
 			m_mask_a = 0;
-			m_mask_b &= ~3;
+			m_mask_b &= 12;
 			break;
 		case KBF:  // Turn Off B
 			LOG("%s: KBF data:%02x\n", __FUNCTION__, data);
-			m_mask_b &= ~12;
+			m_mask_b &= 3;
 			break;
 		case KER:  // Reset Keyboard Error
 			LOG("%s: KER data:%02x\n", __FUNCTION__, data);
@@ -182,7 +187,7 @@ void r10788_device::io_w(offs_t offset, uint8_t data)
 
 uint8_t r10788_device::io_r(offs_t offset)
 {
-	assert(offset < 16);
+	offset &= 15;
 	uint8_t data = 0xf;
 	switch (offset)
 	{
@@ -203,8 +208,6 @@ uint8_t r10788_device::io_r(offs_t offset)
 			m_klb = m_reg[1][m_io_counter];
 			data = m_klb;
 			LOG("%s: KLB [%2d] data:%02x\n", __FUNCTION__, m_io_counter, data);
-			// FIXME: does it automagically increment at KLB write?
-			m_io_counter = (m_io_counter + 1) % 16;
 			break;
 		case KDN:  // Turn On Display
 			LOG("%s: KDN data:%02x\n", __FUNCTION__, data);

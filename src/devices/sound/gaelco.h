@@ -7,13 +7,12 @@
 
 #include "dirom.h"
 
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> gaelco_gae1_device
-
-#include "dirom.h"
 
 class gaelco_gae1_device : public device_t,
 							public device_sound_interface,

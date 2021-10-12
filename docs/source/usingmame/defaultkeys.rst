@@ -30,7 +30,6 @@ and saving/loading save states.
 
 **Tab**
     Toggles the configuration menu.
-    Switches to the next UI panel.
 **~** (tilde key)
     Toggles the On-Screen Display.
 
@@ -64,8 +63,6 @@ and saving/loading save states.
     Highlight first UI menu option.
 **End**
     Select last UI menu option.
-**Left Shift+Tab**
-    Select previous UI panel.
 **Enter**/**Joystick 1 Button 1**
     Select currently highlighted UI menu option.
 **Space**
@@ -73,10 +70,6 @@ and saving/loading save states.
 **Delete**
     Clear/reset to default when highlighting an entry on the input
     configuration, cheat options, and plugin options pages.
-**[**
-    UI Previous Group
-**]**
-    UI Next Group
 **P**
     Pauses the emulated machine.
 **Left Shift+P**
@@ -110,6 +103,7 @@ and saving/loading save states.
     * **Page Up**/**Page Down** - scroll up/down one page at a time.
     * **Home**/**End** - move to top/bottom of list.
     * **-**/**+** - increase/decrease the number of colors per row.
+    * **0** - restore the default number of colors per row.
     * **Enter** - switch to graphics viewer.
 
     Graphics mode:
@@ -121,6 +115,7 @@ and saving/loading save states.
     * **Left**/**Right** - change color displayed.
     * **R** - rotate tiles 90 degrees clockwise.
     * **-**/**+** - increase/decrease the number of tiles per row.
+    * **0** - restore the default number of tiles per row.
     * **Enter** - switch to tilemap viewer.
 
     Tilemap mode:
@@ -130,10 +125,11 @@ and saving/loading save states.
     * **Shift+Up**/**Down**/**Left**/**Right** - scroll 1 pixel at a time.
     * **Control+Up**/**Down**/**Left**/**Right** - scroll 64 pixels at a time.
     * **R** - rotate tilemap view 90 degrees clockwise.
-    * **-**/**+** - increase/decrease the zoom factor.
+    * **-**/**+** - decrease/increase the zoom factor.
+    * **0** - expand small tilemaps to fill the display.
     * **Enter** - switch to palette/colortable mode.
 
-    Note: Not all games have decoded graphics and/or tilemaps.
+    Note: Not all systems have decoded graphics and/or tilemaps.
 **Left Ctrl+F5**
     Toggle Filter.
     (*SDL MAME only*)
@@ -200,8 +196,31 @@ and saving/loading save states.
     keyboard as presented upon start by using
     :ref:`-uimodekey<mame-commandline-uimodekey>`
 **Escape**
-    Exits emulator.
-    Cancel current UI option.
+    Exit emulator, return to the previous menu, or cancel the current UI option.
+
+
+.. _default-selmenu-keys:
+
+System and software selection menus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The system and software selection menus use additional controls
+
+**Tab**
+    Moves keyboard/controller focus to the next UI panel.
+**Shift+Tab**
+    Moves keyboard/controller focus to the previous UI panel.
+**Left Alt+F**
+    Adds or removes the selected system or software list time from the favorites
+    list.
+**Left Alt+E**
+    Exports the currently displayed list of systems.
+**Left Alt+D**
+    Shows the full-size info viewer if info is available for the selected system
+    or software list item.  (Shows information loaded by the data plugin from
+    external files, including history.xml and mameinfo.dat.)
+**F1**
+    Audits system ROMs.
 
 
 .. _default-arcade-keys:

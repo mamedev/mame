@@ -3,7 +3,8 @@
 /*******************************************************************************
 
     Skeleton driver for Merit Scorpion darts machines.
-    The same PCB is used also on other Merit darts machines, like Regent Darts.
+    The same PCB is used also on other Merit darts machines, like Regent Darts
+    and Pub Time Darts II.
 
     Hardware overview:
     Main CPU: Dallas DS80C3202-UM or compatible (80C31 on older models)
@@ -116,16 +117,37 @@ ROM_START(scrpiondb)
 	ROM_LOAD( "4778-02_u7-r02_c1994_mii.u7", 0x00000, 0x10000, CRC(57a5083d) SHA1(edb94dbb9e040e960c45406b082ede133574351a) )
 ROM_END
 
-// Very old PCB model ("© 1989 Merit Industries" silkcreened on PCB), i80C31 instead of 80C32 and without socket for DS1204U-3.
-ROM_START(scrpiondc)
+/* Older PCB (silkcreened "© 1989 Merit Industries"), i80C31 instead of 80C32 and without socket for DS1204U-3.
+   The "Solo Challenger" was an upgrade kit, including a replacement EEPROM, a new button, some new art, and a
+   complete manual with schematics.
+   The standard "Pub Time Darts II Plus 2" machine had a separate PCB for cheat detection with ultrasounds
+   (named MIC/ULTRA BOARD):
+  ____________________________________________
+ | :  RCA CONNECTORS -> (o) (o) (o) (o)  (o)  |
+ | : <- CONN J2                               |
+ | _________                                  |
+ | |_MPQ2484|                                 |
+ |                       _________   CONN J9  |
+ |                       4116R-001      ···   |
+ | _________  _________  _________            |
+ | |_TPQ2807| T74LS02B1  |_LM324N_|           |
+ |            _________  _________            |
+ |          CD74HC4060E  |_LM324N_|           |
+ |            _________  _________  _________ |
+ |           |_DM74123N| SN74LS08N  SN74LS221N|
+ |              CONN J10 -> ····              |
+ | :::::::::::::::::::::::::::::::::::::::::: |
+ |___________________CONN J1__________________|
+*/
+ROM_START(pubtimed2ch)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "challenger_r4b.u7", 0x00000, 0x08000, CRC(6d5c0634) SHA1(45f4ed2e984f2525a1ed680bbc2a11eab93b0bca) ) // 27256
 ROM_END
 
 } // Anonymous namespace
 
-//   YEAR  NAME       PARENT    COMPAT       MACHINE   INPUT         CLASS       INIT  COMPANY  FULLNAME                   FLAGS
-GAME(1999, scrpiond,         0, scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Jun 15, 1999)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, scrpionda, scrpiond, scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Oct 01, 1997)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993, scrpiondb, scrpiond, scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Dec 24, 1993)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992, scrpiondc, scrpiond, scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Mar 24, 1992)", MACHINE_IS_SKELETON_MECHANICAL)
+//   YEAR  NAME         PARENT    COMPAT       MACHINE   INPUT         CLASS       INIT  COMPANY  FULLNAME                                                        FLAGS
+GAME(1999, scrpiond,    0,        scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Jun 15, 1999)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, scrpionda,   scrpiond, scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Oct 01, 1997)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, scrpiondb,   scrpiond, scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Dec 24, 1993)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992, pubtimed2ch, 0,        scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Pub Time Darts II Plus 2 with Solo Challenger (Mar 24, 1992)", MACHINE_IS_SKELETON_MECHANICAL)

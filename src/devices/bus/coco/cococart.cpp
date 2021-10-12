@@ -713,11 +713,11 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("max", COCO_PAK_MAX);
 	device.option_add("midi", COCO_MIDI);
-	device.option_add("msx2", DRAGON_MSX2);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);
+	device.option_add("ssfm", DRAGON_MSX2);
 	device.option_add("stecomp", COCO_STEREO_COMPOSER);
 	device.option_add("sym12", COCO_SYM12);
 	device.option_add("wpk", COCO_WPK);
@@ -769,13 +769,13 @@ void dragon_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("jcbspch", DRAGON_JCBSPCH);
 	device.option_add("max", COCO_PAK_MAX);
 	device.option_add("midi", DRAGON_MIDI);
-	device.option_add("msx2", DRAGON_MSX2);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("pak", COCO_PAK);
 	device.option_add("serial", DRAGON_SERIAL);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
+	device.option_add("ssfm", DRAGON_MSX2);
 	device.option_add("stecomp", COCO_STEREO_COMPOSER);
 	device.option_add("sym12", COCO_SYM12);
 	device.option_add("wpk2p", COCO_WPK2P);

@@ -10,8 +10,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/itt3030_dsk.h"
 
 itt3030_format::itt3030_format() : wd177x_format(formats)

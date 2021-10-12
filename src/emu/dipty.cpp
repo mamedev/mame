@@ -27,7 +27,7 @@ bool device_pty_interface::open()
 {
 	if (!m_opened)
 	{
-		if (osd_file::openpty(m_pty_master, m_slave_name) == osd_file::error::NONE)
+		if (!osd_file::openpty(m_pty_master, m_slave_name))
 		{
 			m_opened = true;
 		}
@@ -54,7 +54,7 @@ bool device_pty_interface::is_open() const
 ssize_t device_pty_interface::read(u8 *rx_chars , size_t count) const
 {
 	u32 actual_bytes;
-	if (m_opened && m_pty_master->read(rx_chars, 0, count, actual_bytes) == osd_file::error::NONE)
+	if (m_opened && !m_pty_master->read(rx_chars, 0, count, actual_bytes))
 		return actual_bytes;
 	else
 		return -1;
@@ -71,9 +71,4 @@ bool device_pty_interface::is_slave_connected() const
 {
 	// TODO: really check for slave status
 	return m_opened;
-}
-
-const char *device_pty_interface::slave_name() const
-{
-	return m_slave_name.c_str();
 }

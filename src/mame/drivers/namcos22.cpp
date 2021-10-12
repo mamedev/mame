@@ -4120,6 +4120,17 @@ ROM_START( ridgeracf )
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrf1data.6r", 0, 0x080000, CRC(ce3c6ed6) SHA1(23e033364bc967c10c49fd1d5413dda837670633) )
 
+	/* this stuff was missing from this version, and shouldn't be the same (bad textures if we use these roms) */
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "rrf1cg0.bin", 0x200000*0x4, 0x200000, BAD_DUMP CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
+	ROM_LOAD( "rrf1cg1.bin", 0x200000*0x5, 0x200000, BAD_DUMP CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
+	ROM_LOAD( "rrf1cg2.bin", 0x200000*0x6, 0x200000, BAD_DUMP CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
+	ROM_LOAD( "rrf1cg3.bin", 0x200000*0x7, 0x200000, BAD_DUMP CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "rrf1ccrl.bin",0x000000, 0x200000, BAD_DUMP CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
+	ROM_LOAD( "rrf1ccrh.bin",0x200000, 0x080000, BAD_DUMP CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
+
 	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
 	ROM_LOAD( "rrf2potl0.l0", 0x80000*0, 0x80000, CRC(9b762e60) SHA1(50b67ff6678bacba140bad3aedda75c30851fa7a) )
 	ROM_LOAD( "rrf2potl1.l1", 0x80000*1, 0x80000, CRC(ab4d66b0) SHA1(59020b3dc2efff99cd528752ca7168b64ae96ac4) )
@@ -4134,21 +4145,10 @@ ROM_START( ridgeracf )
 	ROM_LOAD( "rrf1wave2.10n", 0x100000*1, 0x100000,CRC(4ceeae12) SHA1(ae3a6583f8912bc784c7bc63d32448228cf217ba) ) // differs from normal sets
 	ROM_LOAD( "rrf1wave3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
 
-	/* this stuff was missing from this version, and shouldn't be the same (bad textures if we use these roms) */
 	ROM_REGION( 0x300, "gamma_proms", 0 )
-	ROM_LOAD( "rrf1gam.2d",   0x0000, 0x0100, BAD_DUMP CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
-	ROM_LOAD( "rrf1gam.3d",   0x0100, 0x0100, BAD_DUMP CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
-	ROM_LOAD( "rrf1gam.4d",   0x0200, 0x0100, BAD_DUMP CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
-
-	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
-	ROM_LOAD( "rrf1cg0.bin", 0x200000*0x4, 0x200000, BAD_DUMP CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
-	ROM_LOAD( "rrf1cg1.bin", 0x200000*0x5, 0x200000, BAD_DUMP CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
-	ROM_LOAD( "rrf1cg2.bin", 0x200000*0x6, 0x200000, BAD_DUMP CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
-	ROM_LOAD( "rrf1cg3.bin", 0x200000*0x7, 0x200000, BAD_DUMP CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
-
-	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
-	ROM_LOAD( "rrf1ccrl.bin",0x000000, 0x200000, BAD_DUMP CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
-	ROM_LOAD( "rrf1ccrh.bin",0x200000, 0x080000, BAD_DUMP CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
+	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 ROM_END
 
 

@@ -762,6 +762,7 @@ public:
 	attotime last_update() const { return m_last_update; }
 	int sample_count() const { return m_samples_this_update; }
 	int unique_id() { return m_unique_id++; }
+	stream_buffer::sample_t compressor_scale() const { return m_compressor_scale; }
 
 	// allocate a new stream with a new-style callback
 	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);
@@ -832,6 +833,7 @@ private:
 
 	stream_buffer::sample_t m_compressor_scale; // current compressor scale factor
 	int m_compressor_counter;             // compressor update counter for backoff
+	bool m_compressor_enabled;            // enable compressor (it will still be calculated for detecting overdrive)
 
 	u8 m_muted;                           // bitmask of muting reasons
 	bool m_nosound_mode;                  // true if we're in "nosound" mode

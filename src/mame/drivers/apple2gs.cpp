@@ -119,6 +119,7 @@
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 //#include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/q68.h"
 #include "bus/a2bus/ramcard16k.h"
 //#include "bus/a2bus/ramfast.h"
 #include "bus/a2bus/sider.h"
@@ -1542,7 +1543,7 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_ioudis = true;
-	m_newvideo = 0x01;
+	m_newvideo = 0x01;      // verified on ROM03 hardware
 	m_clock_frame = 0;
 	m_mouse_x = 0x00;
 	m_mouse_y = 0x00;
@@ -2186,10 +2187,23 @@ void apple2gs_state::do_io(int offset)
 				accel_normal_speed();
 			}
 
-			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
-			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
-			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
-			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+			// 558 monostable one-shot timers; a running timer cannot be restarted
+			if (machine().time().as_double() >= m_joystick_x1_time)
+			{
+				m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
+			}
+			if (machine().time().as_double() >= m_joystick_y1_time)
+			{
+				m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
+			}
+			if (machine().time().as_double() >= m_joystick_x2_time)
+			{
+				m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
+			}
+			if (machine().time().as_double() >= m_joystick_y2_time)
+			{
+				m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+			}
 			break;
 
 		default:
@@ -2618,10 +2632,32 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			// todo: does reading these on the IIgs also trigger the joysticks?
 			if (!machine().side_effects_disabled())
 			{
-				m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
-				m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
-				m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
-				m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+				// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
+				if ((m_accel_present) && !BIT(m_accel_gsxsettings, 6))
+				{
+					m_accel_temp_slowdown = true;
+					m_acceltimer->adjust(attotime::from_msec(5));
+					accel_normal_speed();
+				}
+
+				// 558 monostable one-shot timers; a running timer cannot be restarted
+				if (machine().time().as_double() >= m_joystick_x1_time)
+				{
+					m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
+				}
+				if (machine().time().as_double() >= m_joystick_y1_time)
+				{
+					m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
+				}
+				if (machine().time().as_double() >= m_joystick_x2_time)
+				{
+					m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
+				}
+				if (machine().time().as_double() >= m_joystick_y2_time)
+				{
+					m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+				}
+
 			}
 
 			return m_rom[offset + 0x3c000];
@@ -4829,6 +4865,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 	device.option_add("booti", A2BUS_BOOTI);     /* Booti Card */
 	device.option_add("lancegs", A2BUS_LANCEGS);  /* ///SHH SYSTEME LANceGS Card */
+	device.option_add("q68", A2BUS_Q68);          /* Stellation Q68 68000 card */
+	device.option_add("q68plus", A2BUS_Q68PLUS);  /* Stellation Q68 Plus 68000 card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)

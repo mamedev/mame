@@ -1040,8 +1040,6 @@ s32 voodoo_banshee_device::internal_2d_w(offs_t offset, u32 data)
 		default:
 			if (offset >= 0x20 && offset < 0x40)
 				execute_blit(data);
-			else if (offset >= 0x40 && offset < 0x80)
-				{} // TODO: colorPattern
 			break;
 	}
 

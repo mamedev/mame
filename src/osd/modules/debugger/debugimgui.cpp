@@ -844,23 +844,23 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				auto* mem = downcast<debug_view_memory*>(view_ptr->view);
 				bool physical = mem->physical();
 				bool rev = mem->reverse();
-				int format = mem->get_data_format();
+				debug_view_memory::data_format format = mem->get_data_format();
 				uint32_t chunks = mem->chunks_per_row();
 
-				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == 1) ? true : false))
-					mem->set_data_format(1);
-				if(ImGui::MenuItem("2-byte chunks", nullptr,(format == 2) ? true : false))
-					mem->set_data_format(2);
-				if(ImGui::MenuItem("4-byte chunks", nullptr,(format == 4) ? true : false))
-					mem->set_data_format(4);
-				if(ImGui::MenuItem("8-byte chunks", nullptr,(format == 8) ? true : false))
-					mem->set_data_format(8);
-				if(ImGui::MenuItem("32-bit floating point", nullptr,(format == 9) ? true : false))
-					mem->set_data_format(9);
-				if(ImGui::MenuItem("64-bit floating point", nullptr,(format == 10) ? true : false))
-					mem->set_data_format(10);
-				if(ImGui::MenuItem("80-bit floating point", nullptr,(format == 11) ? true : false))
-					mem->set_data_format(11);
+				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == debug_view_memory::data_format::HEX_8BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::HEX_8BIT);
+				if(ImGui::MenuItem("2-byte chunks", nullptr,(format == debug_view_memory::data_format::HEX_16BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::HEX_16BIT);
+				if(ImGui::MenuItem("4-byte chunks", nullptr,(format == debug_view_memory::data_format::HEX_32BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::HEX_32BIT);
+				if(ImGui::MenuItem("8-byte chunks", nullptr,(format == debug_view_memory::data_format::HEX_64BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::HEX_64BIT);
+				if(ImGui::MenuItem("32-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_32BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::FLOAT_32BIT);
+				if(ImGui::MenuItem("64-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_64BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::FLOAT_64BIT);
+				if(ImGui::MenuItem("80-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_80BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::FLOAT_80BIT);
 				ImGui::Separator();
 				if(ImGui::MenuItem("Logical addresses", nullptr,!physical))
 					mem->set_physical(false);
@@ -938,7 +938,7 @@ void debug_imgui::mount_image()
 {
 	if(m_selected_file != nullptr)
 	{
-		osd_file::error err;
+		std::error_condition err;
 		switch(m_selected_file->type)
 		{
 			case file_entry_type::DRIVE:
@@ -947,7 +947,7 @@ void debug_imgui::mount_image()
 					util::zippath_directory::ptr dir;
 					err = util::zippath_directory::open(m_selected_file->fullpath, dir);
 				}
-				if(err == osd_file::error::NONE)
+				if(!err)
 				{
 					m_filelist_refresh = true;
 					strcpy(m_path,m_selected_file->fullpath.c_str());
@@ -989,8 +989,8 @@ void debug_imgui::refresh_filelist()
 	m_filelist_refresh = false;
 
 	util::zippath_directory::ptr dir;
-	osd_file::error const err = util::zippath_directory::open(m_path,dir);
-	if(err == osd_file::error::NONE)
+	std::error_condition const err = util::zippath_directory::open(m_path,dir);
+	if(!err)
 	{
 		int x = 0;
 		// add drives
@@ -1108,7 +1108,12 @@ void debug_imgui::draw_mount_dialog(const char* label)
 		if(ImGui::InputText("##mountpath",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
 			m_filelist_refresh = true;
 		ImGui::Separator();
-		if(ImGui::ListBoxHeader("##filelist",m_filelist.size(),15))
+
+		ImVec2 listbox_size;
+		listbox_size.x = 0.0f;
+		listbox_size.y = ImGui::GetTextLineHeightWithSpacing() * 15.25f;
+
+		if(ImGui::BeginListBox("##filelist",listbox_size))
 		{
 			for(auto f = m_filelist.begin();f != m_filelist.end();++f)
 			{
@@ -1138,7 +1143,7 @@ void debug_imgui::draw_mount_dialog(const char* label)
 					}
 				}
 			}
-			ImGui::ListBoxFooter();
+			ImGui::EndListBox();
 		}
 		ImGui::Separator();
 		if(ImGui::Button("Cancel##mount"))

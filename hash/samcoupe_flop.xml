@@ -23,7 +23,7 @@ license:CC0
   SAMDOS disks include the official MGT ZX Spectrum emulator.
 -->
 
-<softwarelist name="samcoupe_flop" description="SAM Coupe floppy disks">
+<softwarelist name="samcoupe_flop" description="SAM Coupé floppy disks">
 
 	<software name="manic">
 		<description>Manic Miner (2 Level Demo)</description>
@@ -52,6 +52,16 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="sam coupe system disk (SAMDOS v2.0).dsk" size="819200" crc="6634f061" sha1="a0b6696ea81356bff052daeb7fc49cc4a9f7ff17"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="batnball">
+		<description>Batz 'n Balls</description>
+		<year>1992</year>
+		<publisher>Revelation Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="910336">
+				<rom name="batznballs.dsk" size="910336" crc="3f9528e9" sha1="453ffae4da3cce3b5c7424ce4da1ae5bc7a6b274"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,6 +95,51 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	<software name="dominobx">
+		<description>Domino Box</description>
+		<year>1997</year>
+		<publisher>Supplement Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="dominobox.dsk" size="819200" crc="23abd828" sha1="7eda0ecab957db7df4cff9ae8c8f24e3cfe57c86"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="doubletp">
+		<description>Double Top</description>
+		<year>1993</year>
+		<publisher>Supplement Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="doubletop.mgt" size="819200" crc="f8b4c583" sha1="b6cff3ab3aa0df571b376588217d3c7e27bed976"/>
+			</dataarea>
+		</part>
+	</software>
+		<software name="exodus">
+		<description>Exodus</description>
+		<year>1993</year>
+		<publisher>Apex Developments</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="exodus - disk 1 - intro.dsk" size="860416" crc="ea97bd4b" sha1="8797e7b92f8c4e803ee6a3c58b4b0f3dfab711ec"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="exodus - disk 2 - game.dsk" size="860416" crc="da163757" sha1="cf25b0f4ed68370cccc8a156ce585186d954aaa8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="5trislnd">
+		<description>Five on a Treasure Island</description>
+		<year>1990</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="fiveonatreasureisland.dsk" size="860416" crc="5307cd36" sha1="f9400b504045629200b4a751fe6abcb4009ceac9"/>
+			</dataarea>
+		</part>
+	</software>
 	<software name="lemmings">
 		<description>Lemmings</description>
 		<year>1993</year>
@@ -102,6 +157,16 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="857856">
 				<rom name="prince of persia.dsk" size="857856" crc="29020c84" sha1="e75292191c9c403bc8422cb490ad189b4b9dc5cc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="quizball">
+		<description>Quizball</description>
+		<year>1991</year>
+		<publisher>Revelation Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="QuizBall.dsk" size="860416" crc="20661bbc" sha1="33dd733d50a6ff82ce876299fd15853c9dc411d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -125,6 +190,17 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	<software name="spellmst">
+		<description>Spell Master</description>
+		<year>1992</year>
+		<publisher>FRED Publishing</publisher>
+		<info name="version" value="ver. 1.2"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="spellmaster.dsk" size="819200" crc="7b30e3c4" sha1="408ed5a9e8ff245eb746dc306d515b6faf62a7e6"/>
+			</dataarea>
+		</part>
+	</software>
 	<software name="sphera">
 		<description>Sphera</description>
 		<year>1990</year>
@@ -132,6 +208,16 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="sphera.dsk" size="819200" crc="6e8cc190" sha1="5502ae252d570129a82aecc8e17b1a4d197ab4ff"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="splat">
+		<description>Splat!</description>
+		<year>1991</year>
+		<publisher>Revelation Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="splat.dsk" size="860416" crc="4b429c21" sha1="71963862173fff0b5b1bafe3145e50d8fe5e90ac"/>
 			</dataarea>
 		</part>
 	</software>

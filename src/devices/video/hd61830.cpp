@@ -21,7 +21,6 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(HD61830, hd61830_device, "hd61830", "Hitachi HD61830B LCD Controller")
-decltype(HD61830) HD61830B = HD61830;
 
 
 // default address map

@@ -475,6 +475,8 @@ public:
 	{
 	}
 
+	static auto parent_rom_device_type() { return &MACKBD_M0110A; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override
 	{
@@ -489,6 +491,8 @@ public:
 		: keyboard_base(mconfig, MACKBD_M0110A_J, tag, owner, clock)
 	{
 	}
+
+	static auto parent_rom_device_type() { return &MACKBD_M0110A; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override

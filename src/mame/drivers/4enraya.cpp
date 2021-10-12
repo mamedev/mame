@@ -12,6 +12,7 @@
 
   4 En Raya (set 1),                              1990, IDSA.
   4 En Raya (set 2),                              1990, IDSA.
+  unknown bowling themed 'gum' poker machine      1992?,Paradise Automatique / TourVision
   unknown 'Pac-Man' gambling game,                1990, Unknown.
   unknown 'Space Invaders' gambling game (set 1), 1990, Unknown (made in France).
   unknown 'Space Invaders' gambling game (set 2), 199?, Unknown.
@@ -274,6 +275,21 @@ void unk_gambl_state::unkpacg_main_map(address_map &map)
 	map(0x8000, 0x9fff).rom();
 }
 
+void unk_gambl_state::unkpacga_main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("maincpu", 0x6000);
+	map(0x6000, 0x67ff).ram().share("nvram");
+	map(0x7000, 0x7fff).w(FUNC(_4enraya_state::fenraya_videoram_w));
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
+}
+
+void unk_gambl_state::tourpgum_main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x67ff).ram().share("nvram");
+	map(0x7000, 0x7fff).w(FUNC(_4enraya_state::fenraya_videoram_w));
+}
+
 void unk_gambl_state::unkpacg_main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
@@ -429,6 +445,57 @@ static INPUT_PORTS_START( unkfr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( tourpgum )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // 1 credit (5 needed to start)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) // 5 credits?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // 5 credits?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Exchange")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Lot 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Lot 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Lot 3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Lot 5")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Lot 1")
+
+	PORT_START("DSW1") // only one bank of DSW on this PCB, presumably the 2nd one as service input is there? needs checking in code
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "DSW1-1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW1-2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW1-3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "DSW1-4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "DSW1-5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "DSW1-6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x80, 0x00, "DSW1-8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /***********************************
 *     GFX Layouts & GFX decode     *
 ***********************************/
@@ -470,14 +537,8 @@ void _4enraya_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-void _4enraya_state::_4enraya(machine_config &config)
+void _4enraya_state::_4enraya_video(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &_4enraya_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &_4enraya_state::main_portmap);
-	m_maincpu->set_periodic_int(FUNC(_4enraya_state::irq0_line_hold), attotime::from_hz(4*60)); // unknown timing
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -490,6 +551,18 @@ void _4enraya_state::_4enraya(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4enraya);
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+}
+
+
+void _4enraya_state::_4enraya(machine_config &config)
+{
+	/* basic machine hardware */
+	Z80(config, m_maincpu, MAIN_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_4enraya_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &_4enraya_state::main_portmap);
+	m_maincpu->set_periodic_int(FUNC(_4enraya_state::irq0_line_hold), attotime::from_hz(4*60)); // unknown timing
+
+	_4enraya_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -512,6 +585,32 @@ void unk_gambl_state::unkpacg(machine_config &config)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void unk_gambl_state::unkpacga(machine_config &config)
+{
+	unkpacg(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::unkpacga_main_map);
+}
+
+void unk_gambl_state::tourpgum(machine_config &config)
+{
+	/* basic machine hardware */
+	Z80(config, m_maincpu, XTAL(18'000'000)/4); // can only see an 18Mhz XTAL on this PCB?
+	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::tourpgum_main_map);
+	m_maincpu->set_addrmap(AS_IO, &unk_gambl_state::unkpacg_main_portmap);
+	m_maincpu->set_periodic_int(FUNC(_4enraya_state::irq0_line_hold), attotime::from_hz(4*60)); // unknown timing
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	_4enraya_video(config);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay, XTAL(18'000'000)/4/4).add_route(ALL_OUTPUTS, "mono", 1.0); /* guess */
+	m_ay->port_a_read_callback().set_ioport("DSW2");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***********************************
 *             Rom Load             *
@@ -545,19 +644,102 @@ ROM_START( 4enrayaa )
 	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) /* system control: used for memory mapping */
 ROM_END
 
+/*  ________________________________________________________________________________________________________
+   |                          __________  __________  ______________  __________  __________ VIDEOGUM/TV   |
+   |                         |T74LS14B1| |_74LS74AN| | EPROM 1     | |MC1454BCP| |_TC4023BP|               |
+   |                                                 |_____________|  __________              __________   |
+   |  __________  __________  __________  __________  ______________ |SN74LS166N             |__7406N__| __|
+   | |_74LS08N_| |_74LS393_| |_74LS153N| |W2416K-10L | EPROM 2     |  __________              __________ |_
+   |  __________  __________  __________             |_____________| |SN74LS166N             |4116R-001| __|
+   | |_74LS393_| |__74LS10_| |74LS257AN|              ______________  __________  __________             __|
+   |  __________  __________  __________  __________ | EPROM 3     | |SN74LS166N |__7406N__|             __|
+   | |SN74LS08N| |SN74LS32N| |GD74LS157| |W2416K-10L |_____________|                                     __|
+   |  __________  __________  __________  __________      __________              __________  __________ __|
+   | |_GS74LS20| |74LS125AN| PC74HCT138P |SN74LS08N|     |SN74LS245N|             |_74LS273_| |ULN2003A| __|
+   |  __________  __________  __________  __________    ____________  __________  __________  __________ __|
+   | |_74LS74AN| |SN74LS32N| |T74LS00B1| PC74HCT138P   | W2416-10L | |SN74LS32N| |SN74LS245N  |4116R-001 __|
+   |  __________  __________  __________  __________   |___________|              __________             __|
+   | |GD72LS393| |_74LS74AN| |_74LS241N| |_74LS241N|  _________________          |T74LS273B1             __|
+   |  __________  __________  _________________      | AY3910A/P      |                       __________ __|
+   | |SN74LS92N| |_74LS74AN| | Z0840004PSC Z80|      |________________|                      |ULN2003A_| __|
+   |  __________  __________ |________________|                       __________  __________  __________ __|
+   | |__EMPTY__| |__EMPTY__|                                         |__8xDIPS_| |SN74LS245N |SN7407N_|  __|
+   |                              __________                          __________  __________  __________ |_
+   |                             |_74LS245N|                         |74LS02??*| |74LS273B1| |4116R-001|   |
+   |    Xtal                     ______________   BATT                __________  __________               |
+   |   18.000 MHz               | EPROM 4     |                      |_ULN2003A| |74LS273B1|               |
+   |                            |_____________|                  CONN-> ······     ······ <-CONN           |
+   |_______________________________________________________________________________________________________|
+
+  The PCB here was marked as a 'Gum' machine and is from a gambling machine that instead of paying out money would dispense chewing gum as prizes
+  Other games with 'Gum' in the title also exist, see 'Chewing Gum' and 'Royal Gum' in other drivers for example, these were likely used with similar
+  chewing gum dispensers.
+
+  TourVision was a Spanish developer, PCB had TourVision stickers, but this kind of machine was illegal in Spain, so made for the French market instead
+
+  Ariège Amusements was the exclusive distributor of TourVision products until 1991, Paradise Automatique was a spin-off of this distributor
+  and was legally created in 1992 to import/export food vending machines, video games and audiovisual appliances and continued to work with
+  TourVision.
+
+  A version of this exists (on newer hardware?) with the title 'Lucky Gum' or 'Luck Gum' however the supported game shows no title screen so the title
+  is unknown.
+*/
+ROM_START( tourpgum )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4.ic52",   0x0000, 0x8000, CRC(58d68a5a) SHA1(e1eb9113d6ebb1cedf5c6724c15b96934e357504) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "1_tourvision.ic19",   0x00000, 0x8000, CRC(dbfb5b72) SHA1(efdc66f2288cd66f0b91211d3d1e7e6b20079ab1) )
+	ROM_LOAD( "2_tourvision.ic18",   0x08000, 0x8000, CRC(af25ed99) SHA1(9605b36151791b84c2d0648070b0f97e31300dbb) )
+	ROM_LOAD( "3_tourvision.ic17",   0x10000, 0x8000, CRC(0b081663) SHA1(86dbf69e819ced12ac7cb7a4839fe0ba677580ae) )
+ROM_END
 
 /*
   Unknown 'Pac-Man' gambling game.
 */
 ROM_START(unkpacg)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("1.u14",    0x0000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2))
-	ROM_LOAD("2.u46",    0x8000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291))
+	ROM_LOAD( "1.u14",   0x0000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2) )
+	ROM_LOAD( "2.u46",   0x8000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "3.u20",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
 	ROM_LOAD( "4.u19",   0x4000, 0x2000, CRC(4a123a3d) SHA1(26300b8af0d0df0023a153a212699727311d1b74) )
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
+ROM_END
+
+ROM_START(unkpacga)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "p1.bin",  0x0000, 0x8000, CRC(386bd2da) SHA1(fa786c25dd5ec1a26ebe021ca701dccebfcbb64f) )  // first 0x5fff are 0xff filled
+	ROM_LOAD( "p2.bin",  0x8000, 0x8000, CRC(7878d7f3) SHA1(cacdd4b8e33a93e2913d0f5d740195ef0f439031) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "r.bin",   0x0000, 0x2000, CRC(b0d7b67a) SHA1(87bd150ed46d1346a363dc45c226e72967426f2a) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x0000, 0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "b.bin",   0x2000, 0x2000, CRC(5b26dce5) SHA1(d00434ab352169eca3c458917d5d1a04d0d2c2df) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x2000, 0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "g.bin",   0x4000, 0x2000, CRC(e12d34e0) SHA1(96790eec9032ca6f513cf0f6a1962d91a21ce2ae) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x4000, 0x2000)
+	ROM_IGNORE(0x4000)
+ROM_END
+
+ROM_START(unkpacgb)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "p1.bin",  0x0000, 0x8000, CRC(5cc6b5e1) SHA1(80325eef389f7d6a8c78531fdc6e5b73721eb0b1) )
+	ROM_LOAD( "p2.bin",  0x8000, 0x8000, CRC(06b42740) SHA1(0639ec2e31bd81e85a45689929bb67a61599497c) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "r.bin",   0x0000, 0x2000, CRC(b0d7b67a) SHA1(87bd150ed46d1346a363dc45c226e72967426f2a) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x0000, 0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "b.bin",   0x2000, 0x2000, CRC(5b26dce5) SHA1(d00434ab352169eca3c458917d5d1a04d0d2c2df) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x2000, 0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "g.bin",   0x4000, 0x2000, CRC(e12d34e0) SHA1(96790eec9032ca6f513cf0f6a1962d91a21ce2ae) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(        0x4000, 0x2000)
+	ROM_IGNORE(0x4000)
 ROM_END
 
 /*
@@ -634,13 +816,13 @@ ROM_END
 *          Driver Init             *
 ***********************************/
 
-void unk_gambl_state::driver_init()
+void unk_gambl_enc_state::driver_init()
 {
 	_4enraya_state::driver_init();
 
 	// descramble rom
 	uint8_t *rom = memregion("maincpu")->base();
-	for (int i = 0x8000; i < 0xa000; i++)
+	for (int i = 0x8000; i < 0x10000; i++)
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
 }
 
@@ -649,9 +831,15 @@ void unk_gambl_state::driver_init()
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS            INIT        ROT   COMPANY      FULLNAME                                         FLAGS  */
+/*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS            INIT        ROT   COMPANY      FULLNAME                                          FLAGS  */
 GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksig,   0,       unkpacg,  unkfr,   unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacgb, unkpacg, unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacga, unkpacg, unkpacga, unkpacg, unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                         MACHINE_SUPPORTS_SAVE )
+
+GAME( 199?, unksig,   0,       unkpacg,  unkfr,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )

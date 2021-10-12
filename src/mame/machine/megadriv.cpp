@@ -1033,20 +1033,6 @@ void md_base_state::megadriv_init_common()
 	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 }
 
-void md_base_state::init_megadriv_c2()
-{
-	megadriv_init_common();
-
-	m_vdp->set_use_cram(0); // C2 uses its own palette ram
-	m_vdp->set_vdp_pal(false);
-	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(262);
-
-	m_version_hi_nibble = 0x20; // JPN NTSC no-SCD
-}
-
-
-
 void md_base_state::init_megadriv()
 {
 	megadriv_init_common();

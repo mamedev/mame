@@ -479,6 +479,7 @@ MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AM9519"] = true
 MACHINES["AMIGAFDC"] = true
+MACHINES["APPLEPIC"] = true
 MACHINES["ARM_IOMD"] = true
 MACHINES["AT_KEYBC"] = true
 MACHINES["AT28C16"] = true
@@ -691,6 +692,7 @@ MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
 MACHINES["SPG2XX"] = true
 MACHINES["SPG290"] = true
+MACHINES["SPISDCARD"] = true
 MACHINES["STVCD"] = true
 MACHINES["SUN4C_MMU"] = true
 MACHINES["SWTPC8212"] = true
@@ -728,6 +730,7 @@ MACHINES["TTL7474"] = true
 MACHINES["TUBE"] = true
 MACHINES["UCB1200"] = true
 MACHINES["UPD1990A"] = true
+MACHINES["UPD4991A"] = true
 --MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
 MACHINES["UPD7001"] = true
@@ -837,6 +840,7 @@ BUSES["AMIGA_KEYBOARD"] = true
 BUSES["APF"] = true
 BUSES["APRICOT_EXPANSION"] = true
 BUSES["APRICOT_KEYBOARD"] = true
+BUSES["APRICOT_VIDEO"] = true
 BUSES["AQUARIUS"] = true
 BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
@@ -1341,6 +1345,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"olivetti",
 		"olympia",
 		"omnibyte",
+		"omron",
 		"openuni",
 		"orion",
 		"osborne",
@@ -2453,6 +2458,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidel_cc1.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_cc10.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_cc7.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_checkc2.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_chesster.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_csc.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_dames.cpp",
@@ -3105,6 +3111,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc8401a.cpp",
 	MAME_DIR .. "src/mame/includes/pc8401a.h",
 	MAME_DIR .. "src/mame/video/pc8401a.cpp",
+	MAME_DIR .. "src/mame/machine/pc80s31k.cpp",
+	MAME_DIR .. "src/mame/machine/pc80s31k.h",
 	MAME_DIR .. "src/mame/drivers/pc8001.cpp",
 	MAME_DIR .. "src/mame/includes/pc8001.h",
 	MAME_DIR .. "src/mame/drivers/pc8801.cpp",
@@ -3121,6 +3129,12 @@ files {
 	MAME_DIR .. "src/mame/machine/pc9801_cd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.h",
+	MAME_DIR .. "src/mame/drivers/pc98ha.cpp",
+	MAME_DIR .. "src/mame/includes/pc98ha.h",
+	MAME_DIR .. "src/mame/drivers/pc9801_epson.cpp",
+	MAME_DIR .. "src/mame/includes/pc9801_epson.h",
+	MAME_DIR .. "src/mame/drivers/pc9821.cpp",
+	MAME_DIR .. "src/mame/includes/pc9821.h",
 	MAME_DIR .. "src/mame/drivers/tk80bs.cpp",
 }
 
@@ -3266,6 +3280,11 @@ files {
 	MAME_DIR .. "src/mame/includes/ob68k1a.h",
 }
 
+createMESSProjects(_target, _subtarget, "omron")
+files {
+	MAME_DIR .. "src/mame/drivers/luna_68k.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "openuni")
 files {
 	MAME_DIR .. "src/mame/drivers/hektor.cpp",
@@ -3286,7 +3305,6 @@ files {
 	MAME_DIR .. "src/mame/machine/osborne1.cpp",
 	MAME_DIR .. "src/mame/drivers/osbexec.cpp",
 	MAME_DIR .. "src/mame/drivers/vixen.cpp",
-	MAME_DIR .. "src/mame/includes/vixen.h",
 }
 
 createMESSProjects(_target, _subtarget, "osi")
@@ -4424,6 +4442,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/ymmu50.cpp",
 	MAME_DIR .. "src/mame/drivers/ymmu80.cpp",
 	MAME_DIR .. "src/mame/drivers/ymmu100.cpp",
+	MAME_DIR .. "src/mame/drivers/ympsr16.cpp",
+	MAME_DIR .. "src/mame/drivers/ympsr40.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr60.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr340.cpp",
 	MAME_DIR .. "src/mame/drivers/ymsy35.cpp",
@@ -4561,6 +4581,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gem_rp.cpp",
 	MAME_DIR .. "src/mame/drivers/gigatron.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
+	MAME_DIR .. "src/mame/drivers/gm1000.cpp",
 	MAME_DIR .. "src/mame/drivers/gnat10.cpp",
 	MAME_DIR .. "src/mame/drivers/goupil.cpp",
 	MAME_DIR .. "src/mame/drivers/grfd2301.cpp",
@@ -4657,6 +4678,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ptcsol.cpp",
 	MAME_DIR .. "src/mame/drivers/pulsar.cpp",
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
+	MAME_DIR .. "src/mame/drivers/pwp14.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",

@@ -39,6 +39,9 @@ public:
 	// hdsel line when present and in output mode (active high)
 	auto hdsel_cb() { return m_hdsel_cb.bind(); }
 
+	// dat1byte line when present (active high)
+	auto dat1byte_cb() { return m_dat1byte_cb.bind(); }
+
 	// floppy selection input, to be updated according to the previous callbacks,
 	// nullptr if none selected
 	virtual void set_floppy(floppy_image_device *floppy) = 0;
@@ -94,7 +97,7 @@ public:
 
 protected:
 	devcb_write8 m_phases_cb, m_devsel_cb;
-	devcb_write_line m_sel35_cb, m_hdsel_cb;
+	devcb_write_line m_sel35_cb, m_hdsel_cb, m_dat1byte_cb;
 
 	// Current phase value in the bottom bits, input/output flags in the top bits
 	u8 m_phases;

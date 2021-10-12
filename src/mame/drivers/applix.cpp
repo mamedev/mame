@@ -462,7 +462,7 @@ void applix_state::main_mem(address_map &map)
 	map(0x500000, 0x51ffff).rom().region("maincpu", 0);
 	map(0x600000, 0x60007f).w(FUNC(applix_state::palette_w));
 	map(0x600080, 0x6000ff).w(FUNC(applix_state::dac_latch_w));
-	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nibble; video base, low nibble) (odd)
+	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nybble; video base, low nybble) (odd)
 	map(0x600180, 0x6001ff).w(FUNC(applix_state::analog_latch_w));
 	map(0x700000, 0x700007).mirror(0x78).rw("scc", FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0xff00).cswidth(16);
 	map(0x700080, 0x7000ff).r(FUNC(applix_state::applix_inputs_r));

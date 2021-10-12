@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-/***************************************************************************
+/******************************************************************************
 
                             -= Clash Road =-
 
@@ -12,26 +12,33 @@ Video Chips :   ?
 
 Sound CPU   :   Z80A (LH0080A)
 
-Sound Chips :   Custom (NAMCO)
+Sound Chips :   Custom (Nichibutsu?)
 
 XTAL        :   18.432 MHz
 
 TODO:
-- few unused video registers (2 and 3);
-- clshroad: erratic gameplay speed;
+- clshroad: erratic gameplay/sound speed.
+  Being pretty logical that CPUs runs at master clock / 6 then we also need to
+  halve the vblank irq rate so that opponents won't pop up in the middle of the
+  screen. Main CPU would also overrun the sound CPU way too much otherwise.
+  We also need to hand tune the sound frequencies compared to the other games
+  so that it won't cut off BGMs abruptly during playback.
+  TL;DR needs verification of all clocks with a PCB;
 - firebatl: video (https://tmblr.co/ZgJvzv2E2C_z-) shows transparency for the
-  text layer is not correctly emulated, fixed by initializing VRAM to 0xf0? (that layer seems unused by this game);
-- firebatl: bad sprite colors;
+  text layer is not correctly emulated, fixed by initializing VRAM to 0xf0?
+  (that layer seems unused by this game);
+- firebatl: bad sprite colors, most notably player ship (should be way darker);
 - firebatl: remove ROM patch;
-- firebatl: reads $6000-$6002 and $6100 at POST, and in the range $6100-$61ff before every start
-  of gameplay/after player dies.
+- firebatl: reads $6000-$6002 and $6100 at POST, and in the range $6100-$61ff
+  before every start of gameplay/after player dies.
   Currently 0-filled in ROM loading:
   - $6100 is actually OR-ed with the coinage work RAM buffer setting at $8022;
-  - $6124 is shifted right once at PC=0x5df and stored to $82e6, which is later checked at PC=0x187 and must
-    be $01 otherwise game goes into an infinite loop after dying (without ROM patch);
+  - $6124 is shifted right once at PC=0x5df and stored to $82e6, which is later
+    checked at PC=0x187 and must be $01 otherwise game goes into an infinite
+    loop after dying (without ROM patch);
   - (more ...)
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "includes/clshroad.h"
@@ -39,11 +46,16 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
-#include "screen.h"
 #include "speaker.h"
 
-/* unknown divider, assume /5 */
-#define MAIN_CLOCK XTAL(18'432'000)/5
+#define MASTER_CLOCK XTAL(18'432'000)
+
+void clshroad_state::machine_start()
+{
+	save_item(NAME(m_main_irq_mask));
+	save_item(NAME(m_sound_irq_mask));
+	save_item(NAME(m_color_bank));
+}
 
 void clshroad_state::machine_reset()
 {
@@ -87,7 +99,9 @@ void clshroad_state::clshroad_map(address_map &map)
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xa100, 0xa107).r(FUNC(clshroad_state::input_r));
 	map(0xa800, 0xafff).ram().w(FUNC(clshroad_state::vram_1_w)).share("vram_1"); // Layer 1
-	map(0xb000, 0xb003).writeonly().share("vregs"); // Scroll
+	map(0xb000, 0xb001).writeonly().share("vregs"); // Scroll
+	map(0xb002, 0xb002).w(FUNC(clshroad_state::color_bank_w));
+	map(0xb003, 0xb003).w(FUNC(clshroad_state::video_unk_w));
 	map(0xc000, 0xc7ff).ram().w(FUNC(clshroad_state::vram_0_w)).share("vram_0"); // Layer 0
 }
 
@@ -110,7 +124,7 @@ static INPUT_PORTS_START( clshroad )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
@@ -257,20 +271,31 @@ static const gfx_layout layout_16x16x4 =
 
 static GFXDECODE_START( gfx_firebatl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0, 16 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,  16,  1 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,   0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x2,   512, 64 ) // [2] Layer 1
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_clshroad )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,    0, 16 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x90,  1 ) // [1] Layer 0
-	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,      0, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,   0, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,     0, 16 ) // [2] Layer 1
 GFXDECODE_END
 
 
 
 INTERRUPT_GEN_MEMBER(clshroad_state::vblank_irq)
 {
+	if(m_main_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
+}
+
+INTERRUPT_GEN_MEMBER(clshroad_state::half_vblank_irq)
+{
+	// without this then clshroad runs too fast & BGMs stops playing exactly halfway thru.
+	// it also otherwise make opponents to pop up in the middle of the screen
+	if (m_screen->frame_number() & 1)
+		return;
+
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
@@ -284,13 +309,15 @@ INTERRUPT_GEN_MEMBER(clshroad_state::sound_timer_irq)
 void clshroad_state::firebatl(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK);   /* ? */
+	Z80(config, m_maincpu, MASTER_CLOCK / 6); // μPD780C running at 3.072 MHz? Overruns max frequency of 2.5 MHz ...
 	m_maincpu->set_addrmap(AS_PROGRAM, &clshroad_state::clshroad_map);
 	m_maincpu->set_vblank_int("screen", FUNC(clshroad_state::vblank_irq));
 
-	Z80(config, m_audiocpu, MAIN_CLOCK);  /* ? */
+	Z80(config, m_audiocpu, MASTER_CLOCK / 6); // μPD780C running at 3.072 MHz? Overruns max frequency of 2.5 MHz ...
 	m_audiocpu->set_addrmap(AS_PROGRAM, &clshroad_state::clshroad_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(clshroad_state::sound_timer_irq), attotime::from_hz(120));    /* periodic interrupt, don't know about the frequency */
+	m_audiocpu->set_periodic_int(FUNC(clshroad_state::sound_timer_irq), attotime::from_hz(120)); // periodic interrupt, exact frequency unknown
+
+	config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK / 6 / 512)); // 6000 Hz
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
@@ -299,13 +326,10 @@ void clshroad_state::firebatl(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x120, 0x100);
-	screen.set_visarea(0, 0x120-1, 0x0+16, 0x100-16-1);
-	screen.set_screen_update(FUNC(clshroad_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
+	m_screen->set_screen_update(FUNC(clshroad_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firebatl);
 	PALETTE(config, m_palette, FUNC(clshroad_state::firebatl_palette), 512+64*4, 256);
@@ -315,20 +339,22 @@ void clshroad_state::firebatl(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	WIPING_CUSTOM(config, "custom", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WIPING_CUSTOM(config, "custom", 96000 / 2).add_route(ALL_OUTPUTS, "mono", 1.0); // 48000 Hz?
 }
 
 void clshroad_state::clshroad(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK);  /* ? real speed unknown. 3MHz is too low and causes problems */
+	Z80(config, m_maincpu, MASTER_CLOCK / 6);  // LH0080A running at 3.072 MHz? /5 is too fast, /6 matches wiping.cpp
 	m_maincpu->set_addrmap(AS_PROGRAM, &clshroad_state::clshroad_map);
-	m_maincpu->set_vblank_int("screen", FUNC(clshroad_state::vblank_irq));
+	m_maincpu->set_vblank_int("screen", FUNC(clshroad_state::half_vblank_irq));
 
-	Z80(config, m_audiocpu, MAIN_CLOCK); /* ? */
+	Z80(config, m_audiocpu, MASTER_CLOCK / 6); // LH0080A running at 3.072 MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &clshroad_state::clshroad_sound_map);
-	//m_audiocpu->set_vblank_int("screen", FUNC(clshroad_state::irq0_line_hold));   /* IRQ, no NMI */
-	m_audiocpu->set_periodic_int(FUNC(clshroad_state::sound_timer_irq), attotime::from_hz(60));    /* periodic interrupt, don't know about the frequency */
+	// TODO: by logic this should be MASTER_CLOCK / 3 / 65536 = 93.75 Hz, but it quite don't work right.
+	m_audiocpu->set_periodic_int(FUNC(clshroad_state::sound_timer_irq), attotime::from_hz(82.75)); // periodic interrupt, exact frequency unknown
+
+	config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK / 6 / 512)); // 6000 Hz
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_nop(); // never writes here?
@@ -337,13 +363,10 @@ void clshroad_state::clshroad(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x120, 0x100);
-	screen.set_visarea(0, 0x120-1, 0x0+16, 0x100-16-1);
-	screen.set_screen_update(FUNC(clshroad_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
+	m_screen->set_screen_update(FUNC(clshroad_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_clshroad);
 	PALETTE(config, m_palette, FUNC(clshroad_state::clshroad_palette), 256);
@@ -353,7 +376,7 @@ void clshroad_state::clshroad(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	WIPING_CUSTOM(config, "custom", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WIPING_CUSTOM(config, "custom", MASTER_CLOCK / 3 / 256).add_route(ALL_OUTPUTS, "mono", 1.0); // 24000 Hz?
 }
 
 
@@ -572,7 +595,7 @@ void clshroad_state::init_firebatl()
 	ROM[0x6124] = 0x02;
 }
 
-GAME( 1984, firebatl,  0,        firebatl, firebatl, clshroad_state, init_firebatl, ROT90, "Woodplace Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, clshroad,  0,        clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroads, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroadd, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, firebatl,  0,        firebatl, firebatl, clshroad_state, init_firebatl, ROT90, "Woodplace Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION ) // developed by Graphic Research
+GAME( 1986, clshroad,  0,        clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1986, clshroads, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1986, clshroadd, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )

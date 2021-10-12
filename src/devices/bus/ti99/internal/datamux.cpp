@@ -82,7 +82,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
+DEFINE_DEVICE_TYPE(TI99_DATAMUX, bus::ti99::internal::datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
 
 namespace bus::ti99::internal {
 

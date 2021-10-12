@@ -19198,8 +19198,8 @@ but dumps still have to be confirmed.
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mega turrican (may 18, 1993 prototype).bin" size="1048576" crc="3ba35acd" sha1="486fd963b1389806a565dab21c81c46c273c8e5f"/>
 <!-- labels on 512K 27C040s:
-                <rom name="megaturrican odd" size="524288" crc="" sha1="" offset="0x000001" loadflag="load16_byte"/>
-                <rom name="megaturrican even" size="524288" crc="" sha1="" offset="0x000000" loadflag="load16_byte"/>
+                <rom name="megaturrican odd" size="524288" crc="b24e7a97" sha1="37039c6d7e86c859ab8e09c3c1b9f76020806654" offset="0x000000" loadflag="load16_byte"/>
+                <rom name="megaturrican even" size="524288" crc="5575b737" sha1="e33960471e50beff20320b0e40115aa872452c3c" offset="0x000001" loadflag="load16_byte"/>
 -->
 			</dataarea>
 		</part>
@@ -31412,7 +31412,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- dumps which need ad hoc handlers to be installed in the emulator -->
 
-<!-- This cart is missing the higher bank containing Dragon Ball game -->
+	<!-- This cart is missing the higher bank containing Dragon Ball game -->
 	<software name="12in1">
 		<description>12 in 1 (Incomplete Dump)</description>
 		<year>199?</year>
@@ -31497,7 +31497,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- // this contains only the first bank, so most of the games are missing -->
+	<!-- This contains only the first bank, so most of the games are missing -->
 	<software name="golden10" supported="partial">
 		<description>Golden 10 in 1 (Incomplete Dump)</description>
 		<year>199?</year>
@@ -31710,14 +31710,16 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+
+	<!-- This dump is incomplete and is missing the entire second half -->
 	<software name="s19in1" supported="partial">
 		<description>Super 19 in 1 (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mcpir"/>
-			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="super 19-in-1 (pirate).bin" size="4194304" crc="0ad2b342" sha1="e1c041ba69da087c428dcda16850159f3caebd4b" offset="00000"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="super 19-in-1 (pirate).bin" size="2097152" crc="52224f30" sha1="b4c822f8a36083b282cec7c6353ce6bcbc063972" offset="00000" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

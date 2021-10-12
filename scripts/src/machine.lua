@@ -826,6 +826,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/applepic.h,MACHINES["APPLEPIC"] = true
+---------------------------------------------------
+
+if (MACHINES["APPLEPIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/applepic.cpp",
+		MAME_DIR .. "src/devices/machine/applepic.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/at28c16.h,MACHINES["AT28C16"] = true
 ---------------------------------------------------
 
@@ -3438,6 +3450,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/upd4991a.h,MACHINES["UPD4991A"] = true
+---------------------------------------------------
+
+if (MACHINES["UPD4991A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upd4991a.cpp",
+		MAME_DIR .. "src/devices/machine/upd4991a.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upd4992.h,MACHINES["UPD4992"] = true
 ---------------------------------------------------
 
@@ -4156,6 +4180,17 @@ if (MACHINES["SMARTMEDIA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/smartmed.cpp",
 		MAME_DIR .. "src/devices/machine/smartmed.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/spi_sdcard.h,MACHINES["SPISDCARD"] = true
+---------------------------------------------------
+if (MACHINES["SPISDCARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/spi_sdcard.cpp",
+		MAME_DIR .. "src/devices/machine/spi_sdcard.h",
 	}
 end
 

@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
+DEFINE_DEVICE_TYPE(HPDIO_98544, bus::hp_dio::dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
 
 namespace bus::hp_dio {
 

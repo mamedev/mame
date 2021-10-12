@@ -226,8 +226,8 @@ private:
 
 	void dgnbeta_map(address_map &map);
 
-	void execute_beta_key_dump(int ref, const std::vector<std::string> &params);
-	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);
+	void execute_beta_key_dump(const std::vector<std::string> &params);
+	void execute_beta_dat_log(const std::vector<std::string> &params);
 };
 
 #endif // MAME_INCLUDES_DGN_BETA_H

@@ -656,6 +656,7 @@ konblands.cpp
 konendev.cpp
 kongs470.cpp
 konmedal.cpp
+konmedal020.cpp
 konmedal68k.cpp
 kontest.cpp
 kopunch.cpp
@@ -925,6 +926,7 @@ olibochu.cpp
 omegrace.cpp
 oneshot.cpp
 onetwo.cpp
+opercoin.cpp
 opwolf.cpp
 orbit.cpp
 othello.cpp
@@ -1030,6 +1032,7 @@ quizshow.cpp
 r2dtank.cpp
 r2dx_v33.cpp
 rabbit.cpp
+radikaldarts.cpp
 raiden.cpp
 raiden2.cpp
 raiden_ms.cpp
@@ -1043,6 +1046,7 @@ rbmk.cpp
 rcorsair.cpp
 re900.cpp
 realbrk.cpp
+recel.cpp
 redalert.cpp
 redclash.cpp
 relief.cpp
@@ -1520,10 +1524,11 @@ zwackery.cpp
 -ng_mv2f
 -ng_mv4f
 //saturn.cpp
--saturn
--saturnjp
--saturneu
--vsaturn
 -hisaturn
+-saturn
+-saturneu
+-saturnjp
+-saturnkr
+-vsaturn
 //vectrex.cpp
 -vectrex

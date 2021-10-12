@@ -78,15 +78,116 @@ Stephh's notes (based on the games M68000 code and some tests) :
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/karnov.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs51/mcs51.h"
+#include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
+#include "video/bufsprite.h"
+#include "video/deckarn.h"
+#include "video/decrmc3.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+
+/*************************************
+ *
+ *  Type definitions
+ *
+ *************************************/
+
+class karnov_state : public driver_device
+{
+public:
+	karnov_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"),
+		m_screen(*this, "screen"),
+		m_spriteram(*this, "spriteram") ,
+		m_spritegen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_ram(*this, "ram"),
+		m_videoram(*this, "videoram"),
+		m_pf_data(*this, "pf_data"),
+		m_scroll(*this, "scroll") { }
+
+	void chelnovjbl(machine_config &config);
+	void karnov(machine_config &config);
+	void wndrplnt(machine_config &config);
+	void karnovjbl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<mcs51_cpu_device> m_mcu;
+	required_device<screen_device> m_screen;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<deco_karnovsprites_device> m_spritegen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<deco_rmc3_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_pf_data;
+	required_shared_ptr<uint16_t> m_scroll;
+
+	// video
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fix_tilemap;
+
+	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	DECLARE_VIDEO_START(karnov);
+	DECLARE_VIDEO_START(wndrplnt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void base_sound_map(address_map &map);
+	void chelnovjbl_mcu_map(address_map &map);
+	void chelnovjbl_mcu_io_map(address_map &map);
+	void karnov_map(address_map &map);
+	void karnovjbl_map(address_map &map);
+	void karnov_sound_map(address_map &map);
+	void karnovjbl_sound_map(address_map &map);
+
+	// protection mcu
+	void mcu_coin_irq(int state);
+	void mcu_ack_w(uint16_t data);
+	uint16_t mcu_r();
+	void mcu_w(uint16_t data);
+	void mcu_p2_w(uint8_t data);
+
+	// protection mcu (bootleg specific)
+	uint8_t mcu_data_l_r();
+	void mcu_data_l_w(uint8_t data);
+	uint8_t mcu_data_h_r();
+	void mcu_data_h_w(uint8_t data);
+	void mcubl_p1_w(uint8_t data);
+
+	uint8_t m_mcu_p0;
+	uint8_t m_mcu_p1;
+	uint8_t m_mcu_p2;
+	uint16_t m_mcu_to_maincpu;
+	uint16_t m_maincpu_to_mcu;
+	bool m_coin_state;
+};
 
 
 /*************************************
@@ -199,119 +300,6 @@ void karnov_state::mcubl_p1_w(uint8_t data)
 	m_mcu_p1 = data;
 }
 
-// mcu simulation below
-
-void karnov_state::wndrplnt_mcu_w( uint16_t data )
-{
-	/* The last command hasn't been ACK'd (probably a conflict with coin command) */
-	if (m_i8751_needs_ack)
-	{
-		m_i8751_command_queue = data;
-		return;
-	}
-
-	m_i8751_return=0;
-
-	if (data == 0x100) m_i8751_return = 0x67a;
-	if (data == 0x200) m_i8751_return = 0x214;
-	if (data == 0x300) m_i8751_return = 0x17; /* Copyright text on title screen */
-//  if (data == 0x300) m_i8751_return = 0x1; /* (USA) Copyright text on title screen */
-
-	/* The game writes many values in the 0x600 range, but only a specific mask
-	matters for the return value */
-	if ((data & 0x600) == 0x600)
-	{
-		switch (data & 0x18)
-		{
-			case 0x00:  m_i8751_return = 0x4d53; break;
-			case 0x08:  m_i8751_return = 0x4b54; break;
-			case 0x10:  m_i8751_return = 0x5453; break;
-			case 0x18:  m_i8751_return = 0x5341; break;
-		}
-	}
-//  else logerror("%s - Unknown Write %02x intel\n", machine().describe_context(), data);
-
-	/* These are 68k function call addresses - different address for each power-up */
-	if (data == 0x400) m_i8751_return = 0x594;
-	if (data == 0x401) m_i8751_return = 0x5ea;
-	if (data == 0x402) m_i8751_return = 0x628;
-	if (data == 0x403) m_i8751_return = 0x66c;
-	if (data == 0x404) m_i8751_return = 0x6a4;
-	if (data == 0x405) m_i8751_return = 0x6a4;
-	if (data == 0x406) m_i8751_return = 0x6a4;
-
-	/* This is 68k program code which is executed every frame */
-	if (data == 0x50c) m_i8751_return = 0x13fc;
-	if (data == 0x50b) m_i8751_return = 0x00ff;
-	if (data == 0x50a) m_i8751_return = 0x0006;
-	if (data == 0x509) m_i8751_return = 0x0000;
-	if (data == 0x508) m_i8751_return = 0x4a39;
-	if (data == 0x507) m_i8751_return = 0x0006;
-	if (data == 0x506) m_i8751_return = 0x0000;
-	if (data == 0x505) m_i8751_return = 0x66f8;
-	if (data == 0x504) m_i8751_return = 0x4a39;
-	if (data == 0x503) m_i8751_return = 0x000c;
-	if (data == 0x502) m_i8751_return = 0x0003;
-	if (data == 0x501) m_i8751_return = 0x6bf8;
-	if (data == 0x500) m_i8751_return = 0x4e75;
-
-	m_maincpu->set_input_line(6, HOLD_LINE); /* Signal main cpu task is complete */
-	m_i8751_needs_ack = 1;
-}
-
-
-/*************************************
- *
- *  Memory handlers
- *
- *************************************/
-
-void karnov_state::wndrplnt_mcu_ack_w(u16 data)
-{
-	m_maincpu->set_input_line(6, CLEAR_LINE);
-
-	if (m_i8751_needs_ack)
-	{
-		/* If a command and coin insert happen at once, then the i8751 will queue the coin command until the previous command is ACK'd */
-		if (m_i8751_coin_pending)
-		{
-			m_i8751_return = m_i8751_coin_pending;
-			m_maincpu->set_input_line(6, HOLD_LINE);
-			m_i8751_coin_pending = 0;
-		}
-		else if (m_i8751_command_queue)
-		{
-			/* Pending control command - just write it back as SECREQ */
-			m_i8751_needs_ack = 0;
-			wndrplnt_mcu_w(m_i8751_command_queue);
-			m_i8751_command_queue = 0;
-		}
-		else
-		{
-			m_i8751_needs_ack = 0;
-		}
-	}
-}
-
-u16 karnov_state::wndrplnt_mcu_r()
-{
-	return m_i8751_return;
-}
-
-void karnov_state::wndrplnt_mcu_reset_w(u16 data)
-{
-	logerror("Reset i8751\n");
-	m_i8751_needs_ack = 0;
-	m_i8751_coin_pending = 0;
-	m_i8751_command_queue = 0;
-	m_i8751_return = 0;
-}
-
-void karnov_state::vint_ack_w(u16 data)
-{
-	m_maincpu->set_input_line(7, CLEAR_LINE);
-}
-
 
 /*************************************
  *
@@ -335,7 +323,7 @@ void karnov_state::karnov_map(address_map &map)
 	map(0x0c0004, 0x0c0005).portr("DSW").w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::mcu_r), FUNC(karnov_state::mcu_w));
 	map(0x0c0008, 0x0c000b).writeonly().share("scroll");
-	map(0x0c000e, 0x0c000f).nopr().w(FUNC(karnov_state::vint_ack_w));
+	map(0x0c000e, 0x0c000f).nopr().lw16([this](u16 data) { m_maincpu->set_input_line(7, CLEAR_LINE); }, "vint_ack_w");
 }
 
 void karnov_state::karnovjbl_map(address_map &map)
@@ -343,14 +331,6 @@ void karnov_state::karnovjbl_map(address_map &map)
 	karnov_map(map);
 	map(0x0c0000, 0x0c0001).portr("P1_P2").nopw();
 	map(0x0c0006, 0x0c0007).lr16(NAME([]() { return 0x56a; })).lw16(NAME([this](u16 data) { m_maincpu->set_input_line(6, HOLD_LINE); }));
-}
-
-void karnov_state::wndrplnt_map(address_map &map)
-{
-	karnov_map(map);
-	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::wndrplnt_mcu_ack_w));
-	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::wndrplnt_mcu_r), FUNC(karnov_state::wndrplnt_mcu_w));
-	map(0x0c000c, 0x0c000d).w(FUNC(karnov_state::wndrplnt_mcu_reset_w));
 }
 
 void karnov_state::base_sound_map(address_map &map)
@@ -409,17 +389,17 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+	PORT_START("COIN")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 INPUT_PORTS_END
 
 /* verified from M68000 code */
 static INPUT_PORTS_START( karnov )
 	PORT_INCLUDE( common )
-
-	PORT_START("COIN")
-	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2")
@@ -467,6 +447,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( karnovjbl )
 	PORT_INCLUDE(karnov)
 
+	// no interrupt on coin input here
 	PORT_MODIFY("COIN")
 	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN1)
@@ -481,11 +462,6 @@ static INPUT_PORTS_START( wndrplnt )
 	PORT_MODIFY("P1_P2")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_COCKTAIL */
-
-	PORT_START("COIN")  /* Dummy input for i8751 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2")
@@ -530,12 +506,6 @@ INPUT_PORTS_END
 /* verified from M68000 code */
 static INPUT_PORTS_START( chelnov )
 	PORT_INCLUDE( common )
-
-	PORT_START("COIN")
-	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2")
@@ -618,6 +588,72 @@ INPUT_PORTS_END
 
 /*************************************
  *
+ *  Video emulation
+ *
+ *************************************/
+
+uint32_t karnov_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int const flip = BIT(m_scroll[0], 15);
+
+	m_bg_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_spritegen->set_flip_screen(flip);
+
+	m_bg_tilemap->set_scrollx(m_scroll[0]);
+	m_bg_tilemap->set_scrolly(m_scroll[1]);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram->buffer(), 0x800);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
+{
+	int tile = m_videoram[tile_index];
+	tileinfo.set(0, tile & 0xfff, tile >> 14, 0);
+}
+
+TILE_GET_INFO_MEMBER(karnov_state::get_bg_tile_info)
+{
+	int tile = m_pf_data[tile_index];
+	tileinfo.set(1, tile & 0x7ff, tile >> 12, 0);
+}
+
+void karnov_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_videoram[offset]);
+	m_fix_tilemap->mark_tile_dirty(offset);
+}
+
+void karnov_state::playfield_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_pf_data[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+VIDEO_START_MEMBER(karnov_state, karnov)
+{
+	/* Allocate bitmap & tilemap */
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_fix_tilemap->set_transparent_pen(0);
+}
+
+VIDEO_START_MEMBER(karnov_state, wndrplnt)
+{
+	/* Allocate bitmap & tilemap */
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_fix_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+
+	m_fix_tilemap->set_transparent_pen(0);
+}
+
+
+/*************************************
+ *
  *  Graphics definitions
  *
  *************************************/
@@ -654,60 +690,12 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Interrupt generator
- *
- *************************************/
-
-WRITE_LINE_MEMBER(karnov_state::wndrplnt_mcusim_vbint_w)
-{
-	if (!state)
-		return;
-
-	uint8_t port = ioport("COIN")->read();
-
-	/* Coin input to the i8751 generates an interrupt to the main cpu */
-	if (port == 0)
-		m_latch = 1;
-
-	if (port != 0 && m_latch)
-	{
-		if (m_i8751_needs_ack)
-		{
-			/* i8751 is busy - queue the command */
-			m_i8751_coin_pending = port | 0x8000;
-		}
-		else
-		{
-			m_i8751_return = port | 0x8000;
-			m_maincpu->set_input_line(6, ASSERT_LINE);
-			m_i8751_needs_ack = 1;
-		}
-
-		m_latch = 0;
-	}
-
-	m_maincpu->set_input_line(7, ASSERT_LINE);
-}
-
-void karnov_state::vbint_w(int state)
-{
-	m_maincpu->set_input_line(7, ASSERT_LINE);
-}
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
 
 void karnov_state::machine_start()
 {
-	save_item(NAME(m_i8751_return));
-	save_item(NAME(m_i8751_needs_ack));
-	save_item(NAME(m_i8751_coin_pending));
-	save_item(NAME(m_i8751_command_queue));
-	save_item(NAME(m_latch));
 	save_item(NAME(m_mcu_p0));
 	save_item(NAME(m_mcu_p1));
 	save_item(NAME(m_mcu_p2));
@@ -719,12 +707,6 @@ void karnov_state::machine_start()
 void karnov_state::machine_reset()
 {
 	memset(m_ram, 0, 0x4000 / 2); /* Chelnov likes ram clear on reset.. */
-
-	m_i8751_return = 0;
-	m_i8751_needs_ack = 0;
-	m_i8751_coin_pending = 0;
-	m_i8751_command_queue = 0;
-//  m_latch = 0;
 
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
@@ -763,7 +745,7 @@ void karnov_state::karnov(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(karnov_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(karnov_state::vbint_w));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 7, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
@@ -809,6 +791,13 @@ void karnov_state::karnovjbl(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void karnov_state::wndrplnt(machine_config &config)
+{
+	karnov(config);
+
+	MCFG_VIDEO_START_OVERRIDE(karnov_state, wndrplnt)
+}
+
 void karnov_state::chelnovjbl(machine_config &config)
 {
 	karnov(config);
@@ -822,50 +811,6 @@ void karnov_state::chelnovjbl(machine_config &config)
 	m_mcu->set_addrmap(AS_IO, &karnov_state::chelnovjbl_mcu_io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(karnov_state::mcubl_p1_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
-}
-
-void karnov_state::wndrplnt(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 20_MHz_XTAL/2);   /* 10 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::wndrplnt_map);
-
-	M6502(config, m_audiocpu, 12_MHz_XTAL/8);    /* Accurate */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
-
-	/* video hardware */
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(karnov_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(karnov_state::wndrplnt_mcusim_vbint_w));
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
-	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
-	m_palette->set_prom_region("proms");
-	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
-
-	DECO_KARNOVSPRITES(config, m_spritegen, 0);
-
-	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-
-	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL/8)); // 1.5 MHz
-	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL/4)); // 3 MHz
-	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -1050,7 +995,7 @@ ROM_START( wndrplnt )
 	ROM_LOAD( "ea05.f3",     0x8000, 0x8000, CRC(8dbb6231) SHA1(342faa020448ce916e820b3df18d44191983f7a6) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "wndrplnt_i8751.k14", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "ea.k14", 0x0000, 0x1000, CRC(b481f6a9) SHA1(e2c4376662fc7b209cd6a2f4e9a85807c8af2548) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ea00.c5",    0x00000, 0x08000, CRC(9f3cac4c) SHA1(af8a275ff531029dbada3c820c9f660fef383100) )   /* Characters */
@@ -1273,6 +1218,9 @@ ROM_START( chelnovjbla )
 	ROM_LOAD( "ee-17.k8",     0x0000, 0x0400, CRC(b1db6586) SHA1(a7ecfcb4cf0f7450900820b3dfad8813efedfbea) )    /* not dumped here, taken from parent */
 	ROM_LOAD( "ee-16.l6",     0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) )
 ROM_END
+
+
+} // Anonymous namespace
 
 
 /*************************************

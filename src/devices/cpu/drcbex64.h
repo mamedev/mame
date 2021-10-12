@@ -18,6 +18,8 @@
 
 #include "asmjit/src/asmjit/asmjit.h"
 
+#include <vector>
+
 
 namespace drc {
 
@@ -230,9 +232,9 @@ private:
 	x86log_context *        m_log;                  // logging
 	FILE *                  m_log_asmjit;
 
-	uint32_t *                m_absmask32;            // absolute value mask (32-bit)
-	uint64_t *                m_absmask64;            // absolute value mask (32-bit)
-	uint8_t *                 m_rbpvalue;             // value of RBP
+	uint32_t *              m_absmask32;            // absolute value mask (32-bit)
+	uint64_t *              m_absmask64;            // absolute value mask (32-bit)
+	uint8_t *               m_rbpvalue;             // value of RBP
 
 	x86_entry_point_func    m_entry;                // entry point
 	x86code *               m_exit;                 // exit point
@@ -246,22 +248,46 @@ private:
 		x86code *           debug_log_hashjmp_fail; // hashjmp debugging
 		x86code *           drcmap_get_value;       // map lookup helper
 
-		uint32_t              ssemode;                // saved SSE mode
-		uint32_t              ssemodesave;            // temporary location for saving
-		uint32_t              ssecontrol[4];          // copy of the sse_control array
+		uint32_t            ssemode;                // saved SSE mode
+		uint32_t            ssemodesave;            // temporary location for saving
+		uint32_t            ssecontrol[4];          // copy of the sse_control array
 		float               single1;                // 1.0 is single-precision
 		double              double1;                // 1.0 in double-precision
 
 		void *              stacksave;              // saved stack pointer
 		void *              hashstacksave;          // saved stack pointer for hashjmp
 
-		uint8_t               flagsmap[0x1000];       // flags map
-		uint64_t              flagsunmap[0x20];       // flags unmapper
+		uint8_t             flagsmap[0x1000];       // flags map
+		uint64_t            flagsunmap[0x20];       // flags unmapper
 	};
 	near_state &            m_near;
 
+	// resolved memory handler functions
+	struct resolved_handler { uintptr_t obj = 0; x86code *func = nullptr; };
+	struct resolved_accessors
+	{
+
+		resolved_handler    read_byte;
+		resolved_handler    read_word;
+		resolved_handler    read_word_masked;
+		resolved_handler    read_dword;
+		resolved_handler    read_dword_masked;
+		resolved_handler    read_qword;
+		resolved_handler    read_qword_masked;
+
+		resolved_handler    write_byte;
+		resolved_handler    write_word;
+		resolved_handler    write_word_masked;
+		resolved_handler    write_dword;
+		resolved_handler    write_dword_masked;
+		resolved_handler    write_qword;
+		resolved_handler    write_qword_masked;
+	};
+	using resolved_accessors_vector = std::vector<resolved_accessors>;
+	resolved_accessors_vector m_resolved_accessors;
+
 	// globals
-	typedef void (drcbe_x64::*opcode_generate_func)(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	using opcode_generate_func = void (drcbe_x64::*)(asmjit::x86::Assembler &, const uml::instruction &);
 	struct opcode_table_entry
 	{
 		uml::opcode_t           opcode;             // opcode in question

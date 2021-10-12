@@ -434,9 +434,9 @@
 #include "genboard.h"
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(GENEVE_GATE_ARRAY, bus::ti99::internal, geneve_gate_array_device, "geneve_gate_array", "Geneve Gate Array")
-DEFINE_DEVICE_TYPE_NS(GENMOD_DECODER,    bus::ti99::internal, genmod_decoder_device, "genmod_decoder", "GenMod decoder circuit")
-DEFINE_DEVICE_TYPE_NS(GENEVE_PAL,        bus::ti99::internal, geneve_pal_device, "geneve_pal", "Geneve PAL circuit")
+DEFINE_DEVICE_TYPE(GENEVE_GATE_ARRAY, bus::ti99::internal::geneve_gate_array_device, "geneve_gate_array", "Geneve Gate Array")
+DEFINE_DEVICE_TYPE(GENMOD_DECODER,    bus::ti99::internal::genmod_decoder_device, "genmod_decoder", "GenMod decoder circuit")
+DEFINE_DEVICE_TYPE(GENEVE_PAL,        bus::ti99::internal::geneve_pal_device, "geneve_pal", "Geneve PAL circuit")
 
 namespace bus::ti99::internal {
 

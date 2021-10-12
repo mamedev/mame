@@ -4319,7 +4319,7 @@ float nv2a_renderer::combiner_map_input_function(Combiner::MapFunction code, flo
 	case 0: // unsigned identity
 		return std::max(0.0f, value);
 	case 1: // unsigned invert
-		return 1.0f - std::min(std::max(value, 0.0f), 1.0f);
+		return 1.0f - std::clamp(value, 0.0f, 1.0f);
 	case 2: // expand normal
 		return 2.0f * std::max(0.0f, value) - 1.0f;
 	case 3: // expand negate
@@ -4348,9 +4348,9 @@ void nv2a_renderer::combiner_map_input_function_array(Combiner::MapFunction code
 		data[2] = std::max(0.0f, data[2]);
 		break;
 	case 1:
-		data[0] = 1.0f - std::min(std::max(data[0], 0.0f), 1.0f);
-		data[1] = 1.0f - std::min(std::max(data[1], 0.0f), 1.0f);
-		data[2] = 1.0f - std::min(std::max(data[2], 0.0f), 1.0f);
+		data[0] = 1.0f - std::clamp(data[0], 0.0f, 1.0f);
+		data[1] = 1.0f - std::clamp(data[1], 0.0f, 1.0f);
+		data[2] = 1.0f - std::clamp(data[2], 0.0f, 1.0f);
 		break;
 	case 2:
 		data[0] = 2.0f * std::max(0.0f, data[0]) - 1.0f;
@@ -4697,9 +4697,9 @@ void nv2a_renderer::combiner_compute_rgb_outputs(int id, int stage_number)
 		m = 0;
 		combiner_function_AB(id, combiner.work[id].functions.RGBop1);
 	}
-	combiner.work[id].functions.RGBop1[0] = std::max(std::min((combiner.work[id].functions.RGBop1[0] + bias) * scale, 1.0f), -1.0f);
-	combiner.work[id].functions.RGBop1[1] = std::max(std::min((combiner.work[id].functions.RGBop1[1] + bias) * scale, 1.0f), -1.0f);
-	combiner.work[id].functions.RGBop1[2] = std::max(std::min((combiner.work[id].functions.RGBop1[2] + bias) * scale, 1.0f), -1.0f);
+	combiner.work[id].functions.RGBop1[0] = std::clamp((combiner.work[id].functions.RGBop1[0] + bias) * scale, -1.0f, 1.0f);
+	combiner.work[id].functions.RGBop1[1] = std::clamp((combiner.work[id].functions.RGBop1[1] + bias) * scale, -1.0f, 1.0f);
+	combiner.work[id].functions.RGBop1[2] = std::clamp((combiner.work[id].functions.RGBop1[2] + bias) * scale, -1.0f, 1.0f);
 	// second
 	if (combiner.setup.stage[n].mapout_rgb.CD_dotproduct) {
 		m = m | 1;
@@ -4707,18 +4707,18 @@ void nv2a_renderer::combiner_compute_rgb_outputs(int id, int stage_number)
 	}
 	else
 		combiner_function_CD(id, combiner.work[id].functions.RGBop2);
-	combiner.work[id].functions.RGBop2[0] = std::max(std::min((combiner.work[id].functions.RGBop2[0] + bias) * scale, 1.0f), -1.0f);
-	combiner.work[id].functions.RGBop2[1] = std::max(std::min((combiner.work[id].functions.RGBop2[1] + bias) * scale, 1.0f), -1.0f);
-	combiner.work[id].functions.RGBop2[2] = std::max(std::min((combiner.work[id].functions.RGBop2[2] + bias) * scale, 1.0f), -1.0f);
+	combiner.work[id].functions.RGBop2[0] = std::clamp((combiner.work[id].functions.RGBop2[0] + bias) * scale, -1.0f, 1.0f);
+	combiner.work[id].functions.RGBop2[1] = std::clamp((combiner.work[id].functions.RGBop2[1] + bias) * scale, -1.0f, 1.0f);
+	combiner.work[id].functions.RGBop2[2] = std::clamp((combiner.work[id].functions.RGBop2[2] + bias) * scale, -1.0f, 1.0f);
 	// third
 	if (m == 0) {
 		if (combiner.setup.stage[n].mapout_rgb.muxsum)
 			combiner_function_ABmuxCD(id, combiner.work[id].functions.RGBop3);
 		else
 			combiner_function_ABsumCD(id, combiner.work[id].functions.RGBop3);
-		combiner.work[id].functions.RGBop3[0] = std::max(std::min((combiner.work[id].functions.RGBop3[0] + bias) * scale, 1.0f), -1.0f);
-		combiner.work[id].functions.RGBop3[1] = std::max(std::min((combiner.work[id].functions.RGBop3[1] + bias) * scale, 1.0f), -1.0f);
-		combiner.work[id].functions.RGBop3[2] = std::max(std::min((combiner.work[id].functions.RGBop3[2] + bias) * scale, 1.0f), -1.0f);
+		combiner.work[id].functions.RGBop3[0] = std::clamp((combiner.work[id].functions.RGBop3[0] + bias) * scale, -1.0f, 1.0f);
+		combiner.work[id].functions.RGBop3[1] = std::clamp((combiner.work[id].functions.RGBop3[1] + bias) * scale, -1.0f, 1.0f);
+		combiner.work[id].functions.RGBop3[2] = std::clamp((combiner.work[id].functions.RGBop3[2] + bias) * scale, -1.0f, 1.0f);
 	}
 }
 
@@ -4749,10 +4749,10 @@ void nv2a_renderer::combiner_compute_alpha_outputs(int id, int stage_number)
 	}
 	// first
 	combiner.work[id].functions.Aop1 = combiner.work[id].variables.A[3] * combiner.work[id].variables.B[3];
-	combiner.work[id].functions.Aop1 = std::max(std::min((combiner.work[id].functions.Aop1 + bias) * scale, 1.0f), -1.0f);
+	combiner.work[id].functions.Aop1 = std::clamp((combiner.work[id].functions.Aop1 + bias) * scale, -1.0f, 1.0f);
 	// second
 	combiner.work[id].functions.Aop2 = combiner.work[id].variables.C[3] * combiner.work[id].variables.D[3];
-	combiner.work[id].functions.Aop2 = std::max(std::min((combiner.work[id].functions.Aop2 + bias) * scale, 1.0f), -1.0f);
+	combiner.work[id].functions.Aop2 = std::clamp((combiner.work[id].functions.Aop2 + bias) * scale, -1.0f, 1.0f);
 	// third
 	if (combiner.setup.stage[n].mapout_alpha.muxsum) {
 		if (combiner.work[id].registers.spare0[3] >= 0.5f)
@@ -4762,7 +4762,7 @@ void nv2a_renderer::combiner_compute_alpha_outputs(int id, int stage_number)
 	}
 	else
 		combiner.work[id].functions.Aop3 = combiner.work[id].variables.A[3] * combiner.work[id].variables.B[3] + combiner.work[id].variables.C[3] * combiner.work[id].variables.D[3];
-	combiner.work[id].functions.Aop3 = std::max(std::min((combiner.work[id].functions.Aop3 + bias) * scale, 1.0f), -1.0f);
+	combiner.work[id].functions.Aop3 = std::clamp((combiner.work[id].functions.Aop3 + bias) * scale, -1.0f, 1.0f);
 }
 
 WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)

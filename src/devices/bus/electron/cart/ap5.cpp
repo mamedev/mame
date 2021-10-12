@@ -161,7 +161,7 @@ image_init_result electron_ap5_device::load_rom(device_image_interface &image, g
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 8K/16K is supported");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 8K/16K is supported");
 		return image_init_result::FAIL;
 	}
 

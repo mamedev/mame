@@ -816,11 +816,11 @@ void lethalj_state::gameroom(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki1", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+	OKIM6295(config, "oki1", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	OKIM6295(config, "oki2", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+	OKIM6295(config, "oki2", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	OKIM6295(config, "oki3", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+	OKIM6295(config, "oki3", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
 

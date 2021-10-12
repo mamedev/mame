@@ -69,8 +69,13 @@ nes_hkrom_device::nes_hkrom_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_TXSROM, tag, owner, clock)
+nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txsrom_device(mconfig, NES_TXSROM, tag, owner, clock)
 {
 }
 
@@ -283,7 +288,8 @@ void nes_txrom_device::txrom_write(offs_t offset, uint8_t data)
 			break;
 
 		case 0x2000:
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			if (m_mirroring != PPU_MIRROR_4SCREEN)
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x2001:

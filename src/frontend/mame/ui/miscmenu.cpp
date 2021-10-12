@@ -15,6 +15,7 @@
 #include "ui/selector.h"
 #include "ui/submenu.h"
 #include "ui/ui.h"
+#include "ui/utils.h"
 
 #include "infoxml.h"
 #include "mame.h"
@@ -599,11 +600,11 @@ void menu_export::handle()
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-				if (infile.open(filename + ".xml") == osd_file::error::NONE)
+				if (!infile.open(filename + ".xml"))
 					for (int seq = 0; ; ++seq)
 					{
 						const std::string seqtext = string_format("%s_%04d", filename, seq);
-						if (infile.open(seqtext + ".xml") != osd_file::error::NONE)
+						if (infile.open(seqtext + ".xml"))
 						{
 							filename = seqtext;
 							break;
@@ -612,7 +613,7 @@ void menu_export::handle()
 
 				// attempt to open the output file
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				if (file.open(filename + ".xml") == osd_file::error::NONE)
+				if (!file.open(filename + ".xml"))
 				{
 					const std::string fullpath(file.fullpath());
 					file.close();
@@ -644,11 +645,11 @@ void menu_export::handle()
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-				if (infile.open(filename + ".txt") == osd_file::error::NONE)
+				if (!infile.open(filename + ".txt"))
 					for (int seq = 0; ; ++seq)
 					{
 						const std::string seqtext = string_format("%s_%04d", filename, seq);
-						if (infile.open(seqtext + ".txt") != osd_file::error::NONE)
+						if (infile.open(seqtext + ".txt"))
 						{
 							filename = seqtext;
 							break;
@@ -657,7 +658,7 @@ void menu_export::handle()
 
 				// attempt to open the output file
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				if (file.open(filename + ".txt") == osd_file::error::NONE)
+				if (!file.open(filename + ".txt"))
 				{
 					// print the header
 					std::ostringstream buffer;
@@ -702,11 +703,33 @@ void menu_export::populate(float &customtop, float &custombottom)
 menu_machine_configure::menu_machine_configure(
 		mame_ui_manager &mui,
 		render_container &container,
+		ui_system_info const &info,
+		std::function<void (bool, bool)> &&handler,
+		float x0, float y0)
+	: menu_machine_configure(mui, container, info.description.c_str(), *info.driver, std::move(handler), x0, y0)
+{
+}
+
+menu_machine_configure::menu_machine_configure(
+		mame_ui_manager &mui,
+		render_container &container,
+		game_driver const &drv,
+		std::function<void (bool, bool)> &&handler,
+		float x0, float y0)
+	: menu_machine_configure(mui, container, drv.type.fullname(), drv, std::move(handler), x0, y0)
+{
+}
+
+menu_machine_configure::menu_machine_configure(
+		mame_ui_manager &mui,
+		render_container &container,
+		char const *description,
 		game_driver const &drv,
 		std::function<void (bool, bool)> &&handler,
 		float x0, float y0)
 	: menu(mui, container)
 	, m_handler(std::move(handler))
+	, m_description(description)
 	, m_drv(drv)
 	, m_x0(x0)
 	, m_y0(y0)
@@ -754,8 +777,8 @@ void menu_machine_configure::handle()
 				{
 					const std::string filename(m_drv.name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-					osd_file::error filerr = file.open(filename + ".ini");
-					if (filerr == osd_file::error::NONE)
+					std::error_condition const filerr = file.open(filename + ".ini");
+					if (!filerr)
 					{
 						std::string inistring = m_opts.output_ini();
 						file.puts(inistring);
@@ -835,7 +858,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure Machine:"), m_drv.type.fullname() };
+	char const *const text[] = { _("Configure Machine:"), m_description };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
@@ -891,7 +914,7 @@ menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_cont
 menu_plugins_configure::~menu_plugins_configure()
 {
 	emu_file file_plugin(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
+	if (file_plugin.open("plugin.ini"))
 		// Can't throw in a destructor, so let's ignore silently for
 		// now.  We shouldn't write files in a destructor in any case.
 		//
@@ -934,13 +957,20 @@ void menu_plugins_configure::handle()
 
 void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
-	plugin_options& plugins = mame_machine_manager::instance()->plugins();
+	plugin_options const &plugins = mame_machine_manager::instance()->plugins();
 
-	for (auto &curentry : plugins.plugins())
+	bool first(true);
+	for (auto const &curentry : plugins.plugins())
 	{
-		bool enabled = curentry.m_start;
-		item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
+		if ("library" != curentry.m_type)
+		{
+			first = false;
+			bool const enabled = curentry.m_start;
+			item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
+		}
 	}
+	if (first)
+		item_append(_("No plugins found"), 0, nullptr);
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }

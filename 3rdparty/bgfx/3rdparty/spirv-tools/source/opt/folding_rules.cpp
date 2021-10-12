@@ -14,6 +14,7 @@
 
 #include "source/opt/folding_rules.h"
 
+#include <climits>
 #include <limits>
 #include <memory>
 #include <utility>
@@ -35,6 +36,45 @@ const uint32_t kFMixXIdInIdx = 2;
 const uint32_t kFMixYIdInIdx = 3;
 const uint32_t kFMixAIdInIdx = 4;
 const uint32_t kStoreObjectInIdx = 1;
+
+// Some image instructions may contain an "image operands" argument.
+// Returns the operand index for the "image operands".
+// Returns -1 if the instruction does not have image operands.
+int32_t ImageOperandsMaskInOperandIndex(Instruction* inst) {
+  const auto opcode = inst->opcode();
+  switch (opcode) {
+    case SpvOpImageSampleImplicitLod:
+    case SpvOpImageSampleExplicitLod:
+    case SpvOpImageSampleProjImplicitLod:
+    case SpvOpImageSampleProjExplicitLod:
+    case SpvOpImageFetch:
+    case SpvOpImageRead:
+    case SpvOpImageSparseSampleImplicitLod:
+    case SpvOpImageSparseSampleExplicitLod:
+    case SpvOpImageSparseSampleProjImplicitLod:
+    case SpvOpImageSparseSampleProjExplicitLod:
+    case SpvOpImageSparseFetch:
+    case SpvOpImageSparseRead:
+      return inst->NumOperands() > 4 ? 2 : -1;
+    case SpvOpImageSampleDrefImplicitLod:
+    case SpvOpImageSampleDrefExplicitLod:
+    case SpvOpImageSampleProjDrefImplicitLod:
+    case SpvOpImageSampleProjDrefExplicitLod:
+    case SpvOpImageGather:
+    case SpvOpImageDrefGather:
+    case SpvOpImageSparseSampleDrefImplicitLod:
+    case SpvOpImageSparseSampleDrefExplicitLod:
+    case SpvOpImageSparseSampleProjDrefImplicitLod:
+    case SpvOpImageSparseSampleProjDrefExplicitLod:
+    case SpvOpImageSparseGather:
+    case SpvOpImageSparseDrefGather:
+      return inst->NumOperands() > 5 ? 3 : -1;
+    case SpvOpImageWrite:
+      return inst->NumOperands() > 3 ? 3 : -1;
+    default:
+      return -1;
+  }
+}
 
 // Returns the element width of |type|.
 uint32_t ElementWidth(const analysis::Type* type) {
@@ -85,6 +125,66 @@ Instruction* NonConstInput(IRContext* context, const analysis::Constant* c,
       inst->GetSingleWordInOperand(in_op));
 }
 
+std::vector<uint32_t> ExtractInts(uint64_t val) {
+  std::vector<uint32_t> words;
+  words.push_back(static_cast<uint32_t>(val));
+  words.push_back(static_cast<uint32_t>(val >> 32));
+  return words;
+}
+
+std::vector<uint32_t> GetWordsFromScalarIntConstant(
+    const analysis::IntConstant* c) {
+  assert(c != nullptr);
+  uint32_t width = c->type()->AsInteger()->width();
+  assert(width == 32 || width == 64);
+  if (width == 64) {
+    uint64_t uval = static_cast<uint64_t>(c->GetU64());
+    return ExtractInts(uval);
+  }
+  return {c->GetU32()};
+}
+
+std::vector<uint32_t> GetWordsFromScalarFloatConstant(
+    const analysis::FloatConstant* c) {
+  assert(c != nullptr);
+  uint32_t width = c->type()->AsFloat()->width();
+  assert(width == 32 || width == 64);
+  if (width == 64) {
+    utils::FloatProxy<double> result(c->GetDouble());
+    return result.GetWords();
+  }
+  utils::FloatProxy<float> result(c->GetFloat());
+  return result.GetWords();
+}
+
+std::vector<uint32_t> GetWordsFromNumericScalarOrVectorConstant(
+    analysis::ConstantManager* const_mgr, const analysis::Constant* c) {
+  if (const auto* float_constant = c->AsFloatConstant()) {
+    return GetWordsFromScalarFloatConstant(float_constant);
+  } else if (const auto* int_constant = c->AsIntConstant()) {
+    return GetWordsFromScalarIntConstant(int_constant);
+  } else if (const auto* vec_constant = c->AsVectorConstant()) {
+    std::vector<uint32_t> words;
+    for (const auto* comp : vec_constant->GetComponents()) {
+      auto comp_in_words =
+          GetWordsFromNumericScalarOrVectorConstant(const_mgr, comp);
+      words.insert(words.end(), comp_in_words.begin(), comp_in_words.end());
+    }
+    return words;
+  }
+  return {};
+}
+
+const analysis::Constant* ConvertWordsToNumericScalarOrVectorConstant(
+    analysis::ConstantManager* const_mgr, const std::vector<uint32_t>& words,
+    const analysis::Type* type) {
+  if (type->AsInteger() || type->AsFloat())
+    return const_mgr->GetConstant(type, words);
+  if (const auto* vec_type = type->AsVector())
+    return const_mgr->GetNumericVectorConstantWithWords(vec_type, words);
+  return nullptr;
+}
+
 // Returns the negation of |c|. |c| must be a 32 or 64 bit floating point
 // constant.
 uint32_t NegateFloatingPointConstant(analysis::ConstantManager* const_mgr,
@@ -105,13 +205,6 @@ uint32_t NegateFloatingPointConstant(analysis::ConstantManager* const_mgr,
   const analysis::Constant* negated_const =
       const_mgr->GetConstant(c->type(), std::move(words));
   return const_mgr->GetDefiningInstruction(negated_const)->result_id();
-}
-
-std::vector<uint32_t> ExtractInts(uint64_t val) {
-  std::vector<uint32_t> words;
-  words.push_back(static_cast<uint32_t>(val));
-  words.push_back(static_cast<uint32_t>(val >> 32));
-  return words;
 }
 
 // Negates the integer constant |c|. Returns the id of the defining instruction.
@@ -431,7 +524,8 @@ uint32_t PerformFloatingPointOperation(analysis::ConstantManager* const_mgr,
     float fval = val.getAsFloat();                                           \
     if (!IsValidResult(fval)) return 0;                                      \
     words = val.GetWords();                                                  \
-  }
+  }                                                                          \
+  static_assert(true, "require extra semicolon")
   switch (opcode) {
     case SpvOpFMul:
       FOLD_OP(*);
@@ -466,24 +560,19 @@ uint32_t PerformIntegerOperation(analysis::ConstantManager* const_mgr,
   uint32_t width = type->AsInteger()->width();
   assert(width == 32 || width == 64);
   std::vector<uint32_t> words;
-#define FOLD_OP(op)                                        \
-  if (width == 64) {                                       \
-    if (type->IsSigned()) {                                \
-      int64_t val = input1->GetS64() op input2->GetS64();  \
-      words = ExtractInts(static_cast<uint64_t>(val));     \
-    } else {                                               \
-      uint64_t val = input1->GetU64() op input2->GetU64(); \
-      words = ExtractInts(val);                            \
-    }                                                      \
-  } else {                                                 \
-    if (type->IsSigned()) {                                \
-      int32_t val = input1->GetS32() op input2->GetS32();  \
-      words.push_back(static_cast<uint32_t>(val));         \
-    } else {                                               \
-      uint32_t val = input1->GetU32() op input2->GetU32(); \
-      words.push_back(val);                                \
-    }                                                      \
-  }
+  // Regardless of the sign of the constant, folding is performed on an unsigned
+  // interpretation of the constant data. This avoids signed integer overflow
+  // while folding, and works because sign is irrelevant for the IAdd, ISub and
+  // IMul instructions.
+#define FOLD_OP(op)                                      \
+  if (width == 64) {                                     \
+    uint64_t val = input1->GetU64() op input2->GetU64(); \
+    words = ExtractInts(val);                            \
+  } else {                                               \
+    uint32_t val = input1->GetU32() op input2->GetU32(); \
+    words.push_back(val);                                \
+  }                                                      \
+  static_assert(true, "require extra semicolon")
   switch (opcode) {
     case SpvOpIMul:
       FOLD_OP(*);
@@ -514,7 +603,6 @@ uint32_t PerformOperation(analysis::ConstantManager* const_mgr, SpvOp opcode,
                           const analysis::Constant* input1,
                           const analysis::Constant* input2) {
   assert(input1 && input2);
-  assert(input1->type() == input2->type());
   const analysis::Type* type = input1->type();
   std::vector<uint32_t> words;
   if (const analysis::Vector* vector_type = type->AsVector()) {
@@ -876,12 +964,11 @@ FoldingRule MergeDivMulArithmetic() {
 // Fold divides of a constant and a negation.
 // Cases:
 // (-x) / 2 = x / -2
-// 2 / (-x) = 2 / -x
+// 2 / (-x) = -2 / x
 FoldingRule MergeDivNegateArithmetic() {
   return [](IRContext* context, Instruction* inst,
             const std::vector<const analysis::Constant*>& constants) {
-    assert(inst->opcode() == SpvOpFDiv || inst->opcode() == SpvOpSDiv ||
-           inst->opcode() == SpvOpUDiv);
+    assert(inst->opcode() == SpvOpFDiv || inst->opcode() == SpvOpSDiv);
     analysis::ConstantManager* const_mgr = context->get_constant_mgr();
     const analysis::Type* type =
         context->get_type_mgr()->GetType(inst->type_id());
@@ -1377,146 +1464,181 @@ FoldingRule IntMultipleBy1() {
   };
 }
 
-FoldingRule CompositeConstructFeedingExtract() {
-  return [](IRContext* context, Instruction* inst,
-            const std::vector<const analysis::Constant*>&) {
-    // If the input to an OpCompositeExtract is an OpCompositeConstruct,
-    // then we can simply use the appropriate element in the construction.
-    assert(inst->opcode() == SpvOpCompositeExtract &&
-           "Wrong opcode.  Should be OpCompositeExtract.");
-    analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
-    analysis::TypeManager* type_mgr = context->get_type_mgr();
+// Returns the number of elements that the |index|th in operand in |inst|
+// contributes to the result of |inst|.  |inst| must be an
+// OpCompositeConstructInstruction.
+uint32_t GetNumOfElementsContributedByOperand(IRContext* context,
+                                              const Instruction* inst,
+                                              uint32_t index) {
+  assert(inst->opcode() == SpvOpCompositeConstruct);
+  analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
+  analysis::TypeManager* type_mgr = context->get_type_mgr();
 
-    // If there are no index operands, then this rule cannot do anything.
-    if (inst->NumInOperands() <= 1) {
-      return false;
-    }
+  analysis::Vector* result_type =
+      type_mgr->GetType(inst->type_id())->AsVector();
+  if (result_type == nullptr) {
+    // If the result of the OpCompositeConstruct is not a vector then every
+    // operands corresponds to a single element in the result.
+    return 1;
+  }
 
-    uint32_t cid = inst->GetSingleWordInOperand(kExtractCompositeIdInIdx);
-    Instruction* cinst = def_use_mgr->GetDef(cid);
-
-    if (cinst->opcode() != SpvOpCompositeConstruct) {
-      return false;
-    }
-
-    std::vector<Operand> operands;
-    analysis::Type* composite_type = type_mgr->GetType(cinst->type_id());
-    if (composite_type->AsVector() == nullptr) {
-      // Get the element being extracted from the OpCompositeConstruct
-      // Since it is not a vector, it is simple to extract the single element.
-      uint32_t element_index = inst->GetSingleWordInOperand(1);
-      uint32_t element_id = cinst->GetSingleWordInOperand(element_index);
-      operands.push_back({SPV_OPERAND_TYPE_ID, {element_id}});
-
-      // Add the remaining indices for extraction.
-      for (uint32_t i = 2; i < inst->NumInOperands(); ++i) {
-        operands.push_back({SPV_OPERAND_TYPE_LITERAL_INTEGER,
-                            {inst->GetSingleWordInOperand(i)}});
-      }
-
-    } else {
-      // With vectors we have to handle the case where it is concatenating
-      // vectors.
-      assert(inst->NumInOperands() == 2 &&
-             "Expecting a vector of scalar values.");
-
-      uint32_t element_index = inst->GetSingleWordInOperand(1);
-      for (uint32_t construct_index = 0;
-           construct_index < cinst->NumInOperands(); ++construct_index) {
-        uint32_t element_id = cinst->GetSingleWordInOperand(construct_index);
-        Instruction* element_def = def_use_mgr->GetDef(element_id);
-        analysis::Vector* element_type =
-            type_mgr->GetType(element_def->type_id())->AsVector();
-        if (element_type) {
-          uint32_t vector_size = element_type->element_count();
-          if (vector_size < element_index) {
-            // The element we want comes after this vector.
-            element_index -= vector_size;
-          } else {
-            // We want an element of this vector.
-            operands.push_back({SPV_OPERAND_TYPE_ID, {element_id}});
-            operands.push_back(
-                {SPV_OPERAND_TYPE_LITERAL_INTEGER, {element_index}});
-            break;
-          }
-        } else {
-          if (element_index == 0) {
-            // This is a scalar, and we this is the element we are extracting.
-            operands.push_back({SPV_OPERAND_TYPE_ID, {element_id}});
-            break;
-          } else {
-            // Skip over this scalar value.
-            --element_index;
-          }
-        }
-      }
-    }
-
-    // If there were no extra indices, then we have the final object.  No need
-    // to extract even more.
-    if (operands.size() == 1) {
-      inst->SetOpcode(SpvOpCopyObject);
-    }
-
-    inst->SetInOperands(std::move(operands));
-    return true;
-  };
+  // If the result type is a vector then the operands are either scalars or
+  // vectors. If it is a scalar, then it corresponds to a single element.  If it
+  // is a vector, then each element in the vector will be an element in the
+  // result.
+  uint32_t id = inst->GetSingleWordInOperand(index);
+  Instruction* def = def_use_mgr->GetDef(id);
+  analysis::Vector* type = type_mgr->GetType(def->type_id())->AsVector();
+  if (type == nullptr) {
+    return 1;
+  }
+  return type->element_count();
 }
 
-FoldingRule CompositeExtractFeedingConstruct() {
-  // If the OpCompositeConstruct is simply putting back together elements that
-  // where extracted from the same souce, we can simlpy reuse the source.
-  //
-  // This is a common code pattern because of the way that scalar replacement
-  // works.
-  return [](IRContext* context, Instruction* inst,
-            const std::vector<const analysis::Constant*>&) {
-    assert(inst->opcode() == SpvOpCompositeConstruct &&
-           "Wrong opcode.  Should be OpCompositeConstruct.");
-    analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
-    uint32_t original_id = 0;
+// Returns the in-operands for an OpCompositeExtract instruction that are needed
+// to extract the |result_index|th element in the result of |inst| without using
+// the result of |inst|. Returns the empty vector if |result_index| is
+// out-of-bounds. |inst| must be an |OpCompositeConstruct| instruction.
+std::vector<Operand> GetExtractOperandsForElementOfCompositeConstruct(
+    IRContext* context, const Instruction* inst, uint32_t result_index) {
+  assert(inst->opcode() == SpvOpCompositeConstruct);
+  analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
+  analysis::TypeManager* type_mgr = context->get_type_mgr();
 
-    // Check each element to make sure they are:
-    // - extractions
-    // - extracting the same position they are inserting
-    // - all extract from the same id.
-    for (uint32_t i = 0; i < inst->NumInOperands(); ++i) {
-      uint32_t element_id = inst->GetSingleWordInOperand(i);
-      Instruction* element_inst = def_use_mgr->GetDef(element_id);
+  analysis::Type* result_type = type_mgr->GetType(inst->type_id());
+  if (result_type->AsVector() == nullptr) {
+    uint32_t id = inst->GetSingleWordInOperand(result_index);
+    return {Operand(SPV_OPERAND_TYPE_ID, {id})};
+  }
 
-      if (element_inst->opcode() != SpvOpCompositeExtract) {
-        return false;
+  // If the result type is a vector, then vector operands are concatenated.
+  uint32_t total_element_count = 0;
+  for (uint32_t idx = 0; idx < inst->NumInOperands(); ++idx) {
+    uint32_t element_count =
+        GetNumOfElementsContributedByOperand(context, inst, idx);
+    total_element_count += element_count;
+    if (result_index < total_element_count) {
+      std::vector<Operand> operands;
+      uint32_t id = inst->GetSingleWordInOperand(idx);
+      Instruction* operand_def = def_use_mgr->GetDef(id);
+      analysis::Type* operand_type = type_mgr->GetType(operand_def->type_id());
+
+      operands.push_back({SPV_OPERAND_TYPE_ID, {id}});
+      if (operand_type->AsVector()) {
+        uint32_t start_index_of_id = total_element_count - element_count;
+        uint32_t index_into_id = result_index - start_index_of_id;
+        operands.push_back({SPV_OPERAND_TYPE_LITERAL_INTEGER, {index_into_id}});
       }
-
-      if (element_inst->NumInOperands() != 2) {
-        return false;
-      }
-
-      if (element_inst->GetSingleWordInOperand(1) != i) {
-        return false;
-      }
-
-      if (i == 0) {
-        original_id =
-            element_inst->GetSingleWordInOperand(kExtractCompositeIdInIdx);
-      } else if (original_id != element_inst->GetSingleWordInOperand(
-                                    kExtractCompositeIdInIdx)) {
-        return false;
-      }
+      return operands;
     }
+  }
+  return {};
+}
 
-    // The last check it to see that the object being extracted from is the
-    // correct type.
-    Instruction* original_inst = def_use_mgr->GetDef(original_id);
-    if (original_inst->type_id() != inst->type_id()) {
+bool CompositeConstructFeedingExtract(
+    IRContext* context, Instruction* inst,
+    const std::vector<const analysis::Constant*>&) {
+  // If the input to an OpCompositeExtract is an OpCompositeConstruct,
+  // then we can simply use the appropriate element in the construction.
+  assert(inst->opcode() == SpvOpCompositeExtract &&
+         "Wrong opcode.  Should be OpCompositeExtract.");
+  analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
+
+  // If there are no index operands, then this rule cannot do anything.
+  if (inst->NumInOperands() <= 1) {
+    return false;
+  }
+
+  uint32_t cid = inst->GetSingleWordInOperand(kExtractCompositeIdInIdx);
+  Instruction* cinst = def_use_mgr->GetDef(cid);
+
+  if (cinst->opcode() != SpvOpCompositeConstruct) {
+    return false;
+  }
+
+  uint32_t index_into_result = inst->GetSingleWordInOperand(1);
+  std::vector<Operand> operands =
+      GetExtractOperandsForElementOfCompositeConstruct(context, cinst,
+                                                       index_into_result);
+
+  if (operands.empty()) {
+    return false;
+  }
+
+  // Add the remaining indices for extraction.
+  for (uint32_t i = 2; i < inst->NumInOperands(); ++i) {
+    operands.push_back(
+        {SPV_OPERAND_TYPE_LITERAL_INTEGER, {inst->GetSingleWordInOperand(i)}});
+  }
+
+  if (operands.size() == 1) {
+    // If there were no extra indices, then we have the final object.  No need
+    // to extract any more.
+    inst->SetOpcode(SpvOpCopyObject);
+  }
+
+  inst->SetInOperands(std::move(operands));
+  return true;
+}
+
+// If the OpCompositeConstruct is simply putting back together elements that
+// where extracted from the same source, we can simply reuse the source.
+//
+// This is a common code pattern because of the way that scalar replacement
+// works.
+bool CompositeExtractFeedingConstruct(
+    IRContext* context, Instruction* inst,
+    const std::vector<const analysis::Constant*>&) {
+  assert(inst->opcode() == SpvOpCompositeConstruct &&
+         "Wrong opcode.  Should be OpCompositeConstruct.");
+  analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
+  uint32_t original_id = 0;
+
+  if (inst->NumInOperands() == 0) {
+    // The struct being constructed has no members.
+    return false;
+  }
+
+  // Check each element to make sure they are:
+  // - extractions
+  // - extracting the same position they are inserting
+  // - all extract from the same id.
+  for (uint32_t i = 0; i < inst->NumInOperands(); ++i) {
+    const uint32_t element_id = inst->GetSingleWordInOperand(i);
+    Instruction* element_inst = def_use_mgr->GetDef(element_id);
+
+    if (element_inst->opcode() != SpvOpCompositeExtract) {
       return false;
     }
 
-    // Simplify by using the original object.
-    inst->SetOpcode(SpvOpCopyObject);
-    inst->SetInOperands({{SPV_OPERAND_TYPE_ID, {original_id}}});
-    return true;
-  };
+    if (element_inst->NumInOperands() != 2) {
+      return false;
+    }
+
+    if (element_inst->GetSingleWordInOperand(1) != i) {
+      return false;
+    }
+
+    if (i == 0) {
+      original_id =
+          element_inst->GetSingleWordInOperand(kExtractCompositeIdInIdx);
+    } else if (original_id !=
+               element_inst->GetSingleWordInOperand(kExtractCompositeIdInIdx)) {
+      return false;
+    }
+  }
+
+  // The last check it to see that the object being extracted from is the
+  // correct type.
+  Instruction* original_inst = def_use_mgr->GetDef(original_id);
+  if (original_inst->type_id() != inst->type_id()) {
+    return false;
+  }
+
+  // Simplify by using the original object.
+  inst->SetOpcode(SpvOpCopyObject);
+  inst->SetInOperands({{SPV_OPERAND_TYPE_ID, {original_id}}});
+  return true;
 }
 
 FoldingRule InsertFeedingExtract() {
@@ -1750,6 +1872,35 @@ FoldingRule RedundantPhi() {
     // We have a single incoming value.  Simplify using that value.
     inst->SetOpcode(SpvOpCopyObject);
     inst->SetInOperands({{SPV_OPERAND_TYPE_ID, {incoming_value}}});
+    return true;
+  };
+}
+
+FoldingRule BitCastScalarOrVector() {
+  return [](IRContext* context, Instruction* inst,
+            const std::vector<const analysis::Constant*>& constants) {
+    assert(inst->opcode() == SpvOpBitcast && constants.size() == 1);
+    if (constants[0] == nullptr) return false;
+
+    const analysis::Type* type =
+        context->get_type_mgr()->GetType(inst->type_id());
+    if (HasFloatingPoint(type) && !inst->IsFloatingPointFoldingAllowed())
+      return false;
+
+    analysis::ConstantManager* const_mgr = context->get_constant_mgr();
+    std::vector<uint32_t> words =
+        GetWordsFromNumericScalarOrVectorConstant(const_mgr, constants[0]);
+    if (words.size() == 0) return false;
+
+    const analysis::Constant* bitcasted_constant =
+        ConvertWordsToNumericScalarOrVectorConstant(const_mgr, words, type);
+    if (!bitcasted_constant) return false;
+
+    auto new_feeder_id =
+        const_mgr->GetDefiningInstruction(bitcasted_constant, inst->type_id())
+            ->result_id();
+    inst->SetOpcode(SpvOpCopyObject);
+    inst->SetInOperands({{SPV_OPERAND_TYPE_ID, {new_feeder_id}}});
     return true;
   };
 }
@@ -2316,6 +2467,64 @@ FoldingRule RemoveRedundantOperands() {
   };
 }
 
+// If an image instruction's operand is a constant, updates the image operand
+// flag from Offset to ConstOffset.
+FoldingRule UpdateImageOperands() {
+  return [](IRContext*, Instruction* inst,
+            const std::vector<const analysis::Constant*>& constants) {
+    const auto opcode = inst->opcode();
+    (void)opcode;
+    assert((opcode == SpvOpImageSampleImplicitLod ||
+            opcode == SpvOpImageSampleExplicitLod ||
+            opcode == SpvOpImageSampleDrefImplicitLod ||
+            opcode == SpvOpImageSampleDrefExplicitLod ||
+            opcode == SpvOpImageSampleProjImplicitLod ||
+            opcode == SpvOpImageSampleProjExplicitLod ||
+            opcode == SpvOpImageSampleProjDrefImplicitLod ||
+            opcode == SpvOpImageSampleProjDrefExplicitLod ||
+            opcode == SpvOpImageFetch || opcode == SpvOpImageGather ||
+            opcode == SpvOpImageDrefGather || opcode == SpvOpImageRead ||
+            opcode == SpvOpImageWrite ||
+            opcode == SpvOpImageSparseSampleImplicitLod ||
+            opcode == SpvOpImageSparseSampleExplicitLod ||
+            opcode == SpvOpImageSparseSampleDrefImplicitLod ||
+            opcode == SpvOpImageSparseSampleDrefExplicitLod ||
+            opcode == SpvOpImageSparseSampleProjImplicitLod ||
+            opcode == SpvOpImageSparseSampleProjExplicitLod ||
+            opcode == SpvOpImageSparseSampleProjDrefImplicitLod ||
+            opcode == SpvOpImageSparseSampleProjDrefExplicitLod ||
+            opcode == SpvOpImageSparseFetch ||
+            opcode == SpvOpImageSparseGather ||
+            opcode == SpvOpImageSparseDrefGather ||
+            opcode == SpvOpImageSparseRead) &&
+           "Wrong opcode.  Should be an image instruction.");
+
+    int32_t operand_index = ImageOperandsMaskInOperandIndex(inst);
+    if (operand_index >= 0) {
+      auto image_operands = inst->GetSingleWordInOperand(operand_index);
+      if (image_operands & SpvImageOperandsOffsetMask) {
+        uint32_t offset_operand_index = operand_index + 1;
+        if (image_operands & SpvImageOperandsBiasMask) offset_operand_index++;
+        if (image_operands & SpvImageOperandsLodMask) offset_operand_index++;
+        if (image_operands & SpvImageOperandsGradMask)
+          offset_operand_index += 2;
+        assert(((image_operands & SpvImageOperandsConstOffsetMask) == 0) &&
+               "Offset and ConstOffset may not be used together");
+        if (offset_operand_index < inst->NumOperands()) {
+          if (constants[offset_operand_index]) {
+            image_operands = image_operands | SpvImageOperandsConstOffsetMask;
+            image_operands = image_operands & ~SpvImageOperandsOffsetMask;
+            inst->SetInOperand(operand_index, {image_operands});
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  };
+}
+
 }  // namespace
 
 void FoldingRules::AddFoldingRules() {
@@ -2323,10 +2532,12 @@ void FoldingRules::AddFoldingRules() {
   // Note that the order in which rules are added to the list matters. If a rule
   // applies to the instruction, the rest of the rules will not be attempted.
   // Take that into consideration.
-  rules_[SpvOpCompositeConstruct].push_back(CompositeExtractFeedingConstruct());
+  rules_[SpvOpBitcast].push_back(BitCastScalarOrVector());
+
+  rules_[SpvOpCompositeConstruct].push_back(CompositeExtractFeedingConstruct);
 
   rules_[SpvOpCompositeExtract].push_back(InsertFeedingExtract());
-  rules_[SpvOpCompositeExtract].push_back(CompositeConstructFeedingExtract());
+  rules_[SpvOpCompositeExtract].push_back(CompositeConstructFeedingExtract);
   rules_[SpvOpCompositeExtract].push_back(VectorShuffleFeedingExtract());
   rules_[SpvOpCompositeExtract].push_back(FMixFeedingExtract());
 
@@ -2388,9 +2599,39 @@ void FoldingRules::AddFoldingRules() {
 
   rules_[SpvOpStore].push_back(StoringUndef());
 
-  rules_[SpvOpUDiv].push_back(MergeDivNegateArithmetic());
-
   rules_[SpvOpVectorShuffle].push_back(VectorShuffleFeedingShuffle());
+
+  rules_[SpvOpImageSampleImplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSampleExplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSampleDrefImplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSampleDrefExplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSampleProjImplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSampleProjExplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSampleProjDrefImplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSampleProjDrefExplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageFetch].push_back(UpdateImageOperands());
+  rules_[SpvOpImageGather].push_back(UpdateImageOperands());
+  rules_[SpvOpImageDrefGather].push_back(UpdateImageOperands());
+  rules_[SpvOpImageRead].push_back(UpdateImageOperands());
+  rules_[SpvOpImageWrite].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSparseSampleImplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSparseSampleExplicitLod].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSparseSampleDrefImplicitLod].push_back(
+      UpdateImageOperands());
+  rules_[SpvOpImageSparseSampleDrefExplicitLod].push_back(
+      UpdateImageOperands());
+  rules_[SpvOpImageSparseSampleProjImplicitLod].push_back(
+      UpdateImageOperands());
+  rules_[SpvOpImageSparseSampleProjExplicitLod].push_back(
+      UpdateImageOperands());
+  rules_[SpvOpImageSparseSampleProjDrefImplicitLod].push_back(
+      UpdateImageOperands());
+  rules_[SpvOpImageSparseSampleProjDrefExplicitLod].push_back(
+      UpdateImageOperands());
+  rules_[SpvOpImageSparseFetch].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSparseGather].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSparseDrefGather].push_back(UpdateImageOperands());
+  rules_[SpvOpImageSparseRead].push_back(UpdateImageOperands());
 
   FeatureManager* feature_manager = context_->get_feature_mgr();
   // Add rules for GLSLstd450

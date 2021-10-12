@@ -35,6 +35,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class d9final_state : public driver_device
 {
 public:
@@ -44,10 +46,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lo_vram(*this, "lo_vram"),
 		m_hi_vram(*this, "hi_vram"),
-		m_cram(*this, "cram")
+		m_cram(*this, "cram"),
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	void d9final(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -56,6 +63,7 @@ private:
 	required_shared_ptr<uint8_t> m_lo_vram;
 	required_shared_ptr<uint8_t> m_hi_vram;
 	required_shared_ptr<uint8_t> m_cram;
+	required_memory_bank m_mainbank;
 
 	tilemap_t *m_sc0_tilemap;
 
@@ -67,19 +75,16 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void d9final_io(address_map &map);
-	void d9final_map(address_map &map);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 };
 
 
 
 TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 {
-	int tile = ((m_hi_vram[tile_index] & 0x3f)<<8) | m_lo_vram[tile_index];
+	int tile = ((m_hi_vram[tile_index] & 0x3f) << 8) | m_lo_vram[tile_index];
 	int color = m_cram[tile_index] & 0x3f;
 
 	tileinfo.set(0,
@@ -90,12 +95,12 @@ TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 
 void d9final_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(d9final_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,64,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(d9final_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 uint32_t d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -119,10 +124,10 @@ void d9final_state::sc0_cram(offs_t offset, uint8_t data)
 
 void d9final_state::bank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x7);
+	m_mainbank->set_entry(data & 0x7);
 }
 
-/* game checks this after three attract cycles, otherwise coin inputs stop to work. */
+// game checks this after three attract cycles, otherwise coin inputs stop to work.
 uint8_t d9final_state::prot_latch_r()
 {
 //  printf("PC=%06x\n",m_maincpu->pc());
@@ -131,21 +136,21 @@ uint8_t d9final_state::prot_latch_r()
 }
 
 
-void d9final_state::d9final_map(address_map &map)
+void d9final_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xc800, 0xcbff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xcc00, 0xcfff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share("lo_vram");
-	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share("hi_vram");
-	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share("cram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share(m_lo_vram);
+	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share(m_hi_vram);
+	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share(m_cram);
 	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //.rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
 	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 }
 
-void d9final_state::d9final_io(address_map &map)
+void d9final_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 //  map(0x00, 0x00).nopw(); //bit 0: irq enable? screen enable?
@@ -194,9 +199,9 @@ static INPUT_PORTS_START( d9final )
 	PORT_DIPSETTING(    0x12, "5000" )
 	PORT_DIPSETTING(    0x22, "10000" )
 	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPSETTING(    0x10, "20000" )
+	PORT_DIPSETTING(    0x30, "20000" )
 	PORT_DIPSETTING(    0x02, "50000" )
-// 0x10 20000
-// 0x30 20000
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )
 	PORT_DIPNAME( 0x08, 0x08, "Auto Start" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -294,26 +299,26 @@ static const gfx_layout tiles16x8_layout =
 };
 
 static GFXDECODE_START( gfx_d9final )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x8_layout, 0, 16*4 )
+	GFXDECODE_ENTRY( "tiles", 0, tiles16x8_layout, 0, 16 * 4 )
 GFXDECODE_END
 
 void d9final_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank1")->set_entry(0);
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_mainbank->set_entry(0);
 }
 
 void d9final_state::d9final(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 24000000/4); /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &d9final_state::d9final_map);
-	m_maincpu->set_addrmap(AS_IO, &d9final_state::d9final_io);
+	// basic machine hardware
+	Z80(config, m_maincpu, 24000000 / 4); /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &d9final_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &d9final_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(d9final_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -325,11 +330,12 @@ void d9final_state::d9final(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_d9final);
 	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBRG_444, 0x400);
 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	//ES8712(config, "essnd", 24000000/3).add_route(ALL_OUTPUTS, "mono", 1.0); // clock unknown
+	//ES8712(config, "essnd", 24000000 / 3).add_route(ALL_OUTPUTS, "mono", 1.0); // clock unknown
 
 	RTC62421(config, "rtc", XTAL(32'768)); // internal oscillator
 }
@@ -342,11 +348,12 @@ ROM_START( d9final )
 	ROM_COPY( "maincpu", 0x10000, 0x18000, 0x08000 ) //or just 0xff
 	ROM_LOAD( "1.2h", 0x20000, 0x10000, CRC(901281ec) SHA1(7b4cae343f1b025d988a507141c0fa8229a0fea1)  )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "3.13h", 0x00001, 0x40000, CRC(a2de0cce) SHA1(d510671b75417c10ce479663f6f21367121384b4) )
 	ROM_LOAD16_BYTE( "4.15h", 0x00000, 0x40000, CRC(859b7105) SHA1(1b36f84706473afaa50b6546d7373a2ee6602b9a) )
 ROM_END
 
+} // Anonymous namespace
 
 
 GAME( 1992, d9final, 0, d9final, d9final, d9final_state, empty_init, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )

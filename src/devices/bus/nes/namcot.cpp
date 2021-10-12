@@ -8,7 +8,7 @@
 
  Here we emulate the following PCBs
 
- * Namcot 3433 & 3443 (aka DxROM) [mapper 88, 204, 154]
+ * Namcot 3433 & 3443 (aka DxROM) [mapper 88, 206, 154]
  * Namcot 3446 [mapper 76]
  * Namcot 3425 [mapper 95]
  * Namcot 163 [mapper 19]

@@ -99,7 +99,7 @@ DEVICE_IMAGE_LOAD_MEMBER(spectrum_intf2_device::cart_load)
 
 	if (size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

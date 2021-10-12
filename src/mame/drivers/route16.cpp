@@ -257,6 +257,27 @@ void route16_state::init_route16c()
 	rom[0x756] = 0x07;
 }
 
+void route16_state::init_route16d()
+{
+	save_item(NAME(m_protection_data));
+	// hack out the protection
+	u8 *rom = memregion("cpu1")->base();
+
+	rom[0x0e9] = 0x3a; // remove call 2CCD
+
+	rom[0x105] = 0; // remove jp nz,4109
+	rom[0x106] = 0;
+	rom[0x107] = 0;
+
+	rom[0x735] = 0; // remove jp nz,4238
+	rom[0x736] = 0;
+	rom[0x737] = 0;
+
+	rom[0x74b] = 0xc3; // skip protection checking
+	rom[0x74c] = 0x5a;
+	rom[0x74d] = 0x07;
+}
+
 void route16_state::init_vscompmj() // only opcodes encrypted
 {
 	uint8_t *rom = memregion("cpu1")->base();
@@ -1020,6 +1041,34 @@ ROM_START( route16 )
 	ROM_LOAD( "mb7052.61",    0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // bottom bitmap
 ROM_END
 
+ // 2 sets found, one on TVX1 and one on TVX2 PCB. TVX1 has lots of wire hacks. Both PCBs have an identical TVX-S1 sub board with Fujitsu MB8841 + logic.
+ // There were two different bytes between the two versions, both in ROM a2:
+ // 0x1dd is 0x46 in the TVX1 dump and 0x47 in the TVX2 one. 0x764 is 0x04 in the TVX1 dump and 0x06 in the TVX2 one.
+ // Those cause the game to malfunction and it doesn't seem to be additional protection. The a2 ROM below is the one dumped from the TVX2 PCB.
+ROM_START( route16d )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "a0.7.bin", 0x0000, 0x0800, CRC(025a4f63) SHA1(f1ced12c7667467c25f7fc595ae2e1b3aef4a29f) )
+	ROM_LOAD( "a1.bin",   0x0800, 0x0800, CRC(ab6117fa) SHA1(99a96042ef9634fb32b7b5ca7e7e05f6637a7014) )
+	ROM_LOAD( "a2.8.bin", 0x1000, 0x0800, CRC(5174f9ac) SHA1(162303589c30cbd2c1b701c32a1aa6f9008d3b35) )
+	ROM_LOAD( "a3.bin",   0x1800, 0x0800, CRC(3ba19f10) SHA1(2e0f4a7b162f2ff2d17db0edc92f3c9804a8f8ee) )
+	ROM_LOAD( "a4.bin",   0x2000, 0x0800, CRC(1da34bde) SHA1(b67420c6d7857303c137199f718de77ba7e38336) )
+	ROM_LOAD( "a5.bin",   0x2800, 0x0800, CRC(74438cf5) SHA1(a7b7191f2a7b26577ee4459a6d3a83548f1c44ee) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "b0.bin", 0x0000, 0x0800, CRC(fef605f3) SHA1(bfbffa0ded3e285c034f0ad832864021ef3f2256) )
+	ROM_LOAD( "b1.bin", 0x0800, 0x0800, CRC(49f265fc) SHA1(62e072828d1f64700dd2f3ed81417740e585bad4) )
+	ROM_LOAD( "b2.bin", 0x1000, 0x0800, CRC(defc5797) SHA1(aec8179e647de70016e0e63b720f932752adacc1) )
+	ROM_LOAD( "b3.bin", 0x1800, 0x0800, CRC(88d94a66) SHA1(163e952ada7c05110d1f1c681bd57d3b9ea8866e) )
+
+	ROM_REGION( 0x800, "mcu", 0 ) // on a small daughterboard inserted at a6
+	ROM_LOAD( "mb8841",       0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	// The upper 128 bytes are 0's, used by the hardware to blank the display
+	ROM_LOAD( "mb7052.59", 0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // top bitmap
+	ROM_LOAD( "mb7052.61", 0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // bottom bitmap
+ROM_END
+
 ROM_START( route16a )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "tvg54.a0",     0x0000, 0x0800, CRC(aef9ffc1) SHA1(178d23e4963336ded93c13cb17940a4ae98270c5) )
@@ -1415,7 +1464,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Sun Electronics",                            "Route 16 (Sun Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Sun Electronics",                            "Route 16 (Sun Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16d, route16,  route16,  route16a, route16_state, init_route16d, ROT270, "Sun Electronics",                            "Route 16 (Sun Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, route16a, route16,  route16,  route16a, route16_state, init_route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, route16b, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
