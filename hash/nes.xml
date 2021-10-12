@@ -76709,7 +76709,7 @@ be better to redump them properly. -->
 
 <!-- Pirate fighting games -->
 
-	<software name="cityfgt4">
+	<software name="cityfgt4" supported="partial">
 		<description>City Fighter IV (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
