@@ -1347,7 +1347,33 @@ ROM_START( asuka ) /* Taito PCB: ASKA&ASKA - K1100388A / J1100169A */
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
-ROM_START( asukaj ) /* Known to exist but not dumped: revision 1 with B68 08-1 & B68 09-1 program ROMs */
+ROM_START( asukaj )
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
+	ROM_LOAD16_BYTE( "b68-09-1.ic23", 0x00000, 0x20000, CRC(d61be555) SHA1(c1c711df1f39ae6ec9ee964c93fa4d7ef46cd271) )
+	ROM_LOAD16_BYTE( "b68-08-1.ic8",  0x00001, 0x20000, CRC(e916f17b) SHA1(f5b662ac1533c76beac501a053528a595f36258a) )
+	/* 0x040000 - 0x7ffff is intentionally empty */
+	ROM_LOAD16_WORD( "b68-03.ic30", 0x80000, 0x80000, CRC(d3a59b10) SHA1(35a2ff18b64e73ac5e17484354c0cc58bc2cd7fc) )    /* Fix ROM */
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "b68-01.ic3", 0x00000, 0x80000, CRC(89f32c94) SHA1(74fbb699e05e2336509cb5ac06ed94335ff870d5) )   /* SCR tiles (8 x 8) */
+
+	ROM_REGION( 0xa0000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "b68-02.ic6", 0x00000, 0x80000, CRC(f5018cd3) SHA1(860ce140ae369556d03d5d78987b87c0d6070df5) ) /* Sprites (16 x 16) */
+	ROM_LOAD16_BYTE     ( "b68-07.ic5", 0x80001, 0x10000, CRC(c113acc8) SHA1(613c61a78df73dcb0b9c9018ae829e865baac772) )
+	ROM_LOAD16_BYTE     ( "b68-06.ic4", 0x80000, 0x10000, CRC(f517e64d) SHA1(8be491bfe0f7eed58521de9d31da677acf635c23) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "b68-11.ic27", 0x00000, 0x10000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) ) /* banked */
+
+	ROM_REGION( 0x10000, "msm", 0 )   /* ADPCM samples */
+	ROM_LOAD( "b68-10.ic24", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
+ROM_END
+
+ROM_START( asukaja )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "b68-09.ic23", 0x00000, 0x20000, CRC(1eaa1bbb) SHA1(01ca6a5f3c47dab49654b84601119714eb329cc5) )
 	ROM_LOAD16_BYTE( "b68-08.ic8",  0x00001, 0x20000, CRC(8cc96e60) SHA1(dc94f3fd48c0407ec72e8330bc688e9e16d39213) )
@@ -1880,7 +1906,8 @@ GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri, asuka_state, empty_init,   
 GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri, asuka_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, asuka,     0,        asuka,    asuka,    asuka_state, empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, asukaj,    asuka,    asuka,    asuka,    asuka_state, empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asukaj,    asuka,    asuka,    asuka,    asuka_state, empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan, version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asukaja,   asuka,    asuka,    asuka,    asuka_state, empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mofflott,  0,        mofflott, mofflott, asuka_state, empty_init,    ROT270, "Taito Corporation",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
 
