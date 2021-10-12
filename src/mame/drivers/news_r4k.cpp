@@ -78,15 +78,13 @@
  *   - Brooktree Bt468KG220 RAMDAC: not emulated
  *
  *  Known issues:
- *  - Telnet is broken - the login prompt works, but hangs after completing authentication and sending the initial login message
- *    How X11 and SXDM work when Telnet doesn't is beyond me... Might be missing some SONIC3 functionality, or it might be
- *    connected to the following item...
- *  - Some shell commands are problematic and can cause MAME to hang (`dbx` especially; `ps` after another user has logged in).
- *    I haven't seen any attempts to communicate with unemulated APbus hardware or anything like that, yet. However, this needs
- *    more investigation.
+ *  - Telnet has some weird behavior at times - some users hang when logging in, but logging in as root and using `su` to change to them works.
+ *  - Sometimes, output from a command run as root on serial while a user is logged in over SXDM will show up in their `sxsession` console.
+ *    Need to determine if emulation is inducing that.
  *  - Bootloader doesn't work with DRC enabled (see CPU section above)
  *  - Monitor ROM command `ss -r` doesn't show most register values
- *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly)
+ *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly,
+ *     both on real hardware and in emulation)
  *
  *  TODO:
  *  - More complete floppy support (only supports floppy boot at the moment)
@@ -94,14 +92,14 @@
  *  - Parallel I/O
  *  - Framebuffer (and remaining kb/ms support)
  *  - APbus expansion slots
+ *  - Triage the minor NEWS-OS issues mentioned above
  *
  *  TODO before opening first MR:
  *  - FIFO and ESCC cleanup (lots of it!)
  *  - SPIFI3 refactoring (actual AUTOSTAT too)
  *  - CD-ROM access if possible
- *  - See if NEWS-OS 4 can be stabilized further (telnet, etc.)
  *  - Find better workaround for SCACHE enumeration
- *  - Save state support for Sony ASICs
+ *  - Save state support
  */
 
 #include "emu.h"

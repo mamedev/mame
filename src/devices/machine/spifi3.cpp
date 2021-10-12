@@ -1466,6 +1466,13 @@ void spifi3_device::step(bool timeout)
 
                         step(false); // TODO: delay needed?
                     }
+                    else if ((newPhase == S_PHASE_MSG_IN) && ((spifi_reg.cmlen & CML_AMSG_EN) > 0))
+                    {
+                        LOG("PAD: AUTOMSG enabled, proceeding to message input!\n");
+                        state = INIT_XFR;
+                        xfr_phase = newPhase;
+                        // TODO: anything else? set ICOND AMSGOFF or something?
+                    }
                     else
                     {
                         LOG("Finished phase, marking bus complete\n");
