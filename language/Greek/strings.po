@@ -366,12 +366,12 @@ msgstr "P1 Hanafuda Όχι"
 #: src/emu/inpttype.ipp:107
 msgctxt "input-name"
 msgid "Key In"
-msgstr "Πλήκτρο Μέσα"
+msgstr "Πίστωση Κλειδιού"
 
 #: src/emu/inpttype.ipp:108
 msgctxt "input-name"
 msgid "Key Out"
-msgstr "Πλήκτρο Έξω"
+msgstr "Χρέωση Κλειδιού"
 
 #: src/emu/inpttype.ipp:109 src/emu/inpttype.ipp:544
 msgctxt "input-name"
@@ -2136,7 +2136,7 @@ msgstr "Κέρμα 12"
 #: src/emu/inpttype.ipp:521
 msgctxt "input-name"
 msgid "Bill 1"
-msgstr "Λογαριασμός 1"
+msgstr "Αποδέκτης Χαρτονομισμάτων 1"
 
 #: src/emu/inpttype.ipp:526
 msgctxt "input-name"
@@ -2416,52 +2416,52 @@ msgstr "Κουπί 10"
 #: src/emu/inpttype.ipp:610
 msgctxt "input-name"
 msgid "Paddle V"
-msgstr "Κουπί V"
+msgstr "Κουπί Κάθ."
 
 #: src/emu/inpttype.ipp:611
 msgctxt "input-name"
 msgid "Paddle V 2"
-msgstr "Κουπί V 2"
+msgstr "Κουπί Κάθ. 2"
 
 #: src/emu/inpttype.ipp:612
 msgctxt "input-name"
 msgid "Paddle V 3"
-msgstr "Κουπί V 3"
+msgstr "Κουπί Κάθ. 3"
 
 #: src/emu/inpttype.ipp:613
 msgctxt "input-name"
 msgid "Paddle V 4"
-msgstr "Κουπί V 4"
+msgstr "Κουπί Κάθ. 4"
 
 #: src/emu/inpttype.ipp:614
 msgctxt "input-name"
 msgid "Paddle V 5"
-msgstr "Κουπί V 5"
+msgstr "Κουπί Κάθ. 5"
 
 #: src/emu/inpttype.ipp:615
 msgctxt "input-name"
 msgid "Paddle V 6"
-msgstr "Κουπί V 6"
+msgstr "Κουπί Κάθ. 6"
 
 #: src/emu/inpttype.ipp:616
 msgctxt "input-name"
 msgid "Paddle V 7"
-msgstr "Κουπί V 7"
+msgstr "Κουπί Κάθ. 7"
 
 #: src/emu/inpttype.ipp:617
 msgctxt "input-name"
 msgid "Paddle V 8"
-msgstr "Κουπί V 8"
+msgstr "Κουπί Κάθ. 8"
 
 #: src/emu/inpttype.ipp:618
 msgctxt "input-name"
 msgid "Paddle V 9"
-msgstr "Κουπί V 9"
+msgstr "Κουπί Κάθ. 9"
 
 #: src/emu/inpttype.ipp:619
 msgctxt "input-name"
 msgid "Paddle V 10"
-msgstr "Κουπί V 10"
+msgstr "Κουπί Κάθ. 10"
 
 #: src/emu/inpttype.ipp:624
 msgctxt "input-name"
@@ -2516,52 +2516,52 @@ msgstr "Θέσεως 10"
 #: src/emu/inpttype.ipp:638
 msgctxt "input-name"
 msgid "Positional V"
-msgstr "Θέσεως V"
+msgstr "Θέσεως Κάθ."
 
 #: src/emu/inpttype.ipp:639
 msgctxt "input-name"
 msgid "Positional V 2"
-msgstr "Θέσεως V 2"
+msgstr "Θέσεως Κάθ. 2"
 
 #: src/emu/inpttype.ipp:640
 msgctxt "input-name"
 msgid "Positional V 3"
-msgstr "Θέσεως V 3"
+msgstr "Θέσεως Κάθ. 3"
 
 #: src/emu/inpttype.ipp:641
 msgctxt "input-name"
 msgid "Positional V 4"
-msgstr "Θέσεως V 4"
+msgstr "Θέσεως Κάθ. 4"
 
 #: src/emu/inpttype.ipp:642
 msgctxt "input-name"
 msgid "Positional V 5"
-msgstr "Θέσεως V 5"
+msgstr "Θέσεως Κάθ. 5"
 
 #: src/emu/inpttype.ipp:643
 msgctxt "input-name"
 msgid "Positional V 6"
-msgstr "Θέσεως V 6"
+msgstr "Θέσεως Κάθ. 6"
 
 #: src/emu/inpttype.ipp:644
 msgctxt "input-name"
 msgid "Positional V 7"
-msgstr "Θέσεως V 7"
+msgstr "Θέσεως Κάθ. 7"
 
 #: src/emu/inpttype.ipp:645
 msgctxt "input-name"
 msgid "Positional V 8"
-msgstr "Θέσεως V 8"
+msgstr "Θέσεως Κάθ. 8"
 
 #: src/emu/inpttype.ipp:646
 msgctxt "input-name"
 msgid "Positional V 9"
-msgstr "Θέσεως V 9"
+msgstr "Θέσεως Κάθ. 9"
 
 #: src/emu/inpttype.ipp:647
 msgctxt "input-name"
 msgid "Positional V 10"
-msgstr "Θέσεως V 10"
+msgstr "Θέσεως Κάθ. 10"
 
 #: src/emu/inpttype.ipp:652
 msgctxt "input-name"
@@ -2616,52 +2616,52 @@ msgstr "Περιστροφικό 10"
 #: src/emu/inpttype.ipp:666
 msgctxt "input-name"
 msgid "Dial V"
-msgstr "Περιστροφικό V"
+msgstr "Περιστροφικό Κάθ."
 
 #: src/emu/inpttype.ipp:667
 msgctxt "input-name"
 msgid "Dial V 2"
-msgstr "Περιστροφικό V 2"
+msgstr "Περιστροφικό Κάθ. 2"
 
 #: src/emu/inpttype.ipp:668
 msgctxt "input-name"
 msgid "Dial V 3"
-msgstr "Περιστροφικό V 3"
+msgstr "Περιστροφικό Κάθ. 3"
 
 #: src/emu/inpttype.ipp:669
 msgctxt "input-name"
 msgid "Dial V 4"
-msgstr "Περιστροφικό V 4"
+msgstr "Περιστροφικό Κάθ. 4"
 
 #: src/emu/inpttype.ipp:670
 msgctxt "input-name"
-msgid "Dial V 5"
-msgstr "Περιστροφικό V 5"
+msgid "Dial Κάθ. 5"
+msgstr "Περιστροφικό Κάθ. 5"
 
 #: src/emu/inpttype.ipp:671
 msgctxt "input-name"
-msgid "Dial V 6"
-msgstr "Περιστροφικό V 6"
+msgid "Dial Κάθ. 6"
+msgstr "Περιστροφικό Κάθ. 6"
 
 #: src/emu/inpttype.ipp:672
 msgctxt "input-name"
 msgid "Dial V 7"
-msgstr "Περιστροφικό V 7"
+msgstr "Περιστροφικό Κάθ. 7"
 
 #: src/emu/inpttype.ipp:673
 msgctxt "input-name"
 msgid "Dial V 8"
-msgstr "Περιστροφικό V 8"
+msgstr "Περιστροφικό Κάθ. 8"
 
 #: src/emu/inpttype.ipp:674
 msgctxt "input-name"
 msgid "Dial V 9"
-msgstr "Περιστροφικό V 9"
+msgstr "Περιστροφικό Κάθ. 9"
 
 #: src/emu/inpttype.ipp:675
 msgctxt "input-name"
 msgid "Dial V 10"
-msgstr "Περιστροφικό V 10"
+msgstr "Περιστροφικό Κάθ. 10"
 
 #: src/emu/inpttype.ipp:680
 msgctxt "input-name"
@@ -5867,7 +5867,7 @@ msgstr "Επιλογή"
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr "Οθονες Game Over "
+msgstr "Οθονες Game Over"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
