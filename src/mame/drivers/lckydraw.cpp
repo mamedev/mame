@@ -414,7 +414,7 @@ ROM_START(lckydraw)
 	ROM_LOAD( "lckydrw3.rom", 0x0800, 0x0400, CRC(464155bb) SHA1(5bbf784dba9149575444e6b1250ac9b5c2bced87) )
 ROM_END
 
-ROM_START(lckydrawa)
+ROM_START(lckydrawa)  // stronger flippers
 	ROM_REGION( 0xc00, "maincpu", 0)
 	ROM_LOAD( "lckydrw1.rom", 0x0000, 0x0400, CRC(58ebb50f) SHA1(016ed66b4ee9979aa109c0ce085597a62d33bf8d) )
 	ROM_LOAD( "lckydrw2.rom", 0x0400, 0x0400, CRC(816b9e20) SHA1(0dd8acc633336f250960ebe89cc707fd115afeee) )
