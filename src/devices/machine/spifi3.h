@@ -182,7 +182,7 @@ private:
         BUS_FREE
     };
 
-    enum
+    enum dma_direction
     {
         DMA_NONE,
         DMA_IN,
@@ -299,12 +299,30 @@ private:
     const uint32_t SEL_WATN = 0x80;		// Select with ATN
     const uint32_t SEL_TARGET = 0x70;
     void select_w(uint32_t data);
+    int get_target_id()
+    {
+        return (spifi_reg.select & SEL_TARGET) >> 4;
+    }
 
     // Autodata register
     const uint32_t ADATA_IN = 0x40;
     const uint32_t ADATA_EN = 0x80;
     const uint32_t ADATA_TARGET_ID = 0x07;
     void autodata_w(uint32_t data);
+    bool autodata_active(int target_id)
+    {
+        return (spifi_reg.autodata & ADATA_EN) && ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id);
+    }
+
+    // Autostat register
+    void autostat_done(int target_id)
+    {
+        spifi_reg.autostat &= ~(1 << target_id);
+    }
+    bool autostat_active(int target_id)
+    {
+        return spifi_reg.autostat & (1 << target_id);
+    }
 
     // prcmd
     enum PRCMD_COMMANDS : uint32_t
@@ -327,10 +345,18 @@ private:
     uint8_t cmd_buf_r(offs_t offset);
     void cmd_buf_w(offs_t offset, uint8_t data);
 
-    // cmlen
+    // cmlen register
     const uint32_t CML_LENMASK = 0x0f;
     const uint32_t CML_AMSG_EN = 0x40;
     const uint32_t CML_ACOM_EN = 0x80;
+    bool automsg_active()
+    {
+        return spifi_reg.cmlen & CML_AMSG_EN;
+    }
+    bool autocmd_active()
+    {
+        return spifi_reg.cmlen & CML_ACOM_EN;
+    }
 
     struct spifi_cmd_entry
     {

@@ -8,10 +8,20 @@
  * - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifireg.h
  * - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifi.c
  * - https://github.com/mamedev/mame/blob/master/src/devices/machine/ncr5390.cpp
+ * 
+ * TODO:
+ *  - Reselection, target mode
+ *  - Anything the Sony NEWS driver doesn't use
+ *  - Find out the proper handshake between the SCSI and DMA controller when padding is required
+ *  - SPSTAT and ICOND values
  */
 
 #include "emu.h"
 #include "spifi3.h"
+
+#define LOG_GENERAL (1U << 0)
+#define LOG_STATE (1U << 1)
+#define LOG_INTERRUPT (1U << 2)
 
 // #define VERBOSE 1
 #include "logmacro.h"
@@ -390,7 +400,6 @@ void spifi3_device::select_w(uint32_t data)
     {
         LOG("Select started! Targeting ID %d\n", (data & SEL_TARGET) >> 4);
         state = DISC_SEL_ARBITRATION_INIT;
-        // spifi_reg.spstat = SPS_SEL;
         dma_set(DMA_OUT);
         arbitrate();
     }
@@ -410,12 +419,13 @@ void spifi3_device::autodata_w(uint32_t data)
 uint32_t spifi3_device::prstat_r()
 {
     auto ctrl = scsi_bus->ctrl_r();
+
+    // TODO: PRS_Z, which is 1 when the bus is free, and 0 during REQ/ACK handshakes
     uint32_t prstat = 0;
     prstat |= (ctrl & S_ATN) ? PRS_ATN : 0;
     prstat |= (ctrl & S_MSG) ? PRS_MSG : 0;
     prstat |= (ctrl & S_CTL) ? PRS_CD : 0;
     prstat |= (ctrl & S_INP) ? PRS_IO : 0;
-    // TODO: PRS_Z, which is 1 when the bus is free, and 0 during REQ/ACK handshakes
     spifi_reg.prstat = prstat; // Might be able to get rid of the register copy of this since we can compute it on demand.
     LOG("read spifi_reg.prstat = 0x%x\n", prstat);
     return prstat;
@@ -666,9 +676,9 @@ void spifi3_device::function_bus_complete()
     LOG("function_bus_complete\n");
     state = IDLE;
     spifi_reg.spstat = SPS_IDLE; // TODO:
-    // was: istatus |= I_FUNCTION|I_BUS;
-    spifi_reg.intr |= INTR_FCOMP | INTR_BSRQ; // TODO: icond? is BSRQ 1:1 w/ bus complete?
-    spifi_reg.prcmd = 0; // TODO:
+    // TODO: Any ICOND changes needed here?
+    spifi_reg.intr |= INTR_FCOMP | INTR_BSRQ;
+    spifi_reg.prcmd = 0;
     dma_set(DMA_NONE);
     check_drq();
     check_irq();
@@ -680,7 +690,7 @@ void spifi3_device::function_complete()
     state = IDLE;
     spifi_reg.spstat = SPS_IDLE; // TODO:
     spifi_reg.intr |= INTR_FCOMP; // TODO: icond?
-    spifi_reg.prcmd = 0; // TODO:
+    spifi_reg.prcmd = 0;
     dma_set(DMA_NONE);
     check_drq();
     check_irq();
@@ -692,7 +702,7 @@ void spifi3_device::bus_complete()
     state = IDLE;
     // was: istatus |= I_BUS;
     spifi_reg.intr |= INTR_BSRQ; // TODO: icond? is BSRQ 1:1 w/ bus complete?
-    spifi_reg.prcmd = 0; // TODO:
+    spifi_reg.prcmd = 0;
     dma_set(DMA_NONE);
     check_drq();
     check_irq();
@@ -723,13 +733,14 @@ void spifi3_device::decrement_tcounter(int count)
     }
     if (tcounter == 0)
     {
-        spifi_reg.icond |= ICOND_CNTZERO; // TODO: does this immediately trigger an interrupt? or is this just a status thing?
+        // TODO: does this immediately trigger an interrupt? or is this just a status thing?
+        spifi_reg.icond |= ICOND_CNTZERO;
     }
 }
 
 void spifi3_device::delay(int cycles)
 {
-    // TODO: What is clock_conv?
+    // TODO: What is the appropriate value of clock_conv for SPIFI?
     if(!clock_conv)
     {
         return;
@@ -745,7 +756,6 @@ void spifi3_device::delay_cycles(int cycles)
 
 void spifi3_device::arbitrate()
 {
-    //spifi_reg.spstat = SPS_ARB;
     state = (state & STATE_MASK) | (ARB_COMPLETE << SUB_SHIFT);
     scsi_bus->data_w(scsi_refid, 1 << scsi_id);
     scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
@@ -787,18 +797,13 @@ void spifi3_device::step(bool timeout)
     uint32_t ctrl = scsi_bus->ctrl_r();
     uint32_t data = scsi_bus->data_r();
 
-    // SPIFI3 has an 8-slot buffer for commands. NetBSD source code seems to show that the initiator commands
-    // are written into cmbuf[id] (7), with the ability to pull info about other IDs from other cmbuf slots.
-    // auto command = spifi_reg.cmbuf[scsi_id]; // refid??
-    // uint8_t commandStart = command.cdb[0];
-
-    /*LOGMASKED(LOG_STATE, */ LOG("state=%d.%d %s\n", state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, timeout ? "timeout" : "change");
+    LOGMASKED(LOG_STATE, "state=%d.%d %s\n", state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, timeout ? "timeout" : "change");
 
     if(mode == MODE_I && !(ctrl & S_BSY)) // Not busy and we are the initiator. We can disconnect.
     {
-        state = IDLE; // Set idle state
-        spifi_reg.spstat = SPS_IDLE;
         // TODO: Set Z state flag? Any interrupts needed?
+        state = IDLE;
+        spifi_reg.spstat = SPS_IDLE;
         reset_disconnect();
         check_irq();
     }
@@ -807,19 +812,17 @@ void spifi3_device::step(bool timeout)
     {
         case IDLE:
         {
-            // Don't need to do anything
             spifi_reg.spstat = SPS_IDLE;
             break;
         }
 
-        case BUSRESET_WAIT_INT:
+        case BUSRESET_WAIT_INT: // Bus was reset by a command, go to idle state and clear reset signal
         {
-            // Bus was reset by a command, go to idle state and clear reset signal
             state = IDLE;
             scsi_bus->ctrl_w(scsi_refid, 0, S_RST);
             reset_disconnect();
 
-            // TODO: Is there a spifi3 equiv of the below?
+            // TODO: spifi3 equivalent of the below?
             /*if (!(config & 0x40)) {
                 istatus |= I_SCSI_RESET;
                 check_irq();
@@ -837,7 +840,8 @@ void spifi3_device::step(bool timeout)
             // Scan to see if we won arbitration
             int arbitrationWinner;
             for(arbitrationWinner = 7; arbitrationWinner >= 0 && !(data & (1<<arbitrationWinner)); arbitrationWinner--) {};
-            if(arbitrationWinner != scsi_id) {
+            if(arbitrationWinner != scsi_id)
+            {
                 scsi_bus->data_w(scsi_refid, 0);
                 scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
                 fatalerror("spifi3_device::step need to wait for bus free (lost arbitration)\n");
@@ -857,7 +861,7 @@ void spifi3_device::step(bool timeout)
                 break;
             }
 
-            bus_id = (spifi_reg.select & SEL_TARGET) >> 4; // TODO: this is ugly and temporary
+            bus_id = get_target_id();
             scsi_bus->data_w(scsi_refid, (1 << scsi_id) | (1 << bus_id));
             state = (state & STATE_MASK) | (ARB_SET_DEST << SUB_SHIFT);
             delay_cycles(4);
@@ -872,8 +876,7 @@ void spifi3_device::step(bool timeout)
             }
 
             state = (state & STATE_MASK) | (ARB_RELEASE_BUSY << SUB_SHIFT);
-            scsi_bus->ctrl_w(scsi_refid, spifi_reg.select & SEL_WATN ? S_ATN : 0, S_ATN | S_BSY); // TODO: is this right? was: scsi_bus->ctrl_w(scsi_refid, c == CD_SELECT_ATN || c == CD_SELECT_ATN_STOP ? S_ATN : 0, S_ATN|S_BSY);
-                                                                                                  // Does SPIFI3 have a "STOP" equivalent?
+            scsi_bus->ctrl_w(scsi_refid, spifi_reg.select & SEL_WATN ? S_ATN : 0, S_ATN | S_BSY);
             delay(2);
             break;
         }
@@ -980,7 +983,6 @@ void spifi3_device::step(bool timeout)
             {
                 scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
                 state = IDLE;
-                //spifi_reg.spstat = SPS_DISCON << 4; // Set disconnected flag since we don't have a connection. Bit shift to match NetBSD, but that needs to be tested/investigated
                 spifi_reg.intr = INTR_TIMEO; // signal timeout
                 // TODO: Set Z state flag?
                 reset_disconnect();
@@ -1154,7 +1156,7 @@ void spifi3_device::step(bool timeout)
                 // autoidentified target, now we need to see if autocmd is enabled. If so, we can just proceed to the XFR phase automatically.
                 command_pos = 0;
                 auto newPhase = (ctrl & S_PHASE_MASK);
-                if((spifi_reg.cmlen & CML_ACOM_EN) && newPhase == S_PHASE_COMMAND)
+                if(newPhase == S_PHASE_COMMAND && autocmd_active())
                 {
                     // LOG("Select complete, autocmd enabled so moving on to XFR phase!\n");
                     scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // TODO: Deassert ACK - just trying this out
@@ -1162,7 +1164,7 @@ void spifi3_device::step(bool timeout)
                     xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
                     step(false); // TODO: delay needed?
                 }
-                else if ((spifi_reg.cmlen & CML_AMSG_EN) && (newPhase == S_PHASE_MSG_OUT || newPhase == S_PHASE_MSG_IN))
+                else if ((newPhase == S_PHASE_MSG_OUT || newPhase == S_PHASE_MSG_IN) && automsg_active())
                 {
                     // LOG("Select complete, automsg enabled so moving on to XFR phase!\n");
                     state = INIT_XFR;
@@ -1309,7 +1311,7 @@ void spifi3_device::step(bool timeout)
                     // However, if AUTOMSG is enabled, automatically accept the message by lowering ACK before continuing.
                     if((xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)))
                     {
-                        state = (spifi_reg.cmlen & CML_AMSG_EN) ? INIT_XFR_RECV_BYTE_ACK_AUTOMSG : INIT_XFR_RECV_BYTE_NACK;
+                        state = automsg_active() ? INIT_XFR_RECV_BYTE_ACK_AUTOMSG : INIT_XFR_RECV_BYTE_NACK;
                     }
                     else
                     {
@@ -1382,7 +1384,7 @@ void spifi3_device::step(bool timeout)
                 LOG("Non-DMA transfer in complete!\n");
                 state = INIT_XFR_BUS_COMPLETE;
                 auto newPhase = (ctrl & S_PHASE_MASK);
-                if ((newPhase == S_PHASE_MSG_IN) && ((spifi_reg.cmlen & CML_AMSG_EN) > 0)) // Automsg enabled, do that instead
+                if ((newPhase == S_PHASE_MSG_IN) && automsg_active()) // Automsg enabled, do that instead
                 {
                     LOG("AUTOMSG enabled, proceeding to message input!\n");
                     state = INIT_XFR;
@@ -1416,9 +1418,8 @@ void spifi3_device::step(bool timeout)
                     }
                     step(false);
                 }
-                else if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                else if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
                 {
-                    // TODO: ID enforcement for autostat
                     LOG("Autostat enabled, proceeding to status input automatically\n");
                     state = INIT_XFR;
                     xfr_phase = newPhase;
@@ -1426,9 +1427,9 @@ void spifi3_device::step(bool timeout)
                     // Below this is a guess
                     dma_command = false;
                     dma_dir = DMA_NONE;
-                    spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                    autostat_done(bus_id);
                 }
-                else if ((newPhase == S_PHASE_MSG_IN) && ((spifi_reg.cmlen & CML_AMSG_EN) > 0))
+                else if ((newPhase == S_PHASE_MSG_IN) && automsg_active())
                 {
                     LOG("AUTOMSG enabled, proceeding to message input!\n");
                     state = INIT_XFR;
@@ -1446,8 +1447,8 @@ void spifi3_device::step(bool timeout)
                     command_pos = 0;
 
                     // If initiator autostatus is enabled, we can automatically do the status phase
-                    // TODO: ID checking and actually transferring the status byte to the appropriate SPIFI register
-                    if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                    // TODO: Transfer the status byte to the appropriate SPIFI register
+                    if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
                     {
                         LOG("Autostat enabled, proceeding to status input automatically\n");
                         state = INIT_XFR;
@@ -1456,9 +1457,9 @@ void spifi3_device::step(bool timeout)
                         // Below this is a guess
                         dma_command = false;
                         dma_dir = DMA_NONE;
-                        spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                        autostat_done(bus_id);
                     }
-                    else if (newPhase == S_PHASE_COMMAND && (spifi_reg.cmlen & CML_ACOM_EN))
+                    else if (newPhase == S_PHASE_COMMAND && autocmd_active())
                     {
                         LOG("Autocmd enabled, proceeding to command automatically\n");
                         state = INIT_XFR;
@@ -1466,7 +1467,7 @@ void spifi3_device::step(bool timeout)
 
                         step(false); // TODO: delay needed?
                     }
-                    else if ((newPhase == S_PHASE_MSG_IN) && ((spifi_reg.cmlen & CML_AMSG_EN) > 0))
+                    else if ((newPhase == S_PHASE_MSG_IN) && automsg_active())
                     {
                         LOG("PAD: AUTOMSG enabled, proceeding to message input!\n");
                         state = INIT_XFR;
@@ -1568,7 +1569,7 @@ void spifi3_device::step(bool timeout)
             {
                 command_pos = 0;
 
-                if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
                 {
                     // TODO: ID enforcement for autostat
                     LOG("PAD: Autostat enabled, proceeding to status input automatically\n");
@@ -1578,7 +1579,7 @@ void spifi3_device::step(bool timeout)
                     // Below this is a guess
                     dma_command = false;
                     dma_dir = DMA_NONE;
-                    spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                    autostat_done(bus_id);
                     step(false);
                 }
                 else
@@ -1613,7 +1614,7 @@ void spifi3_device::step(bool timeout)
             {
                 command_pos = 0;
 
-                if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
                 {
                     // TODO: ID enforcement for autostat
                     LOG("PAD: Autostat enabled, proceeding to status input automatically\n");
@@ -1623,7 +1624,7 @@ void spifi3_device::step(bool timeout)
                     // Below this is a guess
                     dma_command = false;
                     dma_dir = DMA_NONE;
-                    spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                    autostat_done(bus_id);
                     step(false);
                 }
                 else
