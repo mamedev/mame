@@ -2,13 +2,13 @@
 # Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Automatically generated, 2016.
-#
+
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-11 14:20+1100\n"
-"PO-Revision-Date: 2021-06-06 22:30+0300\n"
+"POT-Creation-Date: 2021-10-11 14:00+1100\n"
+"PO-Revision-Date: 2021-10-12 23:00+0300\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -16,3366 +16,3367 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.7.1\n"
 
 #: src/emu/inpttype.ipp:26
 msgctxt "input-name"
 msgid "P1 Up"
-msgstr ""
+msgstr "P1 Επάνω"
 
 #: src/emu/inpttype.ipp:27
 msgctxt "input-name"
 msgid "P1 Down"
-msgstr ""
+msgstr "P1 Κάτω"
 
 #: src/emu/inpttype.ipp:28
 msgctxt "input-name"
 msgid "P1 Left"
-msgstr ""
+msgstr "P1 Αριστερά"
 
 #: src/emu/inpttype.ipp:29
 msgctxt "input-name"
 msgid "P1 Right"
-msgstr ""
+msgstr "P1 Δεξιά"
 
 #: src/emu/inpttype.ipp:30
 msgctxt "input-name"
 msgid "P1 Right Stick/Up"
-msgstr ""
+msgstr "P1 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:31
 msgctxt "input-name"
 msgid "P1 Right Stick/Down"
-msgstr ""
+msgstr "P1 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:32
 msgctxt "input-name"
 msgid "P1 Right Stick/Left"
-msgstr ""
+msgstr "P1 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:33
 msgctxt "input-name"
 msgid "P1 Right Stick/Right"
-msgstr ""
+msgstr "P1 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:34
 msgctxt "input-name"
 msgid "P1 Left Stick/Up"
-msgstr ""
+msgstr "P1 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:35
 msgctxt "input-name"
 msgid "P1 Left Stick/Down"
-msgstr ""
+msgstr "P1 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:36
 msgctxt "input-name"
 msgid "P1 Left Stick/Left"
-msgstr ""
+msgstr "P1 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:37
 msgctxt "input-name"
 msgid "P1 Left Stick/Right"
-msgstr ""
+msgstr "P1 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:38
 msgctxt "input-name"
 msgid "P1 Button 1"
-msgstr ""
+msgstr "P1 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:39
 msgctxt "input-name"
 msgid "P1 Button 2"
-msgstr ""
+msgstr "P1 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:40
 msgctxt "input-name"
 msgid "P1 Button 3"
-msgstr ""
+msgstr "P1 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:41
 msgctxt "input-name"
 msgid "P1 Button 4"
-msgstr ""
+msgstr "P1 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:42
 msgctxt "input-name"
 msgid "P1 Button 5"
-msgstr ""
+msgstr "P1 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:43
 msgctxt "input-name"
 msgid "P1 Button 6"
-msgstr ""
+msgstr "P1 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:44
 msgctxt "input-name"
 msgid "P1 Button 7"
-msgstr ""
+msgstr "P1 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:45
 msgctxt "input-name"
 msgid "P1 Button 8"
-msgstr ""
+msgstr "P1 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:46
 msgctxt "input-name"
 msgid "P1 Button 9"
-msgstr ""
+msgstr "P1 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:47
 msgctxt "input-name"
 msgid "P1 Button 10"
-msgstr ""
+msgstr "P1 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:48
 msgctxt "input-name"
 msgid "P1 Button 11"
-msgstr ""
+msgstr "P1 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:49
 msgctxt "input-name"
 msgid "P1 Button 12"
-msgstr ""
+msgstr "P1 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:50
 msgctxt "input-name"
 msgid "P1 Button 13"
-msgstr ""
+msgstr "P1 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:51
 msgctxt "input-name"
 msgid "P1 Button 14"
-msgstr ""
+msgstr "P1 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:52
 msgctxt "input-name"
 msgid "P1 Button 15"
-msgstr ""
+msgstr "P1 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:53
 msgctxt "input-name"
 msgid "P1 Button 16"
-msgstr ""
+msgstr "P1 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:54
 msgctxt "input-name"
 msgid "P1 Start"
-msgstr ""
+msgstr "P1 Έναρξη"
 
 #: src/emu/inpttype.ipp:55
 msgctxt "input-name"
 msgid "P1 Select"
-msgstr ""
+msgstr "P1 Επιλογή"
 
 #: src/emu/inpttype.ipp:60
 msgctxt "input-name"
 msgid "P1 Mahjong A"
-msgstr ""
+msgstr "P1 Mahjong A"
 
 #: src/emu/inpttype.ipp:61
 msgctxt "input-name"
 msgid "P1 Mahjong B"
-msgstr ""
+msgstr "P1 Mahjong B"
 
 #: src/emu/inpttype.ipp:62
 msgctxt "input-name"
 msgid "P1 Mahjong C"
-msgstr ""
+msgstr "P1 Mahjong C"
 
 #: src/emu/inpttype.ipp:63
 msgctxt "input-name"
 msgid "P1 Mahjong D"
-msgstr ""
+msgstr "P1 Mahjong D"
 
 #: src/emu/inpttype.ipp:64
 msgctxt "input-name"
 msgid "P1 Mahjong E"
-msgstr ""
+msgstr "P1 Mahjong E"
 
 #: src/emu/inpttype.ipp:65
 msgctxt "input-name"
 msgid "P1 Mahjong F"
-msgstr ""
+msgstr "P1 Mahjong F"
 
 #: src/emu/inpttype.ipp:66
 msgctxt "input-name"
 msgid "P1 Mahjong G"
-msgstr ""
+msgstr "P1 Mahjong G"
 
 #: src/emu/inpttype.ipp:67
 msgctxt "input-name"
 msgid "P1 Mahjong H"
-msgstr ""
+msgstr "P1 Mahjong H"
 
 #: src/emu/inpttype.ipp:68
 msgctxt "input-name"
 msgid "P1 Mahjong I"
-msgstr ""
+msgstr "P1 Mahjong I"
 
 #: src/emu/inpttype.ipp:69
 msgctxt "input-name"
 msgid "P1 Mahjong J"
-msgstr ""
+msgstr "P1 Mahjong J"
 
 #: src/emu/inpttype.ipp:70
 msgctxt "input-name"
 msgid "P1 Mahjong K"
-msgstr ""
+msgstr "P1 Mahjong K"
 
 #: src/emu/inpttype.ipp:71
 msgctxt "input-name"
 msgid "P1 Mahjong L"
-msgstr ""
+msgstr "P1 Mahjong L"
 
 #: src/emu/inpttype.ipp:72
 msgctxt "input-name"
 msgid "P1 Mahjong M"
-msgstr ""
+msgstr "P1 Mahjong M"
 
 #: src/emu/inpttype.ipp:73
 msgctxt "input-name"
 msgid "P1 Mahjong N"
-msgstr ""
+msgstr "P1 Mahjong N"
 
 #: src/emu/inpttype.ipp:74
 msgctxt "input-name"
 msgid "P1 Mahjong O"
-msgstr ""
+msgstr "P1 Mahjong O"
 
 #: src/emu/inpttype.ipp:75
 msgctxt "input-name"
 msgid "P1 Mahjong P"
-msgstr ""
+msgstr "P1 Mahjong P"
 
 #: src/emu/inpttype.ipp:76
 msgctxt "input-name"
 msgid "P1 Mahjong Q"
-msgstr ""
+msgstr "P1 Mahjong Q"
 
 #: src/emu/inpttype.ipp:77
 msgctxt "input-name"
 msgid "P1 Mahjong Kan"
-msgstr ""
+msgstr "P1 Mahjong Kan"
 
 #: src/emu/inpttype.ipp:78
 msgctxt "input-name"
 msgid "P1 Mahjong Pon"
-msgstr ""
+msgstr "P1 Mahjong Pon"
 
 #: src/emu/inpttype.ipp:79
 msgctxt "input-name"
 msgid "P1 Mahjong Chi"
-msgstr ""
+msgstr "P1 Mahjong Chi"
 
 #: src/emu/inpttype.ipp:80
 msgctxt "input-name"
 msgid "P1 Mahjong Reach"
-msgstr ""
+msgstr "P1 Mahjong Reach"
 
 #: src/emu/inpttype.ipp:81
 msgctxt "input-name"
 msgid "P1 Mahjong Ron"
-msgstr ""
+msgstr "P1 Mahjong Ron"
 
 #: src/emu/inpttype.ipp:82
 msgctxt "input-name"
 msgid "P1 Mahjong Flip Flop"
-msgstr ""
+msgstr "P1 Mahjong Flip Flop"
 
 #: src/emu/inpttype.ipp:83
 msgctxt "input-name"
 msgid "P1 Mahjong Bet"
-msgstr ""
+msgstr "P1 Mahjong Ποντάρισμα"
 
 #: src/emu/inpttype.ipp:84
 msgctxt "input-name"
 msgid "P1 Mahjong Take Score"
-msgstr ""
+msgstr "P1 Mahjong Πάρτε σκορ"
 
 #: src/emu/inpttype.ipp:85
 msgctxt "input-name"
 msgid "P1 Mahjong Double Up"
-msgstr ""
+msgstr "P1 Mahjong Διπλασιασμός"
 
 #: src/emu/inpttype.ipp:86
 msgctxt "input-name"
 msgid "P1 Mahjong Big"
-msgstr ""
+msgstr "P1 Mahjong Μεγάλο"
 
 #: src/emu/inpttype.ipp:87
 msgctxt "input-name"
 msgid "P1 Mahjong Small"
-msgstr ""
+msgstr "P1 Mahjong Μικρό"
 
 #: src/emu/inpttype.ipp:88
 msgctxt "input-name"
 msgid "P1 Mahjong Last Chance"
-msgstr ""
+msgstr "P1 Mahjong Τελευταία Ευκαιρία"
 
 #: src/emu/inpttype.ipp:93
 msgctxt "input-name"
 msgid "P1 Hanafuda A/1"
-msgstr ""
+msgstr "P1 Hanafuda A/1"
 
 #: src/emu/inpttype.ipp:94
 msgctxt "input-name"
 msgid "P1 Hanafuda B/2"
-msgstr ""
+msgstr "P1 Hanafuda B/2"
 
 #: src/emu/inpttype.ipp:95
 msgctxt "input-name"
 msgid "P1 Hanafuda C/3"
-msgstr ""
+msgstr "P1 Hanafuda C/3"
 
 #: src/emu/inpttype.ipp:96
 msgctxt "input-name"
 msgid "P1 Hanafuda D/4"
-msgstr ""
+msgstr "P1 Hanafuda D/4"
 
 #: src/emu/inpttype.ipp:97
 msgctxt "input-name"
 msgid "P1 Hanafuda E/5"
-msgstr ""
+msgstr "P1 Hanafuda E/5"
 
 #: src/emu/inpttype.ipp:98
 msgctxt "input-name"
 msgid "P1 Hanafuda F/6"
-msgstr ""
+msgstr "P1 Hanafuda F/6"
 
 #: src/emu/inpttype.ipp:99
 msgctxt "input-name"
 msgid "P1 Hanafuda G/7"
-msgstr ""
+msgstr "P1 Hanafuda G/7"
 
 #: src/emu/inpttype.ipp:100
 msgctxt "input-name"
 msgid "P1 Hanafuda H/8"
-msgstr ""
+msgstr "P1 Hanafuda H/8"
 
 #: src/emu/inpttype.ipp:101
 msgctxt "input-name"
 msgid "P1 Hanafuda Yes"
-msgstr ""
+msgstr "P1 Hanafuda Ναι"
 
 #: src/emu/inpttype.ipp:102
 msgctxt "input-name"
 msgid "P1 Hanafuda No"
-msgstr ""
+msgstr "P1 Hanafuda Όχι"
 
 #: src/emu/inpttype.ipp:107
 msgctxt "input-name"
 msgid "Key In"
-msgstr ""
+msgstr "Πίστωση Κλειδιού"
 
 #: src/emu/inpttype.ipp:108
 msgctxt "input-name"
 msgid "Key Out"
-msgstr ""
+msgstr "Χρέωση Κλειδιού"
 
 #: src/emu/inpttype.ipp:109 src/emu/inpttype.ipp:544
 msgctxt "input-name"
 msgid "Service"
-msgstr ""
+msgstr "Σέρβις"
 
 #: src/emu/inpttype.ipp:110
 msgctxt "input-name"
 msgid "Book-Keeping"
-msgstr ""
+msgstr "Λογιστικα"
 
 #: src/emu/inpttype.ipp:111
 msgctxt "input-name"
 msgid "Door"
-msgstr ""
+msgstr "Πόρτα"
 
 #: src/emu/inpttype.ipp:112
 msgctxt "input-name"
 msgid "Payout"
-msgstr ""
+msgstr "Πληρωμή"
 
 #: src/emu/inpttype.ipp:113
 msgctxt "input-name"
 msgid "Bet"
-msgstr ""
+msgstr "Ποντάρισμα"
 
 #: src/emu/inpttype.ipp:114
 msgctxt "input-name"
 msgid "Deal"
-msgstr ""
+msgstr "Μοιρασιά"
 
 #: src/emu/inpttype.ipp:115
 msgctxt "input-name"
 msgid "Stand"
-msgstr ""
+msgstr "Στάση"
 
 #: src/emu/inpttype.ipp:116
 msgctxt "input-name"
 msgid "Take Score"
-msgstr ""
+msgstr "Πάρτε Βαθμολογία"
 
 #: src/emu/inpttype.ipp:117
 msgctxt "input-name"
 msgid "Double Up"
-msgstr ""
+msgstr "Διπλασιασμός"
 
 #: src/emu/inpttype.ipp:118
 msgctxt "input-name"
 msgid "Half Gamble"
-msgstr ""
+msgstr "Μισό στοίχημα"
 
 #: src/emu/inpttype.ipp:119
 msgctxt "input-name"
 msgid "High"
-msgstr ""
+msgstr "Μεγαλύτερο"
 
 #: src/emu/inpttype.ipp:120
 msgctxt "input-name"
 msgid "Low"
-msgstr ""
+msgstr "Μικρότερο"
 
 #: src/emu/inpttype.ipp:125
 msgctxt "input-name"
 msgid "Hold 1"
-msgstr ""
+msgstr "Κράτηση 1"
 
 #: src/emu/inpttype.ipp:126
 msgctxt "input-name"
 msgid "Hold 2"
-msgstr ""
+msgstr "Κράτηση 2"
 
 #: src/emu/inpttype.ipp:127
 msgctxt "input-name"
 msgid "Hold 3"
-msgstr ""
+msgstr "Κράτηση 3"
 
 #: src/emu/inpttype.ipp:128
 msgctxt "input-name"
 msgid "Hold 4"
-msgstr ""
+msgstr "Κράτηση 4"
 
 #: src/emu/inpttype.ipp:129
 msgctxt "input-name"
 msgid "Hold 5"
-msgstr ""
+msgstr "Κράτηση 5"
 
 #: src/emu/inpttype.ipp:130
 msgctxt "input-name"
 msgid "Cancel"
-msgstr ""
+msgstr "Ακύρωση"
 
 #: src/emu/inpttype.ipp:135
 msgctxt "input-name"
 msgid "Stop Reel 1"
-msgstr ""
+msgstr "Διακοπή Κυλίνδρου 1"
 
 #: src/emu/inpttype.ipp:136
 msgctxt "input-name"
 msgid "Stop Reel 2"
-msgstr ""
+msgstr "Διακοπή Κυλίνδρου 2"
 
 #: src/emu/inpttype.ipp:137
 msgctxt "input-name"
 msgid "Stop Reel 3"
-msgstr ""
+msgstr "Διακοπή Κυλίνδρου 3"
 
 #: src/emu/inpttype.ipp:138
 msgctxt "input-name"
 msgid "Stop Reel 4"
-msgstr ""
+msgstr "Διακοπή Κυλίνδρου 4"
 
 #: src/emu/inpttype.ipp:139
 msgctxt "input-name"
 msgid "Stop All Reels"
-msgstr ""
+msgstr "Διακοπή Όλων των Κυλίνδρων"
 
 #: src/emu/inpttype.ipp:144
 msgctxt "input-name"
 msgid "P2 Up"
-msgstr ""
+msgstr "P2 Επάνω"
 
 #: src/emu/inpttype.ipp:145
 msgctxt "input-name"
 msgid "P2 Down"
-msgstr ""
+msgstr "P2 Κάτω"
 
 #: src/emu/inpttype.ipp:146
 msgctxt "input-name"
 msgid "P2 Left"
-msgstr ""
+msgstr "P2 Αριστερά"
 
 #: src/emu/inpttype.ipp:147
 msgctxt "input-name"
 msgid "P2 Right"
-msgstr ""
+msgstr "P2 Δεξιά"
 
 #: src/emu/inpttype.ipp:148
 msgctxt "input-name"
 msgid "P2 Right Stick/Up"
-msgstr ""
+msgstr "P2 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:149
 msgctxt "input-name"
 msgid "P2 Right Stick/Down"
-msgstr ""
+msgstr "P2 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:150
 msgctxt "input-name"
 msgid "P2 Right Stick/Left"
-msgstr ""
+msgstr "P2 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:151
 msgctxt "input-name"
 msgid "P2 Right Stick/Right"
-msgstr ""
+msgstr "P2 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:152
 msgctxt "input-name"
 msgid "P2 Left Stick/Up"
-msgstr ""
+msgstr "P2 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:153
 msgctxt "input-name"
 msgid "P2 Left Stick/Down"
-msgstr ""
+msgstr "P2 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:154
 msgctxt "input-name"
 msgid "P2 Left Stick/Left"
-msgstr ""
+msgstr "P2 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:155
 msgctxt "input-name"
 msgid "P2 Left Stick/Right"
-msgstr ""
+msgstr "P2 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:156
 msgctxt "input-name"
 msgid "P2 Button 1"
-msgstr ""
+msgstr "P2 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:157
 msgctxt "input-name"
 msgid "P2 Button 2"
-msgstr ""
+msgstr "P2 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:158
 msgctxt "input-name"
 msgid "P2 Button 3"
-msgstr ""
+msgstr "P2 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:159
 msgctxt "input-name"
 msgid "P2 Button 4"
-msgstr ""
+msgstr "P2 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:160
 msgctxt "input-name"
 msgid "P2 Button 5"
-msgstr ""
+msgstr "P2 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:161
 msgctxt "input-name"
 msgid "P2 Button 6"
-msgstr ""
+msgstr "P2 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:162
 msgctxt "input-name"
 msgid "P2 Button 7"
-msgstr ""
+msgstr "P2 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:163
 msgctxt "input-name"
 msgid "P2 Button 8"
-msgstr ""
+msgstr "P2 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:164
 msgctxt "input-name"
 msgid "P2 Button 9"
-msgstr ""
+msgstr "P2 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:165
 msgctxt "input-name"
 msgid "P2 Button 10"
-msgstr ""
+msgstr "P2 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:166
 msgctxt "input-name"
 msgid "P2 Button 11"
-msgstr ""
+msgstr "P2 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:167
 msgctxt "input-name"
 msgid "P2 Button 12"
-msgstr ""
+msgstr "P2 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:168
 msgctxt "input-name"
 msgid "P2 Button 13"
-msgstr ""
+msgstr "P2 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:169
 msgctxt "input-name"
 msgid "P2 Button 14"
-msgstr ""
+msgstr "P2 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:170
 msgctxt "input-name"
 msgid "P2 Button 15"
-msgstr ""
+msgstr "P2 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:171
 msgctxt "input-name"
 msgid "P2 Button 16"
-msgstr ""
+msgstr "P2 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:172
 msgctxt "input-name"
 msgid "P2 Start"
-msgstr ""
+msgstr "P2 Έναρξη"
 
 #: src/emu/inpttype.ipp:173
 msgctxt "input-name"
 msgid "P2 Select"
-msgstr ""
+msgstr "P2 Επιλογή"
 
 #: src/emu/inpttype.ipp:178
 msgctxt "input-name"
 msgid "P2 Mahjong A"
-msgstr ""
+msgstr "P2 Mahjong A"
 
 #: src/emu/inpttype.ipp:179
 msgctxt "input-name"
 msgid "P2 Mahjong B"
-msgstr ""
+msgstr "P2 Mahjong B"
 
 #: src/emu/inpttype.ipp:180
 msgctxt "input-name"
 msgid "P2 Mahjong C"
-msgstr ""
+msgstr "P2 Mahjong C"
 
 #: src/emu/inpttype.ipp:181
 msgctxt "input-name"
 msgid "P2 Mahjong D"
-msgstr ""
+msgstr "P2 Mahjong D"
 
 #: src/emu/inpttype.ipp:182
 msgctxt "input-name"
 msgid "P2 Mahjong E"
-msgstr ""
+msgstr "P2 Mahjong E"
 
 #: src/emu/inpttype.ipp:183
 msgctxt "input-name"
 msgid "P2 Mahjong F"
-msgstr ""
+msgstr "P2 Mahjong F"
 
 #: src/emu/inpttype.ipp:184
 msgctxt "input-name"
 msgid "P2 Mahjong G"
-msgstr ""
+msgstr "P2 Mahjong G"
 
 #: src/emu/inpttype.ipp:185
 msgctxt "input-name"
 msgid "P2 Mahjong H"
-msgstr ""
+msgstr "P2 Mahjong H"
 
 #: src/emu/inpttype.ipp:186
 msgctxt "input-name"
 msgid "P2 Mahjong I"
-msgstr ""
+msgstr "P2 Mahjong I"
 
 #: src/emu/inpttype.ipp:187
 msgctxt "input-name"
 msgid "P2 Mahjong J"
-msgstr ""
+msgstr "P2 Mahjong J"
 
 #: src/emu/inpttype.ipp:188
 msgctxt "input-name"
 msgid "P2 Mahjong K"
-msgstr ""
+msgstr "P2 Mahjong K"
 
 #: src/emu/inpttype.ipp:189
 msgctxt "input-name"
 msgid "P2 Mahjong L"
-msgstr ""
+msgstr "P2 Mahjong L"
 
 #: src/emu/inpttype.ipp:190
 msgctxt "input-name"
 msgid "P2 Mahjong M"
-msgstr ""
+msgstr "P2 Mahjong M"
 
 #: src/emu/inpttype.ipp:191
 msgctxt "input-name"
 msgid "P2 Mahjong N"
-msgstr ""
+msgstr "P2 Mahjong N"
 
 #: src/emu/inpttype.ipp:192
 msgctxt "input-name"
 msgid "P2 Mahjong O"
-msgstr ""
+msgstr "P2 Mahjong O"
 
 #: src/emu/inpttype.ipp:193
 msgctxt "input-name"
 msgid "P2 Mahjong P"
-msgstr ""
+msgstr "P2 Mahjong P"
 
 #: src/emu/inpttype.ipp:194
 msgctxt "input-name"
 msgid "P2 Mahjong Q"
-msgstr ""
+msgstr "P2 Mahjong Q"
 
 #: src/emu/inpttype.ipp:195
 msgctxt "input-name"
 msgid "P2 Mahjong Kan"
-msgstr ""
+msgstr "P2 Mahjong Kan"
 
 #: src/emu/inpttype.ipp:196
 msgctxt "input-name"
 msgid "P2 Mahjong Pon"
-msgstr ""
+msgstr "P2 Mahjong Pon"
 
 #: src/emu/inpttype.ipp:197
 msgctxt "input-name"
 msgid "P2 Mahjong Chi"
-msgstr ""
+msgstr "P2 Mahjong Chi"
 
 #: src/emu/inpttype.ipp:198
 msgctxt "input-name"
 msgid "P2 Mahjong Reach"
-msgstr ""
+msgstr "P2 Mahjong Reach"
 
 #: src/emu/inpttype.ipp:199
 msgctxt "input-name"
 msgid "P2 Mahjong Ron"
-msgstr ""
+msgstr "P2 Mahjong Ron"
 
 #: src/emu/inpttype.ipp:200
 msgctxt "input-name"
 msgid "P2 Mahjong Bet"
-msgstr ""
+msgstr "P2 Mahjong Ποντάρισμα"
 
 #: src/emu/inpttype.ipp:201
 msgctxt "input-name"
 msgid "P2 Mahjong Last Chance"
-msgstr ""
+msgstr "P2 Mahjong Τελευταία Ευκαιρία"
 
 #: src/emu/inpttype.ipp:202
 msgctxt "input-name"
 msgid "P2 Mahjong Take Score"
-msgstr ""
+msgstr "P2 Mahjong Πάρε σκορ"
 
 #: src/emu/inpttype.ipp:203
 msgctxt "input-name"
 msgid "P2 Mahjong Double Up"
-msgstr ""
+msgstr "P2 Mahjong Διπλασιασμός"
 
 #: src/emu/inpttype.ipp:204
 msgctxt "input-name"
 msgid "P2 Mahjong Flip Flop"
-msgstr ""
+msgstr "P2 Mahjong Flip Flop"
 
 #: src/emu/inpttype.ipp:205
 msgctxt "input-name"
 msgid "P2 Mahjong Big"
-msgstr ""
+msgstr "P2 Mahjong Μεγάλο"
 
 #: src/emu/inpttype.ipp:206
 msgctxt "input-name"
 msgid "P2 Mahjong Small"
-msgstr ""
+msgstr "P2 Mahjong Μικρό"
 
 #: src/emu/inpttype.ipp:211
 msgctxt "input-name"
 msgid "P2 Hanafuda A/1"
-msgstr ""
+msgstr "P2 Hanafuda A/1"
 
 #: src/emu/inpttype.ipp:212
 msgctxt "input-name"
 msgid "P2 Hanafuda B/2"
-msgstr ""
+msgstr "P2 Hanafuda B/2"
 
 #: src/emu/inpttype.ipp:213
 msgctxt "input-name"
 msgid "P2 Hanafuda C/3"
-msgstr ""
+msgstr "P2 Hanafuda C/3"
 
 #: src/emu/inpttype.ipp:214
 msgctxt "input-name"
 msgid "P2 Hanafuda D/4"
-msgstr ""
+msgstr "P2 Hanafuda D/4"
 
 #: src/emu/inpttype.ipp:215
 msgctxt "input-name"
 msgid "P2 Hanafuda E/5"
-msgstr ""
+msgstr "P2 Hanafuda E/5"
 
 #: src/emu/inpttype.ipp:216
 msgctxt "input-name"
 msgid "P2 Hanafuda F/6"
-msgstr ""
+msgstr "P2 Hanafuda F/6"
 
 #: src/emu/inpttype.ipp:217
 msgctxt "input-name"
 msgid "P2 Hanafuda G/7"
-msgstr ""
+msgstr "P2 Hanafuda G/7"
 
 #: src/emu/inpttype.ipp:218
 msgctxt "input-name"
 msgid "P2 Hanafuda H/8"
-msgstr ""
+msgstr "P2 Hanafuda H/8"
 
 #: src/emu/inpttype.ipp:219
 msgctxt "input-name"
 msgid "P2 Hanafuda Yes"
-msgstr ""
+msgstr "P2 Hanafuda Ναι"
 
 #: src/emu/inpttype.ipp:220
 msgctxt "input-name"
 msgid "P2 Hanafuda No"
-msgstr ""
+msgstr "P2 Hanafuda Όχι"
 
 #: src/emu/inpttype.ipp:225
 msgctxt "input-name"
 msgid "P3 Up"
-msgstr ""
+msgstr "P3 Επάνω"
 
 #: src/emu/inpttype.ipp:226
 msgctxt "input-name"
 msgid "P3 Down"
-msgstr ""
+msgstr "P3 Κάτω"
 
 #: src/emu/inpttype.ipp:227
 msgctxt "input-name"
 msgid "P3 Left"
-msgstr ""
+msgstr "P3 Αριστερά"
 
 #: src/emu/inpttype.ipp:228
 msgctxt "input-name"
 msgid "P3 Right"
-msgstr ""
+msgstr "P3 Δεξιά"
 
 #: src/emu/inpttype.ipp:229
 msgctxt "input-name"
 msgid "P3 Right Stick/Up"
-msgstr ""
+msgstr "P3 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:230
 msgctxt "input-name"
 msgid "P3 Right Stick/Down"
-msgstr ""
+msgstr "P3 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:231
 msgctxt "input-name"
 msgid "P3 Right Stick/Left"
-msgstr ""
+msgstr "P3 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:232
 msgctxt "input-name"
 msgid "P3 Right Stick/Right"
-msgstr ""
+msgstr "P3 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:233
 msgctxt "input-name"
 msgid "P3 Left Stick/Up"
-msgstr ""
+msgstr "P3 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:234
 msgctxt "input-name"
 msgid "P3 Left Stick/Down"
-msgstr ""
+msgstr "P3 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:235
 msgctxt "input-name"
 msgid "P3 Left Stick/Left"
-msgstr ""
+msgstr "P3 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:236
 msgctxt "input-name"
 msgid "P3 Left Stick/Right"
-msgstr ""
+msgstr "P3 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:237
 msgctxt "input-name"
 msgid "P3 Button 1"
-msgstr ""
+msgstr "P3 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:238
 msgctxt "input-name"
 msgid "P3 Button 2"
-msgstr ""
+msgstr "P3 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:239
 msgctxt "input-name"
 msgid "P3 Button 3"
-msgstr ""
+msgstr "P3 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:240
 msgctxt "input-name"
 msgid "P3 Button 4"
-msgstr ""
+msgstr "P3 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:241
 msgctxt "input-name"
 msgid "P3 Button 5"
-msgstr ""
+msgstr "P3 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:242
 msgctxt "input-name"
 msgid "P3 Button 6"
-msgstr ""
+msgstr "P3 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:243
 msgctxt "input-name"
 msgid "P3 Button 7"
-msgstr ""
+msgstr "P3 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:244
 msgctxt "input-name"
 msgid "P3 Button 8"
-msgstr ""
+msgstr "P3 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:245
 msgctxt "input-name"
 msgid "P3 Button 9"
-msgstr ""
+msgstr "P3 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:246
 msgctxt "input-name"
 msgid "P3 Button 10"
-msgstr ""
+msgstr "P3 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:247
 msgctxt "input-name"
 msgid "P3 Button 11"
-msgstr ""
+msgstr "P3 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:248
 msgctxt "input-name"
 msgid "P3 Button 12"
-msgstr ""
+msgstr "P3 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:249
 msgctxt "input-name"
 msgid "P3 Button 13"
-msgstr ""
+msgstr "P3 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:250
 msgctxt "input-name"
 msgid "P3 Button 14"
-msgstr ""
+msgstr "P3 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:251
 msgctxt "input-name"
 msgid "P3 Button 15"
-msgstr ""
+msgstr "P3 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:252
 msgctxt "input-name"
 msgid "P3 Button 16"
-msgstr ""
+msgstr "P3 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:253
 msgctxt "input-name"
 msgid "P3 Start"
-msgstr ""
+msgstr "P3 Έναρξη"
 
 #: src/emu/inpttype.ipp:254
 msgctxt "input-name"
 msgid "P3 Select"
-msgstr ""
+msgstr "P3 Επιλογή"
 
 #: src/emu/inpttype.ipp:259
 msgctxt "input-name"
 msgid "P4 Up"
-msgstr ""
+msgstr "P4 Επάνω"
 
 #: src/emu/inpttype.ipp:260
 msgctxt "input-name"
 msgid "P4 Down"
-msgstr ""
+msgstr "P4 Κάτω"
 
 #: src/emu/inpttype.ipp:261
 msgctxt "input-name"
 msgid "P4 Left"
-msgstr ""
+msgstr "P4 Αριστερά"
 
 #: src/emu/inpttype.ipp:262
 msgctxt "input-name"
 msgid "P4 Right"
-msgstr ""
+msgstr "P4 Δεξιά"
 
 #: src/emu/inpttype.ipp:263
 msgctxt "input-name"
 msgid "P4 Right Stick/Up"
-msgstr ""
+msgstr "P4 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:264
 msgctxt "input-name"
 msgid "P4 Right Stick/Down"
-msgstr ""
+msgstr "P4 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:265
 msgctxt "input-name"
 msgid "P4 Right Stick/Left"
-msgstr ""
+msgstr "P4 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:266
 msgctxt "input-name"
 msgid "P4 Right Stick/Right"
-msgstr ""
+msgstr "P4 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:267
 msgctxt "input-name"
 msgid "P4 Left Stick/Up"
-msgstr ""
+msgstr "P4 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:268
 msgctxt "input-name"
 msgid "P4 Left Stick/Down"
-msgstr ""
+msgstr "P4 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:269
 msgctxt "input-name"
 msgid "P4 Left Stick/Left"
-msgstr ""
+msgstr "P4 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:270
 msgctxt "input-name"
 msgid "P4 Left Stick/Right"
-msgstr ""
+msgstr "P4 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:271
 msgctxt "input-name"
 msgid "P4 Button 1"
-msgstr ""
+msgstr "P4 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:272
 msgctxt "input-name"
 msgid "P4 Button 2"
-msgstr ""
+msgstr "P4 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:273
 msgctxt "input-name"
 msgid "P4 Button 3"
-msgstr ""
+msgstr "P4 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:274
 msgctxt "input-name"
 msgid "P4 Button 4"
-msgstr ""
+msgstr "P4 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:275
 msgctxt "input-name"
 msgid "P4 Button 5"
-msgstr ""
+msgstr "P4 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:276
 msgctxt "input-name"
 msgid "P4 Button 6"
-msgstr ""
+msgstr "P4 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:277
 msgctxt "input-name"
 msgid "P4 Button 7"
-msgstr ""
+msgstr "P4 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:278
 msgctxt "input-name"
 msgid "P4 Button 8"
-msgstr ""
+msgstr "P4 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:279
 msgctxt "input-name"
 msgid "P4 Button 9"
-msgstr ""
+msgstr "P4 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:280
 msgctxt "input-name"
 msgid "P4 Button 10"
-msgstr ""
+msgstr "P4 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:281
 msgctxt "input-name"
 msgid "P4 Button 11"
-msgstr ""
+msgstr "P4 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:282
 msgctxt "input-name"
 msgid "P4 Button 12"
-msgstr ""
+msgstr "P4 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:283
 msgctxt "input-name"
 msgid "P4 Button 13"
-msgstr ""
+msgstr "P4 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:284
 msgctxt "input-name"
 msgid "P4 Button 14"
-msgstr ""
+msgstr "P4 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:285
 msgctxt "input-name"
 msgid "P4 Button 15"
-msgstr ""
+msgstr "P4 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:286
 msgctxt "input-name"
 msgid "P4 Button 16"
-msgstr ""
+msgstr "P4 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:287
 msgctxt "input-name"
 msgid "P4 Start"
-msgstr ""
+msgstr "P4 Έναρξη"
 
 #: src/emu/inpttype.ipp:288
 msgctxt "input-name"
 msgid "P4 Select"
-msgstr ""
+msgstr "P4 Επιλογή"
 
 #: src/emu/inpttype.ipp:293
 msgctxt "input-name"
 msgid "P5 Up"
-msgstr ""
+msgstr "P5 Επάνω"
 
 #: src/emu/inpttype.ipp:294
 msgctxt "input-name"
 msgid "P5 Down"
-msgstr ""
+msgstr "P5 Κάτω"
 
 #: src/emu/inpttype.ipp:295
 msgctxt "input-name"
 msgid "P5 Left"
-msgstr ""
+msgstr "P5 Αριστερά"
 
 #: src/emu/inpttype.ipp:296
 msgctxt "input-name"
 msgid "P5 Right"
-msgstr ""
+msgstr "P5 Δεξιά"
 
 #: src/emu/inpttype.ipp:297
 msgctxt "input-name"
 msgid "P5 Right Stick/Up"
-msgstr ""
+msgstr "P5 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:298
 msgctxt "input-name"
 msgid "P5 Right Stick/Down"
-msgstr ""
+msgstr "P5 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:299
 msgctxt "input-name"
 msgid "P5 Right Stick/Left"
-msgstr ""
+msgstr "P5 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:300
 msgctxt "input-name"
 msgid "P5 Right Stick/Right"
-msgstr ""
+msgstr "P5 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:301
 msgctxt "input-name"
 msgid "P5 Left Stick/Up"
-msgstr ""
+msgstr "P5 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:302
 msgctxt "input-name"
 msgid "P5 Left Stick/Down"
-msgstr ""
+msgstr "P5 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:303
 msgctxt "input-name"
 msgid "P5 Left Stick/Left"
-msgstr ""
+msgstr "P5 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:304
 msgctxt "input-name"
 msgid "P5 Left Stick/Right"
-msgstr ""
+msgstr "P5 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:305
 msgctxt "input-name"
 msgid "P5 Button 1"
-msgstr ""
+msgstr "P5 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:306
 msgctxt "input-name"
 msgid "P5 Button 2"
-msgstr ""
+msgstr "P5 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:307
 msgctxt "input-name"
 msgid "P5 Button 3"
-msgstr ""
+msgstr "P5 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:308
 msgctxt "input-name"
 msgid "P5 Button 4"
-msgstr ""
+msgstr "P5 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:309
 msgctxt "input-name"
 msgid "P5 Button 5"
-msgstr ""
+msgstr "P5 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:310
 msgctxt "input-name"
 msgid "P5 Button 6"
-msgstr ""
+msgstr "P5 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:311
 msgctxt "input-name"
 msgid "P5 Button 7"
-msgstr ""
+msgstr "P5 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:312
 msgctxt "input-name"
 msgid "P5 Button 8"
-msgstr ""
+msgstr "P5 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:313
 msgctxt "input-name"
 msgid "P5 Button 9"
-msgstr ""
+msgstr "P5 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:314
 msgctxt "input-name"
 msgid "P5 Button 10"
-msgstr ""
+msgstr "P5 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:315
 msgctxt "input-name"
 msgid "P5 Button 11"
-msgstr ""
+msgstr "P5 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:316
 msgctxt "input-name"
 msgid "P5 Button 12"
-msgstr ""
+msgstr "P5 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:317
 msgctxt "input-name"
 msgid "P5 Button 13"
-msgstr ""
+msgstr "P5 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:318
 msgctxt "input-name"
 msgid "P5 Button 14"
-msgstr ""
+msgstr "P5 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:319
 msgctxt "input-name"
 msgid "P5 Button 15"
-msgstr ""
+msgstr "P5 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:320
 msgctxt "input-name"
 msgid "P5 Button 16"
-msgstr ""
+msgstr "P5 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:321
 msgctxt "input-name"
 msgid "P5 Start"
-msgstr ""
+msgstr "P5 Έναρξη"
 
 #: src/emu/inpttype.ipp:322
 msgctxt "input-name"
 msgid "P5 Select"
-msgstr ""
+msgstr "P5 Επιλογή"
 
 #: src/emu/inpttype.ipp:327
 msgctxt "input-name"
 msgid "P6 Up"
-msgstr ""
+msgstr "P6 Επάνω"
 
 #: src/emu/inpttype.ipp:328
 msgctxt "input-name"
 msgid "P6 Down"
-msgstr ""
+msgstr "P6 Κάτω"
 
 #: src/emu/inpttype.ipp:329
 msgctxt "input-name"
 msgid "P6 Left"
-msgstr ""
+msgstr "P6 Αριστερά"
 
 #: src/emu/inpttype.ipp:330
 msgctxt "input-name"
 msgid "P6 Right"
-msgstr ""
+msgstr "P6 Δεξιά"
 
 #: src/emu/inpttype.ipp:331
 msgctxt "input-name"
 msgid "P6 Right Stick/Up"
-msgstr ""
+msgstr "P6 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:332
 msgctxt "input-name"
 msgid "P6 Right Stick/Down"
-msgstr ""
+msgstr "P6 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:333
 msgctxt "input-name"
 msgid "P6 Right Stick/Left"
-msgstr ""
+msgstr "P6 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:334
 msgctxt "input-name"
 msgid "P6 Right Stick/Right"
-msgstr ""
+msgstr "P6 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:335
 msgctxt "input-name"
 msgid "P6 Left Stick/Up"
-msgstr ""
+msgstr "P6 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:336
 msgctxt "input-name"
 msgid "P6 Left Stick/Down"
-msgstr ""
+msgstr "P6 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:337
 msgctxt "input-name"
 msgid "P6 Left Stick/Left"
-msgstr ""
+msgstr "P6 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:338
 msgctxt "input-name"
 msgid "P6 Left Stick/Right"
-msgstr ""
+msgstr "P6 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:339
 msgctxt "input-name"
 msgid "P6 Button 1"
-msgstr ""
+msgstr "P6 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:340
 msgctxt "input-name"
 msgid "P6 Button 2"
-msgstr ""
+msgstr "P6 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:341
 msgctxt "input-name"
 msgid "P6 Button 3"
-msgstr ""
+msgstr "P6 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:342
 msgctxt "input-name"
 msgid "P6 Button 4"
-msgstr ""
+msgstr "P6 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:343
 msgctxt "input-name"
 msgid "P6 Button 5"
-msgstr ""
+msgstr "P6 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:344
 msgctxt "input-name"
 msgid "P6 Button 6"
-msgstr ""
+msgstr "P6 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:345
 msgctxt "input-name"
 msgid "P6 Button 7"
-msgstr ""
+msgstr "P6 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:346
 msgctxt "input-name"
 msgid "P6 Button 8"
-msgstr ""
+msgstr "P6 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:347
 msgctxt "input-name"
 msgid "P6 Button 9"
-msgstr ""
+msgstr "P6 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:348
 msgctxt "input-name"
 msgid "P6 Button 10"
-msgstr ""
+msgstr "P6 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:349
 msgctxt "input-name"
 msgid "P6 Button 11"
-msgstr ""
+msgstr "P6 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:350
 msgctxt "input-name"
 msgid "P6 Button 12"
-msgstr ""
+msgstr "P6 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:351
 msgctxt "input-name"
 msgid "P6 Button 13"
-msgstr ""
+msgstr "P6 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:352
 msgctxt "input-name"
 msgid "P6 Button 14"
-msgstr ""
+msgstr "P6 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:353
 msgctxt "input-name"
 msgid "P6 Button 15"
-msgstr ""
+msgstr "P6 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:354
 msgctxt "input-name"
 msgid "P6 Button 16"
-msgstr ""
+msgstr "P6 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:355
 msgctxt "input-name"
 msgid "P6 Start"
-msgstr ""
+msgstr "P6 Έναρξη"
 
 #: src/emu/inpttype.ipp:356
 msgctxt "input-name"
 msgid "P6 Select"
-msgstr ""
+msgstr "P6 Επιλογή"
 
 #: src/emu/inpttype.ipp:361
 msgctxt "input-name"
 msgid "P7 Up"
-msgstr ""
+msgstr "P7 Επάνω"
 
 #: src/emu/inpttype.ipp:362
 msgctxt "input-name"
 msgid "P7 Down"
-msgstr ""
+msgstr "P7 Κάτω"
 
 #: src/emu/inpttype.ipp:363
 msgctxt "input-name"
 msgid "P7 Left"
-msgstr ""
+msgstr "P7 Αριστερά"
 
 #: src/emu/inpttype.ipp:364
 msgctxt "input-name"
 msgid "P7 Right"
-msgstr ""
+msgstr "P7 Δεξιά"
 
 #: src/emu/inpttype.ipp:365
 msgctxt "input-name"
 msgid "P7 Right Stick/Up"
-msgstr ""
+msgstr "P7 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:366
 msgctxt "input-name"
 msgid "P7 Right Stick/Down"
-msgstr ""
+msgstr "P7 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:367
 msgctxt "input-name"
 msgid "P7 Right Stick/Left"
-msgstr ""
+msgstr "P7 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:368
 msgctxt "input-name"
 msgid "P7 Right Stick/Right"
-msgstr ""
+msgstr "P7 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:369
 msgctxt "input-name"
 msgid "P7 Left Stick/Up"
-msgstr ""
+msgstr "P7 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:370
 msgctxt "input-name"
 msgid "P7 Left Stick/Down"
-msgstr ""
+msgstr "P7 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:371
 msgctxt "input-name"
 msgid "P7 Left Stick/Left"
-msgstr ""
+msgstr "P7 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:372
 msgctxt "input-name"
 msgid "P7 Left Stick/Right"
-msgstr ""
+msgstr "P7 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:373
 msgctxt "input-name"
 msgid "P7 Button 1"
-msgstr ""
+msgstr "P7 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:374
 msgctxt "input-name"
 msgid "P7 Button 2"
-msgstr ""
+msgstr "P7 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:375
 msgctxt "input-name"
 msgid "P7 Button 3"
-msgstr ""
+msgstr "P7 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:376
 msgctxt "input-name"
 msgid "P7 Button 4"
-msgstr ""
+msgstr "P7 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:377
 msgctxt "input-name"
 msgid "P7 Button 5"
-msgstr ""
+msgstr "P7 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:378
 msgctxt "input-name"
 msgid "P7 Button 6"
-msgstr ""
+msgstr "P7 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:379
 msgctxt "input-name"
 msgid "P7 Button 7"
-msgstr ""
+msgstr "P7 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:380
 msgctxt "input-name"
 msgid "P7 Button 8"
-msgstr ""
+msgstr "P7 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:381
 msgctxt "input-name"
 msgid "P7 Button 9"
-msgstr ""
+msgstr "P7 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:382
 msgctxt "input-name"
 msgid "P7 Button 10"
-msgstr ""
+msgstr "P7 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:383
 msgctxt "input-name"
 msgid "P7 Button 11"
-msgstr ""
+msgstr "P7 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:384
 msgctxt "input-name"
 msgid "P7 Button 12"
-msgstr ""
+msgstr "P7 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:385
 msgctxt "input-name"
 msgid "P7 Button 13"
-msgstr ""
+msgstr "P7 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:386
 msgctxt "input-name"
 msgid "P7 Button 14"
-msgstr ""
+msgstr "P7 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:387
 msgctxt "input-name"
 msgid "P7 Button 15"
-msgstr ""
+msgstr "P7 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:388
 msgctxt "input-name"
 msgid "P7 Button 16"
-msgstr ""
+msgstr "P7 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:389
 msgctxt "input-name"
 msgid "P7 Start"
-msgstr ""
+msgstr "P7 Έναρξη"
 
 #: src/emu/inpttype.ipp:390
 msgctxt "input-name"
 msgid "P7 Select"
-msgstr ""
+msgstr "P7 Επιλογή"
 
 #: src/emu/inpttype.ipp:395
 msgctxt "input-name"
 msgid "P8 Up"
-msgstr ""
+msgstr "P8 Επάνω"
 
 #: src/emu/inpttype.ipp:396
 msgctxt "input-name"
 msgid "P8 Down"
-msgstr ""
+msgstr "P8 Κάτω"
 
 #: src/emu/inpttype.ipp:397
 msgctxt "input-name"
 msgid "P8 Left"
-msgstr ""
+msgstr "P8 Αριστερά"
 
 #: src/emu/inpttype.ipp:398
 msgctxt "input-name"
 msgid "P8 Right"
-msgstr ""
+msgstr "P8 Δεξιά"
 
 #: src/emu/inpttype.ipp:399
 msgctxt "input-name"
 msgid "P8 Right Stick/Up"
-msgstr ""
+msgstr "P8 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:400
 msgctxt "input-name"
 msgid "P8 Right Stick/Down"
-msgstr ""
+msgstr "P8 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:401
 msgctxt "input-name"
 msgid "P8 Right Stick/Left"
-msgstr ""
+msgstr "P8 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:402
 msgctxt "input-name"
 msgid "P8 Right Stick/Right"
-msgstr ""
+msgstr "P8 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:403
 msgctxt "input-name"
 msgid "P8 Left Stick/Up"
-msgstr ""
+msgstr "P8 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:404
 msgctxt "input-name"
 msgid "P8 Left Stick/Down"
-msgstr ""
+msgstr "P8 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:405
 msgctxt "input-name"
 msgid "P8 Left Stick/Left"
-msgstr ""
+msgstr "P8 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:406
 msgctxt "input-name"
 msgid "P8 Left Stick/Right"
-msgstr ""
+msgstr "P8 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:407
 msgctxt "input-name"
 msgid "P8 Button 1"
-msgstr ""
+msgstr "P8 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:408
 msgctxt "input-name"
 msgid "P8 Button 2"
-msgstr ""
+msgstr "P8 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:409
 msgctxt "input-name"
 msgid "P8 Button 3"
-msgstr ""
+msgstr "P8 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:410
 msgctxt "input-name"
 msgid "P8 Button 4"
-msgstr ""
+msgstr "P8 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:411
 msgctxt "input-name"
 msgid "P8 Button 5"
-msgstr ""
+msgstr "P8 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:412
 msgctxt "input-name"
 msgid "P8 Button 6"
-msgstr ""
+msgstr "P8 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:413
 msgctxt "input-name"
 msgid "P8 Button 7"
-msgstr ""
+msgstr "P8 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:414
 msgctxt "input-name"
 msgid "P8 Button 8"
-msgstr ""
+msgstr "P8 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:415
 msgctxt "input-name"
 msgid "P8 Button 9"
-msgstr ""
+msgstr "P8 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:416
 msgctxt "input-name"
 msgid "P8 Button 10"
-msgstr ""
+msgstr "P8 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:417
 msgctxt "input-name"
 msgid "P8 Button 11"
-msgstr ""
+msgstr "P8 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:418
 msgctxt "input-name"
 msgid "P8 Button 12"
-msgstr ""
+msgstr "P8 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:419
 msgctxt "input-name"
 msgid "P8 Button 13"
-msgstr ""
+msgstr "P8 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:420
 msgctxt "input-name"
 msgid "P8 Button 14"
-msgstr ""
+msgstr "P8 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:421
 msgctxt "input-name"
 msgid "P8 Button 15"
-msgstr ""
+msgstr "P8 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:422
 msgctxt "input-name"
 msgid "P8 Button 16"
-msgstr ""
+msgstr "P8 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:423
 msgctxt "input-name"
 msgid "P8 Start"
-msgstr ""
+msgstr "P8 Έναρξη"
 
 #: src/emu/inpttype.ipp:424
 msgctxt "input-name"
 msgid "P8 Select"
-msgstr ""
+msgstr "P8 Επιλογή"
 
 #: src/emu/inpttype.ipp:429
 msgctxt "input-name"
 msgid "P9 Up"
-msgstr ""
+msgstr "P9 Επάνω"
 
 #: src/emu/inpttype.ipp:430
 msgctxt "input-name"
 msgid "P9 Down"
-msgstr ""
+msgstr "P9 Κάτω"
 
 #: src/emu/inpttype.ipp:431
 msgctxt "input-name"
 msgid "P9 Left"
-msgstr ""
+msgstr "P9 Αριστερά"
 
 #: src/emu/inpttype.ipp:432
 msgctxt "input-name"
 msgid "P9 Right"
-msgstr ""
+msgstr "P9 Δεξιά"
 
 #: src/emu/inpttype.ipp:433
 msgctxt "input-name"
 msgid "P9 Right Stick/Up"
-msgstr ""
+msgstr "P9 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:434
 msgctxt "input-name"
 msgid "P9 Right Stick/Down"
-msgstr ""
+msgstr "P9 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:435
 msgctxt "input-name"
 msgid "P9 Right Stick/Left"
-msgstr ""
+msgstr "P9 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:436
 msgctxt "input-name"
 msgid "P9 Right Stick/Right"
-msgstr ""
+msgstr "P9 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:437
 msgctxt "input-name"
 msgid "P9 Left Stick/Up"
-msgstr ""
+msgstr "P9 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:438
 msgctxt "input-name"
 msgid "P9 Left Stick/Down"
-msgstr ""
+msgstr "P9 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:439
 msgctxt "input-name"
 msgid "P9 Left Stick/Left"
-msgstr ""
+msgstr "P9 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:440
 msgctxt "input-name"
 msgid "P9 Left Stick/Right"
-msgstr ""
+msgstr "P9 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:441
 msgctxt "input-name"
 msgid "P9 Button 1"
-msgstr ""
+msgstr "P9 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:442
 msgctxt "input-name"
 msgid "P9 Button 2"
-msgstr ""
+msgstr "P9 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:443
 msgctxt "input-name"
 msgid "P9 Button 3"
-msgstr ""
+msgstr "P9 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:444
 msgctxt "input-name"
 msgid "P9 Button 4"
-msgstr ""
+msgstr "P9 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:445
 msgctxt "input-name"
 msgid "P9 Button 5"
-msgstr ""
+msgstr "P9 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:446
 msgctxt "input-name"
 msgid "P9 Button 6"
-msgstr ""
+msgstr "P9 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:447
 msgctxt "input-name"
 msgid "P9 Button 7"
-msgstr ""
+msgstr "P9 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:448
 msgctxt "input-name"
 msgid "P9 Button 8"
-msgstr ""
+msgstr "P9 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:449
 msgctxt "input-name"
 msgid "P9 Button 9"
-msgstr ""
+msgstr "P9 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:450
 msgctxt "input-name"
 msgid "P9 Button 10"
-msgstr ""
+msgstr "P9 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:451
 msgctxt "input-name"
 msgid "P9 Button 11"
-msgstr ""
+msgstr "P9 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:452
 msgctxt "input-name"
 msgid "P9 Button 12"
-msgstr ""
+msgstr "P9 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:453
 msgctxt "input-name"
 msgid "P9 Button 13"
-msgstr ""
+msgstr "P9 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:454
 msgctxt "input-name"
 msgid "P9 Button 14"
-msgstr ""
+msgstr "P9 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:455
 msgctxt "input-name"
 msgid "P9 Button 15"
-msgstr ""
+msgstr "P9 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:456
 msgctxt "input-name"
 msgid "P9 Button 16"
-msgstr ""
+msgstr "P9 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:457
 msgctxt "input-name"
 msgid "P9 Start"
-msgstr ""
+msgstr "P9 Έναρξη"
 
 #: src/emu/inpttype.ipp:458
 msgctxt "input-name"
 msgid "P9 Select"
-msgstr ""
+msgstr "P9 Επιλογή"
 
 #: src/emu/inpttype.ipp:463
 msgctxt "input_name"
 msgid "P10 Up"
-msgstr ""
+msgstr "P10 Επάνω"
 
 #: src/emu/inpttype.ipp:464
 msgctxt "input_name"
 msgid "P10 Down"
-msgstr ""
+msgstr "P10 Κάτω"
 
 #: src/emu/inpttype.ipp:465
 msgctxt "input_name"
 msgid "P10 Left"
-msgstr ""
+msgstr "P10 Αριστερά"
 
 #: src/emu/inpttype.ipp:466
 msgctxt "input_name"
 msgid "P10 Right"
-msgstr ""
+msgstr "P10 Δεξιά"
 
 #: src/emu/inpttype.ipp:467
 msgctxt "input_name"
 msgid "P10 Right Stick/Up"
-msgstr ""
+msgstr "P10 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:468
 msgctxt "input_name"
 msgid "P10 Right Stick/Down"
-msgstr ""
+msgstr "P10 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:469
 msgctxt "input_name"
 msgid "P10 Right Stick/Left"
-msgstr ""
+msgstr "P10 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:470
 msgctxt "input_name"
 msgid "P10 Right Stick/Right"
-msgstr ""
+msgstr "P10 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:471
 msgctxt "input_name"
 msgid "P10 Left Stick/Up"
-msgstr ""
+msgstr "P10 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:472
 msgctxt "input_name"
 msgid "P10 Left Stick/Down"
-msgstr ""
+msgstr "P10 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:473
 msgctxt "input_name"
 msgid "P10 Left Stick/Left"
-msgstr ""
+msgstr "P10 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:474
 msgctxt "input_name"
 msgid "P10 Left Stick/Right"
-msgstr ""
+msgstr "P10 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:475
 msgctxt "input_name"
 msgid "P10 Button 1"
-msgstr ""
+msgstr "P10 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:476
 msgctxt "input_name"
 msgid "P10 Button 2"
-msgstr ""
+msgstr "P10 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:477
 msgctxt "input_name"
 msgid "P10 Button 3"
-msgstr ""
+msgstr "P10 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:478
 msgctxt "input_name"
 msgid "P10 Button 4"
-msgstr ""
+msgstr "P10 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:479
 msgctxt "input_name"
 msgid "P10 Button 5"
-msgstr ""
+msgstr "P10 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:480
 msgctxt "input_name"
 msgid "P10 Button 6"
-msgstr ""
+msgstr "P10 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:481
 msgctxt "input_name"
 msgid "P10 Button 7"
-msgstr ""
+msgstr "P10 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:482
 msgctxt "input_name"
 msgid "P10 Button 8"
-msgstr ""
+msgstr "P10 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:483
 msgctxt "input_name"
 msgid "P10 Button 9"
-msgstr ""
+msgstr "P10 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:484
 msgctxt "input_name"
 msgid "P10 Button 10"
-msgstr ""
+msgstr "P10 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:485
 msgctxt "input_name"
 msgid "P10 Button 11"
-msgstr ""
+msgstr "P10 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:486
 msgctxt "input_name"
 msgid "P10 Button 12"
-msgstr ""
+msgstr "P10 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:487
 msgctxt "input_name"
 msgid "P10 Button 13"
-msgstr ""
+msgstr "P10 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:488
 msgctxt "input_name"
 msgid "P10 Button 14"
-msgstr ""
+msgstr "P10 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:489
 msgctxt "input_name"
 msgid "P10 Button 15"
-msgstr ""
+msgstr "P10 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:490
 msgctxt "input_name"
 msgid "P10 Button 16"
-msgstr ""
+msgstr "P10 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:491
 msgctxt "input_name"
 msgid "P10 Start"
-msgstr ""
+msgstr "P10 Έναρξη"
 
 #: src/emu/inpttype.ipp:492
 msgctxt "input_name"
 msgid "P10 Select"
-msgstr ""
+msgstr "P10 Επιλογή"
 
 #: src/emu/inpttype.ipp:497
 msgctxt "input-name"
 msgid "1 Player Start"
-msgstr ""
+msgstr "1 Παίκτης Έναρξη"
 
 #: src/emu/inpttype.ipp:498
 msgctxt "input-name"
 msgid "2 Players Start"
-msgstr ""
+msgstr "2 Παίκτες Έναρξη"
 
 #: src/emu/inpttype.ipp:499
 msgctxt "input-name"
 msgid "3 Players Start"
-msgstr ""
+msgstr "3 Παίκτες Έναρξη"
 
 #: src/emu/inpttype.ipp:500
 msgctxt "input-name"
 msgid "4 Players Start"
-msgstr ""
+msgstr "4 Παίκτες Έναρξη"
 
 #: src/emu/inpttype.ipp:501
 msgctxt "input-name"
 msgid "5 Players Start"
-msgstr ""
+msgstr "5 Παίκτες Έναρξη"
 
 #: src/emu/inpttype.ipp:502
 msgctxt "input-name"
 msgid "6 Players Start"
-msgstr ""
+msgstr "6 Παίκτες Έναρξη"
 
 #: src/emu/inpttype.ipp:503
 msgctxt "input-name"
 msgid "7 Players Start"
-msgstr ""
+msgstr "7 Παίκτες Έναρξη"
 
 #: src/emu/inpttype.ipp:504
 msgctxt "input-name"
 msgid "8 Players Start"
-msgstr ""
+msgstr "8 Παίκτες Έναρξη"
 
 #: src/emu/inpttype.ipp:509
 msgctxt "input-name"
 msgid "Coin 1"
-msgstr ""
+msgstr "Κέρμα 1"
 
 #: src/emu/inpttype.ipp:510
 msgctxt "input-name"
 msgid "Coin 2"
-msgstr ""
+msgstr "Κέρμα 2"
 
 #: src/emu/inpttype.ipp:511
 msgctxt "input-name"
 msgid "Coin 3"
-msgstr ""
+msgstr "Κέρμα 3"
 
 #: src/emu/inpttype.ipp:512
 msgctxt "input-name"
 msgid "Coin 4"
-msgstr ""
+msgstr "Κέρμα 4"
 
 #: src/emu/inpttype.ipp:513
 msgctxt "input-name"
 msgid "Coin 5"
-msgstr ""
+msgstr "Κέρμα 5"
 
 #: src/emu/inpttype.ipp:514
 msgctxt "input-name"
 msgid "Coin 6"
-msgstr ""
+msgstr "Κέρμα 6"
 
 #: src/emu/inpttype.ipp:515
 msgctxt "input-name"
 msgid "Coin 7"
-msgstr ""
+msgstr "Κέρμα 7"
 
 #: src/emu/inpttype.ipp:516
 msgctxt "input-name"
 msgid "Coin 8"
-msgstr ""
+msgstr "Κέρμα 8"
 
 #: src/emu/inpttype.ipp:517
 msgctxt "input-name"
 msgid "Coin 9"
-msgstr ""
+msgstr "Κέρμα 9"
 
 #: src/emu/inpttype.ipp:518
 msgctxt "input-name"
 msgid "Coin 10"
-msgstr ""
+msgstr "Κέρμα 10"
 
 #: src/emu/inpttype.ipp:519
 msgctxt "input-name"
 msgid "Coin 11"
-msgstr ""
+msgstr "Κέρμα 11"
 
 #: src/emu/inpttype.ipp:520
 msgctxt "input-name"
 msgid "Coin 12"
-msgstr ""
+msgstr "Κέρμα 12"
 
 #: src/emu/inpttype.ipp:521
 msgctxt "input-name"
 msgid "Bill 1"
-msgstr ""
+msgstr "Αποδέκτης Χαρτονομισμάτων 1"
 
 #: src/emu/inpttype.ipp:526
 msgctxt "input-name"
 msgid "Service 1"
-msgstr ""
+msgstr "Σέρβις 1"
 
 #: src/emu/inpttype.ipp:527
 msgctxt "input-name"
 msgid "Service 2"
-msgstr ""
+msgstr "Σέρβις 2"
 
 #: src/emu/inpttype.ipp:528
 msgctxt "input-name"
 msgid "Service 3"
-msgstr ""
+msgstr "Σέρβις 3"
 
 #: src/emu/inpttype.ipp:529
 msgctxt "input-name"
 msgid "Service 4"
-msgstr ""
+msgstr "Σέρβις 4"
 
 #: src/emu/inpttype.ipp:534
 msgctxt "input-name"
 msgid "Tilt 1"
-msgstr ""
+msgstr "Κλίση 1"
 
 #: src/emu/inpttype.ipp:535
 msgctxt "input-name"
 msgid "Tilt 2"
-msgstr ""
+msgstr "Κλίση 2"
 
 #: src/emu/inpttype.ipp:536
 msgctxt "input-name"
 msgid "Tilt 3"
-msgstr ""
+msgstr "Κλίση 3"
 
 #: src/emu/inpttype.ipp:537
 msgctxt "input-name"
 msgid "Tilt 4"
-msgstr ""
+msgstr "Κλίση 4"
 
 #: src/emu/inpttype.ipp:542
 msgctxt "input-name"
 msgid "Power On"
-msgstr ""
+msgstr "Ενεργοποίηση"
 
 #: src/emu/inpttype.ipp:543
 msgctxt "input-name"
 msgid "Power Off"
-msgstr ""
+msgstr "Απενεργοποίηση"
 
 #: src/emu/inpttype.ipp:545
 msgctxt "input-name"
 msgid "Tilt"
-msgstr ""
+msgstr "Κλίση"
 
 #: src/emu/inpttype.ipp:546
 msgctxt "input-name"
 msgid "Door Interlock"
-msgstr ""
+msgstr "Κλειδαριά πόρτας"
 
 #: src/emu/inpttype.ipp:547
 msgctxt "input-name"
 msgid "Memory Reset"
-msgstr ""
+msgstr "Μηδενισμός Μνήμης"
 
 #: src/emu/inpttype.ipp:548
 msgctxt "input-name"
 msgid "Volume Down"
-msgstr ""
+msgstr "Ένταση Ήχου Κάτω"
 
 #: src/emu/inpttype.ipp:549
 msgctxt "input-name"
 msgid "Volume Up"
-msgstr ""
+msgstr "Ένταση Ήχου Επάνω"
 
 #: src/emu/inpttype.ipp:554
 msgctxt "input-name"
 msgid "P1 Pedal 1"
-msgstr ""
+msgstr "P1 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:555
 msgctxt "input-name"
 msgid "P2 Pedal 1"
-msgstr ""
+msgstr "P2 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:556
 msgctxt "input-name"
 msgid "P3 Pedal 1"
-msgstr ""
+msgstr "P3 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:557
 msgctxt "input-name"
 msgid "P4 Pedal 1"
-msgstr ""
+msgstr "P4 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:558
 msgctxt "input-name"
 msgid "P5 Pedal 1"
-msgstr ""
+msgstr "P5 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:559
 msgctxt "input-name"
 msgid "P6 Pedal 1"
-msgstr ""
+msgstr "P6 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:560
 msgctxt "input-name"
 msgid "P7 Pedal 1"
-msgstr ""
+msgstr "P7 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:561
 msgctxt "input-name"
 msgid "P8 Pedal 1"
-msgstr ""
+msgstr "P8 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:562
 msgctxt "input-name"
 msgid "P9 Pedal 1"
-msgstr ""
+msgstr "P9 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:563
 msgctxt "input-name"
 msgid "P10 Pedal 1"
-msgstr ""
+msgstr "P10 Πετάλι 1"
 
 #: src/emu/inpttype.ipp:568
 msgctxt "input-name"
 msgid "P1 Pedal 2"
-msgstr ""
+msgstr "P1 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:569
 msgctxt "input-name"
 msgid "P2 Pedal 2"
-msgstr ""
+msgstr "P2 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:570
 msgctxt "input-name"
 msgid "P3 Pedal 2"
-msgstr ""
+msgstr "P3 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:571
 msgctxt "input-name"
 msgid "P4 Pedal 2"
-msgstr ""
+msgstr "P4 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:572
 msgctxt "input-name"
 msgid "P5 Pedal 2"
-msgstr ""
+msgstr "P5 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:573
 msgctxt "input-name"
 msgid "P6 Pedal 2"
-msgstr ""
+msgstr "P6 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:574
 msgctxt "input-name"
 msgid "P7 Pedal 2"
-msgstr ""
+msgstr "P7 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:575
 msgctxt "input-name"
 msgid "P8 Pedal 2"
-msgstr ""
+msgstr "P8 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:576
 msgctxt "input-name"
 msgid "P9 Pedal 2"
-msgstr ""
+msgstr "P9 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:577
 msgctxt "input-name"
 msgid "P10 Pedal 2"
-msgstr ""
+msgstr "P10 Πετάλι 2"
 
 #: src/emu/inpttype.ipp:582
 msgctxt "input-name"
 msgid "P1 Pedal 3"
-msgstr ""
+msgstr "P1 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
 msgid "P2 Pedal 3"
-msgstr ""
+msgstr "P2 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:584
 msgctxt "input-name"
 msgid "P3 Pedal 3"
-msgstr ""
+msgstr "P3 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:585
 msgctxt "input-name"
 msgid "P4 Pedal 3"
-msgstr ""
+msgstr "P4 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:586
 msgctxt "input-name"
 msgid "P5 Pedal 3"
-msgstr ""
+msgstr "P5 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:587
 msgctxt "input-name"
 msgid "P6 Pedal 3"
-msgstr ""
+msgstr "P6 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:588
 msgctxt "input-name"
 msgid "P7 Pedal 3"
-msgstr ""
+msgstr "P7 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:589
 msgctxt "input-name"
 msgid "P8 Pedal 3"
-msgstr ""
+msgstr "P8 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:590
 msgctxt "input-name"
 msgid "P9 Pedal 3"
-msgstr ""
+msgstr "P9 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:591
 msgctxt "input-name"
 msgid "P10 Pedal 3"
-msgstr ""
+msgstr "P10 Πετάλι 3"
 
 #: src/emu/inpttype.ipp:596
 msgctxt "input-name"
 msgid "Paddle"
-msgstr ""
+msgstr "Κουπί"
 
 #: src/emu/inpttype.ipp:597
 msgctxt "input-name"
 msgid "Paddle 2"
-msgstr ""
+msgstr "Κουπί 2"
 
 #: src/emu/inpttype.ipp:598
 msgctxt "input-name"
 msgid "Paddle 3"
-msgstr ""
+msgstr "Κουπί 3"
 
 #: src/emu/inpttype.ipp:599
 msgctxt "input-name"
 msgid "Paddle 4"
-msgstr ""
+msgstr "Κουπί 4"
 
 #: src/emu/inpttype.ipp:600
 msgctxt "input-name"
 msgid "Paddle 5"
-msgstr ""
+msgstr "Κουπί 5"
 
 #: src/emu/inpttype.ipp:601
 msgctxt "input-name"
 msgid "Paddle 6"
-msgstr ""
+msgstr "Κουπί 6"
 
 #: src/emu/inpttype.ipp:602
 msgctxt "input-name"
 msgid "Paddle 7"
-msgstr ""
+msgstr "Κουπί 7"
 
 #: src/emu/inpttype.ipp:603
 msgctxt "input-name"
 msgid "Paddle 8"
-msgstr ""
+msgstr "Κουπί 8"
 
 #: src/emu/inpttype.ipp:604
 msgctxt "input-name"
 msgid "Paddle 9"
-msgstr ""
+msgstr "Κουπί 9"
 
 #: src/emu/inpttype.ipp:605
 msgctxt "input-name"
 msgid "Paddle 10"
-msgstr ""
+msgstr "Κουπί 10"
 
 #: src/emu/inpttype.ipp:610
 msgctxt "input-name"
 msgid "Paddle V"
-msgstr ""
+msgstr "Κουπί Κάθ."
 
 #: src/emu/inpttype.ipp:611
 msgctxt "input-name"
 msgid "Paddle V 2"
-msgstr ""
+msgstr "Κουπί Κάθ. 2"
 
 #: src/emu/inpttype.ipp:612
 msgctxt "input-name"
 msgid "Paddle V 3"
-msgstr ""
+msgstr "Κουπί Κάθ. 3"
 
 #: src/emu/inpttype.ipp:613
 msgctxt "input-name"
 msgid "Paddle V 4"
-msgstr ""
+msgstr "Κουπί Κάθ. 4"
 
 #: src/emu/inpttype.ipp:614
 msgctxt "input-name"
 msgid "Paddle V 5"
-msgstr ""
+msgstr "Κουπί Κάθ. 5"
 
 #: src/emu/inpttype.ipp:615
 msgctxt "input-name"
 msgid "Paddle V 6"
-msgstr ""
+msgstr "Κουπί Κάθ. 6"
 
 #: src/emu/inpttype.ipp:616
 msgctxt "input-name"
 msgid "Paddle V 7"
-msgstr ""
+msgstr "Κουπί Κάθ. 7"
 
 #: src/emu/inpttype.ipp:617
 msgctxt "input-name"
 msgid "Paddle V 8"
-msgstr ""
+msgstr "Κουπί Κάθ. 8"
 
 #: src/emu/inpttype.ipp:618
 msgctxt "input-name"
 msgid "Paddle V 9"
-msgstr ""
+msgstr "Κουπί Κάθ. 9"
 
 #: src/emu/inpttype.ipp:619
 msgctxt "input-name"
 msgid "Paddle V 10"
-msgstr ""
+msgstr "Κουπί Κάθ. 10"
 
 #: src/emu/inpttype.ipp:624
 msgctxt "input-name"
 msgid "Positional"
-msgstr ""
+msgstr "Θέσεως"
 
 #: src/emu/inpttype.ipp:625
 msgctxt "input-name"
 msgid "Positional 2"
-msgstr ""
+msgstr "Θέσεως 2"
 
 #: src/emu/inpttype.ipp:626
 msgctxt "input-name"
 msgid "Positional 3"
-msgstr ""
+msgstr "Θέσεως 3"
 
 #: src/emu/inpttype.ipp:627
 msgctxt "input-name"
 msgid "Positional 4"
-msgstr ""
+msgstr "Θέσεως 4"
 
 #: src/emu/inpttype.ipp:628
 msgctxt "input-name"
 msgid "Positional 5"
-msgstr ""
+msgstr "Θέσεως 5"
 
 #: src/emu/inpttype.ipp:629
 msgctxt "input-name"
 msgid "Positional 6"
-msgstr ""
+msgstr "Θέσεως 6"
 
 #: src/emu/inpttype.ipp:630
 msgctxt "input-name"
 msgid "Positional 7"
-msgstr ""
+msgstr "Θέσεως 7"
 
 #: src/emu/inpttype.ipp:631
 msgctxt "input-name"
 msgid "Positional 8"
-msgstr ""
+msgstr "Θέσεως 8"
 
 #: src/emu/inpttype.ipp:632
 msgctxt "input-name"
 msgid "Positional 9"
-msgstr ""
+msgstr "Θέσεως 9"
 
 #: src/emu/inpttype.ipp:633
 msgctxt "input-name"
 msgid "Positional 10"
-msgstr ""
+msgstr "Θέσεως 10"
 
 #: src/emu/inpttype.ipp:638
 msgctxt "input-name"
 msgid "Positional V"
-msgstr ""
+msgstr "Θέσεως Κάθ."
 
 #: src/emu/inpttype.ipp:639
 msgctxt "input-name"
 msgid "Positional V 2"
-msgstr ""
+msgstr "Θέσεως Κάθ. 2"
 
 #: src/emu/inpttype.ipp:640
 msgctxt "input-name"
 msgid "Positional V 3"
-msgstr ""
+msgstr "Θέσεως Κάθ. 3"
 
 #: src/emu/inpttype.ipp:641
 msgctxt "input-name"
 msgid "Positional V 4"
-msgstr ""
+msgstr "Θέσεως Κάθ. 4"
 
 #: src/emu/inpttype.ipp:642
 msgctxt "input-name"
 msgid "Positional V 5"
-msgstr ""
+msgstr "Θέσεως Κάθ. 5"
 
 #: src/emu/inpttype.ipp:643
 msgctxt "input-name"
 msgid "Positional V 6"
-msgstr ""
+msgstr "Θέσεως Κάθ. 6"
 
 #: src/emu/inpttype.ipp:644
 msgctxt "input-name"
 msgid "Positional V 7"
-msgstr ""
+msgstr "Θέσεως Κάθ. 7"
 
 #: src/emu/inpttype.ipp:645
 msgctxt "input-name"
 msgid "Positional V 8"
-msgstr ""
+msgstr "Θέσεως Κάθ. 8"
 
 #: src/emu/inpttype.ipp:646
 msgctxt "input-name"
 msgid "Positional V 9"
-msgstr ""
+msgstr "Θέσεως Κάθ. 9"
 
 #: src/emu/inpttype.ipp:647
 msgctxt "input-name"
 msgid "Positional V 10"
-msgstr ""
+msgstr "Θέσεως Κάθ. 10"
 
 #: src/emu/inpttype.ipp:652
 msgctxt "input-name"
 msgid "Dial"
-msgstr ""
+msgstr "Περιστροφικό"
 
 #: src/emu/inpttype.ipp:653
 msgctxt "input-name"
 msgid "Dial 2"
-msgstr ""
+msgstr "Περιστροφικό 2"
 
 #: src/emu/inpttype.ipp:654
 msgctxt "input-name"
 msgid "Dial 3"
-msgstr ""
+msgstr "Περιστροφικό 3"
 
 #: src/emu/inpttype.ipp:655
 msgctxt "input-name"
 msgid "Dial 4"
-msgstr ""
+msgstr "Περιστροφικό 4"
 
 #: src/emu/inpttype.ipp:656
 msgctxt "input-name"
 msgid "Dial 5"
-msgstr ""
+msgstr "Περιστροφικό 5"
 
 #: src/emu/inpttype.ipp:657
 msgctxt "input-name"
 msgid "Dial 6"
-msgstr ""
+msgstr "Περιστροφικό 6"
 
 #: src/emu/inpttype.ipp:658
 msgctxt "input-name"
 msgid "Dial 7"
-msgstr ""
+msgstr "Περιστροφικό 7"
 
 #: src/emu/inpttype.ipp:659
 msgctxt "input-name"
 msgid "Dial 8"
-msgstr ""
+msgstr "Περιστροφικό 8"
 
 #: src/emu/inpttype.ipp:660
 msgctxt "input-name"
 msgid "Dial 9"
-msgstr ""
+msgstr "Περιστροφικό 9"
 
 #: src/emu/inpttype.ipp:661
 msgctxt "input-name"
 msgid "Dial 10"
-msgstr ""
+msgstr "Περιστροφικό 10"
 
 #: src/emu/inpttype.ipp:666
 msgctxt "input-name"
 msgid "Dial V"
-msgstr ""
+msgstr "Περιστροφικό Κάθ."
 
 #: src/emu/inpttype.ipp:667
 msgctxt "input-name"
 msgid "Dial V 2"
-msgstr ""
+msgstr "Περιστροφικό Κάθ. 2"
 
 #: src/emu/inpttype.ipp:668
 msgctxt "input-name"
 msgid "Dial V 3"
-msgstr ""
+msgstr "Περιστροφικό Κάθ. 3"
 
 #: src/emu/inpttype.ipp:669
 msgctxt "input-name"
 msgid "Dial V 4"
-msgstr ""
+msgstr "Περιστροφικό Κάθ. 4"
 
 #: src/emu/inpttype.ipp:670
 msgctxt "input-name"
-msgid "Dial V 5"
-msgstr ""
+msgid "Dial Κάθ. 5"
+msgstr "Περιστροφικό Κάθ. 5"
 
 #: src/emu/inpttype.ipp:671
 msgctxt "input-name"
-msgid "Dial V 6"
-msgstr ""
+msgid "Dial Κάθ. 6"
+msgstr "Περιστροφικό Κάθ. 6"
 
 #: src/emu/inpttype.ipp:672
 msgctxt "input-name"
 msgid "Dial V 7"
-msgstr ""
+msgstr "Περιστροφικό Κάθ. 7"
 
 #: src/emu/inpttype.ipp:673
 msgctxt "input-name"
 msgid "Dial V 8"
-msgstr ""
+msgstr "Περιστροφικό Κάθ. 8"
 
 #: src/emu/inpttype.ipp:674
 msgctxt "input-name"
 msgid "Dial V 9"
-msgstr ""
+msgstr "Περιστροφικό Κάθ. 9"
 
 #: src/emu/inpttype.ipp:675
 msgctxt "input-name"
 msgid "Dial V 10"
-msgstr ""
+msgstr "Περιστροφικό Κάθ. 10"
 
 #: src/emu/inpttype.ipp:680
 msgctxt "input-name"
 msgid "Track X"
-msgstr ""
+msgstr "Τροχιά X"
 
 #: src/emu/inpttype.ipp:681
 msgctxt "input-name"
 msgid "Track X 2"
-msgstr ""
+msgstr "Τροχιά X 2"
 
 #: src/emu/inpttype.ipp:682
 msgctxt "input-name"
 msgid "Track X 3"
-msgstr ""
+msgstr "Τροχιά X 3"
 
 #: src/emu/inpttype.ipp:683
 msgctxt "input-name"
 msgid "Track X 4"
-msgstr ""
+msgstr "Τροχιά X 4"
 
 #: src/emu/inpttype.ipp:684
 msgctxt "input-name"
 msgid "Track X 5"
-msgstr ""
+msgstr "Τροχιά X 5"
 
 #: src/emu/inpttype.ipp:685
 msgctxt "input-name"
 msgid "Track X 6"
-msgstr ""
+msgstr "Τροχιά X 6"
 
 #: src/emu/inpttype.ipp:686
 msgctxt "input-name"
 msgid "Track X 7"
-msgstr ""
+msgstr "Τροχιά X 7"
 
 #: src/emu/inpttype.ipp:687
 msgctxt "input-name"
 msgid "Track X 8"
-msgstr ""
+msgstr "Τροχιά X 8"
 
 #: src/emu/inpttype.ipp:688
 msgctxt "input-name"
 msgid "Track X 9"
-msgstr ""
+msgstr "Τροχιά X 9"
 
 #: src/emu/inpttype.ipp:689
 msgctxt "input-name"
 msgid "Track X 10"
-msgstr ""
+msgstr "Τροχιά X 10"
 
 #: src/emu/inpttype.ipp:694
 msgctxt "input-name"
 msgid "Track Y"
-msgstr ""
+msgstr "Τροχιά Y"
 
 #: src/emu/inpttype.ipp:695
 msgctxt "input-name"
 msgid "Track Y 2"
-msgstr ""
+msgstr "Τροχιά Y 2"
 
 #: src/emu/inpttype.ipp:696
 msgctxt "input-name"
 msgid "Track Y 3"
-msgstr ""
+msgstr "Τροχιά Y 3"
 
 #: src/emu/inpttype.ipp:697
 msgctxt "input-name"
 msgid "Track Y 4"
-msgstr ""
+msgstr "Τροχιά Y 4"
 
 #: src/emu/inpttype.ipp:698
 msgctxt "input-name"
 msgid "Track Y 5"
-msgstr ""
+msgstr "Τροχιά Y 5"
 
 #: src/emu/inpttype.ipp:699
 msgctxt "input-name"
 msgid "Track Y 6"
-msgstr ""
+msgstr "Τροχιά Y 6"
 
 #: src/emu/inpttype.ipp:700
 msgctxt "input-name"
 msgid "Track Y 7"
-msgstr ""
+msgstr "Τροχιά Y 7"
 
 #: src/emu/inpttype.ipp:701
 msgctxt "input-name"
 msgid "Track Y 8"
-msgstr ""
+msgstr "Τροχιά Y 8"
 
 #: src/emu/inpttype.ipp:702
 msgctxt "input-name"
 msgid "Track Y 9"
-msgstr ""
+msgstr "Τροχιά Y 9"
 
 #: src/emu/inpttype.ipp:703
 msgctxt "input-name"
 msgid "Track Y 10"
-msgstr ""
+msgstr "Τροχιά Y 10"
 
 #: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr ""
+msgstr "AD Μοχλός X"
 
 #: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr ""
+msgstr "AD Μοχλός X 2"
 
 #: src/emu/inpttype.ipp:710
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr ""
+msgstr "AD Μοχλός X 3"
 
 #: src/emu/inpttype.ipp:711
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr ""
+msgstr "AD Μοχλός X 4"
 
 #: src/emu/inpttype.ipp:712
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr ""
+msgstr "AD Μοχλός X 5"
 
 #: src/emu/inpttype.ipp:713
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr ""
+msgstr "AD Μοχλός X 6"
 
 #: src/emu/inpttype.ipp:714
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr ""
+msgstr "AD Μοχλός X 7"
 
 #: src/emu/inpttype.ipp:715
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr ""
+msgstr "AD Μοχλός X 8"
 
 #: src/emu/inpttype.ipp:716
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr ""
+msgstr "AD Μοχλός X 9"
 
 #: src/emu/inpttype.ipp:717
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr ""
+msgstr "AD Μοχλός X 10"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr ""
+msgstr "AD Μοχλός Y"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr ""
+msgstr "AD Μοχλός Y 2"
 
 #: src/emu/inpttype.ipp:724
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr ""
+msgstr "AD Μοχλός Y 3"
 
 #: src/emu/inpttype.ipp:725
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr ""
+msgstr "AD Μοχλός Y 4"
 
 #: src/emu/inpttype.ipp:726
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr ""
+msgstr "AD Μοχλός Y 5"
 
 #: src/emu/inpttype.ipp:727
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr ""
+msgstr "AD Μοχλός Y 6"
 
 #: src/emu/inpttype.ipp:728
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr ""
+msgstr "AD Μοχλός Y 7"
 
 #: src/emu/inpttype.ipp:729
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr ""
+msgstr "AD Μοχλός Y 8"
 
 #: src/emu/inpttype.ipp:730
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr ""
+msgstr "AD Μοχλός Y 9"
 
 #: src/emu/inpttype.ipp:731
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr ""
+msgstr "AD Μοχλός Y 10"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr ""
+msgstr "AD Μοχλός Z"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr ""
+msgstr "AD Μοχλός Z 2"
 
 #: src/emu/inpttype.ipp:738
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr ""
+msgstr "AD Μοχλός Z 3"
 
 #: src/emu/inpttype.ipp:739
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr ""
+msgstr "AD Μοχλός Z 4"
 
 #: src/emu/inpttype.ipp:740
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr ""
+msgstr "AD Μοχλός Z 5"
 
 #: src/emu/inpttype.ipp:741
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr ""
+msgstr "AD Μοχλός Z 6"
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr ""
+msgstr "AD Μοχλός Z 7"
 
 #: src/emu/inpttype.ipp:743
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr ""
+msgstr "AD Μοχλός Z 8"
 
 #: src/emu/inpttype.ipp:744
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr ""
+msgstr "AD Μοχλός Z 9"
 
 #: src/emu/inpttype.ipp:745
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr ""
+msgstr "AD Μοχλός Z 10"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
 msgid "Lightgun X"
-msgstr ""
+msgstr "Όπλο φωτός X"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
 msgid "Lightgun X 2"
-msgstr ""
+msgstr "Όπλο φωτός X 2"
 
 #: src/emu/inpttype.ipp:752
 msgctxt "input-name"
 msgid "Lightgun X 3"
-msgstr ""
+msgstr "Όπλο φωτός X 3"
 
 #: src/emu/inpttype.ipp:753
 msgctxt "input-name"
 msgid "Lightgun X 4"
-msgstr ""
+msgstr "Όπλο φωτός X 4"
 
 #: src/emu/inpttype.ipp:754
 msgctxt "input-name"
 msgid "Lightgun X 5"
-msgstr ""
+msgstr "Όπλο φωτός X 5"
 
 #: src/emu/inpttype.ipp:755
 msgctxt "input-name"
 msgid "Lightgun X 6"
-msgstr ""
+msgstr "Όπλο φωτός X 6"
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
 msgid "Lightgun X 7"
-msgstr ""
+msgstr "Όπλο φωτός X 7"
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
 msgid "Lightgun X 8"
-msgstr ""
+msgstr "Όπλο φωτός X 8"
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
 msgid "Lightgun X 9"
-msgstr ""
+msgstr "Όπλο φωτός X 9"
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
 msgid "Lightgun X 10"
-msgstr ""
+msgstr "Όπλο φωτός X 10"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
 msgid "Lightgun Y"
-msgstr ""
+msgstr "Όπλο φωτός Y"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
 msgid "Lightgun Y 2"
-msgstr ""
+msgstr "Όπλο φωτός Y 2"
 
 #: src/emu/inpttype.ipp:766
 msgctxt "input-name"
 msgid "Lightgun Y 3"
-msgstr ""
+msgstr "Όπλο φωτός Y 3"
 
 #: src/emu/inpttype.ipp:767
 msgctxt "input-name"
 msgid "Lightgun Y 4"
-msgstr ""
+msgstr "Όπλο φωτός Y 4"
 
 #: src/emu/inpttype.ipp:768
 msgctxt "input-name"
 msgid "Lightgun Y 5"
-msgstr ""
+msgstr "Όπλο φωτός Y 5"
 
 #: src/emu/inpttype.ipp:769
 msgctxt "input-name"
 msgid "Lightgun Y 6"
-msgstr ""
+msgstr "Όπλο φωτός Y 6"
 
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"
 msgid "Lightgun Y 7"
-msgstr ""
+msgstr "Όπλο φωτός Y 7"
 
 #: src/emu/inpttype.ipp:771
 msgctxt "input-name"
 msgid "Lightgun Y 8"
-msgstr ""
+msgstr "Όπλο φωτός Y 8"
 
 #: src/emu/inpttype.ipp:772
 msgctxt "input-name"
 msgid "Lightgun Y 9"
-msgstr ""
+msgstr "Όπλο φωτός Y 9"
 
 #: src/emu/inpttype.ipp:773
 msgctxt "input-name"
 msgid "Lightgun Y 10"
-msgstr ""
+msgstr "Όπλο φωτός Y 10"
 
 #: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "Mouse X"
-msgstr ""
+msgstr "Ποντίκι X"
 
 #: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "Mouse X 2"
-msgstr ""
+msgstr "Ποντίκι X 2"
 
 #: src/emu/inpttype.ipp:780
 msgctxt "input-name"
 msgid "Mouse X 3"
-msgstr ""
+msgstr "Ποντίκι X 3"
 
 #: src/emu/inpttype.ipp:781
 msgctxt "input-name"
 msgid "Mouse X 4"
-msgstr ""
+msgstr "Ποντίκι X 4"
 
 #: src/emu/inpttype.ipp:782
 msgctxt "input-name"
 msgid "Mouse X 5"
-msgstr ""
+msgstr "Ποντίκι X 5"
 
 #: src/emu/inpttype.ipp:783
 msgctxt "input-name"
 msgid "Mouse X 6"
-msgstr ""
+msgstr "Ποντίκι X 6"
 
 #: src/emu/inpttype.ipp:784
 msgctxt "input-name"
 msgid "Mouse X 7"
-msgstr ""
+msgstr "Ποντίκι X 7"
 
 #: src/emu/inpttype.ipp:785
 msgctxt "input-name"
 msgid "Mouse X 8"
-msgstr ""
+msgstr "Ποντίκι X 8"
 
 #: src/emu/inpttype.ipp:786
 msgctxt "input-name"
 msgid "Mouse X 9"
-msgstr ""
+msgstr "Ποντίκι X 9"
 
 #: src/emu/inpttype.ipp:787
 msgctxt "input-name"
 msgid "Mouse X 10"
-msgstr ""
+msgstr "Ποντίκι X 10"
 
 #: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "Mouse Y"
-msgstr ""
+msgstr "Ποντίκι Y"
 
 #: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "Mouse Y 2"
-msgstr ""
+msgstr "Ποντίκι Y 2"
 
 #: src/emu/inpttype.ipp:794
 msgctxt "input-name"
 msgid "Mouse Y 3"
-msgstr ""
+msgstr "Ποντίκι Y 3"
 
 #: src/emu/inpttype.ipp:795
 msgctxt "input-name"
 msgid "Mouse Y 4"
-msgstr ""
+msgstr "Ποντίκι Y 4"
 
 #: src/emu/inpttype.ipp:796
 msgctxt "input-name"
 msgid "Mouse Y 5"
-msgstr ""
+msgstr "Ποντίκι Y 5"
 
 #: src/emu/inpttype.ipp:797
 msgctxt "input-name"
 msgid "Mouse Y 6"
-msgstr ""
+msgstr "Ποντίκι Y 6"
 
 #: src/emu/inpttype.ipp:798
 msgctxt "input-name"
 msgid "Mouse Y 7"
-msgstr ""
+msgstr "Ποντίκι Y 7"
 
 #: src/emu/inpttype.ipp:799
 msgctxt "input-name"
 msgid "Mouse Y 8"
-msgstr ""
+msgstr "Ποντίκι Y 8"
 
 #: src/emu/inpttype.ipp:800
 msgctxt "input-name"
 msgid "Mouse Y 9"
-msgstr ""
+msgstr "Ποντίκι Y 9"
 
 #: src/emu/inpttype.ipp:801
 msgctxt "input-name"
 msgid "Mouse Y 10"
-msgstr ""
+msgstr "Ποντίκι Y 10"
 
 #: src/emu/inpttype.ipp:806
 msgctxt "input-name"
 msgid "Keypad"
-msgstr ""
+msgstr "Pad πλήκτρων"
 
 #: src/emu/inpttype.ipp:807
 msgctxt "input-name"
 msgid "Keyboard"
-msgstr ""
+msgstr "Πληκτρολόγιο"
 
 #: src/emu/inpttype.ipp:812
 msgctxt "input-name"
 msgid "On Screen Display"
-msgstr ""
+msgstr "Μενού οθόνης"
 
 #: src/emu/inpttype.ipp:813
 msgctxt "input-name"
 msgid "Break in Debugger"
-msgstr ""
+msgstr "Διακοπή στο Debugger"
 
 #: src/emu/inpttype.ipp:814
 msgctxt "input-name"
 msgid "Config Menu"
-msgstr ""
+msgstr "Μενού διαμόρφωσης"
 
 #: src/emu/inpttype.ipp:815
 msgctxt "input-name"
 msgid "Pause"
-msgstr ""
+msgstr "Παύση"
 
 #: src/emu/inpttype.ipp:816
 msgctxt "input-name"
 msgid "Pause - Single Step"
-msgstr ""
+msgstr "Παύση - Ένα Βήμα"
 
 #: src/emu/inpttype.ipp:817
 msgctxt "input-name"
 msgid "Rewind - Single Step"
-msgstr ""
+msgstr "Επιστροφή - Ένα Βήμα"
 
 #: src/emu/inpttype.ipp:818
 msgctxt "input-name"
 msgid "Reset Machine"
-msgstr ""
+msgstr "Επαναφορά Μηχανήματος"
 
 #: src/emu/inpttype.ipp:819
 msgctxt "input-name"
 msgid "Soft Reset"
-msgstr ""
+msgstr "Ελαφριά επαναφορά"
 
 #: src/emu/inpttype.ipp:820
 msgctxt "input-name"
 msgid "Show Decoded Graphics"
-msgstr ""
+msgstr "Προβολή Αποκωδικοποιημένων Γραφικών"
 
 #: src/emu/inpttype.ipp:821
 msgctxt "input-name"
 msgid "Frameskip Dec"
-msgstr ""
+msgstr "Μείωση Παραληψης καρέ"
 
 #: src/emu/inpttype.ipp:822
 msgctxt "input-name"
 msgid "Frameskip Inc"
-msgstr ""
+msgstr "Αύξηση Παραληψης καρέ"
 
 #: src/emu/inpttype.ipp:823
 msgctxt "input-name"
 msgid "Throttle"
-msgstr ""
+msgstr "Πλήρης ισχύς"
 
 #: src/emu/inpttype.ipp:824
 msgctxt "input-name"
 msgid "Fast Forward"
-msgstr ""
+msgstr "Γρήγορη Προώθηση"
 
 #: src/emu/inpttype.ipp:825
 msgctxt "input-name"
 msgid "Show FPS"
-msgstr ""
+msgstr "Προβολή FPS"
 
 #: src/emu/inpttype.ipp:826
 msgctxt "input-name"
 msgid "Save Snapshot"
-msgstr ""
+msgstr "Αποθήκευση Στιγμιότυπου"
 
 #: src/emu/inpttype.ipp:827
 msgctxt "input-name"
 msgid "Write current timecode"
-msgstr ""
+msgstr "Εγγραφή τρέχοντος χρονοκώδικα"
 
 #: src/emu/inpttype.ipp:828
 msgctxt "input-name"
 msgid "Record MNG"
-msgstr ""
+msgstr "Καταγραφή MNG"
 
 #: src/emu/inpttype.ipp:829
 msgctxt "input-name"
 msgid "Record AVI"
-msgstr ""
+msgstr "Καταγραφή AVI"
 
 #: src/emu/inpttype.ipp:830
 msgctxt "input-name"
 msgid "Toggle Cheat"
-msgstr ""
+msgstr "Εναλλαγή Cheat"
 
 #: src/emu/inpttype.ipp:831
 msgctxt "input-name"
 msgid "UI Up"
-msgstr ""
+msgstr "UI Επάνω"
 
 #: src/emu/inpttype.ipp:832
 msgctxt "input-name"
 msgid "UI Down"
-msgstr ""
+msgstr "UI Κάτω"
 
 #: src/emu/inpttype.ipp:833
 msgctxt "input-name"
 msgid "UI Left"
-msgstr ""
+msgstr "UI Αριστερά"
 
 #: src/emu/inpttype.ipp:834
 msgctxt "input-name"
 msgid "UI Right"
-msgstr ""
+msgstr "UI Δεξιά"
 
 #: src/emu/inpttype.ipp:835
 msgctxt "input-name"
 msgid "UI Home"
-msgstr ""
+msgstr "UI Αρχική"
 
 #: src/emu/inpttype.ipp:836
 msgctxt "input-name"
 msgid "UI End"
-msgstr ""
+msgstr "UI Τέλος"
 
 #: src/emu/inpttype.ipp:837
 msgctxt "input-name"
 msgid "UI Page Up"
-msgstr ""
+msgstr "UI Σελίδα Επάνω"
 
 #: src/emu/inpttype.ipp:838
 msgctxt "input-name"
 msgid "UI Page Down"
-msgstr ""
+msgstr "UI Σελίδα Κάτω"
 
 #: src/emu/inpttype.ipp:839
 msgctxt "input-name"
 msgid "UI Focus Next"
-msgstr ""
+msgstr "UI Εστίαση Επόμενο"
 
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
 msgid "UI Focus Previous"
-msgstr ""
+msgstr "UI Εστίαση Προηγούμενο"
 
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "UI Select"
-msgstr ""
+msgstr "UI Επιλογή"
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "UI Cancel"
-msgstr ""
+msgstr "UI Ακύρωση"
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
 msgid "UI Display Comment"
-msgstr ""
+msgstr "UI Προβολή σχολίου"
 
 #: src/emu/inpttype.ipp:844
 msgctxt "input-name"
 msgid "UI Clear"
-msgstr ""
+msgstr "UI Καθαρισμός"
 
 #: src/emu/inpttype.ipp:845
 msgctxt "input-name"
 msgid "UI Zoom In"
-msgstr ""
+msgstr "UI Μεγένθυση"
 
 #: src/emu/inpttype.ipp:846
 msgctxt "input-name"
 msgid "UI Zoom Out"
-msgstr ""
+msgstr "UI Σιμικρυνση"
 
 #: src/emu/inpttype.ipp:847
 msgctxt "input-name"
 msgid "UI Default Zoom"
-msgstr ""
+msgstr "UI Προεπιλεγμένο ζουμ"
 
 #: src/emu/inpttype.ipp:848
 msgctxt "input-name"
 msgid "UI Previous Group"
-msgstr ""
+msgstr "UI Προηγούμενη Ομάδα"
 
 #: src/emu/inpttype.ipp:849
 msgctxt "input-name"
 msgid "UI Next Group"
-msgstr ""
+msgstr "UI Επόμενη Ομάδα"
 
 #: src/emu/inpttype.ipp:850
 msgctxt "input-name"
 msgid "UI Rotate"
-msgstr ""
+msgstr "UI Περιστροφή"
 
 #: src/emu/inpttype.ipp:851
 msgctxt "input-name"
 msgid "Show Profiler"
-msgstr ""
+msgstr "Προβολή Profiler"
 
 #: src/emu/inpttype.ipp:852
 msgctxt "input-name"
 msgid "UI Toggle"
-msgstr ""
+msgstr "UI Εναλλαγή"
 
 #: src/emu/inpttype.ipp:853
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr ""
+msgstr "UI Απελευθέρωση δείκτη"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
 msgid "UI Paste Text"
-msgstr ""
+msgstr "UI Επικόλληση κειμένου"
 
 #: src/emu/inpttype.ipp:855
 msgctxt "input-name"
 msgid "Save State"
-msgstr ""
+msgstr "Αποθήκευση Κατάστασης"
 
 #: src/emu/inpttype.ipp:856
 msgctxt "input-name"
 msgid "Load State"
-msgstr ""
+msgstr "Φόρτωση Κατάστασης"
 
 #: src/emu/inpttype.ipp:857
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
-msgstr ""
+msgstr "UI (Πρώτο) Έναρξη Κασέτας"
 
 #: src/emu/inpttype.ipp:858
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
-msgstr ""
+msgstr "UI (Πρώτο) Διακοπή Κασέτας"
 
 #: src/emu/inpttype.ipp:859
 msgctxt "input-name"
 msgid "UI External DAT View"
-msgstr ""
+msgstr "UI Προβολή εξωτερικού DAT"
 
 #: src/emu/inpttype.ipp:860
 msgctxt "input-name"
 msgid "UI Add/Remove favorite"
-msgstr ""
+msgstr "UI Προσθήκη/Αφαίρεση αγαπημένου"
 
 #: src/emu/inpttype.ipp:861
 msgctxt "input-name"
 msgid "UI Export List"
-msgstr ""
+msgstr "UI Εξαγωγή Λίστας"
 
 #: src/emu/inpttype.ipp:862
 msgctxt "input-name"
 msgid "UI Audit Media"
-msgstr ""
+msgstr "UI Έλεγχος Μέσων"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
@@ -3715,12 +3716,12 @@ msgstr "Πατήστε %s για διαγραφή"
 #: plugins/autofire/autofire_menu.lua:68
 #, lua-format
 msgid "%s [%d Hz]"
-msgstr ""
+msgstr "%s [%d Hz]"
 
 #: plugins/autofire/autofire_menu.lua:68 plugins/autofire/autofire_menu.lua:103
 #: plugins/autofire/autofire_menu.lua:252
 msgid "input-name"
-msgstr ""
+msgstr "όνομα-εισαγωγής"
 
 #: plugins/autofire/autofire_menu.lua:75 plugins/autofire/autofire_menu.lua:208
 msgid "Add autofire button"
@@ -4167,11 +4168,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selsoft.cpp:540
 msgid "[Start empty]"
-msgstr ""
+msgstr "[Έναρξη άδειο]"
 
 #: src/frontend/mame/ui/selsoft.cpp:540
 msgid "[Use file manager]"
-msgstr ""
+msgstr "[Χρήση διαχείρησης αρχείων]"
 
 #: src/frontend/mame/ui/selsoft.cpp:723
 #, c-format
@@ -4495,7 +4496,7 @@ msgstr "Χαρτογράφηση Συσκευών"
 
 #: src/frontend/mame/ui/submenu.cpp:101
 msgid "Lightgun Device Assignment"
-msgstr "Ανάθεση Συσκευής Lightgun"
+msgstr "Ανάθεση Συσκευής Όπλου φωτός"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Trackball Device Assignment"
@@ -4503,23 +4504,23 @@ msgstr "Ανάθεση Συσκευής Trackball"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Pedal Device Assignment"
-msgstr "Ανάθεση Συσκευής Pedal"
+msgstr "Ανάθεση Συσκευής Πεταλιού"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Adstick Device Assignment"
-msgstr "Ανάθεση Συσκευής Adstick"
+msgstr "Ανάθεση Συσκευής Ad μοχλού"
 
 #: src/frontend/mame/ui/submenu.cpp:105
 msgid "Paddle Device Assignment"
-msgstr "Ανάθεση Συσκευής Paddle"
+msgstr "Ανάθεση Συσκευής Κουπιού"
 
 #: src/frontend/mame/ui/submenu.cpp:106
 msgid "Dial Device Assignment"
-msgstr "Ανάθεση Συσκευής Dial"
+msgstr "Ανάθεση Συσκευής Περιστροφής"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Positional Device Assignment"
-msgstr "Ανάθεση Συσκευής Posisional"
+msgstr "Ανάθεση Συσκευής Θέσεως"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Mouse Device Assignment"
@@ -5005,82 +5006,82 @@ msgstr "Απενεργοποιημένο"
 #: src/frontend/mame/ui/utils.cpp:63
 msgctxt "swlist-info"
 msgid "Alternate Title"
-msgstr ""
+msgstr "Εναλλακτικός Τίτλος"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgctxt "swlist-info"
 msgid "Author"
-msgstr ""
+msgstr "Συγγραφέας"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgctxt "swlist-info"
 msgid "Barcode Number"
-msgstr ""
+msgstr "Αριθμός Γραμμωτου Κώδικα"
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgctxt "swlist-info"
 msgid "Developer"
-msgstr ""
+msgstr "Υπεύθυνος ανάπτυξης"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgctxt "swlist-info"
 msgid "Distributor"
-msgstr ""
+msgstr "Διανομέας"
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
 msgid "Installation Instructions"
-msgstr ""
+msgstr "Οδηγίες Εγκατάστασης"
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
 msgid "ISBN"
-msgstr ""
+msgstr "ISBN"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgctxt "swlist-info"
 msgid "OEM"
-msgstr ""
+msgstr "OEM"
 
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
 msgid "Original Publisher"
-msgstr ""
+msgstr "Αρχικός Εκδότης"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
 msgid "Part Number"
-msgstr ""
+msgstr "Αριθμός παρτίδας"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
 msgid "PCB"
-msgstr ""
+msgstr "PCB"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
 msgid "Programmer"
-msgstr ""
+msgstr "Προγραμματιστής"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
 msgid "Release Date"
-msgstr ""
+msgstr "Ημερομηνία κυκλοφορίας"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
 msgid "Serial Number"
-msgstr ""
+msgstr "Σειριακός Αριθμός"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
 msgid "Usage Instructions"
-msgstr ""
+msgstr "Οδηγίες Χρήσης"
 
 #: src/frontend/mame/ui/utils.cpp:78
 msgctxt "swlist-info"
 msgid "Version"
-msgstr ""
+msgstr "Έκδοση"
 
 #: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
@@ -5235,22 +5236,22 @@ msgstr "Εκδότης"
 #: src/frontend/mame/ui/utils.cpp:117
 msgctxt "software-filter"
 msgid "Developer"
-msgstr ""
+msgstr "Υπεύθυνος ανάπτυξης"
 
 #: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Distributor"
-msgstr ""
+msgstr "Διανομέας"
 
 #: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Author"
-msgstr ""
+msgstr "Συγγραφέας"
 
 #: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Programmer"
-msgstr ""
+msgstr "Προγραμματιστής"
 
 #: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
@@ -5343,11 +5344,11 @@ msgstr "Περιλαμβάνονται κλώνοι"
 #: src/frontend/mame/ui/utils.cpp:2046 src/frontend/mame/ui/inifile.cpp:270
 msgctxt "swlist-info"
 msgid "Software list/item"
-msgstr ""
+msgstr "Λίστα λογισμικού/αντικείμενο"
 
 #: src/frontend/mame/ui/datmenu.cpp:81 src/frontend/mame/ui/selmenu.cpp:2692
 msgid "Software List Info"
-msgstr ""
+msgstr "Πληροφορίες Λίστας λογισμικού"
 
 #: src/frontend/mame/ui/datmenu.cpp:365
 msgid "Revision: "
@@ -5472,7 +5473,7 @@ msgstr " (προεπιλογή)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:973
 msgid "No plugins found"
-msgstr ""
+msgstr "Δε βρέθηκαν πρόσθετα"
 
 #: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Pseudo terminals"
@@ -5493,16 +5494,19 @@ msgid ""
 "Press %2$s to delete\n"
 "Press %3$s to cancel"
 msgstr ""
+"Διαγραφή αποθηκευμένης κατάστασης %1$s?\n"
+"Πατήστε %2$s για διαγραφή\n"
+"Πατήστε %3$s για ακύρωση"
 
 #: src/frontend/mame/ui/state.cpp:378
 #, c-format
 msgid "Error removing saved state file %1$s"
-msgstr ""
+msgstr "Πρόβλημα κατά την αφαίρεση της αποθηκευμένης κατάστασης %1$s"
 
 #: src/frontend/mame/ui/state.cpp:424
 #, c-format
 msgid "Press %1$s to delete"
-msgstr ""
+msgstr "Πατήστε %1$s για διαγραφή"
 
 #: src/frontend/mame/ui/state.cpp:497
 msgid "Load State"
@@ -5541,7 +5545,7 @@ msgstr "Άλλα Στοιχεία Ελέγχου"
 
 #: src/frontend/mame/ui/inputmap.cpp:227
 msgid "This machine has no configurable inputs."
-msgstr ""
+msgstr "Αυτό το μηχάνημα δεν έχει είσαγωγές προς ρύθμιση."
 
 #: src/frontend/mame/ui/inputmap.cpp:310
 msgid "Pressed"
@@ -5748,12 +5752,12 @@ msgstr "Μέσα Λογισμικού"
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgctxt "path-option"
 msgid "Sound Samples"
-msgstr ""
+msgstr "Δείγματα ήχου"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
 msgid "Artwork"
-msgstr ""
+msgstr "Artwork"
 
 #: src/frontend/mame/ui/dirmenu.cpp:41
 msgctxt "path-option"
@@ -5763,17 +5767,17 @@ msgstr "Στόχαστρα"
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
 msgid "Cheat Files"
-msgstr ""
+msgstr "Αρχεία Cheat"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
 msgid "Plugins"
-msgstr ""
+msgstr "Πρόσθετα"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44
 msgctxt "path-option"
 msgid "UI Translations"
-msgstr ""
+msgstr "Μεταφράσεις UI"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
@@ -5783,12 +5787,12 @@ msgstr "INIs"
 #: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
 msgid "UI Settings"
-msgstr ""
+msgstr "Ρυθμίσεις UI"
 
 #: src/frontend/mame/ui/dirmenu.cpp:47
 msgctxt "path-option"
 msgid "Plugin Data"
-msgstr ""
+msgstr "Δεδομένα Πρόσθετων"
 
 #: src/frontend/mame/ui/dirmenu.cpp:48
 msgctxt "path-option"
@@ -5838,12 +5842,12 @@ msgstr "Φυλλάδια"
 #: src/frontend/mame/ui/dirmenu.cpp:57
 msgctxt "path-option"
 msgid "Title Screens"
-msgstr ""
+msgstr "Οθόνες Τίτλου"
 
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Game Endings"
-msgstr ""
+msgstr "Τερματισμοί Παιχνιδιών"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
@@ -5853,17 +5857,17 @@ msgstr "Αρχηγοί"
 #: src/frontend/mame/ui/dirmenu.cpp:60
 msgctxt "path-option"
 msgid "Artwork Previews"
-msgstr ""
+msgstr "Προεπισκόπηση Artwork"
 
 #: src/frontend/mame/ui/dirmenu.cpp:61
 msgctxt "path-option"
 msgid "Select"
-msgstr ""
+msgstr "Επιλογή"
 
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr ""
+msgstr "Οθονες Game Over"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
@@ -5941,16 +5945,16 @@ msgstr " ΓΡΑΦΙΔΕΣ"
 #: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
 #, c-format
 msgid "Zoom = 1/%1$d"
-msgstr ""
+msgstr "Μεγένθυση = 1/%1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
 #, c-format
 msgid "Zoom = %1$d"
-msgstr ""
+msgstr "Μεγένθυση = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1262
 msgid "Expand to fit"
-msgstr ""
+msgstr "Μέγιστη Επέκταση"
 
 #: src/frontend/mame/ui/selgame.cpp:856
 msgid "Configure Machine"
@@ -5992,12 +5996,12 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:95
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable"
-msgstr ""
+msgstr "Έλεγχος ROMs για %1$u μηχανήματα που δεν είναι διαθέσιμα"
 
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for all %1$u machines"
-msgstr ""
+msgstr "Έλεγχος ROMs για όλα τα %1$u μηχανήματα"
 
 #: src/frontend/mame/ui/custui.cpp:33
 msgid "Show All"
@@ -6029,7 +6033,7 @@ msgstr "Γλώσσα"
 
 #: src/frontend/mame/ui/custui.cpp:183
 msgid "System Names"
-msgstr ""
+msgstr "Ονόματα συστήματος"
 
 #: src/frontend/mame/ui/custui.cpp:186
 msgid "Show side panels"
@@ -6037,11 +6041,11 @@ msgstr "Προβολή πλευρικών πάνελ"
 
 #: src/frontend/mame/ui/custui.cpp:198
 msgid "UI Customization Settings"
-msgstr ""
+msgstr "Ρυθμίσεις Προσαρμογής UI"
 
 #: src/frontend/mame/ui/custui.cpp:212 src/frontend/mame/ui/custui.cpp:256
 msgid "[built-in]"
-msgstr ""
+msgstr "[ενσωματομένο]"
 
 #: src/frontend/mame/ui/custui.cpp:338
 msgid "default"
@@ -6393,12 +6397,12 @@ msgstr "Φυλλάδιο"
 #: src/frontend/mame/ui/selmenu.cpp:81
 msgctxt "selmenu-artwork"
 msgid "Title Screen"
-msgstr ""
+msgstr "Οθόνη Τίτλου"
 
 #: src/frontend/mame/ui/selmenu.cpp:82
 msgctxt "selmenu-artwork"
 msgid "Ending"
-msgstr ""
+msgstr "Τερματισμός"
 
 #: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
@@ -6438,12 +6442,12 @@ msgstr "Βαθμολογία"
 #: src/frontend/mame/ui/selmenu.cpp:90
 msgctxt "selmenu-artwork"
 msgid "Select"
-msgstr ""
+msgstr "Επιλογή"
 
 #: src/frontend/mame/ui/selmenu.cpp:91
 msgctxt "selmenu-artwork"
 msgid "Marquee"
-msgstr ""
+msgstr "Μαρκίζα"
 
 #: src/frontend/mame/ui/selmenu.cpp:92
 msgctxt "selmenu-artwork"
@@ -6452,7 +6456,7 @@ msgstr "Εξώφυλλα"
 
 #: src/frontend/mame/ui/selmenu.cpp:96
 msgid "Add or remove favorite"
-msgstr ""
+msgstr "Προσθήκη ή αφαίρεση αγαπημένου"
 
 #: src/frontend/mame/ui/selmenu.cpp:97
 msgid "Export displayed list to file"
@@ -6460,7 +6464,7 @@ msgstr "Εξαγωγή λίστας σε αρχείο"
 
 #: src/frontend/mame/ui/selmenu.cpp:98
 msgid "Audit media"
-msgstr ""
+msgstr "Έλεγχος μέσων"
 
 #: src/frontend/mame/ui/selmenu.cpp:99
 msgid "Show DATs view"
@@ -6506,7 +6510,7 @@ msgstr "Ο Οδηγός είναι κλώνος του: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:1287
 msgid "Return to previous menu"
-msgstr ""
+msgstr "Επιστροφή στο προηγούμενο μενού"
 
 #: src/frontend/mame/ui/selmenu.cpp:2233
 msgid "Images"
@@ -6879,7 +6883,7 @@ msgstr "Ήχος"
 
 #: src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Compressor"
-msgstr ""
+msgstr "Συμπιεστής"
 
 #: src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
@@ -7039,84 +7043,3 @@ msgstr "* Επιλογές Υποδοχής:\n"
 msgid "[None]\n"
 msgstr "[Καμία]\n"
 
-#, c-format
-#~ msgid "Audit ROMs for %1$u machines marked unavailable?"
-#~ msgstr "Έλεγχος ROMs για %1$u μηχανήματα που δεν είναι διαθέσιμα;"
-
-#, c-format
-#~ msgid "Audit ROMs for all %1$u machines?"
-#~ msgstr "Έλεγχος ROMs για όλα τα %1$u μηχανήματα;"
-
-#~ msgid "Add or remove favorites"
-#~ msgstr "Προσθήκη ή αφαίρεση από τα αγαπημένα"
-
-#, c-format
-#~ msgid "Romset: %1$-.100s"
-#~ msgstr "Romset: %1$-.100s"
-
-#~ msgid "Custom UI Settings"
-#~ msgstr "Προσαρμοσμένες Ρυθμίσεις UI"
-
-#~ msgid "Software Usage"
-#~ msgstr "Χρήση Λογισμικού"
-
-#~ msgid "Usage"
-#~ msgstr "Χρήση"
-
-#~ msgctxt "path-option"
-#~ msgid "UI"
-#~ msgstr "UI"
-
-#~ msgctxt "path-option"
-#~ msgid "Language"
-#~ msgstr "Γλώσσα"
-
-#~ msgctxt "path-option"
-#~ msgid "Samples"
-#~ msgstr "Δείγματα"
-
-#~ msgctxt "path-option"
-#~ msgid "Cheats"
-#~ msgstr "Cheats"
-
-#~ msgctxt "path-option"
-#~ msgid "Titles"
-#~ msgstr "Τίτλοι"
-
-#~ msgctxt "path-option"
-#~ msgid "Ends"
-#~ msgstr "Τερματισμοί"
-
-#~ msgctxt "path-option"
-#~ msgid "Artworks"
-#~ msgstr "Artworks"
-
-#~ msgctxt "path-option"
-#~ msgid "Artworks Preview"
-#~ msgstr "Προεπισκόπηση Artworks"
-
-#~ msgctxt "path-option"
-#~ msgid "GameOver"
-#~ msgstr "GameOver"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Titles"
-#~ msgstr "Τίτλοι"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Ends"
-#~ msgstr "Τερματισμοί"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Marquees"
-#~ msgstr "Μαρκίζες"
-
-#~ msgid "This machine has no input map."
-#~ msgstr "Αυτό το μηχάνημα δεν έχει χαρτογραφηση εισαγωγής."
-
-#~ msgid "Select"
-#~ msgstr "Επιλογή"
-
-#, c-format
-#~ msgid "romset: %1$-.100s"
-#~ msgstr "romset: %1$-.100s"
