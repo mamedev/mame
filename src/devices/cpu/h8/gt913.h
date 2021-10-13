@@ -13,17 +13,19 @@
 
 #pragma once
 
-#include "cpu/h8/h8.h"
-#include "cpu/h8/h8_intc.h"
-#include "cpu/h8/h8_port.h"
-#include "cpu/h8/h8_sci.h"
-#include "gt913_io.h"
-#include "gt913_kbd.h"
-#include "gt913_snd.h"
+#include "h8.h"
+#include "h8_intc.h"
+#include "h8_port.h"
+#include "h8_sci.h"
+#include "machine/gt913_io.h"
+#include "machine/gt913_kbd.h"
+#include "machine/gt913_snd.h"
 
 class gt913_device : public h8_device {
 public:
 	gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void uart_rate_w(uint8_t data);
 	void uart_control_w(uint8_t data);
@@ -39,24 +41,20 @@ protected:
 	
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map(address_map &map);
-	void map_opcodes(address_map &map);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	/* handle bank switching instructions */
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
-	void set_bank_num();
-	/* translate other opcodes which match normal H8 instructions */
-	void decode_opcodes();
-	
-	virtual space_config_vector memory_space_config() const override;
-	
-	address_space_config opcodes_config;
-	
+
+#define O(o) void o ## _full(); void o ## _partial()
+	O(ldbank_imm2l_bankl); O(ldbank_imm4l_bankh); O(ldbank_r8l_bankl); O(ldbank_r8l_bankh);
+
+	O(dispatch_6600); O(dispatch_7000); O(dispatch_7200);
+#undef O
+
 	required_memory_region        m_rom;
-	required_shared_ptr<uint16_t> m_opcodes;
 
 	required_memory_bank m_bank;
 	uint16_t             m_banknum;

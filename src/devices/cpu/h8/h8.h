@@ -115,7 +115,6 @@ protected:
 	address_space_config program_config, io_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache cache;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific program;
-	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache opcodes;
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific io;
 	h8_dma_device *dma_device;
 	h8_dtc_device *dtc_device;
@@ -156,8 +155,6 @@ protected:
 	virtual int trapa_setup();
 	virtual void irq_setup() = 0;
 
-	uint16_t read16op(uint32_t adr);
-	uint16_t fetch_op();
 	uint16_t read16i(uint32_t adr);
 	uint16_t fetch();
 	inline void fetch(int slot) { IR[slot] = fetch(); }
@@ -169,7 +166,7 @@ protected:
 	inline void prefetch() { prefetch_start(); prefetch_done(); }
 	inline void prefetch_noirq() { prefetch_start(); prefetch_done_noirq(); }
 	inline void prefetch_noirq_notrace() { prefetch_start(); prefetch_done_noirq_notrace(); }
-	void prefetch_start() { NPC = PC & 0xffffff; PIR = fetch_op(); }
+	void prefetch_start() { NPC = PC & 0xffffff; PIR = fetch(); }
 	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc & 0xffffff; PC = pc+2; PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();

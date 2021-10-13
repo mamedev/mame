@@ -2,7 +2,7 @@
 # copyright-holders:Olivier Galibert
 macro bxx_any %cond
 	prefetch_start();
-	TMP2 = read16op(TMP1);
+	TMP2 = read16i(TMP1);
 	if(%cond)
 		prefetch_switch(TMP1, TMP2);
 	prefetch_done();

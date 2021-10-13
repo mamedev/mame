@@ -1398,8 +1398,6 @@ end
 
 if (MACHINES["GT913"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/gt913.cpp",
-		MAME_DIR .. "src/devices/machine/gt913.h",
 		MAME_DIR .. "src/devices/machine/gt913_io.cpp",
 		MAME_DIR .. "src/devices/machine/gt913_io.h",
 		MAME_DIR .. "src/devices/machine/gt913_kbd.cpp",

@@ -20,14 +20,13 @@
 
 #include "emu.h"
 #include "gt913.h"
+#include "gt913d.h"
 
 DEFINE_DEVICE_TYPE(GT913, gt913_device, "gt913", "Casio GT913F")
 
 gt913_device::gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_device(mconfig, GT913, tag, owner, clock, address_map_constructor(FUNC(gt913_device::map), this)),
-	opcodes_config("opcodes", ENDIANNESS_BIG, 16, 16, 0, address_map_constructor(FUNC(gt913_device::map_opcodes), this)),
 	m_rom(*this, DEVICE_SELF),
-	m_opcodes(*this, "opcodes"),
 	m_bank(*this, "bank"),
 	m_intc(*this, "intc"),
 	m_sound(*this, "gt_sound"),
@@ -39,11 +38,9 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	has_hc = false;
 }
 
-device_memory_interface::space_config_vector gt913_device::memory_space_config() const
-{	
-	auto spaces = h8_device::memory_space_config();
-	spaces.emplace_back(AS_OPCODES, &opcodes_config);
-	return spaces;
+std::unique_ptr<util::disasm_interface> gt913_device::create_disassembler()
+{
+	return std::make_unique<gt913_disassembler>();
 }
 
 void gt913_device::map(address_map &map)
@@ -85,11 +82,6 @@ void gt913_device::map(address_map &map)
 	map(0xfff3, 0xfff3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 //	map(0xfff4, 0xfff4).nopw(); probably not port 3 DDR - ctk551 writes 0x00 but uses port 3 for output only
 	map(0xfff5, 0xfff5).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-}
-
-void gt913_device::map_opcodes(address_map &map)
-{
-	map(0x0000, 0x7fff).rom().share("opcodes");
 }
 
 void gt913_device::device_add_mconfig(machine_config &config)
@@ -165,8 +157,6 @@ void gt913_device::device_start()
 
 	m_bank->configure_entries(0, m_rom->bytes() >> 12, m_rom->base(), 1 << 12);
 
-	decode_opcodes();
-
 	save_item(NAME(m_banknum));
 }
 
@@ -177,169 +167,4 @@ void gt913_device::device_reset()
 	m_banknum = 0;
 }
 
-void gt913_device::do_exec_full()
-{
-	if ((inst_state & 0xfffb80) == 0x0380)
-	{
-		set_bank_num();
-		if (icount <= bcount) { inst_substate = 1; return; }
-		prefetch();
-	}
-	else
-	{
-		h8_device::do_exec_full();
-	}
-}
-
-void gt913_device::do_exec_partial()
-{
-	if ((inst_state & 0xfffb80) == 0x0380)
-	{
-		switch (inst_substate) {
-		case 0:
-			set_bank_num();
-			if (icount <= bcount) { inst_substate = 1; return; }
-			[[fallthrough]];
-		case 1:;
-			prefetch();
-			break;
-		}
-		inst_substate = 0;
-	}
-	else
-	{
-		h8_device::do_exec_partial();
-	}
-}
-
-void gt913_device::set_bank_num()
-{
-	if (BIT(IR[0], 10))
-		TMP1 = IR[0] & 0xf;
-	else
-		TMP1 = r8_r(IR[0]);
-
-	if (BIT(IR[0], 6))
-		m_banknum = (m_banknum & 0xfffc) | (TMP1 & 0x3);
-	else
-		m_banknum = (TMP1 << 2) | (m_banknum & 0x3);
-
-	m_bank->set_entry(m_banknum);
-}
-
-void gt913_device::decode_opcodes()
-{
-	auto rombase = &m_rom->as_u16();
-	const auto size = 0x8000 / 2;
-
-	for (offs_t offset = 0; offset < size; offset++)
-	{
-		uint16_t opcode = rombase[offset];
-
-		switch (opcode & 0xF800)
-		{
-		default:
-			// most opcodes are decoded normally
-			break;
-
-		case 0x0000:
-		case 0x0800:
-		case 0x1800:
-			switch (opcode & 0x1F00)
-			{
-			case 0x0100: // SLEEP
-				opcode = 0x0180;
-				break;
-
-			case 0x0200: // STC / LDC (or bank switching opcodes if bit 7 is set)
-			case 0x0300:
-				if (!BIT(opcode, 7))
-					opcode &= 0xff0f;
-				break;
-
-			case 0x0F00: // MULXU
-				opcode = 0x5000 | (opcode & 0xFF);
-				break;
-
-			case 0x1B00: // SUBS.L (immediate value is inverted)
-				opcode ^= 0x80;
-				break;
-
-			case 0x1F00: // DIVXU
-				opcode = 0x5100 | (opcode & 0xFF);
-				break;
-			}
-			break;
-
-		case 0x5000:
-			// BSET, BCLR, BTST
-			opcode = bitswap<16>(opcode, 15, 14, 13, 8, 11, 12, 9, 10, 7, 6, 5, 4, 3, 2, 1, 0) ^ 0x3400;
-			break;
-
-		case 0x5800:
-			switch (opcode & 0x0F00)
-			{
-			case 0x0800: // RTS
-				opcode = 0x5470;
-				break;
-			case 0x0900: // RTE
-				opcode = 0x5670;
-				break;
-			case 0x0A00: // JMP
-				if (BIT(opcode, 7))
-					opcode = 0x5A00;
-				else
-					opcode = 0x5900 | (opcode & 0x70);
-				break;
-			case 0x0C00: // JSR
-				if (BIT(opcode, 7))
-					opcode = 0x5E00;
-				else
-					opcode = 0x5D00 | (opcode & 0x70);
-				break;
-			case 0x0E00: // BSR
-				opcode = 0x5500 | (opcode & 0xFF);
-				break;
-			case 0x0F00: // MOV.W #imm,Rn
-				opcode = 0x7900 | (opcode & 0x07);
-				break;
-			}
-			break;
-
-		case 0x6000:
-		case 0x7000:
-			switch (opcode & 0x1F00)
-			{
-			case 0x0600: // BTST #xx:3,@Rd
-				if (offset + 1 < size && (rombase[offset + 1] & 0xFF8F) == 0)
-				{
-					m_opcodes[offset] = (opcode & 0xFF) | 0x7C00;
-					offset++;
-					opcode = (rombase[offset] & 0xFF) | 0x7300;
-				}
-				break;
-
-			case 0x1000:
-			case 0x1200:
-				// BSET/BCLR #xx:3,@aa:8
-				if (offset + 1 < size && (rombase[offset + 1] & 0xFF8F) == 0)
-				{
-					m_opcodes[offset] = opcode | 0x7F00;
-					offset++;
-					opcode = (rombase[offset] & 0xFF) | (opcode & 0xFF00);
-				}
-				break;
-			}
-			break;
-
-		case 0x6800:
-		case 0x7800:
-			// MOV.B, MOV.W
-			opcode = bitswap<16>(opcode, 15, 14, 13, 7, 11, 9, 10, 8, 12, 6, 5, 4, 3, 2, 1, 0);
-			break;
-
-		}
-
-		m_opcodes[offset] = opcode;
-	}
-}
+#include "cpu/h8/gt913.hxx"

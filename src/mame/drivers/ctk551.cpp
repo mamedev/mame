@@ -49,7 +49,7 @@
 
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "machine/gt913.h"
+#include "cpu/h8/gt913.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
