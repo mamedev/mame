@@ -274,14 +274,14 @@ The size may optionally be preceded by an access type specification:
   (program)
 * ``d`` or ``ld`` specifies a logical address defaulting to space 1
   (data)
-* ``i`` or ``li`` specifies a logical address defaulting to space 1
+* ``i`` or ``li`` specifies a logical address defaulting to space 2
   (I/O)
-* ``3`` or ``l3`` specifies a logical address defaulting to space 1
+* ``3`` or ``l3`` specifies a logical address defaulting to space 3
   (opcodes)
 * ``pp`` specifies a physical address defaulting to space 0 (program)
 * ``pd`` specifies a physical address defaulting to space 1 (data)
-* ``pi`` specifies a physical address defaulting to space 1 (I/O)
-* ``p3`` specifies a physical address defaulting to space 1 (opcodes)
+* ``pi`` specifies a physical address defaulting to space 2 (I/O)
+* ``p3`` specifies a physical address defaulting to space 3 (opcodes)
 * ``r`` specifies direct read/write pointer access defaulting to space 0
   (program)
 * ``o`` specifies direct read/write pointer access defaulting to space 3

@@ -556,20 +556,31 @@ void menu::draw(uint32_t flags)
 			float const line_y0 = visible_top + (float)linenum * line_height;
 			float const line_y1 = line_y0 + line_height;
 
-			// set the hover if this is our item
-			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
-				m_hover = itemnum;
+			// work out what we're dealing with
+			bool const uparrow = !linenum && show_top_arrow;
+			bool const downarrow = (linenum == (m_visible_lines - 1)) && show_bottom_arrow;
 
-			// if we're selected, draw with a different background
+			// set the hover if this is our item
+			bool const hovered = mouse_in_rect(line_x0, line_y0, line_x1, line_y1);
+			if (hovered)
+			{
+				if (uparrow)
+					m_hover = HOVER_ARROW_UP;
+				else if (downarrow)
+					m_hover = HOVER_ARROW_DOWN;
+				else if (is_selectable(pitem))
+					m_hover = itemnum;
+			}
+
 			if (is_selected(itemnum))
 			{
+				// if we're selected, draw with a different background
 				fgcolor = fgcolor2 = fgcolor3 = ui().colors().selected_color();
 				bgcolor = ui().colors().selected_bg_color();
 			}
-
-			// else if the mouse is over this item, draw with a different background
-			else if (itemnum == m_hover)
+			else if (hovered && (uparrow || downarrow || is_selectable(pitem)))
 			{
+				// else if the mouse is over this item, draw with a different background
 				fgcolor = fgcolor2 = fgcolor3 = ui().colors().mouseover_color();
 				bgcolor = ui().colors().mouseover_bg_color();
 			}
@@ -578,7 +589,7 @@ void menu::draw(uint32_t flags)
 			if (bgcolor != ui().colors().text_bg_color())
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 
-			if (linenum == 0 && show_top_arrow)
+			if (uparrow)
 			{
 				// if we're on the top line, display the up arrow
 				draw_arrow(
@@ -588,10 +599,8 @@ void menu::draw(uint32_t flags)
 							line_y0 + 0.75f * line_height,
 							fgcolor,
 							ROT0);
-				if (m_hover == itemnum)
-					m_hover = HOVER_ARROW_UP;
 			}
-			else if (linenum == m_visible_lines - 1 && show_bottom_arrow)
+			else if (downarrow)
 			{
 				// if we're on the bottom line, display the down arrow
 				draw_arrow(
@@ -601,8 +610,6 @@ void menu::draw(uint32_t flags)
 							line_y0 + 0.75f * line_height,
 							fgcolor,
 							ROT0 ^ ORIENTATION_FLIP_Y);
-				if (m_hover == itemnum)
-					m_hover = HOVER_ARROW_DOWN;
 			}
 			else if (pitem.type == menu_item_type::SEPARATOR)
 			{
@@ -677,23 +684,25 @@ void menu::draw(uint32_t flags)
 				// apply arrows
 				if (is_selected(itemnum) && (pitem.flags & FLAG_LEFT_ARROW))
 				{
+					float const l = effective_left + effective_width - subitem_width - gutter_width;
+					float const r = l + lr_arrow_width;
 					draw_arrow(
-								effective_left + effective_width - subitem_width - gutter_width,
-								line_y0 + 0.1f * line_height,
-								effective_left + effective_width - subitem_width - gutter_width + lr_arrow_width,
-								line_y0 + 0.9f * line_height,
+								l, line_y0 + 0.1f * line_height, r, line_y0 + 0.9f * line_height,
 								fgcolor,
 								ROT90 ^ ORIENTATION_FLIP_X);
+					if (mouse_in_rect(l, line_y0 + 0.1f * line_height, r, line_y0 + 0.9f * line_height))
+						m_hover = HOVER_UI_LEFT;
 				}
 				if (is_selected(itemnum) && (pitem.flags & FLAG_RIGHT_ARROW))
 				{
+					float const r = effective_left + effective_width + gutter_width;
+					float const l = r - lr_arrow_width;
 					draw_arrow(
-								effective_left + effective_width + gutter_width - lr_arrow_width,
-								line_y0 + 0.1f * line_height,
-								effective_left + effective_width + gutter_width,
-								line_y0 + 0.9f * line_height,
+								l, line_y0 + 0.1f * line_height, r, line_y0 + 0.9f * line_height,
 								fgcolor,
 								ROT90);
+					if (mouse_in_rect(l, line_y0 + 0.1f * line_height, r, line_y0 + 0.9f * line_height))
+						m_hover = HOVER_UI_RIGHT;
 				}
 			}
 		}
@@ -856,13 +865,15 @@ void menu::handle_events(uint32_t flags, event &ev)
 			if (custom_mouse_down())
 				return;
 
-			if ((flags & PROCESS_ONLYCHAR) == 0)
+			if (!(flags & PROCESS_ONLYCHAR))
 			{
 				if (m_hover >= 0 && m_hover < m_items.size())
+				{
 					m_selected = m_hover;
+				}
 				else if (m_hover == HOVER_ARROW_UP)
 				{
-					if ((flags & FLAG_UI_DATS) != 0)
+					if (flags & FLAG_UI_DATS)
 					{
 						top_line -= m_visible_items - (last_item_visible() ? 1 : 0);
 						return;
@@ -883,6 +894,16 @@ void menu::handle_events(uint32_t flags, event &ev)
 					if (m_selected > m_items.size() - 1)
 						m_selected = m_items.size() - 1;
 					top_line += m_visible_lines - 2;
+				}
+				else if (m_hover == HOVER_UI_LEFT)
+				{
+					ev.iptkey = IPT_UI_LEFT;
+					stop = true;
+				}
+				else if (m_hover == HOVER_UI_RIGHT)
+				{
+					ev.iptkey = IPT_UI_RIGHT;
+					stop = true;
 				}
 			}
 			break;

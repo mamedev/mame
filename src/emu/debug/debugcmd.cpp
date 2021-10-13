@@ -252,7 +252,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("bpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpclear, this, _1));
 	m_console.register_command("bpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, false, _1));
 	m_console.register_command("bpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, true, _1));
-	m_console.register_command("bplist",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_bplist, this, _1));
+	m_console.register_command("bplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bplist, this, _1));
 
 	m_console.register_command("wpset",     CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, -1, _1));
 	m_console.register_command("wp",        CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, -1, _1));
@@ -265,7 +265,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpclear, this, _1));
 	m_console.register_command("wpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, false, _1));
 	m_console.register_command("wpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, true, _1));
-	m_console.register_command("wplist",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_wplist, this, _1));
+	m_console.register_command("wplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wplist, this, _1));
 
 	m_console.register_command("rpset",     CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1));
 	m_console.register_command("rp",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1));
@@ -337,8 +337,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 
 	m_console.register_command("dasm",      CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1));
 
-	m_console.register_command("trace",     CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1));
-	m_console.register_command("traceover", CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_traceover, this, _1));
+	m_console.register_command("trace",     CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1, false));
+	m_console.register_command("traceover", CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1, true));
 	m_console.register_command("traceflush",CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_traceflush, this, _1));
 
 	m_console.register_command("history",   CMDFLAG_NONE, 0, 2, std::bind(&debugger_commands::execute_history, this, _1));
@@ -1816,29 +1816,45 @@ void debugger_commands::execute_bplist(const std::vector<std::string> &params)
 {
 	int printed = 0;
 	std::string buffer;
-
-	/* loop over all CPUs */
-	for (device_t &device : device_enumerator(m_machine.root_device()))
-		if (!device.debug()->breakpoint_list().empty())
-		{
-			m_console.printf("Device '%s' breakpoints:\n", device.tag());
-
-			/* loop over the breakpoints */
-			for (const auto &bpp : device.debug()->breakpoint_list())
+	auto const apply =
+			[this, &printed, &buffer] (device_t &device)
 			{
-				debug_breakpoint &bp = *bpp.second;
-				buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
-				if (std::string(bp.condition()).compare("1") != 0)
-					buffer.append(string_format(" if %s", bp.condition()));
-				if (std::string(bp.action()).compare("") != 0)
-					buffer.append(string_format(" do %s", bp.action()));
-				m_console.printf("%s\n", buffer);
-				printed++;
-			}
-		}
+				if (!device.debug()->breakpoint_list().empty())
+				{
+					m_console.printf("Device '%s' breakpoints:\n", device.tag());
 
-	if (printed == 0)
-		m_console.printf("No breakpoints currently installed\n");
+					// loop over the breakpoints
+					for (const auto &bpp : device.debug()->breakpoint_list())
+					{
+						debug_breakpoint &bp = *bpp.second;
+						buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
+						if (std::string(bp.condition()).compare("1") != 0)
+							buffer.append(string_format(" if %s", bp.condition()));
+						if (std::string(bp.action()).compare("") != 0)
+							buffer.append(string_format(" do %s", bp.action()));
+						m_console.printf("%s\n", buffer);
+						printed++;
+					}
+				}
+			};
+
+	if (!params.empty())
+	{
+		device_t *cpu;
+		if (!validate_cpu_parameter(params[0], cpu))
+			return;
+		apply(*cpu);
+		if (!printed)
+			m_console.printf("No breakpoints currently installed for CPU %s\n", cpu->tag());
+	}
+	else
+	{
+		// loop over all CPUs
+		for (device_t &device : device_enumerator(m_machine.root_device()))
+			apply(device);
+		if (!printed)
+			m_console.printf("No breakpoints currently installed\n");
+	}
 }
 
 
@@ -1977,35 +1993,57 @@ void debugger_commands::execute_wplist(const std::vector<std::string> &params)
 {
 	int printed = 0;
 	std::string buffer;
-
-	/* loop over all CPUs */
-	for (device_t &device : device_enumerator(m_machine.root_device()))
-		for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
-			if (!device.debug()->watchpoint_vector(spacenum).empty())
+	auto const apply =
+			[this, &printed, &buffer] (device_t &device)
 			{
-				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
-
-				m_console.printf("Device '%s' %s space watchpoints:\n", device.tag(),
-								 device.debug()->watchpoint_vector(spacenum).front()->space().name());
-
-				/* loop over the watchpoints */
-				for (const auto &wp : device.debug()->watchpoint_vector(spacenum))
+				for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
 				{
-					buffer = string_format("%c%4X @ %0*X-%0*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
-							wp->space().addrchars(), wp->address(),
-							wp->space().addrchars(), wp->address() + wp->length() - 1,
-							types[int(wp->type())]);
-					if (std::string(wp->condition()).compare("1") != 0)
-						buffer.append(string_format(" if %s", wp->condition()));
-					if (std::string(wp->action()).compare("") != 0)
-						buffer.append(string_format(" do %s", wp->action()));
-					m_console.printf("%s\n", buffer);
-					printed++;
-				}
-			}
+					if (!device.debug()->watchpoint_vector(spacenum).empty())
+					{
+						static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
-	if (printed == 0)
-		m_console.printf("No watchpoints currently installed\n");
+						m_console.printf(
+								"Device '%s' %s space watchpoints:\n",
+								device.tag(),
+								device.debug()->watchpoint_vector(spacenum).front()->space().name());
+
+						// loop over the watchpoints
+						for (const auto &wp : device.debug()->watchpoint_vector(spacenum))
+						{
+							buffer = string_format(
+									"%c%4X @ %0*X-%0*X %s",
+									wp->enabled() ? ' ' : 'D', wp->index(),
+									wp->space().addrchars(), wp->address(),
+									wp->space().addrchars(), wp->address() + wp->length() - 1,
+									types[int(wp->type())]);
+							if (std::string(wp->condition()).compare("1") != 0)
+								buffer.append(string_format(" if %s", wp->condition()));
+							if (std::string(wp->action()).compare("") != 0)
+								buffer.append(string_format(" do %s", wp->action()));
+							m_console.printf("%s\n", buffer);
+							printed++;
+						}
+					}
+				}
+			};
+
+	if (!params.empty())
+	{
+		device_t *cpu;
+		if (!validate_cpu_parameter(params[0], cpu))
+			return;
+		apply(*cpu);
+		if (!printed)
+			m_console.printf("No watchpoints currently installed for CPU %s\n", cpu->tag());
+	}
+	else
+	{
+		// loop over all CPUs
+		for (device_t &device : device_enumerator(m_machine.root_device()))
+			apply(device);
+		if (!printed)
+			m_console.printf("No watchpoints currently installed\n");
+	}
 }
 
 
@@ -3576,11 +3614,11 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 
 
 /*-------------------------------------------------
-    execute_trace_internal - functionality for
+    execute_trace - functionality for
     trace over and trace info
 -------------------------------------------------*/
 
-void debugger_commands::execute_trace_internal(const std::vector<std::string> &params, bool trace_over)
+void debugger_commands::execute_trace(const std::vector<std::string> &params, bool trace_over)
 {
 	const char *action = nullptr;
 	bool detect_loops = true;
@@ -3644,26 +3682,6 @@ void debugger_commands::execute_trace_internal(const std::vector<std::string> &p
 		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename);
 	else
 		m_console.printf("Stopped tracing on CPU '%s'\n", cpu->tag());
-}
-
-
-/*-------------------------------------------------
-    execute_trace - execute the trace command
--------------------------------------------------*/
-
-void debugger_commands::execute_trace(const std::vector<std::string> &params)
-{
-	execute_trace_internal(params, false);
-}
-
-
-/*-------------------------------------------------
-    execute_traceover - execute the trace over command
--------------------------------------------------*/
-
-void debugger_commands::execute_traceover(const std::vector<std::string> &params)
-{
-	execute_trace_internal(params, true);
 }
 
 

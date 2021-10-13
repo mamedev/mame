@@ -3,6 +3,8 @@
 General Debugger Commands
 =========================
 
+:ref:`debugger-command-help`
+    displays built-in help in the console
 :ref:`debugger-command-do`
     evaluates the given expression
 :ref:`debugger-command-symlist`
@@ -41,6 +43,30 @@ General Debugger Commands
     read commands from file and executes them one by one
 :ref:`debugger-command-quit`
     exit the debugger and end the emulation session
+
+
+.. _debugger-command-help:
+
+help
+----
+
+**help [<topic>]**
+
+Displays built-in debugger help in the debugger console.  If no
+**<topic>** is specified, top-level topics are listed.  Most debugger
+commands have correspondingly named help topics.
+
+Examples:
+
+``help``
+    Lists top-level help topics.
+``help expressions``
+    Displays built-in help for debugger expression syntax.
+``help wpiset``
+    Displays built-in help for the
+    :ref:`wpiset <debugger-command-wpset>` command.
+
+Back to :ref:`debugger-general-list`
 
 
 .. _debugger-command-do:

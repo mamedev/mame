@@ -190,7 +190,6 @@ public:
 			std::string_view filename,
 			std::string &listname,
 			std::string &description,
-			std::string &notes,
 			std::list<software_info> &infolist,
 			std::ostream &errors);
 
@@ -241,8 +240,8 @@ private:
 	struct XML_ParserStruct *   m_parser;
 	std::string &               m_listname;
 	std::string &               m_description;
-	std::string &               m_notes;
 	bool                        m_data_accum_expected;
+	bool                        m_ignore_cdata;
 	std::string                 m_data_accum;
 	software_info *             m_current_info;
 	software_part *             m_current_part;
@@ -259,7 +258,6 @@ softlist_parser::softlist_parser(
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
-		std::string &notes,
 		std::list<software_info> &infolist,
 		std::ostream &errors) :
 	m_filename(filename),
@@ -267,8 +265,8 @@ softlist_parser::softlist_parser(
 	m_errors(errors),
 	m_listname(listname),
 	m_description(description),
-	m_notes(notes),
 	m_data_accum_expected(false),
+	m_ignore_cdata(false),
 	m_current_info(nullptr),
 	m_current_part(nullptr),
 	m_pos(POS_ROOT)
@@ -488,6 +486,7 @@ void softlist_parser::end_handler(void *data, const char *name)
 
 	// stop accumulating
 	state->m_data_accum_expected = false;
+	state->m_ignore_cdata = false;
 	state->m_data_accum.clear();
 }
 
@@ -500,7 +499,11 @@ void softlist_parser::data_handler(void *data, const char *s, int len)
 {
 	softlist_parser *state = reinterpret_cast<softlist_parser *>(data);
 
-	if (state->m_data_accum_expected)
+	if (state->m_ignore_cdata)
+	{
+		// allowed, but we don't use it
+	}
+	else if (state->m_data_accum_expected)
 	{
 		// if we have an std::string to accumulate data in, do it
 		state->m_data_accum.append(s, len);
@@ -548,9 +551,9 @@ void softlist_parser::parse_root_start(const char *tagname, const char **attribu
 
 void softlist_parser::parse_main_start(const char *tagname, const char **attributes)
 {
-	// <software name='' cloneof='' supported=''>
 	if (strcmp(tagname, "software") == 0)
 	{
+		// <software name='' cloneof='' supported=''>
 		static char const *const attrnames[] = { "name", "cloneof", "supported" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
@@ -562,10 +565,10 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 		else
 			parse_error("No name defined for item");
 	}
-	// <notes>
 	else if (strcmp(tagname, "notes") == 0)
 	{
-		m_data_accum_expected = true;
+		// <notes>
+		m_ignore_cdata = true;
 	}
 	else
 		unknown_tag(tagname);
@@ -574,8 +577,6 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 
 void softlist_parser::parse_main_end(const char *tagname)
 {
-	if (strcmp(tagname, "notes") == 0)
-		m_notes = std::move(m_data_accum);
 }
 
 
@@ -607,7 +608,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 
 	// <notes>
 	else if (strcmp(tagname, "notes") == 0)
-		m_data_accum_expected = true;
+		m_ignore_cdata = true;
 
 	// <info name='' value=''>
 	else if (strcmp(tagname, "info") == 0)
@@ -884,10 +885,6 @@ void softlist_parser::parse_soft_end(const char *tagname)
 	else if (strcmp(tagname, "publisher") == 0)
 		m_current_info->m_publisher = std::move(m_data_accum);
 
-	// <notes>
-	else if (strcmp(tagname, "notes") == 0)
-		m_current_info->m_notes = std::move(m_data_accum);
-
 	// </part>
 	else if (strcmp(tagname, "part") == 0)
 	{
@@ -915,11 +912,10 @@ void parse_software_list(
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
-		std::string &notes,
 		std::list<software_info> &infolist,
 		std::ostream &errors)
 {
-	detail::softlist_parser(file, filename, listname, description, notes, infolist, errors);
+	detail::softlist_parser(file, filename, listname, description, infolist, errors);
 }
 
 
