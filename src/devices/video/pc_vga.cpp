@@ -129,6 +129,8 @@ DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "GAMTOR VGA")
 DEFINE_DEVICE_TYPE(ATI_VGA,    ati_vga_device,    "ati_vga",    "ATi VGA")
 DEFINE_DEVICE_TYPE(IBM8514A,   ibm8514a_device,   "ibm8514a",   "IBM 8514/A Video")
 DEFINE_DEVICE_TYPE(MACH8,      mach8_device,      "mach8",      "Mach8")
+DEFINE_DEVICE_TYPE(XGA_COPRO,  xga_copro_device,  "xga_copro",  "IBM XGA Coprocessor")
+DEFINE_DEVICE_TYPE(OTI111,     oak_oti111_vga_device,  "oti111_vga",  "Oak Technologies Spitfire 64111")
 
 vga_device::vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -5835,4 +5837,472 @@ void mach8_device::mach8_ge_ext_config_w(uint16_t data)
 	mach8.ge_ext_config = data;
 	if(data & 0x8000)
 		popmessage("EEPROM enabled via 7AEE");
+}
+
+xga_copro_device::xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, XGA_COPRO, tag, owner, clock)
+	, m_var(TYPE::XGA)
+	, m_mem_read_cb(*this)
+	, m_mem_write_cb(*this)
+{
+}
+
+void xga_copro_device::start_command()
+{
+	switch((m_pelop >> 24) & 15)
+	{
+		case 11:
+			if(m_var == TYPE::OTI111)
+			{
+				logerror("oak specific textblt\n");
+				break;
+			}
+			[[fallthrough]];
+		case 12:
+			if(m_var == TYPE::OTI111)
+			{
+				logerror("oak specific fast pattern copy\n");
+				break;
+			}
+			[[fallthrough]];
+		default:
+			logerror("invalid pel op step func %d\n", (m_pelop >> 24) & 15);
+			break;
+		case 2:
+			logerror("draw and step read\n");
+			break;
+		case 3:
+			logerror("line draw read\n");
+			break;
+		case 4:
+			logerror("draw and step write\n");
+			break;
+		case 5:
+			logerror("line draw write\n");
+			break;
+		case 8:
+			logerror("pxblt\n");
+			break;
+		case 9:
+			logerror("inverting pxblt\n");
+			break;
+		case 10:
+			logerror("area fill pxblt\n");
+			break;
+	}
+}
+
+void do_pxblt()
+{
+
+}
+
+u8 xga_copro_device::xga_read(offs_t offset)
+{
+	switch(offset)
+	{
+		case 0x12:
+			return m_pelmap;
+		case 0x14:
+			return m_pelmap_base[m_pelmap];
+		case 0x15:
+			return m_pelmap_base[m_pelmap] >> 8;
+		case 0x16:
+			return m_pelmap_base[m_pelmap] >> 16;
+		case 0x17:
+			return m_pelmap_base[m_pelmap] >> 24;
+		case 0x18:
+			return m_pelmap_width[m_pelmap];
+		case 0x19:
+			return m_pelmap_width[m_pelmap] >> 8;
+		case 0x1a:
+			return m_pelmap_height[m_pelmap];
+		case 0x1b:
+			return m_pelmap_height[m_pelmap] >> 8;
+		case 0x1c:
+			return m_pelmap_format[m_pelmap];
+		case 0x20:
+			return m_bresh_err;
+		case 0x21:
+			return m_bresh_err >> 8;
+		case 0x24:
+			return m_bresh_k1;
+		case 0x25:
+			return m_bresh_k1 >> 8;
+		case 0x28:
+			return m_bresh_k2;
+		case 0x29:
+			return m_bresh_k2 >> 8;
+		case 0x2c:
+			return m_dir;
+		case 0x2d:
+			return m_dir >> 8;
+		case 0x2e:
+			return m_dir >> 16;
+		case 0x2f:
+			return m_dir >> 24;
+		case 0x48:
+			return m_fmix;
+		case 0x49:
+			return m_bmix;
+		case 0x4a:
+			return m_destccc;
+		case 0x4c:
+			return m_destccv;
+		case 0x4d:
+			return m_destccv >> 8;
+		case 0x4e:
+			return m_destccv >> 16;
+		case 0x4f:
+			return m_destccv >> 24;
+		case 0x50:
+			return m_pelbmask;
+		case 0x51:
+			return m_pelbmask >> 8;
+		case 0x52:
+			return m_pelbmask >> 16;
+		case 0x53:
+			return m_pelbmask >> 24;
+		case 0x54:
+			return m_carrychain;
+		case 0x55:
+			return m_carrychain >> 8;
+		case 0x56:
+			return m_carrychain >> 16;
+		case 0x57:
+			return m_carrychain >> 24;
+		case 0x58:
+			return m_fcolor;
+		case 0x59:
+			return m_fcolor >> 8;
+		case 0x5a:
+			return m_fcolor >> 16;
+		case 0x5b:
+			return m_fcolor >> 24;
+		case 0x5c:
+			return m_bcolor;
+		case 0x5d:
+			return m_bcolor >> 8;
+		case 0x5e:
+			return m_bcolor >> 16;
+		case 0x5f:
+			return m_bcolor >> 24;
+		case 0x60:
+			return m_opdim1;
+		case 0x61:
+			return m_opdim1 >> 8;
+		case 0x62:
+			return m_opdim2;
+		case 0x63:
+			return m_opdim2 >> 8;
+		case 0x6c:
+			return m_maskorigx;
+		case 0x6d:
+			return m_maskorigx >> 8;
+		case 0x6e:
+			return m_maskorigy;
+		case 0x6f:
+			return m_maskorigy >> 8;
+		case 0x70:
+			return m_srcxaddr;
+		case 0x71:
+			return m_srcxaddr >> 8;
+		case 0x72:
+			return m_srcyaddr;
+		case 0x73:
+			return m_srcyaddr >> 8;
+		case 0x74:
+			return m_patxaddr;
+		case 0x75:
+			return m_patxaddr >> 8;
+		case 0x76:
+			return m_patyaddr;
+		case 0x77:
+			return m_patyaddr >> 8;
+		case 0x78:
+			return m_dstxaddr;
+		case 0x79:
+			return m_dstxaddr >> 8;
+		case 0x7a:
+			return m_dstyaddr;
+		case 0x7b:
+			return m_dstyaddr >> 8;
+		case 0x7c:
+			return m_pelop;
+		case 0x7d:
+			return m_pelop >> 8;
+		case 0x7e:
+			return m_pelop >> 16;
+		case 0x7f:
+			return m_pelop >> 24;
+	}
+	return 0;
+}
+
+void xga_copro_device::xga_write(offs_t offset, u8 data)
+{
+	switch(offset)
+	{
+		case 0x12:
+			m_pelmap = data & 3;
+			break;
+		case 0x14:
+			m_pelmap_base[m_pelmap] = (m_pelmap_base[m_pelmap] & ~0xff) | data;
+			break;
+		case 0x15:
+			m_pelmap_base[m_pelmap] = (m_pelmap_base[m_pelmap] & ~0xff00) | (data << 8);
+			break;
+		case 0x16:
+			m_pelmap_base[m_pelmap] = (m_pelmap_base[m_pelmap] & ~0xff0000) | (data << 16);
+			break;
+		case 0x17:
+			m_pelmap_base[m_pelmap] = (m_pelmap_base[m_pelmap] & ~0xff000000) | (data << 24);
+			break;
+		case 0x18:
+			m_pelmap_width[m_pelmap] = (m_pelmap_width[m_pelmap] & ~0xff) | data;
+			break;
+		case 0x19:
+			m_pelmap_width[m_pelmap] = (m_pelmap_width[m_pelmap] & ~0xff00) | (data << 8);
+			break;
+		case 0x1a:
+			m_pelmap_height[m_pelmap] = (m_pelmap_height[m_pelmap] & ~0xff) | data;
+			break;
+		case 0x1b:
+			m_pelmap_height[m_pelmap] = (m_pelmap_height[m_pelmap] & ~0xff00) | (data << 8);
+			break;
+		case 0x1c:
+			m_pelmap_format[m_pelmap] = data;
+			break;
+		case 0x20:
+			m_bresh_err = (m_bresh_err & ~0xff) | data;
+			break;
+		case 0x21:
+			m_bresh_err = (m_bresh_err & ~0xff00) | (data << 8);
+			break;
+		case 0x24:
+			m_bresh_k1 = (m_bresh_k1 & ~0xff) | data;
+			break;
+		case 0x25:
+			m_bresh_k1 = (m_bresh_k1 & ~0xff00) | (data << 8);
+			break;
+		case 0x28:
+			m_bresh_k2 = (m_bresh_k2 & ~0xff) | data;
+			break;
+		case 0x29:
+			m_bresh_k2 = (m_bresh_k2 & ~0xff00) | (data << 8);
+			break;
+		case 0x2c:
+			m_dir = (m_dir & ~0xff) | data;
+			break;
+		case 0x2d:
+			m_dir = (m_dir & ~0xff00) | (data << 8);
+			break;
+		case 0x2e:
+			m_dir = (m_dir & ~0xff0000) | (data << 16);
+			break;
+		case 0x2f:
+			m_dir = (m_dir & ~0xff000000) | (data << 24);
+			break;
+		case 0x48:
+			m_fmix = data;
+			break;
+		case 0x49:
+			m_bmix = data;
+			break;
+		case 0x4a:
+			m_destccc = data;
+			break;
+		case 0x4c:
+			m_destccv = (m_destccv & ~0xff) | data;
+			break;
+		case 0x4d:
+			m_destccv = (m_destccv & ~0xff00) | (data << 8);
+			break;
+		case 0x4e:
+			m_destccv = (m_destccv & ~0xff0000) | (data << 16);
+			break;
+		case 0x4f:
+			m_destccv = (m_destccv & ~0xff000000) | (data << 24);
+			break;
+		case 0x50:
+			m_pelbmask = (m_pelbmask & ~0xff) | data;
+			break;
+		case 0x51:
+			m_pelbmask = (m_pelbmask & ~0xff00) | (data << 8);
+			break;
+		case 0x52:
+			m_pelbmask = (m_pelbmask & ~0xff0000) | (data << 16);
+			break;
+		case 0x53:
+			m_pelbmask = (m_pelbmask & ~0xff000000) | (data << 24);
+			break;
+		case 0x54:
+			m_carrychain = (m_carrychain & ~0xff) | data;
+			break;
+		case 0x55:
+			m_carrychain = (m_carrychain & ~0xff00) | (data << 8);
+			break;
+		case 0x56:
+			m_carrychain = (m_carrychain & ~0xff0000) | (data << 16);
+			break;
+		case 0x57:
+			m_carrychain = (m_carrychain & ~0xff000000) | (data << 24);
+			break;
+		case 0x58:
+			m_fcolor = (m_fcolor & ~0xff) | data;
+			break;
+		case 0x59:
+			m_fcolor = (m_fcolor & ~0xff00) | (data << 8);
+			break;
+		case 0x5a:
+			m_fcolor = (m_fcolor & ~0xff0000) | (data << 16);
+			break;
+		case 0x5b:
+			m_fcolor = (m_fcolor & ~0xff000000) | (data << 24);
+			break;
+		case 0x5c:
+			m_bcolor = (m_bcolor & ~0xff) | data;
+			break;
+		case 0x5d:
+			m_bcolor = (m_bcolor & ~0xff00) | (data << 8);
+			break;
+		case 0x5e:
+			m_bcolor = (m_bcolor & ~0xff0000) | (data << 16);
+			break;
+		case 0x5f:
+			m_bcolor = (m_bcolor & ~0xff000000) | (data << 24);
+			break;
+		case 0x60:
+			m_opdim1 = (m_opdim1 & ~0xff) | data;
+			break;
+		case 0x61:
+			m_opdim1 = (m_opdim1 & ~0xff00) | (data << 8);
+			break;
+		case 0x62:
+			m_opdim2 = (m_opdim2 & ~0xff) | data;
+			break;
+		case 0x63:
+			m_opdim2 = (m_opdim2 & ~0xff00) | (data << 8);
+			break;
+		case 0x6c:
+			m_maskorigx = (m_maskorigx & ~0xff) | data;
+			break;
+		case 0x6d:
+			m_maskorigx = (m_maskorigx & ~0xff00) | (data << 8);
+			break;
+		case 0x6e:
+			m_maskorigy = (m_maskorigy & ~0xff) | data;
+			break;
+		case 0x6f:
+			m_maskorigy = (m_maskorigy & ~0xff00) | (data << 8);
+			break;
+		case 0x70:
+			m_srcxaddr = (m_srcxaddr & ~0xff) | data;
+			break;
+		case 0x71:
+			m_srcxaddr = (m_srcxaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x72:
+			m_srcyaddr = (m_srcyaddr & ~0xff) | data;
+			break;
+		case 0x73:
+			m_srcyaddr = (m_srcyaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x74:
+			m_patxaddr = (m_patxaddr & ~0xff) | data;
+			break;
+		case 0x75:
+			m_patxaddr = (m_patxaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x76:
+			m_patyaddr = (m_patyaddr & ~0xff) | data;
+			break;
+		case 0x77:
+			m_patyaddr = (m_patyaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x78:
+			m_dstxaddr = (m_dstxaddr & ~0xff) | data;
+			break;
+		case 0x79:
+			m_dstxaddr = (m_dstxaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x7a:
+			m_dstyaddr = (m_dstyaddr & ~0xff) | data;
+			break;
+		case 0x7b:
+			m_dstyaddr = (m_dstyaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x7c:
+			m_pelop = (m_pelop & ~0xff) | data;
+			break;
+		case 0x7d:
+			m_pelop = (m_pelop & ~0xff00) | (data << 8);
+			break;
+		case 0x7e:
+			m_pelop = (m_pelop & ~0xff0000) | (data << 16);
+			break;
+		case 0x7f:
+			m_pelop = (m_pelop & ~0xff000000) | (data << 24);
+			start_command();
+			break;
+	}
+}
+
+void xga_copro_device::device_start()
+{
+}
+
+void xga_copro_device::device_reset()
+{
+	m_pelmap = 0;
+}
+
+oak_oti111_vga_device::oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, OTI111, tag, owner, clock)
+	, m_xga(*this, "xga")
+{
+}
+
+void oak_oti111_vga_device::device_add_mconfig(machine_config &config)
+{
+	XGA_COPRO(config, m_xga, 0);
+	m_xga->mem_read_callback().set(FUNC(oak_oti111_vga_device::mem_linear_r));
+	m_xga->mem_write_callback().set(FUNC(oak_oti111_vga_device::mem_linear_w));
+	m_xga->set_type(xga_copro_device::TYPE::OTI111);
+}
+
+u8 oak_oti111_vga_device::xga_read(offs_t offset)
+{
+	switch(offset)
+	{
+		case 0x13: //fifo status
+			return 0xf;
+		default:
+			return m_xga->xga_read(offset);
+	}
+	return 0;
+}
+
+void oak_oti111_vga_device::xga_write(offs_t offset, u8 data)
+{
+	m_xga->xga_write(offset, data);
+}
+
+void oak_oti111_vga_device::device_start()
+{
+	svga_device::device_start();
+	vga.svga_intf.vram_size = 0x100000;
+}
+
+u8 oak_oti111_vga_device::dac_read(offs_t offset)
+{
+	if(offset >= 6)
+		return vga_device::port_03c0_r(offset);
+	return 0;
+}
+
+void oak_oti111_vga_device::dac_write(offs_t offset, u8 data)
+{
+	if(offset >= 6)
+		vga_device::port_03c0_w(offset, data);
 }
