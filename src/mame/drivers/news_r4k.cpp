@@ -77,6 +77,8 @@
  *   - 16x NEC D482235G5 Dual Port Graphics Buffers: not emulated
  *   - Brooktree Bt468KG220 RAMDAC: not emulated
  *
+ *  Approximate an ST12250 with this: chdman createhd --output test.chd --chs 2707,19,85
+ *
  *  Known issues:
  *  - Telnet has some weird behavior at times - some users hang when logging in, but logging in as root and using `su` to change to them works.
  *  - Sometimes, output from a command run as root on serial while a user is logged in over SXDM will show up in their `sxsession` console.
@@ -431,7 +433,7 @@ protected:
 static void news_scsi_devices(device_slot_interface &device)
 {
     device.option_add("harddisk", NSCSI_HARDDISK);
-    // device.option_add("cdrom", NSCSI_CDROM); // APmonitor chokes on CDROM at the moment
+    device.option_add("cdrom", NSCSI_CDROM_NEWS);
 }
 
 /*

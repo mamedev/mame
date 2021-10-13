@@ -313,6 +313,14 @@ private:
     {
         return (spifi_reg.autodata & ADATA_EN) && ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id);
     }
+    bool autodata_in(int target_id)
+    {
+        return autodata_active(target_id) && (spifi_reg.autodata & ADATA_IN);
+    }
+    bool autodata_out(int target_id)
+    {
+        return autodata_active(target_id) && !(spifi_reg.autodata & ADATA_IN);
+    }
 
     // Autostat register
     void autostat_done(int target_id)

@@ -14,6 +14,7 @@
  *  - Anything the Sony NEWS driver doesn't use
  *  - Find out the proper handshake between the SCSI and DMA controller when padding is required
  *  - SPSTAT and ICOND values
+ *  - CMDPAGE details
  */
 
 #include "emu.h"
@@ -23,7 +24,7 @@
 #define LOG_STATE (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
 
-// #define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 #define DELAY_HACK // TODO:
@@ -398,7 +399,11 @@ void spifi3_device::select_w(uint32_t data)
 
     if(data & SEL_ISTART)
     {
-        LOG("Select started! Targeting ID %d\n", (data & SEL_TARGET) >> 4);
+        auto target_id = (data & SEL_TARGET) >> 4;
+        LOG("Select started! Targeting ID %d\n", target_id);
+
+        // Selects cmbuf entry, maybe? - can be manually set before a command based on NetBSD source, not supported yet
+        spifi_reg.cmdpage = target_id;
         state = DISC_SEL_ARBITRATION_INIT;
         dma_set(DMA_OUT);
         arbitrate();
@@ -700,7 +705,6 @@ void spifi3_device::bus_complete()
 {
     LOG("bus_complete\n");
     state = IDLE;
-    // was: istatus |= I_BUS;
     spifi_reg.intr |= INTR_BSRQ; // TODO: icond? is BSRQ 1:1 w/ bus complete?
     spifi_reg.prcmd = 0;
     dma_set(DMA_NONE);
@@ -1038,7 +1042,15 @@ void spifi3_device::step(bool timeout)
             {
                 auto data = scsi_bus->data_r();
                 // LOG("Got 0x%x! FIFO count: %d\n", data, m_even_fifo.size() + 1);
-                m_even_fifo.push(data);
+                if(((state & STATE_MASK) == INIT_XFR_RECV_BYTE_ACK) && (xfr_phase & S_PHASE_MASK) == S_PHASE_STATUS)
+                {
+                    LOG("Got status byte 0x%x, setting cmbuf[%d].status!\n", data, bus_id);
+                    spifi_reg.cmbuf[bus_id].status = data;
+                }
+                else
+                {
+                    m_even_fifo.push(data);
+                }
                 check_drq();
             }
             scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
@@ -1301,7 +1313,7 @@ void spifi3_device::step(bool timeout)
                 case S_PHASE_MSG_IN:
                 {
                     // can't receive if the fifo is full
-                    if (m_even_fifo.size() == 8 && !(xfr_phase == S_PHASE_STATUS && spifi_reg.autostat)) // TODO: - no idea if status goes to the fifo or not
+                    if (m_even_fifo.size() == 8 && !(xfr_phase == S_PHASE_STATUS && autostat_active(bus_id))) // TODO: - no idea if status goes to the fifo or not
                     {
                         // check_drq(); // in case data should be transferred now
                         break;
@@ -1347,9 +1359,8 @@ void spifi3_device::step(bool timeout)
                 state = INIT_XFR_BUS_COMPLETE;
 
                 auto newPhase = (ctrl & S_PHASE_MASK);
-                if(newPhase == S_PHASE_STATUS && spifi_reg.autostat > 0)
+                if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
                 {
-                    // TODO: ID enforcement for autostat
                     LOG("Autostat enabled, proceeding to status input automatically\n");
                     state = INIT_XFR;
                     xfr_phase = newPhase;
@@ -1357,7 +1368,7 @@ void spifi3_device::step(bool timeout)
                     // Below this is a guess
                     dma_command = false;
                     dma_dir = DMA_NONE;
-                    spifi_reg.autostat &= ~0x1; // TODO: should only be target ID of this transfer
+                    autostat_done(bus_id);
                 }
                 else if(newPhase == S_PHASE_DATA_OUT)
                 {
@@ -1402,8 +1413,8 @@ void spifi3_device::step(bool timeout)
                 // TODO: is this the right interpretation??
                 // If the target gives us a non-data phase, though, we will notify the host. Is this the correct behavior??
                 auto newPhase = (ctrl & S_PHASE_MASK);
-                if ( (newPhase == S_PHASE_DATA_IN && (((spifi_reg.autodata & (ADATA_EN | ADATA_IN)) == (ADATA_EN | ADATA_IN))
-                     || (newPhase == S_PHASE_DATA_OUT && ((spifi_reg.autodata & (ADATA_EN | ADATA_IN)) == ADATA_EN))))) // TODO: ID enforcement
+
+                if ((newPhase == S_PHASE_DATA_IN && autodata_in(bus_id)) || (newPhase == S_PHASE_DATA_OUT && autodata_out(bus_id)))
                 {
                     state = INIT_XFR;
                     xfr_phase = newPhase;
@@ -1416,6 +1427,13 @@ void spifi3_device::step(bool timeout)
                     {
                         dma_dir = DMA_OUT;
                     }
+
+                    while (!m_even_fifo.empty())
+                    {
+                        m_even_fifo.pop();
+                    }
+
+                    check_drq();
                     step(false);
                 }
                 else if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
@@ -1469,7 +1487,7 @@ void spifi3_device::step(bool timeout)
                     }
                     else if ((newPhase == S_PHASE_MSG_IN) && automsg_active())
                     {
-                        LOG("PAD: AUTOMSG enabled, proceeding to message input!\n");
+                        LOG("AUTOMSG enabled, proceeding to message input!\n");
                         state = INIT_XFR;
                         xfr_phase = newPhase;
                         // TODO: anything else? set ICOND AMSGOFF or something?
@@ -1571,8 +1589,7 @@ void spifi3_device::step(bool timeout)
 
                 if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
                 {
-                    // TODO: ID enforcement for autostat
-                    LOG("PAD: Autostat enabled, proceeding to status input automatically\n");
+                    LOG("Autostat enabled, proceeding to status input automatically\n");
                     state = INIT_XFR;
                     xfr_phase = newPhase;
 
@@ -1616,8 +1633,7 @@ void spifi3_device::step(bool timeout)
 
                 if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
                 {
-                    // TODO: ID enforcement for autostat
-                    LOG("PAD: Autostat enabled, proceeding to status input automatically\n");
+                    LOG("Autostat enabled, proceeding to status input automatically\n");
                     state = INIT_XFR;
                     xfr_phase = newPhase;
 
