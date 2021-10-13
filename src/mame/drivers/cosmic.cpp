@@ -1137,6 +1137,28 @@ ROM_START( cosmica3 ) // main: 7910-AII sub: 7910-BII sound: 7910-S
 	ROM_LOAD( "8-8.ic10", 0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) )
 ROM_END
 
+ROM_START( cosmicab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1-al2019-2516-e3.bin", 0x0000, 0x0800, CRC(2303333f) SHA1(b37e46044daa4cd9ac4ccc9fbb27eb7789d76399) )
+	ROM_LOAD( "2-al202a-2516-e4.bin", 0x0800, 0x0800, CRC(20710582) SHA1(8a7b8c724cfd09dbc242fd57b23742da8fc51580) )
+	ROM_LOAD( "3-al2019-2516-e5.bin", 0x1000, 0x0800, CRC(b25d24b4) SHA1(30746493738c715080b62b1718f110b9a790ffb2) )
+	ROM_LOAD( "4-2516-e6.bin",        0x1800, 0x0800, CRC(51834cd9) SHA1(5c3cd942c1447d60ee189224b2ced046419f51e7) )
+	ROM_LOAD( "5-al2019-2516-e7.bin", 0x2000, 0x0800, CRC(e2b6680f) SHA1(e672d9c1612d34b43167fc5502e8131846da60e7) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // sprites
+	ROM_LOAD( "7-2716-n2.bin",        0x0000, 0x0800, CRC(aa6c6079) SHA1(af4ab73e9e1c189290b26bf42adb511d5a347df9) )
+	ROM_LOAD( "6-2516-n1.bin",        0x0800, 0x0800, CRC(431e866c) SHA1(b007cd3cc856360a0247bd78bb49d173f5cef321) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "u7910.d9",             0x0000, 0x0020, CRC(dfb60f19) SHA1(d510327ff3492f098659c551f7245835f61a2959) )
+
+	ROM_REGION( 0x0400, "user1", 0 ) // color map
+	ROM_LOAD( "9-4708-2708-e2.bin",   0x0000, 0x0400, CRC(ea4ee931) SHA1(d0a4afda4b493efb40286c2d67bf56a2a8b8da9d) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) // starfield generator
+	ROM_LOAD( "8-2708-k3.bin",        0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) )
+ROM_END
+
 
 /* rom 9 not dumped according to readme? */
 ROM_START( magspot )
@@ -1307,18 +1329,19 @@ void cosmic_state::init_panic()
 }
 
 
-GAME( 1979, cosmica,  0,       cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (version II, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, cosmica3, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (version II, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, cosmica1, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (first version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, cosmica2, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nomnlnd,  0,       nomnlnd, nomnlnd,  cosmic_state, init_nomnlnd, ROT270, "Universal", "Sengoku no Jieitai", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nomnlndg, nomnlnd, nomnlnd, nomnlndg, cosmic_state, init_nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, magspot,  0,       magspot, magspot,  cosmic_state, empty_init,   ROT270, "Universal", "Magical Spot", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, magspot2, 0,       magspot, magspot,  cosmic_state, empty_init,   ROT270, "Universal", "Magical Spot II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panic,    0,       panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal", "Space Panic (version E)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panic2,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal", "Space Panic (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panic3,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal", "Space Panic (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panich,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal", "Space Panic (harder)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panicger, panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, devzone,  0,       devzone, devzone,  cosmic_state, init_devzone, ROT270, "Universal", "Devil Zone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, devzone2, devzone, devzone, devzone2, cosmic_state, init_devzone, ROT270, "Universal", "Devil Zone (easier)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmica,  0,       cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal",                         "Cosmic Alien (version II, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmica3, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal",                         "Cosmic Alien (version II, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmica1, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal",                         "Cosmic Alien (first version)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmica2, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal",                         "Cosmic Alien (early version II?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmicab, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "bootleg",                           "Cosmic Alien (bootleg)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nomnlnd,  0,       nomnlnd, nomnlnd,  cosmic_state, init_nomnlnd, ROT270, "Universal",                         "Sengoku no Jieitai",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nomnlndg, nomnlnd, nomnlnd, nomnlndg, cosmic_state, init_nomnlnd, ROT270, "Universal (Gottlieb license)",      "No Man's Land (Gottlieb)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, magspot,  0,       magspot, magspot,  cosmic_state, empty_init,   ROT270, "Universal",                         "Magical Spot",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, magspot2, 0,       magspot, magspot,  cosmic_state, empty_init,   ROT270, "Universal",                         "Magical Spot II",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panic,    0,       panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal",                         "Space Panic (version E)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panic2,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal",                         "Space Panic (set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panic3,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal",                         "Space Panic (set 3)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panich,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal",                         "Space Panic (harder)",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panicger, panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal (ADP Automaten license)", "Space Panic (German)",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, devzone,  0,       devzone, devzone,  cosmic_state, init_devzone, ROT270, "Universal",                         "Devil Zone",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, devzone2, devzone, devzone, devzone2, cosmic_state, init_devzone, ROT270, "Universal",                         "Devil Zone (easier)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
