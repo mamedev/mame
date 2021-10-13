@@ -2535,7 +2535,7 @@ license:CC0
 	<software name="mathnme">
 		<description>Math and Me (Version 1.0 08/01/88)</description>
 		<year>1988</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="release" value="2021-06-16"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- It requires a 512K Apple IIgs. -->
@@ -3400,11 +3400,11 @@ license:CC0
 	<software name="readnme">
 		<description>Reading and Me (Version 1.0)</description>
 		<year>1988</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="release" value="2021-07-25"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- It requires a 512K Apple IIgs. -->
-		<!--"Reading and Me" is a 1988 educational program developed by Louis X. Savain and C. K. Haun, and distributed by Davidson and Associates. This is version 1.0. It requires a 512K Apple IIgs.-->
+		<!--"Reading and Me" is a 1988 educational program developed by Louis X. Savain and C. K. Haun, and distributed by Davidson &amp; Associates. This is version 1.0. It requires a 512K Apple IIgs.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Program disk"/>

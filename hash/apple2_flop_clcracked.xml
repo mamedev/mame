@@ -725,7 +725,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="thief (1981)(datamost)(san inc and trex crack).dsk" size="143360" crc="e2faf16e" sha1="bedfb20b1753acb6d1babdc44143761d07bc8782" />
+				<rom name="thief (1981)(datamost)(san inc &amp; trex crack).dsk" size="143360" crc="e2faf16e" sha1="bedfb20b1753acb6d1babdc44143761d07bc8782" />
 			</dataarea>
 		</part>
 	</software>
@@ -2035,7 +2035,7 @@ license:CC0
 	<software name="fantlrd">
 		<description>Professor Davensteev's Fantasy Land (Red Level) (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2014-08-20"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2048,7 +2048,7 @@ license:CC0
 	<software name="fantlbl">
 		<description>Professor Davensteev's Fantasy Land (Blue Level) (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2017-12-19"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2565,7 +2565,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="gumball (4am and san inc crack).dsk" size="143360" crc="ca1dde79" sha1="76bf52bf011442f01414976d706514ef21999354" />
+				<rom name="gumball (4am &amp; san inc crack).dsk" size="143360" crc="ca1dde79" sha1="76bf52bf011442f01414976d706514ef21999354" />
 			</dataarea>
 		</part>
 	</software>
@@ -3503,7 +3503,7 @@ license:CC0
 	<software name="alphblue">
 		<description>Alphabetizing - Blue Level (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2017-04-28"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -4906,7 +4906,7 @@ license:CC0
 	<software name="behndwhl">
 		<description>Behind the Wheel, Blue Level (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2016-07-13"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -12106,7 +12106,7 @@ license:CC0
 	<software name="hlthwtch">
 		<description>Health Watch (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2017-05-31"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -12886,7 +12886,7 @@ license:CC0
 	<software name="jrescblu">
 		<description>Jungle Rescue - Blue Level (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2018-04-14"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -14238,7 +14238,7 @@ license:CC0
 	<software name="magcstle">
 		<description>Magic Castle (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2016-07-13"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -17572,7 +17572,7 @@ license:CC0
 	<software name="mtnclmce">
 		<description>Mountain Climbing - Cause and Effect (cleanly cracked)</description>
 		<year>1982</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2015-12-27"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -20490,7 +20490,7 @@ license:CC0
 	<software name="atwgtmi">
 		<description>Around The World: Getting The Main Idea (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2019-04-27"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -24690,7 +24690,7 @@ license:CC0
 	<software name="tcoddwcn">
 		<description>The Chief of Detectives: Drawing Conclusions (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2015-09-02"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -26149,7 +26149,7 @@ license:CC0
 	<software name="spacmath">
 		<description>Space Math (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2016-03-09"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -29215,7 +29215,7 @@ license:CC0
 	<software name="seqblue">
 		<description>Sequence: Blue Level (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2017-05-01"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -31237,7 +31237,7 @@ license:CC0
 	<software name="thtmstry">
 		<description>That's My Story (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2017-10-05"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -31692,7 +31692,7 @@ license:CC0
 	<software name="scrmwdrd">
 		<description>Scrambled Words: Red Level (cleanly cracked)</description>
 		<year>1982</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2017-11-20"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -34171,7 +34171,7 @@ license:CC0
 	<software name="seqred">
 		<description>Sequence: Red Level (cleanly cracked)</description>
 		<year>1982</year>
-		<publisher>Methods and Solutions</publisher>
+		<publisher>Methods &amp; Solutions</publisher>
 		<info name="release" value="2018-09-05"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -46149,7 +46149,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
 		<info name="release" value="2021-09-09"/>
-		<!--"Logic Builders" is a 1984 educational game developed by Methods and Solutions and distributed by Scholastic.-->
+		<!--"Logic Builders" is a 1984 educational game developed by Methods &amp; Solutions and distributed by Scholastic.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
