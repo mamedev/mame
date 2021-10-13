@@ -65,7 +65,7 @@ private:
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<8> m_io_switches;
 	output_finder<48> m_digits;
-	output_finder<128> m_io_outputs;
+	output_finder<48> m_io_outputs;  // 16 solenoids + 32 lamps
 };
 
 void lckydraw_state::mem_map(address_map &map)
@@ -126,7 +126,7 @@ void lckydraw_state::bus_w(offs_t offset, u8 data)
 		case 2:
 			// solenoids
 			{
-				for (u8 i = 0; i < 8; i++)
+				for (u8 i = 0; i < 2; i++)
 					if (BIT(m_p2_out[1], i))
 						for (u8 j = 0; j < 8; j++)
 							m_io_outputs[i*8+j] = BIT(data, j);
@@ -164,6 +164,9 @@ void lckydraw_state::bus_w(offs_t offset, u8 data)
 							if (state)
 								m_samples->start(3, 3);  // 10 chime
 							break;
+						case 14:
+							machine().bookkeeping().coin_counter_w(0, state);
+							break;
 						default:
 							break;
 					}
@@ -179,10 +182,10 @@ void lckydraw_state::bus_w(offs_t offset, u8 data)
 		case 13:
 			// Lamps
 			{
-				for (u8 i = 0; i < 8; i++)
+				for (u8 i = 0; i < 4; i++)
 					if (BIT(m_p2_out[12], i))
 						for (u8 j = 0; j < 8; j++)
-							m_io_outputs[64+i*8+j] = BIT(data, j);
+							m_io_outputs[16+i*8+j] = BIT(data, j);
 			}
 			// Displays
 			{
