@@ -11567,6 +11567,9 @@ cswat                           // (c) 1984
 @source:ct486.cpp
 ct486                           // 1993? 486 with CS4031
 
+@source:ctk551.cpp
+ctk551                          //
+
 @source:cubeqst.cpp
 cubeqst                         // (c) 1983 Simutrek Inc.
 cubeqsta                        // (c) 1983 Simutrek Inc.
