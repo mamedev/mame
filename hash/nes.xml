@@ -78316,10 +78316,10 @@ be better to redump them properly. -->
 
 <!-- This was a promotional release to coincide with the third anniversary of the related 3DS game. -->
 	<software name="mmknight" cloneof="gottapro">
-		<description>Minna de Mamotte Knight - Amazon no Daisakusen</description>
+		<description>Minna de Mamotte Knight - Amazon no Diet Daisakusen</description>
 		<year>2017</year>
 		<publisher>Ancient corp</publisher>
-		<info name="alt_title" value="みんなでまもって騎士 アマゾンの大作戦"/>
+		<info name="alt_title" value="みんなでまもって騎士 アマゾンのダイエット大作戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<dataarea name="prg" size="262144">
