@@ -231,6 +231,13 @@ private:
     void fifoctrl_w(uint32_t data);
     std::queue<uint32_t> m_even_fifo; // 0, 2, 4, 6, 8, 10, 12, 14
     std::queue<uint32_t> m_odd_fifo;  // 1, 3, 5, 7, 9, 11, 13, 15
+    void clear_queue(std::queue<uint32_t> queue)
+    {
+        while(!queue.empty())
+        {
+            queue.pop();
+        }
+    }
 
     // spstat
     const uint32_t SPS_IDLE = 0x00;
@@ -331,6 +338,7 @@ private:
     {
         return spifi_reg.autostat & (1 << target_id);
     }
+    void start_autostat(int target_id);
 
     // prcmd
     enum PRCMD_COMMANDS : uint32_t
@@ -361,6 +369,7 @@ private:
     {
         return spifi_reg.cmlen & CML_AMSG_EN;
     }
+    void start_automsg(int msg_phase);
     bool autocmd_active()
     {
         return spifi_reg.cmlen & CML_ACOM_EN;
