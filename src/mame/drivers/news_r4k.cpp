@@ -54,8 +54,8 @@
  *       early in the boot flow if the secondary cache size is 0KB as measured by the kernel because the scache size is used
  *       when determining some of the variables used by the memory allocator. This can be bypassed using the debugger.
  *       Caveat: other NEWS-OS 4 kernels will have this in a different spot.
+ *        - NEWS-OS 4.2.1aRD CD-ROM miniroot: Set breakpoint at 0x80001B90, then update memory location 0x800B7DFC to 0x100000 (1024 KB)
  *        - Vanilla NEWS-OS 4.2.1aRD (FCS#2): Set breakpoint at 0x800CD5E8, then update memory location 0x801AECB0 to 0x100000 (1024 KB)
- *        - Kernel recompiled without esccf driver (highly unlikely to match other builds): bp@0x800CBA78, memory location 0x801A46AC
  *  Motherboard:
  *   - Sony CXD8490G, CXD8491G, CXD8492G, CXD8489G (unknown ASICs): not emulated
  *   - Main memory: partially emulated (memory controller is unknown and not emulated - memory configurations other than 64MB don't work at the moment)
@@ -77,7 +77,7 @@
  *   - 16x NEC D482235G5 Dual Port Graphics Buffers: not emulated
  *   - Brooktree Bt468KG220 RAMDAC: not emulated
  *
- *  Approximate an ST12250 with this: chdman createhd --output test.chd --chs 2707,19,85
+ *  ~2GB HD image that plays well with the NEWS-OS installer: `chdman createhd -o test.chd -s 2088960000`
  *
  *  Known issues:
  *  - Telnet has some weird behavior at times - some users hang when logging in, but logging in as root and using `su` to change to them works.
@@ -162,7 +162,6 @@ public:
           m_dma_ram(*this, "dmaram"),
           m_net_ram(*this, "netram"),
           m_rtc(*this, "rtc"),
-          // m_escc(*this, "escc1"),
           m_escc(*this, "escc"),
           m_serial(*this, "serial%u", 0U),
           m_fifo0(*this, "apfifo0"),
