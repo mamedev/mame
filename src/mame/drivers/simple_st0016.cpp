@@ -534,7 +534,7 @@ uint32_t st0016_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void st0016_state::st0016(machine_config &config)
 {
 	// basic machine hardware
-	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
+	ST0016_CPU(config, m_maincpu, XTAL(48'000'000) / 6); // 8 MHz (48 MHz / 6) verified from nratechu (https://www.youtube.com/watch?v=scKF95t4-lU)
 	m_maincpu->set_addrmap(AS_PROGRAM, &st0016_state::st0016_mem);
 	m_maincpu->set_addrmap(AS_IO, &st0016_state::st0016_io);
 	m_maincpu->set_screen(m_screen);
