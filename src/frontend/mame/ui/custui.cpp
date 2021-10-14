@@ -618,7 +618,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	// bottom text
 	// get the text for 'UI Select'
-	std::string const bottomtext[] = { util::string_format(_("Double-click or press %1$s to change the color value"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD))) };
+	std::string const bottomtext[] = { util::string_format(_("Double-click or press %1$s to change the color value"), ui().get_general_input_setting(IPT_UI_SELECT)) };
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
@@ -839,13 +839,12 @@ void menu_rgb_ui::handle()
 void menu_rgb_ui::populate(float &customtop, float &custombottom)
 {
 	// set filter arrow
-	uint32_t arrow_flags = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	std::string s_text = std::string(m_search).append("_");
 	item_append(_("ARGB Settings"), FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 
 	if (m_lock_ref != RGB_ALPHA)
 	{
-		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->a());
+		uint32_t arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->a());
 		item_append(_("color-channel", "Alpha"), string_format("%3u", m_color->a()), arrow_flags, (void *)(uintptr_t)RGB_ALPHA);
 	}
 	else
@@ -853,7 +852,7 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 
 	if (m_lock_ref != RGB_RED)
 	{
-		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->r());
+		uint32_t arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->r());
 		item_append(_("color-channel", "Red"), string_format("%3u", m_color->r()), arrow_flags, (void *)(uintptr_t)RGB_RED);
 	}
 	else
@@ -861,7 +860,7 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 
 	if (m_lock_ref != RGB_GREEN)
 	{
-		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->g());
+		uint32_t arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->g());
 		item_append(_("color-channel", "Green"), string_format("%3u", m_color->g()), arrow_flags, (void *)(uintptr_t)RGB_GREEN);
 	}
 	else
@@ -869,7 +868,7 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 
 	if (m_lock_ref != RGB_BLUE)
 	{
-		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->b());
+		uint32_t arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->b());
 		item_append(_("color-channel", "Blue"), string_format("%3u", m_color->b()), arrow_flags, (void *)(uintptr_t)RGB_BLUE);
 	}
 	else

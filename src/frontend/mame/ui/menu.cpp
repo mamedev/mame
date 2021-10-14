@@ -515,10 +515,12 @@ void menu::draw(uint32_t flags)
 
 	if (top_line < 0 || is_first_selected())
 		top_line = 0;
-	if (m_selected >= (top_line + m_visible_lines))
+	else if (m_selected >= (top_line + m_visible_lines))
 		top_line = m_selected - (m_visible_lines / 2);
 	if ((top_line > (m_items.size() - m_visible_lines)) || is_last_selected())
 		top_line = m_items.size() - m_visible_lines;
+	else if (m_selected >= (top_line + m_visible_lines - 2))
+		top_line = m_selected - m_visible_lines + ((m_selected == (m_items.size() - 1)) ? 1: 2);
 
 	// if scrolling, show arrows
 	bool const show_top_arrow((m_items.size() > m_visible_lines) && !first_item_visible());
@@ -1013,7 +1015,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	// hitting cancel also pops the stack
 	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
 	{
-		if (!menu_has_search_active())
+		if (!custom_ui_cancel())
 			stack_pop();
 		return;
 	}

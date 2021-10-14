@@ -9,18 +9,22 @@
 *********************************************************************/
 
 #include "emu.h"
-
-#include "ui/ui.h"
 #include "ui/datmenu.h"
+
+#include "ui/systemlist.h"
+#include "ui/ui.h"
 #include "ui/utils.h"
 
+#include "luaengine.h"
 #include "mame.h"
+
+#include "drivenum.h"
 #include "rendfont.h"
 #include "softlist.h"
 #include "uiinput.h"
-#include "luaengine.h"
 
 #include <cmath>
+#include <string_view>
 
 
 namespace ui {
@@ -29,10 +33,10 @@ namespace ui {
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const game_driver *driver)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_system_info *system)
 	: menu(mui, container)
 	, m_actual(0)
-	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
+	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
 	, m_swinfo(nullptr)
 	, m_issoft(false)
 
@@ -48,7 +52,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 		}
 	}
 	std::vector<std::string> lua_list;
-	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", driver ? driver->name : "", lua_list))
+	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", system ? system->driver->name : "", lua_list))
 	{
 		int count = 0;
 		for (std::string& item : lua_list)
@@ -65,10 +69,10 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 //  ctor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const game_driver *driver)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const ui_system_info *system)
 	: menu(mui, container)
 	, m_actual(0)
-	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
+	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
 	, m_swinfo(swinfo)
 	, m_list(swinfo->listname)
 	, m_short(swinfo->shortname)
@@ -295,7 +299,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 {
 	float maxwidth = origx2 - origx1;
 	float width;
-	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->type.fullname();
+	std::string_view driver = m_issoft ? m_swinfo->longname : m_system->description;
 
 	float const lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
 	ui().draw_text_full(container(), driver, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,

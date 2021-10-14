@@ -706,41 +706,19 @@ menu_machine_configure::menu_machine_configure(
 		ui_system_info const &info,
 		std::function<void (bool, bool)> &&handler,
 		float x0, float y0)
-	: menu_machine_configure(mui, container, info.description.c_str(), *info.driver, std::move(handler), x0, y0)
-{
-}
-
-menu_machine_configure::menu_machine_configure(
-		mame_ui_manager &mui,
-		render_container &container,
-		game_driver const &drv,
-		std::function<void (bool, bool)> &&handler,
-		float x0, float y0)
-	: menu_machine_configure(mui, container, drv.type.fullname(), drv, std::move(handler), x0, y0)
-{
-}
-
-menu_machine_configure::menu_machine_configure(
-		mame_ui_manager &mui,
-		render_container &container,
-		char const *description,
-		game_driver const &drv,
-		std::function<void (bool, bool)> &&handler,
-		float x0, float y0)
 	: menu(mui, container)
 	, m_handler(std::move(handler))
-	, m_description(description)
-	, m_drv(drv)
+	, m_sys(info)
 	, m_x0(x0)
 	, m_y0(y0)
 	, m_curbios(0)
-	, m_was_favorite(mame_machine_manager::instance()->favorite().is_favorite_system(drv))
+	, m_was_favorite(mame_machine_manager::instance()->favorite().is_favorite_system(*info.driver))
 	, m_want_favorite(m_was_favorite)
 {
 	// parse the INI file
 	std::ostringstream error;
 	osd_setup_osd_specific_emu_options(m_opts);
-	mame_options::parse_standard_inis(m_opts, error, &m_drv);
+	mame_options::parse_standard_inis(m_opts, error, m_sys.driver);
 	setup_bios();
 }
 
@@ -749,9 +727,9 @@ menu_machine_configure::~menu_machine_configure()
 	if (m_was_favorite != m_want_favorite)
 	{
 		if (m_want_favorite)
-			mame_machine_manager::instance()->favorite().add_favorite_system(m_drv);
+			mame_machine_manager::instance()->favorite().add_favorite_system(*m_sys.driver);
 		else
-			mame_machine_manager::instance()->favorite().remove_favorite_system(m_drv);
+			mame_machine_manager::instance()->favorite().remove_favorite_system(*m_sys.driver);
 	}
 
 	if (m_handler)
@@ -775,7 +753,7 @@ void menu_machine_configure::handle()
 			{
 			case SAVE:
 				{
-					const std::string filename(m_drv.name);
+					const std::string filename(m_sys.driver->name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 					std::error_condition const filerr = file.open(filename + ".ini");
 					if (!filerr)
@@ -796,15 +774,15 @@ void menu_machine_configure::handle()
 				break;
 			case CONTROLLER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), m_sys.driver, &m_opts);
 				break;
 			case VIDEO:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), m_sys.driver, &m_opts);
 				break;
 			case ADVANCED:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), m_sys.driver, &m_opts);
 				break;
 			default:
 				break;
@@ -858,7 +836,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure Machine:"), m_description };
+	char const *const text[] = { _("Configure Machine:"), m_sys.description.c_str() };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
@@ -868,19 +846,19 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 
 void menu_machine_configure::setup_bios()
 {
-	if (!m_drv.rom)
+	if (!m_sys.driver->rom)
 		return;
 
 	std::string specbios(m_opts.bios());
 	char const *default_name(nullptr);
-	for (tiny_rom_entry const *rom = m_drv.rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (tiny_rom_entry const *rom = m_sys.driver->rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = rom->name;
 	}
 
 	std::size_t bios_count = 0;
-	for (romload::system_bios const &bios : romload::entries(m_drv.rom).get_system_bioses())
+	for (romload::system_bios const &bios : romload::entries(m_sys.driver->rom).get_system_bioses())
 	{
 		std::string name(bios.get_description());
 		u32 const bios_flags(bios.get_value());

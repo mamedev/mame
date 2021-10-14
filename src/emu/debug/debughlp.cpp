@@ -259,9 +259,9 @@ const help_item f_static_help_list[] =
 		"Image Commands\n"
 		"Type help <command> for further details on each command\n"
 		"\n"
-		"  images -- lists all image devices and mounted files\n"
-		"  mount <device>,<filename> -- mounts file to named device\n"
-		"  unmount <device> -- unmounts file from named device\n"
+		"  images -- lists all image devices and mounted mounted media\n"
+		"  mount <instance>,<filename> -- mounts file to specified device\n"
+		"  unmount <instance> -- unmounts media from specified device\n"
 	},
 	{
 		"do",
@@ -1767,37 +1767,47 @@ const help_item f_static_help_list[] =
 		"\n"
 		"  images\n"
 		"\n"
-		"Used to display list of available image devices.\n"
+		"Lists the instance names for media images devices in the system and the currently mounted "
+		"media images, if any.  Brief instance names, as allowed for command line media options, "
+		"are listed.\n"
 		"\n"
 		"Examples:\n"
 		"\n"
 		"images\n"
-		"  Show list of devices and mounted files for current driver.\n"
+		"  Lists image device instance names and mounted media.\n"
 	},
 	{
 		"mount",
 		"\n"
-		"  mount <device>,<filename>\n"
+		"  mount <instance>,<filename>\n"
 		"\n"
-		"Mount <filename> to image <device>.\n"
-		"<filename> can be softlist item or full path to file.\n"
+		"Mounts a file on a media device.  The device may be specified by its instance name or "
+		"brief instance name, as allowed for command line media options.\n"
+		"\n"
+		"Some media devices allow software list items to be mounted using this command by supplying "
+		"the short name of the software list item in place of a filename for the <filename> "
+		"parameter.\n"
 		"\n"
 		"Examples:\n"
 		"\n"
-		"mount cart,aladdin\n"
-		"  Mounts softlist item aladdin on cart device.\n"
+		"mount flop1,os1xutls.td0\n"
+		"  Mount the file 'os1xutls.td0' on the media device with instance name 'flop1'.\n"
+		"mount cart,10yard\n"
+		"  Mount the software list item with short name '10yard' on the media device with instance "
+		"name 'cart'.\n"
 	},
 	{
 		"unmount",
 		"\n"
-		"  unmount <device>\n"
+		"  unmount <instance>\n"
 		"\n"
-		"Unmounts file from image <device>.\n"
+		"Unmounts the mounted media image (if any) from a device.  The device may be specified by "
+		"its instance name or brief instance name, as allowed for command line media options.\n"
 		"\n"
 		"Examples:\n"
 		"\n"
 		"unmount cart\n"
-		"  Unmounts any file mounted on device named cart.\n"
+		"  Unmounts any media image mounted on the device with instance name 'cart'.\n"
 	}
 };
 

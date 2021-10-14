@@ -11,10 +11,10 @@ MAME Debugger
 Introduction
 ------------
 
-MAME includes an interactive low-level debugger that target the emulated
-system.  This can be a useful tool for diagnosing emulation issues,
-developing software to run on vintage systems, creating cheats, ROM
-hacking, or just looking at how software works.
+MAME includes an interactive low-level debugger that targets the
+emulated system.  This can be a useful tool for diagnosing emulation
+issues, developing software to run on vintage systems, creating cheats,
+ROM hacking, or just investigating how software works.
 
 Use the ``-debug`` command line option to start MAME with the debugger
 activated.  By default, pressing the tilde (**~**) during emulation
@@ -176,36 +176,36 @@ and a few new ones (memory accessors).
 The table below lists all the operators, ordered from highest to lowest
 precedence:
 
-( )
+``(`` ``)``
     Standard parentheses
-++ --
+``++`` ``--``
     Postfix increment/decrement
-++ -- ~ ! - + b@ w@ d@ q@ b! w! d! q!
+``++`` ``--`` ``~`` ``!`` ``-`` ``+`` ``b@`` ``w@`` ``d@`` ``q@`` ``b!`` ``w!`` ``d!`` ``q!``
     Prefix increment/decrement, binary complement, logical complement,
     unary identity/negation, memory access
-\* / %
+``*`` ``/`` ``%``
     Multiplication, division, modulo
-\+ -
+``+`` ``-``
     Addition, subtraction
-<< >>
+``<<`` ``>>``
     Bitwise left/right shift
-< <= > >=
+``< ``<=`` ``>`` ``>=``
     Less than, less than or equal, greater than, greater than or equal
-== !=
+``==`` ``!=``
     Equal, not equal
-\&
+``&``
     Bitwise intersection (and)
-\^
+``^``
     Bitwise exclusive or
-\|
+``|``
     Bitwise union (or)
-\&&
+``&&``
     Logical conjunction (and)
-\||
+``||``
     Logical disjunction (or)
-= \*= /= %= += -= <<= >>= &= \|= ^=
+``=`` ``*=`` ``/=`` ``%=`` ``+=`` ``-=`` ``<<=`` ``>>=`` ``&=`` ``|=`` ``^=``
     Assignment and modifying assignment
-\,
+``,``
     Separate terms, function parameters
 
 Major differences from C expression semantics:
@@ -268,6 +268,38 @@ and side effect modes are as follows:
 * ``@`` suppress side effects
 * ``!`` do not suppress side effects
 
+Suppressing side effects of a read access yields the value reading from
+address would, with no further effects.  For example reading a mailbox
+with side effects disabled will not clear the pending flag, and reading
+a FIFO with side effects disabled will not remove an item.
+
+For write accesses, suppressing side effects doesn’t change behaviour in
+most cases – you want to see the effects of writing to a location.
+However, there are some exceptions where it is useful to separate
+multiple effects of a write access.  For example:
+
+* Some registers need to be written in sequence to avoid race
+  conditions.  The debugger can issue multiple writes at the same point
+  in emulated time, so these race conditions cannot be avoided
+  trivially.  For example writing to the MC68HC05 output compare
+  register high byte (OCRH) inhibits compare until the output compare
+  register low byte (OCRL) is written to prevent race conditions.
+  Since the debugger can write to both locations at the same instant
+  from the emulated machine’s point of view, the race condition is not
+  usually relevant.  It’s more error-prone if you can accidentally set
+  hidden state when all you really want to do is change the value, so
+  writing to OCRH with side effects suppressed does not inhibit compare,
+  it just changes the value in the output compare register.
+* Writing to some registers has multiple effects that may be useful to
+  separate for debugging purposes.  Using the MC68HC05 as an example
+  again, writing to OCRL changes the value in the output compare
+  register, and also clears the output compare flag (OCF) and enables
+  compare if it was previously inhibited by writing to OCRH.  Writing to
+  OCRL with side effects disable just changes the value in the register
+  without clearing OCF or enabling compare, since it’s useful for
+  debugging purposes.  Writing to OCRL with side effects enabled has the
+  additional effects.
+
 The size may optionally be preceded by an access type specification:
 
 * ``p`` or ``lp`` specifies a logical address defaulting to space 0
@@ -295,40 +327,40 @@ That may seem like a lot to digest, so let’s look at the simplest
 examples:
 
 ``b@<addr>``
-    Refers to the byte at **<addr>** in the program space of the visible
+    Refers to the byte at **<addr>** in the program space of the current
     CPU while suppressing side effects
 ``b!<addr>``
-    Refers to the byte at **<addr>** in the program space of the visible
+    Refers to the byte at **<addr>** in the program space of the current
     CPU, *not* suppressing side effects such as reading a mailbox
     clearing the pending flag, or reading a FIFO removing an item
 ``w@<addr>`` and ``w!<addr>``
-    Refer to the word at **<addr>** in the program space of the visible
+    Refer to the word at **<addr>** in the program space of the current
     CPU, suppressing or not suppressing side effects, respectively.
 ``d@<addr>`` and ``d!<addr>``
     Refer to the double word at **<addr>** in the program space of the
-    visible CPU, suppressing or not suppressing side effects,
+    current CPU, suppressing or not suppressing side effects,
     respectively.
 ``q@<addr>`` and ``q!<addr>``
     Refer to the quadruple word at **<addr>** in the program space of
-    the visible CPU, suppressing or not suppressing side effects,
+    the current CPU, suppressing or not suppressing side effects,
     respectively.
 
 Adding access types gives additional possibilities:
 
 ``dw@300``
-    Refers to the word at 300 in the data space of the visible CPU while
+    Refers to the word at 300 in the data space of the current CPU while
     suppressing side effects
 ``id@400``
-    Refers to the double word at 400 in the I/O space of the visible CPU
+    Refers to the double word at 400 in the I/O space of the current CPU
     CPU while suppressing side effects
 ``ppd!<addr>``
     Refers to the double word at physical address **<addr>** in the
-    program space of the visible CPU while not suppressing side effects
+    program space of the current CPU while not suppressing side effects
 ``rw@<addr>``
     Refers to the word at address **<addr>** in the program space of the
-    visible CPU using direct read/write pointer access
+    current CPU using direct read/write pointer access
 
-If we want to access an address space of a device other than the visible
+If we want to access an address space of a device other than the current
 CPU, an address space beyond the first four indices, or a memory region,
 we need to include a tag or name:
 
@@ -344,6 +376,9 @@ we need to include a tag or name:
 ``monitor.mb@78``
     Refers to the byte at 78 in the memory region with the absolute tag
     ``:monitor``
+``..md@202``
+    Refers to the double word at address 202 in the memory region with
+    the same tag path as the current CPU.
 
 Some combinations are not useful.  For example physical and logical
 addresses are equivalent for some CPUs, and direct read/write pointer

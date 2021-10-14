@@ -45,6 +45,7 @@ public:
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_ui_cancel() override { return !m_filename.empty(); }
 	virtual bool custom_mouse_down() override;
 
 private:

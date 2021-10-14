@@ -23,6 +23,7 @@
 #include "emuopts.h"
 #include "natkeyboard.h"
 #include "render.h"
+#include "softlist.h"
 
 #include "corestr.h"
 
@@ -4126,9 +4127,26 @@ void debugger_commands::execute_images(const std::vector<std::string> &params)
 {
 	image_interface_enumerator iter(m_machine.root_device());
 	for (device_image_interface &img : iter)
-		m_console.printf("%s: %s\n", img.brief_instance_name(), img.exists() ? img.filename() : "[empty slot]");
-	if (iter.first() == nullptr)
-		m_console.printf("No image devices in this driver\n");
+	{
+		if (!img.exists())
+		{
+			m_console.printf("%s: [no media]\n", img.brief_instance_name());
+		}
+		else if (img.loaded_through_softlist())
+		{
+			m_console.printf("%s: %s:%s:%s\n",
+					img.brief_instance_name(),
+					img.software_list_name(),
+					img.software_entry()->shortname(),
+					img.part_entry()->name());
+		}
+		else
+		{
+			m_console.printf("%s: %s\n", img.brief_instance_name(), img.filename());
+		}
+	}
+	if (!iter.first())
+		m_console.printf("No image devices present\n");
 }
 
 /*-------------------------------------------------
@@ -4137,21 +4155,18 @@ void debugger_commands::execute_images(const std::vector<std::string> &params)
 
 void debugger_commands::execute_mount(const std::vector<std::string> &params)
 {
-	bool done = false;
 	for (device_image_interface &img : image_interface_enumerator(m_machine.root_device()))
 	{
-		if (img.brief_instance_name() == params[0])
+		if ((img.instance_name() == params[0]) || (img.brief_instance_name() == params[0]))
 		{
 			if (img.load(params[1]) != image_init_result::PASS)
 				m_console.printf("Unable to mount file %s on %s\n", params[1], params[0]);
 			else
 				m_console.printf("File %s mounted on %s\n", params[1], params[0]);
-			done = true;
-			break;
+			return;
 		}
 	}
-	if (!done)
-		m_console.printf("There is no image device :%s\n", params[0]);
+	m_console.printf("No image instance %s\n", params[0]);
 }
 
 /*-------------------------------------------------
@@ -4160,19 +4175,23 @@ void debugger_commands::execute_mount(const std::vector<std::string> &params)
 
 void debugger_commands::execute_unmount(const std::vector<std::string> &params)
 {
-	bool done = false;
 	for (device_image_interface &img : image_interface_enumerator(m_machine.root_device()))
 	{
-		if (img.brief_instance_name() == params[0])
+		if ((img.instance_name() == params[0]) || (img.brief_instance_name() == params[0]))
 		{
-			img.unload();
-			m_console.printf("Unmounted file from : %s\n", params[0]);
-			done = true;
-			break;
+			if (img.exists())
+			{
+				img.unload();
+				m_console.printf("Unmounted media from %s\n", params[0]);
+			}
+			else
+			{
+				m_console.printf("No media mounted on %s\n", params[0]);
+			}
+			return;
 		}
 	}
-	if (!done)
-		m_console.printf("There is no image device :%s\n", params[0]);
+	m_console.printf("No image instance %s\n", params[0]);
 }
 
 
