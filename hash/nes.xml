@@ -62745,6 +62745,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="batmandy" cloneof="batman">
+		<description>Batman - The Video Game (Brazil, pirate)</description>
+		<year>1992?</year>
+		<publisher>Dynacon</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="th21311" />
+			<feature name="pcb_model" value="TH2131-1" />
+			<dataarea name="prg" size="131072">
+				<rom name="nd940-p" size="131072" crc="c3a5e31e" sha1="1093ac63afb276c03315f34f8f35176085d03083" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nd941-c" size="131072" crc="f3b41c18" sha1="04c7ccb51c0a2b211c84289650ebba448d6f5413" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beatnbox">
 		<description>Beat n Box (Kor)</description>
 		<year>19??</year>
@@ -63587,6 +63603,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="65536">
 				<rom name="flying superboy.chr" size="65536" crc="e9b4810d" sha1="7ca6956f689ee714283d7d0d9b9922448fefce88" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fudomyodh" cloneof="demnswrd">
+		<description>Fudou Myouou Den (pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="不動明王伝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ax40g" />
+			<dataarea name="prg" size="262144">
+				<rom name="ying zi chuan shuo 2 - fudou myouou den (j)[p1].prg" size="262144" crc="c23539a5" sha1="edb9c2125bf0ba9c3d39a72f1af5343a18f7d06c" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="ying zi chuan shuo 2 - fudou myouou den (j)[p1].chr" size="131072" crc="aaa9acdd" sha1="4d39604b139e5802f541ee3c0033bd326195731e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

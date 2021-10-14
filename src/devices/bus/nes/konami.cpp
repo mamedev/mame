@@ -55,8 +55,13 @@ nes_konami_vrc1_device::nes_konami_vrc1_device(const machine_config &mconfig, co
 {
 }
 
+nes_konami_vrc2_device::nes_konami_vrc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0)
+{
+}
+
 nes_konami_vrc2_device::nes_konami_vrc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_VRC2, tag, owner, clock), m_latch(0)
+	: nes_konami_vrc2_device(mconfig, NES_VRC2, tag, owner, clock)
 {
 }
 
