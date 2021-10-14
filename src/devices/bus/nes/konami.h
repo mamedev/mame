@@ -109,7 +109,8 @@ protected:
 	uint8_t m_latch, m_mmc_prg_bank;
 
 	void irq_tick();
-	uint16_t m_irq_count, m_irq_count_latch;
+	void irq_ctrl_w(uint8_t data);
+	uint8_t m_irq_count, m_irq_count_latch;
 	int m_irq_enable, m_irq_enable_latch;
 	int m_irq_mode;
 	int m_irq_prescale;
