@@ -397,7 +397,7 @@ static const nes_mmc mmc_list[] =
 	// 359 BMC-SB-5013 multicarts
 	// 360 Bit Corp 31-in-1 (ID 3150) (has five accessible DIP switches!)
 	{ 361, BMC_YY841101C },
-	// 362 JY-005 multicart
+	{ 362, BMC_830506C },
 	// 363 variant of mapper 358?
 	{ 364, BMC_830832C },
 	// 365 is this asderp95 in nes.xml?
@@ -483,7 +483,7 @@ static const nes_mmc mmc_list[] =
 	// 517 another Korean karaoke cart with mic
 	// 518 Subor UNL-DANCE2000 and a few others
 	{ 519, UNL_EH8813A },          // Dr Mario II Chinese pirate
-	// { 520, UNKNOWN }, this is probably 2yudb
+	{ 520, BTL_2YUDB },
 	{ 521, DREAMTECH_BOARD },      // Korean Igo
 	{ 522, UNL_LH10 },             // Fuuun Shaolin Kyo FDS conversion
 	// { 523, UNKNOWN }, likely fengshnb or a clone not yet in nes.xml
