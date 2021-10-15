@@ -48,6 +48,7 @@ menu_audit::menu_audit(mame_ui_manager &mui, render_container &container)
 				std::size_t(0),
 				[] (std::size_t n, ui_system_info const &info) { return n + (info.available ? 0 : 1);  }))
 	, m_future()
+	, m_next(0)
 	, m_audited(0)
 	, m_current(nullptr)
 	, m_cancel(false)
@@ -163,7 +164,7 @@ void menu_audit::handle()
 	case phase::CANCELLATION:
 		process(PROCESS_CUSTOM_ONLY | PROCESS_NOINPUT);
 
-		if ((m_audited.load() >= (m_fast ? m_unavailable : m_availablesorted.size())) || m_cancel.load())
+		if ((m_next.load() >= m_availablesorted.size()) || m_cancel.load())
 		{
 			bool done(true);
 			for (auto &future : m_future)
@@ -195,7 +196,7 @@ bool menu_audit::do_audit()
 {
 	while (true)
 	{
-		std::size_t const i(m_audited.fetch_add(1));
+		std::size_t const i(m_next.fetch_add(1));
 		if (m_availablesorted.size() <= i)
 			return true;
 

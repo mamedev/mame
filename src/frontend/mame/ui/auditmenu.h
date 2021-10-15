@@ -45,6 +45,7 @@ private:
 	std::vector<std::reference_wrapper<ui_system_info> > const &m_availablesorted;
 	std::size_t const m_unavailable;
 	std::vector<std::future<bool> > m_future;
+	std::atomic<std::size_t> m_next;
 	std::atomic<std::size_t> m_audited;
 	std::atomic<ui_system_info const *> m_current;
 	std::atomic<bool> m_cancel;

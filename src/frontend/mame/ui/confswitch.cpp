@@ -391,25 +391,29 @@ bool menu_settings_dip_switches::custom_mouse_down()
 
 	float const x(get_mouse_x() - m_first_nub);
 	float const y(get_mouse_y());
-	for (unsigned n = 0U; switch_groups().size() > n; ++n)
+	for (unsigned n = 0U, line = 0U; (switch_groups().size() > n) && (m_visible_switch_groups > line); ++n)
 	{
 		switch_group_descriptor const &group(switch_groups()[n]);
-		if (group.mask && (y >= m_switch_group_y[n]) && (y < (m_switch_group_y[n] + m_clickable_height)))
+		if (group.mask)
 		{
-			unsigned const cnt(group.switch_count());
-			for (unsigned i = 0U; cnt > i; ++i)
+			++line;
+			if ((y >= m_switch_group_y[n]) && (y < (m_switch_group_y[n] + m_clickable_height)))
 			{
-				if (BIT(group.mask, i))
+				unsigned const cnt(group.switch_count());
+				for (unsigned i = 0U; cnt > i; ++i)
 				{
-					float const xstart(float(i) * m_single_width);
-					if ((x >= xstart) && (x < (xstart + m_nub_width)))
+					if (BIT(group.mask, i))
 					{
-						ioport_field::user_settings settings;
-						group.toggles[i].field->get_user_settings(settings);
-						settings.value ^= group.toggles[i].mask;
-						group.toggles[i].field->set_user_settings(settings);
-						reset(reset_options::REMEMBER_REF);
-						return true;
+						float const xstart(float(i) * m_single_width);
+						if ((x >= xstart) && (x < (xstart + m_nub_width)))
+						{
+							ioport_field::user_settings settings;
+							group.toggles[i].field->get_user_settings(settings);
+							settings.value ^= group.toggles[i].mask;
+							group.toggles[i].field->set_user_settings(settings);
+							reset(reset_options::REMEMBER_REF);
+							return true;
+						}
 					}
 				}
 			}
