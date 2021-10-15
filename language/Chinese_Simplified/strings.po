@@ -890,7 +890,7 @@ msgstr "P3 左摇杆/左"
 #: src/emu/inpttype.ipp:236
 msgctxt "input-name"
 msgid "P3 Left Stick/Right"
-msgstr P3 左摇杆/右"
+msgstr "P3 左摇杆/右"
 
 #: src/emu/inpttype.ipp:237
 msgctxt "input-name"
@@ -1040,7 +1040,7 @@ msgstr "P4 左摇杆/左"
 #: src/emu/inpttype.ipp:270
 msgctxt "input-name"
 msgid "P4 Left Stick/Right"
-msgstr P4 左摇杆/右"
+msgstr "P4 左摇杆/右"
 
 #: src/emu/inpttype.ipp:271
 msgctxt "input-name"
@@ -1190,7 +1190,7 @@ msgstr "P5 左摇杆/左"
 #: src/emu/inpttype.ipp:304
 msgctxt "input-name"
 msgid "P5 Left Stick/Right"
-msgstr P5 左摇杆/右"
+msgstr "P5 左摇杆/右"
 
 #: src/emu/inpttype.ipp:305
 msgctxt "input-name"
@@ -1340,7 +1340,7 @@ msgstr "P6 左摇杆/左"
 #: src/emu/inpttype.ipp:338
 msgctxt "input-name"
 msgid "P6 Left Stick/Right"
-msgstr P6 左摇杆/右"
+msgstr "P6 左摇杆/右"
 
 #: src/emu/inpttype.ipp:339
 msgctxt "input-name"
@@ -1490,7 +1490,7 @@ msgstr "P7 左摇杆/左"
 #: src/emu/inpttype.ipp:372
 msgctxt "input-name"
 msgid "P7 Left Stick/Right"
-msgstr P7 左摇杆/右"
+msgstr "P7 左摇杆/右"
 
 #: src/emu/inpttype.ipp:373
 msgctxt "input-name"
@@ -1640,7 +1640,7 @@ msgstr "P8 左摇杆/左"
 #: src/emu/inpttype.ipp:406
 msgctxt "input-name"
 msgid "P8 Left Stick/Right"
-msgstr P8 左摇杆/右"
+msgstr "P8 左摇杆/右"
 
 #: src/emu/inpttype.ipp:407
 msgctxt "input-name"
@@ -1790,7 +1790,7 @@ msgstr "P9 左摇杆/左"
 #: src/emu/inpttype.ipp:440
 msgctxt "input-name"
 msgid "P9 Left Stick/Right"
-msgstr P9 左摇杆/右"
+msgstr "P9 左摇杆/右"
 
 #: src/emu/inpttype.ipp:441
 msgctxt "input-name"
@@ -1940,7 +1940,7 @@ msgstr "P10 左摇杆/左"
 #: src/emu/inpttype.ipp:474
 msgctxt "input_name"
 msgid "P10 Left Stick/Right"
-msgstr P10 左摇杆/右"
+msgstr "P10 左摇杆/右"
 
 #: src/emu/inpttype.ipp:475
 msgctxt "input_name"
@@ -3170,7 +3170,7 @@ msgstr "显示解码图形"
 #: src/emu/inpttype.ipp:821
 msgctxt "input-name"
 msgid "Frameskip Dec"
-msgstr 减少省略帧数"
+msgstr "减少省略帧数"
 
 #: src/emu/inpttype.ipp:822
 msgctxt "input-name"
