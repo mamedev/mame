@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: kmg, Fabio Priuli
+// copyright-holders:kmg
 /***********************************************************************************************************
 
 
@@ -38,6 +38,8 @@ DEFINE_DEVICE_TYPE(NES_SHUIGUAN,    nes_shuiguan_device,    "nes_shuiguan",    "
 DEFINE_DEVICE_TYPE(NES_T230,        nes_t230_device,        "nes_t230",        "NES Cart T-230 PCB")
 DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
 DEFINE_DEVICE_TYPE(NES_TH21311,     nes_th21311_device,     "nes_th21311",     "NES Cart UNL-TH2131-1 PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_SGZ, nes_waixing_sgz_device, "nes_waixing_sgz", "NES Cart Waixing San Guo Zhi PCB")
+DEFINE_DEVICE_TYPE(NES_HENGG_SHJY3, nes_hengg_shjy3_device, "nes_hengg_shjy3", "NES Cart Henggedianzi Shen Hua Jian Yun III PCB")
 
 
 nes_2yudb_device::nes_2yudb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -87,6 +89,21 @@ nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *
 
 nes_th21311_device::nes_th21311_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_konami_vrc2_device(mconfig, NES_TH21311, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
+}
+
+nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 chr_match)
+	: nes_konami_vrc4_device(mconfig, type, tag, owner, clock), m_chr_match(chr_match)
+{
+}
+
+nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_waixing_sgz_device(mconfig, NES_WAIXING_SGZ, tag, owner, clock, 0x06)
+{
+}
+
+nes_hengg_shjy3_device::nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_waixing_sgz_device(mconfig, NES_HENGG_SHJY3, tag, owner, clock, 0x04)
 {
 }
 
@@ -227,6 +244,19 @@ void nes_th21311_device::pcb_reset()
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_irq_latch = 0;
+}
+
+void nes_waixing_sgz_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+	save_item(NAME(m_chr_mask));
+	save_item(NAME(m_chr_match));
+
+	m_chr_mask = 0xfe;
+
+	// VRC4 pins 3 and 4
+	m_vrc_ls_prg_a = 3;  // A3
+	m_vrc_ls_prg_b = 2;  // A2
 }
 
 
@@ -548,6 +578,57 @@ void nes_th21311_device::write_h(offs_t offset, u8 data)
 		nes_konami_vrc2_device::write_h(offset, data);
 }
 
+/*-------------------------------------------------
+
+ Waixing San Guo Zhi Board, Henggedianzi UNL-SHJY3
+
+ Games: San Guo Zhi (mapper 252), several Chinese
+ hacks of Dragon Ball games (mapper 253)
+
+ VRC4 clones that substitute 2K of CHRRAM in place for
+ two of the standard 1K CHRROM pages. Unusually this is
+ done by a GAL looking at certain address bits of the
+ PPU's address space, as the PPU writes pattern tables.
+
+ iNES: mapper 252 and mapper 253
+
+ In MAME: Supported.
+
+ TODO: Why does Sanguozhi flicker every second or two?
+
+ -------------------------------------------------*/
+
+void nes_waixing_sgz_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("waixing_sgz write_h, offset: %04x, data: %02x\n", offset, data));
+
+	nes_konami_vrc4_device::write_h(offset, data);
+
+	for (int bank = 0; bank < 8; bank++)
+		if ((m_mmc_vrom_bank[bank] & m_chr_mask) == m_chr_match)
+			chr1_x(bank, m_mmc_vrom_bank[bank] & 1, CHRRAM);
+}
+
+void nes_waixing_sgz_device::chr_w(offs_t offset, u8 data)
+{
+	device_nes_cart_interface::chr_w(offset, data);
+
+	switch (m_mmc_vrom_bank[BIT(offset, 10, 3)])
+	{
+		case 0x88:
+			m_chr_mask = 0xfc;
+			m_chr_match = 0x4c;
+			break;
+		case 0xc2:
+			m_chr_mask = 0xfe;
+			m_chr_match = 0x7c;
+			break;
+		case 0xc8:
+			m_chr_mask = 0xfe;
+			m_chr_match = 0x04;
+			break;
+	}
+}
 
 /*-------------------------------------------------
 
