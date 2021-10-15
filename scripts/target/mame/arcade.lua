@@ -3630,6 +3630,7 @@ files {
 	MAME_DIR .. "src/mame/video/segaybd.cpp",
 	MAME_DIR .. "src/mame/includes/segaipt.h",
 	MAME_DIR .. "src/mame/drivers/sg1000a.cpp",
+	MAME_DIR .. "src/mame/drivers/speedbsk.cpp",
 	MAME_DIR .. "src/mame/drivers/stactics.cpp",
 	MAME_DIR .. "src/mame/includes/stactics.h",
 	MAME_DIR .. "src/mame/video/stactics.cpp",

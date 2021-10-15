@@ -1,0 +1,205 @@
+// license:BSD-3-Clause
+// copyright-holders:
+
+/*
+Speed Basketball by Sega (1992)
+https://www.youtube.com/watch?v=efs2KNNncn8
+
+Exciting Boat Race by Sega (1993) (only sound PCB is dumped)
+
+Hardware notes:
+Main PCB marked 'SEGA 1991 171-6202B' with '834-8700' and '921016.0639E' stickers.
+Main components:
+- D70008AC-8 main CPU
+- D71051G serial control unit
+- D71054G programmable timer / counter
+- 2x D71055G parallel interface unit
+- 2x D4701AC incremental encoder counter
+- 315-5338A I/O custom
+- 93C45 serial EEPROM
+- OSC 32.000 MHz
+- 1 4-dip bank
+
+Sound PCB marked 'SOUND SEGA 1991 MADE IN JAPAN' with '837-8724-01' sticker ('837-9653' on Exciting Boat Race')
+Main components:
+- Z0840008PSC audio CPU
+- 315-5476A Sega PCM
+- YM2151
+- TMP82C51AP-8 (D71051C-10 on Exciting Boat Race)
+- Oki M6253
+- OSC 48.000 MHz
+- OSC 16.9344 MHz
+- 1 4-dip bank
+
+
+Notes:
+- Speed Basketball only has some LEDs and lamps, the rest is mechanical.
+- The driver contains the ROMs for the sound PCB of Exciting Boat Race as a placeholder, since it's the same PCB as the one used by Speed Basketball.
+  Exciting Boat Race is a main + satellites arrangement with video, so when the other PCBs are found it should be moved out of here.
+*/
+
+#include "emu.h"
+
+#include "machine/315_5338a.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/msm6253.h"
+#include "machine/pit8253.h"
+#include "machine/upd4701.h"
+#include "sound/rf5c68.h"
+#include "sound/ymopm.h"
+
+#include "speaker.h"
+
+
+namespace {
+
+class speedbsk_state : public driver_device
+{
+public:
+	speedbsk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ }
+
+	void speedbsk(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+
+	void main_map(address_map &map);
+	void audio_map(address_map &map);
+};
+
+
+void speedbsk_state::machine_start()
+{
+}
+
+
+void speedbsk_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+}
+
+void speedbsk_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+}
+
+
+static INPUT_PORTS_START( speedbsk )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW") // on main PCB
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW:4")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // only 4 dips
+
+	PORT_START("DSW2") // on audio PCB
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW:4")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // only 4 dips
+INPUT_PORTS_END
+
+
+void speedbsk_state::speedbsk(machine_config &config)
+{
+	// basic machine hardware
+	Z80(config, m_maincpu, 32_MHz_XTAL / 4); // actually D70008AC-8, divider guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedbsk_state::main_map);
+
+	z80_device &audiocpu(Z80(config, "audiocpu", 48_MHz_XTAL / 12)); // divider guessed
+	audiocpu.set_addrmap(AS_PROGRAM, &speedbsk_state::audio_map);
+
+	I8251(config, "d71051", 0);
+
+	PIT8254(config, "d71054", 0);
+
+	I8255(config, "d71055_0");
+
+	I8255(config, "d71055_1");
+
+	MSM6253(config, "adc", 0);
+
+	UPD4701A(config, "upd4701_0");
+
+	UPD4701A(config, "upd4701_1");
+
+	SEGA_315_5338A(config, "io", 0);
+
+	EEPROM_93C46_8BIT(config, "eeprom"); // Actually 93c45
+
+	// video hardware
+	// TODO: LED screen
+
+	// sound hardware, on sound PCB
+	I8251(config, "tmp82c51", 0);
+
+	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo
+
+	YM2151(config, "ymsnd", 16.9344_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.75); // divider guessed, may use 48_MHz XTAL instead
+
+	RF5C68(config, "rfsnd", 16.9344_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.75); // actually Sega 315-5476A
+}
+
+
+ROM_START( speedbsk )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "epr-14666.ic25", 0x0000, 0x8000, CRC(9f6d896a) SHA1(d7133f7bc8225bca14249d354f35ed2e9290567a) )
+
+	ROM_REGION( 0x200000, "audiocpu", 0 )
+	ROM_LOAD( "epr-14711.ic13",   0x000000, 0x20000, CRC(9b4322c5) SHA1(f68238a85c10528f87d90d383eed64bef9feacde) ) // 11xxxxxxxxxxxxxxx = 0xFF, almost empty
+	ROM_LOAD( "mpr-14712-t.ic14", 0x080000, 0x80000, CRC(4b05f4ba) SHA1(5915d735a6bdf55e651a24342f1ded9c54f5c495) )
+	ROM_LOAD( "mpr-14713-t.ic15", 0x100000, 0x80000, BAD_DUMP CRC(16950cda) SHA1(e32413f9585d31624d05d0e594e70bbc7273eb06) ) // was marked as bad by the dumper
+	// ic16 empty
+
+	ROM_REGION( 0x400, "mainpcb_plds", 0 )
+	ROM_LOAD( "315-5558_peel16v8.ic23", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "315-5559_peel16v8.ic24", 0x200, 0x117, NO_DUMP )
+
+	ROM_REGION( 0x600, "soundpcb_plds", 0 )
+	ROM_LOAD( "315-4499_gal16v8.ic6", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "315-5500_gal16v8.ic7", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "315-5501_gal16v8.ic8", 0x400, 0x117, NO_DUMP )
+ROM_END
+
+// TODO: move this out of this driver when rest of the PCBs are found and dumped
+ROM_START( boatrace )
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x200000, "audiocpu", 0 )
+	ROM_LOAD( "epr-15892.ic13", 0x000000, 0x20000, CRC(3a178efc) SHA1(21b0fa0f962bb0b882d8a9649863fdfb4ecb63db) ) // 11xxxxxxxxxxxxxxx = 0xFF, almost empty
+	ROM_LOAD( "epr-15893.ic14", 0x080000, 0x80000, CRC(4cf30c7b) SHA1(20e9432ec0e55451bce1b193c030707216141f96) )
+	ROM_LOAD( "epr-15894.ic15", 0x100000, 0x80000, CRC(60adad47) SHA1(7a8f373c2d225794c85ee0e7354ace35e757ffa2) )
+	ROM_LOAD( "epr-15895.ic16", 0x180000, 0x80000, CRC(a6bf6eff) SHA1(1a3280464b0b449521d64df665d889c35d6f1fc5) )
+
+	ROM_REGION( 0x600, "soundpcb_plds", 0 )
+	ROM_LOAD( "315-4499_gal16v8.ic6", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "315-5500_gal16v8.ic7", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "315-5501_gal16v8.ic8", 0x400, 0x117, NO_DUMP )
+ROM_END
+
+} // Anonymous namespace
+
+
+GAME( 1992, speedbsk, 0, speedbsk, speedbsk, speedbsk_state, empty_init, ROT0, "Sega", "Speed Basketball", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, boatrace, 0, speedbsk, speedbsk, speedbsk_state, empty_init, ROT0, "Sega", "Exciting Boat Race", MACHINE_IS_SKELETON )

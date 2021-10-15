@@ -38961,6 +38961,10 @@ musicbal                        // (c) 1987
 speedbal                        // (c) 1987
 speedbala                       // (c) 1987
 
+@source:speedbsk.cpp
+boatrace
+speedbsk
+
 @source:speedspn.cpp
 speedspn                        // (c) 1994
 
